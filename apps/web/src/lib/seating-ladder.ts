@@ -1,20 +1,25 @@
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
+
 /** The direction of a ladder: up or down from the start, or around it. */
 export type LadderDirection = 'up' | 'down' | 'around'
 
 /** What a ladder varies: the charge, the seating depth or the powder temperature. */
 type LadderKind = 'charge' | 'seating' | 'temperature'
 
-export const ladderKinds: readonly { value: LadderKind; label: string }[] = [
-  { value: 'charge', label: 'Charge' },
-  { value: 'seating', label: 'Seating' },
-  { value: 'temperature', label: 'Temperature' },
+export const ladderKinds: readonly { value: LadderKind; label: Message }[] = [
+  { value: 'charge', label: msg('Charge') },
+  { value: 'seating', label: msg('Seating') },
+  { value: 'temperature', label: msg('Temperature') },
 ]
 
 /** The kinds a ladder can run. */
 export type RunnableLadderKind = LadderKind
 
 /** What a ladder of `kind` varies, as the page names it: "Charge", "Seating" or "Temperature". */
-export const ladderTitle = (kind: LadderKind) => ladderKinds.find((k) => k.value === kind)?.label
+export const ladderTitle = (kind: LadderKind, t: Translator['t']) => {
+  const found = ladderKinds.find((k) => k.value === kind)
+  return found && t(found.label)
+}
 
 /** A link's or file's ladder kind; anything else is the charge. */
 export const runKindOf = (v: string | null | undefined): RunnableLadderKind =>
@@ -27,11 +32,17 @@ export const runKindOf = (v: string | null | undefined): RunnableLadderKind =>
 export function temperatureLadderBlockReason(
   powderLabel: string | undefined,
   hasSensitivity: boolean,
+  t: Translator['t'],
 ) {
   if (hasSensitivity) return
   return powderLabel
-    ? `${powderLabel} has no temperature sensitivity, so the model cannot vary its burn rate with temperature.`
-    : 'No powder is chosen. The model varies the burn rate with temperature only through the temperature sensitivity of the powder record.'
+    ? t(
+        '{label} has no temperature sensitivity, so the model cannot vary its burn rate with temperature.',
+        { label: powderLabel },
+      )
+    : t(
+        'No powder is chosen. The model varies the burn rate with temperature only through the temperature sensitivity of the powder record.',
+      )
 }
 
 /** The values of a ladder: `start + i * step` up or down, or an odd count centred on `start`, lowest first. */
@@ -53,13 +64,18 @@ export function temperatureLadder(
   steps: number,
   direction: LadderDirection,
   show: (k: number) => string,
+  t: Translator['t'],
 ): { steps: number[] } | { error: string } {
   if (start === undefined)
-    return { error: 'Powder temperature is empty: the temperature ladder starts from it.' }
+    return { error: t('Powder temperature is empty: the temperature ladder starts from it.') }
   const values = ladderValues(start, step, steps, direction)
   const lo = Math.min(...values)
   if (!(lo > 0))
-    return { error: `The ladder reaches ${show(lo)}: a temperature of 0 K or less is no state.` }
+    return {
+      error: t('The ladder reaches {temperature}: a temperature of 0 K or less is no state.', {
+        temperature: show(lo),
+      }),
+    }
   return { steps: values }
 }
 
@@ -98,24 +114,34 @@ export function seatingLadder(
   steps: number,
   direction: LadderDirection,
   show: (m: number) => string,
+  t: Translator['t'],
 ): { steps: SeatingStep[] } | { error: string } {
   const name = seatingLengthName[seat.lengthKind]
-  if (start === undefined) return { error: `${name} is empty: the seating ladder starts from it.` }
+  if (start === undefined)
+    return { error: t('{name} is empty: the seating ladder starts from it.', { name }) }
   const lengths = ladderValues(start, step, steps, direction)
   const [lo, hi] = [Math.min(...lengths), Math.max(...lengths)]
   const [from, to] = seat.range
   // a millionth of a millimetre: a step that lands on the range's end is inside it
   if (lo < from - 1e-9 || hi > to + 1e-9)
     return {
-      error: `${name} ${show(lo)} to ${show(hi)} is outside the seating range ${show(from)} to ${show(to)} of this cartridge and bullet.`,
+      error: t(
+        '{name} {lo} to {hi} is outside the seating range {from} to {to} of this cartridge and bullet.',
+        { name, lo: show(lo), hi: show(hi), from: show(from), to: show(to) },
+      ),
     }
   const out: SeatingStep[] = []
   for (const value of lengths) {
     const { volume, travel } = seat.at(value)
     if (volume === undefined || travel === undefined)
-      return { error: 'The seating ladder needs a case capacity and a barrel length.' }
+      return { error: t('The seating ladder needs a case capacity and a barrel length.') }
     if (volume <= 0)
-      return { error: `The case volume behind the bullet is 0 or less at ${name} ${show(value)}.` }
+      return {
+        error: t('The case volume behind the bullet is 0 or less at {name} {value}.', {
+          name,
+          value: show(value),
+        }),
+      }
     out.push({ value, volume, travel })
   }
   return { steps: out }

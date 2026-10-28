@@ -1,5 +1,6 @@
 import { type InteriorLoad, interiorApply } from '@open-reloading/core'
 import { formatNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { longerBody } from './barrel-length.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 
@@ -42,24 +43,33 @@ export function lotBody(
 }
 
 /** Why `fraction` is no burn-rate change for the lot rows, or undefined. */
-export function lotFractionError(fraction: number | undefined) {
-  if (fraction === undefined) return 'Enter a burn-rate change.'
-  if (!(fraction > 0)) return 'The burn-rate change must be above 0.'
+export function lotFractionError(fraction: number | undefined, t: Translator['t']) {
+  if (fraction === undefined) return t('Enter a burn-rate change.')
+  if (!(fraction > 0)) return t('The burn-rate change must be above 0.')
   if (fraction > maxLotFraction)
-    return `The burn-rate change is at most ${formatNumber(maxLotFraction * 100, 0)} %.`
+    return t('The burn-rate change is at most {percent} %.', { percent: maxLotFraction * 100 })
 }
 
 /** The burn-rate change of a lot as the rows name it: "+3 %" or "−3 %" (U+2212). */
 export const lotLabel = (lot: Lot, fraction: number) =>
-  `${lot === 'high' ? '+' : '−'}${formatNumber(fraction * 100, 1).replace(/\.0$/, '')} %`
+  `${lot === 'high' ? '+' : '−'}${formatNumber(fraction * 100, 1).replace(/[.,]0$/, '')} %`
 
 /** What a screen reader hears of the chart before its values. */
-export const lotChartDescription = (fraction: number, target: boolean) =>
-  `The line is the nominal run. The shaded band spans the barrel times of the nominal row and the rows at a burn rate ${lotLabel('high', fraction)} and ${lotLabel('low', fraction)}.${target ? ' The dashed line is the target barrel time.' : ''} The table gives the values.`
+export const lotChartDescription = (fraction: number, target: boolean, t: Translator['t']) =>
+  [
+    t(
+      'The line is the nominal run. The shaded band spans the barrel times of the nominal row and the rows at a burn rate {high} and {low}.',
+      { high: lotLabel('high', fraction), low: lotLabel('low', fraction) },
+    ),
+    target ? t('The dashed line is the target barrel time.') : '',
+    t('The table gives the values.'),
+  ]
+    .filter(Boolean)
+    .join(' ')
 
 /** The row's burn-rate cell: "nominal", or the lot's change. */
-export const burnRateLabel = (lot: Lot | undefined, fraction: number) =>
-  lot ? lotLabel(lot, fraction) : 'nominal'
+export const burnRateLabel = (lot: Lot | undefined, fraction: number, t: Translator['t']) =>
+  lot ? lotLabel(lot, fraction) : t('nominal')
 
 /** The barrel times of one charge in the nominal run and the two lots, s; absent for a row without a result. */
 export interface BarrelTimes {

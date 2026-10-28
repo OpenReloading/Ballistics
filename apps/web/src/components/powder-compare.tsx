@@ -3,8 +3,17 @@
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
 import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import { refusalText, targetError, targetNumber, targetUnit } from '../lib/charge-target.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import {
+  noComparableLimitText,
+  refusalText,
+  targetError,
+  targetNumber,
+  targetUnit,
+} from '../lib/charge-target.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
   type ColumnSort,
@@ -21,34 +30,45 @@ import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { shownLength } from '../lib/workbench.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
-import { type CompareRow, usePowderCompare } from './use-powder-compare.ts'
+import {
+  type CompareMessage,
+  type CompareRow,
+  noBulkDensity,
+  reasonText,
+  usePowderCompare,
+} from './use-powder-compare.ts'
 import { useLoad } from './workbench-context.ts'
 import { flagView } from './workbench-readouts.tsx'
 
 type Column = {
   key: string
-  label: string
+  label: Message
   /** The quantity whose unit symbol follows the label. */
   unit?: 'charge' | 'pressure' | 'velocity' | undefined
   value: (r: CompareRow) => string | number | undefined
 }
 
 const columns: readonly Column[] = [
-  { key: 'powder', label: 'Powder', value: (r) => productLabel(r) },
-  { key: 'charge', label: 'Charge', unit: 'charge', value: (r) => r.charge },
-  { key: 'flags', label: 'Flags', value: (r) => r.flag },
-  { key: 'peak', label: 'Peak pressure', unit: 'pressure', value: (r) => r.values?.peak },
-  { key: 'percent', label: 'Percent of maximum', value: (r) => r.values?.percent },
-  { key: 'velocity', label: 'Muzzle velocity', unit: 'velocity', value: (r) => r.values?.velocity },
-  { key: 'fill', label: 'Case fill', value: (r) => r.ratio },
-  { key: 'burnt', label: 'Burnt at the muzzle', value: (r) => r.values?.burnt },
-  { key: 'burnout', label: 'Burnout', value: (r) => r.values?.burnout },
+  { key: 'powder', label: msg('Powder'), value: (r) => productLabel(r) },
+  { key: 'charge', label: msg('Charge'), unit: 'charge', value: (r) => r.charge },
+  { key: 'flags', label: msg('Flags'), value: (r) => r.flag },
+  { key: 'peak', label: msg('Peak pressure'), unit: 'pressure', value: (r) => r.values?.peak },
+  { key: 'percent', label: msg('Percent of maximum'), value: (r) => r.values?.percent },
+  {
+    key: 'velocity',
+    label: msg('Muzzle velocity'),
+    unit: 'velocity',
+    value: (r) => r.values?.velocity,
+  },
+  { key: 'fill', label: msg('Case fill'), value: (r) => r.ratio },
+  { key: 'burnt', label: msg('Burnt at the muzzle'), value: (r) => r.values?.burnt },
+  { key: 'burnout', label: msg('Burnout'), value: (r) => r.values?.burnout },
 ]
 
 /** The target mode shows the pressure range at the charge found where the other modes show the peak. */
 const rangeColumn: Column = {
   key: 'range',
-  label: 'Pressure range',
+  label: msg('Pressure range'),
   unit: 'pressure',
   value: (r) => r.values?.range.low,
 }
@@ -78,6 +98,7 @@ function SortHead({
   system: UnitSystem
   onSort: (sort: ColumnSort | undefined) => void
 }) {
+  const { t } = useTranslation()
   return (
     <th
       scope="col"
@@ -87,7 +108,7 @@ function SortHead({
     >
       <UnstyledButton className="sort-button" onClick={() => onSort(nextSort(c.key, dir))}>
         <span>
-          {c.label}
+          {t(c.label)}
           {c.unit && <span className="th-unit"> {system[c.unit].symbol}</span>}
         </span>
         {dir && (
@@ -106,16 +127,17 @@ function SortHead({
 
 /** The case fill of a row; the reason it is unknown is the title. */
 function FillCell({ ratio }: { ratio: number | undefined }) {
+  const { t } = useTranslation()
   return (
     <td
-      data-label="Case fill"
+      data-label={t('Case fill')}
       className="num"
-      title={ratio === undefined ? 'No bulk density in the record' : undefined}
+      title={ratio === undefined ? t(noBulkDensity) : undefined}
     >
       {ratio === undefined ? (
         <>
           <span aria-hidden="true">&ndash;</span>
-          <span className="visually-hidden">unknown</span>
+          <span className="visually-hidden">{t('unknown')}</span>
         </>
       ) : (
         `${formatNumber(ratio * 100, 0)} %`
@@ -138,31 +160,44 @@ function ValueCells({
   target: boolean
   system: UnitSystem
 }) {
+  const { t } = useTranslation()
+  const flag = r.flagText?.(t)
   return (
     <>
-      <td data-label="Flags">{r.flag && flagView(r.flag)}</td>
+      <td data-label={t('Flags')}>{flag && flagView(flag)}</td>
       {target ? (
-        <td data-label={`Pressure range, ${system.pressure.symbol}`} className="num">
-          {formatQuantity('pressure', system, values.range.low)} to{' '}
-          {formatQuantity('pressure', system, values.range.high)}
+        <td
+          data-label={t('Pressure range, {unit}', { unit: system.pressure.symbol })}
+          className="num"
+        >
+          {t('{low} to {high}', {
+            low: formatQuantity('pressure', system, values.range.low),
+            high: formatQuantity('pressure', system, values.range.high),
+          })}
         </td>
       ) : (
-        <td data-label={`Peak pressure, ${system.pressure.symbol}`} className="num">
+        <td
+          data-label={t('Peak pressure, {unit}', { unit: system.pressure.symbol })}
+          className="num"
+        >
           {formatQuantity('pressure', system, values.peak)}
         </td>
       )}
-      <td data-label="Percent of maximum" className="num">
-        {values.percent === undefined ? 'no limit' : `${formatNumber(values.percent, 0)} %`}
+      <td data-label={t('Percent of maximum')} className="num">
+        {values.percent === undefined ? t('no limit') : `${formatNumber(values.percent, 0)} %`}
       </td>
-      <td data-label={`Muzzle velocity, ${system.velocity.symbol}`} className="num">
+      <td
+        data-label={t('Muzzle velocity, {unit}', { unit: system.velocity.symbol })}
+        className="num"
+      >
         {formatQuantity('velocity', system, values.velocity)}
       </td>
       <FillCell ratio={r.ratio} />
-      <td data-label="Burnt at the muzzle" className="num">
+      <td data-label={t('Burnt at the muzzle')} className="num">
         {formatNumber(values.burnt * 100, 0)} %
       </td>
-      <td data-label="Burnout" className="num">
-        {values.burnout === undefined ? 'none' : shownLength('travel', system, values.burnout)}
+      <td data-label={t('Burnout')} className="num">
+        {values.burnout === undefined ? t('none') : shownLength('travel', system, values.burnout)}
       </td>
     </>
   )
@@ -183,27 +218,31 @@ function PowderRow({
   system: UnitSystem
   onOpen: (row: CompareRow) => void
 }) {
+  const { t } = useTranslation()
   return (
     <tr aria-current={r.id === current ? 'true' : undefined}>
-      <td data-label="Powder">
+      <td data-label={t('Powder')}>
         <UnstyledButton
           className="powder-open"
-          title="Use this powder in the workbench"
+          title={t('Use this powder in the workbench')}
           onClick={() => onOpen(r)}
         >
           {productLabel(r)}
         </UnstyledButton>
-        {r.id === current && <span className="barrel-current"> current</span>}
+        {r.id === current && <span className="barrel-current"> {t('current')}</span>}
       </td>
-      <td data-label={`Charge, ${system.charge.symbol}`} className="num">
+      <td data-label={t('Charge, {unit}', { unit: system.charge.symbol })} className="num">
         {r.charge !== undefined && formatQuantity('charge', system, r.charge)}
       </td>
       {r.values ? (
         <ValueCells row={r} values={r.values} target={target} system={system} />
       ) : (
-        <td data-label="Result" colSpan={columns.length - 2}>
-          Not computed:{' '}
-          {r.refusal ? refusalText(r.refusal, 'peakPressure', system, percent) : r.reason}
+        <td data-label={t('Result')} colSpan={columns.length - 2}>
+          {t('Not computed: {reason}', {
+            reason: r.refusal
+              ? refusalText(r.refusal, 'peakPressure', system, percent, t)
+              : reasonText(r.reason ?? '', t),
+          })}
         </td>
       )}
     </tr>
@@ -231,11 +270,12 @@ const Rows = memo(function Rows({
   current: string | undefined
   onOpen: (row: CompareRow) => void
 }) {
+  const { t } = useTranslation()
   return (
-    <ScrollRegion label="Powders for this load">
+    <ScrollRegion label={t('Powders for this load')}>
       {withTableRoles(
         <table className="limits ladder-table powder-table">
-          <caption className="visually-hidden">Powders for this load (simulation)</caption>
+          <caption className="visually-hidden">{t('Powders for this load (simulation)')}</caption>
           <thead>
             <tr>
               {columnsFor(target).map((c, i) => (
@@ -306,30 +346,54 @@ function isStale(
 }
 
 /** The status line: the progress or the count, the message, the target's reason, staleness and the standing notice. */
-function statusText(o: {
-  running: boolean
-  progress: { done: number; total: number } | undefined
-  shown: number
-  total: number
-  failed: number
-  message: string | undefined
-  targetShown: string | undefined
-  stale: boolean
-}) {
+function statusText(
+  o: {
+    running: boolean
+    progress: { done: number; total: number } | undefined
+    shown: number
+    total: number
+    failed: number
+    message: CompareMessage | undefined
+    targetShown: string | undefined
+    stale: boolean
+  },
+  t: Translator['t'],
+) {
   let head: string | undefined
-  if (o.running && o.progress) head = `Computing ${o.progress.done} of ${o.progress.total} powders`
-  else if (o.total > 0) {
-    const count = o.shown === o.total ? o.total : `${o.shown} of ${o.total}`
-    head = `${count} powders, ${o.failed} not computed`
-  }
+  if (o.running && o.progress)
+    head = t('Computing {done} of {total} powders', {
+      done: o.progress.done,
+      total: o.progress.total,
+    })
+  else if (o.total > 0)
+    head =
+      o.shown === o.total
+        ? t('{total} powders, {failed} not computed', { total: o.total, failed: o.failed })
+        : t('{shown} of {total} powders, {failed} not computed', {
+            shown: o.shown,
+            total: o.total,
+            failed: o.failed,
+          })
   const parts = [
     head,
-    o.message,
+    o.message && messageText(o.message, t),
     o.targetShown,
-    o.stale ? 'Inputs changed since these rows' : undefined,
-    'Simulation, not load data. A row is no recommendation',
+    o.stale ? t('Inputs changed since these rows') : undefined,
+    t('Simulation, not load data. A row is no recommendation'),
   ].filter(Boolean)
   return `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.`
+}
+
+/** The line after a batch that stopped early or failed. */
+function messageText(message: CompareMessage, t: Translator['t']) {
+  if (message.kind === 'stopped')
+    return t('Stopped. {reason}', { reason: t(noComparableLimitText) })
+  if (message.kind === 'cancelled')
+    return t('Cancelled after {done} of {total} powders.', {
+      done: message.done,
+      total: message.total,
+    })
+  return translateMessage(message.text, t)
 }
 
 /** Whether the row's charge is not the typed one (to a part in a billion). */
@@ -386,11 +450,12 @@ function ChargeInput({
   onFill: (v: number | string) => void
   fillValid: boolean
 }) {
+  const { t } = useTranslation()
   if (kind === 'target')
     return (
       <NumberInput
         size={controlSize.row.input}
-        aria-label="Target peak pressure"
+        aria-label={t('Target peak pressure')}
         suffix={` ${unit.symbol}`}
         hideControls
         allowNegative={false}
@@ -408,7 +473,7 @@ function ChargeInput({
   return (
     <NumberInput
       size={controlSize.row.input}
-      aria-label="Case fill"
+      aria-label={t('Case fill')}
       suffix=" %"
       min={caseFillPercentRange.min}
       max={caseFillPercentRange.max}
@@ -428,6 +493,7 @@ function ChargeInput({
  * until Compute.
  */
 export function PowderCompare({ system }: { system: UnitSystem }) {
+  const { t } = useTranslation()
   const { loadRequest, powder, choosePowder, applyCharge, fields, cartridge } = useLoad()
   const [kind, setKind] = useState<CompareMode['kind']>('typed')
   const [fill, setFill] = useState<number | string>(caseFillPercentRange.initial)
@@ -439,7 +505,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const unit = targetUnit('peakPressure', system, asPercent)
   // the reason shows for a typed value, and for an empty field once it was left
   const [targetLeft, setTargetLeft] = useState(false)
-  const targetReason = targetError(targetText, unit)
+  const targetReason = targetError(targetText, unit, t)
   const targetValid = targetReason === undefined
   const targetShown = targetText !== '' || targetLeft ? targetReason : undefined
   const mode = modeOf(
@@ -478,16 +544,19 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     () => isStale(loadRequest, mode, study.key, running),
     [loadRequest, mode, study.key, running],
   )
-  const text = statusText({
-    running,
-    progress,
-    shown: shown.length,
-    total: study.rows.length,
-    failed,
-    message,
-    targetShown,
-    stale,
-  })
+  const text = statusText(
+    {
+      running,
+      progress,
+      shown: shown.length,
+      total: study.rows.length,
+      failed,
+      message,
+      targetShown,
+      stale,
+    },
+    t,
+  )
   const open = (r: CompareRow) => {
     choosePowder(r.id)
     // the row's values are for its charge: a case fill row sets it too
@@ -511,11 +580,11 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       <div className="powder-controls">
         <SegmentedControl
           size={controlSize.row.toggle}
-          aria-label="Charge"
+          aria-label={t('Charge')}
           data={[
-            { value: 'typed', label: 'Typed charge' },
-            { value: 'fill', label: 'Case fill' },
-            { value: 'target', label: 'Target' },
+            { value: 'typed', label: t('Typed charge') },
+            { value: 'fill', label: t('Case fill') },
+            { value: 'target', label: t('Target') },
           ]}
           value={kind}
           onChange={(v) => setKind(v as CompareMode['kind'])}
@@ -536,14 +605,14 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           variant="default"
           aria-pressed={asPercent}
           disabled={kind !== 'target' || cartridge === undefined}
-          title="Read the target as a percentage of the cartridge's CIP Pmax"
+          title={t("Read the target as a percentage of the cartridge's CIP Pmax")}
           onClick={() => {
             setPercent(!asPercent)
             setTargetText('')
             setTargetLeft(false)
           }}
         >
-          % Pmax
+          {t('% Pmax')}
         </Button>
         <Button
           size={controlSize.row.button}
@@ -551,13 +620,13 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           disabled={!running && !modeValid(kind, fillValid, targetValid)}
           onClick={running ? study.cancel : study.compute}
         >
-          {running ? 'Cancel' : 'Compute'}
+          {running ? t('Cancel') : t('Compute')}
         </Button>
       </div>
       <div className="powder-filters">
-        {select('manufacturerName', 'Manufacturer', manufacturers)}
-        {select('base', 'Base', bases)}
-        {select('form', 'Form', forms)}
+        {select('manufacturerName', t('Manufacturer'), manufacturers)}
+        {select('base', t('Base'), bases)}
+        {select('form', t('Form'), forms)}
       </div>
       <p className="barrel-status" aria-hidden="true">
         <span className="barrel-status-text" title={text}>
@@ -566,7 +635,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       </p>
       {/* the count changes with every answer: the live region says only start, end and cancel */}
       <p className="visually-hidden" role="status">
-        {running ? 'Computing powders.' : text}
+        {running ? t('Computing powders.') : text}
       </p>
       <Rows
         rows={shown}

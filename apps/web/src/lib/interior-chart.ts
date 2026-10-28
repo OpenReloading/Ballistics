@@ -1,6 +1,7 @@
 /** The workbench interior chart: curves, events, limit lines and the ECharts option. */
 
 import { plainNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { nth } from './nth.ts'
 import { type PlaybackResult, type PlaybackSample, sampler } from './playback.ts'
@@ -62,7 +63,11 @@ function burntTime(points: readonly Point[], f: number) {
  * is in the barrel: from the shot start up to, not including, the muzzle exit (a line at the muzzle
  * would lie on the muzzle line).
  */
-export function chartEvents(r: PlaybackResult, z1?: number): ChartEvent[] {
+export function chartEvents(
+  r: PlaybackResult,
+  z1: number | undefined,
+  t: Translator['t'],
+): ChartEvent[] {
   const events: ChartEvent[] = []
   if (r.tenPercentPressureTime > 0)
     events.push({ key: 'tenPercent', label: '10 %', time: r.tenPercentPressureTime })
@@ -72,10 +77,10 @@ export function chartEvents(r: PlaybackResult, z1?: number): ChartEvent[] {
       events.push({ key, label, time })
   }
   if (z1 !== undefined && z1 < 1) inBarrel('z1', 'z1', z1)
-  events.push({ key: 'peak', label: 'peak', time: r.maxPressureTime })
+  events.push({ key: 'peak', label: t('peak'), time: r.maxPressureTime })
   inBarrel('burnt', '95 %', burntFractionLine)
-  if (r.burnout) events.push({ key: 'burnout', label: 'burnout', time: r.burnout.time })
-  events.push({ key: 'muzzle', label: 'muzzle', time: r.muzzleTime })
+  if (r.burnout) events.push({ key: 'burnout', label: t('burnout'), time: r.burnout.time })
+  events.push({ key: 'muzzle', label: t('muzzle'), time: r.muzzleTime })
   return events.sort((a, b) => a.time - b.time)
 }
 
@@ -160,7 +165,7 @@ const referenceLines = [85, 75] as const
  * Lines at the first compared limit with a pressure, as "Percent of maximum" uses, and at the
  * `referenceLines` percentages of it, in display units; undefined without such a limit. Never "safe".
  */
-export function limitLines(limits: Limit[] | undefined, system: UnitSystem) {
+export function limitLines(limits: Limit[] | undefined, system: UnitSystem, t: Translator['t']) {
   const l = firstPressureLimit(limits)
   if (l?.pressure === undefined) return
   const name = `CIP ${l.symbol}`
@@ -168,7 +173,10 @@ export function limitLines(limits: Limit[] | undefined, system: UnitSystem) {
   const max = system.pressure.fromSi(l.pressure)
   return [
     { y: max, label: `${name} ${value}` },
-    ...referenceLines.map((m) => ({ y: (max * m) / 100, label: `${m} % of ${name}` })),
+    ...referenceLines.map((m) => ({
+      y: (max * m) / 100,
+      label: t('{percent} % of {name}', { percent: m, name }),
+    })),
   ]
 }
 
@@ -467,6 +475,7 @@ export function interiorOption({
   theme,
   animate,
   z1,
+  t,
 }: {
   steps: Step[]
   selected: number
@@ -479,12 +488,13 @@ export function interiorOption({
   animate: boolean
   /** The run's burn form z1, for its event line. */
   z1?: number | undefined
+  t: Translator['t']
 }) {
   const shown = shownQuantities(show)
   const r = nth(steps, selected).result
   const at = sampler(r.points)
   const xs = steps.flatMap((s) => s.result.points.map((p) => chartX(p, x, system)))
-  const events = chartEvents(r, z1)
+  const events = chartEvents(r, z1, t)
   // reduce, not a spread: a ladder of long runs passes the engine's argument limit
   const xMax = xs.reduce((a, v) => Math.max(a, v), -Infinity)
   const xMin = xs.reduce((a, v) => Math.min(a, v), Infinity)

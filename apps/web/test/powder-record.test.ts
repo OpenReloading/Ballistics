@@ -1,6 +1,7 @@
 import { powderModelValues, recordResistance } from '@open-reloading/core'
 import type { Powder } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   fitTables,
   fittedEnergyRatio,
@@ -71,22 +72,24 @@ it('gives the model fields in SI, the start pressure by the rule of the fit', ()
 it('marks a field from the record, fitted or a fixed input, and an edit after the fill', () => {
   const origin = powderModelValues(powder) ?? {}
   const shown = (si: number) => `${si} u`
-  expect(recordMark(powder, origin, 'vivacity', 0.5, shown)).toBe('From the record (fitted).')
-  expect(recordMark(powder, origin, 'gamma', 1.24, shown)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'record', english.t)).toBe(
+    'From the record (fitted).',
+  )
+  expect(recordMark(powder, origin, 'gamma', 1.24, shown, 'record', english.t)).toBe(
     'From the record (input of the fit).',
   )
-  expect(recordMark(powder, origin, 'vivacity', 0.6, shown)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'record', english.t)).toBe(
     'Changed from the record value 0.5 u.',
   )
-  expect(recordMark(powder, origin, 'vivacity', undefined, shown)).toBe(
+  expect(recordMark(powder, origin, 'vivacity', undefined, shown, 'record', english.t)).toBe(
     'Changed from the record value 0.5 u.',
   )
-  expect(recordMark(powder, origin, 'charge', 0.002, shown)).toBeUndefined()
+  expect(recordMark(powder, origin, 'charge', 0.002, shown, 'record', english.t)).toBeUndefined()
   // the values of a user design say so
-  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'user design')).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.5, shown, 'user design', english.t)).toBe(
     'From the user design (fitted).',
   )
-  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'user design')).toBe(
+  expect(recordMark(powder, origin, 'vivacity', 0.6, shown, 'user design', english.t)).toBe(
     'Changed from the user design value 0.5 u.',
   )
 })
@@ -114,7 +117,7 @@ it('applies the bore resistance of the record from the cartridge, bullet length 
 
 it("marks a start pressure the record does not hold as the fit's rule", () => {
   const origin = powderModelValues(powder) ?? {}
-  expect(recordMark(powder, origin, 'startPressure', 30e6, String)).toBe(
+  expect(recordMark(powder, origin, 'startPressure', 30e6, String, 'record', english.t)).toBe(
     "From the fit's start pressure rule for barrels of 300 mm and longer.",
   )
 })

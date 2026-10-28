@@ -11407,3 +11407,33 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     color: var(--muted);
   }
 }
+
+/* the Run button of the page bar keeps its width for the longer German word */
+@media screen and (min-width: 75em) {
+  :lang(de) .page-bar .bar-run {
+    padding-inline-end: 0.375rem;
+  }
+}
+
+/* German words run longer: where the columns are narrow (75em to 108em) the labels of the
+   workbench's input cards take the smaller size and keep one line */
+@media screen and (min-width: 75em) and (max-width: 107.99em) {
+  :lang(de)
+    .workbench
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-InputWrapper-root
+    > .mantine-InputWrapper-label,
+  :lang(de) .workbench .workspace-inputs :is(.record-row, .seating-row) > :first-child {
+    font-size: var(--mantine-font-size-xs);
+  }
+
+  /* the readout rows and columns keep narrower gaps, for the longer labels and phrases */
+  :lang(de) .workbench .readouts.readout-list {
+    column-gap: 0.5rem;
+  }
+
+  :lang(de) .workbench .readouts.readout-list > div {
+    gap: 0.25rem;
+  }
+}

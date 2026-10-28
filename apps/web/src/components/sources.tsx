@@ -1,5 +1,9 @@
+'use client'
+
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
 import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg } from '../i18n/translate.ts'
 import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
@@ -11,24 +15,26 @@ const note = (text: string) => text.replaceAll(', not load data', '')
 
 type Has = (k: keyof Source) => boolean
 
+const columns: [keyof Source, Message][] = [
+  ['origin', msg('Origin')],
+  ['retrieved', msg('Retrieved')],
+  ['license', msg('License')],
+  ['fields', msg('Covers')],
+  ['note', msg('Note')],
+]
+
 function SourcesHead({ has }: { has: Has }) {
-  const columns: [keyof Source, string][] = [
-    ['origin', 'Origin'],
-    ['retrieved', 'Retrieved'],
-    ['license', 'License'],
-    ['fields', 'Covers'],
-    ['note', 'Note'],
-  ]
+  const { t } = useTranslation()
   return (
     <TableTr role="row">
       <TableTh scope="col" role="columnheader">
-        Source
+        {t('Source')}
       </TableTh>
       {columns
         .filter(([key]) => has(key))
         .map(([key, label]) => (
           <TableTh key={key} scope="col" role="columnheader">
-            {label}
+            {t(label)}
           </TableTh>
         ))}
     </TableTr>
@@ -36,12 +42,19 @@ function SourcesHead({ has }: { has: Has }) {
 }
 
 function SourceMeta({ source: s }: { source: Source }) {
+  const { t } = useTranslation()
   return (
     <span className="source-meta">
       {s.publisher && <span>{s.publisher}</span>}
       {s.edition && <span>{s.edition}</span>}
       {s.terms && (
-        <span>{isWebLink(s.terms) ? <a href={s.terms}>Terms</a> : `Terms: ${s.terms}`}</span>
+        <span>
+          {isWebLink(s.terms) ? (
+            <a href={s.terms}>{t('Terms')}</a>
+          ) : (
+            t('Terms: {terms}', { terms: s.terms })
+          )}
+        </span>
       )}
       {s.sha256 && <CopyHash hash={s.sha256} />}
     </span>
@@ -49,16 +62,18 @@ function SourceMeta({ source: s }: { source: Source }) {
 }
 
 function CoversCell({ fields }: { fields: string[] | undefined }) {
-  if (!fields) return 'whole record'
+  const { t, tn } = useTranslation()
+  if (!fields) return t('whole record')
   return (
     <Noted
-      value={`${fields.length} ${fields.length === 1 ? 'field' : 'fields'}`}
+      value={tn(fields.length, '{count} field', '{count} fields')}
       notes={[fields.join(', ')]}
     />
   )
 }
 
 function SourceRow({ source: s, has }: { source: Source; has: Has }) {
+  const { t } = useTranslation()
   return (
     <TableTr role="row">
       <TableTh scope="row" role="rowheader">
@@ -68,27 +83,27 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
         <SourceMeta source={s} />
       </TableTh>
       {has('origin') && (
-        <TableTd role="cell" data-label="Origin">
+        <TableTd role="cell" data-label={t('Origin')}>
           {s.origin}
         </TableTd>
       )}
       {has('retrieved') && (
-        <TableTd role="cell" className="nowrap" data-label="Retrieved">
+        <TableTd role="cell" className="nowrap" data-label={t('Retrieved')}>
           {s.retrieved && <Day day={s.retrieved} />}
         </TableTd>
       )}
       {has('license') && (
-        <TableTd role="cell" data-label="License">
+        <TableTd role="cell" data-label={t('License')}>
           {s.license}
         </TableTd>
       )}
       {has('fields') && (
-        <TableTd role="cell" className="nowrap" data-label="Covers">
+        <TableTd role="cell" className="nowrap" data-label={t('Covers')}>
           <CoversCell fields={s.fields} />
         </TableTd>
       )}
       {has('note') && (
-        <TableTd role="cell" data-label="Note">
+        <TableTd role="cell" data-label={t('Note')}>
           {s.note && note(s.note)}
         </TableTd>
       )}
@@ -104,11 +119,12 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
  * (`data-label`), so every table element carries its ARIA role.
  */
 export function Sources({ provenance }: { provenance: Provenance }) {
+  const { t } = useTranslation()
   const list = provenance.sources
   const has = (k: keyof Source) => list.some((s) => s[k] !== undefined)
   return (
     <>
-      <ScrollRegion label="Sources table">
+      <ScrollRegion label={t('Sources table')}>
         <Table className="sources" role="table">
           <TableThead role="rowgroup">
             <SourcesHead has={has} />

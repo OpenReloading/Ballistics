@@ -1,5 +1,6 @@
 import { interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'
 import {
   type ChartQuantity,
@@ -32,7 +33,7 @@ const run = (
 // a faster burn than the example, as in playback.test.ts: it burns out in the barrel
 const r = run({ vivacity: 1 })
 const mass = interiorBody(exampleInterior).load.bullet.mass
-const events = playbackEvents(r)
+const events = playbackEvents(r, english.t)
 const stops = events.map((e) => e.time)
 
 /** Small deterministic pseudo-random numbers in [0, 1). */

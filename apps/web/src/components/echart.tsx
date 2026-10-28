@@ -171,7 +171,7 @@ export function EChart({
   }, [height])
 
   // the labels and tooltips are written by the option's formatters: a change of language draws them again
-  const { language } = useTranslation()
+  const { language, t } = useTranslation()
   const drawnIn = useRef(language)
   useEffect(() => {
     if (!chart.current || (drawn.current === option && drawnIn.current === language)) return
@@ -225,7 +225,7 @@ export function EChart({
         ref={keys}
         type="range"
         className="visually-hidden echart-keys"
-        aria-label={`${title}, readout`}
+        aria-label={t('{title}, readout', { title })}
         aria-describedby={`${id}-d`}
         aria-keyshortcuts="ArrowLeft ArrowRight Home End"
         min={0}
@@ -242,7 +242,7 @@ export function EChart({
         }}
       />
       <p id={`${id}-d`} className="visually-hidden">
-        {description} Arrow keys move the readout along the curve.
+        {description} {t('Arrow keys move the readout along the curve.')}
       </p>
     </div>
   )
