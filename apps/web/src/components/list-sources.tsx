@@ -4,6 +4,8 @@ import { ActionIcon, Badge, Button, Checkbox, Group, Popover, Stack, Tooltip } f
 import type { UserRecord } from '@open-reloading/schema'
 import { CaretDown, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import {
   type Origin,
   originNames,
@@ -25,6 +27,7 @@ import type { DirectoryColumn } from './directory-table.tsx'
  * a list row and drops the row.
  */
 export function useUserRecords(reread?: unknown) {
+  const { t } = useTranslation()
   const [records, setRecords] = useState<UserRecord[]>([])
   // biome-ignore lint/correctness/useExhaustiveDependencies: `reread` only restarts the read
   useEffect(() => {
@@ -45,8 +48,8 @@ export function useUserRecords(reread?: unknown) {
       if (
         !id ||
         !(await confirmDialog({
-          title: `Delete ${name} from this browser? This cannot be undone.`,
-          confirmLabel: 'Delete',
+          title: t('Delete {name} from this browser? This cannot be undone.', { name }),
+          confirmLabel: t('Delete'),
           danger: true,
         }))
       )
@@ -55,14 +58,14 @@ export function useUserRecords(reread?: unknown) {
         await deleteRecords([id])
       } catch {
         await confirmDialog({
-          title: `${name} was not deleted: the browser refused.`,
-          confirmLabel: 'OK',
+          title: t('{name} was not deleted: the browser refused.', { name }),
+          confirmLabel: t('OK'),
         })
         return
       }
       setRecords((rs) => rs.filter((r) => r.id !== id))
     },
-    [records],
+    [records, t],
   )
   return [records, remove] as const
 }
@@ -105,9 +108,12 @@ export function SourceFilter({
   onChange: (src: string) => void
   sources?: readonly Origin[]
 }) {
+  const { t } = useTranslation()
   const shown = readOrigins(src, sources)
   const text =
-    shown.length === sources.length ? 'All sources' : shown.map((o) => originNames[o]).join(', ')
+    shown.length === sources.length
+      ? t('All sources')
+      : shown.map((o) => t(originNames[o])).join(', ')
   return (
     <AppPopover position="bottom-start" trapFocus>
       <Popover.Target>
@@ -116,7 +122,7 @@ export function SourceFilter({
           data-set={shown.length < sources.length || undefined}
           variant="default"
           size={controlSize.row.button}
-          aria-label={`Source: ${text}`}
+          aria-label={t('Source: {text}', { text })}
           aria-haspopup="dialog"
           w="9rem"
           rightSection={<CaretDown size={12} aria-hidden="true" />}
@@ -131,13 +137,13 @@ export function SourceFilter({
             const checked = shown.includes(o)
             const last = checked && shown.length === 1
             return (
-              <Tooltip key={o} label="At least one source stays on" disabled={!last}>
+              <Tooltip key={o} label={t('At least one source stays on')} disabled={!last}>
                 <Checkbox
                   checked={checked}
                   disabled={last}
                   label={
                     <Group component="span" justify="space-between" gap="md" wrap="nowrap">
-                      <span>{originNames[o]}</span>
+                      <span>{t(originNames[o])}</span>
                       <span className="source-count">{counts[o]}</span>
                     </Group>
                   }
@@ -162,22 +168,32 @@ export function sourceColumn<T extends { id: string; origin?: 'user' | undefined
 ): DirectoryColumn<T> {
   return {
     key: 'source',
-    label: 'Source',
-    help: 'Mine: designs saved in this browser. Rows without a mark are the OpenReloading catalog.',
+    label: msg('Source'),
+    help: msg(
+      'Mine: designs saved in this browser. Rows without a mark are the OpenReloading catalog.',
+    ),
     width: '6.5rem',
     value: (r) => originOf(r),
     cell: (r, tabIndex) =>
       r.origin === 'user' ? (
         <Group component="span" display="inline-flex" gap={4} wrap="nowrap">
           <Badge variant="filled" size="sm" tt="none" className="source-badge">
-            {originNames.user}
+            <OriginName origin="user" />
           </Badge>
           <DeleteRow row={r} name={name(r)} onDelete={onDelete} tabIndex={tabIndex} />
         </Group>
       ) : (
-        <span className="visually-hidden">{originNames.openreloading}</span>
+        <span className="visually-hidden">
+          <OriginName origin="openreloading" />
+        </span>
       ),
   }
+}
+
+/** The name of a source in the language shown. */
+function OriginName({ origin }: { origin: Origin }) {
+  const { t } = useTranslation()
+  return t(originNames[origin])
 }
 
 /** A Mine row's Delete: in the Source column, and on a phone (where that column is hidden) at the row's end. */
@@ -192,15 +208,16 @@ export function DeleteRow({
   onDelete: (rowId: string, name: string) => void
   tabIndex: number
 }) {
+  const { t } = useTranslation()
   return (
-    <Tooltip label="Delete from this browser">
+    <Tooltip label={t('Delete from this browser')}>
       <ActionIcon
         className="row-action"
         tabIndex={tabIndex}
         variant="subtle"
         color="red"
         size={controlSize.row.icon}
-        aria-label={`Delete ${name}`}
+        aria-label={t('Delete {name}', { name })}
         onClick={() => onDelete(row.id, name)}
       >
         <Trash size={14} aria-hidden="true" />

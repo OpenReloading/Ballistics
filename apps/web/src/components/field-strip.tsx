@@ -18,7 +18,9 @@ import {
   Target,
   TrendDown,
 } from '@phosphor-icons/react'
+import { useTranslation } from '../i18n/language.ts'
 import { rowNotes, rowParts, type StripItem } from '../lib/record-fields.ts'
+import { say, type Wording } from '../lib/wording.ts'
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Sized, slotUnits } from './fact-cards.tsx'
 import { MutedBadge } from './standard-badge.tsx'
@@ -56,20 +58,21 @@ export function FieldStrip({
 }: {
   items: StripItem[]
   country?: { name: string; code?: string | undefined } | undefined
-  tags?: string[]
+  tags?: Wording[]
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   if (items.length === 0 && !country && tags.length === 0) return null
   return (
     <FactCards>
       {items.map((i) => {
-        const now = rowParts(i.row, system)
-        const also = slotUnits.map((u) => rowParts(i.row, u))
+        const now = rowParts(i.row, system, t)
+        const also = slotUnits.map((u) => rowParts(i.row, u, t))
         return (
           <FactCard key={i.icon} icon={icons[i.icon]}>
             <Fact
-              label={i.label}
-              notes={rowNotes(i.row)}
+              label={i.words ? say(t, i.words) : i.label}
+              notes={rowNotes(i.row, t)}
               unit={{ now: now.unit, also: also.map((p) => p.unit) }}
             >
               <Sized
@@ -82,16 +85,16 @@ export function FieldStrip({
       })}
       {country && (
         <FactCard icon={Globe}>
-          <Fact label="Country" notes={['Country of the manufacturer']}>
+          <Fact label={t('Country')} notes={[t('Country of the manufacturer')]}>
             <Countries items={[country]} as="span" />
           </Fact>
         </FactCard>
       )}
       {tags.length > 0 && (
         <div className="fact-tags">
-          {tags.map((t, i) => (
+          {tags.map((tag, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: two facts can read the same
-            <MutedBadge key={i}>{t}</MutedBadge>
+            <MutedBadge key={i}>{say(t, tag)}</MutedBadge>
           ))}
         </div>
       )}

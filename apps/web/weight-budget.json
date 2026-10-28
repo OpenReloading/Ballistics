@@ -19,180 +19,180 @@
       },
       "routes": {
         "/": {
-          "initial": 414851,
-          "total": 461884
+          "initial": 415388,
+          "total": 462554
         },
         "/_not-found": {
-          "initial": 409102,
-          "total": 456135
+          "initial": 409607,
+          "total": 456773
         },
         "/offline": {
-          "initial": 409102,
-          "total": 456135
+          "initial": 409607,
+          "total": 456773
         }
       }
     },
     "lists": {
       "budget": {
-        "initial": 442000,
-        "total": 490000
+        "initial": 446000,
+        "total": 494000
       },
       "routes": {
         "/bullets": {
-          "initial": 433194,
-          "total": 480227
+          "initial": 436076,
+          "total": 483242
         },
         "/cartridges": {
-          "initial": 430271,
-          "total": 477304
+          "initial": 434279,
+          "total": 481445
         },
         "/powders": {
-          "initial": 432277,
-          "total": 479310
+          "initial": 436994,
+          "total": 484160
         },
         "/disciplines": {
-          "initial": 427119,
-          "total": 474152
+          "initial": 431946,
+          "total": 479112
         },
         "/federations": {
-          "initial": 427114,
-          "total": 474147
+          "initial": 431941,
+          "total": 479107
         },
         "/targets": {
-          "initial": 428058,
-          "total": 475091
+          "initial": 431770,
+          "total": 478936
         },
         "/cases": {
-          "initial": 432637,
-          "total": 479670
+          "initial": 436664,
+          "total": 483830
         },
         "/primers": {
-          "initial": 427351,
-          "total": 474384
+          "initial": 431371,
+          "total": 478537
         }
       }
     },
     "records": {
       "budget": {
-        "initial": 502000,
-        "total": 550000
+        "initial": 506000,
+        "total": 554000
       },
       "routes": {
         "/bullets/[id]": {
-          "initial": 491672,
-          "total": 538705
+          "initial": 495449,
+          "total": 542615
         },
         "/cartridges/[id]": {
-          "initial": 481452,
-          "total": 528485
+          "initial": 485436,
+          "total": 532602
         },
         "/disciplines/[id]": {
-          "initial": 444887,
-          "total": 491920
+          "initial": 448380,
+          "total": 495546
         },
         "/federations/[id]": {
-          "initial": 430213,
-          "total": 477246
+          "initial": 434470,
+          "total": 481636
         },
         "/targets/[id]": {
-          "initial": 445175,
-          "total": 492208
+          "initial": 448690,
+          "total": 495856
         },
         "/bullets/compare": {
-          "initial": 478371,
-          "total": 525404
+          "initial": 482015,
+          "total": 529181
         },
         "/session": {
-          "initial": 437070,
-          "total": 484103
+          "initial": 437618,
+          "total": 484784
         },
         "/cases/[id]": {
-          "initial": 443660,
-          "total": 490693
+          "initial": 445415,
+          "total": 492581
         },
         "/primers/[id]": {
-          "initial": 443488,
-          "total": 490521
+          "initial": 445100,
+          "total": 492266
         }
       }
     },
     "curve charts": {
       "budget": {
-        "initial": 459000,
-        "total": 698000
+        "initial": 462000,
+        "total": 701000
       },
       "routes": {
         "/powders/[id]": {
-          "initial": 449516,
-          "total": 684083
+          "initial": 452099,
+          "total": 686831
         },
         "/powders/burn-rates": {
-          "initial": 427507,
-          "total": 662074
+          "initial": 428893,
+          "total": 663625
         }
       }
     },
     "designers": {
       "budget": {
         "initial": 419000,
-        "total": 648000
+        "total": 653000
       },
       "routes": {
         "/bullets/designer": {
-          "initial": 410007,
-          "total": 537807
+          "initial": 410534,
+          "total": 540282
         },
         "/cartridges/designer": {
-          "initial": 410040,
-          "total": 634826
+          "initial": 410583,
+          "total": 639928
         },
         "/targets/designer": {
-          "initial": 409963,
-          "total": 505293
+          "initial": 410493,
+          "total": 505996
         },
         "/powders/designer": {
-          "initial": 409968,
-          "total": 512745
+          "initial": 410499,
+          "total": 515028
         }
       }
     },
     "tools": {
       "budget": {
         "initial": 565000,
-        "total": 603000
+        "total": 604000
       },
       "routes": {
         "/cases/editor": {
-          "initial": 469794,
-          "total": 507436
+          "initial": 470387,
+          "total": 508162
         },
         "/firearms": {
-          "initial": 489926,
-          "total": 527568
+          "initial": 492761,
+          "total": 530536
         },
         "/groups": {
-          "initial": 553343,
-          "total": 590985
+          "initial": 553918,
+          "total": 591693
         },
         "/my-cases": {
-          "initial": 409452,
-          "total": 456485
+          "initial": 409957,
+          "total": 457123
         },
         "/range": {
-          "initial": 418156,
-          "total": 465189
+          "initial": 418661,
+          "total": 465827
         }
       }
     },
     "workbench": {
       "budget": {
-        "initial": 638000,
-        "total": 1001000
+        "initial": 641000,
+        "total": 1004000
       },
       "routes": {
         "/workbench": {
-          "initial": 625444,
-          "total": 980969
+          "initial": 627894,
+          "total": 983582
         }
       }
     }

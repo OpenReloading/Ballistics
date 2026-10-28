@@ -1,8 +1,12 @@
 import { figureModel, recordFigures, screenEm } from '@open-reloading/drawing/cartridge'
 import { describe, expect, it } from 'vitest'
+import de from '../src/i18n/de.json'
+import { translator } from '../src/i18n/translate.ts'
+import { groups } from '../src/lib/cartridge-designer.ts'
 import {
   combinedRows,
   defaultVariantIndex,
+  groupLabel,
   inReadingOrder,
   pressureStripValues,
   rowGroups,
@@ -275,4 +279,9 @@ describe('variantMatrix', () => {
       'EE',
     ])
   })
+})
+
+it('names every group of the designer in German', () => {
+  const { t } = translator(de, 'de')
+  for (const label of Object.values(groups)) expect(groupLabel(label, t), label).not.toBe(label)
 })

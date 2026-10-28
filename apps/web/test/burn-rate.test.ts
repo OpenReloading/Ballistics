@@ -1,6 +1,8 @@
 import type { Powder } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
+  bandAndBarsNote,
+  bandNote,
   classifyPowder,
   curveAt,
   isFitted,
@@ -11,6 +13,7 @@ import {
   rateDomain,
   rateTicks,
   typedBurn,
+  uncertaintyFactor,
 } from '../src/lib/burn-rate.ts'
 
 const record = (
@@ -161,4 +164,9 @@ describe('the neighbours of a powder in the burn-rate order', () => {
     expect(neighbours(rows, 'none')).toBeUndefined()
     expect(neighbours(rows, 'missing')).toBeUndefined()
   })
+})
+
+it('writes the standard uncertainties of the band notes as the interval factor', () => {
+  expect(bandNote).toContain(`Plus and minus ${uncertaintyFactor} standard`)
+  expect(bandAndBarsNote).toContain(`plus and minus ${uncertaintyFactor} standard`)
 })

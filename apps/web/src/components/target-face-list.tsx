@@ -5,12 +5,14 @@ import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { plainNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
-import { countText, filterText } from '../lib/lists.ts'
+import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import type { Origin } from '../lib/sources.ts'
 import {
-  distanceText,
   faceFacetKeys,
   faceFacets,
   type TargetFaceRow,
@@ -42,6 +44,8 @@ export function TargetFaceList({
   /** The names of the disciplines by id, for the Discipline filter. */
   disciplines: readonly { id: string; name: string }[]
 }) {
+  const tr = useTranslation()
+  const { t, tn } = tr
   const { system } = useUnits()
   const [state, set, clear] = useListState(faceFacetKeys)
   const filters = useDeferredValue(state)
@@ -54,31 +58,28 @@ export function TargetFaceList({
     [items, filters],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
-  const named = [
-    ...facetNames(facets, state.facets ?? {}),
-    state.query.trim() && `matching "${state.query.trim()}"`,
-  ]
+  const named = [...facetNames(facets, state.facets ?? {}), matchingText(t, state.query)]
   const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
-    { key: 'name', label: 'Name', value: (r) => r.name, cell: (r) => r.name },
+    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'organization',
-      label: 'Federation',
+      label: msg('Federation'),
       width: '7rem',
       value: (r) => r.organization,
       cell: (r) => r.organization,
     },
     {
       key: 'distance',
-      label: 'Distance',
+      label: msg('Distance'),
       unit: 'm',
       width: '8rem',
       value: (r) => r.distances[0],
-      cell: (r) => r.distances.join(', '),
+      cell: (r) => r.distances.map((d) => plainNumber(d)).join(', '),
     },
     {
       key: 'outer',
-      label: 'Outer diameter',
+      label: msg('Outer diameter'),
       unit: system.length.symbol,
       num: true,
       width: '8rem',
@@ -87,7 +88,7 @@ export function TargetFaceList({
     },
     {
       key: 'rings',
-      label: 'Rings',
+      label: msg('Rings'),
       num: true,
       width: '5rem',
       value: (r) => r.rings,
@@ -95,7 +96,7 @@ export function TargetFaceList({
     },
     {
       key: 'disciplines',
-      label: 'Disciplines',
+      label: msg('Disciplines'),
       num: true,
       width: '7rem',
       value: (r) => r.disciplines,
@@ -105,17 +106,18 @@ export function TargetFaceList({
   const facts = (r: TargetFaceRow) =>
     [
       r.organization,
-      distanceText(r.distances),
+      r.distances.length > 0 ? `${r.distances.map((d) => plainNumber(d)).join(', ')} m` : '',
       `${outer(r)} ${system.length.symbol}`,
-      `${r.rings} rings`,
+      tn(r.rings, '{count} ring', '{count} rings'),
     ].join(' · ')
   return (
     <>
       <PageBar
         title={listTitles.targets}
+        translated
         status={
-          <BarCount widest={`${items.length} of ${countText(items.length, items.length, 'faces')}`}>
-            {countText(shown.length, items.length, 'faces')}
+          <BarCount widest={widestCount(tr, items.length, 'faces')}>
+            {countText(tr, shown.length, items.length, 'faces')}
           </BarCount>
         }
         actions={
@@ -125,7 +127,7 @@ export function TargetFaceList({
               href="/targets/designer"
               leftSection={<Plus aria-hidden="true" />}
             >
-              New face
+              {t('New face')}
             </Button>
             <UnitsIconButton />
           </>
@@ -136,7 +138,7 @@ export function TargetFaceList({
         <DirectoryFilters
           query={state.query}
           onQuery={(q) => set({ query: q })}
-          placeholder="Name, federation or event, 25 m…"
+          placeholder={t('Name, federation or event, 25 m…')}
           sorting={{ columns, sort: state.sort, onSort: (sort) => set({ sort }) }}
         >
           <SourceFilter
@@ -162,8 +164,8 @@ export function TargetFaceList({
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? 'All target faces'
-              : `Target faces, ${named.filter(Boolean).join(', ')}`
+              ? t('All target faces')
+              : t('Target faces, {filters}', { filters: named.filter(Boolean).join(', ') })
           }
           noun="faces"
           sort={state.sort}

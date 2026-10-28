@@ -1,7 +1,7 @@
 'use client'
 
 import type { CatalogueCase } from '@open-reloading/schema'
-import Link from 'next/link'
+import { msg } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
@@ -11,6 +11,7 @@ import {
 } from '../lib/manufacturers.ts'
 import { caseRowGroups, caseStrip } from '../lib/record-fields.ts'
 import { refId } from '../lib/record-metadata.ts'
+import { CaseCartridgeNote } from './case-cartridge-note.tsx'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
@@ -33,13 +34,9 @@ function CaseRecord({ c, names, cartridge }: { c: CatalogueCase } & Extras) {
       provenance={c.provenance}
       strip={<FieldStrip items={caseStrip(c, maker)} />}
       values={
-        <Panel id="record-data" title="Properties">
-          <FieldTable caption="Properties" labelledBy="record-data" groups={groups} />
-          {cartridge && (
-            <p className="record-note">
-              Cartridge: <Link href={`/cartridges/${cartridge.id}`}>{cartridge.name}</Link>
-            </p>
-          )}
+        <Panel id="record-data" title={msg('Properties')} translated>
+          <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={groups} />
+          {cartridge && <CaseCartridgeNote id={cartridge.id} name={cartridge.name} />}
           {c.note && <p className="record-note">{c.note}</p>}
         </Panel>
       }

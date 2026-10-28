@@ -10,6 +10,7 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
 import { formatQuantity, type Quantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
@@ -408,18 +409,28 @@ function firstMount(f: Firearm) {
  * The facts of a list card: barrel length and twist, and the first optic of the active
  * configuration (else the first) with its zero range.
  */
-export function cardFacts(f: Firearm, system: UnitSystem) {
+export function cardFacts(f: Firearm, system: UnitSystem, t: Translator['t']) {
   const barrel = [
     f.barrelLength?.value
-      ? `${withUnit('barrelLength', system, toSi('length', f.barrelLength.value))} barrel`
+      ? t('{length} barrel', {
+          length: withUnit('barrelLength', system, toSi('length', f.barrelLength.value)),
+        })
       : undefined,
-    twistText(f, system),
+    f.twist?.value
+      ? t('1:{twist}, {hand}', {
+          twist: withUnit('twist', system, toSi('length', f.twist.value)),
+          hand: f.twistHand === 'left' ? t('left') : t('right'),
+        })
+      : undefined,
   ]
     .filter(Boolean)
     .join(', ')
   const { mount, optic } = firstMount(f)
   const sight = mount
-    ? `${optic?.name || 'Optic'}, zero ${withUnit('range', system, toSi('length', mount.zeroRange.value))}`
+    ? t('{optic}, zero {range}', {
+        optic: optic?.name || t('Optic'),
+        range: withUnit('range', system, toSi('length', mount.zeroRange.value)),
+      })
     : undefined
   return { barrel: barrel || undefined, sight }
 }

@@ -1,5 +1,6 @@
 import { millerStability, type Projectile } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 
@@ -89,17 +90,23 @@ export function computedBulletRows(
   const twist = millerTwist(r)
   return [
     {
-      label: 'Sectional density',
+      label: msg('Sectional density'),
       value: { quantity: 'sectionalDensity', si: sectionalDensity(r) },
-      method: 'Computed: mass over diameter squared.',
+      method: msg('Computed: mass over diameter squared.'),
     },
     ...(twist === undefined
       ? []
       : [
           {
-            label: `Twist for Sg ${millerStabilityTarget}`,
+            // the target of `millerStabilityTarget`
+            label: msg('Twist for Sg 1.5'),
             value: { quantity: 'twist', si: twist },
-            method: `Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg.${r.tip?.type === 'polymer-tip' ? ' The rule is not fitted to plastic tips.' : ''}`,
+            method:
+              r.tip?.type === 'polymer-tip'
+                ? msg(
+                    "Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg. The rule is not fitted to plastic tips.",
+                  )
+                : msg("Computed: Miller's rule at 2800 ft/s, 59 °F, 29.92 inHg."),
           } satisfies FieldRow,
         ]),
   ]

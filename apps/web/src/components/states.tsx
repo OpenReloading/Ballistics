@@ -5,7 +5,7 @@ import { FunnelX, Info, Warning, WarningOctagon } from '@phosphor-icons/react'
 import { useRouter } from 'next/navigation'
 import { type ReactNode, useLayoutEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message as Marked, msg, type Translator } from '../i18n/translate.ts'
+import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { controlSize } from '../lib/theme.ts'
 import { LibraryTabs } from './library-tabs.tsx'
 import { PageBar } from './page-bar.tsx'
@@ -38,65 +38,44 @@ export function EmptyNote({
 }
 
 /**
- * What each page names while it loads, as a whole sentence (a noun phrase does not translate into
- * every language's word order). A `what` not listed here reads English text inside the sentence.
+ * What a loading line says, by what loads: a whole sentence each, as the word order of a language
+ * is its own. A new `what` gets its line here.
  */
-const loadingTexts: Record<string, Marked> = {
+const loadingLines = {
   bullets: msg('Loading bullets'),
-  disciplines: msg('Loading disciplines'),
   cartridges: msg('Loading cartridges'),
-  'target faces': msg('Loading target faces'),
-  federations: msg('Loading federations'),
   powders: msg('Loading powders'),
-  'the preview': msg('Loading the preview'),
-  'your data': msg('Loading your data'),
-  'the designer': msg('Loading the designer'),
-  cartridge: msg('Loading cartridge'),
-  manufacturers: msg('Loading manufacturers'),
-  firearms: msg('Loading firearms'),
-  'the cases': msg('Loading the cases'),
   cases: msg('Loading cases'),
   primers: msg('Loading primers'),
+  disciplines: msg('Loading disciplines'),
+  federations: msg('Loading federations'),
+  firearms: msg('Loading firearms'),
+  'target faces': msg('Loading target faces'),
+  bullet: msg('Loading bullet'),
+  cartridge: msg('Loading cartridge'),
+  case: msg('Loading case'),
+  discipline: msg('Loading discipline'),
+  federation: msg('Loading federation'),
+  powder: msg('Loading powder'),
+  primer: msg('Loading primer'),
+  'target face': msg('Loading target face'),
+  curves: msg('Loading curves'),
+  manufacturers: msg('Loading manufacturers'),
+  'the bullet record': msg('Loading the bullet record'),
+  'the cartridge record': msg('Loading the cartridge record'),
+  'the cases': msg('Loading the cases'),
+  'the designer': msg('Loading the designer'),
   'the measurements': msg('Loading the measurements'),
+  'the preview': msg('Loading the preview'),
+  'the settings': msg('Loading the settings'),
   'the shot groups': msg('Loading the shot groups'),
   'the unit settings': msg('Loading the unit settings'),
-  'the cartridge record': msg('Loading the cartridge record'),
-  'the bullet record': msg('Loading the bullet record'),
-  'the settings': msg('Loading the settings'),
   'the workbench defaults': msg('Loading the workbench defaults'),
-  curves: msg('Loading curves'),
-}
+  'your data': msg('Loading your data'),
+} as const
 
-/** The loading sentence for `what`, without its closing ellipsis. */
-function loadingText(t: Translator['t'], what: string) {
-  const known = loadingTexts[what]
-  return known ? t(known) : t('Loading {what}', { what })
-}
-
-/** `DataError` titles by the record kind callers name. */
-const unavailableTexts: Record<string, Marked> = {
-  Bullet: msg('Bullet data is unavailable right now.'),
-  Discipline: msg('Discipline data is unavailable right now.'),
-  Case: msg('Case data is unavailable right now.'),
-  Cartridge: msg('Cartridge data is unavailable right now.'),
-  'Target face': msg('Target face data is unavailable right now.'),
-  Federation: msg('Federation data is unavailable right now.'),
-  Primer: msg('Primer data is unavailable right now.'),
-  Powder: msg('Powder data is unavailable right now.'),
-}
-
-/** `EmptyList` titles by the plural noun callers name. */
-const noMatchTexts: Record<string, Marked> = {
-  bullets: msg('No bullets match these filters.'),
-  cases: msg('No cases match these filters.'),
-  cartridges: msg('No cartridges match these filters.'),
-  disciplines: msg('No disciplines match these filters.'),
-  primers: msg('No primers match these filters.'),
-  firearms: msg('No firearms match these filters.'),
-  'target faces': msg('No target faces match these filters.'),
-  powders: msg('No powders match these filters.'),
-  federations: msg('No federations match these filters.'),
-}
+/** What can load: a key of `loadingLines`. */
+export type Loadable = keyof typeof loadingLines
 
 /**
  * The one loading state: the text for screen readers and a skeleton of the rows to come. `inline`
@@ -107,16 +86,17 @@ export function Loading({
   rows = 3,
   inline = false,
 }: {
-  what: string
+  what: Loadable
   rows?: number | undefined
   inline?: boolean
 }) {
   const { t } = useTranslation()
-  if (inline) return <p>{loadingText(t, what)}</p>
+  const line = t(loadingLines[what])
+  if (inline) return <p>{line}</p>
   return (
     <div role="status">
       <Text size="sm" c="dimmed">
-        {loadingText(t, what)}…
+        {line}…
       </Text>
       <Stack gap={6} mt={6} aria-hidden="true">
         {Array.from({ length: rows }, (_, k) => (
@@ -284,15 +264,26 @@ export function ErrorNote({
   )
 }
 
+/** The title of the error state of a kind's data: a whole sentence each. */
+const unavailableLines = {
+  Bullet: msg('Bullet data is unavailable right now.'),
+  Cartridge: msg('Cartridge data is unavailable right now.'),
+  Case: msg('Case data is unavailable right now.'),
+  Discipline: msg('Discipline data is unavailable right now.'),
+  Federation: msg('Federation data is unavailable right now.'),
+  Powder: msg('Powder data is unavailable right now.'),
+  Primer: msg('Primer data is unavailable right now.'),
+  'Target face': msg('Target face data is unavailable right now.'),
+} as const
+
+/** The kinds whose data a page can fail to read: a key of `unavailableLines`. */
+export type DataKind = keyof typeof unavailableLines
+
 /** The data of a page could not be read from the API; Retry asks again. */
-export function DataError({ what, retry }: { what: string; retry: () => void }) {
+export function DataError({ what, retry }: { what: DataKind; retry: () => void }) {
   const { t } = useTranslation()
-  const known = unavailableTexts[what]
   return (
-    <ErrorNote
-      title={known ? t(known) : t('{what} data is unavailable right now.', { what })}
-      onRetry={retry}
-    >
+    <ErrorNote title={t(unavailableLines[what])} onRetry={retry}>
       {t('The server did not answer.')}
     </ErrorNote>
   )
@@ -304,13 +295,13 @@ export function ListError({
   what,
   retry,
 }: {
-  title: string
-  what: string
+  title: Marked
+  what: DataKind
   retry: () => void
 }) {
   return (
     <>
-      <PageBar title={title} />
+      <PageBar title={title} translated />
       <LibraryTabs />
       <DataError what={what} retry={retry} />
     </>
@@ -318,7 +309,7 @@ export function ListError({
 }
 
 /** `DataError` in a server page: Retry renders the page's server data again. */
-export function ServerDataError({ what }: { what: string }) {
+export function ServerDataError({ what }: { what: DataKind }) {
   const router = useRouter()
   return (
     <>
@@ -335,13 +326,13 @@ const skeletonWidths = [62, 48, 70, 55, 66, 42, 58, 74, 50, 64, 46, 68]
  * What a list shows while its data loads, under the page bar: a filter row and the table's
  * frame, its head and rows where the records will be, so nothing moves when they arrive.
  */
-export function ListLoading({ what }: { what: string }) {
+export function ListLoading({ what }: { what: Loadable }) {
   const { t } = useTranslation()
   return (
     <>
       <LibraryTabs />
       <div className="directory" role="status">
-        <span className="visually-hidden">{loadingText(t, what)}…</span>
+        <span className="visually-hidden">{t(loadingLines[what])}…</span>
         {/* the metrics of the real filter row (DirectoryFilters), so the frame stays where it is */}
         <Group className="directory-filters" gap="xs" py="xs" aria-hidden="true">
           <Skeleton height={30} className="directory-search" />
@@ -361,6 +352,19 @@ export function ListLoading({ what }: { what: string }) {
   )
 }
 
+/** What a searched list says when nothing matches, by what it lists: a whole sentence each. */
+const noMatchLines = {
+  bullets: msg('No bullets match these filters.'),
+  cartridges: msg('No cartridges match these filters.'),
+  cases: msg('No cases match these filters.'),
+  disciplines: msg('No disciplines match these filters.'),
+  federations: msg('No federations match these filters.'),
+  firearms: msg('No firearms match these filters.'),
+  powders: msg('No powders match these filters.'),
+  primers: msg('No primers match these filters.'),
+  'target faces': msg('No target faces match these filters.'),
+} as const
+
 /**
  * What a searched list shows when nothing matches. `filters` names the search and the choices set;
  * Clear filters with `onClear` resets them.
@@ -370,16 +374,15 @@ export function EmptyList({
   filters,
   onClear,
 }: {
-  noun: string
+  noun: keyof typeof noMatchLines
   filters?: string
   onClear?: () => void
 }) {
   const { t } = useTranslation()
-  const known = noMatchTexts[noun]
   return (
     <EmptyNote
       icon={<FunnelX size={24} aria-hidden="true" />}
-      title={known ? t(known) : t('No {noun} match these filters.', { noun })}
+      title={t(noMatchLines[noun])}
       description={filters}
       action={
         onClear && (

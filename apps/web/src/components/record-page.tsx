@@ -1,10 +1,24 @@
+'use client'
+
 import type { Provenance } from '@open-reloading/schema'
 import type { ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg } from '../i18n/translate.ts'
+import { say, type Wording } from '../lib/wording.ts'
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
 import { RecordActions } from './record-actions.tsx'
 import { Sources } from './sources.tsx'
 import { MutedBadge } from './standard-badge.tsx'
+
+/** How a record's values came about, in the title of its Sources panel. */
+const kinds: Record<Provenance['kind'], Message> = {
+  published: msg('published'),
+  measured: msg('measured'),
+  derived: msg('derived'),
+  fitted: msg('fitted'),
+  computed: msg('computed'),
+}
 
 /**
  * The frame of a record page (the cartridge and powder records build on it): the page bar with
@@ -30,7 +44,7 @@ export function RecordPage({
 }: {
   title: string
   /** Facts beside the title (line, caliber, product number), not repeated in the tables. */
-  badges: string[]
+  badges: Wording[]
   /** A layout of the grid, such as `record-chart` (powder) or `cartridge-record`. */
   className?: string
   /** "Compare" link. */
@@ -53,13 +67,15 @@ export function RecordPage({
   side?: ReactNode | undefined
   provenance: Provenance
 }) {
+  const { t } = useTranslation()
+  const facts = badges.map((b) => say(t, b))
   return (
     <div className={`record record-frame${className ? ` ${className}` : ''}`}>
       <PageBar
         title={title}
         after={
           badgeNodes ??
-          badges.map((b, i) => (
+          facts.map((b, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: two facts can read the same
             <MutedBadge key={i} className="record-badge">
               {b}
@@ -71,11 +87,11 @@ export function RecordPage({
         }
       />
       {/* below 75em the bar has no room beside the title: the same facts as a line under it */}
-      {badges.length > 0 && (
+      {facts.length > 0 && (
         <p className="record-facts">
-          {badges.map((b, i) => (
+          {facts.map((b, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: two facts can read the same
-            <span key={i}>{i < badges.length - 1 ? `${b} · ` : b}</span>
+            <span key={i}>{i < facts.length - 1 ? `${b} · ` : b}</span>
           ))}
         </p>
       )}
@@ -86,7 +102,7 @@ export function RecordPage({
         {side && <div className="record-side">{side}</div>}
         <Panel
           id="record-sources"
-          title={`Sources (${provenance.kind})`}
+          title={t('Sources ({kind})', { kind: t(kinds[provenance.kind]) })}
           className="record-sources"
         >
           <Sources provenance={provenance} />

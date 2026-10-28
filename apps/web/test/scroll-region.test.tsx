@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DirectoryTable } from '../src/components/directory-table.tsx'
 import { PanelTable, ScrollRegion } from '../src/components/scroll-region.tsx'
+import { msg } from '../src/i18n/translate.ts'
 
 // the server HTML is a region and a tab stop: a box that overflows before hydration is reachable by
 // keyboard (axe scrollable-region-focusable); the observer drops both once the content fits
@@ -21,10 +22,10 @@ it('a directory table box is a named region and its first row link the one tab s
       <DirectoryTable<{ id: string }>
         rows={[{ id: 'a' }, { id: 'b' }]}
         columns={[
-          { key: 'name', label: 'Name', cell: (r) => r.id },
+          { key: 'name', label: msg('Name'), cell: (r) => r.id },
           {
             key: 'note',
-            label: 'Note',
+            label: msg('Note'),
             cell: (r, tabIndex) => (
               <button type="button" tabIndex={tabIndex}>
                 {r.id}
@@ -37,7 +38,7 @@ it('a directory table box is a named region and its first row link the one tab s
         facts={() => ''}
         label={(r) => r.id}
         caption="All rows"
-        noun="rows"
+        noun="bullets"
         sort={undefined}
         onSort={() => {}}
         empty={null}

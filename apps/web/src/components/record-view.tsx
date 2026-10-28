@@ -1,9 +1,10 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { PageBar } from './page-bar.tsx'
 import { PageNotFound } from './page-not-found.tsx'
-import { DataError, Loading } from './states.tsx'
+import { DataError, type DataKind, type Loadable, Loading } from './states.tsx'
 import { type RecordState, useRead, useRecord } from './use-record.ts'
 
 /** The page while its data is read: the record's name under the page bar, the failure with Retry, or the not-found page. */
@@ -14,10 +15,11 @@ function Pending({
   retry,
 }: {
   name: string
-  what: string
+  what: DataKind
   state: Exclude<RecordState<unknown>, { status: 'ok' }>
   retry: () => void
 }) {
+  const { t } = useTranslation()
   if (state.status === 'notFound')
     return (
       <>
@@ -31,10 +33,11 @@ function Pending({
       {state.status === 'error' ? (
         <DataError what={what} retry={retry} />
       ) : (
-        <Loading what={what.toLowerCase()} rows={6} />
+        // every `DataKind` lower-cased is a `Loadable`
+        <Loading what={what.toLowerCase() as Loadable} rows={6} />
       )}
       <noscript>
-        <p>The record is read and drawn by a script: this page needs JavaScript.</p>
+        <p>{t('The record is read and drawn by a script: this page needs JavaScript.')}</p>
       </noscript>
     </>
   )
@@ -45,7 +48,7 @@ interface RecordRef {
   kind: string
   id: string
   name: string
-  what: string
+  what: DataKind
 }
 
 /**
@@ -72,7 +75,7 @@ function Extras<X>({
   children,
 }: {
   name: string
-  what: string
+  what: DataKind
   load: (signal: AbortSignal) => Promise<X>
   children: (extras: X) => ReactNode
 }) {

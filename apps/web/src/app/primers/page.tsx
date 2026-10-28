@@ -19,7 +19,7 @@ async function Primers() {
   if (r.status !== 'ok')
     return (
       <>
-        <PageBar title={listTitles.primers} />
+        <PageBar title={listTitles.primers} translated />
         <ServerDataError what="Primer" />
       </>
     )
@@ -39,7 +39,7 @@ export default function PrimersPage() {
     <Suspense
       fallback={
         <>
-          <PageBar title={listTitles.primers} />
+          <PageBar title={listTitles.primers} translated />
           <ListLoading what="primers" />
         </>
       }

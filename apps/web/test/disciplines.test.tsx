@@ -4,6 +4,8 @@ import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
+import de from '../src/i18n/de.json'
+import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
   type DisciplineRecord,
@@ -16,12 +18,14 @@ import {
   disciplineRuleBook,
   disciplineStrip,
   type FederationRecord,
+  federationMatches,
   federationRow,
   federationScope,
   hostText,
   ruleRows,
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
+import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 // the list renders its tab bar, which reads the route and the router
@@ -83,7 +87,8 @@ it('shows the distance in the unit of the rule book and filters by either unit o
   expect(shownBy({ dist: ['25yd'] })).toEqual(bdmp25)
   expect(shownBy({ dist: ['25m'] })).toEqual(expect.arrayContaining(bdmp25))
   expect(
-    disciplineStrip(defined(records.find((d) => d.id === bothIds[0])), 'BDMP')[1]?.row,
+    disciplineStrip(defined(records.find((d) => d.id === bothIds[0])), translator().t, 'BDMP')[1]
+      ?.row,
   ).toMatchObject({
     text: expect.stringMatching(/^\d+ m \/ \d+ yd$/),
   })
@@ -118,12 +123,13 @@ it('renders the discipline list: one row per discipline linking its page, no fed
 })
 
 it('gives the strip, the number, section, page and caliber classes, and the rule book with its page', () => {
-  expect(disciplineStrip(pistol, 'DSB').map((i) => [i.label, i.row.text])).toEqual([
+  const { t } = translator()
+  expect(disciplineStrip(pistol, t, 'DSB').map((i) => [i.label, i.row.text])).toEqual([
     ['Federation', 'DSB'],
     ['Distance', '25 m'],
   ])
-  const rowsOf = defined(disciplineGroups(pistol, classes)[0]).rows
-  expect(rowsOf.map((r) => r.label)).toEqual([
+  const rowsOf = defined(disciplineGroups(pistol, classes, t)[0]).rows
+  expect(rowsOf.map((r) => say(t, r.label))).toEqual([
     'Number',
     'Section',
     'Page',
@@ -182,9 +188,9 @@ it('names a homepage by its host without www', () => {
 
 it('shows the rule facts a record states, converted where the unit differs, and nothing where it states none', () => {
   expect(ruleRows(undefined)).toEqual([])
-  expect(disciplineGroups(pistol, classes).filter((g) => g.title === 'Rules')).toHaveLength(
-    pistol.rules ? 1 : 0,
-  )
+  expect(
+    disciplineGroups(pistol, classes, translator().t).filter((g) => g.title === 'Rules'),
+  ).toHaveLength(pistol.rules ? 1 : 0)
   const rows = ruleRows({
     firearm: 'long-gun',
     actions: ['single-shot', 'semi-automatic'],
@@ -226,4 +232,17 @@ it('shows the rule facts a record states, converted where the unit differs, and 
     si: 1.5,
   })
   expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
+})
+
+it('also searches the category and the country as the language shown writes them', () => {
+  const german = translator(de, 'de').t
+  const query = { ...emptyDirectory, query: 'gewehr' }
+  // a rifle discipline whose own texts do not say Gewehr
+  const rifle = defined(rows.find((r) => r.category === 'rifle' && !disciplineMatches(r, query)))
+  expect(disciplineMatches(rifle, query, german)).toBe(true)
+  const dsb = federationRow(defined(federationRecords.find((f) => f.country === 'DE')), summaries)
+  const country = { ...emptyDirectory, query: 'deutschland' }
+  expect(federationMatches(dsb, country, 'Deutschland')).toBe(true)
+  expect(federationMatches(dsb, country)).toBe(false)
+  expect(federationMatches(dsb, { ...emptyDirectory, query: 'DE' }, 'Deutschland')).toBe(true)
 })

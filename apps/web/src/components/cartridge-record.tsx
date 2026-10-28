@@ -22,20 +22,26 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { type Message, msg } from '../i18n/translate.ts'
 import {
   type CombinedRow,
+  clearanceLine,
   clearanceMeaning,
   converted,
   defaultVariantIndex,
+  groupLabel,
   type MatrixRow,
   rowGroups,
   sideHint,
   specValueText,
   toleranceText,
 } from '../lib/cartridge-record.ts'
+import { caseTypeText } from '../lib/list-values.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { drawingLengthUnit, type UnitSystem } from '../lib/units.ts'
+import { say, type Wording } from '../lib/wording.ts'
 import { Countries } from './countries.tsx'
 import { Fact, FactCard, FactCards, Label, Sized, slotUnits } from './fact-cards.tsx'
 import { arrowStops, Noted, SymbolStop } from './field-table.tsx'
@@ -67,12 +73,13 @@ const slotNotes = (v: SpecValue, clearance: number | undefined, system: UnitSyst
 
 /** The clearance note: hover (and the symbol's hint for the keyboard), a screen reader reads "Clearance"; a negative one is red. */
 function Clearance({ text, negative }: { text: string; negative: boolean }) {
+  const { t } = useTranslation()
   return (
-    <Tooltip label={`Clearance: ${clearanceMeaning}`} events={tipEvents}>
+    <Tooltip label={clearanceLine(t(clearanceMeaning), t)} events={tipEvents}>
       <span
         className={negative ? 'clearance conflict' : 'clearance'}
         role="note"
-        aria-label={`Clearance ${text}`}
+        aria-label={t('Clearance {value}', { value: text })}
       >
         {text}
       </span>
@@ -254,12 +261,13 @@ export function RecordScope({
 }
 
 /** The record's mm or inch switch, named by `label` where a page has more than one. */
-export function UnitSwitch({ label = 'Length unit' }: { label?: string | undefined }) {
+export function UnitSwitch({ label }: { label?: string | undefined }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const { setUnit } = useContext(RecordView)
   return (
     <SegmentedControl
-      aria-label={label}
+      aria-label={label ?? t('Length unit')}
       size={controlSize.row.toggle}
       data={[
         { label: 'mm', value: 'mm' },
@@ -271,7 +279,16 @@ export function UnitSwitch({ label = 'Length unit' }: { label?: string | undefin
   )
 }
 
-const sideTitle = { cartridge: 'Cartridge', chamber: 'Chamber' } as const
+/** The names of a record's two sides, with the labels built on them: whole messages, as word order differs. */
+const sideTitle = { cartridge: msg('Cartridge'), chamber: msg('Chamber') } as const
+const sideUnitLabel = {
+  cartridge: msg('Cartridge length unit'),
+  chamber: msg('Chamber length unit'),
+} as const
+const sideDimensions = {
+  cartridge: msg('Cartridge dimensions'),
+  chamber: msg('Chamber dimensions'),
+} as const
 
 /**
  * The record's two sides (after the CIP data sheets): a panel for the
@@ -332,10 +349,12 @@ function SidePanel({
   table?: string | undefined
   figures: ReactNode
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const id = `record-${side}`
   const length = system.length.symbol
-  const limit = side === 'cartridge' ? 'Max' : 'Min'
+  const limit = (unit: string) =>
+    side === 'cartridge' ? t('Max ({unit})', { unit }) : t('Min ({unit})', { unit })
   // the characters of the longest tolerance or limit with its clearance in either unit: the slot of every row
   const slot = Math.max(
     0,
@@ -362,16 +381,16 @@ function SidePanel({
   return (
     <Panel
       id={id}
-      title={sideTitle[side]}
+      title={t(sideTitle[side])}
       className={undrawn ? 'side-panel side-undrawn' : 'side-panel'}
       // the record's one length unit: both panels switch it
-      controls={<UnitSwitch label={`${sideTitle[side]} length unit`} />}
+      controls={<UnitSwitch label={t(sideUnitLabel[side])} />}
     >
       <div className="side-body">
-        <ScrollRegion label={`${sideTitle[side]} dimensions`}>
+        <ScrollRegion label={t(sideDimensions[side])}>
           <Table
             className="cartridge-values side-values"
-            aria-label={`${sideTitle[side]} dimensions`}
+            aria-label={t(sideDimensions[side])}
             stickyHeader
             style={{ '--slot': slot } as CSSProperties}
             onFocus={(e) => {
@@ -383,13 +402,10 @@ function SidePanel({
             <TableThead>
               <TableTr>
                 <TableTh scope="col" className="dim-symbol">
-                  Symbol
+                  {t('Symbol')}
                 </TableTh>
                 <TableTh scope="col" className="num">
-                  <Sized
-                    now={`${limit} (${length})`}
-                    also={slotUnits.map((u) => `${limit} (${u.length.symbol})`)}
-                  />
+                  <Sized now={limit(length)} also={slotUnits.map((u) => limit(u.length.symbol))} />
                 </TableTh>
               </TableTr>
             </TableThead>
@@ -397,7 +413,10 @@ function SidePanel({
             {groups.map((group) => (
               <TableTbody
                 key={group[0]?.group}
-                aria-label={rowGroups.find(([g]) => g === group[0]?.group)?.[1]}
+                aria-label={groupLabel(
+                  rowGroups.find(([g]) => g === group[0]?.group)?.[1] ?? '',
+                  t,
+                )}
               >
                 {group.map((r) => (
                   <SideRow
@@ -432,7 +451,8 @@ function SideRow({
   tabbable: boolean
   system: UnitSystem
 }) {
-  const hint = sideHint(r, side, table)
+  const { t } = useTranslation()
+  const hint = sideHint(r, side, table, t)
   const value = r[side]
   const tabIndex = tabbable ? 0 : -1
   return (
@@ -475,14 +495,15 @@ export function VariantMatrix({
   rows: MatrixRow[]
   labelledBy: string
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const { variant } = useContext(RecordView)
   return (
-    <ScrollRegion label="Variants table">
+    <ScrollRegion label={t('Variants table')}>
       <Table className="cartridge-values variant-matrix" aria-labelledby={labelledBy}>
         <TableThead>
           <TableTr>
-            <TableTh scope="col">Value</TableTh>
+            <TableTh scope="col">{t('Value')}</TableTh>
             {variants.map((v, i) => (
               <TableTh key={v} scope="col" className="num" data-shown={i === variant || undefined}>
                 {v}
@@ -529,9 +550,9 @@ function factParts(v: SpecValue, system: UnitSystem) {
 
 /** The hover help of the facts that are not symbols of the record. */
 const factMeanings = {
-  table: 'Table: the CIP table of the record, I to XI, by cartridge class',
-  case: 'Case: the case type, derived from the record',
-  method: 'Method: the pressure measuring method',
+  table: msg('Table: the CIP table of the record, I to XI, by cartridge class'),
+  case: msg('Case: the case type, derived from the record'),
+  method: msg('Method: the pressure measuring method'),
 }
 
 /**
@@ -551,11 +572,12 @@ export function RecordFacts({
   notes: string[][]
   standard: {
     table?: string | undefined
-    date?: { label: string; value: string }
+    date?: { label: Message; value: string }
     countries?: { name: string; code?: string | undefined }[] | undefined
   }
-  build: { caseType?: string | undefined; method?: string | undefined }
+  build: { caseType?: string | undefined; method?: Wording | undefined }
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const items = values.map((v, i) => ({ v, notes: notes[i] ?? [] }))
   const pressures = items.filter(({ v }) => v.quantity === 'pressure')
@@ -593,13 +615,13 @@ export function RecordFacts({
       {(standard.table || standard.date || standard.countries) && (
         <FactCard icon={Certificate}>
           {standard.table && (
-            <Fact label="Table" notes={[factMeanings.table]}>
+            <Fact label={t('Table')} notes={[t(factMeanings.table)]}>
               {standard.table}
             </Fact>
           )}
-          {standard.date && <Fact label={standard.date.label}>{standard.date.value}</Fact>}
+          {standard.date && <Fact label={t(standard.date.label)}>{standard.date.value}</Fact>}
           {standard.countries && (
-            <Fact label="Country">
+            <Fact label={t('Country')}>
               <Countries items={standard.countries} as="span" />
             </Fact>
           )}
@@ -608,13 +630,13 @@ export function RecordFacts({
       {(build.caseType || build.method) && (
         <FactCard icon={Cylinder}>
           {build.caseType && (
-            <Fact label="Case" notes={[factMeanings.case]}>
-              {build.caseType}
+            <Fact label={t('Case')} notes={[t(factMeanings.case)]}>
+              {caseTypeText(t, build.caseType)}
             </Fact>
           )}
           {build.method && (
-            <Fact label="Method" notes={[factMeanings.method]}>
-              {build.method}
+            <Fact label={t('Method')} notes={[t(factMeanings.method)]}>
+              {say(t, build.method)}
             </Fact>
           )}
         </FactCard>
@@ -625,10 +647,11 @@ export function RecordFacts({
 
 /** A shotshell's case length variant whose drawings show, in the Variants title row (every variant stays in the page and prints). */
 export function VariantSelect({ variants }: { variants: string[] }) {
+  const { t } = useTranslation()
   const { variant, setVariant } = useContext(RecordView)
   return (
     <Select
-      aria-label="Variant"
+      aria-label={t('Variant')}
       size={controlSize.row.input}
       w="8.5rem"
       allowDeselect={false}

@@ -1,11 +1,14 @@
 import { bulletProfile } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import de from '../src/i18n/de.json'
+import { translator } from '../src/i18n/translate.ts'
 import {
   compareGroups,
   differenceMarks,
   rowDiffers,
   sharedScale,
+  turnPrefixOf,
 } from '../src/lib/bullet-compare.ts'
 import {
   compareFrom,
@@ -14,6 +17,7 @@ import {
   parseCompareIds,
 } from '../src/lib/compare-ids.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
 it('parses ids: trimmed, deduplicated, at most four, only record id characters', () => {
@@ -61,6 +65,8 @@ const record = (over: Partial<Bullet>): Bullet =>
     ...over,
   }) as Bullet
 
+const english = translator().t
+
 it('merges the data tables in the record groups, values in the preset, a missing one undefined', () => {
   const a = record({
     length: { value: 31.5 },
@@ -72,7 +78,7 @@ it('merges the data tables in the record groups, values in the preset, a missing
   } as Partial<Bullet>)
   const b = record({ id: 'y', noseLength: { value: 15 } } as Partial<Bullet>)
   const us = compareGroups([a, b], presetUnits('us'))
-  expect(us.map((g) => g.title)).toEqual([
+  expect(us.map((g) => say(english, g.title))).toEqual([
     'Size',
     'Shape',
     'Twist',
@@ -80,7 +86,9 @@ it('merges the data tables in the record groups, values in the preset, a missing
     'Ballistic coefficients',
   ])
   const row = (title: string, label: string) =>
-    us.find((g) => g.title === title)?.rows.find((r) => r.label === label)
+    us
+      .find((g) => say(english, g.title) === title)
+      ?.rows.find((r) => say(english, r.label) === label)
   expect(row('Size', 'Diameter')).toEqual({
     label: 'Diameter',
     symbol: 'd',
@@ -94,7 +102,7 @@ it('merges the data tables in the record groups, values in the preset, a missing
   expect(row('Ballistic coefficients', 'G7')?.values).toEqual(['0.260', undefined])
   expect(row('Ballistic coefficients', 'G1')?.values).toEqual(['0.507', undefined])
   const metric = compareGroups([a], presetUnits('metric-grams'))
-  expect(defined(metric[0]).rows.map((r) => [r.label, r.values[0], r.unit])).toEqual([
+  expect(defined(metric[0]).rows.map((r) => [say(english, r.label), r.values[0], r.unit])).toEqual([
     ['Diameter', '7.82', 'mm'],
     ['Mass', '10.89', 'g'],
     ['Length', '31.50', 'mm'],
@@ -146,4 +154,19 @@ it('raises the shared text size until the tallest drawing fits its height with 1
   // a short pair needs no raise
   const short = sharedScale([profile(7.82, 31)], 320)
   expect((defined(short.models[0]).em * 320) / short.tallest).toBeGreaterThanOrEqual(11)
+})
+
+it('shows the values and the marks of a row in the language of the translator', () => {
+  const german = translator(de, 'de').t
+  const a = record({ recommendedTwist: { value: 254 } } as Partial<Bullet>)
+  const b = record({ id: 'y', recommendedTwist: { value: 203.2 } } as Partial<Bullet>)
+  const twist = defined(
+    compareGroups([a, b], presetUnits('us'), german)
+      .find((g) => say(german, g.title) === 'Drall')
+      ?.rows.find((r) => say(german, r.label) === 'Empfohlener Drall'),
+  )
+  expect(twist.values).toEqual(['1 Umdrehung auf 10.0', '1 Umdrehung auf 8.0'])
+  expect(differenceMarks(twist.values, turnPrefixOf(german))).toEqual(['max', 'min'])
+  // a decimal comma reads as a point
+  expect(differenceMarks(['0,5', '0,25'])).toEqual(['max', 'min'])
 })

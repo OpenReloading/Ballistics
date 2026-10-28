@@ -14,6 +14,8 @@ import {
 } from '@mantine/core'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import { type KeyboardEvent, type ReactNode, useId, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { type Translator, translator } from '../i18n/translate.ts'
 import {
   type FieldGroup,
   type FieldRow,
@@ -24,10 +26,13 @@ import {
 } from '../lib/record-fields.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
+import { say, type Wording } from '../lib/wording.ts'
 import { Sized, slotUnits } from './fact-cards.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
+
+type Translate = Translator['t']
 
 /** Arrow up and down, Home and End between the `selector` stops of a table: one tab stop, the rows by the arrows. */
 export function arrowStops(e: KeyboardEvent<HTMLElement>, selector: string) {
@@ -85,11 +90,12 @@ export function Noted({
 }
 
 function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
-  const value = rowValue(row, system)
-  const notes = rowNotes(row)
+  const { t } = useTranslation()
+  const value = rowValue(row, system, t)
+  const notes = rowNotes(row, t)
   return (
     <TableTr>
-      <TableTh scope="row">{rowLabel(row, system)}</TableTh>
+      <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={value} notes={notes} /> : value}
       </TableTd>
@@ -123,19 +129,20 @@ function SymbolRow({
   /** Left out by the filter or the search: hidden on screen, printed. */
   off: boolean
 }) {
-  const notes = rowNotes(row)
-  const { number, unit } = rowParts(row, system)
+  const { t } = useTranslation()
+  const notes = rowNotes(row, t)
+  const { number, unit } = rowParts(row, system, t)
   return (
     <TableTr data-symbol={row.symbol} data-off={off || undefined}>
       <TableTd className="field-symbol">
         {row.symbol && <SymbolStop tabIndex={tabbable ? 0 : -1}>{row.symbol}</SymbolStop>}
       </TableTd>
-      <TableTh scope="row">{rowLabel(row, system)}</TableTh>
+      <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={number} notes={notes} /> : number}
       </TableTd>
       <TableTd className="field-unit-cell">
-        <Sized now={unit} also={slotUnits.map((u) => rowParts(row, u).unit)} />
+        <Sized now={unit} also={slotUnits.map((u) => rowParts(row, u, t).unit)} />
       </TableTd>
     </TableTr>
   )
@@ -155,6 +162,7 @@ function SymbolTable({
   groups: FieldGroup[]
   on: Set<FieldRow>
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const symbols = groups.flatMap((g) =>
     g.rows.flatMap((r) => (r.symbol && on.has(r) ? [r.symbol] : [])),
@@ -162,7 +170,7 @@ function SymbolTable({
   const [active, setActive] = useState<string>()
   const stop = symbols.includes(active ?? '') ? active : symbols[0]
   return (
-    <ScrollRegion label={`${label} table`}>
+    <ScrollRegion label={t('{label} table', { label })}>
       <Table
         className="field-table symbol-table"
         aria-label={label}
@@ -179,14 +187,14 @@ function SymbolTable({
         <TableThead>
           <TableTr>
             <TableTh scope="col" className="field-symbol">
-              Symbol
+              {t('Symbol')}
             </TableTh>
-            <TableTh scope="col">Quantity</TableTh>
+            <TableTh scope="col">{t('Quantity')}</TableTh>
             <TableTh scope="col" className="num">
-              Value
+              {t('Value')}
             </TableTh>
             <TableTh scope="col" className="field-unit-cell">
-              Unit
+              {t('Unit')}
             </TableTh>
           </TableTr>
         </TableThead>
@@ -196,7 +204,7 @@ function SymbolTable({
             {g.title && (
               <TableTr className="field-group">
                 <TableTh scope="rowgroup" colSpan={4}>
-                  {g.title}
+                  {say(t, g.title)}
                 </TableTh>
               </TableTr>
             )}
@@ -217,15 +225,19 @@ function SymbolTable({
   )
 }
 
-/** Rows whose label or symbol holds `q`, ignoring case; groups left without rows drop out. */
-export function searchGroups(groups: FieldGroup[], q: string): FieldGroup[] {
+/** Rows whose label (in the language of `t`) or symbol holds `q`, ignoring case; groups left without rows drop out. */
+export function searchGroups(
+  groups: FieldGroup[],
+  q: string,
+  t: Translate = translator().t,
+): FieldGroup[] {
   const needle = q.trim().toLowerCase()
   if (!needle) return groups
   return groups
     .map((g) => ({
       ...g,
       rows: g.rows.filter((r) =>
-        [r.label, r.symbol].some((t) => t?.toLowerCase().includes(needle)),
+        [say(t, r.label), r.symbol].some((x) => x?.toLowerCase().includes(needle)),
       ),
     }))
     .filter((g) => g.rows.length > 0)
@@ -244,33 +256,48 @@ export function FieldPanel({
   children,
 }: {
   id: string
-  title: string
+  title: Wording
   groups: FieldGroup[]
   className?: string
   /** Under the table: the record's note. */
   children?: ReactNode
 }) {
+  const { t, language } = useTranslation()
+  // the filter is kept by the English text of its label, so a change of language keeps it
+  const key = (w: Wording) => say(translator().t, w)
   const [group, setGroup] = useState('All')
   const [q, setQ] = useState('')
-  const filters = [...new Set(groups.flatMap((g) => g.filter ?? g.title ?? []))]
+  const filters = [
+    ...new Map(groups.flatMap((g) => g.filter ?? g.title ?? []).map((w) => [key(w), w])).entries(),
+  ]
   const shown = searchGroups(
-    group === 'All' ? groups : groups.filter((g) => (g.filter ?? g.title) === group),
+    group === 'All'
+      ? groups
+      : groups.filter((g) => {
+          const w = g.filter ?? g.title
+          return w !== undefined && key(w) === group
+        }),
     q,
+    t,
   )
+  const name = say(t, title)
   return (
     <Panel
       id={id}
-      title={title}
+      title={name}
       className={className ? `field-panel ${className}` : 'field-panel'}
       controls={
         filters.length > 1 && (
           <SegmentedControl
-            aria-label={`${title}: group`}
+            aria-label={t('{title}: group', { title: name })}
             size={controlSize.row.toggle}
-            data={['All', ...filters].map((t) => ({
-              value: t,
-              label: t.replace(' and ', ', '),
-            }))}
+            data={[
+              { value: 'All', label: t('All') },
+              ...filters.map(([value, w]) => ({
+                value,
+                label: say(t, w).replace(' and ', ', ').replace(' und ', ', '),
+              })),
+            ]}
             value={group}
             onChange={setGroup}
           />
@@ -282,16 +309,21 @@ export function FieldPanel({
           className="field-search"
           type="search"
           size={controlSize.row.input}
-          aria-label={`Search ${title.toLowerCase()}`}
-          placeholder="Symbol or name"
+          // a German noun keeps its capital
+          aria-label={t('Search {title}', {
+            title: language === 'en' ? name.toLowerCase() : name,
+          })}
+          placeholder={t('Symbol or name')}
           leftSection={<MagnifyingGlass aria-hidden="true" />}
           value={q}
           onChange={(e) => setQ(e.currentTarget.value)}
         />
       )}
       {/* every row stays in the table: print has them all */}
-      <SymbolTable label={title} groups={groups} on={new Set(shown.flatMap((g) => g.rows))} />
-      {shown.length === 0 && <p className="record-note">No row matches {q.trim()}.</p>}
+      <SymbolTable label={name} groups={groups} on={new Set(shown.flatMap((g) => g.rows))} />
+      {shown.length === 0 && (
+        <p className="record-note">{t('No row matches {query}.', { query: q.trim() })}</p>
+      )}
       {children}
     </Panel>
   )
@@ -301,28 +333,30 @@ export function FieldPanel({
  * A bullet's ballistic coefficients: the drag model (with its velocity band), the value in the
  * viewer's unit, named in the header, and the record's note.
  */
-export function CoefficientTable({ label, rows }: { label: string; rows: FieldRow[] }) {
+export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldRow[] }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
-  const unit = (u: UnitSystem) => `BC (${u.ballisticCoefficient.symbol})`
+  const name = say(t, label)
+  const unit = (u: UnitSystem) => t('BC ({unit})', { unit: u.ballisticCoefficient.symbol })
   return (
-    <ScrollRegion label={`${label} table`}>
-      <Table className="field-table coefficient-table" aria-label={label}>
+    <ScrollRegion label={t('{label} table', { label: name })}>
+      <Table className="field-table coefficient-table" aria-label={name}>
         <TableThead>
           <TableTr>
-            <TableTh scope="col">Drag model</TableTh>
+            <TableTh scope="col">{t('Drag model')}</TableTh>
             <TableTh scope="col" className="num">
               <Sized now={unit(system)} also={slotUnits.map(unit)} />
             </TableTh>
-            <TableTh scope="col">Note</TableTh>
+            <TableTh scope="col">{t('Note')}</TableTh>
           </TableTr>
         </TableThead>
         <TableTbody>
           {rows.map((row, k) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: a drag model can repeat
             <TableTr key={k}>
-              <TableTh scope="row">{rowLabel(row, system)}</TableTh>
-              <TableTd className="nowrap num">{rowParts(row, system).number}</TableTd>
-              <TableTd className="field-note-cell">{row.method}</TableTd>
+              <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
+              <TableTd className="nowrap num">{rowParts(row, system, t).number}</TableTd>
+              <TableTd className="field-note-cell">{row.method && say(t, row.method)}</TableTd>
             </TableTr>
           ))}
         </TableTbody>
@@ -342,15 +376,17 @@ export function FieldTable({
   labelledBy,
   groups,
 }: {
-  caption: string
+  caption: Wording
   labelledBy?: string | undefined
   groups: FieldGroup[]
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
+  const name = say(t, caption)
   return (
-    <ScrollRegion label={`${caption} table`}>
+    <ScrollRegion label={t('{label} table', { label: name })}>
       <Table className="field-table" captionSide="top" aria-labelledby={labelledBy}>
-        {!labelledBy && <TableCaption>{caption}</TableCaption>}
+        {!labelledBy && <TableCaption>{name}</TableCaption>}
         {groups
           .filter((g) => g.rows.length > 0)
           .map((g, i) => (
@@ -359,7 +395,7 @@ export function FieldTable({
               {g.title && (
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={2}>
-                    {g.title}
+                    {say(t, g.title)}
                   </TableTh>
                 </TableTr>
               )}

@@ -1,5 +1,6 @@
 import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import { msg, translator } from '../src/i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   buildRows,
@@ -20,10 +21,12 @@ import {
   rowValue,
 } from '../src/lib/record-fields.ts'
 import { presetUnits } from '../src/lib/units.ts'
+import { say } from '../src/lib/wording.ts'
 import { defined, missing } from './defined.ts'
 import { targetBullet } from './fixtures/bullets.ts'
 
 const provenance: Provenance = { kind: 'published', sources: [] }
+const english = translator().t
 const grains = presetUnits('metric-grains')
 const us = presetUnits('us')
 const si = presetUnits('metric-grams')
@@ -42,7 +45,8 @@ const dataRows = (b: Bullet) =>
 
 it('splits the build into structure, jacket, core and surface, the manufacturer wording as printed on the first', () => {
   const row = (construction: Bullet['construction']) => shown(buildRows(construction))
-  const notes = (construction: Bullet['construction']) => buildRows(construction).map(rowNotes)
+  const notes = (construction: Bullet['construction']) =>
+    buildRows(construction).map((r) => rowNotes(r))
   const mapped = { raw: 'Jacketed Lead', core: { material: 'lead' }, jacket: {} } as const
   expect(row(mapped)).toEqual([
     ['Jacket', 'yes'],
@@ -290,14 +294,14 @@ it('gives the aliases, the composition and the computed thermochemistry with its
 
 it('rounds a value row to significant digits when asked', () => {
   const row: FieldRow = {
-    label: 'Reference pressure',
+    label: msg('Reference pressure'),
     value: { quantity: 'pressure', si: 98066.5, significantDigits: 3 },
   }
   expect(rowValue(row, grains)).toBe('0.981 bar')
   expect(rowValue(row, us)).toBe('14.2 psi')
   expect(
     rowValue(
-      { label: 'Stress', value: { quantity: 'pressure', si: 0, significantDigits: 3 } },
+      { label: msg('Stress'), value: { quantity: 'pressure', si: 0, significantDigits: 3 } },
       grains,
     ),
   ).toBe('0 bar')
@@ -367,7 +371,13 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
     ['q', 'Burn form q', '0.5'],
     ['z1', 'Burn form z1', '0.8'],
   ])
-  expect(powderParameterGroups(p, 2).map((g) => [g.title, g.filter, g.rows.length])).toEqual([
+  expect(
+    powderParameterGroups(p, 2).map((g) => [
+      g.title && say(english, g.title),
+      g.filter,
+      g.rows.length,
+    ]),
+  ).toEqual([
     ['Fitted (simulated, with 2 standard uncertainties)', 'Fitted', 2],
     ['Fixed model inputs', 'Fixed inputs', 9],
     ['Burn form, two-stage', 'Fixed inputs', 4],
@@ -435,11 +445,11 @@ it('splits a value from its unit for the unit column, a text row with its own un
   expect(rowParts(diameter, us)).toEqual({ number: '.3080', unit: 'in' })
   const twist = dataRows(target).at(-1) as FieldRow
   expect(rowParts(twist, us)).toEqual({ number: '1 turn in 12.0', unit: 'in' })
-  expect(rowParts({ label: 'Angle', text: '9', unit: 'deg' }, us)).toEqual({
+  expect(rowParts({ label: msg('Angle'), text: '9', unit: 'deg' }, us)).toEqual({
     number: '9',
     unit: 'deg',
   })
-  expect(rowParts({ label: 'Tip', text: 'hollow-point' }, us)).toEqual({
+  expect(rowParts({ label: msg('Tip'), text: 'hollow-point' }, us)).toEqual({
     number: 'hollow-point',
     unit: '',
   })
