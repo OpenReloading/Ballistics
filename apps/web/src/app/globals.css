@@ -7842,6 +7842,15 @@ main .field-table tr.field-group > th {
   }
 }
 
+/* forced colours drop the selected segment's fill (the indicator, and the label's ::before until the
+   control has measured itself): its border marks it */
+@media (forced-colors: active) {
+  .mantine-SegmentedControl-indicator,
+  .mantine-SegmentedControl-label[data-active]::before {
+    border: 2px solid Highlight;
+  }
+}
+
 @media (forced-colors: active) {
   .message {
     border-color: CanvasText;

@@ -5,7 +5,7 @@ import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
-import { loadForm } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
 // The states a visitor reaches after a click: a record page of each `[id]` route, the workbench
@@ -256,3 +256,15 @@ for (const width of widths) {
       expect((await note.boundingBox())?.height).toBeGreaterThanOrEqual(24)
   })
 }
+
+test('the selected segment of a segmented control has a border in forced colours', async ({
+  page,
+}) => {
+  await page.emulateMedia({ forcedColors: 'active' })
+  await page.goto('/workbench')
+  await applyExampleLoad(page)
+  const indicator = loadForm(page).locator('.mantine-SegmentedControl-indicator').first()
+  await expect(indicator).toBeVisible()
+  // forced colours remove the fill: the border is all that marks the segment
+  await expect(indicator).toHaveCSS('border-top-width', '2px')
+})
