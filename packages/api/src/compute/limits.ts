@@ -3,8 +3,13 @@
  * compared; crusher values are listed, never compared. No message says or implies that a load is safe.
  */
 import {
+  type AdvisoryId,
+  type AdvisoryLoad,
+  type AdvisoryRule,
+  advisoryRule,
   chargeTooSmall,
   chargeTooSmallRatio,
+  interiorAdvisories,
   type MaximumPlacement,
   type PressureRange,
   placeMaximum,
@@ -38,23 +43,30 @@ export type Limit = {
 }
 
 /**
- * A message of an interior response; `code` names the rule, `spec` the id of the C.I.P. sheet it
- * refers to, and `symbol`, `variant` and `method` the limit of a `limitExceeded` message.
+ * A message of an interior response; `code` names the rule of the advisory registry of core, with its
+ * `severity`, `inputs` and `fix`. `spec` is the id of the C.I.P. sheet it refers to, and `symbol`,
+ * `variant` and `method` the limit of a `limitExceeded` message.
  */
 export type Warning = {
-  code:
-    | 'limitExceeded'
-    | 'noCartridge'
-    | 'noComparableLimit'
-    | 'rangeIncomplete'
-    | 'chargeTooSmall'
-    | 'resistanceNotApplied'
-    | 'loadRatioHigh'
+  code: AdvisoryId
+  severity: AdvisoryRule['severity']
+  inputs: string[]
   message: string
+  fix: string
   spec?: string
   symbol?: string
   variant?: string
   method?: string | null
+}
+
+/** A warning of `rule` with the registry's severity, inputs and fix around `message`. */
+export function warning(
+  rule: AdvisoryRule,
+  message: string,
+  extra: Pick<Warning, 'spec' | 'symbol' | 'variant' | 'method'> = {},
+): Warning {
+  const { id, severity, inputs, fix } = rule
+  return { code: id, severity, inputs: [...inputs], message, fix, ...extra }
 }
 
 const compared = new Set(['transducer', 'piezo', null])
@@ -133,10 +145,10 @@ function chargeWarning(charge: {
   if (!chargeTooSmall(p, ps, pi)) return undefined
   const hold = Math.max(ps, pi)
   const limit = chargeTooSmallRatio * hold
-  return {
-    code: 'chargeTooSmall',
-    message: `Charge too small for the model: the simulated peak mean pressure, ${bar(p, limit)}, is below ${chargeTooSmallRatio} times the ${ps >= pi ? 'start' : 'ignition'} pressure (${bar(hold, limit)}); results are outside the range the model was built for.`,
-  }
+  return warning(
+    advisoryRule.chargeTooSmall,
+    `Charge too small for the model: the simulated peak mean pressure, ${bar(p, limit)}, is below ${chargeTooSmallRatio} times the ${ps >= pi ? 'start' : 'ignition'} pressure (${bar(hold, limit)}); results are outside the range the model was built for.`,
+  )
 }
 
 /**
@@ -147,10 +159,9 @@ function chargeWarning(charge: {
 function cartridgeLimits(range: PressureRange, cartridge: CartridgeWithSpecs | undefined) {
   const warnings: Warning[] = []
   if (cartridge === undefined) {
-    warnings.push({
-      code: 'noCartridge',
-      message: 'No cartridge id was given, so no CIP Pmax was checked.',
-    })
+    warnings.push(
+      warning(advisoryRule.noCartridge, 'No cartridge id was given, so no CIP Pmax was checked.'),
+    )
     return { limits: undefined, warnings, resolved: undefined }
   }
   const limits = cartridge.values
@@ -158,19 +169,21 @@ function cartridgeLimits(range: PressureRange, cartridge: CartridgeWithSpecs | u
     .map((v) => limit(cartridge, v, range))
   for (const l of limits)
     if (l.exceeded)
-      warnings.push({
-        code: 'limitExceeded',
-        spec: sheetId(cartridge),
-        symbol: l.symbol,
-        ...(l.variant !== undefined && { variant: l.variant }),
-        method: l.method,
-        message: exceededMessage(l, range),
-      })
+      warnings.push(
+        warning(advisoryRule.limitExceeded, exceededMessage(l, range), {
+          spec: sheetId(cartridge),
+          symbol: l.symbol,
+          ...(l.variant !== undefined && { variant: l.variant }),
+          method: l.method,
+        }),
+      )
   if (!limits.some((l) => l.compared))
-    warnings.push({
-      code: 'noComparableLimit',
-      message: `${cartridge.name} has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure.`,
-    })
+    warnings.push(
+      warning(
+        advisoryRule.noComparableLimit,
+        `${cartridge.name} has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure.`,
+      ),
+    )
   const resolved = { id: cartridge.id, name: cartridge.name, provenance: cartridge.provenance }
   return { limits, warnings, resolved }
 }
@@ -180,10 +193,10 @@ function rangeWarnings(range: PressureRange): Warning[] {
   const failed = range.cases.filter((c) => c.maxPressure === null)
   if (failed.length === 0) return []
   return [
-    {
-      code: 'rangeIncomplete',
-      message: `${failed.length} of ${range.cases.length} range cases could not be computed (${[...new Set(failed.map((c) => c.reason))].join(', ')}); the range covers only the computed cases, and the true range can be wider.`,
-    },
+    warning(
+      advisoryRule.rangeIncomplete,
+      `${failed.length} of ${range.cases.length} range cases could not be computed (${[...new Set(failed.map((c) => c.reason))].join(', ')}); the range covers only the computed cases, and the true range can be wider.`,
+    ),
   ]
 }
 
@@ -201,15 +214,15 @@ interface LimitCheck {
   cartridge: CheckedCartridge | undefined
 }
 
-/** An M3 run for the charge-too-small check: its peak mean pressure and its load's pressures, Pa. */
+/** An M3 run for the charge-too-small check and the input rules: its peak mean pressure and its load, Pa. */
 interface ChargeRun {
   result: { maxMeanPressure: number }
-  load: { startPressure: number; ignitionPressure: number }
+  load: AdvisoryLoad & { ignitionPressure: number }
 }
 
 /**
  * Limits, warnings and the cartridge echo for a pressure range; `cartridge` undefined when no id
- * was given. `run` (M3 only) adds the charge-too-small check.
+ * was given. `run` (M3 only) adds the charge-too-small check and the input rules of the registry.
  */
 export function limitCheck(
   range: PressureRange,
@@ -226,5 +239,6 @@ export function limitCheck(
       ignitionPressure: run.load.ignitionPressure,
     })
   if (small) warnings.push(small)
+  if (run) warnings.push(...interiorAdvisories(run.load).map((a) => warning(a, a.message)))
   return { limits, warnings, cartridge: resolved }
 }

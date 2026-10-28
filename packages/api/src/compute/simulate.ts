@@ -1,5 +1,6 @@
 /** `POST /interior/load-file`: an M3 run of the workbench load file, with the summary the workbench shows. */
 import {
+  advisoryRule,
   boreArea,
   cartridgeBoreAreaMm2,
   cartridgeBulletDiameterMm,
@@ -26,7 +27,7 @@ import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts
 import { powderBulkDensity } from './charge-run.ts'
 import { runInterior } from './interior-run.ts'
 import { interiorBody } from './interior-schema.ts'
-import type { CartridgeWithSpecs, Warning } from './limits.ts'
+import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
   catalogueIdOf,
   fileLoad,
@@ -120,20 +121,24 @@ function summarizeStep(
   const ratio = loadRatio(s.charge, bulkDensity, chamberVolume)
   const warnings: Warning[] = [...s.warnings]
   if (powderLabel && missing.length > 0)
-    warnings.push({
-      code: 'resistanceNotApplied',
-      message: `Simulation: the parameters of ${powderLabel} were fitted with a bore-resistance law this run cannot apply (missing: ${missing.join(', ')}); the results are biased.`,
-    })
+    warnings.push(
+      warning(
+        advisoryRule.resistanceNotApplied,
+        `Simulation: the parameters of ${powderLabel} were fitted with a bore-resistance law this run cannot apply (missing: ${missing.join(', ')}); the results are biased.`,
+      ),
+    )
   const fill = solidFill(s.charge, density, chamberVolume)
   if (fill > solidFillLimit)
-    warnings.push({
-      code: 'loadRatioHigh',
-      message: `Simulation: ${
-        ratio === undefined || bulkDensity === undefined
-          ? `solid fill ${fill.toFixed(2)} is above ${solidFillLimit}`
-          : `load ratio ${ratio.toFixed(2)} is above ${fillLoadRatioLimit(density, bulkDensity).toFixed(2)}, solid fill ${solidFillLimit} for this powder`
-      }; the model is outside the range it was built for.`,
-    })
+    warnings.push(
+      warning(
+        advisoryRule.loadRatioHigh,
+        `Simulation: ${
+          ratio === undefined || bulkDensity === undefined
+            ? `solid fill ${fill.toFixed(2)} is above ${solidFillLimit}`
+            : `load ratio ${ratio.toFixed(2)} is above ${fillLoadRatioLimit(density, bulkDensity).toFixed(2)}, solid fill ${solidFillLimit} for this powder`
+        }; the model is outside the range it was built for.`,
+      ),
+    )
   const { result } = s
   return {
     charge: s.charge,

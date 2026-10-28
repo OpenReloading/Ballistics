@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { buildOpenApi } from '@open-reloading/api/openapi'
+import { advisoryRules } from '@open-reloading/core'
 import { pressureMethod } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { limitCheck, type Warning } from '../../../packages/api/dist/compute/limits.js'
@@ -179,7 +180,12 @@ describe('the warnings of an interior answer', () => {
   const done = [{ maxPressure: 4e8 }]
   const small = (startPressure: number, ignitionPressure: number) => ({
     result: { maxMeanPressure: 1e6 },
-    load: { startPressure, ignitionPressure },
+    load: {
+      startPressure,
+      ignitionPressure,
+      barrel: { length: 0.6, twist: 0.3 },
+      bullet: { mass: 0.01 },
+    },
   })
 
   /** The warnings the API writes, from its own limit check. */
@@ -232,7 +238,14 @@ describe('the warnings of an interior answer', () => {
       `load ratio \${ratio.toFixed(2)} is above \${fillLoadRatioLimit(density, bulkDensity).toFixed(2)}, solid fill \${solidFillLimit} for this powder`,
     )
     expect(source).toContain('; the model is outside the range it was built for.')
-    expect(source).toContain("code: 'loadRatioHigh'")
+    expect(source).toContain('advisoryRule.loadRatioHigh')
+  })
+
+  it('names every rule of the registry in German', () => {
+    for (const { name } of advisoryRules) {
+      expect(translateMessage(name, marker.t), name).toBe('MAPPED')
+      expect(translateMessage(name, german.t), name).not.toBe(name)
+    }
   })
 
   it('produces the codes of the limit check', () => {

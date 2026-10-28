@@ -123,11 +123,12 @@ describe('shownWarnings', () => {
             'Charge too small for the model: the simulated peak mean pressure, 250 bar, is low',
         },
         { code: 'test', message: 'Other warning.' },
+        { code: 'gyrationRadiusWithoutTwist', message: 'Twist is 0.' },
       ],
     }) as unknown as InteriorResponse
 
   it('writes an exceeded limit in the page unit with the sheet date and method, and names it', () => {
-    const [line, small, other] = shownWarnings(
+    const [line, small, other, ignored] = shownWarnings(
       body(4766e5, 4174e5, 5460e5),
       presetUnits('us'),
       english.t,
@@ -141,6 +142,7 @@ describe('shownWarnings', () => {
       name: 'charge too small for the model',
     })
     expect(other).toEqual({ text: 'Other warning.', name: undefined })
+    expect(ignored).toEqual({ text: 'Twist is 0.', name: 'gyration radius ignored' })
   })
 
   it('converts every bar value of a message and leaves other words alone', () => {
