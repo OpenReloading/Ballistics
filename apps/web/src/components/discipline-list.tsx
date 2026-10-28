@@ -1,6 +1,6 @@
 'use client'
 
-import { useDeferredValue, useMemo } from 'react'
+import { useCallback, useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
@@ -36,7 +36,10 @@ export function DisciplineList({ items }: { items: DisciplineRow[] }) {
   const { t } = tr
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const shown = useMemo(() => items.filter((r) => disciplineMatches(r, filters)), [items, filters])
+  const shown = useMemo(
+    () => items.filter((r) => disciplineMatches(r, filters, t)),
+    [items, filters, t],
+  )
   const named = [state.organization, matchingText(t, state.query)]
   const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
@@ -157,13 +160,19 @@ export function FederationList({ items }: { items: FederationRow[] }) {
   const tr = useTranslation()
   const { t, language } = tr
   // the record prints "International" or an ISO code: a code is named in the language shown
-  const country = (c: string) =>
-    c === 'International'
-      ? t('International')
-      : countryName(c, /^[A-Z]{2}$/.test(c) ? c : undefined, language)
+  const country = useCallback(
+    (c: string) =>
+      c === 'International'
+        ? t('International')
+        : countryName(c, /^[A-Z]{2}$/.test(c) ? c : undefined, language),
+    [t, language],
+  )
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const shown = useMemo(() => items.filter((r) => federationMatches(r, filters)), [items, filters])
+  const shown = useMemo(
+    () => items.filter((r) => federationMatches(r, filters, country(r.country))),
+    [items, filters, country],
+  )
   const query = state.query.trim()
   const columns: DirectoryColumn<FederationRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },

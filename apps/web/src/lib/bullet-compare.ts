@@ -8,14 +8,13 @@ import {
   bulletScreenEm,
 } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
-import { msg } from '../i18n/translate.ts'
+import { msg, type Translator, translator } from '../i18n/translate.ts'
 import {
   ballisticCoefficientRows,
   bulletDataGroups,
   type FieldGroup,
   type FieldRow,
   rowParts,
-  turnPrefix,
 } from './record-fields.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 import type { Wording } from './wording.ts'
@@ -57,6 +56,7 @@ function mergeRows(
   at: number,
   count: number,
   system: UnitSystem,
+  t: Translator['t'],
 ) {
   const seen = new Map<string, number>()
   for (const r of own) {
@@ -66,7 +66,7 @@ function mergeRows(
     const n = seen.get(label) ?? 0
     seen.set(label, n + 1)
     const key = `${label}#${n}`
-    const { number, unit } = rowParts(r, system)
+    const { number, unit } = rowParts(r, system, t)
     const row = rows.get(key) ?? {
       label: r.label,
       ...(from !== undefined && { from }),
@@ -84,13 +84,17 @@ function mergeRows(
  * ballistic coefficients, each row once in the order first met (a repeated label once per
  * repeat), a value per bullet where its record has the row.
  */
-export function compareGroups(bullets: Bullet[], system: UnitSystem): CompareGroup[] {
+export function compareGroups(
+  bullets: Bullet[],
+  system: UnitSystem,
+  t: Translator['t'] = translator().t,
+): CompareGroup[] {
   // the groups in `bulletDataGroups` order, also where the first bullet lacks one
   const titles = new Map<string, Wording>()
   const groups = new Map<string, Map<string, CompareRow>>(
-    [...groupOrder, msg('Ballistic coefficients')].map((t) => {
-      titles.set(keyOf(t), t)
-      return [keyOf(t), new Map()]
+    [...groupOrder, msg('Ballistic coefficients')].map((title) => {
+      titles.set(keyOf(title), title)
+      return [keyOf(title), new Map()]
     }),
   )
   bullets.forEach((b, i) => {
@@ -104,7 +108,7 @@ export function compareGroups(bullets: Bullet[], system: UnitSystem): CompareGro
       titles.set(title, wording)
       const rows = groups.get(title) ?? new Map<string, CompareRow>()
       groups.set(title, rows)
-      mergeRows(rows, g.rows, i, bullets.length, system)
+      mergeRows(rows, g.rows, i, bullets.length, system, t)
     }
   })
   return [...groups]
@@ -115,14 +119,22 @@ export function compareGroups(bullets: Bullet[], system: UnitSystem): CompareGro
 /** Whether a row's shown values are not all the same. An absent value differs from a present one. */
 export const rowDiffers = (values: readonly (string | undefined)[]) => new Set(values).size > 1
 
+/** The text before a twist's length per turn in the language of `t`. */
+export const turnPrefixOf = (t: Translator['t']) => t('1 turn in {length}', { length: '' })
+
 /**
  * The largest and smallest of a row's shown values, compared as shown (so two values that read
- * the same are equal), a twist by its length per turn. Nothing where fewer than two values show
- * or all are the same.
+ * the same are equal), a twist by its length per turn after `turnPrefix`. A decimal comma reads
+ * as a point. Nothing where fewer than two values show or all are the same.
  */
-export function differenceMarks(shown: readonly (string | undefined)[]) {
+export function differenceMarks(
+  shown: readonly (string | undefined)[],
+  turnPrefix = turnPrefixOf(translator().t),
+) {
   const xs = shown.map((s) =>
-    s === undefined ? undefined : Number(s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s),
+    s === undefined
+      ? undefined
+      : Number((s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s).replace(',', '.')),
   )
   const present = xs.filter((x): x is number => x !== undefined && Number.isFinite(x))
   const [lo, hi] = [Math.min(...present), Math.max(...present)]

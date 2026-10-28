@@ -112,6 +112,7 @@ const meaningText = (meaning: string, t: Translate) => {
 
 /** The English labels of the row groups of the Dimensions table that have a German text (see `meaningMessages`). */
 const groupMessages: Readonly<Record<string, Message>> = {
+  'Head, rim and groove': msg('Head, rim and groove'),
   Body: msg('Body'),
   Shoulder: msg('Shoulder'),
   'Neck and length': msg('Neck and length'),

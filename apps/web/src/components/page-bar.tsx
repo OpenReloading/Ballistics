@@ -63,10 +63,6 @@ export function PageBar({
   titleHidden = false,
   compact = false,
 }: {
-  /** The h1: a record's name, as published, or with `translated` a message of the catalogue (a list's title). */
-  title: string | Message
-  /** `title` is a message that the language shown translates. */
-  translated?: boolean
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
   titleHidden?: boolean
   /** Beside the title: the workbench's open loads, a record's standard badges. */
@@ -83,10 +79,20 @@ export function PageBar({
   reserve?: boolean | undefined
   /** The Safety button as an icon, as the workbench's other secondary actions. */
   compact?: boolean
-}) {
+} & (
+  | {
+      /** The h1: a record's name, as published. */
+      title: string
+      translated?: false
+    }
+  | {
+      /** The h1: a message of the catalogue (a list's title), which the language shown translates. */
+      title: Message
+      translated: true
+    }
+)) {
   const { t } = useTranslation()
-  // the type of `title` says a translated one is a Message
-  const title = translated ? t(given as Message) : given
+  const title = translated ? t(given) : given
   const [statusLine, setStatusLine] = useState<HTMLDivElement | null>(null)
   const [open, setOpen] = useState(false)
   const toggle = useRef<HTMLButtonElement>(null)

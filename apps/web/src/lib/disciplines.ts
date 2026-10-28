@@ -7,10 +7,11 @@ import {
   type Source,
   toSi,
 } from '@open-reloading/schema'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { categoryWord } from './face-words.ts'
+import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type StripItem, titleFromKebab } from './record-fields.ts'
 
@@ -78,8 +79,12 @@ export function disciplineRow(
   }
 }
 
-/** Whether a discipline row passes the federation scope and the search. */
-export const disciplineMatches = (r: DisciplineRow, s: DirectoryState) =>
+/** Whether a discipline row passes the federation scope and the search (the category also as `t` shows it). */
+export const disciplineMatches = (
+  r: DisciplineRow,
+  s: DirectoryState,
+  t: Translator['t'] = translator().t,
+) =>
   (!s.organization || r.federation === s.organization) &&
   matchesQuery(
     [
@@ -87,6 +92,7 @@ export const disciplineMatches = (r: DisciplineRow, s: DirectoryState) =>
       r.number,
       r.federation,
       r.category && titleFromKebab(r.category),
+      r.category && kebabValue(t, r.category),
       ...r.classes.map((c) => c.name),
     ],
     s.query,
@@ -223,5 +229,5 @@ export function federationRow(
 }
 
 /** Whether a federation row passes the search. */
-export const federationMatches = (r: FederationRow, s: DirectoryState) =>
-  matchesQuery([r.name, r.abbreviation, r.country], s.query)
+export const federationMatches = (r: FederationRow, s: DirectoryState, countryLabel?: string) =>
+  matchesQuery([r.name, r.abbreviation, r.country, countryLabel], s.query)

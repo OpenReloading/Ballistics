@@ -95,7 +95,7 @@ export function BulletDrawing({
   ]
   return (
     <figure className="drawing-figure">
-      <TechnicalDrawing id={id} title={title} desc={description(p, unit)} model={model} linked />
+      <TechnicalDrawing id={id} title={title} desc={description(p, unit, t)} model={model} linked />
       {/* the print drawing shares the screen drawing's description */}
       <TechnicalDrawing
         id={`${id}-print`}

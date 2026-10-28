@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { args, presets } from './visual-check.mts'
+import { args, inLanguage, presets } from './visual-check.mts'
 
 describe('visual check arguments', () => {
   it('takes page paths and presets together, each page once', () => {
@@ -19,5 +19,13 @@ describe('visual check arguments', () => {
     expect(() => args(['--width', '390'])).toThrow(/width/)
     expect(() => args(['trajectory'])).toThrow(/trajectory/)
     expect(() => args([])).toThrow(/no pages/)
+  })
+})
+
+describe('page bar texts in the language shown', () => {
+  it('takes the catalogue text and leaves a text it lacks in English', () => {
+    expect(inLanguage('Open', { Open: 'Öffnen' })).toBe('Öffnen')
+    expect(inLanguage('Example load', { Open: 'Öffnen' })).toBe('Example load')
+    expect(inLanguage('Open', { Open: { one: 'a', other: 'b' } })).toBe('Open')
   })
 })

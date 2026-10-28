@@ -3,6 +3,7 @@ import { readRecords } from '@open-reloading/data'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
+import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -13,6 +14,7 @@ import {
   disciplineRuleBook,
   disciplineStrip,
   type FederationRecord,
+  federationMatches,
   federationRow,
   federationScope,
   hostText,
@@ -143,4 +145,17 @@ it('counts per federation its disciplines and renders the list with the tabs and
 it('names a homepage by its host without www', () => {
   expect(hostText('https://www.issf-sports.org/')).toBe('issf-sports.org')
   expect(hostText('https://example.org/a/b')).toBe('example.org')
+})
+
+it('also searches the category and the country as the language shown writes them', () => {
+  const german = translator(de, 'de').t
+  const query = { ...emptyDirectory, query: 'gewehr' }
+  // a rifle discipline whose own texts do not say Gewehr
+  const rifle = defined(rows.find((r) => r.category === 'rifle' && !disciplineMatches(r, query)))
+  expect(disciplineMatches(rifle, query, german)).toBe(true)
+  const dsb = federationRow(defined(federationRecords.find((f) => f.country === 'DE')), summaries)
+  const country = { ...emptyDirectory, query: 'deutschland' }
+  expect(federationMatches(dsb, country, 'Deutschland')).toBe(true)
+  expect(federationMatches(dsb, country)).toBe(false)
+  expect(federationMatches(dsb, { ...emptyDirectory, query: 'DE' }, 'Deutschland')).toBe(true)
 })

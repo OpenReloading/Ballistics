@@ -1,12 +1,14 @@
 import { bulletProfile } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import {
   compareGroups,
   differenceMarks,
   rowDiffers,
   sharedScale,
+  turnPrefixOf,
 } from '../src/lib/bullet-compare.ts'
 import {
   compareFrom,
@@ -152,4 +154,19 @@ it('raises the shared text size until the tallest drawing fits its height with 1
   // a short pair needs no raise
   const short = sharedScale([profile(7.82, 31)], 320)
   expect((defined(short.models[0]).em * 320) / short.tallest).toBeGreaterThanOrEqual(11)
+})
+
+it('shows the values and the marks of a row in the language of the translator', () => {
+  const german = translator(de, 'de').t
+  const a = record({ recommendedTwist: { value: 254 } } as Partial<Bullet>)
+  const b = record({ id: 'y', recommendedTwist: { value: 203.2 } } as Partial<Bullet>)
+  const twist = defined(
+    compareGroups([a, b], presetUnits('us'), german)
+      .find((g) => say(german, g.title) === 'Drall')
+      ?.rows.find((r) => say(german, r.label) === 'Empfohlener Drall'),
+  )
+  expect(twist.values).toEqual(['1 Umdrehung auf 10.0', '1 Umdrehung auf 8.0'])
+  expect(differenceMarks(twist.values, turnPrefixOf(german))).toEqual(['max', 'min'])
+  // a decimal comma reads as a point
+  expect(differenceMarks(['0,5', '0,25'])).toEqual(['max', 'min'])
 })

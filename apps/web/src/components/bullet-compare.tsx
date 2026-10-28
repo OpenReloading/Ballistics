@@ -16,7 +16,7 @@ import Link from 'next/link'
 import type { CSSProperties, ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
-import { compareGroups, differenceMarks, rowDiffers } from '../lib/bullet-compare.ts'
+import { compareGroups, differenceMarks, rowDiffers, turnPrefixOf } from '../lib/bullet-compare.ts'
 import { caliberLabel, caliberUnit } from '../lib/caliber.ts'
 import { compareHref } from '../lib/compare-ids.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -112,7 +112,7 @@ function Values({
                 </TableTh>
               </TableTr>
             </TableThead>
-            {compareGroups(bullets, system).map((g) => (
+            {compareGroups(bullets, system, t).map((g) => (
               <TableTbody key={say(t, g.title)}>
                 <TableTr className="field-group">
                   <TableTh scope="rowgroup" colSpan={bullets.length + 3}>
@@ -120,7 +120,7 @@ function Values({
                   </TableTh>
                 </TableTr>
                 {g.rows.map((row, k) => {
-                  const marks = differenceMarks(row.values)
+                  const marks = differenceMarks(row.values, turnPrefixOf(t))
                   return (
                     // biome-ignore lint/suspicious/noArrayIndexKey: a label can repeat
                     <TableTr key={k} data-differs={rowDiffers(row.values) || undefined}>

@@ -29,7 +29,10 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
   const { t } = tr
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const shown = useMemo(() => rows.filter((r) => primerMatches(r, filters.query)), [rows, filters])
+  const shown = useMemo(
+    () => rows.filter((r) => primerMatches(r, filters.query, t)),
+    [rows, filters, t],
+  )
   const named = [matchingText(t, state.query)].filter(Boolean)
   const columns: DirectoryColumn<PrimerRow>[] = [
     {

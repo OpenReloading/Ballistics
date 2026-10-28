@@ -2,6 +2,7 @@
 
 import { Affix, Button, Group, Notification, Text } from '@mantine/core'
 import { type ReactNode, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { controlSize } from '../lib/theme.ts'
 import { AppModal } from './app-modal.tsx'
 import { useRoute } from './use-route.ts'
@@ -70,6 +71,7 @@ const close = (o: Offer) => {
 
 /** Renders the confirm dialog and the undo notice; mounted once in the providers. */
 export function ConfirmHost() {
+  const { t } = useTranslation()
   const current = useSyncExternalStore(
     subscribe,
     () => queue[0],
@@ -140,7 +142,7 @@ export function ConfirmHost() {
         <Group justify="flex-end" gap="xs">
           {/* the safe answer has the focus: Enter keeps what is there */}
           <Button variant="default" data-autofocus onClick={() => answer(shown, false)}>
-            {shown?.cancelLabel ?? 'Cancel'}
+            {shown?.cancelLabel ?? t('Cancel')}
           </Button>
           <Button {...(shown?.danger && { color: 'red' })} onClick={() => answer(shown, true)}>
             {shown?.confirmLabel}

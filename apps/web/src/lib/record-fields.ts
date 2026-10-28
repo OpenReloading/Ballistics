@@ -72,9 +72,6 @@ export type FieldGroup = {
   rows: FieldRow[]
 }
 
-/** The text before a twist's length per turn, in English. */
-export const turnPrefix = '1 turn in '
-
 /** A row's unit: the symbol of its quantity, or the unit it names as text or words. */
 const unitOf = (row: FieldRow, system: UnitSystem, t: Translate) =>
   row.value

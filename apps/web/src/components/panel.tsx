@@ -20,18 +20,24 @@ export function Panel({
 }: {
   /** The title's id; a table in the panel names itself by it (`aria-labelledby`). */
   id: string
-  /** The heading: text as shown, or with `translated` a message of the catalogue. */
-  title: string | Message
-  /** `title` is a message that the language shown translates. */
-  translated?: boolean
   /** Beside the title: a view switch, a filter, a search field. */
   controls?: ReactNode
   className?: string
   children: ReactNode
-}) {
+} & (
+  | {
+      /** The heading as shown. */
+      title: string
+      translated?: false
+    }
+  | {
+      /** The heading: a message of the catalogue, which the language shown translates. */
+      title: Message
+      translated: true
+    }
+)) {
   const { t } = useTranslation()
-  // the type of `title` says a translated one is a Message
-  const title = translated ? t(given as Message) : given
+  const title = translated ? t(given) : given
   return (
     <Paper
       component="section"

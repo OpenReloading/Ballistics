@@ -77,24 +77,19 @@ test('German is chosen in Settings, switches the home page and the dialog, and i
   expect(problems).toEqual([])
 })
 
-test('the Database list and a record page in German have no accessibility violation', async ({
-  page,
-}) => {
+// the axe sweep of both pages in German is in a11y-states.spec.ts
+test('the Database list and a record page show in German', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('language', 'de'))
-  const axe = () =>
-    new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
 
   await gotoHydrated(page, '/cartridges/')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await expect(page.getByRole('heading', { level: 1, name: 'Patronen' })).toBeVisible()
   await expect(page.getByRole('tab', { name: 'Treibladungspulver' })).toBeVisible()
   await expect(page.getByRole('searchbox')).toHaveAttribute('placeholder', /Alias/)
-  expect((await axe().analyze()).violations).toEqual([])
 
   await gotoHydrated(page, '/cartridges/308-win/')
   await expect(page.getByRole('link', { name: 'In der Werkbank verwenden' })).toBeVisible()
   await expect(page.getByRole('heading', { name: /^Quellen/ })).toBeVisible()
-  expect((await axe().analyze()).violations).toEqual([])
 })
 
 test.describe('offline', () => {
