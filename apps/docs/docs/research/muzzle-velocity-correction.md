@@ -13,14 +13,14 @@ Exterior model: does correcting a speed read at the stored muzzle distance of a 
 
 Decided before the run.
 
-- Bullets: synthetic, on the 12 most frequent bullet diameters (4 to 13 mm) of the cartridge records (5.7 to 9.55 mm), four bullets each, 48 combinations. The mass follows from a sectional density of 0.16, 0.22 (twice) and 0.28 lb/in2. The ballistic coefficient is the sectional density over an assumed form factor: 0.55 against G1 (0.16 and 0.22), 1.0 against G7 (0.22 and 0.28). Form factors are assumptions, not measurements. Sea-level standard air.
+- Bullets: synthetic, on the 12 most frequent bullet diameters (the G1 value of the cartridge side, kept between 4 and 13 mm) among the cartridge records in `packages/data/records/cartridges/` at the commit named under Reproduce; the 12 lie between 5.7 and 9.55 mm, four bullets each, 48 combinations. The mass follows from a sectional density of 0.16, 0.22 (twice) and 0.28 lb/in2. The ballistic coefficient is the sectional density over an assumed form factor: 0.55 against G1 (0.16 and 0.22), 1.0 against G7 (0.22 and 0.28). Form factors are assumptions, not measurements. Sea-level standard air.
 - Inversion: the muzzle velocity whose flown speed at the stored distance equals the measured one, found by moving a guess by the miss over the existing point-mass `trajectory` (horizontal bore, no wind, no Earth rotation, spin drift or jump). No new integrator. The closed-form exponential loss with a constant drag coefficient is kept as a cross-check only.
 - Test 1: 1000 seeded shots, each a random combination, muzzle velocity 300 to 1000 m/s and distance 1 to 10 m. Fly the known velocity to the distance, correct the speed there back, compare. Accept: mean bias below 0.1 m/s. The forward and the backward run use the same model, so this checks the search, not the drag law. As an independent check, 1000 further shots on a constant drag coefficient of 0.3, where the closed form is the exact solution and serves as the truth.
 - Test 2: a 68 gr, 6.17 mm bullet at 2.44 m and 975 m/s, and a 175 gr, 7.82 mm bullet at 4.0 m and 800 m/s (G7 coefficients 0.15 and 0.27 lb/in2, assumed). Accept: the corrected value equals the muzzle velocity flown within 0.3 m/s (1 ft/s).
 - Test 3: the correction in m/s and in percent of the measured speed at 5 m for every combination at 350, 650 and 950 m/s (144 cases), and the closed form against the inversion.
 - Rule: if the correction at 5 m is below 0.1 percent for every case, the result is no change and the distance is documented as ignorable up to that value. 0.1 percent stands for the accuracy of an optical chronograph and is a placeholder, unverified. The table is given so another limit can be applied.
 
-Reproduce: `node tools/research/muzzle-velocity-correction.ts` from the repository root, on the branch `research/muzzle-velocity-correction`.
+Reproduce: `node tools/research/muzzle-velocity-correction.ts` from the repository root, at commit `fbb0e3dcd1d033490a9081b12d6447c9bebe078a` (the script, the core function and the cartridge records it reads).
 
 ## Formulas
 
@@ -61,7 +61,7 @@ All 144 cases lie between 0.311 and 0.716 percent; none is below 0.1 percent. Wi
 
 ## Result
 
-Improved. Rule: the correction at 5 m is 0.31 to 0.72 percent of the velocity in every case, above the 0.1 percent limit, so it is worth building. The inversion gives the flown muzzle velocity back to $10^{-7}$ m/s on a bullet with a standard drag function and to $2\times10^{-4}$ m/s against the exact solution of a constant coefficient, and both named cases agree within 0.3 m/s by a wide margin. Adopted as a core function `muzzleVelocityFromDownrange` with unit tests for test 1 and test 2, on the branch `research/muzzle-velocity-correction`, ready to cherry-pick. Not on the default branch with this entry.
+Improved. Rule: the correction at 5 m is 0.31 to 0.72 percent of the velocity in every case, above the 0.1 percent limit, so the simulation alone suggests the correction may be worth building, pending a verified limit and measured sessions. The inversion gives the flown muzzle velocity back to $10^{-7}$ m/s on a bullet with a standard drag function and to $2\times10^{-4}$ m/s against the exact solution of a constant coefficient, and both named cases agree within 0.3 m/s by a wide margin. Adopted as a core function `muzzleVelocityFromDownrange` with unit tests for test 1 and test 2, at commit `fbb0e3dcd1d033490a9081b12d6447c9bebe078a`, ready to cherry-pick. Not on the default branch with this entry.
 
 Wiring for the web app, not built: in `chargeRows` (`apps/web/src/lib/measurements.ts`), when a session has a muzzle distance above zero and the saved load gives the bullet's mass, diameter and drag, call the function on the mean gate velocity and show the result as its own number next to the gate reading. The switch is off by default and switches the number off again. The comparison with the simulated muzzle velocity uses the corrected number only while the switch is on. Without a load there is no corrected number and no field is added to the session. The summary shows the corrected number labelled as a simulation.
 
