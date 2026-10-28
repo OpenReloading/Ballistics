@@ -163,10 +163,46 @@ export function readTable(text: string): TableRead {
   return tableOfRows(splitRows(text, delimiter))
 }
 
+const opening = '([{'
+const closing = ')]}'
+
+/** Each bracketed part on one line replaced by a space, from an opening bracket to the next closing one of any kind; linear time. */
+function withoutBrackets(text: string): string {
+  let out = ''
+  let open: string | undefined
+  for (const c of text) {
+    if (open === undefined) {
+      if (opening.includes(c)) open = c
+      else out += c
+    } else if (closing.includes(c)) {
+      out += ' '
+      open = undefined
+    } else if ('\n\r\u2028\u2029'.includes(c)) {
+      out += open + c
+      open = undefined
+    } else open += c
+  }
+  return out + (open ?? '')
+}
+
+/** The trimmed text inside the first brackets that hold any, their last character when they hold only white space; linear time. */
+function firstBracketed(text: string): string | undefined {
+  let open = -1
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charAt(i)
+    if (open < 0) {
+      if (opening.includes(c)) open = i
+    } else if (closing.includes(c)) {
+      if (i > open + 1) return text.slice(open + 1, i).trim() || text.charAt(i - 1)
+      open = -1
+    }
+  }
+  return undefined
+}
+
 /** The header as words: lower case, accents and umlauts folded, units in brackets removed. */
 export function headerWords(header: string): string[] {
-  return header
-    .replace(/[([{].*?[)\]}]/g, ' ')
+  return withoutBrackets(header)
     .toLowerCase()
     .replaceAll('ä', 'ae')
     .replaceAll('ö', 'oe')
@@ -180,7 +216,7 @@ export function headerWords(header: string): string[] {
 
 /** The unit word a header carries in brackets or after a slash, underscore or space, lower case; undefined for none. */
 export function headerUnit(header: string): string | undefined {
-  const bracket = /[([{]\s*([^)\]}]+?)\s*[)\]}]/.exec(header)?.[1]
+  const bracket = firstBracketed(header)
   const tail = /[_/ ]([a-z]{1,4})$/i.exec(header)?.[1]
   return (bracket ?? tail)?.toLowerCase()
 }
