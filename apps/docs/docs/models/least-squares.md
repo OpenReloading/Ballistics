@@ -83,6 +83,10 @@ $$
 
 Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`stalled`, `small`).
 
+The result names the rule that ended the loop in `stop`: `stalled` for the first condition, `smallStep` for the second. Under a Huber loss the weights follow the residuals, so a row can cross the threshold on the last step. `weightsSettled` is true when the set of rows beyond the threshold was the same before and after the last accepted step, and always true without a Huber loss or without an accepted step. When it is false, the stop rule fired while the weights were still moving, and the fitted values may differ from those of a longer run.
+
+Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`stop`, `weightsSettled`).
+
 The tolerance $\epsilon$ is $10^{-12}$ unless the caller sets `tolerance`. The [curve fit](interior-curve-fit.md) sets $10^{-9}$: correlated form parameters leave a flat valley in which steps still gain a small share of $\chi^2$ long after the parameters have moved by far less than their uncertainty.
 
 After `maxIterations` accepted or rejected steps it runs the conditioning check at the current iterate, then fails with reason `not-converged`.
