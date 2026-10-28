@@ -256,10 +256,46 @@ export interface TruingPlanInput {
     | undefined
 }
 
+/**
+ * Why a planned string cannot separate muzzle velocity from drag factor, whatever the numbers:
+ * `single-range` (impacts or dials at one distance and no chronograph) and `velocity-only` (a
+ * chronograph and no impact or dial).
+ */
+export type PlanRefusalId = 'single-range' | 'velocity-only'
+
+/** A plan the structure of the string rules out, with what to change. */
+export interface PlanRefusal {
+  /** Fixed identifier. */
+  id: PlanRefusalId
+  /** What to add to the string. */
+  advice: string
+}
+
+const refusalAdvice: Readonly<Record<PlanRefusalId, string>> = {
+  'single-range':
+    'All impacts or dials are at one distance, so one drop cannot separate muzzle velocity from drag factor. Add an entry at a second distance, or chronograph readings.',
+  'velocity-only':
+    'Chronograph readings alone give one speed, which muzzle velocity and drag factor both move. Add an impact or dial entry at a distance.',
+}
+
 /** Result of `planTruingStrings`. */
 export interface TruingPlan extends Identification {
   /** Number of planned rows: entries plus the chronograph. */
   observationCount: number
+  /** Structural refusals of the planned string, none when it passes; the statuses still hold. */
+  refusals: PlanRefusal[]
+}
+
+/** The refusals a planned string earns (`apps/docs/docs/models/exterior-truing-strings.md`, "Refusals of a plan"). */
+function planRefusals(
+  entries: readonly PlanEntry[],
+  chronograph: TruingPlanInput['chronograph'],
+): PlanRefusal[] {
+  const ids: PlanRefusalId[] = []
+  if (entries.length === 0) ids.push('velocity-only')
+  else if (chronograph === undefined && new Set(entries.map((e) => e.range)).size === 1)
+    ids.push('single-range')
+  return ids.map((id) => ({ id, advice: refusalAdvice[id] }))
 }
 
 interface Row {
@@ -751,6 +787,7 @@ export function planTruingStrings(
         : p,
     ),
     observationCount: rows.length,
+    refusals: planRefusals(entries, chronograph),
   }
 }
 

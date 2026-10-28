@@ -8,7 +8,7 @@ description: Plan and fit of muzzle velocity, drag factor, click value and an op
 A range string is a set of measurements at known distances: the mean impact above the line of sight at the zero setting, or the clicks dialled to centre the group, plus optional chronograph readings.
 
 - `fitTruingStrings` fits the muzzle velocity, a constant drag factor, the click value of the sight and, with the option `fitZeroOffset`, a zero offset to such a string, weighted by the stated uncertainty of every row. A parameter the data cannot separate is named weak or unresolved, returns no value and keeps its nominal value in the reported model. The identified parameters come with confidence intervals. A chi-square test checks the residuals.
-- `planTruingStrings` gives the statuses and standard errors of a planned string before any shot.
+- `planTruingStrings` gives the statuses and standard errors of a planned string before any shot, and the refusals of its structure.
 - `comparePlanCandidates` does so for several candidate strings.
 
 The workbench's Trajectory tab has the section Truing from range strings: the plan from distances, shots and the dispersion of one shot, the entry of measured rows, each with its number of shots and standard deviation, and the fit with its intervals and residual check. Its nominal shot is the tab's result.
@@ -102,6 +102,19 @@ $$
 Code: `packages/core/src/exterior/range-strings.ts`, `parameterStatuses`, `analyse`, `rangeStringDefaults`.
 
 The limits are the options `maxInflation`, `maxRelativeStandardUncertainty` and `maxZeroSigma`. When some parameter is collinear, the result names in `confounded` the parameters whose component in the eigenvector of the smallest eigenvalue exceeds 0.3 (`confoundedComponent`). A weak parameter reports $\sigma_{\theta_j}$ and $\mathrm{VIF}_j$ (infinite for a singular design) but no value and no interval.
+
+### Refusals of a plan
+
+A plan carries `refusals`, each with a fixed `id` and an `advice` text, when the structure of the string rules out separating $v_0$ from $k$:
+
+| `id` | Condition | Advice |
+| --- | --- | --- |
+| `single-range` | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings. |
+| `velocity-only` | A chronograph and no impact or dial entry | Add an impact or dial entry at a distance. |
+
+Code: `packages/core/src/exterior/range-strings.ts`, `planRefusals`, `refusalAdvice`.
+
+One drop moves $v_0$ and $k$ along the same direction, and one speed does the same. The refusal names the cause that the statuses show as `collinear` or `no-information`. The statuses are still reported. A chronograph with entries at one range passes, since it fixes $v_0$ and the drop then fixes $k$.
 
 ### Gaussian priors
 

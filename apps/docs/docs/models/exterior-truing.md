@@ -10,6 +10,7 @@ Truing adjusts inputs of the trajectory so that its predictions match measured v
 - `trueMuzzleVelocity` fits the muzzle velocity.
 - `trueDrag` fits a drag correction, with or without the muzzle velocity.
 - `trueDragSessions` fits one drag correction of one projectile, shared by several sessions flown with their own conditions.
+- `compareTruingFits` fits the same observations with the muzzle velocity alone and with the drag factor together with the muzzle velocity, and reports how far the two fitted shots disagree.
 
 ## Equations
 
@@ -99,6 +100,18 @@ Code: `packages/core/src/exterior/truing.ts`, `truingResult` (`parameters`).
 
 $\sigma_{\theta_j}$ and the correlations come from [the covariance at the solution](least-squares.md). The result also reports $\chi^2$, the degrees of freedom $n - p$, the condition number, and for every observation the predicted value, the residual (predicted minus observed) and the predicted Mach number at its range.
 
+### Divergence of the two fits
+
+With $\hat y_i^{(v)}$ the prediction of the muzzle velocity fit and $\hat y_i^{(k)}$ that of the fit of $v_0$ and $k$ together, at the same $n$ observations:
+
+$$
+D = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \left(\frac{\hat y_i^{(k)} - \hat y_i^{(v)}}{\sigma_i}\right)^2}
+$$
+
+Code: `packages/core/src/exterior/truing.ts`, `compareTruingFits` (`divergence`).
+
+$\sigma_i = 1$ where the observations have none, which the fit allows for one kind only. The two-parameter fit contains the one-parameter fit as the case $k = 1$, so data that only a muzzle velocity error produced give $k = 1$ and $D = 0$ up to the solver tolerance. A drag error that the muzzle velocity has to absorb gives $D > 0$. $D$ compares predictions at the observed ranges and says nothing about the ranges between or beyond them.
+
 ### The zero during truing
 
 With a zero range, every candidate is zeroed again at that range by `trajectory`, so the zero carries the candidate muzzle velocity and drag. A height observed at the zero range then carries no information and is reported as unresolved. With bore angles given directly, they are held for every candidate.
@@ -146,6 +159,8 @@ The trajectories of a fit run at `relativeTolerance` $10^{-10}$, `absoluteTolera
 | $\sigma_i$ | Standard deviation of observation $i$ | unit of the observation | unit of the observation |
 | $r_i$, $\chi^2$ | Weighted residual, sum of squares | 1 | 1 |
 | $\sigma_{q_j}$ | Standard uncertainty of a fitted parameter | unit of the parameter | unit of the parameter |
+| $\hat y_i^{(v)}$, $\hat y_i^{(k)}$ | Prediction of the muzzle velocity fit, of the fit of $v_0$ and $k$ | mm, deg, m/s | m, rad, m/s |
+| $D$ | Divergence of the two fits | 1 | 1 |
 
 ## Assumptions
 

@@ -513,6 +513,60 @@ export function trueDrag(
   )
 }
 
+/** One observation's predictions under the two fits of `compareTruingFits`. */
+export interface TruingDifference {
+  /** Quantity observed. */
+  kind: Observation['kind']
+  /** Slant range, m. */
+  range: number
+  /** Prediction of the drag fit minus that of the muzzle velocity fit, unit of `kind`. */
+  difference: number
+  /** `difference` over the standard uncertainty of the observation, 1 where it has none. */
+  standardized: number
+}
+
+/** Result of `compareTruingFits`. */
+export interface TruingComparison {
+  /** The fit of the muzzle velocity alone, drag as given. */
+  velocityFit: TruingResult
+  /** The fit of the drag factor together with the muzzle velocity. */
+  dragFit: TruingResult
+  /** One row per observation, in input order. */
+  differences: TruingDifference[]
+  /** Root mean square of the standardized differences; 0 when the two fits predict alike. */
+  divergence: number
+}
+
+/**
+ * Fits the same observations twice, the muzzle velocity alone and a constant drag factor together
+ * with the muzzle velocity, and reports how far the two fitted shots disagree at the observed
+ * ranges. Data that only a muzzle velocity error produced give a divergence of 0 (the drag fit
+ * finds a factor of 1); a drag error the velocity fit has to absorb shows as a positive
+ * divergence (`apps/docs/docs/models/exterior-truing.md`, "Divergence of the two fits").
+ * Throws what either fit throws, so at least two observations that separate the two parameters.
+ */
+export function compareTruingFits(
+  shot: TrajectoryInput,
+  observations: readonly Observation[],
+  options?: TruingOptions,
+): TruingComparison {
+  const velocityFit = trueMuzzleVelocity(shot, observations, options)
+  const dragFit = trueDrag(shot, observations, { fitMuzzleVelocity: true }, options)
+  const differences = observations.map((x, i): TruingDifference => {
+    const difference = nth(dragFit.residuals, i).predicted - nth(velocityFit.residuals, i).predicted
+    return {
+      kind: x.kind,
+      range: x.range,
+      difference,
+      standardized: difference / (x.standardUncertainty ?? 1),
+    }
+  })
+  const divergence = Math.sqrt(
+    differences.reduce((s, d) => s + d.standardized ** 2, 0) / differences.length,
+  )
+  return { velocityFit, dragFit, differences, divergence }
+}
+
 /**
  * Fits one drag correction of the projectile, shared by all sessions, to the observations of
  * every session flown with its own conditions, and optionally each session's muzzle velocity
