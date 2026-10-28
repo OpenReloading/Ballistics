@@ -17,7 +17,7 @@ import { fixedNumber } from '../i18n/number.ts'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
-import type { FieldValue } from '../lib/field-spec.ts'
+import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
@@ -85,6 +85,30 @@ function valueMessages(t: PhotoState, record: Design['origin']): MessageEntry[] 
   ]
 }
 
+/** A length typed for the scale, with the message for an entry the scale cannot use. */
+export function DistanceField({
+  label,
+  system,
+  value,
+  onChange,
+}: {
+  label: string
+  system: UnitSystem
+  value: FieldValue
+  onChange: (v: FieldValue) => void
+}) {
+  const spec = distanceSpec(label)
+  return (
+    <NumberField
+      spec={spec}
+      system={system}
+      value={value}
+      onChange={onChange}
+      error={(shown) => fieldError(spec, value, shown)}
+    />
+  )
+}
+
 /** The scale controls: the two distances on the ruler and the sizes read off a caliper. */
 function ScaleControls({ system, t }: { system: UnitSystem; t: PhotoState }) {
   const set = (i: 0 | 1) => (v: FieldValue) =>
@@ -97,14 +121,14 @@ function ScaleControls({ system, t }: { system: UnitSystem; t: PhotoState }) {
         Click or tap the graduation of the ruler at two points, A and B, then enter their distance.
         Drag a point to move it. A second pair, C and D, checks the first.
       </Text>
-      <NumberField
-        spec={distanceSpec('Distance A to B')}
+      <DistanceField
+        label="Distance A to B"
         system={system}
         value={t.distances[0]}
         onChange={set(0)}
       />
-      <NumberField
-        spec={distanceSpec('Distance C to D (optional)')}
+      <DistanceField
+        label="Distance C to D (optional)"
         system={system}
         value={t.distances[1]}
         onChange={set(1)}
@@ -127,14 +151,14 @@ function ScaleControls({ system, t }: { system: UnitSystem; t: PhotoState }) {
         the ruler where it has. Both together also show a bullet that is tilted or a cut-out that
         includes a shadow.
       </Text>
-      <NumberField
-        spec={distanceSpec('Diameter, caliper (optional)')}
+      <DistanceField
+        label="Diameter, caliper (optional)"
         system={system}
         value={t.known[0]}
         onChange={setKnown(0)}
       />
-      <NumberField
-        spec={distanceSpec('Overall length, caliper (optional)')}
+      <DistanceField
+        label="Overall length, caliper (optional)"
         system={system}
         value={t.known[1]}
         onChange={setKnown(1)}
