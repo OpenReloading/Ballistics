@@ -151,6 +151,7 @@
       "ladder pressure must be positive",
       "pressureSigma must be positive",
       "barrelLength must be positive",
+      "boreDiameter must be positive",
       "propellantTemperature must be positive",
       "peakPressure and pressureSigma together",
       "peakPressure and pressureBasis together",
@@ -167,6 +168,7 @@
       "prior {name}: value above {floor}, sigma above 0",
       "charge must be positive",
       "level must lie in (0, 1)",
+      "domainMargin must lie in [0, 1)",
       "the fit has no covariance: add rows or velocity sigmas"
     ],
     "ladders": [
