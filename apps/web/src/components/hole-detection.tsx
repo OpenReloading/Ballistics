@@ -21,6 +21,12 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Message as Text, type Translator } from '../i18n/translate.ts'
 import { commonCaliber } from '../lib/caliber.ts'
+import {
+  type CandidateClass,
+  caliberCandidates,
+  caliberClassesOf,
+  ownCartridges,
+} from '../lib/caliber-candidates.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
 import { type FoundFace, faceGeometry } from '../lib/face-sheet.ts'
@@ -231,6 +237,7 @@ export function useHoleDetection({
     setRecord(undefined)
     if (faceId) fetchFace(faceId).then(setRecord, () => {})
   }, [faceId])
+  const { candidates, caliber, setCaliber } = useCaliberCandidates(group, size?.diameter)
   useEffect(() => {
     if (tool !== 'region') setPending([])
   }, [tool])
@@ -774,6 +781,12 @@ export function useHoleDetection({
       onHoles={() => setStep(4)}
       onSize={() => setSizeOpen(true)}
       onHoleSize={commitHoleSize}
+      candidates={candidates}
+      caliber={caliber}
+      onCaliber={(c) => {
+        setCaliber(c.id)
+        if (!size) commitHoleSize(c.diameter)
+      }}
       onAccept={() => take(proposals)}
     />
   )
@@ -800,6 +813,36 @@ export function useHoleDetection({
   }
 
   return { onPoint, hint, layer, panel, progressBar, photoAdded }
+}
+
+/**
+ * The caliber candidates of the group (`caliberCandidates`) and the class picked, else the one
+ * preselected; loaded for each group, face and event.
+ */
+function useCaliberCandidates(group: ShotGroup | undefined, hole: number | undefined) {
+  const [classes, setClasses] = useState<{ list: CandidateClass[]; mine: ReadonlySet<string> }>()
+  const [picked, setCaliber] = useState<string>()
+  const face = group?.face
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on another group, face or event only
+  useEffect(() => {
+    setClasses(undefined)
+    setCaliber(undefined)
+    if (!face) return
+    let live = true
+    Promise.all([caliberClassesOf(face), ownCartridges()]).then(
+      ([list, mine]) => live && setClasses({ list, mine }),
+      () => {},
+    )
+    return () => {
+      live = false
+    }
+  }, [group?.id, face?.id, face?.event])
+  const { candidates, preselected } = caliberCandidates(
+    classes?.list ?? [],
+    hole,
+    classes?.mine ?? new Set(),
+  )
+  return { candidates, caliber: picked ?? preselected, setCaliber }
 }
 
 /** The marked region, else the face, else the whole turned photo. */
@@ -991,6 +1034,9 @@ function ResultLine({
   onHoles,
   onSize,
   onHoleSize,
+  candidates,
+  caliber: picked,
+  onCaliber,
   onAccept,
 }: {
   target: string | undefined
@@ -1006,6 +1052,12 @@ function ResultLine({
   onHoles: () => void
   onSize: () => void
   onHoleSize: (si: number | undefined) => void
+  /** The caliber classes of the discipline, the likeliest first. */
+  candidates: readonly CandidateClass[]
+  /** The class picked or preselected; none while two share the hole size. */
+  caliber: string | undefined
+  /** Picks a class; without a hole size its diameter becomes the hole size. */
+  onCaliber: (c: CandidateClass) => void
   onAccept: () => void
 }) {
   const { t, tn } = useTranslation()
@@ -1064,6 +1116,24 @@ function ResultLine({
         />
       ) : (
         item(t('Caliber'), caliber, t('Change the hole size'), onSize)
+      )}
+      {candidates.length > 0 && (
+        <div className="prop-row detect-wide">
+          <span className="prop-label">{t('Caliber class')}</span>
+          <span className="prop-value row-buttons caliber-chips">
+            {candidates.map((c) => (
+              <Button
+                key={c.id}
+                size={controlSize.row.button}
+                variant={c.id === picked ? 'filled' : 'default'}
+                aria-pressed={c.id === picked}
+                onClick={() => onCaliber(c)}
+              >
+                {c.name}
+              </Button>
+            ))}
+          </span>
+        </div>
       )}
       <Button
         size={controlSize.row.button}

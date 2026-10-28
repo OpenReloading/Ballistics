@@ -166,6 +166,18 @@ $$
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `acceptProposals`.
 
+### Caliber candidates
+
+The result line offers the caliber classes of the group's discipline, the one its target event scores, as one button each; a group without a discipline offers the classes of every discipline on its target. With a hole size $D_0$, the class of nominal diameter $d_c$ nearest to it comes first, with every class within the resolution of its diameter:
+
+$$
+|d_c - d_\mathrm{nearest}| < \Delta_d, \quad \Delta_d = 0.5\ \mathrm{mm}
+$$
+
+Code: `apps/web/src/lib/caliber-candidates.ts`, `caliberCandidates`, `HOLE_SIZE_RESOLUTION`.
+
+Those classes share a hole size: a class of the user's firearms or loads (one of its cartridges) comes first among them, and none is preselected. The other classes follow by $|d_c - D_0|$. The nearest class is preselected when no other shares its hole size. Without a hole size the classes keep their order, the user's first, and none is preselected; picking one then sets the hole size to its nominal diameter and the run follows. The class picked is shown in the line and not stored (the hole size it gives is stored as typed); proposals stay out of the statistics until accepted.
+
 ### Strays
 
 With four or more proposals, a proposal is dropped as print, stain or background when its nearest other proposal lies farther than four times the median of these nearest distances plus two hole diameters:
@@ -318,6 +330,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 | $A$, $k$ | Area of a part, peaks in it | no kind, 1 | px², 1 |
 | $D_0$, $D'$ | Expected hole size, refined size of a run | mm, no kind | m, px |
 | $d_\mathrm{hole}$ | Measured hole diameter of an accepted shot | mm | m |
+| $d_c$, $d_\mathrm{nearest}$, $\Delta_d$ | Nominal diameter of a caliber class, of the class nearest to the hole size, and the resolution under which classes share a hole size | mm | m |
 | $Y$, $t$ | Luma, Otsu threshold | no kind | 0 to 255 |
 | $\omega_0, \omega_1$, $\mu_0, \mu_1$ | Class weights and mean lumas below and above $t$ | no kind | 1 |
 | $s$ | Photo pixels per mm of a target, from its black diameter | no kind | px/mm |
@@ -337,7 +350,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 
 ## Limits
 
-- The thresholds and scale sets are the app's own values from a prototype, without a published source. So are the limits of the photo quality check.
+- The thresholds and scale sets are the app's own values from a prototype, without a published source. So is the resolution $\Delta_d$ of the caliber candidates. So are the limits of the photo quality check.
 - The photo quality check reads the black area's ellipse: a target whose black area is not found is judged by brightness, glare and light over the whole photo, edge sharpness and size. A tilt of a photo whose target shows no black area, and a reflection on the black area, are not measured. A black zone that fills the photo of a target that is not selected looks like a dark photo (a fair note). The blur of a photo with thin rings and no hole is not measured. A photo with none of the problems may still give wrong or missing holes.
 - Torn or elongated holes, holes in a printed line and very close holes may be missed or miscounted. The user confirms, moves or deletes each proposal.
 - A hole within half a hole of the photo's edge is not proposed.
