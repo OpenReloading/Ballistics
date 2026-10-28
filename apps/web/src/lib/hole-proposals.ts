@@ -15,7 +15,7 @@ export type EditorProposal = HoleProposal & { id: number }
  * Confidence tier (a starting value): a proposal below it is a maybe, shown on the photo but left
  * out of Accept all and the proposal count.
  */
-export const MAYBE_BELOW = 0.5
+const MAYBE_BELOW = 0.5
 
 /** True for a proposal below the confidence tier. */
 export const isMaybe = (p: Pick<HoleProposal, 'confidence'>): boolean => p.confidence < MAYBE_BELOW
