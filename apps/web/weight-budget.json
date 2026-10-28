@@ -14,8 +14,8 @@
     },
     "shell": {
       "budget": {
-        "initial": 420000,
-        "total": 466000
+        "initial": 424000,
+        "total": 472000
       },
       "routes": {
         "/": {
@@ -34,8 +34,8 @@
     },
     "lists": {
       "budget": {
-        "initial": 438000,
-        "total": 484000
+        "initial": 442000,
+        "total": 490000
       },
       "routes": {
         "/bullets": {
@@ -134,8 +134,8 @@
     },
     "designers": {
       "budget": {
-        "initial": 416000,
-        "total": 639000
+        "initial": 419000,
+        "total": 648000
       },
       "routes": {
         "/bullets/designer": {
@@ -158,8 +158,8 @@
     },
     "tools": {
       "budget": {
-        "initial": 559000,
-        "total": 595000
+        "initial": 565000,
+        "total": 603000
       },
       "routes": {
         "/cases/editor": {
@@ -186,8 +186,8 @@
     },
     "workbench": {
       "budget": {
-        "initial": 631000,
-        "total": 989000
+        "initial": 638000,
+        "total": 1001000
       },
       "routes": {
         "/workbench": {
