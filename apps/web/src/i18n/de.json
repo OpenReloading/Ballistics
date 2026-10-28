@@ -3661,6 +3661,8 @@
     "other": "Simulationsparameter angepasst an {count} Schussreihen, {date}"
   },
   "simulation parameters, hand-tuned": "Simulationsparameter, von Hand abgestimmt",
+  "A powder record holds at most 40 points of one charge and temperature.": "Ein Treibladungspulver-Datensatz fasst höchstens 40 Punkte aus je einer Treibladung und Temperatur.",
+  "The fit does not make a valid powder record.": "Die Anpassung ergibt keinen gültigen Treibladungspulver-Datensatz.",
   "The fit cannot be stored as a powder record in this browser.": "Die Anpassung lässt sich in diesem Browser nicht als Treibladungspulver-Datensatz speichern.",
   "The powder was not saved.": "Das Treibladungspulver wurde nicht gespeichert.",
   "{name} (fit {n})": "{name} (Anpassung {n})",

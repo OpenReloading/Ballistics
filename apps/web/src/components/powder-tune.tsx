@@ -28,7 +28,7 @@ import { newId } from '../lib/new-id.ts'
 import { openOnWorkbench } from '../lib/open-loads.ts'
 import { type PowderFitState, temperatureFit, withSensitivity } from '../lib/powder-fit.ts'
 import { fitMark } from '../lib/powder-record.ts'
-import { fittedPowder, refitOf } from '../lib/powder-save.ts'
+import { fittedPowder, maxFitPoints, refitOf } from '../lib/powder-save.ts'
 import {
   fitStrings,
   loadStrings,
@@ -162,6 +162,16 @@ interface TuneSave {
   base?: Powder | undefined
   /** The stored fit of the base, a user powder saved from this screen: the save is then a refit. */
   baseFit?: UserPowderFit | undefined
+  /** The name typed for the powder, kept across fits; absent, a default from the base. */
+  name?: string | undefined
+  onName?: ((name: string) => void) | undefined
+}
+
+/** Why a save failed: too many points for a record, no valid record, or the write. */
+export const saveFailures = {
+  points: msg('A powder record holds at most 40 points of one charge and temperature.'),
+  record: msg('The fit does not make a valid powder record.'),
+  store: msg('The fit cannot be stored as a powder record in this browser.'),
 }
 
 /**
@@ -182,13 +192,13 @@ function SaveFit({
   const { t } = useTranslation()
   // a fitted user powder is refitted as a new record, so the loads on the old one run as before
   const refit = refitOf(save.base, save.baseFit, t)
-  const [name, setName] = useState(
-    () =>
-      refit?.name ??
-      (save.base ? t('{name}, fitted', { name: save.base.name }) : t('Fitted powder')),
-  )
+  const name =
+    save.name ??
+    refit?.name ??
+    (save.base ? t('{name}, fitted', { name: save.base.name }) : t('Fitted powder'))
   const [saved, setSaved] = useState<string>()
-  const [failed, setFailed] = useState(false)
+  const [failed, setFailed] = useState<keyof typeof saveFailures>()
+  const [saving, setSaving] = useState(false)
   const fit = state.fit?.fit
   const confidence = state.range?.confidence
   function store() {
@@ -205,15 +215,18 @@ function SaveFit({
       previous: refit?.previous,
     })
     setSaved(undefined)
-    setFailed(false)
+    setFailed(undefined)
     if (!record || !userRecord.safeParse(record).success) {
-      setFailed(true)
+      setFailed((record?.data.fit?.input.length ?? 0) > maxFitPoints ? 'points' : 'record')
       return
     }
-    putRecords([record]).then(
-      () => setSaved(record.name),
-      () => setFailed(true),
-    )
+    setSaving(true)
+    putRecords([record])
+      .then(
+        () => setSaved(record.name),
+        () => setFailed('store'),
+      )
+      .finally(() => setSaving(false))
   }
   return (
     <div className="powder-save">
@@ -221,11 +234,11 @@ function SaveFit({
         <TextInput
           label={t('Powder name')}
           value={name}
-          onChange={(e) => setName(e.currentTarget.value)}
+          onChange={(e) => save.onName?.(e.currentTarget.value)}
           maxLength={200}
           style={{ flex: 1, minWidth: '12rem' }}
         />
-        <Button variant="default" disabled={!confidence || state.running} onClick={store}>
+        <Button variant="default" disabled={!confidence || state.running || saving} onClick={store}>
           {t('Save as a powder')}
         </Button>
       </Group>
@@ -244,9 +257,7 @@ function SaveFit({
         </Message>
       )}
       {failed && (
-        <ErrorNote title={t('The powder was not saved.')}>
-          {t('The fit cannot be stored as a powder record in this browser.')}
-        </ErrorNote>
+        <ErrorNote title={t('The powder was not saved.')}>{t(saveFailures[failed])}</ErrorNote>
       )}
     </div>
   )
@@ -629,6 +640,8 @@ export function PowderTune() {
   const [form, setForm] = useState({ charge: '', shots: '', temperature: '' })
   const [error, setError] = useState(false)
   const [readFailed, setReadFailed] = useState(false)
+  // the powder name lives here, so a new fit, which renders the save anew, keeps it
+  const [name, setName] = useState<string>()
 
   useEffect(() => {
     const ids = tuneSessionIds(window.location.search)
@@ -726,7 +739,7 @@ export function PowderTune() {
           fit={fit}
           rows={rows}
           strings={strings}
-          save={save}
+          save={save && { ...save, name, onName: setName }}
           onAnyway={() => setAnyway(true)}
           sensitivity={sensitivity}
           onSensitivity={setSensitivity}
