@@ -23,6 +23,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - Every record carries its source (provenance), and the terms where the source states them; values taken as facts carry a page citation.
 - Results are simulations, not load data: no wording that calls a load or a result safe.
 - Code conventions, stored units and package rules: [AGENTS.md](AGENTS.md#conventions).
+- A pull request that adds a major user-visible feature adds a news item (`apps/web/news/YYYY-MM-DD-slug.md`: front matter `title` and `link`, two sentences) for the home page's What's new list, reviewed like any file; smaller changes are in the changelogs only.
 - Every spike and every model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md), a negative or null result included, and is closed with a link to it. The entry is written when the work ends, from the template on that page; `npm test -w @open-reloading/docs` fails on an entry that misses a section.
 
 ## Data requests, translations and review

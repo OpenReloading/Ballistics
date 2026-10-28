@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Home, RecordCount } from '../components/home.tsx'
+import { HomeNews } from '../components/home-news.tsx'
 import {
   listAllBullets,
   listAllCartridges,
@@ -9,6 +10,7 @@ import {
   listAllTargetFaces,
   listDisciplines,
 } from '../lib/api.ts'
+import { newestNews } from '../lib/news.ts'
 
 /** A list's record count. */
 async function Count({
@@ -32,5 +34,10 @@ const inData: Record<string, ReactNode> = {
 }
 
 export default function HomePage() {
-  return <Home counts={inData} />
+  return (
+    <>
+      <Home counts={inData} />
+      <HomeNews items={newestNews()} />
+    </>
+  )
 }
