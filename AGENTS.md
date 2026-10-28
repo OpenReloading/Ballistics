@@ -19,6 +19,7 @@
   - knip over every workspace, configured in `knip.jsonc`. Fails on an unused file, export, exported type or dependency, and on an unlisted binary.
   - The `exports` of a package point into `dist`, which knip cannot map back to `src`, so each entry file of a package is listed in `knip.jsonc`. A new entry file (a package export, a worker, a script run by Node or CI) is added there. Every `ignore*` entry carries a one-line reason.
   - A finding is fixed: drop the `export` of a symbol used only in its file, delete code nothing uses. `tools/test/knip.test.ts` checks that knip fails on each kind.
+- Research log entries (`apps/docs/docs/research/`): `npm test -w @open-reloading/docs` checks that each has every section of the template (`apps/docs/scripts/research-log.mts`). A spike or model-change issue ends with an entry and is closed with its link (`CONTRIBUTING.md`, Rules).
 - Doc comments: `npm run docs:check` (after `build`)
   - TypeDoc `validation.notDocumented`, warnings as errors, on every export of schema, core, drawing, importers, data and api. Not on properties, constructors, parameters and references. Without `notExported`.
   - Configured in `packages/<name>/typedoc.json`, the shared options in `packages/typedoc.base.json`.
