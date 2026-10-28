@@ -34,7 +34,7 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 
 ### Command
 
-The command line workspace (`packages/cli`) is not in the repository yet, so these commands do not run in a clean checkout until it lands.
+The two CLI commands below require the command line workspace (`packages/cli`), which is not in the repository yet. They do not run in a clean checkout until it lands.
 
 ```sh
 npm run build
