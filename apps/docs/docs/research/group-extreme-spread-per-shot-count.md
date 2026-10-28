@@ -19,7 +19,7 @@ Decided before the run.
 - Ratio of the mean extreme spread of 3 shots to that of 5 shots.
 - Rule: build when the means for $n$ = 2, 3, 5 and 10 agree with the values 1.77, 2.41, 3.07 and 3.81 $\sigma$ named in the issue within 2 percent. The values are this simulation's own; no published table is used.
 
-Reproduce: `node tools/research/group-extreme-spread-per-shot-count.ts` (about 26 s), on the branch `research/group-statistics`.
+Reproduce: `node tools/research/group-extreme-spread-per-shot-count.ts` (about 26 s), from commit `15a57e29ad802a10481a21d1188dc1844736f91b` (on the branch `research/group-statistics`; the script and the core functions it imports are in that commit, the seeds are in the script).
 
 ## Formulas
 
@@ -68,7 +68,7 @@ Proposed text for the Limits of [Groups](../models/groups.md), replacing the sen
 
 Web wiring, not built (at most ten lines):
 
-- In the groups tab, next to the extreme spread of a group of $n$ shots with $2 \le n \le 20$ and a radial or per-axis $\sigma$ estimate, a line: "For this shot count a group of this load is typically X to Y (mean Z), 90 percent range" with $X$, $Y$, $Z$ the table values times the estimated $\sigma$.
+- In the groups tab, next to the extreme spread of a group of $n$ shots with $2 \le n \le 20$ and a per-axis $\sigma$ estimate (a radial standard deviation is divided by $\sqrt{2}$ first), a line: "For this shot count a group of this load is typically X to Y (mean Z), 90 percent range" with $X$, $Y$, $Z$ the table values times the per-axis $\sigma$.
 - Where groups of different shot counts are compared, one line: "Groups of 3 shots average 0.79 of groups of 5 shots from the same rifle; compare groups of the same shot count." The ratio is `mean(n) / mean(m)` of the table.
 - Where several groups of one load are listed, one line: "The largest of 8 five-shot groups is about 1.4 times the mean, the smallest about 0.6 times, from chance alone." The numbers come from this entry for $k$ = 8, 12, 20 and are static text.
 - No other change; the shipped statistics stay as they are. The text states what chance does, no group size is called good or bad.

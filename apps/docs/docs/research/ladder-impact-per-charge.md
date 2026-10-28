@@ -18,9 +18,9 @@ Decided before the run; the first three items fix what the issue leaves open.
 - Statistic: for each charge the mean of the corrected shot heights (the residual centre) with the standard deviation of those heights; the note is shown when the heterogeneity statistic over the charges exceeds the chi-square quantile at the 99 percent level with 8 degrees of freedom. A false flag is a note shown with no oscillation injected.
 - Phase recovery: an ordinary least squares fit of a constant, a cosine and a sine of one cycle over the range to the 9 residual centres; the phase counts as recovered when it is within 45 degrees of the injected phase (chance level: 25 percent).
 - Flat spots: the existing `ladderFlatSpots` (95 percent bands) on the residual centres, counted as a second display check.
-- Rule: build as a note on the ladder only when the phase is recovered in more than 70 percent of 20 000 seeded ladders at 3 groups per charge and false flags stay under 5 percent. Otherwise nothing is built and the entry says the shift is below the detectable size at that shot count.
+- Rule: build as a note on the ladder only when the phase is recovered in more than 70 percent of 20 000 seeded ladders at 3 groups per charge and false flags stay under 5 percent. Otherwise nothing is built and the entry says the method did not meet its criteria (a statement about the method, not about the detectable size of a shift).
 
-Reproduce: `node tools/research/ladder-impact-per-charge.ts` (about 7 s), on the branch `research/group-statistics`.
+Reproduce: `node tools/research/ladder-impact-per-charge.ts` (about 7 s), from commit `15a57e29ad802a10481a21d1188dc1844736f91b` (on the branch `research/group-statistics`; the script and the core functions it imports are in that commit, the seeds are in the script).
 
 ## Formulas
 
@@ -30,7 +30,7 @@ $$
 z_{ij} = y_{ij} - b \left( v_{ij} - \bar{v} \right), \qquad r_i = \bar{z}_i, \qquad Q = \frac{\sum_i n_i \left( r_i - \bar{r} \right)^2}{s_p^2}
 $$
 
-with $\bar{v}$ the mean velocity of the ladder, $\bar{r}$ the count-weighted mean of the $r_i$ and $s_p^2$ the variance of the $z_{ij}$ pooled over the charges. Under a constant height $Q$ is close to chi-square distributed with $m - 1$ degrees of freedom for $m$ charges, the large-sample form of the one-way analysis of variance ([NIST/SEMATECH](../bibliography.md#nist-sematech); section unverified). The pooled variance is estimated, so the reference is approximate; the false-note rate below is measured, not assumed.
+with $\bar{v}$ the mean velocity of the ladder, $\bar{r}$ the count-weighted mean of the $r_i$ and $s_p^2$ the variance of the $z_{ij}$ pooled over the charges. Under a constant height $Q$ is close to chi-square distributed with $m - 1$ degrees of freedom for $m$ charges, a heuristic: the large-sample form of the one-way analysis of variance, whose F statistic times $m - 1$ tends to chi-square with $m - 1$ degrees of freedom as the error degrees of freedom grow (no page of [NIST/SEMATECH](../bibliography.md#nist-sematech) was checked: unverified). The pooled variance is estimated, so the reference is approximate and only the measured false-note rate below is relied on.
 
 ## Numbers
 
@@ -52,7 +52,7 @@ Not explored: oscillation amplitudes below 0.05 in, periods other than one cycle
 
 ## Result
 
-improved. Rule met on the stated assumptions: the phase is recovered in 100 percent of 20 000 ladders at 3 groups per charge (limit 70 percent), false notes are 1.4 percent (limit 5 percent). Adopted in a reduced form, a note on the ladder with the warning that it needs 3 to 4 groups per charge and a drop slope known to better than about 20 percent (at that error the false-note rate leaves the limit). The function `ladderImpactResiduals(charges, slope, level)` (per charge the residual centre, its standard deviation and shot count in the shape of `LadderStep`, the heterogeneity statistic, its degrees of freedom and the flag; SI units) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test requires the note in more than 99 percent of 400 ladders with a 0.1 in oscillation and in under 5 percent of 400 without, and covers the input checks.
+improved. Rule met on the stated assumptions: the phase is recovered in 100 percent of 20 000 ladders at 3 groups per charge (limit 70 percent), false notes are 1.4 percent (limit 5 percent). Adopted in a reduced form, a note on the ladder with the warning that it needs 3 to 4 groups per charge and a drop slope. Tested false-note rates: 1.4 percent with an exact slope and 6.6 percent with a slope 20 percent off; slope errors in between were not tested. The function `ladderImpactResiduals(charges, slope, level)` (per charge the residual centre, its standard deviation and shot count in the shape of `LadderStep`, the heterogeneity statistic, its degrees of freedom and the flag; SI units) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test requires the note in more than 99 percent of 400 ladders with a 0.1 in oscillation and in under 5 percent of 400 without, and covers the input checks.
 
 Web wiring, not built (at most ten lines):
 

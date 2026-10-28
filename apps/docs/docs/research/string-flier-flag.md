@@ -20,7 +20,7 @@ Decided before the run.
 - Rule: build only for $N$ of 10 or more, with the 1 percent either-end $k$, when the false-flag rate on the independent seed is from 0.5 to 1.5 percent for $N$ = 8 to 30 and the planted 8 SD flier is found in more than 90 percent of strings for $N$ of 10 or more. At $N = 5$ the screen shows nothing.
 - The flag is advisory: it never sets the `excluded` flag of a shot, the standard deviation is shown with and without the flagged shot, and a cold-bore shot is a real effect.
 
-Reproduce: `node tools/research/string-flier-flag.ts` (about 65 s), on the branch `research/group-statistics`.
+Reproduce: `node tools/research/string-flier-flag.ts` (about 65 s), from commit `15a57e29ad802a10481a21d1188dc1844736f91b` (on the branch `research/group-statistics`; the script and the core functions it imports are in that commit, the seeds are in the script).
 
 ## Formulas
 
@@ -30,7 +30,7 @@ $$
 T = \frac{\lvert x_j - \bar{x}_{(j)} \rvert}{s_{(j)}}
 $$
 
-with $\bar{x}_{(j)}$ and $s_{(j)}$ the mean and sample standard deviation of the string without shot $j$. This is the externally scaled deleted residual of regression diagnostics for a model with a constant only ([Belsley 1980](../bibliography.md#belsley-1980); chapter unverified). The shot farthest from the full mean is also the one with the largest $T$, because $T$ rises with the distance from the full mean. The factor $k_N$ is the 99th percentile of $T$ for clean normal strings of $N$ shots; no distribution formula is used, so the factors are simulated values.
+with $\bar{x}_{(j)}$ and $s_{(j)}$ the mean and sample standard deviation of the string without shot $j$. Up to the factor $\sqrt{(N-1)/N}$ (leverage $1/N$ of a constant-only model) this is the externally studentized deleted residual of regression diagnostics ([Belsley 1980](../bibliography.md#belsley-1980); page unverified, the factor is derived here and the calibration absorbs it). The shot farthest from the full mean is also the one with the largest $T$, because $T$ rises with the distance from the full mean. The factor $k_N$ is the 99th percentile of $T$ for clean normal strings of $N$ shots; no distribution formula is used, so the factors are simulated values.
 
 A rule that flags a shot when fewer than 0.5 shots are expected beyond it flags one end of a clean string with probability $1 - (1 - 1/(4N))^N$ (analytic: 0.23 at $N = 5$, 0.22 for large $N$), about one clean string in five: unfit.
 
