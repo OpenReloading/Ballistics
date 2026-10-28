@@ -11443,3 +11443,29 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     gap: 0.25rem;
   }
 }
+
+/* prototype of the powder tuning screen */
+.tune-proto {
+  display: grid;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  align-items: start;
+}
+.tune-proto section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.tune-table th,
+.tune-table td {
+  padding: 0.25rem 0.5rem;
+}
+.tune-table tr[data-invalid] td {
+  background: var(--error-bg, rgba(250, 82, 82, 0.15));
+}
+@media (min-width: 62em) {
+  .tune-proto {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
