@@ -16,7 +16,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - `npm test -w @open-reloading/docs` (`apps/docs/scripts/bibliography.test.mts`) fails on a file or name that no longer exists and on a source file no page names.
   - A change to a model's code updates its model page in the same commit.
 - `src/errors.ts`:
-  - `InputError` (extends `RangeError`): thrown on purpose for inputs outside the model and for computations that do not finish within their limits. `TruingError`, `PowderFitError` and `ValueError` (`interior/load-file.ts`) extend it.
+  - `InputError` (extends `RangeError`): thrown on purpose for inputs outside the model and for computations that do not finish within their limits. `TruingError`, `PowderFitError`, `MixedPressureBasisError` (`interior/fit.ts`, pressure rows on more than one basis) and `ValueError` (`interior/load-file.ts`) extend it.
   - Any other error is a defect (the API answers 500).
   - `need(ok, message)` throws an `InputError` for a failed input check.
   - `nth(array, index)` returns the entry or throws a `RangeError`; the integrator and interior model keep a module-local unchecked `el` for state vectors (`noUncheckedIndexedAccess`), a call into another module does not inline in vitest and slowed the Monte Carlo tests several times.
