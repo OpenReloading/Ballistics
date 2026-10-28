@@ -8,6 +8,7 @@ import {
   type LadderPoint,
   MixedPressureBasisError,
   PowderFitError,
+  type PowderParameter,
   type PressureBasis,
   powderDomainMargin,
   predictPowder,
@@ -592,6 +593,18 @@ describe('powder fit prediction bands', () => {
     expect(predictPowder(fit, 2.2e-3).velocity.standardUncertainty).toBeGreaterThan(
       below.velocity.standardUncertainty,
     )
+  })
+
+  it('refuses a fit that names a parameter it has no setter for', () => {
+    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
+    const renamed = {
+      ...fit,
+      parameters: fit.parameters.map((p, k) =>
+        k === 0 ? { ...p, name: 'toString' as PowderParameter } : p,
+      ),
+    }
+    expect(() => predictPowder(renamed, 2.8e-3)).toThrow(InputError)
+    expect(() => predictPowder(renamed, 2.8e-3)).toThrow(/^parameters: burnRate/)
   })
 
   describe('domain', () => {
