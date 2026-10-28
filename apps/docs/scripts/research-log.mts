@@ -36,9 +36,9 @@ function withoutComments(text: string): string {
 /** The body of each `## ` section of a page, by heading. */
 function bodies(text: string): Map<string, string> {
   const found = new Map<string, string>()
-  for (const part of text.split(/^## /m).slice(1)) {
+  for (const part of withoutComments(text).split(/^## /m).slice(1)) {
     const end = part.indexOf('\n')
-    found.set(part.slice(0, end).trim(), withoutComments(part.slice(end + 1)).trim())
+    found.set(part.slice(0, end).trim(), part.slice(end + 1).trim())
   }
   return found
 }
@@ -55,8 +55,10 @@ export function entryErrors(text: string, root: string): string[] {
       errors.push(`"${s}" must start with ${list.join(', ')}`)
   }
   const where = body.get('Where in the app') ?? ''
-  // shortcut: only a path with a slash inside backticks counts, a bare name is not looked up
-  for (const [, f] of where.matchAll(/`([\w.-]+\/[\w./[\]-]+)`/g))
+  // shortcut: only a path with a slash or a file name with a known extension inside backticks counts, a bare name is not looked up
+  for (const [, f] of where.matchAll(
+    /`([\w.-]+\/[\w./[\]-]+|[\w.-]+\.(?:md|mdx|mts|ts|tsx|js|mjs|cjs|json|jsonc|ya?ml))`/g,
+  ))
     if (!existsSync(join(root, f ?? ''))) errors.push(`no file ${f}`)
   return errors
 }

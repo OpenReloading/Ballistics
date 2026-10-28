@@ -44,6 +44,26 @@ test('a comment-only section, a longer word as answer and a missing extensionles
   ])
 })
 
+test('a commented-out section heading and a missing root-level file fail', () => {
+  const hidden = `${entry('Numbers')}\n<!--\n## Numbers\nPlaceholder\n-->\n`
+  assert.deepEqual(entryErrors(hidden, root), ['section "Numbers" is missing or empty'])
+  assert.deepEqual(
+    entryErrors(entry().replaceAll('apps/docs/scripts/research-log.mts', 'README.typo.md'), root),
+    ['no file README.typo.md'],
+  )
+  assert.deepEqual(
+    entryErrors(entry().replaceAll('apps/docs/scripts/research-log.mts', 'README.md'), root),
+    [],
+  )
+  assert.deepEqual(
+    entryErrors(
+      entry().replaceAll('apps/docs/scripts/research-log.mts', 'ellipseProbability'),
+      root,
+    ),
+    [],
+  )
+})
+
 test('every research log entry has all fields', () => {
   const files = entryFiles(dir)
   assert.ok(files.length > 0)
