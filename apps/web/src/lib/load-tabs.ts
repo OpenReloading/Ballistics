@@ -1,5 +1,6 @@
 /** The workbench loads, tabs and the saved-loads list. */
 import type { UserRecord } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
 import { storageName } from './edition.ts'
 import { matchesQuery } from './lists.ts'
 import { copyName } from './user-file-names.ts'
@@ -24,17 +25,18 @@ export function tabAfterClose(keys: string[], key: string): string | undefined {
   return keys[i + 1] ?? keys[i - 1]
 }
 
-const noCartridge = 'No cartridge'
-
 /** The name of a load nobody named: cartridge, bullet, and powder with the charge; "New load" when none is set. */
-export function generatedName(p: {
-  cartridge?: string | undefined
-  bullet?: string | undefined
-  powder?: string | undefined
-  charge?: string | undefined
-}): string {
+export function generatedName(
+  p: {
+    cartridge?: string | undefined
+    bullet?: string | undefined
+    powder?: string | undefined
+    charge?: string | undefined
+  },
+  t: Translator['t'],
+): string {
   const parts = [p.cartridge, p.bullet, [p.powder, p.charge].filter(Boolean).join(' ')]
-  return parts.filter(Boolean).join(', ') || 'New load'
+  return parts.filter(Boolean).join(', ') || t('New load')
 }
 
 /**
@@ -80,7 +82,8 @@ export const cartridgeGroup = (cartridge: string | undefined) =>
 export function loadGroups(
   records: LoadRecord[],
   query: string,
-  cartridgeNames: Record<string, string> = {},
+  cartridgeNames: Record<string, string>,
+  t: Translator['t'],
 ) {
   const groups = new Map<string, { key: string; title: string; records: LoadRecord[] }>()
   for (const r of records) {
@@ -88,7 +91,7 @@ export function loadGroups(
     const key = cartridgeGroup(r.data.cartridge)
     const group = groups.get(key) ?? {
       key,
-      title: key ? (cartridgeNames[key] ?? key) : noCartridge,
+      title: key ? (cartridgeNames[key] ?? key) : t('No cartridge'),
       records: [],
     }
     group.records.push(r)

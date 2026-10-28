@@ -314,6 +314,12 @@ Code: `packages/core/src/interior/load-file.ts`, `solidFillLimit`, `fillLoadRati
 
 Taking the random close packing of equal spheres as the limit for grains of every shape is a choice of the model.
 
+### Load from records
+
+`recordLoad` builds the run of a load that names a cartridge, a powder and a bullet, for callers that have no form state: the powder record's model parameters (`powderModelValues`), the cartridge's chamber land diameter $F$ as the bore diameter, its twist $u$ and its bore area $Q$ (without $Q$, the circle of the mean of $F$ and the groove diameter $Z$, `boreArea`), the bore resistance of the powder's fit (`recordResistance`) and the powder's temperature sensitivity. The charge, the chamber volume behind the seated bullet, the bullet travel and the bullet mass are the caller's, and so is the propellant temperature (K), which defaults to the temperature of the powder's fit. A powder without an interior model, a missing value or a bore-resistance law without the bullet length is an error, never a run without that term.
+
+Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |

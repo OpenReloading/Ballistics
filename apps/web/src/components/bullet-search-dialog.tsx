@@ -15,6 +15,8 @@ import type { CartridgeDiameters } from '@open-reloading/core'
 import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   type BulletItem,
   type BulletRow,
@@ -32,11 +34,11 @@ import { EmptyNote, ErrorNote } from './states.tsx'
 /** Rows drawn at once: a narrower search shows the rest. */
 const shownRows = 100
 
-const sortOptions: { value: BulletSort; label: string }[] = [
-  { value: 'relevance', label: 'Best match' },
-  { value: 'name', label: 'Manufacturer and name' },
-  { value: 'mass', label: 'Heaviest first' },
-  { value: 'ballisticCoefficient', label: 'Highest BC first' },
+const sortOptions: { value: BulletSort; label: Message }[] = [
+  { value: 'relevance', label: msg('Best match') },
+  { value: 'name', label: msg('Manufacturer and name') },
+  { value: 'mass', label: msg('Heaviest first') },
+  { value: 'ballisticCoefficient', label: msg('Highest BC first') },
 ]
 
 type Catalogue = { status: 'loading' } | { status: 'ok'; rows: BulletItem[] } | { status: 'error' }
@@ -61,8 +63,12 @@ function useCatalogue(opened: boolean) {
   return { state, retry: () => setAttempt((n) => n + 1) }
 }
 
-const massText = (row: BulletRow, system: UnitSystem, cells: ReturnType<typeof bulletCells>) =>
-  row.mass === null ? 'n/a' : `${cells.mass} ${system.mass.symbol}`
+const massText = (
+  row: BulletRow,
+  system: UnitSystem,
+  cells: ReturnType<typeof bulletCells>,
+  t: Translator['t'],
+) => (row.mass === null ? t('n/a') : `${cells.mass} ${system.mass.symbol}`)
 
 const keySteps: Record<string, number> = { ArrowDown: 1, ArrowUp: -1, PageDown: 8, PageUp: -8 }
 
@@ -84,12 +90,13 @@ function searchKey(
   move(step)
 }
 
-function statusMessage(state: Catalogue, found: number, total: number) {
-  if (state.status === 'loading') return 'Loading bullets'
+function statusMessage(state: Catalogue, found: number, total: number, t: Translator['t']) {
+  if (state.status === 'loading') return t('Loading bullets')
   if (state.status === 'error') return ''
-  if (found === total) return `${total} bullets`
-  const cut = found > shownRows ? `, first ${shownRows} shown` : ''
-  return `${found} of ${total} bullets${cut}`
+  if (found === total) return t('{total} bullets', { total })
+  return found > shownRows
+    ? t('{found} of {total} bullets, first {shown} shown', { found, total, shown: shownRows })
+    : t('{found} of {total} bullets', { found, total })
 }
 
 function ResultRow({
@@ -109,10 +116,11 @@ function ResultRow({
   onActive: (i: number) => void
   onChoose: (row: BulletRow) => void
 }) {
+  const { t } = useTranslation()
   const cells = bulletCells(row, system)
   const bc = bulletBallisticCoefficient(row)
-  const mass = massText(row, system, cells)
-  const bcText = bc ? ballisticCoefficientText(bc) : 'n/a'
+  const mass = massText(row, system, cells, t)
+  const bcText = bc ? ballisticCoefficientText(bc) : t('n/a')
   return (
     // keyboard: the search box owns the focus and moves the highlight
     // biome-ignore lint/a11y/useKeyWithClickEvents: see above
@@ -134,7 +142,7 @@ function ResultRow({
           {row.name}
           {row.origin && (
             <Badge ml="xs" variant="light">
-              Your design
+              {t('Your design')}
             </Badge>
           )}
         </span>
@@ -165,29 +173,30 @@ function Results({
   onActive: (i: number) => void
   onChoose: (row: BulletRow) => void
 }) {
+  const { t } = useTranslation()
   if (status === 'error')
     return (
-      <ErrorNote title="The bullets could not be read." onRetry={retry}>
-        The server did not answer. The designer and the workbench still work.
+      <ErrorNote title={t('The bullets could not be read.')} onRetry={retry}>
+        {t('The server did not answer. The designer and the workbench still work.')}
       </ErrorNote>
     )
   if (shown.length === 0)
     return status === 'ok' ? (
       <EmptyNote
         icon={<MagnifyingGlass size={20} aria-hidden="true" />}
-        title="No bullet matches"
-        description="Remove a filter or a word."
+        title={t('No bullet matches')}
+        description={t('Remove a filter or a word.')}
       />
     ) : null
   return (
     <div className="bd-list-wrap">
       <div className="bd-head" aria-hidden="true">
-        <span>Bullet</span>
-        <span>Caliber</span>
-        <span>Mass</span>
-        <span>BC</span>
+        <span>{t('Bullet')}</span>
+        <span>{t('Caliber')}</span>
+        <span>{t('Mass')}</span>
+        <span>{t('BC')}</span>
       </div>
-      <div id={`${id}-list`} role="listbox" aria-label="Bullets" className="bd-list">
+      <div id={`${id}-list`} role="listbox" aria-label={t('Bullets')} className="bd-list">
         {shown.map((row, i) => (
           <ResultRow
             key={row.id}
@@ -243,6 +252,7 @@ export function BulletSearchDialog({
   system: UnitSystem
   onChoose: (row: BulletRow) => void
 }) {
+  const { t } = useTranslation()
   const { state, retry } = useCatalogue(opened)
   const phone = useMediaQuery('(max-width: 47.99em)')
   const [query, setQuery] = useState('')
@@ -308,13 +318,20 @@ export function BulletSearchDialog({
   }, [active, opened, current, id])
 
   const manufacturers = useMemo(() => manufacturerChoices(catalogue), [catalogue])
-  const calibers = useMemo(() => caliberOptions(rows.map((r) => r.diameter)), [rows])
+  const calibers = useMemo(
+    () =>
+      caliberOptions(
+        rows.map((r) => r.diameter),
+        t,
+      ),
+    [rows, t],
+  )
   const filterCount = [manufacturer, caliber, mass, origin !== 'all' && origin].filter(
     Boolean,
   ).length
 
   const total = rows.length
-  const message = statusMessage(state, results.length, total)
+  const message = statusMessage(state, results.length, total, t)
 
   function move(by: number) {
     if (shown.length === 0) return
@@ -331,18 +348,20 @@ export function BulletSearchDialog({
     <AppModal
       opened={opened}
       onClose={onClose}
-      title="Choose a bullet"
+      title={t('Choose a bullet')}
       size="64rem"
       fullScreen={phone}
       className="bd-modal"
-      closeButton={{ 'aria-label': 'Close the bullet search' }}
+      closeButton={{ 'aria-label': t('Close the bullet search') }}
     >
       <div className="bd">
         <TextInput
           ref={searchBox}
           data-autofocus
-          label="Search bullets"
-          description="Words of the manufacturer or name in any order, a caliber such as 308, a weight such as 168 or 10.9g"
+          label={t('Search bullets')}
+          description={t(
+            'Words of the manufacturer or name in any order, a caliber such as 308, a weight such as 168 or 10.9g',
+          )}
           autoComplete="off"
           value={query}
           rightSection={state.status === 'loading' ? <Loader size="xs" /> : undefined}
@@ -362,43 +381,43 @@ export function BulletSearchDialog({
             aria-controls={`${id}-filters`}
             onClick={() => setFiltersOpen((o) => !o)}
           >
-            Filters{filterCount > 0 ? ` (${filterCount})` : ''}
+            {filterCount > 0 ? t('Filters ({count})', { count: filterCount }) : t('Filters')}
           </Button>
         </div>
         <div className="bd-filters" id={`${id}-filters`} data-open={filtersOpen}>
           <Select
-            label="Manufacturer"
-            placeholder="Any"
+            label={t('Manufacturer')}
+            placeholder={t('Any')}
             data={manufacturers}
             value={manufacturer || null}
             searchable
             clearable
-            nothingFoundMessage="No manufacturer found"
+            nothingFoundMessage={t('No manufacturer found')}
             onChange={(v) => setManufacturer(v ?? '')}
           />
           <Select
-            label="Caliber"
-            placeholder="Any"
+            label={t('Caliber')}
+            placeholder={t('Any')}
             data={calibers}
             value={caliber || null}
             searchable
             clearable
-            nothingFoundMessage="No caliber found"
+            nothingFoundMessage={t('No caliber found')}
             onChange={(v) => setCaliber(v ?? '')}
           />
           <fieldset className="bd-mass">
-            <legend>Mass ({system.mass.symbol})</legend>
+            <legend>{t('Mass ({unit})', { unit: system.mass.symbol })}</legend>
             <NumberInput
-              aria-label={`Mass from, ${system.mass.symbol}`}
-              placeholder="From"
+              aria-label={t('Mass from, {unit}', { unit: system.mass.symbol })}
+              placeholder={t('From')}
               min={0}
               hideControls
               value={from}
               onChange={setFrom}
             />
             <NumberInput
-              aria-label={`Mass to, ${system.mass.symbol}`}
-              placeholder="To"
+              aria-label={t('Mass to, {unit}', { unit: system.mass.symbol })}
+              placeholder={t('To')}
               min={0}
               hideControls
               value={to}
@@ -407,11 +426,11 @@ export function BulletSearchDialog({
           </fieldset>
           {designs.length > 0 && (
             <SegmentedControl
-              aria-label="Source"
+              aria-label={t('Source')}
               data={[
-                { value: 'all', label: 'All' },
-                { value: 'catalogue', label: 'Catalogue' },
-                { value: 'designs', label: 'My designs' },
+                { value: 'all', label: t('All') },
+                { value: 'catalogue', label: t('Catalogue') },
+                { value: 'designs', label: t('My designs') },
               ]}
               value={origin}
               onChange={(v) => setOrigin(v as typeof origin)}
@@ -419,8 +438,8 @@ export function BulletSearchDialog({
           )}
           <Select
             className="bd-sort"
-            label="Sort by"
-            data={sortOptions}
+            label={t('Sort by')}
+            data={sortOptions.map((o) => ({ value: o.value, label: t(o.label) }))}
             value={sort}
             allowDeselect={false}
             onChange={(v) => {
@@ -436,9 +455,9 @@ export function BulletSearchDialog({
             <Pill
               withRemoveButton
               onRemove={() => setFitOn(false)}
-              removeButtonProps={{ 'aria-label': 'Show bullets of every diameter' }}
+              removeButtonProps={{ 'aria-label': t('Show bullets of every diameter') }}
             >
-              Fits {fitName ?? 'the cartridge'}
+              {fitName ? t('Fits {name}', { name: fitName }) : t('Fits the cartridge')}
             </Pill>
           </div>
         )}
@@ -464,38 +483,40 @@ export function BulletSearchDialog({
 }
 
 function Preview({ row, system }: { row: BulletRow; system: UnitSystem }) {
+  const { t } = useTranslation()
   const cells = bulletCells(row, system)
   const bc = bulletBallisticCoefficient(row)
-  const facts: [string, string | undefined][] = [
-    ['Manufacturer', row.manufacturerName || undefined],
-    ['Caliber', cells.caliber],
-    ['Diameter', cells.diameter],
-    ['Mass', row.mass === null ? undefined : `${cells.mass} ${system.mass.symbol}`],
-    ['Length', row.length === null ? undefined : `${cells.length} ${system.length.symbol}`],
+  const facts: [Message, string | undefined][] = [
+    [msg('Manufacturer'), row.manufacturerName || undefined],
+    [msg('Caliber'), cells.caliber],
+    [msg('Diameter'), cells.diameter],
+    [msg('Mass'), row.mass === null ? undefined : `${cells.mass} ${system.mass.symbol}`],
+    [msg('Length'), row.length === null ? undefined : `${cells.length} ${system.length.symbol}`],
     [
-      'BC',
+      msg('BC'),
       bc
         ? [bc, bc.other].flatMap((x) => (x ? [ballisticCoefficientText(x)] : [])).join(', ')
         : undefined,
     ],
-    ['Construction', row.construction],
-    ['Tip', row.tipType],
-    ['Country', row.country],
+    [msg('Construction'), row.construction],
+    [msg('Tip'), row.tipType],
+    [msg('Country'), row.country],
   ]
   return (
-    <aside className="bd-preview" aria-label="Highlighted bullet">
+    <aside className="bd-preview" aria-label={t('Highlighted bullet')}>
       <p className="bd-preview-title">{row.name}</p>
       <dl>
         {facts.map(([k, v]) => (
           <div key={k}>
-            <dt>{k}</dt>
-            <dd>{v ?? 'n/a'}</dd>
+            <dt>{t(k)}</dt>
+            <dd>{v ?? t('n/a')}</dd>
           </div>
         ))}
       </dl>
       {!row.origin && (
         <Link href={`/bullets/${row.id}`} target="_blank" rel="noopener">
-          Open the record<span className="visually-hidden"> in a new tab</span>
+          {t('Open the record')}
+          <span className="visually-hidden"> {t('in a new tab')}</span>
         </Link>
       )}
     </aside>

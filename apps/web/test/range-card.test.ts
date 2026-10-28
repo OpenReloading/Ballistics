@@ -1,5 +1,6 @@
 import { lbPerSqInToKgPerSqM, type TrajectoryPoint } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { rangeCardColumns, rangeCardFacts, rangeCardRows } from '../src/lib/range-card.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
@@ -22,7 +23,7 @@ describe('range card', () => {
     ])
     const mil = defined(rangeCardRows([point], presetUnits('metric-grains'))[0])
     expect(mil[2]).toBe('0.29')
-    expect(rangeCardColumns(presetUnits('us'))).toEqual([
+    expect(rangeCardColumns(presetUnits('us'), {}, english.t)).toEqual([
       'Range (yd)',
       'Height (in)',
       'Elevation (MOA)',
@@ -32,14 +33,16 @@ describe('range card', () => {
       'Time (s)',
       'Notes',
     ])
-    expect(rangeCardColumns(presetUnits('metric-grains'))[2]).toBe('Elevation (mrad)')
+    expect(rangeCardColumns(presetUnits('metric-grains'), {}, english.t)[2]).toBe(
+      'Elevation (mrad)',
+    )
   })
 
   it('gives the holds in clicks and the wind brackets per 1 m/s and per 1 mph', () => {
     const us = presetUnits('us')
     // a quarter MOA click: the elevation of 1 MOA is 4 clicks
     const extras = { click: moa / 4, wind: { mps: [0.5 * moa], mph: [0.2 * moa] } }
-    expect(rangeCardColumns(us, extras)).toEqual([
+    expect(rangeCardColumns(us, extras, english.t)).toEqual([
       'Range (yd)',
       'Height (in)',
       'Elevation (MOA / clicks)',
@@ -69,6 +72,9 @@ describe('range card', () => {
       { muzzleVelocity: 800, sightHeight: 0.04, temperature: 288.15, windSpeed: 0 },
       100,
       presetUnits('metric-grains'),
+      false,
+      undefined,
+      english.t,
     )
     expect(Object.fromEntries(facts)).toMatchObject({
       'Muzzle velocity': '800 m/s',
@@ -85,7 +91,7 @@ describe('range card', () => {
     const system = presetUnits('metric-grains')
     const shot = { temperature: 288.15, pressure: 101325, humidity: 0.5 }
     const names = (si: Record<string, number>, source?: string) =>
-      Object.fromEntries(rangeCardFacts(si, 100, system, false, source))
+      Object.fromEntries(rangeCardFacts(si, 100, system, false, source, english.t))
     expect(names(shot)).not.toHaveProperty(['Zero air'])
     expect(names(shot)).not.toHaveProperty(['Drag factor'])
     const set = names(
@@ -104,6 +110,8 @@ describe('range card', () => {
       100,
       presetUnits('us'),
       true,
+      undefined,
+      english.t,
     )
     expect(defined(facts[0])[0]).toBe('Bullet')
     expect(defined(facts[0])[1]).toMatch(/^168 gr, BC 0\.243 /)

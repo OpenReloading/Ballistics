@@ -3,6 +3,7 @@
  * a bullet diameter (a bullet's, or a cartridge's G1) falls in the group whose span holds it.
  */
 import { toSi } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
 import { inchText, metersPerInch, type UnitSystem } from './units.ts'
 
 /** Name and span [from, to) in inches, by size; set by hand over the bullets and CIP G1 values. */
@@ -64,7 +65,7 @@ const named = new Set(commonCalibers.map(([name]) => name))
  * The options of the caliber Select: the common calibers, then the other diameters, each by
  * size with its count; an empty group left out.
  */
-export function caliberOptions(diameters: readonly number[]) {
+export function caliberOptions(diameters: readonly number[], t: Translator['t']) {
   const groups = new Map<string, { mm: number; count: number }>()
   for (const mm of diameters) {
     const name = commonCaliber(mm)
@@ -78,7 +79,7 @@ export function caliberOptions(diameters: readonly number[]) {
       .sort((a, b) => a[1].mm - b[1].mm)
       .map(([value, { count }]) => ({ value, label: `${value} (${count})` }))
   return [
-    { group: 'Common calibers', items: items(true) },
-    { group: 'Other diameters', items: items(false) },
+    { group: t('Common calibers'), items: items(true) },
+    { group: t('Other diameters'), items: items(false) },
   ].filter((g) => g.items.length > 0)
 }

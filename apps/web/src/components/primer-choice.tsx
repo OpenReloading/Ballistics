@@ -2,6 +2,7 @@
 
 import { NativeSelect } from '@mantine/core'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { PrimerSummary } from '../lib/api-types.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -20,6 +21,7 @@ export function PrimerChoice({
   id: string | undefined
   onChange: (id: string | undefined) => void
 }) {
+  const { t } = useTranslation()
   const names = useManufacturerNames()
   const [items, setItems] = useState<PrimerSummary[]>()
   const [failed, setFailed] = useState(false)
@@ -46,16 +48,16 @@ export function PrimerChoice({
   }, [])
   const listed = items ?? []
   if (listed.length === 0 && !id) return null
-  const unlisted = items === undefined ? 'Loading' : 'A primer not in the catalogue'
+  const unlisted = items === undefined ? t('Loading') : t('A primer not in the catalogue')
   return (
     <NativeSelect
-      label="Primer"
+      label={t('Primer')}
       value={id ?? ''}
       onChange={(e) => onChange(e.currentTarget.value || undefined)}
       data={[
-        { value: '', label: 'None' },
+        { value: '', label: t('None') },
         ...(id && !listed.some((p) => p.id === id)
-          ? [{ value: id, label: failed ? 'A primer (catalogue unavailable)' : unlisted }]
+          ? [{ value: id, label: failed ? t('A primer (catalogue unavailable)') : unlisted }]
           : []),
         ...listed.map((p) => ({
           value: p.id,

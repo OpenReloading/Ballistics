@@ -30,10 +30,13 @@ import {
   useState,
 } from 'react'
 import { flushSync } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import { bulletDrag } from '../lib/bullet.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample as exampleData } from '../lib/example-data.ts'
 import { exampleFields } from '../lib/examples.ts'
@@ -42,6 +45,7 @@ import {
   type Fields,
   fieldError,
   siValues,
+  specText,
   switchFields,
 } from '../lib/field-spec.ts'
 import { sightOptions } from '../lib/firearm.ts'
@@ -98,28 +102,33 @@ const designKeys = ['mass', 'diameter', 'length']
 const panels = ['bullet', 'load', 'rifle', 'conditions', 'output']
 /** The fields a firearm choice fills and an edit leaves; the zero air and drag factor stay editable per run. */
 const sightKeys = ['sightHeight', 'twist', 'zeroRange']
-const omittedText: Record<OmittedEffect, string> = {
-  coriolis: 'Coriolis',
-  coriolisVertical: 'vertical Coriolis',
-  spinDrift: 'spin drift (needs bullet length and twist)',
-  jump: 'aerodynamic jump (needs bullet length and twist)',
-  spinDecay: 'spin decay',
-  magnus: 'Magnus force',
+const omittedText: Record<OmittedEffect, Message> = {
+  coriolis: msg('Coriolis'),
+  coriolisVertical: msg('vertical Coriolis'),
+  spinDrift: msg('spin drift (needs bullet length and twist)'),
+  jump: msg('aerodynamic jump (needs bullet length and twist)'),
+  spinDecay: msg('spin decay'),
+  magnus: msg('Magnus force'),
 }
 
-const stopText: Record<Exclude<Trajectory['stop'], 'done'>, string> = {
-  apex: 'the bullet stopped moving forward along the line of sight',
-  atmosphere: 'the path left the atmosphere model (above 11000 m or below -5000 m altitude)',
-  maxTime: 'the largest time of flight (120 s) was reached',
-  yaw: 'the yaw of repose reached its limit',
+const stopText: Record<Exclude<Trajectory['stop'], 'done'>, Message> = {
+  apex: msg('the bullet stopped moving forward along the line of sight'),
+  atmosphere: msg('the path left the atmosphere model (above 11000 m or below -5000 m altitude)'),
+  maxTime: msg('the largest time of flight (120 s) was reached'),
+  yaw: msg('the yaw of repose reached its limit'),
 }
+
+type T = Translator['t']
 
 /**
  * `design`: the name of the user bullet design the bullet values came from; `si`: the SI
  * inputs of the result, so a later edit does not relabel its range card.
  */
 type Result = TrajectoryResult & {
+  /** The bullet's description in English: the range card is printed in English. */
   bullet: string
+  /** The same in the language shown. */
+  bulletText: string
   design?: string | undefined
   si: Record<string, number | undefined>
   /** The bullet values came from the manual fields, so the card lists mass and BC. */
@@ -134,7 +143,7 @@ type RecordState =
   | { status: 'none' }
   | { status: 'loading' }
   | { status: 'ok'; record: Bullet }
-  | { status: 'error'; message: string }
+  | { status: 'error' }
 
 /** Everything a computation reads; debounced as one value. */
 type Inputs = {
@@ -166,18 +175,21 @@ function angle(system: UnitSystem, rad: number) {
   return withUnit('correction', system, rad)
 }
 
-function noBcText(model: string) {
-  return `This bullet has no ${model} BC in the database. Choose ${model === 'G7' ? 'G1' : 'G7'} or enter the drag manually.`
+function noBcText(model: string, t: T) {
+  return t(
+    'This bullet has no {model} BC in the database. Choose {other} or enter the drag manually.',
+    { model, other: model === 'G7' ? 'G1' : 'G7' },
+  )
 }
 
 /** The errors of the edited fields, the first edited field with one, and the first empty one's error. */
-function checkFields(i: Inputs) {
+function checkFields(i: Inputs, t: T) {
   const specs: readonly FieldSpec[] = i.source === 'manual' ? allFields : shotFields
   const errors: Record<string, string> = {}
   let invalid: string | undefined
   let empty: string | undefined
   for (const s of specs) {
-    const error = fieldError(s, i.fields[s.key], i.system)
+    const error = fieldError(s, i.fields[s.key], i.system, t)
     if (!error) continue
     if (i.touched[s.key]) {
       errors[s.key] = error
@@ -188,31 +200,40 @@ function checkFields(i: Inputs) {
 }
 
 type Drawn =
-  | { projectile: ReturnType<typeof manualProjectile>; bullet: string }
+  | { projectile: ReturnType<typeof manualProjectile>; bullet: (t: T) => string }
   | { prompt: string }
 
 /** The projectile of the manual fields, or the prompt for the field still empty. */
 function manualDrawn(i: Inputs, si: ReturnType<typeof siValues>, empty: string | undefined): Drawn {
   if (empty) return { prompt: empty }
+  const { design, manualModel: model } = i
   return {
-    projectile: manualProjectile(si, i.manualModel),
-    bullet: `${i.design ? `${i.design} (user design), ` : ''}${i.manualModel} manual drag`,
+    projectile: manualProjectile(si, model),
+    bullet: (t) =>
+      design
+        ? t('{design} (user design), {model} manual drag', { design, model })
+        : t('{model} manual drag', { model }),
   }
 }
 
 /** The projectile of the chosen bullet record, or the prompt for what is missing. */
-function recordDrawn(i: Inputs, empty: string | undefined): Drawn {
-  if (i.record.status !== 'ok') return { prompt: 'Choose a bullet from the database.' }
+function recordDrawn(i: Inputs, empty: string | undefined, t: T): Drawn {
+  if (i.record.status !== 'ok') return { prompt: t('Choose a bullet from the database.') }
   const { record } = i.record
   const drag = bulletDrag(record, i.recordModel, i.choice)
-  if (drag.kind === 'none') return { prompt: noBcText(i.recordModel) }
-  if (drag.kind === 'choose') return { prompt: 'Choose one of the BC values of the record.' }
+  if (drag.kind === 'none') return { prompt: noBcText(i.recordModel, t) }
+  if (drag.kind === 'choose') return { prompt: t('Choose one of the BC values of the record.') }
   if (empty) return { prompt: empty }
   const bc = bulletDrag(record, i.recordModel)
   const chosen = bc.kind === 'choose' && i.choice !== undefined ? bc.values[i.choice] : undefined
+  const product = productLabel(record, i.names)
+  const model = i.recordModel
   return {
     projectile: drag.projectile,
-    bullet: `${productLabel(record, i.names)}, ${i.recordModel}${chosen ? ` ${chosen.value} lb/in²` : ''}`,
+    bullet: (t) =>
+      chosen
+        ? t('{product}, {model} {value} lb/in²', { product, model, value: chosen.value })
+        : t('{product}, {model}', { product, model }),
   }
 }
 
@@ -225,13 +246,13 @@ function resultExtras(i: Inputs) {
   }
 }
 
-/** Field errors of the edited fields and the outcome of one computation. */
-function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt } {
-  const { errors, invalid, empty } = checkFields(i)
+/** Field errors of the edited fields and the outcome of one computation, texts in the language of `t`. */
+function evaluate(i: Inputs, t: T): { errors: Record<string, string>; attempt: Attempt } {
+  const { errors, invalid, empty } = checkFields(i, t)
   if (invalid) return { errors, attempt: { kind: 'invalid', label: invalid } }
   const prompt = (text: string) => ({ errors, attempt: { kind: 'prompt', text } as const })
   const si = siValues(i.fields)
-  const drawn = i.source === 'manual' ? manualDrawn(i, si, empty) : recordDrawn(i, empty)
+  const drawn = i.source === 'manual' ? manualDrawn(i, si, empty) : recordDrawn(i, empty, t)
   if ('prompt' in drawn) return prompt(drawn.prompt)
   try {
     return {
@@ -240,7 +261,8 @@ function evaluate(i: Inputs): { errors: Record<string, string>; attempt: Attempt
         kind: 'ok',
         result: {
           ...trajectoryResult(si, drawn.projectile, i.twistHand),
-          bullet: drawn.bullet,
+          bullet: drawn.bullet(english.t),
+          bulletText: drawn.bullet(t),
           si,
           manual: i.source === 'manual',
           ...resultExtras(i),
@@ -264,27 +286,43 @@ function RecordDetails({
   names: ManufacturerNames
   system: UnitSystem
 }) {
+  const { t } = useTranslation()
   const mm = (x: number) => withUnit('length', system, toSi('length', x))
+  const product = productLabel(record, names)
+  const mass = withUnit('mass', system, toSi('mass', record.mass.value))
+  const diameter = mm(record.diameter.value)
   return (
     <div className="record">
       <p>
-        {productLabel(record, names)}:{' '}
-        {formatQuantity('mass', system, toSi('mass', record.mass.value))} {system.mass.symbol},
-        diameter {mm(record.diameter.value)}
-        {record.length && `, length ${mm(record.length.value)}`}
+        {record.length
+          ? t('{product}: {mass}, diameter {diameter}, length {length}', {
+              product,
+              mass,
+              diameter,
+              length: mm(record.length.value),
+            })
+          : t('{product}: {mass}, diameter {diameter}', { product, mass, diameter })}
       </p>
       <ul>
-        {(record.ballisticCoefficients ?? []).map((c, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
-          <li key={i}>
-            {c.dragModel} {c.value} lb/in²
-            {c.minVelocity && ` from ${withUnit('velocity', system, c.minVelocity.value)}`}
-            {c.note && ` (${c.note})`}
-          </li>
-        ))}
+        {(record.ballisticCoefficients ?? []).map((c, i) => {
+          const values = { model: c.dragModel, value: c.value }
+          return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
+            <li key={i}>
+              {c.minVelocity
+                ? t('{model} {value} lb/in² from {velocity}', {
+                    ...values,
+                    velocity: withUnit('velocity', system, c.minVelocity.value),
+                  })
+                : t('{model} {value} lb/in²', values)}
+              {c.note && ` (${c.note})`}
+            </li>
+          )
+        })}
       </ul>
       <p className="sources">
-        Source ({record.provenance.kind}): <SourceTitles sources={record.provenance.sources} />
+        {t('Source ({kind}):', { kind: record.provenance.kind })}{' '}
+        <SourceTitles sources={record.provenance.sources} />
       </p>
     </div>
   )
@@ -292,35 +330,38 @@ function RecordDetails({
 
 /** The holds and the design note of a result. */
 function ResultTop({ result, system }: { result: Result; system: UnitSystem }) {
+  const { t } = useTranslation()
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
   const rows = result.tablePoints
   const last = rows[rows.length - 1]
-  const at = last && `at ${formatQuantity('range', system, last.range)} ${u('range')}`
+  const at = { range: last ? withUnit('range', system, last.range) : '' }
   return (
     <>
       {result.design && (
         <p className="note user-design">
-          Computed from the user design {result.design}, not a catalogue record.
+          {t('Computed from the user design {design}, not a catalogue record.', {
+            design: result.design,
+          })}
         </p>
       )}
       {last && (
         <dl className="readouts">
           <div>
-            <dt>Elevation hold {at}</dt>
+            <dt>{t('Elevation hold at {range}', at)}</dt>
             <dd>{angle(system, last.elevationHold)}</dd>
           </div>
           <div>
-            <dt>Windage hold {at}</dt>
+            <dt>{t('Windage hold at {range}', at)}</dt>
             <dd>{angle(system, last.windageHold)}</dd>
           </div>
           <div>
-            <dt>Velocity {at}</dt>
+            <dt>{t('Velocity at {range}', at)}</dt>
             <dd>
               {formatQuantity('velocity', system, last.velocity)} {u('velocity')}
             </dd>
           </div>
           <div>
-            <dt>Energy {at}</dt>
+            <dt>{t('Energy at {range}', at)}</dt>
             <dd>
               {formatQuantity('energy', system, last.energy)} {u('energy')}
             </dd>
@@ -333,35 +374,52 @@ function ResultTop({ result, system }: { result: Result; system: UnitSystem }) {
 
 /** The summary list of a result: bore elevation, air, stability, transonic range and what was left out. */
 function ResultNotes({ result, system }: { result: Result; system: UnitSystem }) {
-  const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
-  const { trajectory: t, tablePoints: rows } = result
+  const { t } = useTranslation()
+  const { trajectory: flight, tablePoints: rows } = result
   const last = rows[rows.length - 1]
   const transonic = rows.find((p) => p.transonic || p.subsonic)
-  const zero = zeroConditions(result.si, system, result.dragSource)
+  const zero = zeroConditions(result.si, system, result.dragSource, t)
   return (
     <ul className="summary">
-      <li>Bore elevation above the line of sight: {angle(system, t.bore.elevationAngle)}</li>
       <li>
-        Density altitude: {formatQuantity('altitude', system, result.densityAltitude)}{' '}
-        {u('altitude')}
+        {t('Bore elevation above the line of sight: {angle}', {
+          angle: angle(system, flight.bore.elevationAngle),
+        })}
       </li>
-      {zero.zeroAir && <li>Zero air: {zero.zeroAir}</li>}
-      {zero.dragFactor && <li>Drag factor applied: {zero.dragFactor}</li>}
-      {t.stability !== undefined && (
-        <li>Gyroscopic stability (Miller): {formatNumber(t.stability, 2)}</li>
+      <li>
+        {t('Density altitude: {altitude}', {
+          altitude: withUnit('altitude', system, result.densityAltitude),
+        })}
+      </li>
+      {zero.zeroAir && <li>{t('Zero air: {air}', { air: zero.zeroAir })}</li>}
+      {zero.dragFactor && (
+        <li>{t('Drag factor applied: {factor}', { factor: zero.dragFactor })}</li>
+      )}
+      {flight.stability !== undefined && (
+        <li>
+          {t('Gyroscopic stability (Miller): {value}', {
+            value: formatNumber(flight.stability, 2),
+          })}
+        </li>
       )}
       {transonic && (
         <li>
-          Transonic from {formatQuantity('range', system, transonic.range)} {u('range')}
+          {t('Transonic from {range}', { range: withUnit('range', system, transonic.range) })}
         </li>
       )}
-      {t.omitted.length > 0 && (
-        <li>Effects left out: {t.omitted.map((o) => omittedText[o]).join(', ')}</li>
-      )}
-      {t.stop !== 'done' && (
+      {flight.omitted.length > 0 && (
         <li>
-          The computation stopped early: {stopText[t.stop]}. Last computed range:{' '}
-          {last ? `${formatQuantity('range', system, last.range)} ${u('range')}` : 'none'}.
+          {t('Effects left out: {list}', {
+            list: flight.omitted.map((o) => t(omittedText[o])).join(', '),
+          })}
+        </li>
+      )}
+      {flight.stop !== 'done' && (
+        <li>
+          {t('The computation stopped early: {reason}. Last computed range: {range}.', {
+            reason: t(stopText[flight.stop]),
+            range: last ? withUnit('range', system, last.range) : t('none'),
+          })}
         </li>
       )}
     </ul>
@@ -370,46 +428,51 @@ function ResultNotes({ result, system }: { result: Result; system: UnitSystem })
 
 /** The trajectory table of a result. */
 function ResultTable({ result, system }: { result: Result; system: UnitSystem }) {
+  const { t } = useTranslation()
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
   const rows = result.tablePoints
   return (
     <PanelTable
-      label="Trajectory table"
-      caption={
-        <>
-          Trajectory: {result.bullet}, zero {formatQuantity('range', system, result.zeroRange)}{' '}
-          {u('range')}
-        </>
-      }
+      label={t('Trajectory table')}
+      caption={t('Trajectory: {label}, zero {range}', {
+        label: result.bulletText,
+        range: withUnit('range', system, result.zeroRange),
+      })}
       columns={[
-        `Range (${u('range')})`,
-        `Height (${u('lineOfSightOffset')})`,
-        `Elevation hold (${u('correction')})`,
-        `Windage (${u('lineOfSightOffset')})`,
-        `Windage hold (${u('correction')})`,
-        `Velocity (${u('velocity')})`,
-        'Mach',
-        `Energy (${u('energy')})`,
-        'Time (s)',
+        t('Range ({unit})', { unit: u('range') }),
+        t('Height ({unit})', { unit: u('lineOfSightOffset') }),
+        t('Elevation hold ({unit})', { unit: u('correction') }),
+        t('Windage ({unit})', { unit: u('lineOfSightOffset') }),
+        t('Windage hold ({unit})', { unit: u('correction') }),
+        t('Velocity ({unit})', { unit: u('velocity') }),
+        t('Mach'),
+        t('Energy ({unit})', { unit: u('energy') }),
+        t('Time (s)'),
       ]}
       numeric
     >
-      {rows.map((p) => (
-        <tr key={p.range}>
-          <td className="num">{formatQuantity('range', system, p.range)}</td>
-          <td className="num">{formatQuantity('lineOfSightOffset', system, p.height)}</td>
-          <td className="num">{formatQuantity('correction', system, p.elevationHold)}</td>
-          <td className="num">{formatQuantity('lineOfSightOffset', system, p.windage)}</td>
-          <td className="num">{formatQuantity('correction', system, p.windageHold)}</td>
-          <td className="num">{formatQuantity('velocity', system, p.velocity)}</td>
-          <td className="num">
-            {formatNumber(p.mach, 2)}
-            {p.subsonic ? ' subsonic' : p.transonic ? ' transonic' : ''}
-          </td>
-          <td className="num">{formatQuantity('energy', system, p.energy)}</td>
-          <td className="num">{formatNumber(p.time, 3)}</td>
-        </tr>
-      ))}
+      {rows.map((p) => {
+        const mach = formatNumber(p.mach, 2)
+        return (
+          <tr key={p.range}>
+            <td className="num">{formatQuantity('range', system, p.range)}</td>
+            <td className="num">{formatQuantity('lineOfSightOffset', system, p.height)}</td>
+            <td className="num">{formatQuantity('correction', system, p.elevationHold)}</td>
+            <td className="num">{formatQuantity('lineOfSightOffset', system, p.windage)}</td>
+            <td className="num">{formatQuantity('correction', system, p.windageHold)}</td>
+            <td className="num">{formatQuantity('velocity', system, p.velocity)}</td>
+            <td className="num">
+              {p.subsonic
+                ? t('{mach} subsonic', { mach })
+                : p.transonic
+                  ? t('{mach} transonic', { mach })
+                  : mach}
+            </td>
+            <td className="num">{formatQuantity('energy', system, p.energy)}</td>
+            <td className="num">{formatNumber(p.time, 3)}</td>
+          </tr>
+        )
+      })}
     </PanelTable>
   )
 }
@@ -428,6 +491,7 @@ function ResultDetail({
   /** Over the chart's top right corner, so it shows and goes without moving the chart. */
   staleLine?: ReactNode
 }) {
+  const { t } = useTranslation()
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
   const { tablePoints: rows, chartPoints: chart } = result
   const notes = <ResultNotes result={result} system={system} />
@@ -437,10 +501,13 @@ function ResultDetail({
       fill={chartHeight === undefined}
       x={chart.map((p) => system.range.fromSi(p.range))}
       y={chart.map((p) => system.lineOfSightOffset.fromSi(p.height))}
-      xLabel={`Range (${u('range')})`}
-      yLabel={`Height above the line of sight (${u('lineOfSightOffset')})`}
-      title="Height above the line of sight against range"
-      description={`From 0 to ${formatQuantity('range', system, chart[chart.length - 1]?.range ?? 0)} ${u('range')}; lowest point ${formatQuantity('lineOfSightOffset', system, Math.min(...chart.map((p) => p.height)))} ${u('lineOfSightOffset')}. The table tab lists the values.`}
+      xLabel={t('Range ({unit})', { unit: u('range') })}
+      yLabel={t('Height above the line of sight ({unit})', { unit: u('lineOfSightOffset') })}
+      title={t('Height above the line of sight against range')}
+      description={t('From 0 to {range}; lowest point {low}. The table tab lists the values.', {
+        range: withUnit('range', system, chart[chart.length - 1]?.range ?? 0),
+        low: withUnit('lineOfSightOffset', system, Math.min(...chart.map((p) => p.height))),
+      })}
       zeroLine
     />
   )
@@ -454,7 +521,7 @@ function ResultDetail({
       </div>
       {tableEl}
       <details className="values-details">
-        <summary>Moving target and hit probability</summary>
+        <summary>{t('Moving target and hit probability')}</summary>
         <MovingTarget points={rows} system={system} />
         <HitProbability
           points={rows}
@@ -465,11 +532,11 @@ function ResultDetail({
         />
       </details>
       <details className="values-details screen-only">
-        <summary>Truing from range strings</summary>
+        <summary>{t('Truing from range strings')}</summary>
         <TruingSession
           nominal={{
             shot: result.shot,
-            bullet: result.bullet,
+            bullet: result.bulletText,
             zeroRange: result.zeroRange,
             click: result.click?.value,
           }}
@@ -568,6 +635,7 @@ function DatabaseBullet({
   loadBullet,
   replaced,
 }: BulletFieldsProps) {
+  const { t } = useTranslation()
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
   const drag = record.status === 'ok' ? bulletDrag(record.record, recordModel, choice) : undefined
   // without `choice`, so the BC list stays while one value is chosen
@@ -580,20 +648,22 @@ function DatabaseBullet({
         <div className="wide">
           <RecordSearch<BulletSummary>
             kind="bullets"
-            label="Search bullets by manufacturer or name"
+            label={t('Search bullets by manufacturer or name')}
             // the chosen record in the field, as in the workbench's pickers
-            chosen={record.status === 'ok' ? productLabel(record.record, names) : 'Search bullets'}
+            chosen={
+              record.status === 'ok' ? productLabel(record.record, names) : t('Search bullets')
+            }
             describe={(b) =>
               `${productLabel(b, names)}, ${formatQuantity('mass', system, toSi('mass', b.mass))} ${u('mass')}`
             }
             onSelect={(b) => chooseRecord(b.id)}
-            noneText="No bullet found"
-            unreachableText="The database is unreachable; manual input still works."
+            noneText={t('No bullet found')}
+            unreachableText={t('The database is unreachable; manual input still works.')}
           />
         </div>
       )}
       <NativeSelect
-        label="Drag model"
+        label={t('Drag model')}
         value={recordModel}
         data={['G7', 'G1']}
         onChange={(e) => {
@@ -603,21 +673,28 @@ function DatabaseBullet({
       />
       <div className="wide">
         {record.status === 'loading' && <Loading what="the bullet record" inline />}
-        {record.status === 'error' && <p>{record.message}</p>}
+        {record.status === 'error' && (
+          <p>{t('The database is unreachable; manual input still works.')}</p>
+        )}
         {/* the Bullet card shows the load's record */}
         {record.status === 'ok' && own && (
           <RecordDetails record={record.record} names={names} system={system} />
         )}
         {record.status === 'ok' && record.record.id === loadBullet && (
           <p className="note from-load">
-            From the load: the bullet of the Bullet panel
-            {replaced && ', in place of the one entered here'}.
+            {replaced
+              ? t(
+                  'From the load: the bullet of the Bullet panel, in place of the one entered here.',
+                )
+              : t('From the load: the bullet of the Bullet panel.')}
           </p>
         )}
-        {drag?.kind === 'none' && <p className="note">{noBcText(recordModel)}</p>}
+        {drag?.kind === 'none' && <p className="note">{noBcText(recordModel, t)}</p>}
         {bcOptions?.kind === 'choose' && (
           <Radio.Group
-            label={`The record lists several ${recordModel} BCs without velocity bands; choose one`}
+            label={t('The record lists several {model} BCs without velocity bands; choose one', {
+              model: recordModel,
+            })}
             value={choice === undefined ? null : String(choice)}
             onChange={(v) => setChoice(Number(v))}
           >
@@ -627,7 +704,7 @@ function DatabaseBullet({
                   // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
                   key={i}
                   value={String(i)}
-                  label={`${v.value} lb/in²${v.note ? ` (${v.note})` : ''}`}
+                  label={`${t('{value} lb/in²', { value: v.value })}${v.note ? ` (${v.note})` : ''}`}
                 />
               ))}
             </Stack>
@@ -635,8 +712,11 @@ function DatabaseBullet({
         )}
         {chosen && (
           <p>
-            {recordModel} BC {chosen.value} lb/in² chosen from the record, used from 0{' '}
-            {u('velocity')}.
+            {t('{model} BC {value} lb/in² chosen from the record, used from 0 {unit}.', {
+              model: recordModel,
+              value: chosen.value,
+              unit: u('velocity'),
+            })}
           </p>
         )}
       </div>
@@ -654,23 +734,26 @@ function ManualBullet({
   setManualModel,
   group,
 }: BulletFieldsProps) {
+  const { t } = useTranslation()
   return (
     <>
       <NativeSelect
         className="wide"
-        label="Bullet design"
-        description="From your bullet designs in this browser; fills mass, diameter and length."
+        label={t('Bullet design')}
+        description={t(
+          'From your bullet designs in this browser; fills mass, diameter and length.',
+        )}
         value={design?.id ?? ''}
         onFocus={readDesigns}
         onChange={(e) => chooseDesign(e.currentTarget.value)}
         data={[
-          { value: '', label: designs.length ? 'None' : 'None in this browser' },
+          { value: '', label: designs.length ? t('None') : t('None in this browser') },
           ...designs.map((d) => ({ value: d.id, label: d.name })),
         ]}
       />
       {group(['mass', 'diameter', 'length'])}
       <NativeSelect
-        label="Drag model"
+        label={t('Drag model')}
         value={manualModel}
         data={dragModels}
         onChange={(e) => setManualModel(e.currentTarget.value as DragModel)}
@@ -683,19 +766,20 @@ function ManualBullet({
 /** The Bullet panel's fields: with the load's bullet no source switch or search. */
 function BulletFields(props: BulletFieldsProps) {
   const { own, source, setSource } = props
+  const { t } = useTranslation()
   return (
     <>
       {/* with the load's bullet: no source switch or search */}
       {own && (
         <SegmentedControl
           size={controlSize.row.toggle}
-          aria-label="Bullet source"
+          aria-label={t('Bullet source')}
           className="wide"
           value={source}
           onChange={(v) => setSource(v as 'database' | 'manual')}
           data={[
-            { value: 'database', label: 'From the database' },
-            { value: 'manual', label: 'Manual drag' },
+            { value: 'database', label: t('From the database') },
+            { value: 'manual', label: t('Manual drag') },
           ]}
         />
       )}
@@ -730,22 +814,25 @@ function RifleFields({
   setSight,
   group,
 }: RifleFieldsProps) {
+  const { t } = useTranslation()
   return (
     <>
       {ownSight && (
         <NativeSelect
           className="wide"
-          label="Firearm and sight"
+          label={t('Firearm and sight')}
           description={
             sightGone
-              ? 'The chosen firearm is no longer in this browser; its values stay.'
-              : 'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.'
+              ? t('The chosen firearm is no longer in this browser; its values stay.')
+              : t(
+                  'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.',
+                )
           }
           value={sight}
           onFocus={readSights}
           onChange={(e) => chooseSight(e.currentTarget.value)}
           data={[
-            { value: '', label: sights.length ? 'None' : 'None in this browser' },
+            { value: '', label: sights.length ? t('None') : t('None in this browser') },
             ...sights.map(({ value, label }) => ({ value, label })),
           ]}
         />
@@ -753,7 +840,7 @@ function RifleFields({
       {group(['sightHeight', 'twist'])}
       <div className="twist-hand">
         <p className="segment-label" id="twist-hand">
-          Twist direction
+          {t('Twist direction')}
         </p>
         <SegmentedControl
           aria-labelledby="twist-hand"
@@ -764,8 +851,8 @@ function RifleFields({
             setSight('')
           }}
           data={[
-            { value: 'right', label: 'Right' },
-            { value: 'left', label: 'Left' },
+            { value: 'right', label: t('Right') },
+            { value: 'left', label: t('Left') },
           ]}
         />
       </div>
@@ -775,27 +862,35 @@ function RifleFields({
 }
 
 /** The text over a result whose inputs changed. */
-function staleTextOf(attempt: Attempt) {
+function staleTextOf(attempt: Attempt, t: T) {
   return attempt.kind === 'invalid'
-    ? `Result for earlier inputs. Fix ${attempt.label} to update.`
-    : 'Result for earlier inputs.'
+    ? t('Result for earlier inputs. Fix {label} to update.', { label: specText(t, attempt.label) })
+    : t('Result for earlier inputs.')
 }
 
 /** The status line of an attempt: the update it made, or that the result is of earlier inputs. */
-function summaryOf(attempt: Attempt, stale: boolean, system: UnitSystem) {
+function summaryOf(attempt: Attempt, stale: boolean, system: UnitSystem, t: T) {
   if (attempt.kind === 'ok') {
     const rows = attempt.result.tablePoints
     const lastRow = rows[rows.length - 1]
     if (lastRow)
-      return `Updated: ${rows.length} ranges, elevation at ${formatQuantity('range', system, lastRow.range)} ${system.range.symbol} ${angle(system, lastRow.elevationHold)}.`
+      return t('Updated: {rows} ranges, elevation at {range} {angle}.', {
+        rows: rows.length,
+        range: withUnit('range', system, lastRow.range),
+        angle: angle(system, lastRow.elevationHold),
+      })
   }
-  return stale ? staleTextOf(attempt) : ''
+  return stale ? staleTextOf(attempt, t) : ''
 }
 
 /** The fields a computation still needs before its first result. */
-function neededOf(source: 'database' | 'manual', record: RecordState, fields: Fields) {
+function neededOf(
+  source: 'database' | 'manual',
+  record: RecordState,
+  fields: Fields,
+): readonly Message[] {
   return [
-    ...(source === 'database' && record.status !== 'ok' ? ['Bullet'] : []),
+    ...(source === 'database' && record.status !== 'ok' ? [msg('Bullet')] : []),
     ...(source === 'manual' ? [...manualBulletFields, ...shotFields] : shotFields)
       .filter((s) => 'required' in s && s.required && !fields[s.key]?.text)
       .map((s) => s.label),
@@ -813,9 +908,10 @@ function FormNotes({
   alert: ReactNode
   attempt: Attempt
   emptyState: boolean
-  needed: string[]
+  needed: readonly Message[]
   fillExample: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <>
       {alert}
@@ -824,21 +920,21 @@ function FormNotes({
       )}
       {emptyState && (
         <section aria-labelledby="trajectory-empty" className="trajectory-empty">
-          <h2 id="trajectory-empty">No result yet</h2>
+          <h2 id="trajectory-empty">{t('No result yet')}</h2>
           {attempt.kind === 'prompt' && <p className="prompt">{attempt.text}</p>}
           {needed.length > 0 && (
             <>
-              <p>Still needed:</p>
+              <p>{t('Still needed:')}</p>
               <ul>
                 {needed.map((label) => (
-                  <li key={label}>{label}</li>
+                  <li key={label}>{t(label)}</li>
                 ))}
               </ul>
             </>
           )}
           {exampleData && (
             <Button variant="default" onClick={fillExample}>
-              Use the example
+              {t('Use the example')}
             </Button>
           )}
         </section>
@@ -849,6 +945,7 @@ function FormNotes({
 
 /** The range card's Print menu, one entry per paper size. */
 function RangeCardMenu({ setPaper }: { setPaper: (size: PaperSize) => void }) {
+  const { t } = useTranslation()
   return (
     // an icon at the end of the holds row, so the hold labels keep their width
     <Menu position="bottom-end" withinPortal shadow="sm">
@@ -857,8 +954,8 @@ function RangeCardMenu({ setPaper }: { setPaper: (size: PaperSize) => void }) {
           variant="default"
           size={controlSize.row.icon}
           className="range-card-button"
-          aria-label="Print range card"
-          title="Print range card"
+          aria-label={t('Print range card')}
+          title={t('Print range card')}
         >
           <Printer aria-hidden="true" />
         </ActionIcon>
@@ -873,7 +970,7 @@ function RangeCardMenu({ setPaper }: { setPaper: (size: PaperSize) => void }) {
               printRangeCard()
             }}
           >
-            Print on {size.toUpperCase()}
+            {t('Print on {size}', { size: size.toUpperCase() })}
           </Menu.Item>
         ))}
       </Menu.Dropdown>
@@ -893,6 +990,7 @@ function TrajectoryTop({
   stale: boolean
   printButton: ReactNode
 }) {
+  const { t } = useTranslation()
   return (
     <section
       aria-labelledby="trajectory-result"
@@ -900,7 +998,7 @@ function TrajectoryTop({
       data-stale={stale || undefined}
     >
       <h2 id="trajectory-result" className="visually-hidden">
-        Trajectory result
+        {t('Trajectory result')}
       </h2>
       <ResultTop result={result} system={system} />
       {printButton}
@@ -976,6 +1074,7 @@ export function TrajectoryForm({
   }
   ref?: Ref<TrajectoryHandle> | undefined
 }) {
+  const { t } = useTranslation()
   const { choice: unitChoice, system, ready } = useUnits()
   const names = useManufacturerNames()
   const form = useForm<Fields>({
@@ -1062,16 +1161,19 @@ export function TrajectoryForm({
     ],
   )
   const [debounced] = useDebouncedValue(inputs, 150)
-  const { errors, attempt } = useMemo(() => evaluate(debounced), [debounced])
+  const { errors, attempt } = useMemo(() => evaluate(debounced, t), [debounced, t])
   const { result, stale, clearLast } = useLastResult(attempt)
 
-  const staleText = staleTextOf(attempt)
-  const summary = summaryOf(attempt, stale, system)
+  const staleText = staleTextOf(attempt, t)
+  const summary = summaryOf(attempt, stale, system, t)
   // announced and alerted 1 s after the last change, so values passed while typing stay quiet
   const [status] = useDebouncedValue(summary, 1000)
+  const [staleStatus] = useDebouncedValue(stale, 1000)
   const message = attempt.kind === 'error' ? attempt.message : ''
   const [alerted] = useDebouncedValue(message, 1000)
-  const alert = alerted && alerted === message && <ErrorNote>{message}</ErrorNote>
+  const alert = alerted && alerted === message && (
+    <ErrorNote>{translateMessage(message, t)}</ErrorNote>
+  )
 
   const field = (spec: FieldSpec) => (
     <NumberField
@@ -1089,7 +1191,7 @@ export function TrajectoryForm({
       }}
       error={
         errors[spec.key]
-          ? (s) => fieldError(spec, fields[spec.key], s) ?? errors[spec.key]
+          ? (s) => fieldError(spec, fields[spec.key], s, t) ?? errors[spec.key]
           : undefined
       }
     />
@@ -1217,10 +1319,7 @@ export function TrajectoryForm({
       setChoice(linkedChoice)
     } catch {
       if (controller.signal.aborted) return
-      setRecord({
-        status: 'error',
-        message: 'The database is unreachable; manual input still works.',
-      })
+      setRecord({ status: 'error' })
     }
   }
 
@@ -1338,7 +1437,9 @@ export function TrajectoryForm({
       <Accordion multiple value={openPanels} onChange={setOpenPanels} order={2} className="panels">
         <Accordion.Item value="bullet">
           {/* the Bullet card of the workbench is a region "Bullet" too: one name per landmark */}
-          <Accordion.Control aria-label="Bullet of the trajectory">Bullet</Accordion.Control>
+          <Accordion.Control aria-label={t('Bullet of the trajectory')}>
+            {t('Bullet')}
+          </Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
               <BulletFields
@@ -1367,18 +1468,20 @@ export function TrajectoryForm({
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="load">
-          <Accordion.Control>Load</Accordion.Control>
+          <Accordion.Control>{t('Load')}</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
               {group(['muzzleVelocity'])}
               {loadVelocity !== undefined && fields.muzzleVelocity?.si === loadVelocity && (
-                <p className="note from-load">From the load: muzzle velocity of the last run.</p>
+                <p className="note from-load">
+                  {t('From the load: muzzle velocity of the last run.')}
+                </p>
               )}
             </div>
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="rifle">
-          <Accordion.Control>Rifle and scope</Accordion.Control>
+          <Accordion.Control>{t('Rifle and scope')}</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
               <RifleFields
@@ -1397,18 +1500,20 @@ export function TrajectoryForm({
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="zero">
-          <Accordion.Control>Zero air and drag</Accordion.Control>
+          <Accordion.Control>{t('Zero air and drag')}</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
               {group(['zeroTemperature', 'zeroPressure', 'zeroHumidity', 'dragFactor'])}
               {inputs.dragSource && (
-                <p className="note from-load">Drag factor source: {inputs.dragSource}</p>
+                <p className="note from-load">
+                  {t('Drag factor source: {source}', { source: inputs.dragSource })}
+                </p>
               )}
             </div>
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="conditions">
-          <Accordion.Control>Conditions</Accordion.Control>
+          <Accordion.Control>{t('Conditions')}</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">
               {group(['temperature', 'pressure', 'altitude', 'humidity', 'windSpeed', 'windFrom'])}
@@ -1416,7 +1521,7 @@ export function TrajectoryForm({
           </Accordion.Panel>
         </Accordion.Item>
         <Accordion.Item value="output">
-          <Accordion.Control>Output</Accordion.Control>
+          <Accordion.Control>{t('Output')}</Accordion.Control>
           <Accordion.Panel>
             <div className="panel-fields">{group(['maxRange', 'rangeStep'])}</div>
           </Accordion.Panel>
@@ -1432,10 +1537,7 @@ export function TrajectoryForm({
 
   // the stale line shows the state, so a stale or lagging stale text is only announced
   const statusLine = (
-    <p
-      role="status"
-      className={stale || status.startsWith('Result for earlier') ? 'status-quiet' : 'status'}
-    >
+    <p role="status" className={stale || staleStatus ? 'status-quiet' : 'status'}>
       {status}
     </p>
   )

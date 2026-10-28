@@ -1,5 +1,6 @@
 import { interiorValueKeys } from '@open-reloading/core'
 import { expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'
 import { burnFormError, interiorBody, interiorFields } from '../src/lib/interior-input.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -77,10 +78,12 @@ it('sends the two-stage form when a, m, q and z1 are set, the constant form when
 })
 
 it('flags the empty burn form fields of a partly filled form', () => {
-  expect(burnFormError({ formA: 0 }, 'formM')).toMatch(/burn form/)
-  expect(burnFormError({ formA: 0 }, 'formA')).toBeUndefined()
-  expect(burnFormError({}, 'formM')).toBeUndefined()
-  expect(burnFormError({ formA: 0, formM: 1, formQ: 0, formZ1: 1 }, 'formM')).toBeUndefined()
+  expect(burnFormError({ formA: 0 }, 'formM', english.t)).toMatch(/burn form/)
+  expect(burnFormError({ formA: 0 }, 'formA', english.t)).toBeUndefined()
+  expect(burnFormError({}, 'formM', english.t)).toBeUndefined()
+  expect(
+    burnFormError({ formA: 0, formM: 1, formQ: 0, formZ1: 1 }, 'formM', english.t),
+  ).toBeUndefined()
 })
 
 it('has the fields core reads for a load file (POST /interior/load-file)', () => {

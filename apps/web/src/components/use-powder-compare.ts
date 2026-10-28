@@ -2,6 +2,7 @@
 
 import type { Powder } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchPowder, fetchPowderList, postInteriorRun, postJson } from '../lib/api-client.ts'
 import type { InteriorResponse, PowderSummary } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
@@ -11,6 +12,7 @@ import {
   chargeTargetBody,
   noComparableLimitText,
 } from '../lib/charge-target.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import {
@@ -27,6 +29,27 @@ import {
 import { percentOfPressureLimit } from '../lib/workbench.ts'
 import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import { derived, stepFlag } from './workbench-outcome.ts'
+
+const noModel = msg('No fitted model parameters')
+const apiSilent = msg('The API did not answer.')
+const noRecord = msg('The powder record was not found.')
+/** Why a row has no case fill: the record gives no bulk density. */
+export const noBulkDensity = msg('No bulk density in the record')
+
+/** The sentences of this tab's rows; a row's other reasons are messages of the API and the packages. */
+const ownReasons: readonly Message[] = [
+  noModel,
+  apiSilent,
+  noRecord,
+  noBulkDensity,
+  noComparableLimitText,
+]
+
+/** A row's reason in the language of `t`. */
+export function reasonText(reason: string, t: Translator['t']) {
+  const own = ownReasons.find((m) => m === reason)
+  return own ? t(own) : translateMessage(reason, t)
+}
 
 /** One powder of the Powders tab. */
 export type CompareRow = {
@@ -50,7 +73,10 @@ export type CompareRow = {
     /** Pa: the pressure range of the run, low and high. */
     range: { low: number; high: number }
   }
+  /** The flag in English: the column's sort key. */
   flag?: string | undefined
+  /** The flag in the language of `t`. */
+  flagText?: ((t: Translator['t']) => string | undefined) | undefined
   /** Why the powder has no values. */
   reason?: string | undefined
   /** The solver's 422 answer of a target mode row, worded in the units shown by `refusalText`. */
@@ -73,16 +99,18 @@ export function answerRow(
 ): CompareRow {
   try {
     const shown = {
-      body: answer,
+      // the curve is not kept: the flag and the case fill read the numbers
+      body: { ...answer, result: { ...answer.result, points: [] } },
       load: { ...req.body.load, charge },
       bulkDensity: req.bulkDensity,
       resistanceMissing: req.resistanceMissing,
     }
     const r = answer.result
+    const flag = stepFlag(shown, english.t)
     return {
       ...head,
       charge,
-      ratio: derived(shown).ratio,
+      ratio: derived(shown, english.t).ratio,
       values: {
         peak: answer.pressureRange.nominalPressure,
         percent: percentOfPressureLimit(r.peakBreechPressure, answer.limits)?.percent,
@@ -91,19 +119,27 @@ export function answerRow(
         burnout: r.burnout?.travel,
         range: { low: answer.pressureRange.lowPressure, high: answer.pressureRange.highPressure },
       },
-      flag: stepFlag(shown),
+      flag,
+      flagText: flag === undefined ? undefined : (t) => stepFlag(shown, t),
     }
   } catch (err) {
     return { ...head, charge, reason: errorText(err) }
   }
 }
 
+/** What the Powders tab says after a batch that stopped early or failed, in words the page puts together where it shows them. */
+export type CompareMessage =
+  | { kind: 'stopped' }
+  | { kind: 'cancelled'; done: number; total: number }
+  /** The message of an error as it came, English. */
+  | { kind: 'error'; text: string }
+
 /** The Powders tab's state: the rows, the progress of the batch and what the rows were computed for. */
 type PowderCompare = {
   rows: CompareRow[]
   progress?: { done: number; total: number } | undefined
   running: boolean
-  message?: string | undefined
+  message?: CompareMessage | undefined
   /** Names the load and charge mode the rows were computed for. */
   key?: string | undefined
   /** The mode the rows were computed for. */
@@ -145,10 +181,10 @@ async function recordFor(
   try {
     record = await fetchPowder(id, batch)
   } catch {
-    return { row: batch.aborted ? undefined : { ...head, reason: 'The API did not answer.' } }
+    return { row: batch.aborted ? undefined : { ...head, reason: apiSilent } }
   }
-  if (!record) return { row: { ...head, reason: 'The powder record was not found.' } }
-  if (!record.interior) return { row: { ...head, reason: 'No fitted model parameters' } }
+  if (!record) return { row: { ...head, reason: noRecord } }
+  if (!record.interior) return { row: { ...head, reason: noModel } }
   return { record }
 }
 
@@ -184,12 +220,12 @@ async function powderRow(
   head: RowHead,
   s: PowderSummary,
 ): Promise<CompareRow | undefined> {
-  if (!s.interior) return { ...head, reason: 'No fitted model parameters' }
+  if (!s.interior) return { ...head, reason: noModel }
   const fetched = await recordFor(head, s.id, cx.batch)
   if ('row' in fetched) return fetched.row
   const { record } = fetched
   const charge = compareCharge(cx.mode, cx.typed, record.bulkDensity?.value, cx.volume)
-  if (charge === undefined) return { ...head, reason: 'No bulk density in the record' }
+  if (charge === undefined) return { ...head, reason: noBulkDensity }
   let req: ReturnType<RowContext['loadRequest']>
   try {
     req = cx.loadRequest({ powder: record, charge })
@@ -257,7 +293,7 @@ export async function computeRows(
     powders.forEach((s, i) => {
       slots[i] ??= s.interior
         ? { ...headOf(s), reason: noLimit?.message ?? noComparableLimitText, refusal: noLimit }
-        : { ...headOf(s), reason: 'No fitted model parameters' }
+        : { ...headOf(s), reason: noModel }
     })
   return { rows: produced(), total: powders.length, noLimit }
 }
@@ -266,9 +302,9 @@ export async function computeRows(
 function endMessage(
   done: { rows: CompareRow[]; total: number; noLimit?: ChargeTargetRefusal | undefined },
   aborted: boolean,
-) {
-  if (done.noLimit && !aborted) return `Stopped. ${noComparableLimitText}`
-  if (aborted) return `Cancelled after ${done.rows.length} of ${done.total} powders.`
+): CompareMessage | undefined {
+  if (done.noLimit && !aborted) return { kind: 'stopped' }
+  if (aborted) return { kind: 'cancelled', done: done.rows.length, total: done.total }
   return
 }
 
@@ -293,7 +329,7 @@ export function usePowderCompare(
   const [rows, setRows] = useState<CompareRow[]>([])
   const [progress, setProgress] = useState<PowderCompare['progress']>()
   const [running, setRunning] = useState(false)
-  const [message, setMessage] = useState<string>()
+  const [message, setMessage] = useState<CompareMessage>()
   const [key, setKey] = useState<string>()
   const [computed, setComputed] = useState<CompareMode>()
   const controller = useRef<AbortController>(undefined)
@@ -303,7 +339,7 @@ export function usePowderCompare(
   async function compute() {
     controller.current?.abort()
     const built = baseRequest(loadRequest)
-    if ('message' in built) return setMessage(built.message)
+    if ('message' in built) return setMessage({ kind: 'error', text: built.message })
     const { base } = built
     const abort = new AbortController()
     controller.current = abort
@@ -346,7 +382,7 @@ export function usePowderCompare(
       const ended = endMessage(done, signal.aborted)
       if (ended && current()) setMessage(ended)
     } catch (err) {
-      if (!signal.aborted) setMessage(errorText(err))
+      if (!signal.aborted) setMessage({ kind: 'error', text: errorText(err) })
     } finally {
       clearTimeout(timer)
       if (current()) setRunning(false)

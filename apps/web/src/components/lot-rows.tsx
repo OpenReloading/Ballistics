@@ -2,6 +2,9 @@
 
 import { Button, NumberInput, Text } from '@mantine/core'
 import dynamic from 'next/dynamic'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import type { FieldSpec } from '../lib/field-spec.ts'
 import { defaultLotFraction, maxLotFraction } from '../lib/lot-rows.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -23,8 +26,10 @@ export function preloadLotChart() {
 
 export const fractionSpec: FieldSpec = {
   key: 'lotFraction',
-  label: 'Lot burn rate change',
-  help: 'The two extra rows of each charge burn this much faster and slower than the powder record.',
+  label: msg('Lot burn rate change'),
+  help: msg(
+    'The two extra rows of each charge burn this much faster and slower than the powder record.',
+  ),
   quantity: 'percent',
   required: true,
   min: 0,
@@ -34,8 +39,9 @@ export const fractionSpec: FieldSpec = {
 }
 
 /** What the lot rows say about barrel time: a computed value of the simulation. */
-export const lotNote =
-  'Lot rows: the burn rate of each charge raised and lowered. Barrel time is a computed value of the simulation, not a measurement.'
+export const lotNote = msg(
+  'Lot rows: the burn rate of each charge raised and lowered. Barrel time is a computed value of the simulation, not a measurement.',
+)
 
 /** The chart of the lot rows' barrel times, with the note under it; nothing before the rows arrive. */
 export function LotChartBlock({
@@ -48,6 +54,7 @@ export function LotChartBlock({
   /** The note under the chart; the printed report carries none. */
   note?: boolean
 }) {
+  const { t } = useTranslation()
   if (!lot.rows) return null
   return (
     <>
@@ -57,19 +64,21 @@ export function LotChartBlock({
         target={lot.targetSeconds}
         system={system}
       />
-      {note && <p className="note lot-note">{lotNote}</p>}
+      {note && <p className="note lot-note">{t(lotNote)}</p>}
     </>
   )
 }
 
 /** The fields of the lot rows, the status of their request and the chart. */
 export function LotPanel({ lot, system }: { lot: LotRows; system: UnitSystem }) {
+  const { t } = useTranslation()
   const first = lot.error
-  const failed = lot.message && `Lot rows failed: ${lot.message}`
-  const text = first ?? (lot.pending ? 'Lot rows pending' : failed)
+  const failed =
+    lot.message && t('Lot rows failed: {message}', { message: translateMessage(lot.message, t) })
+  const text = first ?? (lot.pending ? t('Lot rows pending') : failed)
   return (
     <section className="lot-rows" aria-labelledby="lot-rows-title">
-      <h3 id="lot-rows-title">Powder lot rows</h3>
+      <h3 id="lot-rows-title">{t('Powder lot rows')}</h3>
       <div className="lot-fields">
         <NumberField
           spec={fractionSpec}
@@ -80,8 +89,8 @@ export function LotPanel({ lot, system }: { lot: LotRows; system: UnitSystem }) 
           hiddenError
         />
         <NumberInput
-          label="Target barrel time"
-          description="Optional: a line on the chart."
+          label={t('Target barrel time')}
+          description={t('Optional: a line on the chart.')}
           hideControls
           min={0}
           decimalScale={3}
@@ -101,7 +110,7 @@ export function LotPanel({ lot, system }: { lot: LotRows; system: UnitSystem }) 
         </span>
         {!first && !lot.pending && lot.message && (
           <Button size={controlSize.row.button} variant="default" ml="xs" onClick={lot.retry}>
-            Retry
+            {t('Retry')}
           </Button>
         )}
       </p>

@@ -2,6 +2,7 @@
 
 import { toSi } from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { requestTimeout } from '../lib/api-client.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import {
@@ -151,6 +152,7 @@ export function useBarrelStudy({
   system: UnitSystem
   enabled: boolean
 }): BarrelStudy {
+  const { t } = useTranslation()
   const symbol = system.barrelLength.symbol
   const [typed, setTyped] = useState<Partial<Record<RangeKey, FieldValue>>>({})
   const [unit, setUnit] = useState(symbol)
@@ -166,8 +168,8 @@ export function useBarrelStudy({
     return { from: field('from'), to: field('to'), step: field('step') }
   }, [typed, system])
   const planned = useMemo(
-    () => rangeLengths(range.from.si, range.to.si, range.step.si, (m) => inEveryUnit(system, m)),
-    [range.from.si, range.to.si, range.step.si, system],
+    () => rangeLengths(range.from.si, range.to.si, range.step.si, (m) => inEveryUnit(system, m), t),
+    [range.from.si, range.to.si, range.step.si, system, t],
   )
   const lengths = 'lengths' in planned ? planned.lengths : undefined
   const figure = ok && stripFigureOf(ok)

@@ -13,11 +13,11 @@ test('under German the workbench writes and takes a decimal comma and its result
   await page.addInitScript(() => localStorage.setItem('language', 'de'))
   await gotoHydrated(page, '/workbench')
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
-  await applyExampleLoad(page)
+  await applyExampleLoad(page, 'de')
 
-  const charge = loadForm(page).getByLabel(/^Charge mass/)
+  const charge = loadForm(page, 'Laborierung').getByLabel(/^Ladungsmasse/)
   await expect(charge).toHaveValue('2,40')
-  const line = page.locator('.result').getByText(/^Simulation done\. /)
+  const line = page.locator('.result').getByText(/^Simulation abgeschlossen\. /)
   // a comma and a point both give the value; the result writes the comma
   for (const [typed, shown] of [
     ['2,5', '2,50'],
@@ -25,7 +25,7 @@ test('under German the workbench writes and takes a decimal comma and its result
   ] as const) {
     await charge.fill(typed)
     await charge.press('Control+Enter')
-    await expect(line).toContainText(`Step 0, ${shown} g: `, { timeout: 15_000 })
+    await expect(line).toContainText(`Stufe 0, ${shown} g: `, { timeout: 15_000 })
   }
   // leaving the field writes the value as the language does
   await charge.blur()
@@ -37,7 +37,7 @@ test('under German the workbench writes and takes a decimal comma and its result
   expect(await keys.innerText()).not.toMatch(/\d\.\d/)
 
   const { violations } = await new AxeBuilder({ page })
-    .include('form[aria-label="Load"]')
+    .include('form[aria-label="Laborierung"]')
     .include('.readout-keys')
     .analyze()
   expect(violations.map((v) => v.id)).toEqual([])

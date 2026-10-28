@@ -13,6 +13,8 @@ The group statistics describe the shots of one group on a target:
 - the covariance with its principal axis
 - ellipses that hold a stated share of the shots
 
+The velocities of a chronograph string have their own statistics (mean, standard deviation, extreme spread, interval of the standard deviation, shots needed), see "Velocity strings".
+
 Several groups of one load are pooled in angle, each about its own centre. Excluded shots enter only their count and the offset of their centre. A value whose minimum shot count is not met is undefined.
 
 ## Equations
@@ -173,6 +175,34 @@ Code: `packages/core/src/groups/chi-square.ts`, `chiSquareSurvival`.
 
 evaluated by the modified Lentz method, and there $P = 1 - Q$: the series would need about $z$ terms. Below, $Q = 1 - P$. Quantiles come from bisection on $P$.
 
+### Velocity strings
+
+For the $n$ velocities $v_i$ of one string (m/s, excluded shots left out), the mean, the standard deviation with divisor $n - 1$ and the extreme spread are
+
+$$
+\bar v = \frac{1}{n} \sum_{i=1}^{n} v_i, \qquad s = \sqrt{\frac{\sum_i (v_i - \bar v)^2}{n - 1}}, \qquad \mathrm{ES} = \max_i v_i - \min_i v_i
+$$
+
+Code: `packages/core/src/groups/velocity-statistics.ts`, `velocityStatistics`.
+
+The interval of the population standard deviation is the one-axis form of the interval above, $S = (n-1)s^2$ and $\nu = n - 1$, so as multiples of $s$:
+
+$$
+\sqrt{\frac{n-1}{\chi^2_{1-\alpha/2,\,n-1}}} \le \frac{\sigma}{s} \le \sqrt{\frac{n-1}{\chi^2_{\alpha/2,\,n-1}}}
+$$
+
+Code: `packages/core/src/groups/velocity-statistics.ts`, `velocityStatistics` (`intervalFactors`).
+
+It needs 3 shots. The extreme spread has no interval.
+
+The relative half-width of the interval is $w(n) = (u_n - l_n)/2$ with $l_n$ and $u_n$ the two factors above. `shotsNeeded` returns the smallest $n \ge 3$ with $w(n)$ at most the wanted value. $w$ falls with $n$, so the search doubles $n$ and then halves the bracket. At the 95 % level, 12, 26 and 53 shots give a half-width of 50 %, 30 % and 20 %; at 90 %, 9, 19 and 38.
+
+Code: `packages/core/src/groups/velocity-statistics.ts`, `shotsNeeded`.
+
+The session summary shows the 95 % interval and $n$ with each statistic. It compares two strings by their intervals: where they overlap, it states that the difference is smaller than the uncertainty. Two strings are ranked by the smaller SD only when the intervals are apart and each has at least 10 shots; with fewer shots, or without an interval, it states that there are too few shots to compare. At $n = 10$ and 95 % the interval runs from 0.69 to 1.83 times $s$, so two strings of 10 shots separate only when their standard deviations differ by a factor of about 2.7.
+
+Code: `apps/web/src/lib/string-comparison.ts`, `compareSd`. `apps/web/src/components/string-comparison.tsx`, `StringComparison`.
+
 ### Bisection
 
 `bisect` finds the point where a predicate that holds below the root turns false. It halves the bracket $[l, h]$ at the midpoint $x_m = (l + h)/2$: $l$ becomes $x_m$ where the predicate holds there, else $h$ becomes $x_m$. The result is the midpoint of the final bracket. A caller passes the iteration count and whether to stop early once $x_m$ equals an end of the bracket. The chi-square and Student's t quantiles and the elliptical CEP stop early, with 200, 200 and 100 halvings. The seven-perforation burnout of the [burn forms](interior-burn-forms.md) and the ignition burnt fraction of the [M3 model](interior-m3.md) run 200 halvings without the early stop.
@@ -255,6 +285,8 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 | $F_{2,m}(p)$ | Quantile of the F distribution with 2 and $m$ degrees of freedom | 1 | 1 |
 | $1 - \alpha$ | Two-sided confidence level, default 0.95 | 1 | 1 |
 | $\nu$ | Degrees of freedom | 1 | 1 |
+| $v_i$, $\bar v$, $s$ | Velocity of shot $i$ of a string, mean, standard deviation | m/s | m/s |
+| $l_n$, $u_n$, $w$ | Limits of the interval of $\sigma$ over $s$ for $n$ shots, relative half-width | 1 | 1 |
 | $\chi^2_{q,\nu}$ | Quantile of the chi-square distribution at probability $q$ | 1 | 1 |
 | $P$, $Q$ | Regularized lower and upper incomplete gamma functions | 1 | 1 |
 | $t$, $\theta$ | Student's t quantile and its angle $\arctan(t/\sqrt{\nu})$ | 1, no kind | 1, rad |
@@ -266,6 +298,7 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 ## Assumptions
 
 - The shots of a group come from one bivariate normal population. The chi-square intervals of $\sigma$, the radial standard deviation and the CEP assume equal, uncorrelated axes (circular normal). The per-axis intervals assume normal dispersion along that axis.
+- The velocities of a string are independent draws from one normal population. Drift over the string (barrel heat) and the rounding of the chronograph make them less so.
 - Every variance divides by $n - 1$. The mean radius and the centre divide by $n$.
 - Pooled groups share one population in angle: each group is reduced about its own centre and scaled by its own distance.
 - The prediction ellipse covers a further shot with probability $p$ on average over groups, not for every group.
@@ -273,6 +306,7 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 ## Limits
 
 - Minimum shot counts: the centre and the aim offset need 1 shot, every dispersion value and the dispersion ellipse 2, the prediction ellipse 3, the velocity correlation 3 shots with a velocity, not all of one velocity or one height.
+- The interval of a velocity standard deviation holds its level only for normal velocities. In simulated strings of 10 to 30 shots from skewed, heavy-tailed or stray-shot populations, an interval stated at 95 % covered the true value 76 to 90 % of the time, and it is too narrow, not too wide. A percentile bootstrap covered less at these shot counts and is not used. The extreme spread of a string carries no interval.
 - Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables, not reproduced here.
 - The circular CEP overstates the CEP of an elongated group. The elliptical CEP holds for any axis ratio and equals the circular one for equal, uncorrelated axes.
 - The dispersion ellipse describes the shots fired. For small $n$ it holds less than the share $p$ of further shots.
