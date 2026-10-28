@@ -22,6 +22,14 @@ import {
   interior,
 } from './model.ts'
 
+/**
+ * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.
+ * Values on different bases are not converted into each other.
+ */
+export type PressureBasis = 'transducer' | 'piezo' | 'crusher' | 'energy'
+
+const pressureBases: readonly string[] = ['transducer', 'piezo', 'crusher', 'energy']
+
 /** One charge of a chronograph ladder: measured muzzle velocity and, optionally, peak pressure. */
 export interface LadderPoint {
   /** Charge mass, kg. */
@@ -34,6 +42,8 @@ export interface LadderPoint {
   peakPressure?: number
   /** Standard uncertainty of `peakPressure`, Pa; required with `peakPressure`. */
   pressureSigma?: number
+  /** Basis `peakPressure` was measured on; required with `peakPressure`, and all pressures of a fit share one. */
+  pressureBasis?: PressureBasis
   /** Projectile travel to the muzzle of the barrel fired, m; default the load's. */
   barrelLength?: number
   /** Propellant temperature of the string, K; default the load's. */
@@ -146,6 +156,8 @@ export interface PowderFit {
   weighted: boolean
   /** `refined` when a prior on the burn coefficient was given, else `from-scratch`. */
   basis: PowderFitBasis
+  /** Number of pressure rows per basis; at most one entry, none without pressures. */
+  pressureRows: Partial<Record<PressureBasis, number>>
   /** One row per velocity, then pressure, of each ladder point in input order. */
   residuals: PowderFitResidual[]
   /** Sum of squared residuals over sigma (sigma 1 where the ladder has none), plus `priorChiSquare`. */
@@ -224,6 +236,22 @@ export class PowderFitError extends InputError {
   }
 }
 
+/** Failure of `fitPowder` when the pressure rows of a ladder use more than one basis. */
+export class MixedPressureBasisError extends InputError {
+  /** Number of pressure rows per basis. */
+  readonly rows: Partial<Record<PressureBasis, number>>
+
+  constructor(rows: Partial<Record<PressureBasis, number>>) {
+    super(
+      `pressure rows use more than one basis: ${Object.entries(rows)
+        .map(([basis, n]) => `${n} ${basis}`)
+        .join(', ')}`,
+    )
+    this.name = 'MixedPressureBasisError'
+    this.rows = rows
+  }
+}
+
 /** Smallest ratio of the longest to the shortest barrel length at which `energy` is fitted. */
 const minLengthSpan = 1.05
 
@@ -256,6 +284,14 @@ function checkLadder(ladder: readonly LadderPoint[]): number {
       (x.peakPressure === undefined) === (x.pressureSigma === undefined),
       'peakPressure and pressureSigma together',
     )
+    need(
+      (x.peakPressure === undefined) === (x.pressureBasis === undefined),
+      'peakPressure and pressureBasis together',
+    )
+    need(
+      x.pressureBasis === undefined || pressureBases.includes(x.pressureBasis),
+      `pressureBasis must be one of ${pressureBases.join(', ')}`,
+    )
   }
   const withSigma = ladder.filter((x) => x.velocitySigma !== undefined).length
   need(withSigma === 0 || withSigma === ladder.length, 'velocitySigma on all points or none')
@@ -264,6 +300,18 @@ function checkLadder(ladder: readonly LadderPoint[]): number {
     'pressures need velocity sigmas',
   )
   return withSigma
+}
+
+/** Pressure rows per basis of a checked ladder; throws `MixedPressureBasisError` for more than one basis. */
+function pressureRowsPerBasis(
+  ladder: readonly LadderPoint[],
+): Partial<Record<PressureBasis, number>> {
+  const rows: Partial<Record<PressureBasis, number>> = {}
+  for (const { pressureBasis } of ladder) {
+    if (pressureBasis !== undefined) rows[pressureBasis] = (rows[pressureBasis] ?? 0) + 1
+  }
+  if (Object.keys(rows).length > 1) throw new MixedPressureBasisError(rows)
+  return rows
 }
 
 /** One observation of the fit: a ladder velocity or pressure with its sigma (1 without one). */
@@ -393,6 +441,7 @@ export function fitPowder(
 ): PowderFit {
   const { parameters = ['burnRate'], maxIterations = 30, maxCondition = 1e3 } = options
   const withSigma = checkLadder(ladder)
+  const pressureRows = pressureRowsPerBasis(ladder)
   checkParameters(load, ladder, parameters)
   need(
     Number.isInteger(maxIterations) && maxIterations > 0,
@@ -534,6 +583,7 @@ export function fitPowder(
     ...(fit.covariance ? { covariance: fit.covariance } : {}),
     weighted: withSigma > 0,
     basis: priors.burnRate === undefined ? 'from-scratch' : 'refined',
+    pressureRows,
     residuals: rows.map((o, i) => {
       const predicted = nth(fit.predicted, i)
       return {
