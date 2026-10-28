@@ -177,7 +177,9 @@
       "peakPressure and pressureBasis together",
       "pressureBasis must be one of {list}",
       "domainMargin must lie in [0, 1)",
-      "boreDiameter must be positive"
+      "boreDiameter must be positive",
+      "the powder has no interior model",
+      "the bore resistance of the powder needs {list}"
     ],
     "ladders": [
       "ladder start charge must be above 0",
