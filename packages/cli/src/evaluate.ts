@@ -133,7 +133,13 @@ export function predict(row: Row, records: Records, model: InteriorModel): Predi
   if (typeof load === 'string') return { reason: load }
   try {
     const result = model(load)
-    if (!result.valid) return { reason: 'modelRefused' }
+    // a velocity or pressure that is not a finite number would turn every statistic into null
+    if (
+      !result.valid ||
+      !Number.isFinite(result.muzzleVelocity) ||
+      !Number.isFinite(result.peakBreechPressure)
+    )
+      return { reason: 'modelRefused' }
     return { velocity: result.muzzleVelocity, pressure: result.peakBreechPressure }
   } catch (error) {
     if (error instanceof InputError) return { reason: 'modelRefused' }

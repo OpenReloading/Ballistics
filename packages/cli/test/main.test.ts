@@ -135,6 +135,26 @@ describe('exit codes', () => {
   })
 })
 
+describe('a candidate with a velocity that is not a number', () => {
+  const nan = new URL('./fixtures/nan-model.mjs', import.meta.url).pathname
+
+  it('refuses those rows, keeps every statistic a number, and re-reads as a baseline', async () => {
+    const r = await cli(['verify', ...data, '--model', nan])
+    expect(r.code).toBe(0)
+    const json = JSON.parse(r.stdout)
+    expect(json.overall.rows.notUsed.modelRefused).toBeGreaterThan(0)
+    for (const m of [json.overall, ...Object.values<{ velocity: object }>(json.byFamily)])
+      expect(m.velocity === null || Object.values(m.velocity).every(Number.isFinite)).toBe(true)
+    expect(Number.isFinite(json.overall.velocity.median)).toBe(true)
+    expect(Number.isFinite(json.interval.halfWidth)).toBe(true)
+    expect(result.safeParse(json).success).toBe(true)
+    const baseline = writeRows(r.stdout, 'baseline.json')
+    expect(
+      (await cli(['compare', ...data, '--baseline', baseline, '--candidate', 'm3'])).code,
+    ).toBe(0)
+  })
+})
+
 describe('an unexpected error', () => {
   it.each([
     ['a candidate that throws', new URL('./fixtures/throwing-model.mjs', import.meta.url).pathname],

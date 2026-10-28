@@ -107,6 +107,17 @@ describe('predict', () => {
         throw new InputError('x')
       }),
     ).toEqual({ reason: 'modelRefused' })
+    for (const muzzleVelocity of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])
+      expect(
+        predict(row, records, (load) => ({ ...interior(load), muzzleVelocity }) as never),
+      ).toEqual({ reason: 'modelRefused' })
+    expect(
+      predict(
+        row,
+        records,
+        (load) => ({ ...interior(load), peakBreechPressure: Number.NaN }) as never,
+      ),
+    ).toEqual({ reason: 'modelRefused' })
     expect(() =>
       predict(row, records, () => {
         throw new Error('defect')
