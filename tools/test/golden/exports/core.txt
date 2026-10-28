@@ -23,6 +23,7 @@
 . ChargeTarget
 . ChargeTargetKind
 . Chronograph
+. ChronographString
 . ClosedVesselResult
 . CoefficientOverMach
 . CompassPoint
@@ -317,6 +318,7 @@
 . planTruingStrings
 . pointDispersion
 . pooledGroupStatistics
+. pooledVelocitySd
 . powderConfidence
 . powderConfidenceRules
 . powderDomainMargin
@@ -349,6 +351,7 @@
 . speedOfSound
 . spinDrift
 . standardAtmosphere
+. stringLadder
 . subtendedAngle
 . toleranceRange
 . trajectory
