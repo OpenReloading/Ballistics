@@ -62,3 +62,23 @@ test('the photograph canvas is an application with a short name and its keys as 
   await canvas.focus()
   await expect(canvas).toBeFocused()
 })
+
+test('the diameter and the overall length from a caliper give the scale without a ruler', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  await page.getByRole('button', { name: 'From a photo' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Bullet from a photograph' })
+  await dialog.getByRole('button', { name: 'Try a sample' }).click()
+  const length = dialog.getByRole('row', { name: /^Length/ })
+  await expect(length).toContainText(/31\.\d+ ± /, { timeout: 30_000 })
+
+  await dialog.getByRole('button', { name: 'Clear the scale' }).click()
+  await expect(dialog.getByText('No scale yet.')).toBeVisible()
+  await expect(length).toHaveCount(0)
+
+  await dialog.getByRole('spinbutton', { name: /^Diameter, caliper/ }).fill('7.8')
+  await dialog.getByRole('spinbutton', { name: /^Overall length, caliper/ }).fill('31.4')
+  await expect(dialog.getByText(/^Scale \d+\.\d+ px\/mm, uncertainty/)).toBeVisible()
+  await expect(length).toContainText(/31\.\d+ ± /)
+})

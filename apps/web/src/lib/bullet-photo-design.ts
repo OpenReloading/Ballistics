@@ -89,16 +89,20 @@ export function photoRows(
   })
 }
 
-/** What a measurement was made from: the cut-out, the scale and the fixed axis direction (undefined when found). */
+/** What a measurement was made from: the cut-out, the ruler's scale, the caliper sizes and the fixed axis direction (undefined when found). */
 export interface MeasuredInputs {
   cut: unknown
   scale: Scale | undefined
   axis: number | undefined
+  known?: unknown
 }
 
-/** Whether a measurement made from `made` still answers the inputs `now`: the same cut-out and scale objects and axis. */
+/** Whether a measurement made from `made` still answers the inputs `now`: the same cut-out, scale and caliper size objects and axis. */
 export const measuredFor = (made: MeasuredInputs, now: MeasuredInputs): boolean =>
-  made.cut === now.cut && made.scale === now.scale && made.axis === now.axis
+  made.cut === now.cut &&
+  made.scale === now.scale &&
+  made.known === now.known &&
+  made.axis === now.axis
 
 /** What the note says about the photograph: its size and scale, never its file. */
 export interface PhotoFacts {
