@@ -19,6 +19,16 @@ export const sourceOrigin = z.enum(['manufacturer', 'public', 'community'])
 /** Whether a source's `terms` is a link: it starts with http:// or https://. Any other text is a note. */
 export const isWebLink = (text: string) => /^https?:\/\//.test(text)
 
+// `new URL` instead of `URL.canParse`, which the oldest supported browsers lack.
+const parsesAsUrl = (text: string) => {
+  try {
+    new URL(text)
+    return true
+  } catch {
+    return false
+  }
+}
+
 /**
  * One cited source: title, optional publisher, page, URL, retrieval date and SHA-256 of the file (64
  * lowercase hex digits), and the terms its data is used under.
@@ -75,7 +85,7 @@ export const source = z.object({
   terms: z
     .string()
     .min(1)
-    .refine((t) => !isWebLink(t) || URL.canParse(t), {
+    .refine((t) => !isWebLink(t) || parsesAsUrl(t), {
       message: 'a text starting with http:// or https:// must be a URL',
     })
     .describe(
