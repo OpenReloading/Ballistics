@@ -4,7 +4,7 @@ import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // the offline layer's worker answers the reloads of the offline test
@@ -48,7 +48,15 @@ const stored = (page: Page, kind: string) =>
     return all.filter((r) => r.kind === kind)
   }, kind)
 
-/** Saves the example load in the workbench as a load of this browser and gives its record. */
+/** The text of every field of the load form. */
+const formValues = (page: Page) =>
+  loadForm(page)
+    .getByRole('textbox')
+    .evaluateAll((els) =>
+      els.map((e) => [e.getAttribute('aria-label') ?? '', (e as HTMLInputElement).value]),
+    )
+
+/** Saves the example load in the workbench as a load of this browser and gives its record and form values. */
 async function saveExampleLoad(page: Page) {
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
@@ -61,16 +69,18 @@ async function saveExampleLoad(page: Page) {
   await expect.poll(async () => (await stored(page, 'load')).length).toBe(1)
   const [record] = await stored(page, 'load')
   if (!record) throw new Error('the load was not saved')
-  return record
+  return { ...record, values: await formValues(page) }
 }
 
 /** Opens the saved load in the workbench and runs it. */
-async function openSaved(page: Page, name: string) {
+async function openSaved(page: Page, { name, values }: { name: string; values: string[][] }) {
   await gotoHydrated(page, '/workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
+  // the name shows before the records fill the fields: a run started earlier finds them empty
+  await expect.poll(() => formValues(page)).toEqual(values)
   await runLine(page)
 }
 
@@ -133,6 +143,10 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   // conditions and a note are kept with the string
   await page.getByLabel(/^Air temperature/).fill('11.5')
   await page.getByRole('textbox', { name: 'Note', exact: true }).fill('light rain')
+  // the write to the browser store runs after the input event: a reload before it commits drops it
+  await expect
+    .poll(async () => (await stored(page, 'session'))[0]?.data.strings[0]?.note)
+    .toBe('light rain')
 
   await page.reload()
   await expect(shots).toHaveCount(10)
@@ -161,7 +175,7 @@ test('a 10-shot string entered offline survives reloads and is on the Measuremen
   expect(after?.data.sessions).toEqual([`user:${session?.id}`])
 
   // at home: the load opens in the workbench and its Measurements tab lists the session
-  await openSaved(page, saved.name)
+  await openSaved(page, saved)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await expect(page.locator('legend.series-name')).toContainText('range')
   await expect(page.getByLabel(/^String 1: /)).toBeAttached()
