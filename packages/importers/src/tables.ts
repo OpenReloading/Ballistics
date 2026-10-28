@@ -103,7 +103,7 @@ const headerOnly: TableRead = {
  * unless most of its cells are numbers. Refused below two columns or without data rows.
  */
 export function tableOfRows(raw: string[][]): TableRead {
-  const width = Math.max(0, ...raw.map((r) => r.length))
+  const width = raw.reduce((m, r) => Math.max(m, r.length), 0)
   if (width < 2) return { refusal: 'The rows have no table of two columns or more.' }
   const padded = raw.map((r) => Array.from({ length: width }, (_, i) => (r[i] ?? '').trim()))
   const first = padded[0] ?? []

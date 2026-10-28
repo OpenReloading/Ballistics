@@ -439,6 +439,13 @@ describe('readTable', () => {
     ])
   })
 
+  it('reads a CSV of 200,000 rows', () => {
+    const rows = Array.from({ length: 200_000 }, (_, i) => `${i},168,0.308`)
+    const t = tableOf(`Name,Weight,Dia\n${rows.join('\n')}`)
+    expect(t.rows).toHaveLength(200_000)
+    expect(t.rows.at(-1)).toEqual(['199999', '168', '0.308'])
+  })
+
   it('reads quoted cells across lines, semicolons and tabs', () => {
     const t = tableOf('Name;Note\n"A ""b""";"two\nlines"\nC;d\n')
     expect(t.rows).toEqual([
