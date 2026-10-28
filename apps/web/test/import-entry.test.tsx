@@ -95,6 +95,21 @@ it('reads a clean table, imports its rows with the source and finds them again o
   expect(importCount([{ build: changed, source: '' }], 'x', true).total).toBe(1)
 })
 
+it('keeps the record of the first file when a second file of the same import holds the row with other values', async () => {
+  const h = storeWorker()
+  await h.ask({ type: 'read', id: 1, bytes: csv(bullets) })
+  await h.ask({ type: 'read', id: 2, bytes: csv(['Alpha 168,Invented Arms,7.82,168,0.47']) })
+  await h.ask({ type: 'build', id: 1, kind: 'bullet' })
+  expect(built(await h.ask({ type: 'build', id: 2, kind: 'bullet' }))).toMatchObject({ added: 1 })
+
+  await h.ask({ type: 'commit', id: 1, imported, replace: false })
+  const first = h.stored()
+  const second = await h.ask({ type: 'commit', id: 2, imported, replace: false })
+  expect(second).toMatchObject({ type: 'committed', written: 0 })
+  expect(built(second)).toMatchObject({ added: 0, changed: 1 })
+  expect(h.stored()).toEqual(first)
+})
+
 it('rejects a bad row and keeps the others, counting a repeated row once', async () => {
   const h = storeWorker()
   await h.ask({

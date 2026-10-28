@@ -303,7 +303,9 @@ export function importWorker(
     if (m.type === 'build')
       return { type: 'built', id: m.id, build: await build(m.id, m.kind, m.map) }
     const h = held(m.id)
-    if (!h.plan || !h.kind) throw new Error('the file is not built')
+    if (!h.built || !h.kind) throw new Error('the file is not built')
+    // planned again: another file of this import or another tab may have stored a row since the build
+    h.plan = planOf(h.built, await store.records())
     const write = toWrite(h.plan, m.replace).map((r) => ({ ...r, imported: m.imported }))
     await store.put(write)
     const written = write.filter((r) => r.kind !== 'manufacturer').length
