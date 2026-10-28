@@ -618,5 +618,129 @@
         "gasTemperature": null
       }
     ]
+  },
+  "energy temperature of 0 per K": {
+    "peakBreechPressure": 1108848214.7897706,
+    "maxPressureTime": 0.0004208939301676214,
+    "maxPressureTravel": 0.03206850254368542,
+    "maxBasePressure": 966891059.9228675,
+    "maxMeanPressure": 1061529163.1674696,
+    "muzzleVelocity": 1003.0828419255059,
+    "muzzleTime": 0.0010918183882503304,
+    "muzzleMeanPressure": 56287337.93570924,
+    "muzzleBasePressure": 51269174.43746999,
+    "muzzleBreechPressure": 58796419.68482888,
+    "shotStartTime": 0.00010015787659304996,
+    "barrelTime": 0.0009916605116572805,
+    "burnout": {
+      "time": 0.0004922503966448965,
+      "travel": 0.06893805877317136
+    },
+    "muzzleBurntFraction": 1,
+    "muzzleEnergy": 4779.33214188541,
+    "efficiency": 0.43766777856093503,
+    "energy": {
+      "gas": 5653.206549195145,
+      "translation": 4779.33214188541,
+      "rotation": 17.912887962281985,
+      "gasKinetic": 469.5484209571631,
+      "resistance": 0,
+      "heat": 0,
+      "leakage": 0
+    },
+    "tenPercentPressureTime": 0.00020240183446297818,
+    "pointCount": 554,
+    "points": [
+      {
+        "time": 0,
+        "travel": 0,
+        "velocity": 0,
+        "burntFraction": 0.003277906907443673,
+        "meanPressure": 4999999.999999762,
+        "basePressure": 4999999.999999762,
+        "breechPressure": 4999999.999999762,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0001360000000000001,
+        "travel": 0.0000692536343720994,
+        "velocity": 4.234371354643222,
+        "burntFraction": 0.027390911331580226,
+        "meanPressure": 42352431.594574645,
+        "basePressure": 38576601.46858218,
+        "breechPressure": 44240346.65757088,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0002739999999999998,
+        "travel": 0.003673652833023508,
+        "velocity": 65.57129020379769,
+        "burntFraction": 0.17089863971367014,
+        "meanPressure": 263662107.71020612,
+        "basePressure": 240155940.72303376,
+        "breechPressure": 275415191.20379233,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.00041199999999999885,
+        "travel": 0.028702735847684388,
+        "velocity": 361.7427120213544,
+        "burntFraction": 0.8264446760251651,
+        "meanPressure": 1032050932.9819975,
+        "basePressure": 940040891.1120228,
+        "breechPressure": 1078055953.916985,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.000539999999999998,
+        "travel": 0.10078143978493631,
+        "velocity": 709.2201469226275,
+        "burntFraction": 1,
+        "meanPressure": 435236370.8662299,
+        "basePressure": 396433909.2560952,
+        "breechPressure": 454637601.6712973,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.000677999999999997,
+        "travel": 0.20982732531322892,
+        "velocity": 851.9395210479726,
+        "burntFraction": 1,
+        "meanPressure": 193397075.19236928,
+        "basePressure": 176155219.75935748,
+        "breechPressure": 202018002.9088752,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.000815999999999996,
+        "travel": 0.33287140235703927,
+        "velocity": 924.8241966390212,
+        "burntFraction": 1,
+        "meanPressure": 113270437.82684319,
+        "basePressure": 103172081.8310156,
+        "breechPressure": 118319615.824757,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.000953999999999995,
+        "travel": 0.4638717703794225,
+        "velocity": 970.7352261735841,
+        "burntFraction": 1,
+        "meanPressure": 76526347.710201,
+        "basePressure": 69703823.51885407,
+        "breechPressure": 79937609.80587445,
+        "gasTemperature": null
+      },
+      {
+        "time": 0.0010918183882503304,
+        "travel": 0.6,
+        "velocity": 1003.0828419255059,
+        "burntFraction": 1,
+        "meanPressure": 56287337.93570924,
+        "basePressure": 51269174.43746999,
+        "breechPressure": 58796419.68482888,
+        "gasTemperature": null
+      }
+    ]
   }
 }

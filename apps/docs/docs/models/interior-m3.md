@@ -202,6 +202,16 @@ Without temperature sensitivities, $\tau_T = 1$.
 
 A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
 
+The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
+
+$$
+Q(T_p) = Q \exp\left(\beta_Q (T_p - T_\text{ref})\right)
+$$
+
+Code: `packages/core/src/interior/model.ts`, `energyAtTemperature` (used for the charge energy $m_c Q$ in `scaleInteriorLoad` and for `efficiency`).
+
+The reference $T_\text{ref}$ is that of `temperatureSensitivity`, which a nonzero value needs. The default is 0, which leaves every result unchanged. The convective heat model keeps the unscaled $Q$ in its gas constant $R = (\gamma - 1) Q / T_f$, so a scaled energy there acts as a different gas temperature at a fixed $R$. The option is not a field of the powder record or the load file.
+
 ### Scaled state and integration
 
 The state is scaled so that one absolute tolerance fits every component:
@@ -383,7 +393,7 @@ Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
 
 ## Limits
 
-- Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy, charge-mass corrections of the Lagrange coefficients.
+- Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy unless `propellant.energyTemperature` is set (default 0, not stored on powder records), charge-mass corrections of the Lagrange coefficients.
 - The bullet material is not an input of the resistance law.
 - The heat model is the only term that depends on the size of the gun. Without it, peak pressure and velocity against travel in calibres are unchanged when every length is multiplied by $s$, volumes, masses and the charge by $s^3$, areas by $s^2$ and grain dimensions by $s$, and times scale with $s$ ([research log](../research/interior-exact-scaling-sensitivity.md)). With the convective heat loss (flame temperature 2800 K, factor 1) on the seven-perforation rifle load of the research entry, $s$ from 0.5 to 5 moved peak pressure by -0.35 to +0.66 % and muzzle velocity by -0.64 to +1.2 %.
 - Validity reasons of an invalid result: `input` with the first invalid field, `chamberVolume` (solid volume or covolume of the charge not below $V_c$), `noShotStart` (burnout before the projectile moves), `stuck` (velocity back to 0), `integration` (step size or step count), `maxTime` (run time reached before the muzzle).
