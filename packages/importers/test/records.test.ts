@@ -201,6 +201,78 @@ describe('units and decimal marks', () => {
     expect(bc.symbol).toBe('kg/m2')
     expect(bc.toStored(703.0695796391)).toBeCloseTo(1, 9)
   })
+
+  const pmaxOf = (header: string, cells: string[]) => {
+    const t = tableOf(
+      csv([['Name', 'Case length', header], ...cells.map((c, i) => [`C${i}`, '51', c])]),
+    )
+    const map = autoMap(t, 'cartridge')
+    const built = buildRecords(t, 'cartridge', map, now)
+    const r = built.entries[0]?.record
+    const pmax =
+      r?.kind === 'cartridge'
+        ? r.data.overrides?.values?.find((v) => v.symbol === 'Pmax')
+        : undefined
+    return { map: map[2], built, value: pmax?.value }
+  }
+
+  it('reads MPa and kpsi from the header and never guesses them from the values', () => {
+    const mpa = pmaxOf('Max pressure (MPa)', ['400', '420'])
+    expect(mpa.map).toMatchObject({ unit: 'MPa', unitFrom: 'header' })
+    expect(mpa.value).toBeCloseTo(4000, 9)
+    const kpsi = pmaxOf('Max pressure (kpsi)', ['62'])
+    expect(kpsi.map).toMatchObject({ unit: 'kpsi', unitFrom: 'header' })
+    expect(defined(kpsi.value)).toBeCloseTo(62000 * 0.06894757, 3)
+    expect(pmaxOf('Max pressure', ['62']).map).toMatchObject({ unit: 'bar', unitFrom: 'default' })
+  })
+
+  it('rejects the rows of a column whose header names a unit the field does not take', () => {
+    for (const header of ['Max pressure (atm)', 'Max pressure/kPa', 'pmax_atm']) {
+      const { map, built } = pmaxOf(header, ['4000', '4100'])
+      expect(map, header).toMatchObject({
+        field: 'maxPressure',
+        unit: undefined,
+        unitFrom: 'unknown',
+      })
+      expect(built.entries).toHaveLength(0)
+      expect(built.rejected[0]?.reason).toBe(
+        'Max pressure: the header names a unit other than bar, psi, MPa, kpsi. Choose the unit of the column.',
+      )
+    }
+    const t = tableOf(
+      csv([
+        ['Name', 'Case length', 'Max pressure (atm)'],
+        ['C', '51', '4000'],
+      ]),
+    )
+    const map = autoMap(t, 'cartridge').map((m, i) =>
+      i === 2 ? { ...m, unit: 'bar', unitFrom: undefined } : m,
+    )
+    expect(buildRecords(t, 'cartridge', map, now).entries).toHaveLength(1)
+  })
+
+  it('reads a unit word after a space and takes another last word as part of the name', () => {
+    const t = tableOf(
+      csv([
+        ['Name', 'Diameter inches', 'Weight grains'],
+        ['A', '0.308', '168'],
+      ]),
+    )
+    expect(autoMap(t, 'bullet').map((m) => [m.unit, m.unitFrom])).toEqual([
+      [undefined, undefined],
+      ['in', 'header'],
+      ['gr', 'header'],
+    ])
+    const c = tableOf(
+      csv([
+        ['Name', 'Case length', 'Max OAL'],
+        ['C', '51.2', '71.1'],
+      ]),
+    )
+    const map = autoMap(c, 'cartridge')
+    expect(map.map((m) => m.unitFrom)).toEqual([undefined, 'values', 'values'])
+    expect(buildRecords(c, 'cartridge', map, now).rejected).toEqual([])
+  })
 })
 
 describe('buildRecords', () => {

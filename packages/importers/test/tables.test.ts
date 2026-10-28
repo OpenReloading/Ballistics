@@ -11,7 +11,7 @@ const wordsReference = (header: string) =>
     .filter(Boolean)
 const unitReference = (header: string) =>
   (
-    /[([{]\s*([^)\]}]+?)\s*[)\]}]/.exec(header)?.[1] ?? /[_/ ]([a-z]{1,4})$/i.exec(header)?.[1]
+    /[([{]\s*([^)\]}]+?)\s*[)\]}]/.exec(header)?.[1] ?? /[_/ ]([a-z]{1,6})$/i.exec(header)?.[1]
   )?.toLowerCase()
 
 describe('header scans', () => {

@@ -217,7 +217,7 @@ export function headerWords(header: string): string[] {
 /** The unit word a header carries in brackets or after a slash, underscore or space, lower case; undefined for none. */
 export function headerUnit(header: string): string | undefined {
   const bracket = firstBracketed(header)
-  const tail = /[_/ ]([a-z]{1,4})$/i.exec(header)?.[1]
+  const tail = /[_/ ]([a-z]{1,6})$/i.exec(header)?.[1]
   return (bracket ?? tail)?.toLowerCase()
 }
 

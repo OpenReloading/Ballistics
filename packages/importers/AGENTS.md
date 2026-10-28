@@ -88,7 +88,7 @@ Parsers for chronograph export files, ESM. Pure functions from file text, or fro
 
 - `readTable(text)` (`src/tables.ts`): a JSON list of objects, or delimited text (`,`, `;`, tab) whose first row has two cells or more and repeats its width in a second row. Else `{ refusal }` ("no table", JSON that does not parse or has another shape). `tableOfRows(rows)` takes worksheet rows. A table without data rows is refused.
 - `suggestKind(table)` (`src/records.ts`): a score per kind (bullet, powder, cartridge) from header words and value ranges. `tierFloors`: high from 0.80, medium from 0.60, low from 0.40; below, `refusal` names the scores and the floor.
-- `autoMap(table, kind)`: per column the field (by header alias, `fieldSpecs` in `src/record-fields.ts`), the unit (from the header, else the values, else the stored unit) and the decimal mark.
+- `autoMap(table, kind)`: per column the field (by header alias, `fieldSpecs` in `src/record-fields.ts`), the unit (from the header, else the values, else the stored unit; `unitFrom: 'unknown'` and no unit when brackets or a slash or underscore name a unit the field does not take, which rejects the rows until the caller sets one; MPa and kpsi only from the header) and the decimal mark.
 - `buildRecords(table, kind, map, now)`: each row checked on its own. `counts` (accepted, with a warning, rejected), `rejected` and `warnings` with row, column, cell and reason. Makers become manufacturer records. Ids from `idOfKey` of kind, name, maker and, for bullets, diameter and mass. The caller parses each record with the user record schema (schema is types only here).
 
 ## Unverified and tests
