@@ -440,6 +440,38 @@ main .home-cards h3 {
   flex: none;
 }
 
+/* home: the What's new list under the cards, the date left of the linked title and its text */
+.home-news {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-news li {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.home-news li + li {
+  border-top: 1px solid var(--border);
+}
+
+.home-news time,
+.home-news p {
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+}
+
+.home-news time {
+  font-variant-numeric: tabular-nums;
+}
+
+.home-news p {
+  margin: 0;
+}
+
 /* the tab bar of the Database, between the page bar and the list */
 .library-tabs {
   flex: none;
@@ -468,6 +500,12 @@ main .home-cards h3 {
   .home-cards li + li {
     border-top: 1px solid var(--border);
     border-left: 0;
+  }
+
+  .home-news li {
+    grid-template-columns: 1fr;
+    gap: 0.125rem;
+    padding: 0.5rem 0;
   }
 }
 

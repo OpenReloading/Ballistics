@@ -30,8 +30,9 @@ const webInputs = [
 
 /** Changes that no check reads: prose outside the documents the app, its tests and the tools read, and GitHub's templates. */
 const docsOnly = [
-  // the docs site's pages are checked by the docs tests (bibliography and code lines)
-  /^(?!README\.md$)(?!apps\/docs\/docs\/).*\.md$/,
+  // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page
+  // prerenders the news items
+  /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/).*\.md$/,
   /^\.github\/(ISSUE_TEMPLATE\/|pull_request_template\.md$)/,
   /^(LICENSE|NOTICE|\.coderabbit\.yaml)$/,
 ]

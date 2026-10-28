@@ -99,8 +99,8 @@ module.exports = {
       name: 'web-no-node-builtins',
       severity: 'error',
       comment:
-        'apps/web sources run in the browser or in route handlers that read the API: no node: modules.',
-      from: { path: own('apps/web/src') },
+        'apps/web sources run in the browser or in route handlers that read the API: no node: modules. The news loader runs only in the prerender of the static export, which reads the news folder.',
+      from: { path: own('apps/web/src'), pathNot: '^apps/web/src/lib/news\\.ts$' },
       to: { dependencyTypes: ['core'] },
     },
     {
