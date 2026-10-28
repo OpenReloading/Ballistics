@@ -1,9 +1,4 @@
-import {
-  type CartridgeSpecs,
-  cartridgeBoreAreaMm2,
-  cartridgeBulletDiameterMm,
-  cartridgeGrooveDiameterMm,
-} from '../cartridge-specs.ts'
+import { type CartridgeSpecs, cartridgeBulletDiameterMm } from '../cartridge-specs.ts'
 import { InputError, need } from '../errors.ts'
 import { type ResistanceTerms, recordResistance } from './bore-resistance.ts'
 import { interiorLoad } from './load-file.ts'
@@ -46,11 +41,16 @@ export interface RecordRun {
   temperature?: number | undefined
 }
 
-/** The first value of `symbol` on the chamber side that is not a variant, in m; undefined without one. */
-function chamberMetres(c: CartridgeSpecs, symbol: string) {
-  const mm = c.values.find(
+/** The first value of `symbol` on the chamber side that is not a variant, in the unit of the sheet (mm, mm2); undefined without one. */
+function chamberValue(c: CartridgeSpecs, symbol: string) {
+  return c.values.find(
     (v) => v.side === 'chamber' && v.symbol === symbol && !v.variant && v.value !== undefined,
   )?.value
+}
+
+/** The same in m for a length. */
+function chamberMetres(c: CartridgeSpecs, symbol: string) {
+  const mm = chamberValue(c, symbol)
   return mm === undefined ? undefined : mm * 1e-3
 }
 
@@ -67,8 +67,8 @@ export function recordLoad(r: RecordRun): InteriorLoad {
   const model = powderModelValues(powder)
   if (model === undefined || powder.interior === undefined)
     throw new InputError('the powder has no interior model')
-  const area = cartridgeBoreAreaMm2(cartridge)
-  const groove = cartridgeGrooveDiameterMm(cartridge)
+  const area = chamberValue(cartridge, 'Q')
+  const groove = chamberValue(cartridge, 'Z')
   const load = interiorLoad(
     {
       ...model,

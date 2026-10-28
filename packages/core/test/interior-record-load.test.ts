@@ -96,6 +96,17 @@ describe('recordLoad', () => {
     expect(chamber.boreArea).toBeCloseTo((Math.PI / 4) * ((7.62e-3 + 7.82e-3) / 2) ** 2, 12)
   })
 
+  it('ignores a variant of Q and Z like one of F and u', () => {
+    const withVariants = {
+      values: [
+        { side: 'chamber', symbol: 'Q', value: 1, variant: 'other' },
+        { side: 'chamber', symbol: 'Z', value: 1, variant: 'other' },
+        ...cartridge.values,
+      ],
+    }
+    expect(recordLoad({ ...run, cartridge: withVariants })).toEqual(recordLoad(run))
+  })
+
   it('adds the temperature sensitivity of the record', () => {
     expect(recordLoad({ ...run, powder: sensitive }).propellant.temperatureSensitivity).toEqual({
       reference: 294.15,
