@@ -1,0 +1,19 @@
+{
+  "id": "synthetic-capacity-308-match",
+  "origin": "catalogue",
+  "cartridge": "catalogue:308-match",
+  "waterCapacity": {
+    "value": 3.6
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["waterCapacity"],
+        "note": "Invented value for tests; not a measurement."
+      }
+    ]
+  }
+}

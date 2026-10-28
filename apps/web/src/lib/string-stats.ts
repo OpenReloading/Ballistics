@@ -1,3 +1,5 @@
+import { type Interval, velocityStatistics } from '@open-reloading/core'
+
 /** The part of a shot the statistics read: velocity in m/s and the reason it is excluded. */
 interface StatShot {
   velocity: { value: number }
@@ -17,26 +19,25 @@ export interface StringStats {
   extremeSpread: number
   min: number
   max: number
+  /** Chi-square interval of the population SD at `confidenceLevel`, m/s; undefined below three shots. */
+  standardDeviationInterval: Interval | undefined
+  confidenceLevel: number
 }
 
 /** Statistics of one string over its shots without an exclusion reason; undefined when none is left. */
 export function stringStats(shots: readonly StatShot[]): StringStats | undefined {
   const v = shots.filter((s) => !s.excluded).map((s) => s.velocity.value)
-  if (v.length === 0) return undefined
-  const mean = v.reduce((a, x) => a + x, 0) / v.length
-  const sd =
-    v.length > 1
-      ? Math.sqrt(v.reduce((a, x) => a + (x - mean) ** 2, 0) / (v.length - 1))
-      : undefined
-  const min = v.reduce((a, x) => Math.min(a, x), Number.POSITIVE_INFINITY)
-  const max = v.reduce((a, x) => Math.max(a, x), Number.NEGATIVE_INFINITY)
+  const st = velocityStatistics(v)
+  if (!st) return undefined
   return {
-    count: v.length,
+    count: st.count,
     excluded: shots.length - v.length,
-    mean,
-    standardDeviation: sd,
-    extremeSpread: max - min,
-    min,
-    max,
+    mean: st.mean,
+    standardDeviation: st.standardDeviation,
+    extremeSpread: st.extremeSpread,
+    min: st.min,
+    max: st.max,
+    standardDeviationInterval: st.standardDeviationInterval,
+    confidenceLevel: st.confidenceLevel,
   }
 }

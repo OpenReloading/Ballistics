@@ -52,7 +52,11 @@ const ladder = (withPressure: readonly number[] = [], n = 0, at = charges): Ladd
       muzzleVelocity: r.muzzleVelocity + n * nth(noise, i % 5) * 3,
       velocitySigma: 3,
       ...(withPressure.includes(charge)
-        ? { peakPressure: r.peakBreechPressure, pressureSigma: 5e6 }
+        ? {
+            peakPressure: r.peakBreechPressure,
+            pressureSigma: 5e6,
+            pressureBasis: 'transducer' as const,
+          }
         : {}),
     }
   })

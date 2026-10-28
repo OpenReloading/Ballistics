@@ -16,7 +16,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
   - `npm test -w @open-reloading/docs` (`apps/docs/scripts/bibliography.test.mts`) fails on a file or name that no longer exists and on a source file no page names.
   - A change to a model's code updates its model page in the same commit.
 - `src/errors.ts`:
-  - `InputError` (extends `RangeError`): thrown on purpose for inputs outside the model and for computations that do not finish within their limits. `TruingError`, `PowderFitError` and `ValueError` (`interior/load-file.ts`) extend it.
+  - `InputError` (extends `RangeError`): thrown on purpose for inputs outside the model and for computations that do not finish within their limits. `TruingError`, `PowderFitError`, `MixedPressureBasisError` (`interior/fit.ts`, pressure rows on more than one basis) and `ValueError` (`interior/load-file.ts`) extend it.
   - Any other error is a defect (the API answers 500).
   - `need(ok, message)` throws an `InputError` for a failed input check.
   - `nth(array, index)` returns the entry or throws a `RangeError`; the integrator and interior model keep a module-local unchecked `el` for state vectors (`noUncheckedIndexedAccess`), a call into another module does not inline in vitest and slowed the Monte Carlo tests several times.
@@ -26,6 +26,7 @@ Pure TypeScript ballistics solver, ESM. Must stay headless: no runtime dependenc
 - `src/interior/model.ts`: `interior` and `closedVessel`, the M3 Noble-Abel interior model (`apps/docs/docs/models/interior-m3.md`).
   - SI in and out, temperatures in K. Integrates with `src/exterior/rk45.ts` in scaled time.
   - Gas leakage (`leakage`, `leakFlowFactor`) and the heat-loss defaults (`convectiveDefaults`): `apps/docs/docs/models/interior-leakage-heat.md`.
+- `src/interior/record-load.ts`: `recordLoad`, the run of a load that names a cartridge, a powder and a bullet record, from structural record types (`apps/docs/docs/models/interior-m3.md`, "Load from records"). The caller gives the seated volume and travel (the seating geometry is in `@open-reloading/drawing`). Used by `packages/cli`.
 - `src/interior/form.ts`: burn laws and form functions (`apps/docs/docs/models/interior-burn-forms.md`), one entry per grain shape and per vivacity form with its form function and its shape-specific checks.
 - `src/interior/fit.ts`: `fitPowder`, `PowderFitError` (`apps/docs/docs/models/interior-powder-fit.md`). Weighted least-squares fit of the M3 burn coefficient and, on request, the start pressure and a factor on the chamber volume (`volumeFactor`, initial 1, optional prior around 1) to a chronograph ladder (mean muzzle velocities, optional peak pressures), with optional Gaussian priors and a Huber loss. Also the specific energy (`energy`, needs barrel lengths that differ by 5 %) and a factor on both temperature sensitivities (`temperatureFactor`, initial 1, needs a load with a sensitivity); a point carries its own `barrelLength` and `propellantTemperature`. One `interior` run per distinct charge, barrel length, temperature and evaluation.
   - `src/interior/fit-sessions.ts`: `fitPowderSessions` over `PowderSession`s (barrel length, temperature, ladder). A requested parameter other than the burn coefficient that the sessions leave unresolved is dropped and listed in `held`, the others in `resolved`.
