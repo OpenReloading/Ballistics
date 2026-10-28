@@ -287,6 +287,8 @@ type PreviewProps = {
   /** The case record chosen, held by the page so a load keeps it: its stated capacity is the default of the capacity. */
   caseId?: string | undefined
   onCaseId?: (id: string | undefined) => void
+  /** The field of the case lot, after the case record choice in the `choices` slot. */
+  caseLot?: ReactNode
   /** The user's groups of cases of this cartridge, and the one chosen: its measured capacity is the page's measured capacity. */
   ownCases?: readonly OwnCase[] | undefined
   ownCaseId?: string | undefined
@@ -1467,6 +1469,7 @@ function SeatingControls({ m }: { m: Model }) {
         slots,
         <>
           <CaseChoice m={m} />
+          {slots?.choices && m.p.caseLot}
           <CapacityChoice m={m} />
         </>,
         slots?.choices,

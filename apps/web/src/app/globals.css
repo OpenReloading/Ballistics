@@ -3849,6 +3849,11 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: 1 1 8rem;
 }
 
+/* a lot holds a short code: a narrow cell, so the row with both lots stays one line from 75em */
+.workbench :is(.pinned-row, .pinned-row-slot) > .lot-field {
+  flex: 0 1 4.5rem;
+}
+
 .pinned-row-slot {
   display: contents;
 }
@@ -4081,6 +4086,16 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .workbench .panel-head > .mantine-ActionIcon-root {
   margin-left: auto;
+}
+
+/* the powder lot beside the powder search, on the search's line */
+.workbench .panel-head > .lot-field {
+  flex: 0 0 6rem;
+  order: 1;
+}
+
+.workbench .panel-head:has(> .lot-field) > .search {
+  flex-basis: calc(100% - 6rem - 0.5rem);
 }
 
 .workbench .panel-head .mantine-Input-wrapper {
@@ -5237,6 +5252,10 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .panel-head > :is(.search, .mantine-Select-root) {
     flex: 1 1 0;
+    order: 0;
+  }
+
+  .workbench .panel-head > .lot-field {
     order: 0;
   }
 

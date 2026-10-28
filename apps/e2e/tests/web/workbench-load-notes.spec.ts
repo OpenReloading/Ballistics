@@ -46,12 +46,14 @@ test('a changed powder lot between two sessions is a note on the load and its se
   await applyExampleLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Notes', exact: true }).click()
+  // the Notes tab's fields: the lots beside the component choices carry the same names
+  const lots = page.getByRole('group', { name: 'Lots' })
   for (const [label, lot] of [
     ['Powder lot', 'P1'],
     ['Primer lot', 'R1'],
     ['Case lot', 'C1'],
   ])
-    await page.getByLabel(label, { exact: true }).fill(lot)
+    await lots.getByLabel(label, { exact: true }).fill(lot)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await read(page, 'day1.csv')
   await expect(page.getByRole('status').filter({ hasText: 'Read day1.csv' })).toBeVisible()
@@ -60,7 +62,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
 
   // the lot of the next session differs; a note shows before the load is saved again
   await page.getByRole('tab', { name: 'Notes', exact: true }).click()
-  await page.getByLabel('Powder lot', { exact: true }).fill('P2')
+  await lots.getByLabel('Powder lot', { exact: true }).fill('P2')
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await read(page, 'day2.csv')
   await expect(page.getByRole('status').filter({ hasText: 'Read day2.csv' })).toBeVisible()
@@ -93,7 +95,7 @@ test('a changed powder lot between two sessions is a note on the load and its se
   await expect(page.locator('.file-state')).toContainText('Saved')
   await runLine(page)
   await page.getByRole('tab', { name: 'Notes', exact: true }).click()
-  await expect(page.getByLabel('Powder lot', { exact: true })).toHaveValue('P2')
+  await expect(lots.getByLabel('Powder lot', { exact: true })).toHaveValue('P2')
   await expect(notes.getByText(note)).toHaveCount(0)
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
 })

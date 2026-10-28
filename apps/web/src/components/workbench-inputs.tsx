@@ -55,6 +55,7 @@ import { type InputPanel, lengthText } from '../lib/workbench.ts'
 import { citedDefaults, type DefaultKey } from '../lib/workbench-defaults.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { Noted } from './field-table.tsx'
+import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
@@ -550,6 +551,7 @@ export function InputCards() {
                     {t(panelTitles[p])}
                   </h2>
                   {p !== 'cartridge' && <CardPicker panel={p} />}
+                  {p === 'powder' && <LotField lot="powder" bare />}
                   {morePanels.includes(p) && (
                     <AppPopover
                       opened={more === p}
@@ -599,7 +601,7 @@ export function InputCards() {
 
 /**
  * The pinned row above the cards: the cartridge search, then the choices that depend on it in that
- * order, primer, brass record and case capacity record (the `choices` slot).
+ * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
  */
 function LoadRow() {
   const { primerId, setPrimerChoice } = useLoad()
@@ -607,6 +609,7 @@ function LoadRow() {
     <div className="pinned-row">
       <CartridgePicker />
       <PrimerChoice id={primerId} onChange={setPrimerChoice} />
+      <LotField lot="primer" short />
       <SeatingSlot name="choices" />
     </div>
   )
@@ -1324,6 +1327,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         cartridge && setCapacityChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }
       caseId={caseId}
+      caseLot={<LotField lot="case" short />}
       onCaseId={(id) =>
         cartridge && setCaseChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }

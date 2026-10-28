@@ -190,7 +190,10 @@ test('two tabs entering shots for one load lose none, and a Save of the load in 
   expect(await stored(page, 'session')).toHaveLength(1)
   // the page opened first does not know the session: a change there and Save keep it
   await page.getByRole('tab', { name: 'Notes', exact: true }).click()
-  await page.getByLabel('Powder lot', { exact: true }).fill('LOT-1')
+  await page
+    .getByRole('group', { name: 'Lots' })
+    .getByLabel('Powder lot', { exact: true })
+    .fill('LOT-1')
   await (await barButton(page, 'Save')).click()
   // the load changed in another tab: the workbench asks, and keeps the session when overwritten
   const ask = page.getByRole('dialog', { name: 'Overwrite the newer copy?' })
