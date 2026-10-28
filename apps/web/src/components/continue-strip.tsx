@@ -3,22 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import {
-  openLoadsKey,
-  openLoadsText,
-  parseOpenLoads,
-  type RecentLoad,
-  recentLoads,
-  withOpened,
-} from '../lib/open-loads.ts'
-
-/** Adds load `id` to the workbench's open loads as the shown one; the workbench opens it on mounting. */
-function openOnWorkbench(id: string) {
-  try {
-    const set = parseOpenLoads(localStorage.getItem(openLoadsKey))
-    localStorage.setItem(openLoadsKey, openLoadsText(withOpened(set, id)))
-  } catch {}
-}
+import { openOnWorkbench, type RecentLoad, recentLoads } from '../lib/open-loads.ts'
 
 /**
  * The home page's Continue line: the three newest saved loads of this browser, each opening in the

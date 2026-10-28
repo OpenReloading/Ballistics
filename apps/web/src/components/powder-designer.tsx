@@ -38,9 +38,11 @@ import {
   rowId,
   specOf,
 } from '../lib/powder-designer.ts'
+import { tunePowderHref } from '../lib/powder-tune.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { namedKey } from '../lib/user-data.ts'
+import { userRef } from '../lib/variants.ts'
 import { say, verbatim } from '../lib/wording.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -211,6 +213,8 @@ export function PowderDesigner() {
   const keyed = new Map(problems.flatMap((p) => (p.key ? [[p.key, p.message] as const] : [])))
   const general = problems.filter((p) => !p.key).map((p) => p.message)
   const name = design.name.trim() || fallbackName
+  const saved = edited ? userRef(recordId) : undefined
+  const tuneHref = saved ? tunePowderHref(saved) : '/powders/tune'
 
   const toolbar = (a: { type: string }) => {
     if (a.type === 'new') {
@@ -413,7 +417,7 @@ export function PowderDesigner() {
       content: (
         <>
           <p className="note">
-            <Link href="/powders/tune">{t('Fit a powder from chronograph strings')}</Link>
+            <Link href={tuneHref}>{t('Fit a powder from chronograph strings')}</Link>
           </p>
           <div className="prop-grid designer-grid">
             <fieldset className="designer-checks" data-error={fittedError ? true : undefined}>

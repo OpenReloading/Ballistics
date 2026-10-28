@@ -272,7 +272,7 @@ export function Measurements({
   setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
   const { t, tn } = useTranslation()
-  const { manufacturerRef, manufacturerName, sessionRefCount } = useResult()
+  const { manufacturerRef, manufacturerName, sessionRefCount, handOffTune } = useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [failures, setFailures] = useState<Failure[]>([])
   const [read, setRead] = useState<{ name: string; strings: number }[]>([])
@@ -460,7 +460,7 @@ export function Measurements({
       {table}
       {sessionStrings(sessions).length > 0 && (
         <p>
-          <Link href={tuneHref(sessions.map((s) => s.id))}>
+          <Link href={tuneHref(sessions.map((s) => s.id))} onClick={handOffTune}>
             {t('Fit a powder from these strings')}
           </Link>
         </p>

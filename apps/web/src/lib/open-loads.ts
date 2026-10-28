@@ -31,6 +31,14 @@ export const withOpened = (set: OpenLoads, id: string): OpenLoads => ({
   active: id,
 })
 
+/** Adds load `id` to the workbench's open loads as the shown one; the workbench opens it on mounting. */
+export function openOnWorkbench(id: string) {
+  try {
+    const set = parseOpenLoads(localStorage.getItem(openLoadsKey))
+    localStorage.setItem(openLoadsKey, openLoadsText(withOpened(set, id)))
+  } catch {}
+}
+
 /** A stored load's id, name and saved time; the workbench checks the record when it opens it. */
 export type RecentLoad = { id: string; name: string; saved: string }
 

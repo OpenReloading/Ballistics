@@ -3589,5 +3589,20 @@
   "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.": "Blatt „{name}“ enthält keine Tabelle mit zwei oder mehr Spalten. Verschieben Sie die Tabelle auf das erste Blatt.",
   "{reason}. Fix the row or delete it.": "{reason}. Korrigieren Sie die Zeile oder löschen Sie sie.",
   "Continue": "Fortsetzen",
-  "Loads you save show here.": "Gespeicherte Laborierungen erscheinen hier."
+  "Loads you save show here.": "Gespeicherte Laborierungen erscheinen hier.",
+  "Choose a saved load with strings of this powder. It opens in the workbench, where its Measurements link fits the powder.": "Wählen Sie eine gespeicherte Laborierung mit Schussreihen dieses Treibladungspulvers. Sie öffnet sich in der Werkbank, wo ihr Link in den Messungen das Treibladungspulver anpasst.",
+  "Fitted vivacity: {value}": "Angepasste Vivacity: {value}",
+  "Fitted vivacity: {value}, standard uncertainty {u}": "Angepasste Vivacity: {value}, Standardunsicherheit {u}",
+  "Fitting": "Wird angepasst",
+  "Left out, the strings of another load at {charges} {unit}": "Ausgelassen: die Schussreihen einer anderen Laborierung bei {charges} {unit}",
+  "tight": "eng",
+  "moderate": "mittel",
+  "loose": "weit",
+  "No fit: {reason}": "Keine Anpassung: {reason}",
+  "No saved load uses this powder. Open a saved load's Measurements tab to fit a powder from its strings.": "Keine gespeicherte Laborierung verwendet dieses Treibladungspulver. Öffnen Sie die Messungen einer gespeicherten Laborierung, um ein Treibladungspulver an ihre Schussreihen anzupassen.",
+  "Open this load in the workbench and follow its Measurements link to fit a powder.": "Öffnen Sie diese Laborierung in der Werkbank und folgen Sie dem Link in ihren Messungen, um ein Treibladungspulver anzupassen.",
+  "Pressure range: {label}, plus and minus {percent} %": "Druckbereich: {label}, plus und minus {percent} %",
+  "Save the load to fit a powder from its strings.": "Speichern Sie die Laborierung, um ein Treibladungspulver an ihre Schussreihen anzupassen.",
+  "Saved loads with this powder": "Gespeicherte Laborierungen mit diesem Treibladungspulver",
+  "Working out the pressure range": "Druckbereich wird berechnet"
 }

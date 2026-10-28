@@ -10,7 +10,7 @@ import {
   cartridgeDiameters,
   cartridgeGrooveDiameterMm,
   gasVelocityFactor,
-  overrideResistance,
+  type InteriorLoad,
   powderModelValues,
   recordResistance,
   ValueError,
@@ -69,7 +69,8 @@ import {
   suggestDefaults,
   volumeMeasured,
 } from '../lib/input-defaults.ts'
-import { burnFormError, interiorBody, interiorFields } from '../lib/interior-input.ts'
+import { burnFormError, type interiorBody, interiorFields } from '../lib/interior-input.ts'
+import { interiorRequest } from '../lib/interior-request.ts'
 import {
   dismissed,
   effectiveSnapshots,
@@ -96,6 +97,7 @@ import { nth } from '../lib/nth.ts'
 import { powderValues } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
+import { writeTuneLoad } from '../lib/powder-tune.ts'
 import {
   droppedIds,
   linkedId,
@@ -712,44 +714,6 @@ function ownStepError(spec: FieldSpec, v: FieldValue, shown: UnitSystem, t: Tran
       ? undefined
       : t('{label} must be above 0.', { label: specText(t, spec.label) }))
   )
-}
-
-/**
- * The bore resistance of a run: the record's law, else what a link carried of it, with what the
- * law could not apply.
- */
-function resistanceFor(a: {
-  chosen: Powder | undefined
-  fromLink: LinkedPowder | undefined
-  cartridge: CartridgeChoice | undefined
-  groove: Groove | undefined
-  body: ReturnType<typeof interiorBody>
-  bulletLength: number | undefined
-}) {
-  const { chosen, fromLink, cartridge, groove, body } = a
-  if (!chosen?.interior?.resistance)
-    return {
-      resistance:
-        fromLink &&
-        overrideResistance(undefined, {
-          boreFriction: fromLink.boreFriction,
-          engravingPressure: fromLink.engravingPressure,
-          engravingLength: fromLink.engravingLength,
-        }),
-      missing: [],
-    }
-  if (cartridge && groove?.id !== cartridge.id)
-    return { missing: ["the cartridge record's groove diameter (not loaded)"] }
-  return recordResistance(chosen, {
-    boreDiameter: body.load.chamber.boreDiameter,
-    boreArea: body.load.chamber.boreArea,
-    startPressure: body.load.startPressure,
-    cartridge: cartridge && {
-      g1: cartridge.g1,
-      z: groove?.id === cartridge.id ? groove.z : undefined,
-    },
-    bulletLengthMm: a.bulletLength,
-  })
 }
 
 const postInterior = (body: unknown, signal: AbortSignal) =>
@@ -1964,35 +1928,17 @@ export function useWorkbenchState() {
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? chosenPowder
-    const values = powderValues(siValues(fields), chosenPowder, as)
-    const body = interiorBody(
-      { ...values, boreArea: values.boreArea ?? qM },
-      cartridge?.id,
-      grooveM,
-    )
-    // a missing powder record: the bulk density (kg/m3) and the bore resistance its link carried
-    const fromLink = as ? undefined : linkedPowder
-    const bulkDensity = chosen?.bulkDensity
-      ? toSi('density', chosen.bulkDensity.value)
-      : fromLink?.bulkDensity
-    const { resistance, missing } = resistanceFor({
-      chosen,
-      fromLink,
+    const { body, bulkDensity, missing } = interiorRequest({
+      values: powderValues(siValues(fields), chosenPowder, as),
+      powder: chosen,
+      // a missing powder record: the bulk density and the bore resistance its link carried
+      linked: as ? undefined : linkedPowder,
       cartridge,
       groove,
-      body,
+      boreArea: qM,
+      grooveDiameter: grooveM,
       bulletLength,
     })
-    // the typed friction and engraving values replace the record's terms
-    const applied = overrideResistance(resistance, values)
-    if (applied) body.load.resistance = applied
-    const sensitivity = chosen?.temperatureSensitivity
-    if (sensitivity)
-      body.load.propellant.temperatureSensitivity = {
-        reference: sensitivity.reference.value,
-        cold: sensitivity.cold.value,
-        hot: sensitivity.hot.value,
-      }
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
     const recordInputs = [
@@ -2003,6 +1949,25 @@ export function useWorkbenchState() {
     ]
     return { body, bulkDensity, resistanceMissing, recordInputs }
   }
+
+  /**
+   * The Measurements tab's tuning link: the load this run simulates, handed to the route for the
+   * strings of this saved load; an unsaved edit hands over nothing, so no stale load is fitted.
+   */
+  function handTuneLoad() {
+    const menu = fileMenu.current
+    const id = menu?.id()
+    const ref = id && userRef(id)
+    if (!ref) return
+    let load: InteriorLoad | undefined
+    try {
+      if (!menu?.snapshot().unsaved) load = loadRequest().body.load
+    } catch {}
+    writeTuneLoad(ref, load)
+  }
+  const tuning = useRef(handTuneLoad)
+  tuning.current = handTuneLoad
+  const handOffTune = useCallback(() => tuning.current(), [])
 
   /** Writes a charge (kg) into the charge field, as typed. */
   function applyCharge(si: number) {
@@ -3042,6 +3007,7 @@ export function useWorkbenchState() {
     manufacturerName: manufacturers.nameOf,
     loadNotes,
     sessionRefCount: sessionRefs.length,
+    handOffTune,
     setSeen,
     setStepsDraft,
     setTab,
