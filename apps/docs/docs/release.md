@@ -54,6 +54,16 @@ Publishing is off until the settings below exist and the repository variable `NP
 
 `npm pack --dry-run -w @open-reloading/<name>` lists the package contents: `dist` without source maps and the license files (`data`: `LICENSE` for CC BY 4.0 and `LICENSE-MIT`), no sources, tests or records folder.
 
+## Contract baselines
+
+The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`npm test`, the CI `test` groups `packages` and `web`):
+
+- The JSON Schemas the schema build writes: `packages/schema/test/golden/json-schema/`.
+- The export list (values and types) of each published package: `tools/test/golden/exports/<name>.txt`, one line per entry point and name.
+- A user data file with a record of each kind, which the current code must read and write back unchanged, and a share link of two of its records: `apps/web/test/golden/`.
+
+`npm run baselines` (after `npm run build`) rewrites the JSON Schemas, the export lists and the share link from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
+
 ## API contract
 
 - `npm run api:check` compares the API document of the current routes with `packages/api/openapi.baseline.json` through `oasdiff breaking` and fails on any `ERR` finding. The CI `check` job writes the API document and runs the same oasdiff version in its container (`docker run`), not the npm script.

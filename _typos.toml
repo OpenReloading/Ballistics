@@ -11,7 +11,7 @@ extend-exclude = [
   "package-lock.json",
   "*.snap",
   "**/*-snapshots/",
-  "apps/web/test/golden/",
+  "**/test/golden/",
   # a catalogue is written in the language it translates into (german-terms.json is checked)
   "apps/web/src/i18n/??.json",
 ]

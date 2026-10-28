@@ -16,6 +16,7 @@
       "!**/.next",
       "!**/dist",
       "!**/next-env.d.ts",
+      "!**/test/golden",
       "!packages/data/test/fixtures/invalid/chrono/broken.json"
     ]
   },
@@ -60,10 +61,6 @@
     }
   },
   "overrides": [
-    {
-      "includes": ["apps/web/test/golden/**"],
-      "linter": { "enabled": false }
-    },
     {
       "includes": ["packages/drawing/src/**"],
       "linter": {

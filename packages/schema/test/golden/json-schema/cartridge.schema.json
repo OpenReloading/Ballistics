@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "aliases": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "table": {
+      "type": "string",
+      "minLength": 1
+    },
+    "country": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "revised": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+    },
+    "pressureMethod": {
+      "type": "string",
+      "enum": [
+        "transducer",
+        "piezo",
+        "crusher",
+        "energy"
+      ]
+    },
+    "verification": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "unverified"
+      ]
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "enum": [
+              "cartridge",
+              "chamber"
+            ],
+            "description": "Column the value is printed in. Absent for pressures, energies and measuring positions."
+          },
+          "symbol": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The standard's symbol, for example `L3` or `P1`."
+          },
+          "quantity": {
+            "type": "string",
+            "enum": [
+              "length",
+              "area",
+              "volume",
+              "mass",
+              "density",
+              "pressure",
+              "energy",
+              "velocity",
+              "time",
+              "angle",
+              "temperature",
+              "absoluteTemperature",
+              "specificEnergy",
+              "molarMass",
+              "specificVolume",
+              "burnRate",
+              "inverseTemperature",
+              "massFraction",
+              "relativeHumidity",
+              "count",
+              "dimensionless",
+              "ballisticCoefficient"
+            ],
+            "description": "Quantity of the value. `value` is in its stored unit."
+          },
+          "value": {
+            "type": "number",
+            "description": "In the stored unit of `quantity`. Absent when the source prints no single number."
+          },
+          "raw": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The value as written when it differs from `value`, for example `1°30'0\"` or `25/30`."
+          },
+          "limit": {
+            "type": "string",
+            "enum": [
+              "max",
+              "min"
+            ],
+            "description": "Set when the standard qualifies the value itself (`e min`, `r1 max`). Otherwise the column applies: cartridge values are maxima, chamber values minima."
+          },
+          "tolerance": {
+            "type": "object",
+            "properties": {
+              "lower": {
+                "type": "number",
+                "maximum": 0,
+                "description": "Lower deviation, 0 or below."
+              },
+              "upper": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Upper deviation, 0 or above."
+              }
+            },
+            "description": "Signed deviations from `value` as printed, in its unit, for example `{ lower: -0.2 }`."
+          },
+          "variant": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Sub-case the standard distinguishes, such as a chamber length marking (`12/70`)."
+          },
+          "basic": {
+            "type": "boolean",
+            "description": "Printed as a basic dimension."
+          },
+          "footnotes": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Footnote numbers printed next to the symbol."
+          }
+        },
+        "required": [
+          "symbol",
+          "quantity"
+        ]
+      }
+    },
+    "exceptions": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "finding": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "finding",
+          "note"
+        ]
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "published",
+            "measured",
+            "derived",
+            "fitted",
+            "computed"
+          ],
+          "description": "How the values came about."
+        },
+        "sources": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Title of the source: the document, or the site and table."
+              },
+              "publisher": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Who issued the data: a maker, a standards body or the authors."
+              },
+              "edition": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Edition, print or date as the document states it."
+              },
+              "page": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Page or section of the document."
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "An http or https URL of the source."
+              },
+              "retrieved": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                "description": "Date the source was retrieved, ISO 8601."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+              },
+              "fields": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "published",
+                  "measured",
+                  "derived",
+                  "fitted",
+                  "computed"
+                ],
+                "description": "Kind of this source values when it differs from the provenance kind of the record."
+              },
+              "license": {
+                "type": "string",
+                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+              },
+              "terms": {
+                "type": "string",
+                "minLength": 1,
+                "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+              },
+              "origin": {
+                "type": "string",
+                "enum": [
+                  "manufacturer",
+                  "public",
+                  "community"
+                ],
+                "description": "Who stands behind the source: manufacturer, public or community."
+              },
+              "run": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{16}$",
+                    "description": "Model version id the report names."
+                  },
+                  "report": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Report of the evaluation of the fit."
+                  }
+                },
+                "required": [
+                  "version",
+                  "report"
+                ],
+                "description": "The fit run behind a `fitted` source."
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Note on the source."
+              }
+            },
+            "required": [
+              "title"
+            ]
+          },
+          "description": "The sources of the values, at least one."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Note on the provenance."
+        }
+      },
+      "required": [
+        "kind",
+        "sources"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "table",
+    "published",
+    "verification",
+    "values",
+    "provenance"
+  ]
+}

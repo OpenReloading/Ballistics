@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "website": {
+      "type": "string",
+      "format": "uri"
+    },
+    "aliases": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "published",
+            "measured",
+            "derived",
+            "fitted",
+            "computed"
+          ],
+          "description": "How the values came about."
+        },
+        "sources": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Title of the source: the document, or the site and table."
+              },
+              "publisher": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Who issued the data: a maker, a standards body or the authors."
+              },
+              "edition": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Edition, print or date as the document states it."
+              },
+              "page": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Page or section of the document."
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "An http or https URL of the source."
+              },
+              "retrieved": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                "description": "Date the source was retrieved, ISO 8601."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+              },
+              "fields": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "published",
+                  "measured",
+                  "derived",
+                  "fitted",
+                  "computed"
+                ],
+                "description": "Kind of this source values when it differs from the provenance kind of the record."
+              },
+              "license": {
+                "type": "string",
+                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+              },
+              "terms": {
+                "type": "string",
+                "minLength": 1,
+                "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+              },
+              "origin": {
+                "type": "string",
+                "enum": [
+                  "manufacturer",
+                  "public",
+                  "community"
+                ],
+                "description": "Who stands behind the source: manufacturer, public or community."
+              },
+              "run": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{16}$",
+                    "description": "Model version id the report names."
+                  },
+                  "report": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Report of the evaluation of the fit."
+                  }
+                },
+                "required": [
+                  "version",
+                  "report"
+                ],
+                "description": "The fit run behind a `fitted` source."
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Note on the source."
+              }
+            },
+            "required": [
+              "title"
+            ]
+          },
+          "description": "The sources of the values, at least one."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Note on the provenance."
+        }
+      },
+      "required": [
+        "kind",
+        "sources"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "provenance"
+  ],
+  "additionalProperties": false
+}

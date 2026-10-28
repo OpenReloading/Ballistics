@@ -1,0 +1,733 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "photo": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Id of the photo's user file (`files` of the user data file). Absent for a drawn target."
+    },
+    "references": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "line",
+                "description": "Two points a known length apart."
+              },
+              "a": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Right, px."
+                  },
+                  "y": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Down, px."
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "description": "A point of the photo as the browser shows it, px from its top left."
+              },
+              "b": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Right, px."
+                  },
+                  "y": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Down, px."
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "description": "A point of the photo as the browser shows it, px from its top left."
+              },
+              "length": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "unit": "m",
+                "description": "Length from `a` to `b` on the target, m."
+              }
+            },
+            "required": [
+              "kind",
+              "a",
+              "b",
+              "length"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "ringCentre",
+                "description": "A ring of known diameter: its centre and a point on it."
+              },
+              "centre": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Right, px."
+                  },
+                  "y": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Down, px."
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "description": "A point of the photo as the browser shows it, px from its top left."
+              },
+              "edge": {
+                "type": "object",
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Right, px."
+                  },
+                  "y": {
+                    "type": "number",
+                    "unit": "px",
+                    "description": "Down, px."
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "description": "A point of the photo as the browser shows it, px from its top left."
+              },
+              "diameter": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "unit": "m",
+                "description": "Ring diameter, m."
+              }
+            },
+            "required": [
+              "kind",
+              "centre",
+              "edge",
+              "diameter"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "ringEdge",
+                "description": "A ring of known diameter: three points on it."
+              },
+              "points": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  }
+                ],
+                "items": false,
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Three points on the ring."
+              },
+              "diameter": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "unit": "m",
+                "description": "Ring diameter, m."
+              }
+            },
+            "required": [
+              "kind",
+              "points",
+              "diameter"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "rectangle",
+                "description": "A rectangle of known size, for perspective."
+              },
+              "corners": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Right, px."
+                      },
+                      "y": {
+                        "type": "number",
+                        "unit": "px",
+                        "description": "Down, px."
+                      }
+                    },
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "description": "A point of the photo as the browser shows it, px from its top left."
+                  }
+                ],
+                "items": false,
+                "minItems": 4,
+                "maxItems": 4,
+                "description": "Corners: top left, top right, bottom right, bottom left."
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "unit": "m",
+                "description": "Rectangle width, m."
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "unit": "m",
+                "description": "Rectangle height, m."
+              }
+            },
+            "required": [
+              "kind",
+              "corners",
+              "width",
+              "height"
+            ]
+          }
+        ]
+      },
+      "description": "Scale and perspective references on the photo, one rectangle at most."
+    },
+    "targetRotation": {
+      "type": "number",
+      "unit": "rad",
+      "description": "Angle of the target's x axis on the photo, counter-clockwise, rad."
+    },
+    "targetOrigin": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "type": "number",
+          "unit": "px",
+          "description": "Right, px."
+        },
+        "y": {
+          "type": "number",
+          "unit": "px",
+          "description": "Down, px."
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "description": "Photo point of target (0, 0)."
+    },
+    "photoRotation": {
+      "type": "number",
+      "unit": "rad",
+      "description": "Turn of the photo on screen about its middle, counter-clockwise, rad. References, `targetOrigin` and detection regions are points on the turned photo. Absent: not turned."
+    },
+    "groups": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Id of the group, unique in the sheet."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Name of the group."
+          },
+          "colour": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$",
+            "description": "Colour of the group, `#rrggbb`."
+          },
+          "distance": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "unit": "m",
+            "description": "Muzzle to target, m."
+          },
+          "aim": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "unit": "m",
+                "description": "Right of the target origin, m."
+              },
+              "y": {
+                "type": "number",
+                "unit": "m",
+                "description": "Up from the target origin, m."
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "description": "Point of aim in target m."
+          },
+          "ladderStep": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Index of the ladder step of the sheet's load, 0 for the first charge."
+          },
+          "shots": {
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "unit": "m",
+                  "description": "Right of the target origin, m."
+                },
+                "y": {
+                  "type": "number",
+                  "unit": "m",
+                  "description": "Up from the target origin, m."
+                },
+                "excluded": {
+                  "type": "boolean",
+                  "description": "Left out of the statistics, still shown."
+                },
+                "placement": {
+                  "type": "string",
+                  "enum": [
+                    "detected",
+                    "placed"
+                  ],
+                  "description": "Found by hole detection or placed by the user."
+                },
+                "holeDiameter": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "unit": "m",
+                  "description": "Measured diameter of the hole of a shot accepted from hole detection as a single hole, m."
+                },
+                "chrono": {
+                  "type": "object",
+                  "properties": {
+                    "session": {
+                      "type": "string",
+                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                      "description": "The chronograph session of the round."
+                    },
+                    "string": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Index of the string in the session, from 0."
+                    },
+                    "shot": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Index of the shot in the string, from 0."
+                    }
+                  },
+                  "required": [
+                    "session",
+                    "string",
+                    "shot"
+                  ],
+                  "description": "The chronograph shot of this round."
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "placement"
+              ]
+            },
+            "description": "Shots of the group."
+          },
+          "detection": {
+            "type": "object",
+            "properties": {
+              "region": {
+                "minItems": 3,
+                "maxItems": 64,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "unit": "px",
+                      "description": "Right, px."
+                    },
+                    "y": {
+                      "type": "number",
+                      "unit": "px",
+                      "description": "Down, px."
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "description": "A point of the photo as the browser shows it, px from its top left."
+                },
+                "description": "Photo points of the polygon searched. A rectangle as its four corners."
+              },
+              "expectedHoleDiameter": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "unit": "m",
+                "description": "Expected hole diameter typed by the user, m. Absent: learned, the bullet or the marker."
+              },
+              "backing": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$",
+                "description": "Colour seen through a hole, picked in one, `#rrggbb`. Absent: off."
+              },
+              "minContrast": {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 1,
+                "description": "Least contrast of a hole, a fraction of the local paper white. Absent: 0.15."
+              },
+              "polarity": {
+                "type": "string",
+                "enum": [
+                  "dark",
+                  "light"
+                ],
+                "description": "Holes darker or lighter than their surroundings, from a picked example hole. Absent: both."
+              }
+            },
+            "description": "The choices of hole detection on the photo, kept for the next run."
+          },
+          "face": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the `TargetFace` record."
+              },
+              "event": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "description": "Id of the face's event whose gauge is the scored hole. Absent: the bullet diameter."
+              },
+              "marks": {
+                "minItems": 4,
+                "maxItems": 64,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "ring": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "description": "Ring number of the face."
+                    },
+                    "x": {
+                      "type": "number",
+                      "unit": "m",
+                      "description": "Right of the target origin, m."
+                    },
+                    "y": {
+                      "type": "number",
+                      "unit": "m",
+                      "description": "Up from the target origin, m."
+                    }
+                  },
+                  "required": [
+                    "ring",
+                    "x",
+                    "y"
+                  ]
+                },
+                "description": "Points marked on the face's rings in target m, on two rings at least. Absent: centred on the point of aim."
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "description": "Ring scoring: the target face record, the event whose gauge scores it, its alignment."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "colour",
+          "distance",
+          "shots"
+        ]
+      },
+      "description": "Shot groups of the sheet."
+    },
+    "load": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "Id of the saved load the groups belong to."
+    },
+    "markerDiameter": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "unit": "m",
+      "description": "Diameter of the shot marks, m. Absent: a fixed size on screen."
+    },
+    "notes": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Id of the note, unique in the sheet."
+          },
+          "x": {
+            "type": "number",
+            "unit": "m",
+            "description": "Right of the target origin, m."
+          },
+          "y": {
+            "type": "number",
+            "unit": "m",
+            "description": "Up from the target origin, m."
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Text of the note. `{key.unit}` placeholders show values of `group`."
+          },
+          "group": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Id of the group whose values the placeholders show."
+          }
+        },
+        "required": [
+          "id",
+          "x",
+          "y",
+          "text"
+        ]
+      },
+      "description": "Texts on the target."
+    },
+    "overlays": {
+      "type": "object",
+      "properties": {
+        "spread": {
+          "type": "boolean",
+          "description": "Extreme spread."
+        },
+        "box": {
+          "type": "boolean",
+          "description": "Width and height."
+        },
+        "aim": {
+          "type": "boolean",
+          "description": "Point of aim line."
+        },
+        "ellipses": {
+          "type": "boolean",
+          "description": "Prediction ellipses (50 %, 95 %)."
+        },
+        "dispersion": {
+          "type": "boolean",
+          "description": "Dispersion ellipses (50 %, 95 %)."
+        },
+        "axis": {
+          "type": "boolean",
+          "description": "Major axis."
+        },
+        "excluded": {
+          "type": "boolean",
+          "description": "Excluded direction."
+        },
+        "numbers": {
+          "type": "boolean",
+          "description": "Shot numbers."
+        },
+        "stats": {
+          "type": "boolean",
+          "description": "Statistics box."
+        },
+        "rings": {
+          "type": "boolean",
+          "description": "Face rings and scores."
+        }
+      },
+      "description": "Overlay switches of the editor, as the sheet was last shown."
+    }
+  },
+  "required": [
+    "references",
+    "targetRotation",
+    "groups"
+  ]
+}

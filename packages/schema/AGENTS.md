@@ -1,6 +1,6 @@
 # @open-reloading/schema
 
-Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-schema/` (generated, not committed).
+Zod schemas for records, ESM. The build writes JSON Schema files to `dist/json-schema/` (generated, not committed), which `test/contracts.test.ts` compares with the committed baseline in `test/golden/json-schema/` (`npm run baselines` at the root rewrites it).
 
 - Units, provenance, `Load`, `ChronoSession`, `FiringSeries`, `RangeFirings`, standards and components, user data files, `TargetSheet` (shot groups on a target, m).
 - `TargetFace`: rule-book target faces for ring scoring. `federation` is a federation record id (absent: a user's own design). Events carry an `id` unique within the face and an optional `federation`. Optional ring colours, paper size, bulls, ovals, square rings and event category. Strict events.
