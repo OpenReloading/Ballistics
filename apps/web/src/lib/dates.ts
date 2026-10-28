@@ -28,6 +28,10 @@ export function dayText(day: string, language = shownLanguage()): string {
   return format.format(new Date(day))
 }
 
+/** The day a print was made: YYYY-MM-DD in English, as written out in another language. */
+export const printDay = (d: Date, language = shownLanguage()) =>
+  language === 'en' ? localDay(d) : dayText(localDay(d), language)
+
 /** A date and time in the language shown; English follows the browser's locale, as it always did. */
 export const dateTimeText = (d: Date, language = shownLanguage()) =>
   d.toLocaleString(language === 'en' ? undefined : language)

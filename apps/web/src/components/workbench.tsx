@@ -16,12 +16,12 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { formatNumber, plainNumber } from '../i18n/number.ts'
-import { english, type Translator } from '../i18n/translate.ts'
+import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
+import type { Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import { summaryFitSource } from '../lib/bullet-fit.ts'
 import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
-import { localDay } from '../lib/dates.ts'
+import { printDay } from '../lib/dates.ts'
 import { loadExample } from '../lib/example-data.ts'
 import { activeClick } from '../lib/firearm.ts'
 import { interiorFields } from '../lib/interior-input.ts'
@@ -29,7 +29,7 @@ import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
-import { ladderTitle, seatingLengthName } from '../lib/seating-ladder.ts'
+import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
 import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
@@ -83,12 +83,14 @@ const burnKeys = ['vivacity', 'exponent', 'referencePressure', 'formA', 'formM',
 type OkOutcome = Extract<Outcome, { kind: 'ok' }>
 type Load = ReturnType<typeof useWorkbenchState>
 type PrintRows = [string, string | undefined][]
+type T = Translator['t']
 
 /** COAL or CBTO of the run; the one the bullet was seated by is "set", the other "derived". */
 function seatingRow(
   k: 'overallLength' | 'baseToOgive',
   ok: OkOutcome | undefined,
   system: UnitSystem,
+  t: T,
 ): [string, string | undefined] {
   const name = seatingLengthName[k]
   const runSeated = ok?.printed.seated
@@ -98,114 +100,151 @@ function seatingRow(
     return [
       name,
       k === (ok?.ladder.seatingBy ?? 'overallLength')
-        ? `${shownLength('diameter', system, stepSeating.value)}, set`
+        ? t('{length}, set', { length: shownLength('diameter', system, stepSeating.value) })
         : undefined,
     ]
   const v = runSeated?.[k]
-  const how = runSeated?.mode && (runSeated.mode === k ? ', set' : ', derived')
   // a seated bullet without a base-to-ogive prints why CBTO is missing
-  if (v === undefined) return [name, runSeated?.mode ? 'needs the bullet base-to-ogive' : undefined]
-  return [name, `${shownLength('diameter', system, v)}${how ?? ''}`]
+  if (v === undefined)
+    return [name, runSeated?.mode ? t('needs the bullet base-to-ogive') : undefined]
+  const length = shownLength('diameter', system, v)
+  if (!runSeated?.mode) return [name, length]
+  return [
+    name,
+    runSeated.mode === k ? t('{length}, set', { length }) : t('{length}, derived', { length }),
+  ]
 }
 
 /** COAL and CBTO of the run. */
-const seatingRowsOf = (ok: OkOutcome | undefined, system: UnitSystem) =>
-  (['overallLength', 'baseToOgive'] as const).map((k) => seatingRow(k, ok, system))
+const seatingRowsOf = (ok: OkOutcome | undefined, system: UnitSystem, t: T) =>
+  (['overallLength', 'baseToOgive'] as const).map((k) => seatingRow(k, ok, system, t))
 
 /** Volume and travel the run took from the seated bullet, which are approximate. */
-function approximateNote(ok: OkOutcome | undefined) {
+function approximateNote(ok: OkOutcome | undefined, t: T) {
   if (!ok || ok.printed.fromSeating.length === 0) return
-  const names = ok.printed.fromSeating
-    .map((k) => (k === 'volume' ? 'Usable case volume' : 'Bullet travel'))
-    .join(' and ')
-  return `${names} from the seated bullet: derived from approximate bullet and case geometry.`
+  const [first, second] = ok.printed.fromSeating.map((k) =>
+    k === 'volume' ? t('Usable case volume') : t('Bullet travel'),
+  )
+  const names = second ? t('{first} and {second}', { first: first ?? '', second }) : first
+  return t('{names} from the seated bullet: derived from approximate bullet and case geometry.', {
+    names: names ?? '',
+  })
 }
 
 /** A field as the print shows it: its label and its value with the unit; none while empty. */
-function printRow(load: Load, key: string): [string, string | undefined] {
+function printRow(load: Load, key: string, t: T): [string, string | undefined] {
   const spec = interiorFields.find((f) => f.key === key)
-  return [spec?.label ?? key, spec && load.shown(key, spec.quantity)]
+  return [spec ? t(spec.label) : key, spec && load.shown(key, spec.quantity)]
 }
 
-function cartridgePrintRows(load: Load, ok: OkOutcome | undefined, seatingRows: PrintRows) {
+function cartridgePrintRows(load: Load, ok: OkOutcome | undefined, seatingRows: PrintRows, t: T) {
   const { system, cartridge, cartridgeDesign, pmax, mmText, specValue, measuredFor, measured } =
     load
   const depth = ok?.printed.seated?.depth
   return [
-    ['Cartridge', cartridge?.name ?? (cartridgeDesign && `${cartridgeDesign.name} (user design)`)],
     [
-      'CIP Pmax',
+      t('Cartridge'),
+      cartridge?.name ??
+        (cartridgeDesign && t('{name} (user design)', { name: cartridgeDesign.name })),
+    ],
+    [
+      t('CIP Pmax'),
       pmax === undefined ? undefined : withUnit('pressure', system, toSi('pressure', pmax)),
     ],
-    ['Case length, CIP L3', mmText(specValue('cartridge', 'L3'))],
-    printRow(load, 'volume'),
-    printRow(load, 'boreDiameter'),
-    printRow(load, 'boreArea'),
+    [t('Case length, CIP L3'), mmText(specValue('cartridge', 'L3'))],
+    printRow(load, 'volume', t),
+    printRow(load, 'boreDiameter', t),
+    printRow(load, 'boreArea', t),
     [
-      'Case capacity (H₂O), measured',
+      t('Case capacity (H₂O), measured'),
       measuredFor === cartridge?.id && measured.measuredWaterCapacity?.si !== undefined
-        ? `${measured.measuredWaterCapacity.text} ${system.capacity.symbol}`
+        ? `${localizeNumber(measured.measuredWaterCapacity.text)} ${system.capacity.symbol}`
         : undefined,
     ],
     ...seatingRows,
-    ['Seating depth', depth === undefined ? undefined : shownLength('diameter', system, depth)],
+    [t('Seating depth'), depth === undefined ? undefined : shownLength('diameter', system, depth)],
   ] as PrintRows
 }
 
-function bulletPrintRows(load: Load): PrintRows {
+function bulletPrintRows(load: Load, t: T): PrintRows {
   const { bulletLabel, bulletDesign, bullet, mmText, bc } = load
   return [
-    ['Bullet', bulletLabel ?? bulletDesign?.name],
-    ['Diameter', bullet && mmText(bullet.diameter.value)],
-    ['Length', bullet?.length && mmText(bullet.length.value)],
-    ['Ballistic coefficient', bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
-    printRow(load, 'bulletMass'),
+    [t('Bullet'), bulletLabel ?? bulletDesign?.name],
+    [t('Diameter'), bullet && mmText(bullet.diameter.value)],
+    [t('Length'), bullet?.length && mmText(bullet.length.value)],
+    [t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
+    printRow(load, 'bulletMass', t),
   ]
 }
 
 /** The ladder as the print words it: its kind, steps, direction and step size. */
-function ladderPrintText(load: Load) {
-  const { ladderSteps, ladderKind, seatAt, direction, seatStep, tempStep, ladder, system } = load
+function ladderPrintText(load: Load, t: T) {
+  const { ladderSteps, ladderKind, seatAt, seatStep, tempStep, ladder, system } = load
   if (ladderSteps <= 1) return
+  const direction = { up: t('up'), down: t('down'), around: t('around') }[load.direction]
   if (ladderKind === 'seating') {
     const step = seatStep.seatStep?.text
     if (!step) return
-    return `${ladderSteps} ${seatAt ? seatingLengthName[seatAt.lengthKind] : 'seating'} values, ${direction}, ${step} ${system.length.symbol} apart`
+    return t('{steps} {length} values, {direction}, {step} {unit} apart', {
+      steps: ladderSteps,
+      direction,
+      length: seatAt ? seatingLengthName[seatAt.lengthKind] : t('seating'),
+      step: localizeNumber(step),
+      unit: system.length.symbol,
+    })
   }
   if (ladderKind === 'temperature') {
     const step = tempStep.tempStep?.text
     if (!step) return
-    return `${ladderSteps} powder temperatures, ${direction}, ${step} ${system.temperatureDifference.symbol} apart`
+    return t('{steps} powder temperatures, {direction}, {step} {unit} apart', {
+      steps: ladderSteps,
+      direction,
+      step: localizeNumber(step),
+      unit: system.temperatureDifference.symbol,
+    })
   }
   const step = ladder.ladderStep?.text
   if (!step) return
-  return `${ladderSteps} charges, ${direction}, ${step} ${system.charge.symbol} apart`
+  return t('{steps} charges, {direction}, {step} {unit} apart', {
+    steps: ladderSteps,
+    direction,
+    step: localizeNumber(step),
+    unit: system.charge.symbol,
+  })
 }
 
-function powderPrintRows(load: Load, runTemperature: string | undefined): PrintRows {
+function powderPrintRows(load: Load, runTemperature: string | undefined, t: T): PrintRows {
   return [
-    ['Powder', load.powderDesign ? `${load.powderLabel} (user design)` : load.powderLabel],
-    printRow(load, 'charge'),
-    ['Powder temperature', runTemperature],
-    ['Ladder', ladderPrintText(load)],
-    ...modelFields.map((k) => printRow(load, k)),
-    ...powderMoreFields.map((k) => printRow(load, k)),
+    [
+      t('Powder'),
+      load.powderDesign
+        ? t('{name} (user design)', { name: load.powderLabel ?? '' })
+        : load.powderLabel,
+    ],
+    printRow(load, 'charge', t),
+    [t('Powder temperature'), runTemperature],
+    [t('Ladder'), ladderPrintText(load, t)],
+    ...modelFields.map((k) => printRow(load, k, t)),
+    ...powderMoreFields.map((k) => printRow(load, k, t)),
   ]
 }
 
-function gunPrintRows(load: Load, ok: OkOutcome | undefined): PrintRows {
+function gunPrintRows(load: Load, ok: OkOutcome | undefined, t: T): PrintRows {
   const { system, gunWeightUsed } = load
   const barrel = ok?.printed.seated?.barrel
   return [
-    ['Firearm', ok?.printed.firearm],
-    ['Barrel length', barrel === undefined ? undefined : withUnit('barrelLength', system, barrel)],
-    printRow(load, 'travel'),
-    printRow(load, 'twist'),
+    [t('Firearm'), ok?.printed.firearm],
     [
-      'Gun weight',
+      t('Barrel length'),
+      barrel === undefined ? undefined : withUnit('barrelLength', system, barrel),
+    ],
+    printRow(load, 'travel', t),
+    printRow(load, 'twist', t),
+    [
+      t('Gun weight'),
       gunWeightUsed.si === undefined
         ? undefined
-        : `${gunWeightUsed.text} ${system.firearmMass.symbol}`,
+        : `${localizeNumber(gunWeightUsed.text)} ${system.firearmMass.symbol}`,
     ],
   ]
 }
@@ -216,12 +255,13 @@ function printGroupsOf(
   ok: OkOutcome | undefined,
   seatingRows: PrintRows,
   runTemperature: string | undefined,
+  t: T,
 ): [string, PrintRows][] {
   return [
-    ['Cartridge', cartridgePrintRows(load, ok, seatingRows)],
-    ['Bullet', bulletPrintRows(load)],
-    ['Powder and charge', powderPrintRows(load, runTemperature)],
-    ['Gun and barrel', gunPrintRows(load, ok)],
+    [t('Cartridge'), cartridgePrintRows(load, ok, seatingRows, t)],
+    [t('Bullet'), bulletPrintRows(load, t)],
+    [t('Powder and charge'), powderPrintRows(load, runTemperature, t)],
+    [t('Gun and barrel'), gunPrintRows(load, ok, t)],
   ]
 }
 
@@ -244,6 +284,14 @@ type ReportProps = {
   warnings: ReturnType<typeof warningLines> | undefined
 }
 
+/** The heading over the ladder table of a ladder of `kind`. */
+const ladderHeading = (kind: OkOutcome['ladder']['kind'], t: T) =>
+  ({
+    charge: t('Charge ladder'),
+    seating: t('Seating ladder'),
+    temperature: t('Temperature ladder'),
+  })[kind]
+
 /** What follows the report's readouts: the ladder, the barrel length study, the limits and the notes. */
 function ReportAfter({
   ok,
@@ -255,11 +303,12 @@ function ReportAfter({
   notes,
   system,
 }: ReportProps) {
+  const { t } = useTranslation()
   const study =
     barrel.base === undefined ? (
-      <p>Needs a seated bullet in the cartridge figure.</p>
+      <p>{t('Needs a seated bullet in the cartridge figure.')}</p>
     ) : barrelError ? (
-      <p>Not computed: {barrelError}</p>
+      <p>{t('Not computed: {reason}', { reason: barrelError })}</p>
     ) : (
       <BarrelTable study={barrel} system={system} />
     )
@@ -267,18 +316,18 @@ function ReportAfter({
     <>
       {steps.length > 1 && (
         <>
-          <h2>{ladderTitle(ok.ladder.kind, english.t)} ladder</h2>
+          <h2>{ladderHeading(ok.ladder.kind, t)}</h2>
           {ladderTable}
-          {lot.message && <p>Lot rows not computed: {lot.message}</p>}
+          {lot.message && <p>{t('Lot rows not computed: {reason}', { reason: lot.message })}</p>}
           <LotChartBlock lot={lot} system={system} note={false} />
         </>
       )}
-      <h2>Barrel length</h2>
+      <h2>{t('Barrel length')}</h2>
       {study}
       <LimitsView body={ok.body} />
       {notes && (
         <>
-          <h2>Notes</h2>
+          <h2>{t('Notes')}</h2>
           <p>{notes}</p>
         </>
       )}
@@ -290,12 +339,14 @@ function ReportAfter({
 function Report(props: ReportProps) {
   const { ok, chartSlot, steps, loadTitle, stale, fromDesign, approximate, printGroups } = props
   const { stepValue, warnings, system } = props
+  const { t, language } = useTranslation()
   const shownStep = steps.find((s) => s.n - 1 === ok.selected) ?? steps[0]
   return (
     <PrintReport chartSlot={chartSlot} after={<ReportAfter {...props} />}>
       <h1>{loadTitle}</h1>
       <p className="report-sub">
-        Printed {localDay(new Date())}.{stale && ' Inputs changed since this result.'}
+        {t('Printed {date}.', { date: printDay(new Date(), language) })}
+        {stale && ` ${t('Inputs changed since this result.')}`}
         {fromDesign && ` ${fromDesign}`}
         {approximate && ` ${approximate}`}
       </p>
@@ -317,8 +368,12 @@ function Report(props: ReportProps) {
         ))}
       </div>
       <h2>
-        Result
-        {steps.length > 1 && shownStep && `, step ${selectedLabel(ok)}: ${stepValue(shownStep)}`}
+        {steps.length > 1 && shownStep
+          ? t('Result, step {step}: {value}', {
+              step: selectedLabel(ok),
+              value: stepValue(shownStep),
+            })
+          : t('Result')}
       </h2>
       <Readouts ok={ok} system={system} stale={false} printed />
       {warnings && warnings.length > 0 && (
@@ -339,22 +394,26 @@ function sheetComponents(
   seatingRows: PrintRows,
   runTemperature: string | undefined,
   charge: (kg: number) => string,
+  t: T,
 ) {
+  const weight = withUnit('mass', system, ok.load.bullet.mass)
   return (
     [
-      ['Cartridge', ok.identity.cartridge],
+      [t('Cartridge'), ok.identity.cartridge],
       [
-        'Bullet',
-        `${ok.identity.bullet ?? 'no record'}, ${withUnit('mass', system, ok.load.bullet.mass)}${ok.identity.bullet ? '' : ' typed'}`,
+        t('Bullet'),
+        ok.identity.bullet
+          ? t('{record}, {weight}', { record: ok.identity.bullet, weight })
+          : t('no record, {weight} typed', { weight }),
       ],
-      ['Powder', ok.identity.powder],
+      [t('Powder'), ok.identity.powder],
       ...seatingRows,
       // a seating or temperature ladder's charge is one for all steps; the other values are those of the shown step
-      ...(singleCharge(ok) ? [['Charge', charge(ok.load.charge)]] : []),
-      ['Usable case volume', withUnit('capacity', system, ok.load.chamber.volume)],
-      ['Bullet travel', shownLength('travel', system, ok.load.barrel.length)],
-      ['Firearm', ok.printed.firearm],
-      ['Powder temperature', runTemperature],
+      ...(singleCharge(ok) ? [[t('Charge'), charge(ok.load.charge)]] : []),
+      [t('Usable case volume'), withUnit('capacity', system, ok.load.chamber.volume)],
+      [t('Bullet travel'), shownLength('travel', system, ok.load.barrel.length)],
+      [t('Firearm'), ok.printed.firearm],
+      [t('Powder temperature'), runTemperature],
     ] as PrintRows
   ).filter((r): r is [string, string] => Boolean(r[1]))
 }
@@ -371,6 +430,7 @@ function sheetSteps(
   system: UnitSystem,
   stepValue: (s: ShownStep) => string,
   velocity: (r: InteriorResponse['result']) => string,
+  t: T,
 ) {
   return steps.map((s) => ({
     n: s.n,
@@ -382,7 +442,7 @@ function sheetSteps(
     ofMax: s.d?.ofMax && `${formatNumber(s.d.ofMax.percent, 0)} %`,
     velocity: s.at && velocity(s.at.body.result),
     energy: s.at && withUnit('energy', system, s.at.body.result.muzzleEnergy),
-    flag: s.flag,
+    flag: s.at && stepFlag(s.at, t),
   }))
 }
 
@@ -780,28 +840,30 @@ function PrintViews({
   barrel,
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
-  // the printed pages are English whatever the screen shows
-  const steps = useMemo(() => shownSteps(ok, english.t), [ok])
-  const warnings = useMemo(() => ok && warningLines(ok, system, english.t), [ok, system])
+  const { t } = useTranslation()
+  const steps = useMemo(() => shownSteps(ok, t), [ok, t])
+  const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
   /** The report's and the load sheets' title: cartridge, bullet and powder of the run. */
   const loadTitle = ok
     ? [ok.identity.cartridge, ok.identity.bullet, ok.identity.powder].filter(Boolean).join(', ')
     : ''
-  const seatingRows = seatingRowsOf(ok, system)
+  const seatingRows = seatingRowsOf(ok, system, t)
   const runTemperature = ok && withUnit('temperature', system, ok.load.propellantTemperature)
   const approximate =
-    [approximateNote(ok), volumeNoteText(ok)].filter(Boolean).join(' ') || undefined
+    [approximateNote(ok, t), volumeNoteText(ok, t)].filter(Boolean).join(' ') || undefined
   /** Said on every print and result that took values from a user cartridge design. */
   const fromDesign =
     [
       ok?.cartridgeDesign &&
-        `Case values from the user design ${ok.cartridgeDesign}, not a catalogue record.`,
-      ok?.powderDesign && powderDesignNote(ok.powderDesign),
+        t('Case values from the user design {name}, not a catalogue record.', {
+          name: ok.cartridgeDesign,
+        }),
+      ok?.powderDesign && powderDesignNote(ok.powderDesign, t),
     ]
       .filter(Boolean)
       .join(' ') || undefined
-  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature)
+  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, t)
   const ladderTable = (
     <LadderTable
       ok={ok}
@@ -837,12 +899,12 @@ function PrintViews({
   const sheets = ok && (
     <LoadSheets
       title={loadTitle}
-      components={sheetComponents(ok, system, seatingRows, runTemperature, charge)}
-      note={[stale && 'Inputs changed since this result.', fromDesign, approximate]
+      components={sheetComponents(ok, system, seatingRows, runTemperature, charge, t)}
+      note={[stale && t('Inputs changed since this result.'), fromDesign, approximate]
         .filter(Boolean)
         .join(' ')}
       by={sheetBy(ok)}
-      steps={sheetSteps(steps, system, stepValue, velocity)}
+      steps={sheetSteps(steps, system, stepValue, velocity, t)}
     />
   )
   return (

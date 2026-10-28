@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
-import { localDay } from '../lib/dates.ts'
+import { printDay } from '../lib/dates.ts'
 import { type FieldSpec, type Fields, fieldError, initialFields } from '../lib/field-spec.ts'
 import { cssMm, ladderMarks, markDiameterMm, maxMarkMm, rulerMm } from '../lib/ladder-target.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
@@ -50,7 +50,7 @@ export function LadderTarget({
   labels: readonly string[]
   system: UnitSystem
 }) {
-  const { t } = useTranslation()
+  const { t, language } = useTranslation()
   const body = usePortalBody()
   const [fields, setFields] = useState<Fields>(() => initialFields(specs, system))
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)))
@@ -75,7 +75,9 @@ export function LadderTarget({
             severity: 'warning' as const,
             text: t(
               'A mark of {diameter} mm does not fit a sheet: choose a smaller size or distance.',
-              { diameter: Math.round(diameter) },
+              {
+                diameter: Math.round(diameter),
+              },
             ),
           },
         ]
@@ -111,12 +113,16 @@ export function LadderTarget({
         size !== undefined &&
         createPortal(
           <div className="ladder-target">
-            <h1>Ladder target</h1>
-            <p className="sheet-date">Printed {localDay(new Date())}</p>
+            <h1>{t('Ladder target')}</h1>
+            <p className="sheet-date">
+              {t('Printed {date}', { date: printDay(new Date(), language) })}
+            </p>
             <p>
-              Distance {formatQuantity('range', system, distance)} {system.range.symbol}, mark size{' '}
-              {formatQuantity('correction', system, size)} {system.correction.symbol}
-              {` (${plainNumber(Math.round((diameter ?? 0) * 10) / 10)} mm).`}
+              {t('Distance {distance}, mark size {size} ({diameter} mm).', {
+                distance: `${formatQuantity('range', system, distance)} ${system.range.symbol}`,
+                size: `${formatQuantity('correction', system, size)} ${system.correction.symbol}`,
+                diameter: plainNumber(Math.round((diameter ?? 0) * 10) / 10),
+              })}
             </p>
             <div className="ladder-marks">
               {marks.map((m, i) => (
@@ -135,9 +141,9 @@ export function LadderTarget({
               ))}
             </div>
             <div className="ladder-ruler" style={{ width: cssMm(rulerMm) }}>
-              <span>{rulerMm} mm</span>
+              <span>{plainNumber(rulerMm)} mm</span>
             </div>
-            <p>Print at 100 % scale: the ruler measures {rulerMm} mm.</p>
+            <p>{t('Print at 100 % scale: the ruler measures {length} mm.', { length: rulerMm })}</p>
           </div>,
           body,
         )}

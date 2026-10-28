@@ -1,7 +1,7 @@
 import { loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
-import { msg, type Translator } from '../i18n/translate.ts'
+import { english, msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import { nth } from '../lib/nth.ts'
@@ -126,8 +126,13 @@ export const volumeNote = {
 }
 
 /** The note as one sentence pair for the prints, none when the run's volume is measured. */
-export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined) =>
-  ok && !ok.volumeMeasured ? `${volumeNote.title}: ${volumeNote.text}` : undefined
+export const volumeNoteText = (
+  ok: { volumeMeasured: boolean } | undefined,
+  t: Translator['t'] = english.t,
+) =>
+  ok && !ok.volumeMeasured
+    ? t('{title}: {text}', { title: t(volumeNote.title), text: t(volumeNote.text) })
+    : undefined
 
 export const notReached = msg('The API is unreachable.')
 export const needsNetwork = msg(

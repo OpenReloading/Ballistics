@@ -26,6 +26,7 @@ import type {
 } from '@open-reloading/schema'
 import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
+import { msg } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
 import { close, type FieldSpec, fieldError } from '../lib/field-spec.ts'
 import {
@@ -45,10 +46,10 @@ import { RecordSearch } from './record-search.tsx'
 import type { useManufacturers } from './use-manufacturers.ts'
 
 export const opticKinds = [
-  { value: 'scope', label: 'Scope' },
-  { value: 'redDot', label: 'Red dot' },
-  { value: 'ironSights', label: 'Iron sights' },
-  { value: 'other', label: 'Other' },
+  { value: 'scope', label: msg('Scope') },
+  { value: 'redDot', label: msg('Red dot') },
+  { value: 'ironSights', label: msg('Iron sights') },
+  { value: 'other', label: msg('Other') },
 ]
 
 /** Filled in by the user; Save checks that it is a number. */

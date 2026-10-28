@@ -10,34 +10,35 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
+import { english, msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
 import { formatQuantity, type Quantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
 
 export const firearmFields = [
-  { key: 'barrelLength', label: 'Barrel length', quantity: 'barrelLength', min: 0 },
-  { key: 'twist', label: 'Twist, length per turn', quantity: 'twist', min: 0 },
-  { key: 'grooveDiameter', label: 'Groove diameter, measured', quantity: 'length', min: 0 },
-  { key: 'boreDiameter', label: 'Bore diameter, measured', quantity: 'length', min: 0 },
-  { key: 'freebore', label: 'Freebore', quantity: 'length', min: 0 },
+  { key: 'barrelLength', label: msg('Barrel length'), quantity: 'barrelLength', min: 0 },
+  { key: 'twist', label: msg('Twist, length per turn'), quantity: 'twist', min: 0 },
+  { key: 'grooveDiameter', label: msg('Groove diameter, measured'), quantity: 'length', min: 0 },
+  { key: 'boreDiameter', label: msg('Bore diameter, measured'), quantity: 'length', min: 0 },
+  { key: 'freebore', label: msg('Freebore'), quantity: 'length', min: 0 },
   {
     key: 'baseToOgiveAtLands',
-    label: 'Base to ogive at the lands, measured',
+    label: msg('Base to ogive at the lands, measured'),
     help: 'Cartridge length to the bullet ogive with the bullet touching the lands.',
     quantity: 'length',
     min: 0,
   },
   {
     key: 'overallLengthAtLands',
-    label: 'Overall length at the lands, measured',
+    label: msg('Overall length at the lands, measured'),
     help: 'Cartridge overall length with the bullet touching the lands.',
     quantity: 'length',
     min: 0,
   },
-  { key: 'firearmMass', label: 'Mass', quantity: 'firearmMass', min: 0, positive: true },
+  { key: 'firearmMass', label: msg('Mass'), quantity: 'firearmMass', min: 0, positive: true },
   {
     key: 'roundCount',
-    label: 'Round count',
+    label: msg('Round count'),
     help: 'Rounds fired through the barrel so far.',
     quantity: 'ratio',
     min: 0,
@@ -45,7 +46,7 @@ export const firearmFields = [
   },
   {
     key: 'noteAtRoundCount',
-    label: 'Note at round count',
+    label: msg('Note at round count'),
     help: 'A saved load shot from this firearm gets a note when a session passes this count.',
     quantity: 'ratio',
     min: 0,
@@ -55,18 +56,18 @@ export const firearmFields = [
 ] as const satisfies readonly FieldSpec[]
 
 export const opticFields = [
-  { key: 'clickValue', label: 'Click value', quantity: 'correction', min: 0, positive: true },
-  { key: 'travel', label: 'Turret travel', quantity: 'correction', min: 0, positive: true },
+  { key: 'clickValue', label: msg('Click value'), quantity: 'correction', min: 0, positive: true },
+  { key: 'travel', label: msg('Turret travel'), quantity: 'correction', min: 0, positive: true },
   {
     key: 'minMagnification',
-    label: 'Magnification, lowest',
+    label: msg('Magnification, lowest'),
     quantity: 'ratio',
     min: 0,
     positive: true,
   },
   {
     key: 'maxMagnification',
-    label: 'Magnification, highest',
+    label: msg('Magnification, highest'),
     quantity: 'ratio',
     min: 0,
     positive: true,
@@ -372,9 +373,12 @@ export function activeClick(r: UserRecord | undefined) {
 }
 
 /** The twist as length per turn with its direction: "1:10.0 in, right". */
-export const twistText = (f: Firearm, system: UnitSystem) =>
+export const twistText = (f: Firearm, system: UnitSystem, t: Translator['t'] = english.t) =>
   f.twist?.value
-    ? `1:${withUnit('twist', system, toSi('length', f.twist.value))}, ${f.twistHand}`
+    ? t('1:{length}, {hand}', {
+        length: withUnit('twist', system, toSi('length', f.twist.value)),
+        hand: f.twistHand === 'left' ? t('left') : t('right'),
+      })
     : undefined
 
 /** A click value (rad) in the turret marking `clickUnit`, else in the units of `system`. */

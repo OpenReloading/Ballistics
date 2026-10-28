@@ -3,6 +3,7 @@
  * or target mm on a drawn target. No React, DOM or Next.js.
  */
 import { fromSi } from '@open-reloading/schema'
+import { plainNumber } from '../i18n/number.ts'
 
 export type ViewBox = { x: number; y: number; w: number; h: number }
 type Pt = { x: number; y: number }
@@ -46,7 +47,8 @@ export function printLayout(
 }
 
 /** The scale as text: "2:1", "1:5". */
-export const scaleText = (s: number) => (s >= 1 ? `${s}:1` : `1:${Math.round(1 / s)}`)
+export const scaleText = (s: number) =>
+  s >= 1 ? `${plainNumber(s)}:1` : `1:${plainNumber(Math.round(1 / s))}`
 
 /**
  * The view after a two-finger move: `box` and `k` (view units per screen px) at the start, `p` the

@@ -2,8 +2,8 @@
 
 import type { TrajectoryPoint } from '@open-reloading/core'
 import { createPortal } from 'react-dom'
-import { english } from '../i18n/translate.ts'
-import { localDay } from '../lib/dates.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { printDay } from '../lib/dates.ts'
 import { clickText } from '../lib/firearm.ts'
 import { rangeCardColumns, rangeCardFacts, rangeCardRows } from '../lib/range-card.ts'
 import type { UnitSystem } from '../lib/units.ts'
@@ -37,12 +37,11 @@ export function RangeCard({
   system: UnitSystem
   paper: PaperSize
 }) {
+  const { t, language } = useTranslation()
   // the portal target exists after mounting only (server render has no document)
   const body = usePortalBody()
   if (!body) return null
   const extras = { click: result.click?.value, wind: result.windPerUnit }
-  // printed alone: English until the print view is translated
-  const { t } = english
   const columns = rangeCardColumns(system, extras, t)
   const facts = rangeCardFacts(
     result.si,
@@ -60,7 +59,7 @@ export function RangeCard({
   return createPortal(
     <div className="range-card" data-paper={paper}>
       <h1>{t('Range card: {name}', { name: result.bullet })}</h1>
-      <p className="sheet-date">{t('Printed {date}', { date: localDay(new Date()) })}</p>
+      <p className="sheet-date">{t('Printed {date}', { date: printDay(new Date(), language) })}</p>
       <dl className="range-card-facts">
         {facts.map(([k, v]) => (
           <div key={k}>
