@@ -77,6 +77,7 @@
 . UserCaseRecord
 . UserManufacturer
 . UserPowder
+. UserPowderFit
 . UserRecord
 . UserRecordKind
 . UserRecords
@@ -191,6 +192,7 @@
 . userIdRegex
 . userManufacturer
 . userPowder
+. userPowderFit
 . userRecord
 . userRefFields
 . valueKey

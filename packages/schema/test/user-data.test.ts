@@ -183,6 +183,33 @@ const powderRecord = {
   },
 } as const
 
+const powderFit = {
+  input: [
+    {
+      charge: { value: 2.8 },
+      muzzleVelocity: { value: 820 },
+      shots: 5,
+      barrelLength: { value: 610 },
+      temperature: { value: 21 },
+      caseCapacity: { value: 3.6 },
+      bulletMass: { value: 10.886 },
+    },
+  ],
+  parameters: ['burnRate', 'startPressure'],
+  options: {
+    prior: { burnRate: { value: 1.2, sigma: 0.3 } },
+    loss: { kind: 'huber', threshold: 2 },
+  },
+  date: saved,
+  model: 'm3',
+  modelVersion: '0.0.4',
+  confidence: 'moderate',
+  reasons: ['no-pressure', 'narrow-ladder'],
+  sessions: [`user:${uuid}`],
+  previous: `user:${other}`,
+} as const
+const fittedPowder = { ...powderRecord, data: { ...powderRecord.data, fit: powderFit } } as const
+
 const file = (records: unknown[], version: unknown = userDataVersion) => ({
   format: userDataFormat,
   version,
@@ -256,6 +283,29 @@ describe('userDataFile', () => {
     const interior = { gamma: 1, pressureExponent: 0, burnForm: { z1: 0 } }
     const draft = { ...powderRecord, data: { ...powderRecord.data, draft: { interior } } }
     expect(userRecord.safeParse(draft).success).toBe(true)
+  })
+
+  it('keeps the fit of a fitted powder through a round trip, without resolving its references', () => {
+    const json = JSON.parse(JSON.stringify(file([fittedPowder])))
+    const { records } = userDataFile.parse(json)
+    expect(records).toEqual([fittedPowder])
+    expect(checkUserRefs(records)).toEqual([])
+    expect(userRefFields(fittedPowder)).toEqual([])
+  })
+
+  it('rejects a fit with more than 40 points, a negative charge or a missing field', () => {
+    const [point] = powderFit.input
+    const ok = (fit: object) =>
+      userRecord.safeParse({ ...fittedPowder, data: { ...fittedPowder.data, fit } }).success
+    expect(ok({ ...powderFit, input: Array(40).fill(point) })).toBe(true)
+    expect(ok({ ...powderFit, input: Array(41).fill(point) })).toBe(false)
+    expect(ok({ ...powderFit, input: [{ ...point, charge: { value: -2.8 } }] })).toBe(false)
+    const { caseCapacity: _, ...noCapacity } = point
+    expect(ok({ ...powderFit, input: [noCapacity] })).toBe(false)
+    expect(ok({ ...powderFit, input: [{ ...point, charge: 2.8 }] })).toBe(false)
+    expect(ok({ ...powderFit, sessions: ['catalogue:range-day'] })).toBe(false)
+    expect(ok({ ...powderFit, previous: 'old-1' })).toBe(false)
+    expect(ok({ ...powderFit, parameters: ['burnRate', 'burnRate'] })).toBe(false)
   })
 
   it('refuses a powder with an id that is no UUID, and says why', () => {

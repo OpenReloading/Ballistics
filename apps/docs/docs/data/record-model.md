@@ -255,6 +255,32 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - `Load.snapshots` (`sessionSnapshot` in `packages/schema/src/load.ts`, up to 50, at most one per entry of `Load.sessions`) keeps what the load was at each session: `powderLot`, `primerLot`, `caseLot`, `seating` and the firearm's `roundCount`, and the ids of the notes the user dismissed for that session. `Load.powderLot` is new beside `primer.lot` and `case.lot` (a powder is a bare reference and had no place for a lot); a primer is a `lot` and an optional catalogue `record`, so a lot alone can be stored. `Firearm.noteAtRoundCount` is the count the user sets for the round count note. All are optional additions: no existing record changes.
 - The snapshot is shown live until the load is saved with the session, then fixed. The rules and their thresholds are on `apps/docs/docs/models/load-notes.md`.
 
+### Fit of a user powder
+
+A fitted user powder keeps a copy of what it was fitted to in the optional `fit` of its data (`userPowderFit` in `packages/schema/src/user-data.ts`), so deleting or editing a session never changes what the powder rests on. Its `provenanceKind` stays `fitted`. Every quantity is `{ value }` in its stored unit, and every field is required unless marked optional.
+
+| Field | Content | Unit |
+| --- | --- | --- |
+| `input` | 1 to 40 points, each with every field below | |
+| `input[].charge` | powder charge, above 0 | g |
+| `input[].muzzleVelocity` | mean muzzle velocity of the string, above 0 | m/s |
+| `input[].shots` | shots of the string, a whole number above 0 | 1 |
+| `input[].barrelLength` | barrel length, above 0 | mm |
+| `input[].temperature` | powder temperature | degC |
+| `input[].caseCapacity` | water capacity of the case, above 0 | cm3 |
+| `input[].bulletMass` | bullet mass, above 0 | g |
+| `parameters` | the parameters the fit freed, each once: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor` | |
+| `options.prior` | optional: per freed parameter a Gaussian prior, `value` (the centre) and `sigma` (of the log parameter) | `value`: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1; `sigma`: 1 |
+| `options.loss` | `{ kind: 'quadratic' }` or `{ kind: 'huber', threshold }` | threshold in sigmas of the rows |
+| `date` | time of the fit, ISO 8601 in UTC | |
+| `model`, `modelVersion` | interior model (such as `m3`) and the version of the code that fitted | |
+| `confidence` | width class of the peak-pressure range: `tight`, `moderate` or `loose` | |
+| `reasons` | up to 20 reason names of the fit's confidence | |
+| `sessions` | up to 50 `user:<UUID>` references to the sessions the points came from, for information only | |
+| `previous` | optional: `user:<UUID>` of the powder record this one refits | |
+
+`sessions` and `previous` are never resolved: `checkUserRefs` does not report them and a share link does not count them as user references. The block is part of the user data file baseline (`apps/web/test/golden/user-data.json`, [release](../release.md#contract-baselines)).
+
 ## Decisions
 
 - The record attribute is `origin` with the values `catalogue`, `user` and `shared`. The citation's `origin` becomes `standing`.
