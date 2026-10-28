@@ -43,6 +43,7 @@ import type {
 import { runBatch } from '../lib/batch.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
+import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
@@ -171,7 +172,6 @@ import {
   firearmMassSpec,
   ladderSpec,
   maxLadderSteps,
-  measuredWaterCapacitySpec,
   modelFields,
   powderMoreFields,
   requiredModelKeys,

@@ -34,6 +34,7 @@ import {
   tables,
 } from '../lib/cartridge-designer.ts'
 import { groupLabel, meaningText, symbolText } from '../lib/cartridge-record.ts'
+import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
 import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } from '../lib/units.ts'
@@ -51,7 +52,6 @@ import { RecordSearch } from './record-search.tsx'
 import { EmptyNote, Loading } from './states.tsx'
 import { useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
-import { measuredWaterCapacitySpec } from './workbench-inputs.tsx'
 import { Workspace } from './workspace.tsx'
 
 const SeatingPreview = dynamic(

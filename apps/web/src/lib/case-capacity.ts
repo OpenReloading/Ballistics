@@ -1,4 +1,13 @@
 import { loadWaterCapacity } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
+
+/** The Cartridge card's measured case capacity, for the unit switch (the field is the preview's). */
+export const measuredWaterCapacitySpec = {
+  key: 'measuredWaterCapacity',
+  label: msg('Case capacity (H₂O)'),
+  quantity: 'capacity',
+  min: 0,
+} as const
 
 /**
  * The path that answers the case record `caseId` when the cartridge's case list has no such id: a
