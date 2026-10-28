@@ -7,7 +7,8 @@
   "page": "Seite L-74, PDF p. 74",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "rifle",
   "caliberClasses": {

@@ -7,7 +7,8 @@
   "page": "Teil C, Seite 12 bis 13 von 142, PDF pp. 12 to 13",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "service-pistol",
   "rules": {

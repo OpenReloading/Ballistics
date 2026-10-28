@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 272 bis 274 von 294, PDF pp. 272 to 274",
   "distance": {
     "value": 800000,
-    "raw": "800 Meter"
+    "raw": "800 Meter",
+    "unit": "m"
   },
   "category": "rifle",
   "rules": {

@@ -6,7 +6,8 @@
   "page": "Teil D, Seite 268 bis 269 von 294, PDF pp. 268 to 269",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "rules": {
     "firearm": "long-gun",

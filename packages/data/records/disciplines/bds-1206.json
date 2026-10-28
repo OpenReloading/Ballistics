@@ -7,7 +7,8 @@
   "page": "Seite K-16, PDF p. 16",
   "distance": {
     "value": 20000,
-    "raw": "5, 10, 15, 20 m"
+    "raw": "5, 10, 15, 20 m",
+    "unit": "m"
   },
   "category": "revolver",
   "rules": {

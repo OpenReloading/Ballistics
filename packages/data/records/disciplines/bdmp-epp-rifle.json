@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 232 bis 239 von 294, PDF pp. 232 to 239",
   "distance": {
     "value": 30000,
-    "raw": "30 m"
+    "raw": "30 m",
+    "unit": "m"
   },
   "category": "rifle",
   "rules": {

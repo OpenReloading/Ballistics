@@ -7,7 +7,8 @@
   "page": "Seite 32, PDF p. 90",
   "distance": {
     "value": 300000,
-    "raw": "300 Meter"
+    "raw": "300 Meter",
+    "unit": "m"
   },
   "category": "precision-rifle",
   "caliberClasses": {

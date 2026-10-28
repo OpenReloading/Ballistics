@@ -7,7 +7,8 @@
   "page": "Seite 9, PDF p. 41",
   "distance": {
     "value": 15000,
-    "raw": "10 und 15 Meter"
+    "raw": "10 und 15 Meter",
+    "unit": "m"
   },
   "caliberClasses": {
     "ids": [

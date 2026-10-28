@@ -7,7 +7,8 @@
   "page": "Teil E, Seite 13 bis 14 von 42, PDF pp. 13 to 14",
   "distance": {
     "value": 50000,
-    "raw": "50 m"
+    "raw": "50 m",
+    "unit": "m"
   },
   "category": "rifle",
   "rules": {

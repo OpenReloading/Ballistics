@@ -6,7 +6,8 @@
   "page": "Teil C, Seite 71 von 142, PDF p. 71",
   "distance": {
     "value": 25000,
-    "raw": "25 Meter/Yards"
+    "raw": "25 Meter/Yards",
+    "unit": "m/yd"
   },
   "category": "pistol",
   "rules": {

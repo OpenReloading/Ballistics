@@ -7,7 +7,8 @@
   "page": "Seite 17, PDF p. 75",
   "distance": {
     "value": 50000,
-    "raw": "50 Meter"
+    "raw": "50 Meter",
+    "unit": "m"
   },
   "caliberClasses": {
     "ids": ["rimfire-22"],

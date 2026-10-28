@@ -7,7 +7,8 @@
   "page": "Teil 10 Seite 15, PDF p. 435",
   "distance": {
     "value": 10000,
-    "raw": "10 m"
+    "raw": "10 m",
+    "unit": "m"
   },
   "category": "air-rifle",
   "caliberClasses": {

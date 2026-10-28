@@ -6,7 +6,8 @@
   "page": "p. 364 (PDF p. 364)",
   "distance": {
     "value": 25000,
-    "raw": "25m"
+    "raw": "25m",
+    "unit": "m"
   },
   "category": "pistol",
   "caliberClasses": {

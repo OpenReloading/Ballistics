@@ -7,7 +7,8 @@
   "page": "Teil C, Seite 36 bis 37 von 142, PDF pp. 36 to 37",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "pistol",
   "rules": {

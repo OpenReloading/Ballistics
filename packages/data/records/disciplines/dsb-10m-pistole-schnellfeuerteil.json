@@ -7,7 +7,8 @@
   "page": "Teil 0 Seite 80, PDF p. 98",
   "distance": {
     "value": 10000,
-    "raw": "10 m"
+    "raw": "10 m",
+    "unit": "m"
   },
   "rules": {
     "firearm": "short-gun",

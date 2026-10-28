@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 272 bis 274 von 294, PDF pp. 272 to 274",
   "distance": {
     "value": 300000,
-    "raw": "300 Meter"
+    "raw": "300 Meter",
+    "unit": "m"
   },
   "rules": {
     "firearm": "long-gun",

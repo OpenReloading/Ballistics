@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 203 bis 209 von 294, PDF pp. 203 to 209",
   "distance": {
     "value": 25000,
-    "raw": "25 Meter"
+    "raw": "25 Meter",
+    "unit": "m"
   },
   "category": "rifle",
   "rules": {

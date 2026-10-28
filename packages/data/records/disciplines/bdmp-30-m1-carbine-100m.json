@@ -6,7 +6,8 @@
   "page": "Teil D, Seite 42 bis 44 von 294, PDF pp. 42 to 44",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "carbine",
   "caliberClasses": {

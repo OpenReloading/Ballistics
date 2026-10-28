@@ -7,7 +7,8 @@
   "page": "Seite 59, PDF p. 117",
   "distance": {
     "value": 50000,
-    "raw": "50 Meter"
+    "raw": "50 Meter",
+    "unit": "m"
   },
   "rules": {
     "firearm": "long-gun",

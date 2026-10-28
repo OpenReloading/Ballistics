@@ -7,7 +7,8 @@
   "page": "Teil 0 Seite 81, PDF p. 99",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "pistol",
   "rules": {

@@ -7,7 +7,8 @@
   "page": "Seite 42, PDF p. 42",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "revolver",
   "caliberClasses": {

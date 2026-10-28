@@ -7,7 +7,8 @@
   "page": "Teil 0 Seite 76, PDF p. 94",
   "distance": {
     "value": 10000,
-    "raw": "10 m"
+    "raw": "10 m",
+    "unit": "m"
   },
   "caliberClasses": {
     "ids": ["air-4-5"],

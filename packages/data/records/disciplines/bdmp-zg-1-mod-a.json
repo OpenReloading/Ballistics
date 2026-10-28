@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 69 von 294, PDF p. 69",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "rifle",
   "rules": {

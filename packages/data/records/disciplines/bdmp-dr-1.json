@@ -7,7 +7,8 @@
   "page": "Teil C, Seite 76 bis 77 von 142, PDF pp. 76 to 77",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "revolver",
   "rules": {

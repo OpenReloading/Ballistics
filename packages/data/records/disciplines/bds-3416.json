@@ -7,7 +7,8 @@
   "page": "Seite Z-23, PDF p. 24",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "precision-rifle",
   "rules": {

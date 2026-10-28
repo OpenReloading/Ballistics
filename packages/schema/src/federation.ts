@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { recordId } from './ids.ts'
 import { provenance } from './provenance.ts'
 import { countryCode, positiveLength, sha256 } from './shared.ts'
-import { quantity } from './units.ts'
+import { quantity, units } from './units.ts'
 
 /**
  * Kind of discipline an event belongs to. One face serves several: the ISSF 25 m face carries
@@ -139,6 +139,12 @@ export const disciplineRules = z.strictObject({
 export interface DisciplineRules extends z.infer<typeof disciplineRules> {}
 
 /**
+ * The unit a rule book states a discipline's distance in: metres, yards, or both
+ * ("50 Meter/Yards"), where the same number applies to each.
+ */
+export const distanceUnit = z.enum(['m', 'yd', 'm/yd'])
+
+/**
  * A discipline (match, course of fire) of one federation as its rule book defines it.
  * Inferred type: {@link Discipline}.
  */
@@ -154,7 +160,11 @@ export const discipline = z.strictObject({
   section: z.string().min(1),
   /** Page of that section (printed page, PDF page). */
   page: z.string().min(1),
-  distance: positiveLength(),
+  /**
+   * Distance in mm. `unit` is the unit the rule book states: the number is as printed, so `m/yd`
+   * keeps the metric reading in `value` and a yards-only record holds the yards converted.
+   */
+  distance: positiveLength().extend({ unit: distanceUnit }).meta({ unit: units.length }),
   /** Kind of firearm, where the rule book states it. */
   category: disciplineCategory.optional(),
   /**

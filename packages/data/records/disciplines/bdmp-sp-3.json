@@ -7,7 +7,8 @@
   "page": "Teil C, Seite 82 bis 83 von 142, PDF pp. 82 to 83",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "rules": {
     "firearm": "short-gun",

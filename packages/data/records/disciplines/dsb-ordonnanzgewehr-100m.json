@@ -7,7 +7,8 @@
   "page": "Teil 1 Seite 17, PDF p. 129",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "service-rifle",
   "rules": {
