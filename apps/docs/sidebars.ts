@@ -42,6 +42,7 @@ const sidebars: SidebarsConfig = {
       'load-notes',
     ]),
     'models/least-squares',
+    'models/validation',
     {
       type: 'category',
       label: 'Research log',
