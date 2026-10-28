@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 87 bis 90 von 294, PDF pp. 87 to 90",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "lever-action",
   "provenance": {

@@ -17,8 +17,8 @@ export interface DirectoryState {
   compareIds?: string
   /** Bullets: the id of a cartridge; only the bullets that fit it by the CIP rule (`fitRule`). */
   fits?: string
-  /** Disciplines: the federation's abbreviation, from the federation record's link. URL key `org`. */
-  organization?: string
+  /** The values chosen per choice filter (`facets.ts`), under the filter's key as URL key, comma-separated. */
+  facets?: Record<string, string[]>
 }
 
 export const emptyDirectory: DirectoryState = { query: '', sort: undefined }
@@ -28,7 +28,7 @@ export const noFilters: Partial<DirectoryState> = {
   ...emptyDirectory,
   sources: '',
   fits: '',
-  organization: '',
+  facets: {},
 }
 
 /** Each field with its URL key, in the URL's order; the first is in every state. */
@@ -37,18 +37,25 @@ const urlKeys = [
   ['sources', 'src'],
   ['compareIds', 'pick'],
   ['fits', 'fits'],
-  ['organization', 'org'],
 ] as const satisfies readonly (readonly [Exclude<keyof DirectoryState, 'sort'>, string])[]
 
-export function readDirectory(search: string): DirectoryState {
+/** `search` read into a state; `facetKeys` are the choice filters of the list, read where the URL has them. */
+export function readDirectory(search: string, facetKeys: readonly string[] = []): DirectoryState {
   const p = new URLSearchParams(search)
   const sort = p.get('sort') ?? ''
+  const facets = Object.fromEntries(
+    facetKeys.flatMap((k) => {
+      const values = (p.get(k) ?? '').split(',').filter(Boolean)
+      return values.length > 0 ? [[k, values]] : []
+    }),
+  )
   return {
     query: p.get('q') ?? '',
     // the keys of one list only where the URL has them
     ...Object.fromEntries(
       urlKeys.slice(1).flatMap(([field, key]) => (p.has(key) ? [[field, p.get(key)]] : [])),
     ),
+    ...(Object.keys(facets).length > 0 && { facets }),
     sort: sort
       ? sort.startsWith('-')
         ? { column: sort.slice(1), dir: 'descending' }
@@ -57,14 +64,29 @@ export function readDirectory(search: string): DirectoryState {
   }
 }
 
-/** `search` with the state's parameters replaced; other parameters (such as `units`) stay. */
-export function writeDirectory(state: DirectoryState, search: string): string {
+/**
+ * `search` with the state's parameters replaced; other parameters (such as `units`) stay. The
+ * parameters of `facetKeys` and of the facets in the state are replaced too.
+ */
+export function writeDirectory(
+  state: DirectoryState,
+  search: string,
+  facetKeys: readonly string[] = [],
+): string {
   const p = new URLSearchParams(search)
-  for (const k of [...urlKeys.map(([, key]) => key), 'sort']) p.delete(k)
+  const facets = Object.entries(state.facets ?? {})
+  for (const k of [
+    ...urlKeys.map(([, key]) => key),
+    'sort',
+    ...facetKeys,
+    ...facets.map(([k]) => k),
+  ])
+    p.delete(k)
   for (const [field, key] of urlKeys) {
     const v = state[field]
     if (v?.trim()) p.set(key, v)
   }
+  for (const [k, values] of facets) if (values.length > 0) p.set(k, values.join(','))
   if (state.sort) p.set('sort', `${state.sort.dir === 'descending' ? '-' : ''}${state.sort.column}`)
   const s = p.toString().replaceAll('%2C', ',').replaceAll('%2F', '/')
   return s ? `?${s}` : ''

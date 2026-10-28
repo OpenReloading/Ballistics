@@ -121,7 +121,7 @@ function FederationRecordView({
               own.length > 0 && (
                 <LinkButton
                   size={controlSize.row.button}
-                  href={`/disciplines${writeDirectory({ ...emptyDirectory, organization: f.abbreviation }, '')}`}
+                  href={`/disciplines${writeDirectory({ ...emptyDirectory, facets: { org: [f.abbreviation] } }, '')}`}
                 >
                   In the discipline list
                 </LinkButton>
