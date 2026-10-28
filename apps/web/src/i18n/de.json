@@ -836,7 +836,6 @@
   "The API answered {status}.": "Die API antwortete mit {status}.",
   "The API did not answer.": "Die API hat nicht geantwortet.",
   "The API is unreachable.": "Die API ist nicht erreichbar.",
-  "the bore resistance of the powder needs {list}": "Der Laufwiderstand des Treibladungspulvers braucht {list}",
   "The English text is binding.": "Der englische Text ist verbindlich.",
   "The Ladder table gives the values.": "Die Tabelle der Ladeleiter nennt die Werte.",
   "The band covers the input tolerances only, no model error: {list}.": "Das Band deckt nur die Eingabetoleranzen ab, keinen Modellfehler: {list}.",

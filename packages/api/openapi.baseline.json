@@ -1829,6 +1829,11 @@
                             "enum": ["new", "fired", "sized"],
                             "description": "The condition of the measured case."
                           },
+                          "convention": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "How the water was filled: fill level, water temperature and primer state, as the source states them. Absent: the default convention of the docs. The volume derived from `waterCapacity` does not read it."
+                          },
                           "note": {
                             "type": "string",
                             "minLength": 1,
@@ -19080,6 +19085,11 @@
                                   "type": "string",
                                   "enum": ["new", "fired", "sized"],
                                   "description": "The condition of the measured case."
+                                },
+                                "convention": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "How the water was filled: fill level, water temperature and primer state, as the source states them. Absent: the default convention of the docs. The volume derived from `waterCapacity` does not read it."
                                 },
                                 "note": {
                                   "type": "string",
