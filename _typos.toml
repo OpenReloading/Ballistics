@@ -28,6 +28,15 @@ extend-ignore-re = [
   "Sek\\. Serie",
   # German organization name in the bibliography
   "Bund Deutscher",
+  # German texts that the tests of the message mapping and the workbench warnings expect
+  "Geben Sie eine Zahl für .* ein\\.",
+  "muss positiv sein",
+  "größer als 0 sein",
+  "unter dem 2,2-Fachen",
+  "Das obere Ende des simulierten Gasdruckbereichs",
+  "klein für das Modell",
+  "für den das Modell gebaut wurde",
+  "0,6[0-9]; das Modell liegt",
 ]
 
 [default.extend-words]

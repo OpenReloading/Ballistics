@@ -175,10 +175,10 @@ export const tableBurntFractions = Array.from({ length: 11 }, (_, i) => i / 10)
 export const vivacityUnit = '1/(MPa·s)'
 
 /** What a curve is: the caption of a powder record's chart. */
-export const modelCaption = 'Model output from fitted M3 parameters, not manufacturer data.'
+const modelCaption = 'Model output from fitted M3 parameters, not manufacturer data.'
 
 /** What the band of a curve and the bar of a mean cover. */
-export const bandNote = `plus and minus ${uncertaintyFactor} standard uncertainties of the fitted vivacity, a lower bound`
+const bandNote = `plus and minus ${uncertaintyFactor} standard uncertainties of the fitted vivacity, a lower bound`
 
 export const modelNote = `${modelCaption} Band and bars: ${bandNote}.`
 
