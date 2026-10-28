@@ -1672,6 +1672,7 @@
   "entered": "eingegeben",
   "entry kind {kind}": "Unbekannte Art des Eintrags: {kind}",
   "entry value": "Wert des Eintrags ungültig",
+  "every string needs at least one velocity": "Jede Schussreihe braucht mindestens eine Geschwindigkeit",
   "exponent needs a start value above 0": "exponent braucht einen Startwert über 0",
   "exponent {exponent}": "Exponent {exponent}",
   "extractor groove diameter": "Durchmesser der Auszieherrille",
