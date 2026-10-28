@@ -49,12 +49,25 @@ export interface DispersionInput {
     /** Change of the height of impact per metre of range at the distance, m/m. */
     verticalPerMetre: number
   }
+  /** Spread of the muzzle speed; absent: none, and the group is scaled as a whole. */
+  velocity?: {
+    /** Standard deviation of the muzzle speed, m/s. */
+    sd: number
+    /** Change of the height of impact per m/s of muzzle speed at the distance, m per m/s. */
+    verticalPerSpeed: number
+    /** The same at the reference distance, m per m/s. */
+    referenceVerticalPerSpeed: number
+  }
 }
 
-/** The point dispersion with its parts: the group scaled to the distance, the wind and the range. */
+/** The point dispersion with its parts: the group scaled to the distance, the wind, the range and the muzzle speed. */
 export interface DispersionResult extends PointDispersion {
-  /** Standard deviation along x from the group, the wind and the range, m. */
-  parts: { group: PointDispersion; wind: number; range: number }
+  /**
+   * The parts, m. `group` is the group scaled to the distance, without its muzzle speed part when
+   * the input has a speed spread; `wind` is along x, `range` and `velocity` along y, `velocity`
+   * present only with a speed spread.
+   */
+  parts: { group: PointDispersion; wind: number; range: number; velocity?: number }
 }
 
 /**
@@ -62,12 +75,27 @@ export interface DispersionResult extends PointDispersion {
  * horizontal axis and the range uncertainty on the vertical axis, added as independent variances.
  * The crosswind is `speed sin(from)`; its variance follows from the speed and direction
  * uncertainties to first order: `sin(from)^2 speedSd^2 + (speed cos(from) directionSd)^2`.
+ * With a muzzle speed spread, the height part it already contributed to the group at the reference
+ * distance is taken out of the vertical group before the linear scaling, and the part at the
+ * distance is added: the height part grows faster than the distance.
  */
 export function pointDispersion(i: DispersionInput): DispersionResult {
   need(i.referenceDistance > 0 && i.distance > 0, 'distances must be positive')
   need(i.group.horizontal > 0 && i.group.vertical > 0, 'the group dispersion must be positive')
   const k = i.distance / i.referenceDistance
-  const group = { horizontal: i.group.horizontal * k, vertical: i.group.vertical * k }
+  let velocity = 0
+  let intrinsic = i.group.vertical
+  if (i.velocity) {
+    need(i.velocity.sd >= 0, 'the speed spread must not be negative')
+    const atReference = Math.abs(i.velocity.referenceVerticalPerSpeed) * i.velocity.sd
+    need(
+      atReference < i.group.vertical,
+      'the height spread from the muzzle speed exceeds the vertical spread of the group',
+    )
+    intrinsic = Math.sqrt(i.group.vertical ** 2 - atReference ** 2)
+    velocity = Math.abs(i.velocity.verticalPerSpeed) * i.velocity.sd
+  }
+  const group = { horizontal: i.group.horizontal * k, vertical: intrinsic * k }
   let wind = 0
   if (i.wind) {
     need(
@@ -87,8 +115,8 @@ export function pointDispersion(i: DispersionInput): DispersionResult {
   }
   return {
     horizontal: Math.hypot(group.horizontal, wind),
-    vertical: Math.hypot(group.vertical, range),
-    parts: { group, wind, range },
+    vertical: Math.hypot(group.vertical, range, velocity),
+    parts: { group, wind, range, ...(i.velocity ? { velocity } : {}) },
   }
 }
 
