@@ -82,6 +82,16 @@ describe('start pressure held once and resisted again', () => {
       fired(withLoad({ resistance: { friction: 1e6, ...ramp(2e6) }, startPressure: 3e6 + 1 })),
     ).toContain(id)
   })
+  it('fires for a profile that rises after travel 0 and says the lower resistance is the one at travel 0', () => {
+    const resistance = {
+      engraving: [
+        { travel: 0, pressure: 2e6 },
+        { travel: 0.001, pressure: 4e6 },
+      ],
+    }
+    expect(fired(withLoad({ resistance, startPressure: 3e6 }))).toContain(id)
+    expect(advisoryRule[id].message).toContain('lower bore resistance at travel 0')
+  })
   it('does not fire at the floor, without engraving at travel 0 or with friction only', () => {
     expect(fired(withLoad({ resistance: ramp(2e6), startPressure: 2e6 }))).not.toContain(id)
     expect(fired(withLoad({ resistance: ramp(0), startPressure: 3e6 }))).not.toContain(id)

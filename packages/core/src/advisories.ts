@@ -119,7 +119,7 @@ export const advisoryRules: readonly AdvisoryRule[] = [
     inputs: ['startPressure', 'ignitionPressure', 'resistance.friction', 'resistance.engraving'],
     name: 'start pressure held once',
     message:
-      'The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then resisted at the lower bore resistance.',
+      'The start pressure is above the bore resistance at travel 0 and above the ignition pressure, and the engraving pressure at travel 0 is not 0, so the projectile is held until the start pressure and then starts against the lower bore resistance at travel 0, after which the engraving profile applies.',
     fix: 'Set the start pressure to the bore resistance at travel 0 or below, or the engraving pressure at travel 0 to 0.',
   },
 ]
