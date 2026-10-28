@@ -4,11 +4,13 @@
  * down, a pixel (i, j) covering [i, i + 1) x [j, j + 1). Pure: no React, DOM or Next.js, so it can
  * run in a Web Worker.
  */
+import { msg } from '../i18n/translate.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
 import { clamp, components } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 import { otsu } from './target-paper.ts'
+import { type Wording, worded } from './wording.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 const at = (a: ArrayLike<number>, i: number) => a[i] as number
@@ -37,7 +39,7 @@ export interface Segmentation {
   height: number
   alpha: Uint8Array
   /** Sentences for the user, empty when the cut looks sound. */
-  warnings: string[]
+  warnings: Wording[]
   /** Gap between the mean grey of the bullet and of the background, grey levels; 0 without a cut-out. */
   contrast: number
   /** The width the grey takes to go from the background to the bullet at the cut-out's edge, px (1 for a sharp edge); 0 for a cut-out not found or corrected by hand. */
@@ -355,10 +357,15 @@ function edgeSpreadOf(
 }
 
 /** The sentence about edges spread over more than 4 px and more than 4 % of the bullet's thickness. */
-function softEdgeWarning(spread: number, thickness: number): string[] {
+function softEdgeWarning(spread: number, thickness: number): Wording[] {
   return spread > Math.max(4, 0.04 * thickness)
     ? [
-        `The edges of the bullet are soft, about ${Math.round(spread)} px wide: a shadow beside the bullet, or the photograph is out of focus or moved. Measured values are less certain; a sharp photograph in even light gives a more exact outline.`,
+        worded(
+          msg(
+            'The edges of the bullet are soft, about {spread} px wide: a shadow beside the bullet, or the photograph is out of focus or moved. Measured values are less certain; a sharp photograph in even light gives a more exact outline.',
+          ),
+          { spread: Math.round(spread) },
+        ),
       ]
     : []
 }
@@ -460,7 +467,7 @@ function coverOf(
  */
 export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const { width: w, height: h } = g
-  const none = (warning: string): Segmentation => ({
+  const none = (warning: Wording): Segmentation => ({
     width: w,
     height: h,
     alpha: new Uint8Array(w * h),
@@ -477,13 +484,13 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   const backgroundHigh = borderLevel(g) > t0
   const flat = flatten(g, (v) => v > t0 === backgroundHigh)
   const grey = levels(flat, w, h)
-  if (!grey) return none('The photograph has one grey only.')
+  if (!grey) return none(msg('The photograph has one grey only.'))
   const gap = Math.abs(grey[1] - grey[0])
   if (gap < minContrast)
-    return none('The bullet and the background are too alike in brightness to tell apart.')
+    return none(msg('The bullet and the background are too alike in brightness to tell apart.'))
   const cover = coverOf(flat, grey, [w, h], exclude)
   if (!cover)
-    return none('No bullet found: no part of the photograph stands out from the background.')
+    return none(msg('No bullet found: no part of the photograph stands out from the background.'))
 
   const { soft, contrast, best, thickness, rivals } = cover
   const box = padded(best, 4, w, h)
@@ -494,18 +501,25 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
   for (let i = 0; i < alpha.length; i++)
     alpha[i] = at(eroded, i) ? 255 : at(dilated, i) ? Math.round(255 * soft(i)) : 0
   const edgeSpread = edgeSpreadOf(flat, mask, w, box, contrast)
-  const warnings = [
+  const warnings: Wording[] = [
     ...(best.edge
-      ? ['The cut-out touches the edge of the photograph: the whole bullet may not be in it.']
+      ? [msg('The cut-out touches the edge of the photograph: the whole bullet may not be in it.')]
       : []),
     ...(gap < lowContrast
       ? [
-          `The bullet differs from the background by ${Math.round(gap)} grey levels only: the outline may be rough. A plainer background, or one much lighter or darker than the bullet, gives a better cut-out.`,
+          worded(
+            msg(
+              'The bullet differs from the background by {gap} grey levels only: the outline may be rough. A plainer background, or one much lighter or darker than the bullet, gives a better cut-out.',
+            ),
+            { gap: Math.round(gap) },
+          ),
         ]
       : []),
     ...(rivals
       ? [
-          'Another object about as large as the bullet is in the photograph. Check that the one cut out is the bullet, or photograph one bullet alone, or paint the others out with the brush.',
+          msg(
+            'Another object about as large as the bullet is in the photograph. Check that the one cut out is the bullet, or photograph one bullet alone, or paint the others out with the brush.',
+          ),
         ]
       : []),
     ...softEdgeWarning(edgeSpread, thickness),

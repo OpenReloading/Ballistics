@@ -17,6 +17,8 @@ import {
 import { Bug } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import web from '../../package.json'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg } from '../i18n/translate.ts'
 import {
   type ReportArea,
   type ReportBlock,
@@ -36,7 +38,32 @@ import { type ReportOption, reportHost } from './report-host.ts'
 import { useUnits } from './units-settings.tsx'
 import { useRoute } from './use-route.ts'
 
-const label = 'Report an issue'
+const label = msg('Report an issue')
+
+/** The areas and types as the dialog shows them; the report itself carries the English value. */
+const areaLabels: Record<ReportArea, Message> = {
+  Workbench: msg('Workbench'),
+  'Shot groups': msg('Shot groups'),
+  'Session summary': msg('Session summary'),
+  Cartridges: msg('Cartridges'),
+  Bullets: msg('Bullets'),
+  Powders: msg('Powders'),
+  Cases: msg('Cases'),
+  Primers: msg('Primers'),
+  Targets: msg('Targets'),
+  Disciplines: msg('Disciplines'),
+  Federations: msg('Federations'),
+  Firearms: msg('Firearms'),
+  'Cartridge designer': msg('Cartridge designer'),
+  'Bullet designer': msg('Bullet designer'),
+  Settings: msg('Settings'),
+  Other: msg('Other'),
+}
+const typeLabels: Record<ReportType, Message> = {
+  Bug: msg('Bug'),
+  'Wrong data': msg('Wrong data'),
+  Idea: msg('Idea'),
+}
 
 /**
  * Report an issue: an icon left of the repository link in the top bar from 75em, a labelled row in
@@ -51,16 +78,17 @@ export function ReportIssueButton({
   drawer?: boolean
   onOpen: () => void
 }) {
+  const { t } = useTranslation()
   if (!url) return null
   const icon = <Bug size={20} aria-hidden="true" />
   if (drawer)
-    return <NavLink component="button" label={label} leftSection={icon} onClick={onOpen} />
+    return <NavLink component="button" label={t(label)} leftSection={icon} onClick={onOpen} />
   return (
-    <Tooltip label={label}>
+    <Tooltip label={t(label)}>
       <ActionIcon
         variant="default"
         visibleFrom="lg"
-        aria-label={label}
+        aria-label={t(label)}
         className="report-issue"
         onClick={onOpen}
       >
@@ -108,6 +136,7 @@ export function ReportIssueDialog({
   onClose: () => void
 }) {
   const route = useRoute()
+  const { t } = useTranslation()
   const context = useContextNow(opened, route)
   const [area, setArea] = useState<ReportArea>('Other')
   const [type, setType] = useState<ReportType>('Bug')
@@ -145,12 +174,12 @@ export function ReportIssueDialog({
     <AppModal
       opened={opened}
       onClose={onClose}
-      title={label}
+      title={t(label)}
       size="lg"
       footer={
         <Group justify="flex-end" gap="xs" p="md" pt={0}>
           <Button variant="default" onClick={onClose}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button
             component="a"
@@ -160,7 +189,7 @@ export function ReportIssueDialog({
             onClick={onClose}
             disabled={!url}
           >
-            Open on GitHub
+            {t('Open on GitHub')}
           </Button>
         </Group>
       }
@@ -168,27 +197,27 @@ export function ReportIssueDialog({
       <Stack gap="xs">
         <Group gap="xs" align="flex-end" wrap="wrap">
           <Select
-            label="Area"
+            label={t('Area')}
             allowDeselect={false}
-            data={reportAreas}
+            data={reportAreas.map((a) => ({ value: a, label: t(areaLabels[a]) }))}
             value={area}
             onChange={(v) => v && setArea(v as ReportArea)}
             comboboxProps={{ withinPortal: false }}
           />
           <Stack gap={4}>
             <Text size="sm" fw={500} id="report-type">
-              Type
+              {t('Type')}
             </Text>
             <SegmentedControl
               aria-labelledby="report-type"
-              data={[...reportTypes]}
+              data={reportTypes.map((r) => ({ value: r, label: t(typeLabels[r]) }))}
               value={type}
               onChange={(v) => setType(v as ReportType)}
             />
           </Stack>
         </Group>
         <Textarea
-          label={reportQuestion(type)}
+          label={t(reportQuestion(type))}
           autosize
           minRows={3}
           maxRows={8}
@@ -209,8 +238,8 @@ export function ReportIssueDialog({
           />
         ))}
         <Textarea
-          label="Sent with the report"
-          description="Public on GitHub. No photos, files or other records of this browser."
+          label={t('Sent with the report')}
+          description={t('Public on GitHub. No photos, files or other records of this browser.')}
           readOnly
           autosize
           minRows={4}

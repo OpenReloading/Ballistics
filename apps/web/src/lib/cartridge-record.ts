@@ -53,6 +53,13 @@ const shotshellMeanings = new Map<string, string>([
  * the catalogue test requires the word for a shooting position in every text that says position.
  */
 const meaningMessages: Readonly<Record<string, Message>> = {
+  'rim diameter at the head': msg('rim diameter at the head'),
+  'head to the start of P1; in the chamber the depth of the rim recess': msg(
+    'head to the start of P1; in the chamber the depth of the rim recess',
+  ),
+  'rim chamfer length along the axis': msg('rim chamfer length along the axis'),
+  'rim chamfer angle from the head face': msg('rim chamfer angle from the head face'),
+  'radius of the rim corner at the head face': msg('radius of the rim corner at the head face'),
   'extractor groove diameter': msg('extractor groove diameter'),
   'extractor groove width at E1': msg('extractor groove width at E1'),
   'groove front cone angle from the axis (table III: belt cone)': msg(
@@ -105,7 +112,8 @@ const meaningMessages: Readonly<Record<string, Message>> = {
   'rim recess depth': msg('rim recess depth'),
 }
 
-const meaningText = (meaning: string, t: Translate) => {
+/** What a symbol stands for (its English text) in the language of `t`. */
+export const meaningText = (meaning: string, t: Translate) => {
   const known = meaningMessages[meaning]
   return known ? t(known) : meaning
 }

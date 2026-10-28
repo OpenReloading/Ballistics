@@ -13,40 +13,46 @@ import {
 import { useMediaQuery } from '@mantine/hooks'
 import { fromSi, toSi } from '@open-reloading/schema'
 import { useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { fixedNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { Design } from '../lib/bullet-designer.ts'
 import { paintPhoto } from '../lib/bullet-photo-canvas.ts'
 import { type PhotoRow, storedText, valueText } from '../lib/bullet-photo-design.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
+import { say } from '../lib/wording.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { type MessageEntry, MessageSlot } from './states.tsx'
 import { distanceSpec, useBulletPhoto } from './use-bullet-photo.ts'
 import { type Tool, usePhotoPointer } from './use-photo-pointer.ts'
 
-const tools: { value: Tool; label: string }[] = [
-  { value: 'scale', label: 'Place scale points' },
-  { value: 'add', label: 'Brush: add' },
-  { value: 'erase', label: 'Brush: erase' },
+const tools: { value: Tool; label: Message }[] = [
+  { value: 'scale', label: msg('Place scale points') },
+  { value: 'add', label: msg('Brush: add') },
+  { value: 'erase', label: msg('Brush: erase') },
 ]
 
 type PhotoState = ReturnType<typeof useBulletPhoto>
 
 /** The messages about the photograph and the cut-out. */
-function stateMessages(t: PhotoState): MessageEntry[] {
-  const outlined = t.found?.outline
-  const empty = t.cut && !outlined && !t.busy
+function stateMessages(p: PhotoState, t: Translator['t']): MessageEntry[] {
+  const outlined = p.found?.outline
+  const empty = p.cut && !outlined && !p.busy
   return [
-    ...(t.failure ? [{ severity: 'error', text: t.failure } as const] : []),
-    ...t.warnings.map((text) => ({ severity: 'warning', text }) as const),
-    ...(t.found?.unusable ? [{ severity: 'error', text: t.found.unusable } as const] : []),
-    ...(t.found?.hints ?? []).map((text) => ({ severity: 'warning', text }) as const),
+    // a failure is a message of the tool, else the browser's own text, which shows as written
+    ...(p.failure ? [{ severity: 'error', text: t(p.failure as Message) } as const] : []),
+    ...p.warnings.map((w) => ({ severity: 'warning', text: say(t, w) }) as const),
+    ...(p.found?.unusable ? [{ severity: 'error', text: say(t, p.found.unusable) } as const] : []),
+    ...(p.found?.hints ?? []).map((w) => ({ severity: 'warning', text: say(t, w) }) as const),
     ...(empty
       ? [
           {
             severity: 'warning',
-            text: 'No bullet is outlined: brush the bullet in, or place the scale points on the ruler.',
+            text: t(
+              'No bullet is outlined: brush the bullet in, or place the scale points on the ruler.',
+            ),
           } as const,
         ]
       : []),
@@ -54,15 +60,19 @@ function stateMessages(t: PhotoState): MessageEntry[] {
       ? [
           {
             severity: 'info',
-            text: 'The nose end was chosen by its longer taper, which is close here: flip the nose if it is wrong.',
+            text: t(
+              'The nose end was chosen by its longer taper, which is close here: flip the nose if it is wrong.',
+            ),
           } as const,
         ]
       : []),
-    ...(t.size && !t.scale
+    ...(p.size && !p.scale
       ? [
           {
             severity: 'info',
-            text: 'Place two points on the ruler and enter the distance between them, or enter the diameter or overall length you measured with a caliper, to get values.',
+            text: t(
+              'Place two points on the ruler and enter the distance between them, or enter the diameter or overall length you measured with a caliper, to get values.',
+            ),
           } as const,
         ]
       : []),
@@ -70,15 +80,30 @@ function stateMessages(t: PhotoState): MessageEntry[] {
 }
 
 /** The messages about the values: what could not be told, and where the photograph and the chosen record disagree. */
-function valueMessages(t: PhotoState, record: Design['origin']): MessageEntry[] {
-  const differing = t.rows.filter((r) => r.differs).map((r) => r.spec.label.toLowerCase())
+function valueMessages(
+  p: PhotoState,
+  record: Design['origin'],
+  t: Translator['t'],
+): MessageEntry[] {
+  const differing = p.rows.filter((r) => r.differs).map((r) => t(r.spec.label).toLowerCase())
+  const values = differing.join(', ')
   return [
-    ...(t.found?.measurement?.notes ?? []).map((text) => ({ severity: 'info', text }) as const),
+    ...(p.found?.measurement?.notes ?? []).map(
+      (w) => ({ severity: 'info', text: say(t, w) }) as const,
+    ),
     ...(differing.length > 0
       ? [
           {
             severity: 'warning',
-            text: `The photograph differs from ${record?.title ?? 'the chosen record'} in ${differing.join(', ')} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.`,
+            text: record
+              ? t(
+                  'The photograph differs from {record} in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.',
+                  { record: record.title, values },
+                )
+              : t(
+                  'The photograph differs from the chosen record in {values} by more than its uncertainty. Check the scale points and the cut-out; the record is not changed.',
+                  { values },
+                ),
           } as const,
         ]
       : []),
@@ -92,11 +117,12 @@ export function DistanceField({
   value,
   onChange,
 }: {
-  label: string
+  label: Message
   system: UnitSystem
   value: FieldValue
   onChange: (v: FieldValue) => void
 }) {
+  const { t } = useTranslation()
   const spec = distanceSpec(label)
   return (
     <NumberField
@@ -104,63 +130,65 @@ export function DistanceField({
       system={system}
       value={value}
       onChange={onChange}
-      error={(shown) => fieldError(spec, value, shown)}
+      error={(shown) => fieldError(spec, value, shown, t)}
     />
   )
 }
 
 /** The scale controls: the two distances on the ruler and the sizes read off a caliper. */
-function ScaleControls({ system, t }: { system: UnitSystem; t: PhotoState }) {
+function ScaleControls({ system, p }: { system: UnitSystem; p: PhotoState }) {
   const set = (i: 0 | 1) => (v: FieldValue) =>
-    t.setDistances(([a, b]) => (i === 0 ? [v, b] : [a, v]))
+    p.setDistances(([a, b]) => (i === 0 ? [v, b] : [a, v]))
   const setKnown = (i: 0 | 1) => (v: FieldValue) =>
-    t.setKnown(([a, b]) => (i === 0 ? [v, b] : [a, v]))
+    p.setKnown(([a, b]) => (i === 0 ? [v, b] : [a, v]))
+  const { t } = useTranslation()
   return (
     <>
       <Text fz="sm">
-        Click or tap the graduation of the ruler at two points, A and B, then enter their distance.
-        Drag a point to move it. A second pair, C and D, checks the first.
+        {t(
+          'Click or tap the graduation of the ruler at two points, A and B, then enter their distance. Drag a point to move it. A second pair, C and D, checks the first.',
+        )}
       </Text>
       <DistanceField
-        label="Distance A to B"
+        label={msg('Distance A to B')}
         system={system}
-        value={t.distances[0]}
+        value={p.distances[0]}
         onChange={set(0)}
       />
       <DistanceField
-        label="Distance C to D (optional)"
+        label={msg('Distance C to D (optional)')}
         system={system}
-        value={t.distances[1]}
+        value={p.distances[1]}
         onChange={set(1)}
       />
       <Button
         variant="default"
-        disabled={t.points.length === 0}
+        disabled={p.points.length === 0}
         onClick={() => {
-          t.setPoints([])
-          t.setDistances([
+          p.setPoints([])
+          p.setDistances([
             { text: '', si: undefined },
             { text: '', si: undefined },
           ])
         }}
       >
-        Clear the scale
+        {t('Clear the scale')}
       </Button>
       <Text fz="sm">
-        Sizes measured with a caliper give the scale where the photograph has no ruler, and check
-        the ruler where it has. Both together also show a bullet that is tilted or a cut-out that
-        includes a shadow.
+        {t(
+          'Sizes measured with a caliper give the scale where the photograph has no ruler, and check the ruler where it has. Both together also show a bullet that is tilted or a cut-out that includes a shadow.',
+        )}
       </Text>
       <DistanceField
-        label="Diameter, caliper (optional)"
+        label={msg('Diameter, caliper (optional)')}
         system={system}
-        value={t.known[0]}
+        value={p.known[0]}
         onChange={setKnown(0)}
       />
       <DistanceField
-        label="Overall length, caliper (optional)"
+        label={msg('Overall length, caliper (optional)')}
         system={system}
-        value={t.known[1]}
+        value={p.known[1]}
         onChange={setKnown(1)}
       />
     </>
@@ -177,24 +205,25 @@ function ValuesTable({
   system: UnitSystem
   record: Design['origin']
 }) {
+  const { t } = useTranslation()
   return (
-    <Table className="field-table" aria-label="Values measured from the photograph">
+    <Table className="field-table" aria-label={t('Values measured from the photograph')}>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th>Value</Table.Th>
-          <Table.Th>Measured, with standard uncertainty</Table.Th>
+          <Table.Th>{t('Value')}</Table.Th>
+          <Table.Th>{t('Measured, with standard uncertainty')}</Table.Th>
           {record && <Table.Th>{record.title}</Table.Th>}
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
         {rows.map((r) => (
           <Table.Tr key={r.spec.key} data-differs={r.differs || undefined}>
-            <Table.Th scope="row">{r.spec.label}</Table.Th>
+            <Table.Th scope="row">{t(r.spec.label)}</Table.Th>
             <Table.Td>{valueText(r.spec, system, r.value)}</Table.Td>
             {record && (
               <Table.Td>
-                {r.record === undefined ? 'not given' : storedText(r.spec, system, r.record)}
-                {r.differs && ' (differs)'}
+                {r.record === undefined ? t('not given') : storedText(r.spec, system, r.record)}
+                {r.differs && ` ${t('(differs)')}`}
               </Table.Td>
             )}
           </Table.Tr>
@@ -219,9 +248,10 @@ function PhotoTool({
   record: Design['origin']
   onOpen: (d: Design) => Promise<boolean>
 }) {
-  const t = useBulletPhoto(system, record)
+  const p = useBulletPhoto(system, record)
+  const { t } = useTranslation()
   const id = useId()
-  const { size, points, found, scale, drawing } = t
+  const { size, points, found, scale, drawing } = p
   const shown = useRef<HTMLCanvasElement>(null)
   const [tool, setTool] = useState<Tool>('scale')
   const [brush, setBrush] = useState(12)
@@ -231,17 +261,17 @@ function PhotoTool({
     tool,
     brush,
     points,
-    setPoints: t.setPoints,
-    stamp: t.stamp,
+    setPoints: p.setPoints,
+    stamp: p.stamp,
   })
   const { cursor } = pointer
 
   // the picture
   useEffect(() => {
     const g = shown.current?.getContext('2d')
-    if (!(g && t.photo.current && t.tint.current)) return
-    paintPhoto(g, t.photo.current, t.tint.current, {
-      hasCut: t.cut !== undefined,
+    if (!(g && p.photo.current && p.tint.current)) return
+    paintPhoto(g, p.photo.current, p.tint.current, {
+      hasCut: p.cut !== undefined,
       outline: found?.outline,
       drawing:
         drawing && scale
@@ -252,10 +282,10 @@ function PhotoTool({
       cursor,
       brush: tool === 'scale' ? undefined : brush,
     })
-  }, [t.photo, t.tint, t.cut, found, drawing, scale, opacity, points, cursor, tool, brush])
+  }, [p.photo, p.tint, p.cut, found, drawing, scale, opacity, points, cursor, tool, brush])
 
   const turned = found?.outline && fromSi('angle', found.outline.angle)
-  const messages = [...stateMessages(t), ...valueMessages(t, record)]
+  const messages = [...stateMessages(p, t), ...valueMessages(p, record, t)]
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
       <div style={{ flex: '2 1 28rem', minWidth: 0 }}>
@@ -266,7 +296,7 @@ function PhotoTool({
           height={size?.height ?? 1}
           tabIndex={size ? 0 : -1}
           role="application"
-          aria-label="Photograph of the bullet"
+          aria-label={t('Photograph of the bullet')}
           aria-describedby={`${id}-keys`}
           onPointerDown={pointer.down}
           onPointerMove={pointer.move}
@@ -284,57 +314,60 @@ function PhotoTool({
           }}
         />
         <p id={`${id}-keys`} className="visually-hidden">
-          Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places
-          a scale point or paints with the brush.
+          {t(
+            'Arrow keys move the cursor, Shift for single pixels, Control for large steps. Enter places a scale point or paints with the brush.',
+          )}
         </p>
         {!size && (
           <Text c="dimmed" fz="sm">
-            Choose a photograph of the bullet beside a ruler, or try the sample. It is read in this
-            browser and never uploaded.
+            {t(
+              'Choose a photograph of the bullet beside a ruler, or try the sample. It is read in this browser and never uploaded.',
+            )}
           </Text>
         )}
         <p role="status" className="visually-hidden">
-          {t.busy ?? pointer.heard}
+          {p.busy ? t(p.busy) : pointer.heard}
         </p>
       </div>
       <Flex direction="column" gap="sm" style={{ flex: '1 1 18rem', minWidth: 0 }}>
         <Flex gap="xs" wrap="wrap">
-          <FileButton onChange={t.read} accept="image/*">
+          <FileButton onChange={p.read} accept="image/*">
             {(props) => (
               <Button variant="default" {...props}>
-                Choose photograph
+                {t('Choose photograph')}
               </Button>
             )}
           </FileButton>
-          <Button variant="default" onClick={t.sample}>
-            Try a sample
+          <Button variant="default" onClick={p.sample}>
+            {t('Try a sample')}
           </Button>
         </Flex>
         {size && (
           <>
             <SegmentedControl
-              aria-label="Tool"
+              aria-label={t('Tool')}
               size="xs"
               value={tool}
               onChange={(v) => setTool(v as Tool)}
-              data={tools}
+              data={tools.map((o) => ({ value: o.value, label: t(o.label) }))}
             />
             {tool === 'scale' ? (
-              <ScaleControls system={system} t={t} />
+              <ScaleControls system={system} p={p} />
             ) : (
               <>
                 <Text fz="sm">
-                  Paint over the picture to add to the bullet or erase from it. Keys: arrows move
-                  the cursor, Enter paints.
+                  {t(
+                    'Paint over the picture to add to the bullet or erase from it. Keys: arrows move the cursor, Enter paints.',
+                  )}
                 </Text>
                 <Text component="label" fz="sm" htmlFor="photo-brush">
-                  Brush radius, {brush} px
+                  {t('Brush radius, {size} px', { size: brush })}
                 </Text>
                 <Slider
                   id="photo-brush"
                   min={2}
                   max={80}
-                  thumbLabel="Brush radius"
+                  thumbLabel={t('Brush radius')}
                   value={brush}
                   onChange={setBrush}
                 />
@@ -342,44 +375,49 @@ function PhotoTool({
             )}
             <Text fz="sm" aria-live="polite">
               {scale
-                ? `Scale ${fixedNumber(scale.pxPerMm, 2)} px/mm, uncertainty ${fixedNumber(100 * scale.relUncertainty, 2)} %.`
-                : 'No scale yet.'}
+                ? t('Scale {scale} px/mm, uncertainty {uncertainty} %.', {
+                    scale: fixedNumber(scale.pxPerMm, 2),
+                    uncertainty: fixedNumber(100 * scale.relUncertainty, 2),
+                  })
+                : t('No scale yet.')}
             </Text>
             <Flex gap="xs" wrap="wrap">
-              <Button variant="default" disabled={!t.cut} onClick={t.cutAgain}>
-                Cut out again
+              <Button variant="default" disabled={!p.cut} onClick={p.cutAgain}>
+                {t('Cut out again')}
               </Button>
               <Button
                 variant="default"
                 disabled={!found?.outline}
-                onClick={() => found?.outline && t.setAxis(found.outline.angle + Math.PI)}
+                onClick={() => found?.outline && p.setAxis(found.outline.angle + Math.PI)}
               >
-                Flip nose
+                {t('Flip nose')}
               </Button>
               <Button
                 variant="default"
-                disabled={t.axis === undefined}
-                onClick={() => t.setAxis(undefined)}
+                disabled={p.axis === undefined}
+                onClick={() => p.setAxis(undefined)}
               >
-                Find the axis again
+                {t('Find the axis again')}
               </Button>
             </Flex>
             <NumberInput
-              label="Axis direction, degrees from the photograph's x axis"
-              description="Base to tip, y down. Typing a direction fixes the axis."
+              label={t("Axis direction, degrees from the photograph's x axis")}
+              description={t('Base to tip, y down. Typing a direction fixes the axis.')}
               hideControls
               step={0.1}
               decimalScale={2}
-              value={turned === undefined ? '' : Number(turned.toFixed(2))}
-              onChange={(v) => typeof v === 'number' && t.setAxis(toSi('angle', v))}
+              value={turned === undefined ? '' : Math.round(100 * turned) / 100}
+              onChange={(v) => typeof v === 'number' && p.setAxis(toSi('angle', v))}
               disabled={!found?.outline}
             />
             <Text component="label" fz="sm" htmlFor="photo-opacity">
-              Drawing over the photograph, {Math.round(100 * opacity)} %
+              {t('Drawing over the photograph, {percent} %', {
+                percent: Math.round(100 * opacity),
+              })}
             </Text>
             <Slider
               id="photo-opacity"
-              thumbLabel="Drawing opacity"
+              thumbLabel={t('Drawing opacity')}
               min={0}
               max={1}
               step={0.05}
@@ -391,18 +429,19 @@ function PhotoTool({
         )}
       </Flex>
       <div style={{ flex: '1 1 100%' }}>
-        <MessageSlot label="Photograph messages" messages={messages} />
-        {t.rows.length > 0 && <ValuesTable rows={t.rows} system={system} record={record} />}
+        <MessageSlot label={t('Photograph messages')} messages={messages} />
+        {p.rows.length > 0 && <ValuesTable rows={p.rows} system={system} record={record} />}
         <Flex gap="xs" mt="sm" align="center" wrap="wrap">
           <Button
-            disabled={!(t.ready && t.design && drawing)}
-            onClick={() => t.design && void onOpen(t.design)}
+            disabled={!(p.ready && p.design && drawing)}
+            onClick={() => p.design && void onOpen(p.design)}
           >
-            Open in designer
+            {t('Open in designer')}
           </Button>
           <Text fz="sm" c="dimmed">
-            Seeds the designer with these values and a note that they are measured, with their
-            uncertainties. The photograph is not stored.
+            {t(
+              'Seeds the designer with these values and a note that they are measured, with their uncertainties. The photograph is not stored.',
+            )}
           </Text>
         </Flex>
       </div>
@@ -426,14 +465,15 @@ export function BulletPhoto({
   onOpen: (d: Design) => Promise<boolean>
 }) {
   const phone = useMediaQuery('(max-width: 47.99em)')
+  const { t } = useTranslation()
   return (
     <AppModal
       opened={opened}
       onClose={onClose}
-      title="Bullet from a photograph"
+      title={t('Bullet from a photograph')}
       size="min(72rem, 96vw)"
       fullScreen={phone}
-      closeButton={{ 'aria-label': 'Close the photograph tool' }}
+      closeButton={{ 'aria-label': t('Close the photograph tool') }}
     >
       <PhotoTool
         system={system}

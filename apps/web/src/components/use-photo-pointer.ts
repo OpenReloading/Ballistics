@@ -1,6 +1,7 @@
 'use client'
 
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { pointLabels } from '../lib/bullet-photo-canvas.ts'
 import type { Point } from '../lib/target-geometry.ts'
 
@@ -43,6 +44,7 @@ const stepOf = (e: KeyboardEvent) => (e.shiftKey ? 1 : e.ctrlKey || e.metaKey ? 
  */
 export function usePhotoPointer({ size, tool, brush, points, setPoints, stamp }: PointerInput) {
   const [cursor, setCursor] = useState<Point>()
+  const { t } = useTranslation()
   const [heard, setHeard] = useState('')
   const dragging = useRef<number | undefined>(undefined)
   const painting = useRef(false)
@@ -54,7 +56,7 @@ export function usePhotoPointer({ size, tool, brush, points, setPoints, stamp }:
       .sort((a, b) => a.d - b.d)[0]
     const i = near && (near.d <= reach || points.length >= 4) ? near.i : points.length
     setPoints((all) => (i < all.length ? all.map((q, k) => (k === i ? p : q)) : [...all, p]))
-    setHeard(`Point ${pointLabels[i]} placed.`)
+    setHeard(t('Point {point} placed.', { point: pointLabels[i] ?? '' }))
     return i
   }
   const paint = (p: Point) => stamp(p, tool === 'add' ? 255 : 0, brush)
@@ -87,7 +89,7 @@ export function usePhotoPointer({ size, tool, brush, points, setPoints, stamp }:
   const act = (here: Point) => {
     if (tool === 'scale') return void place(here, 24)
     paint(here)
-    setHeard(tool === 'add' ? 'Added to the bullet.' : 'Erased from the bullet.')
+    setHeard(tool === 'add' ? t('Added to the bullet.') : t('Erased from the bullet.'))
   }
   const keys = (e: KeyboardEvent<HTMLCanvasElement>) => {
     if (!size) return

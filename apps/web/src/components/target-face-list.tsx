@@ -58,7 +58,7 @@ export function TargetFaceList({
     [items, filters],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
-  const named = [...facetNames(facets, state.facets ?? {}), matchingText(t, state.query)]
+  const named = [...facetNames(facets, state.facets ?? {}, t), matchingText(t, state.query)]
   const outer = (r: TargetFaceRow) => formatQuantity('length', system, toSi('length', r.outer))
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },

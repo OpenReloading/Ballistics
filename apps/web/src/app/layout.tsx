@@ -64,7 +64,7 @@ import type { Metadata, Viewport } from 'next'
 import { OfflineLayer } from '../components/offline-layer.tsx'
 import { PageShell } from '../components/page-shell.tsx'
 import { Providers } from '../components/providers.tsx'
-import { ResultsSkipLink } from '../components/results-skip-link.tsx'
+import { ContentSkipLink, ResultsSkipLink } from '../components/results-skip-link.tsx'
 import { SafetyDialog } from '../components/safety-dialog.tsx'
 import { basePath } from '../lib/edition.ts'
 import { titleTemplate } from '../lib/record-metadata.ts'
@@ -106,9 +106,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       </head>
       <body>
         <Providers>
-          <a className="skip-link" href="#main">
-            Skip to content
-          </a>
+          <ContentSkipLink />
           <ResultsSkipLink />
           <SafetyDialog />
           <OfflineLayer />

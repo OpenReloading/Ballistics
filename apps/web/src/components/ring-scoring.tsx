@@ -672,7 +672,7 @@ function ScorePanel(p: PanelProps) {
           disabled={!record}
           data={(record?.rings ?? []).map((x) => ({
             value: String(x.value),
-            label: `${x.value}: ${mmLength(system, x.diameter.value)}`,
+            label: `${plainNumber(x.value)}: ${mmLength(system, x.diameter.value)}`,
           }))}
           value={String(p.ringValue ?? '')}
           onChange={(e) => p.onRing(Number(e.currentTarget.value))}

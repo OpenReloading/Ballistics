@@ -58,7 +58,7 @@ export function DisciplineList({
     [items, filters, t],
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
-  const named = [...facetNames(facets, state.facets ?? {}), matchingText(t, state.query)]
+  const named = [...facetNames(facets, state.facets ?? {}, t), matchingText(t, state.query)]
   const classes = (r: DisciplineRow) => r.classes.map((c) => c.name).join(', ')
   const columns: DirectoryColumn<DisciplineRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
@@ -185,7 +185,10 @@ export function FederationList({ items }: { items: FederationRow[] }) {
     [items, filters, country],
   )
   const { shown, options } = useFacets(items, searched, federationFacets, filters)
-  const named = [...facetNames(federationFacets, state.facets ?? {}), matchingText(t, state.query)]
+  const named = [
+    ...facetNames(federationFacets, state.facets ?? {}, t),
+    matchingText(t, state.query),
+  ]
   const columns: DirectoryColumn<FederationRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {

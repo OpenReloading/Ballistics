@@ -3,6 +3,7 @@
 import { Button, Flex } from '@mantine/core'
 import { ArrowCounterClockwise, ArrowUUpLeft, ArrowUUpRight, Plus } from '@phosphor-icons/react'
 import { memo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import type { UnitSystem } from '../lib/units.ts'
 
@@ -34,6 +35,7 @@ export const DesignerToolbar = memo(function DesignerToolbar({
   system: UnitSystem
   dispatch: (a: ToolbarAction) => void
 }) {
+  const { t } = useTranslation()
   return (
     <Flex className="toolbar" wrap="wrap" gap="xs">
       <Button
@@ -41,20 +43,20 @@ export const DesignerToolbar = memo(function DesignerToolbar({
         disabled={!undo}
         leftSection={<ArrowUUpLeft aria-hidden="true" />}
         onClick={() => dispatch({ type: 'undo' })}
-        title={`Undo (${shortcutLabel('undo')})`}
+        title={t('Undo ({shortcut})', { shortcut: shortcutLabel('undo') })}
         aria-keyshortcuts={shortcutAriaKeys('undo')}
       >
-        Undo
+        {t('Undo')}
       </Button>
       <Button
         variant="default"
         disabled={!redo}
         leftSection={<ArrowUUpRight aria-hidden="true" />}
         onClick={() => dispatch({ type: 'redo' })}
-        title={`Redo (${shortcutLabel('redo')})`}
+        title={t('Redo ({shortcut})', { shortcut: shortcutLabel('redo') })}
         aria-keyshortcuts={shortcutAriaKeys('redo')}
       >
-        Redo
+        {t('Redo')}
       </Button>
       <Button
         variant="default"

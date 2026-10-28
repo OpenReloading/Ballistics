@@ -1,12 +1,17 @@
 import type { BulletDimensions } from '@open-reloading/drawing/bullet'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { grayOf, scaleOf, segment } from '../src/lib/bullet-photo.ts'
 import { segmentPhoto } from '../src/lib/bullet-photo-colour.ts'
 import { measureOutline, type PhotoField } from '../src/lib/bullet-photo-measure.ts'
 import { fitOutline, type Outline } from '../src/lib/bullet-photo-outline.ts'
 import { minWidthPx, outlineHints } from '../src/lib/bullet-photo-quality.ts'
 import { type PhotoSpec, renderPhoto } from '../src/lib/bullet-photo-sample.ts'
+import { say, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
+
+/** The English text of sentences for the user. */
+const text = (w: readonly Wording[]) => w.map((x) => say(english.t, x)).join(' ')
 
 const area = (s: { alpha: Uint8Array }) => s.alpha.reduce((n, v) => n + (v >= 128 ? 1 : 0), 0)
 
@@ -137,10 +142,8 @@ describe('more than one bullet in the photograph', () => {
     const image = { ...one.image, data: both }
     const span = defined(one.span)
     const seg = segmentPhoto(image, [span.a, span.b])
-    expect(seg.warnings.join(' ')).toMatch(/Another object/)
-    expect(segmentPhoto(one.image, [span.a, span.b]).warnings.join(' ')).not.toMatch(
-      /Another object/,
-    )
+    expect(text(seg.warnings)).toMatch(/Another object/)
+    expect(text(segmentPhoto(one.image, [span.a, span.b]).warnings)).not.toMatch(/Another object/)
   })
 })
 
@@ -167,7 +170,7 @@ describe('soft edges', () => {
     const sharp = measured(spec())
     const soft = measured(spec({ blur: 5 }))
     expect(sharp.seg.warnings).toEqual([])
-    expect(soft.seg.warnings.join(' ')).toMatch(/soft/)
+    expect(text(soft.seg.warnings)).toMatch(/soft/)
     expect(defined(soft.m.values.diameter).uncertainty).toBeGreaterThan(
       3 * defined(sharp.m.values.diameter).uncertainty,
     )
@@ -176,7 +179,7 @@ describe('soft edges', () => {
 
   it('flags a soft shadow beside the bullet and keeps the diameter within its uncertainty', () => {
     const r = measured(spec({ shadow: { dx: 0, dy: 40, blur: 14, depth: 0.3 } }))
-    expect(r.seg.warnings.join(' ')).toMatch(/soft/)
+    expect(text(r.seg.warnings)).toMatch(/soft/)
     expectNear(r, 3)
   })
 })
@@ -196,23 +199,25 @@ describe('the size of the bullet in the photograph', () => {
     const grey = { width: 80, height: 60, data: new Uint8ClampedArray(80 * 60 * 4).fill(120) }
     const seg = segmentPhoto(grey)
     expect(area(seg)).toBe(0)
-    expect(seg.warnings.join(' ')).not.toMatch(/ragged/)
+    expect(text(seg.warnings)).not.toMatch(/ragged/)
   })
 
   it('refuses a bullet too narrow to measure and says how to fix it', () => {
     const h = outlineHints(outlineOf(minWidthPx / 2 - 2, 200))
-    expect(h.unusable).toMatch(/too small to measure/)
-    expect(h.unusable).toMatch(/closer/)
+    expect(text(h.unusable ? [h.unusable] : [])).toMatch(/too small to measure/)
+    expect(text(h.unusable ? [h.unusable] : [])).toMatch(/closer/)
   })
 
   it('refuses a cut-out that is not longer than wide', () => {
-    expect(outlineHints(outlineOf(90, 120)).unusable).toMatch(/not the shape of a bullet/)
+    const long = outlineHints(outlineOf(90, 120)).unusable
+    expect(text(long ? [long] : [])).toMatch(/not the shape of a bullet/)
   })
 
   it('gives a hint for a narrow bullet and none for a wide one', () => {
-    expect(outlineHints(outlineOf(15, 200))).toEqual({
-      hints: [expect.stringMatching(/px across/)],
-    })
+    const narrow = outlineHints(outlineOf(15, 200))
+    expect(narrow.unusable).toBeUndefined()
+    expect(narrow.hints).toHaveLength(1)
+    expect(text(narrow.hints)).toMatch(/px across/)
     expect(outlineHints(outlineOf(60, 400))).toEqual({ hints: [] })
   })
 

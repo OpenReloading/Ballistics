@@ -1,7 +1,9 @@
 import { ActionIcon, NavLink } from '@mantine/core'
 import { GithubLogo } from '@phosphor-icons/react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 
-const label = 'Source code on GitHub'
+const label = msg('Source code on GitHub')
 
 /**
  * The link to the source repository: an icon next to the theme switch in the top bar from
@@ -14,13 +16,14 @@ export function RepositoryLink({
   url?: string | undefined
   drawer?: boolean | undefined
 }) {
+  const { t } = useTranslation()
   if (!url) return null
   if (drawer)
     return (
       <NavLink
         component="a"
         href={url}
-        label={label}
+        label={t(label)}
         leftSection={<GithubLogo size={20} aria-hidden="true" />}
       />
     )
@@ -30,7 +33,7 @@ export function RepositoryLink({
       href={url}
       variant="default"
       visibleFrom="lg"
-      aria-label={label}
+      aria-label={t(label)}
       className="repository-link"
     >
       <GithubLogo size={20} aria-hidden="true" />

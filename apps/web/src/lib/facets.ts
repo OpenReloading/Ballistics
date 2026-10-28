@@ -1,10 +1,11 @@
 /** The choice filters of the lists: which rows pass them and how many each option would leave. */
+import type { Message, Translator } from '../i18n/translate.ts'
 
 /** What one list filters by: a field whose values a row has one or several of. */
 export interface Facet<T> {
   /** The URL parameter. */
   key: string
-  label: string
+  label: Message
   /** The row's values for this filter, as the URL keeps them; none when the row has no value. */
   values: (row: T) => readonly string[]
   /** The text of a value; the value itself where unset. */
@@ -88,9 +89,13 @@ export function facetOptions<T>(
 }
 
 /** The chosen options as the no-match note names them: "Federation DSB, BDS". */
-export function facetNames<T>(facets: readonly Facet<T>[], selected: FacetSelection) {
+export function facetNames<T>(
+  facets: readonly Facet<T>[],
+  selected: FacetSelection,
+  t: Translator['t'],
+) {
   return facets.flatMap((f) => {
     const on = chosen(selected, f.key)
-    return on.length > 0 ? [`${f.label} ${on.map((v) => f.text?.(v) ?? v).join(', ')}`] : []
+    return on.length > 0 ? [`${t(f.label)} ${on.map((v) => f.text?.(v) ?? v).join(', ')}`] : []
   })
 }

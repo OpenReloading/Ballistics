@@ -65,23 +65,23 @@ export const faceFacetKeys = ['org', 'discipline', 'dist', 'rings']
  */
 export function faceFacets(disciplines: ReadonlyMap<string, string>): Facet<TargetFaceRow>[] {
   return [
-    { key: 'org', label: 'Federation', values: (r) => [r.organization] },
+    { key: 'org', label: msg('Federation'), values: (r) => [r.organization] },
     {
       key: 'discipline',
-      label: 'Discipline',
+      label: msg('Discipline'),
       values: (r) => r.disciplineIds,
       text: (v) => disciplines.get(v) ?? v,
     },
     {
       key: 'dist',
-      label: 'Distance',
+      label: msg('Distance'),
       values: (r) => r.distances.map(String),
       text: (v) => `${v} m`,
       order: (a, b) => Number(a) - Number(b),
     },
     {
       key: 'rings',
-      label: 'Rings',
+      label: msg('Rings'),
       values: (r) => [String(r.rings)],
       order: (a, b) => Number(a) - Number(b),
     },

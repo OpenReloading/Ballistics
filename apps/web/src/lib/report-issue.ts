@@ -1,5 +1,6 @@
 /** Report issue: the area of a page, the record it shows, and the prefilled new-issue link of the repository. */
 import { fromSi, type TargetSheet } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import type { FederationData } from './face-disciplines.ts'
 
 /** Areas of the app, the second part of a report title. */
@@ -28,7 +29,7 @@ export type ReportType = (typeof reportTypes)[number]
 
 /** The dialog's label of the report text. */
 export const reportQuestion = (type: ReportType) =>
-  type === 'Idea' ? 'What do you need?' : 'What happened?'
+  type === 'Idea' ? msg('What do you need?') : msg('What happened?')
 
 /** Longest link: GitHub and browsers refuse longer ones. */
 export const maxReportChars = 7000

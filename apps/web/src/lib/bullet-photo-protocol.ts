@@ -4,6 +4,7 @@ import type { BulletMeasurement } from './bullet-photo-measure.ts'
 import type { Outline } from './bullet-photo-outline.ts'
 import type { Known } from './bullet-photo-scale.ts'
 import type { Point } from './target-geometry.ts'
+import type { Wording } from './wording.ts'
 
 export type WorkerRequest =
   /** The working image as RGBA, row by row; the worker keeps its grey. */
@@ -28,7 +29,7 @@ export type WorkerRequest =
 
 export type WorkerReply =
   | { kind: 'loaded'; id: number }
-  | { kind: 'segmented'; id: number; alpha: Uint8Array; warnings: string[]; edgeSpread: number }
+  | { kind: 'segmented'; id: number; alpha: Uint8Array; warnings: Wording[]; edgeSpread: number }
   /** `outline` is absent when no bullet is outlined; the measurement is absent then too, and when the photograph is too poor to measure (`unusable` says why). */
   | {
       kind: 'measured'
@@ -37,7 +38,7 @@ export type WorkerReply =
       measurement?: BulletMeasurement
       /** The scale the measurement is made at: the ruler's, else the known sizes'; absent when there is none and the values are in px. */
       scale?: Scale
-      hints: string[]
-      unusable?: string
+      hints: Wording[]
+      unusable?: Wording
     }
   | { kind: 'error'; id: number; message: string }

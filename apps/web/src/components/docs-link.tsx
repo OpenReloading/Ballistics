@@ -1,7 +1,9 @@
 import { ActionIcon, NavLink, Tooltip } from '@mantine/core'
 import { Books } from '@phosphor-icons/react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 
-const label = 'Documentation'
+const label = msg('Documentation')
 
 /**
  * The link to the docs site: an icon in the sidebar's foot (tooltip as its name), a labelled row in
@@ -14,25 +16,26 @@ export function DocsLink({
   url?: string | undefined
   drawer?: boolean | undefined
 }) {
+  const { t } = useTranslation()
   if (!url) return null
   if (drawer)
     return (
       <NavLink
         component="a"
         href={url}
-        label={label}
+        label={t(label)}
         leftSection={<Books size={20} aria-hidden="true" />}
       />
     )
   return (
-    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
+    <Tooltip label={t(label)} position="right" transitionProps={{ duration: 0 }}>
       <ActionIcon
         component="a"
         href={url}
         size="xl"
         variant="subtle"
         color="gray"
-        aria-label={label}
+        aria-label={t(label)}
       >
         <Books size={24} aria-hidden="true" />
       </ActionIcon>

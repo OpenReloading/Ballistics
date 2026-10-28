@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { OfflineState } from '../../components/offline-state.tsx'
 import { PageBar } from '../../components/page-bar.tsx'
+import { msg } from '../../i18n/translate.ts'
 import { sections } from '../../lib/sections.ts'
 
 export const metadata: Metadata = { title: 'Offline', robots: { index: false } }
@@ -11,12 +12,12 @@ export default function Offline() {
   const [tools] = sections
   return (
     <>
-      <PageBar title="Offline" />
+      <PageBar title={msg('Offline')} translated />
       <OfflineState
         links={[
           ...tools.pages,
-          { href: '/firearms', label: 'Firearms' },
-          { href: '/cases/editor', label: 'Case group' },
+          { href: '/firearms', label: msg('Firearms') },
+          { href: '/cases/editor', label: msg('Case group') },
         ]}
       />
     </>

@@ -2,6 +2,8 @@
 
 import type { UserRecordKind } from '@open-reloading/schema'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import type { Message } from '../i18n/translate.ts'
 import { type History, historyOf } from '../lib/history.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import type { FileMenuHandle } from './file-menu.tsx'
@@ -28,9 +30,9 @@ interface DesignerSetup<D, A> {
   kind: UserRecordKind
   fileData: (design: D) => unknown
   /** The design of a catalogue record, or the line shown when it does not start one; throws when it cannot be read. */
-  load: (id: string, system: UnitSystem) => Promise<D | string>
-  loadingText: string
-  failText: string
+  load: (id: string, system: UnitSystem) => Promise<D | Message>
+  loadingText: Message
+  failText: Message
 }
 
 /**
@@ -47,7 +49,9 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
     undo: () => dispatch(asAction<D, A>({ type: 'undo' })),
     redo: () => dispatch(asAction<D, A>({ type: 'redo' })),
   })
-  const [loading, setLoading] = useState<string>()
+  const { t } = useTranslation()
+  // held as the message, so a language change rewrites the line shown
+  const [loading, setLoading] = useState<Message>()
   const fileMenu = useRef<FileMenuHandle>(null)
   /** A new record (`next`) starts a new file record; false when the user keeps unsaved changes. */
   const startNew = useCallback(
@@ -81,7 +85,8 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
       try {
         const design = await load(id, system)
         if (typeof design === 'string') {
-          setLoading(design)
+          // a design is an object, so a string is the message of `load`
+          setLoading(design as Message)
           return
         }
         await begin(design)
@@ -115,7 +120,7 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
     history,
     design: history.present,
     dispatch,
-    loading,
+    loading: loading && t(loading),
     fileMenu,
     start,
     begin,

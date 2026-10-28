@@ -3,6 +3,7 @@
 import { createSpotlight } from '@mantine/spotlight'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { designerHref, userBulletRows } from '../lib/sources.ts'
 import { userBullets } from '../lib/variants.ts'
@@ -20,6 +21,7 @@ const search = createSpotlight()
  */
 export function SiteSearch({ request }: { request: number }) {
   const router = useRouter()
+  const { t } = useTranslation()
   const names = useManufacturerNames()
   const [records] = useUserRecords(request)
   const mine = useResolved(records, userBullets)
@@ -36,7 +38,7 @@ export function SiteSearch({ request }: { request: number }) {
       }
       onPowder={(p) => router.push(`/powders/${p.id}`)}
       describeBullet={(b) => productLabel(b, names)}
-      bulletsLabel="Bullets"
+      bulletsLabel={t('Bullets')}
       designs={designs}
     />
   )

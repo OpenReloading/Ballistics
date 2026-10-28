@@ -11,8 +11,9 @@ import {
 } from '@mantine/core'
 import { Flask, Plus, X } from '@phosphor-icons/react'
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from 'react'
-import { msg } from '../i18n/translate.ts'
-import { fieldError } from '../lib/field-spec.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message as Marked, msg } from '../i18n/translate.ts'
+import { fieldError, specText } from '../lib/field-spec.ts'
 import { historyOf } from '../lib/history.ts'
 import { newId } from '../lib/new-id.ts'
 import {
@@ -36,9 +37,10 @@ import {
   rowId,
   specOf,
 } from '../lib/powder-designer.ts'
+import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { namedKey } from '../lib/user-data.ts'
-import { verbatim } from '../lib/wording.ts'
+import { say, verbatim } from '../lib/wording.ts'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
@@ -54,29 +56,27 @@ import { Workspace } from './workspace.tsx'
 /** The key of the empty draft: nothing to keep before the first edit. */
 const blankKey = namedKey(fileData(newDesign()), '')
 
-const optionLabel = (o: string) => (o === '' ? 'Not stated' : o)
-
-const provenanceText: Record<(typeof provenanceKinds)[number], string> = {
-  measured: 'Measured',
-  published: 'Published',
-  derived: 'Derived',
-  fitted: 'Fitted to data',
-  computed: 'Computed by a model',
+const provenanceText: Record<(typeof provenanceKinds)[number], Marked> = {
+  measured: msg('Measured'),
+  published: msg('Published'),
+  derived: msg('Derived'),
+  fitted: msg('Fitted to data'),
+  computed: msg('Computed by a model'),
 }
 
-const fittedText: Record<(typeof fittedKeys)[number], string> = {
-  vivacity: 'Vivacity',
-  energy: 'Specific energy',
-  'form.a': 'Form a',
+const fittedText: Record<(typeof fittedKeys)[number], Marked> = {
+  vivacity: msg('Vivacity'),
+  energy: msg('Specific energy'),
+  'form.a': msg('Form a'),
 }
 
 /** The thermochemistry's ranges: the name in the record and the label of its row. */
 const ranges = [
-  ['flameTemperature', 'Flame temperature'],
-  ['impetus', 'Impetus'],
-  ['gamma', 'Gamma'],
-  ['molarMass', 'Molar mass'],
-  ['covolume', 'Covolume'],
+  ['flameTemperature', msg('Flame temperature')],
+  ['impetus', msg('Impetus')],
+  ['gamma', msg('Gamma')],
+  ['molarMass', msg('Molar mass')],
+  ['covolume', msg('Covolume')],
 ] as const
 
 const specsOf = (group: PowderSpec['group']) => powderSpecs.filter((s) => s.group === group)
@@ -98,61 +98,72 @@ function RecordPanel({
   /** The number of problems that belong to a field. */
   keyed: number
 }) {
+  const { t, tn } = useTranslation()
   const status =
     'powder' in built
-      ? `Usable in the workbench as ${name} (your design).${
-          built.powder.interior ? '' : ' Without burn-law parameters it fills no model values.'
-        }`
+      ? built.powder.interior
+        ? t('Usable in the workbench as {name} (your design).', { name })
+        : t(
+            'Usable in the workbench as {name} (your design). Without burn-law parameters it fills no model values.',
+            { name },
+          )
       : edited
         ? problems
             .filter((p) => !p.key)
             .map((p) => p.message)
-            .join(' ') || `${keyed} ${keyed === 1 ? 'field' : 'fields'} to fix.`
+            .join(' ') || tn(keyed, '{count} field to fix.', '{count} fields to fix.')
         : ''
   // print: the values and the mark, not the form
   const values = powderSpecs.flatMap((s) => {
     const si = fieldAt(design, s.key).si
     return si === undefined
       ? []
-      : [{ label: verbatim(s.label), value: { quantity: s.quantity, si } }]
+      : [{ label: verbatim(specText(t, s.label)), value: { quantity: s.quantity, si } }]
   })
   const choices = [
-    ['Provenance', design.provenanceKind && provenanceText[design.provenanceKind]],
-    ['Grain form', design.grainForm],
-    ['Propellant base', design.propellantBase],
-  ].flatMap(([label, text]) => (label && text ? [{ label: verbatim(label), text }] : []))
+    {
+      label: msg('Provenance'),
+      text: design.provenanceKind && t(provenanceText[design.provenanceKind]),
+    },
+    { label: msg('Grain form'), text: design.grainForm && say(t, rawWording(design.grainForm)) },
+    {
+      label: msg('Propellant base'),
+      text: design.propellantBase && say(t, rawWording(design.propellantBase)),
+    },
+  ].flatMap(({ label, text }) => (text ? [{ label: verbatim(t(label)), text }] : []))
   return (
     <>
       <div className="page-panel-head designer-panel-head">
-        <h2 className="page-panel-title record-heading">Record</h2>
+        <h2 className="page-panel-title record-heading">{t('Record')}</h2>
       </div>
       <Text component="p" inherit fz="sm" m={0} className="derived-line" title={status}>
         {status}
       </Text>
       {problems.length > 0 && edited ? (
-        <Message severity="warning" title="The record does not pass the powder schema yet">
+        <Message severity="warning" title={t('The record does not pass the powder schema yet')}>
           <ul className="powder-problems">
             {problems.map((p) => (
               <li key={`${p.key ?? ''}${p.message}`}>
-                {p.key ? `${problemLabel(p.key)}: ` : ''}
-                {p.message}
+                {p.key
+                  ? t('{part}: {message}', { part: problemLabel(p.key, t), message: p.message })
+                  : p.message}
               </li>
             ))}
           </ul>
         </Message>
       ) : edited ? (
         <Message severity="info">
-          User design: the workbench marks every result computed with it.
+          {t('User design: the workbench marks every result computed with it.')}
         </Message>
       ) : (
         <EmptyNote
           icon={<Flask size={24} aria-hidden="true" />}
-          title="No powder yet"
-          description="Enter a name and the values you have. The checks run as you type."
+          title={t('No powder yet')}
+          description={t('Enter a name and the values you have. The checks run as you type.')}
         />
       )}
       <div className="print-only">
-        <p>{name} (user design, not a catalogue record)</p>
+        <p>{t('{name} (user design, not a catalogue record)', { name })}</p>
         <FieldTable
           caption={msg('Values of the design')}
           groups={[{ rows: [...choices, ...values] }]}
@@ -170,6 +181,7 @@ function RecordPanel({
  * offered by the workbench's Powder card as the user's own design.
  */
 export function PowderDesigner() {
+  const { t } = useTranslation()
   const { system } = useUnits()
   const [history, dispatch] = useReducer(reduce, undefined, () => historyOf(newDesign()))
   const design = history.present
@@ -193,7 +205,7 @@ export function PowderDesigner() {
     key,
   )
 
-  const built = useMemo(() => checkDesign(design, recordId), [design, recordId])
+  const built = useMemo(() => checkDesign(design, recordId, t), [design, recordId, t])
   const problems = 'problems' in built ? built.problems : []
   const keyed = new Map(problems.flatMap((p) => (p.key ? [[p.key, p.message] as const] : [])))
   const general = problems.filter((p) => !p.key).map((p) => p.message)
@@ -218,9 +230,9 @@ export function PowderDesigner() {
         spec={spec}
         system={system}
         value={value}
-        help={spec.help ?? ''}
+        help={spec.help ? specText(t, spec.help) : ''}
         changed={false}
-        error={fieldError(spec, value, system) ?? shown(spec.key)}
+        error={fieldError(spec, value, system, t) ?? shown(spec.key)}
         unit={text}
         dispatch={dispatch}
       />
@@ -242,7 +254,7 @@ export function PowderDesigner() {
     options: readonly string[],
     action: (v: string) => Action,
     error?: string,
-    text: (o: string) => string = optionLabel,
+    text: (o: string) => string = (o) => (o === '' ? t('Not stated') : say(t, rawWording(o))),
   ) => (
     <div className="designer-field" data-error={error ? true : undefined}>
       <NativeSelect
@@ -262,7 +274,7 @@ export function PowderDesigner() {
     return (
       <div key={part} className="powder-row">
         <span className="powder-label">
-          {label}
+          {t(label)}
           {system[unit.quantity].symbol ? `, ${system[unit.quantity].symbol}` : ''}
         </span>
         {(['value', 'min', 'max'] as const).map((p) =>
@@ -276,8 +288,8 @@ export function PowderDesigner() {
     <div key={r.id} className="powder-row powder-ingredient">
       <TextInput
         size={controlSize.row.input}
-        aria-label={`Ingredient ${i + 1} name`}
-        placeholder="Ingredient"
+        aria-label={t('Ingredient {n} name', { n: i + 1 })}
+        placeholder={t('Ingredient')}
         value={r.name}
         onChange={(ev) =>
           dispatch({ type: 'ingredient', id: r.id, part: 'name', value: ev.currentTarget.value })
@@ -285,7 +297,7 @@ export function PowderDesigner() {
       />
       <TextInput
         size={controlSize.row.input}
-        aria-label={`Ingredient ${i + 1} CAS number`}
+        aria-label={t('Ingredient {n} CAS number', { n: i + 1 })}
         placeholder="CAS"
         value={r.cas}
         onChange={(ev) =>
@@ -293,13 +305,17 @@ export function PowderDesigner() {
         }
       />
       {(['min', 'max'] as const).map((p) => {
-        const spec = { ...specOf(`comp.${r.id}.${p}`), label: `Ingredient ${i + 1} ${p} percent` }
+        const label =
+          p === 'min'
+            ? t('Ingredient {n} min percent', { n: i + 1 })
+            : t('Ingredient {n} max percent', { n: i + 1 })
+        const spec = { ...specOf(`comp.${r.id}.${p}`), label }
         return field(spec, 'none')
       })}
       <ActionIcon
         variant="subtle"
-        aria-label={`Remove ingredient ${i + 1}`}
-        title={`Remove ingredient ${i + 1}`}
+        aria-label={t('Remove ingredient {n}', { n: i + 1 })}
+        title={t('Remove ingredient {n}', { n: i + 1 })}
         onClick={() => dispatch({ type: 'removeRow', id: r.id })}
       >
         <X aria-hidden="true" />
@@ -312,42 +328,42 @@ export function PowderDesigner() {
   const sections: { key: string; title: string; content: ReactNode }[] = [
     {
       key: 'identity',
-      title: 'Powder',
+      title: t('Powder'),
       content: (
         <div className="prop-grid designer-grid">
           <TextInput
-            label="Name"
+            label={t('Name')}
             value={design.name}
             maxLength={200}
             onChange={(ev) => dispatch({ type: 'name', value: ev.currentTarget.value })}
           />
           <Textarea
-            label="Aliases, one per line"
+            label={t('Aliases, one per line')}
             rows={2}
             value={design.aliases}
             onChange={(ev) =>
               dispatch({ type: 'text', key: 'aliases', value: ev.currentTarget.value })
             }
           />
-          {select('Grain form', design.grainForm, grainForms, (value) => ({
+          {select(t('Grain form'), design.grainForm, grainForms, (value) => ({
             type: 'grainForm',
             value: value as typeof design.grainForm,
           }))}
-          {select('Propellant base', design.propellantBase, propellantBases, (value) => ({
+          {select(t('Propellant base'), design.propellantBase, propellantBases, (value) => ({
             type: 'propellantBase',
             value: value as typeof design.propellantBase,
           }))}
           {specsOf('properties').map((s) => field(s))}
           {select(
-            'Values came about by',
+            t('Values came about by'),
             design.provenanceKind,
             provenanceKinds,
             (value) => ({ type: 'provenanceKind', value: value as typeof design.provenanceKind }),
             shown('provenanceKind'),
-            (o) => (o === '' ? 'Choose…' : provenanceText[o as keyof typeof provenanceText]),
+            (o) => (o === '' ? t('Choose…') : t(provenanceText[o as keyof typeof provenanceText])),
           )}
           <Textarea
-            label="Note"
+            label={t('Note')}
             rows={2}
             value={design.note}
             onChange={(ev) =>
@@ -359,10 +375,10 @@ export function PowderDesigner() {
     },
     {
       key: 'composition',
-      title: 'Composition, mass percent',
+      title: t('Composition, mass percent'),
       content: (
         <div className="side-grid">
-          {head(['Ingredient', 'CAS', 'Min', 'Max', ''])}
+          {head([t('Ingredient'), 'CAS', t('Min'), t('Max'), ''])}
           {ingredientRows}
           <Button
             variant="default"
@@ -370,21 +386,21 @@ export function PowderDesigner() {
             leftSection={<Plus aria-hidden="true" />}
             onClick={() => dispatch({ type: 'addRow', id: rowId() })}
           >
-            Add ingredient
+            {t('Add ingredient')}
           </Button>
         </div>
       ),
     },
     {
       key: 'thermochemistry',
-      title: 'Thermochemistry',
+      title: t('Thermochemistry'),
       content: (
         <>
           <div className="prop-grid designer-grid">
             {field(specOf('thermochemistry.loadingDensity.value'))}
           </div>
           <div className="side-grid">
-            {head(['', 'Value', 'Min', 'Max'])}
+            {head(['', t('Value'), t('Min'), t('Max')])}
             {rangeRows}
           </div>
         </>
@@ -392,15 +408,15 @@ export function PowderDesigner() {
     },
     {
       key: 'burn',
-      title: 'Burn law (interior model)',
+      title: t('Burn law (interior model)'),
       content: (
         <div className="prop-grid designer-grid">
           <fieldset className="designer-checks" data-error={fittedError ? true : undefined}>
-            <legend>Parameters the fit moved</legend>
+            <legend>{t('Parameters the fit moved')}</legend>
             {fittedKeys.map((k) => (
               <Checkbox
                 key={k}
-                label={fittedText[k]}
+                label={t(fittedText[k])}
                 checked={design.fitted.includes(k)}
                 onChange={(ev) =>
                   dispatch({ type: 'fitted', key: k, value: ev.currentTarget.checked })
@@ -422,7 +438,7 @@ export function PowderDesigner() {
   const inputs = (
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
       <PropertyGrid
-        title="Parameters"
+        title={t('Parameters')}
         sections={sections}
         message={edited ? general[0] : undefined}
       />
@@ -443,13 +459,14 @@ export function PowderDesigner() {
   return (
     <>
       <PageBar
-        title="Powder designer"
+        title={msg('Powder designer')}
+        translated
         actions={
           <>
             <DesignerToolbar
               undo={history.past.length > 0}
               redo={history.future.length > 0}
-              newLabel="New powder"
+              newLabel={t('New powder')}
               system={system}
               dispatch={toolbar}
             />

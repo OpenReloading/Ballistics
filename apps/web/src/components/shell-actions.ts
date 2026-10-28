@@ -3,6 +3,7 @@
 import { useMantineColorScheme } from '@mantine/core'
 import { useRouter } from 'next/navigation'
 import { useContext } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { sections } from '../lib/sections.ts'
 import { shortcutLabel } from '../lib/shortcuts.ts'
 import { openSafety } from './safety-dialog.tsx'
@@ -22,32 +23,33 @@ export function useShellActions(): { pages: Command[]; commands: Command[] } {
   const openSettings = useContext(SettingsDialog)
   const { setColorScheme } = useMantineColorScheme()
   const singleKeys = useSingleKeys()
+  const { t } = useTranslation()
   return {
     pages: [
-      { label: 'Home', run: () => router.push('/') },
+      { label: t('Home'), run: () => router.push('/') },
       // the pages, and each tab of the Library pages by its own name (Powders, Firearms…)
       ...sections.flatMap((s) =>
         s.pages.flatMap((p) =>
           [p, ...('tabs' in p ? p.tabs : [])].map((x) => ({
-            label: x.label,
+            label: t(x.label),
             run: () => router.push(x.href),
           })),
         ),
       ),
     ],
     commands: [
-      { label: 'Settings', run: () => openSettings() },
-      { label: 'Units settings', run: () => openSettings('units') },
-      { label: 'Workbench settings', run: () => openSettings('workbench') },
-      { label: 'Safety notice', run: openSafety },
+      { label: t('Settings'), run: () => openSettings() },
+      { label: t('Units settings'), run: () => openSettings('units') },
+      { label: t('Workbench settings'), run: () => openSettings('workbench') },
+      { label: t('Safety notice'), run: openSafety },
       {
-        label: 'Keyboard shortcuts',
+        label: t('Keyboard shortcuts'),
         run: openShortcuts,
         ...(singleKeys && { keys: shortcutLabel('help') }),
       },
-      { label: 'Theme: system', run: () => setColorScheme('auto') },
-      { label: 'Theme: light', run: () => setColorScheme('light') },
-      { label: 'Theme: dark', run: () => setColorScheme('dark') },
+      { label: t('Theme: system'), run: () => setColorScheme('auto') },
+      { label: t('Theme: light'), run: () => setColorScheme('light') },
+      { label: t('Theme: dark'), run: () => setColorScheme('dark') },
     ],
   }
 }

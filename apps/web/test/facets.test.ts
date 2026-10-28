@@ -1,4 +1,5 @@
 import { expect, it } from 'vitest'
+import { english, msg } from '../src/i18n/translate.ts'
 import { type Facet, facetNames, facetOptions, facetRows } from '../src/lib/facets.ts'
 
 type Row = { id: string; org: string; distances: string[]; rings: string }
@@ -9,9 +10,9 @@ const rows: Row[] = [
   { id: 'd', org: 'ISSF', distances: [], rings: '10' },
 ]
 const facets: Facet<Row>[] = [
-  { key: 'org', label: 'Federation', values: (r) => [r.org] },
-  { key: 'dist', label: 'Distance', values: (r) => r.distances, text: (v) => `${v} m` },
-  { key: 'rings', label: 'Rings', values: (r) => [r.rings] },
+  { key: 'org', label: msg('Federation'), values: (r) => [r.org] },
+  { key: 'dist', label: msg('Distance'), values: (r) => r.distances, text: (v) => `${v} m` },
+  { key: 'rings', label: msg('Rings'), values: (r) => [r.rings] },
 ]
 const ids = (selected: Record<string, string[]>) =>
   facetRows(rows, facets, selected).map((r) => r.id)
@@ -57,7 +58,7 @@ it('leaves out a filter with fewer than two values unless a value is chosen, and
     { value: '25', text: '25 m', count: 2 },
     { value: '50', text: '50 m', count: 2 },
   ])
-  expect(facetNames(facets, { org: ['DSB'], dist: ['25', '50'], rings: [] })).toEqual([
+  expect(facetNames(facets, { org: ['DSB'], dist: ['25', '50'], rings: [] }, english.t)).toEqual([
     'Federation DSB',
     'Distance 25 m, 50 m',
   ])

@@ -19,6 +19,7 @@ import {
   type UserCartridge,
 } from '@open-reloading/schema'
 import { localizeNumber } from '../i18n/number.ts'
+import { english, msg, type Translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { drawable } from './cartridge-sheet.ts'
 import {
@@ -414,8 +415,18 @@ export interface Evaluation {
   derived: Derived[]
 }
 
-export const missingHint =
-  'Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw.'
+export const missingHint = msg(
+  'Enter at least R1, R, P1, L3 and H2 of the cartridge or the chamber to draw.',
+)
+
+const sideSymbol = {
+  cartridge: msg('Cartridge {symbol}'),
+  chamber: msg('Chamber {symbol}'),
+} as const
+
+/** The field's label in the language of `t`: the side and the symbol. */
+export const fieldLabel = (s: CartridgeFieldSpec, t: Translator['t'] = english.t) =>
+  t(sideSymbol[s.side], { symbol: s.symbol })
 
 /** Where each field's value comes from, against the record the design started from. */
 function fieldStates({ fields, origin }: Design): Evaluation['states'] {
@@ -444,14 +455,25 @@ function refuseInvalid(
   { fields }: Design,
   system: UnitSystem,
   last: string | undefined,
+  t: Translator['t'],
 ): Evaluation['refusal'] {
   const tooLarge = (s: CartridgeFieldSpec) => {
     const si = fields[s.key]?.si
     if (s.limit === undefined || si === undefined || si <= s.limit) return
-    return `${s.label} must be at most ${localizeNumber(exactFieldText(s.quantity, system, s.limit))} ${system[s.quantity].symbol} in the designer.`
+    return t('{label} must be at most {max} {unit} in the designer.', {
+      label: fieldLabel(s, t),
+      max: localizeNumber(exactFieldText(s.quantity, system, s.limit)),
+      unit: system[s.quantity].symbol,
+    })
   }
   const invalid = fieldSpecs
-    .map((s) => [s.key, fieldError(s, fields[s.key], system) ?? tooLarge(s)] as const)
+    .map(
+      (s) =>
+        [
+          s.key,
+          fieldError({ ...s, label: fieldLabel(s, t) }, fields[s.key], system, t) ?? tooLarge(s),
+        ] as const,
+    )
     .filter(([, e]) => e !== undefined)
   const bad = invalid.find(([k]) => k === last) ?? invalid[0]
   if (bad) return { reason: bad[1] as string, field: bad[0] }
@@ -465,6 +487,7 @@ function refuseUnlayable(
   spec: DraftSpec,
   { fields }: Design,
   last: string | undefined,
+  t: Translator['t'],
 ): { list: Figure[]; shown: Figure[] } | { refusal: NonNullable<Evaluation['refusal']> } {
   let list: Figure[]
   let shown: Figure[]
@@ -492,7 +515,7 @@ function refuseUnlayable(
   } catch {
     return {
       refusal: {
-        reason: 'These dimensions do not form an outline.',
+        reason: t('These dimensions do not form an outline.'),
         field: last ?? nth(fieldSpecs, 0).key,
       },
     }
@@ -505,7 +528,7 @@ function refuseUnlayable(
     )
     return {
       refusal: {
-        reason: [...missing, missingHint].join(' '),
+        reason: [...missing, t(missingHint)].join(' '),
         field: keys.find((k) => k === last) ?? keys[0] ?? nth(fieldSpecs, 0).key,
       },
     }
@@ -556,9 +579,14 @@ function outlineNotes(shown: Figure[]): Evaluation['notes'] {
 /**
  * The drawing, field states, checks and derived values of a design. `last` is the field edited
  * last: a refusal naming it shows there. Invalid field text and designs no side draws give no
- * drawing, so the page keeps its last one.
+ * drawing, so the page keeps its last one. Its texts are in the language of `t`.
  */
-export function evaluate(design: Design, system: UnitSystem, last?: string): Evaluation {
+export function evaluate(
+  design: Design,
+  system: UnitSystem,
+  last?: string,
+  t: Translator['t'] = english.t,
+): Evaluation {
   const states = fieldStates(design)
   const done = (refusal: Evaluation['refusal']): Evaluation => ({
     refusal,
@@ -568,18 +596,18 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
     derived: [],
   })
 
-  const invalid = refuseInvalid(design, system, last)
+  const invalid = refuseInvalid(design, system, last, t)
   if (invalid) return done(invalid)
 
   const spec = draftSpec(design)
-  const laid = refuseUnlayable(spec, design, last)
+  const laid = refuseUnlayable(spec, design, last, t)
   if ('refusal' in laid) return done(laid.refusal)
   const { list, shown } = laid
 
   const checks = plausibilityChecks(spec)
   const notes = outlineNotes(shown)
   const lead = nth(shown, 0)
-  const derived = design.table === 'VII' ? [] : derive(lead, spec.values)
+  const derived = design.table === 'VII' ? [] : derive(lead, spec.values, t)
   for (const { side, p } of lead.drawn)
     if (
       side === 'cartridge' &&
@@ -590,17 +618,30 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
   return { spec, figures: list, states, checks, notes, derived }
 }
 
+const derivedLabels = {
+  cartridge: {
+    neck: msg('Cartridge neck length'),
+    shoulder: msg('Cartridge shoulder angle'),
+    taper: msg('Cartridge body taper'),
+  },
+  chamber: {
+    neck: msg('Chamber neck length'),
+    shoulder: msg('Chamber shoulder angle'),
+    taper: msg('Chamber body taper'),
+  },
+} as const
+
 /** Neck length, shoulder angle and body taper of each drawn side, from stored values (mm, degrees); SI out. */
-function derivedAngles(figure: Figure, values: SpecValue[]): Derived[] {
+function derivedAngles(figure: Figure, values: SpecValue[], t: Translator['t']): Derived[] {
   const out: Derived[] = []
   for (const { side, p } of figure.drawn) {
     const v = (symbol: string) => storedValue(values, side, symbol)?.value
     const [L1, L2, L3, P1, P2, H1] = ['L1', 'L2', 'L3', 'P1', 'P2', 'H1'].map(v)
-    const name = sideName[side]
+    const label = derivedLabels[side]
     if (L3 !== undefined && L2 !== undefined && L3 > L2)
       out.push({
         key: `${side}.neck`,
-        label: `${name} neck length`,
+        label: t(label.neck),
         basis: 'L3 - L2',
         quantity: 'length',
         si: toSi('length', L3 - L2),
@@ -608,8 +649,8 @@ function derivedAngles(figure: Figure, values: SpecValue[]): Derived[] {
     if (P2 !== undefined && H1 !== undefined && L1 !== undefined && L2 !== undefined && L2 > L1)
       out.push({
         key: `${side}.shoulder`,
-        label: `${name} shoulder angle`,
-        basis: 'included, 2 atan((P2 - H1) / 2 / (L2 - L1))',
+        label: t(label.shoulder),
+        basis: t('included, 2 atan((P2 - H1) / 2 / (L2 - L1))'),
         quantity: 'angle',
         si: 2 * Math.atan((P2 - H1) / 2 / (L2 - L1)),
       })
@@ -618,8 +659,8 @@ function derivedAngles(figure: Figure, values: SpecValue[]): Derived[] {
     if (P1 !== undefined && P2 !== undefined && L1 !== undefined && zP1 !== undefined && L1 > zP1)
       out.push({
         key: `${side}.taper`,
-        label: `${name} body taper`,
-        basis: 'included angle from P1 at its drawn station to P2 at L1',
+        label: t(label.taper),
+        basis: t('included angle from P1 at its drawn station to P2 at L1'),
         quantity: 'angle',
         si: 2 * Math.atan((P1 - P2) / 2 / (L1 - zP1)),
       })
@@ -631,7 +672,11 @@ function derivedAngles(figure: Figure, values: SpecValue[]): Derived[] {
  * Case volume of the drawn cartridge, approximate: its outline less a wall from the head end to the
  * mouth, stored values (mm, degrees) in, SI out; none without a drawn cartridge.
  */
-function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | undefined {
+function approximateCaseVolume(
+  figure: Figure,
+  values: SpecValue[],
+  t: Translator['t'],
+): Derived | undefined {
   const c = figure.drawn.find((d) => d.side === 'cartridge')
   if (!c) return undefined
   const v = (symbol: string) => storedValue(values, 'cartridge', symbol)?.value
@@ -652,11 +697,19 @@ function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | u
   }
   return {
     key: 'volume',
-    label: 'Case volume (approximate)',
+    label: t('Case volume (approximate)'),
     quantity: 'capacity',
     // mm3 is mm2 times mm
     si: toSi('length', toSi('area', mm3)),
-    basis: `the cartridge outline less a wall of ${fromNeck ? `(H2 - G1) / 2 = ${Number(wall.toFixed(3))} mm` : '0.3 mm (assumed, no G1)'} everywhere, from the head end (E, else R) at ${head} mm to the mouth; cartridge maxima, not a measured capacity`,
+    basis: t(
+      'the cartridge outline less a wall of {wall} everywhere, from the head end (E, else R) at {head} mm to the mouth; cartridge maxima, not a measured capacity',
+      {
+        wall: fromNeck
+          ? t('(H2 - G1) / 2 = {wall} mm', { wall: Number(wall.toFixed(3)) })
+          : t('0.3 mm (assumed, no G1)'),
+        head,
+      },
+    ),
   }
 }
 
@@ -664,9 +717,9 @@ function approximateCaseVolume(figure: Figure, values: SpecValue[]): Derived | u
  * Neck length, shoulder angle and body taper per drawn side, and the case volume of the drawn
  * cartridge, all from stored values in mm and degrees; SI out.
  */
-function derive(figure: Figure, values: SpecValue[]): Derived[] {
-  const volume = approximateCaseVolume(figure, values)
-  return [...derivedAngles(figure, values), ...(volume ? [volume] : [])]
+function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derived[] {
+  const volume = approximateCaseVolume(figure, values, t)
+  return [...derivedAngles(figure, values, t), ...(volume ? [volume] : [])]
 }
 
 /** Slider range of a field, SI: fixed per symbol, widened by a larger value. */

@@ -2,6 +2,7 @@
 
 import { Autocomplete } from '@mantine/core'
 import { memo, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import type { useManufacturers } from './use-manufacturers.ts'
 
 /**
@@ -25,6 +26,7 @@ export const ManufacturerInput = memo(function ManufacturerInput({
   manufacturers: ReturnType<typeof useManufacturers>
 }) {
   // undefined: not being edited, the field shows the name of `value`
+  const { t } = useTranslation()
   const [typed, setTyped] = useState<string>()
   const pending = useRef<string>(undefined)
   // Mantine calls onChange with the option's text right after onOptionSubmit
@@ -61,7 +63,9 @@ export const ManufacturerInput = memo(function ManufacturerInput({
       value={typed ?? nameOf(value)}
       error={
         unchecked
-          ? 'The manufacturer list cannot be read, so this name is not kept. Try again when it loads.'
+          ? t(
+              'The manufacturer list cannot be read, so this name is not kept. Try again when it loads.',
+            )
           : undefined
       }
       data={[...new Set(known.map((m) => m.name))]}

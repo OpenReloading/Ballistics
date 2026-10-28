@@ -507,6 +507,8 @@ export function FirearmLibrary() {
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
   const [failure, setFailure] = useState('')
+  /** Why the firearm that `?record=` names could not be opened. */
+  const [linkFailure, setLinkFailure] = useState<Message>()
   /** Why the browser store could not be read. */
   const [readError, setReadError] = useState('')
   /** The name field was left once; its error shows from then on, not on a fresh page. */
@@ -521,7 +523,7 @@ export function FirearmLibrary() {
   const menu = useRef<FileMenuHandle>(null)
   // a row's link in a new tab: `?record=<id>` opens that firearm
   // the alert line shows alerts only, not the reading of the linked record
-  useRecordLink('firearm', menu, (m) => setFailure(m && m !== recordLoadingText ? m : ''))
+  useRecordLink('firearm', menu, (m) => setLinkFailure(m === recordLoadingText ? undefined : m))
 
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)
@@ -728,6 +730,7 @@ export function FirearmLibrary() {
             }
           />
           {failure && <ErrorNote>{failure}</ErrorNote>}
+          {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
           <LibraryBody
             readError={readError}
             onRetry={refresh}

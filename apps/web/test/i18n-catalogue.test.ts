@@ -160,6 +160,9 @@ const otherSense: Record<string, string> = {
     'drop: drop a file onto the page, not a bullet drop',
   'Photo: choose, drop or paste one; it stays in this browser and is never uploaded':
     'drop: drop a file onto the page',
+  'Click or tap the graduation of the ruler at two points, A and B, then enter their distance. Drag a point to move it. A second pair, C and D, checks the first.':
+    'drag: move with the pointer, not air drag',
+  'Include shot positions': 'where the shots are on the sheet, not a shooting position',
   'Select: drag shots, points of aim and reference points; drag the background to pan':
     'drag: move with the pointer, not air drag',
   'The federation whose disciplines the Discipline list shows. All: every discipline, then the face events no discipline names.':

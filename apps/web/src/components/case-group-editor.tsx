@@ -4,6 +4,7 @@ import { Button } from '@mantine/core'
 import type { Case, UserCaseRecord, UserRecord } from '@open-reloading/schema'
 import { useCallback, useDeferredValue, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import type { Message } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import { blankCaseGroup, caseGroupProblem, groupCapacity, withCapacity } from '../lib/case-group.ts'
@@ -60,12 +61,12 @@ export function CaseGroupEditor() {
   const [data, setData] = useState<Case>(blankCaseGroup)
   /** The measured water capacity, m3: a record of its own that the group names. */
   const [capacity, setCapacity] = useState<number>()
-  const [failure, setFailure] = useState('')
+  const [failure, setFailure] = useState<Message>()
   const [nameLeft, setNameLeft] = useState(false)
   /** A new or opened group remounts the editor, so no field starts as left. */
   const [generation, setGeneration] = useState(0)
   const menu = useRef<FileMenuHandle>(null)
-  useRecordLink('case', menu, (m) => setFailure(m && m !== recordLoadingText ? m : ''))
+  useRecordLink('case', menu, (m) => setFailure(m === recordLoadingText ? undefined : m))
   const { nameOf: cartridgeName, setNames: setCartridgeNames } = useCartridgeNames([data.cartridge])
 
   /** Shows `next` in a remounted editor, with its measured capacity `m3`. */
@@ -136,7 +137,7 @@ export function CaseGroupEditor() {
         }
       />
       <div className="library">
-        {failure && <ErrorNote>{failure}</ErrorNote>}
+        {failure && <ErrorNote>{t(failure)}</ErrorNote>}
         <CaseEditor
           key={generation}
           data={data}

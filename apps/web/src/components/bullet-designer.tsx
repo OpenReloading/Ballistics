@@ -8,7 +8,9 @@ import { type Bullet, toSi, type UserBullet } from '@open-reloading/schema'
 import { Camera } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
-import { msg } from '../i18n/translate.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { localizeDecimals } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
 import {
@@ -33,9 +35,10 @@ import {
 import { fieldError } from '../lib/field-spec.ts'
 import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
+import { rawWording } from '../lib/record-values.ts'
 import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { resolveBullet } from '../lib/variants.ts'
-import { verbatim } from '../lib/wording.ts'
+import { say } from '../lib/wording.ts'
 import { description } from './bullet-drawing.tsx'
 import { DesignerField } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
@@ -59,38 +62,50 @@ const BulletPhoto = dynamic(() => import('./bullet-photo.tsx').then((m) => m.Bul
   ssr: false,
 })
 
-const choiceLabels: Record<ChoiceKey, [string, Group]> = {
-  'base.type': ['Base type', 'base'],
-  'ogive.form': ['Nose form', 'nose'],
-  'tip.type': ['Tip', 'tip'],
+const choiceLabels: Record<ChoiceKey, [Message, Group]> = {
+  'base.type': [msg('Base type'), 'base'],
+  'ogive.form': [msg('Nose form'), 'nose'],
+  'tip.type': [msg('Tip'), 'tip'],
 }
 
 /** Hollow bases get shorter names: the select is too narrow for the full type name. */
-const shortLabels: Record<string, string> = {
-  'conical-hollow-base': 'hollow cone',
-  'rounded-hollow-base': 'hollow round',
+const shortLabels: Record<string, Message> = {
+  'conical-hollow-base': msg('hollow cone'),
+  'rounded-hollow-base': msg('hollow round'),
 }
 
-const optionLabel = (o: string) =>
-  o === '' ? 'Not given' : (shortLabels[o] ?? o.replaceAll('-', ' '))
+/** An option's name: a stored value the catalogue has is translated, English shows it with spaces. */
+function optionLabel(o: string, t: Translator['t']) {
+  if (o === '') return t('Not given')
+  const short = shortLabels[o]
+  if (short) return t(short)
+  const word = say(t, rawWording(o))
+  return word === o ? o.replaceAll('-', ' ') : word
+}
 
 /** The field's state line: where its value comes from. */
-function stateText(s: DesignerSpec, state: FieldState, system: UnitSystem) {
+function stateText(s: DesignerSpec, state: FieldState, system: UnitSystem, t: Translator['t']) {
   const unit = system[s.quantity].symbol
   const value = (si: number) => `${formatQuantity(s.quantity, system, si)}${unit ? ` ${unit}` : ''}`
   switch (state.kind) {
     case 'record':
-      return 'From the catalog record'
+      return t('From the catalog record')
     case 'entered':
-      return state.changed
-        ? `Changed; catalog ${state.record === undefined ? 'value not given' : value(state.record)}`
-        : 'Entered'
+      if (!state.changed) return t('Entered')
+      return state.record === undefined
+        ? t('Changed; catalog value not given')
+        : t('Changed; catalog {value}', { value: value(state.record) })
     case 'derived':
-      return `Derived: ${value(state.si)}`
+      return t('Derived: {value}', { value: value(state.si) })
     case 'assumed':
-      return `Assumed: ${value(state.si)}${state.basis ? ` (${state.basis})` : ''}`
+      return state.basis
+        ? t('Assumed: {value} ({basis})', {
+            value: value(state.si),
+            basis: localizeDecimals(state.basis),
+          })
+        : t('Assumed: {value}', { value: value(state.si) })
     case 'empty':
-      return 'Not given'
+      return t('Not given')
   }
 }
 
@@ -112,18 +127,19 @@ const StartSearch = memo(function StartSearch({
   chosen?: string | undefined
 }) {
   const names = useManufacturerNames()
+  const { t } = useTranslation()
   return (
     <RecordSearch<BulletSummary>
       kind="bullets"
-      label="Start from a record"
-      chosen={chosen ?? 'Start from a record'}
+      label={t('Start from a record')}
+      chosen={chosen ?? t('Start from a record')}
       picked={chosen !== undefined}
       describe={(b) =>
         `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}`
       }
       onSelect={(b) => start(b.id)}
-      noneText="No bullet found"
-      unreachableText="The database is unreachable. The designer still works."
+      noneText={t('No bullet found')}
+      unreachableText={t('The database is unreachable. The designer still works.')}
     />
   )
 })
@@ -139,16 +155,17 @@ const ChoiceSelect = memo(function ChoiceSelect({
   error?: string | undefined
   dispatch: (a: Action) => void
 }) {
+  const { t } = useTranslation()
   return (
     // the message is the description (screen readers, the grid's help line) and the title: it moves nothing
     <div className="designer-field" data-error={error ? true : undefined}>
       <NativeSelect
-        label={choiceLabels[k][0]}
+        label={t(choiceLabels[k][0])}
         labelProps={{ title: error }}
         value={value}
         description={error}
         error={!!error}
-        data={['', ...choiceOptions[k]].map((o) => ({ value: o, label: optionLabel(o) }))}
+        data={['', ...choiceOptions[k]].map((o) => ({ value: o, label: optionLabel(o, t) }))}
         onChange={(ev) => dispatch({ type: 'choice', key: k, value: ev.currentTarget.value })}
       />
     </div>
@@ -195,27 +212,43 @@ const PrintDrawing = memo(function PrintDrawing({
   )
 })
 
-const fieldLabel = (key: string) =>
-  designerSpecs.find((s) => s.key === key)?.label ??
-  (key in choiceLabels ? choiceLabels[key as ChoiceKey][0] : key)
+const fieldLabel = (key: string, t: Translator['t']) => {
+  const label =
+    designerSpecs.find((s) => s.key === key)?.label ??
+    (key in choiceLabels ? choiceLabels[key as ChoiceKey][0] : undefined)
+  return label ? t(label) : key
+}
 
-const changedText = (changed: DesignerSpec, design: Design) =>
-  `${changed.label} ${design.fields[changed.key]?.text || 'cleared'}. `
+const changedText = (changed: DesignerSpec, design: Design, t: Translator['t']) => {
+  const text = design.fields[changed.key]?.text
+  return text
+    ? t('{label} {value}. ', { label: t(changed.label), value: text })
+    : t('{label} cleared. ', { label: t(changed.label) })
+}
 
 /** The polite line: the refusal, else the last change and that the drawing updated. */
-const announcement = (refusal: { reason: string } | undefined, change: string | undefined) =>
-  refusal ? `Drawing not updated: ${refusal.reason}` : `${change ?? ''}Drawing updated.`
+const announcement = (
+  refusal: { reason: string } | undefined,
+  change: string | undefined,
+  t: Translator['t'],
+) =>
+  refusal
+    ? t('Drawing not updated: {reason}', { reason: refusal.reason })
+    : `${change ?? ''}${t('Drawing updated.')}`
 
 /** The Parameters panel's message for a locked, changed-base or started-from design. */
-function designMessage(design: Design) {
-  if (design.locked) return `Read only: ${design.locked.reason}`
+function designMessage(design: Design, t: Translator['t']) {
+  if (design.locked) return t('Read only: {reason}', { reason: design.locked.reason })
   if (design.baseChanged)
-    return `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
-  return design.origin && `Started from ${design.origin.title}.`
+    return t(
+      'The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.',
+      { name: design.origin?.title ?? design.basedOn ?? '' },
+    )
+  return design.origin && t('Started from {name}.', { name: design.origin.title })
 }
 
 /** Whether a segment is drawn from an assumed shape, and the notes under the drawing. */
-function drawingNotes(drawing: Drawing | undefined) {
+function drawingNotes(drawing: Drawing | undefined, t: Translator['t']) {
   if (!drawing) return { assumed: undefined, notes: [] }
   const { annotation, outline } = drawing.profile
   const symbols = [...annotation.dimensions, ...annotation.radii].map(
@@ -223,11 +256,11 @@ function drawingNotes(drawing: Drawing | undefined) {
   )
   const assumed = outline.segments.some((s) => s.approximate)
   const notes = [
-    'Entered and catalog values are dimensioned, derived and assumed values are not.',
+    t('Entered and catalog values are dimensioned, derived and assumed values are not.'),
     ...(assumed
-      ? ['Dashed in the flag color: parts drawn from an assumed shape (see the notes).']
+      ? [t('Dashed in the flag color: parts drawn from an assumed shape (see the notes).')]
       : []),
-    ...(symbols.length > 0 ? [`Symbols: ${symbols.join(', ')}.`] : []),
+    ...(symbols.length > 0 ? [t('Symbols: {symbols}.', { symbols: symbols.join(', ') })] : []),
     ...outline.notes,
   ]
   return { assumed, notes }
@@ -244,23 +277,25 @@ function markDimension(box: HTMLElement | null, t: Element | null) {
 }
 
 /** The values of the print sheet: identity, choices and the entered fields. */
-const printRows = (design: Design, manufacturer: string | undefined): FieldRow[] => [
+const printRows = (
+  design: Design,
+  manufacturer: string | undefined,
+  t: Translator['t'],
+): FieldRow[] => [
   ...(
     [
-      ['Manufacturer', manufacturer],
-      ['Name', design.name],
+      [msg('Manufacturer'), manufacturer],
+      [msg('Name'), design.name],
     ] as const
-  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label: verbatim(label), text }] : [])),
+  ).flatMap(([label, text]): FieldRow[] => (text ? [{ label, text }] : [])),
   ...(Object.keys(choiceLabels) as ChoiceKey[]).flatMap((k): FieldRow[] =>
     design.choices[k]
-      ? [{ label: verbatim(choiceLabels[k][0]), text: optionLabel(design.choices[k]) }]
+      ? [{ label: choiceLabels[k][0], text: optionLabel(design.choices[k], t) }]
       : [],
   ),
   ...designerSpecs.flatMap((s): FieldRow[] => {
     const si = design.fields[s.key]?.si
-    return si === undefined
-      ? []
-      : [{ label: verbatim(s.label), value: { quantity: s.quantity, si } }]
+    return si === undefined ? [] : [{ label: s.label, value: { quantity: s.quantity, si } }]
   }),
 ]
 
@@ -269,6 +304,7 @@ const printRows = (design: Design, manufacturer: string | undefined): FieldRow[]
  * it, undo and redo; the last valid drawing stays while the input is refused.
  */
 export function BulletDesigner() {
+  const { t } = useTranslation()
   const manufacturers = useManufacturers()
   const reloadManufacturers = manufacturers.reload
   const { system, history, design, dispatch, loading, fileMenu, start, begin, toolbarDispatch } =
@@ -284,20 +320,23 @@ export function BulletDesigner() {
         const names = await fetchManufacturerNames().catch(() => noManufacturerNames)
         return fromRecord(record, system, names)
       },
-      loadingText: 'Loading the bullet…',
-      failText: 'The bullet could not be loaded. The designer still works.',
+      loadingText: msg('Loading the bullet…'),
+      failText: msg('The bullet could not be loaded. The designer still works.'),
     })
 
   const [photoOpen, setPhotoOpen] = useState(false)
   const photoButton = useRef<HTMLButtonElement>(null)
-  const e = useMemo(() => evaluate(design, system, history.last), [design, system, history.last])
+  const e = useMemo(
+    () => evaluate(design, system, history.last, t),
+    [design, system, history.last, t],
+  )
   const lastGood = useRef<Drawing | undefined>(undefined)
   if (e.drawing) lastGood.current = e.drawing
   const drawing = e.drawing ?? lastGood.current
   const printed = useDeferredValue(drawing)
   // one polite line 500 ms after the last change
   const changed = history.last && designerSpecs.find((s) => s.key === history.last)
-  const message = announcement(e.refusal, changed && changedText(changed, design))
+  const message = announcement(e.refusal, changed && changedText(changed, design, t), t)
   const [announced] = useDebouncedValue(message, 500)
 
   const errorOf = (key: string) =>
@@ -305,6 +344,7 @@ export function BulletDesigner() {
       designerSpecs.find((s) => s.key === key) as DesignerSpec,
       design.fields[key],
       system,
+      t,
     ) ?? (e.refusal?.field === key ? e.refusal.reason : undefined)
 
   const groupFields = (g: Group) => (
@@ -333,7 +373,7 @@ export function BulletDesigner() {
               spec={s}
               system={system}
               value={value}
-              help={stateText(s, state, system)}
+              help={stateText(s, state, system, t)}
               flag={changed ? 'changed' : flagOf[state.kind]}
               changed={changed}
               error={errorOf(s.key)}
@@ -347,8 +387,8 @@ export function BulletDesigner() {
 
   const labelOf = (d: Design) =>
     productLabel({ name: d.name, manufacturerName: manufacturers.nameOf(d.manufacturer) })
-  const title = `Outline, ${labelOf(design) || 'new bullet'}`
-  const { assumed, notes } = drawingNotes(drawing)
+  const title = t('Outline, {name}', { name: labelOf(design) || t('new bullet') })
+  const { assumed, notes } = drawingNotes(drawing, t)
 
   const root = useRef<HTMLDivElement>(null)
   const mark = (t: Element | null) => markDimension(root.current, t)
@@ -379,8 +419,8 @@ export function BulletDesigner() {
         undo={history.past.length > 0}
         redo={history.future.length > 0}
         reset={design.origin !== undefined}
-        newLabel="New bullet"
-        resetLabel="Reset to record"
+        newLabel={t('New bullet')}
+        resetLabel={t('Reset to record')}
         system={system}
         dispatch={toolbarDispatch}
       />
@@ -391,7 +431,7 @@ export function BulletDesigner() {
         onClick={() => setPhotoOpen(true)}
         disabled={design.locked !== undefined}
       >
-        From a photo
+        {t('From a photo')}
       </Button>
       <FileMenu
         ref={fileMenu}
@@ -400,7 +440,7 @@ export function BulletDesigner() {
         data={fileValue}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
-        reportBox="Include the design"
+        reportBox={t('Include the design')}
       />
     </>
   )
@@ -410,22 +450,22 @@ export function BulletDesigner() {
     <form noValidate onSubmit={(ev) => ev.preventDefault()}>
       <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
         <PropertyGrid
-          title="Parameters"
+          title={t('Parameters')}
           head={<StartSearch system={system} start={start} chosen={design.origin?.title} />}
-          message={loading ?? designMessage(design)}
+          message={loading ?? designMessage(design, t)}
           sections={(Object.keys(groups) as Group[]).map((g) => ({
             key: g,
-            title: groups[g],
+            title: t(groups[g]),
             content:
               g === 'identity' ? (
                 <div className="prop-grid designer-grid">
                   <ManufacturerInput
-                    label="Manufacturer"
+                    label={t('Manufacturer')}
                     value={design.manufacturer}
                     manufacturers={manufacturers}
                     onChange={(value) => dispatch({ type: 'manufacturer', value })}
                   />
-                  <TextField k="name" label="Name" value={design.name} dispatch={dispatch} />
+                  <TextField k="name" label={t('Name')} value={design.name} dispatch={dispatch} />
                 </div>
               ) : (
                 groupFields(g)
@@ -438,11 +478,15 @@ export function BulletDesigner() {
 
   const computed =
     e.computed.length > 0
-      ? `Computed from the design: ${e.computed.map((r) => `${rowLabel(r, system)} ${rowValue(r, system)}`).join(', ')}.`
+      ? t('Computed from the design: {values}.', {
+          values: e.computed
+            .map((r) => `${rowLabel(r, system, t)} ${rowValue(r, system, t)}`)
+            .join(', '),
+        })
       : ''
 
   // print: the drawing and the values, not the form
-  const values = printRows(design, manufacturers.nameOf(design.manufacturer))
+  const values = printRows(design, manufacturers.nameOf(design.manufacturer), t)
 
   const results = (
     <>
@@ -452,7 +496,7 @@ export function BulletDesigner() {
           onClose={() => {
             setPhotoOpen(false)
             // the tool is unmounted at once, so the modal's own return of the focus never runs
-            focusBack(photoButton.current, '.page-bar button[aria-label="Page actions"]')
+            focusBack(photoButton.current, '.page-bar .page-bar-toggle')
           }}
           system={system}
           record={design.origin}
@@ -460,19 +504,22 @@ export function BulletDesigner() {
         />
       )}
       <div className="page-panel-head designer-panel-head">
-        <h2 className="page-panel-title record-heading">Drawing</h2>
+        <h2 className="page-panel-title record-heading">{t('Drawing')}</h2>
       </div>
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={e.refusal?.reason}>
         {e.refusal &&
-          `Drawing for earlier inputs. Fix ${fieldLabel(e.refusal.field)}: ${e.refusal.reason}`}
+          t('Drawing for earlier inputs. Fix {field}: {reason}', {
+            field: fieldLabel(e.refusal.field, t),
+            reason: e.refusal.reason,
+          })}
       </Text>
       {drawing && (
         <figure className="drawing-figure designer-drawing" data-stale={!e.drawing || undefined}>
           <TechnicalDrawing
             id="designer-drawing"
             title={title}
-            desc={description(drawing.profile, drawingLengthUnit(system))}
+            desc={description(drawing.profile, drawingLengthUnit(system), t)}
             model={drawing.screen}
             linked
           />
@@ -486,11 +533,16 @@ export function BulletDesigner() {
           {/* on screen the legend line and the notes behind a button, in print every note */}
           <figcaption>
             <span className="screen-only designer-legend">
-              {assumed ? 'Dashed: drawn from an assumed shape. ' : ''}Derived and assumed values are
-              not dimensioned.
+              {assumed
+                ? t(
+                    'Dashed: drawn from an assumed shape. Derived and assumed values are not dimensioned.',
+                  )
+                : t('Derived and assumed values are not dimensioned.')}
             </span>
             <DrawingNotes notes={notes} />
-            <span className="print-only">Drawing of the design. {notes.join(' ')}</span>
+            <span className="print-only">
+              {t('Drawing of the design.')} {notes.join(' ')}
+            </span>
           </figcaption>
         </figure>
       )}
@@ -513,7 +565,7 @@ export function BulletDesigner() {
 
   return (
     <>
-      <PageBar title="Bullet designer" actions={toolbar} />
+      <PageBar translated title={msg('Bullet designer')} actions={toolbar} />
       {/* biome-ignore lint/a11y/noStaticElementInteractions: follows focus and hover of the fields inside, takes none itself */}
       <div
         ref={root}

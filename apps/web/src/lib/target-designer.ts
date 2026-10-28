@@ -1,6 +1,8 @@
 /** The target face designer: the draft, its file data, the face it builds and the problems it reports. */
 import type { FaceShape } from '@open-reloading/drawing/target'
 import { faceColour, type TargetFace, type TargetFaceDesign } from '@open-reloading/schema'
+import { untranslated } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   type FieldSpec,
   type Fields,
@@ -60,15 +62,15 @@ export function specOf(key: string): FieldSpec {
   const common = { key, positive: true }
   switch (last) {
     case 'value':
-      return { ...common, label: 'Ring value', quantity: 'ratio', integer: true }
+      return { ...common, label: msg('Ring value'), quantity: 'ratio', integer: true }
     case 'diameter':
-      return { ...common, label: 'Diameter', quantity: 'length' }
+      return { ...common, label: msg('Diameter'), quantity: 'length' }
     case 'height':
-      return { ...common, label: 'Height', quantity: 'length' }
+      return { ...common, label: msg('Height'), quantity: 'length' }
     case 'distance':
-      return { ...common, label: 'Distance', quantity: 'range' }
+      return { ...common, label: msg('Distance'), quantity: 'range' }
     default:
-      return { ...common, label: 'Gauge', quantity: 'length' }
+      return { ...common, label: msg('Gauge'), quantity: 'length' }
   }
 }
 
@@ -202,26 +204,63 @@ const fieldKeyOf = (d: Design, path: PropertyKey[]): string | undefined => {
   if (head === 'blackHeight') return 'black.height'
 }
 
-const labels: Record<string, string> = {
-  rings: 'Rings',
-  events: 'Events',
-  blackDiameter: 'Black area diameter',
-  blackHeight: 'Black area height',
-  innerTen: 'Inner ten',
+const labels: Record<string, Message> = {
+  rings: msg('Rings'),
+  events: msg('Events of the face'),
+  blackDiameter: msg('Black area diameter'),
+  blackHeight: msg('Black area height'),
+  innerTen: msg('Inner ten'),
+}
+
+/** The refusals of the face schema and of the face builder, by their text, as messages the catalogue holds. */
+const faceMessages: Record<string, Message> = {
+  'Required.': msg('Required.'),
+  'must be one above the ring outside it': msg('must be one above the ring outside it'),
+  'must be below the ring outside it': msg('must be below the ring outside it'),
+  'must not exceed the innermost ring': msg('must not exceed the innermost ring'),
+  'a square has no height': msg('a square has no height'),
+  'height on all rings or on none': msg('height on all rings or on none'),
+  'tenth-ring values need circular rings': msg('tenth-ring values need circular rings'),
+  'cover needs a circular inner ten': msg('cover needs a circular inner ten'),
+  'a height needs oval rings': msg('a height needs oval rings'),
+  'stadium on all rings or on none': msg('stadium on all rings or on none'),
+  'a stadium needs a height': msg('a stadium needs a height'),
+  'a stadium is at least as high as it is wide': msg('a stadium is at least as high as it is wide'),
+  'a stadium inner ten needs a height': msg('a stadium inner ten needs a height'),
+  'must be unique within the face': msg('must be unique within the face'),
+  'black zones must be adjacent rings': msg('black zones must be adjacent rings'),
+  'must equal the diameter of the outermost black ring': msg(
+    'must equal the diameter of the outermost black ring',
+  ),
+}
+
+/** A refusal in the language of `t`: a text the table lacks (a zod message) stays as it is. */
+function faceMessage(text: string, t: Translator['t']) {
+  const known = faceMessages[text]
+  if (known) return t(known)
+  const needed = /^at least (\d+) needed\.$/.exec(text)
+  return needed ? t('at least {n} needed.', { n: Number(needed[1]) }) : text
 }
 
 /**
- * The face the draft builds as the tools use it, or the problems with the draft: those of a field
- * carry its key, the others name the part of the face.
+ * The face the draft builds as the tools use it, or the problems with the draft in the language of
+ * `t`: those of a field carry its key, the others name the part of the face.
  */
-export function faceOf(d: Design, id: string): { face: TargetFace } | { problems: Problem[] } {
+export function faceOf(
+  d: Design,
+  id: string,
+  t: Translator['t'] = untranslated(),
+): { face: TargetFace } | { problems: Problem[] } {
   const built = buildFace(fileData(d), id, d.name.trim() || 'Target face design')
   if ('face' in built) return built
   return {
-    problems: built.issues.map(({ path, message }) => {
+    problems: built.issues.map(({ path, message: given }) => {
       const key = fieldKeyOf(d, path)
       const part = typeof path[0] === 'string' ? labels[path[0]] : undefined
-      return key || !part ? { key, message } : { message: `${part}: ${message}` }
+      const message = faceMessage(given, t)
+      return key || !part
+        ? { key, message }
+        : { message: t('{part}: {message}', { part: t(part), message }) }
     }),
   }
 }

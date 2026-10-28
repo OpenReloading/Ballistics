@@ -1,12 +1,17 @@
 import type { BulletDimensions } from '@open-reloading/drawing/bullet'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { scaleOf } from '../src/lib/bullet-photo.ts'
 import { segmentPhoto } from '../src/lib/bullet-photo-colour.ts'
 import { measureOutline } from '../src/lib/bullet-photo-measure.ts'
 import { fitOutline } from '../src/lib/bullet-photo-outline.ts'
 import { renderPhoto } from '../src/lib/bullet-photo-sample.ts'
 import { resolveScale } from '../src/lib/bullet-photo-scale.ts'
+import { say, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
+
+/** The English text of sentences for the user. */
+const text = (w: readonly Wording[]) => w.map((x) => say(english.t, x)).join(' ')
 
 const shape: BulletDimensions = {
   diameter: 7.82,
@@ -86,14 +91,14 @@ describe('the scale from caliper sizes', () => {
     const r = resolveScale(px, ruler, { diameter: 8.5, length: 30 })
     expect(r.scale).toBe(ruler)
     expect(r.notes).toHaveLength(1)
-    expect(r.notes[0]).toMatch(/diameter in the photograph is \d+\.\d %/)
+    expect(text(r.notes)).toMatch(/diameter in the photograph is \d+(\.\d)? %/)
   })
 
   it('says that two sizes give scales apart, and uses their mean with the difference in its uncertainty', () => {
     const agree = defined(resolveScale(px, undefined, { diameter: 7.82, length: 30 }).scale)
     const r = resolveScale(px, undefined, { diameter: 8.5, length: 30 })
     expect(r.notes).toHaveLength(1)
-    expect(r.notes[0]).toMatch(/scales \d+\.\d % apart/)
+    expect(text(r.notes)).toMatch(/scales \d+(\.\d)? % apart/)
     expect(defined(r.scale).relUncertainty).toBeGreaterThan(3 * agree.relUncertainty)
   })
 })
