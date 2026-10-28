@@ -135,6 +135,7 @@ export const sections = [
 /** Tool pages: no reading measure on their text; every other page is a document page. */
 export const toolRoutes = [
   '/workbench',
+  '/prototype-workbench',
   '/groups',
   '/bullets/designer',
   '/cartridges/designer',

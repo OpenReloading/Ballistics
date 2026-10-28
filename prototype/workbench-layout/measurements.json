@@ -1,0 +1,2789 @@
+[
+  {
+    "variant": "shipped",
+    "size": "1280x650",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["workspace-scroll v45"],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 23,
+      "shown": 23,
+      "inView": 23
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 642
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 343
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 0
+    },
+    "cut": [],
+    "recordNameEllipsis": 0,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "overallLength",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "Slide to change COAL",
+        "Dynamic vivacity of Demo Powder Co. DP40",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "charge",
+        "down",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "Browse bullets",
+        "More of Bullet",
+        "Cup and core",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": null
+    }
+  },
+  {
+    "variant": "shipped",
+    "size": "1366x657",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["workspace-scroll v38"],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 23,
+      "shown": 23,
+      "inView": 23
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 649
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 343
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 0
+    },
+    "cut": [],
+    "recordNameEllipsis": 0,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "overallLength",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "Slide to change COAL",
+        "Dynamic vivacity of Demo Powder Co. DP40",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "charge",
+        "down",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "Browse bullets",
+        "More of Bullet",
+        "Cup and core",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": null
+    }
+  },
+  {
+    "variant": "shipped",
+    "size": "390x844",
+    "pageScroll": {
+      "down": 593,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v1182"],
+    "inputsColumnScroll": 1182,
+    "inputs": {
+      "total": 22,
+      "shown": 22,
+      "inView": 8
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": -643,
+          "bottom": 372
+        },
+        {
+          "top": 372,
+          "bottom": 1135
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 534
+        },
+        {
+          "panel": "powder",
+          "height": 310
+        },
+        {
+          "panel": "bullet",
+          "height": 222
+        },
+        {
+          "panel": "firearm",
+          "height": 219
+        }
+      ],
+      "figure": 475
+    },
+    "cut": [],
+    "recordNameEllipsis": 0,
+    "tab": {
+      "stops": 43,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "overallLength",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "Slide to change COAL",
+        "Cartridge",
+        "Full view",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "charge",
+        "down",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "Browse bullets",
+        "More of Bullet",
+        "Cup and core",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": null
+    }
+  },
+  {
+    "variant": "A",
+    "size": "1280x650",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": [],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 22,
+      "shown": 22,
+      "inView": 22
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 642
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 340
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 240
+    },
+    "cut": [],
+    "recordNameEllipsis": 2,
+    "tab": {
+      "stops": 39,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0019,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": 1
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 3
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "B",
+    "size": "1280x650",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v36"],
+    "inputsColumnScroll": 36,
+    "inputs": {
+      "total": 25,
+      "shown": 16,
+      "inView": 14
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 102,
+          "bottom": 678
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 424
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        },
+        {
+          "panel": "bullet",
+          "height": 0
+        },
+        {
+          "panel": "powder",
+          "height": 0
+        }
+      ],
+      "figure": 0
+    },
+    "cut": [],
+    "recordNameEllipsis": 3,
+    "tab": {
+      "stops": 27,
+      "inversions": [],
+      "order": [
+        "Cartridge and gun",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "tab Cartridge and gun",
+      "tab Projectile",
+      "tab Propellant",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 1,
+      "clsInputs": 0,
+      "clsResults": 0.0015,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v73"],
+      "inputsColumnScroll": 73,
+      "cut": [],
+      "recordNameEllipsis": 3
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v73"],
+      "inputsColumnScroll": 73,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "C",
+    "size": "1280x650",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": [],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 22,
+      "shown": 22,
+      "inView": 22
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 642
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 340
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 240
+    },
+    "cut": [],
+    "recordNameEllipsis": 2,
+    "tab": {
+      "stops": 39,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0013,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": 1
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 3
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "D",
+    "size": "1280x650",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v17"],
+    "inputsColumnScroll": 17,
+    "inputs": {
+      "total": 25,
+      "shown": 25,
+      "inView": 25
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 659
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 437
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 160
+    },
+    "cut": [],
+    "recordNameEllipsis": 5,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0019,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v48"],
+      "inputsColumnScroll": 48,
+      "cut": [],
+      "recordNameEllipsis": 6
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v52"],
+      "inputsColumnScroll": 52,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "D-top",
+    "size": "1280x650",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": [],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 25,
+      "shown": 25,
+      "inView": 25
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 117,
+          "bottom": 642
+        },
+        {
+          "top": 117,
+          "bottom": 631
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 340
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 179
+    },
+    "cut": [],
+    "recordNameEllipsis": 4,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0019,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v28"],
+      "inputsColumnScroll": 28,
+      "cut": [],
+      "recordNameEllipsis": 5
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v45"],
+      "inputsColumnScroll": 45,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "A",
+    "size": "1366x657",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": [],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 22,
+      "shown": 22,
+      "inView": 22
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 649
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 340
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 247
+    },
+    "cut": [],
+    "recordNameEllipsis": 2,
+    "tab": {
+      "stops": 39,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0013,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": 1
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 3
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "B",
+    "size": "1366x657",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v29"],
+    "inputsColumnScroll": 29,
+    "inputs": {
+      "total": 25,
+      "shown": 16,
+      "inView": 15
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 102,
+          "bottom": 678
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 424
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        },
+        {
+          "panel": "bullet",
+          "height": 0
+        },
+        {
+          "panel": "powder",
+          "height": 0
+        }
+      ],
+      "figure": 0
+    },
+    "cut": [],
+    "recordNameEllipsis": 3,
+    "tab": {
+      "stops": 27,
+      "inversions": [],
+      "order": [
+        "Cartridge and gun",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "tab Cartridge and gun",
+      "tab Projectile",
+      "tab Propellant",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 1,
+      "clsInputs": 0,
+      "clsResults": 0.0025,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v66"],
+      "inputsColumnScroll": 66,
+      "cut": [],
+      "recordNameEllipsis": 3
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v66"],
+      "inputsColumnScroll": 66,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "C",
+    "size": "1366x657",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": [],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 22,
+      "shown": 22,
+      "inView": 22
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 649
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 340
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 247
+    },
+    "cut": [],
+    "recordNameEllipsis": 2,
+    "tab": {
+      "stops": 39,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0013,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": 1
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 3
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": [],
+      "inputsColumnScroll": 0,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "D",
+    "size": "1366x657",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v10"],
+    "inputsColumnScroll": 10,
+    "inputs": {
+      "total": 25,
+      "shown": 25,
+      "inView": 25
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 56,
+          "bottom": 659
+        },
+        {
+          "top": 56,
+          "bottom": 570
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 437
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 160
+    },
+    "cut": [],
+    "recordNameEllipsis": 5,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0019,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v41"],
+      "inputsColumnScroll": 41,
+      "cut": [],
+      "recordNameEllipsis": 6
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v45"],
+      "inputsColumnScroll": 45,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "D-top",
+    "size": "1366x657",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": [],
+    "inputsColumnScroll": 0,
+    "inputs": {
+      "total": 25,
+      "shown": 25,
+      "inView": 25
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 117,
+          "bottom": 649
+        },
+        {
+          "top": 117,
+          "bottom": 631
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 340
+        },
+        {
+          "panel": "powder",
+          "height": 210
+        },
+        {
+          "panel": "bullet",
+          "height": 146
+        },
+        {
+          "panel": "firearm",
+          "height": 146
+        }
+      ],
+      "figure": 186
+    },
+    "cut": [],
+    "recordNameEllipsis": 4,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0019,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v21"],
+      "inputsColumnScroll": 21,
+      "cut": [],
+      "recordNameEllipsis": 5
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v38"],
+      "inputsColumnScroll": 38,
+      "cut": [],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "A",
+    "size": "390x844",
+    "pageScroll": {
+      "down": 104,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v788"],
+    "inputsColumnScroll": 788,
+    "inputs": {
+      "total": 22,
+      "shown": 22,
+      "inView": 9
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 102,
+          "bottom": 721
+        },
+        {
+          "top": 721,
+          "bottom": 1487
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 498
+        },
+        {
+          "panel": "powder",
+          "height": 310
+        },
+        {
+          "panel": "bullet",
+          "height": 222
+        },
+        {
+          "panel": "firearm",
+          "height": 222
+        }
+      ],
+      "figure": 115
+    },
+    "cut": [],
+    "recordNameEllipsis": 0,
+    "tab": {
+      "stops": 39,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0001,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 1,
+      "brass": 1,
+      "capacity": 1
+    },
+    "long": {
+      "pageScroll": {
+        "down": 117,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v803"],
+      "inputsColumnScroll": 803,
+      "cut": [],
+      "recordNameEllipsis": 1
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 112,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v798h22"],
+      "inputsColumnScroll": 798,
+      "cut": ["H1 \"Workbench layout A (prototype)\" overflows downwards"],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "B",
+    "size": "390x844",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v307"],
+    "inputsColumnScroll": 307,
+    "inputs": {
+      "total": 25,
+      "shown": 16,
+      "inView": 11
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 147,
+          "bottom": 1005
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 630
+        },
+        {
+          "panel": "firearm",
+          "height": 222
+        },
+        {
+          "panel": "bullet",
+          "height": 0
+        },
+        {
+          "panel": "powder",
+          "height": 0
+        }
+      ],
+      "figure": 0
+    },
+    "cut": [],
+    "recordNameEllipsis": 3,
+    "tab": {
+      "stops": 27,
+      "inversions": [],
+      "order": [
+        "Cartridge and gun",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "tab Cartridge and gun",
+      "tab Projectile",
+      "tab Propellant",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 1,
+      "clsInputs": 0,
+      "clsResults": 0.0001,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v353"],
+      "inputsColumnScroll": 353,
+      "cut": [],
+      "recordNameEllipsis": 4
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v350"],
+      "inputsColumnScroll": 350,
+      "cut": ["H1 \"Workbench layout B (prototype)\" overflows downwards"],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "C",
+    "size": "390x844",
+    "pageScroll": {
+      "down": 0,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v307"],
+    "inputsColumnScroll": 307,
+    "inputs": {
+      "total": 25,
+      "shown": 16,
+      "inView": 11
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 147,
+          "bottom": 1005
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        },
+        {
+          "top": 0,
+          "bottom": 0
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 630
+        },
+        {
+          "panel": "firearm",
+          "height": 222
+        },
+        {
+          "panel": "bullet",
+          "height": 0
+        },
+        {
+          "panel": "powder",
+          "height": 0
+        }
+      ],
+      "figure": 0
+    },
+    "cut": [],
+    "recordNameEllipsis": 3,
+    "tab": {
+      "stops": 27,
+      "inversions": [],
+      "order": [
+        "Cartridge and gun",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "tab Cartridge and gun",
+      "tab Projectile",
+      "tab Propellant",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 1,
+      "clsInputs": 0,
+      "clsResults": 0.0001,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v353"],
+      "inputsColumnScroll": 353,
+      "cut": [],
+      "recordNameEllipsis": 4
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 0,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v350"],
+      "inputsColumnScroll": 350,
+      "cut": ["H1 \"Workbench layout C (prototype)\" overflows downwards"],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "D",
+    "size": "390x844",
+    "pageScroll": {
+      "down": 236,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v920"],
+    "inputsColumnScroll": 920,
+    "inputs": {
+      "total": 25,
+      "shown": 25,
+      "inView": 11
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 102,
+          "bottom": 853
+        },
+        {
+          "top": 853,
+          "bottom": 1619
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 630
+        },
+        {
+          "panel": "powder",
+          "height": 310
+        },
+        {
+          "panel": "bullet",
+          "height": 222
+        },
+        {
+          "panel": "firearm",
+          "height": 222
+        }
+      ],
+      "figure": 115
+    },
+    "cut": [],
+    "recordNameEllipsis": 3,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0001,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 249,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v935"],
+      "inputsColumnScroll": 935,
+      "cut": [],
+      "recordNameEllipsis": 4
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 244,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v930h22"],
+      "inputsColumnScroll": 930,
+      "cut": ["H1 \"Workbench layout D (prototype)\" overflows downwards"],
+      "recordNameEllipsis": 0
+    }
+  },
+  {
+    "variant": "D-top",
+    "size": "390x844",
+    "pageScroll": {
+      "down": 189,
+      "across": 0
+    },
+    "scrolling": ["m_b0c91715 v873"],
+    "inputsColumnScroll": 873,
+    "inputs": {
+      "total": 25,
+      "shown": 25,
+      "inView": 11
+    },
+    "geometry": {
+      "columns": [
+        {
+          "top": 186,
+          "bottom": 805
+        },
+        {
+          "top": 805,
+          "bottom": 1571
+        }
+      ],
+      "cards": [
+        {
+          "panel": "cartridge",
+          "height": 498
+        },
+        {
+          "panel": "powder",
+          "height": 310
+        },
+        {
+          "panel": "bullet",
+          "height": 222
+        },
+        {
+          "panel": "firearm",
+          "height": 222
+        }
+      ],
+      "figure": 115
+    },
+    "cut": [],
+    "recordNameEllipsis": 3,
+    "tab": {
+      "stops": 42,
+      "inversions": [],
+      "order": [
+        "Primer",
+        "Brass record",
+        "Case capacity record",
+        "Search cartridges by name",
+        "More of Cartridge",
+        "Usable case volume (cm³)",
+        "cm³, switch Usable case volume to gr H₂O",
+        "Bore diameter (mm)",
+        "mm, switch Bore diameter to in",
+        "Bore area (mm²)",
+        "mm², switch Bore area to in²",
+        "Case capacity (H₂O) (cm³)",
+        "cm³, switch Case capacity (H₂O) to gr H₂",
+        "COAL",
+        "COAL (mm)",
+        "mm, switch COAL to in",
+        "DIV",
+        "Search powders by manufacturer and name",
+        "More of Powder",
+        "Charge mass (g)",
+        "g, switch Charge mass to gr",
+        "Powder temperature (°C)",
+        "°C, switch Powder temperature to °F",
+        "Ladder steps",
+        "Step size (g)",
+        "g, switch Step size to gr",
+        "Charge",
+        "Up",
+        "Show",
+        "Search bullets by manufacturer and name",
+        "More of Bullet",
+        "Bullet mass (g)",
+        "g, switch Bullet mass to gr",
+        "Firearm from your library",
+        "Bullet travel (mm)",
+        "mm, switch Bullet travel to in",
+        "Twist (mm)",
+        "mm, switch Twist to in",
+        "Barrel length (mm)",
+        "mm, switch Barrel length to in",
+        "Gun weight (kg)",
+        "kg, switch Gun weight to lb"
+      ]
+    },
+    "ax": [
+      "combobox Primer",
+      "combobox Brass record",
+      "combobox Case capacity record",
+      "combobox Search cartridges by name",
+      "button More of Cartridge",
+      "textbox Usable case volume (cm³)",
+      "button cm³, switch Usable case volume to gr H₂O",
+      "textbox Bore diameter (mm)",
+      "button mm, switch Bore diameter to in",
+      "textbox Bore area (mm²)",
+      "button mm², switch Bore area to in²",
+      "textbox Case capacity (H₂O) (cm³)",
+      "button cm³, switch Case capacity (H₂O) to gr H₂O",
+      "radio COAL",
+      "radio CBTO",
+      "textbox COAL (mm)",
+      "button mm, switch COAL to in",
+      "combobox Search powders by manufacturer and name",
+      "button More of Powder",
+      "textbox Charge mass (g)",
+      "button g, switch Charge mass to gr",
+      "spinbutton Powder temperature (°C)",
+      "button °C, switch Powder temperature to °F",
+      "textbox Ladder steps",
+      "textbox Step size (g)",
+      "button g, switch Step size to gr",
+      "radio Charge",
+      "radio Seating",
+      "radio Temperature",
+      "radio Up",
+      "radio Down",
+      "radio Around",
+      "button Show",
+      "combobox Search bullets by manufacturer and name",
+      "button More of Bullet",
+      "textbox Bullet mass (g)",
+      "button g, switch Bullet mass to gr",
+      "combobox Firearm from your library",
+      "textbox Bullet travel (mm)",
+      "button mm, switch Bullet travel to in",
+      "textbox Twist (mm)",
+      "button mm, switch Twist to in",
+      "textbox Barrel length (mm)",
+      "button mm, switch Barrel length to in",
+      "textbox Gun weight (kg)",
+      "button kg, switch Gun weight to lb"
+    ],
+    "edit": {
+      "tapsToCharge": 0,
+      "clsInputs": 0,
+      "clsResults": 0.0001,
+      "moved": 0
+    },
+    "taps": {
+      "primer": 0,
+      "brass": 0,
+      "capacity": 0
+    },
+    "long": {
+      "pageScroll": {
+        "down": 201,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v887"],
+      "inputsColumnScroll": 887,
+      "cut": [],
+      "recordNameEllipsis": 4
+    },
+    "spacing": {
+      "pageScroll": {
+        "down": 218,
+        "across": 0
+      },
+      "scrolling": ["m_b0c91715 v904h22"],
+      "inputsColumnScroll": 904,
+      "cut": ["H1 \"Workbench layout D (prototype)\" overflows downwards"],
+      "recordNameEllipsis": 0
+    }
+  }
+]

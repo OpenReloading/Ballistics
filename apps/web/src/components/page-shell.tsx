@@ -12,6 +12,7 @@ import { useRoute } from './use-route.ts'
  */
 const frameRoutes = new Set([
   '/workbench',
+  '/prototype-workbench',
   '/groups',
   '/bullets',
   '/cartridges',
