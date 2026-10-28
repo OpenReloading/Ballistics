@@ -641,7 +641,7 @@
   "Pressure limits of the cartridge": "Druckgrenzwerte der Patrone",
   "Pressure range": "Druckbereich",
   "Pressure range, {unit}": "Druckbereich, {unit}",
-  "pressureBasis must be one of {list}": "pressureBasis muss eines von {list} sein",
+  "pressureBasis must be one of {list}": "pressureBasis muss einer von {list} sein",
   "Primer": "Zündhütchen",
   "Primer data is unavailable right now.": "Die Zündhütchendaten sind gerade nicht verfügbar.",
   "Primer lot": "Zündhütchen-Los",
