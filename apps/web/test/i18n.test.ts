@@ -27,6 +27,13 @@ describe('translator', () => {
     expect(german.tn(2, 'One {count} thing', 'Many {count} things')).toBe('Many 2 things')
   })
 
+  it('keeps two senses of one English word apart by the context of the key', () => {
+    expect(german.t('Brass')).toBe('Hülsen')
+    expect(german.t('material\u0004Brass')).toBe('Messinghülse')
+    expect(english.t('material\u0004Brass')).toBe('Brass')
+    expect(german.t('other\u0004No catalogue has this')).toBe('No catalogue has this')
+  })
+
   it('shows the English plural forms when the entry is not a plural', () => {
     const wrong = translator({ [`${count[0]}|${count[1]}`]: 'Datensätze' }, 'de')
     expect(wrong.tn(1, ...count)).toBe('1 record')

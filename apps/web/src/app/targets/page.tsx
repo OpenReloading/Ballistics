@@ -17,7 +17,7 @@ import { targetFaceRow } from '../../lib/target-faces.ts'
 export const metadata: Metadata = {
   title: 'Targets',
   description:
-    'Rule-book target faces with ring diameters, black area, distances and the disciplines shot on them, each with its sources.',
+    'Rule-book targets with ring diameters, black area, distances and the disciplines shot on them, each with its sources.',
 }
 
 async function Targets() {

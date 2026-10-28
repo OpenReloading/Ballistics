@@ -17,7 +17,7 @@ export default function Offline() {
         links={[
           ...tools.pages,
           { href: '/firearms', label: msg('Firearms') },
-          { href: '/cases/editor', label: msg('Case group') },
+          { href: '/cases/editor', label: msg('Brass group') },
         ]}
       />
     </>

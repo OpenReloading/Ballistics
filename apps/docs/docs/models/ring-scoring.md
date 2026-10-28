@@ -1,18 +1,18 @@
 ---
 title: Ring scoring
-description: Ring value, tenth-ring value and inner ten of a shot on a rule-book target face, and the fit of a face to points marked on its rings.
+description: Ring value, tenth-ring value and inner ten of a shot on a rule-book target, and the fit of a target to points marked on its rings.
 ---
 
 # Ring scoring
 
-Ring scoring gives each shot on a target face:
+Ring scoring gives each shot on a target:
 
 - the value of the highest ring its hole touches
-- the tenth-ring value, where the face's rules allow it
+- the tenth-ring value, where the target's rules allow it
 - whether it is an inner ten
-- the zone label of the bull it belongs to, on a face with several bulls
+- the zone label of the bull it belongs to, on a target with several bulls
 
-A face is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Face records hold ring diameters in mm. Shots are hole centres in target m from the face centre (the sheet centre on a face with several bulls). The group stores the face id and the id of the event, which `lib/ring-scoring.ts` looks up in the face. The face and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). A face from the browser's face designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. The code is in `apps/web/src/lib/ring-scoring.ts`.
+A target is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Target records hold ring diameters in mm. Shots are hole centres in target m from the target centre (the sheet centre on a target with several bulls). The group stores the target id and the id of the event, which `lib/ring-scoring.ts` looks up in the target. The target and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). A target from the browser's target designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. The code is in `apps/web/src/lib/ring-scoring.ts`.
 
 ## Equations
 
@@ -28,7 +28,7 @@ Code: `apps/web/src/lib/ring-scoring.ts`, `scoredHoleDiameter`.
 
 ### Bull
 
-A face with the list `bulls` has several scoring centres $c_k$ on one sheet, positions in mm from the sheet centre, all with the rings of the record. A shot belongs to the nearest bull, and the rings, the inner ten and the tenths are measured from that bull's centre. A shot at the same distance from two bulls belongs to the one listed first in the record. The shot carries the `zone` label of its bull, where the bull has one: two scoring zones on one card are two bulls with a label each. A face without `bulls` has one bull at the face centre.
+A target with the list `bulls` has several scoring centres $c_k$ on one sheet, positions in mm from the sheet centre, all with the rings of the record. A shot belongs to the nearest bull, and the rings, the inner ten and the tenths are measured from that bull's centre. A shot at the same distance from two bulls belongs to the one listed first in the record. The shot carries the `zone` label of its bull, where the bull has one: two scoring zones on one card are two bulls with a label each. A target without `bulls` has one bull at the target centre.
 
 $$
 k^\ast = \arg\min_k \lvert p - c_k \rvert, \qquad p' = p - c_{k^\ast}
@@ -63,7 +63,7 @@ Here $\varepsilon = 10^{-12}$ m ($10^{-9}$ mm), so a hole edge on a ring line co
 The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$ and $d = \lvert p' \rvert$:
 
 - `cover`: the hole covers the inner-ten circle completely.
-- `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above, and the inner ten of a stadium face is a stadium.
+- `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above, and the inner ten of a stadium target is a stadium.
 
 $$
 \text{cover: } d + R_X \le g + \varepsilon, \qquad \text{touch: } d \le R_X + g + \varepsilon
@@ -73,7 +73,7 @@ Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot`.
 
 ### Tenth-ring value
 
-On faces whose rule book allows decimal scoring (`decimal: true`; the record then has circular rings only), each ring's scoring area is divided into ten equal parts counted inward from the touching position. For a hole in ring $n$ with ring width $w_n = R_n - R_{n+1}$ (for the innermost ring $w = R_{n-1} - R_n$):
+On targets whose rule book allows decimal scoring (`decimal: true`; the record then has circular rings only), each ring's scoring area is divided into ten equal parts counted inward from the touching position. For a hole in ring $n$ with ring width $w_n = R_n - R_{n+1}$ (for the innermost ring $w = R_{n-1} - R_n$):
 
 $$
 \text{decimal} = v_n + \frac{1}{10} \min\left(9,\, \max\left(0,\, \left\lfloor 10\, \frac{R_n + g - d}{w_n} + 10^{-9} \right\rfloor\right)\right)
@@ -81,7 +81,7 @@ $$
 
 Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot` (`depth`, `tenth`).
 
-A face with `decimal: false`, or none where the rule book does not state it, is scored in whole rings.
+A target with `decimal: false`, or none where the rule book does not state it, is scored in whole rings.
 
 Where the innermost zone, of radius $R_\mathrm{last} + g$, is wider than one ring width, the rule books do not state how the extra width is divided. The app then counts tenths of the ring width from the touching edge inward and gives .9 to the rest of the centre. That case is flagged by
 
@@ -101,9 +101,9 @@ $$
 
 Code: `apps/web/src/lib/ring-scoring.ts`, `scoreGroup`, `scoreGroupOnFace`.
 
-### Fit of a face to its rings
+### Fit of a target to its rings
 
-A point $p = (x, y)$ marked on a ring of radius $R$ satisfies $\lvert p - c \rvert = s R$ for the face centre $c$ and the scale $s$. Squared, with $u = s^2$ and $t = \lvert c \rvert^2$ taken as a free unknown, this is linear in $(c_x, c_y, u, t)$:
+A point $p = (x, y)$ marked on a ring of radius $R$ satisfies $\lvert p - c \rvert = s R$ for the target centre $c$ and the scale $s$. Squared, with $u = s^2$ and $t = \lvert c \rvert^2$ taken as a free unknown, this is linear in $(c_x, c_y, u, t)$:
 
 $$
 2x\, c_x + 2y\, c_y + R^2 u - t = x^2 + y^2
@@ -119,7 +119,7 @@ $$
 
 Code: `apps/web/src/lib/ring-scoring.ts`, `fitRings`, `apps/web/src/lib/target-geometry.ts`, `solve`.
 
-A sheet point $p$ is scored at its position on the face, with the hole diameter left physical:
+A sheet point $p$ is scored at its position on the target, with the hole diameter left physical:
 
 $$
 q = \frac{p - c}{s}
@@ -127,7 +127,7 @@ $$
 
 Code: `apps/web/src/lib/ring-scoring.ts`, `onFace`, `faceAlignment`.
 
-Without marks the face is centred on the group's point of aim, or on the sheet origin without one, with $s = 1$.
+Without marks the target is centred on the group's point of aim, or on the sheet origin without one, with $s = 1$.
 
 ## Symbols
 
@@ -149,25 +149,25 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 | $w_n$ | Width of ring $n$ | mm | m |
 | $T$, $T_\mathrm{dec}$ | Group total and decimal total | 1 | 1 |
 | $p = (x, y)$ | Point marked on a ring, on the sheet | mm | m |
-| $c$ | Face centre on the sheet | mm | m |
-| $s$ | Scale, sheet length per face length | 1 | 1 |
+| $c$ | Target centre on the sheet | mm | m |
+| $s$ | Scale, sheet length per target length | 1 | 1 |
 | $u$, $t$ | Unknowns $s^2$ and $\lvert c \rvert^2$ of the linear fit | no kind | no kind |
 | $\mathrm{rms}$ | Root mean square radial misfit of the marked points | mm | m |
-| $q$ | Shot position on the face | mm | m |
+| $q$ | Shot position on the target | mm | m |
 
 ## Assumptions
 
-- Rings about one bull are concentric: circles, axis-aligned ovals (face upright), stadiums (all rings and the inner ten) or squares (a square outer area with circles inside it, ovals on all rings or on none). The inner ten is a circle or an oval, or a stadium on a stadium face. Ring widths and heights run to the outside edge of the ring line, as the rule books measure them.
-- Every bull of a face has the rings of the record, and a shot belongs to the bull whose centre is nearest, not to the bull whose rings it touches.
+- Rings about one bull are concentric: circles, axis-aligned ovals (target upright), stadiums (all rings and the inner ten) or squares (a square outer area with circles inside it, ovals on all rings or on none). The inner ten is a circle or an oval, or a stadium on a stadium target. Ring widths and heights run to the outside edge of the ring line, as the rule books measure them.
+- Every bull of a target has the rings of the record, and a shot belongs to the bull whose centre is nearest, not to the bull whose rings it touches.
 - A hole is a disc of the gauge or bullet diameter centred on the shot. The touch rule then is the distance condition above.
-- The face fit has no perspective, rotation or ring-line thickness. Noise-free marks give the exact centre and scale.
+- The target fit has no perspective, rotation or ring-line thickness. Noise-free marks give the exact centre and scale.
 
 ## Limits
 
 - Tenth-ring values need circular rings: a record with `decimal: true` and oval, stadium or square rings is refused, and an oval inner ten counts only by touch.
-- Fitting a face to ring marks needs one bull and circular rings. The photo face search skips the DSU stadium faces (`photoSearch: false`), the user picks one from the face list. On another face the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
+- Fitting a target to ring marks needs one bull and circular rings. The photo target search skips the DSU stadium targets (`photoSearch: false`), the user picks one from the target list. On another target the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
 - Zones with polygon outlines and targets that are hit or miss (symbols, plates) are not scored.
-- The drawing of a face shows one bull, draws a square ring as a square but its black area and inner ten as ovals, a stadium ring, its black area and inner ten as stadiums, and the ring overlay on the photo draws every ring as a circle.
+- The drawing of a target shows one bull, draws a square ring as a square but its black area and inner ten as ovals, a stadium ring, its black area and inner ten as stadiums, and the ring overlay on the photo draws every ring as a circle.
 - Gauges are recorded only where the rule book gives one diameter for the event. Other events score with the bullet diameter, else the marker diameter.
 - Excluded shots are scored and shown but not counted in the totals.
 
@@ -175,10 +175,10 @@ Without marks the face is centred on the group's point of aim, or on the sheet o
 
 - [ISSF 2022](../bibliography.md#issf-2022), pp. 320 to 330: ring diameters to the outside edge of the line (rule 1.1.2), plug gauges and their measuring edges (rules 1.4.1 to 1.4.10), the higher value for a hole touching a ring line (rule 5.2.1).
 - [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), pp. 194 to 200: decimal scoring (rule 6.3.3.1, p. 194), inner ten (rules 6.3.4.1 to 6.3.4.6), the 10 m air rifle inner ten only when the dot is shot out (rule 6.3.4.3).
-- [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), faces in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
-- [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, faces in B.11.
-- [DSU 2018](../bibliography.md#dsu-2018): the oval-ring faces b2 to b5 and b5 Präzision, Kapitel 1 (Seiten 12 to 16, PDF pp. 14 to 18), touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
-- [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, faces in Kapitel 8 to 10.
-- [BDS 2025](../bibliography.md#bds-2025): faces Z1 to Z21 and Anhang 1, no scoring rule stated.
+- [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), targets in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
+- [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, targets in B.11.
+- [DSU 2018](../bibliography.md#dsu-2018): the oval-ring targets b2 to b5 and b5 Präzision, Kapitel 1 (Seiten 12 to 16, PDF pp. 14 to 18), touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
+- [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, targets in Kapitel 8 to 10.
+- [BDS 2025](../bibliography.md#bds-2025): targets Z1 to Z21 and Anhang 1, no scoring rule stated.
 - [Eberly 2013](../bibliography.md#eberly-2013): distance from a point to an ellipse, closest-point condition and its bisection.
 - [Kasa 1976](../bibliography.md#kasa-1976): algebraic circle fit, pp. 8 to 14.

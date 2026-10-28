@@ -38,7 +38,7 @@ export const databaseTabs: readonly LibraryTab[] = [
   },
   {
     href: '/cases',
-    label: msg('Cases'),
+    label: msg('Brass'),
     description: msg(
       'Cartridge case products with material, primer pocket and stated water capacity, each with its sources.',
     ),
@@ -64,21 +64,21 @@ export const databaseTabs: readonly LibraryTab[] = [
     href: '/targets',
     label: msg('Targets'),
     description: msg(
-      'Rule-book target faces: ring diameters, black area and the disciplines shot on them, each with its source.',
+      'Rule-book targets: ring diameters, black area and the disciplines shot on them, each with its source.',
     ),
   },
   {
     href: '/disciplines',
     label: msg('Disciplines'),
     description: msg(
-      'Rule-book disciplines and their federations: distance, caliber classes and the faces they are shot on, each with its source.',
+      'Rule-book disciplines and their federations: distance, caliber classes and the targets they are shot on, each with its source.',
     ),
   },
   {
     href: '/federations',
     label: msg('Federations'),
     description: msg(
-      'Shooting federations with the rule books their disciplines and target faces are read from, each with its source.',
+      'Shooting federations with the rule books their disciplines and targets are read from, each with its source.',
     ),
   },
 ]
@@ -123,7 +123,7 @@ export const sections = [
         label: msg('Database'),
         icon: 'database',
         description: msg(
-          'The published records, each with its source, and your own next to them: your firearms, cartridges, cases, primers, powders, bullets, target faces, disciplines and federations.',
+          'The published records, each with its source, and your own next to them: your firearms, cartridges, brass, primers, powders, bullets, targets, disciplines and federations.',
         ),
         tabs: databaseTabs,
         covers: ['/my-cases'],

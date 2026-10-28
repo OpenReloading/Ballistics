@@ -378,7 +378,7 @@ export function useHoleDetection({
       if (stops.current !== stopped) return
       setProgress(undefined)
       setStep(0)
-      return say(t('The target faces need the network: set the scale by hand (step 2).'), true)
+      return say(t('The targets need the network: set the scale by hand (step 2).'), true)
     }
     if (stops.current !== stopped) return
     ask(
@@ -471,7 +471,7 @@ export function useHoleDetection({
         () => undefined,
       ))
     if (stops.current !== stopped) return
-    if (!fit) return say(t('This face does not fit the ellipses found.'), true)
+    if (!fit) return say(t('This target does not fit the ellipses found.'), true)
     applyFit(fit, false, event)
   }
 
@@ -656,7 +656,7 @@ export function useHoleDetection({
     setDiameter(si)
     const plane = found && si ? fitDiameter(found, fromSi('length', si)) : undefined
     if (plane) applyFit(plane, false)
-    else if (si) say(t('Find the face first: no black area is known.'), true)
+    else if (si) say(t('Find the target first: no black area is known.'), true)
   }
   const stepBody = [
     <RotateStep key="rotate" turn={turn} running={running} onTurnBy={turnBy} onTurn={onTurn} />,
@@ -777,20 +777,20 @@ function faceFollowUp({ fits, black }: FaceSearch, t: Translator['t']) {
   if (fits.length > 1)
     return {
       step: 1,
-      text: t('More than one face fits these rings: choose the target in Target face.'),
+      text: t('More than one target fits these rings: choose one in Target.'),
     }
   const [only] = fits
   if (only)
     return {
       step: 1,
-      text: t('The rings may be those of the {face}: choose it in Target face to use it.', {
+      text: t('The rings may be those of the {face}: choose it in Target to use it.', {
         face: only.face.name,
       }),
     }
   return {
     step: 1,
     text: t(
-      'No face fits the rings found (dashed): choose a face, type the black diameter or set the scale.',
+      'No target fits the rings found (dashed): choose a target, type the black diameter or set the scale.',
     ),
   }
 }
@@ -1051,7 +1051,7 @@ function ScaleStep({
         <span
           className="prop-label"
           title={t(
-            'A known distance on the target or the size of a face ring, marked on the photo in Calibrate.',
+            'A known distance on the target or the size of a target ring, marked on the photo in Calibrate.',
           )}
         >
           {t('Scale')}
@@ -1062,7 +1062,7 @@ function ScaleStep({
         <span
           className="prop-label"
           title={t(
-            'The rule-book face on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one face may fit the rings: choose. Without a fit the faces are ranked by how well their rings match.',
+            'The rule-book target on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one target may fit the rings: choose. Without a fit the targets are ranked by how well their rings match.',
           )}
         >
           {t('Target')}
@@ -1070,7 +1070,7 @@ function ScaleStep({
         <span className="prop-value">
           <NativeSelect
             size={controlSize.row.input}
-            aria-label={t('Target face')}
+            aria-label={t('Target on the photo')}
             disabled={!choices.length || running}
             data={[{ value: '', label: choices.length ? t('Choose') : t('none') }, ...choices]}
             value={chosen}
@@ -1083,7 +1083,7 @@ function ScaleStep({
           key: 'blackDiameter',
           label: msg('Black diameter'),
           help: msg(
-            'Diameter of the black area on the target, used when no face fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).',
+            'Diameter of the black area on the target, used when no target fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).',
           ),
           quantity: 'length',
           min: 0,
@@ -1101,7 +1101,7 @@ function ScaleStep({
           disabled={!canFind || running}
           onClick={onFind}
         >
-          {t('Find face')}
+          {t('Find target')}
         </Button>
         <Button size={controlSize.row.button} variant="default" onClick={onCalibrate}>
           {t('Calibrate')}

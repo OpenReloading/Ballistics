@@ -40,7 +40,7 @@ function TargetFaceRecord({
       provenance={f.provenance}
       strip={<FaceStrip face={values} />}
       figure={
-        <Panel id="face-drawing" title={msg('Face')} translated>
+        <Panel id="face-drawing" title={msg('Target')} translated>
           <TargetFaceDrawing face={f} />
         </Panel>
       }

@@ -11,7 +11,7 @@ export const reportAreas = [
   'Cartridges',
   'Bullets',
   'Powders',
-  'Cases',
+  'Brass',
   'Primers',
   'Targets',
   'Disciplines',
@@ -44,13 +44,13 @@ const areaRoutes: [string, ReportArea][] = [
   ['/cartridges', 'Cartridges'],
   ['/bullets', 'Bullets'],
   ['/powders', 'Powders'],
-  ['/cases', 'Cases'],
+  ['/cases', 'Brass'],
   ['/primers', 'Primers'],
   ['/targets', 'Targets'],
   ['/disciplines', 'Disciplines'],
   ['/federations', 'Federations'],
   ['/firearms', 'Firearms'],
-  ['/my-cases', 'Cases'],
+  ['/my-cases', 'Brass'],
 ]
 
 const under = (route: string, path: string) => route === path || route.startsWith(`${path}/`)
@@ -63,9 +63,9 @@ const recordKinds: Record<string, string> = {
   cartridges: 'cartridge',
   bullets: 'bullet',
   powders: 'powder',
-  cases: 'case',
+  cases: 'brass',
   primers: 'primer',
-  targets: 'target face',
+  targets: 'target',
   disciplines: 'discipline',
   federations: 'federation',
 }
@@ -219,7 +219,7 @@ export function sheetSettings(sheet: Pick<TargetSheet, 'groups'>, data?: Federat
     const fed = d && data?.federations.find((x) => x.id === d.federation)
     return [
       `- ${g.name}: ${Number(g.distance.toFixed(2))} m`,
-      f ? `face \`${f.id}\`` : 'no face',
+      f ? `target \`${f.id}\`` : 'no target',
       ...(f?.event ? [`event "${f.event}"`] : []),
       ...(d ? [`discipline ${[d.number, d.name].filter(Boolean).join(' ')} (\`${d.id}\`)`] : []),
       ...(fed ? [`federation ${fed.abbreviation}`] : []),

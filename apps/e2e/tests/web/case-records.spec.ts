@@ -22,7 +22,7 @@ test('a case record chosen in the Cartridge card gives the stated capacity, a ty
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).not.toHaveAttribute('placeholder', /\d/)
   await page.getByRole('button', { name: 'More of Cartridge' }).click()
-  await page.getByRole('combobox', { name: 'Case record' }).selectOption({ index: 1 })
+  await page.getByRole('combobox', { name: 'Brass record' }).selectOption({ index: 1 })
   await expect(capacity).toHaveAttribute('placeholder', /^\d/)
   await capacity.fill('3.9')
   await expect(capacity).toHaveValue('3.9')

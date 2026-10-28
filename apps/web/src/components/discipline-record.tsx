@@ -35,18 +35,20 @@ export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[]
   const perStage = rows.length > 1
   const hasCourse = rows.some((m) => m.course)
   return (
-    <Panel id="discipline-stages" title={t('Faces ({count})', { count: rows.length })}>
+    <Panel id="discipline-stages" title={t('Targets ({count})', { count: rows.length })}>
       {rows.length === 0 ? (
         <p className="record-note">{t('No target mapping names this discipline.')}</p>
       ) : (
         <PanelTable
-          label={t('Faces table')}
+          label={t('Targets table')}
           className="face-table"
           caption={
-            <span className="visually-hidden">{t('The faces and stages of this discipline')}</span>
+            <span className="visually-hidden">
+              {t('The targets and stages of this discipline')}
+            </span>
           }
           columns={[
-            t('Face'),
+            t('Target'),
             t('Event'),
             t('Stage'),
             t('Gauge'),

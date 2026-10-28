@@ -86,7 +86,7 @@ export function CaseEditor({
     <section aria-labelledby="library-editor" className="library-editor">
       <Group gap="md" wrap="nowrap" className="page-panel-head library-head">
         <h2 id="library-editor" className="page-panel-title record-heading">
-          {data.name || t('New case group')}
+          {data.name || t('New brass group')}
         </h2>
         {data.cartridge && (
           <Group gap={2} wrap="nowrap">

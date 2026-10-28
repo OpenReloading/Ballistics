@@ -1236,12 +1236,12 @@ function CaseChoice({ m }: { m: Model }) {
     ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c, t) })),
     // a load names a group this browser does not have
     ...(ownId && !own.some((c) => c.id === ownId)
-      ? [{ value: `user:${ownId}`, label: t('A case group not in this browser') }]
+      ? [{ value: `user:${ownId}`, label: t('A brass group not in this browser') }]
       : []),
   ]
   return (
     <NativeSelect
-      label={t('Case record')}
+      label={t('Brass record')}
       value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
       onChange={(e) => {
         const v = e.currentTarget.value
@@ -1250,7 +1250,7 @@ function CaseChoice({ m }: { m: Model }) {
       }}
       data={[
         { value: '', label: t('None') },
-        ...(ownItems.length > 0 ? [{ group: t('Your cases'), items: ownItems }] : []),
+        ...(ownItems.length > 0 ? [{ group: t('Your brass'), items: ownItems }] : []),
         ...(items.length > 0
           ? [
               {
@@ -1291,7 +1291,7 @@ function CapacityChoice({ m }: { m: Model }) {
         data={[
           ...(m.chosenCase?.waterCapacity === undefined
             ? []
-            : [{ value: '', label: t('From the case record') }]),
+            : [{ value: '', label: t('From the brass record') }]),
           ...capacities.map((c) => ({ value: c.id, label: capacityText(c, names, t) })),
         ]}
       />
@@ -1319,7 +1319,7 @@ function MeasuredCapacity({ m }: { m: Model }) {
               'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
             )
           : msg(
-              "Measured: water to the mouth of your fired cases. Replaces the capacity or case record; empty: the record's value.",
+              "Measured: water to the mouth of your fired cases. Replaces the capacity or brass record; empty: the record's value.",
             ),
       }}
       system={system}
@@ -1337,7 +1337,7 @@ function MeasuredCapacity({ m }: { m: Model }) {
                 ? t('From the capacity record {record}. Type a measured capacity to replace it.', {
                     record: capacityText(stock.record, names, t),
                   })
-                : t('From the case record {record}. Type a measured capacity to replace it.', {
+                : t('From the brass record {record}. Type a measured capacity to replace it.', {
                     record: chosenCase ? caseText(chosenCase, names, t) : '',
                   }),
             }

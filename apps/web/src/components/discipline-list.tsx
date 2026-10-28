@@ -100,7 +100,7 @@ export function DisciplineList({
     },
     {
       key: 'faces',
-      label: msg('Faces'),
+      label: msg('Targets'),
       num: true,
       width: '5rem',
       value: (r) => r.faceIds.length,

@@ -4,7 +4,7 @@ import { titleFromKebab } from './record-fields.ts'
 
 /** The value as a name ("nickel-plated-brass" as "Nickel plated brass"), keyed as it reads. */
 const names: Record<string, Message> = {
-  Brass: msg('Brass'),
+  Brass: msg('material\u0004Brass'),
   'Nickel plated brass': msg('Nickel plated brass'),
   'Lacquered steel': msg('Lacquered steel'),
   'Polymer coated steel': msg('Polymer coated steel'),

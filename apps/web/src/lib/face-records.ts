@@ -82,7 +82,8 @@ export const isFaceId = (id: string) =>
 export function fetchFace(id: string) {
   if (id.startsWith(faceIdPrefix))
     return designFaces().then(
-      (faces) => faces.find((f) => f.id === id) ?? Promise.reject(new Error('No such face design')),
+      (faces) =>
+        faces.find((f) => f.id === id) ?? Promise.reject(new Error('No such target design')),
     )
   let p = records.get(id)
   if (!p) {

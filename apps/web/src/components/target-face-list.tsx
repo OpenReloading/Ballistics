@@ -127,7 +127,7 @@ export function TargetFaceList({
               href="/targets/designer"
               leftSection={<Plus aria-hidden="true" />}
             >
-              {t('New face')}
+              {t('New target')}
             </Button>
             <UnitsIconButton />
           </>
@@ -164,8 +164,8 @@ export function TargetFaceList({
           label={(r) => r.name}
           caption={
             named.filter(Boolean).length === 0
-              ? t('All target faces')
-              : t('Target faces, {filters}', { filters: named.filter(Boolean).join(', ') })
+              ? t('All targets')
+              : t('Targets, {filters}', { filters: named.filter(Boolean).join(', ') })
           }
           noun="faces"
           sort={state.sort}

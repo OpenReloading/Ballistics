@@ -148,7 +148,7 @@ export function disciplineFacets(
       values: (r) => r.classes.map((c) => c.id),
       text: (v) => classNames.get(v) ?? v,
     },
-    { key: 'face', label: msg('Face'), values: (r) => r.faceIds, text: (v) => faces.get(v) ?? v },
+    { key: 'face', label: msg('Target'), values: (r) => r.faceIds, text: (v) => faces.get(v) ?? v },
   ]
 }
 

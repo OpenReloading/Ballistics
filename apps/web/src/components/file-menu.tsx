@@ -119,12 +119,12 @@ const kindNames: Record<UserRecordKind, Message> = {
   cartridge: msg('cartridge designs'),
   powder: msg('powder designs'),
   caseCapacity: msg('measured capacities'),
-  case: msg('case groups'),
+  case: msg('brass groups'),
   load: msg('loads'),
   firearm: msg('firearms'),
   session: msg('chronograph sessions'),
   targetSheet: msg('target sheets'),
-  targetFaceDesign: msg('target face designs'),
+  targetFaceDesign: msg('target designs'),
 }
 
 /** A line of the status, written when it is shown so that a change of language reaches it. */

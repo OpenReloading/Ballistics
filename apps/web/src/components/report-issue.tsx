@@ -48,7 +48,7 @@ const areaLabels: Record<ReportArea, Message> = {
   Cartridges: msg('Cartridges'),
   Bullets: msg('Bullets'),
   Powders: msg('Powders'),
-  Cases: msg('Cases'),
+  Brass: msg('Brass'),
   Primers: msg('Primers'),
   Targets: msg('Targets'),
   Disciplines: msg('Disciplines'),

@@ -206,7 +206,7 @@ const fieldKeyOf = (d: Design, path: PropertyKey[]): string | undefined => {
 
 const labels: Record<string, Message> = {
   rings: msg('Rings'),
-  events: msg('Events of the face'),
+  events: msg('Events of the target'),
   blackDiameter: msg('Black area diameter'),
   blackHeight: msg('Black area height'),
   innerTen: msg('Inner ten'),
@@ -227,7 +227,7 @@ const faceMessages: Record<string, Message> = {
   'a stadium needs a height': msg('a stadium needs a height'),
   'a stadium is at least as high as it is wide': msg('a stadium is at least as high as it is wide'),
   'a stadium inner ten needs a height': msg('a stadium inner ten needs a height'),
-  'must be unique within the face': msg('must be unique within the face'),
+  'must be unique within the face': msg('must be unique within the target'),
   'black zones must be adjacent rings': msg('black zones must be adjacent rings'),
   'must equal the diameter of the outermost black ring': msg(
     'must equal the diameter of the outermost black ring',
@@ -251,7 +251,7 @@ export function faceOf(
   id: string,
   t: Translator['t'] = untranslated(),
 ): { face: TargetFace } | { problems: Problem[] } {
-  const built = buildFace(fileData(d), id, d.name.trim() || 'Target face design')
+  const built = buildFace(fileData(d), id, d.name.trim() || 'Target design')
   if ('face' in built) return built
   return {
     problems: built.issues.map(({ path, message: given }) => {

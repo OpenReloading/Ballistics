@@ -194,9 +194,9 @@ function usePrinting() {
 const printedLines: Record<ListNoun, Message> = {
   bullets: msg('Printed: the first {limit} of {total} bullets in this selection.'),
   cartridges: msg('Printed: the first {limit} of {total} cartridges in this selection.'),
-  cases: msg('Printed: the first {limit} of {total} cases in this selection.'),
+  cases: msg('Printed: the first {limit} of {total} brass in this selection.'),
   disciplines: msg('Printed: the first {limit} of {total} disciplines in this selection.'),
-  faces: msg('Printed: the first {limit} of {total} faces in this selection.'),
+  faces: msg('Printed: the first {limit} of {total} targets in this selection.'),
   federations: msg('Printed: the first {limit} of {total} federations in this selection.'),
   firearms: msg('Printed: the first {limit} of {total} firearms in this selection.'),
   powders: msg('Printed: the first {limit} of {total} powders in this selection.'),

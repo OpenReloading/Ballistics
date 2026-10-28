@@ -9,9 +9,9 @@ import { listTitles } from '../../lib/list-titles.ts'
 import { manufacturerAliases, manufacturerNames } from '../../lib/manufacturers.ts'
 
 export const metadata: Metadata = {
-  title: 'Cases',
+  title: 'Brass',
   description:
-    'Cartridge case products by cartridge, with material, primer pocket, flash hole, mass and the water capacity the manufacturer states, each with its sources.',
+    'Brass by cartridge, with material, primer pocket, flash hole, mass and the water capacity the manufacturer states, each with its sources.',
 }
 
 async function Cases() {

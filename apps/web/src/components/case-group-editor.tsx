@@ -120,7 +120,7 @@ export function CaseGroupEditor() {
                 if (await menu.current?.startNew(blank)) show(blank)
               }}
             >
-              {t('New case group')}
+              {t('New brass group')}
             </Button>
             <FileMenu
               ref={menu}

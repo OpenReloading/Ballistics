@@ -54,24 +54,24 @@ import { useUnits } from './units-settings.tsx'
 
 type Scoring = ReturnType<typeof scoreGroupOnFace>
 
-const offline = msg('Faces need the network')
+const offline = msg('Targets need the network')
 const faceHelp = msg(
-  'The rule-book target face that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.',
+  'The rule-book target that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.',
 )
 const federationHelp = msg(
-  'The federation whose disciplines the Discipline list shows. All: every discipline, then the face events no discipline names.',
+  'The federation whose disciplines the Discipline list shows. All: every discipline, then the target events no discipline names.',
 )
 const disciplineHelp = msg(
-  'The discipline sets the face, the event and with it the scored hole. Type to search by name, number or federation.',
+  'The discipline sets the target, the event and with it the scored hole. Type to search by name, number or federation.',
 )
 const eventHelp = msg(
-  "A face no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.",
+  "A target no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.",
 )
 const ringHelp = msg(
   'The ring the next marks lie on; mark the outer edge of its line. Fit needs 4 marks on 2 rings.',
 )
 const ownRuleNote = msg(
-  'Tenths in the 10 zone of this face: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.',
+  'Tenths in the 10 zone of this target: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.',
 )
 
 /** A shot's value as shown: tenths where the face has them, X for an inner ten. */
@@ -131,13 +131,13 @@ function scoreStatus(o: {
 }) {
   const { list, choice, face, current, result, system, t } = o
   if (list === 'error') return t(offline)
-  if (!choice) return t('No face: no score.')
+  if (!choice) return t('No target: no score.')
   if (face === 'error')
     return choice.id.startsWith(faceIdPrefix)
-      ? t('This face design is deleted or no longer a valid face.')
-      : t('Faces need the network: {id} could not be loaded.', { id: choice.id })
+      ? t('This target design is deleted or no longer a valid target.')
+      : t('Targets need the network: {id} could not be loaded.', { id: choice.id })
   if (current && typeof current === 'object' && 'error' in current) return current.error
-  if (!result) return t('Loading the face…')
+  if (!result) return t('Loading the target…')
   if (!choice.marks) return t('Centred on the point of aim (or the origin) at the sheet scale.')
   const misfit = mmLength(system, fromSi('length', result.alignment.rms ?? 0))
   return t('Fitted to {count} marks, misfit {misfit}, scale {scale} %.', {
@@ -444,7 +444,7 @@ function fitFace(o: {
     const a = faceAlignment(record, marks, undefined, t)
     setFace((x) => x && { ...x, marks })
     say(
-      t('Face fitted to {count} marks, misfit {misfit}.', {
+      t('Target fitted to {count} marks, misfit {misfit}.', {
         count: marks.length,
         misfit: mmLength(system, fromSi('length', a.rms ?? 0)),
       }),
@@ -572,7 +572,7 @@ function AlignRow(p: PanelProps) {
           size={controlSize.row.button}
           variant={choice && !choice.marks ? 'filled' : 'default'}
           disabled={!record}
-          title={t('Centre the face on the point of aim (or the origin) at the sheet scale')}
+          title={t('Centre the target on the point of aim (or the origin) at the sheet scale')}
           onClick={() => p.onFaceEdit((x) => x && { id: x.id, ...(x.event && { event: x.event }) })}
         >
           {t('On aim')}
@@ -582,7 +582,7 @@ function AlignRow(p: PanelProps) {
           size={controlSize.row.button}
           variant={tool === 'rings' ? 'filled' : 'default'}
           disabled={!record || !p.hasFrame}
-          title={t('Mark points on two or more rings of the face, then Fit')}
+          title={t('Mark points on two or more rings of the target, then Fit')}
           onClick={p.onMark}
         >
           {t('Mark')}
@@ -591,8 +591,8 @@ function AlignRow(p: PanelProps) {
           size={controlSize.row.button}
           variant="default"
           disabled={tool !== 'rings' || !canFit}
-          aria-label={t('Fit face')}
-          title={t("Fit the face's centre and scale to the marks")}
+          aria-label={t('Fit target')}
+          title={t("Fit the target's centre and scale to the marks")}
           onClick={p.onFit}
         >
           {t('Fit')}
@@ -627,7 +627,7 @@ function FaceSelects(p: PanelProps) {
         onPick={p.onDiscipline}
       />
       <NativeSelect
-        label={t('Face')}
+        label={t('Target')}
         size={controlSize.row.input}
         description={t(faceHelp)}
         labelProps={{ title: t(faceHelp) }}
@@ -681,7 +681,7 @@ function ScorePanel(p: PanelProps) {
           <span
             className="prop-label"
             title={t(
-              'Add the fitted face as a scale reference of the sheet (Calibrate): its outermost marked ring at the rule-book diameter.',
+              'Add the fitted target as a scale reference of the sheet (Calibrate): its outermost marked ring at the rule-book diameter.',
             )}
           >
             {t('Scale ref.')}
@@ -691,7 +691,7 @@ function ScorePanel(p: PanelProps) {
               size={controlSize.row.button}
               variant="default"
               disabled={!p.sheet.photo || !choice?.marks || !result}
-              aria-label={t('Add the face as a scale reference')}
+              aria-label={t('Add the target as a scale reference')}
               onClick={p.onReference}
             >
               {t('Add')}

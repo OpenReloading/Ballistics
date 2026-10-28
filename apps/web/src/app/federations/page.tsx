@@ -10,7 +10,7 @@ import { listTitles } from '../../lib/list-titles.ts'
 export const metadata: Metadata = {
   title: 'Federations',
   description:
-    'Shooting federations with their rule books and the disciplines and target faces read from them.',
+    'Shooting federations with their rule books and the disciplines and targets read from them.',
 }
 
 async function Federations() {

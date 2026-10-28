@@ -34,8 +34,9 @@ const countLines: Record<
       tn(n, '{shown} of {count} cartridge', '{shown} of {count} cartridges', { shown }),
   },
   cases: {
-    all: (tn, n) => tn(n, '{count} case', '{count} cases'),
-    some: (tn, shown, n) => tn(n, '{shown} of {count} case', '{shown} of {count} cases', { shown }),
+    all: (tn, n) => tn(n, '{count} brass', '{count} brass'),
+    some: (tn, shown, n) =>
+      tn(n, '{shown} of {count} brass', '{shown} of {count} brass', { shown }),
   },
   disciplines: {
     all: (tn, n) => tn(n, '{count} discipline', '{count} disciplines'),
@@ -43,8 +44,9 @@ const countLines: Record<
       tn(n, '{shown} of {count} discipline', '{shown} of {count} disciplines', { shown }),
   },
   faces: {
-    all: (tn, n) => tn(n, '{count} face', '{count} faces'),
-    some: (tn, shown, n) => tn(n, '{shown} of {count} face', '{shown} of {count} faces', { shown }),
+    all: (tn, n) => tn(n, '{count} target', '{count} targets'),
+    some: (tn, shown, n) =>
+      tn(n, '{shown} of {count} target', '{shown} of {count} targets', { shown }),
   },
   federations: {
     all: (tn, n) => tn(n, '{count} federation', '{count} federations'),

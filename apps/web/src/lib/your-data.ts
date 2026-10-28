@@ -19,7 +19,7 @@ const yourDataKinds: readonly YourDataKind[] = [
   { kind: 'cartridge', label: msg('Cartridges'), href: '/cartridges?src=user' },
   { kind: 'bullet', label: msg('Bullets'), href: '/bullets?src=user' },
   { kind: 'powder', label: msg('Powders'), href: '/powders/designer' },
-  { kind: 'case', label: msg('Cases'), href: '/cases?src=user' },
+  { kind: 'case', label: msg('Brass'), href: '/cases?src=user' },
   { kind: 'targetFaceDesign', label: msg('Targets'), href: '/targets/designer' },
   { kind: 'firearm', label: msg('Firearms'), href: '/firearms' },
 ]

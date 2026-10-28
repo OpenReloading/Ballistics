@@ -80,11 +80,11 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).toHaveValue('')
   await page.getByRole('button', { name: 'More of Cartridge' }).click()
-  await page.getByRole('combobox', { name: 'Case record' }).selectOption(`user:${caseId}`)
+  await page.getByRole('combobox', { name: 'Brass record' }).selectOption(`user:${caseId}`)
   // the group's measured capacity is in the measured field, where the run marks it as measured
   await expect(capacity).toHaveValue(/^3\.6/)
   // a group without a measured capacity leaves none of the previous group's in the field
-  await page.getByRole('combobox', { name: 'Case record' }).selectOption(`user:${plainId}`)
+  await page.getByRole('combobox', { name: 'Brass record' }).selectOption(`user:${plainId}`)
   await expect(capacity).toHaveValue('')
 })
 
@@ -117,11 +117,11 @@ test('Settings, General: Your data counts the records per kind and opens the lis
   const table = dialog.getByRole('table')
   const count = (kind: string) =>
     table.getByRole('row').filter({ has: page.getByRole('link', { name: kind, exact: true }) })
-  await expect(count('Cases').getByRole('cell')).toHaveText('2')
+  await expect(count('Brass').getByRole('cell')).toHaveText('2')
   // a kind with no records shows 0
   await expect(count('Bullets').getByRole('cell')).toHaveText('0')
   await expect(count('Firearms').getByRole('cell')).toHaveText('0')
-  await table.getByRole('link', { name: 'Cases', exact: true }).click()
+  await table.getByRole('link', { name: 'Brass', exact: true }).click()
   await expect(page).toHaveURL(/\/cases\/\?src=user$/)
   await expect(dialog).toBeHidden()
 })

@@ -5,11 +5,11 @@ export const listTitles = {
   bullets: msg('Bullets'),
   cartridges: msg('Cartridges'),
   powders: msg('Powders'),
-  cases: msg('Cases'),
+  cases: msg('Brass'),
   primers: msg('Primers'),
   targets: msg('Targets'),
   disciplines: msg('Disciplines'),
   federations: msg('Federations'),
   firearms: msg('Firearms'),
-  caseGroup: msg('Case group'),
+  caseGroup: msg('Brass group'),
 }

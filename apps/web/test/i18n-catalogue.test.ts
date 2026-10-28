@@ -91,8 +91,63 @@ describe.each(catalogues)('catalogue %s', (code) => {
   })
 })
 
+/** English texts where target names a target record, whose verified German term (Target face) is Scheibe. */
+const targetRecords = [
+  'Target',
+  'Target on the photo',
+  'Add the fitted target as a scale reference of the sheet (Calibrate): its outermost marked ring at the rule-book diameter.',
+  'Add the target as a scale reference',
+  'All targets',
+  'Centre the target on the point of aim (or the origin) at the sheet scale',
+  'Choose a target',
+  'Choose a target for a result.',
+  'Events of the target',
+  'Find target',
+  'Find the target first: no black area is known.',
+  'Fit target',
+  "Fit the target's centre and scale to the marks",
+  'Loading target',
+  'Loading targets',
+  'Loading the target…',
+  'Mark points on two or more rings of the target, then Fit',
+  'New target',
+  'No target fits the rings found (dashed): choose a target, type the black diameter or set the scale.',
+  'No target: no score.',
+  'No targets match these filters.',
+  'Printed: the first {limit} of {total} targets in this selection.',
+  'Ring marks fit a target with one bull',
+  'Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total.',
+  'Rule-book disciplines and their federations: distance, caliber classes and the targets they are shot on, each with its source.',
+  'Rule-book targets: ring diameters, black area and the disciplines shot on them, each with its source.',
+  'Shooting federations with the rule books their disciplines and targets are read from, each with its source.',
+  'Target designer',
+  'Target fitted to {count} marks, misfit {misfit}.',
+  'Targets ({count})',
+  'Targets need the network',
+  'Targets need the network: {id} could not be loaded.',
+  'Targets table',
+  'Targets, {filters}',
+  'Tenths in the 10 zone of this target: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.',
+  'The published records, each with its source, and your own next to them: your firearms, cartridges, brass, primers, powders, bullets, targets, disciplines and federations.',
+  'The rings may be those of the {face}: choose it in Target to use it.',
+  "The rings of the active group's target and each shot's value, when a target is chosen (Group).",
+  'The rule-book target on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one target may fit the rings: choose. Without a fit the targets are ranked by how well their rings match.',
+  'The rule-book target that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.',
+  'The target could not be read: {reason}',
+  'The target has no ring {value}',
+  'The targets and stages of this discipline',
+  'The targets its disciplines are shot on',
+  'The targets need the network: set the scale by hand (step 2).',
+  'This target design is deleted or no longer a valid target.',
+  'This target does not fit the ellipses found.',
+  'must be unique within the target',
+  '{count} target|{count} targets',
+  '{shown} of {count} target|{shown} of {count} targets',
+]
+
 /** English texts that contain a term's English word in another sense, each with the sense. */
 const otherSense: Record<string, string> = {
+  ...Object.fromEntries(targetRecords.map((k) => [k, 'target: a target record, Scheibe'])),
   'Bullet position': 'where the bullet is in the barrel, not a shooting position',
   'Case fill': 'the load ratio, whose verified term (Ladedichte) names no case',
   'single shot': 'a firearm action that is loaded by hand for each shot (Einzellader)',
@@ -117,12 +172,12 @@ const otherSense: Record<string, string> = {
     'a rifle as the discipline category or the firearm in a shooting-sport text, where the rule books write Gewehr; Büchse names the primer size',
   'Empty: by cartridge class, rifle {rifle}, pistol {pistol} (assumptions, no source).':
     'a rifle as the discipline category or the firearm in a shooting-sport text, where the rule books write Gewehr; Büchse names the primer size',
-  Targets: 'the Targets tab lists target face records, whose verified term is Scheibe',
-  'No target mapping of its disciplines names a face.':
-    'target mapping: a record kind; the German names the face',
+  Targets: 'the Targets tab lists target records, whose verified term is Scheibe',
+  'No target mapping of its disciplines names a target.':
+    'target mapping: a record kind; the German names the target record, Scheibe',
   'No target mapping names this discipline.':
     'target mapping: a record kind; the German names the discipline',
-  'The events and disciplines shot on this face':
+  'The events and disciplines shot on this target':
     'events: the verified term of Event is Wettbewerb',
   'Shooting distance': 'the compound Schießentfernung translates both words',
   'Results are simulations, not load data. Never use a result as a charge weight or as proof that a load is safe. Start from load data published by the powder or bullet maker for your exact components.':
@@ -165,21 +220,21 @@ const otherSense: Record<string, string> = {
   'Include shot positions': 'where the shots are on the sheet, not a shooting position',
   'Select: drag shots, points of aim and reference points; drag the background to pan':
     'drag: move with the pointer, not air drag',
-  'The federation whose disciplines the Discipline list shows. All: every discipline, then the face events no discipline names.':
+  'The federation whose disciplines the Discipline list shows. All: every discipline, then the target events no discipline names.':
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
-  'The discipline sets the face, the event and with it the scored hole. Type to search by name, number or federation.':
+  'The discipline sets the target, the event and with it the scored hole. Type to search by name, number or federation.':
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
-  "A face no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.":
+  "A target no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.":
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
   'No hole size: set Marker, or choose a discipline or event with a gauge.':
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
   'Where a further shot lands with the stated coverage (50 %, 95 %), from the shots of the group. Absent below 3 shots.':
     'lands: a shot lands, not the rifling lands',
   'Load a photo first.': 'load as the verb for a photo file, not a load (Laborierung)',
-  'More than one face fits these rings: choose the target in Target face.':
-    'the target is the face to choose in the field Target face, whose German label is Scheibe',
-  'Diameter of the black area on the target, used when no face fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).':
-    'a face that fits is a Scheibe, the target itself stays Zielscheibe',
+  'More than one target fits these rings: choose one in Target.':
+    'the target is the record to choose in the field Target, whose German label is Scheibe',
+  'Diameter of the black area on the target, used when no target fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).':
+    'a target record that fits is a Scheibe, the paper target stays Zielscheibe',
   'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.':
     'drag is the mouse action, not aerodynamic drag',
   '{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it.':

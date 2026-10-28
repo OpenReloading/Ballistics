@@ -41,7 +41,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await expect(capacity).toHaveValue('')
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
   await expect(capacity).toHaveAccessibleDescription(
-    /From the case record Demo Cases 308 Win\. Brass Demo: 3\.6 g water\./,
+    /From the brass record Demo Cases 308 Win\. Brass Demo: 3\.6 g water\./,
   )
   // a typed value no record gives
   await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.45')
@@ -75,7 +75,7 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   // the brass is chosen again and gives the capacity
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
   await page.getByRole('button', { name: 'More of Cartridge' }).click()
-  await expect(page.getByRole('combobox', { name: 'Case record' })).toHaveValue(
+  await expect(page.getByRole('combobox', { name: 'Brass record' })).toHaveValue(
     'demo-case-308-brass',
   )
   await expect(page.locator('.file-state')).toContainText('Saved')

@@ -66,7 +66,7 @@ export const overlayNames = {
   excluded: msg('Excluded direction'),
   numbers: msg('Shot numbers'),
   stats: msg('Statistics box'),
-  rings: msg('Face rings and scores'),
+  rings: msg('Target rings and scores'),
 } as const
 export type Overlay = keyof typeof overlayNames
 
@@ -79,7 +79,7 @@ export const overlayHelp: Partial<Record<Overlay, Message>> = {
     'Describes the shots fired: the ellipses holding 50 % and 95 % of a normal spread with their covariance; dashed. Absent below 2 shots.',
   ),
   rings: msg(
-    "The rings of the active group's target face and each shot's value, when a face is chosen (Group).",
+    "The rings of the active group's target and each shot's value, when a target is chosen (Group).",
   ),
 }
 

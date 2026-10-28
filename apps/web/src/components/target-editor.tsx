@@ -1118,7 +1118,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                 {group.face && (
                   <Table.Th
                     scope="col"
-                    title={`${t('Ring value, with tenths where the face has them; X: inner ten. Excluded shots show their value and do not count in the total.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
+                    title={`${t('Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
                   >
                     {t('Score')}
                   </Table.Th>

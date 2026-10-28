@@ -1,11 +1,11 @@
 ---
 title: Hit probability
-description: The probability of a hit and the expected score on a target face from the dispersion of a group scaled to the distance, with the crosswind and range uncertainty added.
+description: The probability of a hit and the expected score on a target from the dispersion of a group scaled to the distance, with the crosswind and range uncertainty added.
 ---
 
 # Hit probability
 
-For a distance, a target face and the dispersion of the user's group, the model gives the probability that a shot lands inside each scoring zone of the face, the probability of a hit, and the expected score. The group's dispersion is scaled linearly with distance. The uncertainty of the wind and of the range adds to it through the sensitivity of the trajectory. The result is a simulation of a dispersion model, not a prediction of a shooter's score.
+For a distance, a target and the dispersion of the user's group, the model gives the probability that a shot lands inside each scoring zone of the target, the probability of a hit, and the expected score. The group's dispersion is scaled linearly with distance. The uncertainty of the wind and of the range adds to it through the sensitivity of the trajectory. The result is a simulation of a dispersion model, not a prediction of a shooter's score.
 
 ## Equations
 
@@ -49,7 +49,7 @@ $$
 
 Code: `packages/core/src/groups/hit-probability.ts`, `hitProbability`.
 
-The zones of a face are its rings, grown by the radius of the scored hole as in [ring scoring](ring-scoring.md): a shot scores a ring when the hole edge touches it. The tenth-ring values and the inner ten are not part of the expected score.
+The zones of a target are its rings, grown by the radius of the scored hole as in [ring scoring](ring-scoring.md): a shot scores a ring when the hole edge touches it. The tenth-ring values and the inner ten are not part of the expected score.
 
 ## Symbols
 
@@ -78,7 +78,7 @@ The zones of a face are its rings, grown by the radius of the scored hole as in 
 ## Limits
 
 - The standard deviation of a group of a few shots is itself uncertain; the probability inherits it. A group of 5 shots gives a standard deviation known to about a third.
-- Faces whose zones are not nested ellipses about one centre (several bulls per sheet, scoring areas that are no ellipse) are outside the model.
+- Targets whose zones are not nested ellipses about one centre (several bulls per sheet, scoring areas that are no ellipse) are outside the model.
 - A very small dispersion against a large zone gives a probability of 1 to the precision of the integration.
 
 ## Sources

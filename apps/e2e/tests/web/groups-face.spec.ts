@@ -85,8 +85,9 @@ async function goStep(page: Page, name: string) {
 }
 const field = (page: Page, label: string, unit = 'mm') =>
   page.getByRole('textbox', { name: `${label} (${unit})`, exact: true })
-const faceSelect = (page: Page) => page.getByRole('combobox', { name: 'Target face', exact: true })
-const scoreFace = (page: Page) => page.getByRole('combobox', { name: 'Face', exact: true })
+const faceSelect = (page: Page) =>
+  page.getByRole('combobox', { name: 'Target on the photo', exact: true })
+const scoreFace = (page: Page) => page.getByRole('combobox', { name: 'Target', exact: true })
 
 async function load(page: Page, png: Buffer) {
   await expect(page.getByRole('combobox', { name: 'Target sheet' })).not.toHaveValue('')
@@ -295,14 +296,14 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
   })
 })
 
-test('no face fits: the ellipses are shown and a typed black diameter sets the scale', async ({
+test('no target fits: the ellipses are shown and a typed black diameter sets the scale', async ({
   page,
 }) => {
   // a black area without ring lines
   const png = await facePng(page, 'issf-10m-air-pistol', [], false)
   await load(page, png)
   await page.getByRole('button', { name: 'Detect holes' }).click()
-  await expect(page.locator('.target-status')).toHaveText(/^No face fits the rings found/, {
+  await expect(page.locator('.target-status')).toHaveText(/^No target fits the rings found/, {
     timeout: 30_000,
   })
   await expect(step(page, 'Scale')).toHaveAttribute('aria-current', 'step')

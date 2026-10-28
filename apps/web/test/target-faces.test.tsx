@@ -79,7 +79,7 @@ it('renders the list: one row per face linking its page, the outer diameter in t
       <TargetFaceList items={rows} disciplines={[]} />
     </MantineProvider>,
   )
-  expect(out).toContain(`${faces.length} faces`)
+  expect(out).toContain(`${faces.length} targets`)
   expect(out).toContain(`href="/targets/${precision.id}"`)
   expect(out).toContain('500.00')
 })

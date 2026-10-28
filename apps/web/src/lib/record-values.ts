@@ -80,7 +80,7 @@ const spaced: Readonly<Record<string, Message>> = {
 // a primer cup of brass is left out: the catalogue test requires the German word for a cartridge case in every text that says brass
 const title: Readonly<Record<string, Message>> = {
   // case wall materials
-  brass: msg('Brass'),
+  brass: msg('material\u0004Brass'),
   'nickel-plated-brass': msg('Nickel plated brass'),
   'lacquered-steel': msg('Lacquered steel'),
   'polymer-coated-steel': msg('Polymer coated steel'),

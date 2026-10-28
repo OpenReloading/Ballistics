@@ -182,10 +182,10 @@ export function HitProbability({
       </p>
       <div className="hit-probability-fields">
         <NativeSelect
-          label={t('Target face')}
+          label={t('Target')}
           value={faceId}
           data={[
-            { value: '', label: t('Choose a face') },
+            { value: '', label: t('Choose a target') },
             ...faces.map((f) => ({ value: f.id, label: `${f.name} (${f.organization})` })),
           ]}
           onChange={(e) => setFaceId(e.currentTarget.value)}
@@ -212,7 +212,9 @@ export function HitProbability({
       </div>
       {load.status === 'error' && (
         <p role="alert">
-          {t('The face could not be read: {reason}', { reason: translateMessage(load.message, t) })}
+          {t('The target could not be read: {reason}', {
+            reason: translateMessage(load.message, t),
+          })}
         </p>
       )}
       {failure && <p role="alert">{translateMessage(failure, t)}</p>}
@@ -265,7 +267,7 @@ export function HitProbability({
       )}
       {!outcome && load.status !== 'error' && !failure && (
         <p className="note">
-          {faceId ? t('Fill every field for a result.') : t('Choose a target face for a result.')}
+          {faceId ? t('Fill every field for a result.') : t('Choose a target for a result.')}
         </p>
       )}
     </section>

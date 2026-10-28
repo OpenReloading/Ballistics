@@ -24,7 +24,7 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Chronograph session | `chrono-session.ts` | `records/chrono` (empty), bundle only; user record `session` (step 7) | catalogue, user, importers |
 | Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | catalogue |
 | Source record | `provenance.ts` | `records/sources`, inlined into records on read | catalogue |
-| Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder each | catalogue |
+| Federation, discipline, target mapping, target | `federation.ts`, `target-face.ts` | one folder each | catalogue |
 | Caliber class | `caliber-class.ts` | `records/caliber-classes` | catalogue |
 | Load tables | `load-tables.ts` | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm`, in the stored units (step 5) | user |
@@ -58,7 +58,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Types and enums (medium).** `apps/web/src/lib/api-types.ts` re-declared the record types of the schema, and the case type list existed in the API route and in the web app. Drift showed in `productNumber` (optional in the copy, required in the schema) and in `ogive.form` (a string). Step 1 removes this.
 
-**Low:** inline bullet, firearm and ammunition descriptions in publication records (`firing.ts`, `range.ts`) repeat part of Bullet and Firearm; `targetMapping.gauge` is stored on the mapping and on the face event.
+**Low:** inline bullet, firearm and ammunition descriptions in publication records (`firing.ts`, `range.ts`) repeat part of Bullet and Firearm; `targetMapping.gauge` is stored on the mapping and on the target event.
 
 ## Target model
 
@@ -89,7 +89,7 @@ The finer standing of a citation (manufacturer, public, community) stays in `pro
 | Case | catalogue, user | a user group of cases is a Case with `origin` `user`, an optional `basedOn` catalogue product, its measured values and the `capacity` reference |
 | Load | catalogue, user, shared | references to cartridge, firearm, bullet, powder, primer and capacity; the case as a component description; seating; charge; a typed `analysis` with `overrides` and the ladder |
 | Session | catalogue, user, shared | an event: strings of `{load, variation, shots}`, conditions, device, provenance with the imported file's SHA-256 |
-| TargetFace, Federation, Discipline, TargetMapping | catalogue, user (faces) | `organization` is a federation reference |
+| TargetFace, Federation, Discipline, TargetMapping | catalogue, user (targets) | `organization` is a federation reference |
 | TargetSheet | user, shared | the photo stays a file; `load` and `session` are references |
 
 Session stays separate from Load: a session is an event fixed in time, a load is a recipe reused over many sessions, and merging them would copy recipe data into every event. A target sheet is an event of its own that references both. Solver bodies stay derived SI inputs built from resolved entities and are never stored. The designers stay separate screens but edit the same entities.
@@ -159,7 +159,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 9 | Manufacturer references (done, below) | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
-| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of target faces (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
+| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of targets (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
 
 Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fit any time; 10 does not run together with other changes to the cartridge routes.
 
@@ -231,15 +231,15 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - Limits: a load file or a copied JSON carries the load, not the capacity record, so in another browser the measured value is reported as missing (the same limit as a user cartridge or bullet design); share links never carried it. The load file route names no solver value from a capacity (the volume is a typed override).
 
 - Own cases: the user record of kind `case` (`packages/schema/src/user-data.ts`) holds a `Case` with `origin` `user`. `manufacturer` is required of a catalogue case only. `basedOn` names the catalogue product the group started from; its fields are the group's own values, not overrides of the product. The measured fields are optional: `numberOfFirings`, `trimLength` and `neckWall` (mm), `casesMeasured` and `spread` (g, standard deviation of the capacity over those cases). The measured water capacity stays a `caseCapacity` record that the group names with `capacity`, so a capacity is stored once: the case group editor (`/cases/editor`, `apps/web/src/components/case-group-editor.tsx`) writes it with the id `measuredCapacityId` gives for the cartridge and value, the same record the workbench writes for a typed measured capacity. The record id must be a UUID, so a load can name the group with `case.record` (`user:<UUID>`). `checkUserRefs` reports a group's `user:` cartridge, manufacturer and capacity and a load's `case.record` that no record answers. Export all and Import carry the groups with every other record; a single group's file does not carry its capacity record (the limit of a load file above).
-- The workbench lists the groups of the chosen cartridge in the Cartridge card's Case record choice. Choosing one fills the measured capacity field from the group's capacity record, which the run already marks as measured, and a saved load keeps `case.record` as the group's reference.
+- The workbench lists the groups of the chosen cartridge in the Cartridge card's Brass record choice. Choosing one fills the measured capacity field from the group's capacity record, which the run already marks as measured, and a saved load keeps `case.record` as the group's reference.
 
 ### Step 12: what changed
 
 - `loadTables` (`packages/schema/src/load-tables.ts`) is the schema of `load-tables.json`: row file name to `{ manufacturer, title, url?, retrieved }`, strict, `manufacturer` a record id and `retrieved` an ISO date. `readLoadTables` parses each entry: one that breaks the schema is left out and `data:validate` reports each issue with the row file and field. The manufacturer must still be a record (`checkManufacturerReferences`).
 
-- Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target face list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
+- Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
 
-- `TargetFace.federation` and the face events' `federation` are federation record ids (`organization` is gone from the records), a face without `federation` is a user's own design. Every face event has an `id` (a record id, unique within the face) and `TargetMapping.event` holds it. `data:validate` checks the federation references, the mapping against the event's federation and the uniqueness (`checkFaceFederations`, `checkMappings`). The target faces API list derives `organization` from the federation. The web app keys the event choice by id, and a target sheet's `face.event` is a record id: a saved sheet that holds an event name is rejected like any record of an older format.
+- `TargetFace.federation` and the target events' `federation` are federation record ids (`organization` is gone from the records), a target without `federation` is a user's own design. Every target event has an `id` (a record id, unique within the target) and `TargetMapping.event` holds it. `data:validate` checks the federation references, the mapping against the event's federation and the uniqueness (`checkFaceFederations`, `checkMappings`). The targets API list derives `organization` from the federation. The web app keys the event choice by id, and a target sheet's `face.event` is a record id: a saved sheet that holds an event name is rejected like any record of an older format.
 
 ### Step 9: what changed
 

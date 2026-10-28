@@ -248,7 +248,7 @@ export function faceAlignment(
   t: Translator['t'],
 ): FaceAlignment {
   if (!marks?.length) return { centre: aim ?? { x: 0, y: 0 }, scale: 1 }
-  if (face.bulls) throw new Error(t('Ring marks fit a face with one bull'))
+  if (face.bulls) throw new Error(t('Ring marks fit a target with one bull'))
   if (face.rings.some((r) => r.height || r.shape === 'square'))
     throw new Error(t('Ring marks fit circular rings'))
   const rings = new Map<number, Point[]>()
@@ -256,7 +256,7 @@ export function faceAlignment(
   const fit = fitRings(
     [...rings].map(([value, points]) => {
       const ring = face.rings.find((r) => r.value === value)
-      if (!ring) throw new Error(t('The face has no ring {value}', { value }))
+      if (!ring) throw new Error(t('The target has no ring {value}', { value }))
       return { diameter: ring.diameter.value, points }
     }),
     t,

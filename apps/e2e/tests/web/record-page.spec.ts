@@ -49,7 +49,7 @@ const records: {
     id: 'demo-case-308-brass',
     name: 'Demo Cases 308 Win. Brass Demo',
     title: 'Demo Cases 308 Win. Brass Demo',
-    description: 'Recorded properties of the case Demo Cases 308 Win. Brass Demo, with sources.',
+    description: 'Recorded properties of the brass Demo Cases 308 Win. Brass Demo, with sources.',
   },
   {
     route: 'primers',
@@ -76,7 +76,7 @@ const records: {
     name: '25 m Pistole/Revolver',
     title: '25 m Pistole/Revolver',
     description:
-      'Distance, caliber classes and the target faces of 25 m Pistole/Revolver, with its rule book.',
+      'Distance, caliber classes and the targets of 25 m Pistole/Revolver, with its rule book.',
     drawn: 'main svg.target-face-drawing',
   },
   {
@@ -86,7 +86,7 @@ const records: {
     name: 'Deutscher Schützenbund e.V.',
     title: 'Deutscher Schützenbund e.V.',
     description:
-      'The rule books of Deutscher Schützenbund e.V., its disciplines and the target faces they use.',
+      'The rule books of Deutscher Schützenbund e.V., its disciplines and the targets they use.',
     drawn: 'main svg.target-face-drawing',
   },
 ]

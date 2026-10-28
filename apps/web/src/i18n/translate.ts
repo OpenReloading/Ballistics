@@ -44,6 +44,12 @@ export interface Translator {
 const numberText = (language: string, n: number) =>
   new Intl.NumberFormat(language, { useGrouping: false, maximumFractionDigits: 20 }).format(n)
 
+/**
+ * The English text of a key. A key may start with a context and U+0004 ('material\u0004Brass'),
+ * so one English word with two senses has two catalogue entries; English shows the text after it.
+ */
+const englishOf = (text: string) => text.slice(text.indexOf('\u0004') + 1)
+
 const fill = (text: string, values: Values | undefined, language: string) =>
   values
     ? text.replace(/\{(\w+)\}/g, (placeholder, name: string) => {
@@ -64,7 +70,7 @@ export function translator(catalogue?: Catalogue, language = 'en'): Translator {
     language: shown,
     t: (text: string, values?: Values) => {
       const entry = catalogue?.[text]
-      return fill(typeof entry === 'string' ? entry : text, values, shown)
+      return fill(typeof entry === 'string' ? entry : englishOf(text), values, shown)
     },
     tn: (count: number, one: string, other: string, values?: Values) => {
       const entry = catalogue?.[`${one}|${other}`]

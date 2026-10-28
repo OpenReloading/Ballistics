@@ -167,7 +167,7 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
   const unset = t('Not stated')
   return [
     {
-      title: msg('Face'),
+      title: msg('Target'),
       rows: [
         ...length(msg('Black area height'), f.blackHeight?.value, f.blackHeight?.raw),
         ...text(

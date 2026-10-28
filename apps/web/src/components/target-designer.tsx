@@ -39,7 +39,7 @@ import { useKeptDraft } from './use-kept-draft.ts'
 import { Workspace } from './workspace.tsx'
 
 /** The record name of a face without a name. */
-const fallbackName = 'Target face design'
+const fallbackName = 'Target design'
 
 /** The key of the empty draft: nothing to keep before the first edit. */
 const blankKey = namedKey(fileData(newDesign()), '')
@@ -219,7 +219,7 @@ export function TargetDesigner() {
   const sections = [
     {
       key: 'face',
-      title: t('Face'),
+      title: t('Target'),
       content: (
         <div className="prop-grid designer-grid">
           <TextInput
@@ -284,7 +284,7 @@ export function TargetDesigner() {
     },
     {
       key: 'events',
-      title: t('Events of the face'),
+      title: t('Events of the target'),
       content: (
         <div className="side-grid">
           {head([
@@ -362,14 +362,14 @@ export function TargetDesigner() {
   return (
     <>
       <PageBar
-        title={msg('Target face designer')}
+        title={msg('Target designer')}
         translated
         actions={
           <>
             <DesignerToolbar
               undo={history.past.length > 0}
               redo={history.future.length > 0}
-              newLabel={t('New face')}
+              newLabel={t('New target')}
               system={system}
               dispatch={toolbar}
             />

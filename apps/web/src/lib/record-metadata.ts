@@ -89,7 +89,7 @@ export function recordHeadText(
     case 'cases':
       return {
         title: label,
-        description: `Recorded properties of the case ${label}, with sources.`,
+        description: `Recorded properties of the brass ${label}, with sources.`,
       }
     case 'primers':
       return {
@@ -104,12 +104,12 @@ export function recordHeadText(
     case 'disciplines':
       return {
         title: name,
-        description: `Distance, caliber classes and the target faces of ${name}, with its rule book.`,
+        description: `Distance, caliber classes and the targets of ${name}, with its rule book.`,
       }
     case 'federations':
       return {
         title: name,
-        description: `The rule books of ${name}, its disciplines and the target faces they use.`,
+        description: `The rule books of ${name}, its disciplines and the targets they use.`,
       }
   }
 }
