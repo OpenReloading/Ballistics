@@ -41,6 +41,7 @@
   - `npm run api:check`: breaking changes against `packages/api/openapi.baseline.json`. A break passes only with the baseline rewritten by `npm run api-baseline -w @open-reloading/tools` in the same pull request.
   - `npm run api:conformance`: Schemathesis against the running API at `API_URL`.
   - The contract version is the `@open-reloading/api` version. Every public route is under `/v1`.
+- Contract baselines (after `build`, part of `npm test`, `apps/docs/docs/release.md`, Contract baselines): each `test/contracts.test.ts` of schema (the JSON Schemas of `dist/json-schema`), web (the golden user data file and share link) and tools (the export list of each published package, from its `.d.ts`) compares the build with the files in its `test/golden/`. `npm run baselines` rewrites them in the same pull request as the change; the golden user data file is edited by hand.
 - E2E (projects and when to run which: `apps/e2e/AGENTS.md`):
   - `npm run test:e2e`: the static export served on `WEB_URL` (default `http://localhost:3003`: `npm run static:build`, then `npm run pages:serve`) and the API on `API_URL` (default `http://localhost:3000`, `node packages/api/dist/server.js`), which the smoke spec's comparison and the load file spec read.
   - In `apps/e2e/`: install the browser once with `npx playwright install --with-deps chromium`.

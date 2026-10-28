@@ -1,0 +1,722 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Id of a catalogue load, the file name without `.json`."
+    },
+    "origin": {
+      "type": "string",
+      "enum": [
+        "catalogue",
+        "user",
+        "shared"
+      ],
+      "description": "Where the record lives: the git catalogue, this browser, or a received file."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Name of a catalogue load. A user load is named by its record."
+    },
+    "cartridge": {
+      "type": "string",
+      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+      "description": "Reference to a cartridge: `catalogue:<record id>` or `user:<UUID>`."
+    },
+    "firearm": {
+      "type": "string",
+      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+      "description": "Reference to a firearm: `catalogue:<record id>` or `user:<UUID>`."
+    },
+    "bullet": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+          "description": "Reference to a bullet: `catalogue:<record id>` or `user:<UUID>`."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "manufacturer": {
+              "type": "string",
+              "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+              "description": "Manufacturer record of the component."
+            },
+            "lot": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Lot number as printed on the package."
+            },
+            "model": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Model name of the bullet."
+            },
+            "bulletMass": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "description": "In g."
+                },
+                "raw": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The value as written in the source, when it differed."
+                }
+              },
+              "required": [
+                "value"
+              ],
+              "unit": "g",
+              "description": "Mass of the bullet."
+            }
+          },
+          "required": [
+            "manufacturer",
+            "model",
+            "bulletMass"
+          ],
+          "additionalProperties": false,
+          "description": "The bullet as the publication describes it, where no record exists."
+        }
+      ],
+      "description": "The bullet: a reference, or a description in a measured catalogue load."
+    },
+    "powder": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+          "description": "Reference to a powder: `catalogue:<record id>` or `user:<UUID>`."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "manufacturer": {
+              "type": "string",
+              "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+              "description": "Manufacturer record of the component."
+            },
+            "lot": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Lot number as printed on the package."
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Product name of the powder."
+            }
+          },
+          "required": [
+            "manufacturer",
+            "name"
+          ],
+          "additionalProperties": false,
+          "description": "The powder as the publication describes it, where no record exists."
+        }
+      ],
+      "description": "The powder: a reference, or a description in a measured catalogue load. A catalogue load names a catalogue powder."
+    },
+    "powderLot": {
+      "description": "Lot number of the powder, as printed on the package.",
+      "type": "string",
+      "minLength": 1
+    },
+    "charge": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "In g."
+        },
+        "raw": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The value as written in the source, when it differed."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "unit": "g",
+      "description": "Powder mass of one round."
+    },
+    "capacity": {
+      "type": "string",
+      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+      "description": "The water capacity of the case: a catalogue capacity, or one the user measured."
+    },
+    "primer": {
+      "type": "object",
+      "properties": {
+        "lot": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Lot number as printed on the package."
+        },
+        "record": {
+          "type": "string",
+          "allOf": [
+            {
+              "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+            },
+            {
+              "pattern": "^catalogue:"
+            }
+          ],
+          "description": "The primer: a catalogue product."
+        }
+      },
+      "additionalProperties": false,
+      "description": "The primer: the catalogue product and the lot."
+    },
+    "case": {
+      "type": "object",
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+          "description": "Manufacturer record of the component."
+        },
+        "lot": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Lot number as printed on the package."
+        },
+        "firingCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "Times the case was fired before this load."
+        },
+        "record": {
+          "type": "string",
+          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+          "description": "The case: a catalogue product, whose stated water capacity is the default of `capacity`, or a case group of the user."
+        }
+      },
+      "additionalProperties": false,
+      "description": "The case as described. Its measured water capacity is the `capacity` reference, which takes precedence over the stated capacity of `record`."
+    },
+    "seating": {
+      "type": "object",
+      "properties": {
+        "by": {
+          "type": "string",
+          "enum": [
+            "overallLength",
+            "baseToOgive"
+          ],
+          "description": "The length the bullet is seated by: cartridge overall length or base to ogive."
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "In mm."
+            },
+            "raw": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The value as written in the source, when it differed."
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unit": "mm",
+          "description": "That length."
+        }
+      },
+      "required": [
+        "by",
+        "value"
+      ],
+      "description": "The length the bullet is seated by. The other one is derived."
+    },
+    "note": {
+      "type": "string",
+      "maxLength": 10000,
+      "description": "Notes of the load, plain text."
+    },
+    "analysis": {
+      "type": "object",
+      "properties": {
+        "overrides": {
+          "type": "object",
+          "properties": {
+            "volume": {
+              "type": "number",
+              "unit": "cm3",
+              "description": "The value of `volume` in cm3."
+            },
+            "boreDiameter": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `boreDiameter` in mm."
+            },
+            "boreArea": {
+              "type": "number",
+              "unit": "mm2",
+              "description": "The value of `boreArea` in mm2."
+            },
+            "travel": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `travel` in mm."
+            },
+            "twist": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `twist` in mm."
+            },
+            "bulletMass": {
+              "type": "number",
+              "unit": "g",
+              "description": "The value of `bulletMass` in g."
+            },
+            "propellantEnergy": {
+              "type": "number",
+              "unit": "J/kg",
+              "description": "The value of `propellantEnergy` in J/kg."
+            },
+            "gamma": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `gamma` in 1."
+            },
+            "density": {
+              "type": "number",
+              "unit": "g/cm3",
+              "description": "The value of `density` in g/cm3."
+            },
+            "covolume": {
+              "type": "number",
+              "unit": "m3/kg",
+              "description": "The value of `covolume` in m3/kg."
+            },
+            "vivacity": {
+              "type": "number",
+              "unit": "1/s",
+              "description": "The value of `vivacity` in 1/s."
+            },
+            "exponent": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `exponent` in 1."
+            },
+            "referencePressure": {
+              "type": "number",
+              "unit": "bar",
+              "description": "The value of `referencePressure` in bar."
+            },
+            "propellantTemperature": {
+              "type": "number",
+              "unit": "degC",
+              "description": "The value of `propellantTemperature` in degC."
+            },
+            "ignitionPressure": {
+              "type": "number",
+              "unit": "bar",
+              "description": "The value of `ignitionPressure` in bar."
+            },
+            "startPressure": {
+              "type": "number",
+              "unit": "bar",
+              "description": "The value of `startPressure` in bar."
+            },
+            "sebert": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `sebert` in 1."
+            },
+            "formA": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `formA` in 1."
+            },
+            "formM": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `formM` in 1."
+            },
+            "formQ": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `formQ` in 1."
+            },
+            "formZ1": {
+              "type": "number",
+              "unit": "1",
+              "description": "The value of `formZ1` in 1."
+            },
+            "leakArea": {
+              "type": "number",
+              "unit": "mm2",
+              "description": "The value of `leakArea` in mm2."
+            },
+            "boreFriction": {
+              "type": "number",
+              "unit": "bar",
+              "description": "The value of `boreFriction` in bar."
+            },
+            "engravingPressure": {
+              "type": "number",
+              "unit": "bar",
+              "description": "The value of `engravingPressure` in bar."
+            },
+            "engravingLength": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `engravingLength` in mm."
+            },
+            "firearmMass": {
+              "type": "number",
+              "unit": "g",
+              "description": "The value of `firearmMass` in g."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Solver values the user typed. Every other value follows the referenced records."
+        },
+        "ladder": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "charge",
+                    "seating",
+                    "temperature"
+                  ],
+                  "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                },
+                "stepCount": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 21,
+                  "description": "Number of ladder steps."
+                },
+                "step": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                },
+                "direction": {
+                  "type": "string",
+                  "enum": [
+                    "up",
+                    "down"
+                  ],
+                  "description": "Steps from the charge (or seating length) up or down."
+                }
+              },
+              "required": [
+                "stepCount",
+                "direction"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "charge",
+                    "seating",
+                    "temperature"
+                  ],
+                  "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                },
+                "stepCount": {
+                  "type": "number",
+                  "enum": [
+                    3,
+                    5,
+                    7,
+                    9,
+                    11,
+                    13,
+                    15,
+                    17,
+                    19,
+                    21
+                  ],
+                  "description": "Number of ladder steps, odd so the steps centre on the charge."
+                },
+                "step": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                },
+                "direction": {
+                  "type": "string",
+                  "const": "around",
+                  "description": "Steps centred on the charge (or seating length)."
+                }
+              },
+              "required": [
+                "stepCount",
+                "direction"
+              ]
+            }
+          ],
+          "description": "The ladder of the load: step count, step size and direction."
+        }
+      },
+      "description": "The typed solver values and the ladder the load is analysed with."
+    },
+    "sessions": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+        "description": "Reference to a session: `catalogue:<record id>` or `user:<UUID>`."
+      },
+      "description": "Chronograph sessions read on the Measurements tab. Each names its strings' load and what they vary."
+    },
+    "snapshots": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "session": {
+            "type": "string",
+            "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+            "description": "The session the snapshot belongs to: one of `Load.sessions`."
+          },
+          "powderLot": {
+            "description": "Powder lot of the load at the session.",
+            "type": "string",
+            "minLength": 1
+          },
+          "primerLot": {
+            "description": "Primer lot of the load at the session.",
+            "type": "string",
+            "minLength": 1
+          },
+          "caseLot": {
+            "description": "Case lot of the load at the session.",
+            "type": "string",
+            "minLength": 1
+          },
+          "seating": {
+            "type": "object",
+            "properties": {
+              "by": {
+                "type": "string",
+                "enum": [
+                  "overallLength",
+                  "baseToOgive"
+                ],
+                "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+              },
+              "value": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "In mm."
+                  },
+                  "raw": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "The value as written in the source, when it differed."
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "unit": "mm",
+                "description": "That length."
+              }
+            },
+            "required": [
+              "by",
+              "value"
+            ],
+            "description": "The seating of the load at the session."
+          },
+          "roundCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "Rounds fired through the firearm at the session."
+          },
+          "dismissed": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40
+            },
+            "description": "Ids of the notes on this session that the user dismissed."
+          }
+        },
+        "required": [
+          "session"
+        ],
+        "additionalProperties": false
+      },
+      "description": "What the load was at each of its sessions, at most one per session of `sessions`."
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "published",
+            "measured",
+            "derived",
+            "fitted",
+            "computed"
+          ],
+          "description": "How the values came about."
+        },
+        "sources": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Title of the source: the document, or the site and table."
+              },
+              "publisher": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Who issued the data: a maker, a standards body or the authors."
+              },
+              "edition": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Edition, print or date as the document states it."
+              },
+              "page": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Page or section of the document."
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "An http or https URL of the source."
+              },
+              "retrieved": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                "description": "Date the source was retrieved, ISO 8601."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+              },
+              "fields": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "published",
+                  "measured",
+                  "derived",
+                  "fitted",
+                  "computed"
+                ],
+                "description": "Kind of this source values when it differs from the provenance kind of the record."
+              },
+              "license": {
+                "type": "string",
+                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+              },
+              "terms": {
+                "type": "string",
+                "minLength": 1,
+                "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+              },
+              "origin": {
+                "type": "string",
+                "enum": [
+                  "manufacturer",
+                  "public",
+                  "community"
+                ],
+                "description": "Who stands behind the source: manufacturer, public or community."
+              },
+              "run": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{16}$",
+                    "description": "Model version id the report names."
+                  },
+                  "report": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Report of the evaluation of the fit."
+                  }
+                },
+                "required": [
+                  "version",
+                  "report"
+                ],
+                "description": "The fit run behind a `fitted` source."
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Note on the source."
+              }
+            },
+            "required": [
+              "title"
+            ]
+          },
+          "description": "The sources of the values, at least one."
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Note on the provenance."
+        }
+      },
+      "required": [
+        "kind",
+        "sources"
+      ],
+      "description": "Where the values come from. Required for a catalogue load."
+    }
+  },
+  "required": [
+    "origin"
+  ]
+}
