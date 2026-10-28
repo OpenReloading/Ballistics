@@ -37,6 +37,7 @@ import {
   confirmedHoleDiameters,
   type EditorProposal,
   expectedHoleSize,
+  isMaybe,
   localPxPerM,
   proposalsClearOfShots,
   rectangleFromDiagonal,
@@ -379,14 +380,13 @@ export function useHoleDetection({
     )
     setProposals(list)
     setFlagged(m.flagged)
+    const count = list.filter((p) => !isMaybe(p)).length
     if (list.length) {
       if (auto) {
         setStep(undefined)
         setResult(true)
       } else setStep(4)
-      say(
-        `${t('{count} proposed; accept them to add shots.', { count: list.length })}${flaggedNote(m.flagged)}`,
-      )
+      say(`${t('{count} proposed; accept them to add shots.', { count })}${flaggedNote(m.flagged)}`)
     }
     return list.length
   }
@@ -640,6 +640,8 @@ export function useHoleDetection({
     setProposals((x) => x.map((q) => (q.id === id ? { ...q, ...p } : q)))
   const remove = (id: number) => setProposals((x) => x.filter((q) => q.id !== id))
 
+  const sure = proposals.filter((p) => !isMaybe(p))
+
   const hint = toolHint(tool, shape, pending.length, t)
 
   const layer = (k: number) => {
@@ -728,9 +730,10 @@ export function useHoleDetection({
     </div>,
     <ReviewStep
       key="review"
-      proposals={proposals.length}
+      proposals={sure.length}
+      maybe={proposals.length - sure.length}
       flagged={flagged.length}
-      onAccept={() => take(proposals)}
+      onAccept={() => take(sure)}
       onClear={() => {
         setProposals([])
         setFlagged([])
@@ -772,7 +775,7 @@ export function useHoleDetection({
     <ResultLine
       target={record?.name}
       references={references}
-      proposals={proposals.length}
+      proposals={sure.length}
       size={size}
       sizeOpen={sizeOpen}
       running={running}
@@ -787,7 +790,7 @@ export function useHoleDetection({
         setCaliber(c)
         commitHoleSize(c.diameter)
       }}
-      onAccept={() => take(proposals)}
+      onAccept={() => take(sure)}
     />
   )
 
@@ -1414,11 +1417,13 @@ function ExampleStep({
 
 function ReviewStep({
   proposals,
+  maybe,
   flagged,
   onAccept,
   onClear,
 }: {
   proposals: number
+  maybe: number
   flagged: number
   onAccept: () => void
   onClear: () => void
@@ -1443,7 +1448,7 @@ function ReviewStep({
         <Button
           size={controlSize.row.button}
           variant="default"
-          disabled={proposals === 0 && flagged === 0}
+          disabled={proposals + maybe + flagged === 0}
           aria-label={t('Clear proposals')}
           title={t('Clear proposals and areas to place by hand')}
           onClick={onClear}
@@ -1785,7 +1790,8 @@ function ProposalLayer({
       {proposals.map((p, i) => {
         const r = Math.max(holePx / 2, 6 * k)
         const pct = Math.round(p.confidence * 100)
-        const label =
+        const maybe = isMaybe(p)
+        const name =
           p.clusterSize > 1
             ? t('Proposal {n}, confidence {pct} %, one of {count} in a cluster', {
                 n: i + 1,
@@ -1793,6 +1799,7 @@ function ProposalLayer({
                 count: p.clusterSize,
               })
             : t('Proposal {n}, confidence {pct} %', { n: i + 1, pct })
+        const label = maybe ? `${name}, ${t('maybe')}` : name
         return (
           <g key={p.id}>
             {/* biome-ignore lint/a11y/useSemanticElements: an SVG mark has no button element */}
@@ -1801,7 +1808,7 @@ function ProposalLayer({
               tabIndex={0}
               aria-label={label}
               data-proposal={p.id}
-              className="proposal"
+              className={maybe ? 'proposal maybe' : 'proposal'}
               cx={p.x}
               cy={p.y}
               r={r}
@@ -1847,7 +1854,7 @@ function ProposalLayer({
               fontSize={11 * k}
               aria-hidden="true"
             >
-              {t('{pct} %', { pct })}
+              {maybe ? t('maybe {pct} %', { pct }) : t('{pct} %', { pct })}
               {p.clusterSize > 1 ? ` (${p.clusterSize})` : ''}
             </text>
           </g>

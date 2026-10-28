@@ -140,6 +140,10 @@ $$
 
 Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `apps/web/src/lib/raster-ops.ts`, `components`.
 
+A proposal with a confidence below 0.5 is shown as "maybe": the user can accept it on the photo, but Accept all and the proposal count leave it out. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
+
+Code: `apps/web/src/lib/hole-proposals.ts`, `MAYBE_BELOW`, `isMaybe`.
+
 ### Hole size
 
 From a picked hole, the size is the hole diameter at the strongest wide-scale peak within $D$ of the pick, clamped to 0.7 to 1.4 of the expected size. The median diameter of the five strongest kept peaks then refines it once, when it differs by more than 12 %:

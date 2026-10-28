@@ -8707,6 +8707,12 @@ main .session-shots th:nth-child(-n + 2) {
   cursor: grab;
 }
 
+/* below the confidence tier: sparser dashes, not in Accept all */
+.target-canvas .proposal.maybe {
+  stroke-dasharray: 2 4;
+  opacity: 0.7;
+}
+
 .target-canvas .proposal:focus-visible {
   outline: none;
   stroke: var(--link);

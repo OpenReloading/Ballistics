@@ -2701,6 +2701,8 @@
   "Proposal {n}, confidence {pct} %": "Vorschlag {n}, Konfidenz {pct} %",
   "{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it.": "{label}. Doppelklick oder Eingabetaste übernimmt ihn, Ziehen oder Pfeiltasten verschieben ihn, Entf löscht ihn.",
   "{pct} %": "{pct} %",
+  "maybe": "vielleicht",
+  "maybe {pct} %": "vielleicht {pct} %",
   "The black area and the paper are close in brightness.": "Der Spiegel und das Papier haben fast die gleiche Helligkeit.",
   "Retake with more light on the target and without a photo filter.": "Neu aufnehmen, mit mehr Licht auf der Zielscheibe und ohne Fotofilter.",
   "The black zones of the target look grey.": "Die schwarzen Zonen der Zielscheibe wirken grau.",
