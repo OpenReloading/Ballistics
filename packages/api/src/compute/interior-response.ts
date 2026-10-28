@@ -7,6 +7,7 @@ import { provenance } from '@open-reloading/schema'
 import { z } from 'zod'
 import { notice } from './answer.ts'
 import { chargeTargetKinds } from './charge-schema.ts'
+import { identity } from './identity.ts'
 
 const num = (description: string) => z.number().describe(description)
 const int = (description: string) => z.int().describe(description)
@@ -252,6 +253,7 @@ const checked = { pressureRange, sampled, limits, warnings }
 /** 200 body of `POST /interior`: one M3 run, or the steps of a charge ladder. */
 export const interiorResponse = z.union([
   z.looseObject({
+    ...identity,
     notice: noticeField,
     model: z.literal('m3').describe('The interior model'),
     units: m3Units,
@@ -263,6 +265,7 @@ export const interiorResponse = z.union([
       .describe('The records of the request, absent without a cartridge id'),
   }),
   z.looseObject({
+    ...identity,
     notice: noticeField,
     model: z.literal('m3').describe('The interior model'),
     units: m3Units,
@@ -295,6 +298,7 @@ const summaryStep = { charge, summary, ...checked }
 
 /** 200 body of `POST /interior/load-file`: the summary of the shown step, its curve on request and the ladder. */
 export const loadFileResponse = z.looseObject({
+  ...identity,
   notice: noticeField,
   units: z
     .looseObject({
@@ -339,6 +343,7 @@ const extreme = (description: string) =>
 
 /** 200 body of `POST /interior/charge-target`: the charge that reaches the target and its run without the curve. */
 export const chargeTargetResponse = z.looseObject({
+  ...identity,
   notice: noticeField,
   model: z.literal('m3').describe('The interior model'),
   units: m3Units,

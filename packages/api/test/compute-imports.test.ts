@@ -51,6 +51,7 @@ describe('catalogue entry', () => {
       'catalogue/list.ts',
       'catalogue/open.ts',
       'catalogue/types.ts',
+      'hash.ts',
     ])
     expect(found.filter((f) => !catalogueAllowed.includes(defined(f.split(': ')[1])))).toEqual([])
   })

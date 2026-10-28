@@ -6,6 +6,7 @@
 import { dragModels } from '@open-reloading/core'
 import { provenance } from '@open-reloading/schema'
 import { z } from 'zod'
+import { identity } from './identity.ts'
 
 const num = (description: string) => z.number().describe(description)
 const int = (description: string) => z.int().describe(description)
@@ -183,6 +184,7 @@ const trajectoryPoint = z.looseObject({
 
 /** 200 body of `POST /exterior/trajectory`. */
 export const trajectoryResponse = z.looseObject({
+  ...identity,
   units,
   result: z
     .looseObject({
@@ -212,6 +214,7 @@ const observationKind = z
 
 /** 200 body of `POST /exterior/truing`. */
 export const truingResponse = z.looseObject({
+  ...identity,
   units,
   result: z
     .looseObject({
@@ -324,6 +327,7 @@ const identification = {
 
 /** 200 body of `POST /exterior/range-strings/plan`. */
 export const rangeStringsPlanResponse = z.looseObject({
+  ...identity,
   units,
   result: z
     .array(
@@ -344,6 +348,7 @@ export const rangeStringsPlanResponse = z.looseObject({
 
 /** 200 body of `POST /exterior/range-strings/fit`. */
 export const rangeStringsFitResponse = z.looseObject({
+  ...identity,
   units,
   result: z
     .looseObject({
@@ -391,6 +396,7 @@ export const rangeStringsFitResponse = z.looseObject({
 
 /** 200 body of `GET /exterior/stability`. */
 export const stabilityResponse = z.looseObject({
+  ...identity,
   units,
   method: z.literal('miller').describe('Stability rule'),
   result: num('Gyroscopic stability factor, 1'),

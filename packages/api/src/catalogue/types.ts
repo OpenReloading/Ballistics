@@ -340,4 +340,9 @@ export interface Catalogue {
   renamed(kind: string, id: string): string | undefined
   /** The case capacity records of a cartridge, ordered by id. */
   capacities(cartridge: string): Catalogued<'caseCapacity'>[]
+  /**
+   * The SHA-256 of the whole data set (every record and the renames) as 64 hex digits: the same
+   * records give the same value, any changed field changes it. Reads the record file on the first call.
+   */
+  dataHash(): Promise<string>
 }
