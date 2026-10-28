@@ -1,4 +1,5 @@
 import { bulletWindow } from '@open-reloading/core'
+import { canonicalJson, sha256 } from '../hash.ts'
 import { revisionOf } from './derive.ts'
 import { select } from './list.ts'
 import {
@@ -44,6 +45,7 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
     if (record === undefined) return undefined
     return { ...record, kind, origin: 'catalogue', revision: revisionOf(record) } as Catalogued<K>
   }
+  let dataHash: Promise<string> | undefined
   const cartridgeItems = new Map(index.cartridges.map((r) => [r.item.id, r.item]))
   return {
     cartridges: ({ table, ...paging } = {}) =>
@@ -107,5 +109,8 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
         : undefined
       return (ids ?? []).flatMap((id) => get('caseCapacity', id) ?? [])
     },
+    dataHash: () =>
+      (dataHash ??= (async () =>
+        sha256(canonicalJson({ records: load(), renames: index.renames })))()),
   }
 }
