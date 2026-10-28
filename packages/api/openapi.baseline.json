@@ -2795,9 +2795,13 @@
                           "type": "string",
                           "minLength": 1,
                           "description": "The value as written in the source, when it differed."
+                        },
+                        "unit": {
+                          "type": "string",
+                          "enum": ["m", "yd", "m/yd"]
                         }
                       },
-                      "required": ["value"],
+                      "required": ["value", "unit"],
                       "additionalProperties": false,
                       "unit": "mm"
                     },
