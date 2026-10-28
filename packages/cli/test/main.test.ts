@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Ajv2020 } from 'ajv/dist/2020.js'
 import { describe, expect, it } from 'vitest'
@@ -6,7 +7,7 @@ import { run } from '../src/main.ts'
 import { result } from '../src/result.ts'
 import { resultJsonSchema } from '../src/write-json-schema.ts'
 import { rowsPath } from './data.ts'
-import { recordRoots } from './fixture.ts'
+import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
 
 const schemaPath = join(import.meta.dirname, '../schema/result.schema.json')
 const worse = new URL('./fixtures/worse-model.mjs', import.meta.url).pathname
@@ -60,6 +61,19 @@ describe('the JSON result', () => {
   })
 })
 
+describe('the records', () => {
+  it('notes a record that fails its schema on stderr and still gives the result', async () => {
+    const bad = mkdtempSync(join(tmpdir(), 'cli-records-'))
+    mkdirSync(join(bad, 'powders'))
+    writeFileSync(join(bad, 'powders', 'broken.json'), '{"id":"broken"}')
+    const r = await cli(['verify', ...data, '--records', bad])
+    expect(r.code).toBe(0)
+    expect(r.stderr).toMatch(/^\d+ problem\(s\) in the records/)
+    expect(JSON.parse(r.stdout).command).toBe('verify')
+    expect((await cli(['verify', ...data])).stderr).toBe('')
+  })
+})
+
 describe('exit codes', () => {
   it('is 0 for a result', async () => {
     expect((await cli(['verify', ...data])).code).toBe(0)
@@ -70,12 +84,22 @@ describe('exit codes', () => {
     expect(sealed.code).toBe(1)
     expect(sealed.stdout).toBe('')
     expect(sealed.stderr).toContain('sealed')
-    const baseline = JSON.stringify({})
-    expect(baseline).toBe('{}')
     expect(
       (await cli(['compare', ...data, '--split', 'test', '--baseline', 'm3', '--candidate', 'm3']))
         .code,
     ).toBe(1)
+    const only = writeRows(rowsCsv([{ cartridge: '308-win', charge: 2.0, velocity: 0.01 }]))
+    const none = await cli([
+      'verify',
+      '--rows',
+      only,
+      ...data.slice(2),
+      '--split',
+      'test',
+      '--final',
+    ])
+    expect(none.code).toBe(1)
+    expect(none.stderr).toContain('no row of the test split could be evaluated')
   })
 
   it.each([

@@ -9,8 +9,8 @@ description: Held-out evaluation of the interior model on a file of load rows, a
 
 ```sh
 npm run build
-npx ballistics verify --rows rows.csv --records /path/to/records
-npx ballistics compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
+node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
+node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
 ```
 
 Real rows and real records are passed by path and are never committed. The repository holds no rows; its tests build a small synthetic set from the model itself, with errors known by construction.
@@ -33,7 +33,7 @@ One CSV file, or a folder of `.csv` files read in name order, with a header line
 
 A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted.
 
-The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The default rows path is `BALLISTICS_ROWS`. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
+The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. A record that fails its schema is left out and counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
 
 ## Split
 

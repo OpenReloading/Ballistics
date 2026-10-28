@@ -4,15 +4,15 @@
 
 ## Commands (this directory, or `-w @open-reloading/cli` from the root)
 
-- Build: `npm run build` (needs the other packages built first). Run: `npx ballistics ...` from the root.
+- Build: `npm run build` (needs the other packages built first). Run: `node packages/cli/dist/bin.js ...` from the root (the package is private, so npm links no `ballistics` command).
 - Test: `npm test` (Vitest, coverage floors in `vitest.config.ts`). Type check: `npm run typecheck`.
 - JSON schema of a result: `npm run schema` rewrites `schema/result.schema.json` from `src/result.ts`; a test fails when the file is stale.
 
 ## Loop for an agent
 
-1. Save the baseline: `npx ballistics verify --rows <rows> --records <dir> > baseline.json` (validation split, JSON when piped). Its `modelVersion` names the model, records and rows.
+1. Save the baseline: `node packages/cli/dist/bin.js verify --rows <rows> --records <dir> > baseline.json` (validation split, JSON when piped). Its `modelVersion` names the model, records and rows.
 2. Change the model (core), then `npm run build -w @open-reloading/core`.
-3. `npx ballistics compare --rows <rows> --records <dir> --baseline baseline.json --candidate m3`. A candidate can also be a module path that exports `interior`, with no build step.
+3. `node packages/cli/dist/bin.js compare --rows <rows> --records <dir> --baseline baseline.json --candidate m3`. A candidate can also be a module path that exports `interior`, with no build step.
 4. Decide on `change`: a negative `velocityMedian` and `velocityP90` is better; check `usedRows` (a model that refuses rows looks better) and the per-family changes (`--group-by` for others). Keep or revert.
 5. Run the sealed test split once, for the final version: add `--split test --final`. Never iterate on it.
 

@@ -27,6 +27,8 @@ export interface Options {
   final: boolean
   /** Adds the groups of this key to the result. */
   groupBy?: Grouping | undefined
+  /** Gets a note about the inputs; the result stays on stdout. */
+  warn?: ((text: string) => void) | undefined
 }
 
 type Inputs = VerifyResult['inputs']
@@ -41,6 +43,8 @@ function checkSealed({ split, final }: Options) {
 function prepare(options: Options) {
   const { rows, files } = readRows(options.rows)
   const records = loadRecords(options.records)
+  if (records.issues > 0)
+    options.warn?.(`${records.issues} problem(s) in the records; the valid records are used\n`)
   return { rows, records, inputs: inputsOf(rows, files, records) }
 }
 

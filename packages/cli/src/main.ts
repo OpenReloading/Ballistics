@@ -46,7 +46,7 @@ function checkChoices(
 }
 
 /** The options of the command line, with the environment's defaults. */
-function optionsOf(args: string[], env: NodeJS.ProcessEnv) {
+function optionsOf(args: string[], env: NodeJS.ProcessEnv, warn: Io['stderr']) {
   const { values } = parseArgs({
     args,
     strict: true,
@@ -75,15 +75,16 @@ function optionsOf(args: string[], env: NodeJS.ProcessEnv) {
     records: values.records ?? fromEnv,
     split: split as Split,
     final: values.final === true,
+    warn,
     ...(by !== undefined && { groupBy: by as Grouping }),
   }
   return { options, values }
 }
 
 /** Runs `command` with its options and returns the text of the result. */
-async function execute(command: string, args: string[], env: NodeJS.ProcessEnv, tty: boolean) {
-  const { options, values } = optionsOf(args, env)
-  const json = values.json === true || (values.table !== true && !tty)
+async function execute(command: string, args: string[], env: NodeJS.ProcessEnv, io: Io) {
+  const { options, values } = optionsOf(args, env, io.stderr)
+  const json = values.json === true || (values.table !== true && !io.tty)
   if (command === 'verify') {
     const result = await verify(options, values.model)
     return json ? JSON.stringify(result, null, 2) : verifyTable(result)
@@ -99,7 +100,7 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
   const [command = '', ...args] = argv
   try {
     if (command !== 'verify' && command !== 'compare') throw new UsageError(usage)
-    io.stdout(`${await execute(command, args, env, io.tty)}\n`)
+    io.stdout(`${await execute(command, args, env, io)}\n`)
     return 0
   } catch (error) {
     if (error instanceof Refusal) {
