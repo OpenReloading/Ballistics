@@ -39,6 +39,30 @@ Code: `packages/core/src/groups/hit-probability.ts`, `ellipseProbability` (`f`, 
 
 The integral is cut at $\lvert x \rvert = 8\sigma_x$. For a circular zone of radius $r$ and equal standard deviations it equals the closed form $1 - e^{-r^2/(2\sigma^2)}$, which the tests compare against. The error function is the chi-square distribution of one degree of freedom, $\operatorname{erf}(z/\sqrt{2}) = F_{\chi^2_1}(z^2)$ ([shot groups](groups.md)).
 
+### Offset of the point of impact
+
+Optionally the point of impact is centred at $(\delta_x, \delta_y)$ from the aim point, for example the measured group centre minus the point of aim ([shot groups](groups.md)). The density of $x$ is then centred at $\delta_x$, the probability for $y$ is the normal probability between $-b\cos t$ and $b\cos t$ about $\delta_y$, and the integral runs over $x \in [-a, a] \cap [\delta_x - 8\sigma_x, \delta_x + 8\sigma_x]$, empty (probability 0) when the zone lies beyond that:
+
+$$
+P(a, b) = \int \frac{e^{-(x-\delta_x)^2/(2\sigma_x^2)}}{\sigma_x \sqrt{2\pi}}\left[\Phi\!\left(\frac{b \cos t - \delta_y}{\sigma_y}\right) - \Phi\!\left(\frac{-b \cos t - \delta_y}{\sigma_y}\right)\right] a \cos t\ \mathrm{d}t
+$$
+
+Code: `packages/core/src/groups/hit-probability.ts`, `ellipseProbability` (`offset`), `hitProbability`.
+
+With $\Phi$ the standard normal distribution function. For a circular zone of radius $r$ and equal standard deviations it is $1 - Q_1(\delta/\sigma,\ r/\sigma)$ with $\delta = \sqrt{\delta_x^2 + \delta_y^2}$ and $Q_1$ the Marcum Q function of order 1 (source not in the bibliography, unverified); the tests compare against it, written as the noncentral chi-square distribution of two degrees of freedom. For $\delta > r$ the probability first rises and then falls as $\sigma$ grows: a tighter group lowers it. The offset is an input of the prediction, not a setting of the sight.
+
+### Shots needed
+
+With $p$ the probability of a hit with one shot (the hit probability above) and independent shots, the chance of at least one hit in $n$ shots is $1 - (1-p)^n$. The smallest whole number of shots with a wanted chance $P_w$ and the mean number of shots to the first hit are
+
+$$
+n = \left\lceil \frac{\ln(1 - P_w)}{\ln(1 - p)} \right\rceil, \qquad \bar n = \frac{1}{p}
+$$
+
+Code: `packages/core/src/groups/hit-probability.ts`, `shotsToHit`.
+
+After $\bar n$ shots the chance tends to $1 - e^{-1} \approx 63.2$ percent as $p$ becomes small.
+
 ### Expected score
 
 Zones are nested, outermost first, with values $v_k$. A shot inside zone $k$ and outside zone $k+1$ scores $v_k$:
@@ -66,19 +90,23 @@ The zones of a target are its rings, grown by the radius of the scored hole as i
 | $a$, $b$ | Semi-axes of a scoring zone | mm | m |
 | $P$, $p_k$ | Probability inside a zone, inside a zone and outside the next | 1 | 1 |
 | $v_k$ | Value of zone $k$ | 1 | 1 |
+| $\delta_x$, $\delta_y$ | Offset of the centre of the point of impact from the aim point | mm | m |
+| $n$, $\bar n$, $P_w$ | Shots needed, mean shots to the first hit, wanted chance of a hit | 1 | 1 |
 
 ## Assumptions
 
 - The group is a sample of the same distribution as the shots to be fired: the same rifle, load and shooter, the dispersion circular unless two standard deviations are given. Hold and aim errors beyond the group are not included.
 - Dispersion grows linearly with distance, which holds for the dispersion of a group in angle and not for a drift that grows faster than the distance.
 - The sensitivities $S_c$ and $S_R$ are taken at the nominal wind and range and held for the whole spread (first order). A wind of changing speed along the path is one wind.
-- The point of impact is centred on the aim point: the zero is right.
+- The point of impact is centred on the aim point unless an offset is given: without one, the zero is right. With one, it is the same for every shot.
+- The shots are independent, with the same probability of a hit, for the number of shots needed.
 - The wind and range errors are independent of each other and of the group.
 
 ## Limits
 
 - The standard deviation of a group of a few shots is itself uncertain; the probability inherits it. A group of 5 shots gives a standard deviation known to about a third.
 - Targets whose zones are not nested ellipses about one centre (several bulls per sheet, scoring areas that are no ellipse) are outside the model.
+- An offset is the same for every shot. A centre that changes from group to group, and an offset that is not measured, are not modelled.
 - A very small dispersion against a large zone gives a probability of 1 to the precision of the integration.
 
 ## Sources
