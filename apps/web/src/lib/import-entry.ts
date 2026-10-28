@@ -19,11 +19,17 @@ import {
 } from '@open-reloading/importers'
 import { type UserRecord, userRecord } from '@open-reloading/schema'
 import { storageName } from './edition.ts'
+import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
 import { maxFileBytes, planImport } from './user-data.ts'
 
-/** What a card shows of a read file: the refusal, or the table's header, samples and kind suggestion. */
+/**
+ * What a card shows of a read file: the refusal (with the load-file format that refused it), the
+ * load file's format, record count and what it did not read, or the table's header, samples and
+ * kind suggestion.
+ */
 export type CardView =
-  | { refusal: string }
+  | { refusal: string; format?: string | undefined }
+  | { format: string; records: number; warnings: string[]; unmapped: string[] }
   | {
       header: string[]
       /** Up to three non-empty cells per column. */
@@ -97,12 +103,21 @@ interface Held {
   plan?: Plan
 }
 
-/** A file's table and the sheet it is on, or its refusal. */
-type FileRead = { refusal: string } | { table: Table; sheet?: string | undefined }
+/** A file's table and the sheet it is on, a load file's card, or its refusal. */
+type FileRead =
+  | { refusal: string; format?: string | undefined }
+  | { load: Extract<CardView, { records: number }> }
+  | { table: Table; sheet?: string | undefined }
 
 /** The first table of a workbook's sheets, or the refusal of the first sheet. */
 async function workbookTable(bytes: Uint8Array): Promise<FileRead> {
-  const { worksheets } = await readWorkbook(bytes)
+  let worksheets: Awaited<ReturnType<typeof readWorkbook>>['worksheets']
+  try {
+    worksheets = (await readWorkbook(bytes)).worksheets
+  } catch (e) {
+    const reason = e instanceof Error ? e.message : String(e)
+    return { refusal: `The workbook cannot be read: ${reason}. Save it again as XLSX or CSV.` }
+  }
   let first: string | undefined
   for (const sheet of worksheets) {
     const read = tableOfRows(sheet.rows)
@@ -116,11 +131,36 @@ async function workbookTable(bytes: Uint8Array): Promise<FileRead> {
   }
 }
 
-function readFile(bytes: Uint8Array): FileRead | Promise<FileRead> {
+/** `decodeText`'s two reasons as refusals that end with the action. */
+const textRefusals: Record<string, string> = {
+  'UTF-16 text with an odd number of bytes':
+    'UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.',
+}
+const notText =
+  'The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again.'
+
+/**
+ * One inspection of a file's bytes, its extension not read: the size, the load-file formats in
+ * their order, a workbook by its signature, then the text as a JSON list or a delimited table.
+ */
+function readFile(bytes: Uint8Array, formats: LoadFileFormat[]): FileRead | Promise<FileRead> {
   if (bytes.byteLength > maxFileBytes)
     return { refusal: 'The file is larger than 40 MB. Split it and import the parts.' }
+  const format = loadFormatOf(bytes, formats)
+  if (format) {
+    const p = format.parse(bytes)
+    if (!p.ok) return { refusal: p.reason, format: format.name }
+    const { records, warnings = [], unmapped = [] } = p
+    return { load: { format: format.name, records: records.length, warnings, unmapped } }
+  }
   if (isWorkbook(bytes)) return workbookTable(bytes)
-  return readTable(decodeText(bytes).replace(/^﻿/, ''))
+  let text: string
+  try {
+    text = decodeText(bytes)
+  } catch (e) {
+    return { refusal: textRefusals[e instanceof Error ? e.message : ''] ?? notText }
+  }
+  return readTable(text.replace(/^\uFEFF/, ''))
 }
 
 const samplesOf = (t: { header: string[]; rows: string[][] }) =>
@@ -208,11 +248,32 @@ const viewOf = (held: Held): BuildView => {
 /** The records a commit writes: the new rows and makers, and the changed rows when `replace`. */
 const toWrite = (plan: Plan, replace: boolean) => [...plan.added, ...(replace ? plan.changed : [])]
 
+/** The card of a read file: its refusal, its load-file card, or its table with the suggested kind. */
+function cardOf(read: FileRead): CardView {
+  if ('refusal' in read) return read
+  if ('load' in read) return read.load
+  const { table } = read
+  const s = suggestKind(table)
+  return {
+    header: table.header,
+    samples: samplesOf(table),
+    rows: table.rows.length,
+    scores: s.scores,
+    kind: s.kind,
+    tier: s.tier,
+    ...(read.sheet !== undefined && { sheet: read.sheet }),
+  }
+}
+
 /**
  * The worker's handler: reads, builds and writes the files of one Import entry by id, keeping
  * tables and records here so the page receives summaries only.
  */
-export function importWorker(store: ImportStore, post: (r: ImportReply) => void) {
+export function importWorker(
+  store: ImportStore,
+  post: (r: ImportReply) => void,
+  formats = loadFileFormats,
+) {
   const files = new Map<number, Held>()
   const held = (id: number) => {
     const h = files.get(id)
@@ -235,27 +296,9 @@ export function importWorker(store: ImportStore, post: (r: ImportReply) => void)
       return
     }
     if (m.type === 'read') {
-      const read = await readFile(new Uint8Array(m.bytes))
-      if ('refusal' in read) {
-        files.set(m.id, {})
-        return { type: 'read', id: m.id, card: { refusal: read.refusal } }
-      }
-      const { table } = read
-      files.set(m.id, { table })
-      const s = suggestKind(table)
-      return {
-        type: 'read',
-        id: m.id,
-        card: {
-          header: table.header,
-          samples: samplesOf(table),
-          rows: table.rows.length,
-          scores: s.scores,
-          kind: s.kind,
-          tier: s.tier,
-          ...(read.sheet !== undefined && { sheet: read.sheet }),
-        },
-      }
+      const read = await readFile(new Uint8Array(m.bytes), formats)
+      files.set(m.id, 'table' in read ? { table: read.table } : {})
+      return { type: 'read', id: m.id, card: cardOf(read) }
     }
     if (m.type === 'build')
       return { type: 'built', id: m.id, build: await build(m.id, m.kind, m.map) }
@@ -317,10 +360,10 @@ export const mappingsFor = (saved: SavedMappings, header: readonly string[]) =>
 
 /**
  * The first build of a read table: the last saved mapping made for its header, else the suggested
- * kind with the automatic map; none for a refused file or a table no kind reaches.
+ * kind with the automatic map; none for a refused file, a load file or a table no kind reaches.
  */
 export function firstBuild(card: CardView, saved: SavedMappings) {
-  if ('refusal' in card) return
+  if (!('header' in card)) return
   const name = mappingsFor(saved, card.header).at(-1)
   const mapping = name === undefined ? undefined : saved[name]
   if (mapping) return { kind: mapping.kind, map: mapping.map, mapping: name }

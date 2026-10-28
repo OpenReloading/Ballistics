@@ -479,7 +479,9 @@ async function writeRecordFile(o: {
 async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
   const text = await read(file)
   const parsed: ParsedUserFile =
-    text === undefined ? { ok: false, reason: tooLargeMessage } : readLoadFile(text)
+    text === undefined
+      ? { ok: false, reason: tooLargeMessage }
+      : readLoadFile(new TextEncoder().encode(text))
   if (!parsed.ok) {
     const { reason } = parsed
     const problem: Said = ({ t }) =>
@@ -554,7 +556,7 @@ interface ImportIo {
 
 /** Reads and stores one file at a time, so several large files are not held at once. */
 async function importTexts(
-  files: { name: string; text: () => Promise<string | undefined> }[],
+  files: { name: string; bytes: () => Promise<Uint8Array | undefined> }[],
   io: ImportIo,
   { t }: Translator,
 ) {
@@ -576,7 +578,7 @@ async function importTexts(
       invalid,
       skipped,
       notes,
-    } = parseFiles([{ name: f.name, text: await f.text() }], undefined, t)
+    } = parseFiles([{ name: f.name, bytes: await f.bytes() }], undefined, t)
     count += records.length
     const plan = planImport(records, (await storedRecords()).records)
     try {
@@ -1533,7 +1535,11 @@ function FileMenuOf<K extends UserRecordKind>({
 
   const importData = (files: File[]) =>
     importTexts(
-      files.map((file) => ({ name: file.name, text: () => read(file) })),
+      files.map((file) => ({
+        name: file.name,
+        bytes: async () =>
+          file.size > maxFileBytes ? undefined : new Uint8Array(await file.arrayBuffer()),
+      })),
       importIo,
       tr,
     )
@@ -1829,7 +1835,11 @@ function FileMenuOf<K extends UserRecordKind>({
             onClick={act(msg('Paste failed: {error}'), async () => {
               const text = pasted ?? ''
               setPasted(undefined)
-              await importTexts([{ name: t('Pasted text'), text: async () => text }], importIo, tr)
+              await importTexts(
+                [{ name: t('Pasted text'), bytes: async () => new TextEncoder().encode(text) }],
+                importIo,
+                tr,
+              )
             })}
           >
             {t('Import')}

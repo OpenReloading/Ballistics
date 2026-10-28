@@ -110,8 +110,11 @@ describe('user data files', () => {
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
     const { records, skipped } = parseFiles(
       [
-        { name: 'good.json', text: userDataText([load]) },
-        { name: 'bad.json', text: userDataText([load, bad as unknown as UserRecord]) },
+        { name: 'good.json', bytes: new TextEncoder().encode(userDataText([load])) },
+        {
+          name: 'bad.json',
+          bytes: new TextEncoder().encode(userDataText([load, bad as unknown as UserRecord])),
+        },
       ],
       undefined,
       english.t,
@@ -124,7 +127,7 @@ describe('user data files', () => {
 
   it('skips a file over the size limit', () => {
     const { skipped } = parseFiles(
-      [{ name: 'big.json', text: ' '.repeat(maxFileBytes + 1) }, { name: 'unread.json' }],
+      [{ name: 'big.json', bytes: new Uint8Array(maxFileBytes + 1) }, { name: 'unread.json' }],
       undefined,
       english.t,
     )
@@ -373,7 +376,7 @@ describe('user data files', () => {
     })
     const parsed = parseUserDataFile(text)
     expect(!parsed.ok && parsed.reason).toContain('earlier version')
-    const read = readLoadFile(text)
+    const read = readLoadFile(new TextEncoder().encode(text))
     expect(!read.ok && read.reason).toContain('earlier version')
   })
 

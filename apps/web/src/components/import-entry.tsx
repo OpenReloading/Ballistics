@@ -38,7 +38,8 @@ import {
   type SavedMappings,
   saveMapping,
 } from '../lib/import-entry.ts'
-import { loadFileFormats } from '../lib/load-file-formats.ts'
+import { loadFileFormats, loadFormatOf, readNote } from '../lib/load-file-formats.ts'
+import { maxFileBytes } from '../lib/user-data.ts'
 import { AppModal } from './app-modal.tsx'
 
 /** One picked file on the page. */
@@ -75,6 +76,8 @@ function verdict(e: Entry, t: Translator['t']): { text: string; color: string } 
   const c = e.card
   if (!c) return { text: t('Reading…'), color: 'gray' }
   if ('refusal' in c) return { text: t('Refused'), color: 'red' }
+  if ('records' in c)
+    return { text: t('Load file, read by {format}', { format: c.format }), color: 'teal' }
   if (!e.kind) return { text: t('Refused: no kind'), color: 'red' }
   const kind = t(kindLabels[e.kind])
   const tier = !e.touched && !e.mapping && e.kind === c.kind ? c.tier : undefined
@@ -88,7 +91,7 @@ export const folded = (e: Entry) =>
   !e.touched &&
   !e.mapping &&
   e.card !== undefined &&
-  !('refusal' in e.card) &&
+  'header' in e.card &&
   e.card.tier === 'high' &&
   e.kind === e.card.kind
 
@@ -232,6 +235,26 @@ function Report({ b, t }: { b: BuildView; t: Translator['t'] }) {
   )
 }
 
+/** A refused file's reason, with the load-file format that refused it, or a load file's records and what was not read. */
+function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
+  const { t, tn } = useTranslation()
+  if ('refusal' in c)
+    return (
+      <Text size="sm" c="red">
+        {c.format === undefined
+          ? label(c.refusal, t)
+          : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
+      </Text>
+    )
+  const { warnings, unmapped } = c
+  const note = readNote({ ok: true, records: [], warnings, unmapped }, t)
+  return (
+    <Text size="sm">
+      {[tn(c.records, '{count} record', '{count} records'), note].filter(Boolean).join('. ')}
+    </Text>
+  )
+}
+
 /** One file card: the verdict, Remove, the kind and the mapping (folded on a high-tier card), the counts. */
 export function FileCard({
   e,
@@ -246,7 +269,7 @@ export function FileCard({
   const [name, setName] = useState('')
   const v = verdict(e, t)
   const c = e.card
-  const table = c && !('refusal' in c) ? c : undefined
+  const table = c && 'header' in c ? c : undefined
   const fold = folded(e)
   return (
     <Paper withBorder p="sm" component="section" aria-label={e.name}>
@@ -274,11 +297,7 @@ export function FileCard({
             {label(e.failure, t)}
           </Text>
         )}
-        {c && 'refusal' in c && (
-          <Text size="sm" c="red">
-            {label(c.refusal, t)}
-          </Text>
-        )}
+        {c && !('header' in c) && <ReadNote c={c} />}
         {table && !e.kind && (
           <Text size="sm" c="red">
             {noKindText(table, t)}
@@ -536,7 +555,7 @@ export function ImportEntry({
     saveMapping: (id, name) => {
       const e = filesRef.current.find((f) => f.id === id)
       const { kind, map, card } = e ?? {}
-      if (!kind || !map || !card || 'refusal' in card) return
+      if (!kind || !map || !card || !('header' in card)) return
       saved.current = saveMapping(saved.current, name, { kind, header: card.header, map })
       setDone(t('Saved the mapping {name}.', { name }))
     },
@@ -629,14 +648,19 @@ export function ImportEntry({
 }
 
 /**
- * Picked files split by content: a JSON object, as an OpenReloading data file is, goes to the data
- * file import, every other file to the Import entry's cards.
+ * Picked files split by content: a file the OpenReloading data format detects goes to the data file
+ * import, every other file (a file over the size limit unread) to the Import entry's cards.
  */
 export async function splitImport<F extends { file: Blob }>(picked: F[]) {
   const data: F[] = []
   const tables: F[] = []
-  for (const p of picked)
-    (/^\uFEFF?\s*\{/.test(await p.file.slice(0, 1024).text()) ? data : tables).push(p)
+  for (const p of picked) {
+    const format =
+      p.file.size > maxFileBytes
+        ? undefined
+        : loadFormatOf(new Uint8Array(await p.file.arrayBuffer()))
+    ;(format !== undefined && format === loadFileFormats[0] ? data : tables).push(p)
+  }
   return { data, tables }
 }
 

@@ -2,6 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import type { UserRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
+import { xlsx } from '../../../packages/importers/test/xlsx.ts'
 import {
   type CardActions,
   type Entry,
@@ -20,6 +21,9 @@ import {
   importWorker,
   mappingsFor,
 } from '../src/lib/import-entry.ts'
+import { type LoadFileFormat, loadFileFormats } from '../src/lib/load-file-formats.ts'
+import { maxFileBytes, userDataText } from '../src/lib/user-data.ts'
+import { defined } from './defined.ts'
 
 const csv = (rows: string[]) =>
   new TextEncoder().encode(['Name,Maker,Diameter (mm),Weight (gr),BC G1', ...rows].join('\n'))
@@ -32,7 +36,7 @@ const bullets = [
 ]
 
 /** The worker's handler over an in-memory store, answering one request at a time. */
-function storeWorker() {
+function storeWorker(formats = loadFileFormats) {
   let stored: UserRecord[] = []
   const replies: ImportReply[] = []
   const handle = importWorker(
@@ -45,6 +49,7 @@ function storeWorker() {
       },
     },
     (r) => replies.push(r),
+    formats,
   )
   const ask = async (m: ImportRequest) => {
     await handle(m)
@@ -256,4 +261,99 @@ it('sends the data files of a mixed pick to the data import and the rest to the 
   const { data, tables } = await splitImport(picked)
   expect(data.map((p) => p.file.name)).toEqual(['openreloading-data.json'])
   expect(tables.map((p) => p.file.name)).toEqual(['bullets.csv', 'list.json'])
+})
+
+const load: UserRecord = {
+  kind: 'load',
+  id: 'w1',
+  name: '308 Win.',
+  saved: '2026-10-13T10:00:00.000Z',
+  data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
+}
+
+/** An invented load-file format: one module, one entry after the registry's own. */
+const lines: LoadFileFormat = {
+  name: 'Test lines',
+  accept: { 'text/plain': ['.txt'] },
+  detect: (b) => new TextDecoder().decode(b).startsWith('LOAD'),
+  parse: () => ({ ok: true, records: [load], unmapped: ['primer'] }),
+}
+
+const encoded = (text: string) => new TextEncoder().encode(text).buffer as ArrayBuffer
+
+it('gives a mixed batch of a table and two load files the card of each with no click', async () => {
+  const h = storeWorker([...loadFileFormats, lines])
+  // one at a time: `ask` takes the last reply
+  const cards: CardView[] = []
+  for (const [i, bytes] of [csv(bullets), encoded('LOAD 1'), encoded('LOAD 2')].entries()) {
+    const r = await h.ask({ type: 'read', id: i + 1, bytes })
+    if (r.type !== 'read') throw new Error(`reply ${r.type}`)
+    cards.push(r.card)
+  }
+  expect(cards[0]).toMatchObject({ kind: 'bullet', tier: 'high', rows: 3 })
+  const card = { format: 'Test lines', records: 1, warnings: [], unmapped: ['primer'] }
+  expect(cards.slice(1)).toEqual([card, card])
+  expect(firstBuild(defined(cards[1]), {})).toBeUndefined()
+})
+
+it('gives a workbook, a semicolon CSV, a JSON list, a data file and a file over 40 MB their cards', async () => {
+  const h = storeWorker()
+  const read = async (bytes: ArrayBuffer | Uint8Array) => {
+    const b = bytes instanceof Uint8Array ? (bytes.slice().buffer as ArrayBuffer) : bytes
+    const r = await h.ask({ type: 'read', id: 1, bytes: b })
+    if (r.type !== 'read') throw new Error(`reply ${r.type}`)
+    return r.card
+  }
+  const rows = ['Name,Maker,Diameter (mm),Weight (gr),BC G1', ...bullets].map((r) => r.split(','))
+  expect(await read(xlsx([{ name: 'Bullets', rows }]))).toMatchObject({
+    kind: 'bullet',
+    rows: 3,
+    sheet: 'Bullets',
+  })
+  expect(await read(encoded(rows.map((r) => r.join(';')).join('\n')))).toMatchObject({
+    kind: 'bullet',
+    rows: 3,
+  })
+  const list = bullets.map((b) => {
+    const [Name, Maker, Diameter, Weight, BC] = b.split(',')
+    return { Name, Maker, 'Diameter (mm)': Diameter, 'Weight (gr)': Weight, 'BC G1': BC }
+  })
+  expect(await read(encoded(JSON.stringify(list)))).toMatchObject({ kind: 'bullet', rows: 3 })
+  expect(await read(encoded(userDataText([load])))).toEqual({
+    format: 'OpenReloading data',
+    records: 1,
+    warnings: [],
+    unmapped: [],
+  })
+  expect(await read(new ArrayBuffer(maxFileBytes + 1))).toEqual({
+    refusal: 'The file is larger than 40 MB. Split it and import the parts.',
+  })
+  expect(await read(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3]))).toMatchObject({
+    refusal: expect.stringMatching(
+      /^The workbook cannot be read: .+\. Save it again as XLSX or CSV\.$/,
+    ),
+  })
+  expect(await read(new Uint8Array([0xff, 0xfe, 0x41]))).toEqual({
+    refusal:
+      'UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.',
+  })
+})
+
+it('tells a file by its content, not its extension', async () => {
+  const file = (name: string, text: string) => ({ file: new File([text], name) })
+  const picked = [
+    file('data.csv', userDataText([load])),
+    file('bullets.json', 'Name,Diameter\nAlpha,7.82\nBeta,5.70'),
+    file('object.json', '{"a": 1}'),
+  ]
+  const { data, tables } = await splitImport(picked)
+  expect(data.map((p) => p.file.name)).toEqual(['data.csv'])
+  expect(tables.map((p) => p.file.name)).toEqual(['bullets.json', 'object.json'])
+  const h = storeWorker()
+  const card = await h.ask({
+    type: 'read',
+    id: 1,
+    bytes: await defined(picked[1]).file.arrayBuffer(),
+  })
+  expect(card).toMatchObject({ type: 'read', card: { header: ['Name', 'Diameter'], rows: 2 } })
 })

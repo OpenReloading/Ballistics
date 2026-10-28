@@ -73,7 +73,9 @@
     "The file is larger than 40 MB. Split it and import the parts.",
     "The workbook has no cells with text. Open the right file or paste the table into a sheet.",
     "UTF-16 text with an odd number of bytes",
-    "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again"
+    "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again",
+    "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.",
+    "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again."
   ],
   "templates": {
     "app and API request failures": [
@@ -384,6 +386,7 @@
       "No column is mapped to {fields}. Map a column to it or read the file as another kind.",
       "No column is mapped to {fields}. Map a column to each or read the file as another kind.",
       "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.",
+      "The workbook cannot be read: {reason}. Save it again as XLSX or CSV.",
       "{reason}. Fix the row or delete it."
     ]
   }
