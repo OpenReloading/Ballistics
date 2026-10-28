@@ -149,6 +149,7 @@ The extension of such a segment can reach zero or negative drag within one trial
 - A BC against the wrong standard function (for example a G1 BC read against G7) cannot be detected. The result names the drag model used (`dragModel`).
 - A drag curve needs at least two nodes, strictly rising Mach and $C_D \ge 0$. A BC must be positive, and bands need distinct thresholds.
 - With the standard tables the two interpolations differ most after the bullet turns transonic or subsonic. A sparse custom curve depends more on the choice than the standard tables.
+- Research log: [monotone cubic against hand-computed values](../research/drag-monotone-cubic-closed-form.md).
 
 ## Sources
 

@@ -10,6 +10,7 @@ import { need, nth } from '../errors.ts'
 import {
   fitPowder,
   type LadderPoint,
+  outsideDomain,
   type PowderFit,
   PowderFitError,
   type PowderFitOptions,
@@ -138,7 +139,7 @@ export interface PowderPressureRange {
   contributions: PowderRangeContribution[]
   /** Largest `relativeHalfWidth` over the points. */
   relativeHalfWidth: number
-  /** Whether a point lies outside the ladder's charge range. */
+  /** Whether a point lies outside the fit's domain on the charge or barrel length axis. */
   extrapolated: boolean
 }
 
@@ -353,14 +354,21 @@ export function powderPressureRange(
       relativeHalfWidth: (k * standardUncertainty) / peakPressure,
     }
   })
-  const { min, max } = fit.chargeRange
   return {
     level,
     coverageFactor: k,
     points: bands,
     contributions,
     relativeHalfWidth: Math.max(...bands.map((b) => b.relativeHalfWidth)),
-    extrapolated: points.some((p) => p.charge < min || p.charge > max),
+    extrapolated: points.some(
+      (p) =>
+        Object.keys(
+          outsideDomain(fit.domain, {
+            charge: p.charge,
+            barrelLength: p.barrelLength ?? fit.load.barrel.length,
+          }),
+        ).length > 0,
+    ),
   }
 }
 

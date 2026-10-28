@@ -385,12 +385,14 @@ Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
 
 - Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy, charge-mass corrections of the Lagrange coefficients.
 - The bullet material is not an input of the resistance law.
+- The heat model is the only term that depends on the size of the gun. Without it, peak pressure and velocity against travel in calibres are unchanged when every length is multiplied by $s$, volumes, masses and the charge by $s^3$, areas by $s^2$ and grain dimensions by $s$, and times scale with $s$ ([research log](../research/interior-exact-scaling-sensitivity.md)). With the convective heat loss (flame temperature 2800 K, factor 1) on the seven-perforation rifle load of the research entry, $s$ from 0.5 to 5 moved peak pressure by -0.35 to +0.66 % and muzzle velocity by -0.64 to +1.2 %.
 - Validity reasons of an invalid result: `input` with the first invalid field, `chamberVolume` (solid volume or covolume of the charge not below $V_c$), `noShotStart` (burnout before the projectile moves), `stuck` (velocity back to 0), `integration` (step size or step count), `maxTime` (run time reached before the muzzle).
 - Input checks: all values finite, volumes, areas, lengths, masses, energies, densities, temperatures and $p_i$ positive, $k \gt 1$, $\eta \ge 0$, $L_\text{tw} \ge 0$, $p_\text{st} \ge 0$, profile travels strictly increasing.
 - `tenPercentPressureTime` is linear between curve points and depends on the output step.
 - `barrelTime` runs from shot start.
 - Charge too small (`chargeTooSmall`): the API warns when the peak mean pressure is below 2.2 times the hold pressure ([charge too small](#charge-too-small)).
 - Solid fill above 0.64 (`solidFillLimit`): the API (`loadRatioHigh`) and the workbench warn ([load file](#load-file)).
+- Research log: [constant-surface closed form](../research/interior-constant-surface-closed-form.md), [closed vessel](../research/interior-closed-vessel-closed-forms.md), [published worked example](../research/interior-published-worked-example.md), [internal consistency checks](../research/interior-internal-consistency-checks.md), [Sébert factor](../research/interior-sebert-factor-choice.md), [charge too small](../research/interior-charge-too-small-bound.md), [solid fill limit](../research/interior-solid-fill-limit.md).
 
 ### Charge too small
 

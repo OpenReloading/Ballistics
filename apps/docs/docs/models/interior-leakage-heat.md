@@ -195,6 +195,7 @@ Code: `packages/core/src/interior/model.ts`, `convectiveDefaults`.
 - No default leak area: no measurement constrains it. A leak area is an input to fit or measure.
 - Input checks: at least one leak-area point, travels finite, at least 0 and strictly increasing, areas, back pressure and discharge coefficient finite and at least 0. Heat model: flame temperature, viscosity, Prandtl number and wall temperature positive, factor at least 0.
 - `closedVessel` with leakage describes a vented vessel with the leak area at travel 0.
+- Research log: [isentropic blowdown closed form](../research/interior-leakage-blowdown-closed-form.md).
 - Not offered: other heat-loss forms (Reynolds analogy), which need neither viscosity nor Prandtl number, and a loss as a fixed fraction of the released energy, which equals a lower $Q$.
 
 ## Sources
