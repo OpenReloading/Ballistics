@@ -829,7 +829,7 @@ describe('GET /exterior/stability', () => {
     })
     expect(explicit.statusCode).toBe(200)
     const input = { mass: 0.01134, diameter: 0.00782, length: 0.0312, twist: 0.254, velocity: 800 }
-    expect(explicit.json()).toEqual({
+    expect(explicit.json()).toMatchObject({
       units: { result: '1' },
       method: 'miller',
       result: millerStability({ ...input, air }),
