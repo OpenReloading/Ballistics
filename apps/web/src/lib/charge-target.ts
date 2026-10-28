@@ -4,6 +4,7 @@ import { english, type Message, msg, type Say, type Translator } from '../i18n/t
 import type { ErrorBody, InteriorResponse } from './api-types.ts'
 import { translateMessage } from './core-messages.ts'
 import { errorText } from './error-text.ts'
+import { interiorFields } from './interior-input.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
 /** Targets of `POST /interior/charge-target`. */
@@ -122,6 +123,33 @@ export const noComparableLimitText = msg('The cartridge has no CIP limit to comp
 
 const number = (u: TargetUnit, si: number) => formatNumber(u.fromSi(si), u.decimals)
 
+/** The workbench field behind each load path the model reports as invalid. */
+const loadFieldKeys: Record<string, string> = {
+  'chamber.volume': 'volume',
+  'chamber.boreArea': 'boreArea',
+  'chamber.boreDiameter': 'boreDiameter',
+  'barrel.length': 'travel',
+  'barrel.twist': 'twist',
+  'bullet.mass': 'bulletMass',
+  charge: 'charge',
+  'propellant.specificEnergy': 'propellantEnergy',
+  'propellant.gamma': 'gamma',
+  'propellant.density': 'density',
+  'propellant.covolume': 'covolume',
+  propellantTemperature: 'propellantTemperature',
+  ignitionPressure: 'ignitionPressure',
+  startPressure: 'startPressure',
+  'resistance.friction': 'boreFriction',
+  'leakage.area': 'leakArea',
+}
+
+/** The label the workbench shows for a load field, else the model's own name for it. */
+function fieldLabel(field: string, t: Translator['t']): string {
+  const key = loadFieldKeys[field]
+  const spec = key === undefined ? undefined : interiorFields.find((f) => f.key === key)
+  return spec ? t(spec.label) : field
+}
+
 /** The refusal in words, in the units shown; the reachable range is part of it. */
 export function refusalText(
   refusal: ChargeTargetRefusal,
@@ -158,7 +186,7 @@ export function refusalText(
     return failure.field
       ? t('The simulation gives no valid run for this load. Reason: {reason}; field: {field}.', {
           reason: why,
-          field: failure.field,
+          field: fieldLabel(failure.field, t),
         })
       : t('The simulation gives no valid run for this load. Reason: {reason}.', { reason: why })
   }

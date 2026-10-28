@@ -124,7 +124,19 @@ describe('refusalText', () => {
       english.t,
     )
     expect(text).toBe(
-      'The simulation gives no valid run for this load. Reason: input; field: ignitionPressure.',
+      'The simulation gives no valid run for this load. Reason: input; field: Ignition pressure.',
+    )
+    const refusal = (field: string) => ({
+      statusCode: 422,
+      reason: 'noValidRun',
+      failure: { reason: 'input', field },
+    })
+    expect(refusalText(refusal('ignitionPressure'), 'peakPressure', si, false, german.t)).toContain(
+      'Feld: Zünddruck.',
+    )
+    // a field without a workbench label keeps the model's name
+    expect(refusalText(refusal('heat'), 'peakPressure', si, false, german.t)).toContain(
+      'Feld: heat.',
     )
     expect(
       refusalText({ statusCode: 422, reason: 'noValidRun' }, 'barrelTime', si, false, english.t),
