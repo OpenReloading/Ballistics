@@ -28,7 +28,7 @@ $$
 \frac{dV}{du} = c_0 + \frac{2c}{k-1}\,\frac{u}{N}\,V, \qquad c_0 = m_c\left(\frac{1}{\rho_s} - \eta\right)
 $$
 
-The travel follows from $V$ by the free-volume equation. After burnout the gas energy $N$ falls as $V^{-(k-1)}$, which gives the muzzle velocity. The derivation is the author's own, by the energy balance and the reduced variable of the constant-surface case ([Rheinmetall 1977](../bibliography.md#rheinmetall-1977), pp. 88 to 94, for the case with $\eta = 1/\rho_s$).
+The travel follows from $V$ by the free-volume equation. After burnout the gas energy $N$ falls as $V^{-(k-1)}$, which gives the muzzle velocity. The solution is derived from the energy balance and the reduced variable of the constant-surface case ([Rheinmetall 1977](../bibliography.md#rheinmetall-1977), pp. 88 to 94, for the case with $\eta = 1/\rho_s$).
 
 In that case the velocity depends on the travel only through $A x/V^*$ with $V^* = V_c - m_c/\rho_s$. To first order an added chamber volume $\Delta V$ then acts like a shorter barrel by $L\,\Delta V/V^*$:
 
