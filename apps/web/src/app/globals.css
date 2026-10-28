@@ -7519,6 +7519,12 @@ main .field-table tr.field-group > th {
     padding: 0.5mm 1.5mm;
   }
 
+  /* a long word in a heading (German) breaks at its syllables, else anywhere, instead of widening the table past the paper */
+  :is(.print-report, .range-card, .target-print, .ladder-target) th {
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+
   .print-report .readouts {
     break-inside: avoid;
     display: grid;
