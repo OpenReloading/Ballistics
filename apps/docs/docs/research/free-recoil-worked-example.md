@@ -11,11 +11,11 @@ Free recoil: does `freeRecoil` reproduce the recoil velocity and energy that a p
 
 ## Method
 
-The example's inputs were converted to SI and entered: firearm 7 lb, projectile 589.9 gr, charge 33.4 gr, muzzle velocity 1275 ft/s, gas velocity factor 1.5, with 1 lb = 0.45359237 kg, 1 gr = 64.79891 mg, 1 ft = 0.3048 m and 1 ft lbf = 1.3558179483 J. The velocity was compared with the exact fraction 816000/49000 ft/s, the energy with 30.168 ft lbf, both within the tolerance of `toBeCloseTo` ($5 \cdot 10^{-10}$ in ft/s for 9 digits; $5 \cdot 10^{-4}$ in ft lbf for 3 digits).
+The example's inputs were converted to SI and entered: firearm 7 lb, projectile 589.9 gr, charge 33.4 gr, muzzle velocity 1275 ft/s, gas velocity factor 1.5, with 1 lb = 0.45359237 kg, 1 gr = 64.79891 mg, 1 ft = 0.3048 m and 1 ft lbf = 1.3558179483 J. The velocity was compared with the exact fraction 816000/49000 ft/s, the energy with 30.168 ft lbf, the velocity to 9 digits and the energy to 3 digits (the precision argument of `toBeCloseTo`).
 
 ## Formulas
 
-The momentum balance of the [free recoil model](../models/free-recoil.md), $I = (m_p + f\, m_c)\, v_0$, $v_g = I / m_g$ and $E_g = \tfrac12 m_g v_g^2$, from [SAAMI 2018](../bibliography.md#saami-2018). In the units of the example the momentum is $(589.9 + 1.5 \cdot 33.4)\ \text{gr} \cdot 1275\ \text{ft/s} = 640.0 \cdot 1275 = 816000\ \text{gr ft/s}$ and the firearm mass is $7 \cdot 7000 = 49000$ gr, which gives the velocity fraction above.
+The momentum balance of the [free recoil model](../models/free-recoil.md), $I = (m_p + f\, m_c)\, v_0$, $v_g = I / m_g$ and $E_g = \tfrac12 m_g v_g^2$, from [SAAMI 2018](../bibliography.md#saami-2018). In the units of the example the numerator of the velocity is the momentum $(589.9 + 1.5 \cdot 33.4) \cdot 1275$ in gr ft/s, which the test writes as 816000, and the denominator is the firearm mass of 7 lb in grains, 49000.
 
 ## Numbers
 

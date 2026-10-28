@@ -11,7 +11,7 @@ Least squares: does `identifiability` give the variance inflation, the condition
 
 ## Method
 
-A weighted Jacobian of two columns of unit norm whose information has correlation $\rho = 0.9$ was built as rows $(1, \rho)$ and $(0, \sqrt{1 - \rho^2})$. The report was compared with the closed forms below. Accept limits, from the tests: $5 \cdot 10^{-10}$ (9 digits) for the variance inflation and the condition number, $5 \cdot 10^{-13}$ (12 digits) for the correlation, and equality for the conditional sigmas. Two more cases: independent columns must give inflation 1, and a singular design must give infinite inflation, standard uncertainty and condition number with finite correlations.
+A weighted Jacobian of two columns of unit norm whose information has correlation $\rho = 0.9$ was built as rows $(1, \rho)$ and $(0, \sqrt{1 - \rho^2})$. The report was compared with the closed forms below. Accept limits, from the tests: 9 digits for the variance inflation and the condition number, 12 digits for the correlation, and equality for the conditional sigmas. Two more cases: independent columns must give inflation 1, and a singular design must give infinite inflation, standard uncertainty and condition number with finite correlations.
 
 ## Formulas
 

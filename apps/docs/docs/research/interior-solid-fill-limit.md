@@ -32,7 +32,7 @@ The density of the random close packing of equal spheres is 0.6366 ([Scott 1969]
 
 ## Result
 
-No change. Adopted: the limit of 0.64 for every grain shape, a choice of the model; a denser fill needs grains that deform or break, which changes their burning surface. The charge solver stops at it. Not adopted: a limit per grain shape, which would need packing data this page does not have, and no limit at all, which would let the solver return loads the model cannot describe.
+No change. Adopted: the limit of 0.64 for grains of every shape, a choice of the model; a denser fill needs grains that deform or break, which changes their burning surface. The charge solver stops at it. Not offered: a limit that depends on the grain shape.
 
 ## Data basis
 

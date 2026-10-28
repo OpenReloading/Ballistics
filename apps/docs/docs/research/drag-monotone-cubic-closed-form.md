@@ -25,11 +25,11 @@ A fourth case reads the first segment of the first table past its nodes, at Mach
 
 ## Formulas
 
-The slope at an interior node is the three-point parabola slope $p_j$ limited to twice the smaller adjacent secant, and the end nodes take the end secants ([monotone cubic interpolation](../models/exterior-drag.md); the limit follows [Fritsch 1980](../bibliography.md#fritsch-1980), pages unverified). For the first table the secants are 1 and 1/2, the parabola slope is 5/6, so the interior slope is $2 \min(1,\ 1/2,\ 5/12) = 5/6$. For the third table the secants are 1 and 5, the parabola slope is 3, so the interior slope is $2 \min(1,\ 5,\ 3/2) = 2$, bounded by the smaller secant, not by the parabola. With two nodes there is one secant and the cubic is the line.
+The slope at an interior node is the three-point parabola slope $p_j$ limited to twice the smaller adjacent secant, and the end nodes take the end secants ([monotone cubic interpolation](../models/exterior-drag.md); the limit follows [Fritsch 1980](../bibliography.md#fritsch-1980), pages unverified). For the first table the secants are 1 and 1/2, the parabola slope is 5/6, so the interior slope is $2 \min(1,\ 1/2,\ 5/12) = 5/6$. For the third table the secants are 1 and 5, the parabola slope is 3, so the interior slope is $2 \min(1,\ 5,\ 3/2) = 2$, set by the smaller secant, not by the parabola. With two nodes there is one secant and the cubic is the line.
 
 ## Numbers
 
-All five groups agree within $10^{-15}$ relative. The steep table checks that the limit acts: the parabola slope 3 would overshoot, and the limited slope 2 gives 3/8 and 25/8.
+All five groups agree within $10^{-15}$ relative. The steep table checks which term sets the slope: the smaller secant 1 bounds it, not the parabola slope 3, so the slope is 2 and the values are 3/8 and 25/8.
 
 ## Result
 

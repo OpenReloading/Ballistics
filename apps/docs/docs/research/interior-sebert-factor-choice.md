@@ -33,7 +33,7 @@ None measured. The effective mass is $m_e = m_p' + \delta\, m_c$: with $s = 1/2$
 
 ## Result
 
-No change. Documented as a choice of the model, not taken from a source: setting $\varepsilon$ equal to the Sébert factor. Not adopted for the load file: a separate key for the breech coefficient. The core accepts two coefficients, and the load-file key sets both. Kept: the Lagrange pair as the default when no factor is given.
+No change. Documented as a choice of the model, not taken from a source: setting $\varepsilon$ equal to the Sébert factor. Not offered: a separate breech coefficient in the load file (the core takes two, the load-file key sets both). The Lagrange pair stays the default when no factor is given.
 
 ## Data basis
 
