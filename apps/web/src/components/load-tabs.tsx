@@ -3,6 +3,7 @@
 import { ActionIcon, Button, Popover } from '@mantine/core'
 import { CaretDown, Check, FolderOpen, PencilSimple, Plus, X } from '@phosphor-icons/react'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { controlSize } from '../lib/theme.ts'
 import { AppPopover } from './app-popover.tsx'
 
@@ -41,6 +42,7 @@ export function LoadTabs({
   /** The typed name as it changes; undefined: the generated name. */
   onRename: (name: string | undefined) => void
 }) {
+  const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const field = useRef<HTMLInputElement>(null)
@@ -60,7 +62,7 @@ export function LoadTabs({
     setEditing(false)
     switcher.current?.focus()
   }
-  const index = items.findIndex((t) => t.active)
+  const index = items.findIndex((tb) => tb.active)
   const shown = items[index]
   const [menu, setMenu] = useState(false)
   // another load is shown: the edit of the earlier one is over
@@ -78,7 +80,19 @@ export function LoadTabs({
               ref={switcher}
               variant="default"
               className="load-switch"
-              aria-label={`Load ${index + 1}: ${label}${shown?.unsaved ? ', unsaved changes' : ''}, switch load (${items.length} open)`}
+              aria-label={
+                shown?.unsaved
+                  ? t('Load {n}: {label}, unsaved changes, switch load ({count} open)', {
+                      n: index + 1,
+                      label,
+                      count: items.length,
+                    })
+                  : t('Load {n}: {label}, switch load ({count} open)', {
+                      n: index + 1,
+                      label,
+                      count: items.length,
+                    })
+              }
               // WCAG 2.5.3: the name holds the visible number and label as two words (the space after the number)
               title={shown?.title}
               aria-haspopup="dialog"
@@ -97,27 +111,27 @@ export function LoadTabs({
             </Button>
           </Popover.Target>
           <Popover.Dropdown>
-            <ul className="load-menu" aria-label="All open loads">
-              {items.map((t) => (
-                <li key={t.key} className="load-row" data-active={t.active || undefined}>
+            <ul className="load-menu" aria-label={t('All open loads')}>
+              {items.map((tb) => (
+                <li key={tb.key} className="load-row" data-active={tb.active || undefined}>
                   <button
                     type="button"
                     className="load-row-name"
-                    aria-current={t.active ? 'true' : undefined}
-                    title={t.title}
+                    aria-current={tb.active ? 'true' : undefined}
+                    title={tb.title}
                     onClick={() => {
                       setMenu(false)
-                      onSwitch(t.key)
+                      onSwitch(tb.key)
                     }}
                   >
                     <span className="load-row-check" aria-hidden="true">
-                      {t.active && <Check size={14} weight="bold" />}
+                      {tb.active && <Check size={14} weight="bold" />}
                     </span>
-                    <span className="load-row-title">{t.title}</span>
-                    {t.unsaved && (
+                    <span className="load-row-title">{tb.title}</span>
+                    {tb.unsaved && (
                       <>
                         <span className="load-row-dot" aria-hidden="true" />
-                        <span className="visually-hidden">, unsaved changes</span>
+                        <span className="visually-hidden">{t(', unsaved changes')}</span>
                       </>
                     )}
                   </button>
@@ -125,11 +139,11 @@ export function LoadTabs({
                     <button
                       type="button"
                       className="load-close"
-                      aria-label={`Close ${t.title}`}
+                      aria-label={t('Close {title}', { title: tb.title })}
                       onClick={() => {
                         // the question about unsaved changes is a dialog: the menu gives way
-                        if (t.unsaved) setMenu(false)
-                        onClose(t.key)
+                        if (tb.unsaved) setMenu(false)
+                        onClose(tb.key)
                       }}
                     >
                       <X size={12} aria-hidden="true" />
@@ -151,7 +165,7 @@ export function LoadTabs({
                   setEditing(true)
                 }}
               >
-                Rename this load
+                {t('Rename this load')}
               </Button>
               <Button
                 variant="subtle"
@@ -164,7 +178,7 @@ export function LoadTabs({
                   onList()
                 }}
               >
-                Saved loads
+                {t('Saved loads')}
               </Button>
             </div>
           </Popover.Dropdown>
@@ -173,7 +187,7 @@ export function LoadTabs({
           <input
             ref={field}
             className="load-edit"
-            aria-label="Load name"
+            aria-label={t('Load name')}
             placeholder={generated}
             maxLength={200}
             value={draft}
@@ -194,7 +208,12 @@ export function LoadTabs({
         {/* the whole name on paper */}
         <span className="print-only">{shown?.title}</span>
       </div>
-      <ActionIcon variant="default" aria-label="New load" title="New load" onClick={onNew}>
+      <ActionIcon
+        variant="default"
+        aria-label={t('New load')}
+        title={t('New load')}
+        onClick={onNew}
+      >
         <Plus size={18} aria-hidden="true" />
       </ActionIcon>
     </div>

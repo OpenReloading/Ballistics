@@ -1,0 +1,19 @@
+{
+  "id": "synthetic-capacity-30-30-win",
+  "origin": "catalogue",
+  "cartridge": "catalogue:30-30-win",
+  "waterCapacity": {
+    "value": 2.2
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["waterCapacity"],
+        "note": "Invented value for tests; not a measurement."
+      }
+    ]
+  }
+}

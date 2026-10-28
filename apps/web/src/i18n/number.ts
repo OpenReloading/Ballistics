@@ -1,4 +1,5 @@
 import { shownLanguage } from './shown.ts'
+import { type Translator, translator } from './translate.ts'
 
 /**
  * Numbers in the language shown. Inside the app a number is its canonical text: a point as the
@@ -175,6 +176,18 @@ export function parseNumber(
   return d ? decimal : asGroup
 }
 
-/** The message for an {@link ParsedNumber} that is ambiguous, in the language shown. */
-export const ambiguousMessage = (p: Extract<ParsedNumber, { kind: 'ambiguous' }>) =>
-  `Ambiguous: write ${plainNumber(p.decimal)} for a decimal or ${plainNumber(p.grouped)} for a whole number.`
+/**
+ * English text with its numbers in the language shown: what a caller that has no `t` gets, as
+ * before its text was translated.
+ */
+export const untranslated = (): Translator['t'] => translator({}, shownLanguage()).t
+
+/** The message for an {@link ParsedNumber} that is ambiguous, in the language of `t`. */
+export const ambiguousMessage = (
+  p: Extract<ParsedNumber, { kind: 'ambiguous' }>,
+  t: Translator['t'] = untranslated(),
+) =>
+  t('Ambiguous: write {decimal} for a decimal or {grouped} for a whole number.', {
+    decimal: p.decimal,
+    grouped: p.grouped,
+  })

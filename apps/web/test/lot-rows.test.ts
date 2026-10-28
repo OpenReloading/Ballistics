@@ -1,5 +1,6 @@
 import { chargeLadder, type InteriorLoad, interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { exampleInterior, exampleRecords, loadExample } from '../src/lib/example-data.ts'
 import { exampleFields } from '../src/lib/examples.ts'
 import { siValues } from '../src/lib/field-spec.ts'
@@ -96,16 +97,16 @@ describe('lot rows', () => {
   })
 
   it('check the typed percentage', () => {
-    expect(lotFractionError(0.03)).toBeUndefined()
-    expect(lotFractionError(undefined)).toMatch(/Enter/)
-    expect(lotFractionError(0)).toMatch(/above 0/)
-    expect(lotFractionError(0.6)).toMatch(/at most 50 %/)
+    expect(lotFractionError(0.03, english.t)).toBeUndefined()
+    expect(lotFractionError(undefined, english.t)).toMatch(/Enter/)
+    expect(lotFractionError(0, english.t)).toMatch(/above 0/)
+    expect(lotFractionError(0.6, english.t)).toMatch(/at most 50 %/)
   })
 
   it('name the rows by their burn rate', () => {
     expect(lotLabel('high', 0.03)).toBe('+3 %')
     expect(lotLabel('low', 0.025)).toBe('−2.5 %')
-    expect(burnRateLabel(undefined, 0.03)).toBe('nominal')
+    expect(burnRateLabel(undefined, 0.03, english.t)).toBe('nominal')
     expect(lots).toEqual(['low', 'high'])
   })
 

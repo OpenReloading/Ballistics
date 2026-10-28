@@ -119,7 +119,16 @@ test('the example loads into badges, the strings table and a tab per string with
   await expect(stats(page).getByRole('row')).toHaveCount(4)
   await expect(
     stats(page).getByRole('row').filter({ hasText: 'String 3: Example C' }).getByRole('cell'),
-  ).toHaveText(['String 3: Example C', '9 of 10', '872.5', '1.6', '4.9', '870.2', '875.1'])
+  ).toHaveText([
+    'String 3: Example C',
+    '9 of 10',
+    '872.5',
+    '1.6',
+    '1.1 to 3.1',
+    '4.9',
+    '870.2',
+    '875.1',
+  ])
 
   const tabs = page.getByRole('tab')
   await expect(tabs).toHaveText([

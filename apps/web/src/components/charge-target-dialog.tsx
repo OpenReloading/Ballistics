@@ -2,29 +2,24 @@
 
 import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import {
-  type ChargeTargetRefusal,
-  type ChargeTargetResponse,
+  answerOf,
   chargeTargetBody,
-  refusalText,
+  checkedRequest,
+  type Outcome,
   type TargetKind,
-  targetError,
   targetKinds,
   targetNumber,
   targetUnit,
 } from '../lib/charge-target.ts'
-import { errorText } from '../lib/error-text.ts'
+import { translateMessage } from '../lib/core-messages.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
 import { notReached } from './workbench-outcome.ts'
-
-type Outcome =
-  | { kind: 'found'; body: ChargeTargetResponse }
-  | { kind: 'refused'; text: string }
-  | { kind: 'failed'; text: string }
 
 /** `request` is the load request the answer was solved for: an answer shows only for the same load. */
 type Answer = { request: string } & Outcome
@@ -39,53 +34,12 @@ function requestKey(loadRequest: () => { body: object; bulkDensity?: number | un
   }
 }
 
-type LoadRequest = ReturnType<ReturnType<typeof useLoad>['loadRequest']>
-
-/** The load request to post, or the text that says why not: a bad value, an unbuilt load, no bulk density. */
-function checkedRequest(
-  value: string | number,
-  unit: ReturnType<typeof targetUnit>,
-  kind: TargetKind,
-  loadRequest: () => LoadRequest,
-): { req: LoadRequest } | { text: string } {
-  const invalid = targetError(value, unit)
-  if (invalid) return { text: invalid }
-  let req: LoadRequest
-  try {
-    req = loadRequest()
-  } catch (err) {
-    return { text: errorText(err) }
-  }
-  if (kind === 'loadRatio' && req.bulkDensity === undefined)
-    return { text: 'The load ratio needs a powder with a bulk density.' }
-  return { req }
-}
-
-/** The answer for an HTTP response of the solver: found, refused (422) or failed. */
-function answerOf(
-  res: Response,
-  json: unknown,
-  kind: TargetKind,
-  system: Parameters<typeof refusalText>[2],
-  asPercent: boolean,
-): Outcome {
-  if (res.ok && json) return { kind: 'found', body: json as ChargeTargetResponse }
-  if (res.status === 422 && json)
-    return {
-      kind: 'refused',
-      text: refusalText(json as ChargeTargetRefusal, kind, system, asPercent),
-    }
-  return {
-    kind: 'failed',
-    text: (json as ChargeTargetRefusal | undefined)?.message ?? `Error ${res.status}.`,
-  }
-}
-
 /**
  * The charge at which the simulation reaches a target: the target and its value, the answer with
  * the pressure range at that charge, and Apply, which writes the charge into the field. It posts the load of the fields as Run does.
  */
 export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+  const { t } = useTranslation()
   const { system, cartridge, loadRequest, applyCharge, powderDesign } = useLoad()
   const [kind, setKind] = useState<TargetKind>('peakPressure')
   const [percent, setPercent] = useState(false)
@@ -153,7 +107,8 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       if (controller.signal.aborted) return
       setAnswer({ request, ...answerOf(res, json, kind, system, asPercent) })
     } catch {
-      if (!controller.signal.aborted) setAnswer({ request, kind: 'failed', text: notReached })
+      if (!controller.signal.aborted)
+        setAnswer({ request, kind: 'failed', text: (t) => t(notReached) })
     } finally {
       if (running.current === controller) setPending(false)
     }
@@ -161,7 +116,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
 
   const found = answer?.kind === 'found' ? answer.body : undefined
   return (
-    <AppModal opened={opened} onClose={onClose} title="Charge for a target" size="sm">
+    <AppModal opened={opened} onClose={onClose} title={t('Charge for a target')} size="sm">
       <form
         noValidate
         onSubmit={(e) => {
@@ -171,9 +126,9 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       >
         <Stack gap="xs">
           <Select
-            label="Target"
+            label={t('Target')}
             allowDeselect={false}
-            data={targetKinds}
+            data={targetKinds.map((k) => ({ value: k.value, label: t(k.label) }))}
             value={kind}
             onChange={(v) => v && change(v as TargetKind)}
             comboboxProps={{ withinPortal: false }}
@@ -181,7 +136,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
           <Group align="flex-end" gap="xs" wrap="nowrap">
             <NumberInput
               flex={1}
-              label="Value"
+              label={t('Value')}
               hideControls
               value={value}
               decimalScale={unit.decimals}
@@ -202,51 +157,54 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               <Button
                 variant="default"
                 aria-pressed={percent}
-                title="Read the value as a percentage of the cartridge's CIP Pmax"
+                title={t("Read the value as a percentage of the cartridge's CIP Pmax")}
                 onClick={() => {
                   setPercent((p) => !p)
                   setValue('')
                   reset()
                 }}
               >
-                % of Pmax
+                {t('% of Pmax')}
               </Button>
             )}
           </Group>
           <Button type="submit" loading={pending}>
-            Find charge
+            {t('Find charge')}
           </Button>
         </Stack>
       </form>
       <div aria-live="polite" role="status">
         {answer && answer.kind !== 'found' && (
           <Text mt="sm" size="sm" role={answer.kind === 'failed' ? 'alert' : undefined}>
-            {answer.text}
+            {answer.text(t)}
           </Text>
         )}
         {found && (
           <Stack mt="sm" gap="xs" data-testid="charge-target-result">
             <Text size="sm">
-              The simulation reaches the target at about{' '}
+              {t('The simulation reaches the target at about')}{' '}
               <strong data-testid="charge-target-charge">
                 {formatQuantity('charge', system, found.charge)} {system.charge.symbol}
               </strong>{' '}
-              (simulation, not load data).
+              {t('(simulation, not load data).')}
             </Text>
             <Row
-              label="Peak pressure"
+              label={t('Peak pressure')}
               value={withUnit('pressure', system, found.pressureRange.nominalPressure)}
             />
             <Row
-              label="Pressure range"
-              value={`${formatQuantity('pressure', system, found.pressureRange.lowPressure)} to ${withUnit('pressure', system, found.pressureRange.highPressure)}`}
+              label={t('Pressure range')}
+              value={t('{low} to {high}', {
+                low: formatQuantity('pressure', system, found.pressureRange.lowPressure),
+                high: withUnit('pressure', system, found.pressureRange.highPressure),
+              })}
             />
             <Row
-              label="Muzzle velocity"
+              label={t('Muzzle velocity')}
               value={withUnit('velocity', system, found.result.muzzleVelocity)}
             />
-            <Row label="Barrel time" value={msText(found.result.barrelTime)} />
-            {!found.burnoutInBarrel && <Row label="Burnout" value="not in the barrel" />}
+            <Row label={t('Barrel time')} value={msText(found.result.barrelTime)} />
+            {!found.burnoutInBarrel && <Row label={t('Burnout')} value={t('not in the barrel')} />}
             {powderDesign && (
               <Text size="xs" className="user-design">
                 {powderDesignNote(powderDesign.name)}
@@ -256,18 +214,18 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               .filter((w) => w.code !== 'noCartridge')
               .map((w) => (
                 <Text key={w.message} size="xs">
-                  {w.message}
+                  {translateMessage(w.message, t)}
                 </Text>
               ))}
             <Group justify="flex-end" gap="xs">
               <Button
-                title="Writes the charge into the charge field"
+                title={t('Writes the charge into the charge field')}
                 onClick={() => {
                   applyCharge(found.charge)
                   onClose()
                 }}
               >
-                Apply
+                {t('Apply')}
               </Button>
             </Group>
           </Stack>

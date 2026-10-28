@@ -32,6 +32,9 @@
         "src/target/index.ts"
       ]
     },
+    "packages/cli": {
+      "entry": ["src/bin.ts"]
+    },
     "packages/api": {
       "entry": [
         "src/openapi.ts",

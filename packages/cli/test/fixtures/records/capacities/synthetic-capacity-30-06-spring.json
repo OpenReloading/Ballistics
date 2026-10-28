@@ -1,0 +1,19 @@
+{
+  "id": "synthetic-capacity-30-06-spring",
+  "origin": "catalogue",
+  "cartridge": "catalogue:30-06-spring",
+  "waterCapacity": {
+    "value": 3.9
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["waterCapacity"],
+        "note": "Invented value for tests; not a measurement."
+      }
+    ]
+  }
+}

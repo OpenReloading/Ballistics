@@ -1,5 +1,6 @@
 import { interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'
 import {
@@ -59,20 +60,20 @@ describe('chartEvents', () => {
   const z1 = exampleInterior.formZ1 as number
 
   it('gives 10 %, peak, 95 % burnt, burnout when in the barrel and muzzle, by time', () => {
-    const keys = chartEvents(r).map((e) => e.key)
+    const keys = chartEvents(r, undefined, english.t).map((e) => e.key)
     // the example burns out past the muzzle, the same load in a 2 m barrel in it
     expect(r.burnout).toBeNull()
     expect(keys).toEqual(['tenPercent', 'peak', 'burnt', 'muzzle'])
     const long = run({ travel: 2 })
     expect(long.burnout).not.toBeNull()
-    expect(chartEvents(long).map((e) => e.key)).toEqual([
+    expect(chartEvents(long, undefined, english.t).map((e) => e.key)).toEqual([
       'tenPercent',
       'peak',
       'burnt',
       'burnout',
       'muzzle',
     ])
-    expect(defined(chartEvents(r)[0]).time).toBe(r.tenPercentPressureTime)
+    expect(defined(chartEvents(r, undefined, english.t)[0]).time).toBe(r.tenPercentPressureTime)
   })
 
   // points of (time s, burnt fraction): 0 at 0, 0.5 at 1, 0.9 at 2, 1 at 4
@@ -97,11 +98,11 @@ describe('chartEvents', () => {
     [4, 1],
   ]
   const timeOf = (e: PlaybackResult, key: string, z = 0.7) =>
-    chartEvents(e, z).find((x) => x.key === key)?.time
+    chartEvents(e, z, english.t).find((x) => x.key === key)?.time
 
   it('puts z1 and 95 % at the linear crossing of the burnt fraction', () => {
     // 0.7: 1 + (0.7 - 0.5) / (0.9 - 0.5) * 1 = 1.5; 0.95: 2 + (0.95 - 0.9) / (1 - 0.9) * 2 = 3
-    const events = chartEvents(synthetic(ramp), 0.7)
+    const events = chartEvents(synthetic(ramp), 0.7, english.t)
     expect(events.map((e) => e.key)).toEqual(['z1', 'peak', 'burnt', 'muzzle'])
     expect(events.map((e) => e.time)).toEqual([
       expect.closeTo(1.5, 12),
@@ -129,8 +130,8 @@ describe('chartEvents', () => {
       [1, 0.5],
       [4, 0.9],
     ])
-    expect(chartEvents(never, 0.7).map((e) => e.key)).toEqual(['peak', 'z1', 'muzzle'])
-    expect(chartEvents(never, 0.95).map((e) => e.key)).toEqual(['peak', 'muzzle'])
+    expect(chartEvents(never, 0.7, english.t).map((e) => e.key)).toEqual(['peak', 'z1', 'muzzle'])
+    expect(chartEvents(never, 0.95, english.t).map((e) => e.key)).toEqual(['peak', 'muzzle'])
   })
 
   it('keeps a crossing at the shot start and drops one exactly at the muzzle', () => {
@@ -146,25 +147,29 @@ describe('chartEvents', () => {
   })
 
   it('leaves out z1 without a two-stage form or at 1', () => {
-    expect(chartEvents(r).map((e) => e.key)).not.toContain('z1')
-    expect(chartEvents(r, 1).map((e) => e.key)).not.toContain('z1')
+    expect(chartEvents(r, undefined, english.t).map((e) => e.key)).not.toContain('z1')
+    expect(chartEvents(r, 1, english.t).map((e) => e.key)).not.toContain('z1')
   })
 
   it('leaves out z1 and 95 % that the bullet has not reached at the muzzle', () => {
     const short = run({ travel: 0.05 })
     expect(short.muzzleBurntFraction).toBeLessThan(z1)
-    expect(chartEvents(short, z1).map((e) => e.key)).toEqual(
+    expect(chartEvents(short, z1, english.t).map((e) => e.key)).toEqual(
       expect.not.arrayContaining(['z1', 'burnt']),
     )
   })
 
   it('leaves out a 10 % time of 0, a missing burnout and 95 % burnt before the shot start', () => {
-    const keys = chartEvents({
-      ...r,
-      tenPercentPressureTime: 0,
-      burnout: null,
-      shotStartTime: r.muzzleTime,
-    }).map((e) => e.key)
+    const keys = chartEvents(
+      {
+        ...r,
+        tenPercentPressureTime: 0,
+        burnout: null,
+        shotStartTime: r.muzzleTime,
+      },
+      undefined,
+      english.t,
+    ).map((e) => e.key)
     expect(keys).toEqual(['peak', 'muzzle'])
   })
 })
@@ -212,7 +217,7 @@ const cip: Limit = {
 describe('limitLines', () => {
   const system = presetUnits('metric-grains')
   it('draws the first compared limit and its reference lines', () => {
-    const lines = limitLines([{ ...cip, compared: false }, cip], system)
+    const lines = limitLines([{ ...cip, compared: false }, cip], system, english.t)
     expect(lines?.map((l) => l.label)).toEqual([
       'CIP Pmax 4150 bar',
       '85 % of CIP Pmax',
@@ -225,9 +230,9 @@ describe('limitLines', () => {
   })
 
   it('leaves out the source without a number and gives undefined without a compared limit', () => {
-    expect(defined(limitLines([cip], system)?.[0]).label).toBe('CIP Pmax 4150 bar')
-    expect(limitLines([{ ...cip, compared: false }], system)).toBeUndefined()
-    expect(limitLines(undefined, system)).toBeUndefined()
+    expect(defined(limitLines([cip], system, english.t)?.[0]).label).toBe('CIP Pmax 4150 bar')
+    expect(limitLines([{ ...cip, compared: false }], system, english.t)).toBeUndefined()
+    expect(limitLines(undefined, system, english.t)).toBeUndefined()
   })
 })
 
@@ -252,9 +257,24 @@ describe('interiorOption', () => {
     { n: 1, result: slower },
     { n: 2, result: r },
   ]
-  const lines = limitLines([{ compared: true, pressure: 4150e5, symbol: 'Pmax' } as never], system)
+  const lines = limitLines(
+    [{ compared: true, pressure: 4150e5, symbol: 'Pmax' } as never],
+    system,
+    english.t,
+  )
   const option = (show: 'all' | 'pressure', x: 'travel' | 'time' = 'travel') =>
-    interiorOption({ steps, selected: 1, mass, x, show, lines, system, theme, animate: true })
+    interiorOption({
+      steps,
+      selected: 1,
+      mass,
+      x,
+      show,
+      lines,
+      system,
+      theme,
+      animate: true,
+      t: english.t,
+    })
 
   it('lays the grid out on the plot edges the playback strip spans', () => {
     expect(plotEdges(1)).toEqual([56, 72])
@@ -313,6 +333,7 @@ describe('interiorOption', () => {
       system,
       theme,
       animate: false,
+      t: english.t,
     })
     expect(o.xAxis.max).toBeGreaterThan(o.xAxis.min)
   })
@@ -320,7 +341,7 @@ describe('interiorOption', () => {
   it('puts event lines and the limit lines once, on the selected pressure curve', () => {
     const marks = option('all').series.flatMap((s) => s.markLine?.data ?? [])
     expect(marks.filter((m) => 'xAxis' in m).map((m) => m.name)).toEqual(
-      chartEvents(r).map((e) => e.key),
+      chartEvents(r, undefined, english.t).map((e) => e.key),
     )
     expect(marks.filter((m) => 'yAxis' in m).map((m) => m.label.formatter)).toEqual(
       lines?.map((l) => l.label),
@@ -367,6 +388,7 @@ describe('interiorOption', () => {
       system,
       theme,
       animate: true,
+      t: english.t,
     })
     const marks = o.series.flatMap((s) => s.markPoint?.data ?? [])
     expect(marks.map((m) => m.name)).toEqual(['Step 1 peak', 'Step 1 end'])
@@ -389,6 +411,7 @@ describe('interiorOption', () => {
         system,
         theme,
         animate: false,
+        t: english.t,
       }).animation,
     ).toBe(false)
   })

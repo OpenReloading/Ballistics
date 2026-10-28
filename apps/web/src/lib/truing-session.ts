@@ -7,10 +7,13 @@ import {
   type RangeStringParameter,
   type RangeStringParameterName,
   type TrajectoryInput,
+  TruingError,
   type TruingPlan,
   type WeakReason,
 } from '@open-reloading/core'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { translateMessage } from './core-messages.ts'
 import { errorText } from './error-text.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
@@ -62,60 +65,69 @@ const shotsOf = (text: string) => {
   return x !== undefined && Number.isInteger(x) && x >= 1 ? x : undefined
 }
 
+type T = Translator['t']
+
 /** A row's number and where it stands in the message when it is missing. */
-function need(x: number | undefined, what: string, positive = false): number {
-  if (x === undefined) throw new RangeError(`${what}: enter a number.`)
-  if (positive && !(x > 0)) throw new RangeError(`${what}: must be greater than 0.`)
+function need(x: number | undefined, what: string, t: T, positive = false): number {
+  if (x === undefined) throw new RangeError(t('{what}: enter a number.', { what }))
+  if (positive && !(x > 0)) throw new RangeError(t('{what}: must be greater than 0.', { what }))
   return x
 }
 
-const rowName = (i: number) => `Row ${i + 1}`
+/** The message of a failed plan or fit in the language of `t`. */
+function problemOf(e: unknown, t: T): string {
+  if (e instanceof TruingError) {
+    const reason = translateMessage(e.reason, t)
+    if (reason !== e.reason) return reason
+  }
+  return translateMessage(errorText(e), t)
+}
 
 /** The rows that carry anything, with their position; a blank trailing row is not an error. */
 const filled = (rows: readonly TruingRow[]) =>
   rows.flatMap((r, i) => (r.range || r.shots || r.mean || r.deviation ? [{ r, i }] : []))
 
 /** Planned entries (no measured values) and the chronograph that has shots and a deviation, SI. */
-function planned(input: TruingInputs) {
+function planned(input: TruingInputs, t: T) {
   const { system: s } = input
   const entries = filled(input.rows).map(({ r, i }) => ({
     kind: r.kind,
-    range: s.range.toSi(need(numberOf(r.range), `${rowName(i)} distance`, true)),
-    shotCount: need(shotsOf(r.shots), `${rowName(i)} shots`),
+    range: s.range.toSi(need(numberOf(r.range), t('Row {n} distance', { n: i + 1 }), t, true)),
+    shotCount: need(shotsOf(r.shots), t('Row {n} shots', { n: i + 1 }), t),
   }))
   const { shots, deviation } = input.chrono
   const chronograph =
     shots || deviation
       ? {
-          shotCount: need(shotsOf(shots), 'Chronograph shots'),
+          shotCount: need(shotsOf(shots), t('Chronograph shots'), t),
           standardDeviation: s.velocity.toSi(
-            need(numberOf(deviation), 'Chronograph deviation', true),
+            need(numberOf(deviation), t('Chronograph deviation'), t, true),
           ),
         }
       : undefined
   return { entries, chronograph }
 }
 
-const clickOf = (input: TruingInputs) =>
-  input.system.correction.toSi(need(numberOf(input.click), 'Click value', true))
+const clickOf = (input: TruingInputs, t: T) =>
+  input.system.correction.toSi(need(numberOf(input.click), t('Click value'), t, true))
 
-/** Why the plan or the fit has no answer, or the answer. */
+/** Why the plan or the fit has no answer (its text in the language of the `t` it was made with), or the answer. */
 export type Attempt<T> = { answer: T } | { problem: string }
 
 /**
  * The statuses and standard errors of the planned string: the rows' kinds, distances and shots, the
  * chronograph's shots and deviation, and the dispersion of one shot.
  */
-export function planSession(shot: TrajectoryInput, input: TruingInputs): Attempt<TruingPlan> {
+export function planSession(shot: TrajectoryInput, input: TruingInputs, t: T): Attempt<TruingPlan> {
   try {
-    const { entries, chronograph } = planned(input)
+    const { entries, chronograph } = planned(input, t)
     const dispersion = input.system.correction.toSi(
-      need(numberOf(input.dispersion), 'Dispersion of one shot', true),
+      need(numberOf(input.dispersion), t('Dispersion of one shot'), t, true),
     )
     const plan = planTruingStrings(
       {
         shot,
-        clickValue: clickOf(input),
+        clickValue: clickOf(input, t),
         dispersion,
         entries,
         ...(chronograph && { chronograph }),
@@ -124,12 +136,16 @@ export function planSession(shot: TrajectoryInput, input: TruingInputs): Attempt
     )
     return { answer: plan }
   } catch (e) {
-    return { problem: errorText(e) }
+    return { problem: problemOf(e, t) }
   }
 }
 
 /** The fit of the measured rows and chronograph readings. */
-export function fitSession(shot: TrajectoryInput, input: TruingInputs): Attempt<RangeStringFit> {
+export function fitSession(
+  shot: TrajectoryInput,
+  input: TruingInputs,
+  t: T,
+): Attempt<RangeStringFit> {
   try {
     const { system: s } = input
     const entries = filled(input.rows).map(({ r, i }): RangeStringEntry => {
@@ -137,46 +153,52 @@ export function fitSession(shot: TrajectoryInput, input: TruingInputs): Attempt<
       const toSi = (x: number) => (r.kind === 'impact' ? s.lineOfSightOffset.toSi(x) : x)
       return {
         kind: r.kind,
-        range: s.range.toSi(need(numberOf(r.range), `${rowName(i)} distance`, true)),
-        shotCount: need(shotsOf(r.shots), `${rowName(i)} shots`),
-        value: toSi(need(numberOf(r.mean), `${rowName(i)} mean`)),
-        standardDeviation: toSi(need(numberOf(r.deviation), `${rowName(i)} deviation`, true)),
+        range: s.range.toSi(need(numberOf(r.range), t('Row {n} distance', { n: i + 1 }), t, true)),
+        shotCount: need(shotsOf(r.shots), t('Row {n} shots', { n: i + 1 }), t),
+        value: toSi(need(numberOf(r.mean), t('Row {n} mean', { n: i + 1 }), t)),
+        standardDeviation: toSi(
+          need(numberOf(r.deviation), t('Row {n} deviation', { n: i + 1 }), t, true),
+        ),
       }
     })
     const c = input.chrono
     const chronograph =
       c.shots || c.mean || c.deviation
         ? {
-            shotCount: need(shotsOf(c.shots), 'Chronograph shots'),
-            mean: s.velocity.toSi(need(numberOf(c.mean), 'Chronograph mean', true)),
+            shotCount: need(shotsOf(c.shots), t('Chronograph shots'), t),
+            mean: s.velocity.toSi(need(numberOf(c.mean), t('Chronograph mean'), t, true)),
             standardDeviation: s.velocity.toSi(
-              need(numberOf(c.deviation), 'Chronograph deviation', true),
+              need(numberOf(c.deviation), t('Chronograph deviation'), t, true),
             ),
           }
         : undefined
     return {
       answer: fitTruingStrings(
-        { shot, clickValue: clickOf(input), entries, ...(chronograph && { chronograph }) },
+        { shot, clickValue: clickOf(input, t), entries, ...(chronograph && { chronograph }) },
         { fitZeroOffset: input.fitZeroOffset },
       ),
     }
   } catch (e) {
-    return { problem: errorText(e) }
+    return { problem: problemOf(e, t) }
   }
 }
 
-export const parameterLabels: Record<RangeStringParameterName, string> = {
-  muzzleVelocity: 'Muzzle velocity',
-  dragFactor: 'Drag factor',
-  clickValue: 'Click value',
-  zeroOffset: 'Zero offset',
+/** The parameter names as table row headings and, in lower case, inside a sentence. */
+export const parameterLabels: Record<
+  RangeStringParameterName,
+  { label: Message; inline: Message }
+> = {
+  muzzleVelocity: { label: msg('Muzzle velocity'), inline: msg('muzzle velocity') },
+  dragFactor: { label: msg('Drag factor'), inline: msg('drag factor') },
+  clickValue: { label: msg('Click value'), inline: msg('click value') },
+  zeroOffset: { label: msg('Zero offset'), inline: msg('zero offset') },
 }
 
-const reasonText: Record<WeakReason, string> = {
-  'no-information': 'the data does not move it',
-  collinear: 'the data cannot tell it from another parameter',
-  imprecise: 'too imprecise',
-  'fit-failed': 'the fit failed',
+const reasonText: Record<WeakReason, Message> = {
+  'no-information': msg('the data does not move it'),
+  collinear: msg('the data cannot tell it from another parameter'),
+  imprecise: msg('too imprecise'),
+  'fit-failed': msg('the fit failed'),
 }
 
 /** One parameter as shown: a value and an interval only when it is identified. */
@@ -212,17 +234,22 @@ const standardError = (p: RangeStringParameter, system: UnitSystem) => {
 }
 
 /** "Identified", or "Weak" or "Unresolved" with the reasons. */
-function statusText(p: RangeStringParameter): string {
-  if (p.status === 'identified') return 'Identified'
-  const reasons = p.reasons.map((r) => reasonText[r]).join('; ')
-  return `${p.status === 'weak' ? 'Weak' : 'Unresolved'}${reasons ? `: ${reasons}` : ''}`
+function statusText(p: RangeStringParameter, t: T): string {
+  if (p.status === 'identified') return t('Identified')
+  const reasons = p.reasons.map((r) => t(reasonText[r])).join('; ')
+  if (p.status === 'weak') return reasons ? t('Weak: {reasons}', { reasons }) : t('Weak')
+  return reasons ? t('Unresolved: {reasons}', { reasons }) : t('Unresolved')
 }
 
 /** "lower to upper (level %)" of an interval. */
-function intervalText(p: RangeStringParameter, system: UnitSystem): string | undefined {
+function intervalText(p: RangeStringParameter, system: UnitSystem, t: T): string | undefined {
   if (!p.interval) return
   const { lower, upper, confidenceLevel } = p.interval
-  return `${quantityText(p.name, lower, system)} to ${quantityText(p.name, upper, system)} (${formatNumber(100 * confidenceLevel, 0)} %)`
+  return t('{lower} to {upper} ({level} %)', {
+    lower: quantityText(p.name, lower, system),
+    upper: quantityText(p.name, upper, system),
+    level: formatNumber(100 * confidenceLevel, 0),
+  })
 }
 
 /**
@@ -232,6 +259,7 @@ function intervalText(p: RangeStringParameter, system: UnitSystem): string | und
 export function parameterLines(
   parameters: readonly RangeStringParameter[],
   system: UnitSystem,
+  t: T,
 ): ParameterLine[] {
   return parameters.map((p) => {
     const identified = p.status === 'identified'
@@ -239,29 +267,52 @@ export function parameterLines(
       identified && p.value !== undefined ? quantityText(p.name, p.value, system) : undefined
     return {
       name: p.name,
-      label: parameterLabels[p.name],
+      label: t(parameterLabels[p.name].label),
       status: p.status,
-      statusText: statusText(p),
+      statusText: statusText(p, t),
       ...(value && { value }),
-      ...(identified && { interval: intervalText(p, system) }),
+      ...(identified && { interval: intervalText(p, system, t) }),
       ...(standardError(p, system) && { error: standardError(p, system) }),
     }
   })
 }
 
 /** The residual check of a fit as sentences; the second one when the intervals are not to be relied on. */
-export function residualLines(fit: RangeStringFit): string[] {
+export function residualLines(fit: RangeStringFit, t: T): string[] {
   const dof = fit.degreesOfFreedom
-  const check =
-    dof > 0
-      ? `Chi-square ${formatNumber(fit.chiSquare, 2)} on ${dof} degrees of freedom${fit.pValue === undefined ? '' : `, p = ${formatNumber(fit.pValue, 3)}`}: the residuals ${fit.consistent ? 'agree' : 'do not agree'} with the stated uncertainties.`
-      : 'No residual check: as many parameters as rows.'
+  const chi = formatNumber(fit.chiSquare, 2)
+  const p = fit.pValue === undefined ? undefined : formatNumber(fit.pValue, 3)
+  const values = { chi, dof, p: p ?? '' }
+  let check: string
+  if (dof <= 0) check = t('No residual check: as many parameters as rows.')
+  else if (p === undefined)
+    check = fit.consistent
+      ? t(
+          'Chi-square {chi} on {dof} degrees of freedom: the residuals agree with the stated uncertainties.',
+          values,
+        )
+      : t(
+          'Chi-square {chi} on {dof} degrees of freedom: the residuals do not agree with the stated uncertainties.',
+          values,
+        )
+  else
+    check = fit.consistent
+      ? t(
+          'Chi-square {chi} on {dof} degrees of freedom, p = {p}: the residuals agree with the stated uncertainties.',
+          values,
+        )
+      : t(
+          'Chi-square {chi} on {dof} degrees of freedom, p = {p}: the residuals do not agree with the stated uncertainties.',
+          values,
+        )
   return [
     check,
     ...(fit.intervalsTrusted
       ? []
       : [
-          'The intervals are not to be relied on: the residuals disagree or a held parameter shifts them.',
+          t(
+            'The intervals are not to be relied on: the residuals disagree or a held parameter shifts them.',
+          ),
         ]),
   ]
 }
@@ -270,5 +321,10 @@ export function residualLines(fit: RangeStringFit): string[] {
 export const nominalLine = (
   n: { bullet: string; muzzleVelocity: number; zeroRange: number },
   system: UnitSystem,
+  t: T,
 ) =>
-  `${n.bullet}, ${withUnit('velocity', system, n.muzzleVelocity)}, zero ${withUnit('range', system, n.zeroRange)}`
+  t('{label}, {velocity}, zero {range}', {
+    label: n.bullet,
+    velocity: withUnit('velocity', system, n.muzzleVelocity),
+    range: withUnit('range', system, n.zeroRange),
+  })

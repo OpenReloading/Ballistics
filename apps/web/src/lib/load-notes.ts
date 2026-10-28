@@ -5,6 +5,7 @@ import {
   type SessionReading,
 } from '@open-reloading/core'
 import { type Load, type SessionRecord, type SessionSnapshot, toSi } from '@open-reloading/schema'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { sessionRef } from './measurements.ts'
 import { stringStats } from './string-stats.ts'
 import { type UnitSystem, withUnit } from './units.ts'
@@ -126,35 +127,78 @@ export function notesOf(
   return loadNotes(readings, threshold)
 }
 
-const lotNames = { powderLot: 'powder', primerLot: 'primer', caseLot: 'case' } as const
-const lengthNames = { overallLength: 'Cartridge overall length', baseToOgive: 'Base to ogive' }
+const lotNames = {
+  powderLot: msg('Powder lot'),
+  primerLot: msg('Primer lot'),
+  caseLot: msg('Case lot'),
+} as const
+const lengthNames = {
+  overallLength: msg('Cartridge overall length'),
+  baseToOgive: msg('Base to ogive'),
+}
 
 /** A note as one sentence: the values it compares, with the sessions they come from. `name` gives a session's name. */
 export function noteText(
   n: LoadNote,
   name: (session: string) => string,
   system: UnitSystem,
+  t: Translator['t'],
 ): string {
   switch (n.rule) {
     case 'powderLot':
     case 'primerLot':
     case 'caseLot': {
-      const what = `${lotNames[n.rule][0]?.toUpperCase()}${lotNames[n.rule].slice(1)} lot`
-      if (n.change === 'missing')
-        return `${what} is not recorded for ${name(n.session)}.${
-          n.before ? ` ${name(n.earlier ?? '')} has ${n.before}.` : ''
-        }`
-      return `${what} is ${n.now} in ${name(n.session)} and was ${n.before} in ${name(n.earlier ?? '')}.`
+      const what = t(lotNames[n.rule])
+      if (n.change === 'missing') {
+        const missing = t('{what} is not recorded for {session}.', {
+          what,
+          session: name(n.session),
+        })
+        return n.before
+          ? `${missing} ${t('{earlier} has {before}.', { earlier: name(n.earlier ?? ''), before: n.before })}`
+          : missing
+      }
+      return t('{what} is {now} in {session} and was {before} in {earlier}.', {
+        what,
+        now: n.now ?? '',
+        session: name(n.session),
+        before: n.before ?? '',
+        earlier: name(n.earlier ?? ''),
+      })
     }
     case 'seating': {
       const at = (mm: number) => withUnit('length', system, toSi('length', mm))
-      return `${lengthNames[n.by]} is ${at(n.now)} in ${name(n.session)} and was ${at(n.before)} in ${name(n.earlier)}.`
+      return t('{what} is {now} in {session} and was {before} in {earlier}.', {
+        what: t(lengthNames[n.by]),
+        now: at(n.now),
+        session: name(n.session),
+        before: at(n.before),
+        earlier: name(n.earlier),
+      })
     }
     case 'velocity': {
       const v = (ms: number) => withUnit('velocity', system, ms)
-      return `Mean velocity is ${v(n.now)} in ${name(n.session)} and was ${v(n.before)} in ${name(n.earlier)}, a move larger than the sessions' standard deviation of ${v(n.spread)}.`
+      return t(
+        "Mean velocity is {now} in {session} and was {before} in {earlier}, a move larger than the sessions' standard deviation of {spread}.",
+        {
+          now: v(n.now),
+          session: name(n.session),
+          before: v(n.before),
+          earlier: name(n.earlier),
+          spread: v(n.spread),
+        },
+      )
     }
     case 'roundCount':
-      return `The firearm has ${n.now} rounds at ${name(n.session)} and had ${n.before} at ${name(n.earlier)}; you set a note at ${n.threshold} rounds.`
+      return t(
+        'The firearm has {now} rounds at {session} and had {before} at {earlier}; you set a note at {threshold} rounds.',
+        {
+          now: n.now,
+          session: name(n.session),
+          before: n.before,
+          earlier: name(n.earlier),
+          threshold: n.threshold,
+        },
+      )
   }
 }
