@@ -7,7 +7,8 @@
   "page": "Seite 40, PDF p. 40",
   "distance": {
     "value": 25000,
-    "raw": "25 m"
+    "raw": "25 m",
+    "unit": "m"
   },
   "category": "pistol",
   "caliberClasses": {

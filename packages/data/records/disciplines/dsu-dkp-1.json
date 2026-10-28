@@ -7,7 +7,8 @@
   "page": "Seiten 3 bis 4, PDF pp. 147 to 148",
   "distance": {
     "value": 10000,
-    "raw": "10 / 7,50 / 5 Meter"
+    "raw": "10 / 7,50 / 5 Meter",
+    "unit": "m"
   },
   "category": "air-pistol",
   "caliberClasses": {
