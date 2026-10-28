@@ -207,7 +207,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
             {!found.burnoutInBarrel && <Row label={t('Burnout')} value={t('not in the barrel')} />}
             {powderDesign && (
               <Text size="xs" className="user-design">
-                {powderDesignNote(powderDesign.name)}
+                {powderDesignNote(powderDesign.name, t)}
               </Text>
             )}
             {found.warnings

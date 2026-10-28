@@ -138,8 +138,10 @@ describe('the chamber volume note', () => {
         derived: [volume],
       }),
     })
-    expect(volumeNoteText(run(fromMeasured.volume?.si ?? 0, measuredCapacity))).toBeUndefined()
-    expect(volumeNoteText(run(fromRecord.volume?.si ?? 0, undefined))).toMatch(
+    expect(
+      volumeNoteText(run(fromMeasured.volume?.si ?? 0, measuredCapacity), english.t),
+    ).toBeUndefined()
+    expect(volumeNoteText(run(fromRecord.volume?.si ?? 0, undefined), english.t)).toMatch(
       /^Chamber volume not measured: .*measured case capacity/,
     )
   })
@@ -166,6 +168,6 @@ describe('the chamber volume note', () => {
   })
 
   it('says nothing without a result', () => {
-    expect(volumeNoteText(undefined)).toBeUndefined()
+    expect(volumeNoteText(undefined, english.t)).toBeUndefined()
   })
 })

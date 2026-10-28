@@ -7596,11 +7596,14 @@ main .field-table tr.field-group > th {
     border-collapse: collapse;
   }
 
+  /* a long word (German compounds) breaks in its cell and never widens the table */
   .sheet-table :is(th, td) {
     padding: 1mm 2mm;
     border: 0.3mm solid #999;
     text-align: left;
     font-weight: 400;
+    overflow-wrap: anywhere;
+    hyphens: auto;
   }
 
   .sheet-table thead th,

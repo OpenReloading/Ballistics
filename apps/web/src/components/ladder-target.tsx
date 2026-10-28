@@ -111,12 +111,14 @@ export function LadderTarget({
         size !== undefined &&
         createPortal(
           <div className="ladder-target">
-            <h1>Ladder target</h1>
-            <p className="sheet-date">Printed {localDay(new Date())}</p>
+            <h1>{t('Ladder target')}</h1>
+            <p className="sheet-date">{t('Printed {date}', { date: localDay(new Date()) })}</p>
             <p>
-              Distance {formatQuantity('range', system, distance)} {system.range.symbol}, mark size{' '}
-              {formatQuantity('correction', system, size)} {system.correction.symbol}
-              {` (${plainNumber(Math.round((diameter ?? 0) * 10) / 10)} mm).`}
+              {t('Distance {distance}, mark size {size} ({diameter} mm).', {
+                distance: `${formatQuantity('range', system, distance)} ${system.range.symbol}`,
+                size: `${formatQuantity('correction', system, size)} ${system.correction.symbol}`,
+                diameter: plainNumber(Math.round((diameter ?? 0) * 10) / 10),
+              })}
             </p>
             <div className="ladder-marks">
               {marks.map((m, i) => (
@@ -137,7 +139,7 @@ export function LadderTarget({
             <div className="ladder-ruler" style={{ width: cssMm(rulerMm) }}>
               <span>{rulerMm} mm</span>
             </div>
-            <p>Print at 100 % scale: the ruler measures {rulerMm} mm.</p>
+            <p>{t('Print at 100 % scale: the ruler measures {length} mm.', { length: rulerMm })}</p>
           </div>,
           body,
         )}
