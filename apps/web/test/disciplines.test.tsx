@@ -73,6 +73,9 @@ it('shows the distance in the unit of the rule book and filters by either unit o
   const metricRow = { ...defined(rows[0]), distance: metric, unit: 'm' as const }
   const distFacet = defined(disciplineFacets([metricRow], new Map()).find((f) => f.key === 'dist'))
   expect(distFacet.values(metricRow)).toEqual(['12.7m'])
+  const fine = { ...metricRow, distance: toSi('length', 12345) }
+  expect(disciplineDistance(fine)).toBe('12.345 m')
+  expect(distFacet.values(fine)).toEqual(['12.345m'])
   const bothIds = records.filter((d) => d.distance.unit === 'm/yd').map((d) => d.id)
   expect(bothIds.length).toBeGreaterThan(0)
   const bdmp25 = rows.filter((r) => r.unit === 'm/yd' && r.distance === 25).map((r) => r.id)

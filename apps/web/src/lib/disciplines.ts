@@ -53,8 +53,8 @@ const metresPerYard = 0.9144
  */
 function distanceReadings(stored: number, unit: DisciplineRow['unit']) {
   // the SI conversion leaves float noise (12700 mm is 12.700000000000001 m)
-  const metres = Math.round(stored * 100) / 100
-  const yards = Math.round((stored / metresPerYard) * 100) / 100
+  const metres = Number(stored.toPrecision(12))
+  const yards = Number((stored / metresPerYard).toPrecision(12))
   return unit === 'yd'
     ? [{ number: yards, unit: 'yd' }]
     : unit === 'm'
