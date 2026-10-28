@@ -11,6 +11,31 @@
     "unit": "m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "sighters": 0,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 330,
+          "raw": "5:30 min"
+        },
+        "covers": "discipline"
+      }
+    ],
+    "actions": ["semi-automatic", "revolver"],
+    "maxBarrelLength": {
+      "value": 101.6,
+      "raw": "4 in"
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +48,39 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.17.14, Teil C, Seite 118 von 142, PDF p. 118",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.1, Teil C, Seite 116 von 142, PDF p. 116",
+        "fields": ["rules.actions", "rules.maxBarrelLength"],
+        "note": "The barrel limit is given for revolvers."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.2, Teil C, Seite 116 von 142, PDF p. 116",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.3, Teil C, Seite 116 von 142, PDF p. 116",
+        "fields": ["rules.sights"],
+        "note": "The optical-sight class is scored separately."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.8, Teil C, Seite 117 von 142, PDF p. 117",
+        "fields": ["rules.sighters", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.14, Teil C, Seite 118 bis 121 von 142, PDF pp. 118 to 121",
+        "fields": ["rules.positions", "rules.supports", "rules.seriesShots"],
+        "note": "A post supports the shooter, the firearm may not touch it. Five shots per magazine."
       }
     ],
     "note": "Pistols in 9 mm Luger and revolvers in .38 Special or .357 Magnum. EPP Production (C.17.B, Teil C, PDF p. 129) is the same course for unchanged service pistols of the DP 1 list, EPP Optical Sight (C.17.19, Teil C, PDF p. 122) is scored separately. Seven stations at 7 to 30 m, the record holds the longest distance."

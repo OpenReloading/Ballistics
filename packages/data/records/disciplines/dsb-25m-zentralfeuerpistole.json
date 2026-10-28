@@ -14,6 +14,26 @@
     "ids": ["pistol-7-65", "revolver-32", "pistol-9mm", "revolver-357-38", "pistol-9x18"],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 153,
+      "raw": "15,3 cm"
+    },
+    "maxFirearmMass": {
+      "value": 1400
+    },
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,6 +47,37 @@
         "page": "2.20, Teil 2 Seite 20, PDF p. 156 and Pistolentabelle, Teil 2 Seite 23, PDF p. 159",
         "fields": ["caliberClasses"],
         "note": "The rule prints a calibre range of 7,62 to 9,65 mm."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 81, PDF p. 99 (row 2.45)",
+        "fields": ["rules.firearm", "rules.positions", "rules.sights", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1, Teil 2 Seite 1, PDF p. 137",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.20 (calibers 7.62 to 9.65 mm), Teil 2 Seite 20, PDF p. 156",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (row 2.45)",
+        "fields": ["rules.maxFirearmMass", "rules.minTriggerWeight", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.20.1, Teil 2 Seite 20, PDF p. 156",
+        "fields": ["rules.ammunition"],
+        "note": "Lead or an equally soft bullet material only; jacketed bullets, magnum and reinforced loads are not allowed."
       }
     ],
     "note": "The name prints Pistole. The rule admits revolvers and self-loading pistols."

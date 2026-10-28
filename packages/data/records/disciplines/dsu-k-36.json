@@ -28,6 +28,28 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["prone", "kneeling", "standing"],
+    "supports": ["freehand", "rest"],
+    "sights": ["open"],
+    "maxBarrelLength": {
+      "value": 212.7,
+      "raw": "8 3/8 in"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 360
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -51,6 +73,52 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Kurzbezeichnungen Kurzwaffen, Seite 1 (PDF p. 225)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seiten 21 bis 22, PDF pp. 53 to 54",
+        "fields": ["rules.firearm", "rules.positions"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Waffen und Ausrüstung, Seite 5 (PDF p. 37)",
+        "fields": ["rules.actions", "rules.sights"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Seiten 21 bis 22, PDF pp. 53 to 54",
+        "fields": ["rules.supports"],
+        "note": "Prone: the grip or the hands may rest on the ground."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Schießstellungen, Seite 4 (PDF p. 36)",
+        "fields": ["rules.supports"],
+        "note": "Prone: the grip or the hands may rest on the ground."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Waffen und Ausrüstung, Seite 5 (PDF p. 37)",
+        "fields": ["rules.maxBarrelLength"],
+        "note": "Rule for all short guns of the federation except the single-loading long-distance pistol; the minimum is 3 in (7.62 cm)."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Waffen und Ausrüstung, Seite 5 (PDF p. 37)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Kalibereinteilung, Seite 6 (PDF p. 38)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 2, Zeitwertungstabelle, Seite 23 (PDF p. 55)",
+        "fields": ["rules.timeLimits"],
+        "note": "Longest time of the age class 18 to 49; the senior classes have 390, 420 and 450 s."
       }
     ]
   }

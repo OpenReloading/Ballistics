@@ -9,6 +9,17 @@
     "raw": "5,60 mm"
   },
   "shotCount": 20,
+  "sighters": 5,
+  "seriesShots": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 300,
+        "raw": "5 min"
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +37,12 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
         "fields": ["gauge"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.19.3 (as 2.18.3), Teil 2 Seite 19, PDF p. 155; 2.18.2 and 2.18.3.1, Teil 2 Seite 17, PDF p. 153",
+        "fields": ["sighters", "seriesShots", "timeLimits"],
+        "note": "One practice series of five shots before the stage."
       }
     ]
   }

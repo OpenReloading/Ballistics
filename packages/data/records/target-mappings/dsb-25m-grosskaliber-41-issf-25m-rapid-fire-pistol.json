@@ -8,6 +8,15 @@
     "value": 11.58,
     "raw": "11,58 mm"
   },
+  "seriesShots": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 20
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -20,6 +29,11 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
         "fields": ["gauge"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 82, PDF p. 100 (row 2.57)",
+        "fields": ["seriesShots", "timeLimits"]
       }
     ]
   }

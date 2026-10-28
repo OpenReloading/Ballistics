@@ -5,6 +5,15 @@
   "event": "bdmp-sp3-sportpistole-3-prazision",
   "stage": "Präzision",
   "shotCount": 15,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 300,
+        "raw": "5 min"
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +31,11 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.13B.7, Teil C, Seite 82 von 142, PDF p. 82",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.7, Teil C, Seite 82 bis 83 von 142, PDF pp. 82 to 83",
+        "fields": ["timeLimits"]
       }
     ]
   }

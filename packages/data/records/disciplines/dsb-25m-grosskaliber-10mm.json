@@ -11,6 +11,16 @@
     "unit": "m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "maxBarrelLength": {
+      "value": 153,
+      "raw": "15,3 cm"
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -18,6 +28,22 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 82, PDF p. 100",
         "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 82, PDF p. 100 (row 2.56)",
+        "fields": ["rules.firearm", "rules.positions", "rules.sights", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.1.1 (2.50 to 2.59), Teil 2 Seite 2, PDF p. 138",
+        "fields": ["rules.supports"],
+        "note": "Two hands may hold the firearm."
       }
     ]
   }

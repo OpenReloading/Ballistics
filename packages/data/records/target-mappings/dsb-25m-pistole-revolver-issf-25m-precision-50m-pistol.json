@@ -5,6 +5,16 @@
   "event": "dsb-25-m-pistole-revolver-150-sek-serie",
   "stage": "150 Sek. Serie",
   "shotCount": 20,
+  "sighters": 5,
+  "seriesShots": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 150
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -17,6 +27,12 @@
         "source": "dsb-sportordnung-2027",
         "page": "2.21.2, Teil 2 Seite 21, PDF p. 157 (four series of five shots on the precision face)",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.21.2, Teil 2 Seite 21, PDF p. 157",
+        "fields": ["sighters", "seriesShots", "timeLimits"],
+        "note": "One practice series of five shots before the first scored series."
       }
     ]
   }

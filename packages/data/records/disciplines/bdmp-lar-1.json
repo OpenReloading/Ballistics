@@ -11,6 +11,30 @@
     "unit": "m"
   },
   "category": "lever-action",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["lever-action"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand", "rest"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1200,
+          "raw": "20 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +47,54 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.15.13, Teil D, Seite 88 von 294, PDF p. 88",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.1, Teil D, Seite 87 von 294, PDF p. 87",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.2, Teil D, Seite 87 von 294, PDF p. 87",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.5, D.15.19, Teil D, Seite 87 bis 90 von 294, PDF pp. 87 to 90",
+        "fields": ["rules.sights"],
+        "note": "Open sights; the modified class (D.15.19) allows aperture sights."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.6, Teil D, Seite 87 bis 88 von 294, PDF pp. 87 to 88",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.4, D.15.8, D.15.16, Teil D, Seite 87 bis 89 von 294, PDF pp. 87 to 89",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Prone freehand, no sling; the two-position variant adds standing or kneeling."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.9, Teil D, Seite 88 von 294, PDF p. 88",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.15.10, Teil D, Seite 88 von 294, PDF p. 88",
+        "fields": ["rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Sitting rested is an alternative to prone and is scored in its own class."
       }
     ],
     "note": "D.15.19 (Teil D, PDF p. 90) allows the discipline with aperture or hole sights, period-correct, instead of open sights. The variant (mod.) has the distance, programme and face of this record and no record of its own."

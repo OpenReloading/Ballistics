@@ -11,6 +11,22 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic", "repeater", "single-shot"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxMagnification": {
+      "value": 10
+    },
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "ammunition": {
+      "handloads": true
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,8 +39,38 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.11.13, Teil D, Seite 68 von 294, PDF p. 68",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.16, Teil D, Seite 70 von 294, PDF p. 70",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.2, D.11.4, D.11.5, Teil D, Seite 67 von 294, PDF p. 67",
+        "fields": [
+          "rules.minTriggerWeight",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.ammunition"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.11.7, Teil D, Seite 68 von 294, PDF p. 68",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions"]
       }
     ],
-    "note": "Sniper rifles of an army, police or customs introduced at any date, with a bipod allowed; split into ZG 1 mod. B1 (before 1 January 1965) and B2 (after) where needed. D.11.16 restates no distance, the record takes the 100 m of ZG 1 (D.11.13)."
+    "note": "Sniper rifles of an army, police or customs introduced at any date, with a bipod allowed; split into ZG 1 mod. B1 (before 1 January 1965) and B2 (after) where needed. D.11.16 restates no distance, the record takes the 100 m of ZG 1 (D.11.13). Only the weapon rule deviates from ZG 1 (D.11.16); the other rules are read from ZG 1. Sighters and times are not set because the target plan differs."
   }
 }

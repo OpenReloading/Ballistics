@@ -15,6 +15,30 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic", "repeater", "single-shot"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxFirearmMass": {
+      "value": 8500
+    },
+    "ammunition": {
+      "handloads": false
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,7 +51,28 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.13A.13, Teil D, Seite 77 von 294, PDF p. 77",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13A.1, D.13A.4, D.13A.5, Teil D, Seite 76 von 294, PDF p. 76",
+        "fields": ["rules.actions", "rules.sights", "rules.maxFirearmMass", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13A.7, Teil D, Seite 76 bis 77 von 294, PDF pp. 76 to 77",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13A.9, D.13A.10, Teil D, Seite 77 von 294, PDF p. 77",
+        "fields": ["rules.sighters", "rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "Only commercial ammunition is allowed, read as no handloads. The organiser announces prone or sitting with a rest. Any magnification is allowed, so no limit is set."
   }
 }

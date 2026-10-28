@@ -15,6 +15,25 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["prone", "kneeling", "standing"],
+    "supports": ["freehand", "sling"],
+    "sights": ["optical", "reflex"],
+    "ammunition": {
+      "handloads": true
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 420,
+          "raw": "7 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -32,6 +51,29 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 3 (PDF p. 229)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 37 bis 38, PDF pp. 95 to 96",
+        "fields": ["rules.firearm", "rules.actions", "rules.positions", "rules.timeLimits"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 37 bis 38, PDF pp. 95 to 96",
+        "fields": ["rules.supports"],
+        "note": "The carrying sling may serve as shooting sling in the prone position only."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 37 bis 38, PDF pp. 95 to 96",
+        "fields": ["rules.sights"],
+        "note": "Telescopic sight or dot."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
       }
     ]
   }

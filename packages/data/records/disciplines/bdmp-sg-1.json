@@ -25,6 +25,34 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["aperture"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxBarrelLength": {
+      "value": 762,
+      "raw": "30 in"
+    },
+    "maxFirearmMass": {
+      "value": 6500
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3300,
+          "raw": "55 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,8 +70,43 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.2.15, Teil D, Seite 13 von 294, PDF p. 13",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.1, D.2.2, D.2.3, Teil D, Seite 11 von 294, PDF p. 11",
+        "fields": [
+          "rules.actions",
+          "rules.minTriggerWeight",
+          "rules.maxBarrelLength",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.6, Teil D, Seite 12 von 294, PDF p. 12",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.10, Teil D, Seite 12 von 294, PDF p. 12",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.11, Teil D, Seite 12 von 294, PDF p. 12",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.2.12, Teil D, Seite 13 von 294, PDF p. 13",
+        "fields": ["rules.timeLimits"]
       }
     ],
-    "note": "The book prints Kaliber bis 8 mm."
+    "note": "The book prints Kaliber bis 8 mm. Repeaters are shot as single loaders. Sitting with a rest is an alternative position scored in a separate class (D.1.3.5). One optical aid up to 1.5x magnification may sit in the aperture or the front-sight tunnel (D.2.8, D.3.8)."
   }
 }

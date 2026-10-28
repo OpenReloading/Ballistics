@@ -11,6 +11,33 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater", "single-shot", "semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxFirearmMass": {
+      "value": 8250
+    },
+    "ammunition": {
+      "handloads": true,
+      "minMuzzleEnergy": {
+        "value": 2800
+      }
+    },
+    "sighters": 0,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,7 +50,38 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.33.13, Teil D, Seite 272 von 294, PDF p. 272",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.1, Teil D, Seite 270 von 294, PDF p. 270",
+        "fields": ["rules.actions", "rules.maxFirearmMass", "rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.6, Teil D, Seite 270 von 294, PDF p. 270",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.7, Teil D, Seite 271 von 294, PDF p. 271",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.9, Teil D, Seite 271 von 294, PDF p. 271",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.33.10, Teil D, Seite 271 von 294, PDF p. 271",
+        "fields": ["rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "The energy minimum is measured at 5 m. Any magnification and trigger weight are allowed. A bipod is required. The 10 min cover the scored shots of this distance. Sighters are limited to 3 on 300 m."
   }
 }

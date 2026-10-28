@@ -14,6 +14,16 @@
     "ids": ["air-4-5"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 500
+    },
+    "maxFirearmMass": {
+      "value": 1500
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -31,6 +41,21 @@
         "source": "dsb-sportordnung-2027",
         "page": "2.11 to 2.14, Teil 2 Seite 12 to 14, PDF pp. 148 to 150",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 80, PDF p. 98 (rows 2.10, 2.11, 2.17 and 2.18, columns Waffenart and Visierung)",
+        "fields": ["rules.firearm", "rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Pistolentabelle, Teil 2 Seite 23, PDF p. 159 (rows 2.10, 2.16, 2.17, 2.18); Wettbewerbstabelle Auflagewettbewerbe, Teil 9 Seite 8, PDF p. 418 (row 2.11)",
+        "fields": ["rules.maxFirearmMass", "rules.minTriggerWeight"]
       }
     ],
     "note": "Row 2.17 prints Scheibe Nr. 7/8: its rapid-fire part is dsb-10m-pistole-schnellfeuerteil."

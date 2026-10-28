@@ -11,6 +11,9 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +26,11 @@
         "source": "dsb-sportordnung-2027",
         "page": "Teil 0 Seite 77 to 79, PDF pp. 95 to 97 (rows 1.40, 1.41, 1.42, 1.43, 1.45, 1.60, 1.80 and 1.85, the 50 m .22 rifle disciplines on Scheibe Nr. 3)",
         "fields": ["number", "section", "page", "distance"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 77 to 79, PDF pp. 95 to 97 (rows 1.40, 1.41, 1.42, 1.43, 1.45, 1.60, 1.80 and 1.85, column Waffenart)",
+        "fields": ["rules.firearm"]
       }
     ]
   }

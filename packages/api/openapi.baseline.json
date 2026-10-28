@@ -1571,6 +1571,7 @@
                               "pressure",
                               "energy",
                               "velocity",
+                              "time",
                               "angle",
                               "temperature",
                               "absoluteTemperature",
@@ -2794,9 +2795,13 @@
                           "type": "string",
                           "minLength": 1,
                           "description": "The value as written in the source, when it differed."
+                        },
+                        "unit": {
+                          "type": "string",
+                          "enum": ["m", "yd", "m/yd"]
                         }
                       },
-                      "required": ["value"],
+                      "required": ["value", "unit"],
                       "additionalProperties": false,
                       "unit": "mm"
                     },
@@ -2838,6 +2843,257 @@
                     "internationalDiscipline": {
                       "type": "string",
                       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "rules": {
+                      "type": "object",
+                      "properties": {
+                        "firearm": {
+                          "type": "string",
+                          "enum": ["short-gun", "long-gun"]
+                        },
+                        "actions": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "single-shot",
+                              "repeater",
+                              "semi-automatic",
+                              "revolver",
+                              "lever-action"
+                            ]
+                          }
+                        },
+                        "positions": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": ["standing", "kneeling", "sitting", "prone"]
+                          }
+                        },
+                        "supports": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": ["freehand", "sling", "rest"]
+                          }
+                        },
+                        "sights": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": ["original", "open", "aperture", "optical", "reflex"]
+                          }
+                        },
+                        "maxMagnification": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In 1."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "1"
+                        },
+                        "minTriggerWeight": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In g."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "g"
+                        },
+                        "maxBarrelLength": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm"
+                        },
+                        "maxFirearmMass": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In g."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "g"
+                        },
+                        "ammunition": {
+                          "type": "object",
+                          "properties": {
+                            "handloads": {
+                              "type": "boolean"
+                            },
+                            "minMuzzleEnergy": {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0,
+                                  "description": "In J."
+                                },
+                                "raw": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "The value as written in the source, when it differed."
+                                }
+                              },
+                              "required": ["value"],
+                              "additionalProperties": false,
+                              "unit": "J"
+                            },
+                            "minBulletMass": {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0,
+                                  "description": "In g."
+                                },
+                                "raw": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "The value as written in the source, when it differed."
+                                }
+                              },
+                              "required": ["value"],
+                              "additionalProperties": false,
+                              "unit": "g"
+                            },
+                            "maxBulletMass": {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0,
+                                  "description": "In g."
+                                },
+                                "raw": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "description": "The value as written in the source, when it differed."
+                                }
+                              },
+                              "required": ["value"],
+                              "additionalProperties": false,
+                              "unit": "g"
+                            },
+                            "bulletTypes": {
+                              "minItems": 1,
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": [
+                                  "lead",
+                                  "jacketed",
+                                  "full-metal-jacket",
+                                  "hollow-point",
+                                  "wadcutter"
+                                ]
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "sighters": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            },
+                            {
+                              "type": "string",
+                              "const": "unlimited"
+                            }
+                          ]
+                        },
+                        "seriesShots": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "timeLimits": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "duration": {
+                                "type": "object",
+                                "properties": {
+                                  "value": {
+                                    "type": "number",
+                                    "exclusiveMinimum": 0,
+                                    "description": "In s."
+                                  },
+                                  "raw": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "The value as written in the source, when it differed."
+                                  }
+                                },
+                                "required": ["value"],
+                                "additionalProperties": false,
+                                "unit": "s"
+                              },
+                              "covers": {
+                                "type": "string",
+                                "enum": ["discipline", "stage", "series", "shot"]
+                              },
+                              "includesSighters": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["duration", "covers"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "additionalProperties": false
                     },
                     "provenance": {
                       "type": "object",
@@ -5307,6 +5563,26 @@
                                 "minimum": -9007199254740991,
                                 "maximum": 9007199254740991,
                                 "description": "Planned rows: entries plus the chronograph"
+                              },
+                              "refusals": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string",
+                                      "enum": ["single-range", "velocity-only"],
+                                      "description": "Fixed identifier of the refusal"
+                                    },
+                                    "advice": {
+                                      "type": "string",
+                                      "description": "What to add to the planned string"
+                                    }
+                                  },
+                                  "required": ["id", "advice"],
+                                  "additionalProperties": {}
+                                },
+                                "description": "Structural refusals of the planned string, empty when it passes"
                               }
                             },
                             "required": [
@@ -5314,7 +5590,8 @@
                               "conditionNumber",
                               "confounded",
                               "correlation",
-                              "observationCount"
+                              "observationCount",
+                              "refusals"
                             ],
                             "additionalProperties": {},
                             "description": "Statuses, standard errors and predicted intervals"
@@ -18205,6 +18482,7 @@
                                                   "pressure",
                                                   "energy",
                                                   "velocity",
+                                                  "time",
                                                   "angle",
                                                   "temperature",
                                                   "absoluteTemperature",
@@ -24730,6 +25008,60 @@
                       "type": "integer",
                       "exclusiveMinimum": 0,
                       "maximum": 9007199254740991
+                    },
+                    "sighters": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "string",
+                          "const": "unlimited"
+                        }
+                      ]
+                    },
+                    "seriesShots": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "timeLimits": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "duration": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number",
+                                "exclusiveMinimum": 0,
+                                "description": "In s."
+                              },
+                              "raw": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "The value as written in the source, when it differed."
+                              }
+                            },
+                            "required": ["value"],
+                            "additionalProperties": false,
+                            "unit": "s"
+                          },
+                          "covers": {
+                            "type": "string",
+                            "enum": ["discipline", "stage", "series", "shot"]
+                          },
+                          "includesSighters": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["duration", "covers"],
+                        "additionalProperties": false
+                      }
                     },
                     "provenance": {
                       "type": "object",

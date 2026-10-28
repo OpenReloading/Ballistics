@@ -15,6 +15,28 @@
     "ids": ["rifle-6-5", "rifle-270", "rifle-7mm", "rifle-30", "rifle-30-carbine", "rifle-8mm"],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["sitting"],
+    "supports": ["rest", "sling"],
+    "sights": ["original"],
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 3,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -33,6 +55,42 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 12, PDF p. 70",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.sights",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 12, PDF p. 70",
+        "fields": ["rules.supports"],
+        "note": "Forend on a rest; the original rifle sling may be used as shooting sling."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Klasseneinteilung der Sportwaffen, Seite 7 (PDF p. 65)",
+        "fields": ["rules.supports"],
+        "note": "Forend on a rest; the original rifle sling may be used as shooting sling."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Schießarten, Probeschüsse, Seite 4 (PDF p. 62)",
+        "fields": ["rules.sighters"],
+        "note": "At most 3 sighting shots, fired at a target marked for them, before the first scoring shot."
       }
     ]
   }
