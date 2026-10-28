@@ -6,7 +6,7 @@
  * carry the record's own title, description, Open Graph and Twitter tags, with the values of its data
  * file: its HTML holds nothing else of the record, the browser renders the rest.
  *
- *   node scripts/check-prerender.mts [<export folder>]
+ *   node scripts/check-prerender.mts
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
@@ -123,13 +123,7 @@ export function checkPages(site: string, env: Record<string, string | undefined>
 }
 
 if (import.meta.main) {
-  const root = path.resolve(import.meta.dirname, '../../..')
-  const site = path.resolve(root, process.argv[2] ?? 'pages')
-  const inside = path.relative(root, site)
-  if (inside.startsWith('..') || path.isAbsolute(inside)) {
-    console.error(`the export folder must be inside the repository: ${site}`)
-    process.exit(2)
-  }
+  const site = path.resolve(import.meta.dirname, '../../../pages')
   const { expected, missing, noHead } = checkPages(site)
   if (missing.length > 0) {
     console.error(
