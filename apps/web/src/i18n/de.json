@@ -558,7 +558,6 @@
   "Gun and barrel": "Waffe und Lauf",
   "Gun weight": "Waffengewicht",
   "Gyroscopic stability (Miller): {value}": "Drallstabilität (Miller): {value}",
-  "Gyroscopic stability falls below {limit} from {range} ({value} there, Miller's rule with the speed and air along the flight). Check the twist.": "Die Drallstabilität fällt ab {range} unter {limit} (dort {value}, Millers Regel mit der Geschwindigkeit und der Luft entlang des Flugs). Prüfen Sie den Drall.",
   "hard bolt lift": "schwergängiges Öffnen des Verschlusses",
   "HTTP {status}": "HTTP {status}",
   "Half section of the cartridge; no bullet seated.": "Halbschnitt der Patrone; kein Geschoss gesetzt.",

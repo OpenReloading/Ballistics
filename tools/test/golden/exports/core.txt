@@ -179,7 +179,6 @@
 . SimilarPowder
 . SimilarPowdersPrior
 . SkippedInput
-. StabilityPoint
 . StartPressureDefault
 . StepBudget
 . TargetMotion
@@ -264,7 +263,6 @@
 . estimateDragFromOutline
 . fQuantileTwoNumeratorDegrees
 . fillLoadRatioLimit
-. firstLowStability
 . fitPowder
 . fitPowderSessions
 . fitPressureCurve
@@ -304,7 +302,6 @@
 . millerStability
 . minAltitude
 . minIntervalScale
-. minStability
 . missingLoadKeys
 . momentSlopeFromStability
 . movingTargetLead

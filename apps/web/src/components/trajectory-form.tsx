@@ -15,7 +15,6 @@ import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
 import {
   type DragModel,
   dragModels,
-  minStability,
   type OmittedEffect,
   type Trajectory,
 } from '@open-reloading/core'
@@ -398,18 +397,6 @@ function ResultNotes({ result, system }: { result: Result; system: UnitSystem })
           {t('Gyroscopic stability (Miller): {value}', {
             value: formatNumber(flight.stability, 2),
           })}
-        </li>
-      )}
-      {flight.stability !== undefined && result.lowStability && (
-        <li className="exceeded">
-          {t(
-            "Gyroscopic stability falls below {limit} from {range} ({value} there, Miller's rule with the speed and air along the flight). Check the twist.",
-            {
-              limit: formatNumber(minStability, 1),
-              range: withUnit('range', system, result.lowStability.range),
-              value: formatNumber(result.lowStability.stability, 2),
-            },
-          )}
         </li>
       )}
       {transonic && (
