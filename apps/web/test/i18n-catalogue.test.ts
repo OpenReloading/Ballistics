@@ -95,6 +95,7 @@ describe.each(catalogues)('catalogue %s', (code) => {
 const otherSense: Record<string, string> = {
   'Bullet position': 'where the bullet is in the barrel, not a shooting position',
   'Case fill': 'the load ratio, whose verified term (Ladedichte) names no case',
+  'single shot': 'a firearm action that is loaded by hand for each shot (Einzellader)',
   'Powder temperature': 'the compound Pulvertemperatur, the usual word, in a label of one line',
   'The band is the 5th to 95th percentile of {samples} draws (seed {seed}, {failed} left the model) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
     'corner case: an extreme combination of inputs',

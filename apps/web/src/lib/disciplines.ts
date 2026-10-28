@@ -10,7 +10,7 @@ import {
   toSi,
 } from '@open-reloading/schema'
 import { plainNumber } from '../i18n/number.ts'
-import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
+import { english, type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { DirectoryState } from './directory.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
 import { categoryWord } from './face-words.ts'
@@ -19,6 +19,7 @@ import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type FieldRow, type StripItem, titleFromKebab } from './record-fields.ts'
 import type { Quantity } from './units.ts'
+import { say, verbatim, type Wording, worded } from './wording.ts'
 
 /** A discipline record as the API answers it: its sources resolved. */
 export type DisciplineRecord = Omit<Discipline, 'provenance'> & { provenance: Provenance }
@@ -228,22 +229,63 @@ const quantityRow = (
       ]
     : []
 
+// the stored values of the rule facts, as words of a list
+const ruleWords: Readonly<Record<string, Message>> = {
+  'single-shot': msg('single shot'),
+  repeater: msg('repeater'),
+  'semi-automatic': msg('semi automatic'),
+  revolver: msg('revolver'),
+  'lever-action': msg('lever action'),
+  standing: msg('standing'),
+  kneeling: msg('kneeling'),
+  sitting: msg('sitting'),
+  prone: msg('prone'),
+  freehand: msg('freehand'),
+  sling: msg('sling'),
+  rest: msg('rest'),
+  original: msg('original'),
+  open: msg('open'),
+  aperture: msg('aperture'),
+  optical: msg('optical'),
+  reflex: msg('reflex'),
+  lead: msg('lead'),
+  jacketed: msg('jacketed'),
+  'full-metal-jacket': msg('full metal jacket'),
+  'hollow-point': msg('hollow point'),
+  wadcutter: msg('wadcutter'),
+}
+
+const firearmWords: Readonly<Record<string, Message>> = {
+  'short-gun': msg('Short gun'),
+  'long-gun': msg('Long gun'),
+}
+
+const spacedText = (v: string) => titleFromKebab(v).toLowerCase()
+
 const list = (label: Message, values: readonly string[] | undefined): FieldRow[] =>
-  values ? [{ label, text: values.map((v) => titleFromKebab(v).toLowerCase()).join(', ') }] : []
+  values
+    ? [
+        {
+          label,
+          text: values.map(spacedText).join(', '),
+          words: values.map((v) => ruleWords[v] ?? verbatim(spacedText(v))),
+        },
+      ]
+    : []
 
 /** A duration in seconds as minutes where it is whole minutes. */
-const durationText = (seconds: number) =>
-  seconds % 60 === 0 ? `${seconds / 60} min` : `${seconds} s`
+const duration = (seconds: number) =>
+  seconds % 60 === 0 ? { n: seconds / 60, unit: 'min' } : { n: seconds, unit: 's' }
 
-const sightersText = (included: boolean | undefined) =>
-  included === undefined ? '' : included ? ', sighters included' : ', sighters not included'
-
-const coverText = {
-  discipline: 'for the discipline',
-  stage: 'per stage',
-  series: 'per series',
-  shot: 'per shot',
+const coverWords = {
+  discipline: msg('{n} {unit} for the discipline'),
+  stage: msg('{n} {unit} per stage'),
+  series: msg('{n} {unit} per series'),
+  shot: msg('{n} {unit} per shot'),
 }
+
+const sighterWords = (included: boolean | undefined): Wording[] =>
+  included === undefined ? [] : [included ? msg('sighters included') : msg('sighters not included')]
 
 /** The sighters, series size and time limits of a discipline or a stage as rows. */
 export function courseRows(
@@ -253,21 +295,26 @@ export function courseRows(
     ...(c.sighters === undefined
       ? []
       : [
-          {
-            label: msg('Sighters'),
-            text: c.sighters === 'unlimited' ? 'Any number' : String(c.sighters),
-            numeric: true,
-          },
+          c.sighters === 'unlimited'
+            ? { label: msg('Sighters'), text: 'Any number', words: [msg('Any number')] }
+            : { label: msg('Sighters'), text: String(c.sighters), numeric: true },
         ]),
     ...(c.seriesShots === undefined
       ? []
       : [{ label: msg('Shots per series'), text: String(c.seriesShots), numeric: true }]),
-    ...(c.timeLimits ?? []).map((t) => ({
-      label: msg('Time limit'),
-      text: `${durationText(t.duration.value)} ${coverText[t.covers]}${sightersText(t.includesSighters)}`,
-      numeric: true,
-      ...(t.duration.raw && { printed: t.duration.raw }),
-    })),
+    ...(c.timeLimits ?? []).map((t) => {
+      const words = [
+        worded(coverWords[t.covers], duration(t.duration.value)),
+        ...sighterWords(t.includesSighters),
+      ]
+      return {
+        label: msg('Time limit'),
+        text: words.map((w) => say(english.t, w)).join(', '),
+        words,
+        numeric: true,
+        ...(t.duration.raw && { printed: t.duration.raw }),
+      }
+    }),
   ]
 }
 
@@ -276,7 +323,15 @@ export function ruleRows(r: DisciplineRules | undefined): FieldRow[] {
   if (!r) return []
   const a = r.ammunition
   return [
-    ...(r.firearm ? [{ label: msg('Firearm'), text: titleFromKebab(r.firearm) }] : []),
+    ...(r.firearm
+      ? [
+          {
+            label: msg('Firearm'),
+            text: titleFromKebab(r.firearm),
+            words: [firearmWords[r.firearm] ?? verbatim(titleFromKebab(r.firearm))],
+          },
+        ]
+      : []),
     ...list(msg('Actions'), r.actions),
     ...list(msg('Positions'), r.positions),
     ...list(msg('Support'), r.supports),
@@ -289,7 +344,13 @@ export function ruleRows(r: DisciplineRules | undefined): FieldRow[] {
     ...quantityRow(msg('Firearm mass up to'), 'firearmMass', 'mass', r.maxFirearmMass),
     ...(a?.handloads === undefined
       ? []
-      : [{ label: msg('Handloads'), text: a.handloads ? 'Allowed' : 'Not allowed' }]),
+      : [
+          {
+            label: msg('Handloads'),
+            text: a.handloads ? 'Allowed' : 'Not allowed',
+            words: [a.handloads ? msg('Allowed') : msg('Not allowed')],
+          },
+        ]),
     ...quantityRow(msg('Muzzle energy from'), 'energy', 'energy', a?.minMuzzleEnergy),
     ...quantityRow(msg('Bullet mass from'), 'mass', 'mass', a?.minBulletMass),
     ...quantityRow(msg('Bullet mass up to'), 'mass', 'mass', a?.maxBulletMass),

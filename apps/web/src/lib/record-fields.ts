@@ -81,7 +81,7 @@ const unitOf = (row: FieldRow, system: UnitSystem, t: Translate) =>
       : (row.unit ?? '')
 
 /** A row's text part in the language of `t`. */
-const textOf = (row: FieldRow, t: Translate) =>
+export const rowText = (row: FieldRow, t: Translate) =>
   row.words
     ? row.words.map((w) => say(t, w)).join(', ')
     : row.numeric
@@ -91,7 +91,7 @@ const textOf = (row: FieldRow, t: Translate) =>
 /** A row's value as shown in `system`: rounded to the unit's decimals, with its symbol. */
 export function rowValue(row: FieldRow, system: UnitSystem, t: Translate = english): string {
   if (!row.value) {
-    const text = textOf(row, t)
+    const text = rowText(row, t)
     const unit = unitOf(row, system, t)
     return unit ? `${text} ${unit}` : (text ?? '')
   }

@@ -27,6 +27,7 @@ import {
   ruleRows,
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
+import { rowText } from '../src/lib/record-fields.ts'
 import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
@@ -240,6 +241,17 @@ it('shows the rule facts a record states, converted where the unit differs, and 
     si: 1.5,
   })
   expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
+  const german = translator(de, 'de').t
+  const words = (label: string) =>
+    rows.filter((r) => r.label === label).map((r) => rowText(r, german))
+  expect(words('Firearm')).toEqual(['Langwaffe'])
+  expect(words('Support')).toEqual(['freihändig, mit Riemen'])
+  expect(words('Handloads')).toEqual(['Nicht erlaubt'])
+  expect(words('Time limit')).toEqual([
+    '30 min für die Disziplin, Probeschüsse eingeschlossen',
+    '90 s für jede der Serien',
+    '0,5 s je Schuss, Probeschüsse nicht eingeschlossen',
+  ])
 })
 
 it('also searches the category and the country as the language shown writes them', () => {
