@@ -85,6 +85,18 @@ Code: `packages/core/src/exterior/stability.ts`, `aerodynamicJump` (`perMph`, `j
 
 The upper sign holds for right-hand twist: wind from the left lowers the shot, wind from the right raises it. Left-hand twist mirrors this. The [point-mass trajectory](exterior-point-mass.md#outputs-per-point) adds $s\tan\delta_J$ to the height.
 
+### Stability from the geometry alone
+
+With the outline of the bullet, the overturning-moment slope is estimated from the volume $V$, the distance $z_\mathrm{cm}$ of the centre of mass from the base and the base area $A_B$ (source of the expression unverified):
+
+$$
+C_{M\alpha}' = \frac{8 \left[ V - z_\mathrm{cm} A_B \right]}{\pi d^3}
+$$
+
+Code: `packages/core/src/exterior/outline-inertia.ts`, `outlineInertia` (`momentSlope`), `packages/core/src/exterior/modified.ts`, `gyroscopicStability`.
+
+With the inertias of the [outline](exterior-modified-point-mass.md) and $p = 2 \pi V / T_w$ in the stability factor of linear theory, the muzzle factor does not depend on the muzzle velocity. Over twelve rifle outlines it is 0.65 to 0.76 of Miller's factor ([research entry](../research/bullet-inertia-from-outline.md)): a lower estimate, an estimate from an assumed uniform density, and not a statement about a particular bullet or barrel.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |

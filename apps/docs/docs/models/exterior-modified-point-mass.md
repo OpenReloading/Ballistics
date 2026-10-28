@@ -73,6 +73,18 @@ $$
 
 Code: `packages/core/src/exterior/modified.ts`, `cylinderInertia`, `packages/core/src/exterior/trajectory.ts`, `estimateInertias`.
 
+### Moments of inertia from the outline
+
+With the outline of the bullet (diameter, length, nose length, $R_t/R$, boat-tail length, base and meplat diameter, the shape of [outline drag](exterior-outline-drag.md)) and its mass, the moments of a body of revolution of uniform density follow from the profile $r(z)$ measured from the base:
+
+$$
+V = \pi \int r^2 dz, \qquad I_x = \frac{\pi \rho}{2} \int r^4 dz, \qquad I_y = \rho \int \left( \frac{\pi r^4}{4} + \pi r^2 (z - z_\mathrm{cm})^2 \right) dz, \qquad \rho = \frac{m}{V}
+$$
+
+Code: `packages/core/src/exterior/outline-inertia.ts`, `outlineInertia`.
+
+with $z_\mathrm{cm} = \pi \int r^2 z \, dz / V$. The split of density between jacket and core is not known from the outline, so the result is an estimate. [Research entry](../research/bullet-inertia-from-outline.md): on the 168 grain demo outline both moments fall below the cylinder, by 14 and 33 percent.
+
 ### Gyroscopic stability and the overturning-moment estimate
 
 The gyroscopic stability factor of linear theory:
