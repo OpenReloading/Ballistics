@@ -58,8 +58,6 @@ const parameterNames = [
   'temperatureFactor',
 ] as const
 
-const parameterRule = `parameters: ${parameterNames.join(', ')}, each at most once`
-
 /**
  * Parameter of the fit: the burn coefficient (or vivacity, by the load's burn kind), the start
  * pressure, Pa, the factor that multiplies the chamber volume (1 leaves it as given), the specific
@@ -462,7 +460,7 @@ function powderParameterMap(
   ])
   const setters = parameters.map((name) => {
     const setter = set.get(name)
-    if (!setter) throw new InputError(parameterRule)
+    if (!setter) throw new InputError(`parameters: ${parameterNames.join(', ')}, each at most once`)
     return setter
   })
   const apply = (values: number[]): InteriorLoad =>
@@ -491,7 +489,7 @@ function checkParameters(
     parameters.length > 0 &&
       new Set(parameters).size === parameters.length &&
       parameters.every((p) => parameterNames.includes(p)),
-    parameterRule,
+    `parameters: ${parameterNames.join(', ')}, each at most once`,
   )
   const sensitivity = load.propellant.temperatureSensitivity
   need(
