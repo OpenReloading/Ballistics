@@ -111,6 +111,10 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
     },
     dataHash: () =>
       (dataHash ??= (async () =>
-        sha256(canonicalJson({ records: load(), renames: index.renames })))()),
+        sha256(canonicalJson({ records: load(), renames: index.renames })))().catch((error) => {
+        // a failed read is not kept: the next call tries again
+        dataHash = undefined
+        throw error
+      })),
   }
 }

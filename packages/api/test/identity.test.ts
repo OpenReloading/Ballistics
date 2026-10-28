@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { buildCatalogue } from '../src/catalogue/build.ts'
+import { openCatalogue } from '../src/catalogue/open.ts'
 import { chargeTargetExample } from '../src/compute/charge-schema.ts'
 import { trajectoryExample } from '../src/compute/exterior-schema.ts'
 import { interiorExample } from '../src/compute/interior-schema.ts'
@@ -122,5 +124,20 @@ describe('Catalogue.dataHash', () => {
       powders: [{ ...first, name: `${first?.name} x` }, ...rest],
     } as typeof bundle
     expect(await hash(changed)).not.toBe(base)
+  })
+
+  it('tries again after a failed read of the record file', async () => {
+    const data = buildCatalogue(bundle)
+    let fail = true
+    const catalogue = openCatalogue({
+      index: data.index,
+      records: () => {
+        if (fail) throw new Error('read failed')
+        return data.records
+      },
+    })
+    await expect(catalogue.dataHash()).rejects.toThrow('read failed')
+    fail = false
+    expect(await catalogue.dataHash()).toBe(await testCatalogue(bundle).dataHash())
   })
 })
