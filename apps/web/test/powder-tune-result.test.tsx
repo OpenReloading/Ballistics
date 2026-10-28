@@ -8,7 +8,13 @@ import {
 } from '@open-reloading/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { reasonTexts, TuneNotes } from '../src/components/powder-tune.tsx'
+import {
+  reasonTexts,
+  refusalTexts,
+  TuneNotes,
+  TuneStrings,
+} from '../src/components/powder-tune.tsx'
+import { chargeRows } from '../src/lib/measurements.ts'
 import { nth } from '../src/lib/nth.ts'
 import type { PowderFitReply, PowderFitState } from '../src/lib/powder-fit.ts'
 import { answerPowderFit, handCurve, handLoad } from '../src/lib/powder-fit-answer.ts'
@@ -115,10 +121,12 @@ describe('hand tuning', () => {
     expect(curve.length).toBeGreaterThan(charges.length / 2)
     for (const { charge, velocity } of curve) {
       const fl = fitted.fit.load
+      const burn = fl.propellant.burn
+      if (burn.kind !== 'vivacity') throw new Error('vivacity burn law expected')
       const r = interior({
         ...fl,
         charge,
-        propellant: { ...fl.propellant, burn: { ...fl.propellant.burn, vivacity } },
+        propellant: { ...fl.propellant, burn: { ...burn, vivacity } },
       })
       if (!r.valid) throw new Error(r.reason)
       expect(velocity).toBe(r.muzzleVelocity)
@@ -141,5 +149,42 @@ describe('hand tuning', () => {
     expect(html).toContain('aria-valuenow="0"')
     expect(html).not.toContain('Hand-tuned')
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*Back to the fit/)
+  })
+})
+
+describe('refusals and rules on the screen', () => {
+  it.each(Object.keys(refusalTexts) as (keyof typeof refusalTexts)[])(
+    'says what to change for %s',
+    (reason) => {
+      const html = text({ failure: { kind: 'refused', id: 1, reason }, running: false })
+      expect(html).toContain(refusalTexts[reason])
+    },
+  )
+
+  it('offers the other values on a thin ladder', () => {
+    const html = text({ fit: { ...fitted, rule: 'thin' }, running: false })
+    expect(html).toContain('Fewer than 3 charges, or charges less than 10 % apart')
+    expect(html).toContain('Try the other values anyway')
+    expect(html).not.toContain('they move together')
+  })
+
+  it('says why held values stay at their start values', () => {
+    const html = text({ fit: { ...fitted, rule: 'held' }, running: false })
+    expect(html).toContain('they move together. They stay at their start values')
+    expect(html).not.toContain('Try the other values anyway')
+  })
+
+  it('highlights the string whose charge the model cannot run', () => {
+    const rows = chargeRows(
+      [2.6e-3, 3.5e-3].map((charge) => ({ charge, shots: [{ velocity: { value: 800 } }] })),
+      [],
+    )
+    const html = renderToStaticMarkup(
+      <MantineProvider>
+        <TuneStrings rows={rows} fault={3.5e-3} />
+      </MantineProvider>,
+    )
+    expect(html.match(/class="string-fault"/g)).toHaveLength(1)
+    expect(html).toMatch(/class="string-fault".*Cannot run/)
   })
 })

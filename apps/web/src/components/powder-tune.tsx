@@ -4,6 +4,7 @@ import { Badge, Button, Group, Slider, Text, TextInput } from '@mantine/core'
 import type {
   InteriorLoad,
   PowderConfidenceReason,
+  PowderFitReason,
   PowderParameter,
   PowderPrediction,
 } from '@open-reloading/core'
@@ -59,6 +60,25 @@ export const reasonTexts: Record<PowderConfidenceReason, Marked> = {
   'input-refit-failed': msg('An input left out of the pressure range'),
 }
 
+/** Each refusal of `fitPowder` in plain words: the cause and one action. */
+export const refusalTexts: Record<PowderFitReason, Marked> = {
+  underdetermined: msg(
+    'There are fewer charges than values to fit. Add a string at another charge, or fit the burn coefficient alone.',
+  ),
+  unresolved: msg(
+    'These strings cannot tell one of the values apart from the burn coefficient. Widen the charge spread, add a measured pressure, or fit the burn coefficient alone.',
+  ),
+  'ill-conditioned': msg(
+    'The charges are too close to separate the values you asked for. Add a string at a charge well apart from the others, or add a measured pressure.',
+  ),
+  invalid: msg(
+    'The model cannot run one of the charges. Check the charge of the highlighted string against the case and the bullet.',
+  ),
+  'not-converged': msg(
+    'The fit did not settle. Start from the burn coefficient of a similar powder, or fit fewer values.',
+  ),
+}
+
 /** The name and quantity of each fitted parameter; a factor has no unit. */
 const parameterNames: Record<PowderParameter, { name: Marked; quantity?: Quantity }> = {
   burnRate: { name: msg('Vivacity'), quantity: 'vivacity' },
@@ -88,7 +108,15 @@ const step = 0.05
  * The fit's result: fitted values with their intervals, the residual per string, the curve and
  * band with the band's numbers at both ends, then the pressure range's label and its reasons.
  */
-function FitResult({ state, rows }: { state: PowderFitState; rows: readonly ChargeRow[] }) {
+function FitResult({
+  state,
+  rows,
+  onAnyway,
+}: {
+  state: PowderFitState
+  rows: readonly ChargeRow[]
+  onAnyway: () => void
+}) {
   const { t } = useTranslation()
   const { system } = useUnits()
   const { fit, range, failure } = state
@@ -143,11 +171,28 @@ function FitResult({ state, rows }: { state: PowderFitState; rows: readonly Char
         {failure && (
           <Message severity="warning">
             {failure.kind === 'refused'
-              ? t('No fit: {reason}', { reason: translateMessage(failure.reason, t) })
+              ? t(refusalTexts[failure.reason])
               : translateMessage(failure.message, t)}
           </Message>
         )}
       </div>
+      {fit?.rule === 'thin' && (
+        <Message severity="warning">
+          {t(
+            'Fewer than 3 charges, or charges less than 10 % apart: only the burn coefficient is fitted, the other values stay at those of the similar powder.',
+          )}{' '}
+          <Button variant="default" size="compact-sm" onClick={onAnyway}>
+            {t('Try the other values anyway')}
+          </Button>
+        </Message>
+      )}
+      {fit?.rule === 'held' && (
+        <Message severity="warning">
+          {t(
+            'These strings cannot tell the start pressure or the chamber volume from the burn coefficient: they move together. They stay at their start values and only the burn coefficient is fitted. Add a measured pressure to fit more.',
+          )}
+        </Message>
+      )}
       {range && range.confidence.reasons.length > 0 && (
         <ul className="fit-reasons" aria-label={t('Reasons for the label')}>
           {range.confidence.reasons.map((r) => (
@@ -287,6 +332,53 @@ function FitResult({ state, rows }: { state: PowderFitState; rows: readonly Char
   )
 }
 
+/** The strings per charge with mean, SD and shot count; `fault`, kg, marks the charge the model cannot run. */
+export function TuneStrings({
+  rows,
+  fault,
+}: {
+  rows: readonly ChargeRow[]
+  fault?: number | undefined
+}) {
+  const { t } = useTranslation()
+  const { system } = useUnits()
+  const c = system.charge
+  const v = system.velocity
+  const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
+  return (
+    <PanelTable
+      label={t('Strings per charge')}
+      caption={t('Strings per charge')}
+      columns={[
+        t('Charge ({unit})', { unit: c.symbol }),
+        t('Shots'),
+        t('Mean ({unit})', { unit: v.symbol }),
+        t('SD ({unit})', { unit: v.symbol }),
+      ]}
+    >
+      {rows.map((r) => (
+        <tr key={r.charge} className={r.charge === fault ? 'string-fault' : undefined}>
+          <td className="num">
+            {r.charge === fault && (
+              <Badge variant="light" color="orange" mr="xs">
+                {t('Cannot run')}
+              </Badge>
+            )}
+            {formatNumber(c.fromSi(r.charge), c.decimals)}
+          </td>
+          <td className="num">{r.velocityStats?.count ?? 0}</td>
+          <td className="num">{r.velocityStats ? speed(r.velocityStats.mean) : ''}</td>
+          <td className="num">
+            {r.velocityStats?.standardDeviation === undefined
+              ? ''
+              : speed(r.velocityStats.standardDeviation)}
+          </td>
+        </tr>
+      ))}
+    </PanelTable>
+  )
+}
+
 /**
  * What the screen says of the load the strings name: save it first, open it on the workbench when
  * no load was handed over, the strings of another load left out, and the fit once it runs.
@@ -296,12 +388,15 @@ export function TuneNotes({
   interior,
   fit,
   rows = [],
+  onAnyway = () => {},
 }: {
   loaded: ReturnType<typeof loadStrings> | undefined
   interior: InteriorLoad | undefined
   fit: PowderFitState
   /** The strings per charge, the measured points of the chart. */
   rows?: readonly ChargeRow[]
+  /** Asks for the values left out by the thin rule. */
+  onAnyway?: () => void
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -329,7 +424,7 @@ export function TuneNotes({
           })}
         </p>
       )}
-      {interior && <FitResult state={fit} rows={rows} />}
+      {interior && <FitResult state={fit} rows={rows} onAnyway={onAnyway} />}
     </>
   )
 }
@@ -367,10 +462,10 @@ export function PowderTune() {
 
   const c = system.charge
   const v = system.velocity
-  const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
   const strings = useMemo(() => [...(loaded?.strings ?? []), ...added], [loaded, added])
   const rows = chargeRows(strings, [])
-  const fit = usePowderFit(interior, strings)
+  const [anyway, setAnyway] = useState(false)
+  const fit = usePowderFit(interior, strings, anyway)
 
   function add() {
     const charge = parseNumber(form.charge, { min: 0 })
@@ -397,29 +492,10 @@ export function PowderTune() {
       />
       <div className="sheet powder-tune">
         {rows.length > 0 ? (
-          <PanelTable
-            label={t('Strings per charge')}
-            caption={t('Strings per charge')}
-            columns={[
-              t('Charge ({unit})', { unit: c.symbol }),
-              t('Shots'),
-              t('Mean ({unit})', { unit: v.symbol }),
-              t('SD ({unit})', { unit: v.symbol }),
-            ]}
-          >
-            {rows.map((r) => (
-              <tr key={r.charge}>
-                <td className="num">{formatNumber(c.fromSi(r.charge), c.decimals)}</td>
-                <td className="num">{r.velocityStats?.count ?? 0}</td>
-                <td className="num">{r.velocityStats ? speed(r.velocityStats.mean) : ''}</td>
-                <td className="num">
-                  {r.velocityStats?.standardDeviation === undefined
-                    ? ''
-                    : speed(r.velocityStats.standardDeviation)}
-                </td>
-              </tr>
-            ))}
-          </PanelTable>
+          <TuneStrings
+            rows={rows}
+            fault={fit.failure?.kind === 'refused' ? fit.failure.charge : undefined}
+          />
         ) : (
           <p className="prompt empty-state">
             {t(
@@ -427,7 +503,13 @@ export function PowderTune() {
             )}
           </p>
         )}
-        <TuneNotes loaded={loaded} interior={interior} fit={fit} rows={rows} />
+        <TuneNotes
+          loaded={loaded}
+          interior={interior}
+          fit={fit}
+          rows={rows}
+          onAnyway={() => setAnyway(true)}
+        />
         {choices &&
           (choices.length > 0 ? (
             <nav aria-label={t('Saved loads with this powder')}>

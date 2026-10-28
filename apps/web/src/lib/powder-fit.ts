@@ -10,12 +10,17 @@ import type {
 } from '@open-reloading/core'
 import { msg } from '../i18n/translate.ts'
 
-/** A fit the tuning screen asks for: the start load, the strings and the options of `fitPowder`. */
+/**
+ * A fit the tuning screen asks for: the start load, the strings and the options of `fitPowder`,
+ * whose `parameters` are the values asked for.
+ */
 export interface PowderFitRequest {
   id: number
   load: InteriorLoad
   strings: ChronographString[]
   options?: PowderFitOptions | undefined
+  /** Fit the values asked for although the ladder is thin or one of them moves with the burn coefficient. */
+  anyway?: boolean | undefined
 }
 
 /**
@@ -23,7 +28,17 @@ export interface PowderFitRequest {
  * range and its label. A refused fit or a failure ends the answer, after the fit when the range failed.
  */
 export type PowderFitReply =
-  | { kind: 'fit'; id: number; fit: PowderFit; band: PowderPrediction[] }
+  /**
+   * `rule`: the burn coefficient was fitted alone instead of the values asked for, because the
+   * ladder is thin or because another value moved with it (`held`).
+   */
+  | {
+      kind: 'fit'
+      id: number
+      fit: PowderFit
+      band: PowderPrediction[]
+      rule?: 'thin' | 'held' | undefined
+    }
   | { kind: 'range'; id: number; range: PowderPressureRange; confidence: PowderConfidence }
   /** `fitPowder` refused the ladder; `charge`, kg, is the string at fault of `invalid`. */
   | { kind: 'refused'; id: number; reason: PowderFitReason; charge?: number | undefined }

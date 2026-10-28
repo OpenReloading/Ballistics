@@ -3596,7 +3596,6 @@
   "tight": "eng",
   "moderate": "mittel",
   "loose": "weit",
-  "No fit: {reason}": "Keine Anpassung: {reason}",
   "No saved load uses this powder. Open a saved load's Measurements tab to fit a powder from its strings.": "Keine gespeicherte Laborierung verwendet dieses Treibladungspulver. Öffnen Sie die Messungen einer gespeicherten Laborierung, um ein Treibladungspulver an ihre Schussreihen anzupassen.",
   "Open this load in the workbench and follow its Measurements link to fit a powder.": "Öffnen Sie diese Laborierung in der Werkbank und folgen Sie dem Link in ihren Messungen, um ein Treibladungspulver anzupassen.",
   "Pressure range: {label}, plus and minus {percent} %": "Druckbereich: {label}, plus und minus {percent} %",
@@ -3632,5 +3631,14 @@
   "Back to the fit": "Zurück zur Anpassung",
   "Hand tuning": "Abstimmung von Hand",
   "Hand-tuned": "Von Hand abgestimmt",
-  "Hand-tuned values are yours, not a fit. Simulation, not load data.": "Von Hand abgestimmte Werte sind Ihre eigenen, keine Anpassung. Simulation, keine Ladedaten."
+  "Hand-tuned values are yours, not a fit. Simulation, not load data.": "Von Hand abgestimmte Werte sind Ihre eigenen, keine Anpassung. Simulation, keine Ladedaten.",
+  "There are fewer charges than values to fit. Add a string at another charge, or fit the burn coefficient alone.": "Es gibt weniger Treibladungen als anzupassende Werte. Fügen Sie eine Schussreihe mit einer anderen Treibladung hinzu, oder passen Sie nur den Abbrandkoeffizienten an.",
+  "These strings cannot tell one of the values apart from the burn coefficient. Widen the charge spread, add a measured pressure, or fit the burn coefficient alone.": "Diese Schussreihen können einen der Werte nicht vom Abbrandkoeffizienten unterscheiden. Spreizen Sie die Treibladungen weiter, fügen Sie einen gemessenen Gasdruck hinzu, oder passen Sie nur den Abbrandkoeffizienten an.",
+  "The charges are too close to separate the values you asked for. Add a string at a charge well apart from the others, or add a measured pressure.": "Die Treibladungen liegen zu nah beieinander, um die gewünschten Werte zu trennen. Fügen Sie eine Schussreihe mit einer deutlich anderen Treibladung hinzu, oder fügen Sie einen gemessenen Gasdruck hinzu.",
+  "The model cannot run one of the charges. Check the charge of the highlighted string against the case and the bullet.": "Das Modell kann eine der Treibladungen nicht rechnen. Prüfen Sie die Treibladung der hervorgehobenen Schussreihe gegen Hülse und Geschoss.",
+  "The fit did not settle. Start from the burn coefficient of a similar powder, or fit fewer values.": "Die Anpassung ist nicht zur Ruhe gekommen. Beginnen Sie mit dem Abbrandkoeffizienten eines ähnlichen Treibladungspulvers, oder passen Sie weniger Werte an.",
+  "Fewer than 3 charges, or charges less than 10 % apart: only the burn coefficient is fitted, the other values stay at those of the similar powder.": "Weniger als 3 Treibladungen oder Treibladungen weniger als 10 % auseinander: Nur der Abbrandkoeffizient wird angepasst, die anderen Werte bleiben bei denen des ähnlichen Treibladungspulvers.",
+  "Try the other values anyway": "Die anderen Werte trotzdem versuchen",
+  "These strings cannot tell the start pressure or the chamber volume from the burn coefficient: they move together. They stay at their start values and only the burn coefficient is fitted. Add a measured pressure to fit more.": "Diese Schussreihen können Startdruck und Volumen des Patronenlagers nicht vom Abbrandkoeffizienten unterscheiden: Sie bewegen sich gemeinsam. Sie bleiben bei ihren Startwerten, und nur der Abbrandkoeffizient wird angepasst. Fügen Sie einen gemessenen Gasdruck hinzu, um mehr anzupassen.",
+  "Cannot run": "Nicht rechenbar"
 }

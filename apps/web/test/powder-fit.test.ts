@@ -72,6 +72,7 @@ describe('powder fit in a worker', () => {
         load: load(),
         strings: one,
         options: { parameters: ['burnRate', 'startPressure'] },
+        anyway: true,
       }),
     ).toEqual([{ kind: 'refused', id: 2, reason: 'underdetermined', charge: undefined }])
   })

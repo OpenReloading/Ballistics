@@ -3,9 +3,12 @@ import {
   InputError,
   type InteriorLoad,
   interior,
+  type LadderPoint,
   type PowderFit,
   PowderFitError,
+  type PowderParameter,
   powderConfidence,
+  powderConfidenceRules,
   powderPressureRange,
   predictPowder,
   stringLadder,
@@ -27,12 +30,57 @@ export function bandCharges({ min, max }: PowderFit['chargeRange'], n = 25) {
   return Array.from({ length: n }, (_, i) => lo + ((hi - lo) * i) / (n - 1))
 }
 
-/** Answers `q` through `post`: the fit and band as soon as they are known, then the slow pressure range. */
+/**
+ * Fewest distinct charges and smallest spread (largest over smallest charge, less 1) to fit the
+ * values of `thinRule.values` besides the burn coefficient.
+ */
+const thinRule = {
+  charges: 3,
+  spread: 0.1,
+  values: ['startPressure', 'volumeFactor'] as readonly PowderParameter[],
+}
+
+/** Whether `ladder` has too few charges, or too close ones, for the values of `thinRule.values`. */
+function thinLadder(ladder: readonly LadderPoint[]) {
+  const charges = [...new Set(ladder.map((p) => p.charge))]
+  // a spread of exactly 10 % computes a hair below 0.1 in floating point
+  return (
+    charges.length < thinRule.charges ||
+    Math.max(...charges) / Math.min(...charges) - 1 < thinRule.spread - 1e-9
+  )
+}
+
+/** Whether a fitted value other than the burn coefficient moves with it beyond `powderConfidenceRules.correlation`. */
+function heldFit(fit: PowderFit) {
+  const burn = fit.parameters.findIndex((p) => p.name === 'burnRate')
+  return fit.parameters.some(
+    (_, j) =>
+      j !== burn && Math.abs(fit.correlation?.[burn]?.[j] ?? 0) > powderConfidenceRules.correlation,
+  )
+}
+
+/**
+ * Answers `q` through `post`: the fit and band as soon as they are known, then the slow pressure
+ * range. Unless `anyway`, a thin ladder leaves out the values of `thinRule.values`, and the burn
+ * coefficient is fitted alone when a value asked for besides it moves with it (`held`): the core
+ * fits such a value without refusing. On 2 charges every extra value moves with it, pressures or
+ * not, so `anyway` lifts both rules.
+ */
 export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) => void) {
   const { id } = q
   try {
     const ladder = stringLadder(q.strings)
-    const fit = fitPowder(q.load, ladder, q.options)
+    const asked = q.options?.parameters ?? ['burnRate']
+    const thin = !q.anyway && asked.some((p) => thinRule.values.includes(p)) && thinLadder(ladder)
+    let rule: 'thin' | 'held' | undefined = thin ? 'thin' : undefined
+    let parameters = thin ? asked.filter((p) => !thinRule.values.includes(p)) : asked
+    const options = () => ({ ...q.options, parameters })
+    let fit = fitPowder(q.load, ladder, options())
+    if (!q.anyway && heldFit(fit)) {
+      rule = 'held'
+      parameters = ['burnRate']
+      fit = fitPowder(q.load, ladder, options())
+    }
     // a band charge outside the ladder may not run; the band leaves it out instead of refusing the fit
     const band = bandCharges(fit.chargeRange).flatMap((c) => {
       try {
@@ -42,8 +90,8 @@ export function answerPowderFit(q: PowderFitRequest, post: (r: PowderFitReply) =
         throw err
       }
     })
-    post({ kind: 'fit', id, fit, band })
-    const range = powderPressureRange(fit, ladder, { fit: q.options })
+    post({ kind: 'fit', id, fit, band, rule })
+    const range = powderPressureRange(fit, ladder, { fit: options() })
     post({ kind: 'range', id, range, confidence: powderConfidence(fit, range) })
   } catch (err) {
     post(

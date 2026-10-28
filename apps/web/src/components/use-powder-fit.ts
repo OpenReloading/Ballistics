@@ -13,10 +13,14 @@ const fitWorker = () =>
   new Worker(new URL('../lib/powder-fit.worker.ts', import.meta.url), { type: 'module' })
 
 /**
- * The fit of `strings` from `load` in a worker of the page, with each part as it arrives. Every
- * change of the strings or the load asks again and drops the running answer; no load, no fit.
+ * The fit of `strings` from `load` in a worker of the page, with each part as it arrives; `anyway`
+ * lifts the thin and held rules. Every change asks again and drops the running answer; no load, no fit.
  */
-export function usePowderFit(load: InteriorLoad | undefined, strings: readonly TuneString[]) {
+export function usePowderFit(
+  load: InteriorLoad | undefined,
+  strings: readonly TuneString[],
+  anyway = false,
+) {
   const [state, setState] = useState<PowderFitState>({ running: false })
   const runner = useRef<ReturnType<typeof powderFitRunner> | undefined>(undefined)
   useEffect(() => {
@@ -26,8 +30,8 @@ export function usePowderFit(load: InteriorLoad | undefined, strings: readonly T
   }, [])
   useEffect(() => {
     const ladder = fitStrings(strings)
-    if (load && ladder.length > 0) runner.current?.run({ load, strings: ladder })
-  }, [load, strings])
+    if (load && ladder.length > 0) runner.current?.run({ load, strings: ladder, anyway })
+  }, [load, strings, anyway])
   return state
 }
 

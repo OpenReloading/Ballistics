@@ -11628,6 +11628,11 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   }
 }
 
+/* the string whose charge the model cannot run, named in the refusal */
+.powder-tune .string-fault td {
+  background: var(--warn-bg);
+}
+
 .hand-tune {
   display: grid;
   gap: 0.5rem;
