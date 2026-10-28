@@ -10,6 +10,7 @@ import {
   TextInput,
 } from '@mantine/core'
 import { Flask, Plus, X } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { type ReactNode, useEffect, useMemo, useReducer, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
@@ -410,27 +411,32 @@ export function PowderDesigner() {
       key: 'burn',
       title: t('Burn law (interior model)'),
       content: (
-        <div className="prop-grid designer-grid">
-          <fieldset className="designer-checks" data-error={fittedError ? true : undefined}>
-            <legend>{t('Parameters the fit moved')}</legend>
-            {fittedKeys.map((k) => (
-              <Checkbox
-                key={k}
-                label={t(fittedText[k])}
-                checked={design.fitted.includes(k)}
-                onChange={(ev) =>
-                  dispatch({ type: 'fitted', key: k, value: ev.currentTarget.checked })
-                }
-              />
-            ))}
-            {fittedError && (
-              <Text fz="sm" c="var(--error-fg)">
-                {fittedError}
-              </Text>
-            )}
-          </fieldset>
-          {specsOf('burn').map((s) => field(s))}
-        </div>
+        <>
+          <p className="note">
+            <Link href="/powders/tune">{t('Fit a powder from chronograph strings')}</Link>
+          </p>
+          <div className="prop-grid designer-grid">
+            <fieldset className="designer-checks" data-error={fittedError ? true : undefined}>
+              <legend>{t('Parameters the fit moved')}</legend>
+              {fittedKeys.map((k) => (
+                <Checkbox
+                  key={k}
+                  label={t(fittedText[k])}
+                  checked={design.fitted.includes(k)}
+                  onChange={(ev) =>
+                    dispatch({ type: 'fitted', key: k, value: ev.currentTarget.checked })
+                  }
+                />
+              ))}
+              {fittedError && (
+                <Text fz="sm" c="var(--error-fg)">
+                  {fittedError}
+                </Text>
+              )}
+            </fieldset>
+            {specsOf('burn').map((s) => field(s))}
+          </div>
+        </>
       ),
     },
   ]

@@ -23,6 +23,7 @@ import {
 } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
 import { nth } from '../lib/nth.ts'
+import { sessionStrings, tuneHref } from '../lib/powder-tune.ts'
 import { conditionsText } from '../lib/range-entry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
@@ -457,6 +458,13 @@ export function Measurements({
         </p>
       )}
       {table}
+      {sessionStrings(sessions).length > 0 && (
+        <p>
+          <Link href={tuneHref(sessions.map((s) => s.id))}>
+            {t('Fit a powder from these strings')}
+          </Link>
+        </p>
+      )}
       {table &&
         (curve.length < 2 ? (
           <p className="note">{t('The chart needs a charge ladder of two steps or more.')}</p>

@@ -3480,5 +3480,22 @@
   "Caliber class": "Kaliberklasse",
   "Clear all": "Alle zurücksetzen",
   "The manufacturer list cannot be read, so this name is not kept. Try again when it loads.": "Die Herstellerliste kann nicht gelesen werden, daher wird dieser Name nicht übernommen. Versuchen Sie es erneut, sobald sie geladen ist.",
-  "Safety": "Sicherheit"
+  "Safety": "Sicherheit",
+  "{count} charge|{count} charges": {
+    "one": "{count} Treibladung",
+    "other": "{count} Treibladungen"
+  },
+  "Add a string": "Schussreihe hinzufügen",
+  "Add a string, or open this page from the Measurements tab of a load with chronograph strings mapped to charges.": "Fügen Sie eine Schussreihe hinzu oder öffnen Sie diese Seite über den Tab Messungen einer Laborierung mit Chronographen-Schussreihen, die Treibladungen zugeordnet sind.",
+  "All values on this screen are simulations, not load data.": "Alle Werte auf diesem Bildschirm sind Simulationen, keine Ladedaten.",
+  "Enter a charge and at least one shot velocity, each a positive number.": "Geben Sie eine Treibladung und mindestens eine Schussgeschwindigkeit ein, jeweils als positive Zahl.",
+  "Fit a powder from chronograph strings": "Treibladungspulver an Chronographen-Schussreihen anpassen",
+  "Fit a powder from these strings": "Treibladungspulver an diese Schussreihen anpassen",
+  "Mean ({unit})": "Mittelwert ({unit})",
+  "SD ({unit})": "SD ({unit})",
+  "Separated by spaces": "Durch Leerzeichen getrennt",
+  "Shot velocities ({unit})": "Schussgeschwindigkeiten ({unit})",
+  "Strings per charge": "Schussreihen je Treibladung",
+  "The string was not added.": "Die Schussreihe wurde nicht hinzugefügt.",
+  "Tune a powder": "Treibladungspulver abstimmen"
 }
