@@ -26,7 +26,7 @@ test('the primer list opens a primer record with its properties and sources', as
   await page.getByRole('link', { name: /Large Rifle Demo/ }).click()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Large Rifle Demo')
   await expect(page.getByRole('region', { name: 'Properties', exact: true })).toContainText('DP-LR')
-  await expect(page.getByRole('region', { name: /^Sources/ })).toBeVisible()
+  await expect(page.getByRole('region', { name: /^Sources \(/ })).toBeVisible()
 })
 
 test('the primer list narrows by search', async ({ page }) => {
