@@ -25,7 +25,7 @@ export interface LoadFileFormat {
 }
 
 /** The text of `bytes` as UTF-8, a byte order mark left out, as `File.text()` reads it. */
-export const utf8 = (bytes: Uint8Array) => new TextDecoder().decode(bytes)
+const utf8 = (bytes: Uint8Array) => new TextDecoder().decode(bytes)
 
 /**
  * Every load-file format, detected in this order. The OpenReloading user data file, a JSON object
