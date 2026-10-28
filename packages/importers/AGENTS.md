@@ -1,6 +1,6 @@
 # @open-reloading/importers
 
-Parsers for chronograph export files, ESM. Pure functions from file text, or from an XLSX workbook read from file bytes, to `ChronoSession` candidates. No Node imports in `src/`. Package rules: root `AGENTS.md`.
+Parsers for chronograph export files, ESM. Pure functions from file text, or from an XLSX workbook read from file bytes, to `ChronoSession` candidates, and tables of bullets, powders and cartridges to user records. No Node imports in `src/`. Package rules: root `AGENTS.md`.
 
 ## Commands (this directory, or `-w @open-reloading/importers` from the root)
 
@@ -83,6 +83,13 @@ Parsers for chronograph export files, ESM. Pure functions from file text, or fro
   - Units from the header (text in `(...)` or `[...]`, else a recognised last word) or the options. A missing unit throws `pressure unit is missing: ...` (time likewise), a file unit that differs from the option throws. The sensor position (`breech`, `mean`, `base`) is always the caller's.
   - Throws on a non-number (`line <n>: ...`), times that do not increase and fewer than 3 samples. `lowPass: { cutoff }` is a zero-phase one-pole filter.
 - `parseOpenReloadingCsv`: first row of names from `string velocity velocityUnit coldBore excluded` (any case, trailing empty cells ignored, `velocity` required), delimiter from that row.
+
+## Tables to user records
+
+- `readTable(text)` (`src/tables.ts`): a JSON list of objects, or delimited text (`,`, `;`, tab) whose first row has two cells or more and repeats its width in a second row. Else `{ refusal }` ("no table", JSON that does not parse or has another shape). `tableOfRows(rows)` takes worksheet rows. A table without data rows is refused.
+- `suggestKind(table)` (`src/records.ts`): a score per kind (bullet, powder, cartridge) from header words and value ranges. `tierFloors`: high from 0.80, medium from 0.60, low from 0.40; below, `refusal` names the scores and the floor.
+- `autoMap(table, kind)`: per column the field (by header alias, `fieldSpecs` in `src/record-fields.ts`), the unit (from the header, else the values, else the stored unit) and the decimal mark.
+- `buildRecords(table, kind, map, now)`: each row checked on its own. `counts` (accepted, with a warning, rejected), `rejected` and `warnings` with row, column, cell and reason. Makers become manufacturer records. Ids from `idOfKey` of kind, name, maker and, for bullets, diameter and mass. The caller parses each record with the user record schema (schema is types only here).
 
 ## Unverified and tests
 
