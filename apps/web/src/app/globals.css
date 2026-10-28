@@ -3717,6 +3717,41 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
+/* the pinned row of the record choices a load is built on: the cartridge search, then primer, brass
+   and case capacity, labels above the selects. The first block of the flow, across both columns
+   from 75em, where the four share one line; narrower they wrap. A cell is never narrower than its
+   label */
+.workbench .pinned-row {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  align-items: flex-end;
+  gap: 0.25rem 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+.workbench .pinned-row > *,
+.pinned-row-slot > * {
+  flex: 1 1 8rem;
+}
+
+.pinned-row-slot {
+  display: contents;
+}
+
+.workbench .pinned-row .mantine-Input-wrapper {
+  --input-height-xs: var(--field-height);
+}
+
+.workbench .pinned-row .mantine-InputWrapper-label {
+  display: block;
+  margin: 0;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 /* the input groups in two columns from 75em of window beside the sidebar;
    narrower, the columns have no box */
 .panel-column {
@@ -3749,14 +3784,17 @@ main .library-head.page-panel-head > .page-panel-title {
     min-width: 0;
   }
 
-  /* two columns: Cartridge with the figure (in a low window the burn-rate figure) below; Powder,
-     Bullet and Gun */
-  .workbench .panels > .panel-column:first-child {
-    grid-column: 1;
-    grid-row: 1 / span 2;
+  /* under the pinned row two columns: Cartridge with the figure (in a low window the burn-rate
+     figure) below; Powder, Bullet and Gun */
+  .workbench .panels > .panel-column {
+    grid-row: 2;
   }
 
   .workbench .panels > .panel-column:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .workbench .panels > .panel-column:nth-child(3) {
     grid-column: 2;
   }
 
@@ -5543,14 +5581,13 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .panels {
     grid-template-columns: repeat(2, 18rem);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     column-gap: 0.375rem;
     align-items: stretch;
   }
 
-  .workbench .panels > .panel-column:is(:first-child, :nth-child(2)) {
+  .workbench .panels > .panel-column {
     display: flex;
-    grid-row: 1;
     flex-direction: column;
     gap: 0.375rem;
   }

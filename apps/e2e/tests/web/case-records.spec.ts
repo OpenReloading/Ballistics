@@ -15,13 +15,12 @@ test('the case list opens a case record with its cartridge', async ({ page }) =>
   )
 })
 
-test('a case record chosen in the Cartridge card gives the stated capacity, a typed one replaces it', async ({
+test('a case record chosen above the cards gives the stated capacity, a typed one replaces it', async ({
   page,
 }) => {
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const capacity = loadForm(page).getByRole('textbox', { name: /^Case capacity/ })
   await expect(capacity).not.toHaveAttribute('placeholder', /\d/)
-  await page.getByRole('button', { name: 'More of Cartridge' }).click()
   await page.getByRole('combobox', { name: 'Brass record' }).selectOption({ index: 1 })
   await expect(capacity).toHaveAttribute('placeholder', /^\d/)
   await capacity.fill('3.9')

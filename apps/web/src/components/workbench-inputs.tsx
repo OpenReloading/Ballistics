@@ -530,6 +530,7 @@ export function InputCards() {
     <form ref={inputs} noValidate onSubmit={(e) => e.preventDefault()} aria-label={t('Load')}>
       {/* fixed cards: icon and title in the heading, the record in its picker */}
       <div className="panels">
+        <LoadRow />
         {panelColumns.map((column, i) => (
           <div key={column[0]} className="panel-column">
             {column.map((p) => (
@@ -548,7 +549,7 @@ export function InputCards() {
                   <h2 id={`panel-${p}`} className="panel-title">
                     {t(panelTitles[p])}
                   </h2>
-                  <CardPicker panel={p} />
+                  {p !== 'cartridge' && <CardPicker panel={p} />}
                   {morePanels.includes(p) && (
                     <AppPopover
                       opened={more === p}
@@ -596,22 +597,35 @@ export function InputCards() {
   )
 }
 
+/**
+ * The pinned row above the cards: the cartridge search, then the choices that depend on it in that
+ * order, primer, brass record and case capacity record (the `choices` slot).
+ */
+function LoadRow() {
+  const { primerId, setPrimerChoice } = useLoad()
+  return (
+    <div className="pinned-row">
+      <CartridgePicker />
+      <PrimerChoice id={primerId} onChange={setPrimerChoice} />
+      <SeatingSlot name="choices" />
+    </div>
+  )
+}
+
 /** The seating preview's slots in the cards. */
-export const seatingSlotNames = ['cartridge', 'gun', 'more', 'moreValues'] as const
+export const seatingSlotNames = ['cartridge', 'gun', 'choices', 'more', 'moreValues'] as const
 export type SeatingSlotName = (typeof seatingSlotNames)[number]
 
 /**
- * A named place in a card for the seating preview's controls: the case capacity, seating and its
- * values (`cartridge`), the barrel length (`gun`), the capacity record and notes (`more`) and
- * further values (`moreValues`, a `dl`).
+ * A named place for the seating preview's controls: the case capacity, seating and its values
+ * (`cartridge`), the barrel length (`gun`), the brass and capacity record choices of the pinned row
+ * (`choices`), the notes (`more`) and further values (`moreValues`, a `dl`).
  */
 function SeatingSlot({ name }: { name: SeatingSlotName }) {
   const { slotRefs } = useLoad()
-  return name === 'moreValues' ? (
-    <dl ref={slotRefs[name]} className="seating-more wide" />
-  ) : (
-    <div ref={slotRefs[name]} className="seating-slot wide" />
-  )
+  if (name === 'moreValues') return <dl ref={slotRefs[name]} className="seating-more wide" />
+  if (name === 'choices') return <div ref={slotRefs[name]} className="pinned-row-slot" />
+  return <div ref={slotRefs[name]} className="seating-slot wide" />
 }
 
 /** The cards with a More popover. */
@@ -1072,6 +1086,7 @@ function CartridgePicker() {
       key={searchKey}
       kind="cartridges"
       label={t('Search cartridges by name')}
+      picked={!!(cartridge || cartridgeDesign)}
       chosen={
         cartridge?.name ??
         (cartridgeDesign
@@ -1165,7 +1180,7 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
-  const { specValue, system, allDiameters, setAllDiameters, primerId, setPrimerChoice } = useLoad()
+  const { specValue, system, allDiameters, setAllDiameters } = useLoad()
   const { t } = useTranslation()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
@@ -1178,7 +1193,6 @@ function CardMore({ panel }: { panel: InputPanel }) {
         )}
         <SeatingSlot name="more" />
         <SeatingSlot name="moreValues" />
-        <PrimerChoice id={primerId} onChange={setPrimerChoice} />
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
@@ -1295,6 +1309,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       slots={{
         cartridge: seatingSlots.cartridge ?? null,
         gun: seatingSlots.gun ?? null,
+        choices: seatingSlots.choices ?? null,
         more: seatingSlots.more ?? null,
         moreValues: seatingSlots.moreValues ?? null,
       }}
