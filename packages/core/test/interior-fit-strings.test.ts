@@ -86,7 +86,10 @@ describe('string ladder', () => {
         charge,
         velocities: Array.from({ length: 5 }, () => nth(truth, i) + 4 * noise()),
       }))
-      const b = nth(fitPowder(load(0.38), stringLadder(strings)).parameters, 0)
+      // the fit reads only muzzle velocity and peak pressure, which the 10 times coarser curve
+      // spacing (also the largest step) moves by less than 1e-6 m/s here, at a sixth of the run time
+      const fit = fitPowder(load(0.38), stringLadder(strings), { options: { outputStep: 2e-5 } })
+      const b = nth(fit.parameters, 0)
       if (Math.abs(b.value - 0.45) <= 2 * (b.standardUncertainty ?? 0)) inside++
     }
     expect(inside / seeds).toBeGreaterThanOrEqual(0.9)
