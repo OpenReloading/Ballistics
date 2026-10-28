@@ -437,6 +437,18 @@ describe('powder fit prior and robust loss', () => {
     expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
   })
 
+  it('reports the stop rule and whether the down-weighted rows settled', () => {
+    const points = ladder(load(), 3, 0)
+    const bad = points.map((x, i) =>
+      i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
+    )
+    const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
+    expect(robust.weightsSettled).toBe(true)
+    expect(['stalled', 'smallStep']).toContain(robust.stop)
+    // without a Huber loss no row is down-weighted
+    expect(fitPowder(load(0.38), bad).weightsSettled).toBe(true)
+  })
+
   it('rejects malformed priors and a Huber loss without sigmas', () => {
     const points = ladder(load(), 3, 0)
     const bare = points.map(({ velocitySigma: _, ...x }) => x)

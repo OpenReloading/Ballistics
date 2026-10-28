@@ -13,7 +13,7 @@ import type { Settings } from '../errors.ts'
 import { InputError, need, nth } from '../errors.ts'
 import { chiSquareQuantile } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
-import { logLeastSquares } from '../least-squares.ts'
+import { type LogFitStop, logLeastSquares } from '../least-squares.ts'
 import {
   type InteriorInvalid,
   type InteriorLoad,
@@ -164,6 +164,10 @@ export interface PowderFit {
   chargeRange: { min: number; max: number }
   /** Iterations of the solver. */
   iterations: number
+  /** The rule that ended the solver: a cost drop below the tolerance, or a step below 1e-8. */
+  stop: LogFitStop
+  /** Whether the ladder rows beyond the Huber threshold were the same before and after the last accepted step; true without `huberThreshold`. */
+  weightsSettled: boolean
   /** `interior` runs of the fit. */
   runCount: number
 }
@@ -551,6 +555,8 @@ export function fitPowder(
     conditionNumber: fit.conditionNumber,
     chargeRange: { min: Math.min(...charges), max: Math.max(...charges) },
     iterations: fit.iterations,
+    stop: fit.stop,
+    weightsSettled: fit.weightsSettled,
     runCount,
   }
 }
