@@ -13,6 +13,7 @@ import { loadWaterCapacity, toSi } from '@open-reloading/schema'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
+import { familyOf } from './unseen.ts'
 
 /** The interior model a run calls: the signature of `interior` of core. */
 export type InteriorModel = typeof interior
@@ -46,14 +47,6 @@ export interface Outcome {
   construction: string
   prediction: Prediction
 }
-
-/** The powder family: propellant base and grain form of the record, `unspecified` where it has none. */
-export const familyOf = (
-  powder: { propellantBase?: string | undefined; grainForm?: string | undefined } | undefined,
-) =>
-  powder
-    ? `${powder.propellantBase ?? 'unspecified'}/${powder.grainForm ?? 'unspecified'}`
-    : 'unknown'
 
 /** The construction of a bullet record, for grouping. */
 export const constructionOf = (bullet: Bullet | undefined) => {
