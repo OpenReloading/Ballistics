@@ -150,7 +150,7 @@
   "Burn form: {list} needed with the others, or leave all four empty.": "Abbrandform: {list} zusammen mit den anderen angeben oder alle vier leer lassen.",
   "Burn rate": "Abbrandgeschwindigkeit",
   "Burn rate (model output)": "Abbrandgeschwindigkeit (Modellergebnis)",
-  "Burn rate, {unit}": "Abbrand, {unit}",
+  "Burn rate, {unit}": "Abbrandgeschwindigkeit, {unit}",
   "Burn rates": "Abbrandgeschwindigkeiten",
   "Burn-rate order": "Abbrandreihenfolge",
   "Burnout": "Burnout",

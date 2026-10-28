@@ -6,7 +6,13 @@ import terms from '../src/i18n/german-terms.json'
 
 const source = messages()
 const fold = (s: string) =>
-  s.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
+  s
+    .toLowerCase()
+    .replace(/ä/g, 'a')
+    .replace(/ö/g, 'o')
+    .replace(/ü/g, 'u')
+    .replace(/ß/g, 'ss')
+    .replace(/\u00ad/g, '') // a soft hyphen marks where a long compound may break
 const placeholders = (s: string) =>
   [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1] ?? '').sort((a, b) => a.localeCompare(b))
 
@@ -122,6 +128,7 @@ const otherSense: Record<string, string> = {
     'Safety text: the owner approves its wording',
   'Measurements, statistics, group sizes, scores and records shown here can contain errors from the models, the data or your inputs.':
     'Safety text: the owner approves its wording',
+  'Safety notice and disclaimer': 'the heading of a page that holds the notice and the disclaimer',
   'boatTailLength must be zero or more': 'zero: the number',
   'meplatDiameter must be zero up to the diameter': 'zero: the number',
   'A flat spot is a statistical observation of the strings fired: neighbouring charges whose slope of mean velocity has a {level} % band that includes zero. Few shots make wide bands. It is not a safety statement and not a charge to load.':
@@ -166,6 +173,17 @@ describe('German catalogue', () => {
       if (key in otherSense) continue
       for (const w of words.filter((w) => occurs(w.word, key)))
         expect(fold(textOf(entry)), `${key}: ${w.german}`).toContain(fold(w.german))
+    }
+  })
+
+  it('writes a decided multi word term as the table does, where its English phrase occurs', () => {
+    const decided = terms.terms.filter(
+      (t) => t.status === 'decided' && t.german && /^[A-Za-z]+( [A-Za-z]+)+$/.test(t.english),
+    )
+    for (const [key, entry] of Object.entries(de)) {
+      if (key in otherSense) continue
+      for (const t of decided.filter((t) => wordPattern(t.english).test(key)))
+        expect(fold(textOf(entry)), `${key}: ${t.german}`).toContain(fold(t.german ?? ''))
     }
   })
 
