@@ -38,6 +38,8 @@ extend-ignore-re = [
   "klein für das Modell",
   "für den das Modell gebaut wurde",
   "0,6[0-9]; das Modell liegt",
+  # German field label of the no-valid-run refusal that the charge-target test expects
+  "Feld: (Zünddruck|heat)\\.",
 ]
 
 [default.extend-words]
