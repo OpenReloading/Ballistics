@@ -88,6 +88,8 @@ describe.each(catalogues)('catalogue %s', (code) => {
 /** English texts that contain a term's English word in another sense, each with the sense. */
 const otherSense: Record<string, string> = {
   'Bullet position': 'where the bullet is in the barrel, not a shooting position',
+  'Case fill': 'the load ratio, whose verified term (Ladedichte) names no case',
+  'Powder temperature': 'the compound Pulvertemperatur, the usual word, in a label of one line',
   'The band is the 5th to 95th percentile of {samples} draws (seed {seed}, {failed} left the model) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
     'corner case: an extreme combination of inputs',
   'The band is the 5th to 95th percentile of {samples} draws (seed {seed}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':

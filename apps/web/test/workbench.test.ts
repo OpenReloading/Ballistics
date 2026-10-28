@@ -5,6 +5,7 @@ import de from '../src/i18n/de.json'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
+import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import {
   bandLine,
@@ -415,6 +416,7 @@ describe('sampled band', () => {
 
 describe('in German', () => {
   const german = translator(de as Catalogue, 'de')
+  installCoreMessages()
   beforeEach(() => setShownLanguage('de'))
   afterEach(() => setShownLanguage('en'))
   const pressureRange = { nominalPressure: 4000e5, lowPressure: 3600e5, highPressure: 4400e5 }

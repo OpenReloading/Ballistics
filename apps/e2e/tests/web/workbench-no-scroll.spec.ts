@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { showGerman } from './german.ts'
 import { storeUnits } from './units.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
@@ -129,6 +130,22 @@ for (const [width, height, shown] of [
       await expect.poll(() => overflowing(page)).toEqual([])
       expect(await cut(page)).toEqual([])
     })
+
+// the run is made in English, then the language changes: the same results in German words
+for (const [state, ladder] of [states[0], states[1]])
+  test(`at 1280 x 650 the workbench in German with ${state} scrolls and cuts nothing`, async ({
+    page,
+  }) => {
+    test.setTimeout(60_000)
+    await page.setViewportSize({ width: 1280, height: 650 })
+    await runExample(page)
+    if (ladder) await runLadder(page, ...ladder)
+    await showGerman(page)
+    await expect(page.locator('.readouts dt', { hasText: 'Ladedichte' }).first()).toBeVisible()
+    await expect(page.locator('.band-line')).toBeVisible({ timeout: 10_000 })
+    await expect.poll(() => overflowing(page)).toEqual([])
+    expect(await cut(page)).toEqual([])
+  })
 
 test('at 1100 x 800 only the inputs column of the workbench scrolls, not the page', async ({
   page,

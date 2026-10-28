@@ -19,6 +19,10 @@ const loaders: Record<Exclude<Language, 'en'>, () => Promise<{ default: Catalogu
   de: () => import('./de.json'),
 }
 
+/** The table of package and API messages: loaded with any language but English, read by `translateMessage`. */
+const loadMessages = () =>
+  import('../lib/core-message-table.ts').then((m) => m.installCoreMessages())
+
 /** `localStorage` key of the chosen language. */
 const languageKey = storageName('language')
 
@@ -46,7 +50,7 @@ async function show(code: Language) {
   if (current.chosen === code && current.language === code) return
   publish({ ...current, chosen: code })
   try {
-    const { default: catalogue } = await loaders[code]()
+    const [{ default: catalogue }] = await Promise.all([loaders[code](), loadMessages()])
     if (current.chosen === code) publish({ chosen: code, ...translator(catalogue, code) })
   } catch {
     // offline and never opened in this language: the text stays English, the choice stays stored

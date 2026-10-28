@@ -7,11 +7,14 @@ import { missingValuesAnswer } from '../../../packages/api/dist/compute/load-fil
 import de from '../src/i18n/de.json'
 import { type Catalogue, english, translator } from '../src/i18n/translate.ts'
 import {
+  installCoreMessages,
   messageTexts,
-  translateMessage,
   type WarningCode,
   warningMessages,
-} from '../src/lib/core-messages.ts'
+} from '../src/lib/core-message-table.ts'
+import { translateMessage } from '../src/lib/core-messages.ts'
+
+installCoreMessages()
 
 const german = translator(de as Catalogue, 'de')
 /** Every message text mapped to a marker: a message shows the marker only if a template matched it. */
