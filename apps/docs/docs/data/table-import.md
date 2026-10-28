@@ -22,7 +22,7 @@ Each kind gets a score from 0 to 1: every column is matched to at most one field
 
 ## Fields
 
-A header is matched in lower case, without accents, with ä, ö, ü and ß as ae, oe, ue and ss, and without the text in brackets. The first unit of a field is the stored one. A value outside the usual range is a warning on its row; a required field that is empty rejects the row.
+A header is matched in lower case, without accents, with ß as ss and ä, ö and ü as their base letter followed by e, and without the text in brackets. The first unit of a field is the stored one. A value outside the usual range is a warning on its row; a required field that is empty rejects the row.
 
 ### Bullets
 
