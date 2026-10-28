@@ -6,6 +6,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { sections } from '../lib/sections.ts'
 import { controlSize } from '../lib/theme.ts'
+import { ContinueStrip } from './continue-strip.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
@@ -49,6 +50,7 @@ export function Home({ counts }: { counts: Record<string, ReactNode> }) {
           {t('A ballistics database with interior and exterior ballistics simulations')}
         </p>
       </div>
+      <ContinueStrip />
       <Panel id="home-tools" title={t(tools.title)}>
         <ul className="home-cards">
           {tools.pages.map((p) => (

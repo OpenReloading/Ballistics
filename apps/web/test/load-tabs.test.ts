@@ -8,8 +8,6 @@ import {
   type LoadRecord,
   loadGroups,
   loadName,
-  openLoadsText,
-  parseOpenLoads,
   renameStored,
   shortName,
   tabAfterClose,
@@ -93,15 +91,6 @@ it('picks the next tab, else the previous one, when a tab closes', () => {
   expect(tabAfterClose(['a', 'b', 'c'], 'b')).toBe('c')
   expect(tabAfterClose(['a', 'b', 'c'], 'c')).toBe('b')
   expect(tabAfterClose(['a'], 'a')).toBeUndefined()
-})
-
-it('reads the open set back and ignores anything damaged', () => {
-  const set = { ids: ['a', 'b'], active: 'b' }
-  expect(parseOpenLoads(openLoadsText(set))).toEqual(set)
-  expect(parseOpenLoads(null)).toEqual({ ids: [] })
-  expect(parseOpenLoads('not json')).toEqual({ ids: [] })
-  expect(parseOpenLoads('{"ids":[1,"a",null],"active":5}')).toEqual({ ids: ['a'] })
-  expect(parseOpenLoads('{"ids":["a","a"]}')).toEqual({ ids: ['a'] })
 })
 
 it('reminds to export after 10 changes, or 7 days after the last export', () => {

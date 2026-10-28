@@ -1,7 +1,6 @@
 /** The workbench loads, tabs and the saved-loads list. */
 import type { UserRecord } from '@open-reloading/schema'
 import type { Translator } from '../i18n/translate.ts'
-import { storageName } from './edition.ts'
 import { matchesQuery } from './lists.ts'
 import { copyName } from './user-file-names.ts'
 import { putRecords, storedRecord } from './user-store.ts'
@@ -104,24 +103,4 @@ export function loadGroups(
         ? Number(!a.key) - Number(!b.key)
         : a.title.localeCompare(b.title, 'en', { numeric: true }),
     )
-}
-
-/** The saved loads open in the tabs and the one shown, stored in `localStorage` (`openLoads`). */
-type OpenLoads = { ids: string[]; active?: string | undefined }
-
-export const openLoadsKey = storageName('openLoads')
-
-export const openLoadsText = (set: OpenLoads) => JSON.stringify(set)
-
-/** A stored set; anything damaged reads as empty. */
-export function parseOpenLoads(text: string | null): OpenLoads {
-  try {
-    const json = JSON.parse(text ?? 'null') as { ids?: unknown; active?: unknown } | null
-    const ids = Array.isArray(json?.ids)
-      ? [...new Set(json.ids.filter((x): x is string => typeof x === 'string'))]
-      : []
-    return typeof json?.active === 'string' ? { ids, active: json.active } : { ids }
-  } catch {
-    return { ids: [] }
-  }
 }

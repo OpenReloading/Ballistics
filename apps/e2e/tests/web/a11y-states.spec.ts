@@ -5,6 +5,7 @@ import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
+import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
@@ -162,6 +163,25 @@ const states: State[] = [
       await page.getByRole('button', { name: 'Chart data' }).click()
       await dialogOf('Chart data')(page)
       await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: '/ with saved loads',
+    scrolls: true,
+    open: async (page, check) => {
+      await gotoHydrated(page, '/')
+      await putRecords(page, [
+        {
+          kind: 'load',
+          id: '00000000-0000-4000-8000-000000000001',
+          name: 'Saved test load',
+          saved: '2026-10-20T10:00:00.000Z',
+          data: { origin: 'user' },
+        },
+      ])
+      await gotoHydrated(page, '/')
+      await expect(page.getByRole('link', { name: 'Saved test load' })).toBeVisible()
+      await check('page')
     },
   },
   {
