@@ -4,6 +4,7 @@ import { compareTargetFaces, type TargetFace, type TargetMapping } from '@open-r
 import Link from 'next/link'
 import {
   type CaliberClassSummary,
+  courseRows,
   type DisciplineRecord,
   disciplineGroups,
   disciplineRuleBook,
@@ -53,6 +54,12 @@ function DisciplineRecordView({
     `/groups?face=${encodeURIComponent(m.face)}&event=${encodeURIComponent(m.event)}`
   // two or more stages: each row opens its own; the page bar opens the first
   const perStage = stages.length > 1
+  // the sighters, series and time limits a stage's rule book gives itself
+  const courseOf = (m: TargetMapping) =>
+    courseRows(m)
+      .map((r) => `${r.label}: ${r.text}`)
+      .join('; ')
+  const hasCourse = stages.some((m) => courseOf(m) !== '')
   return (
     <RecordPage
       title={d.name}
@@ -78,6 +85,7 @@ function DisciplineRecordView({
                 'Stage',
                 'Gauge',
                 'Shots',
+                ...(hasCourse ? ['Course of fire'] : []),
                 ...(perStage ? ['Shot groups'] : []),
               ]}
             >
@@ -99,6 +107,7 @@ function DisciplineRecordView({
                     <td>{m.stage}</td>
                     <td className="num">{m.gauge && shownLength(m.gauge.value)}</td>
                     <td className="num">{m.shotCount}</td>
+                    {hasCourse && <td>{courseOf(m)}</td>}
                     {perStage && (
                       <td>
                         <Link

@@ -15,6 +15,7 @@ import {
   federationRow,
   federationScope,
   hostText,
+  ruleRows,
 } from '../src/lib/disciplines.ts'
 import { defined } from './defined.ts'
 
@@ -140,4 +141,48 @@ it('counts per federation its disciplines and renders the list with the tabs and
 it('names a homepage by its host without www', () => {
   expect(hostText('https://www.issf-sports.org/')).toBe('issf-sports.org')
   expect(hostText('https://example.org/a/b')).toBe('example.org')
+})
+
+it('shows the rule facts a record states, converted where the unit differs, and nothing where it states none', () => {
+  expect(ruleRows(undefined)).toEqual([])
+  expect(disciplineGroups(pistol, classes).filter((g) => g.title === 'Rules')).toHaveLength(
+    pistol.rules ? 1 : 0,
+  )
+  const rows = ruleRows({
+    firearm: 'long-gun',
+    actions: ['single-shot', 'semi-automatic'],
+    positions: ['prone'],
+    supports: ['freehand', 'sling'],
+    sights: ['aperture'],
+    maxMagnification: { value: 4 },
+    minTriggerWeight: { value: 1500 },
+    maxBarrelLength: { value: 762 },
+    ammunition: {
+      handloads: false,
+      minMuzzleEnergy: { value: 200 },
+      bulletTypes: ['hollow-point'],
+    },
+    sighters: 'unlimited',
+    seriesShots: 10,
+    timeLimits: [
+      { duration: { value: 1800, raw: '30 min' }, covers: 'discipline', includesSighters: true },
+      { duration: { value: 90 }, covers: 'series' },
+    ],
+  })
+  const text = (label: string) => rows.filter((r) => r.label === label).map((r) => r.text)
+  expect(text('Firearm')).toEqual(['Long gun'])
+  expect(text('Actions')).toEqual(['single shot, semi automatic'])
+  expect(text('Magnification up to')).toEqual(['4×'])
+  expect(text('Handloads')).toEqual(['Not allowed'])
+  expect(text('Bullets')).toEqual(['hollow point'])
+  expect(text('Sighters')).toEqual(['Any number'])
+  expect(text('Time limit')).toEqual([
+    '30 min for the discipline, sighters included',
+    '90 s per series',
+  ])
+  expect(rows.find((r) => r.label === 'Trigger weight from')?.value).toEqual({
+    quantity: 'mass',
+    si: 1.5,
+  })
+  expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
 })

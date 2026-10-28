@@ -11,6 +11,8 @@ export interface StoredUnits {
   pressure: 'bar'
   energy: 'J'
   velocity: 'm/s'
+  /** Time limits of a course of fire. */
+  time: 's'
   angle: 'deg'
   temperature: 'degC'
   /** Flame and gas temperatures of thermochemistry; ambient temperatures use `temperature`. */
@@ -44,6 +46,7 @@ export const units: StoredUnits = {
   pressure: 'bar',
   energy: 'J',
   velocity: 'm/s',
+  time: 's',
   angle: 'deg',
   temperature: 'degC',
   absoluteTemperature: 'K',
@@ -86,6 +89,7 @@ export const siMaps: Record<QuantityKind, SiMap> = {
   pressure: scale(1e5),
   energy: scale(1),
   velocity: scale(1),
+  time: scale(1),
   angle: scale(Math.PI / 180),
   temperature: { factor: 1, offset: 273.15 },
   absoluteTemperature: scale(1),
