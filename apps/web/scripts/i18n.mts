@@ -90,9 +90,17 @@ export function extract(source: string, file = 'source'): string[] {
   return found
 }
 
-/** The distinct messages of every source under `src/`, sorted. */
+/** The messages of the table `src/lib/core-message-table.json`: its codes and the templates of every group. */
+function tableMessages(root: string): string[] {
+  const { codes, templates } = JSON.parse(
+    readFileSync(path.join(root, 'src/lib/core-message-table.json'), 'utf8'),
+  ) as { codes: string[]; templates: Record<string, string[]> }
+  return [...codes, ...Object.values(templates).flat()]
+}
+
+/** The distinct messages of every source under `src/` and of the message table, sorted. */
 export function messages(root = webRoot): string[] {
-  const all = new Set<string>()
+  const all = new Set<string>(tableMessages(root))
   for (const file of globSync('src/**/*.{ts,tsx}', { cwd: root }))
     for (const text of extract(readFileSync(path.join(root, file), 'utf8'), file)) all.add(text)
   return [...all].sort((a, b) => a.localeCompare(b, 'en'))
