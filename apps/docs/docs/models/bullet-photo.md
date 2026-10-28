@@ -31,6 +31,16 @@ $$
 
 Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`.
 
+**Sizes read off a caliper.** The user can also enter the bullet's diameter and overall length, measured with a caliper. Each gives a scale $k_i = \ell_i / L_i$ from the photograph's own measurement $\ell_i$ (px) of that size and its standard uncertainty $u(\ell_i)$, with the caliper's $u(L_i) = 0.02$ mm:
+
+$$
+\frac{u(k_i)}{k_i} = \sqrt{\left(\frac{u(\ell_i)}{\ell_i}\right)^2 + \left(\frac{u(L_i)}{L_i}\right)^2}
+$$
+
+Code: `apps/web/src/lib/bullet-photo-scale.ts`, `estimatesOf`.
+
+Where the photograph has no ruler points, the scale is the mean of these weighted by $1/(u(k_i)/k_i)^2$, with the same rectangular term for the disagreement of the two as above. Where it has, the ruler's scale is used and each size is a check. A size is flagged when its scale is away from the ruler's (or the two sizes' scales from each other) by more than three standard uncertainties and 2 %. The note gives the difference in percent and names what to check: the scale points, the cut-out, and that the bullet lies flat and square to the camera. A tilted bullet shortens its length and not its diameter, so a flagged pair tells a tilt that the cut-out alone does not. Code: `apps/web/src/lib/bullet-photo-scale.ts`, `resolveScale`.
+
 ### Cut-out
 
 1. The photograph is turned into luma with the weights of [ITU-R BT.601](../bibliography.md#itu-r-bt-601).
@@ -43,6 +53,12 @@ Code: `apps/web/src/lib/bullet-photo.ts`, `scaleOf`.
 Code: `apps/web/src/lib/bullet-photo.ts`, `segment`, `coverOf`, `localLevels`, `clearBars`, `flatten`, `levels`. The user can correct the cut-out with a brush.
 
 **Colour.** When the bullet is within 60 grey levels of the background in luma, the cut-out is also made on the colour distance of each pixel from the background colour along the line to the bullet's colour (the background's median colour of the border, the bullet's mean of the pixels furthest from it, not counting the colours at the points the user placed on the ruler), and the colour cut-out replaces the luma one only when its contrast is more than 1.5 times greater; otherwise the luma cut-out is kept. Code: `apps/web/src/lib/bullet-photo-colour.ts`, `segmentPhoto`, `colourSeparation`.
+
+**Highlights and uneven backgrounds.** A bullet can be darker than the background on one side and brighter on the other (copper with a highlight on grey), so a cut-out by luma alone gives one side. A second cut is made on the distance of each pixel from the background of its row (of its column when the first cut-out spans more than 40% of the photograph's width and less than 40% of its height), in luma in either direction or in chroma weighted 1.5, the background being the median of the line's pixels outside the first cut-out. Where the background has two tones (a wall and a table) that is the background in each. This cut-out or the colour one replaces the first when it contains at least 80% of it and is more than 10% larger. The choice is made on the photograph reduced to 900 px on its longer side, and the photograph itself is cut the chosen way once, so a large photograph costs about one cut and not four.
+
+**Ragged edges.** A cut-out whose edge, after a closing of 2 px that takes thin slits out, has more than 9 boundary pixels per root of its area is a patch of the background's texture, not a bullet: a smooth body of length L and width d has 2 (L + d) / sqrt(L d), 7 at ten diameters long. The largest of the other cut-outs with a smooth edge is taken instead. When none is, the user is told that the background may be textured or busy. Code: `segmentPhoto`, `pickCut`, `deviation`, `raggedness`.
+
+**A second object.** When another part of the first pass is at least 30% as large as the part chosen (a second bullet, a cartridge, a ruler whose points are not placed yet), a note says so and asks the user to check that the one cut out is the bullet, to photograph one bullet alone or to paint the others out with the brush. The part chosen is the largest that does not touch the photograph's edge, else the largest. Code: `bestPart` in `apps/web/src/lib/bullet-photo.ts`.
 
 **Edge spread.** The width $s$ the grey takes to go from the background to the bullet at the cut-out's edge is the contrast over the steepest slope, taken along the boundary and kept at its upper quartile (a shadow lies along one side only). A sharp edge reads 1 to 3 px. Above 4 px and 4 % of the bullet's thickness the cut-out carries a note that the edges are soft (a shadow beside the bullet, or an out-of-focus or moved photograph), and each edge position's standard uncertainty grows:
 
@@ -163,20 +179,20 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - Lens distortion is not corrected: a wide-angle lens near its edge distorts lengths. Keep the bullet and the ruler near the middle, with a long focal length.
 - The bullet is a body of revolution, so its silhouette is symmetric about the axis.
 - The bullet differs from the background in brightness (at least 25 grey levels) or, where it does not, in colour.
-- The two points a user places on the ruler are at known graduation marks.
+- The two points a user places on the ruler are at known graduation marks, and a size entered from a caliper is the bullet's own (a diameter of the shank, an overall length from base to tip).
 
 ## Limits
 
 - The mouth of a hollow point is not seen in a side silhouette: it is not measured, the meplat is the width of the rim.
 - A hybrid or other nose that is not a circle arc is not classified: no ogive radius or $R_t/R$ is seeded, and a note says so.
 - A rebated boat tail or a cone that is not straight raises a note; the line fit then represents it poorly.
-- The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective, and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
+- The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective (a caliper size entered with the length and the diameter flags a tilt, not corrects it), and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
 - The seeded design is a starting point. Its mass and manufacturer stay empty, and the note kept in it says the values are measured from a photograph, with the scale and every value's uncertainty. No image is stored.
 - A shadow beside the bullet is not taken out of the cut-out. It is told by its soft edge, which raises the uncertainty and adds a note; brushing it out of the cut-out measures the bullet alone. A shadow with a sharp edge cannot be told from the bullet.
 - Perspective is not detected: a bullet or a camera tilted so that one end is nearer makes the sides of the shank converge, and no note says so.
 - A reflection that reaches the bullet's edge cuts into the outline there, with no note unless it makes the edge ragged.
 - A photograph of more than 2400 px on its longer side is shrunk to that while it is read.
-- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a soft shadow, strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
+- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a bullet darker than the paper on one side and brighter on the other, a soft shadow, strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`), and the scale from caliper sizes without a ruler, and their checks against a ruler and each other (`apps/web/test/bullet-photo-scale.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
 
 ## Sources
 
