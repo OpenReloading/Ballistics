@@ -2,6 +2,7 @@
 
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@open-reloading/schema'
 import Link from 'next/link'
+import { localizeDecimals } from '../i18n/number.ts'
 import {
   type CaliberClassSummary,
   courseRows,
@@ -57,7 +58,7 @@ function DisciplineRecordView({
   // the sighters, series and time limits a stage's rule book gives itself
   const courseOf = (m: TargetMapping) =>
     courseRows(m)
-      .map((r) => `${r.label}: ${r.text}`)
+      .map((r) => `${r.label}: ${r.numeric ? localizeDecimals(r.text ?? '') : r.text}`)
       .join('; ')
   const hasCourse = stages.some((m) => courseOf(m) !== '')
   return (

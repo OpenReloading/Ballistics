@@ -216,6 +216,9 @@ const list = (label: string, values: readonly string[] | undefined): FieldRow[] 
 const durationText = (seconds: number) =>
   seconds % 60 === 0 ? `${seconds / 60} min` : `${seconds} s`
 
+const sightersText = (included: boolean | undefined) =>
+  included === undefined ? '' : included ? ', sighters included' : ', sighters not included'
+
 const coverText = {
   discipline: 'for the discipline',
   stage: 'per stage',
@@ -234,14 +237,16 @@ export function courseRows(
           {
             label: 'Sighters',
             text: c.sighters === 'unlimited' ? 'Any number' : String(c.sighters),
+            numeric: true,
           },
         ]),
     ...(c.seriesShots === undefined
       ? []
-      : [{ label: 'Shots per series', text: String(c.seriesShots) }]),
+      : [{ label: 'Shots per series', text: String(c.seriesShots), numeric: true }]),
     ...(c.timeLimits ?? []).map((t) => ({
       label: 'Time limit',
-      text: `${durationText(t.duration.value)} ${coverText[t.covers]}${t.includesSighters ? ', sighters included' : ''}`,
+      text: `${durationText(t.duration.value)} ${coverText[t.covers]}${sightersText(t.includesSighters)}`,
+      numeric: true,
       ...(t.duration.raw && { printed: t.duration.raw }),
     })),
   ]
@@ -258,7 +263,7 @@ export function ruleRows(r: DisciplineRules | undefined): FieldRow[] {
     ...list('Support', r.supports),
     ...list('Sights', r.sights),
     ...(r.maxMagnification
-      ? [{ label: 'Magnification up to', text: `${r.maxMagnification.value}×` }]
+      ? [{ label: 'Magnification up to', text: `${r.maxMagnification.value}×`, numeric: true }]
       : []),
     ...quantityRow('Trigger weight from', 'mass', 'mass', r.minTriggerWeight),
     ...quantityRow('Barrel length up to', 'barrelLength', 'length', r.maxBarrelLength),

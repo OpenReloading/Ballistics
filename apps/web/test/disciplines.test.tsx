@@ -204,6 +204,7 @@ it('shows the rule facts a record states, converted where the unit differs, and 
     timeLimits: [
       { duration: { value: 1800, raw: '30 min' }, covers: 'discipline', includesSighters: true },
       { duration: { value: 90 }, covers: 'series' },
+      { duration: { value: 0.5 }, covers: 'shot', includesSighters: false },
     ],
   })
   const text = (label: string) => rows.filter((r) => r.label === label).map((r) => r.text)
@@ -216,7 +217,10 @@ it('shows the rule facts a record states, converted where the unit differs, and 
   expect(text('Time limit')).toEqual([
     '30 min for the discipline, sighters included',
     '90 s per series',
+    '0.5 s per shot, sighters not included',
   ])
+  expect(rows.filter((r) => r.label === 'Time limit').every((r) => r.numeric)).toBe(true)
+  expect(rows.find((r) => r.label === 'Magnification up to')?.numeric).toBe(true)
   expect(rows.find((r) => r.label === 'Trigger weight from')?.value).toEqual({
     quantity: 'mass',
     si: 1.5,
