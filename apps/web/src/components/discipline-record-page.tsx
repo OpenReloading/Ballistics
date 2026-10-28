@@ -1,8 +1,11 @@
 'use client'
 
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@open-reloading/schema'
+import { useTranslation } from '../i18n/language.ts'
+import { localizeDecimals } from '../i18n/number.ts'
 import {
   type CaliberClassSummary,
+  courseRows,
   type DisciplineRecord,
   disciplineRuleBook,
   type FederationListItem,
@@ -23,7 +26,8 @@ interface Extras {
   classes: CaliberClassSummary[]
 }
 
-function DisciplineRecordView({
+/** The record page's content: re-rendered on a language change, which the stages' decimal marks follow. */
+export function DisciplineRecordView({
   d,
   mappings,
   faces,
@@ -31,6 +35,7 @@ function DisciplineRecordView({
   federations,
   classes,
 }: { d: DisciplineRecord } & Extras) {
+  useTranslation()
   const federation = federations.find((f) => f.id === d.federation)
   const international = disciplines.find((x) => x.id === d.internationalDiscipline)
   const book = disciplineRuleBook(d)
@@ -44,6 +49,11 @@ function DisciplineRecordView({
   const first = stages[0]
   const groupsHref = (m: { face: string; event: string }) =>
     `/groups?face=${encodeURIComponent(m.face)}&event=${encodeURIComponent(m.event)}`
+  // the sighters, series and time limits a stage's rule book gives itself
+  const courseOf = (m: TargetMapping) =>
+    courseRows(m)
+      .map((r) => `${r.label}: ${r.numeric ? localizeDecimals(r.text ?? '') : r.text}`)
+      .join('; ')
   return (
     <RecordPage
       title={d.name}
@@ -70,6 +80,7 @@ function DisciplineRecordView({
               stage: m.stage,
               gauge: m.gauge?.value,
               shotCount: m.shotCount,
+              course: courseOf(m),
               groupsHref: groupsHref(m),
             }
           })}
@@ -82,6 +93,7 @@ function DisciplineRecordView({
             section: d.section,
             page: d.page,
             caliberClasses: d.caliberClasses,
+            rules: d.rules,
           }}
           classes={classes}
           federation={{ id: d.federation, name: federation?.name ?? d.federation }}

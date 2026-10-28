@@ -10,6 +10,22 @@
     "unit": "m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sighters": 0,
+    "sights": ["open"],
+    "maxBarrelLength": {
+      "value": 108,
+      "raw": "4,25“"
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,8 +38,33 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.6D.5, Teil C, Seite 33 von 142, PDF p. 33",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6D.1, Teil C, Seite 32 von 142, PDF p. 32",
+        "fields": ["rules.actions", "rules.maxBarrelLength"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.5, C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports", "rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6D.2, Teil C, Seite 32 von 142, PDF p. 32",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6D.3, Teil C, Seite 33 von 142, PDF p. 33",
+        "fields": ["rules.ammunition"]
       }
     ],
-    "note": "Revolvers with a barrel up to 4.25 in and pistols that fit the 220 x 140 x 40 mm box (C.6D.1). The course runs at 20, 15 and 10 m, the record holds the longest distance."
+    "note": "Revolvers with a barrel up to 4.25 in and pistols that fit the 220 x 140 x 40 mm box (C.6D.1). The course runs at 20, 15 and 10 m, the record holds the longest distance. The barrel limit is stated for revolvers; pistols are limited by a gauge box. Any bullet shape except wadcutter is allowed."
   }
 }

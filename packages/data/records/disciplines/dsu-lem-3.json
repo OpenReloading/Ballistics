@@ -24,6 +24,27 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["aperture"],
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 3,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,6 +63,35 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 1 (PDF p. 227)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 19, PDF p. 77",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Klasseneinteilung der Sportwaffen, Seite 8 (PDF p. 66)",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Schießarten, Probeschüsse, Seite 4 (PDF p. 62)",
+        "fields": ["rules.sighters"],
+        "note": "At most 3 sighting shots, fired at a target marked for them, before the first scoring shot."
       }
     ]
   }

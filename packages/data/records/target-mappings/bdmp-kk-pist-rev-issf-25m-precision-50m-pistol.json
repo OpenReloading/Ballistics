@@ -5,6 +5,16 @@
   "event": "bdmp-kk-pist-rev-kleinkaliber-kurzwaffe-prazision",
   "stage": "Präzision",
   "shotCount": 12,
+  "seriesShots": 6,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 180,
+        "raw": "3 min"
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +33,11 @@
         "page": "C.16.9, Teil C, Seite 113 von 142, PDF p. 113",
         "fields": ["shotCount"],
         "note": "Two series of six shots."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.9, Teil C, Seite 113 bis 114 von 142, PDF pp. 113 to 114",
+        "fields": ["seriesShots", "timeLimits"]
       }
     ]
   }

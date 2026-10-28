@@ -11,6 +11,22 @@
     "unit": "m"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,7 +39,18 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.8.6, Teil E, Seite 25 von 42, PDF p. 25",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.8.1, E.8.3, Teil E, Seite 25 von 42, PDF p. 25",
+        "fields": ["rules.firearm", "rules.actions", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.8.8, Teil E, Seite 26 von 42, PDF p. 26",
+        "fields": ["rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "The firearm kind follows from the percussion revolvers admitted."
   }
 }

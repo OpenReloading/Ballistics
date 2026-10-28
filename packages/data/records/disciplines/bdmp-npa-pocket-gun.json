@@ -10,6 +10,19 @@
     "unit": "m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point"]
+    },
+    "sighters": 0,
+    "seriesShots": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +35,43 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.7D.5, Teil C, Seite 40 von 142, PDF p. 40",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.5, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Two hands allowed."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.6.6, Teil C, Seite 18 von 142, PDF p. 18",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.1, Teil C, Seite 39 von 142, PDF p. 39",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.2, Teil C, Seite 39 von 142, PDF p. 39",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.3, Teil C, Seite 40 von 142, PDF p. 40",
+        "fields": ["rules.ammunition"],
+        "note": "All bullet forms except wadcutters."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.7D.5, Teil C, Seite 40 von 142, PDF p. 40",
+        "fields": ["rules.seriesShots"]
       }
     ],
     "note": "Revolvers with a 3 in barrel and pistols that fit the 180 x 140 x 40 mm box (C.7D.1). The course runs at 15, 10, 7 and 3 m on one or two NPA faces, the book does not say who chooses. The record holds the longest distance."

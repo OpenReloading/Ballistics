@@ -5,6 +5,15 @@
   "event": "vdrbw-r-g-1-grosskaliberrevolver-zeitserie",
   "stage": "Zeitserie",
   "shotCount": 15,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 20
+      },
+      "covers": "series",
+      "includesSighters": false
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -12,6 +21,11 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "8.6.8, Seite 42, PDF p. 42; Scheibe 10.2, Seite 97, PDF p. 97",
         "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.6.9, Seite 42, PDF p. 42",
+        "fields": ["timeLimits"]
       }
     ]
   }

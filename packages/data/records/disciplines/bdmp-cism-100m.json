@@ -25,6 +25,25 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["standing", "kneeling", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "maxMagnification": {
+      "value": 1.5
+    },
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxFirearmMass": {
+      "value": 6500,
+      "raw": "6.5 kg"
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,6 +61,55 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.5.12, Teil D, Seite 28 von 294, PDF p. 28",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.1, Teil D, Seite 26 von 294, PDF p. 26",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.2, Teil D, Seite 26 von 294, PDF p. 26",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.3, Teil D, Seite 26 von 294, PDF p. 26",
+        "fields": ["rules.maxFirearmMass"],
+        "note": "The mass includes sights and hand stop."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.6, Teil D, Seite 27 von 294, PDF p. 27",
+        "fields": ["rules.sights"],
+        "note": "Any sight of two aiming elements."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.8, Teil D, Seite 27 von 294, PDF p. 27",
+        "fields": ["rules.maxMagnification"],
+        "note": "The 1.5x aid is a lens in the rear or front sight, not a telescope."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.10, Teil D, Seite 27 bis 28 von 294, PDF pp. 27 to 28",
+        "fields": ["rules.positions", "rules.seriesShots"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.1, D.1.3.2, D.1.3.3, Teil D, Seite 8 bis 9 von 294, PDF pp. 8 to 9",
+        "fields": ["rules.supports"],
+        "note": "A sling is allowed prone and kneeling, not standing."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.5.11, Teil D, Seite 28 von 294, PDF p. 28",
+        "fields": ["rules.sighters"]
       }
     ],
     "note": "The book prints Kaliber bis 8 mm."

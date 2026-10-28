@@ -11,6 +11,30 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["aperture"],
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1200,
+          "raw": "20 min"
+        },
+        "covers": "discipline"
+      },
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -24,6 +48,19 @@
         "page": "Kapitel 5, Inhaltsverzeichnis, Seite 2 (PDF p. 146)",
         "fields": ["name"],
         "note": "The page and the sheet page of b5 print the code DLZ, the contents print LZ. The contents print the name with the prefix Langwaffendisziplin."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seite 19, PDF p. 163",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
       }
     ]
   }

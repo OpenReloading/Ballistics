@@ -23,6 +23,8 @@ interface DisciplineStageRow {
   /** The scoring gauge, mm. */
   gauge?: number | undefined
   shotCount?: number | undefined
+  /** The sighters, series and time limits the stage's rule book gives, as one text. */
+  course?: string | undefined
   /** Where the stage opens in the shot groups. */
   groupsHref: string
 }
@@ -31,6 +33,7 @@ interface DisciplineStageRow {
 export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[] }) {
   const { t } = useTranslation()
   const perStage = rows.length > 1
+  const hasCourse = rows.some((m) => m.course)
   return (
     <Panel id="discipline-stages" title={t('Faces ({count})', { count: rows.length })}>
       {rows.length === 0 ? (
@@ -48,6 +51,7 @@ export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[]
             t('Stage'),
             t('Gauge'),
             t('Shots'),
+            ...(hasCourse ? [t('Course of fire')] : []),
             ...(perStage ? [t('Shot groups')] : []),
           ]}
         >
@@ -63,6 +67,7 @@ export function DisciplineStages({ rows }: { rows: readonly DisciplineStageRow[]
               <td>{m.stage}</td>
               <td className="num">{m.gauge !== undefined && shownLength(m.gauge)}</td>
               <td className="num">{m.shotCount}</td>
+              {hasCourse && <td>{m.course}</td>}
               {perStage && (
                 <td>
                   <Link
@@ -111,7 +116,7 @@ export function DisciplineData({
   book,
   international,
 }: {
-  record: Pick<DisciplineRecord, 'number' | 'section' | 'page' | 'caliberClasses'>
+  record: Pick<DisciplineRecord, 'number' | 'section' | 'page' | 'caliberClasses' | 'rules'>
   classes: readonly { id: string; name: string }[]
   federation: { id: string; name: string }
   book?: RuleBookCitation | undefined

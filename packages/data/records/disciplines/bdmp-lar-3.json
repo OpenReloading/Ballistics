@@ -11,6 +11,20 @@
     "unit": "m"
   },
   "category": "lever-action",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["lever-action"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["open", "aperture", "reflex", "optical"],
+    "minTriggerWeight": {
+      "value": 1000,
+      "raw": "1000 p"
+    },
+    "ammunition": {
+      "handloads": true
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +37,38 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.16A.13, Teil D, Seite 97 bis 98 von 294, PDF pp. 97 to 98",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.1, Teil D, Seite 94 von 294, PDF p. 94",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.2, Teil D, Seite 94 von 294, PDF p. 94",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.5, Teil D, Seite 94 bis 95 von 294, PDF pp. 94 to 95",
+        "fields": ["rules.sights"],
+        "note": "Standard class: open sights as issued. Open class: aperture, reflex or optical sights."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.6, Teil D, Seite 95 von 294, PDF p. 95",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16A.11, D.16A.13, Teil D, Seite 96 bis 98 von 294, PDF pp. 96 to 98",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "The arms may rest on the knees, the firearm may not."
       }
     ],
     "note": "Lever-action rifle, calibers from 6.5 mm that count as handgun cartridges, Standard class with open sights and Open class with aperture, red-dot or telescopic sights. The course runs at 10, 15, 25 and 50 m, the record holds the longest distance."

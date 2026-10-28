@@ -5,6 +5,15 @@
   "event": "vdrbw-p-g-1-halbautomatische-grosskaliberpistole-zeitserie",
   "stage": "Zeitserie",
   "shotCount": 15,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 10
+      },
+      "covers": "series",
+      "includesSighters": false
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -12,6 +21,11 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "8.5.8, Seite 40, PDF p. 40; Scheibe 10.2, Seite 97, PDF p. 97",
         "fields": ["discipline", "face", "event", "stage", "shotCount"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.5.9, Seite 40, PDF p. 40",
+        "fields": ["timeLimits"]
       }
     ]
   }

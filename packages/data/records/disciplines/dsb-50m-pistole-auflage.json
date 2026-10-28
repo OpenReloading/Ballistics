@@ -15,6 +15,24 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["single-shot"],
+    "positions": ["standing"],
+    "supports": ["rest"],
+    "sights": ["open"],
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3300,
+          "raw": "55 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,6 +45,33 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.21, row 2.21, Teil 0 Seite 80, PDF p. 98",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 81, PDF p. 99 (row 2.21)",
+        "fields": ["rules.firearm", "rules.actions", "rules.positions", "rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "2.10.5, Teil 2 Seite 12, PDF p. 148",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "9.7.6.1, Teil 9 Seite 6, PDF p. 416; 9.8.3, Teil 9 Seite 7, PDF p. 417",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing for all classes; sitting on a stool only from senior class III. The pistol rests on a support."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "9.2, Teil 9 Seite 1, PDF p. 411",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "9.3, Teil 9 Seite 2, PDF p. 412",
+        "fields": ["rules.timeLimits"],
+        "note": "Printed time is for pulley systems; other systems have 50 min. The time includes the sighters."
       }
     ]
   }

@@ -10,6 +10,22 @@
     "raw": "25 m",
     "unit": "m"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point", "wadcutter"]
+    },
+    "sighters": 5,
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +38,38 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.13B.6, Teil C, Seite 82 von 142, PDF p. 82",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.1, Teil C, Seite 82 von 142, PDF p. 82",
+        "fields": ["rules.actions", "rules.sights", "rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.3, Teil C, Seite 82 von 142, PDF p. 82",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.4, Teil C, Seite 82 von 142, PDF p. 82",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.2.1.1, Teil C, Seite 7 von 142, PDF p. 7",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.7, Teil C, Seite 82 bis 83 von 142, PDF pp. 82 to 83",
+        "fields": ["rules.sighters", "rules.seriesShots"]
       }
-    ]
+    ],
+    "note": "Sighters and series size hold for both stages; the stage times are on the target mappings."
   }
 }

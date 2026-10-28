@@ -10,6 +10,21 @@
     "raw": "25 m",
     "unit": "m"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["original", "open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 152.4,
+      "raw": "6 in"
+    },
+    "sighters": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +37,45 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.16.12, Teil C, Seite 114 von 142, PDF p. 114",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.1, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.2, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.3, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["rules.sights"],
+        "note": "Open sights of two aiming elements as delivered."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.4, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["rules.maxBarrelLength"],
+        "note": "Measured with the chamber for pistols, without it for revolvers."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.8, Teil C, Seite 113 von 142, PDF p. 113",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Two hands allowed."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.9, Teil C, Seite 113 bis 114 von 142, PDF pp. 113 to 114",
+        "fields": ["rules.sighters"],
+        "note": "Six sighters within 5 minutes."
       }
     ]
   }

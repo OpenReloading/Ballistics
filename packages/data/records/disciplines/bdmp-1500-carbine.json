@@ -10,6 +10,18 @@
     "unit": "m/yd"
   },
   "category": "carbine",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand"],
+    "sights": ["open", "optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 1135,
+      "raw": "2.5 lb"
+    },
+    "sighters": "unlimited"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +34,40 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.37.7, Teil D, Seite 287 bis 288 von 294, PDF pp. 287 to 288",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.2, Teil D, Seite 285 von 294, PDF p. 285",
+        "fields": ["rules.actions", "rules.minTriggerWeight"],
+        "note": "Revolver rifles in single action: 1135 g. Semi-automatic rifles, pistols in a carbine kit and revolver rifles in double action: 1360 g."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.2.1, Teil D, Seite 285 von 294, PDF p. 285",
+        "fields": ["rules.sights"],
+        "note": "Any open or optical sight."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.7, Teil D, Seite 287 bis 288 von 294, PDF pp. 287 to 288",
+        "fields": ["rules.positions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.9, Teil D, Seite 289 bis 290 von 294, PDF pp. 289 to 290",
+        "fields": ["rules.supports"],
+        "note": "A post supports the shooter, the firearm may not touch it."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.37.11, Teil D, Seite 292 von 294, PDF p. 292",
+        "fields": ["rules.sighters"],
+        "note": "Two warm-ups (50 m in 165 s, 25 m in 90 s) with any number of shots."
       }
     ],
     "note": "Carbines in handgun calibers from .35. The course runs at 7 (10), 15, 25 and 50 m or yd, the record holds the longest distance."

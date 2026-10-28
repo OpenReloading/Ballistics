@@ -5,6 +5,17 @@
   "event": "2804-25-m-kombi-rb-kk-off-vis-teil-prazision",
   "stage": "Präzision",
   "shotCount": 20,
+  "sighters": "unlimited",
+  "seriesShots": 10,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 300,
+        "raw": "5 min"
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -17,6 +28,17 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 7.03.1, Seite L-41, PDF p. 41",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.05, Seite L-41, PDF p. 41",
+        "fields": ["sighters"],
+        "note": "Within 3 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.03.1, Seite L-41, PDF p. 41",
+        "fields": ["seriesShots", "timeLimits"]
       }
     ]
   }

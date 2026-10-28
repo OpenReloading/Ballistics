@@ -11,6 +11,16 @@
     "unit": "m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["original", "open"],
+    "minTriggerWeight": {
+      "value": 1000
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +33,38 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.15A.11, Teil C, Seite 111 von 142, PDF p. 111",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15.1, Teil C, Seite 106 von 142, PDF p. 106",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15A.1, Teil C, Seite 110 von 142, PDF p. 110",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15.2, C.15A.1, Teil C, Seite 107 bis 110 von 142, PDF pp. 107 to 110",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15.6, C.15A.2, Teil C, Seite 107 bis 110 von 142, PDF pp. 107 to 110",
+        "fields": ["rules.sights"],
+        "note": "Only the open sights the firearm is delivered with."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.15A.11, Teil C, Seite 111 von 142, PDF p. 111",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing, kneeling and sitting; a post supports the shooter, the firearm may not touch it."
       }
     ],
     "note": "Semi-automatic .22 l.r. pistols and revolvers (C.15.1). C.15A.5 allows 10, 15 or 25 m, the match table (C.15A.11) uses all three."

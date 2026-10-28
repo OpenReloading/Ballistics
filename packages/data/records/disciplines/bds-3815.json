@@ -11,6 +11,25 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling"],
+    "supports": ["freehand"],
+    "sights": ["optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 6500
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -30,6 +49,43 @@
         "page": "L 12.01, Seite L-68, PDF p. 68",
         "fields": ["category"],
         "note": "The table bounds the cartridge by case length (47 mm), not by calibre."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.01, Seite L-68, PDF p. 68",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "The row sits in the long gun part of the handbook."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.07, L 12.08, Seite L-69, PDF p. 69",
+        "fields": ["rules.positions"],
+        "note": "The skill part kneels at 15 and 25 m and stands at 20 m; the course part stands, kneels, stands (38xx: the same at 30, 40, 50 m)."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.07, Seite L-80, PDF p. 80",
+        "fields": ["rules.sights"],
+        "note": "Telescopic and electronic (reflex, red dot) sights both count as optical sights."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed if the case matches factory dimensions and the law is met; lead and jacketed bullets of any shape, tracer and hard core excluded."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 12.06, L 12.07, Seite L-69, PDF p. 69",
+        "fields": ["rules.sighters", "rules.seriesShots"],
+        "note": "Sighters: 3 minutes before the skill part. The skill part fires three series of 5 shots in 15 seconds each; the course part has its own timed program, not recorded here."
       }
     ]
   }

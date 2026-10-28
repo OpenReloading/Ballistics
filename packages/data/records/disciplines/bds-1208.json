@@ -11,6 +11,28 @@
     "unit": "m"
   },
   "category": "revolver",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "positions": ["standing", "kneeling"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 220
+    },
+    "maxFirearmMass": {
+      "value": 1600
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -29,6 +51,54 @@
         "source": "bds-sporthandbuch-kurzwaffen-2026",
         "page": "K 4.01, Seite K-16, PDF p. 16",
         "fields": ["category"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.01.1, K 2.01.3, K 2.01.4, Seite K-8, PDF p. 8",
+        "fields": ["rules.firearm", "rules.actions"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.10, Seite K-10 and K-11, PDF pp. 10 and 11; K 4.07, Seite K-18, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Standing for the skill part and some parcours stages, kneeling in one parcours stage."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.01, Seite K-16, PDF p. 16",
+        "fields": ["rules.maxFirearmMass", "rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.04, K 2.05, K 2.06, K 2.07, Seite K-9 and K-10, PDF pp. 9 and 10",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.09, Seite K-10, PDF p. 10",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 2.02, Seite K-9, PDF p. 9",
+        "fields": ["rules.maxBarrelLength"]
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 7.01, Seite K-28, PDF p. 28",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed when the case matches factory ammunition of the discipline."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.05, Seite K-17, PDF p. 17",
+        "fields": ["rules.sighters"],
+        "note": "Within 3 minutes at 20 m."
+      },
+      {
+        "source": "bds-sporthandbuch-kurzwaffen-2026",
+        "page": "K 4.06, K 4.07, Seite K-17 and K-18, PDF pp. 17 and 18",
+        "fields": ["rules.seriesShots"]
       }
     ]
   }

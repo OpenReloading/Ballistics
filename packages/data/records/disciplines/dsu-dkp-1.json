@@ -15,6 +15,13 @@
     "ids": ["air-4-5"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["prone", "kneeling", "sitting", "standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -37,6 +44,17 @@
         "page": "Kapitel 5, Inhaltsverzeichnis Druckluftwaffen und Zimmerstutzen, Seite 2 (PDF p. 146)",
         "fields": ["name"],
         "note": "The table of contents prints the code LP 1 for this discipline."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 3 bis 4, PDF pp. 147 to 148",
+        "fields": [
+          "rules.firearm",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.seriesShots"
+        ]
       }
     ]
   }

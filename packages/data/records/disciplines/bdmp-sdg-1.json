@@ -11,6 +11,21 @@
     "unit": "m"
   },
   "category": "service-rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -28,7 +43,28 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.3.12, Teil E, Seite 12 von 42, PDF p. 12",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.1, Teil E, Seite 11 von 42, PDF p. 11",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.4, E.3.5, Teil E, Seite 11 von 42, PDF p. 11",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.4, E.3.8, Teil E, Seite 11 bis 12 von 42, PDF pp. 11 to 12",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.3.10, Teil E, Seite 12 von 42, PDF p. 12",
+        "fields": ["rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "The original carrying strap may serve as a shooting sling."
   }
 }

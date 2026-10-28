@@ -4,7 +4,9 @@ import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
+import { DisciplineRecordView } from '../src/components/discipline-record-page.tsx'
 import de from '../src/i18n/de.json'
+import * as language from '../src/i18n/language.ts'
 import { translator } from '../src/i18n/translate.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
@@ -22,6 +24,7 @@ import {
   federationRow,
   federationScope,
   hostText,
+  ruleRows,
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
 import { say } from '../src/lib/wording.ts'
@@ -33,6 +36,12 @@ vi.mock('next/navigation', () => ({
   usePathname: () => route.path,
   useRouter: () => ({ push: () => {} }),
 }))
+
+// the record view shows decimal marks of the language shown, so it must subscribe to it
+vi.mock('../src/i18n/language.ts', async (original) => {
+  const actual = await original<typeof import('../src/i18n/language.ts')>()
+  return { ...actual, useTranslation: vi.fn(actual.useTranslation) }
+})
 
 const { bundle } = readRecords()
 const records = bundle.disciplines as unknown as DisciplineRecord[]
@@ -185,6 +194,54 @@ it('names a homepage by its host without www', () => {
   expect(hostText('https://example.org/a/b')).toBe('example.org')
 })
 
+it('shows the rule facts a record states, converted where the unit differs, and nothing where it states none', () => {
+  expect(ruleRows(undefined)).toEqual([])
+  expect(
+    disciplineGroups(pistol, classes, translator().t).filter((g) => g.title === 'Rules'),
+  ).toHaveLength(pistol.rules ? 1 : 0)
+  const rows = ruleRows({
+    firearm: 'long-gun',
+    actions: ['single-shot', 'semi-automatic'],
+    positions: ['prone'],
+    supports: ['freehand', 'sling'],
+    sights: ['aperture'],
+    maxMagnification: { value: 4 },
+    minTriggerWeight: { value: 1500 },
+    maxBarrelLength: { value: 762 },
+    ammunition: {
+      handloads: false,
+      minMuzzleEnergy: { value: 200 },
+      bulletTypes: ['hollow-point'],
+    },
+    sighters: 'unlimited',
+    seriesShots: 10,
+    timeLimits: [
+      { duration: { value: 1800, raw: '30 min' }, covers: 'discipline', includesSighters: true },
+      { duration: { value: 90 }, covers: 'series' },
+      { duration: { value: 0.5 }, covers: 'shot', includesSighters: false },
+    ],
+  })
+  const text = (label: string) => rows.filter((r) => r.label === label).map((r) => r.text)
+  expect(text('Firearm')).toEqual(['Long gun'])
+  expect(text('Actions')).toEqual(['single shot, semi automatic'])
+  expect(text('Magnification up to')).toEqual(['4×'])
+  expect(text('Handloads')).toEqual(['Not allowed'])
+  expect(text('Bullets')).toEqual(['hollow point'])
+  expect(text('Sighters')).toEqual(['Any number'])
+  expect(text('Time limit')).toEqual([
+    '30 min for the discipline, sighters included',
+    '90 s per series',
+    '0.5 s per shot, sighters not included',
+  ])
+  expect(rows.filter((r) => r.label === 'Time limit').every((r) => r.numeric)).toBe(true)
+  expect(rows.find((r) => r.label === 'Magnification up to')?.numeric).toBe(true)
+  expect(rows.find((r) => r.label === 'Trigger weight from')?.value).toEqual({
+    quantity: 'mass',
+    si: 1.5,
+  })
+  expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
+})
+
 it('also searches the category and the country as the language shown writes them', () => {
   const german = translator(de, 'de').t
   const query = { ...emptyDirectory, query: 'gewehr' }
@@ -196,4 +253,20 @@ it('also searches the category and the country as the language shown writes them
   expect(federationMatches(dsb, country, 'Deutschland')).toBe(true)
   expect(federationMatches(dsb, country)).toBe(false)
   expect(federationMatches(dsb, { ...emptyDirectory, query: 'DE' }, 'Deutschland')).toBe(true)
+})
+
+it('subscribes the record view itself to the language shown, not only the components it renders', () => {
+  const subscribe = vi.mocked(language.useTranslation)
+  subscribe.mockClear()
+  // called as a function, so only the view's own hooks run: its children render nothing here
+  subscribe.mockImplementationOnce(() => translator() as never)
+  DisciplineRecordView({
+    d: pistol,
+    mappings: [],
+    faces: [],
+    disciplines: [],
+    federations: [],
+    classes: [],
+  })
+  expect(subscribe).toHaveBeenCalledTimes(1)
 })

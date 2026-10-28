@@ -11,6 +11,33 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxMagnification": {
+      "value": 6
+    },
+    "maxFirearmMass": {
+      "value": 8000
+    },
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,8 +50,30 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.14.8, Teil E, Seite 38 von 42, PDF p. 38",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.1, E.14.3, E.14.4, Teil E, Seite 37 von 42, PDF p. 37",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.maxFirearmMass",
+          "rules.ammunition"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.6, Teil E, Seite 37 bis 38 von 42, PDF pp. 37 to 38",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.14.7, Teil E, Seite 38 von 42, PDF p. 38",
+        "fields": ["rules.sighters", "rules.timeLimits"]
       }
     ],
-    "note": "E.14.8 (Teil E) names class SPFG 1 for this distance; class SPFG 3 (300 to 900 m) is bdmp-zfspfg-3."
+    "note": "E.14.8 (Teil E) names class SPFG 1 for this distance; class SPFG 3 (300 to 900 m) is bdmp-zfspfg-3. The organiser may instead announce 5 sighters and 15 scored shots in 45 min. Cross sticks serve as the rest; shooters aged 60 and over follow E.0.14."
   }
 }

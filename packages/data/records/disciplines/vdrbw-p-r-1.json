@@ -23,6 +23,22 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["semi-automatic", "revolver"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 152.4
+    },
+    "ammunition": {
+      "handloads": true
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -35,6 +51,30 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "8.11, Seite 53, PDF p. 53",
         "fields": ["federation", "section", "page", "distance", "caliberClasses"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.1, Seite 32, PDF p. 32",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 8 covers handguns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.1.3.1, Seite 32, PDF p. 32",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "8.11.1, 8.11.2, 8.11.4, 8.11.7, Seite 53, PDF p. 53",
+        "fields": [
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.maxBarrelLength",
+          "rules.minTriggerWeight"
+        ]
       }
     ]
   }
