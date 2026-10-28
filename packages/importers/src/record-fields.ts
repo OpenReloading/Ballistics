@@ -19,11 +19,14 @@ export interface ColumnUnit {
   symbol: string
   /** A number in this unit converted into the stored unit. */
   toStored: (x: number) => number
+  /** Read only when the header names it, never guessed from the values. */
+  named?: boolean
 }
 
-const unit = (symbol: string, factor: number): ColumnUnit => ({
+const unit = (symbol: string, factor: number, named?: true): ColumnUnit => ({
   symbol,
   toStored: factor === 1 ? (x) => x : (x) => x * factor,
+  ...(named && { named }),
 })
 
 // exact by definition (NIST SP 811, Appendix B.9): 1 in = 25.4 mm, 1 gr = 64.79891 mg, 1 lb = 0.45359237 kg, standard gravity 9.80665 m/s2
@@ -33,7 +36,14 @@ const lengthUnits = [unit('mm', 1), unit('in', 25.4), unit('cm', 10)]
 const massUnits = [unit('g', 1), unit('gr', 0.06479891)]
 const coefficientUnits = [unit('lb/in2', 1), unit('kg/m2', inch ** 2 / pound)]
 const densityUnits = [unit('g/cm3', 1)]
-const pressureUnits = [unit('bar', 1), unit('psi', (pound * 9.80665) / inch ** 2 / 1e5)]
+const psi = (pound * 9.80665) / inch ** 2 / 1e5
+// the values of MPa and kpsi fall in the usual bar range too, so only a header names them
+const pressureUnits = [
+  unit('bar', 1),
+  unit('psi', psi),
+  unit('MPa', 10, true),
+  unit('kpsi', psi * 1000, true),
+]
 
 /** One mappable field of a kind. `range` is the usual span in the stored unit: outside it is a warning. */
 export interface FieldSpec {

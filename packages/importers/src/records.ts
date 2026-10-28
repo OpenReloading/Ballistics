@@ -32,8 +32,8 @@ export interface TableColumnMap {
   /** Symbol of one of the field's units. */
   unit?: string | undefined
   decimal: '.' | ','
-  /** Where the unit came from: the header, the values or the stored unit as the default. */
-  unitFrom?: 'header' | 'values' | 'default' | undefined
+  /** Where the unit came from: the header, the values or the stored unit as the default; `unknown` when the header names a unit the field does not take. */
+  unitFrom?: 'header' | 'values' | 'default' | 'unknown' | undefined
   /** The cells could also read as grouped integers: the decimal mark is a guess. */
   ambiguousDecimal?: boolean | undefined
 }
@@ -58,7 +58,11 @@ const sampleOf = (table: Table, column: number) =>
     .map((r) => r[column] ?? '')
     .filter((c) => c !== '')
 
-const unitFromHeader = (header: string, units: ColumnUnit[]) => {
+/** The unit the header names, `unknown` for a unit in brackets or after a slash or underscore the field does not take. */
+const unitFromHeader = (
+  header: string,
+  units: ColumnUnit[],
+): ColumnUnit | 'unknown' | undefined => {
   const raw = headerUnit(header)
   if (!raw) return
   const key = raw.replace(/inch(es)?|"/g, 'in').replace(/grains?/g, 'gr')
@@ -68,7 +72,9 @@ const unitFromHeader = (header: string, units: ColumnUnit[]) => {
       .replaceAll('²', '2')
       .replaceAll('³', '3')
       .replace(/[^a-z0-9]/g, '')
-  return units.find((u) => plain(u.symbol) === plain(key))
+  const named = units.find((u) => plain(u.symbol) === plain(key))
+  // a last word after a space may be a word of the name (Case length, Max OAL), not a unit
+  return named ?? (header.toLowerCase().endsWith(` ${raw}`) ? undefined : 'unknown')
 }
 
 /** Share of `cells` read as numbers in `unit` that fall in `range` of the stored unit. */
@@ -95,10 +101,12 @@ function unitOf(
   header: string,
   cells: string[],
   decimal: '.' | ',',
-): { unit: ColumnUnit; from: 'header' | 'values' | 'default' } {
-  const units = field.units ?? [first]
-  const named = unitFromHeader(header, units)
+): { unit?: ColumnUnit; from: 'header' | 'values' | 'default' | 'unknown' } {
+  const all = field.units ?? [first]
+  const named = unitFromHeader(header, all)
+  if (named === 'unknown') return { from: 'unknown' }
   if (named) return { unit: named, from: 'header' }
+  const units = all.filter((u) => !u.named)
   if (units.length === 1 || !field.range) return { unit: first, from: 'default' }
   const typical = field.typical ?? field.range
   let best = { unit: first, fit: -1, usual: -1 }
@@ -129,9 +137,12 @@ function valueScore(field: FieldSpec, cells: string[]): number {
   if (units && range) {
     const typical = field.typical ?? range
     return Math.max(
-      ...units.map(
-        (u) => inRange(cells, decimal, u, typical) * 0.5 + inRange(cells, decimal, u, range) * 0.5,
-      ),
+      ...units
+        .filter((u) => !u.named)
+        .map(
+          (u) =>
+            inRange(cells, decimal, u, typical) * 0.5 + inRange(cells, decimal, u, range) * 0.5,
+        ),
     )
   }
   return cells.filter((c) => readNumber(c, decimal) === undefined).length / cells.length
@@ -208,7 +219,7 @@ export function autoMap(table: Table, kind: TableKind): TableColumnMap[] {
     const first = hit.field.units?.[0]
     if (first) {
       const u = unitOf(hit.field, first, header, sample, decimal)
-      map.unit = u.unit.symbol
+      map.unit = u.unit?.symbol
       map.unitFrom = u.from
     }
     return map
@@ -257,6 +268,12 @@ function numberCell(
   map: TableColumnMap,
   field: FieldSpec,
 ): { value: number; raw?: string; warning?: string } | { problem: string } {
+  if (map.unitFrom === 'unknown' && map.unit === undefined) {
+    const symbols = field.units?.map((u) => u.symbol).join(', ')
+    return {
+      problem: `${field.label}: the header names a unit other than ${symbols}. Choose the unit of the column.`,
+    }
+  }
   const unit = stored(map, field)
   if (!unit) return { problem: `${field.label} has no unit. Choose a unit for the column.` }
   const x = readNumber(cell, map.decimal)

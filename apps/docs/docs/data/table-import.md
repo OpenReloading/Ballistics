@@ -57,13 +57,13 @@ A grain form or base not in the list is a warning: the value is left out and the
 | Case length | caselength, l3, case, huelsenlaenge | mm, in, cm | 10 to 120 |
 | Overall length | overalllength, coal, oal, l6, cartridgelength | mm, in, cm | 15 to 150 |
 | Bullet diameter | bulletdiameter, g1, diameter, dia | mm, in, cm | 3 to 25 |
-| Max pressure | maxpressure, pmax, pressure, maxpress | bar, psi | 300 to 6500 |
+| Max pressure | maxpressure, pmax, pressure, maxpress | bar, psi, MPa, kpsi | 300 to 6500 |
 
 ## Units and decimal mark
 
 Each number column has its own unit and decimal mark, both changeable on the card.
 
-- Unit: named in the header, in brackets or after a slash, underscore or space (`Weight (gr)`, `Diameter_in`; inch and grains are read as in and gr). Without one, the unit whose conversion puts the most values in the usual range is taken, and the card says the unit was guessed from the values. Without a fit, the stored unit.
+- Unit: named in the header, in brackets or after a slash, underscore or space (`Weight (gr)`, `Diameter_in`, `Weight grains`; inch and grains are read as in and gr). A unit in brackets or after a slash or underscore that the field does not take rejects the rows of the column until a unit is chosen on the card. A last word after a space that is no unit of the field counts as part of the name. Without a unit in the header, the unit whose conversion puts the most values in the usual range is taken, and the card says the unit was guessed from the values. MPa and kpsi are never guessed: their values fall in the bar range too. Without a fit, the stored unit.
 - Decimal mark: point or comma, whichever more cells use. A column of cells such as `1,500` that could also be grouped integers is marked as a guess.
 - A value in another unit than the stored one keeps its text as written next to the converted value.
 
