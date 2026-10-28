@@ -242,3 +242,17 @@ for (const width of [320, 390]) {
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width)
   })
 }
+
+// WCAG 2.5.8: the note buttons of a case length variants matrix (a cartridge whose values have notes)
+for (const width of widths) {
+  test(`the note buttons of the variants matrix are 24 px high at ${width} px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: tall })
+    await gotoHydrated(page, '/cartridges/12')
+    const notes = page.locator('.variant-matrix th .field-note')
+    await expect(notes.first()).toBeVisible()
+    for (const note of await notes.all())
+      expect((await note.boundingBox())?.height).toBeGreaterThanOrEqual(24)
+  })
+}

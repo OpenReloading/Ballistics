@@ -7116,6 +7116,13 @@ main .field-table tr.field-group > th {
   text-underline-offset: 0.2em;
 }
 
+/* the matrix's row names are note buttons of a text's width, pressed on touch: a 24 px target (WCAG 2.5.8) */
+.variant-matrix th .field-note {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
 @media screen {
   .cartridge-values .tolerance {
     font-size: var(--mantine-font-size-xs);

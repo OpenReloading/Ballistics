@@ -58,7 +58,7 @@ The sixth process of the evaluation plan (design a target, save, use it as the f
 
 ## Findings
 
-Severity: blocker is a failure of a Level A criterion in the gated scope. Major is a failure of a Level AA criterion. Minor is everything else, including checks without a success criterion and failures that depend on how a criterion is read. Counts: 2 blockers (both fixed), 5 major (2 fixed), 6 minor.
+Severity: blocker is a failure of a Level A criterion in the gated scope. Major is a failure of a Level AA criterion. Minor is everything else, including checks without a success criterion and failures that depend on how a criterion is read. Counts: 2 blockers (both fixed), 5 major (2 fixed, 1 in part), 6 minor.
 
 | Id | Severity | Criterion | Page and state | Evidence | Status |
 |---|---|---|---|---|---|
@@ -74,7 +74,7 @@ Severity: blocker is a failure of a Level A criterion in the gated scope. Major 
 | A-10 | minor | none (axe best practice `region`) | An open tooltip, for example the sidebar's Search button focused on a record page | The tooltip is outside every landmark | Open |
 | A-11 | minor | 1.4.4 Resize Text (AA), 1.4.10 | Most pages at 200 % text size, at 640 px and at 320 px | The page title in the page bar is cut with an ellipsis ("Loa..." at 320 px). The full title is in the document title and in the heading's text | Open |
 | A-12 | minor | 4.1.3 Status Messages (AA) | Shot groups, shots placed by pointer | After four shots only "Saved in this browser" is announced, not the shot count or the score. The count and the score are text on the page and the shots have named buttons and x and y fields | Open |
-| A-13 | major | 2.5.8 Target Size (Minimum) (AA) | Record pages of cartridges whose dimensions table has notes: 2 of the 58 random cartridges (32 Rus, 8), at every width and in both schemes; the structured sample's cartridge (308 Win.) has none | The note buttons "Cartridge l (mm)" and "Chamber L (mm)" are 108 and 106 px wide and 16.3 px high with 18.6 px of free space to their neighbours (axe `target-size`, 2 nodes per page) | Open, and listed as known in the automated sweep. Workaround: the note is the button's description for a screen reader and the arrow keys move between the symbols; a touch user has no alternative |
+| A-13 | major | 2.5.8 Target Size (Minimum) (AA) | Record pages of cartridges whose dimensions table has notes: 2 of the 58 random cartridges (32 Rus, 8), at every width and in both schemes; the structured sample's cartridge (308 Win.) has none | The note buttons "Cartridge l (mm)" and "Chamber L (mm)" are 108 and 106 px wide and 16.3 px high with 18.6 px of free space to their neighbours (axe `target-size`, 2 nodes per page) | Partly fixed: the note buttons of the variants matrix ("Cartridge l" and "Chamber L", the two axe violations) now have a 24 px target, measured by `a11y-states.spec.ts`. The small symbol buttons of the dimensions table remain below 24 px (axe lists them for review) and stay on the known list of the automated sweep. Workaround: the note is the button's description for a screen reader and the arrow keys move between the symbols |
 
 The random sample (106 pages, 424 states) found one failure type that the structured sample did not show, A-13, and repeated A-04 on titles. It found no horizontal scrolling and no other axe violation. The "needs review" results of the random pages are the two kinds the sweep already lists as reviewed (text inside drawings and charts, and the small symbol buttons of the dimensions table).
 
@@ -97,7 +97,7 @@ Open findings with the reason they are not fixed yet and the way round them. The
 |---|---|---|
 | A-04 | The labels are truncated by design to keep the workbench in one window (1280 x 650); a fix changes the label columns of the cards | A wider window; names are complete for assistive technology |
 | A-05 | The tooltip component of the UI library cannot be hovered; a fix replaces it with a hover card in about 40 places | The text is the accessible name or description |
-| A-13 | The note buttons sit in the table's symbol column and are text-sized by design; a fix gives them a 24 px target or moves the note into the cell | The note is the button's description; arrow keys move between the symbols |
+| A-13 | The symbol buttons of the dimensions table are text-sized by design; a 24 px target for every symbol makes each row of the table taller, which needs a design decision | The note is the button's description; arrow keys move between the symbols |
 | A-06 | The segmented control draws its selected state with a fill only; a forced-colours rule for its indicator is not written | Selected state through assistive technology |
 | A-08 to A-12 | Minor; wording, one chart colour, the title bar and a status message | See each row |
 
