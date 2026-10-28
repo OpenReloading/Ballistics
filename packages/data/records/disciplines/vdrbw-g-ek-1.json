@@ -15,6 +15,28 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot"],
+    "positions": ["standing", "kneeling", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3600,
+          "raw": "60 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,6 +49,36 @@
         "source": "vdrbw-schiesssportordnung-2023",
         "page": "9.11, Seite 78, PDF p. 78",
         "fields": ["federation", "section", "page", "distance", "caliberClasses", "category"]
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1, Seite 59, PDF p. 59",
+        "fields": ["rules.firearm"],
+        "note": "Chapter 9 covers long guns."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.1.4.1, Seite 59, PDF p. 59",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded ammunition is allowed. Bundeswehr ranges take only factory-loaded full-metal-jacket ammunition."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.11.1, 9.11.2, 9.11.8, Seite 78, PDF p. 78",
+        "fields": ["rules.actions", "rules.positions", "rules.sights"],
+        "note": "No optical aids on the rifle."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.11.14, Seite 79, PDF p. 79",
+        "fields": ["rules.supports"],
+        "note": "A shooting sling is allowed."
+      },
+      {
+        "source": "vdrbw-schiesssportordnung-2023",
+        "page": "9.11.9, 9.11.10, 9.11.11, Seite 78, PDF p. 78",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Any number of sighters before each position. The time is not stopped for target changes."
       }
     ]
   }

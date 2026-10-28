@@ -11,6 +11,33 @@
     "unit": "m"
   },
   "category": "revolver",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "positions": ["standing", "prone"],
+    "supports": ["freehand"],
+    "maxBarrelLength": {
+      "value": 212.7,
+      "raw": "8 3/8 in"
+    },
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1200,
+          "raw": "20 min"
+        },
+        "covers": "discipline"
+      },
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +50,24 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 18, PDF p. 140",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.seriesShots",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Grundlegende Bestimmungen, Seite 3 (PDF p. 5)",
+        "fields": ["rules.maxBarrelLength"],
+        "note": "Rule for all short guns of the federation except the single-loading long-distance pistol; the minimum is 3 in (7.62 cm)."
       }
     ]
   }

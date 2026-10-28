@@ -10,6 +10,38 @@
     "raw": "25 m",
     "unit": "m"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver", "semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxBarrelLength": {
+      "value": 153,
+      "raw": "6“"
+    },
+    "maxFirearmMass": {
+      "value": 1400
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed", "full-metal-jacket", "hollow-point", "wadcutter"]
+    },
+    "sighters": 5,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 300,
+          "raw": "5 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,8 +54,44 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.13.6, Teil C, Seite 79 von 142, PDF p. 79",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.1, Teil C, Seite 3 von 142, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13.1, Teil C, Seite 78 bis 79 von 142, PDF pp. 78 to 79",
+        "fields": [
+          "rules.actions",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxBarrelLength",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13.3, Teil C, Seite 79 von 142, PDF p. 79",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13.4, Teil C, Seite 79 von 142, PDF p. 79",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.2.1.1, Teil C, Seite 7 von 142, PDF p. 7",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13.7, Teil C, Seite 79 von 142, PDF p. 79",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"]
       }
     ],
-    "note": "The rule admits revolvers and self-loading pistols."
+    "note": "The rule admits revolvers and self-loading pistols. The barrel limit is 166 mm for calibres .44 and .45 (C.13.1 c)."
   }
 }

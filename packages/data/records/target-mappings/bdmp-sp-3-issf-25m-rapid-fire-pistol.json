@@ -5,6 +5,14 @@
   "event": "bdmp-sp3-sportpistole-3-duell",
   "stage": "Duell",
   "shotCount": 15,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 3
+      },
+      "covers": "shot"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +30,11 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.13B.7, Teil C, Seite 83 von 142, PDF p. 83",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.13B.7, Teil C, Seite 82 bis 83 von 142, PDF pp. 82 to 83",
+        "fields": ["timeLimits"]
       }
     ],
     "note": "B.11.1.1 prints a ring spacing of 5 cm."

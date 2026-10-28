@@ -10,6 +10,29 @@
     "raw": "300 Meter",
     "unit": "m"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater", "single-shot"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxFirearmMass": {
+      "value": 11500
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +45,33 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.34.13, Teil D, Seite 274 von 294, PDF p. 274",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.1, Teil D, Seite 272 von 294, PDF p. 272",
+        "fields": ["rules.actions", "rules.maxFirearmMass", "rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.6, Teil D, Seite 273 von 294, PDF p. 273",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.7, Teil D, Seite 273 von 294, PDF p. 273",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.34.10, Teil D, Seite 274 von 294, PDF p. 274",
+        "fields": ["rules.timeLimits"]
       }
-    ]
+    ],
+    "note": "The energy minimum differs by calibre (4100 to 5500 J) and is not stored. Any magnification and trigger weight are allowed. A bipod is required. The 10 min cover the scored shots of this distance. Sighters are on 300 m only, but the rule book gives both 3 and 5, so no count is set."
   }
 }

@@ -2,8 +2,10 @@
 import {
   type CaliberClass,
   type Discipline,
+  type DisciplineRules,
   type Federation,
   type Provenance,
+  type QuantityValue,
   type Source,
   toSi,
 } from '@open-reloading/schema'
@@ -15,7 +17,8 @@ import { categoryWord } from './face-words.ts'
 import type { Facet } from './facets.ts'
 import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
-import { type FieldGroup, type StripItem, titleFromKebab } from './record-fields.ts'
+import { type FieldGroup, type FieldRow, type StripItem, titleFromKebab } from './record-fields.ts'
+import type { Quantity } from './units.ts'
 
 /** A discipline record as the API answers it: its sources resolved. */
 export type DisciplineRecord = Omit<Discipline, 'provenance'> & { provenance: Provenance }
@@ -208,12 +211,100 @@ const classBasis: Record<'stated' | 'derived', Message> = {
   derived: msg('Derived from the range or gauge the rule book states'),
 }
 
+/** A stored quantity as a row in SI, with the figure as printed in the rule book where it differed. */
+const quantityRow = (
+  label: Message,
+  quantity: Quantity,
+  kind: 'length' | 'mass' | 'energy',
+  v: QuantityValue | undefined,
+): FieldRow[] =>
+  v
+    ? [
+        {
+          label,
+          value: { quantity, si: toSi(kind, v.value) },
+          ...(v.raw && { printed: v.raw }),
+        },
+      ]
+    : []
+
+const list = (label: Message, values: readonly string[] | undefined): FieldRow[] =>
+  values ? [{ label, text: values.map((v) => titleFromKebab(v).toLowerCase()).join(', ') }] : []
+
+/** A duration in seconds as minutes where it is whole minutes. */
+const durationText = (seconds: number) =>
+  seconds % 60 === 0 ? `${seconds / 60} min` : `${seconds} s`
+
+const sightersText = (included: boolean | undefined) =>
+  included === undefined ? '' : included ? ', sighters included' : ', sighters not included'
+
+const coverText = {
+  discipline: 'for the discipline',
+  stage: 'per stage',
+  series: 'per series',
+  shot: 'per shot',
+}
+
+/** The sighters, series size and time limits of a discipline or a stage as rows. */
+export function courseRows(
+  c: Pick<NonNullable<Discipline['rules']>, 'sighters' | 'seriesShots' | 'timeLimits'>,
+): FieldRow[] {
+  return [
+    ...(c.sighters === undefined
+      ? []
+      : [
+          {
+            label: msg('Sighters'),
+            text: c.sighters === 'unlimited' ? 'Any number' : String(c.sighters),
+            numeric: true,
+          },
+        ]),
+    ...(c.seriesShots === undefined
+      ? []
+      : [{ label: msg('Shots per series'), text: String(c.seriesShots), numeric: true }]),
+    ...(c.timeLimits ?? []).map((t) => ({
+      label: msg('Time limit'),
+      text: `${durationText(t.duration.value)} ${coverText[t.covers]}${sightersText(t.includesSighters)}`,
+      numeric: true,
+      ...(t.duration.raw && { printed: t.duration.raw }),
+    })),
+  ]
+}
+
+/** The rule facts a discipline's rule book states, as rows; none where it states none. */
+export function ruleRows(r: DisciplineRules | undefined): FieldRow[] {
+  if (!r) return []
+  const a = r.ammunition
+  return [
+    ...(r.firearm ? [{ label: msg('Firearm'), text: titleFromKebab(r.firearm) }] : []),
+    ...list(msg('Actions'), r.actions),
+    ...list(msg('Positions'), r.positions),
+    ...list(msg('Support'), r.supports),
+    ...list(msg('Sights'), r.sights),
+    ...(r.maxMagnification
+      ? [{ label: msg('Magnification up to'), text: `${r.maxMagnification.value}×`, numeric: true }]
+      : []),
+    ...quantityRow(msg('Trigger weight from'), 'mass', 'mass', r.minTriggerWeight),
+    ...quantityRow(msg('Barrel length up to'), 'barrelLength', 'length', r.maxBarrelLength),
+    ...quantityRow(msg('Firearm mass up to'), 'firearmMass', 'mass', r.maxFirearmMass),
+    ...(a?.handloads === undefined
+      ? []
+      : [{ label: msg('Handloads'), text: a.handloads ? 'Allowed' : 'Not allowed' }]),
+    ...quantityRow(msg('Muzzle energy from'), 'energy', 'energy', a?.minMuzzleEnergy),
+    ...quantityRow(msg('Bullet mass from'), 'mass', 'mass', a?.minBulletMass),
+    ...quantityRow(msg('Bullet mass up to'), 'mass', 'mass', a?.maxBulletMass),
+    ...list(msg('Bullets'), a?.bulletTypes),
+    ...courseRows(r),
+  ]
+}
+
 /** The discipline's values beyond the strip: number, section, page and the caliber classes. */
 export function disciplineGroups(
-  d: Pick<DisciplineRecord, 'number' | 'section' | 'page' | 'caliberClasses'>,
+  d: Pick<DisciplineRecord, 'number' | 'section' | 'page' | 'caliberClasses' | 'rules'>,
   classes: readonly CaliberClassRef[],
   t: Translator['t'],
 ): FieldGroup[] {
+  const rules = ruleRows(d.rules)
   return [
     {
       rows: [
@@ -236,6 +327,7 @@ export function disciplineGroups(
           : []),
       ],
     },
+    ...(rules.length > 0 ? [{ title: msg('Rules'), rows: rules }] : []),
   ]
 }
 

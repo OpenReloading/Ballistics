@@ -5,6 +5,7 @@
   "event": "bdmp-kk-pist-rev-kleinkaliber-kurzwaffe-duell",
   "stage": "Duell",
   "shotCount": 12,
+  "seriesShots": 6,
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +24,12 @@
         "page": "C.16.9, Teil C, Seite 113 von 142, PDF p. 113",
         "fields": ["shotCount"],
         "note": "Two series of three pairs of shots."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.16.9, Teil C, Seite 113 bis 114 von 142, PDF pp. 113 to 114",
+        "fields": ["seriesShots"],
+        "note": "Each series is three pairs of shots, each pair in a 3 s window."
       }
     ],
     "note": "B.11.1.1 prints a ring spacing of 5 cm."

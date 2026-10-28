@@ -9,6 +9,15 @@
     "raw": "9.65mm"
   },
   "shotCount": 30,
+  "sighters": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 3
+      },
+      "covers": "shot"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +35,18 @@
         "source": "issf-rules-2025-third-print",
         "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
+        "fields": ["sighters"],
+        "note": "One sighting series of five shots before the stage."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.4, p. 365 (PDF p. 365)",
+        "fields": ["timeLimits"],
+        "note": "The target is shown five times, about 3 seconds each, one shot per appearance."
       }
     ]
   }

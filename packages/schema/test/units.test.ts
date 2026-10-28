@@ -35,6 +35,7 @@ describe('unit table', () => {
     for (const kind of [
       'energy',
       'velocity',
+      'time',
       'absoluteTemperature',
       'specificEnergy',
       'molarMass',

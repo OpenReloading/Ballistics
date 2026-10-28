@@ -10,6 +10,27 @@
     "unit": "m"
   },
   "category": "pistol",
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "minTriggerWeight": {
+      "value": 1360
+    },
+    "sighters": 0,
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 330,
+          "raw": "5:30 min"
+        },
+        "covers": "discipline"
+      }
+    ],
+    "actions": ["semi-automatic"]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +43,38 @@
         "source": "bdmp-sportordnung-2026-register-8",
         "page": "C.17.A.14, Teil C, Seite 125 von 142, PDF p. 125",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "Teil C (Kurzwaffen-Disziplinen), Seite 1 von 142, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A.1, Teil C, Seite 123 von 142, PDF p. 123",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A.2, Teil C, Seite 123 von 142, PDF p. 123",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A.3, Teil C, Seite 123 von 142, PDF p. 123",
+        "fields": ["rules.sights"],
+        "note": "The optical-sight class is scored separately."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A.8, Teil C, Seite 124 von 142, PDF p. 124",
+        "fields": ["rules.sighters", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-8",
+        "page": "C.17.A.14, Teil C, Seite 125 bis 128 von 142, PDF pp. 125 to 128",
+        "fields": ["rules.positions", "rules.supports", "rules.seriesShots"],
+        "note": "A post supports the shooter, the firearm may not touch it. Five shots per magazine."
       }
     ],
     "note": "Series polymer pistols in 9 mm Luger. The course is that of EPP, with station 2 at 25 m standing instead of 30 m prone (C.17.A.14). EPP Polymer Optical Sight (C.17.A.19, Teil C, PDF p. 129) is scored separately. The record holds the longest distance."

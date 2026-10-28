@@ -14,6 +14,26 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 5400,
+          "raw": "1 hour 30 minutes"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -31,6 +51,34 @@
         "source": "issf-rules-2025-third-print",
         "page": "Rules 8.4.3.4 and 8.4.4, p. 358 (PDF p. 358)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.1.1, p. 351 (PDF p. 351)",
+        "fields": ["rules.firearm"],
+        "note": "Stated for the pistol section as a whole."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.4.1.2, p. 352 (PDF p. 352); rule 8.7.1, p. 360 (PDF p. 360)",
+        "fields": ["rules.positions", "rules.supports", "rules.sights"],
+        "note": "Standing free, one hand, open sights only."
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.4.4, p. 358 (PDF p. 358)",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 6.11.9.8, p. 255 (PDF p. 255); rule 8.11, p. 374 (PDF p. 374)",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 6.11.9.8, p. 255 (PDF p. 255); rule 8.11, p. 374 (PDF p. 374)",
+        "fields": ["rules.timeLimits"],
+        "note": "Time for electronic scoring targets; with paper targets it is 1 hour 45 minutes."
       }
     ]
   }

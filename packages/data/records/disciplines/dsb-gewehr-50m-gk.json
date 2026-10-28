@@ -11,6 +11,10 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "sights": ["aperture"]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -18,6 +22,11 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 76 to 80, PDF pp. 94 to 98 (rows 1.37, 1.51, 1.54, 1.71, 1.91, 1.96)",
         "fields": ["name", "number", "federation", "section", "page", "distance", "category"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 76 to 80, PDF pp. 94 to 98 (rows 1.37, 1.51, 1.54, 1.71, 1.91 and 1.96, columns Waffenart and Visierung)",
+        "fields": ["rules.firearm", "rules.sights"]
       }
     ]
   }

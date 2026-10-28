@@ -10,6 +10,21 @@
     "unit": "m"
   },
   "category": "carbine",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 2000,
+      "raw": "2000 p"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 0,
+    "seriesShots": 6
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +37,42 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.10D.10, Teil D, Seite 62 von 294, PDF p. 62",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.2, Teil D, Seite 61 von 294, PDF p. 61",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.4, Teil D, Seite 61 von 294, PDF p. 61",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.5, D.10D.8, Teil D, Seite 61 bis 62 von 294, PDF pp. 61 to 62",
+        "fields": ["rules.supports", "rules.positions"],
+        "note": "No sling of any kind. A post supports the shooter, the firearm may not touch it."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.6, Teil D, Seite 61 von 294, PDF p. 61",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.10, Teil D, Seite 62 von 294, PDF p. 62",
+        "fields": ["rules.seriesShots"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.13, Teil D, Seite 64 von 294, PDF p. 64",
+        "fields": ["rules.sighters"]
       }
     ],
     "note": "The course runs at 10, 50 and 25 m. D.10D.0 names the pistol discipline PP 1 under a PP 2 heading. The record holds the longest distance."

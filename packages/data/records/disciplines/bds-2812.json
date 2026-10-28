@@ -15,6 +15,22 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 5000
+    },
+    "ammunition": {
+      "bulletTypes": ["lead", "jacketed"]
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -33,6 +49,35 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 7.02, Seite L-40, PDF p. 40",
         "fields": ["category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 7.02, Seite L-40, PDF p. 40",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "Open or closed sight; the closed sight with a hole rear sight is stored as aperture, a Diopter in the rule book sense is not allowed."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, L 14.07, Seite L-79 and L-80, PDF pp. 79 and 80",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.2, Seite L-81, PDF p. 81",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"]
       }
     ]
   }

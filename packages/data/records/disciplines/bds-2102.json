@@ -15,6 +15,33 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 5000
+    },
+    "ammunition": {
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,6 +54,47 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 2.01, Seite L-8, PDF p. 8",
         "fields": ["number", "distance", "category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.01, Seite L-8, PDF p. 8",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, L 14.07, Seite L-79 and L-80, PDF pp. 79 and 80",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.1, Seite L-81, PDF p. 81",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Shooters aged 55 or more may sit instead of lying, where the range allows it."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.06, Seite L-17, PDF p. 17",
+        "fields": ["rules.sighters"],
+        "note": "Within 5 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 2.04, Seite L-17, PDF p. 17",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "Program of the German and state championships; the halved program below state level is 15 shots in 15 minutes."
       }
     ]
   }

@@ -11,6 +11,35 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxFirearmMass": {
+      "value": 6500,
+      "raw": "6.5 kg"
+    },
+    "ammunition": {
+      "maxBulletMass": {
+        "value": 10.04,
+        "raw": "155 gr"
+      }
+    },
+    "sighters": 2,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 45
+        },
+        "covers": "shot"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +52,49 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.4.13, Teil D, Seite 20 von 294, PDF p. 20",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.1, Teil D, Seite 17 von 294, PDF p. 17",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.1.1, D.4.1.2, Teil D, Seite 17 von 294, PDF p. 17",
+        "fields": ["rules.minTriggerWeight", "rules.maxFirearmMass"],
+        "note": "The mass includes sights, hand stop and bipod."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.1.5, Teil D, Seite 18 von 294, PDF p. 18",
+        "fields": ["rules.sights"],
+        "note": "Any sight of two aiming elements."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.2, Teil D, Seite 18 von 294, PDF p. 18",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.3, Teil D, Seite 18 von 294, PDF p. 18",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.15, Teil D, Seite 21 von 294, PDF p. 21",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.4.17, Teil D, Seite 21 von 294, PDF p. 21",
+        "fields": ["rules.timeLimits"],
+        "note": "Per shot when shooting in a squad; a string squad gets one total time for all shots."
       }
     ],
     "note": "Rifles in .308 Winchester. D.4.13 sets 300 to 1000 m in 100 m steps nationally (300 to 1200 yd at Bisley), the announcement fixes the distances. The record holds the longest national distance."

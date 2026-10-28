@@ -11,6 +11,27 @@
     "unit": "m"
   },
   "category": "air-rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["repeater"],
+    "positions": ["prone", "kneeling", "standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "ammunition": {
+      "minMuzzleEnergy": {
+        "value": 7.5
+      }
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 420,
+          "raw": "7 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +44,24 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 5, Inhaltsverzeichnis, Seite 2 (PDF p. 146)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 9 bis 10, PDF pp. 153 to 154",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 5, Seiten 9 bis 10, PDF pp. 153 to 154",
+        "fields": ["rules.ammunition"],
+        "note": "Muzzle energy above 7.5 J."
       }
     ]
   }
