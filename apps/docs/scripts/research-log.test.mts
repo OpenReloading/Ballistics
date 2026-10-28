@@ -64,6 +64,17 @@ test('a commented-out section heading and a missing root-level file fail', () =>
   )
 })
 
+test('a heading inside a fenced block, a directory and a missing ./ root file fail', () => {
+  const fenced = `${entry('Numbers')}\n\`\`\`md\n## Numbers\n\nPlaceholder\n\`\`\`\n`
+  assert.deepEqual(entryErrors(fenced, root), ['section "Numbers" is missing or empty'])
+  const path = 'apps/docs/scripts/research-log.mts'
+  assert.deepEqual(entryErrors(entry().replaceAll(path, 'apps/docs/scripts'), root), [
+    'no file apps/docs/scripts',
+  ])
+  assert.deepEqual(entryErrors(entry().replaceAll(path, './LICENSE'), root), [])
+  assert.deepEqual(entryErrors(entry().replaceAll(path, './LICENCE'), root), ['no file ./LICENCE'])
+})
+
 test('every research log entry has all fields', () => {
   const files = entryFiles(dir)
   assert.ok(files.length > 0)

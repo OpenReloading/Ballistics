@@ -1,7 +1,7 @@
 // Checks of the research log entries, `docs/research/*.md`, run by research-log.test.mts: every entry has
 // the sections of the template, the fields with a fixed answer start with one of the answers, and the
 // files named under "Where in the app" exist.
-import { existsSync, readdirSync } from 'node:fs'
+import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 /** The sections of an entry, in order. */
@@ -33,14 +33,20 @@ function withoutComments(text: string): string {
   return out
 }
 
-/** The body of each `## ` section of a page, by heading. */
+/** The body of each `## ` section of a page, by heading; a `## ` line inside a fenced code block is text. */
 function bodies(text: string): Map<string, string> {
-  const found = new Map<string, string>()
-  for (const part of withoutComments(text).split(/^## /m).slice(1)) {
-    const end = part.indexOf('\n')
-    found.set(part.slice(0, end).trim(), part.slice(end + 1).trim())
+  const lines = new Map<string, string[]>()
+  let current: string[] | undefined
+  let fenced = false
+  for (const line of withoutComments(text).split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) fenced = !fenced
+    const heading = fenced ? null : /^## (.*)/.exec(line)
+    if (heading) {
+      current = []
+      lines.set((heading[1] ?? '').trim(), current)
+    } else current?.push(line)
   }
-  return found
+  return new Map([...lines].map(([name, body]) => [name, body.join('\n').trim()]))
 }
 
 /** Findings on one entry: a missing or empty section, a fixed answer not given, a named file that does not exist. */
@@ -55,11 +61,12 @@ export function entryErrors(text: string, root: string): string[] {
       errors.push(`"${s}" must start with ${list.join(', ')}`)
   }
   const where = body.get('Where in the app') ?? ''
-  // shortcut: only a path with a slash or a file name with a known extension inside backticks counts, a bare name is not looked up
+  // shortcut: only a path with a slash (`./LICENSE` for a root-level file without extension) or a file name with a known extension inside backticks counts, a bare name is not looked up
   for (const [, f] of where.matchAll(
     /`([\w.-]+\/[\w./[\]-]+|[\w.-]+\.(?:md|mdx|mts|ts|tsx|js|mjs|cjs|json|jsonc|ya?ml))`/g,
   ))
-    if (!existsSync(join(root, f ?? ''))) errors.push(`no file ${f}`)
+    if (!statSync(join(root, f ?? ''), { throwIfNoEntry: false })?.isFile())
+      errors.push(`no file ${f}`)
   return errors
 }
 
