@@ -57,12 +57,9 @@ function sharedFiles() {
  */
 export async function loadModel(spec: string): Promise<Model> {
   const { core, files } = sharedFiles()
-  if (spec === builtInName)
-    return {
-      name: spec,
-      interior,
-      files: [...files, ...closure(join(core, 'interior/model.js'), core, 'core')],
-    }
+  // A candidate may call the core model, so its version includes the core model's files too.
+  const coreModel = [...files, ...closure(join(core, 'interior/model.js'), core, 'core')]
+  if (spec === builtInName) return { name: spec, interior, files: coreModel }
   const path = resolve(spec)
   if (!existsSync(path))
     throw new UsageError(`the model ${spec} is neither "${builtInName}" nor a file`)
@@ -77,6 +74,6 @@ export async function loadModel(spec: string): Promise<Model> {
   return {
     name: spec,
     interior: loaded.interior as InteriorModel,
-    files: [...files, ...closure(path, dirname(path), 'candidate')],
+    files: [...coreModel, ...closure(path, dirname(path), 'candidate')],
   }
 }

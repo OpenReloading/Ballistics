@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { compare, verify } from '../src/commands.ts'
 import { Refusal, UsageError } from '../src/errors.ts'
+import { loadModel } from '../src/model.ts'
 import { rowsPath } from './data.ts'
 import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
 
@@ -108,5 +109,11 @@ describe('compare', () => {
     const a = await verify(options, path)
     writeFileSync(helper, "export { interior } from '@open-reloading/core'\n// changed\n")
     expect((await verify(options, path)).modelVersion).not.toBe(a.modelVersion)
+  })
+
+  it('includes the files of the core model in a candidate version', async () => {
+    const { files } = await loadModel(worse)
+    expect(files.map((f) => f.label)).toContain('core/interior/model.js')
+    expect(files.map((f) => f.label)).toContain('candidate/worse-model.mjs')
   })
 })

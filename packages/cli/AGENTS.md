@@ -10,7 +10,7 @@
 
 ## Loop for an agent
 
-1. Save the baseline: `node packages/cli/dist/bin.js verify --rows <rows> --records <dir> > baseline.json` (validation split, JSON when piped). Its `modelVersion` names the model, records and rows.
+1. Save the baseline: `node packages/cli/dist/bin.js verify --rows <rows> --records <dir> > baseline.json` (validation split, JSON when piped; add `--group-by <key>` here and in step 3 to get grouped changes). Its `modelVersion` names the model, records and rows.
 2. Change the model (core), then `npm run build -w @open-reloading/core`.
 3. `node packages/cli/dist/bin.js compare --rows <rows> --records <dir> --baseline baseline.json --candidate m3`. A candidate can also be a module path that exports `interior`, with no build step.
 4. Decide on `change`: a negative `velocityMedian` and `velocityP90` is better; check `usedRows` (a model that refuses rows looks better) and the per-family changes (`--group-by` for others). Keep or revert.

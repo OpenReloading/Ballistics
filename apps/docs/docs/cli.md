@@ -33,7 +33,7 @@ One CSV file, or a folder of `.csv` files read in name order, with a header line
 
 A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted.
 
-The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. A record that fails its schema is left out and counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
+The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
 
 ## Split
 
@@ -53,7 +53,7 @@ The powder parameters are those of the records (`--params records`, the only mod
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 
-- `<label> <sha256>` of each built source file the evaluation reads: the files `@open-reloading/core` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module and its relative imports replace the model file of core);
+- `<label> <sha256>` of each built source file the evaluation reads: the files `@open-reloading/core` builds for `interior/model.js` and `interior/record-load.js`, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed);
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 
