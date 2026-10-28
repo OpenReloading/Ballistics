@@ -7272,6 +7272,20 @@ main .field-table tr.field-group > th {
   min-height: 1.5rem;
 }
 
+/* the dimensions tables' symbols too, stacked one per row: under a 24 px pitch they fail WCAG 2.5.8
+   whatever the space beside them, so the symbol fills its row and its cell has no block padding */
+@media screen {
+  .cartridge-values tbody th [tabindex] {
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  main .cartridge-values tbody th.dim-symbol {
+    padding-block: 0;
+  }
+}
+
 @media screen {
   .cartridge-values .tolerance {
     font-size: var(--mantine-font-size-xs);

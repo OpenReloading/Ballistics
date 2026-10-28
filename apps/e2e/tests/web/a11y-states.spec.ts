@@ -326,6 +326,20 @@ for (const width of widths) {
   })
 }
 
+// WCAG 2.5.8: the symbol buttons of the dimensions tables, one per row, with and without notes
+for (const width of widths) {
+  test(`the symbols of the dimensions tables are 24 px high at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: tall })
+    for (const id of ['12', '308-win']) {
+      await gotoHydrated(page, `/cartridges/${id}`)
+      const symbols = page.locator('.cartridge-values tbody th [tabindex]')
+      await expect(symbols.first()).toBeVisible()
+      for (const symbol of await symbols.all())
+        expect((await symbol.boundingBox())?.height).toBeGreaterThanOrEqual(24)
+    }
+  })
+}
+
 test('the selected segment of a segmented control has a border in forced colours', async ({
   page,
 }) => {
