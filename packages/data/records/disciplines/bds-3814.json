@@ -7,7 +7,8 @@
   "page": "Seite L-67, PDF p. 67",
   "distance": {
     "value": 50000,
-    "raw": "30, 40, 50 m"
+    "raw": "30, 40, 50 m",
+    "unit": "m"
   },
   "category": "rifle",
   "provenance": {

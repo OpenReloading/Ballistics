@@ -7,7 +7,8 @@
   "page": "Teil E, Seite 17 bis 22 von 42, PDF pp. 17 to 22",
   "distance": {
     "value": 900000,
-    "raw": "300 bis 900m"
+    "raw": "300 bis 900m",
+    "unit": "m"
   },
   "category": "rifle",
   "provenance": {

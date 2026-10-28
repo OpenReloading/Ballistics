@@ -26,6 +26,14 @@ describe('CaseCapacity', () => {
     expect(catalogueCaseCapacity.safeParse(user).success).toBe(false)
   })
 
+  it('takes an optional convention string, not an empty one', () => {
+    expect(caseCapacity.parse(user).convention).toBeUndefined()
+    const convention = 'to the mouth, water at 20 C, primer seated'
+    expect(caseCapacity.parse({ ...user, convention }).convention).toBe(convention)
+    expect(catalogueCaseCapacity.parse({ ...catalogue, convention }).convention).toBe(convention)
+    expectIssueAt(caseCapacity, { ...user, convention: '' }, 'convention')
+  })
+
   it('needs an id and provenance in a catalogue record, which names catalogue records only', () => {
     const { id: _id, provenance: _p, ...bare } = catalogue
     expectIssueAt(caseCapacity, bare, 'id')

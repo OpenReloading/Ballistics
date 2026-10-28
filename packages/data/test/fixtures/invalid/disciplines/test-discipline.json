@@ -4,6 +4,6 @@
   "name": "Test discipline",
   "section": "1.1",
   "page": "p. 1",
-  "distance": { "value": 10000 },
+  "distance": { "value": 10000, "unit": "m" },
   "provenance": { "kind": "published", "sources": [{ "title": "Test rule book" }] }
 }

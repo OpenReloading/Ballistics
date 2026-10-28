@@ -39,7 +39,7 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `federation` | Id of the federation whose rule book defines it |
 | `name`, `number` | Name and discipline number or code as printed ("2113", "SG 1") |
 | `section`, `page` | Rule-book section that defines it, printed page and PDF page |
-| `distance` | mm |
+| `distance` | `value` in mm; `unit`: the unit the rule book states, `m`, `yd` or `m/yd` (both, as in "50 Meter/Yards"). The number is the printed one: `m/yd` keeps the metric reading in `value`, and the same number applies in yards. |
 | `category` | Kind of firearm (`disciplineCategory`), where the rule book states it |
 | `caliberClasses` | `ids` of caliber class records (`records/caliber-classes/`) with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
 | `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent |

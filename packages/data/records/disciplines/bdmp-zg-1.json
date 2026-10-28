@@ -7,7 +7,8 @@
   "page": "Teil D, Seite 66 bis 70 von 294, PDF pp. 66 to 70",
   "distance": {
     "value": 100000,
-    "raw": "100 m"
+    "raw": "100 m",
+    "unit": "m"
   },
   "category": "rifle",
   "caliberClasses": {

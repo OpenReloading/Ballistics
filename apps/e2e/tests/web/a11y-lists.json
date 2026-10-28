@@ -215,6 +215,18 @@
       "node": "<td",
       "where": "Keyboard shortcuts",
       "reason": "Cell of the shortcuts table in a dialog that scrolls sideways at the narrow widths; the part outside the box counts as covered. It sits on the dialog surface, 5:1 or more in both themes by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "class=\"source-count\"",
+      "where": "Database list filter",
+      "reason": "Option count of a single digit, which axe cannot judge as text. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg, the popover's body colour)."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "mantine-Group-root > span:nth-child(1)",
+      "where": "Database list filter",
+      "reason": "Option name below the visible part of the popover's scroll box, which axe reports as covered. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg)."
     }
   ]
 }

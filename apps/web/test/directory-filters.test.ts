@@ -43,13 +43,18 @@ it('keeps the search, source, scope and sort in the URL, other parameters untouc
     query: '168 vld',
     sources: 'user',
     fits: '308-win',
-    organization: 'ISSF',
+    facets: { org: ['ISSF', 'DSB'], dist: ['25m'] },
     sort: { column: 'mass', dir: 'descending' as const },
   }
   const search = writeDirectory(state, '?units=us')
-  expect(search).toBe('?units=us&q=168+vld&src=user&fits=308-win&org=ISSF&sort=-mass')
-  expect(readDirectory(search)).toEqual(state)
-  expect(writeDirectory(emptyDirectory, search)).toBe('?units=us')
+  expect(search).toBe('?units=us&q=168+vld&src=user&fits=308-win&org=ISSF,DSB&dist=25m&sort=-mass')
+  expect(readDirectory(search, ['org', 'dist', 'category'])).toEqual(state)
+  // a filter the list does not have is not read, and a filter taken out leaves the URL
+  expect(readDirectory(search).facets).toBeUndefined()
+  expect(writeDirectory({ ...state, facets: { org: ['ISSF'] } }, search, ['org', 'dist'])).toBe(
+    '?units=us&q=168+vld&src=user&fits=308-win&org=ISSF&sort=-mass',
+  )
+  expect(writeDirectory(emptyDirectory, search, ['org', 'dist'])).toBe('?units=us')
   expect(readDirectory('?sort=name')).toEqual({
     ...emptyDirectory,
     sort: { column: 'name', dir: 'ascending' },

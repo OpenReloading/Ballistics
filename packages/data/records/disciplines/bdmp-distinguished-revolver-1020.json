@@ -6,7 +6,8 @@
   "page": "Teil C, Seite 140 von 142, PDF p. 140",
   "distance": {
     "value": 25000,
-    "raw": "25 Meter/ Yard"
+    "raw": "25 Meter/ Yard",
+    "unit": "m/yd"
   },
   "category": "revolver",
   "provenance": {
