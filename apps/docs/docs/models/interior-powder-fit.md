@@ -106,6 +106,10 @@ $$
 
 Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/core/src/huber.ts`, `huberLoss`.
 
+The result carries `stop` and `weightsSettled` of the [solver](least-squares.md#levenberg-marquardt-step): which rule ended the loop and whether the set of ladder rows beyond the threshold was unchanged over the last accepted step. Without `huberThreshold` the second is true.
+
+Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`stop`, `weightsSettled`).
+
 Priors and the Huber loss need uncertainties on every velocity, since $s_j$ and $k$ are in absolute and in sigma units. Without `huberThreshold` the loss is quadratic ([Huber 1964](../bibliography.md#huber-1964)).
 
 ### Uncertainty
