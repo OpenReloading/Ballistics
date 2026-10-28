@@ -1,6 +1,7 @@
 'use client'
 
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@open-reloading/schema'
+import { useTranslation } from '../i18n/language.ts'
 import { localizeDecimals } from '../i18n/number.ts'
 import {
   type CaliberClassSummary,
@@ -25,7 +26,8 @@ interface Extras {
   classes: CaliberClassSummary[]
 }
 
-function DisciplineRecordView({
+/** The record page's content: re-rendered on a language change, which the stages' decimal marks follow. */
+export function DisciplineRecordView({
   d,
   mappings,
   faces,
@@ -33,6 +35,7 @@ function DisciplineRecordView({
   federations,
   classes,
 }: { d: DisciplineRecord } & Extras) {
+  useTranslation()
   const federation = federations.find((f) => f.id === d.federation)
   const international = disciplines.find((x) => x.id === d.internationalDiscipline)
   const book = disciplineRuleBook(d)
