@@ -99,6 +99,12 @@ describe('shotsNeeded', () => {
     expect(halfWidth(n - 1)).toBeGreaterThan(0.25)
   })
 
+  it('searches up to the shot limit when doubling would pass it', () => {
+    const n = shotsNeeded(0.01, 0.999991)
+    expect(n).toBeGreaterThan(98_304)
+    expect(n).toBeLessThanOrEqual(100_000)
+  })
+
   it('starts at 3 shots for a wide interval and refuses a width it cannot search', () => {
     expect(shotsNeeded(100)).toBe(3)
     expect(() => shotsNeeded(0.001)).toThrow(InputError)

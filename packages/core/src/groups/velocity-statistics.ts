@@ -91,10 +91,8 @@ export function shotsNeeded(relativeHalfWidth: number, level: number = defaultLe
     return (f.upper - f.lower) / 2 <= relativeHalfWidth
   }
   let hi = minimumIntervalShots
-  while (!narrow(hi)) {
-    hi *= 2
-    need(hi <= shotLimit, 'relative half-width needs more shots than the search covers')
-  }
+  while (!narrow(hi) && hi < shotLimit) hi = Math.min(hi * 2, shotLimit)
+  need(narrow(hi), 'relative half-width needs more shots than the search covers')
   let lo = Math.max(minimumIntervalShots, hi / 2)
   // narrow(hi) holds; find the first n in (lo, hi] that holds
   if (narrow(lo)) return lo
