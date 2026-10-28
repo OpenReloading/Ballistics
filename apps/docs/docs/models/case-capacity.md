@@ -189,7 +189,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 ## Assumptions
 
-- The default convention of a capacity record without `convention`: the water fills the case to the mouth, at 20 °C, the primer state as the record's `caseCondition` implies (not stated otherwise).
+- The default convention of a capacity record without `convention`: the water fills the case to the mouth, at 20 °C. The primer state is not part of the default: `caseCondition` does not define one.
 - The bullet is a solid of revolution with the outline `bulletOutline` builds. Missing dimensions take stated proportions, which the notes name.
 - The cavity of a hollow base is a cone of half angle 45° or a hemisphere, as deep as its radius, and it is empty: no wad or lubricant in it.
 - Only the mouth position bounds the bullet volume. The neck diameter and the case wall do not enter.
