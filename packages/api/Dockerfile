@@ -8,6 +8,7 @@ COPY packages/core/package.json packages/core/
 COPY packages/data/package.json packages/data/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
+COPY packages/cli/package.json packages/cli/
 COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/
@@ -29,6 +30,7 @@ COPY packages/core/package.json packages/core/
 COPY packages/data/package.json packages/data/
 COPY packages/api/package.json packages/api/
 COPY packages/drawing/package.json packages/drawing/
+COPY packages/cli/package.json packages/cli/
 COPY apps/web/package.json apps/web/
 COPY tools/package.json tools/
 COPY apps/e2e/package.json apps/e2e/

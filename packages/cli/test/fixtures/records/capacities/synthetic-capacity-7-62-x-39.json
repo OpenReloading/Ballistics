@@ -1,0 +1,19 @@
+{
+  "id": "synthetic-capacity-7-62-x-39",
+  "origin": "catalogue",
+  "cartridge": "catalogue:7-62-x-39",
+  "waterCapacity": {
+    "value": 2.0
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": ["waterCapacity"],
+        "note": "Invented value for tests; not a measurement."
+      }
+    ]
+  }
+}

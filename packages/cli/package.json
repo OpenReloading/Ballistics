@@ -1,0 +1,30 @@
+{
+  "name": "@open-reloading/cli",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ballistics": "dist/bin.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "schema": "node src/write-json-schema.ts && biome format --write schema",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@open-reloading/core": "0.0.3",
+    "@open-reloading/data": "0.0.4",
+    "@open-reloading/drawing": "0.0.3",
+    "@open-reloading/schema": "0.0.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.5",
+    "ajv": "^8.20.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
