@@ -1,0 +1,218 @@
+{
+  "speed": {
+    "smallFileFirst": {
+      "mainThreadGapMs": 39.90000003576279,
+      "longTasksMs": []
+    },
+    "large": {
+      "wallMs": 184,
+      "timing": "Read in 33 ms, built in 41 ms.",
+      "counts": "5028 rows: 4939 accepted, 9 with a warning, 89 rejected. New 4911, already here 0, changed 9, repeated in file 19.",
+      "mainThreadGapMs": 39.40000003576279,
+      "longTasksMs": []
+    },
+    "remap": {
+      "wallMs": 105,
+      "timing": "Read in 33 ms, built in 41 ms.",
+      "mainThreadGapMs": 21,
+      "longTasksMs": []
+    }
+  },
+  "clicks": {
+    "a:a_clean_csv": {
+      "clicks": 5,
+      "typed": 1,
+      "written": 7
+    },
+    "a:b_mixed_three": {
+      "clicks": 5,
+      "typed": 1,
+      "written": 14
+    },
+    "a:c_wrong_guess": {
+      "clicks": 8,
+      "typed": 1,
+      "written": 9
+    },
+    "b:a_clean_csv": {
+      "clicks": 2,
+      "typed": 1,
+      "written": 7
+    },
+    "b:b_mixed_three": {
+      "clicks": 2,
+      "typed": 1,
+      "written": 14
+    },
+    "b:c_wrong_guess": {
+      "clicks": 5,
+      "typed": 1,
+      "written": 9
+    }
+  },
+  "duplicates": {
+    "second": "4 rows: 4 accepted, 0 with a warning, 0 rejected. New 0, already here 7, changed 0, repeated in file 0.",
+    "third": "4 rows: 4 accepted, 0 with a warning, 0 rejected. New 0, already here 6, changed 1, repeated in file 0.",
+    "button": "Import 0 valid rows",
+    "disabled": true
+  },
+  "keyboard": {
+    "b": [
+      "Alpha",
+      "Dark theme",
+      "Search",
+      "Load workbench",
+      "Session summary",
+      "Shot groups",
+      "Database",
+      "Settings",
+      "Safety notice",
+      "Choose files",
+      "bullets-5000.csv",
+      "bullets-eu.csv",
+      "powders.csv",
+      "cartridges.csv",
+      "bullets.xlsx",
+      "weather.csv",
+      "demo.load",
+      "headers-only-length.csv",
+      "notes.txt",
+      "Remove bullets-eu.csv",
+      "",
+      "Field of column Bezeichnung",
+      "Field of column Hersteller",
+      "Field of column Kaliber",
+      "Field of column Durchmesser mm",
+      "Unit of column Durchmesser mm",
+      "Decimal mark of column Durchmesser mm",
+      "Field of column Gewicht g",
+      "Unit of column Gewicht g",
+      "Decimal mark of column Gewicht g",
+      "Field of column Länge mm",
+      "Unit of column Länge mm",
+      "Decimal mark of column Länge mm",
+      "Field of column G1",
+      "Unit of column G1",
+      "Decimal mark of column G1",
+      "",
+      "",
+      "Remove powders.csv",
+      ""
+    ],
+    "a": [
+      "Close",
+      "Field of column Bezeichnung",
+      "Field of column Hersteller",
+      "Field of column Kaliber",
+      "Field of column Durchmesser mm",
+      "Unit of column Durchmesser mm",
+      "Decimal mark of column Durchmesser mm",
+      "Field of column Gewicht g",
+      "Unit of column Gewicht g",
+      "Decimal mark of column Gewicht g",
+      "Field of column Länge mm",
+      "Unit of column Länge mm",
+      "Decimal mark of column Länge mm",
+      "Field of column G1",
+      "Unit of column G1",
+      "Decimal mark of column G1",
+      "",
+      "Field of column Name",
+      "Field of column Maker",
+      "Field of column Grain form",
+      "Field of column Base",
+      "Field of column Bulk density (g/cm3)",
+      "Unit of column Bulk density (g/cm3)",
+      "Decimal mark of column Bulk density (g/cm3)",
+      "",
+      "Field of column Name",
+      "Field of column Dia",
+      "Unit of column Dia",
+      "Decimal mark of column Dia",
+      "Field of column Len",
+      "Unit of column Len",
+      "Decimal mark of column Len",
+      "",
+      "Back",
+      "Continue",
+      "Close",
+      "Field of column Bezeichnung",
+      "Field of column Hersteller",
+      "Field of column Kaliber",
+      "Field of column Durchmesser mm"
+    ]
+  },
+  "layout": {
+    "b 1280x650": {
+      "scrollWidth": 1280,
+      "innerWidth": 1280,
+      "scrollHeight": 2631,
+      "innerHeight": 650
+    },
+    "a step2 1280x650": {
+      "dialogW": 620,
+      "dialogH": 585,
+      "innerWidth": 1280,
+      "innerHeight": 650,
+      "bodyScrolls": false,
+      "overflowX": false
+    },
+    "a step3 1280x650": {
+      "dialogW": 620,
+      "dialogH": 585,
+      "innerWidth": 1280,
+      "innerHeight": 650,
+      "bodyScrolls": false,
+      "overflowX": false
+    },
+    "a step4 1280x650": {
+      "dialogW": 620,
+      "dialogH": 585,
+      "innerWidth": 1280,
+      "innerHeight": 650,
+      "bodyScrolls": false,
+      "overflowX": false
+    },
+    "b 390x844": {
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "scrollHeight": 4547,
+      "innerHeight": 844
+    },
+    "a step2 390x844": {
+      "dialogW": 351,
+      "dialogH": 759.59375,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "bodyScrolls": false,
+      "overflowX": false
+    },
+    "a step3 390x844": {
+      "dialogW": 351,
+      "dialogH": 759.59375,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "bodyScrolls": false,
+      "overflowX": false
+    },
+    "a step4 390x844": {
+      "dialogW": 351,
+      "dialogH": 759.59375,
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "bodyScrolls": false,
+      "overflowX": false
+    }
+  },
+  "verdicts": {
+    "bullets-5000.csv": "Table of bullets (high)",
+    "bullets-eu.csv": "Table of bullets (high)",
+    "bullets.xlsx": "Table of bullets (high)",
+    "powders.csv": "Table of powders (high)",
+    "cartridges.csv": "Table of cartridges (high)",
+    "headers-only-length.csv": "Table of bullets (medium)",
+    "weather.csv": "Refused: no kind",
+    "demo.load": "Load file, read by Demo load text",
+    "notes.txt": "Refused: no kind"
+  }
+}

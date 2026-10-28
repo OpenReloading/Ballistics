@@ -1,0 +1,21 @@
+ok   bullet-0     want bullet    got bullet    high b1.00 c0.45 p0.20
+ok   bullet-1     want bullet    got bullet    high b0.95 c0.42 p0.30
+ok   bullet-2     want bullet    got bullet    high b1.00 c0.45 p0.20
+ok   bullet-3     want bullet    got bullet    high b0.95 p0.25 c0.20
+ok   bullet-4     want bullet    got bullet    high b1.00 c0.45 p0.20
+ok   bullet-5     want bullet    got bullet    high b1.00 c0.45 p0.25
+ok   powder-0     want powder    got powder    medium p0.75 b0.20 c0.20
+ok   powder-1     want powder    got powder    high p1.00 b0.20 c0.20
+ok   powder-2     want powder    got powder    high p0.97 b0.20 c0.20
+ok   powder-3     want powder    got powder    high p0.80 b0.25 c0.20
+ok   powder-4     want powder    got powder    medium p0.70 b0.20 c0.20
+ok   cartridge-0  want cartridge got cartridge high c1.00 b0.59 p0.20
+ok   cartridge-1  want cartridge got cartridge high c1.00 b0.23 p0.20
+ok   cartridge-2  want cartridge got cartridge medium c0.77 b0.24 p0.20
+ok   cartridge-3  want cartridge got cartridge medium c0.72 b0.50 p0.20
+ok   cartridge-4  want cartridge got cartridge medium c0.60 b0.24 p0.20
+ok   unrelated-0  want undefined got undefined - b0.00 p0.00 c0.00
+ok   unrelated-1  want undefined got undefined - b0.00 p0.00 c0.00
+ok   unrelated-2  want undefined got undefined - b0.20 p0.20 c0.20
+kind accuracy: 19/19
+unit conversion, largest absolute error (g, mm): 1.7763568394002505e-15
