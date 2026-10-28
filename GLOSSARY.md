@@ -203,7 +203,7 @@ _Avoid_: l3
 _Avoid_: l6
 
 **Case capacity**:
-One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
+One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `convention`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
 
 **Water capacity**:
 `waterCapacity`: mass of water filling a case to the mouth, g, on a case capacity.
@@ -215,6 +215,9 @@ _Avoid_: ownCapacity
 
 **Case condition**:
 `caseCondition`: state of the case when its capacity was measured: `new`, `fired` or `sized`.
+
+**Capacity convention**:
+`convention`: how the water was filled for a case capacity (fill level, water temperature, primer state), free text as the source states it. Absent: the default convention of the case capacity model page. It does not enter the derived volume.
 
 **Caliber class**:
 A record of kind `caliber-classes`: a class of bullet diameter with `name`, `diameter` and the member `cartridges`. `caliberClasses`: on a discipline an object with the ids of the class records it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
