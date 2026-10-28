@@ -2,6 +2,7 @@
   "name": "@open-reloading/schema",
   "version": "0.0.4",
   "license": "MIT",
+  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/schema/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",
