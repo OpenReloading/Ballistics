@@ -19,7 +19,7 @@ Try one or more of these tasks in the [web app](https://openreloading.github.io/
 ## Report what went wrong
 
 - A bug, a wrong value or a confusing step: Report an issue (the bug icon in the top bar, or the drawer on a phone), or [open an issue](https://github.com/OpenReloading/Ballistics/issues/new/choose). Name the task, what you expected and what you saw. A screenshot helps.
-- General feedback and questions: [GitHub Discussions](https://github.com/OpenReloading/Ballistics/discussions) or [Discord](https://discord.gg/hUCSjDYNaa).
+- General feedback and questions: [GitHub Discussions](https://github.com/OpenReloading/Ballistics/discussions) or the community channel linked in the [README](https://github.com/OpenReloading/Ballistics#readme).
 
 ## Post for the community channels
 
