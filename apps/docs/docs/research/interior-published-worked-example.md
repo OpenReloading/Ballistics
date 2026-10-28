@@ -15,7 +15,7 @@ The example's inputs were entered as printed on its first sheet: chamber volume 
 
 ## Formulas
 
-Those of the [constant-surface entry](interior-constant-surface-closed-form.md): the scaled muzzle travel $\xi_e = A x_e / V^\ast$, the burnout state $\theta_B$, the factor $1/(1 - \theta_B)$ and the pressure and velocity of the closed form. The source is [the 1977 weapons handbook](../bibliography.md#rheinmetall-1977), section 2.1.5.5, p. 95 and sheets 1 to 3 (sheet 1 is printed on p. 98).
+Those of the [constant-surface entry](interior-constant-surface-closed-form.md): the scaled muzzle travel $\xi_e = A x_e / V^\ast$, the burnout state $\theta_B$, the factor $1/(1 - \theta_B)$ and the pressure and velocity of the closed form. The source is [the 1977 weapons handbook](../bibliography.md#rheinmetall-1977), section 2.1.5.5, p. 95 and sheets 1 to 3 (sheet 1 is printed on p. 98; the pages of sheets 2 and 3 are unverified here). The test takes the pressure and velocity values from sheet 2 and the burnout values from sheet 3.
 
 ## Numbers
 

@@ -25,7 +25,7 @@ A fourth case reads the first segment of the first table past its nodes, at Mach
 
 ## Formulas
 
-The slope at an interior node is the three-point parabola slope $p_j$ limited to twice the smaller adjacent secant, and the end nodes take the end secants ([monotone cubic interpolation](../models/exterior-drag.md); the limit follows [Fritsch 1980](../bibliography.md#fritsch-1980), pages unverified). For the first table the secants are 1 and 1/2, the parabola slope is 5/6, so the interior slope is $2 \min(1,\ 1/2,\ 5/12) = 5/6$. For the third table the secants are 1 and 5, the parabola slope is 3, so the interior slope is $2 \min(1,\ 5,\ 3/2) = 2$, set by the smaller secant, not by the parabola. With two nodes there is one secant and the cubic is the line.
+The slope at an interior node is the three-point parabola slope $p_j$ limited to twice the smaller adjacent secant, and the end nodes take the end secants ([monotone cubic interpolation](../models/exterior-drag.md); the limited three-point slope follows [Steffen 1990](../bibliography.md#steffen-1990), equation numbers unverified, and the monotonicity region of the Hermite form [Fritsch 1980](../bibliography.md#fritsch-1980)). For the first table the secants are 1 and 1/2, the parabola slope is 5/6, so the interior slope is $2 \min(1,\ 1/2,\ 5/12) = 5/6$. For the third table the secants are 1 and 5, the parabola slope is 3, so the interior slope is $2 \min(1,\ 5,\ 3/2) = 2$, set by the smaller secant, not by the parabola. With two nodes there is one secant and the cubic is the line.
 
 ## Numbers
 

@@ -19,6 +19,8 @@ The momentum balance of the [free recoil model](../models/free-recoil.md), $I = 
 
 ## Numbers
 
+The printed values are transcribed from the test comment; the page of the standard that holds them is unverified.
+
 | Quantity | Printed on the sheet | Model |
 | --- | --- | --- |
 | recoil velocity | 16.65 ft/s | 16.653 ft/s (816000/49000) |
