@@ -26,7 +26,7 @@ import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { localDay } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
-import { pickFiles, splitImport, tableFormats } from '../lib/file-access.ts'
+import { pickFiles, tableFormats } from '../lib/file-access.ts'
 import {
   type BuildView,
   type CardView,
@@ -623,4 +623,33 @@ export function ImportEntry({
       </Stack>
     </AppModal>
   )
+}
+
+/**
+ * Picked files split by content: a JSON object, as an OpenReloading data file is, goes to the data
+ * file import, every other file to the Import entry's cards.
+ */
+export async function splitImport<F extends { file: Blob }>(picked: F[]) {
+  const data: F[] = []
+  const tables: F[] = []
+  for (const p of picked)
+    (/^\uFEFF?\s*\{/.test(await p.file.slice(0, 1024).text()) ? data : tables).push(p)
+  return { data, tables }
+}
+
+/** The Import entry's page and the table files it opens with. */
+export interface TablesEntry {
+  Entry: typeof ImportEntry
+  files: File[]
+}
+
+/** Data files go to `importData`, every other file to the Import entry's cards. */
+export async function routeImport(
+  picked: { file: File }[],
+  show: (entry: TablesEntry) => void,
+  importData: (files: File[]) => Promise<void>,
+) {
+  const { data, tables } = await splitImport(picked)
+  if (tables.length) show({ Entry: ImportEntry, files: tables.map((p) => p.file) })
+  if (data.length) await importData(data.map((p) => p.file))
 }

@@ -8,8 +8,8 @@ import {
   FileCard,
   folded,
   ImportFoot,
+  splitImport,
 } from '../src/components/import-entry.tsx'
-import { splitImport } from '../src/lib/file-access.ts'
 import {
   type BuildView,
   type CardView,

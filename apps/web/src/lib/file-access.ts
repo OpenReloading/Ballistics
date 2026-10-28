@@ -60,18 +60,6 @@ export const tableFormats: { name: string; accept: Record<string, string[]> }[] 
   },
 ]
 
-/**
- * Picked files split by content: a JSON object, as an OpenReloading data file is, goes to the data
- * file import, every other file to the Import entry's cards.
- */
-export async function splitImport<F extends { file: Blob }>(picked: F[]) {
-  const data: F[] = []
-  const tables: F[] = []
-  for (const p of picked)
-    (/^\uFEFF?\s*\{/.test(await p.file.slice(0, 1024).text()) ? data : tables).push(p)
-  return { data, tables }
-}
-
 /** Files from the open picker or a file input, offering `formats`; empty when cancelled. */
 export async function pickFiles(
   multiple: boolean,
