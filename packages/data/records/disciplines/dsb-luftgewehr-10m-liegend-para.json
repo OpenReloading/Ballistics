@@ -15,6 +15,17 @@
     "ids": ["air-4-5"],
     "basis": "derived"
   },
+  "rules": {
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3600,
+          "raw": "60 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,6 +38,12 @@
         "source": "dsb-sportordnung-2027",
         "page": "0.21, Teil 0 Seite 76, PDF p. 94 (row 1.10: Luftgewehr, 4,5 mm, 10 m)",
         "fields": ["distance", "caliberClasses"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "10.12 Schießzeiten und Schusszahlen (row 1.18), Teil 10 Seite 15, PDF p. 435",
+        "fields": ["rules.timeLimits"],
+        "note": "Printed time is for pulley systems; other systems have 50 min."
       }
     ],
     "note": "Row 1.18 prints no distance, caliber or face. The record takes them from the air rifle row 1.10 of 0.21 (Scheibe Nr. 1)."

@@ -14,6 +14,27 @@
     "ids": ["rimfire-17", "rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater"],
+    "positions": ["sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -31,6 +52,35 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 3 (PDF p. 229)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 63, PDF p. 121",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.sights",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 63, PDF p. 121",
+        "fields": ["rules.supports"],
+        "note": "Bipod, sandbag or bench rest at the forend and the rear of the stock; complete cradles are not allowed."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seite 63, PDF p. 121",
+        "fields": ["rules.sighters"],
+        "note": "Any number of sighting shots, within the total time."
       }
     ]
   }

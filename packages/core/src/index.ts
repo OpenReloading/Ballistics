@@ -1,3 +1,4 @@
+export * from './advisories.ts'
 export * from './bullet-fit.ts'
 export * from './cartridge-specs.ts'
 export * from './drag-tables.ts'

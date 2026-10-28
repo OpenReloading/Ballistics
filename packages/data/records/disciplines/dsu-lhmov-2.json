@@ -26,6 +26,17 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "kneeling", "standing"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open"],
+    "ammunition": {
+      "handloads": true
+    },
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -44,6 +55,29 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Kurzbezeichnungen Langwaffen, Seite 4 (PDF p. 230)",
         "fields": ["caliberClasses"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 49 bis 50, PDF pp. 107 to 108",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.sights",
+          "rules.seriesShots"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Seiten 49 bis 50, PDF pp. 107 to 108",
+        "fields": ["rules.supports"],
+        "note": "The carrying sling may serve as shooting sling in the prone position only."
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 3, Kalibereinteilung, Seite 10 (PDF p. 68)",
+        "fields": ["rules.ammunition"],
+        "note": "Factory and reloaded cartridges are allowed; reloads must match the performance of the calibre."
       }
     ]
   }

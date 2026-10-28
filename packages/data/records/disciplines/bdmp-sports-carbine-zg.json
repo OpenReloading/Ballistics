@@ -10,6 +10,36 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxMagnification": {
+      "value": 10
+    },
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxFirearmMass": {
+      "value": 5000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 8
+        },
+        "covers": "series",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,7 +52,40 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.29.12, Teil D, Seite 259 von 294, PDF p. 259",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1, Teil D, Seite 3 von 294, PDF p. 3",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29.1, D.29.2, D.29.3, D.29.4, Teil D, Seite 258 von 294, PDF p. 258",
+        "fields": [
+          "rules.actions",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass",
+          "rules.sights",
+          "rules.maxMagnification",
+          "rules.ammunition"
+        ]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29.6, Teil D, Seite 258 bis 259 von 294, PDF pp. 258 to 259",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.29.8, D.29.9, Teil D, Seite 259 von 294, PDF p. 259",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions"]
       }
-    ]
+    ],
+    "note": "The sighting series has 5 min. Sitting with a rest is an alternative position (D.1.3.5)."
   }
 }

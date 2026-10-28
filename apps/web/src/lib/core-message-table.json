@@ -42,7 +42,17 @@
     "yaw",
     "done",
     "the floor",
-    "simulation, not load data"
+    "simulation, not load data",
+    "limit exceeded",
+    "no cartridge",
+    "no comparable limit",
+    "range incomplete",
+    "charge too small for the model",
+    "resistance not applied",
+    "solid fill high",
+    "start pressure has no effect",
+    "gyration radius ignored",
+    "start pressure held once"
   ],
   "templates": {
     "app and API request failures": [
@@ -335,6 +345,12 @@
       "zero did not converge (miss {h} m, {w} m)",
       "range {n}",
       "range {n} m not reached"
+    ],
+    "advisory registry": [
+      "The simulated peak pressure is above a CIP maximum pressure of the cartridge.",
+      "The cartridge has no CIP Pmax measured by transducer or piezo.",
+      "Some cases of the pressure range could not be computed.",
+      "The simulated peak mean pressure is below {ratio} times the hold pressure; the results are outside the range the model was built for."
     ]
   }
 }

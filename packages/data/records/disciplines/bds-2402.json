@@ -15,6 +15,32 @@
     "ids": ["rimfire-22"],
     "basis": "stated"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["prone", "sitting"],
+    "supports": ["freehand", "rest"],
+    "sights": ["optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "maxFirearmMass": {
+      "value": 5500
+    },
+    "ammunition": {
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 40
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -27,6 +53,47 @@
         "source": "bds-sporthandbuch-langwaffen-2026",
         "page": "L 5.01, Seite L-27, PDF p. 27",
         "fields": ["number", "distance", "category", "caliberClasses"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 5.01, Seite L-27, PDF p. 27",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.06, L 14.07, Seite L-79 and L-80, PDF pp. 79 and 80",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 14.08.6, Seite L-83, PDF p. 83",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Lying on a bipod or rest; every such discipline may also be shot freehand. Shooters aged 55 or more may sit instead of lying, where the range allows it."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 5.06, Seite L-30, PDF p. 30",
+        "fields": ["rules.sighters"],
+        "note": "Within 5 minutes."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 5.04, Seite L-30, PDF p. 30",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "The 40 seconds include the magazine change."
       }
     ]
   }

@@ -8,6 +8,15 @@
     "value": 9.65,
     "raw": "9,65 mm"
   },
+  "seriesShots": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 150
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -21,6 +30,11 @@
         "page": "0.11.3.2, Teil 0 Seite 40, PDF p. 58",
         "fields": ["gauge"],
         "note": "0.11.3.2 sets the 9,65 mm gauge for pistols over 7,62 mm. Row 2.51 prints 7,62 to 7,63 mm."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 81, PDF p. 99 (row 2.51)",
+        "fields": ["seriesShots", "timeLimits"]
       }
     ]
   }

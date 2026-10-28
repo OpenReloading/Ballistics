@@ -4,6 +4,14 @@
   "face": "bdmp-pp1",
   "event": "bdmp-30-m1-carbine-pp-2",
   "shotCount": 24,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 165
+      },
+      "covers": "stage"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -16,6 +24,12 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.10D.10, Teil D, Seite 62 von 294, PDF p. 62",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.10D.10, Teil D, Seite 62 von 294, PDF p. 62",
+        "fields": ["timeLimits"],
+        "note": "Time of the 50 m station; the 10 m and 25 m stations have other times."
       }
     ],
     "note": "The 50 m station (24 of the 60 shots, D.10D.10) is shot on the full PP 1 face. The 10 m and 25 m stations use a PP 1 face reduced to 50 %, for which the book prints no dimensions and no record exists, so the shot count is that of the 50 m station."

@@ -10,6 +10,31 @@
     "raw": "300 m",
     "unit": "m"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater", "semi-automatic"],
+    "positions": ["sitting", "prone"],
+    "supports": ["rest"],
+    "sights": ["optical"],
+    "maxFirearmMass": {
+      "value": 8250,
+      "raw": "8.25 kg"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -22,6 +47,49 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.13B.13, Teil D, Seite 81 von 294, PDF p. 81",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.1, Teil D, Seite 80 von 294, PDF p. 80",
+        "fields": ["rules.actions", "rules.maxFirearmMass"],
+        "note": "The mass includes bipod, scope and mounts."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.4, Teil D, Seite 80 von 294, PDF p. 80",
+        "fields": ["rules.sights"],
+        "note": "Any magnification."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.5, Teil D, Seite 80 von 294, PDF p. 80",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.7, Teil D, Seite 80 von 294, PDF p. 80",
+        "fields": ["rules.positions", "rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.9, Teil D, Seite 81 von 294, PDF p. 81",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.13B.10, Teil D, Seite 81 von 294, PDF p. 81",
+        "fields": ["rules.timeLimits"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions"],
+        "note": "Sitting rested is an alternative to prone and may share its class."
       }
     ]
   }

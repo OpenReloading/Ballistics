@@ -23,6 +23,31 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater"],
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true,
+      "bulletTypes": ["lead", "jacketed"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 600,
+          "raw": "10 min"
+        },
+        "covers": "series"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -36,6 +61,31 @@
         "page": "L 6.01, Seite L-32, PDF p. 32",
         "fields": ["number", "distance", "category", "caliberClasses"],
         "note": "The table further limits the calibre to an original version of the rifle type."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 6.01, Seite L-32, PDF p. 32",
+        "fields": [
+          "rules.firearm",
+          "rules.actions",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight"
+        ],
+        "note": "The row sits in the long gun part of the handbook."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 15.01, Seite L-86, PDF p. 86",
+        "fields": ["rules.ammunition"],
+        "note": "Reloaded centerfire ammunition is allowed if the case matches factory dimensions and the law is met; lead and jacketed bullets of any shape, tracer and hard core excluded."
+      },
+      {
+        "source": "bds-sporthandbuch-langwaffen-2026",
+        "page": "L 6.02, L 6.04, Seite L-34, PDF p. 34",
+        "fields": ["rules.sighters", "rules.seriesShots", "rules.timeLimits"],
+        "note": "Series and times are those of the Deutsche Meisterschaft and Landesmeisterschaft program; district level fires 15 shots in 15 minutes. Sighters have their own 5 minutes; a target changing system may change the sequence."
       }
     ]
   }

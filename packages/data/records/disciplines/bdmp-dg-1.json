@@ -25,6 +25,30 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["single-shot", "repeater", "semi-automatic"],
+    "positions": ["sitting", "prone"],
+    "supports": ["freehand", "sling", "rest"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,6 +66,53 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.6.13, Teil D, Seite 31 von 294, PDF p. 31",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.1, Teil D, Seite 29 von 294, PDF p. 29",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.2, Teil D, Seite 29 von 294, PDF p. 29",
+        "fields": ["rules.minTriggerWeight"],
+        "note": "One listed service rifle has 1300 g."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.4, D.6.8, Teil D, Seite 30 von 294, PDF p. 30",
+        "fields": ["rules.supports", "rules.positions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Sitting rested is an alternative to prone freehand and is scored in its own class."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.5, Teil D, Seite 30 von 294, PDF p. 30",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.6, Teil D, Seite 30 von 294, PDF p. 30",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.9, Teil D, Seite 30 von 294, PDF p. 30",
+        "fields": ["rules.sighters"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.6.10, Teil D, Seite 30 von 294, PDF p. 30",
+        "fields": ["rules.timeLimits"]
       }
     ],
     "note": "The calibre must be one introduced for the rifle in a regular army, the police or customs and may not exceed 8 mm. D.6.17 (Teil D, PDF p. 31) allows the discipline with civil versions of service rifles that look like the original. The variant (mod.) has the distance, programme and face of this record and no record of its own."

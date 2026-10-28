@@ -11,6 +11,21 @@
     "unit": "m"
   },
   "category": "lever-action",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["lever-action"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand", "rest"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1000
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 5,
+    "seriesShots": 10
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +38,44 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.16.11, Teil D, Seite 92 von 294, PDF p. 92",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.1, Teil D, Seite 91 von 294, PDF p. 91",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.2, Teil D, Seite 91 von 294, PDF p. 91",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.5, D.16.16, Teil D, Seite 91 bis 93 von 294, PDF pp. 91 to 93",
+        "fields": ["rules.sights"],
+        "note": "Open sights; the modified class (D.16.16) allows aperture sights."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.6, Teil D, Seite 91 bis 92 von 294, PDF pp. 91 to 92",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.16.4, D.16.8, Teil D, Seite 91 bis 92 von 294, PDF pp. 91 to 92",
+        "fields": ["rules.positions", "rules.supports", "rules.sighters", "rules.seriesShots"],
+        "note": "Prone, then kneeling or standing, no sling; one sighting series of 5 shots prone."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.1.3.5, Teil D, Seite 10 von 294, PDF p. 10",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "Sitting rested is an alternative to prone and is scored in its own class."
       }
     ],
     "note": "D.16.16 (Teil D, PDF p. 93) allows the discipline with aperture or hole sights, period-correct, instead of open sights. The variant (mod.) has the distance, programme and face of this record and no record of its own."

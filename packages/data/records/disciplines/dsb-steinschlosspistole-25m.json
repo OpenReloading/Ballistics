@@ -11,6 +11,27 @@
     "unit": "m"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["single-shot"],
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": "unlimited",
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 2400,
+          "raw": "40 min"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +44,39 @@
         "source": "dsb-sportordnung-2027",
         "page": "Teil 7 Seite 1, PDF p. 339 (title: Regeln für das Schießen mit Vorderladerwaffen)",
         "fields": ["category"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.21, Teil 0 Seite 89, PDF p. 107 (row 7.60)",
+        "fields": ["rules.firearm", "rules.actions", "rules.positions", "rules.timeLimits"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "7.1.4, Teil 7 Seite 2, PDF p. 340; 2.1, Teil 2 Seite 1, PDF p. 137",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Vorderladertabelle (row 7.60), Teil 7 Seite 12 and 13, PDF pp. 350 and 351",
+        "fields": ["rules.sights"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "7.2.1.2, Teil 7 Seite 2, PDF p. 340",
+        "fields": ["rules.ammunition"],
+        "note": "Lead bullets in the ball disciplines."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "7.7.1, Teil 7 Seite 6, PDF p. 344",
+        "fields": ["rules.sighters"],
+        "note": "Unlimited sighters in the 10 min preparation time."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "7.7.3, Teil 7 Seite 6, PDF p. 344",
+        "fields": ["rules.timeLimits"],
+        "note": "Scoring time only; the sighters fall in the preparation time."
       }
     ]
   }

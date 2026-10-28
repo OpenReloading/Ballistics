@@ -25,6 +25,25 @@
     ],
     "basis": "derived"
   },
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting", "prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxFirearmMass": {
+      "value": 6500,
+      "raw": "6.5 kg"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "sighters": 2,
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -42,6 +61,48 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.8.10, Teil D, Seite 36 von 294, PDF p. 36",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.1, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["rules.actions"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.2, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["rules.maxFirearmMass"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.3, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.6, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["rules.supports"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.7, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["rules.sights"],
+        "note": "Two aiming elements and no optical element; a ring front sight is not allowed."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.8, Teil D, Seite 35 von 294, PDF p. 35",
+        "fields": ["rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.8.13, Teil D, Seite 36 bis 37 von 294, PDF pp. 36 to 37",
+        "fields": ["rules.positions", "rules.sighters", "rules.seriesShots"],
+        "note": "Standing; kneeling or sitting; prone. Two sighters before each of the four parts; the scored parts are 2 x 5 or 4 x 5 shots."
       }
     ],
     "note": "The book prints Kaliber ab .222 Rem. bis 8 mm. The discipline is shot at 25, 100 or 300 m at the choice stated in D.8.10. D.8.18 (Teil D, PDF p. 37) allows optical sights without magnification (DG 3 mod.) and D.8.19 allows only rifles of D.25.1 (DG 3 EPP Rifle), each scored in its own class with the distance, programme and face of this record and no record of its own. D.8.9 and D.8.16 also allow 25 m for the .30 M1 Carbine on a \"proportional verkleinerte Scheibe\" without a factor or dimensions, so the 25 m variant has no record."

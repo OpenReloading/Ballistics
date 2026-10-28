@@ -11,6 +11,25 @@
     "unit": "m"
   },
   "category": "muzzle-loader",
+  "rules": {
+    "firearm": "short-gun",
+    "positions": ["standing"],
+    "supports": ["freehand"],
+    "sights": ["open"],
+    "maxBarrelLength": {
+      "value": 212.7,
+      "raw": "8 3/8 in"
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +42,23 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 9, Schwarzpulver und Vorderlader, Seite 1 (PDF p. 233)",
         "fields": ["name", "number"]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 4, Seite 6, PDF p. 128",
+        "fields": [
+          "rules.firearm",
+          "rules.positions",
+          "rules.supports",
+          "rules.sights",
+          "rules.timeLimits"
+        ]
+      },
+      {
+        "source": "dsu-sporthandbuch-2018",
+        "page": "Kapitel 1, Grundlegende Bestimmungen, Seite 3 (PDF p. 5)",
+        "fields": ["rules.maxBarrelLength"],
+        "note": "Rule for all short guns of the federation except the single-loading long-distance pistol; the minimum is 3 in (7.62 cm)."
       }
     ]
   }

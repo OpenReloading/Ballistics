@@ -11,6 +11,16 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "actions": ["semi-automatic"],
+    "positions": ["standing", "kneeling", "sitting"],
+    "supports": ["freehand"],
+    "sights": ["optical", "reflex"],
+    "minTriggerWeight": {
+      "value": 1000
+    }
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +33,27 @@
         "source": "bdmp-sportordnung-2026-register-9",
         "page": "D.22.A.10, Teil D, Seite 205 von 294, PDF p. 205",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "Teil D (Langwaffen-Disziplinen), Seite 1 von 294, PDF p. 1",
+        "fields": ["rules.firearm"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.22.A.2, Teil D, Seite 203 von 294, PDF p. 203",
+        "fields": ["rules.sights"],
+        "note": "Optical aids only; D.22.1.3.2 names telescopes and reflex sights as the optical sights."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.22.1.2, D.22.A.2, Teil D, Seite 200 bis 203 von 294, PDF pp. 200 to 203",
+        "fields": ["rules.actions", "rules.minTriggerWeight"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-9",
+        "page": "D.22.A.8, D.22.A.10, Teil D, Seite 204 bis 205 von 294, PDF pp. 204 to 205",
+        "fields": ["rules.positions", "rules.supports"]
       }
     ],
     "note": "Semi-automatic .22 l.r. rifles with optical sights (D.22.A.2). D.22.A.6 allows 10, 15 or 25 m, the match table (D.22.A.10) uses all three."

@@ -98,6 +98,8 @@ const otherSense: Record<string, string> = {
     'corner case: an extreme combination of inputs',
   '{failed} of {total} range cases could not be computed; the true range can be wider.':
     'case: one computed combination of inputs',
+  'Some cases of the pressure range could not be computed.':
+    'case: one computed combination of inputs',
   '{n} of {m} range cases could not be computed ({list}); the range covers only the computed cases, and the true range can be wider.':
     'case: one computed combination of inputs',
   'Sampled bands {notice}: corner-case range shown.':

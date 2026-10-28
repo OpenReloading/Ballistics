@@ -9,6 +9,15 @@
     "raw": "5.60mm"
   },
   "shotCount": 30,
+  "sighters": 5,
+  "timeLimits": [
+    {
+      "duration": {
+        "value": 240
+      },
+      "covers": "series"
+    }
+  ],
   "provenance": {
     "kind": "published",
     "sources": [
@@ -26,6 +35,12 @@
         "source": "issf-rules-2025-third-print",
         "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
         "fields": ["shotCount"]
+      },
+      {
+        "source": "issf-rules-2025-third-print",
+        "page": "Rule 8.7.6.4, p. 364 (PDF p. 364)",
+        "fields": ["sighters", "timeLimits"],
+        "note": "One sighting series of five shots before the stage."
       }
     ]
   }

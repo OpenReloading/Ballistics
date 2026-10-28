@@ -11,6 +11,20 @@
     "unit": "m"
   },
   "category": "rifle",
+  "rules": {
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["open", "aperture"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1800,
+          "raw": "30 min"
+        },
+        "covers": "discipline"
+      }
+    ]
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,6 +37,23 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.5.11, Teil E, Seite 16 von 42, PDF p. 16",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.5.7, Teil E, Seite 15 von 42, PDF p. 15",
+        "fields": ["rules.positions", "rules.supports"],
+        "note": "A two-point sling is allowed. Shooters aged 60 and over may use a rest (E.0.14)."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.5.4, Teil E, Seite 15 von 42, PDF p. 15",
+        "fields": ["rules.sights"],
+        "note": "Two aiming elements without magnification, matching the age of the firearm; the announcement may allow period telescopes."
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.5.9, Teil E, Seite 16 von 42, PDF p. 16",
+        "fields": ["rules.timeLimits"]
       }
     ]
   }

@@ -11,6 +11,15 @@
     "unit": "m"
   },
   "category": "revolver",
+  "rules": {
+    "firearm": "short-gun",
+    "actions": ["revolver"],
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "sighters": "unlimited",
+    "seriesShots": 5
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -23,8 +32,18 @@
         "source": "bdmp-sportordnung-2026-register-10",
         "page": "E.11.6, Teil E, Seite 31 von 42, PDF p. 31",
         "fields": ["distance"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11.1, E.11.3, Teil E, Seite 31 von 42, PDF p. 31",
+        "fields": ["rules.firearm", "rules.actions", "rules.ammunition"]
+      },
+      {
+        "source": "bdmp-sportordnung-2026-register-10",
+        "page": "E.11.7, Teil E, Seite 32 von 42, PDF p. 32",
+        "fields": ["rules.sighters", "rules.seriesShots"]
       }
     ],
-    "note": "Metallic-cartridge black-powder revolvers of a regular army. A.3.21.4.1 excludes this discipline from the hole-centre rule of the black-powder disciplines, so rings are scored by touch."
+    "note": "Metallic-cartridge black-powder revolvers of a regular army. A.3.21.4.1 excludes this discipline from the hole-centre rule of the black-powder disciplines, so rings are scored by touch. The three series have different times (50, 25 and 15 s), so no time is set; sighting time is 5 min."
   }
 }

@@ -43,6 +43,66 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `category` | Kind of firearm (`disciplineCategory`), where the rule book states it |
 | `caliberClasses` | `ids` of caliber class records (`records/caliber-classes/`) with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
 | `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent |
+| `rules` | The rule facts below, each present only where the rule book states it |
+
+### Rule facts
+
+`rules` holds what a shooter needs to set up a match. Every field is optional and **absent means the rule book does not state it** for that discipline: the page shows nothing for it. Each field is cited in the provenance with its own source and page (`fields`: `rules.<name>`).
+
+| Field | Meaning |
+|---|---|
+| `firearm` | `short-gun` or `long-gun` |
+| `actions` | Actions allowed: `single-shot`, `repeater`, `semi-automatic`, `revolver`, `lever-action` |
+| `positions` | Positions allowed: `standing`, `kneeling`, `sitting`, `prone` (a rule book that frees the position lists all four) |
+| `supports` | How the firearm may be supported: `freehand`, `sling`, `rest` |
+| `sights` | Sights allowed: `original` (as issued), `open`, `aperture`, `optical`, `reflex` |
+| `maxMagnification` | Greatest magnification of an optical sight |
+| `minTriggerWeight` | Least trigger weight at release, g |
+| `maxBarrelLength` | mm |
+| `maxFirearmMass` | g |
+| `ammunition` | `handloads` (reloaded ammunition allowed or not), `minMuzzleEnergy` (J), `minBulletMass` and `maxBulletMass` (g), `bulletTypes` (`lead`, `jacketed`, `full-metal-jacket`, `hollow-point`, `wadcutter`) |
+| `sighters` | Number of sighting shots, or `unlimited` where the rule book allows any number (a rule book that says none gives `0`) |
+| `seriesShots` | Shots of one series, where the score is split into series |
+| `timeLimits` | List of `duration` (s, with the printed figure in `raw`), what it `covers` (`discipline`, `stage`, `series`, `shot`) and `includesSighters` where stated |
+
+A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](record-model.md)). Power factors, which are no single stored quantity, are not recorded.
+
+### Which facts the rule books state
+
+Disciplines with the fact set, of the disciplines of each federation (stage values on target mappings are not counted; 58 mappings carry `sighters`, `seriesShots` or `timeLimits`):
+
+| Fact | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | VdRBw (25) |
+|---|---|---|---|---|---|---|
+| `firearm` | 103 | 104 | 44 | 72 | 16 | 25 |
+| `actions` | 98 | 101 | 31 | 62 | 5 | 25 |
+| `positions` | 103 | 104 | 38 | 71 | 16 | 25 |
+| `supports` | 103 | 104 | 34 | 72 | 16 | 25 |
+| `sights` | 100 | 101 | 41 | 71 | 10 | 25 |
+| `maxMagnification` | 15 | 15 | 0 | 7 | 2 | 3 |
+| `minTriggerWeight` | 61 | 79 | 13 | 0 | 8 | 20 |
+| `maxBarrelLength` | 24 | 13 | 12 | 16 | 5 | 7 |
+| `maxFirearmMass` | 33 | 87 | 15 | 0 | 15 | 0 |
+| `ammunition.handloads` | 71 | 74 | 1 | 48 | 0 | 25 |
+| `ammunition.bulletTypes` | 43 | 104 | 16 | 1 | 11 | 0 |
+| `ammunition.minMuzzleEnergy` | 7 | 0 | 0 | 8 | 0 | 0 |
+| `ammunition.minBulletMass` | 6 | 0 | 1 | 0 | 1 | 0 |
+| `ammunition.maxBulletMass` | 7 | 0 | 0 | 0 | 0 | 0 |
+| `sighters` | 75 | 95 | 28 | 27 | 14 | 21 |
+| `seriesShots` | 36 | 96 | 5 | 42 | 8 | 21 |
+| `timeLimits` | 58 | 72 | 27 | 62 | 11 | 15 |
+
+A gap is a fact the rule books leave open, or a fact that one record cannot hold:
+
+- **Open in all six rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
+- **Barrel length:** stated for handgun disciplines; the rifle tables of the German rule books print the length of the whole system, which is no barrel length.
+- **Free or as issued:** where a rule book says "any" or "as the original" for trigger weight, firearm mass or magnification, the field is absent.
+- **Time limits:** a record merging rows with different times, or a discipline whose time differs per stage while it has a single unstaged mapping, has no `timeLimits`. Sighting-only windows are not recorded.
+- **Other gaps:** BDS air gun disciplines (the cited BDS volumes hold no air gun rules), DSB Großkaliber 2.51 to 2.57 (no mass, trigger or sighters), BDMP Teil E (the part covers long and short guns) and records of DSB that merge rows of different rule tables (only facts that every merged row states are set).
+- **Where the rule books differ by class or level of the match:** the record holds the value of the championship programme or the standard class and its note names the other (for example BDS Deutsche Meisterschaft, BDMP target rifle against F-class mass).
+
+Choices that the enums force: a closed rear sight (Lochkimme) is `aperture`; "any sight" lists every sight; lying on a rest where freehand is also allowed lists both supports; resting on a post is `rest`. The note of a record says where it applies.
+
+A discipline with stages whose sighters, series size or time limits differ puts `sighters`, `seriesShots` and `timeLimits` on the stage's [target mapping](#target-mapping) instead; a stage value replaces the discipline's. The record shots of a stage stay `shotCount` of the mapping.
 
 A discipline shot over several distances in one match (BDS Mehrdistanzschießen) is one record: `distance.value` is the farthest distance, `distance.raw` lists all of them. Its mapping holds the shots of the whole discipline.
 
@@ -53,7 +113,7 @@ Muzzle-loading disciplines carry no caliber classes: the classes group cartridge
 `records/target-mappings/<id>.json`, schema `targetMapping`. One record per face event:
 
 - the discipline, the face and the id of the face event that scores it
-- where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per face; a discipline whose caliber groups shoot on different faces has one mapping per face with the groups as its `stage`), the scoring `gauge` and the number of record shots `shotCount` (sighters not counted)
+- where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per face; a discipline whose caliber groups shoot on different faces has one mapping per face with the groups as its `stage`), the scoring `gauge` the number of record shots `shotCount` (sighters not counted) and the stage's own `sighters`, `seriesShots` and `timeLimits` (as in [Rule facts](#rule-facts))
 
 A mapping gauge equals the event's where both are given. Which gauge scores a group: [Ring scoring](../models/ring-scoring.md).
 
