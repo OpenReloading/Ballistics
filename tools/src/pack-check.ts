@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { dirname, join, matchesGlob, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { executable } from './executable.ts'
 
 /** The workspaces published to npm. */
 const published = ['schema', 'core', 'drawing', 'importers', 'data']
@@ -21,7 +22,7 @@ interface Manifest {
 
 /** npm packs these whatever `files` says. */
 const alwaysPacked = /^(package\.json|(readme|license|licence|changelog)([.-][^/]*)?)$/i
-const testFile = /(^|\/)(__tests__|test|tests)\/|\.(test|spec)\.[cm]?[jt]sx?$/
+const testFile = /(?:(?:^|\/)(?:__tests__|test|tests)\/)|(?:\.(?:test|spec)\.[cm]?[jt]sx?$)/
 
 /** Every path named by `exports`, through its conditions and subpaths. */
 function exportTargets(value: unknown): string[] {
@@ -54,7 +55,7 @@ function mapProblems(dir: string, file: string, files: Set<string>) {
 export function packProblems(dir: string): string[] {
   const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
   const [pack] = JSON.parse(
-    execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {
+    execFileSync(executable('npm'), ['pack', '--dry-run', '--json', '--ignore-scripts'], {
       cwd: dir,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],

@@ -628,29 +628,32 @@ export function PowderTune() {
   const [added, setAdded] = useState<TuneString[]>([])
   const [form, setForm] = useState({ charge: '', shots: '', temperature: '' })
   const [error, setError] = useState(false)
+  const [readFailed, setReadFailed] = useState(false)
 
   useEffect(() => {
     const ids = tuneSessionIds(window.location.search)
     const powder = tunePowder(window.location.search)
     if (ids.length > 0)
-      readSessions(ids).then((s) => {
-        const found = loadStrings(s)
-        setLoaded(found)
-        if (!found.load) return
-        setInterior(readTuneLoad(found.load))
-        const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
-        const base = readTuneBase(found.load)
-        const sessions = own.map((r) => r.id)
-        // a user powder's stored fit makes the save a refit
-        const stored = base && userRef(base.id) ? storedRecord(base.id) : Promise.resolve()
-        stored
-          .then((raw) => {
-            const r = userRecord.safeParse(raw)
-            const baseFit = r.success && r.data.kind === 'powder' ? r.data.data.fit : undefined
-            setSave({ sessions, base, baseFit })
-          })
-          .catch(() => setSave({ sessions, base }))
-      })
+      readSessions(ids)
+        .then((s) => {
+          const found = loadStrings(s)
+          setLoaded(found)
+          if (!found.load) return
+          setInterior(readTuneLoad(found.load))
+          const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
+          const base = readTuneBase(found.load)
+          const sessions = own.map((r) => r.id)
+          // a user powder's stored fit makes the save a refit
+          const stored = base && userRef(base.id) ? storedRecord(base.id) : Promise.resolve()
+          stored
+            .then((raw) => {
+              const r = userRecord.safeParse(raw)
+              const baseFit = r.success && r.data.kind === 'powder' ? r.data.data.fit : undefined
+              setSave({ sessions, base, baseFit })
+            })
+            .catch(() => setSave({ sessions, base }))
+        })
+        .catch(() => setReadFailed(true))
     else if (powder)
       storedRecords()
         .then(({ records }) => setChoices(loadsWithPowder(records, powder)))
@@ -788,6 +791,7 @@ export function PowderTune() {
             </Button>
           </Group>
         </form>
+        {readFailed && <ErrorNote title={t('The sessions of the link could not be read.')} />}
         {error && (
           <ErrorNote title={t('The string was not added.')}>
             {t(

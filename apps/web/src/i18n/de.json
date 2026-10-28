@@ -3665,5 +3665,6 @@
   "The powder was not saved.": "Das Treibladungspulver wurde nicht gespeichert.",
   "{name} (fit {n})": "{name} (Anpassung {n})",
   "A newer fit of this powder exists.": "Es gibt eine neuere Anpassung dieses Treibladungspulvers.",
-  "Use the refit": "Neue Anpassung verwenden"
+  "Use the refit": "Neue Anpassung verwenden",
+  "The sessions of the link could not be read.": "Die Sitzungen des Links konnten nicht gelesen werden."
 }
