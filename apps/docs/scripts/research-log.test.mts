@@ -34,6 +34,8 @@ test('a fixed answer and the named files are checked', () => {
 test('a comment-only section, a longer word as answer and a missing extensionless file fail', () => {
   const comment = `${entry('Method')}\n## Method\n\n<!-- TODO -->\n`
   assert.deepEqual(entryErrors(comment, root), ['section "Method" is missing or empty'])
+  const nested = `${entry('Method')}\n## Method\n\n<!<!-- x -->-- TODO -->\n`
+  assert.deepEqual(entryErrors(nested, root), ['section "Method" is missing or empty'])
   assert.deepEqual(entryErrors(entry().replaceAll('High, exact.', 'Highly unsure.'), root), [
     '"Confidence" must start with high, medium, low',
   ])

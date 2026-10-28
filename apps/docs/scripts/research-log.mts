@@ -23,18 +23,22 @@ const answers: Record<string, string[]> = {
   Confidence: ['high', 'medium', 'low'],
 }
 
+/** `text` without HTML comments; repeated, so a comment split by another one does not reappear. */
+function withoutComments(text: string): string {
+  let out = text
+  for (let prev = ''; prev !== out; ) {
+    prev = out
+    out = out.replace(/<!--[\s\S]*?-->/g, '')
+  }
+  return out
+}
+
 /** The body of each `## ` section of a page, by heading. */
 function bodies(text: string): Map<string, string> {
   const found = new Map<string, string>()
   for (const part of text.split(/^## /m).slice(1)) {
     const end = part.indexOf('\n')
-    found.set(
-      part.slice(0, end).trim(),
-      part
-        .slice(end + 1)
-        .replace(/<!--[\s\S]*?-->/g, '')
-        .trim(),
-    )
+    found.set(part.slice(0, end).trim(), withoutComments(part.slice(end + 1)).trim())
   }
   return found
 }
