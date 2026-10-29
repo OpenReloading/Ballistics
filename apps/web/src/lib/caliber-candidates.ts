@@ -98,7 +98,7 @@ export async function caliberClassesOf(face: Pick<GroupFace, 'id' | 'event'>) {
 
 async function faceClasses() {
   const res = await apiFetch('target-faces')
-  if (!res.ok) throw new Error(`The API answered ${res.status}.`)
+  if (!res.ok) throw new Error(`Error ${res.status}.`)
   return ((await res.json()) as { items: { id: string; caliberClasses: string[] }[] }).items
 }
 

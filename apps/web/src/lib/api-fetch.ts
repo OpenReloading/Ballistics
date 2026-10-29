@@ -19,6 +19,6 @@ export async function fetchRecord<T>(
 ): Promise<T | undefined> {
   const res = await apiFetch(`${kind}/${encodeURIComponent(id)}`, { ...(signal && { signal }) })
   if (res.status === 404 || res.status === 400) return undefined
-  if (!res.ok) throw new Error(`The API answered ${res.status}.`)
+  if (!res.ok) throw new Error(`Error ${res.status}.`)
   return (await res.json()) as T
 }

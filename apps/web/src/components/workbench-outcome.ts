@@ -129,7 +129,9 @@ export const volumeNote = {
 export const volumeNoteText = (ok: { volumeMeasured: boolean } | undefined, t: Translator['t']) =>
   ok && !ok.volumeMeasured ? `${t(volumeNote.title)}: ${t(volumeNote.text)}` : undefined
 
-export const notReached = msg('The API is unreachable.')
+export const notReached = msg(
+  'A data file did not load or the computation failed. Check the connection and retry.',
+)
 export const needsNetwork = msg(
   'Simulations run in this browser. Offline use requires the needed records to be cached.',
 )

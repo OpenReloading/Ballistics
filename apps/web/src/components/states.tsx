@@ -284,7 +284,7 @@ export function DataError({ what, retry }: { what: DataKind; retry: () => void }
   const { t } = useTranslation()
   return (
     <ErrorNote title={t(unavailableLines[what])} onRetry={retry}>
-      {t('The server did not answer.')}
+      {t('The data file could not be loaded. Check the connection and retry.')}
     </ErrorNote>
   )
 }

@@ -787,7 +787,7 @@ function planSteps(plan: Partial<Step>[], answers: Answer[], charge: number): St
   return plan.map((row, i) => {
     const { res, json } = nth(answers, i)
     if (res.ok && json !== undefined) return { charge, body: json, ...row }
-    const message = json?.message ?? `The API answered ${res.status}.`
+    const message = json?.message ?? `Error ${res.status}.`
     return { charge, error: { message, reason: json?.reason }, ...row }
   })
 }
@@ -906,7 +906,10 @@ function failedRun(steps: Step[], res: Response, json: Answer['json']) {
         : (json as ErrorBody | undefined),
       retryAfter: res.headers.get('retry-after'),
     },
-    text: `The API answered ${status}.`,
+    text:
+      status === 422
+        ? 'The model refused the load. The error panel gives the reason.'
+        : `Error ${status}.`,
   }
 }
 

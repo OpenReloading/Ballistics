@@ -29,7 +29,7 @@ export async function fetchPowderList(signal: AbortSignal): Promise<PowderSummar
   const items: PowderSummary[] = []
   for (let page = 0; page < 50; page++) {
     const res = await apiFetch(`powders?limit=200&offset=${page * 200}`, { signal })
-    if (!res.ok) throw new Error(`The API answered ${res.status}.`)
+    if (!res.ok) throw new Error(`Error ${res.status}.`)
     const json = (await res.json()) as { total: number; items: PowderSummary[] }
     items.push(...json.items)
     if (items.length >= json.total || json.items.length === 0) break
@@ -77,14 +77,16 @@ async function postOnce<T>(
     if (res.status === 503 && json?.reason === 'busy' && retry)
       return { retryAfter: Math.max(1, Number(res.headers.get('retry-after')) || 1) }
     if (res.status === 503 && json?.reason === 'timeout')
-      return { reason: 'The run passed the API deadline.' }
+      return { reason: 'The run passed the time limit.' }
     return {
-      reason: json?.message ?? `The API answered ${res.status}.`,
+      reason: json?.message ?? `Error ${res.status}.`,
       ...(res.status === 422 && json && { refusal: json }),
     }
   } catch {
     if (signal.aborted) return undefined
-    return { reason: 'The API did not answer.' }
+    return {
+      reason: 'A data file did not load or the computation failed. Check the connection and retry.',
+    }
   }
 }
 
