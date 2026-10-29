@@ -1,11 +1,11 @@
 ---
 title: Burn form and exponent from a pressure-time curve
-description: Weighted least-squares fit of the burn coefficient, the initial slope and transition point of a two-stage vivacity form and the pressure exponent of the M3 interior model to one measured pressure-time trace, with the identifiability report of every parameter and the import of the user's own trace files.
+description: Weighted least-squares fit of the burn coefficient, the initial slope and transition point of a two-stage vivacity form and the pressure exponent of the M3 interior model to one measured pressure-time trace or to several traces of one powder at different charges, with the identifiability report of every parameter and the import of the user's own trace files.
 ---
 
 # Burn form and exponent from a pressure-time curve
 
-`fitPressureCurve` fits the burn coefficient, the form parameters $a$ and $z_1$ of a two-stage vivacity form and the pressure exponent $n$ of one [M3](interior-m3.md) load to a measured pressure-time trace. The trace's clock is not the model's, so the fit also finds the time shift between them. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). Each parameter is reported as `identified`, `weak` (fitted, but collinear with the others or imprecise) or `fixed` (held at its start value because the trace does not resolve it), with its uncertainty and variance inflation. The fitted values describe the powder lot, rifle and sensor of that one trace over the pressure range it covers. They are simulation results, not powder data and not load data.
+`fitPressureCurve` fits the burn coefficient, the form parameters $a$ and $z_1$ of a two-stage vivacity form and the pressure exponent $n$ of one [M3](interior-m3.md) load to a measured pressure-time trace. The trace's clock is not the model's, so the fit also finds the time shift between them. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). Each parameter is reported as `identified`, `weak` (fitted, but collinear with the others or imprecise) or `fixed` (held at its start value because the trace does not resolve it), with its uncertainty and variance inflation. The fitted values describe the powder lot, rifle and sensor of that one trace over the pressure range it covers. `fitPressureCurves` fits several traces of the same powder lot, rifle and sensor at different charges together, which resolves the exponent that one trace leaves held ([Several traces](#several-traces)). The results are simulation results, not powder data and not load data.
 
 `parsePressureHistory` in `@open-reloading/importers` reads the user's own trace file into times in s, pressures in bar (`pressureBar`) and the sensor position. The fit takes pressures in Pa, so the caller passes `pressureBar` times $10^5$ as `pressure`.
 
@@ -19,7 +19,7 @@ $$
 \frac{dz}{dt} = B_a\, \tau_T\, \varphi(z; a, z_1) \left(\frac{\max(\bar p, 0)}{p_\text{ref}}\right)^{n}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve` (`apply`), `packages/core/src/interior/model.ts`, `interiorRhs`.
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`apply`), `packages/core/src/interior/model.ts`, `interiorRhs`.
 
 The fit compares the trace with the pressure the model gives at the sensor position: the breech pressure, the space-mean pressure or the pressure at the projectile base. The fit window starts where the trace first reaches 25 % of its peak (at its first sample when it already starts above that) $p_\text{pk}$, found on a parabola through the crossing samples, and ends where it first falls to the fraction $f_\text{end}$ of the peak after the peak (default 0.5):
 
@@ -40,7 +40,7 @@ $$
 B_\text{pk} = B_a \left(\frac{p_\text{pk}}{p_\text{ref,0}}\right)^{n_0}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve` (`restated`).
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`restated`).
 
 The fitted parameters are the logarithms of the ratios to the start values, $B_\text{pk}$, $a$, $z_1$ and $n$ ($a$ needs a start value above 0, $z_1$ below 1, $n$ above 0):
 
@@ -49,7 +49,7 @@ q_j = q_{j,0}\, e^{\theta_j}, \qquad
 t_\text{shift} = t_{\text{shift},0} + s\,\theta_\text{shift}, \qquad s = 10^{-4}\ \text{s}
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve` (`values`, `shiftScale`).
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`values`, `shiftScale`).
 
 The time shift is always fitted and linear. Its start value puts the model's rise to 25 % of its own peak on the trace's rise. A shift fixed at that start value instead biases the other parameters by about the granularity of the trace's sampling, so it is fitted.
 
@@ -61,7 +61,7 @@ $$
 r_i = \frac{\hat p(t_i - t_\text{shift};\ \theta) - p_i}{\sigma}, \qquad \chi^2 = \sum_i r_i^2, \qquad \nu = n_s - n_p - 1
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve` (`evaluate`, `degreesOfFreedom`), `packages/core/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chi2`).
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`evaluate`, `degreesOfFreedom`), `packages/core/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chi2`).
 
 The sample noise $\sigma$ is the trace's `sigma`. Without it the fit uses $\sigma = 1$ and scales the covariance by $\chi^2/\nu$, so the uncertainties assume the residuals are noise. A candidate whose run is invalid, or whose shifted window leaves the model's barrel time, is a rejected step. A Jacobian entry below $10^{-6}\,p_\text{pk}/\sigma$ per unit log parameter counts as noise. The loop stops at a relative gain of $\chi^2$ below $10^{-9}$ (the flat valley of correlated form parameters), a default of 100 iterations, and fails with the condition number of the column-scaled Jacobian above $10^3$.
 
@@ -74,7 +74,7 @@ $$
 u_\text{rel}(q_j) = \sqrt{C_{\theta,jj}}, \qquad u(q_j) = q_j\, u_\text{rel}(q_j)
 $$
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve` (`attempt`, `collinear`), `packages/core/src/least-squares.ts`, `identifiability` (`varianceInflation`).
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`attempt`, `collinear`), `packages/core/src/least-squares.ts`, `identifiability` (`varianceInflation`).
 
 A parameter is `weak` when its variance inflation exceeds `maxInflation` (default 10, reason `collinear`) or its relative standard uncertainty exceeds `maxRelativeStandardUncertainty` (default 0.25, reason `imprecise`). The time shift reports its variance inflation and uncertainty but is not held.
 
@@ -87,15 +87,36 @@ A trace often fixes the burn coefficient and the shape of the rise but not the e
 - An `ill-conditioned` failure holds the next of the exponent, the form slope and the transition point that is still fitted.
 - The burn coefficient is never held. A fit that would leave nothing to fit, and any other failure, throws.
 
-Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurve` (the loop over `attempt`), `withheld`, `giveUp`.
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (the loop over `attempt`), `withheld`, `giveUp`.
 
 A `fixed` parameter keeps the variance inflation of the attempt that showed it and has no standard uncertainty: with the exponent held at its start value, the other parameters absorb whatever the true exponent differs by. The start exponent is the caller's assumption, and a wrong one shows as model error in the residuals, not as an uncertainty. A weak parameter other than the exponent stays in the fit with its `reasons`, and its uncertainty then says how little the trace constrains it.
 
 Raising `maxInflation` keeps the exponent in the fit where the default would hold it. Its uncertainty is then large and linearized, and the report shows its variance inflation.
 
+### Several traces
+
+`fitPressureCurves` takes one load and one charge per trace: trace $k$ is compared with the load at its own charge, everything else is shared. The burn coefficient, $a$, $z_1$ and $n$ are shared, every trace has its own fitted time shift, and the burn coefficient is restated at the geometric mean of the $K$ trace peaks:
+
+$$
+p_\text{ref} = \Bigl(\prod_k p_{\text{pk},k}\Bigr)^{1/K}, \qquad
+\chi^2 = \sum_k \sum_{i \in W_k} \left(\frac{\hat p_k(t_{k,i} - t_{\text{shift},k};\ \theta) - p_{k,i}}{\sigma_k}\right)^2, \qquad
+\nu = \sum_k n_{s,k} - n_p - K
+$$
+
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`peak`, `evaluate`, `moves`).
+
+Each trace has its own window, sensor and $\sigma_k$, found as for one trace. Either every trace gives `sigma` or none does. A time shift moves only its own trace's residuals, so its Jacobian columns are zero elsewhere. The parameters are held and reported as for one trace, with one `timeShift` entry per trace in input order. With one trace the result is that of `fitPressureCurve`.
+
+A trace at a higher peak sees the burn rate change as $(p/p_\text{ref})^n$, while the form function and the time shift do not change with the charge, so the traces together separate the exponent from the shape of the rise. On synthetic traces two or more charges whose highest peak is 1.2 to 1.5 times the lowest gave the exponent a variance inflation of 17 to 83 against 125 to 365 for one trace ([research log](../research/interior-curve-fit-exponent.md)). The default `maxInflation` is therefore 100 when the traces come from at least two charges and the highest peak is at least 1.2 times the lowest, and 10 otherwise. The input checks are listed in `warnings`, each with the traces it names:
+
+- `sameCharge`: traces at the same charge (within a relative $10^{-6}$). Repeat shots add no pressure range but keep the limit of the other charges.
+- `narrowPeaks`: the highest peak is below 1.2 times the lowest. The exponent is then held under the limit of one trace.
+
+Code: `packages/core/src/interior/curve-fit.ts`, `curveWarnings`, `minPeakRatio`.
+
 ### Failures
 
-`fitPressureCurve` throws a `PowderFitError` with reason `invalid` (a run at the start values or in a Jacobian is invalid), `unresolved` or `ill-conditioned` (when no parameter can be held to repair it) or `not-converged` (the iteration budget ran out). Malformed input throws an `InputError` before any run: a burn law that is not a vivacity law with a two-stage form, a trace that is not equally long, finite and strictly increasing in time, with fewer than two samples or without a positive peak, a trace that never falls to the fall fraction after its peak, a window with no more than the fitted parameters plus the time shift in samples, a start value outside the range above, an unknown or repeated parameter.
+`fitPressureCurve` and `fitPressureCurves` throw a `PowderFitError` with reason `invalid` (a run at the start values or in a Jacobian is invalid), `unresolved` or `ill-conditioned` (when no parameter can be held to repair it) or `not-converged` (the iteration budget ran out). Malformed input throws an `InputError` before any run: a burn law that is not a vivacity law with a two-stage form, a trace that is not equally long, finite and strictly increasing in time, with fewer than two samples or without a positive peak, a trace that never falls to the fall fraction after its peak, a window with no more than the fitted parameters plus the time shift in samples, a start value outside the range above, an unknown or repeated parameter, and for `fitPressureCurves` no trace, a charge that is not positive, or `sigma` on only some traces.
 
 ### Trace import
 
@@ -133,6 +154,7 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 | $t_\text{shift}$, $s$ | Time shift of the trace clock against the model clock, its scale | s | s |
 | $r_i$, $\chi^2$, $\nu$ | Weighted residual, sum of squares, degrees of freedom | 1 | 1 |
 | $n_s$, $n_p$ | Samples in the window, fitted parameters without the time shift | 1 | 1 |
+| $K$, $k$, $W_k$ | Number of traces of a joint fit, trace index, samples in its window | 1 | 1 |
 | $C_\theta$ | Covariance of the log parameters | 1 | 1 |
 | $\text{VIF}_j$, $u_\text{rel}$ | Variance inflation factor, relative standard uncertainty | 1 | 1 |
 | $f_c$, $\text{RC}$, $\Delta t_i$ | Low-pass cutoff, its time constant, sample step | Hz, s, s | Hz, s, s |
@@ -149,11 +171,12 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 
 - The fit is local and the cost surface has a flat valley. A start far from the solution, or a held exponent that is wrong, ends in a stuck fit or a model error. The reported uncertainty is linearized at the solution and holds no model error.
 - The shot-start pressure of the model and the trace differ, so the window starts at 25 % of the peak. The rise below that is not fitted.
-- Under the default limits the exponent is usually reported `fixed`: with the time shift fitted, its variance inflation on a noisy trace is far above 10. A trace that resolves it needs low noise, a wide pressure range and a form that is already close. Two or more traces of the same powder at charges whose highest peak is at least about 1.2 times the lowest resolved it on synthetic traces, a time shift fixed from a sensor delay did not ([research log](../research/interior-curve-fit-exponent.md)).
+- Under the default limits the exponent is usually reported `fixed`: with the time shift fitted, its variance inflation on a noisy trace is far above 10. A trace that resolves it needs low noise, a wide pressure range and a form that is already close. Two or more traces of the same powder at charges whose highest peak is at least about 1.2 times the lowest resolved it on synthetic traces (`fitPressureCurves`), a time shift fixed from a sensor delay did not ([research log](../research/interior-curve-fit-exponent.md)).
+- The uncertainty of the exponent of a joint fit holds the trace noise only. On synthetic traces its 90 % interval needed a factor of about 2.5 instead of 1.645 to cover, and missing physics (heat loss, bore friction) biased it by 2 to 7 % with residuals that did not show it.
 - The initial slope $a$ is nearly degenerate with the other parameters on a slow powder. It then comes back `weak`, or the fit holds it.
 - Only the two-stage vivacity form is supported. A geometric law, a constant form and the three-stage form are refused.
 - The low-pass only smooths. Frequencies above the cutoff are not restored and the peak can be lowered.
-- The fitted parameters describe one trace. They are not powder data and hold no charge recommendation or limit.
+- The fitted parameters describe the traces fitted. They are not powder data and hold no charge recommendation or limit.
 
 ## Sources
 
