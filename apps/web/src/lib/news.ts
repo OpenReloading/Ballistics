@@ -14,7 +14,14 @@ export interface NewsItem {
 }
 
 const fileName = /^(\d{4}-\d{2}-\d{2})-([a-z0-9-]+)\.md$/
-const content = /^---\r?\ntitle: *(\S.*?)\s*\r?\nlink: *(\S+)\s*\r?\n---\r?\n([\s\S]*)$/
+
+/** The title, link and text of a news file, split by lines; undefined for no front matter. */
+function newsContent(file: string): [title: string, link: string, text: string] | undefined {
+  const [open, title, link, close, ...text] = file.split(/\r?\n/)
+  const t = /^title: *(\S.*)$/.exec(title ?? '')?.[1]?.trimEnd()
+  const l = /^link: *(\S+)\s*$/.exec(link ?? '')?.[1]
+  return open === '---' && close === '---' && t && l ? [t, l, text.join('\n')] : undefined
+}
 
 /**
  * The newest `count` items of the news folder, newest first. Read by the server page at build
@@ -28,16 +35,10 @@ export function newestNews(count = 5, dir = path.join(process.cwd(), 'news')): N
     .map((name) => {
       const m = fileName.exec(name)
       if (!m) throw new Error(`news/${name}: expected YYYY-MM-DD-slug.md`)
-      const parts = content.exec(readFileSync(path.join(dir, name), 'utf8'))
-      const text = parts?.[3]?.trim()
+      const parts = newsContent(readFileSync(path.join(dir, name), 'utf8'))
+      const text = parts?.[2].trim()
       if (!parts || !text) throw new Error(`news/${name}: expected a title, a link and a text`)
-      return {
-        date: m[1] ?? '',
-        slug: m[2] ?? '',
-        title: parts[1] ?? '',
-        link: parts[2] ?? '',
-        text,
-      }
+      return { date: m[1] ?? '', slug: m[2] ?? '', title: parts[0], link: parts[1], text }
     })
   return items.slice(0, count)
 }

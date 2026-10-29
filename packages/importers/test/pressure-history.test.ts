@@ -54,6 +54,21 @@ describe('parsePressureHistory', () => {
     )
   })
 
+  it('reads a long header and a long cell that is no number in linear time', () => {
+    const start = performance.now()
+    const t = parsePressureHistory(
+      `time ${'['.repeat(50_000)};pressure (MPa)\n0;10\n0.1;150\n0.2;300\n`,
+      { sensor: 'breech', timeUnit: 'ms' },
+    )
+    expect(() =>
+      parsePressureHistory(`time (ms);pressure (MPa)\n${'1'.repeat(50_000)}x;0\n0;10\n0.1;150\n`, {
+        sensor: 'breech',
+      }),
+    ).toThrow('line 2: time or pressure is not a number')
+    expect(performance.now() - start).toBeLessThan(500)
+    expect(t.time).toEqual([0, 1e-4, 2e-4])
+  })
+
   it('requires the sensor position', () => {
     expect(() => parsePressureHistory(mpa, {} as never)).toThrow('the sensor position is missing')
   })

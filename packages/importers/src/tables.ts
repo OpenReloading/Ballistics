@@ -231,7 +231,7 @@ export function readNumber(text: string, decimal: '.' | ','): number | undefined
   if (t === '') return undefined
   const group = decimal === '.' ? ',' : '.'
   const plain = t.replaceAll(group, '').replace(decimal, '.')
-  if (!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(plain)) return undefined
+  if (!/^[+-]?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/i.test(plain)) return undefined
   const n = Number(plain)
   return Number.isFinite(n) ? n : undefined
 }

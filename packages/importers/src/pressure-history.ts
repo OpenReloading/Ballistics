@@ -73,12 +73,22 @@ function reading(text: string): number {
   const t = text.trim()
   if (t.includes(',') && t.includes('.')) return Number.NaN
   const s = t.replace(',', '.')
-  return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s) ? Number(s) : Number.NaN
+  return /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(s) ? Number(s) : Number.NaN
 }
 
 /** The text in `(...)` or `[...]` of a header cell, else undefined. */
 function bracketedUnit(cell: string): string | undefined {
-  return bracketed(cell) ?? /\[([^\]]+)\]/.exec(cell)?.[1]?.trim()
+  return bracketed(cell) ?? squareBracketed(cell)?.trim()
+}
+
+/** The text between the first `[` and the next `]` that encloses some, else undefined; linear time. */
+function squareBracketed(cell: string): string | undefined {
+  for (let a = cell.indexOf('['); a >= 0; a = cell.indexOf('[', a + 1)) {
+    const b = cell.indexOf(']', a + 1)
+    if (b < 0) return undefined
+    if (b > a + 1) return cell.slice(a + 1, b)
+  }
+  return undefined
 }
 
 /** The unit text of a header cell: in brackets, else the last word when it is a unit, else none. */

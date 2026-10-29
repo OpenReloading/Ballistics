@@ -348,9 +348,10 @@ export function parseTwist(text: string): number | undefined {
  * when its number does not parse.
  */
 export function typedTwist(raw: string): string | undefined {
-  const m = /^(\s*(?:1\s*(?::|in)\s*)?)(.*?)\s*$/i.exec(raw)
-  const p = m && parseNumber(m[2] ?? '')
-  return p?.kind === 'number' ? `${m?.[1]}${p.text}` : undefined
+  const t = raw.trimEnd()
+  const lead = /^\s*(?:1\s*(?::|in)\s*)?/i.exec(t)?.[0] ?? ''
+  const p = parseNumber(t.slice(lead.length))
+  return p.kind === 'number' ? `${lead}${p.text}` : undefined
 }
 
 /** A twist's number as field text: "1:8"; 0 (no rifling) stays "0". */

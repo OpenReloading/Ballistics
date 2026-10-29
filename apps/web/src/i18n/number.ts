@@ -94,7 +94,7 @@ export interface NumberRange {
   integer?: boolean | undefined
 }
 
-const shape = /^([+-]?)([\d.,]*\d[\d.,]*)(?:([eE])([+-]?\d{1,4}))?$/
+const shape = /^([+-]?)([\d.,]+)(?:([eE])([+-]?\d{1,4}))?$/
 const grouped = (sep: string) => new RegExp(`^\\d{1,3}(?:\\${sep}\\d{3})+$`)
 
 const accepts = (x: number, { min, max, integer }: NumberRange) =>
@@ -157,6 +157,7 @@ export function parseNumber(
   const m = shape.exec(text)
   if (!m) return { kind: 'invalid' }
   const [, sign = '', body = '', e = '', exp = ''] = m
+  if (!/\d/.test(body)) return { kind: 'invalid' }
   const done = (mantissa: string): ParsedNumber => {
     const value = Number(sign + mantissa + e + exp)
     return Number.isFinite(value)
