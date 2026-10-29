@@ -78,6 +78,18 @@ async function scenario(page: Page, auto: string | undefined, ladder: boolean) {
   const r = await readProbe(page)
   out.manualRunShiftPage = r.shiftPage
   out.manualRunShiftUnexcused = r.shiftUnexcused
+  // 5. one edit and what follows it alone: in an automatic variant one run after the pause
+  await settle(page, 1500)
+  n = await count()
+  await resetShift(page)
+  await charge.fill('')
+  await charge.pressSequentially('46.4', { delay: 50 })
+  await settle(page, 4000)
+  const e = await readProbe(page)
+  out.oneEditRuns = e.runs.length - n
+  out.oneEditShiftInputs = e.shiftInputs
+  out.oneEditShiftPage = e.shiftPage
+  out.oneEditShiftUnexcused = e.shiftUnexcused
   // where a status is announced: the live regions holding the result line
   out.liveRegions = await page
     .locator('[aria-live]:not([aria-live="off"])')
