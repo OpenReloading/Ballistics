@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto'
 import type { UserRecord } from '@open-reloading/schema'
-import { expect, it } from 'vitest'
+import { beforeEach, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { parseFiles } from '../src/lib/load-file-formats.ts'
 import { exportAllText, validRecords } from '../src/lib/user-data.ts'
@@ -11,6 +11,9 @@ import {
   storedPhotoIds,
   storedRecords,
 } from '../src/lib/user-store.ts'
+import { deleteUserDb } from './user-db-reset.ts'
+
+beforeEach(deleteUserDb)
 
 const saved = '2026-10-13T10:00:00.000Z'
 const valid: UserRecord = {
@@ -61,6 +64,7 @@ it('an Export all file round trips its invalid records as invalid records', asyn
 
 it('an imported invalid record never overwrites a stored record with its id', async () => {
   await putRecords([valid])
+  await putInvalid([bad, badSheet])
   const asInvalid = { ...valid, data: 'not an object' }
   const other = { ...bad, name: 'Changed' }
   expect(await putInvalid([asInvalid, other, { name: 'no id' }, null])).toEqual({
@@ -75,6 +79,7 @@ it('an imported invalid record never overwrites a stored record with its id', as
 })
 
 it('deletes an invalid record by its id', async () => {
+  await putInvalid([bad, badSheet])
   await deleteRecord('old-1')
   expect((await storedRecords()).invalid.map((i) => i.id)).toEqual(['old-2'])
 })
