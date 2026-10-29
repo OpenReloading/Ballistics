@@ -1,10 +1,12 @@
 /**
  * The npm tarball of each published library, as `npm pack --dry-run` lists it after the build: fails
  * when an entry point of `exports`, `main` or `types` is missing, or when the list holds a test file,
- * a source map without its sources, or a file outside the `files` field.
+ * a source map without its sources, a file outside the `files` field, or a bare import in a packed
+ * `.js` or `.d.ts` file of a package that is not in `dependencies` or `peerDependencies`.
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
+import { isBuiltin } from 'node:module'
 import { dirname, join, matchesGlob, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { executable } from './executable.ts'
@@ -14,14 +16,20 @@ const published = ['schema', 'core', 'drawing', 'importers', 'data']
 
 /** The fields of package.json the check reads. */
 interface Manifest {
+  name?: string
   main?: string
   types?: string
   exports?: unknown
   files?: string[]
+  dependencies?: Record<string, string>
+  peerDependencies?: Record<string, string>
 }
 
 /** npm packs these whatever `files` says. */
 const alwaysPacked = /^(package\.json|(readme|license|licence|changelog)([.-][^/]*)?)$/i
+const code = /\.(?:[cm]?js|d\.[cm]?ts)$/
+/** The specifier of a static or dynamic `import`, an `export ... from` or a `require` (not text such as `from "${x}"`). */
+const specifier = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*(['"])([^'"\s${}]+)\1/g
 const testFile = /(?:(?:^|\/)(?:__tests__|test|tests)\/)|(?:\.(?:test|spec)\.[cm]?[jt]sx?$)/
 
 /** Every path named by `exports`, through its conditions and subpaths. */
@@ -51,6 +59,22 @@ function mapProblems(dir: string, file: string, files: Set<string>) {
     .map((path) => `source map ${file} ships without its source ${path}`)
 }
 
+/** The packages that the packed file `file` imports and the manifest does not declare. */
+function importProblems(dir: string, file: string, manifest: Manifest) {
+  const declared = new Set([
+    manifest.name,
+    ...Object.keys(manifest.dependencies ?? {}),
+    ...Object.keys(manifest.peerDependencies ?? {}),
+  ])
+  const names = [...readFileSync(join(dir, file), 'utf8').matchAll(specifier)]
+    .map((m) => m[2] ?? '')
+    .filter((s) => !/^[./#]/.test(s) && !s.includes(':') && !isBuiltin(s))
+    .map((s) => s.split('/', s.startsWith('@') ? 2 : 1).join('/'))
+  return [...new Set(names)]
+    .filter((name) => !declared.has(name))
+    .map((name) => `${file} imports ${name}, which is not in dependencies or peerDependencies`)
+}
+
 /** What is wrong with the tarball of the package in `dir`, one line each. */
 export function packProblems(dir: string): string[] {
   const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
@@ -72,6 +96,7 @@ export function packProblems(dir: string): string[] {
     if (!alwaysPacked.test(file) && !inFiles(file, manifest.files ?? []))
       problems.push(`${file} is outside the files field`)
     if (file.endsWith('.map')) problems.push(...mapProblems(dir, file, files))
+    if (code.test(file)) problems.push(...importProblems(dir, file, manifest))
   }
   return problems
 }

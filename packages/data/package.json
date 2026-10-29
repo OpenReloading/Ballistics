@@ -36,13 +36,13 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
-    "@open-reloading/schema": "0.0.4"
+    "@open-reloading/schema": "0.0.4",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.5",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.5",
-    "zod": "^4.6.7"
+    "vitest": "^5.0.5"
   }
 }

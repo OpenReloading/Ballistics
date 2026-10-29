@@ -74,3 +74,28 @@ it('fails on a file outside the files field', () => {
   )
   expect(packProblems(dir)).toEqual(['index.js is outside the files field'])
 })
+
+it('fails on a bare import that the manifest does not declare', () => {
+  const dir = pkg(
+    { ...manifest, name: '@scope/p', dependencies: { a: '1' }, peerDependencies: { '@b/c': '1' } },
+    {
+      'dist/index.js': [
+        "import { readFileSync } from 'node:fs'",
+        "import path from 'path'",
+        "import { x } from './x.js'",
+        "import a from 'a/sub'",
+        "export * from '@b/c'",
+        "import self from '@scope/p/other'",
+        "import { z } from 'zod'",
+      ].join('\n'),
+      'dist/index.d.ts': "export type T = import('@d/e').T",
+    },
+  )
+  expect(packProblems(dir)).toEqual(
+    expect.arrayContaining([
+      'dist/index.d.ts imports @d/e, which is not in dependencies or peerDependencies',
+      'dist/index.js imports zod, which is not in dependencies or peerDependencies',
+    ]),
+  )
+  expect(packProblems(dir)).toHaveLength(2)
+})
