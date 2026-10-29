@@ -34,8 +34,6 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 
 ### Command
 
-The two CLI commands below require the command line workspace (`packages/cli`), which is not in the repository yet. They do not run in a clean checkout until it lands.
-
 ```sh
 npm run build
 node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split validation
@@ -48,16 +46,33 @@ The repository holds no measured rows. The command line tests run on synthetic r
 
 ## Results
 
-The baseline on the validation split has not been produced yet: no measured rows are available to the repository. Cells stay "pending" until a run of `verify --json` fills them. The table is updated by hand at each release.
+A local run of `verify --json` on load rows that are not in the repository, validation split, model version `67d67adfce3ebe7c390bd6630a9a508726dfd85f52ac8f00cd9958a458f187bd`, with the powder parameters of the records (`--params records`). Each cell is a local run. The table is updated by hand at each release.
 
 | Group | Cartridges | Rows | Median velocity error | P90 velocity error | Interval coverage |
 | --- | --- | --- | --- | --- | --- |
-| All | pending | pending | pending | pending | pending |
-| Per family | pending | pending | pending | pending | pending |
-| Per powder (one line each) | pending | pending | pending | pending | pending |
-| Not in the fitted set (leave-one-powder-out) | pending | pending | pending | pending | pending |
+| All | 11 | 10,497 | 3.32 % | 8.87 % | 89.6 % |
+| Family double base, ball | 11 | 3,326 | 3.89 % | 9.59 % | 88.0 % |
+| Family double base, extruded | 11 | 1,179 | 2.82 % | 7.58 % | 92.5 % |
+| Family single base, extruded | 11 | 3,727 | 3.04 % | 8.55 % | 90.3 % |
+| Family base not stated, extruded | 9 | 285 | 2.56 % | 6.07 % | 97.5 % |
+| Family base and form not stated | 11 | 1,466 | 2.98 % | 7.56 % | 92.2 % |
+| Per powder (one line each) | not published | not published | not published | not published | not published |
+| Not in the fitted set (leave-one-powder-out), 216 powders | 11 | 10,496 | 15.7 % | 61.7 % | 31.9 % |
 
-Pressure rows have their own table of the same columns, filled only for rows that carry a printed pressure.
+- Rows: 16,871 in the split, 10,497 used; not used: 5,583 without a case capacity, 639 refused by the model, 120 without powder parameters, 32 without a bullet shape.
+- Families: 514 rows of families with fewer than 5 cartridges or a single source are merged into "other", which is not reported. Per powder lines are not published: a single powder's rows can make the line attributable.
+- Inputs the rows do not carry: the bullet is a stand-in per cartridge and bullet mass, with the length from a fit of length over mass and diameter of the bullet records; a row without a barrel length takes the median printed barrel of its cartridge, else 610 mm (case longer than 33 mm) or 120 mm.
+- The leave-one-powder-out line replaces each powder's fitted fields by the median of its family (see [Command](#command)). Its errors say how far that median is from a fit of the powder, not how far a fit from rows would be.
+- The validation run took 47 s on a shared 16-core host, with `--leave-one-powder-out --group-by family` 64 s.
+
+Pressure, rows that carry a printed peak pressure in bar (piezo, transducer, C.I.P. or unstated method; CUP rows have no pressure):
+
+| Group | Rows | Median pressure error | P90 pressure error |
+| --- | --- | --- | --- |
+| All | 4,060 | 15.0 % | 38.1 % |
+| Not in the fitted set (leave-one-powder-out) | 4,060 | 82.9 % | 486 % |
+
+Not measured: the sealed test split (one run per model version, at release), and therefore the earlier baseline on the test split (median 3.4 %, P90 9.0 %) is not reproduced by the command line tool; by-session checks; a fit of each powder from rows.
 
 ## Decisions
 
@@ -67,7 +82,7 @@ Each row has a default that stays in force until the owner changes it. The cost 
 | --- | --- | --- | --- | --- | --- |
 | Which models may be called validated | All interior outputs; velocity of the powder fit only; none until 1.0 | The interior velocity prediction of the powder fit, for charges not fired, and only with the held-out numbers next to the word. Pressure is reported where rows carry it and never called validated. The exterior model is verified, a different word | The velocity of an untested charge of a fitted powder is what the rows measure. Pressure printed in a source is a sample under its own conventions. The exterior model has no measured trajectories in the data, only closed forms and independent integrations to compare with | Low: a model is added to the list when it has held-out numbers | As recommended |
 | Thresholds | Median 1 % and P90 2 % as claims; as targets for adopting a change; no threshold | Median 1 % and P90 2 % are targets. A model change is adopted when the validation median falls by at least 0.1 percentage points and P90 does not rise. No threshold claim until `verify` has produced the baseline on the validation split | A claim fixed before the baseline exists is a guess; the adoption rule only needs a before and an after on the same rows | A wrong threshold blocks a good change or admits a bad one, and it is corrected by editing one number | Report the result as it is |
-| Powders without rows | Report nothing; report the error of fitted powders; leave-one-powder-out | Leave-one-powder-out as its own line, labelled "powder not in the fitted set". Its P90 is the 90th percentile of the held-out errors of that powder, as defined under Metrics. The half width of the interval shown for an unseen powder is a separate value and is not called P90 | A powder with no rows has nothing to be held out from; leaving a powder out of the fit and predicting it is the only direct measurement of that case | Low: the line stays empty and the interval stays as it is | As recommended. `verify --leave-one-powder-out` gives the line ([command line](../cli.md#powder-not-in-the-fitted-set)): each powder's fitted fields are replaced by the median over the other powders of its family. The cells stay pending until a run on rows outside the repository |
+| Powders without rows | Report nothing; report the error of fitted powders; leave-one-powder-out | Leave-one-powder-out as its own line, labelled "powder not in the fitted set". Its P90 is the 90th percentile of the held-out errors of that powder, as defined under Metrics. The half width of the interval shown for an unseen powder is a separate value and is not called P90 | A powder with no rows has nothing to be held out from; leaving a powder out of the fit and predicting it is the only direct measurement of that case | Low: the line stays empty and the interval stays as it is | As recommended. `verify --leave-one-powder-out` gives the line ([command line](../cli.md#powder-not-in-the-fitted-set)): each powder's fitted fields are replaced by the median over the other powders of its family. The line of the results table is from a local run on rows outside the repository |
 | Where the numbers live and when they are rerun | Generated on every build; hand-updated page; release notes only | The numbers table of this page, updated by hand at each release from `verify --json`. The validation split on every change to model code, the sealed test split once per model version at release | Rows are not in the repository, so a build cannot regenerate the table. The version hash ties a number to the code that produced it | Low | As recommended |
 | What the app says | New on-screen claim; none | Nothing new inside the fitted domain. Outside it the existing interval or refusal text stands | The words of this page are for the documentation. A screen claim needs its own wording review | Low: a claim can be added later | No new on-screen claim |
 | Publishing aggregates | Publish every group; merge small groups | Source composition is reviewed for every published group, per powder groups included. A powder family with fewer than 5 cartridges in the rows is merged into "other", which is not a guarantee that no source can be recovered | Rows of one source can make a group attributable whatever its size | A published group can be merged afterwards, a recovered source cannot be taken back | 5; the owner may set another |

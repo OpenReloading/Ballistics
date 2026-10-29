@@ -20,10 +20,10 @@ Grid, 40 replicates per cell, seeds $1000\,(r + 1) + 16\,k$ for replicate $r$ an
 
 Each run records the fitted over the true exponent, its relative standard uncertainty $u_\text{rel}$, its status and the exponents of the leave-one-out refits. Only runs with the exponent fitted (not `fixed`, no failure) count.
 
-Accept rules, decided in advance:
+Rules:
 
-- Coverage factor: the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the noise-only runs of the even replicates, rounded to one decimal. It is adopted when it covers 90 % within the standard error of about 1.3 points on the odd replicates pooled.
-- Check: the threshold that names at most about 3 % of the noise-only fits. It is said to show model error only when it names clearly more of the model-error fits than of the noise-only fits.
+- Coverage factor: the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the noise-only runs of the even replicates, rounded to one decimal, checked on the odd replicates. The split was fixed before the run.
+- Check: the threshold was chosen from the table below after the run, as the comparison with the interval that names about 3 % of the noise-only fits. The check is said to show model error only when it names clearly more of the model-error fits than of the noise-only fits.
 
 ## Formulas
 

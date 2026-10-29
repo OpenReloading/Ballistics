@@ -36,6 +36,7 @@
     "no-information",
     "collinear",
     "imprecise",
+    "inconsistent",
     "fit-failed",
     "apex",
     "atmosphere",

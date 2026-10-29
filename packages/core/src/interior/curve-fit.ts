@@ -763,7 +763,7 @@ function refits(
       if (exponent?.status === 'fixed' || !exponent) return undefined
       exponents.push(exponent.value)
     } catch (e) {
-      if (e instanceof PowderFitError) return undefined
+      if (e instanceof InputError) return undefined
       throw e
     }
   }

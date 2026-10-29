@@ -15,6 +15,7 @@ import {
   type ReactNode,
   type RefObject,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react'
@@ -745,6 +746,7 @@ export function useHoleDetection({
       maybe={proposals.length - sure.length}
       flagged={flagged.length}
       onAccept={() => take(sure)}
+      onAcceptMaybe={() => take(proposals.filter(isMaybe))}
       onClear={() => {
         setProposals([])
         setFlagged([])
@@ -1435,31 +1437,39 @@ function ReviewStep({
   maybe,
   flagged,
   onAccept,
+  onAcceptMaybe,
   onClear,
 }: {
   proposals: number
   maybe: number
   flagged: number
   onAccept: () => void
+  onAcceptMaybe: () => void
   onClear: () => void
 }) {
   const { t } = useTranslation()
+  const help = useId()
   return (
-    <div
-      className="prop-grid"
-      title={t(
-        'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
-      )}
-    >
+    <div className="prop-grid">
       <Button
         size={controlSize.row.button}
         className="wide"
         disabled={proposals === 0}
+        aria-describedby={help}
         onClick={onAccept}
       >
         {t('Accept all ({count})', { count: proposals })}
       </Button>
       <span className="row-buttons wide">
+        <Button
+          size={controlSize.row.button}
+          variant="default"
+          disabled={maybe === 0}
+          aria-describedby={help}
+          onClick={onAcceptMaybe}
+        >
+          {t('Accept maybes ({count})', { count: maybe })}
+        </Button>
         <Button
           size={controlSize.row.button}
           variant="default"
@@ -1471,6 +1481,11 @@ function ReviewStep({
           {t('Clear')}
         </Button>
       </span>
+      <p id={help} className="review-help wide">
+        {t(
+          'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
+        )}
+      </p>
     </div>
   )
 }
