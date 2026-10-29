@@ -37,7 +37,21 @@ const seeded = [
   limitCartridge('twice-rifle', (2 * nominal.peakBreechPressure) / 1e5, 'transducer'),
   limitCartridge('crusher-rifle', 3000, 'crusher'),
 ]
-const api = withApi({ seed: { ...bundle, cartridges: [...bundle.cartridges, ...seeded] } })
+// a bulk density above the 5000 kg/m3 bound of a request body
+const dense = {
+  id: 'example-a-dense',
+  manufacturer: 'example-a',
+  name: 'Dense',
+  bulkDensity: { value: 6 },
+  provenance: testSource,
+}
+const api = withApi({
+  seed: {
+    ...bundle,
+    cartridges: [...bundle.cartridges, ...seeded],
+    powders: [...bundle.powders, dense],
+  },
+})
 const post = (payload: unknown) => api.post(`${API_PREFIX}/interior/charge-target`, payload)
 
 const notice = 'simulation, not load data'
@@ -170,6 +184,37 @@ describe('POST /interior/charge-target', () => {
       target: { kind: 'muzzleVelocity', value: 1, unit: 'percentOfLimit' },
     })
     expect(unit.status).toBe(400)
+  })
+
+  it("takes a load ratio's bulk density from the powder record unless the load states one", async () => {
+    const target = { kind: 'loadRatio', value: 0.8 }
+    const record = await post({ load, target, powder: 'example-a-fast' })
+    expect(record.status).toBe(200)
+    // 0.9 g/cm3 in the record
+    expect(record.body.charge).toBeCloseTo(0.8 * 900 * load.chamber.volume, 8)
+    expect(record.body.resolved.powder.suppliedFields).toEqual(['bulkDensity'])
+    const stated = await post({
+      load: { ...load, propellant: { ...load.propellant, bulkDensity: 1000 } },
+      target,
+      powder: 'example-a-fast',
+    })
+    expect(stated.body.charge).toBeCloseTo(0.8 * 1000 * load.chamber.volume, 8)
+    expect(stated.body.resolved.powder.suppliedFields).toEqual([])
+  })
+
+  it('refuses a load ratio for a powder without a bulk density and a record density out of bounds', async () => {
+    const target = { kind: 'loadRatio', value: 0.8 }
+    const none = await post({ load, target, powder: 'example-b-slow' })
+    expect(none.status).toBe(422)
+    expect(none.body).toMatchObject({
+      message: 'powder example-b-slow has no bulk density',
+      notice,
+    })
+    const high = await post({ load, target, powder: 'example-a-dense' })
+    expect(high.status).toBe(422)
+    expect(high.body.message).toBe(
+      'powder example-a-dense bulk density 6000 kg/m3 must be above 0 and at most 5000 kg/m3',
+    )
   })
 
   it('answers 404 for an unknown cartridge or powder', async () => {

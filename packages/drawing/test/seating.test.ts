@@ -63,6 +63,23 @@ describe('chamberOf', () => {
       leadeAngle: 1.75,
     })
   })
+
+  it('gives no values without a cartridge L3 and leaves out the chamber values a sheet lacks', () => {
+    const l3 = { side: 'cartridge', symbol: 'L3', quantity: 'length', value: 51.18 } as const
+    expect(
+      chamberOf(spec.values.filter((v) => !(v.side === 'cartridge' && v.symbol === 'L3'))),
+    ).toBeUndefined()
+    expect(chamberOf([l3])).toEqual({
+      caseLength: 51.18,
+      cartridgeL6: undefined,
+      chamberL3: undefined,
+      G1: undefined,
+      F: undefined,
+      leadeEnd: undefined,
+      leadeStart: undefined,
+      leadeAngle: undefined,
+    })
+  })
 })
 
 describe('bulletOutline', () => {

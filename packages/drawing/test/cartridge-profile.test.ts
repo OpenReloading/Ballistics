@@ -654,6 +654,19 @@ describe('fillet', () => {
     expect(defined(arc[8])[1]).toBeCloseTo(1, 9)
     expectTangent(arc, 1, [1, 0], [0, 0], [0, 1])
   })
+
+  it('leaves a straight line as its corner', () => {
+    expect(fillet([-1, 0], [0, 0], [1, 0], 1)).toEqual([[0, 0]])
+  })
+
+  it('sweeps the short way round a corner whose arc crosses the -x direction', () => {
+    // lines to the right of the corner: the arc lies left of its centre, angles 3/4 pi to -3/4 pi
+    const arc = fillet([1, 1], [0, 0], [1, -1], 0.5) as SectionPoint[]
+    expectTangent(arc, 0.5, [1, 1], [0, 0], [1, -1])
+    // its middle sample is the point nearest the corner, r sqrt(2) - r from it on the bisector
+    expect(defined(arc[4])[0]).toBeCloseTo(0.5 * Math.SQRT2 - 0.5, 12)
+    expect(defined(arc[4])[1]).toBeCloseTo(0, 12)
+  })
 })
 
 /** Asserts the samples lie on one circle of radius r that touches line a-corner and corner-b. */

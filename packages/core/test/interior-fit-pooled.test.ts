@@ -4,6 +4,7 @@ import {
   calibratePooled,
   fitPowder,
   fitPowderPooled,
+  InputError,
   type InteriorLoad,
   interior,
   type LadderPoint,
@@ -224,6 +225,14 @@ describe('fitPowderPooled', () => {
     expect(parameter(fit, 'temperatureFactor', 'B').value).toBeCloseTo(1, 3)
   })
 
+  it('holds a burn coefficient at a tight prior', () => {
+    const data = strings(normals(1), charges, 0)
+    const free = fitPowderPooled(data)
+    const fit = fitPowderPooled(data, { priors: { C: { burnRate: { value: 0.6, sigma: 1e-6 } } } })
+    expect(parameter(fit, 'burnRate', 'C').value).toBeCloseTo(0.6, 4)
+    expect(parameter(free, 'burnRate', 'C').value).toBeCloseTo(0.55, 2)
+  })
+
   describe('refusals', () => {
     const data = strings(normals(1), charges, 0)
 
@@ -254,6 +263,27 @@ describe('fitPowderPooled', () => {
       )
       expect(error).toBeInstanceOf(PowderFitError)
       expect((error as PowderFitError).reason).toBe('ill-conditioned')
+    })
+
+    it('refuses a prior without a positive finite value and sigma, or for a powder not in the sessions', () => {
+      for (const prior of [
+        { value: 0, sigma: 0.05 },
+        { value: 0.5, sigma: 0 },
+        { value: Number.NaN, sigma: 0.05 },
+      ])
+        expect(() => fitPowderPooled(data, { priors: { B: { burnRate: prior } } })).toThrow(
+          'prior burnRate of B: value and sigma above 0',
+        )
+      expect(() =>
+        fitPowderPooled(data, { priors: { D: { burnRate: { value: 0.5, sigma: 0.05 } } } }),
+      ).toThrow(InputError)
+    })
+
+    it('refuses sessions whose first run is not valid', () => {
+      const broken = data.map((s) => ({ ...s, load: { ...s.load, startPressure: 1e18 } }))
+      const error = failure(() => fitPowderPooled(broken))
+      expect(error).toBeInstanceOf(PowderFitError)
+      expect((error as PowderFitError).reason).toBe('invalid')
     })
 
     it('refuses pressures and points without a velocity sigma', () => {
