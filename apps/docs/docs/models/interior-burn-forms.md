@@ -206,6 +206,10 @@ The range 0.1 to 0.9 and the 64 intervals of $\bar L_d$ are choices of the model
 
 `dynamicVivacity` rejects an exponent other than 1, because the rate per pressure then depends on the pressure. The constant and two-stage forms are accepted. The type of its argument excludes the three-stage form, because its third stage is integrated in another variable.
 
+$L_d$ is not the quantity read from a measured closed-vessel curve, $L = \dot p / (\bar p\, p_\text{max})$. With the Noble-Abel pressure of the closed vessel, $\bar p = \Phi z / (1 + \chi z)$ at normalised charge density $D = m_c / (V_c \rho_s)$ and $\chi = (1 - \eta \rho_s) D / (1 - D)$, the two differ by a factor that depends on $z$ and on the loading density, $L(z) = L_d(z)\,(1 + \chi)/(1 + \chi z)^2$. The factor is 1 only for $\chi = 0$. For the demo powder ($\eta = 0.97 \cdot 10^{-3}$ m³/kg, $\rho_s = 1600$ kg/m³) it runs from 0.86 at $z = 0$ to 1.16 at $z = 1$ at $D = 0.2$, and from 0.45 to 2.23 at $D = 0.5$, a cartridge-like loading density. Every vivacity, $B_a$ and $\bar L_d$ of this page and of the powder records uses the definition $L_d$. A closed-vessel vivacity taken from elsewhere is converted with the factor before it is compared ([burn law checks](../research/interior-burn-law-checks.md)).
+
+The pressure exponent stays at $n = 1$. With a fixed form function, the integral of $\bar p^n$ over the burn is the same for every charge of one powder, so closed-vessel curves of one powder at four or more loading densities would show the exponent at which that integral varies least. The data has no such curves ([burn law checks](../research/interior-burn-law-checks.md)).
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |
@@ -249,7 +253,7 @@ The range 0.1 to 0.9 and the 64 intervals of $\bar L_d$ are choices of the model
 - Valid input of the two-stage form: finite values, $0 \lt z_1 \le 1$, $1 + a z_1 \gt 0$, $q \ge 0$, and $q \lt 1$ when $z_1 \lt 1$. With $q \ge 1$ the charge reaches $z = 1$ only asymptotically.
 - Valid input of the three-stage form: finite values, $0 \lt z_1 \lt z_2 \lt 1$, $1 + a z_1 \gt 0$, $q \ge 0$ and $0 \le r \lt 1$. With $r \ge 1$ the charge never burns out.
 - Code: `packages/core/src/interior/form.ts`, `burnError`. An invalid law gives the invalid reason `input` with the field name.
-- Grains with different inner and outer webs, deterrent coatings that change the burn rate with depth, and a spread of grain sizes are not modelled.
+- Grains with different inner and outer webs, deterrent coatings that change the burn rate with depth, and a spread of grain sizes are not modelled. The parameter $a$ of the two-stage form is the only proxy for a coating: a negative $a$ gives a degressive first stage, a positive $a$ a progressive one. The powder records hold no coating, so the effect of a coating was not measured ([burn law checks](../research/interior-burn-law-checks.md)).
 - The two-stage and three-stage forms do not reproduce the infinite slope of the surface after the web of a seven-perforated grain burns through. The geometric form has it.
 
 ## Sources

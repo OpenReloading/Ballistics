@@ -79,6 +79,8 @@ Code: `packages/core/src/interior/fit.ts`, `startPressureFloor`.
 
 $p_e(0)$ is the engraving pressure of a profile point at travel 0, else 0. The gas starts at $p_i$, and the projectile starts once the mean pressure reaches $p_\text{st}$ and overcomes the resistance at travel 0 ([shot start](interior-m3.md)). Below $p_\text{floor}$ the start pressure therefore changes nothing. A fitted start pressure must start above $p_\text{floor}$, and the map keeps every step above it. The default fits $B$ alone.
 
+The burn law has no offset (a rate proportional to $\bar p - P_1$, used for low pressures): in a fit to velocities alone, $P_1$ would act as a start pressure for the burn and trade off with $p_\text{st}$, so the fitted start pressure plays its role ([burn law checks](../research/interior-burn-law-checks.md)).
+
 ### Cost
 
 $$
