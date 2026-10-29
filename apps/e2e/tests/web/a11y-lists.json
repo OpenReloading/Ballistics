@@ -173,9 +173,15 @@
     },
     {
       "rule": "color-contrast",
-      "node": "<td class=\"num\">",
+      "node": "tr:nth-child(3) > .num:nth-child(7)",
       "where": "Session summary",
-      "reason": "Value of the strings table at the edge of its horizontal scroll box, partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
+      "reason": "Min of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "tr:nth-child(3) > .num:nth-child(8)",
+      "where": "Session summary",
+      "reason": "Max of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
     },
     {
       "rule": "th-has-data-cells",
