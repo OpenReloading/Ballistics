@@ -1,14 +1,21 @@
 import { describe, expect, it } from 'vitest'
+import { shotViewSheetEnglish } from '../../../packages/importers/test/fixtures.ts'
+import { xlsx } from '../../../packages/importers/test/xlsx.ts'
 import { english } from '../src/i18n/translate.ts'
 import {
+  chronoFileBytes,
   chronoMessageText,
   exampleCsv,
+  exampleSessionFileName,
+  formatNames,
+  formats,
   readChrono,
   readSession,
   type Shot,
   sessionCsv,
   sessionCsvBlob,
   sessionJsonBlob,
+  stringName,
   templateCsv,
   templateJson,
 } from '../src/lib/chrono.ts'
@@ -65,6 +72,46 @@ describe('readChrono', () => {
   })
 })
 
+describe('the file size limit of 32 MiB', () => {
+  const limit = 32 * 1024 * 1024
+  const file = (size: number) =>
+    ({ size, arrayBuffer: async () => new ArrayBuffer(2) }) as unknown as Blob
+
+  it('reads a chosen file up to the limit and refuses a larger one before reading it', async () => {
+    expect(await chronoFileBytes(file(limit))).toEqual(new Uint8Array(2))
+    await expect(chronoFileBytes(file(limit + 1))).rejects.toThrow(
+      'The file is larger than 32 MiB.',
+    )
+  })
+
+  it('refuses text bytes over the limit, and reads text bytes at the limit', async () => {
+    await expect(readChrono(new Uint8Array(limit + 1), {})).rejects.toThrow(
+      'The file is larger than 32 MiB.',
+    )
+    await expect(readChrono(new Uint8Array(limit), {})).rejects.toThrow(/not a recognized/)
+  })
+})
+
+describe('a workbook', () => {
+  it('reads a workbook export', async () => {
+    const r = await readChrono(xlsx([shotViewSheetEnglish]), { fileName: 'session.xlsx' })
+    expect(r.format).toBe('shotview-xlsx')
+  })
+
+  it('is read as a workbook, and one of no known export is named as a workbook', async () => {
+    const book = xlsx([
+      {
+        name: 'Sheet1',
+        rows: [
+          ['a', 'b'],
+          ['1', '2'],
+        ],
+      },
+    ])
+    await expect(readChrono(book, {})).rejects.toThrow(/^The workbook is not a recognized/)
+  })
+})
+
 describe('stringStats', () => {
   it('leaves excluded shots out and uses the n - 1 standard deviation', () => {
     const s = stringStats([shot(2795 * fps), shot(2810 * fps), shot(2803 * fps, 'flyer')])
@@ -103,6 +150,7 @@ it('offers a JSON template and exports a session as JSON that reads back', async
   })
   expect(back.session.strings).toEqual(read.session.strings)
   expect(back.stringLabels).toEqual(['A', 'B'])
+  expect(sessionJsonBlob(read).type).toBe('application/json')
 })
 
 it('offers a CSV template the importer reads as the template', async () => {
@@ -129,6 +177,19 @@ describe('readSession', () => {
     await expect(readSession(bytes(text), 'a.csv', 'ft/s')).rejects.toThrow(first as string)
   })
 
+  it('names the reason of the read with the fallback unit when the file names no unit', async () => {
+    await expect(readSession(bytes('string,velocity\nA,0\nA,815'), 'a.csv', 'm/s')).rejects.toThrow(
+      'row 2: velocity "0" is not positive',
+    )
+  })
+
+  it('keeps the file name as the source of either read', async () => {
+    const named = await readSession(bytes(template), 'day1.csv', 'm/s')
+    const unnamed = await readSession(bytes('string,velocity\nA,812'), 'day2.csv', 'm/s')
+    expect(named.session.provenance.sources[0]?.title).toBe('day1.csv')
+    expect(unnamed.session.provenance.sources[0]?.title).toBe('day2.csv')
+  })
+
   it('names the reason when the file is read neither way', async () => {
     await expect(readSession(bytes('a,b\n1,2'), 'a.csv', 'm/s')).rejects.toThrow(/not a recognized/)
   })
@@ -138,7 +199,32 @@ it('offers an example of three strings of ten made-up shots in the template form
   const r = await readSession(bytes(exampleCsv), 'example.csv', 'm/s')
   expect(r.format).toBe('openreloading-csv')
   expect(r.session.strings.map((s) => s.shots.length)).toEqual([10, 10, 10])
-  expect(r.stringLabels.every((l) => l?.startsWith('Example'))).toBe(true)
+  expect(r.stringLabels).toEqual(['Example A', 'Example B', 'Example C'])
+  const marked = r.session.strings.map((s) =>
+    s.shots.flatMap((shot, k) => [
+      ...(shot.coldBore ? [`${k} cold bore`] : []),
+      ...(shot.excluded ? [`${k} ${shot.excluded}`] : []),
+    ]),
+  )
+  expect(marked).toEqual([['0 cold bore'], [], ['8 flyer']])
+  expect(exampleSessionFileName).toBe('openreloading-example-session.csv')
+})
+
+it('names every format read in the browser but the delimited text', () => {
+  const { delimited, ...read } = formatNames
+  expect(formats).toBe(Object.values(read).join(', '))
+  expect(formats).not.toContain(delimited)
+})
+
+it('marks the first shot of the JSON template as cold bore', () => {
+  const parsed = JSON.parse(templateJson)
+  expect(parsed.strings[0].shots[0]).toEqual({ velocity: 852, coldBore: true })
+  expect(parsed.device).toEqual({ kind: 'other', manufacturerName: 'Manufacturer', model: 'Model' })
+})
+
+it('names a string without a label by its number', () => {
+  expect(stringName(['A', undefined], 0, english.t)).toBe('String 1: A')
+  expect(stringName(['A', undefined], 1, english.t)).toBe('String 2')
 })
 
 describe('sessionCsv', () => {
@@ -164,6 +250,14 @@ describe('sessionCsv', () => {
       '',
     ])
     expect(sessionCsv(r, unitsOf.velocity['m/s'])).toContain('String 2: B,1,0,862.9,')
+  })
+
+  it('writes a string whose shots are all excluded without statistics', () => {
+    const data = {
+      stringLabels: [undefined],
+      session: { strings: [{ shots: [shot(800, 'flyer'), shot(801, 'flyer')] }] },
+    } as unknown as Parameters<typeof sessionCsv>[0]
+    expect(sessionCsv(data, unitsOf.velocity['m/s']).split('\n')[1]).toBe('String 1,0,2,,,,,')
   })
 
   it('keeps text cells from being read as spreadsheet formulas, negative numbers stay numbers', () => {

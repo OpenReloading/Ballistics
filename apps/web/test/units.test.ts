@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { formatNumber } from '../src/i18n/number.ts'
+import { setShownLanguage } from '../src/i18n/shown.ts'
 import { fieldError, fieldValueFromText, switchFields } from '../src/lib/field-spec.ts'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import { shotFields } from '../src/lib/trajectory-input.ts'
 import {
   degreeText,
+  drawingLengthUnit,
   exactFieldText,
   fixedFieldText,
   footPound,
@@ -12,11 +14,14 @@ import {
   inchText,
   kilogramsPerGrain,
   localePreset,
+  msText,
   type PresetId,
   parseTwist,
   parseUnitChoice,
   pascalsPerInHg,
+  percentText,
   presetFromLink,
+  presetNames,
   presetUnitIds,
   presetUnits,
   psi,
@@ -26,6 +31,9 @@ import {
   twistTyped,
   typedTwist,
   unitsOf,
+  waterGrams,
+  waterVolume,
+  withUnit,
 } from '../src/lib/units.ts'
 
 const metric = presetUnits('metric-grams')
@@ -62,6 +70,31 @@ describe('formatQuantity', () => {
     expect(inchText('-0.25', 'in')).toBe('-.25')
     expect(inchText('0.25', 'mm')).toBe('0.25')
     expect(inchText('10.25', 'in')).toBe('10.25')
+    expect(inchText('10.00', 'in')).toBe('10.00')
+  })
+
+  it('keeps the zero before a comma, which German writes', () => {
+    setShownLanguage('de')
+    try {
+      expect(inchText('0,25', 'in')).toBe('0,25')
+      expect(inchText('0,00', 'in')).toBe('0')
+      expect(inchText('0.25', 'in')).toBe('0.25')
+    } finally {
+      setShownLanguage('en')
+    }
+  })
+
+  it('prints times, fractions and values with their unit', () => {
+    expect(msText(0.0012345)).toBe('1.235 ms')
+    expect(percentText(0.125)).toBe('12.5 %')
+    expect(withUnit('velocity', us, 822.96)).toBe('2700 ft/s')
+    expect(withUnit('length', metric, 0.5e-3)).toBe('0.50 mm')
+  })
+
+  it('labels the drawings in the length unit of the system', () => {
+    expect(drawingLengthUnit(us)).toBe('in')
+    expect(drawingLengthUnit(metric)).toBe('mm')
+    expect(drawingLengthUnit(presetUnits('metric-grains'))).toBe('mm')
   })
 })
 
@@ -82,6 +115,13 @@ describe('factors', () => {
 
   it('reads a capacity in grains of water at 0.9982 g/cm3', () => {
     expect(unitsOf.capacity.grH2O.toSi(56)).toBeCloseTo((56 * kilogramsPerGrain) / 998.2, 15)
+  })
+
+  it('turns grams of water into its volume and back', () => {
+    // 0.9982 g/cm3: 99.82 g of water fill 100 cm3
+    expect(waterVolume(99.82)).toBeCloseTo(100e-6, 15)
+    expect(waterGrams(100e-6)).toBeCloseTo(99.82, 10)
+    expect(waterGrams(waterVolume(56))).toBeCloseTo(56, 10)
   })
 
   it('returns every value through toSi and fromSi', () => {
@@ -176,6 +216,31 @@ describe('presets', () => {
       ),
     ).toEqual({ preset: 'metric-grams', overrides: { mass: 'gr' } })
     expect(parseUnitChoice('{"preset":"us"}')).toEqual({ preset: 'us', overrides: {} })
+  })
+
+  it('drops a stored choice that is null, a preset that is no string and overrides of no object', () => {
+    expect(parseUnitChoice('null')).toBeUndefined()
+    expect(parseUnitChoice('{"preset":["us"]}')).toBeUndefined()
+    expect(parseUnitChoice('{"preset":"us","overrides":null}')).toEqual({
+      preset: 'us',
+      overrides: {},
+    })
+    expect(parseUnitChoice('{"preset":"us","overrides":{"length":["mm"]}}')).toEqual({
+      preset: 'us',
+      overrides: {},
+    })
+    expect(parseUnitChoice('{"preset":"us","overrides":{"speed":"mph"}}')).toEqual({
+      preset: 'us',
+      overrides: {},
+    })
+  })
+
+  it('names the presets', () => {
+    expect(presetNames).toEqual({
+      'metric-grains': 'Metric, common use',
+      us: 'US customary',
+      'metric-grams': 'Metric (SI)',
+    })
   })
 })
 
@@ -306,6 +371,15 @@ describe('a twist as 1:N', () => {
     expect(typedTwist(`1:8${' '.repeat(50_000)}x`)).toBeUndefined()
     expect(performance.now() - start).toBeLessThan(500)
     expect(typedTwist(' 1 in 8,5 ')).toBe(' 1 in 8.5')
+  })
+
+  it('keeps the lead of a typed twist with or without spaces', () => {
+    expect(typedTwist('1:8,5')).toBe('1:8.5')
+    expect(typedTwist('1in8')).toBe('1in8')
+    expect(typedTwist('8')).toBe('8')
+    expect(typedTwist('1:x')).toBeUndefined()
+    expect(parseTwist('.25')).toBe(0.25)
+    expect(parseTwist('1:.75')).toBe(0.75)
   })
 
   it('stores a length per turn in SI from the field unit', () => {

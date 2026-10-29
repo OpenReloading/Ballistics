@@ -97,6 +97,26 @@ describe('scoreShot on an oval face', () => {
       expect(scoreShot(oval, shot(x, y), 2 * (gap - 1e-3) * mm).value).toBe(0)
     }
   })
+
+  it('finds the gap to a wide and a tall oval off the axes to well below a micrometre', () => {
+    // `gap` mm out along the normal of the ellipse point at parameter `t`: the gap is exactly that
+    for (const [w, h, gap] of [
+      [100, 60, 5],
+      [60, 100, 5],
+      [100, 60, 80],
+      [60, 100, 80],
+    ] satisfies [number, number, number][]) {
+      const one = faceOf([{ value: 9, w, h }])
+      const [a, b] = [w / 2, h / 2]
+      for (const t of [0.05, 0.3, 0.7, 1.2, 1.52, 2.5, 4]) {
+        const n = Math.hypot(Math.cos(t) / a, Math.sin(t) / b)
+        const x = a * Math.cos(t) + (gap * Math.cos(t)) / a / n
+        const y = b * Math.sin(t) + (gap * Math.sin(t)) / b / n
+        expect(scoreShot(one, shot(x, y), 2 * (gap + off) * mm).value, `${w} ${t}`).toBe(9)
+        expect(scoreShot(one, shot(x, y), 2 * (gap - off) * mm).value, `${w} ${t}`).toBe(0)
+      }
+    }
+  })
 })
 
 describe('scoreShot on a stadium face', () => {
@@ -307,5 +327,15 @@ describe('faceAlignment', () => {
       { value: 10, w: 10, h: 6 },
     ])
     expect(() => faceAlignment(oval, marks, undefined, english.t)).toThrow('circular')
+    const outerOval = faceOf([
+      { value: 9, w: 20, h: 14 },
+      { value: 10, w: 10 },
+    ])
+    expect(() => faceAlignment(outerOval, marks, undefined, english.t)).toThrow('circular')
+    const square = faceOf([
+      { value: 9, w: 20, shape: 'square' },
+      { value: 10, w: 10, shape: 'square' },
+    ])
+    expect(() => faceAlignment(square, marks, undefined, english.t)).toThrow('circular')
   })
 })
