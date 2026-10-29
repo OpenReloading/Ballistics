@@ -233,6 +233,33 @@ describe('fitPowderPooled', () => {
     expect(parameter(free, 'burnRate', 'C').value).toBeCloseTo(0.55, 2)
   })
 
+  it('fits the burn rate coefficient of a geometric burn law', () => {
+    const geometric = (coefficient: number): InteriorLoad => ({
+      ...load(0.5),
+      propellant: {
+        ...load(0.5).propellant,
+        burn: {
+          kind: 'geometric',
+          coefficient,
+          exponent: 0.9,
+          grain: {
+            shape: 'sevenPerf',
+            diameter: 1.25e-3,
+            perforationDiameter: 1.5e-4,
+            length: 2e-3,
+          },
+        },
+      },
+    })
+    const ladder = charges.map((charge): LadderPoint => {
+      const r = interior({ ...geometric(7e-9), charge })
+      if (!r.valid) throw new Error(r.reason)
+      return { charge, muzzleVelocity: r.muzzleVelocity, velocitySigma: sigma }
+    })
+    const fit = fitPowderPooled([{ powder: 'G', rifle: 'r1', load: geometric(6e-9), ladder }])
+    expect(parameter(fit, 'burnRate', 'G').value).toBeCloseTo(7e-9, 12)
+  })
+
   describe('refusals', () => {
     const data = strings(normals(1), charges, 0)
 
@@ -284,6 +311,27 @@ describe('fitPowderPooled', () => {
       const error = failure(() => fitPowderPooled(broken))
       expect(error).toBeInstanceOf(PowderFitError)
       expect((error as PowderFitError).reason).toBe('invalid')
+    })
+
+    it.each([
+      { value: 0, sigma: 0.1 },
+      { value: Number.NaN, sigma: 0.1 },
+      { value: 0.4, sigma: 0 },
+      { value: 0.4, sigma: Number.POSITIVE_INFINITY },
+    ])('refuses a burn coefficient prior of $value with sigma $sigma', (prior) => {
+      expect(() => fitPowderPooled(data, { priors: { A: { burnRate: prior } } })).toThrow(
+        'prior burnRate of A: value and sigma above 0',
+      )
+    })
+
+    it('refuses a charge the interior model cannot run, in the fit and in a prediction', () => {
+      const s = nth(data, 0)
+      const overfull = { charge: 0.05, muzzleVelocity: 900, velocitySigma: sigma }
+      const error = failure(() => fitPowderPooled([{ ...s, ladder: [...s.ladder, overfull] }]))
+      expect((error as PowderFitError).reason).toBe('invalid')
+      const fit = fitPowderPooled([s])
+      const prediction = failure(() => predictPooled(fit, s, 0.05))
+      expect((prediction as PowderFitError).reason).toBe('invalid')
     })
 
     it('refuses pressures and points without a velocity sigma', () => {

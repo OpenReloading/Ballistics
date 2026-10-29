@@ -284,6 +284,32 @@ describe('powder fit over sessions', () => {
     )
   })
 
+  it('holds the last open parameter when the sessions have fewer points than parameters', () => {
+    const [one] = sessions([0.6], [294.15])
+    const ladder = (one?.ladder ?? []).slice(0, 1)
+    const r = fitPowderSessions(start, [{ ...one, ladder }], {
+      parameters: ['burnRate', 'volumeFactor'],
+    })
+    expect(r.resolved).toEqual(['burnRate'])
+    expect(r.held).toEqual([{ name: 'volumeFactor', reason: 'underdetermined' }])
+  })
+
+  it('holds the parameter two close temperatures leave parallel and fits the others', () => {
+    const r = fitPowderSessions(start, sessions([0.5, 0.6], [300, 300.01]), {
+      parameters: ['burnRate', 'energy', 'temperatureFactor'],
+    })
+    expect(r.resolved).toEqual(['burnRate', 'energy'])
+    expect(r.held).toEqual([{ name: 'temperatureFactor', reason: 'ill-conditioned' }])
+  })
+
+  it('runs a session without a temperature at the temperature of the load', () => {
+    const list = sessions(lengths, [294.15]).map(({ propellantTemperature: _, ...s }) => s)
+    const parameters = ['burnRate', 'energy'] as const
+    const direct = fitPowder(load(0.38), points(list), { parameters })
+    const r = fitPowderSessions(load(0.38), list, { parameters })
+    expect(nth(r.parameters, 1).value).toBe(nth(direct.parameters, 1).value)
+  })
+
   it('keeps the burn coefficient and refuses empty input', () => {
     expect(() => fitPowderSessions(start, [])).toThrow(InputError)
     expect(() =>

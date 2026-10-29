@@ -187,6 +187,17 @@ describe('rangeFirings', () => {
     expectIssueAt(rangeFirings, { ...firings, rounds: [negative] }, 'rounds.0.totalYaw')
     expectIssueAt(rangeFirings, { ...firings, bulletDiameter: { value: 0 } }, 'bulletDiameter')
   })
+
+  it('rejects a bullet mass, a Mach number or a drag coefficient of 0', () => {
+    const [round] = firings.rounds
+    expectIssueAt(rangeFirings, { ...firings, bulletMass: { value: 0 } }, 'bulletMass')
+    for (const field of ['mach', 'dragCoefficient'])
+      expectIssueAt(
+        rangeFirings,
+        { ...firings, rounds: [{ ...round, [field]: { value: 0 } }] },
+        `rounds.0.${field}`,
+      )
+  })
 })
 
 describe('caseTypes', () => {
