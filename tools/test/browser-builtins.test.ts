@@ -13,7 +13,7 @@ const browserSources = [
 ]
 
 /**
- * Built-ins that Chrome and Edge 111, Firefox 115 or Safari 16.4 lack (MDN browser compatibility
+ * Built-ins that Chrome and Edge 111, Firefox 121 or Safari 16.4 lack (MDN browser compatibility
  * data), as each is called. The Set methods `union`, `intersection` and `difference` are left out:
  * zod's `z.union` would match.
  */

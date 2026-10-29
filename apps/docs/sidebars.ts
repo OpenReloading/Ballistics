@@ -22,6 +22,7 @@ const sidebars: SidebarsConfig = {
       'interior-sampled-band',
       'interior-velocity-ladder',
     ]),
+    'powder-tuning',
     category('Exterior', [
       'exterior-atmosphere',
       'exterior-drag',
