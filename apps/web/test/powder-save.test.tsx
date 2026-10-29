@@ -7,7 +7,7 @@ import {
 } from '@open-reloading/core'
 import { fromSi, type Powder, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { saveFailures, TuneNotes } from '../src/components/powder-tune.tsx'
 import { english, translator } from '../src/i18n/translate.ts'
 import { dayText, localDay } from '../src/lib/dates.ts'
@@ -300,6 +300,9 @@ describe('a fit of more strings than a record holds', () => {
 
 describe('the save on the tuning screen', () => {
   const disabledSave = /disabled=""><span[^>]*><span[^>]*>Save as a powder/
+  // the mark shows today's day: a fixed clock keeps a run across midnight from failing
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(date)
   const html = renderToStaticMarkup(
     <MantineProvider>
       <TuneNotes
@@ -311,13 +314,12 @@ describe('the save on the tuning screen', () => {
       />
     </MantineProvider>,
   )
+  vi.useRealTimers()
 
   it('offers the save with the fitted mark and no control for the burn form', () => {
     expect(html).toContain('Save as a powder')
     expect(html).not.toMatch(disabledSave)
-    expect(html).toContain(
-      `simulation parameters fitted to 5 strings, ${dayText(localDay(new Date()))}`,
-    )
+    expect(html).toContain(`simulation parameters fitted to 5 strings, ${dayText(localDay(date))}`)
     expect(html.match(/role="slider"/g)).toHaveLength(1)
     expect(html).not.toMatch(/form\.a|Burn form|Initial slope/)
   })
