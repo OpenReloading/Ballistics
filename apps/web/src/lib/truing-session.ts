@@ -11,7 +11,7 @@ import {
   type TruingPlan,
   type WeakReason,
 } from '@open-reloading/core'
-import { type Truing, toSi, truing, userRecord } from '@open-reloading/schema'
+import { type Truing, toSi, truing, type UserRecord, userRecord } from '@open-reloading/schema'
 import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
@@ -197,18 +197,29 @@ function storedParameter(name: RangeStringParameterName, si: number) {
   return storedOf(name === 'muzzleVelocity' ? 'velocity' : 'angle', si)
 }
 
+/** The stored truing schema's limits: rows of one result, results of one configuration. */
+export const truingLimits = { rows: 50, results: 100 }
+
+/**
+ * Why a fit was not stored: the firearm or its configuration is gone, the configuration holds
+ * `truingLimits.results` results, or the strings have more than `truingLimits.rows` rows.
+ */
+export type StoreRefusal = 'missing' | 'full' | 'rows'
+
 /**
  * The truing result as a firearm configuration stores it: the strings as entered, the nominal
  * shot and the fitted parameters, in stored units. Only an identified parameter keeps its value
- * and interval. `input` is the one the fit was made from.
+ * and interval. `input` is the one the fit was made from. 'rows' when there are more rows than
+ * a result keeps.
  */
 export function truingEntry(
   nominal: { shot: TrajectoryInput; bullet: string; zeroRange: number },
   input: TruingInputs,
   fit: RangeStringFit,
   date: Date,
-): Truing {
+): Truing | 'rows' {
   const { clickValue, entries, chronograph } = measured(input, untranslated())
+  if (entries.length > truingLimits.rows) return 'rows'
   const { shot } = nominal
   const length = (x: number) => storedOf('length', x)
   return truing.parse({
@@ -266,14 +277,22 @@ export function truingEntry(
 }
 
 /**
- * The firearm record with `entry` appended to configuration `config`, saved at `now`; undefined
- * when `stored` is no valid firearm with that configuration.
+ * The firearm record with `entry` appended to configuration `config`, saved at `now`; 'missing'
+ * when `stored` is no valid firearm with that configuration, 'full' when the configuration holds
+ * as many results as it keeps.
  */
-export function withTruing(stored: unknown, config: string, entry: Truing, now: Date) {
+export function withTruing(
+  stored: unknown,
+  config: string,
+  entry: Truing,
+  now: Date,
+): UserRecord | Exclude<StoreRefusal, 'rows'> {
   const found = userRecord.safeParse(stored)
-  if (!found.success || found.data.kind !== 'firearm') return
+  if (!found.success || found.data.kind !== 'firearm') return 'missing'
   const f = found.data.data
-  if (!f.configurations.some((c) => c.id === config)) return
+  const target = f.configurations.find((c) => c.id === config)
+  if (!target) return 'missing'
+  if ((target.truing?.length ?? 0) >= truingLimits.results) return 'full'
   return userRecord.parse({
     ...found.data,
     saved: now.toISOString(),

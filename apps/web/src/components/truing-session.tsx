@@ -6,6 +6,7 @@ import type { Truing } from '@open-reloading/schema'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
+import { errorText } from '../lib/error-text.ts'
 import {
   type Attempt,
   blankChrono,
@@ -17,9 +18,11 @@ import {
   parameterLines,
   planSession,
   residualLines,
+  type StoreRefusal,
   type TruingChrono,
   type TruingRow,
   truingEntry,
+  truingLimits,
   withTruing,
 } from '../lib/truing-session.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
@@ -76,6 +79,9 @@ function Statuses({ lines, fit }: { lines: ParameterLine[]; fit: boolean }) {
   )
 }
 
+/** How a store ended: stored, refused for a known reason, or failed with an error text. */
+type StoreOutcome = 'stored' | StoreRefusal | { error: string }
+
 /** Stores a fit with its strings in the chosen firearm configuration, on request. */
 function StoreFit({
   fit,
@@ -84,11 +90,11 @@ function StoreFit({
 }: {
   fit: RangeStringFit
   target: TruingNominal['target']
-  entry: () => Truing
+  entry: () => Truing | 'rows'
 }) {
   const { t } = useTranslation()
   /** The fit that was stored, or that failed to store. */
-  const [stored, setStored] = useState<{ fit: RangeStringFit; ok: boolean }>()
+  const [stored, setStored] = useState<{ fit: RangeStringFit; outcome: StoreOutcome }>()
   if (!target)
     return (
       <p className="note">
@@ -96,23 +102,55 @@ function StoreFit({
       </p>
     )
   const store = () => {
-    const e = entry()
-    updateRecord(target.record, (raw) => withTruing(raw, target.config, e, new Date())).then(
-      (written) => setStored({ fit, ok: written !== undefined }),
-      () => setStored({ fit, ok: false }),
-    )
+    const end = (outcome: StoreOutcome) => setStored({ fit, outcome })
+    try {
+      const e = entry()
+      if (e === 'rows') return end('rows')
+      let refused: StoreRefusal = 'missing'
+      updateRecord(target.record, (raw) => {
+        const written = withTruing(raw, target.config, e, new Date())
+        if (typeof written !== 'string') return written
+        refused = written
+      }).then(
+        (written) => end(written ? 'stored' : refused),
+        (error) => end({ error: errorText(error) }),
+      )
+    } catch (error) {
+      end({ error: errorText(error) })
+    }
   }
-  const done = stored?.fit === fit ? stored : undefined
+  const done = stored?.fit === fit ? stored.outcome : undefined
+  const text = (outcome: StoreOutcome) => {
+    if (typeof outcome === 'object')
+      return t(
+        'Not stored: the browser store refused it. {reason} Free browser storage and try again.',
+        { reason: outcome.error },
+      )
+    switch (outcome) {
+      case 'stored':
+        return t('Stored with {configuration}, with its strings.', { configuration: target.label })
+      case 'missing':
+        return t(
+          'Not stored: the firearm or its configuration is no longer in the library. Choose a firearm and sight above.',
+        )
+      case 'full':
+        return t(
+          'Not stored: {configuration} already holds {n} truing results. Remove an older result of it in the library.',
+          { configuration: target.label, n: truingLimits.results },
+        )
+      case 'rows':
+        return t('Not stored: a stored result keeps at most {n} rows. Remove rows and fit again.', {
+          n: truingLimits.rows,
+        })
+    }
+  }
   return (
     <>
-      <Button variant="default" disabled={done?.ok === true} onClick={store}>
+      <Button variant="default" disabled={done === 'stored'} onClick={store}>
         {t('Store with {configuration}', { configuration: target.label })}
       </Button>
       <p role="status" className="note">
-        {done &&
-          (done.ok
-            ? t('Stored with {configuration}, with its strings.', { configuration: target.label })
-            : t('Not stored: the firearm or its configuration is no longer in the library.'))}
+        {done && text(done)}
       </p>
     </>
   )
