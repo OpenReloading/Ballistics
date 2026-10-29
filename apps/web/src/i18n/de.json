@@ -1713,6 +1713,7 @@
   "included angle of the forcing cone": "Eingeschlossener Winkel des Übergangskegels",
   "included angle of the h cone": "Eingeschlossener Winkel des h-Kegels",
   "included shoulder angle": "Eingeschlossener Schulterwinkel",
+  "inconsistent": "widersprüchlich",
   "input": "Eingabewert außerhalb des Modells",
   "input tolerances only": "nur Eingabetoleranzen",
   "integration": "Berechnung nicht konvergiert",
