@@ -10,6 +10,9 @@ test.beforeEach(async ({ page }) => {
   await storeUnits(page)
 })
 
+/** Test budget of a detection test: up to two 30 s detection waits after the photo is drawn and loaded. */
+const detectionBudget = 90_000
+
 const PX_PER_MM = 7.5
 /** Photo px of the face centre. */
 const C = { x: 700, y: 650 }
@@ -193,6 +196,7 @@ test('a federation narrows the disciplines, a discipline its faces, and a face s
 test('a known hole size: from choosing the photo to Accept is 2 actions, no shot before Accept', async ({
   page,
 }) => {
+  test.setTimeout(detectionBudget)
   const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
   await setMarker(page, '4.5')
   const { count, act } = counter()
@@ -214,6 +218,7 @@ test('a known hole size: from choosing the photo to Accept is 2 actions, no shot
 test('an unknown hole size: the typed size is the third action, and the shots sit on the holes', async ({
   page,
 }) => {
+  test.setTimeout(detectionBudget)
   const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
   // the face's event shot at the group's distance becomes the discipline
   await field(page, 'Distance', 'm').fill('10')
@@ -273,6 +278,7 @@ test('an unknown hole size: the typed size is the third action, and the shots si
 })
 
 test('each item of the result line opens its editor', async ({ page }) => {
+  test.setTimeout(detectionBudget)
   const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
   await setMarker(page, '4.5')
   await load(page, png)
@@ -301,6 +307,7 @@ test('each item of the result line opens its editor', async ({ page }) => {
 test('a photo below the minimum quality names the problem and waits for Detect anyway', async ({
   page,
 }) => {
+  test.setTimeout(detectionBudget)
   const holes: [number, number][] = [
     [61.78, 22.49],
     [-10.03, 56.87],
@@ -332,6 +339,7 @@ test('a photo below the minimum quality names the problem and waits for Detect a
 test('a face chosen for scoring on a sheet calibrated by a line does not move the detection', async ({
   page,
 }) => {
+  test.setTimeout(detectionBudget)
   const holes: [number, number][] = [
     [61.78, 22.49],
     [-10.03, 56.87],
@@ -381,6 +389,7 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
 test('no target fits: the ellipses are shown and a typed black diameter sets the scale', async ({
   page,
 }) => {
+  test.setTimeout(detectionBudget)
   // a black area without ring lines
   const png = await facePng(page, 'issf-10m-air-pistol', [], false)
   await load(page, png)
@@ -405,6 +414,7 @@ test('no target fits: the ellipses are shown and a typed black diameter sets the
 })
 
 test('a photo without any face: the guided steps ask for the scale as before', async ({ page }) => {
+  test.setTimeout(detectionBudget)
   await page.goto('/groups')
   const blank = await page.evaluate(async () => {
     const cv = new OffscreenCanvas(800, 600)
