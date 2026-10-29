@@ -58,7 +58,7 @@ The sixth process of the evaluation plan (design a target, save, use it as the t
 
 ## Findings
 
-Severity: blocker is a failure of a Level A criterion in the gated scope. Major is a failure of a Level AA criterion. Minor is everything else, including checks without a success criterion and failures that depend on how a criterion is read. Counts: 2 blockers (both fixed), 7 major (6 fixed), 6 minor (1 fixed, 1 in part).
+Severity: blocker is a failure of a Level A criterion in the gated scope. Major is a failure of a Level AA criterion. Minor is everything else, including checks without a success criterion and failures that depend on how a criterion is read. Counts: 2 blockers (both fixed), 7 major (6 fixed), 6 minor (1 fixed).
 
 | Id | Severity | Criterion | Page and state | Evidence | Status |
 |---|---|---|---|---|---|
@@ -72,7 +72,7 @@ Severity: blocker is a failure of a Level A criterion in the gated scope. Major 
 | A-08 | minor | 3.3.1 wording | Workbench, status line after a refused run | The status text is "The API answered 422." although the browser app has no server, and it is announced | Open. The error panel (A-01) states the fault |
 | A-09 | minor | 1.4.11 Non-text Contrast (AA) | Workbench chart, light theme | Rendered pixels: pressure line 3.20:1, velocity 4.42:1, energy 3.22:1 against white; one colour of the chart measured 2.78:1 (47 px of about 200,000, most likely the fainter lines of the other ladder steps). Dark theme: 4.66:1, 4.97:1, 5.31:1, no colour under 4.7:1 | Open. The Ladder table tab lists every step |
 | A-10 | minor | none (axe best practice `region`) | An open tooltip, for example the sidebar's Search button focused on a record page | The tooltip is outside every landmark | Open |
-| A-11 | minor | 1.4.4 Resize Text (AA), 1.4.10, 1.4.12 | Most pages at 200 % text size, at 640 px and at 320 px; designers and record pages at 320 px with the spacing of 1.4.12 | The page title in the page bar is cut with an ellipsis ("Loa..." at 320 px). Below 75em the bar is in the app header and the title has two lines; with the spacing of 1.4.12 a title such as "22 Long Rifle" needs a third. The full title is in the document title and in the heading's text | Partly fixed: below 75em the title area scrolls in the app header where the title needs more lines than the band leaves, so nothing is cut with the spacing of 1.4.12 (`text-spacing.spec.ts`). The 1.4.4 and 1.4.10 parts (200 % text, 640 px) are open until rechecked |
+| A-11 | minor | 1.4.4 Resize Text (AA), 1.4.10, 1.4.12 | Most pages at 200 % text size, at 640 px and at 320 px; designers and record pages at 320 px with the spacing of 1.4.12 | The page title in the page bar is cut with an ellipsis ("Loa..." at 320 px). Below 75em the bar is in the app header and the title has two lines; with the spacing of 1.4.12 a title such as "22 Long Rifle" needs a third. The full title is in the document title and in the heading's text | Open. A title area that scrolls in the header leaves the heading partly outside its box, which axe reports at 320 and 390 px: at 320 px the title column is 28 px wide and "308 Win." needs 72 px of height in the 52 px band |
 | A-12 | minor | 4.1.3 Status Messages (AA) | Shot groups, shots placed by pointer | After four shots only "Saved in this browser" is announced, not the shot count or the score. The count and the score are text on the page and the shots have named buttons and x and y fields | Open |
 | A-13 | major | 2.5.8 Target Size (Minimum) (AA) | Record pages of cartridges whose dimensions table has notes: 2 of the 58 random cartridges (32 Rus, 8), at every width and in both schemes; the structured sample's cartridge (308 Win.) has none | The note buttons "Cartridge l (mm)" and "Chamber L (mm)" are 108 and 106 px wide and 16.3 px high with 18.6 px of free space to their neighbours (axe `target-size`, 2 nodes per page) | Fixed: the note buttons of the variants matrix ("Cartridge l" and "Chamber L", the two axe violations) and the symbol buttons of the dimensions tables have a 24 px target. A symbol fills its row and its cell has no block padding, so a row is 24 px plus its rule (screen only, CSS in `globals.css`). `a11y-states.spec.ts` measures both |
 | A-14 | major | 1.4.12 Text Spacing (AA) | Page bar of the workbench and the designers at 1280 and 390 px with the spacing of the criterion applied | The status line ("Result of ...", "Unsaved changes, not saved to a file") is cut by its column. At 1280 px the file state is cut with an ellipsis without the spacing too | Fixed: the line keeps its ellipsis and shows its whole text in a tooltip on hover, keyboard focus (the line is a Tab stop while it has text) and tap; the state stays announced. `text-spacing.spec.ts` |
@@ -98,7 +98,7 @@ Open findings with the reason they are not fixed yet and the way round them. The
 | Id | Why it stays | Workaround |
 |---|---|---|
 | A-15 | The charts lay out their labels inside a fixed box | Chart data and the values table |
-| A-08 to A-12 | Minor; wording, one chart colour, the title at 200 % text and 640 px, and a status message | See each row |
+| A-08 to A-12 | Minor; wording, one chart colour, the title bar and a status message | See each row |
 
 ## Not covered by this audit
 
