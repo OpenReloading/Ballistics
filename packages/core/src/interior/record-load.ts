@@ -2,7 +2,7 @@ import { type CartridgeSpecs, cartridgeBulletDiameterMm } from '../cartridge-spe
 import { InputError, need } from '../errors.ts'
 import { type ResistanceTerms, recordResistance } from './bore-resistance.ts'
 import { interiorLoad } from './load-file.ts'
-import type { InteriorLoad } from './model.ts'
+import { type InteriorLoad, spikeNumber } from './model.ts'
 import { type PowderInteriorRecord, powderModelValues } from './workbench-keys.ts'
 
 /** The powder record values {@link recordLoad} reads, in stored units. */
@@ -84,6 +84,9 @@ export function recordLoad(r: RecordRun): InteriorLoad {
     undefined,
     groove === undefined ? undefined : groove * 1e-3,
   )
+  // spike: start pressure in proportion to the bearing length over a reference length, mm
+  const lref = spikeNumber('SPIKE_LREF_MM')
+  if (lref > 0 && bullet.lengthMm) load.startPressure *= bullet.lengthMm / lref
   const { resistance, missing } = recordResistance(powder, {
     boreDiameter: load.chamber.boreDiameter,
     boreArea: load.chamber.boreArea,

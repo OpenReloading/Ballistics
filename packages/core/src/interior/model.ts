@@ -413,6 +413,13 @@ interface Phase {
   profileIndex: number
 }
 
+/** spike: a number from the environment, 0 when unset; read on the spike branch only. */
+export const spikeNumber = (name: string) =>
+  Number(
+    (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env[name] ??
+      0,
+  )
+
 /** Linear interpolation over travel, 0 before the first and after the last point. */
 const profileAt = <T extends { travel: number }>(
   pts: readonly T[],
@@ -438,7 +445,10 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
   // bore resistance
   const friction = load.resistance?.friction ?? 0
   const profile = load.resistance?.engraving ?? []
-  const resistance = (x: number) => area * (friction + profileAt(profile, (pt) => pt.pressure, x))
+  // spike: a resistance pressure cp p proportional to the mean gas pressure, a separate summand that is exactly 0 at cp = 0
+  const cp = spikeNumber('SPIKE_CP')
+  const resistance = (x: number, p: number) =>
+    area * (friction + profileAt(profile, (pt) => pt.pressure, x)) + (cp > 0 ? area * cp * p : 0)
 
   // gas leakage (apps/docs/docs/models/interior-leakage-heat.md)
   const leak = load.leakage !== undefined
@@ -526,7 +536,7 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
   const pressures = (y: Float64Array): [number, number, number] => {
     const p = pressure(y)
     if (!phase.moving) return [p, p, p]
-    const fr = resistance(el(y, 1) * xe)
+    const fr = resistance(el(y, 1) * xe, p)
     const pb = basePressure(p, fr)
     return [p, pb, pb + (eps * mc * ((area * p - fr) / me)) / area]
   }
@@ -535,7 +545,7 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
   /** Shot start function: positive once the pressure and the force on the base exceed their limits. */
   const startG = (y: Float64Array) => {
     const p = pressure(y)
-    return Math.min(p - pst, area * p - resistance(el(y, 1) * xe))
+    return Math.min(p - pst, area * p - resistance(el(y, 1) * xe, p))
   }
   return {
     resistance,
@@ -570,7 +580,7 @@ function interiorRhs(s: Scaling, gas: Gas, phase: Phase): Rhs {
     }
     const x = el(y, 1) * xe
     const v = el(y, 2) * vr
-    const fr = resistance(x)
+    const fr = resistance(x, p)
     dy[1] = el(y, 2)
     dy[2] = (((area * p - fr) / me) * ts) / vr
     dy[3] = (fr * v * ts) / e0
