@@ -63,6 +63,10 @@ describe('chamberOf', () => {
       leadeAngle: 1.75,
     })
   })
+
+  it('gives no chamber values without the cartridge L3', () => {
+    expect(chamberOf([])).toBeUndefined()
+  })
 })
 
 describe('bulletOutline', () => {

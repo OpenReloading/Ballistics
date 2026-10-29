@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import * as face from '../src/core/face.ts'
+import { fillet } from '../src/core/fillet.ts'
 import {
   arrowheadCorners,
   boxDistance,
@@ -11,6 +12,7 @@ import {
 } from '../src/core/geometry.ts'
 import type { PartPoint } from '../src/core/section.ts'
 import type { Label } from '../src/core/types.ts'
+import { closedEdges, unit } from '../src/core/vector.ts'
 import { defined } from './defined.ts'
 
 const label = (c: PartPoint, dir: PartPoint = [1, 0], w = 4, h = 2): Label => ({
@@ -184,5 +186,30 @@ describe('boxDistance', () => {
     const upright = label([0, 0], [0, 1])
     expect(boxDistance(upright, [0, 3])).toBe(1)
     expect(boxDistance(upright, [2, 0])).toBe(1)
+  })
+})
+
+describe('unit and closedEdges', () => {
+  it('give a unit direction of [1, 0] for two equal points and no edges of an empty polygon', () => {
+    expect(unit([2, 3], [2, 3])).toEqual([1, 0])
+    expect(unit([0, 0], [0, 2])).toEqual([0, 1])
+    expect(closedEdges([])).toEqual([])
+  })
+})
+
+describe('fillet', () => {
+  it('keeps the corner of a straight line', () => {
+    expect(fillet([0, -1], [0, 0], [0, 1], 0.5)).toEqual([[0, 0]])
+  })
+
+  it('draws the quarter arc whose angles cross the negative axis in either direction', () => {
+    // centre [0.5, 0.5]: from 180 to 270 degrees, the short way across +-180
+    const forward = defined(fillet([0, 1], [0, 0], [1, 0], 0.5, 2) ?? undefined)
+    near(forward, [
+      [0, 0.5],
+      [0.5 - 0.5 * Math.SQRT1_2, 0.5 - 0.5 * Math.SQRT1_2],
+      [0.5, 0],
+    ])
+    near(defined(fillet([1, 0], [0, 0], [0, 1], 0.5, 2) ?? undefined), forward.toReversed())
   })
 })
