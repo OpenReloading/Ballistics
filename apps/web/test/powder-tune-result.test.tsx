@@ -14,6 +14,8 @@ import {
   TuneNotes,
   TuneStrings,
 } from '../src/components/powder-tune.tsx'
+import { TuneChart } from '../src/components/powder-tune-chart.tsx'
+import { formatNumber } from '../src/i18n/number.ts'
 import { chargeRows } from '../src/lib/measurements.ts'
 import { nth } from '../src/lib/nth.ts'
 import type { PowderFitReply, PowderFitState } from '../src/lib/powder-fit.ts'
@@ -84,7 +86,10 @@ describe('the result view of the tuning route', () => {
     expect(html).toContain('Fitted values')
     expect(html).toContain('Standard uncertainty')
     expect(html).toContain('Vivacity')
-    expect(html.match(/<tr role="row">/g)?.length).toBe(2 + strings.length + 1)
+    // fitted values, residuals and chart data, each with its head row
+    expect(html.match(/<tr role="row">/g)?.length).toBe(
+      2 + strings.length + 1 + fitted.band.length + 1,
+    )
     expect(html).toContain('Residual per charge')
     expect(html).toContain('role="img"')
     expect(html).toContain(
@@ -102,6 +107,14 @@ describe('the result view of the tuning route', () => {
     const shown = text(state)
     for (const r of all) expect(shown).toContain(`<li>${reasonTexts[r]}</li>`)
     expect(reasonTexts['residual-trend']).toBe('Residuals may show a trend')
+  })
+
+  it('lists the drawn velocity and band per charge step in the Chart data table', () => {
+    expect(html).toContain('<summary>Chart data</summary>')
+    expect(html).toContain('Velocity and band per charge step (simulation)')
+    const p = nth(fitted.band, 0)
+    const v = (ms: number) => formatNumber(system.velocity.fromSi(ms), 1)
+    expect(html).toContain(`${v(p.velocity.lower)} to ${v(p.velocity.upper)}`)
   })
 
   it('shows no band line before the fit has arrived', () => {
@@ -131,6 +144,25 @@ describe('hand tuning', () => {
       if (!r.valid) throw new Error(r.reason)
       expect(Math.abs(velocity - r.muzzleVelocity)).toBeLessThan(1e-6)
     }
+  })
+
+  it('lists the hand-tuned curve in the Chart data table, a charge the model cannot run left empty', () => {
+    const band = fitted.band.slice(0, 2)
+    const [a, b] = band.map((p) => p.charge)
+    if (a === undefined || b === undefined) throw new Error('two band points expected')
+    const html = renderToStaticMarkup(
+      <MantineProvider>
+        <TuneChart
+          band={band}
+          curve={[{ charge: a, velocity: 812.34 }]}
+          ladder={fitted.fit.chargeRange}
+          rows={[]}
+          system={presetUnits('metric-grains')}
+        />
+      </MantineProvider>,
+    )
+    expect(html).toMatch(/<td class="num" role="cell">812\.3<\/td>/)
+    expect(html.match(/<td class="num" role="cell"><\/td>/g)).toHaveLength(1)
   })
 
   it('scales the fitted load by the ratio of a factor to its fitted value', () => {

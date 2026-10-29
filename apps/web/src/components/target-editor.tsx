@@ -76,6 +76,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { storageName } from '../lib/edition.ts'
+import { errorText } from '../lib/error-text.ts'
 import { isFaceId } from '../lib/face-records.ts'
 import { calibrateSheetOnFace } from '../lib/face-sheet.ts'
 import { typedFieldValue } from '../lib/field-spec.ts'
@@ -3129,11 +3130,17 @@ export function TargetEditor({
           if (heading === undefined) say(t('Saved in this browser.'))
           rememberSheet(record.id)
         })
-        .catch(() => {
+        .catch((error) => {
           landed()
           if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
           if (shown.current === record.id) setSaveFailed(true)
-          say(t('Not saved: the browser store refused the sheet.'), true)
+          say(
+            t(
+              'Not saved: the browser store refused the sheet. {reason} Free browser storage or allow site storage for this page, then edit the sheet again.',
+              { reason: errorText(error) },
+            ),
+            true,
+          )
         })
     }
     pendingSave.current = Object.assign(save, {
