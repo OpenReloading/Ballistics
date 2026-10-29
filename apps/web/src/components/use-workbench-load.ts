@@ -60,6 +60,7 @@ import {
 } from '../lib/field-spec.ts'
 import type { FigureView } from '../lib/figure-views.ts'
 import { gunValues, sightOptions, storedOf } from '../lib/firearm.ts'
+import { editHistory, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
 import {
   cartridgeClass,
   type DefaultSources,
@@ -1033,7 +1034,11 @@ function followWrites(a: {
   return writes
 }
 
+/** The pause after the last edit before an automatic run, ms. */
+const autoDelay = 600
+
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: spike prototype, the auto run's two guards
 export function useWorkbenchState() {
   const { choice, system } = useUnits()
   const { t } = useTranslation()
@@ -2813,6 +2818,47 @@ export function useWorkbenchState() {
   /** The card of the next open step, marked until the first result (as the checklist). */
   const nextPanel = outcome ? undefined : nextPanelOf(next, has(['volume']))
 
+  // spike: ?auto=pause runs every load after a pause, ?auto=plain only a load without a ladder
+  const autoRun =
+    typeof window === 'undefined' ? null : new URLSearchParams(location.search).get('auto')
+  const autoReady = () => form.isValid() && stepError() === undefined && todo.every((s) => s.done)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: spike, one timer per edit, read at its end
+  useEffect(() => {
+    if (!autoRun || edits === 0) return
+    if (autoRun === 'plain' && ladderSteps >= 2) return
+    const timer = setTimeout(() => {
+      if (autoReady()) void send()
+    }, autoDelay)
+    return () => clearTimeout(timer)
+  }, [edits])
+
+  // spike: undo and redo of the load's fields; a run of edits of one field is one step, a write
+  // of several fields at once (a record pick, the example, Reset) is one step
+  const history = useRef(historyOf(form.values))
+  const replaying = useRef(false)
+  useEffect(() => {
+    const h = history.current
+    if (replaying.current) {
+      replaying.current = false
+      return
+    }
+    const keys = Object.keys({ ...h.present, ...fields }).filter(
+      (k) => h.present[k]?.text !== fields[k]?.text,
+    )
+    if (keys.length === 0) return
+    history.current =
+      keys.length === 1 ? editHistory(h, fields, `field:${keys[0]}`) : pushHistory(h, fields)
+  }, [fields])
+  const replay = (to: typeof history.current) => {
+    if (to === history.current) return
+    history.current = to
+    replaying.current = true
+    form.setValues(to.present)
+    markChanged()
+  }
+  const undoLoad = () => replay(undo(history.current))
+  const redoLoad = () => replay(redo(history.current))
+
   /**
    * The bore resistance the powder record's law gives for the fields as they stand, under the keys
    * of the fields that can replace it: their placeholders. Undefined without the law, a loaded
@@ -2967,6 +3013,8 @@ export function useWorkbenchState() {
     printing,
     setPrinting,
     edits,
+    undoLoad,
+    redoLoad,
     readDesigns,
     reset,
     restoreResult,
