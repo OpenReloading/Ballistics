@@ -1,8 +1,13 @@
 import 'fake-indexeddb/auto'
 import type { UserRecord } from '@open-reloading/schema'
-import { expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
-import { type ImportFile, type ImportReport, importTexts } from '../src/lib/data-files.ts'
+import {
+  exportNotes,
+  type ImportFile,
+  type ImportReport,
+  importTexts,
+} from '../src/lib/data-files.ts'
 import { exportAllText, validRecords } from '../src/lib/user-data.ts'
 
 const saved = '2026-10-13T10:00:00.000Z'
@@ -35,13 +40,13 @@ function file(name: string, records: UserRecord[], raw: unknown[] = []): ImportF
   return { name, read: async () => bytes }
 }
 
-function run(files: ImportFile[]) {
+function run(files: ImportFile[], refs = async (_: UserRecord[]) => '') {
   const io = {
     onStored: vi.fn(),
     noteStorage: vi.fn(),
     fail: vi.fn<(said: (tr: typeof english) => string) => void>(),
     show: vi.fn<(report: ImportReport) => void>(),
-    refs: async () => '',
+    refs,
   }
   return { io, done: importTexts(files, io, english) }
 }
@@ -91,5 +96,60 @@ it('says the conflicts and the invalid records left out in the plural', async ()
       '0 invalid records restored, 1 left out because a browser record has their id, 1 left out without a text id.',
     conflicts:
       '2 records have the id of a browser record with other content: A, B. Replace the browser copies?',
+  })
+})
+
+it('notes the records that refer to what the browser lacks, once every file is stored', async () => {
+  const d = bullet('3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f', 'D')
+  const seen: string[][] = []
+  const { io, done } = run([file('d.json', [d])], (added) => {
+    seen.push(added.map((r) => r.name))
+    return Promise.resolve('D names a missing manufacturer.')
+  })
+  await done
+  expect(seen).toEqual([['D']])
+  expect(io.show.mock.calls[0]?.[0]?.notes).toContainEqual({
+    name: 'References',
+    note: 'D names a missing manufacturer.',
+  })
+})
+
+it('says a failure before any record without a count to refresh', async () => {
+  const broken: ImportFile = { name: 'x.json', read: () => Promise.reject(new Error('gone')) }
+  const { io, done } = run([broken])
+  await done
+  expect(io.onStored).not.toHaveBeenCalled()
+  expect(io.fail.mock.calls[0]?.[0](english)).toBe(
+    'Import stored 0 records, then failed on x.json: gone',
+  )
+})
+
+describe('exportNotes', () => {
+  const sheet = (name: string, photo?: string) =>
+    ({ kind: 'targetSheet', id: name, name, saved, data: { photo } }) as unknown as UserRecord
+  const notes = (records: UserRecord[], invalid: number, left: string[]) =>
+    exportNotes(
+      records,
+      validRecords(Array(invalid).fill(bad)).invalid,
+      left,
+      english.t,
+      english.tn,
+    )
+
+  it('says nothing for a whole export', () => {
+    expect(notes([sheet('S', 'p1'), a], 0, [])).toBe('')
+  })
+
+  it('names the sheets whose photos were left out, never another kind', () => {
+    expect(notes([sheet('S1', 'p1'), sheet('S2', 'p2'), sheet('S3'), a], 0, ['p1', 'p2'])).toBe(
+      'Left out for the file size limit: the photos of S1, S2. Save on a sheet keeps its photo.',
+    )
+  })
+
+  it('counts the invalid records first, singular and plural', () => {
+    expect(notes([], 1, [])).toBe('1 invalid record is in it as stored.')
+    expect(notes([sheet('S', 'p')], 2, ['p'])).toBe(
+      '2 invalid records are in it as stored. Left out for the file size limit: the photos of S. Save on a sheet keeps its photo.',
+    )
   })
 })

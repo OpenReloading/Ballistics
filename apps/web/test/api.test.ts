@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 vi.mock('next/cache', () => ({ cacheLife: () => {} }))
-const { listAllBullets, staticIds } = await import('../src/lib/api.ts')
+const { getBullet, listAllBullets, listManufacturers, listTargetMappings, staticIds } =
+  await import('../src/lib/api.ts')
 
 const offsets: number[] = []
 
@@ -56,4 +57,50 @@ it('cuts the cartridge pages only with PRERENDER=sample', async () => {
   expect(await staticIds(listAllBullets, 'bullet')).toHaveLength(1684)
   vi.stubEnv('PRERENDER', 'full')
   expect(await staticIds(listAllBullets, 'cartridge')).toHaveLength(1684)
+})
+
+/** Answers `status` with `body` for every path and records the paths asked for. */
+function answer(status: number, body: unknown = {}) {
+  const paths: string[] = []
+  vi.stubGlobal('fetch', (url: string) => {
+    const u = new URL(url)
+    paths.push(u.pathname + u.search)
+    return Promise.resolve(Response.json(body, { status }))
+  })
+  return paths
+}
+
+it('gives notFound for an id the API rejects or lacks, and encodes the id in the path', async () => {
+  const paths = answer(404)
+  expect(await getBullet('a b/c')).toEqual({ status: 'notFound' })
+  expect(paths).toEqual(['/v1/bullets/a%20b%2Fc'])
+  answer(400)
+  expect(await getBullet('x')).toEqual({ status: 'notFound' })
+})
+
+it('fails a list without a page and the detail routes it feeds', async () => {
+  answer(404)
+  expect(await listAllBullets()).toEqual({ status: 'notFound' })
+  await expect(staticIds(listAllBullets, 'bullet')).rejects.toThrow('no bullet list at build')
+})
+
+it('stops at an empty page before total', async () => {
+  answer(200, { total: 5, items: [] })
+  expect(await listAllBullets()).toEqual({ status: 'ok', data: [] })
+})
+
+it('has no manufacturers where the API has no such list', async () => {
+  answer(404)
+  expect(await listManufacturers()).toEqual([])
+  answer(200, { total: 1, items: [{ id: 'm', name: 'M' }] })
+  expect(await listManufacturers()).toEqual([{ id: 'm', name: 'M' }])
+})
+
+it("asks for one face's target mappings, or every mapping", async () => {
+  const paths = answer(200, { items: [{ face: 'f' }] })
+  expect(await listTargetMappings('issf 10m')).toEqual({ status: 'ok', data: [{ face: 'f' }] })
+  await listTargetMappings()
+  expect(paths).toEqual(['/v1/target-mappings?face=issf%2010m', '/v1/target-mappings'])
+  answer(404)
+  expect(await listTargetMappings()).toEqual({ status: 'notFound' })
 })
