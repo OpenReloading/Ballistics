@@ -434,7 +434,7 @@ export function useHoleDetection({
         setQuality(m.quality)
         const { fits } = m.search
         const [only] = fits
-        if (only && fits.length === 1 && m.search.sure) {
+        if (only && fits.length === 1 && m.search.sure && m.search.alike.length < 2) {
           // below the minimum quality the face is applied and the run waits for Detect anyway
           const hold = thenDetect && belowMinimum(m.quality)
           setHeld(hold)
@@ -498,7 +498,7 @@ export function useHoleDetection({
     const stopped = stops.current
     const [id = '', event] = value.split('|')
     const fit =
-      found.fits.find((f) => f.face.id === id) ??
+      [...found.fits, ...found.alike].find((f) => f.face.id === id) ??
       (await fetchFace(id).then(
         (f) => fitPicked(found, f),
         () => undefined,
@@ -889,11 +889,11 @@ function blockedReason(
 }
 
 /** What follows a face search that did not settle on one face: the step and the line to say. */
-function faceFollowUp({ fits, black }: FaceSearch, t: Translator['t']) {
+function faceFollowUp({ fits, alike, black }: FaceSearch, t: Translator['t']) {
   // no black area at all: the steps as they were, from the photo's turn
   if (!black)
     return { step: 0, text: t('Straighten the photo if needed, then set the scale (step 2).') }
-  if (fits.length > 1)
+  if (fits.length > 1 || alike.length > 1)
     return {
       step: 1,
       text: t('More than one target fits these rings: choose one in Target.'),
@@ -979,8 +979,9 @@ const sourceNames = {
 type FaceChoice = { value: string; label: string }
 
 /**
- * What to choose from: for the faces that fit (several are ratio twins) each face with each of its
- * events and the distance, so the event or the distance shot tells them apart; without a fit the
+ * What to choose from: for the faces that fit (several are ratio twins) each face with its outer
+ * diameter and each of its events and the distance, so the size, the event or the distance shot
+ * tells them apart; faces that match the same rings come first, smallest first; without a fit the
  * ranking of the faces.
  */
 function faceChoices(
@@ -991,11 +992,14 @@ function faceChoices(
   if (!found) return []
   if (!found.fits.length)
     return found.ranked.slice(0, 4).map((r) => ({ value: r.id, label: r.name }))
-  return found.fits.flatMap((f) =>
+  const alike = found.alike.length > 1 ? found.alike : []
+  const fits = [...alike, ...found.fits.filter((f) => !alike.some((a) => a.face.id === f.face.id))]
+  return fits.flatMap((f) =>
     f.face.events.map((e) => ({
       value: `${f.face.id}|${e.id}`,
-      label: t('{face}: {event}, {distance}', {
+      label: t('{face} ({outer}): {event}, {distance}', {
         face: f.face.name,
+        outer: formatQuantity('length', system, toSi('length', 2 * f.outer)),
         event: e.name,
         distance: formatQuantity('range', system, toSi('length', e.distance.value)),
       }),

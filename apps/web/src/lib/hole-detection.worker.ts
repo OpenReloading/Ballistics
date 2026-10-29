@@ -130,6 +130,7 @@ async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<
     { width: shot.width, height: shot.height, data: shot.data },
     r.faces,
     r.pxPerMm && r.pxPerMm * fk,
+    r.holeDiameter && fromSi('length', r.holeDiameter),
   )
   // the hole on the resized photo, from the scale of the best fit
   const [fit] = found.fits

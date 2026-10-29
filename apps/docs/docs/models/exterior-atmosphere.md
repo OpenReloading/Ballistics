@@ -114,6 +114,7 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 - Altitudes from -5000 m (`minAltitude`) to 11000 m (the tropopause). A trajectory that leaves this band stops with the reason `atmosphere`.
 - `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, non-finite values, and a pressure and temperature whose air density is not above 0 and at most 1000 kg/m³, `maxDensity` (the density overflows for a temperature near the smallest floating-point number and underflows for a pressure near it).
 - The Magnus constants are those for water. Below 0 degC the formula still gives the pressure over water, not over ice.
+- The sea-level density of the ICAO atmosphere, 1.2250 kg/m³, is 1.018 times the 1.2034 kg/m³ (0.075126 lb/ft³) of the older US Army reference atmosphere. Its sea-level speed of sound, 1120.27 ft/s (341.46 m/s, unverified), is 0.34 % above the dry ICAO value of 340.294 m/s. A BC carries its reference ([drag](exterior-drag.md#ballistic-coefficient-and-drag-curve)), but the air along the path is always this model's.
 
 ## Sources
 
