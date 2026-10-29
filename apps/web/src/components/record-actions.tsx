@@ -116,8 +116,19 @@ export function RecordActions({
           <LinkSimple aria-hidden="true" />
         </ActionIcon>
       </Tooltip>
+      <CopyStatus copied={clipboard.copied} error={clipboard.error} />
       <PrintButton />
     </>
+  )
+}
+
+/** Hidden live region beside a Copy link button: says the result of a copy, empty otherwise. */
+export function CopyStatus({ copied, error }: { copied: boolean; error: Error | null }) {
+  const { t } = useTranslation()
+  return (
+    <span role="status" className="visually-hidden">
+      {copied ? t('Link copied') : error ? t('Copy failed') : ''}
+    </span>
   )
 }
 
