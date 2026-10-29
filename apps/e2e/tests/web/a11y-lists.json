@@ -76,6 +76,12 @@
     },
     {
       "rule": "color-contrast",
+      "node": "dialog-title ",
+      "where": ["Confirm dialog", "Load export dialog"],
+      "reason": "Title of a dialog that wraps to two or more lines, reported as overlapping other boxes because different page content lies under each line, behind the overlay. Every line is inside the dialog's opaque header: 17.4:1 in light and 15.3:1 in dark by measurement."
+    },
+    {
+      "rule": "color-contrast",
       "node": "saved-storage",
       "reason": "Storage note of the Saved loads drawer, reported as overlapping another box. It sits on the drawer surface, 5:1 or more in both themes by measurement."
     },
