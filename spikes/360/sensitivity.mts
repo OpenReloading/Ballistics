@@ -10,7 +10,7 @@ const coefficient = Number(process.argv[2] ?? 1e-9)
 const guess = { start: 25e6, engraving: 40e6, band: 0.025, friction: 8e6 }
 const full = 1.6
 
-function gun(charge: number, engraving: number, friction: number): InteriorLoad {
+function gun(charge: number, engraving: number, friction: number, start = engraving): InteriorLoad {
   return {
     chamber: { volume: 2.2e-3, boreArea: area, boreDiameter: bore },
     barrel: { length: 40 * bore, twist: 0 },
@@ -30,7 +30,7 @@ function gun(charge: number, engraving: number, friction: number): InteriorLoad 
     },
     propellantTemperature: 294.15,
     ignitionPressure: 1e6,
-    startPressure: engraving * guess.start,
+    startPressure: start * guess.start,
     resistance: {
       friction: friction * guess.friction,
       engraving: [
@@ -44,13 +44,14 @@ function gun(charge: number, engraving: number, friction: number): InteriorLoad 
 const cases = [
   ['present', 1, 1],
   ['engraving x2', 2, 1],
+  ['ramp x2, start kept', 2, 1, 1],
   ['friction x2', 1, 2],
   ['both x2', 2, 2],
 ] as const
 for (const charge of [full, 0.75 * full]) {
   const base = interior(gun(charge, 1, 1))
-  for (const [name, e, f] of cases) {
-    const run = interior(gun(charge, e, f))
+  for (const [name, e, f, st] of cases) {
+    const run = interior(gun(charge, e, f, st))
     if (!run.valid || !base.valid) throw new Error(`${name}: ${run.valid ? '' : run.reason}`)
     console.log(
       [
