@@ -72,10 +72,10 @@ const evaluation = z.object({
     .optional()
     .describe('The groups of `--group-by`: the key by which the rows are grouped and the groups.'),
   notInFittedSet: metrics
-    .extend({ powders: count.describe('Powders left out, one at a time.') })
+    .extend({ powders: count.describe('Powders left out, one at a time, each without a value.') })
     .optional()
     .describe(
-      'Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, predicted with its fitted fields replaced by the median of the other powders the rows name, of its family where it has another.',
+      'Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.',
     ),
 })
 

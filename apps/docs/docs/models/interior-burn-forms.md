@@ -255,6 +255,7 @@ The burn law checks keep the pressure exponent at $n = 1$. The laws accept anoth
 - Code: `packages/core/src/interior/form.ts`, `burnError`. An invalid law gives the invalid reason `input` with the field name.
 - Grains with different inner and outer webs, deterrent coatings that change the burn rate with depth, and a spread of grain sizes are not modelled. The parameter $a$ of the two-stage form is the only proxy for a coating: the first stage is degressive when $a m \lt 0$, constant when $a m = 0$ and progressive when $a m \gt 0$. The powder records hold no coating, so the effect of a coating was not measured ([burn law checks](../research/interior-burn-law-checks.md)).
 - The two-stage and three-stage forms do not reproduce the infinite slope of the surface after the web of a seven-perforated grain burns through. The geometric form has it.
+- Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md) (the form parameter is not identified from velocities).
 
 ## Sources
 

@@ -1,12 +1,8 @@
-import { interior } from '@open-reloading/core'
 import type { Powder } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
-import { predict } from '../src/evaluate.ts'
 import { loadModel } from '../src/model.ts'
-import type { Row } from '../src/rows.ts'
-import { percentile } from '../src/stats.ts'
 import { unseenPowder } from '../src/unseen.ts'
 import { recordRoots, records, rowsCsv, writeRows } from './fixture.ts'
 
@@ -41,7 +37,7 @@ describe('unseenPowder', () => {
 })
 
 describe('verify --leave-one-powder-out', () => {
-  // validation cartridge 308-win; sp20, sp21 and sp22 share their fitted values, sp25 is faster
+  // validation cartridge 308-win; the 30-br row is training and plain has no parameters
   const specs = [
     { cartridge: '308-win', powder: 'demo-powder-sp20', charge: 2.4, velocity: 0.03 },
     { cartridge: '308-win', powder: 'demo-powder-sp21', charge: 2.4, velocity: -0.04 },
@@ -57,32 +53,13 @@ describe('verify --leave-one-powder-out', () => {
     final: false,
     leaveOnePowderOut: true,
   } as const
-  const row = (p: string): Row => ({
-    line: 0,
-    cartridge: '308-win',
-    bullet: 'demo-bullet-168',
-    powder: `demo-powder-${p}`,
-    charge: 2.4,
-    velocity: 0,
-    barrel: 600,
-  })
-  const velocity = (p: string) => {
-    const r = predict(row(p), records, interior)
-    return 'velocity' in r ? r.velocity : Number.NaN
-  }
-
-  it('predicts each powder from the others of its family, with a known error', async () => {
-    const r = await verify(options)
-    // left out, sp25 runs at the vivacity of its family, that is as sp20 does
-    const sp25 = Math.abs(velocity('sp20') - velocity('sp25')) / velocity('sp25')
-    expect(sp25).toBeGreaterThan(0.01)
-    const errors = [0.03, 0.04, 0.01, sp25]
-    const line = r.notInFittedSet
+  it('reports no value for each powder left out', async () => {
+    const line = (await verify(options)).notInFittedSet
     expect(line?.powders).toBe(4)
-    expect(line?.rows).toEqual({ inSplit: 4, used: 4, notUsed: {} })
-    expect(line?.velocity?.median).toBeCloseTo(percentile(errors, 0.5) as number, 9)
-    expect(line?.velocity?.p90).toBeCloseTo(percentile(errors, 0.9) as number, 9)
-    expect(line?.interval).not.toBeNull()
+    expect(line?.rows).toEqual({ inSplit: 4, used: 0, notUsed: { noPowderModel: 4 } })
+    expect(line?.velocity).toBeNull()
+    expect(line?.pressure).toBeNull()
+    expect(line?.interval).toBeNull()
   })
 
   it('has no line without the option and keeps the model version', async () => {

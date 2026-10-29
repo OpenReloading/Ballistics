@@ -163,10 +163,10 @@ Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packag
 
 #### Domain
 
-A fit keeps the data it was made from as its `domain`: one closed range per axis, each widened by a relative margin $\delta$ (default `powderDomainMargin`, 0.05, set per fit with `domainMargin`; an assumption: on synthetic ladders with model error the interval loses coverage from the first per cent outside the range, so no margin keeps it, [research log](../research/interior-powder-fit-extrapolation-margin.md)):
+A fit keeps the data it was made from as its `domain`: one closed range per axis, each widened by a relative margin $\delta$ (default `powderDomainMargin`, 0, set per fit with `domainMargin`: on synthetic ladders with model error the interval loses coverage from the first per cent outside the range, so no margin keeps it and the flag sits at the range edge, [research log](../research/interior-powder-fit-extrapolation-margin.md)). The upper end of bore diameter and barrel length is widened by $\delta_+ = \max(\delta, 0.025)$, a tolerance for values rounded in the input; on the other axes $\delta_+ = \delta$:
 
 $$
-[\,x_\min (1 - \delta),\; x_\max (1 + \delta)\,]
+[\,x_\min (1 - \delta),\; x_\max (1 + \delta_+)\,]
 $$
 
 Code: `packages/core/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
@@ -179,7 +179,7 @@ Code: `packages/core/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
 | `boreDiameter` | the load's bore diameter, a single value | `boreDiameter` of the options, default the load's |
 | `barrelLength` | the barrel lengths of the ladder points, default the load's | `barrelLength` of the options, default the load's |
 
-`predictPowder` sets `extrapolation` to an object that names each axis outside its range with the side, `below` or `above`, and leaves it out when every axis is inside. A value exactly at a widened end is inside. The axes are independent: a charge above the ladder usually brings a predicted velocity and pressure above the measured ones, and then all three are named. A `boreDiameter` option changes the bore diameter of the run and scales the bore area with its square. The propellant temperature is not an axis of the domain. Nothing else changes outside the domain. How the band behaves outside the range follows from the covariance: with both parameters fitted it widens quickly beyond the ladder, because the data no longer separate the two effects. With the burn coefficient alone the band follows the sensitivity of the model to that one parameter and can narrow where the sensitivity falls, the velocity band above the ladder for example. The band holds parameter uncertainty only. It contains no model error: a wrong form function, energy or heat loss shifts the true value away from the band, and the farther from the ladder, the more so. A charge at which the model has no valid run, or the perturbed parameters have none, throws a `PowderFitError` with reason `invalid`. A fit without a covariance (as many rows as parameters and no uncertainties) cannot predict.
+`predictPowder` sets `extrapolation` to an object that names each axis outside its range with the side, `below` or `above`, and leaves it out when every axis is inside. A value exactly at a widened end is inside, within a relative $10^{-12}$, so that a charge converted from a typed unit is inside at the ladder charge it equals. The axes are independent: a charge above the ladder usually brings a predicted velocity and pressure above the measured ones, and then all three are named. A `boreDiameter` option changes the bore diameter of the run and scales the bore area with its square. The propellant temperature is not an axis of the domain. Nothing else changes outside the domain. How the band behaves outside the range follows from the covariance: with both parameters fitted it widens quickly beyond the ladder, because the data no longer separate the two effects. With the burn coefficient alone the band follows the sensitivity of the model to that one parameter and can narrow where the sensitivity falls, the velocity band above the ladder for example. The band holds parameter uncertainty only. It contains no model error: a wrong form function, energy or heat loss shifts the true value away from the band, and the farther from the ladder, the more so. A charge at which the model has no valid run, or the perturbed parameters have none, throws a `PowderFitError` with reason `invalid`. A fit without a covariance (as many rows as parameters and no uncertainties) cannot predict.
 
 ### Pressure range from the fixed inputs
 
@@ -379,7 +379,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $\chi^2$ | Sum of squared weighted residuals | 1 | 1 |
 | $n$, $n_p$, $\nu$ | Rows, parameters, degrees of freedom | 1 | 1 |
 | $C_\theta$ | Covariance of the log parameters | 1 | 1 |
-| $x_\min$, $x_\max$, $\delta$ | Smallest and largest value of an axis in the data, relative margin of the domain | as the axis, 1 | as the axis, 1 |
+| $x_\min$, $x_\max$, $\delta$, $\delta_+$ | Smallest and largest value of an axis in the data, relative margin of the domain, relative margin of its upper end | as the axis, 1 | as the axis, 1 |
 | $m$, $\hat y$ | Charge of a prediction, predicted muzzle velocity or peak breech pressure | g, m/s or bar | kg, m/s or Pa |
 | $u(\hat y)$, $g_j$ | Standard uncertainty of a prediction, its gradient in the log parameters | as $\hat y$ | as $\hat y$ |
 | $k$, $z$, $t$, $\alpha$ | Coverage factor, normal and Student quantile, one minus the coverage | 1 | 1 |
@@ -404,7 +404,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 
 - The fit is local: from a start far from the solution the steps can end at the start-pressure floor with `unresolved`.
 - The peak pressure has a kink in the parameters where the peak moves between a located interior peak and burnout. A Jacobian taken across it mixes both sides.
-- A prediction outside the domain is an extrapolation. The result holds no charge recommendation and no limit. The domain is the span of the data plus a margin, not a statement that the model holds inside it.
+- A prediction outside the domain is an extrapolation. The result holds no charge recommendation and no limit. The domain is the span of the data plus a rounding tolerance on bore diameter and barrel length, not a statement that the model holds inside it.
 - A prediction band covers parameter uncertainty and not model error, and it is linearized: far from the ladder, where the model is strongly nonlinear in the parameters, the interval is less reliable.
 - The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate.
 - The burn coefficient, start pressure, volume factor, energy and temperature factor are fitted. Exponent, form parameters and the ratio of the two temperature sensitivities stay as given. `fitPowderSessions` shares one rifle's load, one lot and one set of fixed inputs over its sessions; the [pooled fit](#pooled-fit-over-rifles-powders-and-lots) pools rifles, powders and lots with random effects whose spreads are given, not estimated.
@@ -414,6 +414,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - A crusher pressure is a conventional value, not an absolute pressure: the compression of the copper cylinder depends on the rise time of the pressure and on the cylinder type. A pressure step drives an undamped elastic gauge to twice the deflection of the same static pressure ($x(t) = x_s (1 - \cos \omega t)$), so a fast rise reads differently from a slow one. No single factor converts crusher readings to transducer readings, which is why a fit refuses mixed bases and converts none ([research log](../research/interior-crusher-conventional-pressure.md)).
 - A fitted energy is an effective value, not the thermochemical one. On the 30 powder records with both, the fitted specific energy over the thermochemical value (impetus over $k - 1$) has a median of 0.78, and 27 lie between 0.6 and 0.95 ([research log](../research/interior-plausibility-notes.md)).
 - The fitted burn coefficient holds for the powder as fired. Ageing and moisture are not modelled in [M3](interior-m3.md#limits), so a fit on fresh powder does not hold for old or damp powder of the same lot, and the reverse.
+- Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md), [assumed peak pressure for powders without printed pressures](../research/interior-load-table-pressure-term.md).
 
 ## Sources
 

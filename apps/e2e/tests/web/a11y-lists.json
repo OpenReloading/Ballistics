@@ -156,20 +156,32 @@
     {
       "rule": "color-contrast",
       "node": "aria-label=\"Zoom out\"",
-      "where": "/groups",
+      "where": ["/groups", "Shot groups"],
       "reason": "The button's text is the minus sign U+2212, a character axe cannot read; it is named Zoom out. Measured against the page background it has 5:1 or more in both themes."
     },
     {
       "rule": "color-contrast",
       "node": "aria-hidden=\"true\"",
-      "where": "/groups",
+      "where": ["/groups", "Shot groups"],
       "reason": "Score label drawn with generated content, which axe cannot read. Measured against the page background it has 5:1 or more in both themes."
     },
     {
       "rule": "label-content-name-mismatch",
       "node": "aria-label=\"Zoom ",
-      "where": "/groups",
+      "where": ["/groups", "Shot groups"],
       "reason": "The visible text is the plus or the minus sign and the name is Zoom in or Zoom out: a symbol for the action, which axe cannot compare with words."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "session-strings tr:nth-child(3) > .num:nth-child(7)",
+      "where": "Session summary",
+      "reason": "Min of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "session-strings tr:nth-child(3) > .num:nth-child(8)",
+      "where": "Session summary",
+      "reason": "Max of the third string in the strings table, at the edge of its horizontal scroll box at 320 px and partly clipped, which axe cannot resolve. It is body text on the panel background: 17.4:1 in light and 15.3:1 in dark by measurement."
     },
     {
       "rule": "th-has-data-cells",

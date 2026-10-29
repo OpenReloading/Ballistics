@@ -6,7 +6,6 @@ import { Export } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
-import type { Translator } from '../i18n/translate.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
 import { readouts, statLines } from '../lib/group-readouts.ts'
@@ -74,105 +73,35 @@ export function StatsBlock({
   )
 }
 
-const styleProps = [
-  'fill',
-  'fill-opacity',
-  'stroke',
-  'stroke-width',
-  'stroke-opacity',
-  'stroke-dasharray',
-  'stroke-linecap',
-  'stroke-linejoin',
-  'paint-order',
-  'opacity',
-  'font-size',
-  'font-family',
-  'font-weight',
-  'display',
-]
-
-/**
- * The SVG as standalone markup: an SVG drawn into a canvas loads no stylesheet, so each element's
- * computed style is written onto it; a stroke that keeps its screen width scales by `k` (view units
- * per px).
- */
-function standalone(svg: SVGSVGElement, k: number, size: { w: number; h: number }) {
-  const clone = svg.cloneNode(true) as SVGSVGElement
-  const walk = (a: Element, b: Element) => {
-    const cs = getComputedStyle(a)
-    const fixed = cs.getPropertyValue('vector-effect') === 'non-scaling-stroke'
-    const decl = styleProps.map((p) => {
-      const v = cs.getPropertyValue(p)
-      if (!fixed || (p !== 'stroke-width' && p !== 'stroke-dasharray') || v === 'none')
-        return `${p}:${v}`
-      return `${p}:${v.replace(/[\d.]+(px)?/g, (n) => String(Number.parseFloat(n) * k))}`
-    })
-    b.setAttribute('style', decl.join(';'))
-    b.removeAttribute('class')
-    b.removeAttribute('vector-effect')
-    const copies = [...b.children]
-    for (const [i, c] of [...a.children].entries()) {
-      const copy = copies[i]
-      if (copy) walk(c, copy)
-    }
-  }
-  walk(svg, clone)
-  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-  clone.setAttribute('width', String(size.w))
-  clone.setAttribute('height', String(size.h))
-  clone.setAttribute('preserveAspectRatio', 'none')
-  return new XMLSerializer().serializeToString(clone)
-}
-
-const loaded = async (src: string) => {
-  const img = new Image()
-  img.src = src
-  await img.decode()
-  return img
-}
-
 export const extension = (type: string) =>
   type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W[\s\S]*/, '') ?? 'img')
 
-type RenderJob = {
-  t: Translator['t']
-  photo: { url: string; width: number; height: number } | undefined
-  box: ViewBox
-  size: { w: number; h: number }
-  turn: number
-  k: number
-}
-
-/** The photo, turned about its middle as on screen, under the overlay SVG, drawn into a canvas. */
-async function renderCanvas({ photo, box, size, turn, k, t }: RenderJob) {
-  const svg = document.querySelector('.target-offscreen svg')
-  if (!(svg instanceof SVGSVGElement)) throw new Error(t('nothing drawn'))
-  const canvas = document.createElement('canvas')
-  canvas.width = size.w
-  canvas.height = size.h
-  const g = canvas.getContext('2d')
-  if (!g) throw new Error(t('no canvas'))
-  const stage = document.querySelector('.target-stage')
-  g.fillStyle = (stage && getComputedStyle(stage).backgroundColor) || '#ffffff'
-  g.fillRect(0, 0, size.w, size.h)
-  if (photo) {
-    const img = await loaded(photo.url)
-    const f = size.w / box.w
-    // turned about its middle as on screen
-    g.translate((photo.width / 2 - box.x) * f, (photo.height / 2 - box.y) * f)
-    g.rotate(-turn)
-    g.drawImage(
-      img,
-      (-photo.width / 2) * f,
-      (-photo.height / 2) * f,
-      photo.width * f,
-      photo.height * f,
-    )
-    g.setTransform(1, 0, 0, 1, 0, 0)
+/**
+ * What one rendered image is made of, taken together at the click: a sheet switched while the
+ * renderer loads changes neither the drawing nor the box, photo or file name.
+ */
+export function renderJob(
+  still: StillCanvas,
+  box: ViewBox,
+  photo: { url: string; width: number; height: number } | undefined,
+  turn: number,
+  stem: string,
+) {
+  // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device); a larger photo fails
+  // there; upgrade by scaling the export down past that size
+  // sizes as on a 1000 px wide screen, whatever the window and the zoom
+  const k = box.w / 1000
+  const type = photo ? 'image/jpeg' : 'image/png'
+  return {
+    box,
+    k,
+    size: exportSize(photo, box),
+    photo,
+    turn,
+    type,
+    file: `${stem}-rendered.${extension(type)}`,
+    svg: still(box, k),
   }
-  const markup = standalone(svg, k, size)
-  g.drawImage(await loaded(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`), 0, 0)
-  return canvas
 }
 
 /**
@@ -206,26 +135,21 @@ export function ExportMenu({
   text?: boolean
 }) {
   const { t } = useTranslation()
-  const [job, setJob] = useState<{ box: ViewBox; k: number }>()
+  const [job, setJob] = useState<ReturnType<typeof renderJob>>()
   const stem = recordFileName(name).replace(/\.json$/, '')
 
   async function render() {
     const v = view.current
     if (!v || (photoId && !photo)) return onMessage(t('The photo is not in this browser.'), true)
-    const box = v.extent
-    const size = exportSize(photo, box)
-    // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device); a larger photo fails
-    // there; upgrade by scaling the export down past that size
-    // sizes as on a 1000 px wide screen, whatever the window and the zoom
-    const k = box.w / 1000
-    flushSync(() => setJob({ box, k }))
+    const frozen = renderJob(still, v.extent, photo, turn, stem)
+    flushSync(() => setJob(frozen))
     try {
-      const canvas = await renderCanvas({ photo, box, size, turn, k, t })
-      const type = photo ? 'image/jpeg' : 'image/png'
-      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, type, 0.92))
+      const { renderCanvas } = await import('../lib/target-render.ts')
+      const canvas = await renderCanvas({ ...frozen, t })
+      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, frozen.type, 0.92))
       if (!blob) throw new Error(t('the browser made no image'))
-      download(blob, `${stem}-rendered.${extension(type)}`)
-      onMessage(t('Exported {w} x {h} px.', { w: size.w, h: size.h }))
+      download(blob, frozen.file)
+      onMessage(t('Exported {w} x {h} px.', { w: frozen.size.w, h: frozen.size.h }))
     } catch (e) {
       onMessage(t('Not exported: {reason}', { reason: errorText(e) }), true)
     } finally {
@@ -292,7 +216,7 @@ export function ExportMenu({
             className="target-offscreen"
             style={{ width: 1000, height: (1000 * job.box.h) / job.box.w }}
           >
-            {still(job.box, job.k)}
+            {job.svg}
           </div>,
           document.body,
         )}

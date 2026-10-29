@@ -237,7 +237,9 @@ describe('defaults', () => {
     expect(stdout).toContain('cartridge 308-win')
     expect(stdout).not.toContain('powder not in the fitted set')
     const unseen = await cli(['verify', ...data, '--leave-one-powder-out'], {}, true)
-    expect(unseen.stdout).toContain('powder not in the fitted set (2)')
+    expect(unseen.stdout).toContain(
+      'powder not in the fitted set: no data (2 powders without a value)',
+    )
     const compared = await cli(
       ['compare', ...data, '--group-by', 'cartridge', '--baseline', 'm3', '--candidate', worse],
       {},

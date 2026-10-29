@@ -118,8 +118,14 @@ export interface PowderFitOptions {
   domainMargin?: number | undefined
 }
 
-/** Default relative margin of a fit's `domain`: an assumption, to be tuned against held-out ladders. */
-export const powderDomainMargin = 0.05
+/** Default relative margin of a fit's `domain`: the range edge, outside which the interval loses coverage once the model has any error. */
+export const powderDomainMargin = 0
+
+/** Relative tolerance above the barrel length and bore diameter of the data, for values rounded in the input. */
+const powderDomainTolerance = 0.025
+
+/** Relative tolerance of the domain check, so that a value converted from a typed unit is inside at an edge it equals. */
+const powderDomainEdgeTolerance = 1e-12
 
 /** An axis on which a prediction can leave the data a powder was fitted to. */
 export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength'
@@ -133,8 +139,8 @@ export interface PowderAxisRange {
 }
 
 /**
- * Where a fit holds: the span of the fitted data on each axis, widened by `margin` (a value at the
- * widened end is inside). `pressure` is absent without measured pressures.
+ * Where a fit holds: the span of the fitted data on each axis, widened by `margin`, the upper end of
+ * bore diameter and barrel length by at least 2.5 % (a value at the widened end is inside). `pressure` is absent without measured pressures.
  */
 export interface PowderDomain {
   /** Relative margin that widened each range. */
@@ -163,8 +169,8 @@ export function outsideDomain(
   for (const [axis, value] of Object.entries(values) as [PowderAxis, number][]) {
     const range = domain[axis]
     if (range === undefined) continue
-    if (value < range.min) outside[axis] = 'below'
-    else if (value > range.max) outside[axis] = 'above'
+    if (value < range.min * (1 - powderDomainEdgeTolerance)) outside[axis] = 'below'
+    else if (value > range.max * (1 + powderDomainEdgeTolerance)) outside[axis] = 'above'
   }
   return outside
 }
@@ -688,24 +694,28 @@ export function fitPowder(
   }
 }
 
-/** The ranges of the ladder's charges, velocities, pressures and barrel lengths and of the load's bore, widened by `margin`. */
+/** The ranges of the ladder's charges, velocities, pressures and barrel lengths and of the load's bore, widened by `margin` (bore and barrel above by at least the tolerance). */
 function fitDomain(
   load: InteriorLoad,
   ladder: readonly LadderPoint[],
   margin: number,
 ): PowderDomain {
-  const widen = (values: readonly number[]): PowderAxisRange => ({
+  const widen = (values: readonly number[], above = margin): PowderAxisRange => ({
     min: Math.min(...values) * (1 - margin),
-    max: Math.max(...values) * (1 + margin),
+    max: Math.max(...values) * (1 + above),
   })
+  const tolerance = Math.max(margin, powderDomainTolerance)
   const pressures = ladder.flatMap((x) => (x.peakPressure === undefined ? [] : [x.peakPressure]))
   return {
     margin,
     charge: widen(ladder.map((x) => x.charge)),
     velocity: widen(ladder.map((x) => x.muzzleVelocity)),
     ...(pressures.length > 0 ? { pressure: widen(pressures) } : {}),
-    boreDiameter: widen([load.chamber.boreDiameter]),
-    barrelLength: widen(ladder.map((x) => x.barrelLength ?? load.barrel.length)),
+    boreDiameter: widen([load.chamber.boreDiameter], tolerance),
+    barrelLength: widen(
+      ladder.map((x) => x.barrelLength ?? load.barrel.length),
+      tolerance,
+    ),
   }
 }
 

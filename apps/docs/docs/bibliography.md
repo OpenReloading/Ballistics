@@ -22,6 +22,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="grubbs-1991"></a>**Grubbs 1991.** F. E. Grubbs: *Statistical Measures of Accuracy for Riflemen and Missile Engineers*. 2nd edition, March 1991, 3rd printing, December 1991 (1st printing 1964).
 - <a id="hairer-1993"></a>**Hairer 1993.** E. Hairer, S. P. Nørsett, G. Wanner: *Solving Ordinary Differential Equations I: Nonstiff Problems*. 2nd revised edition, Springer Series in Computational Mathematics 8, Springer, Berlin, Heidelberg, 1993. ISBN 978-3-540-56670-0 (3-540-56670-8).
 - <a id="hartley-2004"></a>**Hartley 2004.** R. Hartley, A. Zisserman: *Multiple View Geometry in Computer Vision*, 2nd edition. Cambridge University Press, Cambridge, 2004. ISBN 978-0-521-54051-3. doi:10.1017/CBO9780511811685. <https://doi.org/10.1017/CBO9780511811685>
+- <a id="hirschfelder-1954"></a>**Hirschfelder 1954.** J. O. Hirschfelder, C. F. Curtiss, R. B. Bird: *Molecular Theory of Gases and Liquids*. John Wiley & Sons, New York, 1954.
 - <a id="hunt-1951"></a>**Hunt 1951.** F. R. W. Hunt (ed.): *Internal Ballistics*. His Majesty's Stationery Office, London, 1951.
 - <a id="kneubuehl-2018"></a>**Kneubuehl 2018.** B. P. Kneubuehl: *Ballistik: Theorie und Praxis*. 1st edition, Springer, Berlin, 2018. ISBN 978-3-662-58299-2.
 - <a id="litz-2015"></a>**Litz 2015.** B. Litz: *Applied Ballistics for Long Range Shooting*, 3rd edition. Applied Ballistics, LLC, 2015. ISBN 9780990920618. Chapter and page numbers unverified.
@@ -46,6 +47,9 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="mccoy-1981"></a>**McCoy 1981.** R. L. McCoy: *"MC DRAG" - A Computer Program for Estimating the Drag Coefficients of Projectiles*. Technical Report ARBRL-TR-02293, US Army Armament Research and Development Command, Ballistic Research Laboratory, Aberdeen Proving Ground, February 1981. Approved for public release.
 - <a id="mccoy-1990"></a>**McCoy 1990.** R. L. McCoy: *Aerodynamic Characteristics of Caliber .22 Long Rifle Match Ammunition*. Memorandum Report BRL-MR-3877, US Army Ballistic Research Laboratory, Aberdeen Proving Ground, November 1990. DTIC ADA229713. <https://ntrl.ntis.gov/NTRL/dashboard/searchResults/titleDetail/ADA229713.xhtml>
 - <a id="nima-2000"></a>**NIMA 2000.** National Imagery and Mapping Agency: *Department of Defense World Geodetic System 1984: Its Definition and Relationships with Local Geodetic Systems*. Technical Report TR8350.2, 3rd edition, 4 July 1997, Amendment 1, 3 January 2000.
+- <a id="rp-1311"></a>**RP-1311.** S. Gordon, B. J. McBride: *Computer Program for Calculation of Complex Chemical Equilibrium Compositions and Applications, Part I: Analysis*. NASA Reference Publication 1311, 1994. <https://ntrs.nasa.gov/citations/19950013764>
+- <a id="svehla-1962"></a>**Svehla 1962.** R. A. Svehla: *Estimated Viscosities and Thermal Conductivities of Gases at High Temperatures*. NASA Technical Report R-132, 1962. Table I (Lennard-Jones force constants). <https://ntrs.nasa.gov/citations/19630012982>
+- <a id="tp-2002-211556"></a>**TP-2002-211556.** B. J. McBride, M. J. Zehe, S. Gordon: *NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species*. NASA TP-2002-211556, 2002. <https://ntrs.nasa.gov/citations/20020085330>
 
 ## Papers
 
@@ -73,6 +77,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="lentz-1976"></a>**Lentz 1976.** W. J. Lentz: *Generating Bessel functions in Mie scattering calculations using continued fractions*. Applied Optics 15(3), 668, 1976. doi:10.1364/AO.15.000668. <https://doi.org/10.1364/AO.15.000668>
 - <a id="levenberg-1944"></a>**Levenberg 1944.** K. Levenberg: *A method for the solution of certain non-linear problems in least squares*. Quarterly of Applied Mathematics 2(2), 1944, 164-168. doi:10.1090/qam/10666.
 - <a id="lindeberg-1998"></a>**Lindeberg 1998.** T. Lindeberg: *Feature detection with automatic scale selection*. International Journal of Computer Vision 30(2), 79-116, 1998. doi:10.1023/A:1008045108935. <https://doi.org/10.1023/A:1008045108935>
+- <a id="maksimuk-2004"></a>**Maksimuk 2004.** Yu. V. Maksimuk, K. Růžička, V. Diky: "Enthalpy of Formation of Dibutyl Phthalate". *International Journal of Thermophysics* 25(2), 2004, 379-385. doi:10.1023/B:IJOT.0000028475.70749.d6. <https://doi.org/10.1023/B:IJOT.0000028475.70749.d6>
 - <a id="marquardt-1963"></a>**Marquardt 1963.** D. W. Marquardt: *An algorithm for least-squares estimation of nonlinear parameters*. Journal of the Society for Industrial and Applied Mathematics 11(2), 1963, 431-441. doi:10.1137/0111030.
 - <a id="marquardt-1970"></a>**Marquardt 1970.** D. W. Marquardt: *Generalized inverses, ridge regression, biased linear estimation, and nonlinear estimation*. Technometrics 12(3), 1970, 591-612.
 - <a id="miller-2005"></a>**Miller 2005.** D. G. Miller: "A New Rule for Estimating Rifling Twist: An Aid to Choosing Bullets and Rifles". *Precision Shooting*, March 2005. Pages unverified.
@@ -114,6 +119,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="dsb-home"></a>**DSB.** Deutscher Schützenbund e.V.: *Homepage*. <https://www.dsb.de/>
 - <a id="dsu-home"></a>**DSU.** Deutsche Schießsport Union e.V.: *Homepage*. <https://www.d-s-u.de/>
 - <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: *Homepage*. <https://www.issf-sports.org/>
+- <a id="nist-webbook"></a>**NIST WebBook.** P. J. Linstrom, W. G. Mallard (eds.): *NIST Chemistry WebBook*, NIST Standard Reference Database 69. NIST, Gaithersburg, MD. Condensed-phase thermochemistry of CAS 64-17-5, 84-74-2, 85-98-3, 121-14-2 and 611-92-7. doi:10.18434/T4D303. <https://webbook.nist.gov/chemistry/>
 - <a id="nist-sematech"></a>**NIST/SEMATECH.** National Institute of Standards and Technology, SEMATECH: *NIST/SEMATECH e-Handbook of Statistical Methods*. NIST, Gaithersburg, MD. <https://www.itl.nist.gov/div898/handbook/>
 - <a id="vdrbw-home"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr e.V.: *Homepage*. <https://www.reservistenverband.de/>
 - <a id="wmo-2025"></a>**WMO 2025.** World Meteorological Organization: *Records of Weather and Climate Extremes*, as of 31 July 2025. Table of the WMO World Weather and Climate Extremes Archive. <https://wmo.int/sites/default/files/2025-07/Table_Records_25Jul2025.pdf>

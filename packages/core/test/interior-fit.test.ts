@@ -574,8 +574,9 @@ describe('powder fit prediction bands', () => {
     const below = predictPowder(fit, 2.4e-3)
     const above = predictPowder(fit, 3.2e-3)
     expect(centre.extrapolation).toBeUndefined()
-    expect(predictPowder(fit, 2.6e-3).extrapolation).toBeUndefined()
-    expect(predictPowder(fit, 3e-3).extrapolation).toBeUndefined()
+    // at the ladder ends the predicted velocity and pressure can leave the noisy measured ones
+    expect(predictPowder(fit, 2.6e-3).extrapolation?.charge).toBeUndefined()
+    expect(predictPowder(fit, 3e-3).extrapolation?.charge).toBeUndefined()
     expect(below.extrapolation).toMatchObject({ charge: 'below' })
     expect(above.extrapolation).toMatchObject({ charge: 'above' })
     for (const outside of [below, above]) {
@@ -613,16 +614,27 @@ describe('powder fit prediction bands', () => {
     const above = (x: number) => x * (1 + 1e-9)
     const below = (x: number) => x * (1 - 1e-9)
 
-    it('holds the span of the data widened by the default margin', () => {
-      expect(domain.margin).toBe(powderDomainMargin)
-      expect(domain.charge.min).toBeCloseTo(2.6e-3 * (1 - powderDomainMargin), 12)
-      expect(domain.charge.max).toBeCloseTo(3e-3 * (1 + powderDomainMargin), 12)
+    it('holds the span of the data, bore diameter and barrel length 2.5 % above', () => {
+      expect(powderDomainMargin).toBe(0)
+      expect(domain.margin).toBe(0)
+      expect(domain.charge).toEqual({ min: 2.6e-3, max: 3e-3 })
       const v = fit.residuals.filter((x) => x.kind === 'velocity').map((x) => x.observed)
-      expect(domain.velocity.max).toBeCloseTo(Math.max(...v) * (1 + powderDomainMargin), 9)
+      expect(domain.velocity).toEqual({ min: Math.min(...v), max: Math.max(...v) })
       const p = fit.residuals.filter((x) => x.kind === 'pressure').map((x) => x.observed)
-      expect(domain.pressure?.min).toBeCloseTo(Math.min(...p) * (1 - powderDomainMargin), 3)
-      expect(domain.boreDiameter.min).toBeCloseTo(6.9e-3 * (1 - powderDomainMargin), 12)
-      expect(domain.barrelLength.max).toBeCloseTo(0.6 * (1 + powderDomainMargin), 12)
+      expect(domain.pressure).toEqual({ min: Math.min(...p), max: Math.max(...p) })
+      expect(domain.boreDiameter).toEqual({ min: 6.9e-3, max: 6.9e-3 * 1.025 })
+      expect(domain.barrelLength).toEqual({ min: 0.6, max: 0.6 * 1.025 })
+    })
+
+    it('flags bore diameter and barrel length past 2.5 % above and any value below', () => {
+      const at = (options: { boreDiameter?: number; barrelLength?: number }) =>
+        predictPowder(fit, 2.8e-3, options).extrapolation
+      expect(at({ boreDiameter: 6.9e-3 * 1.025 })).toBeUndefined()
+      expect(at({ boreDiameter: 6.9e-3 * 1.026 })).toEqual({ boreDiameter: 'above' })
+      expect(at({ boreDiameter: 6.9e-3 * 0.999 })).toEqual({ boreDiameter: 'below' })
+      expect(at({ barrelLength: 0.6 * 1.025 })).toBeUndefined()
+      expect(at({ barrelLength: 0.6 * 1.026 })).toEqual({ barrelLength: 'above' })
+      expect(at({ barrelLength: 0.6 * 0.999 })).toEqual({ barrelLength: 'below' })
     })
 
     it('takes the margin from the options and has no pressure range without pressures', () => {
@@ -640,6 +652,11 @@ describe('powder fit prediction bands', () => {
       const charge = (c: number) => predictPowder(fit, c).extrapolation?.charge
       expect(charge(domain.charge.max)).toBeUndefined()
       expect(charge(domain.charge.min)).toBeUndefined()
+      expect(charge(below(domain.charge.max))).toBeUndefined()
+      expect(charge(above(domain.charge.min))).toBeUndefined()
+      // a charge converted from grains or grams can miss the ladder value in the last bit
+      expect(charge(domain.charge.max * (1 + 1e-15))).toBeUndefined()
+      expect(charge(domain.charge.min * (1 - 1e-15))).toBeUndefined()
       expect(charge(above(domain.charge.max))).toBe('above')
       expect(charge(below(domain.charge.min))).toBe('below')
     })
@@ -649,6 +666,7 @@ describe('powder fit prediction bands', () => {
       const side = (d: number) => bore(d).extrapolation?.boreDiameter
       expect(side(domain.boreDiameter.max)).toBeUndefined()
       expect(side(domain.boreDiameter.min)).toBeUndefined()
+      expect(side(below(domain.boreDiameter.max))).toBeUndefined()
       expect(side(above(domain.boreDiameter.max))).toBe('above')
       expect(side(below(domain.boreDiameter.min))).toBe('below')
       // the run uses the bore
@@ -661,6 +679,7 @@ describe('powder fit prediction bands', () => {
         predictPowder(fit, 2.8e-3, { barrelLength }).extrapolation?.barrelLength
       expect(side(domain.barrelLength.max)).toBeUndefined()
       expect(side(domain.barrelLength.min)).toBeUndefined()
+      expect(side(below(domain.barrelLength.max))).toBeUndefined()
       expect(side(above(domain.barrelLength.max))).toBe('above')
       expect(side(below(domain.barrelLength.min))).toBe('below')
     })
@@ -672,6 +691,8 @@ describe('powder fit prediction bands', () => {
       }))
       const mixed = fitPowder(load(0.4), points, { domainMargin: 0.25 })
       expect(mixed.domain.barrelLength).toEqual({ min: 0.5 * 0.75, max: 0.6 * 1.25 })
+      const exact = fitPowder(load(0.4), points)
+      expect(exact.domain.barrelLength).toEqual({ min: 0.5, max: 0.6 * 1.025 })
     })
 
     it('checks the predicted velocity and pressure against their ranges', () => {
@@ -681,6 +702,7 @@ describe('powder fit prediction bands', () => {
       for (const axis of ['velocity', 'pressure'] as const) {
         const value = at[axis].value
         expect(limited(axis, { min: value, max: value })).toBeUndefined()
+        expect(limited(axis, { min: below(value), max: above(value) })).toBeUndefined()
         expect(limited(axis, { min: above(value), max: 2 * value })).toEqual({ [axis]: 'below' })
         expect(limited(axis, { min: 0, max: below(value) })).toEqual({ [axis]: 'above' })
       }

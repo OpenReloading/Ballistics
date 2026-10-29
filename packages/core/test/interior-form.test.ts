@@ -128,6 +128,66 @@ describe('lens area', () => {
     expect(lensArea(1, 1, 2)).toBe(0)
     expect(lensArea(3, 1, 1.5)).toBeCloseTo(Math.PI, 14)
     expect(lensArea(1, 1, 1)).toBeCloseTo((2 * Math.PI) / 3 - Math.sqrt(3) / 2, 14)
+    expect(lensArea(4, 2, 1)).toBeCloseTo(4 * Math.PI, 14)
+  })
+})
+
+describe('burn law checks', () => {
+  const tube = { shape: 'tube', diameter: 1e-3, perforationDiameter: 2e-4, length: 2e-3 } as const
+  const seven = {
+    shape: 'sevenPerf',
+    diameter: 1.25e-3,
+    perforationDiameter: 1.5e-4,
+    length: 2e-3,
+  } as const
+
+  it('names the first invalid field of a geometric law', () => {
+    const sphere = {
+      kind: 'geometric',
+      coefficient: 1e-9,
+      exponent: 1,
+      grain: { shape: 'sphere', diameter: 5e-4 },
+    } as const
+    expect(burnError({ ...sphere, exponent: 0 })).toBeUndefined()
+    for (const exponent of [-0.1, Number.NaN, Number.POSITIVE_INFINITY])
+      expect(burnError({ ...sphere, exponent })).toBe('propellant.burn.exponent')
+    for (const coefficient of [0, Number.POSITIVE_INFINITY])
+      expect(burnError({ ...sphere, coefficient })).toBe('propellant.burn.coefficient')
+    for (const diameter of [0, Number.POSITIVE_INFINITY])
+      expect(burnError(geometric({ shape: 'sphere', diameter }))).toBe(
+        'propellant.burn.grain.diameter',
+      )
+  })
+
+  it('checks the perforation and the length of tube and seven-perforated grains', () => {
+    // a length of one web is the shortest tube
+    expect(burnError(geometric({ ...tube, length: 4e-4 }))).toBeUndefined()
+    expect(burnError(geometric({ ...tube, length: 3.9e-4 }))).toBe('propellant.burn.grain.length')
+    expect(burnError(geometric({ ...tube, perforationDiameter: 1e-3 }))).toBe(
+      'propellant.burn.grain.perforationDiameter',
+    )
+    expect(burnError(geometric({ ...seven, perforationDiameter: 1.25e-3 / 3 }))).toBe(
+      'propellant.burn.grain.perforationDiameter',
+    )
+    const form = burnForm(geometric(seven))
+    expect(burnError(geometric({ ...seven, length: 2 * form.halfWeb * form.end }))).toBe(
+      'propellant.burn.grain.length',
+    )
+  })
+
+  it('names the first invalid field of a vivacity law', () => {
+    const law = {
+      kind: 'vivacity',
+      vivacity: 1,
+      exponent: 1,
+      referencePressure: 1e5,
+      form: { kind: 'twoStage', a: 1.2, m: 0.4, q: 0, z1: 0.6 },
+    } as const
+    expect(burnError(law)).toBeUndefined()
+    expect(burnError({ ...law, vivacity: 0 })).toBe('propellant.burn.vivacity')
+    expect(burnError({ ...law, referencePressure: 0 })).toBe('propellant.burn.referencePressure')
+    for (const bad of [{ z1: 0 }, { z1: 1.1 }, { q: -0.1 }, { a: -1 / 0.6 }, { m: Number.NaN }])
+      expect(burnError({ ...law, form: { ...law.form, ...bad } })).toBe('propellant.burn.form')
   })
 })
 

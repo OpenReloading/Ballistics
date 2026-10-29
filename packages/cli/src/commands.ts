@@ -14,7 +14,6 @@ import {
 import { readRows } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
 import { byText } from './stats.ts'
-import { unseenPowder } from './unseen.ts'
 import { inputsOf, modelVersion } from './version.ts'
 
 /** What `verify` and `compare` read: the rows, the records, the split and the sealed-split switch. */
@@ -56,7 +55,7 @@ function prepare(options: Options) {
 
 type Prepared = ReturnType<typeof prepare>
 
-/** The outcomes of the rows of `split` of each powder with interior parameters, predicted as a powder not in the fitted set, and the number of those powders. */
+/** The outcomes of the rows of `split` of each powder with interior parameters, predicted as a powder not in the fitted set (without its parameters, so without a value), and the number of those powders. */
 function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split) {
   const fitted = [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
     const powder = records.powders.get(id)
@@ -67,7 +66,7 @@ function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split
   )
   const items = inSplit.flatMap((powder) => {
     const { interior: _, ...plain } = powder
-    const powders = new Map(records.powders).set(powder.id, unseenPowder(powder, fitted) ?? plain)
+    const powders = new Map(records.powders).set(powder.id, plain)
     const own = rows.filter((r) => r.powder === powder.id)
     return outcomes(own, { ...records, powders }, model, [split])
   })

@@ -68,6 +68,7 @@ M3 holds the projectile until the mean pressure reaches $p_\text{st}$ (see [shot
 - Discrete and finite element models of the wad and the individual pellets show wad deformation and pellet interaction during the barrel travel. A model with one gas state does not represent them.
 - The muzzle energy and efficiency of the result include the wad.
 - Everything the [M3 interior model](interior-m3.md) does not contain.
+- Research log: [loads with one assumed powder](../research/shotshell-one-powder-check.md).
 
 ## Sources
 

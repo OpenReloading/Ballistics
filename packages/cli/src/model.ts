@@ -69,7 +69,7 @@ export async function loadModel(spec: string): Promise<Model> {
   const coreModel = [
     ...files,
     ...closure(join(core, 'interior/model.js'), core, 'core'),
-    // the estimator of a powder not in the fitted set, in every run so the version does not depend on the options
+    // the estimator of a powder not in the fitted set, unused by the runs, kept so the published versions stay valid
     ...closure(join(cli, `unseen${extname(here)}`), cli, 'cli'),
   ]
   if (spec === builtInName) return { name: spec, interior, files: coreModel }

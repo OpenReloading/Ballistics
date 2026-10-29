@@ -37,7 +37,12 @@ export function verifyTable(r: VerifyResult): string {
     ...Object.entries(r.byPowder).map(([k, m]) => rowsOf(`powder ${k}`, m)),
     ...Object.entries(r.grouped?.groups ?? {}).map(([k, m]) => rowsOf(`${r.grouped?.by} ${k}`, m)),
     ...(r.notInFittedSet
-      ? [rowsOf(`powder not in the fitted set (${r.notInFittedSet.powders})`, r.notInFittedSet)]
+      ? [
+          rowsOf(
+            `powder not in the fitted set: no data (${r.notInFittedSet.powders} powders without a value)`,
+            r.notInFittedSet,
+          ),
+        ]
       : []),
   ]
   const reasons = Object.entries(r.overall.rows.notUsed).map(([k, n]) => `${k} ${n}`)
