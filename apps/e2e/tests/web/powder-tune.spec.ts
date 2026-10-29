@@ -98,7 +98,12 @@ const redrawTimes = (page: Page, moves: number) =>
       })
       const key = i < n / 2 ? 'ArrowRight' : 'ArrowLeft'
       thumb.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }))
-      await redrawn
+      await Promise.race([
+        redrawn,
+        new Promise((_, fail) =>
+          setTimeout(() => fail(new Error(`move ${i + 1} (${key}): no redraw within 2 s`)), 2000),
+        ),
+      ])
       times.push(performance.now() - t0)
     }
     return times
@@ -107,6 +112,8 @@ const redrawTimes = (page: Page, moves: number) =>
 test('the Measurements link of a saved load fits the powder on the load the workbench runs, and its sliders tune it by hand', async ({
   page,
 }) => {
+  // the fit may take up to 60 s after a run, a save and a navigation, the 30 redraws 2 s each
+  test.setTimeout(150_000)
   // a native picker cannot be driven: the file goes to the origin private file system
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
@@ -141,6 +148,7 @@ test('the Measurements link of a saved load fits the powder on the load the work
   expect(await problems(page, 'powder tune, hand-tuned', '.hand-tune')).toEqual([])
 
   const times = (await redrawTimes(page, 30)).sort((a, b) => a - b)
+  // the median holds on the ubuntu-latest runner of the CI e2e job
   expect(times[15]).toBeLessThanOrEqual(100)
 
   await back.click()

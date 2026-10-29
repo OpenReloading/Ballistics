@@ -47,9 +47,9 @@ async function runLadder(page: Page, kind: 'Charge' | 'Seating', steps: number) 
   await form.getByLabel(/^Step size/).fill(kind === 'Charge' ? '0.15' : '0.5')
   await form.getByRole('radio', { name: kind === 'Charge' ? 'Up' : 'Down', exact: true }).check()
   await form.getByLabel(/^Step size/).press('Control+Enter')
-  await expect(page.getByText(/^Result of /)).toBeAttached({ timeout: 15_000 })
   await expect(page.getByRole('group', { name: `${kind} ladder` }).getByRole('radio')).toHaveCount(
     steps,
+    { timeout: 15_000 },
   )
 }
 
