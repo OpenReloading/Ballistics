@@ -892,10 +892,13 @@ function withBand(o: Outcome | undefined, id: number, first: number, sampled: Sa
   }
 }
 
-/** The error outcome of a run whose every step the model reports as invalid, with its status text. */
-function failedRun(steps: Step[], res: Response, json: Answer['json']) {
-  // a ladder shows the first step's error
-  const error = steps[0]?.error
+/**
+ * The error outcome of a run without a result, with its status text: a refusal when the model
+ * reports every step as invalid, else the failed request's status.
+ */
+export function failedRun(steps: Step[], res: Response, json: Answer['json']) {
+  // a ladder shows the first step's error; a step of a failed request (500) is no refusal
+  const error = res.ok || res.status === 422 ? steps[0]?.error : undefined
   const status = error ? 422 : res.status
   return {
     outcome: {

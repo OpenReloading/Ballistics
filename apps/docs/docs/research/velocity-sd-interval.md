@@ -72,7 +72,7 @@ improved. Adopted with a caveat, as described in [Groups](../models/groups.md#ve
 
 - The chi-square interval with a caveat, not alone and not replaced by a bootstrap: it is exact for normal strings and uses the existing quantile, and its failure mode is an interval that is too narrow. Caveat: the interval assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow, and the real level is lower than the stated one (simulated: 76 to 90 percent for a stated 95 percent at 10 to 30 shots on such strings).
 - 95 percent by default (the default level of the group intervals), the level stated next to the interval.
-- Too few shots to compare below 10 shots: at 10 shots the intervals of two strings separate only when their standard deviations differ by a factor of 2.7 (1.83 / 0.69). No interval below 3 shots.
+- Too few shots to rank below 10 shots: two strings whose intervals do not overlap are ranked only when each has 10 shots or more. Overlapping intervals read as a difference smaller than the uncertainty at any count. At 10 shots the intervals of two strings separate only when their standard deviations differ by a factor of 2.7 (1.83 / 0.69). No interval below 3 shots.
 - No interval for the extreme spread, which was not examined.
 - A kurtosis-adjusted interval (Bonett 2006, Computational Statistics & Data Analysis 50, unverified) is the candidate if a later change needs coverage closer to the stated level on non-normal strings; not implemented.
 

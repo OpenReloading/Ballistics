@@ -197,29 +197,32 @@ function storedParameter(name: RangeStringParameterName, si: number) {
   return storedOf(name === 'muzzleVelocity' ? 'velocity' : 'angle', si)
 }
 
-/** The stored truing schema's limits: rows of one result, results of one configuration. */
-export const truingLimits = { rows: 50, results: 100 }
+/** The stored truing schema's limits: rows of one result, shots of one row, results of one configuration. */
+export const truingLimits = { rows: 50, shots: 10000, results: 100 }
 
 /**
  * Why a fit was not stored: the firearm or its configuration is gone, the configuration holds
- * `truingLimits.results` results, or the strings have more than `truingLimits.rows` rows.
+ * `truingLimits.results` results, the strings have more than `truingLimits.rows` rows, or a row or
+ * the chronograph more than `truingLimits.shots` shots.
  */
-export type StoreRefusal = 'missing' | 'full' | 'rows'
+export type StoreRefusal = 'missing' | 'full' | 'rows' | 'shots'
 
 /**
  * The truing result as a firearm configuration stores it: the strings as entered, the nominal
  * shot and the fitted parameters, in stored units. Only an identified parameter keeps its value
  * and interval. `input` is the one the fit was made from. 'rows' when there are more rows than
- * a result keeps.
+ * a result keeps, 'shots' when a row or the chronograph has more shots than one keeps.
  */
 export function truingEntry(
   nominal: { shot: TrajectoryInput; bullet: string; zeroRange: number },
   input: TruingInputs,
   fit: RangeStringFit,
   date: Date,
-): Truing | 'rows' {
+): Truing | 'rows' | 'shots' {
   const { clickValue, entries, chronograph } = measured(input, untranslated())
   if (entries.length > truingLimits.rows) return 'rows'
+  const counts = [...entries.map((e) => e.shotCount), chronograph?.shotCount ?? 0]
+  if (counts.some((n) => n > truingLimits.shots)) return 'shots'
   const { shot } = nominal
   const length = (x: number) => storedOf('length', x)
   return truing.parse({
@@ -286,7 +289,7 @@ export function withTruing(
   config: string,
   entry: Truing,
   now: Date,
-): UserRecord | Exclude<StoreRefusal, 'rows'> {
+): UserRecord | Exclude<StoreRefusal, 'rows' | 'shots'> {
   const found = userRecord.safeParse(stored)
   if (!found.success || found.data.kind !== 'firearm') return 'missing'
   const f = found.data.data

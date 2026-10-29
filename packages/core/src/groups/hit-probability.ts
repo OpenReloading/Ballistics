@@ -188,7 +188,7 @@ export function shotsToHit(p: number, wanted: number): ShotsToHit {
   if (p === 0) return { shots: Number.POSITIVE_INFINITY, mean: Number.POSITIVE_INFINITY }
   if (p === 1) return { shots: 1, mean: 1 }
   // the tolerance keeps an exact whole result (p = 0.5, wanted = 0.75) from rounding up by rounding error
-  const shots = Math.max(1, Math.ceil(Math.log(1 - wanted) / Math.log(1 - p) - 1e-9))
+  const shots = Math.max(1, Math.ceil(Math.log1p(-wanted) / Math.log1p(-p) - 1e-9))
   return { shots, mean: 1 / p }
 }
 

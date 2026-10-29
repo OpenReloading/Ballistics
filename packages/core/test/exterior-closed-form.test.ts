@@ -49,7 +49,9 @@ describe('flat-fire drop with a constant drag coefficient', () => {
         zero: { elevationAngle: th, windageAngle: 0 },
       }
       const ranges = [100, 200, 400, 600, 800, 1000]
-      for (const q of trajectory(shot, ranges, off).points) {
+      const points = trajectory(shot, ranges, off).points
+      expect(points).toHaveLength(ranges.length)
+      for (const q of points) {
         const x = q.range
         const y =
           x * Math.tan(th) -
@@ -70,8 +72,8 @@ describe('range wind with a constant drag coefficient', () => {
   const v0 = 850
   const cd = 0.3
   const k = (airDensity(air) * Math.PI * diameter ** 2 * cd) / (8 * mass)
-  const run = (tailwind: number, ranges: number[]) =>
-    trajectory(
+  const run = (tailwind: number, ranges: number[]) => {
+    const { points } = trajectory(
       {
         projectile: { mass, diameter, drag: flat(cd) },
         muzzleVelocity: v0,
@@ -82,7 +84,10 @@ describe('range wind with a constant drag coefficient', () => {
       },
       ranges,
       { ...off, gravity: 0 },
-    ).points
+    )
+    expect(points).toHaveLength(ranges.length)
+    return points
+  }
   /** Time at which x = W t + ln(1 + k u0 t) / k reaches `range`, by Newton's method. */
   const timeAt = (w: number, range: number) => {
     const u0 = v0 - w

@@ -593,8 +593,9 @@ export function predictPooled(
 /**
  * The fit with its `modelError` estimated from strings it was not fitted to
  * (`apps/docs/docs/models/interior-powder-fit.md`, "Pooled fit over rifles, powders and lots"):
- * the mean squared relative residual beyond the parameter and string variance, at least 0. Each
- * point needs its `velocitySigma`.
+ * the mean squared relative residual beyond the variance of the prediction without model error
+ * (parameters, string, and an unseen rifle or lot), at least 0. Each point needs its
+ * `velocitySigma`.
  */
 export function calibratePooled(
   fit: PooledPowderFit,

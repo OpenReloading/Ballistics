@@ -90,11 +90,13 @@ function StoreFit({
 }: {
   fit: RangeStringFit
   target: TruingNominal['target']
-  entry: () => Truing | 'rows'
+  entry: () => Truing | 'rows' | 'shots'
 }) {
   const { t } = useTranslation()
   /** The fit that was stored, or that failed to store. */
   const [stored, setStored] = useState<{ fit: RangeStringFit; outcome: StoreOutcome }>()
+  // a second click before the write ends would append the same result twice
+  const [pending, setPending] = useState(false)
   if (!target)
     return (
       <p className="note">
@@ -102,10 +104,15 @@ function StoreFit({
       </p>
     )
   const store = () => {
-    const end = (outcome: StoreOutcome) => setStored({ fit, outcome })
+    if (pending) return
+    const end = (outcome: StoreOutcome) => {
+      setPending(false)
+      setStored({ fit, outcome })
+    }
+    setPending(true)
     try {
       const e = entry()
-      if (e === 'rows') return end('rows')
+      if (typeof e === 'string') return end(e)
       let refused: StoreRefusal = 'missing'
       updateRecord(target.record, (raw) => {
         const written = withTruing(raw, target.config, e, new Date())
@@ -142,11 +149,16 @@ function StoreFit({
         return t('Not stored: a stored result keeps at most {n} rows. Remove rows and fit again.', {
           n: truingLimits.rows,
         })
+      case 'shots':
+        return t(
+          'Not stored: a stored result keeps at most {n} shots in a row or the chronograph. Enter fewer shots and fit again.',
+          { n: truingLimits.shots },
+        )
     }
   }
   return (
     <>
-      <Button variant="default" disabled={done === 'stored'} onClick={store}>
+      <Button variant="default" disabled={pending || done === 'stored'} onClick={store}>
         {t('Store with {configuration}', { configuration: target.label })}
       </Button>
       <p role="status" className="note">

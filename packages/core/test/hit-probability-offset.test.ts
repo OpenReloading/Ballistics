@@ -141,6 +141,11 @@ describe('shots to a hit', () => {
     expect(1 - (1 - p) ** (1 / p)).toBeCloseTo(1 - Math.exp(-1), 4)
   })
 
+  it('keeps a very small p from collapsing to one shot', () => {
+    // 1 - 1e-20 rounds to 1, so ln(1 - p) would be 0
+    expect(shotsToHit(1e-20, 0.9).shots / (Math.log(10) * 1e20)).toBeCloseTo(1, 9)
+  })
+
   it('handles an impossible and a certain hit', () => {
     expect(shotsToHit(0, 0.9)).toEqual({ shots: Infinity, mean: Infinity })
     expect(shotsToHit(1, 0.99)).toEqual({ shots: 1, mean: 1 })

@@ -92,8 +92,7 @@ Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`interval`
 
 $k$ comes from a synthetic study of `fitPressureCurves` at its default limits ([research log](../research/interior-curve-fit-exponent-interval.md)): 2, 3 and 5 breech traces at charges from 2.4 to 3.0 g, exponents 0.3, 0.5 and 0.8, noise 0.1, 0.5 and 2 % of the peak, the exponent starting 20 % high, 40 replicates per cell. $k$ is the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the fitted runs of half the replicates, 2.20 on 535 runs. On the other half it covered 91 % of the runs, 75 to 100 % per cell (18 of 27 cells at 90 % or more), against 85 % with 1.645. Two traces needed less (90th percentile 1.5), five more (2.3).
 
-The interval holds the trace noise only, like the uncertainty it is built on. With heat loss and bore friction in the synthetic truth, which the fitted model lacks, the exponent came out 2 % low (median 0.98 of the truth, 0.96 to 1.01) with a relative uncertainty of about 0.6 %, and the interval covered 18 to 23 % of the runs while $\chi^2/
-u$ stayed at 1.09 to 1.14.
+The interval holds the trace noise only, like the uncertainty it is built on. With heat loss and bore friction in the synthetic truth, which the fitted model lacks, the exponent came out 2 % low (median 0.98 of the truth, 0.96 to 1.01) with a relative uncertainty of about 0.6 %, and the interval covered 18 to 23 % of the runs while $\chi^2/\nu$ stayed at 1.09 to 1.14.
 
 ### Leave-one-trace-out check
 

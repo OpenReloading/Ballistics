@@ -3703,6 +3703,7 @@
   "Not stored: the firearm or its configuration is no longer in the library. Choose a firearm and sight above.": "Nicht gespeichert: Die Schusswaffe oder ihre Konfiguration ist nicht mehr in der Bibliothek. Oben eine Schusswaffe und ein Visier wählen.",
   "Not stored: {configuration} already holds {n} truing results. Remove an older result of it in the library.": "Nicht gespeichert: {configuration} hat bereits {n} Truing-Ergebnisse. In der Bibliothek ein älteres davon entfernen.",
   "Not stored: a stored result keeps at most {n} rows. Remove rows and fit again.": "Nicht gespeichert: Ein gespeichertes Ergebnis hat höchstens {n} Zeilen. Zeilen entfernen und erneut anpassen.",
+  "Not stored: a stored result keeps at most {n} shots in a row or the chronograph. Enter fewer shots and fit again.": "Nicht gespeichert: Ein gespeichertes Ergebnis hat höchstens {n} Schüsse in einer Zeile oder beim Chronographen. Weniger Schüsse eingeben und erneut anpassen.",
   "Not stored: the browser store refused it. {reason} Free browser storage and try again.": "Nicht gespeichert: Der Browserspeicher hat es abgelehnt. {reason} Browserspeicher freigeben und erneut versuchen.",
   "Truing results of {name}": "Truing-Ergebnisse von {name}",
   "Stored on": "Gespeichert am",

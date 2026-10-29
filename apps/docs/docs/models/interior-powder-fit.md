@@ -323,10 +323,10 @@ $$
 
 Code: `packages/core/src/interior/fit-pooled.ts`, `predictPooled` (`gradient`, `variance`).
 
-A rifle the fit has not seen adds the spread of its random effect, $\tau_R \hat v$, and a lot it has not seen for the powder adds $\tau_L g_B$, with $g_B$ the gradient in the powder's burn coefficient. $\sigma_s$ is the `velocitySigma` of the string (default 0, the true mean). `calibratePooled` estimates the relative model error $\varepsilon$ from strings the fit was not fitted to: the mean of the squared relative residual beyond the parameter and string variance, at least 0,
+A rifle the fit has not seen adds the spread of its random effect, $\tau_R \hat v$, and a lot it has not seen for the powder adds $\tau_L g_B$, with $g_B$ the gradient in the powder's burn coefficient. $\sigma_s$ is the `velocitySigma` of the string (default 0, the true mean). `calibratePooled` estimates the relative model error $\varepsilon$ from strings the fit was not fitted to: the mean of the squared relative residual beyond the variance of the prediction without model error, at least 0. In the bracket, the first term applies to a string of a rifle the fit has not seen, the second to a lot it has not seen:
 
 $$
-\varepsilon^2 = \max\Bigl(0,\ \frac{1}{n} \sum_{i=1}^{n} \frac{(y_i - \hat v_i)^2 - g_i^\top C_\theta\, g_i - \sigma_i^2}{\hat v_i^2}\Bigr)
+\varepsilon^2 = \max\Bigl(0,\ \frac{1}{n} \sum_{i=1}^{n} \frac{(y_i - \hat v_i)^2 - g_i^\top C_\theta\, g_i - \sigma_i^2 \;\bigl[-\ (\tau_R\, \hat v_i)^2 - (\tau_L\, g_{B,i})^2\bigr]}{\hat v_i^2}\Bigr)
 $$
 
 Code: `packages/core/src/interior/fit-pooled.ts`, `calibratePooled` (`excess`).

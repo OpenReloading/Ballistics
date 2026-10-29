@@ -260,7 +260,7 @@ describe('a fit stored with a firearm configuration', () => {
       new Date('2026-10-29T12:00:00Z'),
     )
   const entry = entryOf(input)
-  if (entry === 'rows') throw new Error('too many rows')
+  if (typeof entry === 'string') throw new Error(`refused: ${entry}`)
   const record = {
     kind: 'firearm',
     id: 'f1',
@@ -331,5 +331,14 @@ describe('a fit stored with a firearm configuration', () => {
     const rows = (n: number) => entryOf({ ...input, rows: Array.from({ length: n }, () => row) })
     expect(rows(truingLimits.rows)).toHaveProperty('rows')
     expect(rows(truingLimits.rows + 1)).toBe('rows')
+  })
+
+  it('refuses more shots in a row or the chronograph than a stored result keeps', () => {
+    const row = defined(input.rows[0])
+    const shots = (n: number) => entryOf({ ...input, rows: [{ ...row, shots: String(n) }] })
+    expect(shots(truingLimits.shots)).toHaveProperty('rows')
+    expect(shots(truingLimits.shots + 1)).toBe('shots')
+    const chrono = { ...input.chrono, shots: String(truingLimits.shots + 1) }
+    expect(entryOf({ ...input, chrono })).toBe('shots')
   })
 })

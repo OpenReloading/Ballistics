@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { gotoHydrated } from './nav.ts'
 import { applyExampleLoad } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
@@ -21,7 +22,7 @@ export async function openFit(page: Page) {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await page.goto('/workbench')
+  await gotoHydrated(page, '/workbench')
   await applyExampleLoad(page)
   await runLine(page)
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
