@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { exportSize, pinchView, printLayout } from '../src/lib/target-view.ts'
+import { boxAround, exportSize, pinchView, printLayout } from '../src/lib/target-view.ts'
 
 describe('export sizes', () => {
   const photo = { width: 1600, height: 1200 }
@@ -60,5 +60,30 @@ describe('pinch zoom', () => {
   it('two fingers moved together pan the view by their way in view units', () => {
     const b = pinchView(box, 2, { x: 600, y: 400 }, { x: 50, y: 60 }, { x: 60, y: 50 }, 1)
     expect(b).toEqual({ x: -20, y: 20, w: 1000, h: 800 })
+  })
+})
+
+describe('box around points', () => {
+  it('adds 10 % of the larger side on each side', () => {
+    expect(
+      boxAround([
+        { x: 0, y: 0 },
+        { x: 200, y: 100 },
+      ]),
+    ).toEqual({ x: -20, y: -20, w: 240, h: 140 })
+  })
+
+  it('a face outline wider than 200 mm sets the box, not the default square', () => {
+    const outline = [
+      { x: -250, y: 0 },
+      { x: 250, y: 0 },
+      { x: 0, y: -250 },
+      { x: 0, y: 250 },
+    ]
+    expect(boxAround(outline).w).toBe(600)
+  })
+
+  it('without points a 1000 unit square', () => {
+    expect(boxAround([])).toEqual({ x: 0, y: 0, w: 1000, h: 1000 })
   })
 })
