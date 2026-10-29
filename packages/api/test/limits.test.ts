@@ -147,6 +147,112 @@ describe('limitCheck', () => {
   })
 })
 
+describe('limitCheck on the method, the boundary and the echo', () => {
+  const pmax = (value: number, over: object = {}, variant?: string) =>
+    cartridge([{ symbol: 'Pmax', quantity: 'pressure', value, ...(variant && { variant }) }], over)
+  const load = {
+    startPressure: 2e7,
+    ignitionPressure: 1e6,
+    barrel: { length: 0.6, twist: 0.3 },
+    bullet: { mass: 0.01 },
+  }
+
+  it('compares piezo and an unstated method, lists crusher values uncompared', () => {
+    expect(limitCheck(range, pmax(4000, { pressureMethod: 'piezo' })).limits?.[0]?.compared).toBe(
+      true,
+    )
+    const unstated = limitCheck(range, pmax(4000, { pressureMethod: undefined }))
+    expect(unstated.limits?.[0]).toMatchObject({ method: null, compared: true, exceeded: true })
+    expect(unstated.warnings[0]?.message).toContain(
+      '(cip-x-2020-01-01; measuring method not stated in the record)',
+    )
+    const crusher = limitCheck(range, pmax(4000, { pressureMethod: 'crusher' }))
+    expect(crusher.limits).toEqual([
+      {
+        cartridge: 'x',
+        revised: '2020-01-01',
+        symbol: 'Pmax',
+        method: 'crusher',
+        pressure: 4e8,
+        compared: false,
+        reason: 'crusher',
+      },
+    ])
+    expect(crusher.warnings).toMatchObject([
+      {
+        code: 'noComparableLimit',
+        message:
+          'X has no CIP Pmax measured by transducer or piezo. Crusher values are not compared with a simulated pressure.',
+      },
+    ])
+  })
+
+  it('does not count a high end equal to the limit as exceeded', () => {
+    expect(limitCheck(range, pmax(4300)).limits?.[0]?.exceeded).toBe(false)
+  })
+
+  it('names the variant of a warning only when the limit has one', () => {
+    const plain = limitCheck(range, pmax(4000))
+    expect(plain.limits?.[0]).not.toHaveProperty('variant')
+    expect(plain.warnings[0]).not.toHaveProperty('variant')
+    const variant = limitCheck(range, pmax(4000, {}, '12/70'))
+    expect(variant.warnings[0]).toMatchObject({ symbol: 'Pmax', variant: '12/70' })
+  })
+
+  it('stops at five decimals for a value that rounds onto the limit', () => {
+    const close = { ...range, highPressure: 4000.0000001e5 }
+    expect(limitCheck(close, pmax(4000)).warnings[0]?.message).toMatch(
+      /^The upper end of the simulated peak pressure range, 4000\.00000 bar, is above/,
+    )
+  })
+
+  it('echoes the cartridge and says why none was checked without one', () => {
+    expect(limitCheck(range, pmax(5000)).cartridge).toEqual({
+      id: 'x',
+      name: 'X',
+      provenance: { kind: 'published', sources: [{ title: 'Test standard' }] },
+    })
+    expect(limitCheck(range, undefined).warnings[0]?.message).toBe(
+      'No cartridge id was given, so no CIP Pmax was checked.',
+    )
+  })
+
+  it('joins the distinct reasons of failed range cases', () => {
+    const failed = (reason: string) => ({
+      input: 'chargeFraction' as const,
+      side: 1 as const,
+      maxPressure: null,
+      reason,
+    })
+    const incomplete = { ...range, cases: [failed('a'), failed('b'), failed('a')] }
+    expect(limitCheck(incomplete, pmax(5000)).warnings[0]?.message).toMatch(
+      /^3 of 3 range cases could not be computed \(a, b\);/,
+    )
+  })
+
+  it('names the start pressure when it equals the ignition pressure and keeps the side of 2.2 times it', () => {
+    const run = (maxMeanPressure: number, startPressure: number, ignitionPressure: number) =>
+      limitCheck(range, pmax(5000), {
+        result: { maxMeanPressure },
+        load: { ...load, startPressure, ignitionPressure },
+      }).warnings[0]?.message
+    expect(run(4e7, 2e7, 2e7)).toContain('below 2.2 times the start pressure (200 bar)')
+    expect(run(4.3996e7, 2e7, 1e6)).toContain('peak mean pressure, 439.96 bar, is below')
+  })
+
+  it('adds the input rules of the registry to an M3 run', () => {
+    const { warnings } = limitCheck(range, pmax(5000), {
+      result: { maxMeanPressure: 3.9e8 },
+      load: {
+        ...load,
+        barrel: { length: 0.6, twist: 0 },
+        bullet: { mass: 0.01, gyrationRadius: 0.002 },
+      },
+    })
+    expect(warnings.map((w) => w.code)).toEqual(['gyrationRadiusWithoutTwist'])
+  })
+})
+
 describe('maximumCheck', () => {
   const spread = {
     ...range,

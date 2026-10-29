@@ -42,9 +42,28 @@ Surviving classes before the new tests:
 
 The 31 mutants that still survive after the new tests are boundary changes where both branches give the same value at the boundary (the stage joins of the vivacity forms, the lens and sliver limits), the bisection bounds and stop rule of the seven-perforation burnout, the truncation and the end weights of the Simpson rule (below 1e-13 against the closed form), two optional chainings on lookups that always find an entry, and one message text.
 
+Round 5 took five more modules by risk, each run against its own test file with the same tool and settings, installed outside the workspace and run on the host:
+
+- `core/cartridge-specs.ts`: the diameters and bore area that the bullet fit and the cartridge pages read; 35 of its mutants were covered by no test of its own file.
+- `api/compute/limits.ts`: the comparison of a simulated pressure range with the CIP Pmax, its warnings and the decimals that keep a printed value on its side of a limit.
+- `cli/rows.ts`: the parser of the user's load rows, a trust boundary whose messages must name file, line and column and never quote a value.
+- `cli/metrics.ts`: the error metrics, interval coverage and changes that `verify` and `compare` report; it had no test file of its own, so the run before used `test/verify.test.ts` and `test/compare.test.ts`.
+- `importers/pressure-history.ts`: unit factors and spellings of a pressure trace, the reading of numbers and the zero-phase low-pass.
+
+| Module | Mutants | Score before | Surviving or not covered | Wall time | Killed by the new tests | Equivalent left | Score after |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `core/cartridge-specs.ts` | 76 | 52.6 % | 36 (35 not covered) | 2 s | 36 | 0 | 100 % |
+| `api/compute/limits.ts` | 147 | 83.7 % | 24 (4 not covered) | 9 s | 24 | 0 | 100 % |
+| `cli/rows.ts` | 291 | 90.0 % | 29 (4 not covered) | 9 s | 21 | 8 | 97.3 % |
+| `cli/metrics.ts` | 127 | 85.8 % | 18 | 65 s | 18 | 0 | 100 % |
+| `importers/pressure-history.ts` | 242 | 84.7 % | 37 (6 not covered) | 8 s | 23 | 14 | 94.2 % |
+
+The scores after are new runs of the same mutants, not estimates. The new `test/metrics.test.ts` alone reaches 67.2 % in 5 s; the score after of `metrics.ts` is with the verify and compare tests. The kills were a dropped guard (the crusher method, a one-field record, an empty number column, a whitespace line), a changed boundary (a high end equal to the limit, a temperature of exactly -273.15, a printed velocity on the band edge, exactly ten problems), a wrong unit spelling (the micro signs, a bare or lower-case unit word, empty brackets before the unit), a wrong factor (the low-pass gain, checked against the closed form of a spike), a wrong index (the last word of a header cell, the base name of a rows file) and an output reversed or not trimmed. The 22 equivalent mutants are fallbacks for an index the code never misses, guards whose later check gives the same message, trims of cells the cell splitter already trims, a regular expression anchor whose loss `Number` still rejects, and a comparison with an undefined last time that is false either way.
+
+
 ## Result
 
-improved. Tests were added (`test/exterior-atmosphere.test.ts`, `test/interior-form.test.ts`, `test/hit-probability.test.ts`): each limit accepted, each invalid field named, each ring probability against the closed form, and the closed-form check of the zone integral tightened from 8 to 13 digits. Mutation testing is recommended in a reduced form: a weekly, report-only run on these three modules, each against its own test file (about a minute in all), not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run. No workflow was added.
+improved. Tests were added (`test/exterior-atmosphere.test.ts`, `test/interior-form.test.ts`, `test/hit-probability.test.ts`): each limit accepted, each invalid field named, each ring probability against the closed form, and the closed-form check of the zone integral tightened from 8 to 13 digits. Mutation testing is recommended in a reduced form: a weekly, report-only run on these three modules, each against its own test file (about a minute in all), not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run. No workflow was added. Round 5 raised the five modules above to between 94.2 % and 100 %, each own-file run under 10 s except the metrics run over the verify and compare tests.
 
 ## Data basis
 
@@ -55,6 +74,11 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/core/src/exterior/atmosphere.ts`, `packages/core/test/exterior-atmosphere.test.ts`
 - `packages/core/src/interior/form.ts`, `packages/core/test/interior-form.test.ts`
 - `packages/core/src/groups/hit-probability.ts`, `packages/core/test/hit-probability.test.ts`
+- `packages/core/src/cartridge-specs.ts`, `packages/core/test/cartridge-specs.test.ts`
+- `packages/api/src/compute/limits.ts`, `packages/api/test/limits.test.ts`
+- `packages/cli/src/rows.ts`, `packages/cli/test/rows.test.ts`
+- `packages/cli/src/metrics.ts`, `packages/cli/test/metrics.test.ts`
+- `packages/importers/src/pressure-history.ts`, `packages/importers/test/pressure-history.test.ts`
 - `packages/core/vitest.config.ts` (the line coverage floors the mutation score is compared with)
 
 ## Confidence
