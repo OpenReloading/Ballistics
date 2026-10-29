@@ -9,6 +9,7 @@ import {
   FileCard,
   folded,
   ImportFoot,
+  pickedBytes,
   splitImport,
 } from '../src/components/import-entry.tsx'
 import {
@@ -312,6 +313,19 @@ it('sends the data files of a mixed pick to the data import and the rest to the 
   const { data, tables } = await splitImport(picked)
   expect(data.map((p) => p.file.name)).toEqual(['openreloading-data.json'])
   expect(tables.map((p) => p.file.name)).toEqual(['bullets.csv', 'list.json'])
+})
+
+it('refuses a file over 40 MB without reading it', async () => {
+  const file = Object.defineProperty(new File([], 'disk.img'), 'size', { value: maxFileBytes + 1 })
+  const arrayBuffer = vi.spyOn(file, 'arrayBuffer')
+  const card = await pickedBytes(file)
+  expect(card).toEqual({ refusal: 'The file is larger than 40 MB. Split it and import the parts.' })
+  expect(arrayBuffer).not.toHaveBeenCalled()
+  if (card instanceof ArrayBuffer) throw new Error('read')
+  const shown = html(<FileCard e={{ ...entry, card }} shared="" actions={noActions} />)
+  expect(shown).toContain('Refused')
+  expect(shown).not.toContain('Reading')
+  expect(await pickedBytes(new Blob(['a,b']))).toBeInstanceOf(ArrayBuffer)
 })
 
 const load: UserRecord = {

@@ -528,12 +528,8 @@ export function ImportEntry({
       }
       await Promise.all(
         added.map(async ({ id, file }) => {
-          let bytes: ArrayBuffer
-          try {
-            bytes = await file.arrayBuffer()
-          } catch {
-            return patch(id, { busy: false, failure: msg('The file could not be read.') })
-          }
+          const bytes = await pickedBytes(file)
+          if (!(bytes instanceof ArrayBuffer)) return patch(id, { busy: false, card: bytes })
           const r = await call({ type: 'read', id, bytes }, [bytes])
           if (r.type !== 'read')
             return patch(id, { busy: false, failure: r.type === 'failed' ? r.message : undefined })
@@ -667,6 +663,17 @@ export function ImportEntry({
       </Stack>
     </AppModal>
   )
+}
+
+/** The bytes of a picked file, or its refusal card: a file over the size limit is not read. */
+export async function pickedBytes(file: Blob): Promise<ArrayBuffer | { refusal: Message }> {
+  if (file.size > maxFileBytes)
+    return { refusal: msg('The file is larger than 40 MB. Split it and import the parts.') }
+  try {
+    return await file.arrayBuffer()
+  } catch {
+    return { refusal: msg('The file could not be read.') }
+  }
 }
 
 /**
