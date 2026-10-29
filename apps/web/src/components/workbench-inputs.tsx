@@ -15,7 +15,7 @@ import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
@@ -1023,8 +1023,13 @@ function BulletPicker() {
     system,
   } = useLoad()
   const { t } = useTranslation()
-  // mounted from the start: the first closing returns the focus to the button as the later ones do
   const [dialog, setDialog] = useState({ text: '', opened: false })
+  // opened before its code has loaded, the dialog mounts open and cannot return the focus itself
+  const opener = useRef<HTMLElement | null>(null)
+  const close = () => {
+    setDialog({ ...dialog, opened: false })
+    setTimeout(() => opener.current?.focus())
+  }
   const designRows = useMemo(() => userBulletRows(designs), [designs])
   const fit = useMemo(
     () => (bulletParams ? fitOf(cartridge) : undefined),
@@ -1068,13 +1073,14 @@ function BulletPicker() {
           label: t('Browse bullets'),
           onOpen: (typed) => {
             readDesigns()
+            opener.current = document.activeElement as HTMLElement | null
             setDialog({ text: typed, opened: true })
           },
         }}
       />
       <BulletSearchDialog
         opened={dialog.opened}
-        onClose={() => setDialog({ ...dialog, opened: false })}
+        onClose={close}
         text={dialog.text}
         designs={designRows}
         fit={fit}
@@ -1084,7 +1090,7 @@ function BulletPicker() {
           const design = userRecordId(row.id)
           if (design) chooseDesign(design)
           else chooseBullet(row.id)
-          setDialog({ ...dialog, opened: false })
+          close()
         }}
       />
     </>
