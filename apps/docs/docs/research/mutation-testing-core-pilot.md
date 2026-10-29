@@ -1,9 +1,9 @@
 ---
-title: Mutation testing of three core modules
-description: Whether mutation testing finds weak tests in the core package that line coverage does not, its run time per module, the surviving mutant classes and the tests that kill them.
+title: Mutation testing of eight core modules
+description: Whether mutation testing finds weak tests in the core package that line coverage does not, its run time per module, the surviving mutant classes and the tests that kill them, in two rounds.
 ---
 
-# Mutation testing of three core modules
+# Mutation testing of eight core modules
 
 ## Question
 
@@ -18,6 +18,7 @@ Decided before the runs.
 - Metric: the mutation score, killed and timed-out mutants over all mutants, and the wall time per module. A surviving mutant matters when it changes a boundary, a sign, a unit factor or drops a guard.
 - Accept rule: worth adopting when the surviving mutants that matter show missing tests that line coverage hides, and a scheduled run fits in a CI job of 30 minutes.
 - Then: tests for the ten most important survivors at least, and a second run of the same mutants against only the module's own test file to count the kills.
+- Second round, the same tool and settings, each module run against only its own test file from the start: `exterior/drag.ts` (table lookup, segment search and the hold rules every trajectory step reads), `exterior/stability.ts` (unit factors of the Miller formula, the stability band, the MOA constant), `interior/range.ts` (the side bookkeeping of the pressure range and its invalid ends), `groups/statistics.ts` (input guards, signs and the CEP bracket of the group statistics) and `recoil.ts` (input guards of the free recoil). No module of the schema or API layer is in this round.
 
 ## Formulas
 
@@ -40,11 +41,32 @@ Surviving classes before the new tests:
 - A wrong index: `inside[k + 1]` turned into `inside[k - 1]` in `hitProbability` survived, because the test checked only that the ring probabilities sum to the hit probability and the score to their weighted sum, both still true when every inner ring gets 0.
 - A unit factor: `humidity * saturationVapourPressure` turned into a division in the pressure check survived.
 
+Second round, each module against its own test file. "Equivalent" counts the survivors left after the new tests that give the same result as the source; the score after is a new run over the same mutants.
+
+| Module | Mutants | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `exterior/drag.ts` | 181 | 85.1 % | 27 (4 not covered) | 21 s | 20 | 7 | 96.1 % |
+| `exterior/stability.ts` | 97 | 80.4 % | 19 | 4 s | 18 | 1 | 99.0 % |
+| `interior/range.ts` | 137 (9 runtime errors) | 92.2 % | 10 (2 not covered) | 9 s | 7 | 3 | 97.7 % |
+| `groups/statistics.ts` | 373 (24 runtime errors) | 86.3 % | 48 (1 not covered) | 51 min | 35 | 13 | 96.3 % |
+| `recoil.ts` | 44 | 77.3 % | 10 | 3 s | 10 | 0 | 100 % |
+
+A runtime error (a mutant that breaks the module on import) is left out of the score. The statistics run is slow because 216 of its mutants (58 %) are static, so each runs the whole group test file with its seeded simulations, on a host shared with other jobs.
+
+Surviving classes before the new tests, second round:
+
+- Input guards never checked one by one, again: the five positive inputs of `millerStability`, every guard of `freeRecoil`, the confidence level, aim and coverage checks of the group statistics and the guards of `pooledGroupStatistics`, which could be dropped as a whole. The tests asserted only that some error is thrown.
+- Inclusive limits: zero muzzle velocity and gas factor, a drag segment exactly as narrow or as steep as the hold limit, the band edge of `isStable`.
+- A wrong index or side: `dragSegment` below the first node, at a node and at the last node, `segmentCoefficient` on the segments outside the table, the side label of the lower case of the pressure range and the side taken from the one end that could be computed.
+- A wrong sign or unit factor: the Magnus term of the dynamic stability factor, MOA as pi times 10800, the width, height and aim offset of a group whose minimum is not 0, the node spacing of the monotone cubic slope, and the CEP bracket `1.2 * sqrt(l1)` that turned into a division survives below a variance of 1.44 m2.
+
+The equivalent survivors of the second round: the default interpolation literal (any other string reads as linear), the internal node guard and the search bound of the drag table, and its end comparisons where both branches give the node value; `sg >= 1` in `isStable` (at Sg = 1 the second condition fails); in the range, a search for the opposite side (same spread), the branch for two invalid ends (the sign is 0 there too) and a move by zero; in the statistics, products with a deviation whose sum is zero, the axis angle branch that only a negative zero reaches, the limits of exactly 1e-9 for the aim centre and the shared distance, which no input reaches exactly, a zero major variance (the bisection then returns 0 too), and the strict test and stop rule of the CEP bisection (both end within its last step).
+
 The 31 mutants that still survive after the new tests are boundary changes where both branches give the same value at the boundary (the stage joins of the vivacity forms, the lens and sliver limits), the bisection bounds and stop rule of the seven-perforation burnout, the truncation and the end weights of the Simpson rule (below 1e-13 against the closed form), two optional chainings on lookups that always find an entry, and one message text.
 
 ## Result
 
-improved. Tests were added (`test/exterior-atmosphere.test.ts`, `test/interior-form.test.ts`, `test/hit-probability.test.ts`): each limit accepted, each invalid field named, each ring probability against the closed form, and the closed-form check of the zone integral tightened from 8 to 13 digits. Mutation testing is recommended in a reduced form: a weekly, report-only run on these three modules, each against its own test file (about a minute in all), not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run. No workflow was added.
+improved. Tests were added (`test/exterior-atmosphere.test.ts`, `test/interior-form.test.ts`, `test/hit-probability.test.ts`): each limit accepted, each invalid field named, each ring probability against the closed form, and the closed-form check of the zone integral tightened from 8 to 13 digits. Mutation testing is recommended in a reduced form: a weekly, report-only run on these three modules, each against its own test file (about a minute in all), not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run. The second round added tests to five more modules (`test/exterior-drag.test.ts`, `test/exterior-stability.test.ts`, `test/interior-range.test.ts`, `test/groups.test.ts`, `test/recoil.test.ts`); four of them run in seconds against their own test file and fit that weekly run, the group statistics (51 min) does not until its simulation tests move to a file of their own. No workflow was added.
 
 ## Data basis
 
@@ -55,8 +77,13 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/core/src/exterior/atmosphere.ts`, `packages/core/test/exterior-atmosphere.test.ts`
 - `packages/core/src/interior/form.ts`, `packages/core/test/interior-form.test.ts`
 - `packages/core/src/groups/hit-probability.ts`, `packages/core/test/hit-probability.test.ts`
+- `packages/core/src/exterior/drag.ts`, `packages/core/test/exterior-drag.test.ts`
+- `packages/core/src/exterior/stability.ts`, `packages/core/test/exterior-stability.test.ts`
+- `packages/core/src/interior/range.ts`, `packages/core/test/interior-range.test.ts`
+- `packages/core/src/groups/statistics.ts`, `packages/core/test/groups.test.ts`
+- `packages/core/src/recoil.ts`, `packages/core/test/recoil.test.ts`
 - `packages/core/vitest.config.ts` (the line coverage floors the mutation score is compared with)
 
 ## Confidence
 
-medium. The scores before and the kill counts are exact StrykerJS 10.1.1 outputs on these three files; the scores after are estimates computed from them, not a new full-suite run; the full-suite times were taken on a shared machine and vary with its load, and other modules are not measured.
+medium. The scores before and the kill counts are exact StrykerJS 10.1.1 outputs on these three files; the scores after are estimates computed from them, not a new full-suite run; the full-suite times were taken on a shared machine and vary with its load, and other modules are not measured. The second-round scores after are new runs over the same mutants, not estimates; its times are on the shared host too.

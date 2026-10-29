@@ -715,3 +715,77 @@ describe('circular against elliptical CEP by axis ratio', () => {
     close(inside(circular, 0), 0.5949, 1e-4)
   })
 })
+
+describe('groupStatistics: inputs, signs and limits', () => {
+  it('names each invalid input', () => {
+    const level = 'confidence level must lie in (0, 1)'
+    for (const confidenceLevel of [0, 1])
+      expect(() => groupStatistics({ shots: five, distance: 100, confidenceLevel })).toThrow(level)
+    expect(() => pooledGroupStatistics([{ shots: five, distance: 100 }], 1)).toThrow(level)
+    expect(() => groupStatistics({ shots: five, distance: 0 })).toThrow('distance must be positive')
+    expect(() =>
+      pooledGroupStatistics([{ shots: [{ x: 0, y: Number.NaN }], distance: 100 }]),
+    ).toThrow('shot coordinates must be finite')
+    expect(() =>
+      groupStatistics({ shots: [{ x: 0, y: 0, velocity: Number.NaN }], distance: 100 }),
+    ).toThrow('shot velocity must be finite')
+    expect(() =>
+      groupStatistics({ shots: five, distance: 100, aim: { x: 0, y: Number.NaN } }),
+    ).toThrow('aim must be finite')
+    const s = groupStatistics({ shots: five, distance: 100 })
+    for (const coverage of [0, 1]) {
+      expect(() => dispersionEllipse(s, coverage)).toThrow('coverage must lie in (0, 1)')
+      expect(() => predictionEllipse(s, coverage)).toThrow('coverage must lie in (0, 1)')
+    }
+    expect(() => subtendedAngle(0.1, 0)).toThrow('distance must be positive')
+  })
+
+  it('measures width, height and aim offset of a group off the origin', () => {
+    const s = groupStatistics({
+      shots: shots([
+        [5, 7],
+        [8, 9],
+        [6, 13],
+      ]),
+      distance: 100,
+      aim: { x: 1 * mm, y: 3 * mm },
+    })
+    close(s.width, 3 * mm)
+    close(s.height, 6 * mm)
+    // centre (19/3, 29/3) mm
+    close(s.aimOffset?.dx, (19 / 3 - 1) * mm)
+    close(s.aimOffset?.dy, (29 / 3 - 3) * mm)
+  })
+
+  it('has no velocity correlation when the heights do not vary', () => {
+    const s = groupStatistics({
+      shots: [790, 800, 810].map((velocity, i) => ({ x: i * mm, y: 0, velocity })),
+      distance: 100,
+    })
+    expect('velocityCorrelation' in s).toBe(false)
+  })
+
+  it('brackets the elliptical CEP of a spread above one metre', () => {
+    // variance 6 m2 on both axes: the elliptical CEP equals the circular one
+    const s = groupStatistics({
+      shots: [
+        { x: 3, y: 0 },
+        { x: 0, y: 3 },
+        { x: -3, y: 0 },
+        { x: 0, y: -3 },
+      ],
+      distance: 100,
+    })
+    close(s.cepElliptical, Math.sqrt(2 * Math.LN2 * 6), 1e-9)
+  })
+
+  it('pools without excluded shots and with distances equal to 1e-9', () => {
+    const pooled = pooledGroupStatistics([
+      { shots: [...five, { x: 50 * mm, y: 50 * mm, excluded: true }], distance: 100 },
+      { shots: five, distance: 100 + 5e-8 },
+    ])
+    expect(pooled.shotCount).toBe(10)
+    close(pooled.angular?.meanExtremeSpread, (Math.sqrt(32) * mm) / 100, 1e-8)
+    expect(pooled.standardDeviationX).toBeDefined()
+  })
+})
