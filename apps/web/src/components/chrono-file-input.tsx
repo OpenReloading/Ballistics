@@ -4,17 +4,11 @@ import { NativeSelect } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { formatNames, templateCsv, templateJson } from '../lib/chrono.ts'
+import { formats, templateCsv, templateJson } from '../lib/chrono.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
 
 const jsonTemplateHref = `data:application/json;charset=utf-8,${encodeURIComponent(templateJson)}`
 const templateHref = `data:text/csv;charset=utf-8,${encodeURIComponent(templateCsv)}`
-
-/** Formats read in the browser: a delimited file needs a column mapping, which the browser does not take. */
-export const formats = Object.entries(formatNames)
-  .filter(([k]) => k !== 'delimited')
-  .map(([, name]) => name)
-  .join(', ')
 
 /** The JSON and CSV template downloads; `json` is the first link's text. */
 export function TemplateLinks({ json, between }: { json?: string; between?: ReactNode }) {

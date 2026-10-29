@@ -499,7 +499,11 @@ describe('share links', () => {
   })
 
   it('rejects a damaged or invalid fragment with a reason', async () => {
-    expect(await readLink('#record=@@@')).toEqual({ ok: false, reason: 'The link is damaged.' })
+    expect(await readLink('#record=@@@')).toEqual({
+      ok: false,
+      reason:
+        'The link is damaged. Ask the sender to copy the link again or to send the record as a file.',
+    })
     const invalid = {
       ...bullet,
       data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } },

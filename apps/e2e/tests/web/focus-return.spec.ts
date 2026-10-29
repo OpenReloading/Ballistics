@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
@@ -80,6 +81,19 @@ for (const width of widths) {
     await expect(page.getByRole('dialog', { name: 'Saved loads' })).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Saved loads' })).toBeHidden()
+    await expect(way(page, 1280, 'Open')).toBeFocused()
+  })
+
+  test(`Escape closes the Import entry and the focus goes back to the page bar at ${width} px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await withoutOpenPicker(page)
+    await gotoHydrated(page, '/bullets/designer')
+    const entry = await pickFiles(page, [{ name: 'notes.txt', buffer: Buffer.from('no table') }])
+    await expect(entry).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(entry).toBeHidden()
     await expect(way(page, 1280, 'Open')).toBeFocused()
   })
 

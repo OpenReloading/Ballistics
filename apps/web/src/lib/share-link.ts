@@ -5,12 +5,25 @@ import {
   userDataVersion,
   userRefFields,
 } from '@open-reloading/schema'
-import type { Translator } from '../i18n/translate.ts'
-import { type ParsedUserFile, parseUserDataFile } from './user-data.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { type ParsedUserFile, parseUserDataFile, reasonText } from './user-data.ts'
 
 /** Longest share link: the length RFC 9110 section 4.1 recommends every sender and recipient support. */
 export const maxLinkChars = 8000
 const fragmentKey = '#record='
+const damagedLink = msg(
+  'The link is damaged. Ask the sender to copy the link again or to send the record as a file.',
+)
+const longLink = msg(
+  'The link is too long. Ask the sender to copy the link again or to send the record as a file.',
+)
+const ownReasons: readonly Message[] = [damagedLink, longLink]
+
+/** A `reason` of a share link that was not opened, in the language of `t`. */
+export function linkReasonText(reason: string, t: Translator['t']) {
+  const own = ownReasons.find((m) => m === reason)
+  return own ? t(own) : reasonText(reason, t)
+}
 
 const through = async (
   bytes: Uint8Array<ArrayBuffer>,
@@ -62,9 +75,9 @@ export async function shareLink(records: UserRecord[], page: string) {
 /** The records of a share link's fragment, validated as a file; undefined without one. */
 export async function readLink(hash: string): Promise<ParsedUserFile | undefined> {
   if (!hash.startsWith(fragmentKey)) return
-  const damaged: ParsedUserFile = { ok: false, reason: 'The link is damaged.' }
+  const damaged: ParsedUserFile = { ok: false, reason: damagedLink }
   const payload = hash.slice(fragmentKey.length)
-  if (payload.length > maxLinkChars) return { ok: false, reason: 'The link is too long.' }
+  if (payload.length > maxLinkChars) return { ok: false, reason: longLink }
   try {
     const binary = atob(payload.replace(/-/g, '+').replace(/_/g, '/'))
     const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0))
