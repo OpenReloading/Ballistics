@@ -66,14 +66,16 @@ export function splitLines(text: string): string[] {
 
 /**
  * A number with a decimal point or a decimal comma; NaN for anything else, including both
- * and a lone comma before exactly three digits (`2,800`), which may be a thousands separator.
+ * a lone comma before exactly three digits (`2,800`), which may be a thousands separator,
+ * and a digit run too long for a finite number.
  */
 export function parseNumber(text: string): number {
   const t = text.trim()
   if (t.includes(',') && t.includes('.')) return Number.NaN
   if (/^[+-]?\d{1,3},\d{3}$/.test(t)) return Number.NaN
   const s = t.replace(',', '.')
-  return /^[+-]?\d+(\.\d+)?$/.test(s) ? Number(s) : Number.NaN
+  const n = /^[+-]?\d+(\.\d+)?$/.test(s) ? Number(s) : Number.NaN
+  return Number.isFinite(n) ? n : Number.NaN
 }
 
 /** Text from the first `(` to the last `)` when it is not empty, else undefined; linear time. */

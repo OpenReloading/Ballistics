@@ -225,13 +225,15 @@ export function headerUnit(header: string): string | undefined {
   return (bracket ?? tail)?.toLowerCase()
 }
 
-/** A number in text with `decimal` as its mark: spaces and the other mark are grouping. Undefined for no number. */
+/** A number in text with `decimal` as its mark: spaces and the other mark are grouping. Undefined for no finite number. */
 export function readNumber(text: string, decimal: '.' | ','): number | undefined {
   const t = text.trim().replace(/[\s ']/g, '')
   if (t === '') return undefined
   const group = decimal === '.' ? ',' : '.'
   const plain = t.replaceAll(group, '').replace(decimal, '.')
-  return /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(plain) ? Number(plain) : undefined
+  if (!/^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(plain)) return undefined
+  const n = Number(plain)
+  return Number.isFinite(n) ? n : undefined
 }
 
 /** The decimal mark of a column from its cells, and whether a cell could also read as a grouped integer. */

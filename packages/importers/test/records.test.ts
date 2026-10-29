@@ -379,6 +379,25 @@ describe('buildRecords', () => {
     )
   })
 
+  it('rejects a cell that is not a finite number with the not-a-number reason', () => {
+    const cells = ['1e999', '-1e999', '9'.repeat(400)]
+    const t = tableOf(
+      csv([
+        ['Name', 'Diameter (mm)', 'Weight (g)'],
+        ['A', '7.82', '10.9'],
+        ...cells.map((c, i) => [`Big ${i}`, c, '10.9']),
+      ]),
+    )
+    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'), now)
+    expect(b.counts).toEqual({ accepted: 1, warned: 0, rejected: 3 })
+    expect(b.rejected.map((r) => [r.cell, r.reason])).toEqual(
+      cells.map((c) => [
+        c,
+        `Diameter "${c}" is not a number with "." as decimal mark. Fix the cell or change the decimal mark of the column.`,
+      ]),
+    )
+  })
+
   it('reads powders with choices and warns on an unknown spelling', () => {
     const t = tableOf(
       csv([

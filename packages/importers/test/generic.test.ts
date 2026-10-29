@@ -155,6 +155,15 @@ describe('parseDelimited', () => {
     ).toThrow(/not positive/)
   })
 
+  it.each(['1e999', '-1e999', '9'.repeat(400)])(
+    'throws on a velocity that is not a finite number: %s',
+    (cell) => {
+      expect(() =>
+        parseDelimited(`800\n${cell}`, { columns: { velocity: 1 }, velocityUnit: 'm/s' }),
+      ).toThrow(`row 2: velocity "${cell}" is not a number`)
+    },
+  )
+
   it('throws on ambiguous commas and uneven rows', () => {
     const opts = { columns: { velocity: 1 }, velocityUnit: 'm/s' } as const
     expect(() => parseDelimited('812,5\n813,0', opts)).toThrow(/name the delimiter/)
