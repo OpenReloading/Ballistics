@@ -74,6 +74,23 @@ Pressure, rows that carry a printed peak pressure in bar (piezo, transducer, C.I
 
 Not measured: the sealed test split (one run per model version, at release), and therefore the earlier baseline on the test split (median 3.4 %, P90 9.0 %) is not reproduced by the command line tool; by-session checks; a fit of each powder from rows.
 
+### Pooled powder fit
+
+A local run of the [pooled fit](interior-powder-fit.md#pooled-fit-over-rifles-powders-and-lots) on the same kind of load rows, outside the repository. The split was fixed before any result was seen, and the sealed test split was not read.
+
+- Sessions: the rows of one table, cartridge, powder, bullet mass and type, barrel and overall length. Rifle: table, cartridge and barrel. Lot: table.
+- Fit: 516 training-split sessions (952 rows) of 100 powders, 356 parameters. Each powder has a burn coefficient prior centred on its record value, log sigma 0.3. Without it, powders whose velocity barely moves with the burn coefficient left the fit `unresolved`.
+- Calibration of the model error: 329 other training-split sessions (627 rows). Every row has a velocity sigma of 1 % (an assumption: the rows print no spread).
+- Held out: 343 validation-split sessions (633 rows). Their cartridges are not in the fit, so every one is a rifle the fit has not seen.
+
+| Group | Sessions | Rows | Median velocity error | P90 velocity error | 90 % interval coverage |
+| --- | --- | --- | --- | --- | --- |
+| Pooled fit, held out | 343 | 633 | 2.85 % | 7.84 % | 92.9 % |
+| Record parameters, same rows | 343 | 633 | 3.02 % | 7.83 % | not stated |
+
+The targets of median 1 % and P90 2 % are not met. The estimated relative model error is 5.3 %, and it dominates the intervals.
+
+
 ## Decisions
 
 Each row has a default that stays in force until the owner changes it. The cost of being wrong is the cost of correcting the default later.

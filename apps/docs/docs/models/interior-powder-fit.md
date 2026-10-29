@@ -333,6 +333,8 @@ Code: `packages/core/src/interior/fit-pooled.ts`, `calibratePooled` (`excess`).
 
 The held-out strings are chosen by the caller before the fit is looked at; strings that also test the interval must be others again. On synthetic sessions (3 powders, 3 rifles, 2 lots, 4 charges each, a relative model error of 0.4 % on top of a 3 m/s string uncertainty), the nominal 90 % interval after calibration on 108 strings covers between 85 and 95 % of 270 other strings at charges between the fitted ones. The parameter covariance itself holds no model error, as in the single fit.
 
+On held-out measured sessions the targets of median 1 % and P90 2 % velocity error are not met: [validation](validation.md#pooled-powder-fit) gives the aggregates of a local run.
+
 ### Failures
 
 `fitPowder` throws a `PowderFitError` with one of these reasons:
