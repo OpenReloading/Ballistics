@@ -251,6 +251,7 @@ The range 0.1 to 0.9 and the 64 intervals of $\bar L_d$ are choices of the model
 - Code: `packages/core/src/interior/form.ts`, `burnError`. An invalid law gives the invalid reason `input` with the field name.
 - Grains with different inner and outer webs, deterrent coatings that change the burn rate with depth, and a spread of grain sizes are not modelled.
 - The two-stage and three-stage forms do not reproduce the infinite slope of the surface after the web of a seven-perforated grain burns through. The geometric form has it.
+- Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md) (the form parameter is not identified from velocities).
 
 ## Sources
 

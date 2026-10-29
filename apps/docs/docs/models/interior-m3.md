@@ -394,6 +394,7 @@ Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
 - Solid fill above 0.64 (`solidFillLimit`): the API (`loadRatioHigh`) and the workbench warn ([load file](#load-file)).
 - Inputs the run ignores or holds once: the API and the workbench say so ([advisories](#advisories)).
 - Research log: [constant-surface closed form](../research/interior-constant-surface-closed-form.md), [closed vessel](../research/interior-closed-vessel-closed-forms.md), [published worked example](../research/interior-published-worked-example.md), [internal consistency checks](../research/interior-internal-consistency-checks.md), [Sébert factor](../research/interior-sebert-factor-choice.md), [charge too small](../research/interior-charge-too-small-bound.md), [solid fill limit](../research/interior-solid-fill-limit.md).
+- Research log, choices fitted to load tables: [engraving ramp](../research/interior-engraving-ramp.md), [start pressure by construction and class](../research/interior-start-pressure-rules.md), [bullet material](../research/interior-bore-resistance-material.md), [magnum primer factor](../research/interior-magnum-primer-term.md).
 
 ### Charge too small
 

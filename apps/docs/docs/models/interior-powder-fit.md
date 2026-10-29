@@ -367,6 +367,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - Each session is one barrel length and one temperature, and the barrel length is the one the sessions' bore and chamber share. A session fired from a barrel with another bore, chamber or twist is another load.
 - The pressure range holds the inputs it shifts, linearized by the refit at one standard uncertainty each. It holds no model error of the burn form, exponent, heat loss or pressure gradient, and not the correlation of inputs.
 - Each prediction costs one `interior` run per distinct charge, barrel length and temperature, and each Jacobian two predictions per parameter.
+- Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md), [assumed peak pressure for powders without printed pressures](../research/interior-load-table-pressure-term.md).
 
 ## Sources
 

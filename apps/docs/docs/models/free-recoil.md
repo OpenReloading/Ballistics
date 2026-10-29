@@ -55,6 +55,7 @@ Code: `packages/core/src/recoil.ts`, `gasVelocityFactor`.
 - The source lists further factors for shotguns (1.50 for average barrel length, 1.25 for long barrels). `gasVelocityFactor` holds only the rifle and pistol values.
 - The real gas velocity varies with muzzle pressure and projectile velocity. The factor is a constant.
 - Research log: [published worked example](../research/free-recoil-worked-example.md).
+- Research log: [gas outflow velocity after the muzzle](../research/gas-outflow-velocity.md).
 
 ## Sources
 

@@ -405,6 +405,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 - Without a known scale the search cannot tell targets of equal ring ratios and different size apart, and a target that is penalised for rings the photo does not show can rank behind a larger twin outside the tie window.
 - The target search does not read the ring numerals: on a photo of an insert card the targets whose inner rings stand in the same ratios are offered for the user to choose.
 - The photo scale comes from the sheet's calibration near the middle of the region. Perspective across the region is not corrected per hole.
+- Research log: [blob detector against an area-count detector](../research/hole-detection-blob-detector.md), [target centre on a tilted photo](../research/hole-detection-target-centre.md), [rings needed to apply a target](../research/hole-detection-ring-match-count.md).
 
 ## Sources
 
