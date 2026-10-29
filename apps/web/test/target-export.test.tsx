@@ -1,7 +1,7 @@
 import type { ShotGroup } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { extension, StatsBlock } from '../src/components/target-export.tsx'
+import { extension, renderJob, StatsBlock } from '../src/components/target-export.tsx'
 import { presetUnits } from '../src/lib/units.ts'
 
 const group: ShotGroup = {
@@ -37,4 +37,22 @@ it('names a download file by the subtype of its MIME type', () => {
   expect(extension('image/webp;q=1')).toBe('webp')
   expect(extension('')).toBe('img')
   expect(extension('image')).toBe('img')
+})
+
+it('a rendered image keeps the drawing, box, photo and file name of the sheet it was started on', () => {
+  let sheet = 'A'
+  const still = () => (
+    <svg>
+      <title>{sheet}</title>
+    </svg>
+  )
+  const box = { x: 0, y: 0, w: 2000, h: 1000 }
+  const photo = { url: 'blob:a', width: 2000, height: 1000 }
+  const job = renderJob(still, box, photo, 0.5, 'sheet-a')
+  // a switch to sheet B while the renderer loads
+  sheet = 'B'
+  expect(renderToStaticMarkup(job.svg)).toContain('<title>A</title>')
+  expect(job).toMatchObject({ box, k: 2, photo, turn: 0.5, size: { w: 2000, h: 1000 } })
+  expect(job.file).toBe('sheet-a-rendered.jpg')
+  expect(renderJob(still, box, undefined, 0, 'drawn').file).toBe('drawn-rendered.png')
 })

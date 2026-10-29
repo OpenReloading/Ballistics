@@ -77,6 +77,34 @@ export const extension = (type: string) =>
   type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W[\s\S]*/, '') ?? 'img')
 
 /**
+ * What one rendered image is made of, taken together at the click: a sheet switched while the
+ * renderer loads changes neither the drawing nor the box, photo or file name.
+ */
+export function renderJob(
+  still: StillCanvas,
+  box: ViewBox,
+  photo: { url: string; width: number; height: number } | undefined,
+  turn: number,
+  stem: string,
+) {
+  // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device); a larger photo fails
+  // there; upgrade by scaling the export down past that size
+  // sizes as on a 1000 px wide screen, whatever the window and the zoom
+  const k = box.w / 1000
+  const type = photo ? 'image/jpeg' : 'image/png'
+  return {
+    box,
+    k,
+    size: exportSize(photo, box),
+    photo,
+    turn,
+    type,
+    file: `${stem}-rendered.${extension(type)}`,
+    svg: still(box, k),
+  }
+}
+
+/**
  * The Export menu: the original photo as stored, the rendered image of the fitted view at
  * the photo's pixel size, and the print sheet. Everything is made in the browser and downloaded;
  * nothing is sent.
@@ -107,27 +135,21 @@ export function ExportMenu({
   text?: boolean
 }) {
   const { t } = useTranslation()
-  const [job, setJob] = useState<{ box: ViewBox; k: number }>()
+  const [job, setJob] = useState<ReturnType<typeof renderJob>>()
   const stem = recordFileName(name).replace(/\.json$/, '')
 
   async function render() {
     const v = view.current
     if (!v || (photoId && !photo)) return onMessage(t('The photo is not in this browser.'), true)
-    const box = v.extent
-    const size = exportSize(photo, box)
-    // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device); a larger photo fails
-    // there; upgrade by scaling the export down past that size
-    // sizes as on a 1000 px wide screen, whatever the window and the zoom
-    const k = box.w / 1000
-    flushSync(() => setJob({ box, k }))
+    const frozen = renderJob(still, v.extent, photo, turn, stem)
+    flushSync(() => setJob(frozen))
     try {
       const { renderCanvas } = await import('../lib/target-render.ts')
-      const canvas = await renderCanvas({ photo, box, size, turn, k, t })
-      const type = photo ? 'image/jpeg' : 'image/png'
-      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, type, 0.92))
+      const canvas = await renderCanvas({ ...frozen, t })
+      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, frozen.type, 0.92))
       if (!blob) throw new Error(t('the browser made no image'))
-      download(blob, `${stem}-rendered.${extension(type)}`)
-      onMessage(t('Exported {w} x {h} px.', { w: size.w, h: size.h }))
+      download(blob, frozen.file)
+      onMessage(t('Exported {w} x {h} px.', { w: frozen.size.w, h: frozen.size.h }))
     } catch (e) {
       onMessage(t('Not exported: {reason}', { reason: errorText(e) }), true)
     } finally {
@@ -194,7 +216,7 @@ export function ExportMenu({
             className="target-offscreen"
             style={{ width: 1000, height: (1000 * job.box.h) / job.box.w }}
           >
-            {still(job.box, job.k)}
+            {job.svg}
           </div>,
           document.body,
         )}
