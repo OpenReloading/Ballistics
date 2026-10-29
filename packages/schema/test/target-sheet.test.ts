@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { targetSheet } from '../src/index.ts'
+import { z } from 'zod'
+import { groupShot, targetSheet } from '../src/index.ts'
 import { expectIssueAt } from './issue-at.ts'
 
 const uuid = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
@@ -125,6 +126,61 @@ describe('targetSheet', () => {
       [{ ...sheet, overlays: { spread: 'yes' } }, 'overlays.spread'],
     ] as const
     for (const [s, path] of bad) expectIssueAt(targetSheet, s, path)
+  })
+
+  it('names each sheet rule in a custom issue at its field', () => {
+    const rect = sheet.references[3]
+    const issues = (value: unknown) =>
+      targetSheet.safeParse(value).error?.issues.map(({ code, path, message }) => ({
+        code,
+        path,
+        message,
+      }))
+    expect(
+      issues({
+        ...sheet,
+        photo: undefined,
+        load: undefined,
+        references: [rect, rect],
+        groups: [sheet.groups[0], { ...sheet.groups[1], id: 'g1' }],
+        notes: [sheet.notes[1], sheet.notes[1]],
+      }),
+    ).toEqual([
+      { code: 'custom', path: ['references'], message: 'One rectangle at most' },
+      { code: 'custom', path: ['references'], message: 'References need a photo' },
+      { code: 'custom', path: ['groups', 1, 'id'], message: 'Duplicate id' },
+      { code: 'custom', path: ['notes', 1, 'id'], message: 'Duplicate id' },
+      { code: 'custom', path: ['groups', 0, 'ladderStep'], message: 'A ladder step needs a load' },
+    ])
+  })
+
+  it('takes a sheet without a load whose groups have no ladder step', () => {
+    const group = { ...sheet.groups[0], ladderStep: undefined }
+    expect(targetSheet.safeParse({ ...sheet, load: undefined, groups: [group] }).success).toBe(true)
+  })
+
+  it('takes either detection polarity and nothing else', () => {
+    const group = sheet.groups[0]
+    if (!group) throw new Error('the sheet has a first group')
+    const withPolarity = (polarity: string) => ({
+      ...sheet,
+      groups: [{ ...group, detection: { ...group.detection, polarity } }],
+    })
+    for (const polarity of ['dark', 'light'])
+      expect(targetSheet.safeParse(withPolarity(polarity)).success).toBe(true)
+    expectIssueAt(targetSheet, withPolarity('grey'), 'groups.0.detection.polarity')
+  })
+
+  it('states the unit of photo points, target lengths and angles in the JSON Schema', () => {
+    const json = z.toJSONSchema(targetSheet, { unrepresentable: 'any' }) as {
+      properties: Record<string, { unit?: string; properties?: Record<string, { unit?: string }> }>
+    }
+    expect(json.properties.targetOrigin?.properties?.x?.unit).toBe('px')
+    expect(json.properties.markerDiameter?.unit).toBe('m')
+    expect(json.properties.targetRotation?.unit).toBe('rad')
+    expect(json.properties.photoRotation?.unit).toBe('rad')
+    const shot = z.toJSONSchema(groupShot) as { properties: Record<string, { unit?: string }> }
+    expect(shot.properties.x?.unit).toBe('m')
   })
 
   it('refuses detection choices out of range: a region of 2 points, a hole size of zero, a backing that is no colour, a contrast above 1', () => {

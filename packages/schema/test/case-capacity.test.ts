@@ -46,6 +46,40 @@ describe('CaseCapacity', () => {
     )
   })
 
+  it('names each catalogue rule in its issue and needs no case manufacturer', () => {
+    const { caseManufacturer: _m, ...noMaker } = catalogue
+    expect(caseCapacity.safeParse(noMaker).success).toBe(true)
+    const { id: _id, provenance: _p, ...bare } = catalogue
+    const issues = (value: unknown) =>
+      caseCapacity.safeParse(value).error?.issues.map(({ code, path, message }) => ({
+        code,
+        path,
+        message,
+      }))
+    expect(issues({ ...bare, cartridge: user.cartridge })).toEqual([
+      { code: 'custom', path: ['id'], message: 'A catalogue capacity needs an id' },
+      { code: 'custom', path: ['provenance'], message: 'A catalogue capacity needs provenance' },
+      {
+        code: 'custom',
+        path: ['cartridge'],
+        message: 'A catalogue capacity names catalogue records only',
+      },
+    ])
+    expect(catalogueCaseCapacity.safeParse(user).error?.issues).toMatchObject([
+      { path: ['origin'], message: 'A catalogue record has origin catalogue' },
+    ])
+  })
+
+  it('takes each origin and case condition and a note that is not empty', () => {
+    for (const origin of ['user', 'shared'])
+      expect(caseCapacity.safeParse({ ...user, origin }).success).toBe(true)
+    for (const caseCondition of ['new', 'fired', 'sized'])
+      expect(caseCapacity.safeParse({ ...user, caseCondition }).success).toBe(true)
+    expectIssueAt(caseCapacity, { ...user, caseCondition: 'annealed' }, 'caseCondition')
+    expect(caseCapacity.parse({ ...user, note: 'weighed twice' }).note).toBe('weighed twice')
+    expectIssueAt(caseCapacity, { ...user, note: '' }, 'note')
+  })
+
   it('refuses a plain cartridge id, a record of the earlier format', () => {
     expectIssueAt(caseCapacity, { ...catalogue, cartridge: '308-win' }, 'cartridge')
     const { origin: _o, ...old } = catalogue
