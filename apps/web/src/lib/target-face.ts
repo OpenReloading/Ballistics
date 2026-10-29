@@ -624,7 +624,8 @@ export type FaceSearch = {
   /**
    * The fits of the faces that match every ring the best face matches, whatever their score (a
    * larger face is marked down for its outer rings the photo does not show), smallest first: an
-   * equal choice when there is more than one and no scale tells them apart.
+   * equal choice when there is more than one. Empty with a known scale, which has dropped the faces
+   * of another size.
    */
   alike: FaceFit[]
   /**
@@ -698,6 +699,17 @@ function holeSize(image: RgbaImage, black: Ellipse, lo: number, hi: number) {
   return nth(d, d.length >> 1)
 }
 
+/** The fits of the faces that match every ring the best face matches, smallest first; none with a known scale. */
+function alikeOf(black: Ellipse, ranked: FaceMatch[], scale: number | undefined): FaceFit[] {
+  const [top] = ranked
+  if (scale || !top) return []
+  return ranked
+    .filter((m) => top.matched.every((t) => m.matched.some((x) => x.ring === t.ring)))
+    .map((m) => fitFace(black, m))
+    .filter((f): f is FaceFit => !!f)
+    .sort((a, b) => a.outer - b.outer)
+}
+
 function searchFaces(
   image: RgbaImage,
   faces: readonly TargetFace[],
@@ -737,11 +749,7 @@ function searchFaces(
       .filter((f): f is FaceFit => !!f)
     if (!fits.length || top.score <= bestScore) continue
     const sure = fits.length === 1 && top.matched.length >= SURE_RINGS && top.score >= SURE_SCORE
-    const alike = ranked
-      .filter((m) => top.matched.every((t) => m.matched.some((x) => x.ring === t.ring)))
-      .map((m) => fitFace(black, m))
-      .filter((f): f is FaceFit => !!f)
-      .sort((a, b) => a.outer - b.outer)
+    const alike = alikeOf(black, ranked, scale)
     ;[result, bestScore] = [{ ...search, fits, alike, sure }, top.score]
     if (top.score >= SURE) break
   }

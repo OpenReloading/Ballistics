@@ -285,6 +285,8 @@ describe('findFace with a known scale', () => {
     expect(ids(found)).toEqual(['issf-25m-precision-50m-pistol'])
     // smallest first, not by score
     expect(found.alike.map((f) => f.face.id)).toEqual(['issf-25m-precision-50m-pistol', 'large'])
+    // a known scale has dropped the other size: no choice
+    expect(findFace(image, [base, wider], sc.camera.pxPerMm).alike).toEqual([])
   })
 })
 
