@@ -124,7 +124,7 @@ A failed fit throws `TruingError`, an `InputError`, with one of these reasons an
 - `unresolved`: a parameter the observations do not move (a height at the zero range, a Mach knot no flight reaches).
 - `ill-conditioned`: the condition number exceeds `maxCondition` (default $10^3$), with the parameter combination the data cannot separate.
 - `unreachable`: the start shot does not reach an observation range, or a Jacobian evaluation fails.
-- `not-converged`: `maxIterations` (default 30) accepted or rejected steps without convergence.
+- `not-converged`: `maxIterations` accepted or rejected steps without convergence. The default is 30 in core; the REST routes and the web app's browser compute pass 20 and accept at most 20, so a fit that core would finish after more than 20 steps reports `not-converged` there.
 - `step-budget`: the integration steps of all trajectories of the fit, zero searches included, reach `maxTotalSteps`.
 
 Malformed inputs throw a plain `InputError` before any trajectory (`checkObservations`, `dragCorrection`, `fitDrag`):
