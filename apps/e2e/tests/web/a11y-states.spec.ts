@@ -302,6 +302,46 @@ const states: State[] = [
     },
   },
   {
+    name: 'Database list with ticked rows',
+    scrolls: true,
+    open: async (page, check) => {
+      await gotoHydrated(page, '/bullets')
+      const boxes = page.getByRole('checkbox', { name: /^Select Demo Bullets / })
+      await expect(boxes).toHaveCount(2)
+      await boxes.first().click()
+      await boxes.last().click()
+      await expect(page.getByRole('button', { name: 'Clear selection' })).toBeVisible()
+      await check('page')
+    },
+  },
+  {
+    name: 'Session summary with the example',
+    scrolls: true,
+    open: async (page, check) => {
+      await gotoHydrated(page, '/session')
+      await page.getByRole('button', { name: 'Load example' }).click()
+      await expect(page.getByRole('status').filter({ hasText: 'Read' })).toHaveText(
+        'Read 3 strings, 30 shots.',
+      )
+      await check('page')
+    },
+  },
+  {
+    name: 'Shot groups with shots',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/groups')
+      const add = page.getByRole('button', { name: 'Add shot' }).locator('visible=true')
+      // the compact layout folds the group panels behind their strip
+      const strip = page.locator('.sheet-strip').locator('visible=true')
+      if (!(await add.count()) && (await strip.count())) await strip.click()
+      for (const n of [1, 2, 3]) {
+        await add.click()
+        await expect(page.locator('[data-shot]')).toHaveCount(n)
+      }
+      await check('sheet')
+    },
+  },
+  {
     name: 'Site search',
     open: async (page, check) => {
       await gotoHydrated(page, '/powders')
