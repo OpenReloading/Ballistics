@@ -31,15 +31,17 @@ The function takes SI inputs and converts them. The trajectory evaluates $S_g$ o
 
 ### Stability along the trajectory
 
-The trajectory reports where Miller's factor falls below a threshold. At each point the same rule is evaluated with the speed of the point and the air at its height above the firing point (`airAt` of the station air), the mass, diameter, length and twist unchanged. The first point below the threshold gives the range of the warning and the factor there:
+The result gives Miller's factor at the muzzle only, with no value or warning along the path. In linear theory the gyroscopic factor is proportional to $\omega^2 / (\rho\,v^2\,C_{M_\alpha})$, with the spin rate $\omega$, the air density $\rho$, the speed $v$ and the overturning-moment slope $C_{M_\alpha}$ ([McCoy 1999](../bibliography.md#mccoy-1999), chapter numbers unverified; the same ratio is `gyroscopicStability` in `packages/core/src/exterior/modified.ts`). In flat fire the speed falls faster than the spin, so at a constant moment slope the factor rises with range:
 
 $$
-S_g(x) = S_{g,0}\left(\frac{v(x)}{2800\ \mathrm{ft/s}}\right)^{1/3}\frac{T(x)}{288.15\ \mathrm{K}}\,\frac{29.92\ \mathrm{inHg}}{p(x)}
+S_g(x) = S_g(0)\left(\frac{\omega(x)}{\omega_0}\right)^2\left(\frac{v_0}{v(x)}\right)^2\frac{\rho_0}{\rho(x)}\,\frac{C_{M_\alpha}(0)}{C_{M_\alpha}(x)}
 $$
 
-Code: `packages/core/src/exterior/stability.ts`, `firstLowStability`; the threshold is `minStability`, 1.
+Code: `packages/core/src/exterior/modified.ts`, `gyroscopicStability`, evaluated at the muzzle and at a point.
 
-At 1 the linear-theory criterion ($S_g \gt 1$, below) is lost. The slowdown lowers the factor through the velocity term, and the drag rise at Mach 1 is where the bullet slows fastest, so the flagged range usually lies in the transonic range or beyond.
+Miller's rule with the speed and the air of a point behaves the other way: its speed term is $v^{1/3}$, a fit to the muzzle velocity at one twist, where the initial spin is proportional to the muzzle velocity. Along a flight the spin is not proportional to the speed, so the term has no meaning there, and its value falls with the speed while the factor of linear theory rises. For ordinary rifle loads that start above 1 at the muzzle this value fell below 1 late in a long flight, which the factor of linear theory does not do at a constant moment slope. The numbers are in [Along-path stability warning](../research/along-path-stability-warning.md).
+
+A bullet can lose stability in flight where the moment slope rises toward Mach 1, or from a low initial spin. Both need aerodynamic coefficients that Miller's inputs do not carry. Near Mach 1 the app gives no stability warning from the path; the result lists the transonic range instead.
 
 ### Dynamic stability
 
@@ -97,6 +99,10 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 | $T_w$ | Twist length per turn | mm | m |
 | $t_c$, $l_c$ | Twist and length in calibres | 1 | 1 |
 | $v_0$ | Muzzle velocity | m/s | m/s |
+| $v$ | Speed at a point of the flight | m/s | m/s |
+| $\omega$, $\omega_0$ | Spin rate along the flight and at the muzzle | no kind | rad/s |
+| $\rho$, $\rho_0$ | Air density at a point and at the firing point | g/cm3 | kg/m3 |
+| $C_{M_\alpha}$ | Overturning-moment slope, positive | 1 | 1/rad |
 | $T$ | Air temperature at the firing point | degC | K |
 | $p$ | Station pressure | bar | Pa |
 | $S_{g,0}$, $S_g$ | Gyroscopic stability factor, before and after the corrections | 1 | 1 |
@@ -115,13 +121,13 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 ## Assumptions
 
 - Miller's rule describes ordinary jacketed rifle bullets.
-- $S_g$ of the trajectory result is evaluated at the muzzle. Along the path Miller's velocity and air terms are applied to the local speed and air, which stands in for the loss of margin as the bullet slows. The overturning moment rise at Mach 1 and the decay of the spin are not modelled.
+- $S_g$ of the trajectory result is evaluated at the muzzle, with the muzzle velocity and the station air. The rise of the overturning moment toward Mach 1 and the decay of the spin are not modelled.
 - Spin drift and jump are corrections outside the integration, from fits to flat-fire rifle trajectories.
 
 ## Limits
 
 - Plastic tips and very long or very short bullets lie outside Miller's fit.
-- The flagged range is the first computed point below the threshold, so it is as fine as the requested ranges.
+- The result has no stability warning along the flight.
 - $S_g \lt 1$ predicts a tumbling bullet. The trajectory is still computed, and the caller shows the value.
 - The point mass cannot detect a dynamically unstable bullet. Dynamic stability needs the aerodynamic coefficients.
 - Steep and very long flights lie outside the spin drift fit.
