@@ -5991,8 +5991,18 @@ main .library-head.page-panel-head > .page-panel-title {
   color: var(--warn-fg);
 }
 
+/* the note of an estimated chamber volume: the info colour, its explanation on the title's help */
+.workbench .run-line > .volume-note {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--info-fg);
+  white-space: nowrap;
+}
+
 @media print {
-  .workbench .run-line > :is(.notice-text, .warnings-slot) {
+  .workbench .run-line > :is(.notice-text, .volume-note, .warnings-slot) {
     display: none;
   }
 }

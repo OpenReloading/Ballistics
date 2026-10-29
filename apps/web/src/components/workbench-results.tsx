@@ -2,7 +2,7 @@
 
 import { Button, Menu, Tabs, Textarea } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { CaretDown } from '@phosphor-icons/react'
+import { CaretDown, Info } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -14,6 +14,7 @@ import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
+import { Noted } from './field-table.tsx'
 import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
 import { LoadLots, SessionNotes } from './load-notes.tsx'
@@ -21,7 +22,7 @@ import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PowderCompare } from './powder-compare.tsx'
 import { chartCopy } from './print-report.tsx'
-import { ErrorNote, Loading, Message as Note } from './states.tsx'
+import { ErrorNote, Loading } from './states.tsx'
 import { TrajectoryForm } from './trajectory-form.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
@@ -341,7 +342,10 @@ function CopyCsvButton({
   )
 }
 
-/** One line: the load, the notice and the warnings with their popover in a slot of fixed width. */
+/**
+ * One line: the load, the notice, the volume note of an estimated chamber volume and the warnings
+ * with their popover in a slot of fixed width.
+ */
 function RunLine({
   ok,
   identity,
@@ -379,6 +383,14 @@ function RunLine({
         <NavIcon name="safety" size={14} />
         {t('Simulation, not load data')}
       </span>
+      {/* in the line, so the results keep their height; what to enter is its help. The print
+          report's sub line has the note */}
+      {ok && !ok.volumeMeasured && (
+        <span className="volume-note screen-only">
+          <Info size={14} aria-hidden="true" />
+          <Noted value={t(volumeNote.title)} notes={[t(volumeNote.text)]} />
+        </span>
+      )}
       <span className="warnings-slot screen-only">
         {ok && warnings && (
           <WarningsBlock
@@ -473,7 +485,7 @@ function ResultsHead({
   )
 }
 
-/** What the run took from the user's designs instead of a catalogue record, and the volume note. */
+/** What the run took from the user's designs instead of a catalogue record. */
 function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined }) {
   const { t } = useTranslation()
   return (
@@ -498,11 +510,6 @@ function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined 
             name: ok.design,
           })}
         </p>
-      )}
-      {ok && !ok.volumeMeasured && (
-        <Note severity="info" title={t(volumeNote.title)} compact>
-          {t(volumeNote.text)}
-        </Note>
       )}
     </>
   )
