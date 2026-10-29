@@ -62,6 +62,51 @@ describe('freeRecoil', () => {
     expect(r.energy / 1.3558179483).toBeCloseTo(30.168, 3)
   })
 
+  it('energy spread of other gas factor forms over ten typical loads', () => {
+    // Projectile g, charge g, muzzle velocity m/s, typical gas outflow speed m/s. The ranges are
+    // those of the research log entry free-recoil-gas-factor.md, in percent of today's energy.
+    const loads = {
+      pistol: [
+        [8.0, 0.35, 360, 600],
+        [14.9, 0.36, 260, 550],
+        [10.2, 0.25, 270, 500],
+        [10.2, 1.0, 430, 650],
+        [15.6, 1.4, 420, 650],
+      ],
+      rifle: [
+        [3.6, 1.6, 990, 1000],
+        [9.0, 2.7, 820, 950],
+        [9.7, 2.6, 800, 900],
+        [11.7, 3.4, 820, 950],
+        [11.7, 4.5, 900, 1050],
+      ],
+    } as const
+    const energy = (mp: number, mc: number, v: number, f: number) =>
+      freeRecoil({
+        firearmMass: 1,
+        projectileMass: mp / 1000,
+        chargeMass: mc / 1000,
+        muzzleVelocity: v,
+        gasFactor: f,
+      }).energy
+    const spread = (kind: keyof typeof loads, form: (v: number, va: number) => number) => {
+      const d = loads[kind].map(
+        ([mp, mc, v, va]) =>
+          100 * (energy(mp, mc, v, form(v, va)) / energy(mp, mc, v, gasVelocityFactor[kind]) - 1),
+      )
+      return [Math.min(...d), Math.max(...d)].map((x) => Math.round(10 * x) / 10)
+    }
+    const constantSpeed = (v: number) => 1250 / v
+    const increment = (v: number) => 0.5 + 1250 / v
+    const outflow = (v: number, va: number) => 0.5 + va / v
+    expect(spread('pistol', constantSpeed)).toEqual([15.3, 25.5])
+    expect(spread('rifle', constantSpeed)).toEqual([-22.9, -6.7])
+    expect(spread('pistol', increment)).toEqual([17.9, 35.3])
+    expect(spread('rifle', increment)).toEqual([0.6, 11.7])
+    expect(spread('pistol', outflow)).toEqual([4.1, 8.9])
+    expect(spread('rifle', outflow)).toEqual([-11.6, -3.5])
+  })
+
   it('rejects values outside the model', () => {
     const ok = {
       firearmMass: 4,
