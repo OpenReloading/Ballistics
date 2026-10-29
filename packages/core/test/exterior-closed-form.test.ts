@@ -233,6 +233,47 @@ describe('linear-theory stability', () => {
     expect(isStable(1.7035, sd)).toBe(false)
   })
 
+  describe('damping exponents of the 168 gr case from the characteristic equation', () => {
+    // 168 gr, 0.308 in, sea-level density; per calibre of travel, xi'' + (H - iP) xi' - (M + iPT) xi = 0
+    const mass = 168 * 6.479891e-5
+    const d = 0.308 * 0.0254
+    const c = (1.225 * (Math.PI / 4) * d ** 3) / (2 * mass)
+    const [cla, cd, cma, cmpa, cmq, kx, ky] = [2.75, 0.331, 2.63, -0.22, -8.2, 9.224, 1.238]
+    const m = ky * c * cma
+    const h = c * (cla - cd - ky * cmq)
+    const t = c * (cla + kx * cmpa)
+    const sd = (2 * t) / h
+    /** Damping exponents (real parts of the roots), the fast mode (larger turning rate) first. */
+    const roots = (sg: number) => {
+      const p = 2 * Math.sqrt(sg * m)
+      const x = h ** 2 - p ** 2 + 4 * m
+      const y = 4 * p * t - 2 * h * p
+      const r = Math.hypot(x, y)
+      const re = Math.sqrt((r + x) / 2)
+      const im = Math.sign(y) * Math.sqrt((r - x) / 2)
+      return im > 0 ? [(-h + re) / 2, (-h - re) / 2] : [(-h - re) / 2, (-h + re) / 2]
+    }
+
+    it('gives -3.16e-4 for the fast and +5.0e-5 for the slow mode', () => {
+      const fast = nth(roots(1.7035), 0)
+      const slow = nth(roots(1.7035), 1)
+      expect(fast / -3.16e-4).toBeCloseTo(1, 2)
+      expect(slow / 5.0e-5).toBeCloseTo(1, 2)
+      // the linear-theory form -(H -+ P (2T - H) / (phi_f - phi_s)) / 2 drops terms of order H^2 / P^2
+      const p = 2 * Math.sqrt(1.7035 * m)
+      const split = Math.sqrt(p ** 2 - 4 * m)
+      expect(Math.abs(-(h - (p * (2 * t - h)) / split) / 2 / fast - 1)).toBeLessThan(1e-3)
+      expect(Math.abs(-(h + (p * (2 * t - h)) / split) / 2 / slow - 1)).toBeLessThan(1e-3)
+    })
+
+    it('agrees with isStable: both modes damp exactly when the criterion holds', () => {
+      for (const sg of [1.2, 1.7035, 3, 4.5, 4.8, 6, 20]) {
+        const damped = roots(sg).every((damping) => damping < 0)
+        expect(isStable(sg, sd)).toBe(damped)
+      }
+    })
+  })
+
   describe('yaw modes of the rifle-scale case', () => {
     // 11.34 g, 7.82 mm, Ix 7.2e-8, Iy 6.8e-7 kg m2, CMa 3.0, 1.225 kg/m3, 790 m/s, 254 mm twist
     const d = 0.00782
