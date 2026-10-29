@@ -80,6 +80,19 @@ Severity: blocker is a failure of a Level A criterion in the gated scope. Major 
 
 The random sample (106 pages, 424 states) found one failure type that the structured sample did not show, A-13, and repeated A-04 on titles. It found no horizontal scrolling and no other axe violation. The "needs review" results of the random pages are text inside drawings and charts, which the sweep lists as reviewed, and the small symbol buttons of the dimensions table, fixed with A-13.
 
+## Candidate failures
+
+Six candidates found by reading the code before the audit, each checked in Chromium before any change.
+
+| Candidate | Criterion | Verdict | Evidence and test |
+|---|---|---|---|
+| Single-character shortcuts (`/`, `?`) that cannot be turned off | 2.1.4 Character Key Shortcuts (A) | Confirmed, fixed | `/` focused the list search and `?` opened the shortcut list with no way to turn them off. Settings, General now has a "Single-key shortcuts" choice; off, the keys do nothing and the Ctrl or Cmd shortcuts stay. `settings-dialog.spec.ts`, `apps/web/test/single-keys.test.ts` |
+| 16 px tick boxes in Database list rows | 2.5.8 Target Size (Minimum) (AA) | Confirmed, fixed | A 24 px circle around the 16 px box reached the row's name link (measured with `elementFromPoint` on a 12 px radius), so the spacing exception did not hold. The boxes and value notes are 24 px. `cartridges.spec.ts` |
+| Chart tooltip that cannot be dismissed without moving | 1.4.13 Content on Hover or Focus (AA) | Confirmed, fixed | The interior chart's tooltip stayed after Escape, with the pointer on the curve and with the focus on the readout slider. Escape hides it. `workbench-playback.spec.ts`; other tooltips: A-05, `tooltip-hover.spec.ts` |
+| Focusable canvas named only by a label | 4.1.2 Name, Role, Value (A) | Confirmed, fixed | The photo tool's canvas was role `Canvas`, focusable, with its key instructions as its name. It is an application named "Photograph of the bullet" with its keys as the description. `bullet-photo.spec.ts` |
+| Drag-only paths in the photo tool and the target sheet | 2.5.7 Dragging Movements (AA) | One gap confirmed, fixed | Photo tool: scale points and brush discs are set by single clicks and by keys. Target sheet: shots move with Alt and the arrow keys, the aim is set by one click or typed; panning a zoomed view was drag only. The sheet is now a tab stop whose arrow keys pan, and a double click zooms in. `groups-face.spec.ts` |
+| States the sweep never rendered | all rules of the sweep | Confirmed, covered | The sweep saw the pages as they load only. `a11y-states.spec.ts` now sweeps one record per record kind, the workbench after a run, the open dialogs and drawers, the bullet list with ticked rows, the session summary with its example and the shot groups with shots, at 320, 390 and 1280 px, light and dark |
+
 ## Results of the automated runs
 
 | Run | Result |
