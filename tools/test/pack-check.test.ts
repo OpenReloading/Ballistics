@@ -121,3 +121,26 @@ it('fails on a bare import that the manifest does not declare', () => {
   )
   expect(packProblems(dir)).toHaveLength(2)
 })
+
+it('reads a specifier after spaces and one parenthesis', () => {
+  const dir = pkg(manifest, {
+    'dist/index.js': [
+      "const f = require ( 'f' )",
+      "const g = import(\n  'g')",
+      'export { h } from  "h"',
+      "const i = require  ('i')",
+      'import"j"',
+      "const k = require (( 'k')",
+    ].join('\n'),
+    'dist/index.d.ts': '',
+  })
+  const problems = packProblems(dir)
+  expect(problems).toEqual(
+    expect.arrayContaining(
+      ['f', 'g', 'h', 'i', 'j'].map(
+        (name) => `dist/index.js imports ${name}, which is not in dependencies or peerDependencies`,
+      ),
+    ),
+  )
+  expect(problems).toHaveLength(5)
+})
