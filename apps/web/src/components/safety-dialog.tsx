@@ -160,7 +160,6 @@ export function SafetyBarButton({
       variant="light"
       leftSection={icon}
       className="page-bar-safety safety-light screen-only"
-      aria-label={t('Safety notice')}
       onClick={openSafety}
     >
       {t('Safety')}
