@@ -150,12 +150,18 @@ export function handLoad(fit: PowderHandRequest['fit'], values: readonly number[
   return l
 }
 
+/**
+ * Output step of the hand-tuned runs, s: 10 times the default, which moves the muzzle velocity by
+ * less than 1e-6 m/s and runs about 6 times faster, so the curve follows a slider on a slow device.
+ */
+const handOutputStep = 2e-5
+
 /** The muzzle velocity of the hand-tuned load at each charge of `q`; a charge that does not run is left out. */
 export function handCurve(q: Omit<PowderHandRequest, 'kind' | 'id'>): HandPoint[] {
   const load = handLoad(q.fit, q.values)
   return q.charges.flatMap((charge) => {
     try {
-      const r = interior({ ...load, charge })
+      const r = interior({ ...load, charge }, { outputStep: handOutputStep })
       return r.valid ? [{ charge, velocity: r.muzzleVelocity }] : []
     } catch (err) {
       if (err instanceof InputError) return []

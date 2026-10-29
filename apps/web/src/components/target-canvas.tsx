@@ -763,7 +763,11 @@ export function TargetCanvas({
       return
     }
     if (e.pointerType === 'touch') tap.current = e.pointerId
-    else place(toPoint(e))
+    else {
+      // no mousedown follows: a popover the placed point opens again does not take it as a click outside
+      e.preventDefault()
+      place(toPoint(e))
+    }
   }
 
   const onPointerMove = (e: PointerEvent<SVGSVGElement>) => {

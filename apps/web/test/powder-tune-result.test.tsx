@@ -115,7 +115,7 @@ describe('hand tuning', () => {
   if (!p || !u) throw new Error('no fitted vivacity')
   const charges = fitted.band.map((b) => b.charge)
 
-  it('runs interior on the fitted load at the slider values', () => {
+  it('runs interior on the fitted load at the slider values, within 1e-6 m/s of the default output step', () => {
     const vivacity = p.value + 1.5 * u
     const curve = handCurve({ fit: fitted.fit, values: [vivacity], charges })
     expect(curve.length).toBeGreaterThan(charges.length / 2)
@@ -129,7 +129,7 @@ describe('hand tuning', () => {
         propellant: { ...fl.propellant, burn: { ...burn, vivacity } },
       })
       if (!r.valid) throw new Error(r.reason)
-      expect(velocity).toBe(r.muzzleVelocity)
+      expect(Math.abs(velocity - r.muzzleVelocity)).toBeLessThan(1e-6)
     }
   })
 
