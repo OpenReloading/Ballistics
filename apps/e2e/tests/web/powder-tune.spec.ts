@@ -35,6 +35,11 @@ test('the Measurements tab opens the route with the load strings, and an added s
     .locator('input[type="file"]#measurements-file')
     .setInputFiles({ name: 'day1.csv', mimeType: 'text/csv', buffer: Buffer.from(file) })
   await page.getByRole('link', { name: 'Fit a powder from these strings' }).click()
+  // the example load is unsaved work: the page asks before it is left
+  await page
+    .getByRole('dialog', { name: /^Leave this page\?/ })
+    .getByRole('button', { name: 'Leave', exact: true })
+    .click()
   await expect(page).toHaveURL(/\/powders\/tune\/?\?session=/)
 
   const rows = table(page).locator('tbody tr')
@@ -102,6 +107,11 @@ const redrawTimes = (page: Page, moves: number) =>
 test('the Measurements link of a saved load fits the powder on the load the workbench runs, and its sliders tune it by hand', async ({
   page,
 }) => {
+  // a native picker cannot be driven: the file goes to the origin private file system
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
   await page.goto('/workbench')
   await applyExampleLoad(page)
   await runLine(page)
@@ -220,6 +230,7 @@ test('a load on a refitted powder says a newer fit exists and moves to it', asyn
   const note = page.getByText('A newer fit of this powder exists.')
   await expect(note).toBeVisible()
   await page.getByRole('button', { name: 'Use the refit' }).click()
-  await expect(search).toHaveValue('DP40 (fit 2) (your design)')
+  // the card head shows the chosen record as the search field's placeholder
+  await expect(search).toHaveAttribute('placeholder', 'DP40 (fit 2) (your design)')
   await expect(note).toHaveCount(0)
 })
