@@ -13,6 +13,8 @@ node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
 ```
 
+`--help` (or `-h`), alone or after a command, prints the usage and the options and exits 0.
+
 Real rows and real records are passed by path and are never committed. The repository holds no rows; its tests build a small synthetic set from the model itself, with errors known by construction.
 
 ## Rows

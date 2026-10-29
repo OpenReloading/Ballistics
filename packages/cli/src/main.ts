@@ -1,4 +1,4 @@
-import { parseArgs } from 'node:util'
+import { type ParseArgsConfig, parseArgs } from 'node:util'
 import { compare, type Options, verify } from './commands.ts'
 import { Refusal, UsageError } from './errors.ts'
 import { type Grouping, groupings } from './metrics.ts'
@@ -16,6 +16,7 @@ export interface Io {
 const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
+  ballistics --help
 
 options:
   --rows <path>      a rows file or a folder of .csv files (default: BALLISTICS_ROWS)
@@ -27,8 +28,21 @@ options:
                      verify: add the line of the powder not in the fitted set
   --params records   the powder parameters of the records (the only mode so far)
   --json | --table   output format (default: JSON unless stdout is a terminal)
+  -h, --help         this text
 
 exit codes: 0 done, 1 refused run, 2 bad input`
+
+/** Parses a command line, an unknown or malformed option is bad input with the usage. */
+function parse<T extends ParseArgsConfig>(config: T) {
+  try {
+    return parseArgs(config)
+  } catch (error) {
+    // parseArgs reports an unknown or malformed option as a TypeError with a code
+    if (error instanceof TypeError && 'code' in error)
+      throw new UsageError(`${error.message}\n\n${usage}`)
+    throw error
+  }
+}
 
 /** Refuses an option value that is not one of its choices. */
 function checkChoices(
@@ -54,7 +68,7 @@ function optionsOf(
   env: NodeJS.ProcessEnv,
   warn: Io['stderr'],
 ) {
-  const { values } = parseArgs({
+  const { values } = parse({
     args,
     strict: true,
     options: {
@@ -117,8 +131,15 @@ async function execute(
 /** Runs the command line `argv` (without the program), writes the result and returns the exit code. */
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
   const [command = '', ...args] = argv
+  if (argv.includes('--help') || argv.includes('-h')) {
+    io.stdout(`${usage}\n`)
+    return 0
+  }
   try {
-    if (command !== 'verify' && command !== 'compare') throw new UsageError(usage)
+    if (command !== 'verify' && command !== 'compare') {
+      parse({ args: argv, strict: true, allowPositionals: true, options: {} })
+      throw new UsageError(usage)
+    }
     io.stdout(`${await execute(command, args, env, io)}\n`)
     return 0
   } catch (error) {
@@ -126,8 +147,7 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
       io.stderr(`refused: ${error.message}\n`)
       return 1
     }
-    // parseArgs reports an unknown or malformed option as a TypeError with a code
-    if (error instanceof UsageError || (error instanceof TypeError && 'code' in error)) {
+    if (error instanceof UsageError) {
       io.stderr(`${error.message}\n`)
       return 2
     }

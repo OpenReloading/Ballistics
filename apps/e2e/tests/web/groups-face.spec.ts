@@ -150,8 +150,11 @@ for (const response of ['success', 'failure'] as const) {
       if (response === 'failure') await route.fulfill({ status: 503, body: '{}' })
       else await route.continue()
     })
-    // the face search starts on the photo added
-    await load(page, await facePng(page, 'issf-10m-air-pistol', []))
+    // the page asks for every face on load, the face search on the photo added waits for the same held request
+    const sent = page.waitForRequest((r) => r.url().endsWith(path))
+    const png = await facePng(page, 'issf-10m-air-pistol', [])
+    await load(page, png)
+    await sent
     await page.getByRole('button', { name: /^Cancel \(/ }).click()
     let workers = 0
     page.on('worker', () => {
@@ -160,11 +163,9 @@ for (const response of ['success', 'failure'] as const) {
     const finished = page.waitForResponse((r) => r.url().endsWith(path))
     release()
     await (await finished).finished()
-    // The response has reached the browser before checking for delayed UI changes.
-    await page.waitForTimeout(1000)
-    expect(workers).toBe(0)
     await expect(page.locator('.target-status')).toHaveText('Detection cancelled.')
     await expect(scoreFace(page)).toHaveValue('')
+    expect(workers).toBe(0)
   })
 }
 

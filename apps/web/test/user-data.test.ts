@@ -469,6 +469,12 @@ describe('share links', () => {
     expect(maxLinkChars).toBe(8000)
   })
 
+  it('refuses a record whose compressed text is over 200 kB without building the link', async () => {
+    const noise = Array.from({ length: 400000 }, () => Math.random().toString(36)[2]).join('')
+    const big = { ...load, data: { ...load.data, notes: noise } } as UserRecord
+    await expect(shareLink([big], base)).resolves.toBeUndefined()
+  })
+
   it('names the file route for a powder too long for a link, its fit kept whole', async () => {
     const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')
     const big = { ...powder, name: noise } as UserRecord

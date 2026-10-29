@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import de from '../src/i18n/de.json'
 import { chooseLanguage, startLanguage } from '../src/i18n/language.ts'
 import { msg, translator } from '../src/i18n/translate.ts'
@@ -87,17 +87,22 @@ describe('language setting', () => {
   const listeners: ((e: { key: string; newValue: string | null }) => void)[] = []
   const doc = { documentElement: { lang: 'en' } }
 
-  vi.stubGlobal('document', doc)
-  vi.stubGlobal('localStorage', {
-    getItem: (k: string) => store.get(k) ?? null,
-    setItem: (k: string, v: string) => store.set(k, v),
-  })
-  vi.stubGlobal('window', {
-    addEventListener: (_: string, f: (typeof listeners)[number]) => listeners.push(f),
-    removeEventListener: () => {},
+  beforeEach(() => {
+    vi.stubGlobal('document', doc)
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => store.set(k, v),
+    })
+    vi.stubGlobal('window', {
+      addEventListener: (_: string, f: (typeof listeners)[number]) => listeners.push(f),
+      removeEventListener: () => {},
+    })
+    listeners.length = 0
+    chooseLanguage('en')
+    store.clear()
   })
 
-  afterEach(() => store.clear())
+  afterEach(() => vi.unstubAllGlobals())
 
   it('stores the choice, loads the catalogue and sets the document language', async () => {
     chooseLanguage('de')

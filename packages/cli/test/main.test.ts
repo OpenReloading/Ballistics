@@ -131,6 +131,28 @@ describe('exit codes', () => {
     expect(stdout).toBe('')
   })
 
+  it.each([[['--help']], [['-h']], [['verify', '--help']], [['compare', ...data, '-h']]])(
+    'is 0 for help, with the usage on stdout: %j',
+    async (args) => {
+      const { code, stdout, stderr } = await cli(args)
+      expect(code).toBe(0)
+      expect(stdout).toMatch(/^usage:/)
+      expect(stderr).toBe('')
+    },
+  )
+
+  it('is 2 with the usage on stderr for no command and for an unknown option', async () => {
+    const none = await cli([])
+    expect(none.code).toBe(2)
+    expect(none.stderr).toMatch(/^usage:/)
+    const unknown = await cli(['verify', '--rows', 'x.csv', '--nope'])
+    expect(unknown.code).toBe(2)
+    expect(unknown.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
+    const top = await cli(['--nope'])
+    expect(top.code).toBe(2)
+    expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
+  })
+
   it('is 2 for a rows file with a bad value, naming line and column', async () => {
     const { writeRows } = await import('./fixture.ts')
     const bad = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-win,b,p,x,800\n')
@@ -168,6 +190,10 @@ describe('a candidate with a velocity that is not a number', () => {
 describe('an unexpected error', () => {
   it.each([
     ['a candidate that throws', new URL('./fixtures/throwing-model.mjs', import.meta.url).pathname],
+    [
+      'a candidate that throws a coded TypeError',
+      new URL('./fixtures/coded-type-error-model.mjs', import.meta.url).pathname,
+    ],
     ['a directory given as the candidate', join(import.meta.dirname, 'fixtures')],
   ])('ends with one line and exit 2: %s', async (_name, model) => {
     const { code, stdout, stderr } = await cli(['verify', ...data, '--model', model])

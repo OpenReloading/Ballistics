@@ -24,6 +24,7 @@ import {
   resolveUnits,
   roundedFieldText,
   twistTyped,
+  typedTwist,
   unitsOf,
 } from '../src/lib/units.ts'
 
@@ -298,6 +299,13 @@ describe('a twist as 1:N', () => {
       '1:8mm',
     ])
       expect(parseTwist(text), text).toBeUndefined()
+  })
+
+  it('rejects a long typed twist that is no number in linear time', () => {
+    const start = performance.now()
+    expect(typedTwist(`1:8${' '.repeat(50_000)}x`)).toBeUndefined()
+    expect(performance.now() - start).toBeLessThan(500)
+    expect(typedTwist(' 1 in 8,5 ')).toBe(' 1 in 8.5')
   })
 
   it('stores a length per turn in SI from the field unit', () => {

@@ -55,13 +55,17 @@ async function settled(dialog: Locator) {
 /** A button of the sidebar from 75em, of the navigation drawer below it. */
 async function fromNav(page: Page, name: string) {
   const burger = page.getByRole('button', { name: 'Navigation', exact: true })
+  const sidebar = page
+    .getByRole('navigation', { name: 'Main' })
+    .getByRole('button', { name, exact: true })
+  await expect(burger.or(sidebar).first()).toBeVisible()
   if (await burger.isVisible()) {
     await burger.click()
     return page
       .getByRole('dialog', { name: 'Navigation' })
       .getByRole('button', { name, exact: true })
   }
-  return page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name, exact: true })
+  return sidebar
 }
 
 async function openSettings(page: Page, tab: string) {
@@ -76,6 +80,7 @@ async function openSettings(page: Page, tab: string) {
 /** The phone layout shows the inputs or the results: the results of a run are on their own tab. */
 async function showResults(page: Page) {
   const tab = page.getByRole('tab', { name: 'Results', exact: true })
+  await expect(tab.or(page.getByRole('region', { name: 'Results' })).first()).toBeVisible()
   if (await tab.isVisible()) await tab.click()
 }
 
@@ -96,8 +101,7 @@ const states: State[] = [
     open: async (page: Page, check: (view: string) => Promise<void>) => {
       await gotoHydrated(page, `/${dir}/${id}`)
       // the record page renders from its data files once they are read
-      await expect(page.locator('#record-sources')).toBeAttached()
-      await page.waitForLoadState('networkidle')
+      await expect(page.locator('#record-sources')).toBeVisible()
       await check('page')
     },
   })),
@@ -115,8 +119,7 @@ const states: State[] = [
         ready === 'tab'
           ? page.getByRole('tab', { name: 'Treibladungspulver' })
           : page.locator('#record-sources'),
-      ).toBeAttached()
-      await page.waitForLoadState('networkidle')
+      ).toBeVisible()
       await check('page')
     },
   })),
@@ -125,16 +128,21 @@ const states: State[] = [
     open: async (page, check) => {
       await runExample(page)
       await showResults(page)
-      await page.waitForLoadState('networkidle')
+      await expect(page.locator('.interior-chart .echart [role="img"]')).toBeVisible()
       await check('chart')
       for (const tab of ['Ladder table', 'Notes']) {
         // below 62em the tabs that do not fit are in the More menu
         const direct = page.getByRole('tab', { name: tab, exact: true })
+        const more = page.getByRole('button', { name: 'More', exact: true })
+        await expect(direct.or(more).first()).toBeVisible()
         if (await direct.isVisible()) await direct.click()
         else {
-          await page.getByRole('button', { name: 'More', exact: true }).click()
+          await more.click()
           await page.getByRole('menuitem', { name: tab }).click()
         }
+        // axe reads the panel shown and the menu gone, not a fading menu over the old panel
+        await expect(page.getByRole('tabpanel', { name: tab })).toBeVisible()
+        await expect(page.getByRole('menu')).toBeHidden()
         await check(tab)
       }
     },
@@ -290,9 +298,15 @@ for (const width of [320, 390]) {
     await page.setViewportSize({ width, height })
     await gotoHydrated(page, '/workbench')
     await page.getByRole('button', { name: 'Page actions' }).click()
-    const box = await page.locator('.page-bar-actions').boundingBox()
-    expect(box?.x).toBeGreaterThanOrEqual(0)
-    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(width)
+    const panel = page.locator('.page-bar-actions')
+    await expect(panel).toBeVisible()
+    await expect.poll(async () => (await panel.boundingBox())?.x).toBeGreaterThanOrEqual(0)
+    await expect
+      .poll(async () => {
+        const box = await panel.boundingBox()
+        return (box?.x ?? 0) + (box?.width ?? 0)
+      })
+      .toBeLessThanOrEqual(width)
   })
 }
 
@@ -305,11 +319,16 @@ test('the Page actions panel is inside the window at 320 px with 200 % text', as
   })
   await page.getByRole('button', { name: 'Page actions' }).click()
   const panel = page.locator('.page-bar-actions')
-  const box = await panel.boundingBox()
-  expect(box?.x).toBeGreaterThanOrEqual(0)
-  expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(320)
+  await expect(panel).toBeVisible()
+  await expect.poll(async () => (await panel.boundingBox())?.x).toBeGreaterThanOrEqual(0)
+  await expect
+    .poll(async () => {
+      const box = await panel.boundingBox()
+      return (box?.x ?? 0) + (box?.width ?? 0)
+    })
+    .toBeLessThanOrEqual(320)
   // no row reaches past the panel's edge
-  expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+  await expect.poll(() => panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
 })
 
 // WCAG 2.5.8: the note buttons of a case length variants matrix (a cartridge whose values have notes)
