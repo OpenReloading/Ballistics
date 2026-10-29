@@ -1,6 +1,14 @@
 {
   "name": "@open-reloading/core",
   "version": "0.0.3",
+  "description": "Interior and exterior ballistics models, group statistics and solvers as pure functions.",
+  "keywords": [
+    "reloading",
+    "ballistics",
+    "interior-ballistics",
+    "exterior-ballistics",
+    "trajectory"
+  ],
   "license": "MIT",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/core/",
   "repository": {
@@ -12,6 +20,9 @@
     "access": "public"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "sideEffects": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

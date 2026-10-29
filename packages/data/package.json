@@ -1,6 +1,14 @@
 {
   "name": "@open-reloading/data",
   "version": "0.0.4",
+  "description": "OpenReloading catalogue records as one JSON bundle, their reader and plausibility checks.",
+  "keywords": [
+    "reloading",
+    "ballistics",
+    "cartridge",
+    "bullet",
+    "powder"
+  ],
   "license": "MIT AND CC-BY-4.0",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/data/",
   "repository": {
@@ -12,6 +20,9 @@
     "access": "public"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
