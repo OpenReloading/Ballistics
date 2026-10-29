@@ -154,6 +154,26 @@ describe('parseShotView', () => {
     expect(r.warnings).toEqual([])
   })
 
+  it('reads a file without a name line or with an unclosed quote at its end', () => {
+    const headerFirst = shotViewEnglish.split('\n').slice(1).join('\n')
+    const r = parseShotView(headerFirst)
+    expect(r.stringLabels).toEqual([undefined])
+    expect(r.session.strings[0]?.shots).toHaveLength(3)
+    const unclosed = parseShotView(`${shotViewEnglish}\n"open note,\nlast line`)
+    expect(unclosed.session.strings[0]?.shots).toHaveLength(3)
+    expect(unclosed.warnings).toEqual([])
+  })
+
+  it('warns about a footer statistics row with the label only', () => {
+    const r = parseShotView(shotViewEnglish.replace('STD DEV,6.3,,,,,,,', 'STD DEV'))
+    expect(r.warnings).toEqual(['footer STD DEV "" is not a number; not checked'])
+  })
+
+  it('refuses a shot row without a velocity cell', () => {
+    const text = shotViewEnglish.replace('-,,,,,,', '4\n-,,,,,,')
+    expect(() => parseShotView(text)).toThrow('velocity "" is not a number')
+  })
+
   it('reads lone CR line ends', () => {
     const r = parseShotView(shotViewEnglish.replaceAll('\n', '\r'))
     expect(r.session.strings[0]?.shots).toHaveLength(3)
