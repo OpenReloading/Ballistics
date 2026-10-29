@@ -143,7 +143,7 @@ describe('caliberClassesOf', () => {
 
   it('fails when the face list cannot be read', async () => {
     api.faces.status = 503
-    await expect(caliberClassesOf({ id: 'pistol-25m' })).rejects.toThrow('The API answered 503.')
+    await expect(caliberClassesOf({ id: 'pistol-25m' })).rejects.toThrow('Error 503.')
     api.faces.status = 200
   })
 })
