@@ -663,3 +663,55 @@ describe('Student t two-sided quantile', () => {
     expect(() => studentTwoSidedQuantile(0.9, 0)).toThrow(InputError)
   })
 })
+
+describe('circular against elliptical CEP by axis ratio', () => {
+  // four shots (+-1, 0), (0, +-q): uncorrelated axes, minor over major standard deviation q
+  const cepsOf = (q: number) => {
+    const s = groupStatistics({
+      shots: [
+        { x: 1, y: 0 },
+        { x: -1, y: 0 },
+        { x: 0, y: q },
+        { x: 0, y: -q },
+      ],
+      distance: 100,
+    })
+    const major = Math.sqrt(2 / 3)
+    return { circular: (s.cep as number) / major, elliptical: (s.cepElliptical as number) / major }
+  }
+  // share of the population inside radius r (in major standard deviations), midpoint rule
+  const inside = (r: number, q: number) => {
+    const n = 20000
+    let sum = 0
+    for (let i = 0; i < n; i++) {
+      const phi = ((i + 0.5) * Math.PI) / (2 * n)
+      sum += Math.exp((-r * r) / (2 * (Math.cos(phi) ** 2 + q * q * Math.sin(phi) ** 2)))
+    }
+    return 1 - sum / n
+  }
+
+  for (const [ratio, over, share] of [
+    [1, 1, 0.5],
+    [1.5, 1.02577, 0.51725],
+    [2, 1.0694, 0.5432],
+    [3, 1.14228, 0.57516],
+    [5, 1.20286, 0.58992],
+    [10, 1.22687, 0.59382],
+  ] as const) {
+    it(`axis ratio ${ratio}: circular over elliptical ${over}, ${share} inside the circular`, () => {
+      const { circular, elliptical } = cepsOf(1 / ratio)
+      close(circular / elliptical, over, 1e-5)
+      close(inside(circular, 1 / ratio), share, 1e-4)
+      close(inside(elliptical, 1 / ratio), 0.5, 1e-6)
+    })
+  }
+
+  it('one axis only: the ratio of the circular CEP to the median of |z|', () => {
+    // circular sqrt(ln 2) sigma, elliptical the 0.75 quantile of the standard normal
+    const { circular, elliptical } = cepsOf(0)
+    close(circular, Math.sqrt(Math.log(2)), 1e-12)
+    close(elliptical, 0.6744897501960817, 1e-6)
+    close(circular / elliptical, 1.23435, 1e-5)
+    close(inside(circular, 0), 0.5949, 1e-4)
+  })
+})
