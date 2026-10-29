@@ -45,18 +45,21 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   let row: string[] = []
   let cell = ''
   let cells = 0
+  let droppedFilled = false
   let i = 0
   const endCell = () => {
     if (row.length <= maxColumn) row.push(cell)
+    else if (cell.trim() !== '') droppedFilled = true
     cell = ''
   }
   const endRow = () => {
     endCell()
-    if (!isBlank(row)) {
+    if (droppedFilled || !isBlank(row)) {
       rows.push(row)
       cells += row.length
     }
     row = []
+    droppedFilled = false
   }
   while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)

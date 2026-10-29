@@ -543,6 +543,10 @@ describe('readTable', () => {
     expect(tableOfRows(tall)).toEqual({
       refusal: 'The table has more than 1000000 cells. Split it into smaller files.',
     })
+    expect(readTable(`a,b\n1,2\n${','.repeat(257)}x`)).toEqual({
+      refusal:
+        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+    })
     expect(readTable('1,2\n'.repeat(5_000_000))).toEqual({
       refusal: 'The table has more than 1000000 cells. Split it into smaller files.',
     })
