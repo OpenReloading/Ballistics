@@ -157,6 +157,48 @@ describe('parsePressureHistory', () => {
     expect(t.pressureBar).toEqual([12.5, 30, 20])
   })
 
+  it('reads a unit as the last word, in leading or spaced brackets, with a micro sign and in lower case', () => {
+    const o = { sensor: 'breech' } as const
+    const units = (header: string) => parsePressureHistory(`${header}\n0;1\n1;2\n2;3\n`, o).units
+    expect(units('time ms;peak pressure MPa')).toEqual({
+      time: { unit: 'ms', source: 'file' },
+      pressure: { unit: 'MPa', source: 'file' },
+    })
+    expect(units('[ms];p [] mpa').pressure.unit).toBe('MPa')
+    expect(units('t (ms);p [] [mpa]').pressure.unit).toBe('MPa')
+    expect(units('t][ms];p ( kPa )').time.unit).toBe('ms')
+    expect(units('t (\u00b5s);p (bar)').time.unit).toBe('us')
+    expect(units('t (\u03bcs);p (bar)').time.unit).toBe('us')
+  })
+
+  it('reads signed numbers and a fraction without a leading digit, rejects a number with a tail', () => {
+    const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
+    expect(parsePressureHistory('-0;+1\n.25;2\n1;3\n', o).pressureBar).toEqual([1, 2, 3])
+    expect(() => parsePressureHistory('0;1\n1;2x\n2;3\n', o)).toThrow(
+      'line 2: time or pressure is not a number',
+    )
+  })
+
+  it('skips a line of only white space', () => {
+    const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
+    expect(parsePressureHistory('0;1\n  \n1;2\n2;3\n', o).time).toEqual([0, 1, 2])
+  })
+
+  it('gives a spike the peak of a one-pole filter run forwards and backwards', () => {
+    const cutoff = 1e4
+    const dt = 1e-5
+    const rows = Array.from({ length: 41 }, (_, i) => `${i * dt};${i === 10 ? 1000 : 0}`).join('\n')
+    const t = parsePressureHistory(rows, {
+      sensor: 'breech',
+      timeUnit: 's',
+      pressureUnit: 'bar',
+      lowPass: { cutoff },
+    })
+    // gain a per pass; the backward pass sums the forward decay (1 - a)^k twice
+    const a = dt / (dt + 1 / (2 * Math.PI * cutoff))
+    expect(t.pressureBar[10]).toBeCloseTo((1000 * a) / (2 - a), 6)
+  })
+
   it('rejects a reading that is not finite, also after the unit factor', () => {
     const o = { sensor: 'breech', timeUnit: 's', pressureUnit: 'bar' } as const
     expect(() => parsePressureHistory('0;1\n1;1e309\n2;3\n', o)).toThrow(
