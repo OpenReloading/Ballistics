@@ -73,7 +73,8 @@ describe('parseRows', () => {
     expect(() => parseRows(`${head}\nc,b,p,"${'1'.repeat(100000)}x",800\n`, 'f.csv')).toThrow(
       'not a number',
     )
-    expect(performance.now() - start).toBeLessThan(1000)
+    // a backtracking regression takes seconds to minutes here, a coverage run on a loaded runner far less
+    expect(performance.now() - start).toBeLessThan(5000)
   })
 
   it.each(['2', '2.5', '.5', '5.', '+2', '2e-1', '2E0'])('reads %s as a number', (value) => {

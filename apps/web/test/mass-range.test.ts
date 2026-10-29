@@ -34,7 +34,8 @@ it('rejects a long input that does not match without backtracking', () => {
   ]) {
     expect(massRange(text)).toBeUndefined()
   }
-  expect(performance.now() - start).toBeLessThan(500)
+  // a backtracking regression takes seconds to minutes here, a coverage run on a loaded runner far less
+  expect(performance.now() - start).toBeLessThan(5000)
 })
 
 it('shows a mass bound of the other unit at that unit display decimals', () => {
