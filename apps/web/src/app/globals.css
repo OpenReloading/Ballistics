@@ -5264,8 +5264,27 @@ main .library-head.page-panel-head > .page-panel-title {
     order: 0;
   }
 
+  /* the powder search keeps room for a name beside its lot; a long title ends in an ellipsis
+     instead, its full text still the heading's name */
   .workbench .panel-head > .lot-field {
+    flex-basis: 4.5rem;
     order: 0;
+  }
+
+  .workbench .panel-head:has(> .lot-field) > svg {
+    flex-shrink: 0;
+  }
+
+  .workbench .panel-head:has(> .lot-field) > .search {
+    min-width: 6rem;
+  }
+
+  .workbench .panel-head:has(> .lot-field) > .panel-title {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .workbench .panel-head .mantine-Input-wrapper {
