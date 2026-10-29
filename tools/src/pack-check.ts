@@ -30,7 +30,7 @@ interface Manifest {
 const alwaysPacked = /^(package\.json|(readme|license|licence|changelog)([.-][^/]*)?)$/i
 const code = /\.(?:[cm]?js|d\.[cm]?ts)$/
 /** The specifier of a static or dynamic `import`, an `export ... from` or a `require` (not text such as `from "${x}"`). */
-const specifier = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*(['"])([^'"\s${}]+)\1/g
+const specifier = /(?:\bfrom|\bimport|\brequire)\s*(?:\(\s*)?(['"])([^'"\s${}]+)\1/g
 const testFile = /(?:(?:^|\/)(?:__tests__|test|tests)\/)|(?:\.(?:test|spec)\.[cm]?[jt]sx?$)/
 
 /** Every path named by `exports`, through its conditions and subpaths. */

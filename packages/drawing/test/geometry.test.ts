@@ -11,6 +11,7 @@ import {
 } from '../src/core/geometry.ts'
 import type { PartPoint } from '../src/core/section.ts'
 import type { Label } from '../src/core/types.ts'
+import { closedEdges, pairs, unit } from '../src/core/vector.ts'
 import { defined } from './defined.ts'
 
 const label = (c: PartPoint, dir: PartPoint = [1, 0], w = 4, h = 2): Label => ({
@@ -184,5 +185,23 @@ describe('boxDistance', () => {
     const upright = label([0, 0], [0, 1])
     expect(boxDistance(upright, [0, 3])).toBe(1)
     expect(boxDistance(upright, [2, 0])).toBe(1)
+  })
+})
+
+describe('vector helpers', () => {
+  it('gives the unit vector between two points and +x for coincident ones', () => {
+    expect(unit([1, 1], [4, 5])).toEqual([0.6, 0.8])
+    expect(unit([2, 3], [2, 3])).toEqual([1, 0])
+  })
+
+  it('closes a polygon back to its first point and gives no edges for no points', () => {
+    expect(closedEdges([])).toEqual([])
+    expect(pairs([])).toEqual([])
+    expect(closedEdges([1])).toEqual([[1, 1]])
+    expect(closedEdges([1, 2, 3])).toEqual([
+      [1, 2],
+      [2, 3],
+      [3, 1],
+    ])
   })
 })

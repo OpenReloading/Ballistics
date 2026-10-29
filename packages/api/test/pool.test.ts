@@ -105,5 +105,9 @@ describe('errors across the thread boundary', () => {
     const range = roundTrip(new RangeError('Invalid array length'))
     expect(range).not.toBeInstanceOf(RangeError)
     expect(range.message).toBe('Invalid array length')
+    // a thrown value that is not an Error arrives as an Error with its text
+    const thrown = roundTrip('plain text')
+    expect(thrown).toBeInstanceOf(Error)
+    expect(thrown.message).toBe('plain text')
   })
 })

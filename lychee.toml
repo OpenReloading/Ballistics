@@ -30,4 +30,11 @@ exclude = [
   '^https://www\.guns\.com/terms-and-conditions$',
   '^https://www\.iso\.org/copyright\.html$', # answers 403 to automated clients
   '^https://www\.accurateshooter\.com/\?p=2477$', # a bot filter answers 307 without a target to automated clients
+  # The site root serves the docs of the latest release, and no release has them yet. Drop these at the first release.
+  '^https://openreloading\.github\.io/Ballistics/docs/feedback-tasks/$',
+  '^https://openreloading\.github\.io/Ballistics/docs/libraries/core/$',
+  '^https://openreloading\.github\.io/Ballistics/docs/libraries/data/$',
+  '^https://openreloading\.github\.io/Ballistics/docs/libraries/drawing/$',
+  '^https://openreloading\.github\.io/Ballistics/docs/libraries/importers/$',
+  '^https://openreloading\.github\.io/Ballistics/docs/libraries/schema/$',
 ]
