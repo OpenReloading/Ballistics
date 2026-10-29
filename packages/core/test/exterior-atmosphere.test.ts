@@ -7,6 +7,8 @@ import {
   densityAltitude,
   InputError,
   icao,
+  maxDensity,
+  minAltitude,
   saturationVapourPressure,
   speedOfSound,
   standardAtmosphere,
@@ -88,6 +90,30 @@ describe('limits', () => {
     expect(() => checkAir({ ...ok, pressure: 100 })).toThrow(RangeError)
     expect(() => checkAir({ ...ok, altitude: Number.NaN })).toThrow(RangeError)
     expect(checkAir(ok)).toBe(ok)
+  })
+
+  it('accepts each limit itself', () => {
+    const ok = standardAtmosphere(0)
+    expect(checkAir({ ...ok, altitude: minAltitude }).altitude).toBe(minAltitude)
+    expect(checkAir({ ...ok, humidity: 1 }).humidity).toBe(1)
+    // exactly maxDensity of dry air at 250 K
+    const dense = { ...ok, temperature: 250, pressure: maxDensity * icao.gasConstant * 250 }
+    expect(airDensity(dense)).toBe(maxDensity)
+    expect(checkAir(dense)).toBe(dense)
+  })
+
+  it('names the input that is outside the model', () => {
+    const ok = standardAtmosphere(0)
+    for (const temperature of [0, -10, Number.POSITIVE_INFINITY])
+      expect(() => checkAir({ ...ok, temperature })).toThrow(/^temperature/)
+    expect(() => checkAir({ ...ok, humidity: -0.1 })).toThrow(/^humidity/)
+    expect(() => checkAir({ ...ok, pressure: Number.POSITIVE_INFINITY })).toThrow(
+      /^pressure Infinity Pa$/,
+    )
+    // below the vapour pressure, yet the mixture density is still positive
+    const steam = { ...ok, temperature: 373.15, humidity: 1, pressure: 60000 }
+    expect(airDensity(steam)).toBeGreaterThan(0)
+    expect(() => checkAir(steam)).toThrow(/^pressure 60000 Pa$/)
   })
 })
 
