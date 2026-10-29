@@ -174,6 +174,17 @@ Code: `packages/core/src/interior/load-file.ts`, `overrideResistance`, `checkRes
 
 The resistance law with $\tau_f$, $c$ and $\phi_e$ and the oversize limit of 5 % are choices of the model, not taken from a source.
 
+A resistance term in proportion to the gas pressure raised the training velocity error at every value tried, and a start pressure in proportion to the bearing length raised the held-out error; neither was adopted ([research entry](../research/interior-bore-resistance-pressure-bearing.md)). Sensitivity to doubled resistance on a synthetic 76 mm proxy (guessed resistance values: start pressure 25 MPa, engraving ramp 40 MPa over 25 mm, friction pressure 8 MPa; "engraving" doubles the ramp), change of peak breech pressure and muzzle velocity:
+
+| Doubled | Full charge (312 MPa, 761 m/s) | 75 % charge (178 MPa, 584 m/s) |
+| --- | --- | --- |
+| Engraving | +30.5 %, +47 m/s | +39.0 %, +68 m/s |
+| Friction | +8.2 %, −4 m/s | +10.1 %, −2 m/s |
+| Both | +38.0 %, +36 m/s | +48.2 %, +56 m/s |
+| Measured, doubled resistance, term not stated (unverified) | about +10 %, about +6 m/s | about +30 m/s |
+
+Doubled engraving gives the direction of the measured change (more velocity, most at the reduced charge) but several times its size; doubled friction lowers the velocity slightly. The size depends strongly on the guessed proxy.
+
 ### Bore area
 
 Where a load gives no bore area, the C.I.P. bore area $Q_\text{CIP}$ of the cartridge applies, else the circle of the mean of land diameter $F$ and groove diameter $Z$, else the circle of $F$:
