@@ -29,7 +29,8 @@ export function AppModal({
       <Modal.Overlay />
       <Modal.Content>
         <Modal.Header component="div">
-          <Modal.Title>{title}</Modal.Title>
+          {/* the marker of the accessibility sweep's reviewed list */}
+          <Modal.Title data-testid="dialog-title">{title}</Modal.Title>
           {closeButton && <Modal.CloseButton aria-label={t('Close')} {...closeButton} />}
         </Modal.Header>
         <Modal.Body {...bodyProps}>{children}</Modal.Body>

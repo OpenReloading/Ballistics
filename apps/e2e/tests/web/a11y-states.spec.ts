@@ -86,6 +86,23 @@ async function showResults(page: Page) {
   if (await tab.isVisible()) await tab.click()
 }
 
+/** The Saved loads drawer with the example load saved in it. */
+async function openSavedLoads(page: Page) {
+  // a native picker cannot be driven: a save goes to the browser's records, as the app's own
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+  await runExample(page)
+  await (await barButton(page, 'Save')).click()
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
+  const drawer = await dialogOf('Saved loads')(page)
+  // the saved load is listed once the store has it
+  await expect(drawer.locator('.saved-loads li')).toHaveCount(1)
+  return drawer
+}
+
 type State = {
   name: string
   /** A page that scrolls as a whole, in a window as tall as it is. */
@@ -210,19 +227,34 @@ const states: State[] = [
   {
     name: 'Saved loads',
     open: async (page, check) => {
-      // a native picker cannot be driven: a save goes to the browser's records, as the app's own
+      await openSavedLoads(page)
+      await check('drawer', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Confirm dialog',
+    open: async (page, check) => {
+      const drawer = await openSavedLoads(page)
+      await drawer.getByRole('button', { name: /^Delete / }).click()
+      await settled(page.getByRole('dialog', { name: /^Delete .* from this browser\?/ }))
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Load export dialog',
+    open: async (page, check) => {
+      // the dialog is the way out where the clipboard refuses the text
       await page.addInitScript(() => {
-        ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
-          (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+        Object.defineProperty(navigator, 'clipboard', {
+          value: { writeText: () => Promise.reject(new Error('refused')) },
+        })
       })
       await runExample(page)
-      await (await barButton(page, 'Save')).click()
-      await (await barButton(page, 'Open')).click()
-      await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
-      const drawer = await dialogOf('Saved loads')(page)
-      // the saved load is listed once the store has it
-      await expect(drawer.locator('.saved-loads li')).toHaveCount(1)
-      await check('drawer', '[role="dialog"]')
+      await (await barButton(page, 'Save options')).click()
+      await page.getByRole('menuitem', { name: 'Copy JSON for the API' }).click()
+      const dialog = await dialogOf('Load file for the API: copy it by hand')(page)
+      await expect(dialog.getByRole('textbox')).not.toBeEmpty()
+      await check('dialog', '[role="dialog"]')
     },
   },
   {
