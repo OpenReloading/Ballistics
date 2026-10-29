@@ -37,7 +37,7 @@ Training rows, per powder: distinct loads (cartridge, bullet mass, charge, barre
 | unspecified/unspecified | 38 | 1 / 32 / 293 | 5 | 0 | 2.69 | 1.34 | 0.04 | 3% | 3% | 5% | 13% |
 all: 223 powders, loads 1 / 39 / 299; present (vivacity, energy) 0%, exponent per family (+ vivacity refit) 0%, rich form (vivacity, energy, a, m) 3%, exponential series, 3 terms (+ energy) 9%
 
-Moving variables: no row prints a propellant temperature, so a temperature constant is not identified by these rows. The peak pressure of a powder's rows spans a factor of about 2 to 4 (median per family) and the loading density a factor of 1.2 to 3; the burnt fraction at the muzzle moves by 0.2 for ball and extruded double base powders and barely for the others (most of them burn out). A form constant that acts late in the burn is therefore weakly identified for most powders, whatever the row count. Pressure rows per powder are few outside the ball family.
+Moving variables: no row prints a propellant temperature, so a temperature constant is not identified by these rows. The peak pressure of a powder's rows spans a factor of about 2 to 4 (median per family) and the loading density a factor of 1.2 to 3; the burnt fraction at the muzzle moves by about 0.2 for ball and extruded powders and barely for flake powders and those whose form is not stated (most of them burn out). A form constant that acts late in the burn is therefore weakly identified for most powders, whatever the row count. Pressure rows per powder are few outside the ball family.
 
 ## Candidates on the validation split
 
