@@ -271,6 +271,20 @@ describe('findFace with a known scale', () => {
     expect(ids(findFace(shot, [base, large], undefined, 27))).toEqual(['large'])
   })
 
+  it('measures the holes on the scale of the black area on a tilted photo', () => {
+    const holes = [
+      { x: 12, y: -6, diameter: 9 },
+      { x: -40, y: 30, diameter: 9 },
+      { x: 35, y: 50, diameter: 9 },
+    ]
+    const tilted = { ...sc.camera, tilt: 50, yaw: 0, roll: 20 }
+    const { image: shot } = render({ ...sc, camera: tilted, holes, holeGrey: 150 })
+    expect(ids(findFace(shot, [base, large], undefined, 9))).toEqual([
+      'issf-25m-precision-50m-pistol',
+    ])
+    expect(ids(findFace(shot, [base, large], undefined, 27))).toEqual(['large'])
+  })
+
   it('offers a face that matches the same rings as an equal choice, though its further rings cut its score', () => {
     // the large face has two rings more, which the photo does not show
     const extra = [475, 425].map((d) => ({

@@ -36,7 +36,11 @@ export function findFace(
   // faces of one size: a scale does not tell them apart
   if (hi / lo < 1 + 2 * SCALE_TOLERANCE) return found
   const px = holeSize(image, found.black, lo, hi)
-  const scaled = px ? searchFaces(image, faces, px / hole) : undefined
+  // a fit's px per mm, and so the holes measured, are a mean over the tilt; `scale` runs along the
+  // black area's long axis
+  const fit = nth(found.alike, 0)
+  const toMajor = found.black.semiMajor / (fit.face.blackDiameter.value / 2) / fit.pxPerMm
+  const scaled = px ? searchFaces(image, faces, (px * toMajor) / hole) : undefined
   return scaled?.fits.length ? scaled : found
 }
 
