@@ -1,5 +1,6 @@
 import { checkUserRefs, type UserBullet, type UserRecord, userRecord } from '@open-reloading/schema'
 import { afterEach, expect, it, vi } from 'vitest'
+import { storageName } from '../src/lib/edition.ts'
 import {
   baseChanged,
   baseProblem,
@@ -218,4 +219,37 @@ it('forgets a base the catalogue no longer has', async () => {
   expect((await resolveBullet(bulletData(`catalogue:${matchBullet.id}`))).base.status).toBe(
     'unreachable',
   )
+})
+
+it('treats a kept base of another shape as none kept, and forgets it', async () => {
+  stubStorage()
+  const data = bulletData(`catalogue:${matchBullet.id}`)
+  stubApi({ [`bullets/${matchBullet.id}`]: matchBullet })
+  await resolveBullet(data)
+  const key = storageName(`openreloading-base:bullets/${matchBullet.id}`)
+  expect(localStorage.getItem(key)).not.toBeNull()
+  stubApi({}, true)
+  for (const kept of ['"a string"', JSON.stringify({ id: matchBullet.id, mass: 11 })]) {
+    localStorage.setItem(key, kept)
+    expect((await resolveBullet(data)).base.status).toBe('unreachable')
+    expect(localStorage.getItem(key)).toBeNull()
+  }
+})
+
+it('reads a kept cartridge base with the fields the API adds', async () => {
+  stubStorage()
+  const data = { origin: 'user' as const, basedOn: `catalogue:${cartridge308.id}` }
+  // the API answers the sources resolved, where the stored file names them by reference
+  const answer = {
+    ...cartridge308,
+    provenance: { kind: 'published', sources: [{ title: 'C.I.P. sheet' }] },
+    aliases: [],
+    capacities: [],
+    revision: 'aaa',
+  }
+  stubApi({ [`cartridges/${cartridge308.id}`]: answer })
+  await resolveCartridge(data)
+  stubApi({}, true)
+  const r = await resolveCartridge(data)
+  expect(r.base).toEqual({ status: 'found', record: answer })
 })

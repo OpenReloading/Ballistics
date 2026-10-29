@@ -2,6 +2,8 @@
 import {
   applyOverrides,
   type Bullet,
+  bullet,
+  cartridge,
   parseRef,
   type SpecValue,
   toSi,
@@ -10,6 +12,7 @@ import {
   type UserRecord,
   userIdRegex,
 } from '@open-reloading/schema'
+import type { z } from 'zod'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { storageName } from './edition.ts'
@@ -27,16 +30,24 @@ export type Base<T> =
   | { status: 'found'; record: T }
   | { status: 'missing' | 'unreachable'; ref: string }
 
+// the API answers a cartridge without aliases with an empty list, which the record schema rejects
+const cartridgeBase = cartridge.omit({ aliases: true })
+
 const baseKey = (kind: string, id: string) => storageName(`openreloading-base:${kind}/${id}`)
 
-/** The base last read from the API, kept in this browser; undefined without one or without storage. */
-function recalled<T>(key: string): T | undefined {
+/**
+ * The base last read from the API, kept in this browser; undefined without one or without storage.
+ * A kept value that `schema` rejects (an older app's shape, a damaged entry) is forgotten.
+ */
+function recalled<T>(key: string, schema: z.ZodType): T | undefined {
   try {
     const text = localStorage.getItem(key)
-    return text === null ? undefined : (JSON.parse(text) as T)
-  } catch {
-    return undefined
-  }
+    if (text === null) return
+    const kept: unknown = JSON.parse(text)
+    // the value itself, not the parsed data, which would strip the fields the API adds
+    if (schema.safeParse(kept).success) return kept as T
+  } catch {}
+  remember(key, undefined)
 }
 
 /** Keeps `record` (or forgets the key for undefined) as the base last read. Quota or blocked storage: nothing is kept. */
@@ -57,6 +68,7 @@ function remember(key: string, record: object | undefined) {
  */
 async function readBase<T>(
   kind: 'bullets' | 'cartridges',
+  schema: z.ZodType,
   basedOn: string | undefined,
   signal?: AbortSignal,
 ): Promise<Base<T>> {
@@ -68,7 +80,7 @@ async function readBase<T>(
     remember(key, record as object | undefined)
     return record ? { status: 'found', record } : { status: 'missing', ref: basedOn }
   } catch {
-    const kept = recalled<T>(key)
+    const kept = recalled<T>(key, schema)
     return kept ? { status: 'found', record: kept } : { status: 'unreachable', ref: basedOn }
   }
 }
@@ -121,7 +133,7 @@ export async function resolveBullet(
   data: UserBullet,
   signal?: AbortSignal,
 ): Promise<ResolvedBullet> {
-  const base = await readBase<Bullet>('bullets', data.basedOn, signal)
+  const base = await readBase<Bullet>('bullets', bullet, data.basedOn, signal)
   const problem = baseProblem(base)
   const from = base.status === 'found' ? base.record : {}
   return {
@@ -137,7 +149,7 @@ export async function resolveCartridge(
   data: UserCartridge,
   signal?: AbortSignal,
 ): Promise<ResolvedCartridge> {
-  const base = await readBase<CartridgeDetail>('cartridges', data.basedOn, signal)
+  const base = await readBase<CartridgeDetail>('cartridges', cartridgeBase, data.basedOn, signal)
   const from =
     base.status === 'found'
       ? { table: base.record.table, values: base.record.values }
