@@ -31,7 +31,7 @@ A body falling from rest in vacuum drifts east by $\Omega g \cos\varphi\, t^3 / 
 
 The yaw modes in radians per calibre of travel are $(P \pm \sqrt{P^2 - 4M})/2$ with $P = (I_x/I_y)(p d / V)$ and $M = \rho A d^3 C_{M\alpha} / (2 I_y)$; their sum is $P$, their product $M$, and $P^2/(4M)$ is the gyroscopic stability factor, which scales with the square of the spin ([McCoy 1999](../bibliography.md#mccoy-1999), linear theory, equation numbers unverified).
 
-With the damping terms the complex yaw obeys $\xi'' + (H - iP)\xi' - (M + iPT)\xi = 0$ per calibre of travel. The real parts of its two roots are the damping exponents; the linear-theory forms $-\tfrac12 [H \mp P(2T - H)/(\phi'_f - \phi'_s)]$ approximate them, and both are negative exactly when $1/S_g < S_d (2 - S_d)$ with $S_d = 2T/H$ (same source).
+With the damping terms the complex yaw obeys $\xi'' + (H - iP)\xi' - (M + iPT)\xi = 0$ per calibre of travel. The real parts of its two roots are the damping exponents; the linear-theory forms $-\tfrac12 [H \mp P(2T - H)/(\phi'_f - \phi'_s)]$ approximate them, and both are negative exactly when $1/S_g < S_d (2 - S_d)$ with $S_d = 2T/H$ (same source). Here $H = \frac{\rho A d}{2m}\bigl(C_{L\alpha} - C_D - \frac{m d^2}{I_y}(C_{mq} + C_{m\dot\alpha})\bigr)$ is the yaw damping and $T = \frac{\rho A d}{2m}\bigl(C_{L\alpha} + \frac{m d^2}{I_x} C_{mp\alpha}\bigr)$ the lift and Magnus term, both per calibre (their ratio is the $S_d$ of [stability](../models/exterior-stability.md)), and $\phi'_f$, $\phi'_s$ are the fast and slow yaw modes $(P + \sqrt{P^2 - 4M})/2$ and $(P - \sqrt{P^2 - 4M})/2$ above.
 
 ## Numbers
 

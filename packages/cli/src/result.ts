@@ -75,7 +75,7 @@ const evaluation = z.object({
     .extend({ powders: count.describe('Powders left out, one at a time, each without a value.') })
     .optional()
     .describe(
-      'Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` and the errors and the coverage are null.',
+      'Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.',
     ),
 })
 

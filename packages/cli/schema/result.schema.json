@@ -581,7 +581,7 @@
           "additionalProperties": false
         },
         "notInFittedSet": {
-          "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` and the errors and the coverage are null.",
+          "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.",
           "type": "object",
           "properties": {
             "rows": {
@@ -1307,7 +1307,7 @@
               "additionalProperties": false
             },
             "notInFittedSet": {
-              "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` and the errors and the coverage are null.",
+              "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.",
               "type": "object",
               "properties": {
                 "rows": {
@@ -1987,7 +1987,7 @@
               "additionalProperties": false
             },
             "notInFittedSet": {
-              "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` and the errors and the coverage are null.",
+              "description": "Powder not in the fitted set, with `--leave-one-powder-out`: the rows of each powder that has interior parameters, run without them. A powder without rows has no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the errors and the coverage are null.",
               "type": "object",
               "properties": {
                 "rows": {

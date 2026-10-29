@@ -13,7 +13,7 @@ Interior ballistics, ignition: does the ignition pressure of loads with magnum p
 
 Primer product, size and a magnum flag were parsed from the printed note of each row. Ignition pressure of a magnum row: $k$ times 5.0 MPa; other rows 5.0 MPa. $k$ is the minimum of the training chi-square profile on the grid 0.05, 0.1, 0.2, 0.35, 0.5, 0.7, 1, 1.4, 2, 3, 5, powder parameters held, two rounds, every powder refitted (vivacity and energy); compared with $k = 1$.
 
-Accept rule, fixed first: adopt when the validation median drops by more than 0.1 points, the P90 does not rise, the 95 % cartridge-bootstrap interval of the paired change on magnum rows excludes 0, and checks for confounding do not remove the effect. Rows: training 4433 magnum, 13241 standard, 10501 without a size; validation 1373, 7379, 6619; 26 cartridges have both kinds.
+Accept rule, fixed first: adopt when the validation median drops by more than 0.1 points, the P90 does not rise, the 95 % cartridge-bootstrap interval of the paired change on magnum rows excludes 0, and checks for confounding do not remove the effect. Rows parsed: training 4433 magnum, 13241 standard, 10501 without a size; validation 1373, 7379, 6619 (15371); 26 cartridges have both kinds. The table counts 14252 validation rows, the number the candidates of the [load-table fit](interior-load-table-fit-parameters.md) cover, and the fit 3764 training magnum rows: 1119 parsed validation rows (15371 - 14252) and 669 parsed training magnum rows (4433 - 3764) are not in them. The filter that removed them is not recorded and cannot be re-derived from the repository; that it is the coverage of the candidate fit is inferred from the equal count.
 
 ## Formulas
 

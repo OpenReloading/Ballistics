@@ -40,7 +40,7 @@ Variants: (a) raised the false proposals (to 22 and 43 on photos without a face)
 
 ## Result
 
-Improved: the blob detector replaced the area-count detector, with the hole size taken from the scale-space maximum at the picked hole and then the strongest peaks of the region. Variants (a) and (b) not adopted; (c) adopted in a reduced form, only when a face is found, keeping the first run when the run at the refined size gives the first size again.
+Improved: the blob detector replaced the area-count detector. The hole size is taken from the scale-space maximum at the picked hole, then from the strongest peaks of the region. Variants (a) and (b) are not adopted. Variant (c) is adopted in a reduced form: it runs only when a face is found, and the first run is kept when the run at the refined size gives the first size again.
 
 ## Data basis
 
