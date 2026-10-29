@@ -112,8 +112,8 @@ const redrawTimes = (page: Page, moves: number) =>
 test('the Measurements link of a saved load fits the powder on the load the workbench runs, and its sliders tune it by hand', async ({
   page,
 }) => {
-  // the fit may take up to 60 s after a run, a save and a navigation
-  test.setTimeout(90_000)
+  // the fit may take up to 60 s after a run, a save and a navigation, the 30 redraws 2 s each
+  test.setTimeout(150_000)
   // a native picker cannot be driven: the file goes to the origin private file system
   await page.addInitScript(() => {
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
