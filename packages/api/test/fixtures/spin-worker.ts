@@ -10,9 +10,9 @@ parentPort?.on('message', (task: SpinTask) => {
   if (task.exit !== undefined) process.exit(task.exit)
   if (task.fail !== undefined) throw new Error(task.fail)
   parentPort?.postMessage({ started: true })
-  const end = Date.now() + (task.spin ?? 0)
+  const end = performance.now() + (task.spin ?? 0)
   let burned = 0
-  while (Date.now() < end) burned += Math.sqrt(end)
+  while (performance.now() < end) burned += Math.sqrt(end)
   // the sum is read so the loop's work is not dead code
   if (burned < 0) throw new Error('unreachable')
   parentPort?.postMessage({ succeeded: true, value: task.value })

@@ -128,10 +128,10 @@ const pointsOf = (steps: Run[]) =>
  */
 async function runLadder(run: (charge: number) => Promise<Run>, charges: number[]) {
   const steps: ({ charge: number } & Run)[] = []
-  const started = Date.now()
+  const started = performance.now()
   for (let i = 0; i < charges.length && pointsOf(steps) <= ladderPoints; i += ladderBatch) {
     // a 503 timeout, as a step past its deadline gives, instead of a client that gave up
-    if (Date.now() - started + taskTimeoutMs > ladderBudgetMs)
+    if (performance.now() - started + taskTimeoutMs > ladderBudgetMs)
       throw new ComputeTimeout(`ladder would pass ${ladderBudgetMs} ms`)
     steps.push(
       ...(await Promise.all(
