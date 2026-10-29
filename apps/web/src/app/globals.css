@@ -478,6 +478,13 @@ main .home-cards h3 {
   border: 0;
 }
 
+/* a 24 px target: links of similar length one above the other are too close otherwise */
+.home-cards .home-tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
 /* a card with tabs keeps them under its text, not at the card's foot */
 .home-cards li:has(> .home-tabs) > p {
   flex: none;
