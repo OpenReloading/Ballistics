@@ -168,7 +168,11 @@
       "boreDiameter must be positive",
       "the trace has no positive pressure",
       "too few trace samples in the window",
-      "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction"
+      "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction",
+      "at least one trace",
+      "sigma: on every trace or on none",
+      "traces {list} have the same charge",
+      "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
     ],
     "fit confidence and sessions": [
       "at least one point",

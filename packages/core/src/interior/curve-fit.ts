@@ -411,8 +411,8 @@ export function fitPressureCurves(
     traces.some((t) => !sameCharge(t.charge, nth(traces, 0).charge)) &&
     warnings.every((w) => w.reason !== 'narrowPeaks')
   const { maxInflation = spread ? 100 : 10 } = options
-  // the K-th root of the product is exact for one trace, where the mean of the logs is not
-  const peak = peaks.reduce((a, b) => a * b) ** (1 / shotCount)
+  // the product of K-th roots is exact for one trace, where the mean of the logs is not
+  const peak = peaks.reduce((a, b) => a * b ** (1 / shotCount), 1)
 
   // M3 states the burn rate at a reference pressure: restating it at the traces' peak keeps the
   // coefficient and the exponent from being collinear and gives the same model
