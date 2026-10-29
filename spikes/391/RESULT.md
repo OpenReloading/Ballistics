@@ -4,7 +4,7 @@ Throwaway spike branch, not for merge. Aggregates of load rows that are not in t
 
 ## Setup
 
-- Code: `main` at 3a5c6a4a (the CLI and the published validation figures; there is no `integration/0.x-next` branch). Model version of the baseline run `8e17f2eace299766d9ba5212de610444398d027f56b7c18270c3ea5928a27fd3`.
+- Code: `main` at 3a5c6a4a (the CLI and the published validation figures; there is no `integration/0.x-next` branch). Model version of the baseline run `8e17f2eace299766d9ba5212de610444398d027f56b7c18270c3ea5928a27fd3`; it differs from the one on `validation.md` because the hash covers the rows file and the records, and both differ here (converted rows, stand-in bullets).
 - Split: `splitOf`. Every constant below is fitted on training rows only; validation rows are only predicted; the test split was not run and the rows of its cartridges were not written to the converted rows file.
 - The record powder parameters of the baseline were fitted on the training split. The structure of the present model (bore resistance, start pressure rule) was chosen on the validation split earlier, so the baseline is not fully blind on validation; the candidates share that structure, so the comparison is paired.
 - Rows: the same kind of rows as `validation.md`, converted to the CLI columns with a stand-in bullet per cartridge and bullet mass (length from a fit of length over mass and diameter of the bullet records) and the barrel rule of `validation.md`.
@@ -37,7 +37,7 @@ Training rows, per powder: distinct loads (cartridge, bullet mass, charge, barre
 | unspecified/unspecified | 38 | 1 / 32 / 293 | 5 | 0 | 2.69 | 1.34 | 0.04 | 3% | 3% | 5% | 13% |
 all: 223 powders, loads 1 / 39 / 299; present (vivacity, energy) 0%, exponent per family (+ vivacity refit) 0%, rich form (vivacity, energy, a, m) 3%, exponential series, 3 terms (+ energy) 9%
 
-Moving variables: no row prints a propellant temperature, so a temperature constant is not identified by these rows. The peak pressure of a powder's rows spans a factor of about 2 to 4 (median per family) and the loading density a factor of 1.2 to 3; the burnt fraction at the muzzle moves by about 0.2 for ball and extruded powders and barely for flake powders and those whose form is not stated (most of them burn out). A form constant that acts late in the burn is therefore weakly identified for most powders, whatever the row count. Pressure rows per powder are few outside the ball family.
+Moving variables: no row prints a propellant temperature, so a temperature constant is not identified by these rows. The model peak pressure of a powder's rows spans a factor of about 2 to 4 (median per family) and the loading density a factor of 1.2 to 3; the burnt fraction at the muzzle moves by about 0.2 for ball and extruded powders and barely for flake powders and those whose form is not stated (most of them burn out). A form constant that acts late in the burn is therefore weakly identified for most powders, whatever the row count. Pressure rows per powder are few outside the ball family.
 
 ## Candidates on the validation split
 
@@ -116,7 +116,7 @@ Velocity error, pressure error where rows print one; families as above. Leave-on
 | ML stand-alone MLP | unspecified/unspecified | 1464 | 2.78 % | 8.42 % | | | |
 | ML stand-alone MLP | not in the fitted set | 10492 | 9.29 % | 22.85 % | | | |
 
-The leave-one-powder-out line of the per-powder candidates is the M3 line: the candidate module finds a powder by its record vivacity and energy, which the family median replaces, so an unseen powder runs with the present exponent and form. For the machine-learning candidates the powder's own training rows stay in the learner's fit, only its fitted fields are replaced; their line is therefore not a measurement of an unseen powder (see Not checked).
+The leave-one-powder-out line of the per-powder candidates stays within 0.2 percentage points of the M3 line: the candidate module finds a powder by its record vivacity and energy, which the family median replaces, so an unseen powder runs with the present exponent and form. For the machine-learning candidates the powder's own training rows stay in the learner's fit, only its fitted fields are replaced; their line is therefore not a measurement of an unseen powder (see Not checked).
 
 ## Verdicts
 
@@ -134,7 +134,7 @@ Rule of `RULE.md`; `u_d` is the bootstrap standard error of the paired change of
 | ML stand-alone, gradient-boosted trees | 527 KiB model | -0.42 pp | -1.15 pp | 0.52 pp | 11.67 % | fail (fall and direction) |
 | ML stand-alone, small network | 51 KiB model | -0.33 pp | -0.31 pp | 0.34 pp | 11.47 % | fail (fall and direction) |
 
-- Pressure exponent per family: the training error chose 0.8 for the double base ball and extruded families, 0.9 for single base extruded and most others (90 powders at 0.8, 123 at 0.9, 4 at 0.7, 6 at 1). The control shows that half of the median gain and most of the P90 gain come from the exponent, not from refitting the vivacity. The pressure error falls too (median 14.94 to 13.09 %, P90 38.15 to 33.72 %). The stored powder shape already has `pressureExponent`, so the change needs a refit, not a schema change.
+- Pressure exponent per family: the training error chose 0.8 for the double base ball and extruded families and the extruded powders of unstated base, 0.9 for single base extruded and most others (90 powders at 0.8, 123 at 0.9, 4 at 0.7, 6 at 1). The control shows that half of the median gain and most of the P90 gain come from the exponent, not from refitting the vivacity. The pressure error falls too (median 14.94 to 13.09 %, P90 38.15 to 33.72 %). The stored powder shape already has `pressureExponent`, so the change needs a refit, not a schema change.
 - Rich form: passes the velocity rule with the smallest margin, but its pressure error rises from 14.9 to 32.5 % (median) and from 38 to 124 % (P90). Four constants per powder fitted on velocity rows alone move the pressure where no row holds it: the form constants are not identified by velocity rows (see the table of informative rows). A series of exponential terms with 6 or more constants per powder was not fitted: with the same rows it would be less identified still, and 9 % of the powders have fewer informative loads than 7 constants.
 - Machine learning: the trees and the network correct the most, but 5.6 to 11.7 % of the perturbed loads move the velocity the wrong way (more charge, less velocity; shorter barrel, more velocity). The present model has 0.13 % (27 barrel cases). The Gaussian process did not fit (length scales at the lower bound) with the default kernel and was not tuned, by the rule. All learners are deterministic with a fixed seed; trees and the network are small enough to run offline in a browser as data, the Gaussian process at 31 MiB is not.
 - Tooling: the candidate forms, the fit code and the learners' settings were written by a language-model agent in this study and judged by the same rule. Nothing from such a tool is part of a prediction.
