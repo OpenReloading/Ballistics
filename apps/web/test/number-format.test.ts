@@ -60,6 +60,13 @@ describe('the decimal mark', () => {
 })
 
 describe('reading typed numbers', () => {
+  it('rejects long text that is no number in linear time', () => {
+    const start = performance.now()
+    expect(parseNumber(`${'1'.repeat(50_000)}x`).kind).toBe('invalid')
+    expect(parseNumber('.,'.repeat(25_000)).kind).toBe('invalid')
+    expect(performance.now() - start).toBeLessThan(500)
+  })
+
   it.each(['en', 'de'])('reads either mark in %s', (language) => {
     expect(read('1.5', language)).toBe(1.5)
     expect(read('1,5', language)).toBe(1.5)

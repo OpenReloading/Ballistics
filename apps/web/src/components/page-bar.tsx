@@ -153,7 +153,13 @@ export function PageBar({
       </div>
       {/* the line ends in an ellipsis where it is too long: its whole text on hover, focus and tap */}
       <Tooltip label={full} events={tipEvents} multiline maw={320} disabled={!full}>
-        <div className="page-bar-status" ref={setStatusLine} tabIndex={full ? 0 : undefined}>
+        <div
+          className="page-bar-status"
+          ref={setStatusLine}
+          tabIndex={full ? 0 : undefined}
+          role="note"
+          aria-label={full || undefined}
+        >
           {/* the File menu's state text sets the line height of a final status: the same class here */}
           {status ?? (reserve ? <span className="file-state">{'\u00a0'}</span> : undefined)}
         </div>

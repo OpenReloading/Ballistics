@@ -58,6 +58,18 @@ describe('news', () => {
     expect(() => newestNews(5, dir)).toThrow('news/2026-10-01-a.md: expected a title')
   })
 
+  it('reads blank lines after the title and the link', () => {
+    const dir = folder({ '2026-10-01-a.md': '---\ntitle: A \n\n\r\nlink: /x\n \n---\nOne. Two.\n' })
+    expect(newestNews(5, dir)[0]).toMatchObject({ title: 'A', link: '/x', text: 'One. Two.' })
+  })
+
+  it('rejects a long title line without a link in linear time', () => {
+    const dir = folder({ '2026-10-01-a.md': `---\ntitle: a${' '.repeat(50_000)}b` })
+    const start = performance.now()
+    expect(() => newestNews(5, dir)).toThrow('news/2026-10-01-a.md: expected a title')
+    expect(performance.now() - start).toBeLessThan(500)
+  })
+
   it('reads the items of the app', () => {
     const items = newestNews(5, path.join(import.meta.dirname, '../news'))
     expect(items.length).toBeGreaterThan(0)

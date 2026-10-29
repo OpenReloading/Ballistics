@@ -327,6 +327,7 @@ describe('buildRecords', () => {
   })
 
   it('builds records the user record schema accepts', () => {
+    expect(built.entries.length + built.makers.length).toBe(4)
     for (const r of [...built.entries, ...built.makers]) userRecord.parse(r.record)
   })
 

@@ -1,6 +1,6 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { headerUnit, headerWords } from '../src/tables.ts'
+import { headerUnit, headerWords, readNumber } from '../src/tables.ts'
 
 // the expressions the scans replace, as the reference for their results
 const wordsReference = (header: string) =>
@@ -43,5 +43,13 @@ describe('header scans', () => {
       headerUnit(h)
     }
     expect(performance.now() - start).toBeLessThan(200)
+  })
+})
+
+describe('readNumber', () => {
+  it('rejects a long cell that is no number in linear time', () => {
+    const start = performance.now()
+    expect(readNumber(`${'1'.repeat(50_000)}x`, '.')).toBeUndefined()
+    expect(performance.now() - start).toBeLessThan(500)
   })
 })
