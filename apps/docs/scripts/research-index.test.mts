@@ -42,7 +42,12 @@ test('a complete note passes and one without a required field fails', () => {
 
 test('a verified source without a doi, a wrong answer and an unknown model page fail', () => {
   const sources = [{ year: 2001, claim: 'A claim.', verified: true }]
-  assert.deepEqual(noteErrors({ ...fm(), sources }, pages), ['source 1 is verified without a doi'])
+  assert.deepEqual(noteErrors({ ...fm(), sources, status: 'verified' }, pages), [
+    'source 1 is verified without a doi',
+  ])
+  assert.deepEqual(noteErrors({ ...fm(), status: 'verified' }, pages), [
+    '"status" is verified but its sources give partly_verified',
+  ])
   assert.deepEqual(noteErrors({ ...fm(), status: 'sure' }, pages), [
     '"status" must be one of verified, partly_verified, unverified',
   ])

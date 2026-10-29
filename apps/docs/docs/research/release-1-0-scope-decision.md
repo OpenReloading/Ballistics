@@ -11,7 +11,7 @@ Release process: what the 1.0 release covers (components, version numbers, the a
 
 ## Method
 
-A decision table on the issue ([decision table](https://github.com/OpenReloading/Ballistics/issues/294#issuecomment-6462356621)) gives each of eight questions its options, a recommended default, the reasoning and the cost of being wrong. The way to reach the version was read from the release-please documentation and its source, not from a dry run. The owner then accepted or overruled each row ([owner decision](https://github.com/OpenReloading/Ballistics/issues/294#issuecomment-6506294350)).
+A decision table on the issue ([decision table](https://github.com/OpenReloading/Ballistics/issues/294#issuecomment-6462356621)) gives each of eight questions its options, a recommended default, the reasoning and the cost of being wrong. The way to reach the version was read from the release-please documentation and its source, not from a dry run. Each row was then accepted or overruled ([recorded decision](https://github.com/OpenReloading/Ballistics/issues/294#issuecomment-6506294350)).
 
 ## Formulas
 
@@ -38,7 +38,7 @@ no change. Documented as a decision, not adopted in code: no release week is pic
 
 ## Data basis
 
-public: the decision table and the owner decision on the public issue, and the repository's release configuration and workflows.
+public: the decision table and the recorded decision on the public issue, and the repository's release configuration and workflows.
 
 ## Where in the app
 
@@ -50,4 +50,4 @@ public: the decision table and the owner decision on the public issue, and the r
 
 ## Confidence
 
-high: the decision is the owner's answer on the issue, and nothing in the repository changes with it.
+high: the decision is the recorded answer on the issue, and nothing in the repository changes with it.

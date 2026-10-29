@@ -41,7 +41,7 @@ Bench work per idea, as fields typed and how often:
 | History of stock movements | every change, by the app | always | not applicable |
 | Backups | one export | the reminder after 10 changes or 7 days | data lost with the browser |
 
-Verdicts: 0 new records, 0 new issues; 4 ideas folded into open issues (rounds loaded and round count into the load and firearm map, lots and brass into the own lots issue), the box label folded into the traceability issue as a pre-1.0 candidate, 3 dropped (component stock, cost, movement history), 1 confirmed as existing (backups).
+Verdicts over the nine rows (the stock idea is split into component stock and rounds loaded): no new record and no new issue; 5 folded into open issues (rounds loaded and round count into the load and firearm map, lots and brass into the own lots issue, the box label into the traceability issue as a pre-1.0 candidate), 3 dropped (component stock, cost, movement history), 1 confirmed as existing (backups).
 
 ## Result
 

@@ -64,8 +64,18 @@ export function noteErrors(fm: Record<string, unknown>, pages: Set<string>): str
     errors.push('"retrieved" must be a date YYYY-MM-DD')
   for (const p of listOf(fm, 'model_pages', errors))
     if (!pages.has(String(p))) errors.push(`no model page ${p}`)
-  for (const [i, s] of listOf(fm, 'sources', errors).entries())
+  const sources = listOf(fm, 'sources', errors)
+  for (const [i, s] of sources.entries())
     errors.push(...sourceErrors(s as Record<string, unknown> | null, i + 1))
+  const checked = sources.filter((s) => (s as Record<string, unknown> | null)?.verified === true)
+  const expected = !checked.length
+    ? 'unverified'
+    : checked.length < sources.length
+      ? 'partly_verified'
+      : 'verified'
+  // a note without sources (a search that found nothing) has no status to check
+  if (sources.length && answers.status.includes(String(fm.status)) && fm.status !== expected)
+    errors.push(`"status" is ${fm.status} but its sources give ${expected}`)
   return errors
 }
 
@@ -146,6 +156,11 @@ export function llmsText(list: Entry[]): string {
 
 if (import.meta.main) {
   const site = `${process.env.DOCS_URL ?? 'https://openreloading.github.io'}${process.env.DOCS_BASE_URL ?? '/'}`
+  const findings = notesErrors()
+  if (findings.length) {
+    console.error(findings.join('\n'))
+    process.exit(1)
+  }
   const list = entries(site)
   const out = new URL('../static/', import.meta.url)
   mkdirSync(out, { recursive: true })
