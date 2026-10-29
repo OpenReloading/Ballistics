@@ -18,7 +18,7 @@ Rows: load rows that are not in the repository, evaluated with `ballistics verif
 - Accept rule, fixed before any run: on validation the median velocity error falls by at least 0.1 percentage points, the P90 does not rise, the training median falls too, and no more rows are refused. Otherwise the simpler form stays. The mean signed peak-pressure error (model minus printed over printed) is reported and does not decide.
 - $c_p = 0$ reproduced the baseline exactly (every change 0, the same used rows).
 
-The doubling table runs a synthetic 76 mm proxy: bore 76.2 mm, travel 40 calibres, shot 6.2 kg, chamber 2.2 L, charge 1.6 kg and 75 % of it, a tubular grain of 6 by 1.5 by 150 mm, specific energy 3.6 MJ/kg, $k = 1.24$. The burn coefficient $10^{-9}$ m s⁻¹ Pa⁻¹ was set so that the full charge peaks near 300 MPa and burns out in the bore. The resistance values are guesses, not measurements: start pressure 25 MPa, an engraving ramp from 40 MPa to 0 over 25 mm, friction pressure 8 MPa. "Engraving doubled" doubles the start pressure and the ramp. The code is in `spikes/360/` of the branch `spike/360-bore-friction` (never merged).
+The doubling table runs a synthetic 76 mm proxy: bore 76.2 mm, travel 40 calibres, shot 6.2 kg, chamber 2.2 L, charge 1.6 kg and 75 % of it, a tubular grain of 6 by 1.5 by 150 mm, specific energy 3.6 MJ/kg, $k = 1.24$. The burn coefficient $10^{-9}$ m s⁻¹ Pa⁻¹ was set so that the full charge peaks near 300 MPa and burns out in the bore. The resistance values are guesses, not measurements: start pressure 25 MPa, an engraving ramp from 40 MPa to 0 over 25 mm, friction pressure 8 MPa. "Engraving doubled" doubles the ramp. Doubling the start pressure with it gives the same figures: the ramp at travel 0 plus the friction (48 MPa) already holds the shot longer than the start pressure. The code is in `spikes/360/` of the branch `spike/360-bore-friction` (never merged).
 
 ## Formulas
 
@@ -87,10 +87,10 @@ Doubling on the 76 mm proxy (simulations of guessed values):
 | 1.2 kg | engraving doubled | +39.0 % | +68 m/s |
 | 1.2 kg | friction doubled | +10.1 % | −2 m/s |
 | 1.2 kg | both doubled | +48.2 % | +56 m/s |
-| Full charge | measured, doubled resistance (as quoted in the question, unverified) | about +10 % | about +6 m/s |
+| Full charge | measured, doubled resistance, the term not stated (as quoted in the question, unverified) | about +10 % | about +6 m/s |
 | Reduced charge | the same | | about +30 m/s |
 
-A doubled engraving resistance raises the velocity, more at the reduced charge, as the quoted measurements do, but by several times their size. With a burn coefficient twice as large (full-charge peak 1179 MPa) the changes shrink to +14.7 % and +10 m/s at full charge and +21.0 % and +11 m/s at the reduced charge: the size depends mostly on how far the burn is from complete at shot start, which the proxy only guesses.
+The quoted measurements do not say which term was doubled. A doubled engraving ramp (and both terms) raises the velocity, more at the reduced charge, as the measurements do, but by several times their size; doubled friction lowers it slightly. With a burn coefficient twice as large (full-charge peak 1179 MPa) the engraving changes shrink to +14.7 % and +10 m/s at full charge and +21.0 % and +11 m/s at the reduced charge, so the size depends strongly on the guessed proxy.
 
 ## Result
 
