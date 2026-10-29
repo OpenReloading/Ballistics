@@ -201,7 +201,7 @@ The active wind segment, BC band and drag table segment are held fixed within a 
 
 ## Limits
 
-- No Earth curvature. The direction error of gravity grows with range over the Earth radius.
+- No Earth curvature. The direction error of gravity grows with range over the Earth radius $R$: $x/R$ = 0.157 mrad at 1000 m with $R$ = 6357 km. A run with gravity pointing to the Earth's centre moved the height at 1000 m by 0.02 mm (0.00002 mrad) and at 1828.8 m (2000 yd) by 0.84 mm (0.0005 mrad), against the run with constant gravity (G7 BC 0.3 lb/in², 850 m/s, zero at 100 m). Both are far below 0.1 mrad ([research log](../research/exterior-reference-air-earth-curvature.md)).
 - No terrain: the run ends at the last requested range, at the apex of the slant range, at the altitude limits, at `maxTime`, or (modified point mass) at the yaw limit. Ranges not reached are left out of the result.
 - No wind gradient with height, no scope cant, no change of the gyroscopic stability along the path.
 - The zero search also fails when the zero range is not reached.

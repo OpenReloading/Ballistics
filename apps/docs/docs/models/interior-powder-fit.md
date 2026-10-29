@@ -367,6 +367,8 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - Each session is one barrel length and one temperature, and the barrel length is the one the sessions' bore and chamber share. A session fired from a barrel with another bore, chamber or twist is another load.
 - The pressure range holds the inputs it shifts, linearized by the refit at one standard uncertainty each. It holds no model error of the burn form, exponent, heat loss or pressure gradient, and not the correlation of inputs.
 - Each prediction costs one `interior` run per distinct charge, barrel length and temperature, and each Jacobian two predictions per parameter.
+- A crusher pressure is a conventional value, not an absolute pressure: the compression of the copper cylinder depends on the rise time of the pressure and on the cylinder type. A pressure step drives an undamped elastic gauge to twice the deflection of the same static pressure ($x(t) = x_s (1 - \cos \omega t)$), so a fast rise reads differently from a slow one. No single factor converts crusher readings to transducer readings, which is why a fit refuses mixed bases and converts none ([research log](../research/interior-crusher-conventional-pressure.md)).
+- The fitted burn coefficient holds for the powder as fired. Ageing and moisture are not modelled in [M3](interior-m3.md#limits), so a fit on fresh powder does not hold for old or damp powder of the same lot, and the reverse.
 
 ## Sources
 
