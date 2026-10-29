@@ -313,7 +313,7 @@ export function FileCard({
           </Group>
           <Button
             size="compact-sm"
-            variant="subtle"
+            variant="default"
             aria-label={t('Remove {name}', { name: e.name })}
             onClick={() => actions.remove(e.id)}
           >
