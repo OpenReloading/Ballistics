@@ -517,6 +517,15 @@ export function ImportEntry({
           (a): Entry => ({ id: a.id, name: a.file.name, source: '', touched: false, busy: true }),
         ),
       ])
+      const buildFirst = async (id: number, card: CardView) => {
+        try {
+          const first = firstBuild(card, saved.current)
+          patch(id, { card, busy: false, ...(first && { mapping: first.mapping }) })
+          if (first) await build(id, first.kind, first.map)
+        } catch (err) {
+          patch(id, { card, busy: false, failure: errorText(err) })
+        }
+      }
       await Promise.all(
         added.map(async ({ id, file }) => {
           let bytes: ArrayBuffer
@@ -528,9 +537,7 @@ export function ImportEntry({
           const r = await call({ type: 'read', id, bytes }, [bytes])
           if (r.type !== 'read')
             return patch(id, { busy: false, failure: r.type === 'failed' ? r.message : undefined })
-          const first = firstBuild(r.card, saved.current)
-          patch(id, { card: r.card, busy: false, ...(first && { mapping: first.mapping }) })
-          if (first) await build(id, first.kind, first.map)
+          await buildFirst(id, r.card)
         }),
       )
     },

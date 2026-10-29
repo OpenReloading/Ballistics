@@ -4,6 +4,7 @@ import {
   type BuiltRecords,
   buildRecords,
   decodeText,
+  fieldSpecs,
   isWorkbook,
   type KindScore,
   type RowCounts,
@@ -15,6 +16,7 @@ import {
   type TableColumnMap,
   type TableKind,
   type Tier,
+  tableKinds,
   tableOfRows,
 } from '@open-reloading/importers'
 import { type UserRecord, userRecord } from '@open-reloading/schema'
@@ -333,11 +335,40 @@ export type SavedMappings = Record<string, SavedMapping>
 
 const mappingsKey = storageName('import-mappings')
 
-/** The mappings saved in this browser; none where the storage is not available. */
+const isObject = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object'
+const unitSources: unknown[] = [undefined, 'header', 'values', 'default', 'unknown']
+
+/** Whether `m` is a column of a map `build` reads as `kind`: a field of the kind with one of its units, or none. */
+function isColumnMap(m: unknown, kind: TableKind) {
+  if (!isObject(m) || (m.decimal !== '.' && m.decimal !== ',')) return false
+  if (!unitSources.includes(m.unitFrom)) return false
+  if (m.ambiguousDecimal !== undefined && typeof m.ambiguousDecimal !== 'boolean') return false
+  if (m.field === undefined) return m.unit === undefined || typeof m.unit === 'string'
+  const field = fieldSpecs[kind].find((f) => f.key === m.field)
+  return !!field && (m.unit === undefined || !!field.units?.some((u) => u.symbol === m.unit))
+}
+
+/** Whether `m` has the shape of a saved mapping: one of an older build or damaged storage has not. */
+function isSavedMapping(m: unknown): m is SavedMapping {
+  if (!isObject(m) || !tableKinds.includes(m.kind as TableKind)) return false
+  const kind = m.kind as TableKind
+  return (
+    Array.isArray(m.header) &&
+    m.header.every((h) => typeof h === 'string') &&
+    Array.isArray(m.map) &&
+    m.map.length === m.header.length &&
+    m.map.every((c) => isColumnMap(c, kind))
+  )
+}
+
+/** The mappings saved in this browser that have the current shape; none where the storage is not available. */
 export function readMappings(): SavedMappings {
   try {
     const saved: unknown = JSON.parse(localStorage.getItem(mappingsKey) ?? '{}')
-    return saved && typeof saved === 'object' ? (saved as SavedMappings) : {}
+    if (!isObject(saved)) return {}
+    return Object.fromEntries(
+      Object.entries(saved).filter((e): e is [string, SavedMapping] => isSavedMapping(e[1])),
+    )
   } catch {
     return {}
   }

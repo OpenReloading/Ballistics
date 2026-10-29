@@ -1,7 +1,7 @@
 import { MantineProvider } from '@mantine/core'
 import type { UserRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import { xlsx } from '../../../packages/importers/test/xlsx.ts'
 import {
   type CardActions,
@@ -20,6 +20,8 @@ import {
   importCount,
   importWorker,
   mappingsFor,
+  readMappings,
+  saveMapping,
 } from '../src/lib/import-entry.ts'
 import { type LoadFileFormat, loadFileFormats } from '../src/lib/load-file-formats.ts'
 import { maxFileBytes, userDataText } from '../src/lib/user-data.ts'
@@ -176,6 +178,40 @@ it('offers a saved mapping for a file of the same header and builds the next fil
     mapping: undefined,
   })
   expect(firstBuild({ refusal: 'no table' }, saved)).toBeUndefined()
+})
+
+it('drops a saved mapping of another shape and still offers the suggested kind', () => {
+  const header = ['Name', 'Weight']
+  const good = { kind: 'bullet', header, map: [{ field: 'name', decimal: '.' }, { decimal: '.' }] }
+  const kept: Record<string, string> = {}
+  vi.stubGlobal('localStorage', {
+    getItem: (k: string) => kept[k] ?? null,
+    setItem: (k: string, v: string) => {
+      kept[k] = v
+    },
+  })
+  const card: CardView = { header, samples: [], rows: 1, scores: [], kind: 'powder', tier: 'low' }
+  try {
+    for (const bad of [
+      null,
+      { kind: 'bullet', map: [] },
+      { kind: 'primer', header, map: [] },
+      { kind: 'bullet', header, map: [{ field: 'twist', decimal: '.' }, { decimal: '.' }] },
+      { kind: 'bullet', header, map: [{ field: 'name', decimal: '.' }] },
+    ]) {
+      saveMapping({}, 'x', bad as never)
+      expect(readMappings()).toEqual({})
+      expect(firstBuild(card, readMappings())).toEqual({
+        kind: 'powder',
+        map: undefined,
+        mapping: undefined,
+      })
+    }
+    saveMapping({}, 'x', good as never)
+    expect(readMappings()).toEqual({ x: good })
+  } finally {
+    vi.unstubAllGlobals()
+  }
 })
 
 const html = (node: React.ReactNode) =>
