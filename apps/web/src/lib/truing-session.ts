@@ -11,10 +11,13 @@ import {
   type TruingPlan,
   type WeakReason,
 } from '@open-reloading/core'
-import { formatNumber, parseNumber } from '../i18n/number.ts'
+import { type Truing, toSi, truing, userRecord } from '@open-reloading/schema'
+import { formatNumber, parseNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
+import { localDay } from './dates.ts'
 import { errorText } from './error-text.ts'
+import { storedOf } from './firearm.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
 /** One distance as typed: the texts are in the units the section shows (`system`), dial means in clicks. */
@@ -140,6 +143,36 @@ export function planSession(shot: TrajectoryInput, input: TruingInputs, t: T): A
   }
 }
 
+/** The measured rows and chronograph readings, SI, as the fit takes them. */
+function measured(input: TruingInputs, t: T) {
+  const { system: s } = input
+  const entries = filled(input.rows).map(({ r, i }): RangeStringEntry => {
+    // an impact is a length, a dial is in clicks
+    const toSi = (x: number) => (r.kind === 'impact' ? s.lineOfSightOffset.toSi(x) : x)
+    return {
+      kind: r.kind,
+      range: s.range.toSi(need(numberOf(r.range), t('Row {n} distance', { n: i + 1 }), t, true)),
+      shotCount: need(shotsOf(r.shots), t('Row {n} shots', { n: i + 1 }), t),
+      value: toSi(need(numberOf(r.mean), t('Row {n} mean', { n: i + 1 }), t)),
+      standardDeviation: toSi(
+        need(numberOf(r.deviation), t('Row {n} deviation', { n: i + 1 }), t, true),
+      ),
+    }
+  })
+  const c = input.chrono
+  const chronograph =
+    c.shots || c.mean || c.deviation
+      ? {
+          shotCount: need(shotsOf(c.shots), t('Chronograph shots'), t),
+          mean: s.velocity.toSi(need(numberOf(c.mean), t('Chronograph mean'), t, true)),
+          standardDeviation: s.velocity.toSi(
+            need(numberOf(c.deviation), t('Chronograph deviation'), t, true),
+          ),
+        }
+      : undefined
+  return { clickValue: clickOf(input, t), entries, ...(chronograph && { chronograph }) }
+}
+
 /** The fit of the measured rows and chronograph readings. */
 export function fitSession(
   shot: TrajectoryInput,
@@ -147,40 +180,110 @@ export function fitSession(
   t: T,
 ): Attempt<RangeStringFit> {
   try {
-    const { system: s } = input
-    const entries = filled(input.rows).map(({ r, i }): RangeStringEntry => {
-      // an impact is a length, a dial is in clicks
-      const toSi = (x: number) => (r.kind === 'impact' ? s.lineOfSightOffset.toSi(x) : x)
-      return {
-        kind: r.kind,
-        range: s.range.toSi(need(numberOf(r.range), t('Row {n} distance', { n: i + 1 }), t, true)),
-        shotCount: need(shotsOf(r.shots), t('Row {n} shots', { n: i + 1 }), t),
-        value: toSi(need(numberOf(r.mean), t('Row {n} mean', { n: i + 1 }), t)),
-        standardDeviation: toSi(
-          need(numberOf(r.deviation), t('Row {n} deviation', { n: i + 1 }), t, true),
-        ),
-      }
-    })
-    const c = input.chrono
-    const chronograph =
-      c.shots || c.mean || c.deviation
-        ? {
-            shotCount: need(shotsOf(c.shots), t('Chronograph shots'), t),
-            mean: s.velocity.toSi(need(numberOf(c.mean), t('Chronograph mean'), t, true)),
-            standardDeviation: s.velocity.toSi(
-              need(numberOf(c.deviation), t('Chronograph deviation'), t, true),
-            ),
-          }
-        : undefined
     return {
       answer: fitTruingStrings(
-        { shot, clickValue: clickOf(input, t), entries, ...(chronograph && { chronograph }) },
+        { shot, ...measured(input, t) },
         { fitZeroOffset: input.fitZeroOffset },
       ),
     }
   } catch (e) {
     return { problem: problemOf(e, t) }
   }
+}
+
+/** A parameter value, SI, in the stored unit of its kind. */
+function storedParameter(name: RangeStringParameterName, si: number) {
+  if (name === 'dragFactor') return si
+  return storedOf(name === 'muzzleVelocity' ? 'velocity' : 'angle', si)
+}
+
+/**
+ * The truing result as a firearm configuration stores it: the strings as entered, the nominal
+ * shot and the fitted parameters, in stored units. Only an identified parameter keeps its value
+ * and interval. `input` is the one the fit was made from.
+ */
+export function truingEntry(
+  nominal: { shot: TrajectoryInput; bullet: string; zeroRange: number },
+  input: TruingInputs,
+  fit: RangeStringFit,
+  date: Date,
+): Truing {
+  const { clickValue, entries, chronograph } = measured(input, untranslated())
+  const { shot } = nominal
+  const length = (x: number) => storedOf('length', x)
+  return truing.parse({
+    date: localDay(date),
+    bullet: nominal.bullet,
+    muzzleVelocity: storedOf('velocity', shot.muzzleVelocity),
+    zeroRange: length(nominal.zeroRange),
+    temperature: storedOf('temperature', shot.air.temperature),
+    pressure: storedOf('pressure', shot.air.pressure),
+    humidity: storedOf('relativeHumidity', shot.air.humidity),
+    clickValue: storedOf('angle', clickValue),
+    fitZeroOffset: input.fitZeroOffset,
+    rows: entries.map((e) =>
+      e.kind === 'impact'
+        ? {
+            kind: e.kind,
+            range: length(e.range),
+            shots: e.shotCount,
+            mean: length(e.value),
+            deviation: length(e.standardDeviation),
+          }
+        : {
+            kind: e.kind,
+            range: length(e.range),
+            shots: e.shotCount,
+            mean: e.value,
+            deviation: e.standardDeviation,
+          },
+    ),
+    ...(chronograph && {
+      chronograph: {
+        shots: chronograph.shotCount,
+        mean: storedOf('velocity', chronograph.mean),
+        deviation: storedOf('velocity', chronograph.standardDeviation),
+      },
+    }),
+    parameters: fit.parameters.map((p) => {
+      const known = p.status === 'identified'
+      return {
+        name: p.name,
+        status: p.status,
+        reasons: p.reasons,
+        ...(known && p.value !== undefined && { value: storedParameter(p.name, p.value) }),
+        ...(known &&
+          p.interval && {
+            lower: storedParameter(p.name, p.interval.lower),
+            upper: storedParameter(p.name, p.interval.upper),
+            confidenceLevel: p.interval.confidenceLevel,
+          }),
+      }
+    }),
+    ...(fit.consistent !== undefined && { consistent: fit.consistent }),
+    intervalsTrusted: fit.intervalsTrusted,
+  })
+}
+
+/**
+ * The firearm record with `entry` appended to configuration `config`, saved at `now`; undefined
+ * when `stored` is no valid firearm with that configuration.
+ */
+export function withTruing(stored: unknown, config: string, entry: Truing, now: Date) {
+  const found = userRecord.safeParse(stored)
+  if (!found.success || found.data.kind !== 'firearm') return
+  const f = found.data.data
+  if (!f.configurations.some((c) => c.id === config)) return
+  return userRecord.parse({
+    ...found.data,
+    saved: now.toISOString(),
+    data: {
+      ...f,
+      configurations: f.configurations.map((c) =>
+        c.id === config ? { ...c, truing: [...(c.truing ?? []), entry] } : c,
+      ),
+    },
+  })
 }
 
 /** The parameter names as table row headings and, in lower case, inside a sentence. */
@@ -328,3 +431,36 @@ export const nominalLine = (
     velocity: withUnit('velocity', system, n.muzzleVelocity),
     range: withUnit('range', system, n.zeroRange),
   })
+
+/**
+ * A stored truing result as the firearm editor lists it: the distances of its strings, the
+ * chronograph readings and the identified values, in the units of `system`.
+ */
+export function truingSummary(entry: Truing, system: UnitSystem, t: T) {
+  const strings = entry.rows
+    .map((r) =>
+      t('{range} ({kind}, {shots} shots)', {
+        range: withUnit('range', system, toSi('length', r.range.value)),
+        kind: r.kind === 'impact' ? t('impact') : t('dial'),
+        shots: r.shots,
+      }),
+    )
+    .join(', ')
+  const c = entry.chronograph
+  const values = entry.parameters
+    .flatMap((p) => {
+      if (p.value === undefined) return []
+      const si =
+        typeof p.value === 'number'
+          ? p.value
+          : toSi(p.name === 'muzzleVelocity' ? 'velocity' : 'angle', p.value.value)
+      return [`${t(parameterLabels[p.name].label)} ${quantityText(p.name, si, system)}`]
+    })
+    .join(', ')
+  return {
+    strings: c
+      ? t('{strings}; chronograph {count} readings', { strings, count: c.shots })
+      : strings,
+    values: values || t('None identified'),
+  }
+}

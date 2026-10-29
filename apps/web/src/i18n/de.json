@@ -3670,5 +3670,19 @@
   "{name} (fit {n})": "{name} (Anpassung {n})",
   "A newer fit of this powder exists.": "Es gibt eine neuere Anpassung dieses Treibladungspulvers.",
   "Use the refit": "Neue Anpassung verwenden",
-  "The sessions of the link could not be read.": "Die Sitzungen des Links konnten nicht gelesen werden."
+  "The sessions of the link could not be read.": "Die Sitzungen des Links konnten nicht gelesen werden.",
+  "Store with {configuration}": "Speichern bei {configuration}",
+  "Choose a firearm and sight above to store the result with its strings.": "Oben eine Schusswaffe und ein Visier wählen, um das Ergebnis mit seinen Reihen zu speichern.",
+  "Stored with {configuration}, with its strings.": "Bei {configuration} gespeichert, mit seinen Reihen.",
+  "Not stored: the firearm or its configuration is no longer in the library.": "Nicht gespeichert: Die Schusswaffe oder ihre Konfiguration ist nicht mehr in der Bibliothek.",
+  "Truing results of {name}": "Truing-Ergebnisse von {name}",
+  "Stored on": "Gespeichert am",
+  "Strings": "Reihen",
+  "Identified values": "Bestimmte Werte",
+  "Remove truing result {n} of {name}": "Truing-Ergebnis {n} von {name} entfernen",
+  "{range} ({kind}, {shots} shots)": "{range} ({kind}, {shots} Schuss)",
+  "impact": "Auftreffpunkt",
+  "dial": "Verstellung",
+  "{strings}; chronograph {count} readings": "{strings}; Chronograph {count} Messwerte",
+  "None identified": "Keiner bestimmt"
 }

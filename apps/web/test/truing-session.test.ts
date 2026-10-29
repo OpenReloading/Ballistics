@@ -16,6 +16,9 @@ import {
   residualLines,
   type TruingInputs,
   type TruingRow,
+  truingEntry,
+  truingSummary,
+  withTruing,
 } from '../src/lib/truing-session.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
@@ -241,5 +244,66 @@ describe('nominal line', () => {
         english.t,
       ),
     ).toBe('G7 manual drag, 2592 ft/s, zero 109 yd')
+  })
+})
+
+describe('a fit stored with a firearm configuration', () => {
+  const input = measured([300, 600], [800])
+  const fit = fitSession(nominal, input, english.t)
+  if (!('answer' in fit)) throw new Error(fit.problem)
+  const entry = truingEntry(
+    { shot: nominal, bullet: 'Test bullet', zeroRange: 100 },
+    input,
+    fit.answer,
+    new Date('2026-10-29T12:00:00Z'),
+  )
+  const record = {
+    kind: 'firearm',
+    id: 'f1',
+    name: 'Rifle',
+    saved: '2026-10-01T00:00:00.000Z',
+    data: {
+      origin: 'user',
+      name: 'Rifle',
+      twistHand: 'right',
+      optics: [{ id: 'o1', kind: 'scope', name: 'Scope' }],
+      configurations: [
+        {
+          id: 'c1',
+          name: 'Scope',
+          mounts: [{ optic: 'o1', sightHeight: { value: 50 }, zeroRange: { value: 100000 } }],
+        },
+      ],
+    },
+  }
+  const now = new Date('2026-10-29T12:00:01Z')
+
+  it('lists the strings it came from, in stored units', () => {
+    const written = withTruing(record, 'c1', entry, now)
+    if (written?.kind !== 'firearm') throw new Error('not stored')
+    expect(written.saved).toBe(now.toISOString())
+    const [stored] = defined(written.data.configurations[0]).truing ?? []
+    expect(stored?.date).toBe('2026-10-29')
+    expect(stored?.rows.map((r) => [r.kind, r.range.value, r.shots])).toEqual([
+      ['impact', 300000, 5],
+      ['impact', 600000, 5],
+      ['dial', 800000, 5],
+    ])
+    const typed = defined(input.rows[0])
+    expect(defined(stored?.rows[0]).mean).toEqual({
+      value: expect.closeTo(system.lineOfSightOffset.toSi(Number(typed.mean)) * 1000, 6),
+    })
+    expect(defined(stored?.rows[2]).mean).toBe(Number(defined(input.rows[2]).mean))
+    expect(stored?.chronograph?.shots).toBe(10)
+    expect(truingSummary(defined(stored), system, english.t).strings).toContain('chronograph 10')
+  })
+
+  it('keeps a value only for an identified parameter', () => {
+    for (const p of entry.parameters) expect(p.value !== undefined).toBe(p.status === 'identified')
+  })
+
+  it('stores nothing without the firearm or its configuration', () => {
+    expect(withTruing(record, 'c9', entry, now)).toBeUndefined()
+    expect(withTruing(undefined, 'c1', entry, now)).toBeUndefined()
   })
 })

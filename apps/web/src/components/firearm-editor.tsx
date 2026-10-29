@@ -40,6 +40,7 @@ import {
   zeroFields,
 } from '../lib/firearm.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
+import { truingSummary } from '../lib/truing-session.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
 import { ManufacturerInput } from './manufacturer-input.tsx'
 import { NumberField } from './number-field.tsx'
@@ -610,6 +611,59 @@ export function FirearmEditor({
                     </Table.Tbody>
                   </Table>
                 </Table.ScrollContainer>
+                {c.truing?.length ? (
+                  <Table.ScrollContainer minWidth={720}>
+                    <Table
+                      className="firearm-table"
+                      withRowBorders={false}
+                      aria-label={t('Truing results of {name}', { name: title })}
+                    >
+                      <Table.Thead>
+                        <Table.Tr>
+                          <Table.Th>{t('Stored on')}</Table.Th>
+                          <Table.Th>{t('Bullet')}</Table.Th>
+                          <Table.Th>{t('Strings')}</Table.Th>
+                          <Table.Th>{t('Identified values')}</Table.Th>
+                          <Table.Th>
+                            <span className="visually-hidden">{t('Remove')}</span>
+                          </Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>
+                        {c.truing.map((entry, k) => {
+                          const { strings, values } = truingSummary(entry, system, t)
+                          return (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: results have no id and keep their order
+                            <Table.Tr key={k}>
+                              <Table.Th scope="row">{entry.date}</Table.Th>
+                              <Table.Td>{entry.bullet}</Table.Td>
+                              <Table.Td>{strings}</Table.Td>
+                              <Table.Td>{values}</Table.Td>
+                              <Table.Td>
+                                <ActionIcon
+                                  size={controlSize.row.icon}
+                                  variant="subtle"
+                                  color="red"
+                                  aria-label={t('Remove truing result {n} of {name}', {
+                                    name: title,
+                                    n: k + 1,
+                                  })}
+                                  onClick={() =>
+                                    setConfig(i, {
+                                      truing: (c.truing ?? []).filter((x) => x !== entry),
+                                    })
+                                  }
+                                >
+                                  <Trash size={16} aria-hidden="true" />
+                                </ActionIcon>
+                              </Table.Td>
+                            </Table.Tr>
+                          )
+                        })}
+                      </Table.Tbody>
+                    </Table>
+                  </Table.ScrollContainer>
+                ) : null}
                 <Button
                   variant="default"
                   size={controlSize.row.button}

@@ -71,6 +71,8 @@
 . TargetMapping
 . TargetSheet
 . TargetSheetRecord
+. Truing
+. TruingRow
 . UserBullet
 . UserCartridge
 . UserCaseCapacity
@@ -182,6 +184,8 @@
 . targetSheet
 . tipTypes
 . toSi
+. truing
+. truingRow
 . units
 . userBullet
 . userCartridge
