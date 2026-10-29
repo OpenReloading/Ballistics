@@ -10,6 +10,17 @@ import { defined } from './defined.ts'
 // writes; the file is edited by hand when the format changes.
 const golden = (name: string) => readFileSync(new URL(`golden/${name}`, import.meta.url), 'utf8')
 const page = 'https://example.org/bullets/designer'
+/** A share link with its fragment inflated back to the file text. */
+const inflated = async (link: string) => {
+  const [base = '', fragment = ''] = link.split('#record=')
+  const bytes = Uint8Array.from(atob(fragment.replace(/-/g, '+').replace(/_/g, '/')), (c) =>
+    c.charCodeAt(0),
+  )
+  const text = await new Response(
+    new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')),
+  ).text()
+  return `${base}#${text}`
+}
 
 const parsed = parseUserDataFile(golden('user-data.json'))
 const file = parsed.ok ? parsed : undefined
@@ -43,8 +54,10 @@ describe('golden share link', () => {
   })
 
   it('is what the current code writes for its records', async () => {
-    await expect(`${await shareLink(shared(), page)}\n`).toMatchFileSnapshot(
-      'golden/share-link.txt',
-    )
+    const written = defined(await shareLink(shared(), page))
+    const stored = golden('share-link.txt').trim()
+    // zlib builds compress the same text to different bytes: the stored link stands while it holds the same text
+    const link = (await inflated(written)) === (await inflated(stored)) ? stored : written
+    await expect(`${link}\n`).toMatchFileSnapshot('golden/share-link.txt')
   })
 })

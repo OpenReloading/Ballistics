@@ -257,7 +257,8 @@ describe('a fit stored with a firearm configuration', () => {
       { shot: nominal, bullet: 'Test bullet', zeroRange: 100 },
       inputs,
       fit.answer,
-      new Date('2026-10-29T12:00:00Z'),
+      // local noon: the stored day is the local day, the same in every time zone
+      new Date(2026, 9, 29, 12),
     )
   const entry = entryOf(input)
   if (typeof entry === 'string') throw new Error(`refused: ${entry}`)

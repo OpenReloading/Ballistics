@@ -250,7 +250,7 @@ describe('charge ladder on a full pool', () => {
 describe('charge ladder bounds', () => {
   it('starts no batch that could end after the budget: 503 timeout', async () => {
     let calls = 0
-    const clock = vi.spyOn(Date, 'now')
+    const clock = vi.spyOn(performance, 'now')
     let now = 1_000_000
     clock.mockImplementation(() => now)
     // each batch "takes" 6 s: after the first two the next one could end past 14 s

@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto'
 import type { UserRecord } from '@open-reloading/schema'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import {
   exportNotes,
@@ -9,6 +9,7 @@ import {
   importTexts,
 } from '../src/lib/data-files.ts'
 import { exportAllText, validRecords } from '../src/lib/user-data.ts'
+import { deleteUserDb } from './user-db-reset.ts'
 
 const saved = '2026-10-13T10:00:00.000Z'
 const bullet = (id: string, name: string): UserRecord => ({
@@ -32,6 +33,8 @@ const a = bullet('9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d', 'A')
 const b = bullet('1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d', 'B')
 const c = bullet('2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e', 'C')
 const bad = { kind: 'bulletDesign', id: 'old-1', name: 'Old', saved, data: 'not an object' }
+
+beforeEach(deleteUserDb)
 
 function file(name: string, records: UserRecord[], raw: unknown[] = []): ImportFile {
   const exported = exportAllText(records, [], validRecords(raw).invalid)
@@ -79,6 +82,7 @@ it('a read failure on a later file refreshes the lists and states what was store
 })
 
 it('says the conflicts and the invalid records left out in the plural', async () => {
+  await run([file('one.json', [a, b], [bad])]).done
   const { io, done } = run([
     file(
       'again.json',

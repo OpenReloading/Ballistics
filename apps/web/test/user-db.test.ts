@@ -1,17 +1,13 @@
 import 'fake-indexeddb/auto'
-import { afterEach, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { inStore } from '../src/lib/user-db.ts'
+import { deleteUserDb } from './user-db-reset.ts'
+
+beforeEach(deleteUserDb)
 
 afterEach(() => {
   vi.unstubAllGlobals()
 })
-
-const deleted = (name: string) =>
-  new Promise<void>((resolve, reject) => {
-    const r = indexedDB.deleteDatabase(name)
-    r.onsuccess = () => resolve()
-    r.onerror = () => reject(r.error)
-  })
 
 it('tries again after a failed open, as where the browser has no IndexedDB', async () => {
   const real = indexedDB
@@ -43,7 +39,7 @@ it('rejects a request the store refuses, and the write it was part of', async ()
 
 it('opens again with every store after another tab deleted the database', async () => {
   await inStore('records', 'readwrite', (s) => s.put({ id: 'r2' }))
-  await deleted('openreloading-user-data')
+  await deleteUserDb()
   await expect(inStore('records', 'readonly', (s) => s.count())).resolves.toBe(0)
   await expect(inStore('files', 'readonly', (s) => s.count())).resolves.toBe(0)
 })

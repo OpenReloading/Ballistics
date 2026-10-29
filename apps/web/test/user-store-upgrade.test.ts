@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { expect, it } from 'vitest'
+import { beforeEach, expect, it } from 'vitest'
 import {
   putPhoto,
   putRecords,
@@ -7,6 +7,9 @@ import {
   storedPhotoIds,
   storedRecords,
 } from '../src/lib/user-store.ts'
+import { deleteUserDb } from './user-db-reset.ts'
+
+beforeEach(deleteUserDb)
 
 const name = 'openreloading-user-data'
 const saved = '2026-10-13T10:00:00.000Z'

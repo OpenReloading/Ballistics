@@ -37,11 +37,13 @@ beforeEach(() => {
 })
 
 it('statistics are computed once per group object, again only for an edited group', () => {
-  const a = statisticsOf(defined(sheet.groups[0]))
-  expect(statisticsOf(defined(sheet.groups[0]))).toBe(a)
+  // groups of its own: a drawing of `sheet` in another test has computed those already
+  const fresh: TargetSheet = { ...sheet, groups: [group('g1'), group('g2')] }
+  const a = statisticsOf(defined(fresh.groups[0]))
+  expect(statisticsOf(defined(fresh.groups[0]))).toBe(a)
   expect(calls.n).toBe(1)
-  const edited = withGroup(sheet, 'g2', (g) => ({ ...g, name: 'renamed' }))
-  expect(edited.groups[0]).toBe(sheet.groups[0])
+  const edited = withGroup(fresh, 'g2', (g) => ({ ...g, name: 'renamed' }))
+  expect(edited.groups[0]).toBe(fresh.groups[0])
   statisticsOf(defined(edited.groups[0]))
   statisticsOf(defined(edited.groups[1]))
   expect(calls.n).toBe(2)
