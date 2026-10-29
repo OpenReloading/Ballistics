@@ -21,7 +21,7 @@ $$
 a = \frac{\sqrt{k R T_e}}{1 - \eta \rho}, \qquad v_m = \sqrt{\tfrac{1}{2}\, \Gamma\, \frac{p_e V_r}{m_c}}, \qquad \Gamma = k \left(\frac{2}{k + 1}\right)^{k / (k - 1)}
 $$
 
-The outflow velocity estimates are $\sqrt{v_0^2 + v_m^2}$ and $\sqrt{v_0^2 + a^2}$ with $a = 1000$ m/s, with the muzzle velocity $v_0$.
+The outflow velocity estimates are $\sqrt{v_0^2 + v_m^2}$ and $\sqrt{v_0^2 + a_0^2}$ with the muzzle velocity $v_0$ and a fixed sound speed $a_0 = 1000$ m/s; the second uses this fixed value, not the computed sonic velocity $a$.
 
 ## Numbers
 

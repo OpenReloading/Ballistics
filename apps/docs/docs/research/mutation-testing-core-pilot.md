@@ -40,7 +40,7 @@ Surviving classes before the new tests:
 - A wrong index: `inside[k + 1]` turned into `inside[k - 1]` in `hitProbability` survived, because the test checked only that the ring probabilities sum to the hit probability and the score to their weighted sum, both still true when every inner ring gets 0.
 - A unit factor: `humidity * saturationVapourPressure` turned into a division in the pressure check survived.
 
-Still surviving after the new tests (31): boundary changes where both branches give the same value at the boundary (the stage joins of the vivacity forms, the lens and sliver limits), the bisection bounds and stop rule of the seven-perforation burnout, the truncation and the end weights of the Simpson rule (below 1e-13 against the closed form), two optional chainings on lookups that always find an entry, and one message text.
+The 31 mutants that still survive after the new tests are boundary changes where both branches give the same value at the boundary (the stage joins of the vivacity forms, the lens and sliver limits), the bisection bounds and stop rule of the seven-perforation burnout, the truncation and the end weights of the Simpson rule (below 1e-13 against the closed form), two optional chainings on lookups that always find an entry, and one message text.
 
 ## Result
 
@@ -59,4 +59,4 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 
 ## Confidence
 
-medium. The scores and kill counts are exact for StrykerJS 10.1.1 on these three files; the full-suite times were taken on a shared machine and vary with its load, and other modules are not measured.
+medium. The scores before and the kill counts are exact StrykerJS 10.1.1 outputs on these three files; the scores after are estimates computed from them, not a new full-suite run; the full-suite times were taken on a shared machine and vary with its load, and other modules are not measured.

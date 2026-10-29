@@ -124,6 +124,9 @@ export const powderDomainMargin = 0
 /** Relative tolerance above the barrel length and bore diameter of the data, for values rounded in the input. */
 const powderDomainTolerance = 0.025
 
+/** Relative tolerance of the domain check, so that a value converted from a typed unit is inside at an edge it equals. */
+const powderDomainEdgeTolerance = 1e-12
+
 /** An axis on which a prediction can leave the data a powder was fitted to. */
 export type PowderAxis = 'charge' | 'velocity' | 'pressure' | 'boreDiameter' | 'barrelLength'
 
@@ -166,8 +169,8 @@ export function outsideDomain(
   for (const [axis, value] of Object.entries(values) as [PowderAxis, number][]) {
     const range = domain[axis]
     if (range === undefined) continue
-    if (value < range.min) outside[axis] = 'below'
-    else if (value > range.max) outside[axis] = 'above'
+    if (value < range.min * (1 - powderDomainEdgeTolerance)) outside[axis] = 'below'
+    else if (value > range.max * (1 + powderDomainEdgeTolerance)) outside[axis] = 'above'
   }
   return outside
 }

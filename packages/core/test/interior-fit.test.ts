@@ -654,6 +654,9 @@ describe('powder fit prediction bands', () => {
       expect(charge(domain.charge.min)).toBeUndefined()
       expect(charge(below(domain.charge.max))).toBeUndefined()
       expect(charge(above(domain.charge.min))).toBeUndefined()
+      // a charge converted from grains or grams can miss the ladder value in the last bit
+      expect(charge(domain.charge.max * (1 + 1e-15))).toBeUndefined()
+      expect(charge(domain.charge.min * (1 - 1e-15))).toBeUndefined()
       expect(charge(above(domain.charge.max))).toBe('above')
       expect(charge(below(domain.charge.min))).toBe('below')
     })

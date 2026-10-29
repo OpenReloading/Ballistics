@@ -1,13 +1,13 @@
 ---
 title: Rings needed to apply a recognised target without a question
-description: How many matched rings make a target recognised on a photo safe to apply without the user confirming it.
+description: How many matched rings a target recognised on a photo needs before the app applies it without the user confirming it.
 ---
 
 # Rings needed to apply a recognised target without a question
 
 ## Question
 
-[Hole detection](../models/hole-detection.md), recognised target: how many rings matched to a target record make the recognition safe to apply without asking the user?
+[Hole detection](../models/hole-detection.md), recognised target: how many rings matched to a target record does a recognition need before the app applies it automatically, without asking the user?
 
 ## Method
 
@@ -19,11 +19,11 @@ A ring of relative radius $\rho$ matches a ring $\rho_j$ of a record when $|\rho
 
 ## Numbers
 
-The three pistol targets are found with 5 or 6 ellipses and applied. The four others are not found: an orange target and a red band have no black area, and a pistol target and a 100 yard target show a black area with at most two matching rings. An earlier version fitted the 100 yard target to the 10 m air pistol target with three matched rings: equal ring spacing is a coincidence often enough at three rings.
+The three pistol targets are found with 5 or 6 ellipses and applied. The four others are not found: an orange target and a red band have no black area, and a pistol target and a 100-yard target show a black area with at most two matching rings. An earlier version fitted the 100-yard target to the 10 m air pistol target with three matched rings: equal ring spacing is a coincidence often enough at three rings.
 
 ## Result
 
-Improved: a target is applied without a question only with at least 4 matched rings and a score of 2.5; otherwise it is proposed and the user confirms. Applying a target from three matched rings is not adopted. The rim test of the black area and the 3 % tolerance came from this case.
+Improved: a target is applied without a question only when exactly one record fits (no other record within 0.5 of the top score with at least 3 matched rings), that record has at least 4 matched rings (`SURE_RINGS`) and a score of at least 2.5 (`SURE_SCORE`), and, without a known photo scale, no other record matches every ring it matches; otherwise it is proposed and the user confirms. Applying a target from three matched rings is not adopted. The rim test of the black area and the 3 % tolerance came from this case.
 
 ## Data basis
 
