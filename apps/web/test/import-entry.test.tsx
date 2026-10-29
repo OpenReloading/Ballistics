@@ -182,7 +182,7 @@ it('offers a saved mapping for a file of the same header and builds the next fil
 
 it('drops a saved mapping of another shape and still offers the suggested kind', () => {
   const header = ['Name', 'Weight']
-  const good = { kind: 'bullet', header, map: [{ field: 'name', decimal: '.' }] }
+  const good = { kind: 'bullet', header, map: [{ field: 'name', decimal: '.' }, { decimal: '.' }] }
   const kept: Record<string, string> = {}
   vi.stubGlobal('localStorage', {
     getItem: (k: string) => kept[k] ?? null,
@@ -196,7 +196,8 @@ it('drops a saved mapping of another shape and still offers the suggested kind',
       null,
       { kind: 'bullet', map: [] },
       { kind: 'primer', header, map: [] },
-      { kind: 'bullet', header, map: [{ field: 'twist', decimal: '.' }] },
+      { kind: 'bullet', header, map: [{ field: 'twist', decimal: '.' }, { decimal: '.' }] },
+      { kind: 'bullet', header, map: [{ field: 'name', decimal: '.' }] },
     ]) {
       saveMapping({}, 'x', bad as never)
       expect(readMappings()).toEqual({})

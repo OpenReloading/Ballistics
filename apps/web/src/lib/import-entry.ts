@@ -356,6 +356,7 @@ function isSavedMapping(m: unknown): m is SavedMapping {
     Array.isArray(m.header) &&
     m.header.every((h) => typeof h === 'string') &&
     Array.isArray(m.map) &&
+    m.map.length === m.header.length &&
     m.map.every((c) => isColumnMap(c, kind))
   )
 }
