@@ -87,7 +87,7 @@ async function lotAnswer(
     const answers = await askLots(ok, charges, fraction, signal)
     if (signal.aborted) return undefined
     const failed = answers.find((a) => !a.res.ok || a.json === undefined)
-    if (failed) return { message: failed.json?.message ?? `The API answered ${failed.res.status}.` }
+    if (failed) return { message: failed.json?.message ?? `Error ${failed.res.status}.` }
     const charge = nth(charges, 0)
     const [first, second] = [nth(answers, 0), nth(answers, 1)]
     return { steps: { low: stepsOf(first.json, charge), high: stepsOf(second.json, charge) } }

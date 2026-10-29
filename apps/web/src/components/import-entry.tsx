@@ -41,6 +41,7 @@ import {
 import { loadFileFormats, loadFormatOf, readNote } from '../lib/load-file-formats.ts'
 import { maxFileBytes } from '../lib/user-data.ts'
 import { AppModal } from './app-modal.tsx'
+import { focusBack } from './focus-back.ts'
 
 /** One picked file on the page. */
 export interface Entry {
@@ -107,6 +108,27 @@ function noKindText(c: Extract<CardView, { header: string[] }>, t: Translator['t
 }
 
 const label = (text: string, t: Translator['t']) => translateMessage(text, t)
+
+/** The Import entry's status line: how many files are read and the reason of each refused one. */
+export function readStatus(files: Entry[], t: Translator['t']) {
+  if (!files.length) return ''
+  const read = files.filter((e) => e.card || e.failure)
+  const refused = read.flatMap((e) => {
+    const c = e.card
+    const reason = e.failure
+      ? label(e.failure, t)
+      : c && 'refusal' in c
+        ? label(c.refusal, t)
+        : c && 'header' in c && !e.kind
+          ? verdict(e, t).text
+          : undefined
+    return reason ? [t('{name}: {reason}', { name: e.name, reason })] : []
+  })
+  return [
+    t('{read} of {count} files read.', { read: read.length, count: files.length }),
+    ...refused,
+  ].join(' ')
+}
 
 export interface CardActions {
   remove: (id: number) => void
@@ -240,7 +262,7 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   const { t, tn } = useTranslation()
   if ('refusal' in c)
     return (
-      <Text size="sm" c="red">
+      <Text size="sm" c="red" className="import-refusal">
         {c.format === undefined
           ? label(c.refusal, t)
           : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
@@ -276,7 +298,13 @@ export function FileCard({
       <Stack gap="xs">
         <Group justify="space-between" wrap="wrap">
           <Group gap="xs" wrap="wrap">
-            <Text fw={600} className="import-file-name">
+            <Text
+              component="h3"
+              fw={600}
+              className="import-file-name"
+              id={`import-file-${e.id}`}
+              tabIndex={-1}
+            >
               {e.name}
             </Text>
             <Badge color={v.color} variant="light" data-testid="import-verdict">
@@ -285,7 +313,7 @@ export function FileCard({
           </Group>
           <Button
             size="compact-sm"
-            variant="subtle"
+            variant="default"
             aria-label={t('Remove {name}', { name: e.name })}
             onClick={() => actions.remove(e.id)}
           >
@@ -309,7 +337,14 @@ export function FileCard({
         {e.build && <Report b={e.build} t={t} />}
         {table && fold && (
           <Group>
-            <Button size="compact-sm" variant="default" onClick={() => actions.open(e.id)}>
+            <Button
+              size="compact-sm"
+              variant="default"
+              onClick={() => {
+                actions.open(e.id)
+                focusBack(`[data-kind-of="${e.id}"] input:checked`)
+              }}
+            >
               {t('Kind and columns')}
             </Button>
           </Group>
@@ -319,6 +354,7 @@ export function FileCard({
             <SegmentedControl
               size="xs"
               aria-label={t('Kind of {name}', { name: e.name })}
+              data-kind-of={e.id}
               value={e.kind ?? ''}
               onChange={(k) => actions.setKind(e.id, k as TableKind)}
               data={tableKinds.map((k) => ({ value: k, label: t(kindLabels[k]) }))}
@@ -411,7 +447,7 @@ export function ImportFoot({
         value={shared}
         onChange={(ev) => onShared(ev.currentTarget.value)}
       />
-      <Text size="xs" c="dimmed">
+      <Text size="xs" c="dimmed" className="import-rights">
         {t('You are responsible for holding the rights to the data you import.')}
       </Text>
       <Group gap="sm">
@@ -459,6 +495,7 @@ export function ImportEntry({
   const [replace, setReplace] = useState(false)
   const [done, setDone] = useState<string>()
   const [committing, setCommitting] = useState(false)
+  const chooseButton = useRef<HTMLButtonElement>(null)
   const waiting = useRef(new Map<number, (r: ImportReply) => void>())
 
   const patch = useCallback(
@@ -552,6 +589,11 @@ export function ImportEntry({
   const actions: CardActions = {
     remove: (id) => {
       void call({ type: 'drop', id })
+      // the Remove button is gone with its card: the next card, else the one before, else Choose files
+      const fs = filesRef.current
+      const at = fs.findIndex((f) => f.id === id)
+      const next = fs[at + 1] ?? fs[at - 1]
+      focusBack(next && `#import-file-${next.id}`, chooseButton.current)
       setFiles((fs) => fs.filter((f) => f.id !== id))
     },
     setKind: (id, kind) => {
@@ -648,7 +690,7 @@ export function ImportEntry({
     >
       <Stack gap="md" className="import-entry">
         <Group gap="xs" wrap="wrap">
-          <Button variant="default" onClick={() => void choose()}>
+          <Button ref={chooseButton} variant="default" onClick={() => void choose()}>
             {t('Choose files')}
           </Button>
           <Text size="sm" c="dimmed">
@@ -657,6 +699,9 @@ export function ImportEntry({
             )}
           </Text>
         </Group>
+        <p className="visually-hidden" role="status">
+          {readStatus(files, t)}
+        </p>
         {files.map((e) => (
           <FileCard key={e.id} e={e} shared={shared} actions={actions} />
         ))}

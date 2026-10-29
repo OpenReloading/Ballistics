@@ -9143,6 +9143,12 @@ main .session-shots th:nth-child(-n + 2) {
   gap: 0.25rem;
 }
 
+.prop-grid .review-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+}
+
 /* the caliber candidates of a discipline wrap rather than cut a name */
 .prop-grid .row-buttons.caliber-chips {
   flex-wrap: wrap;

@@ -32,7 +32,9 @@ import type { UseWorkbenchStateResult } from './use-workbench-load.ts'
 import { derived, stepFlag } from './workbench-outcome.ts'
 
 const noModel = msg('No fitted model parameters')
-const apiSilent = msg('The API did not answer.')
+const apiSilent = msg(
+  'A data file did not load or the computation failed. Check the connection and retry.',
+)
 const noRecord = msg('The powder record was not found.')
 /** Why a row has no case fill: the record gives no bulk density. */
 export const noBulkDensity = msg('No bulk density in the record')

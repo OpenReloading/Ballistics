@@ -25,7 +25,7 @@ function find(node: ReactNode, text: string): ReactElement<{ onClick?: () => voi
   }
 }
 
-it('the error page keeps the shell: one h1, one message, Retry calls retry', () => {
+it('the error page keeps the shell: one h1, one message with the error, Retry calls retry', () => {
   const retry = vi.fn()
   const html = renderToStaticMarkup(
     <MantineProvider>
@@ -34,7 +34,8 @@ it('the error page keeps the shell: one h1, one message, Retry calls retry', () 
   )
   expect(html.match(/<h1/g)).toHaveLength(1)
   expect(html).toContain('role="alert"')
-  expect(html).not.toContain('render failed')
+  expect(html).toContain('saved records stay in this browser')
+  expect(html).toContain('render failed')
   expect(html).toContain('Retry')
   const note = Children.toArray(RootError({ error, retry }).props.children).find(
     (c): c is ReactElement<{ onRetry: () => void }> => isValidElement(c) && c.type === ErrorNote,
@@ -48,6 +49,8 @@ it('the global error page writes its own document with Try again', () => {
   const html = renderToStaticMarkup(<GlobalError error={error} retry={retry} />)
   expect(html).toMatch(/^<html lang="en">/)
   expect(html).toContain('<h1>Something went wrong</h1>')
+  expect(html).toContain('saved records stay in this browser')
+  expect(html).toContain('<small>render failed</small>')
   find(GlobalError({ error, retry }), 'Try again')?.props.onClick?.()
   expect(retry).toHaveBeenCalledOnce()
 })

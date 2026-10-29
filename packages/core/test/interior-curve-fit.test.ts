@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { nth } from '../src/errors.ts'
 import {
+  type ChargedTrace,
   type CurveFitOptions,
   type CurveParameterReport,
   fitPressureCurve,
+  fitPressureCurves,
   InputError,
   type InteriorLoad,
   interior,
@@ -220,6 +222,157 @@ describe('curve fit identifiability', () => {
     })
     expect(find(fit.parameters, 'formSlope').status).toBe('weak')
     expect(find(fit.parameters, 'formSlope').reasons).toEqual(['imprecise'])
+  })
+})
+
+describe('joint curve fit of several traces', () => {
+  const charged = (charge: number, seed: number): ChargedTrace => ({
+    charge,
+    trace: trace({ ...truth, charge }, 0.005, 'breech', seed),
+  })
+  const set = [charged(0.0024, 11), charged(0.0027, 12), charged(0.003, 13)]
+  // the exponent starts 10 % high, the burn coefficient matched near the peaks
+  const high = load({
+    vivacity: 8.24 * (1.3e8 / 98066.5) ** -0.05,
+    exponent: 0.55,
+    a: 0.84,
+    z1: 0.315,
+  })
+  const joint = fitPressureCurves(high, set, base)
+
+  it('fits the exponent within its uncertainty at the default limit', () => {
+    const exponent = find(joint.parameters, 'exponent')
+    expect(exponent.status).toBe('identified')
+    expect(exponent.varianceInflation).toBeGreaterThan(10)
+    expect(exponent.varianceInflation).toBeLessThan(100)
+    expect(within(exponent, 0.5)).toBe(true)
+    expect(joint.warnings).toEqual([])
+  })
+
+  it('states the burn coefficient at the geometric mean of the peaks, one time shift per trace', () => {
+    const peaks = set.map((s) => Math.max(...s.trace.pressure))
+    const mean = Math.cbrt(peaks.reduce((a, b) => a * b))
+    expect(joint.referencePressure).toBeCloseTo(mean, 0)
+    expect(joint.load.charge).toBe(high.charge)
+    expect(within(find(joint.parameters, 'burnRate'), restated(truthBurn, mean))).toBe(true)
+    expect(joint.parameters.map((p) => p.name)).toEqual([
+      'burnRate',
+      'formSlope',
+      'transition',
+      'exponent',
+      'timeShift',
+      'timeShift',
+      'timeShift',
+    ])
+    expect(joint.traces).toHaveLength(3)
+    const samples = joint.traces.reduce((n, t) => n + t.residuals.length, 0)
+    expect(joint.degreesOfFreedom).toBe(samples - 7)
+    expect(joint.correlation).toHaveLength(7)
+  })
+
+  it('states the interval of the exponent and its refits without each trace', () => {
+    const exponent = find(joint.parameters, 'exponent')
+    const { low, high: top } = exponent.interval ?? { low: Number.NaN, high: Number.NaN }
+    const u = exponent.relativeStandardUncertainty ?? Number.NaN
+    expect(Math.log(top / exponent.value) / u).toBeCloseTo(2.2, 12)
+    expect(Math.log(exponent.value / low) / u).toBeCloseTo(2.2, 12)
+    expect(low).toBeLessThan(0.5)
+    expect(top).toBeGreaterThan(0.5)
+    expect(exponent.leaveOneOut).toHaveLength(3)
+    for (const n of exponent.leaveOneOut ?? []) expect(n).toBeCloseTo(0.5, 1)
+    expect(find(joint.parameters, 'burnRate').interval).toBeUndefined()
+  })
+
+  it('refits without each trace only with three or more traces', () => {
+    const two = fitPressureCurves(high, [nth(set, 0), nth(set, 2)], base)
+    const exponent = find(two.parameters, 'exponent')
+    expect(exponent.status).toBe('identified')
+    expect(exponent.interval).toBeDefined()
+    expect(exponent.leaveOneOut).toBeUndefined()
+  })
+
+  it('names an exponent the traces do not agree on', () => {
+    // the middle trace burns 5 % faster, as another powder lot would
+    const odd = { ...load({ ...truthBurn, vivacity: 8.4 }), charge: 0.0027 }
+    const fit = fitPressureCurves(
+      high,
+      [nth(set, 0), { charge: 0.0027, trace: trace(odd, 0.005, 'breech', 12) }, nth(set, 2)],
+      base,
+    )
+    const exponent = find(fit.parameters, 'exponent')
+    expect(exponent.status).toBe('weak')
+    expect(exponent.reasons).toEqual(['inconsistent'])
+    expect(exponent.value).not.toBe(exponent.initial)
+  })
+
+  it('does not see heat loss and bore friction the fitted model lacks', () => {
+    const lossy = (charge: number, seed: number): ChargedTrace => ({
+      charge,
+      trace: trace(
+        {
+          ...truth,
+          charge,
+          heat: { model: 'convective', flameTemperature: 2800, factor: 0.5 },
+          resistance: { friction: 2.5e6 },
+        },
+        0.005,
+        'breech',
+        seed,
+      ),
+    })
+    const fit = fitPressureCurves(
+      high,
+      [lossy(0.0024, 51), lossy(0.0027, 52), lossy(0.003, 53)],
+      base,
+    )
+    const exponent = find(fit.parameters, 'exponent')
+    // the interval misses the true 0.5, while the residuals and the refits look like noise
+    expect(exponent.interval?.high).toBeLessThan(0.5)
+    expect(exponent.status).toBe('identified')
+    expect(exponent.leaveOneOut).toHaveLength(3)
+    expect(fit.chiSquare / fit.degreesOfFreedom).toBeLessThan(1.2)
+  })
+
+  it('holds the exponent with one trace of the same set', () => {
+    const one = fitPressureCurves(high, set.slice(2), base)
+    expect(find(one.parameters, 'exponent').status).toBe('fixed')
+    expect(one.warnings).toEqual([])
+  })
+
+  it('equals the fit of one trace with one trace', () => {
+    const shot = nth(set, 2)
+    const single = fitPressureCurve({ ...high, charge: shot.charge }, shot.trace, base)
+    const { traces, warnings, ...rest } = fitPressureCurves(
+      { ...high, charge: shot.charge },
+      [shot],
+      base,
+    )
+    expect({ ...rest, ...nth(traces, 0) }).toEqual(single)
+    expect(warnings).toEqual([])
+  })
+
+  it('names repeat shots at one charge and keeps the limit of distinct charges', () => {
+    const fit = fitPressureCurves(high, [nth(set, 0), charged(0.0024, 21), nth(set, 2)], base)
+    expect(fit.warnings).toEqual([
+      { reason: 'sameCharge', traces: [0, 1], message: 'traces 0, 1 have the same charge' },
+    ])
+    expect(find(fit.parameters, 'exponent').status).not.toBe('fixed')
+  })
+
+  it('names a narrow peak range and holds the exponent as with one trace', () => {
+    const fit = fitPressureCurves(high, [charged(0.0029, 31), nth(set, 2)], base)
+    expect(fit.warnings.map((w) => [w.reason, w.traces])).toEqual([['narrowPeaks', [0, 1]]])
+    expect(nth(fit.warnings, 0).message).toMatch(/below 1.2/)
+    expect(find(fit.parameters, 'exponent').status).toBe('fixed')
+  })
+
+  it('rejects an empty set, a bad charge and sigma on only some traces', () => {
+    expect(() => fitPressureCurves(high, [])).toThrow(/at least one trace/)
+    expect(() => fitPressureCurves(high, [{ ...nth(set, 0), charge: 0 }])).toThrow(/charge/)
+    const { sigma: _, ...bare } = nth(set, 1).trace
+    expect(() => fitPressureCurves(high, [nth(set, 0), { charge: 0.0027, trace: bare }])).toThrow(
+      /sigma: on every trace or on none/,
+    )
   })
 })
 

@@ -837,6 +837,13 @@ export function useRingScoring({
     if (reference) onReference(reference)
   }
 
+  /** The outline of the face shown, view units: a drawn target fits to it. */
+  const outline = useMemo(() => {
+    if (!frame || !rings || !result || !record) return
+    const outer = Math.max(record.blackDiameter.value, ...record.rings.map((x) => x.diameter.value))
+    return ringPath(result.alignment, outer).map((q) => targetToView(frame, q))
+  }, [frame, rings, result, record])
+
   const hint = tool === 'rings' ? ringHint(ringValue, marks.length, ringsMarked, t) : undefined
 
   /** The rings of the active group's face and the values of its shots; `still` leaves out marks. */
@@ -893,5 +900,5 @@ export function useRingScoring({
   )
 
   const scope: FaceScope = { ...(fed && { federation: fed }), ...(data && { data }) }
-  return { onPoint, hint, layer, panel, of, ownRuleNote: t(ownRuleNote), scope }
+  return { onPoint, hint, layer, panel, of, ownRuleNote: t(ownRuleNote), scope, outline }
 }

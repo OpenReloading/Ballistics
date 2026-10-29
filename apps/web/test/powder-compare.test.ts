@@ -268,7 +268,7 @@ describe('postJson', () => {
     expect(await postJson('/api/x', {}, new AbortController().signal)).toEqual({ reason: 'no' })
     vi.stubGlobal('fetch', async () => new Response('x', { status: 500 }))
     expect(await postJson('/api/x', {}, new AbortController().signal)).toEqual({
-      reason: 'The API answered 500.',
+      reason: 'Error 500.',
     })
   })
 })
@@ -285,11 +285,9 @@ describe('fetchPowder', () => {
     expect(await fetchPowder('gone', signal)).toBeUndefined()
   })
 
-  it('throws on any other refusal, so the row says the API did not answer', async () => {
+  it('throws on any other refusal, so the row says the data did not load', async () => {
     vi.stubGlobal('fetch', async () => json({ message: 'busy' }, 503))
-    await expect(fetchPowder('other', new AbortController().signal)).rejects.toThrow(
-      'The API answered 503.',
-    )
+    await expect(fetchPowder('other', new AbortController().signal)).rejects.toThrow('Error 503.')
   })
 })
 
@@ -372,11 +370,11 @@ describe('postRun', () => {
   it('names a deadline and a lost connection', async () => {
     vi.stubGlobal('fetch', async () => json({ reason: 'timeout' }, 503))
     expect(await postInteriorRun({}, new AbortController().signal)).toEqual({
-      reason: 'The run passed the API deadline.',
+      reason: 'The run passed the time limit.',
     })
     vi.stubGlobal('fetch', () => Promise.reject(new TypeError('network')))
     expect(await postInteriorRun({}, new AbortController().signal)).toEqual({
-      reason: 'The API did not answer.',
+      reason: 'A data file did not load or the computation failed. Check the connection and retry.',
     })
   })
 

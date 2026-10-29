@@ -2,9 +2,11 @@
 
 import { Button, Checkbox, NativeSelect, TextInput } from '@mantine/core'
 import type { RangeStringFit, TrajectoryInput, TruingPlan } from '@open-reloading/core'
+import type { Truing } from '@open-reloading/schema'
 import { useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
+import { errorText } from '../lib/error-text.ts'
 import {
   type Attempt,
   blankChrono,
@@ -16,10 +18,15 @@ import {
   parameterLines,
   planSession,
   residualLines,
+  type StoreRefusal,
   type TruingChrono,
   type TruingRow,
+  truingEntry,
+  truingLimits,
+  withTruing,
 } from '../lib/truing-session.ts'
 import { roundedFieldText, type UnitSystem } from '../lib/units.ts'
+import { updateRecord } from '../lib/user-store.ts'
 import { PanelTable } from './scroll-region.tsx'
 
 /** What the section reads from the Trajectory tab's result. */
@@ -29,6 +36,8 @@ export type TruingNominal = {
   zeroRange: number
   /** The chosen optic's click, rad. */
   click?: number | undefined
+  /** The firearm configuration chosen in the tab, which a fit can be stored with. */
+  target?: { record: string; config: string; label: string } | undefined
 }
 
 const startRows = () => [blankRow(), blankRow(), blankRow()]
@@ -70,6 +79,95 @@ function Statuses({ lines, fit }: { lines: ParameterLine[]; fit: boolean }) {
   )
 }
 
+/** How a store ended: stored, refused for a known reason, or failed with an error text. */
+type StoreOutcome = 'stored' | StoreRefusal | { error: string }
+
+/** Stores a fit with its strings in the chosen firearm configuration, on request. */
+function StoreFit({
+  fit,
+  target,
+  entry,
+}: {
+  fit: RangeStringFit
+  target: TruingNominal['target']
+  entry: () => Truing | 'rows' | 'shots'
+}) {
+  const { t } = useTranslation()
+  /** The fit that was stored, or that failed to store. */
+  const [stored, setStored] = useState<{ fit: RangeStringFit; outcome: StoreOutcome }>()
+  // a second click before the write ends would append the same result twice
+  const [pending, setPending] = useState(false)
+  if (!target)
+    return (
+      <p className="note">
+        {t('Choose a firearm and sight above to store the result with its strings.')}
+      </p>
+    )
+  const store = () => {
+    if (pending) return
+    const end = (outcome: StoreOutcome) => {
+      setPending(false)
+      setStored({ fit, outcome })
+    }
+    setPending(true)
+    try {
+      const e = entry()
+      if (typeof e === 'string') return end(e)
+      let refused: StoreRefusal = 'missing'
+      updateRecord(target.record, (raw) => {
+        const written = withTruing(raw, target.config, e, new Date())
+        if (typeof written !== 'string') return written
+        refused = written
+      }).then(
+        (written) => end(written ? 'stored' : refused),
+        (error) => end({ error: errorText(error) }),
+      )
+    } catch (error) {
+      end({ error: errorText(error) })
+    }
+  }
+  const done = stored?.fit === fit ? stored.outcome : undefined
+  const text = (outcome: StoreOutcome) => {
+    if (typeof outcome === 'object')
+      return t(
+        'Not stored: the browser store refused it. {reason} Free browser storage and try again.',
+        { reason: outcome.error },
+      )
+    switch (outcome) {
+      case 'stored':
+        return t('Stored with {configuration}, with its strings.', { configuration: target.label })
+      case 'missing':
+        return t(
+          'Not stored: the firearm or its configuration is no longer in the library. Choose a firearm and sight above.',
+        )
+      case 'full':
+        return t(
+          'Not stored: {configuration} already holds {n} truing results. Remove an older result of it in the library.',
+          { configuration: target.label, n: truingLimits.results },
+        )
+      case 'rows':
+        return t('Not stored: a stored result keeps at most {n} rows. Remove rows and fit again.', {
+          n: truingLimits.rows,
+        })
+      case 'shots':
+        return t(
+          'Not stored: a stored result keeps at most {n} shots in a row or the chronograph. Enter fewer shots and fit again.',
+          { n: truingLimits.shots },
+        )
+    }
+  }
+  return (
+    <>
+      <Button variant="default" disabled={pending || done === 'stored'} onClick={store}>
+        {t('Store with {configuration}', { configuration: target.label })}
+      </Button>
+      <p role="status" className="note">
+        {done && text(done)}
+      </p>
+    </>
+  )
+}
+
 /** The count line a screen reader hears when an answer arrives. */
 const countText = (what: string, lines: ParameterLine[], t: Translator['t']) =>
   t('{what}: {n} of {total} parameters identified.', {
@@ -82,7 +180,8 @@ const countText = (what: string, lines: ParameterLine[], t: Translator['t']) =>
  * Truing from range strings: plan a string of distances before shooting, enter the measured
  * strings, and read muzzle velocity, drag factor and click value with their intervals
  * (`apps/docs/docs/models/exterior-truing-strings.md`). The nominal shot is the Trajectory tab's.
- * Nothing is stored.
+ * A fit is stored only on request, with the strings, in the chosen firearm configuration; nothing
+ * else is kept.
  */
 export function TruingSession({ nominal, system }: { nominal: TruingNominal; system: UnitSystem }) {
   const { t } = useTranslation()
@@ -295,6 +394,11 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
             </p>
           )}
           <p className="note">{t('Simulation, not load data.')}</p>
+          <StoreFit
+            fit={fitted.answer}
+            target={nominal.target}
+            entry={() => truingEntry(nominal, inputs, fitted.answer, new Date())}
+          />
         </section>
       )}
     </div>

@@ -9,6 +9,7 @@
 
 import { fromSi } from '@open-reloading/schema'
 import { errorText } from './error-text.ts'
+import { findFace } from './face-search.ts'
 import {
   autoDetect,
   detectFromExample,
@@ -22,7 +23,7 @@ import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protoco
 import { nth } from './nth.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
 import { clamp } from './raster-ops.ts'
-import { faceLabel, findFace, onPhoto } from './target-face.ts'
+import { faceLabel, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
 
 /** The face search looks at the photo resized to this many px on its longer side. */
@@ -130,12 +131,14 @@ async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<
     { width: shot.width, height: shot.height, data: shot.data },
     r.faces,
     r.pxPerMm && r.pxPerMm * fk,
+    r.holeDiameter && fromSi('length', r.holeDiameter),
   )
   // the hole on the resized photo, from the scale of the best fit
   const [fit] = found.fits
   const holePx = fit && r.holeDiameter ? fit.pxPerMm * fromSi('length', r.holeDiameter) : undefined
   // the selected target's layout, else the one of a face found for sure; a weaker match is no hint
-  const layout = r.layout ?? (found.sure && fit ? layoutOf(fit.face) : undefined)
+  const layout =
+    r.layout ?? (found.sure && found.alike.length < 2 && fit ? layoutOf(fit.face) : undefined)
   const quality = photoQuality({ image: shot, scale: fk, black: found.black, holePx, layout })
   return { kind: 'face', search: onPhoto(found, fk, fx0, fy0), quality }
 }

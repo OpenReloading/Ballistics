@@ -6,6 +6,7 @@ import {
   checkAir,
   densityAltitude,
   InputError,
+  icao,
   saturationVapourPressure,
   speedOfSound,
   standardAtmosphere,
@@ -19,6 +20,12 @@ describe('standard atmosphere', () => {
     expect(air).toEqual({ altitude: 0, pressure: 101325, temperature: 288.15, humidity: 0 })
     expect(rel(airDensity(air), 1.225)).toBeLessThan(1e-5)
     expect(rel(speedOfSound(air), 340.294)).toBeLessThan(1e-5)
+  })
+
+  it('has a sea-level density 1.018 times the older reference density of 0.075126 lb/ft3', () => {
+    const density = icao.pressure / (icao.gasConstant * icao.temperature)
+    const older = 0.075126 * (0.45359237 / 0.3048 ** 3)
+    expect(density / older).toBeCloseTo(1.018, 3)
   })
 
   it('reaches 216.65 K and 22632.06 Pa at the tropopause', () => {

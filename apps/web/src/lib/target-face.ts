@@ -52,7 +52,7 @@ const TOLERANCE = 0.03
 /** Faces within this score of the best (half a ring) are ratio twins: a ring the photo misses or a false one can make another face fit as well. */
 const TIE = 0.5
 /** A known scale and the scale a face needs for the black area found differ by at most this share. */
-const SCALE_TOLERANCE = 0.2
+export const SCALE_TOLERANCE = 0.2
 /** A face needs the black edge and at least this many matched rings. */
 const MIN_RINGS = 3
 /** The search stops at a fit this good (score), else it tries every black area candidate. */
@@ -617,6 +617,13 @@ export type FaceSearch = {
   /** The fits of the best face and of the faces that fit as well (ratio twins), best first. */
   fits: FaceFit[]
   /**
+   * The fits of the faces that match every ring the best face matches, whatever their score (a
+   * larger face is marked down for its outer rings the photo does not show), smallest first: an
+   * equal choice when there is more than one. Empty with a known scale, which has dropped the faces
+   * of another size.
+   */
+  alike: FaceFit[]
+  /**
    * One face with at least four rings matched and a score of 2.5: the editor applies it without a
    * question. Fewer rings are a coincidence of ratios often enough (rings at equal spacing) that the
    * user confirms the face.
@@ -624,20 +631,26 @@ export type FaceSearch = {
   sure: boolean
 }
 
-/**
- * Finds the target face in a photo. `image` may be any size: the search runs on a grid of about
- * 700 px and a crop of about 1400 px. `fits` is empty when no face is proposed (no black area, or
- * fewer than two rings match): `ellipses` and `ranked` are then what the editor shows. More than
- * one fit means ratio twins: the user's event or distance tells them apart. A known `scale` (image px per mm) drops the faces of another size first.
- */
-export function findFace(
+/** The fits of the faces that match every ring the best face matches, smallest first; none with a known scale. */
+function alikeOf(black: Ellipse, ranked: FaceMatch[], scale: number | undefined): FaceFit[] {
+  const [top] = ranked
+  if (scale || !top) return []
+  return ranked
+    .filter((m) => top.matched.every((t) => m.matched.some((x) => x.ring === t.ring)))
+    .map((m) => fitFace(black, m))
+    .filter((f): f is FaceFit => !!f)
+    .sort((a, b) => a.outer - b.outer)
+}
+
+/** The face search of `findFace` (`face-search.ts`) at one scale, or none. */
+export function searchFaces(
   image: RgbaImage,
   faces: readonly TargetFace[],
-  scale?: number | undefined,
+  scale: number | undefined,
 ): FaceSearch {
   const s0 = Math.max(1, Math.ceil(Math.max(image.width, image.height) / COARSE))
   const coarse = grayGrid(image, s0)
-  let result: FaceSearch = { ellipses: [], rings: [], ranked: [], fits: [], sure: false }
+  let result: FaceSearch = { ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }
   let bestScore = Number.NEGATIVE_INFINITY
   for (const cand of blackAreas(coarse)) {
     const { black, rings } = ringLines(image, toImageEllipse(coarse, cand.ellipse))
@@ -653,6 +666,7 @@ export function findFace(
         matched: m.matched.length,
       })),
       fits: [],
+      alike: [],
       sure: false,
     }
     if (!result.black) result = search
@@ -668,7 +682,8 @@ export function findFace(
       .filter((f): f is FaceFit => !!f)
     if (!fits.length || top.score <= bestScore) continue
     const sure = fits.length === 1 && top.matched.length >= SURE_RINGS && top.score >= SURE_SCORE
-    ;[result, bestScore] = [{ ...search, fits, sure }, top.score]
+    const alike = alikeOf(black, ranked, scale)
+    ;[result, bestScore] = [{ ...search, fits, alike, sure }, top.score]
     if (top.score >= SURE) break
   }
   return result
@@ -714,21 +729,23 @@ export function onPhoto(search: FaceSearch, k: number, x0: number, y0: number): 
   }
   // photo to work: x' = k (x - x0)
   const toWork: Matrix = [k, 0, -k * x0, 0, k, -k * y0, 0, 0, 1]
+  const fit = (f: FaceFit): FaceFit => ({
+    ...f,
+    centre: p(f.centre),
+    toFace: mul3(f.toFace, toWork),
+    pxPerMm: f.pxPerMm / k,
+    corners: f.corners.map(p) as FaceFit['corners'],
+    outline: f.outline.map(p),
+    blackOutline: f.blackOutline.map(p),
+  })
   return {
     ...(search.black && { black: e(search.black) }),
     ellipses: search.ellipses.map(e),
     rings: search.rings.map((r) => ({ ...r, ellipse: e(r.ellipse) })),
     ranked: search.ranked,
     sure: search.sure,
-    fits: search.fits.map((f) => ({
-      ...f,
-      centre: p(f.centre),
-      toFace: mul3(f.toFace, toWork),
-      pxPerMm: f.pxPerMm / k,
-      corners: f.corners.map(p) as FaceFit['corners'],
-      outline: f.outline.map(p),
-      blackOutline: f.blackOutline.map(p),
-    })),
+    fits: search.fits.map(fit),
+    alike: search.alike.map(fit),
   }
 }
 

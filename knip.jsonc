@@ -15,7 +15,7 @@
       "entry": ["src/index.ts", "src/write-json-schema.ts"]
     },
     "packages/core": {
-      "entry": ["src/index.ts"]
+      "entry": ["src/index.ts", "scripts/*.mts"]
     },
     "packages/importers": {
       "entry": ["src/index.ts"]

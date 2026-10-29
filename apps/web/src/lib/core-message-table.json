@@ -36,6 +36,7 @@
     "no-information",
     "collinear",
     "imprecise",
+    "inconsistent",
     "fit-failed",
     "apex",
     "atmosphere",
@@ -81,9 +82,9 @@
   ],
   "templates": {
     "app and API request failures": [
-      "The API answered {status}.",
-      "The API did not answer.",
-      "The run passed the API deadline.",
+      "The model refused the load. The error panel gives the reason.",
+      "A data file did not load or the computation failed. Check the connection and retry.",
+      "The run passed the time limit.",
       "The lot rows did not answer in {seconds} s.",
       "The longer run did not answer in {seconds} s.",
       "Error {status}.",
@@ -168,7 +169,11 @@
       "boreDiameter must be positive",
       "the trace has no positive pressure",
       "too few trace samples in the window",
-      "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction"
+      "the model at the start values leaves the barrel before the end of the trace window; start closer or raise fallFraction",
+      "at least one trace",
+      "sigma: on every trace or on none",
+      "traces {list} have the same charge",
+      "the highest peak (trace {high}) is {ratio} times the lowest (trace {low}), below {limit}"
     ],
     "fit confidence and sessions": [
       "at least one point",
@@ -211,6 +216,22 @@
       "the powder has no interior model",
       "the bore resistance of the powder needs {list}"
     ],
+    "pooled powder fit": [
+      "parameters: burnRate, temperatureFactor, each at most once, burnRate always",
+      "rifleSigma and lotSigma must be positive",
+      "at least one ladder point per session",
+      "ladder charge and velocity positive",
+      "velocitySigma on every point",
+      "the pooled fit takes velocities only",
+      "barrel length and temperature per session",
+      "the sessions of a powder share one burn kind",
+      "a prior needs its powder in the sessions",
+      "prior {kind} of {group}: value and sigma above 0",
+      "the pooled fit has no covariance",
+      "velocitySigma must be 0 or above",
+      "the powder of the target must be one of the fit",
+      "at least one held-out string"
+    ],
     "ladders": [
       "ladder start charge must be above 0",
       "ladder step must be above 0",
@@ -249,6 +270,11 @@
       "the group dispersion must be positive",
       "wind inputs must not be negative",
       "the range uncertainty must not be negative",
+      "the speed spread must not be negative",
+      "the height spread from the muzzle speed exceeds the vertical spread of the group",
+      "the offset must be finite",
+      "the hit probability must be between 0 and 1",
+      "the wanted probability must be between 0 and 1 exclusive",
       "the semi-axes must be positive",
       "the standard deviations must be positive",
       "a face needs at least one zone",

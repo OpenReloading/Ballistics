@@ -15,6 +15,7 @@ import {
   type ReactNode,
   type RefObject,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react'
@@ -28,6 +29,7 @@ import {
   ownCartridges,
 } from '../lib/caliber-candidates.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
+import { errorText } from '../lib/error-text.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
 import { type FoundFace, faceGeometry } from '../lib/face-sheet.ts'
 import type { FlaggedRegion, HoleProposal } from '../lib/hole-detection.ts'
@@ -281,16 +283,25 @@ export function useHoleDetection({
       }
       onReply(m)
     }
-    w.onerror = () => {
+    w.onerror = (e) => {
       if (worker.current !== w) return
-      failed()
+      failed(e.message)
     }
     w.postMessage(request)
   }
 
-  const failed = () => {
+  const failed = (error?: unknown) => {
     stop()
-    say(t('Hole detection failed in this browser.'), true)
+    say(
+      [
+        t('Hole detection failed in this browser.'),
+        error ? errorText(error) : '',
+        t('Try a smaller photo or another browser.'),
+      ]
+        .filter(Boolean)
+        .join(' '),
+      true,
+    )
   }
 
   async function photoBlob() {
@@ -434,7 +445,7 @@ export function useHoleDetection({
         setQuality(m.quality)
         const { fits } = m.search
         const [only] = fits
-        if (only && fits.length === 1 && m.search.sure) {
+        if (only && fits.length === 1 && m.search.sure && m.search.alike.length < 2) {
           // below the minimum quality the face is applied and the run waits for Detect anyway
           const hold = thenDetect && belowMinimum(m.quality)
           setHeld(hold)
@@ -498,7 +509,7 @@ export function useHoleDetection({
     const stopped = stops.current
     const [id = '', event] = value.split('|')
     const fit =
-      found.fits.find((f) => f.face.id === id) ??
+      [...found.fits, ...found.alike].find((f) => f.face.id === id) ??
       (await fetchFace(id).then(
         (f) => fitPicked(found, f),
         () => undefined,
@@ -735,6 +746,7 @@ export function useHoleDetection({
       maybe={proposals.length - sure.length}
       flagged={flagged.length}
       onAccept={() => take(sure)}
+      onAcceptMaybe={() => take(proposals.filter(isMaybe))}
       onClear={() => {
         setProposals([])
         setFlagged([])
@@ -889,11 +901,11 @@ function blockedReason(
 }
 
 /** What follows a face search that did not settle on one face: the step and the line to say. */
-function faceFollowUp({ fits, black }: FaceSearch, t: Translator['t']) {
+function faceFollowUp({ fits, alike, black }: FaceSearch, t: Translator['t']) {
   // no black area at all: the steps as they were, from the photo's turn
   if (!black)
     return { step: 0, text: t('Straighten the photo if needed, then set the scale (step 2).') }
-  if (fits.length > 1)
+  if (fits.length > 1 || alike.length > 1)
     return {
       step: 1,
       text: t('More than one target fits these rings: choose one in Target.'),
@@ -979,8 +991,9 @@ const sourceNames = {
 type FaceChoice = { value: string; label: string }
 
 /**
- * What to choose from: for the faces that fit (several are ratio twins) each face with each of its
- * events and the distance, so the event or the distance shot tells them apart; without a fit the
+ * What to choose from: for the faces that fit (several are ratio twins) each face with its outer
+ * diameter and each of its events and the distance, so the size, the event or the distance shot
+ * tells them apart; faces that match the same rings come first, smallest first; without a fit the
  * ranking of the faces.
  */
 function faceChoices(
@@ -991,11 +1004,14 @@ function faceChoices(
   if (!found) return []
   if (!found.fits.length)
     return found.ranked.slice(0, 4).map((r) => ({ value: r.id, label: r.name }))
-  return found.fits.flatMap((f) =>
+  const alike = found.alike.length > 1 ? found.alike : []
+  const fits = [...alike, ...found.fits.filter((f) => !alike.some((a) => a.face.id === f.face.id))]
+  return fits.flatMap((f) =>
     f.face.events.map((e) => ({
       value: `${f.face.id}|${e.id}`,
-      label: t('{face}: {event}, {distance}', {
+      label: t('{face} ({outer}): {event}, {distance}', {
         face: f.face.name,
+        outer: formatQuantity('length', system, toSi('length', 2 * f.outer)),
         event: e.name,
         distance: formatQuantity('range', system, toSi('length', e.distance.value)),
       }),
@@ -1421,31 +1437,39 @@ function ReviewStep({
   maybe,
   flagged,
   onAccept,
+  onAcceptMaybe,
   onClear,
 }: {
   proposals: number
   maybe: number
   flagged: number
   onAccept: () => void
+  onAcceptMaybe: () => void
   onClear: () => void
 }) {
   const { t } = useTranslation()
+  const help = useId()
   return (
-    <div
-      className="prop-grid"
-      title={t(
-        'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
-      )}
-    >
+    <div className="prop-grid">
       <Button
         size={controlSize.row.button}
         className="wide"
         disabled={proposals === 0}
+        aria-describedby={help}
         onClick={onAccept}
       >
         {t('Accept all ({count})', { count: proposals })}
       </Button>
       <span className="row-buttons wide">
+        <Button
+          size={controlSize.row.button}
+          variant="default"
+          disabled={maybe === 0}
+          aria-describedby={help}
+          onClick={onAcceptMaybe}
+        >
+          {t('Accept maybes ({count})', { count: maybe })}
+        </Button>
         <Button
           size={controlSize.row.button}
           variant="default"
@@ -1457,6 +1481,11 @@ function ReviewStep({
           {t('Clear')}
         </Button>
       </span>
+      <p id={help} className="review-help wide">
+        {t(
+          'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
+        )}
+      </p>
     </div>
   )
 }

@@ -3,7 +3,9 @@ import path from 'node:path'
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
+import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
+import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
@@ -174,6 +176,19 @@ const states: State[] = [
     },
   },
   {
+    name: 'Powder tuning Chart data',
+    scrolls: true,
+    open: async (page, check) => {
+      // the fit may take up to 60 s after a run, a save and a navigation
+      test.setTimeout(120_000)
+      await openFit(page)
+      const data = page.locator('.values-details')
+      await data.getByText('Chart data', { exact: true }).click()
+      await expect(data.getByRole('table', { name: /^Velocity and band/ })).toBeVisible()
+      await check('page')
+    },
+  },
+  {
     name: '/ with saved loads',
     scrolls: true,
     open: async (page, check) => {
@@ -226,6 +241,27 @@ const states: State[] = [
       await expect(dialog.getByRole('row', { name: /^Length/ })).toContainText(/31\.\d+ ± /, {
         timeout: 30_000,
       })
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Import entry',
+    open: async (page, check) => {
+      await withoutOpenPicker(page)
+      await gotoHydrated(page, '/bullets/designer')
+      // a table that folds, and a text without a table that is refused
+      await pickFiles(page, [
+        {
+          name: 'bullets.csv',
+          buffer: Buffer.from('Name,Diameter (mm),Weight (gr)\nAlpha,7.82,150'),
+        },
+        { name: 'notes.txt', buffer: Buffer.from('Notes, from the range\nwindy day') },
+      ])
+      const dialog = await dialogOf('Tables to read')(page)
+      await expect(dialog.getByTestId('import-verdict')).toHaveText([
+        /^Table of bullets/,
+        'Refused',
+      ])
       await check('dialog', '[role="dialog"]')
     },
   },

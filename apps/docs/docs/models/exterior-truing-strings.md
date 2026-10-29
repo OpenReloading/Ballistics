@@ -11,7 +11,7 @@ A range string is a set of measurements at known distances: the mean impact abov
 - `planTruingStrings` gives the statuses and standard errors of a planned string before any shot, and the refusals of its structure.
 - `comparePlanCandidates` does so for several candidate strings.
 
-The workbench's Trajectory tab has the section Truing from range strings: the plan from distances, shots and the dispersion of one shot, the entry of measured rows, each with its number of shots and standard deviation, and the fit with its intervals and residual check. Its nominal shot is the tab's result.
+The workbench's Trajectory tab has the section Truing from range strings: the plan from distances, shots and the dispersion of one shot, the entry of measured rows, each with its number of shots and standard deviation, and the fit with its intervals and residual check. Its nominal shot is the tab's result. With a firearm and sight chosen in the tab, Store with keeps the result in that firearm configuration (`truing` of the configuration), with the strings it came from, the nominal shot and the values of the identified parameters only. The firearm editor lists them. A stored result changes no other value: the click value, drag factor and muzzle velocity are applied only where the user enters them.
 
 Every prediction is an ordinary `trajectory` call. The iteration is the [least squares on log parameters](least-squares.md).
 

@@ -39,6 +39,8 @@ describe('workbench page bar in the language shown', () => {
     const names: unknown[] = []
     const found = {
       locator: () => found,
+      first: () => found,
+      waitFor: async () => {},
       count: async () => 0,
       getByRole: (_role: string, options: unknown) => names.push(options),
     }

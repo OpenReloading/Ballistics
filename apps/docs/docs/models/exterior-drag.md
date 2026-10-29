@@ -41,6 +41,8 @@ Code: `packages/core/src/exterior/drag.ts`, `lbPerSqInToKgPerSqM`.
 
 A BC names the reference atmosphere it was reduced to (`reference`: `icao` or `metro`). The model stores the reference and checks its value. It does not scale the drag by it: the standard functions are dimensionless and carry no air density, so every BC is used as given.
 
+The two references differ in sea-level air density. The older US Army standard ([AMCP 706-140](../bibliography.md#amcp-706-140)) uses 0.075126 lb/ft³ (1.2034 kg/m³), the ICAO atmosphere 1.2250 kg/m³ ([ICAO 1993](../bibliography.md#icao-1993), [U.S. Standard Atmosphere, 1976](https://ntrs.nasa.gov/citations/19770009539)), 1.8 % more. A BC reduced to the older density converts to the ICAO density by the factor 1.018 (1.2250 / 1.2034). The model does not apply it, so a `metro` BC used as given can differ by up to that factor ([research log](../research/exterior-reference-air-earth-curvature.md)).
+
 ### Velocity bands
 
 A BC input holds one or more bands $(C_k, v_k)$: band $k$ applies while the airspeed is at least $v_k$. The band with the highest threshold not above the airspeed is active, and the lowest band applies below every threshold:
@@ -149,7 +151,7 @@ The extension of such a segment can reach zero or negative drag within one trial
 - A BC against the wrong standard function (for example a G1 BC read against G7) cannot be detected. The result names the drag model used (`dragModel`).
 - A drag curve needs at least two nodes, strictly rising Mach and $C_D \ge 0$. A BC must be positive, and bands need distinct thresholds.
 - With the standard tables the two interpolations differ most after the bullet turns transonic or subsonic. A sparse custom curve depends more on the choice than the standard tables.
-- Research log: [monotone cubic against hand-computed values](../research/drag-monotone-cubic-closed-form.md).
+- Research log: [monotone cubic against hand-computed values](../research/drag-monotone-cubic-closed-form.md), [reference air and Earth curvature](../research/exterior-reference-air-earth-curvature.md).
 
 ## Sources
 

@@ -22,6 +22,7 @@
 . ChargeSolverOptions
 . ChargeTarget
 . ChargeTargetKind
+. ChargedTrace
 . Chronograph
 . ChronographString
 . ClosedVesselResult
@@ -32,6 +33,7 @@
 . CurveParameterReport
 . CurveReason
 . CurveResidual
+. CurveWarning
 . DispersionInput
 . DispersionResult
 . DragInput
@@ -103,7 +105,19 @@
 . PlanRefusal
 . PlanRefusalId
 . PointDispersion
+. PointOffset
+. PooledFitOptions
 . PooledGroupStatistics
+. PooledParameterKind
+. PooledPowderFit
+. PooledPowderParameter
+. PooledPrediction
+. PooledPredictionOptions
+. PooledPriors
+. PooledRequest
+. PooledResidual
+. PooledSession
+. PooledTarget
 . PooledValues
 . PowderAxis
 . PowderAxisRange
@@ -138,6 +152,7 @@
 . PressureBasis
 . PressureCase
 . PressureCurveFit
+. PressureCurvesFit
 . PressureHistory
 . PressureInput
 . PressureRange
@@ -174,15 +189,16 @@
 . SessionReading
 . SessionsTruingResult
 . Settings
+. ShotsToHit
 . ShotshellLoad
 . ShotshellResult
 . SimilarPowder
 . SimilarPowdersPrior
 . SkippedInput
-. StabilityPoint
 . StartPressureDefault
 . StepBudget
 . TargetMotion
+. TraceResiduals
 . Trajectory
 . TrajectoryInput
 . TrajectoryOptions
@@ -223,6 +239,7 @@
 . burnError
 . burnForm
 . burnFormKeys
+. calibratePooled
 . cartridgeBoreAreaMm2
 . cartridgeBulletDiameterMm
 . cartridgeDiameters
@@ -264,10 +281,11 @@
 . estimateDragFromOutline
 . fQuantileTwoNumeratorDegrees
 . fillLoadRatioLimit
-. firstLowStability
 . fitPowder
+. fitPowderPooled
 . fitPowderSessions
 . fitPressureCurve
+. fitPressureCurves
 . fitTruingStrings
 . freeRecoil
 . gasVelocityFactor
@@ -304,7 +322,6 @@
 . millerStability
 . minAltitude
 . minIntervalScale
-. minStability
 . missingLoadKeys
 . momentSlopeFromStability
 . movingTargetLead
@@ -317,6 +334,7 @@
 . placeMaximum
 . planTruingStrings
 . pointDispersion
+. pooledDefaults
 . pooledGroupStatistics
 . pooledVelocitySd
 . powderConfidence
@@ -325,6 +343,7 @@
 . powderInputDefaults
 . powderModelValues
 . powderPressureRange
+. predictPooled
 . predictPowder
 . predictionEllipse
 . pressureInputs
@@ -340,6 +359,7 @@
 . seatingTolerance
 . segmentCoefficient
 . shotsNeeded
+. shotsToHit
 . shotshellInterior
 . shotshellInteriorLoad
 . similarPowderRules

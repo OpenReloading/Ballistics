@@ -24,6 +24,12 @@ export const formatNames = Object.fromEntries(chronoFormats.map((f) => [f.id, f.
   string
 >
 
+/** Formats read in the browser: a delimited file needs a column mapping, which the browser does not take. */
+export const formats = Object.entries(formatNames)
+  .filter(([k]) => k !== 'delimited')
+  .map(([, name]) => name)
+  .join(', ')
+
 /** The OpenReloading JSON template: the members the importer reads (velocities in m/s) and two made-up strings. */
 export const templateJson = `${JSON.stringify(
   {
@@ -79,14 +85,18 @@ export const exampleCsv = `${[
 /** Largest file read, bytes: 32 MiB, the importers' limit for the unpacked parts of a workbook. */
 const maxFileBytes = 32 * 1024 * 1024
 const tooLarge = msg('The file is larger than 32 MiB.')
-const notWorkbook = msg('The workbook is not a recognized chronograph export.')
-const notExport = msg('The file is not a recognized chronograph export.')
+const notWorkbook = msg(
+  "The workbook is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX and choose that file.",
+)
+const notExport = msg(
+  "The file is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX and choose that file.",
+)
 const ownMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
 
 /** The message of an error thrown here or by the importers, in the language of `t`. */
 export const chronoMessageText = (text: string, t: Translator['t']) => {
   const own = ownMessages.find((m) => m === text)
-  return own ? t(own) : translateMessage(text, t)
+  return own ? t(own, { formats }) : translateMessage(text, t)
 }
 
 /** The bytes of a chosen file, its size checked before reading, so a large file chosen by mistake is never loaded. */

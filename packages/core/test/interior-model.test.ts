@@ -642,6 +642,19 @@ describe('failure reasons', () => {
     expect(interior(load)).toEqual({ valid: false, reason })
   })
 
+  it('a projectile that slows before the muzzle without stopping is a valid run', () => {
+    const r = interior({
+      ...m3Load,
+      charge: 0.0006,
+      barrel: { length: 1.5, twist: 0 },
+      resistance: { friction: 5e6 },
+    })
+    if (!r.valid) throw new Error(r.reason)
+    const highest = Math.max(...r.points.map((p) => p.velocity))
+    expect(r.muzzleVelocity).toBeCloseTo(189.4, 1)
+    expect(highest).toBeCloseTo(195.6, 1)
+  })
+
   it.each([
     ['bullet.mass', { ...base, bullet: { mass: -1 } }],
     ['propellant.gamma', { ...base, propellant: { ...base.propellant, gamma: 1 } }],

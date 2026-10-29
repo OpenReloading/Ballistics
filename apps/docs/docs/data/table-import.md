@@ -9,6 +9,15 @@ The web app imports a table of bullets, powders or cartridges (CSV, text, workbo
 
 Each file is told by its bytes, its extension is not read. An OpenReloading data file goes to the data import and its report, as before. On the cards a file is tried in this order: larger than 40 MB (refused), a load file of a known format ("Load file, read by <format>", with its record count and what it did not read), a workbook by its signature, then the text as a JSON list or a delimited table. Code: `apps/web/src/lib/load-file-formats.ts` (the load-file formats, one entry each).
 
+## Limits
+
+A file over a limit is not imported. The card or the status line says which limit it met.
+
+- 40 MB per file (`maxFileBytes` in `apps/web/src/lib/user-data.ts`): a larger file is refused before it is read, with "The file is larger than 40 MB."
+- 256 columns (`maxColumn` in `packages/importers/src/limits.ts`): a wider table is refused, with "The table has more than 256 columns." Remove the extra columns or choose another file.
+- 1,000,000 cells, columns times rows (`maxCells` in `packages/importers/src/limits.ts`): a larger table is refused, with "The table has more than 1000000 cells." Split it into smaller files.
+- 32 MiB for a chronograph file in the workbench's Measurements tab (`maxFileBytes` in `apps/web/src/lib/chrono.ts`): a larger file is refused before it is read, with "The file is larger than 32 MiB."
+
 ## Kind
 
 Each kind gets a score from 0 to 1: every column is matched to at most one field, and each field adds its weight times how well the column fits. A column fits by its header words (the whole header is an alias, one of its words is, or it contains an alias of four letters or more) and by its values (numbers in the usual range, a listed choice, text for a text field). The core fields of a kind, Name among them, add up to 1 or a little more, the others (such as Maker) are a bonus on top; the score is capped at 1.

@@ -163,7 +163,7 @@ $$
 
 Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `apps/web/src/lib/raster-ops.ts`, `components`.
 
-A proposal with a confidence below 0.5 is shown as "maybe": the user can accept it on the photo, but Accept all and the proposal count leave it out. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
+A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step, and Accept all and the proposal count leave it out. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `MAYBE_BELOW`, `isMaybe`.
 
@@ -285,14 +285,16 @@ $$
 
 Code: `apps/web/src/lib/target-face.ts`, `matchFaces`, `scoreMatch`, `shareInFrame`.
 
-4. Every target within 0.5 of the best score with at least 3 rings matched is offered. Targets whose rings the photo shows in the same ratios (an insert card shows rings shared by several targets) are a choice for the user.
+4. Every target within 0.5 of the best score with at least 3 rings matched is offered. Targets whose rings the photo shows in the same ratios (an insert card shows rings shared by several targets) are a choice for the user. Without a known scale, so is every target that matches all the rings the best target matches, whatever its score: a larger target with outer rings the photo does not show scores lower for them. The editor lists these first, smallest first, each with its outer diameter.
 5. The plane: the pair of matched ellipses farthest apart in radius gives the target plane by the conic pencil of two concentric circles, which removes the perspective. A plane whose ellipses do not rectify to circles of the target's radii within 1.5 % of the black radius (rms) drops its worst ring and tries again.
+
+Without a known scale but with a hole size (a caliber or a typed size), when the targets that match the same rings differ in size by more than 40 %, the holes set the scale: the median diameter of the up to 5 strongest light blobs (at least half as strong as the strongest) inside the black area, its edge kept a hole away, over the hole size. The blobs are sought between 0.6 times the smallest and 1.2 times the largest hole size these targets give. The targets' hole sizes and the blobs measured are on the fit's scale, the mean over the tilt (the square root of the local area scale), while a known scale runs along the black area's long axis: the scale is turned to that axis by the ratio of the black area's semi-major axis over the target's black radius to the fit's scale. The search then runs again with that scale, and keeps its first result when no target fits it (`holeSize`).
 
 One target with at least 4 rings matched and a score of 2.5 calibrates the sheet without a question. Otherwise the editor shows what was found and opens the scale step: the user chooses the target, types the black diameter or marks a ring of known size in Calibrate.
 
 The active group takes the target for ring scoring with the event the user chose, else the event of its discipline on this target, else the target's event at the group's distance: of the federation chosen for the Discipline list, else of the federation that publishes the target, else of the one federation that shoots the target there. Otherwise the group has no event and the Discipline list stays empty: no federation is guessed (`apps/web/src/lib/face-sheet.ts`, `calibrateSheetOnFace`).
 
-Code: `apps/web/src/lib/target-face.ts`, `findFace`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `apps/web/src/lib/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
+Code: `apps/web/src/lib/face-search.ts`, `findFace`, `holeSize`. `apps/web/src/lib/target-face.ts`, `searchFaces`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `apps/web/src/lib/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
 
 ### Detection without a picked hole
 
@@ -402,7 +404,8 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 - Print whose parts differ by more than about a fifth in disc diameter (digits of quite different sizes on one target) can read as holes on print: numerals of 4 and 5 mm width pass, a 6.5 mm width among 4 mm ones does not (synthetic digits).
 - A run whose strongest peaks are smaller than half the expected hole size is cut as grain, so holes visible at under about half the expected size are not found without a picked hole.
 - A hole under 4 photo pixels across is refused. So is a region whose working image would leave a hole fewer than 4 working pixels.
-- Without a known scale the search cannot tell targets of equal ring ratios and different size apart, and a target that is penalised for rings the photo does not show can rank behind a larger twin outside the tie window.
+- Without a known scale or a hole size the search cannot tell targets of equal ring ratios and different size apart: they are an equal choice, also on a photo of the smaller target that shows all its rings.
+- The holes set the scale only when they stand on the black area and show lighter than it.
 - The target search does not read the ring numerals: on a photo of an insert card the targets whose inner rings stand in the same ratios are offered for the user to choose.
 - The photo scale comes from the sheet's calibration near the middle of the region. Perspective across the region is not corrected per hole.
 

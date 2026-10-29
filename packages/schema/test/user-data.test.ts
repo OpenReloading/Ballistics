@@ -615,6 +615,67 @@ describe('firearm', () => {
     })
   })
 
+  describe('truing results of a configuration', () => {
+    const result = {
+      date: '2026-10-29',
+      bullet: 'Test bullet',
+      muzzleVelocity: { value: 790 },
+      zeroRange: { value: 100000 },
+      temperature: { value: 15 },
+      pressure: { value: 1013.25 },
+      humidity: { value: 0 },
+      clickValue: { value: 0.00573 },
+      fitZeroOffset: false,
+      rows: [
+        {
+          kind: 'impact',
+          range: { value: 300000 },
+          shots: 5,
+          mean: { value: -120 },
+          deviation: { value: 60 },
+        },
+        { kind: 'dial', range: { value: 800000 }, shots: 5, mean: 64, deviation: 2 },
+      ],
+      chronograph: { shots: 10, mean: { value: 800 }, deviation: { value: 4 } },
+      parameters: [
+        {
+          name: 'muzzleVelocity',
+          status: 'identified',
+          reasons: [],
+          value: { value: 801 },
+          lower: { value: 796 },
+          upper: { value: 806 },
+          confidenceLevel: 0.95,
+        },
+        { name: 'dragFactor', status: 'weak', reasons: ['imprecise'] },
+      ],
+      intervalsTrusted: true,
+    }
+    const withResults = (truing: unknown[]) => ({ configurations: [{ ...config, truing }] })
+
+    it('round-trips through a user data file', () => {
+      const record = { ...firearmRecord, data: { ...firearmRecord.data, ...withResults([result]) } }
+      expect(userDataFile.parse(file([record])).records[0]).toEqual(record)
+    })
+
+    it('rejects a dial in lengths, an impact in clicks and an unknown parameter', () => {
+      const [impact, dial] = result.rows
+      expect(paths(withResults([{ ...result, rows: [{ ...dial, mean: { value: 64 } }] }]))).toEqual(
+        ['data.configurations.0.truing.0.rows.0.mean'],
+      )
+      expect(paths(withResults([{ ...result, rows: [{ ...impact, mean: -120 }] }]))).toEqual([
+        'data.configurations.0.truing.0.rows.0.mean',
+      ])
+      expect(
+        paths(
+          withResults([
+            { ...result, parameters: [{ name: 'twist', status: 'weak', reasons: [] }] },
+          ]),
+        ),
+      ).toEqual(['data.configurations.0.truing.0.parameters.0.name'])
+    })
+  })
+
   it('takes a lands contact with the bullet it was measured with, and none without that bullet', () => {
     const contact = { baseToOgiveAtLands: { value: 28.4 }, overallLengthAtLands: { value: 71.2 } }
     expect(paths({ ...contact, landsBullet: 'catalogue:test-bullet' })).toBeUndefined()

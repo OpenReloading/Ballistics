@@ -15,7 +15,6 @@ import { useDebouncedValue, useMediaQuery } from '@mantine/hooks'
 import {
   type DragModel,
   dragModels,
-  minStability,
   type OmittedEffect,
   type Trajectory,
 } from '@open-reloading/core'
@@ -74,7 +73,7 @@ import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
-import { TruingSession } from './truing-session.tsx'
+import { type TruingNominal, TruingSession } from './truing-session.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
@@ -136,6 +135,8 @@ type Result = TrajectoryResult & {
   click?: { value: number; unit?: 'MOA' | 'mrad' | undefined }
   /** Where the applied drag factor comes from: the mount it was filled from. */
   dragSource?: string
+  /** The firearm configuration of the chosen sight, which a truing result is stored with. */
+  target?: TruingNominal['target']
 }
 
 type RecordState =
@@ -159,6 +160,7 @@ type Inputs = {
   design: string | undefined
   click: Result['click']
   dragSource: string | undefined
+  target: Result['target']
 }
 
 type Attempt =
@@ -241,6 +243,7 @@ function resultExtras(i: Inputs) {
   return {
     ...(i.click && { click: i.click }),
     ...(i.dragSource && { dragSource: i.dragSource }),
+    ...(i.target && { target: i.target }),
     ...(i.source === 'manual' && i.design && { design: i.design }),
   }
 }
@@ -400,18 +403,6 @@ function ResultNotes({ result, system }: { result: Result; system: UnitSystem })
           })}
         </li>
       )}
-      {flight.stability !== undefined && result.lowStability && (
-        <li className="exceeded">
-          {t(
-            "Gyroscopic stability falls below {limit} from {range} ({value} there, Miller's rule with the speed and air along the flight). Check the twist.",
-            {
-              limit: formatNumber(minStability, 1),
-              range: withUnit('range', system, result.lowStability.range),
-              value: formatNumber(result.lowStability.stability, 2),
-            },
-          )}
-        </li>
-      )}
       {transonic && (
         <li>
           {t('Transonic from {range}', { range: withUnit('range', system, transonic.range) })}
@@ -549,6 +540,7 @@ function ResultDetail({
             bullet: result.bulletText,
             zeroRange: result.zeroRange,
             click: result.click?.value,
+            target: result.target,
           }}
           system={system}
         />
@@ -559,6 +551,13 @@ function ResultDetail({
 
 /** What the workbench reads from its Trajectory tab: the tab's query for Copy link. */
 export type TrajectoryHandle = { query: () => string }
+
+/** The firearm record and configuration a sight option names (`<record>/<configuration>/<mount>`). */
+function targetOf(o: { value: string; label: string } | undefined): Result['target'] {
+  if (!o) return
+  const [first, last] = [o.value.indexOf('/'), o.value.lastIndexOf('/')]
+  return { record: o.value.slice(0, first), config: o.value.slice(first + 1, last), label: o.label }
+}
 
 /** What the tab's keys of a copied link set: the fields, the bullet and the drag model. */
 function readLink(system: UnitSystem) {
@@ -1151,6 +1150,7 @@ export function TrajectoryForm({
       twistHand,
       design: design?.name,
       click: sights.find((o) => o.value === sight)?.fill.click,
+      target: targetOf(sights.find((o) => o.value === sight)),
       dragSource: dragFrom?.factor === fields.dragFactor?.si ? dragFrom?.source : undefined,
     }),
     [

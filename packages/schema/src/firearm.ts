@@ -78,6 +78,117 @@ export const opticMount = z.object({
     .optional(),
 })
 
+/** A count of shots, at least 1. */
+const shots = () => z.int().positive().max(10000)
+/** A number of turret clicks. */
+const clicks = (s: z.ZodNumber) => s.meta({ unit: '1' })
+
+/**
+ * One distance of a truing string: the mean and the deviation of one shot, as the height above
+ * the line of sight of the impacts or as clicks dialled.
+ * Inferred type: {@link TruingRow}.
+ */
+export const truingRow = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('impact').describe('Impacts measured at the zero setting.'),
+    range: quantity('length', z.number().positive()).describe('Distance of the row.'),
+    shots: shots().describe('Shots of the row.'),
+    mean: quantity('length').describe('Mean height of the impacts above the line of sight.'),
+    deviation: quantity('length', z.number().positive()).describe(
+      'Standard deviation of one shot.',
+    ),
+  }),
+  z.object({
+    kind: z.literal('dial').describe('Clicks dialled to hit at the distance.'),
+    range: quantity('length', z.number().positive()).describe('Distance of the row.'),
+    shots: shots().describe('Shots of the row.'),
+    mean: clicks(z.number()).describe('Mean of the clicks dialled.'),
+    deviation: clicks(z.number().positive()).describe('Standard deviation of one shot, clicks.'),
+  }),
+])
+
+/** A value of a truing parameter in the stored unit of its kind. */
+const parameterValue = {
+  muzzleVelocity: () => quantity('velocity'),
+  dragFactor: () => z.number().meta({ unit: '1' }),
+  clickValue: () => quantity('angle'),
+  zeroOffset: () => quantity('angle'),
+}
+
+const truingParameter = <N extends keyof typeof parameterValue>(name: N) => {
+  const value = parameterValue[name]
+  return z.object({
+    name: z.literal(name).describe('Which parameter.'),
+    status: z
+      .enum(['identified', 'weak', 'unresolved'])
+      .describe('Whether the strings identify the parameter.'),
+    reasons: z
+      .array(z.enum(['no-information', 'collinear', 'imprecise', 'fit-failed']))
+      .max(4)
+      .describe('Why a parameter is weak or unresolved.'),
+    value: value().describe('Fitted value, only when identified.').optional(),
+    lower: value().describe('Lower end of the confidence interval.').optional(),
+    upper: value().describe('Upper end of the confidence interval.').optional(),
+    confidenceLevel: z
+      .number()
+      .gt(0)
+      .lt(1)
+      .meta({ unit: '1' })
+      .describe('Level of the interval, a fraction.')
+      .optional(),
+  })
+}
+
+/**
+ * One truing result stored with the configuration it was shot with: the strings as entered, the
+ * nominal shot they were fitted against, and the fitted parameters. A parameter that is not
+ * identified has no value.
+ * Inferred type: {@link Truing}.
+ */
+export const truing = z.object({
+  date: z.iso.date().describe('Date the result was stored, ISO 8601.'),
+  load: ref('load').describe('Reference to the load the strings were shot with.').optional(),
+  bullet: text(200).describe('The bullet of the nominal shot as the workbench named it.'),
+  muzzleVelocity: quantity('velocity', z.number().positive()).describe(
+    'Muzzle velocity of the nominal shot.',
+  ),
+  zeroRange: quantity('length', z.number().positive()).describe('Zero range of the nominal shot.'),
+  temperature: quantity('temperature', z.number().gt(-273.15)).describe('Air temperature.'),
+  pressure: quantity('pressure', z.number().positive()).describe('Absolute station pressure.'),
+  humidity: quantity('relativeHumidity', z.number().min(0).max(100)).describe(
+    'Relative humidity, from 0 to 100 %.',
+  ),
+  clickValue: quantity('angle', z.number().positive()).describe('Nominal angle of one click.'),
+  fitZeroOffset: z.boolean().describe('Whether a zero offset was fitted.'),
+  rows: z.array(truingRow).min(1).max(50).describe('Distances shot.'),
+  chronograph: z
+    .object({
+      shots: shots().describe('Chronograph readings.'),
+      mean: quantity('velocity', z.number().positive()).describe('Mean muzzle velocity.'),
+      deviation: quantity('velocity', z.number().positive()).describe(
+        'Standard deviation of one reading.',
+      ),
+    })
+    .describe('Muzzle velocity readings.')
+    .optional(),
+  parameters: z
+    .array(
+      z.discriminatedUnion('name', [
+        truingParameter('muzzleVelocity'),
+        truingParameter('dragFactor'),
+        truingParameter('clickValue'),
+        truingParameter('zeroOffset'),
+      ]),
+    )
+    .max(4)
+    .describe('Fitted parameters.'),
+  consistent: z
+    .boolean()
+    .describe('Whether the residuals agree with the stated uncertainties; absent without a check.')
+    .optional(),
+  intervalsTrusted: z.boolean().describe('Whether the intervals are to be relied on.'),
+})
+
 /**
  * The optics mounted on a firearm between a mount date and a removal date: 1 to 4 mounts, removal
  * not before mounting.
@@ -90,6 +201,11 @@ export const opticConfiguration = z
     mounts: z.array(opticMount).min(1).max(4).describe('The optics mounted, 1 to 4.'),
     mounted: z.iso.date().describe('Mount date, ISO 8601.').optional(),
     removed: z.iso.date().describe('Removal date, ISO 8601, not before `mounted`.').optional(),
+    truing: z
+      .array(truing)
+      .max(100)
+      .describe('Truing results shot with this configuration, oldest first.')
+      .optional(),
   })
   // ISO dates compare as strings
   .refine((c) => !c.mounted || !c.removed || c.mounted <= c.removed, {
@@ -196,5 +312,9 @@ export interface Firearm extends z.infer<typeof firearm> {}
 export interface Optic extends z.infer<typeof optic> {}
 /** The optics mounted on a firearm between a mount date and a removal date. */
 export interface OpticConfiguration extends z.infer<typeof opticConfiguration> {}
+/** A truing result with its strings, nominal shot and fitted parameters. */
+export interface Truing extends z.infer<typeof truing> {}
+/** One distance of a truing string, an impact or a dial. */
+export type TruingRow = z.infer<typeof truingRow>
 /** One optic as mounted, with sight height and zero range in mm, zero air and drag factor. */
 export interface OpticMount extends z.infer<typeof opticMount> {}

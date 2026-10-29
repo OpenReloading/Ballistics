@@ -208,7 +208,7 @@ test('the notice line keeps its box through a result with warnings, an error and
   for (const [grams, outcome] of [
     ['2.4', /^Simulation done\. Step 0, 2\.40 g/],
     ['2.8', /^Simulation done\. Step 0, 2\.80 g/],
-    ['60', /^The API answered 422\./],
+    ['60', /^The model refused the load\./],
     ['2.4', /^Simulation done\. Step 0, 2\.40 g/],
   ] as const) {
     await charge.fill(grams)

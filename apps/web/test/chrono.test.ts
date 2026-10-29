@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
+  chronoMessageText,
   exampleCsv,
   readChrono,
   readSession,
@@ -44,8 +46,13 @@ describe('readChrono', () => {
     expect(r.session.strings).toHaveLength(2)
   })
 
-  it('rejects files of no known format', async () => {
-    await expect(readChrono(bytes('a,b\n1,2'), {})).rejects.toThrow(/not a recognized/)
+  it('rejects files of no known format, naming the formats read and the export to make', async () => {
+    const error = await readChrono(bytes('a,b\n1,2'), {}).catch((e: Error) => e)
+    const text = chronoMessageText(String((error as Error).message), english.t)
+    expect(text).toContain('not a recognized')
+    expect(text).toContain('Garmin Xero ShotView CSV')
+    expect(text).not.toContain('delimited')
+    expect(text).toContain('as CSV or XLSX')
   })
 
   it('names both units when the file contradicts the velocity unit of the caller', async () => {
