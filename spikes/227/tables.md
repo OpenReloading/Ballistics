@@ -80,6 +80,17 @@
 | exact-K3-n0.8-s0.005-velocity | 8 not-converged | 61 | 16 | 0 | 80 | 80 | 84 | 0.003 | 1.000 | 1.00 to 1.01 | 81 | 2.50 | 81 | 1.000 | 1.006 | 1.050 | 1.03 |
 | exact-K3-n0.8-s0.005-exit | 8 ill-conditioned | 57 | 16 | 0 | 66 | 66 | 84 | 0.003 | 1.000 | 1.00 to 1.06 | 67 | 21.72 | 67 | 0.999 | 1.050 | 1.050 | 1.05 |
 
+## Charge spread: two traces from the lowest charge (g) to 3.0 g
+
+| cell | fail | VIF n median | cond median | fitted 10/1e3 | fitted 100/1e3 | fitted 500/1e3 | fitted 500/any | u_rel n median | n/true median | n/true p5-p95 | cover 90 % (all converged) | k for 90 % | cover 90 % (fitted 500/any) | B/true median | a/true median | z1/true median | chi2/dof median |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| exact-K2-n0.3-s0.005-free-low2.6 | 1 not-converged | 63 | 17 | 2 | 98 | 98 | 98 | 0.017 | 1.009 | 0.98 to 1.03 | 90 | 1.67 | 90 | 1.001 | 0.996 | 1.010 | 1.05 |
+| exact-K2-n0.5-s0.005-free-low2.6 | 0 | 65 | 17 | 0 | 100 | 100 | 100 | 0.008 | 1.001 | 0.99 to 1.02 | 82 | 2.19 | 82 | 1.000 | 0.999 | 1.050 | 1.04 |
+| exact-K2-n0.8-s0.005-free-low2.6 | 0 | 83 | 19 | 2 | 100 | 100 | 100 | 0.004 | 1.001 | 0.99 to 1.01 | 86 | 2.08 | 86 | 1.001 | 0.999 | 1.050 | 1.02 |
+| exact-K2-n0.3-s0.005-free-low2.8 | 4 not-converged | 100 | 21 | 0 | 46 | 92 | 92 | 0.022 | 1.003 | 0.98 to 1.03 | 96 | 1.49 | 96 | 1.001 | 1.003 | 1.018 | 1.05 |
+| exact-K2-n0.5-s0.005-free-low2.8 | 1 not-converged | 119 | 23 | 0 | 0 | 98 | 98 | 0.011 | 1.001 | 0.98 to 1.02 | 90 | 1.72 | 90 | 1.000 | 1.008 | 1.050 | 1.04 |
+| exact-K2-n0.8-s0.005-free-low2.8 | 0 | 194 | 29 | 0 | 14 | 100 | 100 | 0.006 | 1.002 | 0.99 to 1.01 | 86 | 1.86 | 86 | 1.001 | 0.997 | 1.050 | 1.02 |
+
 ## Model error: heat loss and bore friction in the truth, exponent 0.5
 
 | cell | fail | VIF n median | cond median | fitted 10/1e3 | fitted 100/1e3 | fitted 500/1e3 | fitted 500/any | u_rel n median | n/true median | n/true p5-p95 | cover 90 % (all converged) | k for 90 % | cover 90 % (fitted 500/any) | B/true median | a/true median | z1/true median | chi2/dof median |

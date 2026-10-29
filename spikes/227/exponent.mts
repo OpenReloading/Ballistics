@@ -96,9 +96,9 @@ const load = (burn: Burn, charge: number, world: World = 'exact'): InteriorLoad 
     : {}),
 })
 
-/** Charges of a set of K traces, kg: 2.4 to 3.0 g, about 0.75 to 1.15 of the middle peak. */
-const chargesOf = (k: number) =>
-  k === 1 ? [0.0028] : Array.from({ length: k }, (_, i) => 0.0024 + (0.0006 * i) / (k - 1))
+/** Charges of a set of K traces, kg: `low` to 3.0 g (default 2.4 g, highest peak 1.3 to 1.5 times the lowest). */
+const chargesOf = (k: number, low = 0.0024) =>
+  k === 1 ? [0.0028] : Array.from({ length: k }, (_, i) => low + ((0.003 - low) * i) / (k - 1))
 
 // ---- traces ----
 const step = 1e-5
@@ -401,12 +401,14 @@ interface Cell {
   mode: Mode
   delayError: number
   world: World
+  /** Lowest charge of the set, kg. */
+  low?: number
 }
 const cells: Cell[] = []
 const add = (c: Omit<Cell, 'id'>) =>
   cells.push({
     ...c,
-    id: `${c.world}-K${c.K}-n${c.exponent}-s${c.noise}-${c.mode}${c.mode === 'known' ? c.delayError * 1e6 : ''}`,
+    id: `${c.world}-K${c.K}-n${c.exponent}-s${c.noise}-${c.mode}${c.mode === 'known' ? c.delayError * 1e6 : ''}${c.low ? `-low${c.low * 1e3}` : ''}`,
   })
 // Q1: several traces, shift fitted
 for (const K of [1, 2, 3, 5])
@@ -426,6 +428,11 @@ for (const K of [1, 3, 5])
   for (const mode of ['free', 'known'] as const)
     add({ K, exponent: 0.5, noise: 0.005, mode, delayError: 0, world: 'mild' })
 
+// narrower charge spreads of two traces; appended so the cells above keep their indices
+for (const low of [0.0026, 0.0028])
+  for (const exponent of [0.3, 0.5, 0.8])
+    add({ K: 2, exponent, noise: 0.005, mode: 'free', delayError: 0, world: 'exact', low })
+
 /** Start values: 3 % off for the burn coefficient, 5 % for the form, 20 % for the exponent. */
 const startOf = (t: Burn): Burn => ({
   ...t,
@@ -440,7 +447,7 @@ function runCell(cell: Cell, index: number) {
   const records: FitRecord[] = []
   for (let r = 0; r < reps; r++) {
     // seeds: 1000 per replicate, 16 per trace; the same traces in every mode of a cell family
-    const traces = chargesOf(cell.K).map((c, k) =>
+    const traces = chargesOf(cell.K, cell.low).map((c, k) =>
       makeTrace(load(truth, c, cell.world), cell.noise, 1000 * (r + 1) + 16 * k),
     )
     try {
@@ -559,11 +566,15 @@ function summarise() {
   }
   table(
     'Q1: K traces, time shift fitted per trace',
-    results.filter((r) => r.world === 'exact' && r.mode === 'free'),
+    results.filter((r) => r.world === 'exact' && r.mode === 'free' && r.low === undefined),
   )
   table(
     'Q2: time shift known (with a common delay error, us) or a second signal',
     results.filter((r) => r.world === 'exact' && r.mode !== 'free'),
+  )
+  table(
+    'Charge spread: two traces from the lowest charge (g) to 3.0 g',
+    results.filter((r) => r.low !== undefined),
   )
   table(
     'Model error: heat loss and bore friction in the truth, exponent 0.5',
