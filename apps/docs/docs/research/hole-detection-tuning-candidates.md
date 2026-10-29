@@ -18,7 +18,7 @@ Decided before the runs.
 - Labels: visible hole centres, unresolved regions and photo quality are model-made visual annotations, not human-verified. A photo counts as complete when every visible centre is marked. On a partial photo, unmarked areas are not negatives. The holdout labels come from a different annotating model than the tuning labels, so the two sets are not labelled alike.
 - Flow per photo, as in the web worker: the photo quality check, then the face search, with the first fit taken whether it is sure or not. Detection then runs on the face (or on the whole photo when no face fits), with the median marked hole diameter as the hole size and a contrast of 0.15. The hole size is therefore taken from the labels, not from the bullet or a learned size as in the app.
 - Metrics, from the quality bar: one-to-one matching, nearest pairs first, within half a hole diameter. A proposal below the confidence tier is a maybe and is not counted. An unmatched proposal inside a marked unresolved region is unknown, not false. Corrections per photo, the median and the 90th percentile, count only usable complete photos. On usable partial photos only found and missed are counted.
-- Candidates: one constant per run, each against the same baseline. In a second round, the confidence tier is varied, and the three settings that removed the most false holes in the first round are combined.
+- Candidates: one constant per run, each against the same baseline. In a second round, the confidence tier is varied, and the settings that removed the most false holes in the first round are combined. Top-hat share (295 false proposals) and seed peaks per polarity (295) tied; the combined row takes the top-hat share and the fill share (308) and leaves the seed peaks out. The rule that broke the tie was not recorded, so the combined row is not reproducible from this entry alone.
 - Accept rule: a candidate goes to the holdout only when it meets the bar on the tuning set (median of 1 correction or fewer, 90th percentile of 3 or fewer). Without holdout evidence no limit or threshold changes.
 
 Measured at commit 4665ed01. A later change to the face search is not included, and the runner has to follow it before the first holdout look.
@@ -37,7 +37,7 @@ Found share over a set: $r = \sum n_\mathrm{found} / \sum n_\mathrm{ref}$. Share
 
 ## Numbers
 
-Tuning set: 566 photos. The quality check holds 62 of them. The face search fits a face on 251 (34 of them sure) and none on 315. There are 51 complete photos: 6 are held and 1 has no marked hole size, which leaves 44 usable complete photos with 434 reference holes. There are 381 usable partial photos with 2638 marked holes.
+Tuning set: 566 photos. The quality check stops 62 of them (not the holdout of the same size). The face search fits a face on 251 (34 of them sure) and none on 315. There are 51 complete photos: 6 are stopped by the quality check and 1 has no marked hole size, which leaves 44 usable complete photos with 434 reference holes. Of the 459 partial photos the quality check lets through, 381 are counted as usable partial photos with 2638 marked holes; the exclusion that removes the other 78 was not recorded.
 
 Usable complete photos (44) and usable partial photos (381):
 
@@ -67,7 +67,7 @@ Face search (right, wrong, found but not first, not found): not measured, becaus
 
 ## Result
 
-no change. No candidate meets the bar on the tuning set: the median stays at 5 corrections in every run. A higher confidence tier trades missed holes for false ones, and its 90th percentile (11 at 0.7) is still far above 3. The detector settings stay as they are, and the holdout was not opened, because no candidate qualified and its labels wait for a person's check. False proposals outnumber missed holes in the baseline (357 against 163), and every setting that removes false proposals also loses found holes. A further candidate is therefore a new step, not a different constant. The causes of the corrections were not classified in this run.
+no change. No candidate meets the bar on the tuning set: the median stays at 5 corrections in every run. A higher confidence tier trades false proposals for missed holes (357 to 125 false and 163 to 217 missed at 0.7), and its 90th percentile (11 at 0.7) is still far above 3. The detector settings stay as they are, and the holdout was not opened, because no candidate qualified and its labels wait for a person's check. False proposals outnumber missed holes in the baseline (357 against 163), and most settings that remove false proposals also lose found holes; the fill share is the exception (357 to 308 false, 271 to 273 found) and is still far from the bar. A further candidate is therefore a new step, not a different constant. The causes of the corrections were not classified in this run.
 
 ## Data basis
 
