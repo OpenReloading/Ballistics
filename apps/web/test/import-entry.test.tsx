@@ -10,8 +10,10 @@ import {
   folded,
   ImportFoot,
   pickedBytes,
+  readStatus,
   splitImport,
 } from '../src/components/import-entry.tsx'
+import { english } from '../src/i18n/translate.ts'
 import {
   type BuildView,
   type CardView,
@@ -283,6 +285,27 @@ it('folds a high-tier card to 2 tab stops and opens every control of it unfolded
   // a medium suggestion is never folded
   const medium = { ...entry, card: { ...tableCard, tier: 'medium' as const } }
   expect(folded(medium)).toBe(false)
+})
+
+it('says how many files are read and the reason of each refused one', () => {
+  const { t } = english
+  expect(readStatus([], t)).toBe('')
+  const files: Entry[] = [
+    entry,
+    {
+      id: 2,
+      name: 'notes.txt',
+      card: { refusal: 'no table' },
+      source: '',
+      touched: false,
+      busy: false,
+    },
+    { ...entry, id: 3, name: 'odd.csv', kind: undefined },
+    { id: 4, name: 'later.csv', source: '', touched: false, busy: true },
+  ]
+  expect(readStatus(files, t)).toBe(
+    '3 of 4 files read. notes.txt: no table odd.csv: Refused: no kind',
+  )
 })
 
 it('disables the Import button until the import has a source', () => {

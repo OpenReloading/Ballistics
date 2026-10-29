@@ -93,6 +93,7 @@ import {
 } from '../lib/workspace-folder.ts'
 import { AppModal } from './app-modal.tsx'
 import { confirmDialog } from './confirm.tsx'
+import { focusBack } from './focus-back.ts'
 import type { ImportEntry, TablesEntry } from './import-entry.tsx'
 import { BarStatus } from './page-bar.tsx'
 import { useReportOptions } from './report-host.ts'
@@ -930,6 +931,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
   const [report, setReport] = useState<Report>()
   const [tables, setTables] = useState<TablesEntry>()
+  const openButton = useRef<HTMLButtonElement>(null)
   const [list, setList] = useState<Of<K>[]>()
   /** The invalid browser records the Open menu last found, and the open list of them. */
   const [invalidCount, setInvalidCount] = useState(0)
@@ -1516,6 +1518,7 @@ function FileMenuOf<K extends UserRecordKind>({
       <Menu position="bottom-end" withInitialFocusPlaceholder={false} onOpen={countInvalid}>
         <Menu.Target>
           <Button
+            ref={openButton}
             variant="default"
             leftSection={<FolderOpen aria-hidden="true" />}
             rightSection={<CaretDown size={12} aria-hidden="true" />}
@@ -1613,7 +1616,11 @@ function FileMenuOf<K extends UserRecordKind>({
           onStored,
           noteStorage: () => void noteStorage(),
         }}
-        onClose={() => setTables(undefined)}
+        onClose={() => {
+          setTables(undefined)
+          // the menu item that opened it is gone: Open, or Page actions below 75em
+          focusBack(openButton.current, '.page-bar button[aria-label="Page actions"]')
+        }}
       />
       <AppModal
         opened={report !== undefined}
