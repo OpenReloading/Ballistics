@@ -7,7 +7,7 @@ description: Weighted least-squares fit of the burn coefficient and, on request,
 
 The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
 
-`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points of a ladder may be fired from another barrel length or at another powder temperature, which is what resolves the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)); `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and names each axis on which a prediction lies outside the data the fit was made from.
+`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points of a ladder may be fired from another barrel length or at another powder temperature, which is what resolves the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)); `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data. `fitPowderPooled` fits the sessions of many rifles, powders and lots at once ([below](#pooled-fit-over-rifles-powders-and-lots)), with prediction intervals that hold a model error. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and names each axis on which a prediction lies outside the data the fit was made from.
 
 ## Equations
 
@@ -295,6 +295,44 @@ Code: `apps/web/src/lib/powder-fit-answer.ts`, `thinRule`, `heldFit`; `packages/
 
 The values describe the rifle's barrels, the lot and the temperatures of the sessions. A fitted energy absorbs every fixed input that moves the velocity with the barrel length (see Identifiability), and a fitted temperature factor absorbs the effect of the initial temperature on the gas energy, which the model does not have. Neither is a property of the powder to carry to another load, and the result is a simulation parameter, not load data.
 
+### Pooled fit over rifles, powders and lots
+
+`fitPowderPooled` fits many chronograph sessions at once. Each session names its powder, rifle and, optionally, lot, and carries its own load (the rifle, components and fixed inputs), barrel length, powder temperature and a ladder of mean velocities with their `velocitySigma`. The predicted mean velocity of a string of session $s$ at charge $m$ is
+
+$$
+\hat v_s(m) = r_{R(s)}\, v_\text{M3}\bigl(m;\ B_{P(s)}\, \ell_{L(s)},\ f_{T,P(s)}\bigr), \qquad
+B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\theta_L}, \quad f_{T,P} = e^{\theta_{T,P}}
+$$
+
+Code: `packages/core/src/interior/fit-pooled.ts`, `fitPowderPooled` (`velocity`, `targetLoad`).
+
+- $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
+- $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
+- $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).
+
+Rifle and lot factors are random effects: each has a Gaussian prior on its log, centred on 0, with the spread `rifleSigma` (default 0.01) or `lotSigma` (default 0.03). The defaults are assumptions, to be tuned on measured sessions. A per-powder prior (`priors`, by powder, on the burn coefficient or the temperature factor, as a `PowderPrior`) comes from a powder record, its thermochemistry or the [similar powders](#prior-from-similar-powders). All priors are pseudo-rows, as in the single fit, so the result is the maximum of the posterior, and its covariance is the posterior one (first-order Laplace approximation). There is no global parameter of the powder model: velocities alone resolve neither the exponent nor the form parameters. A request for `exponent` or `form` fails as `unresolved` before any run, and the pooled fit takes no pressures.
+
+The rows, Jacobian and conditioning check are those of the single fit. Each ladder point is one row; a parameter moves only the rows of its sessions, so a Jacobian column runs `interior` only there, and a rifle step reuses the last run. The fit fails as `fitPowder` does: `ill-conditioned` above the condition limit (for example a temperature factor between two temperatures that differ by a hundredth of a kelvin), `not-converged`, `invalid`, and `unresolved` for a powder whose sessions hold a single charge, where its burn coefficient and the rifle factors cannot be told apart. The result reports the covariance and correlation of all parameters and the condition number. A pooled fit of one session fits the burn coefficient alone and gives the value and standard uncertainty of `fitPowder` on its ladder, within a relative $10^{-9}$ in the tests.
+
+`predictPooled` gives the mean velocity of a target (a session without a ladder) at any charge with an interval. Its variance sums the parameter term of the [prediction at a charge](#prediction-at-a-charge), over the parameters that move the target, the model error and the uncertainty of the string to be predicted:
+
+$$
+u^2(\hat v) = g^\top C_\theta\, g + \bigl(\varepsilon\, \hat v\bigr)^2 + \sigma_s^2 \;\bigl[+\ (\tau_R\, \hat v)^2 + (\tau_L\, g_B)^2\bigr], \qquad
+\hat v \pm z_{1 - \alpha/2}\, u(\hat v)
+$$
+
+Code: `packages/core/src/interior/fit-pooled.ts`, `predictPooled` (`gradient`, `variance`).
+
+A rifle the fit has not seen adds the spread of its random effect, $\tau_R \hat v$, and a lot it has not seen for the powder adds $\tau_L g_B$, with $g_B$ the gradient in the powder's burn coefficient. $\sigma_s$ is the `velocitySigma` of the string (default 0, the true mean). `calibratePooled` estimates the relative model error $\varepsilon$ from strings the fit was not fitted to: the mean of the squared relative residual beyond the parameter and string variance, at least 0,
+
+$$
+\varepsilon^2 = \max\Bigl(0,\ \frac{1}{n} \sum_{i=1}^{n} \frac{(y_i - \hat v_i)^2 - g_i^\top C_\theta\, g_i - \sigma_i^2}{\hat v_i^2}\Bigr)
+$$
+
+Code: `packages/core/src/interior/fit-pooled.ts`, `calibratePooled` (`excess`).
+
+The held-out strings are chosen by the caller before the fit is looked at; strings that also test the interval must be others again. On synthetic sessions (3 powders, 3 rifles, 2 lots, 4 charges each, a relative model error of 0.4 % on top of a 3 m/s string uncertainty), the nominal 90 % interval after calibration on 108 strings covers between 85 and 95 % of 270 other strings at charges between the fitted ones. The parameter covariance itself holds no model error, as in the single fit.
+
 ### Failures
 
 `fitPowder` throws a `PowderFitError` with one of these reasons:
@@ -347,6 +385,8 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 | $u_\text{fit}$, $u_c$, $u_\text{corr}$ | Fit, combined and fully correlated standard uncertainty of the peak pressure | bar | Pa |
 | $h$ | Relative half-width of the pressure range | 1 | 1 |
 | $B_i$, $n$ | Burn coefficients of the similar powders, their number | as the parameter, 1 | as the parameter, 1 |
+| $r_R$, $\ell_L$, $\tau_R$, $\tau_L$ | Velocity factor of a rifle, burn factor of a lot, the spreads of their logs | 1 | 1 |
+| $\varepsilon$, $\sigma_s$ | Relative model error of the pooled fit, standard uncertainty of a predicted string mean | 1, m/s | 1, m/s |
 | $J_\text{floor,i}$ | Noise floor of a Jacobian entry per unit log parameter | 1 | 1 |
 
 ## Assumptions
@@ -365,7 +405,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - A prediction outside the domain is an extrapolation. The result holds no charge recommendation and no limit. The domain is the span of the data plus a margin, not a statement that the model holds inside it.
 - A prediction band covers parameter uncertainty and not model error, and it is linearized: far from the ladder, where the model is strongly nonlinear in the parameters, the interval is less reliable.
 - The posterior uncertainty is the first-order Laplace approximation, no sampling. With a Huber loss it is approximate.
-- The burn coefficient, start pressure, volume factor, energy and temperature factor are fitted. Exponent, form parameters and the ratio of the two temperature sensitivities stay as given. Pooling over lots and over shooters is not supported: the sessions of one fit share one rifle's load, one lot and one set of fixed inputs.
+- The burn coefficient, start pressure, volume factor, energy and temperature factor are fitted. Exponent, form parameters and the ratio of the two temperature sensitivities stay as given. `fitPowderSessions` shares one rifle's load, one lot and one set of fixed inputs over its sessions; the [pooled fit](#pooled-fit-over-rifles-powders-and-lots) pools rifles, powders and lots with random effects whose spreads are given, not estimated.
 - Each session is one barrel length and one temperature, and the barrel length is the one the sessions' bore and chamber share. A session fired from a barrel with another bore, chamber or twist is another load.
 - The pressure range holds the inputs it shifts, linearized by the refit at one standard uncertainty each. It holds no model error of the burn form, exponent, heat loss or pressure gradient, and not the correlation of inputs.
 - Each prediction costs one `interior` run per distinct charge, barrel length and temperature, and each Jacobian two predictions per parameter.

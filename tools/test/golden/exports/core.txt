@@ -106,7 +106,18 @@
 . PlanRefusalId
 . PointDispersion
 . PointOffset
+. PooledFitOptions
 . PooledGroupStatistics
+. PooledParameterKind
+. PooledPowderFit
+. PooledPowderParameter
+. PooledPrediction
+. PooledPredictionOptions
+. PooledPriors
+. PooledRequest
+. PooledResidual
+. PooledSession
+. PooledTarget
 . PooledValues
 . PowderAxis
 . PowderAxisRange
@@ -228,6 +239,7 @@
 . burnError
 . burnForm
 . burnFormKeys
+. calibratePooled
 . cartridgeBoreAreaMm2
 . cartridgeBulletDiameterMm
 . cartridgeDiameters
@@ -270,6 +282,7 @@
 . fQuantileTwoNumeratorDegrees
 . fillLoadRatioLimit
 . fitPowder
+. fitPowderPooled
 . fitPowderSessions
 . fitPressureCurve
 . fitPressureCurves
@@ -321,6 +334,7 @@
 . placeMaximum
 . planTruingStrings
 . pointDispersion
+. pooledDefaults
 . pooledGroupStatistics
 . pooledVelocitySd
 . powderConfidence
@@ -329,6 +343,7 @@
 . powderInputDefaults
 . powderModelValues
 . powderPressureRange
+. predictPooled
 . predictPowder
 . predictionEllipse
 . pressureInputs
