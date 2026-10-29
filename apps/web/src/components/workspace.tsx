@@ -14,6 +14,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
+import { CopyStatus } from './record-actions.tsx'
 import { useScrollFocus } from './scroll-region.tsx'
 
 export type WorkspaceHandle = {
@@ -127,6 +128,7 @@ export function useCopyLink(query: () => string) {
   const clipboard = useClipboard({ timeout: 2000 })
   return {
     copied: clipboard.copied,
+    error: clipboard.error,
     copy: () => {
       // the address bar keeps the link where the clipboard is not allowed (plain http)
       window.history.replaceState(null, '', `${window.location.pathname}#${query()}`)
@@ -155,7 +157,7 @@ export function Toolbar({
   link: ReturnType<typeof useCopyLink>
 }) {
   const { t } = useTranslation()
-  const { copied, copy } = link
+  const { copied, error, copy } = link
   return (
     <>
       {file}
@@ -175,6 +177,7 @@ export function Toolbar({
       >
         {copied ? t('Link copied') : t('Copy link')}
       </Button>
+      <CopyStatus copied={copied} error={error} />
       {after}
     </>
   )
