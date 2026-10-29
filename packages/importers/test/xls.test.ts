@@ -254,6 +254,68 @@ describe('readWorkbook .xls refusals', () => {
     )
   })
 
+  it('refuses a mini stream layout, FAT, directory or mini stream it cannot follow', async () => {
+    const patched = (patch: (file: Buffer, layout: Layout) => void) => xls(one, { patch })
+    const mini = (patch: (file: Buffer, layout: Layout) => void) =>
+      xls([{ name: 'S', rows }], { patch })
+    await expect(fail(patched((f) => f.writeUInt16LE(7, 0x20)))).rejects.toThrow(
+      'not an XLS workbook: mini stream layout is not the standard one',
+    )
+    await expect(fail(patched((f) => f.writeUInt32LE(8192, 0x38)))).rejects.toThrow(
+      'not an XLS workbook: mini stream layout is not the standard one',
+    )
+    await expect(fail(patched((f) => f.writeUInt32LE(100000, 0x2c)))).rejects.toThrow(
+      /not an XLS workbook: the FAT lists 0 of 100000 sectors/,
+    )
+    // 237 FAT sectors need two DIFAT sectors; the first one names itself as the next
+    const looped = xls(one, {
+      fatSectors: 237,
+      patch: (f, l) => {
+        const d = f.readUInt32LE(0x44)
+        f.writeUInt32LE(d, l.offset(d) + l.sectorSize - 4)
+      },
+    })
+    await expect(fail(looped)).rejects.toThrow(
+      'not an XLS workbook: sector chain loops at sector 0',
+    )
+    const unlisted = xls(one, { fatSectors: 110, patch: (f) => f.writeUInt32LE(0xfffffffe, 0x44) })
+    await expect(fail(unlisted)).rejects.toThrow(
+      'not an XLS workbook: the FAT lists 109 of 110 sectors',
+    )
+    const beyondFat = compoundFile([{ name: 'Workbook', data: new Uint8Array(70000) }], {
+      patch: (f) => f.writeUInt32LE(1, 0x2c),
+    })
+    await expect(fail(new Uint8Array(beyondFat))).rejects.toThrow(
+      /not an XLS workbook: sector \d+ has no FAT entry/,
+    )
+    await expect(
+      fail(
+        patched((f, l) => {
+          f[l.entry(0) + 0x42] = 1
+        }),
+      ),
+    ).rejects.toThrow('not an XLS workbook: the directory has no root entry')
+    await expect(fail(mini((f) => f.writeUInt32LE(0xffffffff, 0x3c)))).rejects.toThrow(
+      'not an XLS workbook: the mini stream is missing',
+    )
+    await expect(fail(mini((f, l) => f.writeUInt32LE(64, l.entry(0) + 0x78)))).rejects.toThrow(
+      /not an XLS workbook: mini sector \d+ lies outside the mini stream/,
+    )
+  })
+
+  it('refuses a storage named Workbook and an empty Workbook stream', async () => {
+    const storage = xls(one, {
+      patch: (f, l) => {
+        f[l.entry(1) + 0x42] = 1
+      },
+    })
+    await expect(fail(storage)).rejects.toThrow('not an XLS workbook: no Workbook stream')
+    const empty = compoundFile([{ name: 'Workbook', data: new Uint8Array() }])
+    await expect(fail(new Uint8Array(empty))).rejects.toThrow(
+      'only BIFF8 .xls workbooks (Excel 97 to 2003) are read',
+    )
+  })
+
   it('refuses a short last sector that cuts a stream or a directory entry', async () => {
     const file = xls(one)
     await expect(fail(file.subarray(0, file.length - 511))).rejects.toThrow(

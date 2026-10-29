@@ -664,6 +664,36 @@ describe('POST /interior/load-file, 400 with the field path', () => {
     expect([...mapped].sort()).toEqual([...interiorValueKeys].sort())
   })
 
+  it('maps the ladder fields to the file ladder and keeps other paths', () => {
+    expect(filePath(['ladder', 'chargeStep'], at)).toEqual([...at, 'analysis', 'ladder', 'step'])
+    expect(filePath(['ladder', 'stepCount'], at)).toEqual([
+      ...at,
+      'analysis',
+      'ladder',
+      'stepCount',
+    ])
+    expect(filePath(['load', 'unknown'], at)).toEqual(['load', 'unknown'])
+    expect(filePath(['curves'], at)).toEqual(['curves'])
+  })
+
+  it('refuses a file without a load or with two, and reads the load among other records', async () => {
+    const one = file({ siValues })
+    const load = defined(one.records[0])
+    expect(await paths({ ...one, records: [] })).toEqual([['records']])
+    expect(await paths({ ...one, records: [load, { ...load, id: 'l2' }] })).toEqual([['records']])
+    const maker = {
+      kind: 'manufacturer',
+      id: '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13',
+      name: 'Home Loader',
+      saved: load.saved,
+      data: { origin: 'user' },
+    }
+    const mixed = await simulate({ ...one, records: [maker, load] })
+    expect(mixed.status).toBe(200)
+    const plain = await simulate(one)
+    expect(mixed.body.summary).toEqual(plain.body.summary)
+  })
+
   it('names an unknown field at each level', async () => {
     expect(await paths(file({ siValues }, { extra: 1 }))).toContainEqual(['extra'])
     expect(await paths(file({ siValues, extra: 1 }))).toContainEqual([...at, 'extra'])

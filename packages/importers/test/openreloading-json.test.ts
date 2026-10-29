@@ -76,6 +76,24 @@ describe('OpenReloading session JSON', () => {
     expect(JSON.parse(stringifyOpenReloadingJson(r))).toEqual(file)
   })
 
+  it('reads coldBore false as unset and writes only the members the session has', () => {
+    const r = parseOpenReloadingJson(
+      JSON.stringify({
+        format: 'openreloading-session',
+        version: 1,
+        strings: [{ label: '', shots: [{ velocity: 800, coldBore: false }] }],
+      }),
+    )
+    expect(r.session.strings[0]?.shots[0]).toEqual({ velocity: { value: 800, raw: '800 m/s' } })
+    expect(r.stringLabels).toEqual([undefined])
+    expect(JSON.parse(stringifyOpenReloadingJson(r))).toEqual({
+      format: 'openreloading-session',
+      version: 1,
+      device: { kind: 'other' },
+      strings: [{ shots: [{ velocity: 800 }] }],
+    })
+  })
+
   it('does not claim other JSON or text', () => {
     expect(isOpenReloadingJson('{"format":"other"}')).toBe(false)
     expect(isOpenReloadingJson('{not json')).toBe(false)
@@ -107,6 +125,32 @@ describe('OpenReloading session JSON', () => {
       'empty reason',
       { ...file, strings: [{ shots: [{ velocity: 800, excluded: '' }] }] },
       'excluded',
+    ],
+    ['text date', { ...file, date: 20260305 }, 'date: must be a date as YYYY-MM-DD'],
+    ['device as text', { ...file, device: 'radar' }, 'device: must be an object'],
+    [
+      'empty model',
+      { ...file, device: { kind: 'other', model: '' } },
+      'device.model: must be text',
+    ],
+    [
+      'number maker',
+      { ...file, device: { kind: 'other', manufacturerName: 7 } },
+      'device.manufacturerName: must be text',
+    ],
+    ['negative distance', { ...file, muzzleDistance: -1 }, 'muzzleDistance: must be a positive'],
+    ['empty note', { ...file, note: '' }, 'note: must be text'],
+    ['string as list', { ...file, strings: [[]] }, 'strings[0]: must be an object'],
+    [
+      'number label',
+      { ...file, strings: [{ label: 1, shots: [{ velocity: 800 }] }] },
+      'strings[0].label: must be text',
+    ],
+    ['shot as number', { ...file, strings: [{ shots: [800] }] }, 'strings[0].shots[0]: must be'],
+    [
+      'text cold bore',
+      { ...file, strings: [{ shots: [{ velocity: 800, coldBore: 'yes' }] }] },
+      'strings[0].shots[0].coldBore: must be true or false',
     ],
   ])('refuses %s', (_, bad, message) => {
     expect(() => parseOpenReloadingJson(JSON.stringify(bad))).toThrow(message)
