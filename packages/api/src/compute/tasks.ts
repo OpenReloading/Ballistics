@@ -74,7 +74,12 @@ const runners = {
       : undefined
     const sampled =
       result.valid && t.sampling
-        ? interiorSampledBand(t.load, t.tolerances, { ...t.sampling, now: Date.now }, t.options)
+        ? interiorSampledBand(
+            t.load,
+            t.tolerances,
+            { ...t.sampling, now: () => performance.now() },
+            t.options,
+          )
         : undefined
     return { result, range, sampled }
   },

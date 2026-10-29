@@ -168,6 +168,35 @@ describe('fitRings', () => {
     expect(() => fitRings([marks(5.5, [0, 90]), marks(25.5, [45])], english.t)).toThrow(
       /four points/,
     )
+    expect(() =>
+      fitRings([marks(5.5, [0, 90, 180, 270]), { diameter: 25.5, points: [] }], english.t),
+    ).toThrow(/two rings/)
+  })
+
+  it('fits four points on two rings', () => {
+    const fit = fitRings([marks(15.5, [0, 120]), marks(35.5, [60, 240])], english.t)
+    expect(fit.centre.x).toBeCloseTo(centre.x, 12)
+    expect(fit.centre.y).toBeCloseTo(centre.y, 12)
+    expect(fit.scale).toBeCloseTo(scale, 12)
+  })
+
+  it('refuses points on one spot and an inner ring marked outside an outer one', () => {
+    const spot = { x: 0.01, y: 0.01 }
+    expect(() =>
+      fitRings(
+        [
+          { diameter: 10, points: [spot, spot] },
+          { diameter: 20, points: [spot, spot] },
+        ],
+        english.t,
+      ),
+    ).toThrow('Points are degenerate')
+    // the 15.5 mm ring marked where the 35.5 mm ring is, and the other way round
+    const swapped = [
+      { diameter: 35.5, points: marks(15.5, [0, 90, 180, 270]).points },
+      { diameter: 15.5, points: marks(35.5, [45, 135, 225, 315]).points },
+    ]
+    expect(() => fitRings(swapped, english.t)).toThrow('Points are degenerate')
   })
 })
 
@@ -230,6 +259,17 @@ describe('face on the sheet (target m) and face m', () => {
     const path = ringPath({ centre: { x: 0.01, y: 0 }, scale: 1.02 }, 42.4)
     expect(path.length).toBeGreaterThanOrEqual(64)
     for (const p of path) expect(Math.hypot(p.x - 0.01, p.y)).toBeCloseTo(0.0212 * 1.02, 12)
+    // counter-clockwise from the right, 5 degrees apart
+    const r = 0.0212 * 1.02
+    for (const [i, x, y] of [
+      [0, 0.01 + r, 0],
+      [18, 0.01, r],
+      [36, 0.01 - r, 0],
+      [54, 0.01, -r],
+    ] satisfies [number, number, number][]) {
+      expect(defined(path[i]).x).toBeCloseTo(x, 12)
+      expect(defined(path[i]).y).toBeCloseTo(y, 12)
+    }
   })
 })
 
@@ -278,6 +318,9 @@ describe('scoreGroupOnFace', () => {
     const s = scoreGroupOnFace(rifle50, f, group, 7.82e-3, english.t)
     if ('error' in s) throw new Error(s.error)
     expect(s.hole).toBe(7.82e-3)
+    expect(scoreGroupOnFace(rifle50, f, group, 0, english.t)).toEqual({
+      error: 'No hole size: set Marker, or choose a discipline or event with a gauge.',
+    })
     const moved = scoreGroupOnFace(
       rifle50,
       f,
@@ -291,10 +334,8 @@ describe('scoreGroupOnFace', () => {
 
   it('says so when the marks do not fit', () => {
     const marks = [0, 1, 2, 3].map((i) => ({ ring: 8 + (i % 2), x: 0, y: 0 }))
-    expect(
-      scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, english.t),
-    ).toMatchObject({
-      error: expect.stringMatching(/^The ring marks do not fit/),
+    expect(scoreGroupOnFace(rifle50, { id: rifle50.id, marks }, group, 5e-3, english.t)).toEqual({
+      error: 'The ring marks do not fit: Points are degenerate. Mark them again.',
     })
   })
 })

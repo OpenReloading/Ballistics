@@ -6,6 +6,7 @@ import {
   type DragTable,
   dragCoefficient,
   dragModels,
+  dragSegment,
   dragTableOf,
   dragTables,
   heldSegment,
@@ -444,5 +445,64 @@ describe('monotone cubic interpolation', () => {
       for (const tol of [1e-6, 1e-8, 1e-10])
         expect(Math.abs(height(tol) - exact)).toBeLessThan(tol * range)
     }
+  })
+})
+
+describe('drag table segments', () => {
+  const curve: DragTable = [
+    [0.5, 0.3],
+    [1, 0.4],
+    [2, 0.6],
+    [2.5, 0.7],
+  ]
+
+  it('holds the end values below the first and above the last node', () => {
+    expect(dragCoefficient(curve, 0.1)).toBe(0.3)
+    expect(dragCoefficient(curve, 3)).toBe(0.7)
+    expect(inDragTable(curve, 0.49)).toBe(false)
+    expect(inDragTable(curve, 2.51)).toBe(false)
+  })
+
+  it('finds the segment of a Mach number, a node opening its segment', () => {
+    expect(dragSegment(curve, 0.49)).toBe(-1)
+    expect(dragSegment(curve, 0.5)).toBe(0)
+    expect(dragSegment(curve, 1)).toBe(1)
+    expect(dragSegment(curve, 2)).toBe(2)
+    expect(dragSegment(curve, 2.49)).toBe(2)
+    expect(dragSegment(curve, 2.5)).toBe(3)
+  })
+
+  it('reads the end values on the segments outside the table', () => {
+    expect(segmentCoefficient(curve, -1, 2)).toBe(0.3)
+    expect(segmentCoefficient(curve, 3, 1)).toBe(0.7)
+    expect(heldSegment(curve, -1)).toBe(false)
+    expect(heldSegment(curve, 3)).toBe(false)
+  })
+
+  it('holds a segment only below the width limit and above the slope limit', () => {
+    const width: DragTable = [
+      [0, 1],
+      [1e-6, 1],
+    ]
+    expect(heldSegment(width, 0)).toBe(false)
+    // a rise of 2 over 0.01 Mach is 100 per Mach times the larger node value 2
+    const slope: DragTable = [
+      [0, 0],
+      [0.01, 2],
+    ]
+    expect(heldSegment(slope, 0)).toBe(false)
+  })
+
+  it('weights the interior cubic slope by unequal node spacing', () => {
+    // secants 1/2 and 3/5 over widths 2 and 1: p = (1/2 + 6/5) / 3 = 17/30, slope 2 min(1/2, 3/5,
+    // 17/60) = 17/30; at the middle of the first segment 1/8 + 1/2 - 17/120 = 29/60
+    const uneven: DragTable = [
+      [1, 0],
+      [3, 1],
+      [4, 1.6],
+    ]
+    expect(Math.abs(dragCoefficient(uneven, 2, 'monotone-cubic') / (29 / 60) - 1)).toBeLessThan(
+      1e-15,
+    )
   })
 })

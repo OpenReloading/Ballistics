@@ -128,7 +128,7 @@ describe('compute pool through the API', () => {
       body: JSON.stringify(slow),
     })
     await received
-    const start = Date.now()
+    const start = performance.now()
     const closed = app.close()
     const res = await pending
     expect(res.status).toBe(200)
@@ -136,6 +136,6 @@ describe('compute pool through the API', () => {
     await res.arrayBuffer()
     await closed
     // without `connection: close` the idle connection keeps the server open for keepAliveTimeout
-    expect(Date.now() - start).toBeLessThan(5000)
+    expect(performance.now() - start).toBeLessThan(5000)
   })
 })

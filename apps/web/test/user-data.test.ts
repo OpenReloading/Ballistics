@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import {
   type UserRecord,
@@ -33,6 +34,14 @@ import {
 import { folderFileName, ownsFile, recordFileName } from '../src/lib/user-file-names.ts'
 import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/lib/user-photos.ts'
 import { defined } from './defined.ts'
+
+/** `n` characters of text that does not compress, the same in every run: chained SHA-256 digests. */
+const noise = (n: number) =>
+  Array.from({ length: Math.ceil(n / 43) }, (_, i) =>
+    createHash('sha256').update(String(i)).digest('base64url'),
+  )
+    .join('')
+    .slice(0, n)
 
 const saved = '2026-10-13T10:00:00.000Z'
 const bullet: UserRecord = {
@@ -462,22 +471,18 @@ describe('share links', () => {
   })
 
   it('refuses a record whose link is longer than the limit', async () => {
-    // random text does not compress
-    const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')
-    const big = { ...load, data: { ...load.data, notes: noise } } as UserRecord
+    const big = { ...load, data: { ...load.data, notes: noise(12000) } } as UserRecord
     await expect(shareLink([big], base)).resolves.toBeUndefined()
     expect(maxLinkChars).toBe(8000)
   })
 
   it('refuses a record whose compressed text is over 200 kB without building the link', async () => {
-    const noise = Array.from({ length: 400000 }, () => Math.random().toString(36)[2]).join('')
-    const big = { ...load, data: { ...load.data, notes: noise } } as UserRecord
+    const big = { ...load, data: { ...load.data, notes: noise(400000) } } as UserRecord
     await expect(shareLink([big], base)).resolves.toBeUndefined()
   })
 
   it('names the file route for a powder too long for a link, its fit kept whole', async () => {
-    const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')
-    const big = { ...powder, name: noise } as UserRecord
+    const big = { ...powder, name: noise(12000) } as UserRecord
     await expect(shareLink([big], base)).resolves.toBeUndefined()
     expect(tooLongText(big.kind, english.t)).toBe('Too long for a link: save the powder to a file')
     expect(tooLongText(bullet.kind, english.t)).toContain('longer than 8000 characters')

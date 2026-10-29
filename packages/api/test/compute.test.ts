@@ -774,7 +774,7 @@ describe('POST /interior sampled band', () => {
     const core = interiorSampledBand(
       m3Load,
       pressureToleranceDefaults,
-      { samples: 20, seed: 3, budgetMs: 3000, now: Date.now },
+      { samples: 20, seed: 3, budgetMs: 3000, now: () => performance.now() },
       m3Config,
     )
     expect(body.sampled).toEqual(json(core))

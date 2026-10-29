@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { readRecords } from '@open-reloading/data'
 import { toSi } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { expect, it, vi } from 'vitest'
+import { beforeEach, expect, it, vi } from 'vitest'
 import { DisciplineList, FederationList } from '../src/components/discipline-list.tsx'
 import { DisciplineRecordView } from '../src/components/discipline-record-page.tsx'
 import de from '../src/i18n/de.json'
@@ -37,6 +37,9 @@ vi.mock('next/navigation', () => ({
   usePathname: () => route.path,
   useRouter: () => ({ push: () => {} }),
 }))
+beforeEach(() => {
+  route.path = '/disciplines'
+})
 
 // the record view shows decimal marks of the language shown, so it must subscribe to it
 vi.mock('../src/i18n/language.ts', async (original) => {

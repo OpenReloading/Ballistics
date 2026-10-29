@@ -121,4 +121,30 @@ describe('freeRecoil', () => {
     expect(() => freeRecoil({ ...ok, muzzleVelocity: Number.NaN })).toThrow(InputError)
     expect(() => freeRecoil({ ...ok, gasFactor: -1 })).toThrow(InputError)
   })
+
+  it('names the invalid field and accepts each inclusive limit', () => {
+    const ok = {
+      firearmMass: 4,
+      projectileMass: 0.01,
+      chargeMass: 0.003,
+      muzzleVelocity: 800,
+      gasFactor: 1.75,
+    }
+    expect(() => freeRecoil({ ...ok, firearmMass: 0 })).toThrow('Firearm mass must be positive.')
+    expect(() => freeRecoil({ ...ok, projectileMass: 0 })).toThrow(
+      'Projectile mass must be positive.',
+    )
+    expect(() => freeRecoil({ ...ok, chargeMass: -0.001 })).toThrow(
+      'Charge mass must not be negative.',
+    )
+    for (const muzzleVelocity of [-1, Number.POSITIVE_INFINITY])
+      expect(() => freeRecoil({ ...ok, muzzleVelocity })).toThrow(
+        'Muzzle velocity must not be negative.',
+      )
+    expect(() => freeRecoil({ ...ok, gasFactor: -1 })).toThrow(
+      'Gas velocity factor must not be negative.',
+    )
+    expect(freeRecoil({ ...ok, muzzleVelocity: 0 }).energy).toBe(0)
+    expect(freeRecoil({ ...ok, gasFactor: 0 }).momentum).toBeCloseTo(8, 12)
+  })
 })

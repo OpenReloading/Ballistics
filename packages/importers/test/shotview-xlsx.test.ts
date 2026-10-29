@@ -96,6 +96,15 @@ describe('parseShotViewWorkbook', () => {
     ])
   })
 
+  it('warns about a footer date and a statistics row with the label only', () => {
+    const labelOnly = edit(withDate(shotViewSheetEnglish, ''), (c) => c[0] === 'DATE', [['DATE']])
+    const spread = edit(labelOnly, (c) => c[0] === 'SPREAD', [['SPREAD']])
+    expect(parseShotViewWorkbook(book(spread)).warnings).toEqual([
+      'worksheet 1: footer date "" is not recognised; enter the date',
+      'worksheet 1: footer SPREAD "" is not a number; not checked',
+    ])
+  })
+
   it('reads empty rows of a caller-built workbook', () => {
     const sheet = { name: 'a', rows: [[], ['#', 'Speed (FPS)'], [], ['1', '2800.0'], []] }
     const r = parseShotViewWorkbook(book(sheet))

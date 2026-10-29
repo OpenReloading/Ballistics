@@ -111,6 +111,20 @@ describe('compare', () => {
       compare(options, 'm3', new URL('./fixtures/broken-model.mjs', import.meta.url).pathname),
     ).rejects.toThrow(/cannot be loaded: broken$/)
     expect(fixture('x')).toContain('fixtures')
+    // a module may throw a value that is not an Error: its text is the cause
+    const thrown = writeRows("throw 'plain text\\nsecond line'\n", 'thrown.mjs')
+    await expect(loadModel(thrown)).rejects.toThrow(/cannot be loaded: plain text$/)
+  })
+
+  it('leaves a relative specifier without a file out of the candidate version', async () => {
+    const path = writeRows(
+      "// was: export { interior } from './gone.mjs'\nexport { interior } from '@open-reloading/core'\n",
+      'candidate.mjs',
+    )
+    const { files } = await loadModel(path)
+    expect(files.filter((f) => f.label.startsWith('candidate/')).map((f) => f.label)).toEqual([
+      'candidate/candidate.mjs',
+    ])
   })
 
   it('hashes the files a candidate module imports', async () => {

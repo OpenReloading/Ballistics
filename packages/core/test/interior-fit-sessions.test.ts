@@ -242,6 +242,48 @@ describe('powder fit over sessions', () => {
     expect(nth(r.parameters, 1).value).toBe(nth(direct.parameters, 1).value)
   })
 
+  it('holds the temperature factor that one hot temperature leaves ill-conditioned', () => {
+    const list = sessions([0.6], [313.15], 1)
+    const r = fitPowderSessions(start, list, { parameters: ['burnRate', 'temperatureFactor'] })
+    expect(r.held).toEqual([{ name: 'temperatureFactor', reason: 'ill-conditioned' }])
+    expect(r.resolved).toEqual(['burnRate'])
+    expect(nth(r.parameters, 0).value).toBe(nth(fitPowder(start, points(list)).parameters, 0).value)
+  })
+
+  it('gives up the parameter the ill-conditioned direction lies on most', () => {
+    const r = fitPowderSessions(start, sessions(lengths, [313.15], 1), {
+      parameters: ['burnRate', 'energy', 'temperatureFactor'],
+    })
+    expect(r.held).toEqual([{ name: 'temperatureFactor', reason: 'ill-conditioned' }])
+    expect(r.resolved).toEqual(['burnRate', 'energy'])
+  })
+
+  it('gives up the last parameter when the points are fewer than the parameters', () => {
+    const [one] = sessions([0.6], [294.15], 1)
+    const r = fitPowderSessions(start, [{ ...one, ladder: (one?.ladder ?? []).slice(0, 1) }], {
+      parameters: ['burnRate', 'temperatureFactor'],
+    })
+    expect(r.held).toEqual([{ name: 'temperatureFactor', reason: 'underdetermined' }])
+    expect(r.resolved).toEqual(['burnRate'])
+  })
+
+  it('keeps the temperature a point states itself over its session', () => {
+    const list = sessions([0.6], temperatures, 1)
+    // one session labelled at the reference temperature, its points at their own
+    const mislabelled = [
+      {
+        propellantTemperature: 294.15,
+        ladder: points(list),
+      },
+    ]
+    const parameters = ['burnRate', 'temperatureFactor'] as const
+    const r = fitPowderSessions(start, mislabelled, { parameters })
+    expect(r.resolved).toEqual(parameters)
+    expect(nth(r.parameters, 1).value).toBe(
+      nth(fitPowder(start, points(list), { parameters }).parameters, 1).value,
+    )
+  })
+
   it('keeps the burn coefficient and refuses empty input', () => {
     expect(() => fitPowderSessions(start, [])).toThrow(InputError)
     expect(() =>

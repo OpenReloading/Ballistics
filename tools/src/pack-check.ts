@@ -26,11 +26,16 @@ interface Manifest {
   peerDependencies?: Record<string, string>
 }
 
+/** A package in the output of `npm pack --json`. */
+interface Packed {
+  files: { path: string }[]
+}
+
 /** npm packs these whatever `files` says. */
 const alwaysPacked = /^(package\.json|(readme|license|licence|changelog)([.-][^/]*)?)$/i
 const code = /\.(?:[cm]?js|d\.[cm]?ts)$/
 /** The specifier of a static or dynamic `import`, an `export ... from` or a `require` (not text such as `from "${x}"`). */
-const specifier = /(?:\bfrom|\bimport|\brequire)\s*\(?\s*(['"])([^'"\s${}]+)\1/g
+const specifier = /(?:\bfrom|\bimport|\brequire)\s*(?:\(\s*)?(['"])([^'"\s${}]+)\1/g
 const testFile = /(?:(?:^|\/)(?:__tests__|test|tests)\/)|(?:\.(?:test|spec)\.[cm]?[jt]sx?$)/
 
 /** Every path named by `exports`, through its conditions and subpaths. */
@@ -80,16 +85,23 @@ function importProblems(dir: string, file: string, manifest: Manifest) {
     .map((name) => `${file} imports ${name}, which is not in dependencies or peerDependencies`)
 }
 
-/** What is wrong with the tarball of the package in `dir`, one line each. */
-export function packProblems(dir: string): string[] {
-  const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
-  const [pack] = JSON.parse(
+/** The package `npm pack --dry-run` would write for `dir`. */
+function packOf(dir: string): Packed | undefined {
+  const listed = JSON.parse(
     execFileSync(executable('npm'), ['pack', '--dry-run', '--json', '--ignore-scripts'], {
       cwd: dir,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
     }),
-  ) as { files: { path: string }[] }[]
+  ) as Packed[] | Record<string, Packed>
+  // npm 12 keys the list by package name, older npm writes an array
+  return (Array.isArray(listed) ? listed : Object.values(listed))[0]
+}
+
+/** What is wrong with the tarball of the package in `dir`, one line each. */
+export function packProblems(dir: string): string[] {
+  const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
+  const pack = packOf(dir)
   if (!pack) return ['npm pack listed no package']
   const files = new Set(pack.files.map((f) => f.path))
   const problems = ['README.md']

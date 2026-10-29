@@ -78,3 +78,38 @@ describe('spin drift and jump', () => {
     expect(aerodynamicJump(2, 4, -3, 'left')).toBeLessThan(0)
   })
 })
+
+describe('stability inputs and limits', () => {
+  it('rejects each input at zero', () => {
+    for (const key of ['mass', 'diameter', 'length', 'twist', 'velocity'] as const)
+      expect(() => millerStability({ ...base, [key]: 0 })).toThrow(
+        'mass, diameter, length, twist and velocity must be positive',
+      )
+  })
+
+  it('adds the Magnus moment over the axial inertia', () => {
+    // m d^2 / Ix = 10, m d^2 / Iy = 1: 2 (2 + 10) / (2 - 0.5 + 3) = 16 / 3
+    const c = {
+      liftSlope: 2,
+      drag: 0.5,
+      magnusMoment: 1,
+      pitchDamping: -3,
+      mass: 0.01,
+      diameter: 0.01,
+      axialInertia: 1e-7,
+      transverseInertia: 1e-6,
+    }
+    expect(dynamicStabilityFactor(c)).toBeCloseTo(16 / 3, 12)
+  })
+
+  it('is unstable at a negative Sg and on the band edge', () => {
+    expect(isStable(-1, 1)).toBe(false)
+    // 1 / Sg = 0.75 = Sd (2 - Sd) at Sd = 0.5
+    expect(isStable(4 / 3, 0.5)).toBe(false)
+    expect(isStable(4 / 3, 0.6)).toBe(true)
+  })
+
+  it('takes one MOA as a sixtieth of a degree', () => {
+    expect(radPerMoa * 60 * 180).toBeCloseTo(Math.PI, 14)
+  })
+})
