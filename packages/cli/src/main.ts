@@ -1,4 +1,4 @@
-import { parseArgs } from 'node:util'
+import { type ParseArgsConfig, parseArgs } from 'node:util'
 import { compare, type Options, verify } from './commands.ts'
 import { Refusal, UsageError } from './errors.ts'
 import { type Grouping, groupings } from './metrics.ts'
@@ -32,6 +32,18 @@ options:
 
 exit codes: 0 done, 1 refused run, 2 bad input`
 
+/** Parses a command line, an unknown or malformed option is bad input with the usage. */
+function parse<T extends ParseArgsConfig>(config: T) {
+  try {
+    return parseArgs(config)
+  } catch (error) {
+    // parseArgs reports an unknown or malformed option as a TypeError with a code
+    if (error instanceof TypeError && 'code' in error)
+      throw new UsageError(`${error.message}\n\n${usage}`)
+    throw error
+  }
+}
+
 /** Refuses an option value that is not one of its choices. */
 function checkChoices(
   values: { json?: boolean | undefined; table?: boolean | undefined; params?: string | undefined },
@@ -56,7 +68,7 @@ function optionsOf(
   env: NodeJS.ProcessEnv,
   warn: Io['stderr'],
 ) {
-  const { values } = parseArgs({
+  const { values } = parse({
     args,
     strict: true,
     options: {
@@ -124,7 +136,10 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
     return 0
   }
   try {
-    if (command !== 'verify' && command !== 'compare') throw new UsageError(usage)
+    if (command !== 'verify' && command !== 'compare') {
+      parse({ args: argv, strict: true, allowPositionals: true, options: {} })
+      throw new UsageError(usage)
+    }
     io.stdout(`${await execute(command, args, env, io)}\n`)
     return 0
   } catch (error) {
@@ -134,11 +149,6 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
     }
     if (error instanceof UsageError) {
       io.stderr(`${error.message}\n`)
-      return 2
-    }
-    // parseArgs reports an unknown or malformed option as a TypeError with a code
-    if (error instanceof TypeError && 'code' in error) {
-      io.stderr(`${error.message}\n\n${usage}\n`)
       return 2
     }
     // a candidate that throws, or a file error: one line, never a stack trace

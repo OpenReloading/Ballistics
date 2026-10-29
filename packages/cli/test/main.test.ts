@@ -148,6 +148,9 @@ describe('exit codes', () => {
     const unknown = await cli(['verify', '--rows', 'x.csv', '--nope'])
     expect(unknown.code).toBe(2)
     expect(unknown.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
+    const top = await cli(['--nope'])
+    expect(top.code).toBe(2)
+    expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
   })
 
   it('is 2 for a rows file with a bad value, naming line and column', async () => {
@@ -187,6 +190,10 @@ describe('a candidate with a velocity that is not a number', () => {
 describe('an unexpected error', () => {
   it.each([
     ['a candidate that throws', new URL('./fixtures/throwing-model.mjs', import.meta.url).pathname],
+    [
+      'a candidate that throws a coded TypeError',
+      new URL('./fixtures/coded-type-error-model.mjs', import.meta.url).pathname,
+    ],
     ['a directory given as the candidate', join(import.meta.dirname, 'fixtures')],
   ])('ends with one line and exit 2: %s', async (_name, model) => {
     const { code, stdout, stderr } = await cli(['verify', ...data, '--model', model])
