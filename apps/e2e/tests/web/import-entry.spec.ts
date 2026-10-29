@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { barButton } from './bar.ts'
+import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
 
 // invented bullets, no maker's catalogue
@@ -11,21 +11,9 @@ const rows = [
 ]
 const csv = (lines: string[], head = header) => Buffer.from([head, ...lines].join('\n'))
 
-test.beforeEach(async ({ page }) => {
-  // the file input stands in for the native picker, which a test cannot drive
-  await page.addInitScript(() => {
-    delete (window as unknown as Record<string, unknown>).showOpenFilePicker
-  })
-})
+test.beforeEach(({ page }) => withoutOpenPicker(page))
 
-/** Opens Import… and picks `buffer` as `name`: the click that chooses the file. */
-async function pick(page: Page, name: string, buffer: Buffer) {
-  await (await barButton(page, 'Open')).click()
-  const chooser = page.waitForEvent('filechooser')
-  await page.getByRole('menuitem', { name: 'Import…' }).click()
-  await (await chooser).setFiles({ name, mimeType: 'text/csv', buffer })
-  return page.getByRole('dialog', { name: 'Tables to read' })
-}
+const pick = (page: Page, name: string, buffer: Buffer) => pickFiles(page, [{ name, buffer }])
 
 test('one clean table imports in two clicks and a typed source, and a second import adds nothing', async ({
   page,
@@ -38,7 +26,7 @@ test('one clean table imports in two clicks and a typed source, and a second imp
   await expect(button).toBeDisabled()
   await entry.getByRole('textbox', { name: 'Source' }).fill('Invented catalogue')
   await button.click()
-  await expect(entry.getByRole('status')).toHaveText('Imported 3 records.')
+  await expect(entry.locator('.import-foot').getByRole('status')).toHaveText('Imported 3 records.')
   await expect(entry.getByTestId('import-counts')).toContainText('already here 3')
   await page.keyboard.press('Escape')
 
@@ -84,7 +72,33 @@ for (const { kind, header: head, rows: lines } of others) {
     await expect(entry.getByTestId('import-counts')).toContainText('3 accepted')
     await entry.getByRole('textbox', { name: 'Source' }).fill('Invented catalogue')
     await entry.getByRole('button', { name: 'Import 3 valid rows' }).click()
-    await expect(entry.getByRole('status')).toHaveText('Imported 3 records.')
+    await expect(entry.locator('.import-foot').getByRole('status')).toHaveText(
+      'Imported 3 records.',
+    )
     await expect(entry.getByTestId('import-counts')).toContainText('already here 3')
   })
 }
+
+// WCAG 4.1.3 and 2.4.3: each read is announced, and the focus stays on a control of the entry
+test('the entry announces each read and keeps the focus after Kind and columns and Remove', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/bullets/designer')
+  const entry = await pickFiles(page, [
+    { name: 'a.csv', buffer: csv(rows) },
+    { name: 'notes.txt', buffer: Buffer.from('Notes, from the range\nwindy day') },
+    { name: 'b.csv', buffer: csv(rows) },
+  ])
+  await expect(entry.locator('.import-entry > [role="status"]')).toContainText(
+    /^3 of 3 files read\. notes\.txt: .+/,
+  )
+  const card = (name: string) => entry.getByRole('region', { name })
+  await card('a.csv').getByRole('button', { name: 'Kind and columns' }).click()
+  await expect(card('a.csv').getByRole('radio', { name: 'bullets' })).toBeFocused()
+  await entry.getByRole('button', { name: 'Remove a.csv' }).click()
+  await expect(entry.getByRole('heading', { name: 'notes.txt' })).toBeFocused()
+  await entry.getByRole('button', { name: 'Remove b.csv' }).click()
+  await expect(entry.getByRole('heading', { name: 'notes.txt' })).toBeFocused()
+  await entry.getByRole('button', { name: 'Remove notes.txt' }).click()
+  await expect(entry.getByRole('button', { name: 'Choose files' })).toBeFocused()
+})

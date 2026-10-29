@@ -3592,6 +3592,8 @@
   "The workbook cannot be read: {reason}. Save it again as XLSX or CSV.": "Die Arbeitsmappe kann nicht gelesen werden: {reason}. Speichern Sie sie erneut als XLSX oder CSV.",
   "Load file, read by {format}": "Laborierungsdatei, gelesen von {format}",
   "{format}: {reason}": "{format}: {reason}",
+  "{name}: {reason}": "{name}: {reason}",
+  "{read} of {count} files read.": "{read} von {count} Dateien gelesen.",
   "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again": "Die Datei ist kein UTF-8- oder UTF-16-Text; speichern Sie sie als UTF-8 (CSV UTF-8) und importieren Sie sie erneut",
   "{field} is empty. Fill the cell or delete the row.": "{field} ist leer. Füllen Sie die Zelle oder löschen Sie die Zeile.",
   "{field} has no unit. Choose a unit for the column.": "{field} hat keine Einheit. Wählen Sie eine Einheit für die Spalte.",
