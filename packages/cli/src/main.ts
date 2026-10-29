@@ -16,6 +16,7 @@ export interface Io {
 const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
+  ballistics --help
 
 options:
   --rows <path>      a rows file or a folder of .csv files (default: BALLISTICS_ROWS)
@@ -27,6 +28,7 @@ options:
                      verify: add the line of the powder not in the fitted set
   --params records   the powder parameters of the records (the only mode so far)
   --json | --table   output format (default: JSON unless stdout is a terminal)
+  -h, --help         this text
 
 exit codes: 0 done, 1 refused run, 2 bad input`
 
@@ -117,6 +119,10 @@ async function execute(
 /** Runs the command line `argv` (without the program), writes the result and returns the exit code. */
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
   const [command = '', ...args] = argv
+  if (argv.includes('--help') || argv.includes('-h')) {
+    io.stdout(`${usage}\n`)
+    return 0
+  }
   try {
     if (command !== 'verify' && command !== 'compare') throw new UsageError(usage)
     io.stdout(`${await execute(command, args, env, io)}\n`)
@@ -126,9 +132,13 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
       io.stderr(`refused: ${error.message}\n`)
       return 1
     }
-    // parseArgs reports an unknown or malformed option as a TypeError with a code
-    if (error instanceof UsageError || (error instanceof TypeError && 'code' in error)) {
+    if (error instanceof UsageError) {
       io.stderr(`${error.message}\n`)
+      return 2
+    }
+    // parseArgs reports an unknown or malformed option as a TypeError with a code
+    if (error instanceof TypeError && 'code' in error) {
+      io.stderr(`${error.message}\n\n${usage}\n`)
       return 2
     }
     // a candidate that throws, or a file error: one line, never a stack trace

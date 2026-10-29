@@ -131,6 +131,25 @@ describe('exit codes', () => {
     expect(stdout).toBe('')
   })
 
+  it.each([[['--help']], [['-h']], [['verify', '--help']], [['compare', ...data, '-h']]])(
+    'is 0 for help, with the usage on stdout: %j',
+    async (args) => {
+      const { code, stdout, stderr } = await cli(args)
+      expect(code).toBe(0)
+      expect(stdout).toMatch(/^usage:/)
+      expect(stderr).toBe('')
+    },
+  )
+
+  it('is 2 with the usage on stderr for no command and for an unknown option', async () => {
+    const none = await cli([])
+    expect(none.code).toBe(2)
+    expect(none.stderr).toMatch(/^usage:/)
+    const unknown = await cli(['verify', '--rows', 'x.csv', '--nope'])
+    expect(unknown.code).toBe(2)
+    expect(unknown.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
+  })
+
   it('is 2 for a rows file with a bad value, naming line and column', async () => {
     const { writeRows } = await import('./fixture.ts')
     const bad = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-win,b,p,x,800\n')
