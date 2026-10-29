@@ -157,7 +157,7 @@ function toRow(
 function headerOf(fields: string[]): Column[] | string {
   const names = fields.map((f) => f.trim())
   const unknown = names.filter((n) => !Object.hasOwn(columns, n))
-  if (unknown.length > 0) return `the header has ${unknown.length} unknown column(s)`
+  if (unknown.length > 0) return `the header has unknown column(s) ${unknown.join(', ')}`
   if (new Set(names).size !== names.length) return 'the header repeats a column'
   const missing = required.filter((r) => !names.includes(r))
   return missing.length > 0 ? `the header lacks ${missing.join(', ')}` : (names as Column[])
@@ -192,13 +192,14 @@ function filesOf(path: string): string[] {
   try {
     isDirectory = statSync(path).isDirectory() // NOSONAR: the path is the argument the user gave
   } catch {
-    throw new UsageError('the rows path does not exist')
+    throw new UsageError('the --rows path (or BALLISTICS_ROWS) does not exist')
   }
   if (!isDirectory) return [path]
   const names = readdirSync(path) // NOSONAR: as above
-    .filter((n) => n.endsWith('.csv'))
+    .filter((n) => /\.csv$/i.test(n))
     .toSorted()
-  if (names.length === 0) throw new UsageError('the rows folder holds no .csv file')
+  if (names.length === 0)
+    throw new UsageError('the --rows folder (or BALLISTICS_ROWS) holds no .csv file')
   return names.map((n) => join(path, n))
 }
 

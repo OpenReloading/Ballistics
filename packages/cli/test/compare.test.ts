@@ -1,7 +1,7 @@
-import { writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { compare, verify } from '../src/commands.ts'
-import { Refusal, UsageError } from '../src/errors.ts'
+import { Refusal } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
 import { rowsPath } from './data.ts'
 import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
@@ -60,6 +60,17 @@ describe('compare', () => {
     expect(r.change.overall.velocityMedian).toBeCloseTo(0.111 - 0.03, 9)
   })
 
+  it('reads a baseline with a byte order mark and names the cause of a read failure', async () => {
+    const saved = writeRows(`\uFEFF${JSON.stringify(await verify(options))}`, 'bom.json')
+    expect((await compare(options, saved, 'm3')).baseline.model).toBe('m3')
+    await expect(compare(options, '/nonexistent/b.json', 'm3')).rejects.toThrow(
+      'the --baseline file cannot be read: ENOENT',
+    )
+    const folder = saved.replace('bom.json', 'folder.json')
+    mkdirSync(folder)
+    await expect(compare(options, folder, 'm3')).rejects.toThrow('cannot be read: EISDIR')
+  })
+
   it('refuses a baseline of another split, other rows or no verify result', async () => {
     const training = writeRows(
       JSON.stringify(await verify({ ...options, split: 'training' })),
@@ -77,7 +88,7 @@ describe('compare', () => {
     )
     await expect(compare({ ...options, rows: otherRows }, saved, 'm3')).rejects.toThrow(Refusal)
     const broken = writeRows('{', 'broken.json')
-    await expect(compare(options, broken, 'm3')).rejects.toThrow(UsageError)
+    await expect(compare(options, broken, 'm3')).rejects.toThrow('the --baseline file is not JSON')
     const notResult = writeRows('{"a":1}', 'a.json')
     await expect(compare(options, notResult, 'm3')).rejects.toThrow('not a verify result')
   })
@@ -98,7 +109,7 @@ describe('compare', () => {
     ).rejects.toThrow('exports no function')
     await expect(
       compare(options, 'm3', new URL('./fixtures/broken-model.mjs', import.meta.url).pathname),
-    ).rejects.toThrow('cannot be loaded')
+    ).rejects.toThrow(/cannot be loaded: broken$/)
     expect(fixture('x')).toContain('fixtures')
   })
 

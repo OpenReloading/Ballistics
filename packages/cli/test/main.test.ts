@@ -73,6 +73,13 @@ describe('the records', () => {
     expect(JSON.parse(r.stdout).command).toBe('verify')
     expect((await cli(['verify', ...data])).stderr).toBe('')
   })
+
+  it('names the position of a records root that is not a folder', async () => {
+    const r = await cli(['verify', ...data, '--records', '/nonexistent/records'])
+    expect(r.stderr).toContain(
+      `the --records path ${recordRoots.length + 1} of ${recordRoots.length + 1} (or BALLISTICS_RECORDS) does not exist`,
+    )
+  })
 })
 
 describe('exit codes', () => {
