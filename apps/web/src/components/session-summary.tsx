@@ -15,6 +15,7 @@ import {
   exampleCsv,
   exampleSessionFileName,
   formatNames,
+  formats,
   readSession,
   sessionCsvBlob,
   sessionJsonBlob,
@@ -28,7 +29,7 @@ import { type StringStats, stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
-import { formats, TemplateLinks } from './chrono-file-input.tsx'
+import { TemplateLinks } from './chrono-file-input.tsx'
 import { LazyLineChart, preloadChart } from './lazy-chart.tsx'
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
