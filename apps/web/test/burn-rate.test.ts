@@ -1,5 +1,7 @@
 import type { Powder } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import de from '../src/i18n/de.json'
+import { translator } from '../src/i18n/translate.ts'
 import {
   bandAndBarsNote,
   bandNote,
@@ -87,6 +89,14 @@ describe('typed model parameters', () => {
     expect(typedBurn({ vivacity: 0.6, exponent: 1 })).toBeUndefined()
     const off = typedBurn({ vivacity: 0.6, exponent: 0.9, referencePressure: 1e5 })
     expect(off && 'reason' in off && off.reason).toMatch(/exponent 0.9/)
+  })
+
+  it('are named in the language of the translator', () => {
+    const typed = typedBurn(
+      { vivacity: 0.6, exponent: 1, referencePressure: 1e5 },
+      translator(de, 'de').t,
+    )
+    expect(typed?.label).toBe('Eingegebene Modellparameter')
   })
 })
 

@@ -158,11 +158,12 @@ export const isFitted = (p: FittedPowder | UnfittedPowder): p is FittedPowder =>
  */
 export function typedBurn(
   v: Partial<Record<string, number>>,
+  t: Translator['t'] = english,
 ): FittedPowder | UnfittedPowder | undefined {
   const { vivacity, exponent, referencePressure, formA, formM, formQ, formZ1 } = v
   if (vivacity === undefined || exponent === undefined || referencePressure === undefined) return
   const id = 'typed'
-  const label = 'Typed model parameters'
+  const label = t('Typed model parameters')
   if (exponent !== 1) return unfit({ id, label, kind: 'exponent' }, exponentReason(exponent))
   const form = [formA, formM, formQ, formZ1]
   return {
@@ -272,6 +273,8 @@ export function unfittedGroups(powders: readonly UnfittedPowder[]) {
 /** A row of the powder list: the summary, the order scalar and the burn-rate order among all fitted powders. */
 export interface PowderRow {
   id: string
+  /** `user`: a powder of the browser, a Mine row. */
+  origin?: 'user' | undefined
   /** Id of the manufacturer record. */
   manufacturer: string
   manufacturerName: string

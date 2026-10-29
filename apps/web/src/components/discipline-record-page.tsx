@@ -2,7 +2,6 @@
 
 import { compareTargetFaces, type TargetFace, type TargetMapping } from '@open-reloading/schema'
 import { useTranslation } from '../i18n/language.ts'
-import { localizeDecimals } from '../i18n/number.ts'
 import {
   type CaliberClassSummary,
   courseRows,
@@ -11,7 +10,9 @@ import {
   type FederationListItem,
 } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
+import { rowText } from '../lib/record-fields.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
+import { say } from '../lib/wording.ts'
 import { DisciplineData, DisciplineStages, DisciplineStrip } from './discipline-record.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
@@ -35,7 +36,7 @@ export function DisciplineRecordView({
   federations,
   classes,
 }: { d: DisciplineRecord } & Extras) {
-  useTranslation()
+  const { t } = useTranslation()
   const federation = federations.find((f) => f.id === d.federation)
   const international = disciplines.find((x) => x.id === d.internationalDiscipline)
   const book = disciplineRuleBook(d)
@@ -52,7 +53,7 @@ export function DisciplineRecordView({
   // the sighters, series and time limits a stage's rule book gives itself
   const courseOf = (m: TargetMapping) =>
     courseRows(m)
-      .map((r) => `${r.label}: ${r.numeric ? localizeDecimals(r.text ?? '') : r.text}`)
+      .map((r) => `${say(t, r.label)}: ${rowText(r, t)}`)
       .join('; ')
   return (
     <RecordPage

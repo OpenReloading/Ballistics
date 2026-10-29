@@ -1,6 +1,7 @@
 /** Requests of the Powders tab through `apiFetch`: powder records and summaries, runs. */
 
 import type { Powder } from '@open-reloading/schema'
+import { anySignal } from './any-signal.ts'
 import { apiFetch, fetchRecord } from './api-fetch.ts'
 import type { ErrorBody, InteriorResponse, PowderSummary } from './api-types.ts'
 
@@ -67,7 +68,7 @@ async function postOnce<T>(
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
-      signal: AbortSignal.any([signal, AbortSignal.timeout(requestTimeout)]),
+      signal: anySignal([signal, AbortSignal.timeout(requestTimeout)]),
     })
     const json = (await res.json().catch(() => undefined)) as (T & ErrorBody) | undefined
     // a body cut by the abort is no answer

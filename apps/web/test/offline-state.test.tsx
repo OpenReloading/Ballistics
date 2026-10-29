@@ -2,6 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { NotFoundState, OfflineState } from '../src/components/offline-state.tsx'
+import { msg } from '../src/i18n/translate.ts'
 
 // Retry reloading the page is not checked here (no DOM)
 it('the offline state has a title below the page h1, Retry and links to the pages kept on the device', () => {
@@ -9,8 +10,8 @@ it('the offline state has a title below the page h1, Retry and links to the page
     <MantineProvider>
       <OfflineState
         links={[
-          { href: '/workbench', label: 'Load workbench' },
-          { href: '/firearms', label: 'Firearms' },
+          { href: '/workbench', label: msg('Load workbench') },
+          { href: '/firearms', label: msg('Firearms') },
         ]}
       />
     </MantineProvider>,
@@ -30,8 +31,8 @@ it('the not-found state offers Search and links every page given', () => {
     <MantineProvider>
       <NotFoundState
         links={[
-          { href: '/workbench', label: 'Load workbench' },
-          { href: '/cartridges', label: 'Cartridges' },
+          { href: '/workbench', label: msg('Load workbench') },
+          { href: '/cartridges', label: msg('Cartridges') },
         ]}
       />
     </MantineProvider>,

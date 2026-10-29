@@ -18,14 +18,14 @@ it('counts the records of each kind, 0 for a kind with none, with the list each 
     ['Cartridges', 0],
     ['Bullets', 0],
     ['Powders', 0],
-    ['Cases', 0],
+    ['Brass', 0],
     ['Targets', 0],
     ['Firearms', 2],
   ])
-  expect(rows.find((r) => r.label === 'Cases')?.href).toBe('/cases?src=user')
+  expect(rows.find((r) => r.label === 'Brass')?.href).toBe('/cases?src=user')
   expect(rows.find((r) => r.label === 'Bullets')?.href).toBe('/bullets?src=user')
-  expect(rows.find((r) => r.label === 'Powders')?.href).toBe('/powders/designer')
-  expect(rows.find((r) => r.label === 'Targets')?.href).toBe('/targets/designer')
+  expect(rows.find((r) => r.label === 'Powders')?.href).toBe('/powders?src=user')
+  expect(rows.find((r) => r.label === 'Targets')?.href).toBe('/targets?src=user')
 })
 
 it('counts nothing but the kinds it lists', () => {

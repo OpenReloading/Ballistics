@@ -1,5 +1,6 @@
 import type { TargetSheet } from '@open-reloading/schema'
 import { useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { fetchFederationData } from '../lib/face-records.ts'
 import { sheetSettings, shotPositions } from '../lib/report-issue.ts'
 
@@ -32,10 +33,10 @@ export function useReportOptions(options: ReportOption[] | undefined) {
   }, [offered])
 }
 
-const settingsLabel = 'Include the sheet settings (no photo)'
-
 /** The shot groups page's boxes: the sheet's settings, then its shot positions; none without a sheet. */
 export function useSheetReport(sheet: Pick<TargetSheet, 'groups'> | undefined) {
+  const { t } = useTranslation()
+  const settingsLabel = t('Include the sheet settings (no photo)')
   useReportOptions(
     sheet && [
       {
@@ -44,7 +45,7 @@ export function useSheetReport(sheet: Pick<TargetSheet, 'groups'> | undefined) {
         text: async () => sheetSettings(sheet, await fetchFederationData().catch(() => undefined)),
       },
       {
-        label: 'Include shot positions',
+        label: t('Include shot positions'),
         heading: 'Shot positions',
         text: () => shotPositions(sheet),
         needs: settingsLabel,

@@ -19,14 +19,16 @@
   - knip over every workspace, configured in `knip.jsonc`. Fails on an unused file, export, exported type or dependency, and on an unlisted binary.
   - The `exports` of a package point into `dist`, which knip cannot map back to `src`, so each entry file of a package is listed in `knip.jsonc`. A new entry file (a package export, a worker, a script run by Node or CI) is added there. Every `ignore*` entry carries a one-line reason.
   - A finding is fixed: drop the `export` of a symbol used only in its file, delete code nothing uses. `tools/test/knip.test.ts` checks that knip fails on each kind.
+- npm tarballs of the published libraries: `npm run pack:check` (after `build`, `tools/src/pack-check.ts`). `npm pack --dry-run` in schema, core, drawing, importers and data fails on an entry point of `exports`, `main` or `types` missing from the tarball, a test file, a source map without its sources, or a file outside the `files` field.
 - Research log entries (`apps/docs/docs/research/`): `npm test -w @open-reloading/docs` checks that each has every section of the template (`apps/docs/scripts/research-log.mts`). A spike or model-change issue ends with an entry and is closed with its link (`CONTRIBUTING.md`, Rules).
 - Doc comments: `npm run docs:check` (after `build`)
   - TypeDoc `validation.notDocumented`, warnings as errors, on every export of schema, core, drawing, importers, data and api. Not on properties, constructors, parameters and references. Without `notExported`.
   - Configured in `packages/<name>/typedoc.json`, the shared options in `packages/typedoc.base.json`.
   - A variable type, parameter type or return type of an exported variable or function that renders longer than 100 characters fails (`apps/docs/check.mjs`): give it a named type or interface. Zod schemas are exempt, their doc comment links the inferred type.
 - Test schema, core, importers, drawing, data, api, web, the docs checks, the tools and the e2e script helpers: `npm test`
-  - Coverage: the `test` script of schema, core, importers, drawing, data and api is `vitest run --coverage` (v8, summary in the log, so the CI `test` groups run it). The floors (`coverage.thresholds`) and the excluded files, each with its reason, are in `packages/<name>/vitest.config.ts`. A floor is the measured value rounded down, minus one: raise it in the same pull request when coverage rises, never lower it to make a check pass.
+  - Coverage: the `test` script of schema, core, importers, drawing, data, api and cli is `vitest run --coverage` (v8, summary in the log, so the CI `test` groups run it). The floors (`coverage.thresholds`) and the excluded files, each with its reason, are in `packages/<name>/vitest.config.ts`. A floor is the measured value rounded down, minus one: raise it in the same pull request when coverage rises, never lower it to make a check pass.
   - A single file or test runs without coverage: `npx vitest run <file>` in the package.
+  - lcov reports for the code quality gate: `npm test` writes `packages/<name>/coverage/lcov.info` for those seven. The web app, the docs scripts and the tools have their own run without a threshold, `npm run test:coverage -w @open-reloading/<web|docs|tools>`, writing `apps/web/coverage/lcov.info`, `apps/docs/coverage/lcov.info` (Node's test runner) and `tools/coverage/lcov.info`.
 - Web JavaScript budget per route: `npm run check-weight -w @open-reloading/web` (after `npm run static:build`, which leaves `.next` for it; details in `apps/web/AGENTS.md`). CI runs it in the `e2e` job after the export build.
 - Evaluate the interior model on load rows (after `build`, details in `packages/cli/AGENTS.md`): `node packages/cli/dist/bin.js verify --rows <path>`, `node packages/cli/dist/bin.js compare ...`. Rows are passed by path and never committed.
 - Validate data records: `npm run data:validate`
@@ -41,6 +43,7 @@
   - `npm run api:check`: breaking changes against `packages/api/openapi.baseline.json`. A break passes only with the baseline rewritten by `npm run api-baseline -w @open-reloading/tools` in the same pull request.
   - `npm run api:conformance`: Schemathesis against the running API at `API_URL`.
   - The contract version is the `@open-reloading/api` version. Every public route is under `/v1`.
+- Contract baselines (after `build`, part of `npm test`, `apps/docs/docs/release.md`, Contract baselines): each `test/contracts.test.ts` of schema (the JSON Schemas of `dist/json-schema`), web (the golden user data file and share link) and tools (the export list of each published package, from its `.d.ts`) compares the build with the files in its `test/golden/`. `npm run baselines` rewrites them in the same pull request as the change; the golden user data file is edited by hand.
 - E2E (projects and when to run which: `apps/e2e/AGENTS.md`):
   - `npm run test:e2e`: the static export served on `WEB_URL` (default `http://localhost:3003`: `npm run static:build`, then `npm run pages:serve`) and the API on `API_URL` (default `http://localhost:3000`, `node packages/api/dist/server.js`), which the smoke spec's comparison and the load file spec read.
   - In `apps/e2e/`: install the browser once with `npx playwright install --with-deps chromium`.
@@ -63,9 +66,10 @@
 - Changes start from a GitHub issue. `main` is the only long-lived branch: branches are short-lived, cut from `main` and squash-merged back into it; the release pull request of release-please also targets `main`.
 - To be published to npmjs.com (off until the repository variable `NPM_PUBLISH` is `true`): schema, core, drawing, importers, data (`apps/docs/docs/release.md`). Every other workspace stays `private`.
 - Package rules (`npm run deps:check` checks them):
-  - `packages/core`: no runtime dependencies, no I/O, no database, no HTTP.
+  - `packages/core`: no I/O, no database, no HTTP.
   - `packages/importers`: no I/O. Depends on `@open-reloading/schema` for types only.
-  - `packages/drawing`: no runtime dependencies, no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
+  - `packages/drawing`: no I/O, no React, DOM or Next.js. Values in stored mm and degrees.
+  - A runtime dependency of core or drawing needs a permissive, MIT-compatible licence listed in `allow-licenses` of `.github/dependency-review-config.yml`, passing dependency review and the licence check (`tools/src/licences.ts`). It is added only for a concrete benefit (a missing capability, a defect, or clearly less code with the same tested result) and only when the library is maintained, widely used and not archived; the change states the benefit and the stars, last commit and weekly downloads. Its import rule in `.dependency-cruiser.cjs` then allows that package by name.
   - `packages/data`: git is the source of truth for records.
   - `packages/api`: depends on core, data and schema.
   - `packages/cli`: depends on core, data, drawing and schema, never on the API or the web app. No model logic of its own.
@@ -82,7 +86,7 @@
 - Relative imports end in `.ts` (rewritten to `.js` by `tsc`). Only erasable TypeScript syntax, so Node runs sources directly.
 - Comments, docs, test names and commit messages never say who asked for something, who decided it or when. A comment explains why only where the code cannot show it.
 - No migrations before 1.0: databases are rebuilt, files of an older format are rejected.
-- Before 1.0 no package or data format version is bumped (data formats are version 1, packages are set to 0.0.1 at the public release), and commits carry no breaking marker.
+- Until 1.0 no package or data format version is bumped (data formats are version 1), and commits carry no breaking marker.
 - Every record carries provenance. One stored unit per quantity (`packages/schema/src/units.ts`).
 - A change to a model's code updates its model page in `apps/docs/docs/models/` in the same commit.
 - Results are simulations, not load data. No "safe" claims (see `README.md`), on screen and in docs. Printed pages and downloaded files carry no Safety text and no notice.

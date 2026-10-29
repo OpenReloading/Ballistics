@@ -26,8 +26,10 @@ import type {
 } from '@open-reloading/schema'
 import { Plus, Trash, X } from '@phosphor-icons/react'
 import { type Dispatch, type ReactElement, type SetStateAction, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { msg } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
-import { close, type FieldSpec, fieldError } from '../lib/field-spec.ts'
+import { close, type FieldSpec, fieldError, specText } from '../lib/field-spec.ts'
 import {
   fieldSi,
   fieldStored,
@@ -45,10 +47,10 @@ import { RecordSearch } from './record-search.tsx'
 import type { useManufacturers } from './use-manufacturers.ts'
 
 export const opticKinds = [
-  { value: 'scope', label: 'Scope' },
-  { value: 'redDot', label: 'Red dot' },
-  { value: 'ironSights', label: 'Iron sights' },
-  { value: 'other', label: 'Other' },
+  { value: 'scope', label: msg('Scope') },
+  { value: 'redDot', label: msg('Red dot') },
+  { value: 'ironSights', label: msg('Iron sights') },
+  { value: 'other', label: msg('Other') },
 ]
 
 /** Filled in by the user; Save checks that it is a number. */
@@ -56,9 +58,10 @@ const empty = undefined as unknown as QuantityValue
 
 /** A field's help on hover, focus and touch; the field shows no description line. */
 function Tip({ help, children }: { help?: string | undefined; children: ReactElement }) {
+  const { t } = useTranslation()
   if (!help) return children
   return (
-    <Tooltip label={help} events={tipEvents} multiline maw={280} position="top-start">
+    <Tooltip label={specText(t, help)} events={tipEvents} multiline maw={280} position="top-start">
       <div>{children}</div>
     </Tooltip>
   )
@@ -79,6 +82,7 @@ export function SiField({
   /** A cross-field error of the schema, shown when the field itself is valid. */
   error?: string | undefined
 }) {
+  const { t } = useTranslation()
   const shown = (x: number | undefined) => ({
     text: x === undefined ? '' : roundedFieldText(spec.quantity, system, x),
     si: x,
@@ -101,7 +105,7 @@ export function SiField({
         spec={spec}
         system={system}
         value={value}
-        error={(s) => (left ? fieldError(spec, value, s) : undefined) ?? error}
+        error={(s) => (left ? fieldError(spec, value, s, t) : undefined) ?? error}
         onBlur={() => setLeft(true)}
         onChange={(v) => {
           setState({ value: v, system })
@@ -148,11 +152,12 @@ export function FirearmEditor({
   opticName: (id: string) => string
   mounted: (id: string) => boolean
 }) {
+  const { t, tn } = useTranslation()
   return (
     <section aria-labelledby="library-editor" className="library-editor">
       <Group gap="md" wrap="nowrap" className="page-panel-head library-head">
         <h2 id="library-editor" className="page-panel-title record-heading">
-          {data.name || 'New firearm'}
+          {data.name || t('New firearm')}
         </h2>
         {data.cartridge && (
           <Group gap={2} wrap="nowrap">
@@ -162,7 +167,7 @@ export function FirearmEditor({
             <ActionIcon
               variant="subtle"
               size={controlSize.row.icon}
-              aria-label="Clear the cartridge"
+              aria-label={t('Clear the cartridge')}
               onClick={() => patch({ cartridge: undefined })}
             >
               <X size={14} aria-hidden="true" />
@@ -171,15 +176,17 @@ export function FirearmEditor({
         )}
         {data.roundCount !== undefined && (
           <Text c="dimmed" size="sm">
-            {data.roundCount} rounds
+            {tn(data.roundCount, '{count} round', '{count} rounds')}
           </Text>
         )}
       </Group>
       <Tabs defaultValue="firearm">
         <Tabs.List mb="sm">
-          <Tabs.Tab value="firearm">Firearm</Tabs.Tab>
-          <Tabs.Tab value="optics">Optics ({data.optics.length})</Tabs.Tab>
-          <Tabs.Tab value="configurations">Configurations ({data.configurations.length})</Tabs.Tab>
+          <Tabs.Tab value="firearm">{t('Firearm')}</Tabs.Tab>
+          <Tabs.Tab value="optics">{t('Optics ({count})', { count: data.optics.length })}</Tabs.Tab>
+          <Tabs.Tab value="configurations">
+            {t('Configurations ({count})', { count: data.configurations.length })}
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="firearm">
@@ -190,40 +197,42 @@ export function FirearmEditor({
             verticalSpacing="sm"
           >
             <TextInput
-              label="Name"
+              label={t('Name')}
               required
               maxLength={200}
               value={data.name}
               onChange={(e) => patch({ name: e.currentTarget.value })}
               onBlur={() => setNameLeft(true)}
-              error={nameLeft && !data.name ? 'Enter a name.' : undefined}
+              error={nameLeft && !data.name ? t('Enter a name.') : undefined}
             />
             <div className="firearm-row">
               <span className="firearm-label" aria-hidden="true">
-                Cartridge
+                {t('Cartridge')}
               </span>
               <RecordSearch<CartridgeSummary>
                 kind="cartridges"
-                label="Cartridge"
-                chosen={cartridgeName(data.cartridge) ?? 'Search cartridges'}
+                label={t('Cartridge')}
+                chosen={cartridgeName(data.cartridge) ?? t('Search cartridges')}
                 picked={cartridgeName(data.cartridge) !== undefined}
                 describe={(c) => c.name}
                 onSelect={(c) => {
                   setCartridgeNames((n) => ({ ...n, [c.id]: c.name }))
                   patch({ cartridge: `catalogue:${c.id}` })
                 }}
-                noneText="No cartridge found"
-                unreachableText="The database is unreachable; the cartridge can be chosen later."
+                noneText={t('No cartridge found')}
+                unreachableText={t(
+                  'The database is unreachable; the cartridge can be chosen later.',
+                )}
               />
             </div>
             <ManufacturerInput
-              label="Manufacturer"
+              label={t('Manufacturer')}
               value={data.manufacturer}
               manufacturers={manufacturers}
               onChange={(manufacturer) => patch({ manufacturer })}
             />
             <TextInput
-              label="Model"
+              label={t('Model')}
               maxLength={200}
               value={data.model ?? ''}
               onChange={(e) => patch({ model: e.currentTarget.value })}
@@ -239,25 +248,25 @@ export function FirearmEditor({
             ))}
             <div className="firearm-row">
               <span className="firearm-label" aria-hidden="true">
-                Bullet of the lands contact
+                {t('Bullet of the lands contact')}
               </span>
               <RecordSearch<BulletSummary>
                 kind="bullets"
-                label="Bullet of the lands contact"
-                chosen={bulletName(data.landsBullet) ?? 'Search bullets'}
+                label={t('Bullet of the lands contact')}
+                chosen={bulletName(data.landsBullet) ?? t('Search bullets')}
                 picked={data.landsBullet !== undefined}
                 describe={(b) => b.name}
                 onSelect={(b) => {
                   setBulletNames((n) => ({ ...n, [b.id]: b.name }))
                   patch({ landsBullet: `catalogue:${b.id}` })
                 }}
-                noneText="No bullet found"
-                unreachableText="The database is unreachable; the bullet can be chosen later."
+                noneText={t('No bullet found')}
+                unreachableText={t('The database is unreachable; the bullet can be chosen later.')}
               />
             </div>
             <div className="firearm-row">
               <span className="firearm-label" id="firearm-twist-hand">
-                Twist direction
+                {t('Twist direction')}
               </span>
               <SegmentedControl
                 size={controlSize.row.toggle}
@@ -265,14 +274,14 @@ export function FirearmEditor({
                 value={data.twistHand}
                 onChange={(v) => patch({ twistHand: v as 'right' | 'left' })}
                 data={[
-                  { value: 'right', label: 'Right' },
-                  { value: 'left', label: 'Left' },
+                  { value: 'right', label: t('Right') },
+                  { value: 'left', label: t('Left') },
                 ]}
               />
             </div>
             <Textarea
               className="wide"
-              label="Chamber and other notes"
+              label={t('Chamber and other notes')}
               autosize
               minRows={1}
               maxRows={4}
@@ -289,16 +298,16 @@ export function FirearmEditor({
               <Table className="firearm-table" withRowBorders={false}>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Kind</Table.Th>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Turret marking</Table.Th>
-                    <Table.Th>Click value</Table.Th>
-                    <Table.Th>Turret travel</Table.Th>
-                    <Table.Th>Magnification, lowest</Table.Th>
-                    <Table.Th>Magnification, highest</Table.Th>
-                    <Table.Th>Reticle</Table.Th>
+                    <Table.Th>{t('Kind')}</Table.Th>
+                    <Table.Th>{t('Name')}</Table.Th>
+                    <Table.Th>{t('Turret marking')}</Table.Th>
+                    <Table.Th>{t('Click value')}</Table.Th>
+                    <Table.Th>{t('Turret travel')}</Table.Th>
+                    <Table.Th>{t('Magnification, lowest')}</Table.Th>
+                    <Table.Th>{t('Magnification, highest')}</Table.Th>
+                    <Table.Th>{t('Reticle')}</Table.Th>
                     <Table.Th>
-                      <span className="visually-hidden">Remove</span>
+                      <span className="visually-hidden">{t('Remove')}</span>
                     </Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -307,8 +316,8 @@ export function FirearmEditor({
                     <Table.Tr key={o.id}>
                       <Table.Td>
                         <NativeSelect
-                          label={`Kind, optic ${i + 1}`}
-                          data={opticKinds}
+                          label={t('Kind, optic {n}', { n: i + 1 })}
+                          data={opticKinds.map((k) => ({ value: k.value, label: t(k.label) }))}
                           value={o.kind}
                           onChange={(e) =>
                             setOptic(i, { kind: e.currentTarget.value as Optic['kind'] })
@@ -317,18 +326,18 @@ export function FirearmEditor({
                       </Table.Td>
                       <Table.Td>
                         <TextInput
-                          label={`Name, optic ${i + 1}`}
+                          label={t('Name, optic {n}', { n: i + 1 })}
                           maxLength={200}
-                          placeholder={`Optic ${i + 1}`}
+                          placeholder={t('Optic {n}', { n: i + 1 })}
                           value={o.name}
                           onChange={(e) => setOptic(i, { name: e.currentTarget.value })}
                         />
                       </Table.Td>
                       <Table.Td>
                         <NativeSelect
-                          label={`Turret marking, optic ${i + 1}`}
+                          label={t('Turret marking, optic {n}', { n: i + 1 })}
                           data={[
-                            { value: '', label: 'Not set' },
+                            { value: '', label: t('Not set') },
                             { value: 'mrad', label: 'mrad' },
                             { value: 'MOA', label: 'MOA' },
                           ]}
@@ -343,7 +352,10 @@ export function FirearmEditor({
                       {opticFields.map((spec) => (
                         <Table.Td key={spec.key}>
                           <SiField
-                            spec={{ ...spec, label: `${spec.label}, optic ${i + 1}` }}
+                            spec={{
+                              ...spec,
+                              label: t('{label}, optic {n}', { label: t(spec.label), n: i + 1 }),
+                            }}
                             system={system}
                             si={fieldSi(spec, o[spec.key])}
                             onChange={(si) => setOptic(i, { [spec.key]: fieldStored(spec, si) })}
@@ -353,7 +365,7 @@ export function FirearmEditor({
                       ))}
                       <Table.Td>
                         <TextInput
-                          label={`Reticle, optic ${i + 1}`}
+                          label={t('Reticle, optic {n}', { n: i + 1 })}
                           maxLength={200}
                           value={o.reticle ?? ''}
                           onChange={(e) => setOptic(i, { reticle: e.currentTarget.value })}
@@ -365,8 +377,14 @@ export function FirearmEditor({
                           variant="subtle"
                           color="red"
                           disabled={mounted(o.id)}
-                          aria-label={`Remove ${opticName(o.id)}${mounted(o.id) ? ', mounted in a configuration' : ''}`}
-                          title={mounted(o.id) ? 'Mounted in a configuration' : undefined}
+                          aria-label={
+                            mounted(o.id)
+                              ? t('Remove {name}, mounted in a configuration', {
+                                  name: opticName(o.id),
+                                })
+                              : t('Remove {name}', { name: opticName(o.id) })
+                          }
+                          title={mounted(o.id) ? t('Mounted in a configuration') : undefined}
                           onClick={() => patch({ optics: data.optics.filter((x) => x !== o) })}
                         >
                           <Trash size={16} aria-hidden="true" />
@@ -390,13 +408,13 @@ export function FirearmEditor({
               patch({ optics: [...data.optics, { id, kind: 'scope', name: '' }] })
             }}
           >
-            Add optic
+            {t('Add optic')}
           </Button>
         </Tabs.Panel>
 
         <Tabs.Panel value="configurations">
           {data.configurations.map((c, i) => {
-            const title = c.name || `Configuration ${i + 1}`
+            const title = c.name || t('Configuration {n}', { n: i + 1 })
             return (
               <Card key={c.id} withBorder padding="xs" mb="sm">
                 <Group justify="space-between" wrap="nowrap" mb={4}>
@@ -407,7 +425,7 @@ export function FirearmEditor({
                     size={controlSize.row.icon}
                     variant="subtle"
                     color="red"
-                    aria-label={`Remove ${title}`}
+                    aria-label={t('Remove {name}', { name: title })}
                     onClick={() =>
                       patch({
                         configurations: data.configurations.filter((x) => x !== c),
@@ -425,25 +443,25 @@ export function FirearmEditor({
                   verticalSpacing="sm"
                 >
                   <TextInput
-                    label="Configuration name"
+                    label={t('Configuration name')}
                     maxLength={200}
                     value={c.name}
                     onChange={(e) => setConfig(i, { name: e.currentTarget.value })}
                   />
                   <Checkbox
                     className="firearm-check"
-                    label="Active, on the firearm now"
+                    label={t('Active, on the firearm now')}
                     checked={data.active === c.id}
                     onChange={(e) => patch({ active: e.currentTarget.checked ? c.id : undefined })}
                   />
                   <TextInput
-                    label="Mounted on"
+                    label={t('Mounted on')}
                     type="date"
                     value={c.mounted ?? ''}
                     onChange={(e) => setConfig(i, { mounted: e.currentTarget.value || undefined })}
                   />
                   <TextInput
-                    label="Removed on"
+                    label={t('Removed on')}
                     type="date"
                     value={c.removed ?? ''}
                     error={crossError('configurations', i, 'removed')}
@@ -454,18 +472,18 @@ export function FirearmEditor({
                   <Table
                     className="firearm-table"
                     withRowBorders={false}
-                    aria-label={`Mounts of ${title}`}
+                    aria-label={t('Mounts of {name}', { name: title })}
                   >
                     <Table.Thead>
                       <Table.Tr>
-                        <Table.Th>Optic</Table.Th>
-                        <Table.Th>Sight height</Table.Th>
-                        <Table.Th>Offset</Table.Th>
-                        <Table.Th>Cant</Table.Th>
-                        <Table.Th>Zero range</Table.Th>
-                        <Table.Th>Zero notes</Table.Th>
+                        <Table.Th>{t('Optic')}</Table.Th>
+                        <Table.Th>{t('Sight height')}</Table.Th>
+                        <Table.Th>{t('Offset')}</Table.Th>
+                        <Table.Th>{t('Cant')}</Table.Th>
+                        <Table.Th>{t('Zero range')}</Table.Th>
+                        <Table.Th>{t('Zero notes')}</Table.Th>
                         <Table.Th>
-                          <span className="visually-hidden">Remove</span>
+                          <span className="visually-hidden">{t('Remove')}</span>
                         </Table.Th>
                       </Table.Tr>
                     </Table.Thead>
@@ -475,7 +493,7 @@ export function FirearmEditor({
                         <Table.Tr key={k}>
                           <Table.Td>
                             <NativeSelect
-                              label={`Optic, ${title} mount ${k + 1}`}
+                              label={t('Optic, {name} mount {n}', { name: title, n: k + 1 })}
                               data={data.optics.map((o) => ({
                                 value: o.id,
                                 label: opticName(o.id),
@@ -489,7 +507,11 @@ export function FirearmEditor({
                               <SiField
                                 spec={{
                                   ...spec,
-                                  label: `${spec.label}, ${title} mount ${k + 1}`,
+                                  label: t('{label}, {name} mount {n}', {
+                                    label: t(spec.label),
+                                    name: title,
+                                    n: k + 1,
+                                  }),
                                 }}
                                 system={system}
                                 si={fieldSi(spec, m[spec.key])}
@@ -501,7 +523,10 @@ export function FirearmEditor({
                           ))}
                           <Table.Td>
                             <TextInput
-                              label={`Zero conditions and ammunition, ${title} mount ${k + 1}`}
+                              label={t('Zero conditions and ammunition, {name} mount {n}', {
+                                name: title,
+                                n: k + 1,
+                              })}
                               maxLength={1000}
                               value={m.zeroNotes ?? ''}
                               onChange={(e) => setMount(i, k, { zeroNotes: e.currentTarget.value })}
@@ -513,7 +538,7 @@ export function FirearmEditor({
                               variant="subtle"
                               color="red"
                               disabled={c.mounts.length === 1}
-                              aria-label={`Remove ${title} mount ${k + 1}`}
+                              aria-label={t('Remove {name} mount {n}', { name: title, n: k + 1 })}
                               onClick={() =>
                                 setConfig(i, { mounts: c.mounts.filter((x) => x !== m) })
                               }
@@ -530,15 +555,15 @@ export function FirearmEditor({
                   <Table
                     className="firearm-table"
                     withRowBorders={false}
-                    aria-label={`Zero air and drag factor of ${title}`}
+                    aria-label={t('Zero air and drag factor of {name}', { name: title })}
                   >
                     <Table.Thead>
                       <Table.Tr>
-                        <Table.Th>Optic</Table.Th>
+                        <Table.Th>{t('Optic')}</Table.Th>
                         {zeroFields.map((spec) => (
-                          <Table.Th key={spec.key}>{spec.label}</Table.Th>
+                          <Table.Th key={spec.key}>{specText(t, spec.label)}</Table.Th>
                         ))}
-                        <Table.Th>Drag factor source</Table.Th>
+                        <Table.Th>{t('Drag factor source')}</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -551,7 +576,11 @@ export function FirearmEditor({
                               <SiField
                                 spec={{
                                   ...spec,
-                                  label: `${spec.label}, ${title} mount ${k + 1}`,
+                                  label: t('{label}, {name} mount {n}', {
+                                    label: t(spec.label),
+                                    name: title,
+                                    n: k + 1,
+                                  }),
                                 }}
                                 system={system}
                                 si={fieldSi(spec, m[spec.key])}
@@ -563,7 +592,10 @@ export function FirearmEditor({
                           ))}
                           <Table.Td>
                             <TextInput
-                              label={`Drag factor source, ${title} mount ${k + 1}`}
+                              label={t('Drag factor source, {name} mount {n}', {
+                                name: title,
+                                n: k + 1,
+                              })}
                               maxLength={200}
                               value={m.dragFactorSource ?? ''}
                               onChange={(e) =>
@@ -601,7 +633,7 @@ export function FirearmEditor({
                     })
                   }}
                 >
-                  Add mount
+                  {t('Add mount')}
                 </Button>
               </Card>
             )
@@ -632,11 +664,11 @@ export function FirearmEditor({
                 })
               }}
             >
-              Add configuration
+              {t('Add configuration')}
             </Button>
             {!data.optics.length && (
               <Text size="sm" c="dimmed">
-                Add an optic first.
+                {t('Add an optic first.')}
               </Text>
             )}
           </Group>

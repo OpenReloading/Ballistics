@@ -39,6 +39,7 @@ describe('the JSON result', () => {
       ['verify', ...data],
       ['verify', ...data, '--split', 'test', '--final'],
       ['verify', ...data, '--group-by', 'construction', '--params', 'records'],
+      ['verify', ...data, '--leave-one-powder-out'],
       ['compare', ...data, '--group-by', 'family', '--baseline', 'm3', '--candidate', worse],
       ['compare', ...data, '--baseline', 'm3', '--candidate', worse],
     ]) {
@@ -120,6 +121,7 @@ describe('exit codes', () => {
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--model', 'm3']],
     [['verify', ...data, '--candidate', 'm3']],
     [['verify', ...data, '--baseline', 'm3']],
+    [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--leave-one-powder-out']],
     [['verify', ...data, '--final']],
     [['verify', ...data, '--split', 'training', '--final']],
     [['compare', ...data, '--baseline', 'm3', '--candidate', 'm3', '--final']],
@@ -200,6 +202,9 @@ describe('defaults', () => {
   it('prints the groups of --group-by in the table', async () => {
     const { stdout } = await cli(['verify', ...data, '--group-by', 'cartridge'], {}, true)
     expect(stdout).toContain('cartridge 308-win')
+    expect(stdout).not.toContain('powder not in the fitted set')
+    const unseen = await cli(['verify', ...data, '--leave-one-powder-out'], {}, true)
+    expect(unseen.stdout).toContain('powder not in the fitted set (2)')
     const compared = await cli(
       ['compare', ...data, '--group-by', 'cartridge', '--baseline', 'm3', '--candidate', worse],
       {},

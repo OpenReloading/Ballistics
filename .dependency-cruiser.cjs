@@ -39,14 +39,14 @@ module.exports = {
       name: 'core-imports-nothing',
       severity: 'error',
       comment:
-        'packages/core has no runtime dependencies and no I/O: it imports only its own files.',
+        'packages/core has no I/O: it imports only its own files. A runtime dependency under the rule of AGENTS.md is allowed here by name.',
       from: { path: own('packages/core/src') },
       to: { pathNot: own('packages/core/src') },
     },
     ...Object.entries(drawingFolders).map(([name, may]) => ({
       name: `drawing-${name}-imports`,
       severity: 'error',
-      comment: `packages/drawing has no dependencies, no I/O, no React, DOM or Next.js. Its ${name} folder imports only the folders ${may.join(', ')}.`,
+      comment: `packages/drawing has no I/O, no React, DOM or Next.js. Its ${name} folder imports only the folders ${may.join(', ')}.`,
       from: { path: `^${drawingFolder(name)}` },
       to: { pathNot: `^(${may.map(drawingFolder).join('|')})` },
     })),
@@ -99,8 +99,8 @@ module.exports = {
       name: 'web-no-node-builtins',
       severity: 'error',
       comment:
-        'apps/web sources run in the browser or in route handlers that read the API: no node: modules.',
-      from: { path: own('apps/web/src') },
+        'apps/web sources run in the browser or in route handlers that read the API: no node: modules. The news loader runs only in the prerender of the static export, which reads the news folder.',
+      from: { path: own('apps/web/src'), pathNot: '^apps/web/src/lib/news\\.ts$' },
       to: { dependencyTypes: ['core'] },
     },
     {

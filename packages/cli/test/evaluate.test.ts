@@ -1,8 +1,9 @@
 import { InputError, interior } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
-import { constructionOf, familyOf, outcomes, predict } from '../src/evaluate.ts'
+import { constructionOf, outcomes, predict } from '../src/evaluate.ts'
 import type { Records } from '../src/records.ts'
 import type { Row } from '../src/rows.ts'
+import { familyOf } from '../src/unseen.ts'
 import { records } from './fixture.ts'
 
 const row: Row = {

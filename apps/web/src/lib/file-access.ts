@@ -47,17 +47,31 @@ export async function saveAs(
   return { name }
 }
 
-/** Files from the open picker or a file input; empty when cancelled. */
+/** The table files Import also takes, read by the Import entry: CSV and text, workbooks, JSON lists. */
+export const tableFormats: { name: string; accept: Record<string, string[]> }[] = [
+  {
+    name: 'Tables',
+    accept: {
+      'text/csv': ['.csv'],
+      'text/plain': ['.txt', '.tsv'],
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/vnd.ms-excel': ['.xls'],
+    },
+  },
+]
+
+/** Files from the open picker or a file input, offering `formats`; empty when cancelled. */
 export async function pickFiles(
   multiple: boolean,
   startIn?: FileSystemDirectoryHandle,
+  formats: { name: string; accept: Record<string, string[]> }[] = loadFileFormats,
 ): Promise<{ file: File; handle?: FileSystemFileHandle | undefined }[]> {
   const { showOpenFilePicker } = pickers()
   if (showOpenFilePicker) {
     try {
       const handles = await showOpenFilePicker({
         multiple,
-        types: loadFileFormats.map(({ name, accept }) => ({ description: name, accept })),
+        types: formats.map(({ name, accept }) => ({ description: name, accept })),
         startIn,
       })
       return Promise.all(handles.map(async (handle) => ({ file: await handle.getFile(), handle })))
@@ -69,7 +83,7 @@ export async function pickFiles(
   return new Promise((resolve) => {
     const input = document.createElement('input')
     input.type = 'file'
-    input.accept = loadFileFormats
+    input.accept = formats
       .flatMap((f) => Object.entries(f.accept).flatMap(([type, ext]) => [...ext, type]))
       .join(',')
     input.multiple = multiple

@@ -24,12 +24,13 @@ import { classifyPowder, typedBurn } from '../lib/burn-rate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { localDay } from '../lib/dates.ts'
 import { loadExample } from '../lib/example-data.ts'
-import { specText } from '../lib/field-spec.ts'
+import { siValues, specText } from '../lib/field-spec.ts'
 import { activeClick } from '../lib/firearm.ts'
 import { interiorFields } from '../lib/interior-input.ts'
 import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
+import { loadFitMark } from '../lib/powder-record.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -37,7 +38,7 @@ import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { mmLength, shownLength } from '../lib/workbench.ts'
 import { BarrelTable } from './barrel-length.tsx'
-import { ChargeTargetDialog } from './charge-target-dialog.tsx'
+import type { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
 import { focusBack } from './focus-back.ts'
 import { preloadInteriorChart } from './lazy-chart.tsx'
@@ -222,12 +223,21 @@ function ladderPrintText(load: Load, t: Translate) {
   return t('{count} charges, {direction}, {step} {unit} apart', values)
 }
 
-function powderPrintRows(load: Load, runTemperature: string | undefined, t: Translate): PrintRows {
+function powderPrintRows(
+  load: Load,
+  runTemperature: string | undefined,
+  { t, tn }: Pick<Translator, 't' | 'tn'>,
+): PrintRows {
+  const { powderDesign, origin, fields, system } = load
+  const mark = loadFitMark(powderDesign, origin, siValues(fields), system, (day) => day, { t, tn })
+  const name = load.powderLabel ?? ''
   return [
     [
       t('Powder'),
-      load.powderDesign
-        ? t('{name} (user design)', { name: load.powderLabel ?? '' })
+      powderDesign
+        ? mark
+          ? t('{name} (user design), {mark}', { name, mark })
+          : t('{name} (user design)', { name })
         : load.powderLabel,
     ],
     printRow(load, 'charge', t),
@@ -264,12 +274,12 @@ function printGroupsOf(
   ok: OkOutcome | undefined,
   seatingRows: PrintRows,
   runTemperature: string | undefined,
-  t: Translate,
+  { t, tn }: Pick<Translator, 't' | 'tn'>,
 ): [string, PrintRows][] {
   return [
     [t('Cartridge'), cartridgePrintRows(load, ok, seatingRows, t)],
     [t('Bullet'), bulletPrintRows(load, t)],
-    [t('Powder and charge'), powderPrintRows(load, runTemperature, t)],
+    [t('Powder and charge'), powderPrintRows(load, runTemperature, { t, tn })],
     [t('Gun and barrel'), gunPrintRows(load, ok, t)],
   ]
 }
@@ -840,7 +850,7 @@ function PrintViews({
   barrel,
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
-  const { t } = useTranslation()
+  const { t, tn } = useTranslation()
   const steps = useMemo(() => shownSteps(ok, t), [ok, t])
   const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
@@ -863,7 +873,7 @@ function PrintViews({
     ]
       .filter(Boolean)
       .join(' ') || undefined
-  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, t)
+  const printGroups = printGroupsOf(load, ok, seatingRows, runTemperature, { t, tn })
   const ladderTable = (
     <LadderTable
       ok={ok}
@@ -930,6 +940,7 @@ export function Workbench() {
   const reminder = useExportReminder()
   const [listOpen, setListOpen] = useState(false)
   const [targetOpen, setTargetOpen] = useState(false)
+  const [TargetDialog, setTargetDialog] = useState<typeof ChargeTargetDialog>()
   const { changed: countChange } = reminder
   const stored = useCallback(() => {
     load.onStored()
@@ -985,6 +996,7 @@ export function Workbench() {
     manufacturerName,
     loadNotes,
     sessionRefCount,
+    handOffTune,
     setPrinting,
     setSeen,
     setTab,
@@ -1057,8 +1069,8 @@ export function Workbench() {
   const burn = useMemo(() => {
     if (powder) return classifyPowder(powder, names)
     const typed = JSON.parse(typedKey) as (number | null)[]
-    return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])))
-  }, [powder, names, typedKey])
+    return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), t)
+  }, [powder, names, typedKey, t])
   /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
   const runMarks = useMemo(() => runMarksOf(ok, t), [ok, t])
   const todoKey = JSON.stringify(todo)
@@ -1110,6 +1122,7 @@ export function Workbench() {
       manufacturerName,
       loadNotes,
       sessionRefCount,
+      handOffTune,
       barrel,
       lot,
       chartView,
@@ -1154,6 +1167,7 @@ export function Workbench() {
       manufacturerName,
       loadNotes,
       sessionRefCount,
+      handOffTune,
       barrel,
       lot,
       chartView,
@@ -1385,7 +1399,9 @@ export function Workbench() {
               onStored={stored}
               reminder={reminder.text}
             />
-            <ChargeTargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />
+            {TargetDialog && (
+              <TargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />
+            )}
             <WorkbenchSearch
               onRun={() => run()}
               // the page bar's actions with the shortcuts that exist
@@ -1397,7 +1413,12 @@ export function Workbench() {
                 printReport,
                 phone: Boolean(phone),
                 workspace,
-                openTarget: () => setTargetOpen(true),
+                // a plain import() on first open: next/dynamic would count the dialog in the route's weight
+                openTarget: () =>
+                  import('./charge-target-dialog.tsx').then((m) => {
+                    setTargetDialog(() => m.ChargeTargetDialog)
+                    setTargetOpen(true)
+                  }),
                 openList,
                 link,
                 asNewLoad,

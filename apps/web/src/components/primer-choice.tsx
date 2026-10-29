@@ -7,10 +7,11 @@ import { apiFetch } from '../lib/api-fetch.ts'
 import type { PrimerSummary } from '../lib/api-types.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
+import { controlSize } from '../lib/theme.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 
 /**
- * The primer picker of the workbench: every primer product of the catalogue, the load names the
+ * The primer picker of the workbench's pinned row: every primer product of the catalogue, the load names the
  * chosen one. `id` is the chosen primer's record id; one the list lacks stays chosen under a
  * generic label, so a saved reference is never dropped.
  */
@@ -51,6 +52,7 @@ export function PrimerChoice({
   const unlisted = items === undefined ? t('Loading') : t('A primer not in the catalogue')
   return (
     <NativeSelect
+      size={controlSize.row.input}
       label={t('Primer')}
       value={id ?? ''}
       onChange={(e) => onChange(e.currentTarget.value || undefined)}

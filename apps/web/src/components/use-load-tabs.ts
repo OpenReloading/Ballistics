@@ -3,15 +3,9 @@
 import type { Load } from '@open-reloading/schema'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import {
-  type LoadRecord,
-  openLoadsKey,
-  openLoadsText,
-  parseOpenLoads,
-  tabAfterClose,
-  tabTitles,
-} from '../lib/load-tabs.ts'
+import { type LoadRecord, tabAfterClose, tabTitles } from '../lib/load-tabs.ts'
 import { nth } from '../lib/nth.ts'
+import { openLoadsKey, openLoadsText, parseOpenLoads } from '../lib/open-loads.ts'
 import { linkParams } from '../lib/query.ts'
 import { namedKey, renamedKey } from '../lib/user-data.ts'
 import { storedRecords } from '../lib/user-store.ts'

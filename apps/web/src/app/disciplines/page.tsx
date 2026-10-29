@@ -17,7 +17,7 @@ import { listTitles } from '../../lib/list-titles.ts'
 export const metadata: Metadata = {
   title: 'Disciplines',
   description:
-    'Rule-book disciplines of the shooting federations with distance, category, caliber classes and the target faces they are shot on, each with its sources.',
+    'Rule-book disciplines of the shooting federations with distance, category, caliber classes and the targets they are shot on, each with its sources.',
 }
 
 async function Disciplines() {

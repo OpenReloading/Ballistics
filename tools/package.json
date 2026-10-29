@@ -12,13 +12,16 @@
     "pages": "node src/pages.ts",
     "pages:serve": "node src/pages-serve.ts",
     "dev:static": "node src/static-dev.ts",
-    "test": "vitest run"
+    "pack-check": "node src/pack-check.ts",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage --coverage.include='src/**/*.ts' --coverage.reporter=text-summary --coverage.reporter=lcov"
   },
   "dependencies": {
     "@open-reloading/api": "*"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.5",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5",
     "yaml": "^2.9.1"

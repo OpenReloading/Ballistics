@@ -2,6 +2,7 @@
 
 import { Kbd, Table } from '@mantine/core'
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import {
   isSingleKey,
   parseSingleKeys,
@@ -140,13 +141,14 @@ export function ShortcutsHelp() {
     () => '',
   ).split(' ')
   const singleKeys = useSingleKeys()
+  const { t } = useTranslation()
   return (
-    <AppModal opened={opened} onClose={() => setOpened(false)} title="Keyboard shortcuts">
+    <AppModal opened={opened} onClose={() => setOpened(false)} title={t('Keyboard shortcuts')}>
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Keys</Table.Th>
-            <Table.Th>Action</Table.Th>
+            <Table.Th>{t('Keys')}</Table.Th>
+            <Table.Th>{t('Action')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -159,21 +161,23 @@ export function ShortcutsHelp() {
                     .split(' or ')
                     .map((k, i) => (
                       <span key={k}>
-                        {i > 0 && ' or '}
+                        {i > 0 && ` ${t('or')} `}
                         <Kbd size="xs">{k}</Kbd>
                       </span>
                     ))}
                 </Table.Td>
-                <Table.Td>{shortcuts[id].action}</Table.Td>
+                <Table.Td>{t(shortcuts[id].action)}</Table.Td>
               </Table.Tr>
             ))}
         </Table.Tbody>
       </Table>
       {!singleKeys && (
-        <p className="note">Single-key shortcuts are off. Turn them on in Settings, General.</p>
+        <p className="note">
+          {t('Single-key shortcuts are off. Turn them on in Settings, General.')}
+        </p>
       )}
       {active.includes('redo') && (
-        <p className="note">On macOS Cmd in place of Ctrl, but Ctrl+Y.</p>
+        <p className="note">{t('On macOS Cmd in place of Ctrl, but Ctrl+Y.')}</p>
       )}
     </AppModal>
   )

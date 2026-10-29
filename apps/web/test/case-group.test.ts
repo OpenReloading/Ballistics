@@ -1,3 +1,4 @@
+import { english } from '../src/i18n/translate.ts'
 import 'fake-indexeddb/auto'
 import {
   type Case,
@@ -42,11 +43,17 @@ const caseRecord = (data: Case): UserRecord =>
   userRecord.parse({ kind: 'case', id: caseId, name: data.name, saved, data })
 
 it('asks for a name and a cartridge, then names the field the schema refuses', () => {
-  expect(caseGroupProblem('', group)).toBe('Enter a name.')
-  expect(caseGroupProblem('x', { ...group, cartridge: '' })).toBe('Choose the cartridge.')
-  expect(caseGroupProblem('x', group)).toBeUndefined()
-  expect(caseGroupProblem('x', { ...group, casesMeasured: 0 })).toBe('Cases measured: not valid.')
-  expect(caseGroupProblem('x', { ...group, neckWall: { value: -1 } })).toBe('Neck wall: not valid.')
+  expect(caseGroupProblem('', group, english.t)).toBe('Enter a name.')
+  expect(caseGroupProblem('x', { ...group, cartridge: '' }, english.t)).toBe(
+    'Choose the cartridge.',
+  )
+  expect(caseGroupProblem('x', group, english.t)).toBeUndefined()
+  expect(caseGroupProblem('x', { ...group, casesMeasured: 0 }, english.t)).toBe(
+    'Cases measured: not valid.',
+  )
+  expect(caseGroupProblem('x', { ...group, neckWall: { value: -1 } }, english.t)).toBe(
+    'Neck wall: not valid.',
+  )
 })
 
 it('names the capacity record of the workbench for the same cartridge and value, so a capacity is stored once', () => {

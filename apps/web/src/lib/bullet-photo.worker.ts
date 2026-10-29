@@ -3,6 +3,7 @@
  * leaves the browser), cuts the bullet out of it and outlines and measures a cut-out
  * (`apps/docs/docs/models/bullet-photo.md`), so the page stays responsive on a large photograph.
  */
+import { msg } from '../i18n/translate.ts'
 import { segmentPhoto } from './bullet-photo-colour.ts'
 import { measureOutline } from './bullet-photo-measure.ts'
 import { fitOutline } from './bullet-photo-outline.ts'
@@ -47,7 +48,7 @@ self.onmessage = (e: MessageEvent<WorkerRequest>) => {
       photo = { width: q.width, height: q.height, data: new Uint8ClampedArray(q.data) }
       post({ kind: 'loaded', id: q.id })
     } else if (q.kind === 'segment') {
-      if (!photo) throw new Error('No photograph is loaded.')
+      if (!photo) throw new Error(msg('No photograph is loaded.'))
       const s = segmentPhoto(photo, q.exclude)
       post(
         {

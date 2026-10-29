@@ -5,6 +5,8 @@ import type { ShotGroup } from '@open-reloading/schema'
 import { Export } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 import { createPortal, flushSync } from 'react-dom'
+import { useTranslation } from '../i18n/language.ts'
+import type { Translator } from '../i18n/translate.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
 import { readouts, statLines } from '../lib/group-readouts.ts'
@@ -34,13 +36,15 @@ export function StatsBlock({
   /** A group's ring score as one line, when it has a face. */
   score?: (g: ShotGroup) => string | undefined
 }) {
+  const translator = useTranslation()
+  const { t } = translator
   const lines = groups.flatMap((g): { text: string; colour?: string }[] => {
     const s = groupStatisticsOf(g)
     if (!s.shotCount) return []
     return [
       { text: g.name, colour: g.colour },
-      ...statLines(s, readouts(s, g.distance), system).map((text) => ({ text })),
-      ...(score?.(g) ? [{ text: `Score ${score(g)}` }] : []),
+      ...statLines(s, readouts(s, g.distance), system, translator).map((text) => ({ text })),
+      ...(score?.(g) ? [{ text: t('Score {score}', { score: score(g) ?? '' }) }] : []),
     ]
   })
   if (!lines.length) return null
@@ -131,6 +135,7 @@ export const extension = (type: string) =>
   type === 'image/jpeg' ? 'jpg' : (type.split('/')[1]?.replace(/\W[\s\S]*/, '') ?? 'img')
 
 type RenderJob = {
+  t: Translator['t']
   photo: { url: string; width: number; height: number } | undefined
   box: ViewBox
   size: { w: number; h: number }
@@ -139,14 +144,14 @@ type RenderJob = {
 }
 
 /** The photo, turned about its middle as on screen, under the overlay SVG, drawn into a canvas. */
-async function renderCanvas({ photo, box, size, turn, k }: RenderJob) {
+async function renderCanvas({ photo, box, size, turn, k, t }: RenderJob) {
   const svg = document.querySelector('.target-offscreen svg')
-  if (!(svg instanceof SVGSVGElement)) throw new Error('nothing drawn')
+  if (!(svg instanceof SVGSVGElement)) throw new Error(t('nothing drawn'))
   const canvas = document.createElement('canvas')
   canvas.width = size.w
   canvas.height = size.h
   const g = canvas.getContext('2d')
-  if (!g) throw new Error('no canvas')
+  if (!g) throw new Error(t('no canvas'))
   const stage = document.querySelector('.target-stage')
   g.fillStyle = (stage && getComputedStyle(stage).backgroundColor) || '#ffffff'
   g.fillRect(0, 0, size.w, size.h)
@@ -200,12 +205,13 @@ export function ExportMenu({
   /** A text button the size of File (the page bar), else a toolbar icon. */
   text?: boolean
 }) {
+  const { t } = useTranslation()
   const [job, setJob] = useState<{ box: ViewBox; k: number }>()
   const stem = recordFileName(name).replace(/\.json$/, '')
 
   async function render() {
     const v = view.current
-    if (!v || (photoId && !photo)) return onMessage('The photo is not in this browser.', true)
+    if (!v || (photoId && !photo)) return onMessage(t('The photo is not in this browser.'), true)
     const box = v.extent
     const size = exportSize(photo, box)
     // shortcut: iOS limits a canvas to about 16.7 MP (unverified on a device); a larger photo fails
@@ -214,14 +220,14 @@ export function ExportMenu({
     const k = box.w / 1000
     flushSync(() => setJob({ box, k }))
     try {
-      const canvas = await renderCanvas({ photo, box, size, turn, k })
+      const canvas = await renderCanvas({ photo, box, size, turn, k, t })
       const type = photo ? 'image/jpeg' : 'image/png'
       const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, type, 0.92))
-      if (!blob) throw new Error('the browser made no image')
+      if (!blob) throw new Error(t('the browser made no image'))
       download(blob, `${stem}-rendered.${extension(type)}`)
-      onMessage(`Exported ${size.w} x ${size.h} px.`)
+      onMessage(t('Exported {w} x {h} px.', { w: size.w, h: size.h }))
     } catch (e) {
-      onMessage(`Not exported: ${errorText(e)}`, true)
+      onMessage(t('Not exported: {reason}', { reason: errorText(e) }), true)
     } finally {
       setJob(undefined)
     }
@@ -229,7 +235,7 @@ export function ExportMenu({
 
   async function original() {
     const blob = photoId && (await storedPhoto(photoId).catch(() => undefined))
-    if (!blob) return onMessage('The photo is not in this browser.', true)
+    if (!blob) return onMessage(t('The photo is not in this browser.'), true)
     download(blob, `${stem}-photo.${extension(blob.type)}`)
   }
 
@@ -239,10 +245,14 @@ export function ExportMenu({
         <Menu.Target>
           {text ? (
             <Button variant="default" leftSection={<Export aria-hidden="true" />}>
-              Export
+              {t('Export')}
             </Button>
           ) : (
-            <ActionIcon variant="default" aria-label="Export" title="Export images and print">
+            <ActionIcon
+              variant="default"
+              aria-label={t('Export')}
+              title={t('Export images and print')}
+            >
               <span className="icon-slot" aria-hidden="true">
                 <Export />
               </span>
@@ -250,23 +260,27 @@ export function ExportMenu({
           )}
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item disabled={!photo} onClick={original} title="The photo file as it was loaded">
-            Original photo
+          <Menu.Item
+            disabled={!photo}
+            onClick={original}
+            title={t('The photo file as it was loaded')}
+          >
+            {t('Original photo')}
           </Menu.Item>
           <Menu.Item
             onClick={render}
-            title="Photo, overlays, notes and statistics box at the photo's pixel size"
+            title={t("Photo, overlays, notes and statistics box at the photo's pixel size")}
           >
-            Rendered image
+            {t('Rendered image')}
           </Menu.Item>
           {onPrint && (
             <>
               <Menu.Divider />
               <Menu.Item
                 onClick={onPrint}
-                title="What Fit shows at a stated scale with a ruler, and the statistics"
+                title={t('What Fit shows at a stated scale with a ruler, and the statistics')}
               >
-                Print sheet
+                {t('Print sheet')}
               </Menu.Item>
             </>
           )}

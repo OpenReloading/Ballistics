@@ -23,6 +23,8 @@ options:
   --split <name>     validation (default), training or test
   --final            required for the test split
   --group-by <key>   also group by powder, family, cartridge, bullet or construction
+  --leave-one-powder-out
+                     verify: add the line of the powder not in the fitted set
   --params records   the powder parameters of the records (the only mode so far)
   --json | --table   output format (default: JSON unless stdout is a terminal)
 
@@ -67,12 +69,13 @@ function optionsOf(
       table: { type: 'boolean' },
       'group-by': { type: 'string' },
       params: { type: 'string' },
+      'leave-one-powder-out': { type: 'boolean' },
     },
   })
   const foreign =
     command === 'verify'
       ? (['baseline', 'candidate'] as const).filter((o) => values[o] !== undefined)
-      : (['model'] as const).filter((o) => values[o] !== undefined)
+      : (['model', 'leave-one-powder-out'] as const).filter((o) => values[o] !== undefined)
   if (foreign.length > 0) throw new UsageError(`${command} takes no --${foreign.join(' or --')}`)
   const rows = values.rows ?? env.BALLISTICS_ROWS
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
@@ -85,6 +88,7 @@ function optionsOf(
     records: values.records ?? fromEnv,
     split: split as Split,
     final: values.final === true,
+    leaveOnePowderOut: values['leave-one-powder-out'] === true,
     warn,
     ...(by !== undefined && { groupBy: by as Grouping }),
   }

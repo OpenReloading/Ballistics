@@ -7,8 +7,9 @@ import type { UserCartridge } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
-import { formatNumber } from '../i18n/number.ts'
-import { msg } from '../i18n/translate.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { formatNumber, localizeNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { CartridgeDetail, CartridgeSummary } from '../lib/api-types.ts'
 import {
@@ -20,6 +21,7 @@ import {
   type Evaluation,
   evaluate,
   type FieldState,
+  fieldLabel,
   fieldSpecs,
   fileData,
   fromRecord,
@@ -31,7 +33,8 @@ import {
   reduce,
   tables,
 } from '../lib/cartridge-designer.ts'
-import { symbolText } from '../lib/cartridge-record.ts'
+import { groupLabel, meaningText, symbolText } from '../lib/cartridge-record.ts'
+import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type FieldValue, fieldError } from '../lib/field-spec.ts'
 import type { FieldRow } from '../lib/record-fields.ts'
 import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } from '../lib/units.ts'
@@ -49,13 +52,14 @@ import { RecordSearch } from './record-search.tsx'
 import { EmptyNote, Loading } from './states.tsx'
 import { useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
-import { measuredWaterCapacitySpec } from './workbench-inputs.tsx'
 import { Workspace } from './workspace.tsx'
 
 const SeatingPreview = dynamic(
   () => import('./seating-preview.tsx').then((m) => m.SeatingPreview),
   { ssr: false, loading: () => <Loading what="the preview" inline /> },
 )
+
+type Translate = Translator['t']
 
 const noSeated = () => {}
 const noCapacity: FieldValue = { text: '', si: undefined }
@@ -72,28 +76,31 @@ function helpText(
   s: CartridgeFieldSpec,
   state: FieldState,
   system: UnitSystem,
-  notes: string[] = [],
+  notes: string[],
+  t: Translate,
 ) {
   const value = (si: number) => valueText(s.quantity as Derived['quantity'], system, si)
   const from = (() => {
     switch (state.kind) {
       case 'record':
-        return 'From the record'
+        return t('From the record')
       case 'entered':
-        return state.changed
-          ? `Changed; record ${state.record === undefined ? 'value not printed' : value(state.record)}`
-          : 'Entered'
+        if (!state.changed) return t('Entered')
+        return state.record === undefined
+          ? t('Changed; record value not printed')
+          : t('Changed; record {value}', { value: value(state.record) })
       case 'cleared':
-        return `Cleared; record ${value(state.record)}`
+        return t('Cleared; record {value}', { value: value(state.record) })
       case 'derived':
-        return `Derived by the drawing: ${value(state.si)}`
+        return t('Derived by the drawing: {value}', { value: value(state.si) })
       case 'notPrinted':
-        return 'Not printed in the record'
+        return t('Not printed in the record')
       case 'empty':
-        return 'Not given'
+        return t('Not given')
     }
   })()
-  const meaning = s.meaning.charAt(0).toUpperCase() + s.meaning.slice(1)
+  const text = meaningText(s.meaning, t)
+  const meaning = text.charAt(0).toUpperCase() + text.slice(1)
   return [`${meaning}. ${from}.`, ...notes].join(' ')
 }
 
@@ -127,16 +134,17 @@ const StartSearch = memo(function StartSearch({
   /** The record the design started from, shown in the empty field. */
   chosen?: string | undefined
 }) {
+  const { t } = useTranslation()
   return (
     <RecordSearch<CartridgeSummary>
       kind="cartridges"
-      label="Start from a record"
-      chosen={chosen ?? 'Start from a record'}
+      label={t('Start from a record')}
+      chosen={chosen ?? t('Start from a record')}
       picked={chosen !== undefined}
-      describe={(c) => `${c.name}, CIP table ${c.table}`}
+      describe={(c) => t('{name}, CIP table {table}', { name: c.name, table: c.table })}
       onSelect={(c) => start(c.id)}
-      noneText="No cartridge found"
-      unreachableText="The database is unreachable. The designer still works."
+      noneText={t('No cartridge found')}
+      unreachableText={t('The database is unreachable. The designer still works.')}
     />
   )
 })
@@ -150,13 +158,17 @@ const TableSelect = memo(function TableSelect({
 }) {
   // a table VII record keeps its own table: its shotshell symbols are not edited here
   const shotshell = value === 'VII'
+  const { t } = useTranslation()
   return (
     <NativeSelect
-      label="Drawing rules of CIP table"
-      description="Table III draws a belt; the other tables draw the same outline."
+      label={t('Drawing rules of CIP table')}
+      description={t('Table III draws a belt; the other tables draw the same outline.')}
       value={value}
       disabled={shotshell}
-      data={(shotshell ? ['VII'] : tables).map((t) => ({ value: t, label: `Table ${t}` }))}
+      data={(shotshell ? ['VII'] : tables).map((table) => ({
+        value: table,
+        label: t('Table {table}', { table }),
+      }))}
       onChange={(ev) => dispatch({ type: 'table', value: ev.currentTarget.value })}
     />
   )
@@ -164,6 +176,7 @@ const TableSelect = memo(function TableSelect({
 
 /** The derived values in two reserved lines; each value with its basis is in the line's title. */
 function DerivedLine({ rows, system }: { rows: Derived[]; system: UnitSystem }) {
+  const { t } = useTranslation()
   const value = (d: Derived) => `${d.label} ${valueText(d.quantity, system, d.si)}`
   return (
     <Text
@@ -174,23 +187,31 @@ function DerivedLine({ rows, system }: { rows: Derived[]; system: UnitSystem }) 
       className="derived-line"
       title={rows.map((d) => `${value(d)}: ${d.basis}`).join('\n') || undefined}
     >
-      {rows.length > 0 && `Derived from the design: ${rows.map(value).join(', ')}.`}
+      {rows.length > 0 &&
+        t('Derived from the design: {values}.', { values: rows.map(value).join(', ') })}
     </Text>
   )
 }
 
-const fieldLabel = (key: string) => fieldSpecs.find((s) => s.key === key)?.label ?? key
+const labelOf = (key: string, t: Translate) => {
+  const s = fieldSpecs.find((f) => f.key === key)
+  return s ? fieldLabel(s, t) : key
+}
 
 const isChanged = (state: FieldState) =>
   state.kind === 'cleared' || (state.kind === 'entered' && state.changed)
 
-const seatMissing = (drawn: boolean) =>
+const seatMissing = (drawn: boolean, t: Translate) =>
   drawn
-    ? 'Not given: the cartridge L3, which the seating needs.'
-    : 'Not given: a drawing of the cartridge, which the seating needs.'
+    ? t('Not given: the cartridge L3, which the seating needs.')
+    : t('Not given: a drawing of the cartridge, which the seating needs.')
 
-const staleText = (refusal: { field: string; reason: string }, drawn: boolean) =>
-  `${drawn ? 'Drawing for earlier inputs. ' : ''}Fix ${fieldLabel(refusal.field)}: ${refusal.reason}`
+const staleText = (refusal: { field: string; reason: string }, drawn: boolean, t: Translate) => {
+  const values = { label: labelOf(refusal.field, t), reason: refusal.reason }
+  return drawn
+    ? t('Drawing for earlier inputs. Fix {label}: {reason}', values)
+    : t('Fix {label}: {reason}', values)
+}
 
 /** The polite line: the refusal, else the last change, that the drawing updated and the derived values. */
 function announcement(
@@ -198,20 +219,32 @@ function announcement(
   changed: CartridgeFieldSpec | undefined | '',
   design: Design,
   derivedText: string,
+  t: Translate,
 ) {
-  if (e.refusal) return `Drawing not updated: ${e.refusal.reason}`
-  const change = changed
-    ? `${changed.label} ${design.fields[changed.key]?.text || 'cleared'}. `
-    : ''
-  return `${change}Drawing updated.${derivedText ? ` ${derivedText}.` : ''}`
+  if (e.refusal) return t('Drawing not updated: {reason}', { reason: e.refusal.reason })
+  const text = changed && design.fields[changed.key]?.text
+  const change = !changed
+    ? ''
+    : text
+      ? t('{label} {value}.', { label: fieldLabel(changed, t), value: localizeNumber(text) })
+      : t('{label} cleared.', { label: fieldLabel(changed, t) })
+  const updated = derivedText
+    ? t('Drawing updated. {derived}.', { derived: derivedText })
+    : t('Drawing updated.')
+  return change ? `${change} ${updated}` : updated
 }
 
 /** The Parameters panel's message for a locked, changed-base or started-from design. */
-function designMessage(design: Design) {
-  if (design.locked) return `Read only: ${design.locked.reason}`
+function designMessage(design: Design, t: Translate) {
+  if (design.locked) return t('Read only: {reason}', { reason: design.locked.reason })
   if (design.baseChanged)
-    return `The base record ${design.origin?.title ?? design.basedOn} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.`
-  return design.origin && `Started from ${design.origin.title.replace(/\.?$/, '.')}`
+    return t(
+      'The base record {name} changed since this design was saved. Fields you did not change follow it; Save keeps the design against the new base.',
+      { name: design.origin?.title ?? design.basedOn ?? '' },
+    )
+  return (
+    design.origin && t('Started from {name}.', { name: design.origin.title.replace(/\.$/, '') })
+  )
 }
 
 function DrawingFigure({
@@ -231,6 +264,7 @@ function DrawingFigure({
   onView: (v: View) => void
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
+  const { t } = useTranslation()
   if (drawn?.spec)
     return (
       <div className="designer-drawing" data-stale={stale || undefined}>
@@ -238,7 +272,7 @@ function DrawingFigure({
           spec={drawn.spec}
           list={drawn.figures}
           heading={title}
-          caption="Changed values are drawn as entered, without the record's tolerances."
+          caption={t("Changed values are drawn as entered, without the record's tolerances.")}
           view={view}
           onView={onView}
           unit={unit}
@@ -249,8 +283,8 @@ function DrawingFigure({
   return (
     <EmptyNote
       icon={<Ruler size={24} aria-hidden="true" />}
-      title="No drawing yet"
-      description={missingHint}
+      title={t('No drawing yet')}
+      description={t(missingHint)}
     />
   )
 }
@@ -262,8 +296,8 @@ function seating(drawn: Evaluation | undefined) {
 }
 
 /** The instruction for a design missing its base values is not shown as a refusal. */
-const withoutHint = (refusal: Evaluation['refusal']) =>
-  refusal?.reason.endsWith(missingHint) ? undefined : refusal
+const withoutHint = (refusal: Evaluation['refusal'], t: Translate) =>
+  refusal?.reason.endsWith(t(missingHint)) ? undefined : refusal
 
 const fieldFlag = (state: FieldState) => (isChanged(state) ? 'changed' : flagOf[state.kind])
 
@@ -271,7 +305,7 @@ async function loadCartridge(id: string, system: UnitSystem) {
   const record = await fetchRecord<CartridgeDetail>('cartridges', id)
   if (!record) throw new Error('No such cartridge')
   if (!draws(record))
-    return 'This cartridge has no CIP record that draws. The designer still works.'
+    return msg('This cartridge has no CIP record that draws. The designer still works.')
   return fromRecord(record, system)
 }
 
@@ -281,9 +315,10 @@ function fieldErrorText(
   system: UnitSystem,
   refusal: { field: string; reason: string } | undefined,
   e: Evaluation,
+  t: Translate,
 ) {
   return (
-    fieldError(s, design.fields[s.key], system) ??
+    fieldError({ ...s, label: fieldLabel(s, t) }, design.fields[s.key], system, t) ??
     (refusal?.field === s.key ? refusal.reason : undefined) ??
     e.checks[s.key]?.join(' ')
   )
@@ -302,6 +337,7 @@ function ParameterHead({
   dispatch: (a: Action) => void
   unit: string
 }) {
+  const { t } = useTranslation()
   return (
     <>
       <StartSearch start={start} chosen={design.origin?.title} />
@@ -310,15 +346,16 @@ function ParameterHead({
       </div>
       {shotshell ? (
         <p className="note">
-          Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing shows the
-          record.
+          {t(
+            'Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing shows the record.',
+          )}
         </p>
       ) : (
         // the unit once per column; screen readers have it in each field's name
         <div className="side-row side-head" aria-hidden="true">
-          <span>Symbol</span>
-          <span>Cartridge, {unit}</span>
-          <span>Chamber, {unit}</span>
+          <span>{t('Symbol')}</span>
+          <span>{t('Cartridge, {unit}', { unit })}</span>
+          <span>{t('Chamber, {unit}', { unit })}</span>
         </div>
       )}
     </>
@@ -331,6 +368,7 @@ function ParameterHead({
  * redo; the last valid drawing stays while the input is refused.
  */
 export function CartridgeDesigner() {
+  const { t } = useTranslation()
   /** The view picked; Combined once both sides draw until one is picked. */
   const [view, setView] = useState<View>()
   const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
@@ -340,11 +378,14 @@ export function CartridgeDesigner() {
       kind: 'cartridge',
       fileData,
       load: loadCartridge,
-      loadingText: 'Loading the cartridge…',
-      failText: 'The cartridge could not be loaded. The designer still works.',
+      loadingText: msg('Loading the cartridge…'),
+      failText: msg('The cartridge could not be loaded. The designer still works.'),
     })
 
-  const e = useMemo(() => evaluate(design, system, history.last), [design, system, history.last])
+  const e = useMemo(
+    () => evaluate(design, system, history.last, t),
+    [design, system, history.last, t],
+  )
   const lastGood = useRef<Evaluation | undefined>(undefined)
   if (e.spec) lastGood.current = e
   // the drawing lays out after the fields have taken the input
@@ -360,8 +401,10 @@ export function CartridgeDesigner() {
     (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity ?? f),
     fixedFieldText,
   )
-  const designName = design.origin ? `design from ${design.origin.title}` : 'new cartridge'
-  const title = `Outline, ${designName}`
+  const designName = design.origin
+    ? t('design from {name}', { name: design.origin.title })
+    : t('new cartridge')
+  const title = t('Outline, {name}', { name: designName })
   const { seatSpec, canSeat } = seating(drawn)
   const draft = useMemo(
     () => (seatSpec && canSeat ? { spec: seatSpec, title: designName } : undefined),
@@ -374,12 +417,12 @@ export function CartridgeDesigner() {
     .map((d) => `${d.label} ${valueText(d.quantity, system, d.si)}`)
     .join(', ')
   // nothing to announce before the first change or start
-  const message = history.past.length ? announcement(e, changed, design, derivedText) : ''
+  const message = history.past.length ? announcement(e, changed, design, derivedText, t) : ''
   const [announced] = useDebouncedValue(message, 500)
   // before the first edit a design missing its base values shows the instruction, not a refusal
-  const refusal = history.past.length ? e.refusal : withoutHint(e.refusal)
+  const refusal = history.past.length ? e.refusal : withoutHint(e.refusal, t)
 
-  const errorOf = (s: CartridgeFieldSpec) => fieldErrorText(s, design, system, refusal, e)
+  const errorOf = (s: CartridgeFieldSpec) => fieldErrorText(s, design, system, refusal, e, t)
 
   const shotshell = design.table === 'VII'
   const field = (s: CartridgeFieldSpec) => {
@@ -393,7 +436,7 @@ export function CartridgeDesigner() {
         spec={s}
         system={system}
         value={value}
-        help={helpText(s, state, system, e.notes[s.key])}
+        help={helpText(s, state, system, e.notes[s.key] ?? [], t)}
         flag={fieldFlag(state)}
         changed={changed}
         error={errorOf(s)}
@@ -407,7 +450,7 @@ export function CartridgeDesigner() {
     <div className="side-grid">
       {rowsOf(g).map((r) => (
         <div key={r.symbol} className="side-row">
-          <span className="prop-label" title={r.meaning}>
+          <span className="prop-label" title={meaningText(r.meaning, t)}>
             {symbolText(r.symbol)}
           </span>
           {(['cartridge', 'chamber'] as const).map((side) => {
@@ -436,8 +479,8 @@ export function CartridgeDesigner() {
         undo={history.past.length > 0}
         redo={history.future.length > 0}
         reset={design.origin !== undefined}
-        newLabel="New cartridge"
-        resetLabel="Reset to record"
+        newLabel={t('New cartridge')}
+        resetLabel={t('Reset to record')}
         system={system}
         dispatch={toolbarDispatch}
       />
@@ -448,7 +491,7 @@ export function CartridgeDesigner() {
         data={fileValue}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
-        reportBox="Include the design"
+        reportBox={t('Include the design')}
       />
     </>
   )
@@ -458,7 +501,7 @@ export function CartridgeDesigner() {
       {/* a design whose base is gone is shown, not edited */}
       <fieldset disabled={design.locked !== undefined} className="designer-fieldset">
         <PropertyGrid
-          title="Parameters"
+          title={t('Parameters')}
           head={
             <ParameterHead
               start={start}
@@ -468,23 +511,23 @@ export function CartridgeDesigner() {
               unit={system.length.symbol}
             />
           }
-          message={loading ?? designMessage(design)}
+          message={loading ?? designMessage(design, t)}
           sections={
             shotshell
               ? []
               : [
                   ...(Object.keys(groups) as Group[]).map((g) => ({
                     key: g,
-                    title: groups[g],
+                    title: groupLabel(groups[g], t),
                     content: groupFields(g),
                   })),
                   {
                     key: 'seat',
-                    title: 'Seat a bullet',
+                    title: t('Seat a bullet'),
                     content: canSeat ? (
                       <div ref={setSeatSlot} className="seating-slot" />
                     ) : (
-                      <p className="note">{seatMissing(drawn?.spec !== undefined)}</p>
+                      <p className="note">{seatMissing(drawn?.spec !== undefined, t)}</p>
                     ),
                   },
                 ]
@@ -499,17 +542,17 @@ export function CartridgeDesigner() {
     const si = design.fields[s.key]?.si
     return si === undefined
       ? []
-      : [{ label: verbatim(s.label), value: { quantity: s.quantity, si } }]
+      : [{ label: verbatim(fieldLabel(s, t)), value: { quantity: s.quantity, si } }]
   })
 
   const results = (
     <>
       <div className="page-panel-head designer-panel-head">
-        <h2 className="page-panel-title record-heading">Drawing</h2>
+        <h2 className="page-panel-title record-heading">{t('Drawing')}</h2>
       </div>
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={refusal?.reason}>
-        {refusal && staleText(refusal, drawn !== undefined)}
+        {refusal && staleText(refusal, drawn !== undefined, t)}
       </Text>
       <DrawingFigure
         drawn={drawn}
@@ -541,7 +584,7 @@ export function CartridgeDesigner() {
 
   return (
     <>
-      <PageBar title="Cartridge designer" actions={toolbar} />
+      <PageBar title={msg('Cartridge designer')} translated actions={toolbar} />
       <div className="designer">
         {/* outside the tabs: the results panel is hidden on the phone Inputs tab */}
         <p role="status" className="status visually-hidden">

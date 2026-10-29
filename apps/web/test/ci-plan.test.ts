@@ -90,6 +90,11 @@ it('builds with the sample when the web app changed outside the record pages', (
   expect(plan(['apps/web/src/app/layout.tsx'], closure)).toMatchObject({
     prerender: 'sample',
   })
+  expect(plan(['apps/web/news/2026-10-28-whats-new.md'], closure)).toMatchObject({
+    check: true,
+    e2e: true,
+    prerender: 'sample',
+  })
 })
 
 it('prerenders every record when record data, page code or shared parts changed', () => {

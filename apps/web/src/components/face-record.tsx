@@ -71,7 +71,7 @@ export function FaceEvents({
         className="face-table"
         caption={
           <span className="visually-hidden">
-            {t('The events and disciplines shot on this face')}
+            {t('The events and disciplines shot on this target')}
           </span>
         }
         columns={[

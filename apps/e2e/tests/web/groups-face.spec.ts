@@ -5,7 +5,7 @@ import { toolbarPopover } from './target.ts'
 import { storeUnits } from './units.ts'
 
 // The target face on a photo sets the scale, the centre and the face of the group, and the holes
-// are found without a click on one
+// are found once the photo is added, without a click
 test.beforeEach(async ({ page }) => {
   await storeUnits(page)
 })
@@ -85,8 +85,47 @@ async function goStep(page: Page, name: string) {
 }
 const field = (page: Page, label: string, unit = 'mm') =>
   page.getByRole('textbox', { name: `${label} (${unit})`, exact: true })
-const faceSelect = (page: Page) => page.getByRole('combobox', { name: 'Target face', exact: true })
-const scoreFace = (page: Page) => page.getByRole('combobox', { name: 'Face', exact: true })
+const faceSelect = (page: Page) =>
+  page.getByRole('combobox', { name: 'Target on the photo', exact: true })
+const scoreFace = (page: Page) => page.getByRole('combobox', { name: 'Target', exact: true })
+const acceptAll = (page: Page) => page.getByRole('button', { name: /^Accept all/ })
+const resultLine = (page: Page) => page.locator('[data-detect-result]')
+const shotField = (page: Page) => page.getByRole('spinbutton', { name: /^Shot \d+ x$/ })
+
+/** The marker diameter of the sheet, which gives the hole size when no bullet does. */
+async function setMarker(page: Page, mm: string) {
+  await toolbarPopover(page, 'Overlays')
+  await field(page, 'Marker').fill(mm)
+  await field(page, 'Marker').blur()
+  await page.keyboard.press('Escape')
+}
+
+/** Back from a guided step to the result line. */
+async function backToLine(page: Page) {
+  for (let i = 0; i < 5 && !(await resultLine(page).isVisible()); i++)
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+  await expect(resultLine(page)).toBeVisible()
+}
+
+/** The user's actions from choosing the photo on, counted. */
+function counter() {
+  const count = { n: 0 }
+  const act = async (f: () => Promise<unknown>) => {
+    count.n++
+    await f()
+  }
+  return { count, act }
+}
+
+/** Midway between two ring lines, away from the black area. */
+const sixHoles: [number, number][] = [
+  [61.78, 22.49],
+  [-10.03, 56.87],
+  [-46.75, -17.02],
+  [14.28, -39.23],
+  [-63.87, 36.87],
+  [16.88, 29.23],
+]
 
 async function load(page: Page, png: Buffer) {
   await expect(page.getByRole('combobox', { name: 'Target sheet' })).not.toHaveValue('')
@@ -108,8 +147,8 @@ for (const response of ['success', 'failure'] as const) {
       if (response === 'failure') await route.fulfill({ status: 503, body: '{}' })
       else await route.continue()
     })
+    // the face search starts on the photo added
     await load(page, await facePng(page, 'issf-10m-air-pistol', []))
-    await page.getByRole('button', { name: 'Detect holes', exact: true }).click()
     await page.getByRole('button', { name: /^Cancel \(/ }).click()
     let workers = 0
     page.on('worker', () => {
@@ -151,48 +190,56 @@ test('a federation narrows the disciplines, a discipline its faces, and a face s
   await expect(federation).toHaveValue('bdmp')
 })
 
-test('one click finds the face: scale, centre and face are set and the holes are proposed', async ({
+test('a known hole size: from choosing the photo to Accept is 2 actions, no shot before Accept', async ({
   page,
 }) => {
-  // midway between two ring lines, away from the black area
-  const holes: [number, number][] = [
-    [61.78, 22.49],
-    [-10.03, 56.87],
-    [-46.75, -17.02],
-    [14.28, -39.23],
-    [-63.87, 36.87],
-    [16.88, 29.23],
-  ]
-  const png = await facePng(page, 'issf-10m-air-pistol', holes)
-  await load(page, png)
+  const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
+  await setMarker(page, '4.5')
+  const { count, act } = counter()
+  await act(() => load(page, png))
+  await expect(acceptAll(page)).toHaveText('Accept all (6)', { timeout: 30_000 })
+  await expect(resultLine(page)).toContainText('Air Pistol')
+  await expect(resultLine(page)).toContainText('1 reference')
+  await expect(resultLine(page)).toContainText('6 proposed')
+  // the marker's size preselects its caliber class, which the line names with the size
+  await expect(resultLine(page)).toContainText('4.5 mm (.177) air (4.50)')
+  // no slider on the main path, and the proposals are no shots yet
+  await expect(page.locator('.detect-step').getByRole('slider')).toHaveCount(0)
+  await expect(shotField(page)).toHaveCount(0)
+  await act(() => acceptAll(page).click())
+  await expect(shotField(page)).toHaveCount(6)
+  expect(count.n).toBe(2)
+})
+
+test('an unknown hole size: the typed size is the third action, and the shots sit on the holes', async ({
+  page,
+}) => {
+  const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
   // the face's event shot at the group's distance becomes the discipline
   await field(page, 'Distance', 'm').fill('10')
   await field(page, 'Distance', 'm').blur()
-  // no scale yet: the one-click start looks for the face first
-  await page.getByRole('button', { name: 'Detect holes' }).click()
+  const { count, act } = counter()
+  await act(() => load(page, png))
   await expect(page.locator('.target-status')).toHaveText(/^Enter the hole size/, {
     timeout: 30_000,
   })
-  await goStep(page, 'Scale')
-  await expect(page.locator('.detect-step')).toContainText('1 reference')
-  await expect(faceSelect(page)).toHaveValue('issf-10m-air-pistol|10m-air-pistol')
+  await expect(resultLine(page)).toContainText('1 reference')
   await expect(scoreFace(page)).toHaveValue('issf-10m-air-pistol')
   // the recognised face and event are the same entry of the discipline list
   await expect(page.getByRole('combobox', { name: 'Discipline', exact: true })).toHaveValue(
     'ISSF 10m Air Pistol',
   )
   await expect(page.getByRole('combobox', { name: 'Federation', exact: true })).toHaveValue('issf')
-
-  // the hole size, then the run: no example hole is clicked
-  await goStep(page, 'Example')
-  await field(page, 'Hole size').fill('4.5')
-  await field(page, 'Hole size').blur()
-  await goStep(page, 'Detect')
-  await page.getByRole('button', { name: 'Detect holes' }).click()
-  await expect(page.getByRole('button', { name: /^Accept all/ })).toHaveText('Accept all (6)', {
-    timeout: 30_000,
+  await expect(page.locator('.detect-step').getByRole('slider')).toHaveCount(0)
+  // one action: the size typed and entered in the result line
+  await act(async () => {
+    await field(page, 'Hole size').fill('4.5')
+    await field(page, 'Hole size').press('Enter')
   })
-  await page.getByRole('button', { name: /^Accept all/ }).click()
+  await expect(acceptAll(page)).toHaveText('Accept all (6)', { timeout: 30_000 })
+  await expect(shotField(page)).toHaveCount(0)
+  await act(() => acceptAll(page).click())
+  expect(count.n).toBe(3)
   // the shots sit where the holes were drawn: target mm, y up, the face centre at 0
   const shots: [number, number][] = []
   for (const n of [1, 2, 3, 4, 5, 6])
@@ -200,7 +247,7 @@ test('one click finds the face: scale, centre and face are set and the holes are
       Number(await page.getByRole('spinbutton', { name: `Shot ${n} x` }).inputValue()),
       Number(await page.getByRole('spinbutton', { name: `Shot ${n} y` }).inputValue()),
     ])
-  for (const [x, y] of holes)
+  for (const [x, y] of sixHoles)
     expect(
       shots.some(([sx, sy]) => Math.hypot(sx - x, sy - y) < 1.5),
       `${x} ${y} in ${JSON.stringify(shots)}`,
@@ -225,6 +272,32 @@ test('one click finds the face: scale, centre and face are set and the holes are
   }
 })
 
+test('each item of the result line opens its editor', async ({ page }) => {
+  const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
+  await setMarker(page, '4.5')
+  await load(page, png)
+  await expect(acceptAll(page)).toHaveText('Accept all (6)', { timeout: 30_000 })
+  const line = resultLine(page)
+  // the caliber: the hole size field in the line
+  await line.getByRole('button', { name: 'Change the hole size' }).click()
+  await expect(line.getByRole('textbox', { name: 'Hole size (mm)', exact: true })).toBeVisible()
+  // the target: the Scale step with the target found
+  await line.getByRole('button', { name: 'Change the target' }).click()
+  await expect(step(page, 'Scale')).toHaveAttribute('aria-current', 'step')
+  await expect(faceSelect(page)).toHaveValue('issf-10m-air-pistol|10m-air-pistol')
+  await backToLine(page)
+  // the scale: Calibrate
+  await resultLine(page).getByRole('button', { name: 'Change the scale' }).click()
+  await expect(page.getByRole('textbox', { name: 'Known length (mm)', exact: true })).toBeVisible()
+  await page.keyboard.press('Escape')
+  // the holes: the Review step
+  await resultLine(page).getByRole('button', { name: 'Change the holes' }).click()
+  await expect(step(page, 'Review')).toHaveAttribute('aria-current', 'step')
+  await expect(acceptAll(page)).toHaveText('Accept all (6)')
+  // nothing was accepted on the way
+  await expect(shotField(page)).toHaveCount(0)
+})
+
 test('a photo below the minimum quality names the problem and waits for Detect anyway', async ({
   page,
 }) => {
@@ -234,7 +307,6 @@ test('a photo below the minimum quality names the problem and waits for Detect a
     [-46.75, -17.02],
   ]
   await load(page, await facePng(page, 'issf-10m-air-pistol', holes, true, true))
-  await page.getByRole('button', { name: 'Detect holes' }).click()
   const anyway = page.getByRole('button', { name: 'Detect anyway' })
   await expect(anyway).toBeVisible({ timeout: 30_000 })
   const notes = page.locator('.quality-notes')
@@ -242,7 +314,7 @@ test('a photo below the minimum quality names the problem and waits for Detect a
   await expect(notes).toContainText('Retake in an even light')
   await expect(notes).toContainText('Detection waits.')
   // the face is applied, the run is not started
-  await expect(page.getByRole('button', { name: /^Accept all/ })).toHaveCount(0)
+  await expect(acceptAll(page)).toHaveCount(0)
   const { violations } = await new AxeBuilder({ page })
     .include('.quality-notes')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
@@ -265,7 +337,18 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
     [-10.03, 56.87],
     [-46.75, -17.02],
   ]
+  // the face search on the photo added is held and cancelled, so the line sets the scale
+  let release!: () => void
+  const gate = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  await page.route('**/api/target-faces/issf-10m-air-rifle.json', async (route) => {
+    await gate
+    await route.continue()
+  })
   await load(page, await facePng(page, 'issf-10m-air-pistol', holes))
+  await page.getByRole('button', { name: /^Cancel \(/ }).click()
+  release()
   // a line reference across the outer ring: 155.5 mm
   await toolbarPopover(page, 'Calibrate')
   await page.getByRole('textbox', { name: 'Known length (mm)', exact: true }).fill('155.5')
@@ -290,19 +373,18 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
   await field(page, 'Hole size').blur()
   await goStep(page, 'Detect')
   await page.getByRole('button', { name: 'Detect holes' }).click()
-  await expect(page.getByRole('button', { name: /^Accept all/ })).toHaveText('Accept all (3)', {
+  await expect(acceptAll(page)).toHaveText('Accept all (3)', {
     timeout: 30_000,
   })
 })
 
-test('no face fits: the ellipses are shown and a typed black diameter sets the scale', async ({
+test('no target fits: the ellipses are shown and a typed black diameter sets the scale', async ({
   page,
 }) => {
   // a black area without ring lines
   const png = await facePng(page, 'issf-10m-air-pistol', [], false)
   await load(page, png)
-  await page.getByRole('button', { name: 'Detect holes' }).click()
-  await expect(page.locator('.target-status')).toHaveText(/^No face fits the rings found/, {
+  await expect(page.locator('.target-status')).toHaveText(/^No target fits the rings found/, {
     timeout: 30_000,
   })
   await expect(step(page, 'Scale')).toHaveAttribute('aria-current', 'step')
@@ -337,7 +419,6 @@ test('a photo without any face: the guided steps ask for the scale as before', a
     return btoa(s)
   })
   await load(page, Buffer.from(blank, 'base64'))
-  await page.getByRole('button', { name: 'Detect holes' }).click()
   await expect(page.locator('.target-status')).toHaveText(/^Straighten the photo if needed/, {
     timeout: 30_000,
   })

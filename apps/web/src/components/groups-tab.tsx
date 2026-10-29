@@ -3,6 +3,7 @@
 import { useFocusTrap, useMediaQuery, useMergedRef } from '@mantine/hooks'
 import { chargeLadder } from '@open-reloading/core'
 import { type ComponentProps, useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import type { LadderDirection } from '../lib/seating-ladder.ts'
 import { stepLabel } from '../lib/workbench.ts'
 import { TargetEditor } from './target-editor.tsx'
@@ -20,6 +21,7 @@ export function GroupsTab({
   /** The load's charge ladder, as the API runs it; its charges label the ladder steps. */
   ladder?: { charge: number; step: number; steps: number; direction: LadderDirection } | undefined
 }) {
+  const { t } = useTranslation()
   let charges: number[] | undefined
   try {
     charges = ladder && chargeLadder(ladder.charge, ladder.step, ladder.steps, ladder.direction)
@@ -61,7 +63,7 @@ export function GroupsTab({
   if (props.load === undefined)
     return (
       <p className="prompt empty-state">
-        Save the load (Save in the page bar) to attach target sheets and shot groups to it.
+        {t('Save the load (Save in the page bar) to attach target sheets and shot groups to it.')}
       </p>
     )
   return (
@@ -71,7 +73,7 @@ export function GroupsTab({
       className="groups-tab"
       data-expanded={expanded || undefined}
       role="presentation"
-      {...(expanded && { role: 'dialog', 'aria-modal': true, 'aria-label': 'Shot groups' })}
+      {...(expanded && { role: 'dialog', 'aria-modal': true, 'aria-label': t('Shot groups') })}
       style={height && !expanded ? { height } : undefined}
       onKeyDown={(e) => {
         // not when the editor used the key, nor from a popover outside the box

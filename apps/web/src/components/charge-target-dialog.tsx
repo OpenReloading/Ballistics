@@ -126,7 +126,7 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
       >
         <Stack gap="xs">
           <Select
-            label={t('Target')}
+            label={t('charge\u0004Target')}
             allowDeselect={false}
             data={targetKinds.map((k) => ({ value: k.value, label: t(k.label) }))}
             value={kind}

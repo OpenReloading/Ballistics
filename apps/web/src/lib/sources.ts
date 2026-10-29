@@ -76,8 +76,10 @@ export const userRecordId = (rowId: string) =>
   rowId.startsWith(prefix) ? rowId.slice(prefix.length) : undefined
 
 /** The designer that opens a user row's record (`?record=`). */
-export const designerHref = (kind: 'bullets' | 'cartridges', rowId: string) =>
-  `/${kind}/designer?record=${encodeURIComponent(userRecordId(rowId) ?? rowId)}`
+export const designerHref = (
+  kind: 'bullets' | 'cartridges' | 'powders' | 'targets',
+  rowId: string,
+) => `/${kind}/designer?record=${encodeURIComponent(userRecordId(rowId) ?? rowId)}`
 
 /** User bullets with a diameter as list rows: lengths in mm, mass in g; absent values stay absent. */
 export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {

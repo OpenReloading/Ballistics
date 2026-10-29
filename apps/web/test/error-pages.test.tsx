@@ -5,6 +5,13 @@ import { expect, it, vi } from 'vitest'
 import RootError from '../src/app/error.tsx'
 import GlobalError from '../src/app/global-error.tsx'
 import { ErrorNote } from '../src/components/states.tsx'
+import { english } from '../src/i18n/translate.ts'
+
+// the pages are called as functions below, outside a render, where a hook cannot subscribe
+vi.mock('../src/i18n/language.ts', async (original) => {
+  const actual = await original<typeof import('../src/i18n/language.ts')>()
+  return { ...actual, useTranslation: () => english }
+})
 
 const error = Object.assign(new Error('render failed'), { digest: '1' })
 

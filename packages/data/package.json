@@ -2,6 +2,7 @@
   "name": "@open-reloading/data",
   "version": "0.0.4",
   "license": "MIT AND CC-BY-4.0",
+  "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/data/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OpenReloading/Ballistics.git",

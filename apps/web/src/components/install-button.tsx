@@ -2,6 +2,7 @@
 
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { useSyncExternalStore } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { NavIcon } from './nav-icons.tsx'
 
 /** Chromium's install offer (https://developer.mozilla.org/en-US/docs/Web/API/BeforeInstallPromptEvent). */
@@ -45,10 +46,11 @@ export function useInstall() {
 /** Install: shown only while the browser offers to install the app; one offer, one prompt. */
 export function InstallButton({ position }: { position: 'right' | 'bottom' }) {
   const install = useInstall()
+  const { t } = useTranslation()
   if (!install) return null
   return (
-    <Tooltip label="Install as an app" position={position}>
-      <ActionIcon variant="default" aria-label="Install" onClick={install}>
+    <Tooltip label={t('Install as an app')} position={position}>
+      <ActionIcon variant="default" aria-label={t('Install')} onClick={install}>
         <NavIcon name="install" />
       </ActionIcon>
     </Tooltip>

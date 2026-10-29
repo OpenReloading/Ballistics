@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
-// The default order of the discipline and target face directories follows the federation's own
+// The default order of the discipline and target directories follows the federation's own
 // rule; a clicked column header replaces it. The orders themselves are Vitest tests.
 const rows = (page: import('@playwright/test').Page, base: string) =>
   page.locator(`main a[href^="${base}/"]:not([href$="/designer/"])`)
@@ -20,7 +20,7 @@ test('the discipline directory lists ISSF by category, distance, then name, and 
   await expect(page).toHaveURL(/sort=name/)
 })
 
-test('the target face directory lists BDS faces by their printed code', async ({ page }) => {
+test('the target directory lists BDS targets by their printed code', async ({ page }) => {
   await gotoHydrated(page, '/targets?q=ZF-Scheibe')
   const list = rows(page, '/targets')
   await expect(list.nth(0)).toHaveText('BDS-50m-ZF-Scheibe (Z2)')

@@ -28,8 +28,24 @@ export type {
   TimeUnit,
 } from './pressure-history.ts'
 export { parsePressureHistory } from './pressure-history.ts'
+export type { ColumnUnit, FieldSpec, TableKind } from './record-fields.ts'
+export { fieldSpecs, tableKinds } from './record-fields.ts'
+export { idOfKey } from './record-ids.ts'
+export type {
+  BuiltEntry,
+  BuiltRecords,
+  KindScore,
+  KindSuggestion,
+  RowCounts,
+  RowIssue,
+  TableColumnMap,
+  Tier,
+} from './records.ts'
+export { autoMap, buildRecords, suggestKind, tierFloors } from './records.ts'
 export type { ChronoImport, ChronoParserOptions, SessionCandidate } from './result.ts'
 export { parseShotView, parseShotViewWorkbook } from './shotview.ts'
+export type { Table, TableRead } from './tables.ts'
+export { readTable, tableOfRows } from './tables.ts'
 export type { TemplateOptions } from './template.ts'
 export { parseOpenReloadingCsv } from './template.ts'
 export { decodeText, formatMinutes } from './text.ts'

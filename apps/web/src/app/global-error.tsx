@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslation } from '../i18n/language.ts'
+
 /**
  * An error in the root layout: replaces the whole document, so it carries its own html and body
  * and no app styles, theme or shell.
@@ -10,15 +12,16 @@ export default function GlobalError({
   error: Error & { digest?: string }
   retry: () => void
 }) {
+  const { t, language } = useTranslation()
   return (
-    <html lang="en">
+    <html lang={language}>
       <body style={{ fontFamily: 'system-ui, sans-serif', margin: '2rem' }}>
-        <title>Something went wrong · OpenReloading Ballistics</title>
+        <title>{`${t('Something went wrong')} · OpenReloading Ballistics`}</title>
         <main>
-          <h1>Something went wrong</h1>
-          <p role="alert">OpenReloading could not be shown.</p>
+          <h1>{t('Something went wrong')}</h1>
+          <p role="alert">{t('OpenReloading could not be shown.')}</p>
           <button type="button" onClick={() => retry()}>
-            Try again
+            {t('Try again')}
           </button>
         </main>
       </body>

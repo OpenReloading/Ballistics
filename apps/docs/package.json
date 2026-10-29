@@ -8,7 +8,8 @@
     "site:build": "npm run site:openapi && npm run site:library && docusaurus build",
     "site:library": "typedoc",
     "site:openapi": "node scripts/openapi.mts",
-    "test": "node --test scripts/*.test.mts"
+    "test": "node --test scripts/*.test.mts",
+    "test:coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout scripts/*.test.mts"
   },
   "devDependencies": {
     "@docusaurus/theme-common": "3.10.2",

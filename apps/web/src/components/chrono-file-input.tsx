@@ -3,6 +3,7 @@
 import { NativeSelect } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
 import type { ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNames, templateCsv, templateJson } from '../lib/chrono.ts'
 import { ChronoDropZone } from './chrono-drop-zone.tsx'
 
@@ -16,21 +17,16 @@ export const formats = Object.entries(formatNames)
   .join(', ')
 
 /** The JSON and CSV template downloads; `json` is the first link's text. */
-export function TemplateLinks({
-  json = 'JSON template',
-  between,
-}: {
-  json?: string
-  between?: ReactNode
-}) {
+export function TemplateLinks({ json, between }: { json?: string; between?: ReactNode }) {
+  const { t } = useTranslation()
   return (
     <>
       <a href={jsonTemplateHref} download="openreloading-session-template.json">
-        {json}
+        {json ?? t('JSON template')}
       </a>
       {between}
       <a href={templateHref} download="openreloading-session-template.csv">
-        CSV template
+        {t('CSV template')}
       </a>
     </>
   )
@@ -58,22 +54,24 @@ export function ChronoFileInput({
   onUnit: (unit: VelocityUnit | '') => void
   onFiles: (files: File[]) => void
 }) {
+  const { t } = useTranslation()
   return (
     <div className="file-controls chrono-import">
       <ChronoDropZone id={id} label={label} variant="box" multiple={multiple} onFiles={onFiles} />
       <NativeSelect
         id={unitId}
-        label="Velocity unit when the file names none"
+        label={t('Velocity unit when the file names none')}
         value={unit}
         onChange={(e) => onUnit(e.currentTarget.value as VelocityUnit | '')}
         data={[
-          { value: '', label: 'not set' },
+          { value: '', label: t('not set') },
           { value: 'ft/s', label: 'ft/s' },
           { value: 'm/s', label: 'm/s' },
         ]}
       />
       <p className="note chrono-formats">
-        Reads {formats}. <TemplateLinks json="Download JSON template" between=" · " />
+        {t('Reads {formats}.', { formats })}{' '}
+        <TemplateLinks json={t('Download JSON template')} between=" · " />
       </p>
     </div>
   )

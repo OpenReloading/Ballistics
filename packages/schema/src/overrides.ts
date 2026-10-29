@@ -151,7 +151,6 @@ const {
   country: _powderCountry,
   provenance: _powderProvenance,
   composition: _powderComposition,
-  temperatureSensitivity: _powderSensitivity,
   ...powderShape
 } = powder.shape
 
@@ -168,23 +167,15 @@ const compositionDraft = z.object({
 
 /** The fields of a powder draft that {@link powderDraft} types, in stored units. */
 type PowderDraftFields = Overrides<
-  Omit<
-    Powder,
-    | 'id'
-    | 'manufacturer'
-    | 'name'
-    | 'country'
-    | 'provenance'
-    | 'composition'
-    | 'temperatureSensitivity'
-  >
+  Omit<Powder, 'id' | 'manufacturer' | 'name' | 'country' | 'provenance' | 'composition'>
 > & { composition?: z.infer<typeof compositionDraft>[] | null }
 
 /**
  * The fields of a powder in the powder designer while the draft is unfinished: any of the powder
- * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance` and
- * `temperatureSensitivity`, every one optional, nested objects likewise, in the stored units, the numbers without the powder
- * record's bounds (a half-typed value stays in the draft). The designer builds a {@link Powder} from it and checks that against `powder`.
+ * record's fields but `id`, `manufacturer`, `name`, `country` and `provenance`, every one
+ * optional, nested objects likewise, in the stored units, the numbers without the powder record's
+ * bounds (a half-typed value stays in the draft). The designer builds a {@link Powder} from it and
+ * checks that against `powder`.
  * Inferred type: {@link PowderDraft}.
  */
 export const powderDraft = overridesOf(

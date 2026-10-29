@@ -584,7 +584,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
           data={[
             { value: 'typed', label: t('Typed charge') },
             { value: 'fill', label: t('Case fill') },
-            { value: 'target', label: t('Target') },
+            { value: 'target', label: t('charge\u0004Target') },
           ]}
           value={kind}
           onChange={(v) => setKind(v as CompareMode['kind'])}

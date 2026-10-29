@@ -10,9 +10,11 @@ import {
 } from '@open-reloading/schema'
 import { CaretDown, FloppyDisk, FolderOpen } from '@phosphor-icons/react'
 import {
+  type Dispatch,
   memo,
   type ReactNode,
   type Ref,
+  type SetStateAction,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -21,6 +23,8 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import type { ImportFile, ImportReport as Report } from '../lib/data-files.ts'
 import { dateTimeText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -30,19 +34,19 @@ import {
   readHandleText,
   saveAs,
   saveToFolder,
+  tableFormats,
   writeHandleText,
 } from '../lib/file-access.ts'
-import { parseFiles, readLoadFile, readNote } from '../lib/load-file-formats.ts'
+import { loadFileFormats, readLoadFile, readNote } from '../lib/load-file-formats.ts'
 import { shownManufacturerRefs } from '../lib/manufacturers.ts'
 import { guardNavigation, guardPop } from '../lib/navigation-guard.ts'
 import { newId } from '../lib/new-id.ts'
-import { maxLinkChars, readLink, shareLink, shareProblem } from '../lib/share-link.ts'
+import { maxLinkChars, readLink, shareLink, shareProblem, tooLongText } from '../lib/share-link.ts'
 import { type ShortcutId, shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
 import {
   canonicalJson,
   checkedUserDataText,
-  exportAllText,
   type InvalidRecord,
   makerIdOf,
   makerRecordsOf,
@@ -51,7 +55,7 @@ import {
   namedKey,
   type ParsedUserFile,
   parseUserDataFile,
-  planImport,
+  reasonText,
   refNote,
   renamedKey,
   tooLargeMessage,
@@ -59,12 +63,10 @@ import {
   validRecords,
 } from '../lib/user-data.ts'
 import { ownsFile, recordFileName } from '../lib/user-file-names.ts'
-import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../lib/user-photos.ts'
+import { droppedPhotos, embedFiles, photoIds } from '../lib/user-photos.ts'
 import {
   deletePhoto,
   deleteRecords,
-  putInvalid,
-  putPhoto,
   putRecordIfAbsent,
   putRecords,
   rawPhotoId,
@@ -73,6 +75,7 @@ import {
   storedPhotoIds,
   storedRecord,
   storedRecords,
+  storePhotos,
 } from '../lib/user-store.ts'
 import {
   canPickFolder,
@@ -83,6 +86,7 @@ import {
 } from '../lib/workspace-folder.ts'
 import { AppModal } from './app-modal.tsx'
 import { confirmDialog } from './confirm.tsx'
+import type { ImportEntry, TablesEntry } from './import-entry.tsx'
 import { BarStatus } from './page-bar.tsx'
 import { useReportOptions } from './report-host.ts'
 import { useShortcuts } from './shortcuts.tsx'
@@ -109,23 +113,44 @@ const keyed = (id: ShortcutId) => ({
   ),
 })
 
-const kindNames: Record<UserRecordKind, string> = {
-  manufacturer: 'manufacturers',
-  bullet: 'bullet designs',
-  cartridge: 'cartridge designs',
-  powder: 'powder designs',
-  caseCapacity: 'measured capacities',
-  case: 'case groups',
-  load: 'loads',
-  firearm: 'firearms',
-  session: 'chronograph sessions',
-  targetSheet: 'target sheets',
-  targetFaceDesign: 'target face designs',
+const kindNames: Record<UserRecordKind, Message> = {
+  manufacturer: msg('manufacturers'),
+  bullet: msg('bullet designs'),
+  cartridge: msg('cartridge designs'),
+  powder: msg('powder designs'),
+  caseCapacity: msg('measured capacities'),
+  case: msg('brass groups'),
+  load: msg('loads'),
+  firearm: msg('firearms'),
+  session: msg('chronograph sessions'),
+  targetSheet: msg('target sheets'),
+  targetFaceDesign: msg('target designs'),
 }
 
+/** A line of the status, written when it is shown so that a change of language reaches it. */
+type Said = (tr: Translator) => string
+
+/** The setter of a status line: a state setter would call a `Said` as an update, so it is wrapped. */
+const lineSetter = (set: Dispatch<SetStateAction<Said | undefined>>) => (said?: Said) =>
+  set(said && (() => said))
+
+const shownLine = (said: Said | undefined, tr: Translator) => (said ? said(tr) : '')
+
+/** A line that is one fixed message. */
+const plain =
+  (text: Message): Said =>
+  ({ t }) =>
+    t(text)
+
 /** Shown when a manufacturer that came with a record could not be kept in the browser. */
-const noMaker =
-  'Its manufacturer could not be kept in this browser; Save still writes it into the file.'
+const noMaker = msg(
+  'Its manufacturer could not be kept in this browser; Save still writes it into the file.',
+)
+
+/** Said once the browser refuses persistent storage. */
+const noStorage = msg(
+  'The browser did not grant persistent storage and may clear its records; Export all keeps a copy.',
+)
 
 /** Kinds a share link carries: the designs and the workbench load. */
 const shareable: UserRecordKind[] = ['bullet', 'cartridge', 'load']
@@ -179,19 +204,6 @@ export interface FileMenuHandle {
 /** An item a page adds to the Open menu. */
 type FileMenuItem = { label: string; run: () => void }
 
-type Report = {
-  added: number
-  equal: number
-  skipped: { name: string; reason: string }[]
-  /** Warnings and fields not read of the files read. */
-  notes: { name: string; note: string }[]
-  conflicts: { incoming: UserRecord; stored: UserRecord }[]
-  /** The `invalid` entries of the files: stored as invalid records, left out for an id the browser has, or unstorable. */
-  invalid: { added: number; kept: number; unstorable: number }
-  /** Photos the files carry, stored with the records that are replaced. */
-  files: EmbeddedFile[]
-}
-
 /** The photos `records` point at, as file entries; the ones not in this browser are left out. */
 async function photosOf(records: UserRecord[]) {
   const blobs = await Promise.all(
@@ -201,12 +213,6 @@ async function photosOf(records: UserRecord[]) {
     })),
   )
   return embedFiles(blobs.filter((b): b is { id: string; blob: Blob } => b.blob !== undefined))
-}
-
-/** Keeps in this browser the photos of `records` that the file carries. */
-async function storePhotos(files: EmbeddedFile[], records: UserRecord[]) {
-  const wanted = new Set(photoIds(records))
-  for (const f of files) if (wanted.has(f.id)) await putPhoto(f.id, embeddedFileBlob(f))
 }
 
 /** The user manufacturer `record` names, as `carried` holds it, kept unless one of its id is stored; false when the store refused it. */
@@ -220,52 +226,60 @@ async function keepMakers(record: UserRecord, carried: UserRecord[]) {
 }
 
 /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
-async function refsOf(opened: UserRecord[]) {
+async function refsOf(opened: UserRecord[], t: Translator['t']) {
   const stored = await storedRecords().catch(() => undefined)
-  return stored ? refNote(opened, [builtIn, ...stored.records]) : ''
+  return stored ? refNote(opened, [builtIn, ...stored.records], t) : ''
 }
 
-const keptText: Record<string, string> = {
+const keptText: Record<string, Message | ''> = {
   blank: '',
-  saving: 'Saving in this browser',
-  failed: 'Not saved in this browser',
+  saving: msg('Saving in this browser'),
+  failed: msg('Not saved in this browser'),
 }
 
 /** The file state shown in the page bar. */
-function stateText({
-  saved,
-  dirty,
-  autosaved,
-  kept,
-  unsaved,
-}: {
-  saved: { file: string } | undefined
-  dirty: boolean
-  autosaved: string | undefined
-  kept: string | undefined
-  unsaved: boolean
-}) {
+function stateText(
+  {
+    saved,
+    dirty,
+    autosaved,
+    kept,
+    unsaved,
+  }: {
+    saved: { file: string } | undefined
+    dirty: boolean
+    autosaved: string | undefined
+    kept: string | undefined
+    unsaved: boolean
+  },
+  t: Translator['t'],
+) {
   if (saved) {
-    if (!dirty) return `Saved: ${saved.file}`
-    return autosaved ? `Changed since ${saved.file}` : `Unsaved changes (${saved.file})`
+    if (!dirty) return t('Saved: {file}', { file: saved.file })
+    return autosaved
+      ? t('Changed since {file}', { file: saved.file })
+      : t('Unsaved changes ({file})', { file: saved.file })
   }
   // an autosaved record is kept in the browser until a file is written
-  if (autosaved) return keptText[kept ?? ''] ?? 'Saved in this browser'
-  return unsaved ? 'Unsaved changes, not saved to a file' : 'Not saved to a file'
+  if (autosaved) return t(keptText[kept ?? ''] ?? msg('Saved in this browser'))
+  return unsaved ? t('Unsaved changes, not saved to a file') : t('Not saved to a file')
 }
 
 /** The question while it shows: a second way out asked meanwhile waits for the same answer. */
-function createLeave() {
+function createLeave(language: () => Translator['t']) {
   let leaving = false
   let asking: Promise<boolean> | undefined
   /** True once the user chose to leave; asked once. */
   const leave = () => {
     if (leaving) return Promise.resolve(true)
-    asking ??= ask('Leave this page? Changes not saved to a file are lost.', 'Leave').then((go) => {
-      leaving = go
-      asking = undefined
-      return go
-    })
+    const t = language()
+    asking ??= ask(t('Leave this page? Changes not saved to a file are lost.'), t('Leave')).then(
+      (go) => {
+        leaving = go
+        asking = undefined
+        return go
+      },
+    )
     return asking
   }
   return { leave, leaving: () => leaving, asking: () => asking !== undefined }
@@ -289,8 +303,8 @@ function leavingLink(e: MouseEvent) {
  * or replace, and a guard history entry with this URL, so Back and Forward ask too. Returns the
  * cleanup.
  */
-function guardLeaving(say: (message: string) => void) {
-  const { leave, leaving, asking } = createLeave()
+function guardLeaving(say: (said: Said) => void, language: () => Translator['t']) {
+  const { leave, leaving, asking } = createLeave(language)
   /** Set while a Back taken during the question is undone by a step forward. */
   let undoing = false
   const warn = (e: BeforeUnloadEvent) => e.preventDefault()
@@ -306,7 +320,7 @@ function guardLeaving(say: (message: string) => void) {
   const guard = { ...window.history.state, fileGuard: true }
   // the guard entry replaces the forward entries (Navigation API, Chromium; elsewhere unknown)
   if ((window as { navigation?: { canGoForward: boolean } }).navigation?.canGoForward)
-    say('Forward is not available while changes are not saved to a file.')
+    say(plain(msg('Forward is not available while changes are not saved to a file.')))
   window.history.pushState(guard, '', window.location.href)
   // through guardPop: runs before the router, which must not see a move off the guard entry
   const pop = (e: PopStateEvent) => {
@@ -324,7 +338,7 @@ function guardLeaving(say: (message: string) => void) {
     void leave().then((go) => {
       if (!go) {
         window.history.pushState(guard, '', window.location.href)
-        say('Stayed on this page to keep the changes not saved to a file.')
+        say(plain(msg('Stayed on this page to keep the changes not saved to a file.')))
         return
       }
       unpop()
@@ -350,39 +364,54 @@ interface SharedLink<K extends UserRecordKind> {
   unsaved: () => boolean
   open: (record: Of<K>) => void
   carry: (record: Of<K>, records: UserRecord[]) => void
-  say: (message: string) => void
-  fail: (message: string) => void
+  say: (said: Said) => void
+  fail: (said: Said) => void
 }
 
 /** A share link: the record in the fragment, validated, opened as unsaved work. */
-async function openSharedLink<K extends UserRecordKind>(kind: K, page: SharedLink<K>) {
+async function openSharedLink<K extends UserRecordKind>(
+  kind: K,
+  page: SharedLink<K>,
+  t: Translator['t'],
+) {
   const p = await readLink(window.location.hash)
   if (!p) return
   window.history.replaceState(window.history.state, '', window.location.href.split('#')[0])
-  if (!p.ok) return page.say(`Shared link not opened: ${p.reason}`)
+  if (!p.ok) {
+    const { reason } = p
+    return page.say(({ t }) =>
+      t('Shared link not opened: {reason}', { reason: reasonText(reason, t) }),
+    )
+  }
   const r = p.records.find((x): x is Of<K> => x.kind === kind)
-  if (!r) return page.say(`Shared link not opened: it holds no ${kindNames[kind]}.`)
+  if (!r)
+    return page.say(({ t }) =>
+      t('Shared link not opened: it holds no {kind}.', { kind: t(kindNames[kind]) }),
+    )
   if (
     page.unsaved() &&
-    !(await ask('Replace the unsaved changes with the shared record?', 'Replace'))
+    !(await ask(t('Replace the unsaved changes with the shared record?'), t('Replace')))
   )
     return
   const kept = await keepMakers(r, p.records)
   page.carry(r, p.records)
   page.open(r)
-  if (!kept) page.fail(noMaker)
+  if (!kept) page.fail(plain(noMaker))
 }
 
 /** A copy saved after this tab's one (another tab or window) is overwritten only on yes, asked once. */
-function newerGuard(known: () => string | undefined) {
+function newerGuard(known: () => string | undefined, t: Translator['t']) {
   let agreed = false
   return async (other: string | undefined) => {
     const mine = known()
     if (agreed || !mine || !other || other <= mine) return true
     agreed = await confirmDialog({
-      title: 'Overwrite the newer copy?',
-      message: `A newer copy of this record was saved at ${dateTimeText(new Date(other))} (another tab or window); this tab has the copy saved at ${dateTimeText(new Date(mine))}.`,
-      confirmLabel: 'Overwrite',
+      title: t('Overwrite the newer copy?'),
+      message: t(
+        'A newer copy of this record was saved at {other} (another tab or window); this tab has the copy saved at {mine}.',
+        { other: dateTimeText(new Date(other)), mine: dateTimeText(new Date(mine)) },
+      ),
+      confirmLabel: t('Overwrite'),
       danger: true,
     })
     return agreed
@@ -429,24 +458,39 @@ async function writeRecordFile(o: {
 async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
   const text = await read(file)
   const parsed: ParsedUserFile =
-    text === undefined ? { ok: false, reason: tooLargeMessage } : readLoadFile(text)
-  if (!parsed.ok) return { problem: `${file.name} not opened: ${parsed.reason}` }
+    text === undefined
+      ? { ok: false, reason: tooLargeMessage }
+      : readLoadFile(new TextEncoder().encode(text))
+  if (!parsed.ok) {
+    const { reason } = parsed
+    const problem: Said = ({ t }) =>
+      t('{file} not opened: {reason}', { file: file.name, reason: reasonText(reason, t) })
+    return { problem }
+  }
   const mine = parsed.records.filter((r): r is Of<K> => r.kind === kind)
   const [only] = mine
-  if (!only || mine.length !== 1)
-    return {
-      problem: `${file.name} holds ${mine.length} ${kindNames[kind]}; Open takes a file with one, Import takes collections.`,
-    }
+  if (!only || mine.length !== 1) {
+    const problem: Said = ({ t }) =>
+      t('{file} holds {count} {kind}; Open takes a file with one, Import takes collections.', {
+        file: file.name,
+        count: mine.length,
+        kind: t(kindNames[kind]),
+      })
+    return { problem }
+  }
   return { parsed, text, mine: only }
 }
 
 /** Stores the opened record and its photo in the browser; false when the user keeps the browser copy. */
-async function keepInBrowser(r: UserRecord, files: EmbeddedFile[]) {
+async function keepInBrowser(r: UserRecord, files: EmbeddedFile[], t: Translator['t']) {
   const stored = await storedRecord(r.id).catch(() => undefined)
   if (
     stored &&
     canonicalJson(stored.data) !== canonicalJson(r.data) &&
-    !(await ask(`Replace the browser copy of ${stored.name} with the one in the file?`, 'Replace'))
+    !(await ask(
+      t('Replace the browser copy of {name} with the one in the file?', { name: stored.name }),
+      t('Replace'),
+    ))
   )
     return false
   await storePhotos(files, [r])
@@ -454,92 +498,23 @@ async function keepInBrowser(r: UserRecord, files: EmbeddedFile[]) {
   return true
 }
 
-/** The sentences after an export: the photos left out for the size limit and the invalid records in it. */
-function exportNotes(records: UserRecord[], invalid: InvalidRecord[], left: string[]) {
-  const without = records.flatMap((s) =>
-    s.kind === 'targetSheet' && left.includes(s.data.photo ?? '') ? [s.name] : [],
-  )
-  const photos = without.length
-    ? ` Left out for the file size limit: the photos of ${without.join(', ')}. Save on a sheet keeps its photo.`
-    : ''
-  const raw = invalid.length
-    ? ` ${invalid.length} invalid ${invalid.length === 1 ? 'record is' : 'records are'} in it as stored.`
-    : ''
-  return `${raw}${photos}`
-}
-
-/** What an import reports to: the store hooks and the page's messages. */
-interface ImportIo {
-  onStored?: (() => void) | undefined
-  noteStorage: () => void
-  fail: (message: string) => void
-  show: (report: Report) => void
-}
-
-/** Reads and stores one file at a time, so several large files are not held at once. */
-async function importTexts(
-  files: { name: string; text: () => Promise<string | undefined> }[],
-  io: ImportIo,
-) {
-  const total: Report = {
-    added: 0,
-    equal: 0,
-    skipped: [],
-    notes: [],
-    conflicts: [],
-    invalid: { added: 0, kept: 0, unstorable: 0 },
-    files: [],
-  }
-  let count = 0
-  const added: UserRecord[] = []
-  for (const f of files) {
-    const {
-      records,
-      files: photos,
-      invalid,
-      skipped,
-      notes,
-    } = parseFiles([{ name: f.name, text: await f.text() }])
-    count += records.length
-    const plan = planImport(records, (await storedRecords()).records)
-    try {
-      // an equal record may come to a browser without its photo
-      await storePhotos(photos, [...plan.added, ...plan.equal])
-      await putRecords(plan.added)
-      // after the valid records, and never over a record with its id
-      const stored = await putInvalid(invalid)
-      for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
-    } catch (e) {
-      io.fail(`Import read ${count} records; the browser store write failed: ${errorText(e)}`)
-      if (total.added) io.onStored?.()
-      return
-    }
-    added.push(...plan.added)
-    total.added += plan.added.length
-    total.equal += plan.equal.length
-    total.skipped.push(...skipped)
-    total.notes.push(...notes)
-    total.conflicts.push(...plan.conflicts)
-    // kept for Replace: only the photos of the records it may store
-    const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
-    total.files.push(...photos.filter((p) => wanted.has(p.id)))
-  }
-  // once all files are stored, so a reference to a record of a later file resolves
-  const refs = await refsOf(added)
-  if (refs) total.notes.push({ name: 'References', note: refs })
-  io.onStored?.()
-  io.noteStorage()
-  io.show(total)
+/** The Import entry once a pick opened it. */
+function TablesPage({
+  tables,
+  ...props
+}: { tables: TablesEntry | undefined } & Omit<Parameters<typeof ImportEntry>[0], 'files'>) {
+  return tables ? <tables.Entry files={tables.files} {...props} /> : null
 }
 
 /** Restores the remembered workspace folder; says so when it was lost. */
 function restoreFolderInto(
   setFolder: (folder: { handle: FileSystemDirectoryHandle; allowed: boolean }) => void,
-  say: (message: string) => void,
+  say: (said: Said) => void,
 ) {
   restoreFolder()
     .then(async (h) => {
-      if (h === 'lost') say('The workspace folder could not be restored; choose it again.')
+      if (h === 'lost')
+        say(plain(msg('The workspace folder could not be restored; choose it again.')))
       else if (h) setFolder({ handle: h, allowed: await folderAllowed(h, false) })
     })
     .catch(() => {})
@@ -547,10 +522,11 @@ function restoreFolderInto(
 
 /** The Open menu's Examples section: the page's starting points. */
 function ExampleItems({ examples }: { examples: FileMenuItem[] | undefined }) {
+  const { t } = useTranslation()
   if (!examples || examples.length === 0) return null
   return (
     <>
-      <Menu.Label>Examples</Menu.Label>
+      <Menu.Label>{t('Examples')}</Menu.Label>
       {examples.map((x) => (
         <Menu.Item key={x.label} onClick={x.run}>
           {x.label}
@@ -603,8 +579,8 @@ const reportOption = (
       ]
 
 /** Runs `snapshot` once `filling` has settled, at once when it is no promise. */
-function settled(filling: unknown, snapshot: () => void, say: (message: string) => void) {
-  if (filling instanceof Promise) filling.finally(snapshot).catch((e) => say(errorText(e)))
+function settled(filling: unknown, snapshot: () => void, say: (said: Said) => void) {
+  if (filling instanceof Promise) filling.finally(snapshot).catch((e) => say(() => errorText(e)))
   else snapshot()
 }
 
@@ -614,23 +590,25 @@ function BrowserItems({
   onList,
 }: {
   shown: boolean
-  kind: string
+  kind: Message
   onList: () => void
 }) {
+  const { t } = useTranslation()
   if (!shown) return null
   return (
     <>
-      <Menu.Label>This browser</Menu.Label>
-      <Menu.Item onClick={onList}>Saved {kind}…</Menu.Item>
+      <Menu.Label>{t('This browser')}</Menu.Label>
+      <Menu.Item onClick={onList}>{t('Saved {kind}…', { kind: t(kind) })}</Menu.Item>
     </>
   )
 }
 
 function ApiItems({ onDownload, onCopy }: { onDownload: () => void; onCopy: () => void }) {
+  const { t } = useTranslation()
   return (
     <>
-      <Menu.Item onClick={onDownload}>Download for the API</Menu.Item>
-      <Menu.Item onClick={onCopy}>Copy JSON for the API</Menu.Item>
+      <Menu.Item onClick={onDownload}>{t('Download for the API')}</Menu.Item>
+      <Menu.Item onClick={onCopy}>{t('Copy JSON for the API')}</Menu.Item>
     </>
   )
 }
@@ -646,17 +624,20 @@ function FolderItems({
   onPick: () => void
   onForget: () => void
 }) {
+  const { t } = useTranslation()
   return (
     <>
       <Menu.Divider />
-      <Menu.Label>Workspace folder</Menu.Label>
+      <Menu.Label>{t('Workspace folder')}</Menu.Label>
       {folder && !folder.allowed && (
-        <Menu.Item onClick={onReconnect}>Reconnect folder {folder.handle.name}</Menu.Item>
+        <Menu.Item onClick={onReconnect}>
+          {t('Reconnect folder {name}', { name: folder.handle.name })}
+        </Menu.Item>
       )}
       <Menu.Item onClick={onPick}>
-        {folder ? 'Change workspace folder…' : 'Choose workspace folder…'}
+        {folder ? t('Change workspace folder…') : t('Choose workspace folder…')}
       </Menu.Item>
-      {folder && <Menu.Item onClick={onForget}>Forget workspace folder</Menu.Item>}
+      {folder && <Menu.Item onClick={onForget}>{t('Forget workspace folder')}</Menu.Item>}
     </>
   )
 }
@@ -682,13 +663,11 @@ function FileStatus({
   autosaved: string | undefined
   kept: string | undefined
 }) {
-  const folder = folderName ? `, folder ${folderName}` : ''
+  const { t } = useTranslation()
+  const folder = folderName ? t(', folder {name}', { name: folderName }) : ''
   const shown = !idle
   return (
-    <span
-      className="file-status"
-      title={[shown && `${state}${folder}`, lines, failure].filter(Boolean).join(' ')}
-    >
+    <span className="file-status">
       <span
         className="file-state"
         data-dirty={unsaved || (autosaved && kept === 'failed') || undefined}
@@ -718,25 +697,19 @@ function ImportReport({
   onClose: () => void
   onReplace: () => void
 }) {
-  const { invalid } = report
+  const tr = useTranslation()
+  const { t } = tr
+  const said = report.said(tr)
   return (
     <>
-      <p>
-        {report.added} records added, {report.equal} already in this browser,{' '}
-        {report.skipped.length} files skipped.
-      </p>
-      {invalid.added + invalid.kept + invalid.unstorable > 0 && (
-        <p>
-          {invalid.added} invalid {invalid.added === 1 ? 'record' : 'records'} restored
-          {invalid.kept > 0 && `, ${invalid.kept} left out because a browser record has their id`}
-          {invalid.unstorable > 0 && `, ${invalid.unstorable} left out without a text id`}.
-        </p>
-      )}
+      <p>{said.summary}</p>
+      {said.invalid && <p>{said.invalid}</p>}
       {report.skipped.length > 0 && (
         <ul className="file-skipped">
           {report.skipped.map((s) => (
             <li key={s.name}>
-              <strong>{s.name}</strong>: <span className="file-reason">{s.reason}</span>
+              <strong>{s.name}</strong>:{' '}
+              <span className="file-reason">{reasonText(s.reason, t)}</span>
             </li>
           ))}
         </ul>
@@ -750,21 +723,18 @@ function ImportReport({
           ))}
         </ul>
       )}
-      {report.conflicts.length > 0 ? (
+      {said.conflicts ? (
         <>
-          <p>
-            {report.conflicts.length} records have the id of a browser record with other content:{' '}
-            {report.conflicts.map((c) => c.stored.name).join(', ')}. Replace the browser copies?
-          </p>
+          <p>{said.conflicts}</p>
           <Group>
-            <Button onClick={onReplace}>Replace</Button>
+            <Button onClick={onReplace}>{t('Replace')}</Button>
             <Button variant="default" onClick={onClose}>
-              Keep browser copies
+              {t('Keep browser copies')}
             </Button>
           </Group>
         </>
       ) : (
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('Close')}</Button>
       )}
     </>
   )
@@ -779,13 +749,12 @@ function SavedList<R extends UserRecord>({
 }: {
   list: R[] | undefined
   /** The plural name of the kind. */
-  kind: string
+  kind: Message
   onUse: (record: R) => void
   onDelete: (record: R) => void
   onDeleteAll: () => void
 }) {
-  // the dates follow the language shown
-  useTranslation()
+  const { t } = useTranslation()
   return (
     <>
       {list?.length ? (
@@ -796,27 +765,31 @@ function SavedList<R extends UserRecord>({
                 {r.name}
               </Button>{' '}
               <span className="file-reason">
-                saved {dateTimeText(new Date(r.saved))}
-                {basedOnOf(r) && `, based on ${parseRef(basedOnOf(r) ?? '')?.id}`}
+                {basedOnOf(r)
+                  ? t('saved {date}, based on {name}', {
+                      date: dateTimeText(new Date(r.saved)),
+                      name: parseRef(basedOnOf(r) ?? '')?.id ?? '',
+                    })
+                  : t('saved {date}', { date: dateTimeText(new Date(r.saved)) })}
               </span>{' '}
               <Button
                 variant="subtle"
                 color="red"
                 size={controlSize.row.button}
-                aria-label={`Delete ${r.name}`}
+                aria-label={t('Delete {name}', { name: r.name })}
                 onClick={() => onDelete(r)}
               >
-                Delete
+                {t('Delete')}
               </Button>
             </li>
           ))}
         </ul>
       ) : (
-        <p>None yet; Save and Import keep records here.</p>
+        <p>{t('None yet; Save and Import keep records here.')}</p>
       )}
       {list && list.length > 0 && (
         <Button variant="default" color="red" onClick={onDeleteAll}>
-          Delete all {kind}…
+          {t('Delete all {kind}…', { kind: t(kind) })}
         </Button>
       )}
     </>
@@ -824,9 +797,10 @@ function SavedList<R extends UserRecord>({
 }
 
 function InvalidItem({ record: r, onDelete }: { record: InvalidRecord; onDelete: () => void }) {
+  const { t } = useTranslation()
   return (
     <li>
-      <strong>{r.name ?? r.id ?? 'Unnamed record'}</strong>{' '}
+      <strong>{r.name ?? r.id ?? t('Unnamed record')}</strong>{' '}
       <span className="file-reason">{[r.kind, r.id].filter(Boolean).join(', ')}</span>{' '}
       <Button
         variant="subtle"
@@ -838,10 +812,10 @@ function InvalidItem({ record: r, onDelete }: { record: InvalidRecord; onDelete:
           )
         }
       >
-        Download raw
+        {t('Download raw')}
       </Button>{' '}
       <Button variant="subtle" color="red" size={controlSize.row.button} onClick={onDelete}>
-        Delete
+        {t('Delete')}
       </Button>
       <pre className="file-error">{r.error}</pre>
     </li>
@@ -934,27 +908,34 @@ function FileMenuOf<K extends UserRecordKind>({
   /** The record's saved time as this tab last opened or saved it. */
   const known = useRef<string | undefined>(undefined)
   const [saved, setSaved] = useState<{ file: string; json: string }>()
-  const [message, setMessage] = useState('')
-  /** A failure, announced as an alert. */
-  const [failure, setFailure] = useState('')
+  const tr = useTranslation()
+  const { t } = tr
+  /** The status line and the failure (announced as an alert), written in the language shown. */
+  const [lineSaid, setLineSaid] = useState<Said>()
+  const [failureSaid, setFailureSaid] = useState<Said>()
+  const setMessage = lineSetter(setLineSaid)
+  const setFailure = lineSetter(setFailureSaid)
+  const message = shownLine(lineSaid, tr)
+  const failure = shownLine(failureSaid, tr)
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
   const [report, setReport] = useState<Report>()
+  const [tables, setTables] = useState<TablesEntry>()
   const [list, setList] = useState<Of<K>[]>()
   /** The invalid browser records the Open menu last found, and the open list of them. */
   const [invalidCount, setInvalidCount] = useState(0)
   const [invalidList, setInvalidList] = useState<InvalidRecord[]>()
   /** Text to copy by hand where the clipboard refused it. */
-  const [copyText, setCopyText] = useState<{ title: string; text: string }>()
+  const [copyText, setCopyText] = useState<{ title: Message; text: string }>()
   const [pasted, setPasted] = useState<string>()
   /** Said once the browser refuses persistent storage. */
-  const [storageNote, setStorageNote] = useState('')
+  const [storageNote, setStorageNote] = useState(false)
 
   // read after hydration: the server has no window
   const [folderApi, setFolderApi] = useState(false)
   useEffect(() => {
     if (!canPickFolder()) return
     setFolderApi(true)
-    restoreFolderInto(setFolder, setMessage)
+    restoreFolderInto(setFolder, lineSetter(setLineSaid))
   }, [])
 
   const named = nameKey !== undefined
@@ -969,17 +950,17 @@ function FileMenuOf<K extends UserRecordKind>({
   const unsaved = isUnsaved(autosaved, saved ? dirty : undefined, initial.current, now)
   // Save and Open file of the menu, for a page's own commands (the workbench search)
   const commands = {
-    save: () => act('Save', () => save(false))(),
-    openFile: () => act('Open', open)(),
+    save: () => act(msg('Save failed: {error}'), () => save(false))(),
+    openFile: () => act(msg('Open failed: {error}'), open)(),
   }
   useShortcuts({
     save: commands.save,
-    saveAs: () => act('Save as', () => save(true))(),
+    saveAs: () => act(msg('Save as failed: {error}'), () => save(true))(),
     open: commands.openFile,
   })
   const keyNow = (d: unknown) => keyOf(d, nameKey ?? '')
-  const latest = useRef({ unsaved, now, saved, use, openShared, keyNow, ...commands })
-  latest.current = { unsaved, now, saved, use, openShared, keyNow, ...commands }
+  const latest = useRef({ unsaved, now, saved, use, openShared, keyNow, t, ...commands })
+  latest.current = { unsaved, now, saved, use, openShared, keyNow, t, ...commands }
   const unsavedCallback = useRef(onUnsaved)
   unsavedCallback.current = onUnsaved
   useEffect(() => unsavedCallback.current?.(unsaved), [unsaved])
@@ -999,15 +980,19 @@ function FileMenuOf<K extends UserRecordKind>({
   useEffect(() => {
     if (!shareable.includes(kind)) return
     const read = () =>
-      openSharedLink(kind, {
-        unsaved: () => latest.current.unsaved,
-        open: (r) => latest.current.openShared(r),
-        carry: (r, records) => {
-          carriedMakers.current = makerRecordsOf(r, records)
+      openSharedLink(
+        kind,
+        {
+          unsaved: () => latest.current.unsaved,
+          open: (r) => latest.current.openShared(r),
+          carry: (r, records) => {
+            carriedMakers.current = makerRecordsOf(r, records)
+          },
+          say: setMessage,
+          fail: setFailure,
         },
-        say: setMessage,
-        fail: setFailure,
-      }).catch(() => {})
+        latest.current.t,
+      ).catch(() => {})
     void read()
     window.addEventListener('hashchange', read)
     return () => window.removeEventListener('hashchange', read)
@@ -1040,11 +1025,12 @@ function FileMenuOf<K extends UserRecordKind>({
           const filling = then?.()
           const snapshot = () => setStarted((n) => n + 1)
           // a `then` that returns a promise (records still loading) is snapshot once it settles
-          if (next === undefined) settled(filling, snapshot, setMessage)
+          if (next === undefined) settled(filling, snapshot, lineSetter(setLineSaid))
           return true as const
         }
         if (!latest.current.unsaved) return start()
-        return ask('Discard the unsaved changes and start a new record?', 'Discard').then(
+        const { t } = latest.current
+        return ask(t('Discard the unsaved changes and start a new record?'), t('Discard')).then(
           (yes) => yes && start(),
         )
       },
@@ -1066,7 +1052,7 @@ function FileMenuOf<K extends UserRecordKind>({
         known.current = state.known
         setSaved(state.saved)
         initial.current = state.initial
-        setMessage('')
+        setLineSaid(undefined)
         setStarted((n) => n + 1)
       },
       rename: (to) => setSaved((s) => s && { ...s, json: renamedKey(s.json, to) }),
@@ -1076,14 +1062,17 @@ function FileMenuOf<K extends UserRecordKind>({
 
   // unsaved work: the browser's leave-page prompt, a question before an in-app link or a router
   // push or replace, and a guard history entry with this URL, so Back and Forward ask too
-  useEffect(() => (unsaved ? guardLeaving(setMessage) : undefined), [unsaved])
+  useEffect(
+    () => (unsaved ? guardLeaving(lineSetter(setLineSaid), () => latest.current.t) : undefined),
+    [unsaved],
+  )
 
   // an autosaved record is kept in the browser until a file is written
-  const state = stateText({ saved, dirty, autosaved, kept, unsaved })
+  const state = stateText({ saved, dirty, autosaved, kept, unsaved }, t)
   const ready = folder?.allowed ? folder.handle : undefined
-  // in a page bar the state and messages are its status line: one line, the whole text on hover
+  // in a page bar the state and messages are its status line: one line, the whole text in its tooltip
   const bar = useContext(BarStatus)
-  const lines = [message, note, storageNote].filter(Boolean).join(' ')
+  const lines = [message, note, storageNote && t(noStorage)].filter(Boolean).join(' ')
   const status = (
     <FileStatus
       idle={idle}
@@ -1097,17 +1086,17 @@ function FileMenuOf<K extends UserRecordKind>({
     />
   )
 
-  /** Runs a file action; a failure is shown, not thrown. */
-  const act = (what: string, f: () => Promise<void>) => () => {
-    setMessage('')
-    setFailure('')
-    f().catch((e: unknown) => setFailure(`${what} failed: ${errorText(e)}`))
+  /** Runs a file action; a failure is shown (`failed` is its message with `{error}`), not thrown. */
+  const act = (failed: Message, f: () => Promise<void>) => () => {
+    setMessage()
+    setFailure()
+    f().catch((e: unknown) => setFailure(({ t }) => t(failed, { error: errorText(e) })))
   }
 
   /** The record to write and its checked file text; undefined after showing why not. */
   async function prepareSave(as: boolean) {
     if (problem) {
-      setFailure(`Not saved: ${problem}`)
+      setFailure(({ t }) => t('Not saved: {reason}', { reason: problem }))
       return
     }
     const recordId = as || !id.current ? newId() : id.current
@@ -1115,7 +1104,8 @@ function FileMenuOf<K extends UserRecordKind>({
     // a file Open and Import would reject is not written
     const checked = checkedUserDataText(await withMakers(record), await photosOf([record]))
     if (!checked.ok) {
-      setFailure(`Not saved: ${checked.reason}`)
+      const { reason } = checked
+      setFailure(({ t }) => t('Not saved: {reason}', { reason: reasonText(reason, t) }))
       return
     }
     return { recordId, record, text: checked.text }
@@ -1123,7 +1113,7 @@ function FileMenuOf<K extends UserRecordKind>({
 
   /** Writes the file of a prepared save; undefined when none was written (a newer copy kept, or no file picked). */
   async function writeSave(as: boolean, { recordId, text }: { recordId: string; text: string }) {
-    const allow = newerGuard(() => known.current)
+    const allow = newerGuard(() => known.current, t)
     // a failed read leaves the check to the file; the write reports the browser store failure; an
     // autosaved record's browser copy is this page's own
     const stored = !as && !autosaved && (await storedRecord(recordId).catch(() => undefined))
@@ -1159,7 +1149,7 @@ function FileMenuOf<K extends UserRecordKind>({
   }
 
   function keptNewer() {
-    setMessage('Not saved: a newer copy was kept.')
+    setMessage(plain(msg('Not saved: a newer copy was kept.')))
   }
 
   /** The browser's copy of a saved record; a failure is shown, the file stays written. */
@@ -1169,7 +1159,9 @@ function FileMenuOf<K extends UserRecordKind>({
       if (!store || (await store(record))) onStored?.()
       void noteStorage()
     } catch (e) {
-      setFailure(`Saved to ${file}; the browser copy failed: ${errorText(e)}`)
+      setFailure(({ t }) =>
+        t('Saved to {file}; the browser copy failed: {error}', { file, error: errorText(e) }),
+      )
     }
   }
 
@@ -1182,22 +1174,26 @@ function FileMenuOf<K extends UserRecordKind>({
     setSaved(undefined)
     // not the canonical text of any record: the shared record counts as unsaved work
     initial.current = ''
-    setMessage(`Opened the shared ${record.name}; Save keeps it.`)
+    setMessage(({ t }) => t('Opened the shared {name}; Save keeps it.', { name: record.name }))
   }
 
   /** States once when the browser refuses persistent storage after a write. */
   const noteStorage = () =>
     requestPersistentStorage().then((ok) => {
-      if (!ok)
-        setStorageNote(
-          'The browser did not grant persistent storage and may clear its records; Export all keeps a copy.',
-        )
+      if (!ok) setStorageNote(true)
     })
 
-  async function copy(text: string, what: string) {
+  async function copy(text: string, what: Message) {
     try {
       await navigator.clipboard.writeText(text)
-      setMessage(`${what} copied (${text.length} characters).`)
+      setMessage(({ t, tn }) =>
+        tn(
+          text.length,
+          '{what} copied ({count} character).',
+          '{what} copied ({count} characters).',
+          { what: t(what) },
+        ),
+      )
     } catch {
       setCopyText({ title: what, text })
     }
@@ -1208,31 +1204,34 @@ function FileMenuOf<K extends UserRecordKind>({
   useReportOptions(reportOption(reportBox, problem, async () => withMakers(current())))
 
   async function share() {
-    if (problem) return setFailure(`Not shared: ${problem}`)
+    if (problem) return setFailure(({ t }) => t('Not shared: {reason}', { reason: problem }))
     const refused = shareProblem(current())
-    if (refused) return setFailure(`Not shared: ${refused}`)
+    if (refused)
+      return setFailure(({ t }) => t('Not shared: {reason}', { reason: reasonText(refused, t) }))
     const page = window.location.origin + window.location.pathname
     const link = await shareLink(await withMakers(current()), page)
-    if (!link)
-      return setFailure(
-        `Not shared: the link would be longer than ${maxLinkChars} characters; save the record to a file instead.`,
-      )
-    await copy(link, 'Share link')
+    if (!link) return setFailure(({ t }) => tooLongText(kind, t))
+    await copy(link, msg('Share link'))
   }
 
   /** The text of the file for the API, none (and the reason shown) when the record cannot be written. */
   function apiText() {
     if (problem || !apiData) {
-      setFailure(`Not written: ${problem ?? 'nothing to write'}`)
+      setFailure(({ t }) =>
+        problem
+          ? t('Not written: {reason}', { reason: problem })
+          : t('Not written: nothing to write'),
+      )
       return
     }
     const checked = checkedUserDataText([{ ...current(), data: apiData }])
     if (checked.ok) return checked.text
-    setFailure(`Not written: ${checked.reason}`)
+    const { reason } = checked
+    setFailure(({ t }) => t('Not written: {reason}', { reason: reasonText(reason, t) }))
   }
 
   async function remove(records: Of<K>[], question: string) {
-    if (!records.length || !(await ask(question, 'Delete'))) return
+    if (!records.length || !(await ask(question, t('Delete')))) return
     await deleteRecords(records.map((r) => r.id))
     onStored?.()
     setList((l) => l?.filter((r) => !records.includes(r)))
@@ -1243,8 +1242,16 @@ function FileMenuOf<K extends UserRecordKind>({
       initial.current = ''
       known.current = undefined
     }
-    setMessage(
-      `Deleted ${records.length === 1 ? records[0]?.name : `${records.length} ${kindNames[kind]}`} from this browser; ${only ? 'the page keeps the shown record as unsaved work' : 'the page and saved files keep their copies'}.`,
+    setMessage(({ t }) =>
+      t('Deleted {what} from this browser; {rest}.', {
+        what:
+          records.length === 1
+            ? (records[0]?.name ?? '')
+            : t('{count} {kind}', { count: records.length, kind: t(kindNames[kind]) }),
+        rest: only
+          ? t('the page keeps the shown record as unsaved work')
+          : t('the page and saved files keep their copies'),
+      }),
     )
   }
 
@@ -1253,16 +1260,19 @@ function FileMenuOf<K extends UserRecordKind>({
     // Skip export (or Escape) goes on to the delete question, where Cancel keeps everything
     if (
       (await confirmDialog({
-        title: 'Export all records of this browser to a file before deleting?',
-        confirmLabel: 'Export first',
-        cancelLabel: 'Skip export',
+        title: t('Export all records of this browser to a file before deleting?'),
+        confirmLabel: t('Export first'),
+        cancelLabel: t('Skip export'),
       })) &&
       !(await exportAll())
     )
-      return setMessage('Not deleted: the export was not saved.')
+      return setMessage(plain(msg('Not deleted: the export was not saved.')))
     await remove(
       list,
-      `Delete all ${list.length} ${kindNames[kind]} from this browser? This cannot be undone.`,
+      t('Delete all {count} {kind} from this browser? This cannot be undone.', {
+        count: list.length,
+        kind: t(kindNames[kind]),
+      }),
     )
   }
 
@@ -1295,18 +1305,21 @@ function FileMenuOf<K extends UserRecordKind>({
     fileNote?: string,
     carried: UserRecord[] = [],
   ) {
-    if (unsaved && !(await ask('Replace the unsaved changes with the opened record?', 'Replace')))
+    if (
+      unsaved &&
+      !(await ask(t('Replace the unsaved changes with the opened record?'), t('Replace')))
+    )
       return false
     const kept = await keepMakers(record, carried)
     carriedMakers.current = makerRecordsOf(record, carried)
-    const note = kept ? fileNote : [fileNote, noMaker].filter(Boolean).join(' ')
+    const note = kept ? fileNote : [fileNote, t(noMaker)].filter(Boolean).join(' ')
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = record.id
     handle.current = opened
     known.current = record.saved
     setSaved({ file, json: keyOf(record.data, record.name) })
-    const text = [note, await refsOf([record])].filter(Boolean).join(' ')
-    if (text) setMessage(`${file} opened. ${text}`)
+    const text = [note, await refsOf([record], t)].filter(Boolean).join(' ')
+    if (text) setMessage(({ t }) => t('{file} opened. {text}', { file, text }))
     return true
   }
 
@@ -1314,14 +1327,14 @@ function FileMenuOf<K extends UserRecordKind>({
     const [picked] = await pickFiles(false, ready)
     if (!picked) return
     const opened = await readOpened(picked.file, kind)
-    if (opened.problem !== undefined) {
+    if ('problem' in opened) {
       setMessage(opened.problem)
       return
     }
     const { parsed, text, mine } = opened
     // kept in the browser at once, with its photo, as the page keeps every change
     if (autosaved) {
-      if (!(await keepInBrowser(mine, parsed.files ?? []))) return
+      if (!(await keepInBrowser(mine, parsed.files ?? [], t))) return
       onStored?.()
     }
     // Save writes back only to a file of this record alone
@@ -1329,7 +1342,7 @@ function FileMenuOf<K extends UserRecordKind>({
       mine,
       picked.file.name,
       ownsFile(text, mine.id) ? picked.handle : undefined,
-      readNote(parsed),
+      readNote(parsed, t),
       parsed.records,
     )
   }
@@ -1338,39 +1351,65 @@ function FileMenuOf<K extends UserRecordKind>({
   async function exportAll() {
     const { records, invalid } = await storedRecords()
     if (!records.length && !invalid.length) {
-      setMessage('No records in this browser yet; Save keeps a record here.')
+      setMessage(plain(msg('No records in this browser yet; Save keeps a record here.')))
       return false
     }
+    // a plain import() like the data file import's: Export all is one click of the menu
+    const { exportAllText, exportNotes } = await import('../lib/data-files.ts')
     const checked = exportAllText(records, await photosOf(records), invalid)
     if (!checked.ok) {
-      setFailure(`Not exported: ${checked.reason}`)
+      const { reason } = checked
+      setFailure(({ t }) => t('Not exported: {reason}', { reason: reasonText(reason, t) }))
       return false
     }
     const day = localDay(new Date())
     const r = await saveAs(checked.text, `openreloading-data-${day}.json`, ready)
     if (r) {
-      setMessage(
-        `Exported ${records.length} records to ${r.name}.${exportNotes(records, invalid, checked.left)}`,
-      )
+      setMessage(({ t, tn }) => {
+        const notes = exportNotes(records, invalid, checked.left, t, tn)
+        return tn(
+          records.length,
+          'Exported {count} record to {file}. {notes}',
+          'Exported {count} records to {file}. {notes}',
+          { file: r.name, notes },
+        ).trimEnd()
+      })
       onExported?.()
     }
     return r !== undefined
   }
 
-  const importIo = {
-    onStored,
-    noteStorage: () => void noteStorage(),
-    fail: setFailure,
-    show: setReport,
+  // a plain import() like the Import entry's: the data file import runs only after a pick or a paste
+  async function importTexts(files: ImportFile[]) {
+    await (await import('../lib/data-files.ts')).importTexts(
+      files,
+      {
+        onStored,
+        noteStorage: () => void noteStorage(),
+        fail: setFailure,
+        show: setReport,
+        refs: (added) => refsOf(added, t),
+      },
+      tr,
+    )
   }
 
-  async function importFiles() {
-    const picked = await pickFiles(true, ready)
-    if (!picked.length) return
-    await importTexts(
-      picked.map(({ file }) => ({ name: file.name, text: () => read(file) })),
-      importIo,
+  const importData = (files: File[]) =>
+    importTexts(
+      files.map((file) => ({
+        name: file.name,
+        read: async () =>
+          file.size > maxFileBytes ? undefined : new Uint8Array(await file.arrayBuffer()),
+      })),
     )
+
+  async function importFiles() {
+    const picked = await pickFiles(true, ready, [...loadFileFormats, ...tableFormats])
+    if (!picked.length) return
+    // a plain import() after the pick: the picker needs the click's activation, and next/dynamic
+    // would count the Import entry in the weight of every route with a File menu
+    const { routeImport } = await import('./import-entry.tsx')
+    await routeImport(picked, setTables, importData)
   }
 
   async function replace() {
@@ -1388,8 +1427,14 @@ function FileMenuOf<K extends UserRecordKind>({
     for (const p of left) deletePhoto(p).catch(() => {})
     onStored?.()
     setReport(undefined)
-    setMessage(
-      `Replaced ${report.conflicts.length} browser records. ${await refsOf(incoming)}`.trimEnd(),
+    const refs = await refsOf(incoming, t)
+    setMessage(({ tn }) =>
+      tn(
+        report.conflicts.length,
+        'Replaced {count} browser record. {refs}',
+        'Replaced {count} browser records. {refs}',
+        { refs },
+      ).trimEnd(),
     )
   }
 
@@ -1407,11 +1452,11 @@ function FileMenuOf<K extends UserRecordKind>({
   }
 
   async function removeInvalid(r: InvalidRecord) {
-    const label = r.name ?? r.id ?? 'Unnamed record'
+    const label = r.name ?? r.id ?? t('Unnamed record')
     if (
       !(await ask(
-        `Delete the invalid record ${label} from this browser? This cannot be undone.`,
-        'Delete',
+        t('Delete the invalid record {label} from this browser? This cannot be undone.', { label }),
+        t('Delete'),
       ))
     )
       return
@@ -1422,7 +1467,7 @@ function FileMenuOf<K extends UserRecordKind>({
     if (photo && !(await storedPhotoIds()).has(photo)) deletePhoto(photo).catch(() => {})
     setInvalidList((l) => l?.filter((i) => i !== r))
     setInvalidCount((n) => n - 1)
-    setMessage(`Deleted the invalid record ${label} from this browser.`)
+    setMessage(({ t }) => t('Deleted the invalid record {label} from this browser.', { label }))
   }
 
   async function pickFolder() {
@@ -1440,14 +1485,14 @@ function FileMenuOf<K extends UserRecordKind>({
     const text = apiText()
     if (text !== undefined) {
       download(new Blob([text], { type: 'application/json' }), recordFileName(`${name} api`))
-      setMessage('Downloaded the load file for the API.')
+      setMessage(plain(msg('Downloaded the load file for the API.')))
     }
     return Promise.resolve()
   }
 
   async function copyApi() {
     const text = apiText()
-    if (text !== undefined) await copy(text, 'Load file for the API')
+    if (text !== undefined) await copy(text, msg('Load file for the API'))
   }
 
   async function reconnect() {
@@ -1465,26 +1510,28 @@ function FileMenuOf<K extends UserRecordKind>({
             leftSection={<FolderOpen aria-hidden="true" />}
             rightSection={<CaretDown size={12} aria-hidden="true" />}
           >
-            Open
+            {t('Open')}
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
           <BrowserItems
             shown={Boolean(onList || browserList || !autosaved)}
             kind={kindNames[kind]}
-            onList={onList ?? act('Listing', browserRecords)}
+            onList={onList ?? act(msg('Listing failed: {error}'), browserRecords)}
           />
           {invalidCount > 0 && (
-            <Menu.Item onClick={act('Listing', invalidRecords)}>
-              Invalid records ({invalidCount})…
+            <Menu.Item onClick={act(msg('Listing failed: {error}'), invalidRecords)}>
+              {t('Invalid records ({count})…', { count: invalidCount })}
             </Menu.Item>
           )}
-          <Menu.Label>File</Menu.Label>
-          <Menu.Item onClick={act('Open', open)} {...keyed('open')}>
-            Open file…
+          <Menu.Label>{t('File')}</Menu.Label>
+          <Menu.Item onClick={act(msg('Open failed: {error}'), open)} {...keyed('open')}>
+            {t('Open file…')}
           </Menu.Item>
-          <Menu.Item onClick={act('Import', importFiles)}>Import…</Menu.Item>
-          <Menu.Item onClick={() => setPasted('')}>Paste JSON…</Menu.Item>
+          <Menu.Item onClick={act(msg('Import failed: {error}'), importFiles)}>
+            {t('Import…')}
+          </Menu.Item>
+          <Menu.Item onClick={() => setPasted('')}>{t('Paste JSON…')}</Menu.Item>
           <ExampleItems examples={examples} />
         </Menu.Dropdown>
       </Menu>
@@ -1493,67 +1540,88 @@ function FileMenuOf<K extends UserRecordKind>({
           variant="default"
           leftSection={<FloppyDisk aria-hidden="true" />}
           onClick={commands.save}
-          title={`Save (${shortcutLabel('save')})`}
+          title={t('Save ({shortcut})', { shortcut: shortcutLabel('save') })}
           aria-keyshortcuts={shortcutAriaKeys('save')}
         >
-          Save
+          {t('Save')}
         </Button>
         <Menu position="bottom-end" withInitialFocusPlaceholder={false}>
           <Menu.Target>
-            <Button variant="default" className="save-more" aria-label="Save options">
+            <Button variant="default" className="save-more" aria-label={t('Save options')}>
               <CaretDown size={12} aria-hidden="true" />
             </Button>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item onClick={act('Save as', () => save(true))} {...keyed('saveAs')}>
-              Save as…
+            <Menu.Item
+              onClick={act(msg('Save as failed: {error}'), () => save(true))}
+              {...keyed('saveAs')}
+            >
+              {t('Save as…')}
             </Menu.Item>
             {shareable.includes(kind) && (
-              <Menu.Item onClick={act('Share', share)}>Copy share link</Menu.Item>
+              <Menu.Item onClick={act(msg('Share failed: {error}'), share)}>
+                {t('Copy share link')}
+              </Menu.Item>
             )}
             <Menu.Item
-              onClick={act('Copy', async () =>
-                copy(userDataText(await withMakers(current())), 'Record JSON'),
+              onClick={act(msg('Copy failed: {error}'), async () =>
+                copy(userDataText(await withMakers(current())), msg('Record JSON')),
               )}
             >
-              Copy JSON
+              {t('Copy JSON')}
             </Menu.Item>
             {apiData && (
-              <ApiItems onDownload={act('Download', downloadApi)} onCopy={act('Copy', copyApi)} />
+              <ApiItems
+                onDownload={act(msg('Download failed: {error}'), downloadApi)}
+                onCopy={act(msg('Copy failed: {error}'), copyApi)}
+              />
             )}
             <Menu.Divider />
             <Menu.Item
-              onClick={act('Export', async () => {
+              onClick={act(msg('Export failed: {error}'), async () => {
                 await exportAll()
               })}
             >
-              Export all…
+              {t('Export all…')}
             </Menu.Item>
             {folderApi && (
               <FolderItems
                 folder={folder}
-                onReconnect={act('Reconnect', reconnect)}
-                onPick={act('Folder', pickFolder)}
-                onForget={act('Forget', forget)}
+                onReconnect={act(msg('Reconnect failed: {error}'), reconnect)}
+                onPick={act(msg('Choosing the folder failed: {error}'), pickFolder)}
+                onForget={act(msg('Forget failed: {error}'), forget)}
               />
             )}
           </Menu.Dropdown>
         </Menu>
       </Button.Group>
       {inBar(bar, status)}
-      <AppModal opened={report !== undefined} onClose={() => setReport(undefined)} title="Import">
+      <TablesPage
+        tables={tables}
+        io={{
+          importData: (files) => act(msg('Import failed: {error}'), () => importData(files))(),
+          onStored,
+          noteStorage: () => void noteStorage(),
+        }}
+        onClose={() => setTables(undefined)}
+      />
+      <AppModal
+        opened={report !== undefined}
+        onClose={() => setReport(undefined)}
+        title={t('Import')}
+      >
         {report && (
           <ImportReport
             report={report}
             onClose={() => setReport(undefined)}
-            onReplace={act('Replace', replace)}
+            onReplace={act(msg('Replace failed: {error}'), replace)}
           />
         )}
       </AppModal>
       <AppModal
         opened={list !== undefined}
         onClose={() => setList(undefined)}
-        title={`Saved ${kindNames[kind]} in this browser`}
+        title={t('Saved {kind} in this browser', { kind: t(kindNames[kind]) })}
       >
         <SavedList
           list={list}
@@ -1562,28 +1630,32 @@ function FileMenuOf<K extends UserRecordKind>({
             if (await use(r, `${r.name} (browser)`)) setList(undefined)
           }}
           onDelete={(r) =>
-            act('Delete', () =>
-              remove([r], `Delete ${r.name} from this browser? This cannot be undone.`),
+            act(msg('Delete failed: {error}'), () =>
+              remove(
+                [r],
+                t('Delete {name} from this browser? This cannot be undone.', { name: r.name }),
+              ),
             )()
           }
-          onDeleteAll={act('Delete all', removeAll)}
+          onDeleteAll={act(msg('Delete all failed: {error}'), removeAll)}
         />
       </AppModal>
       <AppModal
         opened={invalidList !== undefined}
         onClose={() => setInvalidList(undefined)}
-        title="Invalid records in this browser"
+        title={t('Invalid records in this browser')}
       >
         <p>
-          These records do not pass the current format. They stay in this browser, are not shown
-          elsewhere and are in Export all as stored, which Import restores as invalid records.
+          {t(
+            'These records do not pass the current format. They stay in this browser, are not shown elsewhere and are in Export all as stored, which Import restores as invalid records.',
+          )}
         </p>
         <ul className="file-records">
           {invalidList?.map((r) => (
             <InvalidItem
               key={String((r.raw as { id?: unknown } | null)?.id)}
               record={r}
-              onDelete={act('Delete', () => removeInvalid(r))}
+              onDelete={act(msg('Delete failed: {error}'), () => removeInvalid(r))}
             />
           ))}
         </ul>
@@ -1591,10 +1663,10 @@ function FileMenuOf<K extends UserRecordKind>({
       <AppModal
         opened={copyText !== undefined}
         onClose={() => setCopyText(undefined)}
-        title={`${copyText?.title ?? ''}: copy it by hand`}
+        title={t('{what}: copy it by hand', { what: copyText ? t(copyText.title) : '' })}
       >
         <Textarea
-          label="The clipboard is not available here"
+          label={t('The clipboard is not available here')}
           readOnly
           autosize
           maxRows={10}
@@ -1605,11 +1677,11 @@ function FileMenuOf<K extends UserRecordKind>({
       <AppModal
         opened={pasted !== undefined}
         onClose={() => setPasted(undefined)}
-        title="Paste JSON"
+        title={t('Paste JSON')}
       >
         <Textarea
-          label="User data file text"
-          description="Checked as Import checks a file."
+          label={t('User data file text')}
+          description={t('Checked as Import checks a file.')}
           autosize
           minRows={4}
           maxRows={12}
@@ -1619,13 +1691,15 @@ function FileMenuOf<K extends UserRecordKind>({
         <Group mt="sm">
           <Button
             disabled={!pasted?.trim()}
-            onClick={act('Paste', async () => {
+            onClick={act(msg('Paste failed: {error}'), async () => {
               const text = pasted ?? ''
               setPasted(undefined)
-              await importTexts([{ name: 'Pasted text', text: async () => text }], importIo)
+              await importTexts([
+                { name: t('Pasted text'), read: async () => new TextEncoder().encode(text) },
+              ])
             })}
           >
-            Import
+            {t('Import')}
           </Button>
         </Group>
       </AppModal>
@@ -1635,6 +1709,7 @@ function FileMenuOf<K extends UserRecordKind>({
 
 /** Open and Save disabled, in their place until a page's record exists. */
 export function FileMenuPlaceholder() {
+  const { t } = useTranslation()
   return (
     <Group gap="xs" className="file-menu">
       <Button
@@ -1643,13 +1718,13 @@ export function FileMenuPlaceholder() {
         leftSection={<FolderOpen aria-hidden="true" />}
         rightSection={<CaretDown size={12} aria-hidden="true" />}
       >
-        Open
+        {t('Open')}
       </Button>
       <Button.Group className="save-group">
         <Button variant="default" disabled leftSection={<FloppyDisk aria-hidden="true" />}>
-          Save
+          {t('Save')}
         </Button>
-        <Button variant="default" disabled className="save-more" aria-label="Save options">
+        <Button variant="default" disabled className="save-more" aria-label={t('Save options')}>
           <CaretDown size={12} aria-hidden="true" />
         </Button>
       </Button.Group>

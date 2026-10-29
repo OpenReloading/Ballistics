@@ -38,7 +38,12 @@ import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-typ
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
-import { renamedCasePath, type UsedWater, usedWater } from '../lib/case-capacity.ts'
+import {
+  measuredWaterCapacitySpec,
+  renamedCasePath,
+  type UsedWater,
+  usedWater,
+} from '../lib/case-capacity.ts'
 import type { OwnCase } from '../lib/case-group.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
@@ -48,6 +53,7 @@ import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
+import { controlSize } from '../lib/theme.ts'
 import { trailing } from '../lib/trailing.ts'
 import {
   drawingLengthUnit,
@@ -70,7 +76,6 @@ import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
-import { measuredWaterCapacitySpec } from './workbench-inputs.tsx'
 import { notReached } from './workbench-outcome.ts'
 
 type Load<T> =
@@ -286,6 +291,8 @@ type PreviewProps = {
   /** The case record chosen, held by the page so a load keeps it: its stated capacity is the default of the capacity. */
   caseId?: string | undefined
   onCaseId?: (id: string | undefined) => void
+  /** The field of the case lot, after the case record choice in the `choices` slot. */
+  caseLot?: ReactNode
   /** The user's groups of cases of this cartridge, and the one chosen: its measured capacity is the page's measured capacity. */
   ownCases?: readonly OwnCase[] | undefined
   ownCaseId?: string | undefined
@@ -302,7 +309,8 @@ type PreviewProps = {
   slots?: {
     cartridge: HTMLElement | null
     gun: HTMLElement | null
-    /** Rarely needed parts: the capacity record (`more`) and further values (`moreValues`, a `dl`). */
+    /** The brass and capacity record choices (`choices`), the notes (`more`) and further values (`moreValues`, a `dl`). */
+    choices?: HTMLElement | null
     more?: HTMLElement | null
     moreValues?: HTMLElement | null
   }
@@ -1104,11 +1112,14 @@ function put(slots: Slots, node: ReactNode, target: HTMLElement | null | undefin
   return target ? createPortal(node, target) : null
 }
 
-/** A rarely needed part: in the `more` slot when the page gives one, else in place. */
+/** A part in its own slot when the page gives one, else in place. */
 function aside(slots: Slots, node: ReactNode, target: HTMLElement | null | undefined) {
   if (!slots || target === undefined) return node
   return target ? createPortal(node, target) : null
 }
+
+/** The workbench row's control height for the brass and capacity selects, the theme's elsewhere. */
+const rowSize = (m: Model) => (m.slots?.choices ? { size: controlSize.row.input } : {})
 
 /** The capacity record's description: its water, and its case maker when it has one. */
 function capacityText(c: Capacity, names: Model['names'], t: T) {
@@ -1236,12 +1247,13 @@ function CaseChoice({ m }: { m: Model }) {
     ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c, t) })),
     // a load names a group this browser does not have
     ...(ownId && !own.some((c) => c.id === ownId)
-      ? [{ value: `user:${ownId}`, label: t('A case group not in this browser') }]
+      ? [{ value: `user:${ownId}`, label: t('A brass group not in this browser') }]
       : []),
   ]
   return (
     <NativeSelect
-      label={t('Case record')}
+      {...rowSize(m)}
+      label={t('Brass record')}
       value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
       onChange={(e) => {
         const v = e.currentTarget.value
@@ -1250,7 +1262,7 @@ function CaseChoice({ m }: { m: Model }) {
       }}
       data={[
         { value: '', label: t('None') },
-        ...(ownItems.length > 0 ? [{ group: t('Your cases'), items: ownItems }] : []),
+        ...(ownItems.length > 0 ? [{ group: t('Your brass'), items: ownItems }] : []),
         ...(items.length > 0
           ? [
               {
@@ -1284,6 +1296,7 @@ function CapacityChoice({ m }: { m: Model }) {
   if (capacities.length > 0)
     return (
       <NativeSelect
+        {...rowSize(m)}
         label={t('Case capacity record')}
         // with a case record's stated capacity in use, no capacity record is the choice
         value={capacity?.id ?? ''}
@@ -1291,12 +1304,22 @@ function CapacityChoice({ m }: { m: Model }) {
         data={[
           ...(m.chosenCase?.waterCapacity === undefined
             ? []
-            : [{ value: '', label: t('From the case record') }]),
+            : [{ value: '', label: t('From the brass record') }]),
           ...capacities.map((c) => ({ value: c.id, label: capacityText(c, names, t) })),
         ]}
       />
     )
   if (designed) return null
+  // the workbench's row keeps its place: the measured capacity field's help says what to enter
+  if (m.slots?.choices)
+    return (
+      <NativeSelect
+        {...rowSize(m)}
+        label={t('Case capacity record')}
+        disabled
+        data={[{ value: '', label: t('None') }]}
+      />
+    )
   return (
     <p>
       {t(
@@ -1319,7 +1342,7 @@ function MeasuredCapacity({ m }: { m: Model }) {
               'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
             )
           : msg(
-              "Measured: water to the mouth of your fired cases. Replaces the capacity or case record; empty: the record's value.",
+              "Measured: water to the mouth of your fired cases. Replaces the capacity or brass record; empty: the record's value.",
             ),
       }}
       system={system}
@@ -1337,7 +1360,7 @@ function MeasuredCapacity({ m }: { m: Model }) {
                 ? t('From the capacity record {record}. Type a measured capacity to replace it.', {
                     record: capacityText(stock.record, names, t),
                   })
-                : t('From the case record {record}. Type a measured capacity to replace it.', {
+                : t('From the brass record {record}. Type a measured capacity to replace it.', {
                     record: chosenCase ? caseText(chosenCase, names, t) : '',
                   }),
             }
@@ -1450,9 +1473,10 @@ function SeatingControls({ m }: { m: Model }) {
         slots,
         <>
           <CaseChoice m={m} />
+          {slots?.choices && m.p.caseLot}
           <CapacityChoice m={m} />
         </>,
-        slots?.more,
+        slots?.choices,
       )}
       {!card && <BarrelField m={m} />}
       <MeasuredCapacity m={m} />

@@ -15,7 +15,7 @@ import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
@@ -25,6 +25,7 @@ import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import { dayText } from '../lib/dates.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -37,7 +38,8 @@ import { landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
-import { recordMark } from '../lib/powder-record.ts'
+import { newerFit } from '../lib/powder-designer.ts'
+import { loadFitMark, recordMark } from '../lib/powder-record.ts'
 import { constructionRows, titleFromKebab } from '../lib/record-fields.ts'
 import {
   type LadderDirection,
@@ -55,6 +57,7 @@ import { type InputPanel, lengthText } from '../lib/workbench.ts'
 import { citedDefaults, type DefaultKey } from '../lib/workbench-defaults.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { Noted } from './field-table.tsx'
+import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
@@ -144,13 +147,6 @@ export const firearmMassSpec = {
   quantity: 'firearmMass',
   positive: true,
 } as const satisfies FieldSpec
-/** The Cartridge card's measured case capacity, for the unit switch (the field is the preview's). */
-export const measuredWaterCapacitySpec = {
-  key: 'measuredWaterCapacity',
-  label: msg('Case capacity (H₂O)'),
-  quantity: 'capacity',
-  min: 0,
-} as const
 
 /**
  * Input groups from 75em: Cartridge and below it the cartridge figure in the first column, Powder,
@@ -530,6 +526,7 @@ export function InputCards() {
     <form ref={inputs} noValidate onSubmit={(e) => e.preventDefault()} aria-label={t('Load')}>
       {/* fixed cards: icon and title in the heading, the record in its picker */}
       <div className="panels">
+        <LoadRow />
         {panelColumns.map((column, i) => (
           <div key={column[0]} className="panel-column">
             {column.map((p) => (
@@ -548,7 +545,8 @@ export function InputCards() {
                   <h2 id={`panel-${p}`} className="panel-title">
                     {t(panelTitles[p])}
                   </h2>
-                  <CardPicker panel={p} />
+                  {p !== 'cartridge' && <CardPicker panel={p} />}
+                  {p === 'powder' && <LotField lot="powder" bare />}
                   {morePanels.includes(p) && (
                     <AppPopover
                       opened={more === p}
@@ -596,22 +594,36 @@ export function InputCards() {
   )
 }
 
+/**
+ * The pinned row above the cards: the cartridge search, then the choices that depend on it in that
+ * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
+ */
+function LoadRow() {
+  const { primerId, setPrimerChoice } = useLoad()
+  return (
+    <div className="pinned-row">
+      <CartridgePicker />
+      <PrimerChoice id={primerId} onChange={setPrimerChoice} />
+      <LotField lot="primer" short />
+      <SeatingSlot name="choices" />
+    </div>
+  )
+}
+
 /** The seating preview's slots in the cards. */
-export const seatingSlotNames = ['cartridge', 'gun', 'more', 'moreValues'] as const
+export const seatingSlotNames = ['cartridge', 'gun', 'choices', 'more', 'moreValues'] as const
 export type SeatingSlotName = (typeof seatingSlotNames)[number]
 
 /**
- * A named place in a card for the seating preview's controls: the case capacity, seating and its
- * values (`cartridge`), the barrel length (`gun`), the capacity record and notes (`more`) and
- * further values (`moreValues`, a `dl`).
+ * A named place for the seating preview's controls: the case capacity, seating and its values
+ * (`cartridge`), the barrel length (`gun`), the brass and capacity record choices of the pinned row
+ * (`choices`), the notes (`more`) and further values (`moreValues`, a `dl`).
  */
 function SeatingSlot({ name }: { name: SeatingSlotName }) {
   const { slotRefs } = useLoad()
-  return name === 'moreValues' ? (
-    <dl ref={slotRefs[name]} className="seating-more wide" />
-  ) : (
-    <div ref={slotRefs[name]} className="seating-slot wide" />
-  )
+  if (name === 'moreValues') return <dl ref={slotRefs[name]} className="seating-more wide" />
+  if (name === 'choices') return <div ref={slotRefs[name]} className="pinned-row-slot" />
+  return <div ref={slotRefs[name]} className="seating-slot wide" />
 }
 
 /** The cards with a More popover. */
@@ -668,6 +680,7 @@ type LoadFieldMarkArgs = {
   powder: LoadValues['powder']
   powderDesign: LoadValues['powderDesign']
   origin: LoadValues['origin']
+  tn: Translator['tn']
 }
 
 /** The mark of a field in the units it shows: where its value comes from. */
@@ -684,6 +697,7 @@ function loadFieldMark(
     powder,
     powderDesign,
     origin,
+    tn,
   }: LoadFieldMarkArgs,
   t: Translator['t'],
 ) {
@@ -708,6 +722,7 @@ function loadFieldMark(
         [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
       powderDesign ? 'user design' : 'record',
       t,
+      loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
     )
   )
 }
@@ -779,7 +794,7 @@ function LoadField({ name: key }: { name: string }) {
     printMedia,
     recordBore,
   } = useLoad()
-  const { t } = useTranslation()
+  const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
   if (!spec) throw new Error(`no field ${key}`)
   const props = form.getInputProps(key)
@@ -824,6 +839,7 @@ function LoadField({ name: key }: { name: string }) {
             powder,
             powderDesign,
             origin,
+            tn,
           },
           t,
         )
@@ -864,6 +880,26 @@ function LoadField({ name: key }: { name: string }) {
 }
 
 const fieldsOf = (keys: readonly string[]) => keys.map((k) => <LoadField key={k} name={k} />)
+
+/** The note on a load whose powder design has a newer fit, with the switch to it. */
+function NewerFitNote() {
+  const { powderDesign, powderDesigns, choosePowderDesign } = useLoad()
+  const { t } = useTranslation()
+  const newer = powderDesign && newerFit(powderDesigns, powderDesign.id)
+  if (!newer) return null
+  return (
+    <p className="note wide">
+      {t('A newer fit of this powder exists.')}{' '}
+      <Button
+        size={controlSize.row.button}
+        variant="default"
+        onClick={() => choosePowderDesign(newer.id)}
+      >
+        {t('Use the refit')}
+      </Button>
+    </p>
+  )
+}
 
 /** A card's fields and record rows. */
 function CardBody({ panel }: { panel: InputPanel }) {
@@ -927,6 +963,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
             formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
         )}
+        <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
         {/* the model parameters behind one row at every width; an invalid one opens it */}
@@ -986,8 +1023,13 @@ function BulletPicker() {
     system,
   } = useLoad()
   const { t } = useTranslation()
-  // mounted from the start: the first closing returns the focus to the button as the later ones do
   const [dialog, setDialog] = useState({ text: '', opened: false })
+  // opened before its code has loaded, the dialog mounts open and cannot return the focus itself
+  const opener = useRef<HTMLElement | null>(null)
+  const close = () => {
+    setDialog({ ...dialog, opened: false })
+    setTimeout(() => opener.current?.focus())
+  }
   const designRows = useMemo(() => userBulletRows(designs), [designs])
   const fit = useMemo(
     () => (bulletParams ? fitOf(cartridge) : undefined),
@@ -1031,13 +1073,14 @@ function BulletPicker() {
           label: t('Browse bullets'),
           onOpen: (typed) => {
             readDesigns()
+            opener.current = document.activeElement as HTMLElement | null
             setDialog({ text: typed, opened: true })
           },
         }}
       />
       <BulletSearchDialog
         opened={dialog.opened}
-        onClose={() => setDialog({ ...dialog, opened: false })}
+        onClose={close}
         text={dialog.text}
         designs={designRows}
         fit={fit}
@@ -1047,7 +1090,7 @@ function BulletPicker() {
           const design = userRecordId(row.id)
           if (design) chooseDesign(design)
           else chooseBullet(row.id)
-          setDialog({ ...dialog, opened: false })
+          close()
         }}
       />
     </>
@@ -1072,6 +1115,7 @@ function CartridgePicker() {
       key={searchKey}
       kind="cartridges"
       label={t('Search cartridges by name')}
+      picked={!!(cartridge || cartridgeDesign)}
       chosen={
         cartridge?.name ??
         (cartridgeDesign
@@ -1165,7 +1209,7 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
-  const { specValue, system, allDiameters, setAllDiameters, primerId, setPrimerChoice } = useLoad()
+  const { specValue, system, allDiameters, setAllDiameters } = useLoad()
   const { t } = useTranslation()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
@@ -1178,7 +1222,6 @@ function CardMore({ panel }: { panel: InputPanel }) {
         )}
         <SeatingSlot name="more" />
         <SeatingSlot name="moreValues" />
-        <PrimerChoice id={primerId} onChange={setPrimerChoice} />
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
@@ -1295,6 +1338,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       slots={{
         cartridge: seatingSlots.cartridge ?? null,
         gun: seatingSlots.gun ?? null,
+        choices: seatingSlots.choices ?? null,
         more: seatingSlots.more ?? null,
         moreValues: seatingSlots.moreValues ?? null,
       }}
@@ -1309,6 +1353,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         cartridge && setCapacityChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }
       caseId={caseId}
+      caseLot={<LotField lot="case" short />}
       onCaseId={(id) =>
         cartridge && setCaseChoice(id ? { cartridge: cartridge.id, id } : undefined)
       }

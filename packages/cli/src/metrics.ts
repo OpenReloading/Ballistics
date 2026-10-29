@@ -33,7 +33,7 @@ function halfWidthOf(training: readonly Outcome[]) {
 }
 
 /** The metrics of a group of rows; `halfWidth` is the interval of {@link halfWidthOf}. */
-function metricsOf(items: readonly Outcome[], halfWidth: number | null): Metrics {
+export function metricsOf(items: readonly Outcome[], halfWidth: number | null): Metrics {
   const used = items.filter(isUsed)
   const velocity = used.map(velocityError)
   const pressure = used.flatMap((o) => pressureError(o) ?? [])

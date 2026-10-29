@@ -141,13 +141,14 @@ export function SafetyBarButton({
   className?: string
 }) {
   const icon = <NavIcon name="safety" />
+  const { t } = useTranslation()
   return iconOnly ? (
-    <Tooltip label="Safety">
+    <Tooltip label={t('Safety')}>
       <ActionIcon
         color="yellow"
         variant="light"
         className={`safety-light screen-only ${className ?? ''}`}
-        aria-label="Safety notice"
+        aria-label={t('Safety notice')}
         onClick={openSafety}
       >
         {icon}
@@ -159,10 +160,9 @@ export function SafetyBarButton({
       variant="light"
       leftSection={icon}
       className="page-bar-safety safety-light screen-only"
-      aria-label="Safety notice"
       onClick={openSafety}
     >
-      Safety
+      {t('Safety')}
     </Button>
   )
 }

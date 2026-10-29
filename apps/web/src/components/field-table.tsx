@@ -46,8 +46,8 @@ export function arrowStops(e: KeyboardEvent<HTMLElement>, selector: string) {
 
 /**
  * A value with notes: a button that shows them on hover, focus and touch; they stay its
- * description. `inline`: a focusable span instead, for rows too tight for a 24 px target (the
- * cartridge record's symbols), where nothing is pressed.
+ * description. `inline`: a row header's symbol (the cartridge record's dimensions tables), whose
+ * notes are only its description and whose tab stop the table sets.
  */
 export function Noted({
   value,

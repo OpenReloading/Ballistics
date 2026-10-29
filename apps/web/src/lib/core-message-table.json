@@ -52,7 +52,32 @@
     "solid fill high",
     "start pressure has no effect",
     "gyration radius ignored",
-    "start pressure held once"
+    "start pressure held once",
+    "Maker",
+    "Caliber",
+    "Diameter",
+    "Mass",
+    "Length",
+    "Grain form",
+    "Propellant base",
+    "Bulk density",
+    "Case length",
+    "Overall length",
+    "Bullet diameter",
+    "Max pressure",
+    "The rows have no table of two columns or more.",
+    "The table has a header but no rows. Add rows or choose another file.",
+    "The text looks like JSON but does not parse. Fix the file or export it again.",
+    "The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.",
+    "The text has no table: no row repeats a comma, semicolon or tab as separator. Export the table as CSV.",
+    "The file is larger than 40 MB. Split it and import the parts.",
+    "The workbook has no cells with text. Open the right file or paste the table into a sheet.",
+    "UTF-16 text with an odd number of bytes",
+    "the file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again",
+    "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.",
+    "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again.",
+    "The import could not run in this browser.",
+    "The file could not be read."
   ],
   "templates": {
     "app and API request failures": [
@@ -196,6 +221,7 @@
       "mean must be finite",
       "standard deviation must be 0 or more",
       "each string needs at least two shots",
+      "every string needs at least one velocity",
       "charges must differ"
     ],
     "load file values": [
@@ -351,6 +377,19 @@
       "The cartridge has no CIP Pmax measured by transducer or piezo.",
       "Some cases of the pressure range could not be computed.",
       "The simulated peak mean pressure is below {ratio} times the hold pressure; the results are outside the range the model was built for."
+    ],
+    "table import": [
+      "{field} is empty. Fill the cell or delete the row.",
+      "{field} has no unit. Choose a unit for the column.",
+      "{field} \"{cell}\" is not a number with \"{mark}\" as decimal mark. Fix the cell or change the decimal mark of the column.",
+      "{field} {cell} is not above 0. Fix the cell or leave it empty.",
+      "{field} {cell} {unit} is outside the usual {low} to {high} {stored}. Check the unit of the column.",
+      "{field} \"{cell}\" is not one of {choices}. The value is left out; change the cell to keep it.",
+      "No column is mapped to {fields}. Map a column to it or read the file as another kind.",
+      "No column is mapped to {fields}. Map a column to each or read the file as another kind.",
+      "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.",
+      "The workbook cannot be read: {reason}. Save it again as XLSX or CSV.",
+      "{reason}. Fix the row or delete it."
     ]
   }
 }

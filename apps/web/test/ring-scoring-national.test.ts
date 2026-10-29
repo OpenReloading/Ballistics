@@ -1,6 +1,7 @@
 import { readRecords } from '@open-reloading/data'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { scoredHoleDiameter, scoreGroupOnFace, scoreShot } from '../src/lib/ring-scoring.ts'
 import { matchFaces } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
@@ -150,6 +151,7 @@ describe('DSU Sporthandbuch 2018, DSU-Scheibe 200 Meter Präzision (Seite 19, PD
       { id: f.id, event: event?.id },
       { shots: [at(47.5)] },
       undefined,
+      english.t,
     )
     expect('error' in scored).toBe(false)
     if (!('error' in scored)) expect(scored.score.total).toBe(9)

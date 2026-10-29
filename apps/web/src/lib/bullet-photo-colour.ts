@@ -4,6 +4,8 @@
  * colour to the bullet's takes the place of the luma (`apps/docs/docs/models/bullet-photo.md`).
  * Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
+
+import { msg } from '../i18n/translate.ts'
 import {
   type Gray,
   grayOf,
@@ -14,6 +16,7 @@ import {
 } from './bullet-photo.ts'
 import type { RgbaImage } from './image.ts'
 import type { Point } from './target-geometry.ts'
+import type { Wording } from './wording.ts'
 
 type Rgb = [number, number, number]
 
@@ -264,8 +267,9 @@ function raggedness({ alpha, width: w, height: h }: Segmentation): number {
 /** Above this the edge of a cut-out is a surface's texture, not a bullet's outline. */
 const ragged = 9
 
-const raggedNote =
-  'The cut-out has a ragged edge: the background may be textured or busy. A plain background gives a better cut-out.'
+const raggedNote = msg(
+  'The cut-out has a ragged edge: the background may be textured or busy. A plain background gives a better cut-out.',
+)
 
 const rough = (s: Segmentation) => raggedness(s) > ragged
 
@@ -294,7 +298,7 @@ interface Pick {
   /** The cut-out `cut` reads the background around, when it is not the photograph's own. */
   known?: Uint8Array
   /** Sentences for the user about the choice itself, which the cut-out made on the photograph needs too. */
-  notes?: string[]
+  notes?: Wording[]
 }
 
 /**

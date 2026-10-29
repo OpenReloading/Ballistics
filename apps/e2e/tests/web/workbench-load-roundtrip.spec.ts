@@ -36,6 +36,13 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await page.goto('/workbench')
   await applyExampleLoad(page)
   const form = loadForm(page)
+  // the example's brass gives the capacity, flagged as the record's
+  const capacity = form.getByRole('textbox', { name: /^Case capacity/ })
+  await expect(capacity).toHaveValue('')
+  await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
+  await expect(capacity).toHaveAccessibleDescription(
+    /From the brass record Demo Cases 308 Win\. Brass Demo: 3\.6 g water\./,
+  )
   // a typed value no record gives
   await form.getByRole('textbox', { name: /^Charge mass/ }).fill('2.45')
   await form.getByRole('textbox', { name: /^Bore diameter/ }).fill('7.70')
@@ -57,20 +64,19 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   expect(overrides).not.toHaveProperty('bulletMass')
   expect(data.charge).toEqual({ value: 2.45 })
   expect(data.cartridge).toBe('catalogue:308-win')
-  // the example's measured case capacity is a user record of its own that the load names
-  const [capacity] = await storedKind(page, 'caseCapacity')
-  expect(data.capacity).toBe(`user:${capacity.id}`)
-  expect(capacity.data).toMatchObject({ origin: 'user', cartridge: 'catalogue:308-win' })
-  expect(capacity.data.waterCapacity).toEqual({ value: 3.6 })
-  expect(data).not.toHaveProperty('case')
+  expect(data.case).toEqual({ record: 'catalogue:demo-case-308-brass' })
+  expect(data).not.toHaveProperty('capacity')
 
   await page.goto('/workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
   await expect.poll(values).toEqual(before)
-  // the measured capacity is back in its field
-  await expect(page.getByRole('textbox', { name: /^Case capacity/ })).toHaveValue(/^\d/)
+  // the brass is chosen again and gives the capacity
+  await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
+  await expect(page.getByRole('combobox', { name: 'Brass record' })).toHaveValue(
+    'demo-case-308-brass',
+  )
   await expect(page.locator('.file-state')).toContainText('Saved')
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
 })

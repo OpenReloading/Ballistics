@@ -12,6 +12,8 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from '../i18n/language.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { type LabelScene, placeLabel } from '../lib/label-placement.ts'
 import { nth } from '../lib/nth.ts'
 import {
@@ -55,27 +57,30 @@ export const toolPoints: Partial<Record<Tool, number>> = {
 }
 
 export const overlayNames = {
-  spread: 'Extreme spread',
-  box: 'Width and height',
-  aim: 'Point of aim line',
-  ellipses: 'Prediction ellipses (50 %, 95 %)',
-  dispersion: 'Dispersion ellipses (50 %, 95 %)',
-  axis: 'Major axis',
-  excluded: 'Excluded direction',
-  numbers: 'Shot numbers',
-  stats: 'Statistics box',
-  rings: 'Face rings and scores',
+  spread: msg('Extreme spread'),
+  box: msg('Width and height'),
+  aim: msg('Point of aim line'),
+  ellipses: msg('Prediction ellipses (50 %, 95 %)'),
+  dispersion: msg('Dispersion ellipses (50 %, 95 %)'),
+  axis: msg('Major axis'),
+  excluded: msg('Excluded direction'),
+  numbers: msg('Shot numbers'),
+  stats: msg('Statistics box'),
+  rings: msg('Target rings and scores'),
 } as const
 export type Overlay = keyof typeof overlayNames
 
 /** Hover text of an overlay switch. */
-export const overlayHelp: Partial<Record<Overlay, string>> = {
-  ellipses:
+export const overlayHelp: Partial<Record<Overlay, Message>> = {
+  ellipses: msg(
     'Where a further shot lands with the stated coverage (50 %, 95 %), from the shots of the group. Absent below 3 shots.',
-  dispersion:
+  ),
+  dispersion: msg(
     'Describes the shots fired: the ellipses holding 50 % and 95 % of a normal spread with their covariance; dashed. Absent below 2 shots.',
-  rings:
-    "The rings of the active group's target face and each shot's value, when a face is chosen (Group).",
+  ),
+  rings: msg(
+    "The rings of the active group's target and each shot's value, when a target is chosen (Group).",
+  ),
 }
 
 export type Selection = { group: string; index: number }
@@ -324,9 +329,10 @@ type OverlayContext = {
   v: (q: Point) => Point
   shotR: (q: Point) => number
   id: string
+  t: Translator['t']
 }
 
-type Ellipse = { kind: string; p: number; suffix: string; pts: Point[] }
+type Ellipse = { kind: 'prediction' | 'dispersion'; p: number; pts: Point[] }
 
 /** The corner points of the ellipse's extremes, to choose a label anchor from. */
 const extremes = (pts: Point[]) => {
@@ -346,13 +352,13 @@ function ellipsesOf(
   v: (q: Point) => Point,
 ): Ellipse[] {
   const kinds = [
-    on('ellipses') && { kind: 'prediction', at: predictionEllipse, suffix: '' },
-    on('dispersion') && { kind: 'dispersion', at: dispersionEllipse, suffix: ' fired' },
+    on('ellipses') && { kind: 'prediction' as const, at: predictionEllipse },
+    on('dispersion') && { kind: 'dispersion' as const, at: dispersionEllipse },
   ].filter((x) => x !== false)
-  return kinds.flatMap(({ kind, at, suffix }) =>
+  return kinds.flatMap(({ kind, at }) =>
     coverages.flatMap((p) => {
       const pts = ellipsePoints(s, at(s, p))
-      return pts ? [{ kind, p, suffix, pts: pts.map(v) }] : []
+      return pts ? [{ kind, p, pts: pts.map(v) }] : []
     }),
   )
 }
@@ -488,16 +494,18 @@ function addSegments(
 }
 
 /** Labels tied to one point first; an ellipse label has four to choose from. */
-function overlayLabels(p: GroupOverlayParts, label: Labeller) {
+function overlayLabels(p: GroupOverlayParts, label: Labeller, t: Translator['t']) {
   const { c, ex, ends, on, v } = p
   return (
     <>
-      {ex && c && label('excluded shots', [ex], c, 'excluded label')}
-      {on('axis') && ends && c && label('major axis', [v(ends[1]), v(ends[0])], c, 'axis label')}
+      {ex && c && label(t('excluded shots'), [ex], c, 'excluded label')}
+      {on('axis') && ends && c && label(t('major axis'), [v(ends[1]), v(ends[0])], c, 'axis label')}
       {c &&
         p.ellipses.map((e) =>
           label(
-            `${Math.round(e.p * 100)} %${e.suffix}`,
+            e.kind === 'dispersion'
+              ? t('{percent} % fired', { percent: Math.round(e.p * 100) })
+              : t('{percent} %', { percent: Math.round(e.p * 100) }),
             extremes(e.pts),
             c,
             `${e.kind} ${e.p} label`,
@@ -542,7 +550,7 @@ function overlayOf(
       aria-hidden="true"
     >
       <OverlayShapes {...parts} />
-      {overlayLabels(parts, label)}
+      {overlayLabels(parts, label, ctx.t)}
     </g>
   )
 }
@@ -667,6 +675,7 @@ export function TargetCanvas({
 }) {
   // an id usable in url(#...) references
   const { system } = useUnits()
+  const { t } = useTranslation()
   const id = `tc${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
   const svg = useRef<SVGSVGElement>(null)
   const wrap = useRef<HTMLDivElement>(null)
@@ -754,7 +763,11 @@ export function TargetCanvas({
       return
     }
     if (e.pointerType === 'touch') tap.current = e.pointerId
-    else place(toPoint(e))
+    else {
+      // no mousedown follows: a popover the placed point opens again does not take it as a click outside
+      e.preventDefault()
+      place(toPoint(e))
+    }
   }
 
   const onPointerMove = (e: PointerEvent<SVGSVGElement>) => {
@@ -873,7 +886,7 @@ export function TargetCanvas({
       <svg
         ref={svg}
         role="application"
-        aria-label="Target sheet"
+        aria-label={t('Target sheet')}
         aria-describedby={`${id}-keys`}
         viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`}
         preserveAspectRatio="xMidYMid meet"
@@ -898,7 +911,7 @@ export function TargetCanvas({
         {frame?.calibration && sheet.targetOrigin && !still && (
           <AxesMark v={v} k={k} fontSize={fontSize} />
         )}
-        {frame && groupOverlays({ sheet, overlays, active, box, k, fontSize, v, shotR, id })}
+        {frame && groupOverlays({ sheet, overlays, active, box, k, fontSize, v, shotR, id, t })}
         <defs>
           <marker
             id={`${id}-arrow`}
@@ -987,7 +1000,7 @@ export function TargetCanvas({
               ref={cursorEl}
               role="button"
               tabIndex={0}
-              aria-label="Point to set"
+              aria-label={t('Point to set')}
               aria-describedby={`${id}-keys`}
               className="key-cursor"
               cx={cursor.x}
@@ -1011,7 +1024,10 @@ export function TargetCanvas({
         )}
       </svg>
       <p id={`${id}-keys`} className="visually-hidden">
-        {`Shots of the active group are buttons in one tab stop: arrow keys, Home and End move the focus between them, Alt with the arrow keys moves the focused shot by ${mmLength(system, 0.1)} (with Shift ${mmLength(system, 1)}), E or Space excludes or includes it, Delete removes it. With the focus on the sheet itself, the arrow keys pan the view, and a double click zooms in at the pointer. While a point is marked, the arrow keys move the marker by a screen pixel (with Shift 10) and Enter sets it.`}
+        {t(
+          'Shots of the active group are buttons in one tab stop: arrow keys, Home and End move the focus between them, Alt with the arrow keys moves the focused shot by {step} (with Shift {big}), E or Space excludes or includes it, Delete removes it. With the focus on the sheet itself, the arrow keys pan the view, and a double click zooms in at the pointer. While a point is marked, the arrow keys move the marker by a screen pixel (with Shift 10) and Enter sets it.',
+          { step: mmLength(system, 0.1), big: mmLength(system, 1) },
+        )}
       </p>
       {overlays.stats && statsBox && !still && (
         <div
@@ -1036,14 +1052,14 @@ export function TargetCanvas({
       )}
       {!still && (
         <div className="canvas-zoom">
-          <button type="button" aria-label="Zoom in" onClick={() => zoom(1 / 1.5)}>
+          <button type="button" aria-label={t('Zoom in')} onClick={() => zoom(1 / 1.5)}>
             +
           </button>
-          <button type="button" aria-label="Zoom out" onClick={() => zoom(1.5)}>
+          <button type="button" aria-label={t('Zoom out')} onClick={() => zoom(1.5)}>
             −
           </button>
-          <button type="button" aria-label="Fit" onClick={() => setView(undefined)}>
-            Fit
+          <button type="button" aria-label={t('Fit')} onClick={() => setView(undefined)}>
+            {t('Fit')}
           </button>
         </div>
       )}

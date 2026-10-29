@@ -48,13 +48,13 @@ it('maps every route group to its area, designers before their lists', () => {
     ['/bullets/compare', 'Bullets'],
     ['/bullets/x', 'Bullets'],
     ['/powders/burn-rates', 'Powders'],
-    ['/cases/demo-case-308-brass', 'Cases'],
+    ['/cases/demo-case-308-brass', 'Brass'],
     ['/primers/demo-primer-large-rifle', 'Primers'],
     ['/targets/issf-25m-precision-50m-pistol', 'Targets'],
     ['/disciplines/dsb-25m-pistole-revolver', 'Disciplines'],
     ['/federations/dsb', 'Federations'],
     ['/firearms', 'Firearms'],
-    ['/my-cases', 'Cases'],
+    ['/my-cases', 'Brass'],
     ['/', 'Other'],
     ['/offline', 'Other'],
     ['/workbenchx', 'Other'],
@@ -64,7 +64,7 @@ it('maps every route group to its area, designers before their lists', () => {
 
 it('names the record of a record page only', () => {
   expect(reportRecord('/targets/issf-25m-precision-50m-pistol')).toEqual({
-    kind: 'target face',
+    kind: 'target',
     id: 'issf-25m-precision-50m-pistol',
   })
   expect(reportRecord('/cartridges/a%20b')).toEqual({ kind: 'cartridge', id: 'a b' })
@@ -233,8 +233,8 @@ it('gives the sheet settings without shot coordinates, the positions only on the
     [
       'Groups: 2',
       '',
-      '- Group 1: 25 m, face `issf-25m-precision-50m-pistol`, event "DSB 25 m Pistole Präzision", discipline 2.40 25 m Pistole (`dsb-25m-pistole`), federation DSB, 2 shots',
-      '- Group 2: 91.44 m, no face, 0 shots',
+      '- Group 1: 25 m, target `issf-25m-precision-50m-pistol`, event "DSB 25 m Pistole Präzision", discipline 2.40 25 m Pistole (`dsb-25m-pistole`), federation DSB, 2 shots',
+      '- Group 2: 91.44 m, no target, 0 shots',
     ].join('\n'),
   )
   expect(sheetSettings(sheet)).not.toContain('discipline')

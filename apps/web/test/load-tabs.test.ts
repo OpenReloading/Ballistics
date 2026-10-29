@@ -8,8 +8,6 @@ import {
   type LoadRecord,
   loadGroups,
   loadName,
-  openLoadsText,
-  parseOpenLoads,
   renameStored,
   shortName,
   tabAfterClose,
@@ -95,34 +93,27 @@ it('picks the next tab, else the previous one, when a tab closes', () => {
   expect(tabAfterClose(['a'], 'a')).toBeUndefined()
 })
 
-it('reads the open set back and ignores anything damaged', () => {
-  const set = { ids: ['a', 'b'], active: 'b' }
-  expect(parseOpenLoads(openLoadsText(set))).toEqual(set)
-  expect(parseOpenLoads(null)).toEqual({ ids: [] })
-  expect(parseOpenLoads('not json')).toEqual({ ids: [] })
-  expect(parseOpenLoads('{"ids":[1,"a",null],"active":5}')).toEqual({ ids: ['a'] })
-  expect(parseOpenLoads('{"ids":["a","a"]}')).toEqual({ ids: ['a'] })
-})
-
 it('reminds to export after 10 changes, or 7 days after the last export', () => {
   const day = 86_400_000
   const t0 = Date.parse('2026-10-01T10:00:00.000Z')
   const at = (days: number) => new Date(t0 + days * day)
   // nothing changed since the export: no reminder however old
-  expect(reminderText(afterExport(at(0)), at(30))).toBeUndefined()
+  expect(reminderText(afterExport(at(0)), at(30), english.t, english.tn)).toBeUndefined()
   let r = afterExport(at(0))
   r = afterChange(r, at(1))
-  expect(reminderText(r, at(2))).toBeUndefined()
-  expect(reminderText(r, at(7))).toBe('1 save since the last export, 7 days ago.')
+  expect(reminderText(r, at(2), english.t, english.tn)).toBeUndefined()
+  expect(reminderText(r, at(7), english.t, english.tn)).toBe(
+    '1 save since the last export, 7 days ago.',
+  )
   for (let i = 0; i < 8; i++) r = afterChange(r, at(2))
-  expect(reminderText(r, at(2))).toBeUndefined()
+  expect(reminderText(r, at(2), english.t, english.tn)).toBeUndefined()
   r = afterChange(r, at(2))
-  expect(reminderText(r, at(2))).toBe('10 saves since the last export.')
+  expect(reminderText(r, at(2), english.t, english.tn)).toBe('10 saves since the last export.')
   // never exported: counted from the first change
   const first = afterChange({ changes: 0 }, at(0))
-  expect(reminderText(first, at(6))).toBeUndefined()
-  expect(reminderText(first, at(7))).toBe('1 save, never exported.')
-  expect(reminderText({ changes: 0 }, at(40))).toBeUndefined()
+  expect(reminderText(first, at(6), english.t, english.tn)).toBeUndefined()
+  expect(reminderText(first, at(7), english.t, english.tn)).toBe('1 save, never exported.')
+  expect(reminderText({ changes: 0 }, at(40), english.t, english.tn)).toBeUndefined()
 })
 
 it('titles a group by the cartridge lookup, not by the record names', () => {

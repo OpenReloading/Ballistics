@@ -1,5 +1,6 @@
 /** Report issue: the area of a page, the record it shows, and the prefilled new-issue link of the repository. */
 import { fromSi, type TargetSheet } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import type { FederationData } from './face-disciplines.ts'
 
 /** Areas of the app, the second part of a report title. */
@@ -10,7 +11,7 @@ export const reportAreas = [
   'Cartridges',
   'Bullets',
   'Powders',
-  'Cases',
+  'Brass',
   'Primers',
   'Targets',
   'Disciplines',
@@ -28,7 +29,7 @@ export type ReportType = (typeof reportTypes)[number]
 
 /** The dialog's label of the report text. */
 export const reportQuestion = (type: ReportType) =>
-  type === 'Idea' ? 'What do you need?' : 'What happened?'
+  type === 'Idea' ? msg('What do you need?') : msg('What happened?')
 
 /** Longest link: GitHub and browsers refuse longer ones. */
 export const maxReportChars = 7000
@@ -43,13 +44,13 @@ const areaRoutes: [string, ReportArea][] = [
   ['/cartridges', 'Cartridges'],
   ['/bullets', 'Bullets'],
   ['/powders', 'Powders'],
-  ['/cases', 'Cases'],
+  ['/cases', 'Brass'],
   ['/primers', 'Primers'],
   ['/targets', 'Targets'],
   ['/disciplines', 'Disciplines'],
   ['/federations', 'Federations'],
   ['/firearms', 'Firearms'],
-  ['/my-cases', 'Cases'],
+  ['/my-cases', 'Brass'],
 ]
 
 const under = (route: string, path: string) => route === path || route.startsWith(`${path}/`)
@@ -62,9 +63,9 @@ const recordKinds: Record<string, string> = {
   cartridges: 'cartridge',
   bullets: 'bullet',
   powders: 'powder',
-  cases: 'case',
+  cases: 'brass',
   primers: 'primer',
-  targets: 'target face',
+  targets: 'target',
   disciplines: 'discipline',
   federations: 'federation',
 }
@@ -218,7 +219,7 @@ export function sheetSettings(sheet: Pick<TargetSheet, 'groups'>, data?: Federat
     const fed = d && data?.federations.find((x) => x.id === d.federation)
     return [
       `- ${g.name}: ${Number(g.distance.toFixed(2))} m`,
-      f ? `face \`${f.id}\`` : 'no face',
+      f ? `target \`${f.id}\`` : 'no target',
       ...(f?.event ? [`event "${f.event}"`] : []),
       ...(d ? [`discipline ${[d.number, d.name].filter(Boolean).join(' ')} (\`${d.id}\`)`] : []),
       ...(fed ? [`federation ${fed.abbreviation}`] : []),

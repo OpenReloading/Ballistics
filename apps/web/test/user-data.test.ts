@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import {
   type UserRecord,
   userDataFormat,
@@ -5,9 +6,16 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
-import { maxLinkChars, readLink, shareLink, shareProblem } from '../src/lib/share-link.ts'
+import {
+  maxLinkChars,
+  readLink,
+  shareLink,
+  shareProblem,
+  tooLongText,
+} from '../src/lib/share-link.ts'
 import {
   canonicalJson,
   checkedUserDataText,
@@ -100,10 +108,17 @@ describe('user data files', () => {
 
   it('skips a file with one invalid record as a whole and names the field', () => {
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
-    const { records, skipped } = parseFiles([
-      { name: 'good.json', text: userDataText([load]) },
-      { name: 'bad.json', text: userDataText([load, bad as unknown as UserRecord]) },
-    ])
+    const { records, skipped } = parseFiles(
+      [
+        { name: 'good.json', bytes: new TextEncoder().encode(userDataText([load])) },
+        {
+          name: 'bad.json',
+          bytes: new TextEncoder().encode(userDataText([load, bad as unknown as UserRecord])),
+        },
+      ],
+      undefined,
+      english.t,
+    )
     expect(records).toEqual([load])
     expect(skipped).toHaveLength(1)
     expect(defined(skipped[0]).name).toBe('bad.json')
@@ -111,10 +126,11 @@ describe('user data files', () => {
   })
 
   it('skips a file over the size limit', () => {
-    const { skipped } = parseFiles([
-      { name: 'big.json', text: ' '.repeat(maxFileBytes + 1) },
-      { name: 'unread.json' },
-    ])
+    const { skipped } = parseFiles(
+      [{ name: 'big.json', bytes: new Uint8Array(maxFileBytes + 1) }, { name: 'unread.json' }],
+      undefined,
+      english.t,
+    )
     expect(skipped.map((s) => s.reason)).toEqual([
       'The file is larger than 40 MB.',
       'The file is larger than 40 MB.',
@@ -151,6 +167,20 @@ describe('user data files', () => {
       equal: [sameData],
       conflicts: [{ incoming: changed, stored: load }],
     })
+  })
+
+  it('keeps the import of a record through Export all and Import, and plans a re-import as equal', () => {
+    const imported: UserRecord = {
+      ...load,
+      imported: { source: 'Maker load data', file: 'loads.csv', day: '2026-10-20' },
+    }
+    const all = exportAllText([imported, bullet])
+    const parsed = all.ok ? parseUserDataFile(all.text) : all
+    expect(parsed).toEqual({ ok: true, records: [imported, bullet] })
+    const again = { ...imported, imported: { source: 'Other', file: '', day: '2026-10-27' } }
+    expect(
+      planImport([again, { ...bullet, imported: again.imported }], [imported, bullet]),
+    ).toEqual({ added: [], equal: [again, { ...bullet, imported: again.imported }], conflicts: [] })
   })
 
   it('names the photos of replaced target sheets that no stored record points at any more', () => {
@@ -346,7 +376,7 @@ describe('user data files', () => {
     })
     const parsed = parseUserDataFile(text)
     expect(!parsed.ok && parsed.reason).toContain('earlier version')
-    const read = readLoadFile(text)
+    const read = readLoadFile(new TextEncoder().encode(text))
     expect(!read.ok && read.reason).toContain('earlier version')
   })
 
@@ -409,6 +439,14 @@ describe('the user manufacturer of a record', () => {
 
 describe('share links', () => {
   const base = 'https://example.org/bullets/designer'
+  // the fitted powder of the golden file
+  const golden: { records: UserRecord[] } = JSON.parse(
+    readFileSync(new URL('golden/user-data.json', import.meta.url), 'utf8'),
+  )
+  const powder = defined(golden.records.find((r) => r.kind === 'powder')) as Extract<
+    UserRecord,
+    { kind: 'powder' }
+  >
 
   it('round trip: a link of a record reads back to the same record', async () => {
     const link = (await shareLink([bullet], base)) as string
@@ -431,6 +469,29 @@ describe('share links', () => {
     expect(maxLinkChars).toBe(8000)
   })
 
+  it('names the file route for a powder too long for a link, its fit kept whole', async () => {
+    const noise = Array.from({ length: 12000 }, () => Math.random().toString(36)[2]).join('')
+    const big = { ...powder, name: noise } as UserRecord
+    await expect(shareLink([big], base)).resolves.toBeUndefined()
+    expect(tooLongText(big.kind, english.t)).toBe('Too long for a link: save the powder to a file')
+    expect(tooLongText(bullet.kind, english.t)).toContain('longer than 8000 characters')
+  })
+
+  it('round trip: a powder with a 5-charge fit reads back with the fit unchanged', async () => {
+    const point = defined(powder.data.fit?.input[0])
+    const fit = {
+      ...defined(powder.data.fit),
+      input: [2.6, 2.7, 2.8, 2.9, 3].map((value, i) => ({
+        ...point,
+        charge: { value },
+        muzzleVelocity: { value: 790 + 15 * i },
+      })),
+    }
+    const fitted = { ...powder, data: { ...powder.data, fit } } as UserRecord
+    const link = (await shareLink([fitted], base)) as string
+    expect(await readLink(new URL(link).hash)).toEqual({ ok: true, records: [fitted] })
+  })
+
   it('rejects a damaged or invalid fragment with a reason', async () => {
     expect(await readLink('#record=@@@')).toEqual({ ok: false, reason: 'The link is damaged.' })
     const invalid = {
@@ -448,6 +509,7 @@ describe('share links', () => {
     const userId = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
     const refused = shareProblem(own({ cartridge: `user:${userId}`, firearm: `user:${userId}` }))
     expect(refused).toContain('(firearm, cartridge)')
+    expect(shareProblem(own({ powder: `user:${userId}` }))).toContain('(powder)')
     expect(shareProblem(own({ cartridge: 'catalogue:308-win' }))).toBeUndefined()
     expect(shareProblem(load)).toBeUndefined()
     // a design carries its base as a catalogue reference and its maker as a name only
@@ -488,23 +550,29 @@ describe('refNote', () => {
   } as UserRecord
 
   it('names the records whose reference points at no record', () => {
-    expect(refNote([withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')], [])).toBe(
+    expect(refNote([withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')], [], english.t)).toBe(
       'Not found: 308 Win.: the firearm user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12 is not in this browser.',
     )
   })
 
   it('is empty when the browser holds the referenced record, or the opened ones do', () => {
-    expect(refNote([withFirearm(`user:${gunId}`)], [rifle])).toBe('')
-    expect(refNote([withFirearm(`user:${gunId}`), rifle], [])).toBe('')
+    expect(refNote([withFirearm(`user:${gunId}`)], [rifle], english.t)).toBe('')
+    expect(refNote([withFirearm(`user:${gunId}`), rifle], [], english.t)).toBe('')
   })
 
   it('finds the built-in example rifle where it is passed with the stored records', () => {
     expect(
-      refNote([withFirearm(`user:${exampleFirearm.id}`)], [userRecord.parse(exampleFirearm)]),
+      refNote(
+        [withFirearm(`user:${exampleFirearm.id}`)],
+        [userRecord.parse(exampleFirearm)],
+        english.t,
+      ),
     ).toBe('')
   })
 
   it('does not report a stored record that is not opened', () => {
-    expect(refNote([bullet], [withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')])).toBe('')
+    expect(
+      refNote([bullet], [withFirearm('user:2b8e1d7c-4f3a-4a6e-9d51-7c0a3e5b9f12')], english.t),
+    ).toBe('')
   })
 })

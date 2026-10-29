@@ -141,7 +141,7 @@ export function FederationDisciplines({
           caption={
             <span className="visually-hidden">{t('The disciplines of this federation')}</span>
           }
-          columns={[t('Number'), t('Discipline'), t('Distance'), t('Category'), t('Faces')]}
+          columns={[t('Number'), t('Discipline'), t('Distance'), t('Category'), t('Targets')]}
         >
           {rows.map((d) => (
             <tr key={d.id}>
@@ -172,17 +172,17 @@ interface FederationFaceRow {
 export function FederationFaces({ rows }: { rows: readonly FederationFaceRow[] }) {
   const { t } = useTranslation()
   return (
-    <Panel id="federation-faces" title={t('Faces ({count})', { count: rows.length })}>
+    <Panel id="federation-faces" title={t('Targets ({count})', { count: rows.length })}>
       {rows.length === 0 ? (
-        <p className="record-note">{t('No target mapping of its disciplines names a face.')}</p>
+        <p className="record-note">{t('No target mapping of its disciplines names a target.')}</p>
       ) : (
         <PanelTable
-          label={t('Faces table')}
+          label={t('Targets table')}
           className="face-table"
           caption={
-            <span className="visually-hidden">{t('The faces its disciplines are shot on')}</span>
+            <span className="visually-hidden">{t('The targets its disciplines are shot on')}</span>
           }
-          columns={[t('Face'), t('Disciplines')]}
+          columns={[t('Target'), t('Disciplines')]}
         >
           {rows.map((x) => (
             <tr key={x.id}>

@@ -1,6 +1,7 @@
 import { subtendedAngle } from '@open-reloading/core'
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { frameOf, rebase, targetToView } from '../src/lib/target-editor.ts'
 import { notePlaceholders, resolveNote } from '../src/lib/target-notes.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -23,8 +24,8 @@ const group = (x3: number): ShotGroup => ({
 describe('note placeholders', () => {
   it('show the current values after a shot moves', () => {
     const text = 'ES {extremeSpread.length}, {extremeSpread.moa}, {extremeSpread.mrad}'
-    const before = resolveNote(text, group(0.004), metric)
-    const after = resolveNote(text, group(0.02), metric)
+    const before = resolveNote(text, group(0.004), metric, undefined, english.t)
+    const after = resolveNote(text, group(0.02), metric, undefined, english.t)
     // ES 10.00 mm, then 20.10 mm between the first and the moved shot
     const es = Math.hypot(0.02, 0.002)
     const moa = (subtendedAngle(es, 100) * 180 * 60) / Math.PI
@@ -36,14 +37,22 @@ describe('note placeholders', () => {
 
   it('name the group, its counts and distance; unknown tokens stay; missing values read n/a', () => {
     expect(
-      resolveNote('{name}: {shots} shots + {excluded} at {distance}', group(0.004), metric),
+      resolveNote(
+        '{name}: {shots} shots + {excluded} at {distance}',
+        group(0.004),
+        metric,
+        undefined,
+        english.t,
+      ),
     ).toBe('Step 2: 3 shots + 1 at 100 m')
-    expect(resolveNote('{nope} {extremeSpread.km} {name', group(0.004), metric)).toBe(
-      '{nope} {extremeSpread.km} {name',
+    expect(
+      resolveNote('{nope} {extremeSpread.km} {name', group(0.004), metric, undefined, english.t),
+    ).toBe('{nope} {extremeSpread.km} {name')
+    expect(resolveNote('{name} {meanRadius.length}', undefined, metric, undefined, english.t)).toBe(
+      'n/a n/a',
     )
-    expect(resolveNote('{name} {meanRadius.length}', undefined, metric)).toBe('n/a n/a')
     const one = { ...group(0), shots: [defined(group(0).shots[0])] }
-    expect(resolveNote('{extremeSpread.moa}', one, metric)).toBe('n/a')
+    expect(resolveNote('{extremeSpread.moa}', one, metric, undefined, english.t)).toBe('n/a')
   })
 
   it('offer every readout in length, MOA and mrad in the picker', () => {
@@ -69,8 +78,12 @@ describe('note values of two shots 10 mm apart at 100 m', () => {
   const grams = presetUnits('metric-grams')
 
   it('the width in MOA follows the moved shot', () => {
-    expect(resolveNote('Width {width.moa}', two(0.01), grams)).toBe('Width 0.34 MOA')
-    expect(resolveNote('Width {width.moa}', two(0.02), grams)).toBe('Width 0.69 MOA')
+    expect(resolveNote('Width {width.moa}', two(0.01), grams, undefined, english.t)).toBe(
+      'Width 0.34 MOA',
+    )
+    expect(resolveNote('Width {width.moa}', two(0.02), grams, undefined, english.t)).toBe(
+      'Width 0.69 MOA',
+    )
   })
 })
 

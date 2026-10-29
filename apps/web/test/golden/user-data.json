@@ -1,0 +1,354 @@
+{
+  "format": "openreloading-user-data",
+  "version": 1,
+  "records": [
+    {
+      "kind": "manufacturer",
+      "id": "3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13",
+      "name": "Home Loader",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user"
+      }
+    },
+    {
+      "kind": "bullet",
+      "id": "9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+      "name": "Home Loader 168 gr",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "manufacturer": "user:3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13",
+        "basedOn": "catalogue:alpha-30425",
+        "overrides": {
+          "name": "168 gr",
+          "diameter": {
+            "value": 7.82
+          },
+          "mass": {
+            "value": 10.886
+          },
+          "base": {
+            "type": "boat-tail",
+            "angle": null
+          }
+        }
+      }
+    },
+    {
+      "kind": "cartridge",
+      "id": "7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57",
+      "name": "Design",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "overrides": {
+          "table": "I",
+          "values": [
+            {
+              "side": "cartridge",
+              "symbol": "L3",
+              "quantity": "length",
+              "value": 51.18
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "powder",
+      "id": "5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b",
+      "name": "Draft powder",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "provenanceKind": "fitted",
+        "draft": {
+          "grainForm": "extruded",
+          "propellantBase": "double",
+          "bulkDensity": {
+            "value": 0.9
+          },
+          "composition": [
+            {
+              "name": "Nitrocellulose",
+              "min": 60,
+              "max": 100
+            }
+          ],
+          "interior": {
+            "fitted": [
+              "vivacity"
+            ],
+            "gamma": 1.24,
+            "burnForm": {
+              "a": {
+                "value": 0.5
+              }
+            }
+          }
+        },
+        "fit": {
+          "input": [
+            {
+              "charge": {
+                "value": 2.8
+              },
+              "muzzleVelocity": {
+                "value": 820
+              },
+              "shots": 5,
+              "barrelLength": {
+                "value": 610
+              },
+              "temperature": {
+                "value": 21
+              },
+              "caseCapacity": {
+                "value": 3.6
+              },
+              "bulletMass": {
+                "value": 10.886
+              }
+            }
+          ],
+          "parameters": [
+            "burnRate"
+          ],
+          "options": {
+            "prior": {
+              "burnRate": {
+                "value": 1.2,
+                "sigma": 0.3
+              }
+            },
+            "loss": {
+              "kind": "quadratic"
+            }
+          },
+          "date": "2026-10-13T10:00:00.000Z",
+          "model": "m3",
+          "modelVersion": "0.0.4",
+          "confidence": "loose",
+          "reasons": [
+            "no-pressure"
+          ],
+          "sessions": [
+            "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
+          ]
+        }
+      }
+    },
+    {
+      "kind": "caseCapacity",
+      "id": "1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
+      "name": "Measured",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "cartridge": "catalogue:308-win",
+        "waterCapacity": {
+          "value": 3.5
+        }
+      }
+    },
+    {
+      "kind": "case",
+      "id": "5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f",
+      "name": "Match brass, lot 3",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "name": "Match brass, lot 3",
+        "cartridge": "catalogue:308-win",
+        "material": "brass",
+        "capacity": "user:1e2d3c4b-5a69-4788-9a0b-1c2d3e4f5a6b",
+        "numberOfFirings": 3,
+        "trimLength": {
+          "value": 51.1
+        }
+      }
+    },
+    {
+      "kind": "firearm",
+      "id": "2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+      "name": "Range rifle",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "name": "Range rifle",
+        "manufacturer": "catalogue:test-maker",
+        "cartridge": "catalogue:308-win",
+        "barrelLength": {
+          "value": 610
+        },
+        "twist": {
+          "value": 254
+        },
+        "twistHand": "right",
+        "optics": [
+          {
+            "id": "o1",
+            "kind": "scope",
+            "name": "5-25x56",
+            "clickUnit": "mrad",
+            "clickValue": {
+              "value": 0.00573
+            }
+          }
+        ],
+        "configurations": [
+          {
+            "id": "c1",
+            "name": "Scope",
+            "mounts": [
+              {
+                "optic": "o1",
+                "sightHeight": {
+                  "value": 55
+                },
+                "zeroRange": {
+                  "value": 100000
+                }
+              }
+            ]
+          }
+        ],
+        "active": "c1"
+      }
+    },
+    {
+      "kind": "session",
+      "id": "6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918",
+      "name": "Day 1",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "date": "2026-10-12",
+        "device": {
+          "kind": "optical"
+        },
+        "strings": [
+          {
+            "variation": {
+              "kind": "charge",
+              "value": {
+                "value": 2.8
+              }
+            },
+            "shots": [
+              {
+                "velocity": {
+                  "value": 800
+                }
+              },
+              {
+                "velocity": {
+                  "value": 805
+                }
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "kind": "measured",
+          "sources": [
+            {
+              "title": "Day 1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "load",
+      "id": "8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+      "name": "Load",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "origin": "user",
+        "charge": {
+          "value": 2.8
+        },
+        "cartridge": "catalogue:308-win",
+        "bullet": "user:9b8a7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d",
+        "powder": "user:5d4c3b2a-1f0e-4d9c-8b7a-6a5f4e3d2c1b",
+        "firearm": "user:2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
+        "case": {
+          "record": "user:5d6e7f80-1a2b-4c3d-8e4f-5a6b7c8d9e0f"
+        },
+        "sessions": [
+          "user:6f5e4d3c-2b1a-4098-8f7e-6d5c4b3a2918"
+        ]
+      }
+    },
+    {
+      "kind": "targetSheet",
+      "id": "4b5c6d7e-8f90-4a1b-8c2d-3e4f5a6b7c8d",
+      "name": "Ladder sheet",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "photo": "p1",
+        "references": [],
+        "targetRotation": 0,
+        "load": "8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
+        "groups": [
+          {
+            "id": "g1",
+            "name": "Step 1",
+            "colour": "#d9480f",
+            "distance": 100,
+            "ladderStep": 0,
+            "shots": [
+              {
+                "x": 0.003,
+                "y": -0.001,
+                "placement": "placed"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "targetFaceDesign",
+      "id": "0a1b2c3d-4e5f-4a6b-8c7d-8e9f0a1b2c3d",
+      "name": "Club face",
+      "saved": "2026-10-13T10:00:00.000Z",
+      "data": {
+        "rings": [
+          {
+            "value": 1,
+            "diameter": 100,
+            "fill": "white",
+            "line": "black"
+          },
+          {
+            "value": 2,
+            "diameter": 50
+          }
+        ],
+        "innerTen": {
+          "diameter": 10,
+          "rule": "cover"
+        },
+        "blackDiameter": 50,
+        "decimal": true,
+        "events": [
+          {
+            "name": "25 m",
+            "distance": 25000,
+            "gauge": 5.6
+          }
+        ]
+      }
+    }
+  ],
+  "files": [
+    {
+      "id": "p1",
+      "type": "image/png",
+      "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg=="
+    }
+  ]
+}

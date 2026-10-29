@@ -2,14 +2,15 @@
 
 import { Table } from '@mantine/core'
 import type { Firearm, Optic } from '@open-reloading/schema'
-import { english } from '../i18n/translate.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { plainNumber } from '../i18n/number.ts'
+import { type Message, msg } from '../i18n/translate.ts'
+import { dayText } from '../lib/dates.ts'
 import type { FieldSpec } from '../lib/field-spec.ts'
 import { clickText, fieldSi, firearmFields, siOf, twistText, zeroFill } from '../lib/firearm.ts'
 import { zeroConditions } from '../lib/range-card.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { opticKinds } from './firearm-editor.tsx'
-
-const kindLabel = (k: Optic['kind']) => opticKinds.find((o) => o.value === k)?.label ?? k
 
 /** The printed data card of the open firearm: what is entered, no interface. */
 export function DataCard({
@@ -32,35 +33,46 @@ export function DataCard({
   /** The name as its heading; off where the panel's head names the firearm. */
   title?: boolean
 }) {
-  const facts: [string, string | undefined][] = [
-    ['Cartridge', cartridge],
-    ['Manufacturer and model', [manufacturer, f.model].filter(Boolean).join(' ') || undefined],
-    ...firearmFields.map((s): [string, string | undefined] => {
-      if (s.key === 'twist') return [s.label, twistText(f, system)]
-      if (s.key === 'roundCount' || s.key === 'noteAtRoundCount')
-        return [s.label, f[s.key] === undefined ? undefined : String(f[s.key])]
+  const { t } = useTranslation()
+  const kindLabel = (k: Optic['kind']) => {
+    const label = opticKinds.find((o) => o.value === k)?.label
+    return label ? t(label) : k
+  }
+  const facts: [Message, string | undefined][] = [
+    [msg('Cartridge'), cartridge],
+    [msg('Manufacturer and model'), [manufacturer, f.model].filter(Boolean).join(' ') || undefined],
+    ...firearmFields.map((s): [Message, string | undefined] => {
+      if (s.key === 'twist') return [s.label, twistText(f, system, t)]
+      if (s.key === 'roundCount' || s.key === 'noteAtRoundCount') {
+        const count = f[s.key]
+        return [s.label, count === undefined ? undefined : plainNumber(count)]
+      }
       const si = fieldSi(s, f[s.key])
       return [s.label, si === undefined ? undefined : withUnit(s.quantity, system, si)]
     }),
-    ['Bullet of the lands contact', landsBullet],
-    ['Notes', f.notes || undefined],
+    [msg('Bullet of the lands contact'), landsBullet],
+    [msg('Notes'), f.notes || undefined],
   ]
   const opt = (si: number | undefined, q: FieldSpec['quantity']) =>
-    si === undefined ? 'n/a' : withUnit(q, system, si)
+    si === undefined ? t('n/a') : withUnit(q, system, si)
   const magnification = (o: Optic) => {
     const m = [o.minMagnification, o.maxMagnification].filter((x) => x !== undefined)
-    return m.length ? `${m.join(' to ')}x` : 'n/a'
+    const [low, high] = m
+    if (low === undefined) return t('n/a')
+    return high === undefined
+      ? t('{magnification}x', { magnification: low })
+      : t('{low} to {high}x', { low, high })
   }
   return (
-    <section className="firearm-card" aria-label="Data card">
-      {title && <h2>{f.name || 'New firearm'}</h2>}
+    <section className="firearm-card" aria-label={t('Data card')}>
+      {title && <h2>{f.name || t('New firearm')}</h2>}
       <Table withTableBorder>
         <Table.Tbody>
           {facts
             .filter(([, v]) => v)
             .map(([k, v]) => (
               <Table.Tr key={k}>
-                <Table.Th>{k}</Table.Th>
+                <Table.Th>{t(k)}</Table.Th>
                 <Table.Td>{v}</Table.Td>
               </Table.Tr>
             ))}
@@ -68,16 +80,16 @@ export function DataCard({
       </Table>
       {f.optics.length > 0 && (
         <>
-          <h3>Optics</h3>
+          <h3>{t('Optics')}</h3>
           <Table withTableBorder>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Optic</Table.Th>
-                <Table.Th>Kind</Table.Th>
-                <Table.Th>Click value</Table.Th>
-                <Table.Th>Turret travel</Table.Th>
-                <Table.Th>Magnification</Table.Th>
-                <Table.Th>Reticle</Table.Th>
+                <Table.Th>{t('Optic')}</Table.Th>
+                <Table.Th>{t('Kind')}</Table.Th>
+                <Table.Th>{t('Click value')}</Table.Th>
+                <Table.Th>{t('Turret travel')}</Table.Th>
+                <Table.Th>{t('Magnification')}</Table.Th>
+                <Table.Th>{t('Reticle')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -89,11 +101,11 @@ export function DataCard({
                     {clickText(
                       { clickValue: siOf('angle', o.clickValue), clickUnit: o.clickUnit },
                       system,
-                    ) ?? 'n/a'}
+                    ) ?? t('n/a')}
                   </Table.Td>
                   <Table.Td>{opt(siOf('angle', o.travel), 'correction')}</Table.Td>
                   <Table.Td>{magnification(o)}</Table.Td>
-                  <Table.Td>{o.reticle || 'n/a'}</Table.Td>
+                  <Table.Td>{o.reticle || t('n/a')}</Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -103,28 +115,28 @@ export function DataCard({
       {f.configurations.map((c, i) => (
         <div key={c.id}>
           <h3>
-            {c.name || `Configuration ${i + 1}`}
-            {c.id === f.active && ' (active)'}
-            {c.mounted && `, mounted ${c.mounted}`}
-            {c.removed && `, removed ${c.removed}`}
+            {c.name || t('Configuration {n}', { n: i + 1 })}
+            {c.id === f.active && ` ${t('(active)')}`}
+            {c.mounted && `, ${t('mounted {date}', { date: dayText(c.mounted) })}`}
+            {c.removed && `, ${t('removed {date}', { date: dayText(c.removed) })}`}
           </h3>
           <Table withTableBorder>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Optic</Table.Th>
-                <Table.Th>Sight height</Table.Th>
-                <Table.Th>Offset</Table.Th>
-                <Table.Th>Cant</Table.Th>
-                <Table.Th>Zero range</Table.Th>
-                <Table.Th>Zero air</Table.Th>
-                <Table.Th>Drag factor</Table.Th>
-                <Table.Th>Zero notes</Table.Th>
+                <Table.Th>{t('Optic')}</Table.Th>
+                <Table.Th>{t('Sight height')}</Table.Th>
+                <Table.Th>{t('Offset')}</Table.Th>
+                <Table.Th>{t('Cant')}</Table.Th>
+                <Table.Th>{t('Zero range')}</Table.Th>
+                <Table.Th>{t('Zero air')}</Table.Th>
+                <Table.Th>{t('Drag factor')}</Table.Th>
+                <Table.Th>{t('Zero notes')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {c.mounts.map((m, k) => {
                 const si = zeroFill(m)
-                const zero = zeroConditions(si, system, m.dragFactorSource, english.t)
+                const zero = zeroConditions(si, system, m.dragFactorSource, t)
                 const air = [
                   si.zeroTemperature === undefined
                     ? ''
@@ -144,9 +156,9 @@ export function DataCard({
                     <Table.Td>{opt(siOf('length', m.lateralOffset), 'length')}</Table.Td>
                     <Table.Td>{opt(siOf('angle', m.cant), 'angle')}</Table.Td>
                     <Table.Td>{opt(siOf('length', m.zeroRange), 'range')}</Table.Td>
-                    <Table.Td>{air || 'n/a'}</Table.Td>
-                    <Table.Td>{zero.dragFactor ?? 'n/a'}</Table.Td>
-                    <Table.Td>{m.zeroNotes || 'n/a'}</Table.Td>
+                    <Table.Td>{air || t('n/a')}</Table.Td>
+                    <Table.Td>{zero.dragFactor ?? t('n/a')}</Table.Td>
+                    <Table.Td>{m.zeroNotes || t('n/a')}</Table.Td>
                   </Table.Tr>
                 )
               })}

@@ -4,6 +4,7 @@ import { Text } from '@mantine/core'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { plainNumber } from '../i18n/number.ts'
 import { errorText } from '../lib/error-text.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { yourDataRows } from '../lib/your-data.ts'
@@ -63,7 +64,7 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
                     {t(r.label)}
                   </Link>
                 </th>
-                <td className="num">{r.count}</td>
+                <td className="num">{plainNumber(r.count)}</td>
               </tr>
             ))}
           </tbody>

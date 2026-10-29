@@ -24,7 +24,7 @@ Writers: catalogue (git records, checked by `readRecords`), user (browser, `pack
 | Chronograph session | `chrono-session.ts` | `records/chrono` (empty), bundle only; user record `session` (step 7) | catalogue, user, importers |
 | Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | catalogue |
 | Source record | `provenance.ts` | `records/sources`, inlined into records on read | catalogue |
-| Federation, discipline, target mapping, target face | `federation.ts`, `target-face.ts` | one folder each | catalogue |
+| Federation, discipline, target mapping, target | `federation.ts`, `target-face.ts` | one folder each | catalogue |
 | Caliber class | `caliber-class.ts` | `records/caliber-classes` | catalogue |
 | Load tables | `load-tables.ts` | `load-tables.json` of a records root | catalogue |
 | Firearm | `firearm.ts` | user record `firearm`, in the stored units (step 5) | user |
@@ -58,7 +58,7 @@ Ranked by how much code and visible behavior depends on them.
 
 **Types and enums (medium).** `apps/web/src/lib/api-types.ts` re-declared the record types of the schema, and the case type list existed in the API route and in the web app. Drift showed in `productNumber` (optional in the copy, required in the schema) and in `ogive.form` (a string). Step 1 removes this.
 
-**Low:** inline bullet, firearm and ammunition descriptions in publication records (`firing.ts`, `range.ts`) repeat part of Bullet and Firearm; `targetMapping.gauge` is stored on the mapping and on the face event.
+**Low:** inline bullet, firearm and ammunition descriptions in publication records (`firing.ts`, `range.ts`) repeat part of Bullet and Firearm; `targetMapping.gauge` is stored on the mapping and on the target event.
 
 ## Target model
 
@@ -89,7 +89,7 @@ The finer standing of a citation (manufacturer, public, community) stays in `pro
 | Case | catalogue, user | a user group of cases is a Case with `origin` `user`, an optional `basedOn` catalogue product, its measured values and the `capacity` reference |
 | Load | catalogue, user, shared | references to cartridge, firearm, bullet, powder, primer and capacity; the case as a component description; seating; charge; a typed `analysis` with `overrides` and the ladder |
 | Session | catalogue, user, shared | an event: strings of `{load, variation, shots}`, conditions, device, provenance with the imported file's SHA-256 |
-| TargetFace, Federation, Discipline, TargetMapping | catalogue, user (faces) | `organization` is a federation reference |
+| TargetFace, Federation, Discipline, TargetMapping | catalogue, user (targets) | `organization` is a federation reference |
 | TargetSheet | user, shared | the photo stays a file; `load` and `session` are references |
 
 Session stays separate from Load: a session is an event fixed in time, a load is a recipe reused over many sessions, and merging them would copy recipe data into every event. A target sheet is an event of its own that references both. Solver bodies stay derived SI inputs built from resolved entities and are never stored. The designers stay separate screens but edit the same entities.
@@ -159,7 +159,7 @@ Each step lands alone with its model page updated in the same commit. Steps 4 to
 | 9 | Manufacturer references (done, below) | 3 |
 | 10 | Replaced by the catalogue storage steps D0 to D6 (`catalogue-storage.md`) | |
 | 11 | Browser store hardening: versioned IndexedDB, keep and list invalid records | before 3 and 4 |
-| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of target faces (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
+| 12 | Catalogue loose ends: schema for load tables (done, below), caliber classes as records (done, below), federation reference of targets (the renames map is part of the catalogue storage, `catalogue-storage.md`) | |
 
 Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fit any time; 10 does not run together with other changes to the cartridge routes.
 
@@ -227,19 +227,19 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 
 - `caseCapacity` (`packages/schema/src/case-capacity.ts`) is the one capacity entity: the catalogue record (`records/capacities`, read through `catalogueCaseCapacity`, which needs `id`, `provenance` and catalogue references only) and the user record of kind `caseCapacity`, the water always in g (`waterCapacity`). It carries `origin`; `cartridge` and `caseManufacturer` are references (`catalogue:` or `user:`). The catalogue's record file leaves `origin` out like every kind, `GET /cartridges/:id` answers it with the capacity. A catalogue capacity of the earlier format (plain `cartridge` id, no `origin`) is rejected: no migration. A test (`packages/schema/test/case-capacity-unit.test.ts`) fails when another entity holds a water mass or when the unit is not g.
 - `Load.capacity` is a reference to a capacity, `catalogue:<id>` or `user:<UUID>`, and replaces `Load.case.waterCapacity`. A catalogue load names a catalogue capacity, `data:validate` checks that it exists (`checkLoadCapacityReferences`). `Load.case` is a strict object (maker, lot, `firingCount`), so a load or file with `case.waterCapacity` fails the schema in Open, Import, the stored-record list and the load file route (400 at the key's path). `checkUserRefs` reports a load's `user:` capacity and a capacity's `user:` cartridge or manufacturer that no record answers.
-- The workbench keeps its two inputs: the capacity record chosen in the Cartridge card and the measured capacity (water to the mouth, replaces the record's value, the flags and notes of the run are unchanged). A load saved with a typed measured capacity names a user capacity record: its id is a version 8 UUID derived from the cartridge reference and the value in g (`measuredCapacityId` in `apps/web/src/lib/load-record.ts`), so one measurement is one record and a changed value another one, which a load saved earlier keeps. Save writes that record to the browser together with the load (`storeLoad`, the File menu's `store`); opening the load reads it back into the field. A record the browser does not answer stays in the load as asked and is listed as not loaded. A capacity record the user chose from the cartridge's catalogue capacities is saved as `catalogue:<id>` (only when chosen, the first one shown by default is followed). The link parameter `measuredWaterCapacity` is unchanged (m³).
+- The workbench keeps its two inputs: the capacity record chosen in the pinned row above the input cards and the measured capacity (water to the mouth, replaces the record's value, the flags and notes of the run are unchanged). A load saved with a typed measured capacity names a user capacity record: its id is a version 8 UUID derived from the cartridge reference and the value in g (`measuredCapacityId` in `apps/web/src/lib/load-record.ts`), so one measurement is one record and a changed value another one, which a load saved earlier keeps. Save writes that record to the browser together with the load (`storeLoad`, the File menu's `store`); opening the load reads it back into the field. A record the browser does not answer stays in the load as asked and is listed as not loaded. A capacity record the user chose from the cartridge's catalogue capacities is saved as `catalogue:<id>` (only when chosen, the first one shown by default is followed). The link parameter `measuredWaterCapacity` is unchanged (m³).
 - Limits: a load file or a copied JSON carries the load, not the capacity record, so in another browser the measured value is reported as missing (the same limit as a user cartridge or bullet design); share links never carried it. The load file route names no solver value from a capacity (the volume is a typed override).
 
 - Own cases: the user record of kind `case` (`packages/schema/src/user-data.ts`) holds a `Case` with `origin` `user`. `manufacturer` is required of a catalogue case only. `basedOn` names the catalogue product the group started from; its fields are the group's own values, not overrides of the product. The measured fields are optional: `numberOfFirings`, `trimLength` and `neckWall` (mm), `casesMeasured` and `spread` (g, standard deviation of the capacity over those cases). The measured water capacity stays a `caseCapacity` record that the group names with `capacity`, so a capacity is stored once: the case group editor (`/cases/editor`, `apps/web/src/components/case-group-editor.tsx`) writes it with the id `measuredCapacityId` gives for the cartridge and value, the same record the workbench writes for a typed measured capacity. The record id must be a UUID, so a load can name the group with `case.record` (`user:<UUID>`). `checkUserRefs` reports a group's `user:` cartridge, manufacturer and capacity and a load's `case.record` that no record answers. Export all and Import carry the groups with every other record; a single group's file does not carry its capacity record (the limit of a load file above).
-- The workbench lists the groups of the chosen cartridge in the Cartridge card's Case record choice. Choosing one fills the measured capacity field from the group's capacity record, which the run already marks as measured, and a saved load keeps `case.record` as the group's reference.
+- The workbench lists the groups of the chosen cartridge in the Brass record choice of the pinned row above the input cards. Choosing one fills the measured capacity field from the group's capacity record, which the run already marks as measured, and a saved load keeps `case.record` as the group's reference.
 
 ### Step 12: what changed
 
 - `loadTables` (`packages/schema/src/load-tables.ts`) is the schema of `load-tables.json`: row file name to `{ manufacturer, title, url?, retrieved }`, strict, `manufacturer` a record id and `retrieved` an ISO date. `readLoadTables` parses each entry: one that breaks the schema is left out and `data:validate` reports each issue with the row file and field. The manufacturer must still be a record (`checkManufacturerReferences`).
 
-- Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target face list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
+- Caliber classes are records (`records/caliber-classes`, `caliberClass` in `packages/schema/src/caliber-class.ts`), served by `GET /caliber-classes` and `/:id`. `Discipline.caliberClasses.ids` and the `caliberClasses` of a target list item are record ids, checked by `data:validate` (`packages/data/src/caliber-classes.ts`), which also holds the membership rules the former test checked. The `caliberClasses` constant of the schema package is gone: the web app reads class names from the API.
 
-- `TargetFace.federation` and the face events' `federation` are federation record ids (`organization` is gone from the records), a face without `federation` is a user's own design. Every face event has an `id` (a record id, unique within the face) and `TargetMapping.event` holds it. `data:validate` checks the federation references, the mapping against the event's federation and the uniqueness (`checkFaceFederations`, `checkMappings`). The target faces API list derives `organization` from the federation. The web app keys the event choice by id, and a target sheet's `face.event` is a record id: a saved sheet that holds an event name is rejected like any record of an older format.
+- `TargetFace.federation` and the target events' `federation` are federation record ids (`organization` is gone from the records), a target without `federation` is a user's own design. Every target event has an `id` (a record id, unique within the target) and `TargetMapping.event` holds it. `data:validate` checks the federation references, the mapping against the event's federation and the uniqueness (`checkFaceFederations`, `checkMappings`). The targets API list derives `organization` from the federation. The web app keys the event choice by id, and a target sheet's `face.event` is a record id: a saved sheet that holds an event name is rejected like any record of an older format.
 
 ### Step 9: what changed
 
@@ -255,10 +255,37 @@ Steps 1, 2 and 11 go first, then 3, then 4 to 6, then 7 to 9. Steps 10 and 12 fi
 - `Load.snapshots` (`sessionSnapshot` in `packages/schema/src/load.ts`, up to 50, at most one per entry of `Load.sessions`) keeps what the load was at each session: `powderLot`, `primerLot`, `caseLot`, `seating` and the firearm's `roundCount`, and the ids of the notes the user dismissed for that session. `Load.powderLot` is new beside `primer.lot` and `case.lot` (a powder is a bare reference and had no place for a lot); a primer is a `lot` and an optional catalogue `record`, so a lot alone can be stored. `Firearm.noteAtRoundCount` is the count the user sets for the round count note. All are optional additions: no existing record changes.
 - The snapshot is shown live until the load is saved with the session, then fixed. The rules and their thresholds are on `apps/docs/docs/models/load-notes.md`.
 
+### Fit of a user powder
+
+A fitted user powder keeps a copy of what it was fitted to in the optional `fit` of its data (`userPowderFit` in `packages/schema/src/user-data.ts`), so deleting or editing a session never changes what the powder rests on. Its `provenanceKind` stays `fitted`. Every quantity is `{ value }` in its stored unit, and every field is required unless marked optional.
+
+| Field | Content | Unit |
+| --- | --- | --- |
+| `input` | 1 to 40 points, each with every field below | |
+| `input[].charge` | powder charge, above 0 | g |
+| `input[].muzzleVelocity` | mean muzzle velocity of the string, above 0 | m/s |
+| `input[].shots` | shots of the string, a whole number above 0 | 1 |
+| `input[].barrelLength` | barrel length, above 0 | mm |
+| `input[].temperature` | powder temperature | degC |
+| `input[].caseCapacity` | water capacity of the case, above 0 | cm3 |
+| `input[].bulletMass` | bullet mass, above 0 | g |
+| `parameters` | the parameters the fit freed, each once: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor` | |
+| `options.prior` | optional: per freed parameter a Gaussian prior, `value` (the centre) and `sigma` (of the log parameter) | `value`: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1; `sigma`: 1 |
+| `options.loss` | `{ kind: 'quadratic' }` or `{ kind: 'huber', threshold }` | threshold in sigmas of the rows |
+| `date` | time of the fit, ISO 8601 in UTC | |
+| `model`, `modelVersion` | interior model (such as `m3`) and the version of the code that fitted | |
+| `confidence` | width class of the peak-pressure range: `tight`, `moderate` or `loose` | |
+| `reasons` | up to 20 reason names of the fit's confidence | |
+| `sessions` | up to 50 `user:<UUID>` references to the sessions the points came from, for information only | |
+| `previous` | optional: `user:<UUID>` of the powder record this one refits | |
+
+`sessions` and `previous` are never resolved: `checkUserRefs` does not report them and a share link does not count them as user references. The block is part of the user data file baseline (`apps/web/test/golden/user-data.json`, [release](../release.md#contract-baselines)).
+
 ## Decisions
 
 - The record attribute is `origin` with the values `catalogue`, `user` and `shared`. The citation's `origin` becomes `standing`.
 - User data stays client side. Compute routes accept a reference or an entity.
 - Overrides follow the merge rules above, and a catalogue change to a field that is not overridden is followed and shown as "base changed".
 - One unit system in stored data. Old SI files are rejected.
+- No migration at 1.0.0: the user data file and share links stay version 1, so an alpha file still opens. Export all data before updating. A browser record of an older shape then shows under Open as one of the invalid records, with its error, Download raw and Delete: fix the downloaded record and import it, or delete it.
 - Session stays separate from Load. FiringSeries can become a Session after step 7, with a per-string summary for publications that print only a mean.

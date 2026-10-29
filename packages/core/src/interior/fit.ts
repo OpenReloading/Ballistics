@@ -432,23 +432,32 @@ function powderParameterMap(
     ...l,
     propellant: { ...l.propellant, ...p },
   })
-  const set: Record<PowderParameter, (l: InteriorLoad, v: number) => InteriorLoad> = {
-    burnRate: (l, v) =>
-      withPropellant(l, {
-        burn: burn.kind === 'vivacity' ? { ...burn, vivacity: v } : { ...burn, coefficient: v },
-      }),
-    startPressure: (l, v) => ({ ...l, startPressure: v }),
-    volumeFactor: (l, v) => ({ ...l, chamber: { ...l.chamber, volume: load.chamber.volume * v } }),
-    energy: (l, v) => withPropellant(l, { specificEnergy: v }),
-    temperatureFactor: (l, v) => {
-      const t = load.propellant.temperatureSensitivity
-      return t === undefined
-        ? l
-        : withPropellant(l, { temperatureSensitivity: { ...t, cold: t.cold * v, hot: t.hot * v } })
-    },
+  const setParameter = (l: InteriorLoad, name: PowderParameter, v: number): InteriorLoad => {
+    switch (name) {
+      case 'burnRate':
+        return withPropellant(l, {
+          burn: burn.kind === 'vivacity' ? { ...burn, vivacity: v } : { ...burn, coefficient: v },
+        })
+      case 'startPressure':
+        return { ...l, startPressure: v }
+      case 'volumeFactor':
+        return { ...l, chamber: { ...l.chamber, volume: load.chamber.volume * v } }
+      case 'energy':
+        return withPropellant(l, { specificEnergy: v })
+      case 'temperatureFactor': {
+        const t = load.propellant.temperatureSensitivity
+        return t === undefined
+          ? l
+          : withPropellant(l, {
+              temperatureSensitivity: { ...t, cold: t.cold * v, hot: t.hot * v },
+            })
+      }
+    }
   }
+  if (!parameters.every((p) => parameterNames.includes(p)))
+    throw new InputError(`parameters: ${parameterNames.join(', ')}, each at most once`)
   const apply = (values: number[]): InteriorLoad =>
-    parameters.reduce((l, name, k) => set[name](l, nth(values, k)), load)
+    parameters.reduce((l, name, k) => setParameter(l, name, nth(values, k)), load)
   // log parameters; the start pressure in ln((p_st - p_floor)/(p_st0 - p_floor)), so no step reaches the floor
   const offset = parameters.map((p) => (p === 'startPressure' ? floor : 0))
   const q = (theta: number[]) =>

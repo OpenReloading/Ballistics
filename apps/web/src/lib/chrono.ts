@@ -11,6 +11,8 @@ import {
   type VelocityUnit,
 } from '@open-reloading/importers'
 import { formatNumber } from '../i18n/number.ts'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
+import { translateMessage } from './core-messages.ts'
 import { toCsv } from './csv.ts'
 import { stringStats } from './string-stats.ts'
 import type { Unit } from './units.ts'
@@ -76,7 +78,16 @@ export const exampleCsv = `${[
 
 /** Largest file read, bytes: 32 MiB, the importers' limit for the unpacked parts of a workbook. */
 const maxFileBytes = 32 * 1024 * 1024
-const tooLarge = 'The file is larger than 32 MiB.'
+const tooLarge = msg('The file is larger than 32 MiB.')
+const notWorkbook = msg('The workbook is not a recognized chronograph export.')
+const notExport = msg('The file is not a recognized chronograph export.')
+const ownMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
+
+/** The message of an error thrown here or by the importers, in the language of `t`. */
+export const chronoMessageText = (text: string, t: Translator['t']) => {
+  const own = ownMessages.find((m) => m === text)
+  return own ? t(own) : translateMessage(text, t)
+}
 
 /** The bytes of a chosen file, its size checked before reading, so a large file chosen by mistake is never loaded. */
 export async function chronoFileBytes(file: Blob) {
@@ -92,13 +103,13 @@ export async function readChrono(
   if (isWorkbook(bytes)) {
     const result = parseChrono(await readWorkbook(bytes), options)
     if (result) return result
-    throw new Error('The workbook is not a recognized chronograph export.')
+    throw new Error(notWorkbook)
   }
   if (bytes.length > maxFileBytes) throw new Error(tooLarge)
   const text = decodeText(bytes)
   const result = parseChrono(text, options)
   if (result) return result
-  throw new Error('The file is not a recognized chronograph export.')
+  throw new Error(notExport)
 }
 
 /**
@@ -124,9 +135,11 @@ export async function readSession(
   }
 }
 
-/** Label "String n" or "String n: label" for the string at zero-based index `k`. */
-export const stringName = (labels: (string | undefined)[], k: number) =>
-  `String ${k + 1}${labels[k] ? `: ${labels[k]}` : ''}`
+/** Label "String n" or "String n: label" for the string at zero-based index `k`, in the language of `t`. */
+export const stringName = (labels: (string | undefined)[], k: number, t: Translator['t']) =>
+  labels[k]
+    ? t('String {n}: {label}', { n: k + 1, label: labels[k] })
+    : t('String {n}', { n: k + 1 })
 
 /** Header and one row per string (numbers with a point, whatever the language shown): shots, excluded, mean, SD, ES, min and max in `unit` with 1 decimal. */
 function statisticsRows(data: ChronoImport, unit: Unit): (string | number)[][] {
@@ -138,7 +151,7 @@ function statisticsRows(data: ChronoImport, unit: Unit): (string | number)[][] {
     ...data.session.strings.map((s, k) => {
       const st = stringStats(s.shots)
       return [
-        stringName(data.stringLabels, k),
+        stringName(data.stringLabels, k, english.t),
         st?.count ?? 0,
         st?.excluded ?? s.shots.length,
         v(st?.mean),
@@ -159,7 +172,7 @@ function shotRows(data: ChronoImport, unit: Unit): (string | number)[][] {
     ['String', 'Shot', `Velocity (${unit.symbol})`, 'Cold bore', 'Excluded'],
     ...data.session.strings.flatMap((s, k) =>
       s.shots.map((shot, n) => [
-        stringName(data.stringLabels, k),
+        stringName(data.stringLabels, k, english.t),
         n + 1,
         v(shot.velocity.value),
         shot.coldBore ? 'yes' : '',

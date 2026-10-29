@@ -1,5 +1,6 @@
 /** Readout rows of a group's statistics: sizes in m with their angles and intervals. */
 import { type GroupStatistics, subtendedAngle } from '@open-reloading/core'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { type UnitSystem, withUnit } from './units.ts'
 
 /**
@@ -17,8 +18,8 @@ export type Interval = {
 /** One readout: a size in m with its angle at the group's distance, and its interval if any. */
 type Readout = {
   key: string
-  label: string
-  help: string
+  label: Message
+  help: Message
   value: number
   angle: number
   interval?: Interval | undefined
@@ -28,31 +29,41 @@ type Readout = {
 
 /** Key, label and definition of each readout row, in display order. */
 export const readoutRows = [
-  ['extremeSpread', 'ES', 'Extreme spread: largest distance between two shots, centre to centre.'],
-  ['width', 'Width', 'Range of the horizontal coordinates.'],
-  ['height', 'Height', 'Range of the vertical coordinates.'],
-  ['meanRadius', 'Mean radius', 'Mean distance of the shots from the group centre.'],
+  [
+    'extremeSpread',
+    msg('ES'),
+    msg('Extreme spread: largest distance between two shots, centre to centre.'),
+  ],
+  ['width', msg('Width'), msg('Range of the horizontal coordinates.')],
+  ['height', msg('Height'), msg('Range of the vertical coordinates.')],
+  ['meanRadius', msg('Mean radius'), msg('Mean distance of the shots from the group centre.')],
   [
     'minPairDistance',
-    'Min. pair',
-    'Smallest distance between two shots, centre to centre; describes the shots fired, no interval.',
+    msg('Min. pair'),
+    msg(
+      'Smallest distance between two shots, centre to centre; describes the shots fired, no interval.',
+    ),
   ],
   [
     'meanPairDistance',
-    'Mean pair',
-    'Mean distance over all pairs of shots, centre to centre; describes the shots fired, no interval.',
+    msg('Mean pair'),
+    msg(
+      'Mean distance over all pairs of shots, centre to centre; describes the shots fired, no interval.',
+    ),
   ],
-  ['standardDeviationX', 'SD horiz.', 'Sample standard deviation of x (divisor n - 1).'],
-  ['standardDeviationY', 'SD vert.', 'Sample standard deviation of y (divisor n - 1).'],
+  ['standardDeviationX', msg('SD horiz.'), msg('Sample standard deviation of x (divisor n - 1).')],
+  ['standardDeviationY', msg('SD vert.'), msg('Sample standard deviation of y (divisor n - 1).')],
   [
     'radialStandardDeviation',
-    'Radial SD',
-    'Square root of the sum of both axis variances (divisor n - 1).',
+    msg('Radial SD'),
+    msg('Square root of the sum of both axis variances (divisor n - 1).'),
   ],
   [
     'cepElliptical',
-    'CEP',
-    'Circular error probable: radius about the group centre holding half of a normal spread with the sample covariance, for any ratio and direction of the axes.',
+    msg('CEP'),
+    msg(
+      'Circular error probable: radius about the group centre holding half of a normal spread with the sample covariance, for any ratio and direction of the axes.',
+    ),
   ],
 ] as const
 
@@ -102,14 +113,23 @@ export const keyReadouts: string[] = ['extremeSpread', 'meanRadius', 'cepEllipti
  * The statistics box text of a group below its name: the shot count, then each key readout of
  * `rows` (the group's `readouts`) in length and angle.
  */
-export function statLines(s: GroupStatistics, rows: Readout[], system: UnitSystem): string[] {
+export function statLines(
+  s: GroupStatistics,
+  rows: Readout[],
+  system: UnitSystem,
+  { t, tn }: Pick<Translator, 't' | 'tn'>,
+): string[] {
   return [
-    `${s.shotCount} shots${s.excludedCount ? ` + ${s.excludedCount} excl.` : ''}`,
+    s.excludedCount
+      ? tn(s.shotCount, '{count} shot + {excluded} excl.', '{count} shots + {excluded} excl.', {
+          excluded: s.excludedCount,
+        })
+      : tn(s.shotCount, '{count} shot', '{count} shots'),
     ...rows
       .filter((r) => keyReadouts.includes(r.key))
       .map(
         (r) =>
-          `${r.label} ${withUnit('length', system, r.value)}, ${withUnit('correction', system, r.angle)}`,
+          `${t(r.label)} ${withUnit('length', system, r.value)}, ${withUnit('correction', system, r.angle)}`,
       ),
   ]
 }

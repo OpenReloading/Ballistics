@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { interior } from '@open-reloading/core'
 import { UsageError } from './errors.ts'
@@ -62,8 +62,16 @@ function sharedFiles() {
  */
 export async function loadModel(spec: string): Promise<Model> {
   const { core, files } = sharedFiles()
+  // this file is built as .js and tested as .ts: the estimator has the same extension
+  const here = fileURLToPath(import.meta.url)
+  const cli = dirname(here)
   // A candidate may call the core model, so its version includes the core model's files too.
-  const coreModel = [...files, ...closure(join(core, 'interior/model.js'), core, 'core')]
+  const coreModel = [
+    ...files,
+    ...closure(join(core, 'interior/model.js'), core, 'core'),
+    // the estimator of a powder not in the fitted set, in every run so the version does not depend on the options
+    ...closure(join(cli, `unseen${extname(here)}`), cli, 'cli'),
+  ]
   if (spec === builtInName) return { name: spec, interior, files: coreModel }
   const path = resolve(spec)
   if (!existsSync(path))

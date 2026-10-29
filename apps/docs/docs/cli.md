@@ -47,13 +47,19 @@ The 90 % interval has the half width $h$, the 90th percentile of the velocity er
 
 Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet`, `unknownPowder`, `noPowderModel` (no interior parameters), `noCaseCapacity`, `noBulletLength`, `noBulletShape`, `noBarrelLength`, `missingCartridgeValue`, `modelRefused`.
 
-The powder parameters are those of the records (`--params records`, the only mode). A fit of each powder on its training rows, leave-one-powder-out and by-session checks need a fit from rows and are not part of this version.
+The powder parameters are those of the records (`--params records`, the only mode). A fit of each powder on its training rows and by-session checks need a fit from rows and are not part of this version.
+
+### Powder not in the fitted set
+
+`verify --leave-one-powder-out` adds `notInFittedSet`, the line "powder not in the fitted set". The fitted set is the powders the rows name (any split) whose record has interior parameters; their record values are the fit, nothing is fitted from rows. Each powder of that set with rows in the run's split is left out in turn: every field its record lists in `interior.fitted` (`vivacity`, `energy`, `form.a`) is replaced by the median of that field over the other powders of its family, or over all other powders when its family has no other; its fixed inputs (gamma, covolume, density, the other burn form constants, resistance, temperatures) stay its own. A powder with no other powder in the set counts as `noPowderModel`. Its rows of the split are predicted with that record, so the test split stays sealed for the line too. The line carries the metrics above over the rows of all left-out powders and `powders`, their number. Its coverage is against the run's interval, from the training rows with the records' parameters: it shows how that interval fares for an unseen powder. The P90 is the 90th percentile of these held-out errors, not a half width.
+
+Limits: the CLI does not see which rows or split the records' parameters were fitted on, and constants shared by the records' fit (bore resistance, the start pressure rule) may have seen the left-out powder's rows. The family median is a baseline estimator, not what the app does: the app refuses a powder without interior parameters.
 
 ## Model version
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
 
-- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/core` builds for `interior/model.js`, `interior/record-load.js` and `water.js` (the water density that turns a capacity into a chamber volume), the files `@open-reloading/schema` builds for the unit conversion (`toSi`, `fromSi`) and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed);
+- `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/core` builds for `interior/model.js`, `interior/record-load.js` and `water.js` (the water density that turns a capacity into a chamber volume), the files `@open-reloading/schema` builds for the unit conversion (`toSi`, `fromSi`) and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed), and the estimator of the powder not in the fitted set (`unseen.js` of the CLI with its relative imports), with or without the option;
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
 

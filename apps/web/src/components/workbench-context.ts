@@ -80,6 +80,8 @@ export type ResultState = {
   manufacturerRef: (typed: string) => string | undefined
   /** The sessions the load names, also those this browser does not answer. */
   sessionRefCount: number
+  /** Hands the load the run simulates to the powder tuning route, on its link. */
+  handOffTune: () => void
   loadNotes: LoadNotesState
   /** The name of a manufacturer reference; empty for none or an unknown one. */
   manufacturerName: (ref: string | undefined) => string

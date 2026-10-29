@@ -3,6 +3,7 @@
 import { Affix, Button, CloseButton, Paper, Text, Tooltip } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { basePath } from '../lib/edition.ts'
 import { controlSize } from '../lib/theme.ts'
 
@@ -14,6 +15,7 @@ import { controlSize } from '../lib/theme.ts'
 export function OfflineLayer() {
   const [waiting, setWaiting] = useState<ServiceWorker>()
   const wide = useMediaQuery('(min-width: 75em)')
+  const { t } = useTranslation()
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
     const sw = navigator.serviceWorker
@@ -54,9 +56,9 @@ export function OfflineLayer() {
     >
       <Paper withBorder shadow="md" className="update-notice" role="status">
         <Text size="sm" fw={600}>
-          New version
+          {t('New version')}
         </Text>
-        <Tooltip label="Loads the new version; your records in this browser stay">
+        <Tooltip label={t('Loads the new version; your records in this browser stay')}>
           <Button
             size={controlSize.row.button}
             onClick={() => {
@@ -72,10 +74,10 @@ export function OfflineLayer() {
               waiting.postMessage('skip-waiting')
             }}
           >
-            Reload
+            {t('Reload')}
           </Button>
         </Tooltip>
-        <CloseButton aria-label="Later" onClick={() => setWaiting(undefined)} />
+        <CloseButton aria-label={t('Later')} onClick={() => setWaiting(undefined)} />
       </Paper>
     </Affix>
   )

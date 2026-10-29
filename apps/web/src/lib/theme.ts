@@ -90,9 +90,14 @@ export const theme = createTheme({
     Badge: { defaultProps: { radius: 0 } },
     Pill: { defaultProps: { radius: 0 } },
     CloseButton: { defaultProps: { size: 24 } },
-    // hover help also on keyboard focus; a tooltip that holds help a touch user needs sets `touch`
+    // hover help also on keyboard focus; a tooltip that holds help a touch user needs sets `touch`.
+    // `interactive` keeps it open while the pointer moves onto it (WCAG 1.4.13, hoverable)
     Tooltip: {
-      defaultProps: { withArrow: true, events: { hover: true, focus: true, touch: false } },
+      defaultProps: {
+        withArrow: true,
+        interactive: true,
+        events: { hover: true, focus: true, touch: false },
+      },
     },
     // the cell padding of the element default in globals.css
     Table: { defaultProps: { verticalSpacing: '0.25rem', horizontalSpacing: '0.5rem' } },

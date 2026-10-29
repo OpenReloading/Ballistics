@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { Refusal, UsageError } from './errors.ts'
-import { outcomes } from './evaluate.ts'
-import { changeOf, evaluate, type Grouping } from './metrics.ts'
+import { type InteriorModel, outcomes } from './evaluate.ts'
+import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, loadModel } from './model.ts'
 import { loadRecords } from './records.ts'
 import {
@@ -12,8 +12,9 @@ import {
   verifyResult,
 } from './result.ts'
 import { readRows } from './rows.ts'
-import type { Split } from './split.ts'
+import { type Split, splitOf } from './split.ts'
 import { byText } from './stats.ts'
+import { unseenPowder } from './unseen.ts'
 import { inputsOf, modelVersion } from './version.ts'
 
 /** What `verify` and `compare` read: the rows, the records, the split and the sealed-split switch. */
@@ -27,6 +28,8 @@ export interface Options {
   final: boolean
   /** Adds the groups of this key to the result. */
   groupBy?: Grouping | undefined
+  /** Adds the line of the powder not in the fitted set. */
+  leaveOnePowderOut?: boolean | undefined
   /** Gets a note about the inputs; the result stays on stdout. */
   warn?: ((text: string) => void) | undefined
 }
@@ -53,6 +56,24 @@ function prepare(options: Options) {
 
 type Prepared = ReturnType<typeof prepare>
 
+/** The outcomes of the rows of `split` of each powder with interior parameters, predicted as a powder not in the fitted set, and the number of those powders. */
+function leftOut({ rows, records }: Prepared, model: InteriorModel, split: Split) {
+  const fitted = [...new Set(rows.map((r) => r.powder))].flatMap((id) => {
+    const powder = records.powders.get(id)
+    return powder?.interior ? [powder] : []
+  })
+  const inSplit = fitted.filter((p) =>
+    rows.some((r) => r.powder === p.id && splitOf(r.cartridge) === split),
+  )
+  const items = inSplit.flatMap((powder) => {
+    const { interior: _, ...plain } = powder
+    const powders = new Map(records.powders).set(powder.id, unseenPowder(powder, fitted) ?? plain)
+    const own = rows.filter((r) => r.powder === powder.id)
+    return outcomes(own, { ...records, powders }, model, [split])
+  })
+  return { items, powders: inSplit.length }
+}
+
 /** What the model selected by `spec` gives on the split; refuses a split with no evaluable row. */
 async function evaluateModel(spec: string, options: Options, data: Prepared): Promise<Evaluation> {
   const model = await loadModel(spec)
@@ -67,7 +88,18 @@ async function evaluateModel(spec: string, options: Options, data: Prepared): Pr
     throw new Refusal(
       `no row of the ${options.split} split could be evaluated (${evaluation.overall.rows.inSplit} in the split)`,
     )
-  return { model: model.name, modelVersion: modelVersion(model, data.inputs), ...evaluation }
+  const unseen = options.leaveOnePowderOut && leftOut(data, model.interior, options.split)
+  return {
+    model: model.name,
+    modelVersion: modelVersion(model, data.inputs),
+    ...evaluation,
+    ...(unseen && {
+      notInFittedSet: {
+        ...metricsOf(unseen.items, evaluation.interval.halfWidth),
+        powders: unseen.powders,
+      },
+    }),
+  }
 }
 
 /** `verify`: the held-out metrics of one model on one split. */

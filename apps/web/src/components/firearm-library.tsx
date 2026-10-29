@@ -42,6 +42,7 @@ import {
   firearmCells,
   firearmIssues,
   firearmProblem,
+  schemaMessage,
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
@@ -506,6 +507,8 @@ export function FirearmLibrary() {
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
   const [failure, setFailure] = useState('')
+  /** Why the firearm that `?record=` names could not be opened. */
+  const [linkFailure, setLinkFailure] = useState<Message>()
   /** Why the browser store could not be read. */
   const [readError, setReadError] = useState('')
   /** The name field was left once; its error shows from then on, not on a fresh page. */
@@ -520,7 +523,7 @@ export function FirearmLibrary() {
   const menu = useRef<FileMenuHandle>(null)
   // a row's link in a new tab: `?record=<id>` opens that firearm
   // the alert line shows alerts only, not the reading of the linked record
-  useRecordLink('firearm', menu, (m) => setFailure(m && m !== recordLoadingText ? m : ''))
+  useRecordLink('firearm', menu, (m) => setLinkFailure(m === recordLoadingText ? undefined : m))
 
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)
@@ -561,11 +564,14 @@ export function FirearmLibrary() {
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(data)
-  const problem = useMemo(() => firearmProblem(fileData.name, fileData), [fileData])
+  const problem = useMemo(() => firearmProblem(fileData.name, fileData, t), [fileData, t])
   const issues = useMemo(() => firearmIssues(data), [data])
   /** The schema's cross-field error at `path`, shown on that field. */
   const crossError = (...path: (string | number)[]) =>
-    issues.find((i) => i.code === 'custom' && i.path.join('/') === path.join('/'))?.message
+    schemaMessage(
+      issues.find((i) => i.code === 'custom' && i.path.join('/') === path.join('/'))?.message ?? '',
+      t,
+    ) || undefined
 
   const patch = (p: Partial<Firearm>) => setData((d) => ({ ...d, ...p }))
   const setOptic = (i: number, p: Partial<Optic>) =>
@@ -658,7 +664,7 @@ export function FirearmLibrary() {
   // each row's cells once per render: every column and the sort read them
   const cellCache = new Map<FirearmRecord, ReturnType<typeof firearmCells>>()
   const cells = (r: FirearmRecord) => {
-    const c = cellCache.get(r) ?? firearmCells(r.data, system)
+    const c = cellCache.get(r) ?? firearmCells(r.data, system, t)
     cellCache.set(r, c)
     return c
   }
@@ -724,6 +730,7 @@ export function FirearmLibrary() {
             }
           />
           {failure && <ErrorNote>{failure}</ErrorNote>}
+          {linkFailure && <ErrorNote>{t(linkFailure)}</ErrorNote>}
           <LibraryBody
             readError={readError}
             onRetry={refresh}

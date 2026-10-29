@@ -2,6 +2,7 @@
 
 import { Modal, type ModalRootProps } from '@mantine/core'
 import type { ComponentProps, ReactNode } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 
 /**
  * A modal dialog assembled from Mantine's parts, with a `div` as header: a second `<header>` beside
@@ -22,13 +23,14 @@ export function AppModal({
   bodyProps?: ComponentProps<typeof Modal.Body> & { 'data-autofocus'?: boolean }
   footer?: ReactNode
 }) {
+  const { t } = useTranslation()
   return (
     <Modal.Root {...root}>
       <Modal.Overlay />
       <Modal.Content>
         <Modal.Header component="div">
           <Modal.Title>{title}</Modal.Title>
-          {closeButton && <Modal.CloseButton aria-label="Close" {...closeButton} />}
+          {closeButton && <Modal.CloseButton aria-label={t('Close')} {...closeButton} />}
         </Modal.Header>
         <Modal.Body {...bodyProps}>{children}</Modal.Body>
         {footer}

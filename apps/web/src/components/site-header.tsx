@@ -24,6 +24,7 @@ import Link from 'next/link'
 import { useContext, useEffect, useId, useRef, useState } from 'react'
 import dark from '../assets/ballistics-dark.svg'
 import light from '../assets/ballistics-light.svg'
+import { useTranslation } from '../i18n/language.ts'
 import { alphaNote } from '../lib/alpha.ts'
 import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
@@ -62,9 +63,10 @@ type Section = (typeof sections)[number]
  */
 function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
   const note = useId()
+  const { t } = useTranslation()
   return (
     <>
-      <Tooltip label={alphaNote} position="bottom-start" transitionProps={{ duration: 0 }}>
+      <Tooltip label={t(alphaNote)} position="bottom-start" transitionProps={{ duration: 0 }}>
         <Anchor
           component={Link}
           href="/"
@@ -82,7 +84,7 @@ function Brand({ onClick, full }: { onClick?: () => void; full?: boolean }) {
       </Tooltip>
       {/* the tooltip renders only while open: screen readers get the note from here */}
       <span id={note} className="visually-hidden">
-        {alphaNote}
+        {t(alphaNote)}
       </span>
     </>
   )
@@ -167,6 +169,7 @@ function SectionLinks({
 }) {
   // the sidebar stays in the document beside the drawer: ids of their own
   const id = useId()
+  const { t } = useTranslation()
   return (
     <div>
       <Text
@@ -177,7 +180,7 @@ function SectionLinks({
         mb={4}
         className={rail ? 'visually-hidden' : undefined}
       >
-        {section.title}
+        {t(section.title)}
       </Text>
       <Stack
         component="ul"
@@ -192,7 +195,7 @@ function SectionLinks({
           <li key={p.href}>
             <PageLink
               href={p.href}
-              label={p.label}
+              label={t(p.label)}
               icon={p.icon}
               route={route}
               rail={rail}
@@ -215,6 +218,7 @@ function SectionLinks({
  */
 export function SiteHeader() {
   const route = useRoute()
+  const { t } = useTranslation()
   const [opened, { toggle, close }] = useDisclosure(false)
   // the drawer is only hidden by CSS from 75em: left open, its scroll lock and focus trap would stay
   const wide = useMediaQuery('(min-width: 75em)')
@@ -256,7 +260,7 @@ export function SiteHeader() {
             size={28}
             opened={opened}
             onClick={toggle}
-            aria-label="Navigation"
+            aria-label={t('Navigation')}
             aria-expanded={opened}
           />
           <Brand full={route === '/'} />
@@ -280,12 +284,12 @@ export function SiteHeader() {
         {/* hidden below 75em, so one navigation "Main" is in the tree at any width. The links scroll in
             a window shorter than they are; the foot (Install, Settings) is outside that box, so it
             stays in view and nothing pressed at the box's edge makes it scroll (globals.css) */}
-        <AppShellSection grow component="nav" aria-label="Main" className="rail">
+        <AppShellSection grow component="nav" aria-label={t('Main')} className="rail">
           <Stack gap="xs" className="rail-links">
             <Stack gap={0} align="center">
               <PageLink
                 href="search"
-                label="Search"
+                label={t('Search')}
                 route={route}
                 rail
                 onOpen={openSearch}
@@ -304,7 +308,7 @@ export function SiteHeader() {
             </div>
             <PageLink
               href="settings"
-              label="Settings"
+              label={t('Settings')}
               route={route}
               rail
               onOpen={() => openSettings()}
@@ -325,19 +329,19 @@ export function SiteHeader() {
       >
         <Drawer.Overlay />
         {/* named by its own label: the wordmark's alpha badge and note would join a title's name */}
-        <Drawer.Content aria-label="Navigation">
+        <Drawer.Content aria-label={t('Navigation')}>
           {/* a div: a second <header> outside the page header would be another banner landmark */}
           <Drawer.Header component="div">
             <Brand onClick={close} />
             {/* focus starts here: on the wordmark it would open the alpha tooltip over the links */}
-            <Drawer.CloseButton aria-label="Close navigation" data-autofocus />
+            <Drawer.CloseButton aria-label={t('Close navigation')} data-autofocus />
           </Drawer.Header>
           <Drawer.Body>
             {/* the sidebar's list with the current page marked, rows 44 px high */}
-            <Stack component="nav" aria-label="Main" gap="md" className="drawer-nav">
+            <Stack component="nav" aria-label={t('Main')} gap="md" className="drawer-nav">
               <PageLink
                 href="search"
-                label="Search"
+                label={t('Search')}
                 route={route}
                 rail={false}
                 onOpen={fromDrawer(openSearch)}
@@ -354,7 +358,7 @@ export function SiteHeader() {
               <Divider />
               <PageLink
                 href="settings"
-                label="Settings"
+                label={t('Settings')}
                 route={route}
                 rail={false}
                 onOpen={fromDrawer(() => openSettings())}

@@ -23,7 +23,15 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - Every record carries its source (provenance), and the terms where the source states them; values taken as facts carry a page citation.
 - Results are simulations, not load data: no wording that calls a load or a result safe.
 - Code conventions, stored units and package rules: [AGENTS.md](AGENTS.md#conventions).
+- A pull request that adds a major user-visible feature adds a news item (`apps/web/news/YYYY-MM-DD-slug.md`: front matter `title` and `link`, two sentences) for the home page's What's new list, reviewed like any file; smaller changes are in the changelogs only.
 - Every spike and every model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md), a negative or null result included, and is closed with a link to it. The entry is written when the work ends, from the template on that page; `npm test -w @open-reloading/docs` fails on an entry that misses a section.
+
+## Data requests, translations and review
+
+- A missing record or wrong data: open an issue with the [data or record request](.github/ISSUE_TEMPLATE/data.yml) form, or with Report an issue in the web app ([report form](.github/ISSUE_TEMPLATE/user-report.yml), type Wrong data). Bugs and features have their own forms ([bug](.github/ISSUE_TEMPLATE/bug.yml), [feature](.github/ISSUE_TEMPLATE/feature.yml)).
+- A component record (cartridge, bullet, powder, case, primer) is added only from a source that allows it: name the document or URL and its terms of use. Values without such a source cannot be added.
+- Translations: the interface texts, the catalogue files and how to add a language are in [Translating the interface](apps/docs/docs/translating.md).
+- Review: every pull request is read by a second reader, a person or a review agent, and enters `main` only with the required checks green: `check`, `e2e`, `workflows`, `conventional`, `dependency-review` and `SonarCloud Code Analysis` ([CI tools](apps/docs/docs/ci-tools.md)). A finding that is not fixed in the pull request becomes an issue.
 
 ## Commits and pull requests
 

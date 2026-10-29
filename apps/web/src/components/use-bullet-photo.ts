@@ -2,6 +2,7 @@
 
 import { fromSi, toSi } from '@open-reloading/schema'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type Message, msg } from '../i18n/translate.ts'
 import { type Design, evaluate } from '../lib/bullet-designer.ts'
 import { paintDisc, type Scale, type ScaleSpan, scaleOf } from '../lib/bullet-photo.ts'
 import { tintBox, tintOf } from '../lib/bullet-photo-canvas.ts'
@@ -20,12 +21,13 @@ import { errorText } from '../lib/error-text.ts'
 import { type FieldSpec, type FieldValue, fieldOf } from '../lib/field-spec.ts'
 import type { Point } from '../lib/target-geometry.ts'
 import type { UnitSystem } from '../lib/units.ts'
+import type { Wording } from '../lib/wording.ts'
 
 /** The longer side of the working image, px: a larger photograph is shrunk to it while it is read. */
 const workLong = 2400
 
-/** The ruler's distance between two placed points. */
-export const distanceSpec = (label: string): FieldSpec => ({
+/** The ruler's distance between two placed points; `label` is a message the field translates. */
+export const distanceSpec = (label: Message): FieldSpec => ({
   key: label,
   label,
   quantity: 'length',
@@ -49,7 +51,7 @@ function useWorker(onError: (message: string) => void) {
       waiting.current.get(e.data.id)?.(e.data)
       waiting.current.delete(e.data.id)
     }
-    w.onerror = () => onError('The photograph could not be processed in this browser.')
+    w.onerror = () => onError(msg('The photograph could not be processed in this browser.'))
     worker.current = w
     return () => w.terminate()
   }, [onError])
@@ -74,8 +76,8 @@ interface Found {
   outline?: Outline
   measurement?: BulletMeasurement
   /** Sentences about the photograph's quality, and why it cannot be measured when it cannot. */
-  hints: string[]
-  unusable?: string
+  hints: Wording[]
+  unusable?: Wording
   /** The scale the worker measured at: the ruler's, else the caliper sizes'; absent when there was none. */
   scale?: Scale
   /** What the worker measured: the design waits for a measurement of the inputs as they are now. */
@@ -100,10 +102,11 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const [known, setKnown] = useState<[FieldValue, FieldValue]>([empty, empty])
   const [axis, setAxis] = useState<number>()
   const [found, setFound] = useState<Found>()
-  const [warnings, setWarnings] = useState<string[]>([])
+  const [warnings, setWarnings] = useState<Wording[]>([])
   /** The width the cut-out's edge is spread over, px; 0 once the cut-out is corrected by hand. */
   const [spread, setSpread] = useState(0)
-  const [busy, setBusy] = useState<string>()
+  const [busy, setBusy] = useState<Message>()
+  /** English, a message where the tool wrote it, translated where it is shown. */
   const [failure, setFailure] = useState<string>()
   const ask = useWorker(setFailure)
 
@@ -125,7 +128,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   const cutOut = useCallback(
     async (exclude: Point[]) => {
       if (!(size && tint.current)) return
-      setBusy('Cutting out the bullet…')
+      setBusy(msg('Cutting out the bullet…'))
       const asked = strokes.current
       const r = await ask({ kind: 'segment', exclude })
       setBusy(undefined)
@@ -188,7 +191,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     const data = canvas
       .getContext('2d', { willReadFrequently: true })
       ?.getImageData(0, 0, canvas.width, canvas.height)
-    if (!data) return setFailure('This browser cannot read the photograph.')
+    if (!data) return setFailure(msg('This browser cannot read the photograph.'))
     const buffer = data.data.buffer as ArrayBuffer
     const r = await ask(
       { kind: 'load', width: canvas.width, height: canvas.height, data: buffer },
@@ -206,13 +209,13 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
     setPoints(span ? [span.a, span.b] : [])
     setKnown([empty, empty])
     setDistances([
-      span ? fieldOf(system, distanceSpec('Distance A to B'), toSi('length', span.mm)) : empty,
+      span ? fieldOf(system, distanceSpec(msg('Distance A to B')), toSi('length', span.mm)) : empty,
       empty,
     ])
     setSize({ width: canvas.width, height: canvas.height })
   }
 
-  const run = async (busyText: string, work: () => Promise<void>) => {
+  const run = async (busyText: Message, work: () => Promise<void>) => {
     setFailure(undefined)
     setBusy(busyText)
     try {
@@ -226,16 +229,16 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
   /** Reads a photograph file, shrunk to the working size. */
   const read = (file: File | null) =>
     file &&
-    run('Reading the photograph…', async () => {
+    run(msg('Reading the photograph…'), async () => {
       const bitmap = await createImageBitmap(file).catch(() => {
-        throw new Error('This file is not an image this browser can read.')
+        throw new Error(msg('This file is not an image this browser can read.'))
       })
       const k = Math.min(1, workLong / Math.max(bitmap.width, bitmap.height))
       const canvas = document.createElement('canvas')
       canvas.width = Math.round(bitmap.width * k)
       canvas.height = Math.round(bitmap.height * k)
       const g = canvas.getContext('2d')
-      if (!g) throw new Error('This browser cannot read the photograph.')
+      if (!g) throw new Error(msg('This browser cannot read the photograph.'))
       g.imageSmoothingQuality = 'high'
       g.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
       bitmap.close()
@@ -244,7 +247,7 @@ export function useBulletPhoto(system: UnitSystem, record: Design['origin']) {
 
   /** The synthetic sample photograph, with its ruler span placed. */
   const sample = () =>
-    run('Making the sample photograph…', async () => {
+    run(msg('Making the sample photograph…'), async () => {
       const { image, span } = samplePhoto()
       const canvas = document.createElement('canvas')
       canvas.width = image.width

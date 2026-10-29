@@ -369,6 +369,49 @@ body {
   line-height: 1.25;
 }
 
+/* home: the newest saved loads on one line of fixed height, each name cut, so nothing below moves
+   when the store has been read */
+.home-continue {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 1.5rem;
+  margin-bottom: var(--panel-gap);
+  font-size: var(--mantine-font-size-sm);
+  white-space: nowrap;
+}
+
+.home-continue > span,
+.home-continue p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.home-continue p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-continue ul {
+  display: flex;
+  gap: 1rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-continue li {
+  min-width: 0;
+}
+
+.home-continue a {
+  display: block;
+  overflow: hidden;
+  line-height: 1.5rem;
+  text-overflow: ellipsis;
+}
+
 .home-cards {
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
@@ -435,9 +478,48 @@ main .home-cards h3 {
   border: 0;
 }
 
+/* a 24 px target: links of similar length one above the other are too close otherwise */
+.home-cards .home-tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
 /* a card with tabs keeps them under its text, not at the card's foot */
 .home-cards li:has(> .home-tabs) > p {
   flex: none;
+}
+
+/* home: the What's new list under the cards, the date left of the linked title and its text */
+.home-news {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-news li {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.home-news li + li {
+  border-top: 1px solid var(--border);
+}
+
+.home-news time,
+.home-news p {
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+}
+
+.home-news time {
+  font-variant-numeric: tabular-nums;
+}
+
+.home-news p {
+  margin: 0;
 }
 
 /* the tab bar of the Database, between the page bar and the list */
@@ -468,6 +550,12 @@ main .home-cards h3 {
   .home-cards li + li {
     border-top: 1px solid var(--border);
     border-left: 0;
+  }
+
+  .home-news li {
+    grid-template-columns: 1fr;
+    gap: 0.125rem;
+    padding: 0.5rem 0;
   }
 }
 
@@ -1523,10 +1611,7 @@ td.nowrap {
 }
 
 .side-row > .prop-label {
-  overflow: hidden;
   font-size: var(--mantine-font-size-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .side-grid .mantine-Input-input {
@@ -2769,6 +2854,39 @@ td.nowrap {
   overflow-wrap: anywhere;
 }
 
+/* Import entry: file cards over the page, the source and the Import button at the foot */
+.import-entry {
+  max-width: 60rem;
+}
+
+.import-file-name,
+.import-column-head,
+.import-rejected {
+  overflow-wrap: anywhere;
+}
+
+.import-column {
+  padding-block: 0.25rem;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+}
+
+.import-column-head {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.import-rejected {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.import-foot {
+  max-width: 60rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--mantine-color-default-border);
+}
+
 /* Firearm library: the table across the page. With a firearm open, the card list sticky beside
    the editor from 62em */
 .library {
@@ -3720,6 +3838,55 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
+/* the pinned row of the record choices a load is built on: the cartridge search, then primer, brass
+   and case capacity, labels above the selects. The first block of the flow, across both columns
+   from 75em, where the four share one line; narrower they wrap. A cell is never narrower than its
+   label */
+.workbench .pinned-row {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  align-items: flex-end;
+  gap: 0.25rem 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+.workbench .pinned-row > *,
+.pinned-row-slot > * {
+  flex: 1 1 8rem;
+}
+
+/* a lot holds a short code: a narrow cell, so the row with both lots stays one line from 75em */
+.workbench :is(.pinned-row, .pinned-row-slot) > .lot-field {
+  flex: 0 1 4.5rem;
+}
+
+/* with both lots the four choices share one line from 75em, in German too, only with a small start
+   width: a cell still grows to its label */
+@media screen and (min-width: 75em) {
+  .workbench .pinned-row > *,
+  .pinned-row-slot > * {
+    flex-basis: 4.5rem;
+  }
+}
+
+.pinned-row-slot {
+  display: contents;
+}
+
+.workbench .pinned-row .mantine-Input-wrapper {
+  --input-height-xs: var(--field-height);
+}
+
+.workbench .pinned-row .mantine-InputWrapper-label {
+  display: block;
+  margin: 0;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 /* the input groups in two columns from 75em of window beside the sidebar;
    narrower, the columns have no box */
 .panel-column {
@@ -3752,14 +3919,17 @@ main .library-head.page-panel-head > .page-panel-title {
     min-width: 0;
   }
 
-  /* two columns: Cartridge with the figure (in a low window the burn-rate figure) below; Powder,
-     Bullet and Gun */
-  .workbench .panels > .panel-column:first-child {
-    grid-column: 1;
-    grid-row: 1 / span 2;
+  /* under the pinned row two columns: Cartridge with the figure (in a low window the burn-rate
+     figure) below; Powder, Bullet and Gun */
+  .workbench .panels > .panel-column {
+    grid-row: 2;
   }
 
   .workbench .panels > .panel-column:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .workbench .panels > .panel-column:nth-child(3) {
     grid-column: 2;
   }
 
@@ -3932,6 +4102,16 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .workbench .panel-head > .mantine-ActionIcon-root {
   margin-left: auto;
+}
+
+/* the powder lot beside the powder search, on the search's line */
+.workbench .panel-head > .lot-field {
+  flex: 0 0 6rem;
+  order: 1;
+}
+
+.workbench .panel-head:has(> .lot-field) > .search {
+  flex-basis: calc(100% - 6rem - 0.5rem);
 }
 
 .workbench .panel-head .mantine-Input-wrapper {
@@ -4591,12 +4771,8 @@ main .library-head.page-panel-head > .page-panel-title {
     padding: 0.0625rem 0;
   }
 
-  /* one-line labels: a label of two lines made the row three lines high with its note */
   .workbench .readouts dt {
-    overflow: hidden;
     font-size: var(--mantine-font-size-xs);
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .workbench .readouts dd {
@@ -5037,10 +5213,7 @@ main .library-head.page-panel-head > .page-panel-title {
     :is(.panel-fields, .seating-slot)
     .mantine-InputWrapper-root
     > .mantine-InputWrapper-label {
-    overflow: hidden;
     font-size: var(--mantine-font-size-sm);
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .workbench .workspace-inputs .mantine-InputWrapper-label[title] {
@@ -5096,6 +5269,29 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .panel-head > :is(.search, .mantine-Select-root) {
     flex: 1 1 0;
     order: 0;
+  }
+
+  /* the powder search keeps room for a name beside its lot; a long title ends in an ellipsis
+     instead, its full text still the heading's name */
+  .workbench .panel-head > .lot-field {
+    flex-basis: 4.5rem;
+    order: 0;
+  }
+
+  .workbench .panel-head:has(> .lot-field) > svg {
+    flex-shrink: 0;
+  }
+
+  .workbench .panel-head:has(> .lot-field) > .search {
+    min-width: 4rem;
+  }
+
+  /* what the icon, the search's least width, the lot, the menu and the four gaps leave */
+  .workbench .panel-head:has(> .lot-field) > .panel-title {
+    max-width: calc(100% - 1.125rem - 4rem - 4.5rem - var(--field-height) - 4 * 0.375rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .workbench .panel-head .mantine-Input-wrapper {
@@ -5237,8 +5433,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .segmented-row label > span {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .segmented-row input {
@@ -5281,11 +5476,8 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .workspace-inputs .mantine-InputWrapper-root > .mantine-InputWrapper-label,
   .workbench .workspace-inputs :is(.record-row, .seating-row, .pair-row) > :first-child {
-    overflow: hidden;
     color: var(--fg);
     font-weight: 400;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   /* a field's box is fixed: the value column only widens for a record's text */
@@ -5365,7 +5557,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   /* the ladder's count and step size in one row: 44 and 54 px fields, one unit */
   .workbench .workspace-inputs .pair-row {
-    grid-template-columns: minmax(0, 1fr) 2.75rem 3.375rem 2.625rem;
+    grid-template-columns: minmax(0, 1fr) 2.75rem minmax(3.375rem, auto) 2.625rem;
     column-gap: 0.25rem;
   }
 
@@ -5391,6 +5583,8 @@ main .library-head.page-panel-head > .page-panel-title {
     > .mantine-InputWrapper-root:last-child
     .mantine-Input-input {
     padding-inline-end: 2.875rem;
+    /* a wider text (more letter spacing) widens the column instead of being cut */
+    field-sizing: content;
   }
 
   .workbench .workspace-inputs .pair-row .mantine-InputWrapper-label {
@@ -5482,7 +5676,7 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .workspace-inputs .pair-row {
-    grid-template-columns: minmax(0, 1fr) 3rem 3.625rem 2.75rem;
+    grid-template-columns: minmax(0, 1fr) 3rem minmax(3.625rem, auto) 2.75rem;
   }
 
   .workbench .workspace-inputs :is(.panel-fields, .seating-slot) .mantine-Input-input,
@@ -5555,14 +5749,13 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .panels {
     grid-template-columns: repeat(2, 18rem);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     column-gap: 0.375rem;
     align-items: stretch;
   }
 
-  .workbench .panels > .panel-column:is(:first-child, :nth-child(2)) {
+  .workbench .panels > .panel-column {
     display: flex;
-    grid-row: 1;
     flex-direction: column;
     gap: 0.375rem;
   }
@@ -5805,8 +5998,18 @@ main .library-head.page-panel-head > .page-panel-title {
   color: var(--warn-fg);
 }
 
+/* the note of an estimated chamber volume: the info colour, its explanation on the title's help */
+.workbench .run-line > .volume-note {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--info-fg);
+  white-space: nowrap;
+}
+
 @media print {
-  .workbench .run-line > :is(.notice-text, .warnings-slot) {
+  .workbench .run-line > :is(.notice-text, .volume-note, .warnings-slot) {
     display: none;
   }
 }
@@ -6123,12 +6326,9 @@ main .library-head.page-panel-head > .page-panel-title {
   .workbench .readouts.readout-keys dt {
     grid-area: label;
     flex-basis: auto;
-    overflow: hidden;
     color: var(--muted);
-    text-overflow: ellipsis;
     font-size: var(--mantine-font-size-xs);
     line-height: 1rem;
-    white-space: nowrap;
   }
 
   .workbench .readouts.readout-keys dd {
@@ -6196,10 +6396,8 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .readouts.readout-list dt {
     flex: 0 1 auto;
-    overflow: hidden;
     color: var(--muted);
     font-size: var(--mantine-font-size-sm);
-    text-overflow: ellipsis;
   }
 
   .workbench .readouts.readout-list dd {
@@ -6215,9 +6413,7 @@ main .library-head.page-panel-head > .page-panel-title {
 
   .workbench .readouts.readout-list dd.readout-phrase {
     flex: 0 1 auto;
-    overflow: hidden;
     font-size: var(--mantine-font-size-xs);
-    text-overflow: ellipsis;
   }
 
   /* a note is the row's title and for screen readers: the row stays one line */
@@ -6967,11 +7163,9 @@ main .field-table tr.field-group > th {
   border: 0;
   background: none;
   max-width: 16rem;
-  overflow: hidden;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-align: start;
   cursor: help;
 }
 
@@ -7121,6 +7315,20 @@ main .field-table tr.field-group > th {
   display: inline-flex;
   align-items: center;
   min-height: 1.5rem;
+}
+
+/* the dimensions tables' symbols too, stacked one per row: under a 24 px pitch they fail WCAG 2.5.8
+   whatever the space beside them, so the symbol fills its row and its cell has no block padding */
+@media screen {
+  .cartridge-values tbody th [tabindex] {
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  main .cartridge-values tbody th.dim-symbol {
+    padding-block: 0;
+  }
 }
 
 @media screen {
@@ -8653,6 +8861,12 @@ main .session-shots th:nth-child(-n + 2) {
   cursor: grab;
 }
 
+/* below the confidence tier: sparser dashes, not in Accept all */
+.target-canvas .proposal.maybe {
+  stroke-dasharray: 2 4;
+  opacity: 0.7;
+}
+
 .target-canvas .proposal:focus-visible {
   outline: none;
   stroke: var(--link);
@@ -8895,11 +9109,8 @@ main .session-shots th:nth-child(-n + 2) {
 .prop-grid .mantine-InputWrapper-root > .mantine-InputWrapper-label,
 .prop-grid .prop-label {
   grid-column: 1;
-  overflow: hidden;
   font-size: var(--mantine-font-size-xs);
   font-weight: 400;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .prop-grid :is(.mantine-InputWrapper-label[title], .prop-label[title]),
@@ -8930,6 +9141,11 @@ main .session-shots th:nth-child(-n + 2) {
   display: flex;
   justify-content: flex-end;
   gap: 0.25rem;
+}
+
+/* the caliber candidates of a discipline wrap rather than cut a name */
+.prop-grid .row-buttons.caliber-chips {
+  flex-wrap: wrap;
 }
 
 .prop-grid input[type="color"] {
@@ -9163,6 +9379,23 @@ main .session-shots th:nth-child(-n + 2) {
 .shot-table input[type="number"]::-webkit-inner-spin-button,
 .shot-table input[type="number"]::-webkit-outer-spin-button {
   appearance: none;
+}
+
+/* the x and y fields go below Set and Clear when the row has no room for a value */
+.prop-grid .aim-row > .prop-label {
+  white-space: nowrap;
+}
+
+.prop-grid .aim-fields {
+  flex-wrap: wrap;
+}
+
+.prop-grid .aim-axis {
+  display: flex;
+  flex: 1 1 4.5rem;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 /* the point of aim's x and y share the value column */
@@ -9551,11 +9784,9 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 main .page-bar h1 {
-  overflow: hidden;
   margin: 0;
   font-size: var(--mantine-h2-font-size);
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 
 .page-bar-title > :not(h1) {
@@ -9682,6 +9913,7 @@ main .page-bar h1 {
   /* two lines of a smaller size, so a long name reads; one line above a status line */
   main .page-bar h1 {
     display: -webkit-box;
+    overflow: hidden;
     font-size: var(--mantine-font-size-md);
     line-height: 1.2;
     white-space: normal;
@@ -11450,4 +11682,56 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   :lang(de) .workbench .readouts.readout-list > div {
     gap: 0.25rem;
   }
+}
+
+/* the string whose charge the model cannot run, named in the refusal */
+.powder-tune .string-fault td {
+  background: var(--warn-bg);
+}
+
+.hand-tune {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  justify-items: stretch;
+}
+
+.hand-tune > button {
+  justify-self: start;
+}
+
+.tune-chart {
+  width: 100%;
+  max-width: 40rem;
+  height: auto;
+  font-size: 11px;
+  fill: var(--fg);
+}
+
+.tune-chart .ladder-range {
+  fill: var(--border);
+  opacity: 0.35;
+}
+
+.tune-chart .grid {
+  stroke: var(--border);
+}
+
+.tune-chart .band {
+  fill: var(--link);
+  opacity: 0.2;
+}
+
+.tune-chart .curve {
+  fill: none;
+  stroke: var(--link);
+  stroke-width: 2;
+}
+
+.tune-chart .measured line {
+  stroke: var(--fg);
+  stroke-width: 1.5;
 }

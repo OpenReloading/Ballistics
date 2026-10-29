@@ -175,6 +175,10 @@
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
     "rules": ["web-no-node-builtins"]
   },
+  "apps/web/src/lib/news.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": []
+  },
   "apps/web/src/lib/data-package.ts": {
     "source": "import { readRecords } from '@open-reloading/data'\nexport { readRecords }",
     "rules": ["not-to-unresolvable", "web-reads-api-only"]

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
 import {
   appUrl,
@@ -107,17 +107,18 @@ it('precaches the catalogue index, and answers it from the shell cache', () => {
   ).toBe('records')
 })
 
-it('the shell holds the offline page, the tools, the manifest and its icons', () => {
-  for (const u of ['/', '/offline', '/workbench', '/groups', '/session'])
-    expect(shellPages).toContain(u)
-  for (const u of [
-    '/firearms',
-    '/cases/editor',
-    '/range',
-    '/bullets/designer',
-    '/cartridges/designer',
-  ])
-    expect(shellPages).toContain(u)
+// page routes the shell leaves out on purpose: `/my-cases` only redirects
+const notPrecached = ['/my-cases']
+
+it('the shell holds every page route but the record pages, the manifest and its icons', () => {
+  const app = new URL('../src/app/', import.meta.url)
+  const routes = readdirSync(app, { recursive: true, encoding: 'utf8' })
+    .filter((f) => /(^|\/)page\.tsx$/.test(f) && !f.includes('['))
+    .map((f) => `/${f.replace(/\/?page\.tsx$/, '')}`)
+  expect(routes).toContain('/powders/tune')
+  // every page route without a `[...]` segment is in both the full and the sample export, so
+  // `cache.addAll` finds each shell page
+  expect([...shellPages].sort()).toEqual(routes.filter((r) => !notPrecached.includes(r)).sort())
   // Settings is a dialog, no page
   expect(shellPages).not.toContain('/settings')
   for (const u of ['/manifest.webmanifest', '/icon.png', '/icon-192.png'])

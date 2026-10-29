@@ -60,9 +60,25 @@ const sidebars: SidebarsConfig = {
     'data/record-model',
     'data/firearm-records',
     'data/catalogue-storage',
+    'data/table-import',
     'bibliography',
   ],
-  contributing: ['cli', 'release', 'ci-tools', 'workbench-search', 'translating', 'accessibility'],
+  contributing: [
+    'cli',
+    {
+      type: 'category',
+      label: 'Libraries',
+      collapsed: true,
+      items: ['schema', 'core', 'drawing', 'importers', 'data'].map((name) => `libraries/${name}`),
+    },
+    'release',
+    'ci-tools',
+    'workbench-search',
+    'translating',
+    'accessibility',
+    'browsers',
+    'feedback-tasks',
+  ],
 }
 
 export default sidebars

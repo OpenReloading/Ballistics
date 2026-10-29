@@ -8,7 +8,7 @@ import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } 
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
-import { chronoFileBytes, readChrono } from '../lib/chrono.ts'
+import { chronoFileBytes, chronoMessageText, readChrono } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import {
@@ -23,6 +23,7 @@ import {
 } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
 import { nth } from '../lib/nth.ts'
+import { sessionStrings, tuneHref } from '../lib/powder-tune.ts'
 import { conditionsText } from '../lib/range-entry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
@@ -190,7 +191,7 @@ type Failure = { file: string; tooMany: true } | { file: string; message: string
 const failureText = (f: Failure, t: Translator['t']) =>
   'tooMany' in f
     ? t('{file}: a load keeps {max} sessions at most.', { file: f.file, max: maxSessions })
-    : `${f.file}: ${translateMessage(f.message, t)}`
+    : `${f.file}: ${chronoMessageText(f.message, t)}`
 
 /** `text` of a statistic when there is one, else nothing. */
 const when = <T,>(x: T | undefined, text: (x: T) => string) => (x === undefined ? '' : text(x))
@@ -271,7 +272,7 @@ export function Measurements({
   setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
   const { t, tn } = useTranslation()
-  const { manufacturerRef, manufacturerName, sessionRefCount } = useResult()
+  const { manufacturerRef, manufacturerName, sessionRefCount, handOffTune } = useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [failures, setFailures] = useState<Failure[]>([])
   const [read, setRead] = useState<{ name: string; strings: number }[]>([])
@@ -457,6 +458,13 @@ export function Measurements({
         </p>
       )}
       {table}
+      {sessionStrings(sessions).length > 0 && (
+        <p>
+          <Link href={tuneHref(sessions.map((s) => s.id))} onClick={handOffTune}>
+            {t('Fit a powder from these strings')}
+          </Link>
+        </p>
+      )}
       {table &&
         (curve.length < 2 ? (
           <p className="note">{t('The chart needs a charge ladder of two steps or more.')}</p>
@@ -557,7 +565,9 @@ export function Measurements({
                 </select>
                 {(str.conditions || str.note) && (
                   <p className="note">
-                    {[conditionsText(str.conditions, system), str.note].filter((x) => x).join('. ')}
+                    {[conditionsText(str.conditions, system, t), str.note]
+                      .filter((x) => x)
+                      .join('. ')}
                   </p>
                 )}
               </div>

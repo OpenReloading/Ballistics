@@ -11,10 +11,21 @@ import {
   versionProblem,
 } from '@open-reloading/schema'
 import { z } from 'zod'
+import type { Translator } from '../i18n/translate.ts'
+import { translateMessage } from './core-messages.ts'
 
 /** Files above this size are skipped on import: a sheet file carries its photo as base64. */
 export const maxFileBytes = 40_000_000
 export const tooLargeMessage = `The file is larger than ${maxFileBytes / 1e6} MB.`
+const notJsonMessage = 'The file is not JSON.'
+
+/** A `reason` of a file that was not read, in the language of `t`: the app's own two, else a message of the packages. */
+export function reasonText(reason: string, t: Translator['t']) {
+  if (reason === tooLargeMessage)
+    return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
+  if (reason === notJsonMessage) return t('The file is not JSON.')
+  return translateMessage(reason, t)
+}
 
 /** The size of `text` as a file, UTF-8 bytes, as Open and Import compare it with `maxFileBytes`. */
 const fileBytes = (text: string) => new TextEncoder().encode(text).byteLength
@@ -61,7 +72,7 @@ export function parseUserDataFile(text: string): ParsedUserFile {
   try {
     json = JSON.parse(text)
   } catch {
-    return { ok: false, reason: 'The file is not JSON.' }
+    return { ok: false, reason: notJsonMessage }
   }
   const problem = versionProblem(json)
   if (problem) return { ok: false, reason: problem }
@@ -227,12 +238,18 @@ export function planImport(incoming: UserRecord[], stored: UserRecord[]) {
  * The references of `opened` that point at no record of `opened` and `stored` (browser records
  * with another id), as one sentence; empty when all resolve.
  */
-export function refNote(opened: UserRecord[], stored: UserRecord[]): string {
+export function refNote(opened: UserRecord[], stored: UserRecord[], t: Translator['t']): string {
   const ids = new Set(opened.map((r) => r.id))
   const name = new Map(opened.map((r) => [r.id, r.name]))
   const all = [...opened, ...stored.filter((r) => !ids.has(r.id))]
   const lines = checkUserRefs(all)
     .filter((d) => ids.has(d.record))
-    .map((d) => `${name.get(d.record)}: the ${d.field} ${d.target} is not in this browser`)
-  return lines.length ? `Not found: ${lines.join('; ')}.` : ''
+    .map((d) =>
+      t('{name}: the {field} {target} is not in this browser', {
+        name: name.get(d.record) ?? '',
+        field: d.field,
+        target: d.target,
+      }),
+    )
+  return lines.length ? t('Not found: {list}.', { list: lines.join('; ') }) : ''
 }

@@ -41,7 +41,8 @@ const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
 /** A compute body above this many bytes is refused with 413: an interior body is under 1 KiB, so the cap keeps a pasted file out of the Worker. */
 const maxBody = 64 * 1024
 
-const answer = (status: number, body: unknown) => Response.json(body, { status })
+const answer = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } })
 const refusal = (status: number, error: string, message: string) =>
   answer(status, { statusCode: status, error, message })
 

@@ -56,7 +56,6 @@ import {
 import {
   type CSSProperties,
   type Dispatch,
-  Fragment,
   type KeyboardEvent,
   type ReactElement,
   type ReactNode,
@@ -73,7 +72,9 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { z } from 'zod'
-import { decimalMark, fixedNumber, formatNumber } from '../i18n/number.ts'
+import { useTranslation } from '../i18n/language.ts'
+import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { storageName } from '../lib/edition.ts'
 import { isFaceId } from '../lib/face-records.ts'
 import { calibrateSheetOnFace } from '../lib/face-sheet.ts'
@@ -206,17 +207,17 @@ const defaultOverlays: Record<Overlay, boolean> = {
   rings: true,
 }
 
-const refNames: Record<RefKind, string> = {
-  line: 'Line',
-  ringCentre: 'Ring, center and edge',
-  ringEdge: 'Ring, three points',
-  rectangle: 'Rectangle, four corners',
+const refNames: Record<RefKind, Message> = {
+  line: msg('Line'),
+  ringCentre: msg('Ring, center and edge'),
+  ringEdge: msg('Ring, three points'),
+  rectangle: msg('Rectangle, four corners'),
 }
-const refHints: Record<RefKind, string> = {
-  line: 'Click both ends of a known length.',
-  ringCentre: 'Click the ring center, then a point on the ring.',
-  ringEdge: 'Click three points on the ring.',
-  rectangle: 'Click the corners: top left, top right, bottom right, bottom left.',
+const refHints: Record<RefKind, Message> = {
+  line: msg('Click both ends of a known length.'),
+  ringCentre: msg('Click the ring center, then a point on the ring.'),
+  ringEdge: msg('Click three points on the ring.'),
+  rectangle: msg('Click the corners: top left, top right, bottom right, bottom left.'),
 }
 
 /** A new sheet: one group at `distance` m, of ladder step `step` when the load has a ladder. */
@@ -286,14 +287,14 @@ async function photoOf(blob: Blob): Promise<Photo> {
 
 let restoring: Promise<string[]> | undefined
 /** Once per page load, also when an effect runs twice: the copy is the last page's. */
-const restoreWaiting = () => (restoring ??= restoreCopy())
+const restoreWaiting = (t: Translator['t']) => (restoring ??= restoreCopy(t))
 
 /**
  * The sheets the last page left unsaved, each stored over the version it was edited from; a sheet
  * another tab saved since stays and the copy is kept as a sheet of its own (the names returned). A
  * copy is dropped once stored, so a failed write keeps it for the next page.
  */
-async function restoreCopy() {
+async function restoreCopy(t: Translator['t']) {
   const kept: string[] = []
   let raw: string | null = null
   try {
@@ -318,7 +319,7 @@ async function restoreCopy() {
     const landed =
       stored?.name === copy.name && canonicalJson(stored.data) === canonicalJson(copy.data)
     if (!landed && !(await putRecordIf(copy, base))) {
-      const own = keptCopy(copy, newId())
+      const own = keptCopy(copy, newId(), t)
       await putRecords([own])
       kept.push(own.name)
     }
@@ -328,7 +329,27 @@ async function restoreCopy() {
 }
 
 /** Names of the group colours (`groupColours`), for the swatches' accessible names. */
-const colourNames = ['Orange', 'Blue', 'Green', 'Ochre', 'Pink', 'Dark green']
+const colourNames = [
+  msg('Orange'),
+  msg('Blue'),
+  msg('Green'),
+  msg('Ochre'),
+  msg('Pink'),
+  msg('Dark green'),
+]
+
+/** The compass words of an aim offset as shown in the offset row. */
+const compassLabels: Record<keyof typeof compassNames, Message> = {
+  N: msg('N'),
+  NE: msg('NE'),
+  E: msg('E'),
+  SE: msg('SE'),
+  S: msg('S'),
+  SW: msg('SW'),
+  W: msg('W'),
+  NW: msg('NW'),
+  centre: msg('center'),
+}
 
 /** Above this many shots the shot table renders only the rows in view. */
 const windowFrom = 100
@@ -516,7 +537,7 @@ type Ed = {
   coarse: boolean
   pop: Pop | undefined
   setPop: Dispatch<SetStateAction<Pop | undefined>>
-  storeError: string | undefined
+  storeError: { reason: string } | undefined
   h: History<TargetSheet>
   setH: Dispatch<SetStateAction<History<TargetSheet>>>
   overlays: Record<Overlay, boolean>
@@ -558,10 +579,11 @@ type Ed = {
 
 /** The photo's display filters: contrast and darken. */
 function FilterPanel({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { sheet, filter, setFilter } = ed
   return (
     <div className="prop-grid">
-      <Row label="Contrast" help="Display only; the photo file stays as it is.">
+      <Row label={t('Contrast')} help={t('Display only; the photo file stays as it is.')}>
         <Slider
           size="sm"
           min={0.5}
@@ -570,11 +592,11 @@ function FilterPanel({ ed }: { ed: Ed }) {
           disabled={!sheet.photo}
           value={filter.contrast}
           onChange={(v) => setFilter({ ...filter, contrast: v })}
-          thumbLabel="Contrast"
+          thumbLabel={t('Contrast')}
           label={(v) => fixedNumber(v, 1)}
         />
       </Row>
-      <Row label="Darken" help="Display only; the photo file stays as it is.">
+      <Row label={t('Darken')} help={t('Display only; the photo file stays as it is.')}>
         <Slider
           size="sm"
           min={0}
@@ -583,8 +605,8 @@ function FilterPanel({ ed }: { ed: Ed }) {
           disabled={!sheet.photo}
           value={filter.darken}
           onChange={(v) => setFilter({ ...filter, darken: v })}
-          thumbLabel="Darken"
-          label={(v) => `${Math.round(v * 100)} %`}
+          thumbLabel={t('Darken')}
+          label={(v) => `${plainNumber(Math.round(v * 100))} %`}
         />
       </Row>
     </div>
@@ -593,14 +615,17 @@ function FilterPanel({ ed }: { ed: Ed }) {
 
 /** The shot marker's diameter. */
 function MarkerField({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { sheet, apply } = ed
   return (
     <div className="prop-grid">
       <SiField
         spec={{
           key: 'markerDiameter',
-          label: 'Marker',
-          help: 'Diameter of the shot marks; the bullet diameter centers a mark on a torn hole. Empty: a fixed size on screen.',
+          label: msg('Marker'),
+          help: msg(
+            'Diameter of the shot marks; the bullet diameter centers a mark on a torn hole. Empty: a fixed size on screen.',
+          ),
           quantity: 'length',
           min: 0,
           positive: true,
@@ -612,7 +637,7 @@ function MarkerField({ ed }: { ed: Ed }) {
             'markerDiameter',
           )
         }
-        placeholder="screen size"
+        placeholder={t('screen size')}
       />
     </div>
   )
@@ -620,12 +645,19 @@ function MarkerField({ ed }: { ed: Ed }) {
 
 /** One scale reference of a photo: its known size and Remove. */
 function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][number]; i: number }) {
+  const { t } = useTranslation()
   const { sheet, frame, applyCal } = ed
   const cal = frame?.calibration
   const factor = cal?.factors[i]
   const dev = cal && factor !== undefined ? factor / cal.scale - 1 : undefined
-  const label = `${refNames[r.kind].split(',')[0]} ${i + 1}`
-  const help = `${refNames[r.kind]}${dev === undefined || sheet.references.length < 2 ? '' : `; scale ${dev >= 0 ? '+' : ''}${fixedNumber(dev * 100, 2)} % from the mean`}`
+  const label = t('{kind} {n}', { kind: t(refNames[r.kind]).split(',')[0] ?? '', n: i + 1 })
+  const help =
+    dev === undefined || sheet.references.length < 2
+      ? t(refNames[r.kind])
+      : t('{kind}; scale {deviation} % from the mean', {
+          kind: t(refNames[r.kind]),
+          deviation: `${dev >= 0 ? '+' : ''}${fixedNumber(dev * 100, 2)}`,
+        })
   const key = r.kind === 'line' ? 'length' : r.kind === 'rectangle' ? 'width' : 'diameter'
   const value = (r as Record<string, unknown>)[key] as number
   return (
@@ -655,11 +687,11 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
       <ActionIcon
         variant="subtle"
         size={controlSize.row.icon}
-        aria-label={`Remove ${label}`}
+        aria-label={t('Remove {label}', { label })}
         disabled={sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)}
         title={
           sheet.references.length === 1 && sheet.groups.some((g) => g.shots.length)
-            ? 'The last reference stays while there are shots.'
+            ? t('The last reference stays while there are shots.')
             : undefined
         }
         onClick={() =>
@@ -674,29 +706,32 @@ function ReferenceRow({ ed, r, i }: { ed: Ed; r: TargetSheet['references'][numbe
 
 /** The Calibrate panel: scale references, rotation and origin; none on a drawn target. */
 function ScalePanel({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { sheet, refKind, setRefKind, known, setKnown, tool, calTool, applyCal, frame } = ed
   const cal = frame?.calibration
   if (!sheet.photo)
-    return <p className="note">A drawn target: shots in target coordinates, no scale needed.</p>
+    return (
+      <p className="note">{t('A drawn target: shots in target coordinates, no scale needed.')}</p>
+    )
   return (
     <div className="prop-grid">
       <NativeSelect
-        label="Reference"
+        label={t('Reference')}
         size={controlSize.row.input}
-        data={Object.entries(refNames).map(([value, label]) => ({ value, label }))}
+        data={Object.entries(refNames).map(([value, label]) => ({ value, label: t(label) }))}
         value={refKind}
         onChange={(e) => setRefKind(e.currentTarget.value as RefKind)}
-        title={refHints[refKind]}
+        title={t(refHints[refKind])}
       />
       {refKind === 'rectangle' ? (
         <>
           <SiField
-            spec={{ key: 'w', label: 'Width', quantity: 'length', min: 0, positive: true }}
+            spec={{ key: 'w', label: msg('Width'), quantity: 'length', min: 0, positive: true }}
             si={known.width}
             onCommit={(si) => setKnown({ ...known, width: si })}
           />
           <SiField
-            spec={{ key: 'h', label: 'Height', quantity: 'length', min: 0, positive: true }}
+            spec={{ key: 'h', label: msg('Height'), quantity: 'length', min: 0, positive: true }}
             si={known.height}
             onCommit={(si) => setKnown({ ...known, height: si })}
           />
@@ -705,7 +740,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
         <SiField
           spec={{
             key: 'len',
-            label: refKind === 'line' ? 'Known length' : 'Ring diameter',
+            label: refKind === 'line' ? msg('Known length') : msg('Ring diameter'),
             quantity: 'length',
             min: 0,
             positive: true,
@@ -721,9 +756,9 @@ function ScalePanel({ ed }: { ed: Ed }) {
         data-cal="mark"
         disabled={refKind === 'rectangle' ? !(known.width && known.height) : !known.length}
         onClick={() => calTool('mark', refKind)}
-        title={refHints[refKind]}
+        title={t(refHints[refKind])}
       >
-        Mark on photo
+        {t('Mark on photo')}
       </Button>
       {sheet.references.map((r, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
@@ -731,8 +766,10 @@ function ScalePanel({ ed }: { ed: Ed }) {
       ))}
       {sheet.references.length > 1 && cal && (
         <Row
-          label="Spread"
-          help="Largest minus smallest scale of the references over their mean: how far they disagree. A photo at an angle shows here; a rectangle corrects it."
+          label={t('Spread')}
+          help={t(
+            'Largest minus smallest scale of the references over their mean: how far they disagree. A photo at an angle shows here; a rectangle corrects it.',
+          )}
         >
           {fixedNumber(cal.spread * 100, 2)} %
         </Row>
@@ -740,21 +777,26 @@ function ScalePanel({ ed }: { ed: Ed }) {
       <SiField
         spec={{
           key: 'targetRotation',
-          label: 'Rotation',
-          help: "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
+          label: msg('Rotation'),
+          help: msg(
+            "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
+          ),
           quantity: 'angle',
         }}
         si={sheet.targetRotation}
         onCommit={(si) => applyCal((s) => ({ ...s, targetRotation: si ?? 0 }), 'targetRotation')}
       />
-      <Row label="Origin" help="The photo point of target (0, 0). Shots stay on their holes.">
+      <Row
+        label={t('Origin point')}
+        help={t('The photo point of target (0, 0). Shots stay on their holes.')}
+      >
         <Button
           size={controlSize.row.button}
           variant={tool === 'origin' ? 'filled' : 'default'}
           data-cal="origin"
           onClick={() => calTool('origin', 'origin')}
         >
-          Set on photo
+          {t('Set on photo')}
         </Button>
       </Row>
     </div>
@@ -762,13 +804,16 @@ function ScalePanel({ ed }: { ed: Ed }) {
 }
 
 /** The colours offered: the series colours and a stored colour that is not one of them. */
-function coloursOf(group: ShotGroup | undefined) {
+function coloursOf(group: ShotGroup | undefined, t: Translator['t']) {
   if (!group) return []
   return [
-    ...groupColours.map((c, i) => ({ value: c, label: colourNames[i] ?? c })),
+    ...groupColours.map((c, i) => {
+      const name = colourNames[i]
+      return { value: c, label: name ? t(name) : c }
+    }),
     ...(groupColours.includes(group.colour)
       ? []
-      : [{ value: group.colour, label: `Color ${group.colour}` }]),
+      : [{ value: group.colour, label: t('Color {color}', { color: group.colour }) }]),
   ]
 }
 
@@ -793,8 +838,9 @@ function GroupPanel({ ed }: { ed: Ed }) {
     setSelected,
     deleteGroup,
   } = ed
+  const { t } = useTranslation()
   const len = system.length
-  const colours = coloursOf(group)
+  const colours = coloursOf(group, t)
   return (
     <div className="prop-grid">
       {/* above the list: a delete that shortens the list moves neither button (a double click
@@ -819,22 +865,22 @@ function GroupPanel({ ed }: { ed: Ed }) {
             setActive(g.id)
           }}
         >
-          Add group
+          {t('Add group')}
         </Button>
         <Button
           size={controlSize.row.button}
           variant="default"
           color="red"
-          title="Delete the active group; Undo brings it back"
+          title={t('Delete the active group; Undo brings it back')}
           disabled={!group || sheet.groups.length < 2}
           onClick={deleteGroup}
         >
-          Delete
+          {t('Delete')}
         </Button>
       </span>
       <div className="wide">
         <Radio.Group
-          label="Groups"
+          label={t('Groups')}
           labelProps={{ className: 'visually-hidden' }}
           name={`${uid}-group`}
           value={group?.id ?? ''}
@@ -849,9 +895,9 @@ function GroupPanel({ ed }: { ed: Ed }) {
                 <span className="swatch" style={{ background: g.colour }} aria-hidden="true" />
                 <span className="group-name">{g.name}</span>
                 <span className="group-count">
-                  {g.shots.filter((s) => !s.excluded).length}
+                  {plainNumber(g.shots.filter((s) => !s.excluded).length)}
                   {g.shots.some((s) => s.excluded)
-                    ? `+${g.shots.filter((s) => s.excluded).length}`
+                    ? `+${plainNumber(g.shots.filter((s) => s.excluded).length)}`
                     : ''}
                 </span>
               </Radio.Card>
@@ -862,18 +908,18 @@ function GroupPanel({ ed }: { ed: Ed }) {
       {group && (
         <>
           <TextInput
-            label="Group name"
+            label={t('Group name')}
             size={controlSize.row.input}
             value={group.name}
             maxLength={200}
-            error={group.name ? undefined : 'Enter a name.'}
+            error={group.name ? undefined : t('Enter a name.')}
             onChange={(e) => {
               const name = e.currentTarget.value
               onGroup((g) => ({ ...g, name }), `name ${group.id}`)
             }}
           />
           <Radio.Group
-            label="Color"
+            label={t('Color')}
             className="colour-row"
             size={controlSize.row.input}
             name={`${uid}-colour`}
@@ -902,8 +948,8 @@ function GroupPanel({ ed }: { ed: Ed }) {
           <SiField
             spec={{
               key: 'distance',
-              label: 'Distance',
-              help: 'Muzzle to target; the angles use it.',
+              label: msg('Distance'),
+              help: msg('Muzzle to target; the angles use it.'),
               quantity: 'range',
               min: 0,
               positive: true,
@@ -916,13 +962,16 @@ function GroupPanel({ ed }: { ed: Ed }) {
           />
           {charges && (
             <NativeSelect
-              label="Ladder step"
+              label={t('Ladder step')}
               size={controlSize.row.input}
               data={[
-                { value: '', label: 'None' },
+                { value: '', label: t('None') },
                 ...charges.map((c, i) => ({
                   value: String(i),
-                  label: `${stepLabels?.[i] ?? i + 1}: ${withUnit('charge', system, c)}`,
+                  label: t('{step}: {charge}', {
+                    step: stepLabels?.[i] ?? i + 1,
+                    charge: withUnit('charge', system, c),
+                  }),
                 })),
               ]}
               value={group.ladderStep === undefined ? '' : String(group.ladderStep)}
@@ -937,9 +986,11 @@ function GroupPanel({ ed }: { ed: Ed }) {
           <div className="prop-row aim-row">
             <span
               className="prop-label"
-              title="Point of aim, each group its own: Set, then click it on the target, or type x and y in target coordinates; drag it with Select."
+              title={t(
+                'Point of aim, each group its own: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.',
+              )}
             >
-              Aim ({len.symbol})
+              {t('Aim ({unit})', { unit: len.symbol })}
             </span>
             <span className="prop-value row-buttons aim-fields">
               <Button
@@ -948,7 +999,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
                 disabled={!frame}
                 onClick={() => startTool('aim')}
               >
-                Set
+                {t('Set')}
               </Button>
               <Button
                 size={controlSize.row.button}
@@ -956,13 +1007,13 @@ function GroupPanel({ ed }: { ed: Ed }) {
                 disabled={!group.aim}
                 onClick={() => onGroup(({ aim: _, ...g }) => g)}
               >
-                Clear
+                {t('Clear')}
               </Button>
               {(['x', 'y'] as const).map((axis) => (
-                <Fragment key={axis}>
+                <span key={axis} className="aim-axis">
                   <span aria-hidden="true">{axis}</span>
                   <CoordInput
-                    label={`Point of aim ${axis}`}
+                    label={t('Point of aim {axis}', { axis })}
                     si={group.aim?.[axis]}
                     disabled={!frame}
                     onCommit={(v) =>
@@ -972,7 +1023,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
                       )
                     }
                   />
-                </Fragment>
+                </span>
               ))}
             </span>
           </div>
@@ -985,6 +1036,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
 
 /** The add shot button of the shots panel's head. */
 function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void }) {
+  const { t } = useTranslation()
   const { group, frame, root } = ed
   if (!group) return null
   return (
@@ -1001,9 +1053,11 @@ function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void })
           root.current?.querySelector<SVGElement>(`[data-shot="${CSS.escape(at)}"]`)?.focus(),
         )
       }}
-      title="A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields."
+      title={t(
+        'A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields.',
+      )}
     >
-      Add shot
+      {t('Add shot')}
     </Button>
   )
 }
@@ -1024,6 +1078,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
     toggle,
     remove,
   } = ed
+  const { t } = useTranslation()
   if (!group) return null
   const len = system.length
   const { windowed, firstRow, lastRow, rowHeight, shotCount } = shotWindow
@@ -1063,20 +1118,20 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                 {group.face && (
                   <Table.Th
                     scope="col"
-                    title={`Ring value, with tenths where the face has them; X: inner ten. Excluded shots show their value and do not count in the total.${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
+                    title={`${t('Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
                   >
-                    Score
+                    {t('Score')}
                   </Table.Th>
                 )}
                 <Table.Th
                   scope="col"
-                  title="Excluded: left out of the statistics, still shown and counted"
+                  title={t('Excluded: left out of the statistics, still shown and counted')}
                 >
-                  Excl.
+                  {t('Excl.')}
                 </Table.Th>
                 {!compact && (
                   <Table.Th scope="col">
-                    <span className="visually-hidden">Delete</span>
+                    <span className="visually-hidden">{t('Delete')}</span>
                   </Table.Th>
                 )}
               </Table.Tr>
@@ -1087,7 +1142,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                 const sel = { group: group.id, index: i }
                 const coord = (axis: 'x' | 'y') => (
                   <CoordInput
-                    label={`Shot ${i + 1} ${axis}`}
+                    label={t('Shot {n} {axis}', { n: i + 1, axis })}
                     si={s[axis]}
                     onCommit={(v) =>
                       shotAt(sel, (x) => ({ ...x, [axis]: v }), `${group.id}:${axis}:${i}`)
@@ -1101,7 +1156,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                       (selected?.group === group.id && selected.index === i) || undefined
                     }
                   >
-                    <Table.Th scope="row">{i + 1}</Table.Th>
+                    <Table.Th scope="row">{plainNumber(i + 1)}</Table.Th>
                     <Table.Td>{coord('x')}</Table.Td>
                     <Table.Td>{coord('y')}</Table.Td>
                     {group.face && (
@@ -1112,7 +1167,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                     <Table.Td>
                       <Checkbox
                         size="xs"
-                        aria-label={`Exclude shot ${i + 1}`}
+                        aria-label={t('Exclude shot {n}', { n: i + 1 })}
                         checked={!!s.excluded}
                         onChange={() => toggle(sel)}
                       />
@@ -1122,7 +1177,7 @@ function ShotsPanel({ ed }: { ed: Ed }) {
                         <ActionIcon
                           variant="subtle"
                           size={controlSize.row.icon}
-                          aria-label={`Delete shot ${i + 1}`}
+                          aria-label={t('Delete shot {n}', { n: i + 1 })}
                           onClick={() => remove(sel)}
                         >
                           <Trash size={14} aria-hidden="true" />
@@ -1156,6 +1211,7 @@ function StatsPanel({ ed }: { ed: Ed }) {
     setOpticChoice,
     click,
   } = ed
+  const { t } = useTranslation()
   if (!group || !stats) return null
   const len = system.length
   const offset = stats.aimOffset
@@ -1168,11 +1224,13 @@ function StatsPanel({ ed }: { ed: Ed }) {
   return (
     <div className="stats-panel">
       <Table className="readout-table" withRowBorders horizontalSpacing={4} verticalSpacing={0}>
-        <caption className="visually-hidden">Statistics of {group.name}</caption>
+        <caption className="visually-hidden">
+          {t('Statistics of {name}', { name: group.name })}
+        </caption>
         <Table.Thead>
           <Table.Tr>
             <Table.Th scope="col">
-              <span className="visually-hidden">Value</span>
+              <span className="visually-hidden">{t('Value')}</span>
             </Table.Th>
             <Table.Th scope="col">{len.symbol}</Table.Th>
             <Table.Th scope="col">MOA</Table.Th>
@@ -1183,13 +1241,19 @@ function StatsPanel({ ed }: { ed: Ed }) {
           <Table.Tr>
             <Table.Th
               scope="row"
-              title="Shots in the statistics; excluded shots are shown and counted, not measured."
+              title={t(
+                'Shots in the statistics; excluded shots are shown and counted, not measured.',
+              )}
             >
-              Shots
+              {t('Shots')}
             </Table.Th>
             <Table.Td colSpan={3}>
-              {stats.shotCount}
-              {stats.excludedCount ? ` (${stats.excludedCount} excluded)` : ''}
+              {stats.excludedCount
+                ? t('{count} ({excluded} excluded)', {
+                    count: stats.shotCount,
+                    excluded: stats.excludedCount,
+                  })
+                : plainNumber(stats.shotCount)}
             </Table.Td>
           </Table.Tr>
           {group.face && (
@@ -1197,22 +1261,22 @@ function StatsPanel({ ed }: { ed: Ed }) {
               <Table.Tr>
                 <Table.Th
                   scope="row"
-                  title={`Sum of the ring values of the included shots, the decimal sum in brackets; excluded shots do not count.${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
+                  title={`${t('Sum of the ring values of the included shots, the decimal sum in brackets; excluded shots do not count.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
                 >
-                  Score
+                  {t('Score')}
                 </Table.Th>
                 <Table.Td colSpan={3}>
                   {groupScore
-                    ? `${groupScore.score.total}${groupScore.score.decimalTotal !== undefined ? ` (${fixedNumber(groupScore.score.decimalTotal, 1)})` : ''}`
-                    : 'n/a'}
+                    ? `${plainNumber(groupScore.score.total)}${groupScore.score.decimalTotal !== undefined ? ` (${fixedNumber(groupScore.score.decimalTotal, 1)})` : ''}`
+                    : t('n/a')}
                 </Table.Td>
               </Table.Tr>
               <Table.Tr>
-                <Table.Th scope="row" title="Inner tens (X) among the included shots.">
-                  Inner tens
+                <Table.Th scope="row" title={t('Inner tens (X) among the included shots.')}>
+                  {t('Inner tens')}
                 </Table.Th>
                 <Table.Td colSpan={3}>
-                  {groupScore ? groupScore.score.innerTenCount : 'n/a'}
+                  {groupScore ? plainNumber(groupScore.score.innerTenCount) : t('n/a')}
                 </Table.Td>
               </Table.Tr>
             </>
@@ -1222,19 +1286,44 @@ function StatsPanel({ ed }: { ed: Ed }) {
             .map((r) => {
               const [a, b] = angles(r.angle)
               const range = (iv: Interval) =>
-                `${Math.round(iv.level * 100)} % interval ${formatQuantity('length', system, iv.lower)} to ${formatQuantity('length', system, iv.upper)} ${len.symbol} (${iv.degreesOfFreedom} degrees of freedom)`
+                t('{level} % interval {lower} to {upper} {unit} ({df} degrees of freedom)', {
+                  level: Math.round(iv.level * 100),
+                  lower: formatQuantity('length', system, iv.lower),
+                  upper: formatQuantity('length', system, iv.upper),
+                  unit: len.symbol,
+                  df: iv.degreesOfFreedom,
+                })
               const c = r.circular
+              const estimate = c && formatQuantity('length', system, c.value)
               const title = [
-                r.help,
+                t(r.help),
                 r.interval &&
-                  ` ${range(r.interval)}${r.interval.circular ? '; assumes circular spread' : ''}.`,
+                  ` ${
+                    r.interval.circular
+                      ? t('{interval}; assumes circular spread.', { interval: range(r.interval) })
+                      : t('{interval}.', { interval: range(r.interval) })
+                  }`,
                 c &&
-                  ` Circular estimate ${formatQuantity('length', system, c.value)} ${len.symbol}${c.interval ? `, ${range(c.interval)}` : ''}; assumes circular spread.`,
+                  ` ${
+                    c.interval
+                      ? t(
+                          'Circular estimate {value} {unit}, {interval}; assumes circular spread.',
+                          {
+                            value: estimate ?? '',
+                            unit: len.symbol,
+                            interval: range(c.interval),
+                          },
+                        )
+                      : t('Circular estimate {value} {unit}; assumes circular spread.', {
+                          value: estimate ?? '',
+                          unit: len.symbol,
+                        })
+                  }`,
               ].join('')
               return (
                 <Table.Tr key={r.key}>
                   <Table.Th scope="row" title={title}>
-                    {r.label}
+                    {t(r.label)}
                   </Table.Th>
                   <Table.Td>{formatQuantity('length', system, r.value)}</Table.Td>
                   <Table.Td>{a}</Table.Td>
@@ -1245,12 +1334,12 @@ function StatsPanel({ ed }: { ed: Ed }) {
           {offset && !compact && (
             <>
               <Table.Tr>
-                <Table.Th scope="row" title="Group center from the point of aim.">
-                  Offset
+                <Table.Th scope="row" title={t('Group center from the point of aim.')}>
+                  {t('Offset')}
                 </Table.Th>
                 <Table.Td>{formatQuantity('length', system, offset.distance)}</Table.Td>
-                <Table.Td colSpan={2} title={compassNames[offset.compass]}>
-                  {offset.compass === 'centre' ? 'center' : offset.compass}
+                <Table.Td colSpan={2} title={t(compassNames[offset.compass])}>
+                  {t(compassLabels[offset.compass])}
                 </Table.Td>
               </Table.Tr>
               {(['x', 'y'] as const).map((axis) => {
@@ -1262,11 +1351,11 @@ function StatsPanel({ ed }: { ed: Ed }) {
                       scope="row"
                       title={
                         axis === 'x'
-                          ? 'Right of the point of aim: positive.'
-                          : 'Above the point of aim: positive.'
+                          ? t('Right of the point of aim: positive.')
+                          : t('Above the point of aim: positive.')
                       }
                     >
-                      {axis === 'x' ? 'Offset horiz.' : 'Offset vert.'}
+                      {axis === 'x' ? t('Offset horiz.') : t('Offset vert.')}
                     </Table.Th>
                     <Table.Td>{formatQuantity('length', system, d)}</Table.Td>
                     <Table.Td>{a}</Table.Td>
@@ -1278,14 +1367,35 @@ function StatsPanel({ ed }: { ed: Ed }) {
                 <Table.Tr>
                   <Table.Th
                     scope="row"
-                    title={`Clicks of ${click.label} (${formatNumber(mrad.fromSi(click.click), 3)} mrad, ${formatNumber(moa.fromSi(click.click), 3)} MOA) that move the group center onto the point of aim.`}
+                    title={t(
+                      'Clicks of {optic} ({mrad} mrad, {moa} MOA) that move the group center onto the point of aim.',
+                      {
+                        optic: click.label,
+                        mrad: formatNumber(mrad.fromSi(click.click), 3),
+                        moa: formatNumber(moa.fromSi(click.click), 3),
+                      },
+                    )}
                   >
-                    Clicks
+                    {t('Clicks')}
                   </Table.Th>
                   <Table.Td colSpan={3}>
                     {(() => {
                       const c = clicksToAim(offset, group.distance, click.click)
-                      return `${c.horizontal.clicks} ${c.horizontal.direction}, ${c.vertical.clicks} ${c.vertical.direction}`
+                      const direction = {
+                        left: t('left'),
+                        right: t('right'),
+                        up: t('up'),
+                        down: t('down'),
+                      }
+                      return t(
+                        '{horizontal} {horizontalDirection}, {vertical} {verticalDirection}',
+                        {
+                          horizontal: c.horizontal.clicks,
+                          horizontalDirection: direction[c.horizontal.direction],
+                          vertical: c.vertical.clicks,
+                          verticalDirection: direction[c.vertical.direction],
+                        },
+                      )
                     })()}
                   </Table.Td>
                 </Table.Tr>
@@ -1297,9 +1407,9 @@ function StatsPanel({ ed }: { ed: Ed }) {
       {!optic && offset && !compact && options.length > 0 && (
         <NativeSelect
           size={controlSize.row.input}
-          label="Optic for clicks"
+          label={t('Optic for clicks')}
           data={[
-            { value: '', label: 'None' },
+            { value: '', label: t('None') },
             ...options.map((o) => ({ value: o.value, label: o.label })),
           ]}
           value={opticChoice}
@@ -1311,32 +1421,33 @@ function StatsPanel({ ed }: { ed: Ed }) {
 }
 
 /** A key value of the group as text with its unit; n/a without it. */
-function keyValueText(keyValues: Ed['keyValues'], system: System, key: string) {
+function keyValueText(keyValues: Ed['keyValues'], system: System, key: string, t: Translator['t']) {
   const r = keyValues.find((x) => x.key === key)
-  return r ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}` : 'n/a'
+  return r ? `${formatQuantity('length', system, r.value)} ${system.length.symbol}` : t('n/a')
 }
 
 /** The group's count and key values in one row. */
 function Headline({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { group, stats, keyValues, system } = ed
   if (!group || !stats) return null
-  const keyValue = (key: string) => keyValueText(keyValues, system, key)
+  const keyValue = (key: string) => keyValueText(keyValues, system, key, t)
   return (
     <dl className="stat-head">
       <div>
         <dt>n</dt>
-        <dd>{stats.shotCount}</dd>
+        <dd>{plainNumber(stats.shotCount)}</dd>
       </div>
       <div>
-        <dt>ES</dt>
+        <dt>{t('ES')}</dt>
         <dd>{keyValue('extremeSpread')}</dd>
       </div>
       <div>
-        <dt>Mean radius</dt>
+        <dt>{t('Mean radius')}</dt>
         <dd>{keyValue('meanRadius')}</dd>
       </div>
       <div>
-        <dt>CEP</dt>
+        <dt>{t('CEP')}</dt>
         <dd>{keyValue('cepElliptical')}</dd>
       </div>
     </dl>
@@ -1345,6 +1456,7 @@ function Headline({ ed }: { ed: Ed }) {
 
 /** Groups per ladder step of the load: the extreme spread chart and its table. */
 function LadderPanel({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { charges, ladderRows, system, stepLabels } = ed
   if (!charges) return null
   const turn = system.correction
@@ -1356,34 +1468,38 @@ function LadderPanel({ ed }: { ed: Ed }) {
         <LazyLineChart
           x={ladderRows.map((r) => system.charge.fromSi(r.charge))}
           y={ladderRows.map((r) => turn.fromSi(r.angle))}
-          xLabel={`Charge (${system.charge.symbol})`}
-          yLabel={`Extreme spread (${turn.symbol})`}
-          title="Group extreme spread against charge"
-          description="Mean extreme spread of the groups at each ladder step, as an angle so groups at different distances compare, against its charge; the table lists the values."
+          xLabel={t('Charge ({unit})', { unit: system.charge.symbol })}
+          yLabel={t('Extreme spread ({unit})', { unit: turn.symbol })}
+          title={t('Group extreme spread against charge')}
+          description={t(
+            'Mean extreme spread of the groups at each ladder step, as an angle so groups at different distances compare, against its charge; the table lists the values.',
+          )}
           height={200}
         />
       ) : (
         <p className="note">
-          Groups at two or more ladder steps give a chart of size against charge.
+          {t('Groups at two or more ladder steps give a chart of size against charge.')}
         </p>
       )}
       <Table className="readout-table" withRowBorders horizontalSpacing={4} verticalSpacing={0}>
-        <caption className="visually-hidden">Groups per ladder step</caption>
+        <caption className="visually-hidden">{t('Groups per ladder step')}</caption>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th scope="col">Step</Table.Th>
+            <Table.Th scope="col">{t('Step')}</Table.Th>
             <Table.Th scope="col">{system.charge.symbol}</Table.Th>
-            <Table.Th scope="col">Groups</Table.Th>
-            <Table.Th scope="col">ES ({turn.symbol})</Table.Th>
-            {oneDistance && <Table.Th scope="col">ES ({len.symbol})</Table.Th>}
+            <Table.Th scope="col">{t('Groups')}</Table.Th>
+            <Table.Th scope="col">{t('ES ({unit})', { unit: turn.symbol })}</Table.Th>
+            {oneDistance && (
+              <Table.Th scope="col">{t('ES ({unit})', { unit: len.symbol })}</Table.Th>
+            )}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {ladderRows.map((r) => (
             <Table.Tr key={r.step}>
-              <Table.Th scope="row">{stepLabels?.[r.step] ?? r.step + 1}</Table.Th>
+              <Table.Th scope="row">{stepLabels?.[r.step] ?? plainNumber(r.step + 1)}</Table.Th>
               <Table.Td>{formatQuantity('charge', system, r.charge)}</Table.Td>
-              <Table.Td>{r.groups}</Table.Td>
+              <Table.Td>{plainNumber(r.groups)}</Table.Td>
               <Table.Td>{formatQuantity('correction', system, r.angle)}</Table.Td>
               {r.length !== undefined && (
                 <Table.Td>{formatQuantity('length', system, r.length)}</Table.Td>
@@ -1398,15 +1514,18 @@ function LadderPanel({ ed }: { ed: Ed }) {
 
 /** The statistics box of the canvas and the exports: the group's name, lines and score. */
 function StatsBoxContent({ ed }: { ed: Ed }) {
+  const translator = useTranslation()
   const { group, stats, keyValues, system, groupScore } = ed
   if (!group || !stats) return null
   return (
     <>
       <strong>{group.name}</strong>
-      {statLines(stats, keyValues, system).map((line) => (
+      {statLines(stats, keyValues, system, translator).map((line) => (
         <span key={line}>{line}</span>
       ))}
-      {groupScore && <span>Score {scoreLine(groupScore)}</span>}
+      {groupScore && (
+        <span>{translator.t('Score {score}', { score: scoreLine(groupScore) ?? '' })}</span>
+      )}
     </>
   )
 }
@@ -1483,10 +1602,11 @@ function ToolPopover({
 
 /** The sheet's name while it is renamed. */
 function SheetName({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { meta, setMeta, setRenaming, root } = ed
   return (
     <TextInput
-      aria-label="Sheet name"
+      aria-label={t('Sheet name')}
       className="sheet-select"
       value={meta.name}
       maxLength={200}
@@ -1500,7 +1620,7 @@ function SheetName({ ed }: { ed: Ed }) {
         }
       }}
       onBlur={() => {
-        if (!meta.name) setMeta((m) => ({ ...m, name: 'Target sheet' }))
+        if (!meta.name) setMeta((m) => ({ ...m, name: t('Target sheet') }))
         setRenaming(false)
         requestAnimationFrame(() =>
           root.current?.querySelector<HTMLElement>('[data-rename]')?.focus(),
@@ -1512,10 +1632,11 @@ function SheetName({ ed }: { ed: Ed }) {
 
 /** The list of the sheets of this browser. */
 function SheetSelect({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { meta, sheets, stored, open } = ed
   return (
     <NativeSelect
-      aria-label="Target sheet"
+      aria-label={t('Target sheet')}
       // the narrow list cuts a long name
       title={meta.name}
       className="sheet-select"
@@ -1534,17 +1655,18 @@ function SheetSelect({ ed }: { ed: Ed }) {
 
 /** Rename, new and delete; the compact tab keeps one row, so they are in Expand. */
 function SheetButtons({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, setRenaming, create, stored, deleteSheet } = ed
   if (compact) return null
   return (
     <>
-      <IconButton label="Rename sheet" data-rename onClick={() => setRenaming(true)}>
+      <IconButton label={t('Rename sheet')} data-rename onClick={() => setRenaming(true)}>
         <PencilSimple />
       </IconButton>
-      <IconButton label="New sheet" onClick={create}>
+      <IconButton label={t('New sheet')} onClick={create}>
         <FilePlus />
       </IconButton>
-      <IconButton label="Delete sheet" disabled={!stored} onClick={deleteSheet}>
+      <IconButton label={t('Delete sheet')} disabled={!stored} onClick={deleteSheet}>
         <Trash />
       </IconButton>
     </>
@@ -1553,12 +1675,13 @@ function SheetButtons({ ed }: { ed: Ed }) {
 
 /** The Photo popover's content: the photo's buttons and its display filters. */
 function PhotoPanel({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { sheet, coarse, setPop, fileInput, cameraInput, removePhoto } = ed
   return (
     <>
-      <h2 className="prop-head">Photo</h2>
+      <h2 className="prop-head">{t('Photo')}</h2>
       <p className="note">
-        Choose, drop or paste a photo; it stays in this browser and is never uploaded.
+        {t('Choose, drop or paste a photo; it stays in this browser and is never uploaded.')}
       </p>
       <Flex component="span" className="row-buttons" wrap="wrap" gap={4} mb="xs">
         <Button
@@ -1570,7 +1693,7 @@ function PhotoPanel({ ed }: { ed: Ed }) {
             fileInput.current?.click()
           }}
         >
-          {sheet.photo ? 'Replace photo' : 'Add photo'}
+          {sheet.photo ? t('Replace photo') : t('Add photo')}
         </Button>
         {coarse && (
           <Button
@@ -1582,7 +1705,7 @@ function PhotoPanel({ ed }: { ed: Ed }) {
               cameraInput.current?.click()
             }}
           >
-            Camera
+            {t('Camera')}
           </Button>
         )}
         <Button
@@ -1595,7 +1718,7 @@ function PhotoPanel({ ed }: { ed: Ed }) {
             void removePhoto()
           }}
         >
-          Remove photo
+          {t('Remove photo')}
         </Button>
       </Flex>
       <FilterPanel ed={ed} />
@@ -1605,11 +1728,14 @@ function PhotoPanel({ ed }: { ed: Ed }) {
 
 /** The photo tool: a button in the compact tab, a popover otherwise. */
 function PhotoTool({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, fileInput } = ed
   if (compact)
     return (
       <IconButton
-        label="Photo: choose, drop or paste one; it stays in this browser and is never uploaded"
+        label={t(
+          'Photo: choose, drop or paste one; it stays in this browser and is never uploaded',
+        )}
         onClick={() => fileInput.current?.click()}
       >
         <ImageIcon />
@@ -1619,8 +1745,8 @@ function PhotoTool({ ed }: { ed: Ed }) {
     <ToolPopover
       ed={ed}
       p="photo"
-      tip="Photo: add, replace or remove; contrast and darken"
-      name="Photo"
+      tip={t('Photo: add, replace or remove; contrast and darken')}
+      name={t('Photo')}
       icon={
         <span className="icon-slot" aria-hidden="true">
           <ImageIcon />
@@ -1634,10 +1760,11 @@ function PhotoTool({ ed }: { ed: Ed }) {
 
 /** The camera button of the compact tab on a touch screen. */
 function CameraButton({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, coarse, cameraInput } = ed
   if (!compact || !coarse) return null
   return (
-    <IconButton label="Photo from the camera" onClick={() => cameraInput.current?.click()}>
+    <IconButton label={t('Photo from the camera')} onClick={() => cameraInput.current?.click()}>
       <Camera />
     </IconButton>
   )
@@ -1675,6 +1802,7 @@ function PhotoInputs({ ed }: { ed: Ed }) {
 
 /** The Calibrate popover: the scale references, rotation and origin. */
 function CalibrateTool({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, unscaled } = ed
   if (compact) return null
   return (
@@ -1683,12 +1811,12 @@ function CalibrateTool({ ed }: { ed: Ed }) {
       p="calibrate"
       tip={
         unscaled
-          ? 'Calibrate: the photo has no scale yet; mark a reference of known size'
-          : 'Calibrate: scale references, rotation and origin'
+          ? t('Calibrate: the photo has no scale yet; mark a reference of known size')
+          : t('Calibrate: scale references, rotation and origin')
       }
       wideTip
-      name="Calibrate"
-      description={unscaled ? 'The photo has no scale yet.' : undefined}
+      name={t('Calibrate')}
+      description={unscaled ? t('The photo has no scale yet.') : undefined}
       icon={
         <span className="icon-slot" aria-hidden="true">
           <Ruler />
@@ -1708,7 +1836,7 @@ function CalibrateTool({ ed }: { ed: Ed }) {
         </Indicator>
       )}
     >
-      <h2 className="prop-head">Calibrate</h2>
+      <h2 className="prop-head">{t('Calibrate')}</h2>
       <ScalePanel ed={ed} />
     </ToolPopover>
   )
@@ -1716,10 +1844,11 @@ function CalibrateTool({ ed }: { ed: Ed }) {
 
 /** The Select and Shot tools. */
 function ToolSwitch({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { meta, storeError, tool, startTool } = ed
   return (
     <SegmentedControl
-      aria-label="Tool"
+      aria-label={t('Tool')}
       // an edit before the store is read is lost when the sheet opens
       disabled={!meta.id && !storeError}
       value={tool === 'select' || tool === 'shot' ? tool : ''}
@@ -1733,10 +1862,12 @@ function ToolSwitch({ ed }: { ed: Ed }) {
               display="inline-flex"
               gap={4}
               wrap="nowrap"
-              title="Select: drag shots, points of aim and reference points; drag the background to pan"
+              title={t(
+                'Select: drag shots, points of aim and reference points; drag the background to pan',
+              )}
             >
               <Cursor size={14} aria-hidden="true" />
-              <span className="seg-text">Select</span>
+              <span className="seg-text">{t('Select')}</span>
             </Group>
           ),
         },
@@ -1748,10 +1879,10 @@ function ToolSwitch({ ed }: { ed: Ed }) {
               display="inline-flex"
               gap={4}
               wrap="nowrap"
-              title="Shot: add shots to the active group by click or tap"
+              title={t('Shot: add shots to the active group by click or tap')}
             >
               <Target size={14} aria-hidden="true" />
-              <span className="seg-text">Shot</span>
+              <span className="seg-text">{t('Shot')}</span>
             </Group>
           ),
         },
@@ -1762,11 +1893,12 @@ function ToolSwitch({ ed }: { ed: Ed }) {
 
 /** Undo, and Redo outside the compact tab. */
 function UndoRedo({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, h, setH } = ed
   return (
     <>
       <IconButton
-        label={`Undo (${shortcutLabel('undo')})`}
+        label={t('Undo ({shortcut})', { shortcut: shortcutLabel('undo') })}
         aria-keyshortcuts={shortcutAriaKeys('undo')}
         disabled={!h.past.length}
         onClick={() => setH(undo)}
@@ -1775,7 +1907,7 @@ function UndoRedo({ ed }: { ed: Ed }) {
       </IconButton>
       {!compact && (
         <IconButton
-          label={`Redo (${shortcutLabel('redo')})`}
+          label={t('Redo ({shortcut})', { shortcut: shortcutLabel('redo') })}
           aria-keyshortcuts={shortcutAriaKeys('redo')}
           disabled={!h.future.length}
           onClick={() => setH(redo)}
@@ -1789,19 +1921,20 @@ function UndoRedo({ ed }: { ed: Ed }) {
 
 /** The Overlays popover: the switches of what the canvas draws. */
 function OverlaysTool({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, overlays, toggleOverlay } = ed
   const overlayCount = (Object.keys(overlayNames) as Overlay[]).filter((o) => overlays[o]).length
   return (
     <ToolPopover
       ed={ed}
       p="overlays"
-      tip={`Overlays: ${overlayCount} on`}
-      name="Overlays"
+      tip={t('Overlays: {count} on', { count: overlayCount })}
+      name={t('Overlays')}
       position="bottom-end"
       icon={<Eye size={16} aria-hidden="true" />}
       frame={(popover) => (
         <Indicator
-          label={<span aria-hidden="true">{overlayCount}</span>}
+          label={<span aria-hidden="true">{plainNumber(overlayCount)}</span>}
           size={14}
           offset={3}
           disabled={!overlayCount}
@@ -1813,17 +1946,21 @@ function OverlaysTool({ ed }: { ed: Ed }) {
       )}
     >
       <fieldset className="overlay-list">
-        <legend className="overlay-legend">Overlays</legend>
-        {(Object.keys(overlayNames) as Overlay[]).map((o) => (
-          <Checkbox
-            key={o}
-            label={overlayNames[o]}
-            title={overlayHelp[o]}
-            wrapperProps={{ title: overlayHelp[o] }}
-            checked={overlays[o]}
-            onChange={(e) => toggleOverlay(o, e.currentTarget.checked)}
-          />
-        ))}
+        <legend className="overlay-legend">{t('Overlays')}</legend>
+        {(Object.keys(overlayNames) as Overlay[]).map((o) => {
+          const help = overlayHelp[o]
+          const title = help && t(help)
+          return (
+            <Checkbox
+              key={o}
+              label={t(overlayNames[o])}
+              title={title}
+              wrapperProps={{ title }}
+              checked={overlays[o]}
+              onChange={(e) => toggleOverlay(o, e.currentTarget.checked)}
+            />
+          )
+        })}
       </fieldset>
       {!compact && <MarkerField ed={ed} />}
     </ToolPopover>
@@ -1832,11 +1969,12 @@ function OverlaysTool({ ed }: { ed: Ed }) {
 
 /** The workbench tab's Expand and Close button. */
 function ExpandButton({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { expand } = ed
   if (!expand) return null
   return (
     <IconButton
-      label={expand.expanded ? 'Close' : 'Expand'}
+      label={expand.expanded ? t('Close') : t('Expand')}
       data-expand
       onClick={() => expand.onChange(!expand.expanded)}
     >
@@ -1847,12 +1985,13 @@ function ExpandButton({ ed }: { ed: Ed }) {
 
 /** The editor's toolbar: sheet, photo, calibration, tools, undo and the overlays. */
 function Toolbar({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { renaming, heading, exportMenu, toolbarKeys } = ed
   return (
     <div
       className="target-toolbar"
       role="toolbar"
-      aria-label="Target sheet tools"
+      aria-label={t('Target sheet tools')}
       onKeyDown={toolbarKeys}
     >
       {renaming ? <SheetName ed={ed} /> : <SheetSelect ed={ed} />}
@@ -1930,6 +2069,7 @@ function Canvas({ ed }: { ed: Ed }) {
     takePhoto,
     unscaled,
   } = ed
+  const { t } = useTranslation()
   const statsBox = group && stats && <StatsBoxContent ed={ed} />
   const photoBox =
     photo && photo !== 'missing'
@@ -2003,19 +2143,22 @@ function Canvas({ ed }: { ed: Ed }) {
       {blankSheet && (
         <div className="canvas-start">
           <p>
-            A drawn target. Place shots, then click where each shot hit. Or add a photo of the
-            target: choose, drop or paste one.
+            {t(
+              'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.',
+            )}
           </p>
           {startActions(controlSize.bar.button)}
         </div>
       )}
       {photo === 'missing' && (
         <p className="canvas-note">
-          The photo of this sheet is not in this browser; its shots are kept.
+          {t('The photo of this sheet is not in this browser; its shots are kept.')}
         </p>
       )}
       {unscaled && (
-        <p className="canvas-note">Mark a reference of known size (Calibrate) to place shots.</p>
+        <p className="canvas-note">
+          {t('Mark a reference of known size (Calibrate) to place shots.')}
+        </p>
       )}
     </div>
   )
@@ -2023,6 +2166,7 @@ function Canvas({ ed }: { ed: Ed }) {
 
 /** The shots section's head: the fold toggle and the add button. */
 function ShotsHead({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { group, uid, shotsOpen, setShotsOpen, addShot } = ed
   if (!group) return null
   return (
@@ -2040,7 +2184,7 @@ function ShotsHead({ ed }: { ed: Ed }) {
           ) : (
             <CaretUp size={12} aria-hidden="true" />
           )}
-          Shots ({group.shots.length})
+          {t('Shots ({count})', { count: group.shots.length })}
         </button>
       </h2>
       <AddShotButton ed={ed} addShot={addShot} />
@@ -2088,21 +2232,22 @@ function SidePanel({ ed, v }: { ed: Ed; v: string }) {
 
 /** The panels as tabs: beside the target, or in the phone's bottom sheet. */
 function SideTabs({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { group, stats, side, setSide, panel, charges } = ed
-  const tabs = [
-    ['groups', 'Group'],
-    ['shots', 'Shots'],
-    ['stats', 'Stats'],
-    ['notes', 'Notes'],
-    ...(charges ? [['ladder', 'Ladder']] : []),
-  ] as [string, string][]
+  const tabs: [string, Message][] = [
+    ['groups', msg('Group')],
+    ['shots', msg('Shots')],
+    ['stats', msg('Stats')],
+    ['notes', msg('Notes')],
+    ...(charges ? [['ladder', msg('Ladder')] as [string, Message]] : []),
+  ]
   return (
     <Tabs value={side} onChange={setSide} className={`target-tabs${panel}`}>
-      {panel && <SideHead ed={ed} title={group?.name ?? 'Groups'} />}
+      {panel && <SideHead ed={ed} title={group?.name ?? t('Groups')} />}
       <Tabs.List>
         {tabs.map(([v, label]) => (
           <Tabs.Tab key={v} value={v}>
-            {label}
+            {t(label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -2114,7 +2259,7 @@ function SideTabs({ ed }: { ed: Ed }) {
       {/* the group's key values under every other tab, at the panel's foot */}
       {panel && side !== 'stats' && group && stats && (
         <div className="target-summary">
-          <h3 className="prop-head">Summary</h3>
+          <h3 className="prop-head">{t('Summary')}</h3>
           <Headline ed={ed} />
         </div>
       )}
@@ -2124,18 +2269,23 @@ function SideTabs({ ed }: { ed: Ed }) {
 
 /** The phone's bottom sheet: a summary strip that opens the panels. */
 function BottomSheet({ ed }: { ed: Ed }) {
+  const { t, tn } = useTranslation()
   const { group, stats, keyValues, system, uid, sheetOpen, setSheetOpen } = ed
   const summaryLine = group
     ? [
         group.name,
-        `${stats?.shotCount ?? 0} shots`,
+        tn(stats?.shotCount ?? 0, '{count} shot', '{count} shots'),
         ...(stats && stats.shotCount > 1
-          ? [`ES ${keyValueText(keyValues, system, 'extremeSpread')}`]
+          ? [t('ES {value}', { value: keyValueText(keyValues, system, 'extremeSpread', t) })]
           : []),
       ].join(' · ')
-    : 'No group'
+    : t('No group')
   return (
-    <section className="target-sheet" data-open={sheetOpen || undefined} aria-label="Group panels">
+    <section
+      className="target-sheet"
+      data-open={sheetOpen || undefined}
+      aria-label={t('Group panels')}
+    >
       <button
         type="button"
         className="sheet-strip"
@@ -2152,7 +2302,7 @@ function BottomSheet({ ed }: { ed: Ed }) {
         ) : (
           <CaretUp size={16} aria-hidden="true" />
         )}
-        <span className="visually-hidden">{sheetOpen ? 'Hide panels' : 'Show panels'}</span>
+        <span className="visually-hidden">{sheetOpen ? t('Hide panels') : t('Show panels')}</span>
       </button>
       <div id={`${uid}-sheet`} className="sheet-body" hidden={!sheetOpen}>
         {sheetOpen && <SideTabs ed={ed} />}
@@ -2163,10 +2313,11 @@ function BottomSheet({ ed }: { ed: Ed }) {
 
 /** The side column of the compact tab: the key statistics, or how to start. */
 function KeySide({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { group, stats, sheet, frame, startActions } = ed
   return (
-    <aside className="target-side key-side" aria-label="Key statistics">
-      <h3 className="prop-head">{group?.name ?? 'Statistics'}</h3>
+    <aside className="target-side key-side" aria-label={t('Key statistics')}>
+      <h3 className="prop-head">{group?.name ?? t('Statistics')}</h3>
       {group?.shots.length ? (
         <>
           {stats && <StatsPanel ed={ed} />}
@@ -2174,7 +2325,7 @@ function KeySide({ ed }: { ed: Ed }) {
         </>
       ) : (
         <Stack gap={4}>
-          <p className="note">{startNote(!!sheet.photo, !!frame)}</p>
+          <p className="note">{startNote(!!sheet.photo, !!frame, t)}</p>
           {startActions(controlSize.row.button)}
         </Stack>
       )}
@@ -2183,31 +2334,34 @@ function KeySide({ ed }: { ed: Ed }) {
 }
 
 /** What to do first on a compact tab without shots. */
-function startNote(photo: boolean, scaled: boolean) {
+function startNote(photo: boolean, scaled: boolean, t: Translator['t']) {
   if (!photo)
-    return 'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.'
+    return t(
+      'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target.',
+    )
   return scaled
-    ? 'Place shots, then click each hole.'
-    : 'Mark a reference of known size (Expand, Calibrate) to place shots.'
+    ? t('Place shots, then click each hole.')
+    : t('Mark a reference of known size (Expand, Calibrate) to place shots.')
 }
 
 /** The statistics column of the wide layout, with the shots, the notes and the ladder. */
 function StatsSide({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { group, stats, uid, shotsOpen, panel, charges, notesPanel } = ed
   return (
-    <aside className={`target-side stats-side${panel}`} aria-label="Statistics and shots">
-      <SideHead ed={ed} title="Statistics" />
+    <aside className={`target-side stats-side${panel}`} aria-label={t('Statistics and shots')}>
+      <SideHead ed={ed} title={t('Statistics')} />
       <Headline ed={ed} />
       {group && stats && <StatsPanel ed={ed} />}
       <ShotsHead ed={ed} />
       <div id={`${uid}-shots`} className="shots-body" hidden={!shotsOpen}>
         {shotsOpen && group && <ShotsPanel ed={ed} />}
       </div>
-      <h2 className="prop-head">Notes</h2>
+      <h2 className="prop-head">{t('Notes')}</h2>
       {notesPanel}
       {charges && (
         <>
-          <h2 className="prop-head">Ladder</h2>
+          <h2 className="prop-head">{t('Ladder')}</h2>
           <LadderPanel ed={ed} />
         </>
       )}
@@ -2217,6 +2371,7 @@ function StatsSide({ ed }: { ed: Ed }) {
 
 /** The target body: the canvas with the panels beside it, in the layout the width allows. */
 function Body({ ed }: { ed: Ed }) {
+  const { t } = useTranslation()
   const { compact, wide, phone, panel, detect } = ed
   if (compact)
     return (
@@ -2229,8 +2384,8 @@ function Body({ ed }: { ed: Ed }) {
   if (wide)
     return (
       <>
-        <aside key="left" className={`target-side${panel}`} aria-label="Groups">
-          <SideHead ed={ed} title="Groups" />
+        <aside key="left" className={`target-side${panel}`} aria-label={t('Groups')}>
+          <SideHead ed={ed} title={t('Groups')} />
           <GroupPanel ed={ed} />
           {detect.panel}
         </aside>
@@ -2260,6 +2415,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
     exportMenu,
     printSheet,
   } = ed
+  const { t } = useTranslation()
   if (heading === undefined) return null
   return (
     <PageBar
@@ -2271,7 +2427,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
           {meta.id ? (
             <FileMenu
               kind="targetSheet"
-              name={meta.name || 'Target sheet'}
+              name={meta.name || t('Target sheet')}
               data={fileData}
               autosaved={meta.id}
               // the save effect brings the two together again
@@ -2289,7 +2445,10 @@ function SheetPageBar({ ed }: { ed: Ed }) {
           {exportMenu}
           <PrintButton
             onClick={printSheet}
-            hint={`Print: what Fit shows at a stated scale with a ruler, and the statistics (also ${shortcutLabel('print')})`}
+            hint={t(
+              'Print: what Fit shows at a stated scale with a ruler, and the statistics (also {shortcut})',
+              { shortcut: shortcutLabel('print') },
+            )}
           />
         </>
       }
@@ -2380,11 +2539,15 @@ async function dropOrphans(
  * Writes the photos and the sheet of a deleted sheet back. Another tab may have saved the sheet
  * since the delete: it stays, and this one comes back as a copy (`put` false).
  */
-async function putBack(r: TargetSheetRecord, files: { id: string; blob: Blob | undefined }[]) {
+async function putBack(
+  r: TargetSheetRecord,
+  files: { id: string; blob: Blob | undefined }[],
+  t: Translator['t'],
+) {
   for (const f of files) if (f.blob) await putPhoto(f.id, f.blob)
   const back = { ...r, saved: new Date().toISOString() }
   const put = await putRecordIf(back, undefined)
-  const own = put ? back : keptCopy(back, newId())
+  const own = put ? back : keptCopy(back, newId(), t)
   if (!put) await putRecords([own])
   return { own, put }
 }
@@ -2420,16 +2583,22 @@ function toolHintOf(
   pointsDone: number,
   detectHint: string | undefined,
   scoreHint: string | undefined,
+  t: Translator['t'],
 ) {
   const first = detectHint ?? scoreHint
   if (first !== undefined) return first
-  const keys = 'Or arrow keys and Enter. Esc cancels.'
+  const keys = t('Or arrow keys and Enter. Esc cancels.')
   if (toolPoints[tool])
-    return `${refHints[tool as RefKind]} Point ${pointsDone + 1} of ${toolPoints[tool]}. ${keys}`
-  if (tool === 'origin') return `Click the photo point of target (0, 0). ${keys}`
-  if (tool === 'aim') return `Click the point of aim of the active group. ${keys}`
+    return t('{hint} Point {n} of {total}. {keys}', {
+      hint: t(refHints[tool as RefKind]),
+      n: pointsDone + 1,
+      total: toolPoints[tool],
+      keys,
+    })
+  if (tool === 'origin') return t('Click the photo point of target (0, 0). {keys}', { keys })
+  if (tool === 'aim') return t('Click the point of aim of the active group. {keys}', { keys })
   if (tool !== 'shot') return
-  return frame ? 'Click a hole to add a shot to the active group.' : 'Mark a reference first.'
+  return frame ? t('Click a hole to add a shot to the active group.') : t('Mark a reference first.')
 }
 
 /** The state the File menu shows for the sheet. */
@@ -2481,13 +2650,14 @@ export function TargetEditor({
   /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
   stored?: number
 }) {
+  const { t } = useTranslation()
   const { system } = useUnits()
   /** The distance of a new sheet: 100 of the display unit (100 yd or 100 m), held in m. */
   const newDistance = useRef(0)
   newDistance.current = system.range.toSi(100)
   const [sheets, setSheets] = useState<TargetSheetRecord[]>([])
   // the id is set on mount (`create` or `open`): no clock or random value during the prerender
-  const [meta, setMeta] = useState({ id: '', name: 'Target sheet 1' })
+  const [meta, setMeta] = useState({ id: '', name: t('Target sheet {n}', { n: 1 }) })
   const [h, setH] = useState(() => historyOf(blank(load, bulletDiameter, newDistance.current)))
   const sheet = h.present
   // the Report issue boxes of /groups, not of the workbench tab
@@ -2558,7 +2728,7 @@ export function TargetEditor({
     return () => clearTimeout(t)
   }, [status])
   /** Why the browser store could not be read: nothing is saved then. */
-  const [storeError, setStoreError] = useState<string>()
+  const [storeError, setStoreError] = useState<{ reason: string }>()
   const [options, setOptions] = useState<ReturnType<typeof clickOptions>>([])
   const [opticChoice, setOpticChoice] = useState('')
   const [side, setSide] = useState<string | null>('groups')
@@ -2582,6 +2752,9 @@ export function TargetEditor({
   const fileInput = useRef<HTMLInputElement>(null)
   const cameraInput = useRef<HTMLInputElement>(null)
   const dragKey = useRef(0)
+  /** The translator of this render, for the save callbacks that outlive it. */
+  const tNow = useRef(t)
+  tNow.current = t
   /** The save of the last edit while it waits for the debounce. */
   const pendingSave = useRef<(() => void) & { record?: () => WaitingRecord }>(undefined)
   /** Saves started and not yet landed, by sheet id: copied too when the page goes. */
@@ -2602,7 +2775,10 @@ export function TargetEditor({
 
   const frame = useMemo(() => frameOf(sheet), [sheet])
   const group = activeGroupOf(sheet, active)
-  const scrollFocus = useScrollFocus(`Shots of ${group?.name ?? ''}`, shotScroller)
+  const scrollFocus = useScrollFocus(
+    t('Shots of {name}', { name: group?.name ?? '' }),
+    shotScroller,
+  )
 
   useEffect(() => setBrowserOverlays(readOverlays()), [])
   const overlays = overlaysOf(sheet, browserOverlays)
@@ -2730,7 +2906,7 @@ export function TargetEditor({
           groups: empty.groups.map((g, i) => (i === 0 ? { ...g, face } : g)),
         }
       : empty
-    const name = `Target sheet ${list.length + 1}`
+    const name = t('Target sheet {n}', { n: list.length + 1 })
     setMeta({ id: newId(), name })
     opened.current = { data, name }
     setH(historyOf(data))
@@ -2796,7 +2972,7 @@ export function TargetEditor({
   useEffect(() => {
     let live = true
     let kept: string[] = []
-    restoreWaiting()
+    restoreWaiting(t)
       .then(
         (k) => {
           kept = k
@@ -2808,7 +2984,7 @@ export function TargetEditor({
         if (!live) return
         const list = sheetsOf(records)
         setSheets(list)
-        setOptions(clickOptions(records))
+        setOptions(clickOptions(records, tNow.current))
         let last: string | null = null
         try {
           last = localStorage.getItem(lastSheet)
@@ -2825,13 +3001,9 @@ export function TargetEditor({
       })
       .then(() => {
         // once: the copies are the last page's
-        if (live) for (const name of kept.splice(0)) say(keptNote(name), true)
+        if (live) for (const name of kept.splice(0)) say(keptNote(name, t), true)
       })
-      .catch((e) =>
-        setStoreError(
-          `the browser store could not be read. ${e instanceof Error ? e.message : ''}`.trim(),
-        ),
-      )
+      .catch((e) => setStoreError({ reason: e instanceof Error ? e.message : '' }))
     return () => {
       live = false
     }
@@ -2865,12 +3037,13 @@ export function TargetEditor({
   const keepOwn = useRef(async (record: TargetSheetRecord, data: TargetSheet) => {
     // a later save of the sheet keeps this edit with its own
     if (bases.current.get(record.id) !== record.saved) return
-    const own = keptCopy(record, newId())
+    const t = tNow.current
+    const own = keptCopy(record, newId(), t)
     await putRecords([own])
     bases.current.set(own.id, own.saved)
     dropCopy(record.id, record.saved)
     reloadLatest.current()
-    say(keptNote(own.name), true)
+    say(keptNote(own.name, t), true)
     if (shown.current !== record.id) return
     pendingSave.current = undefined
     opened.current = { data, name: own.name }
@@ -2899,20 +3072,29 @@ export function TargetEditor({
       // an edit undone before its save is not saved later
       pendingSave.current = undefined
       setSaveFailed(false)
-      if (!meta.id && storeError) say(`Not saved: ${storeError}`, true)
+      if (!meta.id && storeError)
+        say(
+          t('Not saved: the browser store could not be read. {reason}', {
+            reason: storeError.reason,
+          }).trim(),
+          true,
+        )
       return
     }
     const parsed = targetSheet.safeParse(sheet)
     if (!parsed.success) {
       pendingSave.current = undefined
       setSaveFailed(true)
-      say(`Not saved: ${z.prettifyError(parsed.error).split('\n')[0]}`, true)
+      say(
+        t('Not saved: {reason}', { reason: z.prettifyError(parsed.error).split('\n')[0] ?? '' }),
+        true,
+      )
       return
     }
     const recordNow = (): TargetSheetRecord => ({
       kind: 'targetSheet',
       id: meta.id,
-      name: meta.name || 'Target sheet',
+      name: meta.name || t('Target sheet'),
       saved: new Date().toISOString(),
       data: parsed.data,
     })
@@ -2944,22 +3126,22 @@ export function TargetEditor({
           setStored(true)
           setSaveFailed(false)
           // on /groups the page bar's File state says it
-          if (heading === undefined) say('Saved in this browser.')
+          if (heading === undefined) say(t('Saved in this browser.'))
           rememberSheet(record.id)
         })
         .catch(() => {
           landed()
           if (bases.current.get(record.id) === record.saved) bases.current.set(record.id, base)
           if (shown.current === record.id) setSaveFailed(true)
-          say('Not saved: the browser store refused the sheet.', true)
+          say(t('Not saved: the browser store refused the sheet.'), true)
         })
     }
     pendingSave.current = Object.assign(save, {
       record: () => ({ ...recordNow(), base: bases.current.get(meta.id) }),
     })
-    const t = setTimeout(save, 300)
-    return () => clearTimeout(t)
-  }, [sheet, meta, storeError, say, heading])
+    const timer = setTimeout(save, 300)
+    return () => clearTimeout(timer)
+  }, [sheet, meta, storeError, say, heading, t])
   // an edit still waiting is saved when the editor goes (a link, a load change) or the page does
   useEffect(() => {
     const flushNow = () => pendingSave.current?.()
@@ -2990,14 +3172,14 @@ export function TargetEditor({
   async function takePhoto(file: File | undefined) {
     if (!file) return
     if (!(photoTypes as readonly string[]).includes(file.type))
-      return say('The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.', true)
+      return say(t('The file is not a photo: JPEG, PNG, WebP, GIF, AVIF, HEIC or BMP.'), true)
     const target = meta.id
     if (
       sheet.photo &&
       !(await confirmDialog({
-        title: 'Replace the photo?',
-        message: 'Its references go; the shots keep their target values.',
-        confirmLabel: 'Replace',
+        title: t('Replace the photo?'),
+        message: t('Its references go; the shots keep their target values.'),
+        confirmLabel: t('Replace'),
         danger: true,
       }))
     )
@@ -3021,10 +3203,13 @@ export function TargetEditor({
         }),
       )
       if (old) orphans.current.push({ sheet: target, photo: old })
+      // the old photo's size goes, so detection starts on the new one once it has loaded
+      setPhoto(undefined)
+      detect.photoAdded(id)
       setRefKind('line')
-      say('Photo kept in this browser. Calibrate: mark a reference to place shots.')
+      say(t('Photo kept in this browser. Looking for the target and the holes.'))
     } catch {
-      say('The photo could not be read.', true)
+      say(t('The photo could not be read.'), true)
     }
   }
 
@@ -3034,9 +3219,9 @@ export function TargetEditor({
     if (
       !old ||
       !(await confirmDialog({
-        title: 'Remove the photo?',
-        message: 'The shots stay on a drawn target.',
-        confirmLabel: 'Remove',
+        title: t('Remove the photo?'),
+        message: t('The shots stay on a drawn target.'),
+        confirmLabel: t('Remove'),
         danger: true,
       })) ||
       shown.current !== target
@@ -3061,7 +3246,13 @@ export function TargetEditor({
     // what Undo writes back: the sheet as shown, else as last stored
     const parsed = targetSheet.safeParse(sheet)
     const record: TargetSheetRecord | undefined = parsed.success
-      ? { kind: 'targetSheet', id, name: name || 'Target sheet', saved: '', data: parsed.data }
+      ? {
+          kind: 'targetSheet',
+          id,
+          name: name || t('Target sheet'),
+          saved: '',
+          data: parsed.data,
+        }
       : sheets.find((r) => r.id === id)
     // a save still waiting would write the sheet back while the photos are read
     pendingSave.current = undefined
@@ -3070,13 +3261,13 @@ export function TargetEditor({
     )
     const restore = async (r: TargetSheetRecord) => {
       try {
-        const { own, put } = await putBack(r, files)
+        const { own, put } = await putBack(r, files, t)
         if (put) setSheets((list) => [own, ...list.filter((x) => x.id !== id)])
         else void reloadSheets()
         open(own)
-        if (!put) say(keptNote(own.name), true)
+        if (!put) say(keptNote(own.name, t), true)
       } catch {
-        say('Not restored: the browser store refused.', true)
+        say(t('Not restored: the browser store refused.'), true)
       }
     }
     deleteRecord(id)
@@ -3091,9 +3282,9 @@ export function TargetEditor({
         setSheets(rest)
         if (rest[0]) open(rest[0])
         else create(rest)
-        if (record) offerUndo(`Deleted ${name}.`, () => restore(record))
+        if (record) offerUndo(t('Deleted {name}.', { name }), () => restore(record))
       })
-      .catch(() => say('Not deleted: the browser store refused.', true))
+      .catch(() => say(t('Not deleted: the browser store refused.'), true))
   }
 
   // a pasted image becomes the photo while the editor is shown and no field has the focus
@@ -3137,7 +3328,7 @@ export function TargetEditor({
         width: known.width,
         height: known.height,
       }
-    if (!r) return say('Enter the known size first.', true)
+    if (!r) return say(t('Enter the known size first.'), true)
     pushReference(r)
   }
 
@@ -3150,10 +3341,15 @@ export function TargetEditor({
         ref,
       ],
     }
-    if (next.references.length > 20) return say('A sheet holds at most 20 references.', true)
-    if (!frameOf(next)) return say('These points give no scale: three lie on one line.', true)
+    if (next.references.length > 20) return say(t('A sheet holds at most 20 references.'), true)
+    if (!frameOf(next)) return say(t('These points give no scale: three lie on one line.'), true)
     applyCal(() => next)
-    say(`${refNames[ref.kind].split(',')[0]} ${next.references.length} added.`)
+    say(
+      t('{kind} {n} added.', {
+        kind: t(refNames[ref.kind]).split(',')[0] ?? '',
+        n: next.references.length,
+      }),
+    )
   }
 
   function onPoint(p: Point) {
@@ -3180,7 +3376,16 @@ export function TargetEditor({
     const s = g?.shots[sel.index]
     if (!g || !s) return ''
     const value = scored(g.id)?.score.shots[sel.index]
-    return `${g.name}, shot ${sel.index + 1}, x ${formatQuantity('length', system, s.x)}, y ${withUnit('length', system, s.y)}${s.excluded ? ', excluded' : ''}${value ? `, score ${shotText(value)}` : ''}`
+    return [
+      t('{group}, shot {n}, x {x}, y {y}', {
+        group: g.name,
+        n: sel.index + 1,
+        x: formatQuantity('length', system, s.x),
+        y: withUnit('length', system, s.y),
+      }),
+      ...(s.excluded ? [t('excluded')] : []),
+      ...(value ? [t('score {score}', { score: shotText(value) })] : []),
+    ].join(', ')
   }
 
   const shotAt = (
@@ -3203,7 +3408,7 @@ export function TargetEditor({
 
   const addShot = (q: Point) => {
     if (!group) return
-    if (group.shots.length >= 1000) return say('A group holds at most 1000 shots.', true)
+    if (group.shots.length >= 1000) return say(t('A group holds at most 1000 shots.'), true)
     setSelected({ group: group.id, index: group.shots.length })
     onGroup((g) => ({ ...g, shots: [...g.shots, { x: q.x, y: q.y, placement: 'placed' }] }))
   }
@@ -3277,7 +3482,11 @@ export function TargetEditor({
       setActive(gone.id)
       earlier?.undo()
     }
-    groupUndo.current = { n: offerUndo(`Deleted ${names.join(', ')}.`, undo), undo, names }
+    groupUndo.current = {
+      n: offerUndo(t('Deleted {name}.', { name: names.join(', ') }), undo),
+      undo,
+      names,
+    }
   }
 
   const groupScore = group && scored(group.id)
@@ -3300,7 +3509,7 @@ export function TargetEditor({
     )
   }, [charges, sheet, sheets, meta.id])
 
-  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint)
+  const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint, t)
   const hint = hintOf(status, toolHint, help)
 
   /** The sheet without the photo at a fixed view, for the exports (with the statistics box) and the print. */
@@ -3430,7 +3639,7 @@ export function TargetEditor({
         leftSection={<ImageIcon size={size === 'sm' ? 16 : 12} aria-hidden="true" />}
         onClick={() => fileInput.current?.click()}
       >
-        {sheet.photo ? 'Replace photo' : 'Add photo'}
+        {sheet.photo ? t('Replace photo') : t('Add photo')}
       </Button>
       <Button
         size={size}
@@ -3439,7 +3648,7 @@ export function TargetEditor({
         disabled={!frame}
         onClick={() => startTool('shot')}
       >
-        Place shots
+        {t('Place shots')}
       </Button>
     </span>
   )

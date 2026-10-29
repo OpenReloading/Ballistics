@@ -88,7 +88,7 @@ export function buildFace(
     })),
     // a design is not a catalogue face: the photo face search skips it, the user picks it
     photoSearch: false,
-    provenance: { kind: 'measured', sources: [{ title: 'Entered in the face designer' }] },
+    provenance: { kind: 'measured', sources: [{ title: 'Entered in the target designer' }] },
   }
   const r = targetFace.safeParse(candidate)
   if (r.success) return { face: r.data }

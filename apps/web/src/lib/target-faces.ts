@@ -6,6 +6,7 @@ import {
   type TargetFace,
   type TargetMapping,
   toSi,
+  type UserRecord,
 } from '@open-reloading/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { DisciplineSummary, FederationSummary, MappingSummary } from './face-disciplines.ts'
@@ -15,17 +16,20 @@ import type { Facet } from './facets.ts'
 import { matchesQuery } from './lists.ts'
 import { nth } from './nth.ts'
 import type { FieldGroup, FieldRow, StripItem } from './record-fields.ts'
+import { userRowId } from './sources.ts'
 import { verbatim, type Wording } from './wording.ts'
 
 type Translate = Translator['t']
 
-/** One row of the target face list. Lengths in mm, distances in m. */
+/** One row of the target face list, `origin` `user` a face design of the browser. Lengths in mm, distances in m. */
 export type TargetFaceRow = {
   id: string
+  origin?: 'user' | undefined
   name: string
   organization: string
   distances: number[]
-  outer: number
+  /** Absent for a design without an outer ring width yet. */
+  outer?: number | undefined
   rings: number
   disciplines: number
   /** The ids of those disciplines. */
@@ -56,6 +60,32 @@ export function targetFaceRow(f: Face, mappings: readonly MappingSummary[]): Tar
   }
 }
 
+/**
+ * The face designs among `records` as Mine rows: no federation or disciplines, the distances of the
+ * events that have one.
+ */
+export function userFaceRows(records: readonly UserRecord[]): TargetFaceRow[] {
+  return records.flatMap((r) => {
+    if (r.kind !== 'targetFaceDesign') return []
+    const { rings, events } = r.data
+    const mm = events.flatMap((e) => (e.distance === undefined ? [] : [e.distance]))
+    return [
+      {
+        id: userRowId(r.id),
+        origin: 'user' as const,
+        name: r.name,
+        organization: '',
+        distances: [...new Set(mm.map((d) => toSi('length', d)))].sort((a, b) => a - b),
+        outer: rings[0]?.diameter,
+        rings: rings.length,
+        disciplines: 0,
+        disciplineIds: [],
+        events: events.map((e) => e.name),
+      },
+    ]
+  })
+}
+
 /** The URL keys of the face list's choice filters. */
 export const faceFacetKeys = ['org', 'discipline', 'dist', 'rings']
 
@@ -65,23 +95,27 @@ export const faceFacetKeys = ['org', 'discipline', 'dist', 'rings']
  */
 export function faceFacets(disciplines: ReadonlyMap<string, string>): Facet<TargetFaceRow>[] {
   return [
-    { key: 'org', label: 'Federation', values: (r) => [r.organization] },
+    {
+      key: 'org',
+      label: msg('Federation'),
+      values: (r) => (r.organization ? [r.organization] : []),
+    },
     {
       key: 'discipline',
-      label: 'Discipline',
+      label: msg('Discipline'),
       values: (r) => r.disciplineIds,
       text: (v) => disciplines.get(v) ?? v,
     },
     {
       key: 'dist',
-      label: 'Distance',
+      label: msg('Distance'),
       values: (r) => r.distances.map(String),
       text: (v) => `${v} m`,
       order: (a, b) => Number(a) - Number(b),
     },
     {
       key: 'rings',
-      label: 'Rings',
+      label: msg('Rings'),
       values: (r) => [String(r.rings)],
       order: (a, b) => Number(a) - Number(b),
     },
@@ -167,7 +201,7 @@ export function targetFaceGroups(f: Omit<TargetFace, 'provenance'>, t: Translate
   const unset = t('Not stated')
   return [
     {
-      title: msg('Face'),
+      title: msg('Target'),
       rows: [
         ...length(msg('Black area height'), f.blackHeight?.value, f.blackHeight?.raw),
         ...text(

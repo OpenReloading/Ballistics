@@ -135,7 +135,7 @@ export function CaseList({
         actions={
           <>
             <Button component={Link} href="/cases/editor" leftSection={<Plus aria-hidden="true" />}>
-              {t('New case group')}
+              {t('New brass group')}
             </Button>
             <UnitsIconButton />
           </>
@@ -168,8 +168,8 @@ export function CaseList({
           label={productLabel}
           caption={
             named.length === 0
-              ? t('All cases')
-              : t('Cases, {filters}', { filters: named.join(', ') })
+              ? t('All brass')
+              : t('Brass, {filters}', { filters: named.join(', ') })
           }
           noun="cases"
           sort={state.sort}

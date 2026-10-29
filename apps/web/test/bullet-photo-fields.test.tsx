@@ -2,13 +2,14 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DistanceField } from '../src/components/bullet-photo.tsx'
+import { msg } from '../src/i18n/translate.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
 const html = (text: string, si: number | undefined) =>
   renderToStaticMarkup(
     <MantineProvider>
       <DistanceField
-        label="Diameter, caliper (optional)"
+        label={msg('Diameter, caliper (optional)')}
         system={presetUnits('metric-grams')}
         value={{ text, si }}
         onChange={() => {}}

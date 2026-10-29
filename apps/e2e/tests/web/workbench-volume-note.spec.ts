@@ -8,13 +8,22 @@ test.beforeEach(({ page }) => storeUnits(page))
 
 const note = 'Chamber volume not measured'
 
-test('a volume typed over the measured capacity shows the note on screen and in print, in the window', async ({
+test('a record capacity and a volume typed over the measured capacity show the note on screen and in print, in the window', async ({
   page,
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 1280, height: 650 })
   await runExample(page)
-  // the example's volume follows its measured case capacity
+  // the example's volume follows its brass record's stated capacity, an estimate; the print copies
+  // of the note are in the page too
+  const message = page.locator('.run-line .volume-note')
+  await expect(message).toBeVisible()
+  await loadForm(page)
+    .getByRole('textbox', { name: /^Case capacity/ })
+    .fill('3.6')
+  await loadForm(page)
+    .getByLabel(/^Charge mass/)
+    .press('Control+Enter')
   await expect(page.getByText(note)).toHaveCount(0)
   await loadForm(page)
     .getByLabel(/^Usable case volume/)
@@ -22,7 +31,6 @@ test('a volume typed over the measured capacity shows the note on screen and in 
   await loadForm(page)
     .getByLabel(/^Charge mass/)
     .press('Control+Enter')
-  const message = page.locator('.message').filter({ hasText: note })
   await expect(message).toBeVisible({ timeout: 15_000 })
   await expect(message).toContainText('Enter a measured case capacity in the Cartridge card')
   // nothing scrolls, the page or the results column
@@ -32,7 +40,7 @@ test('a volume typed over the measured capacity shows the note on screen and in 
     ),
   )
   expect(overflow.every((x) => x <= 1)).toBe(true)
-  const { violations } = await new AxeBuilder({ page }).include('.message').analyze()
+  const { violations } = await new AxeBuilder({ page }).include('.run-line .volume-note').analyze()
   expect(violations.map((v) => v.id)).toEqual([])
   await page.emulateMedia({ media: 'print' })
   await expect(page.locator('.print-report .report-sub')).toContainText(note)

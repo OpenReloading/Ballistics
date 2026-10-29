@@ -16,6 +16,7 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
+import { type Message, msg } from '../i18n/translate.ts'
 import { nth } from './nth.ts'
 import {
   applyMatrix,
@@ -288,14 +289,14 @@ export const offsetAngles = (o: AimOffset, distance: number) => ({
 })
 
 /** Compass words of `AimOffset.compass` for screen readers and hover text. */
-export const compassNames: Record<AimOffset['compass'], string> = {
-  N: 'high',
-  NE: 'high right',
-  E: 'right',
-  SE: 'low right',
-  S: 'low',
-  SW: 'low left',
-  W: 'left',
-  NW: 'high left',
-  centre: 'on the point of aim',
+export const compassNames: Record<AimOffset['compass'], Message> = {
+  N: msg('high'),
+  NE: msg('high right'),
+  E: msg('right'),
+  SE: msg('low right'),
+  S: msg('low'),
+  SW: msg('low left'),
+  W: msg('left'),
+  NW: msg('high left'),
+  centre: msg('on the point of aim'),
 }

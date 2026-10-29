@@ -6,9 +6,12 @@ import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
+import { msg } from '../i18n/translate.ts'
 import {
   chronoFileBytes,
+  chronoMessageText,
   exampleCsv,
   exampleSessionFileName,
   formatNames,
@@ -17,7 +20,8 @@ import {
   sessionJsonBlob,
   stringName,
 } from '../lib/chrono.ts'
-import { localDay } from '../lib/dates.ts'
+import { translateMessage } from '../lib/core-messages.ts'
+import { dayText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
 import { type StringStats, stringStats } from '../lib/string-stats.ts'
@@ -36,16 +40,13 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 type Read = { fileName: string; data: ChronoImport; pick: number }
 
-const count = (n: number, noun: string) => `${n} ${noun}${n === 1 ? '' : 's'}`
-
-const help = `Reads ${formats}. The file is read in this browser; it is not uploaded or stored.`
-
 /**
  * The session summary: the page bar with Units, Export JSON, Export CSV and Print, a one-row import
  * strip, then the session's badges, the statistics per string, the velocity-per-shot chart with a
  * tab per string in its panel's title row, and the shots of that string.
  */
 export function SessionSummary() {
+  const { t, tn } = useTranslation()
   const { system } = useUnits()
   // the unit for files that name none: the Settings unit until one is chosen here
   const [chosen, setChosen] = useState<VelocityUnit>()
@@ -93,16 +94,21 @@ export function SessionSummary() {
   return (
     <>
       <PageBar
-        title="Session summary"
+        title={msg('Session summary')}
+        translated
         status={
           <span role="status">
-            {read && `Read ${count(strings.length, 'string')}, ${count(shots, 'shot')}.`}
+            {read &&
+              t('Read {strings}, {shots}.', {
+                strings: tn(strings.length, '{count} string', '{count} strings'),
+                shots: tn(shots, '{count} shot', '{count} shots'),
+              })}
           </span>
         }
         actions={
           <>
             <Button component={Link} href="/range" variant="default">
-              Range mode
+              {t('Range mode')}
             </Button>
             <Button
               variant="default"
@@ -115,7 +121,7 @@ export function SessionSummary() {
                 )
               }
             >
-              Export JSON
+              {t('Export JSON')}
             </Button>
             <Button
               variant="default"
@@ -128,7 +134,7 @@ export function SessionSummary() {
                 )
               }
             >
-              Export CSV
+              {t('Export CSV')}
             </Button>
             <UnitsIconButton />
             <PrintButton />
@@ -139,15 +145,20 @@ export function SessionSummary() {
         <Flex className="session-import" wrap="wrap" rowGap="xs" columnGap="md" align="end" my="xs">
           <ChronoDropZone
             id="chrono-file"
-            label="Chronograph file"
+            label={t('Chronograph file')}
             variant="bar"
-            help={help}
+            help={t(
+              'Reads {formats}. The file is read in this browser; it is not uploaded or stored.',
+              {
+                formats,
+              },
+            )}
             file={read?.fileName}
             onFiles={([picked]) => picked && readFile(picked, unit)}
           />
           <NativeSelect
             id="chrono-unit"
-            label="Unit if the file has none"
+            label={t('Unit if the file has none')}
             value={unit}
             onChange={(e) => setChosen(e.currentTarget.value as VelocityUnit)}
             data={['ft/s', 'm/s']}
@@ -155,8 +166,11 @@ export function SessionSummary() {
           <TemplateLinks />
         </Flex>
         {error && (
-          <ErrorNote title="The file was not read." onRetry={() => readFile(file.current, unit)}>
-            {error}
+          <ErrorNote
+            title={t('The file was not read.')}
+            onRetry={() => readFile(file.current, unit)}
+          >
+            {chronoMessageText(error, t)}
           </ErrorNote>
         )}
         {read ? (
@@ -165,8 +179,10 @@ export function SessionSummary() {
           !error && (
             <EmptyNote
               icon={<FileArrowUp size={24} aria-hidden="true" />}
-              title="No file read yet."
-              description="Choose or drop a chronograph file, or load the example: three strings of ten made-up shots."
+              title={t('No file read yet.')}
+              description={t(
+                'Choose or drop a chronograph file, or load the example: three strings of ten made-up shots.',
+              )}
               action={
                 <Button
                   variant="default"
@@ -178,7 +194,7 @@ export function SessionSummary() {
                     )
                   }
                 >
-                  Load example
+                  {t('Load example')}
                 </Button>
               }
             />
@@ -201,6 +217,7 @@ function Headline({
   symbol: string
   level: string
 }) {
+  const { t } = useTranslation()
   const interval = st.standardDeviationInterval
   return (
     <Flex
@@ -212,31 +229,33 @@ function Headline({
       m={0}
     >
       <div>
-        <dt>Mean, n = {st.count}</dt>
+        <dt>{t('Mean, n = {n}', { n: st.count })}</dt>
         <dd>
           {speed(st.mean)} {symbol}
         </dd>
       </div>
       <div>
-        <dt>SD, n = {st.count}</dt>
+        <dt>{t('SD, n = {n}', { n: st.count })}</dt>
         <dd>
           {st.standardDeviation !== undefined
             ? `${speed(st.standardDeviation)} ${symbol}`
-            : 'one shot'}
+            : t('one shot')}
         </dd>
       </div>
       {interval && (
         <div>
-          <dt>
-            SD {level}, n = {st.count}
-          </dt>
+          <dt>{t('SD {level}, n = {n}', { level, n: st.count })}</dt>
           <dd>
-            {speed(interval.lower)} to {speed(interval.upper)} {symbol}
+            {t('{low} to {high} {unit}', {
+              low: speed(interval.lower),
+              high: speed(interval.upper),
+              unit: symbol,
+            })}
           </dd>
         </div>
       )}
       <div>
-        <dt>ES, n = {st.count}</dt>
+        <dt>{t('ES, n = {n}', { n: st.count })}</dt>
         <dd>
           {speed(st.extremeSpread)} {symbol}
         </dd>
@@ -259,26 +278,35 @@ function StatsRow({
   open: boolean
   speed: (ms: number) => string
 }) {
+  const { t } = useTranslation()
   const interval = st?.standardDeviationInterval
+  const na = t('n/a')
   return (
     <tr className={open ? 'is-open' : undefined}>
       <td>{name}</td>
-      <td className="num">{st?.excluded ? `${st.count} of ${shots}` : (st?.count ?? 0)}</td>
-      <td className="num">{st ? speed(st.mean) : 'n/a'}</td>
       <td className="num">
-        {st?.standardDeviation !== undefined ? speed(st.standardDeviation) : 'n/a'}
+        {st?.excluded
+          ? t('{count} of {total}', { count: st.count, total: shots })
+          : (st?.count ?? 0)}
+      </td>
+      <td className="num">{st ? speed(st.mean) : na}</td>
+      <td className="num">
+        {st?.standardDeviation !== undefined ? speed(st.standardDeviation) : na}
       </td>
       <td className="num">
-        {interval ? `${speed(interval.lower)} to ${speed(interval.upper)}` : 'n/a'}
+        {interval
+          ? t('{low} to {high}', { low: speed(interval.lower), high: speed(interval.upper) })
+          : na}
       </td>
-      <td className="num">{st ? speed(st.extremeSpread) : 'n/a'}</td>
-      <td className="num">{st ? speed(st.min) : 'n/a'}</td>
-      <td className="num">{st ? speed(st.max) : 'n/a'}</td>
+      <td className="num">{st ? speed(st.extremeSpread) : na}</td>
+      <td className="num">{st ? speed(st.min) : na}</td>
+      <td className="num">{st ? speed(st.max) : na}</td>
     </tr>
   )
 }
 
 function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
+  const { t, language } = useTranslation()
   const { session, stringLabels, warnings, velocityUnits, format: kind } = read.data
   const v = system.velocity
   const speed = (ms: number) => formatNumber(v.fromSi(ms), 1)
@@ -286,19 +314,29 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
     .filter(Boolean)
     .join(', ')
   const badges = [
-    `File: ${read.fileName}`,
-    `Format: ${formatNames[kind]}`,
-    `Date: ${session.date ?? 'not in the file'}`,
-    `Device: ${device}`,
-    `Unit: ${velocityUnits
-      .map((u) => `${u.unit}, ${u.source === 'file' ? 'from the file' : 'named at import'}`)
-      .join('; ')}`,
+    t('File: {name}', { name: read.fileName }),
+    t('Format: {name}', { name: formatNames[kind] }),
+    t('Date: {date}', {
+      date: session.date ? dayText(session.date, language) : t('not in the file'),
+    }),
+    t('Device: {device}', { device }),
+    t('Unit: {units}', {
+      units: velocityUnits
+        .map((u) =>
+          u.source === 'file'
+            ? t('{unit}, from the file', { unit: u.unit })
+            : t('{unit}, named at import', { unit: u.unit }),
+        )
+        .join('; '),
+    }),
     ...(session.muzzleDistance
       ? [
-          `Muzzle distance: ${withUnit('length', system, toSi('length', session.muzzleDistance.value))}`,
+          t('Muzzle distance: {distance}', {
+            distance: withUnit('length', system, toSi('length', session.muzzleDistance.value)),
+          }),
         ]
       : []),
-    ...(session.note ? [`Note: ${session.note}`] : []),
+    ...(session.note ? [t('Note: {note}', { note: session.note })] : []),
   ]
   const stats = session.strings.map((s) => stringStats(s.shots))
   const level = `${formatNumber(100 * (stats.find(Boolean)?.confidenceLevel ?? 0.95), 0)} %`
@@ -306,7 +344,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
   return (
     <section aria-labelledby="session-result" className="session-result">
       <h2 id="session-result" className="visually-hidden">
-        Session
+        {t('Session')}
       </h2>
       <Group gap={6} my="xs">
         {badges.map((b) => (
@@ -316,11 +354,11 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
         ))}
       </Group>
       {warnings.length > 0 && (
-        <Alert color="yellow" variant="light" title="Import notes" my="xs">
+        <Alert color="yellow" variant="light" title={t('Import notes')} my="xs">
           <ul>
             {warnings.map((w, k) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: warnings keep the importer order and may repeat
-              <li key={k}>{w}</li>
+              <li key={k}>{translateMessage(w, t)}</li>
             ))}
           </ul>
         </Alert>
@@ -328,24 +366,33 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
       <div className="session-panels">
         <Panel
           id="session-strings"
-          title={`Statistics per string, excluded shots left out (${v.symbol})`}
+          title={t('Statistics per string, excluded shots left out ({unit})', { unit: v.symbol })}
         >
           <PanelTable
-            label="String statistics"
+            label={t('String statistics')}
             className="session-strings"
             // the panel title says it; the table keeps it as its name
             caption={
               <span className="visually-hidden">
-                Statistics per string, excluded shots left out ({v.symbol})
+                {t('Statistics per string, excluded shots left out ({unit})', { unit: v.symbol })}
               </span>
             }
-            columns={['String', 'Shots', 'Mean', 'SD', `SD ${level}`, 'ES', 'Min', 'Max']}
+            columns={[
+              t('String'),
+              t('Shots'),
+              t('Mean'),
+              t('SD'),
+              t('SD {level}', { level }),
+              t('ES'),
+              t('Min'),
+              t('Max'),
+            ]}
           >
             {session.strings.map((s, k) => (
               <StatsRow
                 // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
                 key={k}
-                name={stringName(stringLabels, k)}
+                name={stringName(stringLabels, k, t)}
                 st={stats[k]}
                 shots={s.shots.length}
                 open={String(k) === open}
@@ -355,33 +402,35 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
           </PanelTable>
           <StringComparison
             strings={session.strings.map((_, k) => ({
-              name: stringName(stringLabels, k),
+              name: stringName(stringLabels, k, t),
               stats: stats[k],
             }))}
           />
           <p className="session-strings-note">
-            SD {level}: the range that holds the SD of the population the string is drawn from. It
-            assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow.
+            {t(
+              'SD {level}: the range that holds the SD of the population the string is drawn from. It assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow.',
+              { level },
+            )}
           </p>
         </Panel>
         <Tabs value={open} onChange={(k) => k && setOpen(k)} className="session-tabs">
           <Panel
             id="session-velocity"
-            title="Velocity per shot"
+            title={t('Velocity per shot')}
             className="session-velocity"
             controls={
               <Tabs.List>
                 {session.strings.map((_, k) => (
                   // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
                   <Tabs.Tab key={k} value={String(k)}>
-                    {stringName(stringLabels, k)}
+                    {stringName(stringLabels, k, t)}
                   </Tabs.Tab>
                 ))}
               </Tabs.List>
             }
           >
             {session.strings.map((s, k) => {
-              const name = stringName(stringLabels, k)
+              const name = stringName(stringLabels, k, t)
               const st = stats[k]
               const kept = s.shots.flatMap((shot, n) =>
                 shot.excluded ? [] : ([[n + 1, shot]] as const),
@@ -395,25 +444,28 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                     <LazyLineChart
                       x={kept.map(([n]) => n)}
                       y={kept.map(([, shot]) => v.fromSi(shot.velocity.value))}
-                      xLabel="Shot"
-                      yLabel={`Velocity (${v.symbol})`}
-                      limits={[{ y: v.fromSi(st.mean), label: 'Mean' }]}
+                      xLabel={t('Shot')}
+                      yLabel={t('Velocity ({unit})', { unit: v.symbol })}
+                      limits={[{ y: v.fromSi(st.mean), label: t('Mean') }]}
                       points
                       integerX
                       height={210}
-                      title={`Velocity per shot, ${name}`}
-                      description={`Velocity of each of the ${kept.length} shots of ${name} in ${v.symbol} over the shot number, with the mean ${speed(st.mean)} as a line; excluded shots are left out. The shots table lists every value.`}
+                      title={t('Velocity per shot, {name}', { name })}
+                      description={t(
+                        'Velocity of each of the {count} shots of {name} in {unit} over the shot number, with the mean {mean} as a line; excluded shots are left out. The shots table lists every value.',
+                        { count: kept.length, name, unit: v.symbol, mean: speed(st.mean) },
+                      )}
                     />
                   ) : (
-                    <p className="note">Fewer than two shots to draw.</p>
+                    <p className="note">{t('Fewer than two shots to draw.')}</p>
                   )}
                 </Tabs.Panel>
               )
             })}
           </Panel>
-          <Panel id="session-shots" title="Shots" className="session-shots-panel">
+          <Panel id="session-shots" title={t('Shots')} className="session-shots-panel">
             {session.strings.map((s, k) => {
-              const name = stringName(stringLabels, k)
+              const name = stringName(stringLabels, k, t)
               return (
                 // the open string's shots on screen, every string's in print
                 <div
@@ -423,17 +475,22 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                   data-open={String(k) === open || undefined}
                 >
                   <PanelTable
-                    label={`Shots of ${name}`}
+                    label={t('Shots of {name}', { name })}
                     className="session-shots"
-                    caption={<>Shots of {name}</>}
-                    columns={['Shot', `Velocity (${v.symbol})`, 'Cold bore', 'Excluded']}
+                    caption={t('Shots of {name}', { name })}
+                    columns={[
+                      t('Shot'),
+                      t('Velocity ({unit})', { unit: v.symbol }),
+                      t('Cold bore'),
+                      t('Excluded'),
+                    ]}
                   >
                     {s.shots.map((shot, n) => (
                       // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order and have no id
                       <tr key={n}>
                         <td className="num">{n + 1}</td>
                         <td className="num">{speed(shot.velocity.value)}</td>
-                        <td>{shot.coldBore ? 'yes' : ''}</td>
+                        <td>{shot.coldBore ? t('yes') : ''}</td>
                         <td>{shot.excluded ?? ''}</td>
                       </tr>
                     ))}

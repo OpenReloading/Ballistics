@@ -6,14 +6,17 @@ import {
   type QuantityKind,
   toSi,
   type UserPowder,
+  type UserPowderFit,
   type UserRecord,
 } from '@open-reloading/schema'
-import { english, type Translator } from '../i18n/translate.ts'
+import { untranslated } from '../i18n/number.ts'
+import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   type FieldSpec,
   type Fields,
   type FieldValue,
   fieldOf,
+  specText,
   switchFields,
 } from './field-spec.ts'
 import {
@@ -88,18 +91,18 @@ const burn = (
   kind: QuantityKind = 'dimensionless',
 ): PowderSpec => spec(key, label, quantity, kind, 'burn', help)
 
-/** The three numbers of a computed range of the thermochemistry. */
+/** The three numbers of a computed range of the thermochemistry, labelled value, min and max. */
 const range = (
   name: string,
-  label: string,
+  labels: readonly [Message, Message, Message],
   quantity: Quantity,
   kind: QuantityKind,
   help: string,
 ): PowderSpec[] =>
-  (['value', 'min', 'max'] as const).map((part) =>
+  (['value', 'min', 'max'] as const).map((part, i) =>
     spec(
       `thermochemistry.${name}.${part}`,
-      `${label} ${part}`,
+      labels[i] ?? part,
       quantity,
       kind,
       'thermochemistry',
@@ -111,122 +114,134 @@ const range = (
 export const powderSpecs: readonly PowderSpec[] = [
   spec(
     'bulkDensity.value',
-    'Bulk density',
+    msg('Bulk density'),
     'density',
     'density',
     'properties',
-    'Mass per volume of uncompressed powder, voids between the grains included.',
+    msg('Mass per volume of uncompressed powder, voids between the grains included.'),
   ),
   spec(
     'thermochemistry.loadingDensity.value',
-    'Loading density',
+    msg('Loading density'),
     'density',
     'density',
     'thermochemistry',
-    'The loading density of the constant-volume burning the values below are for.',
+    msg('The loading density of the constant-volume burning the values below are for.'),
   ),
   ...range(
     'flameTemperature',
-    'Flame temperature',
+    [msg('Flame temperature value'), msg('Flame temperature min'), msg('Flame temperature max')],
     'temperature',
     'absoluteTemperature',
-    'Flame temperature of the constant-volume burning, with its extremes over the composition ranges.',
+    msg(
+      'Flame temperature of the constant-volume burning, with its extremes over the composition ranges.',
+    ),
   ),
   ...range(
     'impetus',
-    'Impetus',
+    [msg('Impetus value'), msg('Impetus min'), msg('Impetus max')],
     'specificEnergy',
     'specificEnergy',
-    'Impetus of the burning, with its extremes.',
+    msg('Impetus of the burning, with its extremes.'),
   ),
   ...range(
     'gamma',
-    'Gamma',
+    [msg('Gamma value'), msg('Gamma min'), msg('Gamma max')],
     'ratio',
     'dimensionless',
-    'Frozen ratio of specific heats at the flame temperature, with its extremes.',
+    msg('Frozen ratio of specific heats at the flame temperature, with its extremes.'),
   ),
   ...range(
     'molarMass',
-    'Molar mass',
+    [msg('Molar mass value'), msg('Molar mass min'), msg('Molar mass max')],
     'molarMass',
     'molarMass',
-    'Mean molar mass of the combustion gas, with its extremes.',
+    msg('Mean molar mass of the combustion gas, with its extremes.'),
   ),
   ...range(
     'covolume',
-    'Covolume',
+    [msg('Covolume value'), msg('Covolume min'), msg('Covolume max')],
     'covolume',
     'specificVolume',
-    'Covolume of the combustion gas, with its extremes.',
+    msg('Covolume of the combustion gas, with its extremes.'),
   ),
   burn(
     'interior.vivacity.value',
-    'Vivacity',
-    'Burn rate scale of the vivacity law at the reference pressure.',
+    msg('Vivacity'),
+    msg('Burn rate scale of the vivacity law at the reference pressure.'),
     'vivacity',
     'burnRate',
   ),
   burn(
     'interior.energy.value',
-    'Specific energy',
-    'Specific energy of the powder at constant volume.',
+    msg('Specific energy'),
+    msg('Specific energy of the powder at constant volume.'),
     'specificEnergy',
     'specificEnergy',
   ),
-  burn('interior.gamma', 'Gamma', 'Ratio of specific heats of the gas; above 1.'),
-  burn('interior.covolume.value', 'Covolume', 'Covolume of the gas.', 'covolume', 'specificVolume'),
+  burn('interior.gamma', msg('Gamma'), msg('Ratio of specific heats of the gas; above 1.')),
+  burn(
+    'interior.covolume.value',
+    msg('Covolume'),
+    msg('Covolume of the gas.'),
+    'covolume',
+    'specificVolume',
+  ),
   burn(
     'interior.density.value',
-    'Grain density',
-    'Solid density of the grains.',
+    msg('Grain density'),
+    msg('Solid density of the grains.'),
     'density',
     'density',
   ),
   burn(
     'interior.pressureExponent',
-    'Pressure exponent',
-    'Exponent of the pressure in the burn law.',
+    msg('Pressure exponent'),
+    msg('Exponent of the pressure in the burn law.'),
   ),
   burn(
     'interior.referencePressure.value',
-    'Reference pressure',
-    'Pressure at which the vivacity holds.',
+    msg('Reference pressure'),
+    msg('Pressure at which the vivacity holds.'),
     'pressure',
     'pressure',
   ),
   burn(
     'interior.ignitionPressure.value',
-    'Ignition pressure',
-    'Pressure at which the grains start to burn.',
+    msg('Ignition pressure'),
+    msg('Pressure at which the grains start to burn.'),
     'pressure',
     'pressure',
   ),
   burn(
     'interior.startPressure.value',
-    'Start pressure',
-    'Pressure at which the bullet starts to move. Empty: the default of the solver.',
+    msg('Start pressure'),
+    msg('Pressure at which the bullet starts to move. Empty: the default of the solver.'),
     'pressure',
     'pressure',
   ),
   burn(
     'interior.propellantTemperature.value',
-    'Propellant temperature',
-    'Temperature of the propellant the parameters were fitted at.',
+    msg('Propellant temperature'),
+    msg('Temperature of the propellant the parameters were fitted at.'),
     'temperature',
     'temperature',
   ),
-  burn('interior.burnForm.a.value', 'Form a', 'Form parameter a of the two-stage burn form.'),
-  burn('interior.burnForm.m', 'Form m', 'Form parameter m of the two-stage burn form.'),
+  burn(
+    'interior.burnForm.a.value',
+    msg('Form a'),
+    msg('Form parameter a of the two-stage burn form.'),
+  ),
+  burn('interior.burnForm.m', msg('Form m'), msg('Form parameter m of the two-stage burn form.')),
   burn(
     'interior.burnForm.q',
-    'Form q',
-    'Form parameter q of the two-stage burn form; not negative.',
+    msg('Form q'),
+    msg('Form parameter q of the two-stage burn form; not negative.'),
   ),
   burn(
     'interior.burnForm.z1',
-    'Form z1',
-    'Burnt fraction at which the first stage ends; above 0, at most 1.',
+    msg('Form z1'),
+    msg('Burnt fraction at which the first stage ends; above 0, at most 1.'),
   ),
 ]
 
@@ -236,8 +251,8 @@ const specByKey = new Map(powderSpecs.map((s) => [s.key, s]))
 export function specOf(key: string): PowderSpec {
   const own = specByKey.get(key)
   if (own) return own
-  const part = key.endsWith('.max') ? 'max' : 'min'
-  return spec(key, `Mass percent ${part}`, 'percent', 'massFraction', 'properties', '')
+  const label = key.endsWith('.max') ? msg('Mass percent max') : msg('Mass percent min')
+  return spec(key, label, 'percent', 'massFraction', 'properties', '')
 }
 
 /** An ingredient row; its numbers are `comp.<id>.min` and `comp.<id>.max`. */
@@ -261,7 +276,20 @@ export interface Design {
   fields: Fields
   /** The burn-law fields of an opened record that the designer has no input for, kept as they were. */
   unoffered: Tree
+  /** The temperature sensitivity of an opened record, which the designer has no input for, kept as it was. */
+  temperatureSensitivity?: Tree | undefined
+  /** The fit of an opened record saved from a fit, with the SI values of its fitted fields then. */
+  fit?: { block: UserPowderFit; values: Record<string, number | undefined> } | undefined
 }
+
+/** The fields that hold the values a fit frees, by its parameter name. */
+const fitFields = { burnRate: 'interior.vivacity.value', energy: 'interior.energy.value' } as const
+
+/** The fit of the opened record while no value it fitted was edited; an edited one drops it. */
+const keptFit = (d: Design) =>
+  d.fit && Object.values(fitFields).every((k) => fieldAt(d, k).si === d.fit?.values[k])
+    ? d.fit.block
+    : undefined
 
 let counter = 0
 /** A row id, unique in this page: the actions that add a row carry one, so the reducer stays pure. */
@@ -366,10 +394,13 @@ export function fileData(d: Design): UserPowder {
   if (rows.length > 0) draft.composition = rows
   const interior = interiorOf(draft.interior as Tree | undefined, d.fitted)
   if (interior) draft.interior = { ...interior, ...d.unoffered }
+  if (d.temperatureSensitivity) draft.temperatureSensitivity = d.temperatureSensitivity
+  const fit = keptFit(d)
   return {
     origin: 'user',
     ...(d.provenanceKind && { provenanceKind: d.provenanceKind }),
     ...(Object.keys(draft).length > 0 && { draft: draft as NonNullable<UserPowder['draft']> }),
+    ...(fit && { fit }),
   }
 }
 
@@ -405,6 +436,15 @@ export function fromFile(data: UserPowder, name: string, system: UnitSystem): De
     rows: rows.length > 0 ? rows : [{ id: rowId(), name: '', cas: '' }],
     fields,
     unoffered: unofferedOf(draft?.interior as Tree | undefined),
+    ...(draft?.temperatureSensitivity && {
+      temperatureSensitivity: draft.temperatureSensitivity as Tree,
+    }),
+    ...(data.fit && {
+      fit: {
+        block: data.fit,
+        values: Object.fromEntries(Object.values(fitFields).map((k) => [k, fields[k]?.si])),
+      },
+    }),
   }
 }
 
@@ -415,10 +455,10 @@ export interface Problem {
 }
 
 /** The name of the place a problem is at, for the list of problems. */
-export function problemLabel(key: string) {
-  if (key === 'provenanceKind') return 'Provenance'
-  if (key === 'fitted') return 'Burn law'
-  return key.startsWith('comp.') ? 'Composition' : specOf(key).label
+export function problemLabel(key: string, t: Translator['t'] = untranslated()) {
+  if (key === 'provenanceKind') return t('Provenance')
+  if (key === 'fitted') return t('Burn law')
+  return key.startsWith('comp.') ? t('Composition') : specText(t, specOf(key).label)
 }
 
 /** One issue of the powder schema. */
@@ -443,12 +483,12 @@ export function powderOf(
   return parsed.success ? { powder: parsed.data } : { issues: parsed.error.issues }
 }
 
-const sectionLabels: Record<string, string> = {
-  composition: 'Composition',
-  thermochemistry: 'Thermochemistry',
-  interior: 'Burn law',
-  aliases: 'Aliases',
-  bulkDensity: 'Bulk density',
+const sectionLabels: Record<string, Message> = {
+  composition: msg('Composition'),
+  thermochemistry: msg('Thermochemistry'),
+  interior: msg('Burn law'),
+  aliases: msg('Aliases'),
+  bulkDensity: msg('Bulk density'),
 }
 
 /**
@@ -459,21 +499,28 @@ const sectionLabels: Record<string, string> = {
 /** The message of a missing value in the powder schema. */
 const required = /received undefined/
 
-function problemsOf(d: Design, issues: Issue[]): Problem[] {
+function problemsOf(d: Design, issues: Issue[], t: Translator['t']): Problem[] {
   const live = liveRows(d)
   return issues.flatMap((issue): Problem[] => {
     const key = keyOf(live, issue.path)
     if (key === 'provenanceKind' && issue.path[0] === 'interior')
-      return [{ key, message: 'The burn law needs the kind "Fitted to data".' }]
-    if (key) return [{ key, message: required.test(issue.message) ? 'Required.' : issue.message }]
+      return [{ key, message: t('The burn law needs the kind "Fitted to data".') }]
+    if (key)
+      return [{ key, message: required.test(issue.message) ? t('Required.') : issue.message }]
     const prefix = `${issue.path.join('.')}.`
     const empty = powderSpecs.filter(
       (s) => s.key.startsWith(prefix) && fieldAt(d, s.key).text.trim() === '',
     )
     if (required.test(issue.message) && empty.length > 0)
-      return empty.map((s) => ({ key: s.key, message: 'Required.' }))
+      return empty.map((s) => ({ key: s.key, message: t('Required.') }))
     const part = typeof issue.path[0] === 'string' ? sectionLabels[issue.path[0]] : undefined
-    return [{ message: part ? `${part}: ${issue.message}` : issue.message }]
+    return [
+      {
+        message: part
+          ? t('{part}: {message}', { part: t(part), message: issue.message })
+          : issue.message,
+      },
+    ]
   })
 }
 
@@ -502,6 +549,8 @@ export interface PowderDesign {
   id: string
   name: string
   powder: Powder
+  /** What a powder saved from the tuning screen was fitted to. */
+  fit?: UserPowderFit | undefined
 }
 
 /** The valid powder designs among `records`, in the order given. */
@@ -509,18 +558,46 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
   records.flatMap((r) => {
     if (r.kind !== 'powder') return []
     const built = powderOf(r.data, r.name, r.id)
-    return 'powder' in built ? [{ id: r.id, name: r.name, powder: built.powder }] : []
+    return 'powder' in built
+      ? [{ id: r.id, name: r.name, powder: built.powder, fit: r.data.fit }]
+      : []
   })
 
-/** The powder the draft builds as the tools use it, or the problems with the draft. */
-export function checkDesign(d: Design, id: string): { powder: Powder } | { problems: Problem[] } {
+/**
+ * The newest design (latest fit date, then id) whose `fit.previous` chain reaches the powder `id`,
+ * or undefined when no refit of it is stored. A refit names the record it refits, so the chain is
+ * walked from `id` forward; deleting a powder relinks the records that name it (`deleteRecords`).
+ */
+export function newerFit(designs: readonly PowderDesign[], id: string): PowderDesign | undefined {
+  let newest: PowderDesign | undefined
+  const seen = new Set<string>()
+  const next = [id]
+  for (let at = next.pop(); at !== undefined; at = next.pop()) {
+    if (seen.has(at)) continue
+    seen.add(at)
+    for (const d of designs) {
+      if (d.fit?.previous !== `user:${at}`) continue
+      next.push(d.id)
+      const date = newest?.fit?.date ?? ''
+      if (!newest || d.fit.date > date || (d.fit.date === date && d.id > newest.id)) newest = d
+    }
+  }
+  return newest
+}
+
+/** The powder the draft builds as the tools use it, or the problems with the draft in the language of `t`. */
+export function checkDesign(
+  d: Design,
+  id: string,
+  t: Translator['t'] = untranslated(),
+): { powder: Powder } | { problems: Problem[] } {
   const built = powderOf(fileData(d), d.name, id)
   // a typed text that reads as no number is left out of the record, so the record is not done
   const unread = Object.entries(d.fields)
     .filter(([, v]) => v.text.trim() !== '' && v.si === undefined)
-    .map(([key]) => ({ key, message: 'Not a number.' }))
+    .map(([key]) => ({ key, message: t('Not a number.') }))
   if ('powder' in built) return unread.length > 0 ? { problems: unread } : built
-  return { problems: [...unread, ...problemsOf(d, built.issues)] }
+  return { problems: [...unread, ...problemsOf(d, built.issues, t)] }
 }
 
 export type Action =

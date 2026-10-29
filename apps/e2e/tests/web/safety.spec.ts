@@ -62,16 +62,16 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
 }) => {
   await page.addInitScript((value) => localStorage.setItem('safety-ack', value), safetyAck)
   const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
-  // the page bar from 75em, labelled; the phone top bar below, icon only
-  for (const [width, bar, label] of [
-    [1280, '.page-bar', 'Safety'],
-    [390, 'header', ''],
+  // the page bar from 75em, named by its text; the phone top bar below, icon only
+  for (const [width, bar, name, label] of [
+    [1280, '.page-bar', 'Safety', 'Safety'],
+    [390, 'header', 'Safety notice', ''],
   ] as const) {
     await page.setViewportSize({ width, height: 800 })
     await page.goto('/cartridges')
     const button = page
       .locator(bar)
-      .getByRole('button', { name: 'Safety notice', exact: true })
+      .getByRole('button', { name, exact: true })
       .locator('visible=true')
     await expect(button).toHaveText(label)
     // light yellow, the caution note's colours: no longer the filled yellow of I accept

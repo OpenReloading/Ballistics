@@ -15,6 +15,8 @@ import {
   toSi,
   type UserBullet,
 } from '@open-reloading/schema'
+import { untranslated } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'
 import {
   close,
@@ -35,22 +37,23 @@ import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.t
 
 /** The field groups of the designer, in order. */
 export const groups = {
-  identity: 'Identity',
-  size: 'Mass, diameter and length',
-  nose: 'Nose',
-  shank: 'Shank',
-  base: 'Base',
-  tip: 'Tip',
-} as const
+  identity: msg('Identity'),
+  size: msg('Mass, diameter and length'),
+  nose: msg('Nose'),
+  shank: msg('Shank'),
+  base: msg('Base'),
+  tip: msg('Tip'),
+}
 
 export type Group = keyof typeof groups
 
 /** A number field of the designer; `key` is the record path. */
 export interface DesignerSpec extends FieldSpec {
+  label: Message
   group: Group
 }
 
-const len = (key: string, label: string, group: Group): DesignerSpec => ({
+const len = (key: string, label: Message, group: Group): DesignerSpec => ({
   key,
   label,
   quantity: 'length',
@@ -59,38 +62,38 @@ const len = (key: string, label: string, group: Group): DesignerSpec => ({
 })
 
 export const designerSpecs: DesignerSpec[] = [
-  { ...len('diameter', 'Diameter', 'size'), required: true },
-  { key: 'mass', label: 'Mass', quantity: 'mass', group: 'size', min: 0 },
-  len('length', 'Length', 'size'),
-  len('noseLength', 'Nose length', 'nose'),
-  len('ogive.radius', 'Ogive radius', 'nose'),
+  { ...len('diameter', msg('Diameter'), 'size'), required: true },
+  { key: 'mass', label: msg('Mass'), quantity: 'mass', group: 'size', min: 0 },
+  len('length', msg('Length'), 'size'),
+  len('noseLength', msg('Nose length'), 'nose'),
+  len('ogive.radius', msg('Ogive radius'), 'nose'),
   {
     key: 'ogive.radiusRatio',
-    label: 'Ogive Rt/R',
+    label: msg('Ogive Rt/R'),
     quantity: 'ratio',
     group: 'nose',
     min: 0,
     max: 1,
   },
-  len('meplatDiameter', 'Meplat diameter', 'nose'),
-  len('bearingLength', 'Bearing length', 'shank'),
-  len('baseToOgive', 'Base to ogive', 'shank'),
-  len('cannelure.start', 'Cannelure start', 'shank'),
-  len('cannelure.width', 'Cannelure width', 'shank'),
-  len('cannelure.depth', 'Cannelure depth', 'shank'),
-  len('base.length', 'Boat-tail length', 'base'),
-  len('base.diameter', 'Base diameter', 'base'),
-  len('base.cavityDiameter', 'Cavity diameter', 'base'),
+  len('meplatDiameter', msg('Meplat diameter'), 'nose'),
+  len('bearingLength', msg('Bearing length'), 'shank'),
+  len('baseToOgive', msg('Base to ogive'), 'shank'),
+  len('cannelure.start', msg('Cannelure start'), 'shank'),
+  len('cannelure.width', msg('Cannelure width'), 'shank'),
+  len('cannelure.depth', msg('Cannelure depth'), 'shank'),
+  len('base.length', msg('Boat-tail length'), 'base'),
+  len('base.diameter', msg('Base diameter'), 'base'),
+  len('base.cavityDiameter', msg('Cavity diameter'), 'base'),
   {
     key: 'base.angle',
-    label: 'Boat-tail angle',
+    label: msg('Boat-tail angle'),
     quantity: 'angle',
     group: 'base',
     min: 0,
     max: 90,
   },
-  len('tip.length', 'Polymer tip length', 'tip'),
-  len('tip.mouthDiameter', 'Hollow-point mouth diameter', 'tip'),
+  len('tip.length', msg('Polymer tip length'), 'tip'),
+  len('tip.mouthDiameter', msg('Hollow-point mouth diameter'), 'tip'),
 ]
 
 /** The choices, keyed by record path, with their options ('' for not given): the record schema's enums. */
@@ -438,10 +441,11 @@ function validateInputs(
   v: StoredValues,
   system: UnitSystem,
   last: string | undefined,
+  t: Translator['t'],
 ): Evaluation['refusal'] {
   // the mass is not drawn: its error shows at the field only
   const invalid = designerSpecs
-    .map((s) => [s.key, fieldError(s, design.fields[s.key], system)] as const)
+    .map((s) => [s.key, fieldError(s, design.fields[s.key], system, t)] as const)
     .filter(([k, e]) => e !== undefined && k !== 'mass')
   const bad = invalid.find(([k]) => k === last) ?? invalid[0]
   if (bad) return { reason: bad[1] as string, field: bad[0] }
@@ -449,7 +453,7 @@ function validateInputs(
   const widthOnly = v['cannelure.width'] !== undefined && v['cannelure.start'] === undefined
   if (startOnly || widthOnly)
     return {
-      reason: 'A cannelure needs a start and a width.',
+      reason: t('A cannelure needs a start and a width.'),
       field: startOnly ? 'cannelure.width' : 'cannelure.start',
     }
 }
@@ -629,10 +633,15 @@ function ogiveFills(
 
 /**
  * The drawing, the field states and the computed values of a design. `last` is the field edited
- * last: a refusal naming it shows there. Invalid field text and refused dimensions give no drawing,
- * so the page keeps its last one.
+ * last: a refusal naming it shows there, in the language of `t`. Invalid field text and refused
+ * dimensions give no drawing, so the page keeps its last one.
  */
-export function evaluate(design: Design, system: UnitSystem, last?: string): Evaluation {
+export function evaluate(
+  design: Design,
+  system: UnitSystem,
+  last?: string,
+  t: Translator['t'] = untranslated(),
+): Evaluation {
   const { choices } = design
   const { v, states } = fieldStates(design)
   const sdOk = v.mass !== undefined && v.diameter !== undefined && v.diameter > 0
@@ -646,7 +655,7 @@ export function evaluate(design: Design, system: UnitSystem, last?: string): Eva
     : []
   const done = (refusal: Evaluation['refusal']): Evaluation => ({ refusal, states, computed })
 
-  const refusal = validateInputs(design, v, system, last)
+  const refusal = validateInputs(design, v, system, last, t)
   if (refusal) return done(refusal)
 
   const completed = completeShape(v, choices)

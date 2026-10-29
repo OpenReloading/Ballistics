@@ -5,9 +5,11 @@
  * Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
 import { fromSi } from '@open-reloading/schema'
+import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
 import { edgeUncertainty, type Outline } from './bullet-photo-outline.ts'
 import { median1 } from './raster-ops.ts'
+import type { Wording } from './wording.ts'
 
 // Unchecked reads inside loops whose bounds keep the index in range; module-local so the calls inline.
 const at = (a: ArrayLike<number>, i: number) => a[i] as number
@@ -44,7 +46,7 @@ export interface BulletMeasurement {
   ogiveForm?: 'tangent' | 'secant'
   baseType: 'flat' | 'boat-tail'
   /** Sentences about what is missing or doubtful. */
-  notes: string[]
+  notes: Wording[]
 }
 
 /** Standard uncertainty of where a pointed tip ends along the axis, px. */
@@ -298,7 +300,9 @@ function boatTailOf(o: Outline, s: Shank, put: Put, m: BulletMeasurement) {
     uncertainty: fromSi('angle', Math.sqrt(at(fit.cov.c, 3)) / (1 + k * k)),
   }
   if (fit.sigma > 1)
-    m.notes.push('The boat tail is not a straight cone in the photograph (a rebated boat tail?).')
+    m.notes.push(
+      msg('The boat tail is not a straight cone in the photograph (a rebated boat tail?).'),
+    )
   return { z: end([r0, k, s.rRef]), u }
 }
 
@@ -391,7 +395,7 @@ function cannelureOf(o: Outline, s: Shank, put: Put) {
 export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
   const m: BulletMeasurement = { values: {}, baseType: 'flat', notes: [] }
   if (o.z.length < 20) {
-    m.notes.push('The bullet is too short in the photograph to measure.')
+    m.notes.push(msg('The bullet is too short in the photograph to measure.'))
     return m
   }
   // a spread edge adds its position's uncertainty to every length, twice over for a width
@@ -417,8 +421,8 @@ export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
     put('bearingLength', nose.z - bt.z, Math.hypot(nose.u, bt.u))
     m.notes.push(
       m.ogiveForm === 'tangent'
-        ? 'The nose is a tangent ogive: its circle touches the shank.'
-        : 'The nose is a secant ogive: its circle cuts the shank at an angle.',
+        ? msg('The nose is a tangent ogive: its circle touches the shank.')
+        : msg('The nose is a secant ogive: its circle cuts the shank at an angle.'),
     )
   } else {
     // no circle: the nose starts between where the shank leaves 3 px and 0.5 px of the full width
@@ -438,7 +442,9 @@ export function measureOutline(o: Outline, scale: Scale): BulletMeasurement {
     put('bearingLength', start - bt.z, Math.hypot(half, bt.u))
     put('meplatDiameter', 2 * median1(o.r.slice(-3)), 2 * edgeUncertainty)
     m.notes.push(
-      'The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range.',
+      msg(
+        'The nose is not a circle arc (a hybrid or another form): no ogive radius or Rt/R is given, and the nose length is where the shank ends, within a range.',
+      ),
     )
   }
   cannelureOf(o, s, put)

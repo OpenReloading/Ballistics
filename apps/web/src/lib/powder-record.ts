@@ -1,5 +1,8 @@
-import type { Powder } from '@open-reloading/schema'
+import type { Powder, UserPowderFit } from '@open-reloading/schema'
 import type { Translator } from '../i18n/translate.ts'
+import { localDay } from './dates.ts'
+import { interiorFields } from './interior-input.ts'
+import { fixedFieldText, type UnitSystem } from './units.ts'
 
 /**
  * A powder record's M3 parameters in the workbench: the fill, the field marks, the fit summary
@@ -29,6 +32,69 @@ const fittedKey: Record<string, FittedKey> = {
 }
 
 /**
+ * Whether a fitted field of `p` shows another value than the one the record filled (`origin`):
+ * a typed value moved a fitted parameter. `shown` writes a field's SI value at its display
+ * precision, so a value typed as shown is no move.
+ */
+const handTuned = (
+  p: Powder,
+  origin: Record<string, number>,
+  values: Record<string, number | undefined>,
+  shown: (key: string, si: number) => string,
+) =>
+  Object.entries(fittedKey).some(([key, name]) => {
+    const from = origin[key]
+    const si = values[key]
+    return (
+      p.interior?.fitted.includes(name) &&
+      from !== undefined &&
+      (si === undefined || shown(key, si) !== shown(key, from))
+    )
+  })
+
+/**
+ * The mark of a fitted powder: fitted to `strings` strings on the local day of `date`, an ISO time
+ * (`day` writes that day, given as YYYY-MM-DD), or hand-tuned once a fitted value moved.
+ */
+export const fitMark = (
+  strings: number,
+  date: string,
+  tuned: boolean,
+  day: (iso: string) => string,
+  { tn, t }: Pick<Translator, 't' | 'tn'>,
+) =>
+  tuned
+    ? t('simulation parameters, hand-tuned')
+    : tn(
+        strings,
+        'simulation parameters fitted to {count} string, {date}',
+        'simulation parameters fitted to {count} strings, {date}',
+        { date: day(localDay(new Date(date))) },
+      )
+
+/**
+ * The fit mark of the workbench's powder `design` against the record values it filled (`origin`)
+ * and the SI field values, compared as the fields write them in `s`; undefined for a powder not
+ * saved from a fit.
+ */
+export function loadFitMark(
+  design: { powder: Powder; fit?: UserPowderFit | undefined } | undefined,
+  origin: Record<string, number> | undefined,
+  values: Record<string, number | undefined>,
+  s: UnitSystem,
+  day: (iso: string) => string,
+  tr: Pick<Translator, 't' | 'tn'>,
+) {
+  if (!design?.fit || !origin) return
+  const shown = (key: string, si: number) => {
+    const spec = interiorFields.find((f) => f.key === key)
+    return spec ? fixedFieldText(spec.quantity, s, si) : `${si}`
+  }
+  const tuned = handTuned(design.powder, origin, values, shown)
+  return fitMark(design.fit.input.length, design.fit.date, tuned, day, tr)
+}
+
+/**
  * A field's mark against the filled record values `origin`: from the record (fitted or an input of
  * the fit), or changed from the record value; undefined for a field the record does not fill.
  */
@@ -41,13 +107,16 @@ export function recordMark(
   /** Where the values come from. */
   source: 'record' | 'user design',
   t: Translator['t'],
+  /** The mark of a powder saved from a fit (`fitMark`), which its fitted fields carry. */
+  fit?: string | undefined,
 ) {
   const from = origin[key]
   if (from === undefined) return
   if (matchesRecordValue(from, si) && key === 'startPressure' && !p.interior?.startPressure)
     return t("From the fit's start pressure rule for barrels of 300 mm and longer.")
+  const fitted = p.interior?.fitted.some((k) => k === fittedKey[key])
+  if (fitted && fit) return t('From the user design: {mark}.', { mark: fit })
   if (matchesRecordValue(from, si)) {
-    const fitted = p.interior?.fitted.some((k) => k === fittedKey[key])
     if (source === 'record')
       return fitted ? t('From the record (fitted).') : t('From the record (input of the fit).')
     return fitted

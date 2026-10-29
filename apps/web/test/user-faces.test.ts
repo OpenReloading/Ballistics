@@ -62,7 +62,7 @@ it('keeps a record id as it is and gives ids that cut alike different faces', ()
 it('loads a design as a face of the tools that the photo search skips', async () => {
   const face = await fetchFace('user-a1')
   expect(face).toMatchObject({ id: 'user-a1', name: 'Club face', photoSearch: false })
-  await expect(fetchFace('user-b2')).rejects.toThrow('No such face design')
+  await expect(fetchFace('user-b2')).rejects.toThrow('No such target design')
 })
 
 it('keeps the designs when the catalogue cannot be fetched', async () => {

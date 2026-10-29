@@ -9,45 +9,45 @@ import {
   toSi,
   type UserRecord,
 } from '@open-reloading/schema'
-import { formatNumber } from '../i18n/number.ts'
-import type { Translator } from '../i18n/translate.ts'
+import { formatNumber, untranslated } from '../i18n/number.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
 import { formatQuantity, type Quantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
 
 export const firearmFields = [
-  { key: 'barrelLength', label: 'Barrel length', quantity: 'barrelLength', min: 0 },
-  { key: 'twist', label: 'Twist, length per turn', quantity: 'twist', min: 0 },
-  { key: 'grooveDiameter', label: 'Groove diameter, measured', quantity: 'length', min: 0 },
-  { key: 'boreDiameter', label: 'Bore diameter, measured', quantity: 'length', min: 0 },
-  { key: 'freebore', label: 'Freebore', quantity: 'length', min: 0 },
+  { key: 'barrelLength', label: msg('Barrel length'), quantity: 'barrelLength', min: 0 },
+  { key: 'twist', label: msg('Twist, length per turn'), quantity: 'twist', min: 0 },
+  { key: 'grooveDiameter', label: msg('Groove diameter, measured'), quantity: 'length', min: 0 },
+  { key: 'boreDiameter', label: msg('Bore diameter, measured'), quantity: 'length', min: 0 },
+  { key: 'freebore', label: msg('Freebore'), quantity: 'length', min: 0 },
   {
     key: 'baseToOgiveAtLands',
-    label: 'Base to ogive at the lands, measured',
-    help: 'Cartridge length to the bullet ogive with the bullet touching the lands.',
+    label: msg('Base to ogive at the lands, measured'),
+    help: msg('Cartridge length to the bullet ogive with the bullet touching the lands.'),
     quantity: 'length',
     min: 0,
   },
   {
     key: 'overallLengthAtLands',
-    label: 'Overall length at the lands, measured',
-    help: 'Cartridge overall length with the bullet touching the lands.',
+    label: msg('Overall length at the lands, measured'),
+    help: msg('Cartridge overall length with the bullet touching the lands.'),
     quantity: 'length',
     min: 0,
   },
-  { key: 'firearmMass', label: 'Mass', quantity: 'firearmMass', min: 0, positive: true },
+  { key: 'firearmMass', label: msg('Mass'), quantity: 'firearmMass', min: 0, positive: true },
   {
     key: 'roundCount',
-    label: 'Round count',
-    help: 'Rounds fired through the barrel so far.',
+    label: msg('Round count'),
+    help: msg('Rounds fired through the barrel so far.'),
     quantity: 'ratio',
     min: 0,
     integer: true,
   },
   {
     key: 'noteAtRoundCount',
-    label: 'Note at round count',
-    help: 'A saved load shot from this firearm gets a note when a session passes this count.',
+    label: msg('Note at round count'),
+    help: msg('A saved load shot from this firearm gets a note when a session passes this count.'),
     quantity: 'ratio',
     min: 0,
     positive: true,
@@ -56,18 +56,18 @@ export const firearmFields = [
 ] as const satisfies readonly FieldSpec[]
 
 export const opticFields = [
-  { key: 'clickValue', label: 'Click value', quantity: 'correction', min: 0, positive: true },
-  { key: 'travel', label: 'Turret travel', quantity: 'correction', min: 0, positive: true },
+  { key: 'clickValue', label: msg('Click value'), quantity: 'correction', min: 0, positive: true },
+  { key: 'travel', label: msg('Turret travel'), quantity: 'correction', min: 0, positive: true },
   {
     key: 'minMagnification',
-    label: 'Magnification, lowest',
+    label: msg('Magnification, lowest'),
     quantity: 'ratio',
     min: 0,
     positive: true,
   },
   {
     key: 'maxMagnification',
-    label: 'Magnification, highest',
+    label: msg('Magnification, highest'),
     quantity: 'ratio',
     min: 0,
     positive: true,
@@ -77,21 +77,21 @@ export const opticFields = [
 export const mountFields = [
   {
     key: 'sightHeight',
-    label: 'Sight height above the bore',
+    label: msg('Sight height above the bore'),
     quantity: 'length',
     required: true,
     min: 0,
   },
   {
     key: 'lateralOffset',
-    label: 'Lateral offset',
-    help: 'Optic center to the right of the bore; negative to the left.',
+    label: msg('Lateral offset'),
+    help: msg('Optic center to the right of the bore; negative to the left.'),
     quantity: 'length',
   },
-  { key: 'cant', label: 'Cant', help: 'Clockwise as seen from behind.', quantity: 'angle' },
+  { key: 'cant', label: msg('Cant'), help: 'Clockwise as seen from behind.', quantity: 'angle' },
   {
     key: 'zeroRange',
-    label: 'Zero range',
+    label: msg('Zero range'),
     quantity: 'range',
     required: true,
     min: 0,
@@ -101,34 +101,34 @@ export const mountFields = [
 
 /** The zero air and the drag factor of a mount, all optional. */
 export const zeroFields = [
-  { key: 'zeroTemperature', label: 'Zero temperature', quantity: 'temperature' },
+  { key: 'zeroTemperature', label: msg('Zero temperature'), quantity: 'temperature' },
   {
     key: 'zeroPressure',
-    label: 'Zero pressure',
-    help: 'Absolute station pressure, not reduced to sea level.',
+    label: msg('Zero pressure'),
+    help: msg('Absolute station pressure, not reduced to sea level.'),
     quantity: 'airPressure',
     min: 0,
     positive: true,
   },
-  { key: 'zeroHumidity', label: 'Zero humidity', quantity: 'percent', min: 0, max: 100 },
+  { key: 'zeroHumidity', label: msg('Zero humidity'), quantity: 'percent', min: 0, max: 100 },
   {
     key: 'dragFactor',
-    label: 'Drag factor',
-    help: 'From truing: 100 % is the drag of the bullet as given.',
+    label: msg('Drag factor'),
+    help: msg('From truing: 100 % is the drag of the bullet as given.'),
     quantity: 'dragFactor',
     min: 0,
     positive: true,
   },
 ] as const satisfies readonly FieldSpec[]
 
-const labels: Record<string, string> = {
+const labels: Record<string, Message> = {
   ...Object.fromEntries(
     [...firearmFields, ...opticFields, ...mountFields, ...zeroFields].map((s) => [s.key, s.label]),
   ),
-  landsBullet: 'Bullet of the lands contact',
-  dragFactorSource: 'Drag factor source',
-  mounted: 'Mounted on',
-  removed: 'Removed on',
+  landsBullet: msg('Bullet of the lands contact'),
+  dragFactorSource: msg('Drag factor source'),
+  mounted: msg('Mounted on'),
+  removed: msg('Removed on'),
 }
 
 /** Zod issues of `firearm.safeParse(f)` in schema order, empty when valid. */
@@ -138,40 +138,76 @@ export const firearmIssues = (f: Firearm) => firearm.safeParse(f).error?.issues 
  * Why Save refuses a firearm, as a sentence with the field label and where it is; undefined when
  * the record is valid. `name` is the record name, which must not be empty.
  */
-export function firearmProblem(name: string, f: Firearm): string | undefined {
-  if (!name) return 'Enter a name.'
+export function firearmProblem(
+  name: string,
+  f: Firearm,
+  t: Translator['t'] = untranslated(),
+): string | undefined {
+  if (!name) return t('Enter a name.')
   const [issue] = firearmIssues(f)
   if (!issue) return
   // a stored quantity is `{ value }`: the field is the key above it
   const field = String(issue.path.findLast((p) => typeof p === 'string' && p !== 'value'))
-  return `${labels[field] ?? field}${issueWhere(f, issue.path)}: ${issueReason(issue, field)}.`
+  const values = {
+    field: labels[field] ? t(labels[field]) : field,
+    where: issueWhere(f, issue.path, t),
+    reason: issueReason(issue, field, t),
+  }
+  return values.where ? t('{field} {where}: {reason}.', values) : t('{field}: {reason}.', values)
+}
+
+/** The schema's own refusals of a firearm, by their text, as messages the catalogue holds. */
+const schemaMessages: Record<string, Message> = {
+  'Below the lowest magnification': msg('Below the lowest magnification'),
+  'Before the mount date': msg('Before the mount date'),
+  'Duplicate id': msg('Duplicate id'),
+  'Name the bullet the lands contact was measured with': msg(
+    'Name the bullet the lands contact was measured with',
+  ),
+  'Not an optic of this firearm': msg('Not an optic of this firearm'),
+  'Not a configuration of this firearm': msg('Not a configuration of this firearm'),
+}
+
+/** A refusal of the schema in the language of `t`; a text the table lacks stays as it is. */
+export const schemaMessage = (text: string, t: Translator['t'] = untranslated()) => {
+  const known = schemaMessages[text]
+  return known ? t(known) : text
 }
 
 type FirearmIssue = ReturnType<typeof firearmIssues>[number]
 
 /** Where in the record an issue is: the optic or configuration (and mount) it names, else nothing. */
-function issueWhere(f: Firearm, path: FirearmIssue['path']): string {
+function issueWhere(f: Firearm, path: FirearmIssue['path'], t: Translator['t']): string {
   const [list, i, , j] = path
   if (typeof i !== 'number') return ''
   if (list === 'optics') {
     const optic = nth(f.optics, i)
-    return ` in optic ${optic.name || optic.id}`
+    return t('in optic {name}', { name: optic.name || optic.id })
   }
   if (list !== 'configurations') return ''
   const c = nth(f.configurations, i)
-  return ` in configuration ${c.name || c.id}${typeof j === 'number' ? `, mount ${j + 1}` : ''}`
+  const name = c.name || c.id
+  return typeof j === 'number'
+    ? t('in configuration {name}, mount {n}', { name, n: j + 1 })
+    : t('in configuration {name}', { name })
 }
 
-function issueReason(issue: FirearmIssue, field: string): string {
-  if (issue.code === 'custom') return issue.message.charAt(0).toLowerCase() + issue.message.slice(1)
+function issueReason(issue: FirearmIssue, field: string, t: Translator['t']): string {
+  if (issue.code === 'custom') {
+    const said = schemaMessage(issue.message, t)
+    // English reads the refusal after a colon in lower case; a translation keeps its own case
+    return said === issue.message ? said.charAt(0).toLowerCase() + said.slice(1) : said
+  }
   if (issue.code === 'too_small' && field === 'zeroTemperature')
-    return 'must be above absolute zero'
+    return t('must be above absolute zero')
   if (issue.code === 'too_small' && issue.origin === 'number')
-    return `must be ${issue.inclusive ? 'at least' : 'greater than'} ${issue.minimum}`
-  if (issue.code === 'too_big' && field === 'zeroHumidity') return 'must be from 0 to 100 %'
+    return issue.inclusive
+      ? t('must be at least {min}', { min: Number(issue.minimum) })
+      : t('must be greater than {min}', { min: Number(issue.minimum) })
+  if (issue.code === 'too_big' && field === 'zeroHumidity') return t('must be from 0 to 100 %')
   if (issue.code === 'invalid_type')
-    return issue.expected === 'int' ? 'must be a whole number' : 'enter a number'
-  return 'not valid'
+    return issue.expected === 'int' ? t('must be a whole number') : t('enter a number')
+  return t('not valid')
 }
 
 /** A stored quantity in SI, undefined without one. */
@@ -322,20 +358,28 @@ function* mountedOptics(records: UserRecord[]) {
 const mountOption = (
   { r, f, c, i }: { r: UserRecord; f: Firearm; c: Firearm['configurations'][number]; i: number },
   optic: string,
+  t: Translator['t'],
 ) => ({
   value: `${r.id}/${c.id}/${i}`,
-  label: `${r.name}, ${c.name}, ${optic}${c.id === f.active ? ' (active)' : ''}`,
+  label:
+    c.id === f.active
+      ? t('{record}, {configuration}, {optic} (active)', {
+          record: r.name,
+          configuration: c.name,
+          optic,
+        })
+      : `${r.name}, ${c.name}, ${optic}`,
 })
 
 /**
  * One option per mounted optic of every configuration of the firearms among `records`, the
  * active configuration of each firearm first.
  */
-export function sightOptions(records: UserRecord[]) {
+export function sightOptions(records: UserRecord[], t: Translator['t'] = untranslated()) {
   return [...mountedOptics(records)].map((x) => {
     const optic = x.f.optics.find((o) => o.id === x.m.optic)
     return {
-      ...mountOption(x, optic?.name ?? x.m.optic),
+      ...mountOption(x, optic?.name ?? x.m.optic, t),
       fill: {
         sightHeight: toSi('length', x.m.sightHeight.value),
         zeroRange: toSi('length', x.m.zeroRange.value),
@@ -355,12 +399,12 @@ export function sightOptions(records: UserRecord[]) {
  * Optics of the library with a click value, for the clicks to the point of aim: each
  * configuration's mounted optics, the active configuration first.
  */
-export function clickOptions(records: UserRecord[]) {
+export function clickOptions(records: UserRecord[], t: Translator['t'] = untranslated()) {
   return [...mountedOptics(records)].flatMap((x) => {
     const o = x.f.optics.find((y) => y.id === x.m.optic)
     if (!o?.clickValue) return []
     return [
-      { ...mountOption(x, o.name), click: toSi('angle', o.clickValue.value), unit: o.clickUnit },
+      { ...mountOption(x, o.name, t), click: toSi('angle', o.clickValue.value), unit: o.clickUnit },
     ]
   })
 }
@@ -373,9 +417,12 @@ export function activeClick(r: UserRecord | undefined) {
 }
 
 /** The twist as length per turn with its direction: "1:10.0 in, right". */
-export const twistText = (f: Firearm, system: UnitSystem) =>
+export const twistText = (f: Firearm, system: UnitSystem, t: Translator['t'] = untranslated()) =>
   f.twist?.value
-    ? `1:${withUnit('twist', system, toSi('length', f.twist.value))}, ${f.twistHand}`
+    ? t('1:{twist}, {hand}', {
+        twist: withUnit('twist', system, toSi('length', f.twist.value)),
+        hand: f.twistHand === 'left' ? t('left') : t('right'),
+      })
     : undefined
 
 /** A click value (rad) in the turret marking `clickUnit`, else in the units of `system`. */
@@ -440,7 +487,7 @@ export function cardFacts(f: Firearm, system: UnitSystem, t: Translator['t']) {
  * them. The optic and zero are those of the active configuration's first mount (else the first
  * configuration's), '' where nothing is entered.
  */
-export function firearmCells(f: Firearm, system: UnitSystem) {
+export function firearmCells(f: Firearm, system: UnitSystem, t: Translator['t']) {
   const { i, config, mount, optic } = firstMount(f)
   return {
     barrel: f.barrelLength?.value
@@ -448,8 +495,8 @@ export function firearmCells(f: Firearm, system: UnitSystem) {
       : '',
     twist: f.twist?.value ? formatQuantity('twist', system, toSi('length', f.twist.value)) : '',
     hand: f.twist?.value ? f.twistHand : '',
-    optic: mount ? optic?.name || 'Optic' : '',
+    optic: mount ? optic?.name || t('Optic') : '',
     zero: mount ? formatQuantity('range', system, toSi('length', mount.zeroRange.value)) : '',
-    configuration: config ? config.name || `Configuration ${i + 1}` : '',
+    configuration: config ? config.name || t('Configuration {n}', { n: i + 1 }) : '',
   }
 }

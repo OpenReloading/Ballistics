@@ -41,6 +41,18 @@ Code: `packages/core/src/interior/fit.ts`, `ladderRows`, `fitPowder` (`rows`, `e
 
 A point carries its own `barrelLength` and `propellantTemperature` where they differ from the load's, and its prediction is the run at that length and temperature. Velocity uncertainties are given on all points or on none. Pressures need their uncertainty and need velocity uncertainties. Repeated charges add rows but no runs.
 
+### Strings and their weights
+
+`stringLadder` turns chronograph strings into ladder points. A string $j$ of $n_j$ shots $v_{ji}$ gives the point at its charge with its mean $\bar v_j$ as the velocity. Its uncertainty is the pooled standard deviation of all shots about their string means over the root of the string's shot count, over the strings of at least 2 shots:
+
+$$
+s_p = \sqrt{\frac{\sum_j \sum_i (v_{ji} - \bar v_j)^2}{\sum_j (n_j - 1)}}, \qquad \sigma_j = \frac{s_p}{\sqrt{n_j}}
+$$
+
+Code: `packages/core/src/interior/fit-strings.ts`, `stringLadder`, `pooledVelocitySd`.
+
+The sample standard deviation of one string of five shots is too uncertain to weight its row by: on synthetic 5-charge ladders the 2 sigma interval of the burn coefficient held the truth in about 80 % of the fits with each string's own standard deviation, and in 92 to 93 % with the pooled one. Without a string of 2 shots, or with a pooled value of 0, the points carry no uncertainty and the fit is unweighted. The other values of a point (pressure, barrel length, temperature) pass through.
+
 ### Parameters
 
 The burn coefficient is the vivacity $B_a$ of a vivacity law or the coefficient $\beta$ of a geometric law (see [burn laws and form functions](interior-burn-forms.md)). All parameters are fitted as logarithms, the start pressure relative to a floor below which it has no effect:
@@ -264,6 +276,21 @@ Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`conditions`, `evaluate`
 
 Code: `packages/core/src/interior/fit-sessions.ts`, `fitPowderSessions` (`giveUp`).
 
+The tuning screen of the web app fits the strings a user recorded or typed. Each string carries its powder temperature: the one its session records, the one typed with it, or else the load's. Strings at two or more temperatures request the temperature factor with the burn coefficient from `fitPowderSessions`, as one session whose points carry their temperatures; a factor the strings do not resolve is held at 1, and the screen says that only the burn coefficient was fitted. Strings at one temperature fit the burn coefficient alone, and the screen says that the factor needs two or more temperatures. A load whose temperature sensitivity is 0 or absent, as a user powder may be, fits no factor, and the screen asks for one value: it is used below and above the reference, which is the load's propellant temperature, so the ratio of the two sensitivities is 1. Since the fit scales it, the value only starts the fit. The saved powder keeps the fitted load's sensitivities, scaled by the fitted factor, and each string's temperature in its fit points.
+
+Code: `apps/web/src/lib/powder-fit.ts`, `temperatureFit`, `withSensitivity`; `apps/web/src/lib/powder-fit-answer.ts`, `answerPowderFit`; `apps/web/src/lib/powder-save.ts`, `fittedPowder`.
+
+Two rules of the screen can fit fewer values than the request names. A value they leave out keeps the value of the input load, and the screen says which rule applied.
+
+| Rule | When | Fitted |
+| --- | --- | --- |
+| Thin ladder | fewer than 3 distinct charges, or the largest charge less than 10 % above the smallest | the request without the start pressure and the volume factor |
+| Held fit | the fitted start pressure or volume factor correlates with the burn coefficient beyond 0.9 in magnitude, the limit of the confidence rule `start-pressure-correlated` | the burn coefficient alone, fitted again |
+
+On 2 charges every extra value moves with the burn coefficient, so the screen offers to try the other values anyway, which lifts both rules. Hand tuning gives each fitted value with a standard uncertainty a slider of 3 standard uncertainties either side of the fitted value, in steps of 0.05; the lower end stays at 5 % of the fitted value or above. The sliders move the shown values and the curve of the chart, whose runs take an output step of 2e-5 s, 10 times the default: the muzzle velocity moves by less than 1e-6 m/s and a run takes about a sixth of the time. The band and the pressure range stay those of the fit. Save as a powder stores the fitted values, never the hand-tuned ones.
+
+Code: `apps/web/src/lib/powder-fit-answer.ts`, `thinRule`, `heldFit`; `packages/core/src/interior/fit-confidence.ts`, `powderConfidenceRules`; `apps/web/src/components/powder-tune.tsx`, `FitResult`, `SaveFit`.
+
 The values describe the rifle's barrels, the lot and the temperatures of the sessions. A fitted energy absorbs every fixed input that moves the velocity with the barrel length (see Identifiability), and a fitted temperature factor absorbs the effect of the initial temperature on the gas energy, which the model does not have. Neither is a property of the powder to carry to another load, and the result is a simulation parameter, not load data.
 
 ### Failures
@@ -347,4 +374,4 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - [Gelman 2013](../bibliography.md#gelman-2013): the maximum a posteriori estimate and the Laplace approximation of a posterior.
 - [Huber 1964](../bibliography.md#huber-1964): the Huber loss.
 - [Bard 1974](../bibliography.md#bard-1974) (chapter unverified): the estimate of a nonlinear least-squares problem with prior information on the parameters, as extra rows.
-- [JCGM 100:2008](../bibliography.md#jcgm-100-2008), the law of propagation of uncertainty (section 5.1.2, unverified) for the prediction band and the combination of the fixed inputs' effects with the fit's uncertainty, and section 4.2.3 (section number unverified): the standard uncertainty of a mean of $N$ readings, the sample standard deviation over $\sqrt N$, which a caller uses as the velocity uncertainty of a string.
+- [JCGM 100:2008](../bibliography.md#jcgm-100-2008), the law of propagation of uncertainty (section 5.1.2, unverified) for the prediction band and the combination of the fixed inputs' effects with the fit's uncertainty, and section 4.2.3 (section number unverified): the standard uncertainty of a mean of $N$ readings, a standard deviation over $\sqrt N$, which `stringLadder` takes with the pooled standard deviation as the velocity uncertainty of a string.

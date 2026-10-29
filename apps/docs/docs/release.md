@@ -9,8 +9,8 @@ sidebar_position: 2
 
 - Each released part has its own version, [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html), in its `package.json`, and its own tag `<component>-vX.Y.Z` and `CHANGELOG.md`: `packages/schema` (`schema`), `packages/core` (`core`), `packages/drawing` (`drawing`), `packages/importers` (`importers`), `packages/data` (`data`), `packages/api` (`api`), `packages/cli` (`cli`), `apps/web` (`web`) and `apps/docs` (`docs`), listed in `release-please-config.json`. `apps/e2e` and `tools` are not versioned. `schema`, `core`, `drawing`, `importers` and `data` are published to npmjs.com as `@open-reloading/<name>`, each release as that version, once the repository variable `NPM_PUBLISH` is `true` (step 5 below). `cli` is versioned and not published; `api` is published as a container image, `web` and `docs` are part of the Pages site below (`web` has a version, a tag and a changelog but no image). They are `private` workspaces, as are `apps/e2e` and `tools`.
 - A component gets a new version only when a commit since its last release touched its folder. The `node-workspace` plugin also raises the patch version of every listed workspace that depends on a changed one and writes the new version into the dependency entries of `package.json` and `package-lock.json`.
-- 0.0.1 is the first version of every component: with no release tag, `initial-version` in `release-please-config.json` sets it. `.release-please-manifest.json` holds 0.0.0 for each (nothing released yet).
-- Early alpha: 0.0.x, breaking changes are to be expected (README). Before 1.0.0, `feat` and `fix` raise the patch version (`bump-patch-for-minor-pre-major`), and commits carry no breaking marker. From 1.0.0 on, a breaking change (`!` or a `BREAKING CHANGE:` footer) raises the major version. 1.0.0 is a maintainer decision.
+- Every component is released as 1.0.0 in one release pull request: `"release-as": "1.0.0"` on each entry of `packages` in `release-please-config.json` sets that version, and the keys are removed right after that release pull request is merged, so no component is proposed as 1.0.0 a second time. `.release-please-manifest.json` holds the last released version of each component.
+- From 1.0.0 on, `fix` raises the patch version, `feat` the minor version, and a breaking change (`!` or a `BREAKING CHANGE:` footer) the major version. Until 1.0.0, commits carry no breaking marker.
 - The HTTP API has one version: the version of `@open-reloading/api`. The API document carries it as `info.version` (`packages/api/src/version.ts`), and the REST API page of this site shows it. Every public route is under `/v1`.
 
 ## Flow
@@ -26,6 +26,10 @@ sidebar_position: 2
 5. When `schema`, `core`, `drawing`, `importers` or `data` is released and the repository variable `NPM_PUBLISH` is `true`, the `publish` job builds those five libraries from the release commit and runs `npm publish` for each released one, `schema` first (`importers` and `data` depend on it). It uses npm trusted publishing (OIDC, `id-token: write`, npm 11.5.1 or later), so the repository holds no npm token, and npm records a provenance statement with each version. A version already on the registry is skipped, so a failed run can be re-run. While `NPM_PUBLISH` is unset (npm is not set up yet) the job does not run and a library release publishes nothing to npm.
 
 The release pull request is opened with the token of the organization's release GitHub App (`RELEASE_APP_CLIENT_ID`, `RELEASE_APP_PRIVATE_KEY`, [repository settings](ci-tools.md)). GitHub signs the App's API commits (`main` requires signed commits), and a pull request of the App starts its required checks without anyone approving them. Without the App (the variable is unset or the App is not installed on the repository) release-please falls back to the workflow token: the run says so in a warning, and the owner approves the pull request's workflow runs (Approve workflows to run on the pull request). It changes only versions and changelogs.
+
+## Home page news
+
+The web app's home page lists the newest five items of `apps/web/news/`, newest first. Each item is one file `YYYY-MM-DD-slug.md` (the date of the item, a slug of lowercase letters, digits and hyphens) with a front matter of `title` and `link` (an app path such as `/workbench` or a docs URL) and a text of two sentences below it. A file that breaks this format fails the web build. A pull request that adds a user-visible feature adds its item. Release notes stay in the changelogs of each component above.
 
 ## Pages site
 
@@ -53,6 +57,22 @@ Publishing is off until the settings below exist and the repository variable `NP
 3. Publishing access: "Require two-factor authentication and disallow tokens".
 
 `npm pack --dry-run -w @open-reloading/<name>` lists the package contents: `dist` without source maps and the license files (`data`: `LICENSE` for CC BY 4.0 and `LICENSE-MIT`), no sources, tests or records folder.
+
+## Contract baselines
+
+The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`npm test`, the CI `test` groups `packages` and `web`):
+
+- The JSON Schemas the schema build writes: `packages/schema/test/golden/json-schema/`.
+- The export list (values and types) of each published package: `tools/test/golden/exports/<name>.txt`, one line per entry point and name.
+- A user data file with a record of each kind, which the current code must read and write back unchanged, and a share link of two of its records: `apps/web/test/golden/`.
+
+`npm run baselines` (after `npm run build`) rewrites the JSON Schemas, the export lists and the share link from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
+
+## 1.0.0 release
+
+Release notes paragraph, pasted into the release:
+
+> Export all your data before updating (Save options, Export all). Records saved by an alpha version whose shape has changed show as invalid records under Open, with the reason. Download one raw to fix it and import it again, or delete it.
 
 ## API contract
 

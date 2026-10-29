@@ -2,70 +2,10 @@
  * The browser store of user records and target photos (IndexedDB); the workspace folder handle is
  * kept in the same database (`workspace-folder.ts`).
  */
-import type { UserRecord } from '@open-reloading/schema'
-import { storageName } from './edition.ts'
+import type { EmbeddedFile, UserRecord } from '@open-reloading/schema'
 import { validRecords } from './user-data.ts'
-import { photoIds } from './user-photos.ts'
-
-const request = <T>(r: IDBRequest<T>) =>
-  new Promise<T>((resolve, reject) => {
-    r.onsuccess = () => resolve(r.result)
-    r.onerror = () => reject(r.error ?? new Error('IndexedDB request failed'))
-  })
-
-type Store = 'records' | 'handles' | 'files'
-
-/**
- * The database version. 1: the first databases, whose stores were not checked on open. 2: every
- * store exists. A change of the stores adds a version and a step in `upgrade`.
- */
-const version = 2
-
-const databaseName = storageName('openreloading-user-data')
-
-/** Brings a new or older database to `version`: adds the stores it lacks, touches no record. */
-function upgrade(db: IDBDatabase) {
-  for (const name of ['records', 'handles', 'files'] as const)
-    if (!db.objectStoreNames.contains(name))
-      db.createObjectStore(name, name === 'records' ? { keyPath: 'id' } : undefined)
-}
-
-let opened: Promise<IDBDatabase> | undefined
-/** Opens the database at `version`, upgrading an older one in place. */
-const database = () =>
-  (opened ??= new Promise<IDBDatabase>((resolve, reject) => {
-    const r = indexedDB.open(databaseName, version)
-    r.onupgradeneeded = () => upgrade(r.result)
-    r.onsuccess = () => {
-      // another tab deletes the database: close, the next call opens again
-      r.result.onversionchange = () => {
-        r.result.close()
-        opened = undefined
-      }
-      resolve(r.result)
-    }
-    r.onerror = () => reject(r.error ?? new Error('IndexedDB request failed'))
-    // a failure, also a throw of `open` itself (no IndexedDB here), is not kept: the next call tries again
-  }).catch((e) => {
-    opened = undefined
-    throw e
-  }))
-
-/** Runs `f` on one store; resolves once the transaction has committed. */
-export async function inStore<T>(
-  name: Store,
-  mode: IDBTransactionMode,
-  f: (s: IDBObjectStore) => IDBRequest<T> | undefined,
-): Promise<T | undefined> {
-  const tx = (await database()).transaction(name, mode)
-  const r = f(tx.objectStore(name))
-  const result = r && request(r)
-  await new Promise<void>((resolve, reject) => {
-    tx.oncomplete = () => resolve()
-    tx.onerror = tx.onabort = () => reject(tx.error ?? new Error('IndexedDB transaction failed'))
-  })
-  return result
-}
+import { inStore } from './user-db.ts'
+import { embeddedFileBlob, photoIds } from './user-photos.ts'
 
 /** The schema-valid records of the browser store and the invalid ones, as stored: none is dropped. */
 export const storedRecords = async () =>
@@ -169,9 +109,52 @@ export async function putRecordIfAbsent(record: UserRecord) {
   return !stored
 }
 
+/** The `fit.previous` of a stored powder, unvalidated; undefined for any other record. */
+const previousOf = (raw: unknown) => {
+  const r = raw as { kind?: unknown; data?: { fit?: { previous?: unknown } } } | null
+  const p = r?.kind === 'powder' ? r.data?.fit?.previous : undefined
+  return typeof p === 'string' ? p : undefined
+}
+
+const idOf = (ref: string) => ref.slice('user:'.length)
+
+/**
+ * What a powder naming `named` names once the records of `gone` are deleted: the `previous` of a
+ * deleted powder, through the deleted ones, up to a record that stays. Undefined to leave it.
+ */
+function relinked(named: string, gone: ReadonlyMap<string, unknown>) {
+  let to = named
+  const seen = new Set<string>()
+  for (let at = gone.get(idOf(to)); at && !seen.has(to); at = gone.get(idOf(to))) {
+    seen.add(to)
+    const next = previousOf(at)
+    // a deleted powder without a `previous` of its own leaves the name as it was
+    if (!next) return
+    to = next
+  }
+  return to !== named && !gone.has(idOf(to)) ? to : undefined
+}
+
+/**
+ * Deletes the records `ids`. In the same transaction a powder whose `fit.previous` names a
+ * deleted powder takes that powder's own `previous` (through the deleted ones), so a chain of
+ * refits stays whole and a load on an older fit still finds the newest.
+ */
 export const deleteRecords = (ids: string[]) =>
   inStore('records', 'readwrite', (s) => {
-    for (const id of ids) s.delete(id)
+    const all = s.getAll()
+    all.addEventListener('success', () => {
+      const raw = all.result as { id?: unknown; data?: { fit?: object } }[]
+      const gone = new Map(
+        raw.flatMap((r) => (typeof r.id === 'string' && ids.includes(r.id) ? [[r.id, r]] : [])),
+      )
+      for (const r of raw) {
+        const named = previousOf(r)
+        const to = named && typeof r.id === 'string' && !gone.has(r.id) && relinked(named, gone)
+        if (to) s.put({ ...r, data: { ...r.data, fit: { ...r.data?.fit, previous: to } } })
+      }
+      for (const id of ids) s.delete(id)
+    })
     return
   })
 
@@ -180,6 +163,12 @@ export const deleteRecord = (id: string) => deleteRecords([id])
 /** A user file (a target photo) kept in this browser under `id`; never sent anywhere. */
 export const putPhoto = (id: string, file: Blob) =>
   inStore('files', 'readwrite', (s) => s.put(file, id))
+
+/** Keeps in this browser the photos of `records` that the file carries. */
+export async function storePhotos(files: EmbeddedFile[], records: UserRecord[]) {
+  const wanted = new Set(photoIds(records))
+  for (const f of files) if (wanted.has(f.id)) await putPhoto(f.id, embeddedFileBlob(f))
+}
 
 export const storedPhoto = (id: string) =>
   inStore('files', 'readonly', (s) => s.get(id)) as Promise<Blob | undefined>

@@ -1,5 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import {
   type LoadFileFormat,
   loadFileFormats,
@@ -17,11 +18,13 @@ const load: UserRecord = {
   data: { origin: 'user', charge: { value: 2.8 }, cartridge: 'catalogue:308-win' },
 }
 
+const bytes = (text: string) => new TextEncoder().encode(text)
+
 /** A made-up format: lines starting `LOAD`, read to one load with two fields not mapped. */
 const lines: LoadFileFormat = {
   name: 'Test lines',
   accept: { 'text/plain': ['.txt'] },
-  detect: (text) => text.startsWith('LOAD'),
+  detect: (b) => new TextDecoder().decode(b).startsWith('LOAD'),
   parse: () => ({
     ok: true,
     records: [load],
@@ -29,34 +32,43 @@ const lines: LoadFileFormat = {
     warnings: ['The date is not in the file.'],
   }),
 }
-const formats = [lines, ...loadFileFormats]
+const formats = [...loadFileFormats, lines]
 
 describe('load-file formats', () => {
-  it('the OpenReloading user data file is the last entry and reads its files', () => {
-    expect(loadFileFormats.at(-1)?.name).toBe('OpenReloading data')
-    expect(readLoadFile(userDataText([load]))).toEqual({ ok: true, records: [load] })
+  it('the OpenReloading user data file is the first entry and reads its files', () => {
+    expect(loadFileFormats[0]?.name).toBe('OpenReloading data')
+    expect(readLoadFile(bytes(userDataText([load])))).toEqual({ ok: true, records: [load] })
   })
 
-  it('the first format that detects the text reads it', () => {
-    expect(readLoadFile('LOAD 1', formats)).toEqual(lines.parse('LOAD 1'))
-    expect(readLoadFile(userDataText([load]), formats)).toEqual({ ok: true, records: [load] })
+  it('the first format that detects the bytes reads them', () => {
+    expect(readLoadFile(bytes('LOAD 1'), formats)).toEqual(lines.parse(bytes('LOAD 1')))
+    expect(readLoadFile(bytes(userDataText([load])), formats)).toEqual({
+      ok: true,
+      records: [load],
+    })
   })
 
   it('text no format claims keeps the reasons of the user data file', () => {
-    expect(readLoadFile('{', formats)).toEqual({ ok: false, reason: 'The file is not JSON.' })
-    expect(readLoadFile('x'.repeat(maxFileBytes + 1), formats)).toMatchObject({ ok: false })
+    expect(readLoadFile(bytes('{'), formats)).toEqual({
+      ok: false,
+      reason: 'The file is not JSON.',
+    })
+    expect(readLoadFile(new Uint8Array(maxFileBytes + 1), formats)).toMatchObject({ ok: false })
   })
 
   it('warnings and fields not mapped reach the import as one note per file', () => {
-    expect(readNote(lines.parse(''))).toBe('The date is not in the file. Not read: primer, lot.')
-    expect(readNote({ ok: true, records: [] })).toBe('')
+    expect(readNote(lines.parse(bytes('')), english.t)).toBe(
+      'The date is not in the file. Not read: primer, lot.',
+    )
+    expect(readNote({ ok: true, records: [] }, english.t)).toBe('')
     const { records, notes, skipped } = parseFiles(
       [
-        { name: 'a.txt', text: 'LOAD 1' },
-        { name: 'b.json', text: userDataText([load]) },
-        { name: 'c.txt', text: 'other' },
+        { name: 'a.txt', bytes: bytes('LOAD 1') },
+        { name: 'b.json', bytes: bytes(userDataText([load])) },
+        { name: 'c.txt', bytes: bytes('other') },
       ],
       formats,
+      english.t,
     )
     expect(records).toEqual([load, load])
     expect(notes).toEqual([

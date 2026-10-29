@@ -5,6 +5,7 @@ import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
+import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
@@ -165,6 +166,25 @@ const states: State[] = [
     },
   },
   {
+    name: '/ with saved loads',
+    scrolls: true,
+    open: async (page, check) => {
+      await gotoHydrated(page, '/')
+      await putRecords(page, [
+        {
+          kind: 'load',
+          id: '00000000-0000-4000-8000-000000000001',
+          name: 'Saved test load',
+          saved: '2026-10-20T10:00:00.000Z',
+          data: { origin: 'user' },
+        },
+      ])
+      await gotoHydrated(page, '/')
+      await expect(page.getByRole('link', { name: 'Saved test load' })).toBeVisible()
+      await check('page')
+    },
+  },
+  {
     name: 'Saved loads',
     open: async (page, check) => {
       // a native picker cannot be driven: a save goes to the browser's records, as the app's own
@@ -303,6 +323,20 @@ for (const width of widths) {
     await expect(notes.first()).toBeVisible()
     for (const note of await notes.all())
       expect((await note.boundingBox())?.height).toBeGreaterThanOrEqual(24)
+  })
+}
+
+// WCAG 2.5.8: the symbol buttons of the dimensions tables, one per row, with and without notes
+for (const width of widths) {
+  test(`the symbols of the dimensions tables are 24 px high at ${width} px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: tall })
+    for (const id of ['12', '308-win']) {
+      await gotoHydrated(page, `/cartridges/${id}`)
+      const symbols = page.locator('.cartridge-values tbody th [tabindex]')
+      await expect(symbols.first()).toBeVisible()
+      for (const symbol of await symbols.all())
+        expect((await symbol.boundingBox())?.height).toBeGreaterThanOrEqual(24)
+    }
   })
 }
 
