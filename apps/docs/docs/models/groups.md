@@ -308,7 +308,7 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 - Minimum shot counts: the centre and the aim offset need 1 shot, every dispersion value and the dispersion ellipse 2, the prediction ellipse 3, the velocity correlation 3 shots with a velocity, not all of one velocity or one height.
 - The interval of a velocity standard deviation holds its level only for normal velocities. In simulated strings of 10 to 30 shots from skewed, heavy-tailed or stray-shot populations, an interval stated at 95 % covered the true value 76 to 90 % of the time, and it is too narrow, not too wide. A percentile bootstrap covered less at these shot counts and is not used. The extreme spread of a string carries no interval.
 - Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables, not reproduced here.
-- The circular CEP overstates the CEP of an elongated group. The elliptical CEP holds for any axis ratio and equals the circular one for equal, uncorrelated axes.
+- The circular CEP overstates the CEP of an elongated group, by 6.9 % at an axis ratio of 2, 14.2 % at 3 and at most 23.5 % ([research log](../research/group-cep-circular-vs-elliptical.md)). The elliptical CEP holds for any axis ratio and equals the circular one for equal, uncorrelated axes.
 - The dispersion ellipse describes the shots fired. For small $n$ it holds less than the share $p$ of further shots.
 - The velocity correlation describes the data and names no cause. With few shots a large $\lvert r \rvert$ arises by chance.
 - Pooled lengths are given only for groups at one distance (relative difference below $10^{-9}$).
