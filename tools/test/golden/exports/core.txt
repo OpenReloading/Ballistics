@@ -103,6 +103,7 @@
 . PlanRefusal
 . PlanRefusalId
 . PointDispersion
+. PointOffset
 . PooledGroupStatistics
 . PooledValues
 . PowderAxis
@@ -174,6 +175,7 @@
 . SessionReading
 . SessionsTruingResult
 . Settings
+. ShotsToHit
 . ShotshellLoad
 . ShotshellResult
 . SimilarPowder
@@ -337,6 +339,7 @@
 . seatingTolerance
 . segmentCoefficient
 . shotsNeeded
+. shotsToHit
 . shotshellInterior
 . shotshellInteriorLoad
 . similarPowderRules
