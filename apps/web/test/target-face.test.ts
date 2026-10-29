@@ -255,6 +255,39 @@ describe('findFace with a known scale', () => {
   it('proposes the ISSF 25 m precision face, or a tie that contains it, among all faces', () => {
     expect(ids(findFace(image, faces))).toContain('issf-25m-precision-50m-pistol')
   })
+
+  it('takes the face of the size of the holes on its black area: the hole diameter is the scale', () => {
+    const holes = [
+      { x: 12, y: -6, diameter: 9 },
+      { x: -40, y: 30, diameter: 9 },
+      { x: 35, y: 50, diameter: 9 },
+    ]
+    const { image: shot } = render({ ...sc, holes, holeGrey: 150 })
+    expect(ids(findFace(shot, [base, large]))).toEqual(['issf-25m-precision-50m-pistol', 'large'])
+    expect(ids(findFace(shot, [base, large], undefined, 9))).toEqual([
+      'issf-25m-precision-50m-pistol',
+    ])
+    // the same holes from a bullet three times as wide: the face three times as large
+    expect(ids(findFace(shot, [base, large], undefined, 27))).toEqual(['large'])
+  })
+
+  it('offers a face that matches the same rings as an equal choice, though its further rings cut its score', () => {
+    // the large face has two rings more, which the photo does not show
+    const extra = [475, 425].map((d) => ({
+      ...defined(base.rings[0]),
+      diameter: times({ ...defined(base.rings[0]).diameter, value: d }, 3),
+    }))
+    const wider: TargetFace = {
+      ...large,
+      rings: [...large.rings, ...extra].sort((a, b) => b.diameter.value - a.diameter.value),
+    }
+    const found = findFace(image, [base, wider])
+    expect(ids(found)).toEqual(['issf-25m-precision-50m-pistol'])
+    // smallest first, not by score
+    expect(found.alike.map((f) => f.face.id)).toEqual(['issf-25m-precision-50m-pistol', 'large'])
+    // a known scale has dropped the other size: no choice
+    expect(findFace(image, [base, wider], sc.camera.pxPerMm).alike).toEqual([])
+  })
 })
 
 describe('findFace without a face', () => {
@@ -289,7 +322,7 @@ describe('findFace without a face', () => {
     expect(Math.abs(plane.pxPerMm / pxPerMm - 1)).toBeLessThan(0.01)
     expect(fitDiameter(found, 0)).toBeUndefined()
     expect(
-      fitDiameter({ ellipses: [], rings: [], ranked: [], fits: [], sure: false }, 200),
+      fitDiameter({ ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }, 200),
     ).toBeUndefined()
   })
 
@@ -348,7 +381,7 @@ describe('a face the user picks', () => {
     expect(other?.approximate).toBe(true)
     if (own) expect(error(own, h, 250).centre).toBeLessThan(2)
     expect(
-      fitPicked({ ellipses: [], rings: [], ranked: [], fits: [], sure: false }, face),
+      fitPicked({ ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }, face),
     ).toBeUndefined()
   })
 
@@ -442,7 +475,8 @@ describe('on the photo and as a label', () => {
     expect(b[1] / b[2]).toBeCloseTo(a[1] / a[2], 6)
     expect(photo.black && meanRadius(photo.black)).toBeCloseTo(meanRadius(found.black) * 2, 6)
     expect(
-      onPhoto({ ellipses: [], rings: [], ranked: [], fits: [], sure: false }, 1, 0, 0).black,
+      onPhoto({ ellipses: [], rings: [], ranked: [], fits: [], alike: [], sure: false }, 1, 0, 0)
+        .black,
     ).toBeUndefined()
   })
 

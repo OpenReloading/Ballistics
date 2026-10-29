@@ -130,12 +130,14 @@ async function handleFace(r: Extract<WorkerRequest, { kind: 'face' }>): Promise<
     { width: shot.width, height: shot.height, data: shot.data },
     r.faces,
     r.pxPerMm && r.pxPerMm * fk,
+    r.holeDiameter && fromSi('length', r.holeDiameter),
   )
   // the hole on the resized photo, from the scale of the best fit
   const [fit] = found.fits
   const holePx = fit && r.holeDiameter ? fit.pxPerMm * fromSi('length', r.holeDiameter) : undefined
   // the selected target's layout, else the one of a face found for sure; a weaker match is no hint
-  const layout = r.layout ?? (found.sure && fit ? layoutOf(fit.face) : undefined)
+  const layout =
+    r.layout ?? (found.sure && found.alike.length < 2 && fit ? layoutOf(fit.face) : undefined)
   const quality = photoQuality({ image: shot, scale: fk, black: found.black, holePx, layout })
   return { kind: 'face', search: onPhoto(found, fk, fx0, fy0), quality }
 }

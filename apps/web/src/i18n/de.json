@@ -2635,7 +2635,7 @@
   "learned": "gelernt",
   "bullet": "Geschoss",
   "marker": "Markierung",
-  "{face}: {event}, {distance}": "{face}: {event}, {distance}",
+  "{face} ({outer}): {event}, {distance}": "{face} ({outer}): {event}, {distance}",
   "Detection waits. Detect anyway runs it on this photo; check every proposed hole.": "Die Erkennung wartet. „Trotzdem erkennen“ führt sie für dieses Foto aus; prüfen Sie jedes vorgeschlagene Schussloch.",
   "Cancel ({pct} %)": "Abbrechen ({pct} %)",
   "Find the holes on the target or in the region; the photo stays in this browser.": "Die Schusslöcher auf der Zielscheibe oder im Bereich finden; das Foto bleibt in diesem Browser.",

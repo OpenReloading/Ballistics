@@ -13,6 +13,8 @@ host_request_interval = "500ms"
 # a failure is never cached: it is checked again on the next run
 cache_exclude_status = ["400.."]
 max_cache_age = "6d"
+# localhost addresses in the docs name local servers (dev server, export, API), not pages to check
+exclude_loopback = true
 
 # Pages that answer 403 or drop the connection for an automated client, one URL each, never a whole host. They are
 # not broken links as far as can be told, only unreachable for a check. Recheck by hand when the page is edited.
@@ -26,4 +28,6 @@ exclude = [
   '^https://www\.acic\.gov\.au/copyright$',
   '^https://www\.brownells\.com/help/technical-support/terms-of-use/$',
   '^https://www\.guns\.com/terms-and-conditions$',
+  '^https://www\.iso\.org/copyright\.html$', # answers 403 to automated clients
+  '^https://www\.accurateshooter\.com/\?p=2477$', # a bot filter answers 307 without a target to automated clients
 ]
