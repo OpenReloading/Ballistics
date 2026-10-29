@@ -16,7 +16,7 @@ async function scenario(page: Page, auto: string | undefined, ladder: boolean) {
     await form.getByLabel(/^Ladder steps/).fill('21')
     await form.getByRole('radio', { name: 'Charge', exact: true }).check()
     await form.getByLabel(/^Step size/).fill('0.15')
-  }
+  } else await form.getByLabel(/^Ladder steps/).fill('1')
   const charge = form.getByLabel(/^Charge mass/)
   // a first result, so the stale marker has something to mark
   await charge.press('Control+Enter')
@@ -34,6 +34,7 @@ async function scenario(page: Page, auto: string | undefined, ladder: boolean) {
   await charge.pressSequentially('4x', { delay: 80 })
   await page.waitForTimeout(1500)
   out.invalidStartsRun = (await count()) > n
+  out.fieldAfter4x = await charge.inputValue()
   out.staleShownWhileInvalid = await stale(page).isVisible()
 
   // 2. several edits in a row, under the pause: one run at the end
@@ -69,6 +70,14 @@ async function scenario(page: Page, auto: string | undefined, ladder: boolean) {
   const q = await readProbe(page)
   out.shiftInputs = q.shiftInputs
   out.shiftPage = q.shiftPage
+  out.shiftUnexcused = q.shiftUnexcused
+  // 4. one Run by the key, for comparison: its shifts follow an input
+  await resetShift(page)
+  await charge.press('Control+Enter')
+  await settle(page, 2500)
+  const r = await readProbe(page)
+  out.manualRunShiftPage = r.shiftPage
+  out.manualRunShiftUnexcused = r.shiftUnexcused
   // where a status is announced: the live regions holding the result line
   out.liveRegions = await page
     .locator('[aria-live]:not([aria-live="off"])')
@@ -81,6 +90,7 @@ async function scenario(page: Page, auto: string | undefined, ladder: boolean) {
 for (const [name, auto, ladder] of [
   ['run only', undefined, false],
   ['run only, ladder', undefined, true],
+  ['automatic as a setting, on (same code as after a pause)', 'pause', false],
   ['automatic after a pause', 'pause', false],
   ['automatic after a pause, ladder', 'pause', true],
   ['automatic for the plain run only, plain', 'plain', false],

@@ -12,6 +12,7 @@ export const probe = (page: Page) =>
       tasks: [] as { start: number; duration: number }[],
       shiftInputs: 0,
       shiftPage: 0,
+      shiftUnexcused: 0,
       events: [] as { name: string; start: number; delay: number; duration: number }[],
       state: 'idle',
     }
@@ -20,21 +21,26 @@ export const probe = (page: Page) =>
       sources.some((s) =>
         (s.node instanceof Element ? s.node : s.node?.parentElement)?.closest('.workspace-inputs'),
       )
-    const status = () => document.querySelector('.result')?.textContent ?? ''
+    // a run is the time `.result` carries `data-running` (the workbench's `pending`)
     new MutationObserver(() => {
-      const s = status()
-      if (s.includes('Simulating')) {
+      const result = document.querySelector('.result')
+      if (result?.hasAttribute('data-running')) {
         if (p.state !== 'running') {
           p.runs.push({ start: performance.now() })
           p.state = 'running'
         }
       } else if (p.state === 'running') {
         const last = p.runs.at(-1)
-        if (/Simulation done/.test(s) && last) last.end = performance.now()
+        if (/Simulation done/.test(result?.textContent ?? '') && last) last.end = performance.now()
         else p.cancelled++
         p.state = 'idle'
       }
-    }).observe(document.documentElement, { subtree: true, childList: true, characterData: true })
+    }).observe(document, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['data-running'],
+    })
     new PerformanceObserver((l) => {
       for (const e of l.getEntries()) p.tasks.push({ start: e.startTime, duration: e.duration })
     }).observe({ type: 'longtask', buffered: true })
@@ -45,6 +51,7 @@ export const probe = (page: Page) =>
         sources: { node?: Node }[]
       }[]) {
         p.shiftPage += e.value
+        if (!e.hadRecentInput) p.shiftUnexcused += e.value
         if (inInputs(e.sources)) p.shiftInputs += e.value
       }
     }).observe({ type: 'layout-shift', buffered: true })
@@ -70,6 +77,7 @@ export type Probe = {
   tasks: { start: number; duration: number }[]
   shiftInputs: number
   shiftPage: number
+  shiftUnexcused: number
   events: { name: string; start: number; delay: number; duration: number }[]
   state: string
 }
@@ -82,6 +90,7 @@ export const resetShift = (page: Page) =>
     const p = (window as unknown as { probe: Probe }).probe
     p.shiftInputs = 0
     p.shiftPage = 0
+    p.shiftUnexcused = 0
   })
 
 /** Waits for layout shift entries, which arrive after the frame that moved. */

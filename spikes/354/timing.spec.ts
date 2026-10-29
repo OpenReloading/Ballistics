@@ -6,14 +6,16 @@ import { probe, quantile, readProbe } from './probe.ts'
 
 const runs = Number(process.env.RUNS ?? 20)
 
-for (const steps of [1, 21])
+// 5: the example as it is (a 5-step charge ladder), 1: the example's charge alone
+for (const steps of [5, 1, 21])
   for (const rate of [1, 4, 6])
     test(`run time, ${steps} step(s), CPU throttle ${rate}`, async ({ page }) => {
       await probe(page)
       await gotoHydrated(page, '/workbench')
       await applyExampleLoad(page)
       const form = loadForm(page)
-      if (steps > 1) {
+      if (steps === 1) await form.getByLabel(/^Ladder steps/).fill('1')
+      if (steps === 21) {
         await form.getByLabel(/^Ladder steps/).fill(String(steps))
         await form.getByRole('radio', { name: 'Charge', exact: true }).check()
         await form.getByLabel(/^Step size/).fill('0.15')
@@ -24,6 +26,7 @@ for (const steps of [1, 21])
       const charge = form.getByLabel(/^Charge mass/)
       const times: number[] = []
       const longest: number[] = []
+      let first = Number.NaN
       // run 0 is the first of the page (worker start, chunk load); runs 1..n are the measured ones
       for (let i = 0; i <= runs; i++) {
         const before = (await readProbe(page)).runs.length
@@ -44,8 +47,7 @@ for (const steps of [1, 21])
             .filter((t) => t.start >= r.start - 50 && t.start <= end + 50)
             .map((t) => t.duration),
         )
-        if (i === 0)
-          test.info().annotations.push({ type: 'first', description: `${ms.toFixed(0)} ms` })
+        if (i === 0) first = ms
         else {
           times.push(ms)
           longest.push(task)
@@ -64,6 +66,7 @@ for (const steps of [1, 21])
         steps,
         rate,
         runs: times.length,
+        first,
         median: quantile(times, 0.5),
         p90: quantile(times, 0.9),
         max: Math.max(...times),
