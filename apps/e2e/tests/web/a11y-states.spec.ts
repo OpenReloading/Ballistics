@@ -4,6 +4,7 @@ import { expect, type Locator, type Page, test } from '@playwright/test'
 import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
+import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
@@ -171,6 +172,19 @@ const states: State[] = [
       await page.getByRole('button', { name: 'Chart data' }).click()
       await dialogOf('Chart data')(page)
       await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
+    name: 'Powder tuning Chart data',
+    scrolls: true,
+    open: async (page, check) => {
+      // the fit may take up to 60 s after a run, a save and a navigation
+      test.setTimeout(120_000)
+      await openFit(page)
+      const data = page.locator('.values-details')
+      await data.getByText('Chart data', { exact: true }).click()
+      await expect(data.getByRole('table', { name: /^Velocity and band/ })).toBeVisible()
+      await check('page')
     },
   },
   {

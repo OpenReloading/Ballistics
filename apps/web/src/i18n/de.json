@@ -3613,6 +3613,8 @@
   "Working out the pressure range": "Druckbereich wird berechnet",
   "{level} % interval": "{level} %-Intervall",
   "{lower} to {upper}": "{lower} bis {upper}",
+  "{level} % band ({unit})": "{level} %-Band ({unit})",
+  "Velocity and band per charge step (simulation)": "Geschwindigkeit und Band je Ladungsstufe (Simulation)",
   "An input left out of the pressure range": "Eine Eingabe fehlt im Druckbereich",
   "Band: uncertainty of the fitted parameters only, not model error. Simulation, not load data.": "Band: nur die Unsicherheit der angepassten Parameter, kein Modellfehler. Simulation, keine Ladedaten.",
   "Case capacity estimated": "Hülsenvolumen geschätzt",

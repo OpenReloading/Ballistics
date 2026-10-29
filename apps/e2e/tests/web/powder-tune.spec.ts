@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { problems } from './a11y.ts'
-import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
+import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
 import { applyExampleLoad, loadForm } from './workbench.ts'
@@ -67,14 +67,6 @@ test('the Measurements tab opens the route with the load strings, and an added s
   }
 })
 
-// one string per step of the example's charge ladder, 5 steps
-const ladder = [
-  'string,velocity,velocityUnit',
-  ...['A', 'B', 'C', 'D', 'E'].flatMap((name, i) =>
-    [0, 4, 2].map((d) => `${name},${880 - 8 * i + d},m/s`),
-  ),
-].join('\n')
-
 /**
  * Milliseconds from each of `moves` arrow key presses on the first hand-tuning slider to the
  * redraw of the curve, measured in the page; half the moves go right, then back left.
@@ -114,24 +106,7 @@ test('the Measurements link of a saved load fits the powder on the load the work
 }) => {
   // the fit may take up to 60 s after a run, a save and a navigation, the 30 redraws 2 s each
   test.setTimeout(150_000)
-  // a native picker cannot be driven: the file goes to the origin private file system
-  await page.addInitScript(() => {
-    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
-      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
-  })
-  await page.goto('/workbench')
-  await applyExampleLoad(page)
-  await runLine(page)
-  await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
-  await page
-    .locator('input[type="file"]#measurements-file')
-    .setInputFiles({ name: 'ladder.csv', mimeType: 'text/csv', buffer: Buffer.from(ladder) })
-  await (await barButton(page, 'Save')).click()
-  await expect(page.locator('.file-state')).toContainText('Saved')
-  await page.getByRole('link', { name: 'Fit a powder from these strings' }).click()
-  await expect(page).toHaveURL(/\/powders\/tune\/?\?session=/)
-  await expect(table(page).locator('tbody tr')).toHaveCount(5)
-  await expect(page.getByRole('table', { name: 'Fitted values' })).toBeVisible({ timeout: 60_000 })
+  await openFit(page)
   await expect(page.getByText('Save the load to fit a powder from its strings.')).toHaveCount(0)
 
   const hand = page.getByRole('group', { name: 'Hand tuning' })

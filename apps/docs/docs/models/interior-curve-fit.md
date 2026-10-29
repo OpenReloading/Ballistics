@@ -149,7 +149,7 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 
 - The fit is local and the cost surface has a flat valley. A start far from the solution, or a held exponent that is wrong, ends in a stuck fit or a model error. The reported uncertainty is linearized at the solution and holds no model error.
 - The shot-start pressure of the model and the trace differ, so the window starts at 25 % of the peak. The rise below that is not fitted.
-- Under the default limits the exponent is usually reported `fixed`: with the time shift fitted, its variance inflation on a noisy trace is far above 10. A trace that resolves it needs low noise, a wide pressure range and a form that is already close.
+- Under the default limits the exponent is usually reported `fixed`: with the time shift fitted, its variance inflation on a noisy trace is far above 10. A trace that resolves it needs low noise, a wide pressure range and a form that is already close. Two or more traces of the same powder at charges whose highest peak is at least about 1.2 times the lowest resolved it on synthetic traces, a time shift fixed from a sensor delay did not ([research log](../research/interior-curve-fit-exponent.md)).
 - The initial slope $a$ is nearly degenerate with the other parameters on a slow powder. It then comes back `weak`, or the fit holds it.
 - Only the two-stage vivacity form is supported. A geometric law, a constant form and the three-stage form are refused.
 - The low-pass only smooths. Frequencies above the cutoff are not restored and the peak can be lowered.
