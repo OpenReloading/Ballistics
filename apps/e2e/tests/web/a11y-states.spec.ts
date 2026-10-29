@@ -334,6 +334,8 @@ const states: State[] = [
       const add = page.getByRole('button', { name: 'Add shot' }).locator('visible=true')
       // the compact layout folds the group panels behind their strip, which opens on the Group tab
       const strip = page.locator('.sheet-strip').locator('visible=true')
+      // the layout width arrives after the first render, which shows neither control
+      await expect(add.or(strip).first()).toBeVisible()
       if (!(await add.count()) && (await strip.count())) {
         await strip.click()
         await page.getByRole('tab', { name: 'Shots', exact: true }).click()
