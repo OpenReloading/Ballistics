@@ -44,4 +44,25 @@ describe('chargeLadder', () => {
   ] as const)('rejects start %s, step %s, %s steps %s', (start, step, steps, direction) => {
     expect(() => chargeLadder(start, step, steps, direction)).toThrow(InputError)
   })
+
+  it('takes an even count up or down', () => {
+    expect(chargeLadder(0.0029, 0.0001, 4, 'up')).toHaveLength(4)
+    expect(chargeLadder(0.0029, 0.0001, 2, 'down')).toHaveLength(2)
+  })
+
+  it.each([
+    [0, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
+    [-0.001, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
+    [Number.NaN, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
+    [Number.POSITIVE_INFINITY, 0.0001, 2, 'up', 'ladder start charge must be above 0'],
+    [0.0029, 0, 2, 'up', 'ladder step must be above 0'],
+    [0.0029, 0.0001, 0, 'up', 'ladder steps must be an integer of at least 1'],
+    [0.0029, 0.0001, 4, 'around', 'a ladder around the charge needs an odd count'],
+    [0.0002, 0.0001, 3, 'down', 'ladder charge 0 kg must be above 0'],
+  ] as const)(
+    'names the field for start %s, step %s, %s steps %s',
+    (start, step, steps, direction, message) => {
+      expect(() => chargeLadder(start, step, steps, direction)).toThrow(message)
+    },
+  )
 })

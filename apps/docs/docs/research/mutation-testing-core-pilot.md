@@ -1,9 +1,9 @@
 ---
-title: Mutation testing of eight core modules
-description: Whether mutation testing finds weak tests in the core package that line coverage does not, its run time per module, the surviving mutant classes and the tests that kill them, in two rounds.
+title: Mutation testing of thirteen core modules
+description: Whether mutation testing finds weak tests in the core package that line coverage does not, its run time per module, the surviving mutant classes and the tests that kill them, in three rounds.
 ---
 
-# Mutation testing of eight core modules
+# Mutation testing of thirteen core modules
 
 ## Question
 
@@ -19,6 +19,7 @@ Decided before the runs.
 - Accept rule: worth adopting when the surviving mutants that matter show missing tests that line coverage hides, and a scheduled run fits in a CI job of 30 minutes.
 - Then: tests for the ten most important survivors at least, and a second run of the same mutants against only the module's own test file to count the kills.
 - Second round, the same tool and settings, each module run against only its own test file from the start: `exterior/drag.ts` (table lookup, segment search and the hold rules every trajectory step reads), `exterior/stability.ts` (unit factors of the Miller formula, the stability band, the MOA constant), `interior/range.ts` (the side bookkeeping of the pressure range and its invalid ends), `groups/statistics.ts` (input guards, signs and the CEP bracket of the group statistics) and `recoil.ts` (input guards of the free recoil). No module of the schema or API layer is in this round.
+- Third round, the same tool and settings, each module against its own test file. Unlike the first two rounds, the modules were chosen after a screening run: nine small modules not covered before, each against its own test file. The five with the most surviving mutants are in the round, each for what reads it: `groups/velocity-statistics.ts` (the standard deviation interval and shot count the velocity string tools show), `interior/velocity-ladder.ts` (the slope bands that mark the flat spots of a charge ladder), `interior/vivacity.ts` (the mean dynamic vivacity that compares burn laws), `interior/ladder.ts` (the charges of every charge ladder the app and the API compute) and `interior/bore-resistance.ts` (the bore area and resistance law the load-table fit, the load file and the workbench read). Left out after the screening: `exterior/modified.ts` (98.6 %, 1 survivor), `exterior/moving-target.ts` (81.6 %, 7), `interior/start-pressure.ts` (80.8 %, 5) and `cartridge-specs.ts` (52.6 %, 36, of them 35 not covered by its own test file, which a later round can take).
 
 ## Formulas
 
@@ -62,11 +63,31 @@ Surviving classes before the new tests, second round:
 
 The equivalent survivors of the second round: the default interpolation literal (any other string reads as linear), the internal node guard and the search bound of the drag table, and its end comparisons where both branches give the node value; `sg >= 1` in `isStable` (at Sg = 1 the second condition fails); in the range, a search for the opposite side (same spread), the branch for two invalid ends (the sign is 0 there too) and a move by zero; in the statistics, products with a deviation whose sum is zero, the axis angle branch that only a negative zero reaches, the limits of exactly 1e-9 for the aim centre and the shared distance, which no input reaches exactly, a zero major variance (the bisection then returns 0 too), and the strict test and stop rule of the CEP bisection (both end within its last step).
 
+Third round, each module against its own test file, columns as in the second round. The wall times before and after are the same within a second or two.
+
+| Module | Mutants | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `groups/velocity-statistics.ts` | 95 | 81.1 % | 18 | 14 s | 16 | 2 | 97.9 % |
+| `interior/velocity-ladder.ts` | 87 | 66.7 % | 29 (2 not covered) | 3 s | 28 | 1 | 98.9 % |
+| `interior/vivacity.ts` | 58 | 77.6 % | 13 | 3 s | 6 | 7 | 87.9 % |
+| `interior/ladder.ts` | 58 | 82.8 % | 10 | 3 s | 10 | 0 | 100 % |
+| `interior/bore-resistance.ts` | 84 | 54.8 % | 38 (34 not covered) | 3 s | 38 | 0 | 100 % |
+
+Surviving classes before the new tests, third round:
+
+- Input guards never checked one by one, again: the confidence level and width of `velocityStatistics` and `shotsNeeded`, every step check of `ladderFlatSpots`, the start charge, step and odd count of `chargeLadder`, and the range of `meanDynamicVivacity`. The tests asserted only that some error is thrown, and a later check threw instead; an infinite start charge, standard deviation or charge passed when an `&&` became `||`.
+- Inclusive limits: a range of the mean vivacity from 0 or to 1, a standard deviation of 0, an oversize of exactly 5 %, a band of width 0 that counts as flat.
+- A guard never reached: a width of 0.01 or more that 100 000 shots do not reach, whose search loop then never ends without its bound; an even ladder up or down, which a mutant refusing every ladder of an even count passed.
+- A wrong unit factor or sign: the charge step of the ladder slope as a sum, and each count term of the Welch degrees of freedom, since no test checked a slope or a band against a value; the bore resistance with one term switched off, where the tests read only the missing term.
+- Not covered by the own test file: `boreArea` and `recordResistance`, which only the load file and record load tests reached.
+
+The equivalent survivors of the third round: in the shot count search, a strict test of the width (no shot count gives the limit exactly) and the early return at the lower end (the bisection returns the same count); in the ladder, the pooled degrees of freedom with 2 added, which only a band of width 0 reads; in the mean vivacity, the seven mutants of the break filter, because a break outside the range adds a piece and its reverse, which cancel within the Simpson error.
+
 The 31 mutants that still survive after the new tests are boundary changes where both branches give the same value at the boundary (the stage joins of the vivacity forms, the lens and sliver limits), the bisection bounds and stop rule of the seven-perforation burnout, the truncation and the end weights of the Simpson rule (below 1e-13 against the closed form), two optional chainings on lookups that always find an entry, and one message text.
 
 ## Result
 
-improved. Tests were added (`test/exterior-atmosphere.test.ts`, `test/interior-form.test.ts`, `test/hit-probability.test.ts`): each limit accepted, each invalid field named, each ring probability against the closed form, and the closed-form check of the zone integral tightened from 8 to 13 digits. Mutation testing is recommended in a reduced form: a weekly, report-only run on these three modules, each against its own test file (about a minute in all), not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run. The second round added tests to five more modules (`test/exterior-drag.test.ts`, `test/exterior-stability.test.ts`, `test/interior-range.test.ts`, `test/groups.test.ts`, `test/recoil.test.ts`); four of them run in seconds against their own test file and fit that weekly run, the group statistics (51 min) does not until its simulation tests move to a file of their own. No workflow was added.
+improved. Tests were added (`test/exterior-atmosphere.test.ts`, `test/interior-form.test.ts`, `test/hit-probability.test.ts`): each limit accepted, each invalid field named, each ring probability against the closed form, and the closed-form check of the zone integral tightened from 8 to 13 digits. Mutation testing is recommended in a reduced form: a weekly, report-only run on these three modules, each against its own test file (about a minute in all), not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run. The second round added tests to five more modules (`test/exterior-drag.test.ts`, `test/exterior-stability.test.ts`, `test/interior-range.test.ts`, `test/groups.test.ts`, `test/recoil.test.ts`); four of them run in seconds against their own test file and fit that weekly run, the group statistics (51 min) does not until its simulation tests move to a file of their own. No workflow was added. The third round added tests to five more modules (`test/velocity-statistics.test.ts`, `test/interior-velocity-ladder.test.ts`, `test/interior-vivacity.test.ts`, `test/interior-ladder.test.ts`, `test/interior-bore-resistance.test.ts`); each runs in 3 to 17 s against its own test file and fits the weekly run.
 
 ## Data basis
 
@@ -82,8 +103,13 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 - `packages/core/src/interior/range.ts`, `packages/core/test/interior-range.test.ts`
 - `packages/core/src/groups/statistics.ts`, `packages/core/test/groups.test.ts`
 - `packages/core/src/recoil.ts`, `packages/core/test/recoil.test.ts`
+- `packages/core/src/groups/velocity-statistics.ts`, `packages/core/test/velocity-statistics.test.ts`
+- `packages/core/src/interior/velocity-ladder.ts`, `packages/core/test/interior-velocity-ladder.test.ts`
+- `packages/core/src/interior/vivacity.ts`, `packages/core/test/interior-vivacity.test.ts`
+- `packages/core/src/interior/ladder.ts`, `packages/core/test/interior-ladder.test.ts`
+- `packages/core/src/interior/bore-resistance.ts`, `packages/core/test/interior-bore-resistance.test.ts`
 - `packages/core/vitest.config.ts` (the line coverage floors the mutation score is compared with)
 
 ## Confidence
 
-medium. The scores before and the kill counts are exact StrykerJS 10.1.1 outputs on these three files; the scores after are estimates computed from them, not a new full-suite run; the full-suite times were taken on a shared machine and vary with its load, and other modules are not measured. The second-round scores after are new runs over the same mutants, not estimates; its times are on the shared host too.
+medium. The scores before and the kill counts are exact StrykerJS 10.1.1 outputs on these three files; the scores after are estimates computed from them, not a new full-suite run; the full-suite times were taken on a shared machine and vary with its load, and other modules are not measured. The second-round scores after are new runs over the same mutants, not estimates; its times are on the shared host too. The third-round scores after are new runs over the same mutants too; its module choice followed a screening run and is not a risk ranking of all of core.
