@@ -2,3 +2,5 @@ build
 .docusaurus
 static/library
 static/rest
+static/research-index.json
+static/llms.txt

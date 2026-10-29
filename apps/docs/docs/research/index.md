@@ -49,6 +49,10 @@ Starts with one of: high, medium, low. Then the reason in one line.
 
 Equations are described in your own words with a citation. A book, paper, standard or public report is cited by title, author and DOI or URL, in the [bibliography](../bibliography.md). A figure without an open source is marked "unverified" with a confidence level. No text, figure or table of a source is copied.
 
+## Literature notes
+
+What published work says on a model question is a [literature note](./literature/index.md), with its own front matter and sections. The questions still waiting for a search are on [Open literature questions](./literature/open-questions.md).
+
 ## Entries
 
 The entries are listed in the sidebar.
