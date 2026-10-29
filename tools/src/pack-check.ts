@@ -1,8 +1,9 @@
 /**
  * The npm tarball of each published library, as `npm pack --dry-run` lists it after the build: fails
- * when the README or an entry point of `exports`, `main` or `types` is missing, or when the list holds
- * a test file, a source map without its sources, a file outside the `files` field, or a bare import in
- * a packed `.js` or `.d.ts` file of a package that is not in `dependencies` or `peerDependencies`.
+ * when the README or an entry point of `exports`, `main` or `types` is missing (a `*` pattern: no
+ * packed file matches it), or when the list holds a test file, a source map without its sources, a
+ * file outside the `files` field, or a bare import in a packed `.js` or `.d.ts` file of a package
+ * that is not in `dependencies` or `peerDependencies`.
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
@@ -46,6 +47,10 @@ const inFiles = (file: string, patterns: string[]) =>
       const pattern = normalize(p).replace(/\/$/, '')
       return file === pattern || file.startsWith(`${pattern}/`) || matchesGlob(file, pattern)
     })
+
+/** Whether `files` holds the entry point `entry`, or a file that its `*` pattern matches. */
+const packed = (entry: string, files: Set<string>) =>
+  entry.includes('*') ? [...files].some((f) => matchesGlob(f, entry)) : files.has(entry)
 
 /** The sources of the shipped source map `file` that the tarball leaves out. */
 function mapProblems(dir: string, file: string, files: Set<string>) {
@@ -92,7 +97,7 @@ export function packProblems(dir: string): string[] {
     .map((f) => `${f} is not in the tarball`)
   const entries = [manifest.main, manifest.types, ...exportTargets(manifest.exports)]
   for (const entry of new Set(entries.filter((e) => e !== undefined).map((e) => normalize(e))))
-    if (!files.has(entry)) problems.push(`entry point ${entry} is not in the tarball`)
+    if (!packed(entry, files)) problems.push(`entry point ${entry} is not in the tarball`)
   for (const file of files) {
     if (testFile.test(file)) problems.push(`test file ${file} is in the tarball`)
     if (!alwaysPacked.test(file) && !inFiles(file, manifest.files ?? []))
