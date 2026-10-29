@@ -163,7 +163,7 @@ Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packag
 
 #### Domain
 
-A fit keeps the data it was made from as its `domain`: one closed range per axis, each widened by a relative margin $\delta$ (default `powderDomainMargin`, 0.05, set per fit with `domainMargin`; an assumption, not yet tuned against held-out ladders):
+A fit keeps the data it was made from as its `domain`: one closed range per axis, each widened by a relative margin $\delta$ (default `powderDomainMargin`, 0.05, set per fit with `domainMargin`; an assumption: on synthetic ladders with model error the interval loses coverage from the first per cent outside the range, so no margin keeps it, [research log](../research/interior-powder-fit-extrapolation-margin.md)):
 
 $$
 [\,x_\min (1 - \delta),\; x_\max (1 + \delta)\,]
