@@ -1,4 +1,4 @@
-// Size bounds of the workbook readers, all assumed, not cited.
+// Size bounds of the workbook readers (columns and cells also of delimited text and JSON lists), all assumed, not cited.
 
 // the exports use 9 columns, and a 10000-shot worksheet holds 90000 cells of about 10 characters
 export const maxColumn = 256

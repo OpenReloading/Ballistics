@@ -516,4 +516,41 @@ describe('readTable', () => {
       refusal: 'The table has a header but no rows. Add rows or choose another file.',
     })
   })
+
+  it('follows spreadsheet letters past column Z', () => {
+    const wide = tableOfRows([Array.from({ length: 256 }, (_, i) => String(i))])
+    const header = 'table' in wide ? wide.table.header : []
+    expect([25, 26, 51, 52, 255].map((i) => header[i])).toEqual([
+      'Column Z',
+      'Column AA',
+      'Column AZ',
+      'Column BA',
+      'Column IV',
+    ])
+  })
+
+  it('refuses delimited text and JSON lists beyond the column and cell limits quickly', () => {
+    const started = performance.now()
+    expect(readTable(`a,b\n1,2\n5${','.repeat(1_000_000)}\n3,4\n`)).toEqual({
+      refusal:
+        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+    })
+    const objects = Array.from({ length: 2000 }, (_, i) => ({ [`k${i % 1000}`]: i }))
+    expect(readTable(JSON.stringify(objects))).toEqual({
+      refusal:
+        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+    })
+    const tall = Array.from({ length: 500_001 }, () => ['1', '2'])
+    expect(tableOfRows(tall)).toEqual({
+      refusal: 'The table has more than 1000000 cells. Split it into smaller files.',
+    })
+    expect(readTable(`a,b\n1,2\n${','.repeat(257)}x`)).toEqual({
+      refusal:
+        'The table has more than 256 columns. Remove the extra columns or choose another file.',
+    })
+    expect(readTable('1,2\n'.repeat(5_000_000))).toEqual({
+      refusal: 'The table has more than 1000000 cells. Split it into smaller files.',
+    })
+    expect(performance.now() - started).toBeLessThan(5000)
+  })
 })
