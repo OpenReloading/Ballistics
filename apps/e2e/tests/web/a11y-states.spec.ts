@@ -310,7 +310,8 @@ const states: State[] = [
       await expect(boxes).toHaveCount(2)
       await boxes.first().click()
       await boxes.last().click()
-      await expect(page.getByRole('button', { name: 'Clear selection' })).toBeVisible()
+      // below 48em Clear selection moves into the popover of the picks
+      await expect(page.getByText('2 of 4 selected')).toHaveText(/2 of 4 selected/)
       await check('page')
     },
   },
@@ -331,9 +332,12 @@ const states: State[] = [
     open: async (page, check) => {
       await gotoHydrated(page, '/groups')
       const add = page.getByRole('button', { name: 'Add shot' }).locator('visible=true')
-      // the compact layout folds the group panels behind their strip
+      // the compact layout folds the group panels behind their strip, which opens on the Group tab
       const strip = page.locator('.sheet-strip').locator('visible=true')
-      if (!(await add.count()) && (await strip.count())) await strip.click()
+      if (!(await add.count()) && (await strip.count())) {
+        await strip.click()
+        await page.getByRole('tab', { name: 'Shots', exact: true }).click()
+      }
       for (const n of [1, 2, 3]) {
         await add.click()
         await expect(page.locator('[data-shot]')).toHaveCount(n)
