@@ -294,7 +294,7 @@ One target with at least 4 rings matched and a score of 2.5 calibrates the sheet
 
 The active group takes the target for ring scoring with the event the user chose, else the event of its discipline on this target, else the target's event at the group's distance: of the federation chosen for the Discipline list, else of the federation that publishes the target, else of the one federation that shoots the target there. Otherwise the group has no event and the Discipline list stays empty: no federation is guessed (`apps/web/src/lib/face-sheet.ts`, `calibrateSheetOnFace`).
 
-Code: `apps/web/src/lib/target-face.ts`, `findFace`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `holeSize`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `apps/web/src/lib/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
+Code: `apps/web/src/lib/face-search.ts`, `findFace`, `holeSize`. `apps/web/src/lib/target-face.ts`, `searchFaces`, `ringLines`, `ringPlane`, `matchFaces`, `scoreMatch`, `shareInFrame`, `fitFace`, `TIE`, `SCALE_TOLERANCE`, `BLACK_PX`. `apps/web/src/lib/face-image.ts`, `blackAreas`, `blobOf`, `shareInside`, `paperAround`. `apps/web/src/lib/ellipse.ts`, `ransacEllipse`, `concentricPlane`.
 
 ### Detection without a picked hole
 
