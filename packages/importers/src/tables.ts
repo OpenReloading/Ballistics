@@ -1,5 +1,7 @@
 // Tables out of delimited text, JSON lists and worksheet rows: cell text, the header row, numbers in either decimal mark.
 
+import { maxCells, maxColumn } from './limits.ts'
+
 /** A table of cell text: the header and the data rows. */
 export interface Table {
   /** Header cells, or `Column A`, `Column B`, ... when the first row holds numbers. */
@@ -90,9 +92,26 @@ function detectDelimiter(text: string): TableDelimiter | undefined {
 
 const numberLike = /^[+-]?(\d+([.,]\d+)?|[.,]\d+)$/
 
-/** Letters of a spreadsheet column: 0 is A. */
-const columnLetters = (i: number): string =>
-  i < 26 ? String.fromCharCode(65 + i) : `A${columnLetters(i - 26)}`
+/** Letters of a spreadsheet column: 0 is A, 26 is AA. */
+function columnLetters(i: number): string {
+  let letters = ''
+  for (let n = i + 1; n > 0; n = Math.floor((n - 1) / 26))
+    letters = String.fromCharCode(65 + ((n - 1) % 26)) + letters
+  return letters
+}
+
+/** The refusal of a table of `width` columns and `rows` rows beyond the size the readers take. */
+function tooLarge(width: number, rows: number): TableRead | undefined {
+  if (width > maxColumn)
+    return {
+      refusal: `The table has ${width} columns, more than ${maxColumn}. Remove the extra columns or choose another file.`,
+    }
+  if (width * rows > maxCells)
+    return {
+      refusal: `The table has more than ${maxCells} cells. Split it into smaller files.`,
+    }
+  return undefined
+}
 
 const headerOnly: TableRead = {
   refusal: 'The table has a header but no rows. Add rows or choose another file.',
@@ -105,6 +124,8 @@ const headerOnly: TableRead = {
 export function tableOfRows(raw: string[][]): TableRead {
   const width = raw.reduce((m, r) => Math.max(m, r.length), 0)
   if (width < 2) return { refusal: 'The rows have no table of two columns or more.' }
+  const refused = tooLarge(width, raw.length)
+  if (refused) return refused
   const padded = raw.map((r) => Array.from({ length: width }, (_, i) => (r[i] ?? '').trim()))
   const first = padded[0] ?? []
   const filled = first.filter((c) => c !== '')
@@ -117,8 +138,8 @@ export function tableOfRows(raw: string[][]): TableRead {
   return rows.length === 0 ? headerOnly : { table: { header, hasHeader, rows } }
 }
 
-/** A table from a JSON list of objects: the keys of all objects as columns. */
-function tableOfObjects(list: unknown): Table | undefined {
+/** A table from a JSON list of objects: the keys of all objects as columns. Undefined for no such list. */
+function tableOfObjects(list: unknown): TableRead | undefined {
   if (!Array.isArray(list)) return undefined
   const objects = list.filter(
     (x): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x),
@@ -126,12 +147,16 @@ function tableOfObjects(list: unknown): Table | undefined {
   if (objects.length === 0 || objects.length !== list.length) return undefined
   const keys = [...new Set(objects.flatMap((o) => Object.keys(o)))]
   if (keys.length < 2) return undefined
+  const refused = tooLarge(keys.length, objects.length)
+  if (refused) return refused
   const cell = (v: unknown) =>
     v === null || v === undefined ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v)
   return {
-    header: keys,
-    hasHeader: true,
-    rows: objects.map((o) => keys.map((k) => cell(Object.hasOwn(o, k) ? o[k] : undefined))),
+    table: {
+      header: keys,
+      hasHeader: true,
+      rows: objects.map((o) => keys.map((k) => cell(Object.hasOwn(o, k) ? o[k] : undefined))),
+    },
   }
 }
 
@@ -149,13 +174,12 @@ export function readTable(text: string): TableRead {
         refusal: 'The text looks like JSON but does not parse. Fix the file or export it again.',
       }
     }
-    const table = tableOfObjects(json)
-    return table
-      ? { table }
-      : {
-          refusal:
-            'The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.',
-        }
+    return (
+      tableOfObjects(json) ?? {
+        refusal:
+          'The JSON is neither an OpenReloading data file nor a list of objects with the same keys. Export a table instead.',
+      }
+    )
   }
   const delimiter = detectDelimiter(text)
   if (!delimiter) {
