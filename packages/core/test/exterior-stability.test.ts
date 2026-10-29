@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   aerodynamicJump,
   dynamicStabilityFactor,
-  firstLowStability,
   isStable,
   millerStability,
   radPerMoa,
@@ -77,31 +76,5 @@ describe('spin drift and jump', () => {
     expect(aerodynamicJump(2, 4, -3, 'right')).toBeGreaterThan(0)
     expect(aerodynamicJump(2, 4, 3, 'left')).toBeGreaterThan(0)
     expect(aerodynamicJump(2, 4, -3, 'left')).toBeLessThan(0)
-  })
-})
-
-describe('stability along the trajectory', () => {
-  const { velocity: _, air, ...bullet } = base
-  // 2800 ft/s at the muzzle, Mach 1.2 (408 m/s) at 800 m
-  const points = [
-    { range: 0, velocity: base.velocity, heightAboveFiringPoint: 0 },
-    { range: 400, velocity: 600, heightAboveFiringPoint: -2 },
-    { range: 800, velocity: 408, heightAboveFiringPoint: -15 },
-  ]
-
-  it('flags a bullet that is stable at the muzzle and falls below 1 near Mach 1.2', () => {
-    const slow = { ...bullet, twist: 0.34 }
-    expect(millerStability({ ...slow, velocity: base.velocity, air })).toBeGreaterThan(1)
-    const low = firstLowStability(slow, air, points)
-    expect(low?.range).toBe(800)
-    expect(low?.stability).toBeLessThan(1)
-  })
-
-  it('does not flag a well stabilised bullet over the same range', () => {
-    expect(firstLowStability(bullet, air, points)).toBeUndefined()
-  })
-
-  it('takes the threshold given', () => {
-    expect(firstLowStability(bullet, air, points, 1.7)?.range).toBe(800)
   })
 })

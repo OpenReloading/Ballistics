@@ -3,7 +3,6 @@ import {
   type DragModel,
   densityAltitude,
   dragCorrection,
-  firstLowStability,
   icao,
   type Projectile,
   type Trajectory,
@@ -303,8 +302,6 @@ export type TrajectoryResult = {
   bulletDiameter: number
   /** Density altitude of the shot's air, m. */
   densityAltitude: number
-  /** Where Miller's factor first falls below `minStability` along the flight; none without length and twist. */
-  lowStability?: { range: number; stability: number }
 }
 
 /** Table and chart points of one shot from SI field values; throws the input and core errors. */
@@ -318,16 +315,6 @@ export function trajectoryResult(
   const chart = Array.from({ length: chartPoints }, (_, k) => (k * max) / (chartPoints - 1))
   const shot = shotFromValues(values, projectile, twistHand)
   const t = trajectory(shot, [...table, ...chart])
-  const { length } = projectile
-  const { twist } = shot.firearm
-  const low =
-    length !== undefined && twist !== undefined
-      ? firstLowStability(
-          { mass: projectile.mass, diameter: projectile.diameter, length, twist },
-          shot.air,
-          t.points,
-        )
-      : undefined
   const byRange = new Map(t.points.map((pt) => [pt.range, pt]))
   // an early stop leaves out the ranges past it
   const pick = (ranges: number[]) => ranges.flatMap((r) => byRange.get(r) ?? [])
@@ -341,6 +328,5 @@ export function trajectoryResult(
     windPerUnit: windPerUnit(shot, tablePoints),
     bulletDiameter: projectile.diameter,
     densityAltitude: densityAltitude(shot.air),
-    ...(low && { lowStability: low }),
   }
 }
