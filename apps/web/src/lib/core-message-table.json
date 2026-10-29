@@ -81,9 +81,9 @@
   ],
   "templates": {
     "app and API request failures": [
-      "The API answered {status}.",
-      "The API did not answer.",
-      "The run passed the API deadline.",
+      "The model refused the load. The error panel gives the reason.",
+      "A data file did not load or the computation failed. Check the connection and retry.",
+      "The run passed the time limit.",
       "The lot rows did not answer in {seconds} s.",
       "The longer run did not answer in {seconds} s.",
       "Error {status}.",

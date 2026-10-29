@@ -329,7 +329,7 @@ describe('statusText', () => {
 
   it('shows another status as it is, and no result status without a result', () => {
     expect(statusText('Simulating', 'Peak 4 bar.', english.t)).toBe('Simulating')
-    expect(statusText('The API answered 502.', undefined, english.t)).toBe('The API answered 502.')
+    expect(statusText('Error 502.', undefined, english.t)).toBe('Error 502.')
     expect(statusText({ prefix: '' }, undefined, english.t)).toBe('')
   })
 })

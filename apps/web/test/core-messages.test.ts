@@ -281,9 +281,9 @@ describe('the warnings of an interior answer', () => {
 
 describe('the request failures of the app', () => {
   const sentences = [
-    'The API answered 500.',
-    'The API did not answer.',
-    'The run passed the API deadline.',
+    'The model refused the load. The error panel gives the reason.',
+    'A data file did not load or the computation failed. Check the connection and retry.',
+    'The run passed the time limit.',
     'The lot rows did not answer in 20 s.',
     'The longer run did not answer in 20 s.',
     'Error 404.',
@@ -304,7 +304,7 @@ describe('the request failures of the app', () => {
   })
 
   it('writes the status into the sentence', () => {
-    expect(translateMessage('The API answered 503.', german.t)).toBe('Die API antwortete mit 503.')
+    expect(translateMessage('Error 503.', german.t)).toBe('Fehler 503.')
   })
 })
 

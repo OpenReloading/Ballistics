@@ -177,7 +177,9 @@ function Results({
   if (status === 'error')
     return (
       <ErrorNote title={t('The bullets could not be read.')} onRetry={retry}>
-        {t('The server did not answer. The designer and the workbench still work.')}
+        {t(
+          'The bullet data could not be loaded. Check the connection and retry. The designer and the workbench still work.',
+        )}
       </ErrorNote>
     )
   if (shown.length === 0)

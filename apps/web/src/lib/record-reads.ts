@@ -6,7 +6,7 @@ import type { ListOf } from './api-types.ts'
 /** The items of a list route that takes no paging (federations, disciplines, target mappings, caliber classes). */
 export async function readItems<T>(path: string, signal: AbortSignal) {
   const res = await apiFetch(path, { signal })
-  if (!res.ok) throw new Error(`The API answered ${res.status}.`)
+  if (!res.ok) throw new Error(`Error ${res.status}.`)
   return ((await res.json()) as ListOf<T>).items
 }
 

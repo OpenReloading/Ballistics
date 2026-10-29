@@ -87,8 +87,7 @@ async function requestLonger(
     })
     const json = await res.json().catch(() => undefined)
     if (signal.aborted) return undefined
-    if (!res.ok || json === undefined)
-      return { message: json?.message ?? `The API answered ${res.status}.` }
+    if (!res.ok || json === undefined) return { message: json?.message ?? `Error ${res.status}.` }
     return {
       // a step the model reports as invalid keeps its reason, as the workbench shows it
       runs: stepsOf(json, nth(ok.steps, 0).charge).map((s) =>
