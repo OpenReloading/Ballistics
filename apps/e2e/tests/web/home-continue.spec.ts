@@ -74,7 +74,10 @@ for (const [width, height] of sizes)
     await page.setViewportSize({ width, height })
     await openHome(page, [load(1), load(2), load(3)])
     const main = page.locator('main')
-    await main.evaluate((m) => m.querySelector<HTMLElement>('a, button')?.focus())
+    // the first shown stop: below 75em the page bar's labelled Safety button is hidden
+    await main.evaluate((m) =>
+      [...m.querySelectorAll<HTMLElement>('a, button')].find((e) => e.checkVisibility())?.focus(),
+    )
     const stops: Stop[] = []
     for (let i = 0; i < 60; i++) {
       const stop = await main.evaluate((m): Stop | null => {

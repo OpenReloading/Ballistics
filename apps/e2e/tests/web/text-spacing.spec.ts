@@ -47,8 +47,14 @@ for (const width of [1280, 390])
         .filter(Boolean)
         .join(' '),
     )
+    // reached by the keyboard: a tooltip opens on visible focus, not on a script's focus after a click
     await line.focus()
+    await page.keyboard.press('Shift+Tab')
+    await page.keyboard.press('Tab')
+    await expect(line).toBeFocused()
     await expect(page.getByRole('tooltip')).toHaveText(whole)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('tooltip')).toBeHidden()
     if (width === 390) {
       await page.getByRole('tab', { name: 'Results', exact: true }).click()
       await expect.poll(() => cutText(page, names)).toEqual([])
