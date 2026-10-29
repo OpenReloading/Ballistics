@@ -17,6 +17,7 @@ import {
   type TruingInputs,
   type TruingRow,
   truingEntry,
+  truingLimits,
   truingSummary,
   withTruing,
 } from '../src/lib/truing-session.ts'
@@ -251,12 +252,15 @@ describe('a fit stored with a firearm configuration', () => {
   const input = measured([300, 600], [800])
   const fit = fitSession(nominal, input, english.t)
   if (!('answer' in fit)) throw new Error(fit.problem)
-  const entry = truingEntry(
-    { shot: nominal, bullet: 'Test bullet', zeroRange: 100 },
-    input,
-    fit.answer,
-    new Date('2026-10-29T12:00:00Z'),
-  )
+  const entryOf = (inputs: TruingInputs) =>
+    truingEntry(
+      { shot: nominal, bullet: 'Test bullet', zeroRange: 100 },
+      inputs,
+      fit.answer,
+      new Date('2026-10-29T12:00:00Z'),
+    )
+  const entry = entryOf(input)
+  if (entry === 'rows') throw new Error('too many rows')
   const record = {
     kind: 'firearm',
     id: 'f1',
@@ -280,7 +284,7 @@ describe('a fit stored with a firearm configuration', () => {
 
   it('lists the strings it came from, in stored units', () => {
     const written = withTruing(record, 'c1', entry, now)
-    if (written?.kind !== 'firearm') throw new Error('not stored')
+    if (typeof written === 'string' || written.kind !== 'firearm') throw new Error('not stored')
     expect(written.saved).toBe(now.toISOString())
     const [stored] = defined(written.data.configurations[0]).truing ?? []
     expect(stored?.date).toBe('2026-10-29')
@@ -303,7 +307,29 @@ describe('a fit stored with a firearm configuration', () => {
   })
 
   it('stores nothing without the firearm or its configuration', () => {
-    expect(withTruing(record, 'c9', entry, now)).toBeUndefined()
-    expect(withTruing(undefined, 'c1', entry, now)).toBeUndefined()
+    expect(withTruing(record, 'c9', entry, now)).toBe('missing')
+    expect(withTruing(undefined, 'c1', entry, now)).toBe('missing')
+  })
+
+  it('refuses a configuration that holds the most results it keeps', () => {
+    const holding = (n: number) => ({
+      ...record,
+      data: {
+        ...record.data,
+        configurations: record.data.configurations.map((c) => ({
+          ...c,
+          truing: Array.from({ length: n }, () => entry),
+        })),
+      },
+    })
+    expect(withTruing(holding(truingLimits.results - 1), 'c1', entry, now)).toHaveProperty('kind')
+    expect(withTruing(holding(truingLimits.results), 'c1', entry, now)).toBe('full')
+  })
+
+  it('refuses more rows than a stored result keeps', () => {
+    const row = defined(input.rows[0])
+    const rows = (n: number) => entryOf({ ...input, rows: Array.from({ length: n }, () => row) })
+    expect(rows(truingLimits.rows)).toHaveProperty('rows')
+    expect(rows(truingLimits.rows + 1)).toBe('rows')
   })
 })
