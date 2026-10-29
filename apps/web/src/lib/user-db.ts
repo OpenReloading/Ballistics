@@ -58,6 +58,8 @@ export async function inStore<T>(
   const tx = (await database()).transaction(name, mode)
   const r = f(tx.objectStore(name))
   const result = r && request(r)
+  // a failed request also fails the transaction, whose rejection below carries its error
+  result?.catch(() => {})
   await new Promise<void>((resolve, reject) => {
     tx.oncomplete = () => resolve()
     tx.onerror = tx.onabort = () => reject(tx.error ?? new Error('IndexedDB transaction failed'))
