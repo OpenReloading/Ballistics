@@ -36,22 +36,29 @@ function readQuoted(text: string, from: number): { cell: string; next: number } 
 
 const isBlank = (row: string[]) => row.every((x) => x.trim() === '')
 
-/** Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may span lines); blank rows are left out. */
+/**
+ * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may span lines); blank rows are left out.
+ * Cells past `maxColumn + 1` in a row are dropped and splitting stops past `maxCells` cells, enough for the size refusal.
+ */
 function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   const rows: string[][] = []
   let row: string[] = []
   let cell = ''
+  let cells = 0
   let i = 0
   const endCell = () => {
-    row.push(cell)
+    if (row.length <= maxColumn) row.push(cell)
     cell = ''
   }
   const endRow = () => {
     endCell()
-    if (!isBlank(row)) rows.push(row)
+    if (!isBlank(row)) {
+      rows.push(row)
+      cells += row.length
+    }
     row = []
   }
-  while (i < text.length) {
+  while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)
     if (c === '"' && cell === '') {
       const q = readQuoted(text, i + 1)
@@ -104,7 +111,7 @@ function columnLetters(i: number): string {
 function tooLarge(width: number, rows: number): TableRead | undefined {
   if (width > maxColumn)
     return {
-      refusal: `The table has ${width} columns, more than ${maxColumn}. Remove the extra columns or choose another file.`,
+      refusal: `The table has more than ${maxColumn} columns. Remove the extra columns or choose another file.`,
     }
   if (width * rows > maxCells)
     return {
