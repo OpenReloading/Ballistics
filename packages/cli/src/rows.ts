@@ -156,7 +156,12 @@ function toRow(
 /** The header columns of a file, or the problem with its header. */
 function headerOf(fields: string[]): Column[] | string {
   const names = fields.map((f) => f.trim())
-  const unknown = names.filter((n) => !Object.hasOwn(columns, n))
+  // a first line without any required name is data, whose values are never printed
+  if (!required.some((r) => names.includes(r)))
+    return `the first line is not a header: it names none of ${required.join(', ')}`
+  const unknown = names.flatMap((n, i) =>
+    Object.hasOwn(columns, n) ? [] : [n || `(empty, column ${i + 1})`],
+  )
   if (unknown.length > 0) return `the header has unknown column(s) ${unknown.join(', ')}`
   if (new Set(names).size !== names.length) return 'the header repeats a column'
   const missing = required.filter((r) => !names.includes(r))

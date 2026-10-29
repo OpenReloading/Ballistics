@@ -106,10 +106,13 @@ describe('parseRows', () => {
   it.each([
     ['', 'the file is empty'],
     [`${head},extra,more\n`, 'unknown column(s) extra, more'],
+    [`${head},\n`, 'unknown column(s) (empty, column 6)'],
+    ['308-win,b,p,1.5,800\n', 'the first line is not a header'],
     [`${head},table,table\n`, 'repeats'],
     ['cartridge,bullet,powder\n', 'lacks charge_g, velocity_ms'],
   ])('refuses the header %j', (text, part) => {
     expect(() => parseRows(text, 'f.csv')).toThrow(part)
+    expect(() => parseRows(text, 'f.csv')).not.toThrow('308-win')
     expect(() => parseRows(text, 'f.csv')).toThrow(UsageError)
   })
 })
