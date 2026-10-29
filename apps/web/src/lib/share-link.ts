@@ -52,6 +52,8 @@ export async function shareLink(records: UserRecord[], page: string) {
     records,
   })
   const packed = await through(new TextEncoder().encode(text), new CompressionStream('deflate-raw'))
+  // base64 gives 4 characters per 3 bytes; the spread below throws for a large byte count
+  if (Math.ceil(packed.length / 3) * 4 > maxLinkChars) return
   const b64 = btoa(String.fromCharCode(...packed))
   const link = `${page.split('#', 1)[0]}${fragmentKey}${b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')}`
   return link.length > maxLinkChars ? undefined : link
