@@ -1,6 +1,14 @@
 {
   "name": "@open-reloading/drawing",
   "version": "0.0.3",
+  "description": "Figure models of cartridges, bullets, seating and target faces, without a renderer.",
+  "keywords": [
+    "reloading",
+    "ballistics",
+    "cartridge",
+    "drawing",
+    "svg"
+  ],
   "license": "MIT",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/drawing/",
   "repository": {
@@ -12,6 +20,9 @@
     "access": "public"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {

@@ -1,6 +1,14 @@
 {
   "name": "@open-reloading/schema",
   "version": "0.0.4",
+  "description": "Zod schemas, types and stored units of every OpenReloading record kind.",
+  "keywords": [
+    "reloading",
+    "ballistics",
+    "schema",
+    "zod",
+    "units"
+  ],
   "license": "MIT",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/schema/",
   "repository": {
@@ -12,6 +20,9 @@
     "access": "public"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {

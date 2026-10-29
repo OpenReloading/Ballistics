@@ -1,8 +1,8 @@
 /**
  * The npm tarball of each published library, as `npm pack --dry-run` lists it after the build: fails
- * when an entry point of `exports`, `main` or `types` is missing, or when the list holds a test file,
- * a source map without its sources, a file outside the `files` field, or a bare import in a packed
- * `.js` or `.d.ts` file of a package that is not in `dependencies` or `peerDependencies`.
+ * when the README or an entry point of `exports`, `main` or `types` is missing, or when the list holds
+ * a test file, a source map without its sources, a file outside the `files` field, or a bare import in
+ * a packed `.js` or `.d.ts` file of a package that is not in `dependencies` or `peerDependencies`.
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
@@ -87,7 +87,9 @@ export function packProblems(dir: string): string[] {
   ) as { files: { path: string }[] }[]
   if (!pack) return ['npm pack listed no package']
   const files = new Set(pack.files.map((f) => f.path))
-  const problems: string[] = []
+  const problems = ['README.md']
+    .filter((f) => !files.has(f))
+    .map((f) => `${f} is not in the tarball`)
   const entries = [manifest.main, manifest.types, ...exportTargets(manifest.exports)]
   for (const entry of new Set(entries.filter((e) => e !== undefined).map((e) => normalize(e))))
     if (!files.has(entry)) problems.push(`entry point ${entry} is not in the tarball`)

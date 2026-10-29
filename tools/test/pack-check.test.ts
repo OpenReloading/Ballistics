@@ -4,14 +4,15 @@ import { dirname, join } from 'node:path'
 import { expect, it } from 'vitest'
 import { packProblems } from '../src/pack-check.ts'
 
-/** A package in a fresh temporary folder, with `files` written relative to it. */
-function pkg(manifest: object, files: Record<string, string>) {
+/** A package in a fresh temporary folder with a README, with `files` written relative to it (`undefined` leaves one out). */
+function pkg(manifest: object, files: Record<string, string | undefined>) {
   const dir = mkdtempSync(join(tmpdir(), 'pack-check-'))
   writeFileSync(
     join(dir, 'package.json'),
     JSON.stringify({ name: 'p', version: '1.0.0', ...manifest }),
   )
-  for (const [path, text] of Object.entries(files)) {
+  for (const [path, text] of Object.entries({ 'README.md': '# p', ...files })) {
+    if (text === undefined) continue
     mkdirSync(dirname(join(dir, path)), { recursive: true })
     writeFileSync(join(dir, path), text)
   }
@@ -33,6 +34,11 @@ it('passes a package that ships its entry points and nothing else', () => {
     'dist/index.js.map': '{}',
   })
   expect(packProblems(dir)).toEqual([])
+})
+
+it('fails on a missing README', () => {
+  const dir = pkg(manifest, { 'README.md': undefined, 'dist/index.js': '', 'dist/index.d.ts': '' })
+  expect(packProblems(dir)).toEqual(['README.md is not in the tarball'])
 })
 
 it('fails on an entry point of exports that is missing', () => {

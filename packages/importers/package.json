@@ -1,6 +1,14 @@
 {
   "name": "@open-reloading/importers",
   "version": "0.0.4",
+  "description": "Parsers of chronograph exports, pressure histories and reloading record tables.",
+  "keywords": [
+    "reloading",
+    "ballistics",
+    "chronograph",
+    "csv",
+    "importer"
+  ],
   "license": "MIT",
   "homepage": "https://openreloading.github.io/Ballistics/docs/libraries/importers/",
   "repository": {
@@ -12,6 +20,9 @@
     "access": "public"
   },
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "sideEffects": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
