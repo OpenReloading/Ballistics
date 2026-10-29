@@ -34,7 +34,7 @@
     {
       "rule": "color-contrast",
       "node": "<t",
-      "where": ["/disciplines", "/federations", "/targets"],
+      "where": ["/disciplines", "/federations", "/targets", "Powder tuning"],
       "reason": "Cell or column header of a table in a scroll box, which sideways scrolling or the box's edge covers in part. Measured against the page background the text has 5:1 or more in both themes."
     },
     {
@@ -212,6 +212,12 @@
       "node": "mantine-Group-root > span:nth-child(1)",
       "where": "Database list filter",
       "reason": "Option name below the visible part of the popover's scroll box, which axe reports as covered. It sits on the popover surface in the text colour, 17:1 in light and 15:1 in dark (--fg on --bg)."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "mantine-Text-root",
+      "where": "Import entry",
+      "reason": "Refusal reason of a file card or the rights note in the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface the refusal reason has 4.5:1 in light and 7.8:1 in dark, the rights note 7.4:1 and 7.6:1, by measurement."
     }
   ]
 }

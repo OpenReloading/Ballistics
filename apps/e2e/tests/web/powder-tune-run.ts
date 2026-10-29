@@ -25,6 +25,9 @@ export async function openFit(page: Page) {
   await gotoHydrated(page, '/workbench')
   await applyExampleLoad(page)
   await runLine(page)
+  // the phone layout keeps the run's tabs behind its Results tab
+  const results = page.getByRole('tab', { name: 'Results', exact: true })
+  if (await results.isVisible()) await results.click()
   await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
   await page
     .locator('input[type="file"]#measurements-file')

@@ -5,6 +5,8 @@ import type { Page } from '@playwright/test'
  * opens them first, a chosen action closes them again.
  */
 export async function barButton(page: Page, name: string | RegExp, toggleName = 'Page actions') {
+  // a lazily loaded page (the designers) shows a bar without actions after hydration
+  await page.locator('.page-bar-actions').first().waitFor({ state: 'attached' })
   const toggle = page.getByRole('button', { name: toggleName }).locator('visible=true')
   if ((await toggle.count()) > 0 && (await toggle.getAttribute('aria-expanded')) === 'false')
     await toggle.click()
