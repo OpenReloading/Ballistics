@@ -10,7 +10,7 @@ export default defineConfig({
       exclude: ['src/bin.ts', 'src/write-json-schema.ts'],
       reporter: ['text-summary', 'text', 'lcov'],
       // floors: the measured value rounded down, minus one
-      thresholds: { statements: 96, branches: 91, functions: 97, lines: 97 },
+      thresholds: { statements: 97, branches: 93, functions: 97, lines: 97 },
     },
   },
 })
