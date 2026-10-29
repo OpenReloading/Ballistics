@@ -29,11 +29,13 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./json-schema/*": "./dist/json-schema/*"
   },
   "files": [
     "dist",
     "!dist/**/*.map",
+    "!dist/write-json-schema.*",
     "LICENSE"
   ],
   "scripts": {

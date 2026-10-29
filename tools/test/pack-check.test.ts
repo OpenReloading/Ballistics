@@ -49,6 +49,22 @@ it('fails on an entry point of exports that is missing', () => {
   expect(packProblems(dir)).toEqual(['entry point dist/extra.js is not in the tarball'])
 })
 
+it('passes a subpath pattern of exports that matches a packed file', () => {
+  const dir = pkg(
+    { ...manifest, exports: { ...manifest.exports, './data/*': './dist/data/*' } },
+    { 'dist/index.js': '', 'dist/index.d.ts': '', 'dist/data/a.json': '{}' },
+  )
+  expect(packProblems(dir)).toEqual([])
+})
+
+it('fails on a subpath pattern of exports that matches no packed file', () => {
+  const dir = pkg(
+    { ...manifest, exports: { ...manifest.exports, './data/*': './dist/data/*' } },
+    { 'dist/index.js': '', 'dist/index.d.ts': '' },
+  )
+  expect(packProblems(dir)).toEqual(['entry point dist/data/* is not in the tarball'])
+})
+
 it('fails on a test file in the tarball', () => {
   const dir = pkg(manifest, {
     'dist/index.js': '',

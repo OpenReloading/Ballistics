@@ -21,6 +21,9 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 | Import | Contents |
 |---|---|
 | `@open-reloading/schema` | Every schema, type and unit helper |
+| `@open-reloading/schema/json-schema/*` | The JSON Schema (draft 2020-12) of each record kind and file, written from its Zod schema: `<name>.schema.json`, such as `bullet.schema.json` |
+
+The JSON Schemas are part of the published contract: a change to them follows the [versioning rules](../release.md#versions) of the package.
 
 ## Example
 
@@ -30,6 +33,11 @@ import { parseRef, toSi, units } from '@open-reloading/schema'
 console.log(units.pressure) // bar
 console.log(toSi('pressure', 3800)) // 380000000
 console.log(parseRef('catalogue:308-winchester')) // { scope: 'catalogue', id: '308-winchester' }
+
+const bullet = await import('@open-reloading/schema/json-schema/bullet.schema.json', {
+  with: { type: 'json' },
+})
+console.log(bullet.default.$schema) // https://json-schema.org/draft/2020-12/schema
 ```
 
 ## Reference
