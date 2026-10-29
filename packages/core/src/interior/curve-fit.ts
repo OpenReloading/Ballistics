@@ -67,8 +67,16 @@ export interface CurveFitOptions {
   options?: Settings<InteriorOptions> | undefined
 }
 
-/** Why a parameter is `weak` or `fixed`. */
-export type CurveReason = 'collinear' | 'imprecise' | 'unresolved' | 'ill-conditioned'
+/**
+ * Why a parameter is `weak` or `fixed`; `inconsistent`: the exponents of the leave-one-trace-out
+ * refits of a joint fit spread wider than its interval.
+ */
+export type CurveReason =
+  | 'collinear'
+  | 'imprecise'
+  | 'unresolved'
+  | 'ill-conditioned'
+  | 'inconsistent'
 
 /** Identifiability of one parameter of the curve fit. */
 export interface CurveParameterReport {
@@ -80,12 +88,27 @@ export interface CurveParameterReport {
   initial: number
   /** Fitted value, same unit as `initial`; the start value when `fixed`. */
   value: number
-  /** Standard uncertainty with every other fitted parameter free; absent when `fixed`, `Infinity` when the trace gives no covariance. */
+  /**
+   * Standard uncertainty with every other fitted parameter free, linearized at the solution; it
+   * holds the trace noise only, not model error. Absent when `fixed`, `Infinity` when the trace
+   * gives no covariance.
+   */
   standardUncertainty?: number
   /** Relative standard uncertainty, the standard error of the log parameter. */
   relativeStandardUncertainty?: number
   /** Variance inflation factor against the other fitted parameters (1: independent). */
   varianceInflation?: number
+  /**
+   * The exponent only, when fitted: an interval meant to cover the true exponent in 90 % of fits,
+   * `value` times `exp(±k u_rel)` with the coverage factor `k` of a synthetic study. It holds the
+   * trace noise only: missing physics biases the exponent outside it unseen.
+   */
+  interval?: { low: number; high: number }
+  /**
+   * The exponent only, when fitted to three or more traces: the exponent refitted without each
+   * trace in turn, in input order. Absent when a refit fails or holds the exponent.
+   */
+  leaveOneOut?: number[]
   /** Empty when `identified`. */
   reasons: CurveReason[]
 }
@@ -306,6 +329,9 @@ export interface PressureCurvesFit extends Omit<PressureCurveFit, 'window' | 're
   warnings: CurveWarning[]
 }
 
+/** Coverage factor of the exponent's 90 % interval on its relative standard uncertainty, from a synthetic study. */
+const coverage = 2.2
+
 /** Smallest ratio of the highest to the lowest trace peak at which a joint fit resolves the exponent. */
 const minPeakRatio = 1.2
 
@@ -364,6 +390,16 @@ export function fitPressureCurves(
   load: InteriorLoad,
   shots: readonly ChargedTrace[],
   options: CurveFitOptions = {},
+): PressureCurvesFit {
+  return fitTraces(load, shots, options, true)
+}
+
+/** `fitPressureCurves`, with the leave-one-trace-out refits only when `refit`. */
+function fitTraces(
+  load: InteriorLoad,
+  shots: readonly ChargedTrace[],
+  options: CurveFitOptions,
+  refit: boolean,
 ): PressureCurvesFit {
   need(shots.length > 0, 'at least one trace')
   need(
@@ -598,6 +634,14 @@ export function fitPressureCurves(
         standardUncertainty: value * relative,
         relativeStandardUncertainty: relative,
         varianceInflation: inflation,
+        ...(name === 'exponent'
+          ? {
+              interval: {
+                low: value * Math.exp(-coverage * relative),
+                high: value * Math.exp(coverage * relative),
+              },
+            }
+          : {}),
         reasons,
       }
     })
@@ -638,6 +682,14 @@ export function fitPressureCurves(
     current = current.filter((p) => !held.has(p))
   }
   const { fit, parameters, reports } = result as NonNullable<typeof result>
+  if (refit)
+    // a subset may narrow the peak range: its exponent is measured, not judged
+    checkSpread(reports, apply(parameters, fit.theta), shots, {
+      ...options,
+      parameters,
+      maxInflation: Infinity,
+      maxRelativeStandardUncertainty: Infinity,
+    })
   return {
     load: apply(parameters, fit.theta),
     referencePressure: peak,
@@ -665,4 +717,63 @@ export function fitPressureCurves(
     runCount,
     warnings,
   }
+}
+
+/**
+ * With three or more traces and the exponent fitted, sets the leave-one-out exponents on its
+ * report, and the reason `inconsistent` when their jackknife standard error on the log exponent
+ * exceeds the full width of its interval.
+ */
+function checkSpread(
+  reports: CurveParameterReport[],
+  start: InteriorLoad,
+  shots: readonly ChargedTrace[],
+  options: CurveFitOptions,
+) {
+  const exponent = reports.find((r) => r.name === 'exponent')
+  if (!exponent || shots.length < 3) return
+  const values = refits(start, shots, options)
+  if (!values) return
+  exponent.leaveOneOut = values
+  if (jackknife(values) > 2 * coverage * (exponent.relativeStandardUncertainty ?? Infinity)) {
+    exponent.status = 'weak'
+    exponent.reasons.push('inconsistent')
+  }
+}
+
+/**
+ * The exponent fitted from `start` to the traces without each one in turn, or undefined when a
+ * refit fails or holds the exponent.
+ */
+function refits(
+  start: InteriorLoad,
+  shots: readonly ChargedTrace[],
+  options: CurveFitOptions,
+): number[] | undefined {
+  const exponents: number[] = []
+  for (let k = 0; k < shots.length; k++) {
+    try {
+      const fit = fitTraces(
+        start,
+        shots.filter((_, j) => j !== k),
+        options,
+        false,
+      )
+      const exponent = fit.parameters.find((p) => p.name === 'exponent')
+      if (exponent?.status === 'fixed' || !exponent) return undefined
+      exponents.push(exponent.value)
+    } catch (e) {
+      if (e instanceof PowderFitError) return undefined
+      throw e
+    }
+  }
+  return exponents
+}
+
+/** Jackknife standard error of the log of a value from its leave-one-out estimates. */
+function jackknife(values: readonly number[]): number {
+  const logs = values.map(Math.log)
+  const mean = logs.reduce((a, b) => a + b, 0) / logs.length
+  const sum = logs.reduce((a, b) => a + (b - mean) ** 2, 0)
+  return Math.sqrt(((logs.length - 1) / logs.length) * sum)
 }

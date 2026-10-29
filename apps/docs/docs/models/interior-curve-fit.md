@@ -78,11 +78,43 @@ Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`attempt`,
 
 A parameter is `weak` when its variance inflation exceeds `maxInflation` (default 10, reason `collinear`) or its relative standard uncertainty exceeds `maxRelativeStandardUncertainty` (default 0.25, reason `imprecise`). The time shift reports its variance inflation and uncertainty but is not held.
 
+The standard uncertainty of every parameter holds the trace noise only: it is linearized at the solution and assumes the model is right. It holds no model error.
+
+### Interval of the exponent
+
+A fitted exponent carries an `interval` meant to cover the true exponent in 90 % of fits, symmetric in the log exponent with a coverage factor $k$ in place of the 1.645 of a normal distribution:
+
+$$
+n_\text{low} = n\, e^{-k\, u_\text{rel}(n)}, \qquad n_\text{high} = n\, e^{k\, u_\text{rel}(n)}, \qquad k = 2.2
+$$
+
+Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`interval`), `coverage`.
+
+$k$ comes from a synthetic study of `fitPressureCurves` at its default limits ([research log](../research/interior-curve-fit-exponent-interval.md)): 2, 3 and 5 breech traces at charges from 2.4 to 3.0 g, exponents 0.3, 0.5 and 0.8, noise 0.1, 0.5 and 2 % of the peak, the exponent starting 20 % high, 40 replicates per cell. $k$ is the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the fitted runs of half the replicates, 2.20 on 535 runs. On the other half it covered 91 % of the runs, 75 to 100 % per cell (18 of 27 cells at 90 % or more), against 85 % with 1.645. Two traces needed less (90th percentile 1.5), five more (2.3).
+
+The interval holds the trace noise only, like the uncertainty it is built on. With heat loss and bore friction in the synthetic truth, which the fitted model lacks, the exponent came out 2 % low (median 0.98 of the truth, 0.96 to 1.01) with a relative uncertainty of about 0.6 %, and the interval covered 18 to 23 % of the runs while $\chi^2/
+u$ stayed at 1.09 to 1.14.
+
+### Leave-one-trace-out check
+
+With three or more traces and the exponent fitted, the fit refits the exponent $K$ times, each time without one trace, from the fitted load and with the parameters it fitted. A refit judges nothing: it keeps the exponent whatever its variance inflation and uncertainty, since a subset of a trace set has a narrower peak range. `leaveOneOut` lists the refitted exponents $n_{(k)}$ in input order. Their jackknife standard error on the log exponent ([Efron 1982](../bibliography.md#efron-1982)) is compared with the full width of the interval:
+
+$$
+s_J = \sqrt{\frac{K-1}{K} \sum_k \bigl(\ln n_{(k)} - \overline{\ln n_{(\cdot)}}\bigr)^2}, \qquad
+s_J > 2\, k\, u_\text{rel}(n) \ \Rightarrow\ \text{reason } \texttt{inconsistent}
+$$
+
+Code: `packages/core/src/interior/curve-fit.ts`, `checkSpread`, `refits`, `jackknife`.
+
+An `inconsistent` exponent is `weak` and stays fitted with its value and interval: the traces do not agree on it, and holding it at the caller's start value would not make them agree. When a refit fails or holds the exponent, there is no `leaveOneOut` and no check. With two traces there is none either.
+
+In the study the check named 20 of 700 noise-only fits with three or five traces (2.9 %, at most 12.5 % in one cell). A comparison with the interval's half-width instead named 16 %. A trace from a powder that burns 5 % faster than the others is named (test). Heat loss and bore friction are not: the check named 2 and 3 of 40 fits with three and five traces, about the rate of noise-only fits, because the missing physics biases every trace the same way.
+
 ### Holding parameters fixed
 
 A trace often fixes the burn coefficient and the shape of the rise but not the exponent: the pressure exponent and the form parameters move the same part of the curve. The fit therefore holds parameters at their start values and reports why:
 
-- A `weak` exponent is held fixed with the reasons of the attempt that showed it, and the fit repeats without it. A fit of the exponent alone keeps it and reports it `weak`.
+- A `weak` exponent is held fixed with the reasons of the attempt that showed it, and the fit repeats without it. A fit of the exponent alone keeps it and reports it `weak`. The reason `inconsistent` of the [leave-one-trace-out check](#leave-one-trace-out-check) comes after the fit and does not hold it.
 - An `unresolved` failure of the loop holds the parameters it names.
 - An `ill-conditioned` failure holds the next of the exponent, the form slope and the transition point that is still fitted.
 - The burn coefficient is never held. A fit that would leave nothing to fit, and any other failure, throws.
@@ -157,6 +189,8 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 | $K$, $k$, $W_k$ | Number of traces of a joint fit, trace index, samples in its window | 1 | 1 |
 | $C_\theta$ | Covariance of the log parameters | 1 | 1 |
 | $\text{VIF}_j$, $u_\text{rel}$ | Variance inflation factor, relative standard uncertainty | 1 | 1 |
+| $k$, $n_\text{low}$, $n_\text{high}$ | Coverage factor, ends of the exponent's interval | 1 | 1 |
+| $n_{(k)}$, $s_J$ | Exponent refitted without trace $k$, jackknife standard error of its log | 1 | 1 |
 | $f_c$, $\text{RC}$, $\Delta t_i$ | Low-pass cutoff, its time constant, sample step | Hz, s, s | Hz, s, s |
 | $x_i$, $y_i$ | Pressure before and after the low-pass | bar | bar |
 
@@ -169,10 +203,10 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 
 ## Limits
 
-- The fit is local and the cost surface has a flat valley. A start far from the solution, or a held exponent that is wrong, ends in a stuck fit or a model error. The reported uncertainty is linearized at the solution and holds no model error.
+- The fit is local and the cost surface has a flat valley. A start far from the solution, or a held exponent that is wrong, ends in a stuck fit or a model error. The reported uncertainty and the exponent's interval are linearized at the solution and hold no model error.
 - The shot-start pressure of the model and the trace differ, so the window starts at 25 % of the peak. The rise below that is not fitted.
 - Under the default limits the exponent is usually reported `fixed`: with the time shift fitted, its variance inflation on a noisy trace is far above 10. A trace that resolves it needs low noise, a wide pressure range and a form that is already close. Two or more traces of the same powder at charges whose highest peak is at least about 1.2 times the lowest resolved it on synthetic traces (`fitPressureCurves`), a time shift fixed from a sensor delay did not ([research log](../research/interior-curve-fit-exponent.md)).
-- The uncertainty of the exponent of a joint fit holds the trace noise only. On synthetic traces its 90 % interval needed a factor of about 2.5 instead of 1.645 to cover, and missing physics (heat loss, bore friction) biased it by 2 to 7 % with residuals that did not show it.
+- The uncertainty and the interval of the exponent of a joint fit hold the trace noise only. Missing physics (heat loss, bore friction) biased it by 2 to 7 % on synthetic traces, with residuals and a leave-one-trace-out spread that did not show it. The coverage factor is from synthetic traces of one load and covered 75 to 100 % per cell; real traces (sensor resonance, shot start) were not tested.
 - The initial slope $a$ is nearly degenerate with the other parameters on a slow powder. It then comes back `weak`, or the fit holds it.
 - Only the two-stage vivacity form is supported. A geometric law, a constant form and the three-stage form are refused.
 - The low-pass only smooths. Frequencies above the cutoff are not restored and the peak can be lowered.
@@ -183,5 +217,6 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 - Levenberg-Marquardt loop and its stop rule: see the [least-squares page](least-squares.md), [Levenberg 1944](../bibliography.md#levenberg-1944), [Marquardt 1963](../bibliography.md#marquardt-1963).
 - Variance inflation and collinearity diagnosis: [Belsley 1980](../bibliography.md#belsley-1980), [Marquardt 1970](../bibliography.md#marquardt-1970).
 - Nonlinear regression and linearized uncertainty: [Bates 1988](../bibliography.md#bates-1988).
-- Propagation of uncertainty: [JCGM 100:2008](../bibliography.md#jcgm-100-2008).
+- Propagation of uncertainty and coverage factors: [JCGM 100:2008](../bibliography.md#jcgm-100-2008).
+- Jackknife standard error: [Efron 1982](../bibliography.md#efron-1982).
 - Unit factor of psi: [NIST SP 811](../bibliography.md#nist-sp-811).
