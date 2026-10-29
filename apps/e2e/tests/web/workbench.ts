@@ -12,20 +12,22 @@ export const formValues = (page: Page) =>
       els.map((e) => [e.getAttribute('aria-label') ?? '', (e as HTMLInputElement).value]),
     )
 
-/** Clicks an item of the page bar's Open menu. */
-async function openItem(page: Page, name: string | RegExp) {
+/** Clicks an item of the page bar's Open menu, named `open` in the page's language. */
+async function openItem(page: Page, name: string | RegExp, open = 'Open') {
   const item = page.getByRole('menuitem', { name })
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   // retried: the menu can close again before the item's click while an applied example still loads
   await expect(async () => {
-    if (!(await item.isVisible())) await (await barButton(page, 'Open')).click({ timeout: 1000 })
+    if (!(await item.isVisible())) await (await barButton(page, open)).click({ timeout: 1000 })
     await item.click({ timeout: 1000 })
   }).toPass({ timeout: 10_000 })
 }
 
 /** Applies the example load and waits until it is complete, so a run sees all its values. */
 export async function applyExampleLoad(page: Page, language: 'en' | 'de' = 'en') {
-  await openItem(page, language === 'de' ? 'Beispiel-Laborierung' : 'Example load')
+  await (language === 'de'
+    ? openItem(page, 'Beispiel-Laborierung', 'Öffnen')
+    : openItem(page, 'Example load'))
   // complete once its bullet is seated: volume and travel follow the seating
   await expect(
     loadForm(page, language === 'de' ? 'Laborierung' : 'Load').locator('.field-flag-seating'),

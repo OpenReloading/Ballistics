@@ -15,11 +15,11 @@ export const storeUnits = (page: Page, preset = 'metric-grams', overrides = defa
     [preset, overrides] as const,
   )
 
-/** The Settings entry of the sidebar: a button opening the settings dialog. */
+/** The Settings entry of the sidebar: a button opening the settings dialog, in English or German. */
 export const settingsEntry = (page: Page) =>
   page
-    .getByRole('navigation', { name: 'Main' })
-    .getByRole('button', { name: 'Settings', exact: true })
+    .getByRole('navigation', { name: /^(Main|Hauptnavigation)$/ })
+    .getByRole('button', { name: /^(Settings|Einstellungen)$/ })
 
 /** Opens the settings dialog from the sidebar and waits for it to be in view: it fades in. */
 async function settingsDialog(page: Page) {
