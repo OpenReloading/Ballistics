@@ -215,9 +215,15 @@
     },
     {
       "rule": "color-contrast",
-      "node": "mantine-Text-root",
+      "node": "import-refusal",
       "where": "Import entry",
-      "reason": "Refusal reason of a file card or the rights note in the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface the refusal reason has 4.5:1 in light and 7.8:1 in dark, the rights note 7.4:1 and 7.6:1, by measurement."
+      "reason": "Refusal reason of a file card in the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 4.5:1 in light and 7.8:1 in dark, by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "import-rights",
+      "where": "Import entry",
+      "reason": "Rights note of the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 7.4:1 in light and 7.6:1 in dark, by measurement."
     }
   ]
 }

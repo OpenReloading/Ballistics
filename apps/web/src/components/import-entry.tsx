@@ -262,7 +262,7 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   const { t, tn } = useTranslation()
   if ('refusal' in c)
     return (
-      <Text size="sm" c="red">
+      <Text size="sm" c="red" className="import-refusal">
         {c.format === undefined
           ? label(c.refusal, t)
           : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
@@ -447,7 +447,7 @@ export function ImportFoot({
         value={shared}
         onChange={(ev) => onShared(ev.currentTarget.value)}
       />
-      <Text size="xs" c="dimmed">
+      <Text size="xs" c="dimmed" className="import-rights">
         {t('You are responsible for holding the rights to the data you import.')}
       </Text>
       <Group gap="sm">
