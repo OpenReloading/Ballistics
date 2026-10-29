@@ -414,6 +414,7 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 - A crusher pressure is a conventional value, not an absolute pressure: the compression of the copper cylinder depends on the rise time of the pressure and on the cylinder type. A pressure step drives an undamped elastic gauge to twice the deflection of the same static pressure ($x(t) = x_s (1 - \cos \omega t)$), so a fast rise reads differently from a slow one. No single factor converts crusher readings to transducer readings, which is why a fit refuses mixed bases and converts none ([research log](../research/interior-crusher-conventional-pressure.md)).
 - A fitted energy is an effective value, not the thermochemical one. On the 30 powder records with both, the fitted specific energy over the thermochemical value (impetus over $k - 1$) has a median of 0.78, and 27 lie between 0.6 and 0.95 ([research log](../research/interior-plausibility-notes.md)).
 - The fitted burn coefficient holds for the powder as fired. Ageing and moisture are not modelled in [M3](interior-m3.md#limits), so a fit on fresh powder does not hold for old or damp powder of the same lot, and the reverse.
+- Research log: [fitted parameters of the load-table fit](../research/interior-load-table-fit-parameters.md), [assumed peak pressure for powders without printed pressures](../research/interior-load-table-pressure-term.md).
 
 ## Sources
 
