@@ -15,12 +15,22 @@ export interface NewsItem {
 
 const fileName = /^(\d{4}-\d{2}-\d{2})-([a-z0-9-]+)\.md$/
 
-/** The title, link and text of a news file, split by lines; undefined for no front matter. */
+/**
+ * The title, link and text of a news file, split by lines; undefined for no front matter. Blank
+ * lines may follow the title and the link.
+ */
 function newsContent(file: string): [title: string, link: string, text: string] | undefined {
-  const [open, title, link, close, ...text] = file.split(/\r?\n/)
+  const lines = file.split(/\r?\n/)
+  const [open, title] = lines
+  let i = 2
+  const next = () => {
+    while (lines[i]?.trim() === '') i++
+    return lines[i++]
+  }
+  const [link, close] = [next(), next()]
   const t = /^title: *(\S.*)$/.exec(title ?? '')?.[1]?.trimEnd()
   const l = /^link: *(\S+)\s*$/.exec(link ?? '')?.[1]
-  return open === '---' && close === '---' && t && l ? [t, l, text.join('\n')] : undefined
+  return open === '---' && close === '---' && t && l ? [t, l, lines.slice(i).join('\n')] : undefined
 }
 
 /**
