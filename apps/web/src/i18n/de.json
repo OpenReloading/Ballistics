@@ -2677,6 +2677,7 @@
   "Pick one hole": "Ein Schussloch wählen",
   "Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.": "Vorschläge sind auf dem Foto gestrichelt; keiner zählt, bis er übernommen wird. Auf dem Foto: Doppelklick oder Eingabetaste übernimmt einen, Ziehen oder Pfeiltasten verschieben ihn, Entf löscht ihn.",
   "Accept all ({count})": "Alle übernehmen ({count})",
+  "Accept maybes ({count})": "Vielleicht-Vorschläge übernehmen ({count})",
   "Clear proposals": "Vorschläge leeren",
   "Clear proposals and areas to place by hand": "Vorschläge und von Hand zu platzierende Bereiche leeren",
   "Backing color {color}": "Hintergrundfarbe {color}",
