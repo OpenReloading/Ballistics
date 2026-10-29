@@ -1,10 +1,10 @@
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { meanRadius } from '../src/lib/ellipse.ts'
+import { findFace } from '../src/lib/face-search.ts'
 import {
   type FaceFit,
   faceLabel,
-  findFace,
   fitDiameter,
   fitPicked,
   matchFaces,

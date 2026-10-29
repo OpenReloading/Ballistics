@@ -1,6 +1,7 @@
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { msg } from '../src/i18n/translate.ts'
+import { findFace } from '../src/lib/face-search.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import {
   belowMinimum,
@@ -9,7 +10,6 @@ import {
   type QualityIssue,
   type TargetLayout,
 } from '../src/lib/photo-quality.ts'
-import { findFace } from '../src/lib/target-face.ts'
 import { photoScene } from './face-photos.ts'
 import { faceById, faces, render, type Scene } from './face-render.ts'
 
