@@ -3854,6 +3854,15 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: 0 1 4.5rem;
 }
 
+/* with both lots the four choices share one line from 75em, in German too, only with a small start
+   width: a cell still grows to its label */
+@media screen and (min-width: 75em) {
+  .workbench .pinned-row > *,
+  .pinned-row-slot > * {
+    flex-basis: 4.5rem;
+  }
+}
+
 .pinned-row-slot {
   display: contents;
 }
