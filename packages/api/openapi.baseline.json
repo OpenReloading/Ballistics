@@ -21252,6 +21252,695 @@
                                         "format": "date",
                                         "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
                                         "description": "Removal date, ISO 8601, not before `mounted`."
+                                      },
+                                      "truing": {
+                                        "maxItems": 100,
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "date": {
+                                              "type": "string",
+                                              "format": "date",
+                                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                              "description": "Date the result was stored, ISO 8601."
+                                            },
+                                            "load": {
+                                              "type": "string",
+                                              "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                                              "description": "Reference to the load the strings were shot with."
+                                            },
+                                            "bullet": {
+                                              "type": "string",
+                                              "maxLength": 200,
+                                              "description": "The bullet of the nominal shot as the workbench named it."
+                                            },
+                                            "muzzleVelocity": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "In m/s."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "m/s",
+                                              "description": "Muzzle velocity of the nominal shot."
+                                            },
+                                            "zeroRange": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "In mm."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "mm",
+                                              "description": "Zero range of the nominal shot."
+                                            },
+                                            "temperature": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": -273.15,
+                                                  "description": "In degC."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "degC",
+                                              "description": "Air temperature."
+                                            },
+                                            "pressure": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "In bar."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "bar",
+                                              "description": "Absolute station pressure."
+                                            },
+                                            "humidity": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "minimum": 0,
+                                                  "maximum": 100,
+                                                  "description": "In %."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "%",
+                                              "description": "Relative humidity, from 0 to 100 %."
+                                            },
+                                            "clickValue": {
+                                              "type": "object",
+                                              "properties": {
+                                                "value": {
+                                                  "type": "number",
+                                                  "exclusiveMinimum": 0,
+                                                  "description": "In deg."
+                                                },
+                                                "raw": {
+                                                  "type": "string",
+                                                  "minLength": 1,
+                                                  "description": "The value as written in the source, when it differed."
+                                                }
+                                              },
+                                              "required": ["value"],
+                                              "unit": "deg",
+                                              "description": "Nominal angle of one click."
+                                            },
+                                            "fitZeroOffset": {
+                                              "type": "boolean",
+                                              "description": "Whether a zero offset was fitted."
+                                            },
+                                            "rows": {
+                                              "minItems": 1,
+                                              "maxItems": 50,
+                                              "type": "array",
+                                              "items": {
+                                                "oneOf": [
+                                                  {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "kind": {
+                                                        "type": "string",
+                                                        "const": "impact",
+                                                        "description": "Impacts measured at the zero setting."
+                                                      },
+                                                      "range": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "exclusiveMinimum": 0,
+                                                            "description": "In mm."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "mm",
+                                                        "description": "Distance of the row."
+                                                      },
+                                                      "shots": {
+                                                        "type": "integer",
+                                                        "exclusiveMinimum": 0,
+                                                        "maximum": 10000,
+                                                        "description": "Shots of the row."
+                                                      },
+                                                      "mean": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In mm."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "mm",
+                                                        "description": "Mean height of the impacts above the line of sight."
+                                                      },
+                                                      "deviation": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "exclusiveMinimum": 0,
+                                                            "description": "In mm."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "mm",
+                                                        "description": "Standard deviation of one shot."
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "range",
+                                                      "shots",
+                                                      "mean",
+                                                      "deviation"
+                                                    ]
+                                                  },
+                                                  {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "kind": {
+                                                        "type": "string",
+                                                        "const": "dial",
+                                                        "description": "Clicks dialled to hit at the distance."
+                                                      },
+                                                      "range": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "exclusiveMinimum": 0,
+                                                            "description": "In mm."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "mm",
+                                                        "description": "Distance of the row."
+                                                      },
+                                                      "shots": {
+                                                        "type": "integer",
+                                                        "exclusiveMinimum": 0,
+                                                        "maximum": 10000,
+                                                        "description": "Shots of the row."
+                                                      },
+                                                      "mean": {
+                                                        "type": "number",
+                                                        "unit": "1",
+                                                        "description": "Mean of the clicks dialled."
+                                                      },
+                                                      "deviation": {
+                                                        "type": "number",
+                                                        "exclusiveMinimum": 0,
+                                                        "unit": "1",
+                                                        "description": "Standard deviation of one shot, clicks."
+                                                      }
+                                                    },
+                                                    "required": [
+                                                      "kind",
+                                                      "range",
+                                                      "shots",
+                                                      "mean",
+                                                      "deviation"
+                                                    ]
+                                                  }
+                                                ]
+                                              },
+                                              "description": "Distances shot."
+                                            },
+                                            "chronograph": {
+                                              "type": "object",
+                                              "properties": {
+                                                "shots": {
+                                                  "type": "integer",
+                                                  "exclusiveMinimum": 0,
+                                                  "maximum": 10000,
+                                                  "description": "Chronograph readings."
+                                                },
+                                                "mean": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "type": "number",
+                                                      "exclusiveMinimum": 0,
+                                                      "description": "In m/s."
+                                                    },
+                                                    "raw": {
+                                                      "type": "string",
+                                                      "minLength": 1,
+                                                      "description": "The value as written in the source, when it differed."
+                                                    }
+                                                  },
+                                                  "required": ["value"],
+                                                  "unit": "m/s",
+                                                  "description": "Mean muzzle velocity."
+                                                },
+                                                "deviation": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "type": "number",
+                                                      "exclusiveMinimum": 0,
+                                                      "description": "In m/s."
+                                                    },
+                                                    "raw": {
+                                                      "type": "string",
+                                                      "minLength": 1,
+                                                      "description": "The value as written in the source, when it differed."
+                                                    }
+                                                  },
+                                                  "required": ["value"],
+                                                  "unit": "m/s",
+                                                  "description": "Standard deviation of one reading."
+                                                }
+                                              },
+                                              "required": ["shots", "mean", "deviation"],
+                                              "description": "Muzzle velocity readings."
+                                            },
+                                            "parameters": {
+                                              "maxItems": 4,
+                                              "type": "array",
+                                              "items": {
+                                                "oneOf": [
+                                                  {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "name": {
+                                                        "type": "string",
+                                                        "const": "muzzleVelocity",
+                                                        "description": "Which parameter."
+                                                      },
+                                                      "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                          "identified",
+                                                          "weak",
+                                                          "unresolved"
+                                                        ],
+                                                        "description": "Whether the strings identify the parameter."
+                                                      },
+                                                      "reasons": {
+                                                        "maxItems": 4,
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "no-information",
+                                                            "collinear",
+                                                            "imprecise",
+                                                            "fit-failed"
+                                                          ]
+                                                        },
+                                                        "description": "Why a parameter is weak or unresolved."
+                                                      },
+                                                      "value": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In m/s."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "m/s",
+                                                        "description": "Fitted value, only when identified."
+                                                      },
+                                                      "lower": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In m/s."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "m/s",
+                                                        "description": "Lower end of the confidence interval."
+                                                      },
+                                                      "upper": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In m/s."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "m/s",
+                                                        "description": "Upper end of the confidence interval."
+                                                      },
+                                                      "confidenceLevel": {
+                                                        "type": "number",
+                                                        "exclusiveMinimum": 0,
+                                                        "exclusiveMaximum": 1,
+                                                        "unit": "1",
+                                                        "description": "Level of the interval, a fraction."
+                                                      }
+                                                    },
+                                                    "required": ["name", "status", "reasons"]
+                                                  },
+                                                  {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "name": {
+                                                        "type": "string",
+                                                        "const": "dragFactor",
+                                                        "description": "Which parameter."
+                                                      },
+                                                      "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                          "identified",
+                                                          "weak",
+                                                          "unresolved"
+                                                        ],
+                                                        "description": "Whether the strings identify the parameter."
+                                                      },
+                                                      "reasons": {
+                                                        "maxItems": 4,
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "no-information",
+                                                            "collinear",
+                                                            "imprecise",
+                                                            "fit-failed"
+                                                          ]
+                                                        },
+                                                        "description": "Why a parameter is weak or unresolved."
+                                                      },
+                                                      "value": {
+                                                        "type": "number",
+                                                        "unit": "1",
+                                                        "description": "Fitted value, only when identified."
+                                                      },
+                                                      "lower": {
+                                                        "type": "number",
+                                                        "unit": "1",
+                                                        "description": "Lower end of the confidence interval."
+                                                      },
+                                                      "upper": {
+                                                        "type": "number",
+                                                        "unit": "1",
+                                                        "description": "Upper end of the confidence interval."
+                                                      },
+                                                      "confidenceLevel": {
+                                                        "type": "number",
+                                                        "exclusiveMinimum": 0,
+                                                        "exclusiveMaximum": 1,
+                                                        "unit": "1",
+                                                        "description": "Level of the interval, a fraction."
+                                                      }
+                                                    },
+                                                    "required": ["name", "status", "reasons"]
+                                                  },
+                                                  {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "name": {
+                                                        "type": "string",
+                                                        "const": "clickValue",
+                                                        "description": "Which parameter."
+                                                      },
+                                                      "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                          "identified",
+                                                          "weak",
+                                                          "unresolved"
+                                                        ],
+                                                        "description": "Whether the strings identify the parameter."
+                                                      },
+                                                      "reasons": {
+                                                        "maxItems": 4,
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "no-information",
+                                                            "collinear",
+                                                            "imprecise",
+                                                            "fit-failed"
+                                                          ]
+                                                        },
+                                                        "description": "Why a parameter is weak or unresolved."
+                                                      },
+                                                      "value": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In deg."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "deg",
+                                                        "description": "Fitted value, only when identified."
+                                                      },
+                                                      "lower": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In deg."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "deg",
+                                                        "description": "Lower end of the confidence interval."
+                                                      },
+                                                      "upper": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In deg."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "deg",
+                                                        "description": "Upper end of the confidence interval."
+                                                      },
+                                                      "confidenceLevel": {
+                                                        "type": "number",
+                                                        "exclusiveMinimum": 0,
+                                                        "exclusiveMaximum": 1,
+                                                        "unit": "1",
+                                                        "description": "Level of the interval, a fraction."
+                                                      }
+                                                    },
+                                                    "required": ["name", "status", "reasons"]
+                                                  },
+                                                  {
+                                                    "type": "object",
+                                                    "properties": {
+                                                      "name": {
+                                                        "type": "string",
+                                                        "const": "zeroOffset",
+                                                        "description": "Which parameter."
+                                                      },
+                                                      "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                          "identified",
+                                                          "weak",
+                                                          "unresolved"
+                                                        ],
+                                                        "description": "Whether the strings identify the parameter."
+                                                      },
+                                                      "reasons": {
+                                                        "maxItems": 4,
+                                                        "type": "array",
+                                                        "items": {
+                                                          "type": "string",
+                                                          "enum": [
+                                                            "no-information",
+                                                            "collinear",
+                                                            "imprecise",
+                                                            "fit-failed"
+                                                          ]
+                                                        },
+                                                        "description": "Why a parameter is weak or unresolved."
+                                                      },
+                                                      "value": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In deg."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "deg",
+                                                        "description": "Fitted value, only when identified."
+                                                      },
+                                                      "lower": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In deg."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "deg",
+                                                        "description": "Lower end of the confidence interval."
+                                                      },
+                                                      "upper": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "value": {
+                                                            "type": "number",
+                                                            "description": "In deg."
+                                                          },
+                                                          "raw": {
+                                                            "type": "string",
+                                                            "minLength": 1,
+                                                            "description": "The value as written in the source, when it differed."
+                                                          }
+                                                        },
+                                                        "required": ["value"],
+                                                        "unit": "deg",
+                                                        "description": "Upper end of the confidence interval."
+                                                      },
+                                                      "confidenceLevel": {
+                                                        "type": "number",
+                                                        "exclusiveMinimum": 0,
+                                                        "exclusiveMaximum": 1,
+                                                        "unit": "1",
+                                                        "description": "Level of the interval, a fraction."
+                                                      }
+                                                    },
+                                                    "required": ["name", "status", "reasons"]
+                                                  }
+                                                ]
+                                              },
+                                              "description": "Fitted parameters."
+                                            },
+                                            "consistent": {
+                                              "type": "boolean",
+                                              "description": "Whether the residuals agree with the stated uncertainties; absent without a check."
+                                            },
+                                            "intervalsTrusted": {
+                                              "type": "boolean",
+                                              "description": "Whether the intervals are to be relied on."
+                                            }
+                                          },
+                                          "required": [
+                                            "date",
+                                            "bullet",
+                                            "muzzleVelocity",
+                                            "zeroRange",
+                                            "temperature",
+                                            "pressure",
+                                            "humidity",
+                                            "clickValue",
+                                            "fitZeroOffset",
+                                            "rows",
+                                            "parameters",
+                                            "intervalsTrusted"
+                                          ]
+                                        },
+                                        "description": "Truing results shot with this configuration, oldest first."
                                       }
                                     },
                                     "required": ["id", "name", "mounts"]
