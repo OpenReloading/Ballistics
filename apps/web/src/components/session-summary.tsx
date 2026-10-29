@@ -372,6 +372,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
           <PanelTable
             label={t('String statistics')}
             className="session-strings"
+            testId="session-strings"
             // the panel title says it; the table keeps it as its name
             caption={
               <span className="visually-hidden">

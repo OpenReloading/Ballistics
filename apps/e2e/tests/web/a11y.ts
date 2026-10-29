@@ -5,7 +5,8 @@ import type { Page } from '@playwright/test'
 
 /**
  * An axe result listed in `a11y-lists.json`: `rule` is the axe rule id, `node` a part of the node's
- * selector or markup, `where` the start of the route or state name of the sweep, or several (every one when absent).
+ * selector or markup, which follow the `data-testid` of its closest marked ancestor, `where` the start of the
+ * route or state name of the sweep, or several (every one when absent).
  */
 type Entry = {
   rule: string
@@ -59,11 +60,29 @@ const why = (n: NodeResult) =>
 export async function problems(page: Page, where: string, include?: string) {
   const builder = new AxeBuilder({ page }).withTags(tags)
   const { violations, incomplete } = await (include ? builder.include(include) : builder).analyze()
+  // a target of one selector is in the page itself, not in a frame or a shadow root
+  const targets = [...violations, ...incomplete].flatMap((v) =>
+    v.nodes.flatMap((n) => (n.target.length === 1 ? [String(n.target[0])] : [])),
+  )
+  const scopes: Record<string, string> = await page.evaluate(
+    (ts) =>
+      Object.fromEntries(
+        ts.map((t) => [
+          t,
+          document.querySelector(t)?.closest('[data-testid]')?.getAttribute('data-testid') ?? '',
+        ]),
+      ),
+    targets,
+  )
   const lines = (kind: string, results: typeof violations, entries: Entry[]) =>
     results.flatMap((v) =>
       v.nodes
-        .filter((n) => !listed(entries, where, v.id, `${n.target.join(' ')} ${n.html}`))
-        .map((n) => `${where}: ${kind} ${v.id} (${why(n)}): ${n.target.join(' ')} ${n.html}`),
+        .map((n) => ({
+          n,
+          node: `${scopes[n.target.join(' ')] ?? ''} ${n.target.join(' ')} ${n.html}`,
+        }))
+        .filter(({ node }) => !listed(entries, where, v.id, node))
+        .map(({ n, node }) => `${where}: ${kind} ${v.id} (${why(n)}): ${node.trim()}`),
     )
   return [
     ...lines('violation', violations, lists.known),

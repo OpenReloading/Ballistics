@@ -127,6 +127,7 @@ function cellRole(type: string | undefined, scope: string | undefined, inBody: b
 export function PanelTable({
   label,
   className,
+  testId,
   caption,
   columns,
   numeric = false,
@@ -134,6 +135,7 @@ export function PanelTable({
 }: {
   label: string
   className?: string
+  testId?: string
   caption: ReactNode
   columns: readonly string[]
   numeric?: boolean
@@ -142,7 +144,7 @@ export function PanelTable({
   return (
     <ScrollRegion label={label}>
       {withTableRoles(
-        <table className={className}>
+        <table className={className} data-testid={testId}>
           <caption>{caption}</caption>
           <thead>
             <tr>

@@ -71,7 +71,7 @@ Playwright tests against the static export of the web app (`pages/`, served by `
 
 - Rules: the tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa` (including `target-size`, which axe ships disabled but a tag runs) and `best-practice`. No rule is switched off.
 - Widths 320, 390 and 1280 px, light and dark. A page that scrolls as a whole (the routes and the record pages) runs in a 4000 px high window, as axe leaves text below the fold as "needs review"; the workbench and the dialogs run at 900 px.
-- A "needs review" (`incomplete`) result fails like a violation unless it is listed. Nothing is waived by rule alone: an entry names the rule, a part of the node's selector or markup and, where it applies, the start of the route or state name (`where`).
+- A "needs review" (`incomplete`) result fails like a violation unless it is listed. Nothing is waived by rule alone: an entry names the rule, a part of the node's selector or markup (after the `data-testid` of its closest marked ancestor, so `session-strings tr:nth-child(3)` names a row of that table) and, where it applies, the start of the route or state name (`where`).
 - `a11y-lists.json` has two lists, each entry with a reason:
   - `known`: a finding that is not fixed (a violation, or a "needs review" result that review showed to fail) with its reason and `workaround`. Keep it short: fix the component instead.
   - `reviewed`: a "needs review" result that a person read and found to pass, with why axe cannot decide and the measured contrast or the code that makes it pass. A reason with a contrast figure is measured against the solid background behind the node in both themes; recheck it when the tokens change.
