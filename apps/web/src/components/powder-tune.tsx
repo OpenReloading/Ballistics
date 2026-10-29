@@ -23,6 +23,7 @@ import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
+import { errorText } from '../lib/error-text.ts'
 import { type ChargeRow, chargeRows } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
 import { openOnWorkbench } from '../lib/open-loads.ts'
@@ -170,8 +171,10 @@ interface TuneSave {
 /** Why a save failed: too many points for a record, no valid record, or the write. */
 export const saveFailures = {
   points: msg('A powder record holds at most 40 points, one per charge and powder temperature.'),
-  record: msg('The fit does not make a valid powder record.'),
-  store: msg('The fit cannot be stored as a powder record in this browser.'),
+  record: msg('The fit does not make a valid powder record. {reason}'),
+  store: msg(
+    'The fit cannot be stored as a powder record in this browser. {reason} Free browser storage or allow site storage for this page, then save again.',
+  ),
 }
 
 /**
@@ -197,7 +200,7 @@ function SaveFit({
     refit?.name ??
     (save.base ? t('{name}, fitted', { name: save.base.name }) : t('Fitted powder'))
   const [saved, setSaved] = useState<string>()
-  const [failed, setFailed] = useState<keyof typeof saveFailures>()
+  const [failed, setFailed] = useState<{ kind: keyof typeof saveFailures; reason: string }>()
   const [saving, setSaving] = useState(false)
   const fit = state.fit?.fit
   const confidence = state.range?.confidence
@@ -216,15 +219,20 @@ function SaveFit({
     })
     setSaved(undefined)
     setFailed(undefined)
-    if (!record || !userRecord.safeParse(record).success) {
-      setFailed((record?.data.fit?.input.length ?? 0) > maxFitPoints ? 'points' : 'record')
+    const checked = record && userRecord.safeParse(record)
+    if (!record || !checked?.success) {
+      const issue = checked?.error?.issues[0]
+      setFailed({
+        kind: (record?.data.fit?.input.length ?? 0) > maxFitPoints ? 'points' : 'record',
+        reason: issue ? `${issue.path.join('.')}: ${issue.message}` : '',
+      })
       return
     }
     setSaving(true)
     putRecords([record])
       .then(
         () => setSaved(record.name),
-        () => setFailed('store'),
+        (error) => setFailed({ kind: 'store', reason: errorText(error) }),
       )
       .finally(() => setSaving(false))
   }
@@ -257,7 +265,9 @@ function SaveFit({
         </Message>
       )}
       {failed && (
-        <ErrorNote title={t('The powder was not saved.')}>{t(saveFailures[failed])}</ErrorNote>
+        <ErrorNote title={t('The powder was not saved.')}>
+          {t(saveFailures[failed.kind], { reason: failed.reason })}
+        </ErrorNote>
       )}
     </div>
   )

@@ -28,6 +28,7 @@ import {
   ownCartridges,
 } from '../lib/caliber-candidates.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
+import { errorText } from '../lib/error-text.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
 import { type FoundFace, faceGeometry } from '../lib/face-sheet.ts'
 import type { FlaggedRegion, HoleProposal } from '../lib/hole-detection.ts'
@@ -281,16 +282,25 @@ export function useHoleDetection({
       }
       onReply(m)
     }
-    w.onerror = () => {
+    w.onerror = (e) => {
       if (worker.current !== w) return
-      failed()
+      failed(e.message)
     }
     w.postMessage(request)
   }
 
-  const failed = () => {
+  const failed = (error?: unknown) => {
     stop()
-    say(t('Hole detection failed in this browser.'), true)
+    say(
+      [
+        t('Hole detection failed in this browser.'),
+        error ? errorText(error) : '',
+        t('Try a smaller photo or another browser.'),
+      ]
+        .filter(Boolean)
+        .join(' '),
+      true,
+    )
   }
 
   async function photoBlob() {
