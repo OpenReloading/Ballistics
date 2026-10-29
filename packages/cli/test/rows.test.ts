@@ -106,11 +106,14 @@ describe('parseRows', () => {
 
   it.each([
     ['', 'the file is empty'],
-    [`${head},extra\n`, 'unknown column'],
+    [`${head},extra,more\n`, 'unknown column(s) extra, more'],
+    [`${head},\n`, 'unknown column(s) (empty, column 6)'],
+    ['308-win,b,p,1.5,800\n', 'the first line is not a header'],
     [`${head},table,table\n`, 'repeats'],
     ['cartridge,bullet,powder\n', 'lacks charge_g, velocity_ms'],
   ])('refuses the header %j', (text, part) => {
     expect(() => parseRows(text, 'f.csv')).toThrow(part)
+    expect(() => parseRows(text, 'f.csv')).not.toThrow('308-win')
     expect(() => parseRows(text, 'f.csv')).toThrow(UsageError)
   })
 })
@@ -120,19 +123,28 @@ describe('readRows', () => {
   mkdirSync(join(dir, 'tables'))
   writeFileSync(join(dir, 'tables', 'b.csv'), `${head}\nc2,b,p,1,2\n`)
   writeFileSync(join(dir, 'tables', 'a.csv'), `${head}\nc1,b,p,1,2\n`)
+  writeFileSync(join(dir, 'tables', 'C.CSV'), `${head}\nc3,b,p,1,2\n`)
   writeFileSync(join(dir, 'tables', 'notes.txt'), 'not rows')
   mkdirSync(join(dir, 'empty'))
   writeFileSync(join(dir, 'none.csv'), `${head}\n`)
 
-  it('reads a folder of .csv files in name order with their bytes', () => {
+  it('reads a folder of .csv files of any case in name order with their bytes', () => {
     const { rows, files } = readRows(join(dir, 'tables'))
-    expect(rows.map((r) => r.cartridge)).toEqual(['c1', 'c2'])
-    expect(files.map((f) => f.toString().split('\n')[1])).toEqual(['c1,b,p,1,2', 'c2,b,p,1,2'])
+    expect(rows.map((r) => r.cartridge)).toEqual(['c3', 'c1', 'c2'])
+    expect(files.map((f) => f.toString().split('\n')[1])).toEqual([
+      'c3,b,p,1,2',
+      'c1,b,p,1,2',
+      'c2,b,p,1,2',
+    ])
   })
 
   it('refuses a missing path, an empty folder and a file without rows', () => {
-    expect(() => readRows(join(dir, 'missing'))).toThrow('does not exist')
-    expect(() => readRows(join(dir, 'empty'))).toThrow('no .csv file')
+    expect(() => readRows(join(dir, 'missing'))).toThrow(
+      'the --rows path (or BALLISTICS_ROWS) does not exist',
+    )
+    expect(() => readRows(join(dir, 'empty'))).toThrow(
+      'the --rows folder (or BALLISTICS_ROWS) holds no .csv file',
+    )
     expect(() => readRows(join(dir, 'none.csv'))).toThrow('no row')
   })
 })

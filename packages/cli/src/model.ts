@@ -79,8 +79,9 @@ export async function loadModel(spec: string): Promise<Model> {
   let loaded: { interior?: unknown }
   try {
     loaded = (await import(pathToFileURL(path).href)) as { interior?: unknown }
-  } catch {
-    throw new UsageError(`the model module ${spec} cannot be loaded`)
+  } catch (error) {
+    const cause = String(error instanceof Error ? error.message : error).split('\n')[0]
+    throw new UsageError(`the model module ${spec} cannot be loaded: ${cause}`)
   }
   if (typeof loaded.interior !== 'function')
     throw new UsageError(`the model module ${spec} exports no function "interior"`)

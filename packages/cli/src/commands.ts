@@ -119,11 +119,19 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
 
 /** The `verify` result a baseline file holds; a `UsageError` for a file that is not one. */
 function savedResult(path: string): VerifyResult {
+  let text: string
+  try {
+    text = readFileSync(path, 'utf8') // NOSONAR: the path is the argument the user gave
+  } catch (error) {
+    throw new UsageError(
+      `the --baseline file cannot be read: ${(error as NodeJS.ErrnoException).code}`,
+    )
+  }
   let json: unknown
   try {
-    json = JSON.parse(readFileSync(path, 'utf8')) // NOSONAR: the path is the argument the user gave
+    json = JSON.parse(text.replace(/^\uFEFF/, ''))
   } catch {
-    throw new UsageError('the baseline file cannot be read as JSON')
+    throw new UsageError('the --baseline file is not JSON')
   }
   const parsed = verifyResult.safeParse(json)
   if (!parsed.success) throw new UsageError('the baseline file is not a verify result')
