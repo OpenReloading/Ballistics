@@ -216,6 +216,22 @@
       "the powder has no interior model",
       "the bore resistance of the powder needs {list}"
     ],
+    "pooled powder fit": [
+      "parameters: burnRate, temperatureFactor, each at most once, burnRate always",
+      "rifleSigma and lotSigma must be positive",
+      "at least one ladder point per session",
+      "ladder charge and velocity positive",
+      "velocitySigma on every point",
+      "the pooled fit takes velocities only",
+      "barrel length and temperature per session",
+      "the sessions of a powder share one burn kind",
+      "a prior needs its powder in the sessions",
+      "prior {kind} of {group}: value and sigma above 0",
+      "the pooled fit has no covariance",
+      "velocitySigma must be 0 or above",
+      "the powder of the target must be one of the fit",
+      "at least one held-out string"
+    ],
     "ladders": [
       "ladder start charge must be above 0",
       "ladder step must be above 0",
