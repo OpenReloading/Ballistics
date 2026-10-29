@@ -127,7 +127,7 @@ Margins by the accept rule:
 
 ## Result
 
-No change. No margin keeps the interval at its stated level outside the fitted range once any model error is present, so the flag belongs at the range edge (margin 0, a rounding tolerance of 2.5 % above for barrel length and bore diameter at most) and the interval outside the range needs widening instead. Not adopted by this entry: the domain of a fit keeps its default margin `powderDomainMargin` of 0.05 on every axis. Proposed and not built: a fixed-input term for the velocity interval, as `powderPressureRange` has for the pressure; a model-error term that grows with the distance outside the range, sized from the factors above (in `structure-mild` 1.7 inside, 2.1 at +1 %, 2.6 at +5 %, 3.1 at +10 %, 3.9 at +25 %), whose size needs real sessions.
+No change. No margin keeps the interval at its stated level outside the fitted range once any model error is present, so the flag belongs at the range edge (margin 0, a rounding tolerance of 2.5 % above for barrel length and bore diameter at most) and the interval outside the range needs widening instead. Adopted after this entry: `powderDomainMargin` is 0 on every axis (it was 0.05), with a tolerance of 2.5 % above for barrel length and bore diameter. Proposed and not built: a fixed-input term for the velocity interval, as `powderPressureRange` has for the pressure; a model-error term that grows with the distance outside the range, sized from the factors above (in `structure-mild` 1.7 inside, 2.1 at +1 %, 2.6 at +5 %, 3.1 at +10 %, 3.9 at +25 %), whose size needs real sessions.
 
 ## Data basis
 
