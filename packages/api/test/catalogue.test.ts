@@ -199,6 +199,23 @@ describe('open', () => {
       categories: ['air-pistol', 'air-rifle'],
     })
   })
+
+  it('lists a face without a federation without federation and organization', () => {
+    const face = { ...defined(bundle.targetFaces[0]), id: 'club-face', federation: undefined }
+    const open = openCatalogue(buildCatalogue({ ...bundle, targetFaces: [face] }))
+    expect(open.targetFaces().items).toEqual([
+      { id: 'club-face', name: 'Test Face', caliberClasses: [], categories: ['air-rifle'] },
+    ])
+  })
+
+  it('names a target mapping whose discipline is unknown, one mapping or several', () => {
+    const mapping = defined(bundle.targetMappings[0])
+    const stray = { ...mapping, id: 'stray', discipline: 'nobody' }
+    for (const targetMappings of [[stray], [mapping, stray]])
+      expect(() => buildCatalogue({ ...bundle, targetMappings })).toThrow(
+        'stray: unknown discipline nobody',
+      )
+  })
 })
 
 describe('files', () => {

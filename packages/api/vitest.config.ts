@@ -15,7 +15,7 @@ export default defineConfig({
       ],
       reporter: ['text-summary', 'lcov'],
       // floors: the measured value rounded down, minus one
-      thresholds: { statements: 97, branches: 92, functions: 97, lines: 97 },
+      thresholds: { statements: 97, branches: 94, functions: 97, lines: 97 },
     },
   },
 })

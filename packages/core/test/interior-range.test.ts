@@ -4,6 +4,7 @@ import {
   type ApplyTolerance,
   type InteriorLoad,
   interior,
+  interiorApply,
   interiorPressureRange,
   type PressureInput,
   type PressureTolerances,
@@ -296,5 +297,42 @@ describe('placeMaximum', () => {
       burnRateFraction: 0,
     })
     expect(placeMaximum(none, p0)).toEqual({ class: 'inputPlausible', dominantInput: null })
+  })
+})
+
+describe('toleranceRange cases', () => {
+  it('labels each case and its side', () => {
+    const r = toleranceRange(toy, closed(toy), toyApply, closed, toyTolerances)
+    expect(r.quantity).toBe('maxPressure')
+    expect(r.cases.map((c) => [c.input, c.side])).toEqual([
+      ['chargeFraction', 1],
+      ['chargeFraction', -1],
+      ['volumeFraction', 1],
+      ['volumeFraction', -1],
+      ['burnRateFraction', 1],
+      ['burnRateFraction', -1],
+      ['all', 1],
+      ['all', -1],
+    ])
+  })
+
+  it('takes the side from the one end that could be computed', () => {
+    const p0 = closed(toy)
+    const capped = {
+      ...toyApply,
+      chargeFraction: (l: Toy, s: number, t: number) =>
+        s === -1 ? 'outsideModel' : scale('q')(l, s, t),
+    }
+    const r = toleranceRange(toy, p0, capped, closed, toyTolerances)
+    expect(r.cases.at(-2)?.sides?.chargeFraction).toBe(1)
+    expect(r.cases.at(-1)?.reason).toBe('outsideModel')
+  })
+
+  it('moves the bullet mass of an interior load', () => {
+    const moved = interiorApply.massFraction(m3Load, -1, 0.1)
+    expect(typeof moved === 'string' ? moved : moved.bullet).toEqual({
+      ...m3Load.bullet,
+      mass: m3Load.bullet.mass * 0.9,
+    })
   })
 })

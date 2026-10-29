@@ -82,9 +82,9 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
   const mappedFaces = new Map<string, Discipline[]>()
   const disciplines = new Map(source.disciplines.map((d) => [d.id, d]))
   for (const m of source.targetMappings) {
-    const d = disciplines.get(now('disciplines', m.discipline))
+    const d = disciplineOf(disciplines, m, now)
     const face = now('target-faces', m.face)
-    if (d) mappedFaces.set(face, [...(mappedFaces.get(face) ?? []), d])
+    mappedFaces.set(face, [...(mappedFaces.get(face) ?? []), d])
   }
   const capacities = new Map<string, string[]>()
   for (const c of source.capacities.toSorted((a, b) => compareKeys(a.id, b.id))) {
