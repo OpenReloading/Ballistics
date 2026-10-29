@@ -5276,12 +5276,12 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .panel-head:has(> .lot-field) > .search {
-    min-width: 6rem;
+    min-width: 4rem;
   }
 
+  /* what the icon, the search's least width, the lot, the menu and the four gaps leave */
   .workbench .panel-head:has(> .lot-field) > .panel-title {
-    flex: 0 1 auto;
-    min-width: 0;
+    max-width: calc(100% - 1.125rem - 4rem - 4.5rem - var(--field-height) - 4 * 0.375rem);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
