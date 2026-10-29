@@ -7,6 +7,16 @@ import { fromSi } from '@open-reloading/schema'
 export type ViewBox = { x: number; y: number; w: number; h: number }
 type Pt = { x: number; y: number }
 
+/** The box around `pts` with a 10 % margin of the larger side (1 unit at least); a 1000 unit square without points. */
+export function boxAround(pts: Pt[]): ViewBox {
+  if (!pts.length) return { x: 0, y: 0, w: 1000, h: 1000 }
+  const xs = pts.map((p) => p.x)
+  const ys = pts.map((p) => p.y)
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const m = 0.1 * Math.max(x1 - x0, y1 - y0, 1)
+  return { x: x0 - m, y: y0 - m, w: x1 - x0 + 2 * m, h: y1 - y0 + 2 * m }
+}
+
 /** Export px per target mm of a drawn target. */
 const drawnPxPerMm = 10
 

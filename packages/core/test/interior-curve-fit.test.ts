@@ -270,6 +270,69 @@ describe('joint curve fit of several traces', () => {
     expect(joint.correlation).toHaveLength(7)
   })
 
+  it('states the interval of the exponent and its refits without each trace', () => {
+    const exponent = find(joint.parameters, 'exponent')
+    const { low, high: top } = exponent.interval ?? { low: Number.NaN, high: Number.NaN }
+    const u = exponent.relativeStandardUncertainty ?? Number.NaN
+    expect(Math.log(top / exponent.value) / u).toBeCloseTo(2.2, 12)
+    expect(Math.log(exponent.value / low) / u).toBeCloseTo(2.2, 12)
+    expect(low).toBeLessThan(0.5)
+    expect(top).toBeGreaterThan(0.5)
+    expect(exponent.leaveOneOut).toHaveLength(3)
+    for (const n of exponent.leaveOneOut ?? []) expect(n).toBeCloseTo(0.5, 1)
+    expect(find(joint.parameters, 'burnRate').interval).toBeUndefined()
+  })
+
+  it('refits without each trace only with three or more traces', () => {
+    const two = fitPressureCurves(high, [nth(set, 0), nth(set, 2)], base)
+    const exponent = find(two.parameters, 'exponent')
+    expect(exponent.status).toBe('identified')
+    expect(exponent.interval).toBeDefined()
+    expect(exponent.leaveOneOut).toBeUndefined()
+  })
+
+  it('names an exponent the traces do not agree on', () => {
+    // the middle trace burns 5 % faster, as another powder lot would
+    const odd = { ...load({ ...truthBurn, vivacity: 8.4 }), charge: 0.0027 }
+    const fit = fitPressureCurves(
+      high,
+      [nth(set, 0), { charge: 0.0027, trace: trace(odd, 0.005, 'breech', 12) }, nth(set, 2)],
+      base,
+    )
+    const exponent = find(fit.parameters, 'exponent')
+    expect(exponent.status).toBe('weak')
+    expect(exponent.reasons).toEqual(['inconsistent'])
+    expect(exponent.value).not.toBe(exponent.initial)
+  })
+
+  it('does not see heat loss and bore friction the fitted model lacks', () => {
+    const lossy = (charge: number, seed: number): ChargedTrace => ({
+      charge,
+      trace: trace(
+        {
+          ...truth,
+          charge,
+          heat: { model: 'convective', flameTemperature: 2800, factor: 0.5 },
+          resistance: { friction: 2.5e6 },
+        },
+        0.005,
+        'breech',
+        seed,
+      ),
+    })
+    const fit = fitPressureCurves(
+      high,
+      [lossy(0.0024, 51), lossy(0.0027, 52), lossy(0.003, 53)],
+      base,
+    )
+    const exponent = find(fit.parameters, 'exponent')
+    // the interval misses the true 0.5, while the residuals and the refits look like noise
+    expect(exponent.interval?.high).toBeLessThan(0.5)
+    expect(exponent.status).toBe('identified')
+    expect(exponent.leaveOneOut).toHaveLength(3)
+    expect(fit.chiSquare / fit.degreesOfFreedom).toBeLessThan(1.2)
+  })
+
   it('holds the exponent with one trace of the same set', () => {
     const one = fitPressureCurves(high, set.slice(2), base)
     expect(find(one.parameters, 'exponent').status).toBe('fixed')

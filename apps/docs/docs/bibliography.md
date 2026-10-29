@@ -16,6 +16,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="belsley-1980"></a>**Belsley 1980.** D. A. Belsley, E. Kuh, R. E. Welsch: *Regression Diagnostics: Identifying Influential Data and Sources of Collinearity*. Wiley, New York, 1980.
 - <a id="bishop-2006"></a>**Bishop 2006.** C. M. Bishop: *Pattern Recognition and Machine Learning*. Springer, New York, 2006.
 - <a id="corner-1950"></a>**Corner 1950.** J. Corner: *Theory of the Interior Ballistics of Guns*. John Wiley & Sons, New York, 1950.
+- <a id="efron-1982"></a>**Efron 1982.** B. Efron: *The Jackknife, the Bootstrap and Other Resampling Plans*. CBMS-NSF Regional Conference Series in Applied Mathematics 38, SIAM, Philadelphia, 1982. doi:10.1137/1.9781611970319. <https://doi.org/10.1137/1.9781611970319>
 - <a id="gelman-2013"></a>**Gelman 2013.** A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, D. B. Rubin: *Bayesian Data Analysis*, 3rd edition. Chapman and Hall/CRC, Boca Raton, 2013.
 - <a id="golub-2013"></a>**Golub 2013.** G. H. Golub, C. F. Van Loan: *Matrix Computations*, 4th edition. Johns Hopkins University Press, Baltimore, 2013.
 - <a id="grubbs-1991"></a>**Grubbs 1991.** F. E. Grubbs: *Statistical Measures of Accuracy for Riflemen and Missile Engineers*. 2nd edition, March 1991, 3rd printing, December 1991 (1st printing 1964).

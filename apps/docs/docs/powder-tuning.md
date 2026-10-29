@@ -19,6 +19,10 @@ You need a saved load in the [Load workbench](https://openreloading.github.io/Ba
 6. **Save as a powder.** Give a Powder name and choose Save as a powder. The record holds the fitted values, never the hand-tuned ones, and the strings it was fitted from. The Powder search of the workbench then lists it as your design; choose it in the load to simulate with it. To use hand-tuned values, type them on the workbench, where they are marked hand-tuned.
 7. **Refit later.** Fire more strings with a load that uses your fitted powder, map them on the Measurements tab and open the tuning screen again. Saving makes a new record named "<name> (fit 2)", then 3 and on, so the loads on the earlier fit run as before.
 
+## Exporting a powder
+
+In the powder designer, the File menu's Save writes the powder as a user data file: the stored record, its `draft` (the powder fields entered so far) and, for a fitted powder, its `fit` block (the points, the confidence and its reasons). Open file or Import reads that file back unchanged, in this or another browser. Copy JSON copies the same record. A powder has no share link: send the file instead. There is no export of the built powder in the catalogue record format for a catalogue pull request. The file's fields are in [Fit of a user powder](data/record-model.md#fit-of-a-user-powder).
+
 ## Notes and refusals
 
 The screen says when it fitted fewer values than it was asked for, or could not fit:
