@@ -38,6 +38,7 @@ import {
   type EditorProposal,
   expectedHoleSize,
   isMaybe,
+  isNominal,
   localPxPerM,
   proposalsClearOfShots,
   rectangleFromDiagonal,
@@ -341,8 +342,8 @@ export function useHoleDetection({
       (m) => {
         if (m.kind !== 'proposals') return
         const n = show(m, m.holeDiameter ?? hole0, pxPerM, auto)
-        // the size the holes show, for later runs
-        if (n && auto && m.holeDiameter !== undefined)
+        // the size the holes show, for later runs; a bullet or marker keeps its nominal size and source
+        if (n && auto && !isNominal(size) && m.holeDiameter !== undefined)
           setChoice({ expectedHoleDiameter: m.holeDiameter }, 'auto')
         if (!n)
           say(
@@ -1006,7 +1007,7 @@ function faceChoices(
 function chosenFace(group: ShotGroup | undefined, choices: FaceChoice[]) {
   const chosen = group?.face && `${group.face.id}|${group.face.event ?? ''}`
   if (chosen && choices.some((c) => c.value === chosen)) return chosen
-  return choices.find((c) => c.value === group?.face?.id)?.value ?? ''
+  return choices.find((c) => c.value.split('|')[0] === group?.face?.id)?.value ?? ''
 }
 
 /** The photo's quality problems, each with what to change when retaking it; `held` says the run waits. */

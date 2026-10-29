@@ -25,6 +25,10 @@ export const MIN_HOLES_TO_LEARN_SIZE = 3
 
 type HoleSize = { diameter: number; source: 'typed' | 'learned' | 'bullet' | 'marker' }
 
+/** True for a size a bullet or a marker gives: a nominal diameter, not a hole in paper. */
+export const isNominal = (size: { source: string } | undefined): boolean =>
+  size?.source === 'bullet' || size?.source === 'marker'
+
 /**
  * Expected hole diameter, m (own rule, `apps/docs/docs/models/hole-detection.md`, "Hole size"): the size the user typed;
  * else the median of the measured holes of confirmed shots once there are `MIN_HOLES_TO_LEARN_SIZE` of them; else

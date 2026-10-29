@@ -185,6 +185,8 @@ $$
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `expectedHoleSize`, `MIN_HOLES_TO_LEARN_SIZE`.
 
+The size an auto run measures takes the place of a typed size for later runs, except where a bullet or a marker gives the size: that nominal size and its source stay.
+
 An accepted proposal that is the only shot of its part keeps its measured diameter:
 
 $$

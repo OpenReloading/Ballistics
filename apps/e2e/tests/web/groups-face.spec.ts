@@ -201,7 +201,8 @@ test('a known hole size: from choosing the photo to Accept is 2 actions, no shot
   await expect(resultLine(page)).toContainText('Air Pistol')
   await expect(resultLine(page)).toContainText('1 reference')
   await expect(resultLine(page)).toContainText('6 proposed')
-  await expect(resultLine(page)).toContainText('(marker)')
+  // the marker's size preselects its caliber class, which the line names with the size
+  await expect(resultLine(page)).toContainText('4.5 mm (.177) air (4.50)')
   // no slider on the main path, and the proposals are no shots yet
   await expect(page.locator('.detect-step').getByRole('slider')).toHaveCount(0)
   await expect(shotField(page)).toHaveCount(0)
