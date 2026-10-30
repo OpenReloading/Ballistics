@@ -199,6 +199,8 @@ type Run = {
   ring: LogRgb
   /** The shots where the ring numerals stand (a face label with rings), also in `shots`. */
   zone?: HoleProposal[]
+  /** The shots of filled print areas with holes in them (`enclosesHoles`), also in `shots`. */
+  filled?: HoleProposal[]
 }
 type Ctx = WorkImage & {
   blockSize: number
@@ -383,7 +385,12 @@ function solved(
       : { mu: [Math.log(backing.r + 8), Math.log(backing.g + 8), Math.log(backing.b + 8)] }
   const sized = estimateHoleSize(ctx, seed, refine)
   if (!sized) return undefined
-  const { run, holeDiameter } = sized
+  const { holeDiameter } = sized
+  // the seed runs keep the filled print areas: a seed on the light holes of a filled area may only
+  // find the area at the seeds' scale, and the full pass the holes
+  const run = last
+    ? { ...sized.run, shots: sized.run.shots.filter((q) => !sized.run.filled?.includes(q)) }
+    : sized.run
   const { marks, zone } = dropPrintMarks(ctx, run, printed)
   const found: Found = {
     // on a face without a drawn region the region is the face: a flier on it is a shot
@@ -757,7 +764,7 @@ function pipeline(ctx: Ctx, holeDiameter: number, seed: Seed): Run | undefined {
   const kept = testPeaks(peaks, mask, parts, { w, h, keep: ctx.keep, r5, holeDiameter })
   run.sizes = estimateSize(kept, scales, w)
   run.size = run.sizes.length ? median1(run.sizes) : holeDiameter
-  run.shots = shotsFromParts(kept, parts, r5, holeDiameter)
+  Object.assign(run, shotsFromParts(kept, parts, r5, holeDiameter, w))
   return run
 }
 
@@ -830,31 +837,85 @@ function estimateSize(kept: Map<number, Peak[]>, scales: Space, w: number): numb
     .map((p) => D_OVER_SIGMA * sigmaAt(scales, Math.round(p.y) * w + Math.round(p.x)))
 }
 
-/** One shot per kept peak; the peaks of one part form a cluster, a part far larger than its holes is print. */
+/**
+ * One shot per kept peak; the peaks of one part form a cluster, a part far larger than its holes is
+ * print. `filled`: the shots of a filled print area with holes in it (`enclosesHoles`).
+ */
 function shotsFromParts(
   kept: Map<number, Peak[]>,
   parts: number[][],
   r5: number,
   holeDiameter: number,
-): HoleProposal[] {
+  w: number,
+): { shots: HoleProposal[]; filled: HoleProposal[] } {
   const shots: HoleProposal[] = []
+  const filled: HoleProposal[] = []
   let clusterId = 0
   for (const [k, list] of kept) {
-    const diameter = Math.sqrt((4 * nth(parts, k).length) / (Math.PI * list.length))
+    const part = nth(parts, k)
+    const diameter = Math.sqrt((4 * part.length) / (Math.PI * list.length))
     // print: a part with far more area than its peaks have holes
     if (diameter > MAX_PART * holeDiameter) continue
-    for (const p of list)
-      shots.push({
+    const print = enclosesHoles(part, w, holeDiameter)
+    for (const p of list) {
+      const shot = {
         x: p.x,
         y: p.y,
         confidence: clamp(p.response / r5, 0, 1),
         clusterSize: list.length,
         clusterId,
         diameter,
-      })
+      }
+      shots.push(shot)
+      if (print) filled.push(shot)
+    }
     clusterId++
   }
-  return shots
+  return { shots, filled }
+}
+
+/**
+ * Whether the areas off `part` (pixel indices of an image `w` wide) that it encloses are holes of
+ * the other polarity: at least one of a hole's size, `SIZE_MIN` to `SIZE_MAX` of `holeDiameter`
+ * across as a disc of its area, and none larger. A print line around paper encloses more.
+ */
+function enclosesHoles(part: readonly number[], w: number, holeDiameter: number): boolean {
+  let [x0, y0, x1, y1] = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, -1, -1]
+  for (const i of part) {
+    const [x, y] = [i % w, Math.floor(i / w)]
+    ;[x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)]
+  }
+  const [bw, bh] = [x1 - x0 + 1, y1 - y0 + 1]
+  // 1: the part, 2: reached from the edge
+  const box = new Uint8Array(bw * bh)
+  for (const i of part) box[(Math.floor(i / w) - y0) * bw + (i % w) - x0] = 1
+  const stack: number[] = []
+  const visit = (j: number) => {
+    if (box[j]) return
+    box[j] = 2
+    stack.push(j)
+  }
+  for (let x = 0; x < bw; x++) {
+    visit(x)
+    visit((bh - 1) * bw + x)
+  }
+  for (let y = 0; y < bh; y++) {
+    visit(y * bw)
+    visit(y * bw + bw - 1)
+  }
+  for (let j = stack.pop(); j !== undefined; j = stack.pop()) {
+    const x = j % bw
+    if (x > 0) visit(j - 1)
+    if (x < bw - 1) visit(j + 1)
+    if (j >= bw) visit(j - bw)
+    if (j < (bh - 1) * bw) visit(j + bw)
+  }
+  const across = components(
+    box.map((v) => (v ? 0 : 1)),
+    bw,
+    bh,
+  ).map((c) => Math.sqrt((4 * c.length) / Math.PI) / holeDiameter)
+  return across.some((d) => d >= SIZE_MIN) && across.every((d) => d <= SIZE_MAX)
 }
 
 /**

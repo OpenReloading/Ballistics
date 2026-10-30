@@ -163,6 +163,10 @@ $$
 
 Code: `apps/web/src/lib/hole-detection.ts`, `pipeline`, `shotsFromParts`, `MAX_PART`. `apps/web/src/lib/raster-ops.ts`, `components`.
 
+A part is also print when it is a filled area with holes of the other polarity in it: of the areas off the mask that it encloses (not reached by a fill from the edge of its bounding box), at least one is the size of a hole and none is larger. An area counts as the size of a hole when a disc of its area is $0.7 D$ to $1.4 D$ across, the hole sizes a run takes. Paper inside a printed ring line is far larger, so a hole joined to a ring line keeps its part. This drops a filled black square with light holes shot into it, which the opening by $2 D$ cannot remove once the holes leave no room for the square $Q$. The seed runs of the detection without a picked hole keep such a part, so the run chosen does not change: a seed on a light hole of the square can find only the square on the coarse copy, while its run on the full working image finds the holes.
+
+Code: `apps/web/src/lib/hole-detection.ts`, `shotsFromParts`, `enclosesHoles`, `solved`, `SIZE_MIN`, `SIZE_MAX`.
+
 A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step, and Accept all and the proposal count leave it out. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `MAYBE_BELOW`, `isMaybe`.
@@ -408,7 +412,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 - The holes set the scale only when they stand on the black area and show lighter than it.
 - The target search does not read the ring numerals: on a photo of an insert card the targets whose inner rings stand in the same ratios are offered for the user to choose.
 - The photo scale comes from the sheet's calibration near the middle of the region. Perspective across the region is not corrected per hole.
-- On the printed zero target (Shot groups, Zero target) a run finds one polarity: the light holes in the black square need a region about the square, the dark holes on the paper a second run. The dark run over the whole sheet proposes the four corners of the black square and two spots inside it as holes (6 proposals on a synthetic render with five holes near the centre); the corner marks, the digits, the cross and the check bar give none.
+- On the printed zero target (Shot groups, Zero target) a run finds one polarity: the light holes in the black square need a region about the square, the dark holes on the paper a second run. The dark run over the whole sheet proposes nothing on the black square while the light holes in it lie inside it (0 proposals on the print of a synthetic render with five holes near the centre); the corner marks, the digits, the cross and the check bar give none. A light hole that cuts the square's edge encloses no area, so the dark run can still propose spots of the square near it (3 on a synthetic render with one such hole). Light holes in the square that merge into an area larger than a hole leave the square in the dark run too. A ring of touching dark holes around a hole-sized patch of paper is dropped as print.
 - Research log: [blob detector against an area-count detector](../research/hole-detection-blob-detector.md), [target centre on a tilted photo](../research/hole-detection-target-centre.md), [rings needed to apply a target](../research/hole-detection-ring-match-count.md).
 
 ## Sources
