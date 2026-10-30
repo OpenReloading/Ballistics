@@ -86,6 +86,7 @@ export function DisciplineList({
     },
     {
       key: 'category',
+      wide: true,
       label: msg('Category'),
       width: '11rem',
       value: (r) => r.category ?? '',
@@ -93,6 +94,7 @@ export function DisciplineList({
     },
     {
       key: 'classes',
+      wide: true,
       label: msg('Caliber classes'),
       width: '14rem',
       value: classes,

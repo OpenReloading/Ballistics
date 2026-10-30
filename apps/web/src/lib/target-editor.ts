@@ -16,7 +16,7 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
-import { type Message, msg } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { nth } from './nth.ts'
 import {
   applyMatrix,
@@ -158,11 +158,16 @@ export const withoutRegions = <S extends Pick<TargetSheet, 'groups'>>(sheet: S):
 /** Group colours in order of creation: the light chart series colours (`--series-*`). */
 export const groupColours = ['#eb6834', '#2a78d6', '#19a371', '#c18300', '#e46494', '#008300']
 
-export function newGroup(sheet: TargetSheet, id: string, distance: number): ShotGroup {
+export function newGroup(
+  sheet: TargetSheet,
+  id: string,
+  distance: number,
+  t: Translator['t'],
+): ShotGroup {
   const n = sheet.groups.length + 1
   return {
     id,
-    name: `Group ${n}`,
+    name: t('Group {n}', { n }),
     colour: nth(groupColours, (n - 1) % groupColours.length),
     distance,
     shots: [],

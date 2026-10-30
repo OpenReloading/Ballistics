@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { TargetEditor } from '../../components/target-editor.tsx'
+import { msg } from '../../i18n/translate.ts'
 
 export const metadata: Metadata = {
   title: 'Shot groups',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function GroupsPage() {
   return (
     <div className="groups-page">
-      <TargetEditor heading="Shot groups" />
+      <TargetEditor heading={msg('Shot groups')} />
     </div>
   )
 }

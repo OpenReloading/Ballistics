@@ -1,5 +1,6 @@
 import type { Bullet, Powder, Provenance } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
+import de from '../src/i18n/de.json'
 import { msg, translator } from '../src/i18n/translate.ts'
 import {
   ballisticCoefficientRows,
@@ -113,17 +114,36 @@ it('shows the jacket wall, core hardness, gas check, driving bands and the deriv
 
 it('names the added construction values in one line', () => {
   expect(
-    constructionRows({ raw: 'x', structure: 'cast', core: { material: 'lead' }, gasCheck: true })[0]
-      ?.text,
+    constructionRows(
+      { raw: 'x', structure: 'cast', core: { material: 'lead' }, gasCheck: true },
+      english,
+    )[0]?.text,
   ).toBe('Cast, lead core, gas check')
   expect(
-    constructionRows({
-      raw: 'x',
-      structure: 'monolithic',
-      core: { material: 'copper' },
-      drivingBands: 3,
-    })[0]?.text,
+    constructionRows(
+      {
+        raw: 'x',
+        structure: 'monolithic',
+        core: { material: 'copper' },
+        drivingBands: 3,
+      },
+      english,
+    )[0]?.text,
   ).toBe('Monolithic, copper core, 3 driving bands, lead free')
+})
+
+it('names the construction in German under the German setting, the wording kept as printed', () => {
+  const german = translator(de, 'de')
+  const [row] = constructionRows(
+    {
+      raw: 'Cup and core, gilding metal jacket',
+      structure: 'cup-and-core',
+      jacket: { material: 'gilding-metal' },
+    },
+    german.t,
+  )
+  expect(row?.text).toBe('Mantel mit Kern, Mantel aus Tombak')
+  expect(row?.printed).toBe('Cup and core, gilding metal jacket')
 })
 
 it('shows each bullet dimension once, in the unit of each preset, rounded', () => {

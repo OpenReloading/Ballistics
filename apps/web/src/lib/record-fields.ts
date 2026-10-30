@@ -137,22 +137,32 @@ function formatSignificant(x: number, n: number): string {
   return formatNumber(x, Math.max(0, n - 1 - Math.floor(Math.log10(Math.abs(x)))))
 }
 
+const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** A bullet's structure as a name: "Cup and core". */
+export const structureText = (structure: string, t: Translator['t']) =>
+  capitalised(say(t, rawWording(structure)).replaceAll('-', ' '))
+
 /**
  * The construction in a few words: the structure, the core and jacket materials, the surface; a
  * wording with no structured field as printed. The manufacturer's wording shows as the printed text.
  */
-export function constructionRows(c: Bullet['construction']): FieldRow[] {
+export function constructionRows(c: Bullet['construction'], t: Translator['t']): FieldRow[] {
   if (!c) return []
+  const material = (value: string) => say(t, spacedWording(value))
   const parts = [
-    c.structure,
-    c.core && `${c.core.material} core`,
-    c.jacket && `${c.jacket.material ?? ''} jacket`.trim(),
-    ...(c.surface ?? []),
-    c.gasCheck && 'gas check',
-    c.drivingBands && `${c.drivingBands} driving bands`,
-    leadFree(c) && 'lead-free',
+    c.structure && structureText(c.structure, t),
+    c.core && t('{material} core', { material: material(c.core.material) }),
+    c.jacket &&
+      (c.jacket.material
+        ? t('{material} jacket', { material: material(c.jacket.material) })
+        : t('jacket')),
+    ...(c.surface ?? []).map(material),
+    c.gasCheck && t('gas check'),
+    c.drivingBands && t('{n} driving bands', { n: c.drivingBands }),
+    leadFree(c) && t('lead free'),
   ].filter(Boolean)
-  const text = parts.length > 0 ? titleFromKebab(parts.join(', ')) : c.raw
+  const text = parts.length > 0 ? capitalised(parts.join(', ')) : c.raw
   return [{ label: msg('Construction'), text, ...(text !== c.raw && { printed: c.raw }) }]
 }
 

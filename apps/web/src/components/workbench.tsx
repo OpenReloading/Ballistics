@@ -1391,11 +1391,7 @@ export function Workbench() {
                 // or Page actions
                 const opener = listOpener.current
                 listOpener.current = undefined
-                focusBack(
-                  opener,
-                  '.file-menu button',
-                  '.page-bar button[aria-label="Page actions"]',
-                )
+                focusBack(opener, '.file-menu button', '.page-bar .page-bar-toggle')
               }}
               tick={storedTick}
               openIds={tabs.openIds}
