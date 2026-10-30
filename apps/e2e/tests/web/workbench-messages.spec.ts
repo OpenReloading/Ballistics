@@ -187,20 +187,18 @@ test('each severity paints its own fill and text, axe clean in light and dark', 
   }
 })
 
-test('the notice line keeps its box through a result with warnings, an error and no warnings', async ({
+test('the notice line and the notes keep their box through a result with warnings, an error and no warnings', async ({
   page,
 }) => {
   test.setTimeout(60_000)
   await page.goto('/workbench')
   await applyExampleLoad(page)
   const line = page.locator('.run-line')
-  const slot = page.locator('.warnings-slot')
   const charge = loadForm(page).getByLabel(/^Charge mass/)
   const seen = async () => ({
     line: await box(line),
     // what follows the line starts where it did
     below: (await box(line.locator('xpath=following-sibling::*[1]'))).top,
-    slot: { ...(await box(slot)), top: 0, height: 0 },
   })
   const idle = await seen()
   // 2.4 g: a result without warnings; 2.8 g: a result over its limit with a warning; 60 g: the
@@ -221,36 +219,10 @@ test('the notice line keeps its box through a result with warnings, an error and
       await expect(page.locator('.results-error')).toContainText(
         'The charge does not fit the chamber',
       )
-    const warnings = page.locator('.run-line .warnings-slot').getByRole('button')
+    const warnings = page.locator('.result-notes li[data-kind="warning"]')
     await expect(warnings).toHaveCount(grams === '2.8' ? 1 : 0)
     await expect.poll(seen).toEqual(idle)
   }
-})
-
-test('the warnings list keeps its height, scrolls and takes focus only once it scrolls', async ({
-  page,
-}) => {
-  test.setTimeout(60_000)
-  await page.goto('/workbench')
-  await applyExampleLoad(page)
-  const charge = loadForm(page).getByLabel(/^Charge mass/)
-  await charge.fill('2.8')
-  await charge.press('Control+Enter')
-  await page.locator('.warnings-slot').getByRole('button').click()
-  const list = page.getByRole('list', { name: 'Warnings' })
-  await expect(list).toBeVisible()
-  // one warning fits: no tab stop
-  await expect(list).not.toHaveAttribute('tabindex')
-  const height = () => list.evaluate((el) => el.getBoundingClientRect().height)
-  const one = await height()
-  // many (cloned from the one shown): the list stops at the window's share and scrolls
-  await list.evaluate((el) => {
-    for (let k = 0; k < 40; k++) el.append((el.firstElementChild as Element).cloneNode(true))
-  })
-  await expect(list).toHaveAttribute('tabindex', '0')
-  expect(await height()).toBeGreaterThan(one)
-  expect(await height()).toBeLessThanOrEqual((await page.evaluate(() => innerHeight)) * 0.4 + 1)
-  expect(await list.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
 })
 
 test('a ladder step size error in the Powder card moves no card and adds no scroll', async ({

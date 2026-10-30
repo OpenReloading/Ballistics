@@ -26,7 +26,8 @@ const overflowing = (page: Page) =>
       e.matches('.workspace-inputs, .ladder-cells, .workspace-results')
     const directions = (h: number, w: number) => `${h > 1 ? 'v' : ''}${w > 1 ? 'h' : ''}`
     const element = (e: HTMLElement): string[] => {
-      if (!watched(e)) return []
+      // the result notes scroll in their box of fixed height; More shows them all
+      if (!watched(e) || e.matches('.result-notes > ul')) return []
       const [h, w] = [e.scrollHeight - e.clientHeight, e.scrollWidth - e.clientWidth]
       // the ladder steps are one row that scrolls sideways, never down
       const wide = w > 1 && !e.matches('.ladder-cells')
@@ -77,8 +78,10 @@ for (const [width, height, shown] of [
       await page.setViewportSize({ width, height })
       await runExample(page)
       if (ladder) await runLadder(page, ...ladder)
-      // the sampled band and its line follow the result
-      await expect(page.locator('.band-line')).toBeVisible({
+      // the sampled band and its note follow the result
+      await expect(
+        page.locator('.result-notes li', { hasText: /(Velocity|Sampled)/ }),
+      ).toBeAttached({
         timeout: 10_000,
       })
       await expect.poll(() => overflowing(page)).toEqual([])
@@ -96,7 +99,11 @@ for (const [state, ladder] of [states[0], states[1]])
     if (ladder) await runLadder(page, ...ladder)
     await showGerman(page)
     await expect(page.locator('.readouts dt', { hasText: 'Ladedichte' }).first()).toBeVisible()
-    await expect(page.locator('.band-line')).toBeVisible({ timeout: 10_000 })
+    await expect(
+      page.locator('.result-notes li', { hasText: /(Geschwindigkeit|Stichprobe)/ }),
+    ).toBeAttached({
+      timeout: 10_000,
+    })
     await expect.poll(() => overflowing(page)).toEqual([])
     expect(await cut(page)).toEqual([])
   })

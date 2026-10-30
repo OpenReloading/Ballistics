@@ -13,12 +13,12 @@ import type {
 } from '../lib/seating-ladder.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import {
+  bandLine,
   bulletLeadTime,
   percentOfPressureLimit,
   shownWarnings,
   solidFillWarning,
   stepLabel,
-  warningCountText,
 } from '../lib/workbench.ts'
 import type { Seated } from './seating-preview.tsx'
 
@@ -118,7 +118,7 @@ export type Outcome =
     }
 
 /** The note of a run whose chamber volume is not a measured capacity: what is estimated and what to enter. */
-export const volumeNote = {
+const volumeNote = {
   title: msg('Chamber volume not measured'),
   text: msg(
     'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card and empty the volume field to follow it.',
@@ -204,22 +204,69 @@ export function warningLines(
   return [...shownWarnings(ok.body, system, t), ...derived(ok, t).own]
 }
 
-/** The summary line of the warnings: their count, the step of a ladder and their names. */
-export function warningsLine(
+/** The kinds of a result note in their order: limits and model flags, what is missing, how a value is meant. */
+export const noteKinds = ['warning', 'message', 'note'] as const
+export type NoteKind = (typeof noteKinds)[number]
+
+/** One entry of the result's notes: its line, and the full reason with what clears it where the line is short. */
+export type ResultNote = { kind: NoteKind; line: string; text?: string | undefined }
+
+/** What clears a missing case fill, by the reason `loadRatioText` gives. */
+const fillActions = {
+  powder: msg('Choose a powder record in the Powder card.'),
+  density: msg('The powder record gives no bulk density. Choose a powder record that gives one.'),
+  volume: msg('Enter the usable case volume in the Cartridge card.'),
+}
+
+/**
+ * Everything the result panel says about the shown step, warnings first, then messages, then
+ * notes, each in the order of its source.
+ */
+export function resultNotes(
   ok: Extract<Outcome, { kind: 'ok' }>,
-  lines: { name?: string | undefined }[],
+  warnings: { text: string; name?: string | undefined }[],
+  system: UnitSystem,
   t: Translator['t'],
-  tn: Translator['tn'],
-) {
-  const names = lines.flatMap((l) => (l.name ? [l.name] : [])).join(', ')
-  const count = warningCountText(lines.length, tn)
-  if (ok.steps.length > 1) {
-    const step = selectedLabel(ok)
-    return names
-      ? t('{count} for step {step}: {names}', { count, step, names })
-      : t('{count} for step {step}', { count, step })
-  }
-  return names ? t('{count}: {names}', { count, names }) : count
+): ResultNote[] {
+  const { ratio } = derived(ok, t)
+  const band = bandLine(ok.body, system, t)
+  const fill = !ok.powderChosen ? 'powder' : !ok.bulkDensity ? 'density' : 'volume'
+  const designs = [
+    ok.cartridgeDesign &&
+      t('Case values from the user design {name}, not a catalogue record.', {
+        name: ok.cartridgeDesign,
+      }),
+    ok.powderDesign &&
+      t('Powder values from the user design {name}, not a catalogue record.', {
+        name: ok.powderDesign,
+      }),
+    ok.design &&
+      t('Computed with the bullet mass of the user design {name}, not a catalogue record.', {
+        name: ok.design,
+      }),
+  ]
+  const notes: ResultNote[] = [
+    ...warnings.map((w) => ({
+      kind: 'warning' as const,
+      line: w.name ?? w.text,
+      text: w.name ? w.text : undefined,
+    })),
+    ...(ok.volumeMeasured
+      ? []
+      : [{ kind: 'message' as const, line: t(volumeNote.title), text: t(volumeNote.text) }]),
+    ...(ratio === undefined
+      ? [
+          {
+            kind: 'message' as const,
+            line: `${t('Case fill')}: ${loadRatioText(ok, ratio, t)}`,
+            text: t(fillActions[fill]),
+          },
+        ]
+      : []),
+    ...designs.flatMap((line) => (line ? [{ kind: 'note' as const, line }] : [])),
+    ...(band ? [{ kind: 'note' as const, line: band }] : []),
+  ]
+  return noteKinds.flatMap((kind) => notes.filter((n) => n.kind === kind))
 }
 
 /**

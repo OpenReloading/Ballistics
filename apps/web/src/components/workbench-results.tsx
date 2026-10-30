@@ -2,7 +2,7 @@
 
 import { Button, Menu, Tabs, Textarea } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
-import { CaretDown, Info } from '@phosphor-icons/react'
+import { CaretDown } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -14,13 +14,13 @@ import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
 import { BarrelLength } from './barrel-length.tsx'
-import { Noted } from './field-table.tsx'
 import { LadderTarget } from './ladder-target.tsx'
 import { LazyInteriorChart } from './lazy-chart.tsx'
 import { LoadLots, SessionNotes } from './load-notes.tsx'
 import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { chartCopy } from './print-report.tsx'
+import { ResultNotes } from './result-notes.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { TrajectoryForm } from './trajectory-form.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
@@ -32,17 +32,8 @@ import {
   type ShownStep,
   singleCharge,
   stripFigureOf,
-  volumeNote,
-  warningsLine,
 } from './workbench-outcome.ts'
-import {
-  BurnRate,
-  ErrorView,
-  LadderStrip,
-  LadderTable,
-  Readouts,
-  WarningsBlock,
-} from './workbench-readouts.tsx'
+import { BurnRate, ErrorView, LadderStrip, LadderTable, Readouts } from './workbench-readouts.tsx'
 
 export const Measurements = dynamic(
   () => import('./measurements.tsx').then((m) => m.Measurements),
@@ -346,24 +337,19 @@ function CopyCsvButton({
   )
 }
 
-/**
- * One line: the load, the notice, the volume note of an estimated chamber volume and the warnings
- * with their popover in a slot of fixed width.
- */
+/** One line: the load and the notice. */
 function RunLine({
   ok,
   identity,
   status,
   echoed,
-  warnings,
 }: {
   ok: Extract<Outcome, { kind: 'ok' }> | undefined
   identity: string[] | undefined
   status: string
   echoed: boolean
-  warnings: { text: string; name?: string | undefined }[] | undefined
 }) {
-  const { t, tn } = useTranslation()
+  const { t } = useTranslation()
   return (
     <div className="run-line">
       {ok && identity && (
@@ -386,24 +372,6 @@ function RunLine({
       <span className="notice-text screen-only">
         <NavIcon name="safety" size={14} />
         {t('Simulation, not load data')}
-      </span>
-      {/* in the line, so the results keep their height; what to enter is its help. The print
-          report's sub line has the note */}
-      {ok && !ok.volumeMeasured && (
-        <span className="volume-note screen-only">
-          <Info size={14} aria-hidden="true" />
-          <Noted value={t(volumeNote.title)} notes={[t(volumeNote.text)]} />
-        </span>
-      )}
-      <span className="warnings-slot screen-only">
-        {ok && warnings && (
-          <WarningsBlock
-            key={ok.id}
-            warnings={warnings}
-            summary={warningsLine(ok, warnings, t, tn)}
-            announce={ok.announce}
-          />
-        )}
       </span>
     </div>
   )
@@ -486,36 +454,6 @@ function ResultsHead({
       )}
       {!short && <BurnFigure />}
     </div>
-  )
-}
-
-/** What the run took from the user's designs instead of a catalogue record. */
-function DesignNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> | undefined }) {
-  const { t } = useTranslation()
-  return (
-    <>
-      {ok?.cartridgeDesign && (
-        <p className="note user-design">
-          {t('Case values from the user design {name}, not a catalogue record.', {
-            name: ok.cartridgeDesign,
-          })}
-        </p>
-      )}
-      {ok?.powderDesign && (
-        <p className="note user-design">
-          {t('Powder values from the user design {name}, not a catalogue record.', {
-            name: ok.powderDesign,
-          })}
-        </p>
-      )}
-      {ok?.design && (
-        <p className="note user-design">
-          {t('Computed with the bullet mass of the user design {name}, not a catalogue record.', {
-            name: ok.design,
-          })}
-        </p>
-      )}
-    </>
   )
 }
 
@@ -649,20 +587,8 @@ function ResultPanels({ short }: { short: boolean }) {
  * so a keystroke in the inputs does not render it again.
  */
 export const ResultsArea = memo(function ResultsArea() {
-  const {
-    ok,
-    outcome,
-    identity,
-    stale,
-    warnings,
-    system,
-    todo,
-    tab,
-    setTab,
-    setSeen,
-    status,
-    pending,
-  } = useResult()
+  const { ok, outcome, identity, stale, system, todo, tab, setTab, setSeen, status, pending } =
+    useResult()
   const { t } = useTranslation()
   const next = todo.findIndex((s) => !s.done)
   const echoed =
@@ -705,16 +631,9 @@ export const ResultsArea = memo(function ResultsArea() {
               {t('Result')}
             </h2>
           )}
-          {/* one line: the load, the notice and the warnings with their popover in a slot of fixed
-              width; the run's time and the stale mark are in the page bar's status, and the status,
-              which the readouts repeat, is for screen readers */}
-          <RunLine
-            ok={ok}
-            identity={identity}
-            status={status}
-            echoed={echoed}
-            warnings={warnings}
-          />
+          {/* one line: the load and the notice; the run's time and the stale mark are in the page
+              bar's status, and the status, which the readouts repeat, is for screen readers */}
+          <RunLine ok={ok} identity={identity} status={status} echoed={echoed} />
           {/* the results list with the chosen powder's burn rate beside it; an error in their place */}
           <ResultsHead
             outcome={outcome}
@@ -725,7 +644,7 @@ export const ResultsArea = memo(function ResultsArea() {
             next={next}
             short={short}
           />
-          <DesignNotes ok={ok} />
+          {ok && <ResultNotes ok={ok} />}
           {/* the ladder bar sits directly above the tabs and drives every tab */}
           <ShownStrip />
           {tabList}

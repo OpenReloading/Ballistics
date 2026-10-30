@@ -76,6 +76,18 @@
     },
     {
       "rule": "color-contrast",
+      "node": "li[data-kind=",
+      "where": "workbench after the example run",
+      "reason": "Entry of the result notes, a scroll box of fixed height: the part outside the box counts as covered, and the More button beside it as overlapping. Measured against the page and panel background the warning, message and note text has 6.5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "result-note",
+      "where": ["Result notes"],
+      "reason": "Group heading and reason of the result notes dialog, reported as overlapping other boxes because different page content lies under each line, behind the overlay. They are --fg on the dialog's opaque surface, held at 4.5:1 or more in both themes by drawing-tokens.test.ts."
+    },
+    {
+      "rule": "color-contrast",
       "node": "dialog-title ",
       "where": ["Confirm dialog", "Load export dialog"],
       "reason": "Title of a dialog that wraps to two or more lines, reported as overlapping other boxes because different page content lies under each line, behind the overlay. Every line is inside the dialog's opaque header: 17.4:1 in light and 15.3:1 in dark by measurement."
