@@ -142,9 +142,8 @@ Decision 3, sorting the result:
 2. **Bullet dialog for production** (after decisions 1 to 3). Rows beyond 100 in a window, the final sort control, the phone layout checked at 390 px with real data, the workbench docs updated, the prototype's shortcuts removed.
    - 10,000 bullets: dialog open to first row at most 1.5 s, key to rows at most 100 ms, measured in the browser tests with a generated list.
    - axe clean in light and dark at 390 and 1280 px; the workbench no-scroll spec unchanged.
-3. **Powder and cartridge dialogs on the same shell.** Filters of their lists (powders: base, grain form, burn-rate order; cartridges: case type, caliber, Pmax); the shell is extracted from the bullet dialog.
-   - Each of the three cards opens its dialog from the button of its field.
-   - One keyboard spec covers the shared shell; kinds differ only by columns and filters.
+3. **Powder and cartridge dialogs on the same shell.** Built: the shell is `RecordChooser`, each of the three cards opens it from the button of its field, powders filter by manufacturer, grain form and base, cartridges by caliber and case type. Not built: range filters (burn-rate order, Pmax).
+   - One keyboard spec covers the shared shell; kinds differ only by columns and filters (the spec still covers the bullet dialog only).
 4. **Catalogue loading and indexing.** Keep the list across page loads (the offline layer's cache), read pages together, move the index build to a worker above a measured row count, and check the browser's answers against the API's.
    - The dialog opens from a warm cache without a request.
    - A test compares the browser's pages with the API's.

@@ -1130,6 +1130,7 @@ function CartridgePicker() {
     chooseCartridgeDesign,
     searchKey,
     chooseCartridge,
+    readDesigns,
     system,
   } = useLoad()
   const { t } = useTranslation()
@@ -1164,7 +1165,13 @@ function CartridgePicker() {
         onExtra={chooseCartridgeDesign}
         noneText={t('No cartridge found')}
         unreachableText={t(notReached)}
-        browse={{ label: t('Browse cartridges'), onOpen: dialog.open }}
+        browse={{
+          label: t('Browse cartridges'),
+          onOpen: (typed) => {
+            readDesigns()
+            dialog.open(typed)
+          },
+        }}
       />
       <CartridgeChooser
         opened={dialog.opened}
@@ -1191,6 +1198,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
     powderDesign,
     powderDesigns,
     choosePowderDesign,
+    readDesigns,
     system,
   } = useLoad()
   const { t } = useTranslation()
@@ -1221,7 +1229,13 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         onExtra={choosePowderDesign}
         noneText={t('No powder found')}
         unreachableText={t(notReached)}
-        browse={{ label: t('Browse powders'), onOpen: dialog.open }}
+        browse={{
+          label: t('Browse powders'),
+          onOpen: (typed) => {
+            readDesigns()
+            dialog.open(typed)
+          },
+        }}
       />
       <PowderChooser
         opened={dialog.opened}
