@@ -7718,8 +7718,19 @@ main .field-table tr.field-group > th {
     align-items: start;
   }
 
-  .sheet-steps :is(th, td) {
+  /* a column is as wide as its longest header word, and a value keeps to one line: the shared
+     rule's break anywhere (later, so this selector is the more specific) would squeeze the columns
+     to a letter ("Ste p"); the narrower padding fits the German headers on Letter */
+  .sheet-table.sheet-steps :is(th, td) {
+    padding: 1mm;
     font-size: 9pt;
+    overflow-wrap: normal;
+    hyphens: manual;
+  }
+
+  /* the pressure range breaks at its spaces */
+  .sheet-steps .num:not(.range) {
+    white-space: nowrap;
   }
 
   .sheet-steps .wide-blank {

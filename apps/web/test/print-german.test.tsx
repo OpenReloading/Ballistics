@@ -79,11 +79,18 @@ const components: [string, string][] = [
 ]
 
 describe('the load sheets', () => {
-  const sheets = (language: Translator, by?: 'overallLength') =>
-    printed(
-      language,
-      <LoadSheets title="Beispiel" components={components} steps={steps} by={by} note="Hinweis." />,
-    )
+  const sheet = (by?: 'overallLength' | 'temperature') => (
+    <LoadSheets title="Beispiel" components={components} steps={steps} by={by} note="Hinweis." />
+  )
+  const sheets = (language: Translator, by?: 'overallLength' | 'temperature') =>
+    printed(language, sheet(by))
+  /** The column headers of the overview's steps table. */
+  const heads = (language: Translator, by?: 'overallLength' | 'temperature') => {
+    shown.t = language
+    const markup = renderToStaticMarkup(<MantineProvider>{sheet(by)}</MantineProvider>)
+    const thead = /<table class="sheet-table sheet-steps"><thead>([\s\S]*?)<\/thead>/.exec(markup)
+    return [...(thead?.[1] ?? '').matchAll(/<th scope="col">([^<]*)<\/th>/g)].map((m) => m[1])
+  }
 
   it('are in German under the German setting, the overview and a page per charge', () => {
     const page = sheets(german)
@@ -101,6 +108,17 @@ describe('the load sheets', () => {
   it('name the length a seating ladder seats by', () => {
     expect(sheets(german, 'overallLength')).toContain('Stufen nach COAL')
     expect(sheets(english, 'overallLength')).toContain('COAL steps')
+  })
+
+  it('lead the overview rows with the value the ladder varies, not the step', () => {
+    expect(heads(english)[0]).toBe('Charge')
+    expect(heads(english, 'overallLength')[0]).toBe('COAL')
+    expect(heads(english, 'temperature')[0]).toBe('Powder temperature')
+    expect(heads(german, 'temperature')[0]).toBe('Pulvertemperatur')
+    expect(heads(english)).not.toContain('Step')
+    expect(heads(german)).not.toContain('Schritt')
+    expect(sheets(english)).toContain('41,0 gr main')
+    expect(sheets(german, 'temperature')).toContain('Stufen nach Pulvertemperatur')
   })
 
   it('stay English under the English setting', () => {

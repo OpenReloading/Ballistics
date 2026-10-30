@@ -430,9 +430,13 @@ function sheetComponents(
   ).filter((r): r is [string, string] => Boolean(r[1]))
 }
 
-/** The length a seating ladder seats by, for the load sheet's step column. */
+/** What the ladder varies besides the charge, for the load sheet's value column. */
 const sheetBy = (ok: OkOutcome) =>
-  ok.ladder.kind === 'seating' ? (ok.ladder.seatingBy ?? 'overallLength') : undefined
+  ok.ladder.kind === 'seating'
+    ? (ok.ladder.seatingBy ?? 'overallLength')
+    : ok.ladder.kind === 'temperature'
+      ? 'temperature'
+      : undefined
 
 /** One load sheet row per ladder step. */
 function sheetSteps(
