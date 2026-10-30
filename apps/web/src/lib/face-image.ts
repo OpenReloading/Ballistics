@@ -6,7 +6,7 @@
 import { conicOf, type Ellipse, ellipsePoint, meanRadius, ransacEllipse } from './ellipse.ts'
 import type { RgbaImage } from './image.ts'
 import { nth } from './nth.ts'
-import { clamp } from './raster-ops.ts'
+import { clamp, upperMedian } from './raster-ops.ts'
 import type { Point } from './target-geometry.ts'
 
 // Unchecked pixel-buffer reads inside loops whose bounds keep the index in range; module-local so the calls inline.
@@ -604,11 +604,6 @@ function edgeAlongRay(
 ): { point: Point; inside: number; outside: number } | undefined {
   const { width: w, height: h, grey: g } = grid
   const [c, sn] = [Math.cos(start.angle), Math.sin(start.angle)]
-  const median = (v: number[]) =>
-    nth(
-      v.sort((a, b) => a - b),
-      v.length >> 1,
-    )
   // the outward normal of the ellipse at parameter t
   const nx = (Math.cos(t) * c) / start.semiMajor - (Math.sin(t) * sn) / start.semiMinor
   const ny = (Math.cos(t) * sn) / start.semiMajor + (Math.sin(t) * c) / start.semiMinor
@@ -621,7 +616,7 @@ function edgeAlongRay(
   const outer: number[] = []
   for (let o = -span; o <= -span / 2; o += 0.5) inner.push(at(o))
   for (let o = span / 2; o <= span; o += 0.5) outer.push(at(o))
-  const [lo, hi] = [median(inner), median(outer)]
+  const [lo, hi] = [upperMedian(inner), upperMedian(outer)]
   // the black area is darker inside than outside
   if (hi - lo < 25) return undefined
   const mid = (lo + hi) / 2
