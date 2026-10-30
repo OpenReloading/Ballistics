@@ -2121,8 +2121,6 @@
     "one": "{count} Schusswaffe",
     "other": "{count} Schusswaffen"
   },
-  "{count} for step {step}": "{count} bei Schritt {step}",
-  "{count} for step {step}: {names}": "{count} bei Schritt {step}: {names}",
   "{count} ladder steps of {quantity}; {step} solid, the others dashed. {step} {key}.": "{count} Stufen der Ladeleiter für {quantity}; {step} durchgezogen, die anderen gestrichelt. {step}: {key}.",
   "{count} ladder steps, step {step} solid, the others dashed or dotted and named at their end.": "{count} Stufen der Ladeleiter, Stufe {step} durchgezogen, die anderen gestrichelt oder gepunktet und an ihrem Ende benannt.",
   "{count} of {max} selected": "{count} von {max} ausgewählt",
@@ -2143,15 +2141,6 @@
     "other": "{count} Ringe"
   },
   "{count} selected": "{count} ausgewählt",
-  "{count} simulation warning|{count} simulation warnings": {
-    "one": "{count} Simulationswarnung",
-    "other": "{count} Simulationswarnungen"
-  },
-  "{count} warning|{count} warnings": {
-    "one": "{count} Warnung",
-    "other": "{count} Warnungen"
-  },
-  "{count}: {names}": "{count}: {names}",
   "{design} (user design), {model} manual drag": "{design} (Benutzerentwurf), {model} Luftwiderstand manuell",
   "{earlier} has {before}.": "{earlier} hat {before}.",
   "{event} at {values}": "{event} bei {values}",
@@ -3810,5 +3799,18 @@
   "Values of the drawing (simulation inputs, not load data)": "Werte der Zeichnung (Eingaben der Simulation, keine Ladedaten)",
   "fill\u0004Loading density": "Ladungsdichte",
   "Hatched: the charge of {charge} at a case fill of {fill} %.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %.",
-  "Hatched: the charge of {charge} at a case fill of {fill} %, compressed by the bullet.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %, vom Geschoss verdichtet."
+  "Hatched: the charge of {charge} at a case fill of {fill} %, compressed by the bullet.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %, vom Geschoss verdichtet.",
+  "Message": "Meldung",
+  "Messages": "Meldungen",
+  "result\u0004Notes": "Hinweise",
+  "Result notes": "Hinweise zum Ergebnis",
+  "No notes for this result.": "Keine Hinweise zu diesem Ergebnis.",
+  "More ({count})": "Mehr ({count})",
+  "Choose a powder record in the Powder card.": "Wählen Sie in der Karte Treibladungspulver einen Treibladungspulver-Datensatz.",
+  "The powder record gives no bulk density. Choose a powder record that gives one.": "Der Treibladungspulver-Datensatz nennt kein Schüttgewicht. Wählen Sie einen Treibladungspulver-Datensatz, der eines nennt.",
+  "{count} result note|{count} result notes": {
+    "one": "{count} Hinweis zum Ergebnis",
+    "other": "{count} Hinweise zum Ergebnis"
+  },
+  "Enter the usable case volume in the Cartridge card.": "Geben Sie in der Karte Patrone den Hülsennutzraum ein."
 }

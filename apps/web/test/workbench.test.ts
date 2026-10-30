@@ -20,7 +20,6 @@ import {
   solidFillWarning,
   statusText,
   stepLabel,
-  warningCountText,
 } from '../src/lib/workbench.ts'
 import { defined, missing } from './defined.ts'
 
@@ -83,14 +82,6 @@ describe('solidFillWarning', () => {
     expect(solidFillWarning(at(0.65), 1600, 900, volume, english.t)?.text).toBe(
       'Simulation: load ratio 1.16 is above 1.14, solid fill 0.64 for this powder; the model is outside the range it was built for.',
     )
-  })
-})
-
-describe('warningsSummary', () => {
-  it('counts the warnings as simulation warnings', () => {
-    expect(warningCountText(0, english.tn)).toBe('')
-    expect(warningCountText(1, english.tn)).toBe('1 simulation warning')
-    expect(warningCountText(2, english.tn)).toBe('2 simulation warnings')
   })
 })
 
@@ -471,14 +462,12 @@ describe('in German', () => {
     expect(charge?.text).toContain('(2901 psi)')
   })
 
-  it('writes the solid fill warning and the counts', () => {
+  it('writes the solid fill warning', () => {
     const fill = solidFillWarning(0.65 * 1600 * 3.4e-6, 1600, undefined, 3.4e-6, german.t)
     expect(fill).toEqual({
       text: 'Simulation: Der Feststoff-Füllgrad 0,65 liegt über 0,64; das Modell liegt außerhalb des Bereichs, für den es gebaut wurde.',
       name: 'Feststoff-Füllgrad über 0,64',
     })
-    expect(warningCountText(1, german.tn)).toBe('1 Simulationswarnung')
-    expect(warningCountText(2, german.tn)).toBe('2 Simulationswarnungen')
   })
 
   it('writes the notes of the range view and the sampled band in German', () => {

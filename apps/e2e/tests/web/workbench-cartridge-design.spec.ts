@@ -72,7 +72,7 @@ test('a cartridge design fills the fields it covers, draws the figure and is nam
   await field(/^Twist/).fill('305')
   await field(/^Charge mass/).press('Control+Enter')
   await expect(page.getByText(/^Simulation done\. /)).toBeAttached({ timeout: 15_000 })
-  await expect(page.locator('.note.user-design')).toContainText(
+  await expect(page.locator('.result-notes ul')).toContainText(
     'Case values from the user design Mine 7.8, not a catalogue record.',
   )
   await page.emulateMedia({ media: 'print' })

@@ -107,11 +107,6 @@ export const statusText = (status: Status, line: string | undefined, t: Translat
   return line === undefined ? '' : text(status.prefix) + line
 }
 
-export function warningCountText(count: number, tn: Translator['tn']) {
-  if (count === 0) return ''
-  return tn(count, '{count} simulation warning', '{count} simulation warnings')
-}
-
 /** The short name of a warning code from the advisory registry, in the language of `t`. */
 function ruleName(code: string, t: Translator['t']) {
   const name = advisoryRules.find((r) => r.id === code)?.name
