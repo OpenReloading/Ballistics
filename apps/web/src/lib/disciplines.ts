@@ -18,7 +18,7 @@ import type { Facet } from './facets.ts'
 import { kebabValue } from './list-values.ts'
 import { matchesQuery } from './lists.ts'
 import { type FieldGroup, type FieldRow, type StripItem, titleFromKebab } from './record-fields.ts'
-import type { Quantity } from './units.ts'
+import { metersPerYard, type Quantity } from './units.ts'
 import { say, verbatim, type Wording, worded } from './wording.ts'
 
 /** A discipline record as the API answers it: its sources resolved. */
@@ -53,8 +53,6 @@ export type DisciplineRow = {
   faceIds: string[]
 }
 
-const metresPerYard = 0.9144
-
 /**
  * The distance as the rule book prints it, one reading per unit it states: the metres of the
  * record, or for `yd` its yards; for `m/yd` the printed number is the same in each unit.
@@ -62,7 +60,7 @@ const metresPerYard = 0.9144
 function distanceReadings(stored: number, unit: DisciplineRow['unit']) {
   // the SI conversion leaves float noise (12700 mm is 12.700000000000001 m)
   const metres = Number(stored.toPrecision(12))
-  const yards = Number((stored / metresPerYard).toPrecision(12))
+  const yards = Number((stored / metersPerYard).toPrecision(12))
   return unit === 'yd'
     ? [{ number: yards, unit: 'yd' }]
     : unit === 'm'

@@ -20,9 +20,8 @@ import {
   WORK_DIAMETER,
 } from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
-import { nth } from './nth.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
-import { clamp } from './raster-ops.ts'
+import { clamp, upperMedian } from './raster-ops.ts'
 import { faceLabel, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
 
@@ -111,12 +110,10 @@ async function handleColour(r: Extract<WorkerRequest, { kind: 'colour' }>): Prom
       for (const [c, v] of img.data.subarray(i, i + 3).entries()) ch[c]?.push(v)
     }
   if (!reds.length) throw new Error('The point is outside the photo.')
-  const median = (v: number[]) =>
-    nth(
-      v.sort((a, b) => a - b),
-      v.length >> 1,
-    )
-  return { kind: 'colour', rgb: { r: median(reds), g: median(greens), b: median(blues) } }
+  return {
+    kind: 'colour',
+    rgb: { r: upperMedian(reds), g: upperMedian(greens), b: upperMedian(blues) },
+  }
 }
 
 /** The face search and the quality check over the whole turned photo, resized to `FACE_LONG` px on its longer side. */

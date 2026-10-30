@@ -44,3 +44,5 @@ The lead in target lengths is $L / \ell_t$ for a target of length $\ell_t$ in th
 ## Sources
 
 Elementary kinematics of a target at constant velocity. No reference is cited.
+
+- Research log: [lead against the kinematics](../research/exterior-moving-target-kinematics.md).

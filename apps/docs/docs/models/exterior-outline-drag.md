@@ -230,3 +230,4 @@ Code: `packages/core/src/exterior/outline-drag.ts`, `relativeSd` (`sdPercent`).
 ## Sources
 
 - [McCoy 1981](../bibliography.md#mccoy-1981): abstract, p. 3 (range of validity and stated errors), section II, p. 10 (sum of the parts), eqs. 2 and 3, pp. 13 to 14 (supersonic head drag, thickness ratio), eq. 4, p. 14 (meplat), eq. 8, p. 16 (transonic head drag), eqs. 9 and 10, pp. 16 to 18 (boat tail), Figure 6, p. 18 (rotating band), eqs. 11 to 17, pp. 18 to 20 (skin friction, boundary layer options), eqs. 18 and 19, p. 21 (base pressure and base drag), eq. 20, p. 27 (head shape $R_T/R$), section VIII, p. 24 (error), Figure 25, p. 56 (standard deviation against Mach), Figures 26 to 28, pp. 57 to 59 (output Mach numbers), program listing, pp. 63 to 64 (constants and Mach cut-offs the text leaves out). Page numbers are those of the PDF file.
+- Research log: [bullet inertia from the outline](../research/bullet-inertia-from-outline.md).

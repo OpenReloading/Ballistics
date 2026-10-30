@@ -1,6 +1,13 @@
 import { face } from '@open-reloading/drawing'
 import { bulletFigureModel, bulletOutline } from '@open-reloading/drawing/bullet'
-import { applyOverrides, type Bullet, bullet, type UserBullet } from '@open-reloading/schema'
+import {
+  applyOverrides,
+  type Bullet,
+  bullet,
+  fromSi,
+  toSi,
+  type UserBullet,
+} from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { computedBulletRows } from '../src/lib/bullet.ts'
 import {
@@ -19,7 +26,6 @@ import {
   historyOf,
   newDesign,
   reduce,
-  sliderMax,
 } from '../src/lib/bullet-designer.ts'
 import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
@@ -250,14 +256,6 @@ describe('history', () => {
   })
 })
 
-it('slider ranges follow the diameter and widen to a larger value', () => {
-  const d = newDesign(metric)
-  expect(sliderMax('length', d)).toBeCloseTo(8 * 8e-3, 12)
-  expect(sliderMax('noseLength', d)).toBeCloseTo(8 * 8e-3, 12)
-  const big = reduce(historyOf(d), type('noseLength', '90')).present
-  expect(sliderMax('noseLength', big)).toBeCloseTo(90e-3, 12)
-})
-
 it('extreme typed values give a drawing or a reason, never a throw', () => {
   const cases: [string, string][][] = [
     [['length', '100000']],
@@ -309,6 +307,30 @@ it('extreme typed values give a drawing or a reason, never a throw', () => {
 
 type Choices = readonly (readonly [ChoiceKey, readonly string[]])[]
 
+/**
+ * Largest value a random edit types, SI: fixed for the diameter and mass, else in diameters
+ * (rounded up to whole mm), widened by a larger present value.
+ */
+function editMax(key: string, design: Design): number {
+  const d = toSi('length', Math.ceil(fromSi('length', defined(design.fields.diameter?.si))))
+  const max: Record<string, number> = {
+    diameter: 20e-3,
+    mass: 60e-3,
+    length: 8 * d,
+    'ogive.radius': 25 * d,
+    'ogive.radiusRatio': 1,
+    meplatDiameter: d,
+    'base.diameter': d,
+    'base.cavityDiameter': d,
+    'tip.mouthDiameter': d,
+    'base.angle': toSi('angle', 30),
+    'cannelure.width': d,
+    'cannelure.depth': d / 10,
+  }
+  // lengths along the axis: up to the length range
+  return Math.max(max[key] ?? 8 * d, design.fields[key]?.si ?? 0)
+}
+
 /** A random choice, undo or redo, or a field edit that is often empty or invalid. */
 function randomAction(rnd: () => number, h: History, choices: Choices): Action {
   const r = rnd()
@@ -324,7 +346,7 @@ function randomAction(rnd: () => number, h: History, choices: Choices): Action {
     defined(h.present.fields.length).si ?? 4 * (defined(h.present.fields.diameter).si ?? 0)
   const axial = spec.quantity === 'length' && !['length', 'diameter', 'ogive.radius'].includes(key)
   const max = metric[spec.quantity].fromSi(
-    axial ? Math.min(sliderMax(key, h.present), length) : sliderMax(key, h.present),
+    axial ? Math.min(editMax(key, h.present), length) : editMax(key, h.present),
   )
   // clearing a field often, so the sequence leaves refused states again
   // the required diameter stays a number here; its empty and invalid text is tested above

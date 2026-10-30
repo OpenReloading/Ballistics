@@ -6,6 +6,7 @@
 import { InputError } from '../errors.ts'
 import type { Air } from './atmosphere.ts'
 
+// local factors: core cannot import the schema's units, and only these fits use them
 const grain = 0.45359237 / 7000
 const inch = 0.0254
 const foot = 0.3048

@@ -14,7 +14,6 @@ import {
   historyOf,
   newDesign,
   reduce,
-  sliderMax,
 } from '../src/lib/cartridge-designer.ts'
 import { seededRandom } from '../src/lib/ellipse.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
@@ -264,16 +263,6 @@ describe('history', () => {
   })
 })
 
-describe('slider ranges', () => {
-  it('hold still while a value moves inside them and widen past them', () => {
-    const d = win308()
-    const L3 = fieldSpecs.find((s) => s.key === 'cartridge.L3')
-    expect(L3 && sliderMax(L3, d)).toBeCloseTo(200e-3, 12)
-    const long = run(d, type('cartridge.L3', '250')).present
-    expect(L3 && sliderMax(L3, long)).toBeCloseTo(250e-3, 12)
-  })
-})
-
 function randomText(r: number, now: number, next: () => number): string {
   if (r < 0.08) return ''
   if (r < 0.12) return '0'
@@ -285,9 +274,9 @@ function randomText(r: number, now: number, next: () => number): string {
 /** One random edit of a field and its evaluation: the new history, and whether it draws. */
 function randomEdit(h: History, next: () => number) {
   const s = defined(fieldSpecs[Math.floor(next() * fieldSpecs.length)])
-  // mostly near the present value (else a tenth of the slider range), sometimes extreme
+  // mostly near the present value (else a 25th of the length limit or 18 degrees), sometimes extreme
   const now =
-    (defined(h.present.fields[s.key]).si ?? s.range / 10) *
+    (defined(h.present.fields[s.key]).si ?? (s.limit === undefined ? Math.PI / 10 : s.limit / 25)) *
     (s.quantity === 'angle' ? 180 / Math.PI : 1e3)
   const r = next()
   const text = randomText(r, now, next)

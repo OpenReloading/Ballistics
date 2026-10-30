@@ -183,3 +183,4 @@ The trajectories of a fit run at `relativeTolerance` $10^{-10}$, `absoluteTolera
 
 - [Levenberg 1944](../bibliography.md#levenberg-1944) and [Marquardt 1963](../bibliography.md#marquardt-1963): the least-squares method, see [least squares on log parameters](least-squares.md).
 - [Bard 1974](../bibliography.md#bard-1974) (chapter unverified): the covariance of the estimate from the Jacobian at the solution.
+- Research log: [closed forms and round trips](../research/exterior-truing-closed-forms.md).

@@ -64,6 +64,7 @@ const pressureExponent = icao.gravity / (icao.gasConstant * icao.lapseRate)
 
 /** Saturation vapour pressure over water, Pa, Magnus form of WMO-No. 8 (temperature in K). */
 export function saturationVapourPressure(temperature: number): number {
+  // the Magnus form takes degrees Celsius; inline, as core cannot import the schema's units
   const t = temperature - 273.15
   return 611.2 * Math.exp((17.62 * t) / (243.12 + t))
 }

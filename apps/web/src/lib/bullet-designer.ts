@@ -12,7 +12,6 @@ import {
   fromSi,
   ogiveForms,
   tipTypes,
-  toSi,
   type UserBullet,
 } from '@open-reloading/schema'
 import { untranslated } from '../i18n/number.ts'
@@ -690,32 +689,4 @@ export function evaluate(
     states,
     computed,
   }
-}
-
-/**
- * Slider range of a field, SI: fixed for the diameter and mass, else in diameters (rounded up to
- * whole mm), so the ranges hold still while the length or the diameter is typed.
- */
-export function sliderMax(key: string, design: Design): number {
-  // the diameter rounded up to whole mm, so the ranges also hold while the diameter is typed
-  const d = toSi(
-    'length',
-    Math.ceil(fromSi('length', design.fields.diameter?.si ?? newBulletStart.diameter)),
-  )
-  const max: Record<string, number> = {
-    diameter: 20e-3,
-    mass: 60e-3,
-    length: 8 * d,
-    'ogive.radius': 25 * d,
-    'ogive.radiusRatio': 1,
-    meplatDiameter: d,
-    'base.diameter': d,
-    'base.cavityDiameter': d,
-    'tip.mouthDiameter': d,
-    'base.angle': toSi('angle', 30),
-    'cannelure.width': d,
-    'cannelure.depth': d / 10,
-  }
-  // lengths along the axis: up to the length range
-  return Math.max(max[key] ?? 8 * d, design.fields[key]?.si ?? 0)
 }
