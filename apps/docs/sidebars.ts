@@ -62,6 +62,7 @@ const sidebars: SidebarsConfig = {
     'data/firearm-records',
     'data/catalogue-storage',
     'data/table-import',
+    'data/grt-load-files',
     'bibliography',
   ],
   contributing: [

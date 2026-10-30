@@ -115,9 +115,9 @@ describe('user data files', () => {
     expect(JSON.parse(userDataText([bullet])).version).toBe(1)
   })
 
-  it('skips a file with one invalid record as a whole and names the field', () => {
+  it('skips a file with one invalid record as a whole and names the field', async () => {
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
-    const { records, skipped } = parseFiles(
+    const { records, skipped } = await parseFiles(
       [
         { name: 'good.json', bytes: new TextEncoder().encode(userDataText([load])) },
         {
@@ -134,8 +134,8 @@ describe('user data files', () => {
     expect(defined(skipped[0]).reason).toContain('records[1].data.overrides.mass.value')
   })
 
-  it('skips a file over the size limit', () => {
-    const { skipped } = parseFiles(
+  it('skips a file over the size limit', async () => {
+    const { skipped } = await parseFiles(
       [{ name: 'big.json', bytes: new Uint8Array(maxFileBytes + 1) }, { name: 'unread.json' }],
       undefined,
       english.t,
@@ -367,7 +367,7 @@ describe('user data files', () => {
     expect(invalid[1]).toMatchObject({ id: undefined, name: undefined, kind: undefined })
   })
 
-  it('names the earlier load format in a stored record, an opened file and a pasted text', () => {
+  it('names the earlier load format in a stored record, an opened file and a pasted text', async () => {
     const old = {
       kind: 'workbenchState',
       id: 'w9',
@@ -385,7 +385,7 @@ describe('user data files', () => {
     })
     const parsed = parseUserDataFile(text)
     expect(!parsed.ok && parsed.reason).toContain('earlier version')
-    const read = readLoadFile(new TextEncoder().encode(text))
+    const read = await readLoadFile(new TextEncoder().encode(text))
     expect(!read.ok && read.reason).toContain('earlier version')
   })
 

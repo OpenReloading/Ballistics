@@ -91,6 +91,10 @@ Parsers for chronograph export files, ESM. Pure functions from file text, or fro
 - `autoMap(table, kind)`: per column the field (by header alias, `fieldSpecs` in `src/record-fields.ts`), the unit (from the header, else the values, else the stored unit; `unitFrom: 'unknown'` and no unit when brackets or a slash or underscore name a unit the field does not take, which rejects the rows until the caller sets one; MPa and kpsi only from the header) and the decimal mark.
 - `buildRecords(table, kind, map, now)`: each row checked on its own. `counts` (accepted, with a warning, rejected), `rejected` and `warnings` with row, column, cell and reason. Makers become manufacturer records. Ids from `idOfKey` of kind, name, maker and, for bullets, diameter and mass. The caller parses each record with the user record schema (schema is types only here).
 
+## Load files to user records
+
+- `readGrtLoad(xml, saved)` (`src/grtload.ts`): a GRT load file (XML, root element `GordonsReloadingTool`) to the cartridge, the bullet after its maker, the powder and the load, each a user record with an id from its content (`idOfKey`; the maker's key is the one of `buildRecords`). Returns `unmapped` (`section.name` of every field with a value it does not read) and `warnings` (a unit or number not converted, text that is not percent-encoded, a shotshell load). Throws on XML of another root or without load input. The mapping and its reasons: `apps/docs/docs/data/grt-load-files.md`, which changes with the code. The web app's load-file format entry checks each record with the user record schema.
+
 ## Unverified and tests
 
 - Unverified layouts: a ShotView CSV with a set bore flag, ShotView shots left out of the statistics, an XLSX workbook with a set bore flag, ShotView workbook footer labels in other languages.

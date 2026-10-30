@@ -27,7 +27,7 @@ const open = (version?: number, upgrade?: (db: IDBDatabase) => void) =>
     const r = indexedDB.open(name, version)
     if (upgrade) r.onupgradeneeded = () => upgrade(r.result)
     r.onsuccess = () => resolve(r.result)
-    r.onerror = () => reject(r.error)
+    r.onerror = () => reject(r.error ?? new Error('IndexedDB request failed'))
   })
 
 it('opens a version 1 database without the later stores and keeps its records', async () => {
