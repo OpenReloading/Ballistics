@@ -35,6 +35,7 @@ const sidebars: SidebarsConfig = {
       'exterior-truing-strings',
     ]),
     category('Targets and groups', ['groups', 'hit-probability', 'ring-scoring', 'hole-detection']),
+    'photo-guide',
     category('Case and firearm', [
       'case-capacity',
       'bullet-fit',
