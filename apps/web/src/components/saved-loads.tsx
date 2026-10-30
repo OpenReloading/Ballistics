@@ -26,6 +26,7 @@ import {
   loadGroups,
   renameStored,
 } from '../lib/load-tabs.ts'
+import { type LoadUse, loadUse, loadUseText } from '../lib/load-use.ts'
 import { newId } from '../lib/new-id.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
@@ -160,6 +161,11 @@ export function SavedLoads({
   const setMessage = (say?: Say) => setShown(say && { say })
   /** Stored loads of the earlier format, which the schema refuses. */
   const [older, setOlder] = useState(0)
+  /** Per load its firearm, sessions and last session day; the stored firearms' names by id. */
+  const [use, setUse] = useState({
+    loads: new Map<string, LoadUse>(),
+    firearms: new Map<string, string>(),
+  })
   /** The load whose name is edited in its row, with the text. */
   const [renaming, setRenaming] = useState<{ id: string; text: string }>()
   const storage = useStorage(opened)
@@ -172,6 +178,12 @@ export function SavedLoads({
       .then(({ records, invalid }) => {
         setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
         setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
+        setUse({
+          loads: loadUse(records).loads,
+          firearms: new Map(
+            records.flatMap((r) => (r.kind === 'firearm' ? [[r.id, r.name] as const] : [])),
+          ),
+        })
       })
       .catch(() =>
         setShown({ say: (t) => t('The saved loads could not be read from this browser.') }),
@@ -249,6 +261,10 @@ export function SavedLoads({
     ...new Set(records.map((r) => cartridgeGroup(r.data.cartridge))),
   ])
   const groups = loadGroups(records, query, names, t)
+  const usageText = (id: string) => {
+    const u = use.loads.get(id)
+    return loadUseText(u, u?.firearm && use.firearms.get(u.firearm), { t, tn })
+  }
   return (
     <>
       {label}
@@ -310,6 +326,7 @@ export function SavedLoads({
                             {r.name}
                           </Button>
                         )}
+                        <span className="file-reason saved-use">{usageText(r.id)}</span>
                         <span className="file-reason">{dateTimeText(new Date(r.saved))}</span>
                         <ActionIcon
                           size={controlSize.row.icon}

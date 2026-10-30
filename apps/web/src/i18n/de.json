@@ -3786,5 +3786,10 @@
   "Print a box label": "Schachtel-Etikett drucken",
   "Print a box label of {name}": "Schachtel-Etikett von {name} drucken",
   "Print failed: {error}": "Drucken fehlgeschlagen: {error}",
-  "Saved": "Gespeichert"
+  "Saved": "Gespeichert",
+  "No session": "Keine Sitzung",
+  "{count} session|{count} sessions": {
+    "one": "{count} Sitzung",
+    "other": "{count} Sitzungen"
+  }
 }

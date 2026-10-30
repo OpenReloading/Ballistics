@@ -2767,7 +2767,7 @@ td.nowrap {
   list-style: none;
 }
 
-/* a load takes two lines, so its name has the drawer's whole width: the name, then the time and the actions */
+/* a load takes three lines, so its name has the drawer's whole width: the name, its firearm and sessions, then the time and the actions */
 .saved-loads li {
   display: flex;
   flex-wrap: wrap;
@@ -2779,6 +2779,10 @@ td.nowrap {
 .saved-loads li .file-reason {
   flex: 1 1 0;
   padding-left: 0.625rem;
+}
+
+.saved-loads li .saved-use {
+  flex-basis: 100%;
 }
 
 .saved-loads .saved-open {
