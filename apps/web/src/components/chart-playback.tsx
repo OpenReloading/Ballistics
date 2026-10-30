@@ -35,8 +35,7 @@ import {
   travelScrub,
 } from '../lib/playback.ts'
 import { controlSize } from '../lib/theme.ts'
-import { msText, percentText, type UnitSystem, withUnit } from '../lib/units.ts'
-import { shownLength } from '../lib/workbench.ts'
+import { msText, percentText, shownLength, type UnitSystem, withUnit } from '../lib/units.ts'
 
 const readouts = [
   ['time', msg('Time')],

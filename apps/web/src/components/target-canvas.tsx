@@ -30,7 +30,7 @@ import {
 import { circleThrough, type Point, turnedBox } from '../lib/target-geometry.ts'
 import { groupStatisticsOf } from '../lib/target-groups.ts'
 import { boxAround, type ViewBox } from '../lib/target-view.ts'
-import { mmLength } from '../lib/workbench.ts'
+import { mmLength } from '../lib/units.ts'
 import { arrows, viewPoint } from './svg-point.ts'
 import { useUnits } from './units-settings.tsx'
 import { usePinch } from './use-pinch.ts'

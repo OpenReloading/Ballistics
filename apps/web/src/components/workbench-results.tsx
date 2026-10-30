@@ -20,7 +20,6 @@ import { LazyInteriorChart } from './lazy-chart.tsx'
 import { LoadLots, SessionNotes } from './load-notes.tsx'
 import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
-import { PowderCompare } from './powder-compare.tsx'
 import { chartCopy } from './print-report.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { TrajectoryForm } from './trajectory-form.tsx'
@@ -52,6 +51,11 @@ export const Measurements = dynamic(
     loading: () => <Loading what="the measurements" inline />,
   },
 )
+
+const PowderCompare = dynamic(() => import('./powder-compare.tsx').then((m) => m.PowderCompare), {
+  ssr: false,
+  loading: () => <Loading what="the powder comparison" inline />,
+})
 
 const GroupsTab = dynamic(() => import('./groups-tab.tsx').then((m) => m.GroupsTab), {
   ssr: false,

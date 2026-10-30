@@ -123,6 +123,9 @@ import {
   exactFieldText,
   fixedFieldText,
   formatQuantity,
+  lengthText,
+  mmLength,
+  shownLength,
   type UnitSystem,
   waterVolume,
   withUnit,
@@ -139,14 +142,7 @@ import {
   userCartridges,
   userRef,
 } from '../lib/variants.ts'
-import {
-  type InputPanel,
-  lengthText,
-  mmLength,
-  type Status,
-  shownLength,
-  statusText,
-} from '../lib/workbench.ts'
+import { type InputPanel, type Status, statusText } from '../lib/workbench.ts'
 import {
   type DefaultKey,
   defaultKeys,

@@ -27,8 +27,7 @@ import {
   sortPowderRows,
 } from '../lib/powder-compare.ts'
 import { controlSize } from '../lib/theme.ts'
-import { formatQuantity, type UnitSystem } from '../lib/units.ts'
-import { shownLength } from '../lib/workbench.ts'
+import { formatQuantity, shownLength, type UnitSystem } from '../lib/units.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
 import {
   type CompareMessage,

@@ -46,9 +46,8 @@ import {
 import { type Frame, targetToView, viewToTarget } from '../lib/target-editor.ts'
 import type { Point } from '../lib/target-geometry.ts'
 import { controlSize } from '../lib/theme.ts'
-import type { UnitSystem } from '../lib/units.ts'
+import { mmLength, type UnitSystem } from '../lib/units.ts'
 import { faceIdPrefix } from '../lib/user-faces.ts'
-import { mmLength } from '../lib/workbench.ts'
 import type { Tool } from './target-canvas.tsx'
 import { useUnits } from './units-settings.tsx'
 

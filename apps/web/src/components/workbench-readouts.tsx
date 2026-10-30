@@ -23,21 +23,16 @@ import { niceTicks } from '../lib/ticks.ts'
 import {
   formatQuantity,
   inchText,
+  lengthText,
   msText,
   percentText,
   psi,
+  shownLength,
   type UnitSystem,
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import {
-  bandLine,
-  bandNotice,
-  firstPressureLimit,
-  lengthText,
-  resultBand,
-  shownLength,
-} from '../lib/workbench.ts'
+import { bandLine, bandNotice, firstPressureLimit, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'

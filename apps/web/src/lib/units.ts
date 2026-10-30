@@ -395,3 +395,23 @@ export function roundedFieldText(q: Quantity, system: UnitSystem, si: number): s
   const text = String(Number(x.toFixed(Math.min(d, 12))))
   return q === 'twist' ? twistLabel(text) : text
 }
+
+/** Workbench decimals of lengths by kind and unit. */
+const lengthDigits = { travel: { mm: 1, in: 2 }, diameter: { mm: 2, in: 3 } } as const
+
+/** A length in the display unit of `system` with the workbench decimals of its kind, without the symbol. */
+export function lengthText(kind: keyof typeof lengthDigits, system: UnitSystem, si: number) {
+  const unit = system.length
+  const digits = (lengthDigits[kind] as Record<string, number>)[unit.symbol] ?? unit.decimals
+  return formatNumber(unit.fromSi(si), digits)
+}
+
+/** A length in the display unit of `system` with the workbench decimals of its kind, and the symbol. */
+export function shownLength(kind: keyof typeof lengthDigits, system: UnitSystem, si: number) {
+  const { symbol } = system.length
+  return `${inchText(lengthText(kind, system, si), symbol)} ${symbol}`
+}
+
+/** A length given in mm in the display unit of `system`, with the symbol. */
+export const mmLength = (system: UnitSystem, mm: number) =>
+  shownLength('diameter', system, toSi('length', mm))
