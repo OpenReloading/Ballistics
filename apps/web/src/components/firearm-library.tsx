@@ -20,6 +20,7 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
+import Link from 'next/link'
 import {
   type ReactNode,
   useCallback,
@@ -33,6 +34,12 @@ import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
+import {
+  type ClassMembers,
+  classDisciplinesHref,
+  classOfCartridge,
+  fetchClassMembers,
+} from '../lib/caliber-class-of.ts'
 import { dayText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
@@ -226,16 +233,21 @@ function firearmColumns(
   ]
 }
 
-/** Open, Duplicate and Delete of a stored firearm, Duplicate only for the example. */
+/**
+ * Open, Duplicate and Delete of a stored firearm, Duplicate only for the example; the disciplines
+ * that name the caliber class of its cartridge where the cartridge is in one.
+ */
 function RowActions({
   record: r,
   tabIndex,
+  caliberClass,
   onOpen,
   onDuplicate,
   onDelete,
 }: {
   record: FirearmRecord
   tabIndex?: number | undefined
+  caliberClass: ClassMembers | undefined
   onOpen: () => void
   onDuplicate: () => void
   onDelete: () => void
@@ -258,6 +270,11 @@ function RowActions({
       <Menu.Dropdown>
         {stored && <Menu.Item onClick={onOpen}>{t('Open')}</Menu.Item>}
         <Menu.Item onClick={onDuplicate}>{t('Duplicate')}</Menu.Item>
+        {caliberClass && (
+          <Menu.Item component={Link} href={classDisciplinesHref(caliberClass.id)}>
+            {t('Disciplines listing {class}', { class: caliberClass.name })}
+          </Menu.Item>
+        )}
         {stored && (
           <Menu.Item color="red" onClick={onDelete}>
             {t('Delete')}
@@ -584,6 +601,12 @@ export function FirearmLibrary() {
     .join('\n')
   /** Cartridge names by record id: chosen in the search or read from the API. */
   const [cartridgeNames, setCartridgeNames] = useRecordNames('cartridges', cartridgeIds)
+  /** The caliber classes with their members, for the link to the disciplines of a row's class. */
+  const [classes, setClasses] = useState<ClassMembers[]>([])
+  useEffect(() => {
+    // unreachable: the rows show no link
+    fetchClassMembers().then(setClasses, () => {})
+  }, [])
   /** Bullet names by record id, for the bullet of the lands contact. */
   const [bulletNames, setBulletNames] = useRecordNames('bullets', catalogueBulletId(data))
   const bulletName = (ref: string | undefined) => nameOfBullet(t, bulletNames, ref)
@@ -683,6 +706,7 @@ export function FirearmLibrary() {
     <RowActions
       record={r}
       tabIndex={tabIndex}
+      caliberClass={classOfCartridge(classes, catalogueCartridgeId(r.data.cartridge))}
       onOpen={() => menu.current?.open(r)}
       onDuplicate={() => duplicate(r)}
       onDelete={() => remove(r)}

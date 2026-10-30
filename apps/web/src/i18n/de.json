@@ -3755,5 +3755,6 @@
   "{count} load|{count} loads": {
     "one": "{count} Laborierung",
     "other": "{count} Laborierungen"
-  }
+  },
+  "Disciplines listing {class}": "Disziplinen, die {class} aufführen"
 }
