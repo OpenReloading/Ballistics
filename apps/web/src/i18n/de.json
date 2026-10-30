@@ -3782,5 +3782,6 @@
   "The firearm has no mounted optic.": "An der Schusswaffe ist keine Optik montiert.",
   "The bullet has no BC in the database.": "Das Geschoss hat in der Datenbank keinen BC.",
   "The bullet has several BC values; choose one in the workbench.": "Das Geschoss hat mehrere BC-Werte; wählen Sie einen in der Werkbank.",
-  "The bullet record was not found.": "Der Geschossdatensatz wurde nicht gefunden."
+  "The bullet record was not found.": "Der Geschossdatensatz wurde nicht gefunden.",
+  "Name or lot": "Name oder Los"
 }

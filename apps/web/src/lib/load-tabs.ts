@@ -74,8 +74,9 @@ export const cartridgeGroup = (cartridge: string | undefined) =>
   cartridge ? (catalogueIdOf(cartridge) ?? cartridge) : ''
 
 /**
- * The saved-loads list: records whose name has every word of `query`, grouped by cartridge (groups
- * by title, the group without a cartridge last), newest first. A group is titled by the cartridge's
+ * The saved-loads list: records whose name and lots (of the load and of its session snapshots) have
+ * every word of `query`, grouped by cartridge (groups by title, the group without a cartridge last),
+ * newest first. A group is titled by the cartridge's
  * name from `cartridgeNames` (by id), by the id while the lookup lacks it.
  */
 export function loadGroups(
@@ -86,7 +87,9 @@ export function loadGroups(
 ) {
   const groups = new Map<string, { key: string; title: string; records: LoadRecord[] }>()
   for (const r of records) {
-    if (!matchesQuery([r.name], query)) continue
+    const { powderLot, primer, case: brass, snapshots = [] } = r.data
+    const lots = snapshots.flatMap((s) => [s.powderLot, s.primerLot, s.caseLot])
+    if (!matchesQuery([r.name, powderLot, primer?.lot, brass?.lot, ...lots], query)) continue
     const key = cartridgeGroup(r.data.cartridge)
     const group = groups.get(key) ?? {
       key,
