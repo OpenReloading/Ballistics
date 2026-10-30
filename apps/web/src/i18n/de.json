@@ -1473,6 +1473,7 @@
   "Velocity {low} to {high} {unit}. 5th to 95th percentile, {notice}.": "Geschwindigkeit {low} bis {high} {unit}. 5. bis 95. Perzentil, {notice}.",
   "Velocity, measured": "Geschwindigkeit, gemessen",
   "Velocity, simulated": "Geschwindigkeit, simuliert",
+  "Version": "Version",
   "View": "Ansicht",
   "Vivacity": "Vivacity",
   "Volume behind the bullet": "Volumen hinter dem Geschoss",
