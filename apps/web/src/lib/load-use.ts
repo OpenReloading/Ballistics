@@ -28,7 +28,8 @@ export function loadUse(records: readonly UserRecord[]) {
   const firearms = new Map<string, FirearmUse>()
   for (const r of records) {
     if (r.kind !== 'load') continue
-    const refs = r.data.sessions ?? []
+    // a reference to a deleted session counts for nothing
+    const refs = (r.data.sessions ?? []).filter((ref) => days.has(ref))
     const last = refs.reduce<string | undefined>((d, ref) => later(d, days.get(ref)), undefined)
     const target = r.data.firearm === undefined ? undefined : parseRef(r.data.firearm)
     const firearm = target?.scope === 'user' ? target.id : undefined

@@ -56,6 +56,11 @@ describe('load and firearm use', () => {
     expect(loads.get('d')).toEqual({ firearm: undefined, sessions: 0, last: undefined })
   })
 
+  it('leaves out a session reference whose session is no longer stored', () => {
+    const { loads } = loadUse([session('s1', '2026-03-01'), load('e', rifle, ['s1', 'gone'])])
+    expect(loads.get('e')).toEqual({ firearm: rifle, sessions: 1, last: '2026-03-01' })
+  })
+
   it('counts the loads of a firearm and their latest session day', () => {
     expect(firearms.get(rifle)).toEqual({ loads: 2, last: '2026-05-01' })
     expect(firearms.size).toBe(1)
