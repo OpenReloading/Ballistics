@@ -62,7 +62,7 @@ Details per folder are in the `AGENTS.md` of `apps/web`, `apps/e2e`, `tools` and
 
 - `API_URL`: the API for e2e tests, the web build and dev server, and the docs REST API page's link.
 - `WEB_URL`: the static export for the e2e tests (default `http://localhost:3003`).
-- `NEXT_PUBLIC_REPOSITORY_URL`, `NEXT_PUBLIC_DOCS_URL`, `NEXT_PUBLIC_NO_DOCS`: web build time; unset leaves out the repository link and the docs link (`apps/web/src/lib/repository-url.ts`, `docs-url.ts`). `pages.yml` sets the repository URL; `static:build` and `dev:static` set `NEXT_PUBLIC_NO_DOCS`.
+- `NEXT_PUBLIC_REPOSITORY_URL`, `NEXT_PUBLIC_DOCS_URL`, `NEXT_PUBLIC_NO_DOCS`: web build time. Unset `NEXT_PUBLIC_REPOSITORY_URL` leaves out the repository link; unset `NEXT_PUBLIC_DOCS_URL` links `docs/` under the base path, and `NEXT_PUBLIC_NO_DOCS` leaves out the docs link (`apps/web/src/lib/repository-url.ts`, `docs-url.ts`). `pages.yml` sets the repository URL; `static:build` and `dev:static` set `NEXT_PUBLIC_NO_DOCS`.
 - `APP_URL`: the docs navbar's Web app link (set by `tools/src/pages.ts`). `DOCS_URL`, `DOCS_BASE_URL`: the docs site's origin and path. `GITHUB_TOKEN`: lifts the rate limit of the docs build's repository facts.
 - `PAGES_BASE_PATH`, `PAGES_EDITION`, `PAGES_URL`: `apps/web/AGENTS.md`, Static site.
 - `PRERENDER=sample`: a web build prerenders only the records of `apps/web/src/lib/prerender-sample.ts`; other cartridge pages answer 404. Unset or anything else: every record. The dev container sets it; the export takes the mode from `--sample`, never from the variable. `check-prerender.mts` needs the mode of the export it checks.

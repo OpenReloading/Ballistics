@@ -22,7 +22,7 @@ Playwright tests against the static export of the web app (`pages/`, served by `
 
 - Tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa` (with `target-size`) and `best-practice`. No rule is switched off. Widths 320, 390 and 1280 px, light and dark.
 - A "needs review" result fails like a violation unless listed. An entry names the rule, a part of the node's selector or markup (after the `data-testid` of its closest marked ancestor) and, where it applies, the route or state (`where`).
-- `a11y-lists.json`: `known` (a finding not fixed, with its reason and `workaround`; fix the component instead where possible) and `reviewed` (a "needs review" result a person found to pass, with the reason and the measured contrast in both themes; recheck when the tokens change).
+- `a11y-lists.json`: `known` (a finding not fixed, with its reason and `workaround`; fix the component instead where possible) and `reviewed` (a "needs review" result a person found to pass, with the reason; a `color-contrast` entry also gives the measured contrast in both themes, recheck it when the tokens change).
 
 ## Commands (this directory, or `-w @open-reloading/e2e` from the root)
 
@@ -33,7 +33,7 @@ Playwright tests against the static export of the web app (`pages/`, served by `
 - Drawing pixel baseline: runs in the Playwright image (docker or podman), so from the dev container build the export inside and run `npm run pages:serve` and `npm run drawing-baseline` on the host.
   - After an intended change add `-- --update-snapshots` and review the snapshots. Playwright never removes an unused snapshot: delete it by hand.
   - A drawing case the default set does not draw gets its most common record in `common` of `drawing-baseline.spec.ts`.
-- Visual check (images in the git-ignored `visual-check-out/`): `npm run visual-check -- --preset drawing|calculators` or page paths. `VISUAL_OUT`, `VISUAL_WIDTHS` (default `390,1280`), `VISUAL_LOADS=<n>`, `VISUAL_DEFAULTS=1`, `VISUAL_TALL=<height>`.
+- Visual check (images in the git-ignored `visual-check-out/`): `npm run visual-check -- --preset <preset>` (`drawing` or `calculators`) or page paths. `VISUAL_OUT`, `VISUAL_WIDTHS` (default `390,1280`), `VISUAL_LOADS=<n>`, `VISUAL_DEFAULTS=1`, `VISUAL_TALL=<height>`.
 - Unit tests of the scripts: `npm run test:unit`
 - Pages under a base path: `PAGES_BASE_PATH=/Ballistics npm run pages:build`, `PAGES_BASE_PATH=/Ballistics npm run pages:serve`, then `PAGES_URL=http://localhost:3003/Ballistics/ npm test -- --project=pages`.
-- `user-data-folder.spec.ts` needs a secure origin; `http://host.containers.internal` is not one. Run the suite on the host network instead: `podman run --rm --network=host --userns=keep-id -v "$PWD":"$PWD":z -w "$PWD/apps/e2e" -e CI=1 mcr.microsoft.com/playwright:v<@playwright/test version>-noble npx playwright test`
+- `user-data-folder.spec.ts` needs a secure origin; `http://host.containers.internal` is not one. Run the suite on the host network instead: `version=$(node -p "require('@playwright/test/package.json').version") && podman run --rm --network=host --userns=keep-id -v "$PWD":"$PWD":z -w "$PWD/apps/e2e" -e CI=1 "mcr.microsoft.com/playwright:v$version-noble" npx playwright test` (from the root, as `scripts/baseline.sh` looks up the version).
