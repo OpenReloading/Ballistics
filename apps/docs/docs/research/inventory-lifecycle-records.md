@@ -45,7 +45,7 @@ Verdicts over the nine rows (the stock idea is split into component stock and ro
 
 ## Result
 
-no change. Nothing was built. The kept parts are folded into the open issues on own lots (lot strings stay the stored shape; a lot record later is an optional reference beside the string, which needs no migration), on the load and firearm link (rounds loaded as one number on the load; the round count gains the shots of a session on one confirm, and shows its age), and on traceability (a box label printed from the load, no QR code before 1.0). Component stock, cost per round and a history of stock movements are dropped: each shows a wrong value once the user stops typing, and a notebook or spreadsheet does the job.
+no change. Nothing was built. The kept parts are folded into the open issues on own lots (lot strings stay the stored shape; a lot record later is an optional reference beside the string, which needs no migration), on the load and firearm link (rounds loaded as one number on the load; the round count gains the shots of a session on one confirm, and shows its age), and on traceability (a box label printed from the load; the [lot and batch traceability](./lot-batch-traceability.md) entry records the decision that the label carries a QR code naming the load). Component stock, cost per round and a history of stock movements are dropped: each shows a wrong value once the user stops typing, and a notebook or spreadsheet does the job.
 
 Not tracked: rounds or cases one by one (no serial per round or per case), the history of each case, the remaining amount of a powder, primer or bullet lot, purchase prices, an audit trail of changes, scanning of labels.
 

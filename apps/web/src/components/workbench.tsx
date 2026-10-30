@@ -1401,6 +1401,7 @@ export function Workbench() {
               onRenamed={tabs.renamed}
               onStored={stored}
               reminder={reminder.text}
+              system={system}
             />
             {TargetDialog && (
               <TargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />
