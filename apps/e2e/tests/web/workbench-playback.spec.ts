@@ -7,6 +7,8 @@ test.beforeEach(({ page }) => storeUnits(page))
 /** Runs the example load and gives the playback's Play button. */
 async function runPlayback(page: Page) {
   await runExample(page)
+  // the strip draws once the seated figure of the cartridge preview has arrived
+  await expect(page.locator('.strip-bullet')).toBeAttached()
   return page.getByRole('button', { name: 'Play', exact: true })
 }
 

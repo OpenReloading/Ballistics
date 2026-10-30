@@ -84,8 +84,9 @@ test('an own case group is a Mine row of the Cases list, opened in its editor, p
   await page.getByRole('option', { name: 'Match brass, lot 3 (your brass)' }).click()
   // the group's measured capacity is in the measured field, where the run marks it as measured
   await expect(capacity).toHaveValue(/^3\.6/)
-  // a group without a measured capacity leaves none of the previous group's in the field
-  await brass.click()
+  // a group without a measured capacity leaves none of the previous group's in the field;
+  // with a group chosen the field's buttons cover its middle, so the search is typed
+  await brass.fill('Plain')
   await page.getByRole('option', { name: 'Plain brass (your brass)' }).click()
   await expect(capacity).toHaveValue('')
 })
