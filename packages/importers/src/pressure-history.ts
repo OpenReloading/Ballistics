@@ -1,6 +1,7 @@
 // A pressure-time trace of the user's own measurement: time and pressure columns, the units and the
 // sensor position named by the user or the file, an optional zero-phase low-pass.
 import { detectDelimiter, splitCells } from './generic.ts'
+import { psi } from './record-fields.ts'
 import { bracketed, splitLines } from './text.ts'
 
 /** A pressure unit the trace importer recognises (any case in the file). */
@@ -16,9 +17,8 @@ const pressureUnits: Record<PressureUnit, number> = {
   MPa: 10,
   kPa: 0.01,
   Pa: 1e-5,
-  // 1 psi = 0.45359237 kg * 9.80665 m/s2 / (0.0254 m)^2 = 6894.757293168 Pa, NIST SP 811 Appendix B.9
-  psi: 6894.757293168e-5,
-  kpsi: 6894.757293168e-2,
+  psi,
+  kpsi: psi * 1000,
 }
 
 /** Factor of each time unit to s. */

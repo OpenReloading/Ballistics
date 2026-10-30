@@ -79,6 +79,7 @@ export function recordLoad(r: RecordRun): InteriorLoad {
       boreDiameter: chamberMetres(cartridge, 'F'),
       twist: chamberMetres(cartridge, 'u'),
       boreArea: area === undefined ? undefined : area * 1e-6,
+      // the powder record stores degrees Celsius; inline, as core cannot import the schema's units
       propellantTemperature: r.temperature ?? powder.interior.propellantTemperature.value + 273.15,
     },
     undefined,

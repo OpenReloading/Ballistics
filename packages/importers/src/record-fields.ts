@@ -36,7 +36,7 @@ const lengthUnits = [unit('mm', 1), unit('in', 25.4), unit('cm', 10)]
 const massUnits = [unit('g', 1), unit('gr', 0.06479891)]
 const coefficientUnits = [unit('lb/in2', 1), unit('kg/m2', inch ** 2 / pound)]
 const densityUnits = [unit('g/cm3', 1)]
-const psi = (pound * 9.80665) / inch ** 2 / 1e5
+export const psi = (pound * 9.80665) / inch ** 2 / 1e5
 // the values of MPa and kpsi fall in the usual bar range too, so only a header names them
 const pressureUnits = [
   unit('bar', 1),
