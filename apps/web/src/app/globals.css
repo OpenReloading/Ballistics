@@ -3541,10 +3541,20 @@ main .library-head.page-panel-head > .page-panel-title {
     white-space: normal;
   }
 
-  /* a long name wraps, so the numbers keep their room in the column */
-  .powder-table td:first-child {
-    max-width: 6rem;
+  /* a long name wraps and is cut after two lines, so the numbers keep their room in the column;
+     this outranks the one-line first cell of `.workbench table.limits` */
+  .workbench table.limits.powder-table td:first-child {
     white-space: normal;
+  }
+
+  .powder-table .powder-open {
+    display: -webkit-box;
+    max-width: 6rem;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   .powder-table th {
@@ -3578,6 +3588,11 @@ main .library-head.page-panel-head > .page-panel-title {
 .powder-open {
   color: var(--link);
   text-align: left;
+}
+
+/* the current label on a line of its own under the name, never over the next cell */
+.powder-table .barrel-current {
+  display: block;
 }
 
 .powder-open:hover {
