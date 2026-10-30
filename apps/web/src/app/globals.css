@@ -2083,6 +2083,26 @@ td.nowrap {
   stroke-dasharray: 0.5 0.3;
 }
 
+.drawing .seating-charge .tint {
+  fill: var(--powder);
+  fill-opacity: 0.3;
+}
+
+.drawing .seating-charge pattern path {
+  stroke: var(--draw-outline);
+  stroke-width: 0.12px;
+}
+
+.figure-values {
+  margin-top: 0.5rem;
+  font-size: 0.875em;
+}
+
+.figure-values-table caption {
+  text-align: start;
+  color: var(--muted);
+}
+
 .swatch {
   display: inline-block;
   width: 1.5rem;

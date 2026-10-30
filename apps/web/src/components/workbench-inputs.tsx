@@ -1247,6 +1247,12 @@ function landsChoice(
   return landsFor(lands, ref)
 }
 
+/** The charge (kg) and the powder's bulk density (kg/m³) the figure's powder fill reads. */
+const figurePowder = (
+  charge: number | undefined,
+  powder: { bulkDensity?: { value: number } | undefined } | undefined,
+) => ({ charge, bulkDensity: powder?.bulkDensity && toSi('density', powder.bulkDensity.value) })
+
 /**
  * The cartridge figure with the seated bullet, once a cartridge is chosen, drawn into `host`: the
  * card of the inputs' second column or the result tab Cartridge. One node moves between them, so
@@ -1283,6 +1289,8 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     chooseOwnCase,
     setSeatAt,
     suggestions,
+    fields,
+    powder,
   } = useLoad()
   const { ok, stale } = useResult()
   // the figure draws the selected step of a seating ladder while its result is current
@@ -1347,6 +1355,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       onSeated={follow}
       onSeatLadder={setSeatAt}
       ladderStep={ladderStep}
+      powder={figurePowder(fields.charge?.si, powder)}
       measuredWaterCapacity={
         measuredFor === measuredId ? measured.measuredWaterCapacity : emptyStep
       }
