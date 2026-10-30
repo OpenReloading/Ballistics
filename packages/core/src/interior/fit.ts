@@ -10,7 +10,7 @@
  */
 
 import type { Settings } from '../errors.ts'
-import { InputError, need, nth } from '../errors.ts'
+import { InputError, need, nth, positive } from '../errors.ts'
 import { chiSquareQuantile } from '../groups/chi-square.ts'
 import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 import { type LogFitStop, logLeastSquares } from '../least-squares.ts'
@@ -318,8 +318,6 @@ export class MixedPressureBasisError extends InputError {
 
 /** Smallest ratio of the longest to the shortest barrel length at which `energy` is fitted. */
 const minLengthSpan = 1.05
-
-const positive = (v: number | undefined) => v === undefined || (Number.isFinite(v) && v > 0)
 
 /** Start pressure below which the shot start does not depend on it: max(p_i, p_f + p_e(0)). */
 function startPressureFloor(load: InteriorLoad): number {

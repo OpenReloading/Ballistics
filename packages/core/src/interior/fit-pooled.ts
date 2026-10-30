@@ -7,7 +7,7 @@
  */
 
 import type { Settings } from '../errors.ts'
-import { InputError, need, nth } from '../errors.ts'
+import { InputError, need, nth, positive } from '../errors.ts'
 import { chiSquareQuantile } from '../groups/chi-square.ts'
 import { logLeastSquares } from '../least-squares.ts'
 import { type LadderPoint, PowderFitError, type PowderPrior } from './fit.ts'
@@ -148,8 +148,6 @@ export interface PooledPowderFit {
   /** `interior` runs of the fit. */
   runCount: number
 }
-
-const positive = (v: number | undefined) => v === undefined || (Number.isFinite(v) && v > 0)
 
 /** The load with its burn coefficient (or vivacity) set to `value`. */
 function withBurn(load: InteriorLoad, value: number): InteriorLoad {
