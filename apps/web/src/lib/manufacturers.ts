@@ -181,22 +181,6 @@ export const withManufacturerName = <T extends { manufacturer: string }>(
     }
   })
 
-/**
- * The manufacturer options over `rows`: each catalogue manufacturer id with its name, by name.
- */
-export const manufacturerOptions = (
-  rows: readonly { manufacturer?: string | undefined; manufacturerName: string }[],
-) =>
-  [
-    ...new Map(
-      rows.flatMap((r) =>
-        r.manufacturer ? [[r.manufacturer, r.manufacturerName || r.manufacturer]] : [],
-      ),
-    ),
-  ]
-    .map(([value, label]) => ({ value, label }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-
 let listing: Promise<ManufacturerSummary[]> | undefined
 
 /** Every catalogue manufacturer through `apiFetch`, once per page load; retried after a failure. */

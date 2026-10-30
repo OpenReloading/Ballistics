@@ -9,6 +9,7 @@ test.beforeEach(({ page }) => storeUnits(page))
 // its component
 const row = [
   ['combobox', 'Search cartridges by name'],
+  ['button', 'Browse cartridges'],
   ['combobox', 'Primer'],
   ['textbox', 'Primer lot'],
   ['combobox', 'Brass record'],
