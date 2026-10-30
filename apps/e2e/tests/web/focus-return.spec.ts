@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { showGerman } from './german.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -111,3 +112,19 @@ for (const width of widths) {
     await expect(way(page, 1280, 'From a photo')).toBeFocused()
   })
 }
+
+test('in German, Escape closes Saved loads and the focus goes back to Page actions at 390 px', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 })
+  await gotoHydrated(page, '/workbench')
+  await showGerman(page)
+  await (await barButton(page, 'Öffnen', 'Seitenaktionen')).click()
+  await page.getByRole('menuitem', { name: /^Gespeicherte Laborierungen/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Gespeicherte Laborierungen' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'Gespeicherte Laborierungen' })).toBeHidden()
+  await expect(
+    page.getByRole('button', { name: 'Seitenaktionen', exact: true }).locator('visible=true'),
+  ).toBeFocused()
+})
