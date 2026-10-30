@@ -110,8 +110,9 @@ Open findings with the reason they are not fixed yet and the way round them. The
 
 | Id | Why it stays | Workaround |
 |---|---|---|
-| A-15 | The charts lay out their labels inside a fixed box | Chart data and the values table |
-| A-09 to A-12 | Minor; one chart colour, the title bar and a status message | See each row |
+| A-15 | The chart library measures and places the axis and unit labels without the reader's letter and word spacing, and the interior chart keeps a fixed 56 px for its pressure labels. Room for the spaced labels needs both charts to measure with the computed spacing and lay out again when the style changes, or to draw their labels in HTML | Chart data and the values table |
+| A-11 | Below 75em the title sits in the 52 px app header, which cannot grow, and a title area that scrolls there fails axe at 320 and 390 px. The fix moves the title out of the header below 75em on every page and keeps the workbench without page scrolling at every size, a layout change of the whole app | The document title and the heading's full text |
+| A-09, A-10, A-12 | Minor; one chart colour, a tooltip outside the landmarks and a status message | See each row |
 
 ## Not covered by this audit
 
