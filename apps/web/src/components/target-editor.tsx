@@ -1922,6 +1922,7 @@ function Canvas({ ed }: { ed: Ed }) {
     onPoint,
     view,
     layer,
+    score,
     detect,
     hint,
     help,
@@ -1951,6 +1952,7 @@ function Canvas({ ed }: { ed: Ed }) {
         sheet={sheet}
         frame={frame}
         photo={photo === 'missing' ? undefined : photo}
+        face={score.outline}
         active={group?.id}
         selected={selected}
         tool={tool}

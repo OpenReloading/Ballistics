@@ -27,7 +27,7 @@ import {
 } from '../lib/target-editor.ts'
 import { circleThrough, type Point, turnedBox } from '../lib/target-geometry.ts'
 import { groupStatisticsOf } from '../lib/target-groups.ts'
-import type { ViewBox } from '../lib/target-view.ts'
+import { boxAround, type ViewBox } from '../lib/target-view.ts'
 import { mmLength } from '../lib/workbench.ts'
 import { arrows, viewPoint } from './svg-point.ts'
 import { useUnits } from './units-settings.tsx'
@@ -39,9 +39,8 @@ export type Tool =
   | 'aim'
   | 'origin'
   | CalibrationReference['kind']
-  // hole detection: its region, the backing colour and the example hole (hole-detection.tsx)
+  // hole detection: its region and the example hole (hole-detection.tsx)
   | 'region'
-  | 'backing'
   | 'example'
   // ring scoring: points on the rings of a target face (ring-scoring.tsx)
   | 'rings'
@@ -118,11 +117,12 @@ function RefShape({ r }: { r: CalibrationReference }) {
   return <circle cx={c.centre.x} cy={c.centre.y} r={c.radius} />
 }
 
-/** The extent to fit: the photo, or every point drawn with a margin. */
+/** The extent to fit: the photo, or every point drawn with a margin (a drawn target: its face). */
 function extentOf(
   sheet: TargetSheet,
   frame: Frame | undefined,
   photo: { width: number; height: number } | undefined,
+  face: Point[] | undefined,
 ): ViewBox {
   if (photo) return turnedBox(photo.width, photo.height, sheet.photoRotation ?? 0)
   const pts: Point[] = []
@@ -132,14 +132,15 @@ function extentOf(
       if (g.aim) pts.push(targetToView(frame, g.aim))
     }
   for (const r of sheet.references) pts.push(...refPoints(r))
-  // a drawn target: at least 200 mm around the origin
-  if (!sheet.photo) pts.push({ x: -100, y: -100 }, { x: 100, y: 100 })
-  if (!pts.length) return { x: 0, y: 0, w: 1000, h: 1000 }
-  const xs = pts.map((p) => p.x)
-  const ys = pts.map((p) => p.y)
-  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
-  const m = 0.1 * Math.max(x1 - x0, y1 - y0, 1)
-  return { x: x0 - m, y: y0 - m, w: x1 - x0 + 2 * m, h: y1 - y0 + 2 * m }
+  // a drawn target: its face, else at least 200 mm around the origin
+  if (!sheet.photo)
+    pts.push(
+      ...(face ?? [
+        { x: -100, y: -100 },
+        { x: 100, y: 100 },
+      ]),
+    )
+  return boxAround(pts)
 }
 
 type ShotHandlers = {
@@ -549,9 +550,7 @@ function overlayOf(
 
 /** The tools that take a point by click or by the keyboard marker. */
 function isPointTool(tool: Tool) {
-  return (
-    ['aim', 'origin', 'region', 'backing', 'example', 'rings'].includes(tool) || tool in toolPoints
-  )
+  return ['aim', 'origin', 'region', 'example', 'rings'].includes(tool) || tool in toolPoints
 }
 
 /** The tools that show the magnifier while the pointer is over the sheet. */
@@ -631,6 +630,7 @@ export function TargetCanvas({
   layer,
   still,
   view: viewOut,
+  face,
 }: {
   sheet: TargetSheet
   frame: Frame | undefined
@@ -664,6 +664,8 @@ export function TargetCanvas({
   still?: { box: ViewBox; k: number }
   /** Set to the extent Fit shows on every render, for the exports and the print. */
   view?: { current: { extent: ViewBox } | undefined }
+  /** The outline of the active group's face in view units: a drawn target fits to it. */
+  face?: Point[] | undefined
 }) {
   // an id usable in url(#...) references
   const { system } = useUnits()
@@ -678,7 +680,7 @@ export function TargetCanvas({
   const [statsAt, setStatsAt] = useState({ x: 8, y: 8 })
 
   /** The extent to fit: the photo, or every point drawn with a margin. */
-  const extent = useMemo(() => extentOf(sheet, frame, photo), [photo, frame, sheet])
+  const extent = useMemo(() => extentOf(sheet, frame, photo, face), [photo, frame, sheet, face])
   const extentKey = `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
   // biome-ignore lint/correctness/useExhaustiveDependencies: fit once per photo and turn, not on every edit
   useEffect(() => setView(undefined), [extentKey])
