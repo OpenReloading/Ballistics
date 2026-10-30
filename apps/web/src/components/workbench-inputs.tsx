@@ -26,6 +26,7 @@ import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
+import { loadExample } from '../lib/example-data.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -34,7 +35,7 @@ import {
   siValues,
   specText,
 } from '../lib/field-spec.ts'
-import { landsFor } from '../lib/firearm.ts'
+import { gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -1185,20 +1186,21 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
 
 /** A card's record picker, its heading: the chosen record shows in the field. */
 function CardPicker({ panel }: { panel: InputPanel }) {
-  const { chooseFirearm, firearm, firearmList, readDesigns } = useLoad()
+  const { chooseFirearm, firearm, firearms, readDesigns } = useLoad()
   const names = useManufacturerNames()
   const { t } = useTranslation()
   if (panel === 'cartridge') return <CartridgePicker />
   if (panel === 'bullet') return <BulletPicker />
   if (panel === 'powder') return <PowderPicker names={names} />
+  const { data, placeholder } = gunPicker(firearms, loadExample.firearm, t)
   return (
     <Select
       size={controlSize.row.input}
       aria-label={t('Firearm from your library')}
-      placeholder={firearmList.length ? t('Choose a firearm') : t('No firearm in this browser')}
+      placeholder={placeholder}
       searchable
       clearable
-      data={firearmList.map((f) => ({ value: f.id, label: f.name }))}
+      data={data}
       value={firearm ?? null}
       onChange={chooseFirearm}
       onDropdownOpen={readDesigns}

@@ -1103,10 +1103,12 @@ export function useWorkbenchState() {
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
-  /** The library, with the example's built-in rifle while the example is loaded. */
-  const firearmList = (
-    firearm === loadExample.firearm.id ? [loadExample.firearm, ...firearms] : firearms
-  ).map((r) => ({ id: r.id, name: r.name, data: gunValues((r as FirearmRecord).data) }))
+  /** The library, then the example's built-in rifle (`gunPicker`). */
+  const firearmList = [...firearms, loadExample.firearm].map((r) => ({
+    id: r.id,
+    name: r.name,
+    data: gunValues((r as FirearmRecord).data),
+  }))
   /** The chosen firearm's active sight, for the Trajectory tab. */
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],

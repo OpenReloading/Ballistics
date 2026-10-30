@@ -839,7 +839,7 @@
   "No drawing: {reason}": "Keine Zeichnung: {reason}",
   "No federations match these filters.": "Keine Verbände entsprechen diesen Filtern.",
   "No firearm found": "Keine Schusswaffe gefunden",
-  "No firearm in this browser": "Keine Schusswaffe in diesem Browser",
+  "No firearm saved yet. Pick the example rifle, or add yours under Firearms.": "Noch keine Schusswaffe gespeichert. Wählen Sie das Beispielgewehr oder fügen Sie Ihre unter Schusswaffen hinzu.",
   "No firearms match these filters.": "Keine Schusswaffen entsprechen diesen Filtern.",
   "No fitted model parameters": "Keine angepassten Modellparameter",
   "No fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.": "Keine angepassten Parameter: Die Anpassung an die Ladetabellen liefert Parameter nur für Treibladungspulver mit mindestens 10 Trainingszeilen aus mindestens 2 Patronen.",
@@ -2202,6 +2202,7 @@
   "{model} {value} lb/in² from {velocity}": "{model} {value} lb/in² ab {velocity}",
   "{name} (from the link)": "{name} (aus dem Link)",
   "{name} (your design)": "{name} (Ihr Entwurf)",
+  "{name} (example)": "{name} (Beispiel)",
   "{name} ({count} shot)|{name} ({count} shots)": {
     "one": "{name} ({count} Schuss)",
     "other": "{name} ({count} Schüsse)"
