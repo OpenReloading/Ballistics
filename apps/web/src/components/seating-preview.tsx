@@ -1696,16 +1696,8 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
           )}
         </p>
       )}
-      {drawnSeating && m.fill && (
-        <p className="seating-legend">
-          {fillText(m.fill, m.system, t)}{' '}
-          {'level' in m.fill &&
-            t(
-              'The charge level is approximate: the volume behind the bullet is taken as even from the head to the bullet base.',
-            )}
-        </p>
-      )}
-      {drawnSeating && <FigureValues m={m} seating={drawnSeating} />}
+      {/* the workbench card's drawing fills it: the fill and the table go to the Cartridge card's More */}
+      {drawnSeating && put(m.slots, <FigureValues m={m} seating={drawnSeating} />, m.slots?.more)}
       {!shape && view === 'combined' && !designer && (
         <p>{t('Choose a bullet with a length to seat it.')}</p>
       )}
@@ -1713,36 +1705,48 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
   )
 }
 
-/** The values the figure draws, as a table: the same model and fill the drawing reads. */
+/** The powder fill's legend and the values the figure draws as a table, from the model and fill the drawing reads. */
 function FigureValues({ m, seating }: { m: Model; seating: Seating }) {
   const { t } = useTranslation()
+  const { fill } = m
   const rows = seatingValueRows(
     {
       annotation: (m.model ?? m.levelModel)?.annotation,
       seating,
-      fill: m.fill,
+      fill,
       system: m.system,
     },
     t,
   )
   return (
-    <details className="figure-values">
-      <summary>{t('Values of the drawing')}</summary>
-      <PanelTable
-        label={t('Values of the drawing')}
-        className="figure-values-table"
-        caption={t('Values of the drawing (simulation inputs, not load data)')}
-        columns={[t('Name'), t('Value'), t('Unit')]}
-      >
-        {rows.map((r) => (
-          <tr key={`${r.name} ${r.value}`}>
-            <th scope="row">{r.name}</th>
-            <td className="num">{r.value}</td>
-            <td>{r.unit}</td>
-          </tr>
-        ))}
-      </PanelTable>
-    </details>
+    <div className="figure-values">
+      {fill && (
+        <p className="seating-legend">
+          {fillText(fill, m.system, t)}{' '}
+          {'level' in fill &&
+            t(
+              'The charge level is approximate: the volume behind the bullet is taken as even from the head to the bullet base.',
+            )}
+        </p>
+      )}
+      <details>
+        <summary>{t('Values of the drawing')}</summary>
+        <PanelTable
+          label={t('Values of the drawing')}
+          className="figure-values-table"
+          caption={t('Values of the drawing (simulation inputs, not load data)')}
+          columns={[t('Name'), t('Value'), t('Unit')]}
+        >
+          {rows.map((r) => (
+            <tr key={`${r.name} ${r.value}`}>
+              <th scope="row">{r.name}</th>
+              <td className="num">{r.value}</td>
+              <td>{r.unit}</td>
+            </tr>
+          ))}
+        </PanelTable>
+      </details>
+    </div>
   )
 }
 

@@ -1,3 +1,4 @@
+import { face } from '@open-reloading/drawing'
 import type { Seating } from '@open-reloading/drawing/seating'
 import { toSi } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
@@ -63,12 +64,17 @@ describe('seatingValueRows', () => {
     const rows = seatingValueRows({ annotation, seating, fill, system }, english.t)
     const named = new Map(rows.map((r) => [r.name, r]))
     for (const d of annotation.dimensions) {
-      const row = named.get(`${d.kind === 'diameter' ? 'Ø' : ''}${d.symbol}`)
+      const row = named.get(`${d.kind === 'diameter' ? face.diameterSign : ''}${d.symbol}`)
       expect(row, d.symbol).toBeDefined()
       if (d.symbol !== 'Rt/R') expect(Number(row?.value)).toBeCloseTo(d.value, 1)
     }
-    // the drawing labels each length once: as many label texts as length and diameter rows
+    // and the other way: each value text the drawing prints names a row of the table
     const labels = model?.layers.cartridge?.labels.filter((l) => !l.ring) ?? []
+    expect(labels.length).toBeGreaterThan(0)
+    for (const l of labels) {
+      const name = l.text.replace(/^\(|\)$/g, '').split(' ')[0] as string
+      expect(named.has(name), l.text).toBe(true)
+    }
     expect(labels.map((l) => l.text)).toContain(`COAL ${named.get('COAL')?.value}`)
     expect(named.get('CBTO')?.value).toBe('52.74')
     expect(rows.filter((r) => r.name === 'COAL')).toHaveLength(1)

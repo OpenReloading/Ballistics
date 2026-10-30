@@ -1,5 +1,5 @@
 import { loadRatio } from '@open-reloading/core'
-import { type Annotation, angleText, greek } from '@open-reloading/drawing'
+import { type Annotation, angleText, face, greek } from '@open-reloading/drawing'
 import type { Seating } from '@open-reloading/drawing/seating'
 import { toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
@@ -67,7 +67,7 @@ function dimensionRows(annotation: Annotation, system: UnitSystem): ValueRow[] {
       d.symbol === 'Rt/R'
         ? { name: d.symbol, value: String(d.value), unit: '' }
         : {
-            name: `${d.kind === 'diameter' ? 'Ø' : ''}${d.symbol}`,
+            name: `${d.kind === 'diameter' ? face.diameterSign : ''}${d.symbol}`,
             value: length(d.value),
             unit: system.length.symbol,
           },
