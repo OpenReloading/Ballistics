@@ -97,3 +97,4 @@ The workbench asks for the band of the step it shows first, in a second request 
 ## Sources
 
 - [JCGM 101:2008](../bibliography.md#jcgm-101-2008), propagation of distributions by a Monte Carlo method: the procedure of drawing the inputs, evaluating the model per draw and reading the percentiles of the sorted outputs, described here in own words (section numbers unverified). The Box-Muller transform of two uniform numbers is the usual construction of a normal number.
+- Research log: [sampled band against the corner cases](../research/interior-sampled-band-corner-cases.md).
