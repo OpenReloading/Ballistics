@@ -64,6 +64,7 @@ Playwright tests against the static export of the web app (`pages/`, served by `
 | `web/language.spec.ts` | German chosen in Settings switches the home page and the dialog and is remembered over a visit, the Database list, a record page and the workbench after the example run in German with axe clean, the German interface opening offline after a visit, the first-visit Safety notice with the German text beside the English one |
 | `web/german-numbers.spec.ts` | under German the workbench takes a decimal comma or point, writes the comma on leaving a field and in its results; under English a pasted text goes in at the caret |
 | `web/print-german.spec.ts` | the printed report and load sheets in German keep none of the English page text and stay inside the page |
+| `web/box-label.spec.ts` | a saved load's box label printed from the Saved loads drawer: one label of 90 x 60 mm on an A4 page, its QR text `OR1:L:<id>` under the code, nothing overflowing the label. The label's rows and the QR payload decode are Vitest tests (`apps/web/test/box-label.test.tsx`) |
 
 ## The accessibility sweep
 

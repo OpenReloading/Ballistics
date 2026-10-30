@@ -8,9 +8,9 @@ import { storedRecords } from './user-store.ts'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 /** The API path of each kind of record a load names. */
-type Kind = 'cartridges' | 'firearms' | 'bullets' | 'powders'
+type Kind = 'cartridges' | 'firearms' | 'bullets' | 'powders' | 'primers'
 /** The name of the record `ref` names, else the reference as stored; empty without a reference. */
-type NameOf = (kind: Kind, ref: string | undefined) => string
+export type NameOf = (kind: Kind, ref: string | undefined) => string
 
 /**
  * Header and one row per saved load in stored units: charge in g, seating length in mm, the last
@@ -72,7 +72,7 @@ export function firearmRows(
 }
 
 /** The names of the records the loads name: from this browser's records, else asked from the API once each. */
-async function recordNames(records: readonly UserRecord[]): Promise<NameOf> {
+export async function recordNames(records: readonly UserRecord[]): Promise<NameOf> {
   const own = new Map(records.map((r) => [r.id, r.name]))
   const refs = new Map<string, [Kind, string]>()
   for (const r of records) {
@@ -82,6 +82,7 @@ async function recordNames(records: readonly UserRecord[]): Promise<NameOf> {
       ['firearms', r.data.firearm],
       ['bullets', r.data.bullet],
       ['powders', r.data.powder],
+      ['primers', r.data.primer?.record],
     ] as const)
       if (typeof ref === 'string') refs.set(`${kind} ${ref}`, [kind, ref])
   }

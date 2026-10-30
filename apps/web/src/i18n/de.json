@@ -3783,5 +3783,9 @@
   "The bullet has no BC in the database.": "Das Geschoss hat in der Datenbank keinen BC.",
   "The bullet has several BC values; choose one in the workbench.": "Das Geschoss hat mehrere BC-Werte; wählen Sie einen in der Werkbank.",
   "The bullet record was not found.": "Der Geschossdatensatz wurde nicht gefunden.",
+  "Print a box label": "Schachtel-Etikett drucken",
+  "Print a box label of {name}": "Schachtel-Etikett von {name} drucken",
+  "Print failed: {error}": "Drucken fehlgeschlagen: {error}",
+  "Saved": "Gespeichert",
   "Name or lot": "Name oder Los"
 }

@@ -2,8 +2,8 @@
 
 import { ActionIcon, Button, Drawer, Text, TextInput } from '@mantine/core'
 import { parseRef } from '@open-reloading/schema'
-import { Copy, DownloadSimple, PencilSimple, Trash } from '@phosphor-icons/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Copy, DownloadSimple, PencilSimple, Printer, Trash } from '@phosphor-icons/react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { fixedNumber } from '../i18n/number.ts'
 import type { Say } from '../i18n/translate.ts'
@@ -28,6 +28,7 @@ import {
 } from '../lib/load-tabs.ts'
 import { newId } from '../lib/new-id.ts'
 import { controlSize } from '../lib/theme.ts'
+import type { UnitSystem } from '../lib/units.ts'
 import { userDataText } from '../lib/user-data.ts'
 import { recordFileName } from '../lib/user-file-names.ts'
 import { deleteRecord, storedRecord, storedRecords } from '../lib/user-store.ts'
@@ -133,6 +134,7 @@ export function SavedLoads({
   onRenamed,
   onStored,
   reminder,
+  system,
 }: {
   opened: boolean
   onClose: () => void
@@ -147,6 +149,8 @@ export function SavedLoads({
   /** Called after a rename or a copy wrote the store. */
   onStored: () => void
   reminder?: string | undefined
+  /** The units the box label prints in. */
+  system: UnitSystem
 }) {
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')
@@ -159,6 +163,8 @@ export function SavedLoads({
   /** The load whose name is edited in its row, with the text. */
   const [renaming, setRenaming] = useState<{ id: string; text: string }>()
   const storage = useStorage(opened)
+  /** The box label being printed, a portal of `body`. */
+  const [label, setLabel] = useState<ReactNode>()
   // biome-ignore lint/correctness/useExhaustiveDependencies: `tick` is the write counter
   useEffect(() => {
     if (!opened) return
@@ -244,157 +250,178 @@ export function SavedLoads({
   ])
   const groups = loadGroups(records, query, names, t)
   return (
-    <Drawer.Root opened={opened} onClose={onClose} size="sm" position="left">
-      <Drawer.Overlay />
-      <Drawer.Content>
-        {/* a div: a second <header> beside the site header would be another banner landmark */}
-        <Drawer.Header component="div">
-          <Drawer.Title>{t('Saved loads')}</Drawer.Title>
-          <Drawer.CloseButton aria-label={t('Close saved loads')} />
-        </Drawer.Header>
-        <Drawer.Body>
-          <TextInput
-            aria-label={t('Search saved loads')}
-            placeholder={t('Name or lot')}
-            value={query}
-            onChange={(e) => setQuery(e.currentTarget.value)}
-            mb="sm"
-          />
-          <div className="saved-loads">
-            {groups.map((g) => (
-              <section key={g.key} aria-label={g.title}>
-                <Text fw={600} size="sm">
-                  {g.title}
-                </Text>
-                <ul>
-                  {g.records.map((r) => (
-                    <li key={r.id}>
-                      {renaming?.id === r.id ? (
-                        <input
-                          className="saved-rename"
-                          aria-label={t('Name of {name}', { name: r.name })}
-                          maxLength={200}
-                          ref={focusField}
-                          value={renaming.text}
-                          onFocus={(e) => e.currentTarget.select()}
-                          onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
-                          onBlur={(e) => rename(r, e.currentTarget.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') void rename(r, renaming.text)
-                            else if (e.key === 'Escape') {
-                              // the drawer stays open
-                              e.stopPropagation()
-                              stopEdit()
-                            }
-                          }}
-                        />
-                      ) : (
-                        <Button
+    <>
+      {label}
+      <Drawer.Root opened={opened} onClose={onClose} size="sm" position="left">
+        <Drawer.Overlay />
+        <Drawer.Content>
+          {/* a div: a second <header> beside the site header would be another banner landmark */}
+          <Drawer.Header component="div">
+            <Drawer.Title>{t('Saved loads')}</Drawer.Title>
+            <Drawer.CloseButton aria-label={t('Close saved loads')} />
+          </Drawer.Header>
+          <Drawer.Body>
+            <TextInput
+              aria-label={t('Search saved loads')}
+              placeholder={t('Name or lot')}
+              value={query}
+              onChange={(e) => setQuery(e.currentTarget.value)}
+              mb="sm"
+            />
+            <div className="saved-loads">
+              {groups.map((g) => (
+                <section key={g.key} aria-label={g.title}>
+                  <Text fw={600} size="sm">
+                    {g.title}
+                  </Text>
+                  <ul>
+                    {g.records.map((r) => (
+                      <li key={r.id}>
+                        {renaming?.id === r.id ? (
+                          <input
+                            className="saved-rename"
+                            aria-label={t('Name of {name}', { name: r.name })}
+                            maxLength={200}
+                            ref={focusField}
+                            value={renaming.text}
+                            onFocus={(e) => e.currentTarget.select()}
+                            onChange={(e) => setRenaming({ id: r.id, text: e.currentTarget.value })}
+                            onBlur={(e) => rename(r, e.currentTarget.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') void rename(r, renaming.text)
+                              else if (e.key === 'Escape') {
+                                // the drawer stays open
+                                e.stopPropagation()
+                                stopEdit()
+                              }
+                            }}
+                          />
+                        ) : (
+                          <Button
+                            variant="subtle"
+                            size={controlSize.row.button}
+                            className="saved-open"
+                            aria-current={openIds.includes(r.id) || undefined}
+                            onClick={() => {
+                              onOpen(r)
+                              onClose()
+                            }}
+                          >
+                            {r.name}
+                          </Button>
+                        )}
+                        <span className="file-reason">{dateTimeText(new Date(r.saved))}</span>
+                        <ActionIcon
+                          size={controlSize.row.icon}
                           variant="subtle"
-                          size={controlSize.row.button}
-                          className="saved-open"
-                          aria-current={openIds.includes(r.id) || undefined}
-                          onClick={() => {
-                            onOpen(r)
-                            onClose()
-                          }}
+                          aria-label={t('Rename {name}', { name: r.name })}
+                          title={t('Rename')}
+                          onClick={() => edit(r.id, r.name)}
                         >
-                          {r.name}
-                        </Button>
-                      )}
-                      <span className="file-reason">{dateTimeText(new Date(r.saved))}</span>
-                      <ActionIcon
-                        size={controlSize.row.icon}
-                        variant="subtle"
-                        aria-label={t('Rename {name}', { name: r.name })}
-                        title={t('Rename')}
-                        onClick={() => edit(r.id, r.name)}
-                      >
-                        <PencilSimple size={16} aria-hidden="true" />
-                      </ActionIcon>
-                      <ActionIcon
-                        size={controlSize.row.icon}
-                        variant="subtle"
-                        aria-label={t('Duplicate {name}', { name: r.name })}
-                        title={t('Duplicate')}
-                        onClick={() => duplicate(r)}
-                      >
-                        <Copy size={16} aria-hidden="true" />
-                      </ActionIcon>
-                      <ActionIcon
-                        size={controlSize.row.icon}
-                        variant="subtle"
-                        aria-label={t('Export {name}', { name: r.name })}
-                        title={t('Export to a file')}
-                        onClick={() => exportOne(r)}
-                      >
-                        <DownloadSimple size={16} aria-hidden="true" />
-                      </ActionIcon>
-                      <ActionIcon
-                        size={controlSize.row.icon}
-                        variant="subtle"
-                        color="red"
-                        aria-label={t('Delete {name}', { name: r.name })}
-                        title={t('Delete')}
-                        onClick={() => remove(r)}
-                      >
-                        <Trash size={16} aria-hidden="true" />
-                      </ActionIcon>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-            {groups.length === 0 && (
-              <Text size="sm" c="dimmed">
-                {records.length === 0 ? t('No saved loads.') : t('No match.')}
-              </Text>
-            )}
-          </div>
-          <Button
-            variant="default"
-            size={controlSize.row.button}
-            disabled={records.length === 0}
-            onClick={() =>
-              // a plain import(): the CSV code stays out of the workbench's weight
-              import('../lib/records-csv.ts')
-                .then((m) => m.saveLoadsCsv())
-                .catch((e) =>
-                  setMessage((t) => t('Export failed: {error}', { error: errorText(e) })),
-                )
-            }
-          >
-            {t('Export CSV')}
-          </Button>
-          <div className="saved-storage" role="status">
-            {shown && <p>{shown.say(t)}</p>}
-            {older > 0 && (
-              <p>
-                {tn(
-                  older,
-                  '{count} saved load is in the format of an earlier version, which this app no longer reads. Open lists it under Invalid records.',
-                  '{count} saved loads are in the format of an earlier version, which this app no longer reads. Open lists them under Invalid records.',
-                )}
-              </p>
-            )}
-            {storage.persisted !== undefined && (
-              <p>
-                {storage.persisted
-                  ? t('Persistent storage: granted.')
-                  : t('Persistent storage: not granted, the browser may clear the saved loads.')}
-              </p>
-            )}
-            {storage.used !== undefined && (
-              <p>{t('Storage used: {size}.', { size: megabytes(storage.used) })}</p>
-            )}
-            {reminder && (
-              <p data-due>
-                {t('{reminder} Export all (Save options) keeps a copy.', { reminder })}
-              </p>
-            )}
-          </div>
-        </Drawer.Body>
-      </Drawer.Content>
-    </Drawer.Root>
+                          <PencilSimple size={16} aria-hidden="true" />
+                        </ActionIcon>
+                        <ActionIcon
+                          size={controlSize.row.icon}
+                          variant="subtle"
+                          aria-label={t('Duplicate {name}', { name: r.name })}
+                          title={t('Duplicate')}
+                          onClick={() => duplicate(r)}
+                        >
+                          <Copy size={16} aria-hidden="true" />
+                        </ActionIcon>
+                        <ActionIcon
+                          size={controlSize.row.icon}
+                          variant="subtle"
+                          aria-label={t('Export {name}', { name: r.name })}
+                          title={t('Export to a file')}
+                          onClick={() => exportOne(r)}
+                        >
+                          <DownloadSimple size={16} aria-hidden="true" />
+                        </ActionIcon>
+                        <ActionIcon
+                          size={controlSize.row.icon}
+                          variant="subtle"
+                          aria-label={t('Print a box label of {name}', { name: r.name })}
+                          title={t('Print a box label')}
+                          onClick={() =>
+                            // a plain import(): the label and its QR code stay out of the workbench's weight
+                            import('./box-label.tsx')
+                              .then((m) => m.printBoxLabel(r, system, t, setLabel))
+                              .catch((e) =>
+                                setMessage((t) =>
+                                  t('Print failed: {error}', { error: errorText(e) }),
+                                ),
+                              )
+                          }
+                        >
+                          <Printer size={16} aria-hidden="true" />
+                        </ActionIcon>
+                        <ActionIcon
+                          size={controlSize.row.icon}
+                          variant="subtle"
+                          color="red"
+                          aria-label={t('Delete {name}', { name: r.name })}
+                          title={t('Delete')}
+                          onClick={() => remove(r)}
+                        >
+                          <Trash size={16} aria-hidden="true" />
+                        </ActionIcon>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+              {groups.length === 0 && (
+                <Text size="sm" c="dimmed">
+                  {records.length === 0 ? t('No saved loads.') : t('No match.')}
+                </Text>
+              )}
+            </div>
+            <Button
+              variant="default"
+              size={controlSize.row.button}
+              disabled={records.length === 0}
+              onClick={() =>
+                // a plain import(): the CSV code stays out of the workbench's weight
+                import('../lib/records-csv.ts')
+                  .then((m) => m.saveLoadsCsv())
+                  .catch((e) =>
+                    setMessage((t) => t('Export failed: {error}', { error: errorText(e) })),
+                  )
+              }
+            >
+              {t('Export CSV')}
+            </Button>
+            <div className="saved-storage" role="status">
+              {shown && <p>{shown.say(t)}</p>}
+              {older > 0 && (
+                <p>
+                  {tn(
+                    older,
+                    '{count} saved load is in the format of an earlier version, which this app no longer reads. Open lists it under Invalid records.',
+                    '{count} saved loads are in the format of an earlier version, which this app no longer reads. Open lists them under Invalid records.',
+                  )}
+                </p>
+              )}
+              {storage.persisted !== undefined && (
+                <p>
+                  {storage.persisted
+                    ? t('Persistent storage: granted.')
+                    : t('Persistent storage: not granted, the browser may clear the saved loads.')}
+                </p>
+              )}
+              {storage.used !== undefined && (
+                <p>{t('Storage used: {size}.', { size: megabytes(storage.used) })}</p>
+              )}
+              {reminder && (
+                <p data-due>
+                  {t('{reminder} Export all (Save options) keeps a copy.', { reminder })}
+                </p>
+              )}
+            </div>
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+    </>
   )
 }

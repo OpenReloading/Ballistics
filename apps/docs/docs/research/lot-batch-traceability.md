@@ -26,13 +26,13 @@ No model equations. The one conversion the slices would need: 1 grain = 64.79891
 
 | Slice | Typed by the user | Shown when not kept up | Verdict |
 | --- | --- | --- | --- |
-| 1 Lot record and picker | lot, supplier, date per box | a lot without its later boxes | part of the own lots issue; the lot string stays the stored shape, a record is an optional reference beside it |
+| 1 Lot record and picker | lot, supplier, date per box | a lot without its later boxes | no-go, decided in the pre-release: the lot string stays the stored shape and no lot record is planned |
 | 2 Trace from a lot | nothing: the lot strings of loads and session snapshots | nothing wrong: a load without a lot is not found | go: the Saved loads search also matches the lot strings |
 | 3 Batch record | load, lots, quantity, date, charge per batch | a wrong quantity; old batches of a changed recipe | no-go: the session snapshot already keeps the lots, seating and round count of the load at the session; quantity is not stored |
 | 4 Brass process steps | a dated step per process run | a missing step reads as not done | no-go: the case group keeps its firing count; the history of each case is not tracked |
 | 5 Remaining amount per lot | every purchase and use | a wrong amount on hand | no-go (inventory review) |
 | 6 Reminders | a due date or a minimum | a missed or false reminder | in-app notes only, which exist; no system notification, no calendar file |
-| 7 Box label | nothing: printed from the load | not applicable | no build: the printed load sheet already carries the case and primer lots; a label size waits for users asking |
+| 7 Box label | nothing: printed from the load | not applicable | go, decided in the pre-release: a label of 90 x 60 mm printed from a saved load, with a QR code that names the load ([Box label](../models/box-label.md)) |
 | 8 Cost per round | price and pack size per component | an old price | no-go (inventory review) |
 
 Reminder routes:
@@ -46,11 +46,11 @@ Reminder routes:
 
 ## Result
 
-no change. Nothing is built from this map except one search: the Saved loads search also matches the powder, primer and case lot strings of a load and of its session snapshots, which traces a lot to the loads and sessions that used it with no new record. The lot record stays in the own lots issue, as an optional reference beside the lot string, so no migration follows. A batch record, dated brass steps, remaining amounts, cost and system notifications are ruled out: each needs entries the user keeps up, and the session snapshot, the firing count and the load notes already hold what changes a calculation or a comparison.
+no change to the stored shape. Decided: lots stay optional plain strings on the load and its session snapshots, and no lot record is planned. Two slices are built from this map, both from data already stored. The printed box label (slice 7): a saved load prints a label with its components, charge, seating length, save day, the lots that are typed and a QR code whose text names the load by its record id in a versioned form, so the code never carries load values and can become a link later without a format change ([Box label](../models/box-label.md)). And one search: the Saved loads search also matches the powder, primer and case lot strings of a load and of its session snapshots, which traces a lot to the loads and sessions that used it with no new record. A batch record, dated brass steps, remaining amounts, cost and system notifications are ruled out: each needs entries the user keeps up, and the session snapshot, the firing count and the load notes already hold what changes a calculation or a comparison.
 
 The open shape questions resolve with no batch record: a batch without a load does not arise; amount entries, their correction and rounding do not arise with no stored amount; restore duplicates are handled by the per-record replace prompt of the import, keyed by record id. A lot, a load sheet and a trace are bookkeeping: no text calls a lot, a load or a batch safe or fit for use.
 
-Not tracked: batches, quantities loaded or left, process history of cases, purchase prices, reminders outside the app, QR codes.
+Not tracked: batches, quantities loaded or left, process history of cases, purchase prices, reminders outside the app, a lot record. The QR code of the box label names a saved load; the app does not scan it.
 
 ## Data basis
 
@@ -65,6 +65,7 @@ analytic. A review of the repository's schema and web app and of the browser com
 - `apps/web/src/lib/load-notes.ts` (the notes on a changed lot and on the round count).
 - `apps/web/src/lib/data-files.ts` (the import's Replace prompt for a record with the id of a browser record).
 - `apps/web/src/components/load-sheets.tsx` (the printed load sheet with the case and primer lots).
+- `apps/web/src/lib/box-label.ts`, `apps/web/src/components/box-label.tsx` (the box label and its QR text, printed from the Saved loads drawer).
 
 ## Confidence
 

@@ -7866,6 +7866,73 @@ main .field-table tr.field-group > th {
   size: A4 landscape;
 }
 
+/* the box label of a saved load (box-label.tsx): never on screen, printed alone while
+   <html data-print="box-label"> is set; one label of 90 x 60 mm on an A4 page, cut out by hand */
+.box-labels {
+  display: none;
+}
+
+@media print {
+  html[data-print="box-label"] body > :not(.box-labels) {
+    display: none !important;
+  }
+
+  html[data-print="box-label"] .box-labels {
+    display: block;
+    color: #000;
+    font-size: 6.5pt;
+    line-height: 1.2;
+  }
+
+  .box-label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22mm;
+    align-content: start;
+    align-items: start;
+    gap: 1mm 2mm;
+    box-sizing: border-box;
+    width: 90mm;
+    height: 60mm;
+    padding: 2mm;
+    overflow: hidden;
+    border: 0.3mm dashed #000;
+    break-inside: avoid;
+  }
+
+  .box-label h1 {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 8pt;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .box-label .sheet-table {
+    margin: 0;
+  }
+
+  .box-label .sheet-table :is(th, td) {
+    padding: 0.2mm 1mm;
+  }
+
+  /* German row names hyphenate (lang="de" on html) rather than squeeze the values */
+  .box-label .sheet-table tbody th {
+    width: 35%;
+  }
+
+  .box-label-code svg {
+    display: block;
+    width: 22mm;
+    height: 22mm;
+  }
+
+  .box-label-code p {
+    margin: 1mm 0 0;
+    font-size: 5pt;
+    overflow-wrap: anywhere;
+  }
+}
+
 /* trajectory empty state and range card */
 .trajectory-empty h2 {
   margin: 0 0 0.5rem;
