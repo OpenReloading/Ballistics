@@ -196,9 +196,9 @@ No item blocks an earlier one.
 1. #297 send the permission letters. Blockers: none (owner). 1.0 does not wait for answers.
 2. #283 sample load files, #245 yes for the container run, #243 licence answer. Blockers: none (owner).
 3. Freeze check: the contract baselines (`packages/schema/test/golden`, the web golden user data file, the export lists in `tools/test/golden`) are the frozen shapes; no stored-shape change is open after the #25 decision. Blockers: none.
-4. #245 ChamberSim import. Blocker: 2.
-5. #242 GRT import. Blockers: 2 (files from #283 or the run of #245).
-6. #243 QuickLOAD import. Blocker: 2 (licence answer and files); else after 1.0.
+4. #245 load-file import. Blocker: 2.
+5. #242 load-file import. Blockers: 2 (files from #283 or the run of #245).
+6. #243 load-file import. Blocker: 2 (licence answer and files); else after 1.0.
 7. #588 hole detection holdout and tuning. Blocker: owner labels (61 of 62 done) and the second sealed batch.
 8. #402 photo quality gate. Blocker: 7.
 9. #184 SonarCloud findings. Blocker: owner label swap and acceptance answer.
