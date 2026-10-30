@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parseShotView } from '../src/index.ts'
+import { isShotViewHeader } from '../src/shotview.ts'
 import { complete } from './complete.ts'
 import { shotViewEnglish, shotViewGerman } from './fixtures.ts'
 
@@ -185,6 +186,82 @@ describe('parseShotView', () => {
     expect(() => parseShotView(shotViewEnglish, { sha256: 'xyz' })).toThrow(
       'sha256 must be 64 hex digits',
     )
+  })
+})
+
+describe('ShotView CSV rows, name line and footer date', () => {
+  const header = shotViewEnglish.split('\n')[1] ?? ''
+  const dated = (text: string) =>
+    parseShotView(shotViewEnglish.replace(/DATE, "[^"]*"/, `DATE, "${text}"`))
+
+  it('takes a header only with # in its first cell and a bracketed unit in its second', () => {
+    expect(isShotViewHeader(['#', 'SPEED (FPS)'])).toBe(true)
+    expect(isShotViewHeader(['No', 'SPEED (FPS)'])).toBe(false)
+    expect(isShotViewHeader(['#', 'SPEED'])).toBe(false)
+    expect(isShotViewHeader(['#'])).toBe(false)
+  })
+
+  it('keeps a last shot row whose quoted note is never closed', () => {
+    const r = parseShotView(`${header}\n1, 2800.0, , , , , , , "open note`)
+    expect(r.session.strings[0]?.shots.map((s) => s.velocity.raw)).toEqual(['2800.0 FPS'])
+  })
+
+  it('reads the day after a time and only whole numbers of four digits as the year', () => {
+    expect(dated('10:45, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
+    expect(dated('10:45:37, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
+    expect(dated('Serie 12345, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
+  })
+
+  it('leaves a date without a day or without a month to the user', () => {
+    for (const text of ['March 2026', '3, 2026']) {
+      const r = dated(text)
+      expect(r.session.date).toBeUndefined()
+      expect(r.warnings).toEqual([`footer date "${text}" is not recognised; enter the date`])
+    }
+  })
+
+  it('reads the date row after a single dash row and no date after a closing dash row', () => {
+    const single = [header, '1, 2800.0', '-,,,', 'DATE, "March 3, 2026"'].join('\n')
+    expect(parseShotView(single).session.date).toBe('2026-03-03')
+    const r = parseShotView([header, '1, 2800.0', '-,,,'].join('\n'))
+    expect(r.session.date).toBeUndefined()
+  })
+
+  it('takes the first line with text as the name and reads a quoted name as one cell', () => {
+    const named = (line: string) =>
+      parseShotView(shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, line)).stringLabels
+    expect(named('   \nLoad A')).toEqual(['Load A'])
+    expect(named('"Load A, 42.0gr",,')).toEqual(['Load A, 42.0gr'])
+    expect(named(' "Load A, 42.0gr"')).toEqual(['Load A, 42.0gr'])
+    const numbers = parseShotView(
+      shotViewEnglish.replace(/^[^\n]*"Test load A 42.0gr"/, '308, 175gr'),
+    )
+    expect(numbers.stringLabels).toEqual(['308, 175gr'])
+    expect(numbers.session.strings[0]?.shots).toHaveLength(3)
+  })
+
+  it('reads the date row after a blank line below the dash row', () => {
+    const r = parseShotView(shotViewEnglish.replace(/\n-,,,,,,\nDATE/, '\n-,,,,,,\n   \nDATE'))
+    expect(r.session.date).toBe('2026-03-03')
+  })
+
+  it('reads the format and every bore flag of the file', () => {
+    const r = parseShotView(shotViewEnglish.replace(/(2:10:31[^,]*), , /, '$1, x, '))
+    expect(r.format).toBe('shotview-csv')
+    expect(r.session.note).toBe('ShotView bore flags: shot 1 cold bore; shot 2 clean bore')
+  })
+
+  it('checks the German labels of the footer statistics', () => {
+    const sd = parseShotView(
+      shotViewGerman.replace('STANDARDABWEICHUNG,"1,1"', 'STANDARDABWEICHUNG,"9,1"'),
+    )
+    expect(sd.warnings).toEqual([
+      'footer STANDARDABWEICHUNG "9,1" differs from 1.1 computed from the shots',
+    ])
+    const spread = parseShotView(shotViewGerman.replace('STREUUNG,"2,5"', 'STREUUNG,"9,5"'))
+    expect(spread.warnings).toEqual([
+      'footer STREUUNG "9,5" differs from 2.5 computed from the shots',
+    ])
   })
 })
 

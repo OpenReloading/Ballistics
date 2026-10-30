@@ -10,6 +10,7 @@ const dir = mkdtempSync(path.join(tmpdir(), 'pages-serve-'))
 const root = path.join(dir, 'pages') + path.sep
 mkdirSync(path.join(dir, 'pages', 'docs'), { recursive: true })
 mkdirSync(path.join(dir, 'pages-evil'))
+mkdirSync(path.join(root, 'empty'))
 writeFileSync(path.join(root, 'index.html'), '')
 writeFileSync(path.join(root, 'docs', 'index.html'), '')
 writeFileSync(path.join(dir, 'pages-evil', 'secret.html'), '')
@@ -73,4 +74,69 @@ it('moves a directory without its slash to it and keeps the query', async () => 
       .end(),
   )
   expect(location).toBe('/docs/?cartridge=308-win&units=si')
+})
+
+it('finds nothing for a path that only starts with the base path or a directory without index.html', () => {
+  expect(find('/Ballisticsdocs/index.html', root, '/Ballistics')).toBeUndefined()
+  expect(find('/Ballistics/empty', root, '/Ballistics')).toBeUndefined()
+  expect(find('/Ballistics/empty/', root, '/Ballistics')).toBeUndefined()
+})
+
+it('sends the content type of each file extension', async () => {
+  const types: Record<string, string> = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.txt': 'text/plain; charset=utf-8',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.ico': 'image/x-icon',
+    '.woff2': 'font/woff2',
+    '.webmanifest': 'application/manifest+json',
+    '.bin': 'application/octet-stream',
+  }
+  for (const ext of Object.keys(types)) writeFileSync(path.join(root, `file${ext}`), '')
+  const server = createServer(serve(root, '')).listen(0)
+  onTestFinished(() => {
+    server.close()
+  })
+  await new Promise((done) => server.once('listening', done))
+  const { port } = server.address() as AddressInfo
+  for (const [ext, type] of Object.entries(types)) {
+    const sent = await new Promise<string | undefined>((done, fail) =>
+      request({ port, path: `/file${ext}` }, (res) => {
+        res.resume()
+        res.on('end', () => done(res.headers['content-type']))
+      })
+        .on('error', fail)
+        .end(),
+    )
+    expect(sent, ext).toBe(type)
+  }
+})
+
+it('ends the answer where the 404 page fails after its head is sent, and keeps serving', async () => {
+  // a 404.html that is a directory opens, then fails on its first read
+  const broken = path.join(dir, 'broken') + path.sep
+  mkdirSync(path.join(broken, '404.html'), { recursive: true })
+  writeFileSync(path.join(broken, 'index.html'), '')
+  const server = createServer(serve(broken, '')).listen(0)
+  onTestFinished(() => {
+    server.close()
+  })
+  await new Promise((done) => server.once('listening', done))
+  const { port } = server.address() as AddressInfo
+  const answer = (target: string) =>
+    new Promise<string>((done) =>
+      request({ port, path: target }, (res) => {
+        res.on('data', () => {})
+        res.on('end', () => done(`end ${res.statusCode}`))
+        res.on('error', () => done(`broken ${res.statusCode}`))
+      })
+        .on('error', () => done('no answer'))
+        .end(),
+    )
+  expect(await answer('/missing.html')).toMatch(/^(broken 404|no answer)$/)
+  expect(await answer('/index.html')).toBe('end 200')
 })

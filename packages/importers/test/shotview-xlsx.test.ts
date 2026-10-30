@@ -35,6 +35,7 @@ describe('parseShotViewWorkbook', () => {
     )
     const r = parseShotViewWorkbook(book(shotViewSheetEnglish), options)
     expect(r.format).toBe('shotview-xlsx')
+    expect(r.session.note).toBeUndefined()
     expect(r.session.date).toBe('2026-03-08')
   })
 
@@ -143,6 +144,10 @@ describe('parseShotViewWorkbook', () => {
     const set = parseShotViewWorkbook(book(flag('yes')))
     expect(set.session.strings[0]?.shots[0]?.coldBore).toBe(true)
     expect(set.session.note).toBe('ShotView bore flags: string 1 shot 1 clean bore and cold bore')
+    const two = edit(flag('yes'), (c) => c[0] === '2', [['2', '2810.5', '', '', '', '', '', 'x']])
+    expect(parseShotViewWorkbook(book(two)).session.note).toBe(
+      'ShotView bore flags: string 1 shot 1 clean bore and cold bore; string 1 shot 2 cold bore',
+    )
   })
 
   it('keeps one day with the date option', () => {
