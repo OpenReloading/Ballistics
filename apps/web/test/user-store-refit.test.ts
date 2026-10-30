@@ -31,8 +31,15 @@ async function designs(): Promise<PowderDesign[]> {
 
 const previousOf = async (id: string) => (await designs()).find((x) => x.id === id)?.fit?.previous
 
+/** Every stored value, invalid ones as written. */
+async function stored() {
+  const { records, invalid } = await storedRecords()
+  return [...records, ...invalid.map((i) => i.raw)] as { id: unknown; data?: unknown }[]
+}
+
 beforeEach(async () => {
-  await deleteRecords((await designs()).map((x) => x.id))
+  // one test stores a number id, which the store deletes by that key all the same
+  await deleteRecords((await stored()).map((r) => r.id) as string[])
 })
 
 describe('deleting a powder of a chain of refits', () => {
@@ -69,5 +76,42 @@ describe('deleting a powder of a chain of refits', () => {
     await putRecords([powder(a, 0), powder(c, 2, `user:${b}`)] as never)
     expect(newerFit(await designs(), a)).toBeUndefined()
     expect(newerFit(await designs(), b)?.id).toBe(c)
+  })
+
+  it('relinks only powders with a text previous and a text id', async () => {
+    const other = { id: 7, kind: 'powder', data: { fit: { previous: `user:${b}` } } }
+    const load = { id: c, kind: 'load', data: { fit: { previous: `user:${b}` } } }
+    const odd = { id: d, kind: 'powder', data: { fit: { previous: 5 } } }
+    const bare = { id: 'e'.repeat(8), kind: 'powder' }
+    const unfitted = { id: 'f'.repeat(8), kind: 'powder', data: {} }
+    await putRecords([
+      powder(a, 0),
+      powder(b, 1, `user:${a}`),
+      other,
+      load,
+      odd,
+      bare,
+      unfitted,
+    ] as never)
+    await deleteRecords([b])
+    const left = await stored()
+    expect(new Set(left.map((r) => r.id))).toEqual(
+      new Set([7, a, c, d, 'e'.repeat(8), 'f'.repeat(8)]),
+    )
+    for (const r of [other, load, odd, bare, unfitted]) expect(left).toContainEqual(r)
+  })
+
+  it('leaves the name when the deleted records name each other or themselves', async () => {
+    // a <- b <- a, and a <- b <- b, both deleted: no record that stays to name
+    await putRecords([
+      powder(a, 0, `user:${b}`),
+      powder(b, 1, `user:${a}`),
+      powder(c, 2, `user:${a}`),
+    ] as never)
+    await deleteRecords([a, b])
+    expect(await previousOf(c)).toBe(`user:${a}`)
+    await putRecords([powder(a, 0, `user:${b}`), powder(b, 1, `user:${b}`)] as never)
+    await deleteRecords([a, b])
+    expect(await previousOf(c)).toBe(`user:${a}`)
   })
 })

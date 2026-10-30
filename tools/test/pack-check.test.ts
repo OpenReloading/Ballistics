@@ -144,3 +144,98 @@ it('reads a specifier after spaces and one parenthesis', () => {
   )
   expect(problems).toHaveLength(5)
 })
+
+it('reads exports without main or types and skips a condition set to null', () => {
+  const dir = pkg(
+    {
+      files: ['dist'],
+      exports: { '.': { types: './dist/index.d.ts', browser: null, default: './dist/index.js' } },
+    },
+    { 'dist/index.js': '', 'dist/index.d.ts': '' },
+  )
+  expect(packProblems(dir)).toEqual([])
+})
+
+it('reads a files entry with a trailing slash as its folder', () => {
+  const dir = pkg(
+    {
+      main: 'dist/esm/index.js',
+      types: 'dist/esm/index.d.ts',
+      exports: './dist/esm/index.js',
+      files: ['dist/esm/'],
+    },
+    { 'dist/esm/index.js': '', 'dist/esm/index.d.ts': '' },
+  )
+  expect(packProblems(dir)).toEqual([])
+})
+
+it('packs a licence without an extension and a source map without sources', () => {
+  const dir = pkg(
+    { ...manifest, files: ['dist'] },
+    { LICENSE: 'MIT', 'dist/index.js': '', 'dist/index.d.ts': '', 'dist/index.js.map': '{}' },
+  )
+  expect(packProblems(dir)).toEqual([])
+})
+
+it('finds the sources of a source map under its source root', () => {
+  const dir = pkg(
+    { ...manifest, files: ['dist', 'src'] },
+    {
+      'dist/index.js': '',
+      'dist/index.d.ts': '',
+      'dist/index.js.map': JSON.stringify({
+        sourceRoot: '../src',
+        sources: ['index.ts', 'gone.ts'],
+      }),
+      'src/index.ts': '',
+    },
+  )
+  expect(packProblems(dir)).toEqual([
+    'source map dist/index.js.map ships without its source src/gone.ts',
+  ])
+})
+
+it('counts only whole names as always packed', () => {
+  // `main` is packed whatever `files` says; neither name is a licence
+  for (const main of ['licenses.js', 'docs/old-readme.md']) {
+    const dir = pkg(
+      { ...manifest, main },
+      { [main]: '', 'dist/index.js': '', 'dist/index.d.ts': '' },
+    )
+    expect(packProblems(dir)).toEqual([`${main} is outside the files field`])
+  }
+})
+
+it('reads the imports of .cjs and .d.mts files and not of other files', () => {
+  const dir = pkg(manifest, {
+    'README.md': "# p\n\nimport { p } from 'readme-example'",
+    'dist/index.js': '',
+    'dist/index.d.ts': '',
+    'dist/index.cjs': "require('cjs-only')",
+    'dist/index.d.mts': "export type T = import('mts-only').T",
+    'dist/data.json': '{"note": "import \'json-text\'"}',
+  })
+  expect(packProblems(dir)).toEqual([
+    'dist/index.cjs imports cjs-only, which is not in dependencies or peerDependencies',
+    'dist/index.d.mts imports mts-only, which is not in dependencies or peerDependencies',
+  ])
+})
+
+it('finds a test folder at the root and an .mjs test file, not a data file named spec', () => {
+  const dir = pkg(
+    { ...manifest, files: ['dist', 'test'] },
+    {
+      'dist/index.js': '',
+      'dist/index.d.ts': '',
+      'dist/run.test.mjs': '',
+      'dist/case.spec.json': '{}',
+      'test/a.js': '',
+    },
+  )
+  expect(new Set(packProblems(dir))).toEqual(
+    new Set([
+      'test file dist/run.test.mjs is in the tarball',
+      'test file test/a.js is in the tarball',
+    ]),
+  )
+})
