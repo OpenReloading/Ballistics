@@ -3,7 +3,6 @@
   "name": "Österreichischer Schützenbund",
   "abbreviation": "ÖSB",
   "country": "AT",
-  "internationalFederation": "issf",
   "ruleBooks": ["oesb-schiessordnung-2025"],
   "website": "https://www.schuetzenbund.at/",
   "provenance": {
@@ -17,9 +16,9 @@
       },
       {
         "source": "oesb-schiessordnung-2025",
-        "page": "3.1.6, Seite 4, PDF p. 4; 11.1.1, Seite 25, PDF p. 25",
-        "fields": ["country", "internationalFederation"],
-        "note": "The order governs the Austrian national championships. The rules of the international federations apply wherever it sets no national rule; the ISSF is the first one it lists."
+        "page": "3.1.2, Seite 4, PDF p. 4",
+        "fields": ["country"],
+        "note": "The order governs the Austrian championships (ÖM, ÖSTM) and the events held in the name of the ÖSB."
       },
       {
         "title": "Homepage of the ÖSB",
