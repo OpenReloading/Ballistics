@@ -23,7 +23,12 @@ import {
   mappedFace,
   mappingOf,
 } from '../lib/face-disciplines.ts'
-import { compareEvents, compareTargetFaces, federationFaceIds } from '../lib/face-order.ts'
+import {
+  compareEvents,
+  compareTargetFaces,
+  federationFaceIds,
+  federationsWithDisciplines,
+} from '../lib/face-order.ts'
 import type { Face } from '../lib/face-organization.ts'
 import {
   type FaceSummary,
@@ -604,6 +609,7 @@ function AlignRow(p: PanelProps) {
 function FaceSelects(p: PanelProps) {
   const { data, list, choice } = p
   const { t } = useTranslation()
+  const federations = data ? federationsWithDisciplines(data) : []
   return (
     <>
       <NativeSelect
@@ -611,10 +617,10 @@ function FaceSelects(p: PanelProps) {
         size={controlSize.row.input}
         description={t(federationHelp)}
         labelProps={{ title: t(federationHelp) }}
-        disabled={!data?.federations.length}
+        disabled={!federations.length}
         data={[
           { value: '', label: t('All') },
-          ...(data?.federations ?? []).map((f) => ({ value: f.id, label: f.abbreviation })),
+          ...federations.map((f) => ({ value: f.id, label: f.abbreviation })),
         ]}
         value={p.fed}
         onChange={(e) => p.onFederation(e.currentTarget.value)}
