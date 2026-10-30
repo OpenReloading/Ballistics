@@ -29,7 +29,7 @@ export type CardPlan = { id: string; name: string } & (
  * The mean of the shots kept in the latest session of `load` (by date, an undated one oldest), over
  * its strings of the load as it is: no variation, or the load's own charge. Undefined without one.
  */
-export function measuredVelocity(
+function measuredVelocity(
   load: LoadRecord,
   sessions: ReadonlyMap<string, SessionRecord>,
 ): MeasuredVelocity | undefined {

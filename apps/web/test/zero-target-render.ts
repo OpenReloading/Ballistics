@@ -8,7 +8,7 @@ const lum = (colour: string) => (colour === '#fff' ? PAPER : colour === '#000' ?
 type Ink = (x: number, y: number) => number | undefined
 
 const attrs = (tag: string) =>
-  Object.fromEntries([...tag.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]))
+  Object.fromEntries([...tag.matchAll(/(?<![\w-])([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]))
 const num = (a: Record<string, string | undefined>, k: string) => Number(a[k] ?? 0)
 
 /** The sheet's text in English, the fields filled from `values`, else blank. */

@@ -1,9 +1,9 @@
-import { execFileSync } from 'node:child_process'
 import os from 'node:os'
 import path from 'node:path'
 import type { NextConfig } from 'next'
 import packageJson from './package.json' with { type: 'json' }
 import { buildLine } from './src/lib/build-line.ts'
+import { shortCommit } from './src/lib/git-head.ts'
 
 /**
  * The static export, served under this path (`''` at a domain root, `/Ballistics` on a project
@@ -14,10 +14,7 @@ const basePath = process.env.PAGES_BASE_PATH ?? ''
 const edition = process.env.PAGES_EDITION === 'next' ? 'next' : ''
 
 // the checkout's own commit: a release edition builds from its tag, not from the commit that started the run
-let commit = ''
-try {
-  commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim()
-} catch {}
+const commit = shortCommit(path.join(import.meta.dirname, '../..'))
 
 const nextConfig: NextConfig = {
   output: 'export',
