@@ -13,6 +13,7 @@ import {
   userRecord,
   userRefFields,
   versionProblem,
+  withoutUnknownKinds,
 } from '../src/index.ts'
 
 const saved = '2026-10-13T10:00:00.000Z'
@@ -510,6 +511,29 @@ describe('a record of the earlier load format', () => {
     const r = userRecord.safeParse({ ...old, kind: 'other' })
     expect(r.success).toBe(false)
     expect(r.error?.issues[0]?.message).not.toBe(legacyLoadProblem)
+  })
+})
+
+describe('withoutUnknownKinds', () => {
+  const event = { kind: 'event', id: 'e1', name: 'Club match', saved, data: {} }
+
+  it('leaves out the records of an unknown kind and counts them by kind', () => {
+    const json = file([event, loadRecord, { ...event, id: 'e2' }])
+    const { json: known, skipped } = withoutUnknownKinds(json)
+    expect(userDataFile.parse(known).records).toEqual([loadRecord])
+    expect(skipped).toEqual([{ kind: 'event', count: 2 }])
+    expect(json.records).toHaveLength(3)
+  })
+
+  it('keeps known kinds, the old load kind and records without a text kind for the schema', () => {
+    const json = file([
+      loadRecord,
+      { ...event, kind: 'workbenchState' },
+      { ...event, kind: 2 },
+      null,
+    ])
+    expect(withoutUnknownKinds(json)).toEqual({ json, skipped: [] })
+    expect(withoutUnknownKinds('text')).toEqual({ json: 'text', skipped: [] })
   })
 })
 

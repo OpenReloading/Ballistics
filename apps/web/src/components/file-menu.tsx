@@ -401,7 +401,12 @@ async function openSharedLink<K extends UserRecordKind>(
   if (!r)
     return page.say(({ t }) =>
       t('Shared link not opened: it holds {kinds}, no {kind}.', {
-        kinds: [...new Set(p.records.map((x) => t(kindNames[x.kind])))].join(', '),
+        kinds: [
+          ...new Set([
+            ...p.records.map((x) => t(kindNames[x.kind])),
+            ...(p.skipped ?? []).map((s) => s.kind),
+          ]),
+        ].join(', '),
         kind: t(kindNames[kind]),
       }),
     )

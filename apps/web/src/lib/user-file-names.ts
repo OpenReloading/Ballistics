@@ -21,7 +21,8 @@ export function ownsFile(text: string | undefined, id: string) {
   if (text === undefined) return false
   const p = parseUserDataFile(text)
   const own = p.ok ? p.records.find((r) => r.id === id) : undefined
-  if (!p.ok || !own) return false
+  // a Save would drop the records of a kind this version does not know
+  if (!p.ok || !own || p.skipped) return false
   const makers = makerRecordsOf(own, p.records)
   return p.records.every((r) => r === own || makers.includes(r))
 }
