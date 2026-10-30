@@ -64,6 +64,7 @@ import {
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { DataCard } from './firearm-data-card.tsx'
 import { FirearmEditor } from './firearm-editor.tsx'
+import type { FirearmRangeCards, LoadRangeCard } from './firearm-range-cards.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
@@ -226,19 +227,27 @@ function firearmColumns(
   ]
 }
 
-/** Open, Duplicate and Delete of a stored firearm, Duplicate only for the example. */
+/**
+ * Open, Duplicate, Delete and, with saved loads, Print range cards of a stored firearm, Duplicate
+ * only for the example.
+ */
 function RowActions({
   record: r,
   tabIndex,
   onOpen,
   onDuplicate,
   onDelete,
+  loads,
+  onPrintCards,
 }: {
   record: FirearmRecord
   tabIndex?: number | undefined
   onOpen: () => void
   onDuplicate: () => void
   onDelete: () => void
+  /** The saved loads of the firearm: none, no Print range cards. */
+  loads: number
+  onPrintCards: () => void
 }) {
   const { t } = useTranslation()
   const stored = r !== example
@@ -258,6 +267,9 @@ function RowActions({
       <Menu.Dropdown>
         {stored && <Menu.Item onClick={onOpen}>{t('Open')}</Menu.Item>}
         <Menu.Item onClick={onDuplicate}>{t('Duplicate')}</Menu.Item>
+        {stored && loads > 0 && (
+          <Menu.Item onClick={onPrintCards}>{t('Print range cards')}</Menu.Item>
+        )}
         {stored && (
           <Menu.Item color="red" onClick={onDelete}>
             {t('Delete')}
@@ -369,6 +381,24 @@ const cardsOf = (
   exampleShown: FirearmRecord | undefined,
   card: (r: FirearmRecord, stored: boolean) => ReactNode,
 ) => [exampleShown && card(exampleShown, false), ...(shown ?? []).map((r) => card(r, true))]
+
+/**
+ * Print range cards of a firearm: the cards of its loads are computed in a chunk of their own, then
+ * rendered and printed until the dialog closes.
+ */
+function useRangeCards(system: UnitSystem, setFailure: (message: string) => void) {
+  const [shown, setShown] = useState<{ View: typeof FirearmRangeCards; cards: LoadRangeCard[] }>()
+  const printCards = (r: FirearmRecord) =>
+    void import('./firearm-range-cards.tsx')
+      .then(async (m) =>
+        setShown({ View: m.FirearmRangeCards, cards: await m.firearmCards(r.id, system) }),
+      )
+      .catch((e) => setFailure(errorText(e)))
+  const rangeCards = shown && (
+    <shown.View cards={shown.cards} system={system} onDone={() => setShown(undefined)} />
+  )
+  return { printCards, rangeCards }
+}
 
 /** Reads the stored firearms, sorted by name; `read` is this read's number, an older answer arriving later is dropped. */
 function readFirearms(
@@ -679,6 +709,7 @@ export function FirearmLibrary() {
   const { shown, exampleShown, rows } = matching(list, matches)
   const named = namedFilters(t, filters.query)
   const duplicate = (r: FirearmRecord) => start({ ...r.data, name: copyName(r.data.name) })
+  const { printCards, rangeCards } = useRangeCards(system, setFailure)
   const actionsMenu = (r: FirearmRecord, tabIndex?: number) => (
     <RowActions
       record={r}
@@ -686,6 +717,8 @@ export function FirearmLibrary() {
       onOpen={() => menu.current?.open(r)}
       onDuplicate={() => duplicate(r)}
       onDelete={() => remove(r)}
+      loads={usageOf(r).loads}
+      onPrintCards={() => printCards(r)}
     />
   )
   const total = (list?.length ?? 0) + 1
@@ -762,6 +795,7 @@ export function FirearmLibrary() {
         }
       />
       <LibraryTabs />
+      {rangeCards}
       <div className="library" data-editing={compact || undefined}>
         <section aria-labelledby="library-list" className={compact ? 'library-list' : 'directory'}>
           <Title order={2} id="library-list" className="visually-hidden">

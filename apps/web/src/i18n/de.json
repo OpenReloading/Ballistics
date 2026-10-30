@@ -3755,5 +3755,18 @@
   "{count} load|{count} loads": {
     "one": "{count} Laborierung",
     "other": "{count} Laborierungen"
-  }
+  },
+  "Print range cards": "Schusstafeln drucken",
+  "Load: {name}": "Laborierung: {name}",
+  "Muzzle velocity measured: mean of {count} shot|Muzzle velocity measured: mean of {count} shots": {
+    "one": "Mündungsgeschwindigkeit gemessen: Mittel aus {count} Schuss",
+    "other": "Mündungsgeschwindigkeit gemessen: Mittel aus {count} Schüssen"
+  },
+  "Loads without a range card": "Laborierungen ohne Schusstafel",
+  "The bullet is not from the database.": "Das Geschoss stammt nicht aus der Datenbank.",
+  "No chronograph session with shots.": "Keine Chronograph-Sitzung mit Schüssen.",
+  "The firearm has no mounted optic.": "An der Schusswaffe ist keine Optik montiert.",
+  "The bullet has no BC in the database.": "Das Geschoss hat in der Datenbank keinen BC.",
+  "The bullet has several BC values; choose one in the workbench.": "Das Geschoss hat mehrere BC-Werte; wählen Sie einen in der Werkbank.",
+  "The bullet record was not found.": "Der Geschossdatensatz wurde nicht gefunden."
 }
