@@ -6,6 +6,13 @@ import { applyExampleLoad, loadForm } from './workbench.ts'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
+/** The layout shifts of the workbench inputs, summed by the page. */
+type InputShifts = {
+  inputShift: number
+  addShifts: (l: PerformanceEntryList) => void
+  shifts: PerformanceObserver
+}
+
 const sizes = [
   [1280, 650],
   [390, 844],
@@ -28,11 +35,11 @@ for (const [width, height] of sizes)
     page,
   }) => {
     await page.addInitScript(() => {
-      const w = window as unknown as { inputShift: number }
+      const w = window as unknown as InputShifts
       w.inputShift = 0
       // every shift, also those right after input: an edit that moves the inputs counts
-      new PerformanceObserver((list) => {
-        for (const e of list.getEntries() as unknown as {
+      w.addShifts = (list) => {
+        for (const e of list as unknown as {
           value: number
           sources: { node?: Node }[]
         }[])
@@ -44,7 +51,9 @@ for (const [width, height] of sizes)
             )
           )
             w.inputShift += e.value
-      }).observe({ type: 'layout-shift', buffered: true })
+      }
+      w.shifts = new PerformanceObserver((list) => w.addShifts(list.getEntries()))
+      w.shifts.observe({ type: 'layout-shift', buffered: true })
     })
     await page.setViewportSize({ width, height })
     await gotoHydrated(page, '/workbench')
@@ -58,9 +67,13 @@ for (const [width, height] of sizes)
       await charge.pressSequentially(text, { delay: 50 })
       await expect(charge).toHaveValue(new RegExp(`^${text}`))
     }
-    // layout shift entries arrive after the frame that moved
-    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 500))))
     expect(
-      await page.evaluate(() => (window as unknown as { inputShift: number }).inputShift),
+      await page.evaluate(async () => {
+        const w = window as unknown as InputShifts
+        // once the frame drawn now has rendered, with the entries the observer still queues
+        await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+        w.addShifts(w.shifts.takeRecords())
+        return w.inputShift
+      }),
     ).toBe(0)
   })

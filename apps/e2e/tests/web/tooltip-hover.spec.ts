@@ -15,8 +15,12 @@ test('a tooltip stays open while the pointer moves onto it, Escape and leaving c
   const box = await note.boundingBox()
   if (!box) throw new Error('the open tooltip has no box')
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 10 })
-  await page.waitForTimeout(500)
-  await expect(note).toBeVisible()
+  // a close would start the fade out within the next frames: still at rest and opaque means open
+  await page.evaluate(
+    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  )
+  await expect(note).toHaveCSS('opacity', '1')
+  expect(await note.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0)
   await page.keyboard.press('Escape')
   await expect(note).toBeHidden()
 

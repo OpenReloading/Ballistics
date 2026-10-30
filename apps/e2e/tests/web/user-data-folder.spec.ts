@@ -44,10 +44,8 @@ async function saveInFolder(page: Page, by: 'button' | 'shortcut' = 'button') {
   await page.getByRole('combobox', { name: 'Manufacturer' }).fill('Folder')
   if (by === 'button') await (await barButton(page, 'Save')).click()
   else {
-    // the File menu reads the design after a deferred render: a person presses the keys later
-    await page.evaluate(
-      () => new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok))),
-    )
+    // the File menu reads the design after a deferred render, which marks it unsaved
+    await expect(state(page)).toHaveText('Unsaved changes, not saved to a file, folder workspace')
     await page.keyboard.press('Control+S')
   }
   await expect(state(page)).toHaveText('Saved: folder.json, folder workspace')
