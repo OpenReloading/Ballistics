@@ -64,6 +64,14 @@ const loads: Record<string, InteriorLoad> = {
       temperatureSensitivity: { reference: 294.15, cold: 0, hot: 0 },
     },
   },
+  'energy temperature of 0 per K': {
+    ...plain,
+    propellant: {
+      ...plain.propellant,
+      temperatureSensitivity: { reference: 294.15, cold: 0, hot: 0 },
+      energyTemperature: 0,
+    },
+  },
 }
 
 /** The muzzle values and nine points of the curve, spaced evenly in index. */

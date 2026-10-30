@@ -213,6 +213,16 @@ Without temperature sensitivities, $\tau_T = 1$.
 
 A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
 
+The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
+
+$$
+Q(T_p) = Q \exp\left(\beta_Q (T_p - T_\text{ref})\right)
+$$
+
+Code: `packages/core/src/interior/model.ts`, `energyAtTemperature` (used for the charge energy $m_c Q$ in `scaleInteriorLoad` and for `efficiency`).
+
+The reference $T_\text{ref}$ is that of `temperatureSensitivity`, which a nonzero value needs. The default is 0, which leaves every result unchanged. The convective heat model keeps the unscaled $Q$ in its gas constant $R = (\gamma - 1) Q / T_f$, so a scaled energy there acts as a different gas temperature at a fixed $R$. The option is not a field of the powder record or the load file.
+
 ### Scaled state and integration
 
 The state is scaled so that one absolute tolerance fits every component:
@@ -394,7 +404,7 @@ Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
 
 ## Limits
 
-- Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy, ageing and moisture of the powder.
+- Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy unless `propellant.energyTemperature` is set (default 0, not stored on powder records), ageing and moisture of the powder.
 - The temperature term of the gas energy is not adopted: on synthetic loads it carries about a fifth of the muzzle-velocity change for a temperature step, and the fitted temperature factor absorbs it inside the calibrated temperature range (simulations, [research log](../research/propellant-temperature-energy.md)). The check on measured temperature ladders is pending.
 - The Lagrange coefficients assume a gas column of uniform density. Against the self-similar column of an isentropic gas with linear velocity (all of the charge burnt, ratio of specific heats 1.24 to 1.26, [Corner 1950](../bibliography.md#corner-1950), pages unverified) they put the breech and mean pressures over the base pressure high by 0.2 % at $m_c/m_p' = 0.28$, 0.6 to 0.7 % at 0.51 and 1.8 to 2.1 % at 1.03 (breech over base 1.515 against 1.489, mean over base 1.343 against 1.315). The error grows with a heavy charge behind a light projectile ([research log](../research/interior-lagrange-gradient-size.md)).
 - The primer enters only through the ignition pressure $p_i$. On the load-file example of the API ($p_\text{st}$ = 100 bar), $p_i$ from 5 to 100 bar leaves the muzzle velocity at 824.774 m/s, because the projectile is held until $p_\text{st}$. Above $p_\text{st}$, $p_i$ becomes the hold pressure: 200 bar gives 836.635 m/s, 1.44 % more ([charge too small](#charge-too-small), [research log](../research/interior-primer-ignition-pressure.md)).
