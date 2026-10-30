@@ -218,17 +218,19 @@ function PowderRow({
   onOpen: (row: CompareRow) => void
 }) {
   const { t } = useTranslation()
+  const name = productLabel(r)
   return (
     <tr aria-current={r.id === current ? 'true' : undefined}>
       <td data-label={t('Powder')}>
+        {/* a long name is cut after two lines: the title holds it in full */}
         <UnstyledButton
           className="powder-open"
-          title={t('Use this powder in the workbench')}
+          title={`${name}\n${t('Use this powder in the workbench')}`}
           onClick={() => onOpen(r)}
         >
-          {productLabel(r)}
+          {name}
         </UnstyledButton>
-        {r.id === current && <span className="barrel-current"> {t('current')}</span>}
+        {r.id === current && <span className="barrel-current">{t('current')}</span>}
       </td>
       <td data-label={t('Charge, {unit}', { unit: system.charge.symbol })} className="num">
         {r.charge !== undefined && formatQuantity('charge', system, r.charge)}
