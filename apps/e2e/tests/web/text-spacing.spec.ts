@@ -71,6 +71,18 @@ for (const width of [1280, 390])
     await nothingCut(page)
   })
 
+// the longer German labels and buttons in the group panel's column
+test('at 1280 px the shot groups in German cut nothing with the spacing', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('language', 'de'))
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await gotoHydrated(page, '/groups')
+  for (const input of await page.locator('.aim-fields input').all()) await input.fill('-12,5')
+  await nothingCut(page)
+  // the panel scrolls, so a field past its edge counts as scrolled: it holds its rows instead
+  for (const side of await page.locator('.target-side').all())
+    expect(await side.evaluate((e) => e.scrollWidth <= e.clientWidth)).toBe(true)
+})
+
 for (const path of ['/bullets/designer', '/powders/designer', '/targets/designer'])
   test(`at 320 px ${path} cuts nothing with the spacing`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 })
