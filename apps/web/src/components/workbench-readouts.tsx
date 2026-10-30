@@ -15,7 +15,7 @@ import {
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
-import { type Lot, lotLabel } from '../lib/lot-rows.ts'
+import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
 import { type RunnableLadderKind, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -975,7 +975,7 @@ function LadderRow({
       )}
       {lot && (
         <td data-label={t('Burn rate')} className="num">
-          {which ? lotLabel(which, lot.fraction) : t('nominal')}
+          {burnRateLabel(which, lot.fraction, t)}
         </td>
       )}
       <td data-label={t('Flags')}>

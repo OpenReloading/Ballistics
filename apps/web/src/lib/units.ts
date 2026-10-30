@@ -61,7 +61,7 @@ export const waterGrams = (m3: number) =>
 
 export const metersPerInch = 0.0254
 export const metersPerFoot = 0.3048
-const metersPerYard = 0.9144
+export const metersPerYard = 0.9144
 export const kilogramsPerGrain = 6.479891e-5
 /** 1 mph in m/s. */
 export const metersPerSecondPerMph = 0.44704
