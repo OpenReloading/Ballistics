@@ -25,14 +25,19 @@ const names = row.map(([, name]) => name)
 const rowControls = (page: Page) =>
   row.map(([role, name]) => loadForm(page).getByRole(role, { name, exact: true }))
 
-/** Pairs of `controls` whose visual order (top, then left) is the reverse of their order in the list. */
+/**
+ * Pairs of `controls` whose visual order (centre, then left) is the reverse of their order in the
+ * list. Centres, not tops: a field's buttons are not as high as the field.
+ */
 async function inversions(controls: Locator[]) {
   const boxes = await Promise.all(controls.map(async (c) => (await c.boundingBox()) ?? undefined))
+  const middle = (b: { y: number; height: number }) => b.y + b.height / 2
   let count = 0
   boxes.forEach((a, i) => {
     for (const b of boxes.slice(i + 1)) {
       if (!a || !b) throw new Error('a control of the row has no box')
-      if (b.y < a.y - 2 || (Math.abs(b.y - a.y) <= 2 && b.x < a.x)) count++
+      const dy = middle(b) - middle(a)
+      if (dy < -2 || (Math.abs(dy) <= 2 && b.x < a.x)) count++
     }
   })
   return count
