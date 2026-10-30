@@ -32,3 +32,35 @@ it('labels every limit cell with its column header, for the phone card layout', 
   expect(labels).toEqual(headers)
   expect(html).toMatch(/<td data-label="Value" class="num" role="cell">4150 bar \(\d+ psi\)<\/td>/)
 })
+
+const resolved = {
+  ...body,
+  resolved: {
+    cartridge: {
+      id: '308-win',
+      name: '.308 Win.',
+      provenance: { kind: 'published', sources: [{ title: 'Tables of Dimensions' }] },
+    },
+  },
+} as InteriorResponse
+
+const render = (printed: boolean) =>
+  renderToStaticMarkup(
+    <MantineProvider>
+      <LimitsView body={resolved} printed={printed} />
+    </MantineProvider>,
+  )
+
+it("links the cartridge record's sources on screen, in one short line", () => {
+  const html = render(false)
+  expect(html).toContain('Source: C.I.P. TDCC')
+  expect(html).toContain('href="/cartridges/308-win#record-sources"')
+  expect(html).not.toContain('Tables of Dimensions')
+  expect(html).not.toContain('<h3')
+})
+
+it('names the cartridge record on paper, without a link', () => {
+  const html = render(true)
+  expect(html).toContain('Pressure limits: C.I.P. TDCC, cartridge record .308 Win.')
+  expect(html).not.toContain('record-sources')
+})

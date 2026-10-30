@@ -72,7 +72,7 @@ import { NumberField } from './number-field.tsx'
 import { type PaperSize, paperSizes, printRangeCard, RangeCard } from './range-card.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { SourceTitles } from './sources.tsx'
+import { provenanceKinds, RecordSourcesLink } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import type { TruingNominal } from './truing-session.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
@@ -328,8 +328,11 @@ function RecordDetails({
         })}
       </ul>
       <p className="sources">
-        {t('Source ({kind}):', { kind: record.provenance.kind })}{' '}
-        <SourceTitles sources={record.provenance.sources} />
+        <RecordSourcesLink
+          kind="bullets"
+          id={record.id}
+          label={t('Sources ({kind})', { kind: t(provenanceKinds[record.provenance.kind]) })}
+        />
       </p>
     </div>
   )

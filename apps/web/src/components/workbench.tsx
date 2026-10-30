@@ -337,7 +337,7 @@ function ReportAfter({
       )}
       <h2>{t('Barrel length')}</h2>
       {study}
-      <LimitsView body={ok.body} />
+      <LimitsView body={ok.body} printed />
       {notes && (
         <>
           <h2>{t('Notes')}</h2>

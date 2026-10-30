@@ -79,7 +79,7 @@ import { NumberField } from './number-field.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
-import { SourceTitles } from './sources.tsx'
+import { RecordSourcesLink } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
@@ -1256,7 +1256,7 @@ function BulletStatus({ m }: { m: Model }) {
           {t('Bullet: {label}', { label: productLabel(bulletRecord, names) })} ({bulletRecord.id}
           {bulletRecord.provenance.sources[0] && (
             <>
-              , <SourceTitles sources={bulletRecord.provenance.sources.slice(0, 1)} />
+              , <RecordSourcesLink kind="bullets" id={bulletRecord.id} />
             </>
           )}
           )

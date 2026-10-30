@@ -65,6 +65,7 @@ import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
+import { RecordSourcesLink } from './sources.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
@@ -200,6 +201,14 @@ const recordRow = (label: string, value: ReactNode, unit?: string) =>
       {unit && <span className="record-unit">{unit}</span>}
     </div>
   )
+
+/** The powder record's link to its sources: a design has no record page, paper cannot follow it. */
+function PowderSourceRow() {
+  const { powder, powderDesign, printing, printMedia } = useLoad()
+  const { t } = useTranslation()
+  if (!powder || powderDesign || printing || printMedia) return null
+  return recordRow(t('Source'), <RecordSourcesLink kind="powders" id={powder.id} />)
+}
 
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
@@ -965,6 +974,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
             formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
         )}
+        <PowderSourceRow />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />

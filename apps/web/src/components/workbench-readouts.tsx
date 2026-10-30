@@ -36,7 +36,7 @@ import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { SourceTitles } from './sources.tsx'
+import { RecordSourcesLink } from './sources.tsx'
 import { StandardBadge } from './standard-badge.tsx'
 import {
   derived,
@@ -262,11 +262,11 @@ function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; syst
   const note = known ? t(known) : gasFactorNote
   const recoilTitle = note
     ? t(
-        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity; factor {factor}, {note}); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).',
+        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity; factor {factor}, {note}); muzzle devices not counted.',
         { summary: recoilNote, factor: gasFactor, note },
       )
     : t(
-        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).',
+        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity); muzzle devices not counted.',
         { summary: recoilNote, factor: gasFactor },
       )
   return (
@@ -374,7 +374,7 @@ export function Readouts({
   const mipTitle = t(
     '0.1 times the bullet mass in g times the muzzle velocity in m/s ({source}).',
     {
-      source: 'DSB Sportordnung, Regeln für Pistole und Revolver, 2.21.1',
+      source: 'DSB Sportordnung 2.21.1',
     },
   )
   const leadTitle = t('From the 10 % pressure time ({time} after ignition) to muzzle exit.', {
@@ -572,13 +572,19 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
   )
 }
 
-/** Pressure limits table and the sources of the limits; with `system` the range bar between them (the popover). */
+/**
+ * Pressure limits table and their source line; with `system` the range bar between them (the
+ * popover). On screen the line links the cartridge record's sources; on paper it names the record.
+ */
 export function LimitsView({
   body,
   system,
+  printed = false,
 }: {
   body: InteriorResponse
   system?: UnitSystem | undefined
+  /** In the print report: the record's name in place of the link. */
+  printed?: boolean
 }) {
   const { t } = useTranslation()
   const resolved = body.resolved?.cartridge
@@ -622,16 +628,16 @@ export function LimitsView({
         ))}
       </PanelTable>
       {system && <LimitRange body={body} system={system} />}
-      {resolved && (
-        <div className="limit-sources">
-          <h3>{t('Sources of the limits')}</h3>
-          <ol className="sources">
-            <li>
-              CIP: <SourceTitles sources={resolved.provenance.sources} />
-            </li>
-          </ol>
-        </div>
-      )}
+      {resolved &&
+        (printed ? (
+          <p className="limit-sources">
+            {t('Pressure limits: C.I.P. TDCC, cartridge record {name}', { name: resolved.name })}
+          </p>
+        ) : (
+          <p className="limit-sources">
+            {t('Source: C.I.P. TDCC')} <RecordSourcesLink kind="cartridges" id={resolved.id} />
+          </p>
+        ))}
     </div>
   )
 }

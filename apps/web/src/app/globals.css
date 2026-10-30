@@ -3754,13 +3754,9 @@ main .library-head.page-panel-head > .page-panel-title {
   font-size: var(--mantine-font-size-sm);
 }
 
-.workbench .result-group > .note {
+.workbench .result-group > .note,
+.limit-sources {
   margin: 0.5rem 0 0;
-}
-
-.result-group .limit-sources h3 {
-  margin: 0.75rem 0 0.25rem;
-  font-size: var(--mantine-font-size-sm);
 }
 
 /* the input groups as fixed cards: a heading row with icon and title, then the fields */
@@ -6122,17 +6118,6 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .limits-popover .limit-sources {
   font-size: var(--mantine-font-size-xs);
-}
-
-.limits-popover .limit-sources h3 {
-  margin: 0.5rem 0 0;
-  font-size: inherit;
-}
-
-.limits-popover .limit-sources ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 /* 0 to the bar's end: the range as a band, the nominal as a tick, the limit as a dashed line */

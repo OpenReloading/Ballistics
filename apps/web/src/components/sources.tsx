@@ -2,6 +2,7 @@
 
 import { Table, TableTbody, TableTd, TableTh, TableThead, TableTr } from '@mantine/core'
 import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
+import Link from 'next/link'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import { Day } from './day.tsx'
@@ -14,6 +15,15 @@ import { SourceLink } from './source-link.tsx'
 const note = (text: string) => text.replaceAll(', not load data', '')
 
 type Has = (k: keyof Source) => boolean
+
+/** How a record's values came about, in the title of its Sources panel. */
+export const provenanceKinds: Record<Provenance['kind'], Message> = {
+  published: msg('published'),
+  measured: msg('measured'),
+  derived: msg('derived'),
+  fitted: msg('fitted'),
+  computed: msg('computed'),
+}
 
 const columns: [keyof Source, Message][] = [
   ['origin', msg('Origin')],
@@ -149,12 +159,22 @@ export function Sources({ provenance }: { provenance: Provenance }) {
   )
 }
 
-/** The compact form for a line of a tool: the titles (linked), separated by semicolons. */
-export function SourceTitles({ sources }: { sources: Source[] }) {
-  return sources.map((s, i) => (
-    <span key={`${s.title} ${s.url ?? ''} ${s.page ?? ''}`}>
-      {i > 0 && '; '}
-      <SourceLink source={s} />
-    </span>
-  ))
+/** A tool's link to the Sources panel of a catalogue record's page, in a new tab: the tool keeps its state. */
+export function RecordSourcesLink({
+  kind,
+  id,
+  label,
+}: {
+  kind: 'cartridges' | 'bullets' | 'powders'
+  id: string
+  /** Defaults to "Sources". */
+  label?: string
+}) {
+  const { t } = useTranslation()
+  return (
+    <Link href={`/${kind}/${encodeURIComponent(id)}#record-sources`} target="_blank" rel="noopener">
+      {label ?? t('Sources')}
+      <span className="visually-hidden"> {t('in a new tab')}</span>
+    </Link>
+  )
 }
