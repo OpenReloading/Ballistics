@@ -9,6 +9,7 @@ import {
 } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { ambiguousMessage } from '../src/i18n/number.ts'
+import { setShownLanguage } from '../src/i18n/shown.ts'
 import { nth } from '../src/lib/nth.ts'
 import {
   addShot,
@@ -23,6 +24,7 @@ import {
   rangeSteps,
   setExcluded,
   setNotes,
+  typedRounds,
   withSession,
   withStoredSessions,
 } from '../src/lib/range-entry.ts'
@@ -190,6 +192,19 @@ it('applies two changes to the stored record in one transaction, so neither is l
   await expect(updateRecord(context.id, setExcluded(context, main, 9, true))).rejects.toThrow()
   const same = session(await storedRecord(context.id))
   expect(nth(same.data.strings, 0).shots).toHaveLength(2)
+})
+
+it('reads typed rounds as the round count adds them, in the decimal mark shown', () => {
+  setShownLanguage('de')
+  try {
+    expect(typedRounds('2,0')).toBe(2)
+    expect(typedRounds(' 12 ')).toBe(12)
+  } finally {
+    setShownLanguage('en')
+  }
+  expect(typedRounds('3')).toBe(3)
+  for (const text of ['', '0', '1.5', '-2', 'abc', '1,000'])
+    expect(typedRounds(text)).toBe(undefined)
 })
 
 it('reads a velocity in the unit shown and refuses what is not one', () => {

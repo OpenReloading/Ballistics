@@ -244,6 +244,12 @@ export function parseVelocity(
   return si > maxVelocity ? { error: t('That is too fast for a velocity.') } : { velocity: si }
 }
 
+/** Rounds typed as text: a whole number of 1 or more in the language shown ({@link parseNumber}), else undefined. */
+export function typedRounds(text: string) {
+  const p = parseNumber(text, { min: 1, integer: true })
+  return p.kind === 'number' && Number.isInteger(p.value) && p.value >= 1 ? p.value : undefined
+}
+
 /**
  * The references a Save of a load writes: the ones it holds (`current`) and those another tab
  * stored since it was opened (`stored` not in `opened`), such as a session the range page added.

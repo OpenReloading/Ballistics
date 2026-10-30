@@ -3,7 +3,6 @@
 import { type Load, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { parseNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from '../lib/error-text.ts'
 import { withSessionRounds } from '../lib/firearm.ts'
@@ -19,6 +18,7 @@ import {
   setExcluded,
   setNotes,
   stringIndex,
+  typedRounds,
   type WeatherText,
   withSession,
 } from '../lib/range-entry.ts'
@@ -150,6 +150,7 @@ export function useRangeMode() {
   const linked = useRef('')
   const [roundOffer, setRoundOffer] = useState<RoundOffer>()
   const [rounds, setRounds] = useState('')
+  const roundsTyped = typedRounds(rounds)
   const prefilled = useRef(0)
 
   useEffect(() => {
@@ -348,16 +349,15 @@ export function useRangeMode() {
   async function addRounds() {
     const offer = roundOffer
     if (!offer || saving) return
-    const typed = parseNumber(rounds, { min: 1, integer: true })
-    if (typed.kind !== 'number' || !Number.isInteger(typed.value) || typed.value < 1)
-      return setProblem(t('Enter a whole number of rounds, 1 or more.'))
+    const n = roundsTyped
+    if (n === undefined) return setProblem(t('Enter a whole number of rounds, 1 or more.'))
     setSaving(true)
     setProblem(undefined)
     try {
       const written = await updateRecord(offer.firearm, (raw) => {
         const found = userRecord.safeParse(raw)
         if (!found.success) return
-        return withSessionRounds(found.data, offer.base, offer.shots, typed.value, new Date())
+        return withSessionRounds(found.data, offer.base, offer.shots, n, new Date())
       })
       setSaved(
         written?.kind === 'firearm' && written.data.roundCount !== undefined
@@ -407,6 +407,7 @@ export function useRangeMode() {
     saving,
     roundOffer,
     rounds,
+    roundsTyped,
     setRounds,
     addRounds,
   }
