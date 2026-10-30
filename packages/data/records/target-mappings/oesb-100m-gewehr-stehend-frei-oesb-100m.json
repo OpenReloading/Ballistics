@@ -1,0 +1,23 @@
+{
+  "id": "oesb-100m-gewehr-stehend-frei-oesb-100m",
+  "discipline": "oesb-100m-gewehr-stehend-frei",
+  "face": "oesb-100m",
+  "event": "oesb-100m-gewehr-stehend-frei",
+  "shotCount": 40,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.7.3, Seite 15, PDF p. 15",
+        "fields": ["discipline", "face", "event"],
+        "note": "7.1.7.3 gives this face for 100 m, the distance of the course."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.6.2, Seite 14, PDF p. 14",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

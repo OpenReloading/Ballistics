@@ -1,0 +1,60 @@
+{
+  "id": "oesb-100m-gewehr-stehend-aufgelegt",
+  "federation": "oesb",
+  "name": "100 m Gewehr stehend aufgelegt",
+  "section": "7.1.6.2",
+  "page": "Seite 14, PDF p. 14",
+  "distance": {
+    "value": 100000,
+    "raw": "100 m",
+    "unit": "m"
+  },
+  "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["standing"],
+    "supports": ["rest"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 3900,
+          "raw": "65 Minuten"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.1, Seite 10, PDF p. 10; 7.1.6.2, Seite 14, PDF p. 14",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.firearm",
+          "rules.positions"
+        ],
+        "note": "The rifle list marks the course as national; the time table gives its positions, classes and shots."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.4.1 and 7.1.4.2, Seiten 11 to 12, PDF pp. 11 to 12",
+        "fields": ["rules.supports"],
+        "note": "Standing with the fore-end on the arm of a rest stand; no part of the body touches the stand."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.6.2, Seite 14, PDF p. 14",
+        "fields": ["rules.timeLimits"],
+        "note": "Printed time is for pulley systems; electronic systems have 50 min. Sighting shots are fired in the 15 min preparation time before it."
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "oesb-300m-gewehr-2-stellung",
+  "federation": "oesb",
+  "name": "300 m Gewehr 2 Stellung liegend - stehend",
+  "section": "7.1.6.2",
+  "page": "Seite 14, PDF p. 14",
+  "distance": {
+    "value": 300000,
+    "raw": "300 m",
+    "unit": "m"
+  },
+  "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["prone", "standing"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 8100,
+          "raw": "135 Minuten"
+        },
+        "covers": "discipline",
+        "includesSighters": false
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.1, Seite 10, PDF p. 10; 7.1.6.2, Seite 14, PDF p. 14",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.firearm",
+          "rules.positions"
+        ],
+        "note": "The rifle list marks the course as national; the time table gives its positions, classes and shots."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.6.2, Seite 14, PDF p. 14",
+        "fields": ["rules.timeLimits"],
+        "note": "Printed time is for pulley systems; electronic systems have 120 min. Sighting shots are fired in the 15 min preparation time before it."
+      }
+    ]
+  }
+}

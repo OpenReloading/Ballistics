@@ -71,29 +71,29 @@ A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](
 
 Disciplines with the fact set, of the disciplines of each federation (stage values on target mappings are not counted; 58 mappings carry `sighters`, `seriesShots` or `timeLimits`):
 
-| Fact | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | KNSA (8) | NRA (13) | NSRA (2) | VdRBw (25) |
-|---|---|---|---|---|---|---|---|---|---|
-| `firearm` | 103 | 104 | 44 | 72 | 16 | 8 | 13 | 2 | 25 |
-| `actions` | 98 | 101 | 31 | 62 | 5 | 2 | 0 | 0 | 25 |
-| `positions` | 103 | 104 | 38 | 71 | 16 | 8 | 13 | 0 | 25 |
-| `supports` | 103 | 104 | 34 | 72 | 16 | 6 | 4 | 0 | 25 |
-| `sights` | 100 | 101 | 41 | 71 | 10 | 4 | 0 | 0 | 25 |
-| `maxMagnification` | 15 | 15 | 0 | 7 | 2 | 0 | 0 | 0 | 3 |
-| `minTriggerWeight` | 61 | 79 | 13 | 0 | 8 | 6 | 0 | 0 | 20 |
-| `maxBarrelLength` | 24 | 13 | 12 | 16 | 5 | 0 | 0 | 0 | 7 |
-| `maxFirearmMass` | 33 | 87 | 15 | 0 | 15 | 6 | 0 | 0 | 0 |
-| `ammunition.handloads` | 71 | 74 | 1 | 48 | 0 | 8 | 0 | 0 | 25 |
-| `ammunition.bulletTypes` | 43 | 104 | 16 | 1 | 11 | 0 | 0 | 2 | 0 |
-| `ammunition.minMuzzleEnergy` | 7 | 0 | 0 | 8 | 0 | 0 | 0 | 0 | 0 |
-| `ammunition.minBulletMass` | 6 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 |
-| `ammunition.maxBulletMass` | 7 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `sighters` | 75 | 95 | 28 | 27 | 14 | 0 | 0 | 0 | 21 |
-| `seriesShots` | 36 | 96 | 5 | 42 | 8 | 0 | 5 | 0 | 21 |
-| `timeLimits` | 58 | 72 | 27 | 62 | 11 | 8 | 13 | 2 | 15 |
+| Fact | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | KNSA (8) | NRA (13) | NSRA (2) | ÖSB (3) | VdRBw (25) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `firearm` | 103 | 104 | 44 | 72 | 16 | 8 | 13 | 2 | 3 | 25 |
+| `actions` | 98 | 101 | 31 | 62 | 5 | 2 | 0 | 0 | 0 | 25 |
+| `positions` | 103 | 104 | 38 | 71 | 16 | 8 | 13 | 0 | 3 | 25 |
+| `supports` | 103 | 104 | 34 | 72 | 16 | 6 | 4 | 0 | 2 | 25 |
+| `sights` | 100 | 101 | 41 | 71 | 10 | 4 | 0 | 0 | 0 | 25 |
+| `maxMagnification` | 15 | 15 | 0 | 7 | 2 | 0 | 0 | 0 | 0 | 3 |
+| `minTriggerWeight` | 61 | 79 | 13 | 0 | 8 | 6 | 0 | 0 | 0 | 20 |
+| `maxBarrelLength` | 24 | 13 | 12 | 16 | 5 | 0 | 0 | 0 | 0 | 7 |
+| `maxFirearmMass` | 33 | 87 | 15 | 0 | 15 | 6 | 0 | 0 | 0 | 0 |
+| `ammunition.handloads` | 71 | 74 | 1 | 48 | 0 | 8 | 0 | 0 | 0 | 25 |
+| `ammunition.bulletTypes` | 43 | 104 | 16 | 1 | 11 | 0 | 0 | 2 | 0 | 0 |
+| `ammunition.minMuzzleEnergy` | 7 | 0 | 0 | 8 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `ammunition.minBulletMass` | 6 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 |
+| `ammunition.maxBulletMass` | 7 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `sighters` | 75 | 95 | 28 | 27 | 14 | 0 | 0 | 0 | 0 | 21 |
+| `seriesShots` | 36 | 96 | 5 | 42 | 8 | 0 | 5 | 0 | 0 | 21 |
+| `timeLimits` | 58 | 72 | 27 | 62 | 11 | 8 | 13 | 2 | 3 | 15 |
 
 A gap is a fact the rule books leave open, or a fact that one record cannot hold:
 
-- **Open in all nine rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
+- **Open in all ten rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
 - **Barrel length:** stated for handgun disciplines; the rifle tables of the German rule books print the length of the whole system, which is no barrel length.
 - **Free or as issued:** where a rule book says "any" or "as the original" for trigger weight, firearm mass or magnification, the field is absent.
 - **Time limits:** a record merging rows with different times, or a discipline whose time differs per stage while it has a single unstaged mapping, has no `timeLimits`. Sighting-only windows are not recorded.
@@ -170,7 +170,7 @@ Names are alphabetical with numbers in numeric order (25 before 100). The code o
 | BDS | `2101`, group codes `10xx`, `73xx` | By value, `x` read as `0`: `73xx` is 7300, after `4110` |
 | DSB | Section and item, `1.10`, several codes joined by `/` | The first code, each dotted segment numeric: `1.9`, `1.10`, `1.37/1.51/1.54`, `2.20` |
 | DSU, BDMP, VdRBw | Prefix and number, `LDG 2`, `G-H 6`, `SP3` | Prefix, then the number, then any text after it. Several codes by the first. Some BDMP and DSB records have no number |
-| ISSF, KNSA, NRA, NSRA | None | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name |
+| ISSF, KNSA, NRA, NSRA, ÖSB | None | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name |
 
 A discipline without a number follows the numbered ones of its federation and is ordered like ISSF.
 
@@ -191,7 +191,7 @@ A group stores the target id and the target event id, so the discipline follows 
 
 Each rule book is one source record (`records/sources/<id>.json`: title, publisher, edition, URL, retrieval date and SHA-256). A record cites it by id with its own page, fields and note (`{ "source": "<id>", "page": "..." }`). The API returns the source resolved.
 
-The records cite [BDMP 2026](../bibliography.md#bdmp-2026), [BDS 2025](../bibliography.md#bds-2025), [BDS 2026](../bibliography.md#bds-2026), [BDS 2026, Allgemeiner Teil](../bibliography.md#bds-2026-a) (touch rule, the Z20 black area), [DSB 2027](../bibliography.md#dsb-2027), [DSU 2018](../bibliography.md#dsu-2018), [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), [ISSF 2022](../bibliography.md#issf-2022) (gauges), [KNSA 2026](../bibliography.md#knsa-2026), [NRA 2026](../bibliography.md#nra-2026), [NSRA 2024](../bibliography.md#nsra-2024), [SSV 2022](../bibliography.md#ssv-2022) and [VdRBw](../bibliography.md#vdrbw). BDS disciplines take number, name, distance and target from the discipline list of the target volume (2025), and category, caliber classes and shots from the handgun and long-gun volumes (2026). The long-gun volume also gives the disciplines that the target volume does not list. Where the shots depend on the level of the match, a BDS mapping holds the number of the Deutsche Meisterschaft.
+The records cite [BDMP 2026](../bibliography.md#bdmp-2026), [BDS 2025](../bibliography.md#bds-2025), [BDS 2026](../bibliography.md#bds-2026), [BDS 2026, Allgemeiner Teil](../bibliography.md#bds-2026-a) (touch rule, the Z20 black area), [DSB 2027](../bibliography.md#dsb-2027), [DSU 2018](../bibliography.md#dsu-2018), [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), [ISSF 2022](../bibliography.md#issf-2022) (gauges), [KNSA 2026](../bibliography.md#knsa-2026), [NRA 2026](../bibliography.md#nra-2026), [NSRA 2024](../bibliography.md#nsra-2024), [ÖSB 2025](../bibliography.md#oesb-2025), [SSV 2022](../bibliography.md#ssv-2022) and [VdRBw](../bibliography.md#vdrbw). BDS disciplines take number, name, distance and target from the discipline list of the target volume (2025), and category, caliber classes and shots from the handgun and long-gun volumes (2026). The long-gun volume also gives the disciplines that the target volume does not list. Where the shots depend on the level of the match, a BDS mapping holds the number of the Deutsche Meisterschaft.
 
 DSB rows without a record: a target needs rings and a black diameter, and a discipline needs a mapping to a target event. Scheibe Nr. 9 (flap target), Nr. 22 and Nr. 23 (hit areas) print no rings, so rows 2.16 and 8.11 to 8.25 have no discipline. Scheibe Nr. 14/15 prints no mirror diameter. Shotgun, muzzle-loader shotgun, crossbow, archery and Target Sprint rows are out of scope.
 
@@ -202,3 +202,5 @@ NSRA records cover the 20-shot deliberate courses of the three card system at ri
 The SSV (Swiss Shooting) has a federation record and its rule book, the Regeln für das sportliche Schiessen with its nine parts, and no discipline: the rule book names no course of fire. The courses are set by the plan of each event, the federal programmes by the shooting ordinances of the federal defence department. The Technische Regeln Gewehr (Artikel 25 to 27) list the rifle targets at 10, 50 and 300 m without a course that names them: the 10 target, whose printed sizes are those of the ISSF 10 m air rifle, 50 m rifle and 300 m rifle targets, the 5 target, which scores two rings as one value, and the 50 m 20 target, which halves each ring and prints no diameter of the halves. The Technische Regeln Pistole (Artikel 16) name no target of their own.
 
 KNSA records cover the national large-bore rifle courses under KNSA rules (Deel IV, artikel 6.1.2): Standaard Geweer, Militair Geweer, Militair Geweer Optiek and Veteranengeweer, each prone with 30 shots at 100 and at 300 m. The 100 m courses are shot on the Woerden target (artikel 3.3), the 300 m courses on the ISSF 300 m target (artikel 3.1); scoring and gauges follow the ISSF rules. Without a record: the courses under ISSF rules (artikel 6.1.1), which are the ISSF disciplines; Vrij Geweer 300/400/500 m, one course over three distances, while a discipline holds one; and the Precisie Geweer courses, whose PG300 and PG100 Open targets print grey and white rings and no black area. The other parts of the rule book (air rifle, small-bore rifle, pistol, historical arms and the rest) have no records yet. Their national targets include the 12 m small-bore target Model 1986, whose ring sizes are printed as offsets and whose 10 counts only when the hole covers the white dot, which the target record cannot state.
+
+ÖSB records cover the national rifle courses of the Österreichische Schießordnung at 100 and 300 m (7.1.1, times in 7.1.6.2): 100 m Gewehr stehend frei and stehend aufgelegt, each 40 shots on the national 100 m target (7.1.7.3), and the two-position 300 m course for the senior classes, 60 shots prone and standing on the ISSF 300 m target (7.1.7.1). The order applies the ISSF rules wherever it sets no national rule (3.1.6), so scoring and gauges are those of the ISSF; it states no calibre and no ammunition rule. Without a record: the 10 m and 50 m national courses and the national classes of the ISSF courses, shot on ISSF targets; the 300 m prone, three-position and standard rifle courses, which are the ISSF disciplines; the service rifle (Ordonnanzgewehr), which follows a separate national rule book that this order does not reproduce; and pistol, running target, crossbow, silhouette and field target, which defer to their international rules.

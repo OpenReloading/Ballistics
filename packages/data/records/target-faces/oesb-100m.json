@@ -1,0 +1,150 @@
+{
+  "id": "oesb-100m",
+  "name": "Nationale Scheibe für 100 Meter (Scheibenstutzen)",
+  "federation": "oesb",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 350
+      },
+      "fill": "white"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 315
+      },
+      "fill": "white"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 280
+      },
+      "fill": "white"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 245
+      },
+      "fill": "white"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 210
+      },
+      "fill": "black"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 175
+      },
+      "fill": "black"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 140
+      },
+      "fill": "black"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 105
+      },
+      "fill": "black"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 70
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 35
+      },
+      "fill": "black"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 10
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 210
+  },
+  "events": [
+    {
+      "id": "oesb-100m-gewehr-stehend-frei",
+      "name": "ÖSB 100 m Gewehr stehend frei",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "federation": "oesb",
+      "section": "7.1.6.2",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "oesb-100m-gewehr-stehend-aufgelegt",
+      "name": "ÖSB 100 m Gewehr stehend aufgelegt",
+      "distance": {
+        "value": 100000,
+        "raw": "100 m"
+      },
+      "federation": "oesb",
+      "section": "7.1.6.2",
+      "scoring": "touch",
+      "category": "rifle"
+    }
+  ],
+  "paper": {
+    "format": "other",
+    "width": {
+      "value": 350
+    },
+    "height": {
+      "value": 395
+    }
+  },
+  "note": "The book prints the sheet size and one diameter per ring, rings 17.5 mm apart, rings 1 to 4 white and 5 to 10 black, and the inner ten. The 100 m courses score whole rings.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.7.3, Seite 15, PDF p. 15",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter", "paper"]
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.1 and 7.1.6.2, Seiten 10 and 14, PDF pp. 10 and 14",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.federation",
+          "events.section",
+          "events.category"
+        ],
+        "note": "The 100 m rifle courses are the only courses at that distance, and 7.1.7.3 gives the face for 100 m."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "3.1.6, Seite 4, PDF p. 4",
+        "fields": ["events.scoring", "innerTen.rule"],
+        "note": "Scoring follows the ISSF rules, which the order applies where it sets no national rule; they count a ring or the inner ten that the hole touches."
+      }
+    ]
+  }
+}
