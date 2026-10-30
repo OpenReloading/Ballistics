@@ -69,7 +69,8 @@ export const source = z.object({
   /**
    * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
    * or `LicenseRef-<name>` for the publisher's own terms or a written permission, described in `terms`.
-   * A source without a license is covered by the data licence, CC BY 4.0 (`packages/data/LICENSE`).
+   * Without a license, a source of a record distributed by `@open-reloading/data` is covered by its
+   * data licence, CC BY 4.0 (`packages/data/LICENSE`); for other producers' records the producer sets the default.
    */
   license: z
     .string()
