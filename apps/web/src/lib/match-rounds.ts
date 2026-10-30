@@ -20,7 +20,9 @@ export function matchCourse(
   mappings: readonly Pick<TargetMapping, 'stage' | 'shotCount' | 'sighters'>[],
   rules: Pick<DisciplineRules, 'sighters'> | undefined,
 ): MatchCourse {
-  const stages = [...Map.groupBy(mappings, (m) => m.stage).values()]
+  const byStage = new Map<string | undefined, (typeof mappings)[number][]>()
+  for (const m of mappings) byStage.set(m.stage, [...(byStage.get(m.stage) ?? []), m])
+  const stages = [...byStage.values()]
   let shots: number | undefined = 0
   let sighters = 0
   let unlimited = false
