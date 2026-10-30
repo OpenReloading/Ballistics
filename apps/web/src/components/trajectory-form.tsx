@@ -18,7 +18,7 @@ import {
   type OmittedEffect,
   type Trajectory,
 } from '@open-reloading/core'
-import { type Bullet, toSi } from '@open-reloading/schema'
+import { type Bullet, toSi, type UserRecord } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import {
@@ -49,7 +49,7 @@ import {
   specText,
   switchFields,
 } from '../lib/field-spec.ts'
-import { sightOptions } from '../lib/firearm.ts'
+import { sightPicker } from '../lib/firearm.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { inputsQuery, linkParams, queryFields, tabQuery } from '../lib/query.ts'
 import { zeroConditions } from '../lib/range-card.ts'
@@ -560,7 +560,8 @@ export type TrajectoryHandle = { query: () => string }
 
 /** The firearm record and configuration a sight option names (`<record>/<configuration>/<mount>`). */
 function targetOf(o: { value: string; label: string } | undefined): Result['target'] {
-  if (!o) return
+  // the example rifle is never stored, so nothing can be stored with it
+  if (!o || o.value.startsWith(`${exampleData.firearm.id}/`)) return
   const [first, last] = [o.value.indexOf('/'), o.value.lastIndexOf('/')]
   return { record: o.value.slice(0, first), config: o.value.slice(first + 1, last), label: o.label }
 }
@@ -807,7 +808,7 @@ type RifleFieldsProps = {
   ownSight: boolean
   sightGone: boolean
   sight: string
-  sights: ReturnType<typeof sightOptions>
+  sights: ReturnType<typeof sightPicker>
   readSights: () => void
   chooseSight: (value: string) => void
   twistHand: 'right' | 'left'
@@ -847,8 +848,8 @@ function RifleFields({
           onFocus={readSights}
           onChange={(e) => chooseSight(e.currentTarget.value)}
           data={[
-            { value: '', label: sights.length ? t('None') : t('None in this browser') },
-            ...sights.map(({ value, label }) => ({ value, label })),
+            { value: '', label: sights.none },
+            ...sights.options.map(({ value, label }) => ({ value, label })),
           ]}
         />
       )}
@@ -1105,7 +1106,7 @@ export function TrajectoryForm({
   const [twistHand, setTwistHand] = useState<'right' | 'left'>('right')
   // from 62em the chart fills the results column's height
   const wide = useMediaQuery('(min-width: 62em)')
-  const [sights, setSights] = useState<ReturnType<typeof sightOptions>>([])
+  const [sights, setSights] = useState(() => sightPicker([], exampleData.firearm as UserRecord, t))
   const [sight, setSight] = useState('')
   const [paper, setPaper] = useState<PaperSize>('a4')
   /** The chosen firearm was gone when the list was read again. */
@@ -1155,8 +1156,8 @@ export function TrajectoryForm({
       choice,
       twistHand,
       design: design?.name,
-      click: sights.find((o) => o.value === sight)?.fill.click,
-      target: targetOf(sights.find((o) => o.value === sight)),
+      click: sights.options.find((o) => o.value === sight)?.fill.click,
+      target: targetOf(sights.options.find((o) => o.value === sight)),
       dragSource: dragFrom?.factor === fields.dragFactor?.si ? dragFrom?.source : undefined,
     }),
     [
@@ -1279,9 +1280,9 @@ export function TrajectoryForm({
   const readSights = () => {
     storedRecords()
       .then(({ records }) => {
-        const options = sightOptions(records, t)
-        setSights(options)
-        if (sight && !options.some((o) => o.value === sight)) {
+        const picker = sightPicker(records, exampleData.firearm as UserRecord, t)
+        setSights(picker)
+        if (sight && !picker.options.some((o) => o.value === sight)) {
           setSight('')
           setSightGone(true)
         }
@@ -1293,7 +1294,7 @@ export function TrajectoryForm({
   function chooseSight(value: string) {
     setSight(value)
     setSightGone(false)
-    const s = sights.find((o) => o.value === value)
+    const s = sights.options.find((o) => o.value === value)
     if (!s) return
     const set = (key: string, q: FieldSpec['quantity'], si: number) =>
       form.setFieldValue(key, { text: roundedFieldText(q, system, si), si })

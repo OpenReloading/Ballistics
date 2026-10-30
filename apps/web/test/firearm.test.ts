@@ -23,6 +23,7 @@ import {
   landsOf,
   roundsDue,
   sightOptions,
+  sightPicker,
   withSessionRounds,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -508,5 +509,32 @@ describe('gunPicker', () => {
       data: [{ value: 'own', label: 'My rifle' }, marked],
       placeholder: 'Choose a firearm',
     })
+  })
+})
+
+describe('sightPicker', () => {
+  const english = translator().t
+  const example = loadExample.firearm as UserRecord
+  const exampleLabels = sightOptions([example]).map((o) => `${o.label} (example)`)
+
+  it('offers the example rifle on a fresh browser and says what to do', () => {
+    const picker = sightPicker([], example, english)
+    expect(picker.options.map((o) => o.label)).toEqual(exampleLabels)
+    expect(picker.options[0]?.fill).toEqual(sightOptions([example])[0]?.fill)
+    expect(picker.none).toBe(
+      'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
+    )
+    expect(sightPicker([], example, translator(de as Catalogue, 'de').t).none).toBe(
+      'Noch keine Schusswaffe gespeichert. Wählen Sie das Beispielgewehr oder fügen Sie Ihre unter Schusswaffen hinzu.',
+    )
+  })
+
+  it('lists the stored firearms first, the example after them', () => {
+    const picker = sightPicker([rifle], example, english)
+    expect(picker.options.map((o) => o.label)).toEqual([
+      ...sightOptions([rifle]).map((o) => o.label),
+      ...exampleLabels,
+    ])
+    expect(picker.none).toBe('None')
   })
 })
