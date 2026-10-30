@@ -94,6 +94,16 @@ it('writes what the change makes of the stored record, and leaves it when the ch
   expect(await storedRecord(id)).toEqual(sheet('changed', later))
 })
 
+it('rejects with the error the change throws and leaves the record', async () => {
+  await putRecords([sheet('mine', stored)])
+  await expect(
+    updateRecord(id, () => {
+      throw new RangeError('No such shot.')
+    }),
+  ).rejects.toThrow(new RangeError('No such shot.'))
+  expect(await storedRecord(id)).toEqual(sheet('mine', stored))
+})
+
 it('keeps, reads and deletes a photo, and stores only the photos the records point at', async () => {
   await putPhoto('ph0', new Blob(['abc'], { type: 'image/png' }))
   expect(await (await storedPhoto('ph0'))?.text()).toBe('abc')
