@@ -20,6 +20,7 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
+import Link from 'next/link'
 import {
   type ReactNode,
   useCallback,
@@ -33,6 +34,13 @@ import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
+import {
+  type ClassMembers,
+  classDisciplinesHref,
+  classOfCartridge,
+  fetchClassMembers,
+} from '../lib/caliber-class-of.ts'
+import { dayText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import {
@@ -47,6 +55,8 @@ import {
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
+import { gapNotes, loadGaps } from '../lib/load-gaps.ts'
+import { type FirearmUse, loadUse } from '../lib/load-use.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
@@ -115,6 +125,8 @@ function firearmColumns(
   system: UnitSystem,
   cartridgeName: (ref: string | undefined) => string | undefined,
   cells: (r: FirearmRecord) => Cells,
+  usageOf: (r: FirearmRecord) => FirearmUse,
+  notesOf: (r: FirearmRecord) => string[],
   actionsMenu: (r: FirearmRecord, tabIndex?: number) => ReactNode,
 ): DirectoryColumn<FirearmRecord>[] {
   return [
@@ -194,6 +206,33 @@ function firearmColumns(
       cell: (r) => cells(r).configuration,
     },
     {
+      key: 'loads',
+      label: msg('Loads'),
+      help: msg('Saved loads with this firearm.'),
+      num: true,
+      width: '5rem',
+      value: (r) => usageOf(r).loads,
+      cell: (r) => usageOf(r).loads,
+    },
+    {
+      key: 'lastSession',
+      label: msg('Last session'),
+      help: msg('The latest dated chronograph session of those loads.'),
+      width: '8rem',
+      value: (r) => usageOf(r).last,
+      cell: (r) => {
+        const last = usageOf(r).last
+        return last ? dayText(last) : ''
+      },
+    },
+    {
+      key: 'notes',
+      label: msg('Notes'),
+      help: msg('Saved loads of another cartridge, or no saved load.'),
+      value: (r) => notesOf(r).join(' ') || undefined,
+      cell: (r) => notesOf(r).join(' '),
+    },
+    {
       key: 'actions',
       label: msg('Actions'),
       width: '3rem',
@@ -203,16 +242,21 @@ function firearmColumns(
   ]
 }
 
-/** Open, Duplicate and Delete of a stored firearm, Duplicate only for the example. */
+/**
+ * Open, Duplicate and Delete of a stored firearm, Duplicate only for the example; the disciplines
+ * that name the caliber class of its cartridge where the cartridge is in one.
+ */
 function RowActions({
   record: r,
   tabIndex,
+  caliberClass,
   onOpen,
   onDuplicate,
   onDelete,
 }: {
   record: FirearmRecord
   tabIndex?: number | undefined
+  caliberClass: ClassMembers | undefined
   onOpen: () => void
   onDuplicate: () => void
   onDelete: () => void
@@ -235,6 +279,11 @@ function RowActions({
       <Menu.Dropdown>
         {stored && <Menu.Item onClick={onOpen}>{t('Open')}</Menu.Item>}
         <Menu.Item onClick={onDuplicate}>{t('Duplicate')}</Menu.Item>
+        {caliberClass && (
+          <Menu.Item component={Link} href={classDisciplinesHref(caliberClass.id)}>
+            {t('Disciplines listing {class}', { class: caliberClass.name })}
+          </Menu.Item>
+        )}
         {stored && (
           <Menu.Item color="red" onClick={onDelete}>
             {t('Delete')}
@@ -352,12 +401,16 @@ function readFirearms(
   read: number,
   reads: { current: number },
   setList: (list: FirearmRecord[]) => void,
+  setUses: (uses: Map<string, FirearmUse>) => void,
+  setGaps: (gaps: ReturnType<typeof loadGaps>) => void,
   setReadError: (message: string) => void,
 ) {
   setReadError('')
   storedRecords()
     .then(({ records }) => {
       if (read !== reads.current) return
+      setUses(loadUse(records).firearms)
+      setGaps(loadGaps(records))
       setList(
         records
           .filter((r): r is FirearmRecord => r.kind === 'firearm')
@@ -410,9 +463,13 @@ const nameOfBullet = (
   return parsed ? (names[parsed.id] ?? parsed.id) : ref
 }
 
-const nameOfCartridge = (names: Record<string, string>, ref: string | undefined) => {
+const nameOfCartridge = (
+  names: Record<string, string>,
+  designs: ReadonlyMap<string, string>,
+  ref: string | undefined,
+) => {
   const id = catalogueCartridgeId(ref)
-  return id === undefined ? ref : (names[id] ?? id)
+  return id === undefined ? ((ref && designs.get(ref)) ?? ref) : (names[id] ?? id)
 }
 
 /** The data cards that print: the open firearm's, or the example's. */
@@ -503,10 +560,13 @@ function ExampleView({
  */
 export function FirearmLibrary() {
   const tr = useTranslation()
-  const { t } = tr
+  const { t, tn } = tr
   const { system } = useUnits()
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
+  /** The saved loads that name each firearm, by firearm id. */
+  const [uses, setUses] = useState(new Map<string, FirearmUse>())
+  const [gaps, setGaps] = useState(() => loadGaps([]))
   const [failure, setFailure] = useState('')
   /** Why the firearm that `?record=` names could not be opened. */
   const [linkFailure, setLinkFailure] = useState<Message>()
@@ -529,7 +589,7 @@ export function FirearmLibrary() {
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)
   const refresh = useCallback(() => {
-    readFirearms(++reads.current, reads, setList, setReadError)
+    readFirearms(++reads.current, reads, setList, setUses, setGaps, setReadError)
   }, [])
   useEffect(refresh, [refresh])
 
@@ -551,17 +611,25 @@ export function FirearmLibrary() {
     data.cartridge,
     example.data.cartridge,
     ...(list ?? []).map((r) => r.data.cartridge),
+    ...[...gaps.mismatches.values()].flat().map((m) => m.cartridge),
   ]
     .map(catalogueCartridgeId)
     .filter((c): c is string => !!c)
     .join('\n')
   /** Cartridge names by record id: chosen in the search or read from the API. */
   const [cartridgeNames, setCartridgeNames] = useRecordNames('cartridges', cartridgeIds)
+  /** The caliber classes with their members, for the link to the disciplines of a row's class. */
+  const [classes, setClasses] = useState<ClassMembers[]>([])
+  useEffect(() => {
+    // unreachable: the rows show no link
+    fetchClassMembers().then(setClasses, () => {})
+  }, [])
   /** Bullet names by record id, for the bullet of the lands contact. */
   const [bulletNames, setBulletNames] = useRecordNames('bullets', catalogueBulletId(data))
   const bulletName = (ref: string | undefined) => nameOfBullet(t, bulletNames, ref)
   /** The name of the cartridge a reference names, else the reference as stored. */
-  const cartridgeName = (ref: string | undefined) => nameOfCartridge(cartridgeNames, ref)
+  const cartridgeName = (ref: string | undefined) =>
+    nameOfCartridge(cartridgeNames, gaps.designs, ref)
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(data)
@@ -656,6 +724,7 @@ export function FirearmLibrary() {
     <RowActions
       record={r}
       tabIndex={tabIndex}
+      caliberClass={classOfCartridge(classes, catalogueCartridgeId(r.data.cartridge))}
       onOpen={() => menu.current?.open(r)}
       onDuplicate={() => duplicate(r)}
       onDelete={() => remove(r)}
@@ -669,7 +738,21 @@ export function FirearmLibrary() {
     cellCache.set(r, c)
     return c
   }
-  const columns = firearmColumns(t, system, cartridgeName, cells, actionsMenu)
+  const usageOf = (r: FirearmRecord) => uses.get(r.id) ?? { loads: 0 }
+  const notesOf = (r: FirearmRecord) => gapNotes(r, gaps, cartridgeName, t)
+  const columns = firearmColumns(t, system, cartridgeName, cells, usageOf, notesOf, actionsMenu)
+  /** The phone row's line: the record's facts, its loads, last session day and notes. */
+  const facts = (r: FirearmRecord) => {
+    const { loads, last } = usageOf(r)
+    return [
+      ...lines(r),
+      tn(loads, '{count} load', '{count} loads'),
+      last && dayText(last),
+      ...notesOf(r),
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  }
   const card = (r: FirearmRecord, stored: boolean) => (
     <FirearmCard
       key={r.id}
@@ -709,6 +792,18 @@ export function FirearmLibrary() {
               onOpen={onOpen}
               onStored={refresh}
             />
+            <Button
+              variant="default"
+              disabled={!list?.length}
+              onClick={() =>
+                list &&
+                void import('../lib/records-csv.ts')
+                  .then((m) => m.saveFirearmsCsv(list, uses, cartridgeName))
+                  .catch((e) => setFailure(errorText(e)))
+              }
+            >
+              {t('Export CSV')}
+            </Button>
             <UnitsIconButton />
             <PrintButton disabled={!editing && !viewing} />
           </>
@@ -746,7 +841,7 @@ export function FirearmLibrary() {
                 link="name"
                 href={rowHref}
                 onOpen={(r) => (r === example ? view() : menu.current?.open(r))}
-                facts={(r) => lines(r).filter(Boolean).join(' · ')}
+                facts={facts}
                 label={nameOf}
                 caption={tableCaption(t, named)}
                 noun="firearms"
