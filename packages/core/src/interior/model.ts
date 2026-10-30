@@ -51,6 +51,13 @@ export interface InteriorLoad {
      * (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant").
      */
     temperatureSensitivity?: { reference: number; cold: number; hot: number } | undefined
+    /**
+     * Sensitivity of the specific energy to the propellant temperature, 1/K; default 0. The energy
+     * is scaled by exp(energyTemperature (T - reference)) with the reference of
+     * `temperatureSensitivity`, which a nonzero value needs
+     * (`apps/docs/docs/models/interior-m3.md`, "Temperature of the propellant").
+     */
+    energyTemperature?: number | undefined
   }
   /** Propellant temperature, K. */
   propellantTemperature: number
@@ -264,6 +271,14 @@ export type ClosedVesselResult =
 const pos = (v: number | undefined) => v !== undefined && Number.isFinite(v) && v > 0
 const nonNeg = (v: number | undefined) => v !== undefined && Number.isFinite(v) && v >= 0
 
+/** Specific energy at the propellant temperature, J/kg: the input scaled by `energyTemperature`. */
+function energyAtTemperature(load: InteriorLoad): number {
+  const { specificEnergy, energyTemperature, temperatureSensitivity: t } = load.propellant
+  return t === undefined || !energyTemperature
+    ? specificEnergy
+    : specificEnergy * Math.exp(energyTemperature * (load.propellantTemperature - t.reference))
+}
+
 type Check = [string, boolean]
 
 /** Checks of the chamber, barrel, bullet, charge and propellant. */
@@ -286,6 +301,12 @@ function bodyChecks(load: InteriorLoad): Check[] {
     [
       'propellant.temperatureSensitivity',
       t === undefined || (pos(t.reference) && Number.isFinite(t.cold) && Number.isFinite(t.hot)),
+    ],
+    [
+      'propellant.energyTemperature',
+      propellant.energyTemperature === undefined ||
+        propellant.energyTemperature === 0 ||
+        (Number.isFinite(propellant.energyTemperature) && t !== undefined),
     ],
     ['propellantTemperature', pos(load.propellantTemperature)],
     ['ignitionPressure', pos(load.ignitionPressure)],
@@ -373,7 +394,7 @@ function scaleInteriorLoad(load: InteriorLoad) {
   const k = propellant.gamma
   const eta = propellant.covolume
   const solid = mc / propellant.density
-  const e0 = mc * propellant.specificEnergy
+  const e0 = mc * energyAtTemperature(load)
   if (!(vc - solid > 0) || !(vc - eta * mc > 0))
     return { valid: false, reason: 'chamberVolume' } as InteriorInvalid
 
@@ -955,7 +976,7 @@ export function interior(
     burnout: run.burnout,
     muzzleBurntFraction: last.burntFraction,
     muzzleEnergy,
-    efficiency: muzzleEnergy / (load.charge * load.propellant.specificEnergy),
+    efficiency: muzzleEnergy / (load.charge * energyAtTemperature(load)),
     energy: run.energy,
     tenPercentPressureTime,
     steps: run.steps,

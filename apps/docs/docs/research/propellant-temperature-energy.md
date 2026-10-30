@@ -13,7 +13,7 @@ Interior model ([M3](../models/interior-m3.md), [powder fit](../models/interior-
 
 ## Method
 
-Reproduce: `node packages/core/study/propellant-temperature-energy.ts` from the repository root (about 9 minutes, one process, fixed seeds; the rule below is evaluated in the script), at commit `4135bd07b2e78ab7795d0d5176df9e66c53cfed5` (on the branch `research/propellant-temperature-energy`; the script, the option and its tests are in that commit). The option is `propellant.energyTemperature` (1/K, default 0) on the interior load, on that branch only.
+Script: `node packages/core/scripts/propellant-temperature-energy.mts` from the repository root (about 9 minutes, one process, fixed seeds; the rule below is evaluated in the script). The option is `propellant.energyTemperature` (1/K, default 0) on the interior load.
 
 Assumed figures, none with a source in the [bibliography](../bibliography.md), all unverified: energy coefficient 0.0003 1/K, burn-rate sensitivity 0.004 1/K on both sides of the reference 294.15 K, velocity noise 3 m/s per string mean, pressure noise 3 %.
 
@@ -30,7 +30,7 @@ Rule, set before the first run: the option is supported when, with the term in t
 
 ## Formulas
 
-The burn-rate factor is $\tau_T = \exp(\sigma\,(T_p - T_\text{ref}))$ and the energy factor of the option is $\exp(\beta_Q\,(T_p - T_\text{ref}))$ on the specific energy; the first is on the [M3 page](../models/interior-m3.md). To first order the relative change of the muzzle velocity for a small temperature step is the burn-rate elasticity times $\sigma\,\Delta T$ plus the energy elasticity times $\beta_Q\,\Delta T$, so the energy share is the second term over the sum. Both terms raise velocity with temperature, so a velocity ladder cannot tell them apart. A free factor on the burn sensitivities can stand in for the energy term inside the calibrated range and not outside it, because the two enter the pressure curve differently.
+The burn-rate factor is $\tau_T = \exp(\sigma\,(T_p - T_\text{ref}))$ and the energy factor is $\exp(\beta_Q\,(T_p - T_\text{ref}))$, both on the [M3 page](../models/interior-m3.md). To first order the relative change of the muzzle velocity for a small temperature step is the burn-rate elasticity times $\sigma\,\Delta T$ plus the energy elasticity times $\beta_Q\,\Delta T$, so the energy share is the second term over the sum. Both terms raise velocity with temperature, so a velocity ladder cannot tell them apart. A free factor on the burn sensitivities can stand in for the energy term inside the calibrated range and not outside it, because the two enter the pressure curve differently.
 
 ## Numbers
 
@@ -97,8 +97,10 @@ Analytic: synthetic loads and a synthetic truth with the fitted model's own stru
 
 ## Where in the app
 
-- `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (the burn-rate factor; the energy factor `energyAtTemperature` is on the research branch only).
+- `packages/core/src/interior/model.ts`, `energyAtTemperature`.
 - `packages/core/src/interior/fit.ts`, `fitPowder`.
+- `packages/core/test/interior-energy-temperature.test.ts`.
+- `packages/core/scripts/propellant-temperature-energy.mts`.
 - Model pages: [M3 interior model](../models/interior-m3.md), [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence
