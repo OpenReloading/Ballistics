@@ -254,4 +254,8 @@ describe('powderDraft', () => {
     expect(powderDraft.safeParse({ composition: [{ min: -5, max: 120 }] }).success).toBe(true)
     expect(powderDraft.safeParse({ composition: [{ min: 'x' }] }).success).toBe(false)
   })
+
+  it('drops the listed cartridges, which need a source the designer does not write', () => {
+    expect(powderDraft.parse({ listedCartridges: ['308-win'] })).toEqual({})
+  })
 })
