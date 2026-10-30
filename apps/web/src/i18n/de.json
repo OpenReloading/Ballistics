@@ -3746,5 +3746,15 @@
   "Add {count} shot of these strings to the round count of {name}?|Add {count} shots of these strings to the round count of {name}?": {
     "one": "{count} Schuss dieser Schussreihen zur Schusszahl von {name} hinzufügen?",
     "other": "{count} Schüsse dieser Schussreihen zur Schusszahl von {name} hinzufügen?"
-  }
+  },
+  "A4 grid target with corner marks for the photo, the fields from this sheet's load and group": "A4-Gitterzielscheibe mit Eckmarken für das Foto, die Felder aus Ladung und Gruppe dieses Blatts",
+  "Distance (m)": "Entfernung (m)",
+  "Download blank SVG": "Leeres SVG herunterladen",
+  "Download SVG": "SVG herunterladen",
+  "Print at 100 %, not fitted to the page. Check the bar with a ruler.": "Mit 100 % drucken, nicht an die Seite angepasst. Den Balken mit einem Lineal prüfen.",
+  "Print blank zero target": "Leere Zielscheibe zum Einschießen drucken",
+  "Print zero target": "Zielscheibe zum Einschießen drucken",
+  "Shooter": "Schütze",
+  "Zero target": "Zielscheibe zum Einschießen",
+  "Zero target {id}, version {version}, plain corner marks, mark centres {width} x {height} mm, grid {pitch} mm": "Zielscheibe zum Einschießen {id}, Version {version}, einfache Eckmarken, Markenmitten {width} x {height} mm, Gitter {pitch} mm"
 }
