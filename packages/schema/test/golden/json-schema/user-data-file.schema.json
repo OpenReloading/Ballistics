@@ -4474,6 +4474,32 @@
                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
                     "description": "Day the round count was last set, ISO 8601."
                   },
+                  "countedSessions": {
+                    "maxItems": 200,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "session": {
+                          "type": "string",
+                          "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
+                          "description": "Reference to the session."
+                        },
+                        "rounds": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991,
+                          "description": "Rounds of the session added to `roundCount`."
+                        }
+                      },
+                      "required": [
+                        "session",
+                        "rounds"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "description": "Sessions whose rounds were added to `roundCount`, the latest last, so a session is counted once."
+                  },
                   "noteAtRoundCount": {
                     "type": "integer",
                     "exclusiveMinimum": 0,

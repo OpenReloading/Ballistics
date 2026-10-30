@@ -312,9 +312,11 @@ export function Measurements({
 
   /** Asks to add the shots of the strings mapped to a charge, which name this load, to the firearm's count. */
   async function offerRounds(id: string, added: SessionRecord[]) {
-    const shots = added
-      .flatMap((r) => r.data.strings)
-      .reduce((n, s) => n + (s.variation ? s.shots.length : 0), 0)
+    const counts = added.map((r) => ({
+      ref: sessionRef(r.id),
+      shots: r.data.strings.reduce((n, s) => n + (s.variation ? s.shots.length : 0), 0),
+    }))
+    const shots = counts.reduce((n, c) => n + c.shots, 0)
     try {
       const found = userRecord.safeParse(await storedRecord(id))
       if (!found.success || found.data.kind !== 'firearm') return
@@ -332,9 +334,17 @@ export function Measurements({
         confirmLabel: t('Add'),
       })
       if (!ok) return
+      // each session is counted on its own, its base the count before it
       const written = await updateRecord(id, (raw) => {
         const stored = userRecord.safeParse(raw)
-        return stored.success ? withSessionRounds(stored.data, base, shots, shots) : undefined
+        if (!stored.success) return
+        let next: typeof stored.data | undefined
+        let at = base
+        for (const c of counts) {
+          next = withSessionRounds(next ?? stored.data, c.ref, at, c.shots, c.shots) ?? next
+          at += c.shots
+        }
+        return next
       })
       setCounted(
         written?.kind === 'firearm' && written.data.roundCount !== undefined

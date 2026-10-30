@@ -547,6 +547,15 @@ describe('firearm', () => {
     expect(
       paths({ optics: Array.from({ length: 21 }, (_, i) => ({ ...dot, id: `o${i}` })) }),
     ).toContain('data.optics')
+    const counted = { session: 'user:00000000-0000-4000-8000-000000000001', rounds: 3 }
+    expect(paths({ countedSessions: [counted] })).toBeUndefined()
+    expect(paths({ countedSessions: Array(201).fill(counted) })).toEqual(['data.countedSessions'])
+    expect(paths({ countedSessions: [{ ...counted, rounds: -1 }] })).toEqual([
+      'data.countedSessions.0.rounds',
+    ])
+    expect(paths({ countedSessions: [{ ...counted, shots: 3 }] })).toEqual([
+      'data.countedSessions.0',
+    ])
   })
 
   it('checks the magnification range and the configuration dates', () => {

@@ -290,6 +290,9 @@ export const catalogueCartridgeId = (ref: string | undefined) => {
   return parsed?.scope === 'catalogue' ? parsed.id : undefined
 }
 
+/** The entries `countedSessions` holds at most (the schema's limit). */
+const maxCountedSessions = 200
+
 /** A new firearm: no optics or configurations yet. */
 export const blankFirearm = (): Firearm => ({
   origin: 'user',
@@ -310,25 +313,45 @@ export function firearmPatch(f: Firearm, p: Partial<Firearm>, now = new Date()):
 }
 
 /**
- * The stored firearm `record` with `n` rounds added to its count, dated through `firearmPatch`, for
- * a session of `shots` shots whose snapshot recorded the count `base`. undefined, leaving the
- * record, when it is no firearm, has no count, the session has no base, or the count is at least
- * `base + shots` already (the session was added, here or in another tab).
+ * The rounds of the session `session` (`shots` shots, its snapshot recorded the count `base`) that
+ * the count of `f` does not hold yet: the shots minus the rounds counted for the session, or for a
+ * session without an entry in `countedSessions` all its shots unless the count is at least
+ * `base + shots` already. 0 without a count, or without a base and an entry.
+ */
+export function roundsDue(f: Firearm, session: string, base: number | undefined, shots: number) {
+  if (f.roundCount === undefined) return 0
+  const counted = f.countedSessions?.find((c) => c.session === session)?.rounds
+  if (counted !== undefined) return Math.max(0, shots - counted)
+  return base === undefined || f.roundCount >= base + shots ? 0 : shots
+}
+
+/**
+ * The stored firearm `record` with `n` rounds added to its count for the session `session`, dated
+ * through `firearmPatch`, and the rounds counted for the session in `countedSessions` (the oldest
+ * entry dropped at the limit). undefined, leaving the record, when it is no firearm or
+ * {@link roundsDue} is 0 (the session was added, here or in another tab).
  */
 export function withSessionRounds(
   record: UserRecord,
+  session: string,
   base: number | undefined,
   shots: number,
   n: number,
   now = new Date(),
 ): UserRecord | undefined {
-  if (record.kind !== 'firearm' || base === undefined || n < 1) return undefined
-  const count = record.data.roundCount
-  if (count === undefined || count >= base + shots) return undefined
+  if (record.kind !== 'firearm' || n < 1) return undefined
+  const f = record.data
+  if (f.roundCount === undefined || roundsDue(f, session, base, shots) < 1) return undefined
+  const entries = f.countedSessions ?? []
+  const counted = entries.find((c) => c.session === session)?.rounds ?? 0
+  const countedSessions = [
+    ...entries.filter((c) => c.session !== session),
+    { session, rounds: counted + n },
+  ].slice(-maxCountedSessions)
   return userRecord.parse({
     ...record,
     saved: now.toISOString(),
-    data: firearmPatch(record.data, { roundCount: count + n }, now),
+    data: { ...firearmPatch(f, { roundCount: f.roundCount + n }, now), countedSessions },
   })
 }
 
