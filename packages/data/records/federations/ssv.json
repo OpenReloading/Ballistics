@@ -1,0 +1,34 @@
+{
+  "id": "ssv",
+  "name": "Schweizer Schiesssportverband",
+  "abbreviation": "SSV",
+  "country": "CH",
+  "ruleBooks": ["ssv-regeln-sportliches-schiessen-2022"],
+  "website": "https://www.swissshooting.ch/",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "ssv-regeln-sportliches-schiessen-2022",
+        "page": "RSpS, Seite 2, PDF p. 2",
+        "fields": ["name", "abbreviation", "ruleBooks"],
+        "note": "The preamble names the association and its short name; Artikel 1 lists the nine parts that make up the rules in one book. The book names no course of fire: the courses are set by each event's own plan, so no discipline has a record."
+      },
+      {
+        "source": "ssv-regeln-sportliches-schiessen-2022",
+        "page": "RSpS, Artikel 2, Seite 3, PDF p. 3",
+        "fields": ["country"],
+        "note": "The rules rest on the shooting ordinances of the Swiss Federal Council and the federal defence department."
+      },
+      {
+        "title": "Homepage of Swiss Shooting",
+        "publisher": "Schweizer Schiesssportverband",
+        "url": "https://www.swissshooting.ch/",
+        "retrieved": "2026-10-30",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers and names the association."
+      }
+    ]
+  }
+}
