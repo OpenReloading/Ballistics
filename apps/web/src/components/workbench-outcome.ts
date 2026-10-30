@@ -76,6 +76,8 @@ export type Outcome =
       volumeMeasured: boolean
       /** The user powder design whose model parameters the run's fields took. */
       powderDesign?: string | undefined
+      /** The chosen cartridge's name when the powder record lists other cartridges only. */
+      unlisted?: string | undefined
       /** Id of the cartridge record the run compared its limits with. */
       cartridge?: string | undefined
       /** Cartridge, bullet and powder of the run, as their records name them. */
@@ -204,6 +206,18 @@ export function warningLines(
   return [...shownWarnings(ok.body, system, t), ...derived(ok, t).own]
 }
 
+/**
+ * The cartridge's name when the powder record lists the cartridges its manufacturer names and this
+ * one is not among them; a powder without a list says nothing.
+ */
+export const unlistedCartridge = (
+  powder: { listedCartridges?: string[] | undefined } | undefined,
+  cartridge: { id: string; name: string } | undefined,
+) =>
+  cartridge && powder?.listedCartridges && !powder.listedCartridges.includes(cartridge.id)
+    ? cartridge.name
+    : undefined
+
 /** The kinds of a result note in their order: limits and model flags, what is missing, how a value is meant. */
 export const noteKinds = ['warning', 'message', 'note'] as const
 export type NoteKind = (typeof noteKinds)[number]
@@ -251,6 +265,19 @@ export function resultNotes(
       line: w.name ?? w.text,
       text: w.name ? w.text : undefined,
     })),
+    ...(ok.unlisted
+      ? [
+          {
+            kind: 'warning' as const,
+            line: t(
+              '{cartridge} is not among the cartridges the manufacturer lists this powder for.',
+              {
+                cartridge: ok.unlisted,
+              },
+            ),
+          },
+        ]
+      : []),
     ...(ok.volumeMeasured
       ? []
       : [{ kind: 'message' as const, line: t(volumeNote.title), text: t(volumeNote.text) }]),

@@ -457,6 +457,14 @@ Code: `packages/core/src/advisories.ts`, `advisoryRules`, `interiorAdvisories`. 
 - `gyrationRadiusWithoutTwist`: a radius of gyration is given and $L_\text{tw} = 0$. The [effective mass](#effective-mass) then has no rotational term, so the radius is ignored.
 - `startPressureHeldOnce`: $p_\text{st} \gt p_0$, $p_\text{st} \gt p_\text{i}$ (the ignition pressure) and $p_e(0) \gt 0$. The projectile is held until the pressure reaches $p_\text{st}$ and then starts against $p_0$, which is lower. $p_0$ is the resistance at shot start only: the engraving profile can rise with travel, so the resistance later in the motion can exceed $p_0$ and $p_\text{st}$. With $p_\text{i} \ge p_\text{st}$ the [shot start](#shot-start) condition holds at ignition and there is no hold.
 
+### Cartridges listed by the manufacturer
+
+A powder record may carry `listedCartridges`: the ids of the cartridge records the manufacturer lists the powder for on its product page or data sheet, with a source whose `fields` names the list (`packages/schema/src/powder.ts`). It says what the manufacturer lists, not a recommendation, and it is no input of the model. Absent means not recorded, never none. Load data of the manufacturer, such as charges per cartridge, is not stored with it.
+
+When the powder record has a list and the chosen cartridge record is not in it, the workbench's result notes carry one warning: "<cartridge> is not among the cartridges the manufacturer lists this powder for." A listed cartridge, a powder without a list or a run without a cartridge record give none. The powder record page shows the list as "Listed by the manufacturer for", its source with the record's other sources.
+
+Code: `apps/web/src/components/workbench-outcome.ts`, `unlistedCartridge`. `packages/data/src/references.ts`, `checkCartridgeReferences` (each id names a current cartridge record).
+
 ## Sources
 
 - [Kneubuehl 2018](../bibliography.md#kneubuehl-2018), p. 76 eq. (3.3:27): energy balance with the free volume and covolume.

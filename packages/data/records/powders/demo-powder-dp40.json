@@ -4,6 +4,7 @@
   "name": "DP40",
   "grainForm": "extruded",
   "propellantBase": "double",
+  "listedCartridges": ["308-win", "6-5-creedmoor"],
   "interior": {
     "model": "m3",
     "fitted": ["vivacity", "energy"],
@@ -55,7 +56,7 @@
       {
         "source": "synthetic-test-data",
         "kind": "fitted",
-        "fields": ["name", "grainForm", "propellantBase", "interior"],
+        "fields": ["name", "grainForm", "propellantBase", "listedCartridges", "interior"],
         "note": "Invented values for tests and the example; not a real product."
       }
     ]

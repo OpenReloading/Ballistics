@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { type Outcome, resultNotes } from '../src/components/workbench-outcome.ts'
+import {
+  type Outcome,
+  resultNotes,
+  unlistedCartridge,
+} from '../src/components/workbench-outcome.ts'
 import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -100,5 +104,26 @@ describe('resultNotes', () => {
     })
     const { sampled: _, ...body } = plain.body
     expect(resultNotes({ ...plain, body }, [], units, english.t)).toEqual([])
+  })
+
+  it('warns when the powder record lists other cartridges only', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const listed = (o: Ok) =>
+      resultNotes(o, [], units, english.t).filter((n) => n.line.includes('the manufacturer lists'))
+    expect(listed(ok({ ...plain, unlisted: '308 Win.' }))).toEqual([
+      {
+        kind: 'warning',
+        line: '308 Win. is not among the cartridges the manufacturer lists this powder for.',
+      },
+    ])
+    expect(listed(ok(plain))).toEqual([])
+  })
+
+  it('names the cartridge only when the list leaves it out', () => {
+    const cartridge = { id: '308-win', name: '308 Win.' }
+    expect(unlistedCartridge({ listedCartridges: ['6-5-creedmoor'] }, cartridge)).toBe('308 Win.')
+    expect(unlistedCartridge({ listedCartridges: ['308-win'] }, cartridge)).toBeUndefined()
+    expect(unlistedCartridge({}, cartridge)).toBeUndefined()
+    expect(unlistedCartridge({ listedCartridges: ['308-win'] }, undefined)).toBeUndefined()
   })
 })

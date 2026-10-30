@@ -188,6 +188,7 @@ import {
   type Step,
   stepLoad,
   stepsOf,
+  unlistedCartridge,
 } from './workbench-outcome.ts'
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
@@ -2017,6 +2018,7 @@ export function useWorkbenchState() {
       id: runs.current,
       bulkDensity: a.bulkDensity,
       cartridge: body.cartridge,
+      unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
       design: bulletDesign?.name,

@@ -1,8 +1,9 @@
 'use client'
 
-import type { Powder } from '@open-reloading/schema'
+import type { Cartridge, Powder } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
+import { fetchRecord } from '../lib/api-fetch.ts'
 import type { PowderSummary } from '../lib/api-types.ts'
 import {
   classifyPowder,
@@ -55,13 +56,25 @@ function place(
   }
 }
 
-/** What the page reads besides the record: the manufacturer names and, for a fitted powder, its place in the burn-rate order. */
+/**
+ * What the page reads besides the record: the manufacturer names, for a fitted powder its place in
+ * the burn-rate order, and the names of the cartridges the manufacturer lists it for.
+ */
 interface Extras {
   names: ManufacturerNames
   placed: BurnRatePlace | undefined
+  cartridgeNames: ReadonlyMap<string, string>
 }
 
-function PowderRecord({ p, names, placed }: { p: Powder } & Extras) {
+/** The names of the cartridge records `ids`; a record that does not load is left out. */
+async function cartridgeNamesOf(ids: string[], signal: AbortSignal) {
+  const records = await Promise.all(
+    ids.map((id) => fetchRecord<Cartridge>('cartridges', id, signal).catch(() => undefined)),
+  )
+  return new Map(records.flatMap((c) => (c ? [[c.id, c.name] as const] : [])))
+}
+
+function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extras) {
   const manufacturerName = names.get(p.manufacturer)
   const curve = classifyPowder(p, names)
   const ratio = fittedEnergyRatio(p)
@@ -70,7 +83,7 @@ function PowderRecord({ p, names, placed }: { p: Powder } & Extras) {
     uncertaintyFactor,
     ratio === undefined ? undefined : { value: ratio },
   )
-  const data = powderRowGroups(p).filter((g) => g.rows.length > 0)
+  const data = powderRowGroups(p, cartridgeNames).filter((g) => g.rows.length > 0)
   return (
     <RecordPage
       title={productLabel(p, names)}
@@ -126,7 +139,8 @@ export function PowderRecordPage({ id, name }: { id: string; name: string }) {
         const placed = isFitted(classifyPowder(p, names))
           ? place(await fetchPowderList(signal), names, p.id)
           : undefined
-        return { names, placed }
+        const cartridgeNames = await cartridgeNamesOf(p.listedCartridges ?? [], signal)
+        return { names, placed, cartridgeNames }
       }}
     >
       {(p, extras) => <PowderRecord p={p} {...extras} />}

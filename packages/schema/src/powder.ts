@@ -145,6 +145,11 @@ export const powder = z
     interior: powderInterior.optional(),
     /** Burn-rate sensitivity to the propellant temperature; absent: the burn rate does not depend on it. */
     temperatureSensitivity: powderTemperatureSensitivity.optional(),
+    /**
+     * Ids of the cartridge records the manufacturer lists the powder for, as its product page or data
+     * sheet does: what the manufacturer says, not a recommendation. Absent: not recorded, never none.
+     */
+    listedCartridges: z.array(recordId).min(1).optional(),
     note: z.string().min(1).optional(),
     provenance,
   })
@@ -159,6 +164,15 @@ export const powder = z
       )
     )
       ctx.addIssue({ code: 'custom', path: ['interior'], message: 'needs a fitted source' })
+    if (
+      p.listedCartridges &&
+      !p.provenance.sources.some((s) => s.fields?.includes('listedCartridges'))
+    )
+      ctx.addIssue({
+        code: 'custom',
+        path: ['listedCartridges'],
+        message: 'needs a source with fields listedCartridges',
+      })
     if (p.thermochemistry && !p.composition)
       ctx.addIssue({ code: 'custom', path: ['thermochemistry'], message: 'needs a composition' })
     if (p.composition) {

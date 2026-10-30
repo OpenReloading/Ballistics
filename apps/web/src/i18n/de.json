@@ -51,6 +51,8 @@
   "Air pressure": "Luftdruck",
   "Air rifle": "Luftgewehr",
   "Aliases": "Alternative Namen",
+  "Listed by the manufacturer for": "Vom Hersteller angegeben für",
+  "{cartridge} is not among the cartridges the manufacturer lists this powder for.": "{cartridge} gehört nicht zu den Patronen, für die der Hersteller dieses Treibladungspulver angibt.",
   "All": "Alle",
   "All bullets": "Alle Geschosse",
   "All cartridges": "Alle Patronen",
