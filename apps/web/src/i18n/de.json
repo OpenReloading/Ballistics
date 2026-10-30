@@ -3910,5 +3910,6 @@
   "e {value} (derived, not dimensioned)": "e {value} (abgeleitet, nicht bemaßt)",
   "Combined view: both outlines and the gap between them, no dimensions.": "Kombinierte Ansicht: beide Umrisse und der Spalt zwischen ihnen, ohne Maße.",
   "Combined view: both outlines and the gap between them, no dimensions; {regions}.": "Kombinierte Ansicht: beide Umrisse und der Spalt zwischen ihnen, ohne Maße; {regions}.",
-  "{difference} (chamber minimum minus cartridge maximum): {values}": "{difference} (Mindestmaß des Patronenlagers minus Höchstmaß der Patrone): {values}"
+  "{difference} (chamber minimum minus cartridge maximum): {values}": "{difference} (Mindestmaß des Patronenlagers minus Höchstmaß der Patrone): {values}",
+  "Group {n}": "Schussbild {n}"
 }
