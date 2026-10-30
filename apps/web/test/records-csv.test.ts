@@ -1,7 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { toCsv } from '../src/lib/csv.ts'
-import { localDay } from '../src/lib/dates.ts'
 import { firearmRows, loadRows, saveFirearmsCsv, saveLoadsCsv } from '../src/lib/records-csv.ts'
 
 const api = vi.hoisted(() => ({
@@ -155,6 +154,12 @@ describe('saving the CSV files', () => {
     const bytes = new Uint8Array(await blob.arrayBuffer())
     return { name, type: blob.type, bom: [...bytes.slice(0, 3)], text: await blob.text() }
   }
+  // the file name carries today's day: a fixed clock keeps a run across midnight from failing
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(2026, 9, 30, 12))
+  })
+  afterEach(() => vi.useRealTimers())
 
   it('names the records of the saved loads from this browser, else from the API once each', async () => {
     api.names = new Map([
@@ -195,7 +200,7 @@ describe('saving the CSV files', () => {
     ]
     await saveLoadsCsv()
     const file = await lastSaved()
-    expect(file.name).toBe(`openreloading-loads-${localDay(new Date())}.csv`)
+    expect(file.name).toBe('openreloading-loads-2026-10-30.csv')
     expect(file.type).toBe('text/csv;charset=utf-8')
     expect(file.bom).toEqual([0xef, 0xbb, 0xbf])
     const lines = file.text.replace('\ufeff', '').split('\n')
@@ -220,7 +225,7 @@ describe('saving the CSV files', () => {
     >
     saveFirearmsCsv([bare], new Map(), () => undefined)
     const file = await lastSaved()
-    expect(file.name).toBe(`openreloading-firearms-${localDay(new Date())}.csv`)
+    expect(file.name).toBe('openreloading-firearms-2026-10-30.csv')
     expect(file.text.replace('\ufeff', '')).toBe(
       'Name,Cartridge,Round count,Loads,Last session\nSpare,,,0,\n',
     )

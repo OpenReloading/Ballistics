@@ -54,6 +54,9 @@ function storeLoad(id: string) {
 }
 
 beforeEach(() => {
+  // the hook finds the session of today: a fixed clock keeps a run across midnight from failing
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(new Date(2026, 9, 30, 12))
   store.clear()
   const firearm: UserRecord = userRecord.parse({
     kind: 'firearm',
@@ -70,7 +73,10 @@ beforeEach(() => {
   })
 })
 
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.useRealTimers()
+})
 
 it('prefills the rounds of each session chosen and keeps an edit within one session', async () => {
   const h = renderHook(useRangeMode)
