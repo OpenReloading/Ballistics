@@ -161,6 +161,27 @@ describe('readCsrLoad', () => {
     expect(unmapped).toContain('appendix.Measurement.charge.extra')
   })
 
+  it('leaves out the shots of a charge beyond 5000 and the charges of a series beyond 500, with warnings', () => {
+    const shots = (n: number) => '<shot velocity="700"/>'.repeat(n)
+    const charges = Array.from(
+      { length: 502 },
+      (_, i) => `<charge name="C${i}" value="0.002">${shots(i === 0 ? 5003 : 2)}</charge>`,
+    ).join('')
+    const { records, warnings } = readCsrLoad(
+      csrFile({ appendix: `<Measurement>${charges}</Measurement>` }),
+      saved,
+    )
+    const strings = ofKind(records, 'session').data.strings
+    expect(strings).toHaveLength(500)
+    expect(strings[0]?.shots).toHaveLength(5000)
+    expect(strings.at(-1)?.label).toBe('C499')
+    expect(warnings).toEqual([
+      'appendix.Measurement.charge: 3 shots of the charge C0 beyond the limit of 5000 are left out.',
+      'appendix.Measurement: 2 charges (4 shots) of the series beyond the limit of 500 are left out.',
+    ])
+    for (const r of records) expect(userRecord.safeParse(r).success, r.kind).toBe(true)
+  })
+
   it('refuses another root, a file without load and the files of the GRT reader', () => {
     expect(() => readCsrLoad('<other/>', saved)).toThrow('root element')
     expect(() => readCsrLoad('<ChamberSimReloaded format="1"/>', saved)).toThrow('no load')

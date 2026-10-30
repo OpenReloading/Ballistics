@@ -92,6 +92,7 @@ Rules of the measurements:
 - The charge value and the shot velocities carry no unit attribute. The files read hold the charge in kg next to the load's charge in g, and velocities in m/s.
 - A shot without a velocity above 0 is not read, with a warning. A charge without such a shot is not read, with a warning, and a series without a charge left gives no session.
 - A charge without a mass above 0 gives a string without a variation, with a warning.
+- A string keeps its first 5000 shots and a session its first 500 strings, the bounds of the session record. A warning names the shots or charges left out.
 - A shot pressure of 0 means not measured. A pressure above 0 has no field in the session record and is listed as not read, as are a shot name, the source of a charge and the display settings of the series and its charges (`index`, `showinreport`, `title`, `expanded`, `expandedstats`, `menu`, `menuvalue`, `menuunit`).
 - The session ids come from the content, like the other records, so importing the file again adds no session.
 

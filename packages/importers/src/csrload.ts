@@ -19,6 +19,9 @@ import { parseXml, type XmlElement } from './xml.ts'
 const csrLoadRoot = 'ChamberSimReloaded'
 /** The `format` attribute of the root the reader was written for. */
 const csrFormat = '1'
+/** The most shots of a string and strings of a session the session schema takes. */
+const maxShots = 5000
+const maxStrings = 500
 
 /** The attributes of the measurement elements that are read; the others are listed when they hold a value. */
 const readAttributes: Record<string, string[]> = {
@@ -73,8 +76,12 @@ function stringOf(c: XmlElement, at: string, unmapped: Set<string>, warnings: st
   const string: ShotString = {
     ...(label && { label }),
     ...(note && { note }),
-    shots: shots.slice(0, 5000),
+    shots: shots.slice(0, maxShots),
   }
+  if (shots.length > maxShots)
+    warnings.push(
+      `${at}: ${shots.length - maxShots} shots of the charge ${label ?? ''} beyond the limit of ${maxShots} are left out.`,
+    )
   if (Number.isFinite(kg) && kg > 0)
     string.variation = { kind: 'charge', value: { value: Number((kg * 1000).toPrecision(12)) } }
   else warnings.push(`${at}: the charge ${label ?? ''} has no mass; its string varies nothing.`)
@@ -99,10 +106,17 @@ function sessionsOf(
       return []
     })
     if (strings.length === 0) continue
+    const left = strings.slice(maxStrings)
+    if (left.length > 0)
+      warnings.push(
+        `${at}: ${left.length} charges (${left.reduce((n, s) => n + s.shots.length, 0)} shots) of the series beyond the limit of ${maxStrings} are left out.`,
+      )
     const data = {
       origin: 'user' as const,
       device: { kind: 'other' as const },
-      strings: strings.slice(0, 500).map((s) => ({ load: `user:${load.id}` as const, ...s })),
+      strings: strings
+        .slice(0, maxStrings)
+        .map((s) => ({ load: `user:${load.id}` as const, ...s })),
       provenance: {
         kind: 'measured' as const,
         sources: [{ title: 'Measurements of a ChamberSim Reloaded load file' }],
