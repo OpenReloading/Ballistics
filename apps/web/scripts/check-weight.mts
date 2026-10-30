@@ -1,7 +1,8 @@
 /**
  * Fails when the JavaScript a route of the built web app loads grows past the budget of its group in
- * `weight-budget.json`, and prints a table of the change per route against the recorded values (to
- * $GITHUB_STEP_SUMMARY too, when set).
+ * `weight-budget.json`, and prints a table of the change per route against the recorded values and the
+ * headroom left under the budget (to $GITHUB_STEP_SUMMARY too, when set). A route with less than
+ * `nearShare` of its budget left gets a warning line, which does not fail the check.
  *
  * Read from `.next` after the export build (`npm run static:build`, which leaves it in
  * place): the routes of `app-path-routes-manifest.json`,
@@ -140,22 +141,42 @@ export function violations(measured: Record<string, Weight>, budget: Budget) {
   ]
 }
 
+/** Share of a budget under which the headroom left is warned about: half the 2 % margin of the budget rule. */
+const nearShare = 0.01
+
+/** Warnings for routes within budget but with less than `nearShare` of it left: one line per route. */
+export function nearLimit(measured: Record<string, Weight>, budget: Budget) {
+  return Object.entries(budget.groups).flatMap(([name, group]) =>
+    Object.keys(group.routes).flatMap((route) => {
+      const weight = measured[route]
+      if (weight === undefined) return []
+      const near = (['initial', 'total'] as const)
+        .map((key) => ({ key, left: group.budget[key] - weight[key] }))
+        .filter(({ key, left }) => left >= 0 && left < group.budget[key] * nearShare)
+      if (near.length === 0) return []
+      return [
+        `${route}: near the limit of the ${name} budget, ${near.map(({ key, left }) => `${key} ${left} B left`).join(', ')}`,
+      ]
+    }),
+  )
+}
+
 const kb = (n: number) => `${(n / 1000).toFixed(1)} kB`
 const change = (now: number, was: number | undefined) =>
   was === undefined ? 'new' : now === was ? '0' : `${now > was ? '+' : '-'}${Math.abs(now - was)} B`
 
-/** Markdown table: per route the recorded weight, the weight now, the change and the group budget. */
+/** Markdown table: per route the weight now, the change against the recorded weight, the group budget and the headroom under it. */
 export function table(measured: Record<string, Weight>, budget: Budget) {
   const rows = [
-    '| Group | Route | Initial | Change | Total | Change | Budget (initial / total) |',
-    '|---|---|---:|---:|---:|---:|---:|',
+    '| Group | Route | Initial | Change | Total | Change | Budget (initial / total) | Headroom (initial / total) |',
+    '|---|---|---:|---:|---:|---:|---:|---:|',
   ]
   for (const [name, group] of Object.entries(budget.groups)) {
     for (const [route, recorded] of Object.entries(group.routes)) {
       const now = measured[route]
       if (now === undefined) continue
       rows.push(
-        `| ${name} | \`${route}\` | ${kb(now.initial)} | ${change(now.initial, recorded.initial)} | ${kb(now.total)} | ${change(now.total, recorded.total)} | ${kb(group.budget.initial)} / ${kb(group.budget.total)} |`,
+        `| ${name} | \`${route}\` | ${kb(now.initial)} | ${change(now.initial, recorded.initial)} | ${kb(now.total)} | ${change(now.total, recorded.total)} | ${kb(group.budget.initial)} / ${kb(group.budget.total)} | ${group.budget.initial - now.initial} B / ${group.budget.total - now.total} B |`,
       )
     }
   }
@@ -163,7 +184,7 @@ export function table(measured: Record<string, Weight>, budget: Budget) {
   for (const [route, now] of Object.entries(measured)) {
     if (!listed.has(route)) {
       rows.push(
-        `| none | \`${route}\` | ${kb(now.initial)} | new | ${kb(now.total)} | new | none |`,
+        `| none | \`${route}\` | ${kb(now.initial)} | new | ${kb(now.total)} | new | none | none |`,
       )
     }
   }
@@ -179,7 +200,9 @@ if (import.meta.main) {
   }
   const measured = measure(next)
   const failures = violations(measured, budget)
-  const report = `## Web JavaScript per route (gzip)\n\n${table(measured, budget)}\n`
+  const warnings = nearLimit(measured, budget)
+  const notes = warnings.map((line) => `\n- Warning: ${line}`).join('')
+  const report = `## Web JavaScript per route (gzip)\n\n${table(measured, budget)}\n${notes ? `${notes}\n` : ''}`
   console.log(report)
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report)
   if (failures.length > 0) {
