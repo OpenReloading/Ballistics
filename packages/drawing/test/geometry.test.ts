@@ -23,6 +23,13 @@ const label = (c: PartPoint, dir: PartPoint = [1, 0], w = 4, h = 2): Label => ({
   h,
   owner: 'o',
 })
+/** A box off the origin and turned off the axes: its centre (10, 5), its direction (0.6, 0.8). */
+const turned = label([10, 5], [0.6, 0.8])
+/** The point `u` along the direction of `l` and `v` across it from its centre. */
+const at = (l: Label, u: number, v: number): PartPoint => [
+  l.c[0] + u * l.dir[0] - v * l.dir[1],
+  l.c[1] + u * l.dir[1] + v * l.dir[0],
+]
 const square = (x: number, y: number): PartPoint[] => [
   [x, y],
   [x + 1, y],
@@ -55,6 +62,32 @@ describe('segsCross', () => {
     expect(segsCross([0, 0], [2, 0], [1, 0], [3, 0])).toBe(false)
     expect(segsCross([0, 0], [1, 0], [2, 0], [3, 0])).toBe(false)
   })
+
+  it('crosses and misses off the origin', () => {
+    expect(segsCross([10, 5], [14, 9], [10, 9], [14, 5])).toBe(true)
+    expect(segsCross([10, 9], [14, 5], [10, 5], [14, 9])).toBe(true)
+    // the lines meet at (11.5, 6.5), beyond the end (11, 6) of the first segment
+    expect(segsCross([10, 5], [11, 6], [13, 5], [10, 8])).toBe(false)
+    expect(segsCross([13, 5], [10, 8], [10, 5], [11, 6])).toBe(false)
+    // a crossing at (12, 7), halfway along the first segment
+    expect(segsCross([10, 5], [14, 9], [11, 9], [13, 5])).toBe(true)
+  })
+
+  it('is false when the lines would meet before the start of either segment', () => {
+    // the lines meet at (1, 1), behind (2, 2)
+    expect(segsCross([2, 2], [3, 3], [0, 2], [2, 0])).toBe(false)
+    expect(segsCross([0, 2], [2, 0], [2, 2], [3, 3])).toBe(false)
+  })
+
+  it('counts segments meeting end to end at either end of either one as touching', () => {
+    // the end of the first on the start of the second, along x then along y
+    expect(segsCross([0, 0], [1, 0], [1, 0], [1, 1])).toBe(true)
+    expect(segsCross([0, 0], [0, 1], [0, 1], [1, 1])).toBe(true)
+    // the start of the first on the end of the second
+    expect(segsCross([1, 1], [1, 2], [0, 0], [1, 1])).toBe(true)
+    expect(segsCross([0, 1], [1, 1], [0, 0], [0, 1])).toBe(true)
+    expect(segsCross([1, 0], [2, 0], [1, -1], [1, 0])).toBe(true)
+  })
 })
 
 describe('segHitsBox', () => {
@@ -85,12 +118,44 @@ describe('segHitsBox', () => {
     expect(segHitsBox({ a: [1.5, -3], b: [1.5, 3] }, upright)).toBe(false)
     expect(segHitsBox({ a: [-3, 1.5], b: [3, 1.5] }, upright)).toBe(true)
   })
+
+  it('hits and misses a box off the origin and turned off the axes', () => {
+    expect(segHitsBox({ a: at(turned, 1.5, -3), b: at(turned, 1.5, 3) }, turned)).toBe(true)
+    expect(segHitsBox({ a: at(turned, 2.5, -3), b: at(turned, 2.5, 3) }, turned)).toBe(false)
+    expect(segHitsBox({ a: at(turned, -3, 0.5), b: at(turned, 3, 0.5) }, turned)).toBe(true)
+    expect(segHitsBox({ a: at(turned, -3, 1.5), b: at(turned, 3, 1.5) }, turned)).toBe(false)
+  })
+
+  it('counts a segment that ends on the edge of the box as hitting', () => {
+    expect(segHitsBox({ a: [-5, 0], b: [-2, 0] }, box)).toBe(true)
+  })
+
+  it('grows the box by the pad along its width and along its height', () => {
+    const across = { a: [2.5, -5] as PartPoint, b: [2.5, 5] as PartPoint }
+    expect(segHitsBox(across, box)).toBe(false)
+    expect(segHitsBox(across, box, 1)).toBe(true)
+    // a tall box: the segment comes from beyond the half height but within the pad
+    const tall = label([0, 0], [1, 0], 2, 4)
+    expect(segHitsBox({ a: [0, 2.5], b: [0, 10] }, tall, 1)).toBe(true)
+    expect(segHitsBox({ a: [0, 3.5], b: [0, 10] }, tall, 1)).toBe(false)
+  })
 })
 
 describe('boxesOverlap', () => {
   it('is true for overlapping boxes and false for boxes only touching', () => {
     expect(boxesOverlap(label([0, 0]), label([3.9, 0]))).toBe(true)
     expect(boxesOverlap(label([0, 0]), label([4, 0]))).toBe(false)
+    expect(boxesOverlap(label([4, 0]), label([0, 0]))).toBe(false)
+  })
+
+  it('separates on the cross axis of either box where no other axis does', () => {
+    // a small square at 45 degrees to the turned box, 1 + 0.354 mm from its centre line at most
+    const r = Math.SQRT1_2
+    const small = (v: number) =>
+      label(at(turned, 0, v), [(0.6 - 0.8) * r, (0.8 + 0.6) * r], 0.5, 0.5)
+    expect(boxesOverlap(turned, small(1.3))).toBe(true)
+    expect(boxesOverlap(turned, small(1.4))).toBe(false)
+    expect(boxesOverlap(small(1.4), turned)).toBe(false)
   })
 
   it('splits the pad between the two boxes', () => {
@@ -110,6 +175,35 @@ describe('boxesOverlap', () => {
     const square2 = label([0, 0], [1, 0], 2, 2)
     expect(boxesOverlap(square2, label([2, 1.9], [r, r], 2, 2))).toBe(false)
     expect(boxesOverlap(square2, label([2, 0], [r, r], 2, 2))).toBe(true)
+  })
+
+  it('reaches every corner of a box: a diamond at the lower left corner of a square', () => {
+    const r = Math.SQRT1_2
+    const square2 = label([0, 0], [1, 0], 2, 2)
+    expect(boxesOverlap(square2, label([-1.6, -1.6], [r, r], 2, 2))).toBe(true)
+    expect(boxesOverlap(label([-1.6, -1.6], [r, r], 2, 2), square2)).toBe(true)
+    expect(boxesOverlap(square2, label([-1.8, -1.8], [r, r], 2, 2))).toBe(false)
+  })
+
+  it('grows the boxes by half the pad each along their height', () => {
+    expect(boxesOverlap(label([0, 0]), label([0, 2.5]))).toBe(false)
+    expect(boxesOverlap(label([0, 0]), label([0, 2.5]), 1)).toBe(true)
+    expect(boxesOverlap(label([0, 0]), label([0, 3.5]), 1)).toBe(false)
+  })
+
+  it('overlaps and separates boxes off the origin and turned off the axes', () => {
+    const along = (u: number, v: number, dir = turned.dir) => label(at(turned, u, v), dir)
+    expect(boxesOverlap(turned, along(3.9, 0))).toBe(true)
+    expect(boxesOverlap(turned, along(4.1, 0))).toBe(false)
+    expect(boxesOverlap(turned, along(0, 1.9))).toBe(true)
+    expect(boxesOverlap(turned, along(0, 2.1))).toBe(false)
+    // a box across the turned one: its half width and the other's half height add up to 3 either way
+    const across: PartPoint = [-0.8, 0.6]
+    expect(boxesOverlap(turned, along(2.9, 0, across))).toBe(true)
+    expect(boxesOverlap(turned, along(3.1, 0, across))).toBe(false)
+    expect(boxesOverlap(along(3.1, 0, across), turned)).toBe(false)
+    expect(boxesOverlap(turned, along(0, 2.9, across))).toBe(true)
+    expect(boxesOverlap(turned, along(0, 3.1, across))).toBe(false)
   })
 })
 
@@ -169,6 +263,50 @@ describe('polygonsOverlap', () => {
     expect(polygonsOverlap(triangle, square(1.1, 1.1))).toBe(false)
     expect(polygonsOverlap(triangle, square(0.9, 0.9))).toBe(true)
   })
+
+  it('counts polygons exactly the pad apart as clear, in either order', () => {
+    expect(polygonsOverlap(square(0, 0), square(1.5, 0), 0.5)).toBe(false)
+    expect(polygonsOverlap(square(1.5, 0), square(0, 0), 0.5)).toBe(false)
+  })
+
+  it('separates with the pad on the x or y axis where no edge axis does', () => {
+    const diamond = (x: number, y: number): PartPoint[] => [
+      [x, y + 1],
+      [x + 1, y],
+      [x, y - 1],
+      [x - 1, y],
+    ]
+    // tips 0.5 apart
+    expect(polygonsOverlap(diamond(0, 0), diamond(2.5, 0), 0.4)).toBe(false)
+    expect(polygonsOverlap(diamond(0, 0), diamond(2.5, 0), 0.6)).toBe(true)
+    expect(polygonsOverlap(diamond(0, 0), diamond(0, 2.5), 0.4)).toBe(false)
+    expect(polygonsOverlap(diamond(0, 0), diamond(0, 2.5), 0.6)).toBe(true)
+    // exactly the pad apart, in either order
+    expect(polygonsOverlap(diamond(0, 0), diamond(2.5, 0), 0.5)).toBe(false)
+    expect(polygonsOverlap(diamond(2.5, 0), diamond(0, 0), 0.5)).toBe(false)
+  })
+
+  it('reads the closing edge from the last point back to the first', () => {
+    // the hypotenuse is the closing edge
+    const triangle: PartPoint[] = [
+      [0, 2],
+      [0, 0],
+      [2, 0],
+    ]
+    expect(polygonsOverlap(triangle, square(1.1, 1.1))).toBe(false)
+    expect(polygonsOverlap(square(1.1, 1.1), triangle)).toBe(false)
+  })
+
+  it('measures the pad along an edge axis off the origin', () => {
+    // the hypotenuse x + y = 22 lies 1 / sqrt(2) = 0.707 from the corner (11.5, 11.5)
+    const triangle: PartPoint[] = [
+      [10, 12],
+      [10, 10],
+      [12, 10],
+    ]
+    expect(polygonsOverlap(triangle, square(11.5, 11.5), 0.6)).toBe(false)
+    expect(polygonsOverlap(triangle, square(11.5, 11.5), 0.8)).toBe(true)
+  })
 })
 
 describe('boxDistance', () => {
@@ -186,6 +324,13 @@ describe('boxDistance', () => {
     const upright = label([0, 0], [0, 1])
     expect(boxDistance(upright, [0, 3])).toBe(1)
     expect(boxDistance(upright, [2, 0])).toBe(1)
+  })
+
+  it('measures from a box off the origin and turned off the axes', () => {
+    expect(boxDistance(turned, at(turned, 0.5, 0.5))).toBe(0)
+    expect(boxDistance(turned, at(turned, 3, 0))).toBeCloseTo(1, 12)
+    expect(boxDistance(turned, at(turned, 0, -3))).toBeCloseTo(2, 12)
+    expect(boxDistance(turned, at(turned, -3, 2))).toBeCloseTo(Math.SQRT2, 12)
   })
 })
 
