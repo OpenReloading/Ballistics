@@ -197,6 +197,10 @@ export function derived(ok: Shown, t: Translator['t']) {
   }
 }
 
+/** The warnings of a result as one text, the unlisted cartridge's among them; empty without any. */
+export const warningsText = (ok: Extract<Outcome, { kind: 'ok' }>, t: Translator['t']) =>
+  [...derived(ok, t).warnings, ...(ok.unlisted ? [ok.unlisted] : [])].join('\n')
+
 /** The warnings of the shown step as the page shows them: in its pressure unit, with short names. */
 export function warningLines(
   ok: Extract<Outcome, { kind: 'ok' }>,

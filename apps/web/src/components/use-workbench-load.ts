@@ -179,7 +179,6 @@ import {
 } from './workbench-inputs.tsx'
 import {
   atStep,
-  derived,
   needsNetwork,
   notReached,
   type Outcome,
@@ -190,6 +189,7 @@ import {
   stepLoad,
   stepsOf,
   unlistedCartridge,
+  warningsText,
 } from './workbench-outcome.ts'
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
@@ -2051,7 +2051,7 @@ export function useWorkbenchState() {
       announce: false,
     }
     // compared as English text, so a change of language announces nothing again
-    const warnings = derived(ok, english.t).warnings.join('\n')
+    const warnings = warningsText(ok, english.t)
     ok.announce = warnings !== '' && warnings !== lastWarnings.current
     lastWarnings.current = warnings
     showChart(undefined)

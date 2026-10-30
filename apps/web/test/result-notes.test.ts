@@ -3,6 +3,7 @@ import {
   type Outcome,
   resultNotes,
   unlistedCartridge,
+  warningsText,
 } from '../src/components/workbench-outcome.ts'
 import { english } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
@@ -117,6 +118,12 @@ describe('resultNotes', () => {
       },
     ])
     expect(listed(ok(plain))).toEqual([])
+  })
+
+  it('counts the unlisted cartridge as a warning, so a result with only that one is announced', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    expect(warningsText(ok(plain), english.t)).toBe('')
+    expect(warningsText(ok({ ...plain, unlisted: '308 Win.' }), english.t)).toBe('308 Win.')
   })
 
   it('names the cartridge only when the list leaves it out', () => {
