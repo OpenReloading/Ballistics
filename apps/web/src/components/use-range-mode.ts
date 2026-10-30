@@ -151,7 +151,7 @@ export function useRangeMode() {
   const [roundOffer, setRoundOffer] = useState<RoundOffer>()
   const [rounds, setRounds] = useState('')
   const roundsTyped = typedRounds(rounds)
-  const prefilled = useRef(0)
+  const prefilled = useRef('')
 
   useEffect(() => {
     storedRecords()
@@ -234,9 +234,10 @@ export function useRangeMode() {
       .then((offer) => {
         if (!current) return
         setRoundOffer(offer)
-        // a new shot prefills the field again, an exclusion keeps what was typed
-        if (offer && offer.shots !== prefilled.current) setRounds(String(offer.shots))
-        prefilled.current = offer?.shots ?? 0
+        // another session or a new shot prefills the field again, an exclusion keeps what was typed
+        const key = offer ? `${session.id}:${offer.shots}` : ''
+        if (offer && key !== prefilled.current) setRounds(String(offer.shots))
+        prefilled.current = key
       })
       .catch(() => {})
     return () => {
