@@ -3911,5 +3911,11 @@
   "Combined view: both outlines and the gap between them, no dimensions.": "Kombinierte Ansicht: beide Umrisse und der Spalt zwischen ihnen, ohne Maße.",
   "Combined view: both outlines and the gap between them, no dimensions; {regions}.": "Kombinierte Ansicht: beide Umrisse und der Spalt zwischen ihnen, ohne Maße; {regions}.",
   "{difference} (chamber minimum minus cartridge maximum): {values}": "{difference} (Mindestmaß des Patronenlagers minus Höchstmaß der Patrone): {values}",
-  "Group {n}": "Schussbild {n}"
+  "Group {n}": "Schussbild {n}",
+  "{material} core": "Kern aus {material}",
+  "{material} jacket": "Mantel aus {material}",
+  "jacket": "Mantel",
+  "gas check": "Kupferschuh",
+  "{n} driving bands": "{n} Führungsbänder",
+  "lead free": "bleifrei"
 }

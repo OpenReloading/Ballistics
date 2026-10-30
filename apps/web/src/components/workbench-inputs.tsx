@@ -33,7 +33,7 @@ import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
-import { constructionRows, titleFromKebab } from '../lib/record-fields.ts'
+import { constructionRows, structureText } from '../lib/record-fields.ts'
 import {
   type LadderDirection,
   ladderKinds,
@@ -219,9 +219,9 @@ function sizeRow(b: Bullet | undefined, system: UnitSystem, t: Translator['t']) 
 }
 
 /** The construction on one line: the structure, the full wording on hover; else the wording. */
-function constructionCell(c: Bullet['construction']) {
-  const text = constructionRows(c)[0]?.text
-  const short = c?.structure && titleFromKebab(c.structure)
+function constructionCell(c: Bullet['construction'], t: Translator['t']) {
+  const text = constructionRows(c, t)[0]?.text
+  const short = c?.structure && structureText(c.structure, t)
   return short && short !== text ? <Noted value={short} notes={[text as string]} inline /> : text
 }
 
@@ -947,7 +947,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
         {/* one line each, so the column fits at 1366 x 650 */}
         {sizeRow(bullet, system, t)}
         {recordRow(t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
-        {recordRow(t('Construction'), constructionCell(bullet?.construction))}
+        {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}
       </div>
