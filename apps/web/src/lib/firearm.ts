@@ -472,6 +472,25 @@ export function sightOptions(records: UserRecord[], t: Translator['t'] = untrans
 }
 
 /**
+ * The Trajectory tab's sight choice: the sights of the browser's firearms, then those of the
+ * built-in example rifle, which is never stored, and the label of the empty choice.
+ */
+export function sightPicker(records: UserRecord[], example: UserRecord, t: Translator['t']) {
+  return {
+    options: [
+      ...sightOptions(records, t),
+      ...sightOptions([example], t).map((o) => ({
+        ...o,
+        label: t('{name} (example)', { name: o.label }),
+      })),
+    ],
+    none: records.some((r) => r.kind === 'firearm')
+      ? t('None')
+      : t('No firearm saved yet. Pick the example rifle, or add yours under Firearms.'),
+  }
+}
+
+/**
  * Optics of the library with a click value, for the clicks to the point of aim: each
  * configuration's mounted optics, the active configuration first.
  */
