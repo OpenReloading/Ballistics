@@ -1,0 +1,103 @@
+{
+  "id": "nra-sr",
+  "name": "No. SR",
+  "federation": "nra",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 939.8
+      },
+      "fill": "white"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 787.4
+      },
+      "fill": "white"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 635
+      },
+      "fill": "white"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 482.6
+      },
+      "fill": "white"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 330.2
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 177.8
+      },
+      "fill": "black"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 76.2
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 330.2
+  },
+  "events": [
+    {
+      "id": "rule-7-5-standing-slow-fire-200-yd",
+      "name": "Rule 7.5 Standing, slow fire, 200 yards",
+      "distance": {
+        "value": 182880,
+        "raw": "200 yds."
+      },
+      "section": "Rule 7.5",
+      "scoring": "touch"
+    },
+    {
+      "id": "rule-7-6-sitting-kneeling-rapid-fire-200-yd",
+      "name": "Rule 7.6 Sitting or kneeling, rapid fire, 200 yards",
+      "distance": {
+        "value": 182880,
+        "raw": "200 yds."
+      },
+      "section": "Rule 7.6",
+      "scoring": "touch"
+    }
+  ],
+  "photoSearch": false,
+  "note": "The book prints one size per ring in inches, the X ring being the inner ten; sizes are converted at 25.4 mm per inch to 0.1 mm and distances at 914.4 mm per yard. The rings of the aiming black are black, the others white.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 4.3(a), p. 15 (PDF p. 19)",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"]
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rules 7.1 to 7.13, p. 19 (PDF p. 23)",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 14.3, p. 48 (PDF p. 52)",
+        "fields": ["events.scoring", "innerTen.rule"],
+        "note": "A hole whose edge touches the outside of a ring or of the X ring takes the higher value."
+      }
+    ]
+  }
+}

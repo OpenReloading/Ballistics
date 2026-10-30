@@ -1,0 +1,60 @@
+{
+  "id": "nra-rule-7-6",
+  "federation": "nra",
+  "name": "Sitting or kneeling, rapid fire, 200 yards",
+  "section": "Rule 7.6",
+  "page": "p. 19 (PDF p. 23)",
+  "distance": {
+    "value": 182880,
+    "raw": "200 yds.",
+    "unit": "yd"
+  },
+  "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["kneeling", "sitting"],
+    "supports": ["freehand", "sling"],
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 60,
+          "raw": "60 seconds"
+        },
+        "covers": "series"
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.6, p. 19 (PDF p. 23)",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.firearm",
+          "rules.positions"
+        ],
+        "note": "The rule book covers high power rifle matches; the row prints position, number of shots (10 or 20), type of fire, distance and target."
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 3.13, p. 12 (PDF p. 16)",
+        "fields": ["rules.supports"],
+        "note": "The sling may be used with one arm to steady the rifle."
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 8.2(b), p. 24 (PDF p. 28)",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "The time is stated for a string of 10 shots."
+      }
+    ]
+  }
+}

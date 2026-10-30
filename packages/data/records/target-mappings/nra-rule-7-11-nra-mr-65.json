@@ -1,0 +1,17 @@
+{
+  "id": "nra-rule-7-11-nra-mr-65",
+  "discipline": "nra-rule-7-11",
+  "face": "nra-mr-65",
+  "event": "rule-7-11-prone-slow-fire-500-yd",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.11, p. 19 (PDF p. 23)",
+        "fields": ["discipline", "face", "event"],
+        "note": "The row allows 10 or 20 shots, so the mapping states no shot count."
+      }
+    ]
+  }
+}

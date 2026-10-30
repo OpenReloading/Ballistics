@@ -1,0 +1,52 @@
+{
+  "id": "nra-rule-7-13",
+  "federation": "nra",
+  "name": "Prone, slow fire, 1000 yards",
+  "section": "Rule 7.13",
+  "page": "p. 19 (PDF p. 23)",
+  "distance": {
+    "value": 914400,
+    "raw": "1000 yds.",
+    "unit": "yd"
+  },
+  "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["prone"],
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 60,
+          "raw": "one minute per shot"
+        },
+        "covers": "shot"
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.13, p. 19 (PDF p. 23)",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.firearm",
+          "rules.positions"
+        ],
+        "note": "The rule book covers high power rifle matches; the row prints position, number of shots (10 or 20), type of fire, distance and target."
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 8.2(a), p. 23 (PDF p. 27)",
+        "fields": ["rules.timeLimits"],
+        "note": "Beyond 600 yards a match program may allow up to one and a half minutes per shot."
+      }
+    ]
+  }
+}

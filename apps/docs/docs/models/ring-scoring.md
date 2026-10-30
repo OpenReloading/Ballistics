@@ -178,6 +178,7 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 - [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), targets in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
 - [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, targets in B.11.
 - [DSU 2018](../bibliography.md#dsu-2018): the oval-ring targets b2 to b5 and b5 Präzision, Kapitel 1 (Seiten 12 to 16, PDF pp. 14 to 18), touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
+- [NRA 2026](../bibliography.md#nra-2026): touch rule and X ring, Rule 14.3 (p. 48), targets in Section 4 (pp. 14 to 16).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, targets in Kapitel 8 to 10.
 - [BDS 2025](../bibliography.md#bds-2025): targets Z1 to Z21 and Anhang 1, no scoring rule stated.
 - [Eberly 2013](../bibliography.md#eberly-2013): distance from a point to an ellipse, closest-point condition and its bisection.
