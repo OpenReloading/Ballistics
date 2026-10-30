@@ -13,20 +13,8 @@ import {
 } from '../lib/bullet-rows.ts'
 import { type BulletSort, fetchBulletCatalogue, searchBullets } from '../lib/bullet-search.ts'
 import { caliberOptions, commonCaliber } from '../lib/caliber.ts'
-import { manufacturerOptions } from '../lib/manufacturers.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { type ChooserKind, RecordChooser } from './record-chooser.tsx'
-
-/** The manufacturer options, each with its number of bullets. */
-function manufacturerChoices(catalogue: readonly BulletRow[]) {
-  const counts = new Map<string, number>()
-  for (const r of catalogue)
-    if (r.manufacturer) counts.set(r.manufacturer, (counts.get(r.manufacturer) ?? 0) + 1)
-  return manufacturerOptions(catalogue).map((o) => ({
-    ...o,
-    label: `${o.label} (${counts.get(o.value)})`,
-  }))
-}
+import { type ChooserKind, manufacturerSelect, RecordChooser } from './record-chooser.tsx'
 
 /** The bullets as a kind of the record chooser; `search` without the mass and fit filters. */
 export const bulletKind: ChooserKind<BulletRow> = {
@@ -52,12 +40,7 @@ export const bulletKind: ChooserKind<BulletRow> = {
   },
   load: fetchBulletCatalogue,
   selects: [
-    {
-      label: msg('Manufacturer'),
-      nothingFound: msg('No manufacturer found'),
-      options: (catalogue) => manufacturerChoices(catalogue),
-      keep: (r, v) => r.manufacturer === v,
-    },
+    manufacturerSelect(),
     {
       label: msg('Caliber'),
       nothingFound: msg('No caliber found'),

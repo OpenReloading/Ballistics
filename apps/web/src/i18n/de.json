@@ -3799,5 +3799,32 @@
   "{count} session|{count} sessions": {
     "one": "{count} Sitzung",
     "other": "{count} Sitzungen"
-  }
+  },
+  "{found} of {total} cartridges": "{found} von {total} Patronen",
+  "{found} of {total} cartridges, first {shown} shown": "{found} von {total} Patronen, die ersten {shown} angezeigt",
+  "{found} of {total} powders": "{found} von {total} Treibladungspulvern",
+  "{found} of {total} powders, first {shown} shown": "{found} von {total} Treibladungspulvern, die ersten {shown} angezeigt",
+  "{total} cartridges": "{total} Patronen",
+  "{total} powders": "{total} Treibladungspulver",
+  "Browse cartridges": "Patronen durchsuchen",
+  "Browse powders": "Treibladungspulver durchsuchen",
+  "Choose a cartridge": "Patrone wählen",
+  "Choose a powder": "Treibladungspulver wählen",
+  "Close the cartridge search": "Patronensuche schließen",
+  "Close the powder search": "Suche nach Treibladungspulver schließen",
+  "Fastest first": "Schnellste zuerst",
+  "Highlighted cartridge": "Markierte Patrone",
+  "Highlighted powder": "Markiertes Treibladungspulver",
+  "Largest caliber first": "Größtes Kaliber zuerst",
+  "No base found": "Keine Basis gefunden",
+  "No cartridge matches": "Keine Patrone passt",
+  "No case type found": "Keine Hülsenform gefunden",
+  "No form found": "Keine Form gefunden",
+  "No powder matches": "Kein Treibladungspulver passt",
+  "The cartridge data could not be loaded. Check the connection and retry. The designer and the workbench still work.": "Die Patronendaten konnten nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut. Der Designer und die Werkbank funktionieren weiterhin.",
+  "The cartridges could not be read.": "Die Patronen konnten nicht gelesen werden.",
+  "The powder data could not be loaded. Check the connection and retry. The designer and the workbench still work.": "Die Treibladungspulverdaten konnten nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut. Der Designer und die Werkbank funktionieren weiterhin.",
+  "The powders could not be read.": "Die Treibladungspulver konnten nicht gelesen werden.",
+  "Words of the manufacturer or name in any order": "Wörter des Herstellers oder Namens in beliebiger Reihenfolge",
+  "Words of the name or an alias in any order, such as 308 win or 6.5x55": "Wörter des Namens oder eines Alias in beliebiger Reihenfolge, wie 308 win oder 6.5x55"
 }

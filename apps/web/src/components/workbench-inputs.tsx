@@ -24,6 +24,7 @@ import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
+import type { CartridgeRow } from '../lib/cartridge-rows.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { quickCartridges } from '../lib/examples.ts'
@@ -1002,8 +1003,18 @@ function CardBody({ panel }: { panel: InputPanel }) {
   )
 }
 
+// one module for every chooser, so their shared dialog is one chunk
 const BulletSearchDialog = dynamic(
-  () => import('./bullet-search-dialog.tsx').then((m) => m.BulletSearchDialog),
+  () => import('./record-choosers.tsx').then((m) => m.BulletSearchDialog),
+  { ssr: false },
+)
+
+const PowderChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PowderChooser), {
+  ssr: false,
+})
+
+const CartridgeChooser = dynamic(
+  () => import('./record-choosers.tsx').then((m) => m.CartridgeChooser),
   { ssr: false },
 )
 
@@ -1119,39 +1130,54 @@ function CartridgePicker() {
     chooseCartridgeDesign,
     searchKey,
     chooseCartridge,
+    system,
   } = useLoad()
   const { t } = useTranslation()
+  const dialog = useChooser()
+  const choose = (c: CartridgeRow) => {
+    const design = userRecordId(c.id)
+    if (design) chooseCartridgeDesign(design)
+    else chooseCartridge({ id: c.id, name: c.name, ...summaryFitSource(c) })
+  }
   return (
-    <RecordSearch<CartridgeSummary>
-      size={controlSize.row.input}
-      chevron
-      key={searchKey}
-      kind="cartridges"
-      label={t('Search cartridges by name')}
-      picked={!!(cartridge || cartridgeDesign)}
-      chosen={
-        cartridge?.name ??
-        (cartridgeDesign
-          ? t('{name} (your design)', { name: cartridgeDesign.name })
-          : t('Search cartridges (optional)'))
-      }
-      describe={cartridgeOptionText}
-      onSelect={(c) =>
-        chooseCartridge({
-          id: c.id,
-          name: c.name,
-          ...summaryFitSource(c),
-        })
-      }
-      // the browser's cartridge designs in the same list, first
-      extra={cartridgeDesigns.map((d) => ({
-        id: d.id,
-        label: t('{name} (your design)', { name: d.name }),
-      }))}
-      onExtra={chooseCartridgeDesign}
-      noneText={t('No cartridge found')}
-      unreachableText={t(notReached)}
-    />
+    <>
+      <RecordSearch<CartridgeSummary>
+        size={controlSize.row.input}
+        chevron
+        key={searchKey}
+        kind="cartridges"
+        label={t('Search cartridges by name')}
+        picked={!!(cartridge || cartridgeDesign)}
+        chosen={
+          cartridge?.name ??
+          (cartridgeDesign
+            ? t('{name} (your design)', { name: cartridgeDesign.name })
+            : t('Search cartridges (optional)'))
+        }
+        describe={cartridgeOptionText}
+        onSelect={choose}
+        // the browser's cartridge designs in the same list, first
+        extra={cartridgeDesigns.map((d) => ({
+          id: d.id,
+          label: t('{name} (your design)', { name: d.name }),
+        }))}
+        onExtra={chooseCartridgeDesign}
+        noneText={t('No cartridge found')}
+        unreachableText={t(notReached)}
+        browse={{ label: t('Browse cartridges'), onOpen: dialog.open }}
+      />
+      <CartridgeChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        designs={cartridgeDesigns}
+        system={system}
+        onChoose={(c) => {
+          choose(c)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }
 
@@ -1165,8 +1191,10 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
     powderDesign,
     powderDesigns,
     choosePowderDesign,
+    system,
   } = useLoad()
   const { t } = useTranslation()
+  const dialog = useChooser()
   const chosen = (() => {
     if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
     if (powderLabel) return powderLabel
@@ -1176,23 +1204,38 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
       : t('Search powders')
   })()
   return (
-    <RecordSearch<PowderSummary>
-      size={controlSize.row.input}
-      chevron
-      kind="powders"
-      label={t('Search powders by manufacturer and name')}
-      chosen={chosen}
-      describe={(p) => productLabel(p, names)}
-      onSelect={(p) => choosePowder(p.id)}
-      // the browser's powder designs in the same list, first
-      extra={powderDesigns.map((d) => ({
-        id: d.id,
-        label: t('{name} (your design)', { name: d.name }),
-      }))}
-      onExtra={choosePowderDesign}
-      noneText={t('No powder found')}
-      unreachableText={t(notReached)}
-    />
+    <>
+      <RecordSearch<PowderSummary>
+        size={controlSize.row.input}
+        chevron
+        kind="powders"
+        label={t('Search powders by manufacturer and name')}
+        chosen={chosen}
+        describe={(p) => productLabel(p, names)}
+        onSelect={(p) => choosePowder(p.id)}
+        // the browser's powder designs in the same list, first
+        extra={powderDesigns.map((d) => ({
+          id: d.id,
+          label: t('{name} (your design)', { name: d.name }),
+        }))}
+        onExtra={choosePowderDesign}
+        noneText={t('No powder found')}
+        unreachableText={t(notReached)}
+        browse={{ label: t('Browse powders'), onOpen: dialog.open }}
+      />
+      <PowderChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        designs={powderDesigns}
+        system={system}
+        onChoose={(p) => {
+          if (p.origin) choosePowderDesign(p.id)
+          else choosePowder(p.id)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }
 

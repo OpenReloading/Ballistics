@@ -11,7 +11,9 @@ export const fitRule = msg(
 type FitSource = { g1?: number | undefined; land?: number | undefined; groove?: number | undefined }
 
 /** The fit values of a cartridge list summary. */
-export const summaryFitSource = (c: CartridgeSummary): FitSource => ({
+export const summaryFitSource = (
+  c: Pick<CartridgeSummary, 'maxBulletDiameter' | 'boreDiameter' | 'grooveDiameter'>,
+): FitSource => ({
   g1: c.maxBulletDiameter,
   land: c.boreDiameter,
   groove: c.grooveDiameter,

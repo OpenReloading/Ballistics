@@ -22,7 +22,7 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import type { Message, Translator } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { EmptyNote, ErrorNote } from './states.tsx'
@@ -47,8 +47,44 @@ export interface ChooserSelect<R> {
   keep: (row: R, value: string) => boolean
 }
 
+/** The options of the values `of` the rows give, each labelled by `label` with its number of rows. */
+export function countedOptions<R>(
+  rows: readonly R[],
+  of: (row: R) => string | undefined,
+  label: (value: string) => string,
+) {
+  const counts = new Map<string, number>()
+  for (const r of rows) {
+    const v = of(r)
+    if (v) counts.set(v, (counts.get(v) ?? 0) + 1)
+  }
+  return [...counts]
+    .map(([value, n]) => ({ value, name: label(value), n }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(({ value, name, n }) => ({ value, label: `${name} (${n})` }))
+}
+
+/** The manufacturer filter of a kind whose catalogue rows name their manufacturer. */
+export function manufacturerSelect<
+  R extends ChooserRow & { manufacturer?: string | undefined },
+>(): ChooserSelect<R> {
+  return {
+    label: msg('Manufacturer'),
+    nothingFound: msg('No manufacturer found'),
+    options: (catalogue) => {
+      const names = new Map(catalogue.map((r) => [r.manufacturer, r.manufacturerName]))
+      return countedOptions(
+        catalogue,
+        (r) => r.manufacturer,
+        (id) => names.get(id) || id,
+      )
+    },
+    keep: (r, v) => r.manufacturer === v,
+  }
+}
+
 /** A column after the name column: its head, width and the cell text of a row. */
-export interface ChooserColumn<R> {
+interface ChooserColumn<R> {
   label: Message
   width: string
   cell: (row: R, system: UnitSystem, t: Translator['t']) => string
