@@ -70,7 +70,7 @@ import {
   userDataText,
   validRecords,
 } from '../lib/user-data.ts'
-import { ownsFile, recordFileName } from '../lib/user-file-names.ts'
+import { holdsSkipped, ownsFile, recordFileName } from '../lib/user-file-names.ts'
 import { droppedPhotos, embedFiles, photoIds } from '../lib/user-photos.ts'
 import {
   deletePhoto,
@@ -376,7 +376,7 @@ function guardLeaving(say: (said: Said) => void, language: () => Translator['t']
 /** What the page offers a share link: the record, and how it is opened, kept and reported. */
 interface SharedLink<K extends UserRecordKind> {
   unsaved: () => boolean
-  open: (record: Of<K>) => void
+  open: (record: Of<K>, parsed: ParsedUserFile) => void
   carry: (record: Of<K>, records: UserRecord[]) => void
   say: (said: Said) => void
   fail: (said: Said) => void
@@ -400,15 +400,20 @@ async function openSharedLink<K extends UserRecordKind>(
   const r = p.records.find((x): x is Of<K> => x.kind === kind)
   if (!r)
     return page.say(({ t }) =>
-      t('Shared link not opened: it holds {kinds}, no {kind}.', {
-        kinds: [
-          ...new Set([
-            ...p.records.map((x) => t(kindNames[x.kind])),
-            ...(p.skipped ?? []).map((s) => s.kind),
-          ]),
-        ].join(', '),
-        kind: t(kindNames[kind]),
-      }),
+      [
+        t('Shared link not opened: it holds {kinds}, no {kind}.', {
+          kinds: [
+            ...new Set([
+              ...p.records.map((x) => t(kindNames[x.kind])),
+              ...(p.skipped ?? []).map((s) => s.kind),
+            ]),
+          ].join(', '),
+          kind: t(kindNames[kind]),
+        }),
+        readNote(p, t),
+      ]
+        .filter(Boolean)
+        .join(' '),
     )
   if (
     page.unsaved() &&
@@ -417,7 +422,7 @@ async function openSharedLink<K extends UserRecordKind>(
     return
   const kept = await keepMakers(r, p.records)
   page.carry(r, p.records)
-  page.open(r)
+  page.open(r, p)
   if (!kept) page.fail(plain(noMaker))
 }
 
@@ -449,7 +454,9 @@ const savedIn = (t: string | undefined, recordId: string) => {
 /**
  * Writes the record's file: the kept file while it holds this record alone (not an Export all
  * file), else the workspace folder, else a file picked. `current` is the kept file's text.
- * 'newer' when the user keeps a newer copy, undefined when the picker was dismissed.
+ * 'newer' when the user keeps a newer copy, 'skipped' when Save would offer the picker for a kept
+ * file that holds records of a kind this version does not know, undefined when the picker was
+ * dismissed.
  */
 async function writeRecordFile(o: {
   handle: FileSystemFileHandle | undefined
@@ -460,7 +467,9 @@ async function writeRecordFile(o: {
   recordId: string
   text: string
   allow: (other: string | undefined) => Promise<boolean>
-}): Promise<'newer' | { name: string; handle?: FileSystemFileHandle | undefined } | undefined> {
+}): Promise<
+  'newer' | 'skipped' | { name: string; handle?: FileSystemFileHandle | undefined } | undefined
+> {
   const { handle, current, as, ready, name, recordId, text, allow } = o
   if (handle && ownsFile(current, recordId)) {
     if (!(await allow(savedIn(current, recordId)))) return 'newer'
@@ -473,6 +482,8 @@ async function writeRecordFile(o: {
     )
     return h ? { name: h.name, handle: h } : 'newer'
   }
+  // the picker would let the user pick the kept file and drop those records; Save as still may
+  if (!as && holdsSkipped(current)) return 'skipped'
   return saveAs(text, recordFileName(name), ready)
 }
 
@@ -500,7 +511,7 @@ async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
       })
     return { problem }
   }
-  return { parsed, text, mine: only }
+  return { parsed, mine: only }
 }
 
 /** Stores the opened record and its photo in the browser; false when the user keeps the browser copy. */
@@ -1008,7 +1019,7 @@ function FileMenuOf<K extends UserRecordKind>({
         kind,
         {
           unsaved: () => latest.current.unsaved,
-          open: (r) => latest.current.openShared(r),
+          open: (r, parsed) => latest.current.openShared(r, parsed),
           carry: (r, records) => {
             carriedMakers.current = makerRecordsOf(r, records)
           },
@@ -1153,6 +1164,14 @@ function FileMenuOf<K extends UserRecordKind>({
       text,
       allow,
     })
+    if (written === 'skipped')
+      return setFailure(
+        plain(
+          msg(
+            'Not saved: the opened file holds records of a kind this version does not know, which Save would leave out. Save as writes a new file.',
+          ),
+        ),
+      )
     return written === 'newer' ? keptNewer() : written
   }
 
@@ -1190,7 +1209,7 @@ function FileMenuOf<K extends UserRecordKind>({
   }
 
   /** A shared record: a new id, no file, unsaved until saved. */
-  function openShared(record: Of<K>) {
+  function openShared(record: Of<K>, parsed: ParsedUserFile) {
     onOpen(record.data as Of<K>['data'], record.name, record)
     id.current = undefined
     handle.current = undefined
@@ -1198,7 +1217,11 @@ function FileMenuOf<K extends UserRecordKind>({
     setSaved(undefined)
     // not the canonical text of any record: the shared record counts as unsaved work
     initial.current = ''
-    setMessage(({ t }) => t('Opened the shared {name}; Save keeps it.', { name: record.name }))
+    setMessage(({ t }) =>
+      [t('Opened the shared {name}; Save keeps it.', { name: record.name }), readNote(parsed, t)]
+        .filter(Boolean)
+        .join(' '),
+    )
   }
 
   /** States once when the browser refuses persistent storage after a write. */
@@ -1356,20 +1379,15 @@ function FileMenuOf<K extends UserRecordKind>({
       setMessage(opened.problem)
       return
     }
-    const { parsed, text, mine } = opened
+    const { parsed, mine } = opened
     // kept in the browser at once, with its photo, as the page keeps every change
     if (autosaved) {
       if (!(await keepInBrowser(mine, parsed.files ?? [], t))) return
       onStored?.()
     }
-    // Save writes back only to a file of this record alone
-    await use(
-      mine,
-      picked.file.name,
-      ownsFile(text, mine.id) ? picked.handle : undefined,
-      readNote(parsed, t),
-      parsed.records,
-    )
+    // Save writes back only to a file of this record alone; the handle of another file is kept
+    // so Save sees at write time whether that file holds records this version would drop
+    await use(mine, picked.file.name, picked.handle, readNote(parsed, t), parsed.records)
   }
 
   /** True when a file was written. */

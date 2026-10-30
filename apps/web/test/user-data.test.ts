@@ -32,7 +32,12 @@ import {
   userDataText,
   validRecords,
 } from '../src/lib/user-data.ts'
-import { folderFileName, ownsFile, recordFileName } from '../src/lib/user-file-names.ts'
+import {
+  folderFileName,
+  holdsSkipped,
+  ownsFile,
+  recordFileName,
+} from '../src/lib/user-file-names.ts'
 import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/lib/user-photos.ts'
 import { defined } from './defined.ts'
 
@@ -207,6 +212,11 @@ describe('user data files', () => {
 
     it('lets no Save write over a file that holds them', () => {
       expect(ownsFile(fileOf([bullet, event]), bullet.id)).toBe(false)
+      // Save offers no picker over such a file, where the user could pick it and drop them
+      expect(holdsSkipped(fileOf([bullet, event]))).toBe(true)
+      expect(holdsSkipped(fileOf([bullet, load]))).toBe(false)
+      expect(holdsSkipped('not json')).toBe(false)
+      expect(holdsSkipped(undefined)).toBe(false)
     })
   })
 

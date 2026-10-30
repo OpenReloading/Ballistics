@@ -27,6 +27,12 @@ export function ownsFile(text: string | undefined, id: string) {
   return p.records.every((r) => r === own || makers.includes(r))
 }
 
+/** Whether a file's text holds records of a kind this version does not know, which a write over it drops. */
+export function holdsSkipped(text: string | undefined) {
+  const p = text === undefined ? undefined : parseUserDataFile(text)
+  return p?.ok === true && p.skipped !== undefined
+}
+
 /** The first of `name`, `<stem>-2.json`, ... that `read` finds absent or holding only record `id`. */
 export async function folderFileName(
   name: string,

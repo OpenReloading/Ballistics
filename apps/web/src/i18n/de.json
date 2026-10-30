@@ -3142,6 +3142,7 @@
   "{saves} since the last export, {days} days ago.": "{saves} seit dem letzten Export, vor {days} Tagen.",
   "{saves} since the last export.": "{saves} seit dem letzten Export.",
   "Not read: {fields}.": "Nicht gelesen: {fields}.",
+  "Not saved: the opened file holds records of a kind this version does not know, which Save would leave out. Save as writes a new file.": "Nicht gespeichert: Die geöffnete Datei enthält Datensätze einer Art, die diese Version nicht kennt; Speichern würde sie auslassen. Speichern unter schreibt eine neue Datei.",
   "Skipped records of a kind this version does not know: {kinds}. They are not kept, so a file this version exports leaves them out.": "Übersprungen, Datensätze einer Art, die diese Version nicht kennt: {kinds}. Sie werden nicht übernommen, eine Datei, die diese Version exportiert, enthält sie also nicht.",
   "{name} (copy)": "{name} (Kopie)",
   "Changed in another tab: your edits are kept as {name}.": "In einem anderen Tab geändert: Ihre Änderungen wurden als {name} behalten.",
