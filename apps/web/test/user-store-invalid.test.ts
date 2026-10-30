@@ -46,7 +46,7 @@ it('an Export all file round trips its invalid records as invalid records', asyn
   const { invalid } = validRecords([bad, badSheet])
   const exported = exportAllText([valid], [], invalid)
   if (!exported.ok) throw new Error(exported.reason)
-  const read = parseFiles(
+  const read = await parseFiles(
     [{ name: 'all.json', bytes: new TextEncoder().encode(exported.text) }],
     undefined,
     english.t,

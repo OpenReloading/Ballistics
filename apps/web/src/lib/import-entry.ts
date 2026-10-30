@@ -19,7 +19,7 @@ import {
   tableKinds,
   tableOfRows,
 } from '@open-reloading/importers'
-import { type UserRecord, userRecord } from '@open-reloading/schema'
+import { type UserRecord, type UserRecordKind, userRecord } from '@open-reloading/schema'
 import { storageName } from './edition.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
 import { maxFileBytes, planImport } from './user-data.ts'
@@ -31,7 +31,14 @@ import { maxFileBytes, planImport } from './user-data.ts'
  */
 export type CardView =
   | { refusal: string; format?: string | undefined }
-  | { format: string; records: number; warnings: string[]; unmapped: string[] }
+  | {
+      format: string
+      records: number
+      /** The records of the file by kind, manufacturers left out. */
+      kinds: Partial<Record<UserRecordKind, number>>
+      warnings: string[]
+      unmapped: string[]
+    }
   | {
       header: string[]
       /** Up to three non-empty cells per column. */
@@ -73,7 +80,8 @@ export type ImportRequest =
   | { type: 'drop'; id: number }
 
 export type ImportReply =
-  | { type: 'read'; id: number; card: CardView }
+  /** `build` is the plan of a load file's records, which need no kind or columns. */
+  | { type: 'read'; id: number; card: CardView; build?: BuildView | undefined }
   | { type: 'built'; id: number; build: BuildView }
   /** `written` counts the rows written, makers left out; `build` is the plan after the write. */
   | { type: 'committed'; id: number; written: number; build: BuildView }
@@ -108,7 +116,7 @@ interface Held {
 /** A file's table and the sheet it is on, a load file's card, or its refusal. */
 type FileRead =
   | { refusal: string; format?: string | undefined }
-  | { load: Extract<CardView, { records: number }> }
+  | { load: Extract<CardView, { records: number }>; records: UserRecord[] }
   | { table: Table; sheet?: string | undefined }
 
 /** The first table of a workbook's sheets, or the refusal of the first sheet. */
@@ -145,15 +153,20 @@ const notText =
  * One inspection of a file's bytes, its extension not read: the size, the load-file formats in
  * their order, a workbook by its signature, then the text as a JSON list or a delimited table.
  */
-function readFile(bytes: Uint8Array, formats: LoadFileFormat[]): FileRead | Promise<FileRead> {
+async function readFile(bytes: Uint8Array, formats: LoadFileFormat[]): Promise<FileRead> {
   if (bytes.byteLength > maxFileBytes)
     return { refusal: 'The file is larger than 40 MB. Split it and import the parts.' }
   const format = loadFormatOf(bytes, formats)
   if (format) {
-    const p = format.parse(bytes)
+    const p = await format.parse(bytes)
     if (!p.ok) return { refusal: p.reason, format: format.name }
     const { records, warnings = [], unmapped = [] } = p
-    return { load: { format: format.name, records: records.length, warnings, unmapped } }
+    const kinds: Partial<Record<UserRecordKind, number>> = {}
+    for (const r of records) if (r.kind !== 'manufacturer') kinds[r.kind] = (kinds[r.kind] ?? 0) + 1
+    return {
+      load: { format: format.name, records: records.length, kinds, warnings, unmapped },
+      records,
+    }
   }
   if (isWorkbook(bytes)) return workbookTable(bytes)
   let text: string
@@ -196,6 +209,20 @@ function planOf(built: BuiltRecords, stored: UserRecord[]): Plan {
     changed: rows.conflicts.map((c) => c.incoming),
     equal: rows.equal.length,
     repeated,
+  }
+}
+
+/** The records of a load file as a build: every record accepted, manufacturers as makers. */
+function builtOf(records: UserRecord[]): BuiltRecords {
+  const entries = records.filter((r) => r.kind !== 'manufacturer')
+  return {
+    entries: entries.map((record) => ({ key: record.id, row: 0, record })),
+    makers: records
+      .filter((r) => r.kind === 'manufacturer')
+      .map((record) => ({ key: record.id, record })),
+    counts: { accepted: entries.length, warned: 0, rejected: 0 },
+    rejected: [],
+    warnings: [],
   }
 }
 
@@ -292,26 +319,38 @@ export function importWorker(
     return viewOf(h)
   }
 
+  /** A load file is planned at once: its records need no kind or columns. */
+  async function readAnswer(id: number, bytes: ArrayBuffer): Promise<ImportReply> {
+    const read = await readFile(new Uint8Array(bytes), formats)
+    if ('load' in read) {
+      const built = builtOf(read.records)
+      const h: Held = { built, map: [], plan: planOf(built, await store.records()) }
+      files.set(id, h)
+      return { type: 'read', id, card: cardOf(read), build: viewOf(h) }
+    }
+    files.set(id, 'table' in read ? { table: read.table } : {})
+    return { type: 'read', id, card: cardOf(read) }
+  }
+
   async function answer(m: ImportRequest): Promise<ImportReply | undefined> {
     if (m.type === 'drop') {
       files.delete(m.id)
       return
     }
-    if (m.type === 'read') {
-      const read = await readFile(new Uint8Array(m.bytes), formats)
-      files.set(m.id, 'table' in read ? { table: read.table } : {})
-      return { type: 'read', id: m.id, card: cardOf(read) }
-    }
+    if (m.type === 'read') return readAnswer(m.id, m.bytes)
     if (m.type === 'build')
       return { type: 'built', id: m.id, build: await build(m.id, m.kind, m.map) }
-    const h = held(m.id)
-    if (!h.built || !h.kind) throw new Error('the file is not built')
+    const h = files.get(m.id)
+    if (!h?.built) throw new Error('the file is not built')
     // planned again: another file of this import or another tab may have stored a row since the build
     h.plan = planOf(h.built, await store.records())
     const write = toWrite(h.plan, m.replace).map((r) => ({ ...r, imported: m.imported }))
     await store.put(write)
     const written = write.filter((r) => r.kind !== 'manufacturer').length
-    return { type: 'committed', id: m.id, written, build: await build(m.id, h.kind, h.map) }
+    if (h.kind)
+      return { type: 'committed', id: m.id, written, build: await build(m.id, h.kind, h.map) }
+    h.plan = planOf(h.built, await store.records())
+    return { type: 'committed', id: m.id, written, build: viewOf(h) }
   }
 
   return async (m: ImportRequest) => {

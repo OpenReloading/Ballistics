@@ -392,7 +392,7 @@ function recordOf(
 }
 
 /** Lower case, accents and extra spaces folded: the form of a name in a key. */
-const keyText = (s: string) =>
+export const keyText = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()
 
 /** The text the id of a row is made from: kind, name, maker and, for a bullet, its diameter and mass. */
