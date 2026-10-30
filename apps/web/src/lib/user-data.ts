@@ -205,6 +205,18 @@ export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]):
 }
 
 /**
+ * The records of `pool` that `record` names by `user:<id>`, with the
+ * user manufacturers they name: what a file of that record carries along, such as the cartridge,
+ * bullet and powder of a load read from another program's load file.
+ */
+export function linkedRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
+  // alone, every user reference of `record` dangles, so the check lists them all
+  const ids = new Set(checkUserRefs([record]).map((d) => parseRef(d.target)?.id))
+  const linked = pool.filter((r) => r.id !== record.id && ids.has(r.id))
+  return [...linked, ...linked.flatMap((r) => makerRecordsOf(r, pool))]
+}
+
+/**
  * The user manufacturer `record` names as a file or link carries it: the stored one, else the one
  * that came with the opened file or link (`carried`), which the store may lack or hold invalid.
  */

@@ -379,7 +379,13 @@ it('gives a mixed batch of a table and two load files the card of each with no c
     cards.push(r.card)
   }
   expect(cards[0]).toMatchObject({ kind: 'bullet', tier: 'high', rows: 3 })
-  const card = { format: 'Test lines', records: 1, warnings: [], unmapped: ['primer'] }
+  const card = {
+    format: 'Test lines',
+    records: 1,
+    kinds: { load: 1 },
+    warnings: [],
+    unmapped: ['primer'],
+  }
   expect(cards.slice(1)).toEqual([card, card])
   expect(firstBuild(defined(cards[1]), {})).toBeUndefined()
 })
@@ -410,6 +416,7 @@ it('gives a workbook, a semicolon CSV, a JSON list, a data file and a file over 
   expect(await read(encoded(userDataText([load])))).toEqual({
     format: 'OpenReloading data',
     records: 1,
+    kinds: { load: 1 },
     warnings: [],
     unmapped: [],
   })

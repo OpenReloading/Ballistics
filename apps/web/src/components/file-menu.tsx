@@ -55,6 +55,7 @@ import {
   canonicalJson,
   checkedUserDataText,
   type InvalidRecord,
+  linkedRecordsOf,
   makerIdOf,
   makerRecordsOf,
   makersToCarry,
@@ -231,6 +232,11 @@ async function keepMakers(record: UserRecord, carried: UserRecord[]) {
   } catch {
     return false
   }
+}
+
+/** The records `record` names that `carried` holds, kept unless one of its id is stored; a refusal leaves them to `refsOf`'s note. */
+async function keepLinked(record: UserRecord, carried: UserRecord[]) {
+  await Promise.all(linkedRecordsOf(record, carried).map(putRecordIfAbsent)).catch(() => {})
 }
 
 /** `refNote` of `opened` against the browser store and the built-in example rifle; empty when the store cannot be read. */
@@ -471,7 +477,7 @@ async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
   const parsed: ParsedUserFile =
     text === undefined
       ? { ok: false, reason: tooLargeMessage }
-      : readLoadFile(new TextEncoder().encode(text))
+      : await readLoadFile(new TextEncoder().encode(text))
   if (!parsed.ok) {
     const { reason } = parsed
     const problem: Said = ({ t }) =>
@@ -1323,6 +1329,7 @@ function FileMenuOf<K extends UserRecordKind>({
     )
       return false
     const kept = await keepMakers(record, carried)
+    await keepLinked(record, carried)
     carriedMakers.current = makerRecordsOf(record, carried)
     const note = kept ? fileNote : [fileNote, t(noMaker)].filter(Boolean).join(' ')
     onOpen(record.data as Of<K>['data'], record.name, record)

@@ -257,6 +257,21 @@ function Report({ b, t }: { b: BuildView; t: Translator['t'] }) {
   )
 }
 
+/** What a load file holds, as "1 load, 1 cartridge"; a kind without its own words counts as records. */
+function heldText(kinds: Extract<CardView, { records: number }>['kinds'], tn: Translator['tn']) {
+  const words: Record<string, (n: number) => string> = {
+    load: (n) => tn(n, '{count} load', '{count} loads'),
+    cartridge: (n) => tn(n, '{count} cartridge', '{count} cartridges'),
+    bullet: (n) => tn(n, '{count} bullet', '{count} bullets'),
+    powder: (n) => tn(n, '{count} powder', '{count} powders'),
+  }
+  const order = Object.keys(words)
+  return Object.entries(kinds)
+    .sort(([a], [b]) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99))
+    .map(([k, n = 0]) => (words[k] ?? ((n) => tn(n, '{count} record', '{count} records')))(n))
+    .join(', ')
+}
+
 /** A refused file's reason, with the load-file format that refused it, or a load file's records and what was not read. */
 function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   const { t, tn } = useTranslation()
@@ -270,11 +285,7 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
     )
   const { warnings, unmapped } = c
   const note = readNote({ ok: true, records: [], warnings, unmapped }, t)
-  return (
-    <Text size="sm">
-      {[tn(c.records, '{count} record', '{count} records'), note].filter(Boolean).join('. ')}
-    </Text>
-  )
+  return <Text size="sm">{[heldText(c.kinds, tn), note].filter(Boolean).join('. ')}</Text>
 }
 
 /** One file card: the verdict, Remove, the kind and the mapping (folded on a high-tier card), the counts. */
@@ -570,6 +581,9 @@ export function ImportEntry({
           const r = await call({ type: 'read', id, bytes }, [bytes])
           if (r.type !== 'read')
             return patch(id, { busy: false, failure: r.type === 'failed' ? r.message : undefined })
+          // a load file is planned on reading; its format is the source its records carry
+          if (r.build && 'records' in r.card)
+            return patch(id, { busy: false, card: r.card, build: r.build, source: r.card.format })
           await buildFirst(id, r.card)
         }),
       )

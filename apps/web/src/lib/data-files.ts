@@ -94,7 +94,7 @@ export async function importTexts(files: ImportFile[], io: ImportIo, { t }: Tran
         invalid,
         skipped,
         notes,
-      } = parseFiles([{ name: f.name, bytes: await f.read() }], undefined, t)
+      } = await parseFiles([{ name: f.name, bytes: await f.read() }], undefined, t)
       const plan = planImport(records, (await storedRecords()).records)
       // an equal record may come to a browser without its photo
       await storePhotos(photos, [...plan.added, ...plan.equal])
