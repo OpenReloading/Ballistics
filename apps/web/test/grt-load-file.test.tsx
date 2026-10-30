@@ -156,6 +156,41 @@ describe('GRT load files', () => {
     expect(linkedRecordsOf(named, read.records)).toEqual([bullet])
     expect(linkedRecordsOf(bullet, read.records)).toEqual([])
   })
+
+  it('carries the manufacturer of a linked case once, also when the load names it too', () => {
+    const maker: UserRecord = {
+      kind: 'manufacturer',
+      id: '00000000-0000-4000-8000-000000000002',
+      name: 'Own brass works',
+      saved: load.saved,
+      data: { origin: 'user' },
+    }
+    const brass: UserRecord = {
+      kind: 'case',
+      id: '00000000-0000-4000-8000-000000000003',
+      name: 'Fired twice',
+      saved: load.saved,
+      data: {
+        origin: 'user',
+        cartridge: 'catalogue:308-win',
+        material: 'brass',
+        manufacturer: `user:${maker.id}`,
+      },
+    }
+    const named: UserRecord = {
+      ...load,
+      data: { ...load.data, case: { record: `user:${brass.id}` } },
+    }
+    expect(linkedRecordsOf(named, [named, brass, maker])).toEqual([brass, maker])
+    const both: UserRecord = {
+      ...load,
+      data: {
+        ...load.data,
+        case: { record: `user:${brass.id}`, manufacturer: `user:${maker.id}` },
+      },
+    }
+    expect(linkedRecordsOf(both, [both, brass, maker])).toEqual([brass, maker])
+  })
 })
 
 it('reads ten load files with one plan each, skips a broken one and imports the rest once', async () => {
