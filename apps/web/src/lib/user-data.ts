@@ -85,7 +85,17 @@ export function parseUserDataFile(text: string): ParsedUserFile {
         files: r.data.files,
         ...(Array.isArray(invalid) && invalid.length > 0 && { invalid }),
       }
-    : { ok: false, reason: z.prettifyError(r.error) }
+    : { ok: false, reason: problemsText(r.error) }
+}
+
+/** Problems a reason names: a file of many invalid records would otherwise list every one. */
+const shownProblems = 3
+
+/** The first `shownProblems` problems of `error` and how many more there are. */
+function problemsText(error: z.ZodError) {
+  const text = z.prettifyError(new z.ZodError(error.issues.slice(0, shownProblems)))
+  const more = error.issues.length - shownProblems
+  return more > 0 ? `${text}\nand ${more} more problems` : text
 }
 
 /** The text of `userDataText`, or why Open and Import would reject it (too large, invalid). */

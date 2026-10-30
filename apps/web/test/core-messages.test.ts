@@ -14,6 +14,8 @@ import {
   warningMessages,
 } from '../src/lib/core-message-table.ts'
 import { translateMessage } from '../src/lib/core-messages.ts'
+import { linkReasonText, readLink, shareLink } from '../src/lib/share-link.ts'
+import { parseUserDataFile, reasonText, userDataText } from '../src/lib/user-data.ts'
 
 installCoreMessages()
 
@@ -42,6 +44,31 @@ describe('the message table', () => {
     for (const text of ['Hello', 'The cartridge is fine.', '', 'range']) {
       expect(translateMessage(text, german.t)).toBe(text)
     }
+  })
+
+  it('refuses a file and a share link of 1000 invalid records quickly, naming the first problems', async () => {
+    const records = Array.from({ length: 1000 }, () => ({})) as never
+    const file = parseUserDataFile(userDataText(records))
+    const link = await readLink(
+      new URL((await shareLink(records, 'https://example.org/workbench')) as string).hash,
+    )
+    for (const [read, shown] of [
+      [file, reasonText],
+      [link, linkReasonText],
+    ] as const) {
+      if (read?.ok !== false) throw new Error('not refused')
+      expect(read.reason).toMatch(/\nand 997 more problems$/)
+      const start = performance.now()
+      shown(read.reason, german.t)
+      expect(performance.now() - start).toBeLessThan(100)
+    }
+  })
+
+  it('leaves a long text as it is without matching it', () => {
+    const text = 'x'.repeat(200_000)
+    const start = performance.now()
+    expect(translateMessage(text, german.t)).toBe(text)
+    expect(performance.now() - start).toBeLessThan(100)
   })
 
   it('prefers the most specific template', () => {
