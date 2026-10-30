@@ -80,6 +80,8 @@ export type ResultState = {
   manufacturerRef: (typed: string) => string | undefined
   /** The sessions the load names, also those this browser does not answer. */
   sessionRefCount: number
+  /** The store id of the chosen firearm when it is one of this browser. */
+  ownFirearm: string | undefined
   /** Hands the load the run simulates to the powder tuning route, on its link. */
   handOffTune: () => void
   loadNotes: LoadNotesState

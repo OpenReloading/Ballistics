@@ -1085,6 +1085,7 @@ export function Workbench() {
   const bulletDiameter = bullet && toSi('length', bullet.diameter.value)
   // the File menu's id: set by Save and Open, which re-render the page
   const fileId = fileMenu.current?.id()
+  const ownFirearm = firearms.some((f) => f.id === firearm) ? firearm : undefined
   const result = useMemo<ResultState>(
     () => ({
       ok,
@@ -1122,6 +1123,7 @@ export function Workbench() {
       manufacturerName,
       loadNotes,
       sessionRefCount,
+      ownFirearm,
       handOffTune,
       barrel,
       lot,
@@ -1167,6 +1169,7 @@ export function Workbench() {
       manufacturerName,
       loadNotes,
       sessionRefCount,
+      ownFirearm,
       handOffTune,
       barrel,
       lot,

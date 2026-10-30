@@ -3,8 +3,10 @@
 import { type Load, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { parseNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from '../lib/error-text.ts'
+import { withSessionRounds } from '../lib/firearm.ts'
 import {
   addShot,
   localDate,
@@ -56,9 +58,13 @@ export interface RangeLoad {
 /** The reference a load or session record has as another record's reference. */
 const userRef = (id: string) => `user:${id}`
 
+/** The firearm of a load as a store id, for a `user:` reference only. */
+const firearmIdOf = (load: RangeLoad) =>
+  load.data.firearm?.startsWith('user:') ? load.data.firearm.slice(5) : undefined
+
 /** Names the session in the stored load, with the snapshot of the load as it is, in one transaction. */
 async function linkSession(load: RangeLoad, ref: string, t: Translator['t']) {
-  const firearm = load.data.firearm?.startsWith('user:') ? load.data.firearm.slice(5) : undefined
+  const firearm = firearmIdOf(load)
   const stored = firearm ? userRecord.safeParse(await storedRecord(firearm)) : undefined
   const roundCount =
     stored?.success && stored.data.kind === 'firearm' ? stored.data.data.roundCount : undefined
@@ -67,6 +73,26 @@ async function linkSession(load: RangeLoad, ref: string, t: Translator['t']) {
     if (!found.success) throw new Error(t('The stored load is not a valid load.'))
     return withSession(found.data, ref, roundCount, new Date(), t)
   })
+}
+
+/** A session's shots the firearm's round count does not hold yet: its count when the session began (`base`). */
+type RoundOffer = { firearm: string; name: string; base: number; shots: number }
+
+/**
+ * The offer for the session `ref` of `load`, read from the store: undefined for a firearm not of
+ * this browser, without a count, or that holds the session's shots already.
+ */
+async function roundOfferOf(load: RangeLoad, ref: string, shots: number) {
+  const id = firearmIdOf(load)
+  if (!id || shots < 1) return
+  const [gun, stored] = await Promise.all([storedRecord(id), storedRecord(load.id)])
+  const f = userRecord.safeParse(gun)
+  const l = userRecord.safeParse(stored)
+  if (!f.success || f.data.kind !== 'firearm' || !l.success || l.data.kind !== 'load') return
+  const base = l.data.data.snapshots?.find((s) => s.session === ref)?.roundCount
+  const count = f.data.data.roundCount
+  if (base === undefined || count === undefined || count >= base + shots) return
+  return { firearm: id, name: f.data.name, base, shots }
 }
 
 const noWeather: WeatherText = { temperature: '', pressure: '', wind: '' }
@@ -122,6 +148,9 @@ export function useRangeMode() {
   const [saved, setSaved] = useState('')
   const [saving, setSaving] = useState(false)
   const linked = useRef('')
+  const [roundOffer, setRoundOffer] = useState<RoundOffer>()
+  const [rounds, setRounds] = useState('')
+  const prefilled = useRef(0)
 
   useEffect(() => {
     storedRecords()
@@ -192,6 +221,27 @@ export function useRangeMode() {
     })
     setNote(string?.note ?? '')
   }, [step?.key, loadId, session?.id, system])
+
+  // every shot of the session was fired, an excluded one too
+  const sessionShots = session?.data.strings.reduce((n, s) => n + s.shots.length, 0) ?? 0
+  // read again once the write and the load's snapshot of the session have committed
+  useEffect(() => {
+    setRoundOffer(undefined)
+    if (!load || !session || saving) return
+    let current = true
+    roundOfferOf(load, userRef(session.id), sessionShots)
+      .then((offer) => {
+        if (!current) return
+        setRoundOffer(offer)
+        // a new shot prefills the field again, an exclusion keeps what was typed
+        if (offer && offer.shots !== prefilled.current) setRounds(String(offer.shots))
+        prefilled.current = offer?.shots ?? 0
+      })
+      .catch(() => {})
+    return () => {
+      current = false
+    }
+  }, [load, session, sessionShots, saving])
 
   const context = (): RangeContext | undefined =>
     load && loadId
@@ -294,6 +344,38 @@ export function useRangeMode() {
     )
   }
 
+  /** Adds the typed rounds to the firearm's count, unless the session is in it already. */
+  async function addRounds() {
+    const offer = roundOffer
+    if (!offer || saving) return
+    const typed = parseNumber(rounds, { min: 1, integer: true })
+    if (typed.kind !== 'number' || !Number.isInteger(typed.value) || typed.value < 1)
+      return setProblem(t('Enter a whole number of rounds, 1 or more.'))
+    setSaving(true)
+    setProblem(undefined)
+    try {
+      const written = await updateRecord(offer.firearm, (raw) => {
+        const found = userRecord.safeParse(raw)
+        if (!found.success) return
+        return withSessionRounds(found.data, offer.base, offer.shots, typed.value, new Date())
+      })
+      setSaved(
+        written?.kind === 'firearm' && written.data.roundCount !== undefined
+          ? t('Round count of {name}: {count}.', {
+              name: offer.name,
+              count: written.data.roundCount,
+            })
+          : t('The round count of {name} holds this session already.', {
+              name: offer.name,
+            }),
+      )
+    } catch (e) {
+      setProblem(errorText(e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return {
     system,
     loads,
@@ -323,5 +405,9 @@ export function useRangeMode() {
     problem,
     saved,
     saving,
+    roundOffer,
+    rounds,
+    setRounds,
+    addRounds,
   }
 }

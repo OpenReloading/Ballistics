@@ -3720,5 +3720,31 @@
   "The bullet data could not be loaded. Check the connection and retry. The designer and the workbench still work.": "Die Geschossdaten konnten nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut. Der Designer und die Werkbank funktionieren weiterhin.",
   "The data file could not be loaded. Check the connection and retry.": "Die Datendatei konnte nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut.",
   "The model refused the load. The error panel gives the reason.": "Das Modell hat die Laborierung abgelehnt. Der Fehlerbereich nennt den Grund.",
-  "The run passed the time limit.": "Die Berechnung hat das Zeitlimit überschritten."
+  "The run passed the time limit.": "Die Berechnung hat das Zeitlimit überschritten.",
+  "Rounds for a match": "Patronen für einen Wettkampf",
+  "Shots per event": "Schüsse je Durchgang",
+  "Shots per event: {count}": "Schüsse je Durchgang: {count}",
+  "The targets of this discipline state no shot count.": "Die Zielscheiben dieser Disziplin nennen keine Schusszahl.",
+  "match\u0004Events": "Durchgänge",
+  "Sighters per event": "Probeschüsse je Durchgang",
+  "Rule book: {value}": "Sportordnung: {value}",
+  "Reserve, %": "Reserve, %",
+  "Rounds on hand": "Vorhandene Patronen",
+  "Needed {needed}": "Benötigt {needed}",
+  "Needed {needed}, typed {typed}: short by {difference}": "Benötigt {needed}, eingegeben {typed}: {difference} zu wenig",
+  "Needed {needed}, typed {typed}: {difference} over": "Benötigt {needed}, eingegeben {typed}: {difference} übrig",
+  "Enter a whole number of rounds, 1 or more.": "Geben Sie eine ganze Zahl an Schüssen ein, 1 oder mehr.",
+  "Round count of {name}: {count}.": "Schusszahl von {name}: {count}.",
+  "The round count of {name} holds this session already.": "Die Schusszahl von {name} enthält diese Sitzung bereits.",
+  "Rounds fired": "Abgegebene Schüsse",
+  "With fouling shots, sighters and missed readings.": "Mit Schmutzschüssen, Probeschüssen und nicht gemessenen Schüssen.",
+  "Add {count} shot to the round count of {name}|Add {count} shots to the round count of {name}": {
+    "one": "{count} Schuss zur Schusszahl von {name} hinzufügen",
+    "other": "{count} Schüsse zur Schusszahl von {name} hinzufügen"
+  },
+  "Add to the round count?": "Zur Schusszahl hinzufügen?",
+  "Add {count} shot of these strings to the round count of {name}?|Add {count} shots of these strings to the round count of {name}?": {
+    "one": "{count} Schuss dieser Schussreihen zur Schusszahl von {name} hinzufügen?",
+    "other": "{count} Schüsse dieser Schussreihen zur Schusszahl von {name} hinzufügen?"
+  }
 }
