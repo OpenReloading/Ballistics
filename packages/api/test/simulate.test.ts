@@ -624,13 +624,25 @@ describe('POST /interior/load-file, references', () => {
 
   it('answers 400 at the field of a user reference: user records are not on the server', async () => {
     const user = `user:${crypto.randomUUID()}`
-    for (const k of ['cartridge', 'bullet']) {
+    for (const k of ['cartridge', 'bullet', 'powder']) {
       const res = await simulate(file({ siValues, [k]: user }))
       expect(res.status).toBe(400)
       expect(res.body.issues.map((i: { path: unknown[] }) => i.path)).toEqual([
         ['records', 0, 'data', k],
       ])
     }
+  })
+
+  it('reads a powder description of a measured catalogue load', async () => {
+    const body = file({ siValues, cartridge: 'alpha-rifle', bullet: 'example-a-1' })
+    Object.assign(defined(body.records[0]).data, {
+      origin: 'catalogue',
+      id: 'described',
+      name: 'Described',
+      provenance: { kind: 'measured', sources: [{ title: 'Test' }] },
+      powder: { manufacturer: 'catalogue:example-a', name: 'Described' },
+    })
+    expect((await simulate(body)).status).toBe(200)
   })
 })
 

@@ -73,7 +73,7 @@ export function readLoadFile(json: unknown): { path: Path; record: Load; name: s
   else {
     const [i, r] = loads[0] as [number, { data: Load; name: string }]
     // user data stays in the browser: the server resolves catalogue records only
-    for (const k of ['cartridge', 'bullet'] as const) {
+    for (const k of ['cartridge', 'bullet', 'powder'] as const) {
       const target = r.data[k]
       if (typeof target === 'string' && parseRef(target)?.scope === 'user')
         unknown.push(
