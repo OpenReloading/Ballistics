@@ -86,6 +86,25 @@ it('filters the list by the words of the query in the name', () => {
   expect(loadGroups(records, 'zzz', {}, english.t)).toEqual([])
 })
 
+it('finds a load by a lot of the load or of one of its session snapshots', () => {
+  const lots = {
+    ...load('a', 'Lots', '2026-10-01T10:00:00.000Z'),
+    data: {
+      origin: 'user',
+      powderLot: 'P-1001',
+      primer: { lot: 'PR-2002' },
+      case: { lot: 'C-3003' },
+      snapshots: [{ session: 's1', powderLot: 'P-0900', primerLot: 'PR-1900', caseLot: 'C-2900' }],
+    },
+  } as LoadRecord
+  const records = [lots, load('b', 'No lots', '2026-10-02T10:00:00.000Z')]
+  const found = (query: string) =>
+    loadGroups(records, query, {}, english.t).flatMap((g) => g.records.map((r) => r.id))
+  for (const lot of ['P-1001', 'pr-2002', 'C-3003', 'P-0900', 'PR-1900', 'C-2900'])
+    expect(found(lot)).toEqual(['a'])
+  expect(found('X-4004')).toEqual([])
+})
+
 it('picks the next tab, else the previous one, when a tab closes', () => {
   expect(tabAfterClose(['a', 'b', 'c'], 'a')).toBe('b')
   expect(tabAfterClose(['a', 'b', 'c'], 'b')).toBe('c')

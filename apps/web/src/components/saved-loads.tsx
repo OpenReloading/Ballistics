@@ -279,7 +279,7 @@ export function SavedLoads({
           <Drawer.Body>
             <TextInput
               aria-label={t('Search saved loads')}
-              placeholder={t('Search')}
+              placeholder={t('Name or lot')}
               value={query}
               onChange={(e) => setQuery(e.currentTarget.value)}
               mb="sm"
