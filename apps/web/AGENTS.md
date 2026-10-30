@@ -121,6 +121,7 @@ Next.js App Router (TypeScript, React). A static export: the browser reads data 
   - Target sheets are user records. Photos are in the IndexedDB store `files`, never uploaded.
   - An autosave, File > Save, the close-the-page copy and the Undo of a delete write a sheet only over the version the editor read or last wrote (`putRecordIf` in `src/lib/user-store.ts`). A sheet another tab saved since stays, the edit is kept as `<name> (copy)`.
   - Notes with value placeholders, image exports and a print sheet (`target-notes.tsx`, `target-export.tsx`, `target-print.tsx`). Open and Save for one sheet with its photo.
+  - Zero target in the page bar (`zero-target.tsx`, geometry, fields and the SVG in `src/lib/zero-target.ts`): an A4 grid target whose four corner mark centres span 160 x 240 mm, the rectangle reference of a photo of it. Printed alone on the named page `zero-a4` of `globals.css` (no margin, the sheet's mm are the paper's) or saved as SVG. Its fields come from the sheet's load (firearm, cartridge), the active group (distance, name) and the session its shots name (date), or print blank.
   - The same editor is the workbench tab Groups (`groups-tab.tsx`) for the sheets of the saved load.
 - Hole detection in a Web Worker (`src/components/hole-detection.tsx`, `src/lib/hole-detection.worker.ts`, `apps/docs/docs/models/hole-detection.md`):
   - One-click auto detection, and guided steps from one example hole and the photo turn. Recall test on the synthetic photos of `test/fixtures/target-photos/`.
