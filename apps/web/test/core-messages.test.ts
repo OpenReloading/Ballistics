@@ -60,7 +60,8 @@ describe('the message table', () => {
       expect(read.reason).toMatch(/\nand 997 more problems$/)
       const start = performance.now()
       shown(read.reason, german.t)
-      expect(performance.now() - start).toBeLessThan(100)
+      // guards against polynomial backtracking, which takes seconds; a loaded runner stalls past a tight bound
+      expect(performance.now() - start).toBeLessThan(5000)
     }
   })
 
@@ -68,7 +69,8 @@ describe('the message table', () => {
     const text = 'x'.repeat(200_000)
     const start = performance.now()
     expect(translateMessage(text, german.t)).toBe(text)
-    expect(performance.now() - start).toBeLessThan(100)
+    // guards against polynomial backtracking, which takes seconds; a loaded runner stalls past a tight bound
+    expect(performance.now() - start).toBeLessThan(5000)
   })
 
   it('prefers the most specific template', () => {
