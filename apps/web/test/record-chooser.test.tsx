@@ -1,11 +1,20 @@
 import { expect, it } from 'vitest'
 import { bulletKind } from '../src/components/bullet-search-dialog.tsx'
 import type { ChooserKind, ChooserRow } from '../src/components/record-chooser.tsx'
-import { cartridgeKind, powderKind } from '../src/components/record-choosers.tsx'
+import {
+  cartridgeKind,
+  caseKind,
+  firearmKind,
+  powderKind,
+  primerKind,
+} from '../src/components/record-choosers.tsx'
 import { english } from '../src/i18n/translate.ts'
 import type { BulletRow } from '../src/lib/bullet-rows.ts'
 import type { PowderRow } from '../src/lib/burn-rate.ts'
 import type { CartridgeRow } from '../src/lib/cartridge-rows.ts'
+import type { FirearmRow } from '../src/lib/firearm.ts'
+import type { PrimerRow } from '../src/lib/primer-rows.ts'
+import type { CaseRow } from '../src/lib/record-choosers.ts'
 import { presetUnits } from '../src/lib/units.ts'
 
 const system = presetUnits('metric-grams')
@@ -129,4 +138,94 @@ it('the cartridge chooser shows caliber, case type and Pmax, ranks as the API an
   expect(ids(cartridgeKind, rows, '', 'caliber')).toEqual(['308-norma', '308-win', 'own', '6-5x55'])
   expect(ids(cartridgeKind, rows, 'nothing')).toEqual([])
   expect(t(cartridgeKind.texts.empty)).toBe('No cartridge matches')
+})
+
+// invented firearms, lengths in m
+it('the firearm chooser shows barrel length and twist, ranks by name and says when nothing matches', () => {
+  const rows: FirearmRow[] = [
+    { id: 'a', name: 'Match rifle 308', barrelLength: 0.66, twist: 0.254 },
+    { id: 'b', name: 'Hunting rifle', barrelLength: 0.56 },
+    { id: 'ex', name: 'Example rifle, 308 Win. (example)', barrelLength: 0.6, twist: 0.3048 },
+  ]
+  expect(table(firearmKind, rows[0] as FirearmRow)).toEqual([
+    ['Firearm', 'Match rifle 308'],
+    ['Barrel length', '660 mm'],
+    ['Twist', '254 mm'],
+  ])
+  expect(table(firearmKind, rows[1] as FirearmRow)[2]).toEqual(['Twist', ''])
+  // a word's start ranks above its middle; no words: by name
+  expect(ids(firearmKind, rows, '308')).toEqual(['ex', 'a'])
+  expect(ids(firearmKind, rows, 'rifle hunt')).toEqual(['b'])
+  expect(ids(firearmKind, rows, '')).toEqual(['ex', 'b', 'a'])
+  expect(ids(firearmKind, rows, 'nothing')).toEqual([])
+  expect(t(firearmKind.texts.empty)).toBe('No firearm matches')
+  expect(firearmKind.href).toBeUndefined()
+})
+
+// invented brass, water in g
+it('the brass chooser shows material and water, ranks over maker and name and says when nothing matches', () => {
+  const rows: CaseRow[] = [
+    { id: 'user:g1', name: 'Lot 2024', manufacturerName: 'Your brass', waterCapacity: 3.41 },
+    {
+      id: 'acme-308',
+      name: '308 Win',
+      manufacturerName: 'Acme',
+      material: 'brass',
+      waterCapacity: 3.52,
+    },
+    {
+      id: 'beta-308',
+      name: '308 Win Match',
+      manufacturerName: 'Beta',
+      material: 'nickel-plated-brass',
+    },
+  ]
+  expect(table(caseKind, rows[1] as CaseRow)).toEqual([
+    ['Brass', '308 Win'],
+    ['Material', 'Brass'],
+    ['Water', '3.52 g water'],
+  ])
+  expect(ids(caseKind, rows, 'acme')).toEqual(['acme-308'])
+  expect(ids(caseKind, rows, '308 win')).toEqual(['acme-308', 'beta-308'])
+  expect(ids(caseKind, rows, 'lot')).toEqual(['user:g1'])
+  expect(ids(caseKind, rows, '', 'name')).toEqual(['acme-308', 'beta-308', 'user:g1'])
+  expect(ids(caseKind, rows, 'nothing')).toEqual([])
+  expect(t(caseKind.texts.empty)).toBe('No brass matches')
+  // the user's own group has no record page
+  expect(caseKind.href?.(rows[0] as CaseRow)).toBeUndefined()
+  expect(caseKind.href?.(rows[1] as CaseRow)).toBe('/cases/acme-308')
+})
+
+// invented primers
+const primer = (over: Partial<PrimerRow> & Pick<PrimerRow, 'id' | 'name'>): PrimerRow => ({
+  manufacturer: 'acme',
+  manufacturerName: 'Acme Primers',
+  manufacturerAliases: ['AP'],
+  size: 'large-rifle',
+  ...over,
+})
+
+it('the primer chooser shows size and magnum, ranks as the API and says when nothing matches', () => {
+  const rows = [
+    primer({ id: 'a-lr', name: 'LR 210', magnum: false }),
+    primer({ id: 'a-lrm', name: 'LR 210M', magnum: true }),
+    primer({
+      id: 'b-sr',
+      manufacturer: 'beta',
+      manufacturerName: 'Beta',
+      name: 'SR 400',
+      size: 'small-rifle',
+    }),
+  ]
+  expect(table(primerKind, rows[1] as PrimerRow)).toEqual([
+    ['Primer', 'LR 210M'],
+    ['Size', 'Large rifle'],
+    ['Magnum', 'Yes'],
+  ])
+  // the exact name first; the manufacturer's alias finds its primers
+  expect(ids(primerKind, rows, 'lr 210')).toEqual(['a-lr', 'a-lrm'])
+  expect(ids(primerKind, rows, 'ap 210m')).toEqual(['a-lrm'])
+  expect(ids(primerKind, rows, '', 'name')).toEqual(['a-lr', 'a-lrm', 'b-sr'])
+  expect(ids(primerKind, rows, 'nothing')).toEqual([])
+  expect(t(primerKind.texts.empty)).toBe('No primer matches')
 })

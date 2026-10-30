@@ -11,8 +11,12 @@ const row = [
   ['combobox', 'Search cartridges by name'],
   ['button', 'Browse cartridges'],
   ['combobox', 'Primer'],
+  ['button', 'Browse primers'],
   ['textbox', 'Primer lot'],
   ['combobox', 'Brass record'],
+  // the example load chooses its brass
+  ['button', 'Clear the brass record'],
+  ['button', 'Browse brass'],
   ['textbox', 'Case lot'],
   ['combobox', 'Case capacity record'],
 ] as const

@@ -1,21 +1,12 @@
 'use client'
 
-import {
-  ActionIcon,
-  Button,
-  Loader,
-  NumberInput,
-  Paper,
-  Popover,
-  Select,
-  Switch,
-} from '@mantine/core'
+import { ActionIcon, Button, Loader, NumberInput, Paper, Popover, Switch } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
@@ -36,7 +27,7 @@ import {
   siValues,
   specText,
 } from '../lib/field-spec.ts'
-import { gunPicker, landsFor } from '../lib/firearm.ts'
+import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -63,7 +54,7 @@ import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
-import { RecordSearch } from './record-search.tsx'
+import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { RecordSourcesLink } from './sources.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
@@ -610,11 +601,11 @@ export function InputCards() {
  * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
  */
 function LoadRow() {
-  const { primerId, setPrimerChoice } = useLoad()
+  const { primerId, setPrimerChoice, system } = useLoad()
   return (
     <div className="pinned-row">
       <CartridgePicker />
-      <PrimerChoice id={primerId} onChange={setPrimerChoice} />
+      <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
       <LotField lot="primer" short />
       <SeatingSlot name="choices" />
     </div>
@@ -1029,25 +1020,10 @@ const CartridgeChooser = dynamic(
   { ssr: false },
 )
 
-/**
- * A picker's chooser dialog: opened with the field's text, the focus back on its opener when it
- * closes, since a dialog opened before its code has loaded mounts open and cannot return it itself.
- */
-function useChooser() {
-  const [dialog, setDialog] = useState({ text: '', opened: false })
-  const opener = useRef<HTMLElement | null>(null)
-  return {
-    ...dialog,
-    open: (text: string) => {
-      opener.current = document.activeElement as HTMLElement | null
-      setDialog({ text, opened: true })
-    },
-    close: () => {
-      setDialog((d) => ({ ...d, opened: false }))
-      setTimeout(() => opener.current?.focus())
-    },
-  }
-}
+const FirearmChooser = dynamic(
+  () => import('./record-choosers.tsx').then((m) => m.FirearmChooser),
+  { ssr: false },
+)
 
 /** The Bullet card's picker: the inline quick search, and a button that opens the search dialog. */
 function BulletPicker() {
@@ -1264,29 +1240,68 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   )
 }
 
+/** The Gun card's picker: the library's firearms and the example rifle, in the field and the dialog. */
+function GunPicker() {
+  const { chooseFirearm, firearm, firearms, readDesigns, system } = useLoad()
+  const { t } = useTranslation()
+  const dialog = useChooser()
+  const { rows, placeholder } = useMemo(
+    () => gunPicker(firearms, loadExample.firearm, t),
+    [firearms, t],
+  )
+  const find = useMemo(
+    () => async (text: string, limit: number) => {
+      const { firearmKeys, listMatches } = await import('../lib/record-choosers.ts')
+      return listMatches(rows, text, limit, firearmKeys)
+    },
+    [rows],
+  )
+  const chosen = rows.find((r) => r.id === firearm)
+  return (
+    <>
+      <RecordSearch<FirearmRow>
+        size={controlSize.row.input}
+        chevron
+        label={t('Firearm from your library')}
+        picked={!!chosen}
+        chosen={chosen?.name ?? placeholder}
+        describe={(f) => f.name}
+        onSelect={(f) => chooseFirearm(f.id)}
+        noneText={t('No firearm found')}
+        unreachableText={t(notReached)}
+        find={find}
+        browse={{
+          label: t('Browse firearms'),
+          onOpen: (typed) => {
+            readDesigns()
+            dialog.open(typed)
+          },
+        }}
+        clear={{ label: t('Clear the firearm'), onClear: () => chooseFirearm(null) }}
+      />
+      <FirearmChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        catalogue={rows}
+        add={firearms.length === 0}
+        system={system}
+        onChoose={(f) => {
+          chooseFirearm(f.id)
+          dialog.close()
+        }}
+      />
+    </>
+  )
+}
+
 /** A card's record picker, its heading: the chosen record shows in the field. */
 function CardPicker({ panel }: { panel: InputPanel }) {
-  const { chooseFirearm, firearm, firearms, readDesigns } = useLoad()
   const names = useManufacturerNames()
-  const { t } = useTranslation()
   if (panel === 'cartridge') return <CartridgePicker />
   if (panel === 'bullet') return <BulletPicker />
   if (panel === 'powder') return <PowderPicker names={names} />
-  const { data, placeholder } = gunPicker(firearms, loadExample.firearm, t)
-  return (
-    <Select
-      size={controlSize.row.input}
-      aria-label={t('Firearm from your library')}
-      placeholder={placeholder}
-      searchable
-      clearable
-      data={data}
-      value={firearm ?? null}
-      onChange={chooseFirearm}
-      onDropdownOpen={readDesigns}
-      nothingFoundMessage={t('No firearm found')}
-    />
-  )
+  return <GunPicker />
 }
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */

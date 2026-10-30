@@ -118,8 +118,8 @@ export interface ChooserTexts {
  */
 export interface ChooserKind<R extends ChooserRow> {
   texts: ChooserTexts
-  /** The whole catalogue, read once per page load. */
-  load: () => Promise<R[]>
+  /** The whole catalogue, read once per page load; without it the page gives the rows (`catalogue`). */
+  load?: () => Promise<R[]>
   selects: readonly ChooserSelect<R>[]
   /** The first is the default. */
   sorts: readonly { value: string; label: Message }[]
@@ -127,19 +127,22 @@ export interface ChooserKind<R extends ChooserRow> {
   search: (rows: readonly R[], query: string, sort: string) => R[]
   columns: readonly ChooserColumn<R>[]
   facts: (row: R, system: UnitSystem, t: Translator['t']) => [Message, string | undefined][]
-  /** The page of a catalogue record. */
-  href: (row: R) => string
+  /** The page of a catalogue record, if it has one. */
+  href?: (row: R) => string | undefined
 }
 
-type Catalogue<R> = { status: 'loading' } | { status: 'ok'; rows: R[] } | { status: 'error' }
+type Catalogue<R> =
+  | { status: 'loading' }
+  | { status: 'ok'; rows: readonly R[] }
+  | { status: 'error' }
 
 /** The catalogue is read when the dialog first opens, again after Retry. */
-function useCatalogue<R>(opened: boolean, load: () => Promise<R[]>) {
+function useCatalogue<R>(opened: boolean, load: (() => Promise<R[]>) | undefined) {
   const [state, setState] = useState<Catalogue<R>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new attempt reads it again
   useEffect(() => {
-    if (!opened || state.status === 'ok') return
+    if (!opened || !load || state.status === 'ok') return
     let live = true
     setState({ status: 'loading' })
     load().then(
@@ -285,7 +288,8 @@ function Results<R extends ChooserRow>({
  * whole catalogue and the browser's own designs, filters, a result list and a preview of the
  * highlighted record. The search box keeps the focus: arrow keys highlight, Enter or a click
  * chooses. `filters` and `chips` hold a kind's own filters, which `kind.search` reads; `count` is
- * how many of them are set.
+ * how many of them are set. `catalogue` gives the rows of a kind without `load`, such as the
+ * user's firearms.
  */
 export function RecordChooser<R extends ChooserRow>({
   kind,
@@ -298,6 +302,7 @@ export function RecordChooser<R extends ChooserRow>({
   filters,
   count = 0,
   chips,
+  catalogue: given,
 }: {
   kind: ChooserKind<R>
   opened: boolean
@@ -311,10 +316,15 @@ export function RecordChooser<R extends ChooserRow>({
   filters?: ReactNode
   count?: number
   chips?: ReactNode
+  catalogue?: readonly R[]
 }) {
   const { t } = useTranslation()
   const { texts } = kind
-  const { state, retry } = useCatalogue(opened, kind.load)
+  const read = useCatalogue(opened, kind.load)
+  const state = useMemo<Catalogue<R>>(
+    () => (given ? { status: 'ok', rows: given } : read.state),
+    [given, read.state],
+  )
   const phone = useMediaQuery('(max-width: 47.99em)')
   const [query, setQuery] = useState('')
   const [picked, setPicked] = useState<readonly string[]>([])
@@ -467,7 +477,7 @@ export function RecordChooser<R extends ChooserRow>({
         <div className="bd-body">
           <Results
             status={state.status}
-            retry={retry}
+            retry={read.retry}
             shown={shown}
             kind={kind}
             id={id}
@@ -493,6 +503,7 @@ function Preview<R extends ChooserRow>({
   system: UnitSystem
 }) {
   const { t } = useTranslation()
+  const href = row.origin ? undefined : kind.href?.(row)
   return (
     <aside className="bd-preview" aria-label={t(kind.texts.preview)}>
       <p className="bd-preview-title">{row.name}</p>
@@ -504,8 +515,8 @@ function Preview<R extends ChooserRow>({
           </div>
         ))}
       </dl>
-      {!row.origin && (
-        <Link href={kind.href(row)} target="_blank" rel="noopener">
+      {href && (
+        <Link href={href} target="_blank" rel="noopener">
           {t('Open the record')}
           <span className="visually-hidden"> {t('in a new tab')}</span>
         </Link>

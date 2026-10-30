@@ -17,6 +17,7 @@ import {
   type Tagged,
 } from '@open-reloading/drawing/seating'
 import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
+import dynamic from 'next/dynamic'
 import {
   type Dispatch,
   type ReactNode,
@@ -52,6 +53,7 @@ import type { LandsContact } from '../lib/firearm.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
+import type { CaseRow } from '../lib/record-choosers.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
 import {
   type ChargeFill,
@@ -76,7 +78,7 @@ import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
-import { RecordSearch } from './record-search.tsx'
+import { RecordSearch, useChooser } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { RecordSourcesLink } from './sources.tsx'
@@ -94,6 +96,11 @@ type Load<T> =
 type Mode = 'overallLength' | 'baseToOgive'
 
 type T = Translator['t']
+
+// in the module of every chooser, so their shared dialog is one chunk
+const CaseChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.CaseChooser), {
+  ssr: false,
+})
 
 const modeHelp = {
   overallLength: msg('Cartridge overall length.'),
@@ -1276,44 +1283,85 @@ function BulletStatus({ m }: { m: Model }) {
   )
 }
 
-/** The case products of the cartridge: choosing one makes its stated capacity the default. */
+/**
+ * The brass of the cartridge in the field and the dialog: the user's groups of cases (an id with
+ * `user:`) and the case products. Choosing a product makes its stated capacity the default.
+ */
 function CaseChoice({ m }: { m: Model }) {
   const { t } = useTranslation()
+  const dialog = useChooser()
   const { caseList, names } = m
-  const items = caseList.status === 'ok' ? caseList.value.items : []
-  const own = m.p.ownCases ?? []
+  const own = m.p.ownCases
   const ownId = m.p.ownCaseId
-  if (items.length === 0 && own.length === 0 && !ownId) return null
-  const ownItems = [
-    ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c, t) })),
-    // a load names a group this browser does not have
-    ...(ownId && !own.some((c) => c.id === ownId)
-      ? [{ value: `user:${ownId}`, label: t('A brass group not in this browser') }]
-      : []),
-  ]
+  const rows = useMemo((): CaseRow[] => {
+    const items = caseList.status === 'ok' ? caseList.value.items : []
+    return [
+      ...(own ?? []).map((c) => ({
+        id: `user:${c.id}`,
+        name: c.name,
+        manufacturerName: t('Your brass'),
+        waterCapacity: c.grams,
+      })),
+      ...items.map((c) => ({
+        id: c.id,
+        name: c.name,
+        manufacturerName: refName(names, c.manufacturer) || c.manufacturer,
+        material: c.material,
+        waterCapacity: c.waterCapacity,
+      })),
+    ]
+  }, [caseList, own, names, t])
+  const find = useMemo(
+    () => async (text: string, limit: number) => {
+      const { caseKeys, listMatches } = await import('../lib/record-choosers.ts')
+      return listMatches(rows, text, limit, caseKeys)
+    },
+    [rows],
+  )
+  if (rows.length === 0 && !ownId) return null
+  const ownCase = own?.find((c) => c.id === ownId)
+  const choose = (id: string) => {
+    if (id.startsWith('user:')) m.p.onOwnCaseId?.(id.slice('user:'.length))
+    else m.setCaseId(id)
+  }
+  const chosen = ownId
+    ? ownCase
+      ? ownCaseText(ownCase, t)
+      : // a load names a group this browser does not have
+        t('A brass group not in this browser')
+    : m.chosenCase && caseText(m.chosenCase, names, t)
   return (
-    <NativeSelect
-      {...rowSize(m)}
-      label={t('Brass record')}
-      value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
-      onChange={(e) => {
-        const v = e.currentTarget.value
-        if (v.startsWith('user:')) m.p.onOwnCaseId?.(v.slice('user:'.length))
-        else m.setCaseId(v || undefined)
-      }}
-      data={[
-        { value: '', label: t('None') },
-        ...(ownItems.length > 0 ? [{ group: t('Your brass'), items: ownItems }] : []),
-        ...(items.length > 0
-          ? [
-              {
-                group: t('Products'),
-                items: items.map((c) => ({ value: c.id, label: caseText(c, names, t) })),
-              },
-            ]
-          : []),
-      ]}
-    />
+    <>
+      <RecordSearch<CaseRow>
+        {...rowSize(m)}
+        chevron
+        label={t('Brass record')}
+        picked={!!chosen}
+        chosen={chosen || t('Search brass (optional)')}
+        describe={(c) =>
+          c.id.startsWith('user:')
+            ? t('{name} (your brass)', { name: c.name })
+            : `${c.manufacturerName} ${c.name}`.trim()
+        }
+        onSelect={(c) => choose(c.id)}
+        noneText={t('No brass found')}
+        unreachableText={t(notReached)}
+        find={find}
+        browse={{ label: t('Browse brass'), onOpen: dialog.open }}
+        clear={{ label: t('Clear the brass record'), onClear: () => m.setCaseId(undefined) }}
+      />
+      <CaseChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        catalogue={rows}
+        system={m.system}
+        onChoose={(c) => {
+          choose(c.id)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }
 

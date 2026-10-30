@@ -284,18 +284,34 @@ export const gunValues = (f: Firearm) => ({
   lands: landsOf(f),
 })
 
+/** A firearm of the Gun chooser: its name, barrel length and twist (m). */
+export interface FirearmRow {
+  id: string
+  name: string
+  barrelLength?: number | undefined
+  twist?: number | undefined
+}
+
+const firearmRow = (id: string, name: string, f: Firearm): FirearmRow => ({
+  id,
+  name,
+  barrelLength: siOf('length', f.barrelLength),
+  twist: siOf('length', f.twist),
+})
+
 /**
  * The workbench's Gun picker: the browser's firearms, then the built-in example rifle, which is
  * never stored, so a fresh browser still has one to choose.
  */
 export const gunPicker = (
-  stored: readonly { id: string; name: string }[],
-  example: { id: string; name: string },
+  stored: readonly { id: string; name: string; data: Firearm }[],
+  example: { id: string; name: string; data: Record<string, unknown> },
   t: Translator['t'],
 ) => ({
-  data: [
-    ...stored.map((f) => ({ value: f.id, label: f.name })),
-    { value: example.id, label: t('{name} (example)', { name: example.name }) },
+  rows: [
+    ...stored.map((f) => firearmRow(f.id, f.name, f.data)),
+    // the example rifle's data is a firearm (`example-data.ts`)
+    firearmRow(example.id, t('{name} (example)', { name: example.name }), example.data as Firearm),
   ],
   placeholder: stored.length
     ? t('Choose a firearm')

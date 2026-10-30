@@ -2,6 +2,7 @@
 
 import {
   ActionIcon,
+  CloseButton,
   Combobox,
   Group,
   Loader,
@@ -15,6 +16,11 @@ import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { ListOf } from '../lib/api-types.ts'
+
+type ApiKind = 'bullets' | 'cartridges' | 'powders'
+
+/** The matches of a list in the browser, 20 at most with the total. */
+type Find<T> = (text: string, limit: number) => Promise<ListOf<T>>
 
 type State<T> =
   | { status: 'idle' }
@@ -39,13 +45,15 @@ export async function searchRecords<T>(
 
 /** The matches of the typed text: from `find`, else the API; a first key that finds nothing stays quiet. */
 async function matches<T>(
-  kind: 'bullets' | 'cartridges' | 'powders',
+  kind: ApiKind | undefined,
   text: string,
   params: string,
-  find: ((text: string, limit: number) => Promise<ListOf<T>>) | undefined,
+  find: Find<T> | undefined,
   signal: AbortSignal,
 ): Promise<State<T>> {
-  const body = await (find?.(text, 20) ?? searchRecords<T>(kind, text, 20, params, signal))
+  // the props give `kind` whenever they give no `find`
+  const body = await (find?.(text, 20) ??
+    searchRecords<T>(kind as ApiKind, text, 20, params, signal))
   if (text.length < 2 && body.items.length === 0) return { status: 'idle' }
   return { status: 'ok', items: body.items, total: body.total }
 }
@@ -67,16 +75,18 @@ function statusLine<T>(
     : t('{total} found', { total: state.total })
 }
 
-/** The end of the field: the browse button, else the loader, else the select's chevron. */
+/** The end of the field: the clear and browse buttons, else the loader, else the select's chevron. */
 function endSection({
   loading,
   browse,
+  clear,
   chevron,
   size,
   onBrowse,
 }: {
   loading: boolean
   browse: { label: string } | undefined
+  clear: { label: string; onClear: () => void } | undefined
   chevron: boolean
   size: TextInputProps['size']
   onBrowse: () => void
@@ -85,6 +95,7 @@ function endSection({
     return (
       <Group gap={4} wrap="nowrap">
         {loading && <Loader size="xs" />}
+        {clear && <CloseButton size="sm" aria-label={clear.label} onClick={clear.onClear} />}
         <ActionIcon
           variant="subtle"
           size={size === 'xs' ? 'input-xs' : 'input-sm'}
@@ -119,9 +130,9 @@ export function RecordSearch<T extends { id: string }>({
   size,
   chevron = false,
   browse,
+  clear,
   find,
 }: {
-  kind: 'bullets' | 'cartridges' | 'powders'
   label: string
   describe: (item: T) => string
   onSelect: (item: T) => void
@@ -145,9 +156,13 @@ export function RecordSearch<T extends { id: string }>({
   chevron?: boolean
   /** A button at the end of the field that opens a browsing dialog with the typed text. */
   browse?: { label: string; onOpen: (typed: string) => void }
-  /** The matches of the typed text, 20 at most with the total, in place of the API search. */
-  find?: (text: string, limit: number) => Promise<ListOf<T>>
-}) {
+  /** A button beside `browse` that clears the choice, shown while `picked`. */
+  clear?: { label: string; onClear: () => void } | undefined
+} & (
+  | { kind: ApiKind; find?: Find<T> }
+  /** The matches of the typed text in place of the API search. */
+  | { kind?: undefined; find: Find<T> }
+)) {
   const { t } = useTranslation()
   const [q, setQ] = useState('')
   const [state, setState] = useState<State<T>>({ status: 'idle' })
@@ -218,6 +233,7 @@ export function RecordSearch<T extends { id: string }>({
             rightSection={endSection({
               loading: state.status === 'loading',
               browse,
+              clear: picked ? clear : undefined,
               chevron,
               size,
               onBrowse: () => {
@@ -268,4 +284,24 @@ export function RecordSearch<T extends { id: string }>({
       </p>
     </div>
   )
+}
+
+/**
+ * A picker's chooser dialog: opened with the field's text, the focus back on its opener when it
+ * closes, since a dialog opened before its code has loaded mounts open and cannot return it itself.
+ */
+export function useChooser() {
+  const [dialog, setDialog] = useState({ text: '', opened: false })
+  const opener = useRef<HTMLElement | null>(null)
+  return {
+    ...dialog,
+    open: (text: string) => {
+      opener.current = document.activeElement as HTMLElement | null
+      setDialog({ text, opened: true })
+    },
+    close: () => {
+      setDialog((d) => ({ ...d, opened: false }))
+      setTimeout(() => opener.current?.focus())
+    },
+  }
 }

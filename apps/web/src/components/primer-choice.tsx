@@ -1,71 +1,99 @@
 'use client'
 
-import { NativeSelect } from '@mantine/core'
-import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { apiFetch } from '../lib/api-fetch.ts'
-import type { PrimerSummary } from '../lib/api-types.ts'
 import { productLabel } from '../lib/manufacturers.ts'
+import type { PrimerRow } from '../lib/primer-rows.ts'
 import { titleFromKebab } from '../lib/record-fields.ts'
 import { controlSize } from '../lib/theme.ts'
+import type { UnitSystem } from '../lib/units.ts'
+import { RecordSearch, useChooser } from './record-search.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+import { notReached } from './workbench-outcome.ts'
+
+const PrimerChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PrimerChooser), {
+  ssr: false,
+})
 
 /**
- * The primer picker of the workbench's pinned row: every primer product of the catalogue, the load names the
- * chosen one. `id` is the chosen primer's record id; one the list lacks stays chosen under a
- * generic label, so a saved reference is never dropped.
+ * The primer picker of the workbench's pinned row: every primer product of the catalogue in the
+ * field and the dialog, the load names the chosen one. `id` is the chosen primer's record id; one
+ * the list lacks stays chosen under a generic label, so a saved reference is never dropped.
  */
 export function PrimerChoice({
   id,
   onChange,
+  system,
 }: {
   id: string | undefined
   onChange: (id: string | undefined) => void
+  system: UnitSystem
 }) {
   const { t } = useTranslation()
   const names = useManufacturerNames()
-  const [items, setItems] = useState<PrimerSummary[]>()
+  const dialog = useChooser()
+  const [items, setItems] = useState<PrimerRow[]>()
   const [failed, setFailed] = useState(false)
   useEffect(() => {
-    const controller = new AbortController()
-    const { signal } = controller
-    const all: PrimerSummary[] = []
-    const page = async (offset: number): Promise<void> => {
-      const query = new URLSearchParams({ limit: '200', offset: String(offset) })
-      const res = await apiFetch(`primers?${query}`, { signal })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const body = (await res.json()) as { items: PrimerSummary[]; total: number }
-      all.push(...body.items)
-      if (all.length < body.total && body.items.length > 0) return page(all.length)
+    let live = true
+    import('../lib/record-choosers.ts')
+      .then((m) => m.fetchPrimerCatalogue())
+      .then(
+        (rows) => live && setItems(rows),
+        () => live && setFailed(true),
+      )
+    return () => {
+      live = false
     }
-    page(0)
-      .then(() => {
-        if (!signal.aborted) setItems(all)
-      })
-      .catch(() => {
-        if (!signal.aborted) setFailed(true)
-      })
-    return () => controller.abort()
   }, [])
+  const find = useMemo(
+    () => async (text: string, limit: number) => {
+      const { listMatches, primerKeys } = await import('../lib/record-choosers.ts')
+      return listMatches(items ?? [], text, limit, primerKeys)
+    },
+    [items],
+  )
   const listed = items ?? []
   if (listed.length === 0 && !id) return null
+  const describe = (p: PrimerRow) =>
+    `${productLabel(p, names)}, ${titleFromKebab(p.size).toLowerCase()}`
+  const chosen = listed.find((p) => p.id === id)
   const unlisted = items === undefined ? t('Loading') : t('A primer not in the catalogue')
   return (
-    <NativeSelect
-      size={controlSize.row.input}
-      label={t('Primer')}
-      value={id ?? ''}
-      onChange={(e) => onChange(e.currentTarget.value || undefined)}
-      data={[
-        { value: '', label: t('None') },
-        ...(id && !listed.some((p) => p.id === id)
-          ? [{ value: id, label: failed ? t('A primer (catalogue unavailable)') : unlisted }]
-          : []),
-        ...listed.map((p) => ({
-          value: p.id,
-          label: `${productLabel(p, names)}, ${titleFromKebab(p.size).toLowerCase()}`,
-        })),
-      ]}
-    />
+    <>
+      <RecordSearch<PrimerRow>
+        size={controlSize.row.input}
+        chevron
+        label={t('Primer')}
+        picked={!!id}
+        chosen={
+          chosen
+            ? describe(chosen)
+            : id
+              ? failed
+                ? t('A primer (catalogue unavailable)')
+                : unlisted
+              : t('Search primers (optional)')
+        }
+        describe={describe}
+        onSelect={(p) => onChange(p.id)}
+        noneText={t('No primer found')}
+        unreachableText={t(notReached)}
+        find={find}
+        browse={{ label: t('Browse primers'), onOpen: dialog.open }}
+        clear={{ label: t('Clear the primer'), onClear: () => onChange(undefined) }}
+      />
+      <PrimerChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        system={system}
+        onChoose={(p) => {
+          onChange(p.id)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }

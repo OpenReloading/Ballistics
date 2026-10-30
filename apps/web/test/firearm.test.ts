@@ -491,24 +491,34 @@ describe('withSessionRounds', () => {
 describe('gunPicker', () => {
   const english = translator().t
   const example = loadExample.firearm
-  const marked = { value: example.id, label: 'Example rifle, 308 Win. (example)' }
+  const names = (rows: { name: string }[]) => rows.map((r) => r.name)
   it('offers the example rifle on a fresh browser and says what to do', () => {
-    expect(gunPicker([], example, english)).toEqual({
-      data: [marked],
-      placeholder: 'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
-    })
+    const picker = gunPicker([], example, english)
+    expect(names(picker.rows)).toEqual(['Example rifle, 308 Win. (example)'])
+    // its barrel and twist in m for the chooser's columns
+    expect(picker.rows[0]?.barrelLength).toBeGreaterThan(0)
+    expect(picker.rows[0]?.twist).toBeGreaterThan(0)
+    expect(picker.placeholder).toBe(
+      'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
+    )
     const german = gunPicker([], example, translator(de as Catalogue, 'de').t)
     expect(german.placeholder).toBe(
       'Noch keine Schusswaffe gespeichert. Wählen Sie das Beispielgewehr oder fügen Sie Ihre unter Schusswaffen hinzu.',
     )
-    expect(german.data[0]?.label).toBe('Example rifle, 308 Win. (Beispiel)')
+    expect(german.rows[0]?.name).toBe('Example rifle, 308 Win. (Beispiel)')
   })
 
   it('lists the stored firearms first, the example after them', () => {
-    expect(gunPicker([{ id: 'own', name: 'My rifle' }], example, english)).toEqual({
-      data: [{ value: 'own', label: 'My rifle' }, marked],
-      placeholder: 'Choose a firearm',
+    const own = { id: 'own', name: 'My rifle', data: { ...blankFirearm(), name: 'My rifle' } }
+    const picker = gunPicker([own], example, english)
+    expect(picker.rows.map((r) => r.id)).toEqual(['own', example.id])
+    expect(picker.rows[0]).toEqual({
+      id: 'own',
+      name: 'My rifle',
+      barrelLength: undefined,
+      twist: undefined,
     })
+    expect(picker.placeholder).toBe('Choose a firearm')
   })
 })
 

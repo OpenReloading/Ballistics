@@ -45,7 +45,8 @@ test('a primer chosen above the cards is saved with the load and chosen again on
   })
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const primer = page.getByRole('combobox', { name: 'Primer' })
-  await primer.selectOption({ label: 'Demo Primers Large Rifle Demo, large rifle' })
+  await primer.click()
+  await page.getByRole('option', { name: 'Demo Primers Large Rifle Demo, large rifle' }).click()
   await (await barButton(page, 'Save')).click()
   await expect
     .poll(async () => (await storedLoads(page)).map((r) => r.data.primer))
@@ -56,7 +57,8 @@ test('a primer chosen above the cards is saved with the load and chosen again on
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
   await page.getByRole('button', { name, exact: true }).click()
-  await expect(page.getByRole('combobox', { name: 'Primer' })).toHaveValue(
-    'demo-primer-large-rifle',
+  await expect(page.getByRole('combobox', { name: 'Primer' })).toHaveAttribute(
+    'placeholder',
+    'Demo Primers Large Rifle Demo, large rifle',
   )
 })

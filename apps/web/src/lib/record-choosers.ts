@@ -1,14 +1,16 @@
 /**
- * The powder and cartridge choosers' catalogues and ranking: every summary read once per page
+ * The record choosers' catalogues and ranking: every summary read once per page
  * load, ranked as the API's `q` ranks them (`score` of the schema over a key built like the
  * catalogue's), so the dialog finds what the card's field finds.
  */
-import { compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
+import { type CaseMaterial, compareKeys, score, searchKey, sortKey } from '@open-reloading/schema'
 import { apiFetch } from './api-fetch.ts'
-import type { CartridgeSummary, ListOf, PowderSummary } from './api-types.ts'
+import type { CartridgeSummary, ListOf, PowderSummary, PrimerSummary } from './api-types.ts'
 import { orderPowders, type PowderRow } from './burn-rate.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
+import type { FirearmRow } from './firearm.ts'
 import { fetchManufacturers } from './manufacturers.ts'
+import type { PrimerRow } from './primer-rows.ts'
 
 /** Every summary of the list `kind`, in pages of 200 (the route's limit; the pages after the first together). */
 async function listAll<T>(kind: string): Promise<T[]> {
@@ -36,24 +38,41 @@ function once<T>(read: () => Promise<T>): () => Promise<T> {
   }
 }
 
-/** Every catalogue powder with its manufacturer's name and aliases and its burn-rate order. */
-export const fetchPowderCatalogue = once(async () => {
-  const [makers, powders] = await Promise.all([
-    fetchManufacturers(),
-    listAll<PowderSummary>('powders'),
-  ])
+/** Every summary of the list `kind` with its manufacturer's name and aliases. */
+async function listWithMakers<T extends { manufacturer: string }>(kind: string) {
+  const [makers, items] = await Promise.all([fetchManufacturers(), listAll<T>(kind)])
   const byId = new Map(makers.map((m) => [m.id, m]))
-  return orderPowders(
-    powders.map((p) => {
-      const m = byId.get(p.manufacturer)
-      return {
-        ...p,
-        manufacturerName: m?.name ?? '',
-        ...(m?.aliases?.length ? { manufacturerAliases: m.aliases } : {}),
-      }
-    }),
-  )
-})
+  return items.map((p) => {
+    const m = byId.get(p.manufacturer)
+    return {
+      ...p,
+      manufacturerName: m?.name ?? '',
+      ...(m?.aliases?.length ? { manufacturerAliases: m.aliases } : {}),
+    }
+  })
+}
+
+/** Every catalogue powder with its manufacturer's name and aliases and its burn-rate order. */
+export const fetchPowderCatalogue = once(async () =>
+  orderPowders(await listWithMakers<PowderSummary>('powders')),
+)
+
+/** Every catalogue primer. */
+export const fetchPrimerCatalogue = once(
+  (): Promise<PrimerRow[]> => listWithMakers<PrimerSummary>('primers'),
+)
+
+/**
+ * A brass choice of the cartridge: a case record, or a group of the user's cases (an id with
+ * `user:`). `waterCapacity` is the stated water, g, or the group's measured one.
+ */
+export interface CaseRow {
+  id: string
+  name: string
+  manufacturerName: string
+  material?: CaseMaterial | undefined
+  waterCapacity?: number | undefined
+}
 
 /** Every catalogue cartridge. */
 export const fetchCartridgeCatalogue = once(() => listAll<CartridgeSummary>('cartridges'))
@@ -88,6 +107,27 @@ export const powderKeys = (p: PowderRow): Entry => ({
 export const cartridgeKeys = (c: CartridgeRow): Entry => ({
   key: searchKey([c.name, ...c.aliases]),
   order: sortKey(c.name),
+})
+
+/** A primer's keys: each name of its manufacturer with the product name, as the catalogue's. */
+export const primerKeys = (p: PrimerRow): Entry => ({
+  key: searchKey(
+    [p.manufacturerName, ...(p.manufacturerAliases ?? [])].map((n) => `${n} ${p.name}`.trim()),
+    p.name,
+  ),
+  order: sortKey(p.manufacturerName, p.name),
+})
+
+/** A brass choice's keys: its maker (or the user's brass) with its name. */
+export const caseKeys = (c: CaseRow): Entry => ({
+  key: searchKey([`${c.manufacturerName} ${c.name}`.trim()], c.name),
+  order: sortKey(c.manufacturerName, c.name),
+})
+
+/** A firearm's keys: its name. */
+export const firearmKeys = (f: FirearmRow): Entry => ({
+  key: searchKey([f.name]),
+  order: sortKey(f.name),
 })
 
 /** Larger values first, rows without a value last; undefined for equal values. */
@@ -125,4 +165,15 @@ export function rankRecords<R extends { id: string; origin?: 'user' | undefined 
       )
     })
     .map((s) => s.r)
+}
+
+/** The card field's matches: the first `limit` rows the dialog's best match order gives, and their number. */
+export function listMatches<R extends { id: string }>(
+  rows: readonly R[],
+  text: string,
+  limit: number,
+  keys: (row: R) => Entry,
+): ListOf<R> {
+  const found = rankRecords(rows, text, keys, 'relevance')
+  return { items: found.slice(0, limit), total: found.length }
 }
