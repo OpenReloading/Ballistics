@@ -22,6 +22,7 @@ import {
   idParams,
   listQuery,
   missing,
+  noQuery,
   originated,
   page,
   recordIdPattern,
@@ -158,6 +159,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
   app.get(
     '/manufacturers',
     {
+      schema: { querystring: noQuery },
       config: {
         response: manufacturerList,
         summary: 'List manufacturers',

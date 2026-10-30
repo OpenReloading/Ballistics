@@ -54,7 +54,7 @@ describe('buildOpenApi', () => {
   it('documents the statuses each route answers, errors with the shared body', () => {
     const statuses = (path: string, method: string) =>
       Object.keys(d.paths[path]?.[method]?.responses ?? {})
-    expect(statuses('/v1/target-faces', 'get')).toEqual(['200', '500'])
+    expect(statuses('/v1/target-faces', 'get')).toEqual(['200', '400', '500'])
     expect(statuses('/v1/cartridges', 'get')).toEqual(['200', '400', '500'])
     expect(statuses('/v1/bullets/{id}', 'get')).toEqual(['200', '308', '400', '404', '414', '500'])
     expect(d.paths['/v1/bullets/{id}']?.get?.responses['308']?.headers).toHaveProperty('Location')

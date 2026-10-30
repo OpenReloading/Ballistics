@@ -41,7 +41,21 @@ export function buildApp({
   ...options
 }: AppOptions): FastifyInstance {
   // a client that sends its request slower than this gets a 408 and its socket closed
-  const app = Fastify({ requestTimeout: 30_000, ...options })
+  const app = Fastify({
+    requestTimeout: 30_000,
+    // a query key no schema declares is refused (400), not dropped as Fastify's Ajv defaults do
+    ajv: { customOptions: { removeAdditional: false } },
+    schemaErrorFormatter: (errors, dataVar) =>
+      new Error(
+        errors
+          .map(
+            (e) =>
+              `${dataVar}${e.instancePath} ${e.message}${e.keyword === 'additionalProperties' ? `: ${e.params.additionalProperty}` : ''}`,
+          )
+          .join(', '),
+      ),
+    ...options,
+  })
   if (onRoute) app.addHook('onRoute', onRoute)
   // While closing, a keep-alive connection whose response was in flight closes after that
   // response instead of staying open for keepAliveTimeout (Fastify default 72 s)
