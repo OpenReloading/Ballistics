@@ -34,16 +34,20 @@ function readQuoted(text: string, from: number): { cell: string; next: number } 
   return { cell, next: i }
 }
 
+const spaceOrTab = /^[ \t]$/
+
 const isBlank = (row: string[]) => row.every((x) => x.trim() === '')
 
 /**
- * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may span lines); blank rows are left out.
+ * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may follow spaces and span lines); blank rows are left out.
  * Cells past `maxColumn + 1` in a row are dropped and splitting stops past `maxCells` cells, enough for the size refusal.
  */
 function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   const rows: string[][] = []
   let row: string[] = []
   let cell = ''
+  // Whether `cell` holds only spaces and tabs, kept as it grows so a quote does not rescan it.
+  let blank = true
   let cells = 0
   let droppedFilled = false
   let i = 0
@@ -51,6 +55,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
     if (row.length <= maxColumn) row.push(cell)
     else if (cell.trim() !== '') droppedFilled = true
     cell = ''
+    blank = true
   }
   const endRow = () => {
     endCell()
@@ -63,9 +68,10 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   }
   while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)
-    if (c === '"' && cell === '') {
+    if (c === '"' && blank) {
       const q = readQuoted(text, i + 1)
       cell = q.cell
+      blank = /^[ \t]*$/.test(cell)
       i = q.next
     } else if (c === delimiter) {
       endCell()
@@ -75,6 +81,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
       i += c === '\r' && text.charAt(i + 1) === '\n' ? 2 : 1
     } else {
       cell += c
+      blank &&= spaceOrTab.test(c)
       i++
     }
   }
@@ -85,11 +92,12 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
 /**
  * The delimiter that gives the most rows as wide as the first, which must be two cells or more
  * and repeat in a second row; none when no delimiter makes a table.
+ * Tab is tried first and wins a tie, as cell text holds commas far more often than tabs.
  */
 function detectDelimiter(text: string): TableDelimiter | undefined {
   const sample = text.slice(0, 20_000)
   let best: { d: TableDelimiter; score: number } | undefined
-  for (const d of [',', ';', '\t'] as const) {
+  for (const d of ['\t', ',', ';'] as const) {
     const rows = splitRows(sample, d).slice(0, 30)
     const width = rows[0]?.length ?? 0
     const same = rows.filter((r) => r.length === width).length
@@ -174,7 +182,8 @@ function tableOfObjects(list: unknown): TableRead | undefined {
  * The table of a text: a JSON list of objects, or delimited text (comma, semicolon or tab) with
  * two or more rows of equal width. Otherwise the refusal names the cause and one action.
  */
-export function readTable(text: string): TableRead {
+export function readTable(raw: string): TableRead {
+  const text = raw.replace(/^\uFEFF/, '')
   if (/^\s*[[{]/.test(text)) {
     let json: unknown
     try {

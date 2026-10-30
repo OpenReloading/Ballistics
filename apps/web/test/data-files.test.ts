@@ -63,6 +63,7 @@ it('stores two files and reports their records once', async () => {
   expect(report?.said(english)).toEqual({
     summary: '2 records added, 0 already in this browser, 0 files skipped.',
     invalid: '1 invalid record restored.',
+    held: '',
     conflicts: '',
   })
 })
@@ -98,6 +99,7 @@ it('says the conflicts and the invalid records left out in the plural', async ()
     summary: '0 records added, 0 already in this browser, 0 files skipped.',
     invalid:
       '0 invalid records restored, 1 left out because a browser record has their id, 1 left out without a text id.',
+    held: '',
     conflicts:
       '2 records have the id of a browser record with other content: A, B. Replace the browser copies?',
   })

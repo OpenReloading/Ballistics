@@ -189,7 +189,9 @@ it('applies two changes to the stored record in one transaction, so neither is l
   const stored = session(await storedRecord(context.id))
   expect(nth(stored.data.strings, 0).shots.map((x) => x.velocity.value)).toEqual([850, 851])
   // a change that throws leaves the record as it was
-  await expect(updateRecord(context.id, setExcluded(context, main, 9, true))).rejects.toThrow()
+  await expect(updateRecord(context.id, setExcluded(context, main, 9, true))).rejects.toThrow(
+    'No such shot.',
+  )
   const same = session(await storedRecord(context.id))
   expect(nth(same.data.strings, 0).shots).toHaveLength(2)
 })

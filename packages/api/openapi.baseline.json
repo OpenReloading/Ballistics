@@ -40,7 +40,7 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 100,
-              "pattern": "^[^\\u0000]*$"
+              "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
             }
           },
           {
@@ -190,7 +190,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -988,7 +988,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1072,6 +1072,16 @@
                   },
                   "required": ["total", "items"],
                   "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -1284,7 +1294,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1342,7 +1352,7 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 100,
-              "pattern": "^[^\\u0000]*$"
+              "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
             }
           },
           {
@@ -1456,7 +1466,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2002,7 +2012,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2060,7 +2070,7 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 100,
-              "pattern": "^[^\\u0000]*$"
+              "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
             }
           },
           {
@@ -2181,7 +2191,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2585,7 +2595,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2710,7 +2720,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3238,7 +3248,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4368,7 +4378,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5983,7 +5993,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7307,7 +7317,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7939,7 +7949,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9683,7 +9693,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10628,6 +10638,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -10862,7 +10882,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -12704,7 +12724,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -14531,7 +14551,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -16823,7 +16843,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -23914,6 +23934,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -24108,7 +24138,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -24166,7 +24196,7 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 100,
-              "pattern": "^[^\\u0000]*$"
+              "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
             }
           },
           {
@@ -24345,7 +24375,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -25056,7 +25086,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -25114,7 +25144,7 @@
               "type": "string",
               "minLength": 1,
               "maxLength": 100,
-              "pattern": "^[^\\u0000]*$"
+              "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]*$"
             }
           },
           {
@@ -25240,7 +25270,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -25524,7 +25554,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -25639,6 +25669,16 @@
                   },
                   "required": ["total", "items"],
                   "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -26188,7 +26228,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -26312,7 +26352,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {
@@ -26593,7 +26633,7 @@
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
             "content": {
               "application/json": {
                 "schema": {

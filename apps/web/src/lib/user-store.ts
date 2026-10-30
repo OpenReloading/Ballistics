@@ -76,20 +76,31 @@ export async function putRecordIf(record: UserRecord, base: string | undefined) 
  * Replaces the stored record `id` by what `change` makes of it (the stored value as written,
  * unvalidated, undefined when absent), read and written in one transaction: two tabs changing one
  * record never lose each other's change. `change` returns undefined to leave the record as it is.
- * Resolves with the record written, undefined when `change` left it.
+ * Resolves with the record written, undefined when `change` left it; rejects with what `change`
+ * throws, the record left as it was.
  */
 export async function updateRecord(
   id: string,
   change: (stored: unknown) => UserRecord | undefined,
 ) {
   let written: UserRecord | undefined
+  let thrown: { error: unknown } | undefined
   await inStore('records', 'readwrite', (s) => {
     const r = s.get(id)
     r.addEventListener('success', () => {
-      written = change(r.result)
+      // a throw out of the listener would abort with an AbortError and lose the caller's error
+      try {
+        written = change(r.result)
+      } catch (error) {
+        thrown = { error }
+        s.transaction.abort()
+        return
+      }
       if (written) s.put(written)
     })
     return r
+  }).catch((e) => {
+    throw thrown ? thrown.error : e
   })
   return written
 }

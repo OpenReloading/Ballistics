@@ -3019,6 +3019,10 @@
   },
   "{count} left out because a browser record has their id": "{count} ausgelassen, weil ein Browserdatensatz ihre ID hat",
   "{count} left out without a text id": "{count} ausgelassen ohne Text-ID",
+  "{count} record not imported because an invalid browser record has its id: {names}. Download it raw and delete it under Open, Invalid records, then import again.|{count} records not imported because invalid browser records have their ids: {names}. Download them raw and delete them under Open, Invalid records, then import again.": {
+    "one": "{count} Datensatz nicht importiert, weil ein ungültiger Browserdatensatz seine ID hat: {names}. Lade ihn unter Öffnen, Ungültige Datensätze roh herunter, lösche ihn und importiere erneut.",
+    "other": "{count} Datensätze nicht importiert, weil ungültige Browserdatensätze ihre IDs haben: {names}. Lade sie unter Öffnen, Ungültige Datensätze roh herunter, lösche sie und importiere erneut."
+  },
   "{count} record has the id of a browser record with other content: {names}. Replace the browser copy?|{count} records have the id of a browser record with other content: {names}. Replace the browser copies?": {
     "one": "{count} Datensatz hat die ID eines Browserdatensatzes mit anderem Inhalt: {names}. Browserkopie ersetzen?",
     "other": "{count} Datensätze haben die ID eines Browserdatensatzes mit anderem Inhalt: {names}. Browserkopien ersetzen?"
@@ -3547,6 +3551,10 @@
   "The file could not be read.": "Die Datei konnte nicht gelesen werden.",
   "What's new": "Neuigkeiten",
   "{accepted} accepted, {warned} with a warning, {rejected} rejected. New {added}, already here {equal}, changed {changed}, repeated in file {repeated}.": "{accepted} übernommen, {warned} mit Warnung, {rejected} abgelehnt. Neu {added}, bereits hier {equal}, geändert {changed}, in der Datei wiederholt {repeated}.",
+  "{count} record is left out because an invalid browser record has its id. Download it raw and delete it under Open, Invalid records, then import again.|{count} records are left out because invalid browser records have their ids. Download them raw and delete them under Open, Invalid records, then import again.": {
+    "one": "{count} Datensatz ausgelassen, weil ein ungültiger Browserdatensatz seine ID hat. Lade ihn unter Öffnen, Ungültige Datensätze roh herunter, lösche ihn und importiere erneut.",
+    "other": "{count} Datensätze ausgelassen, weil ungültige Browserdatensätze ihre IDs haben. Lade sie unter Öffnen, Ungültige Datensätze roh herunter, lösche sie und importiere erneut."
+  },
   "and {count} more rejected rows": "und {count} weitere abgelehnte Zeilen",
   "bullets": "Geschosse",
   "cartridges": "Patronen",

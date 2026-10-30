@@ -119,13 +119,13 @@ Measurement data imported as values carry their license: public domain in the US
 
 - <a id="bdmp-home"></a>**BDMP.** Bund Deutscher Militär- und Polizeischützen e.V.: *Homepage*. <https://www.bdmp.de/>
 - <a id="bds-home"></a>**BDS.** Bund Deutscher Sportschützen 1975 e. V.: *Homepage*. <https://www.bdsnet.de/>
-- <a id="cdp-emulation"></a>**DevTools Protocol, Emulation.** Chrome DevTools Protocol: *Emulation domain, setCPUThrottlingRate*. <https://chromedevtools.github.io/devtools-protocol/tot/Emulation/#method-setCPUThrottlingRate>
+- <a id="cdp-emulation"></a>**DevTools Protocol, Emulation.** Chrome DevTools Protocol: *Emulation domain, setCPUThrottlingRate*. <https://chromedevtools.github.io/devtools-protocol/#/Emulation.setCPUThrottlingRate>
 - <a id="dlmf"></a>**DLMF.** F. W. J. Olver, A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, R. F. Boisvert, C. W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, M. A. McClain (eds.): *NIST Digital Library of Mathematical Functions*. NIST, Gaithersburg, MD. <https://dlmf.nist.gov/>
 - <a id="dsb-home"></a>**DSB.** Deutscher Schützenbund e.V.: *Homepage*. <https://www.dsb.de/>
 - <a id="dsu-home"></a>**DSU.** Deutsche Schießsport Union e.V.: *Homepage*. <https://www.d-s-u.de/>
 - <a id="event-timing"></a>**Event Timing.** W3C: *Event Timing API*. <https://w3c.github.io/event-timing/>
 - <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: *Homepage*. <https://www.issf-sports.org/>
-- <a id="layout-instability"></a>**Layout Instability.** W3C: *Layout Instability API*. <https://w3c.github.io/layout-instability/>
+- <a id="layout-instability"></a>**Layout Instability.** W3C Web Platform Incubator Community Group: *Layout Instability API*. <https://wicg.github.io/layout-instability/>
 - <a id="longtasks"></a>**Long Tasks.** W3C: *Long Tasks API*. <https://w3c.github.io/longtasks/>
 - <a id="nist-webbook"></a>**NIST WebBook.** P. J. Linstrom, W. G. Mallard (eds.): *NIST Chemistry WebBook*, NIST Standard Reference Database 69. NIST, Gaithersburg, MD. Condensed-phase thermochemistry of CAS 64-17-5, 84-74-2, 85-98-3, 121-14-2 and 611-92-7. doi:10.18434/T4D303. <https://webbook.nist.gov/chemistry/>
 - <a id="nist-sematech"></a>**NIST/SEMATECH.** National Institute of Standards and Technology, SEMATECH: *NIST/SEMATECH e-Handbook of Statistical Methods*. NIST, Gaithersburg, MD. <https://www.itl.nist.gov/div898/handbook/>

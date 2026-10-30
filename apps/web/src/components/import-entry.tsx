@@ -221,7 +221,8 @@ function ColumnRow({
   )
 }
 
-function Report({ b, t }: { b: BuildView; t: Translator['t'] }) {
+function Report({ b }: { b: BuildView }) {
+  const { t, tn } = useTranslation()
   const more = b.counts.rejected - b.rejected.length
   return (
     <Stack gap={4}>
@@ -231,6 +232,15 @@ function Report({ b, t }: { b: BuildView; t: Translator['t'] }) {
           { ...b.counts, added: b.added, equal: b.equal, changed: b.changed, repeated: b.repeated },
         )}
       </Text>
+      {b.blocked > 0 && (
+        <Text size="sm" data-testid="import-blocked">
+          {tn(
+            b.blocked,
+            '{count} record is left out because an invalid browser record has its id. Download it raw and delete it under Open, Invalid records, then import again.',
+            '{count} records are left out because invalid browser records have their ids. Download them raw and delete them under Open, Invalid records, then import again.',
+          )}
+        </Text>
+      )}
       {b.rejected.length > 0 && (
         <ul className="import-rejected">
           {b.rejected.map((r) => (
@@ -346,7 +356,7 @@ export function FileCard({
         {table && e.mapping && (
           <Text size="sm">{t('Read with the saved mapping {name}.', { name: e.mapping })}</Text>
         )}
-        {e.build && <Report b={e.build} t={t} />}
+        {e.build && <Report b={e.build} />}
         {table && fold && (
           <Group>
             <Button

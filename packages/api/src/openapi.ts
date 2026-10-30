@@ -165,7 +165,8 @@ const errorBody: JsonSchema = {
 }
 
 /**
- * The statuses of a route: 200; 400 when Fastify or zod validates its input; its own `errors`;
+ * The statuses of a route: 200; 400 when Fastify or zod validates its input (an undeclared query
+ * parameter included); its own `errors`;
  * 413 (`bodyLimit`) and 415 (no JSON content type) when it takes a body; 414 when it has a path
  * parameter (the router's `maxParamLength`, 100 characters); 500.
  */
@@ -199,7 +200,10 @@ function responses(
               headers: { Location: { schema: { type: 'string' } } },
             }
           : {
-              description: STATUS_CODES[s] ?? String(s),
+              description:
+                s === 400
+                  ? 'Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.'
+                  : (STATUS_CODES[s] ?? String(s)),
               content: json({ $ref: '#/components/schemas/Error' }),
             },
       ]),

@@ -53,7 +53,7 @@ function integer(value: string | null, fallback: number, min: number, max: numbe
   return /^\d+$/.test(value) && n >= min && n <= max ? n : Number.NaN
 }
 
-/** The query values each list reads besides `q`, `limit` and `offset`; the API drops the others. */
+/** The query values each list reads besides `q`, `limit` and `offset`; the API refuses the others. */
 const filters: Record<string, string[]> = {
   cartridges: ['table'],
   bullets: ['manufacturer', 'cartridge'],
@@ -91,7 +91,7 @@ async function catalogue() {
  * order, the refusals of its query schemas. Cartridges, bullets, powders, primers and cases page (`limit`, `offset`)
  * and search (`q`); the filters are `table` (cartridges), `manufacturer` (bullets, powders, primers, cases), `size` and `compound` (primers),
  * `cartridge` (bullets, cases), `federation` (disciplines) and `discipline` and `face` (target mappings).
- * Other keys are dropped, as the API drops them.
+ * Other keys are refused, as the API refuses them, and so is a `q` holding a control character.
  */
 async function list(kind: string, query: URLSearchParams) {
   const paged = searchKinds.has(kind)
@@ -115,7 +115,10 @@ async function list(kind: string, query: URLSearchParams) {
   const text = (v: string | undefined, max: number) =>
     v === undefined || (v.length >= 1 && v.length <= max && !v.includes('\0'))
   const id = (v: string | undefined) => v === undefined || (v.length <= 100 && recordId.test(v))
+  const known = [...(filters[kind] ?? []), ...(paged ? ['q', 'limit', 'offset'] : [])]
   if (
+    [...query.keys()].some((k) => !known.includes(k)) ||
+    /\p{Cc}/u.test(q ?? '') ||
     Number.isNaN(limit) ||
     Number.isNaN(offset) ||
     !text(q, 100) ||

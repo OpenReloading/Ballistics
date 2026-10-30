@@ -1,8 +1,9 @@
+import { startBundleApi } from '@open-reloading/api/static'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 vi.mock('next/cache', () => ({ cacheLife: () => {} }))
-const { getBullet, listAllBullets, listManufacturers, listTargetMappings, staticIds } =
-  await import('../src/lib/api.ts')
+const api = await import('../src/lib/api.ts')
+const { getBullet, listAllBullets, listManufacturers, listTargetMappings, staticIds } = api
 
 const offsets: number[] = []
 
@@ -103,4 +104,33 @@ it("asks for one face's target mappings, or every mapping", async () => {
   expect(paths).toEqual(['/v1/target-mappings?face=issf%2010m', '/v1/target-mappings'])
   answer(404)
   expect(await listTargetMappings()).toEqual({ status: 'notFound' })
+})
+
+it('sends list queries the API accepts, as the build does', async () => {
+  const live = await startBundleApi()
+  try {
+    vi.stubGlobal('fetch', async (url: string) => {
+      const u = new URL(url)
+      const res = await live.app.inject({ url: u.pathname + u.search })
+      return new Response(res.body, { status: res.statusCode })
+    })
+    for (const list of [
+      api.listAllCartridges,
+      api.listAllBullets,
+      api.listAllPowders,
+      api.listAllPrimers,
+      api.listAllCases,
+      api.listAllTargetFaces,
+      api.listDisciplines,
+      api.listFederations,
+      api.listCaliberClasses,
+      () => api.listTargetMappings(),
+    ]) {
+      const r = await list()
+      expect([list.name, r.status]).toEqual([list.name, 'ok'])
+    }
+    expect((await listManufacturers()).length).toBeGreaterThan(0)
+  } finally {
+    await live.close()
+  }
 })

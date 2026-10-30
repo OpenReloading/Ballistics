@@ -14,6 +14,8 @@ console.log(bundle.cartridges.length > 0) // true
 console.log(twistPlausible(254)) // true
 ```
 
+`readRecords(root)` validates a records folder: pass `root`, the `packages/data/records/` folder of a repository clone. The package ships no records folder, so without `root` it throws.
+
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/data/
 
 Licence: code MIT. Data records (`records/`): each entry states its licence in its `license` field; entries without one are CC BY 4.0 (see `LICENSE`).

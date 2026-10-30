@@ -85,7 +85,17 @@ export function parseUserDataFile(text: string): ParsedUserFile {
         files: r.data.files,
         ...(Array.isArray(invalid) && invalid.length > 0 && { invalid }),
       }
-    : { ok: false, reason: z.prettifyError(r.error) }
+    : { ok: false, reason: problemsText(r.error) }
+}
+
+/** Problems a reason names: a file of many invalid records would otherwise list every one. */
+const shownProblems = 3
+
+/** The first `shownProblems` problems of `error` and how many more there are. */
+function problemsText(error: z.ZodError) {
+  const text = z.prettifyError(new z.ZodError(error.issues.slice(0, shownProblems)))
+  const more = error.issues.length - shownProblems
+  return more > 0 ? `${text}\nand ${more} more problems` : text
 }
 
 /** The text of `userDataText`, or why Open and Import would reject it (too large, invalid). */
@@ -236,19 +246,29 @@ export function makersToCarry(
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })
 
-/** Sorts incoming records against the stored ones by `id`: new, equal content, other content. */
-export function planImport(incoming: UserRecord[], stored: UserRecord[]) {
+/**
+ * Sorts incoming records against the stored ones by `id`: new, equal content, other content, and
+ * `blocked` by an invalid stored record of the id in `invalid`, which nothing may overwrite.
+ */
+export function planImport(
+  incoming: UserRecord[],
+  stored: UserRecord[],
+  invalid: readonly InvalidRecord[] = [],
+) {
   const byId = new Map(stored.map((r) => [r.id, r]))
+  const held = new Set(invalid.map((i) => i.id))
   const added: UserRecord[] = []
   const equal: UserRecord[] = []
   const conflicts: { incoming: UserRecord; stored: UserRecord }[] = []
+  const blocked: UserRecord[] = []
   for (const r of incoming) {
     const s = byId.get(r.id)
-    if (!s) added.push(r)
+    if (held.has(r.id)) blocked.push(r)
+    else if (!s) added.push(r)
     else if (content(s) === content(r)) equal.push(r)
     else conflicts.push({ incoming: r, stored: s })
   }
-  return { added, equal, conflicts }
+  return { added, equal, conflicts, blocked }
 }
 
 /**

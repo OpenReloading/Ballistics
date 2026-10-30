@@ -120,6 +120,20 @@ describe('readRecords', () => {
     expect(readRecords().errors).toEqual([])
   })
 
+  it('names the missing root in the packed layout, which has no records folder', async () => {
+    // inside the package, so the copy resolves its dependencies as the installed one does
+    const dir = mkdtempSync(join(import.meta.dirname, '.packed-'))
+    try {
+      cpSync(join(import.meta.dirname, '..', 'src'), join(dir, 'src'), { recursive: true })
+      const packed: typeof import('../src/records.ts') = await import(
+        join(dir, 'src', 'records.ts')
+      )
+      expect(() => packed.readRecords()).toThrow('readRecords: pass the records root')
+    } finally {
+      rmSync(dir, { recursive: true })
+    }
+  })
+
   it('reports an unknown or missing manufacturer of a powder, a case capacity and a load table', () => {
     const provenance = { kind: 'published', sources: [{ title: 'Test' }] }
     const errors = errorsAfter((_root, write) => {

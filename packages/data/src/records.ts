@@ -251,9 +251,15 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
 
 /**
  * Reads, validates and cross-checks every record under `root`, or under each of several roots read
- * as one set (the first holds every kind directory, the second its `load-tables.json`).
+ * as one set (the first holds every kind directory, the second its `load-tables.json`). Without
+ * `root` it reads the `records/` folder of a repository checkout; the npm package ships none, so
+ * there it throws: pass the `records/` folder of a checkout, or read `bundle.json` instead.
  */
 export function readRecords(root: string | readonly string[] = recordsDir): ReadRecordsResult {
+  if (root === recordsDir && !existsSync(recordsDir))
+    throw new Error(
+      'readRecords: pass the records root; the installed package has no records/ folder (use bundle.json for the records)',
+    )
   const errors: string[] = []
   const roots = typeof root === 'string' ? [root] : [...root]
   const bundle = readBundle(roots, errors)

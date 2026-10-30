@@ -150,9 +150,17 @@ function withDecimalMark(text: string, t: Translator['t']): string {
   return mark === '.' ? text : text.replace(/(?<=\d)\.(?=\d)/g, mark)
 }
 
+/**
+ * Longest text matched against the templates: the longest template has fewer than 150 characters
+ * and its values are short. The lazy groups backtrack, so the time of a text that matches no
+ * template grows much faster than its length.
+ */
+const maxMessageChars = 2000
+
 /** The German of `text` when it is a code or an instance of a template, else undefined. */
 function translated(text: string, t: Translator['t']): string | undefined {
   if (codeSet.has(text)) return t(text as Message)
+  if (text.length > maxMessageChars) return undefined
   for (const { template, names, matcher } of patterns) {
     const match = matcher.exec(text)
     if (!match) continue
