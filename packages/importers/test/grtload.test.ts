@@ -163,6 +163,27 @@ describe('readGrtLoad', () => {
     ])
   })
 
+  it('drops a value whose conversion overflows, with a warning, and reads the rest', () => {
+    const text = grtFile({
+      sections: {
+        caliber: [['CaliberName', 'C']],
+        propellant: [
+          ['pname', 'P'],
+          ['mc', '1e308', 'kg'],
+          ['pt', '20', 'Cel'],
+        ],
+      },
+    })
+    const { records, warnings } = readGrtLoad(text, saved)
+    expect(warnings).toEqual([
+      'propellant.mc: "1e308" in unit "kg" is not converted; the field is not read.',
+    ])
+    const load = ofKind(records, 'load')
+    expect(load.data.charge).toBeUndefined()
+    expect(load.data.analysis?.overrides?.propellantTemperature).toBe(20)
+    expect(records.map((r) => r.kind)).toEqual(['cartridge', 'powder', 'load'])
+  })
+
   it('gives the same ids on a second read and one record for a component two files share', () => {
     const a = readGrtLoad(grtFile({}), saved)
     expect(readGrtLoad(grtFile({}), '2027-01-01T00:00:00.000Z').records.map((r) => r.id)).toEqual(

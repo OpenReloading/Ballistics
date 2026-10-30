@@ -112,8 +112,9 @@ function unescaped(s: string, at: string, warnings: string[]) {
 function numberValue(at: string, kind: Kind, f: XmlElement, value: string, warnings: string[]) {
   const unit = f.attributes.unit ?? ''
   const factor = Object.hasOwn(factors[kind], unit) ? factors[kind][unit] : undefined
-  const x = numberOf(value)
-  if (factor !== undefined && Number.isFinite(x)) return Number((x * factor).toPrecision(12))
+  // a finite number can still overflow in the stored unit
+  const stored = factor === undefined ? Number.NaN : numberOf(value) * factor
+  if (Number.isFinite(stored)) return Number(stored.toPrecision(12))
   warnings.push(
     `${at}: "${value.slice(0, 40)}" in unit "${unit.slice(0, 20)}" is not converted; the field is not read.`,
   )
