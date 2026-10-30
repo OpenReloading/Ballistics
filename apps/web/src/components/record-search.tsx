@@ -75,7 +75,11 @@ function statusLine<T>(
     : t('{total} found', { total: state.total })
 }
 
-/** The end of the field: the clear and browse buttons, else the loader, else the select's chevron. */
+/**
+ * The end of the field: the clear button while a record is chosen, else the browse button, else
+ * the loader, else the select's chevron. One button at a time keeps the middle of a narrow field
+ * free for a click.
+ */
 function endSection({
   loading,
   browse,
@@ -95,16 +99,19 @@ function endSection({
     return (
       <Group gap={4} wrap="nowrap">
         {loading && <Loader size="xs" />}
-        {/* a 24 px target (WCAG 2.5.8) */}
-        {clear && <CloseButton size={24} aria-label={clear.label} onClick={clear.onClear} />}
-        <ActionIcon
-          variant="subtle"
-          size={size === 'xs' ? 'input-xs' : 'input-sm'}
-          aria-label={browse.label}
-          onClick={onBrowse}
-        >
-          <ListMagnifyingGlass size={16} aria-hidden="true" />
-        </ActionIcon>
+        {clear ? (
+          // a 24 px target (WCAG 2.5.8)
+          <CloseButton size={24} aria-label={clear.label} onClick={clear.onClear} />
+        ) : (
+          <ActionIcon
+            variant="subtle"
+            size={size === 'xs' ? 'input-xs' : 'input-sm'}
+            aria-label={browse.label}
+            onClick={onBrowse}
+          >
+            <ListMagnifyingGlass size={16} aria-hidden="true" />
+          </ActionIcon>
+        )}
       </Group>
     )
   if (loading) return <Loader size="xs" />
@@ -157,7 +164,7 @@ export function RecordSearch<T extends { id: string }>({
   chevron?: boolean
   /** A button at the end of the field that opens a browsing dialog with the typed text. */
   browse?: { label: string; onOpen: (typed: string) => void }
-  /** A button beside `browse` that clears the choice, shown while `picked`. */
+  /** A button that clears the choice, shown while `picked` in place of `browse`. */
   clear?: { label: string; onClear: () => void } | undefined
 } & (
   | { kind: ApiKind; find?: Find<T> }
@@ -244,8 +251,6 @@ export function RecordSearch<T extends { id: string }>({
               },
             })}
             rightSectionPointerEvents={browse ? 'all' : 'none'}
-            // the clear button beside the browse button
-            {...(browse && picked && clear && { rightSectionWidth: size === 'xs' ? 58 : 64 })}
             onChange={(e) => {
               setQ(e.currentTarget.value)
               combobox.openDropdown()

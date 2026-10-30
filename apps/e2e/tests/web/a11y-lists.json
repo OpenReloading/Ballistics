@@ -104,12 +104,6 @@
     },
     {
       "rule": "color-contrast",
-      "node": "autocomplete=\"off\" role=\"combobox\" aria-haspopup=\"listbox\"",
-      "where": "workbench",
-      "reason": "Empty record search field of the pinned row that shows the chosen record as its placeholder; its clear and browse buttons cover the field's centre, where axe looks for the background. The placeholder is drawn in the text colour on the field's own surface, 17.4:1 light and 11.5:1 dark by measurement."
-    },
-    {
-      "rule": "color-contrast",
       "node": "mantine-NumberInput-input",
       "reason": "Value of a number field in the workbench, whose box overlaps its unit section. It sits on the field's own surface, 5:1 or more in both themes by measurement."
     },

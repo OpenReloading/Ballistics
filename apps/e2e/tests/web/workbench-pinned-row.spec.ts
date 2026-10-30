@@ -14,9 +14,8 @@ const row = [
   ['button', 'Browse primers'],
   ['textbox', 'Primer lot'],
   ['combobox', 'Brass record'],
-  // the example load chooses its brass
+  // the example load chooses its brass: its clear button takes the place of Browse brass
   ['button', 'Clear the brass record'],
-  ['button', 'Browse brass'],
   ['textbox', 'Case lot'],
   ['combobox', 'Case capacity record'],
 ] as const
@@ -71,6 +70,15 @@ for (const [width, height] of [
     const at = names.map((name) => tree.indexOf(`"${name}"`))
     expect(at.every((i) => i >= 0)).toBe(true)
     expect(at).toEqual([...at].sort((a, b) => a - b))
+
+    // a click in the middle of the chosen brass field opens its matches and keeps the choice
+    const brass = loadForm(page).getByRole('combobox', { name: 'Brass record', exact: true })
+    const chosen = await brass.getAttribute('placeholder')
+    await brass.click()
+    await expect(brass).toBeFocused()
+    await expect(brass).toHaveAttribute('placeholder', chosen ?? '')
+    await loadForm(page).getByRole('button', { name: 'Clear the brass record' }).click()
+    await expect(loadForm(page).getByRole('button', { name: 'Browse brass' })).toBeVisible()
   })
 
 test("the Cartridge card's More holds no primer, brass or capacity select", async ({ page }) => {
