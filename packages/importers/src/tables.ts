@@ -37,7 +37,7 @@ function readQuoted(text: string, from: number): { cell: string; next: number } 
 const isBlank = (row: string[]) => row.every((x) => x.trim() === '')
 
 /**
- * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may span lines); blank rows are left out.
+ * Rows of cells of `text` split at `delimiter`, with quoted cells (a quoted cell may follow spaces and span lines); blank rows are left out.
  * Cells past `maxColumn + 1` in a row are dropped and splitting stops past `maxCells` cells, enough for the size refusal.
  */
 function splitRows(text: string, delimiter: TableDelimiter): string[][] {
@@ -63,7 +63,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   }
   while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)
-    if (c === '"' && cell === '') {
+    if (c === '"' && /^[ \t]*$/.test(cell)) {
       const q = readQuoted(text, i + 1)
       cell = q.cell
       i = q.next
@@ -174,7 +174,8 @@ function tableOfObjects(list: unknown): TableRead | undefined {
  * The table of a text: a JSON list of objects, or delimited text (comma, semicolon or tab) with
  * two or more rows of equal width. Otherwise the refusal names the cause and one action.
  */
-export function readTable(text: string): TableRead {
+export function readTable(raw: string): TableRead {
+  const text = raw.replace(/^\uFEFF/, '')
   if (/^\s*[[{]/.test(text)) {
     let json: unknown
     try {

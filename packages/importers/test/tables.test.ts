@@ -1,6 +1,6 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { headerUnit, headerWords, readNumber } from '../src/tables.ts'
+import { headerUnit, headerWords, readNumber, readTable } from '../src/tables.ts'
 
 // the expressions the scans replace, as the reference for their results
 const wordsReference = (header: string) =>
@@ -51,5 +51,33 @@ describe('readNumber', () => {
     const start = performance.now()
     expect(readNumber(`${'1'.repeat(50_000)}x`, '.')).toBeUndefined()
     expect(performance.now() - start).toBeLessThan(500)
+  })
+})
+
+describe('readTable', () => {
+  it('reads a quoted cell after a space', () => {
+    for (const d of [',', ';']) {
+      const text = [
+        `Name${d} Weight${d} Maker`,
+        `Bullet A${d} "6${d}5"${d} "Maker${d} Inc"`,
+        `Bullet B${d} 9.1${d} Maker`,
+      ].join('\n')
+      expect(readTable(text)).toEqual({
+        table: {
+          header: ['Name', 'Weight', 'Maker'],
+          hasHeader: true,
+          rows: [
+            ['Bullet A', `6${d}5`, `Maker${d} Inc`],
+            ['Bullet B', '9.1', 'Maker'],
+          ],
+        },
+      })
+    }
+  })
+
+  it('removes a leading byte order mark', () => {
+    const table = { header: ['name', 'mass'], hasHeader: true, rows: [['a', '1']] }
+    expect(readTable('\uFEFF[{"name":"a","mass":1}]')).toEqual({ table })
+    expect(readTable('\uFEFFname,mass\na,1\n')).toEqual({ table })
   })
 })
