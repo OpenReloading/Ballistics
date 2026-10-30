@@ -48,6 +48,7 @@ import {
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
+import { gapNotes, loadGaps } from '../lib/load-gaps.ts'
 import { type FirearmUse, loadUse } from '../lib/load-use.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
@@ -118,6 +119,7 @@ function firearmColumns(
   cartridgeName: (ref: string | undefined) => string | undefined,
   cells: (r: FirearmRecord) => Cells,
   usageOf: (r: FirearmRecord) => FirearmUse,
+  notesOf: (r: FirearmRecord) => string[],
   actionsMenu: (r: FirearmRecord, tabIndex?: number) => ReactNode,
 ): DirectoryColumn<FirearmRecord>[] {
   return [
@@ -215,6 +217,13 @@ function firearmColumns(
         const last = usageOf(r).last
         return last ? dayText(last) : ''
       },
+    },
+    {
+      key: 'notes',
+      label: msg('Notes'),
+      help: msg('Saved loads of another cartridge, or no saved load.'),
+      value: (r) => notesOf(r).join(' ') || undefined,
+      cell: (r) => notesOf(r).join(' '),
     },
     {
       key: 'actions',
@@ -376,6 +385,7 @@ function readFirearms(
   reads: { current: number },
   setList: (list: FirearmRecord[]) => void,
   setUses: (uses: Map<string, FirearmUse>) => void,
+  setGaps: (gaps: ReturnType<typeof loadGaps>) => void,
   setReadError: (message: string) => void,
 ) {
   setReadError('')
@@ -383,6 +393,7 @@ function readFirearms(
     .then(({ records }) => {
       if (read !== reads.current) return
       setUses(loadUse(records).firearms)
+      setGaps(loadGaps(records))
       setList(
         records
           .filter((r): r is FirearmRecord => r.kind === 'firearm')
@@ -435,9 +446,13 @@ const nameOfBullet = (
   return parsed ? (names[parsed.id] ?? parsed.id) : ref
 }
 
-const nameOfCartridge = (names: Record<string, string>, ref: string | undefined) => {
+const nameOfCartridge = (
+  names: Record<string, string>,
+  designs: ReadonlyMap<string, string>,
+  ref: string | undefined,
+) => {
   const id = catalogueCartridgeId(ref)
-  return id === undefined ? ref : (names[id] ?? id)
+  return id === undefined ? ((ref && designs.get(ref)) ?? ref) : (names[id] ?? id)
 }
 
 /** The data cards that print: the open firearm's, or the example's. */
@@ -534,6 +549,7 @@ export function FirearmLibrary() {
   const [list, setList] = useState<FirearmRecord[]>()
   /** The saved loads that name each firearm, by firearm id. */
   const [uses, setUses] = useState(new Map<string, FirearmUse>())
+  const [gaps, setGaps] = useState(() => loadGaps([]))
   const [failure, setFailure] = useState('')
   /** Why the firearm that `?record=` names could not be opened. */
   const [linkFailure, setLinkFailure] = useState<Message>()
@@ -556,7 +572,7 @@ export function FirearmLibrary() {
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)
   const refresh = useCallback(() => {
-    readFirearms(++reads.current, reads, setList, setUses, setReadError)
+    readFirearms(++reads.current, reads, setList, setUses, setGaps, setReadError)
   }, [])
   useEffect(refresh, [refresh])
 
@@ -578,6 +594,7 @@ export function FirearmLibrary() {
     data.cartridge,
     example.data.cartridge,
     ...(list ?? []).map((r) => r.data.cartridge),
+    ...[...gaps.mismatches.values()].flat().map((m) => m.cartridge),
   ]
     .map(catalogueCartridgeId)
     .filter((c): c is string => !!c)
@@ -588,7 +605,8 @@ export function FirearmLibrary() {
   const [bulletNames, setBulletNames] = useRecordNames('bullets', catalogueBulletId(data))
   const bulletName = (ref: string | undefined) => nameOfBullet(t, bulletNames, ref)
   /** The name of the cartridge a reference names, else the reference as stored. */
-  const cartridgeName = (ref: string | undefined) => nameOfCartridge(cartridgeNames, ref)
+  const cartridgeName = (ref: string | undefined) =>
+    nameOfCartridge(cartridgeNames, gaps.designs, ref)
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(data)
@@ -697,11 +715,17 @@ export function FirearmLibrary() {
     return c
   }
   const usageOf = (r: FirearmRecord) => uses.get(r.id) ?? { loads: 0 }
-  const columns = firearmColumns(t, system, cartridgeName, cells, usageOf, actionsMenu)
-  /** The phone row's line: the record's facts, then its loads and last session day. */
+  const notesOf = (r: FirearmRecord) => gapNotes(r, gaps, cartridgeName, t)
+  const columns = firearmColumns(t, system, cartridgeName, cells, usageOf, notesOf, actionsMenu)
+  /** The phone row's line: the record's facts, its loads, last session day and notes. */
   const facts = (r: FirearmRecord) => {
     const { loads, last } = usageOf(r)
-    return [...lines(r), tn(loads, '{count} load', '{count} loads'), last && dayText(last)]
+    return [
+      ...lines(r),
+      tn(loads, '{count} load', '{count} loads'),
+      last && dayText(last),
+      ...notesOf(r),
+    ]
       .filter(Boolean)
       .join(' · ')
   }

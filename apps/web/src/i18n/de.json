@@ -3755,5 +3755,8 @@
   "{count} load|{count} loads": {
     "one": "{count} Laborierung",
     "other": "{count} Laborierungen"
-  }
+  },
+  "Saved loads of another cartridge, or no saved load.": "Gespeicherte Laborierungen einer anderen Patrone oder keine gespeicherte Laborierung.",
+  "No saved load with this firearm.": "Keine gespeicherte Laborierung mit dieser Schusswaffe.",
+  "{load} is for {other}, this firearm for {own}.": "{load} ist für {other}, diese Schusswaffe für {own}."
 }
