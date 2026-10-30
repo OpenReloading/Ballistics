@@ -7567,6 +7567,17 @@ main .field-table tr.field-group > th {
   line-height: 1.25;
 }
 
+/* a phone: a value longer than the window (a German method) wraps inside its card */
+@media screen and (max-width: 47.99em) {
+  .fact {
+    white-space: normal;
+  }
+
+  .fact dd {
+    overflow-wrap: anywhere;
+  }
+}
+
 .fact dt .fact-unit {
   font-weight: 400;
 }
