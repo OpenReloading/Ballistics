@@ -11578,7 +11578,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   letter-spacing: 0;
 }
 
-/* the bullet search dialog: search box, filters, result list and preview of the highlighted bullet */
+/* the record chooser dialog: search box, filters, result list and preview of the highlighted record */
 .bd {
   display: flex;
   flex-direction: column;
@@ -11652,7 +11652,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .bd-head,
 .bd-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 4.5rem 5rem 5.5rem;
+  grid-template-columns: var(--bd-columns);
   gap: 0.5rem;
   padding: 0.25rem 0.5rem;
 }

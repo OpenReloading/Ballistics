@@ -1007,6 +1007,26 @@ const BulletSearchDialog = dynamic(
   { ssr: false },
 )
 
+/**
+ * A picker's chooser dialog: opened with the field's text, the focus back on its opener when it
+ * closes, since a dialog opened before its code has loaded mounts open and cannot return it itself.
+ */
+function useChooser() {
+  const [dialog, setDialog] = useState({ text: '', opened: false })
+  const opener = useRef<HTMLElement | null>(null)
+  return {
+    ...dialog,
+    open: (text: string) => {
+      opener.current = document.activeElement as HTMLElement | null
+      setDialog({ text, opened: true })
+    },
+    close: () => {
+      setDialog((d) => ({ ...d, opened: false }))
+      setTimeout(() => opener.current?.focus())
+    },
+  }
+}
+
 /** The Bullet card's picker: the inline quick search, and a button that opens the search dialog. */
 function BulletPicker() {
   const {
@@ -1023,13 +1043,7 @@ function BulletPicker() {
     system,
   } = useLoad()
   const { t } = useTranslation()
-  const [dialog, setDialog] = useState({ text: '', opened: false })
-  // opened before its code has loaded, the dialog mounts open and cannot return the focus itself
-  const opener = useRef<HTMLElement | null>(null)
-  const close = () => {
-    setDialog({ ...dialog, opened: false })
-    setTimeout(() => opener.current?.focus())
-  }
+  const dialog = useChooser()
   const designRows = useMemo(() => userBulletRows(designs), [designs])
   const fit = useMemo(
     () => (bulletParams ? fitOf(cartridge) : undefined),
@@ -1073,14 +1087,13 @@ function BulletPicker() {
           label: t('Browse bullets'),
           onOpen: (typed) => {
             readDesigns()
-            opener.current = document.activeElement as HTMLElement | null
-            setDialog({ text: typed, opened: true })
+            dialog.open(typed)
           },
         }}
       />
       <BulletSearchDialog
         opened={dialog.opened}
-        onClose={close}
+        onClose={dialog.close}
         text={dialog.text}
         designs={designRows}
         fit={fit}
@@ -1090,7 +1103,7 @@ function BulletPicker() {
           const design = userRecordId(row.id)
           if (design) chooseDesign(design)
           else chooseBullet(row.id)
-          close()
+          dialog.close()
         }}
       />
     </>

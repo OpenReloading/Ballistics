@@ -1,237 +1,127 @@
 'use client'
 
-import {
-  Badge,
-  Button,
-  Loader,
-  NumberInput,
-  Pill,
-  SegmentedControl,
-  Select,
-  TextInput,
-} from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { NumberInput, Pill } from '@mantine/core'
 import type { CartridgeDiameters } from '@open-reloading/core'
-import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
-import Link from 'next/link'
-import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { msg } from '../i18n/translate.ts'
 import {
-  type BulletItem,
   type BulletRow,
   ballisticCoefficientText,
   bulletBallisticCoefficient,
   bulletCells,
 } from '../lib/bullet-rows.ts'
 import { type BulletSort, fetchBulletCatalogue, searchBullets } from '../lib/bullet-search.ts'
-import { caliberOptions } from '../lib/caliber.ts'
+import { caliberOptions, commonCaliber } from '../lib/caliber.ts'
 import { manufacturerOptions } from '../lib/manufacturers.ts'
 import type { UnitSystem } from '../lib/units.ts'
-import { AppModal } from './app-modal.tsx'
-import { EmptyNote, ErrorNote } from './states.tsx'
-
-/** Rows drawn at once: a narrower search shows the rest. */
-const shownRows = 100
-
-const sortOptions: { value: BulletSort; label: Message }[] = [
-  { value: 'relevance', label: msg('Best match') },
-  { value: 'name', label: msg('Manufacturer and name') },
-  { value: 'mass', label: msg('Heaviest first') },
-  { value: 'ballisticCoefficient', label: msg('Highest BC first') },
-]
-
-type Catalogue = { status: 'loading' } | { status: 'ok'; rows: BulletItem[] } | { status: 'error' }
-
-/** The catalogue is read when the dialog first opens, again after Retry. */
-function useCatalogue(opened: boolean) {
-  const [state, setState] = useState<Catalogue>({ status: 'loading' })
-  const [attempt, setAttempt] = useState(0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new attempt reads it again
-  useEffect(() => {
-    if (!opened || state.status === 'ok') return
-    let live = true
-    setState({ status: 'loading' })
-    fetchBulletCatalogue().then(
-      (rows) => live && setState({ status: 'ok', rows }),
-      () => live && setState({ status: 'error' }),
-    )
-    return () => {
-      live = false
-    }
-  }, [opened, attempt])
-  return { state, retry: () => setAttempt((n) => n + 1) }
-}
-
-const massText = (
-  row: BulletRow,
-  system: UnitSystem,
-  cells: ReturnType<typeof bulletCells>,
-  t: Translator['t'],
-) => (row.mass === null ? t('n/a') : `${cells.mass} ${system.mass.symbol}`)
-
-const keySteps: Record<string, number> = { ArrowDown: 1, ArrowUp: -1, PageDown: 8, PageUp: -8 }
-
-/** Enter chooses the highlighted bullet, the arrow and page keys move the highlight. */
-function searchKey(
-  e: React.KeyboardEvent<HTMLInputElement>,
-  choose: () => void,
-  move: (by: number) => void,
-) {
-  // Ctrl+Enter (Cmd+Enter) stays free for the calculator's run shortcut
-  if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
-    e.preventDefault()
-    choose()
-    return
-  }
-  const step = keySteps[e.key]
-  if (step === undefined) return
-  e.preventDefault()
-  move(step)
-}
-
-function statusMessage(state: Catalogue, found: number, total: number, t: Translator['t']) {
-  if (state.status === 'loading') return t('Loading bullets')
-  if (state.status === 'error') return ''
-  if (found === total) return t('{total} bullets', { total })
-  return found > shownRows
-    ? t('{found} of {total} bullets, first {shown} shown', { found, total, shown: shownRows })
-    : t('{found} of {total} bullets', { found, total })
-}
-
-function ResultRow({
-  row,
-  index,
-  id,
-  active,
-  system,
-  onActive,
-  onChoose,
-}: {
-  row: BulletRow
-  index: number
-  id: string
-  active: number
-  system: UnitSystem
-  onActive: (i: number) => void
-  onChoose: (row: BulletRow) => void
-}) {
-  const { t } = useTranslation()
-  const cells = bulletCells(row, system)
-  const bc = bulletBallisticCoefficient(row)
-  const mass = massText(row, system, cells, t)
-  const bcText = bc ? ballisticCoefficientText(bc) : t('n/a')
-  return (
-    // keyboard: the search box owns the focus and moves the highlight
-    // biome-ignore lint/a11y/useKeyWithClickEvents: see above
-    <div
-      id={`${id}-option-${index}`}
-      role="option"
-      tabIndex={-1}
-      // the search box keeps the focus when a row is pressed
-      onMouseDown={(e) => e.preventDefault()}
-      aria-selected={index === active}
-      className="bd-row"
-      data-active={index === active || undefined}
-      onMouseMove={() => index !== active && onActive(index)}
-      onClick={() => onChoose(row)}
-    >
-      <span className="bd-name">
-        {row.manufacturerName && <span className="bd-maker">{row.manufacturerName}</span>}
-        <span>
-          {row.name}
-          {row.origin && (
-            <Badge ml="xs" variant="light">
-              {t('Your design')}
-            </Badge>
-          )}
-        </span>
-      </span>
-      <span>{cells.caliber}</span>
-      <span>{mass}</span>
-      <span>{bcText}</span>
-    </div>
-  )
-}
-
-function Results({
-  status,
-  retry,
-  shown,
-  id,
-  active,
-  system,
-  onActive,
-  onChoose,
-}: {
-  status: Catalogue['status']
-  retry: () => void
-  shown: BulletRow[]
-  id: string
-  active: number
-  system: UnitSystem
-  onActive: (i: number) => void
-  onChoose: (row: BulletRow) => void
-}) {
-  const { t } = useTranslation()
-  if (status === 'error')
-    return (
-      <ErrorNote title={t('The bullets could not be read.')} onRetry={retry}>
-        {t(
-          'The bullet data could not be loaded. Check the connection and retry. The designer and the workbench still work.',
-        )}
-      </ErrorNote>
-    )
-  if (shown.length === 0)
-    return status === 'ok' ? (
-      <EmptyNote
-        icon={<MagnifyingGlass size={20} aria-hidden="true" />}
-        title={t('No bullet matches')}
-        description={t('Remove a filter or a word.')}
-      />
-    ) : null
-  return (
-    <div className="bd-list-wrap">
-      <div className="bd-head" aria-hidden="true">
-        <span>{t('Bullet')}</span>
-        <span>{t('Caliber')}</span>
-        <span>{t('Mass')}</span>
-        <span>{t('BC')}</span>
-      </div>
-      <div id={`${id}-list`} role="listbox" aria-label={t('Bullets')} className="bd-list">
-        {shown.map((row, i) => (
-          <ResultRow
-            key={row.id}
-            row={row}
-            index={i}
-            id={id}
-            active={active}
-            system={system}
-            onActive={onActive}
-            onChoose={onChoose}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
+import { type ChooserKind, RecordChooser } from './record-chooser.tsx'
 
 /** The manufacturer options, each with its number of bullets. */
-function manufacturerChoices(catalogue: BulletItem[]) {
+function manufacturerChoices(catalogue: readonly BulletRow[]) {
   const counts = new Map<string, number>()
-  for (const r of catalogue) counts.set(r.manufacturer, (counts.get(r.manufacturer) ?? 0) + 1)
+  for (const r of catalogue)
+    if (r.manufacturer) counts.set(r.manufacturer, (counts.get(r.manufacturer) ?? 0) + 1)
   return manufacturerOptions(catalogue).map((o) => ({
     ...o,
     label: `${o.label} (${counts.get(o.value)})`,
   }))
 }
 
+/** The bullets as a kind of the record chooser; `search` without the mass and fit filters. */
+export const bulletKind: ChooserKind<BulletRow> = {
+  texts: {
+    title: msg('Choose a bullet'),
+    close: msg('Close the bullet search'),
+    search: msg('Search bullets'),
+    help: msg(
+      'Words of the manufacturer or name in any order, a caliber such as 308, a weight such as 168 or 10.9g',
+    ),
+    column: msg('Bullet'),
+    list: msg('Bullets'),
+    preview: msg('Highlighted bullet'),
+    loading: msg('Loading bullets'),
+    all: msg('{total} bullets'),
+    some: msg('{found} of {total} bullets'),
+    cut: msg('{found} of {total} bullets, first {shown} shown'),
+    errorTitle: msg('The bullets could not be read.'),
+    errorText: msg(
+      'The bullet data could not be loaded. Check the connection and retry. The designer and the workbench still work.',
+    ),
+    empty: msg('No bullet matches'),
+  },
+  load: fetchBulletCatalogue,
+  selects: [
+    {
+      label: msg('Manufacturer'),
+      nothingFound: msg('No manufacturer found'),
+      options: (catalogue) => manufacturerChoices(catalogue),
+      keep: (r, v) => r.manufacturer === v,
+    },
+    {
+      label: msg('Caliber'),
+      nothingFound: msg('No caliber found'),
+      options: (_, rows, t) =>
+        caliberOptions(
+          rows.map((r) => r.diameter),
+          t,
+        ),
+      keep: (r, v) => commonCaliber(r.diameter) === v,
+    },
+  ],
+  sorts: [
+    { value: 'relevance', label: msg('Best match') },
+    { value: 'name', label: msg('Manufacturer and name') },
+    { value: 'mass', label: msg('Heaviest first') },
+    { value: 'ballisticCoefficient', label: msg('Highest BC first') },
+  ],
+  search: (rows, query, sort) =>
+    searchBullets(rows, query, { manufacturer: '', caliber: '', mass: '' }, sort as BulletSort),
+  columns: [
+    { label: msg('Caliber'), width: '4.5rem', cell: (r) => commonCaliber(r.diameter) },
+    {
+      label: msg('Mass'),
+      width: '5rem',
+      cell: (r, system, t) =>
+        r.mass === null ? t('n/a') : `${bulletCells(r, system).mass} ${system.mass.symbol}`,
+    },
+    {
+      label: msg('BC'),
+      width: '5.5rem',
+      cell: (r, _, t) => {
+        const bc = bulletBallisticCoefficient(r)
+        return bc ? ballisticCoefficientText(bc) : t('n/a')
+      },
+    },
+  ],
+  facts: (row, system) => {
+    const cells = bulletCells(row, system)
+    const bc = bulletBallisticCoefficient(row)
+    return [
+      [msg('Manufacturer'), row.manufacturerName || undefined],
+      [msg('Caliber'), cells.caliber],
+      [msg('Diameter'), cells.diameter],
+      [msg('Mass'), row.mass === null ? undefined : `${cells.mass} ${system.mass.symbol}`],
+      [msg('Length'), row.length === null ? undefined : `${cells.length} ${system.length.symbol}`],
+      [
+        msg('BC'),
+        bc
+          ? [bc, bc.other].flatMap((x) => (x ? [ballisticCoefficientText(x)] : [])).join(', ')
+          : undefined,
+      ],
+      [msg('Construction'), row.construction],
+      [msg('Tip'), row.tipType],
+      [msg('Country'), row.country],
+    ]
+  },
+  href: (row) => `/bullets/${row.id}`,
+}
+
 /**
- * The bullet picker of a workbench card as a dialog: a search box over the whole catalogue and the
+ * The bullet picker of a workbench card: the record chooser over the whole catalogue and the
  * browser's own designs (several words in any order, a caliber such as 308, a weight such as 168
- * or 10.9g), filters, a result list and a preview of the highlighted bullet. The search box keeps
- * the focus: arrow keys highlight, Enter or a click chooses. `fit` keeps the bullets that fit the
- * cartridge until its chip is removed.
+ * or 10.9g), with a mass range and `fit`, which keeps the bullets that fit the cartridge until its
+ * chip is removed.
  */
 export function BulletSearchDialog({
   opened,
@@ -255,204 +145,67 @@ export function BulletSearchDialog({
   onChoose: (row: BulletRow) => void
 }) {
   const { t } = useTranslation()
-  const { state, retry } = useCatalogue(opened)
-  const phone = useMediaQuery('(max-width: 47.99em)')
-  const [query, setQuery] = useState('')
-  const [manufacturer, setManufacturer] = useState('')
-  const [caliber, setCaliber] = useState('')
   const [from, setFrom] = useState<string | number>('')
   const [to, setTo] = useState<string | number>('')
-  const [origin, setOrigin] = useState<'all' | 'catalogue' | 'designs'>('all')
-  const [sort, setSort] = useState<BulletSort>('relevance')
   const [fitOn, setFitOn] = useState(true)
-  const [active, setActive] = useState(0)
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const id = useId()
-  const searchBox = useRef<HTMLInputElement>(null)
 
-  // each opening starts from the card's text, the cartridge fit and no other filter
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on opening only
+  // each opening starts from the cartridge fit and no mass range
   useEffect(() => {
     if (!opened) return
-    setQuery(text)
-    setManufacturer('')
-    setCaliber('')
     setFrom('')
     setTo('')
-    setOrigin('all')
-    setSort('relevance')
     setFitOn(true)
-    setFiltersOpen(false)
   }, [opened])
 
-  const catalogue = state.status === 'ok' ? state.rows : []
-  const rows = useMemo<BulletRow[]>(() => [...designs, ...catalogue], [designs, catalogue])
-  const typed = useDeferredValue(query)
   const massUnit = system.mass.symbol === 'gr' ? 'gr' : 'g'
   const mass = from === '' && to === '' ? '' : `${from}-${to}${massUnit}`
-  const results = useMemo(
-    () =>
-      searchBullets(
-        rows,
-        typed,
-        {
-          manufacturer,
-          caliber,
-          mass,
-          fit: fitOn ? fit : undefined,
-          origin: origin === 'all' ? undefined : origin,
-        },
-        sort,
-      ),
-    [rows, typed, manufacturer, caliber, mass, fitOn, fit, origin, sort],
+  const kind = useMemo<ChooserKind<BulletRow>>(
+    () => ({
+      ...bulletKind,
+      search: (rows, query, sort) =>
+        searchBullets(
+          rows,
+          query,
+          { manufacturer: '', caliber: '', mass, fit: fitOn ? fit : undefined },
+          sort as BulletSort,
+        ),
+    }),
+    [mass, fitOn, fit],
   )
-  // after a failed read only the error shows, so no listbox or highlight is left behind
-  const shown = state.status === 'error' ? [] : results.slice(0, shownRows)
-  // another list highlights its first bullet; the same list, found again, keeps the highlight
-  const listKey = `${results.length}:${results[0]?.id}`
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the list
-  useEffect(() => setActive(0), [listKey])
-  const current = shown[Math.min(active, shown.length - 1)]
-  const optionId = (i: number) => `${id}-option-${i}`
-  useEffect(() => {
-    if (opened && current)
-      document.getElementById(`${id}-option-${active}`)?.scrollIntoView({ block: 'nearest' })
-  }, [active, opened, current, id])
-
-  const manufacturers = useMemo(() => manufacturerChoices(catalogue), [catalogue])
-  const calibers = useMemo(
-    () =>
-      caliberOptions(
-        rows.map((r) => r.diameter),
-        t,
-      ),
-    [rows, t],
-  )
-  const filterCount = [manufacturer, caliber, mass, origin !== 'all' && origin].filter(
-    Boolean,
-  ).length
-
-  const total = rows.length
-  const message = statusMessage(state, results.length, total, t)
-
-  function move(by: number) {
-    if (shown.length === 0) return
-    setActive((i) => Math.max(0, Math.min(shown.length - 1, i + by)))
-  }
-
-  function choose(row: BulletRow | undefined) {
-    if (row) onChoose(row)
-  }
-
-  const list = shown.length > 0
-  const listAria = { 'aria-controls': `${id}-list`, 'aria-activedescendant': optionId(active) }
   return (
-    <AppModal
+    <RecordChooser
+      kind={kind}
       opened={opened}
       onClose={onClose}
-      title={t('Choose a bullet')}
-      size="64rem"
-      fullScreen={phone}
-      className="bd-modal"
-      closeButton={{ 'aria-label': t('Close the bullet search') }}
-    >
-      <div className="bd">
-        <TextInput
-          ref={searchBox}
-          data-autofocus
-          label={t('Search bullets')}
-          description={t(
-            'Words of the manufacturer or name in any order, a caliber such as 308, a weight such as 168 or 10.9g',
-          )}
-          autoComplete="off"
-          value={query}
-          rightSection={state.status === 'loading' ? <Loader size="xs" /> : undefined}
-          onChange={(e) => setQuery(e.currentTarget.value)}
-          role="combobox"
-          aria-expanded={list}
-          {...(list && listAria)}
-          aria-autocomplete="list"
-          onKeyDown={(e) => searchKey(e, () => choose(current), move)}
-        />
-        <div className="bd-filter-bar">
-          <Button
-            className="bd-filters-toggle"
-            variant="default"
-            leftSection={<Funnel size={16} aria-hidden="true" />}
-            aria-expanded={filtersOpen}
-            aria-controls={`${id}-filters`}
-            onClick={() => setFiltersOpen((o) => !o)}
-          >
-            {filterCount > 0 ? t('Filters ({count})', { count: filterCount }) : t('Filters')}
-          </Button>
-        </div>
-        <div className="bd-filters" id={`${id}-filters`} data-open={filtersOpen}>
-          <Select
-            label={t('Manufacturer')}
-            placeholder={t('Any')}
-            data={manufacturers}
-            value={manufacturer || null}
-            searchable
-            clearable
-            nothingFoundMessage={t('No manufacturer found')}
-            onChange={(v) => setManufacturer(v ?? '')}
+      text={text}
+      designs={designs}
+      system={system}
+      onChoose={onChoose}
+      count={mass ? 1 : 0}
+      filters={
+        <fieldset className="bd-mass">
+          <legend>{t('Mass ({unit})', { unit: system.mass.symbol })}</legend>
+          <NumberInput
+            aria-label={t('Mass from, {unit}', { unit: system.mass.symbol })}
+            placeholder={t('From')}
+            min={0}
+            hideControls
+            value={from}
+            onChange={setFrom}
           />
-          <Select
-            label={t('Caliber')}
-            placeholder={t('Any')}
-            data={calibers}
-            value={caliber || null}
-            searchable
-            clearable
-            nothingFoundMessage={t('No caliber found')}
-            onChange={(v) => setCaliber(v ?? '')}
+          <NumberInput
+            aria-label={t('Mass to, {unit}', { unit: system.mass.symbol })}
+            placeholder={t('To')}
+            min={0}
+            hideControls
+            value={to}
+            onChange={setTo}
           />
-          <fieldset className="bd-mass">
-            <legend>{t('Mass ({unit})', { unit: system.mass.symbol })}</legend>
-            <NumberInput
-              aria-label={t('Mass from, {unit}', { unit: system.mass.symbol })}
-              placeholder={t('From')}
-              min={0}
-              hideControls
-              value={from}
-              onChange={setFrom}
-            />
-            <NumberInput
-              aria-label={t('Mass to, {unit}', { unit: system.mass.symbol })}
-              placeholder={t('To')}
-              min={0}
-              hideControls
-              value={to}
-              onChange={setTo}
-            />
-          </fieldset>
-          {designs.length > 0 && (
-            <SegmentedControl
-              aria-label={t('Source')}
-              data={[
-                { value: 'all', label: t('All') },
-                { value: 'catalogue', label: t('Catalogue') },
-                { value: 'designs', label: t('My designs') },
-              ]}
-              value={origin}
-              onChange={(v) => setOrigin(v as typeof origin)}
-            />
-          )}
-          <Select
-            className="bd-sort"
-            label={t('Sort by')}
-            data={sortOptions.map((o) => ({ value: o.value, label: t(o.label) }))}
-            value={sort}
-            allowDeselect={false}
-            onChange={(v) => {
-              if (!v) return
-              setSort(v as BulletSort)
-              // the choice reorders the list under the search box, which keeps the focus
-              searchBox.current?.focus()
-            }}
-          />
-        </div>
-        {fit && fitOn && (
+        </fieldset>
+      }
+      chips={
+        fit &&
+        fitOn && (
           <div className="bd-chips">
             <Pill
               withRemoveButton
@@ -462,65 +215,8 @@ export function BulletSearchDialog({
               {fitName ? t('Fits {name}', { name: fitName }) : t('Fits the cartridge')}
             </Pill>
           </div>
-        )}
-        <p role="status" className="search-status bd-status">
-          {message}
-        </p>
-        <div className="bd-body">
-          <Results
-            status={state.status}
-            retry={retry}
-            shown={shown}
-            id={id}
-            active={active}
-            system={system}
-            onActive={setActive}
-            onChoose={choose}
-          />
-          {current && !phone && <Preview row={current} system={system} />}
-        </div>
-      </div>
-    </AppModal>
-  )
-}
-
-function Preview({ row, system }: { row: BulletRow; system: UnitSystem }) {
-  const { t } = useTranslation()
-  const cells = bulletCells(row, system)
-  const bc = bulletBallisticCoefficient(row)
-  const facts: [Message, string | undefined][] = [
-    [msg('Manufacturer'), row.manufacturerName || undefined],
-    [msg('Caliber'), cells.caliber],
-    [msg('Diameter'), cells.diameter],
-    [msg('Mass'), row.mass === null ? undefined : `${cells.mass} ${system.mass.symbol}`],
-    [msg('Length'), row.length === null ? undefined : `${cells.length} ${system.length.symbol}`],
-    [
-      msg('BC'),
-      bc
-        ? [bc, bc.other].flatMap((x) => (x ? [ballisticCoefficientText(x)] : [])).join(', ')
-        : undefined,
-    ],
-    [msg('Construction'), row.construction],
-    [msg('Tip'), row.tipType],
-    [msg('Country'), row.country],
-  ]
-  return (
-    <aside className="bd-preview" aria-label={t('Highlighted bullet')}>
-      <p className="bd-preview-title">{row.name}</p>
-      <dl>
-        {facts.map(([k, v]) => (
-          <div key={k}>
-            <dt>{t(k)}</dt>
-            <dd>{v ?? t('n/a')}</dd>
-          </div>
-        ))}
-      </dl>
-      {!row.origin && (
-        <Link href={`/bullets/${row.id}`} target="_blank" rel="noopener">
-          {t('Open the record')}
-          <span className="visually-hidden"> {t('in a new tab')}</span>
-        </Link>
-      )}
-    </aside>
+        )
+      }
+    />
   )
 }
