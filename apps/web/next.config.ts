@@ -2,8 +2,8 @@ import os from 'node:os'
 import path from 'node:path'
 import type { NextConfig } from 'next'
 import packageJson from './package.json' with { type: 'json' }
+import { shortCommit } from './scripts/git-head.ts'
 import { buildLine } from './src/lib/build-line.ts'
-import { shortCommit } from './src/lib/git-head.ts'
 
 /**
  * The static export, served under this path (`''` at a domain root, `/Ballistics` on a project

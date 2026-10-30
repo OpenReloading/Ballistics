@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { expect, it } from 'vitest'
-import { shortCommit } from '../src/lib/git-head.ts'
+import { shortCommit } from '../scripts/git-head.ts'
 
 const sha = 'abcdef0123456789abcdef0123456789abcdef01'
 const tmp = () => mkdtempSync(path.join(tmpdir(), 'git-head-'))
