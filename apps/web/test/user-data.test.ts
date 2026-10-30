@@ -175,6 +175,7 @@ describe('user data files', () => {
       added: [fresh],
       equal: [sameData],
       conflicts: [{ incoming: changed, stored: load }],
+      blocked: [],
     })
   })
 
@@ -189,7 +190,12 @@ describe('user data files', () => {
     const again = { ...imported, imported: { source: 'Other', file: '', day: '2026-10-27' } }
     expect(
       planImport([again, { ...bullet, imported: again.imported }], [imported, bullet]),
-    ).toEqual({ added: [], equal: [again, { ...bullet, imported: again.imported }], conflicts: [] })
+    ).toEqual({
+      added: [],
+      equal: [again, { ...bullet, imported: again.imported }],
+      conflicts: [],
+      blocked: [],
+    })
   })
 
   it('names the photos of replaced target sheets that no stored record points at any more', () => {
