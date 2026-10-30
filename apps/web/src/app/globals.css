@@ -6768,6 +6768,11 @@ main .record-sources .sources tbody th {
     clip-path: inset(50%);
     white-space: nowrap;
   }
+
+  /* a source without this value: no bare label */
+  .record-sources .sources td[data-label]:empty {
+    display: none;
+  }
 }
 
 .hash code {
