@@ -6,7 +6,7 @@ description: The catalogue records as one bundle, their reader and plausibility 
 
 # `@open-reloading/data`
 
-The catalogue records of this repository as one JSON bundle, the reader that validates a records folder into that bundle, and the plausibility checks the records pass. The records are licensed CC BY 4.0, the code MIT. The [Data](../data/federations.md) pages describe the records and their sources.
+The catalogue records of this repository as one JSON bundle, the reader that validates a records folder into that bundle, and the plausibility checks the records pass. The code is MIT. Each record entry states its licence in its `license` field; entries without one are CC BY 4.0 (see `packages/data/LICENSE`). The [Data](../data/federations.md) pages describe the records and their sources.
 
 ## Install
 
