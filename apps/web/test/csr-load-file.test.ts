@@ -84,8 +84,25 @@ describe('ChamberSim Reloaded load files', () => {
       grtText,
       '<?xml version="1.0"?><workbook/>',
       '<!-- ChamberSimReloaded -->',
+      '<!-- note --><?xml version="1.0"?><workbook/><ChamberSimReloaded/>',
+      '<?xml version="1.0"?><!-- not closed <ChamberSimReloaded>',
     ])
       expect(format.detect(bytes(other)), other).toBe(false)
+  })
+
+  it('are told after the comments and processing instructions the XML reader takes before the root', async () => {
+    const format = csr as LoadFileFormat
+    const [declaration, ...rest] = csrText().split('\n')
+    const body = rest.join('\n')
+    const long = `<!-- ${'x'.repeat(2000)} -->`
+    for (const text of [
+      `${declaration}\n<!-- saved by hand -->\n${body}`,
+      `<!-- first -->${declaration}<?style a?>\n${long}\n${body}`,
+    ]) {
+      expect(format.detect(bytes(text)), text.slice(0, 60)).toBe(true)
+      const read = await readLoadFile(bytes(text))
+      expect(read.ok).toBe(true)
+    }
   })
 
   it('open to a valid load that an Open stores with its components and measurement series', async () => {
