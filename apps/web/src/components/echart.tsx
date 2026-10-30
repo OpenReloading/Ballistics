@@ -133,7 +133,9 @@ export function EChart({
     })
     seen.observe(node)
     // print lays the page out again without a resize: draw at the print width before the snapshot,
-    // at the box's width after it
+    // at the box's width after it. `afterprint` can come while the print layout still holds, where
+    // the box is hidden or narrow and the observer sees no change on return: measure a frame later,
+    // and again when the print media stops matching
     const redraw = (width: number) => {
       if (!c) return
       c.resize({ width, height: tall() })
@@ -144,8 +146,16 @@ export function EChart({
     const before = () => {
       if (node.clientWidth > printWidth) redraw(printWidth)
     }
+    let frame = 0
     const after = () => {
-      if (node.clientWidth > 0) redraw(node.clientWidth)
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        if (node.clientWidth > 0) redraw(node.clientWidth)
+      })
+    }
+    const media = matchMedia('print')
+    const changed = () => {
+      if (!media.matches) after()
     }
     // Escape hides the tooltip (WCAG 1.4.13) wherever the pointer or the focus is
     const dismiss = (e: globalThis.KeyboardEvent) => {
@@ -153,10 +163,13 @@ export function EChart({
     }
     addEventListener('beforeprint', before)
     addEventListener('afterprint', after)
+    media.addEventListener('change', changed)
     addEventListener('keydown', dismiss)
     return () => {
       removeEventListener('beforeprint', before)
       removeEventListener('afterprint', after)
+      media.removeEventListener('change', changed)
+      cancelAnimationFrame(frame)
       removeEventListener('keydown', dismiss)
       seen.disconnect()
       c?.dispose()
