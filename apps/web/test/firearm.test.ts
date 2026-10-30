@@ -19,6 +19,7 @@ import {
   landsFor,
   landsOf,
   sightOptions,
+  withSessionRounds,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
@@ -405,5 +406,34 @@ describe('firearmPatch', () => {
       roundCountDate: '2026-01-05',
     })
     expect(firearmPatch(counted, { roundCount: 400 }, now).roundCountDate).toBe('2026-01-05')
+  })
+})
+
+describe('withSessionRounds', () => {
+  const now = new Date(2026, 9, 12, 18, 0)
+  const counted = {
+    ...rifle,
+    data: { ...rifle.data, roundCount: 400, roundCountDate: '2026-01-05' },
+  }
+
+  it('adds the rounds and dates the count', () => {
+    const next = defined(withSessionRounds(counted, 400, 10, 12, now))
+    expect(next.kind === 'firearm' && next.data).toMatchObject({
+      roundCount: 412,
+      roundCountDate: '2026-10-12',
+    })
+    expect(next.saved).toBe(now.toISOString())
+  })
+
+  it('skips a session counted already', () => {
+    expect(withSessionRounds(counted, 390, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, 380, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, 391, 10, 10, now)).toBeDefined()
+  })
+
+  it('skips a firearm without a count, a session without a base and no rounds', () => {
+    expect(withSessionRounds(rifle, 0, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, undefined, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, 400, 10, 0, now)).toBeUndefined()
   })
 })

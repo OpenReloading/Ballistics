@@ -8,6 +8,7 @@ import {
   type QuantityValue,
   toSi,
   type UserRecord,
+  userRecord,
 } from '@open-reloading/schema'
 import { formatNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -306,6 +307,29 @@ export function firearmPatch(f: Firearm, p: Partial<Firearm>, now = new Date()):
   const next = { ...f, ...p }
   if (!('roundCount' in p) || p.roundCount === f.roundCount) return next
   return { ...next, roundCountDate: p.roundCount === undefined ? undefined : localDay(now) }
+}
+
+/**
+ * The stored firearm `record` with `n` rounds added to its count, dated through `firearmPatch`, for
+ * a session of `shots` shots whose snapshot recorded the count `base`. undefined, leaving the
+ * record, when it is no firearm, has no count, the session has no base, or the count is at least
+ * `base + shots` already (the session was added, here or in another tab).
+ */
+export function withSessionRounds(
+  record: UserRecord,
+  base: number | undefined,
+  shots: number,
+  n: number,
+  now = new Date(),
+): UserRecord | undefined {
+  if (record.kind !== 'firearm' || base === undefined || n < 1) return undefined
+  const count = record.data.roundCount
+  if (count === undefined || count >= base + shots) return undefined
+  return userRecord.parse({
+    ...record,
+    saved: now.toISOString(),
+    data: firearmPatch(record.data, { roundCount: count + n }, now),
+  })
 }
 
 /** The first `<prefix><n>` not in `taken`; optic and configuration ids are local to a firearm. */
