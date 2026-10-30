@@ -134,6 +134,8 @@ function firearmColumns(
     {
       key: 'name',
       label: msg('Name'),
+      // every column has a width: the table scrolls sideways before the name is squeezed
+      width: '12rem',
       value: nameOf,
       cell: (r) =>
         r === example ? (
@@ -230,6 +232,7 @@ function firearmColumns(
       key: 'notes',
       label: msg('Notes'),
       help: msg('Saved loads of another cartridge, or no saved load.'),
+      width: '12rem',
       value: (r) => notesOf(r).join(' ') || undefined,
       cell: (r) => notesOf(r).join(' '),
     },

@@ -2913,6 +2913,23 @@ td.nowrap {
   }
 }
 
+/* the firearm table's columns all have a width (93rem): below a window of about 1600 px the table
+   scrolls sideways in its box, above it the filler column takes the room left and the name keeps
+   its width */
+@media screen and (min-width: 48em) {
+  .library > .directory > .directory-scroll {
+    overflow-x: auto;
+  }
+
+  .library .directory-table col.name-cell {
+    width: var(--w);
+  }
+
+  .library .directory-table col.filler {
+    width: auto;
+  }
+}
+
 /* the filter row as high under the page bar as on the other lists */
 .library > .directory > .directory-filters {
   padding-top: 0;
@@ -10581,8 +10598,12 @@ main .page-bar h1 {
 
 /* the name is the row's link: set in the text colour and semibold (the shipped Inter weights are
    400 and 600), the link colour and an underline while the row is pointed at or focused, so 500
-   rows are not 500 blue underlines */
+   rows are not 500 blue underlines. A block, so a long name ends in its own cell and its box does
+   not lie over the next cell's text */
 .directory-table td.name-cell a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--fg);
   font-weight: 600;
   text-decoration: none;
