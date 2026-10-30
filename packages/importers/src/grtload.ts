@@ -75,14 +75,15 @@ export interface GrtLoadRead {
   warnings: string[]
 }
 
-const elements = (e: XmlElement) => e.children.filter((c): c is XmlElement => typeof c !== 'string')
+export const elements = (e: XmlElement) =>
+  e.children.filter((c): c is XmlElement => typeof c !== 'string')
 const textOf = (e: XmlElement) => e.children.filter((c) => typeof c === 'string').join('')
-const clip = (s: string | undefined, max = 200) => (s ? s.slice(0, max) : undefined)
+export const clip = (s: string | undefined, max = 200) => (s ? s.slice(0, max) : undefined)
 /** A number with `.` or a lone `,` as decimal mark; NaN otherwise. */
-const numberOf = (s: string) => Number(/^[-+]?\d+,\d+$/.test(s) ? s.replace(',', '.') : s)
+export const numberOf = (s: string) => Number(/^[-+]?\d+,\d+$/.test(s) ? s.replace(',', '.') : s)
 
 /** Id, name and data of a record of `kind`, the id from its content: the same content gives the same id in every file. */
-const named = <D>(kind: string, name: string, data: D) => ({
+export const named = <D>(kind: string, name: string, data: D) => ({
   id: idOfKey(`${kind}|${JSON.stringify([name, data])}`),
   name,
   data,
@@ -99,7 +100,7 @@ interface Read {
 }
 
 /** Text with its percent escapes resolved; the text as written, with a warning, when they are not valid. */
-function unescaped(s: string, at: string, warnings: string[]) {
+export function unescaped(s: string, at: string, warnings: string[]) {
   try {
     return decodeURIComponent(s).trim()
   } catch {
@@ -257,18 +258,10 @@ function loadOf(
 }
 
 /**
- * The records of a load file: the cartridge, the bullet (after its maker) and the powder it names,
- * then the load, saved at `saved` (ISO 8601). Percent escapes in text values are resolved, numbers converted
- * from the unit each field declares to the stored unit; a field with an empty value holds nothing
- * to read. Ids come from the content, so a file read again gives the same records and files that
- * share a component give it one id. Throws with the reason on a file that is no load file of this
- * format. The caller checks each record with the user record schema.
+ * The records of the load input element of a file of this layout (GRT's, also written by other
+ * programs): the cartridge, the bullet after its maker, the powder, then the load last.
  */
-export function readGrtLoad(xml: string, saved: string): GrtLoadRead {
-  const root = parseXml(xml.replace(/^\uFEFF/, ''))
-  if (root.name !== grtLoadRoot) throw new Error(`The root element is not ${grtLoadRoot}.`)
-  const input = elements(root).find((e) => e.name === 'InnerBallistikInput')
-  if (!input) throw new Error('The file holds no load.')
+export function readLoadInput(input: XmlElement, saved: string): GrtLoadRead {
   const r = readInput(input)
   const cartridgeName = clip(r.texts['caliber.CaliberName'])
   const bulletName = clip(r.texts['projectile.ProjectileName'] ?? r.texts['projectile.pname'])
@@ -289,4 +282,20 @@ export function readGrtLoad(xml: string, saved: string): GrtLoadRead {
   })
   const records = [cartridge, ...bullet, powder, load].filter((x) => x !== undefined)
   return { records, unmapped: [...r.unmapped], warnings: r.warnings }
+}
+
+/**
+ * The records of a load file: the cartridge, the bullet (after its maker) and the powder it names,
+ * then the load, saved at `saved` (ISO 8601). Percent escapes in text values are resolved, numbers converted
+ * from the unit each field declares to the stored unit; a field with an empty value holds nothing
+ * to read. Ids come from the content, so a file read again gives the same records and files that
+ * share a component give it one id. Throws with the reason on a file that is no load file of this
+ * format. The caller checks each record with the user record schema.
+ */
+export function readGrtLoad(xml: string, saved: string): GrtLoadRead {
+  const root = parseXml(xml.replace(/^\uFEFF/, ''))
+  if (root.name !== grtLoadRoot) throw new Error(`The root element is not ${grtLoadRoot}.`)
+  const input = elements(root).find((e) => e.name === 'InnerBallistikInput')
+  if (!input) throw new Error('The file holds no load.')
+  return readLoadInput(input, saved)
 }

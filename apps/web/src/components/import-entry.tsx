@@ -264,6 +264,7 @@ function heldText(kinds: Extract<CardView, { records: number }>['kinds'], tn: Tr
     cartridge: (n) => tn(n, '{count} cartridge', '{count} cartridges'),
     bullet: (n) => tn(n, '{count} bullet', '{count} bullets'),
     powder: (n) => tn(n, '{count} powder', '{count} powders'),
+    session: (n) => tn(n, '{count} session', '{count} sessions'),
   }
   const order = Object.keys(words)
   return Object.entries(kinds)
