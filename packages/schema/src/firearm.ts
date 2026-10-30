@@ -259,6 +259,7 @@ export const firearm = z
       .describe('Mass of the firearm.')
       .optional(),
     roundCount: z.int().nonnegative().describe('Rounds fired through the barrel.').optional(),
+    roundCountDate: z.iso.date().describe('Day the round count was last set, ISO 8601.').optional(),
     noteAtRoundCount: z
       .int()
       .positive()

@@ -539,6 +539,7 @@ describe('firearm', () => {
     expect(paths({ twist: { value: Number.POSITIVE_INFINITY } })).toEqual(['data.twist.value'])
     expect(paths({ twistHand: 'up' })).toEqual(['data.twistHand'])
     expect(paths({ roundCount: 1.5 })).toEqual(['data.roundCount'])
+    expect(paths({ roundCountDate: '2026-10-12T08:00:00Z' })).toEqual(['data.roundCountDate'])
   })
 
   it('caps texts and lists', () => {

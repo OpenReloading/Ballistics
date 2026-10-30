@@ -10,10 +10,12 @@ import {
   type FederationListItem,
 } from '../lib/disciplines.ts'
 import type { DisciplineSummary, MappingSummary } from '../lib/face-disciplines.ts'
+import { matchCourse } from '../lib/match-rounds.ts'
 import { rowText } from '../lib/record-fields.ts'
 import { readItems, readRecord } from '../lib/record-reads.ts'
 import { say } from '../lib/wording.ts'
 import { DisciplineData, DisciplineStages, DisciplineStrip } from './discipline-record.tsx'
+import { MatchRounds } from './match-rounds.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 import { TargetFaceDrawing } from './target-face-drawing.tsx'
@@ -117,6 +119,7 @@ export function DisciplineRecordView({
           }
         />
       }
+      side={<MatchRounds course={matchCourse(mappings, d.rules)} />}
     />
   )
 }

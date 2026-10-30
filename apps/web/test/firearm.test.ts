@@ -12,12 +12,14 @@ import {
   fieldSi,
   fieldStored,
   firearmCells,
+  firearmPatch,
   firearmProblem,
   freeId,
   gunValues,
   landsFor,
   landsOf,
   sightOptions,
+  withSessionRounds,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
@@ -382,5 +384,56 @@ describe('cardFacts and clickText', () => {
     expect(clickText({ ...o, clickUnit: 'mrad' }, us)).toBe('0.10 mrad')
     expect(clickText({ ...o, clickUnit: 'MOA' }, metric)).toBe('0.34 MOA')
     expect(clickText({ ...o, clickValue: undefined }, metric)).toBeUndefined()
+  })
+})
+
+describe('firearmPatch', () => {
+  const now = new Date(2026, 9, 12, 23, 30)
+  const counted = { ...blankFirearm(), roundCount: 400, roundCountDate: '2026-01-05' }
+
+  it('dates a changed round count to the local day and drops the date of a cleared one', () => {
+    expect(firearmPatch(blankFirearm(), { roundCount: 120 }, now)).toMatchObject({
+      roundCount: 120,
+      roundCountDate: '2026-10-12',
+    })
+    expect(firearmPatch(counted, { roundCount: 450 }, now).roundCountDate).toBe('2026-10-12')
+    expect(firearmPatch(counted, { roundCount: undefined }, now).roundCountDate).toBeUndefined()
+  })
+
+  it('keeps the date on any other edit and on the same count', () => {
+    expect(firearmPatch(counted, { notes: 'Cleaned', active: 'c1' }, now)).toMatchObject({
+      notes: 'Cleaned',
+      roundCountDate: '2026-01-05',
+    })
+    expect(firearmPatch(counted, { roundCount: 400 }, now).roundCountDate).toBe('2026-01-05')
+  })
+})
+
+describe('withSessionRounds', () => {
+  const now = new Date(2026, 9, 12, 18, 0)
+  const counted = {
+    ...rifle,
+    data: { ...rifle.data, roundCount: 400, roundCountDate: '2026-01-05' },
+  }
+
+  it('adds the rounds and dates the count', () => {
+    const next = defined(withSessionRounds(counted, 400, 10, 12, now))
+    expect(next.kind === 'firearm' && next.data).toMatchObject({
+      roundCount: 412,
+      roundCountDate: '2026-10-12',
+    })
+    expect(next.saved).toBe(now.toISOString())
+  })
+
+  it('skips a session counted already', () => {
+    expect(withSessionRounds(counted, 390, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, 380, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, 391, 10, 10, now)).toBeDefined()
+  })
+
+  it('skips a firearm without a count, a session without a base and no rounds', () => {
+    expect(withSessionRounds(rifle, 0, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, undefined, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, 400, 10, 0, now)).toBeUndefined()
   })
 })

@@ -29,6 +29,7 @@ import { type Dispatch, type ReactElement, type SetStateAction, useState } from 
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary } from '../lib/api-types.ts'
+import { dayText } from '../lib/dates.ts'
 import { close, type FieldSpec, fieldError, specText } from '../lib/field-spec.ts'
 import {
   fieldSi,
@@ -177,7 +178,12 @@ export function FirearmEditor({
         )}
         {data.roundCount !== undefined && (
           <Text c="dimmed" size="sm">
-            {tn(data.roundCount, '{count} round', '{count} rounds')}
+            {data.roundCountDate
+              ? t('{rounds}, as of {date}', {
+                  rounds: tn(data.roundCount, '{count} round', '{count} rounds'),
+                  date: dayText(data.roundCountDate),
+                })
+              : tn(data.roundCount, '{count} round', '{count} rounds')}
           </Text>
         )}
       </Group>

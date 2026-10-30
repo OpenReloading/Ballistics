@@ -2,7 +2,7 @@
 
 import { Button } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
-import { chronoSession, type SessionRecord, toSi } from '@open-reloading/schema'
+import { chronoSession, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import Link from 'next/link'
 import { type Dispatch, type ReactNode, type SetStateAction, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -11,6 +11,7 @@ import { msg, type Translator } from '../i18n/translate.ts'
 import { chronoFileBytes, chronoMessageText, readChrono } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
+import { withSessionRounds } from '../lib/firearm.ts'
 import {
   type ChargeRow,
   chargeRows,
@@ -27,7 +28,9 @@ import { sessionStrings, tuneHref } from '../lib/powder-tune.ts'
 import { conditionsText } from '../lib/range-entry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
+import { storedRecord, updateRecord } from '../lib/user-store.ts'
 import { ChronoFileInput } from './chrono-file-input.tsx'
+import { confirmDialog } from './confirm.tsx'
 import { LadderFlatSpots } from './ladder-flat-spots.tsx'
 import { LineChart, useChartScale } from './line-chart.tsx'
 import { SessionNotes } from './load-notes.tsx'
@@ -272,15 +275,18 @@ export function Measurements({
   setSessions: Dispatch<SetStateAction<SessionRecord[]>>
 }) {
   const { t, tn } = useTranslation()
-  const { manufacturerRef, manufacturerName, sessionRefCount, handOffTune } = useResult()
+  const { manufacturerRef, manufacturerName, sessionRefCount, handOffTune, ownFirearm } =
+    useResult()
   const [unit, setUnit] = useState<VelocityUnit | ''>('')
   const [failures, setFailures] = useState<Failure[]>([])
   const [read, setRead] = useState<{ name: string; strings: number }[]>([])
+  const [counted, setCounted] = useState('')
   const reserved = useRef(0)
 
   async function readFiles(files: File[]) {
     setFailures([])
     setRead([])
+    setCounted('')
     const added: SessionRecord[] = []
     const failed: Failure[] = []
     // a maker named by several files is one reference, a new one is stored once
@@ -301,6 +307,43 @@ export function Measurements({
     reserved.current -= taken.length
     setRead(added.map((r) => ({ name: r.name, strings: r.data.strings.length })))
     setFailures(failed)
+    if (ownFirearm) await offerRounds(ownFirearm, added)
+  }
+
+  /** Asks to add the shots of the strings mapped to a charge, which name this load, to the firearm's count. */
+  async function offerRounds(id: string, added: SessionRecord[]) {
+    const shots = added
+      .flatMap((r) => r.data.strings)
+      .reduce((n, s) => n + (s.variation ? s.shots.length : 0), 0)
+    try {
+      const found = userRecord.safeParse(await storedRecord(id))
+      if (!found.success || found.data.kind !== 'firearm') return
+      const base = found.data.data.roundCount
+      if (shots < 1 || base === undefined) return
+      const firearm = found.data.name
+      const ok = await confirmDialog({
+        title: t('Add to the round count?'),
+        message: tn(
+          shots,
+          'Add {count} shot of these strings to the round count of {name}?',
+          'Add {count} shots of these strings to the round count of {name}?',
+          { name: firearm },
+        ),
+        confirmLabel: t('Add'),
+      })
+      if (!ok) return
+      const written = await updateRecord(id, (raw) => {
+        const stored = userRecord.safeParse(raw)
+        return stored.success ? withSessionRounds(stored.data, base, shots, shots) : undefined
+      })
+      setCounted(
+        written?.kind === 'firearm' && written.data.roundCount !== undefined
+          ? t('Round count of {name}: {count}.', { name: firearm, count: written.data.roundCount })
+          : t('The round count of {name} holds this session already.', { name: firearm }),
+      )
+    } catch (e) {
+      setCounted(errorText(e))
+    }
   }
 
   const charge = (kg: number) => withUnit('charge', system, kg)
@@ -436,7 +479,8 @@ export function Measurements({
                 }),
               )
               .join('; '),
-          })}
+          })}{' '}
+        {counted}
       </p>
       {failures.length > 0 && (
         <ErrorNote title={t('The file was not read.')}>

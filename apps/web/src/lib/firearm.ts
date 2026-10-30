@@ -8,9 +8,11 @@ import {
   type QuantityValue,
   toSi,
   type UserRecord,
+  userRecord,
 } from '@open-reloading/schema'
 import { formatNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { localDay } from './dates.ts'
 import type { FieldSpec } from './field-spec.ts'
 import { nth } from './nth.ts'
 import { formatQuantity, type Quantity, type UnitSystem, unitsOf, withUnit } from './units.ts'
@@ -296,6 +298,39 @@ export const blankFirearm = (): Firearm => ({
   optics: [],
   configurations: [],
 })
+
+/**
+ * `p` over `f`: a changed round count is dated to the local day of `now`, a cleared one loses its
+ * date, and any other edit keeps the date, so it tells how old the count is, not the record.
+ */
+export function firearmPatch(f: Firearm, p: Partial<Firearm>, now = new Date()): Firearm {
+  const next = { ...f, ...p }
+  if (!('roundCount' in p) || p.roundCount === f.roundCount) return next
+  return { ...next, roundCountDate: p.roundCount === undefined ? undefined : localDay(now) }
+}
+
+/**
+ * The stored firearm `record` with `n` rounds added to its count, dated through `firearmPatch`, for
+ * a session of `shots` shots whose snapshot recorded the count `base`. undefined, leaving the
+ * record, when it is no firearm, has no count, the session has no base, or the count is at least
+ * `base + shots` already (the session was added, here or in another tab).
+ */
+export function withSessionRounds(
+  record: UserRecord,
+  base: number | undefined,
+  shots: number,
+  n: number,
+  now = new Date(),
+): UserRecord | undefined {
+  if (record.kind !== 'firearm' || base === undefined || n < 1) return undefined
+  const count = record.data.roundCount
+  if (count === undefined || count >= base + shots) return undefined
+  return userRecord.parse({
+    ...record,
+    saved: now.toISOString(),
+    data: firearmPatch(record.data, { roundCount: count + n }, now),
+  })
+}
 
 /** The first `<prefix><n>` not in `taken`; optic and configuration ids are local to a firearm. */
 export function freeId(prefix: string, taken: string[]) {
