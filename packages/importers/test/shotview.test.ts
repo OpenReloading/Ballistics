@@ -209,7 +209,7 @@ describe('ShotView CSV rows, name line and footer date', () => {
   it('reads the day after a time and only whole numbers of four digits as the year', () => {
     expect(dated('10:45, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
     expect(dated('10:45:37, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
-    expect(dated('Serie 12345, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
+    expect(dated('Lauf 12345, 8. M\u00E4rz 2026').session.date).toBe('2026-03-08')
   })
 
   it('leaves a date without a day or without a month to the user', () => {

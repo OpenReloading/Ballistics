@@ -87,8 +87,25 @@ describe('GRT load files', () => {
       'Shot,Velocity (fps)\n1,2800\n2,2810',
       '<?xml version="1.0"?><workbook/>',
       `<!-- GordonsReloadingTool -->`,
+      `<!-- note --><?xml version="1.0"?><workbook/><GordonsReloadingTool/>`,
+      `<?xml version="1.0"?><!-- not closed <GordonsReloadingTool>`,
     ])
       expect(format.detect(bytes(other)), other).toBe(false)
+  })
+
+  it('are told after the comments and processing instructions the XML reader takes before the root', async () => {
+    const format = grt as LoadFileFormat
+    const [declaration, ...rest] = grtText().split('\r\n')
+    const body = rest.join('\r\n')
+    const long = `<!-- ${'x'.repeat(2000)} -->`
+    for (const text of [
+      `${declaration}\r\n<!-- saved by hand -->\r\n${body}`,
+      `<!-- first -->${declaration}<?style a?>\n${long}\n${body}`,
+    ]) {
+      expect(format.detect(bytes(text)), text.slice(0, 60)).toBe(true)
+      const read = await readLoadFile(bytes(text))
+      expect(read.ok).toBe(true)
+    }
   })
 
   it('open to a valid load that names its cartridge, bullet and powder, which an Open stores with it', async () => {
@@ -138,6 +155,41 @@ describe('GRT load files', () => {
     if (!read.ok) throw new Error(read.reason)
     expect(linkedRecordsOf(named, read.records)).toEqual([bullet])
     expect(linkedRecordsOf(bullet, read.records)).toEqual([])
+  })
+
+  it('carries the manufacturer of a linked case once, also when the load names it too', () => {
+    const maker: UserRecord = {
+      kind: 'manufacturer',
+      id: '00000000-0000-4000-8000-000000000002',
+      name: 'Own brass works',
+      saved: load.saved,
+      data: { origin: 'user' },
+    }
+    const brass: UserRecord = {
+      kind: 'case',
+      id: '00000000-0000-4000-8000-000000000003',
+      name: 'Fired twice',
+      saved: load.saved,
+      data: {
+        origin: 'user',
+        cartridge: 'catalogue:308-win',
+        material: 'brass',
+        manufacturer: `user:${maker.id}`,
+      },
+    }
+    const named: UserRecord = {
+      ...load,
+      data: { ...load.data, case: { record: `user:${brass.id}` } },
+    }
+    expect(linkedRecordsOf(named, [named, brass, maker])).toEqual([brass, maker])
+    const both: UserRecord = {
+      ...load,
+      data: {
+        ...load.data,
+        case: { record: `user:${brass.id}`, manufacturer: `user:${maker.id}` },
+      },
+    }
+    expect(linkedRecordsOf(both, [both, brass, maker])).toEqual([brass, maker])
   })
 })
 

@@ -19,11 +19,11 @@ File menu, Open on the workbench opens the load of one file and keeps the cartri
 
 ## GRT load files (`.grtload`)
 
-An XML file whose root element is `GordonsReloadingTool`. The load is in the element `InnerBallistikInput`: a title, the sections `caliber`, `gun`, `projectile` and `propellant` of `input` fields (each with a name, a value and a unit), and an appendix. Text values are percent-encoded.
+An XML file whose root element is `GordonsReloadingTool`, after an optional XML declaration, comments and processing instructions. The load is in the element `InnerBallistikInput`: a title, the sections `caliber`, `gun`, `projectile` and `propellant` of `input` fields (each with a name, a value and a unit), and an appendix. Text values are percent-encoded.
 
 Reading rules:
 
-- A field is read from the unit it declares, converted to the stored unit. A unit not in the table below, or a value that is no number, gives a warning and the field is not read.
+- A field is read from the unit it declares, converted to the stored unit. A unit not in the table below, a value that is no number, or one too large for a number in the stored unit gives a warning and the field is not read.
 - A field with an empty value holds nothing and is skipped.
 - Every other field with a value, every section not listed and every appendix part other than a note is listed on the card as not read.
 - A text that is not valid percent encoding is read as written, with a warning.
