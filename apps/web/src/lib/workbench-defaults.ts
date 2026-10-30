@@ -88,3 +88,22 @@ export function storeDefaults(d: WorkbenchDefaults) {
     else localStorage.setItem(defaultsKey, text)
   } catch {}
 }
+
+/** `localStorage` key of the Run automatically switch: `off` when switched off, else absent. */
+const autoRunKey = storageName('workbenchAutoRun')
+
+/** Whether the workbench runs on its own after an input change; on when storage is empty or not available. */
+export function readAutoRun(): boolean {
+  try {
+    return localStorage.getItem(autoRunKey) !== 'off'
+  } catch {
+    return true
+  }
+}
+
+export function storeAutoRun(on: boolean) {
+  try {
+    if (on) localStorage.removeItem(autoRunKey)
+    else localStorage.setItem(autoRunKey, 'off')
+  } catch {}
+}

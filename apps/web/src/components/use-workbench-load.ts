@@ -148,6 +148,7 @@ import {
   defaultKeys,
   defaultsText,
   parseDefaults,
+  readAutoRun,
   readDefaults,
   type WorkbenchDefaults,
 } from '../lib/workbench-defaults.ts'
@@ -2068,6 +2069,7 @@ export function useWorkbenchState() {
   }
 
   async function send() {
+    clearTimeout(autoTimer.current)
     running.current?.abort()
     bandRequest.current?.abort()
     let req: ReturnType<typeof loadRequest>
@@ -2169,6 +2171,37 @@ export function useWorkbenchState() {
     setRunWhenFilled(false)
     run()
   }, [runWhenFilled, fields, asked, seated.figure])
+
+  /** Runs a changed load once it is complete and valid; an invalid value shows its error only. */
+  function autoRun() {
+    const loading = Object.values(asked).some((a) => a && !a.failed)
+    // a value is checked on blur: one still being typed has no shown error yet
+    const invalid =
+      Object.values(form.errors).some(Boolean) ||
+      !form.isValid() ||
+      (gunWeight !== undefined &&
+        fieldError(firearmMassSpec, gunWeight, system, t) !== undefined) ||
+      stepError() !== undefined
+    if (!changed || loading || invalid) return
+    try {
+      loadRequest()
+    } catch (err) {
+      if (err instanceof ValueError) form.setFieldError(err.field, err.message)
+      return
+    }
+    void send()
+  }
+  const autoRunNow = useRef(autoRun)
+  autoRunNow.current = autoRun
+  const autoTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  // each input change starts the wait again; Run clears it, the switch is read when it ends
+  useEffect(() => {
+    if (edits === 0 || !readAutoRun()) return
+    autoTimer.current = setTimeout(() => {
+      if (readAutoRun()) autoRunNow.current()
+    }, 600)
+    return () => clearTimeout(autoTimer.current)
+  }, [edits])
 
   /**
    * The shown result of a load that comes back in its tab: put back once the records of the

@@ -1109,6 +1109,7 @@
   "Rule-book targets: ring diameters, black area and the disciplines shot on them, each with its source.": "Scheiben der Sportordnungen: Ringdurchmesser, Spiegel und die Disziplinen, in denen darauf Schüsse abgegeben werden, jeweils mit ihrer Quelle.",
   "Rules": "Regeln",
   "Run": "Starten",
+  "Run automatically": "Automatisch starten",
   "Run simulation": "Simulation starten",
   "Run simulation ({keys})": "Simulation starten ({keys})",
   "Run simulation needs every step but the cartridge.": "„Simulation starten“ braucht alle Schritte außer der Patrone.",
