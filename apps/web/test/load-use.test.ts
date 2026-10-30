@@ -1,5 +1,8 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
+import { blankFirearm } from '../src/lib/firearm.ts'
+import { gapNotes, loadGaps } from '../src/lib/load-gaps.ts'
 import { loadUse } from '../src/lib/load-use.ts'
 
 const saved = '2026-01-01T00:00:00.000Z'
@@ -56,5 +59,85 @@ describe('load and firearm use', () => {
   it('counts the loads of a firearm and their latest session day', () => {
     expect(firearms.get(rifle)).toEqual({ loads: 2, last: '2026-05-01' })
     expect(firearms.size).toBe(1)
+  })
+})
+
+const firearm = (id: string, cartridge?: string): UserRecord => ({
+  kind: 'firearm',
+  id,
+  name: id,
+  saved,
+  data: { ...blankFirearm(), name: id, ...(cartridge && { cartridge }) },
+})
+
+const loadFor = (id: string, firearm: string | undefined, cartridge?: string): UserRecord => ({
+  kind: 'load',
+  id,
+  name: `Load ${id}`,
+  saved,
+  data: {
+    origin: 'user',
+    ...(firearm && { firearm }),
+    ...(cartridge && { cartridge }),
+  },
+})
+
+describe('load and firearm gaps', () => {
+  const m308 = 'catalogue:308-winchester'
+  const m65 = 'catalogue:6-5-creedmoor'
+  const design = '1a2b3c4d-5e6f-4a70-8b81-9c92d3e4f5a6'
+  const pistol = '2b1c2d3e-4f50-4a61-8b72-9c83d4e5f602'
+  const spare = '3b1c2d3e-4f50-4a61-8b72-9c83d4e5f603'
+  const bare = '4b1c2d3e-4f50-4a61-8b72-9c83d4e5f604'
+  const records: UserRecord[] = [
+    firearm(rifle, m308),
+    firearm(pistol, `user:${design}`),
+    firearm(spare, m308),
+    firearm(bare),
+    {
+      kind: 'cartridge',
+      id: design,
+      name: 'My wildcat',
+      saved,
+      data: { origin: 'user', basedOn: m308 },
+    },
+    loadFor('a', `user:${rifle}`, m308),
+    loadFor('b', `user:${rifle}`, m65),
+    loadFor('c', `user:${pistol}`, m308),
+    loadFor('d', `user:${bare}`, m65),
+    loadFor('e', undefined, m65),
+    loadFor('f', 'user:5b1c2d3e-4f50-4a61-8b72-9c83d4e5f605', m65),
+    loadFor('g', `user:${rifle}`),
+  ]
+  const gaps = loadGaps(records)
+  const names: Record<string, string> = { [m308]: '.308 Winchester', [m65]: '6.5 Creedmoor' }
+  const name = (ref: string | undefined) => (ref && gaps.designs.get(ref)) || (ref && names[ref])
+  const notes = (id: string) => {
+    const f = records.find((r) => r.id === id)
+    return f?.kind === 'firearm' ? gapNotes(f, gaps, name, english.t) : []
+  }
+
+  it('notes a load of another cartridge than its firearm, naming both cartridges', () => {
+    expect(notes(rifle)).toEqual(['Load b is for 6.5 Creedmoor, this firearm for .308 Winchester.'])
+    expect(notes(pistol)).toEqual(['Load c is for .308 Winchester, this firearm for My wildcat.'])
+  })
+
+  it('compares only set cartridges: a firearm without one has no mismatch', () => {
+    expect(notes(bare)).toEqual([])
+  })
+
+  it('notes a firearm no saved load names', () => {
+    expect([...gaps.unused]).toEqual([spare])
+    expect(notes(spare)).toEqual(['No saved load with this firearm.'])
+  })
+
+  it('takes a firearm reference that names no stored firearm for no mismatch', () => {
+    const all = [...gaps.mismatches.values()].flat().map((m) => m.load)
+    expect(all).toEqual(['Load b', 'Load c'])
+  })
+
+  it('describes the records only', () => {
+    const text = [rifle, pistol, spare].flatMap(notes).join(' ')
+    expect(text).not.toMatch(/\b(safe|unsafe|enough|recommended)\b/i)
   })
 })
