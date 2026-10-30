@@ -70,7 +70,10 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     '.github/pull_request_template.md',
   ])
     expect(plan([f], closure), f).toMatchObject({ check: false, e2e: false })
-  expect(plan(['compose.yaml'], closure)).toMatchObject({ check: true, e2e: true })
+  for (const f of ['.github/ISSUE_TEMPLATE/user-report.yml', 'NOTICE'])
+    expect(plan([f], closure), f).toMatchObject({ check: true, e2e: false })
+  for (const f of ['compose.yaml', '.dockerignore'])
+    expect(plan([f], closure), f).toMatchObject({ check: true, e2e: true })
 })
 
 it('runs the e2e job for the scripts that build and serve the export', () => {

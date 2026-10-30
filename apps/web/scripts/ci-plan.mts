@@ -33,17 +33,18 @@ const docsOnly = [
   // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page
   // prerenders the news items
   /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/).*\.md$/,
-  /^\.github\/(ISSUE_TEMPLATE\/|pull_request_template\.md$)/,
-  /^(LICENSE|NOTICE|\.coderabbit\.yaml)$/,
+  // the web tests read the user report template, the licence check the generated block of NOTICE
+  /^\.github\/(ISSUE_TEMPLATE\/(?!user-report\.yml$)|pull_request_template\.md$)/,
+  /^(LICENSE|\.coderabbit\.yaml)$/,
 ]
 
 /**
  * Files the e2e job reads besides those that feed the web build: its specs, the compose stack that runs
- * the API and the scripts that build and serve the export.
+ * the API, the build context of its image and the scripts that build and serve the export.
  */
 const e2eInputs = [
   /^apps\/e2e\//,
-  /^compose\.yaml$/,
+  /^(compose\.yaml|\.dockerignore)$/,
   /^tools\/src\/(pages|pages-serve|pages-payload|executable)\.ts$/,
 ]
 
