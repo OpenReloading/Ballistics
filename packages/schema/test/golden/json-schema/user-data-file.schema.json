@@ -7621,7 +7621,7 @@
           }
         ]
       },
-      "description": "The records of the file."
+      "description": "The records of the file. The app skips a record of a kind it does not list here and reports the kind with its count, so that a later version can add kinds; it does not keep the skipped records."
     },
     "files": {
       "type": "array",

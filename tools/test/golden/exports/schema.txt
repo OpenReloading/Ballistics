@@ -59,6 +59,7 @@
 . SheetNote
 . ShotGroup
 . SiMap
+. SkippedKind
 . Source
 . SourceOrigin
 . SourceRecord
@@ -201,3 +202,4 @@
 . userRefFields
 . valueKey
 . versionProblem
+. withoutUnknownKinds

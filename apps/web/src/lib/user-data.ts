@@ -3,12 +3,14 @@ import {
   checkUserRefs,
   type EmbeddedFile,
   parseRef,
+  type SkippedKind,
   type UserRecord,
   userDataFile,
   userDataFormat,
   userDataVersion,
   userRecord,
   versionProblem,
+  withoutUnknownKinds,
 } from '@open-reloading/schema'
 import { z } from 'zod'
 import type { Translator } from '../i18n/translate.ts'
@@ -62,10 +64,12 @@ export type ParsedUserFile =
       /** Fields of the file mapped to no record field, as the format names them. */
       unmapped?: string[]
       warnings?: string[]
+      /** Records of a kind this version does not know, left out of `records`. */
+      skipped?: SkippedKind[]
     }
   | { ok: false; reason: string }
 
-/** One file, validated against `@open-reloading/schema` as a whole. */
+/** One file, validated against `@open-reloading/schema` as a whole but for records of a kind it does not know. */
 export function parseUserDataFile(text: string): ParsedUserFile {
   if (fileBytes(text) > maxFileBytes) return { ok: false, reason: tooLargeMessage }
   let json: unknown
@@ -76,7 +80,8 @@ export function parseUserDataFile(text: string): ParsedUserFile {
   }
   const problem = versionProblem(json)
   if (problem) return { ok: false, reason: problem }
-  const r = userDataFile.safeParse(json)
+  const { json: known, skipped } = withoutUnknownKinds(json)
+  const r = userDataFile.safeParse(known)
   const invalid = (json as { invalid?: unknown }).invalid
   return r.success
     ? {
@@ -84,8 +89,30 @@ export function parseUserDataFile(text: string): ParsedUserFile {
         records: r.data.records,
         files: r.data.files,
         ...(Array.isArray(invalid) && invalid.length > 0 && { invalid }),
+        ...(skipped.length > 0 && { skipped }),
       }
-    : { ok: false, reason: problemsText(r.error) }
+    : {
+        ok: false,
+        reason: problemsText(skipped.length ? atFileIndex(r.error, json, known) : r.error),
+      }
+}
+
+/** `error` with each record index of `known` turned back into the index in `json`, which holds the skipped records too. */
+function atFileIndex(error: z.ZodError, json: unknown, known: unknown) {
+  const kept = (known as { records: unknown[] }).records
+  // `kept` is `records` in order without the skipped records, which are objects
+  const index: number[] = []
+  ;(json as { records: unknown[] }).records.forEach((r, i) => {
+    if (r === kept[index.length]) index.push(i)
+  })
+  return new z.ZodError(
+    error.issues.map((i) => {
+      const [field, at, ...rest] = i.path
+      return field === 'records' && typeof at === 'number'
+        ? { ...i, path: [field, index[at] ?? at, ...rest] }
+        : i
+    }),
+  )
 }
 
 /** Problems a reason names: a file of many invalid records would otherwise list every one. */

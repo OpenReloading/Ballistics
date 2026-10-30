@@ -62,13 +62,21 @@ export async function readLoadFile(
   return await (loadFormatOf(bytes, formats) ?? nth(formats, 0)).parse(bytes)
 }
 
-/** The warnings and unmapped fields of a read file as one sentence, empty when it has none. */
+/** The warnings, unmapped fields and skipped kinds of a read file as one sentence, empty when it has none. */
 export const readNote = (p: ParsedUserFile, t: Translator['t']) =>
   p.ok
     ? [
         ...(p.warnings ?? []).map((w) => translateMessage(w, t)),
         ...(p.unmapped?.length
           ? [t('Not read: {fields}.', { fields: p.unmapped.join(', ') })]
+          : []),
+        ...(p.skipped?.length
+          ? [
+              t(
+                'Skipped records of a kind this version does not know: {kinds}. They are not kept, so a file this version exports leaves them out.',
+                { kinds: p.skipped.map((k) => `${k.count} × ${k.kind}`).join(', ') },
+              ),
+            ]
           : []),
       ].join(' ')
     : ''

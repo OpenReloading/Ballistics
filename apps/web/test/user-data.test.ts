@@ -7,9 +7,10 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import de from '../src/i18n/de.json'
+import { english, translator } from '../src/i18n/translate.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
-import { parseFiles, readLoadFile } from '../src/lib/load-file-formats.ts'
+import { parseFiles, readLoadFile, readNote } from '../src/lib/load-file-formats.ts'
 import {
   maxLinkChars,
   readLink,
@@ -31,7 +32,12 @@ import {
   userDataText,
   validRecords,
 } from '../src/lib/user-data.ts'
-import { folderFileName, ownsFile, recordFileName } from '../src/lib/user-file-names.ts'
+import {
+  folderFileName,
+  holdsSkipped,
+  ownsFile,
+  recordFileName,
+} from '../src/lib/user-file-names.ts'
 import { droppedPhotos, embeddedFileBlob, embedFiles, photoIds } from '../src/lib/user-photos.ts'
 import { defined } from './defined.ts'
 
@@ -144,6 +150,74 @@ describe('user data files', () => {
       'The file is larger than 40 MB.',
       'The file is larger than 40 MB.',
     ])
+  })
+
+  describe('records of a kind this version does not know', () => {
+    const event = { kind: 'event', id: 'e1', name: 'Club match', saved, data: { day: 1 } }
+    const stage = { ...event, kind: 'stage', id: 's1' }
+    const fileOf = (records: unknown[]) => userDataText(records as UserRecord[])
+
+    it('skips them and reads every known record of the file', () => {
+      expect(
+        parseUserDataFile(fileOf([event, bullet, stage, { ...event, id: 'e2' }, load])),
+      ).toEqual({
+        ok: true,
+        records: [bullet, load],
+        skipped: [
+          { kind: 'event', count: 2 },
+          { kind: 'stage', count: 1 },
+        ],
+      })
+    })
+
+    it('reads a file of only unknown kinds as one without records', () => {
+      expect(parseUserDataFile(fileOf([event]))).toEqual({
+        ok: true,
+        records: [],
+        skipped: [{ kind: 'event', count: 1 }],
+      })
+    })
+
+    it('still refuses an invalid record of a known kind, at its index in the file', () => {
+      const bad = { ...load, data: { origin: 'user', charge: { value: 'much' } } }
+      const parsed = parseUserDataFile(fileOf([event, stage, bad]))
+      expect(parsed.ok).toBe(false)
+      expect(!parsed.ok && parsed.reason).toContain('records[2].data.charge.value')
+      const old = { ...event, kind: 'workbenchState' }
+      const legacy = parseUserDataFile(fileOf([event, old]))
+      expect(!legacy.ok && legacy.reason).toContain('earlier version')
+      expect(parseUserDataFile(fileOf([{ ...event, kind: 1 }])).ok).toBe(false)
+    })
+
+    it('names each skipped kind with its count in the report, in English and German', async () => {
+      const bytes = new TextEncoder().encode(
+        fileOf([event, event, stage, load].map((r, i) => ({ ...r, id: `r${i}` }))),
+      )
+      const { records, notes } = await parseFiles(
+        [{ name: 'later.json', bytes }],
+        undefined,
+        english.t,
+      )
+      expect(records).toHaveLength(1)
+      expect(notes).toEqual([
+        {
+          name: 'later.json',
+          note: 'Skipped records of a kind this version does not know: 2 × event, 1 × stage. They are not kept, so a file this version exports leaves them out.',
+        },
+      ])
+      const german = readNote(parseUserDataFile(fileOf([event])), translator(de, 'de').t)
+      expect(german).toContain('1 × event')
+      expect(german).toContain('diese Version nicht kennt')
+    })
+
+    it('lets no Save write over a file that holds them', () => {
+      expect(ownsFile(fileOf([bullet, event]), bullet.id)).toBe(false)
+      // Save offers no picker over such a file, where the user could pick it and drop them
+      expect(holdsSkipped(fileOf([bullet, event]))).toBe(true)
+      expect(holdsSkipped(fileOf([bullet, load]))).toBe(false)
+      expect(holdsSkipped('not json')).toBe(false)
+      expect(holdsSkipped(undefined)).toBe(false)
+    })
   })
 
   it('keeps hostile text as plain data', () => {

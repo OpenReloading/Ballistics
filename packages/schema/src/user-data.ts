@@ -309,6 +309,37 @@ export const userRecord = z.discriminatedUnion(
   },
 )
 
+/** The record kinds this version reads. */
+const knownKinds: ReadonlySet<string> = new Set(userRecord.options.map((o) => o.shape.kind.value))
+
+/** A record kind of a user data file that this version does not know, and how many records had it. */
+export interface SkippedKind {
+  /** The `kind` as the file gives it. */
+  kind: string
+  /** Records of that kind in the file. */
+  count: number
+}
+
+/**
+ * `json` without its records of a kind this version does not know, and those kinds with their
+ * counts, so that a file of a later version that adds kinds still opens. A record without a text
+ * `kind` or of kind `workbenchState` stays, for the schema to refuse as before.
+ */
+export function withoutUnknownKinds(json: unknown): { json: unknown; skipped: SkippedKind[] } {
+  const records = (json as { records?: unknown } | null)?.records
+  if (!Array.isArray(records)) return { json, skipped: [] }
+  const counts = new Map<string, number>()
+  const kept = records.filter((r) => {
+    const kind = (r as { kind?: unknown } | null)?.kind
+    if (typeof kind !== 'string' || knownKinds.has(kind) || kind === 'workbenchState') return true
+    counts.set(kind, (counts.get(kind) ?? 0) + 1)
+    return false
+  })
+  if (!counts.size) return { json, skipped: [] }
+  const skipped = [...counts].map(([kind, count]) => ({ kind, count }))
+  return { json: { ...(json as object), records: kept }, skipped }
+}
+
 /** Media type of a stored photo: a raster image (an SVG can carry script). */
 export type PhotoType =
   | 'image/jpeg'
@@ -350,7 +381,9 @@ export const userDataFile = z.object({
   records: z
     .array(userRecord)
     .refine((rs) => new Set(rs.map((r) => r.id)).size === rs.length, 'Duplicate record id')
-    .describe('The records of the file.'),
+    .describe(
+      'The records of the file. The app skips a record of a kind it does not list here and reports the kind with its count, so that a later version can add kinds; it does not keep the skipped records.',
+    ),
   files: z
     .array(embeddedFile)
     .refine((fs) => new Set(fs.map((f) => f.id)).size === fs.length, 'Duplicate file id')
