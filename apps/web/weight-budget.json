@@ -163,7 +163,7 @@
     "tools": {
       "budget": {
         "initial": 565000,
-        "total": 604000
+        "total": 605000
       },
       "routes": {
         "/cases/editor": {
