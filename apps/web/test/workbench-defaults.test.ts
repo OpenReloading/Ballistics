@@ -1,11 +1,13 @@
 import { defaultStartPressure } from '@open-reloading/core'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { interiorFields } from '../src/lib/interior-input.ts'
 import {
   citedDefaults,
   defaultKeys,
   defaultsText,
   parseDefaults,
+  readAutoRun,
+  storeAutoRun,
   validDefault,
   type WorkbenchDefaults,
 } from '../src/lib/workbench-defaults.ts'
@@ -78,5 +80,26 @@ describe('workbench defaults', () => {
     expect(defaultsText({ ...cited, barrelLength: 0.4 })).toBe('{"barrelLength":0.4}')
     const both = { ...cited, propellantTemperature: 283.15, barrelLength: 0.4 }
     expect(parseDefaults(defaultsText(both) as string)).toEqual(both)
+  })
+})
+
+describe('Run automatically switch', () => {
+  afterEach(() => {
+    storeAutoRun(true)
+    vi.unstubAllGlobals()
+  })
+
+  it('stays off for the page load when storage takes no write', () => {
+    const blocked = () => {
+      throw new Error('blocked')
+    }
+    vi.stubGlobal('localStorage', { getItem: () => null, setItem: blocked, removeItem: blocked })
+    expect(readAutoRun()).toBe(true)
+    storeAutoRun(false)
+    expect(readAutoRun()).toBe(false)
+    vi.stubGlobal('localStorage', { getItem: blocked, setItem: blocked, removeItem: blocked })
+    expect(readAutoRun()).toBe(false)
+    storeAutoRun(true)
+    expect(readAutoRun()).toBe(true)
   })
 })
