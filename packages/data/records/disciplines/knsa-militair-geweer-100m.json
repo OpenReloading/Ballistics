@@ -1,0 +1,88 @@
+{
+  "id": "knsa-militair-geweer-100m",
+  "federation": "knsa",
+  "name": "Militair Geweer, 100-m liggend",
+  "section": "Deel IV, 6.1.2 d",
+  "page": "Deel IV, pagina 11, PDF p. 82",
+  "distance": {
+    "value": 100000,
+    "raw": "100-m",
+    "unit": "m"
+  },
+  "category": "service-rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["prone"],
+    "supports": ["freehand", "sling"],
+    "sights": ["original"],
+    "minTriggerWeight": {
+      "value": 1500
+    },
+    "maxFirearmMass": {
+      "value": 8000,
+      "raw": "8 kg"
+    },
+    "ammunition": {
+      "handloads": true
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 2400,
+          "raw": "40 minuten"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 6.1.2 d, pagina 11, PDF p. 82",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.positions"
+        ],
+        "note": "The list of national courses under KNSA rules names the rifle, the distance, the prone position and 30 shots."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 2.1, pagina 3, PDF p. 74",
+        "fields": ["rules.firearm"],
+        "note": "Large-bore rifle is any centrefire rifle of at most 8 mm (.323 in) calibre."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 2.3.1 c.1, pagina 3 to 4, PDF pp. 74 to 75",
+        "fields": [
+          "category",
+          "rules.supports",
+          "rules.sights",
+          "rules.minTriggerWeight",
+          "rules.maxFirearmMass"
+        ],
+        "note": "A rifle of a regular armed force, in its original form: an aperture sight only where original, no front ring sight or optics, no bipod or rest; a sling is allowed."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 2.6.1, pagina 7, PDF p. 78",
+        "fields": ["rules.ammunition.handloads"],
+        "note": "Handloaded ammunition is allowed where it meets the ammunition rules of article 2.6."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 6.2.3.1, pagina 12, PDF p. 83",
+        "fields": ["rules.timeLimits"],
+        "note": "The championship gives 40 minutes, sighting shots included."
+      }
+    ]
+  }
+}

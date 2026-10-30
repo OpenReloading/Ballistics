@@ -294,6 +294,70 @@
       "federation": "dsb",
       "section": "0.20 Scheibe Nr. 5",
       "scoring": "centre"
+    },
+    {
+      "id": "knsa-standaard-geweer-300m",
+      "name": "KNSA Standaard Geweer, 300-m liggend",
+      "distance": {
+        "value": 300000,
+        "raw": "300-m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "federation": "knsa",
+      "section": "Deel IV, 6.1.2 b",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "knsa-militair-geweer-300m",
+      "name": "KNSA Militair Geweer, 300-m liggend",
+      "distance": {
+        "value": 300000,
+        "raw": "300-m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "federation": "knsa",
+      "section": "Deel IV, 6.1.2 e",
+      "scoring": "touch",
+      "category": "service-rifle"
+    },
+    {
+      "id": "knsa-militair-geweer-optiek-300m",
+      "name": "KNSA Militair Geweer Optiek, 300-m liggend",
+      "distance": {
+        "value": 300000,
+        "raw": "300-m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "federation": "knsa",
+      "section": "Deel IV, 6.1.2 g",
+      "scoring": "touch",
+      "category": "service-rifle"
+    },
+    {
+      "id": "knsa-veteranengeweer-300m",
+      "name": "KNSA Veteranengeweer, 300-m liggend",
+      "distance": {
+        "value": 300000,
+        "raw": "300-m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "federation": "knsa",
+      "section": "Deel IV, 6.1.2 i",
+      "scoring": "touch",
+      "category": "service-rifle"
     }
   ],
   "numerals": true,
@@ -407,6 +471,20 @@
         "source": "dsu-sporthandbuch-2018",
         "page": "Kapitel 1, Auswertung der Scheiben, Seite 27, PDF p. 29",
         "fields": ["events.scoring"]
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikelen 3.1, 6.1.2 and 12.4, pagina 7 to 17, PDF pp. 78, 82 and 88",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.federation",
+          "events.section",
+          "events.gauge",
+          "events.scoring",
+          "events.category"
+        ],
+        "note": "National 300 m courses are shot on the ISSF target, scored and gauged by the ISSF rules."
       }
     ]
   }

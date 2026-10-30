@@ -1,0 +1,34 @@
+{
+  "id": "knsa",
+  "name": "Koninklijke Nederlandse Schietsport Associatie",
+  "abbreviation": "KNSA",
+  "country": "NL",
+  "ruleBooks": ["knsa-schiet-en-wedstrijdreglement-2026"],
+  "website": "https://www.knsa.nl/",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel I, artikel 1.1, pagina 3, PDF p. 3",
+        "fields": ["name", "abbreviation", "ruleBooks"],
+        "note": "Article 1.1 defines the short name KNSA for the association. The rules are one book in ten parts: Deel I holds the general provisions, Deel IV the rules for large-bore rifle (Groot Kaliber Geweer)."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel I, title page, PDF p. 1",
+        "fields": ["country"],
+        "note": "The association's postal address is in Leusden, the Netherlands; the national championships of the rules are those of the Netherlands."
+      },
+      {
+        "title": "Homepage of the KNSA",
+        "publisher": "Koninklijke Nederlandse Schietsport Associatie",
+        "url": "https://www.knsa.nl/",
+        "retrieved": "2026-10-30",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers, names the association and links its rule book."
+      }
+    ]
+  }
+}

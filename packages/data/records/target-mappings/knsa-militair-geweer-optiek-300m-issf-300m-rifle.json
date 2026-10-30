@@ -1,0 +1,23 @@
+{
+  "id": "knsa-militair-geweer-optiek-300m-issf-300m-rifle",
+  "discipline": "knsa-militair-geweer-optiek-300m",
+  "face": "issf-300m-rifle",
+  "event": "knsa-militair-geweer-optiek-300m",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 3.1, pagina 7, PDF p. 78",
+        "fields": ["discipline", "face", "event"],
+        "note": "300 m courses use the ISSF targets."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 6.1.2 g, pagina 11, PDF p. 82",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

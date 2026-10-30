@@ -178,6 +178,7 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 - [DSB 2027](../bibliography.md#dsb-2027): touch rule and measuring rings by calibre, Teil 0, 0.11.3 and 0.11.3.2 (Seite 40), targets in 0.20 (Teil 0, Seiten 62 to 70), hole centre for the muzzle-loader ball events, 7.7.5 (Teil 7, Seite 8).
 - [BDMP 2026](../bibliography.md#bdmp-2026): touch rule, A.3.21.1.3, hole centre for black powder, A.3.21.4.1, targets in B.11.
 - [DSU 2018](../bibliography.md#dsu-2018): the oval-ring targets b2 to b5 and b5 Präzision, Kapitel 1 (Seiten 12 to 16, PDF pp. 14 to 18), touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
+- [KNSA 2026](../bibliography.md#knsa-2026): scoring and gauges by the ISSF rules, Deel IV artikelen 8.5.2, 12.1 and 12.4 (PDF pp. 87 to 88), the Woerden target in artikel 3.3 (PDF pp. 78 to 79).
 - [NRA 2026](../bibliography.md#nra-2026): touch rule and X ring, Rule 14.3 (p. 48), targets in Section 4 (pp. 14 to 16).
 - [NSRA 2024](../bibliography.md#nsra-2024): touch rule for inward gauging and X ring, Rules 5.1.6 and 5.1.9 (PDF p. 8), targets in Appendix A (PDF pp. 29 to 30), gauges in Appendix B (PDF p. 31).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, targets in Kapitel 8 to 10.
