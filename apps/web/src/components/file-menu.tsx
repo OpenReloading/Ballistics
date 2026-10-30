@@ -1650,7 +1650,7 @@ function FileMenuOf<K extends UserRecordKind>({
         onClose={() => {
           setTables(undefined)
           // the menu item that opened it is gone: Open, or Page actions below 75em
-          focusBack(openButton.current, '.page-bar button[aria-label="Page actions"]')
+          focusBack(openButton.current, '.page-bar .page-bar-toggle')
         }}
       />
       <AppModal

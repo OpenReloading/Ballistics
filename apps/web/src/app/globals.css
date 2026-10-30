@@ -8428,9 +8428,13 @@ main .field-table tr.field-group > th {
   padding: 0.5rem 0.75rem;
 }
 
-/* one line: the file name gives way first */
-.session-import .drop-zone > * {
+/* one line: the file name gives way first, a hint longer than the box wraps */
+.session-import .drop-zone > :not(.drop-zone-hint) {
   white-space: nowrap;
+}
+
+.session-import .drop-zone-hint {
+  min-width: 0;
 }
 
 /* a phone: the hint takes a line under the label */

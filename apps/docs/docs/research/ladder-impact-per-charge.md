@@ -71,7 +71,7 @@ analytic. Seeded ladders from assumed values (the numbers of the issue for the d
 - `apps/web/src/components/ladder-flat-spots.tsx` and `apps/web/src/components/ladder-target.tsx` (where the note sits).
 - `packages/schema/src/target-sheet.ts` (`ladderStep` of a group).
 - `apps/web/src/lib/hit-probability.ts` (`verticalPerMetre`).
-- [Velocity flat spots of a charge ladder](../models/interior-velocity-ladder.md): add the note, its warning and the limit that the drop slope must be known.
+- [Velocity flat spots of a charge ladder](../models/interior-velocity-ladder.md): the note is not built, so the page says only that the ladder shows velocity; the note, its warning and the drop-slope limit follow with the feature ([issue #711](https://github.com/OpenReloading/Ballistics/issues/711)).
 
 ## Confidence
 

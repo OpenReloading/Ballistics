@@ -38,31 +38,45 @@ const empty: FieldValue = { text: '', si: undefined }
 
 type Without<T> = T extends unknown ? Omit<T, 'id'> : never
 
-/** Asks the worker of the tool; one worker for the life of the dialog, an answer matched by its request id. */
-function useWorker(onError: (message: string) => void) {
+/**
+ * Asks the worker of the tool, started on the first request; an answer matched by its request id.
+ * A worker that failed to load or died ends what waits with an error reply, the next request starts a new one.
+ */
+export function useWorker(onError: (message: string) => void) {
   const worker = useRef<Worker | undefined>(undefined)
   const waiting = useRef(new Map<number, (r: WorkerReply) => void>())
   const sequence = useRef(0)
-  useEffect(() => {
-    const w = new Worker(new URL('../lib/bullet-photo.worker.ts', import.meta.url), {
-      type: 'module',
-    })
-    w.onmessage = (e: MessageEvent<WorkerReply>) => {
-      waiting.current.get(e.data.id)?.(e.data)
-      waiting.current.delete(e.data.id)
-    }
-    w.onerror = () => onError(msg('The photograph could not be processed in this browser.'))
-    worker.current = w
-    return () => w.terminate()
-  }, [onError])
+  useEffect(() => () => worker.current?.terminate(), [])
   return useCallback(
-    (request: Without<WorkerRequest>, transfer: Transferable[] = []) =>
-      new Promise<WorkerReply>((resolve) => {
+    (request: Without<WorkerRequest>, transfer: Transferable[] = []) => {
+      if (!worker.current) {
+        const w = new Worker(new URL('../lib/bullet-photo.worker.ts', import.meta.url), {
+          type: 'module',
+        })
+        w.onmessage = (e: MessageEvent<WorkerReply>) => {
+          waiting.current.get(e.data.id)?.(e.data)
+          waiting.current.delete(e.data.id)
+        }
+        const fail = () => {
+          w.terminate()
+          if (worker.current === w) worker.current = undefined
+          const message = msg('The photograph could not be processed in this browser.')
+          for (const [id, resolve] of waiting.current) resolve({ kind: 'error', id, message })
+          waiting.current.clear()
+          onError(message)
+        }
+        w.onerror = fail
+        w.onmessageerror = fail
+        worker.current = w
+      }
+      const w = worker.current
+      return new Promise<WorkerReply>((resolve) => {
         const id = ++sequence.current
         waiting.current.set(id, resolve)
-        worker.current?.postMessage({ ...request, id }, transfer)
-      }),
-    [],
+        w.postMessage({ ...request, id }, transfer)
+      })
+    },
+    [onError],
   )
 }
 

@@ -199,6 +199,9 @@ const states: State[] = [
       await showResults(page)
       await page.getByRole('button', { name: 'Chart data' }).click()
       await dialogOf('Chart data')(page)
+      // below 48em a cell of a `limits` table shows its column name from `data-label`
+      await expect(page.locator('[role="dialog"] table.limits td').first()).toBeVisible()
+      await expect(page.locator('[role="dialog"] table.limits td:not([data-label])')).toHaveCount(0)
       await check('dialog', '[role="dialog"]')
     },
   },

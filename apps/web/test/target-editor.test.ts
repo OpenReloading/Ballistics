@@ -1,7 +1,8 @@
 import { dispersionEllipse, predictionEllipse, subtendedAngle } from '@open-reloading/core'
 import type { ShotGroup, TargetSheet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { english } from '../src/i18n/translate.ts'
+import de from '../src/i18n/de.json'
+import { english, translator } from '../src/i18n/translate.ts'
 import { readouts } from '../src/lib/group-readouts.ts'
 import { type LabelBox, type LabelScene, placeLabel } from '../src/lib/label-placement.ts'
 import {
@@ -12,6 +13,7 @@ import {
   extremePairIndices,
   frameOf,
   ladderExtremeSpreads,
+  newGroup,
   rebase,
   screenNudge,
   shotExtentCorners,
@@ -497,5 +499,13 @@ describe('close-the-page copies', () => {
     )
     // within the 200 characters of a record name
     expect(keptCopy({ ...edit, name: 'x'.repeat(200) }, 'b', english.t).name).toHaveLength(200)
+  })
+})
+
+describe('newGroup', () => {
+  it('names the group after its place, in the language shown', () => {
+    const sheet = { references: [], targetRotation: 0, groups: [group] }
+    expect(newGroup(sheet, 'g2', 100, english.t).name).toBe('Group 2')
+    expect(newGroup(sheet, 'g2', 100, translator(de, 'de').t).name).toBe('Schussbild 2')
   })
 })

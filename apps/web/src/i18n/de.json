@@ -3902,5 +3902,20 @@
   "The primer data could not be loaded. Check the connection and retry. The workbench still works.": "Die Zündhütchendaten konnten nicht geladen werden. Prüfen Sie die Verbindung und versuchen Sie es erneut. Die Werkbank funktioniert weiterhin.",
   "The primers could not be read.": "Die Zündhütchen konnten nicht gelesen werden.",
   "Water": "Wasser",
-  "Words of the name in any order": "Wörter des Namens in beliebiger Reihenfolge"
+  "Words of the name in any order": "Wörter des Namens in beliebiger Reihenfolge",
+  "Technical drawing, full section about the axis.": "Technische Zeichnung, Vollschnitt um die Achse.",
+  "Cartridge view: {values}.": "Ansicht Patrone: {values}.",
+  "Chamber view: the chamber in a marked {width} steel band; {values}.": "Ansicht Patronenlager: das Patronenlager in einem markierten Stahlband von {width}; {values}.",
+  "diameter {value}": "Durchmesser {value}",
+  "e {value} (derived, not dimensioned)": "e {value} (abgeleitet, nicht bemaßt)",
+  "Combined view: both outlines and the gap between them, no dimensions.": "Kombinierte Ansicht: beide Umrisse und der Spalt zwischen ihnen, ohne Maße.",
+  "Combined view: both outlines and the gap between them, no dimensions; {regions}.": "Kombinierte Ansicht: beide Umrisse und der Spalt zwischen ihnen, ohne Maße; {regions}.",
+  "{difference} (chamber minimum minus cartridge maximum): {values}": "{difference} (Mindestmaß des Patronenlagers minus Höchstmaß der Patrone): {values}",
+  "Group {n}": "Schussbild {n}",
+  "{material} core": "Kern aus {material}",
+  "{material} jacket": "Mantel aus {material}",
+  "jacket": "Mantel",
+  "gas check": "Kupferschuh",
+  "{n} driving bands": "{n} Führungsbänder",
+  "lead free": "bleifrei"
 }
