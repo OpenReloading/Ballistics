@@ -11,11 +11,11 @@ Pure parsers, ESM: chronograph exports (text, or an XLSX or XLS workbook read fr
 ## Rules
 
 - Formats: `chronoFormats` (`src/index.ts`) is the one list, in display order. `ChronoFormatId`, `detectFormat`, `detectWorkbookFormat`, `parseChrono` and the web format names derive from it, so a new format is its module plus one entry. Layouts and mappings: each parser and its tests.
-- Detection and parsing read file content only, never the file name. `'delimited'` is never detected: it needs a column mapping.
-- A parser returns only what the file supplies, plus `missingPaths`, the dot paths the user must enter. `test/complete.ts` fills exactly those paths and validates.
+- Format detection reads file content only, never the file name. `'delimited'` is never detected: it needs a column mapping.
+- A parser returns what the file supplies, the caller's `fileName`, `sha256` and `velocityUnit` as provenance and unit (`src/result.ts`), warnings, and `missingPaths`, the dot paths the user must enter (without `fileName`, the source title is one of them). `test/complete.ts` fills exactly those paths and validates.
 - Velocities are stored in m/s; `raw` keeps the cell text and unit as written. The caller's `velocityUnit` applies only where the file names none; a recognised file unit that differs throws.
 - Throw on input the parser cannot read without guessing (a velocity like `2,800` that may hold a thousands separator, a missing or unknown unit when the caller names no `velocityUnit`). Warn, never throw, on a check that only compares (footer statistics, shots outside 30 to 2000 m/s).
-- Workbook readers (`src/zip.ts`, `src/xml.ts`, `src/cfb.ts`, `src/xls.ts`) read untrusted bytes: every size, count and nesting bound is in `src/limits.ts` or beside its reader, checked before the work it bounds. Keep a bound when changing a reader; a new reader gets its own.
+- Workbook readers (`src/zip.ts`, `src/xml.ts`, `src/cfb.ts`, `src/workbook.ts`, `src/xls.ts`) read untrusted bytes: every size, count and nesting bound is in `src/limits.ts` or beside its reader. ZIP, CFB and XML bounds are checked before the allocation, copy or callback they bound; cell column, count and character limits are checked in `placeCell` (`src/cells.ts`) before the cell is stored. Keep a bound when changing a reader; a new reader gets its own.
 - Load file mappings change with `apps/docs/docs/data/grt-load-files.md`, table import with `apps/docs/docs/data/table-import.md`.
 - `buildRecords` and the load file readers return plain records; the caller parses them with the user record schema (schema is types only here).
 
