@@ -768,6 +768,18 @@ export function FirearmLibrary() {
               onOpen={onOpen}
               onStored={refresh}
             />
+            <Button
+              variant="default"
+              disabled={!list?.length}
+              onClick={() =>
+                list &&
+                void import('../lib/records-csv.ts')
+                  .then((m) => m.saveFirearmsCsv(list, uses, cartridgeName))
+                  .catch((e) => setFailure(errorText(e)))
+              }
+            >
+              {t('Export CSV')}
+            </Button>
             <UnitsIconButton />
             <PrintButton disabled={!editing && !viewing} />
           </>

@@ -351,6 +351,21 @@ export function SavedLoads({
               </Text>
             )}
           </div>
+          <Button
+            variant="default"
+            size={controlSize.row.button}
+            disabled={records.length === 0}
+            onClick={() =>
+              // a plain import(): the CSV code stays out of the workbench's weight
+              import('../lib/records-csv.ts')
+                .then((m) => m.saveLoadsCsv())
+                .catch((e) =>
+                  setMessage((t) => t('Export failed: {error}', { error: errorText(e) })),
+                )
+            }
+          >
+            {t('Export CSV')}
+          </Button>
           <div className="saved-storage" role="status">
             {shown && <p>{shown.say(t)}</p>}
             {older > 0 && (
