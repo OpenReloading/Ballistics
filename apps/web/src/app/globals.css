@@ -1514,6 +1514,13 @@ td.nowrap {
   width: 2.25rem;
   color: var(--fg);
   font-weight: 600;
+  text-indent: 0;
+}
+
+/* a label's second line under its first, not under the symbol */
+.prop-form:has([data-symbol]) .prop-grid label {
+  padding-inline-start: 2.25rem;
+  text-indent: -2.25rem;
 }
 
 /* the drawing's title row as a panel's (`.page-panel > .page-panel-head`) */
@@ -1693,6 +1700,31 @@ td.nowrap {
 
 .powder-label {
   font-size: var(--mantine-font-size-sm);
+}
+
+/* a phone: a ring's colours one under the other, the row labels room for their longest word, the
+   first field's placeholder left to its column head (Name, Ingredient) */
+@media screen and (max-width: 22.5em) {
+  .face-colours {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.125rem;
+  }
+
+  .powder-row {
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .powder-row + .powder-row {
+    margin-top: 0.25rem;
+  }
+
+  .powder-ingredient {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) repeat(2, minmax(0, 0.75fr)) 1.75rem;
+  }
+
+  :is(.face-event, .powder-ingredient) > :first-child input::placeholder {
+    color: transparent;
+  }
 }
 
 .powder-designer .side-grid > button {
