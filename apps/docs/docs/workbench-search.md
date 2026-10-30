@@ -15,12 +15,12 @@ Option C (inline field and dialog) with matching in the browser (E) and a "Sort 
 
 ## What the search does today
 
-- `RecordSearch` (`apps/web/src/components/record-search.tsx:43`) sends `GET <kind>?q=<text>&limit=20` 300 ms after the last key (`:110`), from 2 characters on. The Ctrl+K palette (`apps/web/src/components/workbench-search.tsx`) sends the same `q` per kind with 8 matches each.
+- `RecordSearch` (`apps/web/src/components/record-search.tsx`) sends `GET <kind>?q=<text>&limit=20` 300 ms after the last key, from 2 characters on. The Ctrl+K palette (`apps/web/src/components/workbench-search.tsx`) sends the same `q` per kind with 8 matches each.
 - `q` was one substring test (`ilike '%q%'`) over the manufacturer name or an alias, a space, and the product name; for cartridges it tested names and aliases. The numbers below were measured with it. The API and the browser's data files now rank with the schema's matcher (`apps/docs/docs/data/catalogue-storage.md`).
 - The words must stand next to each other in that order. Nothing else is searched (no caliber, no weight), and a number is a substring (`168` also matches `0.168`).
 - The answer is ordered by manufacturer name, name, id: no relevance order, and no way to narrow other than typing more.
 - Enter chooses only when exactly one row is shown and none is highlighted.
-- The directory lists search the same records with other rules (`bulletMatches`, `apps/web/src/lib/bullet-rows.ts:55`: every word at a word start, over manufacturer, aliases, name, caliber and weight text). The same words give different answers in the card and on `/bullets`.
+- The directory lists search the same records with other rules (`bulletMatches` in `apps/web/src/lib/bullet-rows.ts`: every word at a word start, over manufacturer, aliases, name, caliber and weight text). The same words give different answers in the card and on `/bullets`.
 
 ## Failures with real queries
 

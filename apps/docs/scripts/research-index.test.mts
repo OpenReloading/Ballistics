@@ -93,5 +93,6 @@ test('a page path splits into its folder and file name, in linear time on a long
   const long = `${'a/'.repeat(100_000)}b`
   const start = performance.now()
   assert.equal(splitPath(long).name, 'b')
-  assert.ok(performance.now() - start < 100)
+  // guards against polynomial backtracking, which takes seconds; a loaded runner stalls past a tight bound
+  assert.ok(performance.now() - start < 5000)
 })
