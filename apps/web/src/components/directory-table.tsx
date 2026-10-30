@@ -55,6 +55,8 @@ export interface DirectoryColumn<T> {
   help?: Message | undefined
   /** Not printed, as a row action. */
   screenOnly?: boolean
+  /** Shown only in a list box of 64rem or more, so the name keeps its room on a tablet. */
+  wide?: boolean
   /** At the header's end, after its label: a scale's ticks. */
   head?: ReactNode
 }
@@ -144,7 +146,7 @@ function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
 const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
   c.key === link
     ? 'name-cell'
-    : [c.num && 'num', c.screenOnly && 'screen-only', repeat && 'repeat']
+    : [c.num && 'num', c.screenOnly && 'screen-only', c.wide && 'wide-only', repeat && 'repeat']
         .filter(Boolean)
         .join(' ') || undefined
 
@@ -441,7 +443,13 @@ export function DirectoryTable<T extends { id: string }>({
           {columns.map((c) => (
             <col
               key={c.key}
-              className={c.key === link ? 'name-cell' : c.screenOnly ? 'screen-only' : undefined}
+              className={
+                c.key === link
+                  ? 'name-cell'
+                  : [c.screenOnly && 'screen-only', c.wide && 'wide-only']
+                      .filter(Boolean)
+                      .join(' ') || undefined
+              }
               data-sorted={sort?.column === c.key || undefined}
               style={c.width ? ({ '--w': c.width } as CSSProperties) : undefined}
             />

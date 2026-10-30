@@ -10742,6 +10742,24 @@ main .page-bar h1 {
   padding: 0;
 }
 
+/* a tablet's list box: the columns of a wide box and the burn rate's scale give their room to the
+   name, which a 768 px window left none */
+@container (max-width: 63.99rem) {
+  .directory-table .wide-only {
+    display: none;
+  }
+}
+
+@container (max-width: 59.99rem) {
+  .directory-table {
+    --rate-scale: 0px;
+  }
+
+  .directory-table :is(.rate-ticks, .rate-cell svg) {
+    display: none;
+  }
+}
+
 @container (min-width: 90rem) {
   .directory-table col.name-cell {
     width: 32rem;
