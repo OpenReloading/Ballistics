@@ -17,6 +17,8 @@ export interface Io {
 const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
+  ballistics run <operation> --input <file|-> [--records <dir>]
+  ballistics operations
   ballistics --help | --version
 
 options:
@@ -33,6 +35,26 @@ options:
   --version          the version
 
 exit codes: 0 done, 1 refused run, 2 bad input, 3 internal error`
+
+/** The help of `run` and `operations`, each with an example that runs from the repository root. */
+const commandHelp = {
+  run: `usage: ballistics run <operation> --input <file|-> [--records <dir>]
+
+Runs one compute operation offline and writes its answer as JSON: the answer of the
+route POST /v1/<operation> to the body in the --input file (- for stdin). Record ids
+resolve against --records (repeatable, default BALLISTICS_RECORDS, else the repository
+records). A body the schema rejects is bad input (exit 2), a 422 answer a refusal (exit 1).
+
+example:
+  node packages/cli/dist/bin.js run interior --input packages/cli/examples/interior.json`,
+  operations: `usage: ballistics operations
+
+Writes every operation of run as JSON: its name, summary, description, and the JSON Schema
+(2020-12) of its input body and of its answer.
+
+example:
+  node packages/cli/dist/bin.js operations`,
+}
 
 /** Parses a command line, an unknown or malformed option is bad input with the usage. */
 function parse<T extends ParseArgsConfig>(config: T) {
@@ -137,13 +159,49 @@ async function execute(
   return json ? JSON.stringify(result, null, 2) : compareTable(result)
 }
 
+/** Runs `run` or `operations` with its options and returns the answer. */
+async function operate(
+  command: 'run' | 'operations',
+  args: string[],
+  env: NodeJS.ProcessEnv,
+  io: Io,
+) {
+  const { listOperations, runOperation } = await import('./operations.ts')
+  if (command === 'operations') {
+    parse({ args, strict: true, options: { json: { type: 'boolean' } } })
+    return listOperations()
+  }
+  const { values, positionals } = parse({
+    args,
+    strict: true,
+    allowPositionals: true,
+    options: {
+      input: { type: 'string' },
+      records: { type: 'string', multiple: true },
+      json: { type: 'boolean' },
+    },
+  })
+  const [name, ...extra] = positionals
+  if (name === undefined || extra.length > 0 || values.input === undefined)
+    throw new UsageError(commandHelp.run)
+  const roots = values.records ?? env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
+  return await runOperation(name, values.input, roots, io.stderr)
+}
+
 /** What went wrong: bad input (exit 2), a refused run (1) or an internal error (3). */
 type ErrorKind = 'usage' | 'refused' | 'internal'
 
 /** The kind, exit code and message of an error a run ends with. */
-function failure(error: unknown): { kind: ErrorKind; code: number; message: string } {
-  if (error instanceof Refusal) return { kind: 'refused', code: 1, message: error.message }
-  if (error instanceof UsageError) return { kind: 'usage', code: 2, message: error.message }
+function failure(error: unknown): {
+  kind: ErrorKind
+  code: number
+  message: string
+  details?: Record<string, unknown> | undefined
+} {
+  if (error instanceof Refusal)
+    return { kind: 'refused', code: 1, message: error.message, details: error.details }
+  if (error instanceof UsageError)
+    return { kind: 'usage', code: 2, message: error.message, details: error.details }
   return {
     kind: 'internal',
     code: 3,
@@ -153,8 +211,8 @@ function failure(error: unknown): { kind: ErrorKind; code: number; message: stri
 
 /** The error on stderr: one JSON object for a script, the text line on a terminal; never a stack trace. */
 function report(error: unknown, json: boolean, io: Io): number {
-  const { kind, code, message } = failure(error)
-  if (json) io.stderr(`${JSON.stringify({ error: { kind, message } })}\n`)
+  const { kind, code, message, details } = failure(error)
+  if (json) io.stderr(`${JSON.stringify({ error: { kind, message, ...details } })}\n`)
   else if (kind === 'refused') io.stderr(`refused: ${message}\n`)
   else if (kind === 'usage') io.stderr(`${message}\n`)
   else io.stderr(`error: ${message}\n`.replace(/\n(?!$)/g, ' '))
@@ -165,7 +223,7 @@ function report(error: unknown, json: boolean, io: Io): number {
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
   const [command = '', ...args] = argv
   if (argv.includes('--help') || argv.includes('-h')) {
-    io.stdout(`${usage}\n`)
+    io.stdout(`${command === 'run' || command === 'operations' ? commandHelp[command] : usage}\n`)
     return 0
   }
   if (argv.includes('--version')) {
@@ -176,6 +234,10 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
     return 0
   }
   try {
+    if (command === 'run' || command === 'operations') {
+      io.stdout(`${JSON.stringify(await operate(command, args, env, io), null, 2)}\n`)
+      return 0
+    }
     if (command !== 'verify' && command !== 'compare') {
       parse({ args: argv, strict: true, allowPositionals: true, options: {} })
       throw new UsageError(usage)

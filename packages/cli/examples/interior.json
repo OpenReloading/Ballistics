@@ -1,0 +1,36 @@
+{
+  "model": "m3",
+  "load": {
+    "chamber": {
+      "volume": 0.0000034,
+      "boreArea": 0.0000375,
+      "boreDiameter": 0.00691
+    },
+    "barrel": {
+      "length": 0.6,
+      "twist": 0
+    },
+    "bullet": {
+      "mass": 0.0095
+    },
+    "charge": 0.0028,
+    "propellant": {
+      "specificEnergy": 3900000,
+      "gamma": 1.23,
+      "density": 1600,
+      "covolume": 0.000625,
+      "burn": {
+        "kind": "vivacity",
+        "vivacity": 0.56,
+        "exponent": 1,
+        "referencePressure": 98066.5,
+        "form": {
+          "kind": "constant"
+        }
+      }
+    },
+    "propellantTemperature": 294.15,
+    "ignitionPressure": 1000000,
+    "startPressure": 0
+  }
+}

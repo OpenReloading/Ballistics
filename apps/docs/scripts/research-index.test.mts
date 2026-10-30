@@ -71,18 +71,17 @@ test('every literature note has all fields', () => {
   assert.deepEqual(notesErrors(), [])
 })
 
-test('the index lists every research page once, with a link line in llms.txt', () => {
+test('the index lists every research page once, with a link line in llms.txt and the command line page', () => {
   const list = entries('https://example.org/')
   assert.ok(list.some((e) => e.link === 'https://example.org/research/literature/open-questions'))
   assert.ok(list.some((e) => e.link === 'https://example.org/research/literature/'))
   assert.equal(new Set(list.map((e) => e.link)).size, list.length)
   assert.ok(list.every((e) => e.title && e.description))
-  assert.equal(
-    llmsText(list)
-      .split('\n')
-      .filter((l) => l.startsWith('- [')).length,
-    list.length,
-  )
+  const lines = llmsText(list, 'https://example.org/')
+    .split('\n')
+    .filter((l) => l.startsWith('- ['))
+  assert.equal(lines.length, list.length + 1)
+  assert.ok(lines.at(-1)?.startsWith('- [Command line](https://example.org/cli)'))
 })
 
 test('a page path splits into its folder and file name, in linear time on a long one', () => {

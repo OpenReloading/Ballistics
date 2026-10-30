@@ -1,9 +1,9 @@
 ---
 title: Command line
-description: Held-out evaluation of the interior model on a file of load rows, and a comparison of two model versions.
+description: One compute operation of the API offline, the list of operations with their schemas, held-out evaluation of the interior model on a file of load rows, and a comparison of two model versions.
 ---
 
-# Command line: `verify` and `compare`
+# Command line
 
 `packages/cli` (`@open-reloading/cli`, bin `ballistics`) measures how far the interior model is from printed load rows it was not fitted to, and says whether a changed model got better. It adds no model of its own: a row becomes an interior run through `recordLoad` of `@open-reloading/core` (the [M3 page](models/interior-m3.md#load-from-records)) and the seating of `@open-reloading/drawing`. Results are simulations compared with printed values, never load data.
 
@@ -13,7 +13,22 @@ node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
 ```
 
-`--help` (or `-h`), alone or after a command, prints the usage and the options and exits 0.
+`--help` (or `-h`), alone or after a command, prints the usage and the options and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
+
+## Operations: `run` and `operations`
+
+`run <operation> --input <file|->` runs one compute operation of the REST API offline and writes its answer as JSON on stdout: the answer of `POST /v1/<operation>` to the body in the file (`-` reads it from standard input). The operations are the compute routes: `exterior/trajectory`, `exterior/truing`, `exterior/range-strings/plan`, `exterior/range-strings/fit`, `interior`, `interior/load-file` and `interior/charge-target`. The body, the answer and the errors are those of the route, from the same code: the REST API page of this site (`/rest/`) documents each body. The answer has no `inputHash`, `apiVersion` or `dataHash`, which the server adds; `interior/load-file` answers without curves, as the route without `?curves=true`.
+
+```sh
+node packages/cli/dist/bin.js run interior --input packages/cli/examples/interior.json
+node packages/cli/dist/bin.js operations
+```
+
+Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the records of `--records <dir>` (repeatable, `BALLISTICS_RECORDS`), by default the records of the data package, as for `verify`. An unknown id is bad input. A body the schema rejects is bad input with the issues in the error object (`issues`, each with `path` and `message`). An answer the route gives with 422 (an input core refuses, a charge target out of reach, a load file without a value) is a refusal: the error object carries it as `answer`.
+
+`operations` writes one JSON document, `{"operations":[...]}`, with each operation's `name`, `summary`, `description`, `input` (the JSON Schema 2020-12 of the body) and `output` (that of the 200 answer). The schemas are written from the zod definitions the API's OpenAPI document is built from.
+
+What the two commands will not do: give load data (an answer is a simulation, `notice` on every interior answer), use the network or start a server, or ask a question on the terminal.
 
 Real rows and real records are passed by path and are never committed. The repository holds no rows; its tests build a small synthetic set from the model itself, with errors known by construction.
 
@@ -79,17 +94,17 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 
 | Exit code | Meaning | `kind` |
 |---|---|---|
 | 0 | A result was written | |
-| 1 | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run | `refused` |
-| 2 | Bad input: the rows file, an option, the records, a model module (also one that throws) | `usage` |
+| 1 | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run, a 422 answer of an operation | `refused` |
+| 2 | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id | `usage` |
 | 3 | An internal error of the CLI | `internal` |
 
-An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`; on a terminal it is a text line. It never carries a stack trace.
+An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`, for `run` with `issues` or `answer`; on a terminal it is a text line. It never carries a stack trace.
 
 The package `AGENTS.md` describes the loop for a language-model agent.

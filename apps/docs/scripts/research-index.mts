@@ -142,8 +142,8 @@ export function entries(site: string, dir = research): Entry[] {
     .sort((a, b) => a.link.localeCompare(b.link))
 }
 
-/** The llms.txt of the index: one link line per page. */
-export function llmsText(list: Entry[]): string {
+/** The llms.txt of the index: one link line per page, and the command line page of `site`. */
+export function llmsText(list: Entry[], site: string): string {
   const line = (e: Entry) => {
     const tail = [e.status, e.result, ...(e.model_pages ?? [])].filter(Boolean).join(', ')
     return `- [${e.id ? `${e.id} ` : ''}${e.title}](${e.link}): ${e.description}${tail ? ` (${tail})` : ''}`
@@ -156,6 +156,10 @@ export function llmsText(list: Entry[]): string {
     '## Research',
     '',
     ...list.map(line),
+    '',
+    '## Tools',
+    '',
+    `- [Command line](${site}cli): runs one compute operation of the API offline (\`ballistics run\`), lists the operations with their JSON Schemas (\`ballistics operations\`) and evaluates the interior model on load rows. No network, no prompts, no load data.`,
     '',
   ].join('\n')
 }
@@ -171,5 +175,5 @@ if (import.meta.main) {
   const out = new URL('../static/', import.meta.url)
   mkdirSync(out, { recursive: true })
   writeFileSync(new URL('research-index.json', out), `${JSON.stringify(list, null, 2)}\n`)
-  writeFileSync(new URL('llms.txt', out), llmsText(list))
+  writeFileSync(new URL('llms.txt', out), llmsText(list, site))
 }

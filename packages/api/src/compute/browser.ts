@@ -21,7 +21,15 @@ export {
 } from './exterior-schema.ts'
 export { type InteriorContext, runInterior } from './interior-run.ts'
 export { interiorBody } from './interior-schema.ts'
+export { type JsonSchema, jsonSchema } from './json-schema.ts'
 export type { CartridgeWithSpecs } from './limits.ts'
+export {
+  type Operation,
+  type OperationAnswer,
+  type OperationContext,
+  operation,
+  operations,
+} from './operations.ts'
 export { loadFileBody, simulate, simulateQuery } from './simulate.ts'
 export { type StabilityQuery, stabilityQuery } from './stability-schema.ts'
 export {
@@ -33,6 +41,7 @@ export {
 export {
   type ComputeRunner,
   ComputeTimeout,
+  inlineRunner,
   reviveError,
   runTask,
   type SerializedError,

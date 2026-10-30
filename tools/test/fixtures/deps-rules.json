@@ -155,6 +155,14 @@
     "source": "import { buildApp } from '@open-reloading/api'\nexport { buildApp }",
     "rules": ["cli-imports-core-data-drawing-schema-only", "not-to-unresolvable"]
   },
+  "packages/cli/src/api-entries.ts": {
+    "source": "import { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nexport { runTask, openCatalogue }",
+    "rules": ["not-to-unresolvable"]
+  },
+  "packages/cli/src/api-static.ts": {
+    "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
+    "rules": ["cli-imports-core-data-drawing-schema-only", "not-to-unresolvable"]
+  },
   "packages/cli/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
     "rules": ["cli-imports-core-data-drawing-schema-only"]
