@@ -27,9 +27,12 @@ export function recordIds(
   }
 }
 
-/** The cartridge of every case, capacity, load and firing series. */
+/**
+ * The cartridge of every case, capacity, load and firing series, and the cartridges a powder is
+ * listed for.
+ */
 export function checkCartridgeReferences(
-  bundle: Pick<Bundle, 'cases' | 'capacities' | 'loads' | 'firings'>,
+  bundle: Pick<Bundle, 'cartridges' | 'cases' | 'capacities' | 'loads' | 'firings' | 'powders'>,
   ids: RecordIds,
   errors: string[],
 ) {
@@ -43,6 +46,11 @@ export function checkCartridgeReferences(
   for (const c of bundle.capacities)
     unknown('capacities', c.id, c.cartridge, parseRef(c.cartridge)?.id)
   for (const l of bundle.loads) unknown('loads', l.id, l.cartridge, parseRef(l.cartridge)?.id)
+  // the workbench compares the list with the chosen record's id, so an old id never matches
+  const current = new Set(bundle.cartridges.map((c) => c.id))
+  for (const p of bundle.powders)
+    for (const c of p.listedCartridges ?? [])
+      if (!current.has(c)) errors.push(`powders/${p.id}.json: unknown listed cartridge "${c}"`)
 }
 
 /** The bullet and powder of every load that names a record. */

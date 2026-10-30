@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { msg } from '../src/i18n/translate.ts'
@@ -5,6 +6,7 @@ import { findFace } from '../src/lib/face-search.ts'
 import type { RgbaImage } from '../src/lib/image.ts'
 import {
   belowMinimum,
+  guideRule,
   layoutOf,
   photoQuality,
   type QualityIssue,
@@ -384,5 +386,36 @@ describe('a target of any pattern', () => {
     expect(layoutOf({ rings: [ring('white'), ring('black')] } as never)).toEqual({ dark: true })
     expect(layoutOf({ rings: [ring('white'), ring('white')] } as never)).toEqual({ dark: false })
     expect(layoutOf({ rings: [ring(), ring('white')] } as never)).toEqual({ dark: undefined })
+  })
+})
+
+describe('guideRule', () => {
+  it('links each problem to the rule of the photo guide that says how to retake the photo', () => {
+    expect(Object.fromEntries(Object.entries(guideRule).map(([p, r]) => [p, r.name]))).toEqual({
+      face: 'One target, all of it',
+      framing: 'One target, all of it',
+      tilt: 'Straight from above, no slant',
+      contrast: 'Even light, no reflection',
+      exposure: 'Even light, no reflection',
+      glare: 'Even light, no reflection',
+      shadow: 'Even light, no reflection',
+      resolution: 'Close enough',
+      blur: 'Steady, not soft',
+    })
+  })
+
+  it('names a heading of the guide and links its anchor', () => {
+    const guide = readFileSync(new URL('../../docs/docs/photo-guide.md', import.meta.url), 'utf8')
+    const headings = [...guide.matchAll(/^## (.+)$/gm)].map((m) => m[1] ?? '')
+    // the anchor of a Docusaurus heading: lower case, punctuation dropped, spaces as hyphens
+    const anchor = (h: string) =>
+      h
+        .toLowerCase()
+        .replace(/[^\p{L}\p{N} -]/gu, '')
+        .replace(/ /g, '-')
+    for (const rule of Object.values(guideRule)) {
+      const heading = headings.find((h) => h.endsWith(rule.name))
+      expect(heading && anchor(heading)).toBe(rule.anchor)
+    }
   })
 })

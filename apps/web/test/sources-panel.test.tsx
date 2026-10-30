@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import type { Source } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { Sources, SourceTitles } from '../src/components/sources.tsx'
+import { RecordSourcesLink, Sources } from '../src/components/sources.tsx'
 import { dayText } from '../src/lib/dates.ts'
 
 const hash = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
@@ -43,12 +43,10 @@ it('shows 12 digits of the hash, copies the full hash and keeps the rest in the 
   expect(render(sheet)).toContain(`aria-label="Copy hash ${hash.slice(0, 12)}"`)
 })
 
-it('lists the titles in the compact form, separated by semicolons', () => {
-  const html = renderToStaticMarkup(
-    <SourceTitles sources={[sheet, { title: 'Manual', page: '12' }]} />,
-  )
+it("links a record's Sources panel in a new tab", () => {
+  const html = renderToStaticMarkup(<RecordSourcesLink kind="bullets" id="a b" />)
   expect(html).toBe(
-    '<span><a href="https://example.com/sheet.pdf">Data sheet 2026</a></span><span>; Manual, page 12</span>',
+    '<a target="_blank" rel="noopener" href="/bullets/a%20b#record-sources">Sources<span class="visually-hidden"> in a new tab</span></a>',
   )
 })
 

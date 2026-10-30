@@ -36,8 +36,8 @@ export function LoadSheets({
   note?: string | undefined
   /** Label and value rows: cartridge, bullet, powder, seating, firearm. */
   components: [string, string][]
-  /** The length the steps seat the bullet by; none: they vary the charge. */
-  by?: SeatingLengthKind | undefined
+  /** What the steps vary besides the charge: the length they seat the bullet by, or the powder temperature. */
+  by?: SeatingLengthKind | 'temperature' | undefined
   steps: SheetStep[]
 }) {
   const { t } = useTranslation()
@@ -64,7 +64,8 @@ export function LoadSheets({
     </div>
   )
   const lines = (n: number) => Array.from({ length: n }, (_, i) => i)
-  const stepName = by ? seatingLengthName[by] : t('Charge')
+  const stepName =
+    by === 'temperature' ? t('Powder temperature') : by ? seatingLengthName[by] : t('Charge')
   return createPortal(
     <div className="load-sheets">
       <section className="load-sheet">
@@ -78,7 +79,6 @@ export function LoadSheets({
         <table className="sheet-table sheet-steps">
           <thead>
             <tr>
-              <th scope="col">{t('Step')}</th>
               <th scope="col">{stepName}</th>
               {simulated && (
                 <>
@@ -100,11 +100,12 @@ export function LoadSheets({
           <tbody>
             {steps.map((s) => (
               <tr key={s.n}>
-                <td>{s.label === '0' ? t('{label} main', { label: s.label }) : s.label}</td>
-                <td className="num">{s.charge}</td>
+                <td className="num">
+                  {s.label === '0' ? t('{label} main', { label: s.charge }) : s.charge}
+                </td>
                 {simulated && (
                   <>
-                    <td className="num">{s.pressure}</td>
+                    <td className="num range">{s.pressure}</td>
                     <td className="num">{s.ofMax}</td>
                     <td className="num">{s.velocity}</td>
                     <td>{s.flag}</td>

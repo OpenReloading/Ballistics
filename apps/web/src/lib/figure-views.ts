@@ -1,4 +1,4 @@
-import type { Dimension, LengthUnit, Medium } from '@open-reloading/drawing'
+import type { Annotation, Dimension, LengthUnit, Medium } from '@open-reloading/drawing'
 import {
   type Drawn,
   type FigureModel,
@@ -9,6 +9,9 @@ import {
 
 /** The views of the workbench's cartridge figure: Combined has no dimensions. */
 export type FigureView = 'cartridge' | 'chamber' | 'combined'
+
+/** A view's model with the annotation of the side it dimensions, the source of its values table. */
+type ViewModel = FigureModel & { annotation?: Annotation }
 
 /**
  * The models of the three views of the workbench's cartridge figure: Combined (`preview`, both
@@ -29,13 +32,16 @@ export function figureViewBuilder(
   unit: LengthUnit,
   medium: Medium = 'screen',
   views: readonly FigureView[] = ['cartridge', 'chamber', 'combined'],
-): (seated?: SeatedLengths) => Partial<Record<FigureView, FigureModel>> {
+): (seated?: SeatedLengths) => Partial<Record<FigureView, ViewModel>> {
   const record = recordFigures(spec).find((f) => f.drawn.length)?.drawn
   const shown = record ?? preview
   if (!shown) return () => ({})
   const em = screenEm([shown], unit)
-  const lay = (d: Drawn[number]) => figureModel([d], medium, em, 0, [], false, unit)
-  const fixed: Partial<Record<FigureView, FigureModel>> = {}
+  const lay = (d: Drawn[number]): ViewModel => ({
+    ...figureModel([d], medium, em, 0, [], false, unit),
+    annotation: d.p.annotation,
+  })
+  const fixed: Partial<Record<FigureView, ViewModel>> = {}
   if (preview && views.includes('combined'))
     fixed.combined = figureModel(preview, medium, em, 0, [], false, unit)
   const sides = (record ?? []).filter((d) => views.includes(d.side))
@@ -45,7 +51,7 @@ export function figureViewBuilder(
   const order = [...(fixed.combined ? (['combined'] as const) : []), ...sides.map((d) => d.side)]
   return (seated) =>
     sharedFrame(
-      order.flatMap((view): [FigureView, FigureModel][] => {
+      order.flatMap((view): [FigureView, ViewModel][] => {
         const model =
           view === 'cartridge' && cartridge
             ? lay(seated ? seatedSide(cartridge, seated, unit) : cartridge)
@@ -56,9 +62,7 @@ export function figureViewBuilder(
 }
 
 /** The models with the union of their frames and the scale bar of the lowest. */
-function sharedFrame(
-  models: [FigureView, FigureModel][],
-): Partial<Record<FigureView, FigureModel>> {
+function sharedFrame(models: [FigureView, ViewModel][]): Partial<Record<FigureView, ViewModel>> {
   const all = models.map(([, m]) => m)
   if (all.length === 0) return {}
   const left = Math.min(...all.map((m) => m.frame[0]))

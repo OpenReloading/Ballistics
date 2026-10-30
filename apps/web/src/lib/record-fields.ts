@@ -334,10 +334,21 @@ const computed = (label: Message, unit: string, r: ComputedRange): FieldRow => (
  * The groups of a powder page's Properties table, in record order; absent fields are left out.
  * Manufacturer, form, base, bulk density and country are the cards of `powderStrip`.
  */
-export function powderRowGroups(p: Powder): FieldGroup[] {
+export function powderRowGroups(
+  p: Powder,
+  cartridgeNames: ReadonlyMap<string, string> = new Map(),
+): FieldGroup[] {
   const t = p.thermochemistry
   return [
-    { rows: text(msg('Aliases'), p.aliases?.join('; ')) },
+    {
+      rows: [
+        ...text(msg('Aliases'), p.aliases?.join('; ')),
+        ...text(
+          msg('Listed by the manufacturer for'),
+          p.listedCartridges?.map((id) => cartridgeNames.get(id) ?? id).join('; '),
+        ),
+      ],
+    },
     {
       title: msg('Composition'),
       rows: (p.composition ?? []).map(

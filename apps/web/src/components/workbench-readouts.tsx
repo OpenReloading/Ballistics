@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Popover, UnstyledButton } from '@mantine/core'
+import { Popover, UnstyledButton } from '@mantine/core'
 import { freeRecoil } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
@@ -18,7 +18,6 @@ import { translateMessage } from '../lib/core-messages.ts'
 import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
 import { type RunnableLadderKind, seatingLengthName } from '../lib/seating-ladder.ts'
-import { controlSize } from '../lib/theme.ts'
 import { niceTicks } from '../lib/ticks.ts'
 import {
   formatQuantity,
@@ -32,14 +31,13 @@ import {
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import { bandLine, bandNotice, firstPressureLimit, resultBand } from '../lib/workbench.ts'
+import { bandNotice, firstPressureLimit, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { SourceTitles } from './sources.tsx'
+import { RecordSourcesLink } from './sources.tsx'
 import { StandardBadge } from './standard-badge.tsx'
-import { useScrolls } from './states.tsx'
 import {
   derived,
   loadRatioText,
@@ -130,72 +128,6 @@ export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'erro
         <p>{t('Retry after {seconds} s', { seconds: outcome.retryAfter })}</p>
       )}
     </>
-  )
-}
-
-/**
- * The warnings in the notice line: a button with their summary on one line, the list in a
- * popover, so the line never grows; nothing without warnings.
- */
-export function WarningsBlock({
-  warnings,
-  summary,
-  announce,
-}: {
-  /** The lines, in the page's units. */
-  warnings: { text: string }[]
-  /** The summary line: count, step and names. */
-  summary: string
-  announce: boolean
-}) {
-  const { t, tn } = useTranslation()
-  const { ref: list, scrolls } = useScrolls()
-  if (warnings.length === 0) return null
-  return (
-    <span role={announce ? 'status' : undefined} className="warnings-block">
-      <AppPopover
-        position="bottom-end"
-        width={popoverWidth.list}
-        // in the notice line, so the result region holds the list; fixed, so it stays in the window
-        withinPortal={false}
-        floatingStrategy="fixed"
-        keepMounted
-        trapFocus
-      >
-        <Popover.Target>
-          <Button
-            variant="subtle"
-            size={controlSize.row.button}
-            aria-controls="warnings-list"
-            className="warnings-summary"
-            title={summary}
-          >
-            <span className="warn-icon">
-              <NavIcon name="safety" size={14} />
-            </span>
-            {/* the count in view; the whole summary is the button's name and title */}
-            <span className="warnings-text" aria-hidden="true">
-              {tn(warnings.length, '{count} warning', '{count} warnings')}
-            </span>
-            <span className="visually-hidden">{summary}</span>
-          </Button>
-        </Popover.Target>
-        <Popover.Dropdown id="warnings-list" className="warnings-list">
-          <h3 id="warnings-title">{t('Warnings')}</h3>
-          {/* a list of any length keeps the popover's height: it scrolls, and takes focus to do so */}
-          <ul ref={list} tabIndex={scrolls ? 0 : undefined} aria-labelledby="warnings-title">
-            {warnings.map((w) => (
-              <li key={w.text}>
-                <span className="warn-icon">
-                  <NavIcon name="safety" size={14} />
-                </span>
-                {w.text}
-              </li>
-            ))}
-          </ul>
-        </Popover.Dropdown>
-      </AppPopover>
-    </span>
   )
 }
 
@@ -330,11 +262,11 @@ function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; syst
   const note = known ? t(known) : gasFactorNote
   const recoilTitle = note
     ? t(
-        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity; factor {factor}, {note}); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).',
+        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity; factor {factor}, {note}); muzzle devices not counted.',
         { summary: recoilNote, factor: gasFactor, note },
       )
     : t(
-        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity); muzzle devices not counted (SAAMI, Gun Recoil - Technical, 2018).',
+        '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity); muzzle devices not counted.',
         { summary: recoilNote, factor: gasFactor },
       )
   return (
@@ -442,7 +374,7 @@ export function Readouts({
   const mipTitle = t(
     '0.1 times the bullet mass in g times the muzzle velocity in m/s ({source}).',
     {
-      source: 'DSB Sportordnung, Regeln für Pistole und Revolver, 2.21.1',
+      source: 'DSB Sportordnung 2.21.1',
     },
   )
   const leadTitle = t('From the 10 % pressure time ({time} after ignition) to muzzle exit.', {
@@ -458,7 +390,6 @@ export function Readouts({
   const limits = ofMax?.limit.pressure && (
     <PeakLimits ok={ok} system={system} printed={printed} ofMax={ofMax} />
   )
-  const bandText = bandLine(ok.body, system, t)
   const big = (value: string, unit: string) => (
     <>
       <span className="readout-value">{value}</span> <span className="readout-unit">{unit}</span>
@@ -514,7 +445,6 @@ export function Readouts({
           </dd>
         </div>
       </dl>
-      {!printed && bandText && <p className="band-line screen-only">{bandText}</p>}
       <dl className="readouts readout-list" data-stale={stale || undefined}>
         <div>
           <dt>{t('Muzzle pressure')}</dt>
@@ -535,9 +465,9 @@ export function Readouts({
         <BurnoutItem ok={ok} system={system} />
         <div title={fillTitle}>
           <dt>{t('Case fill')}</dt>
-          {/* without a value the reason in view and in print, in the small type of a phrase */}
+          {/* without a value the reason in print; on screen it is a result note */}
           <dd className={ratio === undefined ? readoutPhrase : undefined}>
-            {loadRatioText(ok, ratio, t)}
+            {ratio === undefined && !printed ? t('not available') : loadRatioText(ok, ratio, t)}
           </dd>
           {ratio !== undefined && ratio > 1 && <dd className="readout-note">{t('compressed')}</dd>}
           {readoutFact(fillTitle)}
@@ -642,13 +572,19 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
   )
 }
 
-/** Pressure limits table and the sources of the limits; with `system` the range bar between them (the popover). */
+/**
+ * Pressure limits table and their source line; with `system` the range bar between them (the
+ * popover). On screen the line links the cartridge record's sources; on paper it names the record.
+ */
 export function LimitsView({
   body,
   system,
+  printed = false,
 }: {
   body: InteriorResponse
   system?: UnitSystem | undefined
+  /** In the print report: the record's name in place of the link. */
+  printed?: boolean
 }) {
   const { t } = useTranslation()
   const resolved = body.resolved?.cartridge
@@ -692,16 +628,16 @@ export function LimitsView({
         ))}
       </PanelTable>
       {system && <LimitRange body={body} system={system} />}
-      {resolved && (
-        <div className="limit-sources">
-          <h3>{t('Sources of the limits')}</h3>
-          <ol className="sources">
-            <li>
-              CIP: <SourceTitles sources={resolved.provenance.sources} />
-            </li>
-          </ol>
-        </div>
-      )}
+      {resolved &&
+        (printed ? (
+          <p className="limit-sources">
+            {t('Pressure limits: C.I.P. TDCC, cartridge record {name}', { name: resolved.name })}
+          </p>
+        ) : (
+          <p className="limit-sources">
+            {t('Source: C.I.P. TDCC')} <RecordSourcesLink kind="cartridges" id={resolved.id} />
+          </p>
+        ))}
     </div>
   )
 }

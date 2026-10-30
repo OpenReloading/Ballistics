@@ -14,6 +14,7 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
+    "@open-reloading/api": "0.0.4",
     "@open-reloading/core": "0.0.3",
     "@open-reloading/data": "0.0.4",
     "@open-reloading/drawing": "0.0.3",

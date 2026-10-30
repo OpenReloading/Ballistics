@@ -30,7 +30,7 @@
   - A single file or test runs without coverage: `npx vitest run <file>` in the package.
   - lcov reports for the code quality gate: `npm test` writes `packages/<name>/coverage/lcov.info` for those seven. The web app, the docs scripts and the tools have their own run without a threshold, `npm run test:coverage -w @open-reloading/<web|docs|tools>`, writing `apps/web/coverage/lcov.info`, `apps/docs/coverage/lcov.info` (Node's test runner) and `tools/coverage/lcov.info`.
 - Web JavaScript budget per route: `npm run check-weight -w @open-reloading/web` (after `npm run static:build`, which leaves `.next` for it; details in `apps/web/AGENTS.md`). CI runs it in the `e2e` job after the export build.
-- Evaluate the interior model on load rows (after `build`, details in `packages/cli/AGENTS.md`): `node packages/cli/dist/bin.js verify --rows <path>`, `node packages/cli/dist/bin.js compare ...`. Rows are passed by path and never committed.
+- Evaluate the interior model on load rows (after `build`, details in `packages/cli/AGENTS.md`): `node packages/cli/dist/bin.js verify --rows <path>`, `node packages/cli/dist/bin.js compare ...`. Rows are passed by path and never committed. One compute operation offline: `node packages/cli/dist/bin.js run <operation> --input <file>`, the list with schemas: `node packages/cli/dist/bin.js operations`.
 - Validate data records: `npm run data:validate`
 - Docs site (Docusaurus, `apps/docs`): `npm run site:build -w @open-reloading/docs` (after `build`)
   - Generated, git-ignored: the TypeDoc site of the six packages (`static/library/`, configured by `apps/docs/typedoc.config.mjs` with the landing page `apps/docs/library.md`), served at `/library/`, the REST API page (`static/rest/`: the API document, the Scalar viewer and its page, `scripts/openapi.mts`), served at `/rest/`. Its link to the API's own reference (`/v1/reference/`) uses `API_URL`, no link when it is unset.
@@ -72,7 +72,7 @@
   - A runtime dependency of core or drawing needs a permissive, MIT-compatible licence listed in `allow-licenses` of `.github/dependency-review-config.yml`, passing dependency review and the licence check (`tools/src/licences.ts`). It is added only for a concrete benefit (a missing capability, a defect, or clearly less code with the same tested result) and only when the library is maintained, widely used and not archived; the change states the benefit and the stars, last commit and weekly downloads. Its import rule in `.dependency-cruiser.cjs` then allows that package by name.
   - `packages/data`: git is the source of truth for records.
   - `packages/api`: depends on core, data and schema.
-  - `packages/cli`: depends on core, data, drawing and schema, never on the API or the web app. No model logic of its own.
+  - `packages/cli`: depends on core, data, drawing and schema, and of the API only on its browser entries `@open-reloading/api/compute` and `@open-reloading/api/catalogue`, never on the server or the web app. No model logic of its own.
   - `apps/web`: reads from the API, renders the figure models of `@open-reloading/drawing`. No database access or solver logic in route handlers.
     - The web app is a static export: it runs the API's compute entry (`@open-reloading/api/compute`) in the browser and reads data files the API wrote at build time. Only the build reads the API itself, for the record pages.
 - Mantine docs: the Mantine MCP server (`.mcp.json`, `.codex/config.toml`) or the docs index https://mantine.dev/llms.txt.

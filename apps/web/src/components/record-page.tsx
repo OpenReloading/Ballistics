@@ -3,22 +3,12 @@
 import type { Provenance } from '@open-reloading/schema'
 import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
 import { say, type Wording } from '../lib/wording.ts'
 import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
 import { RecordActions } from './record-actions.tsx'
-import { Sources } from './sources.tsx'
+import { provenanceKinds, Sources } from './sources.tsx'
 import { MutedBadge } from './standard-badge.tsx'
-
-/** How a record's values came about, in the title of its Sources panel. */
-const kinds: Record<Provenance['kind'], Message> = {
-  published: msg('published'),
-  measured: msg('measured'),
-  derived: msg('derived'),
-  fitted: msg('fitted'),
-  computed: msg('computed'),
-}
 
 /**
  * The frame of a record page (the cartridge and powder records build on it): the page bar with
@@ -102,7 +92,7 @@ export function RecordPage({
         {side && <div className="record-side">{side}</div>}
         <Panel
           id="record-sources"
-          title={t('Sources ({kind})', { kind: t(kinds[provenance.kind]) })}
+          title={t('Sources ({kind})', { kind: t(provenanceKinds[provenance.kind]) })}
           className="record-sources"
         >
           <Sources provenance={provenance} />

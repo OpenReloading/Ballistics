@@ -148,6 +148,7 @@ import {
   defaultKeys,
   defaultsText,
   parseDefaults,
+  readAutoRun,
   readDefaults,
   type WorkbenchDefaults,
 } from '../lib/workbench-defaults.ts'
@@ -178,7 +179,6 @@ import {
 } from './workbench-inputs.tsx'
 import {
   atStep,
-  derived,
   needsNetwork,
   notReached,
   type Outcome,
@@ -188,6 +188,8 @@ import {
   type Step,
   stepLoad,
   stepsOf,
+  unlistedCartridge,
+  warningsText,
 } from './workbench-outcome.ts'
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
@@ -1103,10 +1105,12 @@ export function useWorkbenchState() {
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
-  /** The library, with the example's built-in rifle while the example is loaded. */
-  const firearmList = (
-    firearm === loadExample.firearm.id ? [loadExample.firearm, ...firearms] : firearms
-  ).map((r) => ({ id: r.id, name: r.name, data: gunValues((r as FirearmRecord).data) }))
+  /** The library, then the example's built-in rifle (`gunPicker`). */
+  const firearmList = [...firearms, loadExample.firearm].map((r) => ({
+    id: r.id,
+    name: r.name,
+    data: gunValues((r as FirearmRecord).data),
+  }))
   /** The chosen firearm's active sight, for the Trajectory tab. */
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
@@ -2015,6 +2019,7 @@ export function useWorkbenchState() {
       id: runs.current,
       bulkDensity: a.bulkDensity,
       cartridge: body.cartridge,
+      unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
       design: bulletDesign?.name,
@@ -2046,7 +2051,7 @@ export function useWorkbenchState() {
       announce: false,
     }
     // compared as English text, so a change of language announces nothing again
-    const warnings = derived(ok, english.t).warnings.join('\n')
+    const warnings = warningsText(ok, english.t)
     ok.announce = warnings !== '' && warnings !== lastWarnings.current
     lastWarnings.current = warnings
     showChart(undefined)
@@ -2064,6 +2069,7 @@ export function useWorkbenchState() {
   }
 
   async function send() {
+    clearTimeout(autoTimer.current)
     running.current?.abort()
     bandRequest.current?.abort()
     let req: ReturnType<typeof loadRequest>
@@ -2097,7 +2103,11 @@ export function useWorkbenchState() {
     } catch {
       if (!controller.signal.aborted) showUnreached()
     } finally {
-      if (running.current === controller) setPending(false)
+      // a finished run is no longer running: the next input change keeps its status line
+      if (running.current === controller) {
+        setPending(false)
+        running.current = null
+      }
     }
   }
 
@@ -2165,6 +2175,37 @@ export function useWorkbenchState() {
     setRunWhenFilled(false)
     run()
   }, [runWhenFilled, fields, asked, seated.figure])
+
+  /** Runs a changed load once it is complete and valid; an invalid value shows its error only. */
+  function autoRun() {
+    const loading = Object.values(asked).some((a) => a && !a.failed)
+    // a value is checked on blur: one still being typed has no shown error yet
+    const invalid =
+      Object.values(form.errors).some(Boolean) ||
+      !form.isValid() ||
+      (gunWeight !== undefined &&
+        fieldError(firearmMassSpec, gunWeight, system, t) !== undefined) ||
+      stepError() !== undefined
+    if (!changed || loading || invalid) return
+    try {
+      loadRequest()
+    } catch (err) {
+      if (err instanceof ValueError) form.setFieldError(err.field, err.message)
+      return
+    }
+    void send()
+  }
+  const autoRunNow = useRef(autoRun)
+  autoRunNow.current = autoRun
+  const autoTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  // each input change starts the wait again; Run clears it, the switch is read when it ends
+  useEffect(() => {
+    if (edits === 0 || !readAutoRun()) return
+    autoTimer.current = setTimeout(() => {
+      if (readAutoRun()) autoRunNow.current()
+    }, 600)
+    return () => clearTimeout(autoTimer.current)
+  }, [edits])
 
   /**
    * The shown result of a load that comes back in its tab: put back once the records of the
@@ -2533,9 +2574,11 @@ export function useWorkbenchState() {
   const chosenCapacity = chosenCapacityOf(capacityChoice, cartridgeKey)
   const chosenCase = chosenCapacityOf(caseChoice, cartridgeKey)
   const chosenOwnCase = chosenCapacityOf(ownCaseChoice, cartridgeKey)
-  const cartridgeCases = cartridge
-    ? cases.filter((c) => c.cartridge === `catalogue:${cartridge.id}`)
-    : []
+  // one list per cartridge and library read, so the brass field's matches last while they do
+  const cartridgeCases = useMemo(
+    () => (cartridge ? cases.filter((c) => c.cartridge === `catalogue:${cartridge.id}`) : []),
+    [cartridge, cases],
+  )
 
   const activeStep = ladderStepField(ladderKind, {
     seat: seatStep,

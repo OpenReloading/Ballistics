@@ -123,7 +123,7 @@ test('a powder design fills the model values, is marked and named in the run and
   await input(/^Twist/).fill('305')
   await input(/^Charge mass/).press('Control+Enter')
   await expect(page.getByText(/^Simulation done\. /)).toBeAttached({ timeout: 15_000 })
-  await expect(page.locator('.note.user-design')).toContainText(
+  await expect(page.locator('.result-notes ul')).toContainText(
     'Powder values from the user design Mine DP, not a catalogue record.',
   )
   await page.emulateMedia({ media: 'print' })

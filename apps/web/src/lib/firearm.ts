@@ -284,6 +284,40 @@ export const gunValues = (f: Firearm) => ({
   lands: landsOf(f),
 })
 
+/** A firearm of the Gun chooser: its name, barrel length and twist (m). */
+export interface FirearmRow {
+  id: string
+  name: string
+  barrelLength?: number | undefined
+  twist?: number | undefined
+}
+
+const firearmRow = (id: string, name: string, f: Firearm): FirearmRow => ({
+  id,
+  name,
+  barrelLength: siOf('length', f.barrelLength),
+  twist: siOf('length', f.twist),
+})
+
+/**
+ * The workbench's Gun picker: the browser's firearms, then the built-in example rifle, which is
+ * never stored, so a fresh browser still has one to choose.
+ */
+export const gunPicker = (
+  stored: readonly { id: string; name: string; data: Firearm }[],
+  example: { id: string; name: string; data: Record<string, unknown> },
+  t: Translator['t'],
+) => ({
+  rows: [
+    ...stored.map((f) => firearmRow(f.id, f.name, f.data)),
+    // the example rifle's data is a firearm (`example-data.ts`)
+    firearmRow(example.id, t('{name} (example)', { name: example.name }), example.data as Firearm),
+  ],
+  placeholder: stored.length
+    ? t('Choose a firearm')
+    : t('No firearm saved yet. Pick the example rifle, or add yours under Firearms.'),
+})
+
 /** The catalogue record id a cartridge reference names; undefined for a `user:` reference. */
 export const catalogueCartridgeId = (ref: string | undefined) => {
   const parsed = ref === undefined ? undefined : parseRef(ref)
@@ -451,6 +485,25 @@ export function sightOptions(records: UserRecord[], t: Translator['t'] = untrans
       } satisfies SightFill as SightFill,
     }
   })
+}
+
+/**
+ * The Trajectory tab's sight choice: the sights of the browser's firearms, then those of the
+ * built-in example rifle, which is never stored, and the label of the empty choice.
+ */
+export function sightPicker(records: UserRecord[], example: UserRecord, t: Translator['t']) {
+  return {
+    options: [
+      ...sightOptions(records, t),
+      ...sightOptions([example], t).map((o) => ({
+        ...o,
+        label: t('{name} (example)', { name: o.label }),
+      })),
+    ],
+    none: records.some((r) => r.kind === 'firearm')
+      ? t('None')
+      : t('No firearm saved yet. Pick the example rifle, or add yours under Firearms.'),
+  }
 }
 
 /**

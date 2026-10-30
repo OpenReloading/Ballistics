@@ -251,6 +251,22 @@ it('leaves the powder properties of the strip out of the Properties table', () =
   ])
 })
 
+it('names the cartridges the manufacturer lists, by record id where no name is known', () => {
+  const [identity = missing()] = powderRowGroups(
+    {
+      id: 'a',
+      manufacturer: 'example-a',
+      name: 'Powder A',
+      listedCartridges: ['308-win', '6-5-creedmoor'],
+      provenance,
+    },
+    new Map([['308-win', '308 Win.']]),
+  )
+  expect(shown(identity.rows)).toEqual([
+    ['Listed by the manufacturer for', '308 Win.; 6-5-creedmoor'],
+  ])
+})
+
 it('gives the aliases, the composition and the computed thermochemistry with its range on hover', () => {
   const [identity = missing(), composition = missing(), thermo = missing()] = powderRowGroups({
     id: 'a',

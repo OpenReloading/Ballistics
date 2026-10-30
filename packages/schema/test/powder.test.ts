@@ -57,4 +57,27 @@ describe('powder', () => {
     for (const country of ['fi', 'FIN', 'Finland', ''])
       expect(paths({ ...base, country, provenance: sources(named) })).toEqual(['country'])
   })
+
+  it('accepts listed cartridges with a source that names them, and rejects the other cases', () => {
+    const listed = {
+      title: 'Example Powder Co., product page',
+      origin: 'manufacturer',
+      url: 'https://example.com/powders/powder',
+      retrieved: '2026-10-30',
+      fields: ['listedCartridges'],
+    }
+    const provenance = { kind: 'published', sources: [...base.provenance.sources, listed] }
+    expect(
+      powder.parse({ ...base, listedCartridges: ['308-win'], provenance }).listedCartridges,
+    ).toEqual(['308-win'])
+    expect(powder.parse(base).listedCartridges).toBeUndefined()
+    const paths = (record: object) =>
+      powder.safeParse(record).error?.issues.map((i) => i.path.join('.'))
+    // a source without `fields` does not name the list
+    expect(paths({ ...base, listedCartridges: ['308-win'] })).toEqual(['listedCartridges'])
+    expect(paths({ ...base, listedCartridges: [], provenance })).toEqual(['listedCartridges'])
+    expect(paths({ ...base, listedCartridges: ['308 Win'], provenance })).toEqual([
+      'listedCartridges.0',
+    ])
+  })
 })

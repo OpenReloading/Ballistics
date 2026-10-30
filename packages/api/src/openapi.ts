@@ -1,8 +1,9 @@
 import { STATUS_CODES } from 'node:http'
 import type { RouteOptions } from 'fastify'
-import { z } from 'zod'
+import type { z } from 'zod'
 import { buildApp } from './app.ts'
 import type { Catalogue } from './catalogue/types.ts'
+import { type JsonSchema, jsonSchema } from './compute/json-schema.ts'
 import { inlineRunner } from './compute/tasks.ts'
 import { API_VERSION } from './version.ts'
 
@@ -29,9 +30,6 @@ declare module 'fastify' {
     example?: unknown
   }
 }
-
-/** JSON Schema (OpenAPI 3.1 dialect) of one parameter, body or response, as `z.toJSONSchema` writes it. */
-type JsonSchema = Record<string, unknown>
 
 /** The parts of an OpenAPI 3.1 document that the breaking-change check and the reference read. */
 export interface OpenApiDocument {
@@ -120,27 +118,6 @@ const tagOf = (url: string) => {
   const tag = tags.find((t) => t.segments.some((s) => s === first))
   if (!tag) throw new Error(`no tag for ${url}`)
   return tag.name
-}
-
-/** A request schema as its input, a response schema as its output (records are stored parsed). */
-const jsonSchema = (schema: z.ZodType, io: 'input' | 'output' = 'input'): JsonSchema => {
-  const { $schema: _, ...rest } = z.toJSONSchema(schema, {
-    io,
-    unrepresentable: 'any',
-    // a number in a query string is parsed from its text, the document shows the number it must be
-    // (zod leaves out the examples of a transformed input; they are the numbers too)
-    override: ({ zodSchema, jsonSchema }) => {
-      const def = zodSchema._zod.def
-      const examples = z.globalRegistry.get(zodSchema)?.examples
-      if (examples) jsonSchema.examples = examples as unknown[]
-      if (io !== 'input' || def.type !== 'pipe' || def.out._zod.def.type !== 'number') return
-      const { $schema: _, ...number } = z.toJSONSchema(def.out as z.ZodType)
-      for (const key of Object.keys(jsonSchema))
-        if (key !== 'description' && key !== 'examples') delete jsonSchema[key]
-      Object.assign(jsonSchema, number)
-    },
-  })
-  return rest
 }
 
 /**

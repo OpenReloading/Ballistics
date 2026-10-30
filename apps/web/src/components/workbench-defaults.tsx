@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Stack } from '@mantine/core'
+import { Button, Stack, Switch } from '@mantine/core'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
@@ -21,7 +21,9 @@ import {
   citedDefaults,
   defaultKeys,
   defaultsText,
+  readAutoRun,
   readDefaults,
+  storeAutoRun,
   storeDefaults,
   validDefault,
   type WorkbenchDefaults,
@@ -53,10 +55,12 @@ export function WorkbenchDefaultsForm() {
   const [stored, setStored] = useState<WorkbenchDefaults>()
   const [fields, setFields] = useState<Fields>({})
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
+  const [autoRun, setAutoRun] = useState(true)
   // biome-ignore lint/correctness/useExhaustiveDependencies: read once after mounting; units follow below
   useEffect(() => {
     const d = readDefaults()
     setStored(d)
+    setAutoRun(readAutoRun())
     setFields(
       initialFields(
         specs.map((s, i) => ({ ...s, initial: d[nth(keys, i)] })),
@@ -130,6 +134,15 @@ export function WorkbenchDefaultsForm() {
 
   return (
     <Stack gap="sm" maw="40rem" className="workbench-defaults">
+      <Switch
+        label={t('Run automatically')}
+        checked={autoRun}
+        onChange={(e) => {
+          const on = e.currentTarget.checked
+          setAutoRun(on)
+          storeAutoRun(on)
+        }}
+      />
       {specs.map((spec, i) => {
         const key = nth(keys, i)
         const value = fields[spec.key]

@@ -16,7 +16,7 @@ test('a record capacity and a volume typed over the measured capacity show the n
   await runExample(page)
   // the example's volume follows its brass record's stated capacity, an estimate; the print copies
   // of the note are in the page too
-  const message = page.locator('.run-line .volume-note')
+  const message = page.locator('.result-notes li', { hasText: note })
   await expect(message).toBeVisible()
   await loadForm(page)
     .getByRole('textbox', { name: /^Case capacity/ })
@@ -32,7 +32,12 @@ test('a record capacity and a volume typed over the measured capacity show the n
     .getByLabel(/^Charge mass/)
     .press('Control+Enter')
   await expect(message).toBeVisible({ timeout: 15_000 })
-  await expect(message).toContainText('Enter a measured case capacity in the Cartridge card')
+  // what to enter is its reason in the notes dialog
+  await page.locator('.result-notes').getByRole('button', { name: /^More/ }).click()
+  const dialog = page.getByRole('dialog', { name: 'Result notes' })
+  await expect(dialog).toContainText('Enter a measured case capacity in the Cartridge card')
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
   // nothing scrolls, the page or the results column
   const overflow = await page.evaluate(() =>
     [document.scrollingElement, document.querySelector('.workspace-results')].map((e) =>
@@ -40,7 +45,7 @@ test('a record capacity and a volume typed over the measured capacity show the n
     ),
   )
   expect(overflow.every((x) => x <= 1)).toBe(true)
-  const { violations } = await new AxeBuilder({ page }).include('.run-line .volume-note').analyze()
+  const { violations } = await new AxeBuilder({ page }).include('.result-notes').analyze()
   expect(violations.map((v) => v.id)).toEqual([])
   await page.emulateMedia({ media: 'print' })
   await expect(page.locator('.print-report .report-sub')).toContainText(note)

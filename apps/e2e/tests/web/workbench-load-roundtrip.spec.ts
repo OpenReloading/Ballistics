@@ -74,8 +74,9 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await expect.poll(values).toEqual(before)
   // the brass is chosen again and gives the capacity
   await expect(capacity).toHaveAttribute('placeholder', /^3\.6/)
-  await expect(page.getByRole('combobox', { name: 'Brass record' })).toHaveValue(
-    'demo-case-308-brass',
+  await expect(page.getByRole('combobox', { name: 'Brass record' })).toHaveAttribute(
+    'placeholder',
+    /308 Win\. Brass Demo/,
   )
   await expect(page.locator('.file-state')).toContainText('Saved')
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)

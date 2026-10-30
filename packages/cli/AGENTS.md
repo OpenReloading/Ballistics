@@ -1,12 +1,17 @@
 # @open-reloading/cli
 
-`ballistics verify` and `ballistics compare`: held-out evaluation of the interior model on a file of load rows. A thin layer: the run of a row is `recordLoad` of `@open-reloading/core` plus the seating of `@open-reloading/drawing`; the package holds no model logic. The page `apps/docs/docs/cli.md` defines rows, split, metrics, output and the model version hash.
+`ballistics run` and `ballistics operations`: one compute operation of the API offline (`src/operations.ts`, over the operations of `@open-reloading/api/compute` and the catalogue of `@open-reloading/api/catalogue`, the only API imports allowed). `ballistics verify` and `ballistics compare`: held-out evaluation of the interior model on a file of load rows. A thin layer: the run of a row is `recordLoad` of `@open-reloading/core` plus the seating of `@open-reloading/drawing`; the package holds no model logic. The page `apps/docs/docs/cli.md` defines rows, split, metrics, output and the model version hash.
 
 ## Commands (this directory, or `-w @open-reloading/cli` from the root)
 
 - Build: `npm run build` (needs the other packages built first). Run: `node packages/cli/dist/bin.js ...` from the root (the package is private, so npm links no `ballistics` command).
 - Test: `npm test` (Vitest, coverage floors in `vitest.config.ts`). Type check: `npm run typecheck`.
 - JSON schema of a result: `npm run schema` rewrites `schema/result.schema.json` from `src/result.ts`; a test fails when the file is stale.
+
+## Operations for an agent
+
+- `node packages/cli/dist/bin.js operations`: every operation with the JSON Schema 2020-12 of its body (`input`) and answer (`output`).
+- `node packages/cli/dist/bin.js run <operation> --input <file|->`: the answer of `POST /v1/<operation>`. Example body: `examples/interior.json` (a test keeps it equal to the route example). Tests compare each operation's answer with the route's (`test/operations.test.ts`).
 
 ## Loop for an agent
 
@@ -16,7 +21,7 @@
 4. Decide on `change`: a negative `velocityMedian` and `velocityP90` is better; check `usedRows` (a model that refuses rows looks better) and the per-family changes (`--group-by` for others). Keep or revert.
 5. Run the sealed test split once, for the final version: add `--split test --final`. Never iterate on it.
 
-Exit code 1 is a refusal, 2 is bad input, 3 an internal error. When stdout is not a terminal (or with `--json`) the error is one JSON object on stderr, `{"error":{"kind":"refused"|"usage"|"internal","message":"..."}}`. Every result carries `notice: "simulation, not load data"`. `--rows -` reads the rows from stdin, `--version` prints the version.
+Exit code 1 is a refusal, 2 is bad input, 3 an internal error. When stdout is not a terminal (or with `--json`) the error is one JSON object on stderr, `{"error":{"kind":"refused"|"usage"|"internal","message":"..."}}`; `run` adds `issues` (a body the schema rejects) or `answer` (a 422 answer). Every result of `verify` and `compare` and every interior answer of `run` carries `notice: "simulation, not load data"`. `--rows -` reads the rows from stdin, `--version` prints the version.
 
 ## Facts
 

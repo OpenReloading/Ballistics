@@ -12,3 +12,14 @@ export function docsUrl(
 ): string | undefined {
   return value?.trim() || (without ? undefined : `${base}/docs/`)
 }
+
+/** The page `page` of the docs site `docs` (a {@link docsUrl}); no docs site, no page. */
+export const docsPage = (docs: string | undefined, page: string): string | undefined =>
+  docs && `${docs.replace(/\/?$/, '/')}${page}`
+
+// inlined at build; no link without a docs site
+/** The photo guide, how to take a target photo that hole detection can read. */
+export const photoGuide = docsPage(
+  docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS),
+  'photo-guide/',
+)

@@ -1,21 +1,12 @@
 'use client'
 
-import {
-  ActionIcon,
-  Button,
-  Loader,
-  NumberInput,
-  Paper,
-  Popover,
-  Select,
-  Switch,
-} from '@mantine/core'
+import { ActionIcon, Button, Loader, NumberInput, Paper, Popover, Switch } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import { type ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
@@ -24,8 +15,10 @@ import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
+import type { CartridgeRow } from '../lib/cartridge-rows.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
+import { loadExample } from '../lib/example-data.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
   type FieldSpec,
@@ -34,7 +27,7 @@ import {
   siValues,
   specText,
 } from '../lib/field-spec.ts'
-import { landsFor } from '../lib/firearm.ts'
+import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -61,8 +54,9 @@ import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
-import { RecordSearch } from './record-search.tsx'
+import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
+import { RecordSourcesLink } from './sources.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
@@ -198,6 +192,14 @@ const recordRow = (label: string, value: ReactNode, unit?: string) =>
       {unit && <span className="record-unit">{unit}</span>}
     </div>
   )
+
+/** The powder record's link to its sources: a design has no record page, paper cannot follow it. */
+function PowderSourceRow() {
+  const { powder, powderDesign, printing, printMedia } = useLoad()
+  const { t } = useTranslation()
+  if (!powder || powderDesign || printing || printMedia) return null
+  return recordRow(t('Source'), <RecordSourcesLink kind="powders" id={powder.id} />)
+}
 
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
@@ -461,11 +463,7 @@ export function StartCard({ onAct }: { onAct?: () => void }) {
       onKeyDownCapture={onAct}
     >
       <h2 id="start-title">{t('Start a load')}</h2>
-      <p>
-        {t(
-          'Step 1: choose the cartridge. Its CIP record limits the bullets to its groove and gives the chamber values and the maximum pressure.',
-        )}
-      </p>
+      <p>{t('Step 1: choose the cartridge.')}</p>
       <CardPicker panel="cartridge" />
       <p className="start-label">{t('Common cartridges')}</p>
       <div className="start-picks">
@@ -599,11 +597,11 @@ export function InputCards() {
  * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
  */
 function LoadRow() {
-  const { primerId, setPrimerChoice } = useLoad()
+  const { primerId, setPrimerChoice, system } = useLoad()
   return (
     <div className="pinned-row">
       <CartridgePicker />
-      <PrimerChoice id={primerId} onChange={setPrimerChoice} />
+      <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
       <LotField lot="primer" short />
       <SeatingSlot name="choices" />
     </div>
@@ -963,6 +961,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
             formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
           system.density.symbol,
         )}
+        <PowderSourceRow />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
@@ -1002,8 +1001,23 @@ function CardBody({ panel }: { panel: InputPanel }) {
   )
 }
 
+// one module for every chooser, so their shared dialog is one chunk
 const BulletSearchDialog = dynamic(
-  () => import('./bullet-search-dialog.tsx').then((m) => m.BulletSearchDialog),
+  () => import('./record-choosers.tsx').then((m) => m.BulletSearchDialog),
+  { ssr: false },
+)
+
+const PowderChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.PowderChooser), {
+  ssr: false,
+})
+
+const CartridgeChooser = dynamic(
+  () => import('./record-choosers.tsx').then((m) => m.CartridgeChooser),
+  { ssr: false },
+)
+
+const FirearmChooser = dynamic(
+  () => import('./record-choosers.tsx').then((m) => m.FirearmChooser),
   { ssr: false },
 )
 
@@ -1023,13 +1037,7 @@ function BulletPicker() {
     system,
   } = useLoad()
   const { t } = useTranslation()
-  const [dialog, setDialog] = useState({ text: '', opened: false })
-  // opened before its code has loaded, the dialog mounts open and cannot return the focus itself
-  const opener = useRef<HTMLElement | null>(null)
-  const close = () => {
-    setDialog({ ...dialog, opened: false })
-    setTimeout(() => opener.current?.focus())
-  }
+  const dialog = useChooser()
   const designRows = useMemo(() => userBulletRows(designs), [designs])
   const fit = useMemo(
     () => (bulletParams ? fitOf(cartridge) : undefined),
@@ -1073,14 +1081,13 @@ function BulletPicker() {
           label: t('Browse bullets'),
           onOpen: (typed) => {
             readDesigns()
-            opener.current = document.activeElement as HTMLElement | null
-            setDialog({ text: typed, opened: true })
+            dialog.open(typed)
           },
         }}
       />
       <BulletSearchDialog
         opened={dialog.opened}
-        onClose={close}
+        onClose={dialog.close}
         text={dialog.text}
         designs={designRows}
         fit={fit}
@@ -1090,7 +1097,7 @@ function BulletPicker() {
           const design = userRecordId(row.id)
           if (design) chooseDesign(design)
           else chooseBullet(row.id)
-          close()
+          dialog.close()
         }}
       />
     </>
@@ -1106,39 +1113,61 @@ function CartridgePicker() {
     chooseCartridgeDesign,
     searchKey,
     chooseCartridge,
+    readDesigns,
+    system,
   } = useLoad()
   const { t } = useTranslation()
+  const dialog = useChooser()
+  const choose = (c: CartridgeRow) => {
+    const design = userRecordId(c.id)
+    if (design) chooseCartridgeDesign(design)
+    else chooseCartridge({ id: c.id, name: c.name, ...summaryFitSource(c) })
+  }
   return (
-    <RecordSearch<CartridgeSummary>
-      size={controlSize.row.input}
-      chevron
-      key={searchKey}
-      kind="cartridges"
-      label={t('Search cartridges by name')}
-      picked={!!(cartridge || cartridgeDesign)}
-      chosen={
-        cartridge?.name ??
-        (cartridgeDesign
-          ? t('{name} (your design)', { name: cartridgeDesign.name })
-          : t('Search cartridges (optional)'))
-      }
-      describe={cartridgeOptionText}
-      onSelect={(c) =>
-        chooseCartridge({
-          id: c.id,
-          name: c.name,
-          ...summaryFitSource(c),
-        })
-      }
-      // the browser's cartridge designs in the same list, first
-      extra={cartridgeDesigns.map((d) => ({
-        id: d.id,
-        label: t('{name} (your design)', { name: d.name }),
-      }))}
-      onExtra={chooseCartridgeDesign}
-      noneText={t('No cartridge found')}
-      unreachableText={t(notReached)}
-    />
+    <>
+      <RecordSearch<CartridgeSummary>
+        size={controlSize.row.input}
+        chevron
+        key={searchKey}
+        kind="cartridges"
+        label={t('Search cartridges by name')}
+        picked={!!(cartridge || cartridgeDesign)}
+        chosen={
+          cartridge?.name ??
+          (cartridgeDesign
+            ? t('{name} (your design)', { name: cartridgeDesign.name })
+            : t('Search cartridges (optional)'))
+        }
+        describe={cartridgeOptionText}
+        onSelect={choose}
+        // the browser's cartridge designs in the same list, first
+        extra={cartridgeDesigns.map((d) => ({
+          id: d.id,
+          label: t('{name} (your design)', { name: d.name }),
+        }))}
+        onExtra={chooseCartridgeDesign}
+        noneText={t('No cartridge found')}
+        unreachableText={t(notReached)}
+        browse={{
+          label: t('Browse cartridges'),
+          onOpen: (typed) => {
+            readDesigns()
+            dialog.open(typed)
+          },
+        }}
+      />
+      <CartridgeChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        designs={cartridgeDesigns}
+        system={system}
+        onChoose={(c) => {
+          choose(c)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }
 
@@ -1152,8 +1181,11 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
     powderDesign,
     powderDesigns,
     choosePowderDesign,
+    readDesigns,
+    system,
   } = useLoad()
   const { t } = useTranslation()
+  const dialog = useChooser()
   const chosen = (() => {
     if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
     if (powderLabel) return powderLabel
@@ -1163,48 +1195,109 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
       : t('Search powders')
   })()
   return (
-    <RecordSearch<PowderSummary>
-      size={controlSize.row.input}
-      chevron
-      kind="powders"
-      label={t('Search powders by manufacturer and name')}
-      chosen={chosen}
-      describe={(p) => productLabel(p, names)}
-      onSelect={(p) => choosePowder(p.id)}
-      // the browser's powder designs in the same list, first
-      extra={powderDesigns.map((d) => ({
-        id: d.id,
-        label: t('{name} (your design)', { name: d.name }),
-      }))}
-      onExtra={choosePowderDesign}
-      noneText={t('No powder found')}
-      unreachableText={t(notReached)}
-    />
+    <>
+      <RecordSearch<PowderSummary>
+        size={controlSize.row.input}
+        chevron
+        kind="powders"
+        label={t('Search powders by manufacturer and name')}
+        chosen={chosen}
+        describe={(p) => productLabel(p, names)}
+        onSelect={(p) => choosePowder(p.id)}
+        // the browser's powder designs in the same list, first
+        extra={powderDesigns.map((d) => ({
+          id: d.id,
+          label: t('{name} (your design)', { name: d.name }),
+        }))}
+        onExtra={choosePowderDesign}
+        noneText={t('No powder found')}
+        unreachableText={t(notReached)}
+        browse={{
+          label: t('Browse powders'),
+          onOpen: (typed) => {
+            readDesigns()
+            dialog.open(typed)
+          },
+        }}
+      />
+      <PowderChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        designs={powderDesigns}
+        system={system}
+        onChoose={(p) => {
+          if (p.origin) choosePowderDesign(p.id)
+          else choosePowder(p.id)
+          dialog.close()
+        }}
+      />
+    </>
+  )
+}
+
+/** The Gun card's picker: the library's firearms and the example rifle, in the field and the dialog. */
+function GunPicker() {
+  const { chooseFirearm, firearm, firearms, readDesigns, system } = useLoad()
+  const { t } = useTranslation()
+  const dialog = useChooser()
+  const { rows, placeholder } = useMemo(
+    () => gunPicker(firearms, loadExample.firearm, t),
+    [firearms, t],
+  )
+  const find = useMemo(
+    () => async (text: string, limit: number) => {
+      const { firearmKeys, listMatches } = await import('../lib/record-choosers.ts')
+      return listMatches(rows, text, limit, firearmKeys)
+    },
+    [rows],
+  )
+  const chosen = rows.find((r) => r.id === firearm)
+  return (
+    <>
+      <RecordSearch<FirearmRow>
+        size={controlSize.row.input}
+        chevron
+        label={t('Firearm from your library')}
+        picked={!!chosen}
+        chosen={chosen?.name ?? placeholder}
+        describe={(f) => f.name}
+        onSelect={(f) => chooseFirearm(f.id)}
+        noneText={t('No firearm found')}
+        unreachableText={t(notReached)}
+        find={find}
+        browse={{
+          label: t('Browse firearms'),
+          onOpen: (typed) => {
+            readDesigns()
+            dialog.open(typed)
+          },
+        }}
+        clear={{ label: t('Clear the firearm'), onClear: () => chooseFirearm(null) }}
+      />
+      <FirearmChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        catalogue={rows}
+        add={firearms.length === 0}
+        system={system}
+        onChoose={(f) => {
+          chooseFirearm(f.id)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }
 
 /** A card's record picker, its heading: the chosen record shows in the field. */
 function CardPicker({ panel }: { panel: InputPanel }) {
-  const { chooseFirearm, firearm, firearmList, readDesigns } = useLoad()
   const names = useManufacturerNames()
-  const { t } = useTranslation()
   if (panel === 'cartridge') return <CartridgePicker />
   if (panel === 'bullet') return <BulletPicker />
   if (panel === 'powder') return <PowderPicker names={names} />
-  return (
-    <Select
-      size={controlSize.row.input}
-      aria-label={t('Firearm from your library')}
-      placeholder={firearmList.length ? t('Choose a firearm') : t('No firearm in this browser')}
-      searchable
-      clearable
-      data={firearmList.map((f) => ({ value: f.id, label: f.name }))}
-      value={firearm ?? null}
-      onChange={chooseFirearm}
-      onDropdownOpen={readDesigns}
-      nothingFoundMessage={t('No firearm found')}
-    />
-  )
+  return <GunPicker />
 }
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
@@ -1245,6 +1338,12 @@ function landsChoice(
   return landsFor(lands, ref)
 }
 
+/** The charge (kg) and the powder's bulk density (kg/m³) the figure's powder fill reads. */
+const figurePowder = (
+  charge: number | undefined,
+  powder: { bulkDensity?: { value: number } | undefined } | undefined,
+) => ({ charge, bulkDensity: powder?.bulkDensity && toSi('density', powder.bulkDensity.value) })
+
 /**
  * The cartridge figure with the seated bullet, once a cartridge is chosen, drawn into `host`: the
  * card of the inputs' second column or the result tab Cartridge. One node moves between them, so
@@ -1281,6 +1380,8 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     chooseOwnCase,
     setSeatAt,
     suggestions,
+    fields,
+    powder,
   } = useLoad()
   const { ok, stale } = useResult()
   // the figure draws the selected step of a seating ladder while its result is current
@@ -1345,6 +1446,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       onSeated={follow}
       onSeatLadder={setSeatAt}
       ladderStep={ladderStep}
+      powder={figurePowder(fields.charge?.si, powder)}
       measuredWaterCapacity={
         measuredFor === measuredId ? measured.measuredWaterCapacity : emptyStep
       }

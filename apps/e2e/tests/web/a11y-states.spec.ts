@@ -183,6 +183,16 @@ const states: State[] = [
     },
   },
   {
+    name: 'Result notes',
+    open: async (page, check) => {
+      await runExample(page)
+      await showResults(page)
+      await page.locator('.result-notes').getByRole('button', { name: /^More/ }).click()
+      await dialogOf('Result notes')(page)
+      await check('dialog', '[role="dialog"]')
+    },
+  },
+  {
     name: 'Chart data',
     open: async (page, check) => {
       await runExample(page)

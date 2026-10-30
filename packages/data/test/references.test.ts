@@ -89,6 +89,21 @@ describe('checkCartridgeReferences', () => {
     ])
   })
 
+  it('names a listed cartridge of a powder that is unknown or an old id', () => {
+    const b = bundle({
+      renames: { cartridges: { 'old-c1': 'c1' } },
+      firings: [],
+      cases: [],
+      capacities: [],
+      loads: [],
+      powders: [{ id: 'p1', listedCartridges: ['c1', 'old-c1', 'c9'] }, { id: 'p2' }],
+    })
+    expect(errorsOf((e) => checkCartridgeReferences(b, recordIds(b), e))).toEqual([
+      'powders/p1.json: unknown listed cartridge "old-c1"',
+      'powders/p1.json: unknown listed cartridge "c9"',
+    ])
+  })
+
   it('reads a cartridge given as a plain id', () => {
     const b = bundle({
       firings: [],

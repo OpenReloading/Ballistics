@@ -8,7 +8,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { bandLine, rangeCardNote, rangeHero, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
-import { printRangeCard } from './range-card.tsx'
+import { printAlone } from './print.ts'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
 import { derived, type Outcome, selectedLabel } from './workbench-outcome.ts'
 import { peakFacts } from './workbench-readouts.tsx'
@@ -175,7 +175,8 @@ export function RangeView() {
             size="md"
             disabled={!card}
             aria-describedby={card ? undefined : 'range-card-needs'}
-            onClick={printRangeCard}
+            // the range card's own module stays with the Trajectory tab, which renders the card
+            onClick={() => printAlone('range-card')}
           >
             {t('Print range card')}
           </Button>

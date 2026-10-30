@@ -218,17 +218,19 @@ function PowderRow({
   onOpen: (row: CompareRow) => void
 }) {
   const { t } = useTranslation()
+  const name = productLabel(r)
   return (
     <tr aria-current={r.id === current ? 'true' : undefined}>
       <td data-label={t('Powder')}>
+        {/* a long name is cut after two lines: the title holds it in full */}
         <UnstyledButton
           className="powder-open"
-          title={t('Use this powder in the workbench')}
+          title={`${name}\n${t('Use this powder in the workbench')}`}
           onClick={() => onOpen(r)}
         >
-          {productLabel(r)}
+          {name}
         </UnstyledButton>
-        {r.id === current && <span className="barrel-current"> {t('current')}</span>}
+        {r.id === current && <span className="barrel-current">{t('current')}</span>}
       </td>
       <td data-label={t('Charge, {unit}', { unit: system.charge.symbol })} className="num">
         {r.charge !== undefined && formatQuantity('charge', system, r.charge)}
@@ -344,7 +346,7 @@ function isStale(
   }
 }
 
-/** The status line: the progress or the count, the message, the target's reason, staleness and the standing notice. */
+/** The status line: the progress or the count, the message, the target's reason, and staleness. */
 function statusText(
   o: {
     running: boolean
@@ -378,9 +380,8 @@ function statusText(
     o.message && messageText(o.message, t),
     o.targetShown,
     o.stale ? t('Inputs changed since these rows') : undefined,
-    t('Simulation, not load data. A row is no recommendation'),
   ].filter(Boolean)
-  return `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.`
+  return parts.length > 0 ? `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.` : ''
 }
 
 /** The line after a batch that stopped early or failed. */

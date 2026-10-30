@@ -17,6 +17,7 @@ import {
   type Tagged,
 } from '@open-reloading/drawing/seating'
 import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
+import dynamic from 'next/dynamic'
 import {
   type Dispatch,
   type ReactNode,
@@ -52,7 +53,14 @@ import type { LandsContact } from '../lib/firearm.ts'
 import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
+import type { CaseRow } from '../lib/record-choosers.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
+import {
+  type ChargeFill,
+  chargeFill,
+  fillPercent,
+  seatingValueRows,
+} from '../lib/seating-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { trailing } from '../lib/trailing.ts'
 import {
@@ -70,9 +78,10 @@ import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
-import { RecordSearch } from './record-search.tsx'
+import { RecordSearch, useChooser } from './record-search.tsx'
+import { PanelTable } from './scroll-region.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
-import { SourceTitles } from './sources.tsx'
+import { RecordSourcesLink } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
@@ -87,6 +96,11 @@ type Load<T> =
 type Mode = 'overallLength' | 'baseToOgive'
 
 type T = Translator['t']
+
+// in the module of every chooser, so their shared dialog is one chunk
+const CaseChooser = dynamic(() => import('./record-choosers.tsx').then((m) => m.CaseChooser), {
+  ssr: false,
+})
 
 const modeHelp = {
   overallLength: msg('Cartridge overall length.'),
@@ -251,6 +265,25 @@ function SeatedBullet({
   )
 }
 
+/** The powder charge in the case, in the part frame (mm): from the head to its level, tinted and hatched. */
+function ChargeLevel({ id, level }: { id: string; level: number }) {
+  return (
+    <g className="seating-charge" clipPath={`url(#${id}-cartridge)`}>
+      <pattern
+        id={`${id}-hatch`}
+        width="1"
+        height="1"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        <path d="M0 0V1" />
+      </pattern>
+      <rect className="tint" x={0} y={-50} width={level} height={100} />
+      <rect x={0} y={-50} width={level} height={100} fill={`url(#${id}-hatch)`} />
+    </g>
+  )
+}
+
 type PreviewProps = {
   /** The catalogue record to seat in; none for a `draft`. */
   cartridge?: { id: string; name: string } | undefined
@@ -320,6 +353,11 @@ type PreviewProps = {
   ladderStep?: { by: Mode; value: number } | undefined
   /** The figure's full view: the same drawing in a modal at the window's height. */
   fullView?: { opened: boolean; onClose: () => void }
+  /**
+   * The load's charge (kg) and its powder's bulk density (kg/m³): the figure draws the powder fill.
+   * A page without a charge leaves it out and shows no fill.
+   */
+  powder?: { charge: number | undefined; bulkDensity: number | undefined } | undefined
 }
 
 /** The lands contact in mm, as `seat` takes it. */
@@ -937,6 +975,15 @@ function useSeatingModel(p: PreviewProps) {
   )
 
   const fmt = unitFormats(system)
+  const behind = figureSeating?.volumeBehindBullet?.value
+  const fill =
+    p.powder &&
+    figureSeating &&
+    chargeFill({
+      ...p.powder,
+      volume: behind === undefined ? undefined : unitsOf.capacity.cm3.toSi(behind),
+      base: figureSeating.basePosition,
+    })
   const contact = contactText(seating, fmt.mm, t)
   /** The workbench's cards: the fields there show what the rows below leave out. */
   const card = inCard
@@ -997,6 +1044,7 @@ function useSeatingModel(p: PreviewProps) {
     setSliding,
     canCbto,
     measuredWaterCapacity,
+    fill,
   }
 }
 
@@ -1215,7 +1263,7 @@ function BulletStatus({ m }: { m: Model }) {
           {t('Bullet: {label}', { label: productLabel(bulletRecord, names) })} ({bulletRecord.id}
           {bulletRecord.provenance.sources[0] && (
             <>
-              , <SourceTitles sources={bulletRecord.provenance.sources.slice(0, 1)} />
+              , <RecordSourcesLink kind="bullets" id={bulletRecord.id} />
             </>
           )}
           )
@@ -1235,44 +1283,85 @@ function BulletStatus({ m }: { m: Model }) {
   )
 }
 
-/** The case products of the cartridge: choosing one makes its stated capacity the default. */
+/**
+ * The brass of the cartridge in the field and the dialog: the user's groups of cases (an id with
+ * `user:`) and the case products. Choosing a product makes its stated capacity the default.
+ */
 function CaseChoice({ m }: { m: Model }) {
   const { t } = useTranslation()
+  const dialog = useChooser()
   const { caseList, names } = m
-  const items = caseList.status === 'ok' ? caseList.value.items : []
-  const own = m.p.ownCases ?? []
+  const own = m.p.ownCases
   const ownId = m.p.ownCaseId
-  if (items.length === 0 && own.length === 0 && !ownId) return null
-  const ownItems = [
-    ...own.map((c) => ({ value: `user:${c.id}`, label: ownCaseText(c, t) })),
-    // a load names a group this browser does not have
-    ...(ownId && !own.some((c) => c.id === ownId)
-      ? [{ value: `user:${ownId}`, label: t('A brass group not in this browser') }]
-      : []),
-  ]
+  const rows = useMemo((): CaseRow[] => {
+    const items = caseList.status === 'ok' ? caseList.value.items : []
+    return [
+      ...(own ?? []).map((c) => ({
+        id: `user:${c.id}`,
+        name: c.name,
+        manufacturerName: t('Your brass'),
+        waterCapacity: c.grams,
+      })),
+      ...items.map((c) => ({
+        id: c.id,
+        name: c.name,
+        manufacturerName: refName(names, c.manufacturer) || c.manufacturer,
+        material: c.material,
+        waterCapacity: c.waterCapacity,
+      })),
+    ]
+  }, [caseList, own, names, t])
+  const find = useMemo(
+    () => async (text: string, limit: number) => {
+      const { caseKeys, listMatches } = await import('../lib/record-choosers.ts')
+      return listMatches(rows, text, limit, caseKeys)
+    },
+    [rows],
+  )
+  if (rows.length === 0 && !ownId) return null
+  const ownCase = own?.find((c) => c.id === ownId)
+  const choose = (id: string) => {
+    if (id.startsWith('user:')) m.p.onOwnCaseId?.(id.slice('user:'.length))
+    else m.setCaseId(id)
+  }
+  const chosen = ownId
+    ? ownCase
+      ? ownCaseText(ownCase, t)
+      : // a load names a group this browser does not have
+        t('A brass group not in this browser')
+    : m.chosenCase && caseText(m.chosenCase, names, t)
   return (
-    <NativeSelect
-      {...rowSize(m)}
-      label={t('Brass record')}
-      value={ownId ? `user:${ownId}` : (m.chosenCase?.id ?? '')}
-      onChange={(e) => {
-        const v = e.currentTarget.value
-        if (v.startsWith('user:')) m.p.onOwnCaseId?.(v.slice('user:'.length))
-        else m.setCaseId(v || undefined)
-      }}
-      data={[
-        { value: '', label: t('None') },
-        ...(ownItems.length > 0 ? [{ group: t('Your brass'), items: ownItems }] : []),
-        ...(items.length > 0
-          ? [
-              {
-                group: t('Products'),
-                items: items.map((c) => ({ value: c.id, label: caseText(c, names, t) })),
-              },
-            ]
-          : []),
-      ]}
-    />
+    <>
+      <RecordSearch<CaseRow>
+        {...rowSize(m)}
+        chevron
+        label={t('Brass record')}
+        picked={!!chosen}
+        chosen={chosen || t('Search brass (optional)')}
+        describe={(c) =>
+          c.id.startsWith('user:')
+            ? t('{name} (your brass)', { name: c.name })
+            : `${c.manufacturerName} ${c.name}`.trim()
+        }
+        onSelect={(c) => choose(c.id)}
+        noneText={t('No brass found')}
+        unreachableText={t(notReached)}
+        find={find}
+        browse={{ label: t('Browse brass'), onOpen: dialog.open }}
+        clear={{ label: t('Clear the brass record'), onClear: () => m.setCaseId(undefined) }}
+      />
+      <CaseChooser
+        opened={dialog.opened}
+        onClose={dialog.close}
+        text={dialog.text}
+        catalogue={rows}
+        system={m.system}
+        onChoose={(c) => {
+          choose(c.id)
+          dialog.close()
+        }}
+      />
+    </>
   )
 }
 
@@ -1525,10 +1614,26 @@ function undrawnDesc(view: Model['view'], record: string | undefined, t: T) {
 function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T) {
   const { view, designed, name, design } = m
   const where = designed ? name : `${spec.standard} ${spec.name}`
+  const fill = drawnSeating && m.fill ? ` ${fillText(m.fill, m.system, t)}` : ''
   return {
     caption: captionOf(view, design?.name, where, t),
-    desc: figureDesc(m, spec, drawnSeating, t),
+    desc: figureDesc(m, spec, drawnSeating, t) + fill,
   }
+}
+
+/** The powder fill as the legend and the description say it, or the inputs it needs. */
+function fillText(fill: ChargeFill, system: UnitSystem, t: T) {
+  if ('missing' in fill)
+    return t('Powder fill not drawn: needs {missing}.', {
+      missing: fill.missing.map((x) => t(x)).join(', '),
+    })
+  const values = { charge: withUnit('charge', system, fill.charge), fill: fillPercent(fill.ratio) }
+  return fill.compressed
+    ? t(
+        'Hatched: the charge of {charge} at a case fill of {fill} %, compressed by the bullet.',
+        values,
+      )
+    : t('Hatched: the charge of {charge} at a case fill of {fill} %.', values)
 }
 
 /** The figure's title: `design` is the name of the user design seated, none for a record's bullet. */
@@ -1569,6 +1674,9 @@ function DrawnFigure({
       model={shown}
       level={shown.medium === 'print'}
     >
+      {seating && m.fill && 'level' in m.fill && shown.cartridge && (
+        <ChargeLevel id={id} level={m.fill.level} />
+      )}
       {seating && (
         <SeatedBullet
           id={id}
@@ -1636,9 +1744,56 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
           )}
         </p>
       )}
+      {/* the workbench card's drawing fills it: the fill and the table go to the Cartridge card's More */}
+      {drawnSeating && put(m.slots, <FigureValues m={m} seating={drawnSeating} />, m.slots?.more)}
       {!shape && view === 'combined' && !designer && (
         <p>{t('Choose a bullet with a length to seat it.')}</p>
       )}
+    </div>
+  )
+}
+
+/** The powder fill's legend and the values the figure draws as a table, from the model and fill the drawing reads. */
+function FigureValues({ m, seating }: { m: Model; seating: Seating }) {
+  const { t } = useTranslation()
+  const { fill } = m
+  const rows = seatingValueRows(
+    {
+      annotation: (m.model ?? m.levelModel)?.annotation,
+      seating,
+      fill,
+      system: m.system,
+    },
+    t,
+  )
+  return (
+    <div className="figure-values">
+      {fill && (
+        <p className="seating-legend">
+          {fillText(fill, m.system, t)}{' '}
+          {'level' in fill &&
+            t(
+              'The charge level is approximate: the volume behind the bullet is taken as even from the head to the bullet base.',
+            )}
+        </p>
+      )}
+      <details>
+        <summary>{t('Values of the drawing')}</summary>
+        <PanelTable
+          label={t('Values of the drawing')}
+          className="figure-values-table"
+          caption={t('Values of the drawing (simulation inputs, not load data)')}
+          columns={[t('Name'), t('Value'), t('Unit')]}
+        >
+          {rows.map((r) => (
+            <tr key={`${r.name} ${r.value}`}>
+              <th scope="row">{r.name}</th>
+              <td className="num">{r.value}</td>
+              <td>{r.unit}</td>
+            </tr>
+          ))}
+        </PanelTable>
+      </details>
     </div>
   )
 }

@@ -213,6 +213,16 @@ Without temperature sensitivities, $\tau_T = 1$.
 
 A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
 
+The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
+
+$$
+Q(T_p) = Q \exp\left(\beta_Q (T_p - T_\text{ref})\right)
+$$
+
+Code: `packages/core/src/interior/model.ts`, `energyAtTemperature` (used for the charge energy $m_c Q$ in `scaleInteriorLoad` and for `efficiency`).
+
+The reference $T_\text{ref}$ is that of `temperatureSensitivity`, which a nonzero value needs. The default is 0, which leaves every result unchanged. The convective heat model keeps the unscaled $Q$ in its gas constant $R = (\gamma - 1) Q / T_f$, so a scaled energy there acts as a different gas temperature at a fixed $R$. The option is not a field of the powder record or the load file.
+
 ### Scaled state and integration
 
 The state is scaled so that one absolute tolerance fits every component:
@@ -394,7 +404,7 @@ Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
 
 ## Limits
 
-- Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy, ageing and moisture of the powder.
+- Not modelled: air ahead of the projectile, recoil and a moving breech, primer energy beyond the ignition pressure, pressure waves, erosion, a spread of grain sizes, the effect of the initial temperature on the gas energy unless `propellant.energyTemperature` is set (default 0, not stored on powder records), ageing and moisture of the powder.
 - The temperature term of the gas energy is not adopted: on synthetic loads it carries about a fifth of the muzzle-velocity change for a temperature step, and the fitted temperature factor absorbs it inside the calibrated temperature range (simulations, [research log](../research/propellant-temperature-energy.md)). The check on measured temperature ladders is pending.
 - The Lagrange coefficients assume a gas column of uniform density. Against the self-similar column of an isentropic gas with linear velocity (all of the charge burnt, ratio of specific heats 1.24 to 1.26, [Corner 1950](../bibliography.md#corner-1950), pages unverified) they put the breech and mean pressures over the base pressure high by 0.2 % at $m_c/m_p' = 0.28$, 0.6 to 0.7 % at 0.51 and 1.8 to 2.1 % at 1.03 (breech over base 1.515 against 1.489, mean over base 1.343 against 1.315). The error grows with a heavy charge behind a light projectile ([research log](../research/interior-lagrange-gradient-size.md)).
 - The primer enters only through the ignition pressure $p_i$. On the load-file example of the API ($p_\text{st}$ = 100 bar), $p_i$ from 5 to 100 bar leaves the muzzle velocity at 824.774 m/s, because the projectile is held until $p_\text{st}$. Above $p_\text{st}$, $p_i$ becomes the hold pressure: 200 bar gives 836.635 m/s, 1.44 % more ([charge too small](#charge-too-small), [research log](../research/interior-primer-ignition-pressure.md)).
@@ -456,6 +466,14 @@ Code: `packages/core/src/advisories.ts`, `advisoryRules`, `interiorAdvisories`. 
 - `startPressureBelowResistance`: $0 \lt p_\text{st} \le p_0$. The start condition of [shot start](#shot-start) is then decided by the second term, so the start pressure has no effect. A start pressure of 0 counts as not given.
 - `gyrationRadiusWithoutTwist`: a radius of gyration is given and $L_\text{tw} = 0$. The [effective mass](#effective-mass) then has no rotational term, so the radius is ignored.
 - `startPressureHeldOnce`: $p_\text{st} \gt p_0$, $p_\text{st} \gt p_\text{i}$ (the ignition pressure) and $p_e(0) \gt 0$. The projectile is held until the pressure reaches $p_\text{st}$ and then starts against $p_0$, which is lower. $p_0$ is the resistance at shot start only: the engraving profile can rise with travel, so the resistance later in the motion can exceed $p_0$ and $p_\text{st}$. With $p_\text{i} \ge p_\text{st}$ the [shot start](#shot-start) condition holds at ignition and there is no hold.
+
+### Cartridges listed by the manufacturer
+
+A powder record may carry `listedCartridges`: the ids of the cartridge records the manufacturer lists the powder for on its product page or data sheet, with a source whose `fields` names the list (`packages/schema/src/powder.ts`). It says what the manufacturer lists, not a recommendation, and it is no input of the model. Absent means not recorded, never none. Load data of the manufacturer, such as charges per cartridge, is not stored with it.
+
+When the powder record has a list and the chosen cartridge record is not in it, the workbench's result notes carry one warning: "<cartridge> is not among the cartridges the manufacturer lists this powder for." A listed cartridge, a powder without a list or a run without a cartridge record give none. The powder record page shows the list as "Listed by the manufacturer for", its source with the record's other sources.
+
+Code: `apps/web/src/components/workbench-outcome.ts`, `unlistedCartridge`. `packages/data/src/references.ts`, `checkCartridgeReferences` (each id names a current cartridge record).
 
 ## Sources
 

@@ -91,9 +91,12 @@ module.exports = {
       name: 'cli-imports-core-data-drawing-schema-only',
       severity: 'error',
       comment:
-        'packages/cli is a thin layer over the libraries: it depends on core, data, drawing and schema, never on the API or the web app.',
+        'packages/cli is a thin layer over the libraries: it depends on core, data, drawing and schema, and of @open-reloading/api only on the compute and catalogue entries the browser runs, never on the server or the web app.',
       from: { path: own('packages/cli/src') },
-      to: workspaceExcept('packages/cli/src', 'core', 'data', 'drawing', 'schema'),
+      to: {
+        path: workspace,
+        pathNot: `^(packages/cli/src/|${['core', 'data', 'drawing', 'schema'].map(pkg).join('|')}|packages/api/dist/(compute|catalogue)/browser\\.js$|@open-reloading/api/(compute|catalogue)$)`,
+      },
     },
     {
       name: 'web-no-node-builtins',

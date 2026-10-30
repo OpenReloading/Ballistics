@@ -20,6 +20,45 @@ const overflow = (page: Page, selector: string) =>
     ),
   )
 
+/** The header words of the load sheet's steps table that break across lines. */
+const brokenHeads = (page: Page) =>
+  page.locator('.sheet-steps thead th').evaluateAll((cells) =>
+    cells.flatMap((cell) => {
+      const text = cell.firstChild
+      if (!text?.textContent) return []
+      return [...text.textContent.matchAll(/\S+/g)].flatMap((word) => {
+        const range = document.createRange()
+        range.setStart(text, word.index)
+        range.setEnd(text, word.index + word[0].length)
+        return range.getClientRects().length > 1 ? [word[0]] : []
+      })
+    }),
+  )
+
+/** The printable width of the landscape sheet, px at 96 dpi: the paper less the default 10 mm margins. */
+const landscape = { A4: (297 - 20) * (96 / 25.4), Letter: (279.4 - 20) * (96 / 25.4) }
+
+test('the load sheet heads the steps by their value and breaks no header word on A4 and Letter', async ({
+  page,
+}) => {
+  await runExample(page)
+  await page.emulateMedia({ media: 'print' })
+  await page.evaluate(() => {
+    document.documentElement.dataset.print = 'sheets'
+  })
+  const heads = page.locator('.sheet-steps thead th')
+  await expect(heads.first()).toHaveText('Charge')
+  await expect(heads.filter({ hasText: /^Step$/ })).toHaveCount(0)
+  for (const language of ['en', 'de']) {
+    if (language === 'de') await showGerman(page)
+    for (const width of Object.values(landscape)) {
+      await page.setViewportSize({ width: Math.floor(width), height: 794 })
+      expect(await brokenHeads(page), `${language} at ${Math.floor(width)} px`).toEqual([])
+      expect(await overflow(page, '.load-sheet:not(.step), .load-sheet:not(.step) table')).toBe(0)
+    }
+  }
+})
+
 test('the report and the load sheets print in German and stay inside the page', async ({
   page,
 }) => {
