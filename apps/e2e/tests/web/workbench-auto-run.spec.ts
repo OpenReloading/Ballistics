@@ -51,7 +51,7 @@ test('with Run automatically off, only Run runs', async ({ page }) => {
   await dialog.getByRole('tab', { name: 'Workbench' }).click()
   const toggle = dialog.getByRole('switch', { name: 'Run automatically' })
   await expect(toggle).toBeChecked()
-  await dialog.getByText('Run automatically', { exact: true }).click()
+  await toggle.click()
   await expect(toggle).not.toBeChecked()
   await page.keyboard.press('Escape')
 
