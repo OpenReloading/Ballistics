@@ -71,29 +71,29 @@ A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](
 
 Disciplines with the fact set, of the disciplines of each federation (stage values on target mappings are not counted; 58 mappings carry `sighters`, `seriesShots` or `timeLimits`):
 
-| Fact | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | NRA (13) | VdRBw (25) |
-|---|---|---|---|---|---|---|---|
-| `firearm` | 103 | 104 | 44 | 72 | 16 | 13 | 25 |
-| `actions` | 98 | 101 | 31 | 62 | 5 | 0 | 25 |
-| `positions` | 103 | 104 | 38 | 71 | 16 | 13 | 25 |
-| `supports` | 103 | 104 | 34 | 72 | 16 | 4 | 25 |
-| `sights` | 100 | 101 | 41 | 71 | 10 | 0 | 25 |
-| `maxMagnification` | 15 | 15 | 0 | 7 | 2 | 0 | 3 |
-| `minTriggerWeight` | 61 | 79 | 13 | 0 | 8 | 0 | 20 |
-| `maxBarrelLength` | 24 | 13 | 12 | 16 | 5 | 0 | 7 |
-| `maxFirearmMass` | 33 | 87 | 15 | 0 | 15 | 0 | 0 |
-| `ammunition.handloads` | 71 | 74 | 1 | 48 | 0 | 0 | 25 |
-| `ammunition.bulletTypes` | 43 | 104 | 16 | 1 | 11 | 0 | 0 |
-| `ammunition.minMuzzleEnergy` | 7 | 0 | 0 | 8 | 0 | 0 | 0 |
-| `ammunition.minBulletMass` | 6 | 0 | 1 | 0 | 1 | 0 | 0 |
-| `ammunition.maxBulletMass` | 7 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `sighters` | 75 | 95 | 28 | 27 | 14 | 0 | 21 |
-| `seriesShots` | 36 | 96 | 5 | 42 | 8 | 5 | 21 |
-| `timeLimits` | 58 | 72 | 27 | 62 | 11 | 13 | 15 |
+| Fact | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | NRA (13) | NSRA (2) | VdRBw (25) |
+|---|---|---|---|---|---|---|---|---|
+| `firearm` | 103 | 104 | 44 | 72 | 16 | 13 | 2 | 25 |
+| `actions` | 98 | 101 | 31 | 62 | 5 | 0 | 0 | 25 |
+| `positions` | 103 | 104 | 38 | 71 | 16 | 13 | 0 | 25 |
+| `supports` | 103 | 104 | 34 | 72 | 16 | 4 | 0 | 25 |
+| `sights` | 100 | 101 | 41 | 71 | 10 | 0 | 0 | 25 |
+| `maxMagnification` | 15 | 15 | 0 | 7 | 2 | 0 | 0 | 3 |
+| `minTriggerWeight` | 61 | 79 | 13 | 0 | 8 | 0 | 0 | 20 |
+| `maxBarrelLength` | 24 | 13 | 12 | 16 | 5 | 0 | 0 | 7 |
+| `maxFirearmMass` | 33 | 87 | 15 | 0 | 15 | 0 | 0 | 0 |
+| `ammunition.handloads` | 71 | 74 | 1 | 48 | 0 | 0 | 0 | 25 |
+| `ammunition.bulletTypes` | 43 | 104 | 16 | 1 | 11 | 0 | 2 | 0 |
+| `ammunition.minMuzzleEnergy` | 7 | 0 | 0 | 8 | 0 | 0 | 0 | 0 |
+| `ammunition.minBulletMass` | 6 | 0 | 1 | 0 | 1 | 0 | 0 | 0 |
+| `ammunition.maxBulletMass` | 7 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `sighters` | 75 | 95 | 28 | 27 | 14 | 0 | 0 | 21 |
+| `seriesShots` | 36 | 96 | 5 | 42 | 8 | 5 | 0 | 21 |
+| `timeLimits` | 58 | 72 | 27 | 62 | 11 | 13 | 2 | 15 |
 
 A gap is a fact the rule books leave open, or a fact that one record cannot hold:
 
-- **Open in all seven rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
+- **Open in all eight rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
 - **Barrel length:** stated for handgun disciplines; the rifle tables of the German rule books print the length of the whole system, which is no barrel length.
 - **Free or as issued:** where a rule book says "any" or "as the original" for trigger weight, firearm mass or magnification, the field is absent.
 - **Time limits:** a record merging rows with different times, or a discipline whose time differs per stage while it has a single unstaged mapping, has no `timeLimits`. Sighting-only windows are not recorded.
@@ -170,7 +170,7 @@ Names are alphabetical with numbers in numeric order (25 before 100). The code o
 | BDS | `2101`, group codes `10xx`, `73xx` | By value, `x` read as `0`: `73xx` is 7300, after `4110` |
 | DSB | Section and item, `1.10`, several codes joined by `/` | The first code, each dotted segment numeric: `1.9`, `1.10`, `1.37/1.51/1.54`, `2.20` |
 | DSU, BDMP, VdRBw | Prefix and number, `LDG 2`, `G-H 6`, `SP3` | Prefix, then the number, then any text after it. Several codes by the first. Some BDMP and DSB records have no number |
-| ISSF, NRA | None | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name |
+| ISSF, NRA, NSRA | None | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name |
 
 A discipline without a number follows the numbered ones of its federation and is ordered like ISSF.
 
@@ -191,8 +191,10 @@ A group stores the target id and the target event id, so the discipline follows 
 
 Each rule book is one source record (`records/sources/<id>.json`: title, publisher, edition, URL, retrieval date and SHA-256). A record cites it by id with its own page, fields and note (`{ "source": "<id>", "page": "..." }`). The API returns the source resolved.
 
-The records cite [BDMP 2026](../bibliography.md#bdmp-2026), [BDS 2025](../bibliography.md#bds-2025), [BDS 2026](../bibliography.md#bds-2026), [BDS 2026, Allgemeiner Teil](../bibliography.md#bds-2026-a) (touch rule, the Z20 black area), [DSB 2027](../bibliography.md#dsb-2027), [DSU 2018](../bibliography.md#dsu-2018), [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), [ISSF 2022](../bibliography.md#issf-2022) (gauges), [NRA 2026](../bibliography.md#nra-2026) and [VdRBw](../bibliography.md#vdrbw). BDS disciplines take number, name, distance and target from the discipline list of the target volume (2025), and category, caliber classes and shots from the handgun and long-gun volumes (2026). The long-gun volume also gives the disciplines that the target volume does not list. Where the shots depend on the level of the match, a BDS mapping holds the number of the Deutsche Meisterschaft.
+The records cite [BDMP 2026](../bibliography.md#bdmp-2026), [BDS 2025](../bibliography.md#bds-2025), [BDS 2026](../bibliography.md#bds-2026), [BDS 2026, Allgemeiner Teil](../bibliography.md#bds-2026-a) (touch rule, the Z20 black area), [DSB 2027](../bibliography.md#dsb-2027), [DSU 2018](../bibliography.md#dsu-2018), [ISSF 2025, Third Print](../bibliography.md#issf-2025-third), [ISSF 2022](../bibliography.md#issf-2022) (gauges), [NRA 2026](../bibliography.md#nra-2026), [NSRA 2024](../bibliography.md#nsra-2024) and [VdRBw](../bibliography.md#vdrbw). BDS disciplines take number, name, distance and target from the discipline list of the target volume (2025), and category, caliber classes and shots from the handgun and long-gun volumes (2026). The long-gun volume also gives the disciplines that the target volume does not list. Where the shots depend on the level of the match, a BDS mapping holds the number of the Deutsche Meisterschaft.
 
 DSB rows without a record: a target needs rings and a black diameter, and a discipline needs a mapping to a target event. Scheibe Nr. 9 (flap target), Nr. 22 and Nr. 23 (hit areas) print no rings, so rows 2.16 and 8.11 to 8.25 have no discipline. Scheibe Nr. 14/15 prints no mirror diameter. Shotgun, muzzle-loader shotgun, crossbow, archery and Target Sprint rows are out of scope.
 
 NRA records cover the single-stage courses of fire of the High Power Rifle Rules (Rules 7.1 to 7.13), one discipline per course, and the targets they are shot on. The multiple-stage and aggregate courses (Rule 7.14 onwards) combine these courses or let the program pick the distance and have no record. The NRA No. SR-5 and LR Center targets have no record: no single-stage course names them. A course allows 10 or 20 shots, so its mapping states no shot count. Prone courses state no support: the AR-Tactical Mid-Range Prone rifle may be shot from a bipod and a rear bag, other rifles with a sling.
+
+NSRA records cover the 20-shot deliberate courses of the three card system at rifle meetings (Rule 8.15.3.2) on the targets of Appendix A, one discipline per distance, at 50 and 100 yards on the 1989 series long-range targets. The rule book applies the course regardless of position, so the records state none, and names no number of sighting shots. The 25 yards and 25 metres courses and the short-range and 10 m air rifle targets have no record: they are scored by outward gauging (a hole touching a line takes the lower value), which the target record cannot state. The 50 metres course has no target in Appendix A. The decimal (cadet and schools) and MM8 targets print no aiming mark size. The pistol and 6 yards air targets, the skirmisher targets (hit or miss) and the time-limit prone course ("a standard target") have no course of fire with a target in the rule book; the competitions are set by their own conditions.

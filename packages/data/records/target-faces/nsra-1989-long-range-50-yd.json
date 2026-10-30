@@ -1,0 +1,102 @@
+{
+  "id": "nsra-1989-long-range-50-yd",
+  "name": "1989 series long range, 50 yards",
+  "federation": "nsra",
+  "rings": [
+    {
+      "value": 4,
+      "diameter": {
+        "value": 96.81
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 82.18
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 67.55
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 52.92
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 38.29
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 23.66
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 9.03
+      }
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 4.09
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 102.78
+  },
+  "events": [
+    {
+      "id": "rule-8-15-3-2-deliberate-50-yd",
+      "name": "Rule 8.15.3.2 Deliberate rifle, 50 yards",
+      "distance": {
+        "value": 45720,
+        "raw": "50 yards"
+      },
+      "gauge": {
+        "value": 5.6
+      },
+      "section": "Rule 8.15.3.2",
+      "scoring": "touch",
+      "category": "rifle"
+    }
+  ],
+  "note": "The book prints one size per ring in mm for edge touching, the X ring being the inner ten, and the aiming mark as the black area; it states no ring colours. An oversize gauge of 9.03 mm may score the 50 yards face instead of the 5.6 mm gauge (Rule 5.1.8).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix A, PDF p. 29",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"]
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 8.15.3.2, PDF p. 23",
+        "fields": ["events.name", "events.distance", "events.section", "events.category"]
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rules 5.1.6 and 5.1.9, PDF p. 8",
+        "fields": ["events.scoring", "innerTen.rule"],
+        "note": "Inward gauging: when the flange of the gauge touches the line the higher value counts; a shot in or touching the X ring counts as an inner ten."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix B, PDF p. 31",
+        "fields": ["events.gauge"],
+        "note": "The 5.6 mm gauge scores all events with 5.6 mm (.22 in) ammunition."
+      }
+    ]
+  }
+}
