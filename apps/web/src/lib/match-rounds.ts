@@ -11,6 +11,13 @@ export interface MatchCourse {
   openSighters?: 'unlimited' | 'not-stated' | undefined
 }
 
+/** The mappings per stage, in order of first appearance (`Map.groupBy` is too new for the supported browsers). */
+function byStage<T extends { stage?: string | undefined }>(mappings: readonly T[]): T[][] {
+  const stages = new Map<string | undefined, T[]>()
+  for (const m of mappings) stages.set(m.stage, [...(stages.get(m.stage) ?? []), m])
+  return [...stages.values()]
+}
+
 /**
  * Shots and sighters per event. Mappings of one `stage` (or several without one, the whole
  * discipline) are alternative faces and count once; a stage's own sighters replace the
@@ -20,9 +27,7 @@ export function matchCourse(
   mappings: readonly Pick<TargetMapping, 'stage' | 'shotCount' | 'sighters'>[],
   rules: Pick<DisciplineRules, 'sighters'> | undefined,
 ): MatchCourse {
-  const byStage = new Map<string | undefined, (typeof mappings)[number][]>()
-  for (const m of mappings) byStage.set(m.stage, [...(byStage.get(m.stage) ?? []), m])
-  const stages = [...byStage.values()]
+  const stages = byStage(mappings)
   let shots: number | undefined = 0
   let sighters = 0
   let unlimited = false

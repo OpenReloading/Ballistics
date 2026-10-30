@@ -7983,6 +7983,16 @@ main .field-table tr.field-group > th {
   .range-card[data-paper="a4"] {
     page: range-a4;
   }
+
+  /* the range cards of a firearm's loads: each load's line starts a page, its card follows on it */
+  .range-card + .range-card-load {
+    break-before: page;
+  }
+
+  .range-card-load p,
+  .range-card-skipped p {
+    margin: 0 0 1mm;
+  }
 }
 
 /* one look for messages: the severity's fill and text, an edge in the text colour, and with it the
@@ -11740,4 +11750,35 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
 .tune-chart .measured line {
   stroke: var(--fg);
   stroke-width: 1.5;
+}
+
+/* zero target: its own A4 page without margins, so the sheet's mm are the paper's */
+.zero-target {
+  display: none;
+}
+
+@media print {
+  @page zero-a4 {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html[data-print="zero-target"] body > :not(.zero-target) {
+    display: none !important;
+  }
+
+  /* a hair under 297 mm, so rounding never starts a second page */
+  html[data-print="zero-target"] .zero-target {
+    display: block;
+    page: zero-a4;
+    width: 210mm;
+    height: 296.5mm;
+    overflow: hidden;
+  }
+
+  .zero-target img {
+    display: block;
+    width: 210mm;
+    height: 297mm;
+  }
 }
