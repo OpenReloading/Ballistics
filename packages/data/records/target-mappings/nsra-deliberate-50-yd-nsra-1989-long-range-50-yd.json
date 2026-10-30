@@ -1,0 +1,18 @@
+{
+  "id": "nsra-deliberate-50-yd-nsra-1989-long-range-50-yd",
+  "discipline": "nsra-deliberate-50-yd",
+  "face": "nsra-1989-long-range-50-yd",
+  "event": "rule-8-15-3-2-deliberate-50-yd",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 8.15.3.2, PDF p. 23",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The 50 yards card holds four targets with five shots at each."
+      }
+    ]
+  }
+}

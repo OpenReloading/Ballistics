@@ -1,0 +1,34 @@
+{
+  "id": "nsra",
+  "name": "National Small-bore Rifle Association",
+  "abbreviation": "NSRA",
+  "country": "GB",
+  "ruleBooks": ["nsra-rules-and-regulations-2024"],
+  "website": "https://www.nsra.co.uk/",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Title page (PDF p. 1)",
+        "fields": ["name", "abbreviation", "ruleBooks"],
+        "note": "The title page names the association; the rules call it the NSRA throughout. The book covers small-bore and air rifle, small-bore and air pistol and crossbow competitions."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 1.12, PDF p. 4",
+        "fields": ["country"],
+        "note": "The association's challenge trophies may not leave the United Kingdom."
+      },
+      {
+        "title": "Homepage of National Small-bore Rifle Association",
+        "publisher": "National Small-bore Rifle Association",
+        "url": "https://www.nsra.co.uk/",
+        "retrieved": "2026-10-30",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers, names the association and links its rules page."
+      }
+    ]
+  }
+}

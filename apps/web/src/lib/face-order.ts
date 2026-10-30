@@ -34,3 +34,11 @@ export function federationFaceIds(
     ...faces.filter((f) => f.federation === federation).map((f) => f.id),
   ])
 }
+
+/** The federations with at least one discipline: one without leaves the Discipline list empty. */
+export function federationsWithDisciplines(data: {
+  federations: FederationSummary[]
+  disciplines: DisciplineSummary[]
+}): FederationSummary[] {
+  return data.federations.filter((f) => data.disciplines.some((d) => d.federation === f.id))
+}

@@ -1,0 +1,23 @@
+{
+  "id": "knsa-veteranengeweer-100m-knsa-woerden",
+  "discipline": "knsa-veteranengeweer-100m",
+  "face": "knsa-woerden",
+  "event": "knsa-veteranengeweer-100m",
+  "shotCount": 30,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 3.3, pagina 7, PDF p. 78",
+        "fields": ["discipline", "face", "event"],
+        "note": "National 100 m courses are shot on the Woerden target."
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 6.1.2 h, pagina 11, PDF p. 82",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

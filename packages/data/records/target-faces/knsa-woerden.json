@@ -1,0 +1,154 @@
+{
+  "id": "knsa-woerden",
+  "name": "Schijf Geweer nummer 1 (\"Woerden\")",
+  "federation": "knsa",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 328
+      },
+      "fill": "white"
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 295
+      },
+      "fill": "white"
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 261
+      },
+      "fill": "white"
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 228
+      },
+      "fill": "white"
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 195
+      },
+      "fill": "black"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 161
+      },
+      "fill": "black"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 128
+      },
+      "fill": "black"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 95
+      },
+      "fill": "black"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 61
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 28
+      },
+      "fill": "black"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 11
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 195
+  },
+  "events": [
+    {
+      "id": "knsa-standaard-geweer-100m",
+      "name": "KNSA Standaard Geweer, 100-m liggend",
+      "distance": {
+        "value": 100000,
+        "raw": "100-m"
+      },
+      "section": "Deel IV, 6.1.2 a",
+      "scoring": "touch",
+      "category": "rifle"
+    },
+    {
+      "id": "knsa-militair-geweer-100m",
+      "name": "KNSA Militair Geweer, 100-m liggend",
+      "distance": {
+        "value": 100000,
+        "raw": "100-m"
+      },
+      "section": "Deel IV, 6.1.2 d",
+      "scoring": "touch",
+      "category": "service-rifle"
+    },
+    {
+      "id": "knsa-militair-geweer-optiek-100m",
+      "name": "KNSA Militair Geweer Optiek, 100-m liggend",
+      "distance": {
+        "value": 100000,
+        "raw": "100-m"
+      },
+      "section": "Deel IV, 6.1.2 f",
+      "scoring": "touch",
+      "category": "service-rifle"
+    },
+    {
+      "id": "knsa-veteranengeweer-100m",
+      "name": "KNSA Veteranengeweer, 100-m liggend",
+      "distance": {
+        "value": 100000,
+        "raw": "100-m"
+      },
+      "section": "Deel IV, 6.1.2 h",
+      "scoring": "touch",
+      "category": "service-rifle"
+    }
+  ],
+  "note": "The book prints one diameter per ring with its tolerance, the inner ten (mouche) and the black area; ring lines are 0.4 to 0.5 mm thick. Scoring and gauges follow the ISSF rules, to which the book refers.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 3.3, pagina 7 to 8, PDF pp. 78 to 79",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"]
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikel 6.1.2, pagina 11, PDF p. 82",
+        "fields": ["events.name", "events.distance", "events.section", "events.category"]
+      },
+      {
+        "source": "knsa-schiet-en-wedstrijdreglement-2026",
+        "page": "Deel IV, artikelen 8.5.2 and 12.1, pagina 16 to 17, PDF pp. 87 to 88",
+        "fields": ["events.scoring", "innerTen.rule"],
+        "note": "National scoring follows the ISSF rules, which count a ring or the inner ten that the hole touches."
+      }
+    ]
+  }
+}

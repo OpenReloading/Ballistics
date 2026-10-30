@@ -1,0 +1,18 @@
+{
+  "id": "nsra-deliberate-100-yd-nsra-1989-long-range-100-yd",
+  "discipline": "nsra-deliberate-100-yd",
+  "face": "nsra-1989-long-range-100-yd",
+  "event": "rule-8-15-3-2-deliberate-100-yd",
+  "shotCount": 20,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 8.15.3.2, PDF p. 23",
+        "fields": ["discipline", "face", "event", "shotCount"],
+        "note": "The 100 yards card holds two targets with 10 shots at each."
+      }
+    ]
+  }
+}

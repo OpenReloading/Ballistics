@@ -1,0 +1,55 @@
+{
+  "id": "nsra-deliberate-100-yd",
+  "federation": "nsra",
+  "name": "Deliberate rifle, 100 yards",
+  "section": "Rule 8.15.3.2",
+  "page": "PDF p. 23",
+  "distance": {
+    "value": 91440,
+    "raw": "100 yd",
+    "unit": "yd"
+  },
+  "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "ammunition": {
+      "bulletTypes": ["lead"]
+    },
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 1200,
+          "raw": "20 minutes"
+        },
+        "covers": "discipline",
+        "includesSighters": true
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 8.15.3.2, PDF p. 23",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.firearm",
+          "rules.timeLimits"
+        ],
+        "note": "The rule sets the 20-shot course of the three card system at rifle meetings, 20 minutes for the course and its sighting shots. Rule 8.15.3.1 applies it regardless of position, so the record states none."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 8.2.1, PDF p. 20",
+        "fields": ["rules.ammunition.bulletTypes"],
+        "note": "Every bullet of the rifle rules is wholly of lead or a similar soft material."
+      }
+    ]
+  }
+}

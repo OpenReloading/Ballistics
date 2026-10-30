@@ -5,7 +5,7 @@ import type {
   MappingSummary,
 } from '../src/lib/face-disciplines.ts'
 import { disciplineOptions } from '../src/lib/face-disciplines.ts'
-import { federationFaceIds } from '../src/lib/face-order.ts'
+import { federationFaceIds, federationsWithDisciplines } from '../src/lib/face-order.ts'
 
 const federations = [
   { id: 'dsb', name: 'DSB', abbreviation: 'DSB' },
@@ -43,5 +43,14 @@ describe('federation filter', () => {
       { id: 'own', federation: 'bds' },
     ]
     expect([...federationFaceIds(faces, data, 'bds')].sort()).toEqual(['bds-face', 'own'])
+  })
+
+  it('offers only the federations with a discipline', () => {
+    const ruleBookOnly = { id: 'ssv', name: 'SSV', abbreviation: 'SSV' } as FederationSummary
+    const offered = federationsWithDisciplines({
+      ...data,
+      federations: [...federations, ruleBookOnly],
+    })
+    expect(offered.map((f) => f.id)).toEqual(['dsb', 'bds'])
   })
 })
