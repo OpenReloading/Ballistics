@@ -138,6 +138,14 @@ describe('compareDisciplines', () => {
       'dsb - Gewehr 50 m',
     ])
   })
+
+  it('puts an unnumbered discipline without a category after those with one', () => {
+    const sorted = [
+      d('issf', undefined, 'Running Target', 10000),
+      d('issf', undefined, '50m Rifle Prone', 50000, 'rifle'),
+    ].sort(compareDisciplines)
+    expect(sorted.map((x) => x.name)).toEqual(['50m Rifle Prone', 'Running Target'])
+  })
 })
 
 describe('compareTargetFaces', () => {
@@ -166,6 +174,16 @@ describe('compareTargetFaces', () => {
       '50m Rifle Target',
       '300m Rifle Target',
     ])
+  })
+
+  it('puts a face without a federation first and orders faces without a code by name', () => {
+    const faces = [{ name: 'b' }, { federation: 'BDS', name: 'a' }, { name: 'a' }]
+    expect(faces.toSorted(compareTargetFaces)).toEqual([
+      { name: 'a' },
+      { name: 'b' },
+      { federation: 'BDS', name: 'a' },
+    ])
+    expect(compareTargetFaces({ name: 'x' }, { name: 'x' })).toBe(0)
   })
 })
 

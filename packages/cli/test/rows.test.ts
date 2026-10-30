@@ -77,9 +77,12 @@ describe('parseRows', () => {
     expect(performance.now() - start).toBeLessThan(5000)
   })
 
-  it.each(['2', '2.5', '.5', '5.', '+2', '2e-1', '2E0'])('reads %s as a number', (value) => {
-    expect(parseRows(`${head}\nc,b,p,${value},800\n`, 'f.csv')[0]?.charge).toBe(Number(value))
-  })
+  it.each(['2', '2.5', '.5', '.25', '5.', '+2', '2e-1', '2E0', '2e10'])(
+    'reads %s as a number',
+    (value) => {
+      expect(parseRows(`${head}\nc,b,p,${value},800\n`, 'f.csv')[0]?.charge).toBe(Number(value))
+    },
+  )
 
   it('names file, line and column of each problem and never quotes a value', () => {
     const text = `${head},barrel_mm,temperature_c\nc,b,p,abc,800,,\nc,b,p,0,800,,\n,b,p,1,800,-1,\nc,b,p,1,800,,-300\nc,b,p\n`
@@ -100,15 +103,49 @@ describe('parseRows', () => {
   })
 
   it('stops listing after ten problems and counts the rest', () => {
-    const body = Array.from({ length: 13 }, () => 'c,b,p,x,800').join('\n')
-    expect(() => parseRows(`${head}\n${body}\n`, 'f.csv')).toThrow(/\n3 more$/)
+    const bad = (n: number) => Array.from({ length: n }, () => 'c,b,p,x,800').join('\n')
+    expect(() => parseRows(`${head}\n${bad(13)}\n`, 'f.csv')).toThrow(
+      /^(f\.csv:\d+: [^\n]+\n){10}3 more$/,
+    )
+    expect(() => parseRows(`${head}\n${bad(10)}\n`, 'f.csv')).toThrow(
+      /^(f\.csv:\d+: [^\n]+\n){9}f\.csv:11: [^\n]+$/,
+    )
+  })
+
+  it('trims cells and header names, unquotes doubled quotes', () => {
+    const text = ` cartridge , bullet,powder,charge_g,velocity_ms,table\n c1 ,b,p, 2.5 ,800,"say ""hi"""\n`
+    expect(parseRows(text, 'f.csv')[0]).toMatchObject({
+      cartridge: 'c1',
+      charge: 2.5,
+      table: 'say "hi"',
+    })
+  })
+
+  it('keeps a byte order mark that does not start the file', () => {
+    expect(parseRows(`${head},table\nc,b,p,1,2,a\uFEFFb\n`, 'f.csv')[0]?.table).toBe('a\uFEFFb')
+  })
+
+  it('names an empty number column and a record of one field', () => {
+    expect(() => parseRows(`${head}\nc,b,p,,800\n`, 'f.csv')).toThrow('f.csv:2: charge_g is empty')
+    expect(() => parseRows(`${head}\nc\n`, 'f.csv')).toThrow(
+      'f.csv:2: has 1 fields, the header has 5',
+    )
+  })
+
+  it('accepts a temperature only above -273.15', () => {
+    const at = (t: string) => () => parseRows(`${head},temperature_c\nc,b,p,1,2,${t}\n`, 'f.csv')
+    expect(at('-273.15')).toThrow('temperature_c must be above -273.15')
+    expect(at('-273.14')()[0]?.temperature).toBe(-273.14)
   })
 
   it.each([
     ['', 'the file is empty'],
     [`${head},extra,more\n`, 'unknown column(s) extra, more'],
     [`${head},\n`, 'unknown column(s) (empty, column 6)'],
-    ['308-win,b,p,1.5,800\n', 'the first line is not a header'],
+    [
+      '308-win,b,p,1.5,800\n',
+      'f.csv:1: the first line is not a header: it names none of cartridge, bullet, powder, charge_g, velocity_ms',
+    ],
     [`${head},table,table\n`, 'repeats'],
     ['cartridge,bullet,powder\n', 'lacks charge_g, velocity_ms'],
   ])('refuses the header %j', (text, part) => {
@@ -125,6 +162,8 @@ describe('readRows', () => {
   writeFileSync(join(dir, 'tables', 'a.csv'), `${head}\nc1,b,p,1,2\n`)
   writeFileSync(join(dir, 'tables', 'C.CSV'), `${head}\nc3,b,p,1,2\n`)
   writeFileSync(join(dir, 'tables', 'notes.txt'), 'not rows')
+  writeFileSync(join(dir, 'tables', 'old.csv.txt'), `${head}\nc4,b,p,1,2\n`)
+  writeFileSync(join(dir, 'bad.csv'), `${head}\nc,b,p,0,2\n`)
   mkdirSync(join(dir, 'empty'))
   writeFileSync(join(dir, 'none.csv'), `${head}\n`)
 
@@ -136,6 +175,11 @@ describe('readRows', () => {
       'c1,b,p,1,2',
       'c2,b,p,1,2',
     ])
+  })
+
+  it('reads a single file and names only its base name in a problem', () => {
+    expect(readRows(join(dir, 'tables', 'a.csv')).rows.map((r) => r.cartridge)).toEqual(['c1'])
+    expect(() => readRows(join(dir, 'bad.csv'))).toThrow(/^bad\.csv:2: charge_g must be above 0$/)
   })
 
   it('refuses a missing path, an empty folder and a file without rows', () => {

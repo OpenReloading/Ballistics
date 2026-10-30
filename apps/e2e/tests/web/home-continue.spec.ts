@@ -19,11 +19,12 @@ const load = (n: number) => ({
 /** Opens the home page with `records` in the browser store and the layout shifts summed from the start. */
 async function openHome(page: Page, records: object[]) {
   await page.addInitScript(() => {
-    const w = window as unknown as { shift: number }
+    const w = window as unknown as { shift: number; shifts: PerformanceObserver }
     w.shift = 0
-    new PerformanceObserver((list) => {
+    w.shifts = new PerformanceObserver((list) => {
       for (const e of list.getEntries() as unknown as { value: number }[]) w.shift += e.value
-    }).observe({ type: 'layout-shift', buffered: true })
+    })
+    w.shifts.observe({ type: 'layout-shift', buffered: true })
   })
   await gotoHydrated(page, '/')
   if (records.length > 0) {
@@ -32,12 +33,17 @@ async function openHome(page: Page, records: object[]) {
   }
   const strip = page.getByRole('navigation', { name: 'Continue' })
   await expect(strip.locator(records.length > 0 ? 'a' : 'p').first()).toBeVisible()
-  // layout shift entries arrive after the frame that moved
-  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 500))))
   return strip
 }
 
-const shift = (page: Page) => page.evaluate(() => (window as unknown as { shift: number }).shift)
+/** The shifts summed once the frame drawn now has rendered, with the entries the observer still queues. */
+const shift = (page: Page) =>
+  page.evaluate(async () => {
+    const w = window as unknown as { shift: number; shifts: PerformanceObserver }
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+    for (const e of w.shifts.takeRecords() as unknown as { value: number }[]) w.shift += e.value
+    return w.shift
+  })
 
 for (const [width, height] of sizes)
   for (const seeded of [true, false])

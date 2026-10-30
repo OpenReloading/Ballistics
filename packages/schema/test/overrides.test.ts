@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { applyOverrides, type Bullet, bulletOverrides, type Cartridge } from '../src/index.ts'
+import { z } from 'zod'
+import {
+  applyOverrides,
+  type Bullet,
+  bulletOverrides,
+  type Cartridge,
+  cartridgeOverrides,
+  cartridgeValueOverride,
+  powderDraft,
+} from '../src/index.ts'
 
 const bullet = {
   id: 'b1',
@@ -55,6 +64,13 @@ describe('applyOverrides', () => {
       ballisticCoefficients: [{ dragModel: 'G1', value: 0.5 }],
     })
     expect(r.ballisticCoefficients).toEqual([{ dragModel: 'G1', value: 0.5 }])
+    expect(Array.isArray(r.ballisticCoefficients)).toBe(true)
+  })
+
+  it('skips a field whose override is undefined', () => {
+    const r = applyOverrides({ name: 'a' } as Partial<Bullet>, { name: undefined, note: undefined })
+    expect(r).toEqual({ name: 'a' })
+    expect('note' in r).toBe(false)
   })
 
   it('removes a field and a nested object with an explicit null', () => {
@@ -118,6 +134,13 @@ describe('applyOverrides on cartridge values', () => {
     expect(r.values.map((v) => `${v.side}.${v.symbol}`)).toEqual(['cartridge.L3', 'chamber.L3'])
   })
 
+  it('drops the removal of a value the base lacks', () => {
+    const r = applyOverrides(cartridge, {
+      values: [{ symbol: 'P1', quantity: 'length', value: null }],
+    })
+    expect(r.values).toEqual(cartridge.values)
+  })
+
   it('takes every value as new without a base value list, dropping removals', () => {
     const r = applyOverrides({} as Partial<Cartridge>, {
       table: 'III',
@@ -149,5 +172,86 @@ describe('bulletOverrides', () => {
       { meplatDiameter: { value: -1 } },
     ])
       expect(bulletOverrides.safeParse(bad).success).toBe(false)
+  })
+})
+
+/** The description of each property of the JSON Schema of `schema`. */
+const descriptions = (schema: z.ZodType) =>
+  Object.fromEntries(
+    Object.entries(
+      (
+        z.toJSONSchema(schema, { unrepresentable: 'any' }) as {
+          properties: Record<string, { description?: string }>
+        }
+      ).properties,
+    ).map(([k, v]) => [k, v.description]),
+  )
+/** The JSON Schema of the array items at `field` of `schema`'s properties. */
+const items = (schema: z.ZodType, field: string) =>
+  (
+    z.toJSONSchema(schema, { unrepresentable: 'any' }) as {
+      properties: Record<string, { anyOf: { items?: z.core.JSONSchema.BaseSchema }[] }>
+    }
+  ).properties[field]?.anyOf.find((s) => s.items)?.items
+
+describe('override schema descriptions', () => {
+  it('describes a field without one by its path and record', () => {
+    expect(descriptions(bulletOverrides).mass).toBe(
+      'The `mass` of the bullet record. `null` removes it.',
+    )
+    expect(descriptions(cartridgeOverrides).table).toBe(
+      'The `table` of the cartridge record. `null` removes it.',
+    )
+    expect(items(bulletOverrides, 'ballisticCoefficients')?.properties?.dragModel).toMatchObject({
+      description:
+        'The `ballisticCoefficients.[].dragModel` of the bullet record. `null` removes it.',
+    })
+  })
+
+  it('keeps the own description of an array item field and of a whole described item', () => {
+    expect(items(cartridgeOverrides, 'values')?.properties?.value).toMatchObject({
+      description:
+        'In the stored unit of `quantity`. `null` removes the value of this side, symbol and variant.',
+    })
+    expect(items(cartridgeOverrides, 'values')?.properties?.side).toMatchObject({
+      description:
+        'Column the value is printed in. Absent for pressures, energies and measuring positions.',
+    })
+    expect(items(powderDraft, 'composition')?.properties).toMatchObject({
+      name: { description: 'Name of the ingredient as the safety data sheet prints it.' },
+      cas: { description: 'CAS registry number of the ingredient.' },
+      min: { description: 'Lower end of the mass percent range.' },
+      max: { description: 'Upper end of the mass percent range.' },
+    })
+  })
+})
+
+describe('cartridgeValueOverride', () => {
+  it('takes a value, a null value or a raw text, and refuses an entry with neither', () => {
+    const entry = { symbol: 'L3', quantity: 'length' }
+    expect(cartridgeValueOverride.safeParse({ ...entry, value: 51 }).success).toBe(true)
+    expect(cartridgeValueOverride.safeParse({ ...entry, value: null }).success).toBe(true)
+    expect(cartridgeValueOverride.safeParse({ ...entry, raw: '25/30' }).success).toBe(true)
+    expect(cartridgeValueOverride.safeParse(entry).error?.issues).toMatchObject([
+      { code: 'custom', message: 'a value needs value or raw' },
+    ])
+    expect(cartridgeOverrides.safeParse({ values: [entry] }).success).toBe(false)
+    expect(cartridgeOverrides.safeParse({ values: [{ ...entry, value: null }] }).success).toBe(true)
+  })
+})
+
+describe('powderDraft', () => {
+  it('takes a number outside the bounds of the powder record, but not one of another type', () => {
+    const draft = { temperatureSensitivity: { reference: { value: -1 } } }
+    expect(powderDraft.safeParse(draft).success).toBe(true)
+    expect(
+      bulletOverrides.safeParse({ ballisticCoefficients: [{ dragModel: 'G1', value: -1 }] })
+        .success,
+    ).toBe(false)
+    expect(
+      powderDraft.safeParse({ temperatureSensitivity: { reference: { value: 'x' } } }).success,
+    ).toBe(false)
+    expect(powderDraft.safeParse({ composition: [{ min: -5, max: 120 }] }).success).toBe(true)
+    expect(powderDraft.safeParse({ composition: [{ min: 'x' }] }).success).toBe(false)
   })
 })

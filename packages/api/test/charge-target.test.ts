@@ -5,9 +5,13 @@ import {
   pressureToleranceDefaults,
 } from '@open-reloading/core'
 import { describe, expect, it } from 'vitest'
-import { API_PREFIX } from '../src/version.ts'
+import { buildApp } from '../src/app.ts'
+import { chargeTargetExample } from '../src/compute/charge-schema.ts'
+import { ComputeBusy } from '../src/compute/tasks.ts'
+import { buildOpenApi } from '../src/openapi.ts'
+import { API_PREFIX, API_VERSION } from '../src/version.ts'
 import { bundle, m3Load as load } from './fixtures.ts'
-import { withApi } from './setup.ts'
+import { testCatalogue, withApi } from './setup.ts'
 
 /** The charge route's run configuration (`interiorApiDefaults`, `caps.chargeSteps`). */
 const config = { maxTime: 0.04, maxSteps: 10000 }
@@ -221,5 +225,62 @@ describe('POST /interior/charge-target', () => {
     const target = { kind: 'peakPressure', value: 1e8 }
     expect((await post({ load, target, cartridge: 'nope' })).status).toBe(404)
     expect((await post({ load, target, powder: 'nope' })).status).toBe(404)
+  })
+
+  it('stamps a solved answer with the input hash, API version and data hash', async () => {
+    const { body } = await post({ load, target: { kind: 'peakPressure', value: 1e8 } })
+    expect(body.inputHash).toMatch(/^[0-9a-f]{64}$/)
+    expect(body.apiVersion).toBe(API_VERSION)
+    expect(body.dataHash).toBe(await api.catalogue.dataHash())
+  })
+
+  it('answers 413 for a body above 256 KiB', async () => {
+    const target = { kind: 'peakPressure', value: 1e8 }
+    const res = await api.app.inject({
+      method: 'POST',
+      url: `${API_PREFIX}/interior/charge-target`,
+      payload: { load, target, pad: 'x'.repeat(256 * 1024) },
+    })
+    expect(res.statusCode).toBe(413)
+  })
+
+  it('answers 503 with the notice and retry-after when the compute pool is full', async () => {
+    const busy = buildApp({
+      catalogue: testCatalogue(bundle),
+      compute: {
+        run: () => Promise.reject(new ComputeBusy('all compute workers are busy', 5)),
+        close: async () => {},
+      },
+    })
+    const res = await busy.inject({
+      method: 'POST',
+      url: `${API_PREFIX}/interior/charge-target`,
+      payload: { load, target: { kind: 'peakPressure', value: 1e8 } },
+    })
+    await busy.close()
+    expect(res.statusCode).toBe(503)
+    expect(res.headers['retry-after']).toBe('5')
+    expect(res.json()).toMatchObject({ reason: 'busy', notice })
+  })
+
+  it('documents its summary, statuses, example and answer schema', async () => {
+    const operation = (await buildOpenApi()).paths[`${API_PREFIX}/interior/charge-target`]?.post
+    expect(operation?.summary).toBe('Solve the charge for a target')
+    expect(operation?.description).toContain('Results are simulations, not load data.')
+    expect(Object.keys(operation?.responses ?? {})).toEqual([
+      '200',
+      '400',
+      '404',
+      '413',
+      '415',
+      '422',
+      '500',
+      '503',
+    ])
+    expect(operation?.requestBody?.content['application/json']?.example).toEqual(
+      chargeTargetExample,
+    )
+    const answer = operation?.responses['200']?.content?.['application/json']?.schema
+    expect(answer).toHaveProperty('properties.charge')
   })
 })
