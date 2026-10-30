@@ -19,7 +19,7 @@ File menu, Open on the workbench opens the load of one file and keeps the cartri
 
 ## GRT load files (`.grtload`)
 
-An XML file whose root element is `GordonsReloadingTool`. The load is in the element `InnerBallistikInput`: a title, the sections `caliber`, `gun`, `projectile` and `propellant` of `input` fields (each with a name, a value and a unit), and an appendix. Text values are percent-encoded.
+An XML file whose root element is `GordonsReloadingTool`, after an optional XML declaration, comments and processing instructions. The load is in the element `InnerBallistikInput`: a title, the sections `caliber`, `gun`, `projectile` and `propellant` of `input` fields (each with a name, a value and a unit), and an appendix. Text values are percent-encoded.
 
 Reading rules:
 
