@@ -123,6 +123,7 @@ The zones of a target are its rings, grown by the radius of the scored hole as i
 - Targets whose zones are not nested ellipses about one centre (several bulls per sheet, scoring areas that are no ellipse) are outside the model.
 - An offset is the same for every shot. A centre that changes from group to group, and an offset that is not measured, are not modelled.
 - The speed spread acts on the height only; the spin drift is not varied with it.
+- The zones follow the touch rule on every target: a target whose events are scored by outward gauging ([ring scoring](ring-scoring.md)) gets zones too large by the hole diameter.
 - Cant and aiming errors are not modelled: a rifle rolled by 1 degree moves the impact 5.2 in at 1000 yd, in proportion to the drop.
 - A very small dispersion against a large zone gives a probability of 1 to the precision of the integration.
 - Research log: [closed form for a circular zone](../research/hit-probability-closed-form.md), [speed spread](../research/hit-probability-velocity-term.md), [rifle cant](../research/hit-probability-cant.md), [offset and shots needed](../research/hit-probability-offset-shots-needed.md).

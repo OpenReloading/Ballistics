@@ -1,0 +1,116 @@
+{
+  "id": "nsra-1989-short-range-15-yd",
+  "name": "1989 series short range, 15 yards",
+  "federation": "nsra",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 49.49
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 45.1
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 40.71
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 36.32
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 31.93
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 27.55
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 23.16
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 18.77
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 14.38
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 9.99
+      }
+    }
+  ],
+  "blackDiameter": {
+    "value": 30.84
+  },
+  "events": [
+    {
+      "id": "rifle-15-yd",
+      "name": "Rifle, 15 yards",
+      "distance": {
+        "value": 13716,
+        "raw": "15 yards"
+      },
+      "gauge": {
+        "value": 5.6
+      },
+      "scoring": "outward",
+      "category": "rifle"
+    }
+  ],
+  "photoSearch": false,
+  "note": "The book prints one size per ring in mm for edge touching, a centre dot of 1.00 mm that is no scoring ring, and the aiming mark as the black area; it states no ring colours and no inner ten. Its aiming mark lies between two rings, so the photo search skips it.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix A, PDF p. 29",
+        "fields": ["name", "rings", "blackDiameter"],
+        "note": "The book lists the rings without values from the innermost, the 1st scoring ring, outward; the 1st scoring ring is the 10 and each ring outward one lower, as the short-range 25 metres column, whose last printed ring is a 6 (Rule 5.1.7.1), shows."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix A, PDF p. 29",
+        "fields": ["events.name", "events.distance", "events.category"],
+        "note": "The rifle targets of the 1989 short-range series for this distance."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 5.1.7, PDF p. 8",
+        "fields": ["events.scoring"],
+        "note": "Outward gauging: the edge of the hole furthest from the centre decides; when the flange of the gauge touches the outside of the line the lower value counts, and a shot touching the outside of the lowest ring has no value."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix B, Fig. 4, PDF p. 31",
+        "fields": ["events.gauge"],
+        "note": "The 5.6 mm gauge scores outward gauging targets."
+      }
+    ]
+  }
+}

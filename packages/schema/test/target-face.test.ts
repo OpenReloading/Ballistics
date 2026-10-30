@@ -69,6 +69,29 @@ describe('targetFace', () => {
   })
 })
 
+describe('targetFace outward gauging', () => {
+  const { decimal: _, ...whole } = face
+  const withScoring = (scoring?: string) => ({
+    ...whole,
+    events: [{ ...face.events[0], ...(scoring && { scoring }) }],
+  })
+
+  it('accepts an outward event and parses touch, centre and no rule unchanged', () => {
+    for (const scoring of [undefined, 'touch', 'centre', 'outward']) {
+      const record = withScoring(scoring)
+      expect(targetFace.parse(record)).toEqual(record)
+    }
+  })
+
+  it('refuses an outward event on oval, square or stadium rings and on a decimal face', () => {
+    const oval = whole.rings.map((r, i) => ({ ...r, height: mm(30 - 10 * i) }))
+    expectIssueAt(targetFace, { ...withScoring('outward'), rings: oval }, 'events.0.scoring')
+    const square = [{ ...face.rings[0], shape: 'square' }, face.rings[1]]
+    expectIssueAt(targetFace, { ...withScoring('outward'), rings: square }, 'events.0.scoring')
+    expectIssueAt(targetFace, { ...withScoring('outward'), decimal: true }, 'events.0.scoring')
+  })
+})
+
 describe('targetFace extended geometry', () => {
   const rings = [
     { value: 8, diameter: mm(30), fill: 'white', line: 'black' },

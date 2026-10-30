@@ -126,7 +126,10 @@ describe('disciplines of the federations', () => {
       events: [{ ...defined(defined(faces[0]).events[0]), id: 'own', name: 'Own' }],
     }
     const items = disciplineOptions([...faces, extra], data)
-    expect(items.at(-1)).toEqual({ value: 'x-face|own', label: `${extra.organization} Own` })
+    expect(items.find((i) => i.value === 'x-face|own')).toEqual({
+      value: 'x-face|own',
+      label: `${extra.organization} Own`,
+    })
     expect(disciplineValue({ id: 'x-face', event: 'own' }, data.mappings)).toBe('x-face|own')
     expect(mappedFace(data.mappings, 'x-face')).toBe(false)
     expect(mappedFace(data.mappings, 'issf-10m-air-rifle')).toBe(true)

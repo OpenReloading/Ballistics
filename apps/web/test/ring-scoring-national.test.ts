@@ -2,7 +2,12 @@ import { readRecords } from '@open-reloading/data'
 import type { TargetFace } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
-import { scoredHoleDiameter, scoreGroupOnFace, scoreShot } from '../src/lib/ring-scoring.ts'
+import {
+  scoredHoleDiameter,
+  scoreGroupOnFace,
+  scoreShot,
+  usesOwnTenthRule,
+} from '../src/lib/ring-scoring.ts'
 import { matchFaces } from '../src/lib/target-face.ts'
 import { defined } from './defined.ts'
 
@@ -231,6 +236,66 @@ describe('VdRBw Schießsportordnung, 10.3 Pistolen- und Gewehrscheibe (Seite 98,
     )
     expect(event).toMatchObject({ federation: 'vdrbw', section: '8.2.5, 8.2.6 (Scheibe 10.3)' })
     expect(event?.distance.value).toBe(25000)
+  })
+})
+
+describe('NSRA Rules and Regulations 2024, outward gauging (Rule 5.1.7, Appendix A PDF pp. 29 to 30)', () => {
+  // ring 10 first; the 5.6 mm gauge of Appendix B
+  const printed: Record<string, number[]> = {
+    'nsra-1989-short-range-25-yd': [
+      12.92, 20.23, 27.55, 34.86, 42.18, 49.49, 56.81, 64.12, 71.44, 78.75,
+    ],
+    'nsra-1989-short-range-20-yd': [
+      11.45, 17.3, 23.16, 29.01, 34.86, 40.71, 46.56, 52.42, 58.27, 64.12,
+    ],
+    'nsra-1989-short-range-15-yd': [
+      9.99, 14.38, 18.77, 23.16, 27.55, 31.93, 36.32, 40.71, 45.1, 49.49,
+    ],
+    'nsra-air-11-10m': [8.8, 12, 15.2, 18.4, 21.6, 24.8, 28, 31.2, 34.4, 37.6],
+  }
+  const g = 5.6 / 2
+
+  it.each(Object.keys(printed))(
+    'scores %s by the far hole edge: on the outer edge of a line the lower value',
+    (id) => {
+      const f = face(id)
+      const rings = defined(printed[id])
+      expect(f.rings.map((r) => r.diameter.value)).toEqual(rings.toReversed())
+      expect(f.events.every((e) => e.scoring === 'outward' && e.gauge?.value === 5.6)).toBe(true)
+      rings.forEach((diameter, i) => {
+        const value = 10 - i
+        const edge = diameter / 2 - g
+        expect(scoreShot(f, at(edge - off), 5.6 * mm, true).value).toBe(value)
+        // on the line within the 1e-9 mm tolerance, and outside the lowest ring: 0
+        expect(scoreShot(f, at(edge), 5.6 * mm, true).value).toBe(value - 1)
+        expect(scoreShot(f, at(edge - 0.5e-9), 5.6 * mm, true).value).toBe(value - 1)
+      })
+    },
+  )
+
+  it('scores the same hole by its near edge without the outward rule', () => {
+    const f = face('nsra-1989-short-range-25-yd')
+    expect(scoreShot(f, at(12.92 / 2 - g), 5.6 * mm).value).toBe(10)
+    expect(scoreShot(f, at(12.92 / 2 + g), 5.6 * mm).value).toBe(10)
+  })
+
+  it('takes the rule from the event and applies no own tenth rule', () => {
+    const f = face('nsra-1989-short-range-25-yd')
+    const edge = 12.92 / 2 - g
+    const s = scoreGroupOnFace(
+      f,
+      { id: f.id, event: 'rule-8-15-3-2-deliberate-25-yd' },
+      { shots: [at(edge), at(edge - off), at(40)] },
+      undefined,
+      english.t,
+    )
+    if ('error' in s) throw new Error(s.error)
+    expect(s.score.shots.map((x) => x.value)).toEqual([9, 10, 0])
+    expect(s.score.total).toBe(19)
+    expect(s.score.decimalTotal).toBeUndefined()
+    // the geometry alone would call for it: the 10 is wider than one ring with the gauge
+    expect(usesOwnTenthRule(f, 5.6 * mm)).toBe(true)
+    expect(s.usesOwnTenthRule).toBe(false)
   })
 })
 

@@ -16,7 +16,11 @@ import { PanelTable } from './scroll-region.tsx'
 import { shownLength } from './shown-length.tsx'
 
 /** How an event scores a hole, by the stored value. */
-const scoredBy = { touch: msg('Hole edge'), centre: msg('Hole centre') }
+const scoredBy = {
+  touch: msg('Hole edge'),
+  centre: msg('Hole centre'),
+  outward: msg('Hole edge, outward'),
+}
 
 /** A face record without its sources, which the page's sources panel shows. */
 type FaceValues = Omit<Face, 'provenance'>
