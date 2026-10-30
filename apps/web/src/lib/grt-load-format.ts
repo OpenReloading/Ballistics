@@ -1,17 +1,27 @@
 /** The load-file format entry of GRT load files; its reader `grt-load-file.ts` loads with the first read. */
 import type { LoadFileFormat } from './load-file-formats.ts'
 
-/** One processing instruction (the declaration too) or comment before the root, as the XML reader skips them. */
-const preamble = /\s*(?:<\?[\s\S]*?\?>|<!--[\s\S]*?-->)/y
-const root = /\s*<GordonsReloadingTool[\s/>]/y
+const root = '<GordonsReloadingTool'
 
-/** Whether the root element of `text` is the one of a GRT load file. */
+/**
+ * Whether the root element of `text` is the one of a GRT load file, past the processing
+ * instructions (the declaration too) and comments the XML reader skips before it.
+ */
 function grtRoot(text: string) {
-  let at = 0
-  // each step ends past its own markup, so the text is read once
-  for (preamble.lastIndex = 0; preamble.test(text); ) at = preamble.lastIndex
-  root.lastIndex = at
-  return root.test(text)
+  let i = 0
+  for (;;) {
+    while (/\s/.test(text.charAt(i))) i++
+    const [open, close] = text.startsWith('<?', i)
+      ? ['<?', '?>']
+      : text.startsWith('<!--', i)
+        ? ['<!--', '-->']
+        : []
+    if (!open || !close)
+      return text.startsWith(root, i) && /[\s/>]/.test(text.charAt(i + root.length))
+    const end = text.indexOf(close, i + open.length)
+    if (end < 0) return false
+    i = end + close.length
+  }
 }
 
 export const grtLoadFormat: LoadFileFormat = {
