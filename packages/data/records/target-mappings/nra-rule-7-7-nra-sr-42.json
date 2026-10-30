@@ -1,0 +1,17 @@
+{
+  "id": "nra-rule-7-7-nra-sr-42",
+  "discipline": "nra-rule-7-7",
+  "face": "nra-sr-42",
+  "event": "rule-7-7-prone-rapid-fire-200-yd",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.7, p. 19 (PDF p. 23)",
+        "fields": ["discipline", "face", "event"],
+        "note": "The row allows 10 or 20 shots, so the mapping states no shot count."
+      }
+    ]
+  }
+}

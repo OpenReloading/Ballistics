@@ -1,0 +1,28 @@
+{
+  "id": "nra",
+  "name": "National Rifle Association of America",
+  "abbreviation": "NRA",
+  "country": "US",
+  "ruleBooks": ["nra-high-power-rifle-rules-2026"],
+  "website": "https://www.nra.org/",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Title page (PDF p. 1)",
+        "fields": ["name", "abbreviation", "country", "ruleBooks"],
+        "note": "The title page names the association with its address in Fairfax, Virginia. The book covers high power rifle matches except F-Class, silhouette, sporting rifle and international events, which have rule books of their own."
+      },
+      {
+        "title": "Homepage of National Rifle Association of America",
+        "publisher": "National Rifle Association of America",
+        "url": "https://www.nra.org/",
+        "retrieved": "2026-10-30",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers and names the association. The rule book prints the same address."
+      }
+    ]
+  }
+}
