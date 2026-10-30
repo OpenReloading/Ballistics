@@ -197,3 +197,4 @@ Code: `packages/core/src/exterior/trajectory.ts`, `fly` (`yawAt`), `trajectoryDe
 - [McCoy 1999](../bibliography.md#mccoy-1999): modified point-mass trajectory, linearized angular motion and aerodynamic jump (chapter numbers unverified).
 - [McCoy 1990](../bibliography.md#mccoy-1990), eq. (12), p. 10: vertical deflection from a crosswind, the same size and sign as $R \tan \delta_J$.
 - [Miller 2005](../bibliography.md#miller-2005): the stability factor from which the overturning moment is estimated (pages unverified).
+- Research log: [bullet inertia from the outline](../research/bullet-inertia-from-outline.md), [along-path stability warning](../research/along-path-stability-warning.md).

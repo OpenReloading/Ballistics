@@ -149,7 +149,7 @@ A photograph too poor to measure gets sentences that say what is wrong and what 
 | Too small | The bullet is narrower than 16 px | No values; take the photograph closer or crop to the bullet, at least 80 px across |
 | Not a bullet's proportions | The cut-out is shorter than wide or more than 10 times as long | No values; brush the bullet in and the rest out, or retake it alone on a plain background |
 | Narrow | Narrower than 40 px | Values, with the best case of their uncertainty ($\sqrt{2} u_e$ over the width, below 40 px it is more than 1 %) |
-| Ragged | The scatter of the shank's sides is above 1.5 px or 2 % of the width | A reflection, a shadow or noise; retake in even soft light or brush the cut-out |
+| Ragged | The scatter of the shank's sides is above 1.5 px and 2 % of the width | A reflection, a shadow or noise; retake in even soft light or brush the cut-out |
 | Soft edges | Edge spread above 4 px and 4 % of the thickness | Shadow beside the bullet, or out of focus or moved; values are less certain |
 | Low contrast | The cut-out used has the bullet within 60 grey levels of the background | The outline may be rough; a plainer or much lighter or darker background |
 | Cut at the frame | The cut-out touches the photograph's edge | The whole bullet may not be in it |

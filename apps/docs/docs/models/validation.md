@@ -131,3 +131,4 @@ May not say:
 
 - [JCGM 100:2008](../bibliography.md#jcgm-100-2008): the law of propagation of uncertainty behind the fit's prediction interval, which the coverage tests.
 - The [powder fit](interior-powder-fit.md) and [peak-pressure range](interior-pressure-range.md) pages describe the models whose outputs are compared.
+- Research log: [burn law constants](../research/interior-burn-law-constants.md), [pressure exponent per powder family, leave one powder out](../research/interior-exponent-per-family-unseen-powder.md).

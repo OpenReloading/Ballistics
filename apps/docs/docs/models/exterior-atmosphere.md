@@ -123,3 +123,4 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 - [WMO-No. 8](../bibliography.md#wmo-no-8), Annex 4.B: Magnus formula for the saturation vapour pressure over water (edition and constants unverified against the current edition).
 - [Picard 2008](../bibliography.md#picard-2008): CIPM-2007 density of moist air, the real-gas form the model simplifies.
 - [Cramer 1993](../bibliography.md#cramer-1993): speed of sound and ratio of specific heats in humid air, the real-gas form the model simplifies.
+- Research log: [reference air density and Earth curvature](../research/exterior-reference-air-earth-curvature.md).

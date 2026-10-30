@@ -66,7 +66,7 @@ With $p$ = 0.05, 0.5 and 0.95 these are the reported `p05`, `p50` and `p95`. The
 
 Code: `packages/api/src/compute/interior-schema.ts`, `samplingDefaults`; `packages/api/src/compute/tasks.ts`, `runners`.
 
-The workbench asks for the band of the step it shows first, in a second request after the result. It shows the 5th to 95th percentile of the pressure and of the velocity in place of the corner-case range, and a row "Bands: input tolerances only". After an over-budget run the row reads "over budget" and the pressure shows the corner-case range. The velocity has no corner-case range, so it shows no band then. The limit check compares the corner-case range with the limit in every case. Printed pages and downloaded files carry no such line.
+The workbench asks for the band of the step it shows first, in a second request after the result. It shows the 5th to 95th percentile of the pressure and of the velocity in place of the corner-case range, and the line "Velocity {low} to {high} {unit}. 5th to 95th percentile, input tolerances only." After an over-budget run the line reads "Sampled bands over budget: corner-case range shown." and the pressure shows the corner-case range. The velocity has no corner-case range, so it shows no band then. The limit check compares the corner-case range with the limit in every case. Printed pages and downloaded files carry no such line.
 
 ## Symbols
 

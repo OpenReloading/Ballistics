@@ -66,3 +66,4 @@ Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`
 
 - [NIST/SEMATECH](../bibliography.md#nist-sematech): 1.3.5.3 (two-sample t-test for equal means, the Welch-Satterthwaite degrees of freedom, section number unverified).
 - [Abramowitz 1964](../bibliography.md#abramowitz-1964): 26.7.3 and 26.7.4 (Student's t distribution for whole degrees of freedom), page numbers unverified.
+- Research log: [point of impact per charge in a ladder](../research/ladder-impact-per-charge.md).

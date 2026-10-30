@@ -207,3 +207,4 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 - [Tanaka 2001](../bibliography.md#tanaka-2001): density of water at 20 °C, table, pp. 301 to 309 (the table value is unverified, not re-read from the paper).
 - [C.I.P. TDCC](../bibliography.md#cip-tdcc): cartridge length $L_3$ and the chamber values $L_3$, $s$, $G$, $G_1$, $F$ and $i$, per cartridge sheet.
+- Research log: [placing a maximum pressure against the tolerance range](../research/interior-ceiling-classification.md).
