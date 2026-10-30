@@ -1,8 +1,10 @@
 import { parseRef, type UserRecord } from '@open-reloading/schema'
+import type { Translator } from '../i18n/translate.ts'
+import { dayText } from './dates.ts'
 import { sessionRef } from './measurements.ts'
 
 /** A load's firearm id, its session count and the latest day of its dated sessions. */
-type LoadUse = { firearm?: string | undefined; sessions: number; last?: string | undefined }
+export type LoadUse = { firearm?: string | undefined; sessions: number; last?: string | undefined }
 
 /** The saved loads that name a firearm and the latest session day over them. */
 export type FirearmUse = { loads: number; last?: string | undefined }
@@ -37,3 +39,20 @@ export function loadUse(records: readonly UserRecord[]) {
   }
   return { loads, firearms }
 }
+
+/**
+ * The line under a load's name in the saved loads: the name of its firearm, its sessions or
+ * "No session", and the last session day.
+ */
+export const loadUseText = (
+  use: LoadUse | undefined,
+  firearm: string | undefined,
+  { t, tn }: Pick<Translator, 't' | 'tn'>,
+) =>
+  [
+    firearm,
+    use?.sessions ? tn(use.sessions, '{count} session', '{count} sessions') : t('No session'),
+    use?.last && dayText(use.last),
+  ]
+    .filter(Boolean)
+    .join(' · ')

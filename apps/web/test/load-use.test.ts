@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { blankFirearm } from '../src/lib/firearm.ts'
 import { gapNotes, loadGaps } from '../src/lib/load-gaps.ts'
-import { loadUse } from '../src/lib/load-use.ts'
+import { loadUse, loadUseText } from '../src/lib/load-use.ts'
 
 const saved = '2026-01-01T00:00:00.000Z'
 const rifle = '0b1c2d3e-4f50-4a61-8b72-9c83d4e5f601'
@@ -59,6 +59,13 @@ describe('load and firearm use', () => {
   it('counts the loads of a firearm and their latest session day', () => {
     expect(firearms.get(rifle)).toEqual({ loads: 2, last: '2026-05-01' })
     expect(firearms.size).toBe(1)
+  })
+
+  it('writes the firearm, the sessions and the last day, leaving out what a load lacks', () => {
+    const text = (id: string, firearm?: string) => loadUseText(loads.get(id), firearm, english)
+    expect(text('a', 'Rifle')).toBe('Rifle · 2 sessions · 1 March 2026')
+    expect(text('c')).toBe('1 session')
+    expect(text('d')).toBe('No session')
   })
 })
 
