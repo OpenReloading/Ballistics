@@ -94,6 +94,7 @@ Parsers for chronograph export files, ESM. Pure functions from file text, or fro
 ## Load files to user records
 
 - `readGrtLoad(xml, saved)` (`src/grtload.ts`): a GRT load file (XML, root element `GordonsReloadingTool`) to the cartridge, the bullet after its maker, the powder and the load, each a user record with an id from its content (`idOfKey`; the maker's key is the one of `buildRecords`). Returns `unmapped` (`section.name` of every field with a value it does not read) and `warnings` (a unit or number not converted, text that is not percent-encoded, a shotshell load). Throws on XML of another root or without load input. The mapping and its reasons: `apps/docs/docs/data/grt-load-files.md`, which changes with the code. The web app's load-file format entry checks each record with the user record schema.
+- `readCsrLoad(xml, saved)` (`src/csrload.ts`): a ChamberSim Reloaded load file (XML, root element `ChamberSimReloaded`, input element `load`, written for `format` 1; another or a missing format warns). The load input is read by `readLoadInput` of `src/grtload.ts`, the layout both formats share. Adds a session per measurement series (`appendix.Measurement`): one string per charge naming the load, the charge read in kg into a charge variation in g, shot velocities in m/s, device kind `other`. Shot pressures, display attributes and every other part are listed as unmapped. Mapping on the same docs page.
 
 ## Unverified and tests
 

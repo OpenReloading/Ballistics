@@ -54,6 +54,7 @@
 . parseShotView
 . parseShotViewWorkbook
 . parseVelocityUnit
+. readCsrLoad
 . readGrtLoad
 . readTable
 . readWorkbook

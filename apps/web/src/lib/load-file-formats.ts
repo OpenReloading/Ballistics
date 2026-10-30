@@ -2,6 +2,7 @@
 import { type EmbeddedFile, type UserRecord, userDataFormat } from '@open-reloading/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
+import { csrLoadFormat } from './csr-load-format.ts'
 import { grtLoadFormat } from './grt-load-format.ts'
 import { nth } from './nth.ts'
 import {
@@ -45,6 +46,7 @@ export const loadFileFormats: LoadFileFormat[] = [
     parse: (bytes) => parseUserDataFile(utf8(bytes)),
   },
   grtLoadFormat,
+  csrLoadFormat,
 ]
 
 /** The first format of `formats` that detects `bytes`, none for a file over `maxFileBytes`. */

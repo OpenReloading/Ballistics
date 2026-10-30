@@ -12,6 +12,7 @@ import { isOpenReloadingCsv, parseOpenReloadingCsv } from './template.ts'
 import { splitLines } from './text.ts'
 
 export type { Workbook, Worksheet } from './cells.ts'
+export { readCsrLoad } from './csrload.ts'
 export type { Column, ColumnMap, DelimitedOptions, Delimiter } from './generic.ts'
 export { parseDelimited } from './generic.ts'
 export type { GrtLoadRead } from './grtload.ts'
