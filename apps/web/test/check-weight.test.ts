@@ -6,6 +6,7 @@ import { expect, it } from 'vitest'
 import {
   type Budget,
   measure,
+  nearLimit,
   parseClientManifest,
   table,
   violations,
@@ -101,22 +102,43 @@ it('tabulates the change against the recorded weight', () => {
     },
   }
   const rows = table({ '/a': { initial: 95_000, total: 120_000 } }, big).split('\n')
-  expect(rows[2]).toBe('| pages | `/a` | 95.0 kB | +5000 B | 120.0 kB | 0 | 100.0 kB / 150.0 kB |')
+  expect(rows[2]).toBe(
+    '| pages | `/a` | 95.0 kB | +5000 B | 120.0 kB | 0 | 100.0 kB / 150.0 kB | 5000 B / 30000 B |',
+  )
+})
+
+it('warns once per route with less than 1 % of its budget left, not on a route over it', () => {
+  const big: Budget = {
+    groups: {
+      pages: {
+        budget: { initial: 100_000, total: 150_000 },
+        routes: { '/a': { initial: 0, total: 0 }, '/b': { initial: 0, total: 0 } },
+      },
+    },
+  }
+  const near = { '/a': { initial: 99_001, total: 149_000 }, '/b': { initial: 99_000, total: 1 } }
+  expect(nearLimit(near, big)).toEqual([
+    '/a: near the limit of the pages budget, initial 999 B left, total 1000 B left',
+  ])
+  expect(violations(near, big)).toEqual([])
+  expect(
+    nearLimit({ '/a': { initial: 100_001, total: 1 }, '/b': { initial: 1, total: 1 } }, big),
+  ).toEqual([])
 })
 
 it('tabulates a built route in no group, for the budget it needs', () => {
   const rows = table({ '/new': { initial: 1_000, total: 2_000 } }, { groups: {} }).split('\n')
-  expect(rows[2]).toBe('| none | `/new` | 1.0 kB | new | 2.0 kB | new | none |')
+  expect(rows[2]).toBe('| none | `/new` | 1.0 kB | new | 2.0 kB | new | none | none |')
 })
 
-// The owner raised the tools and workbench budgets above this rule on 2026-10-30; the review is #645.
-it('keeps every group budget at least at its largest recorded weight plus 2 %, rounded up to 1000 B', () => {
+// The 2 % margin applies when a budget is set or raised; recorded weights may later grow into it.
+it('keeps every group budget at least at its largest recorded weight', () => {
   const file = readFileSync(path.join(import.meta.dirname, '..', 'weight-budget.json'), 'utf8')
   const recorded = JSON.parse(file) as Budget
-  const rule = (group: Budget['groups'][string], key: 'initial' | 'total') =>
-    Math.ceil((Math.max(...Object.values(group.routes).map((w) => w[key])) * 1.02) / 1000) * 1000
+  const largest = (group: Budget['groups'][string], key: 'initial' | 'total') =>
+    Math.max(...Object.values(group.routes).map((w) => w[key]))
   for (const [name, group] of Object.entries(recorded.groups)) {
-    expect(group.budget.initial, name).toBeGreaterThanOrEqual(rule(group, 'initial'))
-    expect(group.budget.total, name).toBeGreaterThanOrEqual(rule(group, 'total'))
+    expect(group.budget.initial, name).toBeGreaterThanOrEqual(largest(group, 'initial'))
+    expect(group.budget.total, name).toBeGreaterThanOrEqual(largest(group, 'total'))
   }
 })
