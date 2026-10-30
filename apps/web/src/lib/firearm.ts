@@ -284,6 +284,24 @@ export const gunValues = (f: Firearm) => ({
   lands: landsOf(f),
 })
 
+/**
+ * The workbench's Gun picker: the browser's firearms, then the built-in example rifle, which is
+ * never stored, so a fresh browser still has one to choose.
+ */
+export const gunPicker = (
+  stored: readonly { id: string; name: string }[],
+  example: { id: string; name: string },
+  t: Translator['t'],
+) => ({
+  data: [
+    ...stored.map((f) => ({ value: f.id, label: f.name })),
+    { value: example.id, label: t('{name} (example)', { name: example.name }) },
+  ],
+  placeholder: stored.length
+    ? t('Choose a firearm')
+    : t('No firearm saved yet. Pick the example rifle, or add yours under Firearms.'),
+})
+
 /** The catalogue record id a cartridge reference names; undefined for a `user:` reference. */
 export const catalogueCartridgeId = (ref: string | undefined) => {
   const parsed = ref === undefined ? undefined : parseRef(ref)

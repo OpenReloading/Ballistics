@@ -1,7 +1,9 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { toSi, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { translator } from '../src/i18n/translate.ts'
+import de from '../src/i18n/de.json'
+import { type Catalogue, translator } from '../src/i18n/translate.ts'
+import { loadExample } from '../src/lib/example-data.ts'
 import {
   activeClick,
   blankFirearm,
@@ -15,6 +17,7 @@ import {
   firearmPatch,
   firearmProblem,
   freeId,
+  gunPicker,
   gunValues,
   landsFor,
   landsOf,
@@ -481,5 +484,29 @@ describe('withSessionRounds', () => {
     expect(entries).toHaveLength(200)
     expect(entries.at(-1)).toEqual({ session: b, rounds: 2 })
     expect(entries[0]?.session).toBe(many[2]?.session)
+  })
+})
+
+describe('gunPicker', () => {
+  const english = translator().t
+  const example = loadExample.firearm
+  const marked = { value: example.id, label: 'Example rifle, 308 Win. (example)' }
+  it('offers the example rifle on a fresh browser and says what to do', () => {
+    expect(gunPicker([], example, english)).toEqual({
+      data: [marked],
+      placeholder: 'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
+    })
+    const german = gunPicker([], example, translator(de as Catalogue, 'de').t)
+    expect(german.placeholder).toBe(
+      'Noch keine Schusswaffe gespeichert. Wählen Sie das Beispielgewehr oder fügen Sie Ihre unter Schusswaffen hinzu.',
+    )
+    expect(german.data[0]?.label).toBe('Example rifle, 308 Win. (Beispiel)')
+  })
+
+  it('lists the stored firearms first, the example after them', () => {
+    expect(gunPicker([{ id: 'own', name: 'My rifle' }], example, english)).toEqual({
+      data: [{ value: 'own', label: 'My rifle' }, marked],
+      placeholder: 'Choose a firearm',
+    })
   })
 })
