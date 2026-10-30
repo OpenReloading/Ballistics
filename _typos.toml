@@ -28,6 +28,9 @@ extend-ignore-re = [
   "Sek\\. Serie",
   # German organization name in the bibliography
   "Bund Deutscher",
+  # Dutch names in the federations page and the bibliography
+  "Precisie Geweer",
+  "Schietsport Associatie",
   # German texts that the tests of the message mapping and the workbench warnings expect
   "Geben Sie eine Zahl für .* ein\\.",
   "Geben Sie eine Zielgröße über 0 ein\\.",
