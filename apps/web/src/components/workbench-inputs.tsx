@@ -463,11 +463,7 @@ export function StartCard({ onAct }: { onAct?: () => void }) {
       onKeyDownCapture={onAct}
     >
       <h2 id="start-title">{t('Start a load')}</h2>
-      <p>
-        {t(
-          'Step 1: choose the cartridge. Its CIP record limits the bullets to its groove and gives the chamber values and the maximum pressure.',
-        )}
-      </p>
+      <p>{t('Step 1: choose the cartridge.')}</p>
       <CardPicker panel="cartridge" />
       <p className="start-label">{t('Common cartridges')}</p>
       <div className="start-picks">

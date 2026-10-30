@@ -346,7 +346,7 @@ function isStale(
   }
 }
 
-/** The status line: the progress or the count, the message, the target's reason, staleness and the standing notice. */
+/** The status line: the progress or the count, the message, the target's reason, and staleness. */
 function statusText(
   o: {
     running: boolean
@@ -380,9 +380,8 @@ function statusText(
     o.message && messageText(o.message, t),
     o.targetShown,
     o.stale ? t('Inputs changed since these rows') : undefined,
-    t('Simulation, not load data. A row is no recommendation'),
   ].filter(Boolean)
-  return `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.`
+  return parts.length > 0 ? `${parts.map((p) => p?.replace(/\.$/, '')).join('. ')}.` : ''
 }
 
 /** The line after a batch that stopped early or failed. */

@@ -500,7 +500,7 @@ export function Measurements({
       {sessions.length === 0 && (
         <p className="prompt empty-state">
           {t(
-            'Read a chronograph file to compare its strings with the simulated velocity per charge. Nothing is sent; the file is read in this browser.',
+            'Read a chronograph file to compare its strings with the simulated velocity per charge.',
           )}
         </p>
       )}

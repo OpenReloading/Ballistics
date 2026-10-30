@@ -393,7 +393,6 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
               )}
             </p>
           )}
-          <p className="note">{t('Simulation, not load data.')}</p>
           <StoreFit
             fit={fitted.answer}
             target={nominal.target}

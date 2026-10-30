@@ -489,9 +489,7 @@ function LadderBody() {
         </>
       ) : (
         <p className="prompt empty-state">
-          {t(
-            'One step: the readouts give its values. Set Ladder steps in the Powder card for a table of steps.',
-          )}
+          {t('Set Ladder steps in the Powder card for a table of steps.')}
         </p>
       )}
     </>
@@ -569,11 +567,6 @@ function ResultPanels({ short }: { short: boolean }) {
       <Tabs.Panel value="notes">
         {heading('notes', t)}
         <LoadLots />
-        <p className="note">
-          {t(
-            'Each session is compared with the one before it. A note shows what differs and where the values come from; it says nothing about whether a load is acceptable.',
-          )}
-        </p>
         <SessionNotes />
         <Textarea
           label={t('Notes')}
