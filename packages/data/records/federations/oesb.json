@@ -1,0 +1,34 @@
+{
+  "id": "oesb",
+  "name": "Österreichischer Schützenbund",
+  "abbreviation": "ÖSB",
+  "country": "AT",
+  "ruleBooks": ["oesb-schiessordnung-2025"],
+  "website": "https://www.schuetzenbund.at/",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "12.1, Seite 26, PDF p. 26",
+        "fields": ["name", "abbreviation", "ruleBooks"],
+        "note": "The list of abbreviations gives ÖSB for the federation and ÖSchO for its shooting order, which holds the national rules that the international rules leave open."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "3.1.2, Seite 4, PDF p. 4",
+        "fields": ["country"],
+        "note": "The order governs the Austrian championships (ÖM, ÖSTM) and the events held in the name of the ÖSB."
+      },
+      {
+        "title": "Homepage of the ÖSB",
+        "publisher": "Österreichischer Schützenbund",
+        "url": "https://www.schuetzenbund.at/",
+        "retrieved": "2026-10-30",
+        "origin": "public",
+        "fields": ["website"],
+        "note": "The page was loaded on the retrieval date: it answers, names the federation and links its rule books."
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "oesb-300m-gewehr-2-stellung-issf-300m-rifle",
+  "discipline": "oesb-300m-gewehr-2-stellung",
+  "face": "issf-300m-rifle",
+  "event": "oesb-300m-gewehr-2-stellung",
+  "shotCount": 60,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.7.1, Seite 15, PDF p. 15",
+        "fields": ["discipline", "face", "event"],
+        "note": "Courses are shot on the internationally approved faces; at 300 m that is the ISSF 300 m target."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "7.1.6.2, Seite 14, PDF p. 14",
+        "fields": ["shotCount"]
+      }
+    ]
+  }
+}

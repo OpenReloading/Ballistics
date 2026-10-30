@@ -41,7 +41,7 @@ const views = [
  * other face the editor applies the one fit without a question.
  */
 const twinGroups = [
-  ['issf-300m-rifle', 'bdmp-nr1-100m', 'bdmp-nr1-50m', 'bdmp-nr1-25m'],
+  ['issf-300m-rifle', 'bdmp-nr1-100m', 'bdmp-nr1-50m', 'bdmp-nr1-25m', 'oesb-100m'],
   ['bdmp-nr6', 'bdmp-nr7', 'bds-z18-pg'],
   ['bdmp-nr8', 'bds-z19-300m-pg'],
   ['bdmp-nr9', 'bdmp-nr10'],

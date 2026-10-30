@@ -181,6 +181,7 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 - [KNSA 2026](../bibliography.md#knsa-2026): scoring and gauges by the ISSF rules, Deel IV artikelen 8.5.2, 12.1 and 12.4 (PDF pp. 87 to 88), the Woerden target in artikel 3.3 (PDF pp. 78 to 79).
 - [NRA 2026](../bibliography.md#nra-2026): touch rule and X ring, Rule 14.3 (p. 48), targets in Section 4 (pp. 14 to 16).
 - [NSRA 2024](../bibliography.md#nsra-2024): touch rule for inward gauging and X ring, Rules 5.1.6 and 5.1.9 (PDF p. 8), targets in Appendix A (PDF pp. 29 to 30), gauges in Appendix B (PDF p. 31).
+- [ÖSB 2025](../bibliography.md#oesb-2025): scoring by the ISSF rules, 3.1.6 (p. 4), the national 100 m target in 7.1.7.3 (p. 15).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, targets in Kapitel 8 to 10.
 - [BDS 2025](../bibliography.md#bds-2025): targets Z1 to Z21 and Anhang 1, no scoring rule stated.
 - [Eberly 2013](../bibliography.md#eberly-2013): distance from a point to an ellipse, closest-point condition and its bisection.

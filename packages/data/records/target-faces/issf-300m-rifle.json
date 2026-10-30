@@ -358,6 +358,22 @@
       "section": "Deel IV, 6.1.2 i",
       "scoring": "touch",
       "category": "service-rifle"
+    },
+    {
+      "id": "oesb-300m-gewehr-2-stellung",
+      "name": "ÖSB 300 m Gewehr 2 Stellung",
+      "distance": {
+        "value": 300000,
+        "raw": "300 m"
+      },
+      "gauge": {
+        "value": 8,
+        "raw": "8.00mm"
+      },
+      "federation": "oesb",
+      "section": "7.1.6.2",
+      "scoring": "touch",
+      "category": "rifle"
     }
   ],
   "numerals": true,
@@ -485,6 +501,20 @@
           "events.category"
         ],
         "note": "National 300 m courses are shot on the ISSF target, scored and gauged by the ISSF rules."
+      },
+      {
+        "source": "oesb-schiessordnung-2025",
+        "page": "3.1.6, 7.1.6.2 and 7.1.7.1, Seiten 4 to 15, PDF pp. 4, 14 and 15",
+        "fields": [
+          "events.name",
+          "events.distance",
+          "events.gauge",
+          "events.federation",
+          "events.section",
+          "events.scoring",
+          "events.category"
+        ],
+        "note": "The national 300 m two-position course is shot on the internationally approved face, scored and gauged by the ISSF rules."
       }
     ]
   }
