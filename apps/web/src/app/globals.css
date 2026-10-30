@@ -5575,6 +5575,12 @@ main .library-head.page-panel-head > .page-panel-title {
     min-width: 0;
   }
 
+  /* a record's value is as wide as it is, so a long label (German) keeps one line; it still ends
+     at the edge of the field boxes */
+  .workbench .workspace-inputs .record-row {
+    grid-template-columns: minmax(0, 1fr) auto 2.625rem;
+  }
+
   .workbench .workspace-inputs .record-row > :nth-child(2) {
     text-align: right;
     white-space: nowrap;

@@ -95,7 +95,8 @@ function endSection({
     return (
       <Group gap={4} wrap="nowrap">
         {loading && <Loader size="xs" />}
-        {clear && <CloseButton size="sm" aria-label={clear.label} onClick={clear.onClear} />}
+        {/* a 24 px target (WCAG 2.5.8) */}
+        {clear && <CloseButton size={24} aria-label={clear.label} onClick={clear.onClear} />}
         <ActionIcon
           variant="subtle"
           size={size === 'xs' ? 'input-xs' : 'input-sm'}
@@ -244,7 +245,7 @@ export function RecordSearch<T extends { id: string }>({
             })}
             rightSectionPointerEvents={browse ? 'all' : 'none'}
             // the clear button beside the browse button
-            {...(browse && picked && clear && { rightSectionWidth: size === 'xs' ? 56 : 64 })}
+            {...(browse && picked && clear && { rightSectionWidth: size === 'xs' ? 58 : 64 })}
             onChange={(e) => {
               setQ(e.currentTarget.value)
               combobox.openDropdown()
