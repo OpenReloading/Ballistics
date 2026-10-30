@@ -50,6 +50,17 @@ function readBody(input: string): unknown {
   }
 }
 
+/** A body the schema rejects; a terminal run prints the message only, so it names the first issue. */
+function schemaError(error: z.ZodError) {
+  const issues = error.issues.map(({ path, message }) => ({ path, message }))
+  const first = issues[0]
+  const at = first?.path.length ? `${first.path.map(String).join('.')}: ` : ''
+  return new UsageError(
+    `the --input does not match the schema of the operation${first ? `: ${at}${first.message}` : ''}`,
+    { issues },
+  )
+}
+
 /** `run`: the answer of the operation `name` to the body of `input`, over the records of `roots`. */
 export async function runOperation(
   name: string,
@@ -71,10 +82,7 @@ export async function runOperation(
   try {
     answer = await op.run(context, body)
   } catch (error) {
-    if (error instanceof z.ZodError)
-      throw new UsageError('the --input does not match the schema of the operation', {
-        issues: error.issues.map(({ path, message }) => ({ path, message })),
-      })
+    if (error instanceof z.ZodError) throw schemaError(error)
     // a record lookup of the routes fails an unknown id with a 404 error
     if ((error as { statusCode?: unknown }).statusCode === 404)
       throw new UsageError((error as Error).message)

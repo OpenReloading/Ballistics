@@ -96,6 +96,11 @@ describe('run offline', () => {
     expect(error.kind).toBe('usage')
     expect(error.issues.length).toBeGreaterThan(0)
     expect(error.issues[0]).toHaveProperty('path')
+    // the message alone, as a terminal shows it, names the first issue
+    const [first] = error.issues
+    expect(error.message).toBe(
+      `the --input does not match the schema of the operation: ${first.path.join('.')}: ${first.message}`,
+    )
   })
 
   it('answers a 422 of the route as a refusal with the answer', async () => {
