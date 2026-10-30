@@ -3799,5 +3799,15 @@
   "{count} session|{count} sessions": {
     "one": "{count} Sitzung",
     "other": "{count} Sitzungen"
-  }
+  },
+  "a charge": "eine Treibladung",
+  "a case capacity": "ein Hülsenvolumen",
+  "the bulk density of the powder": "das Schüttgewicht des Treibladungspulvers",
+  "Powder fill not drawn: needs {missing}.": "Füllung mit Treibladungspulver nicht gezeichnet: benötigt {missing}.",
+  "The charge level is approximate: the volume behind the bullet is taken as even from the head to the bullet base.": "Die Füllhöhe ist angenähert: das Volumen hinter dem Geschoss gilt als gleichmäßig vom Hülsenboden bis zum Geschossboden.",
+  "Values of the drawing": "Werte der Zeichnung",
+  "Values of the drawing (simulation inputs, not load data)": "Werte der Zeichnung (Eingaben der Simulation, keine Ladedaten)",
+  "fill\u0004Loading density": "Ladungsdichte",
+  "Hatched: the charge of {charge} at a case fill of {fill} %.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %.",
+  "Hatched: the charge of {charge} at a case fill of {fill} %, compressed by the bullet.": "Schraffiert: die Treibladung von {charge} bei einer Ladedichte von {fill} %, vom Geschoss verdichtet."
 }

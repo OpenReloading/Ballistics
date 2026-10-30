@@ -53,6 +53,12 @@ import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
+import {
+  type ChargeFill,
+  chargeFill,
+  fillPercent,
+  seatingValueRows,
+} from '../lib/seating-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { trailing } from '../lib/trailing.ts'
 import {
@@ -71,6 +77,7 @@ import { type UserBulletView, userBullets } from '../lib/variants.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { RecordSearch } from './record-search.tsx'
+import { PanelTable } from './scroll-region.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
@@ -251,6 +258,25 @@ function SeatedBullet({
   )
 }
 
+/** The powder charge in the case, in the part frame (mm): from the head to its level, tinted and hatched. */
+function ChargeLevel({ id, level }: { id: string; level: number }) {
+  return (
+    <g className="seating-charge" clipPath={`url(#${id}-cartridge)`}>
+      <pattern
+        id={`${id}-hatch`}
+        width="1"
+        height="1"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(45)"
+      >
+        <path d="M0 0V1" />
+      </pattern>
+      <rect className="tint" x={0} y={-50} width={level} height={100} />
+      <rect x={0} y={-50} width={level} height={100} fill={`url(#${id}-hatch)`} />
+    </g>
+  )
+}
+
 type PreviewProps = {
   /** The catalogue record to seat in; none for a `draft`. */
   cartridge?: { id: string; name: string } | undefined
@@ -320,6 +346,11 @@ type PreviewProps = {
   ladderStep?: { by: Mode; value: number } | undefined
   /** The figure's full view: the same drawing in a modal at the window's height. */
   fullView?: { opened: boolean; onClose: () => void }
+  /**
+   * The load's charge (kg) and its powder's bulk density (kg/m³): the figure draws the powder fill.
+   * A page without a charge leaves it out and shows no fill.
+   */
+  powder?: { charge: number | undefined; bulkDensity: number | undefined } | undefined
 }
 
 /** The lands contact in mm, as `seat` takes it. */
@@ -937,6 +968,15 @@ function useSeatingModel(p: PreviewProps) {
   )
 
   const fmt = unitFormats(system)
+  const behind = figureSeating?.volumeBehindBullet?.value
+  const fill =
+    p.powder &&
+    figureSeating &&
+    chargeFill({
+      ...p.powder,
+      volume: behind === undefined ? undefined : unitsOf.capacity.cm3.toSi(behind),
+      base: figureSeating.basePosition,
+    })
   const contact = contactText(seating, fmt.mm, t)
   /** The workbench's cards: the fields there show what the rows below leave out. */
   const card = inCard
@@ -997,6 +1037,7 @@ function useSeatingModel(p: PreviewProps) {
     setSliding,
     canCbto,
     measuredWaterCapacity,
+    fill,
   }
 }
 
@@ -1525,10 +1566,26 @@ function undrawnDesc(view: Model['view'], record: string | undefined, t: T) {
 function figureText(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: T) {
   const { view, designed, name, design } = m
   const where = designed ? name : `${spec.standard} ${spec.name}`
+  const fill = drawnSeating && m.fill ? ` ${fillText(m.fill, m.system, t)}` : ''
   return {
     caption: captionOf(view, design?.name, where, t),
-    desc: figureDesc(m, spec, drawnSeating, t),
+    desc: figureDesc(m, spec, drawnSeating, t) + fill,
   }
+}
+
+/** The powder fill as the legend and the description say it, or the inputs it needs. */
+function fillText(fill: ChargeFill, system: UnitSystem, t: T) {
+  if ('missing' in fill)
+    return t('Powder fill not drawn: needs {missing}.', {
+      missing: fill.missing.map((x) => t(x)).join(', '),
+    })
+  const values = { charge: withUnit('charge', system, fill.charge), fill: fillPercent(fill.ratio) }
+  return fill.compressed
+    ? t(
+        'Hatched: the charge of {charge} at a case fill of {fill} %, compressed by the bullet.',
+        values,
+      )
+    : t('Hatched: the charge of {charge} at a case fill of {fill} %.', values)
 }
 
 /** The figure's title: `design` is the name of the user design seated, none for a record's bullet. */
@@ -1569,6 +1626,9 @@ function DrawnFigure({
       model={shown}
       level={shown.medium === 'print'}
     >
+      {seating && m.fill && 'level' in m.fill && shown.cartridge && (
+        <ChargeLevel id={id} level={m.fill.level} />
+      )}
       {seating && (
         <SeatedBullet
           id={id}
@@ -1636,10 +1696,53 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
           )}
         </p>
       )}
+      {drawnSeating && m.fill && (
+        <p className="seating-legend">
+          {fillText(m.fill, m.system, t)}{' '}
+          {'level' in m.fill &&
+            t(
+              'The charge level is approximate: the volume behind the bullet is taken as even from the head to the bullet base.',
+            )}
+        </p>
+      )}
+      {drawnSeating && <FigureValues m={m} seating={drawnSeating} />}
       {!shape && view === 'combined' && !designer && (
         <p>{t('Choose a bullet with a length to seat it.')}</p>
       )}
     </div>
+  )
+}
+
+/** The values the figure draws, as a table: the same model and fill the drawing reads. */
+function FigureValues({ m, seating }: { m: Model; seating: Seating }) {
+  const { t } = useTranslation()
+  const rows = seatingValueRows(
+    {
+      annotation: (m.model ?? m.levelModel)?.annotation,
+      seating,
+      fill: m.fill,
+      system: m.system,
+    },
+    t,
+  )
+  return (
+    <details className="figure-values">
+      <summary>{t('Values of the drawing')}</summary>
+      <PanelTable
+        label={t('Values of the drawing')}
+        className="figure-values-table"
+        caption={t('Values of the drawing (simulation inputs, not load data)')}
+        columns={[t('Name'), t('Value'), t('Unit')]}
+      >
+        {rows.map((r) => (
+          <tr key={`${r.name} ${r.value}`}>
+            <th scope="row">{r.name}</th>
+            <td className="num">{r.value}</td>
+            <td>{r.unit}</td>
+          </tr>
+        ))}
+      </PanelTable>
+    </details>
   )
 }
 
