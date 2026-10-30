@@ -123,7 +123,7 @@ body {
 
 /* Mantine's field border is gray-4, about 1.5:1 on white; an error or success field keeps its state border */
 :root[data-mantine-color-scheme]
-.mantine-Input-wrapper[data-variant="default"]:not([data-error]):not([data-success]) {
+  .mantine-Input-wrapper[data-variant="default"]:not([data-error]):not([data-success]) {
   --input-bd: var(--input-border);
 }
 
@@ -4645,11 +4645,11 @@ main .library-head.page-panel-head > .page-panel-title {
 
 /* before the first run only what has content: the figure's Cartridge tab of a low window */
 .result[data-empty]
-:is(
-  .ladder-strip,
-  .result-tablist [role="tab"]:not([data-before-run], [data-before-run] *),
-  .mantine-Tabs-panel:not([data-before-run], [data-before-run] *)
-) {
+  :is(
+    .ladder-strip,
+    .result-tablist [role="tab"]:not([data-before-run], [data-before-run] *),
+    .mantine-Tabs-panel:not([data-before-run], [data-before-run] *)
+  ) {
   display: none;
 }
 

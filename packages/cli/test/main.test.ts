@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -13,11 +14,17 @@ const schemaPath = join(import.meta.dirname, '../schema/result.schema.json')
 const worse = new URL('./fixtures/worse-model.mjs', import.meta.url).pathname
 
 /** Runs the command line and returns the exit code and what it wrote. */
-async function cli(args: string[], env: NodeJS.ProcessEnv = {}, tty = false) {
+async function cli(
+  args: string[],
+  env: NodeJS.ProcessEnv = {},
+  tty = false,
+  write = (_text: string) => {},
+) {
   let stdout = ''
   let stderr = ''
   const code = await run(args, env, {
     stdout: (t) => {
+      write(t)
       stdout += t
     },
     stderr: (t) => {
@@ -48,6 +55,7 @@ describe('the JSON result', () => {
       const json = JSON.parse(stdout)
       expect(validate(json), JSON.stringify(validate.errors)).toBe(true)
       expect(json.schemaVersion).toBe(1)
+      expect(json.notice).toBe('simulation, not load data')
       expect(result.safeParse(json).success).toBe(true)
     }
   })
@@ -55,6 +63,12 @@ describe('the JSON result', () => {
   it('rejects a result of another shape', () => {
     expect(validate({ schemaVersion: 2, command: 'verify' })).toBe(false)
     expect(validate({ schemaVersion: 1, command: 'run' })).toBe(false)
+  })
+
+  it('has an absolute $id', () => {
+    const { $id } = JSON.parse(readFileSync(schemaPath, 'utf8'))
+    expect(new URL($id).href).toBe($id)
+    expect($id).toMatch(/\/result\.schema\.json$/)
   })
 
   it('is the schema the package generates (npm run schema)', () => {
@@ -148,14 +162,22 @@ describe('exit codes', () => {
     },
   )
 
+  it('is 0 for --version, with the package version on stdout', async () => {
+    const { version } = JSON.parse(
+      readFileSync(join(import.meta.dirname, '../package.json'), 'utf8'),
+    )
+    const r = await cli(['--version'])
+    expect(r).toEqual({ code: 0, stdout: `ballistics ${version}\n`, stderr: '' })
+  })
+
   it('is 2 with the usage on stderr for no command and for an unknown option', async () => {
-    const none = await cli([])
+    const none = await cli([], {}, true)
     expect(none.code).toBe(2)
     expect(none.stderr).toMatch(/^usage:/)
-    const unknown = await cli(['verify', '--rows', 'x.csv', '--nope'])
+    const unknown = await cli(['verify', '--rows', 'x.csv', '--nope'], {}, true)
     expect(unknown.code).toBe(2)
     expect(unknown.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
-    const top = await cli(['--nope'])
+    const top = await cli(['--nope'], {}, true)
     expect(top.code).toBe(2)
     expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
   })
@@ -203,11 +225,56 @@ describe('an unexpected error', () => {
     ],
     ['a directory given as the candidate', join(import.meta.dirname, 'fixtures')],
   ])('ends with one line and exit 2: %s', async (_name, model) => {
-    const { code, stdout, stderr } = await cli(['verify', ...data, '--model', model])
+    const { code, stdout, stderr } = await cli(['verify', ...data, '--model', model], {}, true)
     expect(code).toBe(2)
     expect(stdout).toBe('')
     expect(stderr).toMatch(/^[^\n]+\n$/)
     expect(stderr).not.toContain('    at ')
+    expect(JSON.parse((await cli(['verify', ...data, '--model', model])).stderr).error.kind).toBe(
+      'usage',
+    )
+  })
+})
+
+describe('an error', () => {
+  const full = () => {
+    throw new Error('no space left\non the device')
+  }
+
+  it.each([
+    ['usage', 2, ['verify', '--rows', 'x.csv', '--nope'], undefined, /^Unknown option '--nope'/],
+    ['refused', 1, ['verify', ...data, '--split', 'test'], undefined, /^refused: the test split/],
+    ['internal', 3, ['verify', ...data], full, /^error: no space left on the device\n$/],
+  ] as const)(
+    'of kind %s exits %i, one JSON object on stderr when piped or with --json, else text',
+    async (kind, exit, args, write, text) => {
+      for (const [extra, tty] of [
+        [[], false],
+        [['--json'], true],
+      ] as const) {
+        const r = await cli([...args, ...extra], {}, tty, write)
+        expect(r.code).toBe(exit)
+        expect(r.stderr).toMatch(/^[^\n]+\n$/)
+        expect(JSON.parse(r.stderr)).toEqual({ error: { kind, message: expect.any(String) } })
+      }
+      const terminal = await cli([...args], {}, true, write)
+      expect(terminal.code).toBe(exit)
+      expect(terminal.stderr).toMatch(text)
+    },
+  )
+})
+
+describe('the process', () => {
+  const bin = join(import.meta.dirname, '../src/bin.ts')
+
+  it('reads the rows from standard input for --rows -', () => {
+    const r = spawnSync(process.execPath, [bin, 'verify', '--rows', '-', ...data.slice(2)], {
+      input: readFileSync(rowsPath),
+      encoding: 'utf8',
+    })
+    expect(r.status).toBe(0)
+    const fromFile = spawnSync(process.execPath, [bin, 'verify', ...data], { encoding: 'utf8' })
+    expect(JSON.parse(r.stdout).overall).toEqual(JSON.parse(fromFile.stdout).overall)
   })
 })
 

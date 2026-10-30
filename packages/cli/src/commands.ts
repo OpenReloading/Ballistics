@@ -7,6 +7,7 @@ import { loadRecords } from './records.ts'
 import {
   type CompareResult,
   type Evaluation,
+  notice,
   schemaVersion,
   type VerifyResult,
   verifyResult,
@@ -108,6 +109,7 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
   const evaluation = await evaluateModel(spec, options, data)
   return {
     schemaVersion,
+    notice,
     command: 'verify',
     split: options.split,
     final: options.final,
@@ -142,6 +144,7 @@ async function baselineOf(spec: string, options: Options, data: Prepared): Promi
   if (!spec.endsWith('.json')) return await evaluateModel(spec, options, data)
   const {
     schemaVersion: _v,
+    notice: _n,
     command: _c,
     split,
     final: _f,
@@ -174,6 +177,7 @@ export async function compare(
   const families = new Set([...Object.keys(baseline.byFamily), ...Object.keys(candidate.byFamily)])
   return {
     schemaVersion,
+    notice,
     command: 'compare',
     split: options.split,
     final: options.final,

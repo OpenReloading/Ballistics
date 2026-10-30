@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -16,6 +16,9 @@
       "!**/.next",
       "!**/dist",
       "!**/next-env.d.ts",
+      "!**/*.md",
+      "!**/*.yaml",
+      "!**/*.yml",
       "!**/test/golden",
       "!packages/data/test/fixtures/invalid/chrono/broken.json"
     ]
@@ -36,6 +39,8 @@
         "noImportantStyles": "off"
       },
       "correctness": {
+        "noComponentHookFactories": "off",
+        "noInvalidGridAreas": "off",
         "noUnusedVariables": "error",
         "noUnusedImports": "error",
         "noUndeclaredDependencies": "error"
@@ -61,6 +66,15 @@
     }
   },
   "overrides": [
+    {
+      "includes": ["**/test/**", "apps/e2e/**"],
+      "linter": {
+        "rules": {
+          "performance": { "useDomNodeTextContent": "off" },
+          "suspicious": { "useArraySortCompare": "off" }
+        }
+      }
+    },
     {
       "includes": ["packages/drawing/src/**"],
       "linter": {

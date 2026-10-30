@@ -86,8 +86,12 @@ const inputs = z.object({
   rows: z.string().describe('SHA-256 over the SHA-256 of each rows file.'),
   records: z.string().describe('SHA-256 over the records the rows name.'),
 })
+/** The label every result carries, the notice of the API's answers. */
+export const notice = 'simulation, not load data'
+
 const common = {
   schemaVersion: z.literal(schemaVersion),
+  notice: z.literal(notice),
   split: z.enum(splits),
   final: z.boolean().describe('True for a run of the test split, which needs `--final`.'),
   inputs,
