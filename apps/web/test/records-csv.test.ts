@@ -31,7 +31,7 @@ const rifle = '0b1c2d3e-4f50-4a61-8b72-9c83d4e5f601'
 const names: Record<string, string> = {
   'cartridges catalogue:308-win': '.308 Winchester',
   [`firearms user:${rifle}`]: 'Bench rifle',
-  'bullets catalogue:smk-175': 'MatchKing 175',
+  'bullets catalogue:smk-175': 'Test bullet 175',
 }
 const nameOf = (kind: string, ref: string | undefined) =>
   ref === undefined ? '' : (names[`${kind} ${ref}`] ?? ref)
@@ -89,7 +89,7 @@ describe('saved loads CSV', () => {
       'Match, "long"\nnight',
       '.308 Winchester',
       'Bench rifle',
-      'MatchKing 175',
+      'Test bullet 175',
       'catalogue:gone',
       2.9,
       54.1,
