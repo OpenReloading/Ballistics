@@ -2,6 +2,7 @@
 
 import {
   ActionIcon,
+  Anchor,
   Button,
   Checkbox,
   ColorSwatch,
@@ -75,6 +76,7 @@ import { z } from 'zod'
 import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, fixedNumber, formatNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { photoGuide } from '../lib/docs-url.ts'
 import { storageName } from '../lib/edition.ts'
 import { errorText } from '../lib/error-text.ts'
 import { isFaceId } from '../lib/face-records.ts'
@@ -1684,6 +1686,14 @@ function PhotoPanel({ ed }: { ed: Ed }) {
       <h2 className="prop-head">{t('Photo')}</h2>
       <p className="note">
         {t('Choose, drop or paste a photo; it stays in this browser and is never uploaded.')}
+        {photoGuide && (
+          <>
+            {' '}
+            <Anchor href={photoGuide} target="_blank" rel="noopener">
+              {t('How to take a photo the app can score')}
+            </Anchor>
+          </>
+        )}
       </p>
       <Flex component="span" className="row-buttons" wrap="wrap" gap={4} mb="xs">
         <Button

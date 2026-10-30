@@ -28,6 +28,7 @@ import {
   caliberClassesOf,
   ownCartridges,
 } from '../lib/caliber-candidates.ts'
+import { photoGuide } from '../lib/docs-url.ts'
 import { ellipsePoint } from '../lib/ellipse.ts'
 import { errorText } from '../lib/error-text.ts'
 import { fetchAllFaces, fetchFace } from '../lib/face-records.ts'
@@ -45,7 +46,7 @@ import {
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../lib/hole-proposals.ts'
-import { belowMinimum, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
+import { belowMinimum, guideRule, layoutOf, type QualityIssue } from '../lib/photo-quality.ts'
 import type { Frame } from '../lib/target-editor.ts'
 import {
   type FaceFit,
@@ -1035,6 +1036,18 @@ function QualityNotes({ issues, held }: { issues: readonly QualityIssue[]; held:
       {issues.map((i) => (
         <Message key={i.problem} severity={i.level === 'bad' ? 'warning' : 'info'}>
           {t(i.text, { n: i.n ?? 0 })} {t(i.fix)}
+          {photoGuide && (
+            <>
+              {' '}
+              <Anchor
+                href={`${photoGuide}#${guideRule[i.problem].anchor}`}
+                target="_blank"
+                rel="noopener"
+              >
+                {t('Photo guide: {rule}', { rule: t(guideRule[i.problem].name) })}
+              </Anchor>
+            </>
+          )}
         </Message>
       ))}
       {held && (

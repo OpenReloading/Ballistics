@@ -26,6 +26,28 @@ type QualityProblem =
   | 'resolution'
   | 'framing'
 
+/** The rules of the photo guide (`apps/docs/docs/photo-guide.md`): the anchor of the heading and its name. */
+const rules = {
+  target: { anchor: '2-one-target-all-of-it', name: msg('One target, all of it') },
+  above: { anchor: '3-straight-from-above-no-slant', name: msg('Straight from above, no slant') },
+  light: { anchor: '4-even-light-no-reflection', name: msg('Even light, no reflection') },
+  close: { anchor: '5-close-enough', name: msg('Close enough') },
+  steady: { anchor: '6-steady-not-soft', name: msg('Steady, not soft') },
+} as const
+
+/** The rule of the photo guide that says how to retake a photo with the problem. */
+export const guideRule: Readonly<Record<QualityProblem, { anchor: string; name: Message }>> = {
+  face: rules.target,
+  framing: rules.target,
+  tilt: rules.above,
+  contrast: rules.light,
+  exposure: rules.light,
+  glare: rules.light,
+  shadow: rules.light,
+  resolution: rules.close,
+  blur: rules.steady,
+}
+
 /** `bad` is below the minimum quality: detection is held until the user goes on; `fair` is a note. */
 type QualityLevel = 'fair' | 'bad'
 

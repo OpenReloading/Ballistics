@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DocsLink } from '../src/components/docs-link.tsx'
-import { docsUrl } from '../src/lib/docs-url.ts'
+import { docsPage, docsUrl } from '../src/lib/docs-url.ts'
 
 const render = (url?: string | undefined, drawer?: boolean) =>
   renderToStaticMarkup(
@@ -26,4 +26,12 @@ it('docsUrl: the set value, else the docs folder of the site, else none', () => 
   expect(docsUrl(undefined, '')).toBe('/docs/')
   expect(docsUrl(undefined, '', '1')).toBeUndefined()
   expect(docsUrl('https://example.org/docs/', '', '1')).toBe('https://example.org/docs/')
+})
+
+it('docsPage: the page under the docs site with or without its closing slash, none without a site', () => {
+  expect(docsPage('/docs/', 'photo-guide/')).toBe('/docs/photo-guide/')
+  expect(docsPage('https://example.org/docs', 'photo-guide/')).toBe(
+    'https://example.org/docs/photo-guide/',
+  )
+  expect(docsPage(undefined, 'photo-guide/')).toBeUndefined()
 })
