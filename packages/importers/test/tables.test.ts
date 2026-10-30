@@ -75,6 +75,15 @@ describe('readTable', () => {
     }
   })
 
+  it('keeps a quote after cell text as text, also in a long cell', () => {
+    expect(readTable('a,b\nx "y",2\n')).toEqual({
+      table: { header: ['a', 'b'], hasHeader: true, rows: [['x "y"', '2']] },
+    })
+    const cell = `${' '.repeat(100_000)}x${'"'.repeat(100_000)}`
+    const read = readTable(`a,b\n1,2\n${cell},2\n`)
+    expect('table' in read && read.table.rows[1]?.[0]).toBe(cell.trim())
+  })
+
   it('removes a leading byte order mark', () => {
     const table = { header: ['name', 'mass'], hasHeader: true, rows: [['a', '1']] }
     expect(readTable('\uFEFF[{"name":"a","mass":1}]')).toEqual({ table })

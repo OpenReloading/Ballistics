@@ -34,6 +34,8 @@ function readQuoted(text: string, from: number): { cell: string; next: number } 
   return { cell, next: i }
 }
 
+const spaceOrTab = /^[ \t]$/
+
 const isBlank = (row: string[]) => row.every((x) => x.trim() === '')
 
 /**
@@ -44,6 +46,8 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   const rows: string[][] = []
   let row: string[] = []
   let cell = ''
+  // Whether `cell` holds only spaces and tabs, kept as it grows so a quote does not rescan it.
+  let blank = true
   let cells = 0
   let droppedFilled = false
   let i = 0
@@ -51,6 +55,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
     if (row.length <= maxColumn) row.push(cell)
     else if (cell.trim() !== '') droppedFilled = true
     cell = ''
+    blank = true
   }
   const endRow = () => {
     endCell()
@@ -63,9 +68,10 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
   }
   while (i < text.length && cells <= maxCells) {
     const c = text.charAt(i)
-    if (c === '"' && /^[ \t]*$/.test(cell)) {
+    if (c === '"' && blank) {
       const q = readQuoted(text, i + 1)
       cell = q.cell
+      blank = /^[ \t]*$/.test(cell)
       i = q.next
     } else if (c === delimiter) {
       endCell()
@@ -75,6 +81,7 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
       i += c === '\r' && text.charAt(i + 1) === '\n' ? 2 : 1
     } else {
       cell += c
+      blank &&= spaceOrTab.test(c)
       i++
     }
   }
