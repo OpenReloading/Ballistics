@@ -67,15 +67,18 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
                   </th>
                   <td className="num">{plainNumber(r.count)}</td>
                 </tr>
-                {!!r.notes && (
-                  <tr>
-                    <th scope="row">
-                      <Link href={r.href} onClick={onNavigate}>
-                        {t('Notes on firearms and saved loads')}
-                      </Link>
-                    </th>
-                    <td className="num">{plainNumber(r.notes)}</td>
-                  </tr>
+                {r.notes?.map(
+                  (n) =>
+                    !!n.count && (
+                      <tr key={n.href}>
+                        <th scope="row">
+                          <Link href={n.href} onClick={onNavigate}>
+                            {t(n.label)}
+                          </Link>
+                        </th>
+                        <td className="num">{plainNumber(n.count)}</td>
+                      </tr>
+                    ),
                 )}
               </Fragment>
             ))}

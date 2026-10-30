@@ -44,8 +44,14 @@ export function loadGaps(records: readonly UserRecord[]) {
   return { unused, mismatches, loads, designs }
 }
 
-/** The number of gaps, each once: the firearms no load names and the loads with a gap. */
-export const gapCount = ({ unused, loads }: ReturnType<typeof loadGaps>) => unused.size + loads.size
+/**
+ * The number of notes each place shows: the firearm library (`firearms`: a firearm no load names
+ * and each mismatch) and the Saved loads line (`loads`: each load with a gap, mismatches too).
+ */
+export const gapCounts = ({ unused, mismatches, loads }: ReturnType<typeof loadGaps>) => ({
+  firearms: [...mismatches.values()].reduce((n, m) => n + m.length, unused.size),
+  loads: loads.size,
+})
 
 /** The note of a saved load's gap, a mismatch naming its `firearm` and both cartridges by `name`. */
 export const loadGapNote = (

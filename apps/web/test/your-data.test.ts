@@ -39,11 +39,26 @@ it('counts nothing but the kinds it lists', () => {
   expect(yourDataRows([maker]).every((r) => r.count === 0)).toBe(true)
 })
 
-it('adds the notes on firearms and saved loads to the firearms row only', () => {
-  const load: UserRecord = { kind: 'load', id: 'l', name: 'Load', saved, data: { origin: 'user' } }
+const load: UserRecord = { kind: 'load', id: 'l', name: 'Load', saved, data: { origin: 'user' } }
+const notesOf = (records: UserRecord[]) =>
+  yourDataRows(records)
+    .find((r) => r.kind === 'firearm')
+    ?.notes?.map((n) => [n.label, n.href, n.count])
+
+it('adds the notes on firearms and on saved loads to the firearms row only, each linked to where it is shown', () => {
   const rows = yourDataRows([firearm('a'), load])
-  // the firearm no load names and the load without a firearm
-  expect(rows.find((r) => r.kind === 'firearm')?.notes).toBe(2)
   expect(rows.filter((r) => 'notes' in r)).toHaveLength(1)
   expect(rows.find((r) => r.kind === 'firearm')?.href).toBe('/firearms')
+  // the firearm no load names on the firearms page, the load without a firearm on the Saved loads line
+  expect(notesOf([firearm('a'), load])).toEqual([
+    ['Notes on firearms', '/firearms', 1],
+    ['Notes on saved loads', '/workbench', 1],
+  ])
+})
+
+it('links the note of a load without a firearm to the saved loads, with no firearm stored', () => {
+  expect(notesOf([load])).toEqual([
+    ['Notes on firearms', '/firearms', 0],
+    ['Notes on saved loads', '/workbench', 1],
+  ])
 })

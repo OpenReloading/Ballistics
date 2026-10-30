@@ -2,7 +2,7 @@ import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { blankFirearm } from '../src/lib/firearm.ts'
-import { gapCount, gapNotes, loadGapNote, loadGaps } from '../src/lib/load-gaps.ts'
+import { gapCounts, gapNotes, loadGapNote, loadGaps } from '../src/lib/load-gaps.ts'
 import { loadUse, loadUseText } from '../src/lib/load-use.ts'
 
 const saved = '2026-01-01T00:00:00.000Z'
@@ -165,13 +165,11 @@ describe('load and firearm gaps', () => {
     expect(['a', 'd', 'g'].map(loadNote)).toEqual([undefined, undefined, undefined])
   })
 
-  it('counts each gap once: a mismatch noted on its firearm and on its load counts one', () => {
+  it('counts the notes the firearm library and the Saved loads line each show, a mismatch on both', () => {
     const firearmNotes = [rifle, pistol, spare, bare].flatMap(notes).length
-    const loadNotes = [...gaps.loads.keys()].map(loadNote).filter(Boolean).length
-    expect(gapCount(gaps)).toBe(
-      firearmNotes + loadNotes - [...gaps.mismatches.values()].flat().length,
-    )
-    expect(gapCount(gaps)).toBe(5)
+    const loadNotes = 'abcdefg'.split('').map(loadNote).filter(Boolean).length
+    expect(gapCounts(gaps)).toEqual({ firearms: firearmNotes, loads: loadNotes })
+    expect(gapCounts(gaps)).toEqual({ firearms: 3, loads: 4 })
   })
 
   it('describes the records only', () => {
