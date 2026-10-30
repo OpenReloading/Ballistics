@@ -100,6 +100,10 @@ test('the workbench in German after the example run has no axe finding', async (
   await runExample(page)
   await showGerman(page)
   await expect(page.getByRole('tab', { name: 'Ladeleiter-Tabelle', exact: true })).toBeVisible()
+  // the sampled band's note follows the result and makes the notes list scroll
+  await expect(
+    page.locator('.result-notes li', { hasText: /(Geschwindigkeit|Stichprobe)/ }),
+  ).toBeAttached({ timeout: 10_000 })
   await page.waitForLoadState('networkidle')
   expect(await problems(page, 'workbench in German')).toEqual([])
 })
