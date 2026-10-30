@@ -2103,7 +2103,11 @@ export function useWorkbenchState() {
     } catch {
       if (!controller.signal.aborted) showUnreached()
     } finally {
-      if (running.current === controller) setPending(false)
+      // a finished run is no longer running: the next input change keeps its status line
+      if (running.current === controller) {
+        setPending(false)
+        running.current = null
+      }
     }
   }
 
