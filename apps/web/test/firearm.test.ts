@@ -503,7 +503,7 @@ describe('gunPicker', () => {
     )
     const german = gunPicker([], example, translator(de as Catalogue, 'de').t)
     expect(german.placeholder).toBe(
-      'Noch keine Schusswaffe gespeichert. Wählen Sie das Beispielgewehr oder fügen Sie Ihre unter Schusswaffen hinzu.',
+      de['No firearm saved yet. Pick the example rifle, or add yours under Firearms.'],
     )
     expect(german.rows[0]?.name).toBe('Example rifle, 308 Win. (Beispiel)')
   })
@@ -535,7 +535,7 @@ describe('sightPicker', () => {
       'No firearm saved yet. Pick the example rifle, or add yours under Firearms.',
     )
     expect(sightPicker([], example, translator(de as Catalogue, 'de').t).none).toBe(
-      'Noch keine Schusswaffe gespeichert. Wählen Sie das Beispielgewehr oder fügen Sie Ihre unter Schusswaffen hinzu.',
+      de['No firearm saved yet. Pick the example rifle, or add yours under Firearms.'],
     )
   })
 
