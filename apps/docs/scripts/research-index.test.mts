@@ -9,6 +9,7 @@ import {
   noteErrors,
   notesErrors,
   required,
+  splitPath,
 } from './research-index.mts'
 
 const note = `---
@@ -82,4 +83,16 @@ test('the index lists every research page once, with a link line in llms.txt', (
       .filter((l) => l.startsWith('- [')).length,
     list.length,
   )
+})
+
+test('a page path splits into its folder and file name, in linear time on a long one', () => {
+  assert.deepEqual(splitPath('literature/open-questions.md'), {
+    folder: 'literature/',
+    name: 'open-questions',
+  })
+  assert.deepEqual(splitPath('log.md'), { folder: '', name: 'log' })
+  const long = `${'a/'.repeat(100_000)}b`
+  const start = performance.now()
+  assert.equal(splitPath(long).name, 'b')
+  assert.ok(performance.now() - start < 100)
 })
