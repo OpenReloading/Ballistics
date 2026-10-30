@@ -1,13 +1,13 @@
 ---
-title: Mutation testing of thirteen core and five web modules
-description: Whether mutation testing finds weak tests in the core package and the web libraries that line coverage does not, its run time per module, the surviving mutant classes and the tests that kill them, in four rounds.
+title: Mutation testing of core, web, API, CLI, importer and schema modules
+description: Whether mutation testing finds weak tests in the core package, the web libraries, the API, the CLI, the importers and the schema that line coverage does not, its run time per module, the surviving mutant classes and the tests that kill them, in six rounds.
 ---
 
-# Mutation testing of thirteen core and five web modules
+# Mutation testing of core, web, API, CLI, importer and schema modules
 
 ## Question
 
-Test quality of `packages/core`: does mutation testing find weak tests that the line coverage floor (98 percent) does not, at a run time the repository can carry?
+Test quality of the logic modules (`packages/core` first, then the web libraries, the API, the CLI, the importers and the schema): does mutation testing find weak tests that the line coverage floor does not, at a run time the repository can carry?
 
 ## Method
 
@@ -108,7 +108,7 @@ The equivalent survivors of the fourth round: in the units, the catch of an unre
 
 The 31 mutants that still survive after the new tests are boundary changes where both branches give the same value at the boundary (the stage joins of the vivacity forms, the lens and sliver limits), the bisection bounds and stop rule of the seven-perforation burnout, the truncation and the end weights of the Simpson rule (below 1e-13 against the closed form), two optional chainings on lookups that always find an entry, and one message text.
 
-Round 5 took five more modules by risk, each run against its own test file with the same tool and settings, installed outside the workspace and run on the host:
+Round 5 took five more modules by risk with the same tool and settings, installed outside the workspace and run on the host, each against its own test file except `cli/metrics.ts`, whose score is over `test/verify.test.ts` and `test/compare.test.ts` (its own test file alone gives 67.2 %):
 
 - `core/cartridge-specs.ts`: the diameters and bore area that the bullet fit and the cartridge pages read; 35 of its mutants were covered by no test of its own file.
 - `api/compute/limits.ts`: the comparison of a simulated pressure range with the CIP Pmax, its warnings and the decimals that keep a printed value on its side of a limit.
