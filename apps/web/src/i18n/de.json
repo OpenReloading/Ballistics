@@ -3746,5 +3746,13 @@
   "Add {count} shot of these strings to the round count of {name}?|Add {count} shots of these strings to the round count of {name}?": {
     "one": "{count} Schuss dieser Schussreihen zur Schusszahl von {name} hinzufügen?",
     "other": "{count} Schüsse dieser Schussreihen zur Schusszahl von {name} hinzufügen?"
+  },
+  "Loads": "Laborierungen",
+  "Saved loads with this firearm.": "Gespeicherte Laborierungen mit dieser Schusswaffe.",
+  "Last session": "Letzte Sitzung",
+  "The latest dated chronograph session of those loads.": "Die jüngste datierte Chronograph-Sitzung dieser Laborierungen.",
+  "{count} load|{count} loads": {
+    "one": "{count} Laborierung",
+    "other": "{count} Laborierungen"
   }
 }

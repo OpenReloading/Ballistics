@@ -33,6 +33,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
+import { dayText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import {
@@ -47,6 +48,7 @@ import {
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
+import { type FirearmUse, loadUse } from '../lib/load-use.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
@@ -115,6 +117,7 @@ function firearmColumns(
   system: UnitSystem,
   cartridgeName: (ref: string | undefined) => string | undefined,
   cells: (r: FirearmRecord) => Cells,
+  usageOf: (r: FirearmRecord) => FirearmUse,
   actionsMenu: (r: FirearmRecord, tabIndex?: number) => ReactNode,
 ): DirectoryColumn<FirearmRecord>[] {
   return [
@@ -192,6 +195,26 @@ function firearmColumns(
       width: '9.5rem',
       value: (r) => cells(r).configuration || undefined,
       cell: (r) => cells(r).configuration,
+    },
+    {
+      key: 'loads',
+      label: msg('Loads'),
+      help: msg('Saved loads with this firearm.'),
+      num: true,
+      width: '5rem',
+      value: (r) => usageOf(r).loads,
+      cell: (r) => usageOf(r).loads,
+    },
+    {
+      key: 'lastSession',
+      label: msg('Last session'),
+      help: msg('The latest dated chronograph session of those loads.'),
+      width: '8rem',
+      value: (r) => usageOf(r).last,
+      cell: (r) => {
+        const last = usageOf(r).last
+        return last ? dayText(last) : ''
+      },
     },
     {
       key: 'actions',
@@ -352,12 +375,14 @@ function readFirearms(
   read: number,
   reads: { current: number },
   setList: (list: FirearmRecord[]) => void,
+  setUses: (uses: Map<string, FirearmUse>) => void,
   setReadError: (message: string) => void,
 ) {
   setReadError('')
   storedRecords()
     .then(({ records }) => {
       if (read !== reads.current) return
+      setUses(loadUse(records).firearms)
       setList(
         records
           .filter((r): r is FirearmRecord => r.kind === 'firearm')
@@ -503,10 +528,12 @@ function ExampleView({
  */
 export function FirearmLibrary() {
   const tr = useTranslation()
-  const { t } = tr
+  const { t, tn } = tr
   const { system } = useUnits()
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
+  /** The saved loads that name each firearm, by firearm id. */
+  const [uses, setUses] = useState(new Map<string, FirearmUse>())
   const [failure, setFailure] = useState('')
   /** Why the firearm that `?record=` names could not be opened. */
   const [linkFailure, setLinkFailure] = useState<Message>()
@@ -529,7 +556,7 @@ export function FirearmLibrary() {
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)
   const refresh = useCallback(() => {
-    readFirearms(++reads.current, reads, setList, setReadError)
+    readFirearms(++reads.current, reads, setList, setUses, setReadError)
   }, [])
   useEffect(refresh, [refresh])
 
@@ -669,7 +696,15 @@ export function FirearmLibrary() {
     cellCache.set(r, c)
     return c
   }
-  const columns = firearmColumns(t, system, cartridgeName, cells, actionsMenu)
+  const usageOf = (r: FirearmRecord) => uses.get(r.id) ?? { loads: 0 }
+  const columns = firearmColumns(t, system, cartridgeName, cells, usageOf, actionsMenu)
+  /** The phone row's line: the record's facts, then its loads and last session day. */
+  const facts = (r: FirearmRecord) => {
+    const { loads, last } = usageOf(r)
+    return [...lines(r), tn(loads, '{count} load', '{count} loads'), last && dayText(last)]
+      .filter(Boolean)
+      .join(' · ')
+  }
   const card = (r: FirearmRecord, stored: boolean) => (
     <FirearmCard
       key={r.id}
@@ -746,7 +781,7 @@ export function FirearmLibrary() {
                 link="name"
                 href={rowHref}
                 onOpen={(r) => (r === example ? view() : menu.current?.open(r))}
-                facts={(r) => lines(r).filter(Boolean).join(' · ')}
+                facts={facts}
                 label={nameOf}
                 caption={tableCaption(t, named)}
                 noun="firearms"
