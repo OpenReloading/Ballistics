@@ -4,11 +4,14 @@ import {
   acceptProposals,
   confirmedHoleDiameters,
   type EditorProposal,
+  expectedHoleSize,
+  isMaybe,
+  isNominal,
   localPxPerM,
   proposalsClearOfShots,
   rectangleFromDiagonal,
 } from '../src/lib/hole-proposals.ts'
-import { frameOf, targetToView } from '../src/lib/target-editor.ts'
+import { type Frame, frameOf, targetToView } from '../src/lib/target-editor.ts'
 import { groupStatisticsOf } from '../src/lib/target-groups.ts'
 import { defined } from './defined.ts'
 
@@ -40,6 +43,54 @@ const proposal = (id: number, x: number, y: number, clusterSize = 1): EditorProp
   diameter: 78,
 })
 
+describe('isMaybe and isNominal', () => {
+  it('marks a proposal below a confidence of 0.5 as a maybe', () => {
+    expect(isMaybe({ confidence: 0.49 })).toBe(true)
+    expect(isMaybe({ confidence: 0.5 })).toBe(false)
+    expect(isMaybe({ confidence: 0.8 })).toBe(false)
+  })
+
+  it('counts a bullet or marker size as nominal, a typed or learned one and none as not', () => {
+    expect(isNominal({ source: 'bullet' })).toBe(true)
+    expect(isNominal({ source: 'marker' })).toBe(true)
+    expect(isNominal({ source: 'typed' })).toBe(false)
+    expect(isNominal({ source: 'learned' })).toBe(false)
+    expect(isNominal(undefined)).toBe(false)
+  })
+})
+
+describe('expectedHoleSize', () => {
+  const sizes = { bulletDiameter: 0.0078, markerDiameter: 0.006 }
+
+  it('takes the typed size before every other', () => {
+    expect(
+      expectedHoleSize({ typedDiameter: 0.009, confirmedDiameters: [1, 2, 3], ...sizes }),
+    ).toEqual({ diameter: 0.009, source: 'typed' })
+  })
+
+  it('learns the median of three or more measured holes, sorted by size', () => {
+    expect(expectedHoleSize({ confirmedDiameters: [0.009, 0.007, 0.008], ...sizes })).toEqual({
+      diameter: 0.008,
+      source: 'learned',
+    })
+    expect(expectedHoleSize({ confirmedDiameters: [0.01, 0.007, 0.009, 0.008], ...sizes })).toEqual(
+      { diameter: expect.closeTo(0.0085, 12), source: 'learned' },
+    )
+  })
+
+  it('falls back to the bullet, then the marker, then none below three holes', () => {
+    expect(expectedHoleSize({ confirmedDiameters: [0.009, 0.007], ...sizes })).toEqual({
+      diameter: 0.0078,
+      source: 'bullet',
+    })
+    expect(expectedHoleSize({ confirmedDiameters: [], markerDiameter: 0.006 })).toEqual({
+      diameter: 0.006,
+      source: 'marker',
+    })
+    expect(expectedHoleSize({ confirmedDiameters: [] })).toBeUndefined()
+  })
+})
+
 describe('rectangleOf', () => {
   it('gives the four corners of the rectangle of two opposite corners, clockwise from top left', () => {
     expect(rectangleFromDiagonal({ x: 300, y: 50 }, { x: 100, y: 200 })).toEqual([
@@ -56,6 +107,27 @@ describe('localPxPerM', () => {
     const region = rectangleFromDiagonal({ x: 500, y: 400 }, { x: 700, y: 600 })
     expect(localPxPerM(frame, region)).toBeCloseTo(10_000, 6)
   })
+
+  it('is taken at the middle of the region, 1 mm forward along x and y, under perspective', () => {
+    // photo px = 10 000 * target m / (1 + 10 * x + 10 * y): the scale shrinks along x and y
+    const [s, c] = [10_000, 10]
+    const tilted: Frame = {
+      toImage: [s, 0, 0, 0, s, 0, c, c, 1],
+      toTarget: [1 / s, 0, 0, 0, 1 / s, 0, -c / s, -c / s, 1],
+    }
+    const photo = (x: number, y: number): [number, number] => [
+      (s * x) / (1 + c * x + c * y),
+      (s * y) / (1 + c * x + c * y),
+    ]
+    // the middle (200, 150) px is target (0.02, 0.015) / (1 - 0.2 - 0.15) m
+    const [x, y, mm] = [0.02 / 0.65, 0.015 / 0.65, 0.001]
+    const [ox, oy] = photo(x, y)
+    const [ax, ay] = photo(x + mm, y)
+    const [bx, by] = photo(x, y + mm)
+    const expected = (Math.hypot(ax - ox, ay - oy) + Math.hypot(bx - ox, by - oy)) / 2 / mm
+    const region = rectangleFromDiagonal({ x: 100, y: 50 }, { x: 300, y: 250 })
+    expect(localPxPerM(tilted, region)).toBeCloseTo(expected, 6)
+  })
 })
 
 describe('newProposals', () => {
@@ -64,6 +136,22 @@ describe('newProposals', () => {
     const shot = targetToView(frame, defined(group.shots[0]))
     const list = [proposal(1, shot.x + 30, shot.y), proposal(2, shot.x + 50, shot.y)]
     expect(proposalsClearOfShots(list, group, frame, 78).map((p) => p.id)).toEqual([2])
+  })
+
+  it('drops a proposal near any shot and keeps one exactly half a hole away', () => {
+    const plain: Frame = {
+      toImage: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+      toTarget: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+    }
+    const two: ShotGroup = {
+      ...group,
+      shots: [
+        { x: 0, y: 0, placement: 'placed' },
+        { x: 100, y: 0, placement: 'placed' },
+      ],
+    }
+    const list = [proposal(1, 130, 0), proposal(2, 39, 0), proposal(3, 50, 50)]
+    expect(proposalsClearOfShots(list, two, plain, 78).map((p) => p.id)).toEqual([2, 3])
   })
 })
 

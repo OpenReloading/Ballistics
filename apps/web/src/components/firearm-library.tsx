@@ -41,6 +41,7 @@ import {
   catalogueCartridgeId,
   firearmCells,
   firearmIssues,
+  firearmPatch,
   firearmProblem,
   schemaMessage,
 } from '../lib/firearm.ts'
@@ -573,7 +574,7 @@ export function FirearmLibrary() {
       t,
     ) || undefined
 
-  const patch = (p: Partial<Firearm>) => setData((d) => ({ ...d, ...p }))
+  const patch = (p: Partial<Firearm>) => setData((d) => firearmPatch(d, p))
   const setOptic = (i: number, p: Partial<Optic>) =>
     setData((d) => ({ ...d, optics: d.optics.map((o, j) => (j === i ? { ...o, ...p } : o)) }))
   const setConfig = (i: number, p: Partial<OpticConfiguration>) =>

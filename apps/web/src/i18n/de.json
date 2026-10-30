@@ -2852,6 +2852,7 @@
     "one": "{count} Schuss abgegeben",
     "other": "{count} Schuss abgegeben"
   },
+  "{rounds}, as of {date}": "{rounds}, Stand {date}",
   "Optics ({count})": "Optiken ({count})",
   "Configurations ({count})": "Konfigurationen ({count})",
   "Search cartridges": "Patronen suchen",
