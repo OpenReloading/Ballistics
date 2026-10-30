@@ -2,7 +2,7 @@
 
 import { Text } from '@mantine/core'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -58,14 +58,26 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.kind}>
-                <th scope="row">
-                  <Link href={r.href} onClick={onNavigate}>
-                    {t(r.label)}
-                  </Link>
-                </th>
-                <td className="num">{plainNumber(r.count)}</td>
-              </tr>
+              <Fragment key={r.kind}>
+                <tr>
+                  <th scope="row">
+                    <Link href={r.href} onClick={onNavigate}>
+                      {t(r.label)}
+                    </Link>
+                  </th>
+                  <td className="num">{plainNumber(r.count)}</td>
+                </tr>
+                {!!r.notes && (
+                  <tr>
+                    <th scope="row">
+                      <Link href={r.href} onClick={onNavigate}>
+                        {t('Notes on firearms and saved loads')}
+                      </Link>
+                    </th>
+                    <td className="num">{plainNumber(r.notes)}</td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
