@@ -1,96 +1,31 @@
 # @open-reloading/api
 
-Fastify HTTP API (TypeScript, ESM) exposing `@open-reloading/core` and the data records, which it reads from the in-process catalogue (`src/catalogue/`).
-
-- `src/app.ts` builds the app (plugins and routes registered explicitly).
-- `src/server.ts` opens the catalogue (`loadCatalogue`: the index and record files `npm run build` wrote into `dist/catalogue/`, else built from the data bundle) and starts listening. No database, no start-up wait.
-
-## Endpoints
-
-- Every route below is served under `API_PREFIX` (`/v1`, `src/version.ts`) except the liveness probe `GET /`. Paths below omit the prefix. `src/app.ts` registers the route plugins under it.
-- `buildOpenApi` (`src/openapi.ts`) reads the route's `config`:
-  - `body`, `query`: the zod schema of a request, every field with a `.describe()` text and its unit. A query number is parsed from its text and documented as the number.
-  - `response`: the zod schema of the 200 body. The read routes build theirs from the record schemas of `@open-reloading/schema`, the compute routes from `src/compute/*-response.ts` (loose objects: a field core adds does not break the document).
-  - `errors`: the error statuses of the route's own code.
-  - `summary`, `description`: what the route answers. `example`: a valid request body.
-  - Fastify JSON-schema parameters carry their `description` in the property schema.
-  - Tags by the first path segment: Records, Competition, Exterior, Interior.
-- `GET /v1/openapi.json`: the document. `GET /v1/reference/`: the Scalar viewer of it (`@scalar/fastify-api-reference`, its script from the package at `/v1/reference/js/scalar.js`). Both only when `buildApp` gets `openApi` (`src/server.ts`), so they are not part of the document.
-- `buildOpenApi` adds 400, 413, 414, 415 and 500 where Fastify answers them, every error with the shared `Error` body.
-- The document's `info.version` is `API_VERSION`, the version of this package (`package.json`, set by release-please), the one contract version.
-- `npm run api:check` at the root compares the document with `openapi.baseline.json` (oasdiff, `tools/AGENTS.md`). `npm run api:conformance` tests a running API against it (Schemathesis).
-- `GET /cartridges?q=&table=&limit=&offset=`: `{ total, items: [{ id, name, aliases, table, maxBulletDiameter?, boreDiameter?, grooveDiameter?, caseLength?, cartridgeLength?, pmax?, caseType?, country? }] }`.
-  - A cartridge is one C.I.P. sheet. `q` searches names and aliases. `table` is the C.I.P. table (`I` to `XI` in the records).
-  - `maxBulletDiameter` (mm): the smallest cartridge-side G1 of its sheet. `boreDiameter` and `grooveDiameter` (mm): the smallest chamber-side F and Z, each absent when none.
-  - `caseLength` and `cartridgeLength` (mm): the smallest cartridge-side L3 and L6 (the shortest variant). `pmax` (bar): the highest Pmax.
-  - `caseType` (`rimless`, `semi-rimmed`, `rimmed`, `rebated`, `belted`) from its cartridge R1, P1 and R3 (`caseType` in `src/catalogue/derive.ts`): an R3 is a belt, R1 more than 0.7 mm over P1 a rim, more than 0.3 mm a semi-rim, more than 0.25 mm under it a rebated rim. Absent without R1 and P1 (the table VII shotshells among them).
-  - `country`: the sheet's `country` text, as printed.
-- Every `/:id` record route below answers an id that `records/renames.json` replaces with 308 and the `Location` of the current record (`missing` in `src/routes/common.ts`), an unknown id with 404.
-- `GET /cartridges/:id`: the cartridge record (`id`, `name`, `aliases`, `table`, `country?`, `published`, `revised?`, `pressureMethod?`, `verification`, `exceptions?`, `values` in file order, `provenance`), its `caseType` (as in the list) and its case capacities. 404 when unknown.
-- `GET /manufacturers`: `{ total, items: [{ id, name, aliases?, website? }] }` ordered by name. `GET /manufacturers/:id`: the whole record (`apps/docs/docs/data/manufacturers.md`).
-- `GET /powders?q=&manufacturer=&limit=&offset=`, `GET /bullets?...&cartridge=`: summaries with `manufacturer` (the manufacturer id), ordered by manufacturer name and name.
-  - `q` ranks (see below) the manufacturer name or one of its aliases followed by the product name. `manufacturer` is an exact manufacturer id.
-  - `cartridge` (a cartridge id) keeps the bullets that fit its C.I.P. G1, F and Z by `bulletFits` of core (above the middle of F and Z, up to G1 plus 0.005 mm). None for an unknown cartridge or one without the three values (`bullets` in `src/catalogue/open.ts`).
-  - `ballisticCoefficientG1` and `ballisticCoefficientG7` of a bullet: the record's first coefficient of that drag model, null without one.
-  - Absent without a value: `country` (ISO code of the manufacturer's country) of a powder or bullet, the bullet's `tipType` (the record's tip type) and `construction` (the record's construction structure, else the core material as `<material>-core`).
-  - `GET /powders/:id`, `GET /bullets/:id`: the whole record.
-- `GET /primers?q=&manufacturer=&size=&compound=&limit=&offset=`: `{ total, items: [{ id, manufacturer, name, productNumber?, size, magnum?, compound? }] }` ordered by manufacturer name and name. `q` ranks the manufacturer name or alias followed by the product name or the product number. `size` and `compound` are exact. `GET /primers/:id`: the whole record (`apps/docs/docs/data/primers.md`).
-- `GET /cases?q=&manufacturer=&cartridge=&limit=&offset=`: `{ total, items: [{ id, manufacturer, cartridge, name, productNumber, material, waterCapacity?, mass? }] }` ordered by manufacturer name and name (`manufacturer` and `cartridge` are record ids, `waterCapacity` the stated figure and `mass` the empty case, g). `q` ranks the manufacturer name or alias followed by the product name or the product number. `GET /cases/:id`: the whole record (`apps/docs/docs/data/cases.md`) with its `origin` and `revision`.
-- `GET /target-faces`: `{ total, items: [{ id, federation?, organization?, name, caliberClasses, categories }] }`, every face. `caliberClasses`: the caliber classes of the disciplines mapped to it. `categories`: those of its events and those disciplines. `GET /target-faces/:id`: the whole record.
-- Order and search are the catalogue's (`apps/docs/docs/data/catalogue-storage.md`), so the order is part of the answer:
-  - The default order of cartridges, manufacturers, powders and bullets is the `sortKey` of `@open-reloading/schema` (case and accent folded, every digit run by value), ties by id.
-  - `q` keeps the rows that hold every word of it, in any order, also as written without spaces and hyphens, and ranks them by `score` of the schema package (a word starting a word of the name first); equal ranks keep the default order.
-  - The competition lists (`GET /federations`, `/disciplines`, `/target-faces`, `/target-mappings`) are sorted at build with the comparators of `@open-reloading/schema` (`src/competition-order.ts`).
-  - A record answers as stored: the catalogue's `kind`, `origin` and `revision` are not part of the body.
-- `GET /federations`, `GET /disciplines?federation=`, `GET /target-mappings?discipline=&face=`, `GET /caliber-classes` and their `/:id` routes (`src/routes/federations.ts`): summaries and records as `apps/docs/docs/data/federations.md` lists them. An unknown filter id gives no items.
-
-Compute (`src/routes/compute.ts`, each route's work in a run function of `src/compute/` that the browser entry exports):
-
-- `POST /exterior/trajectory`, `POST /exterior/truing`.
-- `POST /exterior/range-strings/plan` and `/fit` (core `comparePlanCandidates`, `fitTruingStrings`). Infinite numbers are `null` at the whitelisted paths in `src/compute/exterior-run.ts`, 422 at any other. A zero-offset prior without `fitZeroOffset` is 400.
-- `POST /interior` (`model` `m3`).
-- `POST /interior/load-file`: the workbench load file as body (one record of kind `load`, `Load` of the schema package, stored units), results as JSON (`src/compute/load-file.ts`, `src/compute/simulate.ts`). The field mapping is `interiorLoad` of core, shared with the workbench. `loadValues` gives the SI values: the powder record's `powderModelValues`, the bullet record's mass, the load's typed `analysis.overrides` and its `charge`; the bore area is the cartridge record's without an override. A value no record or override gives is not invented: every such value is listed in one 422 (`reason` `missingValues`, `missing`: `key`, `path` in the file as for a 400 issue, stored `quantity`; `missingLoadKeys` of core, `missingValuesAnswer` in `src/compute/load-file.ts`). It is answered after the checks of the file itself (format, unknown fields, one load, `user:` references, query: 400) and before the checks that need the values (a ladder step, the `/interior` body), a record lookup or the model, so a file with both a missing value and a bad ladder step answers 422 first. 400 issues carry the path in the file. A `cartridge` or `bullet` that is a `user:` reference is refused there (a design is resolved in the browser); a `catalogue:<id>` reference is read from the catalogue. The load's `capacity` reference (a catalogue or user capacity) gives no solver value here (the volume is a typed override) and is not resolved; `case.waterCapacity` of the earlier format is a 400 at its path. A record of the old kind `workbenchState` is a 400 at `records[i].kind`.
-- `GET /exterior/stability` (`muzzleVelocity` in the query).
-- A compute answer carries its result under `result`, except `POST /interior` with a `ladder` (each of `ladderSteps` has its `result`) and `POST /interior/load-file` (`summary`, `points`, `ladderSteps`).
-- Every 200 compute answer carries `inputHash`, `apiVersion` and `dataHash` (`describeAnswers`, `src/routes/identity.ts`, a `preSerialization` hook of the two compute route plugins; the fields' schema is `src/compute/identity.ts`). Errors carry none, and the browser entry (`@open-reloading/api/compute`) adds none.
-  - `inputHash`: SHA-256 (Web Crypto, `src/hash.ts`) of the canonical JSON (keys sorted at every depth, array order kept) of the request body as sent, defaults not filled in. A request without a body (`GET /exterior/stability`) hashes its query (the strings as sent); a request with both a body and a query (`POST /interior/load-file?curves=`) hashes `{ body, query }`.
-  - `apiVersion`: `API_VERSION`.
-  - `dataHash`: `Catalogue.dataHash()`, SHA-256 of the canonical JSON of every record and the renames. It reads the record file on the first compute answer and is kept for the life of the catalogue. The same records give the same value on every build.
-- Bodies are the `@open-reloading/core` arguments in SI, validated by the strict zod schemas in `src/compute/*-schema.ts` (400). `bullet` and `powder` ids are resolved in `src/compute/resolve.ts` and echoed under `resolved` with `suppliedFields`, the request values the record supplied.
-- 422: core `InputError` (and its subclass `TruingError`), unusable records and invalid interior results.
-- 503: a compute deadline (`reason` `timeout`), a full queue or a worker that cannot be created (`reason` `busy`).
-- 500: other errors.
-- Documented NaN result fields are written as `null`.
-- Interior 200 responses carry `pressureRange` and `warnings`; a warning has `code` (a rule of the advisory registry of core, `advisoryRules`), `severity`, `inputs`, `fix` and `message` (`warning` in `src/compute/limits.ts`, the input rules from `interiorAdvisories`); a single run with `sampling` also carries `sampled` (`apps/docs/docs/models/interior-sampled-band.md`; a ladder takes no sampling). A `limitExceeded` warning names its limit: the sheet id (`spec`), `symbol`, `variant` and `method`. A `ladder` (`chargeStep` kg, `stepCount`) answers `ladderSteps`. An optional `cartridge` id adds `limits` (the Pmax values of its sheet, `src/compute/limits.ts`): each carries `cartridge` (its id) and `revised` (the date of the sheet revision, `revised` or else `published`). `resolved.cartridge` is `{ id, name, provenance }`. An optional `maximumPressure` (Pa, `POST /interior` only) adds `maximumCheck` to each valid run: `class`, `dominantInput` and a message about the range only (`maximumCheck` in `src/compute/limits.ts`, core `placeMaximum`).
-- Interior responses with status 200, 422, 503 or a schema 400 carry `notice: "simulation, not load data"`.
-
-`POST /interior/charge-target` (`src/routes/charge-target.ts`, the run in `src/compute/charge-run.ts`, `src/compute/charge-schema.ts`):
-
-- The charge at which an M3 run reaches a target (peak pressure in Pa or as a percentage of the compared CIP limit, muzzle velocity, load ratio, barrel time, bullet lead time). Core `solveCharge` as the compute task `chargeSolve`.
-- The body takes the bulk density in `load.propellant.bulkDensity`.
-- 200 carries the charge, `achievedValue`, `relativeTolerance`, `evaluationCount`, its run, the range and the warnings of `POST /interior`.
-- 422: a target outside the reachable values, with `reason` and `reachable` (`minValue` and `maxValue`, each with its charge). `noValidRun` carries the `failure` of the first scanned run.
-- `options.maxSteps` is capped at `caps.chargeSteps` (the solver runs up to 152 times in one task).
-- Every answer carries the notice.
+Fastify HTTP API exposing `@open-reloading/core` and the data records from the in-process catalogue (`src/catalogue/`, design in `apps/docs/docs/data/catalogue-storage.md`). `src/app.ts` builds the app, `src/server.ts` opens the catalogue and listens. The routes and their bodies are documented in the OpenAPI document (`GET /v1/openapi.json`, viewer at `/v1/reference/`).
 
 ## Commands (this directory, or `-w @open-reloading/api` from the root)
 
-- Build: `npm run build` (output `dist/`, with `dist/catalogue/index.json` and `records.json`)
-- Dev server: `npm run dev` (Node runs `src/server.ts` directly, restarts on change)
-- Start: `npm start` (`HOST`, `PORT`, default `0.0.0.0:3000`; needs the build's catalogue files, else builds the catalogue from the data bundle)
-- Test: `npm test` (Vitest, `app.inject` over a catalogue built from synthetic records, no server needed)
-- Single test: `npx vitest run <file> -t "<name>"`
+- Build: `npm run build` (`dist/`, with the catalogue files in `dist/catalogue/`)
+- Dev server: `npm run dev`. Start: `npm start` (`HOST`, `PORT`, default `0.0.0.0:3000`).
+- Test: `npm test` (Vitest, `app.inject` over a catalogue of synthetic records). Single test: `npx vitest run <file> -t "<name>"`
 - Type check: `npm run typecheck`
+- Contract: `npm run api:check` and `npm run api:conformance` at the root (`tools/AGENTS.md`). A breaking change rewrites `openapi.baseline.json` in the same pull request.
+- Image: `docker build -f packages/api/Dockerfile .` (context is the repository root).
 
-## Facts
+## Rules
 
-- Relative imports end in `.ts`. `tsc` rewrites them to `.js`. Only erasable TypeScript syntax (no enums, no namespaces), because Node strips types without compiling.
-- Errors (`src/app.ts`): a 4xx answer keeps its message. Any other error answers 500 `{ statusCode, error, message: 'internal server error', requestId }`, without the error's text. The error goes to the server log under that `reqId`.
+- Every route is under `API_PREFIX` (`/v1`, `src/version.ts`) except the liveness probe `GET /`. `info.version` is `API_VERSION`, this package's version.
+- `buildOpenApi` (`src/openapi.ts`) builds the document from each route's `config`: `body` and `query` (zod, every field with a `.describe()` text and its unit), `response` (the zod schema of the 200 body), `errors` (the route's own error statuses), `summary`, `description`, `example`. A new route sets all of them.
+- Errors: a 4xx answer keeps its message. Any other error answers 500 with `message: 'internal server error'` and the `requestId`, never the error's text. Core `InputError` (and subclasses) is 422, a compute deadline or full queue 503.
+- Read endpoints leave out null fields (absent means unknown). Compute responses keep the core result shape, where `null` means "not defined".
+- An id `records/renames.json` replaces answers 308 to the current record.
+- Every 200 compute answer carries `inputHash`, `apiVersion` and `dataHash` (`src/routes/identity.ts`). Interior answers carry `notice: "simulation, not load data"`; never a statement that a load is safe.
+- Compute bodies are core arguments in SI, validated by the strict zod schemas in `src/compute/`. The step and count caps in `src/compute/schemas.ts` bound the work of a request.
+- Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`) with a 5 s deadline per task; tests that mock core pass `buildApp({ catalogue, compute: inlineRunner })`.
 - Edit records in `packages/data`, never in the catalogue files.
-- Read endpoints leave out null fields, as records do (absent means unknown). Compute responses keep the core result shape, where `null` means "not defined".
-- Trajectory, truing and interior run on a `node:worker_threads` pool (`src/compute/pool.ts`, tasks in `src/compute/tasks.ts`, entry `src/compute/worker.ts`) with a 5 s deadline per task from submit. The worker of a task past its deadline is terminated. Stability runs on the main thread. Errors cross the thread boundary as plain objects and are rebuilt into `TruingError`, `InputError` or `Error`. Tests that mock core pass `buildApp({ catalogue, compute: inlineRunner })`.
-- The step and count caps in `src/compute/schemas.ts` (per integration, for truing also the iteration cap and the step total over all its trajectories) bound the work of a request. An interior run is at most 13 model runs with its range. A ladder runs that per step, up to 21 steps, in batches of 4 within 14 s and at most 100000 output points: no batch starts once the steps run so far are above it (`compute/interior-run.ts`).
-- `@open-reloading/api/compute` (`src/compute/browser.ts`): `operations` (`src/compute/operations.ts`: name, summary, description, body and response schemas, example and run of each compute `POST` route; the routes and the command line read it), `jsonSchema`, `runInterior`, `runChargeTarget`, the exterior run functions of `src/compute/exterior-run.ts` (record lookups passed in), `simulate` (the load file route, over a catalogue), the body and query schemas, `errorAnswer` and the task runner without Fastify, the database or Node APIs. The web app runs it in the browser. At run time it imports only core, schema and zod (`test/compute-imports.test.ts`).
-- `@open-reloading/api/static` (`src/static.ts`, build time only): `startBundleApi` (this API over the catalogue of the bundle, compute in its thread) and `writeStaticApi` (the static site's data files: `catalogue/index.json` and one file per record, the body of the API's record route). Parity of the browser's answers and the API's: `apps/web/test/static-api.test.ts`.
-- `@open-reloading/api/catalogue` (`src/catalogue/browser.ts`): the in-process catalogue (`buildCatalogue`, `openCatalogue`, the `Catalogue` interface) without Node APIs, imports core and schema only (`test/compute-imports.test.ts`). `src/catalogue/node.ts` reads and writes its index and record file, which `npm run build` writes into `dist/catalogue/` (`write.ts`). The routes and the compute lookups read it. Design: `apps/docs/docs/data/catalogue-storage.md`.
-- Dockerfile build context is the repository root: `docker build -f packages/api/Dockerfile .`
+
+## Entries
+
+- `@open-reloading/api/compute` (`src/compute/browser.ts`): `operations` (each compute `POST` route's schemas, example and run; the routes and the command line read it) and the run functions, without Fastify or Node APIs. The web app runs it in the browser.
+- `@open-reloading/api/catalogue` (`src/catalogue/browser.ts`): the catalogue without Node APIs.
+- Both import only core, schema and zod at run time (`test/compute-imports.test.ts`).
+- `@open-reloading/api/static` (`src/static.ts`, build time only): `startBundleApi` and `writeStaticApi` (the static site's data files). `apps/web/test/static-api.test.ts` checks that the browser answers equal the API's.
