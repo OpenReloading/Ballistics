@@ -408,6 +408,7 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 - The holes set the scale only when they stand on the black area and show lighter than it.
 - The target search does not read the ring numerals: on a photo of an insert card the targets whose inner rings stand in the same ratios are offered for the user to choose.
 - The photo scale comes from the sheet's calibration near the middle of the region. Perspective across the region is not corrected per hole.
+- On the printed zero target (Shot groups, Zero target) a run finds one polarity: the light holes in the black square need a region about the square, the dark holes on the paper a second run. The dark run over the whole sheet proposes the four corners of the black square and two spots inside it as holes (6 proposals on a synthetic render with five holes near the centre); the corner marks, the digits, the cross and the check bar give none.
 - Research log: [blob detector against an area-count detector](../research/hole-detection-blob-detector.md), [target centre on a tilted photo](../research/hole-detection-target-centre.md), [rings needed to apply a target](../research/hole-detection-ring-match-count.md).
 
 ## Sources

@@ -15,7 +15,7 @@ import {
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
-import { type Lot, lotLabel } from '../lib/lot-rows.ts'
+import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
 import { type RunnableLadderKind, seatingLengthName } from '../lib/seating-ladder.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -23,21 +23,16 @@ import { niceTicks } from '../lib/ticks.ts'
 import {
   formatQuantity,
   inchText,
+  lengthText,
   msText,
   percentText,
   psi,
+  shownLength,
   type UnitSystem,
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import {
-  bandLine,
-  bandNotice,
-  firstPressureLimit,
-  lengthText,
-  resultBand,
-  shownLength,
-} from '../lib/workbench.ts'
+import { bandLine, bandNotice, firstPressureLimit, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -975,7 +970,7 @@ function LadderRow({
       )}
       {lot && (
         <td data-label={t('Burn rate')} className="num">
-          {which ? lotLabel(which, lot.fraction) : t('nominal')}
+          {burnRateLabel(which, lot.fraction, t)}
         </td>
       )}
       <td data-label={t('Flags')}>

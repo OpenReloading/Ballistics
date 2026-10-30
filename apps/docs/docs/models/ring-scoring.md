@@ -182,3 +182,4 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 - [BDS 2025](../bibliography.md#bds-2025): targets Z1 to Z21 and Anhang 1, no scoring rule stated.
 - [Eberly 2013](../bibliography.md#eberly-2013): distance from a point to an ellipse, closest-point condition and its bisection.
 - [Kasa 1976](../bibliography.md#kasa-1976): algebraic circle fit, pp. 8 to 14.
+- Research log: [ring scoring against the rule books](../research/ring-scoring-rule-book-faces.md).

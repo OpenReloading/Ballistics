@@ -40,6 +40,14 @@ export function median1(v: readonly number[]): number {
       : (nth(s, s.length / 2 - 1) + nth(s, s.length / 2)) / 2
     : 0
 }
+
+/** The upper middle value of `v`, which it sorts in place; throws for an empty `v`. */
+export const upperMedian = (v: number[]) =>
+  nth(
+    v.sort((a, b) => a - b),
+    v.length >> 1,
+  )
+
 type Pick = (a: number, b: number) => number
 
 /** The running extreme from the start of each block of `size` pixels in `g`, to its end in `f`. */

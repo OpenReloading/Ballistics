@@ -36,6 +36,43 @@ function stepName(step: RangeStep, system: UnitSystem, t: Translator['t']) {
   return `${text} (${step.offset > 0 ? '+' : '−'}${plainNumber(Math.abs(step.offset))})`
 }
 
+/** The offer to add the session's rounds to the firearm's count: the button names the number it adds. */
+function RoundCount({ r }: { r: ReturnType<typeof useRangeMode> }) {
+  const { t, tn } = useTranslation()
+  const offer = r.roundOffer
+  if (!offer) return null
+  const n = r.roundsTyped
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        void r.addRounds()
+      }}
+    >
+      <Group align="flex-end" wrap="nowrap">
+        <TextInput
+          label={t('Rounds fired')}
+          description={t('With fouling shots, sighters and missed readings.')}
+          size="lg"
+          inputMode="numeric"
+          w="8rem"
+          value={r.rounds}
+          onChange={(e) => r.setRounds(e.currentTarget.value)}
+          error={n === undefined && t('Enter a whole number of rounds, 1 or more.')}
+        />
+        <Button type="submit" variant="default" mih={target} disabled={r.saving || n === undefined}>
+          {tn(
+            n ?? offer.shots,
+            'Add {count} shot to the round count of {name}',
+            'Add {count} shots to the round count of {name}',
+            { name: offer.name },
+          )}
+        </Button>
+      </Group>
+    </form>
+  )
+}
+
 export function RangeMode() {
   const { t } = useTranslation()
   const r = useRangeMode()
@@ -274,6 +311,7 @@ export function RangeMode() {
             >
               {t('Shot groups for a target photo')}
             </Button>
+            <RoundCount r={r} />
             <Button component={Link} href="/session" variant="default" mih={target}>
               {t('Session summary')}
             </Button>

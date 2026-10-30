@@ -236,3 +236,4 @@ The intervals are flagged as not to be relied on (`intervalsTrusted` false) when
 - [Widrow 2008](../bibliography.md#widrow-2008): the variance $w^2/12$ of a uniform rounding error.
 - [Abramowitz 1964](../bibliography.md#abramowitz-1964), 26.7.3 and 26.7.4 (page unverified): Student's t distribution for whole degrees of freedom.
 - [Bishop 2006](../bibliography.md#bishop-2006), section 4.4 (section number unverified): the Laplace approximation of a posterior with a Gaussian prior.
+- Research log: [fit on synthetic strings](../research/exterior-truing-strings-coverage.md).

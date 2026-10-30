@@ -14,6 +14,7 @@ import type { RgbaImage } from '../src/lib/image.ts'
 import type { Point } from '../src/lib/target-geometry.ts'
 import { paperOutline } from '../src/lib/target-paper.ts'
 import { defined } from './defined.ts'
+import { sheetInk, sheetSvg } from './zero-target-render.ts'
 
 const detectHoles = (input: HoleDetectionInput): HoleProposal[] => findHoles(input).proposals
 
@@ -651,5 +652,41 @@ describe('workBlockSize', () => {
 
   it('refuses a region too large for its holes instead of working on too few px per hole', () => {
     expect(() => workBlockSize(5, 20000, 20000)).toThrow(RangeError)
+  })
+})
+
+describe('the printed zero target', () => {
+  it('finds five holes on the sheet: two in the black square, one on a grid line, two on paper', () => {
+    const s = new Scene(210 * pxPerMm, 297 * pxPerMm)
+    const ink = sheetInk(sheetSvg({ rifle: 'Rifle 1', distance: '100', group: 'Group 1' }))
+    for (let y = 0; y < s.height; y++)
+      for (let x = 0; x < s.width; x++) s.lum[y * s.width + x] = ink(x / pxPerMm, y / pxPerMm)
+    // sheet mm right and up of the centre to photo px
+    const at = (x: number, y: number) => ({ x: (105 + x) * pxPerMm, y: (148.5 - y) * pxPerMm })
+    const inSquare = [at(-6, 5), at(5, -6)]
+    const onPaper = [at(30, 10), at(-25, 18), at(20, -30)]
+    for (const t of inSquare) s.hole(t, 140)
+    for (const t of onPaper) s.hole(t, 60)
+    const truth = [...inSquare, ...onPaper]
+    const image = s.image()
+    // a run finds one polarity: the light holes in a region about the black square, then the dark
+    // ones on the whole sheet
+    const square = { x: at(-20, 0).x, y: at(0, 20).y, width: 40 * pxPerMm, height: 40 * pxPerMm }
+    const options = { image, pxPerM, expectedHoleDiameter: bullet }
+    const found = [
+      ...detectHoles({ ...options, region: square, polarity: 'light' }),
+      ...detectHoles({ ...options, region: all(s), polarity: 'dark' }),
+    ]
+    const near = (p: Point) => truth.some((t) => Math.hypot(p.x - t.x, p.y - t.y) < 0.5 * D)
+    for (const t of truth)
+      expect(found.some((p) => Math.hypot(p.x - t.x, p.y - t.y) < 0.2 * D)).toBe(true)
+    // proposals on the print: the dark run takes the square's corners and two spots inside it for
+    // holes (Limits of the hole detection model page); none on the marks, digits, cross or bar
+    const print = found.filter((p) => !near(p))
+    expect(print).toHaveLength(6)
+    for (const p of print) {
+      expect(Math.abs(p.x / pxPerMm - 105)).toBeLessThan(13)
+      expect(Math.abs(p.y / pxPerMm - 148.5)).toBeLessThan(13)
+    }
   })
 })

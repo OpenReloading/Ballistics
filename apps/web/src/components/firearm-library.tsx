@@ -20,6 +20,7 @@ import {
   type UserRecord,
 } from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
+import Link from 'next/link'
 import {
   type ReactNode,
   useCallback,
@@ -33,6 +34,13 @@ import { useTranslation } from '../i18n/language.ts'
 import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
+import {
+  type ClassMembers,
+  classDisciplinesHref,
+  classOfCartridge,
+  fetchClassMembers,
+} from '../lib/caliber-class-of.ts'
+import { dayText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample } from '../lib/example-data.ts'
 import {
@@ -41,11 +49,14 @@ import {
   catalogueCartridgeId,
   firearmCells,
   firearmIssues,
+  firearmPatch,
   firearmProblem,
   schemaMessage,
 } from '../lib/firearm.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchesQuery, matchingText, widestCount } from '../lib/lists.ts'
+import { gapNotes, loadGaps } from '../lib/load-gaps.ts'
+import { type FirearmUse, loadUse } from '../lib/load-use.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { copyName } from '../lib/user-file-names.ts'
@@ -61,6 +72,7 @@ import {
 import { FileMenu, type FileMenuHandle } from './file-menu.tsx'
 import { DataCard } from './firearm-data-card.tsx'
 import { FirearmEditor } from './firearm-editor.tsx'
+import type { FirearmRangeCards, LoadRangeCard } from './firearm-range-cards.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
@@ -114,12 +126,16 @@ function firearmColumns(
   system: UnitSystem,
   cartridgeName: (ref: string | undefined) => string | undefined,
   cells: (r: FirearmRecord) => Cells,
+  usageOf: (r: FirearmRecord) => FirearmUse,
+  notesOf: (r: FirearmRecord) => string[],
   actionsMenu: (r: FirearmRecord, tabIndex?: number) => ReactNode,
 ): DirectoryColumn<FirearmRecord>[] {
   return [
     {
       key: 'name',
       label: msg('Name'),
+      // every column has a width: the table scrolls sideways before the name is squeezed
+      width: '12rem',
       value: nameOf,
       cell: (r) =>
         r === example ? (
@@ -193,6 +209,34 @@ function firearmColumns(
       cell: (r) => cells(r).configuration,
     },
     {
+      key: 'loads',
+      label: msg('Loads'),
+      help: msg('Saved loads with this firearm.'),
+      num: true,
+      width: '5rem',
+      value: (r) => usageOf(r).loads,
+      cell: (r) => usageOf(r).loads,
+    },
+    {
+      key: 'lastSession',
+      label: msg('Last session'),
+      help: msg('The latest dated chronograph session of those loads.'),
+      width: '8rem',
+      value: (r) => usageOf(r).last,
+      cell: (r) => {
+        const last = usageOf(r).last
+        return last ? dayText(last) : ''
+      },
+    },
+    {
+      key: 'notes',
+      label: msg('Notes'),
+      help: msg('Saved loads of another cartridge, or no saved load.'),
+      width: '12rem',
+      value: (r) => notesOf(r).join(' ') || undefined,
+      cell: (r) => notesOf(r).join(' '),
+    },
+    {
       key: 'actions',
       label: msg('Actions'),
       width: '3rem',
@@ -202,19 +246,30 @@ function firearmColumns(
   ]
 }
 
-/** Open, Duplicate and Delete of a stored firearm, Duplicate only for the example. */
+/**
+ * Open, Duplicate, Delete and, with saved loads, Print range cards of a stored firearm, Duplicate
+ * only for the example; the disciplines that name the caliber class of its cartridge where the
+ * cartridge is in one.
+ */
 function RowActions({
   record: r,
   tabIndex,
+  caliberClass,
   onOpen,
   onDuplicate,
   onDelete,
+  loads,
+  onPrintCards,
 }: {
   record: FirearmRecord
   tabIndex?: number | undefined
+  caliberClass: ClassMembers | undefined
   onOpen: () => void
   onDuplicate: () => void
   onDelete: () => void
+  /** The saved loads of the firearm: none, no Print range cards. */
+  loads: number
+  onPrintCards: () => void
 }) {
   const { t } = useTranslation()
   const stored = r !== example
@@ -234,6 +289,14 @@ function RowActions({
       <Menu.Dropdown>
         {stored && <Menu.Item onClick={onOpen}>{t('Open')}</Menu.Item>}
         <Menu.Item onClick={onDuplicate}>{t('Duplicate')}</Menu.Item>
+        {caliberClass && (
+          <Menu.Item component={Link} href={classDisciplinesHref(caliberClass.id)}>
+            {t('Disciplines listing {class}', { class: caliberClass.name })}
+          </Menu.Item>
+        )}
+        {stored && loads > 0 && (
+          <Menu.Item onClick={onPrintCards}>{t('Print range cards')}</Menu.Item>
+        )}
         {stored && (
           <Menu.Item color="red" onClick={onDelete}>
             {t('Delete')}
@@ -346,17 +409,39 @@ const cardsOf = (
   card: (r: FirearmRecord, stored: boolean) => ReactNode,
 ) => [exampleShown && card(exampleShown, false), ...(shown ?? []).map((r) => card(r, true))]
 
+/**
+ * Print range cards of a firearm: the cards of its loads are computed in a chunk of their own, then
+ * rendered and printed until the dialog closes.
+ */
+function useRangeCards(system: UnitSystem, setFailure: (message: string) => void) {
+  const [shown, setShown] = useState<{ View: typeof FirearmRangeCards; cards: LoadRangeCard[] }>()
+  const printCards = (r: FirearmRecord) =>
+    void import('./firearm-range-cards.tsx')
+      .then(async (m) =>
+        setShown({ View: m.FirearmRangeCards, cards: await m.firearmCards(r.id, system) }),
+      )
+      .catch((e) => setFailure(errorText(e)))
+  const rangeCards = shown && (
+    <shown.View cards={shown.cards} system={system} onDone={() => setShown(undefined)} />
+  )
+  return { printCards, rangeCards }
+}
+
 /** Reads the stored firearms, sorted by name; `read` is this read's number, an older answer arriving later is dropped. */
 function readFirearms(
   read: number,
   reads: { current: number },
   setList: (list: FirearmRecord[]) => void,
+  setUses: (uses: Map<string, FirearmUse>) => void,
+  setGaps: (gaps: ReturnType<typeof loadGaps>) => void,
   setReadError: (message: string) => void,
 ) {
   setReadError('')
   storedRecords()
     .then(({ records }) => {
       if (read !== reads.current) return
+      setUses(loadUse(records).firearms)
+      setGaps(loadGaps(records))
       setList(
         records
           .filter((r): r is FirearmRecord => r.kind === 'firearm')
@@ -409,9 +494,13 @@ const nameOfBullet = (
   return parsed ? (names[parsed.id] ?? parsed.id) : ref
 }
 
-const nameOfCartridge = (names: Record<string, string>, ref: string | undefined) => {
+const nameOfCartridge = (
+  names: Record<string, string>,
+  designs: ReadonlyMap<string, string>,
+  ref: string | undefined,
+) => {
   const id = catalogueCartridgeId(ref)
-  return id === undefined ? ref : (names[id] ?? id)
+  return id === undefined ? ((ref && designs.get(ref)) ?? ref) : (names[id] ?? id)
 }
 
 /** The data cards that print: the open firearm's, or the example's. */
@@ -502,10 +591,13 @@ function ExampleView({
  */
 export function FirearmLibrary() {
   const tr = useTranslation()
-  const { t } = tr
+  const { t, tn } = tr
   const { system } = useUnits()
   const [data, setData] = useState<Firearm>(blankFirearm)
   const [list, setList] = useState<FirearmRecord[]>()
+  /** The saved loads that name each firearm, by firearm id. */
+  const [uses, setUses] = useState(new Map<string, FirearmUse>())
+  const [gaps, setGaps] = useState(() => loadGaps([]))
   const [failure, setFailure] = useState('')
   /** Why the firearm that `?record=` names could not be opened. */
   const [linkFailure, setLinkFailure] = useState<Message>()
@@ -528,7 +620,7 @@ export function FirearmLibrary() {
   /** The latest read: an older answer that arrives later is dropped. */
   const reads = useRef(0)
   const refresh = useCallback(() => {
-    readFirearms(++reads.current, reads, setList, setReadError)
+    readFirearms(++reads.current, reads, setList, setUses, setGaps, setReadError)
   }, [])
   useEffect(refresh, [refresh])
 
@@ -550,17 +642,25 @@ export function FirearmLibrary() {
     data.cartridge,
     example.data.cartridge,
     ...(list ?? []).map((r) => r.data.cartridge),
+    ...[...gaps.mismatches.values()].flat().map((m) => m.cartridge),
   ]
     .map(catalogueCartridgeId)
     .filter((c): c is string => !!c)
     .join('\n')
   /** Cartridge names by record id: chosen in the search or read from the API. */
   const [cartridgeNames, setCartridgeNames] = useRecordNames('cartridges', cartridgeIds)
+  /** The caliber classes with their members, for the link to the disciplines of a row's class. */
+  const [classes, setClasses] = useState<ClassMembers[]>([])
+  useEffect(() => {
+    // unreachable: the rows show no link
+    fetchClassMembers().then(setClasses, () => {})
+  }, [])
   /** Bullet names by record id, for the bullet of the lands contact. */
   const [bulletNames, setBulletNames] = useRecordNames('bullets', catalogueBulletId(data))
   const bulletName = (ref: string | undefined) => nameOfBullet(t, bulletNames, ref)
   /** The name of the cartridge a reference names, else the reference as stored. */
-  const cartridgeName = (ref: string | undefined) => nameOfCartridge(cartridgeNames, ref)
+  const cartridgeName = (ref: string | undefined) =>
+    nameOfCartridge(cartridgeNames, gaps.designs, ref)
 
   // the File menu renders after an edit, from the deferred data
   const fileData = useDeferredValue(data)
@@ -573,7 +673,7 @@ export function FirearmLibrary() {
       t,
     ) || undefined
 
-  const patch = (p: Partial<Firearm>) => setData((d) => ({ ...d, ...p }))
+  const patch = (p: Partial<Firearm>) => setData((d) => firearmPatch(d, p))
   const setOptic = (i: number, p: Partial<Optic>) =>
     setData((d) => ({ ...d, optics: d.optics.map((o, j) => (j === i ? { ...o, ...p } : o)) }))
   const setConfig = (i: number, p: Partial<OpticConfiguration>) =>
@@ -651,13 +751,17 @@ export function FirearmLibrary() {
   const { shown, exampleShown, rows } = matching(list, matches)
   const named = namedFilters(t, filters.query)
   const duplicate = (r: FirearmRecord) => start({ ...r.data, name: copyName(r.data.name) })
+  const { printCards, rangeCards } = useRangeCards(system, setFailure)
   const actionsMenu = (r: FirearmRecord, tabIndex?: number) => (
     <RowActions
       record={r}
       tabIndex={tabIndex}
+      caliberClass={classOfCartridge(classes, catalogueCartridgeId(r.data.cartridge))}
       onOpen={() => menu.current?.open(r)}
       onDuplicate={() => duplicate(r)}
       onDelete={() => remove(r)}
+      loads={usageOf(r).loads}
+      onPrintCards={() => printCards(r)}
     />
   )
   const total = (list?.length ?? 0) + 1
@@ -668,7 +772,21 @@ export function FirearmLibrary() {
     cellCache.set(r, c)
     return c
   }
-  const columns = firearmColumns(t, system, cartridgeName, cells, actionsMenu)
+  const usageOf = (r: FirearmRecord) => uses.get(r.id) ?? { loads: 0 }
+  const notesOf = (r: FirearmRecord) => gapNotes(r, gaps, cartridgeName, t)
+  const columns = firearmColumns(t, system, cartridgeName, cells, usageOf, notesOf, actionsMenu)
+  /** The phone row's line: the record's facts, its loads, last session day and notes. */
+  const facts = (r: FirearmRecord) => {
+    const { loads, last } = usageOf(r)
+    return [
+      ...lines(r),
+      tn(loads, '{count} load', '{count} loads'),
+      last && dayText(last),
+      ...notesOf(r),
+    ]
+      .filter(Boolean)
+      .join(' · ')
+  }
   const card = (r: FirearmRecord, stored: boolean) => (
     <FirearmCard
       key={r.id}
@@ -708,12 +826,25 @@ export function FirearmLibrary() {
               onOpen={onOpen}
               onStored={refresh}
             />
+            <Button
+              variant="default"
+              disabled={!list?.length}
+              onClick={() =>
+                list &&
+                void import('../lib/records-csv.ts')
+                  .then((m) => m.saveFirearmsCsv(list, uses, cartridgeName))
+                  .catch((e) => setFailure(errorText(e)))
+              }
+            >
+              {t('Export CSV')}
+            </Button>
             <UnitsIconButton />
             <PrintButton disabled={!editing && !viewing} />
           </>
         }
       />
       <LibraryTabs />
+      {rangeCards}
       <div className="library" data-editing={compact || undefined}>
         <section aria-labelledby="library-list" className={compact ? 'library-list' : 'directory'}>
           <Title order={2} id="library-list" className="visually-hidden">
@@ -745,7 +876,7 @@ export function FirearmLibrary() {
                 link="name"
                 href={rowHref}
                 onOpen={(r) => (r === example ? view() : menu.current?.open(r))}
-                facts={(r) => lines(r).filter(Boolean).join(' · ')}
+                facts={facts}
                 label={nameOf}
                 caption={tableCaption(t, named)}
                 noun="firearms"

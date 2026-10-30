@@ -20,6 +20,7 @@ import {
 } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { Printer } from '@phosphor-icons/react'
+import dynamic from 'next/dynamic'
 import {
   type ReactNode,
   type Ref,
@@ -73,9 +74,14 @@ import { RecordSearch } from './record-search.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { SourceTitles } from './sources.tsx'
 import { ErrorNote, Loading } from './states.tsx'
-import { type TruingNominal, TruingSession } from './truing-session.tsx'
+import type { TruingNominal } from './truing-session.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
+
+const TruingSession = dynamic(() => import('./truing-session.tsx').then((m) => m.TruingSession), {
+  ssr: false,
+  loading: () => <Loading what="the truing" inline />,
+})
 
 const allFields = [...shotFields, ...manualBulletFields]
 /** The range fields with a default: zero range, largest range, range step. */

@@ -3,5 +3,5 @@ export const deleteUserDb = () =>
   new Promise<void>((resolve, reject) => {
     const r = indexedDB.deleteDatabase('openreloading-user-data')
     r.onsuccess = () => resolve()
-    r.onerror = () => reject(r.error)
+    r.onerror = () => reject(r.error ?? new Error('IndexedDB request failed'))
   })

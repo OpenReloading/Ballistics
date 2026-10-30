@@ -35,8 +35,7 @@ import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
 import { userBulletRows, userRecordId } from '../lib/sources.ts'
-import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
-import { mmLength, shownLength } from '../lib/workbench.ts'
+import { formatQuantity, mmLength, shownLength, type UnitSystem, withUnit } from '../lib/units.ts'
 import { BarrelTable } from './barrel-length.tsx'
 import type { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
@@ -1085,6 +1084,7 @@ export function Workbench() {
   const bulletDiameter = bullet && toSi('length', bullet.diameter.value)
   // the File menu's id: set by Save and Open, which re-render the page
   const fileId = fileMenu.current?.id()
+  const ownFirearm = firearms.some((f) => f.id === firearm) ? firearm : undefined
   const result = useMemo<ResultState>(
     () => ({
       ok,
@@ -1122,6 +1122,7 @@ export function Workbench() {
       manufacturerName,
       loadNotes,
       sessionRefCount,
+      ownFirearm,
       handOffTune,
       barrel,
       lot,
@@ -1167,6 +1168,7 @@ export function Workbench() {
       manufacturerName,
       loadNotes,
       sessionRefCount,
+      ownFirearm,
       handOffTune,
       barrel,
       lot,
@@ -1398,6 +1400,7 @@ export function Workbench() {
               onRenamed={tabs.renamed}
               onStored={stored}
               reminder={reminder.text}
+              system={system}
             />
             {TargetDialog && (
               <TargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />

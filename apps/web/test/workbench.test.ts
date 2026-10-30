@@ -6,18 +6,16 @@ import { setShownLanguage } from '../src/i18n/shown.ts'
 import { type Catalogue, english, type Translator, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
-import { presetUnits } from '../src/lib/units.ts'
+import { mmLength, presetUnits, shownLength } from '../src/lib/units.ts'
 import {
   bandLine,
   bandNotice,
   bulletLeadTime,
-  mmLength,
   percentOfPressureLimit,
   rangeCardNote,
   rangeHero,
   resultBand,
   resultTabsFit,
-  shownLength,
   shownWarnings,
   solidFillWarning,
   statusText,

@@ -151,6 +151,7 @@ import { ExportMenu, StatsBlock, type StillCanvas, type ViewRef } from './target
 import { NotesLayer, NotesPanel } from './target-notes.tsx'
 import { type LoadSummary, printTargetSheet, TargetPrint } from './target-print.tsx'
 import { useUnits } from './units-settings.tsx'
+import type { ZeroTargetMenu } from './zero-target.tsx'
 
 type Photo = { url: string; width: number; height: number }
 type RefKind = CalibrationReference['kind']
@@ -2417,8 +2418,11 @@ function SheetPageBar({ ed }: { ed: Ed }) {
     storeFromMenu,
     exportMenu,
     printSheet,
+    sheet,
+    group,
   } = ed
   const { t } = useTranslation()
+  const [Zero, setZero] = useState<typeof ZeroTargetMenu>()
   if (heading === undefined) return null
   return (
     <PageBar
@@ -2446,6 +2450,19 @@ function SheetPageBar({ ed }: { ed: Ed }) {
             <FileMenuPlaceholder />
           )}
           {exportMenu}
+          {Zero ? (
+            <Zero sheet={sheet} group={group} />
+          ) : (
+            <Button
+              variant="default"
+              // a plain import() on first use: next/dynamic would count it in the route's weight
+              onClick={() =>
+                import('./zero-target.tsx').then((m) => setZero(() => m.ZeroTargetMenu))
+              }
+            >
+              {t('Zero target')}
+            </Button>
+          )}
           <PrintButton
             onClick={printSheet}
             hint={t(

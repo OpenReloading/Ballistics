@@ -54,7 +54,8 @@ const chamber: Side[] = ['chamber']
 
 /**
  * The CIP symbols the outline reads (`cipProfile` of `@open-reloading/drawing/cartridge`), outside
- * table VII: meaning, sides, group and the end of the slider range in mm or degrees.
+ * table VII: meaning, sides, group and a typical largest value in mm or degrees, which sets the
+ * length limit (2.5 times it, 50 mm for a diameter) and is not read for an angle.
  */
 const symbols: [string, string, Side[], Group, number, 'length' | 'angle'][] = [
   ['R1', 'rim diameter at the head', both, 'head', 35, 'length'],
@@ -111,14 +112,12 @@ export interface CartridgeFieldSpec extends FieldSpec {
   symbol: string
   meaning: string
   group: Group
-  /** End of the slider range, SI. */
-  range: number
   /** Largest length accepted, SI: the layout time grows with the size of the drawing. */
   limit?: number
 }
 
 export const fieldSpecs: CartridgeFieldSpec[] = symbols.flatMap(
-  ([symbol, meaning, sides, group, range, q]) =>
+  ([symbol, meaning, sides, group, size, q]) =>
     sides.map((side) => ({
       key: `${side}.${symbol}`,
       label: `${sideName[side]} ${symbol}`,
@@ -126,12 +125,11 @@ export const fieldSpecs: CartridgeFieldSpec[] = symbols.flatMap(
       min: 0,
       ...(q === 'angle'
         ? { max: 180 }
-        : { limit: range === 35 ? 50e-3 : storedToSi(q, 2.5 * range) }),
+        : { limit: size === 35 ? 50e-3 : storedToSi(q, 2.5 * size) }),
       side,
       symbol,
       meaning,
       group,
-      range: storedToSi(q, range),
     })),
 )
 
@@ -721,10 +719,6 @@ function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derive
   const volume = approximateCaseVolume(figure, values, t)
   return [...derivedAngles(figure, values, t), ...(volume ? [volume] : [])]
 }
-
-/** Slider range of a field, SI: fixed per symbol, widened by a larger value. */
-export const sliderMax = (s: CartridgeFieldSpec, design: Design) =>
-  Math.max(s.range, design.fields[s.key]?.si ?? 0)
 
 /**
  * What a saved cartridge design gives the workbench: the spec its preview draws and seats in, the

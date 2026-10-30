@@ -109,16 +109,14 @@ it('tabulates a built route in no group, for the budget it needs', () => {
   expect(rows[2]).toBe('| none | `/new` | 1.0 kB | new | 2.0 kB | new | none |')
 })
 
-it('keeps every group budget at its largest recorded weight plus 2 %, rounded up to 1000 B', () => {
+// The owner raised the tools and workbench budgets above this rule on 2026-10-30; the review is #645.
+it('keeps every group budget at least at its largest recorded weight plus 2 %, rounded up to 1000 B', () => {
   const file = readFileSync(path.join(import.meta.dirname, '..', 'weight-budget.json'), 'utf8')
   const recorded = JSON.parse(file) as Budget
   const rule = (group: Budget['groups'][string], key: 'initial' | 'total') =>
     Math.ceil((Math.max(...Object.values(group.routes).map((w) => w[key])) * 1.02) / 1000) * 1000
   for (const [name, group] of Object.entries(recorded.groups)) {
-    expect({ name, ...group.budget }).toEqual({
-      name,
-      initial: rule(group, 'initial'),
-      total: rule(group, 'total'),
-    })
+    expect(group.budget.initial, name).toBeGreaterThanOrEqual(rule(group, 'initial'))
+    expect(group.budget.total, name).toBeGreaterThanOrEqual(rule(group, 'total'))
   }
 })

@@ -9,7 +9,7 @@ export default defineConfig({
       exclude: ['src/build.ts', 'src/validate.ts'],
       reporter: ['text-summary', 'lcov'],
       // floors: the measured value rounded down, minus one
-      thresholds: { statements: 98, branches: 95, functions: 99, lines: 98 },
+      thresholds: { statements: 98, branches: 96, functions: 99, lines: 98 },
     },
   },
 })

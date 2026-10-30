@@ -11,7 +11,7 @@ import { msg, type Say, type Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { translateMessage } from './core-messages.ts'
 import type { LadderDirection } from './seating-ladder.ts'
-import { formatQuantity, inchText, type UnitSystem } from './units.ts'
+import { formatQuantity, type UnitSystem } from './units.ts'
 
 /** Input panels of the load workbench, in reading order. */
 const panelOrder = ['cartridge', 'bullet', 'powder', 'firearm'] as const
@@ -226,26 +226,6 @@ export function shownWarnings(
     return limitExceededText(body, l, l.pressure, system, t)
   })
 }
-
-/** Workbench decimals of lengths by kind and unit. */
-const lengthDigits = { travel: { mm: 1, in: 2 }, diameter: { mm: 2, in: 3 } } as const
-
-/** A length in the display unit of `system` with the workbench decimals of its kind, without the symbol. */
-export function lengthText(kind: keyof typeof lengthDigits, system: UnitSystem, si: number) {
-  const unit = system.length
-  const digits = (lengthDigits[kind] as Record<string, number>)[unit.symbol] ?? unit.decimals
-  return formatNumber(unit.fromSi(si), digits)
-}
-
-/** A length in the display unit of `system` with the workbench decimals of its kind, and the symbol. */
-export function shownLength(kind: keyof typeof lengthDigits, system: UnitSystem, si: number) {
-  const { symbol } = system.length
-  return `${inchText(lengthText(kind, system, si), symbol)} ${symbol}`
-}
-
-/** A length given in mm in the display unit of `system`, with the symbol. */
-export const mmLength = (system: UnitSystem, mm: number) =>
-  shownLength('diameter', system, toSi('length', mm))
 
 /**
  * Why the range card is out of reach after a run: a missing bullet record at once; any other

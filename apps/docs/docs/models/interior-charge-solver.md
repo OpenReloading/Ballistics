@@ -108,3 +108,4 @@ The target value must be above 0, and the load ratio target needs a bulk density
 ## Sources
 
 - [Dowell 1971](../bibliography.md#dowell-1971): the modified regula falsi (Illinois) iteration (not read, unverified).
+- Research log: [solid fill limit of the interior model](../research/interior-solid-fill-limit.md).

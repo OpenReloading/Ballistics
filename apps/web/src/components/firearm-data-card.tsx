@@ -43,6 +43,14 @@ export function DataCard({
     [msg('Manufacturer and model'), [manufacturer, f.model].filter(Boolean).join(' ') || undefined],
     ...firearmFields.map((s): [Message, string | undefined] => {
       if (s.key === 'twist') return [s.label, twistText(f, system, t)]
+      if (s.key === 'roundCount' && f.roundCount !== undefined && f.roundCountDate)
+        return [
+          s.label,
+          t('{rounds}, as of {date}', {
+            rounds: plainNumber(f.roundCount),
+            date: dayText(f.roundCountDate),
+          }),
+        ]
       if (s.key === 'roundCount' || s.key === 'noteAtRoundCount') {
         const count = f[s.key]
         return [s.label, count === undefined ? undefined : plainNumber(count)]

@@ -182,10 +182,10 @@ export function validRecords(raw: unknown[]) {
   return { records, invalid }
 }
 
-/** The id of the user manufacturer a bullet, firearm or case capacity `record` names; undefined for none. */
+/** The id of the user manufacturer a bullet, firearm, case or case capacity `record` names; undefined for none. */
 export function makerIdOf(record: UserRecord): string | undefined {
   const text =
-    record.kind === 'bullet' || record.kind === 'firearm'
+    record.kind === 'bullet' || record.kind === 'firearm' || record.kind === 'case'
       ? record.data.manufacturer
       : record.kind === 'caseCapacity'
         ? record.data.caseManufacturer
@@ -202,6 +202,19 @@ export function makerIdOf(record: UserRecord): string | undefined {
 export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
   const id = makerIdOf(record)
   return id ? pool.filter((r) => r.kind === 'manufacturer' && r.id === id) : []
+}
+
+/**
+ * The records of `pool` that `record` names by `user:<id>`, with the
+ * user manufacturers they name: what a file of that record carries along, such as the cartridge,
+ * bullet and powder of a load read from another program's load file.
+ */
+export function linkedRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
+  // alone, every user reference of `record` dangles, so the check lists them all
+  const ids = new Set(checkUserRefs([record]).map((d) => parseRef(d.target)?.id))
+  const linked = pool.filter((r) => r.id !== record.id && ids.has(r.id))
+  // a maker the record names itself and one of its records names too is carried once
+  return [...new Set([...linked, ...linked.flatMap((r) => makerRecordsOf(r, pool))])]
 }
 
 /**

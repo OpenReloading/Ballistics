@@ -52,3 +52,4 @@ $\delta$ is half the last printed digit of the two-decimal C.I.P. values, so a $
 ## Sources
 
 - [C.I.P. TDCC](../bibliography.md#cip-tdcc): the projectile diameter $G_1$ on the cartridge drawing and the land and groove diameters $F$ and $Z$ of the chamber, per cartridge sheet.
+- Research log: [bullet fit window against C.I.P. values](../research/bullet-fit-cip-window.md).

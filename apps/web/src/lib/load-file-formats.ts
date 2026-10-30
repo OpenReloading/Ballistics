@@ -2,6 +2,7 @@
 import { type EmbeddedFile, type UserRecord, userDataFormat } from '@open-reloading/schema'
 import type { Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
+import { grtLoadFormat } from './grt-load-format.ts'
 import { nth } from './nth.ts'
 import {
   maxFileBytes,
@@ -21,7 +22,8 @@ export interface LoadFileFormat {
   /** Media type to file extensions, as the open picker takes them. */
   accept: Record<string, string[]>
   detect: (bytes: Uint8Array) => boolean
-  parse: (bytes: Uint8Array) => ParsedUserFile
+  /** A format with a large reader loads it here, so the File menu's routes do not carry it. */
+  parse: (bytes: Uint8Array) => ParsedUserFile | Promise<ParsedUserFile>
 }
 
 /** The text of `bytes` as UTF-8, a byte order mark left out, as `File.text()` reads it. */
@@ -42,6 +44,7 @@ export const loadFileFormats: LoadFileFormat[] = [
     },
     parse: (bytes) => parseUserDataFile(utf8(bytes)),
   },
+  grtLoadFormat,
 ]
 
 /** The first format of `formats` that detects `bytes`, none for a file over `maxFileBytes`. */
@@ -49,9 +52,12 @@ export const loadFormatOf = (bytes: Uint8Array, formats = loadFileFormats) =>
   bytes.byteLength > maxFileBytes ? undefined : formats.find((f) => f.detect(bytes))
 
 /** One file read by the first format of `formats` that detects it, else by the first format. */
-export function readLoadFile(bytes: Uint8Array, formats = loadFileFormats): ParsedUserFile {
+export async function readLoadFile(
+  bytes: Uint8Array,
+  formats = loadFileFormats,
+): Promise<ParsedUserFile> {
   if (bytes.byteLength > maxFileBytes) return { ok: false, reason: tooLargeMessage }
-  return (loadFormatOf(bytes, formats) ?? nth(formats, 0)).parse(bytes)
+  return await (loadFormatOf(bytes, formats) ?? nth(formats, 0)).parse(bytes)
 }
 
 /** The warnings and unmapped fields of a read file as one sentence, empty when it has none. */
@@ -66,7 +72,7 @@ export const readNote = (p: ParsedUserFile, t: Translator['t']) =>
     : ''
 
 /** Every valid file's records, photos, `invalid` entries and notes, and each skipped file with its reason. */
-export function parseFiles(
+export async function parseFiles(
   files: { name: string; bytes?: Uint8Array | undefined }[],
   formats = loadFileFormats,
   t: Translator['t'],
@@ -80,7 +86,7 @@ export function parseFiles(
     const p: ParsedUserFile =
       f.bytes === undefined
         ? { ok: false, reason: tooLargeMessage }
-        : readLoadFile(f.bytes, formats)
+        : await readLoadFile(f.bytes, formats)
     if (p.ok) {
       records.push(...p.records)
       embedded.push(...(p.files ?? []))

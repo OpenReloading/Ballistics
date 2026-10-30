@@ -67,13 +67,55 @@ function references(text: string): string {
 
 const local = (name: string) => name.slice(name.indexOf(':') + 1)
 const nameAt = /[^\s/>=<"']+/y
-const attributeAt = /\s+([^\s/>=<"']+)\s*=\s*(?:"([^"<]*)"|'([^'<]*)')/y
-const tagEnd = /\s*(\/?)>/y
-const endTagAt = /([^\s/>=<"']+)\s*>/y
 
 function match(re: RegExp, text: string, at: number): RegExpExecArray | null {
   re.lastIndex = at
   return re.exec(text)
+}
+
+const space = /\s/
+
+/** The position of the first character from `at` that is not white space. */
+function skipSpace(text: string, at: number): number {
+  let i = at
+  while (i < text.length && space.test(text.charAt(i))) i++
+  return i
+}
+
+/** One attribute (white space, name, `=`, a quoted value without `<`) at `at`, else null. */
+function attributeAt(
+  text: string,
+  at: number,
+): { name: string; value: string; length: number } | null {
+  const start = skipSpace(text, at)
+  const n = start > at ? match(nameAt, text, start) : null
+  if (!n) return null
+  const eq = skipSpace(text, start + n[0].length)
+  if (text.charAt(eq) !== '=') return null
+  const open = skipSpace(text, eq + 1)
+  const quote = text.charAt(open)
+  if (quote !== '"' && quote !== "'") return null
+  const close = text.indexOf(quote, open + 1)
+  const value = close < 0 ? '' : text.slice(open + 1, close)
+  if (close < 0 || value.includes('<')) return null
+  return { name: n[0], value, length: close + 1 - at }
+}
+
+/** The end of a start tag at `at` (`>` or `/>` after white space), else null. */
+function tagEndAt(text: string, at: number): { empty: boolean; length: number } | null {
+  const i = skipSpace(text, at)
+  const empty = text.charAt(i) === '/'
+  return text.charAt(i + (empty ? 1 : 0)) === '>'
+    ? { empty, length: i + (empty ? 2 : 1) - at }
+    : null
+}
+
+/** The name and length of an end tag body (`name`, white space, `>`) at `at`, else null. */
+function endTagBodyAt(text: string, at: number): { name: string; length: number } | null {
+  const n = match(nameAt, text, at)
+  if (!n) return null
+  const i = skipSpace(text, at + n[0].length)
+  return text.charAt(i) === '>' ? { name: n[0], length: i + 1 - at } : null
 }
 
 /** Elements and characters (text and attribute markup) `scanXml` may still read. */
@@ -116,19 +158,18 @@ function readAttributes(
   const attributes: Record<string, string> = {}
   const seen = new Set<string>()
   let end = at
-  for (let a = match(attributeAt, text, end); a; a = match(attributeAt, text, end)) {
-    // every match has the name (group 1) and one quoted value (group 2 or 3)
-    const name = a[1] as string
+  for (let a = attributeAt(text, end); a; a = attributeAt(text, end)) {
+    const name = a.name
     if (seen.has(name)) throw new Error(`duplicate attribute ${name} in <${qname}>`)
     seen.add(name)
     if (seen.size > maxAttributes) {
       throw new Error(`more than ${maxAttributes} attributes in <${qname}>`)
     }
-    spend(remaining, 'characters', a[0].length)
+    spend(remaining, 'characters', a.length)
     if (name !== 'xmlns' && !name.startsWith('xmlns:')) {
-      attributes[local(name)] = references((a[2] ?? a[3]) as string)
+      attributes[local(name)] = references(a.value)
     }
-    end += a[0].length
+    end += a.length
   }
   return { attributes, end }
 }
@@ -144,9 +185,9 @@ function readStartTag(
   const qname = n[0]
   spend(remaining, 'elements', 1)
   const { attributes, end } = readAttributes(text, lt + 1 + qname.length, qname, remaining)
-  const close = match(tagEnd, text, end)
+  const close = tagEndAt(text, end)
   if (!close) throw new Error(`malformed tag <${qname}>`)
-  return { qname, attributes, empty: close[1] !== '', end: end + close[0].length }
+  return { qname, attributes, empty: close.empty, end: end + close.length }
 }
 
 /** What `scanXml` keeps while it reads. */
@@ -175,14 +216,14 @@ function checkEncoding(pi: string): void {
 
 /** Closes the element named by the end tag at `lt`; returns the position after the tag. */
 function readEndTag(text: string, lt: number, st: ScanState): number {
-  const m = match(endTagAt, text, lt + 2)
+  const m = endTagBodyAt(text, lt + 2)
   const top = st.qnames.pop()
-  if (!m || top === undefined || m[1] !== top) {
-    throw new Error(`end tag </${m?.[1] ?? ''}> does not match <${top ?? ''}>`)
+  if (!m || top === undefined || m.name !== top) {
+    throw new Error(`end tag </${m?.name ?? ''}> does not match <${top ?? ''}>`)
   }
   const name = st.path.pop() as string
   st.events.close(name, st.path)
-  return lt + 2 + m[0].length
+  return lt + 2 + m.length
 }
 
 /** Opens the element of the start tag at `lt`; returns the position after the tag. */

@@ -164,6 +164,9 @@ export function SettingsSections({
           <Section id="settings-manufacturers" title={t('Manufacturers in this browser')}>
             <ManufacturersForm />
           </Section>
+          <Section id="settings-version" title={t('Version')}>
+            <Text size="sm">{process.env.NEXT_PUBLIC_BUILD_LINE}</Text>
+          </Section>
         </Stack>
       </Tabs.Panel>
       <Tabs.Panel value="units">

@@ -30,8 +30,14 @@ import {
   sampler,
 } from '../lib/playback.ts'
 import { controlSize } from '../lib/theme.ts'
-import { formatQuantity, msText, percentText, type UnitSystem, withUnit } from '../lib/units.ts'
-import { shownLength } from '../lib/workbench.ts'
+import {
+  formatQuantity,
+  msText,
+  percentText,
+  shownLength,
+  type UnitSystem,
+  withUnit,
+} from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { ChartPlayback } from './chart-playback.tsx'
 import { EChart, useChartTokens } from './echart.tsx'

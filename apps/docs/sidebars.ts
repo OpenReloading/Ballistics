@@ -41,6 +41,7 @@ const sidebars: SidebarsConfig = {
       'bullet-photo',
       'free-recoil',
       'load-notes',
+      'box-label',
     ]),
     'models/least-squares',
     'models/validation',
@@ -62,6 +63,7 @@ const sidebars: SidebarsConfig = {
     'data/firearm-records',
     'data/catalogue-storage',
     'data/table-import',
+    'data/grt-load-files',
     'bibliography',
   ],
   contributing: [

@@ -117,14 +117,20 @@ export function notesErrors(dir = research): string[] {
     .flatMap((p) => noteErrors(frontMatter(p.text), names).map((e) => `${p.path}: ${e}`))
 }
 
+/** The folder of a page path with its trailing slash, and the file name without `.md`. */
+export function splitPath(path: string): { folder: string; name: string } {
+  const cut = path.lastIndexOf('/') + 1
+  return { folder: path.slice(0, cut), name: path.slice(cut).replace(/\.md$/, '') }
+}
+
 /** The index entries of the research pages under `dir`; `site` is the URL of the docs root. */
 export function entries(site: string, dir = research): Entry[] {
   return pages(dir)
     .map(({ path, text }) => {
       const fm = frontMatter(text)
       // Docusaurus takes the doc id from the front matter, else from the file name
-      const name = typeof fm.id === 'string' ? fm.id : path.replace(/^.*\/|\.md$/g, '')
-      const folder = path.includes('/') ? path.replace(/[^/]*$/, '') : ''
+      const { folder, name: file } = splitPath(path)
+      const name = typeof fm.id === 'string' ? fm.id : file
       const entry: Entry = {
         title: String(fm.title ?? name),
         description: String(fm.description ?? ''),

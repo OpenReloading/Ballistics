@@ -70,3 +70,7 @@ A note can be dismissed for the session it is about. The dismissal is kept with 
 - Until the load is saved, a session shows the load as it is now. Saving fixes it: a change of lot made afterwards shows in the next session's snapshot, not in the earlier ones.
 - A string that is not mapped to the load's charge is not read for the velocity rule.
 - A note is a prompt to check the load again. It does not tell whether the load is acceptable.
+
+## Sources
+
+The rules compare values the user recorded, with thresholds set by this project: the resolution of the length fields and the sessions' own spread. No reference is cited. The research log entries on [inventory lifecycle records](../research/inventory-lifecycle-records.md) and [load and firearm data views](../research/load-firearm-data-views.md) describe the records the rules read; neither checks the rules.
