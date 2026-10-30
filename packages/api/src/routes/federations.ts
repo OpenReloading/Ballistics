@@ -10,7 +10,7 @@ import {
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
-import { idParams, missing, page, recordIdPattern, stored } from './common.ts'
+import { idParams, missing, noQuery, page, recordIdPattern, stored } from './common.ts'
 
 const id = { type: 'string', pattern: recordIdPattern, maxLength: 100 } as const
 const cappedIdParams = {
@@ -74,6 +74,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
   app.get(
     '/target-faces',
     {
+      schema: { querystring: noQuery },
       config: {
         response: targetFaceList,
         summary: 'List target faces',
@@ -106,6 +107,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
   app.get(
     '/federations',
     {
+      schema: { querystring: noQuery },
       config: {
         response: federationList,
         summary: 'List federations',
@@ -149,6 +151,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
   app.get(
     '/caliber-classes',
     {
+      schema: { querystring: noQuery },
       config: {
         response: caliberClassList,
         summary: 'List caliber classes',

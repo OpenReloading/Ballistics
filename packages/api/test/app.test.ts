@@ -164,9 +164,8 @@ describe('GET /cartridges', () => {
     expect(page.body.items.map((c: { id: string }) => c.id)).toEqual(['beta-pistol'])
   })
 
-  it('ignores the removed standard parameter', async () => {
-    const all = (await get(`${API_PREFIX}/cartridges`)).body.total
-    expect((await get(`${API_PREFIX}/cartridges?standard=SAAMI`)).body.total).toBe(all)
+  it('refuses the removed standard parameter', async () => {
+    expect((await get(`${API_PREFIX}/cartridges?standard=SAAMI`)).status).toBe(400)
   })
 
   it('rejects invalid parameters', async () => {

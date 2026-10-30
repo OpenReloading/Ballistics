@@ -77,4 +77,33 @@ describe('error bodies', () => {
       await app.close()
     }
   })
+
+  it('refuses a query parameter a list does not declare, naming it, and a control character in q', async () => {
+    const app = buildApp({ catalogue: testCatalogue(bundle), compute: inlineRunner })
+    try {
+      for (const list of [
+        'cartridges',
+        'bullets',
+        'powders',
+        'primers',
+        'cases',
+        'manufacturers',
+        'federations',
+        'disciplines',
+        'target-mappings',
+        'target-faces',
+        'caliber-classes',
+      ]) {
+        const res = await app.inject({ url: `${API_PREFIX}/${list}?tabel=I` })
+        expect([list, res.statusCode]).toEqual([list, 400])
+        expect(res.json().message).toBe('querystring must NOT have additional properties: tabel')
+      }
+      for (const q of ['%01', 'a%01b', '%1F', '%7F', '%C2%9F']) {
+        const res = await app.inject({ url: `${API_PREFIX}/cartridges?q=${q}` })
+        expect([q, res.statusCode]).toEqual([q, 400])
+      }
+    } finally {
+      await app.close()
+    }
+  })
 })

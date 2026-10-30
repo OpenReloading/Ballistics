@@ -92,10 +92,15 @@ describe('the static site answers reads as the API', () => {
     'target-mappings',
     'caliber-classes',
   ]
+  /** The kinds that page; the others refuse `limit` and `offset`. */
+  const paged = kinds.slice(0, 5)
 
   it('gives every list, paged, as the API does', async () => {
     for (const kind of kinds)
-      for (const query of ['', '?limit=200', '?limit=3&offset=2', '?offset=100000']) {
+      for (const query of [
+        '',
+        ...(paged.includes(kind) ? ['?limit=200', '?limit=3&offset=2', '?offset=100000'] : []),
+      ]) {
         const { live, file } = await both(`${kind}${query}`)
         expect(file, `${kind}${query}`).toEqual(live)
       }
@@ -148,7 +153,7 @@ describe('the static site answers reads as the API', () => {
 
   it('lists every kind in the order of its sort key, as the API does', async () => {
     for (const kind of ['cartridges', 'bullets', 'powders', 'manufacturers']) {
-      const { live, file } = await both(`${kind}?limit=200`)
+      const { live, file } = await both(paged.includes(kind) ? `${kind}?limit=200` : kind)
       expect(
         file.body.items.map((i: { id: string }) => i.id),
         kind,
@@ -221,7 +226,7 @@ describe('the static site answers reads as the API', () => {
 
   it('answers a record, an unknown id with 404 and a malformed one with 400', async () => {
     for (const kind of kinds) {
-      const first = (await both(`${kind}?limit=1`)).live.body.items[0] as { id: string }
+      const first = (await both(kind)).live.body.items[0] as { id: string }
       const { live, file } = await both(`${kind}/${first.id}`)
       expect(file, kind).toEqual(live)
     }
@@ -251,6 +256,12 @@ describe('the static site answers reads as the API', () => {
       'disciplines?federation=Not_An_Id',
       'target-mappings?face=Not_An_Id',
       'target-mappings?discipline=Not_An_Id',
+      'cartridges?tabel=I',
+      'bullets?cartridges=308-win',
+      'disciplines?federaton=x',
+      'federations?x=1',
+      'cartridges?q=%01',
+      'bullets?q=a%01b',
     ]) {
       const { live, file } = await both(query)
       expect([file.status, query]).toEqual([live.status, query])
