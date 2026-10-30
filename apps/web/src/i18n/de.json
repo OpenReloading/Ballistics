@@ -3759,5 +3759,18 @@
   "Saved loads of another cartridge, or no saved load.": "Gespeicherte Laborierungen einer anderen Patrone oder keine gespeicherte Laborierung.",
   "No saved load with this firearm.": "Keine gespeicherte Laborierung mit dieser Schusswaffe.",
   "{load} is for {other}, this firearm for {own}.": "{load} ist für {other}, diese Schusswaffe für {own}.",
-  "Disciplines listing {class}": "Disziplinen, die {class} aufführen"
+  "Disciplines listing {class}": "Disziplinen, die {class} aufführen",
+  "Print range cards": "Schusstafeln drucken",
+  "Load: {name}": "Laborierung: {name}",
+  "Muzzle velocity measured: mean of {count} shot|Muzzle velocity measured: mean of {count} shots": {
+    "one": "Mündungsgeschwindigkeit gemessen: Mittel aus {count} Schuss",
+    "other": "Mündungsgeschwindigkeit gemessen: Mittel aus {count} Schüssen"
+  },
+  "Loads without a range card": "Laborierungen ohne Schusstafel",
+  "The bullet is not from the database.": "Das Geschoss stammt nicht aus der Datenbank.",
+  "No chronograph session with shots.": "Keine Chronograph-Sitzung mit Schüssen.",
+  "The firearm has no mounted optic.": "An der Schusswaffe ist keine Optik montiert.",
+  "The bullet has no BC in the database.": "Das Geschoss hat in der Datenbank keinen BC.",
+  "The bullet has several BC values; choose one in the workbench.": "Das Geschoss hat mehrere BC-Werte; wählen Sie einen in der Werkbank.",
+  "The bullet record was not found.": "Der Geschossdatensatz wurde nicht gefunden."
 }
