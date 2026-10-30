@@ -94,9 +94,9 @@ describe('error bodies', () => {
         'target-faces',
         'caliber-classes',
       ]) {
-        const res = await app.inject({ url: `${API_PREFIX}/${list}?tabel=I` })
+        const res = await app.inject({ url: `${API_PREFIX}/${list}?tables=I` })
         expect([list, res.statusCode]).toEqual([list, 400])
-        expect(res.json().message).toBe('querystring must NOT have additional properties: tabel')
+        expect(res.json().message).toBe('querystring must NOT have additional properties: tables')
       }
       for (const q of ['%01', 'a%01b', '%1F', '%7F', '%C2%9F']) {
         const res = await app.inject({ url: `${API_PREFIX}/cartridges?q=${q}` })

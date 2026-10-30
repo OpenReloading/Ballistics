@@ -81,9 +81,7 @@ export const getTargetFace = getOne<TargetFace>('/target-faces')
 export const getDiscipline = getOne<DisciplineRecord>('/disciplines')
 export const getFederation = getOne<FederationRecord>('/federations')
 
-export const listAllTargetFaces = () => listAll<{ id: string; name: string }>('/target-faces')
-
-/** The items of a list route that takes no paging (federations, disciplines, target mappings). */
+/** The items of a list route that takes no paging (target faces, federations, disciplines, target mappings). */
 async function listItems<T>(path: string): Promise<Fetched<T[]>> {
   const r = await apiGet<ListOf<T>>(path)
   return r.status === 'ok' ? { status: 'ok', data: r.data.items } : r
@@ -93,6 +91,7 @@ export const listTargetMappings = (face?: string) =>
   listItems<MappingSummary>(
     face ? `/target-mappings?face=${encodeURIComponent(face)}` : '/target-mappings',
   )
+export const listAllTargetFaces = () => listItems<{ id: string; name: string }>('/target-faces')
 export const listDisciplines = () => listItems<DisciplineSummary>('/disciplines')
 export const listFederations = () => listItems<FederationListItem>('/federations')
 export const listCaliberClasses = () => listItems<CaliberClassSummary>('/caliber-classes')
