@@ -12,6 +12,7 @@ import {
   fieldSi,
   fieldStored,
   firearmCells,
+  firearmPatch,
   firearmProblem,
   freeId,
   gunValues,
@@ -382,5 +383,27 @@ describe('cardFacts and clickText', () => {
     expect(clickText({ ...o, clickUnit: 'mrad' }, us)).toBe('0.10 mrad')
     expect(clickText({ ...o, clickUnit: 'MOA' }, metric)).toBe('0.34 MOA')
     expect(clickText({ ...o, clickValue: undefined }, metric)).toBeUndefined()
+  })
+})
+
+describe('firearmPatch', () => {
+  const now = new Date(2026, 9, 12, 23, 30)
+  const counted = { ...blankFirearm(), roundCount: 400, roundCountDate: '2026-01-05' }
+
+  it('dates a changed round count to the local day and drops the date of a cleared one', () => {
+    expect(firearmPatch(blankFirearm(), { roundCount: 120 }, now)).toMatchObject({
+      roundCount: 120,
+      roundCountDate: '2026-10-12',
+    })
+    expect(firearmPatch(counted, { roundCount: 450 }, now).roundCountDate).toBe('2026-10-12')
+    expect(firearmPatch(counted, { roundCount: undefined }, now).roundCountDate).toBeUndefined()
+  })
+
+  it('keeps the date on any other edit and on the same count', () => {
+    expect(firearmPatch(counted, { notes: 'Cleaned', active: 'c1' }, now)).toMatchObject({
+      notes: 'Cleaned',
+      roundCountDate: '2026-01-05',
+    })
+    expect(firearmPatch(counted, { roundCount: 400 }, now).roundCountDate).toBe('2026-01-05')
   })
 })
