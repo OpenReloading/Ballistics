@@ -25,6 +25,8 @@ Frame one target with a strip of paper around it, and cover or fold away a neigh
 
 In-app note: "The black area of the target is cut off by the edge of the photo." It is shown only while no target is selected or recognised, since a photo may show only the centre of a known target. The check does not see a second target in the frame.
 
+In-app note: "No edge of a target or a hole was found in this photo." It is shown for a photo with no black area and no edge to measure. A target of thin rings only, with no hole yet, gives it even when the whole target is in the frame: set the scale by hand instead of retaking.
+
 ## 3. Straight from above, no slant
 
 ![Good: a square sheet with round rings. Bad: the sheet drawn as a trapezoid with the rings squeezed into flat ellipses, from a camera held at a slant.](photo-guide/straight-from-above.svg)
