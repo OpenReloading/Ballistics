@@ -159,11 +159,13 @@ function useCatalogue<R>(opened: boolean, load: (() => Promise<R[]>) | undefined
 const keySteps: Record<string, number> = { ArrowDown: 1, ArrowUp: -1, PageDown: 8, PageUp: -8 }
 
 /** Enter chooses the highlighted row, the arrow and page keys move the highlight. */
-function searchKey(
+export function searchKey(
   e: React.KeyboardEvent<HTMLInputElement>,
   choose: () => void,
   move: (by: number) => void,
 ) {
+  // the Enter that confirms an IME composition picks no row
+  if (e.nativeEvent.isComposing) return
   // Ctrl+Enter (Cmd+Enter) stays free for the calculator's run shortcut
   if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
     e.preventDefault()

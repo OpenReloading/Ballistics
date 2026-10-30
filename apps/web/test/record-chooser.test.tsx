@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest'
 import { bulletKind } from '../src/components/bullet-search-dialog.tsx'
-import type { ChooserKind, ChooserRow } from '../src/components/record-chooser.tsx'
+import { type ChooserKind, type ChooserRow, searchKey } from '../src/components/record-chooser.tsx'
 import {
   cartridgeKind,
   caseKind,
@@ -228,4 +228,27 @@ it('the primer chooser shows size and magnum, ranks as the API and says when not
   expect(ids(primerKind, rows, '', 'name')).toEqual(['a-lr', 'a-lrm', 'b-sr'])
   expect(ids(primerKind, rows, 'nothing')).toEqual([])
   expect(t(primerKind.texts.empty)).toBe('No primer matches')
+})
+
+it('Enter in the search box chooses the highlighted row, but not while it confirms an IME composition', () => {
+  const press = (key: string, isComposing: boolean) => {
+    const done: string[] = []
+    const e = {
+      key,
+      ctrlKey: false,
+      metaKey: false,
+      nativeEvent: { isComposing },
+      preventDefault() {},
+    }
+    searchKey(
+      e as unknown as Parameters<typeof searchKey>[0],
+      () => done.push('choose'),
+      (by) => done.push(`move ${by}`),
+    )
+    return done
+  }
+  expect(press('Enter', false)).toEqual(['choose'])
+  expect(press('ArrowDown', false)).toEqual(['move 1'])
+  expect(press('Enter', true)).toEqual([])
+  expect(press('ArrowDown', true)).toEqual([])
 })
