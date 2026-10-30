@@ -34,6 +34,16 @@ console.log(bundle.cartridges.length > 0) // true
 console.log(twistPlausible(254)) // true
 ```
 
+## Reading a records folder
+
+`readRecords(root)` validates the records of a folder laid out as `packages/data/records/` of the repository, one directory per kind. Pass that folder of a clone, or several folders read as one set. The npm package ships no records folder: without `root`, `readRecords` reads the `records/` folder next to the package only in a repository checkout and throws in an installed package. For the records themselves, import `bundle.json`.
+
+```js
+import { readRecords } from '@open-reloading/data'
+
+const { bundle, errors } = readRecords('Ballistics/packages/data/records')
+```
+
 ## Reference
 
 Every export with its doc comment: [library reference](pathname:///library/modules/_open-reloading_data.html).
