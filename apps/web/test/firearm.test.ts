@@ -18,6 +18,7 @@ import {
   gunValues,
   landsFor,
   landsOf,
+  roundsDue,
   sightOptions,
   withSessionRounds,
 } from '../src/lib/firearm.ts'
@@ -411,29 +412,74 @@ describe('firearmPatch', () => {
 
 describe('withSessionRounds', () => {
   const now = new Date(2026, 9, 12, 18, 0)
+  const a = 'user:00000000-0000-4000-8000-00000000000a'
+  const b = 'user:00000000-0000-4000-8000-00000000000b'
   const counted = {
     ...rifle,
     data: { ...rifle.data, roundCount: 400, roundCountDate: '2026-01-05' },
   }
+  /** The count after adding the rounds `roundsDue` offers for each step in turn. */
+  const countAfter = (steps: { session: string; base: number; shots: number }[]) => {
+    let r: UserRecord = { ...rifle, data: { ...rifle.data, roundCount: 100 } }
+    for (const s of steps) {
+      const due: number = r.kind === 'firearm' ? roundsDue(r.data, s.session, s.base, s.shots) : 0
+      r = withSessionRounds(r, s.session, s.base, s.shots, due, now) ?? r
+    }
+    return r.kind === 'firearm' ? r.data.roundCount : undefined
+  }
 
-  it('adds the rounds and dates the count', () => {
-    const next = defined(withSessionRounds(counted, 400, 10, 12, now))
+  it('adds the rounds, dates the count and records them for the session', () => {
+    const next = defined(withSessionRounds(counted, a, 400, 10, 12, now))
     expect(next.kind === 'firearm' && next.data).toMatchObject({
       roundCount: 412,
       roundCountDate: '2026-10-12',
+      countedSessions: [{ session: a, rounds: 12 }],
     })
     expect(next.saved).toBe(now.toISOString())
   })
 
   it('skips a session counted already', () => {
-    expect(withSessionRounds(counted, 390, 10, 10, now)).toBeUndefined()
-    expect(withSessionRounds(counted, 380, 10, 10, now)).toBeUndefined()
-    expect(withSessionRounds(counted, 391, 10, 10, now)).toBeDefined()
+    expect(withSessionRounds(counted, a, 390, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, a, 380, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, a, 391, 10, 10, now)).toBeDefined()
   })
 
   it('skips a firearm without a count, a session without a base and no rounds', () => {
-    expect(withSessionRounds(rifle, 0, 10, 10, now)).toBeUndefined()
-    expect(withSessionRounds(counted, undefined, 10, 10, now)).toBeUndefined()
-    expect(withSessionRounds(counted, 400, 10, 0, now)).toBeUndefined()
+    expect(withSessionRounds(rifle, a, 0, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, a, undefined, 10, 10, now)).toBeUndefined()
+    expect(withSessionRounds(counted, a, 400, 10, 0, now)).toBeUndefined()
+  })
+
+  it('counts a later shot of a session once', () => {
+    expect(
+      countAfter([
+        { session: a, base: 100, shots: 1 },
+        { session: a, base: 100, shots: 2 },
+      ]),
+    ).toBe(102)
+  })
+
+  it('counts a session that began at the count of another one', () => {
+    expect(
+      countAfter([
+        { session: b, base: 100, shots: 1 },
+        { session: a, base: 100, shots: 3 },
+      ]),
+    ).toBe(104)
+  })
+
+  it('offers the shots not counted yet and keeps the latest sessions at the limit', () => {
+    const many = Array.from({ length: 200 }, (_, i) => ({
+      session: `user:00000000-0000-4000-8000-${String(i).padStart(12, '0')}`,
+      rounds: 1,
+    }))
+    const f = { ...counted.data, countedSessions: [...many.slice(1), { session: a, rounds: 4 }] }
+    expect(roundsDue(f, a, undefined, 10)).toBe(6)
+    expect(roundsDue(f, a, undefined, 3)).toBe(0)
+    const next = defined(withSessionRounds({ ...counted, data: f }, b, 400, 2, 2, now))
+    const entries = next.kind === 'firearm' ? (next.data.countedSessions ?? []) : []
+    expect(entries).toHaveLength(200)
+    expect(entries.at(-1)).toEqual({ session: b, rounds: 2 })
+    expect(entries[0]?.session).toBe(many[2]?.session)
   })
 })

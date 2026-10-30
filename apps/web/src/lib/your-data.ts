@@ -1,5 +1,6 @@
 import type { UserRecord, UserRecordKind } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
+import { gapCounts, loadGaps } from './load-gaps.ts'
 
 /** A row of Settings' Your data: a kind of the user's records and the list that shows them. */
 interface YourDataKind {
@@ -23,6 +24,23 @@ const yourDataKinds: readonly YourDataKind[] = [
   { kind: 'firearm', label: msg('Firearms'), href: '/firearms' },
 ]
 
-/** One row per kind of {@link yourDataKinds} with the number of `records` of that kind (0 for none). */
+/** The notes on firearms and on saved loads, each linked to the page that shows them. */
+function noteRows(records: readonly UserRecord[]) {
+  const { firearms, loads } = gapCounts(loadGaps(records))
+  return [
+    { label: msg('Notes on firearms'), href: '/firearms', count: firearms },
+    // the Saved loads line of the workbench, opened from Open or the load switcher
+    { label: msg('Notes on saved loads'), href: '/workbench', count: loads },
+  ]
+}
+
+/**
+ * One row per kind of {@link yourDataKinds} with the number of `records` of that kind (0 for none).
+ * The firearms row adds the notes on firearms and on saved loads (`notes`).
+ */
 export const yourDataRows = (records: readonly UserRecord[]) =>
-  yourDataKinds.map((k) => ({ ...k, count: records.filter((r) => r.kind === k.kind).length }))
+  yourDataKinds.map((k) => ({
+    ...k,
+    count: records.filter((r) => r.kind === k.kind).length,
+    ...(k.kind === 'firearm' && { notes: noteRows(records) }),
+  }))

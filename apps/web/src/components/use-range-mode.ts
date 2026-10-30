@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
 import { errorText } from '../lib/error-text.ts'
-import { withSessionRounds } from '../lib/firearm.ts'
+import { roundsDue, withSessionRounds } from '../lib/firearm.ts'
 import {
   addShot,
   localDate,
@@ -75,8 +75,18 @@ async function linkSession(load: RangeLoad, ref: string, t: Translator['t']) {
   })
 }
 
-/** A session's shots the firearm's round count does not hold yet: its count when the session began (`base`). */
-type RoundOffer = { firearm: string; name: string; base: number; shots: number }
+/**
+ * The rounds of a session the firearm's round count does not hold yet (`shots`), of the session's
+ * `total` shots; `base` is the count when the session began.
+ */
+type RoundOffer = {
+  firearm: string
+  name: string
+  session: string
+  base: number | undefined
+  total: number
+  shots: number
+}
 
 /**
  * The offer for the session `ref` of `load`, read from the store: undefined for a firearm not of
@@ -90,9 +100,9 @@ async function roundOfferOf(load: RangeLoad, ref: string, shots: number) {
   const l = userRecord.safeParse(stored)
   if (!f.success || f.data.kind !== 'firearm' || !l.success || l.data.kind !== 'load') return
   const base = l.data.data.snapshots?.find((s) => s.session === ref)?.roundCount
-  const count = f.data.data.roundCount
-  if (base === undefined || count === undefined || count >= base + shots) return
-  return { firearm: id, name: f.data.name, base, shots }
+  const due = roundsDue(f.data.data, ref, base, shots)
+  if (due < 1) return
+  return { firearm: id, name: f.data.name, session: ref, base, total: shots, shots: due }
 }
 
 const noWeather: WeatherText = { temperature: '', pressure: '', wind: '' }
@@ -358,7 +368,7 @@ export function useRangeMode() {
       const written = await updateRecord(offer.firearm, (raw) => {
         const found = userRecord.safeParse(raw)
         if (!found.success) return
-        return withSessionRounds(found.data, offer.base, offer.shots, n, new Date())
+        return withSessionRounds(found.data, offer.session, offer.base, offer.total, n, new Date())
       })
       setSaved(
         written?.kind === 'firearm' && written.data.roundCount !== undefined

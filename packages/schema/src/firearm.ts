@@ -260,6 +260,18 @@ export const firearm = z
       .optional(),
     roundCount: z.int().nonnegative().describe('Rounds fired through the barrel.').optional(),
     roundCountDate: z.iso.date().describe('Day the round count was last set, ISO 8601.').optional(),
+    countedSessions: z
+      .array(
+        z.strictObject({
+          session: ref('session').describe('Reference to the session.'),
+          rounds: z.int().nonnegative().describe('Rounds of the session added to `roundCount`.'),
+        }),
+      )
+      .max(200)
+      .describe(
+        'Sessions whose rounds were added to `roundCount`, the latest last, so a session is counted once.',
+      )
+      .optional(),
     noteAtRoundCount: z
       .int()
       .positive()

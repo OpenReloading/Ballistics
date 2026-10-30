@@ -1,0 +1,17 @@
+{
+  "id": "nra-rule-7-4-nra-mr-31",
+  "discipline": "nra-rule-7-4",
+  "face": "nra-mr-31",
+  "event": "rule-7-4-prone-slow-fire-100-yd",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.4, p. 19 (PDF p. 23)",
+        "fields": ["discipline", "face", "event"],
+        "note": "The row allows 10 or 20 shots, so the mapping states no shot count."
+      }
+    ]
+  }
+}

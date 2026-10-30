@@ -208,10 +208,19 @@ function filesOf(path: string): string[] {
   return names.map((n) => join(path, n))
 }
 
-/** Reads the rows of a file, or of every `.csv` file of a folder. */
+/** Reads the rows of a file, of every `.csv` file of a folder, or of standard input for `-`. */
 export function readRows(path: string): RowFiles {
-  const read = (file: string) => readFileSync(file) // NOSONAR: as above
-  const files = filesOf(path).map((file) => ({ file, bytes: read(file) }))
+  const read = (file: string | 0) => {
+    try {
+      return readFileSync(file) // NOSONAR: as above
+    } catch (error) {
+      throw new UsageError(`the rows cannot be read: ${(error as NodeJS.ErrnoException).code}`)
+    }
+  }
+  const files =
+    path === '-'
+      ? [{ file: 'stdin', bytes: read(0) }]
+      : filesOf(path).map((file) => ({ file, bytes: read(file) }))
   const rows = files.flatMap(({ file, bytes }) =>
     parseRows(bytes.toString('utf8'), file.split('/').at(-1) ?? file),
   )

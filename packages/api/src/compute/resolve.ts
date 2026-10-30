@@ -1,14 +1,16 @@
 /** Database records to core inputs, with exact unit conversions. */
-import { httpErrors } from '@fastify/sensible'
 import { type Aerodynamics, InputError, type Projectile } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import type { Catalogue } from '../catalogue/types.ts'
 import { type ResolvedRecord, resolvedRecord } from './answer.ts'
 import type { CartridgeWithSpecs } from './limits.ts'
 
-/** `record`, or a 404 error naming the `kind` and `id` that were not found. */
+/**
+ * `record`, or a 404 error naming the `kind` and `id` that were not found. Fastify answers it with
+ * its `statusCode`.
+ */
 function found<T>(record: T | undefined, kind: string, id: string): T {
-  if (!record) throw httpErrors.notFound(`${kind} ${id} not found`)
+  if (!record) throw Object.assign(new Error(`${kind} ${id} not found`), { statusCode: 404 })
   return record
 }
 

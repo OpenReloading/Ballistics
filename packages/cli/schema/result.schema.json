@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openreloading.github.io/Ballistics/docs/result.schema.json",
   "oneOf": [
     {
       "type": "object",
@@ -7,6 +8,10 @@
         "schemaVersion": {
           "type": "number",
           "const": 1
+        },
+        "notice": {
+          "type": "string",
+          "const": "simulation, not load data"
         },
         "split": {
           "type": "string",
@@ -711,6 +716,7 @@
       },
       "required": [
         "schemaVersion",
+        "notice",
         "split",
         "final",
         "inputs",
@@ -730,6 +736,10 @@
         "schemaVersion": {
           "type": "number",
           "const": 1
+        },
+        "notice": {
+          "type": "string",
+          "const": "simulation, not load data"
         },
         "split": {
           "type": "string",
@@ -2255,6 +2265,7 @@
       },
       "required": [
         "schemaVersion",
+        "notice",
         "split",
         "final",
         "inputs",

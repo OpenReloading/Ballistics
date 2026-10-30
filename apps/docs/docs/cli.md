@@ -35,7 +35,7 @@ One CSV file, or a folder of `.csv` files read in name order, with a header line
 
 A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted. A number is a plain decimal or exponent form (`0.5`, `2.5e1`); `0x1F` and `0b11` are not numbers.
 
-The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
+The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`; `--rows -` reads one rows file from standard input. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
 
 ## Split
 
@@ -79,12 +79,17 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON carries `schemaVersion` (1) and is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
-| Exit code | Meaning |
-|---|---|
-| 0 | A result was written |
-| 1 | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run |
-| 2 | Bad input: the rows file, an option, the records, a model module |
+`--version` prints `ballistics <version>` and exits 0.
+
+| Exit code | Meaning | `kind` |
+|---|---|---|
+| 0 | A result was written | |
+| 1 | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run | `refused` |
+| 2 | Bad input: the rows file, an option, the records, a model module (also one that throws) | `usage` |
+| 3 | An internal error of the CLI | `internal` |
+
+An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`; on a terminal it is a text line. It never carries a stack trace.
 
 The package `AGENTS.md` describes the loop for a language-model agent.

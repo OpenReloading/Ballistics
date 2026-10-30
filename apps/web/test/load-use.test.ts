@@ -2,7 +2,7 @@ import type { UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
 import { blankFirearm } from '../src/lib/firearm.ts'
-import { gapNotes, loadGaps } from '../src/lib/load-gaps.ts'
+import { gapCounts, gapNotes, loadGapNote, loadGaps } from '../src/lib/load-gaps.ts'
 import { loadUse, loadUseText } from '../src/lib/load-use.ts'
 
 const saved = '2026-01-01T00:00:00.000Z'
@@ -148,8 +148,34 @@ describe('load and firearm gaps', () => {
     expect(all).toEqual(['Load b', 'Load c'])
   })
 
+  const loadNote = (id: string) => loadGapNote(gaps.loads.get(id), 'Rifle', name, english.t)
+
+  it('notes a load without a firearm, and one whose firearm is no longer stored, never as a mismatch', () => {
+    expect(loadNote('e')).toBe('No firearm')
+    expect(loadNote('f')).toBe('Firearm no longer stored')
+    expect(gaps.loads.get('f')).toEqual({ kind: 'missing' })
+  })
+
+  it('notes a load of another cartridge than its firearm, naming the firearm and both cartridges', () => {
+    expect(loadNote('b')).toBe('Rifle is for .308 Winchester, this load for 6.5 Creedmoor.')
+    expect(loadNote('c')).toBe('Rifle is for My wildcat, this load for .308 Winchester.')
+  })
+
+  it('gives a load without a gap no note', () => {
+    expect(['a', 'd', 'g'].map(loadNote)).toEqual([undefined, undefined, undefined])
+  })
+
+  it('counts the notes the firearm library and the Saved loads line each show, a mismatch on both', () => {
+    const firearmNotes = [rifle, pistol, spare, bare].flatMap(notes).length
+    const loadNotes = 'abcdefg'.split('').map(loadNote).filter(Boolean).length
+    expect(gapCounts(gaps)).toEqual({ firearms: firearmNotes, loads: loadNotes })
+    expect(gapCounts(gaps)).toEqual({ firearms: 3, loads: 4 })
+  })
+
   it('describes the records only', () => {
-    const text = [rifle, pistol, spare].flatMap(notes).join(' ')
+    const text = [...[rifle, pistol, spare].flatMap(notes), ...'bcef'.split('').map(loadNote)].join(
+      ' ',
+    )
     expect(text).not.toMatch(/\b(safe|unsafe|enough|recommended)\b/i)
   })
 })

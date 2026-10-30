@@ -19,6 +19,7 @@ import {
   reminderText,
 } from '../lib/export-reminder.ts'
 import { saveAs } from '../lib/file-access.ts'
+import { loadGapNote, loadGaps } from '../lib/load-gaps.ts'
 import {
   cartridgeGroup,
   duplicateStored,
@@ -161,10 +162,11 @@ export function SavedLoads({
   const setMessage = (say?: Say) => setShown(say && { say })
   /** Stored loads of the earlier format, which the schema refuses. */
   const [older, setOlder] = useState(0)
-  /** Per load its firearm, sessions and last session day; the stored firearms' names by id. */
+  /** Per load its firearm, sessions, last session day and gap; the stored firearms' names by id. */
   const [use, setUse] = useState({
     loads: new Map<string, LoadUse>(),
     firearms: new Map<string, string>(),
+    gaps: loadGaps([]).loads,
   })
   /** The load whose name is edited in its row, with the text. */
   const [renaming, setRenaming] = useState<{ id: string; text: string }>()
@@ -183,6 +185,7 @@ export function SavedLoads({
           firearms: new Map(
             records.flatMap((r) => (r.kind === 'firearm' ? [[r.id, r.name] as const] : [])),
           ),
+          gaps: loadGaps(records).loads,
         })
       })
       .catch(() =>
@@ -258,12 +261,19 @@ export function SavedLoads({
   }
 
   const names = useCartridgeNames([
-    ...new Set(records.map((r) => cartridgeGroup(r.data.cartridge))),
+    ...new Set(
+      [
+        ...records.map((r) => r.data.cartridge),
+        ...[...use.gaps.values()].map((g) => (g.kind === 'mismatch' ? g.own : undefined)),
+      ].map(cartridgeGroup),
+    ),
   ])
   const groups = loadGroups(records, query, names, t)
   const usageText = (id: string) => {
     const u = use.loads.get(id)
-    return loadUseText(u, u?.firearm && use.firearms.get(u.firearm), { t, tn })
+    const firearm = u?.firearm && use.firearms.get(u.firearm)
+    const note = loadGapNote(use.gaps.get(id), firearm, (ref) => names[cartridgeGroup(ref)], t)
+    return [loadUseText(u, firearm, { t, tn }), note].filter(Boolean).join(' · ')
   }
   return (
     <>

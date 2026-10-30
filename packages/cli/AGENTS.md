@@ -16,7 +16,7 @@
 4. Decide on `change`: a negative `velocityMedian` and `velocityP90` is better; check `usedRows` (a model that refuses rows looks better) and the per-family changes (`--group-by` for others). Keep or revert.
 5. Run the sealed test split once, for the final version: add `--split test --final`. Never iterate on it.
 
-Exit code 1 is a refusal, 2 is bad input; the message is on stderr.
+Exit code 1 is a refusal, 2 is bad input, 3 an internal error. When stdout is not a terminal (or with `--json`) the error is one JSON object on stderr, `{"error":{"kind":"refused"|"usage"|"internal","message":"..."}}`. Every result carries `notice: "simulation, not load data"`. `--rows -` reads the rows from stdin, `--version` prints the version.
 
 ## Facts
 

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { interior } from '@open-reloading/core'
+import { InputError, interior } from '@open-reloading/core'
 import { UsageError } from './errors.ts'
 import type { InteriorModel } from './evaluate.ts'
 
@@ -85,9 +85,19 @@ export async function loadModel(spec: string): Promise<Model> {
   }
   if (typeof loaded.interior !== 'function')
     throw new UsageError(`the model module ${spec} exports no function "interior"`)
+  const candidate = loaded.interior as InteriorModel
   return {
     name: spec,
-    interior: loaded.interior as InteriorModel,
+    // a throw of the candidate is bad input, not an internal error; its refusal stays a refused row
+    interior: (...args) => {
+      try {
+        return candidate(...args)
+      } catch (error) {
+        if (error instanceof InputError) throw error
+        const cause = String(error instanceof Error ? error.message : error).split('\n')[0]
+        throw new UsageError(`the model module ${spec} threw: ${cause}`)
+      }
+    },
     files: [...coreModel, ...closure(path, dirname(path), 'candidate')],
   }
 }

@@ -1,0 +1,17 @@
+{
+  "id": "nra-rule-7-2-nra-sr-1",
+  "discipline": "nra-rule-7-2",
+  "face": "nra-sr-1",
+  "event": "rule-7-2-sitting-kneeling-rapid-fire-100-yd",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.2, p. 19 (PDF p. 23)",
+        "fields": ["discipline", "face", "event"],
+        "note": "The row allows 10 or 20 shots, so the mapping states no shot count."
+      }
+    ]
+  }
+}

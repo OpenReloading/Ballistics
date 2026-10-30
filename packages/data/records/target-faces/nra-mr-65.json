@@ -1,0 +1,93 @@
+{
+  "id": "nra-mr-65",
+  "name": "NRA No. MR-65",
+  "federation": "nra",
+  "rings": [
+    {
+      "value": 5,
+      "diameter": {
+        "value": 914.4
+      },
+      "fill": "white"
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 762
+      },
+      "fill": "black"
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 635
+      },
+      "fill": "black"
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 508
+      },
+      "fill": "black"
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 381
+      },
+      "fill": "black"
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 254
+      },
+      "fill": "black"
+    }
+  ],
+  "innerTen": {
+    "diameter": {
+      "value": 127
+    },
+    "rule": "touch"
+  },
+  "blackDiameter": {
+    "value": 762
+  },
+  "events": [
+    {
+      "id": "rule-7-11-prone-slow-fire-500-yd",
+      "name": "Rule 7.11 Prone, slow fire, 500 yards",
+      "distance": {
+        "value": 457200,
+        "raw": "500 yds."
+      },
+      "section": "Rule 7.11",
+      "scoring": "touch"
+    }
+  ],
+  "photoSearch": false,
+  "note": "The book prints one size per ring in inches, the X ring being the inner ten; sizes are converted at 25.4 mm per inch to 0.1 mm and distances at 914.4 mm per yard. The rings of the aiming black are black, the others white.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 4.5(a), pp. 15 to 16 (PDF pp. 19 to 20)",
+        "fields": ["name", "rings", "innerTen.diameter", "blackDiameter"]
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rules 7.1 to 7.13, p. 19 (PDF p. 23)",
+        "fields": ["events.name", "events.distance", "events.section"]
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 14.3, p. 48 (PDF p. 52)",
+        "fields": ["events.scoring", "innerTen.rule"],
+        "note": "A hole whose edge touches the outside of a ring or of the X ring takes the higher value."
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "nra-rule-7-9",
+  "federation": "nra",
+  "name": "Prone, rapid fire, 300 yards",
+  "section": "Rule 7.9",
+  "page": "p. 19 (PDF p. 23)",
+  "distance": {
+    "value": 274320,
+    "raw": "300 yds.",
+    "unit": "yd"
+  },
+  "category": "rifle",
+  "rules": {
+    "firearm": "long-gun",
+    "positions": ["prone"],
+    "seriesShots": 10,
+    "timeLimits": [
+      {
+        "duration": {
+          "value": 70,
+          "raw": "70 seconds"
+        },
+        "covers": "series"
+      }
+    ]
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.9, p. 19 (PDF p. 23)",
+        "fields": [
+          "federation",
+          "name",
+          "section",
+          "page",
+          "distance",
+          "category",
+          "rules.firearm",
+          "rules.positions"
+        ],
+        "note": "The rule book covers high power rifle matches; the row prints position, number of shots (10 or 20), type of fire, distance and target."
+      },
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 8.2(b), p. 24 (PDF p. 28)",
+        "fields": ["rules.seriesShots", "rules.timeLimits"],
+        "note": "The time is stated for a string of 10 shots."
+      }
+    ]
+  }
+}

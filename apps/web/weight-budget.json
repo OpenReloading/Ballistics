@@ -7,8 +7,8 @@
       },
       "routes": {
         "/_global-error": {
-          "initial": 175170,
-          "total": 175170
+          "initial": 176555,
+          "total": 176555
         }
       }
     },
@@ -19,16 +19,16 @@
       },
       "routes": {
         "/": {
-          "initial": 415388,
-          "total": 462554
+          "initial": 413744,
+          "total": 463256
         },
         "/_not-found": {
-          "initial": 409607,
-          "total": 456773
+          "initial": 407277,
+          "total": 456789
         },
         "/offline": {
-          "initial": 409607,
-          "total": 456773
+          "initial": 407277,
+          "total": 456789
         }
       }
     },
@@ -39,36 +39,36 @@
       },
       "routes": {
         "/bullets": {
-          "initial": 436076,
-          "total": 483242
+          "initial": 434287,
+          "total": 483799
         },
         "/cartridges": {
-          "initial": 434279,
-          "total": 481445
+          "initial": 432318,
+          "total": 481830
         },
         "/powders": {
-          "initial": 436994,
-          "total": 484160
+          "initial": 436145,
+          "total": 485657
         },
         "/disciplines": {
-          "initial": 431946,
-          "total": 479112
+          "initial": 432330,
+          "total": 481842
         },
         "/federations": {
-          "initial": 431941,
-          "total": 479107
+          "initial": 432330,
+          "total": 481842
         },
         "/targets": {
-          "initial": 431770,
-          "total": 478936
+          "initial": 431570,
+          "total": 481082
         },
         "/cases": {
-          "initial": 436664,
-          "total": 483830
+          "initial": 435348,
+          "total": 484860
         },
         "/primers": {
-          "initial": 431371,
-          "total": 478537
+          "initial": 429309,
+          "total": 478821
         }
       }
     },
@@ -79,40 +79,40 @@
       },
       "routes": {
         "/bullets/[id]": {
-          "initial": 495449,
-          "total": 542615
+          "initial": 493997,
+          "total": 543509
         },
         "/cartridges/[id]": {
-          "initial": 485436,
-          "total": 532602
+          "initial": 483462,
+          "total": 532974
         },
         "/disciplines/[id]": {
-          "initial": 448380,
-          "total": 495546
+          "initial": 458681,
+          "total": 498784
         },
         "/federations/[id]": {
-          "initial": 434470,
-          "total": 481636
+          "initial": 434311,
+          "total": 483823
         },
         "/targets/[id]": {
-          "initial": 448690,
-          "total": 495856
+          "initial": 447777,
+          "total": 497289
         },
         "/bullets/compare": {
-          "initial": 482015,
-          "total": 529181
+          "initial": 481322,
+          "total": 530834
         },
         "/session": {
-          "initial": 437618,
-          "total": 484784
+          "initial": 437545,
+          "total": 487057
         },
         "/cases/[id]": {
-          "initial": 445415,
-          "total": 492581
+          "initial": 443525,
+          "total": 493037
         },
         "/primers/[id]": {
-          "initial": 445100,
-          "total": 492266
+          "initial": 443343,
+          "total": 492855
         }
       }
     },
@@ -123,12 +123,12 @@
       },
       "routes": {
         "/powders/[id]": {
-          "initial": 452099,
-          "total": 686831
+          "initial": 454935,
+          "total": 692043
         },
         "/powders/burn-rates": {
-          "initial": 428893,
-          "total": 663625
+          "initial": 428089,
+          "total": 665197
         }
       }
     },
@@ -139,24 +139,24 @@
       },
       "routes": {
         "/bullets/designer": {
-          "initial": 410534,
-          "total": 540282
+          "initial": 408252,
+          "total": 543741
         },
         "/cartridges/designer": {
-          "initial": 410583,
-          "total": 639928
+          "initial": 408268,
+          "total": 554819
         },
         "/targets/designer": {
-          "initial": 410493,
-          "total": 505996
+          "initial": 408206,
+          "total": 513136
         },
         "/powders/designer": {
-          "initial": 410499,
-          "total": 515028
+          "initial": 408219,
+          "total": 525346
         },
         "/powders/tune": {
-          "initial": 404691,
-          "total": 459506
+          "initial": 408187,
+          "total": 506417
         }
       }
     },
@@ -167,24 +167,24 @@
       },
       "routes": {
         "/cases/editor": {
-          "initial": 470387,
-          "total": 508162
+          "initial": 489173,
+          "total": 529276
         },
         "/firearms": {
-          "initial": 492761,
-          "total": 530536
+          "initial": 509123,
+          "total": 549226
         },
         "/groups": {
-          "initial": 553918,
-          "total": 591693
+          "initial": 555700,
+          "total": 595803
         },
         "/my-cases": {
-          "initial": 409957,
-          "total": 457123
+          "initial": 407634,
+          "total": 457146
         },
         "/range": {
-          "initial": 418661,
-          "total": 465827
+          "initial": 421307,
+          "total": 470819
         }
       }
     },
@@ -195,8 +195,8 @@
       },
       "routes": {
         "/workbench": {
-          "initial": 627894,
-          "total": 983582
+          "initial": 629846,
+          "total": 1010778
         }
       }
     }

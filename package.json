@@ -42,7 +42,7 @@
     "postinstall": "node hooks/install.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
+    "@biomejs/biome": "^2.6.2",
     "@swc/core": "^1.16.20",
     "dependency-cruiser": "^18.7.0",
     "knip": "^6.43.0"

@@ -20,6 +20,8 @@ const config = async (): Promise<Config> => ({
   // GitHub Pages: DOCS_URL is the site origin, DOCS_BASE_URL the path of the docs ("/repository/docs/")
   url: process.env.DOCS_URL ?? 'https://openreloading.github.io',
   baseUrl,
+  // the CLI's result schema at the address of its $id
+  staticDirectories: ['static', '../../packages/cli/schema'],
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
   // .md files are plain Markdown, .mdx files are MDX

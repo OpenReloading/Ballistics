@@ -1,0 +1,17 @@
+{
+  "id": "nra-rule-7-5-nra-sr",
+  "discipline": "nra-rule-7-5",
+  "face": "nra-sr",
+  "event": "rule-7-5-standing-slow-fire-200-yd",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nra-high-power-rifle-rules-2026",
+        "page": "Rule 7.5, p. 19 (PDF p. 23)",
+        "fields": ["discipline", "face", "event"],
+        "note": "The row allows 10 or 20 shots, so the mapping states no shot count."
+      }
+    ]
+  }
+}

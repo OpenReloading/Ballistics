@@ -206,15 +206,19 @@ export function makerRecordsOf(record: UserRecord, pool: readonly UserRecord[]):
 
 /**
  * The records of `pool` that `record` names by `user:<id>`, with the
- * user manufacturers they name: what a file of that record carries along, such as the cartridge,
- * bullet and powder of a load read from another program's load file.
+ * user manufacturers they name, and the sessions of `pool` whose strings name `record`: what a
+ * file of that record carries along, such as the cartridge, bullet, powder and measurement series
+ * of a load read from another program's load file.
  */
 export function linkedRecordsOf(record: UserRecord, pool: readonly UserRecord[]): UserRecord[] {
   // alone, every user reference of `record` dangles, so the check lists them all
   const ids = new Set(checkUserRefs([record]).map((d) => parseRef(d.target)?.id))
   const linked = pool.filter((r) => r.id !== record.id && ids.has(r.id))
+  const sessions = pool.filter(
+    (r) => r.kind === 'session' && r.data.strings.some((s) => s.load === `user:${record.id}`),
+  )
   // a maker the record names itself and one of its records names too is carried once
-  return [...new Set([...linked, ...linked.flatMap((r) => makerRecordsOf(r, pool))])]
+  return [...new Set([...linked, ...linked.flatMap((r) => makerRecordsOf(r, pool)), ...sessions])]
 }
 
 /**
