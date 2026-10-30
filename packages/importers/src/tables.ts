@@ -92,11 +92,12 @@ function splitRows(text: string, delimiter: TableDelimiter): string[][] {
 /**
  * The delimiter that gives the most rows as wide as the first, which must be two cells or more
  * and repeat in a second row; none when no delimiter makes a table.
+ * Tab is tried first and wins a tie, as cell text holds commas far more often than tabs.
  */
 function detectDelimiter(text: string): TableDelimiter | undefined {
   const sample = text.slice(0, 20_000)
   let best: { d: TableDelimiter; score: number } | undefined
-  for (const d of [',', ';', '\t'] as const) {
+  for (const d of ['\t', ',', ';'] as const) {
     const rows = splitRows(sample, d).slice(0, 30)
     const width = rows[0]?.length ?? 0
     const same = rows.filter((r) => r.length === width).length

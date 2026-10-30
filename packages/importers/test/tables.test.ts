@@ -75,6 +75,19 @@ describe('readTable', () => {
     }
   })
 
+  it('reads tabs when commas split the rows as evenly', () => {
+    expect(readTable('name,detail\tmass\nA,\t"6,5"\nB,\t"7,1"\n')).toEqual({
+      table: {
+        header: ['name,detail', 'mass'],
+        hasHeader: true,
+        rows: [
+          ['A,', '6,5'],
+          ['B,', '7,1'],
+        ],
+      },
+    })
+  })
+
   it('keeps a quote after cell text as text, also in a long cell', () => {
     expect(readTable('a,b\nx "y",2\n')).toEqual({
       table: { header: ['a', 'b'], hasHeader: true, rows: [['x "y"', '2']] },
