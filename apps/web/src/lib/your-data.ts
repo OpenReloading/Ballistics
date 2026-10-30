@@ -1,5 +1,6 @@
 import type { UserRecord, UserRecordKind } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
+import { gapCount, loadGaps } from './load-gaps.ts'
 
 /** A row of Settings' Your data: a kind of the user's records and the list that shows them. */
 interface YourDataKind {
@@ -23,6 +24,13 @@ const yourDataKinds: readonly YourDataKind[] = [
   { kind: 'firearm', label: msg('Firearms'), href: '/firearms' },
 ]
 
-/** One row per kind of {@link yourDataKinds} with the number of `records` of that kind (0 for none). */
+/**
+ * One row per kind of {@link yourDataKinds} with the number of `records` of that kind (0 for none).
+ * The firearms row adds the number of notes on firearms and saved loads (`notes`).
+ */
 export const yourDataRows = (records: readonly UserRecord[]) =>
-  yourDataKinds.map((k) => ({ ...k, count: records.filter((r) => r.kind === k.kind).length }))
+  yourDataKinds.map((k) => ({
+    ...k,
+    count: records.filter((r) => r.kind === k.kind).length,
+    ...(k.kind === 'firearm' && { notes: gapCount(loadGaps(records)) }),
+  }))

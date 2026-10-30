@@ -38,3 +38,12 @@ it('counts nothing but the kinds it lists', () => {
   }
   expect(yourDataRows([maker]).every((r) => r.count === 0)).toBe(true)
 })
+
+it('adds the notes on firearms and saved loads to the firearms row only', () => {
+  const load: UserRecord = { kind: 'load', id: 'l', name: 'Load', saved, data: { origin: 'user' } }
+  const rows = yourDataRows([firearm('a'), load])
+  // the firearm no load names and the load without a firearm
+  expect(rows.find((r) => r.kind === 'firearm')?.notes).toBe(2)
+  expect(rows.filter((r) => 'notes' in r)).toHaveLength(1)
+  expect(rows.find((r) => r.kind === 'firearm')?.href).toBe('/firearms')
+})
