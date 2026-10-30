@@ -22,7 +22,7 @@ import {
 import { type UserRecord, type UserRecordKind, userRecord } from '@open-reloading/schema'
 import { storageName } from './edition.ts'
 import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-formats.ts'
-import { maxFileBytes, planImport } from './user-data.ts'
+import { type InvalidRecord, maxFileBytes, planImport } from './user-data.ts'
 
 /**
  * What a card shows of a read file: the refusal (with the load-file format that refused it), the
@@ -64,6 +64,8 @@ export interface BuildView {
   equal: number
   changed: number
   repeated: number
+  /** Rows and makers left out because an invalid browser record has their id. */
+  blocked: number
 }
 
 /** The source of an import as each written record carries it. */
@@ -92,8 +94,14 @@ const shownIssues = 8
 
 /** The browser store as the worker reads and writes it; tests pass their own. */
 interface ImportStore {
-  records: () => Promise<UserRecord[]>
+  records: () => Promise<Stored>
   put: (records: UserRecord[]) => Promise<unknown>
+}
+
+/** The browser store's records: those that pass the schema and those that do not. */
+interface Stored {
+  records: UserRecord[]
+  invalid: InvalidRecord[]
 }
 
 /** The plan of a build against the stored records. */
@@ -103,6 +111,7 @@ interface Plan {
   changed: UserRecord[]
   equal: number
   repeated: number
+  blocked: number
 }
 
 interface Held {
@@ -191,7 +200,7 @@ const samplesOf = (t: { header: string[]; rows: string[][] }) =>
  * `built` against `stored`: rows with one id in the file collapse (same content) or keep the first
  * (other content); makers count only as written, never as changed.
  */
-function planOf(built: BuiltRecords, stored: UserRecord[]): Plan {
+function planOf(built: BuiltRecords, { records: stored, invalid }: Stored): Plan {
   const first = new Map<string, UserRecord>()
   let repeated = 0
   for (const { record } of built.entries) {
@@ -202,13 +211,15 @@ function planOf(built: BuiltRecords, stored: UserRecord[]): Plan {
   const makers = planImport(
     built.makers.map((m) => m.record),
     stored,
+    invalid,
   )
-  const rows = planImport([...first.values()], stored)
+  const rows = planImport([...first.values()], stored, invalid)
   return {
     added: [...makers.added, ...rows.added],
     changed: rows.conflicts.map((c) => c.incoming),
     equal: rows.equal.length,
     repeated,
+    blocked: makers.blocked.length + rows.blocked.length,
   }
 }
 
@@ -271,6 +282,7 @@ const viewOf = (held: Held): BuildView => {
     equal: plan.equal,
     changed: plan.changed.length,
     repeated: plan.repeated,
+    blocked: plan.blocked,
   }
 }
 

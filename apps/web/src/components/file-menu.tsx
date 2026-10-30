@@ -721,6 +721,7 @@ function ImportReport({
     <>
       <p>{said.summary}</p>
       {said.invalid && <p>{said.invalid}</p>}
+      {said.held && <p>{said.held}</p>}
       {report.skipped.length > 0 && (
         <ul className="file-skipped">
           {report.skipped.map((s) => (

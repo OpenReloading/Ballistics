@@ -17,16 +17,26 @@ export type ImportReport = {
   /** Warnings and fields not read of the files read. */
   notes: { name: string; note: string }[]
   conflicts: { incoming: UserRecord; stored: UserRecord }[]
+  /** Records not stored because an invalid browser record has their id. */
+  blocked: UserRecord[]
   /** The `invalid` entries of the files: stored as invalid records, left out for an id the browser has, or unstorable. */
   invalid: { added: number; kept: number; unstorable: number }
   /** Photos the files carry, stored with the records that are replaced. */
   files: EmbeddedFile[]
   /** The report's sentences in the language of `tr`; empty where there is nothing to say. */
-  said: (tr: Translator) => { summary: string; invalid: string; conflicts: string }
+  said: (tr: Translator) => { summary: string; invalid: string; held: string; conflicts: string }
 }
 
 function reportSaid(report: ImportReport, { t, tn }: Translator) {
-  const { invalid, conflicts } = report
+  const { invalid, conflicts, blocked } = report
+  const held = blocked.length
+    ? tn(
+        blocked.length,
+        '{count} record not imported because an invalid browser record has its id: {names}. Download it raw and delete it under Open, Invalid records, then import again.',
+        '{count} records not imported because invalid browser records have their ids: {names}. Download them raw and delete them under Open, Invalid records, then import again.',
+        { names: blocked.map((r) => r.name).join(', ') },
+      )
+    : ''
   return {
     summary: t('{added} records added, {equal} already in this browser, {skipped} files skipped.', {
       added: report.added,
@@ -49,6 +59,7 @@ function reportSaid(report: ImportReport, { t, tn }: Translator) {
             .filter(Boolean)
             .join(', ')}.`
         : '',
+    held,
     conflicts: conflicts.length
       ? tn(
           conflicts.length,
@@ -81,6 +92,7 @@ export async function importTexts(files: ImportFile[], io: ImportIo, { t }: Tran
     skipped: [],
     notes: [],
     conflicts: [],
+    blocked: [],
     invalid: { added: 0, kept: 0, unstorable: 0 },
     files: [],
     said: (tr) => reportSaid(total, tr),
@@ -95,19 +107,21 @@ export async function importTexts(files: ImportFile[], io: ImportIo, { t }: Tran
         skipped,
         notes,
       } = await parseFiles([{ name: f.name, bytes: await f.read() }], undefined, t)
-      const plan = planImport(records, (await storedRecords()).records)
+      const stored = await storedRecords()
+      const plan = planImport(records, stored.records, stored.invalid)
       // an equal record may come to a browser without its photo
       await storePhotos(photos, [...plan.added, ...plan.equal])
       await putRecords(plan.added)
       added.push(...plan.added)
       total.added += plan.added.length
       // after the valid records, and never over a record with its id
-      const stored = await putInvalid(invalid)
-      for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += stored[k]
+      const put = await putInvalid(invalid)
+      for (const k of ['added', 'kept', 'unstorable'] as const) total.invalid[k] += put[k]
       total.equal += plan.equal.length
       total.skipped.push(...skipped)
       total.notes.push(...notes)
       total.conflicts.push(...plan.conflicts)
+      total.blocked.push(...plan.blocked)
       // kept for Replace: only the photos of the records it may store
       const wanted = new Set(photoIds(plan.conflicts.map((c) => c.incoming)))
       total.files.push(...photos.filter((p) => wanted.has(p.id)))

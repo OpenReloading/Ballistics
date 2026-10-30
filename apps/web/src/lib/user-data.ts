@@ -236,19 +236,29 @@ export function makersToCarry(
 
 const content = (r: UserRecord) => canonicalJson({ kind: r.kind, name: r.name, data: r.data })
 
-/** Sorts incoming records against the stored ones by `id`: new, equal content, other content. */
-export function planImport(incoming: UserRecord[], stored: UserRecord[]) {
+/**
+ * Sorts incoming records against the stored ones by `id`: new, equal content, other content, and
+ * `blocked` by an invalid stored record of the id in `invalid`, which nothing may overwrite.
+ */
+export function planImport(
+  incoming: UserRecord[],
+  stored: UserRecord[],
+  invalid: readonly InvalidRecord[] = [],
+) {
   const byId = new Map(stored.map((r) => [r.id, r]))
+  const held = new Set(invalid.map((i) => i.id))
   const added: UserRecord[] = []
   const equal: UserRecord[] = []
   const conflicts: { incoming: UserRecord; stored: UserRecord }[] = []
+  const blocked: UserRecord[] = []
   for (const r of incoming) {
     const s = byId.get(r.id)
-    if (!s) added.push(r)
+    if (held.has(r.id)) blocked.push(r)
+    else if (!s) added.push(r)
     else if (content(s) === content(r)) equal.push(r)
     else conflicts.push({ incoming: r, stored: s })
   }
-  return { added, equal, conflicts }
+  return { added, equal, conflicts, blocked }
 }
 
 /**

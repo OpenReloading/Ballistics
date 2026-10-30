@@ -46,7 +46,7 @@ function storeWorker(formats = loadFileFormats) {
   const replies: ImportReply[] = []
   const handle = importWorker(
     {
-      records: async () => stored,
+      records: async () => ({ records: stored, invalid: [] }),
       put: (rs) => {
         const ids = new Set(rs.map((r) => r.id))
         stored = [...stored.filter((r) => !ids.has(r.id)), ...rs]
