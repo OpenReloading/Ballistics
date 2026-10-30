@@ -1,9 +1,6 @@
-import { InputError, icao, millerStability } from '@open-reloading/core'
-import type { Bullet } from '@open-reloading/schema'
-import { userDataFile } from '@open-reloading/schema'
 import type { FastifyError, FastifyPluginAsync } from 'fastify'
 import type { z } from 'zod'
-import { assertFinite, computeErrorHandler, resolvedRecord } from '../compute/answer.ts'
+import { computeErrorHandler } from '../compute/answer.ts'
 import {
   rangeStringsFitResponse,
   rangeStringsPlanResponse,
@@ -11,6 +8,14 @@ import {
   trajectoryResponse,
   truingResponse,
 } from '../compute/exterior-response.ts'
+import {
+  type ExteriorContext,
+  runRangeStringsFit,
+  runRangeStringsPlan,
+  runStability,
+  runTrajectory,
+  runTruing,
+} from '../compute/exterior-run.ts'
 import {
   trajectoryBody,
   trajectoryExample,
@@ -21,84 +26,18 @@ import { interiorResponse, loadFileResponse } from '../compute/interior-response
 import { runInterior } from '../compute/interior-run.ts'
 import { interiorBody, interiorExample } from '../compute/interior-schema.ts'
 import { loadFileExample } from '../compute/load-file-example.ts'
-import { bulletProjectile, bulletSi, findBullet, findCartridge } from '../compute/resolve.ts'
-import { caps } from '../compute/schemas.ts'
-import { simulate, simulateQuery } from '../compute/simulate.ts'
-import { stabilityBounds, stabilityQuery } from '../compute/stability-schema.ts'
+import { findBullet, findCartridge } from '../compute/resolve.ts'
+import { loadFileBody, simulate, simulateQuery } from '../compute/simulate.ts'
+import { stabilityQuery } from '../compute/stability-schema.ts'
 import {
   rangeStringsFitBody,
   rangeStringsFitExample,
   rangeStringsPlanBody,
   rangeStringsPlanExample,
 } from '../compute/strings-schema.ts'
-import { responseUnits } from '../compute/units.ts'
 import { API_PREFIX } from '../version.ts'
 import type { ComputeContext } from './common.ts'
 import { describeAnswers } from './identity.ts'
-
-/** Result paths where core can return NaN; JSON writes null. */
-const nanPaths = {
-  spinDrift: /^\.result\.points\.\d+\.spinDrift$/,
-  truing: /^\.result\.(parameters\.\d+\.standardUncertainty|correlation\.\d+\.\d+)$/,
-}
-
-/**
- * Result paths of the range strings routes where a singular design gives an infinite number:
- * the standard uncertainties, variance inflation and condition number of a parameter in
- * the null direction. The correlations stay finite.
- */
-const stringParameter = String.raw`parameters\.\d+\.(relativeStandardUncertainty|varianceInflation|standardUncertainty|posteriorSigma|prior\.ratio)`
-const infinitePaths = {
-  plan: new RegExp(String.raw`^\.result\.\d+\.plan\.(conditionNumber|${stringParameter})$`),
-  fit: new RegExp(String.raw`^\.result\.(conditionNumber|${stringParameter})$`),
-}
-
-/** Mass, diameter and length of a stability query, the missing ones from the bullet `record`. */
-function fillFromRecord(q: z.infer<typeof stabilityQuery>, record: Bullet) {
-  let { mass, diameter, length } = q
-  const si = bulletSi(record)
-  const fields = [
-    ...(mass === undefined ? ['mass'] : []),
-    ...(diameter === undefined ? ['diameter'] : []),
-    ...(length === undefined && si.length !== undefined ? ['length'] : []),
-  ]
-  mass ??= si.mass
-  diameter ??= si.diameter
-  length ??= si.length
-  return { mass, diameter, length, resolved: { bullet: resolvedRecord(record, fields) } }
-}
-
-/**
- * Mass, diameter and length of a stability query, the missing ones from the bullet `record`, each
- * checked against `stabilityBounds`, with the record's `resolved.bullet` part.
- */
-function stabilityInputs(q: z.infer<typeof stabilityQuery>, record: Bullet | undefined) {
-  const { mass, diameter, length, resolved } = record
-    ? fillFromRecord(q, record)
-    : { ...q, resolved: undefined }
-  if (mass === undefined || diameter === undefined || length === undefined)
-    throw new InputError(`bullet ${q.bullet} has no length`)
-  // request values have passed these bounds already; record values have not
-  for (const [key, value] of Object.entries({ mass, diameter, length })) {
-    const [lo, hi] = stabilityBounds[key as 'mass' | 'diameter' | 'length']
-    const unit = key === 'mass' ? 'kg' : 'm'
-    if (!(value >= lo && value <= hi))
-      throw new InputError(
-        `bullet ${q.bullet} ${key} ${value} ${unit} must be within ${lo} and ${hi} ${unit}`,
-      )
-  }
-  return { mass, diameter, length, resolved }
-}
-
-/** The body of `POST /interior/load-file` as the document shows it. The route reads it with `readLoadFile`. */
-const loadFileBody = userDataFile
-  .extend({
-    records: userDataFile.shape.records.describe(
-      'The records of the file. Exactly one is a workbench load (`kind` `load`). Its `charge` and the solver values it types under `data.analysis.overrides` are in stored units (g, mm, cm3, bar, degC).',
-    ),
-    files: userDataFile.shape.files.describe('Photos of target sheets, base64. Not read here.'),
-  })
-  .describe('A load file saved by the workbench.')
 
 /**
  * Exterior trajectory and truing, interior simulation and Miller stability.
@@ -119,15 +58,7 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
   )
   describeAnswers(app, catalogue)
 
-  async function resolveShot<S extends z.infer<typeof trajectoryBody>['shot']>(shot: S) {
-    const p = shot.projectile
-    if (!('bullet' in p)) return { shot: { ...shot, projectile: p }, resolved: undefined }
-    const { projectile, bullet: echoed } = bulletProjectile(
-      await findBullet(catalogue, p.bullet),
-      p,
-    )
-    return { shot: { ...shot, projectile }, resolved: { bullet: echoed, projectile } }
-  }
+  const exterior: ExteriorContext = { compute, findBullet: (id) => findBullet(catalogue, id) }
 
   // `config` carries the zod schema of the request and the error statuses to the contract
   // document (`openapi.ts`): 404 for an unknown id, 422 from the error handler, 503 from the pool
@@ -147,19 +78,9 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
     description:
       'Integrates the flight of a projectile from the muzzle (point mass, or modified point mass with yaw of repose and spin) and answers its state at each requested slant range: distance, height, windage, time, velocity, energy and the holds. The zero gives the elevation and windage angles of the bore. A `bullet` id takes mass, diameter, length and ballistic coefficients from the record.',
   }
-  app.post('/exterior/trajectory', options(trajectoryBody, trajectoryDoc), async (request) => {
-    const body = trajectoryBody.parse(request.body)
-    const { shot, resolved } = await resolveShot(body.shot)
-    const result = await compute.run({
-      kind: 'trajectory',
-      args: [shot, body.ranges, { maxSteps: caps.trajectorySteps, ...body.options }],
-    })
-    const mpm = body.options?.model === 'modified-point-mass'
-    return assertFinite(
-      { units: responseUnits.exterior, result, resolved },
-      mpm ? nanPaths.spinDrift : undefined,
-    )
-  })
+  app.post('/exterior/trajectory', options(trajectoryBody, trajectoryDoc), (request) =>
+    runTrajectory(exterior, trajectoryBody.parse(request.body)),
+  )
 
   const truingDoc = {
     response: truingResponse,
@@ -168,40 +89,9 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
     description:
       'Fits the muzzle velocity, or drag factors (constant or at Mach knots) with or without the muzzle velocity, to measured heights, elevation holds or velocities at known ranges, by least squares on log parameters. Answers the fitted parameters with their standard uncertainties and correlations, the residuals and the trued shot.',
   }
-  app.post('/exterior/truing', options(truingBody, truingDoc), async (request) => {
-    const body = truingBody.parse(request.body)
-    const { shot, resolved } = await resolveShot(body.shot)
-    const o = {
-      maxSteps: caps.truingSteps,
-      maxIterations: caps.truingIterations,
-      maxTotalSteps: caps.truingTotalSteps,
-      ...body.options,
-    }
-    const fit = body.fit
-    const result =
-      fit.kind === 'muzzleVelocity'
-        ? await compute.run({ kind: 'truingMuzzleVelocity', args: [shot, body.observations, o] })
-        : await compute.run({
-            kind: 'truingDrag',
-            args: [
-              shot,
-              body.observations,
-              { knots: fit.knots, fitMuzzleVelocity: fit.fitMuzzleVelocity },
-              o,
-            ],
-          })
-    return assertFinite({ units: responseUnits.truing, result, resolved }, nanPaths.truing)
-  })
-
-  /** Core options of a strings request: the API's defaults and the caps under the request's values. */
-  const stringsOptions = (o: z.infer<typeof rangeStringsFitBody>['options']) => {
-    const { trajectoryOptions, ...rest } = o ?? {}
-    return {
-      maxIterations: caps.truingIterations,
-      ...rest,
-      trajectoryOptions: { maxSteps: caps.truingSteps, ...trajectoryOptions },
-    }
-  }
+  app.post('/exterior/truing', options(truingBody, truingDoc), (request) =>
+    runTruing(exterior, truingBody.parse(request.body)),
+  )
 
   const planDoc = {
     response: rangeStringsPlanResponse,
@@ -210,23 +100,8 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
     description:
       'Compares candidate range strings before any shot: for each candidate the identifiability status and expected standard uncertainty of muzzle velocity, drag factor, click value and zero offset, their variance inflation and the condition number of the design.',
   }
-  app.post(
-    '/exterior/range-strings/plan',
-    options(rangeStringsPlanBody, planDoc),
-    async (request) => {
-      const body = rangeStringsPlanBody.parse(request.body)
-      const { shot, resolved } = await resolveShot(body.shot)
-      const { candidates, clickValue, dispersion } = body
-      const result = await compute.run({
-        kind: 'rangeStringsPlan',
-        args: [{ shot, clickValue, dispersion }, candidates, stringsOptions(body.options)],
-      })
-      return assertFinite(
-        { units: responseUnits.rangeStrings, result, resolved },
-        infinitePaths.plan,
-        true,
-      )
-    },
+  app.post('/exterior/range-strings/plan', options(rangeStringsPlanBody, planDoc), (request) =>
+    runRangeStringsPlan(exterior, rangeStringsPlanBody.parse(request.body)),
   )
 
   const fitDoc = {
@@ -236,20 +111,9 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
     description:
       'Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with its identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.',
   }
-  app.post('/exterior/range-strings/fit', options(rangeStringsFitBody, fitDoc), async (request) => {
-    const body = rangeStringsFitBody.parse(request.body)
-    const { shot, resolved } = await resolveShot(body.shot)
-    const { clickValue, entries, chronograph } = body
-    const result = await compute.run({
-      kind: 'rangeStringsFit',
-      args: [{ shot, clickValue, entries, chronograph }, stringsOptions(body.options)],
-    })
-    return assertFinite(
-      { units: responseUnits.rangeStrings, result, resolved },
-      infinitePaths.fit,
-      true,
-    )
-  })
+  app.post('/exterior/range-strings/fit', options(rangeStringsFitBody, fitDoc), (request) =>
+    runRangeStringsFit(exterior, rangeStringsFitBody.parse(request.body)),
+  )
 
   const interiorDoc = {
     response: interiorResponse,
@@ -302,23 +166,7 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
         'The gyroscopic stability factor of a bullet by the Miller twist rule from mass, diameter, length, twist and muzzle velocity, corrected for air temperature and pressure. A `bullet` id supplies the values the query leaves out.',
     },
   }
-  app.get('/exterior/stability', stabilityOptions, async (request) => {
-    const q = stabilityQuery.parse(request.query)
-    const record = q.bullet === undefined ? undefined : await findBullet(catalogue, q.bullet)
-    const { mass, diameter, length, resolved } = stabilityInputs(q, record)
-    const result = millerStability({
-      mass,
-      diameter,
-      length,
-      twist: q.twist,
-      velocity: q.muzzleVelocity,
-      air: {
-        altitude: 0,
-        pressure: q.pressure ?? icao.pressure,
-        temperature: q.temperature ?? icao.temperature,
-        humidity: 0,
-      },
-    })
-    return assertFinite({ units: responseUnits.stability, method: 'miller', result, resolved })
-  })
+  app.get('/exterior/stability', stabilityOptions, (request) =>
+    runStability(exterior, stabilityQuery.parse(request.query)),
+  )
 }

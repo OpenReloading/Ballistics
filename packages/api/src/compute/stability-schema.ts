@@ -86,3 +86,6 @@ export const stabilityQuery = z
     { message: 'mass, diameter and length are required without bullet' },
   )
   .describe('Projectile, twist, muzzle velocity and air of the stability factor. Units SI.')
+
+/** A parsed `GET /exterior/stability` query. */
+export interface StabilityQuery extends z.infer<typeof stabilityQuery> {}

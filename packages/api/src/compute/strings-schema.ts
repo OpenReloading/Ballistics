@@ -233,6 +233,9 @@ export const rangeStringsFitBody = z
   })
   .describe('A nominal shot and measured range strings to fit. Units SI, rad.')
 
+/** A parsed `POST /exterior/range-strings/plan` body, defaults applied. */
+export interface RangeStringsPlanBody extends z.infer<typeof rangeStringsPlanBody> {}
+
 /** A body of `POST /exterior/range-strings/plan` as a client sends it, before defaults. */
 export interface RangeStringsPlanRequest extends z.input<typeof rangeStringsPlanBody> {}
 
@@ -254,6 +257,9 @@ export const rangeStringsPlanExample: RangeStringsPlanRequest = {
     },
   ],
 }
+
+/** A parsed `POST /exterior/range-strings/fit` body, defaults applied. */
+export interface RangeStringsFitBody extends z.infer<typeof rangeStringsFitBody> {}
 
 /** A body of `POST /exterior/range-strings/fit` as a client sends it, before defaults. */
 export interface RangeStringsFitRequest extends z.input<typeof rangeStringsFitBody> {}

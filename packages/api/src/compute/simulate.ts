@@ -20,6 +20,7 @@ import {
   ladderStepKinds,
   type Powder,
   toSi,
+  userDataFile,
 } from '@open-reloading/schema'
 import { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
@@ -49,6 +50,16 @@ export const simulateQuery = z.strictObject({
     .optional()
     .describe('`true` adds the time curves (`points`) of the shown run. Default `false`.'),
 })
+
+/** The body of `POST /interior/load-file` as the document shows it. The route reads it with `readLoadFile`. */
+export const loadFileBody = userDataFile
+  .extend({
+    records: userDataFile.shape.records.describe(
+      'The records of the file. Exactly one is a workbench load (`kind` `load`). Its `charge` and the solver values it types under `data.analysis.overrides` are in stored units (g, mm, cm3, bar, degC).',
+    ),
+    files: userDataFile.shape.files.describe('Photos of target sheets, base64. Not read here.'),
+  })
+  .describe('A load file saved by the workbench.')
 
 /** Units of the summary of `POST /interior/load-file`. */
 const summaryUnits = {

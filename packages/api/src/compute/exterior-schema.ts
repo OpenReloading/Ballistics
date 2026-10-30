@@ -349,6 +349,9 @@ export const truingBody = z
   })
   .describe('A shot, observations and the parameters to fit to them. Units SI, rad, K.')
 
+/** A parsed `POST /exterior/trajectory` body, defaults applied. */
+export interface TrajectoryBody extends z.infer<typeof trajectoryBody> {}
+
 /** A body of `POST /exterior/trajectory` as a client sends it, before defaults. */
 export interface TrajectoryRequest extends z.input<typeof trajectoryBody> {}
 
@@ -369,6 +372,9 @@ export const trajectoryExample: TrajectoryRequest = {
   },
   ranges: [0, 100, 200, 300, 500],
 }
+
+/** A parsed `POST /exterior/truing` body, defaults applied. */
+export interface TruingBody extends z.infer<typeof truingBody> {}
 
 /** A body of `POST /exterior/truing` as a client sends it, before defaults. */
 export interface TruingRequest extends z.input<typeof truingBody> {}
