@@ -1,7 +1,8 @@
+import { readFileSync } from 'node:fs'
 import { type ParseArgsConfig, parseArgs } from 'node:util'
-import { compare, type Options, verify } from './commands.ts'
+import type { Options } from './commands.ts'
 import { Refusal, UsageError } from './errors.ts'
-import { type Grouping, groupings } from './metrics.ts'
+import type { Grouping } from './metrics.ts'
 import { compareTable, verifyTable } from './report.ts'
 import { type Split, splits } from './split.ts'
 
@@ -16,10 +17,10 @@ export interface Io {
 const usage = `usage:
   ballistics verify  --rows <path> [--model m3|<module>] [options]
   ballistics compare --rows <path> --baseline <m3|module|verify.json> --candidate <m3|module> [options]
-  ballistics --help
+  ballistics --help | --version
 
 options:
-  --rows <path>      a rows file or a folder of .csv files (default: BALLISTICS_ROWS)
+  --rows <path>      a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS)
   --records <dir>    a records root, repeatable (default: BALLISTICS_RECORDS, else the repository records)
   --split <name>     validation (default), training or test
   --final            required for the test split
@@ -29,8 +30,9 @@ options:
   --params records   the powder parameters of the records (the only mode so far)
   --json | --table   output format (default: JSON unless stdout is a terminal)
   -h, --help         this text
+  --version          the version
 
-exit codes: 0 done, 1 refused run, 2 bad input`
+exit codes: 0 done, 1 refused run, 2 bad input, 3 internal error`
 
 /** Parses a command line, an unknown or malformed option is bad input with the usage. */
 function parse<T extends ParseArgsConfig>(config: T) {
@@ -49,6 +51,7 @@ function checkChoices(
   values: { json?: boolean | undefined; table?: boolean | undefined; params?: string | undefined },
   split: string,
   by: string | undefined,
+  groupings: readonly Grouping[],
 ) {
   if (!splits.includes(split as Split))
     throw new UsageError(`--split is one of ${splits.join(', ')}`)
@@ -67,6 +70,7 @@ function optionsOf(
   args: string[],
   env: NodeJS.ProcessEnv,
   warn: Io['stderr'],
+  groupings: readonly Grouping[],
 ) {
   const { values } = parse({
     args,
@@ -95,7 +99,7 @@ function optionsOf(
   if (!rows) throw new UsageError('give --rows <path> or set BALLISTICS_ROWS')
   const split = values.split ?? 'validation'
   const by = values['group-by']
-  checkChoices(values, split, by)
+  checkChoices(values, split, by, groupings)
   const fromEnv = env.BALLISTICS_RECORDS?.split(':').filter(Boolean) ?? []
   const options: Options = {
     rows,
@@ -116,7 +120,12 @@ async function execute(
   env: NodeJS.ProcessEnv,
   io: Io,
 ) {
-  const { options, values } = optionsOf(command, args, env, io.stderr)
+  // the libraries load after --help and --version have answered
+  const [{ compare, verify }, { groupings }] = await Promise.all([
+    import('./commands.ts'),
+    import('./metrics.ts'),
+  ])
+  const { options, values } = optionsOf(command, args, env, io.stderr, groupings)
   const json = values.json === true || (values.table !== true && !io.tty)
   if (command === 'verify') {
     const result = await verify(options, values.model)
@@ -128,11 +137,42 @@ async function execute(
   return json ? JSON.stringify(result, null, 2) : compareTable(result)
 }
 
+/** What went wrong: bad input (exit 2), a refused run (1) or an internal error (3). */
+type ErrorKind = 'usage' | 'refused' | 'internal'
+
+/** The kind, exit code and message of an error a run ends with. */
+function failure(error: unknown): { kind: ErrorKind; code: number; message: string } {
+  if (error instanceof Refusal) return { kind: 'refused', code: 1, message: error.message }
+  if (error instanceof UsageError) return { kind: 'usage', code: 2, message: error.message }
+  return {
+    kind: 'internal',
+    code: 3,
+    message: error instanceof Error ? error.message : String(error),
+  }
+}
+
+/** The error on stderr: one JSON object for a script, the text line on a terminal; never a stack trace. */
+function report(error: unknown, json: boolean, io: Io): number {
+  const { kind, code, message } = failure(error)
+  if (json) io.stderr(`${JSON.stringify({ error: { kind, message } })}\n`)
+  else if (kind === 'refused') io.stderr(`refused: ${message}\n`)
+  else if (kind === 'usage') io.stderr(`${message}\n`)
+  else io.stderr(`error: ${message}\n`.replace(/\n(?!$)/g, ' '))
+  return code
+}
+
 /** Runs the command line `argv` (without the program), writes the result and returns the exit code. */
 export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promise<number> {
   const [command = '', ...args] = argv
   if (argv.includes('--help') || argv.includes('-h')) {
     io.stdout(`${usage}\n`)
+    return 0
+  }
+  if (argv.includes('--version')) {
+    const { version } = JSON.parse(
+      readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+    )
+    io.stdout(`ballistics ${version}\n`)
     return 0
   }
   try {
@@ -143,18 +183,6 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
     io.stdout(`${await execute(command, args, env, io)}\n`)
     return 0
   } catch (error) {
-    if (error instanceof Refusal) {
-      io.stderr(`refused: ${error.message}\n`)
-      return 1
-    }
-    if (error instanceof UsageError) {
-      io.stderr(`${error.message}\n`)
-      return 2
-    }
-    // a candidate that throws, or a file error: one line, never a stack trace
-    io.stderr(
-      `error: ${error instanceof Error ? error.message : String(error)}\n`.replace(/\n(?!$)/g, ' '),
-    )
-    return 2
+    return report(error, argv.includes('--json') || !io.tty, io)
   }
 }
