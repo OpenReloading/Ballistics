@@ -408,7 +408,14 @@ export function FirearmChooser({ add, ...props }: ChooserProps<FirearmRow> & { a
     <RecordChooser
       kind={firearmKind}
       designs={none}
-      chips={add && <Link href="/firearms">{t('Add a firearm under Firearms')}</Link>}
+      chips={
+        add && (
+          <Link href="/firearms" target="_blank" rel="noopener">
+            {t('Add a firearm under Firearms')}
+            <span className="visually-hidden"> {t('in a new tab')}</span>
+          </Link>
+        )
+      }
       {...props}
     />
   )

@@ -243,6 +243,8 @@ export function RecordSearch<T extends { id: string }>({
               },
             })}
             rightSectionPointerEvents={browse ? 'all' : 'none'}
+            // the clear button beside the browse button
+            {...(browse && picked && clear && { rightSectionWidth: size === 'xs' ? 56 : 64 })}
             onChange={(e) => {
               setQ(e.currentTarget.value)
               combobox.openDropdown()

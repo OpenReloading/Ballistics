@@ -2537,9 +2537,11 @@ export function useWorkbenchState() {
   const chosenCapacity = chosenCapacityOf(capacityChoice, cartridgeKey)
   const chosenCase = chosenCapacityOf(caseChoice, cartridgeKey)
   const chosenOwnCase = chosenCapacityOf(ownCaseChoice, cartridgeKey)
-  const cartridgeCases = cartridge
-    ? cases.filter((c) => c.cartridge === `catalogue:${cartridge.id}`)
-    : []
+  // one list per cartridge and library read, so the brass field's matches last while they do
+  const cartridgeCases = useMemo(
+    () => (cartridge ? cases.filter((c) => c.cartridge === `catalogue:${cartridge.id}`) : []),
+    [cartridge, cases],
+  )
 
   const activeStep = ladderStepField(ladderKind, {
     seat: seatStep,
