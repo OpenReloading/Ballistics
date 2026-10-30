@@ -70,6 +70,7 @@ const loadingLines = {
   'the preview': msg('Loading the preview'),
   'the settings': msg('Loading the settings'),
   'the shot groups': msg('Loading the shot groups'),
+  'the trajectory': msg('Loading the trajectory'),
   'the truing': msg('Loading the truing'),
   'the unit settings': msg('Loading the unit settings'),
   'the workbench defaults': msg('Loading the workbench defaults'),

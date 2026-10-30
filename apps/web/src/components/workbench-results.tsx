@@ -22,7 +22,6 @@ import { NavIcon } from './nav-icons.tsx'
 import { chartCopy } from './print-report.tsx'
 import { ResultNotes } from './result-notes.tsx'
 import { ErrorNote, Loading } from './states.tsx'
-import { TrajectoryForm } from './trajectory-form.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
 import { Checklist, shortFrame } from './workbench-inputs.tsx'
@@ -47,6 +46,14 @@ const PowderCompare = dynamic(() => import('./powder-compare.tsx').then((m) => m
   ssr: false,
   loading: () => <Loading what="the powder comparison" inline />,
 })
+
+const TrajectoryForm = dynamic(
+  () => import('./trajectory-form.tsx').then((m) => m.TrajectoryForm),
+  {
+    ssr: false,
+    loading: () => <Loading what="the trajectory" inline />,
+  },
+)
 
 const GroupsTab = dynamic(() => import('./groups-tab.tsx').then((m) => m.GroupsTab), {
   ssr: false,
