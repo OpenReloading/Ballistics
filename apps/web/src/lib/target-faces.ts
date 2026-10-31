@@ -113,9 +113,10 @@ export function faceFacets(
     {
       key: 'dist',
       label: msg('Distance'),
-      // keyed by the shown text: distances that read alike are one option
-      values: (r) => [...new Set(r.distances.map((m) => distance(m)))],
-      order: (a, b) => Number.parseFloat(a) - Number.parseFloat(b),
+      // keyed by the metres to 0.01 m, so a selection in the URL holds in either range unit
+      values: (r) => [...new Set(r.distances.map((m) => String(Number(m.toFixed(2)))))],
+      text: (v) => distance(Number(v)),
+      order: (a, b) => Number(a) - Number(b),
     },
     {
       key: 'rings',
