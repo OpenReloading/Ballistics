@@ -41,6 +41,21 @@ export function boreArea(b: {
   )
 }
 
+/**
+ * The C.I.P. bore area `q` of a cartridge record where it applies to `boreDiameter`: Q describes
+ * the record's land diameter `land`, so a bore diameter that differs from it (typed over the
+ * record's) leaves no record area. A record without a land diameter, or no bore diameter yet,
+ * keeps Q. `land` and `boreDiameter` in one unit.
+ */
+export function recordBoreArea(
+  q: number | undefined,
+  land: number | undefined,
+  boreDiameter: number | undefined,
+): number | undefined {
+  if (land === undefined || boreDiameter === undefined) return q
+  return Math.abs(boreDiameter - land) <= 1e-6 * land ? q : undefined
+}
+
 /** Oversize above which the C.I.P. limits are taken as not comparable, percent. */
 export const maxOversizePercent = 5
 

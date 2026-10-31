@@ -12,6 +12,7 @@ import {
   gasVelocityFactor,
   type InteriorLoad,
   powderModelValues,
+  recordBoreArea,
   recordResistance,
   ValueError,
 } from '@open-reloading/core'
@@ -41,7 +42,7 @@ import type {
   SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
-import { type BulletValues, diameterMm } from '../lib/bullet.ts'
+import { type BulletValues, diameterMm, recordBulletValues } from '../lib/bullet.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
@@ -66,6 +67,7 @@ import {
   type DefaultSources,
   type FollowKey,
   followKeys,
+  isFollowKey,
   type Suggestion,
   type Suggestions,
   suggestDefaults,
@@ -115,6 +117,7 @@ import {
   recordValues,
 } from '../lib/query.ts'
 import { withStoredSessions } from '../lib/range-entry.ts'
+import { changedFromRecord, recordValuesOf } from '../lib/record-changes.ts'
 import {
   type LadderDirection,
   type RunnableLadderKind,
@@ -161,6 +164,7 @@ import {
 import type { FileMenuHandle } from './file-menu.tsx'
 import type { ChartView } from './interior-chart.tsx'
 import { usePrintEvents } from './print.ts'
+import { resetToRecord } from './record-reset.ts'
 import type { Seated } from './seating-preview.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
@@ -171,6 +175,7 @@ import { useManufacturers } from './use-manufacturers.ts'
 import type { LoadNotesState } from './workbench-context.ts'
 import {
   type CartridgeChoice,
+  cardKeys,
   directionOf,
   emptyStep,
   firearmMassSpec,
@@ -247,13 +252,14 @@ type Groove = { id: string; z?: number | undefined; record?: CartridgeDetail }
  */
 function grooveValues(cartridge: CartridgeChoice | undefined, groove: Groove | undefined) {
   const loaded = cartridge && groove?.id === cartridge.id ? groove : undefined
-  if (!loaded) return { grooveM: undefined, qM: undefined, recordTable: undefined }
-  const q = loaded.record?.values.find(
-    (v) => v.side === 'chamber' && v.symbol === 'Q' && !v.variant,
-  )
+  if (!loaded)
+    return { grooveM: undefined, qM: undefined, landM: undefined, recordTable: undefined }
+  const chamber = (symbol: string) =>
+    loaded.record?.values.find((v) => v.side === 'chamber' && v.symbol === symbol && !v.variant)
   return {
     grooveM: loaded.z ? toSi('length', loaded.z) : undefined,
-    qM: toSi('area', q?.value ?? 0) || undefined,
+    qM: toSi('area', chamber('Q')?.value ?? 0) || undefined,
+    landM: mmToM(chamber('F')?.value),
     recordTable: loaded.record?.table,
   }
 }
@@ -390,6 +396,8 @@ type CartridgeSource = {
   specValue: (side: string | undefined, symbol: string) => number | undefined
   seated: Seated
   measuredCapacity: number | undefined
+  /** The bore diameter field's value now, SI. */
+  boreDiameter: number | undefined
 }
 
 /** What the chosen cartridge, or its design, gives the defaults. */
@@ -407,7 +415,12 @@ function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources
     name: cartridge.name,
     class: cartridgeClass(a.recordTable),
     boreDiameter: mmToM(a.specValue('chamber', 'F')),
-    boreArea: mm2ToM2(a.specValue('chamber', 'Q')),
+    // Q describes the record's land diameter F: a typed other bore diameter leaves no record area
+    boreArea: recordBoreArea(
+      mm2ToM2(a.specValue('chamber', 'Q')),
+      mmToM(a.specValue('chamber', 'F')),
+      a.boreDiameter,
+    ),
     twist: mmToM(a.specValue('chamber', 'u')),
     capacity:
       seated.caseVolume === undefined
@@ -1109,7 +1122,7 @@ export function useWorkbenchState() {
   /** Groove diameter Z of the chosen cartridge, mm, for the bore resistance of a fitted powder. */
   /** The chosen cartridge's record: its groove diameter and the values the figure draws. */
   const [groove, setGroove] = useState<Groove | undefined>(undefined)
-  const { grooveM, qM, recordTable } = grooveValues(cartridge, groove)
+  const { grooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
   const [allDiameters, setAllDiameters] = useState(false)
   /** The browser's bullet designs that have a mass, resolved against the catalogue. */
   const [designs, setDesigns] = useState<UserBulletView[]>([])
@@ -1422,6 +1435,8 @@ export function useWorkbenchState() {
    * stays while its field is edited (also empty); a field without one shows the record's value.
    */
   const [typedBulletFields, setTypedBullet] = useState<Fields>({})
+  /** The card whose changed values a record pick replaced, and how many: its one-line note. */
+  const [replaced, setReplaced] = useState<{ panel: InputPanel; count: number }>()
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
@@ -1487,6 +1502,8 @@ export function useWorkbenchState() {
     fixedFieldText,
   )
   const fields = form.values
+  /** The record's bore area Q while the bore diameter is the land diameter it describes. */
+  const qUsed = recordBoreArea(qM, landM, fields.boreDiameter?.si)
 
   /**
    * Writes that complete the start of a new load (the defaults, the first seating) are no edit: a
@@ -1658,6 +1675,7 @@ export function useWorkbenchState() {
     setPowder(undefined)
     setPowderDesign(undefined)
     setOrigin(undefined)
+    setReplaced(undefined)
     setOutcome(undefined)
     showChart(undefined)
     setChanged(false)
@@ -1997,7 +2015,7 @@ export function useWorkbenchState() {
       linked: as ? undefined : linkedPowder,
       cartridge,
       groove,
-      boreArea: qM,
+      boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
     })
@@ -2730,6 +2748,7 @@ export function useWorkbenchState() {
           specValue,
           seated,
           measuredCapacity: measuredWaterCapacity,
+          boreDiameter: fields.boreDiameter?.si,
         },
         t,
       ),
@@ -2763,6 +2782,87 @@ export function useWorkbenchState() {
     seatingKept: seatingKeptOf(referenced, seated, suggestions),
     gunMass: gunFromFirearm.current && !!firearmRef,
   })
+  /** What the user changed over the records, with each record's value; the one source of the marks and resets. */
+  const changes = changedFromRecord(
+    fieldValues,
+    recordValuesOf({
+      origin,
+      bullet: recordBulletValues(bulletRecord),
+      suggestions,
+      seatingOwnsVolume: seatingOwnsVolume(seated),
+      firearmMass: gun?.data.firearmMass,
+    }),
+    given,
+  )
+  /** Gives the changed values among `keys` their record's value again; how many it reset. */
+  const resetKeys = (keys: readonly string[]) => {
+    const n = resetToRecord(keys, {
+      changes,
+      system,
+      bulletKeys: new Set(bulletFields.map((s) => s.key)),
+      setField: form.setFieldValue,
+      clearError: form.clearFieldError,
+      unsetTypedBullet: (drop) =>
+        setTypedBullet((f) =>
+          Object.fromEntries(Object.entries(f).filter(([k]) => !drop.includes(k))),
+        ),
+      follow: (add) => setFollowed((f) => new Set([...f, ...add])),
+      setGunWeight: (v) => {
+        gunFromFirearm.current = true
+        setGunFields({ firearmMass: v })
+      },
+    })
+    if (n > 0) {
+      markChanged()
+      setReplaced(undefined)
+    }
+    return n
+  }
+  /** Notes that a record pick replaces the changed values among `keys` of the card. */
+  const noteReplaced = (panel: InputPanel, keys: readonly string[] = cardKeys[panel]) => {
+    const count = keys.filter((k) => changes[k] !== undefined).length
+    setReplaced(count > 0 ? { panel, count } : undefined)
+  }
+  /** A new cartridge takes the Cartridge card's changed values: they follow the record again. */
+  const dropCartridgeChanges = () => {
+    const keys = cardKeys.cartridge.filter((k) => changes[k] !== undefined)
+    noteReplaced('cartridge')
+    for (const k of keys) form.setFieldValue(k, emptyStep)
+    setFollowed((f) => new Set([...f, ...keys.filter(isFollowKey)]))
+  }
+  /** The record pickers of the cards: each notes the changed values the new record replaces. */
+  const pickBullet = (id: string) => {
+    noteReplaced('bullet')
+    return chooseBullet(id)
+  }
+  const pickDesign = (id: string) => {
+    noteReplaced('bullet')
+    chooseDesign(id)
+  }
+  const pickCartridge = (c: CartridgeChoice) => {
+    if (c.id !== cartridge?.id) dropCartridgeChanges()
+    chooseCartridge(c)
+  }
+  const pickCartridgeDesign = (id: string) => {
+    dropCartridgeChanges()
+    chooseCartridgeDesign(id)
+  }
+  const pickPowder = (id: string) => {
+    noteReplaced('powder')
+    return choosePowder(id)
+  }
+  const pickPowderDesign = (id: string) => {
+    noteReplaced('powder')
+    choosePowderDesign(id)
+  }
+  const pickFirearm = (id: string | null) => {
+    const f = firearmList.find((r) => r.id === id)
+    noteReplaced('firearm', [
+      ...(f?.data.twist === undefined ? [] : ['twist']),
+      ...(f?.data.firearmMass === undefined ? [] : ['firearmMass']),
+    ])
+    chooseFirearm(id)
+  }
   const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
   // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a
   // reference asked for and not loaded stays until a capacity is typed or chosen
@@ -2924,7 +3024,7 @@ export function useWorkbenchState() {
     const { resistance } = recordResistance(powder, {
       boreDiameter: d,
       boreArea: boreArea({
-        area: fields.boreArea?.si ?? qM,
+        area: fields.boreArea?.si ?? qUsed,
         boreDiameter: d,
         grooveDiameter: grooveM,
       }),
@@ -2980,6 +3080,16 @@ export function useWorkbenchState() {
     siLength,
     nextPanel,
     pmax,
+    changes,
+    resetKeys,
+    replaced,
+    pickBullet,
+    pickDesign,
+    pickCartridge,
+    pickCartridgeDesign,
+    pickPowder,
+    pickPowderDesign,
+    pickFirearm,
     shown,
     specValue,
     todo,
@@ -3006,7 +3116,7 @@ export function useWorkbenchState() {
     defaulted,
     defaultOf,
     grooveDiameter: grooveM,
-    cartridgeBoreArea: qM,
+    cartridgeBoreArea: qUsed,
     defaults,
     designs,
     direction,
