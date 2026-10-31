@@ -30,6 +30,7 @@ describe('derive', () => {
       name: 'Beta Pistol',
       aliases: [],
       table: 'IV',
+      boreDiameter: 7.82,
       maxBulletDiameter: 9.02,
       caseLength: 20,
       cartridgeLength: 29.7,

@@ -244,6 +244,7 @@
 . cartridgeBulletDiameterMm
 . cartridgeDiameters
 . cartridgeGrooveDiameterMm
+. cartridgeLandDiameterMm
 . chargeLadder
 . chargeSolverMaxRuns
 . chargeSolverTolerance
@@ -351,6 +352,7 @@
 . radPerMoa
 . radPerMrad
 . rangeStringDefaults
+. recordBoreArea
 . recordLoad
 . recordResistance
 . rk45

@@ -765,12 +765,12 @@ function searchCommands(a: CommandArgs) {
 /** A bullet chosen in the search: a design of this browser or a record. */
 function chooseSearchedBullet(
   id: string,
-  chooseDesign: Load['chooseDesign'],
-  chooseBullet: Load['chooseBullet'],
+  pickDesign: Load['pickDesign'],
+  pickBullet: Load['pickBullet'],
 ) {
   const design = userRecordId(id)
-  if (design) chooseDesign(design)
-  else void chooseBullet(id)
+  if (design) pickDesign(design)
+  else void pickBullet(id)
 }
 
 /** The search's Bullets group heading: all diameters, or the ones the cartridge takes. */
@@ -963,10 +963,10 @@ export function Workbench() {
     cartridge,
     changed,
     chartView,
-    chooseBullet,
-    chooseCartridge,
-    chooseDesign,
-    choosePowder,
+    pickBullet,
+    pickCartridge,
+    pickDesign,
+    pickPowder,
     csvCopied,
     bulletFit,
     describeBullet,
@@ -1462,14 +1462,14 @@ export function Workbench() {
                 reset,
               })}
               onCartridge={(c) =>
-                chooseCartridge({
+                pickCartridge({
                   id: c.id,
                   name: c.name,
                   ...summaryFitSource(c),
                 })
               }
-              onBullet={(b) => chooseSearchedBullet(b.id, chooseDesign, chooseBullet)}
-              onPowder={(p) => choosePowder(p.id)}
+              onBullet={(b) => chooseSearchedBullet(b.id, pickDesign, pickBullet)}
+              onPowder={(p) => pickPowder(p.id)}
               describeBullet={describeBullet}
               designs={designRows}
               bulletFit={bulletFit}
