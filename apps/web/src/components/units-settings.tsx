@@ -298,7 +298,7 @@ export function UnitsForm() {
           ]}
         />
       </div>
-      <SimpleGrid minColWidth="9rem" spacing="0.75rem" verticalSpacing="xs">
+      <SimpleGrid minColWidth="9rem" spacing="0.75rem" verticalSpacing="0.25rem">
         {choices.map(([q, label]) => (
           <NativeSelect
             key={q}

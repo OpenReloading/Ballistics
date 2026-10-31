@@ -8421,8 +8421,25 @@ main .field-table tr.field-group > th {
 /* settings: one body height for every tab, so switching moves nothing; Close in a footer line */
 @media screen and (min-width: 36em) {
   .settings-dialog .mantine-Tabs-root {
-    min-height: 31rem;
+    min-height: min(31rem, 100dvh - 10rem);
   }
+}
+
+/* the header and the footer stay in view, only the tab area scrolls (as the safety dialog) */
+.settings-dialog .mantine-Modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-dialog .mantine-Modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* help text at the app's 12 px minimum */
+.settings-dialog :is(.mantine-Checkbox-description, .mantine-InputWrapper-description) {
+  font-size: 0.75rem;
 }
 
 /* the title as heavy as the panel headings */
