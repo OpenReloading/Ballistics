@@ -5,11 +5,13 @@ import {
   cartridgeBoreAreaMm2,
   cartridgeBulletDiameterMm,
   cartridgeGrooveDiameterMm,
+  cartridgeLandDiameterMm,
   fillLoadRatioLimit,
   InputError,
   type InteriorLoad,
   loadRatio,
   type PressureRange,
+  recordBoreArea,
   recordResistance,
   solidFill,
   solidFillLimit,
@@ -311,12 +313,17 @@ export async function simulate(
       },
     }
   const { cartridge, bullet, powder, powderLabel } = loadFileRecords(context.catalogue, record)
-  // an empty bore area is the cartridge record's, as the workbench fills it
+  // an empty bore area is the cartridge record's, as the workbench fills it, while the bore
+  // diameter is the record's land diameter
   if (cartridge && values.boreArea === undefined)
     load.chamber.boreArea = toSi(
       'area',
       boreArea({
-        area: cartridgeBoreAreaMm2(cartridge),
+        area: recordBoreArea(
+          cartridgeBoreAreaMm2(cartridge),
+          cartridgeLandDiameterMm(cartridge),
+          fromSi('length', load.chamber.boreDiameter),
+        ),
         boreDiameter: fromSi('length', load.chamber.boreDiameter),
         grooveDiameter: cartridgeGrooveDiameterMm(cartridge),
       }),
