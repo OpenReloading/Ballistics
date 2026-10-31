@@ -11037,8 +11037,6 @@ main .page-bar h1 {
 /* an unchecked row box has the field border (3:1): the native one is nearly invisible in dark */
 .directory-table td .row-action input:not(:checked, :disabled) {
   box-sizing: border-box;
-  width: 13px;
-  height: 13px;
   border: 1px solid var(--input-border);
   background: var(--bg);
   appearance: none;

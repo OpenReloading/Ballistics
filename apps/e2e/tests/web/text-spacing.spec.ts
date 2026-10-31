@@ -38,7 +38,7 @@ for (const width of [1280, 390])
     const whole = await line.evaluate((box) =>
       Array.from(box.querySelectorAll('*'))
         .filter((e) => e.childElementCount === 0)
-        .map((e) => e.textContent?.trim())
+        .map((e) => e.getAttribute('data-full') ?? e.textContent?.trim())
         .filter(Boolean)
         .join(' '),
     )
