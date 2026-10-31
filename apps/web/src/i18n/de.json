@@ -832,6 +832,8 @@
   "No cartridges match these filters.": "Keine Patronen entsprechen diesen Filtern.",
   "No case capacity record for {name}: enter your measured case capacity for the volume behind the bullet.": "Kein Hülsenvolumen-Datensatz für {name}: Geben Sie Ihr gemessenes Hülsenvolumen für das Volumen hinter dem Geschoss ein.",
   "No brass matches these filters.": "Keine Hülsen entsprechen diesen Filtern.",
+  "No brass groups of your own yet": "Noch keine eigenen Hülsengruppen",
+  "A brass group keeps the cases you measured, with their water capacity, in this browser.": "Eine Hülsengruppe speichert die von Ihnen gemessenen Hülsen mit ihrer Wasserkapazität in diesem Browser.",
   "No chamber drawing for this record.": "Keine Zeichnung des Patronenlagers zu diesem Datensatz.",
   "No charge in the range gives a valid run with this value.": "Keine Treibladung im Bereich liefert mit diesem Wert eine gültige Berechnung.",
   "No compared pressure limit for this result: no limit lines.": "Für dieses Ergebnis gibt es keinen verglichenen Druckgrenzwert: keine Grenzlinien.",
@@ -3123,7 +3125,7 @@
   "Duplicate {name}": "{name} duplizieren",
   "Export {name}": "{name} exportieren",
   "Export to a file": "In eine Datei exportieren",
-  "No saved loads.": "Keine gespeicherten Laborierungen.",
+  "No saved loads yet. Save a load on the workbench with Save or {keys}, and it appears here.": "Noch keine gespeicherten Laborierungen. Speichern Sie eine Laborierung in der Werkbank mit Speichern oder {keys}, dann erscheint sie hier.",
   "{count} saved load is in the format of an earlier version, which this app no longer reads. Open lists it under Invalid records.|{count} saved loads are in the format of an earlier version, which this app no longer reads. Open lists them under Invalid records.": {
     "one": "{count} gespeicherte Laborierung hat das Format einer früheren Version, das diese App nicht mehr liest. Öffnen listet sie unter „Ungültige Datensätze“ auf.",
     "other": "{count} gespeicherte Laborierungen haben das Format einer früheren Version, das diese App nicht mehr liest. Öffnen listet sie unter „Ungültige Datensätze“ auf."
@@ -3134,9 +3136,9 @@
   "{reminder} Export all (Save options) keeps a copy.": "{reminder} Alles exportieren (Speicheroptionen) sichert eine Kopie.",
   "The file is larger than {size} MB.": "Die Datei ist größer als {size} MB.",
   "The file is not JSON.": "Die Datei ist kein JSON.",
+  "The file is not an OpenReloading data file.": "Die Datei ist keine OpenReloading-Datendatei.",
   "{name}: the {field} {target} is not in this browser": "{name}: {field} {target} ist nicht in diesem Browser",
   "Not found: {list}.": "Nicht gefunden: {list}.",
-  "The file is not an OpenReloading data file.": "Die Datei ist keine OpenReloading-Datendatei.",
   "{count} save|{count} saves": {
     "one": "{count} Speicherung",
     "other": "{count} Speicherungen"
