@@ -288,8 +288,10 @@ test('a chosen bullet seats at the entered COAL in the designed case, and the se
   const seated = page.locator('.seating-figure svg')
   // no bullet and no length: nothing seated, no default filled in
   await expect(seated).toHaveCount(0)
-  await page.getByRole('combobox', { name: 'Search bullets by manufacturer or name' }).fill('168')
-  await page.getByRole('option', { name: /168 gr/ }).click()
+  await page
+    .getByRole('combobox', { name: 'Search bullets by manufacturer or name' })
+    .fill('demo 168')
+  await page.getByRole('option', { name: /^Demo Bullets 30 Cal 168 gr/ }).click()
   await expect(page.getByText('Bullet: Demo Bullets 30 Cal 168 gr HPBT Demo')).toBeVisible()
   await expect(seated).toHaveCount(0)
   await page.getByRole('textbox', { name: /^COAL/ }).fill('71')

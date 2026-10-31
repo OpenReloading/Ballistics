@@ -110,8 +110,8 @@ test('a powder design fills the model values, is marked and named in the run and
   await expect(vivacity).toHaveValue('0.612')
   await expect(vivacity).toHaveAccessibleDescription(/user design/)
 
-  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('168')
-  await page.getByRole('option', { name: /168 gr/ }).click()
+  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('demo 168')
+  await page.getByRole('option', { name: /^Demo Bullets 30 Cal 168 gr/ }).click()
   await form.getByRole('combobox', { name: 'Search cartridges by name' }).fill('308 Win')
   await page
     .getByRole('option', { name: /^308 Win/ })
