@@ -1,5 +1,13 @@
 import { spawn, spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  closeSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  openSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Ajv2020 } from 'ajv/dist/2020.js'
@@ -305,6 +313,23 @@ describe('the process', () => {
     expect(stderr).toBe('')
     expect(code).toBe(0)
   })
+
+  it.runIf(existsSync('/dev/full'))(
+    'reports a failed stdout write as the JSON error and ends with 3',
+    () => {
+      // every write to /dev/full fails with ENOSPC
+      const full = openSync('/dev/full', 'w')
+      const r = spawnSync(process.execPath, [bin, 'operations'], {
+        stdio: ['ignore', full, 'pipe'],
+        encoding: 'utf8',
+      })
+      closeSync(full)
+      expect(JSON.parse(r.stderr)).toEqual({
+        error: { kind: 'internal', message: expect.stringContaining('ENOSPC') },
+      })
+      expect(r.status).toBe(3)
+    },
+  )
 
   it('reads the rows from standard input for --rows -', () => {
     const r = spawnSync(process.execPath, [bin, 'verify', '--rows', '-', ...data.slice(2)], {

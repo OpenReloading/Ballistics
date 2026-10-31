@@ -212,9 +212,13 @@ function failure(error: unknown): {
   }
 }
 
-/** The error on stderr: one JSON object for a script, the text line on a terminal; never a stack trace. */
-function report(error: unknown, json: boolean, io: Io): number {
+/**
+ * The error of the command line `argv` on stderr: one JSON object for `--json` or a script, the
+ * text line on a terminal; never a stack trace. Returns the exit code.
+ */
+export function report(error: unknown, argv: string[], io: Io): number {
   const { kind, code, message, details } = failure(error)
+  const json = argv.includes('--json') || !io.tty
   if (json) io.stderr(`${JSON.stringify({ error: { kind, message, ...details } })}\n`)
   else if (kind === 'refused') io.stderr(`refused: ${message}\n`)
   else if (kind === 'usage') io.stderr(`${message}\n`)
@@ -248,6 +252,6 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
     io.stdout(`${await execute(command, args, env, io)}\n`)
     return 0
   } catch (error) {
-    return report(error, argv.includes('--json') || !io.tty, io)
+    return report(error, argv, io)
   }
 }
