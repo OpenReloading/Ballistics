@@ -198,7 +198,9 @@
 . SimilarPowdersPrior
 . SkippedInput
 . StartPressureDefault
+. StartPressureRule
 . StepBudget
+. StructureFields
 . TargetMotion
 . TraceResiduals
 . Trajectory
@@ -264,6 +266,7 @@
 . coefficientAt
 . comparePlanCandidates
 . compareTruingFits
+. constructionOf
 . convectiveDefaults
 . cylinderInertia
 . defaultRounding
@@ -376,6 +379,7 @@
 . speedOfSound
 . spinDrift
 . standardAtmosphere
+. startPressureOf
 . stringLadder
 . subtendedAngle
 . toleranceRange

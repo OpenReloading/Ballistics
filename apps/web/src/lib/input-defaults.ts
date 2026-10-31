@@ -19,7 +19,7 @@ export type Suggestion = {
 }
 
 /** The form fields that follow a default until typed; the barrel length is the seating's own field. */
-export const followKeys = ['volume', 'boreDiameter', 'boreArea', 'twist'] as const
+export const followKeys = ['volume', 'boreDiameter', 'boreArea', 'twist', 'startPressure'] as const
 export type FollowKey = (typeof followKeys)[number]
 export const isFollowKey = (key: string): key is FollowKey =>
   (followKeys as readonly string[]).includes(key)

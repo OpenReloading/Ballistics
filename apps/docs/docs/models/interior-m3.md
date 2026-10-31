@@ -135,14 +135,28 @@ The second term of $g_\text{start}$ is a choice of the model.
 
 Without a start pressure, a caller can take `defaultStartPressure`:
 
-- Barrel of 0.3 m and longer: an assumed 30 MPa.
-- Shorter barrel: one value per bullet construction (lead, plated, jacketed, monolithic), fitted by the load-table powder fit. A construction not given counts as jacketed, an unknown name is an input error.
+- Barrel of 0.3 m and longer: one value per bullet construction (lead 30.0, jacketed 29.2, monolithic 35.3 MPa), fitted by the load-table powder fit. Plated bullets have no rifle rows and a construction not given takes an assumed 30 MPa.
+- Shorter barrel: one value per bullet construction (lead, plated, jacketed, monolithic), fitted by the same fit. A construction not given counts as jacketed, an unknown name is an input error.
 
 These are effective values of the model, not measured shot-start pressures.
 
 The barrel length of 0.3 m that separates the two cases is a choice of the model.
 
 Code: `packages/core/src/interior/start-pressure.ts`, `defaultStartPressure`, `handgunBarrelLengthLimit`.
+
+The workbench takes the construction from the bullet record's `construction.structure` and the barrel length of the seating (else the firearm's, the Settings default or the one assumed for the cartridge class):
+
+| `construction.structure` | Construction |
+| --- | --- |
+| cast, swaged | lead |
+| plated | plated |
+| cup-and-core, bonded, partitioned | jacketed |
+| monolithic | monolithic |
+| frangible, a construction without a structure | jacketed, marked as assumed |
+
+A record without a `construction` gives no construction, and a barrel length that is not known gives no class: the field keeps the value of 30 MPa. A plated bullet in a rifle takes it too. The field follows this default until a value is typed, and the help gives the 95 % interval of the construction. A powder record's own start pressure replaces it, a record without one leaves the field following it. Load files and the API still take the rifle value of 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure as a value.
+
+Code: `packages/core/src/interior/start-pressure.ts`, `constructionOf`, `startPressureOf`.
 
 ### Bore resistance
 

@@ -544,7 +544,6 @@
   "From the brass record": "Aus dem Hülsendatensatz",
   "From the brass record {record}. Type a measured capacity to replace it.": "Aus dem Hülsendatensatz {record}. Geben Sie ein gemessenes Hülsenvolumen ein, um ihn zu ersetzen.",
   "From the database": "Aus der Datenbank",
-  "From the fit's start pressure rule for barrels of 300 mm and longer.": "Aus der Startdruckregel der Anpassung für Läufe ab 300 mm Länge.",
   "From the load: muzzle velocity of the last run.": "Aus der Laborierung: Mündungsgeschwindigkeit der letzten Berechnung.",
   "From the load: the bullet of the Bullet panel, in place of the one entered here.": "Aus der Laborierung: das Geschoss aus dem Abschnitt Geschoss, anstelle des hier eingegebenen.",
   "From the load: the bullet of the Bullet panel.": "Aus der Laborierung: das Geschoss aus dem Abschnitt Geschoss.",
@@ -4012,5 +4011,8 @@
   "Length from diameter and mass with the effective density of the class {class}, seated at {coal}, because {because}.": "Länge aus Durchmesser und Masse mit der effektiven Dichte der Klasse {class}, gesetzt bei {coal}, weil {because}.",
   "overall length COAL or L6": "Gesamtlänge COAL oder L6",
   "Seated at {coal}, because {because}.": "Gesetzt bei {coal}, weil {because}.",
-  "the COAL entered": "der eingegebenen COAL"
+  "the COAL entered": "der eingegebenen COAL",
+  "{name}, assumed": "{name}, angenommen",
+  "handgun load tables, bullet construction {construction}, barrel under 300 mm; approximate, 95 % interval {low} to {high} {unit}": "Laborierungstabellen für Kurzwaffen, Geschossbauart {construction}, Lauf unter 300 mm; näherungsweise, 95-%-Intervall {low} bis {high} {unit}",
+  "rifle load tables, bullet construction {construction}, barrel 300 mm or longer; approximate, 95 % interval {low} to {high} {unit}": "Laborierungstabellen für Büchsen, Geschossbauart {construction}, Lauf ab 300 mm; näherungsweise, 95-%-Intervall {low} bis {high} {unit}"
 }

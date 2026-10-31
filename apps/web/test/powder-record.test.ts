@@ -115,13 +115,6 @@ it('applies the bore resistance of the record from the cartridge, bullet length 
   expect(recordResistance({ ...powder, interior: undefined }, run)).toEqual({ missing: [] })
 })
 
-it("marks a start pressure the record does not hold as the fit's rule", () => {
-  const origin = powderModelValues(powder) ?? {}
-  expect(recordMark(powder, origin, 'startPressure', 30e6, String, 'record', english.t)).toBe(
-    "From the fit's start pressure rule for barrels of 300 mm and longer.",
-  )
-})
-
 it('lists the fitted tables with their training rows', () => {
   expect(fitTables(powder).map((t) => t.trainingRows)).toEqual([12, undefined])
 })

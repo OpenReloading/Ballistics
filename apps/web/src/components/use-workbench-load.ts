@@ -11,7 +11,6 @@ import {
   cartridgeGrooveDiameterMm,
   gasVelocityFactor,
   type InteriorLoad,
-  powderModelValues,
   recordBoreArea,
   recordResistance,
   ValueError,
@@ -110,7 +109,7 @@ import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { nth } from '../lib/nth.ts'
-import { powderValues } from '../lib/powder-compare.ts'
+import { powderValues, recordFill } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import { writeTuneLoad } from '../lib/powder-tune.ts'
@@ -135,6 +134,7 @@ import {
   temperatureLadder,
   temperatureLadderBlockReason,
 } from '../lib/seating-ladder.ts'
+import { startPressureDefault } from '../lib/start-pressure.ts'
 import {
   exactFieldText,
   fixedFieldText,
@@ -752,6 +752,45 @@ export function approximateVolumeTolerance(
   return Math.min(suggestion.halfWidth, maxVolumeFraction)
 }
 
+/** `base` with the start pressure default: the barrel of the seating, else the start's own, and the bullet's construction. */
+function withStartPressure(
+  base: Suggestions,
+  a: {
+    barrel: number | undefined
+    construction: Parameters<typeof startPressureDefault>[0]['construction']
+    current: number
+    system: UnitSystem
+    t: Translator['t']
+  },
+): Suggestions {
+  const { barrel, construction, current, system, t } = a
+  const show = {
+    text: (si: number) => formatQuantity('pressure', system, si),
+    unit: system.pressure.symbol,
+  }
+  return {
+    ...base,
+    startPressure: startPressureDefault({
+      barrel: barrel ?? base.barrelLength?.si,
+      construction,
+      current,
+      show,
+      t,
+    }),
+  }
+}
+
+/** The defaults a reference gives again on opening: not the start pressure by construction (the approximate one), which a load file and the API do not know, so it is saved as a value. */
+function savedSuggestions(s: Suggestions): Suggestions {
+  if (!s.startPressure?.approximate) return s
+  const { startPressure: _byConstruction, ...rest } = s
+  return rest
+}
+
+/** The followed fields with the start pressure added when `follow`. */
+const followingStart = (s: ReadonlySet<FollowKey>, follow: boolean): ReadonlySet<FollowKey> =>
+  follow ? new Set([...s, 'startPressure']) : s
+
 /** Writes the powder record's model parameters into the fields, except the `keep` ones; the keys written. */
 function fillRecordValues(
   form: Form,
@@ -1088,7 +1127,7 @@ function followedValue(
 }
 
 /** The writes a followed field's new default makes; `written` records the defaults put in. */
-function followWrites(a: {
+export function followWrites(a: {
   followed: ReadonlySet<FollowKey>
   seatedVolume: boolean
   now: Fields
@@ -1902,7 +1941,7 @@ export function useWorkbenchState() {
     markChanged()
     setPowder(design ? undefined : p)
     setPowderDesign(design)
-    const values = powderModelValues(p)
+    const values = recordFill(p)
     const previous = originNow.current
     setOrigin(values)
     if (fill && !values && previous) {
@@ -1910,10 +1949,14 @@ export function useWorkbenchState() {
       // edit goes back to a new load's state (the cited default, else empty)
       const back = revertRecordFill(form, previous, defaults, unitsNow.current)
       setDefaulted((s) => new Set([...s, ...back]))
+      setFollowed((s) => followingStart(s, back.has('startPressure')))
     }
     if (!fill || !values) return
     const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
     setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
+    // a start pressure the record or the opened load gives stays; else the field follows its default
+    const given = !!p.interior?.startPressure || keep.has('startPressure')
+    setFollowed((s) => followingStart(new Set([...s].filter((k) => !filledKeys.has(k))), !given))
   }
 
   /** A powder design of this browser in place of a record. */
@@ -2807,7 +2850,7 @@ export function useWorkbenchState() {
       workbenchDesign(cartridgeDesign.data, cartridgeDesign.resolved, cartridgeDesign.name, system),
     [cartridgeDesign, system],
   )
-  const suggestions: Suggestions = suggestDefaults(
+  const baseSuggestions = suggestDefaults(
     {
       firearm: gunSource(gun),
       cartridge: cartridgeSource(
@@ -2832,6 +2875,13 @@ export function useWorkbenchState() {
     },
     t,
   )
+  const suggestions = withStartPressure(baseSuggestions, {
+    barrel: seated.barrel,
+    construction: bulletRecord?.construction,
+    current: defaults.startPressure,
+    system,
+    t,
+  })
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
@@ -2848,7 +2898,7 @@ export function useWorkbenchState() {
     defaulted,
     followed,
     suggestions: Object.fromEntries(
-      followKeys.map((k) => [k, referenced ? suggestions[k]?.si : undefined]),
+      followKeys.map((k) => [k, referenced ? savedSuggestions(suggestions)[k]?.si : undefined]),
     ),
     previewed,
     seatingKept: seatingKeptOf(referenced, seated, suggestions),
