@@ -145,6 +145,7 @@ export function seat({
   if (depthValue > bullet.length) notes.push('The whole bullet is below the case mouth.')
   const cut = Math.min(Math.max(depthValue, 0), bullet.length)
   const { caseVolume, volume } = seatVolumes(outline, cut, waterCapacity, waterDensity)
+  const behind = volumeBehind(volume, depthValue > chamber.caseLength, notes)
   const byCbto = by.kind === 'baseToOgive'
   const contact = landContact(chamber, bullet, outline, byCbto)
   notes.push(...contact.notes)
@@ -164,7 +165,8 @@ export function seat({
     coal,
     ...(cbto && { cbto }),
     depth: { value: depthValue, tag: 'derived' },
-    ...(caseVolume && volume && { caseVolume, volumeBehindBullet: volume }),
+    ...(caseVolume && { caseVolume }),
+    ...(behind && { volumeBehindBullet: behind }),
     ...(barrelLength !== undefined && {
       travel: { value: barrelLength - base, tag: 'derived' as const },
     }),
@@ -256,6 +258,19 @@ function seatVolumes(
     tag: assumedBelow(outline, cut) ? 'approximate' : 'derived',
   }
   return { caseVolume, volume }
+}
+
+/** The volume behind the bullet, none with a note for a base behind the case head or a volume at or below 0. */
+function volumeBehind(volume: Tagged | undefined, behindHead: boolean, notes: string[]) {
+  if (behindHead)
+    notes.push(
+      'The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given.',
+    )
+  else if (volume && volume.value <= 0)
+    notes.push(
+      'The bullet below the mouth takes the whole case volume: no volume behind the bullet is given.',
+    )
+  return volume && !behindHead && volume.value > 0 ? volume : undefined
 }
 
 /**

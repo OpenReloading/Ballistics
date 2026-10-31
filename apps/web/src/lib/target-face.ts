@@ -60,6 +60,11 @@ const SURE = 3
 /** A fit is applied without a question with this many rings matched and this score. */
 const SURE_RINGS = 4
 const SURE_SCORE = 2.5
+/**
+ * Right and wrong first choices by the rings the first face matched, counted on real photos with
+ * the true face known. Empty until such counts exist: a face's confidence is then undefined.
+ */
+const FIRST_CHOICES: Readonly<Record<number, { right: number; wrong: number }>> = {}
 /** Numerals stand on the two axes within this many mm of them (the digits of the local 25 m faces are 4 to 9 mm tall), between the ring lines. */
 const NUMERAL_WIDTH = 6
 /** Quarter marks of the black area stand on an axis within this share of a hole diameter and within this many hole diameters of its edge (own values). */
@@ -613,7 +618,14 @@ export type FaceSearch = {
   /** The rings found (without the black edge), for a fit of a face the user picks. */
   rings: Ring[]
   /** The faces by score, best first. */
-  ranked: Array<{ id: string; name: string; score: number; matched: number }>
+  ranked: Array<{
+    id: string
+    name: string
+    score: number
+    matched: number
+    /** The share of first choices with this many rings matched that were right (`confidenceOf`). */
+    confidence: number | undefined
+  }>
   /** The fits of the best face and of the faces that fit as well (ratio twins), best first. */
   fits: FaceFit[]
   /**
@@ -629,6 +641,15 @@ export type FaceSearch = {
    * user confirms the face.
    */
   sure: boolean
+}
+
+/** The share of right first choices with `matched` rings, undefined without counts. */
+export function confidenceOf(
+  matched: number,
+  counts: Readonly<Record<number, { right: number; wrong: number }>> = FIRST_CHOICES,
+): number | undefined {
+  const c = counts[matched]
+  return c && c.right + c.wrong > 0 ? c.right / (c.right + c.wrong) : undefined
 }
 
 /** The fits of the faces that match every ring the best face matches, smallest first; none with a known scale. */
@@ -664,6 +685,7 @@ export function searchFaces(
         name: m.face.name,
         score: m.score,
         matched: m.matched.length,
+        confidence: confidenceOf(m.matched.length),
       })),
       fits: [],
       alike: [],

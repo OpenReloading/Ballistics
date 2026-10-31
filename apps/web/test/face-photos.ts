@@ -166,6 +166,15 @@ export type Row = {
   holes: number
   of: number
   extra: number
+  /** The first choice right or not, and the rings its face matched: the counts `confidenceOf` takes. */
+  first: { right: boolean; rings: number } | undefined
+}
+
+/** The search's first choice right or not, with the rings its face matched. */
+function firstChoice(search: ReturnType<typeof findFace>, id: string): Row['first'] {
+  const top = search.fits[0]
+  const rings = top && search.ranked.find((r) => r.id === top.face.id)?.matched
+  return top && rings !== undefined ? { right: top.face.id === id, rings } : undefined
 }
 
 /** The face search and the hole detection on `kind` of `id`, holes of `bullet` mm, against the truth. */
@@ -185,6 +194,7 @@ export async function measure(id: string, kind: PhotoKind, bullet: number): Prom
     holes: 0,
     of: 0,
     extra: 0,
+    first: firstChoice(search, id),
   }
   if (!fit) return row
   const c = project(h, { x: 0, y: 0 })
@@ -235,4 +245,19 @@ export function expectFace(row: Row, outer: number, sure: boolean) {
 export function expectHoles(row: Row, holes: number, extra: number) {
   expect(row.holes).toBeGreaterThanOrEqual(holes)
   expect(row.extra).toBeLessThanOrEqual(extra)
+}
+
+/** Right and wrong first choices by the rings matched, one line per ring count, for the test output. */
+export function firstChoices(rows: readonly Row[]): string {
+  const counts = new Map<number, { right: number; wrong: number }>()
+  for (const { first } of rows) {
+    if (!first) continue
+    const c = counts.get(first.rings) ?? { right: 0, wrong: 0 }
+    c[first.right ? 'right' : 'wrong']++
+    counts.set(first.rings, c)
+  }
+  return [...counts]
+    .sort(([a], [b]) => a - b)
+    .map(([rings, c]) => `${rings} rings: right ${c.right}, wrong ${c.wrong}`)
+    .join('\n')
 }

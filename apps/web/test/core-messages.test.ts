@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { buildOpenApi } from '@open-reloading/api/openapi'
 import { advisoryRules } from '@open-reloading/core'
+import { autoMap, buildRecords, readTable } from '@open-reloading/importers'
 import { pressureMethod } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { limitCheck, type Warning } from '../../../packages/api/dist/compute/limits.js'
@@ -106,6 +107,20 @@ describe('the message table', () => {
     )
     expect(translateMessage('bullet 6.5 Creedmoor has no length', german.t)).toBe(
       'Geschoss 6.5 Creedmoor hat keine Länge',
+    )
+  })
+
+  it('gives the repeated-id warning of a table import in German', () => {
+    const read = readTable('name,maker,diameter,mass\nB1,M1,7.82,175\nB1,M1,7.82,175')
+    if ('refusal' in read) throw new Error(read.refusal)
+    const built = buildRecords(
+      read.table,
+      'bullet',
+      autoMap(read.table, 'bullet'),
+      '2026-10-28T00:00:00.000Z',
+    )
+    expect(translateMessage(built.warnings[0]?.reason ?? '', german.t)).toBe(
+      'Die Zeilen 2 und 3 haben denselben Namen, Hersteller, Durchmesser und dieselbe Masse und damit eine ID: Nur Zeile 2 wird importiert. Ändern Sie eine Zelle der Zeile 3, um sie als eigenen Datensatz zu importieren.',
     )
   })
 

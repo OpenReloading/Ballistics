@@ -97,7 +97,8 @@ function sessionsOf(
   warnings: string[],
 ): SessionRecord[] {
   const sessions: SessionRecord[] = []
-  for (const m of appendix ? elements(appendix).filter((e) => e.name === 'Measurement') : []) {
+  const measurements = appendix ? elements(appendix).filter((e) => e.name === 'Measurement') : []
+  for (const [index, m] of measurements.entries()) {
     const at = 'appendix.Measurement'
     unreadAttributes(m, at, unmapped)
     const strings = elements(m).flatMap((c) => {
@@ -122,7 +123,8 @@ function sessionsOf(
         sources: [{ title: 'Measurements of a ChamberSim Reloaded load file' }],
       },
     }
-    sessions.push({ kind: 'session', ...named('session', load.name, data), saved })
+    // The series index in the key keeps two series of the same content apart.
+    sessions.push({ kind: 'session', ...named(`session|${index}`, load.name, data), saved })
   }
   return sessions
 }
@@ -132,8 +134,8 @@ function sessionsOf(
  * after its maker, the powder and the load), then a session for each measurement series whose
  * strings name the load. A series maps per charge to a string of shot velocities (m/s) that varies
  * the charge; shot pressures, the display settings and every other part are listed as not read.
- * A format other than 1 gives a warning. Ids come from the content, so a file read again gives the
- * same records. Throws with the reason on a file that is no load file of this format. The caller
+ * A format other than 1 gives a warning. Ids come from the content (a session's also from its
+ * place in the file), so a file read again gives the same records. Throws with the reason on a file that is no load file of this format. The caller
  * checks each record with the user record schema.
  */
 export function readCsrLoad(xml: string, saved: string): GrtLoadRead {

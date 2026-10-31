@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -182,6 +182,30 @@ describe('exit codes', () => {
     expect(top.stderr).toMatch(/^Unknown option '--nope'[^\n]*\n\nusage:/)
   })
 
+  it.each([
+    ['run', ['run', 'interior', '--input', 'x.json', '--table'], /usage: ballistics run </],
+    ['operations', ['operations', '--table'], /usage: ballistics operations\n/],
+  ])('is 2 with the help of %s for an unknown option of it', async (_, args, help) => {
+    const { code, stderr } = await cli(args, {}, true)
+    expect(code).toBe(2)
+    expect(stderr).toMatch(/^Unknown option '--table'/)
+    expect(stderr).toMatch(help)
+    expect(stderr).not.toContain('--group-by')
+  })
+
+  it('is 1 for a refused run, naming the invalid field on a terminal', async () => {
+    const body = JSON.parse(
+      readFileSync(join(import.meta.dirname, '../examples/interior.json'), 'utf8'),
+    )
+    body.load.propellant.gamma = 1
+    const dir = mkdtempSync(join(tmpdir(), 'cli-refused-'))
+    const input = join(dir, 'body.json')
+    writeFileSync(input, JSON.stringify(body))
+    const { code, stderr } = await cli(['run', 'interior', '--input', input], {}, true)
+    expect(code).toBe(1)
+    expect(stderr).toBe('refused: interior: input (propellant.gamma)\n')
+  })
+
   it('is 2 for a rows file with a bad value, naming line and column', async () => {
     const { writeRows } = await import('./fixture.ts')
     const bad = writeRows('cartridge,bullet,powder,charge_g,velocity_ms\n308-win,b,p,x,800\n')
@@ -266,6 +290,21 @@ describe('an error', () => {
 
 describe('the process', () => {
   const bin = join(import.meta.dirname, '../src/bin.ts')
+
+  it('ends quietly with 0 when the reader closes the pipe', async () => {
+    const child = spawn(process.execPath, [bin, 'operations'], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    // the read end closes before the first write, so every write meets EPIPE
+    child.stdout.destroy()
+    let stderr = ''
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk
+    })
+    const code = await new Promise((resolve) => child.on('close', resolve))
+    expect(stderr).toBe('')
+    expect(code).toBe(0)
+  })
 
   it('reads the rows from standard input for --rows -', () => {
     const r = spawnSync(process.execPath, [bin, 'verify', '--rows', '-', ...data.slice(2)], {
