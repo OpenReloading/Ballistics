@@ -254,6 +254,18 @@
       "node": "import-rights",
       "where": "Import entry",
       "reason": "Rights note of the Import entry at the narrow widths, reported as overlapping another box; nothing covers it. On the dialog surface it has 7.4:1 in light and 7.6:1 in dark, by measurement."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "id=\"driver-popover-description\"",
+      "where": ["Page tour"],
+      "reason": "Text of the page tour's popover, which axe cannot match to a background because the popover's arrow overlaps it. It is the text colour on the page background: 17.4:1 light, 15.3:1 dark by measurement."
+    },
+    {
+      "rule": "label-content-name-mismatch",
+      "node": "driver-popover-close-btn",
+      "where": ["Page tour"],
+      "reason": "Close button of the page tour: its only visible content is the glyph x, hidden from assistive technology, so the name is its label Close the tour."
     }
   ]
 }

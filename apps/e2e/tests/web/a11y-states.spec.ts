@@ -238,6 +238,15 @@ const states: State[] = [
     },
   },
   {
+    name: 'Page tour',
+    open: async (page, check) => {
+      await gotoHydrated(page, '/workbench')
+      await (await barButton(page, 'Tour')).click()
+      await settled(page.locator('.driver-popover'))
+      await check('popover', '.driver-popover')
+    },
+  },
+  {
     name: 'Saved loads',
     open: async (page, check) => {
       await openSavedLoads(page)

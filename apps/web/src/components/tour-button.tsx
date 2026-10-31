@@ -43,7 +43,14 @@ export function TourButton({ page }: { page: TourPage }) {
       prevBtnText: t('Back'),
       doneBtnText: t('Done'),
       closeBtnLabel: t('Close the tour'),
-      onPopoverRender: (p) => p.wrapper.setAttribute('aria-modal', 'true'),
+      onPopoverRender: (p) => {
+        p.wrapper.setAttribute('aria-modal', 'true')
+        // the glyph is not the button's name: only the label is read
+        const glyph = document.createElement('span')
+        glyph.setAttribute('aria-hidden', 'true')
+        glyph.textContent = p.closeButton.textContent
+        p.closeButton.replaceChildren(glyph)
+      },
       // below 75em the button sat in the closed Page actions panel: its toggle takes focus
       onDestroyed: () => focusBack(button.current, '.page-bar .page-bar-toggle'),
     }).drive()

@@ -14,7 +14,7 @@ export const tours = {
       target: '.load-strip',
       title: msg('Loads'),
       text: msg(
-        'Each open load has a tab. New load starts another; the list holds the saved ones.',
+        'Each open load has a tab. New load starts another; Saved loads lists the loads kept in this browser.',
       ),
     },
     {
@@ -40,7 +40,9 @@ export const tours = {
       // the menu itself has no box in the page bar: its Open button
       target: '.file-menu button',
       title: msg('File'),
-      text: msg('Save keeps the load in this browser; Open reads a load file.'),
+      text: msg(
+        'Save writes the load to a file and keeps a copy in this browser; Open reads a load file.',
+      ),
     },
   ],
   session: [
