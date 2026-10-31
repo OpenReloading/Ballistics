@@ -138,7 +138,7 @@ async function workbenchReady(page: Page) {
   if (await results.isVisible()) await results.click()
   await page.getByRole('region', { name: 'Result', exact: true }).waitFor()
   // the chart code loads apart from the route; the interior chart is drawn with ECharts
-  await page.locator('.echart svg').first().waitFor()
+  await page.locator('.echart svg:visible').first().waitFor()
   // filling a field scrolls the inputs region: show each region from its top
   await page
     .locator('.workspace-inputs, .workbench-centre, .workbench-aside')
@@ -156,7 +156,7 @@ async function ready(page: Page, url: string) {
   if (url.startsWith('/cartridges/') && !designer)
     await page.locator('svg.drawing.screen-only:visible').first().waitFor()
   // the workbench's cards and results are English in every language
-  if (url === '/workbench') {
+  if (url.startsWith('/workbench')) {
     await workbenchReady(page)
     return
   }
@@ -244,7 +244,16 @@ if (import.meta.main) {
   rmSync(root, { recursive: true, force: true })
   mkdirSync(shots, { recursive: true })
   const base = process.env.WEB_URL ?? 'http://localhost:3003'
-  const widths = (process.env.VISUAL_WIDTHS ?? '390,1280').split(',').map(Number)
+  // prototype branch: VISUAL_SIZES=1280x650,390x844 sets width x height per shot
+  const sizes = (
+    process.env.VISUAL_SIZES ??
+    (process.env.VISUAL_WIDTHS ?? '390,1280')
+      .split(',')
+      .map((w) => `${w}x844`)
+      .join(',')
+  )
+    .split(',')
+    .map((s) => s.split('x').map(Number) as [number, number])
   const browser = await chromium.launch()
   try {
     // no offline worker, as in playwright.config.ts
@@ -260,19 +269,23 @@ if (import.meta.main) {
       }, language)
     const tiles: { file: string; caption: string }[] = []
     for (const url of pages)
-      for (const width of widths)
+      for (const [width, height] of sizes)
         for (const theme of ['light', 'dark'] as const) {
-          await page.setViewportSize({ width, height: 844 })
+          await page.setViewportSize({ width, height })
           await page.emulateMedia({ colorScheme: theme })
           await page.goto(url)
           if (language) await page.locator(`html[lang="${language}"]`).waitFor()
           await ready(page, url)
+          await page.waitForTimeout(Number(process.env.VISUAL_SETTLE ?? 0))
+          // VISUAL_INPUTS=1: the Load tab where inputs and results are tabs (phone width)
+          const inputsTab = page.getByRole('tab', { name: 'Load', exact: true }).first()
+          if (process.env.VISUAL_INPUTS && (await inputsTab.isVisible())) await inputsTab.click()
           const file = path.join(
             shots,
-            `${url.slice(1).replaceAll('/', '_') || 'home'}__${theme}__${width}.png`,
+            `${url.slice(1).replace(/[/?=&]/g, '_') || 'home'}__${theme}__${width}x${height}.png`,
           )
           await page.screenshot({ path: file, fullPage: true, clip: await clip(page, url) })
-          tiles.push({ file, caption: `${url}<br>${theme}, ${width} px` })
+          tiles.push({ file, caption: `${url}<br>${theme}, ${width} x ${height}` })
           console.log(file)
           // VISUAL_TALL=<height>: one more shot in a window that tall, where a tool page's regions
           // show what they otherwise scroll

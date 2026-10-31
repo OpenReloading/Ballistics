@@ -43,6 +43,7 @@ import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
+import { type ProtoLayout, useProto } from '../lib/proto.ts'
 import { constructionRows, structureText } from '../lib/record-fields.ts'
 import {
   type LadderDirection,
@@ -505,8 +506,6 @@ export function StartCard({ onAct }: { onAct?: () => void }) {
 export function InputCards() {
   const {
     inputs,
-    more,
-    setMore,
     nextPanel,
     pending,
     cartridge,
@@ -520,7 +519,11 @@ export function InputCards() {
   } = useLoad()
   // the server and the first render lay out a tall window; a low one moves Gun once mounted
   const { t } = useTranslation()
-  const short = useMediaQuery(shortFrame, false) ?? false
+  const { layout } = useProto()
+  const wide = useMediaQuery('(min-width: 75em)', false) ?? false
+  // D and E show the cartridge figure as a result tab
+  const short =
+    (useMediaQuery(shortFrame, false) ?? false) || (wide && (layout === 'd' || layout === 'e'))
   const [figureCard, setFigureCard] = useState<HTMLDivElement | null>(null)
   const { figureTab } = useLoad()
   /** The card's record is chosen: the head shows its name as text. */
@@ -533,65 +536,36 @@ export function InputCards() {
   return (
     <form ref={inputs} noValidate onSubmit={(e) => e.preventDefault()} aria-label={t('Load')}>
       {/* fixed cards: icon and title in the heading, the record in its picker */}
-      <div className="panels">
-        <LoadRow />
-        {panelColumns.map((column, i) => (
-          <div key={column[0]} className="panel-column">
-            {column.map((p) => (
-              <Paper
-                key={p}
-                component="section"
-                withBorder
-                className="panel"
-                data-panel={p}
-                aria-labelledby={`panel-${p}`}
-                data-next={p === nextPanel || undefined}
-              >
-                <div className="panel-head" data-chosen={chosen[p] || undefined}>
-                  <PanelIcon panel={p} />
-                  {/* the title, then the record's name in its search field */}
-                  <h2 id={`panel-${p}`} className="panel-title">
-                    {t(panelTitles[p])}
-                  </h2>
-                  {p !== 'cartridge' && <CardPicker panel={p} />}
-                  {p === 'powder' && <LotField lot="powder" bare />}
-                  {morePanels.includes(p) && (
-                    <AppPopover
-                      opened={more === p}
-                      onChange={(o) => setMore(o ? p : undefined)}
-                      position="bottom-end"
-                      width={popoverWidth.fields}
-                      keepMounted
-                      trapFocus
-                    >
-                      <Popover.Target>
-                        <ActionIcon
-                          size={controlSize.row.icon}
-                          variant="subtle"
-                          color="gray"
-                          aria-label={t('More of {panel}', { panel: t(panelTitles[p]) })}
-                          aria-expanded={more === p}
-                          onClick={() => setMore(more === p ? undefined : p)}
-                        >
-                          <DotsThree size={18} weight="bold" aria-hidden="true" />
-                        </ActionIcon>
-                      </Popover.Target>
-                      <Popover.Dropdown>
-                        <div className="panel-fields more-fields" data-panel={p}>
-                          <CardMore panel={p} />
-                        </div>
-                      </Popover.Dropdown>
-                    </AppPopover>
-                  )}
-                </div>
-                <CardBody panel={p} />
-              </Paper>
-            ))}
-            {i === 0 &&
-              (short ? <BurnFigure /> : <div ref={setFigureCard} className="figure-host" />)}
-          </div>
-        ))}
-      </div>
+      {layout === 'b' ? (
+        <TaskGroups
+          chosen={chosen}
+          figure={short ? <BurnFigure /> : <div ref={setFigureCard} className="figure-host" />}
+        />
+      ) : (
+        <div className="panels">
+          <LoadRow />
+          {panelColumns.map((column, i) => (
+            <div key={column[0]} className="panel-column">
+              {column.map((p) => (
+                <Paper
+                  key={p}
+                  component="section"
+                  withBorder
+                  className="panel"
+                  data-panel={p}
+                  aria-labelledby={`panel-${p}`}
+                  data-next={p === nextPanel || undefined}
+                >
+                  <PanelHead panel={p} chosen={chosen[p]} />
+                  <CardBody panel={p} />
+                </Paper>
+              ))}
+              {i === 0 &&
+                (short ? <BurnFigure /> : <div ref={setFigureCard} className="figure-host" />)}
+            </div>
+          ))}
+        </div>
+      )}
       <LoadFigure host={short ? figureTab : figureCard} />
       <div className="run-bar">
         <RunButton />
@@ -602,18 +576,163 @@ export function InputCards() {
   )
 }
 
+const taskPanels = ['cartridge', 'bullet', 'powder', 'firearm'] as const
+
+/** Prototype B: the bar regrouped by task, the four records, the load's numbers, the gun. */
+function TaskGroups({
+  chosen,
+  figure,
+}: {
+  chosen: Record<InputPanel, boolean>
+  figure: ReactNode
+}) {
+  const { nextPanel } = useLoad()
+  const { t } = useTranslation()
+  return (
+    <div className="panels task-groups">
+      <Paper
+        component="section"
+        withBorder
+        className="panel task-components"
+        aria-labelledby="group-components"
+      >
+        <div className="panel-head">
+          <h2 id="group-components" className="panel-title">
+            {t('Components')}
+          </h2>
+        </div>
+        {taskPanels.map((p) => (
+          <div
+            key={p}
+            className="component-row"
+            data-panel={p}
+            data-next={p === nextPanel || undefined}
+          >
+            <PanelHead panel={p} chosen={chosen[p]} cartridgePicker />
+            {p !== 'firearm' && <CardSummary panel={p} />}
+          </div>
+        ))}
+        <LoadRow bare />
+      </Paper>
+      <Paper
+        component="section"
+        withBorder
+        className="panel task-load"
+        aria-labelledby="group-load"
+      >
+        <div className="panel-head">
+          <h2 id="group-load" className="panel-title">
+            {t('Load')}
+          </h2>
+        </div>
+        <div className="panel-fields">
+          <NewerFitNote />
+          {fieldsOf(['charge', 'propellantTemperature', 'bulletMass'])}
+          <LadderInputs />
+          {fieldsOf(['volume'])}
+          <SeatingSlot name="cartridge" />
+          <ModelParameters />
+        </div>
+      </Paper>
+      <Paper component="section" withBorder className="panel task-gun" aria-labelledby="group-gun">
+        <div className="panel-head">
+          <h2 id="group-gun" className="panel-title">
+            {t('Gun')}
+          </h2>
+        </div>
+        <div className="panel-fields">
+          <SeatingSlot name="gun" />
+        </div>
+      </Paper>
+      <div className="task-figure">{figure}</div>
+    </div>
+  )
+}
+
+/** A card's heading: icon, title, the record's picker and its More popover. */
+function PanelHead({
+  panel,
+  chosen,
+  cartridgePicker = false,
+}: {
+  panel: InputPanel
+  chosen: boolean
+  cartridgePicker?: boolean
+}) {
+  const { more, setMore } = useLoad()
+  const { t } = useTranslation()
+  const { layout } = useProto()
+  return (
+    <div className="panel-head" data-chosen={chosen || undefined}>
+      <PanelIcon panel={panel} />
+      {/* the title, then the record's name in its search field */}
+      <h2 id={`panel-${panel}`} className="panel-title">
+        {t(panelTitles[panel])}
+      </h2>
+      {(panel !== 'cartridge' || cartridgePicker) && <CardPicker panel={panel} />}
+      {panel === 'powder' && <LotField lot="powder" bare />}
+      {hasMore(panel, layout) && (
+        <AppPopover
+          opened={more === panel}
+          onChange={(o) => setMore(o ? panel : undefined)}
+          position="bottom-end"
+          width={popoverWidth.fields}
+          keepMounted
+          trapFocus
+        >
+          <Popover.Target>
+            <ActionIcon
+              size={controlSize.row.icon}
+              variant="subtle"
+              color="gray"
+              aria-label={t('More of {panel}', { panel: t(panelTitles[panel]) })}
+              aria-expanded={more === panel}
+              onClick={() => setMore(more === panel ? undefined : panel)}
+            >
+              <DotsThree size={18} weight="bold" aria-hidden="true" />
+            </ActionIcon>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <div className="panel-fields more-fields" data-panel={panel}>
+              <CardMore panel={panel} />
+            </div>
+          </Popover.Dropdown>
+        </AppPopover>
+      )}
+    </div>
+  )
+}
+
 /**
  * The pinned row above the cards: the cartridge search, then the choices that depend on it in that
  * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
  */
-function LoadRow() {
+function LoadRow({ bare = false }: { bare?: boolean }) {
   const { primerId, setPrimerChoice, system } = useLoad()
-  return (
-    <div className="pinned-row">
-      <CartridgePicker />
+  const { layout } = useProto()
+  const { t } = useTranslation()
+  const rest = (
+    <>
       <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
       <LotField lot="primer" short />
       <SeatingSlot name="choices" />
+    </>
+  )
+  // prototypes: record keeping (tier 2) is one click away, the cartridge search stays
+  if (layout)
+    return (
+      <div className="pinned-row" data-bare={bare || undefined}>
+        {!bare && <CartridgePicker />}
+        <details className="pinned-more">
+          <summary>{t('Primer, brass, lots')}</summary>
+          <div className="pinned-more-fields">{rest}</div>
+        </details>
+      </div>
+    )
+  return (
+    <div className="pinned-row">
+      <CartridgePicker />
+      {rest}
     </div>
   )
 }
@@ -636,6 +755,10 @@ function SeatingSlot({ name }: { name: SeatingSlotName }) {
 
 /** The cards with a More popover. */
 const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder']
+
+/** The prototypes also move the Gun card's twist, travel and weight behind a More popover. */
+const hasMore = (p: InputPanel, layout: ProtoLayout | undefined) =>
+  morePanels.includes(p) || (layout !== undefined && p === 'firearm')
 
 type LoadValues = ReturnType<typeof useLoad>
 type InteriorSpec = (typeof interiorFields)[number]
@@ -909,31 +1032,36 @@ function NewerFitNote() {
   )
 }
 
-/** A card's fields and record rows. */
-function CardBody({ panel }: { panel: InputPanel }) {
-  const {
-    system,
-    bullet,
-    powder,
-    bulletNote,
-    pmax,
-    specValue,
-    bc,
-    modelShown,
-    setModelShown,
-    printing,
-    printMedia,
-    gunWeight,
-    setGunWeight,
-    markChanged,
-  } = useLoad()
+/** The gun weight; its message waits for the end of the typing, as "0." on the way to "0.5" is no error. */
+function GunWeightField() {
+  const { system, gunWeight, setGunWeight, markChanged } = useLoad()
   const { t } = useTranslation()
-  // the gun weight's message waits for the end of the typing, as "0." on the way to "0.5" is no error
   const [gunLeft, setGunLeft] = useState(false)
+  return (
+    <NumberField
+      spec={firearmMassSpec}
+      system={system}
+      value={gunWeight}
+      error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t) : undefined}
+      onBlur={() => setGunLeft(true)}
+      onChange={(value) => {
+        markChanged()
+        setGunLeft(false)
+        setGunWeight(value)
+      }}
+    />
+  )
+}
+
+/** A card's read-only record values: rows in the card, one summary line in the prototypes. */
+function CardSummary({ panel }: { panel: InputPanel }) {
+  const { system, bullet, powder, pmax, specValue, bc } = useLoad()
+  const { t } = useTranslation()
+  const { layout } = useProto()
   const l3 = specValue('cartridge', 'L3')
-  if (panel === 'cartridge')
-    return (
-      <div className="panel-fields">
+  const rows =
+    panel === 'cartridge' ? (
+      <>
         {recordRow(
           t('CIP Pmax'),
           pmax === undefined
@@ -946,25 +1074,15 @@ function CardBody({ panel }: { panel: InputPanel }) {
           l3 === undefined ? undefined : lengthCell(system, l3),
           system.length.symbol,
         )}
-        {fieldsOf(panelFields.cartridge)}
-        {/* case capacity, COAL or CBTO and the seating values of the figure */}
-        <SeatingSlot name="cartridge" />
-      </div>
-    )
-  if (panel === 'bullet')
-    return (
-      <div className="panel-fields">
-        {/* one line each, so the column fits at 1366 x 650 */}
+      </>
+    ) : panel === 'bullet' ? (
+      <>
         {sizeRow(bullet, system, t)}
         {recordRow(t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
         {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
-        {bulletNote && <p className="note wide">{bulletNote}</p>}
-        {fieldsOf(panelFields.bullet)}
-      </div>
-    )
-  if (panel === 'powder')
-    return (
-      <div className="panel-fields">
+      </>
+    ) : panel === 'powder' ? (
+      <>
         {recordRow(
           t('Bulk density'),
           powder?.bulkDensity &&
@@ -972,22 +1090,69 @@ function CardBody({ panel }: { panel: InputPanel }) {
           system.density.symbol,
         )}
         <PowderSourceRow />
+      </>
+    ) : null
+  return layout ? <div className="record-summary wide">{rows}</div> : rows
+}
+
+/** The model parameters behind one row at every width; an invalid one opens it. */
+function ModelParameters() {
+  const { modelShown, setModelShown, printing, printMedia } = useLoad()
+  const { t } = useTranslation()
+  return (
+    <>
+      <div className="model-row wide">
+        <span>{t('Model parameters')}</span>
+        <Button
+          size={controlSize.row.button}
+          variant="default"
+          aria-expanded={modelShown}
+          onClick={() => setModelShown((v) => !v)}
+        >
+          {modelShown ? t('Hide') : t('Show')}
+        </Button>
+      </div>
+      {(modelShown || printing || printMedia) && fieldsOf(modelFields)}
+    </>
+  )
+}
+
+/** A card's fields and record rows. */
+function CardBody({ panel }: { panel: InputPanel }) {
+  const { bulletNote } = useLoad()
+  const { layout } = useProto()
+  if (panel === 'cartridge')
+    return (
+      <div className="panel-fields">
+        <CardSummary panel="cartridge" />
+        {fieldsOf(layout ? ['volume'] : panelFields.cartridge)}
+        {/* case capacity, COAL or CBTO and the seating values of the figure */}
+        <SeatingSlot name="cartridge" />
+      </div>
+    )
+  if (panel === 'bullet')
+    return (
+      <div className="panel-fields">
+        <CardSummary panel="bullet" />
+        {bulletNote && <p className="note wide">{bulletNote}</p>}
+        {fieldsOf(panelFields.bullet)}
+      </div>
+    )
+  if (panel === 'powder')
+    return (
+      <div className="panel-fields">
+        <CardSummary panel="powder" />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
-        {/* the model parameters behind one row at every width; an invalid one opens it */}
-        <div className="model-row wide">
-          <span>{t('Model parameters')}</span>
-          <Button
-            size={controlSize.row.button}
-            variant="default"
-            aria-expanded={modelShown}
-            onClick={() => setModelShown((v) => !v)}
-          >
-            {modelShown ? t('Hide') : t('Show')}
-          </Button>
-        </div>
-        {(modelShown || printing || printMedia) && fieldsOf(modelFields)}
+        <ModelParameters />
+      </div>
+    )
+  if (layout)
+    return (
+      <div className="panel-fields">
+        {/* the barrel length of the figure; travel, twist and weight are in More */}
+        <SeatingSlot name="gun" />
       </div>
     )
   return (
@@ -995,18 +1160,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
       {fieldsOf(panelFields.firearm)}
       {/* the barrel length of the figure */}
       <SeatingSlot name="gun" />
-      <NumberField
-        spec={firearmMassSpec}
-        system={system}
-        value={gunWeight}
-        error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t) : undefined}
-        onBlur={() => setGunLeft(true)}
-        onChange={(value) => {
-          markChanged()
-          setGunLeft(false)
-          setGunWeight(value)
-        }}
-      />
+      <GunWeightField />
     </div>
   )
 }
@@ -1314,10 +1468,19 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 function CardMore({ panel }: { panel: InputPanel }) {
   const { specValue, system, allDiameters, setAllDiameters } = useLoad()
   const { t } = useTranslation()
+  const { layout } = useProto()
   const l6 = specValue('cartridge', 'L6')
+  if (panel === 'firearm')
+    return (
+      <>
+        {fieldsOf(panelFields.firearm)}
+        <GunWeightField />
+      </>
+    )
   if (panel === 'cartridge')
     return (
       <>
+        {layout && fieldsOf(['boreDiameter', 'boreArea'])}
         {recordRow(
           t('COAL, CIP maximum L6'),
           l6 === undefined ? undefined : lengthCell(system, l6),

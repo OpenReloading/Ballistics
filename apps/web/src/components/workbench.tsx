@@ -31,6 +31,7 @@ import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { loadFitMark } from '../lib/powder-record.ts'
+import { useProto } from '../lib/proto.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -1250,6 +1251,7 @@ export function Workbench() {
   // Ctrl+Enter is caught by the frame below, Ctrl+P prints the report once the barrel length study has computed
   useShortcuts({ run: null, print: ok ? printReport : null })
   const phone = useMediaQuery('(max-width: 47.99em)')
+  const proto = useProto(stale, pending, run)
   /** What opened Saved loads, which gets the focus back: a selector, none for the menu's item. */
   const listOpener = useRef<string | undefined>(undefined)
   const openList = useCallback(() => setListOpen(true), [])
@@ -1383,7 +1385,7 @@ export function Workbench() {
             />
             <Workspace
               ref={workspace}
-              className="workbench"
+              className={proto.className}
               inputsLabel={t('Load')}
               inputs={fresh ? <StartCard onAct={markStartCardUsed} /> : <InputCards />}
               results={<ResultsArea />}

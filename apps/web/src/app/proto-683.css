@@ -1,0 +1,247 @@
+/* Throwaway prototypes of the workbench input bar (?proto=a..e, ?run=auto); never merged. */
+
+/* shared: tier 3 record values as one summary line, record keeping behind one disclosure */
+.workbench[class*="proto-"] .workspace-inputs .record-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.75rem;
+  padding: 0.125rem 0.5rem 0.25rem;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.3;
+}
+
+.workbench[class*="proto-"] .workspace-inputs .record-summary .record-row {
+  display: inline-flex;
+  gap: 0.25rem;
+  min-height: 0;
+  padding: 0;
+}
+
+.workbench[class*="proto-"] .workspace-inputs .record-summary .record-row > :first-child {
+  color: var(--muted);
+}
+
+.workbench[class*="proto-"] .workspace-inputs .record-summary:empty {
+  display: none;
+}
+
+.workbench[class*="proto-"] .pinned-more {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.workbench[class*="proto-"] .pinned-more > summary {
+  display: flex;
+  align-items: center;
+  height: var(--field-height);
+  padding: 0 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: var(--mantine-font-size-xs);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.workbench[class*="proto-"] .pinned-more[open] > .pinned-more-fields {
+  position: absolute;
+  inset-block-start: calc(100% + 0.25rem);
+  inset-inline-end: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.25rem 0.375rem;
+  width: 34rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.25);
+}
+
+.workbench[class*="proto-"] .pinned-row[data-bare] {
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  grid-column: auto;
+}
+
+/* the Run area that recalculates itself: Run is a quiet "Run now", the form's bar says so */
+html[data-proto-run="auto"] .page-bar .bar-run {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+html[data-proto-run="auto"] .workbench .run-bar > button {
+  display: none;
+}
+
+html[data-proto-run="auto"] .workbench .run-bar::before {
+  content: "Result follows the inputs";
+  color: var(--muted);
+  font-size: var(--mantine-font-size-sm);
+}
+
+/* B: three task groups, components first */
+.workbench.proto-b .task-components > .component-row {
+  border-bottom: 1px solid var(--border);
+}
+
+.workbench.proto-b .task-components > .component-row .panel-head {
+  border-bottom: 0;
+  background: none;
+}
+
+.workbench.proto-b .task-components > .component-row .record-summary {
+  padding-block-start: 0;
+}
+
+.workbench.proto-b .component-row .panel-head > .panel-title {
+  display: none;
+}
+
+.workbench.proto-b .task-figure {
+  display: flex;
+  flex-direction: column;
+  min-height: 24rem;
+}
+
+.workbench.proto-b .task-figure > :is(.figure-host, .burn-figure) {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 10rem;
+}
+
+.workbench.proto-b .task-figure > .burn-figure {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+}
+
+@media screen and (min-width: 75em) {
+  .workbench.proto-b .panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    align-items: start;
+  }
+
+  .workbench.proto-b .task-components {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .workbench.proto-b .task-gun {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .workbench.proto-b .task-load {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+
+  .workbench.proto-b .task-figure {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+/* C: from 100em inputs in two columns, the cartridge figure in a third, the results beside them */
+@media screen and (min-width: 100em) {
+  .workbench.proto-c .workspace-tabs {
+    grid-template-columns: 64rem minmax(0, 1fr);
+  }
+
+  .workbench.proto-c .panels {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workbench.proto-c .panels > .panel-column:nth-child(2) {
+    display: contents;
+  }
+
+  .workbench.proto-c .panels > .panel-column:nth-child(2) > .panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .workbench.proto-c .panels > .panel-column:nth-child(3) {
+    grid-column: 2;
+  }
+
+  .workbench.proto-c .panels > .panel-column:nth-child(2) > .figure-host {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: stretch;
+    min-height: 40rem;
+  }
+}
+
+/* D: a slim rail of 24rem, one column, the figure a result tab, Run at the foot of the rail */
+@media screen and (min-width: 75em) {
+  .workbench.proto-d .workspace-tabs {
+    grid-template-columns: 24rem minmax(0, 1fr);
+  }
+
+  .workbench.proto-d .panels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .workbench.proto-d .panel-column {
+    display: contents;
+  }
+
+  .workbench.proto-d .panels .burn-figure,
+  .workbench.proto-d .panels .figure-host {
+    display: none;
+  }
+
+  .workbench.proto-d .run-bar {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 5;
+    display: flex;
+    margin: 0;
+    padding: 0.5rem 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+
+  .workbench.proto-d .run-bar > button {
+    flex: 1 1 auto;
+  }
+}
+
+/* E: the inputs as a band across the top, the results below */
+@media screen and (min-width: 75em) {
+  .workbench.proto-e .workspace-tabs {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .workbench.proto-e .workspace-inputs {
+    overflow-y: visible;
+  }
+
+  .workbench.proto-e .panels {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0 0.75rem;
+  }
+
+  .workbench.proto-e .panel-column {
+    display: contents;
+  }
+
+  .workbench.proto-e .panels .burn-figure,
+  .workbench.proto-e .panels .figure-host {
+    display: none;
+  }
+
+  .workbench.proto-e .workspace-results {
+    position: static;
+  }
+}
