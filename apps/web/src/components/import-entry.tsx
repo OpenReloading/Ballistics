@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   Checkbox,
+  Code,
   Group,
   NativeSelect,
   Paper,
@@ -288,11 +289,18 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   const { t, tn } = useTranslation()
   if ('refusal' in c)
     return (
-      <Text size="sm" c="red" className="import-refusal">
-        {c.format === undefined
-          ? label(c.refusal, t)
-          : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
-      </Text>
+      <>
+        <Text size="sm" c="red" className="import-refusal">
+          {c.format === undefined
+            ? label(c.refusal, t)
+            : t('{format}: {reason}', { format: c.format, reason: label(c.refusal, t) })}
+        </Text>
+        {c.detail && (
+          <Text size="xs">
+            <Code>{c.detail}</Code>
+          </Text>
+        )}
+      </>
     )
   const { warnings, unmapped } = c
   const note = readNote({ ok: true, records: [], warnings, unmapped }, t)
