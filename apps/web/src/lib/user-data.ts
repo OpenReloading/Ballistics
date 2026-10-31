@@ -20,12 +20,14 @@ import { translateMessage } from './core-messages.ts'
 export const maxFileBytes = 40_000_000
 export const tooLargeMessage = `The file is larger than ${maxFileBytes / 1e6} MB.`
 const notJsonMessage = 'The file is not JSON.'
+const notDataFileMessage = 'The file is not an OpenReloading data file.'
 
-/** A `reason` of a file that was not read, in the language of `t`: the app's own two, else a message of the packages. */
+/** A `reason` of a file that was not read, in the language of `t`: the app's own three, else a message of the packages. */
 export function reasonText(reason: string, t: Translator['t']) {
   if (reason === tooLargeMessage)
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
+  if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
   return translateMessage(reason, t)
 }
 
@@ -80,6 +82,8 @@ export function parseUserDataFile(text: string): ParsedUserFile {
   }
   const problem = versionProblem(json)
   if (problem) return { ok: false, reason: problem }
+  if ((json as { format?: unknown } | null)?.format !== userDataFormat)
+    return { ok: false, reason: notDataFileMessage }
   const { json: known, skipped } = withoutUnknownKinds(json)
   const r = userDataFile.safeParse(known)
   const invalid = (json as { invalid?: unknown }).invalid

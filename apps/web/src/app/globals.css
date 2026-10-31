@@ -54,6 +54,9 @@
   --mantine-color-body: var(--bg);
   --mantine-color-text: var(--fg);
   --mantine-color-dimmed: var(--muted);
+  /* placeholders: Mantine's pale default gives about 2:1, and some fields are named by theirs alone */
+  --mantine-color-placeholder: var(--muted);
+  --input-placeholder-color: var(--muted);
   --mantine-color-anchor: var(--link);
   --mantine-color-default: var(--bg);
   --mantine-color-default-hover: var(--surface);
@@ -125,6 +128,12 @@ body {
 :root[data-mantine-color-scheme]
   .mantine-Input-wrapper[data-variant="default"]:not([data-error]):not([data-success]) {
   --input-bd: var(--input-border);
+}
+
+/* an unchecked box or radio takes the field border too: Mantine's gray-4 is about 1.5:1 on white */
+.mantine-Checkbox-input:not(:checked, [data-indeterminate], :disabled, [data-error]),
+.mantine-Radio-radio:not(:checked, :disabled, [data-error]) {
+  border-color: var(--input-border);
 }
 
 /* the top bar's right end: Install slot, Safety, theme switch */
@@ -3378,13 +3387,14 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-/* one row that scrolls sideways when the steps do not fit, so the results keep their height */
+/* one row that scrolls sideways when the steps do not fit, so the results keep their height; the
+   padding keeps a chip's focus ring (3 px, 2 px off) inside the scroll box, which clips the rest */
 .ladder-cells {
   display: flex;
   flex-wrap: nowrap;
   gap: 0.25rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
+  padding: 0.3125rem;
 }
 
 .ladder-cells > .ladder-cell {
@@ -3402,9 +3412,17 @@ main .library-head.page-panel-head > .page-panel-title {
   cursor: pointer;
 }
 
+/* the selection is a fill, so the focus ring alone is an outline */
 .ladder-cell[data-selected] {
-  outline: 2px solid var(--focus);
-  outline-offset: -1px;
+  border-color: var(--mantine-primary-color-filled);
+  background: var(--mantine-primary-color-light);
+  color: var(--mantine-primary-color-light-color);
+}
+
+@media (forced-colors: active) {
+  .ladder-cell[data-selected] {
+    border: 2px solid Highlight;
+  }
 }
 
 .ladder-cell:has(input:focus-visible) {
@@ -3713,7 +3731,6 @@ main .library-head.page-panel-head > .page-panel-title {
      with the word on hover and for screen readers */
   .ladder-cells {
     gap: 0.375rem;
-    padding-bottom: 0;
     scrollbar-width: thin;
   }
 
@@ -5568,9 +5585,11 @@ main .library-head.page-panel-head > .page-panel-title {
   color: var(--fg);
 }
 
+/* outside the segment, as Mantine's SegmentedControl draws it: inside, it merged with the
+   selected segment's edge */
 .segmented-row label:has(input:focus-visible) {
   outline: 2px solid var(--focus);
-  outline-offset: -1px;
+  outline-offset: 2px;
 }
 
 .segmented-row label[data-unavailable] {
@@ -10438,13 +10457,6 @@ main .page-bar h1 {
 .source-badge abbr {
   text-decoration: none;
   cursor: help;
-}
-
-/* the selects of the row are named by their placeholder: the muted text colour, not the pale default */
-.directory-filters,
-.burn-overlay {
-  --mantine-color-placeholder: var(--muted);
-  --input-placeholder-color: var(--muted);
 }
 
 /* the list skeleton (ListLoading): rows in the table's frame, under a filter row of the real metrics */

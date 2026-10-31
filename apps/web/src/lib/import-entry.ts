@@ -25,12 +25,13 @@ import { type LoadFileFormat, loadFileFormats, loadFormatOf } from './load-file-
 import { type InvalidRecord, maxFileBytes, planImport } from './user-data.ts'
 
 /**
- * What a card shows of a read file: the refusal (with the load-file format that refused it), the
+ * What a card shows of a read file: the refusal (with the load-file format that refused it and the
+ * reader's own message as `detail`), the
  * load file's format, record count and what it did not read, or the table's header, samples and
  * kind suggestion.
  */
 export type CardView =
-  | { refusal: string; format?: string | undefined }
+  | { refusal: string; format?: string | undefined; detail?: string }
   | {
       format: string
       records: number
@@ -124,7 +125,7 @@ interface Held {
 
 /** A file's table and the sheet it is on, a load file's card, or its refusal. */
 type FileRead =
-  | { refusal: string; format?: string | undefined }
+  | { refusal: string; format?: string | undefined; detail?: string }
   | { load: Extract<CardView, { records: number }>; records: UserRecord[] }
   | { table: Table; sheet?: string | undefined }
 
@@ -134,8 +135,10 @@ async function workbookTable(bytes: Uint8Array): Promise<FileRead> {
   try {
     worksheets = (await readWorkbook(bytes)).worksheets
   } catch (e) {
-    const reason = e instanceof Error ? e.message : String(e)
-    return { refusal: `The workbook cannot be read: ${reason}. Save it again as XLSX or CSV.` }
+    return {
+      refusal: 'The workbook cannot be read. Save it again as XLSX or CSV.',
+      detail: e instanceof Error ? e.message : String(e),
+    }
   }
   let first: string | undefined
   for (const sheet of worksheets) {
