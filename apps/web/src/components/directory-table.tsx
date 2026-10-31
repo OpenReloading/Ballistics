@@ -786,8 +786,9 @@ function SelectBox({
 type SortColumn = { key: string; label: Message; num?: boolean; value?: unknown }
 
 /**
- * The phone's sort (below 48em only the name column shows its head): one option per sortable
- * column and direction, cleared to the list's own order.
+ * The phone's sort (below 48em only the name column shows its head), also shown when a tablet's
+ * list box hides the wide columns: one option per sortable column and direction, cleared to the
+ * list's own order.
  */
 function SortSelect({
   columns,

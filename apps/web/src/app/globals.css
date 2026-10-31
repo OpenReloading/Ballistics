@@ -10509,7 +10509,7 @@ main .page-bar h1 {
   background: color-mix(in srgb, var(--link) 8%, var(--bg));
 }
 
-/* the phone's Sort */
+/* the Sort of a phone and of a tablet's list box that hides columns */
 .directory-filters > .sort-select {
   display: none;
 }
@@ -10899,12 +10899,22 @@ main .page-bar h1 {
   padding: 0;
 }
 
+/* the list's width, which the filter row's Sort and the table's columns both follow */
+.directory {
+  container: directory / inline-size;
+}
+
 /* a tablet's list box: the columns of a wide box and the burn rate's scale give their room to the
-   name, which a 768 px window left none; a print keeps every column */
+   name, which a 768 px window left none, and the Sort shows to sort by the hidden columns; a print
+   keeps every column */
 @media screen {
-  @container (max-width: 63.99rem) {
+  @container directory (max-width: 63.99rem) {
     .directory-table .wide-only {
       display: none;
+    }
+
+    .directory:has(.wide-only) > .directory-filters > .sort-select {
+      display: block;
     }
   }
 
