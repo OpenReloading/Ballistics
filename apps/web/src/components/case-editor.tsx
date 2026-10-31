@@ -2,6 +2,7 @@
 
 import {
   ActionIcon,
+  Anchor,
   Group,
   NativeSelect,
   SimpleGrid,
@@ -16,6 +17,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeSummary, CaseSummary } from '../lib/api-types.ts'
 import { caseGroupCapacitySpec, caseGroupFields } from '../lib/case-group.ts'
+import { capacityGuide } from '../lib/docs-url.ts'
 import { fieldSi, fieldStored } from '../lib/firearm.ts'
 import { kebabValue } from '../lib/list-values.ts'
 import { productLabel } from '../lib/manufacturers.ts'
@@ -107,6 +109,14 @@ export function CaseEditor({
       <p className="note">
         {t(
           'The capacity and the other values are the ones you measured. The workbench takes the capacity as the measured case capacity of its cartridge and shows it as measured. Enter the mean of the cases you measured and how many there were.',
+        )}
+        {capacityGuide && (
+          <>
+            {' '}
+            <Anchor href={capacityGuide} target="_blank" rel="noopener">
+              {t('How to measure case capacity with water')}
+            </Anchor>
+          </>
         )}
       </p>
       <SimpleGrid

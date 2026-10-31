@@ -36,6 +36,18 @@ const sidebars: SidebarsConfig = {
     ]),
     category('Targets and groups', ['groups', 'hit-probability', 'ring-scoring', 'hole-detection']),
     'photo-guide',
+    {
+      type: 'category',
+      label: 'Accuracy guides',
+      collapsed: true,
+      items: [
+        'guides/case-capacity',
+        'guides/bullet-dimensions',
+        'guides/chronograph-setup',
+        'guides/powder-temperature',
+        'guides/chronograph-ladder',
+      ],
+    },
     category('Case and firearm', [
       'case-capacity',
       'bullet-fit',
