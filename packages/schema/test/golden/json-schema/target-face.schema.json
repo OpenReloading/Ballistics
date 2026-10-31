@@ -256,7 +256,8 @@
             "type": "string",
             "enum": [
               "touch",
-              "centre"
+              "centre",
+              "outward"
             ]
           },
           "federation": {
