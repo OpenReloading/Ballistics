@@ -238,6 +238,8 @@
       "ladder steps must be an integer of at least 1",
       "a ladder around the charge needs an odd count",
       "ladder charge {n} kg must be above 0",
+      "ladder charge {n} g must be above 0",
+      "Too big: expected number to be <={n}",
       "a ladder needs at least two strings",
       "mean must be finite",
       "standard deviation must be 0 or more",
