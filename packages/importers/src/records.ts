@@ -477,8 +477,9 @@ const isIssue = (x: Cells | RowIssue): x is RowIssue =>
  * The user records of `table` read with `map` as `kind`, saved at `now` (ISO 8601). Each row is
  * checked on its own: a row that fails is listed with row, column, cell and reason and never
  * blocks the others. Ids are deterministic (`idOfKey` of kind, name, maker and, for a bullet,
- * diameter and mass), so the same row read again gets the same id. The caller still parses each
- * record with the user record schema before storing it.
+ * diameter and mass), so the same row read again gets the same id. A row whose id repeats an
+ * earlier row's gets a warning naming both rows; the caller keeps the first record of an id. The
+ * caller still parses each record with the user record schema before storing it.
  */
 export function buildRecords(
   table: Table,
@@ -520,6 +521,9 @@ export function buildRecords(
     return id
   }
   const warned = new Set<number>()
+  const firstRow = new Map<string, number>()
+  const nameColumn = columns.find((col) => col.f.key === 'name')
+  const nameHeader = nameColumn ? (table.header[nameColumn.i] ?? nameColumn.f.label) : 'Name'
   table.rows.forEach((cells, r) => {
     const row = r + (table.hasHeader ? 2 : 1)
     const before = out.warnings.length
@@ -530,10 +534,19 @@ export function buildRecords(
       out.rejected.push(c)
       return
     }
-    if (out.warnings.length > before) warned.add(row)
     const name = String(c.name ?? '')
     const maker = typeof c.maker === 'string' ? c.maker : undefined
     const key = keyOf(kind, name, maker, c)
+    const first = firstRow.get(key)
+    if (first === undefined) firstRow.set(key, row)
+    else
+      out.warnings.push({
+        row,
+        column: nameHeader,
+        cell: name,
+        reason: `Rows ${first} and ${row} give the same ${kind === 'bullet' ? 'name, maker, diameter and mass' : 'name and maker'}, so one id: only row ${first} is imported. Change a cell of row ${row} to import it as a record of its own.`,
+      })
+    if (out.warnings.length > before) warned.add(row)
     const record = recordOf(kind, idOfKey(key), name, now, c, maker && makerOf(maker))
     out.entries.push({ key, row, record })
   })
