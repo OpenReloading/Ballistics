@@ -9,6 +9,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
+  bandNote,
   classifyPowder,
   dashes,
   describeCurve,
@@ -88,7 +89,10 @@ function OverlayBody({
         title={t('Dynamic vivacity of the chosen powders, model output')}
         description={series.map((s) => describeCurve(s.powder, t)).join(' ')}
       />
-      <p className="screen-only record-note">{t(modelCaption)}</p>
+      <p className="screen-only record-note">
+        {t(modelCaption)}
+        {series.length === 1 && ` ${t(bandNote)}`}
+      </p>
       <Button
         className="curve-toggle"
         variant={open ? 'light' : 'subtle'}

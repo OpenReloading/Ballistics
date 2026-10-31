@@ -114,7 +114,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
     {
       key: 'cal',
       label: msg('Caliber'),
-      unit: 'in',
+      unit: 'in, mm',
       help: msg('The common caliber of the bullet diameter G1.'),
       width: '5rem',
       value: (c) => c.maxBulletDiameter,

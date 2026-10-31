@@ -4,8 +4,9 @@ import { Button } from '@mantine/core'
 import { toSi } from '@open-reloading/schema'
 import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
-import { useDeferredValue, useMemo } from 'react'
+import { useCallback, useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
+import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
@@ -60,9 +61,18 @@ export function TargetFaceList({
   const counts = useMemo(() => countOrigins(items), [items])
   const [state, set, clear] = useListState(faceFacetKeys)
   const filters = useDeferredValue(state)
+  // to 2 decimals: 50 yd is 45.72 m
+  const distance = useCallback(
+    (m: number) => plainNumber(Number(system.range.fromSi(m).toFixed(2))),
+    [system],
+  )
   const facets = useMemo(
-    () => faceFacets(new Map(disciplines.map((d) => [d.id, d.name]))),
-    [disciplines],
+    () =>
+      faceFacets(
+        new Map(disciplines.map((d) => [d.id, d.name])),
+        (m) => `${distance(m)} ${system.range.symbol}`,
+      ),
+    [disciplines, distance, system],
   )
   const searched = useMemo(
     () => items.filter((r) => inOrigins(r, filters.sources) && targetFaceMatches(r, filters.query)),
@@ -76,8 +86,7 @@ export function TargetFaceList({
   ]
   const outer = (r: TargetFaceRow) =>
     r.outer === undefined ? '' : formatQuantity('length', system, toSi('length', r.outer))
-  const distances = (r: TargetFaceRow) =>
-    r.distances.map((d) => formatQuantity('range', system, d)).join(', ')
+  const distances = (r: TargetFaceRow) => r.distances.map(distance).join(', ')
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {

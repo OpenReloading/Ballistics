@@ -62,7 +62,13 @@ function useWholeText(box: HTMLElement | null) {
       )
     read()
     const watch = new MutationObserver(read)
-    watch.observe(box, { childList: true, subtree: true, characterData: true })
+    watch.observe(box, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['data-full'],
+    })
     return () => watch.disconnect()
   }, [box])
   return text

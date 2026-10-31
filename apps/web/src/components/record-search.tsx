@@ -291,7 +291,10 @@ export function RecordSearch<T extends { id: string }>({
       <p
         role="status"
         className="search-status"
-        data-covered={(combobox.dropdownOpened && items.length + local.length > 0) || undefined}
+        data-covered={
+          (state.status === 'ok' && combobox.dropdownOpened && items.length + local.length > 0) ||
+          undefined
+        }
       >
         {message}
       </p>

@@ -170,7 +170,11 @@ export function CaseEditor({
             )
           }}
           data={[
-            { value: '', label: products.length === 0 ? t('Choose a cartridge first') : t('None') },
+            {
+              value: '',
+              label:
+                data.cartridge || products.length > 0 ? t('None') : t('Choose a cartridge first'),
+            },
             ...products.map((p) => ({ value: p.id, label: label(p) })),
           ]}
         />

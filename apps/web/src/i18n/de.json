@@ -2333,7 +2333,6 @@
   "Green": "Grün",
   "Ochre": "Ocker",
   "Pink": "Rosa",
-  "Dark green": "Dunkelgrün",
   "N": "N",
   "NE": "NO",
   "E": "O",
@@ -3990,5 +3989,6 @@
   "Run {time}": "Lauf {time}",
   "Sort: {text}": "Sortierung: {text}",
   "Measured on the cases of this group, for example fired and sized. Mean of the cases measured. The workbench takes it as the measured case capacity.": "Gemessen an den Hülsen dieser Gruppe, zum Beispiel abgeschossen und kalibriert. Mittelwert der gemessenen Hülsen. Die Werkbank übernimmt den Wert als gemessenes Hülsenvolumen.",
-  "Choose a cartridge first": "Zuerst eine Patrone wählen"
+  "Choose a cartridge first": "Zuerst eine Patrone wählen",
+  "Purple": "Violett"
 }

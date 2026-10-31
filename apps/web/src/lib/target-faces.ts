@@ -93,7 +93,11 @@ export const faceFacetKeys = ['org', 'discipline', 'dist', 'rings']
  * The face list's choice filters: federation (by abbreviation), discipline (named by
  * `disciplines`, by id), the distance of an event in m and the ring count.
  */
-export function faceFacets(disciplines: ReadonlyMap<string, string>): Facet<TargetFaceRow>[] {
+export function faceFacets(
+  disciplines: ReadonlyMap<string, string>,
+  /** The text of a distance in m: with the range unit shown. */
+  distance: (metres: number) => string = (m) => `${m} m`,
+): Facet<TargetFaceRow>[] {
   return [
     {
       key: 'org',
@@ -110,7 +114,7 @@ export function faceFacets(disciplines: ReadonlyMap<string, string>): Facet<Targ
       key: 'dist',
       label: msg('Distance'),
       values: (r) => r.distances.map(String),
-      text: (v) => `${v} m`,
+      text: (v) => distance(Number(v)),
       order: (a, b) => Number(a) - Number(b),
     },
     {

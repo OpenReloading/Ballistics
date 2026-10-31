@@ -49,6 +49,7 @@ export function compareCartridgeNames(a: string, b: string): number {
 /** A name or query as typed words compare: folded, a dot ending a word, spaces and hyphens left out. */
 const plain = (s: string) =>
   fold(s)
+    .replace(/^\.(?=\d)/, '')
     .replace(/\.(?=\s|$)/g, '')
     .replace(/[\s-]+/g, '')
 

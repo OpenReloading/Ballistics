@@ -207,13 +207,14 @@ describe('refusals', () => {
     })
   })
 
-  it('keeps the page for a mass of zero or below with a record loaded and flags a negative one at the field', () => {
+  it('keeps the page for a mass of zero or below with a record loaded and flags it at the field', () => {
     for (const text of ['0', '-5']) {
       const h = run(fromRecord(targetBullet, metric), type('mass', text))
       expect(evaluate(h.present, metric, 'mass').computed, text).toEqual([])
     }
     const mass = defined(designerSpecs.find((s) => s.key === 'mass'))
-    expect(fieldError(mass, fieldValueFromText('mass', metric, '-5'), metric)).toBeDefined()
+    for (const text of ['0', '-5'])
+      expect(fieldError(mass, fieldValueFromText('mass', metric, text), metric), text).toBeDefined()
   })
 
   it('asks for the other cannelure value', () => {

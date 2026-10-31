@@ -22,9 +22,9 @@ export function LibraryTabs() {
   // the strip scrolls on a phone: the current tab stays in view
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the route changes
   useEffect(() => {
-    list.current
-      ?.querySelector('[aria-selected="true"]')
-      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    const box = list.current
+    const tab = box?.querySelector<HTMLElement>('[aria-selected="true"]')
+    if (box && tab) box.scrollLeft = tab.offsetLeft - (box.clientWidth - tab.offsetWidth) / 2
   }, [route])
   if (!page?.tabs) return null
   return (

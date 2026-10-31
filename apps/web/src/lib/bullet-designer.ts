@@ -62,7 +62,7 @@ const len = (key: string, label: Message, group: Group): DesignerSpec => ({
 
 export const designerSpecs: DesignerSpec[] = [
   { ...len('diameter', msg('Diameter'), 'size'), required: true },
-  { key: 'mass', label: msg('Mass'), quantity: 'mass', group: 'size', min: 0 },
+  { key: 'mass', label: msg('Mass'), quantity: 'mass', group: 'size', min: 0, positive: true },
   len('length', msg('Length'), 'size'),
   len('noseLength', msg('Nose length'), 'nose'),
   len('ogive.radius', msg('Ogive radius'), 'nose'),
