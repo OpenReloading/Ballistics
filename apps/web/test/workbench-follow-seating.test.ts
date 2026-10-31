@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { followPlan } from '../src/components/use-workbench-load.ts'
+import { followPlan, seatingOwnsVolume } from '../src/components/use-workbench-load.ts'
 
 const plan = (
   values: Parameters<typeof followPlan>[0],
@@ -38,4 +38,12 @@ it('fills the volume again when the seating gives one', () => {
   const { next, following } = plan({ ...report, volume: seated }, now, {})
   expect(next.volume?.si).toBe(seated)
   expect(following.volume).toBe(seated)
+})
+
+it('keeps the case volume default out of a seating without a volume behind the bullet', () => {
+  expect(seatingOwnsVolume({ ...report, volume: seated })).toBe(true)
+  expect(seatingOwnsVolume(report)).toBe(true)
+  // no seating: the case volume default fills the field
+  expect(seatingOwnsVolume({ caseVolume: 4e-6 })).toBe(false)
+  expect(seatingOwnsVolume({})).toBe(false)
 })

@@ -658,6 +658,14 @@ function seatedUpdate(next: PreviewFields, seatedText: PreviewFields, now: Field
   return update
 }
 
+/**
+ * The seating owns the volume: its seated value, or none when the bullet is seated in a case of
+ * known volume but leaves no valid volume behind it. The case volume default fills it only without
+ * a seating.
+ */
+export const seatingOwnsVolume = (s: Seated) =>
+  s.volume !== undefined || (s.overallLength !== undefined && s.caseVolume !== undefined)
+
 /** The start's own seating, with a barrel nobody typed, completes the start (no edit). */
 const isStartSeating = (values: Seated, suggestions: Suggestions) =>
   values.atStart && (values.barrel === undefined || values.barrel === suggestions.barrelLength?.si)
@@ -2810,18 +2818,18 @@ export function useWorkbenchState() {
   /** A followed field's default while it is the field's value; the seating owns the volume once a bullet is seated. */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
-    if (!k || !followed.has(k) || (k === 'volume' && seated.volume !== undefined)) return
+    if (!k || !followed.has(k) || (k === 'volume' && seatingOwnsVolume(seated))) return
     const given = suggestions[k]
     return given && !given.fromFirearm && fields[key]?.si === given.si ? given : undefined
   }
   const suggestionKey = JSON.stringify(followKeys.map((k) => suggestions[k]?.si))
-  const seatedVolume = seated.volume !== undefined
+  const seatedVolume = seatingOwnsVolume(seated)
   // a followed field takes its default when it changes; what was typed is not in `followed`
   // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of a default or of what follows
   useEffect(() => {
     const writes = followWrites({
       followed,
-      seatedVolume: seatedNow.current.volume !== undefined,
+      seatedVolume: seatingOwnsVolume(seatedNow.current),
       now: form.getValues(),
       suggestions,
       written: written.current,
