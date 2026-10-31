@@ -56,6 +56,7 @@ export const bundle: Bundle = {
         { side: 'cartridge', symbol: 'G1', quantity: 'length', value: 9.03, variant: 'b' },
         { side: 'cartridge', symbol: 'G1', quantity: 'length', value: 9.02, variant: 'a' },
         { side: 'chamber', symbol: 'G1', quantity: 'length', value: 8.9 },
+        { side: 'chamber', symbol: 'F', quantity: 'length', value: 7.82 },
         { side: 'chamber', symbol: 'Q', quantity: 'area', value: 47.51 },
       ],
     }),

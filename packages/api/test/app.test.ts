@@ -40,6 +40,7 @@ describe('GET /cartridges', () => {
         name: 'Beta Pistol',
         aliases: [],
         table: 'IV',
+        boreDiameter: 7.82,
         // the smallest cartridge G1 of the sheet; the chamber G1 is not one
         maxBulletDiameter: 9.02,
         caseLength: 20,

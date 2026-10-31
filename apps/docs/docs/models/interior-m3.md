@@ -187,13 +187,13 @@ Doubled engraving gives the direction of the measured change (more velocity, mos
 
 ### Bore area
 
-Where a load gives no bore area, the C.I.P. bore area $Q_\text{CIP}$ of the cartridge applies, else the circle of the mean of land diameter $F$ and groove diameter $Z$, else the circle of $F$:
+Where a load gives no bore area, the C.I.P. bore area $Q_\text{CIP}$ of the cartridge applies while the bore diameter is its land diameter $F$ (a typed other bore diameter leaves no record area, as $Q_\text{CIP}$ describes $F$), else the circle of the mean of land diameter $F$ and groove diameter $Z$, else the circle of $F$:
 
 $$
 A = Q_\text{CIP} \quad\text{or}\quad A = \frac{\pi}{4}\left(\frac{F + Z}{2}\right)^2 \quad\text{or}\quad A = \frac{\pi}{4} F^2
 $$
 
-Code: `packages/core/src/interior/bore-resistance.ts`, `boreArea`. `packages/core/src/cartridge-specs.ts`, `cartridgeBoreAreaMm2`.
+Code: `packages/core/src/interior/bore-resistance.ts`, `boreArea` and `recordBoreArea`. `packages/core/src/cartridge-specs.ts`, `cartridgeBoreAreaMm2` and `cartridgeLandDiameterMm`.
 
 The circle of the mean of $F$ and $Z$ is a choice of the model, not taken from a source.
 

@@ -271,6 +271,10 @@
   "Changed from the record value {value}.": "Gegenüber dem Wert des Datensatzes geändert: {value}.",
   "Reset {label} to the record value {value}": "{label} auf den Wert des Datensatzes zurücksetzen: {value}",
   "Reset card": "Karte zurücksetzen",
+  "The new record replaced {count} changed value.|The new record replaced {count} changed values.": {
+    "one": "Der neue Datensatz hat {count} geänderten Wert ersetzt.",
+    "other": "Der neue Datensatz hat {count} geänderte Werte ersetzt."
+  },
   "Changed from the user design value {value}.": "Gegenüber dem Wert des eigenen Entwurfs geändert: {value}.",
   "Charge": "Treibladung",
   "Charge ({unit})": "Treibladung ({unit})",
@@ -923,7 +927,7 @@
   "Optional, the air of the zero: an empty field takes the shot value. The zero always takes the altitude of the shot.": "Optional, die Luft beim Einschießen: Ein leeres Feld übernimmt den Wert des Schusses. Das Einschießen nutzt immer die Höhenlage des Schusses.",
   "Optional. Absolute station pressure of the zero, not reduced to sea level; empty takes the shot value.": "Optional. Absoluter Luftdruck am Standort beim Einschießen, nicht auf Meereshöhe umgerechnet; leer übernimmt den Wert des Schusses.",
   "Optional. Empty takes the shot value.": "Optional. Leer übernimmt den Wert des Schusses.",
-  "Optional. Empty: the cartridge record's bore area Q, else the circle of the mean of the bore and groove diameters, else of the bore diameter.": "Optional. Leer: der Laufquerschnitt Q des Patronendatensatzes, sonst die Kreisfläche aus dem Mittel von Felddurchmesser und Durchmesser der Züge, sonst aus dem Felddurchmesser.",
+  "Optional. Empty: the cartridge record's bore area Q while the bore diameter is the record's, else the circle of the mean of the bore and groove diameters, else of the bore diameter.": "Optional. Leer: der Laufquerschnitt Q des Patronendatensatzes, solange der Felddurchmesser der des Datensatzes ist, sonst die Kreisfläche aus dem Mittel von Felddurchmesser und Durchmesser der Züge, sonst aus dem Felddurchmesser.",
   "Optional. Friction pressure along the bore. Empty: the powder record's value, else none.": "Optional. Reibungsdruck entlang des Laufs. Leer: der Wert des Treibladungspulver-Datensatzes, sonst keiner.",
   "Optional. Gas leaking past the bullet through an area that is the same over the whole travel. Empty: no leakage.": "Optional. Gas, das über eine auf dem gesamten Weg gleiche Fläche am Geschoss vorbeiströmt. Leer: keine Leckage.",
   "Optional. Gives the lead in target lengths.": "Optional. Gibt den Vorhalt in Ziellängen an.",

@@ -494,7 +494,7 @@ function ChargeInput({
  */
 export function PowderCompare({ system }: { system: UnitSystem }) {
   const { t } = useTranslation()
-  const { loadRequest, powder, choosePowder, applyCharge, fields, cartridge } = useLoad()
+  const { loadRequest, powder, pickPowder, applyCharge, fields, cartridge } = useLoad()
   const [kind, setKind] = useState<CompareMode['kind']>('typed')
   const [fill, setFill] = useState<number | string>(caseFillPercentRange.initial)
   const fillValid = isFillValid(fill)
@@ -558,7 +558,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     t,
   )
   const open = (r: CompareRow) => {
-    choosePowder(r.id)
+    pickPowder(r.id)
     // the row's values are for its charge: a case fill row sets it too
     if (r.charge !== undefined && differsFrom(fields.charge?.si, r.charge)) applyCharge(r.charge)
   }

@@ -64,3 +64,50 @@ test('Reset card gives a card all its record values back', async ({ page }) => {
   await expect(length).toHaveValue(before[1] ?? '')
   await expect(page.getByRole('button', { name: 'Reset card' })).toBeDisabled()
 })
+
+test('a typed bore diameter leaves the record bore area, which describes the record diameter, and a reset brings it back', async ({
+  page,
+}) => {
+  await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  const form = loadForm(page)
+  const [bore, area] = [
+    form.getByRole('textbox', { name: /^Bore diameter/ }),
+    form.getByRole('textbox', { name: /^Bore area/ }),
+  ]
+  // the cartridge record fills it once loaded
+  await expect(area).not.toHaveValue('')
+  const record = await area.inputValue()
+  await bore.fill('7.80')
+  // the area is empty: the circle of the bore diameter shows as its placeholder
+  await expect(area).toHaveValue('')
+  await expect(area).toHaveAttribute('placeholder', /\d/)
+  await form.getByRole('button', { name: /^Reset Bore diameter to the record value/ }).click()
+  await expect(area).toHaveValue(record)
+})
+
+test('picking another bullet replaces the changed values of the card and says how many', async ({
+  page,
+}) => {
+  await page.goto('/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40')
+  const form = loadForm(page)
+  const diameter = form.getByRole('textbox', { name: /^Diameter/ })
+  const length = form.getByRole('textbox', { name: /^Length/ })
+  await expect(diameter).toHaveClass(/field-default/)
+  await diameter.fill('7.84')
+  await length.fill('31.00')
+  await form.getByRole('combobox', { name: 'Search bullets by manufacturer and name' }).fill('150')
+  await page
+    .getByRole('option', { name: /Demo Bullets.*150 gr/ })
+    .first()
+    .click()
+  await expect(form.getByText('The new record replaced 2 changed values.')).toBeVisible()
+  await expect(diameter).toHaveClass(/field-default/)
+  await expect(length).toHaveClass(/field-default/)
+  // the note stays until the next pick or a reset
+  await form.getByRole('combobox', { name: 'Search bullets by manufacturer and name' }).fill('168')
+  await page
+    .getByRole('option', { name: /Demo Bullets.*168 gr/ })
+    .first()
+    .click()
+  await expect(form.getByText(/The new record replaced/)).toHaveCount(0)
+})

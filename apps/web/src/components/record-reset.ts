@@ -1,5 +1,5 @@
 import type { FieldValue } from '../lib/field-spec.ts'
-import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
+import { type FollowKey, isFollowKey } from '../lib/input-defaults.ts'
 import { interiorFields } from '../lib/interior-input.ts'
 import { fixedFieldText, type UnitSystem } from '../lib/units.ts'
 
@@ -16,9 +16,6 @@ export interface ResetTargets {
   follow: (keys: readonly FollowKey[]) => void
   setGunWeight: (value: FieldValue) => void
 }
-
-const isFollowKey = (key: string): key is FollowKey =>
-  (followKeys as readonly string[]).includes(key)
 
 /**
  * Gives the changed values among `keys` the record's value again, the way each came to differ:
