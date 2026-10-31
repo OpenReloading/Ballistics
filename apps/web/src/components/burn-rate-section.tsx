@@ -135,6 +135,11 @@ export function BurnRateSummary({
             <div className="burn-neighbours">
               <Neighbours title={t('Faster')} rows={place.faster} />
               <Neighbours title={t('Slower')} rows={place.slower} />
+              <p className="record-note">
+                {t(
+                  'A neighbour is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.',
+                )}
+              </p>
             </div>
           )}
         </>

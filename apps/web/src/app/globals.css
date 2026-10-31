@@ -7172,6 +7172,11 @@ main .record-sources .sources tbody th {
   color: var(--muted);
 }
 
+.burn-neighbours .record-note {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+}
+
 .record-figure .record-note {
   margin: 0.25rem 0 0;
 }
