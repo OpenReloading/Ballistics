@@ -29,7 +29,7 @@ The web app is a static site. To host it, run `npm run pages:build` (set `PAGES_
 
 ## Data
 
-The records in `packages/data/records/` are one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines. Bullet, powder, case capacity and manufacturer records cite the maker's own publication; powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project licence, the fitted parameters are under the data licence (`packages/data/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
+The records in `packages/data/records/` are one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines. Bullet, powder and manufacturer records cite the maker's own publication, case capacities a maker or a Wikipedia page; powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project licence, the fitted parameters are under the data licence (`packages/data/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
 
 ## Safety
 
@@ -53,5 +53,5 @@ Reloading and shooting are done at your own risk. This software comes without wa
 ## License
 
 - Code: MIT, see [LICENSE](LICENSE).
-- Data records (`packages/data/records/`): each entry states its licence in its `license` field; entries without one are CC BY 4.0 (see [packages/data/LICENSE](packages/data/LICENSE)).
+- Data records (`packages/data/records/`): each entry states its licence in its `license` field; entries without one are CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see [packages/data/LICENSE](packages/data/LICENSE)).
 - The Ballistics logo: [OpenReloading/Artwork](https://github.com/OpenReloading/Artwork) (MIT), see [NOTICE](NOTICE).
