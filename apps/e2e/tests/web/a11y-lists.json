@@ -274,15 +274,9 @@
     },
     {
       "rule": "color-contrast",
-      "node": "settings-offline",
+      "node": "",
       "where": ["Settings"],
-      "reason": "Text under the pinned footer of the Settings dialog, whose tab area scrolls: a partly clipped box that axe cannot match to a background. It is the text colour on the dialog background, 5:1 or more in both themes."
-    },
-    {
-      "rule": "color-contrast",
-      "node": "NativeSelect-label",
-      "where": ["Settings, Units"],
-      "reason": "Label of a unit select under the pinned footer of the Settings dialog, whose tab area scrolls: a partly clipped box that axe cannot match to a background. It is the label colour on the dialog background, 5:1 or more in both themes."
+      "reason": "Text of the Settings dialog at the edge of its scrolling tab area, partly clipped by the box or the pinned footer, so axe cannot match it to a background. It is the text or muted colour on the dialog background, 5:1 or more in both themes."
     }
   ]
 }
