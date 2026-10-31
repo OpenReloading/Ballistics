@@ -61,6 +61,62 @@ export const tours = {
       ),
     },
   ],
+  // one tour for every record page: the parts a kind lacks are left out as not shown
+  record: [
+    {
+      target: '.record-figure',
+      title: msg('Figure'),
+      text: msg('The record drawn or charted from its values.'),
+    },
+    {
+      target: '.record-values',
+      title: msg('Values'),
+      text: msg('The values of the record, in the units chosen under Units.'),
+    },
+    {
+      target: '.record-side',
+      title: msg('Notes'),
+      text: msg('Further values and notes of the record.'),
+    },
+    {
+      target: '.record-sources',
+      title: msg('Sources'),
+      text: msg(
+        'Where the values come from: each source with its origin and the date it was retrieved.',
+      ),
+    },
+    {
+      target: '.page-bar-actions',
+      title: msg('Actions'),
+      text: msg('Use the record in another page, copy its link or print it.'),
+    },
+  ],
+  groups: [
+    {
+      target: '.target-toolbar',
+      title: msg('Tools'),
+      text: msg(
+        'Photo adds a photo of the target; it stays in this browser. Calibrate sets its scale from a reference of known size. Shot places shots.',
+      ),
+    },
+    {
+      target: '.target-stage',
+      title: msg('Target'),
+      text: msg('The photo or the drawn target with the shots of each group.'),
+    },
+    {
+      target: '.stats-side, .target-tabs, .target-sheet',
+      title: msg('Statistics'),
+      text: msg('ES, mean radius and the other statistics of the chosen group, with its shots.'),
+    },
+    {
+      target: '.file-menu button',
+      title: msg('File'),
+      text: msg(
+        'The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.',
+      ),
+    },
+  ],
 } as const satisfies Record<string, readonly TourStep[]>
 
 /** A page that has a tour. */

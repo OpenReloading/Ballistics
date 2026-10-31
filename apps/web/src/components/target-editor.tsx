@@ -152,6 +152,7 @@ import {
 import { ExportMenu, StatsBlock, type StillCanvas, type ViewRef } from './target-export.tsx'
 import { NotesLayer, NotesPanel } from './target-notes.tsx'
 import { type LoadSummary, printTargetSheet, TargetPrint } from './target-print.tsx'
+import { TourButton } from './tour-button.tsx'
 import { useUnits } from './units-settings.tsx'
 import type { ZeroTargetMenu } from './zero-target.tsx'
 
@@ -2476,6 +2477,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
               {t('Zero target')}
             </Button>
           )}
+          <TourButton page="groups" />
           <PrintButton
             onClick={printSheet}
             hint={t(

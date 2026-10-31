@@ -13,7 +13,7 @@ const rendered = (selector: string) => {
   const name = selector.slice(1)
   const pattern = selector.startsWith('#')
     ? new RegExp(`\\bid="${name}"`)
-    : new RegExp(`className=["{\`][^"}\`]*\\b${name}\\b`)
+    : new RegExp(`className=(?:["\`]|\\{\`?)[^"}\`]*\\b${name}\\b`)
   return pattern.test(sources)
 }
 

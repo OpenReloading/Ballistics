@@ -3961,5 +3961,16 @@
   "Save writes the load to a file and keeps a copy in this browser; Open reads a load file.": "Speichern schreibt die Laborierung in eine Datei und behält eine Kopie in diesem Browser; Öffnen liest eine Laborierungsdatei.",
   "How to set up a chronograph": "So stellen Sie einen Chronographen auf",
   "How to fire a ladder for the fit": "So schießen Sie einen Ladeleiter für die Anpassung",
-  "How to measure powder temperature": "So messen Sie die Temperatur des Treibladungspulvers"
+  "How to measure powder temperature": "So messen Sie die Temperatur des Treibladungspulvers",
+  "Figure": "Abbildung",
+  "The record drawn or charted from its values.": "Der Datensatz als Zeichnung oder Diagramm aus seinen Werten.",
+  "Values": "Werte",
+  "The values of the record, in the units chosen under Units.": "Die Werte des Datensatzes in den unter Einheiten gewählten Einheiten.",
+  "Further values and notes of the record.": "Weitere Werte und Notizen des Datensatzes.",
+  "Where the values come from: each source with its origin and the date it was retrieved.": "Woher die Werte stammen: jede Quelle mit ihrer Herkunft und dem Datum, an dem sie abgerufen wurde.",
+  "Use the record in another page, copy its link or print it.": "Den Datensatz auf einer anderen Seite verwenden, seinen Link kopieren oder ihn drucken.",
+  "Photo adds a photo of the target; it stays in this browser. Calibrate sets its scale from a reference of known size. Shot places shots.": "Foto fügt ein Foto der Zielscheibe hinzu; es bleibt in diesem Browser. Kalibrieren legt den Maßstab über eine Referenz bekannter Größe fest. Schuss setzt Schüsse.",
+  "The photo or the drawn target with the shots of each group.": "Das Foto oder die gezeichnete Zielscheibe mit den Schüssen jeder Gruppe.",
+  "ES, mean radius and the other statistics of the chosen group, with its shots.": "ES, mittlerer Radius und die weiteren Statistiken der gewählten Gruppe, mit ihren Schüssen.",
+  "The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.": "Das Blatt wird in diesem Browser gespeichert. Speichern schreibt es in eine Datei; Öffnen liest eine Blattdatei."
 }

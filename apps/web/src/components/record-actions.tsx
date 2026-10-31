@@ -26,6 +26,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
+import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton } from './units-settings.tsx'
 
 /**
@@ -64,19 +65,22 @@ export function LinkButton({
 /**
  * Every record page's actions, one component so they cannot drift: Use in
  * workbench or Open in shot groups (filled, the primary action), Open in designer, Compare, each where the record has
- * one, then Units, Copy link and Print as icon buttons with their names on hover and focus. The
- * bullet comparison shows the icon buttons alone.
+ * one, then the record pages' Tour, Units, Copy link and Print as icon buttons with their names on
+ * hover and focus. The bullet comparison shows the icon buttons alone.
  */
 export function RecordActions({
   compare,
   workbench,
   groups,
   design,
+  tour,
 }: {
   compare?: string | undefined
   workbench?: string | undefined
   groups?: string | undefined
   design?: string | undefined
+  /** The Tour button of the record pages. */
+  tour?: boolean
 }) {
   const { t } = useTranslation()
   const clipboard = useClipboard({ timeout: 2000 })
@@ -102,6 +106,7 @@ export function RecordActions({
           {t('Compare')}
         </LinkButton>
       )}
+      {tour && <TourButton page="record" />}
       <UnitsIconButton />
       {/* the name stays, so a copy moves nothing */}
       <Tooltip
