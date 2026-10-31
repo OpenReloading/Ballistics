@@ -3992,5 +3992,6 @@
   "A neighbour is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.": "Ein Nachbar ist ein Kandidat, kein Ersatz: Er braucht eine neue Ladungsentwicklung, bevor er dieses Pulver ersetzt.",
   "Unsaved": "Ungespeichert",
   "Inputs changed": "Eingaben geändert",
-  "Run {time}": "Lauf {time}"
+  "Run {time}": "Lauf {time}",
+  "Sort: {text}": "Sortierung: {text}"
 }

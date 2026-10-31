@@ -10499,6 +10499,17 @@ main .page-bar h1 {
   background: color-mix(in srgb, var(--link) 8%, var(--bg));
 }
 
+/* its look is the Source button's: the page background and the text colour, also as placeholder */
+.directory-filters > .sort-select .mantine-Input-input {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.directory-filters > .sort-select .mantine-Input-input::placeholder {
+  color: var(--fg);
+  opacity: 1;
+}
+
 /* the Sort of a phone and of a tablet's list box that hides columns */
 .directory-filters > .sort-select {
   display: none;
@@ -10712,19 +10723,14 @@ main .page-bar h1 {
 .directory-table .th-unit {
   display: block;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .directory-table .sort-mark {
   display: inline-flex;
   align-items: center;
   height: 1.25em;
-  opacity: 0;
-}
-
-@media (hover: none) {
-  .directory-table .sort-mark {
-    opacity: 0.4;
-  }
+  opacity: 0.4;
 }
 
 .directory-table th:hover .sort-mark,
@@ -10994,6 +11000,16 @@ main .page-bar h1 {
 .directory-table td .row-action {
   position: relative;
   z-index: 1;
+}
+
+/* an unchecked row box has the field border (3:1): the native one is nearly invisible in dark */
+.directory-table td .row-action input:not(:checked, :disabled) {
+  box-sizing: border-box;
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--input-border);
+  background: var(--bg);
+  appearance: none;
 }
 
 .inline-list {

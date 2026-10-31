@@ -586,6 +586,7 @@ function HeadCell<T>({
         <Tooltip
           label={c.help && t(c.help)}
           disabled={!c.help}
+          position="bottom"
           events={tipEvents}
           multiline
           w={260}
@@ -800,6 +801,8 @@ function SortSelect({
   onSort: (sort: DirectorySort) => void
 }) {
   const { t } = useTranslation()
+  // the input shows the chosen option as "Sort: Burn rate, low to high", the list the option alone
+  const plain = new Map<string, string>()
   const data = columns
     .filter((c) => c.value)
     .flatMap((c) => {
@@ -807,13 +810,16 @@ function SortSelect({
       return [
         {
           value: `${c.key} ascending`,
-          label: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
+          text: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
         },
         {
           value: `${c.key} descending`,
-          label: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
+          text: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
         },
-      ]
+      ].map(({ value, text }) => {
+        plain.set(value, text)
+        return { value, label: t('Sort: {text}', { text }) }
+      })
     })
   return (
     <Select
@@ -823,6 +829,7 @@ function SortSelect({
       size={controlSize.row.input}
       clearable
       data={data}
+      renderOption={({ option }) => plain.get(option.value)}
       value={sort ? `${sort.column} ${sort.dir}` : null}
       onChange={(v) => {
         const [column, dir] = v?.split(' ') ?? []
