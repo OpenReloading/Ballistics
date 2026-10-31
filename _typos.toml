@@ -28,6 +28,9 @@ extend-ignore-re = [
   "Sek\\. Serie",
   # German organization name in the bibliography
   "Bund Deutscher",
+  # a product page title as the maker prints it (it misspells the name) and a powder trade name, in the bibliography
+  "Accuarte No\\. 5",
+  "LEVERevolution",
   # Dutch names in the federations page and the bibliography
   "Precisie Geweer",
   "Schietsport Associatie",
