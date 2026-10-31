@@ -3,7 +3,7 @@ import { fromSi } from '@open-reloading/schema'
 import { kilogramsPerGrain } from './units.ts'
 
 /** Digits with at most one point, either part may be empty. */
-const number = /^\d*(?:\.\d*)?$/
+const isNumber = (s: string) => /^[\d.]*$/.test(s) && s.indexOf('.') === s.lastIndexOf('.')
 
 /**
  * A mass range of the text ("150-180gr", "9.5-g"), undefined when it does not parse or names no
@@ -18,7 +18,7 @@ export function massRange(text: string) {
     .split('-')
     .map((s) => s.trim())
   if (lo === undefined || hi === undefined || more.length > 0) return
-  if (!number.test(lo) || !number.test(hi)) return
+  if (!isNumber(lo) || !isNumber(hi)) return
   // "." alone is no number: no bound
   const n = (s: string) => (s && s !== '.' ? Number(s) : undefined)
   const [min, max] = [n(lo), n(hi)]
