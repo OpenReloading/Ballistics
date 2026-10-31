@@ -156,7 +156,7 @@ export const withoutRegions = <S extends Pick<TargetSheet, 'groups'>>(sheet: S):
 })
 
 /** Group colours in order of creation: the light chart series colours (`--series-*`). */
-export const groupColours = ['#eb6834', '#2a78d6', '#19a371', '#c18300', '#e46494', '#008300']
+export const groupColours = ['#eb6834', '#2a78d6', '#19a371', '#c18300', '#e46494', '#7c4dcc']
 
 export function newGroup(
   sheet: TargetSheet,
