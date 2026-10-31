@@ -28,7 +28,7 @@ Details per folder are in the `AGENTS.md` of `apps/web`, `apps/e2e`, `tools` and
 
 ## CI
 
-- `.github/workflows/ci.yml` runs the checks above except the docs site build and the Pages site. Required checks of `main`: `check`, `e2e`, `workflows`, `conventional`, `dependency-review`, `SonarCloud Code Analysis`. Pull requests are squash-merged, no merge queue.
+- `.github/workflows/ci.yml` runs the checks above except the docs site build and the Pages site. Required checks of `main`: `check`, `e2e`, `workflows`. `conventional`, `dependency-review` and `SonarCloud Code Analysis` report on every pull request but are not required. Pull requests are squash-merged, no merge queue.
 - `check` also runs lychee offline over the tracked Markdown files (relative links and anchors, `lychee.toml`) and typos (`_typos.toml`, each accepted term with its reason). A workspace's tests added to the root `test` script also go into one of the `test` groups of `ci.yml`.
 - On a pull request the `changes` job (`apps/web/scripts/ci-plan.mts`) can skip `check` (prose only) or `e2e`, and can export with `PRERENDER=sample`. A spec that opens a cartridge record has it in the sample (`apps/web/src/lib/prerender-sample.ts`).
 - Other workflows (`apps/docs/docs/ci-tools.md`): `links.yml`, `release.yml`, `release-weekly.yml` (label `hold` skips a week), `pages.yml` (`apps/web/AGENTS.md`, Static site), `pr-title.yml`, `scorecard.yml`.
