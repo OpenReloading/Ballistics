@@ -119,6 +119,23 @@ describe('toLoad', () => {
     expect(loadSchema.safeParse(l).success).toBe(true)
   })
 
+  it('saves a typed base form under analysis and opens it as a link key', () => {
+    const l = toLoad(
+      parts({
+        values: { bulletBaseLength: 0.005 },
+        bulletBase: 'boat-tail',
+      }),
+    )
+    expect(l.analysis).toEqual({
+      overrides: { bulletBaseLength: 5 },
+      bulletBase: 'boat-tail',
+    })
+    expect(loadSchema.safeParse(l).success).toBe(true)
+    const { query } = fromLoad(l)
+    expect(query.get('bulletBase')).toBe('boat-tail')
+    expect(Number(query.get('bulletBaseLength'))).toBeCloseTo(0.005, 12)
+  })
+
   it('writes no analysis for a load of references only', () => {
     const l = toLoad(parts({ values: { charge: 0.0024 } }))
     expect(l.analysis).toBeUndefined()

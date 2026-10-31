@@ -36,6 +36,7 @@ it('resets each kind of value its own way and counts the resets', () => {
     changes: { vivacity: 1.8, boreDiameter: 0.0078, bulletLength: 0.03, firearmMass: 3.2 },
     system: presetUnits('metric-grams'),
     bulletKeys: new Set(['bulletLength']),
+    baseChanged: false,
     setField: vi.fn(),
     clearError: vi.fn(),
     unsetTypedBullet: vi.fn(),
@@ -52,4 +53,29 @@ it('resets each kind of value its own way and counts the resets', () => {
   expect(targets.setField).toHaveBeenCalledWith('boreDiameter', { text: '', si: undefined })
   expect(targets.setField).toHaveBeenCalledWith('vivacity', { text: expect.any(String), si: 1.8 })
   expect(targets.setGunWeight).toHaveBeenCalledWith({ text: expect.any(String), si: 3.2 })
+})
+
+it('resets a changed base form with the base dimensions typed for it', () => {
+  const targets = {
+    changes: { bulletLength: 0.03 },
+    system: presetUnits('metric-grams'),
+    bulletKeys: new Set(['bulletLength']),
+    baseChanged: true,
+    setField: vi.fn(),
+    clearError: vi.fn(),
+    unsetTypedBullet: vi.fn(),
+    follow: vi.fn(),
+    setGunWeight: vi.fn(),
+  }
+  expect(resetToRecord(['bulletBase'], targets)).toBe(1)
+  expect(targets.unsetTypedBullet).toHaveBeenCalledWith([
+    'bulletBase',
+    'bulletBaseLength',
+    'bulletBaseDiameter',
+    'bulletCavityDiameter',
+  ])
+  // a base form equal to the record's is nothing to reset
+  const same = { ...targets, baseChanged: false, unsetTypedBullet: vi.fn() }
+  expect(resetToRecord(['bulletBase'], same)).toBe(0)
+  expect(same.unsetTypedBullet).not.toHaveBeenCalled()
 })

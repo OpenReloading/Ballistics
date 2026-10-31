@@ -159,7 +159,8 @@ export const interiorFields = [
 /**
  * The Bullet card's values a record gives and the user may type over it (`typedBullet` in `bullet.ts`).
  * Not interior inputs, so not in `interiorFields`: the diameter reaches the interior run only as the
- * default bore diameter, the length only through the bore resistance of a fitted powder.
+ * default bore diameter, the length only through the bore resistance of a fitted powder, the base
+ * dimensions only the drawing and the seating.
  */
 export const bulletFields = [
   {
@@ -195,6 +196,29 @@ export const bulletFields = [
     label: msg('BC G1'),
     help: msg('A typed value replaces every velocity band of the record. Empty: the record.'),
     quantity: 'ballisticCoefficient',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletBaseLength',
+    label: msg('Boat-tail length'),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletBaseDiameter',
+    label: msg('Base diameter'),
+    help: msg('Diameter of the base face at the end of the boat tail.'),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletCavityDiameter',
+    label: msg('Cavity diameter'),
+    help: msg('Opening of the hollow base. Its depth follows from it.'),
+    quantity: 'length',
     min: 0,
     positive: true,
   },

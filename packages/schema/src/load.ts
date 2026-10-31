@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { baseTypes } from './bullet.ts'
 import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
@@ -15,6 +16,9 @@ const kinds = {
   bulletLength: 'length',
   bulletBcG1: 'ballisticCoefficient',
   bulletBcG7: 'ballisticCoefficient',
+  bulletBaseLength: 'length',
+  bulletBaseDiameter: 'length',
+  bulletCavityDiameter: 'length',
   propellantEnergy: 'specificEnergy',
   gamma: 'dimensionless',
   density: 'density',
@@ -97,7 +101,12 @@ const ladderStep = z
 export const loadAnalysis = z.object({
   overrides: analysisOverrides
     .describe(
-      'Values the user typed: solver values and the bullet diameter, length and ballistic coefficients. Every other value follows the referenced records.',
+      'Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter). Every other value follows the referenced records.',
+    )
+    .optional(),
+  bulletBase: baseTypes
+    .describe(
+      'The base form the user chose for the bullet instead of the one of its record (`base.type`).',
     )
     .optional(),
   ladder: z

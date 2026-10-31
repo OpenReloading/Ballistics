@@ -3994,5 +3994,7 @@
   "A typed value replaces every velocity band of the record. Empty: the record.": "Ein eingegebener Wert ersetzt alle Geschwindigkeitsbereiche des Datensatzes. Leer: der Datensatz.",
   "Used by the trajectory, the stability estimate and the groups. The interior run takes the bore diameter of the Cartridge card.": "Wird für die Flugbahn, die Stabilität und die Schussbilder verwendet. Die Innenballistik nimmt den Felddurchmesser der Karte Patrone.",
   "{count} bands": "{count} Bänder",
-  "Used by the stability estimate and by the bore resistance of a fitted powder, not by the cartridge drawing. Empty: the length of the record.": "Wird für die Stabilität und für den Laufwiderstand eines angepassten Treibladungspulvers verwendet, nicht für die Zeichnung der Patrone. Leer: die Länge des Datensatzes."
+  "Used by the stability estimate and by the bore resistance of a fitted powder, not by the cartridge drawing. Empty: the length of the record.": "Wird für die Stabilität und für den Laufwiderstand eines angepassten Treibladungspulvers verwendet, nicht für die Zeichnung der Patrone. Leer: die Länge des Datensatzes.",
+  "Diameter of the base face at the end of the boat tail.": "Durchmesser der Bodenfläche am Ende des Heckkonus.",
+  "Opening of the hollow base. Its depth follows from it.": "Öffnung der Hohlbasis. Ihre Tiefe folgt daraus."
 }

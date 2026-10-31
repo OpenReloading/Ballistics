@@ -111,3 +111,79 @@ test('picking another bullet replaces the changed values of the card and says ho
     .click()
   await expect(form.getByText(/The new record replaced/)).toHaveCount(0)
 })
+
+test('the base form and its dimensions are typed over the record, change the volume behind the bullet and reset', async ({
+  page,
+}) => {
+  await page.goto('/workbench')
+  await applyExampleLoad(page)
+  const volume = loadForm(page).getByRole('textbox', { name: /^Usable case volume/ })
+  // the base form is in the card's More popover, which closes with Escape
+  const more = () => page.getByRole('button', { name: 'More of Bullet' })
+  const [base, tail, cavity] = [
+    page.getByRole('combobox', { name: 'Base type' }),
+    page.getByRole('textbox', { name: /^Boat-tail length/ }),
+    page.getByRole('textbox', { name: /^Cavity diameter/ }),
+  ]
+  const reset = (label: string) =>
+    page.getByRole('button', { name: new RegExp(`^Reset ${label} to the record value`) })
+  // the volume follows the seated bullet: read it once it holds still
+  const settled = async () => {
+    let value = ''
+    await expect
+      .poll(async () => {
+        const first = await volume.inputValue()
+        await page.waitForTimeout(500)
+        value = await volume.inputValue()
+        return first !== '' && first === value
+      })
+      .toBe(true)
+    return value
+  }
+  const seated = await settled()
+  await more().click()
+  await expect(base).toHaveValue('boat-tail')
+  await expect(tail).toHaveClass(/field-default/)
+  const recorded = await tail.inputValue()
+
+  // a typed boat-tail length moves the volume, a reset brings it back
+  await tail.fill('2.50')
+  await expect(reset('Boat-tail length')).toHaveCount(1)
+  await expect(volume).not.toHaveValue(seated)
+  await reset('Boat-tail length').click()
+  await expect(tail).toHaveValue(recorded)
+  expect(await settled()).toBe(seated)
+
+  // a flat base has no dimension row; the reset of the form gives the record's form and dimensions back
+  await base.selectOption('flat')
+  await expect(tail).toHaveCount(0)
+  await expect(volume).not.toHaveValue(seated)
+  // the rows moved up under the pointer: the tooltip of the Construction row would cover the button
+  await page.mouse.move(0, 0)
+  await reset('Base type').click()
+  await expect(base).toHaveValue('boat-tail')
+  await expect(tail).toHaveValue(recorded)
+  expect(await settled()).toBe(seated)
+
+  // a hollow base takes its cavity diameter
+  await base.selectOption('conical-hollow-base')
+  await expect(cavity).toBeVisible()
+  await cavity.fill('3.00')
+  await expect(volume).not.toHaveValue(seated)
+  await page.keyboard.press('Escape')
+  await more().click()
+  await page.getByRole('button', { name: 'Reset card' }).click()
+  await expect(base).toHaveValue('boat-tail')
+  expect(await settled()).toBe(seated)
+})
+
+test('a link with a base form opens with it, marked as changed', async ({ page }) => {
+  await page.goto(
+    '/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40&units=metric-grams&bulletBase=flat',
+  )
+  await page.getByRole('button', { name: 'More of Bullet' }).click()
+  await expect(page.getByRole('combobox', { name: 'Base type' })).toHaveValue('flat')
+  await expect(
+    page.getByRole('button', { name: /^Reset Base type to the record value/ }),
+  ).toHaveCount(1)
+})
