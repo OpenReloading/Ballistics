@@ -57,7 +57,8 @@ async function fromNetworkPage(event) {
   const cached =
     (await cache.match(key)) ??
     (await cache.match(stored)) ??
-    (await cache.match(stored, { ignoreSearch: true }))
+    (await cache.match(stored, { ignoreSearch: true })) ??
+    (await cache.match(key, { ignoreSearch: true }))
   try {
     return await networkFirst(event, shell, key, cached)
   } catch (error) {
