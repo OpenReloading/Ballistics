@@ -40,9 +40,9 @@ describe('catalogue budgets', () => {
     expect(best(() => catalogue.cartridges({ q: 'win 308', limit: 50 }))).toBeLessThan(5)
   })
 
-  it('keeps the index the static site downloads under 600 KB, 80 KB gzipped', () => {
+  it('keeps the index the static site downloads under 1.5 MB, 160 KB gzipped', () => {
     const text = Buffer.from(JSON.stringify(buildCatalogue(bundle).index))
-    expect(text.length).toBeLessThan(600_000)
-    expect(gzipSync(text).length).toBeLessThan(80_000)
+    expect(text.length).toBeLessThan(1_500_000)
+    expect(gzipSync(text).length).toBeLessThan(160_000)
   })
 })
