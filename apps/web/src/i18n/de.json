@@ -3946,5 +3946,17 @@
   "jacket": "Mantel",
   "gas check": "Kupferschuh",
   "{n} driving bands": "{n} Führungsbänder",
-  "lead free": "bleifrei"
+  "lead free": "bleifrei",
+  "Tour": "Rundgang",
+  "Tour of this page": "Rundgang durch diese Seite",
+  "Step {current} of {total}": "Schritt {current} von {total}",
+  "Done": "Fertig",
+  "Close the tour": "Rundgang schließen",
+  "Choose the cartridge, bullet, powder and firearm and enter the charge. Empty fields take the record values.": "Wählen Sie Patrone, Geschoss, Treibladungspulver und Schusswaffe und geben Sie die Treibladung ein. Leere Felder übernehmen die Werte des Datensatzes.",
+  "Runs the simulation in this browser with the values entered.": "Führt die Simulation in diesem Browser mit den eingegebenen Werten aus.",
+  "Simulated velocity, peak pressure with its range over the input tolerances, and the trajectory. Results are simulations, not load data.": "Simulierte Geschwindigkeit, Spitzendruck mit seinem Bereich über die Toleranzen der Eingaben und die Flugbahn. Ergebnisse sind Simulationen, keine Ladedaten.",
+  "Save keeps the load in this browser; Open reads a load file.": "Speichern behält die Laborierung in diesem Browser; Öffnen liest eine Laborierungsdatei.",
+  "Choose the file your chronograph wrote; it is read in this browser. The unit applies when the file gives none.": "Wählen Sie die Datei Ihres Chronographen; sie wird in diesem Browser gelesen. Die Einheit gilt, wenn die Datei keine nennt.",
+  "Once a file is read: mean, spread and the other statistics of each string. Load example reads three made-up strings.": "Sobald eine Datei gelesen ist: Mittelwert, Streuung und die übrigen Kennwerte jeder Schussreihe. Beispiel laden liest drei erfundene Schussreihen.",
+  "Each open load has a tab. New load starts another; the list holds the saved ones.": "Jede offene Laborierung hat einen Reiter. Neue Laborierung beginnt eine weitere; die Liste enthält die gespeicherten."
 }

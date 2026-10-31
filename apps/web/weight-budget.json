@@ -103,8 +103,8 @@
           "total": 530834
         },
         "/session": {
-          "initial": 437545,
-          "total": 487057
+          "initial": 440570,
+          "total": 492280
         },
         "/cases/[id]": {
           "initial": 443525,
@@ -191,12 +191,12 @@
     "workbench": {
       "budget": {
         "initial": 626000,
-        "total": 1024000
+        "total": 1045000
       },
       "routes": {
         "/workbench": {
-          "initial": 613141,
-          "total": 1016133
+          "initial": 617542,
+          "total": 1024030
         }
       }
     }

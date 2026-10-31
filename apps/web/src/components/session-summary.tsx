@@ -37,6 +37,7 @@ import { PrintButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
 import { EmptyNote, ErrorNote } from './states.tsx'
 import { StringComparison } from './string-comparison.tsx'
+import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 type Read = { fileName: string; data: ChronoImport; pick: number }
@@ -137,6 +138,7 @@ export function SessionSummary() {
             >
               {t('Export CSV')}
             </Button>
+            <TourButton page="session" />
             <UnitsIconButton />
             <PrintButton />
           </>

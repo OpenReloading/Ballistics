@@ -12101,3 +12101,44 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     height: 297mm;
   }
 }
+
+/* the page tour's popover (driver.js) in the app's colours, light and dark */
+.driver-popover.tour-popover {
+  font-family: inherit;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.tour-popover :is(.driver-popover-title, .driver-popover-description) {
+  font-family: inherit;
+  color: var(--fg);
+}
+
+.tour-popover .driver-popover-progress-text {
+  color: var(--muted);
+}
+
+.tour-popover .driver-popover-footer button {
+  font: inherit;
+  font-size: var(--mantine-font-size-sm);
+  text-shadow: none;
+  color: var(--fg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.tour-popover :is(.driver-popover-footer button, .driver-popover-close-btn):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.tour-popover .driver-popover-close-btn {
+  color: var(--muted);
+}
+
+.tour-popover .driver-popover-arrow {
+  border-color: var(--bg);
+}

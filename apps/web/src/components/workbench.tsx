@@ -50,6 +50,7 @@ import { useReportOptions } from './report-host.ts'
 import { SavedLoads, useExportReminder } from './saved-loads.tsx'
 import type { ScanLabelDialog } from './scan-label-dialog.tsx'
 import { useShortcuts } from './shortcuts.tsx'
+import { TourButton } from './tour-button.tsx'
 import { useBarrelStudy } from './use-barrel-study.ts'
 import { useLoadTabs } from './use-load-tabs.ts'
 import { useLotRows } from './use-lot-rows.ts'
@@ -1363,6 +1364,7 @@ export function Workbench() {
                   }
                   after={
                     <>
+                      <TourButton page="workbench" />
                       <PrintMenu ok={ok} printReport={printReport} />
                       <PrintViews
                         load={load}
