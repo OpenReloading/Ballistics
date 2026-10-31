@@ -5,6 +5,7 @@ import {
   bandCount,
   bulletDrag,
   computedBulletRows,
+  effectiveBulletValues,
   millerTwist,
   recordBulletValues,
   typedBullet,
@@ -174,4 +175,14 @@ it('takes the typed mass and diameter into the projectile of the drag', () => {
   if (drag.kind !== 'bands') throw new Error('bands expected')
   expect(drag.projectile.mass).toBeCloseTo(9.5e-3, 12)
   expect(drag.projectile.diameter).toBeCloseTo(7.85e-3, 12)
+})
+
+it('keeps the record value where a typed bullet value is 0', () => {
+  const r = record([{ dragModel: 'G7', value: 0.25 }])
+  const values = effectiveBulletValues(r, undefined, {
+    bulletDiameter: { si: 0 },
+    bulletLength: { si: 0.032 },
+  })
+  expect(values.bulletDiameter).toBe(recordBulletValues(r).bulletDiameter)
+  expect(values.bulletLength).toBe(0.032)
 })

@@ -57,7 +57,8 @@ export function effectiveBulletValues(
   if (mass !== undefined) out.bulletMass = mass
   for (const key of bulletValueKeys) {
     const si = typed[key]?.si
-    if (si !== undefined) out[key] = si
+    // a value the field refuses (0 or less) leaves the record's value in force
+    if (si !== undefined && si > 0) out[key] = si
   }
   return out
 }
