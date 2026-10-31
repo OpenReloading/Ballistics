@@ -3765,9 +3765,11 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   /* one row that scrolls sideways, so a long ladder keeps the results' height; a flag as its icon
-     with the word on hover and for screen readers */
+     with the word on hover and for screen readers; the focus ring's padding reaches into the
+     space around, so the strip is no taller than its chips */
   .ladder-cells {
     gap: 0.375rem;
+    margin-block: -0.3125rem;
     scrollbar-width: thin;
   }
 
