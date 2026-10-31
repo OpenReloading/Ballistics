@@ -29,7 +29,7 @@ The web app is a static site. To host it, run `npm run pages:build` (set `PAGES_
 
 ## Data
 
-The records in `packages/data/records/` are one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines. Bullet, powder and manufacturer records cite the maker's own publication, case capacities a maker or a Wikipedia page; powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project licence, the fitted parameters are under the data licence (`packages/data/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
+The records in `packages/data/records/` are one cartridge record per C.I.P. sheet, target faces, shooting federations and their disciplines. Bullet, powder and manufacturer records cite the maker's own publication, case capacities Wikipedia (CC BY-SA 4.0); powders carry model parameters fitted to the makers' load tables. Data a maker published carries no project licence, the fitted parameters are under the data licence (`packages/data/LICENSE`). The demo bullet, powder, case, primer and manufacturer records are invented, for the example load and the tests.
 
 ## Safety
 
