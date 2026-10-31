@@ -57,7 +57,8 @@ export interface BulletSummary {
   /** Id of the manufacturer record. */
   manufacturer: string
   name: string
-  diameter: number
+  /** mm; null for a record that only names the bullet. */
+  diameter: number | null
   mass: number
   /** mm; null without a length. */
   length: number | null

@@ -29,7 +29,7 @@
         "operationId": "getBullets",
         "tags": ["Records"],
         "summary": "List bullets",
-        "description": "A page of bullets ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the bullets whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. Each item carries diameter (mm), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction.",
+        "description": "A page of bullets ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the bullets whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. Each item carries diameter (mm, null where the record has none), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction. A record that only names the bullet carries nameOnly.",
         "parameters": [
           {
             "name": "q",
@@ -119,7 +119,7 @@
                             "minLength": 1
                           },
                           "diameter": {
-                            "type": "number"
+                            "type": ["number", "null"]
                           },
                           "mass": {
                             "type": "number"
@@ -167,6 +167,11 @@
                                 "pattern": "^(lead|lead-alloy|copper|copper-alloy|tin|tungsten|steel|compressed-powder)-core$"
                               }
                             ]
+                          },
+                          "nameOnly": {
+                            "type": "boolean",
+                            "const": true,
+                            "description": "A record that only names the bullet: it has no product number."
                           }
                         },
                         "required": [
@@ -840,6 +845,11 @@
                       "type": "string",
                       "minLength": 1
                     },
+                    "nameOnly": {
+                      "type": "boolean",
+                      "const": true,
+                      "description": "A record that only names the bullet: it has no product number."
+                    },
                     "provenance": {
                       "type": "object",
                       "properties": {
@@ -962,16 +972,7 @@
                       "description": "Hash of the stored record. It changes with any field."
                     }
                   },
-                  "required": [
-                    "id",
-                    "manufacturer",
-                    "productNumber",
-                    "name",
-                    "diameter",
-                    "mass",
-                    "provenance",
-                    "revision"
-                  ],
+                  "required": ["id", "manufacturer", "name", "mass", "provenance", "revision"],
                   "additionalProperties": false
                 }
               }
@@ -1549,7 +1550,7 @@
                     },
                     "pressureMethod": {
                       "type": "string",
-                      "enum": ["transducer", "piezo", "crusher", "energy"]
+                      "enum": ["transducer", "piezo", "case-contact", "crusher", "energy"]
                     },
                     "verification": {
                       "type": "string",
@@ -18378,6 +18379,19 @@
                                           "type": "null"
                                         }
                                       ]
+                                    },
+                                    "nameOnly": {
+                                      "description": "A record that only names the bullet: it has no product number.",
+                                      "anyOf": [
+                                        {
+                                          "type": "boolean",
+                                          "const": true,
+                                          "description": "A record that only names the bullet: it has no product number."
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
                                     }
                                   },
                                   "description": "The fields that differ from the base record, or all fields without one. A `null` removes a field of the base."
@@ -18551,7 +18565,13 @@
                                       "anyOf": [
                                         {
                                           "type": "string",
-                                          "enum": ["transducer", "piezo", "crusher", "energy"]
+                                          "enum": [
+                                            "transducer",
+                                            "piezo",
+                                            "case-contact",
+                                            "crusher",
+                                            "energy"
+                                          ]
                                         },
                                         {
                                           "type": "null"

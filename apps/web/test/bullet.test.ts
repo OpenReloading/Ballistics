@@ -141,7 +141,7 @@ it("puts typed values into the record and leaves the record's own values alone",
     bulletBcG1: 0.55 * lbPerSqInToKgPerSqM,
   })
   expect(typed.mass.value).toBeCloseTo(9.5, 9)
-  expect(typed.diameter.value).toBeCloseTo(7.85, 9)
+  expect(typed.diameter?.value).toBeCloseTo(7.85, 9)
   expect(typed.length?.value).toBeCloseTo(30, 9)
   const bcs = Object.fromEntries(
     (typed.ballisticCoefficients ?? []).map((c) => [c.dragModel, c.value]),

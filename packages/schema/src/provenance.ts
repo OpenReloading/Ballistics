@@ -9,9 +9,9 @@ import { sha256 } from './shared.ts'
 export const provenanceKind = z.enum(['published', 'measured', 'derived', 'fitted', 'computed'])
 
 /**
- * Who stands behind a source: the `manufacturer` (data it supplied or published, used with its
- * permission), `public` data under an open license or in the public domain (it can come from a
- * manufacturer too), or `community` contributions.
+ * Who stands behind a source: the `manufacturer` (data it supplied or published; a permission or
+ * terms it states go in `terms`, the origin claims none), `public` data under an open license or in
+ * the public domain (it can come from a manufacturer too), or `community` contributions.
  * Inferred type: {@link SourceOrigin}.
  */
 export const sourceOrigin = z.enum(['manufacturer', 'public', 'community'])
@@ -70,7 +70,9 @@ export const source = z.object({
    * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
    * or `LicenseRef-<name>` for the publisher's own terms or a written permission, described in `terms`.
    * Without a license, a source of a record distributed by `@open-reloading/data` is covered by its
-   * data licence, CC BY 4.0 (`packages/data/LICENSE`); for other producers' records the producer sets the default.
+   * data licence, CC BY 4.0 (`packages/data/LICENSE`), except one with `origin: manufacturer`: data a
+   * manufacturer published carries no project licence, only the terms the manufacturer states.
+   * For other producers' records the producer sets the default.
    */
   license: z
     .string()

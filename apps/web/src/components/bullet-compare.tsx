@@ -92,9 +92,11 @@ function Values({
                           {b.manufacturerName}
                         </Text>
                         <Link href={`/bullets/${b.id}`}>{b.name}</Link>
-                        <Text component="span" inherit c="dimmed" fz="xs" fw={400}>
-                          {caliberLabel(b.diameter.value, caliberUnit(system))}
-                        </Text>
+                        {b.diameter && (
+                          <Text component="span" inherit c="dimmed" fz="xs" fw={400}>
+                            {caliberLabel(b.diameter.value, caliberUnit(system))}
+                          </Text>
+                        )}
                       </span>
                       {bullets.length > 1 && (
                         <CloseButton

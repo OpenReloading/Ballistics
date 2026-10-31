@@ -26,11 +26,11 @@ export const findBullet = (catalogue: Catalogue, id: string) =>
 export const findPowder = (catalogue: Catalogue, id: string) =>
   found(catalogue.get('powder', id), 'powder', id)
 
-/** Record values in SI: mass kg, diameter and length m. */
+/** Record values in SI: mass kg, diameter and length m, each absent where the record has none. */
 export function bulletSi(record: Bullet) {
   return {
     mass: toSi('mass', record.mass.value),
-    diameter: toSi('length', record.diameter.value),
+    diameter: record.diameter && toSi('length', record.diameter.value),
     length: record.length && toSi('length', record.length.value),
   }
 }
@@ -68,6 +68,7 @@ export function bulletProjectile(
       `bullet ${record.id} has ${bands.length} ${ref.dragModel} values without distinct velocity bands; send drag explicitly`,
     )
   const si = bulletSi(record)
+  if (si.diameter === undefined) throw new InputError(`bullet ${record.id} has no diameter`)
   const length = ref.length ?? si.length
   const projectile: Projectile = {
     mass: si.mass,

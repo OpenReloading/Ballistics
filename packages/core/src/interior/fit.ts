@@ -26,9 +26,15 @@ import {
  * What a peak pressure was measured with: the `pressureMethod` vocabulary of the cartridge records.
  * Values on different bases are not converted into each other.
  */
-export type PressureBasis = 'transducer' | 'piezo' | 'crusher' | 'energy'
+export type PressureBasis = 'transducer' | 'piezo' | 'case-contact' | 'crusher' | 'energy'
 
-const pressureBases: readonly string[] = ['transducer', 'piezo', 'crusher', 'energy']
+const pressureBases: readonly string[] = [
+  'transducer',
+  'piezo',
+  'case-contact',
+  'crusher',
+  'energy',
+]
 
 /** One charge of a chronograph ladder: measured muzzle velocity and, optionally, peak pressure. */
 export interface LadderPoint {

@@ -640,6 +640,11 @@
       "type": "string",
       "minLength": 1
     },
+    "nameOnly": {
+      "type": "boolean",
+      "const": true,
+      "description": "A record that only names the bullet: it has no product number."
+    },
     "provenance": {
       "type": "object",
       "properties": {
@@ -782,9 +787,7 @@
   "required": [
     "id",
     "manufacturer",
-    "productNumber",
     "name",
-    "diameter",
     "mass",
     "provenance"
   ]

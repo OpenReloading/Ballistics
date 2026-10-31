@@ -130,9 +130,9 @@ export const twistPlausible = (mm: number) =>
 /** Diameter and mass within small-arms ranges. */
 function checkBulletSize(bullet: Bullet): Finding[] {
   const findings: Finding[] = []
-  const diameter = bullet.diameter.value
+  const diameter = bullet.diameter?.value
   const mass = bullet.mass.value
-  if (diameter < 4 || diameter > 20) {
+  if (diameter !== undefined && (diameter < 4 || diameter > 20)) {
     findings.push({
       finding: 'diameter-range',
       message: `diameter ${diameter} mm is outside 4 to 20 mm`,
@@ -180,7 +180,7 @@ function checkBallisticCoefficients(bullet: Bullet): Finding[] {
 
 /** Length between 1 and 7 diameters. */
 function checkBulletLength(bullet: Bullet): Finding[] {
-  if (!bullet.length) return []
+  if (!bullet.length || !bullet.diameter) return []
   const ratio = bullet.length.value / bullet.diameter.value
   if (!(ratio < 1 || ratio > 7)) return []
   return [

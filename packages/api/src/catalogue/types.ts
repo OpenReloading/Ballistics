@@ -161,7 +161,7 @@ export interface BulletItem {
   id: string
   manufacturer: string
   name: string
-  diameter: number
+  diameter: number | null
   mass: number
   length: number | null
   ballisticCoefficientG1: number | null
@@ -169,6 +169,7 @@ export interface BulletItem {
   country?: string
   tipType?: string
   construction?: string
+  nameOnly?: true
 }
 
 /** A case of the list. `manufacturer` and `cartridge` are record ids; `waterCapacity` (the stated one) and `mass` in g. */

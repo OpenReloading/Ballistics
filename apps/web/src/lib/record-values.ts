@@ -117,6 +117,7 @@ export const cupWording = (value: string): Wording =>
 const methods: Readonly<Record<string, Message>> = {
   transducer: msg('transducer'),
   piezo: msg('piezo'),
+  'case-contact': msg('case-contact'),
   crusher: msg('crusher'),
   energy: msg('energy'),
 }

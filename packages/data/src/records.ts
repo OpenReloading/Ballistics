@@ -27,6 +27,7 @@ import {
   manufacturer,
   type Powder,
   type Primer,
+  type PublishedLoads,
   parseRef,
   powder,
   primer,
@@ -53,6 +54,11 @@ import {
   checkPowder,
   checkSpec,
 } from './plausibility.ts'
+import {
+  checkPublishedLoads,
+  type LocatedPublishedLoads,
+  readPublishedLoads,
+} from './published-loads.ts'
 import { readKind } from './read-kind.ts'
 import {
   checkCartridgeReferences,
@@ -127,15 +133,21 @@ export type Bundle = {
 }
 
 /**
- * What {@link readRecords} returns: the records and the error messages. Valid data has no errors.
+ * What {@link readRecords} returns: the records, the published load files and the error messages.
+ * Valid data has no errors. The published loads stay out of the bundle: they are too many for it,
+ * and the API serves them by cartridge.
  */
 export type ReadRecordsResult = {
   bundle: Bundle
+  publishedLoads: PublishedLoads[]
   errors: string[]
 }
 
 /** Reads every kind directory of `roots`, in this order, the source records first. */
-function readBundle(roots: string[], errors: string[]): Bundle {
+function readBundle(
+  roots: string[],
+  errors: string[],
+): { bundle: Bundle; published: LocatedPublishedLoads[] } {
   const sources = sourceIndex(readKind(roots, 'sources', sourceRecord, { errors }))
   const read = <T extends { id: string }>(dir: string, schema: z.ZodType<T>, optional = false) =>
     readKind(roots, dir, schema, { errors, sources, optional })
@@ -158,8 +170,9 @@ function readBundle(roots: string[], errors: string[]): Bundle {
     targetMappings: read('target-mappings', targetMapping),
     renames: readRenames(roots, errors),
   }
+  const published = readPublishedLoads(roots, sources, errors)
   checkSources(sources, errors)
-  return bundle
+  return { bundle, published }
 }
 
 /** A value may appear once per side, symbol and variant. */
@@ -262,7 +275,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
     )
   const errors: string[] = []
   const roots = typeof root === 'string' ? [root] : [...root]
-  const bundle = readBundle(roots, errors)
+  const { bundle, published } = readBundle(roots, errors)
   const ids = recordIds(bundle)
   for (const c of bundle.cartridges) {
     checkSpecValues(c, errors)
@@ -291,7 +304,19 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   checkLoadCapacityReferences(bundle, errors)
   checkLoadCaseReferences(bundle, ids, errors)
   checkLoadSessionReferences(bundle, errors)
+  checkPublishedLoads(
+    published,
+    {
+      cartridges: ids.cartridges,
+      manufacturers: ids.manufacturers,
+      bullets: bundle.bullets,
+      powders: bundle.powders,
+      primers: bundle.primers,
+      renamedPrimers: Object.keys(bundle.renames?.primers ?? {}),
+    },
+    errors,
+  )
   for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
-  return { bundle, errors }
+  return { bundle, publishedLoads: published.map((p) => p.file), errors }
 }

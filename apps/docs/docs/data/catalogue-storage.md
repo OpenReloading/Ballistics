@@ -28,6 +28,10 @@ Measured on the public bundle, one machine, medians:
 
 Ranked search over a generated 20,000 bullet index in plain JavaScript takes 1 to 2.5 ms per query. A scan with a trigram or full text index is needed only above a few thousand rows in a SQL engine; the in-process index needs none.
 
+## Published loads
+
+The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, one file per cartridge and table (`apps/docs/docs/data/published-loads.md`). `readRecords` returns them as `publishedLoads` next to the bundle. They are not part of `bundle.json` or `catalogue/index.json`, which a table of about 70,000 rows would grow by an order of magnitude.
+
 ## The module
 
 `packages/api/src/catalogue/`. The routes, the compute record lookups, the server and the static build read it.:

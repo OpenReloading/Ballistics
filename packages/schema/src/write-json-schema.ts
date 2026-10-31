@@ -15,6 +15,7 @@ import { manufacturer } from './manufacturer.ts'
 import { powder } from './powder.ts'
 import { primer } from './primer.ts'
 import { sourceRecord } from './provenance.ts'
+import { publishedLoads } from './published-load.ts'
 import { rangeFirings } from './range.ts'
 import { targetFace } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
@@ -34,6 +35,7 @@ for (const [name, schema] of Object.entries({
   'source-record': sourceRecord,
   'firing-series': firingSeries,
   'load-tables': loadTables,
+  'published-loads': publishedLoads,
   'range-firings': rangeFirings,
   'user-data-file': userDataFile,
   'target-sheet': targetSheet,

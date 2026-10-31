@@ -87,7 +87,7 @@ export function BulletList({
         (b, i) =>
           inOrigins(b, filters.sources) &&
           bulletMatches(b, filters.query, keys[i]) &&
-          (!fit || bulletFits(b.diameter, fit)),
+          (!fit || (b.diameter !== null && bulletFits(b.diameter, fit))),
       ),
     [items, keys, filters, fit],
   )

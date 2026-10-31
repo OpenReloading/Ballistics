@@ -26,7 +26,7 @@ Each charge is a product, not a running sum. Every charge must be above 0.
 
 ### Observations
 
-Each ladder point $k$ gives a velocity row and, with a measured pressure, a pressure row after it. A peak pressure carries its basis in `pressureBasis`, one of `transducer`, `piezo`, `crusher` and `energy` (the `pressureMethod` of the cartridge records), and the basis is required with every peak pressure. The pressures of one fit share one basis: a ladder, or the sessions of `fitPowderSessions`, that mixes bases is refused with `MixedPressureBasisError`, whose `rows` and the `pressureRows` of the result give the number of pressure rows per basis. Values are never converted between bases. The prediction of a velocity row is `muzzleVelocity`, that of a pressure row is `peakBreechPressure` of the run at charge $m_k$:
+Each ladder point $k$ gives a velocity row and, with a measured pressure, a pressure row after it. A peak pressure carries its basis in `pressureBasis`, one of `transducer` (the C.I.P. method), `piezo`, `case-contact` (a transducer that rests against the case, the basis of the maker load tables that name it), `crusher` and `energy` (the `pressureMethod` of the cartridge records), and the basis is required with every peak pressure. The pressures of one fit share one basis: a ladder, or the sessions of `fitPowderSessions`, that mixes bases is refused with `MixedPressureBasisError`, whose `rows` and the `pressureRows` of the result give the number of pressure rows per basis. Values are never converted between bases. The prediction of a velocity row is `muzzleVelocity`, that of a pressure row is `peakBreechPressure` of the run at charge $m_k$:
 
 $$
 \hat y_i(\theta) =

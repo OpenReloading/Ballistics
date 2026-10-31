@@ -269,7 +269,7 @@ type Stored = { value: number } | undefined
  */
 function cannelureOnShank(
   b: {
-    diameter: { value: number }
+    diameter?: { value: number } | undefined
     length?: Stored
     noseLength?: Stored
     base?: { type?: string | undefined; length?: Stored } | undefined
@@ -289,7 +289,7 @@ function cannelureOnShank(
       ['cannelure', 'width'],
       b.noseLength ? 'must end before the nose begins' : 'must end within the length',
     )
-  if (groove.depth && !(groove.depth.value < b.diameter.value / 2))
+  if (groove.depth && b.diameter && !(groove.depth.value < b.diameter.value / 2))
     issue(['cannelure', 'depth'], 'must be smaller than the radius')
 }
 
@@ -299,14 +299,15 @@ export const bullet = z
     id: recordId,
     /** Id of the manufacturer record. */
     manufacturer: recordId,
-    /** Product number. */
-    productNumber: z.string().min(1),
+    /** Product number. Absent only with `nameOnly`. */
+    productNumber: z.string().min(1).optional(),
     name: z.string().min(1),
     country: countryCode.optional(),
     productLine: z.string().min(1).optional(),
     /** Caliber as the manufacturer writes it, for example `.308`. */
     caliber: z.string().min(1).optional(),
-    diameter: quantity('length'),
+    /** Diameter. Absent only with `nameOnly`; stored only where a source prints one. */
+    diameter: quantity('length').optional(),
     mass: quantity('mass'),
     length: quantity('length').optional(),
     base: bulletBase.optional(),
@@ -325,13 +326,30 @@ export const bullet = z
     /** Slowest twist the manufacturer allows ("1-10\" or faster"), length per turn. */
     slowestTwist: quantity('length').optional(),
     note: z.string().min(1).optional(),
+    /**
+     * Set on a record that only names a bullet a table prints: no product number and, unless the
+     * table prints one, no diameter. Without it `productNumber` and `diameter` are required, so a
+     * full record cannot lose them unnoticed.
+     */
+    nameOnly: z
+      .literal(true)
+      .describe('A record that only names the bullet: it has no product number.')
+      .optional(),
     provenance,
   })
   .superRefine((b, ctx) => {
     needsCountrySource(b, ctx)
     const issue = (path: string[], message: string) =>
       ctx.addIssue({ code: 'custom', path, message })
-    const d = b.diameter.value
+    if (b.nameOnly) {
+      if (b.productNumber !== undefined)
+        issue(['productNumber'], 'a name-only record has no product number')
+    } else {
+      if (b.productNumber === undefined)
+        issue(['productNumber'], 'a full record needs a product number')
+      if (b.diameter === undefined) issue(['diameter'], 'a full record needs a diameter')
+    }
+    const d = b.diameter?.value
     const below = (
       path: string[],
       v: number | undefined,
@@ -359,7 +377,7 @@ export const bullet = z
     below(
       ['construction', 'jacket', 'thickness'],
       b.construction?.jacket?.thickness?.value,
-      d / 2,
+      d === undefined ? undefined : d / 2,
       'the radius',
     )
     // The depth is not stored: it is half the opening (`bulletOutline`).

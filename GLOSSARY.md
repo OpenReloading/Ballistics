@@ -139,7 +139,7 @@ _Avoid_: maker (as an organization value)
 `table`: table of the C.I.P. TDCC a cartridge or cartridge design sits in, `I` (rimless) to `VII` (shotshell). Also on a cartridge list item, and the list filter `?table=`.
 
 **Pressure method**:
-`pressureMethod` (cartridge) and `pressure.method` (firing series): the method that measured the chamber pressure: `transducer`, `piezo`, `crusher` or `energy`.
+`pressureMethod` (cartridge) and `pressure.method` (firing series): the method that measured the chamber pressure: `transducer` (the C.I.P. method), `piezo`, `case-contact` (a transducer against the outside of the case), `crusher` or `energy`. A pressure is compared only with one of its own method.
 _Avoid_: measuringMethod
 
 **Verification**:
