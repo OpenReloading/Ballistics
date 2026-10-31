@@ -11529,25 +11529,30 @@
                           "additionalProperties": {}
                         },
                         "limits": {
-                          "description": "CIP pressure limits of the cartridge, absent without a cartridge id",
+                          "description": "CIP pressure limits of the cartridge, or the one limit typed by the caller; absent without a cartridge id or a typed limit",
                           "type": "array",
                           "items": {
                             "type": "object",
                             "properties": {
                               "cartridge": {
                                 "type": "string",
-                                "description": "Id of the cartridge"
+                                "description": "Id of the cartridge, absent for a typed limit"
                               },
                               "revised": {
                                 "type": "string",
-                                "description": "Date of the sheet revision"
+                                "description": "Date of the sheet revision, absent for a typed limit"
+                              },
+                              "typed": {
+                                "description": "The caller typed the limit (pressureLimit)",
+                                "type": "boolean",
+                                "const": true
                               },
                               "symbol": {
                                 "type": "string",
                                 "description": "Symbol of the limit, Pmax for CIP"
                               },
                               "method": {
-                                "description": "Measuring method, null when the record states none",
+                                "description": "Measuring method, null when the record states none, typed for a typed limit",
                                 "type": ["string", "null"]
                               },
                               "variant": {
@@ -11575,7 +11580,7 @@
                                 "type": "boolean"
                               }
                             },
-                            "required": ["cartridge", "revised", "symbol", "method", "compared"],
+                            "required": ["symbol", "method", "compared"],
                             "additionalProperties": {}
                           }
                         },
@@ -12401,25 +12406,30 @@
                                     "additionalProperties": {}
                                   },
                                   "limits": {
-                                    "description": "CIP pressure limits of the cartridge, absent without a cartridge id",
+                                    "description": "CIP pressure limits of the cartridge, or the one limit typed by the caller; absent without a cartridge id or a typed limit",
                                     "type": "array",
                                     "items": {
                                       "type": "object",
                                       "properties": {
                                         "cartridge": {
                                           "type": "string",
-                                          "description": "Id of the cartridge"
+                                          "description": "Id of the cartridge, absent for a typed limit"
                                         },
                                         "revised": {
                                           "type": "string",
-                                          "description": "Date of the sheet revision"
+                                          "description": "Date of the sheet revision, absent for a typed limit"
+                                        },
+                                        "typed": {
+                                          "description": "The caller typed the limit (pressureLimit)",
+                                          "type": "boolean",
+                                          "const": true
                                         },
                                         "symbol": {
                                           "type": "string",
                                           "description": "Symbol of the limit, Pmax for CIP"
                                         },
                                         "method": {
-                                          "description": "Measuring method, null when the record states none",
+                                          "description": "Measuring method, null when the record states none, typed for a typed limit",
                                           "type": ["string", "null"]
                                         },
                                         "variant": {
@@ -12447,13 +12457,7 @@
                                           "type": "boolean"
                                         }
                                       },
-                                      "required": [
-                                        "cartridge",
-                                        "revised",
-                                        "symbol",
-                                        "method",
-                                        "compared"
-                                      ],
+                                      "required": ["symbol", "method", "compared"],
                                       "additionalProperties": {}
                                     }
                                   },
@@ -13395,6 +13399,11 @@
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                     "description": "Cartridge record id. Adds the comparison of the peak pressure with its CIP Pmax under limits."
                   },
+                  "pressureLimit": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "A pressure limit typed by the caller, Pa, in place of the CIP Pmax values of the cartridge: limits holds it as the one compared limit (method typed), and the warnings and the percentage target of the charge-target route read it. The cartridge id is then not needed for a limit."
+                  },
                   "maximumPressure": {
                     "type": "number",
                     "exclusiveMinimum": 0,
@@ -13658,11 +13667,16 @@
                           "properties": {
                             "cartridge": {
                               "type": "string",
-                              "description": "Id of the cartridge"
+                              "description": "Id of the cartridge, absent for a typed limit"
                             },
                             "revised": {
                               "type": "string",
-                              "description": "Date of the sheet revision"
+                              "description": "Date of the sheet revision, absent for a typed limit"
+                            },
+                            "typed": {
+                              "description": "The caller typed the limit (pressureLimit)",
+                              "type": "boolean",
+                              "const": true
                             },
                             "symbol": {
                               "type": "string",
@@ -13677,7 +13691,7 @@
                               "description": "The limit, Pa"
                             }
                           },
-                          "required": ["cartridge", "revised", "symbol", "pressure"],
+                          "required": ["symbol", "pressure"],
                           "additionalProperties": {}
                         }
                       },
@@ -14152,25 +14166,30 @@
                       "additionalProperties": {}
                     },
                     "limits": {
-                      "description": "CIP pressure limits of the cartridge, absent without a cartridge id",
+                      "description": "CIP pressure limits of the cartridge, or the one limit typed by the caller; absent without a cartridge id or a typed limit",
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "cartridge": {
                             "type": "string",
-                            "description": "Id of the cartridge"
+                            "description": "Id of the cartridge, absent for a typed limit"
                           },
                           "revised": {
                             "type": "string",
-                            "description": "Date of the sheet revision"
+                            "description": "Date of the sheet revision, absent for a typed limit"
+                          },
+                          "typed": {
+                            "description": "The caller typed the limit (pressureLimit)",
+                            "type": "boolean",
+                            "const": true
                           },
                           "symbol": {
                             "type": "string",
                             "description": "Symbol of the limit, Pmax for CIP"
                           },
                           "method": {
-                            "description": "Measuring method, null when the record states none",
+                            "description": "Measuring method, null when the record states none, typed for a typed limit",
                             "type": ["string", "null"]
                           },
                           "variant": {
@@ -14198,7 +14217,7 @@
                             "type": "boolean"
                           }
                         },
-                        "required": ["cartridge", "revised", "symbol", "method", "compared"],
+                        "required": ["symbol", "method", "compared"],
                         "additionalProperties": {}
                       }
                     },
@@ -15227,6 +15246,11 @@
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                     "description": "Cartridge record id. Adds the comparison of the peak pressure with its CIP Pmax under limits."
                   },
+                  "pressureLimit": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "description": "A pressure limit typed by the caller, Pa, in place of the CIP Pmax values of the cartridge: limits holds it as the one compared limit (method typed), and the warnings and the percentage target of the charge-target route read it. The cartridge id is then not needed for a limit."
+                  },
                   "tolerances": {
                     "type": "object",
                     "properties": {
@@ -15783,25 +15807,30 @@
                       "additionalProperties": {}
                     },
                     "limits": {
-                      "description": "CIP pressure limits of the cartridge, absent without a cartridge id",
+                      "description": "CIP pressure limits of the cartridge, or the one limit typed by the caller; absent without a cartridge id or a typed limit",
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "cartridge": {
                             "type": "string",
-                            "description": "Id of the cartridge"
+                            "description": "Id of the cartridge, absent for a typed limit"
                           },
                           "revised": {
                             "type": "string",
-                            "description": "Date of the sheet revision"
+                            "description": "Date of the sheet revision, absent for a typed limit"
+                          },
+                          "typed": {
+                            "description": "The caller typed the limit (pressureLimit)",
+                            "type": "boolean",
+                            "const": true
                           },
                           "symbol": {
                             "type": "string",
                             "description": "Symbol of the limit, Pmax for CIP"
                           },
                           "method": {
-                            "description": "Measuring method, null when the record states none",
+                            "description": "Measuring method, null when the record states none, typed for a typed limit",
                             "type": ["string", "null"]
                           },
                           "variant": {
@@ -15829,7 +15858,7 @@
                             "type": "boolean"
                           }
                         },
-                        "required": ["cartridge", "revised", "symbol", "method", "compared"],
+                        "required": ["symbol", "method", "compared"],
                         "additionalProperties": {}
                       }
                     },
@@ -16243,25 +16272,30 @@
                                 "additionalProperties": {}
                               },
                               "limits": {
-                                "description": "CIP pressure limits of the cartridge, absent without a cartridge id",
+                                "description": "CIP pressure limits of the cartridge, or the one limit typed by the caller; absent without a cartridge id or a typed limit",
                                 "type": "array",
                                 "items": {
                                   "type": "object",
                                   "properties": {
                                     "cartridge": {
                                       "type": "string",
-                                      "description": "Id of the cartridge"
+                                      "description": "Id of the cartridge, absent for a typed limit"
                                     },
                                     "revised": {
                                       "type": "string",
-                                      "description": "Date of the sheet revision"
+                                      "description": "Date of the sheet revision, absent for a typed limit"
+                                    },
+                                    "typed": {
+                                      "description": "The caller typed the limit (pressureLimit)",
+                                      "type": "boolean",
+                                      "const": true
                                     },
                                     "symbol": {
                                       "type": "string",
                                       "description": "Symbol of the limit, Pmax for CIP"
                                     },
                                     "method": {
-                                      "description": "Measuring method, null when the record states none",
+                                      "description": "Measuring method, null when the record states none, typed for a typed limit",
                                       "type": ["string", "null"]
                                     },
                                     "variant": {
@@ -16289,13 +16323,7 @@
                                       "type": "boolean"
                                     }
                                   },
-                                  "required": [
-                                    "cartridge",
-                                    "revised",
-                                    "symbol",
-                                    "method",
-                                    "compared"
-                                  ],
+                                  "required": ["symbol", "method", "compared"],
                                   "additionalProperties": {}
                                 }
                               },
@@ -20458,6 +20486,36 @@
                                           "unit": "lb/in2",
                                           "description": "The value of `bulletBcG7` in lb/in2."
                                         },
+                                        "bulletBaseLength": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletBaseLength` in mm."
+                                        },
+                                        "bulletBaseDiameter": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletBaseDiameter` in mm."
+                                        },
+                                        "bulletCavityDiameter": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletCavityDiameter` in mm."
+                                        },
+                                        "pmax": {
+                                          "type": "number",
+                                          "unit": "bar",
+                                          "description": "The value of `pmax` in bar."
+                                        },
+                                        "caseLength": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `caseLength` in mm."
+                                        },
+                                        "bulkDensity": {
+                                          "type": "number",
+                                          "unit": "g/cm3",
+                                          "description": "The value of `bulkDensity` in g/cm3."
+                                        },
                                         "propellantEnergy": {
                                           "type": "number",
                                           "unit": "J/kg",
@@ -20560,7 +20618,18 @@
                                         }
                                       },
                                       "additionalProperties": false,
-                                      "description": "Values the user typed: solver values and the bullet diameter, length and ballistic coefficients. Every other value follows the referenced records."
+                                      "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
+                                    },
+                                    "bulletBase": {
+                                      "type": "string",
+                                      "enum": [
+                                        "flat",
+                                        "boat-tail",
+                                        "rebated-boat-tail",
+                                        "conical-hollow-base",
+                                        "rounded-hollow-base"
+                                      ],
+                                      "description": "The base form the user chose for the bullet instead of the one of its record (`base.type`)."
                                     },
                                     "ladder": {
                                       "anyOf": [
