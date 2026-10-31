@@ -46,6 +46,8 @@ extend-ignore-re = [
   # German labels that the test of the printed pages expects
   "Höhenverstellung \\(MOA / Klicks\\)",
   "Kein Maßstab: Das Foto hat keine Referenz\\.",
+  # German refusal of a file in another format that the user data test expects
+  "Die Datei ist keine OpenReloading-Datendatei\\.",
   # German umlaut folded to its transliteration by the table import
   "replaceAll\\('ü', 'ue'\\)",
 ]
