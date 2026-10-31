@@ -123,6 +123,7 @@
           "enum": [
             "transducer",
             "piezo",
+            "case-contact",
             "crusher",
             "energy"
           ]

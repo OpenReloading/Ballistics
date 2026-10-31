@@ -526,7 +526,7 @@ describe('drafts', () => {
     const d = fileData(fromRecord(targetBullet, metric))
     const shape = designShape(resolvedOf(d, targetBullet), metric)
     const r = targetBullet
-    expect(shape?.diameter).toBeCloseTo(r.diameter.value, 9)
+    expect(shape?.diameter).toBeCloseTo(r.diameter?.value as number, 9)
     expect(shape?.length).toBeCloseTo(r.length?.value as number, 9)
     expect(shape?.base?.length).toBeCloseTo(r.base?.length?.value as number, 9)
     const noLength = { diameter: targetBullet.diameter }

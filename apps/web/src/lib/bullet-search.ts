@@ -115,7 +115,7 @@ export function bulletRelevance(b: BulletRow, query: string): number {
 function inOriginAndFit(b: BulletRow, filters: BulletFilters) {
   if (filters.origin !== undefined && (filters.origin === 'designs') !== (b.origin === 'user'))
     return false
-  return filters.fit === undefined || bulletFits(b.diameter, filters.fit)
+  return filters.fit === undefined || (b.diameter !== null && bulletFits(b.diameter, filters.fit))
 }
 
 /** Larger values first, rows without a value last; undefined for equal values. */

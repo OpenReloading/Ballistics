@@ -123,7 +123,8 @@ type BulletDrag =
  */
 export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number): BulletDrag {
   const bcs = (record.ballisticCoefficients ?? []).filter((c) => c.dragModel === model)
-  if (bcs.length === 0) return { kind: 'none' }
+  // the trajectory needs a diameter, which a record that only names the bullet lacks
+  if (bcs.length === 0 || !record.diameter) return { kind: 'none' }
   let bands = bcs.map((c) => ({
     ballisticCoefficient: toSi('ballisticCoefficient', c.value),
     minVelocity: c.minVelocity?.value ?? 0,
@@ -155,7 +156,7 @@ export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number):
 
 /** Sectional density, mass over diameter squared, kg/m2. */
 const sectionalDensity = (r: Pick<Bullet, 'mass' | 'diameter'>) =>
-  toSi('mass', r.mass.value) / toSi('length', r.diameter.value) ** 2
+  r.diameter && toSi('mass', r.mass.value) / toSi('length', r.diameter.value) ** 2
 
 /**
  * Gyroscopic stability factor the Miller twist gives (Litz's recommended minimum, B. Litz, Applied
@@ -170,7 +171,7 @@ const millerStabilityTarget = 1.5
  * the inverse square of the twist, so a reference twist scales to it.
  */
 export function millerTwist(r: Pick<Bullet, 'mass' | 'diameter' | 'length'>): number | undefined {
-  if (!r.length) return
+  if (!r.length || !r.diameter) return
   const reference = 0.254
   const sg = millerStability({
     mass: toSi('mass', r.mass.value),
@@ -188,12 +189,17 @@ export function computedBulletRows(
   r: Pick<Bullet, 'mass' | 'diameter' | 'length'> & { tip?: { type: string } | undefined },
 ): FieldRow[] {
   const twist = millerTwist(r)
+  const density = sectionalDensity(r)
   return [
-    {
-      label: msg('Sectional density'),
-      value: { quantity: 'sectionalDensity', si: sectionalDensity(r) },
-      method: msg('Computed: mass over diameter squared.'),
-    },
+    ...(density === undefined
+      ? []
+      : [
+          {
+            label: msg('Sectional density'),
+            value: { quantity: 'sectionalDensity', si: density },
+            method: msg('Computed: mass over diameter squared.'),
+          } satisfies FieldRow,
+        ]),
     ...(twist === undefined
       ? []
       : [

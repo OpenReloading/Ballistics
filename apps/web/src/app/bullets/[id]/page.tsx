@@ -35,7 +35,7 @@ export default async function BulletPage({ params }: PageProps<'/bullets/[id]'>)
   if (r.status === 'notFound') notFound()
   if (r.status !== 'ok') return <ServerDataError what="Bullet" />
   const [names, cartridges] = await Promise.all([getManufacturerNames(), listAllCartridges()])
-  const fits = cartridges.status === 'ok' ? fitsOf(r.data.diameter.value, cartridges.data) : []
+  const fits = cartridges.status === 'ok' ? fitsOf(r.data.diameter?.value, cartridges.data) : []
   return (
     <BulletRecordPage id={id} name={recordHeadText('bullets', r.data, names).title} fits={fits} />
   )

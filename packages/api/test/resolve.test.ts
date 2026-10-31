@@ -62,6 +62,15 @@ describe('bullet record to projectile', () => {
     expect(bulletSi(defined(bundle.bullets[0])).length).toBeUndefined()
   })
 
+  it('leaves out the diameter of a name-only record and refuses a projectile without one', () => {
+    const { productNumber: _p, diameter: _d, ...rest } = g7
+    const nameOnly = { ...rest, nameOnly: true as const }
+    expect(bulletSi(nameOnly).diameter).toBeUndefined()
+    expect(() => bulletProjectile(nameOnly, { dragModel: 'G1' })).toThrow(
+      new InputError('bullet example-a-1 has no diameter'),
+    )
+  })
+
   it('takes the bands of the drag model, a band without a start speed from 0', () => {
     const { projectile, bullet } = bulletProjectile(g7, { dragModel: 'G7' })
     expect(projectile).toEqual({

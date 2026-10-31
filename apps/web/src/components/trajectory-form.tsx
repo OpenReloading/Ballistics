@@ -297,7 +297,7 @@ function RecordDetails({
   const mm = (x: number) => withUnit('length', system, toSi('length', x))
   const product = productLabel(record, names)
   const mass = withUnit('mass', system, toSi('mass', record.mass.value))
-  const diameter = mm(record.diameter.value)
+  const diameter = record.diameter ? mm(record.diameter.value) : '–'
   return (
     <div className="record">
       <p>

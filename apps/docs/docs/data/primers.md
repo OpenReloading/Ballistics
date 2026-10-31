@@ -31,6 +31,8 @@ Every data field needs a source that lists it in `fields`. A value a source does
 
 `Load.primer` is `{ lot?, record? }`. `record` is a `catalogue:<id>` reference: there is no user primer record, so a `user:` reference is refused. The earlier fields `manufacturer` and `model` are gone, and a load file that has them is refused (no migrations before 1.0).
 
+A published load row names its primer as printed text, optionally with catalogue references set through an explicit alias (`apps/docs/docs/data/published-loads.md`).
+
 ## API
 
 Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /primers` filters by `manufacturer=<id>`, `size=<size>` and `compound=<compound>`, orders by manufacturer name and name, and its `q` matches the manufacturer name with the product name or the product number. `GET /primers/:id` answers the record.

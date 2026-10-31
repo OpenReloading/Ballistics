@@ -37,8 +37,9 @@ const commonCalibers: readonly [string, number, number][] = [
 
 const inches = (mm: number) => toSi('length', mm) / metersPerInch
 
-/** A diameter (mm) as a caliber group: ".308" in inches (3 decimals), "7.82" in mm. */
-export function caliberLabel(mm: number, unit: 'in' | 'mm'): string {
+/** A diameter (mm) as a caliber group: ".308" in inches (3 decimals), "7.82" in mm; empty without one. */
+export function caliberLabel(mm: number | null, unit: 'in' | 'mm'): string {
+  if (mm === null) return ''
   if (unit === 'mm') return mm.toFixed(2)
   return inchText(inches(mm).toFixed(3), 'in')
 }
@@ -53,8 +54,9 @@ function inchLabel(mm: number) {
   return s.startsWith('0.') ? s.slice(1) : s
 }
 
-/** The common caliber of a diameter (mm): its group's name, else the diameter in inches (".350"). */
-export function commonCaliber(mm: number): string {
+/** The common caliber of a diameter (mm): its group's name, else the diameter in inches (".350"); empty without one. */
+export function commonCaliber(mm: number | null): string {
+  if (mm === null) return ''
   const d = inches(mm)
   return commonCalibers.find(([, from, to]) => d >= from && d < to)?.[0] ?? inchLabel(mm)
 }
@@ -65,9 +67,10 @@ const named = new Set(commonCalibers.map(([name]) => name))
  * The options of the caliber Select: the common calibers, then the other diameters, each by
  * size with its count; an empty group left out.
  */
-export function caliberOptions(diameters: readonly number[], t: Translator['t']) {
+export function caliberOptions(diameters: readonly (number | null)[], t: Translator['t']) {
   const groups = new Map<string, { mm: number; count: number }>()
   for (const mm of diameters) {
+    if (mm === null) continue
     const name = commonCaliber(mm)
     const g = groups.get(name)
     if (g) g.count++
