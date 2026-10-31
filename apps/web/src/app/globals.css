@@ -638,6 +638,11 @@ td.nowrap {
   color: var(--muted);
 }
 
+/* an alias in regular weight, so the name and the alias do not run together */
+.aliases {
+  font-weight: 400;
+}
+
 /* record tables: rules between rows and banded, as the report tables, but tighter */
 @media screen {
   .record table {
