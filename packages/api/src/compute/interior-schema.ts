@@ -173,7 +173,9 @@ const ladder = z
     message: 'a ladder around the charge needs an odd number of steps',
     path: ['stepCount'],
   })
-  .describe('A charge ladder from load.charge: stepCount runs with charges chargeStep apart.')
+  .describe(
+    'A charge ladder from load.charge: stepCount runs with charges chargeStep apart. A failed step carries its error; when no step has a result the answer is 422 with the reason of the first step.',
+  )
 /** Cartridge id for the limit check, range tolerances and a charge ladder. */
 const interiorSharedFields = {
   cartridge: recordId

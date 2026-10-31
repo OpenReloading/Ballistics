@@ -841,6 +841,17 @@ describe('POST /interior charge ladder', () => {
     })
   })
 
+  it('answers 422 with the reason of the first step when no step of the ladder is valid', async () => {
+    const { status, body } = await post(`${API_PREFIX}/interior`, {
+      model: 'm3',
+      load: { ...m3Load, charge: 0.01 },
+      ladder: { chargeStep: 0.0001, stepCount: 3 },
+    })
+    expect(status).toBe(422)
+    expect(body).toMatchObject({ message: 'interior: chamberVolume', reason: 'chamberVolume' })
+    expect(body.ladderSteps).toBeUndefined()
+  })
+
   it('centres an odd ladder on the charge and answers 400 for an even one around it', async () => {
     const around = await post(`${API_PREFIX}/interior`, {
       model: 'm3',
