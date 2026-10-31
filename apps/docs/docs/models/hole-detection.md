@@ -79,7 +79,7 @@ Code: `apps/web/src/lib/hole-proposals.ts`, `localPxPerM`.
 
 ### Colour axis
 
-The axis is Fisher's linear discriminant of the hole against the ring around it, in log RGB. The hole colour $\mu$ is the mean of the disc of radius $0.4 D$ at the picked hole ($0.28 D$ while the size is not known yet: $0.4$ times the smallest size $0.7 D$), or the logarithm of a backing colour the user picked. The surroundings are the pixels from $1.0 D$ to $2.4 D$ around the pick on the same kind of surface (black area or paper), or a sample of the region. With their per-channel median $m$ and covariance $\Sigma$ (regularised on the diagonal):
+The axis is Fisher's linear discriminant of the hole against the ring around it, in log RGB. The hole colour $\mu$ is the mean of the disc of radius $0.4 D$ at the picked hole ($0.28 D$ while the size is not known yet: $0.4$ times the smallest size $0.7 D$), or the logarithm of the backing colour an earlier example hole stored. The surroundings are the pixels from $1.0 D$ to $2.4 D$ around the pick on the same kind of surface (black area or paper), or a sample of the region. With their per-channel median $m$ and covariance $\Sigma$ (regularised on the diagonal):
 
 $$
 w = \frac{(\Sigma + \epsilon I)^{-1} (\mu - m)}{\lVert (\Sigma + \epsilon I)^{-1} (\mu - m) \rVert}, \qquad \epsilon = \frac{0.02 \operatorname{tr}\Sigma}{3} + 10^{-5}
