@@ -102,7 +102,7 @@ test('with unsaved firearm edits Settings and Units open the dialog without a qu
   await (await barButton(page, 'New firearm')).click()
   const name = page.getByRole('textbox', { name: /^Name/ })
   await name.fill('Range rifle')
-  await expect(page.locator('.file-state')).toHaveText('Unsaved changes, not saved to a file')
+  await expect(page.locator('.file-state')).toHaveText('Unsaved')
   for (const entry of [sidebarSettings(page), unitsButton(page)]) {
     const dialog = await openFrom(page, entry)
     await page.keyboard.press('Escape')

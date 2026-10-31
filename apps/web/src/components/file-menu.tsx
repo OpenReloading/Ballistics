@@ -251,6 +251,12 @@ const keptText: Record<string, Message | ''> = {
   failed: msg('Not saved in this browser'),
 }
 
+/** The file state's text; `brief` is the page bar's shorter one, where `text` is the tooltip. */
+interface FileState {
+  text: string
+  brief?: string
+}
+
 /** The file state shown in the page bar. */
 function stateText(
   {
@@ -267,16 +273,18 @@ function stateText(
     unsaved: boolean
   },
   t: Translator['t'],
-) {
+): FileState {
   if (saved) {
-    if (!dirty) return t('Saved: {file}', { file: saved.file })
+    if (!dirty) return { text: t('Saved: {file}', { file: saved.file }) }
     return autosaved
-      ? t('Changed since {file}', { file: saved.file })
-      : t('Unsaved changes ({file})', { file: saved.file })
+      ? { text: t('Changed since {file}', { file: saved.file }) }
+      : { text: t('Unsaved changes ({file})', { file: saved.file }), brief: t('Unsaved') }
   }
   // an autosaved record is kept in the browser until a file is written
-  if (autosaved) return t(keptText[kept ?? ''] ?? msg('Saved in this browser'))
-  return unsaved ? t('Unsaved changes, not saved to a file') : t('Not saved to a file')
+  if (autosaved) return { text: t(keptText[kept ?? ''] ?? msg('Saved in this browser')) }
+  return unsaved
+    ? { text: t('Unsaved changes, not saved to a file'), brief: t('Unsaved') }
+    : { text: t('Not saved to a file') }
 }
 
 /** The question while it shows: a second way out asked meanwhile waits for the same answer. */
@@ -678,6 +686,7 @@ function FolderItems({
 function FileStatus({
   idle,
   state,
+  brief,
   folderName,
   lines,
   failure,
@@ -688,6 +697,8 @@ function FileStatus({
   /** No record is open: the status shows messages only. */
   idle: boolean | undefined
   state: string
+  /** The state shortened for a page bar; `state` is then the tooltip's text. */
+  brief: string | undefined
   /** The workspace folder named after the state, none when it is not in use. */
   folderName: string | undefined
   lines: string
@@ -697,6 +708,7 @@ function FileStatus({
   kept: string | undefined
 }) {
   const { t } = useTranslation()
+  const short = useContext(BarStatus) ? brief : undefined
   const folder = folderName ? t(', folder {name}', { name: folderName }) : ''
   const shown = !idle
   return (
@@ -706,9 +718,10 @@ function FileStatus({
         data-dirty={unsaved || (autosaved && kept === 'failed') || undefined}
         // also after a file is written, when the text is the file's state
         data-saving={(autosaved && kept === 'saving') || undefined}
+        data-full={(shown && short && `${state}${folder}`) || undefined}
         aria-live="polite"
       >
-        {shown && state}
+        {shown && (short ?? state)}
         {shown && folder}
       </span>
       <span role="status" className="file-message">
@@ -1111,7 +1124,8 @@ function FileMenuOf<K extends UserRecordKind>({
   const status = (
     <FileStatus
       idle={idle}
-      state={state}
+      state={state.text}
+      brief={state.brief}
       folderName={ready?.name}
       lines={lines}
       failure={failure}

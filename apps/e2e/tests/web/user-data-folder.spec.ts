@@ -45,7 +45,7 @@ async function saveInFolder(page: Page, by: 'button' | 'shortcut' = 'button') {
   if (by === 'button') await (await barButton(page, 'Save')).click()
   else {
     // the File menu reads the design after a deferred render, which marks it unsaved
-    await expect(state(page)).toHaveText('Unsaved changes, not saved to a file, folder workspace')
+    await expect(state(page)).toHaveText('Unsaved, folder workspace')
     await page.keyboard.press('Control+S')
   }
   await expect(state(page)).toHaveText('Saved: folder.json, folder workspace')

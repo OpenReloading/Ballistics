@@ -55,7 +55,8 @@ function useWholeText(box: HTMLElement | null) {
       setText(
         Array.from(box.querySelectorAll('*'))
           .filter((e) => e.childElementCount === 0)
-          .map((e) => e.textContent?.trim())
+          // `data-full`: the whole text of a leaf shown shortened
+          .map((e) => e.getAttribute('data-full') ?? e.textContent?.trim())
           .filter(Boolean)
           .join(' '),
       )
@@ -134,11 +135,18 @@ export function PageBar({
     return () => document.removeEventListener('pointerdown', outside)
   }, [open])
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Escape closes the phone panel, also from its toggle
     <div
       ref={root}
       className="page-bar"
       data-open={open || undefined}
       data-single={(actions && single) || undefined}
+      onKeyDown={(e) => {
+        // not from a menu's portalled dropdown: that one closes itself
+        if (e.key !== 'Escape' || !open || !e.currentTarget.contains(e.target as Node)) return
+        setOpen(false)
+        toggle.current?.focus()
+      }}
     >
       <div className="page-bar-title">
         {/* `data-hydrated`: the e2e ready signal of the page, which hydrates after the layout */}
@@ -182,7 +190,7 @@ export function PageBar({
           >
             <DotsThree size={20} aria-hidden="true" />
           </ActionIcon>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: an action chosen or Escape closes the phone panel */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: an action chosen closes the phone panel */}
           <div
             id={id}
             role="presentation"
@@ -193,12 +201,6 @@ export function PageBar({
               const t =
                 e.target instanceof Element ? e.target.closest('button, [role="menuitem"]') : null
               if (open && t && !t.hasAttribute('aria-haspopup')) setOpen(false)
-            }}
-            onKeyDown={(e) => {
-              // not from a menu's portalled dropdown: that one closes itself
-              if (e.key !== 'Escape' || !open || !e.currentTarget.contains(e.target as Node)) return
-              setOpen(false)
-              toggle.current?.focus()
             }}
           >
             <BarStatus value={statusLine}>{actions}</BarStatus>
