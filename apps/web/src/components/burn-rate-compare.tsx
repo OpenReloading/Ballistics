@@ -91,7 +91,7 @@ function OverlayBody({
       />
       <p className="screen-only record-note">
         {t(modelCaption)}
-        {series.length === 1 && ` ${t(bandNote)}`}
+        {series.length === 1 && series[0]?.powder.spread !== undefined && ` ${t(bandNote)}`}
       </p>
       <Button
         className="curve-toggle"

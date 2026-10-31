@@ -113,9 +113,9 @@ export function faceFacets(
     {
       key: 'dist',
       label: msg('Distance'),
-      values: (r) => r.distances.map(String),
-      text: (v) => distance(Number(v)),
-      order: (a, b) => Number(a) - Number(b),
+      // keyed by the shown text: distances that read alike are one option
+      values: (r) => [...new Set(r.distances.map(distance))],
+      order: (a, b) => Number.parseFloat(a) - Number.parseFloat(b),
     },
     {
       key: 'rings',

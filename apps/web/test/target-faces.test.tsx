@@ -51,15 +51,15 @@ it('filters by federation, discipline, event distance and ring count, each count
     facetRows(rows, facets, selected).map((r) => r.id)
   expect(ids({ org: ['ISSF'], rings: ['10'] })).toContain(precision.id)
   expect(ids({ discipline: ['dsb-25m-pistole-revolver'] })).toContain(precision.id)
-  expect(ids({ dist: ['25'] })).toContain(precision.id)
-  expect(ids({ dist: ['25'], org: ['no-such'] })).toEqual([])
+  expect(ids({ dist: ['25 m'] })).toContain(precision.id)
+  expect(ids({ dist: ['25 m'], org: ['no-such'] })).toEqual([])
   const options = facetOptions(rows, rows, facets, { org: ['ISSF'] })
   const dist = defined(options.get('dist'))
-  expect(dist.find((o) => o.value === '25')).toMatchObject({ text: '25 m' })
+  expect(dist.find((o) => o.value === '25 m')).toMatchObject({ text: '25 m' })
   // the federation's own count ignores its choice; the distances count within ISSF
   const issf = rows.filter((r) => r.organization === 'ISSF')
   expect(defined(options.get('org')).find((o) => o.value === 'ISSF')?.count).toBe(issf.length)
-  expect(dist.find((o) => o.value === '25')?.count).toBe(
+  expect(dist.find((o) => o.value === '25 m')?.count).toBe(
     issf.filter((r) => r.distances.includes(25)).length,
   )
 })
