@@ -39,7 +39,7 @@ module.exports = {
       name: 'core-imports-nothing',
       severity: 'error',
       comment:
-        'packages/core has no I/O: it imports only its own files. A runtime dependency under the rule of AGENTS.md is allowed here by name.',
+        'packages/core has no I/O: it imports only its own files. A runtime dependency is allowed here by name.',
       from: { path: own('packages/core/src') },
       to: { pathNot: own('packages/core/src') },
     },

@@ -42,7 +42,7 @@ it('builds nothing when no changed file feeds the web build', () => {
     [
       'apps/e2e/tests/web/groups.spec.ts',
       'README.md',
-      'apps/web/AGENTS.md',
+      'apps/web/CHANGELOG.md',
       'apps/web/test/api.test.ts',
     ],
     closure,
@@ -65,7 +65,7 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: false })
   for (const f of [
     'CONTRIBUTING.md',
-    'apps/e2e/AGENTS.md',
+    'CODE_OF_CONDUCT.md',
     '.github/ISSUE_TEMPLATE/bug.yml',
     '.github/pull_request_template.md',
   ])

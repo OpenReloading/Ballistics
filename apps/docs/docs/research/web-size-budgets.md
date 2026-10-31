@@ -23,7 +23,7 @@ Decided before measuring:
 ## Formulas
 
 - Headroom of a group $g$ for key $k$ (initial or total): $H_{g,k} = B_{g,k} - \max_{r \in g} w_{r,k}$, with $B$ the budget and $w$ the measured gzip bytes of route $r$.
-- Budget rule of `apps/web/AGENTS.md`: $B_{g,k} = \lceil 1.02 \max_{r \in g} w_{r,k} / 1000 \rceil \cdot 1000$ at the time it is set, raised only by an edit that review sees.
+- Budget rule: $B_{g,k} = \lceil 1.02 \max_{r \in g} w_{r,k} / 1000 \rceil \cdot 1000$ at the time it is set, raised only by an edit that review sees.
 - Per-file overhead of a route: $O = \sum_f \mathrm{gz}(f) - \mathrm{gz}(\mathrm{concat}(f))$. Each file is compressed alone over HTTP, so $\sum_f \mathrm{gz}(f)$ is what crosses the wire; $O$ is what splitting into files costs against one stream.
 
 ## Numbers
@@ -83,7 +83,6 @@ measured: the static export of the pre-release integration branch at `2c9f2c65`,
 
 - `apps/web/weight-budget.json`: the budgets and recorded weights.
 - `apps/web/scripts/check-weight.mts`: `measure`, `routeFiles`, `violations`, `table`.
-- `apps/web/AGENTS.md`: the budget rule (largest value plus 2 %).
 - `apps/web/src/lib/offline.ts`: `precacheList`, the whole-app precache.
 - `apps/web/src/components/workbench-results.tsx`, `apps/web/src/components/workbench-figure.tsx`, `apps/web/src/components/workbench-inputs.tsx`: the workbench's existing lazy parts.
 
