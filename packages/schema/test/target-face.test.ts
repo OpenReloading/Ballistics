@@ -83,6 +83,14 @@ describe('targetFace outward gauging', () => {
     }
   })
 
+  it('accepts an outward event on rings marked as circles', () => {
+    const record = {
+      ...withScoring('outward'),
+      rings: whole.rings.map((r) => ({ ...r, shape: 'circle' })),
+    }
+    expect(targetFace.parse(record)).toEqual(record)
+  })
+
   it('refuses an outward event on oval, square or stadium rings and on a decimal face', () => {
     const oval = whole.rings.map((r, i) => ({ ...r, height: mm(30 - 10 * i) }))
     expectIssueAt(targetFace, { ...withScoring('outward'), rings: oval }, 'events.0.scoring')

@@ -1,9 +1,7 @@
 import { SegmentedControl } from '@mantine/core'
 import { angleText, face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
-  conflictWording,
   type Drawn,
-  differenceWording,
   type Figure,
   type FigureModel,
   figureModel,
@@ -21,6 +19,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
+import { conflictText, differenceText } from '../lib/cartridge-record.ts'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -330,10 +329,10 @@ function regionWords(list: Region[], unit: LengthUnit, t: Translator['t']) {
       .join('; ')
   const conflicts = all.some((v) => v.value < 0)
   const own = t('{difference} (chamber minimum minus cartridge maximum): {values}', {
-    difference: differenceWording,
+    difference: differenceText(t),
     values: words((x) => x >= 0) || t('none'),
   })
-  return `${own}${conflicts ? `; ${conflictWording}: ${words((x) => x < 0)}` : ''}`
+  return `${own}${conflicts ? `; ${conflictText(t)}: ${words((x) => x < 0)}` : ''}`
 }
 
 /** One description of every view of a figure. */

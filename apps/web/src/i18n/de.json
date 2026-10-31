@@ -1834,6 +1834,7 @@
   "noValidRun": "keine gültige Berechnung",
   "noValue": "kein Wert",
   "nominal": "nominell",
+  "nominal minimum difference of published dimensions": "nominelle Mindestdifferenz der veröffentlichten Maße",
   "nominal {value}": "nominell {value}",
   "nonFinite": "Wert nicht endlich",
   "none": "keine",

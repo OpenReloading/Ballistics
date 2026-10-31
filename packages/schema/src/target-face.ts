@@ -203,7 +203,7 @@ function checkStadium(f: z.infer<typeof targetFaceFields>, issue: Issue) {
 /** Event ids are unique within the face; outward gauging needs circular rings in whole rings. */
 function checkEvents(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   const seen = new Set<string>()
-  const circular = f.rings.every((r) => !r.height && !r.shape)
+  const circular = f.rings.every((r) => !r.height && (r.shape ?? 'circle') === 'circle')
   f.events.forEach((e, i) => {
     if (seen.has(e.id)) issue(['events', i, 'id'], 'must be unique within the face')
     seen.add(e.id)

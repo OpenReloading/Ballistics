@@ -279,4 +279,25 @@ describe('CartridgeDrawing', () => {
       shown.t = undefined
     }
   })
+
+  it('words the region differences and a data conflict of the combined view in German', () => {
+    const record = sheetRecord('cip-308-win-2008-09-23')
+    const values = record.values.map((v) =>
+      v.side === 'chamber' && v.symbol === 'P1' ? { ...v, value: 11.9 } : v,
+    )
+    shown.t = translator(de, 'de')
+    try {
+      const html = renderToStaticMarkup(
+        <MantineProvider>
+          <CartridgeDrawing spec={drawable({ ...record, values })} />
+        </MantineProvider>,
+      )
+      const desc = html.match(/<desc[^>]*>([^<]*)<\/desc>/)?.[1] ?? ''
+      expect(desc).toContain('nominelle Mindestdifferenz der veröffentlichten Maße')
+      expect(desc).toContain('Datenkonflikt zwischen')
+      expect(desc).not.toMatch(/nominal minimum|data conflict/)
+    } finally {
+      shown.t = undefined
+    }
+  })
 })
