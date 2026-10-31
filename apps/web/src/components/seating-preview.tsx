@@ -1305,7 +1305,11 @@ function BulletStatus({ m }: { m: Model }) {
         </p>
       )}
       {bulletRecord && !shaped && (
-        <p>{t('This bullet record has no length: the preview needs it.')}</p>
+        <p>
+          {bulletRecord.length
+            ? t('This bullet record has no diameter: the preview needs it.')
+            : t('This bullet record has no length: the preview needs it.')}
+        </p>
       )}
       {refused && (
         <p>

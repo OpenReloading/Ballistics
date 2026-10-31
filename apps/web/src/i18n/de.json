@@ -1403,6 +1403,7 @@
   "Thermochemistry": "Thermochemie",
   "This bullet design has no length or does not draw: the preview needs both.": "Dieser Geschossentwurf hat keine Länge oder lässt sich nicht zeichnen: Die Vorschau benötigt beides.",
   "This bullet has no {model} BC in the database. Choose {other} or enter the drag manually.": "Dieses Geschoss hat in der Datenbank keinen {model}-BC. Wählen Sie {other} oder geben Sie den Luftwiderstand manuell ein.",
+  "This bullet record has no diameter: the preview needs it.": "Dieser Geschossdatensatz hat keinen Durchmesser: Die Vorschau benötigt ihn.",
   "This bullet record has no length: the preview needs it.": "Dieser Geschossdatensatz hat keine Länge: Die Vorschau benötigt sie.",
   "This link is not valid.": "Dieser Link ist ungültig.",
   "This run": "Dieser Durchlauf",
