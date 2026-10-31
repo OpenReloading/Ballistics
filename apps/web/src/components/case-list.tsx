@@ -83,6 +83,7 @@ export function CaseList({
     },
     {
       key: 'material',
+      wide: true,
       label: msg('Material'),
       width: '10rem',
       value: (r) => r.material,
@@ -100,6 +101,7 @@ export function CaseList({
     },
     {
       key: 'capacity',
+      wide: true,
       label: msg('Water capacity'),
       unit: system.capacity.symbol,
       help: msg('The water the manufacturer states fills the case to the mouth.'),
