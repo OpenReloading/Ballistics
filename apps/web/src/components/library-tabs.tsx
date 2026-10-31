@@ -2,6 +2,7 @@
 
 import { Tabs } from '@mantine/core'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { libraryOf } from '../lib/sections.ts'
 import { useRoute } from './use-route.ts'
@@ -17,6 +18,14 @@ export function LibraryTabs() {
   const router = useRouter()
   const { t } = useTranslation()
   const page = libraryOf(route)
+  const list = useRef<HTMLDivElement>(null)
+  // the strip scrolls on a phone: the current tab stays in view
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the route changes
+  useEffect(() => {
+    list.current
+      ?.querySelector('[aria-selected="true"]')
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  }, [route])
   if (!page?.tabs) return null
   return (
     <Tabs
@@ -30,7 +39,7 @@ export function LibraryTabs() {
         router.push(q ? `${href}?${new URLSearchParams({ q })}` : href)
       }}
     >
-      <Tabs.List aria-label={t(page.label)}>
+      <Tabs.List ref={list} aria-label={t(page.label)}>
         {page.tabs.map((tab) => (
           <Tabs.Tab key={tab.href} value={tab.href}>
             {t(tab.label)}

@@ -545,6 +545,18 @@ main .home-cards h3 {
   }
 }
 
+/* one scrolling row on a phone */
+@media (max-width: 47.99em) {
+  .library-tabs .mantine-Tabs-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .library-tabs .mantine-Tabs-tab {
+    flex: none;
+  }
+}
+
 @media (max-width: 47.99em) {
   .home-cards {
     grid-auto-flow: row;
