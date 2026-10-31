@@ -1,8 +1,107 @@
 import { millerStability, type Projectile } from '@open-reloading/core'
-import { type Bullet, toSi } from '@open-reloading/schema'
+import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
+
+/** The bullet values a load may type over its record, by the keys of `analysis.overrides`. */
+const bulletValueKeys = [
+  'bulletMass',
+  'bulletDiameter',
+  'bulletLength',
+  'bulletBcG1',
+  'bulletBcG7',
+] as const
+export type BulletValueKey = (typeof bulletValueKeys)[number]
+
+/** Bullet values in SI (kg, m, kg/m2); an absent key is a value the record does not give or nobody typed. */
+export type BulletValues = Partial<Record<BulletValueKey, number | undefined>>
+
+const bcKeys = { G1: 'bulletBcG1', G7: 'bulletBcG7' } as const
+
+/** The BCs of a drag model the record lists. */
+const bandsOf = (record: Partial<Bullet>, model: 'G1' | 'G7') =>
+  (record.ballisticCoefficients ?? []).filter((c) => c.dragModel === model)
+
+/** How many BCs of `model` the record lists: several are bands that one typed value replaces. */
+export const bandCount = (record: Partial<Bullet> | undefined, model: 'G1' | 'G7') =>
+  record ? bandsOf(record, model).length : 0
+
+/**
+ * The values a bullet record gives, SI. A BC only where the record lists one value of the model: a
+ * record with several bands has no single value to show.
+ */
+export function recordBulletValues(record: Partial<Bullet> | undefined): BulletValues {
+  if (!record) return {}
+  const out: BulletValues = {}
+  if (record.mass) out.bulletMass = toSi('mass', record.mass.value)
+  if (record.diameter) out.bulletDiameter = toSi('length', record.diameter.value)
+  if (record.length) out.bulletLength = toSi('length', record.length.value)
+  for (const model of ['G1', 'G7'] as const) {
+    const [only, ...more] = bandsOf(record, model)
+    if (only && more.length === 0) out[bcKeys[model]] = toSi('ballisticCoefficient', only.value)
+  }
+  return out
+}
+
+/**
+ * The bullet values a run reads: the record's, then the mass of the Bullet mass field, then the
+ * typed values (`typed` holds the field values by key). The one source of every reader.
+ */
+export function effectiveBulletValues(
+  record: Partial<Bullet> | undefined,
+  mass: number | undefined,
+  typed: Record<string, { si: number | undefined }>,
+): BulletValues {
+  const out: BulletValues = recordBulletValues(record)
+  if (mass !== undefined) out.bulletMass = mass
+  for (const key of bulletValueKeys) {
+    const si = typed[key]?.si
+    if (si !== undefined) out[key] = si
+  }
+  return out
+}
+
+/** The bullet diameter of `values`, mm, as the record stores it. */
+export const diameterMm = (values: BulletValues) =>
+  values.bulletDiameter === undefined ? undefined : fromSi('length', values.bulletDiameter)
+
+/** Whether two SI values are one number but for a unit round trip. */
+const sameValue = (a: number, b: number | undefined) =>
+  b !== undefined && Math.abs(a - b) <= 1e-9 * Math.abs(b)
+
+/**
+ * The one place a bullet record meets typed values: `record` with each value of `typed` in place
+ * (every reader of the record's mass, diameter, length and BCs takes the result). A typed BC
+ * replaces all bands of its drag model with one band from 0 m/s; the record's own single value
+ * typed again leaves it as it is. The shape fields stay the record's.
+ */
+export function typedBullet<B extends Partial<Bullet>>(record: B, typed: BulletValues): B {
+  const own = recordBulletValues(record)
+  const out: Partial<Bullet> = { ...record }
+  // a value equal to the record's stays the record's: no round trip through SI
+  const changed = (key: BulletValueKey) => {
+    const si = typed[key]
+    return si !== undefined && !sameValue(si, own[key]) ? si : undefined
+  }
+  const [mass, diameter, length] = [
+    changed('bulletMass'),
+    changed('bulletDiameter'),
+    changed('bulletLength'),
+  ]
+  if (mass !== undefined) out.mass = { value: fromSi('mass', mass) }
+  if (diameter !== undefined) out.diameter = { value: fromSi('length', diameter) }
+  if (length !== undefined) out.length = { value: fromSi('length', length) }
+  for (const model of ['G1', 'G7'] as const) {
+    const si = changed(bcKeys[model])
+    if (si === undefined) continue
+    out.ballisticCoefficients = [
+      ...(out.ballisticCoefficients ?? []).filter((c) => c.dragModel !== model),
+      { dragModel: model, value: fromSi('ballisticCoefficient', si) },
+    ]
+  }
+  return out as B
+}
 
 type BallisticCoefficientChoice = {
   value: number

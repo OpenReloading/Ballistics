@@ -18,9 +18,9 @@ import dynamic from 'next/dynamic'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
-import { plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
+import { bandCount, recordBulletValues } from '../lib/bullet.ts'
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
@@ -39,7 +39,7 @@ import {
 } from '../lib/field-spec.ts'
 import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
-import { burnFormError, interiorFields } from '../lib/interior-input.ts'
+import { bulletFields, burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
@@ -54,7 +54,13 @@ import { shortcutAriaKeys, shortcutLabel } from '../lib/shortcuts.ts'
 import { userBulletRows, userRecordId } from '../lib/sources.ts'
 import { cartridgeOptionText } from '../lib/standards.ts'
 import { controlSize } from '../lib/theme.ts'
-import { formatQuantity, inchText, lengthText, type UnitSystem } from '../lib/units.ts'
+import {
+  fixedFieldText,
+  formatQuantity,
+  inchText,
+  lengthText,
+  type UnitSystem,
+} from '../lib/units.ts'
 import { catalogueRef, userRef } from '../lib/variants.ts'
 import type { InputPanel } from '../lib/workbench.ts'
 import { citedDefaults, type DefaultKey } from '../lib/workbench-defaults.ts'
@@ -214,19 +220,6 @@ function PowderSourceRow() {
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
   inchText(lengthText('diameter', system, toSi('length', mm)), system.length.symbol)
-
-/** Diameter and length on one row, or the diameter alone. */
-function sizeRow(b: Bullet | undefined, system: UnitSystem, t: Translator['t']) {
-  if (!b) return false
-  const d = lengthCell(system, b.diameter.value)
-  return b.length
-    ? recordRow(
-        t('Diameter × length'),
-        `${d} × ${lengthCell(system, b.length.value)}`,
-        system.length.symbol,
-      )
-    : recordRow(t('Diameter'), d, system.length.symbol)
-}
 
 /** The construction on one line: the structure, the full wording on hover; else the wording. */
 function constructionCell(c: Bullet['construction'], t: Translator['t']) {
@@ -797,7 +790,6 @@ function LoadField({ name: key }: { name: string }) {
     follow,
     markChanged,
     setDefaulted,
-    setBulletDesign,
     printing,
     printMedia,
     recordBore,
@@ -877,7 +869,6 @@ function LoadField({ name: key }: { name: string }) {
         markChanged()
         if (defaulted.has(key)) setDefaulted((s) => new Set([...s].filter((k) => k !== key)))
         if (followable) setFollowed((s) => new Set([...s].filter((k) => k !== key)))
-        if (key === 'bulletMass') setBulletDesign(undefined)
         form.setFieldValue(key, value)
         // once a field shows an error it is checked on each change; a burn form value checks the other three
         for (const k of key.startsWith('form') ? burnFormKeys : [key])
@@ -888,6 +879,83 @@ function LoadField({ name: key }: { name: string }) {
 }
 
 const fieldsOf = (keys: readonly string[]) => keys.map((k) => <LoadField key={k} name={k} />)
+
+type BulletKey = (typeof bulletFields)[number]['key']
+
+/**
+ * A Bullet card value the record or design gives: its value in muted text until the user types
+ * over it, an emptied field gives the record's value again. A BC of a record with several bands
+ * has no single value, so the field is empty until one replaces them.
+ */
+function BulletValueField({ name: key }: { name: BulletKey }) {
+  const {
+    system,
+    bulletRecord,
+    typedBulletFields,
+    setTypedBullet,
+    markChanged,
+    printing,
+    printMedia,
+  } = useLoad()
+  const { t } = useTranslation()
+  const spec = bulletFields.find((s) => s.key === key)
+  if (!spec) throw new Error(`no field ${key}`)
+  const typed = typedBulletFields[key]
+  const recorded = recordBulletValues(bulletRecord)[key]
+  const value =
+    typed ??
+    (recorded === undefined
+      ? undefined
+      : { text: fixedFieldText(spec.quantity, system, recorded), si: recorded })
+  const model = key === 'bulletBcG1' ? 'G1' : key === 'bulletBcG7' ? 'G7' : undefined
+  const bands = model ? bandCount(bulletRecord, model) : 0
+  return (
+    <NumberField
+      spec={spec}
+      system={system}
+      value={
+        (printing || printMedia) && value
+          ? { ...value, text: inchText(value.text, system[spec.quantity].symbol) }
+          : value
+      }
+      placeholder={bands > 1 ? t('{count} bands', { count: bands }) : undefined}
+      muted={typed === undefined}
+      error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
+      onChange={(v) => {
+        markChanged()
+        setTypedBullet((f) => ({ ...f, [key]: v }))
+      }}
+      // an emptied field follows the record again once it is left
+      onBlur={() =>
+        setTypedBullet((f) => {
+          if (f[key]?.text.trim() !== '') return f
+          const { [key]: _, ...rest } = f
+          return rest
+        })
+      }
+    />
+  )
+}
+
+/**
+ * The Bullet card's value rows (the card's height is fixed by the window of 1280 x 650): diameter,
+ * length and the first BC row of the drag models the record lists or the user typed (G7 before G1).
+ * The second BC row is the card's More popover's (`more`).
+ */
+function BulletValueFields({ more }: { more?: boolean }) {
+  const { bulletRecord, typedBulletFields } = useLoad()
+  const shown = (key: BulletKey) => {
+    const model = key === 'bulletBcG1' ? 'G1' : key === 'bulletBcG7' ? 'G7' : undefined
+    if (key in typedBulletFields) return true
+    if (!bulletRecord) return false
+    return model ? bandCount(bulletRecord, model) > 0 : true
+  }
+  const [first, second] = bulletFields.filter((s) => s.key.includes('Bc') && shown(s.key))
+  const keys = more
+    ? [second]
+    : [...bulletFields.filter((s) => !s.key.includes('Bc') && shown(s.key)), first]
+  return keys.map((s) => s && <BulletValueField key={s.key} name={s.key} />)
+}
 
 /** The note on a load whose powder design has a newer fit, with the switch to it. */
 function NewerFitNote() {
@@ -913,12 +981,10 @@ function NewerFitNote() {
 function CardBody({ panel }: { panel: InputPanel }) {
   const {
     system,
-    bullet,
     powder,
     bulletNote,
     pmax,
     specValue,
-    bc,
     modelShown,
     setModelShown,
     printing,
@@ -954,12 +1020,9 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'bullet')
     return (
       <div className="panel-fields">
-        {/* one line each, so the column fits at 1366 x 650 */}
-        {sizeRow(bullet, system, t)}
-        {recordRow(t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
-        {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}
+        <BulletValueFields />
       </div>
     )
   if (panel === 'powder')
@@ -1312,7 +1375,7 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
-  const { specValue, system, allDiameters, setAllDiameters } = useLoad()
+  const { specValue, system, allDiameters, setAllDiameters, bullet } = useLoad()
   const { t } = useTranslation()
   const l6 = specValue('cartridge', 'L6')
   if (panel === 'cartridge')
@@ -1336,12 +1399,16 @@ function CardMore({ panel }: { panel: InputPanel }) {
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
   return (
-    <Switch
-      className="wide"
-      label={t('Bullets of all diameters')}
-      checked={allDiameters}
-      onChange={(e) => setAllDiameters(e.currentTarget.checked)}
-    />
+    <>
+      <BulletValueFields more />
+      {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
+      <Switch
+        className="wide"
+        label={t('Bullets of all diameters')}
+        checked={allDiameters}
+        onChange={(e) => setAllDiameters(e.currentTarget.checked)}
+      />
+    </>
   )
 }
 
@@ -1399,8 +1466,13 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     suggestions,
     fields,
     powder,
+    bulletValues,
   } = useLoad()
   const { ok, stale } = useResult()
+  // the figure draws the record's shape at the typed diameter; its other dimensions are the record's,
+  // so a typed length (which they would no longer add up to) stays out
+  const { bulletDiameter } = bulletValues
+  const seatValues = useMemo(() => ({ bulletDiameter }), [bulletDiameter])
   // the figure draws the selected step of a seating ladder while its result is current
   const seatingStep = ok?.steps[ok.selected]?.seating
   const ladderStep =
@@ -1452,7 +1524,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       lands={lands.contact}
       landsOther={lands.other}
       barrelDefault={suggestions.barrelLength}
-      linked={{ bullet: bullet?.id, design: bulletDesign?.id }}
+      linked={{ bullet: bullet?.id, design: bulletDesign?.id, values: seatValues }}
       slots={{
         cartridge: seatingSlots.cartridge ?? null,
         gun: seatingSlots.gun ?? null,

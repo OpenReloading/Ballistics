@@ -166,7 +166,7 @@ Code: `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `oversi
 
 - $o$ is taken as 0 without $Z$ and above `maxOversizePercent` (5 %).
 - $G_1$ and $Z$ are C.I.P. tolerance limits, not measurements. A run reads $G_1$ from the cartridge record, else the bore diameter.
-- The bullet length stands in for the bearing length $L$.
+- The bullet length stands in for the bearing length $L$. The workbench takes the length typed over the bullet record's (`bulletLength`), and `POST /v1/interior/load-file` takes a `bulletLength` override over the record's the same way.
 - $\tau_f$, $c$ and $\phi_e$ are stored with the fitted powder parameters.
 - A load file can replace the friction pressure (`boreFriction`) and the start and length of the engraving ramp (`engravingPressure`, `engravingLength`).
 

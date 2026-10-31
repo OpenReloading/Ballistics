@@ -20418,6 +20418,26 @@
                                           "unit": "g",
                                           "description": "The value of `bulletMass` in g."
                                         },
+                                        "bulletDiameter": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletDiameter` in mm."
+                                        },
+                                        "bulletLength": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletLength` in mm."
+                                        },
+                                        "bulletBcG1": {
+                                          "type": "number",
+                                          "unit": "lb/in2",
+                                          "description": "The value of `bulletBcG1` in lb/in2."
+                                        },
+                                        "bulletBcG7": {
+                                          "type": "number",
+                                          "unit": "lb/in2",
+                                          "description": "The value of `bulletBcG7` in lb/in2."
+                                        },
                                         "propellantEnergy": {
                                           "type": "number",
                                           "unit": "J/kg",
@@ -20520,7 +20540,7 @@
                                         }
                                       },
                                       "additionalProperties": false,
-                                      "description": "Solver values the user typed. Every other value follows the referenced records."
+                                      "description": "Values the user typed: solver values and the bullet diameter, length and ballistic coefficients. Every other value follows the referenced records."
                                     },
                                     "ladder": {
                                       "anyOf": [
