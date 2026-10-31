@@ -4,6 +4,7 @@ import { expect, type Locator, type Page, test } from '@playwright/test'
 import { height, problems, schemes, tall, widths } from './a11y.ts'
 import { barButton } from './bar.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
+import { openLadderGroups } from './ladder-groups.ts'
 import { gotoHydrated } from './nav.ts'
 import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
@@ -164,6 +165,18 @@ const states: State[] = [
         await expect(page.getByRole('menu')).toBeHidden()
         await check(tab)
       }
+    },
+  },
+  {
+    name: 'workbench with the point of impact per charge of a ladder',
+    open: async (page, check) => {
+      const ladder = await openLadderGroups(page)
+      await ladder
+        .getByLabel(/^Chronograph, Group 7,/)
+        .selectOption({ label: 'day1.csv, String 7: S7, 5 shots' })
+      await expect(ladder.getByRole('group', { name: 'Point of impact per charge' })).toBeVisible()
+      await expect(ladder.locator('.ladder-impact .echart [role="img"]')).toBeVisible()
+      await check('impact', '.ladder-groups')
     },
   },
   ...['General', 'Units', 'Workbench'].map((tab) => ({

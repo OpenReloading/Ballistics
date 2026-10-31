@@ -19,12 +19,12 @@ import {
   readSession,
   sessionCsvBlob,
   sessionJsonBlob,
-  stringName,
 } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText, localDay } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
+import { stringName } from '../lib/string-name.ts'
 import { type StringStats, stringStats } from '../lib/string-stats.ts'
 import { controlSize } from '../lib/theme.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'

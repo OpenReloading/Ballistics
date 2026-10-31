@@ -245,7 +245,12 @@
       "standard deviation must be 0 or more",
       "each string needs at least two shots",
       "every string needs at least one velocity",
-      "charges must differ"
+      "charges must differ",
+      "a ladder needs at least three charges",
+      "slope must be finite",
+      "each charge needs at least two shots",
+      "each shot needs a height and a velocity",
+      "heights and velocities must be finite"
     ],
     "load file values": [
       "Enter a number for {label}.",
