@@ -252,7 +252,7 @@ const keptText: Record<string, Message | ''> = {
 }
 
 /** The file state's text; `brief` is the page bar's shorter one, where `text` is the tooltip. */
-interface FileState {
+interface StateText {
   text: string
   brief?: string
 }
@@ -273,7 +273,7 @@ function stateText(
     unsaved: boolean
   },
   t: Translator['t'],
-): FileState {
+): StateText {
   if (saved) {
     if (!dirty) return { text: t('Saved: {file}', { file: saved.file }) }
     return autosaved
