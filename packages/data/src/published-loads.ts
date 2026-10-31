@@ -176,7 +176,8 @@ function checkLoadPrimers(l: PublishedLoad, where: string, known: Known, errors:
     }
     if (size !== undefined && size !== record.size)
       said(`primer size ${size} differs from ${record.id} (${record.size})`)
-    if (magnum !== undefined && magnum !== (record.magnum ?? false))
+    // a primer record leaves magnum out when no source states it, which is not a disagreement
+    if (magnum !== undefined && record.magnum !== undefined && magnum !== record.magnum)
       said(`primer magnum differs from ${record.id}`)
   }
 }

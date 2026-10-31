@@ -41,7 +41,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
         // the strip carries them from 48em, the line under the title on a phone
         badges={badges}
         workbench={workbenchHref('bullet', b.id)}
-        compare={b.diameter && compareFrom(b.id, b.diameter.value)}
+        compare={compareFrom(b.id, b.diameter?.value)}
         design={`/bullets/designer?from=${encodeURIComponent(b.id)}`}
         provenance={b.provenance}
         strip={

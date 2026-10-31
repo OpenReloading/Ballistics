@@ -206,22 +206,33 @@ describe('published load files', () => {
 
   it('reports a printed size or magnum that differs from the primer record', () => {
     const where = 'loads/test-cartridge/test-manufacturer.json: loads a'
-    const errors = errorsOf(
-      file([
-        load('a', {
-          primer: {
-            printed: 'x',
-            records: ['catalogue:test-primer'],
-            size: 'small-rifle',
-            magnum: true,
-          },
-        }),
-      ]),
-    )
+    const { errors } = readAfter((write) => {
+      write('primers/stated-primer.json', {
+        id: 'stated-primer',
+        manufacturer: 'test-manufacturer',
+        name: 'Stated primer',
+        size: 'large-rifle',
+        magnum: false,
+        provenance: { kind: 'published', sources: [{ title: 'Test', fields: ['size', 'magnum'] }] },
+      })
+      write(
+        'loads/test-cartridge/test-manufacturer.json',
+        file([
+          load('a', {
+            primer: {
+              printed: 'x',
+              records: ['catalogue:stated-primer'],
+              size: 'small-rifle',
+              magnum: true,
+            },
+          }),
+        ]),
+      )
+    })
     expect(errors).toContain(
-      `${where}: primer size small-rifle differs from test-primer (large-rifle)`,
+      `${where}: primer size small-rifle differs from stated-primer (large-rifle)`,
     )
-    expect(errors).toContain(`${where}: primer magnum differs from test-primer`)
+    expect(errors).toContain(`${where}: primer magnum differs from stated-primer`)
   })
 
   it('reports a value that does not follow its printed text', () => {
@@ -290,6 +301,27 @@ describe('published load files', () => {
         size: 'large-rifle',
         magnum: true,
         provenance: { kind: 'published', sources: [{ title: 'Test', fields: ['size', 'magnum'] }] },
+      })
+      write(
+        'loads/test-cartridge/test-manufacturer.json',
+        file([
+          load('a', {
+            primer: { printed: 'LRM', records: ['catalogue:magnum-primer'], magnum: true },
+          }),
+        ]),
+      )
+    })
+    expect(errors).toEqual([])
+  })
+
+  it('does not compare a printed magnum with a primer record that states none', () => {
+    const { errors } = readAfter((write) => {
+      write('primers/magnum-primer.json', {
+        id: 'magnum-primer',
+        manufacturer: 'test-manufacturer',
+        name: 'Magnum primer',
+        size: 'large-rifle',
+        provenance: { kind: 'published', sources: [{ title: 'Test', fields: ['size'] }] },
       })
       write(
         'loads/test-cartridge/test-manufacturer.json',

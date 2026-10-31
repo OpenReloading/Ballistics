@@ -35,6 +35,7 @@ it('parses ids: trimmed, deduplicated, at most four, only record id characters',
 
 it("links a bullet record's Compare to the list searched by its caliber with the bullet ticked", () => {
   expect(compareFrom('alpha-30425', 7.823)).toBe('/bullets?q=.308&pick=alpha-30425')
+  expect(compareFrom('alpha-30425')).toBe('/bullets?pick=alpha-30425')
 })
 
 it('writes the compare link with the ids in order', () => {
