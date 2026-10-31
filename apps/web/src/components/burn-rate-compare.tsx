@@ -1,7 +1,6 @@
 'use client'
 
-import { Group, MultiSelect, Pill } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { Button, Group, MultiSelect, Pill } from '@mantine/core'
 import type { Powder } from '@open-reloading/schema'
 import { ChartLine } from '@phosphor-icons/react'
 import Link from 'next/link'
@@ -10,7 +9,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
-  bandAndBarsNote,
+  bandNote,
   classifyPowder,
   dashes,
   describeCurve,
@@ -65,22 +64,20 @@ function OverlayBody({
   picks,
   loading,
   series,
-  wide,
 }: {
   read: boolean
   picks: number
   loading: boolean
   series: { powder: FittedPowder; slot: number }[]
-  wide: boolean | undefined
 }) {
   const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
   if (!read || loading) return <Loading what="curves" />
   if (picks === 0)
     return (
       <EmptyNote
         icon={<ChartLine size={24} aria-hidden="true" />}
         title={t('No powder in the overlay.')}
-        description={t('Tick powders in the powder list to add them.')}
       />
     )
   // every pick failed: the error note above stands alone
@@ -89,17 +86,29 @@ function OverlayBody({
     <>
       <LazyVivacityChart
         series={series}
-        height={wide ? 420 : 300}
         title={t('Dynamic vivacity of the chosen powders, model output')}
         description={series.map((s) => describeCurve(s.powder, t)).join(' ')}
       />
-      <details className="values-details">
-        <summary>{t('Values table')}</summary>
+      <p className="screen-only record-note">
+        {t(modelCaption)}
+        {series.length === 1 && series[0]?.powder.spread !== undefined && ` ${t(bandNote)}`}
+      </p>
+      <Button
+        className="curve-toggle"
+        variant={open ? 'light' : 'subtle'}
+        size="compact-xs"
+        aria-expanded={open}
+        aria-controls="overlay-values"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {t('Values table')}
+      </Button>
+      <div id="overlay-values" className="curve-values" data-open={open || undefined}>
         <CurveTable
           powders={series.map((s) => s.powder)}
           caption={t('Dynamic vivacity of the chosen powders')}
         />
-      </details>
+      </div>
     </>
   )
 }
@@ -112,8 +121,6 @@ function OverlayBody({
  * only the names.
  */
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
-  // the chart is taller on a wide window (the same breakpoint as the placeholder's CSS)
-  const wide = useMediaQuery('(min-width: 88em)')
   const { t } = useTranslation()
   const [picks, setPicks] = useState<OverlayPick[]>([])
   const [read, setRead] = useState(false)
@@ -207,21 +214,17 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
           {failed.map((p) => options.find((o) => o.value === p.id)?.label ?? p.id).join(', ')}
         </ErrorNote>
       )}
-      <OverlayBody read={read} picks={picks.length} loading={loading} series={series} wide={wide} />
+      <OverlayBody read={read} picks={picks.length} loading={loading} series={series} />
     </Panel>
   )
 }
 
-/** The lead of the burn-rate page: what the curves are and what the interval covers. */
+/** The lead of the burn-rate page. */
 export function BurnRatesLead() {
   const { t } = useTranslation()
   return (
     <p className="muted page-lead">
-      {t('Dynamic vivacity, the burn rate per pressure, over burnt fraction.')}{' '}
-      <span className="screen-only">
-        {t(modelCaption)} {t(bandAndBarsNote)}{' '}
-      </span>
-      {t('The interval scales the whole curve.')}
+      {t('Dynamic vivacity, the burn rate per pressure, over burnt fraction.')}
     </p>
   )
 }

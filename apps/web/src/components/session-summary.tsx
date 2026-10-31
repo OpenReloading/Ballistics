@@ -453,7 +453,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                       limits={[{ y: v.fromSi(st.mean), label: t('Mean') }]}
                       points
                       integerX
-                      height={210}
+                      height={240}
                       title={t('Velocity per shot, {name}', { name })}
                       description={t(
                         'Velocity of each of the {count} shots of {name} in {unit} over the shot number, with the mean {mean} as a line; excluded shots are left out. The shots table lists every value.',
@@ -470,6 +470,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
           <Panel id="session-shots" title={t('Shots')} className="session-shots-panel">
             {session.strings.map((s, k) => {
               const name = stringName(stringLabels, k, t)
+              const anyExcluded = s.shots.some((shot) => shot.excluded)
               return (
                 // the open string's shots on screen, every string's in print
                 <div
@@ -486,7 +487,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                       t('Shot'),
                       t('Velocity ({unit})', { unit: v.symbol }),
                       t('Cold bore'),
-                      t('Excluded'),
+                      ...(anyExcluded ? [t('Excluded')] : []),
                     ]}
                   >
                     {s.shots.map((shot, n) => (
@@ -495,7 +496,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                         <td className="num">{n + 1}</td>
                         <td className="num">{speed(shot.velocity.value)}</td>
                         <td>{shot.coldBore ? t('yes') : ''}</td>
-                        <td>{shot.excluded ?? ''}</td>
+                        {anyExcluded && <td>{shot.excluded ?? ''}</td>}
                       </tr>
                     ))}
                   </PanelTable>

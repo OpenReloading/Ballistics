@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { translator } from '../src/i18n/translate.ts'
 import {
-  bandAndBarsNote,
   bandNote,
   classifyPowder,
   curveAt,
@@ -176,7 +175,6 @@ describe('the neighbours of a powder in the burn-rate order', () => {
   })
 })
 
-it('writes the standard uncertainties of the band notes as the interval factor', () => {
+it('writes the standard uncertainties of the band note as the interval factor', () => {
   expect(bandNote).toContain(`Plus and minus ${uncertaintyFactor} standard`)
-  expect(bandAndBarsNote).toContain(`plus and minus ${uncertaintyFactor} standard`)
 })

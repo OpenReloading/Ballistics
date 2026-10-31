@@ -10,7 +10,9 @@ import {
   type CartridgeRow,
   cartridgeCells,
   cartridgeMatches,
+  cartridgeRank,
   cartridgeSearchText,
+  compareCartridgeNames,
   noValues,
   type PackedCartridge,
   unpackCartridges,
@@ -55,7 +57,10 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const mine = useResolved(records, userCartridges)
   // the browser's designs first: a few rows would sit unseen behind the catalogue rows
   const items = useMemo(
-    () => [...userCartridgeRows(mine), ...unpackCartridges(packed)],
+    () => [
+      ...userCartridgeRows(mine),
+      ...unpackCartridges(packed).toSorted((a, b) => compareCartridgeNames(a.name, b.name)),
+    ],
     [mine, packed],
   )
   const counts = useMemo(() => countOrigins(items), [items])
@@ -63,13 +68,19 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
   const texts = useMemo(() => items.map(cartridgeSearchText), [items])
-  const shown = useMemo(
-    () =>
-      items.filter(
-        (c, i) => inOrigins(c, filters.sources) && cartridgeMatches(c, filters.query, texts[i]),
-      ),
-    [items, texts, filters],
-  )
+  const shown = useMemo(() => {
+    const found = items.filter(
+      (c, i) => inOrigins(c, filters.sources) && cartridgeMatches(c, filters.query, texts[i]),
+    )
+    // a search ranks the typed name first; a header sort replaces that order
+    return filters.query.trim() === '' || filters.sort
+      ? found
+      : found.toSorted(
+          (a, b) =>
+            cartridgeRank(b, filters.query) - cartridgeRank(a, filters.query) ||
+            compareCartridgeNames(a.name, b.name),
+        )
+  }, [items, texts, filters])
   const cells = useMemo(
     () => new Map(items.map((c) => [c.id, cartridgeCells(c, system)])),
     [items, system],
@@ -86,6 +97,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
       key: 'name',
       label: msg('Name'),
       value: (c) => c.name,
+      compare: (a, b) => compareCartridgeNames(a.name, b.name),
       cell: (c) => (
         <>
           {c.name}
@@ -102,6 +114,7 @@ export function CartridgeList({ packed }: { packed: PackedCartridge[] }) {
     {
       key: 'cal',
       label: msg('Caliber'),
+      unit: 'in, mm',
       help: msg('The common caliber of the bullet diameter G1.'),
       width: '5rem',
       value: (c) => c.maxBulletDiameter,

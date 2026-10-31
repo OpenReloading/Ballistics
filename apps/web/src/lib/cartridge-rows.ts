@@ -1,5 +1,5 @@
 /** The cartridge list's rows: search text, cells and the packed page props. */
-import { toSi } from '@open-reloading/schema'
+import { fold, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import type { CartridgeSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
@@ -30,6 +30,39 @@ export const cartridgeMatches = (
   query: string,
   text: string = cartridgeSearchText(c),
 ) => matchesQuery([text], query)
+
+const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
+const leadingNumber = /^\s*(\d+(?:[.,]\d+)?)([\s\S]*)$/
+
+/** Orders cartridge names: a leading number by value (5,6 after 5,56), then the rest with numbers by value. */
+export function compareCartridgeNames(a: string, b: string): number {
+  const x = leadingNumber.exec(a)
+  const y = leadingNumber.exec(b)
+  if (x?.[1] && y?.[1])
+    return (
+      Number(x[1].replace(',', '.')) - Number(y[1].replace(',', '.')) ||
+      collator.compare(x[2] ?? '', y[2] ?? '')
+    )
+  return x ? -1 : y ? 1 : collator.compare(a, b)
+}
+
+/** A name or query as typed words compare: folded, a dot ending a word, spaces and hyphens left out. */
+const plain = (s: string) =>
+  fold(s)
+    .trim()
+    .replace(/^\.(?=\d)/, '')
+    .replace(/\.(?=\s|$)/g, '')
+    .replace(/[\s-]+/g, '')
+
+/** 3 for the name typed in full, 2 for its start, 1 for the start of an alias, else 0. */
+export function cartridgeRank(c: CartridgeRow, query: string): number {
+  const q = plain(query)
+  if (!q) return 0
+  const name = plain(c.name)
+  if (name === q) return 3
+  if (name.startsWith(q)) return 2
+  return c.aliases.some((a) => plain(a).startsWith(q)) ? 1 : 0
+}
 
 /** A cartridge's number cells in the preset's units; empty without a value. */
 export function cartridgeCells(c: CartridgeRow, system: UnitSystem) {

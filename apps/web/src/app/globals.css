@@ -24,7 +24,7 @@
   --series-3: #19a371;
   --series-4: #c18300;
   --series-5: #e46494;
-  --series-6: #008300;
+  --series-6: #7c4dcc;
   --hair: #e3e7ec;
   --grid: #e6e9ee;
   --series-1-text: #1f66bf;
@@ -91,7 +91,7 @@
     --series-3: #199e70;
     --series-4: #c98500;
     --series-5: #d55181;
-    --series-6: #008300;
+    --series-6: #a98be8;
     --hair: #2a2f37;
     --grid: #2a2f37;
     --series-1-text: #7db3f5;
@@ -367,6 +367,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem 1rem;
+  margin-top: 1rem;
   margin-bottom: var(--panel-gap);
 }
 
@@ -474,6 +475,7 @@ main .home-cards h3 {
   font-size: var(--mantine-font-size-sm);
   gap: 0.125rem;
   width: 100%;
+  max-width: 30rem;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -543,11 +545,19 @@ main .home-cards h3 {
   }
 }
 
+/* one scrolling row on a phone */
 @media (max-width: 47.99em) {
-  .home-lead {
-    margin-top: 0.75rem;
+  .library-tabs .mantine-Tabs-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
   }
 
+  .library-tabs .mantine-Tabs-tab {
+    flex: none;
+  }
+}
+
+@media (max-width: 47.99em) {
   .home-cards {
     grid-auto-flow: row;
   }
@@ -626,6 +636,11 @@ td.nowrap {
 .aliases,
 .muted {
   color: var(--muted);
+}
+
+/* an alias in regular weight, so the name and the alias do not run together */
+.aliases {
+  font-weight: 400;
 }
 
 /* record tables: rules between rows and banded, as the report tables, but tighter */
@@ -916,6 +931,10 @@ td.nowrap {
   margin: 0.25rem 0 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-sm);
+}
+
+.search-status[data-covered] {
+  opacity: 0;
 }
 
 .prompt {
@@ -7050,10 +7069,16 @@ main .record-sources .sources tbody th {
   height: 300px;
 }
 
-/* the overlay on a wide window is taller (burn-rate-compare.tsx), so the curves are not flattened */
-@media screen and (min-width: 88em) {
-  .burn-overlay .vivacity-loading {
-    height: 420px;
+/* a row of the values reads across: the table stops at 40rem */
+.burn-overlay .curve-values {
+  max-width: 40rem;
+}
+
+/* the overlay's chart follows the window's height, so the curves are not flattened on a wide one */
+@media screen {
+  .burn-overlay .vivacity-loading,
+  .burn-overlay .echart > [role="img"] {
+    height: clamp(300px, 60vh, 520px);
   }
 }
 
@@ -7170,6 +7195,11 @@ main .record-sources .sources tbody th {
 .burn-neighbours p {
   margin: 0;
   color: var(--muted);
+}
+
+.burn-neighbours .record-note {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
 }
 
 .record-figure .record-note {
@@ -8396,8 +8426,25 @@ main .field-table tr.field-group > th {
 /* settings: one body height for every tab, so switching moves nothing; Close in a footer line */
 @media screen and (min-width: 36em) {
   .settings-dialog .mantine-Tabs-root {
-    min-height: 31rem;
+    min-height: min(31rem, 100dvh - 10rem);
   }
+}
+
+/* the header and the footer stay in view, only the tab area scrolls (as the safety dialog) */
+.settings-dialog .mantine-Modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-dialog .mantine-Modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* help text at the app's 12 px minimum */
+.settings-dialog :is(.mantine-Checkbox-description, .mantine-InputWrapper-description) {
+  font-size: 0.75rem;
 }
 
 /* the title as heavy as the panel headings */
@@ -10144,6 +10191,11 @@ main .page-bar h1 {
   display: contents;
 }
 
+/* the tour button's Indicator keeps a box, so its dot sits on the button */
+.page-bar-actions > .mantine-Indicator-root {
+  display: inline-flex;
+}
+
 /* Save's chevron: a square of the bar's control height */
 .save-more {
   width: var(--button-height, 2.25rem);
@@ -10479,6 +10531,17 @@ main .page-bar h1 {
   background: color-mix(in srgb, var(--link) 8%, var(--bg));
 }
 
+/* its look is the Source button's: the page background and the text colour, also as placeholder */
+.directory-filters > .sort-select .mantine-Input-input {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.directory-filters > .sort-select .mantine-Input-input::placeholder {
+  color: var(--fg);
+  opacity: 1;
+}
+
 /* the Sort of a phone and of a tablet's list box that hides columns */
 .directory-filters > .sort-select {
   display: none;
@@ -10692,19 +10755,14 @@ main .page-bar h1 {
 .directory-table .th-unit {
   display: block;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .directory-table .sort-mark {
   display: inline-flex;
   align-items: center;
   height: 1.25em;
-  opacity: 0;
-}
-
-@media (hover: none) {
-  .directory-table .sort-mark {
-    opacity: 0.4;
-  }
+  opacity: 0.4;
 }
 
 .directory-table th:hover .sort-mark,
@@ -10974,6 +11032,14 @@ main .page-bar h1 {
 .directory-table td .row-action {
   position: relative;
   z-index: 1;
+}
+
+/* an unchecked row box has the field border (3:1): the native one is nearly invisible in dark */
+.directory-table td .row-action input:not(:checked, :disabled) {
+  box-sizing: border-box;
+  border: 1px solid var(--input-border);
+  background: var(--bg);
+  appearance: none;
 }
 
 .inline-list {

@@ -121,7 +121,7 @@ function vivacityOption(
       // kept inside the chart: `.chart` clips overflow, a tooltip past its edge was cut and left text over the note
       confine: true,
       borderRadius: 0,
-      valueFormatter: (v: number) => formatNumber(v, 3),
+      valueFormatter: (v: number) => formatNumber(v, 2),
       backgroundColor: tokens.bg,
       borderColor: tokens.border,
       textStyle: { color: tokens.fg },

@@ -28,7 +28,7 @@ import {
   reduce,
 } from '../src/lib/bullet-designer.ts'
 import { seededRandom } from '../src/lib/ellipse.ts'
-import { fieldValueFromText } from '../src/lib/field-spec.ts'
+import { fieldError, fieldValueFromText } from '../src/lib/field-spec.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import type { ResolvedBullet } from '../src/lib/variants.ts'
 import { defined } from './defined.ts'
@@ -205,6 +205,16 @@ describe('refusals', () => {
       reason: 'Enter a number for Diameter.',
       field: 'diameter',
     })
+  })
+
+  it('keeps the page for a mass of zero or below with a record loaded and flags it at the field', () => {
+    for (const text of ['0', '-5']) {
+      const h = run(fromRecord(targetBullet, metric), type('mass', text))
+      expect(evaluate(h.present, metric, 'mass').computed, text).toEqual([])
+    }
+    const mass = defined(designerSpecs.find((s) => s.key === 'mass'))
+    for (const text of ['0', '-5'])
+      expect(fieldError(mass, fieldValueFromText('mass', metric, text), metric), text).toBeDefined()
   })
 
   it('asks for the other cannelure value', () => {

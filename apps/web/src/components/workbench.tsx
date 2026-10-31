@@ -615,6 +615,12 @@ function resultStatus(
   return phone ? t('Result {time}', { time: ok.at }) : t('Result of {time}', { time: ok.at })
 }
 
+/** The page bar's short result state; the sentence of `resultStatus` is its tooltip. */
+function resultBrief(ok: OkOutcome | undefined, stale: boolean, t: Translator['t']) {
+  if (!ok) return t('Not run')
+  return stale ? t('Inputs changed') : t('Run {time}', { time: ok.at })
+}
+
 /** Ctrl+Enter, or Enter in a field of the inputs, from any control of the bar and the workspace runs. */
 function frameKeyDown(inputs: Load['inputs'], run: Load['run']) {
   return (e: KeyboardEvent<HTMLDivElement>) => {
@@ -1294,8 +1300,12 @@ export function Workbench() {
               compact
               // line 1 the shown result, line 2 the File menu's state (portalled after it)
               status={
-                <span className="bar-result" data-stale={stale || undefined}>
-                  {resultStatus(ok, stale, false, t)}
+                <span
+                  className="bar-result"
+                  data-stale={stale || undefined}
+                  data-full={resultStatus(ok, stale, false, t)}
+                >
+                  {resultBrief(ok, stale, t)}
                 </span>
               }
               after={

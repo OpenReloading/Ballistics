@@ -345,7 +345,7 @@ const colourNames = [
   msg('Green'),
   msg('Ochre'),
   msg('Pink'),
-  msg('Dark green'),
+  msg('Purple'),
 ]
 
 /** The compass words of an aim offset as shown in the offset row. */

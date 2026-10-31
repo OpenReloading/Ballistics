@@ -46,6 +46,8 @@ export interface DirectoryColumn<T> {
   cell: (row: T, tabIndex: number) => ReactNode
   /** Sort key; columns without one do not sort. */
   value?: (row: T) => string | number | null | undefined
+  /** Ascending order of two rows, where the key's own order is not the column's. */
+  compare?: (a: T, b: T) => number
   num?: boolean
   /** A value equal to the row above's is set muted (a manufacturer's name once per run of its rows). */
   dim?: boolean
@@ -250,6 +252,9 @@ function useWindowedRows(count: number) {
 /** Sorts the rows by the sort's column when it has a value, else keeps the list order. */
 function sortedRows<T>(rows: readonly T[], columns: DirectoryColumn<T>[], sort: DirectorySort) {
   const by = columns.find((c) => c.key === sort?.column)
+  const { compare } = by ?? {}
+  if (sort && compare)
+    return rows.toSorted((a, b) => (sort.dir === 'ascending' ? 1 : -1) * compare(a, b))
   return sort && by?.value ? sortRows(rows, (r) => by.value?.(r) ?? undefined, sort.dir) : rows
 }
 
@@ -586,6 +591,7 @@ function HeadCell<T>({
         <Tooltip
           label={c.help && t(c.help)}
           disabled={!c.help}
+          position="bottom"
           events={tipEvents}
           multiline
           w={260}
@@ -714,7 +720,10 @@ function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
 function Cell({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
   return children === '' || children == null ? (
-    <span className="missing">{t('n/a')}</span>
+    <span className="missing">
+      <span aria-hidden="true">-</span>
+      <span className="visually-hidden">{t('n/a')}</span>
+    </span>
   ) : (
     children
   )
@@ -800,6 +809,8 @@ function SortSelect({
   onSort: (sort: DirectorySort) => void
 }) {
   const { t } = useTranslation()
+  // the input shows the chosen option as "Sort: Burn rate, low to high", the list the option alone
+  const plain = new Map<string, string>()
   const data = columns
     .filter((c) => c.value)
     .flatMap((c) => {
@@ -807,13 +818,16 @@ function SortSelect({
       return [
         {
           value: `${c.key} ascending`,
-          label: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
+          text: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
         },
         {
           value: `${c.key} descending`,
-          label: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
+          text: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
         },
-      ]
+      ].map(({ value, text }) => {
+        plain.set(value, text)
+        return { value, label: t('Sort: {text}', { text }) }
+      })
     })
   return (
     <Select
@@ -823,6 +837,7 @@ function SortSelect({
       size={controlSize.row.input}
       clearable
       data={data}
+      renderOption={({ option }) => plain.get(option.value)}
       value={sort ? `${sort.column} ${sort.dir}` : null}
       onChange={(v) => {
         const [column, dir] = v?.split(' ') ?? []

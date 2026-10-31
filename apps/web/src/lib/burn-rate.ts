@@ -13,7 +13,7 @@ import { nth } from './nth.ts'
 import { say, type Wording, worded } from './wording.ts'
 
 /** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
-export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '1 5'] as const
+export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '6 2 1 2'] as const
 
 /** Number of standard uncertainties in the vivacity interval (2). */
 export const uncertaintyFactor = 2
@@ -211,11 +211,6 @@ export const modelCaption = msg('Model output from fitted M3 parameters, not man
 /** What the band of a curve and the bar of a mean cover; 2 is `uncertaintyFactor`. */
 export const bandNote = msg(
   'Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
-)
-
-/** `bandNote` as the end of `modelCaption`: what the band and the bars of the burn-rate page's curves are. */
-export const bandAndBarsNote = msg(
-  'Band and bars: plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
 )
 
 const n2 = (v: number) => formatNumber(v, 2)

@@ -39,7 +39,7 @@ export const caseGroupCapacitySpec = {
   key: 'capacity',
   label: msg('Water capacity to the mouth'),
   help: msg(
-    'Measured on the cases of this group, for example fired and sized. The workbench takes it as the measured case capacity.',
+    'Measured on the cases of this group, for example fired and sized. Mean of the cases measured. The workbench takes it as the measured case capacity.',
   ),
   quantity: 'capacity',
   min: 0,

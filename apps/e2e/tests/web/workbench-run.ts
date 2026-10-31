@@ -19,7 +19,7 @@ export async function runExample(page: Page) {
   await loadForm(page)
     .getByLabel(/^Charge mass/)
     .press('Control+Enter')
-  await expect(page.getByText(/^Result of /)).toBeAttached({ timeout: 15_000 })
+  await expect(page.getByText(/^Run \d/)).toBeAttached({ timeout: 15_000 })
   // a record that arrives after Run marks the result stale until the automatic run replaces it
   await expect(page.locator('.result[data-running], .result [data-stale]')).toHaveCount(0, {
     timeout: 15_000,
