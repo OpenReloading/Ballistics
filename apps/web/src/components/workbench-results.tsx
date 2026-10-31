@@ -190,7 +190,17 @@ const ResultChart = memo(function ResultChart() {
 
 /** The Groups tab: the sheets of the saved load, with its ladder and simulated velocities. */
 function GroupsPanel() {
-  const { ok, identity, steps, velocity, fileId, storedTick, bulletDiameter, optic } = useResult()
+  const {
+    ok,
+    identity,
+    steps,
+    velocity,
+    fileId,
+    storedTick,
+    bulletDiameter,
+    optic,
+    chronoSessions,
+  } = useResult()
   const { groupsLadder } = useInputEcho()
   // a seating ladder has one charge: the sheets see the shown step alone, as a run without a ladder
   const single = singleCharge(ok)
@@ -203,6 +213,7 @@ function GroupsPanel() {
         load={fileId}
         stored={storedTick}
         ladder={groupsLadder}
+        sessions={chronoSessions}
         step={step}
         bulletDiameter={bulletDiameter}
         optic={optic}
@@ -219,6 +230,7 @@ function GroupsPanel() {
       fileId,
       storedTick,
       groupsLadder,
+      chronoSessions,
       step,
       bulletDiameter,
       optic,

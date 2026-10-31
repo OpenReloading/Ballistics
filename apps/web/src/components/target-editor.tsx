@@ -27,6 +27,7 @@ import {
   type GroupFace,
   photoTypes,
   recordIdRegex,
+  type SessionRecord,
   type SheetNote,
   type ShotGroup,
   type TargetSheet,
@@ -128,6 +129,7 @@ import {
 import { confirmDialog, offered, offerUndo } from './confirm.tsx'
 import { FileMenu, FileMenuPlaceholder } from './file-menu.tsx'
 import { useHoleDetection } from './hole-detection.tsx'
+import { LadderChrono } from './ladder-chrono.tsx'
 import { LazyLineChart } from './lazy-chart.tsx'
 import { PageBar } from './page-bar.tsx'
 import { usePopoverReturn } from './popover-return.ts'
@@ -526,6 +528,7 @@ type Ed = {
   setOpticChoice: (v: string) => void
   click: { label: string; click: number } | undefined
   ladderRows: ReturnType<typeof ladderExtremeSpreads>
+  sessions: SessionRecord[]
   meta: Meta
   setMeta: Dispatch<SetStateAction<Meta>>
   stored: boolean
@@ -1464,7 +1467,7 @@ function Headline({ ed }: { ed: Ed }) {
 /** Groups per ladder step of the load: the extreme spread chart and its table. */
 function LadderPanel({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
-  const { charges, ladderRows, system, stepLabels } = ed
+  const { charges, ladderRows, system, stepLabels, sheet, sessions, apply } = ed
   if (!charges) return null
   const turn = system.correction
   const oneDistance = ladderRows.every((r) => r.length !== undefined)
@@ -1515,6 +1518,12 @@ function LadderPanel({ ed }: { ed: Ed }) {
           ))}
         </Table.Tbody>
       </Table>
+      <LadderChrono
+        groups={sheet.groups}
+        sessions={sessions}
+        stepLabels={stepLabels}
+        onLink={(id, shots) => apply((s) => withGroup(s, id, (g) => ({ ...g, shots })))}
+      />
     </div>
   )
 }
@@ -2654,6 +2663,7 @@ export function TargetEditor({
   charges,
   stepLabels,
   step,
+  sessions,
   bulletDiameter,
   optic,
   expand,
@@ -2669,6 +2679,8 @@ export function TargetEditor({
   stepLabels?: string[] | undefined
   /** Index of the ladder step shown in the workbench; new groups take it. */
   step?: number | undefined
+  /** The load's chronograph sessions: the strings a ladder group's shots can be linked to. */
+  sessions?: SessionRecord[] | undefined
   /** Bullet diameter of the load, m: the marker of a new sheet. */
   bulletDiameter?: number | undefined
   /** The optic of the workbench's firearm, for the clicks to the point of aim. */
@@ -3776,6 +3788,7 @@ export function TargetEditor({
     setOpticChoice,
     click,
     ladderRows,
+    sessions: sessions ?? [],
     meta,
     setMeta,
     stored,

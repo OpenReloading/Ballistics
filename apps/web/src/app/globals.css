@@ -9846,6 +9846,12 @@ main .session-shots th:nth-child(-n + 2) {
   margin: 0.25rem 0;
 }
 
+.ladder-chrono {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .groups-tab {
   display: flex;
   flex-direction: column;

@@ -3933,6 +3933,8 @@
   "jacket": "Mantel",
   "gas check": "Kupferschuh",
   "{n} driving bands": "{n} Führungsbänder",
+  "{name}, step {step}": "{name}, Stufe {step}",
+  "{session}, {string}, {count} shots": "{session}, {string}, {count} Schüsse",
   "a ladder needs at least three charges": "Ein Ladeleiter braucht mindestens drei Treibladungen",
   "lead free": "bleifrei",
   "Tour": "Rundgang",
@@ -3944,6 +3946,7 @@
   "Runs the simulation in this browser with the values entered.": "Führt die Simulation in diesem Browser mit den eingegebenen Werten aus.",
   "Simulated velocity, peak pressure with its range over the input tolerances, and the trajectory. Results are simulations, not load data.": "Simulierte Geschwindigkeit, Spitzendruck mit seinem Bereich über die Toleranzen der Eingaben und die Flugbahn. Ergebnisse sind Simulationen, keine Ladedaten.",
   "Choose the file your chronograph wrote; it is read in this browser. The unit applies when the file gives none.": "Wählen Sie die Datei Ihres Chronographen; sie wird in diesem Browser gelesen. Die Einheit gilt, wenn die Datei keine nennt.",
+  "Chronograph, {group}": "Chronograph, {group}",
   "each charge needs at least two shots": "Jede Treibladung braucht mindestens zwei Schüsse",
   "Once a file is read: mean, spread and the other statistics of each string. Load example reads three made-up strings.": "Sobald eine Datei gelesen ist: Mittelwert, Streuung und die übrigen Kennwerte jeder Schussreihe. Beispiel laden liest drei erfundene Schussreihen.",
   "Each open load has a tab. New load starts another; Saved loads lists the loads kept in this browser.": "Jede offene Laborierung hat einen Reiter. Neue Laborierung beginnt eine weitere; Gespeicherte Laborierungen listet die in diesem Browser gespeicherten.",
@@ -3965,5 +3968,6 @@
   "heights and velocities must be finite": "Höhen und Geschwindigkeiten müssen endlich sein",
   "The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.": "Das Blatt wird in diesem Browser gespeichert. Speichern schreibt es in eine Datei; Öffnen liest eine Blattdatei.",
   "How to measure bullet dimensions": "So messen Sie die Geschossmaße",
+  "Session not in this browser": "Sitzung nicht in diesem Browser",
   "slope must be finite": "Die Steigung muss endlich sein"
 }
