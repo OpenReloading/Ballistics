@@ -615,9 +615,10 @@ type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
 /**
  * What the seated bullet changes of volume and travel: the fields to write (empty, or still the
- * last seated value) and the values that follow it from now on.
+ * last seated value; a volume that followed a seating without one is emptied) and the values that
+ * follow it from now on.
  */
-function followPlan(
+export function followPlan(
   values: Seated,
   now: Fields,
   a: {
@@ -632,7 +633,13 @@ function followPlan(
   for (const k of previewKeys) {
     const v = values[k]
     const si = now[k]?.si
-    if (v === undefined) continue
+    if (v === undefined) {
+      // a case volume but none behind the bullet (not seated): the earlier seating's volume goes
+      const unseated = k === 'volume' && values.caseVolume !== undefined
+      if (unseated && si !== undefined && si === a.previewed[k])
+        next[k] = { text: '', si: undefined }
+      continue
+    }
     const wasDefault = k === 'volume' && a.followed.has(k) && si === a.written.volume
     if (si !== undefined && Math.abs(si - v) <= 1e-9 * v) following[k] = si
     else if (si === undefined || si === a.previewed[k] || wasDefault) {
@@ -1486,7 +1493,7 @@ export function useWorkbenchState() {
     const reported = seatingOf(values)
     if (reported) setSeatingStart((s) => (values.atStart ? reported : (s ?? reported)))
     // no bullet seated for now (a record loading): what follows the seating keeps following it
-    if (values.volume === undefined && values.travel === undefined) return
+    if (values.overallLength === undefined) return
     const now = form.getValues()
     const { next, following } = followPlan(values, now, {
       followed,
