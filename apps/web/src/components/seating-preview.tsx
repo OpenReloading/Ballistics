@@ -1,6 +1,6 @@
 'use client'
 
-import { NativeSelect } from '@mantine/core'
+import { Anchor, NativeSelect } from '@mantine/core'
 import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { drawnTables } from '@open-reloading/drawing/cartridge'
@@ -47,6 +47,7 @@ import {
 } from '../lib/case-capacity.ts'
 import type { OwnCase } from '../lib/case-group.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import { capacityGuide } from '../lib/docs-url.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { figureViewBuilder } from '../lib/figure-views.ts'
 import type { LandsContact } from '../lib/firearm.ts'
@@ -1423,39 +1424,52 @@ function MeasuredCapacity({ m }: { m: Model }) {
   const { t } = useTranslation()
   const { system, stock, chosenCase, names, designed, measuredWaterCapacity } = m
   return (
-    <NumberField
-      spec={{
-        ...measuredWaterCapacitySpec,
-        help: designed
-          ? msg(
-              'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
-            )
-          : msg(
-              "Measured: water to the mouth of your fired cases. Replaces the capacity or brass record; empty: the record's value.",
-            ),
-      }}
-      system={system}
-      value={measuredWaterCapacity}
-      onChange={(v) => m.p.onMeasuredWaterCapacity?.(v)}
-      // the record's capacity in the field while none is typed
-      placeholder={
-        stock ? (s) => formatQuantity('capacity', s, waterVolume(stock.grams)) : undefined
-      }
-      flag={
-        stock && measuredWaterCapacity.si === undefined
-          ? {
-              kind: 'record',
-              text: stock.record
-                ? t('From the capacity record {record}. Type a measured capacity to replace it.', {
-                    record: capacityText(stock.record, names, t),
-                  })
-                : t('From the brass record {record}. Type a measured capacity to replace it.', {
-                    record: chosenCase ? caseText(chosenCase, names, t) : '',
-                  }),
-            }
-          : undefined
-      }
-    />
+    <>
+      <NumberField
+        spec={{
+          ...measuredWaterCapacitySpec,
+          help: designed
+            ? msg(
+                'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
+              )
+            : msg(
+                "Measured: water to the mouth of your fired cases. Replaces the capacity or brass record; empty: the record's value.",
+              ),
+        }}
+        system={system}
+        value={measuredWaterCapacity}
+        onChange={(v) => m.p.onMeasuredWaterCapacity?.(v)}
+        // the record's capacity in the field while none is typed
+        placeholder={
+          stock ? (s) => formatQuantity('capacity', s, waterVolume(stock.grams)) : undefined
+        }
+        flag={
+          stock && measuredWaterCapacity.si === undefined
+            ? {
+                kind: 'record',
+                text: stock.record
+                  ? t(
+                      'From the capacity record {record}. Type a measured capacity to replace it.',
+                      {
+                        record: capacityText(stock.record, names, t),
+                      },
+                    )
+                  : t('From the brass record {record}. Type a measured capacity to replace it.', {
+                      record: chosenCase ? caseText(chosenCase, names, t) : '',
+                    }),
+              }
+            : undefined
+        }
+      />
+      {/* the workbench card has no room for the row: its More popover holds the link */}
+      {capacityGuide && !m.slots && (
+        <p className="note">
+          <Anchor href={capacityGuide} target="_blank" rel="noopener" size="sm">
+            {t('How to measure case capacity')}
+          </Anchor>
+        </p>
+      )}
+    </>
   )
 }
 

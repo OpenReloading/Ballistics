@@ -8,6 +8,7 @@ import {
   powderKind,
   primerKind,
 } from '../src/components/record-choosers.tsx'
+import { setShownLanguage } from '../src/i18n/shown.ts'
 import { english } from '../src/i18n/translate.ts'
 import type { BulletRow } from '../src/lib/bullet-rows.ts'
 import type { PowderRow } from '../src/lib/burn-rate.ts'
@@ -138,6 +139,21 @@ it('the cartridge chooser shows caliber, case type and Pmax, ranks as the API an
   expect(ids(cartridgeKind, rows, '', 'caliber')).toEqual(['308-norma', '308-win', 'own', '6-5x55'])
   expect(ids(cartridgeKind, rows, 'nothing')).toEqual([])
   expect(t(cartridgeKind.texts.empty)).toBe('No cartridge matches')
+})
+
+it('the cartridge chooser names the countries as the record page does, in the language shown', () => {
+  const country = (text: string) =>
+    cartridgeKind
+      .facts(cartridge({ id: 'c', name: 'C', country: text }), system, t)
+      .find(([k]) => k === 'Country')?.[1]
+  expect(country('United states')).toBe('United States')
+  setShownLanguage('de')
+  try {
+    expect(country('United states')).toBe('Vereinigte Staaten')
+    expect(country('Germany, us')).toBe('Deutschland, Vereinigte Staaten')
+  } finally {
+    setShownLanguage('en')
+  }
 })
 
 // invented firearms, lengths in m

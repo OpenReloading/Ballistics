@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { meanRadius } from '../src/lib/ellipse.ts'
 import { findFace } from '../src/lib/face-search.ts'
 import {
+  confidenceOf,
   type FaceFit,
   faceLabel,
   fitDiameter,
@@ -219,6 +220,22 @@ describe('findFace on drawn faces', () => {
     // the rings cannot tell them apart; each fit has its own scale, 1.6 % apart
     const [x = missing(), y = missing()] = found.fits.map((f) => f.pxPerMm)
     expect(Math.max(x, y) / Math.min(x, y)).toBeCloseTo(1.016, 3)
+  })
+})
+
+describe('the confidence of a ranked face', () => {
+  it('is the share of right first choices with as many rings matched', () => {
+    const counts = { 4: { right: 9, wrong: 1 }, 5: { right: 0, wrong: 0 } }
+    expect(confidenceOf(4, counts)).toBe(0.9)
+    expect(confidenceOf(5, counts)).toBeUndefined()
+    expect(confidenceOf(3, counts)).toBeUndefined()
+  })
+
+  it('is undefined on every ranked face while no counts exist', () => {
+    const image = render(scene(faceById('issf-10m-air-rifle'), defined(views[0]))).image
+    const found = findFace(image, faces)
+    expect(found.ranked.length).toBeGreaterThan(0)
+    for (const r of found.ranked) expect(r.confidence).toBeUndefined()
   })
 })
 

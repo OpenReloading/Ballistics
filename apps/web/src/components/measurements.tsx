@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@mantine/core'
+import { Anchor, Button } from '@mantine/core'
 import type { VelocityUnit } from '@open-reloading/importers'
 import { chronoSession, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { chronoFileBytes, chronoMessageText, readChrono } from '../lib/chrono.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import { chronographGuide } from '../lib/docs-url.ts'
 import { errorText } from '../lib/error-text.ts'
 import { withSessionRounds } from '../lib/firearm.ts'
 import {
@@ -469,6 +470,14 @@ export function Measurements({
               { distances: distances.join(', ') },
             )
           : t('Chronograph velocities are not corrected to the muzzle.')}
+        {chronographGuide && (
+          <>
+            {' '}
+            <Anchor href={chronographGuide} target="_blank" rel="noopener">
+              {t('How to set up a chronograph')}
+            </Anchor>
+          </>
+        )}
       </p>
       <ChronoFileInput
         id={`${idPrefix}-file`}

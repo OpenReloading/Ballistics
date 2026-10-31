@@ -17,7 +17,7 @@ export const chargeTargetKinds = [
   'bulletLeadTime',
 ] as const
 
-/** `unit` `percentOfLimit` (peak pressure only): `value` is a percentage of the first compared limit of `cartridge`. */
+/** `unit` `percentOfLimit` (peak pressure only): `value` is a percentage of the compared limit of `cartridge`. */
 const target = z
   .strictObject({
     kind: z
@@ -34,7 +34,7 @@ const target = z
       .literal('percentOfLimit')
       .optional()
       .describe(
-        'Only for peakPressure: value is a percentage of the first compared CIP limit of cartridge.',
+        'Only for peakPressure: value is a percentage of the compared CIP limit of cartridge. A cartridge whose compared limits differ by variant is refused with 422 severalLimits.',
       ),
   })
   .refine((t) => t.unit === undefined || t.kind === 'peakPressure', {

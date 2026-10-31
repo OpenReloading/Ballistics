@@ -18,8 +18,19 @@ export const docsPage = (docs: string | undefined, page: string): string | undef
   docs && `${docs.replace(/\/?$/, '/')}${page}`
 
 // inlined at build; no link without a docs site
+const docs = docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS)
+
 /** The photo guide, how to take a target photo that hole detection can read. */
-export const photoGuide = docsPage(
-  docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS),
-  'photo-guide/',
-)
+export const photoGuide = docsPage(docs, 'photo-guide/')
+
+/** The guide to measuring case capacity with water. */
+export const capacityGuide = docsPage(docs, 'guides/case-capacity/')
+
+/** The guide to placing a chronograph and its distance to the muzzle. */
+export const chronographGuide = docsPage(docs, 'guides/chronograph-setup/')
+
+/** The guide to firing a charge ladder for the powder fit. */
+export const ladderGuide = docsPage(docs, 'guides/chronograph-ladder/')
+
+/** The guide to measuring powder temperature. */
+export const temperatureGuide = docsPage(docs, 'guides/powder-temperature/')

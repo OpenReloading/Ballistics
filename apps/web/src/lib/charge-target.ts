@@ -196,6 +196,9 @@ export function refusalText(
     toleranceNotReached: msg('The search did not reach its tolerance.'),
     noValidRun: msg('No charge in the range gives a valid run with this value.'),
     noComparableLimit: noComparableLimitText,
+    severalLimits: msg(
+      'The cartridge has a different CIP limit for each variant, so a percentage has no single limit. Enter the pressure instead.',
+    ),
   }
   const known = reason && reasons[reason]
   if (known) return t(known)

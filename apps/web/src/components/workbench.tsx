@@ -48,7 +48,9 @@ import { PageBar } from './page-bar.tsx'
 import { PrintReport } from './print-report.tsx'
 import { useReportOptions } from './report-host.ts'
 import { SavedLoads, useExportReminder } from './saved-loads.tsx'
+import type { ScanLabelDialog } from './scan-label-dialog.tsx'
 import { useShortcuts } from './shortcuts.tsx'
+import { TourButton } from './tour-button.tsx'
 import { useBarrelStudy } from './use-barrel-study.ts'
 import { useLoadTabs } from './use-load-tabs.ts'
 import { useLotRows } from './use-lot-rows.ts'
@@ -724,6 +726,7 @@ type CommandArgs = {
   workspace: Load['workspace']
   openTarget: () => void
   openList: () => void
+  openScan: () => void
   link: ReturnType<typeof useCopyLink>
   asNewLoad: Load['asNewLoad']
   fillExample: Load['fillExample']
@@ -752,6 +755,7 @@ function searchCommands(a: CommandArgs) {
     ...(a.phone ? [{ label: t('Range tab'), run: () => a.workspace.current?.showRange() }] : []),
     { label: t('Charge for a target'), run: a.openTarget },
     { label: t('Saved loads'), run: a.openList },
+    { label: t('Scan box label'), run: a.openScan },
     { label: t('Copy link'), run: a.link.copy },
     { label: t('Example load'), run: a.asNewLoad(a.fillExample) },
     { label: t('Reset load'), run: a.asNewLoad(a.reset) },
@@ -944,6 +948,8 @@ export function Workbench() {
   const [listOpen, setListOpen] = useState(false)
   const [targetOpen, setTargetOpen] = useState(false)
   const [TargetDialog, setTargetDialog] = useState<typeof ChargeTargetDialog>()
+  const [scanOpen, setScanOpen] = useState(false)
+  const [ScanDialog, setScanDialog] = useState<typeof ScanLabelDialog>()
   const { changed: countChange } = reminder
   const stored = useCallback(() => {
     load.onStored()
@@ -1247,6 +1253,15 @@ export function Workbench() {
   /** What opened Saved loads, which gets the focus back: a selector, none for the menu's item. */
   const listOpener = useRef<string | undefined>(undefined)
   const openList = useCallback(() => setListOpen(true), [])
+  // a plain import() on first open: next/dynamic would count the dialog in the route's weight
+  const openScan = useCallback(
+    () =>
+      import('./scan-label-dialog.tsx').then((m) => {
+        setScanDialog(() => m.ScanLabelDialog)
+        setScanOpen(true)
+      }),
+    [],
+  )
   const openListFromSwitcher = useCallback(() => {
     listOpener.current = '.load-switch'
     setListOpen(true)
@@ -1349,6 +1364,7 @@ export function Workbench() {
                   }
                   after={
                     <>
+                      <TourButton page="workbench" />
                       <PrintMenu ok={ok} printReport={printReport} />
                       <PrintViews
                         load={load}
@@ -1401,9 +1417,20 @@ export function Workbench() {
               onStored={stored}
               reminder={reminder.text}
               system={system}
+              onScan={() => {
+                setListOpen(false)
+                openScan()
+              }}
             />
             {TargetDialog && (
               <TargetDialog opened={targetOpen} onClose={() => setTargetOpen(false)} />
+            )}
+            {ScanDialog && (
+              <ScanDialog
+                opened={scanOpen}
+                onClose={() => setScanOpen(false)}
+                onOpen={tabs.openRecord}
+              />
             )}
             <WorkbenchSearch
               onRun={() => run()}
@@ -1423,6 +1450,7 @@ export function Workbench() {
                     setTargetOpen(true)
                   }),
                 openList,
+                openScan,
                 link,
                 asNewLoad,
                 fillExample,

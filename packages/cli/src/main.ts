@@ -56,14 +56,14 @@ example:
   node packages/cli/dist/bin.js operations`,
 }
 
-/** Parses a command line, an unknown or malformed option is bad input with the usage. */
-function parse<T extends ParseArgsConfig>(config: T) {
+/** Parses a command line, an unknown or malformed option is bad input with `help`. */
+function parse<T extends ParseArgsConfig>(config: T, help = usage) {
   try {
     return parseArgs(config)
   } catch (error) {
     // parseArgs reports an unknown or malformed option as a TypeError with a code
     if (error instanceof TypeError && 'code' in error)
-      throw new UsageError(`${error.message}\n\n${usage}`)
+      throw new UsageError(`${error.message}\n\n${help}`)
     throw error
   }
 }
@@ -168,19 +168,22 @@ async function operate(
 ) {
   const { listOperations, runOperation } = await import('./operations.ts')
   if (command === 'operations') {
-    parse({ args, strict: true, options: { json: { type: 'boolean' } } })
+    parse({ args, strict: true, options: { json: { type: 'boolean' } } }, commandHelp.operations)
     return listOperations()
   }
-  const { values, positionals } = parse({
-    args,
-    strict: true,
-    allowPositionals: true,
-    options: {
-      input: { type: 'string' },
-      records: { type: 'string', multiple: true },
-      json: { type: 'boolean' },
+  const { values, positionals } = parse(
+    {
+      args,
+      strict: true,
+      allowPositionals: true,
+      options: {
+        input: { type: 'string' },
+        records: { type: 'string', multiple: true },
+        json: { type: 'boolean' },
+      },
     },
-  })
+    commandHelp.run,
+  )
   const [name, ...extra] = positionals
   if (name === undefined || extra.length > 0 || values.input === undefined)
     throw new UsageError(commandHelp.run)
@@ -209,9 +212,13 @@ function failure(error: unknown): {
   }
 }
 
-/** The error on stderr: one JSON object for a script, the text line on a terminal; never a stack trace. */
-function report(error: unknown, json: boolean, io: Io): number {
+/**
+ * The error of the command line `argv` on stderr: one JSON object for `--json` or a script, the
+ * text line on a terminal; never a stack trace. Returns the exit code.
+ */
+export function report(error: unknown, argv: string[], io: Io): number {
   const { kind, code, message, details } = failure(error)
+  const json = argv.includes('--json') || !io.tty
   if (json) io.stderr(`${JSON.stringify({ error: { kind, message, ...details } })}\n`)
   else if (kind === 'refused') io.stderr(`refused: ${message}\n`)
   else if (kind === 'usage') io.stderr(`${message}\n`)
@@ -245,6 +252,6 @@ export async function run(argv: string[], env: NodeJS.ProcessEnv, io: Io): Promi
     io.stdout(`${await execute(command, args, env, io)}\n`)
     return 0
   } catch (error) {
-    return report(error, argv.includes('--json') || !io.tty, io)
+    return report(error, argv, io)
   }
 }

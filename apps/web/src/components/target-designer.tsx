@@ -213,8 +213,8 @@ export function TargetDesigner() {
     </div>
   ))
 
-  const head = (cells: ReactNode[]) => (
-    <div className="face-row face-head" aria-hidden="true">
+  const head = (cells: ReactNode[], row = 'face-row') => (
+    <div className={`${row} face-head`} aria-hidden="true">
       {cells.map((c, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: fixed header cells
         <span key={i}>{c}</span>
@@ -294,12 +294,15 @@ export function TargetDesigner() {
       title: t('Events of the target'),
       content: (
         <div className="side-grid">
-          {head([
-            t('Name'),
-            t('Distance, {unit}', { unit: system.range.symbol }),
-            t('Gauge, {unit}', { unit: mm }),
-            '',
-          ])}
+          {head(
+            [
+              t('Name'),
+              t('Distance, {unit}', { unit: system.range.symbol }),
+              t('Gauge, {unit}', { unit: mm }),
+              '',
+            ],
+            'face-row face-event',
+          )}
           {eventRows}
           <Button
             variant="default"

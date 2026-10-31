@@ -1,8 +1,20 @@
 #!/usr/bin/env node
-import { run } from './main.ts'
+import { report, run } from './main.ts'
 
-process.exitCode = await run(process.argv.slice(2), process.env, {
-  stdout: (text) => process.stdout.write(text),
-  stderr: (text) => process.stderr.write(text),
+const argv = process.argv.slice(2)
+const io = {
+  stdout: (text: string) => process.stdout.write(text),
+  stderr: (text: string) => process.stderr.write(text),
   tty: process.stdout.isTTY === true,
+}
+
+// a reader that stops early (head, a pager) closes the pipe: that ends the run, it is no failure
+process.stdout.on('error', (error: NodeJS.ErrnoException) => {
+  if (error.code === 'EPIPE') process.exit(0)
+  report(error, argv, {
+    ...io,
+    stderr: (text) => process.stderr.write(text, () => process.exit(3)),
+  })
 })
+
+process.exitCode = await run(argv, process.env, io)

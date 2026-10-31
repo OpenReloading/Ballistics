@@ -6,7 +6,7 @@ import type { InteriorResponse } from './api-types.ts'
 import { nth } from './nth.ts'
 import { type PlaybackResult, type PlaybackSample, sampler } from './playback.ts'
 import { type UnitSystem, withUnit } from './units.ts'
-import { firstPressureLimit } from './workbench.ts'
+import { pressureLimit } from './workbench.ts'
 
 /** x axis of the interior chart: bullet travel or time since ignition. */
 export type ChartX = 'travel' | 'time'
@@ -162,11 +162,11 @@ type Limit = NonNullable<InteriorResponse['limits']>[number]
 const referenceLines = [85, 75] as const
 
 /**
- * Lines at the first compared limit with a pressure, as "Percent of maximum" uses, and at the
+ * Lines at the compared limit with a pressure (`pressureLimit`), as "Percent of maximum" uses, and at the
  * `referenceLines` percentages of it, in display units; undefined without such a limit. Never "safe".
  */
 export function limitLines(limits: Limit[] | undefined, system: UnitSystem, t: Translator['t']) {
-  const l = firstPressureLimit(limits)
+  const l = pressureLimit(limits)
   if (l?.pressure === undefined) return
   const name = `CIP ${l.symbol}`
   const value = withUnit('pressure', system, l.pressure)

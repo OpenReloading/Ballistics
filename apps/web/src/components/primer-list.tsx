@@ -46,6 +46,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
       key: 'number',
+      wide: true,
       label: msg('Product number'),
       width: '9rem',
       value: (r) => r.productNumber,
@@ -67,6 +68,7 @@ export function PrimerList({ rows }: { rows: PrimerRow[] }) {
     },
     {
       key: 'compound',
+      wide: true,
       label: msg('Compound'),
       width: '10rem',
       value: (r) => r.compound,

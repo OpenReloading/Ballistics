@@ -1,6 +1,15 @@
 'use client'
 
-import { ActionIcon, Button, Loader, NumberInput, Paper, Popover, Switch } from '@mantine/core'
+import {
+  ActionIcon,
+  Anchor,
+  Button,
+  Loader,
+  NumberInput,
+  Paper,
+  Popover,
+  Switch,
+} from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
@@ -18,6 +27,7 @@ import { findBullets } from '../lib/bullet-search.ts'
 import type { CartridgeRow } from '../lib/cartridge-rows.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
+import { capacityGuide } from '../lib/docs-url.ts'
 import { loadExample } from '../lib/example-data.ts'
 import { quickCartridges } from '../lib/examples.ts'
 import {
@@ -1315,6 +1325,13 @@ function CardMore({ panel }: { panel: InputPanel }) {
         )}
         <SeatingSlot name="more" />
         <SeatingSlot name="moreValues" />
+        {capacityGuide && (
+          <p className="note">
+            <Anchor href={capacityGuide} target="_blank" rel="noopener" size="sm">
+              {t('How to measure case capacity')}
+            </Anchor>
+          </p>
+        )}
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>

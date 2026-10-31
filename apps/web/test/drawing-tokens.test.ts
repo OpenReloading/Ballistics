@@ -61,6 +61,15 @@ describe('drawing tokens', () => {
       expect(light.get('--mantine-color-disabled-color')).toBe('var(--muted)')
       expect(ratio(tokens.get('--muted') as string, fill)).toBeGreaterThanOrEqual(4.5)
     })
+  // Mantine's field fills: white in light, dark-6 in dark
+  for (const [theme, tokens, fill] of [
+    ['light', light, '#ffffff'],
+    ['dark', dark, '#2e2e2e'],
+  ] as const)
+    it(`gives placeholders 4.5:1 against the field fill in ${theme}`, () => {
+      expect(light.get('--mantine-color-placeholder')).toBe('var(--muted)')
+      expect(ratio(tokens.get('--muted') as string, fill)).toBeGreaterThanOrEqual(4.5)
+    })
   // Message in states.tsx: each variant's text on its own fill
   for (const [theme, tokens] of [
     ['light', light],
@@ -109,6 +118,11 @@ describe('drawing tokens', () => {
   it('leaves the border of an error or success field to Mantine', () => {
     const selector = css.match(/([^{}]*)\{\s*--input-bd:\s*var\(--input-border\)/)?.[1] ?? missing()
     expect(selector).toContain(':not([data-error]):not([data-success])')
+  })
+  it('gives an unchecked checkbox and radio the field border, other states to Mantine', () => {
+    const rule = css.match(/([^{}]*)\{\s*border-color:\s*var\(--input-border\)/)?.[1] ?? missing()
+    expect(rule).toContain('.mantine-Checkbox-input:not(:checked, [data-indeterminate], :disabled')
+    expect(rule).toContain('.mantine-Radio-radio:not(:checked, :disabled')
   })
   it('gives shot groups the light chart series colours', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))

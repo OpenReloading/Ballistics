@@ -558,6 +558,30 @@ describe('seat', () => {
     const deep = seat({ ...base, bullet: flat, by: { kind: 'overallLength', value: 51 } })
     expect(deep.notes.join(' ')).toMatch(/whole bullet/)
   })
+
+  it('gives no volume behind the bullet for a base behind the case head or a bullet that fills the case', () => {
+    const short = { ...chamber, caseLength: 50 }
+    const behind = seat({
+      chamber: short,
+      waterCapacity: 3,
+      waterDensity: 1,
+      bullet: { ...flat, length: 80 },
+      by: { kind: 'overallLength', value: 60 },
+    })
+    expect(behind.depth.value).toBeCloseTo(70, 9)
+    expect(behind.volumeBehindBullet).toBeUndefined()
+    expect(behind.caseVolume?.value).toBe(3)
+    expect(behind.notes.join(' ')).toMatch(/behind the case head/)
+    const full = seat({
+      chamber: short,
+      waterCapacity: 0.1,
+      waterDensity: 1,
+      bullet: flat,
+      by: { kind: 'overallLength', value: 55 },
+    })
+    expect(full.volumeBehindBullet).toBeUndefined()
+    expect(full.notes.join(' ')).toMatch(/takes the whole case volume/)
+  })
 })
 
 describe('coalRange', () => {

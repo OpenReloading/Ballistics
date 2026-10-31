@@ -64,3 +64,101 @@ for (const language of languages)
       ),
     ).toBe(0)
   })
+
+test('a printed box label opens its load by photo, by camera and by its text', async ({ page }) => {
+  await page.addInitScript(() => {
+    // Save writes a file: the origin private file system stands in for the save dialog
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+    window.print = () => {}
+    // the fake camera: a canvas stream of the label image the test hands over, calls counted
+    const w = window as unknown as Record<string, unknown>
+    w.cameraCalls = 0
+    navigator.mediaDevices.getUserMedia = async () => {
+      w.cameraCalls = (w.cameraCalls as number) + 1
+      const img = new Image()
+      img.src = w.labelImage as string
+      await img.decode()
+      const canvas = document.createElement('canvas')
+      canvas.width = 640
+      canvas.height = 480
+      const g = canvas.getContext('2d')
+      if (!g) throw new Error('No canvas for the fake camera.')
+      g.fillStyle = '#fff'
+      const draw = () => {
+        g.fillRect(0, 0, 640, 480)
+        g.drawImage(img, 120, 40, 400, 400)
+        requestAnimationFrame(draw)
+      }
+      draw()
+      const stream = canvas.captureStream(10)
+      w.cameraStream = stream
+      return stream
+    }
+  })
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await gotoHydrated(page, '/workbench')
+  await applyExampleLoad(page)
+  await (await barButton(page, 'Save')).click()
+  await expect(page.locator('.file-state')).toContainText('Saved')
+  const openSaved = async () => {
+    await (await barButton(page, 'Open')).click()
+    await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
+    await expect(page.getByRole('dialog', { name: 'Saved loads' })).toBeVisible()
+  }
+
+  // the printed label as an image
+  await openSaved()
+  await page.getByRole('button', { name: /^Print a box label of / }).click()
+  await page.emulateMedia({ media: 'print' })
+  const image = await page.locator('.box-labels .box-label-code').screenshot()
+  const text = await page.locator('.box-labels .box-label-code p').innerText()
+  await page.emulateMedia({ media: 'screen' })
+  // a new page ends the print state
+  await gotoHydrated(page, '/workbench')
+
+  const scan = page.getByRole('dialog', { name: 'Scan box label' })
+  // photo
+  await openSaved()
+  await page.getByRole('button', { name: 'Scan box label' }).click()
+  await expect(scan).toBeVisible()
+  expect(
+    await page.evaluate(() => (window as unknown as Record<string, unknown>).cameraCalls),
+  ).toBe(0)
+  await scan
+    .locator('input[type="file"]')
+    .setInputFiles({ name: 'label.png', mimeType: 'image/png', buffer: image })
+  await expect(scan).toBeHidden()
+
+  // a label of a load this browser lacks: the dialog stays open and says so
+  await openSaved()
+  await page.getByRole('button', { name: 'Scan box label' }).click()
+  await scan.getByLabel('Label text').fill('OR1:L:00000000-0000-4000-8000-000000000000')
+  await page.keyboard.press('Enter')
+  await expect(scan).toContainText('This load is not saved in this browser and edition.')
+  // the printed text
+  await scan.getByLabel('Label text').fill(text)
+  await page.keyboard.press('Enter')
+  await expect(scan).toBeHidden()
+
+  // camera, from Ctrl+K
+  await page.evaluate(
+    (src) => {
+      ;(window as unknown as Record<string, unknown>).labelImage = src
+    },
+    `data:image/png;base64,${image.toString('base64')}`,
+  )
+  await page.keyboard.press('Control+k')
+  await page.keyboard.type('Scan box label')
+  await page.getByRole('button', { name: 'Scan box label', exact: true }).click()
+  await expect(scan).toBeVisible()
+  await scan.getByRole('button', { name: 'Start camera' }).click()
+  await expect(scan).toBeHidden()
+  expect(
+    await page.evaluate(() =>
+      ((window as unknown as Record<string, unknown>).cameraStream as MediaStream)
+        .getTracks()
+        .every((t) => t.readyState === 'ended'),
+    ),
+  ).toBe(true)
+})

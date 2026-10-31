@@ -48,8 +48,9 @@ const unprocessableAnswer = (reason: string, message: string, extra: object = {}
 })
 
 /**
- * The target of the solver: the request's, or for a percentage target a share of the first
- * compared limit, as the workbench's percent readout; a 422 body when there is no such limit.
+ * The target of the solver: the request's, or for a percentage target a share of the compared
+ * limit, as the workbench's percent readout; a 422 body when there is no such limit or when the
+ * compared limits of the cartridge's variants differ.
  */
 function percentTarget(
   body: ChargeBody,
@@ -57,14 +58,18 @@ function percentTarget(
 ):
   | {
       target: ChargeTarget
-      limit?: Pick<Limit, 'cartridge' | 'revised' | 'symbol'> & { pressure: number }
+      limit?: Pick<Limit, 'cartridge' | 'revised' | 'symbol' | 'variant'> & { pressure: number }
     }
   | { refusal: ReturnType<typeof unprocessableAnswer> } {
   const target: ChargeTarget = { kind: body.target.kind, value: body.target.value }
   if (body.target.unit !== 'percentOfLimit') return { target }
-  const found =
-    cartridge && limitCheck(emptyPressureRange, cartridge).limits?.find((l) => l.compared)
-  if (!found || found.pressure === undefined)
+  const compared = cartridge
+    ? (limitCheck(emptyPressureRange, cartridge).limits ?? []).filter(
+        (l) => l.compared && l.pressure !== undefined,
+      )
+    : []
+  const [found] = compared
+  if (found?.pressure === undefined)
     return {
       refusal: unprocessableAnswer(
         'noComparableLimit',
@@ -73,10 +78,18 @@ function percentTarget(
           : `${body.cartridge} has no CIP Pmax measured by transducer or piezo`,
       ),
     }
+  if (compared.some((l) => l.pressure !== found.pressure))
+    return {
+      refusal: unprocessableAnswer(
+        'severalLimits',
+        `${body.cartridge} has several CIP Pmax values, one per variant (${compared.map((l) => l.variant ?? '-').join(', ')}); a percentage target needs one limit`,
+      ),
+    }
   const limit = {
     cartridge: found.cartridge,
     revised: found.revised,
     symbol: found.symbol,
+    ...(found.variant !== undefined && { variant: found.variant }),
     pressure: found.pressure,
   }
   return {

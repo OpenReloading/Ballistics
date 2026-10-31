@@ -355,6 +355,23 @@ describe('buildRecords', () => {
     expect(idOfKey('a')).toBe(idOfKey('a'))
   })
 
+  it('warns with both rows when two rows give the same id', () => {
+    const t = tableOf(
+      csv([
+        ['name', 'maker', 'diameter', 'mass', 'bcG1'],
+        ['B1', 'M1', '7.82', '175', '0.5'],
+        ['B1', 'M1', '7.82', '175', '0.6'],
+      ]),
+    )
+    const b = buildRecords(t, 'bullet', autoMap(t, 'bullet'), now)
+    expect(b.warnings.map((w) => [w.row, w.column, w.cell])).toEqual([[3, 'name', 'B1']])
+    // the hint names the fields of the id: a changed bcG1 would leave the id and the drop as they are
+    expect(b.warnings[0]?.reason).toBe(
+      'Rows 2 and 3 give the same name, maker, diameter and mass, so one id: only row 2 is imported. Change the name, maker, diameter or mass of row 3 to import it as a record of its own.',
+    )
+    expect(b.counts).toEqual({ accepted: 2, warned: 1, rejected: 0 })
+  })
+
   it('rejects every row when no column is mapped to a required field', () => {
     const t = tableOf(
       csv([

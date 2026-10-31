@@ -90,10 +90,12 @@ export async function runOperation(
     if (!known) throw error
     answer = { status: known.status, payload: known.body }
   }
-  if (answer.status !== 200)
-    throw new Refusal(
-      String((answer.payload as { message?: unknown }).message ?? `answer ${answer.status}`),
-      { answer: answer.payload },
-    )
+  if (answer.status !== 200) {
+    const { message, field } = answer.payload as { message?: unknown; field?: unknown }
+    const text = String(message ?? `answer ${answer.status}`)
+    throw new Refusal(field === undefined ? text : `${text} (${String(field)})`, {
+      answer: answer.payload,
+    })
+  }
   return answer.payload
 }

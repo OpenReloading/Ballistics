@@ -383,6 +383,7 @@ export const chargeTargetResponse = z.looseObject({
           cartridge: text('Id of the cartridge'),
           revised: text('Date of the sheet revision'),
           symbol: text('Symbol of the limit'),
+          variant: text('Variant of that limit').optional(),
           pressure: num('The limit, Pa'),
         })
         .optional()
