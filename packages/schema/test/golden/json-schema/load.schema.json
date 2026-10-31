@@ -305,6 +305,21 @@
               "unit": "lb/in2",
               "description": "The value of `bulletBcG7` in lb/in2."
             },
+            "bulletBaseLength": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `bulletBaseLength` in mm."
+            },
+            "bulletBaseDiameter": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `bulletBaseDiameter` in mm."
+            },
+            "bulletCavityDiameter": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `bulletCavityDiameter` in mm."
+            },
             "propellantEnergy": {
               "type": "number",
               "unit": "J/kg",
@@ -407,7 +422,18 @@
             }
           },
           "additionalProperties": false,
-          "description": "Values the user typed: solver values and the bullet diameter, length and ballistic coefficients. Every other value follows the referenced records."
+          "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter). Every other value follows the referenced records."
+        },
+        "bulletBase": {
+          "type": "string",
+          "enum": [
+            "flat",
+            "boat-tail",
+            "rebated-boat-tail",
+            "conical-hollow-base",
+            "rounded-hollow-base"
+          ],
+          "description": "The base form the user chose for the bullet instead of the one of its record (`base.type`)."
         },
         "ladder": {
           "anyOf": [

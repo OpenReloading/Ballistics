@@ -1,5 +1,5 @@
 import { millerStability, type Projectile } from '@open-reloading/core'
-import { type Bullet, fromSi, toSi } from '@open-reloading/schema'
+import { type Bullet, baseTypes, fromSi, toSi } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
@@ -11,11 +11,39 @@ const bulletValueKeys = [
   'bulletLength',
   'bulletBcG1',
   'bulletBcG7',
+  'bulletBaseLength',
+  'bulletBaseDiameter',
+  'bulletCavityDiameter',
 ] as const
 export type BulletValueKey = (typeof bulletValueKeys)[number]
 
 /** Bullet values in SI (kg, m, kg/m2); an absent key is a value the record does not give or nobody typed. */
 export type BulletValues = Partial<Record<BulletValueKey, number | undefined>>
+
+/** A base form of a bullet, the choice of the Bullet card (`analysis.bulletBase`). */
+export type BaseType = NonNullable<NonNullable<Bullet['base']>['type']>
+
+/** The key of the typed base form among the typed Bullet card fields: its text is the form. */
+export const baseTypeKey = 'bulletBase'
+
+/** The typed base form of `typed`, none for an empty or unknown text. */
+export const typedBaseType = (typed: Record<string, { text: string }>): BaseType | undefined =>
+  baseTypes.safeParse(typed[baseTypeKey]?.text).data
+
+/** The record's base dimensions, by the key of the typed value and the field of the record's `base`. */
+const baseDimensions = {
+  bulletBaseLength: 'length',
+  bulletBaseDiameter: 'diameter',
+  bulletCavityDiameter: 'cavityDiameter',
+} as const
+
+/** The keys of the typed base dimensions. */
+export const baseDimensionKeys: readonly string[] = Object.keys(baseDimensions)
+
+/** The base forms that have a boat tail (with a base face diameter), and those with a cavity. */
+export const boatTailed = (type: BaseType | undefined) => type !== undefined && type !== 'flat'
+export const hollowBased = (type: BaseType | undefined) =>
+  type === 'conical-hollow-base' || type === 'rounded-hollow-base'
 
 const bcKeys = { G1: 'bulletBcG1', G7: 'bulletBcG7' } as const
 
@@ -37,6 +65,10 @@ export function recordBulletValues(record: Partial<Bullet> | undefined): BulletV
   if (record.mass) out.bulletMass = toSi('mass', record.mass.value)
   if (record.diameter) out.bulletDiameter = toSi('length', record.diameter.value)
   if (record.length) out.bulletLength = toSi('length', record.length.value)
+  for (const [key, field] of Object.entries(baseDimensions)) {
+    const stored = record.base?.[field]
+    if (stored) out[key as keyof typeof baseDimensions] = toSi('length', stored.value)
+  }
   for (const model of ['G1', 'G7'] as const) {
     const [only, ...more] = bandsOf(record, model)
     if (only && more.length === 0) out[bcKeys[model]] = toSi('ballisticCoefficient', only.value)
@@ -75,9 +107,14 @@ const sameValue = (a: number, b: number | undefined) =>
  * The one place a bullet record meets typed values: `record` with each value of `typed` in place
  * (every reader of the record's mass, diameter, length and BCs takes the result). A typed BC
  * replaces all bands of its drag model with one band from 0 m/s; the record's own single value
- * typed again leaves it as it is. The shape fields stay the record's.
+ * typed again leaves it as it is. The shape fields stay the record's, but a typed boat-tail length
+ * leaves out the bearing length, which the outline derives.
  */
-export function typedBullet<B extends Partial<Bullet>>(record: B, typed: BulletValues): B {
+export function typedBullet<B extends Partial<Bullet>>(
+  record: B,
+  typed: BulletValues,
+  baseType?: BaseType,
+): B {
   const own = recordBulletValues(record)
   const out: Partial<Bullet> = { ...record }
   // a value equal to the record's stays the record's: no round trip through SI
@@ -101,7 +138,47 @@ export function typedBullet<B extends Partial<Bullet>>(record: B, typed: BulletV
       { dragModel: model, value: fromSi('ballisticCoefficient', si) },
     ]
   }
+  const base = typedBase(record.base, typed, baseType)
+  if (base) out.base = base
+  // the bearing is what the length leaves besides the nose and the boat tail: the outline derives it
+  if (base && base.length?.value !== record.base?.length?.value) delete out.bearingLength
   return out as B
+}
+
+/**
+ * The record's base with the typed form and dimensions in place, none where nothing differs. A form
+ * keeps only what it can have (`bulletBase` in the schema): flat no dimension (its length is a boat tail's), a boat tail no
+ * cavity. A typed dimension equal to the record's stays the record's; a typed length or diameter
+ * leaves out the record's angle, which the outline derives from them.
+ */
+function typedBase(
+  own: Bullet['base'],
+  typed: BulletValues,
+  type: BaseType | undefined,
+): Bullet['base'] {
+  const ownValues = recordBulletValues({ base: own })
+  const base: NonNullable<Bullet['base']> = { ...own }
+  let changed = false
+  for (const [key, field] of Object.entries(baseDimensions)) {
+    const si = typed[key as keyof typeof baseDimensions]
+    if (si === undefined || sameValue(si, ownValues[key as keyof typeof baseDimensions])) continue
+    base[field] = { value: fromSi('length', si) }
+    changed = true
+    // length, diameter and angle fix one another: the angle the record gives would contradict the typed one
+    if (field !== 'cavityDiameter') delete base.angle
+  }
+  if (type !== undefined && type !== own?.type) {
+    base.type = type
+    changed = true
+  }
+  if (!changed) return undefined
+  if (!boatTailed(base.type)) {
+    delete base.length
+    delete base.diameter
+    delete base.angle
+  }
+  if (!hollowBased(base.type)) delete base.cavityDiameter
+  return base
 }
 
 type BallisticCoefficientChoice = {

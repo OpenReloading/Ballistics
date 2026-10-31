@@ -93,6 +93,18 @@ describe('Load', () => {
     expect(load.parse(typed)).toEqual(typed)
   })
 
+  it('keeps the typed base form and dimensions', () => {
+    const typed = {
+      ...userLoad,
+      analysis: {
+        overrides: { bulletBaseLength: 5, bulletBaseDiameter: 5.8, bulletCavityDiameter: 3 },
+        bulletBase: 'rounded-hollow-base',
+      },
+    }
+    expect(load.parse(typed)).toEqual(typed)
+    expect(load.safeParse({ ...userLoad, analysis: { bulletBase: 'wedge' } }).success).toBe(false)
+  })
+
   it('rejects a key under overrides that is no workbench value', () => {
     for (const key of ['charge', 'siValues', 'extra'])
       expectIssueAt(

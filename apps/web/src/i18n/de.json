@@ -3996,5 +3996,7 @@
   "Sort: {text}": "Sortierung: {text}",
   "Measured on the cases of this group, for example fired and sized. Mean of the cases measured. The workbench takes it as the measured case capacity.": "Gemessen an den Hülsen dieser Gruppe, zum Beispiel abgeschossen und kalibriert. Mittelwert der gemessenen Hülsen. Die Werkbank übernimmt den Wert als gemessenes Hülsenvolumen.",
   "Choose a cartridge first": "Zuerst eine Patrone wählen",
-  "Purple": "Violett"
+  "Purple": "Violett",
+  "Diameter of the base face at the end of the boat tail.": "Durchmesser der Bodenfläche am Ende des Heckkonus.",
+  "Opening of the hollow base. Its depth follows from it.": "Öffnung der Hohlbasis. Ihre Tiefe folgt daraus."
 }

@@ -13,7 +13,7 @@ import {
   type UserRecord,
   userRecord,
 } from '@open-reloading/schema'
-import type { BulletValueKey, BulletValues } from './bullet.ts'
+import type { BaseType, BulletValueKey, BulletValues } from './bullet.ts'
 import { storedOf } from './firearm.ts'
 import type { Lots } from './load-notes.ts'
 import type { LadderDirection, RunnableLadderKind } from './seating-ladder.ts'
@@ -159,6 +159,8 @@ export interface LoadParts {
         direction: LadderDirection
       }
     | undefined
+  /** The base form typed over the bullet record's. */
+  bulletBase?: BaseType | undefined
   /** The chronograph sessions of the Measurements tab, as references. */
   sessions: readonly string[]
   /** The lots as typed, and what the load was at each session. */
@@ -168,11 +170,16 @@ export interface LoadParts {
 
 type Analysis = NonNullable<Load['analysis']>
 
-function analysisOf(overrides: Record<string, number>, ladder: LoadParts['ladder']) {
+function analysisOf(
+  overrides: Record<string, number>,
+  ladder: LoadParts['ladder'],
+  bulletBase: BaseType | undefined,
+) {
   const typed = Object.keys(overrides).length > 0
-  if (!typed && !ladder) return
+  if (!typed && !ladder && !bulletBase) return
   return {
     ...(typed && { overrides }),
+    ...(bulletBase && { bulletBase }),
     ...(ladder && {
       ladder: {
         // the charge is the default kind and stays out
@@ -210,7 +217,7 @@ export function toLoad(p: LoadParts): Load {
     capacity: p.capacity,
     seating: p.seating && { by: p.seating.by, value: storedOf('length', p.seating.value) },
     note: p.notes || undefined,
-    analysis: analysisOf(overrides, ladder),
+    analysis: analysisOf(overrides, ladder, p.bulletBase),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
     powderLot: p.lots?.powder.trim() || undefined,
     primer: primerOf(p.primerRecord, p.lots),
@@ -285,6 +292,7 @@ export function fromLoad(load: Load): OpenedLoad {
     query.set(key, String(toSi(analysisKinds[key], stored)))
     typed.add(key)
   }
+  if (load.analysis?.bulletBase) query.set('bulletBase', load.analysis.bulletBase)
   if (load.charge) query.set('charge', String(toSi('mass', load.charge.value)))
   const ladder = load.analysis?.ladder
   if (ladder) {

@@ -37,7 +37,7 @@ import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-types.ts'
 import type { StripFigure } from '../lib/barrel-strip.ts'
-import { type BulletValues, typedBullet } from '../lib/bullet.ts'
+import { type BaseType, type BulletValues, typedBullet } from '../lib/bullet.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable } from '../lib/cartridge-sheet.ts'
 import {
@@ -341,6 +341,8 @@ type PreviewProps = {
     design?: string | undefined
     /** The values typed over the record or design: the preview draws and seats the bullet with them. */
     values?: BulletValues | undefined
+    /** The base form typed over the record's. */
+    baseType?: BaseType | undefined
   }
   /**
    * Where the controls go instead of beside the drawing: case capacity, seating and the
@@ -529,10 +531,11 @@ function useGeometry(o: {
   record: Load<Bullet>
   design: UserBulletView | undefined
   values: BulletValues | undefined
+  baseType: BaseType | undefined
   shown: RefObject<UnitSystem>
   lands: LandsMm | undefined
 }) {
-  const { draft, detail, record, design: chosen, values, shown, lands } = o
+  const { draft, detail, record, design: chosen, values, baseType, shown, lands } = o
   const draftSpec = draft?.spec
   const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
@@ -543,19 +546,22 @@ function useGeometry(o: {
       chosen && values
         ? {
             ...chosen,
-            resolved: { ...chosen.resolved, record: typedBullet(chosen.resolved.record, values) },
+            resolved: {
+              ...chosen.resolved,
+              record: typedBullet(chosen.resolved.record, values, baseType),
+            },
           }
         : chosen,
-    [chosen, values],
+    [chosen, values, baseType],
   )
   const bulletRecord = useMemo(
     () =>
       record.status === 'ok' && !chosen
         ? values
-          ? typedBullet(record.value, values)
+          ? typedBullet(record.value, values, baseType)
           : record.value
         : undefined,
-    [record, chosen, values],
+    [record, chosen, values, baseType],
   )
   const shaped = useMemo(
     () => shapeOf(design, bulletRecord, shown.current),
@@ -868,6 +874,7 @@ function useSeatingModel(p: PreviewProps) {
   useUnitRewrite(system, shown, setBarrel, setPos)
   const { spec, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
     values: p.linked?.values,
+    baseType: p.linked?.baseType,
     draft,
     detail,
     record,
