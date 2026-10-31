@@ -19,13 +19,20 @@ export type InputPanel = (typeof panelOrder)[number]
 
 type Limit = NonNullable<InteriorResponse['limits']>[number]
 
-/** The first compared limit with a pressure: the limit "Percent of maximum" and the chart's limit line use. */
-export const firstPressureLimit = (limits: Limit[] | undefined) =>
-  limits?.find((l) => l.compared && l.pressure !== undefined)
+/**
+ * The compared limit with a pressure that "Percent of maximum" and the chart's limit line use, as
+ * the API's percentage target: undefined without one or when the compared limits of the
+ * cartridge's variants differ.
+ */
+export function pressureLimit(limits: Limit[] | undefined) {
+  const compared = limits?.filter((l) => l.compared && l.pressure !== undefined) ?? []
+  const [first] = compared
+  return compared.every((l) => l.pressure === first?.pressure) ? first : undefined
+}
 
-/** `100 * peakPressure / p_limit` with `p_limit` the first compared limit; undefined without one. */
+/** `100 * peakPressure / p_limit` with `p_limit` the compared limit (`pressureLimit`); undefined without one. */
 export function percentOfPressureLimit(peakPressure: number, limits: Limit[] | undefined) {
-  const limit = firstPressureLimit(limits)
+  const limit = pressureLimit(limits)
   if (!limit?.pressure) return
   return { percent: (100 * peakPressure) / limit.pressure, limit }
 }

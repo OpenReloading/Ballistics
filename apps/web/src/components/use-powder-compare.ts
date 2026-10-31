@@ -67,7 +67,7 @@ export type CompareRow = {
   ratio?: number | undefined
   values?: {
     peak: number
-    /** Of the first compared limit; none without one. */
+    /** Of the compared limit (`pressureLimit`); none without one. */
     percent?: number | undefined
     velocity: number
     burnt: number

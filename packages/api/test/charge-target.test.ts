@@ -40,6 +40,22 @@ function limitCartridge(id: string, pmax: number, pressureMethod: 'transducer' |
 const seeded = [
   limitCartridge('twice-rifle', (2 * nominal.peakBreechPressure) / 1e5, 'transducer'),
   limitCartridge('crusher-rifle', 3000, 'crusher'),
+  {
+    ...limitCartridge('variant-rifle', 0, 'transducer'),
+    values: [
+      { symbol: 'Pmax', quantity: 'pressure' as const, value: 150, variant: 'short' },
+      { symbol: 'Pmax', quantity: 'pressure' as const, value: 1050, variant: 'long' },
+    ],
+  },
+  {
+    ...limitCartridge('same-variant-rifle', 0, 'transducer'),
+    values: ['short', 'long'].map((variant) => ({
+      symbol: 'Pmax',
+      quantity: 'pressure' as const,
+      value: (2 * nominal.peakBreechPressure) / 1e5,
+      variant,
+    })),
+  },
 ]
 // a bulk density above the 5000 kg/m3 bound of a request body
 const dense = {
@@ -139,6 +155,20 @@ describe('POST /interior/charge-target', () => {
       expect(status).toBe(422)
       expect(body).toMatchObject({ reason: 'noComparableLimit', notice })
     }
+  })
+
+  it('refuses a percentage of a cartridge whose variants have different limits', async () => {
+    const target = { kind: 'peakPressure', value: 50, unit: 'percentOfLimit' }
+    const { status, body } = await post({ load, cartridge: 'variant-rifle', target })
+    expect(status).toBe(422)
+    expect(body).toMatchObject({ reason: 'severalLimits', notice })
+    expect(body.message).toContain('short, long')
+    const same = await post({ load, cartridge: 'same-variant-rifle', target })
+    expect(same.status).toBe(200)
+    expect(same.body.target.limit).toMatchObject({
+      cartridge: 'same-variant-rifle',
+      variant: 'short',
+    })
   })
 
   it('refuses a target outside the reachable range with the reason and the range', async () => {

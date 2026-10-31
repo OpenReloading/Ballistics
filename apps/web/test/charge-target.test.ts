@@ -109,6 +109,9 @@ describe('refusalText', () => {
     expect(
       refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false, english.t),
     ).toBe('boom')
+    const several = { statusCode: 422, reason: 'severalLimits' }
+    expect(refusalText(several, 'peakPressure', si, true, english.t)).toMatch(/each variant/)
+    expect(refusalText(several, 'peakPressure', si, true, german.t)).toMatch(/jede Variante/)
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {
