@@ -6,9 +6,10 @@ Research for ticket #822 of the wayfinder map #817. Read on 2026-10-31. Counts c
 
 1. The collected rows reach 241 of the 577 cartridge records. 336 have no row. Most of those 336 are cartridges no current maker table lists (rimfire and blank loads, historic British, German, Austrian, French and Russian cartridges, wildcats). More maker tables will not close that gap; they add depth (more bullets and powders per cartridge, more pressure values) to cartridges that already have rows.
 2. 54 covered cartridges have rows from one maker only, and 62 have no pressure in bar (25 only with CUP values, 37 with none).
-3. The highest yield per hour is in single documents: the Berger quick reference sheet (about 110 bullet records from one 5-page PDF), the Hodgdon burn rate chart (about 25 name-only powder records), the nine Accurate data sheets, and the Shooters World manual.
-4. The highest row counts are Barnes (138 PDFs), Nosler (about 125 cartridge pages), Hammer (about 211 Google Sheets) and Sierra (170 PDFs). Nosler, Sierra and Berger state terms that restrict copying or scraping. Hodgdon's online data center forbids automated scraping in so many words. These need an owner decision, listed at the end.
-5. Do not read the Hodgdon Reloading Data Center, the Berger site, or the Western Powders site. The first forbids it; the second forbids it in its terms; the third currently serves a gambling advertisement as its home page.
+3. Sources with no restriction found, best yield per hour first: the Hodgdon burn rate chart (about 25 name-only powder records), the nine Accurate data sheets, the Shooters World manual (about 1,350 rows), Barnes (138 PDFs, an estimated 10,000 to 20,000 rows), Hammer (about 211 Google Sheets) and Somchem (an estimated 1,500 to 3,000 rows, 12 new powders).
+4. The best single gain is gated: the Berger quick reference sheet (about 110 bullet records from one 5-page PDF, 2 exist) sits on a site whose terms bar scraping and reproduction. Nosler (about 12,000 rows), Sierra (170 PDFs) and Lapua also state terms that restrict copying. They wait for owner decision 1. Hodgdon's online data center forbids automated scraping in so many words and is excluded.
+5. Do not read the Hodgdon Reloading Data Center or the Western Powders site (it currently serves a gambling advertisement as its home page).
+6. The new sources add almost no cartridges. Their indexes, matched against the 336 cartridges without rows, name about five of them (416 Ruger, 500 Jeffery, 404 Rimless N.E., 45 Auto Rim, 5 mm Remington Magnum). They add rows, bullets and powders to cartridges that already have rows. None of them prints pressure.
 
 ## Coverage today
 
@@ -27,7 +28,7 @@ Research for ticket #822 of the wayfinder map #817. Read on 2026-10-31. Counts c
 | Lovex | 1,530 | 53 | 765 | 0 | 1,530 | 1,530 |
 | RWS | 902 | 30 | 0 | 0 | 902 | 896 |
 
-Pressure is printed by five of ten makers. Vihtavuori, Norma, Alliant, Vectan and RWS print none: 28,532 rows (42 percent) carry no pressure, and 10,823 more carry a CUP value that has no conversion to bar. Only 29,147 rows (43 percent) can test a pressure prediction. 2,615 rows (81 printed cartridge names, almost all wildcats such as 22 GT, 6.5mm-06, 6 x 45 mm) have no cartridge record. 3,054 rows belong to 16 cartridge ids that exist as SAAMI cartridges (for example 22 Creedmoor, 6mm GT, 277 SIG Fury, 327 Federal Magnum) but have no record in `packages/data/records/cartridges` on `main`; they are in the row counts above and not in the counts of the 577.
+Pressure is printed by five of ten makers. Vihtavuori, Norma, Alliant, Vectan and RWS print none: 28,532 rows (42 percent) carry no pressure, and 10,823 more carry a CUP value that has no conversion to bar. Only 29,147 rows (43 percent) can test a pressure prediction. 2,615 rows (81 maker and cartridge name pairs, 80 distinct names, almost all wildcats such as 22 GT, 6.5mm-06, 6 x 45 mm) have no cartridge record. 3,054 rows belong to 16 cartridge ids that exist as SAAMI cartridges (for example 22 Creedmoor, 6mm GT, 277 SIG Fury, 327 Federal Magnum) but have no record in `packages/data/records/cartridges` on `main`; they are in the row counts above and not in the counts of the 577.
 
 ### Cartridge records
 
@@ -38,7 +39,7 @@ Pressure is printed by five of ten makers. Vihtavuori, Norma, Alliant, Vectan an
 | With no row | 336 |
 | With rows from one maker only | 54 (ADI 17, Vectan 11, Norma 8, Reload Swiss 8, Vihtavuori 4, Lovex 3, Western 2, Hodgdon 1) |
 | With rows but no pressure in bar | 62 (25 CUP only, 37 none) |
-| With 30 rows or fewer | 66 (31 with 10 or fewer) |
+| With 30 rows or fewer | 64 (31 with 10 or fewer) |
 
 By hold-out split (first byte of the id hash, as fixed for the interior models): the 336 without rows are 192 training, 77 test and 67 validation cartridges, of 339, 129 and 109 in total. Covered cartridges per split: 147 training, 42 validation, 52 test; with pressure in bar: 105, 35 and 39. The once-per-version test read rests on 52 cartridges, 39 of them with pressure values.
 
@@ -62,7 +63,7 @@ The rows name bullets as printed (1,781 distinct strings; 4,750 distinct bullet 
 | Sellier and Bellot | 970 | 47 | 105 |
 | Swift | 862 | 13 | 0 |
 
-The existing real bullet records (1,684 in total, not yet in the public repository) also include Cutting Edge 354, Hammer 318, Missouri Bullet 195, Lehigh 131 and Sako 23; the rows name few of those bullets. The largest uncovered row counts are Nosler, Barnes, Speer, Berger and Lapua, 25,000 rows between them.
+The existing real bullet records (1,684 in total) also include Cutting Edge 354, Hammer 318, Missouri Bullet 195, Lehigh 131 and Sako 23; the rows name few of those bullets. The largest uncovered row counts are Nosler, Barnes, Speer, Berger and Lapua, 25,000 rows between them.
 
 ### Powders
 
@@ -81,7 +82,7 @@ Terms were read from the makers' own pages (a short page fetch each); quotes are
 | Shooters World Vectan catalogue 2025 (US) | 48 pages, shotshell tables only | as above | Out of scope: shotshell. The collected 2023-12 Vectan catalogue holds the metallic tables |
 | Somchem, `somchemreload.com` | HTML per weapon type and caliber (64 calibers, 5 weapon types: conventional rifle, monolithic, Barnes TSX, handgun, shotgun); 12 powders (S385, S365, S361, S355, S341, S335, S321, S265, S221, S121, MS200, MP200); columns powder, case, primer, bullet, COL (mm), start or max, charge (gr), velocity (ft/s), V/C factor; barrel length printed (24 inch on the page read); no pressure | `Disallow: /search/` and Crawl-delay 10. The data URLs are `/search?c=..&f=..`, which do not start with `/search/`; read as allowed, but the owner should confirm | Disclaimer page only (Rheinmetall Denel Munition): data compiled under controlled conditions, no liability. No copying clause. The page shows "The website encountered an unexpected error" |
 | Barnes, `barnesbullets.com/load-data/` | 121 rifle and 17 handgun PDFs, for example `.../content/barnes-loaddata/rifle/308/30-06Springfield.pdf`. The 30-06 file is 8 pages: case, primer, trim length, barrel (24 inch, Bartlein), twist, COAL, ballistic coefficient and sectional density per bullet, minimum and maximum charge with velocity, "C" for compressed; about 87 charge pairs; no pressure | Blocks account and cart paths only; Crawl-delay 10 for a list of AI crawlers, not for other agents | No terms page linked; the page has a disclaimer that the data is for use with Barnes bullets |
-| Nosler, `nosler.com/load-data` | Index lists 111 rifle and 14 handgun cartridges; each cartridge page links one PDF per bullet weight (about 9 for the 30-06). One PDF read: one page, "Version 9.0", maximum SAAMI and tested COAL, BC, SD, case water capacity, primer, 24 inch barrel and twist, three charges per powder with velocity and load density, maximum flagged; no pressure; about 24 rows per PDF | Empty file, nothing blocked | Website use policy: "Permission is granted to electronically copy and to print hard copy portions of this website for the sole purpose" of ordering; any other use "without prior written permission of Nosler Inc. is strictly prohibited" |
+| Nosler, `nosler.com/load-data` | Index lists 111 rifle and 14 handgun cartridges; each cartridge page links one PDF per bullet weight (about 9 for the 30-06). One PDF read: one page, "Version 9.0", maximum SAAMI and tested COAL, BC, SD, case water capacity, primer, 24 inch barrel and twist, four powders with three charges each and velocity and load density, maximum flagged; no pressure; 12 rows in that PDF | Empty file, nothing blocked | Website use policy: "Permission is granted to electronically copy and to print hard copy portions of this website for the sole purpose" of ordering; any other use "without prior written permission of Nosler Inc. is strictly prohibited" |
 | Hammer, `hammerbullets.com/load-data/` | About 211 Google Sheets, one per cartridge. The 308 Winchester sheet read as CSV (424 lines): barrel 24 inch, case length, SAAMI COAL, per bullet the minimum COAL, G1 or G7 BC and twist; per powder start charge, fill percent, start velocity and "velocity at max" (the maximum charge itself is not in the columns read); no pressure | `docs.google.com` allows `/spreadsheet`, Crawl-delay 1; hammerbullets.com blocks only WooCommerce paths | No terms for the data; the page says the company is not responsible for how it is used and that not all data is available yet |
 | Sierra, `sierrabullets.com/load-data/` | 170 PDFs (128 rifle, 42 handgun), Sixth Edition, for example `.../content/load-data/rifle/308/308-winchester.pdf` (14 pages, 2.2 MB). Not start and maximum rows: a grid of powder against target velocity (2800, 2900, ... fps) giving the charge, maximum marked; COAL per bullet; barrel, case, primer, trim length; no pressure | Cart and account paths blocked; Crawl-delay 10 for a list of AI crawlers | Every page of the PDF carries a diagonal watermark that reads, in its scattered letters, "This data is for individual use only" (reconstructed from the extracted characters). The page has a disclaimer, no copyright clause |
 | Berger load data, `bergerbullets.com/reloading-data/` | 26 cartridges as per-cartridge PDFs (Classic Hunter, Elite Hunter, 338) plus a 1st edition manual | No path blocked | Terms and Conditions section 12(i) prohibits "spider, crawl, or scrape"; section 2 prohibits reproduction of "any portion of the Service" |
@@ -103,37 +104,55 @@ Not read: Alliant's online data pages beyond the 2023 guide, Winchester and IMR 
 
 Yield is rows or records gained per hour of work (my estimates, unverified for anything not read). The reading method is the one a collector would use: a PDF text read with the page layout kept, a column parse, and every printed value kept in `raw`. Hours cover a collector, a check against the printed page for a sample and the records, not the review.
 
-| Rank | Source | Gain | Hours | Gain per hour | Method and requests | Gate |
-|---|---|---|---|---|---|---|
-| 1 | Berger quick reference sheet | about 110 bullet records (112 part numbers, 2 exist) with full dimensions and G1 and G7 | 2 | 55 records | 1 PDF request, layout text read, fixed columns | Site terms bar scraping; the PDF is one document already cited |
-| 2 | Hodgdon burn rate chart | about 25 name-only powder records, plus the printed burn order | 2 | about 12 records | 1 PDF request, two-column list read | None found |
-| 3 | Accurate data sheets | 9 powders, an estimated 500 to 900 rows with PSI | 3 | about 200 rows | 9 PDF requests at 10 seconds apart, layout text read, one table per cartridge as in the DP68 sheet | None found; read the PDFs' own terms |
-| 4 | Shooters World manual (2023) | about 1,350 rows (670 load lines times start and maximum), PSI on the handgun tables | 6 | about 225 rows | 1 PDF request, layout text read, similar to the Lovex reader but a different layout | None stated |
-| 5 | Barnes | 138 PDFs, an estimated 10,000 to 20,000 rows (extrapolated from 87 pairs in the 30-06 file), plus BC and SD per bullet | 12 | about 800 to 1,700 rows | 138 PDF requests at 10 seconds apart (23 minutes) after one index request, layout text read | No terms page found |
-| 6 | Hammer | about 211 sheets, an estimated 10,000 lines, as start charge, start velocity and velocity at max | 10 | about 1,000 lines | 211 CSV export requests at 1 second apart after one index request | No terms; the maximum charge is not in the columns read |
-| 7 | Somchem | an estimated 1,500 to 3,000 rows, 12 new powders, V/C factor | 8 | about 250 rows | About 64 calibers times 5 weapon types in HTML, at 10 seconds apart, table parse | The `/search/` robots line; the site shows an error banner |
-| 8 | Nosler | an estimated 24,000 rows from about 1,000 one-page PDFs (about 125 cartridges times about 8 weights), plus BC, SD, COAL and case capacity | 14 | about 1,700 rows | About 1,000 PDF requests at 1 per second (17 minutes) after the index; one fixed layout, three charges per powder | Website use policy restricts reproduction |
-| 9 | Sierra | 170 PDFs, charge per target velocity grid, no start or maximum, no pressure | 16 | unknown (a different row meaning) | 170 PDF requests; text read has to remove the watermark | Watermark "individual use only"; ask the maker first |
-| 10 | Hornady free PDFs | Basic Rifle and Basic Pistol data, ECX, A-Tip: size unknown | 4 | unknown | A few PDF requests | Terms silent on reuse; the book and app data are paid |
-| 11 | Lapua catalogue | about 60 bullet records and factory velocity points | 4 | about 15 records | 1 PDF request | Legal notice forbids duplication without consent: ask |
-| 12 | Hodgdon Annual Manuals 2017 to 2024 | Older editions, no new cartridge expected | 6 | low | 8 PDF requests | Superseded; read only to find withdrawn rows |
+Cartridges newly covered comes from matching each index (the Barnes, Nosler, Sierra and Somchem pages, read on 2026-10-31) against the cartridge records. The match is a lower bound: by name only 26 of 139 Barnes names, 94 of 197 Sierra, 79 of 137 Nosler and 47 of 72 Somchem names matched a record. The unmatched names are mostly US cartridges with no record at all (the 6.5, 7 mm and 300 PRC, 6 mm ARC, the Creedmoor family, the short and super short magnums, Ackley Improved cases) and spelling variants; the unmatched names were also checked by eye against 46 current cartridges from the 336 without rows. Documents with no cartridge index (the burn chart, the Accurate sheets, the Shooters World manual, the Berger sheet) were not matched.
 
-Not worth reading now: the Hodgdon Reloading Data Center (forbidden), Berger load data (terms), Lehigh (nothing found), H&N (nothing found), Speer (a script-loaded page, not read; revisit once the other sources are in), the Vectan 2025 US catalogue (shotshell only), Western Powders (compromised).
+### No restriction found
 
-Powder name-only coverage is cheaper than any row source: item 2 above covers the burn chart; the Vectan and Lovex catalogues are already sources of powder records.
+| Rank | Source | Gain | Hours | Gain per hour | Cartridges newly covered | Method and requests | Gate |
+|---|---|---|---|---|---|---|---|
+| 1 | Hodgdon burn rate chart | about 25 name-only powder records, plus the printed burn order | 2 | about 12 records | none (powders) | 1 PDF request, two-column list read | None found |
+| 2 | Accurate data sheets | 9 powders, an estimated 500 to 900 rows with PSI | 3 | about 200 rows | not matched | 9 PDF requests at 10 seconds apart, layout text read, one table per cartridge as in the DP68 sheet | None found; read the PDFs' own terms |
+| 3 | Shooters World manual (2023) | about 1,350 rows (670 load lines times start and maximum), PSI on the handgun tables | 6 | about 225 rows | not matched | 1 PDF request, layout text read, similar to the Lovex reader but a different layout | None stated |
+| 4 | Barnes | 138 PDFs, an estimated 10,000 to 20,000 rows (extrapolated from 87 pairs in the 30-06 file), plus BC and SD per bullet | 12 | about 800 to 1,700 rows | 1 (500 Jeffery) | 138 PDF requests at 10 seconds apart (23 minutes) after one index request, layout text read | No terms page found |
+| 5 | Hammer | about 211 sheets, an estimated 10,000 lines, as start charge, start velocity and velocity at max | 10 | about 1,000 lines | not matched | 211 CSV export requests at 1 second apart after one index request | No terms; the maximum charge is not in the columns read |
+| 6 | Somchem | an estimated 1,500 to 3,000 rows, 12 new powders, V/C factor | 8 | about 250 rows | 3 (416 Ruger, 500 Jeffery, 404 Rimless N.E.) | About 64 calibers times 5 weapon types in HTML, at 10 seconds apart, table parse | The `/search/` robots line; the site shows an error banner |
+
+### Gated by owner decision 1 (terms restrict copying or scraping)
+
+| Rank | Source | Gain | Hours | Gain per hour | Cartridges newly covered | Method and requests | Gate |
+|---|---|---|---|---|---|---|---|
+| 7 | Berger quick reference sheet | about 110 bullet records (112 part numbers, 2 exist) with full dimensions and G1 and G7 | 2 | 55 records if allowed | none (bullets) | 1 PDF request, layout text read, fixed columns | Site terms bar scraping and reproduction; the PDF is one document already cited |
+| 8 | Nosler | an estimated 12,000 rows from about 1,000 one-page PDFs of 12 rows (about 125 cartridges times about 8 weights), plus BC, SD, COAL and case capacity | 14 | about 850 rows | 1 (416 Ruger) | About 1,000 PDF requests at 1 per second (17 minutes) after the index; one fixed layout, four powders with three charges | Website use policy restricts reproduction |
+| 9 | Sierra | 170 PDFs, charge per target velocity grid, no start or maximum, no pressure | 16 | unknown (a different row meaning) | 2 (45 Auto Rim, 5 mm Remington Magnum) | 170 PDF requests; text read has to remove the watermark | Watermark "individual use only"; ask the maker first |
+| 10 | Lapua catalogue | about 60 bullet records and factory velocity points | 4 | about 15 records | none | 1 PDF request | Legal notice forbids duplication without consent: ask |
+
+### Low value or not read
+
+| Source | Why |
+|---|---|
+| Hornady free PDFs (Basic Rifle and Basic Pistol data, ECX, A-Tip) | Size unknown, not read; terms silent on reuse; the book and app data are paid |
+| Hodgdon Annual Manuals 2017 to 2024 | Older editions of tables already collected; only useful to find withdrawn rows |
+| Hodgdon Reloading Data Center | Forbidden |
+| Berger load data (26 PDFs) | Site terms bar scraping |
+| Lehigh, H&N | No load data found |
+| Speer | A script-loaded page, not read; revisit once the other sources are in |
+| Vectan 2025 US catalogue | Shotshell tables only |
+| Western Powders site | Compromised home page |
+
+Powder name-only coverage is cheaper than any row source: rank 1 covers the burn chart; the Vectan and Lovex catalogues are already sources of powder records.
 
 ## What this means for the ticket's other questions
 
-- Coverage of cartridges with no pressure: only the five makers that print pressure help (Hodgdon, ADI, Western, Reload Swiss, Lovex, and the Accurate and Shooters World documents above). None of Barnes, Nosler, Hammer, Sierra or Somchem print pressure, so they add rows for velocity deviation, not for pressure.
-- The new row sources mostly add rows to cartridges that already have rows (the common rifle cartridges). The coverage gap for the 336 stays unless a regional source is found for the European and Russian ones.
-- Bullets: after item 1, the remaining bullet gaps by row count are Nosler, Barnes and Speer; each has a catalogue behind its own site whose terms were not all read.
+- Cartridges with no pressure: only sources that print pressure help. Of the sources above those are the Accurate sheets and the Shooters World manual. Barnes, Nosler, Hammer, Sierra and Somchem print none, so they add rows for velocity deviation, not for pressure.
+- The new row sources add rows and bullets to cartridges that already have rows (the common rifle cartridges), and about five of the 336 cartridges without rows. The gap for the 336 stays unless a regional source is found for the European and Russian ones. Cartridges with one maker only gain depth; the index match found 2 of the 54 (1 each in Sierra and Nosler, a lower bound).
+- Bullets: after the Berger sheet, the remaining bullet gaps by row count are Nosler, Barnes and Speer; each has a catalogue behind its own site whose terms were not all read.
 
 ## Owner decisions
 
 1. May the project read Nosler (use policy restricts reproduction), Sierra (watermark, individual use), Berger (terms bar scraping) and Lapua (consent for duplication) from public pages with the maker as the cited source, or should each be asked for written permission first? The map says maker data goes public with the maker as `publisher` and the maker's terms in the record; these four terms conflict with that unless the maker agrees.
 2. Hodgdon states its data center data is proprietary and bars automated scraping. Confirm that the Annual Manual PDF is the only Hodgdon route (it is already collected).
 3. Somchem's robots.txt lists `/search/` but the data URLs are `/search?...`. Confirm that reading them is acceptable, or write to the maker.
-4. The 16 SAAMI cartridge ids used by 3,054 rows have no cartridge records on `main`. Should they get cartridge records before the import, so those rows count against the 577?
+4. The 16 SAAMI cartridge ids used by 3,054 rows have no cartridge records on `main`, and the new indexes name dozens more US cartridges with no record (PRC family, ARC, WSSM, Creedmoor family). Should they get cartridge records before the import, so those rows count against the cartridge list?
 
 ## Sources
 
@@ -145,3 +164,4 @@ Powder name-only coverage is cheaper than any row source: item 2 above covers th
 - `https://www.lapua.com/support/downloads_/`, `https://www.lapua.com/more/legal-notice/`
 - `https://www.hornady.com/support/load-data/`, `https://www.hornady.com/terms-of-use`, `https://www.speer.com/reloading/rifle-data.html`
 - robots.txt of each host above, plus `rws-ammunition.com`, `hn-sport.de`, `cuttingedgebullets.com`, `docs.google.com`
+
