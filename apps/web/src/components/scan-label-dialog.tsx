@@ -32,14 +32,17 @@ export function ScanLabelDialog({
   onOpen: (record: LoadRecord) => void
 }) {
   const { t } = useTranslation()
+  const isOpen = useRef(opened)
+  isOpen.current = opened
   const [shown, setShown] = useState<{ severity: Severity; say: Say }>()
-  const show = (severity?: Severity, say?: Say) => setShown(severity && say && { severity, say })
+  // a photo or camera that answers after the dialog closed leaves no message for the next open
+  const show = (severity?: Severity, say?: Say) => {
+    if (isOpen.current) setShown(severity && say && { severity, say })
+  }
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
   const [camera, setCamera] = useState<MediaStream>()
   const stream = useRef<MediaStream | undefined>(undefined)
-  const isOpen = useRef(opened)
-  isOpen.current = opened
   const resetFile = useRef<() => void>(null)
 
   const stopCamera = useCallback(() => {
@@ -47,9 +50,14 @@ export function ScanLabelDialog({
     stream.current = undefined
     setCamera(undefined)
   }, [])
-  // every track stops when the dialog closes or goes
+  // every track stops when the dialog closes or goes; it opens again without the last message
+  // and text
   useEffect(() => {
-    if (!opened) stopCamera()
+    if (!opened) {
+      stopCamera()
+      setShown(undefined)
+      setText('')
+    }
     return stopCamera
   }, [opened, stopCamera])
 
@@ -58,6 +66,8 @@ export function ScanLabelDialog({
     const id = scanned === undefined ? undefined : readLabel(scanned)
     if (!id) return show('warning', none)
     const stored = await storedRecords().catch(() => undefined)
+    // closed while the store was read: no load opens
+    if (!isOpen.current) return
     if (!stored)
       return show('error', (t) => t('The saved loads could not be read from this browser.'))
     const found = labelledLoad(id, stored)
@@ -107,6 +117,8 @@ export function ScanLabelDialog({
         for (const track of s.getTracks()) track.stop()
         return
       }
+      // a second click while the browser asked started a second stream
+      for (const track of stream.current?.getTracks() ?? []) track.stop()
       stream.current = s
       setCamera(s)
     } catch {
