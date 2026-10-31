@@ -120,7 +120,7 @@ A `{manufacturer, model}` description (the maker a `catalogue:` reference) is al
 
 ### Saved recipes
 
-A saved recipe keeps only the solver keys the user typed, under `analysis.overrides`, validated against `workbenchValueKeys`.
+A saved recipe keeps only the keys the user typed, under `analysis.overrides`, validated against `workbenchValueKeys`: the solver values and the bullet's `bulletDiameter`, `bulletLength`, `bulletBcG1` and `bulletBcG7` (the bullet mass is `bulletMass`). A typed BC replaces every velocity band of its drag model with one value from 0 m/s. The interior route reads `bulletLength` for the bore resistance and ignores the other three.
 
 ### Catalogue and API
 

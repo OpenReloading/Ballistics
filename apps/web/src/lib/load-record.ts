@@ -13,6 +13,7 @@ import {
   type UserRecord,
   userRecord,
 } from '@open-reloading/schema'
+import type { BulletValueKey, BulletValues } from './bullet.ts'
 import { storedOf } from './firearm.ts'
 import type { Lots } from './load-notes.ts'
 import type { LadderDirection, RunnableLadderKind } from './seating-ladder.ts'
@@ -31,8 +32,8 @@ const same = (from: number | undefined, si: number | undefined) =>
 export interface Givers {
   /** The powder record's model values, only while the load keeps a reference to that record. */
   origin?: Record<string, number> | undefined
-  /** The bullet record's or design's mass, only while the load keeps a reference to it. */
-  bulletMass?: number | undefined
+  /** The bullet record's or design's values by key, only while the load keeps a reference to it. */
+  bullet?: BulletValues | undefined
   /** The Settings defaults and the fields still holding one. */
   defaults: Record<string, number | undefined>
   defaulted: ReadonlySet<string>
@@ -56,7 +57,7 @@ export function givenKeys(values: Record<string, number | undefined>, g: Givers)
     if (si === undefined) continue
     if (
       same(g.origin?.[key], si) ||
-      (key === 'bulletMass' && same(g.bulletMass, si)) ||
+      same(g.bullet?.[key as BulletValueKey], si) ||
       (g.defaulted.has(key) && same(g.defaults[key], si)) ||
       (g.followed.has(key) && same(g.suggestions[key], si)) ||
       (g.seatingKept && si === g.previewed[key]) ||

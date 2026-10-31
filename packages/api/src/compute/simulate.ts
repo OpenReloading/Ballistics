@@ -31,6 +31,7 @@ import { runInterior } from './interior-run.ts'
 import { type InteriorBody, interiorBody } from './interior-schema.ts'
 import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
+  bulletLengthMm,
   catalogueIdOf,
   fileLoad,
   filePath,
@@ -329,7 +330,7 @@ export async function simulate(
       g1: cartridgeBulletDiameterMm(cartridge),
       z: cartridgeGrooveDiameterMm(cartridge),
     },
-    bulletLengthMm: bullet?.length?.value,
+    bulletLengthMm: bulletLengthMm(values, bullet),
   })
   // the powder record's resistance with the file's overrides: one engraving value alone completes
   // the record's ramp, so the pair is only known here

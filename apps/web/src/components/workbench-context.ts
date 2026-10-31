@@ -5,6 +5,7 @@ import type { Powder, SessionRecord } from '@open-reloading/schema'
 import type { Context, Dispatch, RefObject, SetStateAction } from 'react'
 import { createContext, useContext } from 'react'
 import type { InteriorResponse } from '../lib/api-types.ts'
+import type { BulletValues } from '../lib/bullet.ts'
 import type { FittedPowder, UnfittedPowder } from '../lib/burn-rate.ts'
 import type { activeClick } from '../lib/firearm.ts'
 import type { Lots } from '../lib/load-notes.ts'
@@ -112,6 +113,7 @@ type InputEchoState = {
   trajectoryLoad: {
     muzzleVelocity?: number | undefined
     bullet?: string | undefined
+    bulletValues?: BulletValues | undefined
     twist?: number | undefined
     sightHeight?: number | undefined
     zeroRange?: number | undefined

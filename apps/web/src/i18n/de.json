@@ -93,6 +93,8 @@
   "BC bands need distinct speeds": "BC-Bänder brauchen verschiedene Geschwindigkeiten",
   "BC reference {id}": "BC-Bezug {id} unbekannt",
   "BC {model}": "BC {model}",
+  "BC G1": "BC G1",
+  "BC G7": "BC G7",
   "Ballistic coefficient": "Ballistischer Koeffizient",
   "Ballistic coefficients": "Ballistische Koeffizienten",
   "Band": "Band",
@@ -395,7 +397,6 @@
   "Dial": "Verstellung",
   "Diameter": "Durchmesser",
   "Diameter {diameter}": "Durchmesser {diameter}",
-  "Diameter × length": "Durchmesser × Länge",
   "Diameters, masses, lengths and ballistic coefficients, each with its source.": "Durchmesser, Massen, Längen und ballistische Koeffizienten, jeweils mit ihrer Quelle.",
   "Difference": "Differenz",
   "Difference %": "Differenz %",
@@ -3981,5 +3982,9 @@
   "The point of impact per charge needs the simulated drop slope: a bullet with a ballistic coefficient, the sight height and the zero range.": "Die Trefferlage je Treibladung braucht die simulierte Steigung des Flugbahnabfalls: ein Geschoss mit Ballistikkoeffizient, die Visierhöhe und die Einschießentfernung.",
   "The point of impact per charge needs three charges with {groups} groups of {shots} shots, each shot with a chronograph velocity and each group a point of aim.": "Die Trefferlage je Treibladung braucht drei Treibladungen mit je {groups} Schussbildern aus {shots} Schüssen, jeden Schuss mit einer Chronograph-Geschwindigkeit und jedes Schussbild mit einem Haltepunkt.",
   "The vertical centre changes with the charge by more than the simulated drop explains ({level} % test).": "Die senkrechte Mitte ändert sich mit der Treibladung stärker, als der simulierte Flugbahnabfall erklärt ({level} %-Test).",
-  "Vertical centre of the groups against charge, velocity effect removed": "Senkrechte Mitte der Schussbilder über der Treibladung, Geschwindigkeitseinfluss entfernt"
+  "Vertical centre of the groups against charge, velocity effect removed": "Senkrechte Mitte der Schussbilder über der Treibladung, Geschwindigkeitseinfluss entfernt",
+  "A typed value replaces every velocity band of the record. Empty: the record.": "Ein eingegebener Wert ersetzt alle Geschwindigkeitsbereiche des Datensatzes. Leer: der Datensatz.",
+  "Used by the trajectory, the stability estimate and the groups. The interior run takes the bore diameter of the Cartridge card.": "Wird für die Flugbahn, die Stabilität und die Schussbilder verwendet. Die Innenballistik nimmt den Felddurchmesser der Karte Patrone.",
+  "{count} bands": "{count} Bänder",
+  "Used by the stability estimate and by the bore resistance of a fitted powder, not by the cartridge drawing. Empty: the length of the record.": "Wird für die Stabilität und für den Laufwiderstand eines angepassten Treibladungspulvers verwendet, nicht für die Zeichnung der Patrone. Leer: die Länge des Datensatzes."
 }

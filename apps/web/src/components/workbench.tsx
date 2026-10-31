@@ -181,11 +181,11 @@ function cartridgePrintRows(
 }
 
 function bulletPrintRows(load: Load, t: Translate): PrintRows {
-  const { bulletLabel, bulletDesign, bullet, mmText, bc } = load
+  const { bulletLabel, bulletDesign, bulletValues, siLength, bc } = load
   return [
     [t('Bullet'), bulletLabel ?? bulletDesign?.name],
-    [t('Diameter'), bullet && mmText(bullet.diameter.value)],
-    [t('Length'), bullet?.length && mmText(bullet.length.value)],
+    [t('Diameter'), siLength(bulletValues.bulletDiameter)],
+    [t('Length'), siLength(bulletValues.bulletLength)],
     [t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
     printRow(load, 'bulletMass', t),
   ]
@@ -473,10 +473,10 @@ function linkFields(load: Load) {
 /** The query of Copy link: the inputs, and the Trajectory tab's while it is open. */
 function workbenchLinkQuery(load: Load) {
   const { choice, ladderSteps, ladderKind, direction, cartridge, recordLink, firearm } = load
-  const { measuredWaterCapacity, seating, tab, trajectory, gunWeightUsed } = load
+  const { measuredWaterCapacity, seating, tab, trajectory, gunWeightUsed, typedBulletFields } = load
   const query = inputsQuery(
     choice.preset,
-    { ...linkFields(load), firearmMass: gunWeightUsed },
+    { ...linkFields(load), ...typedBulletFields, firearmMass: gunWeightUsed },
     {
       cartridge: cartridge?.id,
       bullet: recordLink.bulletId,
@@ -958,6 +958,7 @@ export function Workbench() {
   const {
     asNewLoad,
     bullet,
+    bulletValues,
     bulletLabel,
     cartridge,
     changed,
@@ -1091,7 +1092,7 @@ export function Workbench() {
       ),
     [firearms, firearm],
   )
-  const bulletDiameter = bullet && toSi('length', bullet.diameter.value)
+  const { bulletDiameter } = bulletValues
   // the File menu's id: set by Save and Open, which re-render the page
   const fileId = fileMenu.current?.id()
   const ownFirearm = firearms.some((f) => f.id === firearm) ? firearm : undefined
@@ -1198,6 +1199,7 @@ export function Workbench() {
     [ladderKind, ladderSteps, chargeSi, stepSi, direction],
   )
   const [muzzleVelocity, bulletId] = [ok?.body.result.muzzleVelocity, bullet?.id]
+
   const [sightHeight, zeroRange] = [sight?.sightHeight, sight?.zeroRange]
   const [zeroTemperature, zeroPressure, zeroHumidity, dragFactor, dragFactorSource] = [
     sight?.zeroTemperature,
@@ -1210,6 +1212,8 @@ export function Workbench() {
     () => ({
       muzzleVelocity,
       bullet: bulletId,
+      // the tab fetches the record itself: it gets the values typed over it, and the mass
+      bulletValues,
       twist: twistSi,
       sightHeight,
       zeroRange,
@@ -1222,6 +1226,7 @@ export function Workbench() {
     [
       muzzleVelocity,
       bulletId,
+      bulletValues,
       twistSi,
       sightHeight,
       zeroRange,
