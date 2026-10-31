@@ -1,8 +1,13 @@
 import { z } from 'zod'
 import { quantityKind } from './units.ts'
 
-/** Method that measured a chamber pressure. */
-export const pressureMethod = z.enum(['transducer', 'piezo', 'crusher', 'energy'])
+/**
+ * Method that measured a chamber pressure, which is also the basis a pressure is compared on.
+ * `transducer` is the C.I.P. method, `case-contact` a transducer that rests against the outside
+ * of the case (the SAAMI method, as maker tables print it), `crusher` a copper crusher. The
+ * values are not converted into one another.
+ */
+export const pressureMethod = z.enum(['transducer', 'piezo', 'case-contact', 'crusher', 'energy'])
 
 /**
  * One value as a standard publishes it: a dimension, a pressure, an energy or a measuring position.

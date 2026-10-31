@@ -62,6 +62,7 @@
 . IcaoConstants
 . Identifiability
 . Identification
+. ImpactStep
 . InputBasis
 . InputDefault
 . InputError
@@ -76,6 +77,7 @@
 . InteriorValues
 . Interval
 . LadderFlatSpots
+. LadderImpact
 . LadderPoint
 . LadderSegment
 . LadderStep
@@ -244,6 +246,7 @@
 . cartridgeBulletDiameterMm
 . cartridgeDiameters
 . cartridgeGrooveDiameterMm
+. cartridgeLandDiameterMm
 . chargeLadder
 . chargeSolverMaxRuns
 . chargeSolverTolerance
@@ -307,6 +310,7 @@
 . interiorValueKeys
 . isStable
 . ladderFlatSpots
+. ladderImpactResiduals
 . lagrangeGradient
 . lbPerSqInToKgPerSqM
 . leakFlowFactor
@@ -351,6 +355,7 @@
 . radPerMoa
 . radPerMrad
 . rangeStringDefaults
+. recordBoreArea
 . recordLoad
 . recordResistance
 . rk45

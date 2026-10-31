@@ -35,7 +35,8 @@ export const compareHref = (ids: readonly string[]) => `/bullets/compare?ids=${i
 
 /**
  * A bullet record's "Compare": the bullet list searched by its common caliber with the bullet
- * ticked (`pick`), so one more tick opens the comparison.
+ * ticked (`pick`), so one more tick opens the comparison. A bullet without a diameter is ticked in the
+ * unsearched list.
  */
-export const compareFrom = (id: string, diameterMm: number) =>
-  `/bullets?${new URLSearchParams({ q: commonCaliber(diameterMm), pick: id })}`
+export const compareFrom = (id: string, diameterMm?: number) =>
+  `/bullets?${new URLSearchParams(diameterMm === undefined ? { pick: id } : { q: commonCaliber(diameterMm), pick: id })}`

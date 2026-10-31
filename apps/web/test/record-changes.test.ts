@@ -1,0 +1,55 @@
+import { expect, it, vi } from 'vitest'
+import { resetToRecord } from '../src/components/record-reset.ts'
+import { changedFromRecord, recordValuesOf } from '../src/lib/record-changes.ts'
+import { presetUnits } from '../src/lib/units.ts'
+
+it('names the values a record gives that the user changed, with the record value', () => {
+  const changed = changedFromRecord(
+    { vivacity: 2, gamma: 1.24, boreDiameter: 0.0078, density: undefined },
+    { vivacity: 1.8, gamma: 1.24, boreDiameter: 0.00782, density: 1600, covolume: 0.001 },
+    new Set(['boreDiameter']),
+  )
+  // equal, given by a record, empty and without a record value: no change
+  expect(changed).toEqual({ vivacity: 1.8 })
+})
+
+it('takes a value equal to the record value but for a unit round trip as unchanged', () => {
+  expect(changedFromRecord({ gamma: 1.24 + 1e-12 }, { gamma: 1.24 }, new Set())).toEqual({})
+})
+
+it('leaves the volume to the seating while a bullet is seated, and takes the gun weight', () => {
+  const suggestions = {
+    volume: { si: 3e-6, source: 'x' },
+    boreDiameter: { si: 0.0078, source: 'y' },
+  }
+  const base = { origin: undefined, bullet: {}, suggestions, firearmMass: 3.2 }
+  expect(recordValuesOf({ ...base, seatingOwnsVolume: false })).toMatchObject({
+    volume: 3e-6,
+    boreDiameter: 0.0078,
+    firearmMass: 3.2,
+  })
+  expect(recordValuesOf({ ...base, seatingOwnsVolume: true }).volume).toBeUndefined()
+})
+
+it('resets each kind of value its own way and counts the resets', () => {
+  const targets = {
+    changes: { vivacity: 1.8, boreDiameter: 0.0078, bulletLength: 0.03, firearmMass: 3.2 },
+    system: presetUnits('metric-grams'),
+    bulletKeys: new Set(['bulletLength']),
+    setField: vi.fn(),
+    clearError: vi.fn(),
+    unsetTypedBullet: vi.fn(),
+    follow: vi.fn(),
+    setGunWeight: vi.fn(),
+  }
+  const n = resetToRecord(
+    ['vivacity', 'boreDiameter', 'bulletLength', 'firearmMass', 'gamma'],
+    targets,
+  )
+  expect(n).toBe(4)
+  expect(targets.unsetTypedBullet).toHaveBeenCalledWith(['bulletLength'])
+  expect(targets.follow).toHaveBeenCalledWith(['boreDiameter'])
+  expect(targets.setField).toHaveBeenCalledWith('boreDiameter', { text: '', si: undefined })
+  expect(targets.setField).toHaveBeenCalledWith('vivacity', { text: expect.any(String), si: 1.8 })
+  expect(targets.setGunWeight).toHaveBeenCalledWith({ text: expect.any(String), si: 3.2 })
+})

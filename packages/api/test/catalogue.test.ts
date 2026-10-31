@@ -30,6 +30,7 @@ describe('derive', () => {
       name: 'Beta Pistol',
       aliases: [],
       table: 'IV',
+      boreDiameter: 7.82,
       maxBulletDiameter: 9.02,
       caseLength: 20,
       cartridgeLength: 29.7,
@@ -149,6 +150,31 @@ describe('open', () => {
     expect(ids(catalogue.powders({ q: 'old a fast' }))).toEqual(['example-a-fast'])
     expect(ids(catalogue.powders({ q: 'fast', manufacturer: 'example-b' }))).toEqual([])
     expect(ids(catalogue.bullets({ q: 'test 168' }))).toEqual(['example-a-1'])
+  })
+
+  it('lists a name-only bullet with no diameter, marked, and leaves it out of a cartridge filter', () => {
+    const { productNumber: _p, diameter: _d, ...rest } = defined(bundle.bullets[0])
+    const nameOnly = {
+      ...rest,
+      id: 'example-a-name-only',
+      name: 'Name only',
+      nameOnly: true as const,
+    }
+    const listed = openCatalogue(
+      buildCatalogue({ ...bundle, bullets: [...bundle.bullets, nameOnly] }),
+    )
+    expect(listed.bullets({}).items.find((b) => b.id === nameOnly.id)).toEqual({
+      id: 'example-a-name-only',
+      manufacturer: 'example-a',
+      name: 'Name only',
+      diameter: null,
+      mass: 10.89,
+      length: null,
+      ballisticCoefficientG1: 0.46,
+      ballisticCoefficientG7: null,
+      nameOnly: true,
+    })
+    expect(ids(listed.bullets({ cartridge: 'alpha-rifle' }))).not.toContain(nameOnly.id)
   })
 
   it('answers the record with kind, origin and a revision that follows its content', () => {

@@ -58,3 +58,9 @@ export function cartridgeBoreAreaMm2(c: CartridgeSpecs): number | undefined {
   return c.values.find((v) => v.side === 'chamber' && v.symbol === 'Q' && v.value !== undefined)
     ?.value
 }
+
+/** Land diameter F of a cartridge record's CIP chamber, mm (the first one). */
+export function cartridgeLandDiameterMm(c: CartridgeSpecs): number | undefined {
+  return c.values.find((v) => v.side === 'chamber' && v.symbol === 'F' && v.value !== undefined)
+    ?.value
+}

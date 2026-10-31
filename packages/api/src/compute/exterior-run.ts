@@ -168,6 +168,8 @@ function stabilityInputs(q: StabilityQuery, record: Bullet | undefined) {
   const { mass, diameter, length, resolved } = record
     ? fillFromRecord(q, record)
     : { ...q, resolved: undefined }
+  if (diameter === undefined && length !== undefined)
+    throw new InputError(`bullet ${q.bullet} has no diameter`)
   if (mass === undefined || diameter === undefined || length === undefined)
     throw new InputError(`bullet ${q.bullet} has no length`)
   // request values have passed these bounds already; record values have not

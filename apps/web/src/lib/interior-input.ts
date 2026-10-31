@@ -22,7 +22,7 @@ export const interiorFields = [
     key: 'boreArea',
     label: msg('Bore area'),
     help: msg(
-      "Optional. Empty: the cartridge record's bore area Q, else the circle of the mean of the bore and groove diameters, else of the bore diameter.",
+      "Optional. Empty: the cartridge record's bore area Q while the bore diameter is the record's, else the circle of the mean of the bore and groove diameters, else of the bore diameter.",
     ),
     quantity: 'area',
     min: 0,

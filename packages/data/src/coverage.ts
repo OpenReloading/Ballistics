@@ -12,6 +12,7 @@ const identity = new Set([
   'caliber',
   'cartridge',
   'note',
+  'nameOnly',
 ])
 
 /** Quantity objects (`{ value, raw }`) and arrays count as one field. */

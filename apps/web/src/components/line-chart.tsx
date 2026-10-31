@@ -35,6 +35,31 @@ const Scale = createContext<ChartScale | undefined>(undefined)
 /** The scales of the enclosing `LineChart`, once it has drawn. */
 export const useChartScale = () => useContext(Scale)
 
+/** The error bars of `LineChart`'s `bars`, on its scales. */
+function ErrorBars({ x, y, bars }: { x: number[]; y: number[]; bars: number[] }) {
+  const sc = useChartScale()
+  if (!sc) return null
+  return (
+    <g className="error-bar">
+      {x.map((v, i) => {
+        const [px, low, high] = [
+          sc.x(v),
+          sc.y((y[i] ?? 0) - (bars[i] ?? 0)),
+          sc.y((y[i] ?? 0) + (bars[i] ?? 0)),
+        ]
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: one bar per point, in order
+          <g key={i}>
+            <line x1={px} x2={px} y1={low} y2={high} />
+            <line x1={px - 4} x2={px + 4} y1={low} y2={low} />
+            <line x1={px - 4} x2={px + 4} y1={high} y2={high} />
+          </g>
+        )
+      })}
+    </g>
+  )
+}
+
 /**
  * Line chart (ECharts) in display units on linear axes over nice ticks. `title` names the image
  * and `description` states what it shows; the table or readouts next to it carry the data.
@@ -56,6 +81,7 @@ export function LineChart({
   include = [],
   points = false,
   integerX = false,
+  bars,
   children,
 }: {
   x: number[]
@@ -74,6 +100,8 @@ export function LineChart({
   /** A marker on each point of `x` and `y`. */
   points?: boolean
   integerX?: boolean
+  /** A bar of this half length, in the units of `y`, above and below each point (an error bar). */
+  bars?: number[]
   children?: ReactNode
 }) {
   const tokens = useChartTokens(lineTokens)
@@ -81,7 +109,8 @@ export function LineChart({
   const [xMin, xMax] = extent(x)
   // the x axis ends at the data, ticks at nice values up to it
   const xt = axisTicks(xMin, xMax, integerX)
-  const yt = niceTicks(...extent([y, limits.map((l) => l.y), include].flat()))
+  const spread = bars ? y.flatMap((v, i) => [v - (bars[i] ?? 0), v + (bars[i] ?? 0)]) : []
+  const yt = niceTicks(...extent([y, limits.map((l) => l.y), include, spread].flat()))
   const ok = x.length >= 2 && xt.length >= 2 && yt.length >= 2
   // callers pass new arrays on each render: the option follows their values, so a render that
   // changes nothing drawn does not redraw the chart
@@ -194,11 +223,14 @@ export function LineChart({
         height={fill ? undefined : height}
         title={title}
         description={description}
-        onRender={children ? measure : undefined}
+        onRender={children || bars ? measure : undefined}
       />
-      {children && (
+      {(children || bars) && (
         <svg className="chart-overlay" aria-hidden="true" style={{ height }}>
-          <Scale.Provider value={scale}>{children}</Scale.Provider>
+          <Scale.Provider value={scale}>
+            {bars && <ErrorBars x={x} y={y} bars={bars} />}
+            {children}
+          </Scale.Provider>
         </svg>
       )}
     </div>

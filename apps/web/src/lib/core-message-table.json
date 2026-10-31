@@ -4,6 +4,7 @@
     "crusher",
     "transducer",
     "piezo",
+    "case-contact",
     "energy",
     "measuring method not stated",
     "measuring method not stated in the record",
@@ -133,6 +134,7 @@
       "propellant.bulkDensity or powder is required for the loadRatio target",
       "options.maxSteps must be at most {max} for the charge solver",
       "bullet {id} has no length",
+      "bullet {id} has no diameter",
       "bullet {id} {key} {value} {unit} must be within {low} and {high} {unit}",
       "result holds a non-finite number at {path}",
       "powder {id} bulk density {n} kg/m3 must be above 0 and at most {max} kg/m3",
@@ -245,7 +247,12 @@
       "standard deviation must be 0 or more",
       "each string needs at least two shots",
       "every string needs at least one velocity",
-      "charges must differ"
+      "charges must differ",
+      "a ladder needs at least three charges",
+      "slope must be finite",
+      "each charge needs at least two shots",
+      "each shot needs a height and a velocity",
+      "heights and velocities must be finite"
     ],
     "load file values": [
       "Enter a number for {label}.",

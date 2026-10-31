@@ -74,7 +74,7 @@ One envelope on every entity: `id`, `kind`, `origin`, `name`, `provenance`, `bas
 | `user` | the records of this browser's owner |
 | `shared` | received through a file or a share link, kept as a copy owned by the receiver, with the sender's file cited in its provenance |
 
-The finer standing of a citation (manufacturer, public, community) stays in `provenance.sources[].origin`. That field is renamed `standing` so one word has one meaning.
+The finer standing of a citation (manufacturer, public, community) stays in `provenance.sources[].origin`. `manufacturer` is data the maker supplied or published and claims no permission: a permission or terms it states go in `terms`, and such a source carries no project licence (`apps/docs/docs/data/published-loads.md`). That field is renamed `standing` so one word has one meaning.
 
 ### Entities
 
@@ -118,9 +118,20 @@ Stored entities use the stored units of `units.ts` only. SI appears at solver ca
 
 A `{manufacturer, model}` description (the maker a `catalogue:` reference) is allowed only in catalogue records of provenance kind `measured` (publications). In user loads the app creates a user Bullet or Powder stub, so every reference resolves.
 
+### Name-only bullets
+
+A table names a bullet by maker, type and mass, often without a product number, diameter or length. Such a bullet is a record with only what is known: `nameOnly: true`, no `productNumber`, a `mass`, and a `diameter` only where a table prints one (never the cartridge's maximum bullet diameter). The marker is checked in both directions by the schema: without it `productNumber` and `diameter` are required, so a full record that loses one fails `data:validate`; with it `productNumber` must be absent.
+
+- The name and the id carry the caliber where two records of one maker would otherwise collide (names are unique per maker).
+- When a full record of the product appears, the name-only file is deleted, `records/renames.json` maps its id to the new one, and the loads that name it are rewritten in the same change (a load names current ids only).
+- A bullet that no table prints a maker for gets no record: the load keeps the printed text.
+- The API lists `diameter` as `null` and carries `nameOnly: true`. A trajectory needs a diameter and a ballistic coefficient, which such a record lacks.
+
+A powder needs no marker: only `id`, `manufacturer`, `name` and `provenance` are required, so a powder with only a name is a valid record. A manufacturer record with only a name and the table as its source is valid too.
+
 ### Saved recipes
 
-A saved recipe keeps only the keys the user typed, under `analysis.overrides`, validated against `workbenchValueKeys`: the solver values and the bullet's `bulletDiameter`, `bulletLength`, `bulletBcG1` and `bulletBcG7` (the bullet mass is `bulletMass`). A typed BC replaces every velocity band of its drag model with one value from 0 m/s. The interior route reads `bulletLength` for the bore resistance and ignores the other three.
+A saved recipe keeps only the keys the user typed, under `analysis.overrides`, validated against `workbenchValueKeys`: the solver values and the bullet's `bulletDiameter`, `bulletLength`, `bulletBcG1` and `bulletBcG7` (the bullet mass is `bulletMass`). A typed BC replaces every velocity band of its drag model with one value from 0 m/s. The interior route reads `bulletLength` for the bore resistance and ignores the other three. The workbench marks a value that differs from the record's with a reset action (`apps/web/src/lib/record-changes.ts`); a value is marked only when the record supplies that key and the value differs from the record's; a value without a record value, one equal to the record's and a typed BC over a record with several bands are not marked. A new record pick replaces the card's changed values.
 
 ### Catalogue and API
 

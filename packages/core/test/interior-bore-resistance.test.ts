@@ -5,6 +5,7 @@ import {
   cartridgeBulletDiameterMm,
   cartridgeGrooveDiameterMm,
   oversizePercent,
+  recordBoreArea,
   recordResistance,
 } from '../src/index.ts'
 
@@ -49,6 +50,19 @@ describe('bore area', () => {
       12,
     )
     expect(boreArea({ boreDiameter: 7.62 })).toBeCloseTo((Math.PI / 4) * 7.62 ** 2, 12)
+  })
+})
+
+describe('record bore area', () => {
+  it('applies to the land diameter it describes, not to another bore diameter', () => {
+    expect(recordBoreArea(47.51, 7.82, 7.82)).toBe(47.51)
+    expect(recordBoreArea(47.51, 7.82, 7.82 * (1 + 1e-9))).toBe(47.51)
+    expect(recordBoreArea(47.51, 7.82, 7.9)).toBeUndefined()
+  })
+  it('stays where the record has no land diameter or no bore diameter is known', () => {
+    expect(recordBoreArea(47.51, undefined, 7.9)).toBe(47.51)
+    expect(recordBoreArea(47.51, 7.82, undefined)).toBe(47.51)
+    expect(recordBoreArea(undefined, 7.82, 7.82)).toBeUndefined()
   })
 })
 

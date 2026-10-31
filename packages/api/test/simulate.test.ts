@@ -159,6 +159,24 @@ describe('POST /interior/load-file', () => {
     expect(bare.body.summary.peakPressure).not.toBe(sim.body.summary.peakPressure)
   })
 
+  it('takes the circle of the typed bore diameter and the groove diameter, not the record area Q, which describes the land diameter', async () => {
+    const { boreArea: _, ...empty } = siValues
+    const typed = { ...empty, boreDiameter: 7.9e-3 }
+    const sim = await simulate(file({ siValues: typed, cartridge: 'beta-pistol' }))
+    // the fixture's groove diameter is 8.85 mm
+    const mean = (7.9e-3 + 8.85e-3) / 2
+    const explicit = await simulate(
+      file({
+        siValues: { ...typed, boreArea: (Math.PI / 4) * mean ** 2 },
+        cartridge: 'beta-pistol',
+      }),
+    )
+    expect(sim.status).toBe(200)
+    expect(sim.body.summary.peakPressure).toBeCloseTo(explicit.body.summary.peakPressure, 3)
+    const record = await simulate(file({ siValues: empty, cartridge: 'beta-pistol' }))
+    expect(record.body.summary.peakPressure).not.toBe(sim.body.summary.peakPressure)
+  })
+
   it('adds the curves on request', async () => {
     const { body } = await simulate(file({ siValues }), '?curves=true')
     expect(body.points.length).toBeGreaterThan(10)

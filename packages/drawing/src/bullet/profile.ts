@@ -15,7 +15,7 @@ interface StoredQuantity {
 
 /** The bullet record fields the drawing reads; the API type of a bullet record is assignable to it. */
 export interface BulletValues {
-  diameter: StoredQuantity
+  diameter?: StoredQuantity | undefined
   length?: StoredQuantity | undefined
   noseLength?: StoredQuantity | undefined
   baseToOgive?: StoredQuantity | undefined
@@ -108,9 +108,9 @@ const tipDimensions = (tip: NonNullable<BulletValues['tip']>) => ({
   ...(tip.mouthDiameter && { mouthDiameter: tip.mouthDiameter.value }),
 })
 
-/** The shape `bulletOutline` reads, in mm and degrees; undefined without a length. */
+/** The shape `bulletOutline` reads, in mm and degrees; undefined without a length or a diameter. */
 export function bulletDimensions(r: BulletValues): BulletDimensions | undefined {
-  if (!r.length) return
+  if (!r.length || !r.diameter) return
   const base = r.base && baseDimensions(r.base)
   const ogive = r.ogive && ogiveDimensions(r.ogive)
   const cannelure = r.cannelure && cannelureDimensions(r.cannelure)
@@ -343,7 +343,10 @@ function undimensionedFields(shape: BulletDimensions, drawn: { symbol: string }[
 /** The profile of a record: its shape, with the fields its sources cover. */
 export function recordProfile(r: BulletValues): BulletProfile | Refusal {
   const shape = bulletDimensions(r)
-  if (!shape) return { reason: 'The record has no length.', fields: ['length'] }
+  if (!shape) {
+    const field = r.length ? 'diameter' : 'length'
+    return { reason: `The record has no ${field}.`, fields: [field] }
+  }
   return bulletProfile(
     shape,
     (field) => at(r, field) !== undefined && sourceTitle(r, field) !== undefined,

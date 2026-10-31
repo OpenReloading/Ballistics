@@ -774,7 +774,7 @@ function SeatingSlot({ name }: { name: SeatingSlotName }) {
 }
 
 /** The cards with a More popover. */
-const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder']
+const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder', 'firearm']
 
 /** The prototypes also move the Gun card's twist, travel and weight behind a More popover. */
 const hasMore = (p: InputPanel, layout: ProtoLayout | undefined) =>
@@ -823,6 +823,29 @@ function defaultMark(key: string, defaults: LoadValues['defaults'], t: Translato
   return t('Default: {source}.', { source })
 }
 
+/** A value of a field with its unit, as a mark or an action text names it. */
+const valueWithUnit = (quantity: FieldSpec['quantity'], s: UnitSystem, si: number) =>
+  [formatQuantity(quantity, s, si), s[quantity].symbol].filter(Boolean).join(' ')
+
+/** The restore action of a field changed over its record's value: the record's value comes back. */
+function changeAction(
+  spec: Pick<FieldSpec, 'key' | 'label' | 'quantity'>,
+  from: number | undefined,
+  resetKeys: LoadValues['resetKeys'],
+  t: Translator['t'],
+) {
+  if (from === undefined) return
+  return {
+    kind: 'restore' as const,
+    text: (s: UnitSystem) =>
+      t('Reset {label} to the record value {value}', {
+        label: specText(t, spec.label),
+        value: valueWithUnit(spec.quantity, s, from),
+      }),
+    onClick: () => resetKeys([spec.key]),
+  }
+}
+
 type LoadFieldMarkArgs = {
   key: string
   spec: InteriorSpec
@@ -834,6 +857,8 @@ type LoadFieldMarkArgs = {
   powder: LoadValues['powder']
   powderDesign: LoadValues['powderDesign']
   origin: LoadValues['origin']
+  /** The record's value where the user changed it. */
+  changed: number | undefined
   tn: Translator['tn']
 }
 
@@ -851,6 +876,7 @@ function loadFieldMark(
     powder,
     powderDesign,
     origin,
+    changed,
     tn,
   }: LoadFieldMarkArgs,
   t: Translator['t'],
@@ -865,19 +891,23 @@ function loadFieldMark(
           unit: s[spec.quantity].symbol,
         })
   return (
-    powder &&
-    origin &&
-    recordMark(
-      powder,
-      origin,
-      key,
-      fields[key]?.si,
-      (si) =>
-        [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
-      powderDesign ? 'user design' : 'record',
-      t,
-      loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
-    )
+    (powder &&
+      origin &&
+      recordMark(
+        powder,
+        origin,
+        key,
+        fields[key]?.si,
+        (si) => valueWithUnit(spec.quantity, s, si),
+        powderDesign ? 'user design' : 'record',
+        t,
+        loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
+      )) ||
+    (changed === undefined
+      ? undefined
+      : t('Changed from the record value {value}.', {
+          value: valueWithUnit(spec.quantity, s, changed),
+        }))
   )
 }
 
@@ -946,6 +976,8 @@ function LoadField({ name: key }: { name: string }) {
     printing,
     printMedia,
     recordBore,
+    changes,
+    resetKeys,
   } = useLoad()
   const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
@@ -992,6 +1024,7 @@ function LoadField({ name: key }: { name: string }) {
             powder,
             powderDesign,
             origin,
+            changed: changes[key],
             tn,
           },
           t,
@@ -1007,7 +1040,10 @@ function LoadField({ name: key }: { name: string }) {
           (typeof props.error === 'string' ? translateMessage(props.error, t) : undefined))
       }
       flag={seatingFlag(key, seated, previewed, fields, t)}
-      action={seatingAction(key, spec, seated, previewed, fields, takeSeated, t)}
+      action={
+        seatingAction(key, spec, seated, previewed, fields, takeSeated, t) ??
+        changeAction(spec, changes[key], resetKeys, t)
+      }
       onBlur={() => {
         // an emptied field takes its default again
         if (followable && !fields[key]?.text.trim())
@@ -1049,6 +1085,8 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
     markChanged,
     printing,
     printMedia,
+    changes,
+    resetKeys,
   } = useLoad()
   const { t } = useTranslation()
   const spec = bulletFields.find((s) => s.key === key)
@@ -1074,6 +1112,14 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
       placeholder={bands > 1 ? t('{count} bands', { count: bands }) : undefined}
       muted={typed === undefined}
       error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
+      mark={(s) =>
+        changes[key] === undefined
+          ? undefined
+          : t('Changed from the record value {value}.', {
+              value: valueWithUnit(spec.quantity, s, changes[key]),
+            })
+      }
+      action={changeAction(spec, changes[key], resetKeys, t)}
       onChange={(v) => {
         markChanged()
         setTypedBullet((f) => ({ ...f, [key]: v }))
@@ -1112,7 +1158,7 @@ function BulletValueFields({ more }: { more?: boolean }) {
 
 /** The note on a load whose powder design has a newer fit, with the switch to it. */
 function NewerFitNote() {
-  const { powderDesign, powderDesigns, choosePowderDesign } = useLoad()
+  const { powderDesign, powderDesigns, pickPowderDesign } = useLoad()
   const { t } = useTranslation()
   const newer = powderDesign && newerFit(powderDesigns, powderDesign.id)
   if (!newer) return null
@@ -1122,7 +1168,7 @@ function NewerFitNote() {
       <Button
         size={controlSize.row.button}
         variant="default"
-        onClick={() => choosePowderDesign(newer.id)}
+        onClick={() => pickPowderDesign(newer.id)}
       >
         {t('Use the refit')}
       </Button>
@@ -1132,7 +1178,7 @@ function NewerFitNote() {
 
 /** The gun weight; its message waits for the end of the typing, as "0." on the way to "0.5" is no error. */
 function GunWeightField() {
-  const { system, gunWeight, setGunWeight, markChanged } = useLoad()
+  const { system, gunWeight, setGunWeight, markChanged, changes, resetKeys } = useLoad()
   const { t } = useTranslation()
   const [gunLeft, setGunLeft] = useState(false)
   return (
@@ -1141,6 +1187,14 @@ function GunWeightField() {
       system={system}
       value={gunWeight}
       error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t) : undefined}
+      mark={(s) =>
+        changes.firearmMass === undefined
+          ? undefined
+          : t('Changed from the record value {value}.', {
+              value: valueWithUnit(firearmMassSpec.quantity, s, changes.firearmMass),
+            })
+      }
+      action={changeAction(firearmMassSpec, changes.firearmMass, resetKeys, t)}
       onBlur={() => setGunLeft(true)}
       onChange={(value) => {
         markChanged()
@@ -1258,6 +1312,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'cartridge')
     return (
       <div className="panel-fields">
+        <ReplacedNote panel={panel} />
         <CardSummary panel="cartridge" />
         {fieldsOf(layout && !dense(layout) ? ['volume'] : panelFields.cartridge)}
         {/* case capacity, COAL or CBTO and the seating values of the figure */}
@@ -1268,6 +1323,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'bullet')
     return (
       <div className="panel-fields">
+        <ReplacedNote panel={panel} />
         {bulletNote && <p className="note wide">{bulletNote}</p>}
         {fieldsOf(panelFields.bullet)}
         <BulletValueFields />
@@ -1276,6 +1332,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
   if (panel === 'powder')
     return (
       <div className="panel-fields">
+        <ReplacedNote panel={panel} />
         <CardSummary panel="powder" />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
@@ -1293,6 +1350,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
     )
   return (
     <div className="panel-fields">
+      <ReplacedNote panel={panel} />
       {fieldsOf(panelFields.firearm)}
       {/* the barrel length of the figure */}
       <SeatingSlot name="gun" />
@@ -1329,8 +1387,8 @@ function BulletPicker() {
     designs,
     bulletParams,
     describeBullet,
-    chooseBullet,
-    chooseDesign,
+    pickBullet,
+    pickDesign,
     readDesigns,
     linkedBullet,
     cartridge,
@@ -1371,8 +1429,8 @@ function BulletPicker() {
         }
         onSelect={(b) => {
           const design = userRecordId(b.id)
-          if (design) chooseDesign(design)
-          else chooseBullet(b.id)
+          if (design) pickDesign(design)
+          else pickBullet(b.id)
         }}
         noneText={t('No bullet found')}
         unreachableText={t(notReached)}
@@ -1395,8 +1453,8 @@ function BulletPicker() {
         system={system}
         onChoose={(row) => {
           const design = userRecordId(row.id)
-          if (design) chooseDesign(design)
-          else chooseBullet(row.id)
+          if (design) pickDesign(design)
+          else pickBullet(row.id)
           dialog.close()
         }}
       />
@@ -1410,9 +1468,9 @@ function CartridgePicker() {
     cartridge,
     cartridgeDesign,
     cartridgeDesigns,
-    chooseCartridgeDesign,
+    pickCartridgeDesign,
     searchKey,
-    chooseCartridge,
+    pickCartridge,
     readDesigns,
     system,
   } = useLoad()
@@ -1420,8 +1478,8 @@ function CartridgePicker() {
   const dialog = useChooser()
   const choose = (c: CartridgeRow) => {
     const design = userRecordId(c.id)
-    if (design) chooseCartridgeDesign(design)
-    else chooseCartridge({ id: c.id, name: c.name, ...summaryFitSource(c) })
+    if (design) pickCartridgeDesign(design)
+    else pickCartridge({ id: c.id, name: c.name, ...summaryFitSource(c) })
   }
   return (
     <>
@@ -1445,7 +1503,7 @@ function CartridgePicker() {
           id: d.id,
           label: t('{name} (your design)', { name: d.name }),
         }))}
-        onExtra={chooseCartridgeDesign}
+        onExtra={pickCartridgeDesign}
         noneText={t('No cartridge found')}
         unreachableText={t(notReached)}
         browse={{
@@ -1476,11 +1534,11 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   const {
     fields,
     powderLabel,
-    choosePowder,
+    pickPowder,
     linkedPowder,
     powderDesign,
     powderDesigns,
-    choosePowderDesign,
+    pickPowderDesign,
     readDesigns,
     system,
   } = useLoad()
@@ -1503,13 +1561,13 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         label={t('Search powders by manufacturer and name')}
         chosen={chosen}
         describe={(p) => productLabel(p, names)}
-        onSelect={(p) => choosePowder(p.id)}
+        onSelect={(p) => pickPowder(p.id)}
         // the browser's powder designs in the same list, first
         extra={powderDesigns.map((d) => ({
           id: d.id,
           label: t('{name} (your design)', { name: d.name }),
         }))}
-        onExtra={choosePowderDesign}
+        onExtra={pickPowderDesign}
         noneText={t('No powder found')}
         unreachableText={t(notReached)}
         browse={{
@@ -1527,8 +1585,8 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         designs={powderDesigns}
         system={system}
         onChoose={(p) => {
-          if (p.origin) choosePowderDesign(p.id)
-          else choosePowder(p.id)
+          if (p.origin) pickPowderDesign(p.id)
+          else pickPowder(p.id)
           dialog.close()
         }}
       />
@@ -1538,7 +1596,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
 
 /** The Gun card's picker: the library's firearms and the example rifle, in the field and the dialog. */
 function GunPicker() {
-  const { chooseFirearm, firearm, firearms, readDesigns, system } = useLoad()
+  const { pickFirearm, firearm, firearms, readDesigns, system } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
   const { rows, placeholder } = useMemo(
@@ -1562,7 +1620,7 @@ function GunPicker() {
         picked={!!chosen}
         chosen={chosen?.name ?? placeholder}
         describe={(f) => f.name}
-        onSelect={(f) => chooseFirearm(f.id)}
+        onSelect={(f) => pickFirearm(f.id)}
         noneText={t('No firearm found')}
         unreachableText={t(notReached)}
         find={find}
@@ -1573,7 +1631,7 @@ function GunPicker() {
             dialog.open(typed)
           },
         }}
-        clear={{ label: t('Clear the firearm'), onClear: () => chooseFirearm(null) }}
+        clear={{ label: t('Clear the firearm'), onClear: () => pickFirearm(null) }}
       />
       <FirearmChooser
         opened={dialog.opened}
@@ -1583,7 +1641,7 @@ function GunPicker() {
         add={firearms.length === 0}
         system={system}
         onChoose={(f) => {
-          chooseFirearm(f.id)
+          pickFirearm(f.id)
           dialog.close()
         }}
       />
@@ -1600,8 +1658,59 @@ function CardPicker({ panel }: { panel: InputPanel }) {
   return <GunPicker />
 }
 
+/** The values of each card a record gives and the user may change. */
+export const cardKeys: Record<InputPanel, readonly string[]> = {
+  cartridge: panelFields.cartridge,
+  bullet: ['bulletMass', ...bulletFields.map((s) => s.key)],
+  powder: [...modelFields, ...powderMoreFields],
+  firearm: ['twist', 'firearmMass'],
+}
+
+/** The note that a record pick replaced the card's changed values. */
+function ReplacedNote({ panel }: { panel: InputPanel }) {
+  const { replaced } = useLoad()
+  const { tn } = useTranslation()
+  if (replaced?.panel !== panel) return null
+  return (
+    <p className="note wide">
+      {tn(
+        replaced.count,
+        'The new record replaced {count} changed value.',
+        'The new record replaced {count} changed values.',
+      )}
+    </p>
+  )
+}
+
+/** Gives the card's changed values their record's values again. */
+function ResetCard({ panel }: { panel: InputPanel }) {
+  const { changes, resetKeys } = useLoad()
+  const { t } = useTranslation()
+  const keys = cardKeys[panel].filter((k) => changes[k] !== undefined)
+  return (
+    <Button
+      className="wide"
+      size={controlSize.row.button}
+      variant="default"
+      disabled={keys.length === 0}
+      onClick={() => resetKeys(keys)}
+    >
+      {t('Reset card')}
+    </Button>
+  )
+}
+
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
+  return (
+    <>
+      <MoreRows panel={panel} />
+      <ResetCard panel={panel} />
+    </>
+  )
+}
+
+function MoreRows({ panel }: { panel: InputPanel }) {
   const { specValue, system, allDiameters, setAllDiameters, bullet } = useLoad()
   const { t } = useTranslation()
   const { layout } = useProto()
@@ -1634,6 +1743,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
+  if (panel === 'firearm') return null
   return (
     <>
       <BulletValueFields more />
