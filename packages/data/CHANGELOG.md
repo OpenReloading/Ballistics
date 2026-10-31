@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/data-v0.0.4...data-v0.0.5) (2026-10-31)
+
+
+### Features
+
+* **data:** add the Austrian OeSB with its national target and disciplines ([#699](https://github.com/OpenReloading/Ballistics/issues/699)) ([95051bc](https://github.com/OpenReloading/Ballistics/commit/95051bc271d6fcb975f3812c8fb37fbeef91f4c2))
+* **data:** rule facts per discipline and stage ([#432](https://github.com/OpenReloading/Ballistics/issues/432)) ([be5fcd5](https://github.com/OpenReloading/Ballistics/commit/be5fcd55a456a33e3c823890a229f8c5d3fd7195))
+* pre-release batch of command line, importer, firearm and size check work ([#659](https://github.com/OpenReloading/Ballistics/issues/659)) ([e468295](https://github.com/OpenReloading/Ballistics/commit/e46829524214011f7e7c6f7bb26752b6ffb8cff7))
+* pre-release batch of firearm views, box label, load-file importer and research entries ([#656](https://github.com/OpenReloading/Ballistics/issues/656)) ([5d38b2c](https://github.com/OpenReloading/Ballistics/commit/5d38b2cd057a9f0d6e2757dcf833501a1ab0268e))
+* pre-release batch of fits, hit probability, tuning and docs ([#569](https://github.com/OpenReloading/Ballistics/issues/569)) ([3a5c6a4](https://github.com/OpenReloading/Ballistics/commit/3a5c6a4a7be9d52d20eca911cdccd49ad2d104c4))
+* pre-release batch of national body data and hole detection of filled print areas ([#668](https://github.com/OpenReloading/Ballistics/issues/668)) ([5f2e7ea](https://github.com/OpenReloading/Ballistics/commit/5f2e7ea399ae919859628146a2a5d7b3867b6ed5))
+* pre-release batch of workbench record chooser, notes area, print fixes, photo guide and command line operations ([#688](https://github.com/OpenReloading/Ballistics/issues/688)) ([db2b2da](https://github.com/OpenReloading/Ballistics/commit/db2b2dae53086aa27177764e6dc91d0f0699e78f))
+* pre-release integration of the 1.0 work ([#493](https://github.com/OpenReloading/Ballistics/issues/493)) ([46ace26](https://github.com/OpenReloading/Ballistics/commit/46ace26932aa37546eaf95f905870c0606abfb8d))
+* **web:** shared choice filters for Disciplines, Federations and Targets, discipline distance unit ([#427](https://github.com/OpenReloading/Ballistics/issues/427)) ([61737a0](https://github.com/OpenReloading/Ballistics/commit/61737a0d9269d0cb9930860c2d7b563f7c6b6b4b))
+
+
+### Bug fixes
+
+* batch of audit fixes for scoring, German text and layout ([#722](https://github.com/OpenReloading/Ballistics/issues/722)) ([2e2a601](https://github.com/OpenReloading/Ballistics/commit/2e2a6015ff24a4b54ee052fc2098f34bbe9db207))
+* **data:** declare zod as a runtime dependency ([#524](https://github.com/OpenReloading/Ballistics/issues/524)) ([2718f21](https://github.com/OpenReloading/Ballistics/commit/2718f21a499d1118c5bca869354e922b9f658894))
+* pre-release batch of audit fixes for import, API query checks, load file, data package and CI plan ([#698](https://github.com/OpenReloading/Ballistics/issues/698)) ([eba4c2c](https://github.com/OpenReloading/Ballistics/commit/eba4c2c703aaba75e1e50989d850691b46926a10))
+
+
+### Documentation
+
+* add npm READMEs and package metadata to the published libraries ([#527](https://github.com/OpenReloading/Ballistics/issues/527)) ([21db896](https://github.com/OpenReloading/Ballistics/commit/21db896a6800ead1892216fb9918258dbb20834f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/schema bumped from 0.0.4 to 0.0.5
+
 ## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/data-v0.0.3...data-v0.0.4) (2026-10-27)
 
 

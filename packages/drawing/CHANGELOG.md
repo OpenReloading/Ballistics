@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.3...drawing-v0.0.4) (2026-10-31)
+
+
+### Features
+
+* pre-release batch of firearm views, box label, load-file importer and research entries ([#656](https://github.com/OpenReloading/Ballistics/issues/656)) ([5d38b2c](https://github.com/OpenReloading/Ballistics/commit/5d38b2cd057a9f0d6e2757dcf833501a1ab0268e))
+* pre-release batch of fits, hit probability, tuning and docs ([#569](https://github.com/OpenReloading/Ballistics/issues/569)) ([3a5c6a4](https://github.com/OpenReloading/Ballistics/commit/3a5c6a4a7be9d52d20eca911cdccd49ad2d104c4))
+* pre-release batch of tests, fixes and research entries ([#612](https://github.com/OpenReloading/Ballistics/issues/612)) ([df1f134](https://github.com/OpenReloading/Ballistics/commit/df1f1347845b62b98a153896a7f27caefd56befb))
+* pre-release integration of the 1.0 work ([#493](https://github.com/OpenReloading/Ballistics/issues/493)) ([46ace26](https://github.com/OpenReloading/Ballistics/commit/46ace26932aa37546eaf95f905870c0606abfb8d))
+
+
+### Bug fixes
+
+* second batch of audit fixes for messages, contrast, German layout and offline start ([#744](https://github.com/OpenReloading/Ballistics/issues/744)) ([c01a781](https://github.com/OpenReloading/Ballistics/commit/c01a7816faea53693d1941ffc830c536764a88e7))
+
+
+### Documentation
+
+* add npm READMEs and package metadata to the published libraries ([#527](https://github.com/OpenReloading/Ballistics/issues/527)) ([21db896](https://github.com/OpenReloading/Ballistics/commit/21db896a6800ead1892216fb9918258dbb20834f))
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.2...drawing-v0.0.3) (2026-10-27)
 
 
