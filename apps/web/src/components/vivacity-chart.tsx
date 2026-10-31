@@ -109,7 +109,9 @@ function vivacityOption(
     // the bottom keeps room for the x axis name below its labels (containLabel counts labels only)
     grid: {
       left: 4,
-      right: 12,
+      // the label of a mark on the right edge is centred on its line: with the 1.4.12 letter
+      // spacing "burnout" reaches 14 px past it
+      right: 20,
       top: small ? 16 : 28,
       bottom: small ? 18 : 24,
       containLabel: true,
