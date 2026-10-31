@@ -3462,12 +3462,6 @@ main .library-head.page-panel-head > .page-panel-title {
   color: var(--mantine-primary-color-light-color);
 }
 
-@media (forced-colors: active) {
-  .ladder-cell[data-selected] {
-    border: 2px solid Highlight;
-  }
-}
-
 .ladder-cell:has(input:focus-visible) {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
@@ -8319,6 +8313,15 @@ main .field-table tr.field-group > th {
 @media (forced-colors: active) {
   .mantine-SegmentedControl-indicator,
   .mantine-SegmentedControl-label[data-active]::before {
+    border: 2px solid Highlight;
+  }
+}
+
+/* forced colours drop the selected ladder step's fill: its border marks it. Here, after the
+   desktop workbench chips, whose own border would win otherwise */
+@media (forced-colors: active) {
+  .ladder-cell[data-selected],
+  .workbench .ladder-cells > .ladder-cell[data-selected] {
     border: 2px solid Highlight;
   }
 }
