@@ -46,6 +46,10 @@
 . PrimerCompound
 . PrimerSize
 . Provenance
+. PublishedLoad
+. PublishedLoads
+. PublishedMark
+. PublishedPrimer
 . QuantityKind
 . QuantityValue
 . RangeFirings
@@ -156,6 +160,10 @@
 . primerSizes
 . provenance
 . provenanceKind
+. publishedLoad
+. publishedLoads
+. publishedMarks
+. publishedPrimer
 . quantity
 . quantityKind
 . rangeFirings

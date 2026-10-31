@@ -151,6 +151,31 @@ describe('open', () => {
     expect(ids(catalogue.bullets({ q: 'test 168' }))).toEqual(['example-a-1'])
   })
 
+  it('lists a name-only bullet with no diameter, marked, and leaves it out of a cartridge filter', () => {
+    const { productNumber: _p, diameter: _d, ...rest } = defined(bundle.bullets[0])
+    const nameOnly = {
+      ...rest,
+      id: 'example-a-name-only',
+      name: 'Name only',
+      nameOnly: true as const,
+    }
+    const listed = openCatalogue(
+      buildCatalogue({ ...bundle, bullets: [...bundle.bullets, nameOnly] }),
+    )
+    expect(listed.bullets({}).items.find((b) => b.id === nameOnly.id)).toEqual({
+      id: 'example-a-name-only',
+      manufacturer: 'example-a',
+      name: 'Name only',
+      diameter: null,
+      mass: 10.89,
+      length: null,
+      ballisticCoefficientG1: 0.46,
+      ballisticCoefficientG7: null,
+      nameOnly: true,
+    })
+    expect(ids(listed.bullets({ cartridge: 'alpha-rifle' }))).not.toContain(nameOnly.id)
+  })
+
   it('answers the record with kind, origin and a revision that follows its content', () => {
     const record = catalogue.get('bullet', 'example-a-1')
     expect(record).toMatchObject({ id: 'example-a-1', kind: 'bullet', origin: 'catalogue' })

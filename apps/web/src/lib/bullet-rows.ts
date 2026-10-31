@@ -90,7 +90,10 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
   return {
     caliber: commonCaliber(b.diameter),
     // the exact diameter, on hover
-    diameter: `${inchText(formatNumber(system.length.fromSi(toSi('length', b.diameter)), lengthIn ? 4 : 3), system.length.symbol)} ${system.length.symbol}`,
+    diameter:
+      b.diameter === null
+        ? ''
+        : `${inchText(formatNumber(system.length.fromSi(toSi('length', b.diameter)), lengthIn ? 4 : 3), system.length.symbol)} ${system.length.symbol}`,
     mass:
       b.mass === null
         ? ''
@@ -142,7 +145,7 @@ export type PackedBullet = [
   string,
   string,
   string,
-  number,
+  number | null,
   number,
   number | null,
   number | null,

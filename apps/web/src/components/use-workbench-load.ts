@@ -2696,7 +2696,7 @@ export function useWorkbenchState() {
   /** The bullets that fit the cartridge (`GET /bullets?cartridge`); all without its CIP values or with all diameters on. */
   const { bulletFit, bulletParams } = bulletFilter(allDiameters, cartridge)
   const describeBullet = (b: BulletSummary) =>
-    `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}, ${withUnit('length', system, toSi('length', b.diameter))}`
+    `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}${b.diameter === null ? '' : `, ${withUnit('length', system, toSi('length', b.diameter))}`}`
 
   const specValue = (side: string | undefined, symbol: string) =>
     cartridge && groove?.id === cartridge.id

@@ -1435,6 +1435,19 @@
                             "type": "null"
                           }
                         ]
+                      },
+                      "nameOnly": {
+                        "description": "A record that only names the bullet: it has no product number.",
+                        "anyOf": [
+                          {
+                            "type": "boolean",
+                            "const": true,
+                            "description": "A record that only names the bullet: it has no product number."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
                       }
                     },
                     "description": "The fields that differ from the base record, or all fields without one. A `null` removes a field of the base."
@@ -1623,6 +1636,7 @@
                             "enum": [
                               "transducer",
                               "piezo",
+                              "case-contact",
                               "crusher",
                               "energy"
                             ]

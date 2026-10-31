@@ -67,6 +67,15 @@ describe('bullet record to shape', () => {
     expect(recordProfile(r)).toEqual({ reason: 'The record has no length.', fields: ['length'] })
   })
 
+  it('gives no shape and a reason without a diameter', () => {
+    const r = synthetic({ diameter: undefined })
+    expect(bulletDimensions(r)).toBeUndefined()
+    expect(recordProfile(r)).toEqual({
+      reason: 'The record has no diameter.',
+      fields: ['diameter'],
+    })
+  })
+
   it('takes a source without fields for the whole record, a listed path for its subfields', () => {
     const r = synthetic({}, ['diameter', 'base'])
     expect(sourceTitle(r, 'diameter')).toBe('Test sheet')

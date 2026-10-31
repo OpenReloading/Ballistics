@@ -2,6 +2,8 @@
 . Finding
 . LoadTable
 . LoadTables
+. LocatedPublishedLoads
+. PublishedLoadTargets
 . ReadRecordsResult
 . airTemperatureRange
 . checkBullet
@@ -11,8 +13,10 @@
 . checkCoverage
 . checkFittedSources
 . checkPowder
+. checkPublishedLoads
 . checkSpec
 . readLoadTables
+. readPublishedLoads
 . readRecords
 . twistPlausible
 . twistRange

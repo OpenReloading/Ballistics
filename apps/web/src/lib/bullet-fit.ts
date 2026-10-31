@@ -26,7 +26,8 @@ export const fitOf = (c: FitSource | undefined): CartridgeDiameters | undefined 
     : undefined
 
 /** The cartridges of `cartridges` a bullet of `diameter` (mm) fits by their CIP values, as id and name. */
-export function fitsOf(diameter: number, cartridges: CartridgeSummary[]) {
+export function fitsOf(diameter: number | undefined, cartridges: CartridgeSummary[]) {
+  if (diameter === undefined) return []
   return cartridges.flatMap((c) => {
     const fit = fitOf(summaryFitSource(c))
     return fit !== undefined && bulletFits(diameter, fit) ? [{ id: c.id, name: c.name }] : []

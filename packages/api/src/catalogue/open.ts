@@ -76,7 +76,8 @@ export function openCatalogue({ index, records }: CatalogueData): Catalogue {
         paging,
         (b) =>
           (!manufacturer || b.manufacturer === manufacturer) &&
-          (window === undefined || (b.diameter > window.above && b.diameter <= window.upTo)),
+          (window === undefined ||
+            (b.diameter !== null && b.diameter > window.above && b.diameter <= window.upTo)),
       )
     },
     cases: ({ manufacturer, cartridge, ...paging } = {}) =>

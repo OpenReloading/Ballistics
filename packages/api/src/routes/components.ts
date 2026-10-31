@@ -97,6 +97,7 @@ const powderList = page(
       .unwrap()
       .pick({ vivacity: true, pressureExponent: true, referencePressure: true, burnForm: true })
       .optional(),
+    nameOnly: bullet.shape.nameOnly,
   }),
 )
 
@@ -107,7 +108,7 @@ const bulletList = page(
     manufacturer: bullet.shape.manufacturer,
     name: bullet.shape.name,
     // the values of the record's diameter (mm), mass (g), length (mm) and first G1 and G7 coefficients
-    diameter: z.number(),
+    diameter: z.number().nullable(),
     mass: z.number(),
     length: z.number().nullable(),
     ballisticCoefficientG1: z.number().nullable(),
@@ -203,7 +204,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       bulletQuery,
       bulletList,
       bullet.extend({ revision }),
-      'Each item carries diameter (mm), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction.',
+      'Each item carries diameter (mm, null where the record has none), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction. A record that only names the bullet carries nameOnly.',
     ],
   ] as const) {
     app.get<{ Querystring: BulletQuery }>(
