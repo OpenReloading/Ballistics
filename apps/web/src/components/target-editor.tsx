@@ -86,6 +86,7 @@ import { typedFieldValue } from '../lib/field-spec.ts'
 import { clickOptions, freeId } from '../lib/firearm.ts'
 import { type Interval, keyReadouts, readouts, statLines } from '../lib/group-readouts.ts'
 import { editHistory, type History, historyOf, pushHistory, redo, undo } from '../lib/history.ts'
+import { type LadderImpact, ladderImpact } from '../lib/ladder-impact.ts'
 import { newId } from '../lib/new-id.ts'
 import { nth } from '../lib/nth.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcutMatches } from '../lib/shortcuts.ts'
@@ -130,6 +131,7 @@ import { confirmDialog, offered, offerUndo } from './confirm.tsx'
 import { FileMenu, FileMenuPlaceholder } from './file-menu.tsx'
 import { useHoleDetection } from './hole-detection.tsx'
 import { LadderChrono } from './ladder-chrono.tsx'
+import { LadderImpactNote } from './ladder-impact.tsx'
 import { LazyLineChart } from './lazy-chart.tsx'
 import { PageBar } from './page-bar.tsx'
 import { usePopoverReturn } from './popover-return.ts'
@@ -529,6 +531,7 @@ type Ed = {
   click: { label: string; click: number } | undefined
   ladderRows: ReturnType<typeof ladderExtremeSpreads>
   sessions: SessionRecord[]
+  impact: LadderImpact
   meta: Meta
   setMeta: Dispatch<SetStateAction<Meta>>
   stored: boolean
@@ -1467,7 +1470,7 @@ function Headline({ ed }: { ed: Ed }) {
 /** Groups per ladder step of the load: the extreme spread chart and its table. */
 function LadderPanel({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
-  const { charges, ladderRows, system, stepLabels, sheet, sessions, apply } = ed
+  const { charges, ladderRows, system, stepLabels, sheet, sessions, apply, impact } = ed
   if (!charges) return null
   const turn = system.correction
   const oneDistance = ladderRows.every((r) => r.length !== undefined)
@@ -1524,6 +1527,7 @@ function LadderPanel({ ed }: { ed: Ed }) {
         stepLabels={stepLabels}
         onLink={(id, shots) => apply((s) => withGroup(s, id, (g) => ({ ...g, shots })))}
       />
+      <LadderImpactNote impact={impact} system={system} />
     </div>
   )
 }
@@ -2664,6 +2668,7 @@ export function TargetEditor({
   stepLabels,
   step,
   sessions,
+  slopeAt,
   bulletDiameter,
   optic,
   expand,
@@ -2681,6 +2686,8 @@ export function TargetEditor({
   step?: number | undefined
   /** The load's chronograph sessions: the strings a ladder group's shots can be linked to. */
   sessions?: SessionRecord[] | undefined
+  /** The drop slope at a distance, m per m/s (`useDropSlope`): the point of impact per charge. */
+  slopeAt?: ((distance: number) => number | undefined) | undefined
   /** Bullet diameter of the load, m: the marker of a new sheet. */
   bulletDiameter?: number | undefined
   /** The optic of the workbench's firearm, for the clicks to the point of aim. */
@@ -3571,14 +3578,24 @@ export function TargetEditor({
     if (windowed && e) setShotScroll({ top: e.scrollTop, height: e.clientHeight })
   }, [windowed, group?.id])
   // groups per ladder step of this load, every sheet, the open one as edited
-  const ladderRows = useMemo(() => {
-    if (!charges) return []
-    const all = [sheet, ...sheets.filter((r) => r.id !== meta.id).map((r) => r.data)]
-    return ladderExtremeSpreads(
-      all.flatMap((s) => s.groups),
-      charges,
-    )
-  }, [charges, sheet, sheets, meta.id])
+  const ladderGroups = useMemo(
+    () =>
+      [sheet, ...sheets.filter((r) => r.id !== meta.id).map((r) => r.data)].flatMap(
+        (s) => s.groups,
+      ),
+    [sheet, sheets, meta.id],
+  )
+  const ladderRows = useMemo(
+    () => (charges ? ladderExtremeSpreads(ladderGroups, charges) : []),
+    [charges, ladderGroups],
+  )
+  const impact = useMemo(
+    () =>
+      charges && slopeAt
+        ? ladderImpact(ladderGroups, charges, sessions ?? [], slopeAt)
+        : ({ status: 'none' } as const),
+    [charges, ladderGroups, sessions, slopeAt],
+  )
 
   const toolHint = toolHintOf(tool, frame, pending.length, detect.hint, score.hint, t)
   const hint = hintOf(status, toolHint, help)
@@ -3789,6 +3806,7 @@ export function TargetEditor({
     click,
     ladderRows,
     sessions: sessions ?? [],
+    impact,
     meta,
     setMeta,
     stored,

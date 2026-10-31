@@ -3936,6 +3936,7 @@
   "{name}, step {step}": "{name}, Stufe {step}",
   "{session}, {string}, {count} shots": "{session}, {string}, {count} Schüsse",
   "a ladder needs at least three charges": "Ein Ladeleiter braucht mindestens drei Treibladungen",
+  "Centre ({unit})": "Mitte ({unit})",
   "lead free": "bleifrei",
   "Tour": "Rundgang",
   "Tour of this page": "Rundgang durch diese Seite",
@@ -3968,6 +3969,17 @@
   "heights and velocities must be finite": "Höhen und Geschwindigkeiten müssen endlich sein",
   "The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.": "Das Blatt wird in diesem Browser gespeichert. Speichern schreibt es in eine Datei; Öffnen liest eine Blattdatei.",
   "How to measure bullet dimensions": "So messen Sie die Geschossmaße",
+  "Mean height of the shots above the point of aim with the effect of their velocity removed, per charge, with a bar of one standard error; the table lists the values.": "Mittlere Höhe der Schüsse über dem Haltepunkt ohne den Einfluss ihrer Geschwindigkeit, je Treibladung, mit einem Balken von einem Standardfehler; die Tabelle nennt die Werte.",
+  "Point of impact per charge": "Trefferlage je Treibladung",
+  "Residual centre ({unit})": "Restmitte ({unit})",
+  "Residual centre per charge": "Restmitte je Treibladung",
   "Session not in this browser": "Sitzung nicht in diesem Browser",
-  "slope must be finite": "Die Steigung muss endlich sein"
+  "slope must be finite": "Die Steigung muss endlich sein",
+  "Standard error ({unit})": "Standardfehler ({unit})",
+  "The drop slope is simulated in the ICAO standard atmosphere; a slope that is off leaves a trend with the charge, which this test reports too.": "Die Steigung des Flugbahnabfalls ist in der ICAO-Standardatmosphäre simuliert; eine falsche Steigung hinterlässt einen Trend mit der Treibladung, den dieser Test ebenfalls meldet.",
+  "The point of impact per charge needs all ladder groups at one distance.": "Die Trefferlage je Treibladung braucht alle Schussbilder der Ladeleiter auf einer Entfernung.",
+  "The point of impact per charge needs the simulated drop slope: a bullet with a ballistic coefficient, the sight height and the zero range.": "Die Trefferlage je Treibladung braucht die simulierte Steigung des Flugbahnabfalls: ein Geschoss mit Ballistikkoeffizient, die Visierhöhe und die Einschießentfernung.",
+  "The point of impact per charge needs three charges with {groups} groups of {shots} shots, each shot with a chronograph velocity and each group a point of aim.": "Die Trefferlage je Treibladung braucht drei Treibladungen mit je {groups} Schussbildern aus {shots} Schüssen, jeden Schuss mit einer Chronograph-Geschwindigkeit und jedes Schussbild mit einem Haltepunkt.",
+  "The vertical centre changes with the charge by more than the simulated drop explains ({level} % test).": "Die senkrechte Mitte ändert sich mit der Treibladung stärker, als der simulierte Flugbahnabfall erklärt ({level} %-Test).",
+  "Vertical centre of the groups against charge, velocity effect removed": "Senkrechte Mitte der Schussbilder über der Treibladung, Geschwindigkeitseinfluss entfernt"
 }

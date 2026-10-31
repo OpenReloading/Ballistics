@@ -29,6 +29,20 @@ The note is raised when $Q$ exceeds the chi-square quantile at level $\gamma$ (0
 
 Code: `packages/core/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`degrees`, `varies`). The quantile is `chiSquareQuantile` of the [shot group](groups.md) statistics.
 
+### Drop slope
+
+The slope $b$ comes from two trajectories of the exterior [point-mass model](exterior-point-mass.md) in ICAO standard air without wind, at the distance of the groups. The bore angles are those of the zero (range, air and drag factor of the load) at the muzzle velocity $v_0$ of the load, and stay fixed. The two trajectories differ only in the muzzle velocity, $v_0 - d$ and $v_0 + d$ with $d$ = 10 m/s, and $h$ is the height above the line of sight at the distance:
+
+$$
+b = \frac{h(v_0 + d) - h(v_0 - d)}{2d}
+$$
+
+Code: `apps/web/src/lib/ladder-slope.ts`, `dropSlope` (`zero`, `at`, `slope`). The drag is the G7 ballistic coefficient of the bullet record, else the G1, as one band set; a bullet whose coefficients need a choice gives no slope.
+
+### Which shots enter
+
+Code: `apps/web/src/lib/ladder-impact.ts`, `ladderImpact` (`usableShots`, `steps`). A group of a charge enters with its included shots that have a chronograph velocity (a shot linked to a chronograph shot that is excluded has none), and only with five or more of them and a point of aim; the height of a shot is its $y$ minus the $y$ of the point of aim. A charge enters with three or more such groups. The note needs three or more charges and one distance for all ladder groups.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |
@@ -47,12 +61,14 @@ Code: `packages/core/src/interior/ladder-impact.ts`, `ladderImpactResiduals` (`d
 - The heights of the shots of a charge are independent with one common variance across charges, and roughly normal.
 - Over the velocity range of the ladder the height of impact is linear in velocity with the slope $b$.
 - The point of aim is the same for every shot.
+- The slope is the same at every charge, which holds over the velocity range of a ladder but not over a wide one.
 
 ## Limits
 
 - It needs three or more charges with at least two shots each. Seeded ladders with 9 charges, 3 groups of 5 shots per charge and an exact slope raised the note in 1.4 percent of ladders with no oscillation of the height, and in every ladder with an oscillation of 0.1 in; with a slope 20 percent off the false-note rate was 6.6 percent (see the [research entry](../research/ladder-impact-per-charge.md)). Other slope errors and fewer groups were not tested.
 - The chi-square reference is approximate because the pooled variance is itself estimated.
-- A trend of the residual with the charge can come from a wrong slope as well as from the rifle.
+- A trend of the residual with the charge can come from a wrong slope as well as from the rifle. The slope is a simulation of the load's bullet, zero and standard air, not a measurement of the rifle; it is not given for a load without a sight height or a zero range.
+- The link between a group's shots and a chronograph string is by order: it holds while the shots of the group are not added, removed or reordered after it is set.
 - The test says the centres differ. It names no charge as better or worse and does not say whether a load may be fired.
 
 ## Sources

@@ -9852,6 +9852,18 @@ main .session-shots th:nth-child(-n + 2) {
   margin-top: 0.5rem;
 }
 
+/* the note and the warning together */
+.ladder-impact .message-slot {
+  height: 11rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 47.99em) {
+  .ladder-impact .message-slot {
+    height: 10.5rem;
+  }
+}
+
 .groups-tab {
   display: flex;
   flex-direction: column;

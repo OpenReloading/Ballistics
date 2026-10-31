@@ -61,7 +61,7 @@ Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`
 - Each string needs at least two shots, and the standard deviation of two shots is itself very uncertain. The band is wide for few shots: a flat segment can mean only that the strings were too short to tell.
 - Neighbouring segments are tested one by one at the stated level, with no correction for the number of segments, so a ladder of many steps shows a flat segment by chance more often than the level suggests.
 - A flat spot is where the mean velocity did not change measurably over the strings fired. It says nothing about pressure, accuracy or whether a charge may be loaded.
-- The ladder shows velocity only. A point-of-impact note per charge was researched ([point of impact per charge in a ladder](../research/ladder-impact-per-charge.md)) and is not built: it needs 3 to 4 groups of 5 shots per charge, a velocity for each shot and a known drop slope.
+- The ladder shows velocity only. The point of impact of its shot groups per charge is a separate note ([point of impact per charge in a ladder](interior-ladder-impact.md)) that needs groups linked to chronograph shots.
 
 ## Sources
 
