@@ -105,8 +105,15 @@ test('a diameter and length typed over the bullet record are saved as typed valu
   await diameter.fill('7.84')
   await length.fill('31.00')
   await expect(diameter).not.toHaveClass(/field-default/)
-  // the seated bullet is bigger: the volume behind it settles before the fields are read
+  // the seated bullet is bigger: the volume behind it moves and settles before the fields are read
   await expect(volume).not.toHaveValue(seated)
+  await expect
+    .poll(async () => {
+      const first = await volume.inputValue()
+      await page.waitForTimeout(500)
+      return first === (await volume.inputValue())
+    })
+    .toBe(true)
   const values = () =>
     form.getByRole('textbox').evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value))
   const before = await values()
