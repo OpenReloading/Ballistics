@@ -108,3 +108,8 @@ it('searches labels and symbols, ignoring case, and drops the groups left empty'
   expect(searchGroups(groups, 'd').flatMap((g) => g.rows.map((r) => r.label))).toEqual(['Diameter'])
   expect(searchGroups(groups, '')).toBe(groups)
 })
+
+it('lets a combined number wrap after its slashes and keeps a unit whole', () => {
+  const out = html([{ rows: [{ label: msg('Number'), text: '1.40/1.41 lb/in' }] }])
+  expect(out).toContain('1.40/<wbr/>1.41 lb/in')
+})

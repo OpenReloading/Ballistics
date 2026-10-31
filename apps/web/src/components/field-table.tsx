@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { MagnifyingGlass } from '@phosphor-icons/react'
-import { type KeyboardEvent, type ReactNode, useId, useState } from 'react'
+import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
 import {
@@ -89,9 +89,24 @@ export function Noted({
   )
 }
 
+/** A text that may wrap after a slash before a digit, so a combined number such as 1.40/1.41 fits a phone and a unit such as lb/in² stays whole. */
+export function SlashBreaks({ text }: { text: string }) {
+  return text.split(/\/(?=\d)/).map((part, i) =>
+    i === 0 ? (
+      part
+    ) : (
+      // biome-ignore lint/suspicious/noArrayIndexKey: the parts of one fixed text
+      <Fragment key={i}>
+        /<wbr />
+        {part}
+      </Fragment>
+    ),
+  )
+}
+
 function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
   const { t } = useTranslation()
-  const value = rowValue(row, system, t)
+  const value = <SlashBreaks text={rowValue(row, system, t)} />
   const notes = rowNotes(row, t)
   return (
     <TableTr>

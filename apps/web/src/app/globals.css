@@ -6906,6 +6906,15 @@ main .record-sources .sources tbody th {
   vertical-align: middle;
 }
 
+/* phone: a long value (the caliber classes, a combined number) wraps, so the discipline's values
+   and the federation's discipline names stay in view */
+@media screen and (max-width: 47.99em) {
+  :is(.discipline-record, .federation-record)
+    :is(.field-table td, .face-table td:not(.num, .nowrap)) {
+    white-space: normal;
+  }
+}
+
 /* the discipline and federation records: linked facts under the values table, a face drawn small
    before its name */
 .record-links {
@@ -7143,6 +7152,11 @@ main :is(.symbol-table, .coefficient-table, .record-sources .sources) {
 
   :is(.record-chart, .bullet-record) .field-table td:not(.field-unit-cell, .num) {
     white-space: normal;
+  }
+
+  /* narrow cell padding, so the unit column fits at 320 px */
+  :is(.record-chart, .bullet-record) .field-table :is(th, td) {
+    padding-inline: 0.25rem;
   }
 
   /* a fitted value breaks before its percent (no-break spaces inside) */
