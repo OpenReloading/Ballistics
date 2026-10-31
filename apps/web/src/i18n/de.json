@@ -3933,6 +3933,7 @@
   "jacket": "Mantel",
   "gas check": "Kupferschuh",
   "{n} driving bands": "{n} Führungsbänder",
+  "a ladder needs at least three charges": "Ein Ladeleiter braucht mindestens drei Treibladungen",
   "lead free": "bleifrei",
   "Tour": "Rundgang",
   "Tour of this page": "Rundgang durch diese Seite",
@@ -3943,8 +3944,10 @@
   "Runs the simulation in this browser with the values entered.": "Führt die Simulation in diesem Browser mit den eingegebenen Werten aus.",
   "Simulated velocity, peak pressure with its range over the input tolerances, and the trajectory. Results are simulations, not load data.": "Simulierte Geschwindigkeit, Spitzendruck mit seinem Bereich über die Toleranzen der Eingaben und die Flugbahn. Ergebnisse sind Simulationen, keine Ladedaten.",
   "Choose the file your chronograph wrote; it is read in this browser. The unit applies when the file gives none.": "Wählen Sie die Datei Ihres Chronographen; sie wird in diesem Browser gelesen. Die Einheit gilt, wenn die Datei keine nennt.",
+  "each charge needs at least two shots": "Jede Treibladung braucht mindestens zwei Schüsse",
   "Once a file is read: mean, spread and the other statistics of each string. Load example reads three made-up strings.": "Sobald eine Datei gelesen ist: Mittelwert, Streuung und die übrigen Kennwerte jeder Schussreihe. Beispiel laden liest drei erfundene Schussreihen.",
   "Each open load has a tab. New load starts another; Saved loads lists the loads kept in this browser.": "Jede offene Laborierung hat einen Reiter. Neue Laborierung beginnt eine weitere; Gespeicherte Laborierungen listet die in diesem Browser gespeicherten.",
+  "each shot needs a height and a velocity": "Jeder Schuss braucht eine Höhe und eine Geschwindigkeit",
   "Save writes the load to a file and keeps a copy in this browser; Open reads a load file.": "Speichern schreibt die Laborierung in eine Datei und behält eine Kopie in diesem Browser; Öffnen liest eine Laborierungsdatei.",
   "How to set up a chronograph": "So stellen Sie einen Chronographen auf",
   "How to fire a ladder for the fit": "So schießen Sie einen Ladeleiter für die Anpassung",
@@ -3959,6 +3962,8 @@
   "Photo adds a photo of the target; it stays in this browser. Calibrate sets its scale from a reference of known size. Shot places shots.": "Foto fügt ein Foto der Zielscheibe hinzu; es bleibt in diesem Browser. Kalibrieren legt den Maßstab über eine Referenz bekannter Größe fest. Schuss setzt Schüsse.",
   "The photo or the drawn target with the shots of each group.": "Das Foto oder die gezeichnete Zielscheibe mit den Schüssen jeder Gruppe.",
   "ES, mean radius and the other statistics of the chosen group, with its shots. In a narrow window they are under Stats; on a phone, open the strip at the bottom first.": "ES, mittlerer Radius und die weiteren Statistiken der gewählten Gruppe, mit ihren Schüssen. In einem schmalen Fenster stehen sie unter Statistik; auf dem Telefon zuerst die Leiste am unteren Rand öffnen.",
+  "heights and velocities must be finite": "Höhen und Geschwindigkeiten müssen endlich sein",
   "The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.": "Das Blatt wird in diesem Browser gespeichert. Speichern schreibt es in eine Datei; Öffnen liest eine Blattdatei.",
-  "How to measure bullet dimensions": "So messen Sie die Geschossmaße"
+  "How to measure bullet dimensions": "So messen Sie die Geschossmaße",
+  "slope must be finite": "Die Steigung muss endlich sein"
 }

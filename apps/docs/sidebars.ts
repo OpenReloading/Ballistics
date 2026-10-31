@@ -21,6 +21,7 @@ const sidebars: SidebarsConfig = {
       'interior-pressure-range',
       'interior-sampled-band',
       'interior-velocity-ladder',
+      'interior-ladder-impact',
     ]),
     'powder-tuning',
     category('Exterior', [
