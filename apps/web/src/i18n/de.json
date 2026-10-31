@@ -3620,7 +3620,7 @@
   "UTF-16 text with an odd number of bytes": "UTF-16-Text mit einer ungeraden Anzahl von Bytes",
   "UTF-16 text with an odd number of bytes; save it as UTF-8 (CSV UTF-8) and import again.": "UTF-16-Text mit einer ungeraden Anzahl von Bytes; speichern Sie ihn als UTF-8 (CSV UTF-8) und importieren Sie ihn erneut.",
   "The file is not UTF-8 or UTF-16 text; save it as UTF-8 (CSV UTF-8) and import again.": "Die Datei ist kein UTF-8- oder UTF-16-Text; speichern Sie sie als UTF-8 (CSV UTF-8) und importieren Sie sie erneut.",
-  "The workbook cannot be read: {reason}. Save it again as XLSX or CSV.": "Die Arbeitsmappe kann nicht gelesen werden: {reason}. Speichern Sie sie erneut als XLSX oder CSV.",
+  "The workbook cannot be read. Save it again as XLSX or CSV.": "Die Arbeitsmappe kann nicht gelesen werden. Speichern Sie sie erneut als XLSX oder CSV.",
   "Load file, read by {format}": "Laborierungsdatei, gelesen von {format}",
   "{format}: {reason}": "{format}: {reason}",
   "{name}: {reason}": "{name}: {reason}",

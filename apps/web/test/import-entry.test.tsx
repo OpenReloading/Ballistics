@@ -423,10 +423,9 @@ it('gives a workbook, a semicolon CSV, a JSON list, a data file and a file over 
   expect(await read(new ArrayBuffer(maxFileBytes + 1))).toEqual({
     refusal: 'The file is larger than 40 MB. Split it and import the parts.',
   })
-  expect(await read(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3]))).toMatchObject({
-    refusal: expect.stringMatching(
-      /^The workbook cannot be read: .+\. Save it again as XLSX or CSV\.$/,
-    ),
+  expect(await read(new Uint8Array([0x50, 0x4b, 0x03, 0x04, 1, 2, 3]))).toEqual({
+    refusal: 'The workbook cannot be read. Save it again as XLSX or CSV.',
+    detail: expect.stringMatching(/.+/),
   })
   expect(await read(new Uint8Array([0xff, 0xfe, 0x41]))).toEqual({
     refusal:
