@@ -2660,7 +2660,7 @@ td.nowrap {
   cursor: pointer;
 }
 
-/* the workbench bar from 75em: Run beside the loads, then a status block of fixed width (line 1 the
+/* the workbench bar from 75em: Run beside the loads, then a status block of 10.5rem (line 1 the
    result, line 2 the File menu's state), so a change of either moves nothing; Search, Copy link and
    Print as icons named by their text */
 @media screen and (min-width: 75em) {
@@ -2669,19 +2669,28 @@ td.nowrap {
   }
 
   main .page-bar:has(.load-strip) h1 {
+    flex: 0 1 auto;
     margin-right: 0.5rem;
     font-size: var(--mantine-font-size-lg);
+    line-height: 1.1;
   }
 
   .page-bar .bar-run {
     width: 5.25rem;
   }
 
+  /* where the room runs out (a long German title and labels) the status gives it first, down to
+     its first words, then the title wraps; the title is never narrower than its content, so Run
+     does not cover the status */
+  .page-bar:has(.load-strip) .page-bar-title {
+    min-width: min-content;
+  }
+
   .page-bar:has(.load-strip) .page-bar-status {
     display: flex;
-    flex: none;
+    flex: 0 1000 10.5rem;
     flex-direction: column;
-    width: 10.5rem;
+    min-width: 8rem;
     justify-content: center;
     margin-right: auto;
     line-height: 1.0625rem;
