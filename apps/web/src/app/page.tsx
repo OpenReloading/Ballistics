@@ -9,6 +9,7 @@ import {
   listAllPrimers,
   listAllTargetFaces,
   listDisciplines,
+  listFederations,
 } from '../lib/api.ts'
 import { newestNews } from '../lib/news.ts'
 
@@ -31,6 +32,7 @@ const inData: Record<string, ReactNode> = {
   '/primers': <Count list={listAllPrimers} />,
   '/targets': <Count list={listAllTargetFaces} />,
   '/disciplines': <Count list={listDisciplines} />,
+  '/federations': <Count list={listFederations} />,
 }
 
 export default function HomePage() {
