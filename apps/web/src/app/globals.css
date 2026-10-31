@@ -7060,10 +7060,16 @@ main .record-sources .sources tbody th {
   height: 300px;
 }
 
-/* the overlay on a wide window is taller (burn-rate-compare.tsx), so the curves are not flattened */
-@media screen and (min-width: 88em) {
-  .burn-overlay .vivacity-loading {
-    height: 420px;
+/* a row of the values reads across: the table stops at 40rem */
+.burn-overlay .curve-values {
+  max-width: 40rem;
+}
+
+/* the overlay's chart follows the window's height, so the curves are not flattened on a wide one */
+@media screen {
+  .burn-overlay .vivacity-loading,
+  .burn-overlay .echart > [role="img"] {
+    height: clamp(300px, 60vh, 520px);
   }
 }
 

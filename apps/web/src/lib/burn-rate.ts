@@ -213,11 +213,6 @@ export const bandNote = msg(
   'Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
 )
 
-/** `bandNote` as the end of `modelCaption`: what the band and the bars of the burn-rate page's curves are. */
-export const bandAndBarsNote = msg(
-  'Band and bars: plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
-)
-
 const n2 = (v: number) => formatNumber(v, 2)
 
 /** The order scalar with its interval, as text. */
