@@ -106,19 +106,13 @@ export function CaseEditor({
           </Group>
         )}
       </Group>
-      <p className="note">
-        {t(
-          'The capacity and the other values are the ones you measured. The workbench takes the capacity as the measured case capacity of its cartridge and shows it as measured. Enter the mean of the cases you measured and how many there were.',
-        )}
-        {capacityGuide && (
-          <>
-            {' '}
-            <Anchor href={capacityGuide} target="_blank" rel="noopener">
-              {t('How to measure case capacity')}
-            </Anchor>
-          </>
-        )}
-      </p>
+      {capacityGuide && (
+        <p className="note">
+          <Anchor href={capacityGuide} target="_blank" rel="noopener">
+            {t('How to measure case capacity')}
+          </Anchor>
+        </p>
+      )}
       <SimpleGrid
         className="firearm-grid"
         cols={{ base: 1, sm: 2 }}
@@ -157,30 +151,29 @@ export function CaseEditor({
             unreachableText={t('The database is unreachable; the cartridge can be chosen later.')}
           />
         </div>
-        {products.length > 0 && (
-          <NativeSelect
-            label={t('Start from a case product')}
-            description={t('Takes its material and mass; the values you measured replace them.')}
-            value={data.basedOn?.slice('catalogue:'.length) ?? ''}
-            onChange={(e) => {
-              const p = product(e.currentTarget.value)
-              patch(
-                p
-                  ? {
-                      basedOn: `catalogue:${p.id}`,
-                      manufacturer: `catalogue:${p.manufacturer}`,
-                      material: p.material,
-                      ...(p.mass !== undefined && { mass: { value: p.mass } }),
-                    }
-                  : { basedOn: undefined },
-              )
-            }}
-            data={[
-              { value: '', label: t('None') },
-              ...products.map((p) => ({ value: p.id, label: label(p) })),
-            ]}
-          />
-        )}
+        <NativeSelect
+          label={t('Start from a case product')}
+          disabled={products.length === 0}
+          description={t('Takes its material and mass; the values you measured replace them.')}
+          value={data.basedOn?.slice('catalogue:'.length) ?? ''}
+          onChange={(e) => {
+            const p = product(e.currentTarget.value)
+            patch(
+              p
+                ? {
+                    basedOn: `catalogue:${p.id}`,
+                    manufacturer: `catalogue:${p.manufacturer}`,
+                    material: p.material,
+                    ...(p.mass !== undefined && { mass: { value: p.mass } }),
+                  }
+                : { basedOn: undefined },
+            )
+          }}
+          data={[
+            { value: '', label: products.length === 0 ? t('Choose a cartridge first') : t('None') },
+            ...products.map((p) => ({ value: p.id, label: label(p) })),
+          ]}
+        />
         <NativeSelect
           label={t('Material')}
           value={data.material}

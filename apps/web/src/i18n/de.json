@@ -2933,7 +2933,6 @@
   "enter a number": "Zahl eingeben",
   "not valid": "ungültig",
   "{record}, {configuration}, {optic} (active)": "{record}, {configuration}, {optic} (aktiv)",
-  "The capacity and the other values are the ones you measured. The workbench takes the capacity as the measured case capacity of its cartridge and shows it as measured. Enter the mean of the cases you measured and how many there were.": "Die Kapazität und die übrigen Werte sind die, die Sie gemessen haben. Die Werkbank übernimmt die Kapazität als gemessenes Hülsenvolumen der zugehörigen Patrone und zeigt sie als gemessen an. Geben Sie den Mittelwert der gemessenen Hülsen und deren Anzahl ein.",
   "For example headstamp and batch.": "Zum Beispiel Bodenstempel und Charge.",
   "Start from a case product": "Von einem Hülsenprodukt ausgehen",
   "Takes its material and mass; the values you measured replace them.": "Übernimmt Material und Masse; Ihre gemessenen Werte ersetzen sie.",
@@ -2948,7 +2947,6 @@
   "Capacity spread": "Streuung der Kapazität",
   "Standard deviation of the water capacity over the cases measured.": "Standardabweichung der Wasserkapazität über die gemessenen Hülsen.",
   "Water capacity to the mouth": "Wasserkapazität bis zum Hülsenmund",
-  "Measured on the cases of this group, for example fired and sized. The workbench takes it as the measured case capacity.": "Gemessen an den Hülsen dieser Gruppe, zum Beispiel abgeschossen und kalibriert. Die Werkbank übernimmt den Wert als gemessenes Hülsenvolumen.",
   "Choose the cartridge.": "Wählen Sie die Patrone.",
   "{what}: not valid.": "{what}: ungültig.",
   "manufacturers": "Hersteller",
@@ -3990,5 +3988,7 @@
   "Unsaved": "Ungespeichert",
   "Inputs changed": "Eingaben geändert",
   "Run {time}": "Lauf {time}",
-  "Sort: {text}": "Sortierung: {text}"
+  "Sort: {text}": "Sortierung: {text}",
+  "Measured on the cases of this group, for example fired and sized. Mean of the cases measured. The workbench takes it as the measured case capacity.": "Gemessen an den Hülsen dieser Gruppe, zum Beispiel abgeschossen und kalibriert. Mittelwert der gemessenen Hülsen. Die Werkbank übernimmt den Wert als gemessenes Hülsenvolumen.",
+  "Choose a cartridge first": "Zuerst eine Patrone wählen"
 }

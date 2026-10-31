@@ -928,6 +928,10 @@ td.nowrap {
   font-size: var(--mantine-font-size-sm);
 }
 
+.search-status[data-covered] {
+  opacity: 0;
+}
+
 .prompt {
   color: var(--muted);
 }
