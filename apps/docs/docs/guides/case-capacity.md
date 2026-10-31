@@ -31,7 +31,7 @@ The app turns the water mass into a volume with the density of water at 20 °C, 
 
 ## Mean and spread
 
-Report the mean of the case capacities and the sample standard deviation over the cases, in grains or grams of water, and the number of cases. The mean is the input the simulation runs; the spread and the count tell you and others how far one case is from it. A spread above about 1 % of the mean points to mixed lots or to the filling.
+Report the mean of the case capacities and the sample standard deviation over the cases, in grains or grams of water, and the number of cases. The mean is the input the simulation runs; the spread and the count tell you and others how far one case is from it. Compare the spread with the 1 % chamber-volume tolerance of the pressure range: a spread near or above 1 % of the mean means that single cases differ from the mean by about as much as the range moves the input.
 
 ## Entering it
 

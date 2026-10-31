@@ -1461,7 +1461,8 @@ function MeasuredCapacity({ m }: { m: Model }) {
             : undefined
         }
       />
-      {capacityGuide && (
+      {/* the workbench card has no room for the row: its More popover holds the link */}
+      {capacityGuide && !m.slots && (
         <p className="note">
           <Anchor href={capacityGuide} target="_blank" rel="noopener" size="sm">
             {t('How to measure case capacity')}

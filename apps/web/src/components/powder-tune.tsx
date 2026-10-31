@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, Button, Group, Slider, Text, TextInput } from '@mantine/core'
+import { Anchor, Badge, Button, Group, Slider, Text, TextInput } from '@mantine/core'
 import type {
   InteriorLoad,
   PowderConfidenceReason,
@@ -23,6 +23,7 @@ import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
+import { ladderGuide, temperatureGuide } from '../lib/docs-url.ts'
 import { errorText } from '../lib/error-text.ts'
 import { type ChargeRow, chargeRows } from '../lib/measurements.ts'
 import { newId } from '../lib/new-id.ts'
@@ -814,6 +815,17 @@ export function PowderTune() {
             </Button>
           </Group>
         </form>
+        {ladderGuide && temperatureGuide && (
+          <p className="note">
+            <Anchor href={ladderGuide} target="_blank" rel="noopener">
+              {t('How to fire a ladder for the fit')}
+            </Anchor>
+            {' · '}
+            <Anchor href={temperatureGuide} target="_blank" rel="noopener">
+              {t('How to measure powder temperature')}
+            </Anchor>
+          </p>
+        )}
         {readFailed && <ErrorNote title={t('The sessions of the link could not be read.')} />}
         {error && (
           <ErrorNote title={t('The string was not added.')}>
