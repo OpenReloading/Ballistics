@@ -114,7 +114,7 @@ export function CaseEditor({
           <>
             {' '}
             <Anchor href={capacityGuide} target="_blank" rel="noopener">
-              {t('How to measure case capacity with water')}
+              {t('How to measure case capacity')}
             </Anchor>
           </>
         )}

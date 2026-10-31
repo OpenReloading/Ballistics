@@ -1463,8 +1463,8 @@ function MeasuredCapacity({ m }: { m: Model }) {
       />
       {capacityGuide && (
         <p className="note">
-          <Anchor href={capacityGuide} target="_blank" rel="noopener">
-            {t('How to measure case capacity with water')}
+          <Anchor href={capacityGuide} target="_blank" rel="noopener" size="sm">
+            {t('How to measure case capacity')}
           </Anchor>
         </p>
       )}
