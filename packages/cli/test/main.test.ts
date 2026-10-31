@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -266,6 +266,21 @@ describe('an error', () => {
 
 describe('the process', () => {
   const bin = join(import.meta.dirname, '../src/bin.ts')
+
+  it('ends quietly with 0 when the reader closes the pipe', async () => {
+    const child = spawn(process.execPath, [bin, 'operations'], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    // the read end closes before the first write, so every write meets EPIPE
+    child.stdout.destroy()
+    let stderr = ''
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk
+    })
+    const code = await new Promise((resolve) => child.on('close', resolve))
+    expect(stderr).toBe('')
+    expect(code).toBe(0)
+  })
 
   it('reads the rows from standard input for --rows -', () => {
     const r = spawnSync(process.execPath, [bin, 'verify', '--rows', '-', ...data.slice(2)], {
