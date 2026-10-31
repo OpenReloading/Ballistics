@@ -1592,6 +1592,12 @@ td.nowrap {
   grid-template-columns: minmax(0, 1fr) 9rem;
 }
 
+/* a select 1.5rem wider for its chevron, so a German value ("Nicht angegeben") is not cut */
+.designer-grid > .mantine-InputWrapper-root:has(select),
+.designer-grid > .designer-field > .mantine-InputWrapper-root:has(select) {
+  grid-template-columns: minmax(0, 1fr) 10.5rem;
+}
+
 .designer :is(.prop-grid, .side-grid) .mantine-InputWrapper-label {
   font-size: var(--mantine-font-size-sm);
 }
@@ -1635,8 +1641,25 @@ td.nowrap {
   min-height: 1.75rem;
 }
 
+/* the name at least as wide as its placeholder in German ("Name des Wettbewerbs"); narrower than
+   36em it takes a row of its own below distance and gauge, named by its placeholder alone */
 .face-event {
-  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)) 1.75rem;
+  grid-template-columns: minmax(10.5rem, 1.5fr) repeat(2, minmax(0, 1fr)) 1.75rem;
+}
+
+@media screen and (max-width: 35.99em) {
+  .face-event {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 1.75rem;
+  }
+
+  .face-event > :first-child {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .face-head.face-event > :first-child {
+    display: none;
+  }
 }
 
 .face-head {
@@ -1646,11 +1669,18 @@ td.nowrap {
   font-weight: 600;
 }
 
+/* a ring's fill and line side by side, one under the other where the row is narrower than their
+   longest values */
 .face-colours {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 0 0.5rem;
   margin: 0.125rem 2.25rem 0.5rem 3.75rem;
+}
+
+.face-colours > * {
+  flex: 1 1 0;
+  min-width: max-content;
 }
 
 .face-designer .side-grid > button {
@@ -1703,11 +1733,15 @@ td.nowrap {
 }
 
 /* a phone: a ring's colours one under the other, the row labels room for their longest word, the
-   first field's placeholder left to its column head (Name, Ingredient) */
+   first field's placeholder left to its column head (Ingredient) */
 @media screen and (max-width: 22.5em) {
   .face-colours {
-    grid-template-columns: minmax(0, 1fr);
     gap: 0.125rem;
+  }
+
+  .face-colours > * {
+    flex-basis: 100%;
+    min-width: 0;
   }
 
   .powder-row {
@@ -1722,7 +1756,7 @@ td.nowrap {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) repeat(2, minmax(0, 0.75fr)) 1.75rem;
   }
 
-  :is(.face-event, .powder-ingredient) > :first-child input::placeholder {
+  .powder-ingredient > :first-child input::placeholder {
     color: transparent;
   }
 }
@@ -11773,8 +11807,9 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   flex: 1 1 12rem;
 }
 
+/* room for "Beste Übereinstimmung" */
 .bd-filters > .bd-sort {
-  flex: 0 1 12rem;
+  flex: 0 1 13rem;
 }
 
 .bd-mass {
@@ -11906,7 +11941,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     display: none;
   }
 
-  .bd-sort {
+  .bd-filters > .bd-sort {
     flex-basis: 100%;
   }
 
