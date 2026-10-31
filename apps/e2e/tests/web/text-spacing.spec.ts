@@ -16,18 +16,13 @@ const spacing = `* {
 p { margin-bottom: 2em !important; }`
 
 // record names, the load title and the page bar's status line keep their ellipsis, with the full
-// text on hover, focus and tap; the text of the two charts is an open finding (A-15 of the
-// accessibility page)
-const names =
-  '.load-switch, .load-identity, [role=combobox], .page-bar-status, .interior-chart .echart, .vivacity-chart .echart'
-
-// below 75em the title has two lines in the app header, an open finding (A-11)
-const phone = `${names}, main .page-bar h1`
+// text on hover, focus and tap
+const names = '.load-switch, .load-identity, [role=combobox], .page-bar-status'
 
 /** Applies the spacing and expects nothing cut once the layout has settled. */
-async function nothingCut(page: Page, exempt = names) {
+async function nothingCut(page: Page) {
   await page.addStyleTag({ content: spacing })
-  await expect.poll(() => cutText(page, exempt)).toEqual([])
+  await expect.poll(() => cutText(page, names)).toEqual([])
 }
 
 for (const width of [1280, 390])
@@ -87,8 +82,18 @@ for (const path of ['/bullets/designer', '/powders/designer', '/targets/designer
   test(`at 320 px ${path} cuts nothing with the spacing`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 })
     await gotoHydrated(page, path)
-    await nothingCut(page, phone)
+    await nothingCut(page)
   })
+
+// a long German compound in the page bar's title at the narrowest width
+test('at 320 px the German designers cut nothing with the spacing', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('language', 'de'))
+  await page.setViewportSize({ width: 320, height: 800 })
+  for (const path of ['/bullets/designer', '/powders/designer', '/targets/designer']) {
+    await gotoHydrated(page, path)
+    await nothingCut(page)
+  }
+})
 
 // a cartridge with a long name and one with many aliases
 for (const id of ['6mm-me-flobert-court', '22-long-rifle'])
@@ -98,5 +103,5 @@ for (const id of ['6mm-me-flobert-court', '22-long-rifle'])
     }) => {
       await page.setViewportSize({ width, height: 800 })
       await gotoHydrated(page, `/cartridges/${id}`)
-      await nothingCut(page, width === 320 ? phone : names)
+      await nothingCut(page)
     })
