@@ -119,7 +119,7 @@
     "curve charts": {
       "budget": {
         "initial": 462000,
-        "total": 701000
+        "total": 710000
       },
       "routes": {
         "/powders/[id]": {
