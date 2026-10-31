@@ -110,6 +110,17 @@ export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   return tables
 }
 
+/** The load tables of every root; a file two roots list is an error, the first entry stays. */
+function readRootsLoadTables(roots: readonly string[], errors: string[]): LoadTables {
+  const tables: LoadTables = {}
+  for (const r of roots)
+    for (const [file, table] of Object.entries(readLoadTables(r, errors))) {
+      if (file in tables) errors.push(`load-tables.json: ${file} is listed by more than one root`)
+      else tables[file] = table
+    }
+  return tables
+}
+
 /** The records of a records root, one array per kind. */
 export type Bundle = {
   cartridges: Cartridge[]
@@ -286,7 +297,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')
-  const loadTables: LoadTables = Object.assign({}, ...roots.map((r) => readLoadTables(r, errors)))
+  const loadTables = readRootsLoadTables(roots, errors)
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))
       errors.push(`powders/${p.id}.json: ${error}`)
