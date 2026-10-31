@@ -3514,6 +3514,8 @@
   "The page {address} was not opened on this device before, so it is not stored. The tools, your own records and the pages you opened before work without the network.": "Die Seite {address} wurde auf diesem Gerät noch nicht geöffnet und ist daher nicht gespeichert. Die Werkzeuge, Ihre eigenen Datensätze und die zuvor geöffneten Seiten funktionieren ohne Netzwerk.",
   "Not available offline": "Offline nicht verfügbar",
   "Pages kept on this device": "Auf diesem Gerät gespeicherte Seiten",
+  "The tools, your own records and the pages you opened before work without the network.": "Die Werkzeuge, Ihre eigenen Datensätze und die zuvor geöffneten Seiten funktionieren ohne Netzwerk.",
+  "Works offline": "Funktioniert offline",
   "Nothing at this address": "Unter dieser Adresse gibt es nichts",
   "This page could not be found. Search the records, or open one of these pages.": "Diese Seite wurde nicht gefunden. Durchsuchen Sie die Datensätze oder öffnen Sie eine dieser Seiten.",
   "New version": "Neue Version",

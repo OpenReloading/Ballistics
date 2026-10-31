@@ -52,8 +52,12 @@ function networkFirst(event, name, key, cached) {
 async function fromNetworkPage(event) {
   const key = pageKey(event.request.url)
   const cache = await caches.open(shell)
+  const stored = slashedKey(key, slash)
   // a copied link carries a query the stored page lacks
-  const cached = (await cache.match(key)) ?? (await cache.match(key, { ignoreSearch: true }))
+  const cached =
+    (await cache.match(key)) ??
+    (await cache.match(stored)) ??
+    (await cache.match(stored, { ignoreSearch: true }))
   try {
     return await networkFirst(event, shell, key, cached)
   } catch (error) {

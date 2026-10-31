@@ -11,6 +11,7 @@ import {
   shellCache,
   shellFiles,
   shellPages,
+  slashedKey,
   staleCaches,
   strategyOf,
 } from '../src/lib/offline.ts'
@@ -203,6 +204,16 @@ it('a client navigation (RSC, not a prefetch) keeps its page; a prefetch does no
 it('the page key drops the RSC parameter and keeps the query', () => {
   expect(pageKey(`${origin}/cartridges/308-win?_rsc=1x`)).toBe('/cartridges/308-win')
   expect(pageKey(`${origin}/workbench?units=metric&_rsc=1x`)).toBe('/workbench?units=metric')
+})
+
+it('a page key without the trailing slash finds the stored page, with and without a query', () => {
+  expect(slashedKey(pageKey(`${origin}/groups`), '/')).toBe('/groups/')
+  expect(slashedKey(pageKey(`${origin}/groups?units=metric&_rsc=1x`), '/')).toBe(
+    '/groups/?units=metric',
+  )
+  expect(slashedKey('/groups/?units=metric', '/')).toBe('/groups/?units=metric')
+  expect(slashedKey('/', '/')).toBe('/')
+  expect(slashedKey('/groups', '')).toBe('/groups')
 })
 
 it('answers a worker script from the cache with a copy that has no URL of its own', async () => {
