@@ -14,6 +14,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { english, type Message, msg, type Translator } from '../i18n/translate.ts'
 import { translateMessage } from './core-messages.ts'
 import { toCsv } from './csv.ts'
+import { stringName } from './string-name.ts'
 import { stringStats } from './string-stats.ts'
 import type { Unit } from './units.ts'
 
@@ -144,12 +145,6 @@ export async function readSession(
     }
   }
 }
-
-/** Label "String n" or "String n: label" for the string at zero-based index `k`, in the language of `t`. */
-export const stringName = (labels: (string | undefined)[], k: number, t: Translator['t']) =>
-  labels[k]
-    ? t('String {n}: {label}', { n: k + 1, label: labels[k] })
-    : t('String {n}', { n: k + 1 })
 
 /** Header and one row per string (numbers with a point, whatever the language shown): shots, excluded, mean, SD, ES, min and max in `unit` with 1 decimal. */
 function statisticsRows(data: ChronoImport, unit: Unit): (string | number)[][] {

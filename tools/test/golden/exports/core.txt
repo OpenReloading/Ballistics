@@ -62,6 +62,7 @@
 . IcaoConstants
 . Identifiability
 . Identification
+. ImpactStep
 . InputBasis
 . InputDefault
 . InputError
@@ -76,6 +77,7 @@
 . InteriorValues
 . Interval
 . LadderFlatSpots
+. LadderImpact
 . LadderPoint
 . LadderSegment
 . LadderStep
@@ -307,6 +309,7 @@
 . interiorValueKeys
 . isStable
 . ladderFlatSpots
+. ladderImpactResiduals
 . lagrangeGradient
 . lbPerSqInToKgPerSqM
 . leakFlowFactor

@@ -7,6 +7,7 @@ import { useTranslation } from '../i18n/language.ts'
 import type { LadderDirection } from '../lib/seating-ladder.ts'
 import { stepLabel } from '../lib/workbench.ts'
 import { TargetEditor } from './target-editor.tsx'
+import { useDropSlope } from './use-drop-slope.ts'
 
 /**
  * The workbench tab Groups: the target editor for the sheets of the saved load, compact (the
@@ -16,8 +17,11 @@ import { TargetEditor } from './target-editor.tsx'
  */
 export function GroupsTab({
   ladder,
+  trajectoryLoad,
   ...props
-}: Omit<ComponentProps<typeof TargetEditor>, 'charges' | 'stepLabels'> & {
+}: Omit<ComponentProps<typeof TargetEditor>, 'charges' | 'stepLabels' | 'slopeAt'> & {
+  /** The load the Trajectory tab starts from: the drop slope of the point of impact per charge. */
+  trajectoryLoad: Parameters<typeof useDropSlope>[0]
   /** The load's charge ladder, as the API runs it; its charges label the ladder steps. */
   ladder?: { charge: number; step: number; steps: number; direction: LadderDirection } | undefined
 }) {
@@ -26,6 +30,7 @@ export function GroupsTab({
   try {
     charges = ladder && chargeLadder(ladder.charge, ladder.step, ladder.steps, ladder.direction)
   } catch {}
+  const slopeAt = useDropSlope(trajectoryLoad)
   const framed = useMediaQuery('screen and (min-width: 62em)')
   const [box, setBox] = useState<HTMLDivElement | null>(null)
   const [height, setHeight] = useState<number>()
@@ -89,6 +94,7 @@ export function GroupsTab({
       <TargetEditor
         {...props}
         charges={charges}
+        slopeAt={slopeAt}
         stepLabels={charges?.map((_, i) => stepLabel(i, charges.length, ladder?.direction ?? 'up'))}
         expand={{ expanded, onChange: (on) => (on ? setExpanded(true) : close()) }}
       />
