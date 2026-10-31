@@ -337,7 +337,7 @@ export function ruleRows(r: DisciplineRules | undefined): FieldRow[] {
     ...(r.maxMagnification
       ? [{ label: msg('Magnification up to'), text: `${r.maxMagnification.value}×`, numeric: true }]
       : []),
-    ...quantityRow(msg('Trigger weight from'), 'mass', 'mass', r.minTriggerWeight),
+    ...quantityRow(msg('Trigger weight from'), 'firearmMass', 'mass', r.minTriggerWeight),
     ...quantityRow(msg('Barrel length up to'), 'barrelLength', 'length', r.maxBarrelLength),
     ...quantityRow(msg('Firearm mass up to'), 'firearmMass', 'mass', r.maxFirearmMass),
     ...(a?.handloads === undefined

@@ -6,7 +6,6 @@ import { Plus } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { plainNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
@@ -77,6 +76,8 @@ export function TargetFaceList({
   ]
   const outer = (r: TargetFaceRow) =>
     r.outer === undefined ? '' : formatQuantity('length', system, toSi('length', r.outer))
+  const distances = (r: TargetFaceRow) =>
+    r.distances.map((d) => formatQuantity('range', system, d)).join(', ')
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
@@ -89,10 +90,10 @@ export function TargetFaceList({
     {
       key: 'distance',
       label: msg('Distance'),
-      unit: 'm',
+      unit: system.range.symbol,
       width: '8rem',
       value: (r) => r.distances[0],
-      cell: (r) => r.distances.map((d) => plainNumber(d)).join(', '),
+      cell: distances,
     },
     {
       key: 'outer',
@@ -125,7 +126,7 @@ export function TargetFaceList({
     [
       r.origin === 'user' && t(originNames.user),
       r.organization,
-      r.distances.length > 0 ? `${r.distances.map((d) => plainNumber(d)).join(', ')} m` : '',
+      r.distances.length > 0 ? `${distances(r)} ${system.range.symbol}` : '',
       r.outer !== undefined && `${outer(r)} ${system.length.symbol}`,
       tn(r.rings, '{count} ring', '{count} rings'),
     ]
