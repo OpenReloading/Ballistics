@@ -251,6 +251,7 @@ inherits 2.0.4 ISC
 ipaddr.js 2.5.0 MIT
 json-schema-ref-resolver 3.0.0 MIT
 json-schema-traverse 1.0.0 MIT
+jsqr 1.4.0 Apache-2.0
 klona 2.0.6 MIT
 light-my-request 6.6.0 BSD-3-Clause
 media-typer 1.1.1 MIT
