@@ -137,6 +137,7 @@ export function SavedLoads({
   onStored,
   reminder,
   system,
+  onScan,
 }: {
   opened: boolean
   onClose: () => void
@@ -153,6 +154,8 @@ export function SavedLoads({
   reminder?: string | undefined
   /** The units the box label prints in. */
   system: UnitSystem
+  /** Opens the dialog that reads a box label. */
+  onScan: () => void
 }) {
   const [records, setRecords] = useState<LoadRecord[]>([])
   const [query, setQuery] = useState('')
@@ -418,6 +421,9 @@ export function SavedLoads({
               }
             >
               {t('Export CSV')}
+            </Button>
+            <Button variant="default" size={controlSize.row.button} ml="xs" onClick={onScan}>
+              {t('Scan box label')}
             </Button>
             <div className="saved-storage" role="status">
               {shown && <p>{shown.say(t)}</p>}
