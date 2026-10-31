@@ -130,6 +130,12 @@ body {
   --input-bd: var(--input-border);
 }
 
+/* an unchecked box or radio takes the field border too: Mantine's gray-4 is about 1.5:1 on white */
+.mantine-Checkbox-input:not(:checked, [data-indeterminate], :disabled, [data-error]),
+.mantine-Radio-radio:not(:checked, :disabled, [data-error]) {
+  border-color: var(--input-border);
+}
+
 /* the top bar's right end: Install slot, Safety, theme switch */
 .top-end {
   display: flex;

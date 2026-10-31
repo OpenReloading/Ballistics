@@ -119,6 +119,11 @@ describe('drawing tokens', () => {
     const selector = css.match(/([^{}]*)\{\s*--input-bd:\s*var\(--input-border\)/)?.[1] ?? missing()
     expect(selector).toContain(':not([data-error]):not([data-success])')
   })
+  it('gives an unchecked checkbox and radio the field border, other states to Mantine', () => {
+    const rule = css.match(/([^{}]*)\{\s*border-color:\s*var\(--input-border\)/)?.[1] ?? missing()
+    expect(rule).toContain('.mantine-Checkbox-input:not(:checked, [data-indeterminate], :disabled')
+    expect(rule).toContain('.mantine-Radio-radio:not(:checked, :disabled')
+  })
   it('gives shot groups the light chart series colours', () => {
     const series = new Set([1, 2, 3, 4, 5, 6].map((k) => light.get(`--series-${k}`)))
     for (const colour of groupColours) expect(series.has(colour), colour).toBe(true)
