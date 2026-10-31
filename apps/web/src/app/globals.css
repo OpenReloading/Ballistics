@@ -54,6 +54,9 @@
   --mantine-color-body: var(--bg);
   --mantine-color-text: var(--fg);
   --mantine-color-dimmed: var(--muted);
+  /* placeholders: Mantine's pale default gives about 2:1, and some fields are named by theirs alone */
+  --mantine-color-placeholder: var(--muted);
+  --input-placeholder-color: var(--muted);
   --mantine-color-anchor: var(--link);
   --mantine-color-default: var(--bg);
   --mantine-color-default-hover: var(--surface);
@@ -10438,13 +10441,6 @@ main .page-bar h1 {
 .source-badge abbr {
   text-decoration: none;
   cursor: help;
-}
-
-/* the selects of the row are named by their placeholder: the muted text colour, not the pale default */
-.directory-filters,
-.burn-overlay {
-  --mantine-color-placeholder: var(--muted);
-  --input-placeholder-color: var(--muted);
 }
 
 /* the list skeleton (ListLoading): rows in the table's frame, under a filter row of the real metrics */

@@ -61,6 +61,15 @@ describe('drawing tokens', () => {
       expect(light.get('--mantine-color-disabled-color')).toBe('var(--muted)')
       expect(ratio(tokens.get('--muted') as string, fill)).toBeGreaterThanOrEqual(4.5)
     })
+  // Mantine's field fills: white in light, dark-6 in dark
+  for (const [theme, tokens, fill] of [
+    ['light', light, '#ffffff'],
+    ['dark', dark, '#2e2e2e'],
+  ] as const)
+    it(`gives placeholders 4.5:1 against the field fill in ${theme}`, () => {
+      expect(light.get('--mantine-color-placeholder')).toBe('var(--muted)')
+      expect(ratio(tokens.get('--muted') as string, fill)).toBeGreaterThanOrEqual(4.5)
+    })
   // Message in states.tsx: each variant's text on its own fill
   for (const [theme, tokens] of [
     ['light', light],
