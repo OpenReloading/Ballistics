@@ -138,6 +138,17 @@ describe('readCsrLoad', () => {
     expect(new Set(ids).size).toBe(2)
   })
 
+  it('keeps the id of a series when a repeat or another series joins the file', () => {
+    const sessionIds = (appendix: string) =>
+      readCsrLoad(csrFile({ appendix }), saved)
+        .records.filter((r) => r.kind === 'session')
+        .map((r) => r.id)
+    const [single] = sessionIds(series)
+    const other = series.replace('velocity="719"', 'velocity="720"')
+    expect(sessionIds(other + series)[1]).toBe(single)
+    expect(sessionIds(series + other + series)[0]).toBe(single)
+  })
+
   it('warns on another or a missing format and still reads the load', () => {
     expect(readCsrLoad(csrFile({ format: '2' }), saved).warnings[0]).toMatch(
       /^The file is of format "2"; the reader is written for format 1/,
