@@ -10159,6 +10159,11 @@ main .page-bar h1 {
   display: contents;
 }
 
+/* the tour button's Indicator keeps a box, so its dot sits on the button */
+.page-bar-actions > .mantine-Indicator-root {
+  display: inline-flex;
+}
+
 /* Save's chevron: a square of the bar's control height */
 .save-more {
   width: var(--button-height, 2.25rem);
