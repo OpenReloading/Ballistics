@@ -26,4 +26,4 @@ The web app supports these browsers and widths. An older browser may open it, bu
 
 - `tools/test/browser-builtins.test.ts` (part of `npm test`) searches the browser code (`apps/web/src` and the sources of core, drawing, schema, api, importers and data) for built-ins one of these browsers lacks, from the MDN compatibility data, such as `URL.canParse`, `AbortSignal.any`, `Object.groupBy` or `Promise.withResolvers`. The test lists every name it checks. A use fails the test: replace it, as `anySignal` of `apps/web/src/lib/any-signal.ts` replaces `AbortSignal.any`.
 - The Set methods `union`, `intersection` and `difference` are not checked, as zod's `z.union` has the same name.
-- The e2e smoke spec runs in Chromium, and in Firefox and WebKit with `ALL_ENGINES` set (`apps/e2e/AGENTS.md`).
+- The e2e smoke spec runs in Chromium, and in Firefox and WebKit with `ALL_ENGINES` set.

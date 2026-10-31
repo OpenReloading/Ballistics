@@ -50,7 +50,7 @@ Conditions under which a face drawn from stated dimensions may ship after the cu
 
 - The face has a neutral name of its own (for example "Practical-shooting target, octagon, 45 x 57 cm"). "IPSC" or "USPSA" appears only in the citation of the provenance and on the page that explains the source, as a reference to the rule book, edition and appendix.
 - No logo, no shield, no motto, no "official", "approved" or "IPSC target" claim; one line that the project is not affiliated with or endorsed by the body.
-- A printed or downloaded face carries neither mark as a name. Printed pages already carry no notice (`AGENTS.md`), so the neutral name is the safeguard there.
+- A printed or downloaded face carries neither mark as a name. Printed pages already carry no notice, so the neutral name is the safeguard there.
 - No copy, trace or embed of a rule book diagram; every vertex from a stated dimension or an assumption marked as such; a test recomputes the zones.
 - The owner asks a lawyer before shipping to confirm: whether a free open-source project acts in the course of trade at all; whether a printable target face counts as goods of class 28 or as goods similar to them under Article 9(2)(b) of the EU regulation, or calls on a reputation under Article 9(2)(c); whether the body's site and cover terms bind; the German threshold for technical drawings; and the US position on the "USPSA" mark.
 

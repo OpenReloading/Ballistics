@@ -9,7 +9,6 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - `npm ci` also installs a pre-commit hook into this repository's hooks folder (`hooks/install.mjs`, shared by every git worktree). A commit runs Biome on the staged files, the rules of `npm run lint`, and is refused with Biome's message on a finding; `npm run format` applies the safe fixes. It runs no tests or type checks, and CI runs the same Biome check on every pull request.
   - The hook runs `node_modules/.bin/biome` of the checkout. With git on the host and `npm ci` run in the dev container, that is the container's install on the bind-mounted checkout (Linux host): the container need not be running. Where that binary does not run on the host (another operating system, no `npm ci` yet), the hook says so and the commit goes on unchecked: run `devcontainer exec --workspace-folder . npm run lint` before the pull request.
   - A `core.hooksPath` of your own, or a `pre-commit` hook already in the hooks folder, is left alone and the install says so in one line. The hook is not installed in CI.
-- Every command, environment variable and container: [AGENTS.md](AGENTS.md).
 
 ## Before a pull request
 
@@ -22,7 +21,6 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - Every record carries its source (provenance), and the terms where the source states them; values taken as facts carry a page citation.
 - Results are simulations, not load data: no wording that calls a load or a result safe.
-- Code conventions, stored units and package rules: [AGENTS.md](AGENTS.md#conventions).
 - Names of the record fields, the user data files and the API bodies, with the terms to avoid: [GLOSSARY.md](GLOSSARY.md).
 - A pull request that adds a major user-visible feature adds a news item (`apps/web/news/YYYY-MM-DD-slug.md`: front matter `title` and `link`, two sentences) for the home page's What's new list, reviewed like any file; smaller changes are in the changelogs only.
 - Every spike and every model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md), a negative or null result included, and is closed with a link to it. The entry is written when the work ends, from the template on that page; `npm test -w @open-reloading/docs` fails on an entry that misses a section.
