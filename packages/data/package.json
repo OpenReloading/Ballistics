@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/data",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "OpenReloading catalogue records as one JSON bundle, their reader and plausibility checks.",
   "keywords": [
     "reloading",
@@ -47,7 +47,7 @@
     "test": "vitest run --coverage"
   },
   "dependencies": {
-    "@open-reloading/schema": "0.0.4",
+    "@open-reloading/schema": "0.0.5",
     "zod": "^4.6.7"
   },
   "devDependencies": {

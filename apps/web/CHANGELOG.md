@@ -1,5 +1,80 @@
 # Changelog
 
+## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.4...web-v0.0.5) (2026-10-31)
+
+
+### Features
+
+* **api:** input hash, API version and data hash on compute answers ([#415](https://github.com/OpenReloading/Ballistics/issues/415)) ([e3cc1bc](https://github.com/OpenReloading/Ballistics/commit/e3cc1bc993bc6b4ae4ea02ac5912006837ed704a))
+* **cli:** verify and compare held-out model evaluation ([#406](https://github.com/OpenReloading/Ballistics/issues/406)) ([d0b9202](https://github.com/OpenReloading/Ballistics/commit/d0b920239073991dfe5f06b690747d0c0b5b9d83))
+* **core:** named refusals on the strings plan and a divergence of the velocity and drag fits ([#423](https://github.com/OpenReloading/Ballistics/issues/423)) ([c880f8f](https://github.com/OpenReloading/Ballistics/commit/c880f8f7b6906a7593210b29399ffb40f67b1426))
+* **core:** one advisory registry for warnings and ignored inputs ([#421](https://github.com/OpenReloading/Ballistics/issues/421)) ([d9cfa7a](https://github.com/OpenReloading/Ballistics/commit/d9cfa7a761852444ad27730626203e35c992c56d))
+* **data:** add the Austrian OeSB with its national target and disciplines ([#699](https://github.com/OpenReloading/Ballistics/issues/699)) ([95051bc](https://github.com/OpenReloading/Ballistics/commit/95051bc271d6fcb975f3812c8fb37fbeef91f4c2))
+* **data:** rule facts per discipline and stage ([#432](https://github.com/OpenReloading/Ballistics/issues/432)) ([be5fcd5](https://github.com/OpenReloading/Ballistics/commit/be5fcd55a456a33e3c823890a229f8c5d3fd7195))
+* pre-release batch of command line, importer, firearm and size check work ([#659](https://github.com/OpenReloading/Ballistics/issues/659)) ([e468295](https://github.com/OpenReloading/Ballistics/commit/e46829524214011f7e7c6f7bb26752b6ffb8cff7))
+* pre-release batch of firearm views, box label, load-file importer and research entries ([#656](https://github.com/OpenReloading/Ballistics/issues/656)) ([5d38b2c](https://github.com/OpenReloading/Ballistics/commit/5d38b2cd057a9f0d6e2757dcf833501a1ab0268e))
+* pre-release batch of fits, hit probability, tuning and docs ([#569](https://github.com/OpenReloading/Ballistics/issues/569)) ([3a5c6a4](https://github.com/OpenReloading/Ballistics/commit/3a5c6a4a7be9d52d20eca911cdccd49ad2d104c4))
+* pre-release batch of limits, tests and research entries ([#589](https://github.com/OpenReloading/Ballistics/issues/589)) ([7b36740](https://github.com/OpenReloading/Ballistics/commit/7b36740b42ca2804b65cb0d707c1c51702b82b3e))
+* pre-release batch of national body data and hole detection of filled print areas ([#668](https://github.com/OpenReloading/Ballistics/issues/668)) ([5f2e7ea](https://github.com/OpenReloading/Ballistics/commit/5f2e7ea399ae919859628146a2a5d7b3867b6ed5))
+* pre-release batch of tests, fixes and research entries ([#612](https://github.com/OpenReloading/Ballistics/issues/612)) ([df1f134](https://github.com/OpenReloading/Ballistics/commit/df1f1347845b62b98a153896a7f27caefd56befb))
+* pre-release batch of workbench record chooser, notes area, print fixes, photo guide and command line operations ([#688](https://github.com/OpenReloading/Ballistics/issues/688)) ([db2b2da](https://github.com/OpenReloading/Ballistics/commit/db2b2dae53086aa27177764e6dc91d0f0699e78f))
+* pre-release integration of the 1.0 work ([#493](https://github.com/OpenReloading/Ballistics/issues/493)) ([46ace26](https://github.com/OpenReloading/Ballistics/commit/46ace26932aa37546eaf95f905870c0606abfb8d))
+* **schema:** record the measuring convention of a case capacity ([#422](https://github.com/OpenReloading/Ballistics/issues/422)) ([f41453b](https://github.com/OpenReloading/Ballistics/commit/f41453b38e31592820ce961693776236506a45dd))
+* **web:** better automatic bullet outline detection and photo quality hints ([#384](https://github.com/OpenReloading/Ballistics/issues/384)) ([5c654f7](https://github.com/OpenReloading/Ballistics/commit/5c654f7e9d4b43c9e04ba3564f5a4d6241e80b1b))
+* **web:** better cut-outs for photographs on tables, and scale from caliper sizes ([#390](https://github.com/OpenReloading/Ballistics/issues/390)) ([3b836e8](https://github.com/OpenReloading/Ballistics/commit/3b836e8fd6747bb8801f6364d3980ad2afea2f1b))
+* **web:** Database lists, record pages and comparisons in German ([#413](https://github.com/OpenReloading/Ballistics/issues/413)) ([bad3c44](https://github.com/OpenReloading/Ballistics/commit/bad3c4484c174b49be8b483c840136419617127f))
+* **web:** decide the disputed German terms ([#433](https://github.com/OpenReloading/Ballistics/issues/433)) ([400863a](https://github.com/OpenReloading/Ballistics/commit/400863a5a13b04c8bba2c160fa2af6a04a5a98ca))
+* **web:** decimal comma shown, comma and point accepted under the German setting ([#388](https://github.com/OpenReloading/Ballistics/issues/388)) ([0d56696](https://github.com/OpenReloading/Ballistics/commit/0d56696e7c22fe04d1f9872cbd810c046a0729b4))
+* **web:** edit bullet diameter, length and BC on the Bullet card ([#759](https://github.com/OpenReloading/Ballistics/issues/759)) ([9d98d6a](https://github.com/OpenReloading/Ballistics/commit/9d98d6a137256bfb07324fedae210bbbe398c2f0))
+* **web:** German Safety text beside the English one ([#387](https://github.com/OpenReloading/Ballistics/issues/387)) ([97db702](https://github.com/OpenReloading/Ballistics/commit/97db7020ff7c623762e321dcf3c86063a0ca0481))
+* **web:** page tours for the record pages and the shot groups page ([#746](https://github.com/OpenReloading/Ballistics/issues/746)) ([4226b33](https://github.com/OpenReloading/Ballistics/commit/4226b33b2d07061678825e54e7c929183729f6ca))
+* **web:** photo quality check for target photos ([#382](https://github.com/OpenReloading/Ballistics/issues/382)) ([1c2c9da](https://github.com/OpenReloading/Ballistics/commit/1c2c9da01da2bdb9416122a71f5d2a23b0b115e6))
+* **web:** shared choice filters for Disciplines, Federations and Targets, discipline distance unit ([#427](https://github.com/OpenReloading/Ballistics/issues/427)) ([61737a0](https://github.com/OpenReloading/Ballistics/commit/61737a0d9269d0cb9930860c2d7b563f7c6b6b4b))
+* **web:** skip unknown record kinds of a user data file and report them ([#702](https://github.com/OpenReloading/Ballistics/issues/702)) ([f5346fe](https://github.com/OpenReloading/Ballistics/commit/f5346fe56db073969f0bb633c4d7bd9c466af38e))
+* **web:** translate the printed pages to German ([#434](https://github.com/OpenReloading/Ballistics/issues/434)) ([8969277](https://github.com/OpenReloading/Ballistics/commit/896927785acd514edf80e90d7608292522ba2e88))
+* **web:** translate the workbench and the messages of the packages and the API to German ([#414](https://github.com/OpenReloading/Ballistics/issues/414)) ([aa8084c](https://github.com/OpenReloading/Ballistics/commit/aa8084c063b0cdfb1aa9f78b4097c143391e7998))
+* **web:** velocity SD interval, shots needed and string comparison in the session summary ([#416](https://github.com/OpenReloading/Ballistics/issues/416)) ([910d048](https://github.com/OpenReloading/Ballistics/commit/910d0483043fb8bda24321e64634a280e7d2a3ac))
+
+
+### Bug fixes
+
+* batch of audit fixes for scoring, German text and layout ([#722](https://github.com/OpenReloading/Ballistics/issues/722)) ([2e2a601](https://github.com/OpenReloading/Ballistics/commit/2e2a6015ff24a4b54ee052fc2098f34bbe9db207))
+* make six number and text patterns linear and name the page bar status line ([#531](https://github.com/OpenReloading/Ballistics/issues/531)) ([3359a1e](https://github.com/OpenReloading/Ballistics/commit/3359a1e3c90c683057d3bd3d57aacbf1f7dd9ec9))
+* pre-release batch of audit fixes for import, API query checks, load file, data package and CI plan ([#698](https://github.com/OpenReloading/Ballistics/issues/698)) ([eba4c2c](https://github.com/OpenReloading/Ballistics/commit/eba4c2c703aaba75e1e50989d850691b46926a10))
+* second batch of audit fixes for messages, contrast, German layout and offline start ([#744](https://github.com/OpenReloading/Ballistics/issues/744)) ([c01a781](https://github.com/OpenReloading/Ballistics/commit/c01a7816faea53693d1941ffc830c536764a88e7))
+* **web:** check a kept base record against its schema before offline use ([#552](https://github.com/OpenReloading/Ballistics/issues/552)) ([d5bfa7c](https://github.com/OpenReloading/Ballistics/commit/d5bfa7c6518e74661b3df62af77bb787fbe9bd9d))
+* **web:** drop saved import mappings of another shape ([#525](https://github.com/OpenReloading/Ballistics/issues/525)) ([45db7a0](https://github.com/OpenReloading/Ballistics/commit/45db7a0259f93f5f4eb7b6c155d849aa38594b2a))
+* **web:** keep the page bar title and the chart labels whole with the WCAG text spacing ([#750](https://github.com/OpenReloading/Ballistics/issues/750)) ([896ecb7](https://github.com/OpenReloading/Ballistics/commit/896ecb7b64f547b74e152eb76a774f274e06b02f))
+* **web:** parse the mass range number in linear time ([#748](https://github.com/OpenReloading/Ballistics/issues/748)) ([cf30a26](https://github.com/OpenReloading/Ballistics/commit/cf30a26281fd366eff4a99a97a52e08e49ddcbec))
+* **web:** refuse a file over 40 MB in the Import entry before reading it ([#550](https://github.com/OpenReloading/Ballistics/issues/550)) ([2b4c773](https://github.com/OpenReloading/Ballistics/commit/2b4c773a1b4db11f2d4a19cf99a707aed3645579))
+* **web:** refuse a share link of a large record before building it ([#543](https://github.com/OpenReloading/Ballistics/issues/543)) ([01b7867](https://github.com/OpenReloading/Ballistics/commit/01b7867c713674c8387975c584808791dff8074e))
+* **web:** return focus after dialogs and fix three more accessibility findings ([#408](https://github.com/OpenReloading/Ballistics/issues/408)) ([6fc6345](https://github.com/OpenReloading/Ballistics/commit/6fc63457d969c7ec66de04f518602ea200b0db14))
+
+
+### Performance
+
+* **web:** render cartridge record pages in the browser from their data file ([#383](https://github.com/OpenReloading/Ballistics/issues/383)) ([9b4cb28](https://github.com/OpenReloading/Ballistics/commit/9b4cb288a789157c4822859d2a9d72b462049b73))
+* **web:** roll out the small record page to every record kind ([#407](https://github.com/OpenReloading/Ballistics/issues/407)) ([9c2771a](https://github.com/OpenReloading/Ballistics/commit/9c2771ae10a3a77c9f976c89eac29c1d84d931d1))
+
+
+### Documentation
+
+* accessibility audit page and two fixes from it ([#386](https://github.com/OpenReloading/Ballistics/issues/386)) ([f522a7c](https://github.com/OpenReloading/Ballistics/commit/f522a7c5156f2c260cf290d7e38346541ba0de89))
+* match the docs to the code and settings ([#529](https://github.com/OpenReloading/Ballistics/issues/529)) ([d2853ab](https://github.com/OpenReloading/Ballistics/commit/d2853ab24bfdfd8bce45291d8fc7731437c8febd))
+* **research:** bullet inertia from the outline against the solid cylinder ([#429](https://github.com/OpenReloading/Ballistics/issues/429)) ([9eeb1e1](https://github.com/OpenReloading/Ballistics/commit/9eeb1e1c4c3c57021acbbcdbdea6f5cedbf053c9))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @open-reloading/api bumped from 0.0.4 to 0.0.5
+    * @open-reloading/core bumped from 0.0.3 to 0.0.4
+    * @open-reloading/data bumped from 0.0.4 to 0.0.5
+    * @open-reloading/drawing bumped from 0.0.3 to 0.0.4
+    * @open-reloading/importers bumped from 0.0.4 to 0.0.5
+    * @open-reloading/schema bumped from 0.0.4 to 0.0.5
+
 ## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/web-v0.0.3...web-v0.0.4) (2026-10-27)
 
 
