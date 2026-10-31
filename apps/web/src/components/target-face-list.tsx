@@ -86,7 +86,7 @@ export function TargetFaceList({
   ]
   const outer = (r: TargetFaceRow) =>
     r.outer === undefined ? '' : formatQuantity('length', system, toSi('length', r.outer))
-  const distances = (r: TargetFaceRow) => r.distances.map(distance).join(', ')
+  const distances = (r: TargetFaceRow) => r.distances.map((m) => distance(m)).join(', ')
   const columns: DirectoryColumn<TargetFaceRow>[] = [
     { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
     {
