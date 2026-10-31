@@ -26,6 +26,9 @@ export const photoGuide = docsPage(docs, 'photo-guide/')
 /** The guide to measuring case capacity with water. */
 export const capacityGuide = docsPage(docs, 'guides/case-capacity/')
 
+/** The guide to measuring bullet length, base to ogive and bearing length. */
+export const bulletGuide = docsPage(docs, 'guides/bullet-dimensions/')
+
 /** The guide to placing a chronograph and its distance to the muzzle. */
 export const chronographGuide = docsPage(docs, 'guides/chronograph-setup/')
 
