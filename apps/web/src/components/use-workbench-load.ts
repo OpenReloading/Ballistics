@@ -41,7 +41,7 @@ import type {
   SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
-import { type BulletValues, diameterMm } from '../lib/bullet.ts'
+import { type BulletValues, diameterMm, recordBulletValues } from '../lib/bullet.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
@@ -115,6 +115,7 @@ import {
   recordValues,
 } from '../lib/query.ts'
 import { withStoredSessions } from '../lib/range-entry.ts'
+import { changedFromRecord, recordValuesOf } from '../lib/record-changes.ts'
 import {
   type LadderDirection,
   type RunnableLadderKind,
@@ -161,6 +162,7 @@ import {
 import type { FileMenuHandle } from './file-menu.tsx'
 import type { ChartView } from './interior-chart.tsx'
 import { usePrintEvents } from './print.ts'
+import { resetToRecord } from './record-reset.ts'
 import type { Seated } from './seating-preview.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
@@ -2763,6 +2765,39 @@ export function useWorkbenchState() {
     seatingKept: seatingKeptOf(referenced, seated, suggestions),
     gunMass: gunFromFirearm.current && !!firearmRef,
   })
+  /** What the user changed over the records, with each record's value; the one source of the marks and resets. */
+  const changes = changedFromRecord(
+    fieldValues,
+    recordValuesOf({
+      origin,
+      bullet: recordBulletValues(bulletRecord),
+      suggestions,
+      seatingOwnsVolume: seatingOwnsVolume(seated),
+      firearmMass: gun?.data.firearmMass,
+    }),
+    given,
+  )
+  /** Gives the changed values among `keys` their record's value again; how many it reset. */
+  const resetKeys = (keys: readonly string[]) => {
+    const n = resetToRecord(keys, {
+      changes,
+      system,
+      bulletKeys: new Set(bulletFields.map((s) => s.key)),
+      setField: form.setFieldValue,
+      clearError: form.clearFieldError,
+      unsetTypedBullet: (drop) =>
+        setTypedBullet((f) =>
+          Object.fromEntries(Object.entries(f).filter(([k]) => !drop.includes(k))),
+        ),
+      follow: (add) => setFollowed((f) => new Set([...f, ...add])),
+      setGunWeight: (v) => {
+        gunFromFirearm.current = true
+        setGunFields({ firearmMass: v })
+      },
+    })
+    if (n > 0) markChanged()
+    return n
+  }
   const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
   // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a
   // reference asked for and not loaded stays until a capacity is typed or chosen
@@ -2980,6 +3015,8 @@ export function useWorkbenchState() {
     siLength,
     nextPanel,
     pmax,
+    changes,
+    resetKeys,
     shown,
     specValue,
     todo,

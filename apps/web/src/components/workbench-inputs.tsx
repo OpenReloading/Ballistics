@@ -628,7 +628,7 @@ function SeatingSlot({ name }: { name: SeatingSlotName }) {
 }
 
 /** The cards with a More popover. */
-const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder']
+const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder', 'firearm']
 
 type LoadValues = ReturnType<typeof useLoad>
 type InteriorSpec = (typeof interiorFields)[number]
@@ -670,6 +670,29 @@ function defaultMark(key: string, defaults: LoadValues['defaults'], t: Translato
   return t('Default: {source}.', { source })
 }
 
+/** A value of a field with its unit, as a mark or an action text names it. */
+const valueWithUnit = (quantity: FieldSpec['quantity'], s: UnitSystem, si: number) =>
+  [formatQuantity(quantity, s, si), s[quantity].symbol].filter(Boolean).join(' ')
+
+/** The restore action of a field changed over its record's value: the record's value comes back. */
+function changeAction(
+  spec: Pick<FieldSpec, 'key' | 'label' | 'quantity'>,
+  from: number | undefined,
+  resetKeys: LoadValues['resetKeys'],
+  t: Translator['t'],
+) {
+  if (from === undefined) return
+  return {
+    kind: 'restore' as const,
+    text: (s: UnitSystem) =>
+      t('Reset {label} to the record value {value}', {
+        label: specText(t, spec.label),
+        value: valueWithUnit(spec.quantity, s, from),
+      }),
+    onClick: () => resetKeys([spec.key]),
+  }
+}
+
 type LoadFieldMarkArgs = {
   key: string
   spec: InteriorSpec
@@ -681,6 +704,8 @@ type LoadFieldMarkArgs = {
   powder: LoadValues['powder']
   powderDesign: LoadValues['powderDesign']
   origin: LoadValues['origin']
+  /** The record's value where the user changed it. */
+  changed: number | undefined
   tn: Translator['tn']
 }
 
@@ -698,6 +723,7 @@ function loadFieldMark(
     powder,
     powderDesign,
     origin,
+    changed,
     tn,
   }: LoadFieldMarkArgs,
   t: Translator['t'],
@@ -712,19 +738,23 @@ function loadFieldMark(
           unit: s[spec.quantity].symbol,
         })
   return (
-    powder &&
-    origin &&
-    recordMark(
-      powder,
-      origin,
-      key,
-      fields[key]?.si,
-      (si) =>
-        [formatQuantity(spec.quantity, s, si), s[spec.quantity].symbol].filter(Boolean).join(' '),
-      powderDesign ? 'user design' : 'record',
-      t,
-      loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
-    )
+    (powder &&
+      origin &&
+      recordMark(
+        powder,
+        origin,
+        key,
+        fields[key]?.si,
+        (si) => valueWithUnit(spec.quantity, s, si),
+        powderDesign ? 'user design' : 'record',
+        t,
+        loadFitMark(powderDesign, origin, siValues(fields), s, dayText, { t, tn }),
+      )) ||
+    (changed === undefined
+      ? undefined
+      : t('Changed from the record value {value}.', {
+          value: valueWithUnit(spec.quantity, s, changed),
+        }))
   )
 }
 
@@ -793,6 +823,8 @@ function LoadField({ name: key }: { name: string }) {
     printing,
     printMedia,
     recordBore,
+    changes,
+    resetKeys,
   } = useLoad()
   const { t, tn } = useTranslation()
   const spec = interiorFields.find((s) => s.key === key)
@@ -839,6 +871,7 @@ function LoadField({ name: key }: { name: string }) {
             powder,
             powderDesign,
             origin,
+            changed: changes[key],
             tn,
           },
           t,
@@ -854,7 +887,10 @@ function LoadField({ name: key }: { name: string }) {
           (typeof props.error === 'string' ? translateMessage(props.error, t) : undefined))
       }
       flag={seatingFlag(key, seated, previewed, fields, t)}
-      action={seatingAction(key, spec, seated, previewed, fields, takeSeated, t)}
+      action={
+        seatingAction(key, spec, seated, previewed, fields, takeSeated, t) ??
+        changeAction(spec, changes[key], resetKeys, t)
+      }
       onBlur={() => {
         // an emptied field takes its default again
         if (followable && !fields[key]?.text.trim())
@@ -896,6 +932,8 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
     markChanged,
     printing,
     printMedia,
+    changes,
+    resetKeys,
   } = useLoad()
   const { t } = useTranslation()
   const spec = bulletFields.find((s) => s.key === key)
@@ -921,6 +959,14 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
       placeholder={bands > 1 ? t('{count} bands', { count: bands }) : undefined}
       muted={typed === undefined}
       error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
+      mark={(s) =>
+        changes[key] === undefined
+          ? undefined
+          : t('Changed from the record value {value}.', {
+              value: valueWithUnit(spec.quantity, s, changes[key]),
+            })
+      }
+      action={changeAction(spec, changes[key], resetKeys, t)}
       onChange={(v) => {
         markChanged()
         setTypedBullet((f) => ({ ...f, [key]: v }))
@@ -992,6 +1038,8 @@ function CardBody({ panel }: { panel: InputPanel }) {
     gunWeight,
     setGunWeight,
     markChanged,
+    changes,
+    resetKeys,
   } = useLoad()
   const { t } = useTranslation()
   // the gun weight's message waits for the end of the typing, as "0." on the way to "0.5" is no error
@@ -1063,6 +1111,14 @@ function CardBody({ panel }: { panel: InputPanel }) {
         system={system}
         value={gunWeight}
         error={gunLeft ? (s) => fieldError(firearmMassSpec, gunWeight, s, t) : undefined}
+        mark={(s) =>
+          changes.firearmMass === undefined
+            ? undefined
+            : t('Changed from the record value {value}.', {
+                value: valueWithUnit(firearmMassSpec.quantity, s, changes.firearmMass),
+              })
+        }
+        action={changeAction(firearmMassSpec, changes.firearmMass, resetKeys, t)}
         onBlur={() => setGunLeft(true)}
         onChange={(value) => {
           markChanged()
@@ -1373,8 +1429,43 @@ function CardPicker({ panel }: { panel: InputPanel }) {
   return <GunPicker />
 }
 
+/** The values of each card a record gives and the user may change. */
+const cardKeys: Record<InputPanel, readonly string[]> = {
+  cartridge: panelFields.cartridge,
+  bullet: ['bulletMass', ...bulletFields.map((s) => s.key)],
+  powder: [...modelFields, ...powderMoreFields],
+  firearm: ['twist', 'firearmMass'],
+}
+
+/** Gives the card's changed values their record's values again. */
+function ResetCard({ panel }: { panel: InputPanel }) {
+  const { changes, resetKeys } = useLoad()
+  const { t } = useTranslation()
+  const keys = cardKeys[panel].filter((k) => changes[k] !== undefined)
+  return (
+    <Button
+      className="wide"
+      size={controlSize.row.button}
+      variant="default"
+      disabled={keys.length === 0}
+      onClick={() => resetKeys(keys)}
+    >
+      {t('Reset card')}
+    </Button>
+  )
+}
+
 /** Rarely needed rows of a card, in its More popover: no accordion moves the layout. */
 function CardMore({ panel }: { panel: InputPanel }) {
+  return (
+    <>
+      <MoreRows panel={panel} />
+      <ResetCard panel={panel} />
+    </>
+  )
+}
+
+function MoreRows({ panel }: { panel: InputPanel }) {
   const { specValue, system, allDiameters, setAllDiameters, bullet } = useLoad()
   const { t } = useTranslation()
   const l6 = specValue('cartridge', 'L6')
@@ -1398,6 +1489,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
+  if (panel === 'firearm') return null
   return (
     <>
       <BulletValueFields more />

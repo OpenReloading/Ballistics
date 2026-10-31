@@ -269,6 +269,8 @@
   "Chamber, {where}": "Patronenlager, {where}",
   "Chamber: {notes}": "Patronenlager: {notes}",
   "Changed from the record value {value}.": "Gegenüber dem Wert des Datensatzes geändert: {value}.",
+  "Reset {label} to the record value {value}": "{label} auf den Wert des Datensatzes zurücksetzen: {value}",
+  "Reset card": "Karte zurücksetzen",
   "Changed from the user design value {value}.": "Gegenüber dem Wert des eigenen Entwurfs geändert: {value}.",
   "Charge": "Treibladung",
   "Charge ({unit})": "Treibladung ({unit})",
