@@ -1,0 +1,56 @@
+{
+  "id": "hammer-458-cal-250gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "10919",
+  "name": ".458 Cal-250gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 16.2,
+    "raw": "250 gr"
+  },
+  "length": {
+    "value": 22.48,
+    "raw": "Bullet length is .885″"
+  },
+  "noseLength": {
+    "value": 11.11,
+    "raw": "Nose length is .4375″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.227,
+      "note": "Hammer Bullets: \"g1-bc= .227 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 762,
+    "raw": "Recommended minimum twist rate is 1-30″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This 250gr Stone Hammer™ was designed specifically for the 45-70 Gov. This pure copper bullet will work well in the old trap door models as well as the lever action and modern rifles. With the big 1/4″ hollow point it will be a hard hitting performer with excellent velocity for hunting big game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/458-cal-250gr-stone-hammer/: Recommended minimum twist rate is 1-30″ | Bullet length is .885″ | Nose length is .4375″ | Bullet weight is 250gr | Recommended use: Big Game Hunting | g1-bc= .227 estimated"
+      }
+    ]
+  }
+}

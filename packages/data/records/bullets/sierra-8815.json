@@ -1,0 +1,58 @@
+{
+  "id": "sierra-8815",
+  "manufacturer": "sierra",
+  "productNumber": "8815",
+  "name": "45 CAL 230 GR FMJ TOURNAMENT MASTER",
+  "caliber": "0.4515",
+  "diameter": {
+    "value": 11.468,
+    "raw": "0.4515 in"
+  },
+  "mass": {
+    "value": 14.904,
+    "raw": "230 gr"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.14,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/45-cal-230-gr-fmj-tournament-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "025df9bd335f4d986bf50ce843230fe0aa648714d1190a0017d323298cf0a26b",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8815, Bullet Type: Full Metal Jacket (FMJ), Bullet Diameter: 0.4515, Bullet Weight (Grains): 230, G1 BC: 0.140, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

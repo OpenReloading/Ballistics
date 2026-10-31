@@ -1,0 +1,59 @@
+{
+  "id": "sako-151a",
+  "manufacturer": "sako",
+  "productNumber": "151A",
+  "name": "SAKO GAMEHEAD VARMINT RX 151A",
+  "productLine": "GAMEHEAD VARMINT RX",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0,308”"
+  },
+  "mass": {
+    "value": 8.424,
+    "raw": "8,4g/130gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Hollowpoint BT",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.216,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "note": "The printed sectional density 0.194 does not match the printed weight and diameter (0.196).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "5, 13, 18",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "SAKO GAMEHEAD VARMINT RX 151A: Diameter 0,308”, Weight 8,4g/130gr, Ballistic Coefficient 0.216, Bullet Type Hollowpoint BT, Sectional density 0.194"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

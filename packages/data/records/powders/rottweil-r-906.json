@@ -1,0 +1,17 @@
+{
+  "id": "rottweil-r-906",
+  "manufacturer": "rottweil",
+  "name": "R 906",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "rws-reloading-data-page-wiederladen-powder",
+        "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
+        "retrieved": "2026-10-13",
+        "fields": ["name"],
+        "note": "Names the powder Rottweil R 906."
+      }
+    ]
+  }
+}

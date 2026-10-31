@@ -1,0 +1,15 @@
+{
+  "id": "rws",
+  "name": "RWS",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "rws-reloading-data-web-table-rottweil-powders",
+        "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

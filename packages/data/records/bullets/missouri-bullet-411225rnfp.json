@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-411225rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "411225RNFP",
+  "name": ".41 Outlaw, 225 Grain RNFP",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439,
+    "raw": ".411 Diameter"
+  },
+  "mass": {
+    "value": 14.58,
+    "raw": "225 Grain"
+  },
+  "length": {
+    "value": 18.57,
+    "raw": "Bullet OAL .731 +/-"
+  },
+  "note": "Listed as 225 Grain RNFP. Brinell 18. .41 Magnum. For Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "411225RNFP, .41 Outlaw (https://missouribullet.com/details.php?prodId=85): .411 Diameter, 225 Grain RNFP, Brinell 18, Bullet OAL .731 +/-"
+      }
+    ]
+  }
+}

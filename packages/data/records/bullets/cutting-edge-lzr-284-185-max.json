@@ -1,0 +1,61 @@
+{
+  "id": "cutting-edge-lzr-284-185-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 284 185 MAX",
+  "name": "LZR 284 185 MAX (Lazer, 185 gr)",
+  "productLine": "Lazer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 11.988,
+    "raw": "185 gr"
+  },
+  "length": {
+    "value": 44.81,
+    "raw": "1.764\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.659,
+      "note": "G1 BC, above the part number line, printed \".659 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.665,
+      "note": "G1 BC, below the part number line, printed \".665 (Oehler 89)\". Marked (Oehler 89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.338,
+      "note": "G7 BC, above the part number line, printed \".338 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.333,
+      "note": "G7 BC, below the part number line, printed \".333 (Oehler 89)\". Marked (Oehler 89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "1-7\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .284, Grains 185, Minimum Required Twist 1-7\", Part Number LZR 284 185 MAX, G1 BC .659 (A.B.) / .665 (Oehler 89), G7 BC .338 (A.B.) / .333 (Oehler 89), OAL 1.764\", Bullet Projection 1.233\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.233\"."
+}

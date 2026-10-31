@@ -1,0 +1,26 @@
+{
+  "id": "alliant-reloder-16",
+  "manufacturer": "alliant",
+  "name": "Reloder 16",
+  "grainForm": "extruded",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "alliant-safety-data-sheet-reloder-series",
+        "page": "section 9",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_Series_SDS.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm"],
+        "note": "Section 9 gives the appearance \"Gray-black single perforated grain\"; the Alliant SDS listing (https://www.alliantpowder.com/resources/sds.aspx) links this sheet for Reloder 16.",
+        "kind": "derived"
+      }
+    ]
+  }
+}

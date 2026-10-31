@@ -1,0 +1,58 @@
+{
+  "id": "sierra-8340",
+  "manufacturer": "sierra",
+  "productNumber": "8340",
+  "name": "38 CAL 158 GR JSP SPORTS MASTER",
+  "caliber": "0.357",
+  "diameter": {
+    "value": 9.068,
+    "raw": "0.357 in"
+  },
+  "mass": {
+    "value": 10.238,
+    "raw": "158 gr"
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.1,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/38-cal-158-gr-jsp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "01c6724be8f8e3cd143c981717f56399889db8e6c8bab65855e2f20dc73cbbd7",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8340, Bullet Type: Jacketed Soft Point (JSP), Bullet Diameter: 0.357, Bullet Weight (Grains): 158, G1 BC: 0.100, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

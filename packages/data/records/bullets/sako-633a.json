@@ -1,0 +1,45 @@
+{
+  "id": "sako-633a",
+  "manufacturer": "sako",
+  "productNumber": "633A",
+  "name": "SAKO BLADE X 633A",
+  "productLine": "BLADE X",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0,308”"
+  },
+  "mass": {
+    "value": 7.776,
+    "raw": "7,8g/120gr"
+  },
+  "construction": {
+    "raw": "Expanding Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.284,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "9, 16",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "SAKO BLADE X 633A: Diameter 0,308”, Weight 7,8g/120gr, Ballistic Coefficient 0.284, Bullet Type Expanding Copper, Sectional density 0.180"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

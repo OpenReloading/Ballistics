@@ -1,0 +1,61 @@
+{
+  "id": "sierra-1785",
+  "manufacturer": "sierra",
+  "productNumber": "1785",
+  "name": "6.5MM 105 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.264",
+  "diameter": {
+    "value": 6.706,
+    "raw": "0.264 in"
+  },
+  "mass": {
+    "value": 6.804,
+    "raw": "105 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.425,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.212,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1785, 1785C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-105-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "2ac7c0f22be4b3fcf5d653e4fcbad092e07de103c7738c394db72d2f629963a3",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1785, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.264, Bullet Weight (Grains): 105, G1 BC: 0.425, G7 BC: 0.212, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,88 @@
+{
+  "id": "hodgdon-h4895",
+  "manufacturer": "hodgdon",
+  "name": "H4895",
+  "aliases": ["ADI AR2206H"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.64859,
+      "standardUncertainty": 0.013
+    },
+    "energy": {
+      "value": 3267600,
+      "standardUncertainty": 55000
+    },
+    "gamma": 1.2425,
+    "covolume": {
+      "value": 0.001059
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 162,
+    "trainingCartridges": 17
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, H4895® Extreme Rifle Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-h4895/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Product details: Form \"Extruded\", Base \"Single\".",
+        "origin": "manufacturer"
+      },
+      {
+        "source": "adi-world-class-powders-faq-is-hodgdon",
+        "url": "https://www.adiworldclass.com.au/faq-items/is-hodgdon-propellant-the-same-as-adi-propellant/",
+        "retrieved": "2026-10-13",
+        "fields": ["aliases"],
+        "note": "States that ADI exports propellants that Hodgdon Powder Company rebrands; its table pairs ADI AR2206H with H4895."
+      },
+      {
+        "source": "hodgdon-annual-manual-2025-rifle-and-pistol",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "162 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; single base prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "alliant",
+  "name": "Alliant",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-reloader-s-guide-2023-metallic-tables",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

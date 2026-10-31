@@ -1,0 +1,30 @@
+{
+  "id": "hornady-254104",
+  "manufacturer": "hornady",
+  "productNumber": "254104",
+  "name": "25 Cal. CX, .257, 90 gr",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257\""
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "82",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "25 Cal. CX, .257\", 90 gr., G1 .273, G7 .246, Sec. Den. .195, Item # 254104"
+      }
+    ]
+  },
+  "note": "The maker's G1 and G7 do not fit together (G7 0.246 is 0.90 times G1 0.273, outside 0.35 to 0.65), so one of the two is wrong and neither is stored as a BC."
+}

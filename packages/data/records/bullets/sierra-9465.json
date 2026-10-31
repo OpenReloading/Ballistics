@@ -1,0 +1,59 @@
+{
+  "id": "sierra-9465",
+  "manufacturer": "sierra",
+  "productNumber": "9465",
+  "name": "10MM 165 GR JHP -  SIG V-CROWN",
+  "caliber": "0.400",
+  "diameter": {
+    "value": 10.16,
+    "raw": "0.400 in"
+  },
+  "mass": {
+    "value": 10.692,
+    "raw": "165 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.132,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 9465, 9465C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/10mm-165-gr-jhp-sig-v-crown/",
+        "retrieved": "2026-10-08",
+        "sha256": "7573215eee47a69bce8ebf8bc59cd7a9ead6d18e84d8f523a3e29ab29a09deff",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 9465, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.400, Bullet Weight (Grains): 165, G1 BC: 0.132, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

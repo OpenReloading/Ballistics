@@ -1,0 +1,59 @@
+{
+  "id": "sierra-1032",
+  "manufacturer": "sierra",
+  "productNumber": "1032",
+  "name": "20 CAL 32 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.204",
+  "diameter": {
+    "value": 5.182,
+    "raw": "0.204 in"
+  },
+  "mass": {
+    "value": 2.074,
+    "raw": "32 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.221,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "The product page lists Bullet Type Spitzer (SPT) for item 1032C (Spitzer Boat Tail (SBT) for 1032); this record follows item 1032.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/20-cal-32-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "7f581456de60138bd2ef8b9436e1ee7ff264a27fd9cc5618a7480e0f86cdff42",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1032, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.204, Bullet Weight (Grains): 32, G1 BC: 0.221, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

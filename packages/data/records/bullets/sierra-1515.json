@@ -1,0 +1,63 @@
+{
+  "id": "sierra-1515",
+  "manufacturer": "sierra",
+  "productNumber": "1515",
+  "name": "6MM 80 GR SBT VarmintKing (SVK)",
+  "caliber": "0.243",
+  "diameter": {
+    "value": 6.172,
+    "raw": "0.243 in"
+  },
+  "mass": {
+    "value": 5.184,
+    "raw": "80 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.319,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.155,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-80-gr-sbt-varmintking-vk/",
+        "retrieved": "2026-10-08",
+        "sha256": "2b67668b6395190d6953060fccaf9f3c5d6b956f7e64461d345530fff4ff8df5",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1515, Bullet Type: Spitzer Boat Tail, Bullet Diameter: 0.243, Bullet Weight (Grains): 80, G1 BC: 0.319, G7 BC: 0.155, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

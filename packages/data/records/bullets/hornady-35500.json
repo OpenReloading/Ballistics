@@ -1,0 +1,36 @@
+{
+  "id": "hornady-35500",
+  "manufacturer": "hornady",
+  "productNumber": "35500",
+  "name": "9MM XTP, .355, 90 gr",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017,
+    "raw": ".355\""
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.099,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "96",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "9MM XTP, .355\", 90 gr., G1 .099, Sec. Den. .102, Item # 35500"
+      }
+    ]
+  }
+}

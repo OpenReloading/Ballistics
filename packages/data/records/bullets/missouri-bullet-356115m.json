@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-356115m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356115M",
+  "name": "Parabellum, 115 Grain 9MM RN",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042,
+    "raw": ".356 Diameter"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 Grain"
+  },
+  "length": {
+    "value": 13.67,
+    "raw": "Bullet OAL .538 +/-"
+  },
+  "note": "Listed as 115 Grain 9MM RN. Brinell 18. 9mm Parabellum. For General Shooting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "356115M, Parabellum (https://missouribullet.com/details.php?prodId=117): .356 Diameter, 115 Grain 9MM RN, Brinell 18, Bullet OAL .538 +/-"
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-358180wfn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358180WFN",
+  "name": ".357 Pugnose, 180 Grain WFN Flat-Base",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 Grain"
+  },
+  "length": {
+    "value": 18.64,
+    "raw": "Bullet OAL .734 +/-"
+  },
+  "note": "Listed as 180 Grain WFN Flat-Base. Brinell 18. .357 Magnum. For Maximum Energy.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "358180WFN, .357 Pugnose (https://missouribullet.com/details.php?prodId=201): .358 Diameter, 180 Grain WFN Flat-Base, Brinell 18, Bullet OAL .734 +/-"
+      }
+    ]
+  }
+}

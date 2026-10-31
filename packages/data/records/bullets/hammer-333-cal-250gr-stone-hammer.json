@@ -1,0 +1,56 @@
+{
+  "id": "hammer-333-cal-250gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869070573",
+  "name": ".333 Cal-250gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".333",
+  "diameter": {
+    "value": 8.458,
+    "raw": ".333"
+  },
+  "mass": {
+    "value": 16.2,
+    "raw": "250 gr"
+  },
+  "length": {
+    "value": 41.05,
+    "raw": "Bullet length: 1.616″"
+  },
+  "noseLength": {
+    "value": 17.78,
+    "raw": "Nose length: .700″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.47,
+      "note": "Hammer Bullets: \"g1-bc= .470 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Minimum required twist rate is 1-11″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This pure copper Stone Hammer® was designed for the 333 Jeffrey. Designed to be fully stable in 1-11″ twist this traditional weight at 250gr will run comfortably at 2500 fps. Good for any big game hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/333-cal-250gr-stone-hammer/: Minimum required twist rate is 1-11″ or faster | Bullet length: 1.616″ | Nose length: .700″ | Bullet weight: 250gr | Recommended use: Big Game Hunting | g1-bc= .470 estimated"
+      }
+    ]
+  }
+}

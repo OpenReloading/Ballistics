@@ -1,0 +1,58 @@
+{
+  "id": "sierra-5350",
+  "manufacturer": "sierra",
+  "productNumber": "5350",
+  "name": "50 CAL 350 GR JHP SPORTS MASTER",
+  "caliber": "0.500",
+  "diameter": {
+    "value": 12.7,
+    "raw": "0.500 in"
+  },
+  "mass": {
+    "value": 22.68,
+    "raw": "350 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.155,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/50-cal-350-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "a7017e5b37f98f2e3141229698a4d80975a44ba41ab7b708de90e19c2c817e32",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 5350, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.500, Bullet Weight (Grains): 350, G1 BC: 0.155, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

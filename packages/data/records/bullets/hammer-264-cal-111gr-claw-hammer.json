@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-111gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869067989",
+  "name": ".264 Cal-111gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 7.193,
+    "raw": "111 gr"
+  },
+  "length": {
+    "value": 25.4,
+    "raw": "Bullet length: 1.00″"
+  },
+  "noseLength": {
+    "value": 10.35,
+    "raw": "Nose length: .4076″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.183,
+      "note": "Hammer Bullets: \"g1-bc= .183 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "Minimum required twist rate: 1-9″"
+  },
+  "note": "Recommended use: Normal to short range Big Game Hunting. The product page also says: \"This 111gr Claw Hammer® is designed for a minimum twist rate of 1-9″ to ensure the deepest straight-line penetration with 100% weight retention. The dished nose design allows this solid to mushroom at high velocity impacts yet still works tremendously well down to very low velocity impacts, due to the dished nose that creates a larger permanent wound channel than a typical flat nosed solid. The impact velocity on the second photo was 2650 fps.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-111gr-claw-hammer/: Minimum required twist rate: 1-9″ | Bullet length: 1.00″ | Nose length: .4076″ | Bullet weight: 111gr | Recommended use: Normal to short range Big Game Hunting | g1-bc= .183 estimated"
+      }
+    ]
+  }
+}

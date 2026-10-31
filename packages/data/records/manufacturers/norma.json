@@ -1,0 +1,15 @@
+{
+  "id": "norma",
+  "name": "Norma",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "norma-product-page-norma-200",
+        "url": "https://www.norma-ammunition.com/products/components/gunpowder/norma-200---20902005",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

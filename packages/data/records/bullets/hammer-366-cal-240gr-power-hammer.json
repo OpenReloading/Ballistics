@@ -1,0 +1,56 @@
+{
+  "id": "hammer-366-cal-240gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "6206",
+  "name": ".366 (9.3mm) Cal-240gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296,
+    "raw": ".366"
+  },
+  "mass": {
+    "value": 15.552,
+    "raw": "240 gr"
+  },
+  "length": {
+    "value": 34.8,
+    "raw": "Bullet length is 1.370″"
+  },
+  "noseLength": {
+    "value": 18.81,
+    "raw": "Nose length is .7405″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.351,
+      "note": "Hammer Bullets: \"G1-BC= .351 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 381,
+    "raw": "Recommended minimum twist rate is 1-15″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Pure copper for the 9.3mm. This Power Hammer™ is a sleek bullet with its 2mm hollow point, yet very hard hitting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/366-cal-240gr-power-hammer/: Recommended minimum twist rate is 1-15″ | Bullet length is 1.370″ | Nose length is .7405″ | Bullet weight is 240gr | Recommended use: Big Game Hunting | G1-BC= .351 estimated"
+      }
+    ]
+  }
+}

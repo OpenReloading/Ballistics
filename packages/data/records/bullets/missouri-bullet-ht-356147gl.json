@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-356147gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-356147GL",
+  "name": "SubSonic-Grooveless, 147 Grain FP - Grooveless",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042,
+    "raw": ".356 Diameter"
+  },
+  "mass": {
+    "value": 9.525,
+    "raw": "147 Grain"
+  },
+  "length": {
+    "value": 16.51,
+    "raw": "Bullet OAL .650 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 147 Grain FP - Grooveless. Brinell 18. 9mm Parabellum. For Subsonic Work.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-356147GL, SubSonic-Grooveless (https://missouribullet.com/details.php?prodId=399): .356 Diameter, 147 Grain FP - Grooveless, Brinell 18, Bullet OAL .650 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

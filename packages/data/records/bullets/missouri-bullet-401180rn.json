@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-401180rn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "401180RN",
+  "name": "Cowboy #19, 180 Grain RN",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185,
+    "raw": ".401 Diameter"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 Grain"
+  },
+  "length": {
+    "value": 15.85,
+    "raw": "Bullet OAL .624 +/-"
+  },
+  "note": "Listed as 180 Grain RN. Brinell 12. For Modern .38-40 guns. For Cowboy Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "401180RN, Cowboy #19 (https://missouribullet.com/details.php?prodId=190): .401 Diameter, 180 Grain RN, Brinell 12, Bullet OAL .624 +/-"
+      }
+    ]
+  }
+}

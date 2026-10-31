@@ -1,0 +1,42 @@
+{
+  "id": "hammer-500-cal-400gr-jack-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869066419",
+  "name": ".500 Cal-400gr Jack Hammer®",
+  "productLine": "Jack Hammer",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7,
+    "raw": ".500"
+  },
+  "mass": {
+    "value": 25.92,
+    "raw": "400 gr"
+  },
+  "length": {
+    "value": 25.4,
+    "raw": "Bullet length: 1.000″"
+  },
+  "noseLength": {
+    "value": 11.39,
+    "raw": "Nose length: .4483″"
+  },
+  "slowestTwist": {
+    "value": 762,
+    "raw": "Minimum required twist rate is 1-30″ or faster"
+  },
+  "note": "The product page also says: \"Crimp groove at the shoulder\" Recommended use: Big Game Hunting / Personal Defense. The product page also says: \"This Jack Hammer® pure copper bullet is designed for the .500 Smith and Wesson Magnum. At 400gr this will be a great combo for hunting and personal defense, such as big bears and other dangerous game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": ["diameter", "mass", "length", "noseLength", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/500-cal-400gr-jack-hammer/: Minimum required twist rate is 1-30″ or faster | Bullet length: 1.000″ | Nose length: .4483″ | Bullet weight: 400gr | Recommended use: Big Game Hunting / Personal Defense"
+      }
+    ]
+  }
+}

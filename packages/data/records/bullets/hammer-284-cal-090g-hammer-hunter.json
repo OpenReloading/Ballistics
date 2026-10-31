@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-090g-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027731",
+  "name": ".284 Cal-090g Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "length": {
+    "value": 22.94,
+    "raw": "Bullet length is .903″"
+  },
+  "noseLength": {
+    "value": 13.86,
+    "raw": "Nose length is .5456″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.133,
+      "note": "Hammer Bullets: \"g7-bc= .133 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 342.9,
+    "raw": "Required minimum twist rate is 1-13.5″"
+  },
+  "note": "The weight is printed as \"Bullet weight is 90g\"; read as grains. Recommended use: Big Game Hunting. The product page also says: \"This pure copper Hammer Hunter® is an ideal choice for big game hunting at normal ranges where fast and flat with low recoil is desired.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-090g-hammer-hunter/: Required minimum twist rate is 1-13.5″ | Bullet length is .903″ | Nose length is .5456″ | Bullet weight is 90g | Recommended use: Big Game Hunting | g7-bc= .133 estimated"
+      }
+    ]
+  }
+}

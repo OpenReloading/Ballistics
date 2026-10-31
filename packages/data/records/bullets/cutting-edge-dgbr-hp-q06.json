@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-hp-q06",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP Q06",
+  "name": "DGBR-HP Q06 (Safari Raptor, Solid & Lever+, 320 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439,
+    "raw": ".411"
+  },
+  "mass": {
+    "value": 20.736,
+    "raw": "320 gr"
+  },
+  "length": {
+    "value": 34.52,
+    "raw": "1.359\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .411, Grains 320, Part Number DGBR-HP Q06, OAL 1.359\", Bullet Projection .700\""
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .700\"."
+}

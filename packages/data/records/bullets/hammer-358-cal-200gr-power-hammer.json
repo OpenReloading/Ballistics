@@ -1,0 +1,56 @@
+{
+  "id": "hammer-358-cal-200gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "12242",
+  "name": ".358 Cal-200gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 30.99,
+    "raw": "Bullet length is 1.22″"
+  },
+  "noseLength": {
+    "value": 17.92,
+    "raw": "Nose length is .7056″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.382,
+      "note": "Hammer Bullets: \"g1-bc= .382 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4,
+    "raw": "Recommended minimum twist rate is 1-16″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This pure copper Power Hammer™ at 200gr will be an excellent choice for the Whelen crowd. With it’s 2mm hollow point giving good bc and a weight that will run fast without excessive recoil, this bullet will be devastating on game and a pleasure to shoot. This Power Hammer™ will have similar weight retention to the Hammer Hunters at about 70% giving great trauma from the shed petals.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/358-cal-200gr-power-hammer/: Recommended minimum twist rate is 1-16″ | Bullet length is 1.22″ | Nose length is .7056″ | Bullet weight is 200gr | Recommended use: Big Game Hunting | g1-bc= .382 estimated"
+      }
+    ]
+  }
+}

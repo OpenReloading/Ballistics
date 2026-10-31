@@ -1,0 +1,15 @@
+{
+  "id": "adi",
+  "name": "ADI",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "adi-world-class-powders-rifle-load-data-page",
+        "url": "https://www.adiworldclass.com.au/rifle/",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

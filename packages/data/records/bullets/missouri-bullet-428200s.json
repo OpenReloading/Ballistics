@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-428200s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "428200S",
+  "name": ".44-40, 200 Grain RNFP",
+  "caliber": ".428",
+  "diameter": {
+    "value": 10.871,
+    "raw": ".428 Diameter"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 Grain"
+  },
+  "length": {
+    "value": 15.11,
+    "raw": "Bullet OAL .595 +/-"
+  },
+  "note": "Listed as 200 Grain RNFP. Brinell 12. .44-40. For Classic Guns.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "428200S, .44-40 (https://missouribullet.com/details.php?prodId=388): .428 Diameter, 200 Grain RNFP, Brinell 12, Bullet OAL .595 +/-"
+      }
+    ]
+  }
+}

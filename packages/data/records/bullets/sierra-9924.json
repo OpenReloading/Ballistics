@@ -1,0 +1,59 @@
+{
+  "id": "sierra-9924",
+  "manufacturer": "sierra",
+  "productNumber": "9924",
+  "name": "9MM 124 GR JHP -  SIG V-CROWN",
+  "caliber": "0.355",
+  "diameter": {
+    "value": 9.017,
+    "raw": "0.355 in"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 9924, 9924C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/9mm-124-gr-jhp-sig-v-crown/",
+        "retrieved": "2026-10-08",
+        "sha256": "2a5d582fa0740c1c14d51c7fb9516e5e0cc6f0632c513d12ba84e401bdcc9e97",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 9924, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.355, Bullet Weight (Grains): 124, G1 BC: 0.120, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

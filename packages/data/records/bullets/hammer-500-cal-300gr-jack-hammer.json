@@ -1,0 +1,42 @@
+{
+  "id": "hammer-500-cal-300gr-jack-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869066452",
+  "name": ".500 Cal-300gr Jack Hammer®",
+  "productLine": "Jack Hammer",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7,
+    "raw": ".500"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 19.05,
+    "raw": "Bullet length: .750″"
+  },
+  "noseLength": {
+    "value": 8.21,
+    "raw": "Nose length: .3234″"
+  },
+  "slowestTwist": {
+    "value": 1016,
+    "raw": "Minimum required twist rate is 1-40″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting / Personal Defense. The product page also says: \"This Jack Hammer® pure copper pistol bullet is designed for the .500 Smith and Wesson to give a higher velocity option. Also a great combo for the other .500 cal cartridges out there like the 50 AE Desert Eagle. This bullet will work great in any of the .500 cal cartridges for big game hunting as well as personal protection from dangerous animals.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": ["diameter", "mass", "length", "noseLength", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/500-cal-300gr-jack-hammer/: Minimum required twist rate is 1-40″ or faster | Bullet length: .750″ | Nose length: .3234″ | Bullet weight: 300gr | Recommended use: Big Game Hunting / Personal Defense"
+      }
+    ]
+  }
+}

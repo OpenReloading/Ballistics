@@ -1,0 +1,45 @@
+{
+  "id": "hammer-330-cal-235gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869049865",
+  "name": ".330 Cal-235gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".330",
+  "diameter": {
+    "value": 8.382,
+    "raw": ".330"
+  },
+  "mass": {
+    "value": 15.228,
+    "raw": "235 gr"
+  },
+  "length": {
+    "value": 34.8,
+    "raw": "Bullet length is 1.37″"
+  },
+  "noseLength": {
+    "value": 16.22,
+    "raw": "Nose length is .6384″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.383,
+      "note": "Hammer Bullets: \"g1-bc= .383 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist for dangerous game hunting is 1-12″ or faster. Recommended use: Dangerous Game Hunting or small game hunting to save pelts. The product page also says: \"This pure copper dangerous game hunting bullet is designed for the 318 Westley Richards double rifle. This Claw Hammer™ is designed for 100% weight retention but soft enough to expand on the nose. We consider it an expanding solid.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/330-cal-235gr-claw-hammer/: Minimum required twist for dangerous game hunting is 1-12″ or faster | Bullet length is 1.37″ | Nose length is .6384″ | Bullet weight is 235gr | Recommended use: Dangerous Game Hunting or small game hunting to save pelts | g1-bc= .383 estimated"
+      }
+    ]
+  }
+}

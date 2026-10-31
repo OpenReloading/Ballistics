@@ -1,0 +1,63 @@
+{
+  "id": "sierra-1625",
+  "manufacturer": "sierra",
+  "productNumber": "1625",
+  "name": "25 CAL 100 GR SBT GameKing (SGK)",
+  "caliber": "0.257",
+  "diameter": {
+    "value": 6.528,
+    "raw": "0.257 in"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.355,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.17,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/25-cal-100-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "5af2b5d862ddf5a15a191dc0107ba082cca26c80179767cc452f6c138d3b6dba",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1625, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.257, Bullet Weight (Grains): 100, G1 BC: 0.355, G7 BC: 0.170, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

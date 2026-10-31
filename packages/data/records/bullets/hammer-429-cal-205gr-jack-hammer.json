@@ -1,0 +1,42 @@
+{
+  "id": "hammer-429-cal-205gr-jack-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027796",
+  "name": ".429 Cal-205gr (44 mag) Jack Hammer®",
+  "productLine": "Jack Hammer",
+  "caliber": ".429",
+  "diameter": {
+    "value": 10.897,
+    "raw": ".429"
+  },
+  "mass": {
+    "value": 13.284,
+    "raw": "205 gr"
+  },
+  "length": {
+    "value": 19.05,
+    "raw": "Bullet length is .750″"
+  },
+  "noseLength": {
+    "value": 8.19,
+    "raw": "Nose length is .3225″"
+  },
+  "slowestTwist": {
+    "value": 762,
+    "raw": "Minimum required twist rate is 1-30″"
+  },
+  "note": "Recommended use: Personal Defense / Big Game Hunting. The product page also says: \"Designed for the 44 magnum, this 100% weight retention pure copper Jack Hammer™ pistol bullet is stellar. The cupped nose design has enough expansion to open to caliber diameter and create a large permanent wound channel with deep, straight line penetration. This is an outstanding choice for personal protection or big game hunting.\" The weight is taken from the product name (205gr).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "noseLength", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/429-cal-205gr-jack-hammer/: Minimum required twist rate is 1-30″ | Bullet length is .750″ | Nose length is .3225″ | Recommended use: Personal Defense / Big Game Hunting"
+      }
+    ]
+  }
+}

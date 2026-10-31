@@ -1,0 +1,36 @@
+{
+  "id": "hornady-5165",
+  "manufacturer": "hornady",
+  "productNumber": "5165",
+  "name": "50 Cal. A-Tip Match, .510, 750 gr",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954,
+    "raw": ".510\""
+  },
+  "mass": {
+    "value": 48.599,
+    "raw": "750 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 1.05,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "73",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "50 Cal. A-Tip Match, .510\", 750 gr., G1 1.050, Sec. Den. .412, Item # 5165"
+      }
+    ]
+  }
+}

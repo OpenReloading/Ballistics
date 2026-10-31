@@ -1,0 +1,61 @@
+{
+  "id": "sierra-4210",
+  "manufacturer": "sierra",
+  "productNumber": "4210",
+  "name": "25 CAL 110 GR Tipped GameKing (TGK)",
+  "caliber": "0.257",
+  "diameter": {
+    "value": 6.528,
+    "raw": "0.257 in"
+  },
+  "mass": {
+    "value": 7.128,
+    "raw": "110 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.447,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.217,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 4210, 4210C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/25-cal-110-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "0396ca99f8198340c1a744c96ae3341091366f90c778f173a8147887ab4f7b37",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 4210, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.257, Bullet Weight (Grains): 110, G1 BC: 0.447, G7 BC: 0.217, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

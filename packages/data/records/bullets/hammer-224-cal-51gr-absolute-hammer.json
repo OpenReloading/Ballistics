@@ -1,0 +1,56 @@
+{
+  "id": "hammer-224-cal-51gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869026969",
+  "name": ".224 Cal-51gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 3.305,
+    "raw": "51 gr"
+  },
+  "length": {
+    "value": 20.17,
+    "raw": "Bullet length is .794″"
+  },
+  "noseLength": {
+    "value": 11.26,
+    "raw": "Nose length is .4432″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.125,
+      "note": "Hammer Bullets: \"g7-bc= .125 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 247.65,
+    "raw": "Minimum required twist is 1-9.75″ or faster"
+  },
+  "note": "Recommended use: small to medium big game hunting. The product page also says: \"This mid to light weight Absolute Hammer™ is going to be very quick. From varmints to medium game the impact velocities from this bullet are going to be devastating under 300y. The Absolute Hammer™s do not line up with conventional bullet load data and should only be loaded by experienced hand loaders that are comfortable reading pressure and figuring out a load without supporting data to work from.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/224-cal-51gr-absolute-hammer/: Minimum required twist is 1-9.75″ or faster | Bullet length is .794″ | Nose length is .4432″ | Bullet weight is 51gr | Recommended use: small to medium big game hunting. | g7-bc= .125 estimated"
+      }
+    ]
+  }
+}

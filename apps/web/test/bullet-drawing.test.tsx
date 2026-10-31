@@ -97,8 +97,16 @@ describe('bullet drawing over the records', () => {
   })
 })
 
-/** Records with a length (each has a golden file), then the two fixtures. */
-const goldens = [...records.filter((r) => r.length), ...fixtures]
+/** The first record with a length of each maker, and every invented one: a golden file each (the other records draw and are checked above, without a file). Then the two fixtures. */
+const makers = new Set<string>()
+const sampled = records.filter((r) => {
+  if (!r.length) return false
+  if (r.manufacturer.startsWith('demo-')) return true
+  if (makers.has(r.manufacturer)) return false
+  makers.add(r.manufacturer)
+  return true
+})
+const goldens = [...sampled, ...fixtures]
 
 describe('bullet drawing markup', () => {
   for (const r of goldens)

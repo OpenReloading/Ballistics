@@ -1,0 +1,15 @@
+{
+  "id": "accurate",
+  "name": "Accurate",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-powder-co-product-page-accurate-1680",
+        "url": "https://shop.hodgdon.com/accurate-1680/",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

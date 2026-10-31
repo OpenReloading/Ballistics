@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-cal-101gr-hammer-hunter-50",
+  "manufacturer": "hammer",
+  "productNumber": "385",
+  "name": ".243 Cal-101gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 6.545,
+    "raw": "101 gr"
+  },
+  "length": {
+    "value": 33.53,
+    "raw": "Bullet length is 1.32″"
+  },
+  "noseLength": {
+    "value": 18.7,
+    "raw": "Nose length is .7362″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.222,
+      "note": "Hammer Bullets: \"G7-BC=.222 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "Required minimum twist is 1-7″ or faster"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-101gr-hammer-hunter-50/: Required minimum twist is 1-7″ or faster | Bullet length is 1.32″ | Nose length is .7362″ | Bullet weight is 101gr | Recommended use: Big game hunting | G7-BC=.222 estimated"
+      }
+    ]
+  }
+}

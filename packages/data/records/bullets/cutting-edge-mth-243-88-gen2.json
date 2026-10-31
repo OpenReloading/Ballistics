@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mth-243-88-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 243 88 Gen2",
+  "name": "MTH 243 88 Gen2 (MTH, 88 gr)",
+  "productLine": "MTH",
+  "caliber": ".243 (6mm)",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243 (6mm)"
+  },
+  "mass": {
+    "value": 5.702,
+    "raw": "88 gr"
+  },
+  "length": {
+    "value": 28.73,
+    "raw": "1.131\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.445,
+      "note": "G1 BC, printed \".445\". No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "1-9.25\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .243 (6mm), Grains 88, Minimum Required Twist 1-9.25\", Part Number MTH 243 88 Gen2, G1 BC .445, OAL 1.131\", Bullet Projection .580\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .580\"."
+}

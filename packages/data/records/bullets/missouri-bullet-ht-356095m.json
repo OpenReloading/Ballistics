@@ -1,0 +1,38 @@
+{
+  "id": "missouri-bullet-ht-356095m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-356095M",
+  "name": ".380 - Hi-Tek, 95 Grain RN",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042,
+    "raw": ".356 Diameter"
+  },
+  "mass": {
+    "value": 6.156,
+    "raw": "95 Grain"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 95 Grain RN. Brinell 18. .380. For Secret Agents.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "construction.raw"],
+        "note": "HT-356095M, .380 - Hi-Tek (https://missouribullet.com/details.php?prodId=317): .356 Diameter, 95 Grain RN, Brinell 18, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

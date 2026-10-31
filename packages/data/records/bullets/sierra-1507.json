@@ -1,0 +1,56 @@
+{
+  "id": "sierra-1507",
+  "manufacturer": "sierra",
+  "productNumber": "1507",
+  "name": "6MM 70 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.243",
+  "diameter": {
+    "value": 6.172,
+    "raw": "0.243 in"
+  },
+  "mass": {
+    "value": 4.536,
+    "raw": "70 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.299,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1507, 1507C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-70-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "07a8caa67a0c0ff1fbdff11cff2cd208383edc19318725e3a1559cf0936a1afd",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1507, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.243, Bullet Weight (Grains): 70, G1 BC: 0.299, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

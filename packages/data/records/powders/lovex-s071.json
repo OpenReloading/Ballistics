@@ -1,0 +1,31 @@
+{
+  "id": "lovex-s071",
+  "manufacturer": "lovex",
+  "name": "S071",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lovex-reloading-guide-en-37-explosia-a-s",
+        "fields": ["name"],
+        "note": "No public download URL confirmed."
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "3",
+        "fields": ["propellantBase"],
+        "note": "No public download URL confirmed. States that single base powders carry the marking S and double base powders the marking D.",
+        "kind": "derived"
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "7",
+        "fields": ["grainForm"],
+        "note": "Gives the type of propellant of S071-03 as single base, tubular; the reloading guide prints S071 without the variant number. The form of the catalogue variant is applied to the guide name.",
+        "kind": "derived"
+      }
+    ]
+  }
+}

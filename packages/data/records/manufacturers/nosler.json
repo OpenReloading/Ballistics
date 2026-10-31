@@ -1,0 +1,15 @@
+{
+  "id": "nosler",
+  "name": "Nosler",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nosler",
+        "url": "https://www.nosler.com/30-caliber-168gr-hpbt-custom-competition-100ct.html",
+        "retrieved": "2026-09-05",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

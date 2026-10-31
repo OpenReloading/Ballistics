@@ -1,0 +1,90 @@
+{
+  "id": "reload-swiss-rs70",
+  "manufacturer": "reload-swiss",
+  "name": "RS70",
+  "grainForm": "extruded",
+  "propellantBase": "double",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.25235,
+      "standardUncertainty": 0.027
+    },
+    "energy": {
+      "value": 6483300,
+      "standardUncertainty": 740000
+    },
+    "gamma": 1.2202,
+    "covolume": {
+      "value": 0.000983
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 88,
+    "trainingCartridges": 15
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Reload Swiss data sheet RS70 (EN)",
+        "publisher": "Reload Swiss",
+        "url": "https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS70/RS70-EN.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm"],
+        "note": "Propellant type: an extruded, single-based propellant powder based on nitrocellulose.",
+        "origin": "manufacturer"
+      },
+      {
+        "title": "Reload Swiss data sheet RS70 (EN)",
+        "publisher": "Reload Swiss",
+        "url": "https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS70/RS70-EN.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["propellantBase"],
+        "kind": "derived",
+        "note": "The data sheet RS70 (EN) calls RS70 single-based and states that its grains are impregnated with nitroglycerin; with nitroglycerin besides nitrocellulose the record stores double base, as for the Vihtavuori N500 powders.",
+        "origin": "manufacturer"
+      },
+      {
+        "source": "reload-swiss-loading-data-web-table-2026-10-12",
+        "url": "https://www.reload-swiss.com/en/loading-data/rs-loading-data",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "88 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; double base prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      }
+    ]
+  }
+}

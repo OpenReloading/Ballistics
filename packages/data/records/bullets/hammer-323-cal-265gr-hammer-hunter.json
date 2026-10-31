@@ -1,0 +1,45 @@
+{
+  "id": "hammer-323-cal-265gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "7872",
+  "name": ".323 Cal-265gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204,
+    "raw": ".323"
+  },
+  "mass": {
+    "value": 17.172,
+    "raw": "265 gr"
+  },
+  "length": {
+    "value": 49.78,
+    "raw": "Bullet length is 1.96″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.34,
+      "note": "Hammer Bullets: \"g7 bc= .340 from shot drops\" (from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9,
+    "raw": "Recommended minimum twist rate is 1-8.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Pure copper Hammer Hunter™ long range hunting bullet for custom fast twist 8mm. This one will handle all your big game needs from short to long range.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/323-cal-265gr-hammer-hunter/: Recommended minimum twist rate is 1-8.5″ | Bullet length is 1.96″ | Bullet weight is 265gr | Recommended use: Big Game Hunting | g7 bc= .340 from shot drops"
+      }
+    ]
+  }
+}

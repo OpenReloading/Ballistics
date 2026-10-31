@@ -1,0 +1,56 @@
+{
+  "id": "hammer-375-cal-200gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "12226",
+  "name": ".375 Cal-200gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 26.92,
+    "raw": "Bullet length is 1.06″"
+  },
+  "noseLength": {
+    "value": 12.21,
+    "raw": "Nose length is .4808″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.295,
+      "note": "Hammer Bullets: \"g1-bc= .295 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 508,
+    "raw": "Recommended minimum twist rate is 1-20″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Through heavy collaboration with our hunters in Australia, doing extensive testing on game, we came up with this Stone Hammer™ design. It is a 3mm hollow point with heavy meplat thickness like the other Lever Hammer bullets. Also this Stone Hammer™ is designed with a deeper hollow point than what has been normal. It was found through testing on game that the heavier shed petals along with a 60% weight retention is showing amazing results. You can run this relatively light, pure copper Stone Hammer™ bullet at high velocities in any of your 375 calibers, and rest assured that it will perform very well on game. Tested down to 1800 fps impact velocity with perfect performance.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/375-cal-200gr-stone-hammer/: Recommended minimum twist rate is 1-20″ | Bullet length is 1.06″ | Nose length is .4808″ | Bullet weight is 200gr | Recommended use: Big Game Hunting | g1-bc= .295 estimated"
+      }
+    ]
+  }
+}

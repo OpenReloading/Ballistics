@@ -1,0 +1,56 @@
+{
+  "id": "hammer-338-cal-128gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869058713",
+  "name": ".338 Cal-128gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 8.294,
+    "raw": "128 gr"
+  },
+  "length": {
+    "value": 22.35,
+    "raw": "Bullet length is .880″"
+  },
+  "noseLength": {
+    "value": 13.21,
+    "raw": "Nose length is .5199″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.213,
+      "note": "Hammer Bullets: \"g1-bc= .213 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6,
+    "raw": "Minimum required twist is 1-19″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We designed this bullet for a customer that was looking for a lighter pure copper bullet for the 338 Federal that would feed properly. This Stone Hammer® will run comfortably well over 3000 fps in the 338 Federal. Just think what it would do in your 338 Winchester Magnum.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-128gr-stone-hammer/: Minimum required twist is 1-19″ or faster | Bullet length is .880″ | Nose length is .5199″ | Bullet weight is 128gr | Recommended use: Big Game Hunting | g1-bc= .213 estimated"
+      }
+    ]
+  }
+}

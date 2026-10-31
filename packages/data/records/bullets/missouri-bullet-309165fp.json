@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-309165fp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "309165FP",
+  "name": "#1 Whitetail, 165 Grain RNFP",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849,
+    "raw": ".309 Diameter"
+  },
+  "mass": {
+    "value": 10.692,
+    "raw": "165 Grain"
+  },
+  "length": {
+    "value": 23.52,
+    "raw": "Bullet OAL .926 +/-"
+  },
+  "note": "Listed as 165 Grain RNFP. Brinell 18. For .30-.30 Lever Guns.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "309165FP, #1 Whitetail (https://missouribullet.com/details.php?prodId=102): .309 Diameter, 165 Grain RNFP, Brinell 18, Bullet OAL .926 +/-"
+      }
+    ]
+  }
+}

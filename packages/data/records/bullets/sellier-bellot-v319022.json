@@ -1,0 +1,33 @@
+{
+  "id": "sellier-bellot-v319022",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319022",
+  "name": "FMJ, .251, 50 gr (for 6.35 BROWNING)",
+  "productLine": "FMJ",
+  "caliber": ".251",
+  "diameter": {
+    "value": 6.375,
+    "raw": ".251 in (6,38 mm)"
+  },
+  "mass": {
+    "value": 3.24,
+    "raw": "50 grs (3,3 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "note": "Recommended for 6.35 BROWNING.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type"],
+        "note": "V319022 | 6.35 BROWNING | FMJ | 50 | 3,3 | 6,35 | 6,38 | .251. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-476340rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-476340RNFP",
+  "name": ".475 Thumper - Hi-Tek, 340 Grain RNFP-Flat Base",
+  "caliber": ".476",
+  "diameter": {
+    "value": 12.09,
+    "raw": ".476 Diameter"
+  },
+  "mass": {
+    "value": 22.032,
+    "raw": "340 Grain"
+  },
+  "length": {
+    "value": 20.93,
+    "raw": "Bullet OAL .824 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 340 Grain RNFP-Flat Base. Brinell 18. .475 Linebaugh, .480 Ruger. For Vicious Critters.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-476340RNFP, .475 Thumper - Hi-Tek (https://missouribullet.com/details.php?prodId=377): .476 Diameter, 340 Grain RNFP-Flat Base, Brinell 18, Bullet OAL .824 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

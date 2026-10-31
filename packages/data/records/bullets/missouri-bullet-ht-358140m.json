@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-358140m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-358140M",
+  "name": ".357 Zinger - Hi-Tek, 140 Grain TCFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 Grain"
+  },
+  "length": {
+    "value": 15.57,
+    "raw": "Bullet OAL .613 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 140 Grain TCFP. Brinell 18. .357 Magnum. For Fast Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-358140M, .357 Zinger - Hi-Tek (https://missouribullet.com/details.php?prodId=221): .358 Diameter, 140 Grain TCFP, Brinell 18, Bullet OAL .613 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

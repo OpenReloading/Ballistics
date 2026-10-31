@@ -1,0 +1,38 @@
+{
+  "id": "hammer-427-cal-185gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "2439",
+  "name": ".427 Cal 185gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".427",
+  "diameter": {
+    "value": 10.846,
+    "raw": ".427"
+  },
+  "mass": {
+    "value": 12.053,
+    "raw": "186 gr"
+  },
+  "length": {
+    "value": 16.61,
+    "raw": "Bullet length is .654″"
+  },
+  "slowestTwist": {
+    "value": 889,
+    "raw": "Recommended min twist rate is 1-35″"
+  },
+  "note": "Recommended use: Big Game Hunting. BC- TBD. The product page also says: \"We designed this bullet for the 44-40 Winchester lever action. Given the sub 2000 fps vel of this cartridge, we decided that a Claw Hammer™ design would be most effective for hunting. These bullets will be 100% weight retention with the large concave meplat for max energy transfer on impact. The hard hitting design of these bullets will breathe new life into the old lever action. They say this cartridge won the West. We think they would have won faster if they had the Claw Hammer™!\" The product name says 185 gr; the specification says 186 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/427-cal-185gr-claw-hammer/: Recommended min twist rate is 1-35″ | Bullet length is .654″ | Bullet weight is 186gr | Recommended use: Big Game Hunting | BC- TBD"
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-199gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "898",
+  "name": ".308 Cal-199gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 12.765,
+    "raw": "197 gr"
+  },
+  "length": {
+    "value": 41.28,
+    "raw": "Bullet length is 1.625″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.299,
+      "note": "Hammer Bullets: \"G7-BC=.299 from shot drops\" (from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "Recommended twist rate is 1-9.25″ minimum"
+  },
+  "note": "Recommended use: Big game hunting. The product name says 199 gr; the specification says 197 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-199gr-hammer-hunter/: Recommended twist rate is 1-9.25″ minimum | Bullet length is 1.625″ | Bullet weight is 197gr | Recommended use: Big game hunting | G7-BC=.299 from shot drops"
+      }
+    ]
+  }
+}

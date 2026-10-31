@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-fb-228-60",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 228 60",
+  "name": "FB 228 60 (Flat Base Raptor, 60 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".228",
+  "diameter": {
+    "value": 5.791,
+    "raw": ".228"
+  },
+  "mass": {
+    "value": 3.888,
+    "raw": "60 gr"
+  },
+  "length": {
+    "value": 22.38,
+    "raw": ".881\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "G1 BC, printed \".120\". No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .228, Grains 60, Minimum Required Twist 1-10\", Part Number FB 228 60, G1 BC .120, OAL .881\", Bullet Projection .450\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .450\"."
+}

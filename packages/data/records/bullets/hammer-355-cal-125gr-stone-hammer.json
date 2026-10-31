@@ -1,0 +1,45 @@
+{
+  "id": "hammer-355-cal-125gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "6729",
+  "name": ".355 Cal-125gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017,
+    "raw": ".355"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 gr"
+  },
+  "length": {
+    "value": 20.57,
+    "raw": "Bullet length is .81″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.189,
+      "note": "Hammer Bullets: \"G1-BC= .189 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6,
+    "raw": "Recommended minimum twist rate is 1-19″"
+  },
+  "note": "Recommended use: Medium game hunting. The product page also says: \"Designed specifically for the 350 Legend and deer hunting out to 200 yards. At 125gr it is easy to achieve 2500 fps giving very good terminal performance.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/355-cal-125gr-stone-hammer/: Recommended minimum twist rate is 1-19″ | Bullet length is .81″ | Bullet weight is 125gr | Recommended use: Medium game hunting | G1-BC= .189 estimated"
+      }
+    ]
+  }
+}

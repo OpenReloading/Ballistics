@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-er-l235",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER L235",
+  "name": "ER L235 (ER Raptor, 235 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 15.228,
+    "raw": "235 gr"
+  },
+  "length": {
+    "value": 38.58,
+    "raw": "1.519\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.337,
+      "note": "G1 BC, printed \".337\". No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "1-12\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "7",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 7, Extended Range (ER) Raptor: Caliber .375, Grains 235, Minimum Required Twist 1-12\", Part Number ER L235, G1 BC .337, OAL 1.519\", Bullet Projection .730\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .730\"."
+}

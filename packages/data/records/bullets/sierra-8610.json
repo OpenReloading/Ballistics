@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8610",
+  "manufacturer": "sierra",
+  "productNumber": "8610",
+  "name": "44 CAL 240 GR JHC SPORTS MASTER",
+  "caliber": "0.4295",
+  "diameter": {
+    "value": 10.909,
+    "raw": "0.4295 in"
+  },
+  "mass": {
+    "value": 15.552,
+    "raw": "240 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.185,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/44-cal-240-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "be7d33915782a90dffc9ce5c4a2b1ba17191e785146b4a27f2fbd3a9531f3cdd",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8610, Bullet Type: Jacketed Hollow Cavity (JHC), Bullet Diameter: 0.4295, Bullet Weight (Grains): 240, G1 BC: 0.185, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

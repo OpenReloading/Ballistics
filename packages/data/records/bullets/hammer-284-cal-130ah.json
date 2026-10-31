@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-130ah",
+  "manufacturer": "hammer",
+  "productNumber": "10137",
+  "name": ".284 Cal-130 Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 8.424,
+    "raw": "130 gr"
+  },
+  "length": {
+    "value": 32.26,
+    "raw": "Bullet length is 1.270″"
+  },
+  "noseLength": {
+    "value": 19.43,
+    "raw": "Nose length is .765″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.192,
+      "note": "Hammer Bullets: \"g7-bc= .192 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended twist rate is 1-10″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Here is an Absolute Hammer™ for the 1-10″ 7mm rifles. This will be a great choice for all your big game hunting needs with great vel to weight ratio that will really hit hard. The Absolute Hammer™s have very low engraving pressure so they will tend to need faster than normal powder and more of it than is expected for the weight of the bullet. They will not line up with conventional data so should be used with caution by hand loaders that are experience with developing loads with out supporting data.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-130ah/: Recommended twist rate is 1-10″ or faster | Bullet length is 1.270″ | Nose length is .765″ | Bullet weight is 130gr | Recommended use: Big Game Hunting | g7-bc= .192 estimated"
+      }
+    ]
+  }
+}

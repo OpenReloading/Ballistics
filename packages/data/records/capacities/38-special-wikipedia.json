@@ -1,0 +1,21 @@
+{
+  "id": "38-special-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:38-special",
+  "waterCapacity": {
+    "value": 1.516,
+    "raw": "23.4 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .38 Special",
+        "url": "https://en.wikipedia.org/w/index.php?title=.38_Special&oldid=1376197673",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 23.4 gr H2O (1.52 cm3)."
+      }
+    ]
+  }
+}

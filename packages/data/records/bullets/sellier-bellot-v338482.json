@@ -1,0 +1,36 @@
+{
+  "id": "sellier-bellot-v338482",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338482",
+  "name": "HPBT, .308, 168 gr (bullet 2880)",
+  "productLine": "HPBT",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308 in (7,85 mm)"
+  },
+  "mass": {
+    "value": 10.886,
+    "raw": "168 grs (10,9 g)"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "note": "The page prints G1 0,308, the same as the diameter in inches; it is not stored.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "base.type", "tip.type"],
+        "note": "V338482 | 2880 | HPBT | 168 | 10,9 | 30 | 7,85 | .308 | 0,308. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

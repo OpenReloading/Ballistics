@@ -63,8 +63,8 @@ test('a cartridge design fills the fields it covers, draws the figure and is nam
   )
 
   // the run and the print name the design
-  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('168')
-  await page.getByRole('option', { name: /168 gr/ }).click()
+  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('demo 168')
+  await page.getByRole('option', { name: /^Demo Bullets 30 Cal 168 gr/ }).click()
   await form.getByRole('combobox', { name: /^Search powders/ }).fill('DP40')
   await page.getByRole('option', { name: /DP40/ }).click()
   await field(/^Charge mass/).fill('2.4')

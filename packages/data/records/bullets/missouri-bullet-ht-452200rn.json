@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-452200rn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-452200RN",
+  "name": ".45 OddBall - Hi-Tek, 200 Grain RN Flat-Base",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 Grain"
+  },
+  "length": {
+    "value": 15.19,
+    "raw": "Bullet OAL .598 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 200 Grain RN Flat-Base. Brinell 18. .45 ACP. For General Shooting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-452200RN, .45 OddBall - Hi-Tek (https://missouribullet.com/details.php?prodId=232): .452 Diameter, 200 Grain RN Flat-Base, Brinell 18, Bullet OAL .598 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

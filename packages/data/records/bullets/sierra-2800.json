@@ -1,0 +1,55 @@
+{
+  "id": "sierra-2800",
+  "manufacturer": "sierra",
+  "productNumber": "2800",
+  "name": "35 CAL 200 GR RN PRO-HUNTER",
+  "caliber": "0.358",
+  "diameter": {
+    "value": 9.093,
+    "raw": "0.358 in"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.148,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/35-cal-200-gr-rn-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "f01bb0313d9b4682c5f860e7c51fd9920ac7d9a8c7dd9db7df04a759312bf83c",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2800, Bullet Type: Roundnose (RN), Bullet Diameter: 0.358, Bullet Weight (Grains): 200, G1 BC: 0.148, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

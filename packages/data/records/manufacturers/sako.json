@@ -1,0 +1,15 @@
+{
+  "id": "sako",
+  "name": "Sako",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "retrieved": "2026-10-08",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

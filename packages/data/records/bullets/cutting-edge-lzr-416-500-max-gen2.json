@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-lzr-416-500-max-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 416 500 MAX GEN2",
+  "name": "LZR 416 500 MAX GEN2 (Lazer, 500 gr)",
+  "productLine": "Lazer",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566,
+    "raw": ".416"
+  },
+  "mass": {
+    "value": 32.399,
+    "raw": "500 gr"
+  },
+  "length": {
+    "value": 60.58,
+    "raw": "2.385\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.943,
+      "note": "G1 BC, printed \".943 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.473,
+      "note": "G7 BC, printed \".473 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "*1-11\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .416, Grains 500, Minimum Required Twist *1-11\", Part Number LZR 416 500 MAX GEN2, G1 BC .943 (A.B.), G7 BC .473 (A.B.), OAL 2.385\", Bullet Projection 1.753\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1-2 inches faster is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.753\"."
+}

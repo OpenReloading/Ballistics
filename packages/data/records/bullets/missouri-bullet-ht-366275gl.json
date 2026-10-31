@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-366275gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-366275GL",
+  "name": "#1 9.3x57 - Grooveless, 275 Grain FP - Grooveless",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296,
+    "raw": ".366 Diameter"
+  },
+  "mass": {
+    "value": 17.82,
+    "raw": "275 Grain"
+  },
+  "length": {
+    "value": 29.69,
+    "raw": "Bullet OAL 1.169 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 275 Grain FP - Grooveless. Brinell 18. For Mauser & Russian.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-366275GL, #1 9.3x57 - Grooveless (https://missouribullet.com/details.php?prodId=487): .366 Diameter, 275 Grain FP - Grooveless, Brinell 18, Bullet OAL 1.169 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

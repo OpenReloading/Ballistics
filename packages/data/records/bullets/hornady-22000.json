@@ -1,0 +1,30 @@
+{
+  "id": "hornady-22000",
+  "manufacturer": "hornady",
+  "productNumber": "22000",
+  "name": "20 Cal. NTX, .204, 24 gr",
+  "caliber": ".204",
+  "diameter": {
+    "value": 5.182,
+    "raw": ".204\""
+  },
+  "mass": {
+    "value": 1.555,
+    "raw": "24 gr"
+  },
+  "note": "The catalog prints BC .170 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "91",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "20 Cal. NTX, .204\", 24 gr., Ballistic Coef. .170, Sec. Den. .082, Item # 22000"
+      }
+    ]
+  }
+}

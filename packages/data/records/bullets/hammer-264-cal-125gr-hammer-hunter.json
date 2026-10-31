@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-125gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "274",
+  "name": ".264 Cal-124gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 gr"
+  },
+  "length": {
+    "value": 35.74,
+    "raw": "Bullet length is 1.407″"
+  },
+  "noseLength": {
+    "value": 19.73,
+    "raw": "Nose length is .7769″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.245,
+      "note": "Hammer Bullets: \"G7-BC=.245 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended twist rate of 1-8″ or faster"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"This is our most popular Hammer Hunter™. Designed for a 1-8″ twist, this bullet will run in all the modern .264(6.5mm) rifles like the 6.5 Creedmoor and the 26 Nosler. The 124gr Hammer Hunter™ is responsible for taking big game all over the world.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=5",
+        "retrieved": "2026-10-08",
+        "sha256": "7d0c3a6391edef573277ee6a0eabe267ab3a2e170d32d6bcf7e877775108e85c",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-125gr-hammer-hunter/: Recommended twist rate of 1-8″ or faster | Bullet length is 1.407″ | Nose length is .7769″ | Bullet weight is 124 grains | Recommended use: Big game hunting | G7-BC=.245 calculated from shot drops"
+      }
+    ]
+  }
+}

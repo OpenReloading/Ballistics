@@ -1,0 +1,61 @@
+{
+  "id": "sierra-4680",
+  "manufacturer": "sierra",
+  "productNumber": "4680",
+  "name": "30 CAL 180 GR TIPPED GAMEKING (TGK) (Optimized for .300 WIN MAG)",
+  "caliber": "0.308",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0.308 in"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.515,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.252,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 4680, 4680T, 4680C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-180-gr-tipped-gameking-tgk-optimized-for-300-win-mag/",
+        "retrieved": "2026-10-08",
+        "sha256": "a30a793f54b8561c6dd9a430aeeee63c02b86f1d9e1cc3bddeef169112d17dfa",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 4680, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.308, Bullet Weight (Grains): 180, G1 BC: 0.515, G7 BC: 0.252, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

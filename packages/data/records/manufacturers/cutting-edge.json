@@ -1,0 +1,15 @@
+{
+  "id": "cutting-edge",
+  "name": "Cutting Edge Bullets",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "retrieved": "2026-10-08",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

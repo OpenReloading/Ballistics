@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-120gr-lever-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869024508",
+  "name": ".308 Cal-120gr Lever Stone Hammer®",
+  "productLine": "Lever Stone Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 7.776,
+    "raw": "120 gr"
+  },
+  "length": {
+    "value": 24.13,
+    "raw": "Bullet length is .950″"
+  },
+  "noseLength": {
+    "value": 12.75,
+    "raw": "Nose length is .502″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.251,
+      "note": "Hammer Bullets: \"g1-bc= .251 estimated.\" (estimated.)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 381,
+    "raw": "Minimum required twist rate is 1-15″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We decided it was time to zip up the ‘ol 30-30 with a light weight Lever Stone Hammer™. Should be able to get this one around 2700 to 2800 fps in the 30-30. For typical 100 yard or so work this will be very good with that kind of velocity.\" The product page also says: \"You guys that want to run this in your high power rifles should have a Ball!!!\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-120gr-lever-stone-hammer/: Minimum required twist rate is 1-15″ | Bullet length is .950″ | Nose length is .502″ | Bullet weight is 120gr | Recommended use: Big Game Hunting | g1-bc= .251 estimated."
+      }
+    ]
+  }
+}

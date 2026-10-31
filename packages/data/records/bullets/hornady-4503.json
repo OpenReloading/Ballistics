@@ -1,0 +1,30 @@
+{
+  "id": "hornady-4503",
+  "manufacturer": "hornady",
+  "productNumber": "4503",
+  "name": "45 Cal. FP, .458, 350 gr",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458\""
+  },
+  "mass": {
+    "value": 22.68,
+    "raw": "350 gr"
+  },
+  "note": "The catalog prints BC .195 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "87",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "45 Cal. FP, .458\", 350 gr., Ballistic Coef. .195, Sec. Den. .238, Item # 4503"
+      }
+    ]
+  }
+}

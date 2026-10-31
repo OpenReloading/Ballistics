@@ -1,0 +1,36 @@
+{
+  "id": "sellier-bellot-v339522",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339522",
+  "name": "SP, .367, 193 gr (bullet 2951)",
+  "productLine": "SP",
+  "caliber": ".367",
+  "diameter": {
+    "value": 9.322,
+    "raw": ".367 in (9,3 mm)"
+  },
+  "mass": {
+    "value": 12.506,
+    "raw": "193 grs (12,5 g)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.207,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "V339522 | 2951 | SP | 193 | 12,5 | 9,3 | 9,3 | .367 | 0,207. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

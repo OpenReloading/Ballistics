@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-452200mgl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-452200MGL",
+  "name": "IDP #1-Grooveless, 200 Grain SWC - Grooveless",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 Grain"
+  },
+  "length": {
+    "value": 16.03,
+    "raw": "Bullet OAL .631 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 200 Grain SWC - Grooveless. Brinell 18. .45 ACP. For Major Power Factor.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-452200MGL, IDP #1-Grooveless (https://missouribullet.com/details.php?prodId=398): .452 Diameter, 200 Grain SWC - Grooveless, Brinell 18, Bullet OAL .631 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

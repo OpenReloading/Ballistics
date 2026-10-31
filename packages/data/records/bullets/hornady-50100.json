@@ -1,0 +1,30 @@
+{
+  "id": "hornady-50100",
+  "manufacturer": "hornady",
+  "productNumber": "50100",
+  "name": "50 Cal. XTP Mag (500 S&W Mag), .500, 350 gr",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7,
+    "raw": ".500\""
+  },
+  "mass": {
+    "value": 22.68,
+    "raw": "350 gr"
+  },
+  "note": "The catalog prints BC .145 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "97",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "50 Cal. XTP Mag (500 S&W Mag), .500\", 350 gr., Ballistic Coef. .145, Sec. Den. .200, Item # 50100"
+      }
+    ]
+  }
+}

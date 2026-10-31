@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-esp-c130lg-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP C130LG RAPTOR",
+  "name": "ESP C130LG RAPTOR (Safari Raptor, Solid & Lever+, 130 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 8.424,
+    "raw": "130 gr"
+  },
+  "length": {
+    "value": 26.34,
+    "raw": "1.037\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.13,
+      "note": "G1 BC (Est.), printed \".130\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .308, Grains 130, Part Number ESP C130LG RAPTOR, OAL 1.037\", Bullet Projection .357\", G1 BC (Est.) .130"
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .357\"."
+}

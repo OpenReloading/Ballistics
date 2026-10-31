@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-lzr-510-750-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 510 750 MAX",
+  "name": "LZR 510 750 MAX (Lazer, 750 gr)",
+  "productLine": "Lazer",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954,
+    "raw": ".510"
+  },
+  "mass": {
+    "value": 48.599,
+    "raw": "750 gr"
+  },
+  "length": {
+    "value": 63.47,
+    "raw": "2.499\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .510, Grains 750, Minimum Required Twist STANDARD, Part Number LZR 510 750 MAX, G1 BC TBD, G7 BC TBD, OAL 2.499\", Bullet Projection 1.698\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". G7 BC is printed \"TBD\". Minimum required twist is printed \"STANDARD\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.698\"."
+}

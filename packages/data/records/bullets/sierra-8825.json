@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8825",
+  "manufacturer": "sierra",
+  "productNumber": "8825",
+  "name": "45 CAL 200 GR FPJ TOURNAMENT MASTER",
+  "caliber": "0.4515",
+  "diameter": {
+    "value": 11.468,
+    "raw": "0.4515 in"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/45-cal-200-gr-fpj-tournament-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "ccba288bec231236d20840be59644b56be1527e15f9d2204a446e994758c8438",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8825, Bullet Type: Full Profile Jacket (FPJ), Bullet Diameter: 0.4515, Bullet Weight (Grains): 200, G1 BC: 0.120, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

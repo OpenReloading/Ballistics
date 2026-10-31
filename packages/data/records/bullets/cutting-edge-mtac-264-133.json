@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mtac-264-133",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 264 133",
+  "name": "MTAC 264 133 (MTAC, 133 gr)",
+  "productLine": "MTAC",
+  "caliber": ".264 (6.5mm)",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264 (6.5mm)"
+  },
+  "mass": {
+    "value": 8.618,
+    "raw": "133 gr"
+  },
+  "length": {
+    "value": 35.69,
+    "raw": "1.405\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.53,
+      "note": "G1 BC, printed \".530\". No method mark: method not stated. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "*1-7\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .264 (6.5mm), Grains 133, Minimum Required Twist *1-7\", Part Number MTAC 264 133, G1 BC .530, OAL 1.405\", Bullet Projection .720\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .720\"."
+}

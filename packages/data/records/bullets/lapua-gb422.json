@@ -1,0 +1,43 @@
+{
+  "id": "lapua-gb422",
+  "manufacturer": "lapua",
+  "productNumber": "GB422",
+  "name": "10,85 g / 167 gr Scenar OTM",
+  "productLine": "Scenar",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.83
+  },
+  "mass": {
+    "value": 10.85
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "open-meplat"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.446
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.223
+    }
+  ],
+  "note": "Lapua does not name the ogive form.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lapua",
+        "url": "https://www.lapua.com/product/30-scenar-bullet-gb422-1085-g-167-gr-otm/",
+        "retrieved": "2026-09-05",
+        "fields": ["diameter", "mass", "ballisticCoefficients", "base.type", "tip.type"],
+        "note": "7.83 mm (.308 in), 10.85 g (167 gr), Open Tip Match, boat tail; BC G1 0.446, G7 0.223. No length on the page."
+      }
+    ]
+  }
+}

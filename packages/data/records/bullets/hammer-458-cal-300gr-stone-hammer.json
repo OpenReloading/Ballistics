@@ -1,0 +1,56 @@
+{
+  "id": "hammer-458-cal-300gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "7386",
+  "name": ".458 Cal-300gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 26.67,
+    "raw": "Bullet length is 1.05″"
+  },
+  "noseLength": {
+    "value": 11.43,
+    "raw": "Nose length is .450″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.272,
+      "note": "Hammer Bullets: \"g1-bc= .272 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 762,
+    "raw": "Required minimum twist rate is 1-30″ or faster"
+  },
+  "note": "Preferred twist rate for dangerous game is 1-25″ or faster. Recommended use: Big Game Hunting / Dangerous Game Hunting. The product page also says: \"This Stone Hammer™ with it’s 1/4″ hollow point will be a heavy hitter in the 45-70 cartridge. Good weight with high vel will be tough to beat. This Stone Hammer™ should not be overlooked in the big .458’s for dangerous game. Hard hitting without excess recoil.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/458-cal-300gr-stone-hammer/: Required minimum twist rate is 1-30″ or faster | Preferred twist rate for dangerous game is 1-25″ or faster | Bullet length is 1.05″ | Nose length is .450″ | Bullet weight is 300gr | Recommended use: Big Game Hunting / Dangerous Game Hunting | g1-bc= .272 estimated"
+      }
+    ]
+  }
+}

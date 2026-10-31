@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-er-d185-cu-tsg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER D185 Cu TSG",
+  "name": "ER D185 Cu TSG (ER Raptor, 185 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 11.988,
+    "raw": "185 gr"
+  },
+  "length": {
+    "value": 39.22,
+    "raw": "1.544\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.467,
+      "note": "G1 BC, printed \".467 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "7",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 7, Extended Range (ER) Raptor: Caliber .338, Grains 185, Minimum Required Twist 1-10\", Part Number ER D185 Cu TSG, G1 BC .467 (O89), OAL 1.544\", Bullet Projection .963\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .963\"."
+}

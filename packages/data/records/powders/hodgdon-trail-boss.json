@@ -1,0 +1,29 @@
+{
+  "id": "hodgdon-trail-boss",
+  "manufacturer": "hodgdon",
+  "name": "Trail Boss",
+  "aliases": ["ADI Trail Boss"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Hodgdon Trail Boss® Cowboy Action Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-trail-boss/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Product details: Form \"Extruded\", Base \"Single\".",
+        "origin": "manufacturer"
+      },
+      {
+        "source": "adi-world-class-powders-faq-is-hodgdon",
+        "url": "https://www.adiworldclass.com.au/faq-items/is-hodgdon-propellant-the-same-as-adi-propellant/",
+        "retrieved": "2026-10-13",
+        "fields": ["aliases"],
+        "note": "States that ADI exports propellants that Hodgdon Powder Company rebrands; its table pairs ADI Trail Boss with Trail Boss."
+      }
+    ]
+  }
+}

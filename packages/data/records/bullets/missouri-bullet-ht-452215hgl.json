@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-452215hgl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-452215HGL",
+  "name": ".45 Express-Grooveless, 210 Grain WFN Flat-Base Grooveless",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 13.608,
+    "raw": "210 Grain"
+  },
+  "length": {
+    "value": 14.45,
+    "raw": "Bullet OAL .569 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 210 Grain WFN Flat-Base Grooveless. Brinell 20. Perfect for .460 Rowland. Optimized for Max Impact.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-452215HGL, .45 Express-Grooveless (https://missouribullet.com/details.php?prodId=426): .452 Diameter, 210 Grain WFN Flat-Base Grooveless, Brinell 20, Bullet OAL .569 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

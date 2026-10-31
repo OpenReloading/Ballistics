@@ -1,0 +1,58 @@
+{
+  "id": "sierra-5400",
+  "manufacturer": "sierra",
+  "productNumber": "5400",
+  "name": "50 CAL 400 GR JSP SPORTS MASTER",
+  "caliber": "0.500",
+  "diameter": {
+    "value": 12.7,
+    "raw": "0.500 in"
+  },
+  "mass": {
+    "value": 25.92,
+    "raw": "400 gr"
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.185,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/50-cal-400-gr-jsp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "3996612f2d12af279b563a7cc0ee0157b0762065607ad40d406e96c65d3127c0",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 5400, Bullet Type: Jacketed Soft Point (JSP), Bullet Diameter: 0.500, Bullet Weight (Grains): 400, G1 BC: 0.185, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

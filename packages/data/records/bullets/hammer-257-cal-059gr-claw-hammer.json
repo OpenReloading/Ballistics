@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-059gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869066572",
+  "name": ".257 Cal-059gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 3.823,
+    "raw": "59 gr"
+  },
+  "length": {
+    "value": 14.25,
+    "raw": "Bullet length: .561″"
+  },
+  "noseLength": {
+    "value": 6.34,
+    "raw": "Nose length: .2498″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.17,
+      "note": "Hammer Bullets: \"g1-bc= .170 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4,
+    "raw": "Minimum required twist rate: 1-16″ or faster"
+  },
+  "note": "Recommended use: Game Hunting where pelt damage could be an issue. The product page also says: \"We designed this pure copper Claw Hammer® for the 25-20 Winchester lever rifle. The Claw Hammer® design is the same as we use for big bore dangerous game hunting. Designed for 100% weight retention with the cupped meplat that hits very hard and creates a large permanent wound channel with deep straight-line penetration. In the smaller calibers this design has proven very effective for hunting smaller game, like the tiny 10 in Africa, where pelt damage can be an issue. Used in more modern cartridges, this bullet design is a formidable game hunting option.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-059gr-claw-hammer/: Minimum required twist rate: 1-16″ or faster | Bullet length: .561″ | Nose length: .2498″ | Bullet weight: 59gr | Recommended use: Game Hunting where pelt damage could be an issue | g1-bc= .170 estimated"
+      }
+    ]
+  }
+}

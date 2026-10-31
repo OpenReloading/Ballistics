@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-mtac-243-80",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 243 80",
+  "name": "MTAC 243 80 (MTAC, 80 gr)",
+  "productLine": "MTAC",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 5.184,
+    "raw": "80 gr"
+  },
+  "length": {
+    "value": 26.44,
+    "raw": "1.041\""
+  },
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .243, Grains 80, Minimum Required Twist 1-10\", Part Number MTAC 243 80, OAL 1.041\", Bullet Projection .580\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .580\"."
+}

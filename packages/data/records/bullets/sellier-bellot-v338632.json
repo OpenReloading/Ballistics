@@ -1,0 +1,39 @@
+{
+  "id": "sellier-bellot-v338632",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338632",
+  "name": "FMJ, .306, 174 gr (bullet 2947)",
+  "productLine": "FMJ",
+  "caliber": ".306",
+  "diameter": {
+    "value": 7.772,
+    "raw": ".306 in (7,78 mm)"
+  },
+  "mass": {
+    "value": 11.275,
+    "raw": "174 grs (11,3 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.501,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"],
+        "note": "V338632 | 2947 | FMJ | 174 | 11,3 | 7,5 | 7,78 | .306 | 0,501. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

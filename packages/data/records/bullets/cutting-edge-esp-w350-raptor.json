@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-esp-w350-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP W350 Raptor",
+  "name": "ESP W350 Raptor (ESP Raptor, 350 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7,
+    "raw": ".500"
+  },
+  "mass": {
+    "value": 22.68,
+    "raw": "350 gr"
+  },
+  "length": {
+    "value": 37.62,
+    "raw": "1.481\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.16,
+      "note": "G1 BC w/o tip, printed \".160\". Without the tip installed, determined at 50 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.27,
+      "note": "G1 BC w/tip, printed \".270\". With the tip installed, determined at 250 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4,
+    "raw": "1-16\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "8",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 8, Enhanced System Projectile (ESP): Caliber .500, Grains 350, Minimum Required Twist 1-16\", Part Number ESP W350 Raptor, G1 BC w/o tip .160, G1 BC w/tip .270, OAL w/o tip 1.106\", OAL w/tip 1.481\", Bullet Projection w/o tip .380\", Bullet Projection w/tip .755\", Blunt Trauma Base™ ~ Retained Weight (grains) 257"
+      }
+    ]
+  },
+  "note": "Also printed: OAL w/o tip 1.106\" (the length stored is with the tip). Bullet projection (from the SealTite band to the tip, page footnote) printed: w/o tip .380\"; w/tip .755\"."
+}

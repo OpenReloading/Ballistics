@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mtac-408-395-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 408 395 MAX",
+  "name": "MTAC 408 395 MAX (MTAC, 395 gr)",
+  "productLine": "MTAC",
+  "caliber": ".408",
+  "diameter": {
+    "value": 10.363,
+    "raw": ".408"
+  },
+  "mass": {
+    "value": 25.596,
+    "raw": "395 gr"
+  },
+  "length": {
+    "value": 48.72,
+    "raw": "1.918\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.735,
+      "note": "G1 BC, printed \".735 (A.B.)\". Marked (A.B.): independent testing (page footnote). Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.376,
+      "note": "G7 BC, printed \".376 (A.B.)\". Marked (A.B.): independent testing (page footnote). Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "*1-13\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .408, Grains 395, Minimum Required Twist *1-13\", Part Number MTAC 408 395 MAX, G1 BC .735 (A.B.), G7 BC .376 (A.B.), OAL 1.918\", Bullet Projection 1.305\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.305\"."
+}

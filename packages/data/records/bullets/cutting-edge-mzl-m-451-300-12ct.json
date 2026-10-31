@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mzl-m-451-300-12ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MZL M.451 300 12ct",
+  "name": "MZL M.451 300 12ct (MAXIMUS, 300 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".451",
+  "diameter": {
+    "value": 11.455,
+    "raw": ".451"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 27.64,
+    "raw": "1.088\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.275,
+      "note": "G1 BC, printed \".275 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.138,
+      "note": "G7 BC, printed \".138 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 711.2,
+    "raw": "1-28\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .451, Grains 300, Minimum Required Twist 1-28\", Part Number MZL M.451 300 12ct, G1 BC .275 EST, G7 BC .138 EST, OAL 1.088\", BULLET PROJECTION N/A"
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: N/A."
+}

@@ -78,7 +78,7 @@ test('a search without a match offers to clear the filters', async ({ page }) =>
 })
 
 test('the rows ticked for Compare stay in the URL and come back on reload', async ({ page }) => {
-  await gotoHydrated(page, '/powders')
+  await gotoHydrated(page, '/powders?q=dp40')
   const tick = page.getByRole('checkbox', { name: 'Select Demo Powder Co. DP40' })
   await tick.check()
   await expect(page).toHaveURL(/[?&]pick=demo-powder-dp40/)
@@ -97,7 +97,7 @@ test('the rows ticked for Compare stay in the URL and come back on reload', asyn
 test('a shift click ticks the rows between two boxes and Clear selection unticks them', async ({
   page,
 }) => {
-  await gotoHydrated(page, '/bullets')
+  await gotoHydrated(page, '/bullets?q=demo')
   const boxes = page.getByRole('checkbox', { name: /^Select Demo Bullets / })
   await expect(boxes).toHaveCount(2)
   await boxes.first().click()

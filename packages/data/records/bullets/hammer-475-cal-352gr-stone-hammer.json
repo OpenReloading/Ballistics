@@ -1,0 +1,45 @@
+{
+  "id": "hammer-475-cal-352gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869048154",
+  "name": ".475 Cal-352gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".475",
+  "diameter": {
+    "value": 12.065,
+    "raw": ".475"
+  },
+  "mass": {
+    "value": 22.809,
+    "raw": "352 gr"
+  },
+  "length": {
+    "value": 30.48,
+    "raw": "Bullet length is 1.20″"
+  },
+  "noseLength": {
+    "value": 16.51,
+    "raw": "Nose length is .6499″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.296,
+      "note": "Hammer Bullets: \"g1-bc= .296 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist rate for Big Game Hunting is 1-27″ or faster. Minimum required twist rate for Dangerous Game Hunting is 1-24″ or faster. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"We designed this bullet for the 470 Capstick cartridge. This 352gr pure copper Stone Hammer will run about 2600 fps in this cartridge making it plenty for any big game hunting right up through the African dangerous game. For you guys in the straight wall states, you should take a hard look at this combo in the 470 Capstick.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/475-cal-352gr-stone-hammer/: Minimum required twist rate for Big Game Hunting is 1-27″ or faster | Minimum required twist rate for Dangerous Game Hunting is 1-24″ or faster | Bullet length is 1.20″ | Nose length is .6499″ | Bullet weight is 352gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .296 estimated"
+      }
+    ]
+  }
+}

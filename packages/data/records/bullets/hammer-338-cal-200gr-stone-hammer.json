@@ -1,0 +1,56 @@
+{
+  "id": "hammer-338-cal-200gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869042161",
+  "name": ".338 Cal-200gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 33.53,
+    "raw": "Bullet length is 1.32″"
+  },
+  "noseLength": {
+    "value": 17.52,
+    "raw": "Nose length is .6899″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.357,
+      "note": "Hammer Bullets: \"g1-bc= .357 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "Minimum required twist rate is 1-13″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We designed this pure copper bullet for the 338 Marlin Express lever action. Designed with the 3mm hollow point and extra thickness around the meplat, for riding in a tubular magazine, that has proven to be spectacular in terminal performance. With a minimum required twist rate of 1-13″ or faster this Stone Hammer™ bullet will be an excellent choice for pretty much any .338 caliber cartridge on any big game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-200gr-stone-hammer/: Minimum required twist rate is 1-13″ or faster | Bullet length is 1.32″ | Nose length is .6899″ | Bullet weight is 200gr | Recommended use: Big Game Hunting | g1-bc= .357 estimated"
+      }
+    ]
+  }
+}

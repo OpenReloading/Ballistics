@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-117gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "275",
+  "name": ".277 Cal-117gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 7.646,
+    "raw": "118 gr"
+  },
+  "length": {
+    "value": 30.99,
+    "raw": "Bullet length is 1.22″"
+  },
+  "noseLength": {
+    "value": 18.25,
+    "raw": "Nose length is .7185″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.198,
+      "note": "Hammer Bullets: \"G7-BC=.198 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended twist rate of 1-10″ or faster"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"This Hammer Hunter™ has been a stellar on game performer in the 1-10″ standard twist 270 caliber rifles. Gives fantastic velocities and performs well above it’s pay grade on everything from hogs to elk.\" The product name says 117 gr; the specification says 118 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=5",
+        "retrieved": "2026-10-08",
+        "sha256": "7d0c3a6391edef573277ee6a0eabe267ab3a2e170d32d6bcf7e877775108e85c",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-117gr-hammer-hunter/: Recommended twist rate of 1-10″ or faster | Bullet length is 1.22″ | Nose length is .7185″ | Bullet weight is 118 grains | Recommended use: Big game hunting | G7-BC=.198 estimated"
+      }
+    ]
+  }
+}

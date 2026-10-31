@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-fb-308-110-culg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 308 110 CuLG",
+  "name": "FB 308 110 CuLG (Flat Base Raptor, 110 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 7.128,
+    "raw": "110 gr"
+  },
+  "length": {
+    "value": 21.08,
+    "raw": ".830\""
+  },
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "1-12\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .308, Grains 110, Minimum Required Twist 1-12\", Part Number FB 308 110 CuLG, OAL .830\", Bullet Projection .480\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .480\"."
+}

@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-459410gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-459410GL",
+  "name": "#1 SOCOM-Grooveless, 410 Grain RNFP - Grooveless",
+  "caliber": ".459",
+  "diameter": {
+    "value": 11.659,
+    "raw": ".459 Diameter"
+  },
+  "mass": {
+    "value": 26.568,
+    "raw": "410 Grain"
+  },
+  "length": {
+    "value": 27.03,
+    "raw": "Bullet OAL 1.064 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 410 Grain RNFP - Grooveless. Brinell 18. For Subsonic SuperThump.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-459410GL, #1 SOCOM-Grooveless (https://missouribullet.com/details.php?prodId=480): .459 Diameter, 410 Grain RNFP - Grooveless, Brinell 18, Bullet OAL 1.064 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

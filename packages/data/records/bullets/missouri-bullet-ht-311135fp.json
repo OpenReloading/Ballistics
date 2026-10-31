@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-311135fp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-311135FP",
+  "name": "#3 Whitetail - Hi-Tek, 135 Grain RNFP",
+  "caliber": ".311",
+  "diameter": {
+    "value": 7.899,
+    "raw": ".311 Diameter"
+  },
+  "mass": {
+    "value": 8.748,
+    "raw": "135 Grain"
+  },
+  "length": {
+    "value": 19.38,
+    "raw": "Bullet OAL .763 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 135 Grain RNFP. Brinell 18. For Marlin Lever Guns.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-311135FP, #3 Whitetail - Hi-Tek (https://missouribullet.com/details.php?prodId=352): .311 Diameter, 135 Grain RNFP, Brinell 18, Bullet OAL .763 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

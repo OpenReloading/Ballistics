@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-hghp-22-32",
+  "manufacturer": "cutting-edge",
+  "productNumber": "HGHP 22 32",
+  "name": "HGHP 22 32 (MTH, 32 gr)",
+  "productLine": "MTH",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 2.074,
+    "raw": "32 gr"
+  },
+  "length": {
+    "value": 14.05,
+    "raw": ".553\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.122,
+      "note": "G1 BC, printed \".122 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4,
+    "raw": "1-16\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2, 11",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .224, Grains 32, Minimum Required Twist 1-16\", Part Number HGHP 22 32, G1 BC .122 (A.B.), OAL .553\", Bullet Projection .410\" | Page 11, HG RAPTOR - HG SOLID: Caliber 5.7/.224, Grains 32, Part Number HGHP 22 32, OAL .553\", Bullet Projection .410\", Blunt Trauma Base™ ~ Retained Weight (grains) 5 to 6 blades, ~ 6 grs each"
+      }
+    ]
+  },
+  "note": "Blunt Trauma Base™ ~ Retained Weight (grains) \"5 to 6 blades, ~ 6 grs each\" is printed on page 11 only; not stored. Bullet projection (from the SealTite band to the tip, page footnote) printed: .410\". Printed on page 2 (MTH-Match, Tactical, Hunting) and page 11 (HG RAPTOR - HG SOLID); the values are from page 2, whose caliber column gives the bullet diameter."
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-100gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027357",
+  "name": ".308 Cal-100gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "length": {
+    "value": 20.07,
+    "raw": "Bullet length is .790″"
+  },
+  "noseLength": {
+    "value": 9.64,
+    "raw": "Nose length is .3797″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.201,
+      "note": "Hammer Bullets: \"g1-bc= .201 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 457.2,
+    "raw": "Minimum required twist rate is 1-18″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This Stone Hammer™ was designed for the smaller m14 / 30 carbine rifles or those who want to run a nice high velocity in standard 30 calibers without the high recoil. This pure copper bullet will work well for both applications.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-100gr-stone-hammer/: Minimum required twist rate is 1-18″ | Bullet length is .790″ | Nose length is .3797″ | Bullet weight is 100gr | Recommended use: Big Game Hunting | g1-bc= .201 estimated"
+      }
+    ]
+  }
+}

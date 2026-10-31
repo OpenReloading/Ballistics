@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-bp-452200cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-452200CB",
+  "name": "Cowboy #4 - Black Powder, 200 Grain RNFP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 Grain"
+  },
+  "length": {
+    "value": 13.77,
+    "raw": "Bullet OAL .542 +/-"
+  },
+  "note": "Listed as 200 Grain RNFP. Brinell 12. .45 Colt. For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "BP-452200CB, Cowboy #4 - Black Powder (https://missouribullet.com/details.php?prodId=443): .452 Diameter, 200 Grain RNFP, Brinell 12, Bullet OAL .542 +/-"
+      }
+    ]
+  }
+}

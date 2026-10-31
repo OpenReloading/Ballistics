@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-bp-259085m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-259085M",
+  "name": "#1 .25-20 - Black Powder, 85 Grain RNFP",
+  "caliber": ".259",
+  "diameter": {
+    "value": 6.579,
+    "raw": ".259 Diameter"
+  },
+  "mass": {
+    "value": 5.508,
+    "raw": "85 Grain"
+  },
+  "length": {
+    "value": 17.63,
+    "raw": "Bullet OAL .694 +/-"
+  },
+  "note": "Listed as 85 Grain RNFP. Brinell 18. For Critters.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "BP-259085M, #1 .25-20 - Black Powder (https://missouribullet.com/details.php?prodId=451): .259 Diameter, 85 Grain RNFP, Brinell 18, Bullet OAL .694 +/-"
+      }
+    ]
+  }
+}

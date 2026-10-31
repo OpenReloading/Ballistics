@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mtac-243-90-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 243 90 MAX",
+  "name": "MTAC 243 90 MAX (MTAC, 90 gr)",
+  "productLine": "MTAC",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "length": {
+    "value": 30.02,
+    "raw": "1.182\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.43,
+      "note": "G1 BC, printed \".43 est.\". Marked est.: estimated, within +/- 5% (page footnote). Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "*1-8\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .243, Grains 90, Minimum Required Twist *1-8\", Part Number MTAC 243 90 MAX, G1 BC .43 est., OAL 1.182\", Bullet Projection .818\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .818\"."
+}

@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-356125swc",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-356125SWC",
+  "name": "9mm SWC - Hi-Tek, 125 Grain 9MM SWC",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042,
+    "raw": ".356 Diameter"
+  },
+  "mass": {
+    "value": 8.294,
+    "raw": "Note: Actual weight is 128 grains"
+  },
+  "length": {
+    "value": 15.82,
+    "raw": "Bullet OAL .623 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 125 Grain 9MM SWC; Actual weight is 128 grains. Brinell 18. 9mm Parabellum. For Target Shooting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-356125SWC, 9mm SWC - Hi-Tek (https://missouribullet.com/details.php?prodId=207): .356 Diameter, 125 Grain 9MM SWC, Note: Actual weight is 128 grains, Brinell 18, Bullet OAL .623 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

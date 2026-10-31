@@ -1,0 +1,169 @@
+{
+  "id": "alliant-reloder-19",
+  "manufacturer": "alliant",
+  "name": "Reloder 19",
+  "grainForm": "extruded",
+  "composition": [
+    {
+      "name": "Nitrocellulose",
+      "cas": "9004-70-0",
+      "min": 0,
+      "max": 100,
+      "raw": "<0.1, 0.1 - 1, 1 - 5, 5 - 10, 10 - 30, 30 - 60, 60 - 100"
+    },
+    {
+      "name": "Nitroglycerin",
+      "cas": "55-63-0",
+      "min": 0,
+      "max": 18,
+      "raw": "<0.1, 0.1 - 1, 1 - 5, 5 - 18"
+    },
+    {
+      "name": "Diisopentyl phthalate",
+      "cas": "605-50-5",
+      "min": 0,
+      "max": 3,
+      "raw": "<0.1, 0.1 - 1, 1 - 3"
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0,
+      "max": 2,
+      "raw": "<0.1, 0.1 - 1, 1 - 2"
+    },
+    {
+      "name": "N,N'-diethyl-N,N'-diphenylurea",
+      "cas": "85-98-3",
+      "min": 0,
+      "max": 2,
+      "raw": "<0.1, 0.1 - 1, 1 - 2"
+    }
+  ],
+  "thermochemistry": {
+    "loadingDensity": {
+      "value": 0.1
+    },
+    "flameTemperature": {
+      "value": 3093.9,
+      "min": 2461.1,
+      "max": 3610.6
+    },
+    "impetus": {
+      "value": 1055800,
+      "min": 916380,
+      "max": 1131500
+    },
+    "gamma": {
+      "value": 1.2313,
+      "min": 1.2114,
+      "max": 1.2567
+    },
+    "molarMass": {
+      "value": 24.364,
+      "min": 22.33,
+      "max": 26.533
+    },
+    "covolume": {
+      "value": 0.001024,
+      "min": 0.0009488,
+      "max": 0.0011182
+    }
+  },
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.59486,
+      "standardUncertainty": 0.053
+    },
+    "energy": {
+      "value": 2676600,
+      "standardUncertainty": 150000
+    },
+    "gamma": 1.2313,
+    "covolume": {
+      "value": 0.001024
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 47,
+    "trainingCartridges": 16
+  },
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "alliant-powder-sds-reloder-series-smokeless",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_Series_SDS.pdf",
+        "page": "p. 2",
+        "retrieved": "2026-10-12",
+        "fields": ["composition"],
+        "kind": "published",
+        "note": "Safety data sheet section 3 for a family of powders; the ranges span the family, not one powder. The SDS listing at https://www.alliantpowder.com/resources/sds.aspx links this sheet for Reloder 15, 19 and 22; the sheet does not name the Reloder numbers. The sheet prints several ranges per ingredient \"due to varying composition\" and does not say which belongs to which powder; stored as the union of the printed ranges."
+      },
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"],
+        "kind": "published"
+      },
+      {
+        "source": "alliant-safety-data-sheet-reloder-series",
+        "page": "section 9",
+        "url": "https://www.alliantpowder.com/downloads/sds/Reloder_Series_SDS.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm"],
+        "note": "Section 9 gives the appearance \"Gray-black single perforated grain\"; the Alliant SDS listing (https://www.alliantpowder.com/resources/sds.aspx) links this sheet for Reloder 19.",
+        "kind": "derived"
+      },
+      {
+        "source": "openreloading-constant-volume-equilibrium-solver",
+        "sha256": "6ac6e52758c547ed0e83ae52ba851ad6b204404ad3f689082c645d21ef106991",
+        "fields": ["thermochemistry"],
+        "kind": "computed",
+        "note": "Composition: Alliant Powder SDS \"Reloder Series Smokeless Powders, AR-Comp\", revision 03/02/2017, version 2.0; the listed ingredients are taken as the whole composition. Nitrogen in the nitrocellulose 12.6 to 13.4 % (Mass fraction of N for powder records, where safety data sheets print none: from pyrocellulose (12.6 %) to guncotton (13.4 %), the US grades in AMCP 706-175, Solid Propellants, Part One, 1964, p. 46). Value at the mean of the 16 vertices of the composition ranges (fractions summing to 100 %) and the mean nitrogen; min and max over that value and the vertices at both nitrogen bounds, extremes between vertices not searched. sha256 over the solver code and the ingredient data used."
+      },
+      {
+        "source": "alliant-reloader-s-guide-2023-metallic-tables",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "47 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; thermochemistry prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      }
+    ]
+  }
+}

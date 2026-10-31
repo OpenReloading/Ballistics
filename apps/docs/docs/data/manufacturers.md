@@ -21,7 +21,7 @@ A powder, primer or bullet record names its manufacturer by the id of a manufact
 
 ## Id
 
-The id is the slug of the name without the legal form: "Demo Powder Co." becomes `demo-powder`. An id never changes. When a manufacturer changes its name, `name` takes the new one and the old one goes to `aliases`, so records and saved files that name the id keep working. Examples in records, tests and docs use invented names only.
+The id is the slug of the name without the legal form: "Demo Powder Co." becomes `demo-powder`. An id never changes. When a manufacturer changes its name, `name` takes the new one and the old one goes to `aliases`, so records and saved files that name the id keep working. Examples in tests and docs use invented names; the catalogue records name the real makers, each citing the maker's own publication; only the records with the `demo-` prefix are invented.
 
 ## Validation
 

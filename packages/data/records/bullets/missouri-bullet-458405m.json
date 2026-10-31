@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-458405m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "458405M",
+  "name": "#1 Buffalo, 405 Grain RNFP",
+  "caliber": ".459",
+  "diameter": {
+    "value": 11.659,
+    "raw": ".459 Diameter"
+  },
+  "mass": {
+    "value": 26.244,
+    "raw": "405 Grain"
+  },
+  "length": {
+    "value": 26.42,
+    "raw": "Bullet OAL 1.040 +/-"
+  },
+  "note": "Listed as 405 Grain RNFP. Brinell 18. For Large Buffalo.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "458405M, #1 Buffalo (https://missouribullet.com/details.php?prodId=81): .459 Diameter, 405 Grain RNFP, Brinell 18, Bullet OAL 1.040 +/-"
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "sierra-1845",
+  "manufacturer": "sierra",
+  "productNumber": "1845",
+  "name": "270 CAL 140 GR SBT GameKing (SGK)",
+  "caliber": "0.277",
+  "diameter": {
+    "value": 7.036,
+    "raw": "0.277 in"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.457,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.223,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/270-cal-140-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "4323ee1aadcd344afce33dc8b3a16043d96e7b2fc5e3404dab1c85b8afdf2aa1",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1845, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.277, Bullet Weight (Grains): 140, G1 BC: 0.457, G7 BC: 0.223, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

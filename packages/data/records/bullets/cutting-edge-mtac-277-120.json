@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mtac-277-120",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 277 120",
+  "name": "MTAC 277 120 (MTAC, 120 gr)",
+  "productLine": "MTAC",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 7.776,
+    "raw": "120 gr"
+  },
+  "length": {
+    "value": 30.12,
+    "raw": "1.186\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.46,
+      "note": "G1 BC, printed \".460\". No method mark: method not stated. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "*1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .277, Grains 120, Minimum Required Twist *1-10\", Part Number MTAC 277 120, G1 BC .460, OAL 1.186\", Bullet Projection .735\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .735\"."
+}

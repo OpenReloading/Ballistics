@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-430180cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "430180CB",
+  "name": "Cowboy #7, 180 Grain RNFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922,
+    "raw": ".430 Diameter"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 Grain"
+  },
+  "length": {
+    "value": 14.05,
+    "raw": "Bullet OAL .553 +/-"
+  },
+  "note": "Listed as 180 Grain RNFP. Brinell 12. Modern .44-40 and .44 Special. For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "430180CB, Cowboy #7 (https://missouribullet.com/details.php?prodId=68): .430 Diameter, 180 Grain RNFP, Brinell 12, Bullet OAL .553 +/-"
+      }
+    ]
+  }
+}

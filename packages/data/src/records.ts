@@ -110,6 +110,17 @@ export function readLoadTables(dir: string, errors?: string[]): LoadTables {
   return tables
 }
 
+/** The load tables of every root; a file two roots list is an error, the first entry stays. */
+function readRootsLoadTables(roots: readonly string[], errors: string[]): LoadTables {
+  const tables: LoadTables = {}
+  for (const r of roots)
+    for (const [file, table] of Object.entries(readLoadTables(r, errors))) {
+      if (file in tables) errors.push(`load-tables.json: ${file} is listed by more than one root`)
+      else tables[file] = table
+    }
+  return tables
+}
+
 /** The records of a records root, one array per kind. */
 export type Bundle = {
   cartridges: Cartridge[]
@@ -264,7 +275,7 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
 
 /**
  * Reads, validates and cross-checks every record under `root`, or under each of several roots read
- * as one set (the first holds every kind directory, the second its `load-tables.json`). Without
+ * as one set (the first holds every kind directory; the `load-tables.json` of every root lists tables). Without
  * `root` it reads the `records/` folder of a repository checkout; the npm package ships none, so
  * there it throws: pass the `records/` folder of a checkout, or read `bundle.json` instead.
  */
@@ -285,9 +296,8 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   errors.push(...checkFederations(bundle))
   errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
-  const loadRoot = roots[1] ?? roots[0]
-  if (loadRoot === undefined) throw new Error('readRecords needs at least one records root')
-  const loadTables = readLoadTables(loadRoot, errors)
+  if (roots.length === 0) throw new Error('readRecords needs at least one records root')
+  const loadTables = readRootsLoadTables(roots, errors)
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))
       errors.push(`powders/${p.id}.json: ${error}`)

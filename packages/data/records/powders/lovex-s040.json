@@ -1,0 +1,89 @@
+{
+  "id": "lovex-s040",
+  "manufacturer": "lovex",
+  "name": "S040",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 1.0431,
+      "standardUncertainty": 0.093
+    },
+    "energy": {
+      "value": 3959300,
+      "standardUncertainty": 330000
+    },
+    "gamma": 1.2425,
+    "covolume": {
+      "value": 0.001059
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 15,
+    "trainingCartridges": 5
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lovex-reloading-guide-en-37-explosia-a-s",
+        "fields": ["name"],
+        "note": "No public download URL confirmed."
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "3",
+        "fields": ["propellantBase"],
+        "note": "No public download URL confirmed. States that single base powders carry the marking S and double base powders the marking D.",
+        "kind": "derived"
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "6",
+        "fields": ["grainForm"],
+        "note": "Gives the type of propellant of S040-01 as single base, tubular; the reloading guide prints S040 without the variant number. The form of the catalogue variant is applied to the guide name.",
+        "kind": "derived"
+      },
+      {
+        "source": "lovex-reloading-guide-en-37-explosia",
+        "retrieved": "2026-10-13",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "15 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; single base prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      }
+    ]
+  }
+}

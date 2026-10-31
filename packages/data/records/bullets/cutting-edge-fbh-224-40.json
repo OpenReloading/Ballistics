@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-fbh-224-40",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FBH 224 40",
+  "name": "FBH 224 40 (MTH, 40 gr)",
+  "productLine": "MTH",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 2.592,
+    "raw": "40 gr"
+  },
+  "length": {
+    "value": 16.36,
+    "raw": ".644\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.176,
+      "note": "G1 BC, printed \".176 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "1-14\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .224, Grains 40, Minimum Required Twist 1-14\", Part Number FBH 224 40, G1 BC .176 (O89), OAL .644\", Bullet Projection .462\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .462\"."
+}

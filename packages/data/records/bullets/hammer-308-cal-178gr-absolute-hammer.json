@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-178gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8267",
+  "name": ".308 Cal-178gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.534,
+    "raw": "178 gr"
+  },
+  "length": {
+    "value": 37.85,
+    "raw": "Bullet length is 1.490″"
+  },
+  "noseLength": {
+    "value": 22.45,
+    "raw": "Nose length is .884″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.205,
+      "note": "Hammer Bullets: \"G7-BC= .205 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This 30 caliber 1-10″ twist will run in most of the standard twist rate factory rifles. In our testing of this Absolute Hammer™ we saw velocity gains in the 30-06 that puts it in the 300 Winchester Magnum performance class. When tested in the 300 Winchester Magnum the velocity gain put it squarely in the 300 Ultramag class. The Absolute Hammer™s do not line up with conventional data like the other Hammer Bullets, so they are recommended for experience hand loaders only.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-178gr-absolute-hammer/: Recommended minimum twist rate is 1-10″ | Bullet length is 1.490″ | Nose length is .884″ | Bullet weight is 178gr | Recommended use: Big Game Hunting | G7-BC= .205 calculated from shot drops"
+      }
+    ]
+  }
+}

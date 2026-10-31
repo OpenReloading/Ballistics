@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-160gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "832",
+  "name": ".284 Cal-160gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 10.303,
+    "raw": "159 gr"
+  },
+  "length": {
+    "value": 35.81,
+    "raw": "Bullet length is 1.41″"
+  },
+  "noseLength": {
+    "value": 14.22,
+    "raw": "Nose length is .5597″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.446,
+      "note": "Hammer Bullets: \"G1-BC=.446 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3,
+    "raw": "Recommended twist rate is 1-9.5″ minimum"
+  },
+  "note": "Recommended use: Big game hunting. The product name says 160 gr; the specification says 159 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-160gr-stone-hammer/: Recommended twist rate is 1-9.5″ minimum | Bullet length is 1.41″ | Nose length is .5597″ | Bullet weight is 159gr | Recommended use: Big game hunting | G1-BC=.446 estimated"
+      }
+    ]
+  }
+}

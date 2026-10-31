@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-155gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "7942",
+  "name": ".284 Cal-155gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 10.044,
+    "raw": "155 gr"
+  },
+  "length": {
+    "value": 38.1,
+    "raw": "Bullet length is 1.50″"
+  },
+  "noseLength": {
+    "value": 20.51,
+    "raw": "Nose length is .8073″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.239,
+      "note": "Hammer Bullets: \"G7-BC= .239 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9,
+    "raw": "Recommended minimum twist rate is 1-8.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"The Absolute Hammer™ is specific ogive design, that falls under our PDR patent, eliminating any engraving by the rifling forward of the shoulder of the bullet. This bullet will not engage the lands anywhere on the ogive. This eliminates distortion of the nose that causes changes in bc from rifle to rifle depending on how loose or tight the bore is. The bonus to this design is greatly reduced engraving pressure resulting in significant gains in velocity compared to bullets of the same weight. In our 280ai test rifles we gained 300-400 fps over conventional bullets of the same weight. Given the low pressure and extra velocity these bullets produce, they should only be loaded by experienced hand loaders that are very good at reading pressure signs. You will see that these bullets will require faster than normal powders for the cartridge and bullet weight. Load with caution.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-155gr-absolute-hammer/: Recommended minimum twist rate is 1-8.5″ | Bullet length is 1.50″ | Nose length is .8073″ | Bullet weight is 155gr | Recommended use: Big Game Hunting | G7-BC= .239 estimated"
+      }
+    ]
+  }
+}

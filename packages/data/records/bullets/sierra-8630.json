@@ -1,0 +1,58 @@
+{
+  "id": "sierra-8630",
+  "manufacturer": "sierra",
+  "productNumber": "8630",
+  "name": "44 CAL 300 GR JSP SPORTS MASTER",
+  "caliber": "0.4295",
+  "diameter": {
+    "value": 10.909,
+    "raw": "0.4295 in"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.23,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/44-cal-300-gr-jsp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "be8949ca6b71e21e25cdb8a95a44511be5e52da12ced2ebcf2525d3d1c1de0c6",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8630, Bullet Type: Jacketed Soft Point (JSP), Bullet Diameter: 0.4295, Bullet Weight (Grains): 300, G1 BC: 0.230, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

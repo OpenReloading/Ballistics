@@ -1,0 +1,24 @@
+{
+  "id": "adi-aps950",
+  "manufacturer": "adi",
+  "name": "APS950",
+  "country": "AU",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "adi-world-class-powders-pistol-load-data-page",
+        "url": "https://www.adiworldclass.com.au/pistol/",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "adi-world-class-powders-contact-page",
+        "url": "https://www.adiworldclass.com.au/contact/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Reloading enquiries: Australian Munitions, Private Bag No. 1, Mulwala, New South Wales 2647, Australia."
+      }
+    ]
+  }
+}

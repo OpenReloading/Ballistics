@@ -1,0 +1,58 @@
+{
+  "id": "sierra-1913",
+  "manufacturer": "sierra",
+  "productNumber": "1913",
+  "name": "7MM 150 GR SBT GameKing (SGK)",
+  "caliber": "0.284",
+  "diameter": {
+    "value": 7.214,
+    "raw": "0.284 in"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.436,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-150-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "27b926af2411f94fa35a2bbd6f900d030b54774d6d99b08d6804091bd6e6e01f",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1913, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.284, Bullet Weight (Grains): 150, G1 BC: 0.436, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "hammer-423-cal-400gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869042652",
+  "name": ".423 Cal-400gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744,
+    "raw": ".423"
+  },
+  "mass": {
+    "value": 25.92,
+    "raw": "400 gr"
+  },
+  "length": {
+    "value": 40.72,
+    "raw": "Bullet length is 1.603″"
+  },
+  "noseLength": {
+    "value": 16.3,
+    "raw": "Nose length is .6416″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.425,
+      "note": "Hammer Bullets: \"g1-bc= .425 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist for dangerous game hunting is 1-15″ or faster. Minimum required twist for big game hunting is 1-17″ or faster. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"With a 4mm hollow point this pure copper Stone Hammer™ will open very easily at moderate velocities. Designed for the modern 404 Jeffery with a .423″ groove diameter, this traditional weight bullet should be able to run 2300-2400 fps comfortably.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/423-cal-400gr-stone-hammer/: Minimum required twist for dangerous game hunting is 1-15″ or faster | Minimum required twist for big game hunting is 1-17″ or faster | Bullet length is 1.603″ | Nose length is .6416″ | Bullet weight is 400gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .425 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "hammer-277-cal-118gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869069958",
+  "name": ".277 Cal-118gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 7.646,
+    "raw": "118 gr"
+  },
+  "length": {
+    "value": 32.84,
+    "raw": "Bullet length including the tip: 1.293″"
+  },
+  "noseLength": {
+    "value": 16.93,
+    "raw": "Nose length including tip: .6665″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.238,
+      "note": "Hammer Bullets: \"g7-bc= .238\"; the page says \"calculated from shot drops at 860y, 4200′ elevation, MV of 3430 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.466,
+      "note": "Hammer Bullets: \"g1-bc= .466\"; the page says \"calculated from shot drops at 860y, 4200′ elevation, MV of 3430 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Minimum required twist rate is 1-10″ or faster"
+  },
+  "note": "Tip length: .143″. PDR drive band spacing: .200″ (recommend two drive bands in the case neck for concentricity) Recommended use: Big Game Hunting. form factor= .925. The product page also says: \"We designed this pure copper .277 caliber Hammer HBC™ to be able to run in the traditional factory 1-10″ twist barrels and be fully stable. In our factory Tikka 270 Winchester test rifle, we are running these at 3430 fps. That is in a 22″ short barrel! With a 100y zero the dial up to 860y was only 14 moa. Depending on your elevation this makes the 270 Win a max point-blank range combo on a 5″ radius kill zone out to 410y.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-118gr-hammer-hbc/: Minimum required twist rate is 1-10″ or faster | Bullet length including the tip: 1.293″ | Bullet weight: 118gr | Nose length including tip: .6665″ | Tip length: .143″ | PDR drive band spacing: .200″ (recommend two drive bands in the case neck for concentricity) | Recommended use: Big Game Hunting | g7-bc= .238 | g1-bc= .466 | form factor= .925 | calculated from shot drops at 860y, 4200′ elevation, MV of 3430 fps"
+      }
+    ]
+  }
+}

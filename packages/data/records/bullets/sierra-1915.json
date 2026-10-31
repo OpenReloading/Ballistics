@@ -1,0 +1,74 @@
+{
+  "id": "sierra-1915",
+  "manufacturer": "sierra",
+  "productNumber": "1915",
+  "name": "7MM 150 GR HPBT MatchKing (SMK)",
+  "caliber": "0.284",
+  "diameter": {
+    "value": 7.214,
+    "raw": "0.284 in"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.429,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.22,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1915, 1915C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-150-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "e1d449909bcba14d59adcda729ef393e1d18ccfffa6f2215eea02c6b82754b5d",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1915, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.284, Bullet Weight (Grains): 150, G1 BC: 0.429, G7 BC: 0.220, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

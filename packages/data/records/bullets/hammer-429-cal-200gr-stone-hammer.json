@@ -1,0 +1,56 @@
+{
+  "id": "hammer-429-cal-200gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027790",
+  "name": ".429 Cal-200gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".429",
+  "diameter": {
+    "value": 10.897,
+    "raw": ".429"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 20.83,
+    "raw": "Bullet length is .82″"
+  },
+  "noseLength": {
+    "value": 8.19,
+    "raw": "Nose length is .3225″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.206,
+      "note": "Hammer Bullets: \"g1-bc= .206 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 965.2,
+    "raw": "Minimum required twist rate is 1-38″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Designed for the 444 Marlin, this 200gr pure copper Stone Hammer™ will perform well in the lever action and get plenty of velocity for great range and terminal performance.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/429-cal-200gr-stone-hammer/: Minimum required twist rate is 1-38″ | Bullet length is .82″ | Nose length is .3225″ | Bullet weight is 200gr | Recommended use: Big Game Hunting | g1-bc= .206 estimated"
+      }
+    ]
+  }
+}

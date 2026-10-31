@@ -1,0 +1,61 @@
+{
+  "id": "hammer-243-cal-089gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869060774",
+  "name": ".243 Cal-089gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 5.767,
+    "raw": "89 gr"
+  },
+  "length": {
+    "value": 32.23,
+    "raw": "Bullet length including the tip is 1.269″"
+  },
+  "noseLength": {
+    "value": 17.55,
+    "raw": "Nose length including tip is .691″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.48,
+      "note": "Hammer Bullets: \"g1-bc= .480\"; the page says \"Calculated from shot drops at 500y, 1000′ elevation, MV of 3870 fps\"."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.227,
+      "note": "Hammer Bullets: \"g7-bc= .227\"; the page says \"Calculated from shot drops at 500y, 1000′ elevation, MV of 3870 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended minimum twist rate is 1-8″ or faster"
+  },
+  "note": "Tip length is .143″. PDR drive band spacing is .200″. Recommended use: Big Game Hunting. form factor= .947. The product page also says: \"The Hammer HBC™ is now ready in the 6mm. Coming in at 89gr with a g7-bc of .227 this one is a heavy contender at very long range. At 4000′ elevation this will take a 243 Winchester past 900y and still be above our minimum expansion vel of 1800 fps.\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-089gr-hammer-hbc/: Recommended minimum twist rate is 1-8″ or faster | Bullet length including the tip is 1.269″ | Nose length including tip is .691″ | Tip length is .143″ | PDR drive band spacing is .200″ | Bullet weight is 89gr | Recommended use: Big Game Hunting | g1-bc= .480 | g7-bc= .227 | form factor= .947 | Calculated from shot drops at 500y, 1000′ elevation, MV of 3870 fps"
+      }
+    ]
+  }
+}

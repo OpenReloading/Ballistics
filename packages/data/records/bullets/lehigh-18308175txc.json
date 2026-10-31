@@ -1,0 +1,49 @@
+{
+  "id": "lehigh-18308175txc",
+  "manufacturer": "lehigh",
+  "productNumber": "18308175TXC",
+  "name": ".308 diameter, 175 grain Tipped Xtreme Chaos Bullets (50 count)",
+  "productLine": "Tipped Xtreme Chaos",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308 in"
+  },
+  "mass": {
+    "value": 11.34,
+    "raw": "175 gr"
+  },
+  "length": {
+    "value": 38.23,
+    "raw": "1.505 in"
+  },
+  "construction": {
+    "raw": "Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.453,
+      "note": "Lehigh Defense product data; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lehigh-defense-store-product-attributes-graphql",
+        "url": "https://lehighdefense.com/graphql?query=%7Bproducts%28filter%3A%7Bcategory_uid%3A%7Beq%3A%22MTA%3D%22%7D%7D%2CpageSize%3A500%29%7Btotal_count%20items%7Bsku%20name%20url_key%20all_reloading_diameter%20all_reloading_weight_grains%20all_reloading_ld_tech%20all_reloading_ld_material%20all_reloading_ld_g1%20all_reloading_ld_g7%20all_reloading_ld_length%20all_reloading_ld_ogive_length%20all_reloading_ld_minimum_twist%20all_reloading_ld_sectional%7D%7D%7D",
+        "retrieved": "2026-10-08",
+        "sha256": "99a33bfb22d332a0ea790da76dd204d25e6261dc593c26fd63e88239192bfa51",
+        "fields": ["diameter", "mass", "length", "construction.raw", "ballisticCoefficients"],
+        "note": "18308175TXC, https://lehighdefense.com/308-diameter-175-grain-tipped-xtreme-chaos-bullets-50-count.html: Bullet Diameter .308, Bullet Weight (grains) 175, Ballistic Coefficient (G1) .453, Bullet Length 1.505. Option labels from the attribute metadata query (sha256 c1644366c98defb88490b9314a0bf5ad53600f6d27828fe7ceaff7c6c47411fd)."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

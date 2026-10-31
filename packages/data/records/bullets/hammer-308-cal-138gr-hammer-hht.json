@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-138gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869045134",
+  "name": ".308 Cal-138gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 8.942,
+    "raw": "138 gr"
+  },
+  "length": {
+    "value": 31.57,
+    "raw": "Bullet length including tip is 1.243″"
+  },
+  "noseLength": {
+    "value": 18.13,
+    "raw": "Nose length including tip is .7138″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.198,
+      "note": "Hammer Bullets: \"g7-bc= .198 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "Minimum required twist rate is 1-13″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"138gr Hammer HHT™ pure copper bullet that will run in slow twist barrels with great vel and low recoil. This will be a great combo for any big game hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-138gr-hammer-hht/: Minimum required twist rate is 1-13″ or faster | Bullet length including tip is 1.243″ | Nose length including tip is .7138″ | Tip length is .143″ | Bullet weight is 138gr | Recommended use: Big Game Hunting | g7-bc= .198 estimated"
+      }
+    ]
+  }
+}

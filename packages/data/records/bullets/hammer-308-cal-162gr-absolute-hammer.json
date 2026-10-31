@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-162gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8561",
+  "name": ".308 Cal-162gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.497,
+    "raw": "162 gr"
+  },
+  "length": {
+    "value": 34.54,
+    "raw": "Bullets length is 1.360″"
+  },
+  "noseLength": {
+    "value": 21.08,
+    "raw": "Nose length is .830″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.197,
+      "note": "Hammer Bullets: \"g7-bc= .197 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 264.16,
+    "raw": "Recommended minimum twist rate is 1-10.4″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This Absolute Hammer™ is designed for 1-10.4″ twist or faster. The nose on this bullet is short enough to fit nicely in the 300 Winchester Short Magnum with the ability to hit about 3400 fps! Re-loading the Absolute Hammer™s should be done by experienced loaders only because they will not line up with conventional data. The engraving pressure is much lower and will require more powder than normal for bullet weight.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-162gr-absolute-hammer/: Recommended minimum twist rate is 1-10.4″ | Bullets length is 1.360″ | Nose length is .830″ | Bullet weight is 162gr | Recommended use: Big Game Hunting | g7-bc= .197 estimated"
+      }
+    ]
+  }
+}

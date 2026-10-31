@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-cal-69gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "10086",
+  "name": ".243 Cal-069gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 4.471,
+    "raw": "69 gr"
+  },
+  "length": {
+    "value": 23.39,
+    "raw": "Bullet length is .921″"
+  },
+  "noseLength": {
+    "value": 14.62,
+    "raw": "Nose length is .5754″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.139,
+      "note": "Hammer Bullets: \"g7-bc= .139 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended use: Medium and Big Game Hunting. The product page also says: \"This 69gr 1-10″ twist Absolute Hammer™ should be really fun in the 243win. Should be able to get close to 3900 fps with very little recoil. This kind of velocity will give a max point blank range of 430y and still be hitting the target at 2400 fps. Wow!! Look at powders on the fast side of normal. The Absolute Hammer™ will not line up with conventional data and should only be loaded by experience re-loaders that are accustomed reading pressure signs.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-69gr-absolute-hammer/: Recommended minimum twist rate is 1-10″ | Bullet length is .921″ | Nose length is .5754″ | Bullet weight is 69gr | Recommended use: Medium and Big Game Hunting | g7-bc= .139 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "cutting-edge-mth-224-78-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 224 78 MAX",
+  "name": "MTH 224 78 MAX (MTH, 78 gr)",
+  "productLine": "MTH",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 5.054,
+    "raw": "78 gr"
+  },
+  "length": {
+    "value": 30.02,
+    "raw": "1.182\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.408,
+      "note": "G1 BC, above the part number line, printed \".408 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.442,
+      "note": "G1 BC, below the part number line, printed \".442 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.209,
+      "note": "G7 BC, above the part number line, printed \".209 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.218,
+      "note": "G7 BC, below the part number line, printed \".218 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "1-7\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .224, Grains 78, Minimum Required Twist 1-7\", Part Number MTH 224 78 MAX, G1 BC .408 (A.B.) / .442 (O89), G7 BC .209 (A.B.) / .218 (O89), OAL 1.182\", Bullet Projection .773\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .773\". The same G1 .408 and G7 .209 are printed for MTH 277 120."
+}

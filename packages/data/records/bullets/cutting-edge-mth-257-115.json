@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mth-257-115",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 257 115",
+  "name": "MTH 257 115 (MTH, 115 gr)",
+  "productLine": "MTH",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "length": {
+    "value": 32.77,
+    "raw": "1.290\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.46,
+      "note": "G1 BC, printed \".460\". No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "1-8\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .257, Grains 115, Minimum Required Twist 1-8\", Part Number MTH 257 115, G1 BC .460, OAL 1.290\", Bullet Projection .879\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .879\"."
+}

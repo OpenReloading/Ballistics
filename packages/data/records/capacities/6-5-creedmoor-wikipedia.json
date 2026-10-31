@@ -1,0 +1,21 @@
+{
+  "id": "6-5-creedmoor-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:6-5-creedmoor",
+  "waterCapacity": {
+    "value": 3.402,
+    "raw": "52.5 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 6.5mm Creedmoor",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5mm_Creedmoor&oldid=1375349834",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 52.5 gr H2O (3.40 cm3)."
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-452233k",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452233K",
+  "name": "K-Ball, 233 Grain RN",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 15.098,
+    "raw": "233 Grain"
+  },
+  "length": {
+    "value": 17.86,
+    "raw": "Bullet OAL .703 +/-"
+  },
+  "note": "Listed as 233 Grain RN. Brinell 18. .45 ACP. For General Shooting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "452233K, K-Ball (https://missouribullet.com/details.php?prodId=396): .452 Diameter, 233 Grain RN, Brinell 18, Bullet OAL .703 +/-"
+      }
+    ]
+  }
+}

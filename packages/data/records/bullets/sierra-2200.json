@@ -1,0 +1,52 @@
+{
+  "id": "sierra-2200",
+  "manufacturer": "sierra",
+  "productNumber": "2200",
+  "name": "30 Cal 168 gr HPBT MatchKing",
+  "productLine": "MatchKing",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.462,
+      "note": "Sierra lists one G1 BC; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.224
+    }
+  ],
+  "note": "Sierra's 169 gr HPBT-CN MatchKing (#2269, G1 0.527, G7 0.260) is a redesign of this bullet sold under its own item number; Sierra still makes #2200.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-168-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "base.type", "tip.type", "ballisticCoefficients"],
+        "note": "Item #2200 (100) and 2200C (500): Hollow Point Boat Tail (HPBT), 0.308 in, 168 gr, G1 BC 0.462, G7 BC 0.224, Jacketed Lead, Non-Tipped (Specs tab, embedded in the page HTML)."
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,61 @@
+{
+  "id": "hammer-264-cal-139gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "896",
+  "name": ".264 Cal-139gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 8.748,
+    "raw": "135 gr"
+  },
+  "length": {
+    "value": 36.07,
+    "raw": "Bullet length is 1.42″"
+  },
+  "noseLength": {
+    "value": 15.3,
+    "raw": "Nose length is .6025″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.219,
+      "note": "Hammer Bullets: \"G7-BC=.219 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.448,
+      "note": "Hammer Bullets: \"G1-BC=.448 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended twist rate is 1-8″ minimum"
+  },
+  "note": "Recommended use: Big game hunting. The product name says 139 gr; the specification says 135 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-139gr-stone-hammer/: Recommended twist rate is 1-8″ minimum | Bullet length is 1.42″ | Nose length is .6025″ | Bullet weight is 135gr (deeper hollow point) | Recommended use: Big game hunting | G7-BC=.219 estimated | G1-BC=.448 estimated"
+      }
+    ]
+  }
+}

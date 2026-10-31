@@ -1,0 +1,13 @@
+{
+  "id": "lovex",
+  "name": "Lovex",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lovex-reloading-guide-en-37-explosia-a-s",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

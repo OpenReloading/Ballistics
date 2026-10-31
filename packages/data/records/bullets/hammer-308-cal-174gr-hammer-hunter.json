@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-174gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "1645",
+  "name": ".308 Cal-174gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.145,
+    "raw": "172 gr"
+  },
+  "length": {
+    "value": 35.56,
+    "raw": "Bullet length is 1.400″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.247,
+      "note": "Hammer Bullets: \"g7-bc= .247 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 273.05,
+    "raw": "Recommended min twist rate is 10.75″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This bullet is designed to fit factory length magazines of the long actions at 3.34″ and the short actions at 2.8″ oal cartridge lengths. Many of the factory rifles do not have magazines that will accommodate the longer noses of the the other Hammer Hunter™s. These will load very nicely and allow easy mag feeding.\" The product name says 174 gr; the specification says 172 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-174gr-hammer-hunter/: Recommended min twist rate is 10.75″ | Bullet length is 1.400″ | Bullet weight is 172gr | Recommended use: Big Game Hunting | g7-bc= .247 estimated"
+      }
+    ]
+  }
+}

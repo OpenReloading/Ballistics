@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-fb-m-308-220-ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB M.308 220 SS",
+  "name": "FB M.308 220 SS (MAXIMUS, 220 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 14.256,
+    "raw": "220 gr"
+  },
+  "length": {
+    "value": 41.96,
+    "raw": "1.652"
+  },
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "1-8\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .308, Grains 220, Minimum Required Twist 1-8\", Part Number FB M.308 220 SS, G1 BC TBD, G7 BC TBD, OAL 1.652, BULLET PROJECTION 0.859"
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". G7 BC is printed \"TBD\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 0.859."
+}

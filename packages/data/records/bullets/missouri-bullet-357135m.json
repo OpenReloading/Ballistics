@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-357135m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "357135M",
+  "name": "IDP #8, 135 Grain RN",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068,
+    "raw": ".357 Diameter"
+  },
+  "mass": {
+    "value": 8.748,
+    "raw": "135 Grain"
+  },
+  "length": {
+    "value": 15.75,
+    "raw": "Bullet OAL .620 +/-"
+  },
+  "note": "Listed as 135 Grain RN. Brinell 18. .38 Super. For Action Competition.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "357135M, IDP #8 (https://missouribullet.com/details.php?prodId=158): .357 Diameter, 135 Grain RN, Brinell 18, Bullet OAL .620 +/-"
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-400-cal-170gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869056799",
+  "name": ".400 Cal-170gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16,
+    "raw": ".400"
+  },
+  "mass": {
+    "value": 11.016,
+    "raw": "170 gr"
+  },
+  "length": {
+    "value": 20.32,
+    "raw": "Bullet length is .800″"
+  },
+  "noseLength": {
+    "value": 10.15,
+    "raw": "Nose length is .3998″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.189,
+      "note": "Hammer Bullets: \"g1-bc= .189 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 711.2,
+    "raw": "Minimum required twist rate is 1-28″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Designed for the 400 Legend, this Stone Hammer™ comes in at 170gr of pure copper. In our bolt gun test rifle, we achieved 2700 fps comfortably, making this a great combo out to about 200y. We designed this bullet with a crimp groove for those who are using an AR platform.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/400-cal-170gr-stone-hammer/: Minimum required twist rate is 1-28″ or faster | Bullet length is .800″ | Nose length is .3998″ | Bullet weight is 170gr | Recommended use: Big Game Hunting | g1-bc= .189 estimated"
+      }
+    ]
+  }
+}

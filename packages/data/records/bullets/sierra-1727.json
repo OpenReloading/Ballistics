@@ -1,0 +1,74 @@
+{
+  "id": "sierra-1727",
+  "manufacturer": "sierra",
+  "productNumber": "1727",
+  "name": "6.5MM 123 GR HPBT/CN MatchKing (SMK)",
+  "caliber": "0.264",
+  "diameter": {
+    "value": 6.706,
+    "raw": "0.264 in"
+  },
+  "mass": {
+    "value": 7.97,
+    "raw": "123 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.51,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.255,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1727, 1727C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-123-gr-hpbt-cn-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "e66555d5b9f1460ff74b62b8d3a63b8b94c8efedf9e82e487b62b99ad7a45d7b",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1727, Bullet Type: Hollow Point Boat Tail - Closed Nose (HPBT-CN), Bullet Diameter: 0.264, Bullet Weight (Grains): 123, G1 BC: 0.510, G7 BC: 0.255, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

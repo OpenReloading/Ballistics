@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-67gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "1343",
+  "name": ".257 Cal-067gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 4.342,
+    "raw": "67 gr"
+  },
+  "length": {
+    "value": 19.05,
+    "raw": "Bullet Length is .75″"
+  },
+  "noseLength": {
+    "value": 9.52,
+    "raw": "Nose length is .3747″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.241,
+      "note": "Hammer Bullets: \"G1-BC= .241 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "Recommended min twist rate is 1-14″"
+  },
+  "note": "Recommended use: Small to Medium Game Hunting. The product page also says: \"This Stone Hammer™ is designed for the 1-14″ twist rate or faster. A great bullet for young hunters or anyone else that is recoil sensitive. With 90% weight retention and the large 2.5mm hollow point it will still be quite effective on deer and pigs and any other small to medium game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-67gr-stone-hammer/: Recommended min twist rate is 1-14″ | Bullet Length is .75″ | Nose length is .3747″ | Bullet weight is 67gr | Recommended use: Small to Medium Game Hunting | G1-BC= .241 estimated"
+      }
+    ]
+  }
+}

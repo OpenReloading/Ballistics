@@ -1,0 +1,56 @@
+{
+  "id": "hammer-366-cal-200gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869059213",
+  "name": ".366 Cal-200gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296,
+    "raw": ".366"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 29.62,
+    "raw": "Bullet length is 1.166″"
+  },
+  "noseLength": {
+    "value": 15.14,
+    "raw": "Nose length is .5959″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.284,
+      "note": "Hammer Bullets: \"g1-bc= .284 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 431.8,
+    "raw": "Required minimum twist rate is 1-17″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This Stone Hammer® was designed by request for the 9.3×57. This pure copper lead free bullet will work great in the 9.3×57 as well as any of the other 9.3mm rifles out there. Perfect for small deer up through the plains game of Africa. At 200gr it will be a pleasure to shoot and kill with authority.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/366-cal-200gr-stone-hammer/: Required minimum twist rate is 1-17″ or faster | Bullet length is 1.166″ | Nose length is .5959″ | Bullet weight is 200gr | Recommended use: Big Game Hunting | g1-bc= .284 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "hammer-400-10mm-cal-150gr-jack-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869028244",
+  "name": ".400 (10mm) Cal-150gr Jack Hammer®",
+  "productLine": "Jack Hammer",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16,
+    "raw": ".400"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 gr"
+  },
+  "length": {
+    "value": 15.24,
+    "raw": "Bullet length is .600″"
+  },
+  "noseLength": {
+    "value": 6.8,
+    "raw": "Nose length is .2678″"
+  },
+  "slowestTwist": {
+    "value": 889,
+    "raw": "Required twist is 1-35″ or faster"
+  },
+  "note": "Recommended use: Personal defense / Hunting. The product page also says: \"This pure copper Jack Hammer® is designed for the very popular 10mm semi-auto handgun. It will also work well in the 40 Smith and Wesson. The Jack Hammer® is designed for deep penetration and large wound channels from the cupped nose design making it a very lethal personal protection bullet.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/400-10mm-cal-150gr-jack-hammer/: Required twist is 1-35″ or faster | Bullet length is .600″ | Nose length is .2678″ | Bullet weight is 150gr | Recommended use: Personal defense / Hunting"
+      }
+    ]
+  }
+}

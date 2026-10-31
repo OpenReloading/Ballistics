@@ -1,0 +1,61 @@
+{
+  "id": "sierra-4340",
+  "manufacturer": "sierra",
+  "productNumber": "4340",
+  "name": "6.5MM 140 GR Tipped GameKing (TGK)",
+  "caliber": "0.264",
+  "diameter": {
+    "value": 6.706,
+    "raw": "0.264 in"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.563,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.276,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 4340, 4340C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-140-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "ff86cb75ca993ef045e034337fe3be08ddf5e8fdf75fafb966b195cf1bf110ef",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 4340, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.264, Bullet Weight (Grains): 140, G1 BC: 0.563, G7 BC: 0.276, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

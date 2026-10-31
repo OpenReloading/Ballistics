@@ -1,0 +1,56 @@
+{
+  "id": "hammer-323-cal-146gr-lever-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027056",
+  "name": ".323 Cal-146gr Lever Stone Hammer®",
+  "productLine": "Lever Stone Hammer",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204,
+    "raw": ".323"
+  },
+  "mass": {
+    "value": 9.461,
+    "raw": "146 gr"
+  },
+  "length": {
+    "value": 26.67,
+    "raw": "Bullet length is 1.05″"
+  },
+  "noseLength": {
+    "value": 13.84,
+    "raw": "Nose length is .545″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.286,
+      "note": "Hammer Bullets: \"g1-bc= .286 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 393.7,
+    "raw": "Required minimum twist rate is 1-15.5″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We designed this bullet on the request of a customer looking for a bullet to use in his custom Marlin model 336 lever action chambered in 7.92×33 Kurz. After designing the bullet to the weight that our customer wanted it became very apparent this bullet would be very good in the 325 wsm and the 8mm magnum. Pushing these bullets in these cartridges to around the 3500 fps range will be very impressive on game for the normal range hunter. This one will be a very hard hitter for sure.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/323-cal-146gr-lever-stone-hammer/: Required minimum twist rate is 1-15.5″ or faster | Bullet length is 1.05″ | Nose length is .545″ | Bullet weight is 146gr | Recommended use: Big Game Hunting | g1-bc= .286 estimated"
+      }
+    ]
+  }
+}

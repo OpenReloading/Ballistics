@@ -18,4 +18,4 @@ console.log(twistPlausible(254)) // true
 
 Documentation: https://openreloading.github.io/Ballistics/docs/libraries/data/
 
-Licence: code MIT. Data records (`records/`): each entry states its licence in its `license` field; entries without one are CC BY 4.0 (see `LICENSE`).
+Licence: code MIT. Data records (`records/`): an entry with a `license` field uses that licence, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see `LICENSE`).

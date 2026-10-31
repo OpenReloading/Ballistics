@@ -1,0 +1,61 @@
+{
+  "id": "sierra-1616",
+  "manufacturer": "sierra",
+  "productNumber": "1616",
+  "name": "25 CAL 90 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.257",
+  "diameter": {
+    "value": 6.528,
+    "raw": "0.257 in"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.388,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.173,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1616, 1616C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/25-cal-90-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "3888a3ae15c67eaf7f878a40a709c8e38c8431bac3a494142d700bf9de7aee1c",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1616, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.257, Bullet Weight (Grains): 90, G1 BC: 0.388, G7 BC: 0.173, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

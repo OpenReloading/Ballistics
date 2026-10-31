@@ -1,0 +1,45 @@
+{
+  "id": "hammer-458-cal-400gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027701",
+  "name": ".458 Cal-404gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 26.179,
+    "raw": "404 gr"
+  },
+  "length": {
+    "value": 36.58,
+    "raw": "Bullet length is 1.44″"
+  },
+  "noseLength": {
+    "value": 18.81,
+    "raw": "Nose length is .7406″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.393,
+      "note": "Hammer Bullets: \"g1-bc= .393 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist rate is 1-19″ dangerous game or 1-22″ big game. Recommended use: Dangerous Game Hunting and Big Game Hunting. The product page also says: \"We designed this big bore Stone Hammer™ on the request of a customer who wanted the one gun one bullet solution for Hammering anything in the world. Here is the result. A 3mm hollow point that will open easily and produce robust heavy petals with enough weight retention to give deep penetration on the toughest of animals.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/458-cal-400gr-stone-hammer/: Minimum required twist rate is 1-19″ dangerous game or 1-22″ big game | Bullet length is 1.44″ | Nose length is .7406″ | Bullet weight is 404gr | Recommended use: Dangerous Game Hunting and Big Game Hunting | g1-bc= .393 estimated"
+      }
+    ]
+  }
+}

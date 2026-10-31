@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-99gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "994",
+  "name": ".264 Cal-099gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 6.35,
+    "raw": "98 gr"
+  },
+  "length": {
+    "value": 29.21,
+    "raw": "Bullet length is 1.15″"
+  },
+  "noseLength": {
+    "value": 16.26,
+    "raw": "Nose length is .640″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.184,
+      "note": "Hammer Bullets: \"G7-BC= .184 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3,
+    "raw": "Required twist rate is 1-9.5″ or faster"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"These Hammer Hunter™s are designed for easy mag feeding in the 6.5 Creedmoor. These bullets combine a very good form factor to weight to give very nice flat shooting range to the Creedmoor.\" The product page also says: \"Bullet length is 1.145″\" The product name says 99 gr; the specification says 98 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-99gr-hammer-hunter/: Required twist rate is 1-9.5″ or faster | Bullet length is 1.15″ | Nose length is .640″ | Bullet weight is 98gr | Recommended use: Big game hunting | G7-BC= .184 estimated"
+      }
+    ]
+  }
+}

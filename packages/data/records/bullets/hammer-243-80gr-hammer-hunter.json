@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-80gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "270",
+  "name": ".243 Cal-080gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 5.184,
+    "raw": "80 gr"
+  },
+  "length": {
+    "value": 26.54,
+    "raw": "Bullet length is 1.045″"
+  },
+  "noseLength": {
+    "value": 14.97,
+    "raw": "Nose length is .5893″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.175,
+      "note": "Hammer Bullets: \"G7-BC=.175 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "Required minimum twist rate is 1-9.25″"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=5",
+        "retrieved": "2026-10-08",
+        "sha256": "7d0c3a6391edef573277ee6a0eabe267ab3a2e170d32d6bcf7e877775108e85c",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-80gr-hammer-hunter/: Required minimum twist rate is 1-9.25″ | Bullet length is 1.045″ | Nose length is .5893″ | Bullet weight is 80 grains | Recommended use: Big game hunting | G7-BC=.175 estimated"
+      }
+    ]
+  }
+}

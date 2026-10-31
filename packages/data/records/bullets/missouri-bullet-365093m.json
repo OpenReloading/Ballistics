@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-365093m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "365093M",
+  "name": "Makarov, 93 Grain RN",
+  "caliber": ".365",
+  "diameter": {
+    "value": 9.271,
+    "raw": ".365 Diameter"
+  },
+  "mass": {
+    "value": 6.026,
+    "raw": "93 Grain"
+  },
+  "length": {
+    "value": 10.57,
+    "raw": "Bullet OAL .416 +/-"
+  },
+  "note": "Listed as 93 Grain RN. Brinell 18. 9mm Makarov. For Spetznaz Ops.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "365093M, Makarov (https://missouribullet.com/details.php?prodId=112): .365 Diameter, 93 Grain RN, Brinell 18, Bullet OAL .416 +/-"
+      }
+    ]
+  }
+}
