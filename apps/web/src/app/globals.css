@@ -1514,6 +1514,13 @@ td.nowrap {
   width: 2.25rem;
   color: var(--fg);
   font-weight: 600;
+  text-indent: 0;
+}
+
+/* a label's second line under its first, not under the symbol */
+.prop-form:has([data-symbol]) .prop-grid label {
+  padding-inline-start: 2.25rem;
+  text-indent: -2.25rem;
 }
 
 /* the drawing's title row as a panel's (`.page-panel > .page-panel-head`) */
@@ -1693,6 +1700,31 @@ td.nowrap {
 
 .powder-label {
   font-size: var(--mantine-font-size-sm);
+}
+
+/* a phone: a ring's colours one under the other, the row labels room for their longest word, the
+   first field's placeholder left to its column head (Name, Ingredient) */
+@media screen and (max-width: 22.5em) {
+  .face-colours {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.125rem;
+  }
+
+  .powder-row {
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  }
+
+  .powder-row + .powder-row {
+    margin-top: 0.25rem;
+  }
+
+  .powder-ingredient {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) repeat(2, minmax(0, 0.75fr)) 1.75rem;
+  }
+
+  :is(.face-event, .powder-ingredient) > :first-child input::placeholder {
+    color: transparent;
+  }
 }
 
 .powder-designer .side-grid > button {
@@ -6721,6 +6753,11 @@ main .record-sources .sources tbody th {
     content: attr(data-label) ": ";
     font-weight: 600;
   }
+
+  /* a source without this value: no bare label */
+  .record-sources .sources td[data-label]:empty {
+    display: none;
+  }
 }
 
 .source-title {
@@ -6867,6 +6904,15 @@ main .record-sources .sources tbody th {
 
 .face-table tr:has(.stage-face) > * {
   vertical-align: middle;
+}
+
+/* phone: a long value (the caliber classes, a combined number) wraps, so the discipline's values
+   and the federation's discipline names stay in view */
+@media screen and (max-width: 47.99em) {
+  :is(.discipline-record, .federation-record)
+    :is(.field-table td, .face-table td:not(.num, .nowrap)) {
+    white-space: normal;
+  }
 }
 
 /* the discipline and federation records: linked facts under the values table, a face drawn small
@@ -7106,6 +7152,11 @@ main :is(.symbol-table, .coefficient-table, .record-sources .sources) {
 
   :is(.record-chart, .bullet-record) .field-table td:not(.field-unit-cell, .num) {
     white-space: normal;
+  }
+
+  /* narrow cell padding, so the unit column fits at 320 px */
+  :is(.record-chart, .bullet-record) .field-table :is(th, td) {
+    padding-inline: 0.25rem;
   }
 
   /* a fitted value breaks before its percent (no-break spaces inside) */
@@ -7560,6 +7611,17 @@ main .field-table tr.field-group > th {
 .fact-lead dd {
   font-size: var(--mantine-font-size-xl);
   line-height: 1.25;
+}
+
+/* a phone: a value longer than the window (a German method) wraps inside its card */
+@media screen and (max-width: 47.99em) {
+  .fact {
+    white-space: normal;
+  }
+
+  .fact dd {
+    overflow-wrap: anywhere;
+  }
 }
 
 .fact dt .fact-unit {
@@ -8380,9 +8442,13 @@ main .field-table tr.field-group > th {
   padding: 0.5rem 0.75rem;
 }
 
-/* one line: the file name gives way first */
-.session-import .drop-zone > * {
+/* one line: the file name gives way first, a hint longer than the box wraps */
+.session-import .drop-zone > :not(.drop-zone-hint) {
   white-space: nowrap;
+}
+
+.session-import .drop-zone-hint {
+  min-width: 0;
 }
 
 /* a phone: the hint takes a line under the label */
@@ -9441,6 +9507,17 @@ main .session-shots th:nth-child(-n + 2) {
   flex: 1 1 auto;
 }
 
+/* a side panel's column holds its rows: longer (German) labels and buttons wrap inside it, the
+   buttons of a row go onto a second line, a head's button below the head */
+.target-side .prop-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.target-side .prop-grid .row-buttons,
+.target-side .section-head {
+  flex-wrap: wrap;
+}
+
 .target-side .section-head .prop-head,
 .target-side .section-head + .shots-body {
   margin-top: 0.5rem;
@@ -9500,7 +9577,7 @@ main .session-shots th:nth-child(-n + 2) {
   background: var(--surface);
 }
 
-:is(.shot-table, .aim-fields) input[type="number"] {
+:is(.shot-table, .aim-fields) input:is([type="number"], [type="text"]) {
   width: 5rem;
   height: 1.375rem;
   padding: 0 0.25rem;
@@ -9541,8 +9618,8 @@ main .session-shots th:nth-child(-n + 2) {
   min-width: 0;
 }
 
-/* the point of aim's x and y share the value column */
-.prop-grid .aim-fields input[type="number"] {
+/* the point of aim's x and y share the value column; a decimal comma makes them text fields */
+.prop-grid .aim-fields input:is([type="number"], [type="text"]) {
   flex: 1 1 0;
   width: auto;
   min-width: 0;
@@ -9687,7 +9764,7 @@ main .session-shots th:nth-child(-n + 2) {
     height: 2.75rem;
   }
 
-  :is(.shot-table, .aim-fields) input[type="number"] {
+  :is(.shot-table, .aim-fields) input:is([type="number"], [type="text"]) {
     height: 2.75rem;
     font-size: 16px;
   }
@@ -10740,6 +10817,26 @@ main .page-bar h1 {
 
 .directory-table :is(th, td).filler {
   padding: 0;
+}
+
+/* a tablet's list box: the columns of a wide box and the burn rate's scale give their room to the
+   name, which a 768 px window left none; a print keeps every column */
+@media screen {
+  @container (max-width: 63.99rem) {
+    .directory-table .wide-only {
+      display: none;
+    }
+  }
+
+  @container (max-width: 59.99rem) {
+    .directory-table {
+      --rate-scale: 0px;
+    }
+
+    .directory-table :is(.rate-ticks, .rate-cell svg) {
+      display: none;
+    }
+  }
 }
 
 @container (min-width: 90rem) {

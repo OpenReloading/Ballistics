@@ -20,7 +20,8 @@ import {
   runInterior,
   taskTimeoutMs,
 } from '@open-reloading/api/compute'
-import { type Powder, primerCompounds, primerSizes } from '@open-reloading/schema'
+import { type Powder, primerCompounds, primerSizes, recordIdRegex } from '@open-reloading/schema'
+import { maxRecordIdLength } from './compare-ids.ts'
 import { dataFile } from './data-file.ts'
 
 const listKinds = new Set([
@@ -37,7 +38,6 @@ const listKinds = new Set([
   'caliber-classes',
 ])
 const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases', 'primers'])
-const recordId = /^[a-z0-9]+(-[a-z0-9]+)*$/
 /** A compute body above this many bytes is refused with 413: an interior body is under 1 KiB, so the cap keeps a pasted file out of the Worker. */
 const maxBody = 64 * 1024
 
@@ -114,7 +114,8 @@ async function list(kind: string, query: URLSearchParams) {
   const compoundOf = primerCompounds.options.find((o) => o === compound)
   const text = (v: string | undefined, max: number) =>
     v === undefined || (v.length >= 1 && v.length <= max && !v.includes('\0'))
-  const id = (v: string | undefined) => v === undefined || (v.length <= 100 && recordId.test(v))
+  const id = (v: string | undefined) =>
+    v === undefined || (v.length <= maxRecordIdLength && recordIdRegex.test(v))
   const known = [...(filters[kind] ?? []), ...(paged ? ['q', 'limit', 'offset'] : [])]
   if (
     [...query.keys()].some((k) => !known.includes(k)) ||
@@ -165,7 +166,8 @@ async function get(path: string) {
   if (kind === undefined || !listKinds.has(kind) || rest.length > 0)
     return refusal(404, 'Not Found', `${path} not found`)
   if (id === undefined || id === '') return list(kind, url.searchParams)
-  if (!recordId.test(id)) return refusal(400, 'Bad Request', 'params/id must match the record id')
+  if (!recordIdRegex.test(id))
+    return refusal(400, 'Bad Request', 'params/id must match the record id')
   const record = await dataFile(`${kind}/${id}`)
   return record === undefined
     ? refusal(404, 'Not Found', `${kind.replace(/s$/, '')} ${id} not found`)

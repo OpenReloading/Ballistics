@@ -2,12 +2,20 @@ import { MantineProvider } from '@mantine/core'
 import { recordFigures } from '@open-reloading/drawing/cartridge'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import de from '../src/i18n/de.json'
+import { type Translator, translator } from '../src/i18n/translate.ts'
 import { combinedRows } from '../src/lib/cartridge-record.ts'
 import { drawable } from '../src/lib/cartridge-sheet.ts'
 import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
 
+const shown = vi.hoisted(() => ({ t: undefined as Translator | undefined }))
+// a server render reads English from the hook, so a test picks the language here
+vi.mock('../src/i18n/language.ts', async (original) => ({
+  ...(await original<typeof import('../src/i18n/language.ts')>()),
+  useTranslation: () => shown.t ?? translator(),
+}))
 vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 const { CartridgeDrawing } = await import('../src/components/cartridge-drawing.tsx')
 
@@ -257,5 +265,39 @@ describe('CartridgeDrawing', () => {
     expect(long.scale).toBe(short.scale)
     expect(short.length).toBe(35 + 3)
     expect(short.length / long.length).toBeCloseTo((35 + 3) / (88.7 + 3), 2)
+  })
+
+  it('describes the drawing in German under the German setting', () => {
+    shown.t = translator(de, 'de')
+    try {
+      const { descs } = render('cip-308-win-2008-09-23', 'chamber')
+      expect(descs[0]).toMatch(
+        /^Technische Zeichnung, Vollschnitt um die Achse\. Ansicht Patronenlager:/,
+      )
+      expect(descs[0]).not.toMatch(/\b(view|diameter|derived|steel band)\b/)
+    } finally {
+      shown.t = undefined
+    }
+  })
+
+  it('words the region differences and a data conflict of the combined view in German', () => {
+    const record = sheetRecord('cip-308-win-2008-09-23')
+    const values = record.values.map((v) =>
+      v.side === 'chamber' && v.symbol === 'P1' ? { ...v, value: 11.9 } : v,
+    )
+    shown.t = translator(de, 'de')
+    try {
+      const html = renderToStaticMarkup(
+        <MantineProvider>
+          <CartridgeDrawing spec={drawable({ ...record, values })} />
+        </MantineProvider>,
+      )
+      const desc = html.match(/<desc[^>]*>([^<]*)<\/desc>/)?.[1] ?? ''
+      expect(desc).toContain('nominelle Mindestdifferenz der veröffentlichten Maße')
+      expect(desc).toContain('Datenkonflikt zwischen')
+      expect(desc).not.toMatch(/nominal minimum|data conflict/)
+    } finally {
+      shown.t = undefined
+    }
   })
 })

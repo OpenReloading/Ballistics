@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { showGerman } from './german.ts'
 import { pickFiles, withoutOpenPicker } from './import.ts'
 import { gotoHydrated } from './nav.ts'
 import { storeUnits } from './units.ts'
@@ -22,14 +23,14 @@ const way = (page: Page, wide: number, name: string) =>
 test('choosing a cartridge on the start card leaves the focus in the load form', async ({
   page,
 }) => {
-  await gotoHydrated(page, '/workbench')
+  await gotoHydrated(page, '/workbench/')
   await page.getByRole('button', { name: '308 Win.' }).first().click()
   await expect(loadForm(page)).toBeVisible()
   await expect(loadForm(page).locator(':focus')).toHaveCount(1)
 })
 
 test('the example load on the start card leaves the focus in the load form', async ({ page }) => {
-  await gotoHydrated(page, '/workbench')
+  await gotoHydrated(page, '/workbench/')
   await page.getByRole('button', { name: 'Try the example load' }).click()
   await expect(loadForm(page)).toBeVisible()
   await expect(loadForm(page).locator(':focus')).toHaveCount(1)
@@ -43,7 +44,7 @@ test('a saved load that opens by itself on arrival leaves the focus on the page'
     ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
       (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
   })
-  await gotoHydrated(page, '/workbench')
+  await gotoHydrated(page, '/workbench/')
   await applyExampleLoad(page)
   await (await barButton(page, 'Save')).click()
   await expect(page.locator('.file-state')).toContainText('Saved')
@@ -60,7 +61,7 @@ test('Escape closes Saved loads opened from the load switcher and the focus goes
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await gotoHydrated(page, '/workbench')
+  await gotoHydrated(page, '/workbench/')
   const switcher = page.getByRole('button', { name: /switch load/ })
   await switcher.click()
   await page.getByRole('button', { name: 'Saved loads' }).click()
@@ -75,7 +76,7 @@ for (const width of widths) {
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 })
-    await gotoHydrated(page, '/workbench')
+    await gotoHydrated(page, '/workbench/')
     await (await barButton(page, 'Open')).click()
     await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
     await expect(page.getByRole('dialog', { name: 'Saved loads' })).toBeVisible()
@@ -111,3 +112,19 @@ for (const width of widths) {
     await expect(way(page, 1280, 'From a photo')).toBeFocused()
   })
 }
+
+test('in German, Escape closes Saved loads and the focus goes back to Page actions at 390 px', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 })
+  await gotoHydrated(page, '/workbench/')
+  await showGerman(page)
+  await (await barButton(page, 'Öffnen', 'Seitenaktionen')).click()
+  await page.getByRole('menuitem', { name: /^Gespeicherte Laborierungen/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Gespeicherte Laborierungen' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'Gespeicherte Laborierungen' })).toBeHidden()
+  await expect(
+    page.getByRole('button', { name: 'Seitenaktionen', exact: true }).locator('visible=true'),
+  ).toBeFocused()
+})

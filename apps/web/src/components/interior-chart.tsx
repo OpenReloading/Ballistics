@@ -345,7 +345,7 @@ export function InteriorChart({
           {chartRows(r.points).map((s) => (
             <tr key={s.time}>
               {values(s).map(([k, text]) => (
-                <td key={k} className="num">
+                <td key={k} data-label={k} className="num">
                   {text}
                 </td>
               ))}
@@ -360,9 +360,9 @@ export function InteriorChart({
         >
           {playbackEvents(r, t).map((e) => (
             <tr key={e.key}>
-              <td>{e.label}</td>
+              <td data-label={t('Event')}>{e.label}</td>
               {values(at(e.time)).map(([k, text]) => (
-                <td key={k} className="num">
+                <td key={k} data-label={k} className="num">
                   {text}
                 </td>
               ))}
@@ -390,9 +390,13 @@ export function InteriorChart({
         >
           {energy.shown.map((term) => (
             <tr key={term.key}>
-              <td>{t(term.label)}</td>
-              <td className="num">{formatQuantity('energy', system, term.value)}</td>
-              <td className="num">{percentText(term.share)}</td>
+              <td data-label={t('Term')}>{t(term.label)}</td>
+              <td data-label={t('Energy ({unit})', { unit: energyUnit })} className="num">
+                {formatQuantity('energy', system, term.value)}
+              </td>
+              <td data-label={t('Share')} className="num">
+                {percentText(term.share)}
+              </td>
             </tr>
           ))}
         </PanelTable>

@@ -229,9 +229,10 @@ const blank = (
   load: string | undefined,
   marker: number | undefined,
   distance: number,
+  t: Translator['t'],
   step?: number | undefined,
 ): TargetSheet => {
-  const g = newGroup({ references: [], targetRotation: 0, groups: [] }, 'g1', distance)
+  const g = newGroup({ references: [], targetRotation: 0, groups: [] }, 'g1', distance, t)
   return {
     references: [],
     targetRotation: 0,
@@ -546,7 +547,7 @@ type Ed = {
   setH: Dispatch<SetStateAction<History<TargetSheet>>>
   overlays: Record<Overlay, boolean>
   toggleOverlay: (o: Overlay, on: boolean) => void
-  heading: string | undefined
+  heading: Message | undefined
   exportMenu: ReactNode
   expand: { expanded: boolean; onChange: (expanded: boolean) => void } | undefined
   toolbarKeys: (e: KeyboardEvent<HTMLDivElement>) => void
@@ -863,6 +864,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
                 sheet.groups.map((x) => x.id),
               ),
               group?.distance ?? newDistance.current,
+              t,
             )
             const linked = charges && step !== undefined ? { ...g, ladderStep: step } : g
             apply((s) => ({ ...s, groups: [...s.groups, linked] }))
@@ -2437,6 +2439,7 @@ function SheetPageBar({ ed }: { ed: Ed }) {
   return (
     <PageBar
       title={heading}
+      translated
       actions={
         <>
           {/* from the sheet's id on: the menu never runs without autosave; a placeholder keeps
@@ -2676,7 +2679,7 @@ export function TargetEditor({
   /** The workbench's load and its simulated velocities, for the print sheet. */
   summary?: LoadSummary | undefined
   /** The page heading (`/groups`): shown with the File menu of the open sheet beside it. */
-  heading?: string | undefined
+  heading?: Message | undefined
   /** Counts the page's File menu writes to the browser store (workbench Import, Replace). */
   stored?: number
 }) {
@@ -2688,7 +2691,7 @@ export function TargetEditor({
   const [sheets, setSheets] = useState<TargetSheetRecord[]>([])
   // the id is set on mount (`create` or `open`): no clock or random value during the prerender
   const [meta, setMeta] = useState({ id: '', name: t('Target sheet {n}', { n: 1 }) })
-  const [h, setH] = useState(() => historyOf(blank(load, bulletDiameter, newDistance.current)))
+  const [h, setH] = useState(() => historyOf(blank(load, bulletDiameter, newDistance.current, t)))
   const sheet = h.present
   // the Report issue boxes of /groups, not of the workbench tab
   useSheetReport(heading === undefined ? undefined : sheet)
@@ -2928,8 +2931,10 @@ export function TargetEditor({
   /** A new sheet; `face`: the id of the target face its first group is scored on. */
   function create(list = sheets, face?: GroupFace) {
     flush()
-    // the units may be read after the mount that calls this: the ref has the current ones
-    const empty = blank(load, bulletDiameter, newDistance.current, charges ? step : undefined)
+    // the units and the language may be read after the mount that calls this: the refs have the
+    // current ones
+    const t = tNow.current
+    const empty = blank(load, bulletDiameter, newDistance.current, t, charges ? step : undefined)
     const data = face
       ? {
           ...empty,
@@ -2949,6 +2954,22 @@ export function TargetEditor({
     setPending([])
     setPhoto(undefined)
   }
+
+  // a new sheet named before its language loaded takes the names of the language shown, until it
+  // is edited or stored
+  // biome-ignore lint/correctness/useExhaustiveDependencies: on a language change only
+  useEffect(() => {
+    const o = opened.current
+    if (stored || !meta.id || sheet !== o.data || meta.name !== o.name) return
+    const name = t('Target sheet {n}', { n: sheets.length + 1 })
+    const data = {
+      ...sheet,
+      groups: sheet.groups.map((g, i) => ({ ...g, name: t('Group {n}', { n: i + 1 }) })),
+    }
+    setMeta((m) => ({ ...m, name }))
+    opened.current = { data, name }
+    setH(historyOf(data))
+  }, [t])
 
   /** The sheets of this browser (of the load in the workbench), the newest first. */
   const sheetsOf = (records: UserRecord[]) =>

@@ -94,9 +94,12 @@ const targetFaceFields = z.object({
         /**
          * `touch`: the hole counts a ring when it touches the ring line. `centre`: only when the
          * centre of the hole lies on its line or inside it (black-powder events); the hole size is
-         * ignored. Absent: the rule book does not state it; scored as `touch`.
+         * ignored. `outward`: only when the hole edge furthest from the centre stays inside the
+         * outer edge of the ring line; a hole touching the outside of the line takes the lower
+         * value (outward gauging, circular rings and whole rings only). Absent: the rule book does
+         * not state it; scored as `touch`.
          */
-        scoring: z.enum(['touch', 'centre']).optional(),
+        scoring: z.enum(['touch', 'centre', 'outward']).optional(),
         /** Id of the federation whose rule book lists the event, where it is not the face's. */
         federation: recordId.optional(),
         /** Section of that federation's rule book that lists the event. */
@@ -197,12 +200,16 @@ function checkStadium(f: z.infer<typeof targetFaceFields>, issue: Issue) {
     issue(['blackHeight'], 'a stadium is at least as high as it is wide')
 }
 
-/** Event ids are unique within the face. */
+/** Event ids are unique within the face; outward gauging needs circular rings in whole rings. */
 function checkEvents(f: z.infer<typeof targetFaceFields>, issue: Issue) {
   const seen = new Set<string>()
+  const circular = f.rings.every((r) => !r.height && (r.shape ?? 'circle') === 'circle')
   f.events.forEach((e, i) => {
     if (seen.has(e.id)) issue(['events', i, 'id'], 'must be unique within the face')
     seen.add(e.id)
+    if (e.scoring !== 'outward') return
+    if (!circular) issue(['events', i, 'scoring'], 'outward gauging needs circular rings')
+    if (f.decimal) issue(['events', i, 'scoring'], 'outward gauging scores whole rings only')
   })
 }
 

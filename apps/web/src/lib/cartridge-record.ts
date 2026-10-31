@@ -1,5 +1,10 @@
 import { greek } from '@open-reloading/drawing'
-import { conflictWording, type Figure, shotshellVariants } from '@open-reloading/drawing/cartridge'
+import {
+  conflictWording,
+  differenceWording,
+  type Figure,
+  shotshellVariants,
+} from '@open-reloading/drawing/cartridge'
 import { type SpecValue, toSi } from '@open-reloading/schema'
 import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
@@ -291,7 +296,11 @@ export const clearanceMeaning = msg('chamber minimum minus cartridge maximum')
 const conflictMessage = msg(
   'data conflict between published cartridge maximum and chamber minimum (check source)',
 )
-const conflictText = (t: Translate) =>
+const differenceMessage = msg('nominal minimum difference of published dimensions')
+/** The caption wording of a region difference, translated the same way. */
+export const differenceText = (t: Translate) =>
+  differenceWording === differenceMessage ? t(differenceMessage) : differenceWording
+export const conflictText = (t: Translate) =>
   conflictWording === conflictMessage ? t(conflictMessage) : conflictWording
 
 /** A clearance line: "Clearance: {meaning}". */

@@ -1,9 +1,7 @@
 import { SegmentedControl } from '@mantine/core'
 import { angleText, face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
-  conflictWording,
   type Drawn,
-  differenceWording,
   type Figure,
   type FigureModel,
   figureModel,
@@ -21,6 +19,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
+import { conflictText, differenceText } from '../lib/cartridge-record.ts'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { nth } from '../lib/nth.ts'
 import { controlSize } from '../lib/theme.ts'
@@ -301,6 +300,7 @@ const scaleSentence = (k: number, t: Translator['t']) =>
 function described(
   d: { symbol: string; value: number; derived?: true; stored?: SpecValue },
   unit: LengthUnit,
+  t: Translator['t'],
   angle = false,
 ) {
   const [symbol, value = '', ...rest] = d.stored
@@ -309,12 +309,12 @@ function described(
   const length = (text: string) =>
     angle || unit === 'mm' ? text : text.replace(/\d+(\.\d+)?/g, (x) => lengthText(Number(x), unit))
   const shown = angle ? angleText(Number(value)) : `${length(value)} ${unit}`
-  const extra = [...rest.map(length), ...(d.derived ? ['derived'] : [])]
+  const extra = [...rest.map(length), ...(d.derived ? [t('derived')] : [])]
   return `${symbol} ${shown}${extra.length ? ` (${extra.join(' ')})` : ''}`
 }
 
 /** The region values in words: "head R1 0.02 mm; ...", the conflicts apart. */
-function regionWords(list: Region[], unit: LengthUnit) {
+function regionWords(list: Region[], unit: LengthUnit, t: Translator['t']) {
   const all = list.flatMap(({ name, values }) => values.map((v) => ({ name, ...v })))
   const words = (want: (x: number) => boolean) =>
     list
@@ -328,28 +328,51 @@ function regionWords(list: Region[], unit: LengthUnit) {
       })
       .join('; ')
   const conflicts = all.some((v) => v.value < 0)
-  return `${differenceWording} (chamber minimum minus cartridge maximum): ${words((x) => x >= 0) || 'none'}${conflicts ? `; ${conflictWording}: ${words((x) => x < 0)}` : ''}`
+  const own = t('{difference} (chamber minimum minus cartridge maximum): {values}', {
+    difference: differenceText(t),
+    values: words((x) => x >= 0) || t('none'),
+  })
+  return `${own}${conflicts ? `; ${conflictText(t)}: ${words((x) => x < 0)}` : ''}`
 }
 
 /** One description of every view of a figure. */
-function description(drawn: Drawn, list: Region[], unit: LengthUnit) {
+function description(drawn: Drawn, list: Region[], unit: LengthUnit, t: Translator['t']) {
   const sides = drawn.map(({ side, p }) => {
     const { dimensions, angles, radii } = p.annotation
     const values = [
-      ...dimensions.map((d) => `${d.kind === 'diameter' ? 'diameter ' : ''}${described(d, unit)}`),
+      ...dimensions.map((d) =>
+        d.kind === 'diameter'
+          ? t('diameter {value}', { value: described(d, unit, t) })
+          : described(d, unit, t),
+      ),
       ...(p.derivedE === undefined
         ? []
-        : [`e ${lengthText(p.derivedE, unit)} ${unit} (derived, not dimensioned)`]),
-      ...angles.map((a) => described(a, unit, true)),
-      ...radii.map((r) => described(r, unit)),
-    ]
-    return `${sideName[side]} view: ${side === 'chamber' ? `the chamber in a marked ${lengthText(face.steelBandWidth, unit)} ${unit} steel band; ` : ''}${values.join(', ')}.`
+        : [
+            t('e {value} (derived, not dimensioned)', {
+              value: `${lengthText(p.derivedE, unit)} ${unit}`,
+            }),
+          ]),
+      ...angles.map((a) => described(a, unit, t, true)),
+      ...radii.map((r) => described(r, unit, t)),
+    ].join(', ')
+    return side === 'chamber'
+      ? t('Chamber view: the chamber in a marked {width} steel band; {values}.', {
+          width: `${lengthText(face.steelBandWidth, unit)} ${unit}`,
+          values,
+        })
+      : t('Cartridge view: {values}.', { values })
   })
   const combined =
-    drawn.length === 2
-      ? ` Combined view: both outlines and the gap between them, no dimensions${list.length ? `; ${regionWords(list, unit)}` : ''}.`
-      : ''
-  return `Technical drawing, full section about the axis. ${sides.join(' ')}${combined}`
+    drawn.length !== 2
+      ? []
+      : list.length
+        ? [
+            t('Combined view: both outlines and the gap between them, no dimensions; {regions}.', {
+              regions: regionWords(list, unit, t),
+            }),
+          ]
+        : [t('Combined view: both outlines and the gap between them, no dimensions.')]
+  return [t('Technical drawing, full section about the axis.'), ...sides, ...combined].join(' ')
 }
 
 /** Why the views without their side are disabled: the closed front, or the side's missing values. */
@@ -556,7 +579,7 @@ function Outline({
 }) {
   const { t } = useTranslation()
   const title = `${heading ?? t('Outline, {name}', { name: `${spec.standard} ${spec.name}` })}${variant === undefined ? '' : ` (${variant})`}`
-  const desc = description(drawn, differences ?? [], unit)
+  const desc = description(drawn, differences ?? [], unit, t)
   // the record's Combined view: no switch of its own and no print drawing
   const combined = print === undefined
   const switchable = differences !== undefined && !combined

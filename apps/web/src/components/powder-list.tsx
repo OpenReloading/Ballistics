@@ -109,7 +109,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       help: msg(
         'Dynamic vivacity averaged over burnt fraction 0.1 to 0.9 with its interval (plus and minus 2 standard uncertainties), on a log scale: model output from fitted M3 parameters, not manufacturer data. Empty without fitted parameters.',
       ),
-      width: `calc(${scaleWidth}px + 11rem)`,
+      width: `calc(var(--rate-scale, ${scaleWidth}px) + 11rem)`,
       head: <RateTicks domain={domain} />,
       value: (r) => r.meanVivacity,
       cell: (r) =>

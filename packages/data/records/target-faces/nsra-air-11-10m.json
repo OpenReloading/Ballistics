@@ -1,0 +1,115 @@
+{
+  "id": "nsra-air-11-10m",
+  "name": "AIR 11 air rifle, 10 metres",
+  "federation": "nsra",
+  "rings": [
+    {
+      "value": 1,
+      "diameter": {
+        "value": 37.6
+      }
+    },
+    {
+      "value": 2,
+      "diameter": {
+        "value": 34.4
+      }
+    },
+    {
+      "value": 3,
+      "diameter": {
+        "value": 31.2
+      }
+    },
+    {
+      "value": 4,
+      "diameter": {
+        "value": 28.0
+      }
+    },
+    {
+      "value": 5,
+      "diameter": {
+        "value": 24.8
+      }
+    },
+    {
+      "value": 6,
+      "diameter": {
+        "value": 21.6
+      }
+    },
+    {
+      "value": 7,
+      "diameter": {
+        "value": 18.4
+      }
+    },
+    {
+      "value": 8,
+      "diameter": {
+        "value": 15.2
+      }
+    },
+    {
+      "value": 9,
+      "diameter": {
+        "value": 12.0
+      }
+    },
+    {
+      "value": 10,
+      "diameter": {
+        "value": 8.8
+      }
+    }
+  ],
+  "blackDiameter": {
+    "value": 31.2
+  },
+  "events": [
+    {
+      "id": "air-rifle-10m",
+      "name": "Air rifle, 10 metres",
+      "distance": {
+        "value": 10000,
+        "raw": "10 metres"
+      },
+      "gauge": {
+        "value": 5.6
+      },
+      "scoring": "outward",
+      "category": "air-rifle"
+    }
+  ],
+  "note": "The book prints one size per ring in mm for edge touching, a centre dot of 1.00 mm that is no scoring ring, and the aiming mark as the black area; it states no ring colours and no inner ten.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix A, PDF p. 30",
+        "fields": ["name", "rings", "blackDiameter"],
+        "note": "The book lists the rings without values from the innermost, the 1st scoring ring, outward; the 1st scoring ring is the 10 and each ring outward one lower, as the short-range 25 metres column, whose last printed ring is a 6 (Rule 5.1.7.1), shows."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix A, PDF p. 30",
+        "fields": ["events.name", "events.distance", "events.category", "events.gauge"],
+        "note": "The 10 metres air rifle target, outward gauging with a 5.6 mm gauge."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Rule 5.1.7, PDF p. 8",
+        "fields": ["events.scoring"],
+        "note": "Outward gauging: the edge of the hole furthest from the centre decides; when the flange of the gauge touches the outside of the line the lower value counts, and a shot touching the outside of the lowest ring has no value."
+      },
+      {
+        "source": "nsra-rules-and-regulations-2024",
+        "page": "Appendix B, Fig. 4, PDF p. 31",
+        "fields": ["events.gauge"],
+        "note": "The 5.6 mm gauge scores outward gauging targets."
+      }
+    ]
+  }
+}

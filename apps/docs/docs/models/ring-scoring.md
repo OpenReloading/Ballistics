@@ -7,7 +7,7 @@ description: Ring value, tenth-ring value and inner ten of a shot on a rule-book
 
 Ring scoring gives each shot on a target:
 
-- the value of the highest ring its hole touches
+- the value of the highest ring its hole touches, or under outward gauging the highest ring it lies wholly inside
 - the tenth-ring value, where the target's rules allow it
 - whether it is an inner ten
 - the zone label of the bull it belongs to, on a target with several bulls
@@ -18,7 +18,7 @@ A target is placed on the target sheet by fitting its centre and scale to points
 
 ### Scored hole
 
-The scored hole has the radius $g$, 0 for an event that counts the hole centre (`scoring: centre`). An event with `scoring: touch`, or none where the rule book does not state the rule, counts the hole edge. $G$ is the gauge diameter of the event, else of the discipline's target mapping, where the rules fix one. $d_b$ is the bullet diameter of the load, else the marker diameter of the sheet:
+The scored hole has the radius $g$, 0 for an event that counts the hole centre (`scoring: centre`). An event with `scoring: touch`, or none where the rule book does not state the rule, counts the hole edge nearest the centre; an event with `scoring: outward` counts the edge furthest from it (below). $G$ is the gauge diameter of the event, else of the discipline's target mapping, where the rules fix one. $d_b$ is the bullet diameter of the load, else the marker diameter of the sheet:
 
 $$
 g = \begin{cases} 0 & \text{centre scoring} \\ G/2 & \text{gauge given} \\ d_b/2 & \text{otherwise} \end{cases}
@@ -58,6 +58,16 @@ For a circle the condition is $\lvert p' \rvert \le R_n + g + \varepsilon$. The 
 
 Here $\varepsilon = 10^{-12}$ m ($10^{-9}$ mm), so a hole edge on a ring line counts as touching it despite binary rounding. The shot scores the value $v_n$ of the innermost ring touched, 0 when it touches none.
 
+An event with `scoring: outward` (outward gauging) is scored by the edge of the hole furthest from the bull centre. A ring keeps its value only while that edge stays inside the outer edge of the ring line; a hole whose edge reaches the outside of the line takes the next lower value, and one reaching the outside of the outermost ring scores 0. Outward gauging needs circular rings, so with $d = \lvert p' \rvert$ ring $n$ scores when
+
+$$
+d + g \lt R_n - \varepsilon
+$$
+
+Code: `apps/web/src/lib/ring-scoring.ts`, `scoreShot` (`outward`), `scoreGroupOnFace`.
+
+A far edge within $\varepsilon$ of the outer edge of the line counts as on the line, so it takes the lower value. A record with an outward event and oval, stadium or square rings, or with `decimal: true`, is refused ([NSRA 2024](../bibliography.md#nsra-2024), Rule 5.1.7 and Appendix B, Fig. 4).
+
 ### Inner ten
 
 The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$ and $d = \lvert p' \rvert$:
@@ -89,7 +99,7 @@ $$
 R_\mathrm{last} + g \gt R_\mathrm{last-1} - R_\mathrm{last} + \varepsilon
 $$
 
-Code: `apps/web/src/lib/ring-scoring.ts`, `usesOwnTenthRule`.
+Code: `apps/web/src/lib/ring-scoring.ts`, `usesOwnTenthRule`. An outward event scores whole rings, so the flag is never raised for it.
 
 ### Group total
 
@@ -165,11 +175,12 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 ## Limits
 
 - Tenth-ring values need circular rings: a record with `decimal: true` and oval, stadium or square rings is refused, and an oval inner ten counts only by touch.
-- Fitting a target to ring marks needs one bull and circular rings. The photo target search skips the DSU stadium targets and the NRA targets, several of whose rings share the ratios of targets it searches, and the NSRA 1989 long-range 100 yards target, whose aiming mark lies between two rings (`photoSearch: false`), the user picks one from the target list. On another target the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
+- Fitting a target to ring marks needs one bull and circular rings. The photo target search skips the DSU stadium targets, the NRA targets and the NSRA 1989 short-range 25 and 20 yards targets, several of whose rings share the ratios of targets it searches, and the NSRA 1989 long-range 100 yards and short-range 15 yards targets, whose aiming marks lie between two rings (`photoSearch: false`), the user picks one from the target list. On another target the marks are refused and the group shows the error. A group without marks is placed by its point of aim, or the sheet origin without one; with several bulls that point is taken as the sheet centre the bull positions are measured from, so a group aimed at one bull is offset by that bull's position.
 - Zones with polygon outlines and targets that are hit or miss (symbols, plates) are not scored.
 - The drawing of a target shows one bull, draws a square ring as a square but its black area and inner ten as ovals, a stadium ring, its black area and inner ten as stadiums, and the ring overlay on the photo draws every ring as a circle.
 - Gauges are recorded only where the rule book gives one diameter for the event. Other events score with the bullet diameter, else the marker diameter.
 - Excluded shots are scored and shown but not counted in the totals.
+- The NSRA 1989 short-range 25 metres target is left out: its last printed ring is a 6, and a shot outside it but inside or touching the aiming mark scores 5 or 4 (NSRA Rule 5.1.7.1), which is not modelled.
 
 ## Sources
 
@@ -180,7 +191,7 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 - [DSU 2018](../bibliography.md#dsu-2018): the oval-ring targets b2 to b5 and b5 Präzision, Kapitel 1 (Seiten 12 to 16, PDF pp. 14 to 18), touch rule, Kapitel 1 (Seite 27), hole centre for black powder, Kapitel 4 (Besondere Auswertungsregeln, PDF p. 126).
 - [KNSA 2026](../bibliography.md#knsa-2026): scoring and gauges by the ISSF rules, Deel IV artikelen 8.5.2, 12.1 and 12.4 (PDF pp. 87 to 88), the Woerden target in artikel 3.3 (PDF pp. 78 to 79).
 - [NRA 2026](../bibliography.md#nra-2026): touch rule and X ring, Rule 14.3 (p. 48), targets in Section 4 (pp. 14 to 16).
-- [NSRA 2024](../bibliography.md#nsra-2024): touch rule for inward gauging and X ring, Rules 5.1.6 and 5.1.9 (PDF p. 8), targets in Appendix A (PDF pp. 29 to 30), gauges in Appendix B (PDF p. 31).
+- [NSRA 2024](../bibliography.md#nsra-2024): touch rule for inward gauging and X ring, Rules 5.1.6 and 5.1.9, the far hole edge for outward gauging, Rules 5.1.7 and 5.1.7.1 (PDF p. 8), targets in Appendix A (PDF pp. 29 to 30), gauges and the use of the 5.6 mm gauge on outward gauging targets in Appendix B, Fig. 4 (PDF p. 31).
 - [ÖSB 2025](../bibliography.md#oesb-2025): scoring by the ISSF rules, 3.1.6 (p. 4), the national 100 m target in 7.1.7.3 (p. 15).
 - [VdRBw](../bibliography.md#vdrbw): touch rule, rule 519, targets in Kapitel 8 to 10.
 - [BDS 2025](../bibliography.md#bds-2025): targets Z1 to Z21 and Anhang 1, no scoring rule stated.

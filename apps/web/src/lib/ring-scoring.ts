@@ -105,21 +105,25 @@ function nearestBull(face: TargetFace, shot: Point): { centre: Point; zone?: str
 
 /**
  * Score of a hole of diameter `hole` (m) centred at `shot` (m from the face centre): the bull
- * nearest to the shot, then the highest ring whose outer edge the hole touches, tenths of that
- * ring's width counted inward from the touching position, and the inner ten by the face's rule.
+ * nearest to the shot, then the highest ring whose outer edge the hole touches (`outward`: the
+ * highest circular ring the whole hole lies inside, its far edge short of the outer edge of the
+ * line), tenths of that ring's width counted inward from the touching position, and the inner ten
+ * by the face's rule.
  */
-export function scoreShot(face: TargetFace, shot: Point, hole: number): RingScore {
+export function scoreShot(face: TargetFace, shot: Point, hole: number, outward = false): RingScore {
   const { centre, zone } = nearestBull(face, shot)
-  const score = scoreOnBull(face, { x: shot.x - centre.x, y: shot.y - centre.y }, hole)
+  const score = scoreOnBull(face, { x: shot.x - centre.x, y: shot.y - centre.y }, hole, outward)
   return zone ? { ...score, zone } : score
 }
 
 /** `scoreShot` for one bull: `shot` in m from its centre. */
-function scoreOnBull(face: TargetFace, shot: Point, hole: number): RingScore {
+function scoreOnBull(face: TargetFace, shot: Point, hole: number, outward: boolean): RingScore {
   const d = Math.hypot(shot.x, shot.y)
   const g = hole / 2
   const rings = face.rings
-  const i = rings.findLastIndex((r) => touches(r, shot, g))
+  const i = rings.findLastIndex((r) =>
+    outward ? d + g < radius(r.diameter) - touch : touches(r, shot, g),
+  )
   if (i < 0) return { value: 0, ...(face.decimal && { decimal: 0 }), innerTen: false }
   const ring = nth(rings, i)
   const value = ring.value
@@ -142,8 +146,13 @@ function scoreOnBull(face: TargetFace, shot: Point, hole: number): RingScore {
 }
 
 /** Scores, total, tenth-ring total and inner-ten count of a group's shots. */
-export function scoreGroup(face: TargetFace, shots: readonly Point[], hole: number): GroupScore {
-  const scores = shots.map((s) => scoreShot(face, s, hole))
+export function scoreGroup(
+  face: TargetFace,
+  shots: readonly Point[],
+  hole: number,
+  outward = false,
+): GroupScore {
+  const scores = shots.map((s) => scoreShot(face, s, hole, outward))
   const total = scores.reduce((sum, s) => sum + s.value, 0)
   const xCount = scores.filter((s) => s.innerTen).length
   if (!face.decimal) return { shots: scores, total, innerTenCount: xCount }
@@ -322,16 +331,19 @@ export function scoreGroupOnFace(
       }),
     }
   }
-  const shots = group.shots.map((s) => scoreShot(face, onFace(alignment, s), hole))
+  const outward = event?.scoring === 'outward'
+  const shots = group.shots.map((s) => scoreShot(face, onFace(alignment, s), hole, outward))
   const counted = scoreGroup(
     face,
     group.shots.filter((s) => !s.excluded).map((s) => onFace(alignment, s)),
     hole,
+    outward,
   )
   return {
     alignment,
     hole,
-    usesOwnTenthRule: usesOwnTenthRule(face, hole),
+    // outward gauging scores whole rings only
+    usesOwnTenthRule: !outward && usesOwnTenthRule(face, hole),
     score: { ...counted, shots },
   }
 }

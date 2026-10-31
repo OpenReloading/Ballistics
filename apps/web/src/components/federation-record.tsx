@@ -8,7 +8,7 @@ import { msg } from '../i18n/translate.ts'
 import { countryName } from '../lib/countries.ts'
 import { categoryWord } from '../lib/face-words.ts'
 import { controlSize } from '../lib/theme.ts'
-import { FieldTable } from './field-table.tsx'
+import { FieldTable, SlashBreaks } from './field-table.tsx'
 import { HomepageLink } from './homepage-link.tsx'
 import { Panel } from './panel.tsx'
 import { LinkButton } from './record-actions.tsx'
@@ -145,7 +145,7 @@ export function FederationDisciplines({
         >
           {rows.map((d) => (
             <tr key={d.id}>
-              <td>{d.number}</td>
+              <td>{d.number && <SlashBreaks text={d.number} />}</td>
               <th scope="row">
                 <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
               </th>

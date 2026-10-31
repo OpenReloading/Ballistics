@@ -25956,7 +25956,7 @@
                           },
                           "scoring": {
                             "type": "string",
-                            "enum": ["touch", "centre"]
+                            "enum": ["touch", "centre", "outward"]
                           },
                           "federation": {
                             "type": "string",

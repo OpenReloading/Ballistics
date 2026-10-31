@@ -27,7 +27,9 @@ it('parses ids: trimmed, deduplicated, at most four, only record id characters',
   expect(parseCompareIds(' , ')).toEqual({ status: 'empty' })
   expect(parseCompareIds('a,b,c,d,e')).toEqual({ status: 'tooMany', count: 5 })
   expect(parseCompareIds('a,../x,B C')).toEqual({ status: 'invalid', ids: ['../x', 'B C'] })
-  expect(parseCompareIds('x'.repeat(81))).toMatchObject({ status: 'invalid' })
+  expect(parseCompareIds('a--b,a-')).toEqual({ status: 'invalid', ids: ['a--b', 'a-'] })
+  expect(parseCompareIds('x'.repeat(90))).toEqual({ status: 'ok', ids: ['x'.repeat(90)] })
+  expect(parseCompareIds('x'.repeat(101))).toMatchObject({ status: 'invalid' })
   expect(maxComparedBullets).toBe(4)
 })
 
