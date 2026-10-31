@@ -787,6 +787,15 @@ function savedSuggestions(s: Suggestions): Suggestions {
   return rest
 }
 
+/** The run's `noCoefficient`: a powder record with a model and no temperature coefficient, at the temperature of its fit. */
+export function noCoefficientOf(powder: Powder | undefined) {
+  const i = powder?.interior
+  if (!i || powder.temperatureSensitivity) return
+  return {
+    noCoefficient: { reference: toSi('temperature', i.propellantTemperature.value) },
+  }
+}
+
 /** The followed fields with the start pressure added when `follow`. */
 const followingStart = (s: ReadonlySet<FollowKey>, follow: boolean): ReadonlySet<FollowKey> =>
   follow ? new Set([...s, 'startPressure']) : s
@@ -2206,6 +2215,7 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
+      ...noCoefficientOf(chosenPowder),
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
       volumeMeasured: volumeMeasured({

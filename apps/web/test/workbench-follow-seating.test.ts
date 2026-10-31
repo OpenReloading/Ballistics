@@ -1,7 +1,9 @@
+import type { Powder } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import {
   approximateVolumeTolerance,
   followPlan,
+  noCoefficientOf,
   seatingOwnsVolume,
 } from '../src/components/use-workbench-load.ts'
 
@@ -50,6 +52,16 @@ it('keeps the case volume default out of a seating without a volume behind the b
   // no seating: the case volume default fills the field
   expect(seatingOwnsVolume({ caseVolume: 4e-6 })).toBe(false)
   expect(seatingOwnsVolume({})).toBe(false)
+})
+
+const powder = (extra: object) =>
+  ({ id: 'p', interior: { propellantTemperature: { value: 21 } }, ...extra }) as unknown as Powder
+
+it('gives the temperature of the fit for a powder with a model and no temperature coefficient', () => {
+  expect(noCoefficientOf(powder({}))?.noCoefficient.reference).toBeCloseTo(294.15, 9)
+  expect(noCoefficientOf(powder({ temperatureSensitivity: {} }))).toBeUndefined()
+  expect(noCoefficientOf({ id: 'p' } as Powder)).toBeUndefined()
+  expect(noCoefficientOf(undefined)).toBeUndefined()
 })
 
 it('hands the interval of an approximate volume to the run while the field still holds it', () => {

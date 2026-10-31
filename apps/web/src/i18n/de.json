@@ -4014,5 +4014,7 @@
   "the COAL entered": "der eingegebenen COAL",
   "{name}, assumed": "{name}, angenommen",
   "handgun load tables, bullet construction {construction}, barrel under 300 mm; approximate, 95 % interval {low} to {high} {unit}": "Laborierungstabellen für Kurzwaffen, Geschossbauart {construction}, Lauf unter 300 mm; näherungsweise, 95-%-Intervall {low} bis {high} {unit}",
-  "rifle load tables, bullet construction {construction}, barrel 300 mm or longer; approximate, 95 % interval {low} to {high} {unit}": "Laborierungstabellen für Büchsen, Geschossbauart {construction}, Lauf ab 300 mm; näherungsweise, 95-%-Intervall {low} bis {high} {unit}"
+  "rifle load tables, bullet construction {construction}, barrel 300 mm or longer; approximate, 95 % interval {low} to {high} {unit}": "Laborierungstabellen für Büchsen, Geschossbauart {construction}, Lauf ab 300 mm; näherungsweise, 95-%-Intervall {low} bis {high} {unit}",
+  "No temperature coefficient": "Kein Temperaturkoeffizient",
+  "The run ignores the powder temperature {temperature}: the burn rate is that at {reference}, the temperature of its fit.": "Die Berechnung ignoriert die Treibladungspulvertemperatur {temperature}: Die Abbrandgeschwindigkeit gilt bei {reference}, der Temperatur ihrer Anpassung."
 }

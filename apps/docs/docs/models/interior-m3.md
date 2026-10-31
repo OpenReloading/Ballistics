@@ -225,7 +225,7 @@ Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`
 
 Without temperature sensitivities, $\tau_T = 1$.
 
-A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
+A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it. No default coefficient is assumed. When such a powder runs at a propellant temperature other than that of its record's fit, the result panel says that the run ignores the temperature for this powder (`apps/web/src/components/workbench-outcome.ts`, `resultNotes`).
 
 The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
 
