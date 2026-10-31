@@ -225,7 +225,7 @@ export function RecordSearch<T extends { id: string }>({
 
   return (
     <div className="search" data-picked={picked || undefined}>
-      <Combobox store={combobox} onOptionSubmit={submit}>
+      <Combobox store={combobox} onOptionSubmit={submit} width="max-content">
         <Combobox.Target withExpandedAttribute>
           <TextInput
             {...(size !== undefined && { size })}

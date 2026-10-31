@@ -4,6 +4,9 @@ import { useEffect, useSyncExternalStore } from 'react'
 const layouts = ['a', 'b', 'c', 'd', 'e'] as const
 export type ProtoLayout = (typeof layouts)[number]
 
+/** Layouts A and E: every field of a card visible, one row grid, the record values as read-only rows. */
+export const dense = (l: ProtoLayout | undefined) => l === 'a' || l === 'e'
+
 const search = () => window.location.search
 const never = () => () => {}
 

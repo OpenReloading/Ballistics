@@ -10,6 +10,7 @@ import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
+import { useProto } from '../lib/proto.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
@@ -90,6 +91,7 @@ export function BurnFigure() {
   const { t } = useTranslation()
   const { burn, powder, powderLabel, runMarks } = useResult()
   const short = useMediaQuery(shortFrame, false) ?? false
+  const { layout } = useProto()
   return (
     burn && (
       <section aria-labelledby="burn-rate-title" className="burn-figure">
@@ -109,7 +111,12 @@ export function BurnFigure() {
               : t('of the typed model parameters')}
           </span>
         </h3>
-        <BurnRate p={burn} powderId={powder?.id} marks={runMarks} height={short ? 140 : 104} />
+        <BurnRate
+          p={burn}
+          powderId={powder?.id}
+          marks={runMarks}
+          height={short ? (layout === 'a' ? 96 : 140) : 104}
+        />
       </section>
     )
   )
@@ -245,6 +252,7 @@ type ShownTabs = (typeof resultTabs)[number][]
 
 /** The tab row; from 62em the tabs that do not fit go into the More menu, which stays in the row. */
 function ResultTabBar({
+  top = false,
   shownTabs,
   fit,
   framed,
@@ -252,6 +260,7 @@ function ResultTabBar({
   choose,
   listRef,
 }: {
+  top?: boolean
   shownTabs: ShownTabs
   fit: number
   framed: boolean | undefined
@@ -261,6 +270,8 @@ function ResultTabBar({
 }) {
   const { t } = useTranslation()
   const moved = shownTabs.slice(fit)
+  // on a phone the page's own Results tab is beside them
+  const wide = useMediaQuery('(min-width: 62em)', false) ?? false
   return (
     <div className="result-tabbar">
       <Tabs.List ref={listRef} className="result-tablist">
@@ -272,7 +283,7 @@ function ResultTabBar({
             data-before-run={v === 'cartridge' || undefined}
             data-moved={i >= fit || undefined}
           >
-            {t(label)}
+            {t(top && wide && v === 'results' ? msg('Results') : label)}
           </Tabs.Tab>
         ))}
       </Tabs.List>
@@ -599,8 +610,11 @@ export const ResultsArea = memo(function ResultsArea() {
     setSeen((s) => (s.has(v) ? s : new Set([...s, v])))
   }
   const { framed, short, list, shownTabs, fit } = useTabFit(tab, setTab, outcome !== undefined)
+  // prototypes: the tabs open the pane, the load line, readouts and notes belong to the Results tab
+  const top = useProto().layout !== undefined
   const tabList = (
     <ResultTabBar
+      top={top}
       shownTabs={shownTabs}
       fit={fit}
       framed={framed}
@@ -618,6 +632,7 @@ export const ResultsArea = memo(function ResultsArea() {
       className="result"
       data-empty={!outcome || undefined}
       data-running={pending || undefined}
+      data-tab={top ? (short && !outcome ? 'cartridge' : tab) : undefined}
     >
       <Tabs
         // before the first run a low window shows the figure, the one panel with content
@@ -633,6 +648,7 @@ export const ResultsArea = memo(function ResultsArea() {
           )}
           {/* one line: the load and the notice; the run's time and the stale mark are in the page
               bar's status, and the status, which the readouts repeat, is for screen readers */}
+          {top && tabList}
           <RunLine ok={ok} identity={identity} status={status} echoed={echoed} />
           {/* the results list with the chosen powder's burn rate beside it; an error in their place */}
           <ResultsHead
@@ -647,7 +663,7 @@ export const ResultsArea = memo(function ResultsArea() {
           {ok && <ResultNotes ok={ok} />}
           {/* the ladder bar sits directly above the tabs and drives every tab */}
           <ShownStrip />
-          {tabList}
+          {!top && tabList}
           <ResultPanels short={short} />
         </div>
       </Tabs>

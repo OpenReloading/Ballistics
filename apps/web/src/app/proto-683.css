@@ -223,8 +223,10 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
     align-items: stretch;
   }
 
+  /* the band scrolls on its own, the results keep the rest of the window */
   .workbench.proto-e .workspace-inputs {
-    overflow-y: visible;
+    overflow-y: auto;
+    max-height: clamp(11rem, calc(100dvh - 45rem), 60rem);
   }
 
   .workbench.proto-e .panels {
@@ -243,5 +245,291 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
 
   .workbench.proto-e .workspace-results {
     position: static;
+  }
+}
+
+/* ---------- round 2: A and E ---------- */
+
+/* the cartridge search sits in the Cartridge head; primer, brass and lots are the card's last row */
+.keeping {
+  position: relative;
+}
+
+.keeping > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--field-height);
+  font-size: var(--mantine-font-size-sm);
+  cursor: pointer;
+}
+
+.keeping[open] > .keeping-fields {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 100%;
+  z-index: 30;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.25);
+}
+
+.keeping-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.375rem;
+  align-items: end;
+}
+
+.keeping-fields > :first-child,
+.keeping-fields .pinned-row-slot {
+  grid-column: 1 / -1;
+}
+
+.keeping-fields .pinned-row-slot {
+  display: grid;
+  grid-template-columns: subgrid;
+  gap: 0.375rem;
+}
+
+.workbench[class*="proto-"] .record-summary .record-row > :last-child,
+.workbench[class*="proto-"] .record-summary .record-row > :nth-child(2) {
+  color: var(--fg);
+}
+
+/* results: tabs open the pane; the load line, the readout list, the burn figure and the notes belong to
+   the Results tab, the three key figures and the ladder strip stay on every tab */
+.workbench[class*="proto-"]
+  .result:not([data-tab="results"])
+  :is(.run-line, .readout-list, .burn-figure, .result-notes, .next-steps) {
+  display: none;
+}
+
+.workbench[class*="proto-"] .result:not([data-tab="results"]) .results-head {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.workbench[class*="proto-"] .result[data-tab] .result-tabs > .workbench-centre > [role="tabpanel"] {
+  border-top: 1px solid var(--border);
+}
+
+@media screen and (min-width: 62em) {
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --field-height: 1.6875rem;
+    --field-column: 8rem;
+  }
+
+  /* one row grid in every card: a label of at least 7.5rem, one value cell that fills the row's height */
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields > *,
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .seating-slot
+    > :not(.seating-controls, .seating-values),
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .seating-slot
+    :is(.seating-controls, .seating-values)
+    > * {
+    padding-block: 0;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields > .mantine-InputWrapper-root,
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .seating-slot .mantine-InputWrapper-root,
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs :is(.record-row, .seating-row) {
+    grid-template-columns: minmax(7.5rem, 1fr) calc(var(--field-column) - 3rem) 2.625rem;
+    column-gap: 0.375rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .model-row {
+    grid-template-columns: minmax(7.5rem, 1fr) var(--field-column);
+    column-gap: 0.375rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row {
+    min-height: var(--field-height);
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > :nth-child(2):not(:last-child) {
+    padding-right: 0.375rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > :nth-child(2):last-child {
+    grid-column: 2 / -1;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > .record-unit {
+    text-align: left;
+  }
+
+  /* the value cell's whole border at rest: 3:1 against the card (WCAG 1.4.11) */
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-Input-input:where(:not([data-error])) {
+    border-color: var(--input-border);
+  }
+}
+
+@media screen and (min-width: 62em) {
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .mantine-InputWrapper-root
+    > .mantine-InputWrapper-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media screen and (min-width: 108em) {
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --field-column: 9.25rem;
+  }
+}
+
+@media screen and (min-width: 75em) {
+  /* no pinned row: the columns start at the top */
+  .workbench:is(.proto-a, .proto-e) .panels > .panel-column {
+    grid-row: 1;
+  }
+
+  .workbench.proto-a .panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .workbench.proto-a .panels > .panel-column:first-child {
+    grid-column: 1;
+  }
+
+  .workbench.proto-a .panels > .panel-column:nth-child(2) {
+    grid-column: 2;
+  }
+}
+
+/* A from 150em: the reference's three columns, cartridge and gun, bullet, powder */
+@media screen and (min-width: 150em) {
+  .workbench.proto-a .workspace-tabs {
+    grid-template-columns: 78rem minmax(0, 1fr);
+  }
+
+  .workbench.proto-a .panels {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workbench.proto-a .panels > .panel-column:nth-child(2) {
+    display: contents;
+  }
+
+  .workbench.proto-a .panels > .panel-column:nth-child(2) > [data-panel="bullet"] {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .workbench.proto-a .panels > .panel-column:nth-child(2) > [data-panel="powder"] {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+/* E at 1280 x 650: the band scrolls on its own, the results fit under it */
+@media screen and (min-width: 75em) and (max-height: 44.99em) {
+  .workbench.proto-e .run-bar {
+    display: none;
+  }
+
+  .workbench.proto-e .result[data-tab="results"] .run-line {
+    display: none;
+  }
+
+  .workbench.proto-e .result-notes {
+    --notes-height: 1.125rem;
+  }
+
+  .workbench.proto-e .results-head:not(:has(.burn-figure)) > .readouts.readout-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, 1.5rem);
+  }
+
+  .workbench.proto-e .readouts.readout-list > div {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: 0.0625rem;
+  }
+
+  .workbench.proto-e .plain-chart .echart > [role="img"] {
+    min-height: 96px;
+  }
+}
+
+/* a unit column wide enough for "gr H2O": the unit, its gap and the value's padding follow one variable */
+@media screen and (min-width: 62em) {
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --unit-col: 3.25rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .field-unit {
+    width: var(--unit-col);
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-Input-input {
+    padding-inline-end: calc(var(--unit-col) + 0.75rem);
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields > .mantine-InputWrapper-root,
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .seating-slot .mantine-InputWrapper-root,
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs :is(.record-row, .seating-row) {
+    grid-template-columns: minmax(7.5rem, 1fr) calc(
+        var(--field-column) -
+        var(--unit-col) -
+        0.375rem
+      ) var(--unit-col);
+  }
+
+  /* a flag or action (seating, record) stands between the digits and the unit */
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-Input-wrapper:has(.field-flag, .field-action)
+    .mantine-Input-input {
+    padding-inline-end: calc(var(--unit-col) + 1.75rem);
+  }
+
+  /* the ladder's count and step size keep their own narrow columns */
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .pair-row .field-unit {
+    width: 2.625rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .pair-row .ladder-steps .mantine-Input-input {
+    padding-inline-end: 0.375rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .pair-row
+    > .mantine-InputWrapper-root:last-child
+    .mantine-Input-input {
+    padding-inline-end: 2.875rem;
+  }
+}
+
+/* A: the inputs take more of a wide window, so labels keep their words */
+@media screen and (min-width: 100em) and (max-width: 149.99em) {
+  .workbench.proto-a .workspace-tabs {
+    grid-template-columns: 40vw minmax(0, 1fr);
+  }
+}
+
+@media screen and (max-width: 47.99em) {
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-Input-input:where(:not([data-error])) {
+    border-color: var(--input-border);
   }
 }

@@ -43,7 +43,7 @@ import { burnFormError, interiorFields } from '../lib/interior-input.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
-import { type ProtoLayout, useProto } from '../lib/proto.ts'
+import { dense, type ProtoLayout, useProto } from '../lib/proto.ts'
 import { constructionRows, structureText } from '../lib/record-fields.ts'
 import {
   type LadderDirection,
@@ -160,6 +160,11 @@ export const firearmMassSpec = {
  * no box: one flow in this order.
  */
 const panelColumns: InputPanel[][] = [['cartridge'], ['powder', 'bullet', 'firearm']]
+/** Prototype A: the reference's grouping, cartridge and gun, then powder and bullet. */
+const panelColumnsA: InputPanel[][] = [
+  ['cartridge', 'firearm'],
+  ['powder', 'bullet'],
+]
 
 /** The desktop frame of a window lower than 45em (`panelColumns`). */
 export const shortFrame = '(min-width: 75em) and (max-height: 44.99em)'
@@ -544,7 +549,7 @@ export function InputCards() {
       ) : (
         <div className="panels">
           <LoadRow />
-          {panelColumns.map((column, i) => (
+          {(layout === 'a' ? panelColumnsA : panelColumns).map((column, i) => (
             <div key={column[0]} className="panel-column">
               {column.map((p) => (
                 <Paper
@@ -669,7 +674,7 @@ function PanelHead({
       <h2 id={`panel-${panel}`} className="panel-title">
         {t(panelTitles[panel])}
       </h2>
-      {(panel !== 'cartridge' || cartridgePicker) && <CardPicker panel={panel} />}
+      {(panel !== 'cartridge' || cartridgePicker || dense(layout)) && <CardPicker panel={panel} />}
       {panel === 'powder' && <LotField lot="powder" bare />}
       {hasMore(panel, layout) && (
         <AppPopover
@@ -708,32 +713,52 @@ function PanelHead({
  * order, primer and its lot, brass record and its lot and case capacity record (the `choices` slot).
  */
 function LoadRow({ bare = false }: { bare?: boolean }) {
-  const { primerId, setPrimerChoice, system } = useLoad()
   const { layout } = useProto()
   const { t } = useTranslation()
-  const rest = (
-    <>
-      <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
-      <LotField lot="primer" short />
-      <SeatingSlot name="choices" />
-    </>
-  )
   // prototypes: record keeping (tier 2) is one click away, the cartridge search stays
+  if (dense(layout)) return null
   if (layout)
     return (
       <div className="pinned-row" data-bare={bare || undefined}>
         {!bare && <CartridgePicker />}
         <details className="pinned-more">
           <summary>{t('Primer, brass, lots')}</summary>
-          <div className="pinned-more-fields">{rest}</div>
+          <div className="pinned-more-fields">
+            <KeepingFields />
+          </div>
         </details>
       </div>
     )
   return (
     <div className="pinned-row">
       <CartridgePicker />
-      {rest}
+      <KeepingFields />
     </div>
+  )
+}
+
+/** A and E: the record keeping as the last row of the Cartridge card, one click away. */
+function KeepingRow() {
+  const { t } = useTranslation()
+  return (
+    <details className="keeping wide">
+      <summary>{t('Primer, brass, lots')}</summary>
+      <div className="keeping-fields">
+        <KeepingFields />
+      </div>
+    </details>
+  )
+}
+
+/** The choices that depend on the cartridge: primer and its lot, brass record, its lot and the case capacity record. */
+function KeepingFields() {
+  const { primerId, setPrimerChoice, system } = useLoad()
+  return (
+    <>
+      <PrimerChoice id={primerId} onChange={setPrimerChoice} system={system} />
+      <LotField lot="primer" short />
+      <SeatingSlot name="choices" />
+    </>
   )
 }
 
@@ -758,7 +783,10 @@ const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder']
 
 /** The prototypes also move the Gun card's twist, travel and weight behind a More popover. */
 const hasMore = (p: InputPanel, layout: ProtoLayout | undefined) =>
-  morePanels.includes(p) || (layout !== undefined && p === 'firearm')
+  dense(layout)
+    ? // A lists the resistance values in the Powder card, E keeps them in its More
+      morePanels.includes(p) && !(layout === 'a' && p === 'powder')
+    : morePanels.includes(p) || (layout !== undefined && p === 'firearm')
 
 type LoadValues = ReturnType<typeof useLoad>
 type InteriorSpec = (typeof interiorFields)[number]
@@ -1053,34 +1081,69 @@ function GunWeightField() {
   )
 }
 
-/** A card's read-only record values: rows in the card, one summary line in the prototypes. */
-function CardSummary({ panel }: { panel: InputPanel }) {
-  const { system, bullet, powder, pmax, specValue, bc } = useLoad()
+/** The cartridge record's CIP maximum pressure and L3. */
+function CartridgeRows() {
+  const { system, pmax, specValue } = useLoad()
   const { t } = useTranslation()
   const { layout } = useProto()
   const l3 = specValue('cartridge', 'L3')
-  const rows =
-    panel === 'cartridge' ? (
-      <>
-        {recordRow(
-          t('CIP Pmax'),
-          pmax === undefined
-            ? undefined
-            : formatQuantity('pressure', system, toSi('pressure', pmax)),
-          system.pressure.symbol,
-        )}
-        {recordRow(
-          t('Case length, CIP L3'),
-          l3 === undefined ? undefined : lengthCell(system, l3),
-          system.length.symbol,
-        )}
-      </>
-    ) : panel === 'bullet' ? (
+  return (
+    <>
+      {recordRow(
+        t('CIP Pmax'),
+        pmax === undefined ? undefined : formatQuantity('pressure', system, toSi('pressure', pmax)),
+        system.pressure.symbol,
+      )}
+      {recordRow(
+        dense(layout) ? t('CIP L3') : t('Case length, CIP L3'),
+        l3 === undefined ? undefined : lengthCell(system, l3),
+        system.length.symbol,
+      )}
+    </>
+  )
+}
+
+/** The bullet's values as read-only rows; `split` gives diameter, length and BC a row each, the slots of values a later change makes editable. */
+function BulletRows({ split }: { split: boolean }) {
+  const { system, bullet, bc } = useLoad()
+  const { t } = useTranslation()
+  const construction = recordRow(t('Construction'), constructionCell(bullet?.construction, t))
+  if (!split)
+    return (
       <>
         {sizeRow(bullet, system, t)}
         {recordRow(t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`)}
-        {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
+        {construction}
       </>
+    )
+  return (
+    <>
+      {recordRow(
+        t('Diameter'),
+        bullet && lengthCell(system, bullet.diameter.value),
+        system.length.symbol,
+      )}
+      {recordRow(
+        t('Length'),
+        bullet?.length && lengthCell(system, bullet.length.value),
+        system.length.symbol,
+      )}
+      {recordRow(t('Ballistic coefficient'), bc && plainNumber(bc.value), bc?.dragModel)}
+      {construction}
+    </>
+  )
+}
+
+/** A card's read-only record values: rows in the card, one summary line in the prototypes. */
+function CardSummary({ panel }: { panel: InputPanel }) {
+  const { system, powder } = useLoad()
+  const { t } = useTranslation()
+  const { layout } = useProto()
+  const rows =
+    panel === 'cartridge' ? (
+      <CartridgeRows />
+    ) : panel === 'bullet' ? (
+      <BulletRows split={dense(layout)} />
     ) : panel === 'powder' ? (
       <>
         {recordRow(
@@ -1092,27 +1155,39 @@ function CardSummary({ panel }: { panel: InputPanel }) {
         <PowderSourceRow />
       </>
     ) : null
-  return layout ? <div className="record-summary wide">{rows}</div> : rows
+  // A and E show Powder's and Bullet's values as rows of the grid
+  return layout && !(dense(layout) && panel !== 'cartridge') ? (
+    <div className="record-summary wide">{rows}</div>
+  ) : (
+    rows
+  )
 }
 
 /** The model parameters behind one row at every width; an invalid one opens it. */
 function ModelParameters() {
   const { modelShown, setModelShown, printing, printMedia } = useLoad()
   const { t } = useTranslation()
+  const { layout } = useProto()
+  // a window tall enough for A and E lists them without a click
+  const tall =
+    (useMediaQuery(layout === 'e' ? '(min-height: 85em)' : '(min-height: 62em)', false) ?? false) &&
+    dense(layout)
   return (
     <>
       <div className="model-row wide">
         <span>{t('Model parameters')}</span>
-        <Button
-          size={controlSize.row.button}
-          variant="default"
-          aria-expanded={modelShown}
-          onClick={() => setModelShown((v) => !v)}
-        >
-          {modelShown ? t('Hide') : t('Show')}
-        </Button>
+        {!tall && (
+          <Button
+            size={controlSize.row.button}
+            variant="default"
+            aria-expanded={modelShown}
+            onClick={() => setModelShown((v) => !v)}
+          >
+            {modelShown ? t('Hide') : t('Show')}
+          </Button>
+        )}
       </div>
-      {(modelShown || printing || printMedia) && fieldsOf(modelFields)}
+      {(modelShown || tall || printing || printMedia) && fieldsOf(modelFields)}
     </>
   )
 }
@@ -1125,9 +1200,10 @@ function CardBody({ panel }: { panel: InputPanel }) {
     return (
       <div className="panel-fields">
         <CardSummary panel="cartridge" />
-        {fieldsOf(layout ? ['volume'] : panelFields.cartridge)}
+        {fieldsOf(layout && !dense(layout) ? ['volume'] : panelFields.cartridge)}
         {/* case capacity, COAL or CBTO and the seating values of the figure */}
         <SeatingSlot name="cartridge" />
+        {dense(layout) && <KeepingRow />}
       </div>
     )
   if (panel === 'bullet')
@@ -1145,10 +1221,11 @@ function CardBody({ panel }: { panel: InputPanel }) {
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
+        {layout === 'a' && fieldsOf(powderMoreFields)}
         <ModelParameters />
       </div>
     )
-  if (layout)
+  if (layout && !dense(layout))
     return (
       <div className="panel-fields">
         {/* the barrel length of the figure; travel, twist and weight are in More */}
@@ -1480,7 +1557,7 @@ function CardMore({ panel }: { panel: InputPanel }) {
   if (panel === 'cartridge')
     return (
       <>
-        {layout && fieldsOf(['boreDiameter', 'boreArea'])}
+        {layout && !dense(layout) && fieldsOf(['boreDiameter', 'boreArea'])}
         {recordRow(
           t('COAL, CIP maximum L6'),
           l6 === undefined ? undefined : lengthCell(system, l6),

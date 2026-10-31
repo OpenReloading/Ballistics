@@ -2731,9 +2731,10 @@ td.nowrap {
 
   .page-bar:has(.load-strip) .page-bar-status {
     display: flex;
-    flex: 0 1000 10.5rem;
+    flex: 1 1000 10.5rem;
     flex-direction: column;
     min-width: 8rem;
+    max-width: 20rem;
     justify-content: center;
     margin-right: auto;
     line-height: 1.0625rem;
