@@ -175,7 +175,7 @@ function firearmColumns(
     {
       key: 'hand',
       label: msg('Hand'),
-      width: '7rem',
+      width: '7.5rem',
       value: (r) => cells(r).hand || undefined,
       cell: (r) => {
         const hand = cells(r).hand
@@ -213,7 +213,7 @@ function firearmColumns(
       label: msg('Loads'),
       help: msg('Saved loads with this firearm.'),
       num: true,
-      width: '5rem',
+      width: '6.25rem',
       value: (r) => usageOf(r).loads,
       cell: (r) => usageOf(r).loads,
     },
@@ -239,7 +239,7 @@ function firearmColumns(
     {
       key: 'actions',
       label: msg('Actions'),
-      width: '3rem',
+      width: '4rem',
       screenOnly: true,
       cell: (r, tabIndex) => actionsMenu(r, tabIndex),
     },
