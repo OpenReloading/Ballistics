@@ -73,7 +73,13 @@ export function RecordPage({
           ))
         }
         actions={
-          <RecordActions compare={compare} workbench={workbench} groups={groups} design={design} />
+          <RecordActions
+            compare={compare}
+            workbench={workbench}
+            groups={groups}
+            design={design}
+            tour
+          />
         }
       />
       {/* below 75em the bar has no room beside the title: the same facts as a line under it */}

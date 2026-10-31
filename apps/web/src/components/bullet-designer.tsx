@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, NativeSelect, Text, TextInput } from '@mantine/core'
+import { Anchor, Button, NativeSelect, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { face, type LengthUnit } from '@open-reloading/drawing'
 import { bulletFigureModel, bulletSymbols } from '@open-reloading/drawing/bullet'
@@ -32,6 +32,7 @@ import {
   newDesign,
   reduce,
 } from '../lib/bullet-designer.ts'
+import { bulletGuide } from '../lib/docs-url.ts'
 import { fieldError } from '../lib/field-spec.ts'
 import { fetchManufacturerNames, noManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { type FieldRow, rowLabel, rowValue } from '../lib/record-fields.ts'
@@ -467,6 +468,15 @@ export function BulletDesigner() {
                   />
                   <TextField k="name" label={t('Name')} value={design.name} dispatch={dispatch} />
                 </div>
+              ) : g === 'shank' && bulletGuide ? (
+                <>
+                  {groupFields(g)}
+                  <p className="note">
+                    <Anchor href={bulletGuide} target="_blank" rel="noopener">
+                      {t('How to measure bullet dimensions')}
+                    </Anchor>
+                  </p>
+                </>
               ) : (
                 groupFields(g)
               ),

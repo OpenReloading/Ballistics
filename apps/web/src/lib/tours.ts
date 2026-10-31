@@ -37,8 +37,9 @@ export const tours = {
       ),
     },
     {
-      // the menu itself has no box in the page bar: its Open button
-      target: '.file-menu button',
+      // the menu itself has no box in the page bar: its Open button, not the disabled placeholder;
+      // below 75em the closed Page actions panel hides it, so its toggle
+      target: '.file-menu button:not(:disabled), .page-bar-toggle',
       title: msg('File'),
       text: msg(
         'Save writes the load to a file and keeps a copy in this browser; Open reads a load file.',
@@ -58,6 +59,64 @@ export const tours = {
       title: msg('Summary'),
       text: msg(
         'Once a file is read: mean, spread and the other statistics of each string. Load example reads three made-up strings.',
+      ),
+    },
+  ],
+  // one tour for every record page: the parts a kind lacks are left out as not shown
+  record: [
+    {
+      target: '.record-figure',
+      title: msg('Figure'),
+      text: msg('The record drawn or charted from its values.'),
+    },
+    {
+      target: '.record-values',
+      title: msg('Values'),
+      text: msg('The values of the record, in the units chosen under Units.'),
+    },
+    {
+      target: '.record-side',
+      title: msg('Notes'),
+      text: msg('Further values and notes of the record.'),
+    },
+    {
+      target: '.record-sources',
+      title: msg('Sources'),
+      text: msg(
+        'Where the values come from: each source with its origin and the date it was retrieved.',
+      ),
+    },
+    {
+      target: '.page-bar-actions, .page-bar-toggle',
+      title: msg('Actions'),
+      text: msg('Use the record in another page, copy its link or print it.'),
+    },
+  ],
+  groups: [
+    {
+      target: '.target-toolbar',
+      title: msg('Tools'),
+      text: msg(
+        'Photo adds a photo of the target; it stays in this browser. Calibrate sets its scale from a reference of known size. Shot places shots.',
+      ),
+    },
+    {
+      target: '.target-stage',
+      title: msg('Target'),
+      text: msg('The photo or the drawn target with the shots of each group.'),
+    },
+    {
+      target: '.stats-side, .target-tabs, .target-sheet',
+      title: msg('Statistics'),
+      text: msg(
+        'ES, mean radius and the other statistics of the chosen group, with its shots. In a narrow window they are under Stats; on a phone, open the strip at the bottom first.',
+      ),
+    },
+    {
+      target: '.file-menu button:not(:disabled), .page-bar-toggle',
+      title: msg('File'),
+      text: msg(
+        'The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.',
       ),
     },
   ],
