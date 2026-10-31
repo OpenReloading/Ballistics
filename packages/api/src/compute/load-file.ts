@@ -19,6 +19,7 @@ import {
   type AnalysisKey,
   analysisKinds,
   type Bullet,
+  fromSi,
   type Load,
   legacyLoadProblem,
   type Powder,
@@ -113,6 +114,10 @@ export function loadValues(data: Load, { powder, bullet }: LoadRecords): Record<
     ...(data.charge && { charge: toSi('mass', data.charge.value) }),
   }
 }
+
+/** The bullet length the bore resistance law reads, mm: the typed `bulletLength`, else the record's. */
+export const bulletLengthMm = (values: Record<string, number>, bullet: Bullet | undefined) =>
+  values.bulletLength === undefined ? bullet?.length?.value : fromSi('length', values.bulletLength)
 
 /** The catalogue record id of a `cartridge` or `bullet` of a load file: a plain id or a `catalogue:` reference. */
 export const catalogueIdOf = (target: string) => parseRef(target)?.id ?? target

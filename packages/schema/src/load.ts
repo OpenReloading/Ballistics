@@ -11,6 +11,10 @@ const kinds = {
   travel: 'length',
   twist: 'length',
   bulletMass: 'mass',
+  bulletDiameter: 'length',
+  bulletLength: 'length',
+  bulletBcG1: 'ballisticCoefficient',
+  bulletBcG7: 'ballisticCoefficient',
   propellantEnergy: 'specificEnergy',
   gamma: 'dimensionless',
   density: 'density',
@@ -37,9 +41,10 @@ const kinds = {
 export type AnalysisKey = keyof typeof kinds
 
 /**
- * The stored quantity of each solver value a load may override under `analysis.overrides`, the keys
- * of the workbench without `charge` (the load's own `charge`). The values are in the stored unit of
- * the quantity and become SI at the solver call.
+ * The stored quantity of each value a load may override under `analysis.overrides`, the keys of the
+ * workbench without `charge` (the load's own `charge`). A bullet key takes the place of the
+ * referenced bullet record's value, and a ballistic coefficient replaces all bands of its drag
+ * model. The values are in the stored unit of the quantity and become SI at the solver call.
  */
 export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = kinds
 
@@ -91,7 +96,9 @@ const ladderStep = z
  */
 export const loadAnalysis = z.object({
   overrides: analysisOverrides
-    .describe('Solver values the user typed. Every other value follows the referenced records.')
+    .describe(
+      'Values the user typed: solver values and the bullet diameter, length and ballistic coefficients. Every other value follows the referenced records.',
+    )
     .optional(),
   ladder: z
     .union([

@@ -36,10 +36,19 @@ export interface InteriorValues extends Record<(typeof interiorKeys)[number], nu
 /** Field keys of the `values` of `interiorLoad`, the workbench fields a load keeps (`charge` and `analysis.overrides`). */
 export const interiorValueKeys: readonly (keyof InteriorValues)[] = interiorKeys
 
-/** Every key a load keeps: `interiorValueKeys` and `firearmMass` (kg, for the free recoil). */
-export const workbenchValueKeys: readonly (keyof InteriorValues | 'firearmMass')[] = [
-  ...interiorKeys,
+/** Keys of a load the interior solver does not take: the gun weight (kg, free recoil) and the typed bullet values (m, lb/in2 in SI) the exterior tabs and the bore resistance read. */
+const otherKeys = [
   'firearmMass',
+  'bulletDiameter',
+  'bulletLength',
+  'bulletBcG1',
+  'bulletBcG7',
+] as const
+
+/** Every key a load keeps: `interiorValueKeys` and the keys the interior solver does not take. */
+export const workbenchValueKeys: readonly (keyof InteriorValues | (typeof otherKeys)[number])[] = [
+  ...interiorKeys,
+  ...otherKeys,
 ]
 
 /** Fields of the two-stage burn form, with their names in the solver. */

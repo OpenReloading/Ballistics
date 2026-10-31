@@ -187,6 +187,18 @@ describe('POST /interior/load-file', () => {
     expect(sim.body.resolved.bullet.id).toBe(longBullet.id)
   })
 
+  it("takes a typed bullet length in place of the record's for the bore resistance law", async () => {
+    const data = { cartridge: 'beta-pistol', bullet: longBullet.id, powder: fitted.id }
+    const run = (bulletLength?: number) =>
+      simulate(file({ ...data, siValues: { ...siValues, ...(bulletLength && { bulletLength }) } }))
+    const record = await run()
+    // the record's length typed again is no change
+    expect((await run(0.03)).body.summary).toEqual(record.body.summary)
+    const longer = await run(0.036)
+    expect(longer.status).toBe(200)
+    expect(longer.body.summary.muzzleVelocity).not.toBe(record.body.summary.muzzleVelocity)
+  })
+
   it('takes a leak area as an input: the load of /interior with a constant leak, a lower velocity', async () => {
     const leakArea = 5e-6
     const sim = await simulate(file({ siValues: { ...siValues, leakArea } }))

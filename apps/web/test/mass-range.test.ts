@@ -38,6 +38,17 @@ it('rejects a long input that does not match without backtracking', () => {
   expect(performance.now() - start).toBeLessThan(5000)
 })
 
+it('rejects many points and long digit runs around a point in linear time', () => {
+  const start = performance.now()
+  for (const text of [
+    `${'.'.repeat(100000)}-g`,
+    `${'1'.repeat(100000)}.${'1'.repeat(100000)}.-g`,
+  ]) {
+    expect(massRange(text)).toBeUndefined()
+  }
+  expect(performance.now() - start).toBeLessThan(5000)
+})
+
 it('shows a mass bound of the other unit at that unit display decimals', () => {
   // 150 gr in grams: 9.72 g, which filters as 150 gr does
   expect(convertMass(150, 'gr', 'g')).toBe(9.72)

@@ -188,9 +188,13 @@ export function shownQuantities(show: ChartShow): ChartQuantity[] {
   return show === 'all' ? ['pressure', 'velocity', 'energy'] : [show]
 }
 
-/** Room above and below the plot in the chart box, px: the row of event labels and axis units, the tick row with the x unit at its end. */
-const plotTop = 20
-const plotBottom = 20
+/**
+ * Room above and below the plot in the chart box, px: the row of event labels and axis units, the
+ * tick row with the x unit at its end. A 12 px text box is 14 px high plus its 8 px offset from
+ * the axis, so 20 px cut it.
+ */
+const plotTop = 24
+const plotBottom = 24
 
 /**
  * The plot's left and right edges in the chart box, px, for `shown` quantities (one source for the

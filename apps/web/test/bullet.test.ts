@@ -1,7 +1,15 @@
 import { lbPerSqInToKgPerSqM, millerStability } from '@open-reloading/core'
 import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
-import { bulletDrag, computedBulletRows, millerTwist } from '../src/lib/bullet.ts'
+import {
+  bandCount,
+  bulletDrag,
+  computedBulletRows,
+  effectiveBulletValues,
+  millerTwist,
+  recordBulletValues,
+  typedBullet,
+} from '../src/lib/bullet.ts'
 import { rowValue } from '../src/lib/record-fields.ts'
 import { metersPerFoot, pascalsPerInHg, presetUnits } from '../src/lib/units.ts'
 import { missing } from './defined.ts'
@@ -104,4 +112,77 @@ it('gives the twist at which the Miller rule reads Sg 1.5 at 2800 ft/s and stand
   expect(sg).toBeCloseTo(1.5, 10)
   expect(millerTwist({ ...r, length: undefined })).toBeUndefined()
   expect(computedBulletRows({ ...r, length: undefined })).toHaveLength(1)
+})
+
+it("reads a record's values in SI, a BC only where the record lists one value of the model", () => {
+  const r = record([
+    { dragModel: 'G7', value: 0.25 },
+    { dragModel: 'G1', value: 0.5, minVelocity: { value: 900 } },
+    { dragModel: 'G1', value: 0.45, minVelocity: { value: 500 } },
+  ])
+  expect(recordBulletValues(r)).toEqual({
+    bulletMass: 11.34e-3,
+    bulletDiameter: 7.82e-3,
+    bulletLength: 31.2e-3,
+    bulletBcG7: 0.25 * lbPerSqInToKgPerSqM,
+  })
+  expect(bandCount(r, 'G1')).toBe(2)
+  expect(bandCount(undefined, 'G7')).toBe(0)
+  expect(recordBulletValues(undefined)).toEqual({})
+})
+
+it("puts typed values into the record and leaves the record's own values alone", () => {
+  const r = record([{ dragModel: 'G7', value: 0.25 }])
+  const typed = typedBullet(r, {
+    bulletMass: 9.5e-3,
+    bulletDiameter: 7.85e-3,
+    bulletLength: 30e-3,
+    bulletBcG7: 0.3 * lbPerSqInToKgPerSqM,
+    bulletBcG1: 0.55 * lbPerSqInToKgPerSqM,
+  })
+  expect(typed.mass.value).toBeCloseTo(9.5, 9)
+  expect(typed.diameter.value).toBeCloseTo(7.85, 9)
+  expect(typed.length?.value).toBeCloseTo(30, 9)
+  const bcs = Object.fromEntries(
+    (typed.ballisticCoefficients ?? []).map((c) => [c.dragModel, c.value]),
+  )
+  expect(bcs.G7).toBeCloseTo(0.3, 9)
+  expect(bcs.G1).toBeCloseTo(0.55, 9)
+  expect(typed.name).toBe(r.name)
+  // the record's own values typed again, or none: the record as it is
+  expect(typedBullet(r, recordBulletValues(r))).toEqual(r)
+  expect(typedBullet(r, {})).toEqual(r)
+})
+
+it('replaces all bands of a model with one band from 0 m/s', () => {
+  const r = record([
+    { dragModel: 'G1', value: 0.5, minVelocity: { value: 900 } },
+    { dragModel: 'G1', value: 0.45, minVelocity: { value: 500 } },
+    { dragModel: 'G7', value: 0.25 },
+  ])
+  const typed = typedBullet(r, { bulletBcG1: 0.4 * lbPerSqInToKgPerSqM })
+  expect(typed.ballisticCoefficients).toEqual([
+    { dragModel: 'G7', value: 0.25 },
+    { dragModel: 'G1', value: expect.closeTo(0.4, 9) },
+  ])
+  const drag = bulletDrag(typed, 'G1')
+  expect(drag.kind).toBe('bands')
+})
+
+it('takes the typed mass and diameter into the projectile of the drag', () => {
+  const r = record([{ dragModel: 'G7', value: 0.25 }])
+  const drag = bulletDrag(typedBullet(r, { bulletMass: 9.5e-3, bulletDiameter: 7.85e-3 }), 'G7')
+  if (drag.kind !== 'bands') throw new Error('bands expected')
+  expect(drag.projectile.mass).toBeCloseTo(9.5e-3, 12)
+  expect(drag.projectile.diameter).toBeCloseTo(7.85e-3, 12)
+})
+
+it('keeps the record value where a typed bullet value is 0', () => {
+  const r = record([{ dragModel: 'G7', value: 0.25 }])
+  const values = effectiveBulletValues(r, undefined, {
+    bulletDiameter: { si: 0 },
+    bulletLength: { si: 0.032 },
+  })
+  expect(values.bulletDiameter).toBe(recordBulletValues(r).bulletDiameter)
+  expect(values.bulletLength).toBe(0.032)
 })

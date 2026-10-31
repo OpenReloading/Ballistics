@@ -127,6 +127,7 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 ## Limits
 
 - Plastic tips and very long or very short bullets lie outside Miller's fit.
+- The workbench's Trajectory tab takes mass, diameter and length as typed over the bullet record on the Bullet card, so the stability factor belongs to the bullet the load runs with.
 - The result has no stability warning along the flight.
 - $S_g \lt 1$ predicts a tumbling bullet. The trajectory is still computed, and the caller shows the value.
 - The point mass cannot detect a dynamically unstable bullet. Dynamic stability needs the aerodynamic coefficients.

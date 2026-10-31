@@ -82,6 +82,51 @@ test('a saved load reopens with every field as it was and nothing unsaved', asyn
   await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
 })
 
+test('a diameter and length typed over the bullet record are saved as typed values and follow the record again when emptied', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+  await page.goto('/workbench')
+  await applyExampleLoad(page)
+  const form = loadForm(page)
+  const [diameter, length] = [
+    form.getByRole('textbox', { name: /^Diameter/ }),
+    form.getByRole('textbox', { name: /^Length/ }),
+  ]
+  // the record's values, in muted text until typed over
+  const record = await diameter.inputValue()
+  expect(record).not.toBe('')
+  await expect(diameter).toHaveClass(/field-default/)
+  await diameter.fill('7.84')
+  await length.fill('31.00')
+  await expect(diameter).not.toHaveClass(/field-default/)
+  const values = () =>
+    form.getByRole('textbox').evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value))
+  const before = await values()
+  await (await barButton(page, 'Save')).click()
+  await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
+  const [{ name, data }] = await storedLoads(page)
+  const overrides = (data.analysis as { overrides?: Record<string, number> } | undefined)?.overrides
+  expect(overrides).toMatchObject({ bulletDiameter: 7.84, bulletLength: 31 })
+  expect(overrides).not.toHaveProperty('bulletMass')
+  expect(overrides).not.toHaveProperty('bulletBcG7')
+
+  await page.goto('/workbench')
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
+  await page.getByRole('button', { name, exact: true }).click()
+  await expect.poll(values).toEqual(before)
+  await expect(page.locator('.file-state[data-dirty]')).toHaveCount(0)
+  // an emptied field follows the record again once it is left
+  await diameter.fill('')
+  await diameter.blur()
+  await expect(diameter).toHaveValue(record)
+  await expect(diameter).toHaveClass(/field-default/)
+})
+
 test('a load of records keeps only the charge and the travel and reopens with the records filling the rest', async ({
   page,
 }) => {

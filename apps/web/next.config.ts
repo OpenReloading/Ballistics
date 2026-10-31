@@ -7,7 +7,7 @@ import { buildLine } from './src/lib/build-line.ts'
 
 /**
  * The static export, served under this path (`''` at a domain root, `/Ballistics` on a project
- * site). Its data files and compute run in the browser (apps/web/AGENTS.md, Static site).
+ * site). Its data files and compute run in the browser.
  */
 const basePath = process.env.PAGES_BASE_PATH ?? ''
 

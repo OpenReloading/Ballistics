@@ -36,7 +36,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import type { BulletSummary } from '../lib/api-types.ts'
-import { bulletDrag } from '../lib/bullet.ts'
+import { type BulletValues, bulletDrag, typedBullet } from '../lib/bullet.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { errorText } from '../lib/error-text.ts'
 import { loadExample as exampleData } from '../lib/example-data.ts'
@@ -1080,6 +1080,8 @@ export function TrajectoryForm({
   load: {
     muzzleVelocity?: number | undefined
     bullet?: string | undefined
+    /** The mass, diameter, length and BCs of the load's bullet, with what the user typed over the record. */
+    bulletValues?: BulletValues | undefined
     twist?: number | undefined
     /** The chosen firearm's sight, SI. */
     sightHeight?: number | undefined
@@ -1104,7 +1106,16 @@ export function TrajectoryForm({
   const [source, setSource] = useState<'database' | 'manual'>('database')
   const [manualModel, setManualModel] = useState<DragModel>('G7')
   const [recordModel, setRecordModel] = useState<'G1' | 'G7'>('G7')
-  const [record, setRecord] = useState<RecordState>({ status: 'none' })
+  const [fetched, setRecord] = useState<RecordState>({ status: 'none' })
+  /** The record with the values the load typed over it, while it is the load's. */
+  const { bulletValues, bullet: loadRecordId } = load
+  const record = useMemo<RecordState>(
+    () =>
+      fetched.status === 'ok' && bulletValues && fetched.record.id === loadRecordId
+        ? { status: 'ok', record: typedBullet(fetched.record, bulletValues) }
+        : fetched,
+    [fetched, bulletValues, loadRecordId],
+  )
   const [choice, setChoice] = useState<number | undefined>(undefined)
   const [twistHand, setTwistHand] = useState<'right' | 'left'>('right')
   // from 62em the chart fills the results column's height

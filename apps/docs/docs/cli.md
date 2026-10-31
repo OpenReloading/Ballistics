@@ -106,5 +106,3 @@ JSON when stdout is not a terminal or with `--json`, a table with `--table` or o
 | 3 | An internal error of the CLI | `internal` |
 
 An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`, for `run` with `issues` or `answer`; on a terminal it is a text line. It never carries a stack trace.
-
-The package `AGENTS.md` describes the loop for a language-model agent.

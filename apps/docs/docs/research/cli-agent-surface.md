@@ -44,7 +44,7 @@ Checklist:
 | 2. Computations | partly met | `verify` and `compare` met. Interior, exterior (trajectory, drop, wind, zero), group and score statistics and powder fit: no command (`ballistics simulate`, `list`, `schema` all exit 2 with the usage). |
 | 3. Outputs | partly met | JSON on stdout when piped, `schemaVersion` 1, schema file `packages/cli/schema/result.schema.json` kept current by a test, table mode: met. Simulation label: 0 occurrences of "simulation" in the `verify` JSON, while the API answers carry `notice`. Field names are stable through the schema test; units are in the docs, not in the result. |
 | 4. Script and agent ergonomics | partly met | No prompts: met. Exit codes 0, 1 (refused), 2 (bad input) documented; an unexpected error also exits 2 (the last catch of `main.ts`). Errors: one plain text line on stderr, not JSON. Deterministic: met. Stdin: `--rows -` is refused ("does not exist"), `--rows /dev/stdin` works. Batch: a rows file is a batch: met. `--help`: complete for both commands, exits 0 on stdout: met. `--version`: exit 2, unknown option. Command and schema listing as JSON: missing. Network: no `fetch` or `http` in `packages/cli/src`: met. |
-| 5. Discoverability for AI | partly met | `packages/cli/AGENTS.md` with an agent loop: met. The docs `llms.txt` lists only the research pages (`apps/docs/scripts/research-index.mts`). The examples of `apps/docs/docs/cli.md` need rows the repository does not hold, so none runs as written. The schema has no `$id` and is not served at a URL. No tool-server wrapper. What it will not do: the docs page says results are simulations and that a fit from rows is not part of this version; nothing says no network and no prompts. |
+| 5. Discoverability for AI | partly met | A written agent loop for the package: met when this entry was written. The docs `llms.txt` lists only the research pages (`apps/docs/scripts/research-index.mts`). The examples of `apps/docs/docs/cli.md` need rows the repository does not hold, so none runs as written. The schema has no `$id` and is not served at a URL. No tool-server wrapper. What it will not do: the docs page says results are simulations and that a fit from rows is not part of this version; nothing says no network and no prompts. |
 | 6. Packaging and size | partly met | Private package, run as `node packages/cli/dist/bin.js` from a built checkout (no `ballistics` on the path). Start time above. Maintenance: 1396 lines beside the API; any new compute command that does not reuse the API's schemas doubles the contract the OpenAPI baseline guards. |
 
 Against the sources:
@@ -61,7 +61,7 @@ Reuse decision:
 
 - Thin client over the REST API: fails item 4 (no network access needed) and needs a running server. Rejected.
 - Command line over core directly: would copy the request schemas, record resolution, limits and answer shapes of the compute routes, the contract the OpenAPI baseline guards. Rejected.
-- Command line over the API's browser entries (`@open-reloading/api/compute`, `@open-reloading/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test shows they run a load offline. Recommended. It is blocked by the import rule `cli-imports-core-data-drawing-schema-only` of `.dependency-cruiser.cjs` and the package rule in `AGENTS.md` (the CLI never depends on the API): changing them is an owner decision.
+- Command line over the API's browser entries (`@open-reloading/api/compute`, `@open-reloading/api/catalogue`): no Fastify and no I/O of their own, already imported by the web app, and the simplicity test shows they run a load offline. Recommended. It is blocked by the import rule `cli-imports-core-data-drawing-schema-only` of `.dependency-cruiser.cjs` and the package rule that the CLI never depends on the API: changing them is an owner decision.
 - Must not be duplicated: the zod request and answer schemas, record resolution, the limit checks and warnings, the notice string, and the units of the answers.
 
 Simplicity gate per command:
@@ -79,9 +79,9 @@ no change. Not adopted in code; recommendation (medium confidence): the CLI is n
 Plan, in order:
 
 1. Issue #653 (small, no dependency): error objects on stderr with `--json`, exit code 3 for an internal error, `--version`, `--rows -`, `notice` in the result, `$id` in the schema, `--help` before the libraries load.
-2. Owner decision: allow `packages/cli` to import `@open-reloading/api/compute` and `@open-reloading/api/catalogue` (the rule and `AGENTS.md`).
+2. Owner decision: allow `packages/cli` to import `@open-reloading/api/compute` and `@open-reloading/api/catalogue` (the rule and the package rule).
 3. Issue #654 (medium, useful alone): move the exterior handlers and the load file computation into run functions exported from the compute entry, OpenAPI unchanged.
-4. Issue #655 (medium, after 2; exterior and load file operations after 3): `ballistics run <operation> [--input <file>|-]` and `ballistics operations` with input and output schemas from the same zod definitions, docs page, package `AGENTS.md`, an example that runs, a line in `llms.txt`.
+4. Issue #655 (medium, after 2; exterior and load file operations after 3): `ballistics run <operation> [--input <file>|-]` and `ballistics operations` with input and output schemas from the same zod definitions, docs page, an agent loop description, an example that runs, a line in `llms.txt`.
 
 Deferred, outside the pre-release scope: tool-server wrapper, group statistics and powder fit (API first), a table for `run`, publishing the package (an owner decision on releases).
 
@@ -93,7 +93,7 @@ measured: runs of the built CLI and of a 9-line script over the API compute entr
 
 - `packages/cli/src/main.ts`: commands, options, exit codes, the error catch.
 - `packages/cli/schema/result.schema.json`: the result schema.
-- `apps/docs/docs/cli.md`, `packages/cli/AGENTS.md`: the docs and the agent loop.
+- `apps/docs/docs/cli.md`: the docs.
 - `packages/api/src/compute/browser.ts`: the compute entry the web app runs.
 - `packages/api/src/routes/compute.ts`: the compute routes, exterior handlers inline.
 - `packages/api/src/compute/answer.ts`: the notice.

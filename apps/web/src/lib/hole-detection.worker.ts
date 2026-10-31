@@ -2,9 +2,8 @@
  * Web Worker of the target editor: decodes the photo the editor posts (a Blob from the browser
  * store; nothing leaves the browser), downscales it so a hole is about 32 px across (`createImageBitmap`
  * with a resize), cuts the region with its margin (the whole turned photo without a region) and runs
- * `findHoles`, `autoDetect` or `detectFromExample` on it, or reads the colour inside one hole at full
- * resolution (`apps/docs/docs/models/hole-detection.md`), or looks for the target face in the
- * whole photo. Points are on the photo as turned on screen.
+ * `findHoles`, `autoDetect` or `detectFromExample` on it (`apps/docs/docs/models/hole-detection.md`),
+ * or looks for the target face in the whole photo. Points are on the photo as turned on screen.
  */
 
 import { fromSi } from '@open-reloading/schema'
@@ -21,7 +20,7 @@ import {
 } from './hole-detection.ts'
 import type { Photo, WorkerReply, WorkerRequest } from './hole-detection-protocol.ts'
 import { layoutOf, photoQuality } from './photo-quality.ts'
-import { clamp, upperMedian } from './raster-ops.ts'
+import { clamp } from './raster-ops.ts'
 import { faceLabel, onPhoto } from './target-face.ts'
 import { mul3, type Point, turnedBox } from './target-geometry.ts'
 
@@ -86,33 +85,11 @@ function box(pts: Point[], margin: number, p: Photo) {
 self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
   const r = e.data
   try {
-    if (r.kind === 'colour') return post(await handleColour(r))
     post({ kind: 'progress', done: 0.02 })
     if (r.kind === 'face') return post(await handleFace(r))
     post(await handleDetect(r))
   } catch (err) {
     post({ kind: 'error', message: errorText(err) })
-  }
-}
-
-/** The median colour per channel inside the circle of `radius` about `at`, at full resolution. */
-async function handleColour(r: Extract<WorkerRequest, { kind: 'colour' }>): Promise<WorkerReply> {
-  const [x0, y0, x1, y1] = box([r.at], r.radius, r)
-  if (x1 <= x0 || y1 <= y0) throw new Error('The point is outside the photo.')
-  const img = await pixels(r, x0, y0, x1, y1)
-  // the median per channel inside the circle: a torn rim or a fibre does not shift it
-  const [reds, greens, blues]: [number[], number[], number[]] = [[], [], []]
-  const ch = [reds, greens, blues]
-  for (let y = 0; y < img.height; y++)
-    for (let x = 0; x < img.width; x++) {
-      if (Math.hypot(x0 + x - r.at.x, y0 + y - r.at.y) > r.radius) continue
-      const i = (y * img.width + x) * 4
-      for (const [c, v] of img.data.subarray(i, i + 3).entries()) ch[c]?.push(v)
-    }
-  if (!reds.length) throw new Error('The point is outside the photo.')
-  return {
-    kind: 'colour',
-    rgb: { r: upperMedian(reds), g: upperMedian(greens), b: upperMedian(blues) },
   }
 }
 

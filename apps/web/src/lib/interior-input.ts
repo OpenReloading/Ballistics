@@ -156,6 +156,50 @@ export const interiorFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
+/**
+ * The Bullet card's values a record gives and the user may type over it (`typedBullet` in `bullet.ts`).
+ * Not interior inputs, so not in `interiorFields`: the diameter reaches the interior run only as the
+ * default bore diameter, the length only through the bore resistance of a fitted powder.
+ */
+export const bulletFields = [
+  {
+    key: 'bulletDiameter',
+    label: msg('Diameter'),
+    help: msg(
+      'Used by the trajectory, the stability estimate and the groups. The interior run takes the bore diameter of the Cartridge card.',
+    ),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletLength',
+    label: msg('Length'),
+    help: msg(
+      'Used by the stability estimate and by the bore resistance of a fitted powder, not by the cartridge drawing. Empty: the length of the record.',
+    ),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletBcG7',
+    label: msg('BC G7'),
+    help: msg('A typed value replaces every velocity band of the record. Empty: the record.'),
+    quantity: 'ballisticCoefficient',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletBcG1',
+    label: msg('BC G1'),
+    help: msg('A typed value replaces every velocity band of the record. Empty: the record.'),
+    quantity: 'ballisticCoefficient',
+    min: 0,
+    positive: true,
+  },
+] as const satisfies readonly FieldSpec[]
+
 /** A partly filled burn form's error on the empty field `key`; undefined otherwise. */
 export function burnFormError(
   values: Record<string, number | undefined>,

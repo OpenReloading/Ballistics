@@ -1,6 +1,6 @@
 'use client'
 
-import { ActionIcon, Anchor, Button, Flex, NativeSelect, Popover } from '@mantine/core'
+import { ActionIcon, Anchor, Button, NativeSelect } from '@mantine/core'
 import {
   fromSi,
   type ShotGroup,
@@ -8,12 +8,11 @@ import {
   type TargetSheet,
   toSi,
 } from '@open-reloading/schema'
-import { ArrowClockwise, ArrowCounterClockwise, GearSix, X } from '@phosphor-icons/react'
+import { ArrowClockwise, ArrowCounterClockwise, X } from '@phosphor-icons/react'
 import {
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
-  type RefObject,
   useEffect,
   useId,
   useRef,
@@ -60,7 +59,6 @@ import { type Point, turnedBox } from '../lib/target-geometry.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, type UnitSystem } from '../lib/units.ts'
 import { storedPhoto } from '../lib/user-store.ts'
-import { usePopoverReturn } from './popover-return.ts'
 import { SiField } from './si-field.tsx'
 import { Message } from './states.tsx'
 import { arrows, viewPoint } from './svg-point.ts'
@@ -95,14 +93,12 @@ const workerErrors = [
   msg('A region needs at least 3 points'),
   msg('The photo decodes at another size than it is shown; detection is off for it.'),
   msg('No canvas to read the photo.'),
-  msg('The point is outside the photo.'),
 ]
 
 /**
  * Hole detection in the target editor (`apps/docs/docs/models/hole-detection.md`):
  * auto detection once a photo is added, its result in one line with Accept, else the guided
- * steps (rotate, scale, one example hole, detect, review) with the region, backing and threshold
- * behind one Settings disclosure; a Web Worker run
+ * steps (rotate, scale, one example hole and the region, detect, review); a Web Worker run
  * with progress and cancel; the proposals, kept apart from the sheet in photo px until accepted, so
  * no statistic sees them.
  */
@@ -168,8 +164,6 @@ export function useHoleDetection({
   const [sizeOpen, setSizeOpen] = useState(false)
   /** The id of a photo just added: the auto run starts once it has loaded. */
   const addedPhoto = useRef<string | undefined>(undefined)
-  const [settings, setSettings] = useState(false)
-  const gear = useRef<HTMLButtonElement>(null)
   const worker = useRef<Worker | undefined>(undefined)
   /** View units per screen px, from the last drawing of the layer. */
   const unit = useRef(1)
@@ -246,17 +240,6 @@ export function useHoleDetection({
   useEffect(() => {
     if (tool !== 'region') setPending([])
   }, [tool])
-  /** The Settings control that started a point tool: Settings opens again with the focus on it. */
-  const settingsReturnFrom = usePopoverReturn(
-    tool,
-    () => setSettings(true),
-    (which) => document.querySelector<HTMLElement>(`[data-detect-set="${which}"]`),
-  )
-  const settingsTool = (which: string) => {
-    settingsReturnFrom(which)
-    setSettings(false)
-  }
-
   const setChoice = (patch: Partial<Choices>, key: string) =>
     onGroup((g) => {
       const next: Record<string, unknown> = { ...g.detection, ...patch }
@@ -267,7 +250,7 @@ export function useHoleDetection({
   /** One request to a worker of its own; its replies until the last. */
   function ask(request: WorkerRequest, onReply: (m: WorkerReply) => void) {
     // any detection run, from the Detect step or an example hole too, ends the wait
-    if (request.kind !== 'face' && request.kind !== 'colour') setHeld(false)
+    if (request.kind !== 'face') setHeld(false)
     worker.current?.terminate()
     const w = new Worker(new URL('../lib/hole-detection.worker.ts', import.meta.url), {
       type: 'module',
@@ -318,7 +301,7 @@ export function useHoleDetection({
 
   /**
    * A run on the region (without one, on the target the module finds): `auto` takes the colour axis from the
-   * strongest blobs of the region; without it the choices of the example and Settings apply. `found` gets the proposal count.
+   * strongest blobs of the region; without it the choices of the example apply. `found` gets the proposal count.
    */
   async function run(auto: boolean, over?: Choices, found?: (n: number) => void) {
     const c = { ...choices, ...over }
@@ -343,7 +326,7 @@ export function useHoleDetection({
         ...(geometry && { face: geometry }),
         pxPerM,
         holeDiameter: hole0,
-        minContrast: c.minContrast ?? defaultContrast,
+        minContrast: defaultContrast,
         ...(auto
           ? { auto: true }
           : {
@@ -543,33 +526,6 @@ export function useHoleDetection({
     say(t('Detection cancelled.'))
   }
 
-  async function pickColour(at: Point) {
-    const blob = await photoBlob()
-    if (!blob || !photo) return
-    // a quarter hole around the click: the middle of the hole, clear of its rim
-    const radius = Math.max(1, ((size?.diameter ?? 0) * (frame ? localPxPerM(frame, [at]) : 0)) / 4)
-    ask(
-      {
-        kind: 'colour',
-        photo: blob,
-        width: photo.width,
-        height: photo.height,
-        photoRotation: turn,
-        at,
-        radius,
-      },
-      (m) => {
-        if (m.kind !== 'colour') return
-        setChoice({ backing: hex(m.rgb) }, 'backing')
-        say(
-          t('Backing color {color}: the color axis of a run starts from it.', {
-            color: hex(m.rgb),
-          }),
-        )
-      },
-    )
-  }
-
   /**
    * Detection from the example hole under `at` (`detectFromExample`): the hole size the photo's holes
    * show, the contrast, polarity and colour become the choices, and its proposals show.
@@ -592,7 +548,7 @@ export function useHoleDetection({
         ...(geometry && { face: geometry }),
         pxPerM,
         holeDiameter: size?.diameter ?? 0.006,
-        minContrast: choices.minContrast ?? defaultContrast,
+        minContrast: defaultContrast,
       },
       (m) => {
         if (m.kind !== 'proposals') return
@@ -607,7 +563,7 @@ export function useHoleDetection({
           {
             backing: ex.backing && hex(ex.backing),
             expectedHoleDiameter: m.holeDiameter,
-            minContrast: defaultContrast,
+            minContrast: undefined,
             polarity: ex.polarity,
           },
           'example',
@@ -620,12 +576,11 @@ export function useHoleDetection({
     )
   }
 
-  /** A click of the region, backing or example tool; true when it was one. */
+  /** A click of the region or example tool; true when it was one. */
   function onPoint(p: Point): boolean {
-    if (tool === 'backing' || tool === 'example') {
+    if (tool === 'example') {
       startTool('select')
-      const pick = tool === 'backing' ? pickColour : pickExample
-      pick(p).catch(failed)
+      pickExample(p).catch(failed)
       return true
     }
     if (tool !== 'region') return false
@@ -703,6 +658,21 @@ export function useHoleDetection({
     />
   )
 
+  const regionRow = (
+    <RegionRow
+      region={choices.region}
+      tool={tool}
+      shape={shape}
+      enabled={Boolean(photo && frame)}
+      onShape={(sh) => {
+        setShape(sh)
+        setPending([])
+        startTool('region')
+      }}
+      onRegionOff={() => setChoice({ region: undefined }, 'region')}
+    />
+  )
+
   const choicesOfFaces = faceChoices(found, system, t)
   const turnBy = (d: number) => onTurn(turn + d)
   const commitDiameter = (si: number | undefined) => {
@@ -735,6 +705,7 @@ export function useHoleDetection({
       tool={tool}
       canPick={Boolean(photo && frame?.calibration) && !running}
       calibrated={Boolean(frame?.calibration)}
+      regionRow={regionRow}
       onHoleSize={(si) => setChoice({ expectedHoleDiameter: si }, 'expectedHoleDiameter')}
       onPick={() => startTool('example')}
     />,
@@ -754,29 +725,6 @@ export function useHoleDetection({
       }}
     />,
   ]
-
-  const settingsPanel = (
-    <SettingsPanel
-      choices={choices}
-      tool={tool}
-      shape={shape}
-      enabled={Boolean(photo && frame)}
-      running={running}
-      onShape={(s) => {
-        settingsTool(s)
-        setShape(s)
-        setPending([])
-        startTool('region')
-      }}
-      onRegionOff={() => setChoice({ region: undefined }, 'region')}
-      onPickBacking={() => {
-        settingsTool('backing')
-        startTool('backing')
-      }}
-      onBackingOff={() => setChoice({ backing: undefined }, 'backing')}
-      onThreshold={(si) => setChoice({ minContrast: si }, 'contrast')}
-    />
-  )
 
   /** The typed hole size of the result line: the auto run goes on with it. */
   const commitHoleSize = (si: number | undefined) => {
@@ -810,10 +758,6 @@ export function useHoleDetection({
 
   const panel = group && sheet.photo && (
     <DetectPanel
-      settings={settings}
-      setSettings={setSettings}
-      gear={gear}
-      settingsPanel={settingsPanel}
       step={step}
       setStep={setStep}
       start={
@@ -956,9 +900,6 @@ function regionClick(
 }
 
 const toolHints: Partial<Record<Tool, Text>> = {
-  backing: msg(
-    'Click inside one hole: detection also looks for the color that shows through it. Or arrow keys and Enter.',
-  ),
   example: msg(
     'Click the middle of one hole clear of print. Or arrow keys and Enter. Esc cancels.',
   ),
@@ -1399,6 +1340,7 @@ function ExampleStep({
   tool,
   canPick,
   calibrated,
+  regionRow,
   onHoleSize,
   onPick,
 }: {
@@ -1407,6 +1349,8 @@ function ExampleStep({
   tool: Tool
   canPick: boolean
   calibrated: boolean
+  /** Where to look: the Region row. */
+  regionRow: ReactNode
   onHoleSize: (si: number | undefined) => void
   onPick: () => void
 }) {
@@ -1441,6 +1385,7 @@ function ExampleStep({
       >
         {t('Pick one hole')}
       </Button>
+      {regionRow}
     </div>
   )
 }
@@ -1503,151 +1448,73 @@ function ReviewStep({
   )
 }
 
-function SettingsPanel({
-  choices,
+function RegionRow({
+  region,
   tool,
   shape,
   enabled,
-  running,
   onShape,
   onRegionOff,
-  onPickBacking,
-  onBackingOff,
-  onThreshold,
 }: {
-  choices: Choices
+  region: Point[] | undefined
   tool: Tool
   shape: 'rectangle' | 'polygon'
-  /** A photo and its frame exist: the region and backing tools can start. */
+  /** A photo and its frame exist: the region tool can start. */
   enabled: boolean
-  running: boolean
   onShape: (shape: 'rectangle' | 'polygon') => void
   onRegionOff: () => void
-  onPickBacking: () => void
-  onBackingOff: () => void
-  onThreshold: (si: number | undefined) => void
 }) {
   const { t } = useTranslation()
-  const backing = choices.backing
-    ? t('Backing color {color}', { color: choices.backing })
-    : t('Backing color off')
   return (
-    <div className="prop-grid">
-      <div className="prop-row detect-wide">
-        <span
-          className="prop-label"
-          title={`${t(
-            'Where to look: a rectangle (two opposite corners) or a polygon (its corners); absent: the target found in the photo. Saved with the group.',
-          )} ${choices.region ? t('Now {count} corners.', { count: choices.region.length }) : t('None marked.')}`}
-        >
-          {t('Region')}
-        </span>
-        <span className="prop-value row-buttons">
-          {(['rectangle', 'polygon'] as const).map((s) => (
-            <Button
-              key={s}
-              size={controlSize.row.button}
-              variant={tool === 'region' && shape === s ? 'filled' : 'default'}
-              disabled={!enabled}
-              title={
-                s === 'rectangle'
-                  ? t('Mark a rectangle on the photo')
-                  : t('Mark a polygon on the photo')
-              }
-              data-detect-set={s}
-              onClick={() => onShape(s)}
-            >
-              {s === 'rectangle' ? t('Rect.') : t('Polygon')}
-            </Button>
-          ))}
-          <ActionIcon
-            variant="subtle"
-            size={controlSize.row.icon}
-            aria-label={t('Region off')}
-            title={t('Region off: the target found in the photo')}
-            style={{ visibility: choices.region ? 'visible' : 'hidden' }}
-            onClick={onRegionOff}
-          >
-            <X size={12} aria-hidden="true" />
-          </ActionIcon>
-        </span>
-      </div>
-      <div className="prop-row detect-wide">
-        <span
-          className="prop-label"
-          title={t(
-            'The color that shows through a hole on a dark area; an example hole lighter than its surroundings sets it. Pick, then click inside one hole.',
-          )}
-        >
-          {t('Backing')}
-        </span>
-        <span className="prop-value row-buttons">
+    <div className="prop-row detect-wide">
+      <span
+        className="prop-label"
+        title={`${t(
+          'Where to look: a rectangle (two opposite corners) or a polygon (its corners); absent: the target found in the photo. Saved with the group.',
+        )} ${region ? t('Now {count} corners.', { count: region.length }) : t('None marked.')}`}
+      >
+        {t('Region')}
+      </span>
+      <span className="prop-value row-buttons">
+        {(['rectangle', 'polygon'] as const).map((s) => (
           <Button
+            key={s}
             size={controlSize.row.button}
-            variant={tool === 'backing' ? 'filled' : 'default'}
-            disabled={!enabled || running}
-            data-detect-set="backing"
-            onClick={onPickBacking}
-            title={t('Click inside one hole to take its color')}
+            variant={tool === 'region' && shape === s ? 'filled' : 'default'}
+            disabled={!enabled}
+            title={
+              s === 'rectangle'
+                ? t('Mark a rectangle on the photo')
+                : t('Mark a polygon on the photo')
+            }
+            onClick={() => onShape(s)}
           >
-            {t('Pick')}
+            {s === 'rectangle' ? t('Rect.') : t('Polygon')}
           </Button>
-          {/* the swatch and its cross keep their place when off, so nothing moves on a pick */}
-          <span
-            className="swatch"
-            style={{ background: choices.backing ?? 'transparent' }}
-            title={backing}
-            role="img"
-            aria-label={backing}
-          />
-          <ActionIcon
-            variant="subtle"
-            size={controlSize.row.icon}
-            aria-label={t('Backing color off')}
-            title={t('Backing color off')}
-            style={{ visibility: choices.backing ? 'visible' : 'hidden' }}
-            onClick={onBackingOff}
-          >
-            <X size={12} aria-hidden="true" />
-          </ActionIcon>
-        </span>
-      </div>
-      <SiField
-        spec={{
-          key: 'minContrast',
-          label: msg('Threshold'),
-          help: msg(
-            'Least contrast of a hole against its background, in % of the local paper white; an example hole sets it; empty: 15 %. Lower finds fainter holes and more false ones.',
-          ),
-          quantity: 'percent',
-          min: 1,
-          max: 100,
-          positive: true,
-        }}
-        si={choices.minContrast}
-        placeholder="15"
-        onCommit={onThreshold}
-      />
+        ))}
+        <ActionIcon
+          variant="subtle"
+          size={controlSize.row.icon}
+          aria-label={t('Region off')}
+          title={t('Region off: the target found in the photo')}
+          style={{ visibility: region ? 'visible' : 'hidden' }}
+          onClick={onRegionOff}
+        >
+          <X size={12} aria-hidden="true" />
+        </ActionIcon>
+      </span>
     </div>
   )
 }
 
-/** The Detect panel: its head with the Settings popover, the step list, the step shown and Back and Next. */
+/** The Detect panel: its head, the step list, the step shown and Back and Next. */
 function DetectPanel({
-  settings,
-  setSettings,
-  gear,
-  settingsPanel,
   step,
   setStep,
   start,
   notes,
   body,
 }: {
-  settings: boolean
-  setSettings: (update: boolean | ((open: boolean) => boolean)) => void
-  gear: RefObject<HTMLButtonElement | null>
-  settingsPanel: ReactNode
   step: number | undefined
   setStep: (update: number | undefined | ((s: number | undefined) => number | undefined)) => void
   /** The one-click start, shown before a step is chosen. */
@@ -1660,40 +1527,7 @@ function DetectPanel({
   const { t } = useTranslation()
   return (
     <>
-      <Flex className="detect-head" align="flex-end" gap={4}>
-        <h3 className="prop-head">{t('Detect')}</h3>
-        <Popover
-          position="bottom-end"
-          shadow="sm"
-          returnFocus
-          transitionProps={{ duration: 0 }}
-          opened={settings}
-          onChange={setSettings}
-          // closed with the focus inside (Escape), it goes back to the gear
-          onClose={() =>
-            requestAnimationFrame(() => {
-              if (document.activeElement === document.body) gear.current?.focus()
-            })
-          }
-        >
-          <Popover.Target>
-            <ActionIcon
-              ref={gear}
-              variant="subtle"
-              size={controlSize.row.icon}
-              aria-label={t('Detection settings')}
-              title={t('Detection settings: region, backing color, threshold')}
-              onClick={() => setSettings((x) => !x)}
-            >
-              <GearSix size={14} aria-hidden="true" />
-            </ActionIcon>
-          </Popover.Target>
-          <Popover.Dropdown className="toolbar-pop">
-            <h2 className="prop-head">{t('Detection settings')}</h2>
-            {settingsPanel}
-          </Popover.Dropdown>
-        </Popover>
-      </Flex>
+      <h3 className="prop-head">{t('Detect')}</h3>
       <ol className="detect-steps" aria-label={t('Detection steps')}>
         {detectSteps.map((name, i) => (
           <li key={name}>

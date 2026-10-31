@@ -41,9 +41,8 @@ export type Tool =
   | 'aim'
   | 'origin'
   | CalibrationReference['kind']
-  // hole detection: its region, the backing colour and the example hole (hole-detection.tsx)
+  // hole detection: its region and the example hole (hole-detection.tsx)
   | 'region'
-  | 'backing'
   | 'example'
   // ring scoring: points on the rings of a target face (ring-scoring.tsx)
   | 'rings'
@@ -559,9 +558,7 @@ function overlayOf(
 
 /** The tools that take a point by click or by the keyboard marker. */
 function isPointTool(tool: Tool) {
-  return (
-    ['aim', 'origin', 'region', 'backing', 'example', 'rings'].includes(tool) || tool in toolPoints
-  )
+  return ['aim', 'origin', 'region', 'example', 'rings'].includes(tool) || tool in toolPoints
 }
 
 /** The tools that show the magnifier while the pointer is over the sheet. */
