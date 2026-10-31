@@ -27,7 +27,7 @@ export function LadderImpactNote({ impact, system }: { impact: LadderImpact; sys
           t('The point of impact per charge needs all ladder groups at one distance.')}
         {impact.status === 'slope' &&
           t(
-            'The point of impact per charge needs the simulated drop slope: a bullet with a ballistic coefficient, the sight height and the zero range.',
+            'The point of impact per charge needs the simulated drop slope: a bullet with one usable ballistic coefficient, the sight height and the zero range. Several coefficients without velocity bands give no slope.',
           )}
       </p>
     )
