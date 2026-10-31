@@ -9111,11 +9111,7 @@ main .session-shots th:nth-child(-n + 2) {
   background: var(--link);
 }
 
-/* hole detection: the heading with its settings, numbered steps, one step's controls */
-.detect-head .prop-head {
-  flex: 1;
-}
-
+/* hole detection: numbered steps, one step's controls */
 .detect-steps {
   display: flex;
   flex-wrap: wrap;

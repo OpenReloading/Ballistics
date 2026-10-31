@@ -36,7 +36,6 @@ export type WorkerRequest =
         /** Try hole sizes around `holeDiameter` (the bullet) and keep the one the holes show (`autoDetect`). */
         auto?: boolean
       })
-  | (Photo & { kind: 'colour'; at: Point; radius: number })
   /**
    * The face search over the whole turned photo against `faces`; `pxPerMm` is the photo's known
    * scale, `holeDiameter` (m) the bullet's, for the quality check's hole size; `layout` is the
@@ -63,7 +62,6 @@ export type WorkerReply =
       /** What the picked hole showed; absent when no hole was found there. */
       example?: HoleExample
     }
-  | { kind: 'colour'; rgb: Rgb }
   /** The search on the photo's px (`fits` is empty when no face is proposed) and the photo's quality problems. */
   | { kind: 'face'; search: FaceSearch; quality: QualityIssue[] }
   | { kind: 'error'; message: string }
