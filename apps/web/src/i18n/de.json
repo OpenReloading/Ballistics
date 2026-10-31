@@ -93,6 +93,8 @@
   "BC bands need distinct speeds": "BC-Bänder brauchen verschiedene Geschwindigkeiten",
   "BC reference {id}": "BC-Bezug {id} unbekannt",
   "BC {model}": "BC {model}",
+  "BC G1": "BC G1",
+  "BC G7": "BC G7",
   "Ballistic coefficient": "Ballistischer Koeffizient",
   "Ballistic coefficients": "Ballistische Koeffizienten",
   "Band": "Band",
@@ -395,7 +397,6 @@
   "Dial": "Verstellung",
   "Diameter": "Durchmesser",
   "Diameter {diameter}": "Durchmesser {diameter}",
-  "Diameter × length": "Durchmesser × Länge",
   "Diameters, masses, lengths and ballistic coefficients, each with its source.": "Durchmesser, Massen, Längen und ballistische Koeffizienten, jeweils mit ihrer Quelle.",
   "Difference": "Differenz",
   "Difference %": "Differenz %",
@@ -3960,5 +3961,9 @@
   "The photo or the drawn target with the shots of each group.": "Das Foto oder die gezeichnete Zielscheibe mit den Schüssen jeder Gruppe.",
   "ES, mean radius and the other statistics of the chosen group, with its shots. In a narrow window they are under Stats; on a phone, open the strip at the bottom first.": "ES, mittlerer Radius und die weiteren Statistiken der gewählten Gruppe, mit ihren Schüssen. In einem schmalen Fenster stehen sie unter Statistik; auf dem Telefon zuerst die Leiste am unteren Rand öffnen.",
   "The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.": "Das Blatt wird in diesem Browser gespeichert. Speichern schreibt es in eine Datei; Öffnen liest eine Blattdatei.",
-  "How to measure bullet dimensions": "So messen Sie die Geschossmaße"
+  "How to measure bullet dimensions": "So messen Sie die Geschossmaße",
+  "A typed value replaces every velocity band of the record. Empty: the record.": "Ein eingegebener Wert ersetzt alle Geschwindigkeitsbereiche des Datensatzes. Leer: der Datensatz.",
+  "Used by the trajectory, the stability estimate and the groups. The interior run takes the bore diameter of the Cartridge card.": "Wird für die Flugbahn, die Stabilität und die Schussbilder verwendet. Die Innenballistik nimmt den Felddurchmesser der Karte Patrone.",
+  "{count} bands": "{count} Bänder",
+  "Used by the stability estimate and by the bore resistance of a fitted powder, not by the cartridge drawing. Empty: the length of the record.": "Wird für die Stabilität und für den Laufwiderstand eines angepassten Treibladungspulvers verwendet, nicht für die Zeichnung der Patrone. Leer: die Länge des Datensatzes."
 }

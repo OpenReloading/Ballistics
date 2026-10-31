@@ -1,4 +1,4 @@
-import { workbenchValueKeys } from '@open-reloading/core'
+import { lbPerSqInToKgPerSqM, workbenchValueKeys } from '@open-reloading/core'
 import {
   checkUserRefs,
   ladderStepKinds,
@@ -8,7 +8,7 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { interiorFields } from '../src/lib/interior-input.ts'
+import { bulletFields, interiorFields } from '../src/lib/interior-input.ts'
 import {
   capacityOfRecord,
   capacityRecord,
@@ -80,9 +80,14 @@ const parts = (over: Partial<LoadParts> = {}): LoadParts => ({
 describe('the keys of a load', () => {
   it('are the workbench fields but the charge, the keys the solver reads', () => {
     expect([...overrideKeys, 'charge'].sort()).toEqual([...workbenchValueKeys].sort())
+    const bulletKeys: string[] = bulletFields.map((f) => f.key)
     expect(interiorFields.map((f) => f.key).filter((k) => k !== 'charge')).toEqual(
-      expect.arrayContaining(overrideKeys.filter((k) => k !== 'firearmMass')),
+      expect.arrayContaining(
+        overrideKeys.filter((k) => k !== 'firearmMass' && !bulletKeys.includes(k)),
+      ),
     )
+    // the keys no interior field has: the typed bullet values, in their own fields
+    expect(overrideKeys).toEqual(expect.arrayContaining(bulletKeys))
   })
 })
 
@@ -170,9 +175,15 @@ describe('givenKeys', () => {
     expect([...g]).toEqual(['gamma'])
   })
 
-  it('knows the mass of the bullet record or design', () => {
-    expect([...givenKeys(v, { ...none, bulletMass: 0.010886 })]).toEqual(['bulletMass'])
-    expect([...givenKeys(v, { ...none, bulletMass: 0.0108 })]).toEqual([])
+  it('knows the values of the bullet record or design', () => {
+    expect([...givenKeys(v, { ...none, bullet: { bulletMass: 0.010886 } })]).toEqual(['bulletMass'])
+    expect([...givenKeys(v, { ...none, bullet: { bulletMass: 0.0108 } })]).toEqual([])
+    const typed = { ...v, bulletDiameter: 0.00782, bulletLength: 0.0312, bulletBcG7: 150 }
+    const record = { bulletMass: 0.010886, bulletDiameter: 0.00782, bulletLength: 0.03 }
+    expect([...givenKeys(typed, { ...none, bullet: record })].sort()).toEqual([
+      'bulletDiameter',
+      'bulletMass',
+    ])
   })
 
   it('knows a Settings default while the field holds it', () => {
@@ -272,6 +283,21 @@ describe('opening and saving a load', () => {
     expect(Number(query.get('ladderStep'))).toBeCloseTo(0.0003, 12)
     expect(typed.has('bulletMass')).toBe(true)
     expect(typed.has('charge')).toBe(false)
+  })
+
+  it('saves and opens the typed bullet values in stored units', () => {
+    const typed = { ...values, bulletDiameter: 0.00782, bulletLength: 0.0312, bulletBcG7: 150 }
+    const l = toLoad(parts({ values: typed, given: new Set() }))
+    expect(l.analysis?.overrides).toMatchObject({ bulletDiameter: 7.82, bulletLength: 31.2 })
+    expect(l.analysis?.overrides?.bulletBcG7).toBeCloseTo(150 / lbPerSqInToKgPerSqM, 9)
+    expect(loadSchema.safeParse(l).success).toBe(true)
+    const { query, typed: keys } = fromLoad(l)
+    expect(Number(query.get('bulletDiameter'))).toBeCloseTo(0.00782, 12)
+    expect(Number(query.get('bulletLength'))).toBeCloseTo(0.0312, 12)
+    expect(keys.has('bulletBcG7')).toBe(true)
+    // a value the record gives is no override
+    const given = toLoad(parts({ values: typed, given: new Set(['bulletDiameter']) }))
+    expect(given.analysis?.overrides).not.toHaveProperty('bulletDiameter')
   })
 
   it('opens a load of references only with nothing typed', () => {

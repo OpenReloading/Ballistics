@@ -41,6 +41,7 @@ import type {
   SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
+import { type BulletValues, diameterMm } from '../lib/bullet.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
@@ -70,7 +71,12 @@ import {
   suggestDefaults,
   volumeMeasured,
 } from '../lib/input-defaults.ts'
-import { burnFormError, type interiorBody, interiorFields } from '../lib/interior-input.ts'
+import {
+  bulletFields,
+  burnFormError,
+  type interiorBody,
+  interiorFields,
+} from '../lib/interior-input.ts'
 import { interiorRequest } from '../lib/interior-request.ts'
 import {
   dismissed,
@@ -158,6 +164,7 @@ import { usePrintEvents } from './print.ts'
 import type { Seated } from './seating-preview.tsx'
 import type { TrajectoryHandle } from './trajectory-form.tsx'
 import { useFieldUnits, useUnits } from './units-settings.tsx'
+import { useBulletValues } from './use-bullet-values.ts'
 import { useCommit } from './use-commit.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
@@ -414,15 +421,6 @@ function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources
   }
 }
 
-/** The mass of the bullet record, else of a user design that has a reference, kg. */
-function bulletMassOf(
-  bullet: Bullet | undefined,
-  design: { id: string; mass?: number | undefined } | undefined,
-) {
-  if (bullet) return toSi('mass', bullet.mass.value)
-  return design && userRef(design.id) ? design.mass : undefined
-}
-
 /** Whether the seating the load carries is the start's own: the barrel nobody typed. */
 function seatingKeptOf(referenced: boolean, seated: Seated, suggestions: Suggestions) {
   if (!referenced) return false
@@ -512,7 +510,7 @@ function todoOf(a: {
 }
 
 /** The ballistic coefficient the chart and the trajectory take: G7, else G1. */
-const bcOf = (bullet: Bullet | undefined) =>
+const bcOf = (bullet: Partial<Bullet> | undefined) =>
   bullet?.ballisticCoefficients?.find((c) => c.dragModel === 'G7') ??
   bullet?.ballisticCoefficients?.find((c) => c.dragModel === 'G1')
 
@@ -569,9 +567,10 @@ const userRefOf = (id: string | undefined) => (id ? userRef(id) : undefined)
 const usableWeight = (weight: FieldValue | undefined) =>
   weight && (weight.si ?? 0) > 0 ? weight : emptyStep
 
-/** The bullet length a run reads, mm: the record's, else the link's. */
-function bulletLengthOf(bullet: Bullet | undefined, linked: LinkedBullet | undefined) {
-  return bullet?.length?.value ?? (linked?.length && fromSi('length', linked.length))
+/** The bullet length a run reads, mm: the typed one or the record's, else the link's. */
+function bulletLengthOf(values: BulletValues, linked: LinkedBullet | undefined) {
+  const si = values.bulletLength ?? linked?.length
+  return si === undefined ? undefined : fromSi('length', si)
 }
 
 /** The bullets that fit the cartridge (`GET /bullets?cartridge`); all without its CIP values or with all diameters on. */
@@ -945,6 +944,14 @@ function linkedFieldsOf(
   return { linked, missing }
 }
 
+/** The bullet values a link's query or an opened file types: the fields it holds, none for the rest. */
+const typedBulletOf = (query: URLSearchParams, system: UnitSystem): Fields =>
+  Object.fromEntries(
+    Object.entries(queryFields(query, bulletFields, system, fixedFieldText)).filter(
+      ([, f]) => f.si !== undefined,
+    ),
+  )
+
 /** The error of every field whose typed value is outside its bounds. */
 const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
   Object.fromEntries(
@@ -1160,7 +1167,8 @@ export function useWorkbenchState() {
   const [bulletDesign, setBulletDesign] = useState<{
     id: string
     name: string
-    mass?: number | undefined
+    /** The design resolved against its base: the values the Bullet card shows and the run reads. */
+    record?: Partial<Bullet> | undefined
   }>()
   /** The full form without a cartridge, chosen on the start card. */
   const [byHand, setByHand] = useState(false)
@@ -1203,13 +1211,18 @@ export function useWorkbenchState() {
     })
   }, [firearm, firearms, opens])
   /** A bullet design of this browser in place of a record; `fill` writes its mass into the Bullet mass field. */
-  function takeBulletDesign(d: Pick<UserBulletView, 'id' | 'name' | 'si'>, fill = true) {
+  function takeBulletDesign(
+    d: Pick<UserBulletView, 'id' | 'name' | 'si' | 'resolved'>,
+    fill = true,
+    keepTyped = false,
+  ) {
     picking.current.bullets?.abort()
     got('bullet')
-    setBulletDesign({ id: d.id, name: d.name, mass: d.si.mass })
+    setBulletDesign({ id: d.id, name: d.name, record: d.resolved.record })
     setBullet(undefined)
     setBulletNote(undefined)
     if (!fill) return
+    if (!keepTyped) setTypedBullet({})
     markChanged()
     const mass = d.si.mass
     if (mass !== undefined)
@@ -1404,6 +1417,11 @@ export function useWorkbenchState() {
   const openingCapacity = useRef<string>(undefined)
   /** Whether the measured capacity field holds the value a chosen group of cases named, not a typed or loaded one. */
   const measuredFromGroup = useRef(false)
+  /**
+   * The Bullet card's diameter, length and BCs the user typed over the record's, by key. An entry
+   * stays while its field is edited (also empty); a field without one shows the record's value.
+   */
+  const [typedBulletFields, setTypedBullet] = useState<Fields>({})
   /** The Gun and barrel card's gun weight (free recoil only); the load's typed values and links carry it. */
   const [gunFields, setGunFields] = useState<Fields>({ firearmMass: emptyStep })
   const gunWeight = gunFields.firearmMass
@@ -1461,6 +1479,7 @@ export function useWorkbenchState() {
     (update) => setMeasured((f) => update(f)),
     fixedFieldText,
   )
+  useFieldUnits(bulletFields, system, (update) => setTypedBullet((f) => update(f)), fixedFieldText)
   useFieldUnits(
     [firearmMassSpec],
     system,
@@ -1593,8 +1612,22 @@ export function useWorkbenchState() {
   // the link's values while its record is asked for, loading or missing
   const linkedBullet = pendingLink(bullet, asked.bullet?.id, linked.bullet)
   const linkedPowder = pendingLink(powder, asked.powder?.id, linked.powder)
-  /** The bullet length a run reads, mm: the record's, else the link's. */
-  const bulletLength = bulletLengthOf(bullet, linkedBullet)
+  /** The record or design the card shows, the values a run reads (SI, one source for every reader) and the record with them in place. */
+  const {
+    record: bulletRecord,
+    values: bulletValues,
+    now: bulletNow,
+    given: bulletGiven,
+  } = useBulletValues(
+    bullet,
+    bulletDesign,
+    // a design the load cannot name is not a reference that gives its values again
+    bulletDesign && userRef(bulletDesign.id) !== undefined,
+    fields.bulletMass?.si,
+    typedBulletFields,
+  )
+  /** The bullet length a run reads, mm: the typed one or the record's, else the link's. */
+  const bulletLength = bulletLengthOf(bulletValues, linkedBullet)
 
   function reset() {
     setCustomName(undefined)
@@ -1619,6 +1652,7 @@ export function useWorkbenchState() {
     setCartridgeDesign(undefined)
     setBullet(undefined)
     setBulletDesign(undefined)
+    setTypedBullet({})
     setBulletNote(undefined)
     setAllDiameters(false)
     setPowder(undefined)
@@ -1712,12 +1746,15 @@ export function useWorkbenchState() {
     setCartridge(c)
     setBulletNote(undefined)
     const fit = fitOf(c)
-    if (bullet && fit && !bulletFits(bullet.diameter.value, fit)) {
+    const diameter = diameterMm(bulletValues)
+    if (bullet && fit && diameter !== undefined && !bulletFits(diameter, fit)) {
       setBullet(undefined)
+      // the typed values belong to the record that goes
+      setTypedBullet({})
       setBulletNote({
         record: productLabel(bullet, names),
         cartridge: c.name,
-        diameter: bullet.diameter.value,
+        diameter,
         above: bulletWindow(fit).above,
         g1: fit.g1,
       })
@@ -1746,8 +1783,11 @@ export function useWorkbenchState() {
       })
   }
 
-  /** Loads a bullet record; `fill` writes its mass into the Bullet mass field. */
-  function chooseBullet(id: string, fill = true) {
+  /**
+   * Loads a bullet record; `fill` writes its mass into the Bullet mass field and, unless `keepTyped`
+   * (an opened load's own values), ends the diameter, length and BC typed over the earlier record.
+   */
+  function chooseBullet(id: string, fill = true, keepTyped = false) {
     const signal = pick('bullets')
     want('bullet', id)
     return fetchRecord<Bullet>('bullets', id, signal)
@@ -1759,6 +1799,7 @@ export function useWorkbenchState() {
         setBulletDesign(undefined)
         setBulletNote(undefined)
         if (!fill) return
+        if (!keepTyped) setTypedBullet({})
         markChanged()
         const mass = toSi('mass', b.mass.value)
         form.setFieldValue('bulletMass', {
@@ -2302,6 +2343,7 @@ export function useWorkbenchState() {
     // a link follows the defaults of the fields it leaves out; a file opens as saved
     setFollowed(new Set(withDefaults ? followKeys.filter((k) => linked[k]?.si === undefined) : []))
     form.setValues(linked)
+    setTypedBullet(typedBulletOf(query, system))
     // a linked value outside its bounds shows as written with its error
     form.setErrors(fieldErrorsOf(linked, system))
     const queried = queryLadder(query, system)
@@ -2408,7 +2450,7 @@ export function useWorkbenchState() {
         if (!r.success || r.data.kind !== 'bullet' || !resolved || resolved.problem)
           return lost('bullet', ref)
         const mass = resolved.record.mass && toSi('mass', resolved.record.mass.value)
-        takeBulletDesign({ id, name: r.data.name, si: { mass } }, fill)
+        takeBulletDesign({ id, name: r.data.name, si: { mass }, resolved }, fill, true)
       })
       .catch(() => {
         if (!signal.aborted) lost('bullet', ref)
@@ -2579,7 +2621,7 @@ export function useWorkbenchState() {
   function openBullet(ref: unknown, fillMass: boolean) {
     const bulletRef = typeof ref === 'string' ? ref : undefined
     const id = bulletRef && catalogueIdOf(bulletRef)
-    if (id) void chooseBullet(id, fillMass)
+    if (id) void chooseBullet(id, fillMass, true)
     else if (bulletRef) openBulletDesign(bulletRef, fillMass)
   }
 
@@ -2661,6 +2703,8 @@ export function useWorkbenchState() {
       ? groove.record?.values.find((v) => v.side === side && v.symbol === symbol && !v.variant)
           ?.value
       : undefined
+  const siLength = (si: number | undefined) =>
+    si === undefined ? undefined : shownLength('diameter', system, si)
   const mmText = (mm: number | undefined) =>
     mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
   const pmax = specValue(undefined, 'Pmax')
@@ -2689,10 +2733,10 @@ export function useWorkbenchState() {
         },
         t,
       ),
-      bullet: bullet && {
-        name: productLabel(bullet, names),
-        diameter: toSi('length', bullet.diameter.value),
-      },
+      bullet:
+        bullet && bulletValues.bulletDiameter !== undefined
+          ? { name: productLabel(bullet, names), diameter: bulletValues.bulletDiameter }
+          : undefined,
       settingsBarrelLength: defaults.barrelLength,
     },
     t,
@@ -2703,11 +2747,12 @@ export function useWorkbenchState() {
   const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
   const fieldValues: Record<string, number | undefined> = {
     ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
+    ...bulletValues,
     firearmMass: gunWeightUsed.si,
   }
   const given = givenKeys(fieldValues, {
     origin,
-    bulletMass: bulletMassOf(bullet, bulletDesign),
+    bullet: bulletGiven,
     defaults,
     defaulted,
     followed,
@@ -2843,7 +2888,7 @@ export function useWorkbenchState() {
         }
       })
   }, [suggestionKey, followed, seatedVolume])
-  const bc = bcOf(bullet)
+  const bc = bcOf(bulletNow)
 
   /** A new load with nothing chosen or typed: the start card replaces the cards. */
   const fresh = isFresh({
@@ -2920,6 +2965,11 @@ export function useWorkbenchState() {
   return {
     allDiameters,
     bc,
+    bulletNow,
+    bulletRecord,
+    bulletValues,
+    typedBulletFields,
+    setTypedBullet,
     bulletFit,
     bulletParams,
     describeBullet,
@@ -2927,6 +2977,7 @@ export function useWorkbenchState() {
     powderLabel,
     fresh,
     mmText,
+    siLength,
     nextPanel,
     pmax,
     shown,

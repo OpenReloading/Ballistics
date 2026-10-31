@@ -78,6 +78,21 @@ describe('Load', () => {
     expect(Object.keys(analysisKinds)).not.toContain('charge')
   })
 
+  it('keeps the typed bullet values under overrides', () => {
+    const typed = {
+      ...userLoad,
+      analysis: {
+        overrides: {
+          bulletDiameter: 7.82,
+          bulletLength: 31.5,
+          bulletBcG1: 0.462,
+          bulletBcG7: 0.23,
+        },
+      },
+    }
+    expect(load.parse(typed)).toEqual(typed)
+  })
+
   it('rejects a key under overrides that is no workbench value', () => {
     for (const key of ['charge', 'siValues', 'extra'])
       expectIssueAt(
