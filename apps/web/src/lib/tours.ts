@@ -37,8 +37,9 @@ export const tours = {
       ),
     },
     {
-      // the menu itself has no box in the page bar: its Open button
-      target: '.file-menu button',
+      // the menu itself has no box in the page bar: its Open button, not the disabled placeholder;
+      // below 75em the closed Page actions panel hides it, so its toggle
+      target: '.file-menu button:not(:disabled), .page-bar-toggle',
       title: msg('File'),
       text: msg(
         'Save writes the load to a file and keeps a copy in this browser; Open reads a load file.',
@@ -86,7 +87,7 @@ export const tours = {
       ),
     },
     {
-      target: '.page-bar-actions',
+      target: '.page-bar-actions, .page-bar-toggle',
       title: msg('Actions'),
       text: msg('Use the record in another page, copy its link or print it.'),
     },
@@ -107,10 +108,12 @@ export const tours = {
     {
       target: '.stats-side, .target-tabs, .target-sheet',
       title: msg('Statistics'),
-      text: msg('ES, mean radius and the other statistics of the chosen group, with its shots.'),
+      text: msg(
+        'ES, mean radius and the other statistics of the chosen group, with its shots. In a narrow window they are under Stats; on a phone, open the strip at the bottom first.',
+      ),
     },
     {
-      target: '.file-menu button',
+      target: '.file-menu button:not(:disabled), .page-bar-toggle',
       title: msg('File'),
       text: msg(
         'The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.',

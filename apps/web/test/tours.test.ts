@@ -20,7 +20,9 @@ const rendered = (selector: string) => {
 it('every step of every tour points at an element a component renders', () => {
   for (const [page, steps] of Object.entries(tours))
     for (const step of steps) {
-      for (const selector of step.target.split(', ').map((s) => s.replace(/ button$/, ''))) {
+      for (const selector of step.target
+        .split(', ')
+        .map((s) => s.replace(/ button(:not\(:disabled\))?$/, ''))) {
         expect(selector, `${page}: ${selector}`).toMatch(/^[.#][a-z][a-z-]*$/)
         expect(rendered(selector), `${page}: ${selector}`).toBe(true)
       }

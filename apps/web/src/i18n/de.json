@@ -3971,7 +3971,7 @@
   "Use the record in another page, copy its link or print it.": "Den Datensatz auf einer anderen Seite verwenden, seinen Link kopieren oder ihn drucken.",
   "Photo adds a photo of the target; it stays in this browser. Calibrate sets its scale from a reference of known size. Shot places shots.": "Foto fügt ein Foto der Zielscheibe hinzu; es bleibt in diesem Browser. Kalibrieren legt den Maßstab über eine Referenz bekannter Größe fest. Schuss setzt Schüsse.",
   "The photo or the drawn target with the shots of each group.": "Das Foto oder die gezeichnete Zielscheibe mit den Schüssen jeder Gruppe.",
-  "ES, mean radius and the other statistics of the chosen group, with its shots.": "ES, mittlerer Radius und die weiteren Statistiken der gewählten Gruppe, mit ihren Schüssen.",
+  "ES, mean radius and the other statistics of the chosen group, with its shots. In a narrow window they are under Stats; on a phone, open the strip at the bottom first.": "ES, mittlerer Radius und die weiteren Statistiken der gewählten Gruppe, mit ihren Schüssen. In einem schmalen Fenster stehen sie unter Statistik; auf dem Telefon zuerst die Leiste am unteren Rand öffnen.",
   "The sheet is kept in this browser. Save writes it to a file; Open reads a sheet file.": "Das Blatt wird in diesem Browser gespeichert. Speichern schreibt es in eine Datei; Öffnen liest eine Blattdatei.",
   "How to measure bullet dimensions": "So messen Sie die Geschossmaße"
 }
