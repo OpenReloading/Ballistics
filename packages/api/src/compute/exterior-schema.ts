@@ -1,6 +1,14 @@
 import { dragModels } from '@open-reloading/core'
 import { z } from 'zod'
 import { caps, fitIterations, recordId, steps } from './schemas.ts'
+import { stabilityBounds } from './stability-schema.ts'
+
+/** An angle in rad strictly between -pi/2 and pi/2: a value in degrees falls outside. */
+const angle = () =>
+  z
+    .number()
+    .gt(-Math.PI / 2)
+    .lt(Math.PI / 2)
 
 /** Mach (or other abscissa) and value nodes. */
 const nodeTable = (max: number) =>
@@ -86,8 +94,14 @@ const aerodynamics = z
   .describe('Aerodynamic coefficients of the modified point mass, ignored by the point mass model.')
 
 const projectile = z.strictObject({
-  mass: z.number().describe('Projectile mass, kg.'),
-  diameter: z.number().describe('Reference diameter, m.'),
+  mass: z
+    .number()
+    .max(stabilityBounds.mass[1])
+    .describe(`Projectile mass, kg, at most ${stabilityBounds.mass[1]}.`),
+  diameter: z
+    .number()
+    .max(stabilityBounds.diameter[1])
+    .describe(`Reference diameter, m, at most ${stabilityBounds.diameter[1]}.`),
   length: z
     .number()
     .optional()
@@ -136,7 +150,11 @@ export const shot = z
       .describe('An explicit projectile, or a bullet record id with a drag model.'),
     muzzleVelocity: z
       .number()
-      .describe('Muzzle velocity along the bore, relative to the ground, m/s.'),
+      .min(stabilityBounds.muzzleVelocity[0])
+      .max(stabilityBounds.muzzleVelocity[1])
+      .describe(
+        `Muzzle velocity along the bore, relative to the ground, m/s, ${stabilityBounds.muzzleVelocity[0]} to ${stabilityBounds.muzzleVelocity[1]}.`,
+      ),
     firearm: z
       .strictObject({
         sightHeight: z
@@ -154,10 +172,11 @@ export const shot = z
       })
       .describe('Sight position, twist and twist direction of the firearm.'),
     air: air.describe('Station air at the firing point.'),
-    lookAngle: z
-      .number()
+    lookAngle: angle()
       .optional()
-      .describe('Angle of the line of sight above the horizontal, rad, default 0.'),
+      .describe(
+        'Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.',
+      ),
     wind: wind.optional().describe('Wind by horizontal distance segment, default none.'),
     site: z
       .strictObject({
@@ -178,15 +197,19 @@ export const shot = z
       .union([
         z.strictObject({
           range: z.number().describe('Zero slant range, m.'),
-          lookAngle: z.number().optional().describe('Look angle of the zero, rad, default 0.'),
+          lookAngle: angle()
+            .optional()
+            .describe('Look angle of the zero, rad, between -pi/2 and pi/2, default 0.'),
           air: air.optional().describe("Air of the zero, default the shot's air."),
           wind: wind.optional().describe('Wind of the zero, default none.'),
         }),
         z.strictObject({
-          elevationAngle: z.number().describe('Angle of the bore above the line of sight, rad.'),
-          windageAngle: z
-            .number()
-            .describe('Angle of the bore to the right of the line of sight, rad.'),
+          elevationAngle: angle().describe(
+            'Angle of the bore above the line of sight, rad, between -pi/2 and pi/2.',
+          ),
+          windageAngle: angle().describe(
+            'Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2.',
+          ),
         }),
       ])
       .describe('Zero conditions, from which the bore angles are searched, or the bore angles.'),

@@ -34,15 +34,20 @@ const limit = (l: Partial<Limit>): Limit => ({
 })
 
 describe('percentOfMax', () => {
-  it('divides the peak pressure by the first compared limit', () => {
+  it('divides the peak pressure by the compared limit', () => {
     const limits = [
       limit({ compared: false, reason: 'crusher', pressure: 3.0e8 }),
-      limit({ pressure: 4.15e8 }),
-      limit({ pressure: 5e8 }),
+      limit({ pressure: 4.15e8, variant: 'a' }),
+      limit({ pressure: 4.15e8, variant: 'b' }),
     ]
     const p = percentOfPressureLimit(3.81e8, limits)
     expect(p?.percent).toBeCloseTo(91.807, 3)
-    expect(p?.limit.pressure).toBe(4.15e8)
+    expect(p?.limit.variant).toBe('a')
+  })
+
+  it('is undefined when the compared limits of the variants differ', () => {
+    const limits = [limit({ pressure: 1.5e7, variant: '12/35 T' }), limit({ pressure: 1.05e8 })]
+    expect(percentOfPressureLimit(3.81e7, limits)).toBeUndefined()
   })
 
   it('is undefined without a compared limit', () => {

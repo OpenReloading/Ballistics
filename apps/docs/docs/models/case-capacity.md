@@ -89,6 +89,8 @@ $$
 
 Code: `packages/drawing/src/seating/seating.ts`, `seat` (`volumeBehindBullet`).
 
+No volume behind the bullet is given, with a note, when the seating depth is above the case length (the base would sit behind the case head) or when $V_c \le 0$ (the bullet below the mouth takes the whole case volume).
+
 The value is flagged approximate when the part of the outline below the mouth rests on an assumed proportion, or when the bullet has a cavity and any of it is below the mouth.
 
 At fixed COAL a bullet length error $\Delta L$ moves the seating depth by $\Delta L$, and every slice of the bullet, a cavity taken off, is at most the cylinder of the bullet diameter $d$, so

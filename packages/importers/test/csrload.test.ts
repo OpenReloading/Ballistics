@@ -131,6 +131,13 @@ describe('readCsrLoad', () => {
     expect(b.records.map((r) => r.id)).toEqual(a.records.map((r) => r.id))
   })
 
+  it('gives two series of the same content distinct session ids', () => {
+    const { records } = readCsrLoad(csrFile({ appendix: series + series }), saved)
+    const ids = records.filter((r) => r.kind === 'session').map((r) => r.id)
+    expect(ids).toHaveLength(2)
+    expect(new Set(ids).size).toBe(2)
+  })
+
   it('warns on another or a missing format and still reads the load', () => {
     expect(readCsrLoad(csrFile({ format: '2' }), saved).warnings[0]).toMatch(
       /^The file is of format "2"; the reader is written for format 1/,

@@ -6,6 +6,7 @@ import {
   cartridgeBulletDiameterMm,
   cartridgeGrooveDiameterMm,
   fillLoadRatioLimit,
+  InputError,
   type InteriorLoad,
   loadRatio,
   type PressureRange,
@@ -27,7 +28,7 @@ import type { Catalogue } from '../catalogue/types.ts'
 import { assertFinite, notice, resolvedRecord, unprocessable } from './answer.ts'
 import { powderBulkDensity } from './charge-run.ts'
 import { runInterior } from './interior-run.ts'
-import { interiorBody } from './interior-schema.ts'
+import { type InteriorBody, interiorBody } from './interior-schema.ts'
 import { type CartridgeWithSpecs, type Warning, warning } from './limits.ts'
 import {
   catalogueIdOf,
@@ -232,6 +233,30 @@ function simulateAnswer(
   }
 }
 
+/** A mass in kg as the file's grams, rounded to a milligram. */
+const grams = (kg: number) => Number(fromSi('mass', kg).toFixed(3))
+
+/** An issue of the `/interior` body at its path in the file; the charge step's cap in the file's grams. */
+function fileIssue(i: z.core.$ZodIssue, at: PropertyKey[]) {
+  const inGrams = i.code === 'too_big' && i.path.join('.') === 'ladder.chargeStep'
+  return {
+    ...i,
+    ...(inGrams && { message: `Too big: expected number to be <=${grams(Number(i.maximum))}` }),
+    path: filePath(i.path, at),
+  }
+}
+
+/**
+ * Throws the `InputError` (a 422) of a ladder whose lowest charge (kg) is 0 or below, in the file's
+ * grams: the core states it in kg.
+ */
+function needChargesAboveZero(charge: number, ladder: InteriorBody['ladder']) {
+  if (!ladder) return
+  const below = { up: 0, down: ladder.stepCount - 1, around: (ladder.stepCount - 1) / 2 }
+  const lowest = charge - below[ladder.direction ?? 'up'] * ladder.chargeStep
+  if (lowest <= 0) throw new InputError(`ladder charge ${grams(lowest)} g must be above 0`)
+}
+
 /** One `POST /interior/load-file` request (`query`, the load file `json`): the status and body of the answer. */
 export async function simulate(
   context: { catalogue: Catalogue; compute: ComputeRunner },
@@ -267,11 +292,11 @@ export async function simulate(
       })
     } catch (error) {
       if (error instanceof z.ZodError)
-        throw new z.ZodError(error.issues.map((i) => ({ ...i, path: filePath(i.path, path) })))
+        throw new z.ZodError(error.issues.map((i) => fileIssue(i, path)))
       throw error
     }
   }
-  parseBody()
+  needChargesAboveZero(load.charge, parseBody().ladder)
   // after the file's checks (a bad file answers 400): a seating ladder needs the seating
   // geometry of the drawing package, which this route lacks, and a temperature ladder is not run here
   if (ladder?.kind === 'seating' || ladder?.kind === 'temperature')
