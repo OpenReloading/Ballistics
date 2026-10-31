@@ -9854,13 +9854,13 @@ main .session-shots th:nth-child(-n + 2) {
 
 /* the note and the warning together */
 .ladder-impact .message-slot {
-  height: 11rem;
+  height: 13.5rem;
   margin-top: 0.5rem;
 }
 
 @media (max-width: 47.99em) {
   .ladder-impact .message-slot {
-    height: 10.5rem;
+    height: 11rem;
   }
 }
 

@@ -31,33 +31,40 @@ export function useDropSlope(
   const projectile = read && read.bullet === bullet ? read.projectile : undefined
   const { muzzleVelocity, twist, sightHeight, zeroRange } = values
   const { zeroTemperature, zeroPressure, zeroHumidity, dragFactor } = values
-  return useMemo(
-    () => (distance: number) =>
-      projectile &&
-      dropSlope(
-        {
-          muzzleVelocity,
-          twist,
-          sightHeight,
-          zeroRange,
-          zeroTemperature,
-          zeroPressure,
-          zeroHumidity,
-          dragFactor,
-        },
-        projectile,
-        distance,
-      ),
-    [
-      projectile,
-      muzzleVelocity,
-      twist,
-      sightHeight,
-      zeroRange,
-      zeroTemperature,
-      zeroPressure,
-      zeroHumidity,
-      dragFactor,
-    ],
-  )
+  return useMemo(() => {
+    // an edit of a shot changes the groups, not the load: the slope of a distance is flown once
+    const known = new Map<number, number | undefined>()
+    return (distance: number) => {
+      if (!projectile) return
+      if (!known.has(distance))
+        known.set(
+          distance,
+          dropSlope(
+            {
+              muzzleVelocity,
+              twist,
+              sightHeight,
+              zeroRange,
+              zeroTemperature,
+              zeroPressure,
+              zeroHumidity,
+              dragFactor,
+            },
+            projectile,
+            distance,
+          ),
+        )
+      return known.get(distance)
+    }
+  }, [
+    projectile,
+    muzzleVelocity,
+    twist,
+    sightHeight,
+    zeroRange,
+    zeroTemperature,
+    zeroPressure,
+    zeroHumidity,
+    dragFactor,
+  ])
 }
