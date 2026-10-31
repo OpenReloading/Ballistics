@@ -9,6 +9,7 @@ import {
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
 import { english, translator } from '../src/i18n/translate.ts'
+import { installCoreMessages } from '../src/lib/core-message-table.ts'
 import { exampleFirearm } from '../src/lib/example-data.ts'
 import { parseFiles, readLoadFile, readNote } from '../src/lib/load-file-formats.ts'
 import {
@@ -27,6 +28,7 @@ import {
   maxFileBytes,
   parseUserDataFile,
   planImport,
+  reasonText,
   refNote,
   tooLargeMessage,
   userDataText,
@@ -102,7 +104,7 @@ describe('user data files', () => {
   it('rejects text that is not JSON, another format and a newer version with a reason', () => {
     expect(parseUserDataFile('{')).toEqual({ ok: false, reason: 'The file is not JSON.' })
     const other = parseUserDataFile(JSON.stringify({ format: 'x', version: 1, records: [] }))
-    expect(other.ok).toBe(false)
+    expect(other).toEqual({ ok: false, reason: 'The file is not an OpenReloading data file.' })
     const newer = parseUserDataFile(
       JSON.stringify({ format: 'openreloading-user-data', version: 2, records: [] }),
     )
@@ -110,6 +112,25 @@ describe('user data files', () => {
       ok: false,
       reason: 'The file has format version 2; this app reads version 1.',
     })
+  })
+
+  it('refuses another format and another version with one sentence in the language shown', () => {
+    installCoreMessages()
+    const german = translator(de, 'de').t
+    const reason = (json: unknown) => {
+      const p = parseUserDataFile(JSON.stringify(json))
+      if (p.ok) throw new Error('not refused')
+      return [reasonText(p.reason, english.t), reasonText(p.reason, german)]
+    }
+    for (const json of [{ format: 'other', version: 9 }, { version: 1, records: [] }, [], null])
+      expect(reason(json)).toEqual([
+        'The file is not an OpenReloading data file.',
+        'Die Datei ist keine OpenReloading-Datendatei.',
+      ])
+    expect(reason({ format: userDataFormat, version: 9 })).toEqual([
+      'The file has format version 9; this app reads version 1.',
+      'Die Datei hat die Formatversion 9; diese App liest die Version 1.',
+    ])
   })
 
   it('refuses another version, naming the version it reads, and writes version 1', () => {

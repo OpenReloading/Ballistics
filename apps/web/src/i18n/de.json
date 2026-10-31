@@ -3136,6 +3136,7 @@
   "The file is not JSON.": "Die Datei ist kein JSON.",
   "{name}: the {field} {target} is not in this browser": "{name}: {field} {target} ist nicht in diesem Browser",
   "Not found: {list}.": "Nicht gefunden: {list}.",
+  "The file is not an OpenReloading data file.": "Die Datei ist keine OpenReloading-Datendatei.",
   "{count} save|{count} saves": {
     "one": "{count} Speicherung",
     "other": "{count} Speicherungen"
