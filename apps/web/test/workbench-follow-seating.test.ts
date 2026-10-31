@@ -1,5 +1,9 @@
 import { expect, it } from 'vitest'
-import { followPlan, seatingOwnsVolume } from '../src/components/use-workbench-load.ts'
+import {
+  approximateVolumeTolerance,
+  followPlan,
+  seatingOwnsVolume,
+} from '../src/components/use-workbench-load.ts'
 
 const plan = (
   values: Parameters<typeof followPlan>[0],
@@ -46,4 +50,16 @@ it('keeps the case volume default out of a seating without a volume behind the b
   // no seating: the case volume default fills the field
   expect(seatingOwnsVolume({ caseVolume: 4e-6 })).toBe(false)
   expect(seatingOwnsVolume({})).toBe(false)
+})
+
+it('hands the interval of an approximate volume to the run while the field still holds it', () => {
+  const volume = { si: 3e-6, source: '', approximate: true as const, halfWidth: 0.12 }
+  const following = new Set(['volume'] as const)
+  expect(approximateVolumeTolerance(volume, 3e-6, following)).toBe(0.12)
+  // a typed value, a field that no longer follows and a measured volume give no tolerance
+  expect(approximateVolumeTolerance(volume, 3.1e-6, following)).toBeUndefined()
+  expect(approximateVolumeTolerance(volume, 3e-6, new Set())).toBeUndefined()
+  expect(approximateVolumeTolerance({ si: 3e-6, source: '' }, 3e-6, following)).toBeUndefined()
+  // the API takes at most 0.2
+  expect(approximateVolumeTolerance({ ...volume, halfWidth: 0.5 }, 3e-6, following)).toBe(0.2)
 })

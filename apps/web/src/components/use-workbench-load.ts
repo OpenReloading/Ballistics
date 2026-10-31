@@ -49,6 +49,7 @@ import {
   recordBulletValues,
   typedBaseType,
 } from '../lib/bullet.ts'
+import { lessBullet } from '../lib/bullet-below-mouth.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
@@ -407,14 +408,27 @@ type CartridgeSource = {
 }
 
 /** What the chosen cartridge, or its design, gives the defaults. */
-function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources['cartridge'] {
+function cartridgeSource(
+  a: CartridgeSource,
+  system: UnitSystem,
+  t: Translator['t'],
+): DefaultSources['cartridge'] {
   const { cartridge, design, designLoad, seated } = a
+  const show = {
+    text: (si: number) => formatQuantity('capacity', system, si),
+    unit: system.capacity.symbol,
+  }
   if (design)
     return {
       name: design.name,
       design: true,
       boreDiameter: designLoad?.boreDiameter,
-      capacity: designCapacityOf(seated, designLoad, design, t),
+      capacity: lessBullet(
+        designCapacityOf(seated, designLoad, design, t),
+        seated.unseated,
+        show,
+        t,
+      ),
     }
   if (!cartridge) return undefined
   return {
@@ -428,7 +442,7 @@ function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources
       a.boreDiameter,
     ),
     twist: mmToM(a.specValue('chamber', 'u')),
-    capacity:
+    capacity: lessBullet(
       seated.caseVolume === undefined
         ? undefined
         : {
@@ -437,6 +451,10 @@ function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources
               ? t('your measured case capacity, without the bullet')
               : t('case capacity record of {name}, without the bullet', { name: cartridge.name }),
           },
+      seated.unseated,
+      show,
+      t,
+    ),
   }
 }
 
@@ -719,6 +737,19 @@ function revertRecordFill(
     if (given !== undefined) back.add(key)
   }
   return back
+}
+
+/** The API's largest tolerance of the chamber volume (`packages/api/src/compute/interior-schema.ts`). */
+const maxVolumeFraction = 0.2
+
+/** The range tolerance of a chamber volume that still is the approximate default, with its interval: none for a typed or measured one. */
+export function approximateVolumeTolerance(
+  suggestion: Suggestion | undefined,
+  value: number | undefined,
+  followed: ReadonlySet<FollowKey>,
+): number | undefined {
+  if (!suggestion?.halfWidth || value !== suggestion.si || !followed.has('volume')) return undefined
+  return Math.min(suggestion.halfWidth, maxVolumeFraction)
 }
 
 /** Writes the powder record's model parameters into the fields, except the `keep` ones; the keys written. */
@@ -2047,13 +2078,23 @@ export function useWorkbenchState() {
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
+    const volumeTolerance = approximateVolumeTolerance(
+      suggestions.volume,
+      fields.volume?.si,
+      followed,
+    )
     const recordInputs = [
       chosenPowder?.id,
       bulletLength,
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
     ]
-    return { body, bulkDensity, resistanceMissing, recordInputs }
+    return {
+      body: volumeTolerance ? { ...body, tolerances: { volumeFraction: volumeTolerance } } : body,
+      bulkDensity,
+      resistanceMissing,
+      recordInputs,
+    }
   }
 
   /**
@@ -2127,7 +2168,11 @@ export function useWorkbenchState() {
       volumeMeasured: volumeMeasured({
         measuredCapacity: measuredWaterCapacity,
         volume: fields.volume?.si,
-        derived: [suggestions.volume?.si, seated.volume],
+        // an estimated default is no measured capacity
+        derived: [
+          suggestions.volume?.approximate ? undefined : suggestions.volume?.si,
+          seated.volume,
+        ],
       }),
       powderDesign: powderDesign?.name,
       identity: identityOf({
@@ -2776,6 +2821,7 @@ export function useWorkbenchState() {
           measuredCapacity: measuredWaterCapacity,
           boreDiameter: fields.boreDiameter?.si,
         },
+        system,
         t,
       ),
       bullet:

@@ -12,6 +12,10 @@ export type Suggestion = {
   source: string
   /** The firearm's own value: used as the firearm's, not shown as a default. */
   fromFirearm?: true
+  /** The value rests on an estimate: it is not a measured one. */
+  approximate?: true
+  /** Relative half-width of the interval of an approximate value, 1: the run's tolerance of it. */
+  halfWidth?: number
 }
 
 /** The form fields that follow a default until typed; the barrel length is the seating's own field. */

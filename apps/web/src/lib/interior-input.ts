@@ -238,7 +238,13 @@ export function burnFormError(
 
 export type InteriorKey = (typeof interiorFields)[number]['key']
 
-export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string | undefined }
+export type InteriorBody = {
+  model: 'm3'
+  load: InteriorLoad
+  cartridge?: string | undefined
+  /** The tolerance of the chamber volume of the range, relative: the interval of an approximate volume. */
+  tolerances?: { volumeFraction: number }
+}
 
 /**
  * `POST /interior` body from SI field values; the mapping is `interiorLoad` of core, shared with
