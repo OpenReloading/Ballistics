@@ -1601,6 +1601,12 @@ td.nowrap {
   grid-template-columns: minmax(0, 1fr) 9rem;
 }
 
+/* a select 1.5rem wider for its chevron, so a German value ("Nicht angegeben") is not cut */
+.designer-grid > .mantine-InputWrapper-root:has(select),
+.designer-grid > .designer-field > .mantine-InputWrapper-root:has(select) {
+  grid-template-columns: minmax(0, 1fr) 10.5rem;
+}
+
 .designer :is(.prop-grid, .side-grid) .mantine-InputWrapper-label {
   font-size: var(--mantine-font-size-sm);
 }
@@ -1644,8 +1650,25 @@ td.nowrap {
   min-height: 1.75rem;
 }
 
+/* the name at least as wide as its placeholder in German ("Name des Wettbewerbs"); narrower than
+   36em it takes a row of its own below distance and gauge, named by its placeholder alone */
 .face-event {
-  grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)) 1.75rem;
+  grid-template-columns: minmax(10.5rem, 1.5fr) repeat(2, minmax(0, 1fr)) 1.75rem;
+}
+
+@media screen and (max-width: 35.99em) {
+  .face-event {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 1.75rem;
+  }
+
+  .face-event > :first-child {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .face-head.face-event > :first-child {
+    display: none;
+  }
 }
 
 .face-head {
@@ -1655,11 +1678,18 @@ td.nowrap {
   font-weight: 600;
 }
 
+/* a ring's fill and line side by side, one under the other where the row is narrower than their
+   longest values */
 .face-colours {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 0 0.5rem;
   margin: 0.125rem 2.25rem 0.5rem 3.75rem;
+}
+
+.face-colours > * {
+  flex: 1 1 0;
+  min-width: max-content;
 }
 
 .face-designer .side-grid > button {
@@ -1712,11 +1742,15 @@ td.nowrap {
 }
 
 /* a phone: a ring's colours one under the other, the row labels room for their longest word, the
-   first field's placeholder left to its column head (Name, Ingredient) */
+   first field's placeholder left to its column head (Ingredient) */
 @media screen and (max-width: 22.5em) {
   .face-colours {
-    grid-template-columns: minmax(0, 1fr);
     gap: 0.125rem;
+  }
+
+  .face-colours > * {
+    flex-basis: 100%;
+    min-width: 0;
   }
 
   .powder-row {
@@ -1731,7 +1765,7 @@ td.nowrap {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) repeat(2, minmax(0, 0.75fr)) 1.75rem;
   }
 
-  :is(.face-event, .powder-ingredient) > :first-child input::placeholder {
+  .powder-ingredient > :first-child input::placeholder {
     color: transparent;
   }
 }
@@ -2669,7 +2703,7 @@ td.nowrap {
   cursor: pointer;
 }
 
-/* the workbench bar from 75em: Run beside the loads, then a status block of fixed width (line 1 the
+/* the workbench bar from 75em: Run beside the loads, then a status block of 10.5rem (line 1 the
    result, line 2 the File menu's state), so a change of either moves nothing; Search, Copy link and
    Print as icons named by their text */
 @media screen and (min-width: 75em) {
@@ -2678,19 +2712,28 @@ td.nowrap {
   }
 
   main .page-bar:has(.load-strip) h1 {
+    flex: 0 1 auto;
     margin-right: 0.5rem;
     font-size: var(--mantine-font-size-lg);
+    line-height: 1.1;
   }
 
   .page-bar .bar-run {
     width: 5.25rem;
   }
 
+  /* where the room runs out (a long German title and labels) the status gives it first, down to
+     its first words, then the title wraps; the title is never narrower than its content, so Run
+     does not cover the status */
+  .page-bar:has(.load-strip) .page-bar-title {
+    min-width: min-content;
+  }
+
   .page-bar:has(.load-strip) .page-bar-status {
     display: flex;
-    flex: none;
+    flex: 0 1000 10.5rem;
     flex-direction: column;
-    width: 10.5rem;
+    min-width: 8rem;
     justify-content: center;
     margin-right: auto;
     line-height: 1.0625rem;
@@ -10373,6 +10416,28 @@ main .page-bar h1 {
   }
 }
 
+/* a designer's Undo, Redo and Reset as icons named by their text until the German labels, the
+   Safety button and the title fit in one bar */
+@media screen and (min-width: 75em) and (max-width: 104.99em) {
+  .page-bar .toolbar > .bar-icon.mantine-Button-root {
+    width: var(--button-height, 2.25rem);
+    padding: 0;
+  }
+
+  .page-bar .toolbar > .bar-icon .mantine-Button-section {
+    margin: 0;
+  }
+
+  .page-bar .toolbar > .bar-icon .mantine-Button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 /* print: the title as the page heading; the tool pages print their own sheets */
 @media print {
   .page-bar {
@@ -11754,8 +11819,9 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   flex: 1 1 12rem;
 }
 
+/* room for "Beste Übereinstimmung" */
 .bd-filters > .bd-sort {
-  flex: 0 1 12rem;
+  flex: 0 1 13rem;
 }
 
 .bd-mass {
@@ -11887,7 +11953,7 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     display: none;
   }
 
-  .bd-sort {
+  .bd-filters > .bd-sort {
     flex-basis: 100%;
   }
 
