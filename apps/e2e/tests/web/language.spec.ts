@@ -108,6 +108,36 @@ test('the workbench in German after the example run has no axe finding', async (
   expect(await problems(page, 'workbench in German')).toEqual([])
 })
 
+test('the designers in German at 1280 px keep the title, every action, Safety and the theme switch in the page bar', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height })
+  await page.addInitScript(() => localStorage.setItem('language', 'de'))
+  for (const [path, title] of [
+    ['/bullets/designer/', 'Geschoss-Editor'],
+    ['/cartridges/designer/', 'Patronen-Editor'],
+    ['/targets/designer/', 'Scheiben-Editor'],
+  ]) {
+    await gotoHydrated(page, path)
+    const bar = page.locator('.page-bar')
+    const h1 = bar.getByRole('heading', { level: 1, name: title })
+    await expect(h1).toBeVisible()
+    // the bar does not scroll and the title stands on one line
+    expect(await bar.evaluate((b) => b.scrollWidth - b.clientWidth)).toBe(0)
+    expect(
+      await h1.evaluate((h) => {
+        const range = document.createRange()
+        range.selectNodeContents(h)
+        return new Set([...range.getClientRects()].map((r) => r.top)).size
+      }),
+    ).toBe(1)
+    await expect(bar.locator('.page-bar-safety')).toBeInViewport({ ratio: 1 })
+    await expect(page.getByRole('button', { name: 'Dunkles Farbschema' })).toBeInViewport({
+      ratio: 1,
+    })
+  }
+})
+
 test.describe('offline', () => {
   // the offline layer's worker answers the reload
   test.use({ serviceWorkers: 'allow' })

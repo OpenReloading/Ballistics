@@ -10354,6 +10354,28 @@ main .page-bar h1 {
   }
 }
 
+/* a designer's Undo, Redo and Reset as icons named by their text until the German labels, the
+   Safety button and the title fit in one bar */
+@media screen and (min-width: 75em) and (max-width: 104.99em) {
+  .page-bar .toolbar > .bar-icon.mantine-Button-root {
+    width: var(--button-height, 2.25rem);
+    padding: 0;
+  }
+
+  .page-bar .toolbar > .bar-icon .mantine-Button-section {
+    margin: 0;
+  }
+
+  .page-bar .toolbar > .bar-icon .mantine-Button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 /* print: the title as the page heading; the tool pages print their own sheets */
 @media print {
   .page-bar {

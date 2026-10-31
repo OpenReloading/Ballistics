@@ -40,6 +40,7 @@ export const DesignerToolbar = memo(function DesignerToolbar({
     <Flex className="toolbar" wrap="wrap" gap="xs">
       <Button
         variant="default"
+        className="bar-icon"
         disabled={!undo}
         leftSection={<ArrowUUpLeft aria-hidden="true" />}
         onClick={() => dispatch({ type: 'undo' })}
@@ -50,6 +51,7 @@ export const DesignerToolbar = memo(function DesignerToolbar({
       </Button>
       <Button
         variant="default"
+        className="bar-icon"
         disabled={!redo}
         leftSection={<ArrowUUpRight aria-hidden="true" />}
         onClick={() => dispatch({ type: 'redo' })}
@@ -68,9 +70,11 @@ export const DesignerToolbar = memo(function DesignerToolbar({
       {resetLabel && (
         <Button
           variant="default"
+          className="bar-icon"
           disabled={!reset}
           leftSection={<ArrowCounterClockwise aria-hidden="true" />}
           onClick={() => dispatch({ type: 'reset', system })}
+          title={resetLabel}
         >
           {resetLabel}
         </Button>
