@@ -643,7 +643,7 @@ export function evaluate(
 ): Evaluation {
   const { choices } = design
   const { v, states } = fieldStates(design)
-  const sdOk = v.mass !== undefined && v.diameter !== undefined && v.diameter > 0
+  const sdOk = v.mass !== undefined && v.mass > 0 && v.diameter !== undefined && v.diameter > 0
   const computed = sdOk
     ? computedBulletRows({
         mass: { value: v.mass as number },
