@@ -460,22 +460,7 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
     height: var(--field-height);
     min-height: var(--field-height);
     padding-inline: 0.375rem 0.5rem;
-    background: var(--bg);
     text-align: right;
-  }
-
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .mantine-Input-input:where(:not([data-error])) {
-    border-color: var(--input-border);
-  }
-
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .mantine-Input-input:focus {
-    border-color: var(--focus);
   }
 
   .workbench:is(.proto-a, .proto-e)
@@ -590,14 +575,5 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
 
   .workbench.proto-e .panels .figure-host:empty {
     display: none;
-  }
-}
-
-@media screen and (max-width: 47.99em) {
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .mantine-Input-input:where(:not([data-error])) {
-    border-color: var(--input-border);
   }
 }
