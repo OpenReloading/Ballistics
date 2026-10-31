@@ -7,7 +7,7 @@ import { type DropSlopeLoad, dropSlope } from '../lib/ladder-slope.ts'
 
 /**
  * The drop slope at a distance for the load of the Trajectory tab, m per m/s: its bullet record
- * read once per bullet, with the G7 ballistic coefficient the tab starts with, else the G1. A
+ * read once per bullet, with the G7 ballistic coefficient the tab starts with, the G1 only for a bullet without a G7. A
  * function of the distance that gives undefined while the record is not read, for a bullet whose
  * coefficients need a choice, and for a load the trajectory cannot be flown for.
  */
@@ -21,9 +21,9 @@ export function useDropSlope(
     const controller = new AbortController()
     fetchRecord<Bullet>('bullets', bullet, controller.signal)
       .then((record) => {
-        const drag = record && [bulletDrag(record, 'G7'), bulletDrag(record, 'G1')]
-        const found = drag?.find((d) => d.kind === 'bands')
-        setRead({ bullet, projectile: found?.kind === 'bands' ? found.projectile : undefined })
+        const g7 = record && bulletDrag(record, 'G7')
+        const drag = record && g7?.kind === 'none' ? bulletDrag(record, 'G1') : g7
+        setRead({ bullet, projectile: drag?.kind === 'bands' ? drag.projectile : undefined })
       })
       .catch(() => setRead({ bullet, projectile: undefined }))
     return () => controller.abort()

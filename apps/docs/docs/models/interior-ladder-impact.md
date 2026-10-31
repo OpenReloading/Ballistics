@@ -37,7 +37,7 @@ $$
 b = \frac{h(v_0 + d) - h(v_0 - d)}{2d}
 $$
 
-Code: `apps/web/src/lib/ladder-slope.ts`, `dropSlope` (`zero`, `at`, `slope`). The drag is the G7 ballistic coefficient of the bullet record, else the G1, as one band set; a bullet whose coefficients need a choice gives no slope.
+Code: `apps/web/src/lib/ladder-slope.ts`, `dropSlope` (`zero`, `at`, `slope`). The drag is the G7 ballistic coefficient of the bullet record, as one band set, or the G1 for a bullet without a G7; a bullet whose coefficients need a choice gives no slope.
 
 ### Which shots enter
 
