@@ -1,0 +1,21 @@
+{
+  "id": "7-62-x-39-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:7-62-x-39",
+  "waterCapacity": {
+    "value": 2.307,
+    "raw": "35.6 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 7.62x39mm",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.62%C3%9739mm&oldid=1371601372",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 2.31 cm3 (35.6 gr H2O)."
+      }
+    ]
+  }
+}

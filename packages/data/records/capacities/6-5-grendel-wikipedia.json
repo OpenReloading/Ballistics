@@ -1,0 +1,21 @@
+{
+  "id": "6-5-grendel-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:6-5-grendel",
+  "waterCapacity": {
+    "value": 2.268,
+    "raw": "35 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 6.5mm Grendel",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5mm_Grendel&oldid=1345549433",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 2.3 cm3 (35 gr H2O)."
+      }
+    ]
+  }
+}

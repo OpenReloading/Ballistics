@@ -1,0 +1,61 @@
+{
+  "id": "sierra-4665",
+  "manufacturer": "sierra",
+  "productNumber": "4665",
+  "name": "30 CAL 165 GR TIPPED GAMEKING (TGK)",
+  "caliber": "0.308",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0.308 in"
+  },
+  "mass": {
+    "value": 10.692,
+    "raw": "165 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.53,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.234,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 4665, 4665T, 4665C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-165-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "f5f84f50687756a4ab8fadebe98c0599eec3e39460fd2a74dce3b9e9cf1694df",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 4665, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.308, Bullet Weight (Grains): 165, G1 BC: 0.530, G7 BC: 0.234, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

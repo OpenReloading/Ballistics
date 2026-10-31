@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-356147m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "356147M",
+  "name": "SubSonic, 147 Grain 9MM FP",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042,
+    "raw": ".356 Diameter"
+  },
+  "mass": {
+    "value": 9.525,
+    "raw": "147 Grain"
+  },
+  "length": {
+    "value": 17.12,
+    "raw": "Bullet OAL .674 +/-"
+  },
+  "note": "Listed as 147 Grain 9MM FP. Brinell 18. 9mm Parabellum. For Subsonic Work.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "356147M, SubSonic (https://missouribullet.com/details.php?prodId=66): .356 Diameter, 147 Grain 9MM FP, Brinell 18, Bullet OAL .674 +/-"
+      }
+    ]
+  }
+}

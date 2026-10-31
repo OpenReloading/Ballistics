@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-129gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8521",
+  "name": ".264 Cal-129gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 8.359,
+    "raw": "129 gr"
+  },
+  "length": {
+    "value": 37.34,
+    "raw": "Bullet length is 1.470″"
+  },
+  "noseLength": {
+    "value": 22.4,
+    "raw": "Bullet nose length is .8818″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.245,
+      "note": "Hammer Bullets: \"g7-bc= .245 Calculated from shot drops\" (Calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 190.5,
+    "raw": "Recommended minimum twist rate is 1-7.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We ran this 129gr Absolute Hammer™ in our .264 Winchester Magnum 1-7.5″ twist test rifle at a comfortable 3420 fps. This is a solid 200 fps faster than conventional bullet load data for 130gr bullets. A good 300 fps faster than the majority of published data. We did well with rl-26 and n565 powders. The Absolute Hammer™ should be loaded by experienced reloaders that are competent at working up loads that do not match up with any published load data.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-129gr-absolute-hammer/: Recommended minimum twist rate is 1-7.5″ | Bullet length is 1.470″ | Bullet nose length is .8818″ | Bullet weight is 129gr | Recommended use: Big Game Hunting | g7-bc= .245 Calculated from shot drops"
+      }
+    ]
+  }
+}

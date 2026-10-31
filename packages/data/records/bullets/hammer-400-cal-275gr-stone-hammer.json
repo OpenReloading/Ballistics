@@ -1,0 +1,45 @@
+{
+  "id": "hammer-400-cal-275gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869043099",
+  "name": ".400 Cal-275gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16,
+    "raw": ".400"
+  },
+  "mass": {
+    "value": 17.82,
+    "raw": "275 gr"
+  },
+  "length": {
+    "value": 32.89,
+    "raw": "Bullet length is 1.295″"
+  },
+  "noseLength": {
+    "value": 16.24,
+    "raw": "Nose length is .6393″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.327,
+      "note": "Hammer Bullets: \"g1-bc= .327 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist rate is 1-18″ for big game hunting and 1-16″ for dangerous game hunting, or faster. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"Designed for the 400 Tembo, this 275gr Stone Hammer™ will have great vel for flat shooting. Great for big game and plains game hunting as well as some dangerous game hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/400-cal-275gr-stone-hammer/: Minimum required twist rate is 1-18″ for big game hunting and 1-16″ for dangerous game hunting, or faster. | Bullet length is 1.295″ | Nose length is .6393″ | Bullet weight is 275gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .327 estimated"
+      }
+    ]
+  }
+}

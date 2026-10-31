@@ -1,0 +1,58 @@
+{
+  "id": "sierra-1375",
+  "manufacturer": "sierra",
+  "productNumber": "1375",
+  "name": "22 CAL 60 GR HP VarmintKing (SVK)",
+  "caliber": "0.224",
+  "diameter": {
+    "value": 5.69,
+    "raw": "0.224 in"
+  },
+  "mass": {
+    "value": 3.888,
+    "raw": "60 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.246,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-60-gr-hp-varmintking-svk/",
+        "retrieved": "2026-10-08",
+        "sha256": "c08220374623546433086a3dff415491bd1d86197183f53579014970ccab6132",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1375, Bullet Type: Hollow Point (HP), Bullet Diameter: 0.224, Bullet Weight (Grains): 60, G1 BC: 0.246, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

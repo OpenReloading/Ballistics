@@ -1,0 +1,58 @@
+{
+  "id": "sierra-2020",
+  "manufacturer": "sierra",
+  "productNumber": "2020",
+  "name": "30 CAL 125 GR HP/FN Pro-Hunter",
+  "caliber": "0.308",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0.308 in"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.119,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-125-gr-hp-fn-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "e5118bacd1056290e982ee6ffeb38cf711727e2fa2b64009f02ebc4b8d79fa84",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2020, Bullet Type: Hollow Point - Flatnose (HP-FN), Bullet Diameter: 0.308, Bullet Weight (Grains): 125, G1 BC: 0.119, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

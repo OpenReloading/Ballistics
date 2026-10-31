@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-311167gl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-311167GL",
+  "name": "#1 Russian-Grooveless, 167 Grain FP - Grooveless",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925,
+    "raw": ".312 Diameter"
+  },
+  "mass": {
+    "value": 10.821,
+    "raw": "167 Grain"
+  },
+  "length": {
+    "value": 22.83,
+    "raw": "Bullet OAL .899 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 167 Grain FP - Grooveless. Brinell 20. For Mosin-Nagant.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-311167GL, #1 Russian-Grooveless (https://missouribullet.com/details.php?prodId=419): .312 Diameter, 167 Grain FP - Grooveless, Brinell 20, Bullet OAL .899 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8520",
+  "manufacturer": "sierra",
+  "productNumber": "8520",
+  "name": "41 CAL 210 GR JHC SPORTS MASTER",
+  "caliber": "0.410",
+  "diameter": {
+    "value": 10.414,
+    "raw": "0.410 in"
+  },
+  "mass": {
+    "value": 13.608,
+    "raw": "210 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.165,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/41-cal-210-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "eaaec05b032893d74102f51ae7d1cdc94dafcc17b477b3730f4fe70c3b9fcf54",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8520, Bullet Type: Jacketed Hollow Cavity (JHC), Bullet Diameter: 0.410, Bullet Weight (Grains): 210, G1 BC: 0.165, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

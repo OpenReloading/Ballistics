@@ -1,0 +1,39 @@
+{
+  "id": "sellier-bellot-v339132",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339132",
+  "name": "FMJ, .277, 110 gr (bullet 2340)",
+  "productLine": "FMJ",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277 in (7,06 mm)"
+  },
+  "mass": {
+    "value": 7.128,
+    "raw": "110 grs (7,1 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.307,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"],
+        "note": "V339132 | 2340 | FMJ | 110 | 7,1 | 270 | 7,06 | .277 | 0,307. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

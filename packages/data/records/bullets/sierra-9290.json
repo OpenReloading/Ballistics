@@ -1,0 +1,74 @@
+{
+  "id": "sierra-9290",
+  "manufacturer": "sierra",
+  "productNumber": "9290",
+  "name": "22 CAL 90 GR HPBT/CN MatchKing (SMK)",
+  "caliber": "0.224",
+  "diameter": {
+    "value": 5.69,
+    "raw": "0.224 in"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.563,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.278,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 9290, 9290T (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-90-gr-hpbt-cn-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "a83eaad295c6042522438205afc39137494a7dee1122933ed774e3bb768b3528",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 9290, Bullet Type: Hollow Point Boat Tail - Closed Nose (HPBT-CN), Bullet Diameter: 0.224, Bullet Weight (Grains): 90, G1 BC: 0.563, G7 BC: 0.278, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

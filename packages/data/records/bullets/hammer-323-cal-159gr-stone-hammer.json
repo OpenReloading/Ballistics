@@ -1,0 +1,45 @@
+{
+  "id": "hammer-323-cal-159gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "847",
+  "name": ".323 Cal-159gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204,
+    "raw": ".323"
+  },
+  "mass": {
+    "value": 9.979,
+    "raw": "154 gr"
+  },
+  "length": {
+    "value": 29.21,
+    "raw": "Bullet length is 1.15″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.345,
+      "note": "Hammer Bullets: \"G1-BC=.345 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 368.3,
+    "raw": "Recommended twist rate is 1-14.5″ minimum"
+  },
+  "note": "Recommended use: Big game hunting. The product name says 159 gr; the specification says 154 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/323-cal-159gr-stone-hammer/: Recommended twist rate is 1-14.5″ minimum | Bullet length is 1.15″ | Bullet weight is 154gr | Recommended use: Big game hunting | G1-BC=.345 estimated"
+      }
+    ]
+  }
+}

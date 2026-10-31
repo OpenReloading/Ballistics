@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-m-375-175",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.375 175",
+  "name": "M.375 175 (MAXIMUS, 175 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 11.34,
+    "raw": "175 gr"
+  },
+  "length": {
+    "value": 23.29,
+    "raw": ".917\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.217,
+      "note": "G1 BC, printed \".217 (O89)\". Marked (O89): Oehler 89 system. Page footer: the coefficient numbers are confirmed by independent testing and by the Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.108,
+      "note": "G7 BC, printed \".108 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 457.2,
+    "raw": "1-18\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .375, Grains 175, Minimum Required Twist 1-18\", Part Number M.375 175, G1 BC .217 (O89), G7 BC .108 EST, OAL .917\", BULLET PROJECTION .520\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .520\"."
+}

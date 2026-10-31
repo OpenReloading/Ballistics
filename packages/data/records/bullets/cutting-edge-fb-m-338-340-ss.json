@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-fb-m-338-340-ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB M. 338 340 SS",
+  "name": "FB M. 338 340 SS (MAXIMUS, 340 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 22.032,
+    "raw": "340 gr"
+  },
+  "length": {
+    "value": 53.85,
+    "raw": "2.120\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .338, Grains 340, Minimum Required Twist 1-3\", Part Number FB M. 338 340 SS, G1 BC TBD, G7 BC TBD, OAL 2.120\", BULLET PROJECTION 1.120\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". G7 BC is printed \"TBD\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.120\". The twist is printed as \"1-3\"\" (76.2 mm per turn), outside 100 to 1800 mm; it is not stored."
+}

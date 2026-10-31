@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-esp-s300-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP S300 Raptor",
+  "name": "ESP S300 Raptor (ESP Raptor, 300 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 36.88,
+    "raw": "1.452\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.142,
+      "note": "G1 BC w/o tip, printed \".142 (O89)\". Without the tip installed, determined at 50 yards (page footnote). Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.25,
+      "note": "G1 BC w/tip, printed \".250\". With the tip installed, determined at 250 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 508,
+    "raw": "1-20\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "8",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 8, Enhanced System Projectile (ESP): Caliber .458, Grains 300, Minimum Required Twist 1-20\", Part Number ESP S300 Raptor, G1 BC w/o tip .142 (O89), G1 BC w/tip .250, OAL w/o tip 1.103\", OAL w/tip 1.452\", Bullet Projection w/o tip .251\", Bullet Projection w/tip .650\", Blunt Trauma Base™ ~ Retained Weight (grains) 219"
+      }
+    ]
+  },
+  "note": "Also printed: OAL w/o tip 1.103\" (the length stored is with the tip). Bullet projection (from the SealTite band to the tip, page footnote) printed: w/o tip .251\"; w/tip .650\"."
+}

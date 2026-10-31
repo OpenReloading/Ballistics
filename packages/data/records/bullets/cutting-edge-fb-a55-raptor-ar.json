@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-fb-a55-raptor-ar",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB A55 Raptor- AR",
+  "name": "FB A55 Raptor- AR (Flat Base Raptor, 55 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 3.564,
+    "raw": "55 gr"
+  },
+  "length": {
+    "value": 21.01,
+    "raw": ".827\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "G1 BC, printed \".120\". No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "1-11\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .224, Grains 55, Minimum Required Twist 1-11\", Part Number FB A55 Raptor- AR, G1 BC .120, OAL .827\", Bullet Projection .490\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .490\"."
+}

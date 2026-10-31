@@ -1,0 +1,36 @@
+{
+  "id": "hornady-32070",
+  "manufacturer": "hornady",
+  "productNumber": "32070",
+  "name": "32 CAL. XTP, .312, 100 gr",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925,
+    "raw": ".312\""
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.17,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "96",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "32 CAL. XTP, .312\", 100 gr., G1 .170, Sec. Den. .147, Item # 32070"
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-430240m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-430240M",
+  "name": ".44 Magnum - Hi-Tek, 240 Grain TCFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922,
+    "raw": ".430 Diameter"
+  },
+  "mass": {
+    "value": 15.552,
+    "raw": "240 Grain"
+  },
+  "length": {
+    "value": 18.29,
+    "raw": "Bullet OAL .720 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 240 Grain TCFP. Brinell 18. .44 Magnum. For Magnum Loads.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-430240M, .44 Magnum - Hi-Tek (https://missouribullet.com/details.php?prodId=224): .430 Diameter, 240 Grain TCFP, Brinell 18, Bullet OAL .720 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

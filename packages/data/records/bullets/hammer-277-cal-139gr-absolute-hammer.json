@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-139gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8575",
+  "name": ".277 Cal-139gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "length": {
+    "value": 35.05,
+    "raw": "Bullet length is 1.38″"
+  },
+  "noseLength": {
+    "value": 18.16,
+    "raw": "Nose length is .715″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.237,
+      "note": "Hammer Bullets: \"g7-bc= .237 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "Recommended minimum twist rate is 1-9″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"I know… Our 1st .277 Cal Absolute Hammer™ is for a custom twist. But we just built two 270 Sherman Short Mags and they need a bullet for the hunting season coming up fast. The 140gr 9″ twist Absolute Hammer™ should run about 3200 to 3300 in the Sherman Short mag. Load for the Absolute Hammer™s with extreme caution as they do not line up with conventional data and they should be used by experienced re-loaders only.\" The product name says 139 gr; the specification says 140 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-139gr-absolute-hammer/: Recommended minimum twist rate is 1-9″ | Bullet length is 1.38″ | Nose length is .715″ | Bullet weight is 140gr | Recommended use: Big Game Hunting | g7-bc= .237 estimated"
+      }
+    ]
+  }
+}

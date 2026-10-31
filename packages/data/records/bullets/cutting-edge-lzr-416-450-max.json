@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-lzr-416-450-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 416 450 MAX",
+  "name": "LZR 416 450 MAX (Lazer, 450 gr)",
+  "productLine": "Lazer",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566,
+    "raw": ".416"
+  },
+  "mass": {
+    "value": 29.16,
+    "raw": "450 gr"
+  },
+  "length": {
+    "value": 56.08,
+    "raw": "2.208\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.42,
+      "note": "G7 BC, printed \".42 est\". Marked est: estimated, within +/- 5% (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "*1-13\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .416, Grains 450, Minimum Required Twist *1-13\", Part Number LZR 416 450 MAX, G1 BC .83* est, G7 BC .42 est, OAL 2.208\", Bullet Projection 1.576\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \".83* est\"; does not read as a value and is not stored. The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1-2 inches faster is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.576\"."
+}

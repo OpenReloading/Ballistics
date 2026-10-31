@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-321170m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-321170M",
+  "name": "#1 .32-40 - Hi-Tek, 170 Grain RNFP",
+  "caliber": ".321",
+  "diameter": {
+    "value": 8.153,
+    "raw": ".321 Diameter"
+  },
+  "mass": {
+    "value": 11.016,
+    "raw": "170 Grain"
+  },
+  "length": {
+    "value": 21.72,
+    "raw": "Bullet OAL .855 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 170 Grain RNFP. Brinell 18. For Lever Guns.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-321170M, #1 .32-40 - Hi-Tek (https://missouribullet.com/details.php?prodId=261): .321 Diameter, 170 Grain RNFP, Brinell 18, Bullet OAL .855 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

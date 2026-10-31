@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-358125rn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358125RN",
+  "name": "Cowboy #17, 125 Grain RNFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 Grain"
+  },
+  "length": {
+    "value": 13.39,
+    "raw": "Bullet OAL .527 +/-"
+  },
+  "note": "Listed as 125 Grain RNFP. Brinell 12. .38 Special. For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "358125RN, Cowboy #17 (https://missouribullet.com/details.php?prodId=163): .358 Diameter, 125 Grain RNFP, Brinell 12, Bullet OAL .527 +/-"
+      }
+    ]
+  }
+}

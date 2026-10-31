@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-lzr-264-140-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 264 140 MAX",
+  "name": "LZR 264 140 MAX (Lazer, 140 gr)",
+  "productLine": "Lazer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "length": {
+    "value": 39.98,
+    "raw": "1.574\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.588,
+      "note": "G1 BC, printed \".588 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.302,
+      "note": "G7 BC, printed \".302 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "1-7\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .264, Grains 140, Minimum Required Twist 1-7\", Part Number LZR 264 140 MAX, G1 BC .588 (A.B.), G7 BC .302 (A.B.), OAL 1.574\", Bullet Projection 1.101\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.101\"."
+}

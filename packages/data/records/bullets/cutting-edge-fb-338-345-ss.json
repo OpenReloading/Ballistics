@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-fb-338-345-ss",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 338 345 SS",
+  "name": "FB 338 345 SS (Flat Base Raptor, 345 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 22.356,
+    "raw": "345 gr"
+  },
+  "length": {
+    "value": 56.11,
+    "raw": "2.209\""
+  },
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "1-7\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .338, Grains 345, Minimum Required Twist 1-7\", Part Number FB 338 345 SS**, OAL 2.209\", Bullet Projection 1.120\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.120\". The part number is printed with \"**\"; page footnote: \"** Part numbers highlighted in Bold are Lead Free Options\"."
+}

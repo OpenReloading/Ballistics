@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-452255m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-452255M",
+  "name": ".45 Elmer K - Hi-Tek, 250 Grain SWC",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 16.2,
+    "raw": "250 Grain"
+  },
+  "length": {
+    "value": 17.5,
+    "raw": "Bullet OAL .689 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 250 Grain SWC. Brinell 18. .45 Colt (.452). For Elmer Keith Fans.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-452255M, .45 Elmer K - Hi-Tek (https://missouribullet.com/details.php?prodId=210): .452 Diameter, 250 Grain SWC, Brinell 18, Bullet OAL .689 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

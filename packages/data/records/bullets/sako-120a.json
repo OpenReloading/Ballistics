@@ -1,0 +1,48 @@
+{
+  "id": "sako-120a",
+  "manufacturer": "sako",
+  "productNumber": "120A",
+  "name": "SAKO SPEEDHEAD 120A",
+  "productLine": "SPEEDHEAD",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0,308”"
+  },
+  "mass": {
+    "value": 7.97,
+    "raw": "8,0g/123gr"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "construction": {
+    "raw": "Full metal jacket",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.273,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "10, 17",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "SAKO SPEEDHEAD 120A: Diameter 0,308”, Weight 8,0g/123gr, Ballistic Coefficient 0.273, Bullet Type Full metal jacket, Sectional density 0.184"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

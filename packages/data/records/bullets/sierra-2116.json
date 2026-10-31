@@ -1,0 +1,59 @@
+{
+  "id": "sierra-2116",
+  "manufacturer": "sierra",
+  "productNumber": "2116",
+  "name": "30 CAL 115 GR HP VarmintKing (SVK)",
+  "caliber": "0.308",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0.308 in"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.267,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 2116, 2116C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-115-gr-hp-varmintking-svk/",
+        "retrieved": "2026-10-08",
+        "sha256": "291cc25ff690b143d3b626fad9d534009608ff2ab1836b8de57249b75166675e",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2116, Bullet Type: Hollow Point (HP), Bullet Diameter: 0.308, Bullet Weight (Grains): 115, G1 BC: 0.267, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

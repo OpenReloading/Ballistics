@@ -1,0 +1,61 @@
+{
+  "id": "hammer-284-cal-154gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869064080",
+  "name": ".284 Cal-154gr Hammer HBC™ GEN II",
+  "productLine": "Hammer HBC GEN II",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 9.979,
+    "raw": "154 gr"
+  },
+  "length": {
+    "value": 41.02,
+    "raw": "Bullet length with tip: 1.615″"
+  },
+  "noseLength": {
+    "value": 21.34,
+    "raw": "Nose length with tip: .840″ (may require single feeding)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.329,
+      "note": "Hammer Bullets: \"g7-bc= .329\"; the page says \"calculated from shot drops at 860y, 4200′ elevation, MV of 3100 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.654,
+      "note": "Hammer Bullets: \"g1-bc= .654\"; the page says \"calculated from shot drops at 860y, 4200′ elevation, MV of 3100 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Minimum required twist rate is 1-8″ or faster"
+  },
+  "note": "PDR drive band spacing: .200″ (recommend two drive bands in case neck for concentricity) Tip length: .143″. Recommended use: Big Game Hunting. form factor= .829. The product page also says: \"GEN II redesigned as of 10/07/2026\" The product page also says: \"Bullet was shortened at the base and the shoulder moved forward to increase stability with adjustment to the boat tail angle in order to keep the weight the same. Our testing in 4 different rifles and cartridges resulted in the same load and vel going to the same point of impact at 100y and 860y. Loaded to the same COAL as the 1st generation will result in the bullet being closer to the lands. Make sure to adjust if too close in your rifle. In our test rifles we loaded to the same point on the drive bands with a bit more jump and no change in POI.\" The product page also says: \"This will be the heaviest Hammer HBC™ for the 7mm at 154gr and stabilizes in a 1-8″ or faster barrel twist. This pure copper bullet is carrying a very high bc of .329 g7 or .654 g1 along with high velocity potential, makes this a very potent combination for the fast twist 7mm rifles. We hunted with this bullet in our 28 FatGirl running at 3520 fps, and at an elevation of 4200′ this bullet is still carrying 2250 fps at 1000y and reaches 1400y at 1800 fps. Our 3100 fps 7 SAUM reaches 1100y at 1800 fps. Simply amazing!\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-154gr-hammer-hbc/: Minimum required twist rate is 1-8″ or faster | Bullet length with tip: 1.615″ | Nose length with tip: .840″ (may require single feeding) | PDR drive band spacing: .200″ (recommend two drive bands in case neck for concentricity) | Tip length: .143″ | Bullet weight: 154gr | Recommended use: Big Game Hunting | g7-bc= .329 | g1-bc= .654 | form factor= .829 | calculated from shot drops at 860y, 4200′ elevation, MV of 3100 fps"
+      }
+    ]
+  }
+}

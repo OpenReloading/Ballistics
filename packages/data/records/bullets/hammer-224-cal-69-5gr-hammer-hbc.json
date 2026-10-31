@@ -1,0 +1,61 @@
+{
+  "id": "hammer-224-cal-69-5gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869056118",
+  "name": ".224 Cal-69.5gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 4.471,
+    "raw": "69 gr"
+  },
+  "length": {
+    "value": 29.34,
+    "raw": "Bullet length including tip is 1.155″"
+  },
+  "noseLength": {
+    "value": 14.73,
+    "raw": "Nose length including tip is .58″ (may require single feeding)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.187,
+      "note": "Hammer Bullets: \"g7-bc= .187\"; the page says \"Calculated from shot drops at 720y, 1000′ elevation, MV of 3650 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.375,
+      "note": "Hammer Bullets: \"g1-bc= .375\"; the page says \"Calculated from shot drops at 720y, 1000′ elevation, MV of 3650 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Minimum required twist rate is 1-8″ or faster"
+  },
+  "note": "PDR drive band spacing is .188″ (recommend two drive bands in case neck for concentricity) Tip length is .143″. Recommended use: Small to Big Game Hunting. form factor= 1.048. The product page also says: \"This Hammer HBC™ will give guys that are shooting 22 caliber rifles with a 1-8″ or faster barrel twist the ability to stretch their effective range. The pure copper Hammer HBC™ is designed to maximize ballistic coefficient for the bullet weight. Make sure the bullet specifications will work in your cartridge and rifle system. May require single feeding.\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product name says 69.5 gr; the specification says 69 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/224-cal-69-5gr-hammer-hbc/: Minimum required twist rate is 1-8″ or faster | Bullet length including tip is 1.155″ | Nose length including tip is .58″ (may require single feeding) | PDR drive band spacing is .188″ (recommend two drive bands in case neck for concentricity) | Tip length is .143″ | Bullet weight is 69gr | Recommended use: Small to Big Game Hunting | g7-bc= .187 | g1-bc= .375 | form factor= 1.048 | Calculated from shot drops at 720y, 1000′ elevation, MV of 3650 fps"
+      }
+    ]
+  }
+}

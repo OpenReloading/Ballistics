@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-bp-452255cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-452255CB",
+  "name": "Cowboy #9 - Black Powder, 255 Grain SWC",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 16.524,
+    "raw": "255 Grain"
+  },
+  "length": {
+    "value": 17.5,
+    "raw": "Bullet OAL .689 +/- For Cowboy Action Velocities"
+  },
+  "note": "Listed as 255 Grain SWC. Brinell 12. .45 Colt (.452). For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "BP-452255CB, Cowboy #9 - Black Powder (https://missouribullet.com/details.php?prodId=448): .452 Diameter, 255 Grain SWC, Brinell 12, Bullet OAL .689 +/- For Cowboy Action Velocities"
+      }
+    ]
+  }
+}

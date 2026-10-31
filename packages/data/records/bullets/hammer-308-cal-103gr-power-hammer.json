@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-103gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869035297",
+  "name": ".308 Cal-103gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 6.674,
+    "raw": "103 gr"
+  },
+  "length": {
+    "value": 20.07,
+    "raw": "Bullet length is .790″"
+  },
+  "noseLength": {
+    "value": 9.64,
+    "raw": "Nose length is .3797″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.228,
+      "note": "Hammer Bullets: \"g1-bc= .228 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 457.2,
+    "raw": "Minimum required twist rate is 1-18″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This 103gr pure copper Power Hammer™ is the result of shooters running super high velocity. The nose design of the Power Hammer™ will open easily down to 1800 fps, yet still handle impacts on game in the 4000 fps range.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-103gr-power-hammer/: Minimum required twist rate is 1-18″ or faster | Bullet length is .790″ | Nose length is .3797″ | Bullet weight is 103gr | Recommended use: Big Game Hunting | g1-bc= .228 estimated"
+      }
+    ]
+  }
+}

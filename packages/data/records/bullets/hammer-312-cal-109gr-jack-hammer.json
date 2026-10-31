@@ -1,0 +1,56 @@
+{
+  "id": "hammer-312-cal-109gr-jack-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869058863",
+  "name": ".312 Cal-109gr Jack Hammer®",
+  "productLine": "Jack Hammer",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925,
+    "raw": ".312"
+  },
+  "mass": {
+    "value": 7.063,
+    "raw": "109 gr"
+  },
+  "length": {
+    "value": 17.78,
+    "raw": "Bullet length is .70″"
+  },
+  "noseLength": {
+    "value": 6.35,
+    "raw": "Nose length is .250″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.188,
+      "note": "Hammer Bullets: \"g1-bc= .188 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 533.4,
+    "raw": "Minimum required twist is 1-21″ or faster"
+  },
+  "note": "Recommended use: Hunting / self defense. The product page also says: \"This pure copper pistol bullet is designed for the 327 Federal Magnum. Designed for 100% weight retention and superior penetration, this Jack Hammer® will be exceptional for personal defense or hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/312-cal-109gr-jack-hammer/: Minimum required twist is 1-21″ or faster | Bullet length is .70″ | Nose length is .250″ | Bullet weight is 109gr | Recommended use: Hunting / self defense | g1-bc= .188 estimated"
+      }
+    ]
+  }
+}

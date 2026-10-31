@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-116gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "9939",
+  "name": ".277 Cal-116gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 7.517,
+    "raw": "116 gr"
+  },
+  "length": {
+    "value": 30.48,
+    "raw": "Bullet length is 1.20″"
+  },
+  "noseLength": {
+    "value": 18.01,
+    "raw": "Nose length is .709″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.18,
+      "note": "Hammer Bullets: \"g7-bc= .180 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Here is a pure copper Absolute Hammer™ for the factory twist 270’s. This will make the old 270 Win run flatter than ever. The design of the Absolute Hammer™ makes it so that the nose of the bullet can not be engraved by the rifling, resulting in much lower engraving pressure. Due to the lower engraving pressure the Absolutes will not line up with conventional bullet data and will need higher than normal charge weights and often faster powder than conventional bullets. Re-loading should be done by experienced re-loaders that are comfortable working with a cartridge that does not have supporting load data.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-116gr-absolute-hammer/: Recommended minimum twist rate is 1-10″ | Bullet length is 1.20″ | Nose length is .709″ | Bullets weight is 116gr | Recommended use: Big Game Hunting | g7-bc= .180 estimated"
+      }
+    ]
+  }
+}

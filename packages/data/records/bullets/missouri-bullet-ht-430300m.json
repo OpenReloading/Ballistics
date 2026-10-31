@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-430300m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-430300M",
+  "name": ".44 Silhouette - Hi-Tek, 300 Grain TCFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922,
+    "raw": ".430 Diameter"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 Grain"
+  },
+  "length": {
+    "value": 21.87,
+    "raw": "Bullet OAL .861 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 300 Grain TCFP. Brinell 18. .44 Magnum. For Silhouette.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-430300M, .44 Silhouette - Hi-Tek (https://missouribullet.com/details.php?prodId=313): .430 Diameter, 300 Grain TCFP, Brinell 18, Bullet OAL .861 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "sellier-bellot",
+  "name": "Sellier & Bellot",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

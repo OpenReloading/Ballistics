@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-309215blk",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-309215BLK",
+  "name": "OEM Blackout-Grooveless, 215 Grain FP - Grooveless",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849,
+    "raw": ".309 Diameter"
+  },
+  "mass": {
+    "value": 13.932,
+    "raw": "215 Grain"
+  },
+  "length": {
+    "value": 30.66,
+    "raw": "Bullet OAL 1.207+/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 215 Grain FP - Grooveless. Brinell 20.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-309215BLK, OEM Blackout-Grooveless (https://missouribullet.com/details.php?prodId=347): .309 Diameter, 215 Grain FP - Grooveless, Brinell 20, Bullet OAL 1.207+/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

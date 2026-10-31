@@ -1,0 +1,61 @@
+{
+  "id": "sierra-4062",
+  "manufacturer": "sierra",
+  "productNumber": "4062",
+  "name": "22 CAL 64 GR Tipped GameKing (TGK)",
+  "caliber": "0.224",
+  "diameter": {
+    "value": 5.69,
+    "raw": "0.224 in"
+  },
+  "mass": {
+    "value": 4.147,
+    "raw": "64 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.323,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.159,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 4062, 4062C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-64-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "bf7c2a4679576f4d10fa309ab595d6dc1560c024b299a43875f33a463b150a33",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 4062, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.224, Bullet Weight (Grains): 64, G1 BC: 0.323, G7 BC: 0.159, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

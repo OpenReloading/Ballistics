@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-401140m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-401140M",
+  "name": "IDP #7 - Hi-Tek, 140 Grain TCFP",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185,
+    "raw": ".401 Diameter"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 Grain"
+  },
+  "length": {
+    "value": 12.98,
+    "raw": "Bullet OAL .511 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 140 Grain TCFP. Brinell 18. .40 S&W/10mm. For Major Power Factor.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-401140M, IDP #7 - Hi-Tek (https://missouribullet.com/details.php?prodId=219): .401 Diameter, 140 Grain TCFP, Brinell 18, Bullet OAL .511 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

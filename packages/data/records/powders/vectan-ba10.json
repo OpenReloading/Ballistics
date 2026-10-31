@@ -1,0 +1,20 @@
+{
+  "id": "vectan-ba10",
+  "manufacturer": "vectan",
+  "name": "Ba10",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "page": "3",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Describes this range as single base powders in sticks."
+      }
+    ]
+  }
+}

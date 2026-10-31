@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-bp-313078cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "BP-313078CB",
+  "name": "Cowboy #18 - Black Powder, 78 Grain RN",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95,
+    "raw": ".313 Diameter"
+  },
+  "mass": {
+    "value": 5.054,
+    "raw": "78 Grain"
+  },
+  "length": {
+    "value": 12.09,
+    "raw": "Bullet OAL .476 +/-"
+  },
+  "note": "Listed as 78 Grain RN. Brinell 12. .32 H&R. For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "BP-313078CB, Cowboy #18 - Black Powder (https://missouribullet.com/details.php?prodId=438): .313 Diameter, 78 Grain RN, Brinell 12, Bullet OAL .476 +/-"
+      }
+    ]
+  }
+}

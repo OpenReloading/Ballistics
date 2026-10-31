@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-100gr-lever-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "10410",
+  "name": ".257 Cal-100gr Lever Hammer",
+  "productLine": "Lever Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "length": {
+    "value": 28.45,
+    "raw": "Bullet length is 1.12″"
+  },
+  "noseLength": {
+    "value": 12.29,
+    "raw": "Nose length is .484″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.332,
+      "note": "Hammer Bullets: \"g1-bc= .332 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "Recommended minimum twist rate is 1-9.25″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We designed this Stone Hammer™ style bullet specifically for the 25-35 Winchester lever action tube magazine rifle. With the large 3mm hollow point and extra meat on the meplat this bullet will work well in the tube magazine.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-100gr-lever-hammer/: Recommended minimum twist rate is 1-9.25″ | Bullet length is 1.12″ | Nose length is .484″ | Bullet weight is 100gr | Recommended use: Big Game Hunting | g1-bc= .332 estimated"
+      }
+    ]
+  }
+}

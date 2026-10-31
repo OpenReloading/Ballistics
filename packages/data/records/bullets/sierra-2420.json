@@ -1,0 +1,63 @@
+{
+  "id": "sierra-2420",
+  "manufacturer": "sierra",
+  "productNumber": "2420",
+  "name": "8MM 220 GR SBT GAMEKING (SGK)",
+  "caliber": "0.323",
+  "diameter": {
+    "value": 8.204,
+    "raw": "0.323 in"
+  },
+  "mass": {
+    "value": 14.256,
+    "raw": "220 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.521,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.261,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/8mm-220-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "ae735898581d37ce0f2f9301a1fc4bad9178e305f318dbfe62a3a729b4ded1ae",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2420, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.323, Bullet Weight (Grains): 220, G1 BC: 0.521, G7 BC: 0.261, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

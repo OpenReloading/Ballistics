@@ -1,0 +1,59 @@
+{
+  "id": "sierra-9947",
+  "manufacturer": "sierra",
+  "productNumber": "9947",
+  "name": "9MM 147 GR JHP - SIG V-CROWN",
+  "caliber": "0.355",
+  "diameter": {
+    "value": 9.017,
+    "raw": "0.355 in"
+  },
+  "mass": {
+    "value": 9.525,
+    "raw": "147 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.162,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 9947, 9947C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/9mm-147-gr-jhp-sig-v-crown/",
+        "retrieved": "2026-10-08",
+        "sha256": "19bc7e678db0850f939635ea282ea2a60aeca9420523789f0141f27ea823913e",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 9947, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.355, Bullet Weight (Grains): 147, G1 BC: 0.162, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

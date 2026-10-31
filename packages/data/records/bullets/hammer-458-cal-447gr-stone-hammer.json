@@ -1,0 +1,45 @@
+{
+  "id": "hammer-458-cal-447gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "1920",
+  "name": ".458 Cal-447gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 28.965,
+    "raw": "447 gr"
+  },
+  "length": {
+    "value": 37.85,
+    "raw": "Bullet Length is 1.49″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.38,
+      "note": "Hammer Bullets: \"G1-BC=.380 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 558.8,
+    "raw": "Recommended minimum twist rate is 1-22″"
+  },
+  "note": "Recommended minimum twist rate for dangerous game hunting is 1-19″. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"This .458 caliber Stone Hammer™ has a 1/4″ hollow point to give the nose profile enough taper to feed reliably and deform rapidly to a minimum full caliber with 90% retained weight. The large nose dia will allow these bullets to work well in lever actions with tube magazines.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/458-cal-447gr-stone-hammer/: Recommended minimum twist rate is 1-22″ | Recommended minimum twist rate for dangerous game hunting is 1-19″ | Bullet Length is 1.49″ | Bullet weight is 447gr | Recommended use: Big Game and Dangerous Game Hunting | G1-BC=.380 estimated"
+      }
+    ]
+  }
+}

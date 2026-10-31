@@ -1,0 +1,30 @@
+{
+  "id": "hornady-50109",
+  "manufacturer": "hornady",
+  "productNumber": "50109",
+  "name": "50 Cal. DGH, .500, 500 gr",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7,
+    "raw": ".500\""
+  },
+  "mass": {
+    "value": 32.399,
+    "raw": "500 gr"
+  },
+  "note": "The catalog prints BC .200 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "99",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "50 Cal. DGH, .500\", 500 gr., Ballistic Coef. .200, Sec. Den. .286, Item # 50109"
+      }
+    ]
+  }
+}

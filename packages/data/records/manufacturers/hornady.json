@@ -1,0 +1,15 @@
+{
+  "id": "hornady",
+  "name": "Hornady",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "retrieved": "2026-10-08",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

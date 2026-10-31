@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mth-338-200",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 338 200",
+  "name": "MTH 338 200 (MTH, 200 gr)",
+  "productLine": "MTH",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 36.07,
+    "raw": "1.420\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.438,
+      "note": "G1 BC, printed \".438 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.224,
+      "note": "G7 BC, printed \".224 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "*1-12\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .338, Grains 200, Minimum Required Twist *1-12\", Part Number MTH 338 200, G1 BC .438 (A.B.), G7 BC .224 (A.B.), OAL 1.420\", Bullet Projection .850\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .850\"."
+}

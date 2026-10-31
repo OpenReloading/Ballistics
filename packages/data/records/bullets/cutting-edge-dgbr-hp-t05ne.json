@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-dgbr-hp-t05ne",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP T05NE",
+  "name": "DGBR-HP T05NE (Safari Raptor, Solid & Lever+, 460 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".474",
+  "diameter": {
+    "value": 12.04,
+    "raw": ".474"
+  },
+  "mass": {
+    "value": 29.807,
+    "raw": "460 gr"
+  },
+  "length": {
+    "value": 37.47,
+    "raw": "1.475\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.18,
+      "note": "G1 BC (Est.), printed \".180\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "10",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 10, Safari Raptor, Solid, & Lever+: Caliber .474, Grains 460, Part Number DGBR-HP T05NE, OAL 1.475\", Bullet Projection .703\", G1 BC (Est.) .180"
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .703\"."
+}

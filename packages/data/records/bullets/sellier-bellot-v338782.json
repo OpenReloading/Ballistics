@@ -1,0 +1,33 @@
+{
+  "id": "sellier-bellot-v338782",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338782",
+  "name": "FMJ, .308, 150 gr (bullet 2954)",
+  "productLine": "FMJ",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308 in (7,85 mm)"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 grs (9,7 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "note": "The page prints G1 0,308, the same as the diameter in inches; it is not stored.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type"],
+        "note": "V338782 | 2954 | FMJ | 150 | 9,7 | 30 | 7,85 | .308 | 0,308. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

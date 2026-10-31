@@ -1,0 +1,47 @@
+{
+  "id": "cutting-edge-mtac-510-660",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 510 660",
+  "name": "MTAC 510 660 (MTAC, 660 gr)",
+  "productLine": "MTAC",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954,
+    "raw": ".510"
+  },
+  "mass": {
+    "value": 42.767,
+    "raw": "660 gr"
+  },
+  "length": {
+    "value": 52.5,
+    "raw": "2.067\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.707,
+      "note": "G1 BC, printed \".707 (O89)\". Marked (O89): Oehler 89 system. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.354,
+      "note": "G7 BC, printed \".354 (O89)\". Marked (O89): Oehler 89 system. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .510, Grains 660, Minimum Required Twist Standard, Part Number MTAC 510 660, G1 BC .707 (O89), G7 BC .354 (O89), OAL 2.067\", Bullet Projection 1.404\""
+      }
+    ]
+  },
+  "note": "Minimum required twist is printed \"Standard\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.404\"."
+}

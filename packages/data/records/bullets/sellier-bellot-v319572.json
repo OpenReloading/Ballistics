@@ -1,0 +1,30 @@
+{
+  "id": "sellier-bellot-v319572",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319572",
+  "name": "TFMJ, .452, 230 gr (for 45 AUTO, 45 GAP)",
+  "productLine": "TFMJ",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 in (11,48 mm)"
+  },
+  "mass": {
+    "value": 14.904,
+    "raw": "230 grs (14,9 g)"
+  },
+  "note": "Recommended for 45 AUTO, 45 GAP.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass"],
+        "note": "V319572 | 45 AUTO, 45 GAP | TFMJ | 230 | 14,9 | 45 | 11,48 | .452. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

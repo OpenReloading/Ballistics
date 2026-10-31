@@ -1,0 +1,45 @@
+{
+  "id": "hammer-435-cal-410gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869045638",
+  "name": ".435 Cal-410gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".435",
+  "diameter": {
+    "value": 11.049,
+    "raw": ".435"
+  },
+  "mass": {
+    "value": 26.568,
+    "raw": "410 gr"
+  },
+  "length": {
+    "value": 39.22,
+    "raw": "Bullet length is 1.544″"
+  },
+  "noseLength": {
+    "value": 16.76,
+    "raw": "Nose length is .6599″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.206,
+      "note": "Hammer Bullets: \"g1-bc= .206 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist rate is 1-16″ or faster for dangerous game hunting. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"Designed for one of the classic dangerous game rounds developed at the turn of the century. The 425 Westly Richards. Here is some new life for one of the greats.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/435-cal-410gr-stone-hammer/: Minimum required twist rate is 1-16″ or faster for dangerous game hunting | Bullet length is 1.544″ | Nose length is .6599″ | Bullet weight is 410gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .206 estimated"
+      }
+    ]
+  }
+}

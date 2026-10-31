@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-85gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "6580",
+  "name": ".277 Cal-085gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 5.508,
+    "raw": "85 gr"
+  },
+  "length": {
+    "value": 21.59,
+    "raw": "Bullet length is .85″"
+  },
+  "noseLength": {
+    "value": 11.43,
+    "raw": "Nose length is .4499″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.211,
+      "note": "Hammer Bullets: \"G1-BC= .211 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "Recommended minimum twist rate is 1-14″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This pure copper 85gr Stone Hammer™ is a great choice for normal range big game hunting. With high vel and low recoil this bullet will get the job done.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-85gr-stone-hammer/: Recommended minimum twist rate is 1-14″ | Bullet length is .85″ | Nose length is .4499″ | Bullets weight is 85gr | Recommended use: Big Game Hunting | G1-BC= .211 estimated"
+      }
+    ]
+  }
+}

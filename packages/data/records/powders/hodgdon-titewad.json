@@ -1,0 +1,21 @@
+{
+  "id": "hodgdon-titewad",
+  "manufacturer": "hodgdon",
+  "name": "Titewad",
+  "grainForm": "ball",
+  "propellantBase": "double",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Hodgdon Titewad® Shotshell Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-titewad/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Product details: Form \"Spherical\", Base \"Double\".",
+        "origin": "manufacturer"
+      }
+    ]
+  }
+}

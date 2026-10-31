@@ -1,0 +1,45 @@
+{
+  "id": "hammer-172-cal-19gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "890",
+  "name": ".172 Cal-19gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".172",
+  "diameter": {
+    "value": 4.369,
+    "raw": ".172"
+  },
+  "mass": {
+    "value": 1.231,
+    "raw": "19 gr"
+  },
+  "length": {
+    "value": 12.7,
+    "raw": "Bullet length is .5″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.151,
+      "note": "Hammer Bullets: \"G1-BC=.151 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "Recommended twist rate is 1-9.25″ minimum"
+  },
+  "note": "Recommended use: Varmint and small game hunting. The product page also says: \"This varmint bullet will have 72% weight retention after opening in the 1st couple of inches on impact for outstanding results on varmints and small game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/172-cal-19gr-hammer-hunter/: Recommended twist rate is 1-9.25″ minimum | Bullet length is .5″ | Bullet weight is 19gr | Recommended use: Varmint and small game hunting | G1-BC=.151 estimated"
+      }
+    ]
+  }
+}

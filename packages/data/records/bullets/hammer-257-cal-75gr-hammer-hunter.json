@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-75gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "12337",
+  "name": ".257 Cal-075gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 4.86,
+    "raw": "75 gr"
+  },
+  "length": {
+    "value": 22.86,
+    "raw": "Bullet length is .900″"
+  },
+  "noseLength": {
+    "value": 13.33,
+    "raw": "Nose length is .5249″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.147,
+      "note": "Hammer Bullets: \"g7-bc= .147 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 285.75,
+    "raw": "Recommended minimum twist rate is 1-11.25″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Any of you guys that have slow twist 1/4 bores or just want to run some smokin velocity, this is your bullet. With consistent weight retention regardless of the impact velocity, this 75gr pure copper Hammer Hunter™ will server you big game hunting needs very well.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-75gr-hammer-hunter/: Recommended minimum twist rate is 1-11.25″ | Bullet length is .900″ | Nose length is .5249″ | Bullet weight is 75gr | Recommended use: Big Game Hunting | g7-bc= .147 estimated"
+      }
+    ]
+  }
+}

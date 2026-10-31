@@ -1,0 +1,61 @@
+{
+  "id": "sierra-1455",
+  "manufacturer": "sierra",
+  "productNumber": "1455",
+  "name": "22 CAL 55 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.224",
+  "diameter": {
+    "value": 5.69,
+    "raw": "0.224 in"
+  },
+  "mass": {
+    "value": 3.564,
+    "raw": "55 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.271,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.124,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1455, 1455C, 1455Z (box counts). The product page lists G7 BC none for item 1455C (0.124 for 1455); this record follows item 1455.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-55-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "43b4a0fa3615bccdd00d8ba97fb011663bee594d5d423d6bb52df3874e8a33e2",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1455, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.224, Bullet Weight (Grains): 55, G1 BC: 0.271, G7 BC: 0.124, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

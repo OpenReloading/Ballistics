@@ -1,0 +1,73 @@
+{
+  "id": "sierra-1815",
+  "manufacturer": "sierra",
+  "productNumber": "1815",
+  "name": "270 CAL 115 GR HPBT MatchKing (SMK)",
+  "caliber": "0.277",
+  "diameter": {
+    "value": 7.036,
+    "raw": "0.277 in"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.324,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.155,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/270-cal-115-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "67556480b79a41003904cef9ec14db8f2fae0a9abda6b6a72dd74dc5c6e683f6",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1815, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.277, Bullet Weight (Grains): 115, G1 BC: 0.324, G7 BC: 0.155, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

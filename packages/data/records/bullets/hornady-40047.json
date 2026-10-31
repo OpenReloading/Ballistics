@@ -1,0 +1,33 @@
+{
+  "id": "hornady-40047",
+  "manufacturer": "hornady",
+  "productNumber": "40047",
+  "name": "10mm FMJ-FP, .400, 180 gr",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16,
+    "raw": ".400\""
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "note": "Item numbers 40047, 400471, 40047B (box counts). The catalog prints BC .164 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "97",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "tip.type"],
+        "note": "10mm FMJ-FP, .400\", 180 gr., Ballistic Coef. .164, Sec. Den. .161, Item # 40047/400471/40047B"
+      }
+    ]
+  }
+}

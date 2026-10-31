@@ -1,0 +1,48 @@
+{
+  "id": "sako-129a",
+  "manufacturer": "sako",
+  "productNumber": "129A",
+  "name": "SAKO GAMEHEAD 129A",
+  "productLine": "GAMEHEAD",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0,308”"
+  },
+  "mass": {
+    "value": 7.97,
+    "raw": "8,0g/123gr"
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Soft Point",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.25,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "4, 12",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "SAKO GAMEHEAD 129A: Diameter 0,308”, Weight 8,0g/123gr, Ballistic Coefficient 0.250, Bullet Type Soft Point, Sectional density 0.184"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

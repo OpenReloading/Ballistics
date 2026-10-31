@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-esp-c100lg-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP C100LG RAPTOR",
+  "name": "ESP C100LG RAPTOR (Safari Raptor, Solid & Lever+, 100 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "length": {
+    "value": 22.78,
+    "raw": ".897\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "G1 BC (Est.), printed \".120\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .308, Grains 100, Part Number ESP C100LG RAPTOR, OAL .897\", Bullet Projection .319\", G1 BC (Est.) .120"
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .319\"."
+}

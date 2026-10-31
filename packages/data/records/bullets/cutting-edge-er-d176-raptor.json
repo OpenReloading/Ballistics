@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-er-d176-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER D176 Raptor",
+  "name": "ER D176 Raptor (ER Raptor, 176 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 11.405,
+    "raw": "176 gr"
+  },
+  "length": {
+    "value": 41.2,
+    "raw": "1.622\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.422,
+      "note": "G1 BC, printed \".422 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "7",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 7, Extended Range (ER) Raptor: Caliber .338, Grains 176, Minimum Required Twist 1-10\", Part Number ER D176 Raptor, G1 BC .422 (O89), OAL 1.622\", Bullet Projection 1.053\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.053\"."
+}

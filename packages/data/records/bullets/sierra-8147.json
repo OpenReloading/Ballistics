@@ -1,0 +1,59 @@
+{
+  "id": "sierra-8147",
+  "manufacturer": "sierra",
+  "productNumber": "8147",
+  "name": "9MM 147 GR JHP SPORTS MASTER",
+  "caliber": "0.355",
+  "diameter": {
+    "value": 9.017,
+    "raw": "0.355 in"
+  },
+  "mass": {
+    "value": 9.525,
+    "raw": "147 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.157,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 8147, 8147C, 814700K (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/9mm-147-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "3e98307257f9152e31b2b873f510631d9a84470e0c191060feb2f112dcc4d02a",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8147, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.355, Bullet Weight (Grains): 147, G1 BC: 0.157, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

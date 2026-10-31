@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-er-j135-cu-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER J135 Cu Raptor",
+  "name": "ER J135 Cu Raptor (ER Raptor, 135 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".284 (7mm)",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284 (7mm)"
+  },
+  "mass": {
+    "value": 8.748,
+    "raw": "135 gr"
+  },
+  "length": {
+    "value": 37.11,
+    "raw": "1.461\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.423,
+      "note": "G1 BC, printed \".423 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "1-9.25\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "7",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 7, Extended Range (ER) Raptor: Caliber .284 (7mm), Grains 135, Minimum Required Twist 1-9.25\", Part Number ER J135 Cu Raptor, G1 BC .423 (O89), OAL 1.461\", Bullet Projection .790\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .790\"."
+}

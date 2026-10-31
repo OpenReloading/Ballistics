@@ -1,0 +1,55 @@
+{
+  "id": "sierra-2400",
+  "manufacturer": "sierra",
+  "productNumber": "2400",
+  "name": "8MM 150 GR SPT PRO-HUNTER",
+  "caliber": "0.323",
+  "diameter": {
+    "value": 8.204,
+    "raw": "0.323 in"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.336,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/8mm-150-gr-spt-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "af0e83b06638357d7520af160c6a43f65917b009dcabb6727ded7d008aa0c4a1",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2400, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.323, Bullet Weight (Grains): 150, G1 BC: 0.336, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,45 @@
+{
+  "id": "hammer-375-cal-170gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869070143",
+  "name": ".375 Cal-170gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 11.016,
+    "raw": "170 gr"
+  },
+  "length": {
+    "value": 29.27,
+    "raw": "Bullet length including tip: 1.1525″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.288,
+      "note": "Hammer Bullets: \"g1-bc= .288 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6,
+    "raw": "Minimum required twist rate is 1-19″ or faster."
+  },
+  "note": "Tip length: .230″. Recommended use: Big Game Hunting. The product page also says: \"This 170gr Hammer HHT® pure copper bullet is designed to run higher velocity and lower recoil for hunting with the .375 caliber cartridges. All of the advantages of the large frontal area of the big bore plus fast and flat shooting for normal range hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/375-cal-170gr-hammer-hht/: Minimum required twist rate is 1-19″ or faster. | Bullet length including tip: 1.1525″ | Bullet weight: 170gr | Tip length: .230″ | Recommended use: Big Game Hunting | g1-bc= .288 estimated"
+      }
+    ]
+  }
+}

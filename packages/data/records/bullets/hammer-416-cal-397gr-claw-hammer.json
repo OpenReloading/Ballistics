@@ -1,0 +1,41 @@
+{
+  "id": "hammer-416-cal-397gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "2139",
+  "name": ".416 Cal-397gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566,
+    "raw": ".416"
+  },
+  "mass": {
+    "value": 25.725,
+    "raw": "397 gr"
+  },
+  "length": {
+    "value": 38.43,
+    "raw": "Bullets length is 1.513″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.436,
+      "note": "Hammer Bullets: \"G1-BC= .436 estimated\" (estimated)."
+    }
+  ],
+  "note": "Required twist rate for dangerous game hunting is 1-16″ or faster. The faster the twist the deeper and straighter the penetration. Recommended use: Dangerous Game Hunting and Big Game Hunting. The product page also says: \"This is a true 100% weight retention solid dangerous game bullet. This dangerous game Claw Hammer™ is uniquely designed with a slight concave on the 3/8″ meplat. This allows the nose to have enough taper for reliable feeding with exceptional terminal performance, with the nose deforming to full caliber maintaining a flat frontal area, creating a large permanent wound channel. Being constructed of pure copper there is no worry about over expansion, like some lead core bullets, limiting penetration. The Claw Hammer™ will give the bone breaking, deep penetration needed for the most dangerous animals in the world.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/416-cal-397gr-claw-hammer/: Required twist rate for dangerous game hunting is 1-16″ or faster. The faster the twist the deeper and straighter the penetration. | Bullets length is 1.513″ | Bullet weight is 397gr | Recommended use: Dangerous Game Hunting and Big Game Hunting | G1-BC= .436 estimated"
+      }
+    ]
+  }
+}

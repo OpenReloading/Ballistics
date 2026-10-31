@@ -1,0 +1,56 @@
+{
+  "id": "hammer-313-cal-130gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869070382",
+  "name": ".313 Cal-130gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95,
+    "raw": ".313"
+  },
+  "mass": {
+    "value": 8.424,
+    "raw": "130 gr"
+  },
+  "length": {
+    "value": 25.91,
+    "raw": "Bullet length: 1.02″"
+  },
+  "noseLength": {
+    "value": 13.96,
+    "raw": "Nose length: .5498″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.325,
+      "note": "Hammer Bullets: \"g1-bc= .325 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 381,
+    "raw": "Minimum required twist rate is 1-15″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Designed as a lightweight option for the 7.65x53mm Argentine as a fast and flat combo for hunting big game. The Power Hammer™ with it’s 2mm hollow point is easy opening with a nice amount of shed weight for the shock and retained weight for deep straight-line penetration. This will make for a great max point-blank range combo.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/313-cal-130gr-power-hammer/: Minimum required twist rate is 1-15″ or faster | Bullet length: 1.02″ | Nose length: .5498″ | Bullet weight: 130gr | Recommended use: Big Game Hunting | g1-bc= .325 estimated"
+      }
+    ]
+  }
+}

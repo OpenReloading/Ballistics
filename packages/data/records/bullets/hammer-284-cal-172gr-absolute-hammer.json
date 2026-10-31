@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-172gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8571",
+  "name": ".284 Cal-172gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 11.145,
+    "raw": "172 gr"
+  },
+  "length": {
+    "value": 41.15,
+    "raw": "Bullet length is 1.62″"
+  },
+  "noseLength": {
+    "value": 21.49,
+    "raw": "Nose length is .846″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.267,
+      "note": "Hammer Bullets: \"g7-bc= .267 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended minimum twist rate is 1-8″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Our heaviest Absolute Hammer™ for the .284 cal (7mm) at 172gr with the added velocity and consistent ballistic coefficient from the Absolute design, will be outstanding on even the biggest of big game. You should be able to see 3200 fps nicely with your 7mm Remington Magnum. Loading for Absolute Hammer™s should be done by experience re-loaders that are competent at developing a load without published data.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-172gr-absolute-hammer/: Recommended minimum twist rate is 1-8″ | Bullet length is 1.62″ | Nose length is .846″ | Bullet weight is 172gr | Recommended use: Big Game Hunting | g7-bc= .267 estimated"
+      }
+    ]
+  }
+}

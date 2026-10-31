@@ -1,0 +1,73 @@
+{
+  "id": "sierra-1530",
+  "manufacturer": "sierra",
+  "productNumber": "1530",
+  "name": "6MM 85 GR HPBT GameKing (SGK)",
+  "caliber": "0.243",
+  "diameter": {
+    "value": 6.172,
+    "raw": "0.243 in"
+  },
+  "mass": {
+    "value": 5.508,
+    "raw": "85 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.311,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.156,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-85-gr-hpbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "dda28294b485400c5cfd497831a9609878a14d11fdc652132c7958040191afa3",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1530, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.243, Bullet Weight (Grains): 85, G1 BC: 0.311, G7 BC: 0.156, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "sellier-bellot-v318372",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318372",
+  "name": "LRN, .355, 124 gr",
+  "productLine": "LRN",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017,
+    "raw": ".355 in (9,03 mm)"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 grs (8 g)"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass"],
+        "note": "V318372 |  | LRN | 124 | 8 | 9 | 9,03 | .355. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

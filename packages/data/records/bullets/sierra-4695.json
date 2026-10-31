@@ -1,0 +1,49 @@
+{
+  "id": "sierra-4695",
+  "manufacturer": "sierra",
+  "productNumber": "4695",
+  "name": "30 CAL 195 GR TIPPED GAMEKING (TGK)",
+  "caliber": "0.308",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0.308 in"
+  },
+  "mass": {
+    "value": 12.636,
+    "raw": "195 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "note": "Item numbers 4695, 4695C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-195-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "748de28b43c046117a7643a5ee070b3af6957ac09bc94bc71bdce20ac56f06c8",
+        "fields": ["diameter", "mass", "construction.raw"],
+        "note": "Item #: 4695, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.308, Bullet Weight (Grains): 195, G1 BC: NA, G7 BC: NA, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

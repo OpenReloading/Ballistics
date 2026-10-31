@@ -1,0 +1,16 @@
+{
+  "id": "alliant-power-pro-300-mp",
+  "manufacturer": "alliant",
+  "name": "Power Pro 300-MP",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

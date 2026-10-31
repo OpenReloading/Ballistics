@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-501400m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-501400M",
+  "name": "Crusher #1 - Hi-Tek, 400 Grain FP",
+  "caliber": ".501",
+  "diameter": {
+    "value": 12.725,
+    "raw": ".501 Diameter"
+  },
+  "mass": {
+    "value": 25.92,
+    "raw": "400 Grain"
+  },
+  "length": {
+    "value": 21.51,
+    "raw": "Bullet OAL .847 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 400 Grain FP. Brinell 18. .500 S&W. For Utter Destruction.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-501400M, Crusher #1 - Hi-Tek (https://missouribullet.com/details.php?prodId=330): .501 Diameter, 400 Grain FP, Brinell 18, Bullet OAL .847 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

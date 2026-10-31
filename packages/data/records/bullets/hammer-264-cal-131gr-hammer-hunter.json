@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-131gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "2333",
+  "name": ".264 Cal-131gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 8.553,
+    "raw": "132 gr"
+  },
+  "length": {
+    "value": 37.69,
+    "raw": "Bullet Length is 1.484″"
+  },
+  "noseLength": {
+    "value": 22.4,
+    "raw": "Nose length is .8817″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.255,
+      "note": "Hammer Bullets: \"G7-BC= .255 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 190.5,
+    "raw": "Recommended minimum twist rate is 1-7.5″"
+  },
+  "note": "Recommended Use: Big Game Hunting. The product page also says: \"Lots of folks building 6.5 PRC’s with 1-7.5″ twist barrels so we figured we better get a bullet out that matches the need. This Hammer Hunter™ will make a great normal to long range hunting bullet for the 1-7.5″ twist barrels.\" The product name says 131 gr; the specification says 132 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-131gr-hammer-hunter/: Recommended minimum twist rate is 1-7.5″ | Bullet Length is 1.484″ | Nose length is .8817″ | Bullets Weight is 132gr | Recommended Use: Big Game Hunting | G7-BC= .255 estimated"
+      }
+    ]
+  }
+}

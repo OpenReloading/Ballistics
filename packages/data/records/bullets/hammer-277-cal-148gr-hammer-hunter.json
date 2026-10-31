@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-148gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869024595",
+  "name": ".277 Cal-148gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 9.59,
+    "raw": "148 gr"
+  },
+  "length": {
+    "value": 37.08,
+    "raw": "Bullet length is 1.46″"
+  },
+  "noseLength": {
+    "value": 18.48,
+    "raw": "Nose length is .7277″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.25,
+      "note": "Hammer Bullets: \"g7-bc= .250 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9,
+    "raw": "Minimum required twist rate is 1-8.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This pure copper Hammer Hunter™ will be great for you guys that have one of the new fast twist 270 factory rifles or for the custom rifles with faster twist. Designed for a minimum of a 1-8.5″ twist for full stability and outstanding on game performance.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-148gr-hammer-hunter/: Minimum required twist rate is 1-8.5″ | Bullet length is 1.46″ | Nose length is .7277″ | Bullet weight is 148gr | Recommended use: Big Game Hunting | g7-bc= .250 estimated"
+      }
+    ]
+  }
+}

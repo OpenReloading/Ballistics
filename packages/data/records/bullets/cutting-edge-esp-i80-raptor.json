@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-esp-i80-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP I80 Raptor",
+  "name": "ESP I80 Raptor (ESP Raptor, 80 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 5.184,
+    "raw": "80 gr"
+  },
+  "length": {
+    "value": 31.55,
+    "raw": "1.242\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.125,
+      "note": "G1 BC w/o tip, printed \".125\". Without the tip installed, determined at 50 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.275,
+      "note": "G1 BC w/tip, printed \".275\". With the tip installed, determined at 250 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "1-9\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "8",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 8, Enhanced System Projectile (ESP): Caliber .257, Grains 80, Minimum Required Twist 1-9\", Part Number ESP I80 Raptor, G1 BC w/o tip .125, G1 BC w/tip .275, OAL w/o tip .949\", OAL w/tip 1.242\", Bullet Projection w/o tip .411\", Bullet Projection w/tip .704\", Blunt Trauma Base™ ~ Retained Weight (grains) 54"
+      }
+    ]
+  },
+  "note": "Also printed: OAL w/o tip .949\" (the length stored is with the tip). Bullet projection (from the SealTite band to the tip, page footnote) printed: w/o tip .411\"; w/tip .704\"."
+}

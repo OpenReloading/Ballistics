@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-m-311-124-fcg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.311 124 FCG",
+  "name": "M.311 124 FCG (MAXIMUS, 124 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".311",
+  "diameter": {
+    "value": 7.899,
+    "raw": ".311"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 gr"
+  },
+  "length": {
+    "value": 26.26,
+    "raw": "1.034\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.29,
+      "note": "G1 BC, printed \".290 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.145,
+      "note": "G7 BC, printed \".145 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "1-12\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .311, Grains 124, Minimum Required Twist 1-12\", Part Number M.311 124 FCG, G1 BC .290 EST, G7 BC .145 EST, OAL 1.034\", BULLET PROJECTION .680\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .680\"."
+}

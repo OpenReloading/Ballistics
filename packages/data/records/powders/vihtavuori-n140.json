@@ -1,0 +1,167 @@
+{
+  "id": "vihtavuori-n140",
+  "manufacturer": "vihtavuori",
+  "name": "N140",
+  "country": "FI",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "composition": [
+    {
+      "name": "Cellulose nitrate",
+      "cas": "9004-70-0",
+      "min": 80,
+      "max": 99,
+      "raw": "80 - <99"
+    },
+    {
+      "name": "Diethyl diphenylurea",
+      "cas": "85-98-3",
+      "min": 1,
+      "max": 5,
+      "raw": "1 - <5"
+    },
+    {
+      "name": "Diphenylamine",
+      "cas": "122-39-4",
+      "min": 0.1,
+      "max": 2,
+      "raw": "0.1 - <2"
+    }
+  ],
+  "thermochemistry": {
+    "loadingDensity": {
+      "value": 0.1
+    },
+    "flameTemperature": {
+      "value": 2876.5,
+      "min": 2458.5,
+      "max": 3284.5
+    },
+    "impetus": {
+      "value": 1008900,
+      "min": 917300,
+      "max": 1078900
+    },
+    "gamma": {
+      "value": 1.2402,
+      "min": 1.2237,
+      "max": 1.2583
+    },
+    "molarMass": {
+      "value": 23.705,
+      "min": 22.284,
+      "max": 25.312
+    },
+    "covolume": {
+      "value": 0.0010577,
+      "min": 0.00099699,
+      "max": 0.0011287
+    }
+  },
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.7384,
+      "standardUncertainty": 0.021
+    },
+    "energy": {
+      "value": 2865900,
+      "standardUncertainty": 45000
+    },
+    "gamma": 1.2402,
+    "covolume": {
+      "value": 0.0010577
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 357,
+    "trainingCartridges": 23
+  },
+  "provenance": {
+    "kind": "derived",
+    "sources": [
+      {
+        "source": "vihtavuori-sds-n-powder-centralite-revised-03-12",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "page": "p. 2",
+        "retrieved": "2026-10-12",
+        "fields": ["composition"],
+        "kind": "published",
+        "note": "Safety data sheet section 3 for a family of powders; the ranges span the family, not one powder. Covers N105 to N170."
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "page": "1, section 9",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm"],
+        "note": "Lists N140 in the product identifier; section 9 gives the appearance \"Cylindrical grains\".",
+        "kind": "published"
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "page": "section 3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["propellantBase"],
+        "kind": "derived",
+        "note": "Section 3 lists cellulose nitrate and no nitroglycerin: single base."
+      },
+      {
+        "source": "openreloading-constant-volume-equilibrium-solver",
+        "sha256": "a4648b4db63a5e01db6b970e053b16b1a0dfc7f969e1a435e9452fe408f1fcb8",
+        "fields": ["thermochemistry"],
+        "kind": "computed",
+        "note": "Composition: Vihtavuori SDS \"N-Powder (Centralite)\", revised 03/12/2025, version 2; the listed ingredients are taken as the whole composition. Nitrogen in the nitrocellulose 12.6 to 13.4 % (Mass fraction of N for powder records, where safety data sheets print none: from pyrocellulose (12.6 %) to guncotton (13.4 %), the US grades in AMCP 706-175, Solid Propellants, Part One, 1964, p. 46). Value at the mean of the 4 vertices of the composition ranges (fractions summing to 100 %) and the mean nitrogen; min and max over that value and the vertices at both nitrogen bounds, extremes between vertices not searched. sha256 over the solver code and the ingredient data used."
+      },
+      {
+        "source": "vihtavuori-reloading-data-release-14-9-2026",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "357 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; thermochemistry prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      },
+      {
+        "source": "vihtavuori-sds-n-powder-centralite-revised-03-12",
+        "page": "section 1.3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Supplier of the safety data sheet: Nammo Vihtavuori Oy, Ruutitehtaantie 80, 41330 Vihtavuori, Finland."
+      }
+    ]
+  }
+}

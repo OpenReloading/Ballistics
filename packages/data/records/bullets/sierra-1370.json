@@ -1,0 +1,55 @@
+{
+  "id": "sierra-1370",
+  "manufacturer": "sierra",
+  "productNumber": "1370",
+  "name": "22 CAL 63 GR SMP VarmintKing (SVK)",
+  "caliber": "0.224",
+  "diameter": {
+    "value": 5.69,
+    "raw": "0.224 in"
+  },
+  "mass": {
+    "value": 4.082,
+    "raw": "63 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.231,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-63-gr-smp-varmintking-vk/",
+        "retrieved": "2026-10-08",
+        "sha256": "af4ecbd491ab1f08ed95cdfeec59e029965e98d94f1f8d7c1cc8511903391d29",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1370, Bullet Type: Semi-Point (SMP), Bullet Diameter: 0.224, Bullet Weight (Grains): 63, G1 BC: 0.231, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

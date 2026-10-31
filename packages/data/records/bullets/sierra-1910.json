@@ -1,0 +1,55 @@
+{
+  "id": "sierra-1910",
+  "manufacturer": "sierra",
+  "productNumber": "1910",
+  "name": "7MM 140 GR SPT Pro-Hunter",
+  "caliber": "0.284",
+  "diameter": {
+    "value": 7.214,
+    "raw": "0.284 in"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.377,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-140-gr-spt-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "9f9cffa4a5200cae5f02f7073aad3b257e951d3956b23d9c045c565f4b6464bb",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1910, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.284, Bullet Weight (Grains): 140, G1 BC: 0.377, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

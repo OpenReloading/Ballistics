@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-452230s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452230S",
+  "name": "SoftBall!, 230 Grain RN",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 14.904,
+    "raw": "230 Grain"
+  },
+  "length": {
+    "value": 17.17,
+    "raw": "Bullet OAL .676 +/-"
+  },
+  "note": "Listed as 230 Grain RN. Brinell 18. .45 ACP. For General Shooting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "452230S, SoftBall! (https://missouribullet.com/details.php?prodId=59): .452 Diameter, 230 Grain RN, Brinell 18, Bullet OAL .676 +/-"
+      }
+    ]
+  }
+}

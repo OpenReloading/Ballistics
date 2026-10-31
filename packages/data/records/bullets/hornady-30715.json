@@ -1,0 +1,43 @@
+{
+  "id": "hornady-30715",
+  "manufacturer": "hornady",
+  "productNumber": "30715",
+  "name": "30 Cal. BTHP Match, .308, 178 gr",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308\""
+  },
+  "mass": {
+    "value": 11.534,
+    "raw": "178 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.53,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 30715, 30715B (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "78",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "base.type", "tip.type", "ballisticCoefficients"],
+        "note": "30 Cal. BTHP Match, .308\", 178 gr., G1 .530, Sec. Den. .268, Item # 30715/30715B"
+      }
+    ]
+  }
+}

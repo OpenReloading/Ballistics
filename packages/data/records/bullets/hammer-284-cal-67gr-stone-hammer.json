@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-67gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869058756",
+  "name": ".284 Cal-067gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 4.342,
+    "raw": "67 gr"
+  },
+  "length": {
+    "value": 17.02,
+    "raw": "Bullet length is .670″"
+  },
+  "noseLength": {
+    "value": 11.15,
+    "raw": "Nose length is .4389″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.158,
+      "note": "Hammer Bullets: \"g1-bc= .158 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 431.8,
+    "raw": "Minimum required twist rate is 1-17″ or faster"
+  },
+  "note": "Recommended use: Small to Big Game Hunting. The product page also says: \"This pure copper hunting bullet is designed for the Sako 7×33. We originally designed the 77gr Target Hammer for the Sako 7×33 and it has been very popular. Now you guys that are running this classic cartridge have a quality hunting bullet with the 67gr .284 Caliber Stone Hammer ™ .\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-67gr-stone-hammer/: Minimum required twist rate is 1-17″ or faster | Bullet length is .670″ | Nose length is .4389″ | Bullet weight is 67gr | Recommended use: Small to Big Game Hunting | g1-bc= .158 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-224-cal-83gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "1646",
+  "name": ".224 Cal-83gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 5.378,
+    "raw": "83 gr"
+  },
+  "length": {
+    "value": 31.12,
+    "raw": "Bullet Length is 1.225″"
+  },
+  "noseLength": {
+    "value": 13.6,
+    "raw": "Nose length is .5355″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.215,
+      "note": "Hammer Bullets: \"g7-bc= .215 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 165.1,
+    "raw": "Recommended min twist rate is 1-6.5″"
+  },
+  "note": "Recommended use: Medium Game Hunting. The product page also says: \"This is a long heavy for caliber bullet that will need a 1-6.5″ twist barrel to fully stabilize. For those who have custom barreled 22 cal rifles, this bullet will be a great normal range to extended range medium game hunting bullet. Like all the other Hammer Bullets, weight retention will always be consistent regardless of impact vel down to our advertised minimum of 1800fps.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/224-cal-83gr-hammer-hunter/: Recommended min twist rate is 1-6.5″ | Bullet Length is 1.225″ | Nose length is .5355″ | Bullet weight is 83gr | Recommended use: Medium Game Hunting | g7-bc= .215 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-cal-104gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869044964",
+  "name": ".243 Cal-104gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 6.739,
+    "raw": "104 gr"
+  },
+  "length": {
+    "value": 36.32,
+    "raw": "Bullet length including the tip is 1.430″"
+  },
+  "noseLength": {
+    "value": 18.7,
+    "raw": "Nose length including the tip is .7362″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.239,
+      "note": "Hammer Bullets: \"g7-bc= .239 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "Required minimum twist rate is 1-7″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"For you guys that have 6mm rifles with 1-7″ or faster twist this is the heavy that you will want to run. This lead-free Hammer Bullet will meet your expectations for big game hunting using your small bore rifle.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-104gr-hammer-hht/: Required minimum twist rate is 1-7″ or faster | Bullet length including the tip is 1.430″ | Nose length including the tip is .7362″ | Bullet weight is 104gr | Recommended use: Big Game Hunting | g7-bc= .239 estimated"
+      }
+    ]
+  }
+}

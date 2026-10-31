@@ -1,0 +1,56 @@
+{
+  "id": "sierra-2755",
+  "manufacturer": "sierra",
+  "productNumber": "2755",
+  "name": "35 CAL 155 GR FN PRO-HUNTER",
+  "caliber": "0.355",
+  "diameter": {
+    "value": 9.017,
+    "raw": "0.355 in"
+  },
+  "mass": {
+    "value": 10.044,
+    "raw": "155 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.176,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "The product page lists Bullet Diameter 0.35 for item 2755C (0.355 for 2755); G1 BC 0.182 for item 2755C (0.176 for 2755); this record follows item 2755. The product description gives G1 .182; this record follows the specification of item 2755.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/35-cal-155-gr-fn-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "f8fa45a02e027877fb96d96d6732d88470fe33879ba7844b6e8c2312316bf8b2",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2755, Bullet Type: Flatnose (FN), Bullet Diameter: 0.355, Bullet Weight (Grains): 155, G1 BC: 0.176, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

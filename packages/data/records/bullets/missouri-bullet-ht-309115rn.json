@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-309115rn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-309115RN",
+  "name": "#1 Carbine - Hi-Tek, 115 Grain RN",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849,
+    "raw": ".309 Diameter"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 Grain"
+  },
+  "length": {
+    "value": 17.25,
+    "raw": "Bullet OAL .679 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 115 Grain RN. Brinell 18. For the M1 Carbine.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-309115RN, #1 Carbine - Hi-Tek (https://missouribullet.com/details.php?prodId=212): .309 Diameter, 115 Grain RN, Brinell 18, Bullet OAL .679 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

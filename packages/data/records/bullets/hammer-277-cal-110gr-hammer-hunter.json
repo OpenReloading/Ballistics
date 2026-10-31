@@ -1,0 +1,61 @@
+{
+  "id": "hammer-277-cal-110gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027775",
+  "name": ".277 Cal-110gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 7.128,
+    "raw": "110 gr"
+  },
+  "length": {
+    "value": 28.88,
+    "raw": "Bullet length is 1.137″"
+  },
+  "noseLength": {
+    "value": 16.84,
+    "raw": "Nose length is .6629″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.171,
+      "note": "Hammer Bullets: \"g7-bc= .171 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.351,
+      "note": "Hammer Bullets: \"g1-bc= .351 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 266.7,
+    "raw": "Minimum required twist rate is 1-10.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This lightweight Hammer Hunter™™ will be great choice for the big game hunter that wants a fast flat low recoiling option for the any of the 270 cartridges.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-110gr-hammer-hunter/: Minimum required twist rate is 1-10.5″ | Bullet length is 1.137″ | Nose length is .6629″ | Bullet weight is 110gr | Recommended use: Big Game Hunting | g7-bc= .171 estimated | g1-bc= .351 estimated"
+      }
+    ]
+  }
+}

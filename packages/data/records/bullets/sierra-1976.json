@@ -1,0 +1,74 @@
+{
+  "id": "sierra-1976",
+  "manufacturer": "sierra",
+  "productNumber": "1976",
+  "name": "7MM 175 gr MKX",
+  "caliber": "0.284",
+  "diameter": {
+    "value": 7.214,
+    "raw": "0.284 in"
+  },
+  "mass": {
+    "value": 11.34,
+    "raw": "175 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.597,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.295,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1976, 1976C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-175-gr-hpbt-matchking-x-mkx/",
+        "retrieved": "2026-10-08",
+        "sha256": "97ea73f17bed5ec213089107dd5cdc0b1ae96af1361c472ffce64d02245ad16d",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1976, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.284, Bullet Weight (Grains): 175, G1 BC: 0.597, G7 BC: 0.295, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

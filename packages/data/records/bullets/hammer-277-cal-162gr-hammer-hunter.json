@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-162gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027690",
+  "name": ".277 Cal-162gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 10.497,
+    "raw": "162 gr"
+  },
+  "length": {
+    "value": 40.13,
+    "raw": "Bullet length is 1.580″"
+  },
+  "noseLength": {
+    "value": 18.86,
+    "raw": "Nose length is .7426″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.274,
+      "note": "Hammer Bullets: \"g7-bc= .274 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 190.5,
+    "raw": "Minimum required twist rate is 1-7.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Finally, the gun industry is showing some love for the 27 caliber by producing rifles with fast twist barrels. Browning is doing 7″ and 7.5″ twist barrels that will be perfect to run this pure copper Hammer Hunter™ in the 6.8 Western.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-162gr-hammer-hunter/: Minimum required twist rate is 1-7.5″ | Bullet length is 1.580″ | Nose length is .7426″ | Bullet weight is 162gr | Recommended use: Big Game Hunting | g7-bc= .274 estimated"
+      }
+    ]
+  }
+}

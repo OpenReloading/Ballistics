@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mth-338-275",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 338 275",
+  "name": "MTH 338 275 (MTH, 275 gr)",
+  "productLine": "MTH",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 17.82,
+    "raw": "275 gr"
+  },
+  "length": {
+    "value": 47.32,
+    "raw": "1.863\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.412,
+      "note": "G7 BC, printed \".412 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3,
+    "raw": "*1-9.5\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .338, Grains 275, Minimum Required Twist *1-9.5\", Part Number MTH 338 275, G1 BC .826(.801 A.B), G7 BC .412 (A.B.), OAL 1.863\", Bullet Projection 1.036\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \".826(.801 A.B)\"; does not read as a value and is not stored. The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.036\"."
+}

@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-358180m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-358180M",
+  "name": ".357 Striker - Hi-Tek, 180 Grain RNFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 Grain"
+  },
+  "length": {
+    "value": 19.33,
+    "raw": "Bullet OAL .761 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 180 Grain RNFP. Brinell 18. .357 Magnum. For Maximum Energy.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-358180M, .357 Striker - Hi-Tek (https://missouribullet.com/details.php?prodId=321): .358 Diameter, 180 Grain RNFP, Brinell 18, Bullet OAL .761 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

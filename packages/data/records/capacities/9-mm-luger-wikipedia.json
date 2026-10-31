@@ -1,0 +1,21 @@
+{
+  "id": "9-mm-luger-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:9-mm-luger",
+  "waterCapacity": {
+    "value": 0.862,
+    "raw": "13.3 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 9x19mm Parabellum",
+        "url": "https://en.wikipedia.org/w/index.php?title=9%C3%9719mm_Parabellum&oldid=1379172502",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 0.862 cm3 (13.30 gr H2O)."
+      }
+    ]
+  }
+}

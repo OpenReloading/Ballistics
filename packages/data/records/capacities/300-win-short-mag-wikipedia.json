@@ -1,0 +1,21 @@
+{
+  "id": "300-win-short-mag-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:300-win-short-mag",
+  "waterCapacity": {
+    "value": 5.184,
+    "raw": "80 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .300 Winchester Short Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Winchester_Short_Magnum&oldid=1351061051",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Text: case capacity of 80 grains (footnote 2). The infobox gives 80.4 gr."
+      }
+    ]
+  }
+}

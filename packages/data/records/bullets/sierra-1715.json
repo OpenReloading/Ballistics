@@ -1,0 +1,74 @@
+{
+  "id": "sierra-1715",
+  "manufacturer": "sierra",
+  "productNumber": "1715",
+  "name": "6.5MM 107 GR HPBT MatchKing (SMK)",
+  "caliber": "0.264",
+  "diameter": {
+    "value": 6.706,
+    "raw": "0.264 in"
+  },
+  "mass": {
+    "value": 6.933,
+    "raw": "107 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.43,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.203,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1715, 1715C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-107-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "d3c970f41e810c5a9ed82e8b06c2cbb26e40a0734bd30882d8c5eab86602d8e0",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1715, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.264, Bullet Weight (Grains): 107, G1 BC: 0.430, G7 BC: 0.203, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

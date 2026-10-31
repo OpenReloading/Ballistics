@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-080gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869040072",
+  "name": ".264 Cal-080gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 5.184,
+    "raw": "80 gr"
+  },
+  "length": {
+    "value": 25.4,
+    "raw": "Bullet length including tip is 1.00″"
+  },
+  "noseLength": {
+    "value": 15.36,
+    "raw": "Nose length including tip is .6049″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.156,
+      "note": "Hammer Bullets: \"g7-bc= .156 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 292.1,
+    "raw": "Minimum required twist is 1-11.5″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"Running 3600 fps in a Creedmoor, this little bullet still has over 2200 fps at 500 yards. A max point blank range capability of 412 yards without changing your point of aim. Impact velocity at 300 yards over 2700 fps! That’s so cool! (ballistics calculated at 3000′ elevation) This bullet is available with or without a crimp groove.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-080gr-hammer-hht/: Minimum required twist is 1-11.5″ or faster | Bullet length including tip is 1.00″ | Nose length including tip is .6049″ | Tip length is .143″ | Bullet weight is 80gr | Recommended use: Big Game Hunting | g7-bc= .156 estimated"
+      }
+    ]
+  }
+}

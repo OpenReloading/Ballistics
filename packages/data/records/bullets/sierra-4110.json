@@ -1,0 +1,61 @@
+{
+  "id": "sierra-4110",
+  "manufacturer": "sierra",
+  "productNumber": "4110",
+  "name": "6MM 100 GR Tipped GameKing (TGK)",
+  "caliber": "0.243",
+  "diameter": {
+    "value": 6.172,
+    "raw": "0.243 in"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.515,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.253,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 4110, 4110T, 4110C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-100-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "84bb5fc613dad7ec236c863a6771cc680e3716e77aa2fba3158b15fbe395436f",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 4110, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.243, Bullet Weight (Grains): 100, G1 BC: 0.515, G7 BC: 0.253, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

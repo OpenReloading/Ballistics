@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257cal-125gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027743",
+  "name": ".257 Cal-125gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 gr"
+  },
+  "length": {
+    "value": 36.07,
+    "raw": "Bullet length is 1.42″"
+  },
+  "noseLength": {
+    "value": 17.92,
+    "raw": "Nose length is .7057″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.235,
+      "note": "Hammer Bullets: \"g7-bc= .235 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 190.5,
+    "raw": "Minimum required twist rate is 1-7.5″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This 125gr quarter bore Hammer Hunter™ is designed to run in a 7.5″ twist and be fully stable. A great choice for the fast twist .257 caliber rifles for normal to long range hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257cal-125gr-hammer-hunter/: Minimum required twist rate is 1-7.5″ or faster | Bullet length is 1.42″ | Nose length is .7057″ | Bullet weight is 125gr | Recommended use: Big Game Hunting | g7-bc= .235 estimated"
+      }
+    ]
+  }
+}

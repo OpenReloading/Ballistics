@@ -1,0 +1,21 @@
+{
+  "id": "338-lapua-mag-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:338-lapua-mag",
+  "waterCapacity": {
+    "value": 7.387,
+    "raw": "114 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .338 Lapua Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1374066412",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Section Cartridge dimensions: 7.40 ml (114 grains H2O). The infobox gives 7.532 cm3 (116.24 gr H2O)."
+      }
+    ]
+  }
+}

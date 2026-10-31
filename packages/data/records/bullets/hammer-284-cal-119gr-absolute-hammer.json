@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-119gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "9924",
+  "name": ".284 Cal-119gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 7.711,
+    "raw": "119 gr"
+  },
+  "length": {
+    "value": 29.29,
+    "raw": "Bullet length is 1.153″"
+  },
+  "noseLength": {
+    "value": 17.5,
+    "raw": "Nose length is .689″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.176,
+      "note": "Hammer Bullets: \"g7-bc= .176 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 266.7,
+    "raw": "Recommended minimum twist rate is 1-10.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This Absolute Hammer™ will be a rocket sled in the 7mm cartridges. The Absolute Hammer™s have very low engraving pressure resulting in the need for faster than normal powders for most cartridges. Loading of these bullets should only be done by experienced reloaders that are competent at finding a load that does not have supporting load data.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-119gr-absolute-hammer/: Recommended minimum twist rate is 1-10.5″ | Bullet length is 1.153″ | Nose length is .689″ | Bullet weight is 119gr | Recommended use: Big Game Hunting | g7-bc= .176 estimated"
+      }
+    ]
+  }
+}

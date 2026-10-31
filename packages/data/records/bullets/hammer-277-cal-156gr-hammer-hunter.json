@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-156gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "276",
+  "name": ".277 Cal-156gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 10.109,
+    "raw": "156 gr"
+  },
+  "length": {
+    "value": 39.62,
+    "raw": "Bullet length is 1.56″"
+  },
+  "noseLength": {
+    "value": 20.35,
+    "raw": "Nose length is .8011″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.264,
+      "note": "Hammer Bullets: \"G7-BC=.264 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended twist rate of 1-8″ or faster"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=5",
+        "retrieved": "2026-10-08",
+        "sha256": "7d0c3a6391edef573277ee6a0eabe267ab3a2e170d32d6bcf7e877775108e85c",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-156gr-hammer-hunter/: Recommended twist rate of 1-8″ or faster | Bullet length is 1.56″ | Nose length is .8011″ | Bullet weight is 156 grains | Recommended use: Big game hunting | G7-BC=.264 estimated"
+      }
+    ]
+  }
+}

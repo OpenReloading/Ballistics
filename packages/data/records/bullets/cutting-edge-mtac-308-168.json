@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-mtac-308-168",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 308 168",
+  "name": "MTAC 308 168 (MTAC, 168 gr)",
+  "productLine": "MTAC",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.886,
+    "raw": "168 gr"
+  },
+  "length": {
+    "value": 34.7,
+    "raw": "1.366\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.5,
+      "note": "G1 BC, printed \".500\". No method mark: method not stated. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "*1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .308, Grains 168, Minimum Required Twist *1-10\", Part Number MTAC 308 168, G1 BC .500, OAL 1.366\", Bullet Projection .785\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .785\"."
+}

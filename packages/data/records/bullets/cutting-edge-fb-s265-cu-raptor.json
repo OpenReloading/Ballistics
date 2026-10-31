@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-fb-s265-cu-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB S265 CU Raptor",
+  "name": "FB S265 CU Raptor (Flat Base Raptor, 265 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 17.172,
+    "raw": "265 gr"
+  },
+  "length": {
+    "value": 31.42,
+    "raw": "1.237\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.215,
+      "note": "G1 BC, printed \".215 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .458, Grains 265, Minimum Required Twist Standard, Part Number FB S265 CU Raptor**, G1 BC .215 (O89), OAL 1.237\", Bullet Projection .670\""
+      }
+    ]
+  },
+  "note": "Minimum required twist is printed \"Standard\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .670\". The part number is printed with \"**\"; page footnote: \"** Part numbers highlighted in Bold are Lead Free Options\"."
+}

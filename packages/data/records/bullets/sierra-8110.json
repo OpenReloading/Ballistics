@@ -1,0 +1,59 @@
+{
+  "id": "sierra-8110",
+  "manufacturer": "sierra",
+  "productNumber": "8110",
+  "name": "9MM 115 GR JHP SPORTS MASTER",
+  "caliber": "0.355",
+  "diameter": {
+    "value": 9.017,
+    "raw": "0.355 in"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.127,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 8110, 811002K (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/9mm-115-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "aa705ee84f78159d3187aca79e447fb0f9bc3efc12ae7893592c7a21a056a118",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8110, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.355, Bullet Weight (Grains): 115, G1 BC: 0.127, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

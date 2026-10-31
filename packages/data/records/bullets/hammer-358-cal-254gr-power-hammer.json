@@ -1,0 +1,45 @@
+{
+  "id": "hammer-358-cal-254gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "1623",
+  "name": ".358 Cal-254gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 16.459,
+    "raw": "254 gr"
+  },
+  "length": {
+    "value": 38.46,
+    "raw": "Bullet length is 1.514″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.235,
+      "note": "Hammer Bullets: \"G7-bc=.235 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "Recommended minimum twist rate is 1-13″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This is a fairly slick bullet for the 35 Whelen crowd. With it’s 2mm hollow point this Power Hammer™ should extend the effective range of the 35’s.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/358-cal-254gr-power-hammer/: Recommended minimum twist rate is 1-13″ | Bullet length is 1.514″ | Bullet weight is 254gr | Recommended use: Big Game Hunting | G7-bc=.235 estimated"
+      }
+    ]
+  }
+}

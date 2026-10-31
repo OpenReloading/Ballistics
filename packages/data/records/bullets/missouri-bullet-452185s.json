@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-452185s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452185S",
+  "name": "Bullseye #2, 185 Grain SWC",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 11.988,
+    "raw": "185 Grain"
+  },
+  "length": {
+    "value": 15.49,
+    "raw": "Bullet OAL .610 +/-"
+  },
+  "note": "Listed as 185 Grain SWC. Brinell 12. .45 ACP. For Bullseye Velocity.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "452185S, Bullseye #2 (https://missouribullet.com/details.php?prodId=64): .452 Diameter, 185 Grain SWC, Brinell 12, Bullet OAL .610 +/-"
+      }
+    ]
+  }
+}

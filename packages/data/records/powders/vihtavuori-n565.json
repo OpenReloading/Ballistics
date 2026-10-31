@@ -1,0 +1,97 @@
+{
+  "id": "vihtavuori-n565",
+  "manufacturer": "vihtavuori",
+  "name": "N565",
+  "country": "FI",
+  "grainForm": "extruded",
+  "propellantBase": "double",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.4592,
+      "standardUncertainty": 0.014
+    },
+    "energy": {
+      "value": 3299800,
+      "standardUncertainty": 85000
+    },
+    "gamma": 1.2202,
+    "covolume": {
+      "value": 0.000983
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 189,
+    "trainingCartridges": 12
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "page": "1, section 9",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm"],
+        "note": "Lists N565 in the product identifier; section 9 gives the appearance \"Cylindrical grains\"."
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "page": "section 3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["propellantBase"],
+        "kind": "derived",
+        "note": "Section 3 lists nitroglycerin besides cellulose nitrate: double base."
+      },
+      {
+        "source": "vihtavuori-reloading-data-release-14-9-2026",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "189 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; double base prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-high",
+        "page": "section 1.3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-High-Energy-N500-series-RELO-19-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Supplier of the safety data sheet: Nammo Vihtavuori Oy, Ruutitehtaantie 80, 41330 Vihtavuori, Finland."
+      }
+    ]
+  }
+}

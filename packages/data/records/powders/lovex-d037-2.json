@@ -1,0 +1,23 @@
+{
+  "id": "lovex-d037-2",
+  "manufacturer": "lovex",
+  "name": "D037.2",
+  "propellantBase": "double",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lovex-reloading-guide-en-37-explosia-a-s",
+        "fields": ["name"],
+        "note": "No public download URL confirmed."
+      },
+      {
+        "source": "explosia-a-s-propellants-civil-catalogue-2023-en",
+        "page": "3",
+        "fields": ["propellantBase"],
+        "note": "No public download URL confirmed. States that single base powders carry the marking S and double base powders the marking D.",
+        "kind": "derived"
+      }
+    ]
+  }
+}

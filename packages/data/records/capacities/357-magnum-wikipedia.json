@@ -1,0 +1,21 @@
+{
+  "id": "357-magnum-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:357-magnum",
+  "waterCapacity": {
+    "value": 1.698,
+    "raw": "26.2 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .357 Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.357_Magnum&oldid=1368987349",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 26.2 gr H2O (1.70 cm3)."
+      }
+    ]
+  }
+}

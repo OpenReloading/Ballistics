@@ -1,0 +1,45 @@
+{
+  "id": "hammer-510-cal-450gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869043090",
+  "name": ".510 Cal-450gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".510",
+  "diameter": {
+    "value": 12.954,
+    "raw": ".510"
+  },
+  "mass": {
+    "value": 29.16,
+    "raw": "450 gr"
+  },
+  "length": {
+    "value": 32.26,
+    "raw": "Bullet length is 1.27″"
+  },
+  "noseLength": {
+    "value": 15.75,
+    "raw": "Nose length is .6199″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.329,
+      "note": "Hammer Bullets: \"g1-bc= .329 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist rate is 1-29″ for big game hunting and 1-25″ for dangerous game hunting. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"This pure copper big bore Stone Hammer™ was tested on water buffalo in Australia with outstanding results. These will run comfortably at 3000 fps in a 500 Jeffery. This combo will work for any animal that has legs. Qty-40\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/510-cal-450gr-stone-hammer/: Minimum required twist rate is 1-29″ for big game hunting and 1-25″ for dangerous game hunting | Bullet length is 1.27″ | Nose length is .6199″ | Bullet weight is 450gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .329 estimated"
+      }
+    ]
+  }
+}

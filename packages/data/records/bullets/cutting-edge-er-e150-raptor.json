@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-er-e150-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER E150 Raptor",
+  "name": "ER E150 Raptor (ER Raptor, 150 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 gr"
+  },
+  "length": {
+    "value": 29.13,
+    "raw": "1.147\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.233,
+      "note": "G1 BC, printed \".233 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4,
+    "raw": "1-16\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "7",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 7, Extended Range (ER) Raptor: Caliber .358, Grains 150, Minimum Required Twist 1-16\", Part Number ER E150 Raptor, G1 BC .233 (O89), OAL 1.147\", Bullet Projection .600\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .600\"."
+}

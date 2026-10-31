@@ -1,0 +1,55 @@
+{
+  "id": "sierra-1720",
+  "manufacturer": "sierra",
+  "productNumber": "1720",
+  "name": "6.5MM 120 GR SPT Pro-Hunter",
+  "caliber": "0.264",
+  "diameter": {
+    "value": 6.706,
+    "raw": "0.264 in"
+  },
+  "mass": {
+    "value": 7.776,
+    "raw": "120 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.356,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-120-gr-spt-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "b6e0c2fc0241178f08f07a9c7cfd9a11434281d9488439aed61e8aa5f0c528d6",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1720, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.264, Bullet Weight (Grains): 120, G1 BC: 0.356, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

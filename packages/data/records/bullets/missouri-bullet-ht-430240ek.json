@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-430240ek",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-430240EK",
+  "name": ".44 Elmer K - Hi-Tek, 240 Grain SWC",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922,
+    "raw": ".430 Diameter"
+  },
+  "mass": {
+    "value": 15.552,
+    "raw": "240 Grain"
+  },
+  "length": {
+    "value": 18.97,
+    "raw": "Bullet OAL .747 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 240 Grain SWC. Brinell 18. .44 Magnum. Keith-style, but with bevel-base. for reloading ease.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-430240EK, .44 Elmer K - Hi-Tek (https://missouribullet.com/details.php?prodId=241): .430 Diameter, 240 Grain SWC, Brinell 18, Bullet OAL .747 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

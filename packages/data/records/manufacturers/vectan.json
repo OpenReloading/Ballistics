@@ -1,0 +1,15 @@
+{
+  "id": "vectan",
+  "name": "Vectan",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

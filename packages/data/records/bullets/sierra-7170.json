@@ -1,0 +1,61 @@
+{
+  "id": "sierra-7170",
+  "manufacturer": "sierra",
+  "productNumber": "7170",
+  "name": "22 CAL 69 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.224",
+  "diameter": {
+    "value": 5.69,
+    "raw": "0.224 in"
+  },
+  "mass": {
+    "value": 4.471,
+    "raw": "69 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.357,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.177,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "The product page lists Bullet Diameter 0.223 for item 7170C (0.224 for 7170); Bullet Weight 55 for item 7170C (69 for 7170); G7 BC none for item 7170C (.177 for 7170); Bullet Type Spitzer (SPT) for item 7170C (Tipped for 7170); this record follows item 7170.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/22-cal-69-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "e7ccab90c214d2d69d0406b061097d59c05fe020d243fc0cd72c1eda575cf85a",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 7170, Bullet Type: Tipped, Bullet Diameter: 0.224, Bullet Weight (Grains): 69, G1 BC: .357, G7 BC: .177, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

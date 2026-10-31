@@ -1,0 +1,74 @@
+{
+  "id": "sierra-2236",
+  "manufacturer": "sierra",
+  "productNumber": "2236",
+  "name": "30 CAL 205 GR HPBT GAMEKING (SGK)",
+  "caliber": "0.308",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0.308 in"
+  },
+  "mass": {
+    "value": 13.284,
+    "raw": "205 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.48,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.245,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 2236, 2236C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/30-cal-205-gr-hpbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "6f877db8584903de162eabd40a8bd3463bd74ff95047b2646fec393788ebc092",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 2236, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.308, Bullet Weight (Grains): 205, G1 BC: 0.480, G7 BC: 0.245, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

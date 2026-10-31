@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-cal-075gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869040169",
+  "name": ".243 Cal-075gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 4.86,
+    "raw": "75 gr"
+  },
+  "length": {
+    "value": 26.42,
+    "raw": "Bullet length including tip is 1.04″"
+  },
+  "noseLength": {
+    "value": 13.79,
+    "raw": "Nose length including tip is .5429″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.173,
+      "note": "Hammer Bullets: \"g7-bc= .173 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Minimum required twist rate is 1-10″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"Designed for the factory twist .243/6mm caliber rifles, this 75gr Hammer HHT™ will easily load to 3600 fps in the 243 Winchester. The terminal performance and great speed of this pure copper bullet will be plenty for your big game hunting needs.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-075gr-hammer-hht/: Minimum required twist rate is 1-10″ or faster | Bullet length including tip is 1.04″ | Nose length including tip is .5429″ | Tip length is .143″ | Bullet weight is 75gr | Recommended use: Big Game Hunting | g7-bc= .173 estimated"
+      }
+    ]
+  }
+}

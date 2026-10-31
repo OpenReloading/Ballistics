@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-356125h",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-356125H",
+  "name": "IDP #6 - Hi-Tek, 125 Grain TCFP",
+  "caliber": ".356",
+  "diameter": {
+    "value": 9.042,
+    "raw": ".356 Diameter"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 Grain"
+  },
+  "length": {
+    "value": 14.25,
+    "raw": "Bullet OAL .561 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 125 Grain TCFP. Brinell 18. .38 Super. For Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-356125H, IDP #6 - Hi-Tek (https://missouribullet.com/details.php?prodId=504): .356 Diameter, 125 Grain TCFP, Brinell 18, Bullet OAL .561 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

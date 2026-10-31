@@ -1,0 +1,39 @@
+{
+  "id": "sellier-bellot-v338022",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338022",
+  "name": "FMJ, .224, 45 gr (bullet 2901)",
+  "productLine": "FMJ",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224 in (5,7 mm)"
+  },
+  "mass": {
+    "value": 2.916,
+    "raw": "45 grs (2,9 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.143,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"],
+        "note": "V338022 | 2901 | FMJ | 45 | 2,9 | 22 | 5,7 | .224 | 0,143. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

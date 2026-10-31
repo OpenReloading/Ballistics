@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-357148s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-357148S",
+  "name": "PPC #1 - Hi-Tek, 148 Grain DEWC-BB",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068,
+    "raw": ".357 Diameter"
+  },
+  "mass": {
+    "value": 9.59,
+    "raw": "148 Grain"
+  },
+  "length": {
+    "value": 14.71,
+    "raw": "Bullet OAL .579 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 148 Grain DEWC-BB. Brinell 12. .38 Special. NOTE: .357 Diameter for Match Barrels! For PPC Velocity.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-357148S, PPC #1 - Hi-Tek (https://missouribullet.com/details.php?prodId=235): .357 Diameter, 148 Grain DEWC-BB, Brinell 12, Bullet OAL .579 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

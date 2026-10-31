@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-458300m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-458300M",
+  "name": "#2 Buffalo - Hi-Tek, 300 Grain RNFP",
+  "caliber": ".459",
+  "diameter": {
+    "value": 11.659,
+    "raw": ".459 Diameter"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 Grain"
+  },
+  "length": {
+    "value": 19.74,
+    "raw": "Bullet OAL .777 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 300 Grain RNFP. Brinell 18. For Small Buffalo.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-458300M, #2 Buffalo - Hi-Tek (https://missouribullet.com/details.php?prodId=228): .459 Diameter, 300 Grain RNFP, Brinell 18, Bullet OAL .777 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

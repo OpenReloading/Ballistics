@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-168gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869039835",
+  "name": ".308 Cal-168gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.886,
+    "raw": "168 gr"
+  },
+  "length": {
+    "value": 36.25,
+    "raw": "Bullet length including tip is 1.427″"
+  },
+  "noseLength": {
+    "value": 18.29,
+    "raw": "Nose length including tip is .7201″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.241,
+      "note": "Hammer Bullets: \"g7-bc= .241 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 285.75,
+    "raw": "Minimum required twist rate is 1-11.25″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"This Hammer HHT™ is the heaviest that we offer that will be fully stable in the 11″ twist rifles. A great choice for the Tikka and Sako users.\" The weight is taken from the product name (168gr).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-168gr-hammer-hht/: Minimum required twist rate is 1-11.25″ or faster | Bullet length including tip is 1.427″ | Nose length including tip is .7201″ | Tip length is .143″ | Recommended use: Big Game Hunting | g7-bc= .241 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "hammer-224-cal-69gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869032050",
+  "name": ".224 Cal-69gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 4.471,
+    "raw": "69 gr"
+  },
+  "length": {
+    "value": 25.86,
+    "raw": "Bullet Length is 1.018″"
+  },
+  "noseLength": {
+    "value": 12.17,
+    "raw": "Nose Length is .479″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.151,
+      "note": "Hammer Bullets: \"g7-bc= .151 calculated from shot drops\" (calculated from shot drops)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.305,
+      "note": "Hammer Bullets: \"g1-bc= .305 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Minimum Required Twist Rate is 1-8″ or faster."
+  },
+  "note": "Recommended Use: Small to Big Game Hunting. The product page also says: \"This 69gr .224 caliber Absolute Hammer™ made from pure copper will increase the speed potential for those rifles with a 1-8″ twist or faster. Absolute Hammer™s are designed so that they have very low engraving pressure. This results in higher velocity potential in most cartridges than can be seen with conventionally designed bullets. This also means that they will not line up with conventional load data. They should only be loaded by experienced hand loaders that are comfortable reading pressure signs, and figuring out the right powder combination to get there. If you are not comfortable with this then look at the 70gr Hammer Hunter. It will line up with conventional data.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/224-cal-69gr-absolute-hammer/: Minimum Required Twist Rate is 1-8″ or faster. | Bullet Length is 1.018″ | Nose Length is .479″ | Bullet Weight is 69gr | Recommended Use: Small to Big Game Hunting | g7-bc= .151 calculated from shot drops | g1-bc= .305 calculated from shot drops"
+      }
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "id": "vectan-sp-2",
+  "manufacturer": "vectan",
+  "name": "Sp 2",
+  "grainForm": "ball",
+  "propellantBase": "double",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 2.014,
+      "standardUncertainty": 0.31
+    },
+    "energy": {
+      "value": 3746700,
+      "standardUncertainty": 450000
+    },
+    "gamma": 1.2202,
+    "covolume": {
+      "value": 0.000983
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0.8
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 20,
+    "trainingCartridges": 4
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vectan-catalogue-12-2023-powder-ranges",
+        "page": "3",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Describes this range as spherical or flattened grain double base powders."
+      },
+      {
+        "source": "vectan-catalogue-2023-12",
+        "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "20 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; double base prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      }
+    ]
+  }
+}

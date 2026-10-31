@@ -1,0 +1,74 @@
+{
+  "id": "sierra-1565",
+  "manufacturer": "sierra",
+  "productNumber": "1565",
+  "name": "6MM 105 GR HPBT/CN MatchKing (SMK)",
+  "caliber": "0.243",
+  "diameter": {
+    "value": 6.172,
+    "raw": "0.243 in"
+  },
+  "mass": {
+    "value": 6.804,
+    "raw": "105 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.577,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.284,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1565, 1565C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6mm-105-gr-hpbt-cn-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "2d1d0fdcf04756f9d621caea6c54f07373fe615efe8178f034504fcc00c141f2",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 1565, Bullet Type: Hollow Point Boat Tail - Closed Nose (HPBT-CN), Bullet Diameter: 0.243, Bullet Weight (Grains): 105, G1 BC: 0.577, G7 BC: 0.284, Rounds Per Box: 100, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

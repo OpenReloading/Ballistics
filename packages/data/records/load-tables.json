@@ -1,0 +1,61 @@
+{
+  "adi-web-2026-10-13": {
+    "manufacturer": "adi",
+    "title": "ADI load data web pages (rifle and pistol), 2026-10-13",
+    "url": "https://www.adiworldclass.com.au/data-rifle/",
+    "retrieved": "2026-10-13"
+  },
+  "alliant-2023": {
+    "manufacturer": "alliant",
+    "title": "Alliant Reloader's Guide 2023, metallic tables",
+    "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+    "retrieved": "2026-10-13"
+  },
+  "hodgdon-annual-2025": {
+    "manufacturer": "hodgdon",
+    "title": "Hodgdon Annual Manual 2025, rifle and pistol tables",
+    "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+    "retrieved": "2026-10-12"
+  },
+  "lovex-en-37": {
+    "manufacturer": "lovex",
+    "title": "LOVEX Reloading Guide EN 37 (Explosia)",
+    "retrieved": "2026-10-13"
+  },
+  "norma-web-2026-10-13": {
+    "manufacturer": "norma",
+    "title": "Norma reloading data web pages, 2026-10-13",
+    "url": "https://www.norma-ammunition.com/reloading",
+    "retrieved": "2026-10-13"
+  },
+  "reload-swiss-web-2026-10-12": {
+    "manufacturer": "reload-swiss",
+    "title": "Reload Swiss loading data web table, 2026-10-12",
+    "url": "https://www.reload-swiss.com/en/loading-data/rs-loading-data",
+    "retrieved": "2026-10-12"
+  },
+  "rws-web-2026-10-13": {
+    "manufacturer": "rws",
+    "title": "RWS reloading data web table (Rottweil powders), 2026-10-13",
+    "url": "https://rws-ammunition.com/de/infotainment/wiederladen",
+    "retrieved": "2026-10-13"
+  },
+  "vectan-2023-12": {
+    "manufacturer": "vectan",
+    "title": "Vectan catalogue 2023-12",
+    "url": "https://www.vectan.fr/images/files/NS-23-12-CATALOGUE-PP-WEB.pdf",
+    "retrieved": "2026-10-13"
+  },
+  "vihtavuori-2026-09-14": {
+    "manufacturer": "vihtavuori",
+    "title": "Vihtavuori reloading data, release 14.9.2026",
+    "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+    "retrieved": "2026-10-12"
+  },
+  "western-8.0": {
+    "manufacturer": "western",
+    "title": "Western Powders Handloading Guide 8.0",
+    "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/WesternPowdersHandloadingGuide8.0_WEB-1.pdf",
+    "retrieved": "2026-10-12"
+  }
+}

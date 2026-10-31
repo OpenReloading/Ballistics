@@ -1,0 +1,58 @@
+{
+  "id": "sierra-1895",
+  "manufacturer": "sierra",
+  "productNumber": "1895",
+  "name": "7MM 100 GR HP VarmintKing (SVK)",
+  "caliber": "0.284",
+  "diameter": {
+    "value": 7.214,
+    "raw": "0.284 in"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.209,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/7mm-100-gr-hp-varmintking-vk/",
+        "retrieved": "2026-10-08",
+        "sha256": "bc7d59e01fad46db5287a641a8f56098d8c9f99354dcf8b7d29fa364eece1314",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1895, Bullet Type: Hollow Point (HP), Bullet Diameter: 0.284, Bullet Weight (Grains): 100, G1 BC: 0.209, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

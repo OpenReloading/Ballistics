@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mth-284-168",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 284 168",
+  "name": "MTH 284 168 (MTH, 168 gr)",
+  "productLine": "MTH",
+  "caliber": ".284 (7mm)",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284 (7mm)"
+  },
+  "mass": {
+    "value": 10.886,
+    "raw": "168 gr"
+  },
+  "length": {
+    "value": 38.89,
+    "raw": "1.531\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.556,
+      "note": "G1 BC, printed \".556 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.276,
+      "note": "G7 BC, printed \".276 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "1-9\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .284 (7mm), Grains 168, Minimum Required Twist 1-9\", Part Number MTH 284 168, G1 BC .556 (O89), G7 BC .276 (O89), OAL 1.531\", Bullet Projection .712\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .712\"."
+}

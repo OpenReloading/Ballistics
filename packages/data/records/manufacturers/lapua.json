@@ -1,0 +1,15 @@
+{
+  "id": "lapua",
+  "name": "Lapua",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lapua",
+        "url": "https://www.lapua.com/product/30-scenar-bullet-gb422-1085-g-167-gr-otm/",
+        "retrieved": "2026-09-05",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

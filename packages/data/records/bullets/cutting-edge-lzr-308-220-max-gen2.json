@@ -1,0 +1,61 @@
+{
+  "id": "cutting-edge-lzr-308-220-max-gen2",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 308 220 MAX GEN2",
+  "name": "LZR 308 220 MAX GEN2 (Lazer, 220 gr)",
+  "productLine": "Lazer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 14.256,
+    "raw": "220 gr"
+  },
+  "length": {
+    "value": 46.3,
+    "raw": "1.823\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.646,
+      "note": "G1 BC, above the part number line, printed \".646 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.645,
+      "note": "G1 BC, below the part number line, printed \".645 (Oehler 89)\". Marked (Oehler 89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.332,
+      "note": "G7 BC, above the part number line, printed \".332 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.323,
+      "note": "G7 BC, below the part number line, printed \".323 (Oehler 89)\". Marked (Oehler 89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "*1-8\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .308, Grains 220, Minimum Required Twist *1-8\", Part Number LZR 308 220 MAX GEN2, G1 BC .646 (A.B.) / .645 (Oehler 89), G7 BC .332 (A.B.) / .323 (Oehler 89), OAL 1.823\", Bullet Projection 1.292\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1-2 inches faster is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.292\"."
+}

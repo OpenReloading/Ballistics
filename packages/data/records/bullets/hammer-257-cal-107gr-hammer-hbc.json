@@ -1,0 +1,61 @@
+{
+  "id": "hammer-257-cal-107gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869056177",
+  "name": ".257 Cal-107gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 6.933,
+    "raw": "107 gr"
+  },
+  "length": {
+    "value": 35.31,
+    "raw": "Bullet length including tip is 1.390″"
+  },
+  "noseLength": {
+    "value": 20.32,
+    "raw": "Nose length including tip is .800″ (may require single feeding)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.257,
+      "note": "Hammer Bullets: \"g7-bc= .257\"; the page says \"Calculated from shot drops at 1200y, 3100′ elevation, MV of 3400 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.51,
+      "note": "Hammer Bullets: \"g1-bc= .510\"; the page says \"Calculated from shot drops at 1200y, 3100′ elevation, MV of 3400 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Minimum required twist rate is 1-8″ or faster"
+  },
+  "note": "PDR drive band spacing is .200″ (recommend two drive bands in case neck for concentricity) Tip length is .143″. Recommended use: Big Game Hunting. Form factor= .901. The product page also says: \"Designed to be fully stable in a 1-8″ twist barrel or faster, this 107gr Hammer HBC™ is a great mid weight bullet with very good ballistic coefficient. Running with a .901 form factor and the high velocity potential that the Hammer HBC™ bullet show, this bullet will be hard to keep up with to very long range. The Hammer HBC™ is designed to maximize ballistic coefficient for the bullet weight. Make sure the bullet specifications will work in your cartridge and rifle system. May require single feeding.\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-107gr-hammer-hbc/: Minimum required twist rate is 1-8″ or faster | Bullet length including tip is 1.390″ | Nose length including tip is .800″ (may require single feeding) | PDR drive band spacing is .200″ (recommend two drive bands in case neck for concentricity) | Tip length is .143″ | Bullet weight is 107gr | Recommended use: Big Game Hunting | g7-bc= .257 | g1-bc= .510 | Form factor= .901 | Calculated from shot drops at 1200y, 3100′ elevation, MV of 3400 fps"
+      }
+    ]
+  }
+}

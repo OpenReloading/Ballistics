@@ -1,0 +1,36 @@
+{
+  "id": "hornady-301914",
+  "manufacturer": "hornady",
+  "productNumber": "301914",
+  "name": "30 Cal. CX, .308, 110 gr",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308\""
+  },
+  "mass": {
+    "value": 7.128,
+    "raw": "110 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.312,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "83",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "30 Cal. CX, .308\", 110 gr., G1 .312, Sec. Den. .166, Item # 301914"
+      }
+    ]
+  }
+}

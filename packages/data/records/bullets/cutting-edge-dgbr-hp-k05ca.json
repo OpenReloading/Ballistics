@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-hp-k05ca",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP K05CA",
+  "name": "DGBR-HP K05CA (Flat Base Raptor, 257 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744,
+    "raw": ".423"
+  },
+  "mass": {
+    "value": 16.653,
+    "raw": "257 gr"
+  },
+  "length": {
+    "value": 34.62,
+    "raw": "1.363\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .423, Grains 257, Minimum Required Twist Standard, Part Number DGBR-HP K05CA, G1 BC TBD, OAL 1.363\", Bullet Projection .650\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". Minimum required twist is printed \"Standard\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .650\"."
+}

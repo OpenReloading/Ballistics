@@ -1,0 +1,56 @@
+{
+  "id": "hammer-358-cal-275gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869035268",
+  "name": ".358 Cal-275gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 17.82,
+    "raw": "275 gr"
+  },
+  "length": {
+    "value": 41.66,
+    "raw": "Bullet length is 1.64″"
+  },
+  "noseLength": {
+    "value": 20.96,
+    "raw": "Nose length is .825″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.472,
+      "note": "Hammer Bullets: \"g1-bc= .472 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "Minimum required twist rate is 1-12″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This is the heaviest in the 35-caliber line up. At 275gr this pure copper Power Hammer™ is a very hard hitter.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/358-cal-275gr-power-hammer/: Minimum required twist rate is 1-12″ or faster | Bullet length is 1.64″ | Nose length is .825″ | Bullet weight is 275gr | Recommended use: Big Game Hunting | g1-bc= .472 estimated"
+      }
+    ]
+  }
+}

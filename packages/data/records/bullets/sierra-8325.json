@@ -1,0 +1,56 @@
+{
+  "id": "sierra-8325",
+  "manufacturer": "sierra",
+  "productNumber": "8325",
+  "name": "38 CAL 140 GR JHP SPORTS MASTER",
+  "caliber": "0.357",
+  "diameter": {
+    "value": 9.068,
+    "raw": "0.357 in"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.078,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "The page title says JHP, the specification of item 8325 Jacketed Hollow Cavity (JHC).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/38-cal-140-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "c43dc3d8da93a1ea29a9d352109350046aad2632abedbb1e957302b1f2468b11",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8325, Bullet Type: Jacketed Hollow Cavity (JHC), Bullet Diameter: 0.357, Bullet Weight (Grains): 140, G1 BC: 0.078, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

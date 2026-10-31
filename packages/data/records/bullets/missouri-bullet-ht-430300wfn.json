@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-430300wfn",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-430300WFN",
+  "name": ".44 Hammer - Hi-Tek, 300 Grain WFN",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922,
+    "raw": ".430 Diameter"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 Grain"
+  },
+  "length": {
+    "value": 20.98,
+    "raw": "Bullet OAL .826 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 300 Grain WFN. Brinell 18. .44 Magnum. For Takedown.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-430300WFN, .44 Hammer - Hi-Tek (https://missouribullet.com/details.php?prodId=461): .430 Diameter, 300 Grain WFN, Brinell 18, Bullet OAL .826 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

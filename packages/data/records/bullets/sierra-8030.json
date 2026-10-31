@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8030",
+  "manufacturer": "sierra",
+  "productNumber": "8030",
+  "name": "32 CAL 90 GR JHC SPORTS MASTER",
+  "caliber": "0.312",
+  "diameter": {
+    "value": 7.925,
+    "raw": "0.312 in"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.125,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/32-cal-90-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "10f1fe1c21b05ea6b8eb89207565933a7af88dec68c482af9bafcc5ec28e3993",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8030, Bullet Type: Jacketed Hollow Cavity (JHC), Bullet Diameter: 0.312, Bullet Weight (Grains): 90, G1 BC: 0.125, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8500",
+  "manufacturer": "sierra",
+  "productNumber": "8500",
+  "name": "41 CAL 170 GR JHC SPORTS MASTER",
+  "caliber": "0.410",
+  "diameter": {
+    "value": 10.414,
+    "raw": "0.410 in"
+  },
+  "mass": {
+    "value": 11.016,
+    "raw": "170 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.123,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/41-cal-170-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "d84564985983bd12a0aea0a39dbfa36c1cbca0233e8525137719039e6e002e35",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8500, Bullet Type: Jacketed Hollow Cavity (JHC), Bullet Diameter: 0.410, Bullet Weight (Grains): 170, G1 BC: 0.123, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

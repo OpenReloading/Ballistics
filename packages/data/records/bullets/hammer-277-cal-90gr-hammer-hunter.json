@@ -1,0 +1,61 @@
+{
+  "id": "hammer-277-cal-90gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027597",
+  "name": ".277 Cal-090gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "length": {
+    "value": 23.88,
+    "raw": "Bullet length is .94″"
+  },
+  "noseLength": {
+    "value": 14.16,
+    "raw": "Nose length is .5575″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.14,
+      "note": "Hammer Bullets: \"g7-bc= .140 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.29,
+      "note": "Hammer Bullets: \"g1-bc= .290 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "Minimum required twist rate is 1-13″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"The Hammer Hunter™ speed demon for the 270’s. This pure copper bullet will absolutely get the job done on big game at normal hunting ranges. Fire it up and let it go.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-90gr-hammer-hunter/: Minimum required twist rate is 1-13″ | Bullet length is .94″ | Nose length is .5575″ | Bullet weight is 90gr | Recommended use: Big Game Hunting | g7-bc= .140 estimated | g1-bc= .290 estimated"
+      }
+    ]
+  }
+}

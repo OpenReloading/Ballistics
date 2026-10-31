@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-esp-h100-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP H100 Raptor",
+  "name": "ESP H100 Raptor (ESP Raptor, 100 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "length": {
+    "value": 30.12,
+    "raw": "1.186\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "G1 BC w/o tip, printed \".120\". Without the tip installed, determined at 50 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.225,
+      "note": "G1 BC w/tip, printed \".225\". With the tip installed, determined at 250 yards (page footnote). No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "8",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 8, Enhanced System Projectile (ESP): Caliber .277, Grains 100, Minimum Required Twist 1-10\", Part Number ESP H100 Raptor, G1 BC w/o tip .120, G1 BC w/tip .225, OAL w/o tip 1.018\", OAL w/tip 1.186\", Bullet Projection w/o tip .444\", Bullet Projection w/tip .612\", Blunt Trauma Base™ ~ Retained Weight (grains) 71"
+      }
+    ]
+  },
+  "note": "Also printed: OAL w/o tip 1.018\" (the length stored is with the tip). Bullet projection (from the SealTite band to the tip, page footnote) printed: w/o tip .444\"; w/tip .612\"."
+}

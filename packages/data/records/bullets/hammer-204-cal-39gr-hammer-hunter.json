@@ -1,0 +1,50 @@
+{
+  "id": "hammer-204-cal-39gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "7697",
+  "name": ".204 Cal-39gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".204",
+  "diameter": {
+    "value": 5.182,
+    "raw": ".204"
+  },
+  "mass": {
+    "value": 2.527,
+    "raw": "39 gr"
+  },
+  "length": {
+    "value": 17.78,
+    "raw": "Bullet length is .7″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.112,
+      "note": "Hammer Bullets: \"g7-bc= .112 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.234,
+      "note": "Hammer Bullets: \"g1-bc= .234 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3,
+    "raw": "Recommended minimum twist rate is 9.5″"
+  },
+  "note": "Recommended use: Varmint and small game hunting. The product page also says: \"This will be a great bullet for varmints small and large. Plenty fast and heavy enough to penetrate on bigger animals like coyote.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/204-cal-39gr-hammer-hunter/: Recommended minimum twist rate is 9.5″ | Bullet length is .7″ | Bullet weight is 39gr | Recommended use: Varmint and small game hunting | g7-bc= .112 estimated | g1-bc= .234 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "6-5-x-47-lapua-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:6-5-x-47-lapua",
+  "waterCapacity": {
+    "value": 3.11,
+    "raw": "48 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 6.5x47mm Lapua",
+        "url": "https://en.wikipedia.org/w/index.php?title=6.5%C3%9747mm_Lapua&oldid=1292319718",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 3.11 cm3 (48.0 gr H2O)."
+      }
+    ]
+  }
+}

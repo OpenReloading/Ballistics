@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8615",
+  "manufacturer": "sierra",
+  "productNumber": "8615",
+  "name": "44 CAL 250 GR FPJ TOURNAMENT MASTER",
+  "caliber": "0.4295",
+  "diameter": {
+    "value": 10.909,
+    "raw": "0.4295 in"
+  },
+  "mass": {
+    "value": 16.2,
+    "raw": "250 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.213,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/44-cal-250-gr-fpj-tournament-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "96ff51671046d0a832f58499a96c60412b13b8ce3e387fb5805fc7dd44313fdb",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8615, Bullet Type: Full Profile Jacket (FPJ), Bullet Diameter: 0.4295, Bullet Weight (Grains): 250, G1 BC: 0.213, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

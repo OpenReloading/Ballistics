@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-358158rnfpm",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358158RNFPM",
+  "name": "#1 Ranger, 158 Grain RNFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 10.238,
+    "raw": "158 Grain"
+  },
+  "length": {
+    "value": 16.33,
+    "raw": "Bullet OAL .643 +/-"
+  },
+  "note": "Listed as 158 Grain RNFP. Brinell 18. For Tubular Magazines.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "358158RNFPM, #1 Ranger (https://missouribullet.com/details.php?prodId=110): .358 Diameter, 158 Grain RNFP, Brinell 18, Bullet OAL .643 +/-"
+      }
+    ]
+  }
+}

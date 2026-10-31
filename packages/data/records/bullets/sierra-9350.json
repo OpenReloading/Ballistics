@@ -1,0 +1,74 @@
+{
+  "id": "sierra-9350",
+  "manufacturer": "sierra",
+  "productNumber": "9350",
+  "name": "375 CAL 350 GR HPBT/CN MATCHKING (SMK)",
+  "caliber": "0.375",
+  "diameter": {
+    "value": 9.525,
+    "raw": "0.375 in"
+  },
+  "mass": {
+    "value": 22.68,
+    "raw": "350 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.805,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.4,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 9350, 9350T (box counts). The page title says HPBT-CN, the specification of item 9350 Hollow Point Boat Tail (HPBT).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/375-cal-350-gr-hpbt-cn-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "da78beda92069d8d17ea2aed8f019d4d80132c11bcb78992cbb28eacf0d1cf24",
+        "fields": [
+          "diameter",
+          "mass",
+          "base.type",
+          "tip.type",
+          "construction.raw",
+          "ballisticCoefficients"
+        ],
+        "note": "Item #: 9350, Bullet Type: Hollow Point Boat Tail (HPBT), Bullet Diameter: 0.375, Bullet Weight (Grains): 350, G1 BC: 0.805, G7 BC: 0.400, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

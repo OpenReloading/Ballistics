@@ -1,0 +1,49 @@
+{
+  "id": "sierra-7331",
+  "manufacturer": "sierra",
+  "productNumber": "7331",
+  "name": "25 CAL 131 GR Tipped GameKing (TGK)",
+  "caliber": "0.257",
+  "diameter": {
+    "value": 6.528,
+    "raw": "0.257 in"
+  },
+  "mass": {
+    "value": 8.489,
+    "raw": "131 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "note": "Item numbers 7331, 7331C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/25-cal-131-gr-tipped-gameking-tgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "863e6054d402c692003b93c734b0889f31553a84e2465de8e5c681b44acb47ce",
+        "fields": ["diameter", "mass", "construction.raw"],
+        "note": "Item #: 7331, Bullet Type: Tipped GameKing (TGK), Bullet Diameter: 0.257, Bullet Weight (Grains): 131, G1 BC: NA, G7 BC: NA, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

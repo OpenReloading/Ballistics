@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-313098s",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-313098S",
+  "name": ".32 Target - Hi-Tek, 98 Grain WC-BB",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95,
+    "raw": ".313 Diameter"
+  },
+  "mass": {
+    "value": 6.35,
+    "raw": "98 Grain"
+  },
+  "length": {
+    "value": 13.51,
+    "raw": "Bullet OAL .532 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 98 Grain WC-BB. Brinell 12. .32 H&R. For Target Work.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-313098S, .32 Target - Hi-Tek (https://missouribullet.com/details.php?prodId=356): .313 Diameter, 98 Grain WC-BB, Brinell 12, Bullet OAL .532 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

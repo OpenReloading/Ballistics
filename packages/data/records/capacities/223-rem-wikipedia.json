@@ -1,0 +1,21 @@
+{
+  "id": "223-rem-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:223-rem",
+  "waterCapacity": {
+    "value": 1.866,
+    "raw": "28.8 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .223 Remington",
+        "url": "https://en.wikipedia.org/w/index.php?title=.223_Remington&oldid=1371182787",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 28.8 grain H2O (1.87 ml)."
+      }
+    ]
+  }
+}

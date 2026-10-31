@@ -1,0 +1,30 @@
+{
+  "id": "hornady-10208",
+  "manufacturer": "hornady",
+  "productNumber": "10208",
+  "name": "38 Cal. HBWC, .358, 148 gr",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358\""
+  },
+  "mass": {
+    "value": 9.59,
+    "raw": "148 gr"
+  },
+  "note": "The catalog prints BC .047 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "99",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "38 Cal. HBWC, .358\", 148 gr., Ballistic Coef. .047, Sec. Den. .165, Item # 10208"
+      }
+    ]
+  }
+}

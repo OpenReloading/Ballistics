@@ -1,0 +1,42 @@
+{
+  "id": "hornady-28503",
+  "manufacturer": "hornady",
+  "productNumber": "28503",
+  "name": "7mm ELD Match, .284, 180 gr",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284\""
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.796,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated. Hornady states ELD Match BCs are measured by Doppler radar and corrected to standard atmospheric conditions."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.401,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated. Hornady states ELD Match BCs are measured by Doppler radar and corrected to standard atmospheric conditions."
+    }
+  ],
+  "note": "The catalog marks the weight with an asterisk; the footnote on the facing page 74: \"To achieve optimal performance, non-standard magazine length, chamber and faster twist rate barrel may be required.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "75",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "7mm ELD Match, .284\", 180 gr., G1 .796, G7 .401, Sec. Den. .319, Item # 28503"
+      }
+    ]
+  }
+}
