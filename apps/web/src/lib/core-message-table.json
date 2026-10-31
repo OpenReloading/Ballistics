@@ -238,6 +238,8 @@
       "ladder steps must be an integer of at least 1",
       "a ladder around the charge needs an odd count",
       "ladder charge {n} kg must be above 0",
+      "ladder charge {n} g must be above 0",
+      "Too big: expected number to be <={n}",
       "a ladder needs at least two strings",
       "mean must be finite",
       "standard deviation must be 0 or more",
@@ -415,7 +417,13 @@
       "No column is mapped to {fields}. Map a column to each or read the file as another kind.",
       "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.",
       "The workbook cannot be read. Save it again as XLSX or CSV.",
-      "{reason}. Fix the row or delete it."
+      "{reason}. Fix the row or delete it.",
+      "Rows {first} and {row} give the same name, maker, diameter and mass, so one id: only row {first} is imported. Change a cell of row {row} to import it as a record of its own.",
+      "Rows {first} and {row} give the same name and maker, so one id: only row {first} is imported. Change a cell of row {row} to import it as a record of its own."
+    ],
+    "seating": [
+      "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given.",
+      "The bullet below the mouth takes the whole case volume: no volume behind the bullet is given."
     ]
   }
 }

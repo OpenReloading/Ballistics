@@ -448,6 +448,28 @@ describe('POST /interior/load-file', () => {
     ).not.toHaveProperty('ladderSteps')
   })
 
+  it('states the ladder limits in the grams of the file', async () => {
+    const big = await simulate(
+      file({ siValues, ladder: { stepCount: 3, chargeStep: 0.011, direction: 'up' } }),
+    )
+    expect(big.status).toBe(400)
+    expect(big.body.issues).toMatchObject([
+      {
+        path: ['records', 0, 'data', 'analysis', 'ladder', 'step'],
+        message: 'Too big: expected number to be <=10',
+      },
+    ])
+    // 2.8 g down four steps of 1 g
+    const below = await simulate(
+      file({ siValues, ladder: { stepCount: 5, chargeStep: 0.001, direction: 'down' } }),
+    )
+    expect(below.status).toBe(422)
+    expect(below.body).toMatchObject({
+      message: 'ladder charge -1.2 g must be above 0',
+      notice: 'simulation, not load data',
+    })
+  })
+
   it('refuses a temperature ladder instead of reading its step as a charge step', async () => {
     const { status, body } = await simulate(
       file({
