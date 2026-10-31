@@ -250,6 +250,34 @@ describe('readRecords', () => {
   })
 })
 
+describe('readRecords with several roots', () => {
+  it('reads the load tables of every root', () => {
+    const second = mkdtempSync(join(tmpdir(), 'records-second-'))
+    const table = {
+      manufacturer: 'missing-table-manufacturer',
+      title: 'T',
+      retrieved: '2026-01-01',
+    }
+    try {
+      writeFileSync(join(second, 'load-tables.json'), JSON.stringify({ 'second.csv': table }))
+      const first = mkdtempSync(join(tmpdir(), 'records-first-'))
+      cpSync(join(fixtures, 'valid'), first, { recursive: true })
+      try {
+        writeFileSync(join(first, 'load-tables.json'), JSON.stringify({ 'first.csv': table }))
+        const { errors } = readRecords([first, second])
+        for (const file of ['first.csv', 'second.csv'])
+          expect(errors).toContain(
+            `load-tables.json: ${file}: unknown manufacturer "missing-table-manufacturer"`,
+          )
+      } finally {
+        rmSync(first, { recursive: true })
+      }
+    } finally {
+      rmSync(second, { recursive: true })
+    }
+  })
+})
+
 describe('readLoadTables', () => {
   const read = (file: unknown) => {
     const dir = mkdtempSync(join(tmpdir(), 'load-tables-'))

@@ -264,7 +264,7 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
 
 /**
  * Reads, validates and cross-checks every record under `root`, or under each of several roots read
- * as one set (the first holds every kind directory, the second its `load-tables.json`). Without
+ * as one set (the first holds every kind directory; the `load-tables.json` of every root lists tables). Without
  * `root` it reads the `records/` folder of a repository checkout; the npm package ships none, so
  * there it throws: pass the `records/` folder of a checkout, or read `bundle.json` instead.
  */
@@ -285,9 +285,8 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   errors.push(...checkFederations(bundle))
   errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
-  const loadRoot = roots[1] ?? roots[0]
-  if (loadRoot === undefined) throw new Error('readRecords needs at least one records root')
-  const loadTables = readLoadTables(loadRoot, errors)
+  if (roots.length === 0) throw new Error('readRecords needs at least one records root')
+  const loadTables: LoadTables = Object.assign({}, ...roots.map((r) => readLoadTables(r, errors)))
   for (const p of bundle.powders) {
     for (const error of checkFittedSources(p, loadTables))
       errors.push(`powders/${p.id}.json: ${error}`)

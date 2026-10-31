@@ -36,7 +36,7 @@ console.log(twistPlausible(254)) // true
 
 ## Reading a records folder
 
-`readRecords(root)` validates the records of a folder laid out as `packages/data/records/` of the repository, one directory per kind. Pass that folder of a clone, or several folders read as one set: the first must hold every kind directory, and `load-tables.json` is read from the second only (from the first when there is one folder), so a table in any other folder is not used to check fitted powders. The npm package ships no records folder: without `root`, `readRecords` reads the `records/` folder next to the package only in a repository checkout and throws in an installed package. For the records themselves, import `bundle.json`.
+`readRecords(root)` validates the records of a folder laid out as `packages/data/records/` of the repository, one directory per kind. Pass that folder of a clone, or several folders read as one set: the first must hold every kind directory, and the `load-tables.json` of every folder lists tables for checking fitted powders. The npm package ships no records folder: without `root`, `readRecords` reads the `records/` folder next to the package only in a repository checkout and throws in an installed package. For the records themselves, import `bundle.json`.
 
 ```js
 import { readRecords } from '@open-reloading/data'
