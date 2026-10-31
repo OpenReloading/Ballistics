@@ -20,7 +20,14 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import type { BulletSummary, CartridgeSummary, PowderSummary } from '../lib/api-types.ts'
-import { bandCount, recordBulletValues } from '../lib/bullet.ts'
+import {
+  bandCount,
+  baseDimensionKeys,
+  baseTypeKey,
+  boatTailed,
+  hollowBased,
+  recordBulletValues,
+} from '../lib/bullet.ts'
 import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
@@ -65,6 +72,7 @@ import { catalogueRef, userRef } from '../lib/variants.ts'
 import type { InputPanel } from '../lib/workbench.ts'
 import { citedDefaults, type DefaultKey } from '../lib/workbench-defaults.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
+import { BaseFormField } from './bullet-base.tsx'
 import { Noted } from './field-table.tsx'
 import { LotField } from './load-notes.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -997,10 +1005,27 @@ function BulletValueFields({ more }: { more?: boolean }) {
     return model ? bandCount(bulletRecord, model) > 0 : true
   }
   const [first, second] = bulletFields.filter((s) => s.key.includes('Bc') && shown(s.key))
-  const keys = more
-    ? [second]
-    : [...bulletFields.filter((s) => !s.key.includes('Bc') && shown(s.key)), first]
+  const own = (s: { key: string }) => !s.key.includes('Bc') && !baseDimensionKeys.includes(s.key)
+  const keys = more ? [second] : [...bulletFields.filter((s) => own(s) && shown(s.key)), first]
   return keys.map((s) => s && <BulletValueField key={s.key} name={s.key} />)
+}
+
+/**
+ * The bullet's base form in the card's More popover (the card itself is as high as the window of
+ * 1280 x 650 allows), with the boat-tail length and base face diameter, and for a hollow base the
+ * cavity diameter. A flat base has no dimension row.
+ */
+function BaseFormFields() {
+  const { bulletRecord, bulletBaseType } = useLoad()
+  const type = bulletBaseType ?? bulletRecord?.base?.type
+  return (
+    <>
+      <BaseFormField />
+      {boatTailed(type) && <BulletValueField name="bulletBaseLength" />}
+      {boatTailed(type) && <BulletValueField name="bulletBaseDiameter" />}
+      {hollowBased(type) && <BulletValueField name="bulletCavityDiameter" />}
+    </>
+  )
 }
 
 /** The note on a load whose powder design has a newer fit, with the switch to it. */
@@ -1459,9 +1484,12 @@ function ReplacedNote({ panel }: { panel: InputPanel }) {
 
 /** Gives the card's changed values their record's values again. */
 function ResetCard({ panel }: { panel: InputPanel }) {
-  const { changes, resetKeys } = useLoad()
+  const { changes, resetKeys, baseChanged } = useLoad()
   const { t } = useTranslation()
-  const keys = cardKeys[panel].filter((k) => changes[k] !== undefined)
+  const keys = [
+    ...cardKeys[panel].filter((k) => changes[k] !== undefined),
+    ...(panel === 'bullet' && baseChanged ? [baseTypeKey] : []),
+  ]
   return (
     <Button
       className="wide"
@@ -1513,6 +1541,7 @@ function MoreRows({ panel }: { panel: InputPanel }) {
   return (
     <>
       <BulletValueFields more />
+      <BaseFormFields />
       {recordRow(t('Construction'), constructionCell(bullet?.construction, t))}
       <Switch
         className="wide"
@@ -1579,12 +1608,17 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     fields,
     powder,
     bulletValues,
+    bulletBaseType,
   } = useLoad()
   const { ok, stale } = useResult()
-  // the figure draws the record's shape at the typed diameter; its other dimensions are the record's,
-  // so a typed length (which they would no longer add up to) stays out
-  const { bulletDiameter } = bulletValues
-  const seatValues = useMemo(() => ({ bulletDiameter }), [bulletDiameter])
+  // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
+  // record's, so a typed length (which they would no longer add up to) stays out
+  const { bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter } =
+    bulletValues
+  const seatValues = useMemo(
+    () => ({ bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter }),
+    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter],
+  )
   // the figure draws the selected step of a seating ladder while its result is current
   const seatingStep = ok?.steps[ok.selected]?.seating
   const ladderStep =
@@ -1636,7 +1670,12 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       lands={lands.contact}
       landsOther={lands.other}
       barrelDefault={suggestions.barrelLength}
-      linked={{ bullet: bullet?.id, design: bulletDesign?.id, values: seatValues }}
+      linked={{
+        bullet: bullet?.id,
+        design: bulletDesign?.id,
+        values: seatValues,
+        baseType: bulletBaseType,
+      }}
       slots={{
         cartridge: seatingSlots.cartridge ?? null,
         gun: seatingSlots.gun ?? null,

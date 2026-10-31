@@ -1,3 +1,4 @@
+import { baseDimensionKeys, baseTypeKey } from '../lib/bullet.ts'
 import type { FieldValue } from '../lib/field-spec.ts'
 import { type FollowKey, isFollowKey } from '../lib/input-defaults.ts'
 import { interiorFields } from '../lib/interior-input.ts'
@@ -10,6 +11,8 @@ export interface ResetTargets {
   system: UnitSystem
   /** The keys of the Bullet card's typed values (`bulletFields`). */
   bulletKeys: ReadonlySet<string>
+  /** The base form typed over the record's own. */
+  baseChanged: boolean
   setField: (key: string, value: FieldValue) => void
   clearError: (key: string) => void
   unsetTypedBullet: (keys: readonly string[]) => void
@@ -26,7 +29,10 @@ export interface ResetTargets {
 export function resetToRecord(keys: readonly string[], a: ResetTargets) {
   const reset = keys.filter((k) => a.changes[k] !== undefined)
   const typed = reset.filter((k) => a.bulletKeys.has(k))
-  if (typed.length > 0) a.unsetTypedBullet(typed)
+  // the base form takes the dimensions typed for it along: they describe the form that goes
+  const form = a.baseChanged && keys.includes(baseTypeKey)
+  const dropped = form ? [baseTypeKey, ...baseDimensionKeys, ...typed] : typed
+  if (dropped.length > 0) a.unsetTypedBullet(dropped)
   const followed = reset.filter(isFollowKey)
   for (const key of followed) a.setField(key, { text: '', si: undefined })
   if (followed.length > 0) a.follow(followed)
@@ -42,5 +48,5 @@ export function resetToRecord(keys: readonly string[], a: ResetTargets) {
     a.setField(key, { text: fixedFieldText(quantity, a.system, si), si })
     a.clearError(key)
   }
-  return reset.length
+  return reset.length + (form ? 1 : 0)
 }

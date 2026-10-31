@@ -1,4 +1,6 @@
 import { lbPerSqInToKgPerSqM, millerStability } from '@open-reloading/core'
+import { bulletDimensions } from '@open-reloading/drawing/bullet'
+import { bulletOutline } from '@open-reloading/drawing/seating'
 import type { Bullet } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import {
@@ -8,6 +10,7 @@ import {
   effectiveBulletValues,
   millerTwist,
   recordBulletValues,
+  typedBaseType,
   typedBullet,
 } from '../src/lib/bullet.ts'
 import { rowValue } from '../src/lib/record-fields.ts'
@@ -185,4 +188,74 @@ it('keeps the record value where a typed bullet value is 0', () => {
   })
   expect(values.bulletDiameter).toBe(recordBulletValues(r).bulletDiameter)
   expect(values.bulletLength).toBe(0.032)
+})
+
+const boatTail = (): Bullet => ({
+  ...record(undefined),
+  bearingLength: { value: 10 },
+  base: { type: 'boat-tail', length: { value: 6 }, diameter: { value: 5.8 }, angle: { value: 7 } },
+})
+
+it('reads the base dimensions of the record and types them over it', () => {
+  const r = boatTail()
+  expect(recordBulletValues(r)).toMatchObject({
+    bulletBaseLength: expect.closeTo(6e-3, 12),
+    bulletBaseDiameter: expect.closeTo(5.8e-3, 12),
+  })
+  const typed = typedBullet(r, { bulletBaseLength: 5e-3 })
+  expect(typed.base?.length?.value).toBeCloseTo(5, 9)
+  expect(typed.base?.diameter).toEqual({ value: 5.8 })
+  // the angle the record gives would contradict the typed length: the outline derives it
+  expect(typed.base?.angle).toBeUndefined()
+  expect(typed.bearingLength).toBeUndefined()
+  expect(typedBullet(r, { bulletBaseDiameter: 5e-3 }).bearingLength).toEqual({ value: 10 })
+  expect(typedBullet(r, recordBulletValues(r))).toEqual(r)
+})
+
+it('keeps of a typed base form only what that form has', () => {
+  const r = boatTail()
+  const flat = typedBullet(r, recordBulletValues(r), 'flat')
+  expect(flat.base).toEqual({ type: 'flat' })
+  // the bearing is what the length leaves: the outline derives it again
+  expect(flat.bearingLength).toBeUndefined()
+  const hollow = typedBullet(r, { bulletCavityDiameter: 3e-3 }, 'conical-hollow-base')
+  expect(hollow.base?.type).toBe('conical-hollow-base')
+  expect(hollow.base?.cavityDiameter?.value).toBeCloseTo(3, 9)
+  expect(hollow.base?.diameter).toEqual({ value: 5.8 })
+  // a cavity typed for a form without one is dropped
+  expect(typedBullet(r, { bulletCavityDiameter: 3e-3 }, 'boat-tail').base?.cavityDiameter).toBe(
+    undefined,
+  )
+  // the record's own form typed again: the record
+  expect(typedBullet(r, {}, 'boat-tail')).toEqual(r)
+})
+
+it('reads the typed base form from its text only when it names a form', () => {
+  expect(typedBaseType({ bulletBase: { text: 'rebated-boat-tail' } })).toBe('rebated-boat-tail')
+  expect(typedBaseType({ bulletBase: { text: 'wedge' } })).toBeUndefined()
+  expect(typedBaseType({})).toBeUndefined()
+})
+
+it('draws the bullet with the typed base form and its dimensions', () => {
+  const volume = (b: Bullet) => {
+    const shape = bulletDimensions(b)
+    const outline = shape && bulletOutline(shape)
+    if (!outline || 'reason' in outline) throw new Error('outline expected')
+    return outline.volume
+  }
+  const flat = volume(targetBullet)
+  const tailed = typedBullet(
+    targetBullet,
+    { bulletBaseLength: 6e-3, bulletBaseDiameter: 6.2e-3 },
+    'boat-tail',
+  )
+  expect(tailed.base).toMatchObject({ type: 'boat-tail' })
+  // a boat tail takes volume off the base: the bullet seats with more volume behind it
+  expect(volume(tailed)).toBeLessThan(flat)
+  const longer = typedBullet(
+    tailed,
+    { bulletBaseLength: 7e-3, bulletBaseDiameter: 6.2e-3 },
+    'boat-tail',
+  )
+  expect(volume(longer)).toBeLessThan(volume(tailed))
 })

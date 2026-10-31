@@ -42,7 +42,13 @@ import type {
   SampledBand,
 } from '../lib/api-types.ts'
 import { runBatch } from '../lib/batch.ts'
-import { type BulletValues, diameterMm, recordBulletValues } from '../lib/bullet.ts'
+import {
+  type BulletValues,
+  baseTypeKey,
+  diameterMm,
+  recordBulletValues,
+  typedBaseType,
+} from '../lib/bullet.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
@@ -957,13 +963,21 @@ function linkedFieldsOf(
   return { linked, missing }
 }
 
-/** The bullet values a link's query or an opened file types: the fields it holds, none for the rest. */
-const typedBulletOf = (query: URLSearchParams, system: UnitSystem): Fields =>
-  Object.fromEntries(
+/**
+ * The bullet values a link's query or an opened file types: the fields it holds, none for the rest,
+ * and the base form (a text) when it names one.
+ */
+const typedBulletOf = (query: URLSearchParams, system: UnitSystem): Fields => {
+  const typed = Object.fromEntries(
     Object.entries(queryFields(query, bulletFields, system, fixedFieldText)).filter(
       ([, f]) => f.si !== undefined,
     ),
   )
+  const base = query.get(baseTypeKey) ?? ''
+  return typedBaseType({ [baseTypeKey]: { text: base } })
+    ? { ...typed, [baseTypeKey]: { text: base, si: undefined } }
+    : typed
+}
 
 /** The error of every field whose typed value is outside its bounds. */
 const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
@@ -1065,6 +1079,15 @@ function followWrites(a: {
   }
   return writes
 }
+
+/** How many of the card's `keys` the user changed over their record, the base form of the Bullet card included. */
+const changedCount = (
+  panel: InputPanel,
+  keys: readonly string[],
+  changes: Record<string, number>,
+  baseChanged: boolean,
+) =>
+  keys.filter((k) => changes[k] !== undefined).length + (panel === 'bullet' && baseChanged ? 1 : 0)
 
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
 export function useWorkbenchState() {
@@ -1633,6 +1656,9 @@ export function useWorkbenchState() {
   const {
     record: bulletRecord,
     values: bulletValues,
+    baseType: bulletBaseType,
+    baseChanged,
+    savedBaseType,
     now: bulletNow,
     given: bulletGiven,
   } = useBulletValues(
@@ -2800,6 +2826,7 @@ export function useWorkbenchState() {
       changes,
       system,
       bulletKeys: new Set(bulletFields.map((s) => s.key)),
+      baseChanged,
       setField: form.setFieldValue,
       clearError: form.clearFieldError,
       unsetTypedBullet: (drop) =>
@@ -2820,7 +2847,7 @@ export function useWorkbenchState() {
   }
   /** Notes that a record pick replaces the changed values among `keys` of the card. */
   const noteReplaced = (panel: InputPanel, keys: readonly string[] = cardKeys[panel]) => {
-    const count = keys.filter((k) => changes[k] !== undefined).length
+    const count = changedCount(panel, keys, changes, baseChanged)
     setReplaced(count > 0 ? { panel, count } : undefined)
   }
   /** A new cartridge takes the Cartridge card's changed values: they follow the record again. */
@@ -2945,6 +2972,7 @@ export function useWorkbenchState() {
     primerRecord: catalogueRefIn(primerChoice),
     seating,
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
+    bulletBase: savedBaseType,
     sessions: sessionRefs,
   }
   const loadFile = toLoad(loadParts)
@@ -3068,6 +3096,8 @@ export function useWorkbenchState() {
     bulletNow,
     bulletRecord,
     bulletValues,
+    bulletBaseType,
+    baseChanged,
     typedBulletFields,
     setTypedBullet,
     bulletFit,
