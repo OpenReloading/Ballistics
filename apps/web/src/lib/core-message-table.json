@@ -414,7 +414,7 @@
       "No column is mapped to {fields}. Map a column to it or read the file as another kind.",
       "No column is mapped to {fields}. Map a column to each or read the file as another kind.",
       "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.",
-      "The workbook cannot be read: {reason}. Save it again as XLSX or CSV.",
+      "The workbook cannot be read. Save it again as XLSX or CSV.",
       "{reason}. Fix the row or delete it."
     ]
   }

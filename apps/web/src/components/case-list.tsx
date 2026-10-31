@@ -20,6 +20,7 @@ import {
   readOrigins,
   userRecordId,
 } from '../lib/sources.ts'
+import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, waterVolume } from '../lib/units.ts'
 import {
   type DirectoryColumn,
@@ -30,7 +31,7 @@ import {
 import { LibraryTabs } from './library-tabs.tsx'
 import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
-import { EmptyList } from './states.tsx'
+import { EmptyList, EmptyNote } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 /**
@@ -48,7 +49,7 @@ export function CaseList({
   const tr = useTranslation()
   const { t } = tr
   const { system } = useUnits()
-  const [records, removeRow] = useUserRecords()
+  const [records, removeRow, read] = useUserRecords()
   // the browser's groups first: a few rows would sit unseen behind the catalogue's
   const rows = useMemo(
     () => [...userCaseRows(records, new Map(Object.entries(cartridgeNames))), ...catalogue],
@@ -182,7 +183,29 @@ export function CaseList({
             ) : null
           }
           breakBefore={state.sort ? undefined : (r, previous) => r.origin !== previous.origin}
-          empty={<EmptyList noun="cases" filters={filterText(named)} onClear={clear} />}
+          empty={
+            read && counts.user === 0 && on.length === 1 && on[0] === 'user' ? (
+              <EmptyNote
+                icon={<Plus size={24} aria-hidden="true" />}
+                title={t('No brass groups of your own yet')}
+                description={t(
+                  'A brass group keeps the cases you measured, with their water capacity, in this browser.',
+                )}
+                action={
+                  <Button
+                    component={Link}
+                    href="/cases/editor"
+                    variant="default"
+                    size={controlSize.row.button}
+                  >
+                    {t('New brass group')}
+                  </Button>
+                }
+              />
+            ) : (
+              <EmptyList noun="cases" filters={filterText(named)} onClear={clear} />
+            )
+          }
         />
       </div>
     </>

@@ -8,6 +8,7 @@ import { msg, type Translator } from '../i18n/translate.ts'
 import { type PowderRow, vivacityUnit } from '../lib/burn-rate.ts'
 import { caliberOptions, commonCaliber } from '../lib/caliber.ts'
 import { type CartridgeRow, cartridgeCells } from '../lib/cartridge-rows.ts'
+import { countryName, parseCountries } from '../lib/countries.ts'
 import type { FirearmRow } from '../lib/firearm.ts'
 import { baseText, caseTypeText, grainFormText, kebabValue } from '../lib/list-values.ts'
 import type { PowderDesign } from '../lib/powder-designer.ts'
@@ -210,7 +211,13 @@ export const cartridgeKind: ChooserKind<CartridgeRow> = {
       [msg('Max length L6'), length(cells.cartridgeLength) || undefined],
       [msg('Pmax'), cells.pmax ? `${cells.pmax} ${system.pressure.symbol}` : undefined],
       [msg('Case type'), row.caseType && caseTypeText(t, row.caseType)],
-      [msg('Country'), row.country],
+      [
+        msg('Country'),
+        row.country &&
+          parseCountries(row.country)
+            .map(({ name, code }) => countryName(name, code))
+            .join(', '),
+      ],
     ]
   },
   href: (row) => `/cartridges/${row.id}`,

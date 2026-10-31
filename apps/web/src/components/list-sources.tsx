@@ -24,16 +24,21 @@ import type { DirectoryColumn } from './directory-table.tsx'
 /**
  * The user records of this browser, read after mounting; none while the store cannot be
  * read (again whenever `reread` changes). `remove` asks, as the File menu's list of browser records does, then deletes the record of
- * a list row and drops the row.
+ * a list row and drops the row. `read`: the store has answered once.
  */
 export function useUserRecords(reread?: unknown) {
   const { t } = useTranslation()
   const [records, setRecords] = useState<UserRecord[]>([])
+  const [read, setRead] = useState(false)
   // biome-ignore lint/correctness/useExhaustiveDependencies: `reread` only restarts the read
   useEffect(() => {
     let live = true
     storedRecords().then(
-      (r) => live && setRecords(r.records),
+      (r) => {
+        if (!live) return
+        setRecords(r.records)
+        setRead(true)
+      },
       () => {},
     )
     return () => {
@@ -67,7 +72,7 @@ export function useUserRecords(reread?: unknown) {
     },
     [records, t],
   )
-  return [records, remove] as const
+  return [records, remove, read] as const
 }
 
 /**

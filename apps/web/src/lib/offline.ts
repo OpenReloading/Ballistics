@@ -110,6 +110,16 @@ export const pageKey = (url: string) => {
 }
 
 /**
+ * A page key with `slash` added to its path, before the query: the shell stores pages under
+ * `appUrl`, while an address typed or linked without the slash keeps its path as given.
+ */
+export const slashedKey = (key: string, slash = '') => {
+  const i = key.indexOf('?')
+  const path = i < 0 ? key : key.slice(0, i)
+  return slash && !path.endsWith(slash) ? path + slash + key.slice(path.length) : key
+}
+
+/**
  * The shell cache's answer to a request for `destination`. A cached response carries its key without
  * query and fragment, and a worker takes its script response's URL as `location`, so a worker script
  * gets a copy without a URL: the worker keeps the URL it was started with (its bootstrap reads the

@@ -29,6 +29,7 @@ import {
 } from '../lib/load-tabs.ts'
 import { type LoadUse, loadUse, loadUseText } from '../lib/load-use.ts'
 import { newId } from '../lib/new-id.ts'
+import { shortcutLabel } from '../lib/shortcuts.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { userDataText } from '../lib/user-data.ts'
@@ -155,6 +156,8 @@ export function SavedLoads({
   system: UnitSystem
 }) {
   const [records, setRecords] = useState<LoadRecord[]>([])
+  /** The store has answered once: until then no empty state. */
+  const [read, setRead] = useState(false)
   const [query, setQuery] = useState('')
   const { t, tn } = useTranslation()
   /** The line under the list, written in the language shown. */
@@ -179,6 +182,7 @@ export function SavedLoads({
     storedRecords()
       .then(({ records, invalid }) => {
         setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
+        setRead(true)
         setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
         setUse({
           loads: loadUse(records).loads,
@@ -292,6 +296,7 @@ export function SavedLoads({
               placeholder={t('Name or lot')}
               value={query}
               onChange={(e) => setQuery(e.currentTarget.value)}
+              disabled={records.length === 0}
               mb="sm"
             />
             <div className="saved-loads">
@@ -398,9 +403,14 @@ export function SavedLoads({
                   </ul>
                 </section>
               ))}
-              {groups.length === 0 && (
+              {read && groups.length === 0 && (
                 <Text size="sm" c="dimmed">
-                  {records.length === 0 ? t('No saved loads.') : t('No match.')}
+                  {records.length === 0
+                    ? t(
+                        'No saved loads yet. Save a load on the workbench with Save or {keys}, and it appears here.',
+                        { keys: shortcutLabel('save') },
+                      )
+                    : t('No match.')}
                 </Text>
               )}
             </div>

@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { type ReactNode, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
+import { basePath } from '../lib/edition.ts'
+import { offlinePage } from '../lib/offline.ts'
 import { openSiteSearch } from './search-host.ts'
 
 const none = () => () => {}
@@ -52,7 +54,7 @@ function StandIn({
 
 /**
  * The service worker serves this page in place of a page never stored on this device, at that
- * page's address: the address and Retry name that page.
+ * page's address: the address and Retry name that page. At its own address it names no page.
  */
 export function OfflineState({ links }: { links: PageLinks }) {
   const address = useSyncExternalStore(
@@ -61,6 +63,21 @@ export function OfflineState({ links }: { links: PageLinks }) {
     () => '',
   )
   const { t } = useTranslation()
+  const retry = <Button onClick={() => window.location.reload()}>{t('Retry')}</Button>
+  const linksLabel = t('Pages kept on this device')
+  if (address.split('?')[0]?.replace(/\/$/, '') === basePath + offlinePage)
+    return (
+      <StandIn
+        icon={WifiSlash}
+        title={t('Works offline')}
+        description={t(
+          'The tools, your own records and the pages you opened before work without the network.',
+        )}
+        action={retry}
+        links={links}
+        linksLabel={linksLabel}
+      />
+    )
   const [before = '', after = ''] = t(
     'The page {address} was not opened on this device before, so it is not stored. The tools, your own records and the pages you opened before work without the network.',
     { address: '{address}' },
@@ -77,9 +94,9 @@ export function OfflineState({ links }: { links: PageLinks }) {
           {after}
         </>
       }
-      action={<Button onClick={() => window.location.reload()}>{t('Retry')}</Button>}
+      action={retry}
       links={links}
-      linksLabel={t('Pages kept on this device')}
+      linksLabel={linksLabel}
     />
   )
 }
