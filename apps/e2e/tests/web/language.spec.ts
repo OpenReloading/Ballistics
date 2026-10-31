@@ -121,6 +121,8 @@ test('the designers in German at 1280 px keep the title, every action, Safety an
     await gotoHydrated(page, path)
     const bar = page.locator('.page-bar')
     const h1 = bar.getByRole('heading', { level: 1, name: title })
+    // the loading bar has the same title and gives way to the designer's bar once its code is in
+    await expect(bar.locator('.toolbar')).toBeVisible()
     await expect(h1).toBeVisible()
     // the bar does not scroll and the title stands on one line
     expect(await bar.evaluate((b) => b.scrollWidth - b.clientWidth)).toBe(0)

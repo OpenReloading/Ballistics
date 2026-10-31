@@ -418,8 +418,8 @@
       "Sheet \"{name}\" has no table of two columns or more. Move the table to the first sheet.",
       "The workbook cannot be read. Save it again as XLSX or CSV.",
       "{reason}. Fix the row or delete it.",
-      "Rows {first} and {row} give the same name, maker, diameter and mass, so one id: only row {first} is imported. Change a cell of row {row} to import it as a record of its own.",
-      "Rows {first} and {row} give the same name and maker, so one id: only row {first} is imported. Change a cell of row {row} to import it as a record of its own."
+      "Rows {first} and {row} give the same name, maker, diameter and mass, so one id: only row {first} is imported. Change the name, maker, diameter or mass of row {row} to import it as a record of its own.",
+      "Rows {first} and {row} give the same name and maker, so one id: only row {first} is imported. Change the name or maker of row {row} to import it as a record of its own."
     ],
     "seating": [
       "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given.",

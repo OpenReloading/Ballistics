@@ -544,7 +544,10 @@ export function buildRecords(
         row,
         column: nameHeader,
         cell: name,
-        reason: `Rows ${first} and ${row} give the same ${kind === 'bullet' ? 'name, maker, diameter and mass' : 'name and maker'}, so one id: only row ${first} is imported. Change a cell of row ${row} to import it as a record of its own.`,
+        reason:
+          kind === 'bullet'
+            ? `Rows ${first} and ${row} give the same name, maker, diameter and mass, so one id: only row ${first} is imported. Change the name, maker, diameter or mass of row ${row} to import it as a record of its own.`
+            : `Rows ${first} and ${row} give the same name and maker, so one id: only row ${first} is imported. Change the name or maker of row ${row} to import it as a record of its own.`,
       })
     if (out.warnings.length > before) warned.add(row)
     const record = recordOf(kind, idOfKey(key), name, now, c, maker && makerOf(maker))

@@ -120,7 +120,7 @@ describe('the message table', () => {
       '2026-10-28T00:00:00.000Z',
     )
     expect(translateMessage(built.warnings[0]?.reason ?? '', german.t)).toBe(
-      'Die Zeilen 2 und 3 haben denselben Namen, Hersteller, Durchmesser und dieselbe Masse und damit eine ID: Nur Zeile 2 wird importiert. Ändern Sie eine Zelle der Zeile 3, um sie als eigenen Datensatz zu importieren.',
+      'Die Zeilen 2 und 3 haben denselben Namen, Hersteller, Durchmesser und dieselbe Masse und damit eine ID: Nur Zeile 2 wird importiert. Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren.',
     )
   })
 

@@ -97,8 +97,8 @@ function sessionsOf(
   warnings: string[],
 ): SessionRecord[] {
   const sessions: SessionRecord[] = []
-  const measurements = appendix ? elements(appendix).filter((e) => e.name === 'Measurement') : []
-  for (const [index, m] of measurements.entries()) {
+  const seen = new Map<string, number>()
+  for (const m of appendix ? elements(appendix).filter((e) => e.name === 'Measurement') : []) {
     const at = 'appendix.Measurement'
     unreadAttributes(m, at, unmapped)
     const strings = elements(m).flatMap((c) => {
@@ -123,8 +123,12 @@ function sessionsOf(
         sources: [{ title: 'Measurements of a ChamberSim Reloaded load file' }],
       },
     }
-    // The series index in the key keeps two series of the same content apart.
-    sessions.push({ kind: 'session', ...named(`session|${index}`, load.name, data), saved })
+    // The first series of a content keeps the plain key; a repeat adds its count, so ids stay apart.
+    const content = JSON.stringify(data)
+    const repeat = seen.get(content) ?? 0
+    seen.set(content, repeat + 1)
+    const key = repeat === 0 ? 'session' : `session|${repeat}`
+    sessions.push({ kind: 'session', ...named(key, load.name, data), saved })
   }
   return sessions
 }
@@ -134,9 +138,10 @@ function sessionsOf(
  * after its maker, the powder and the load), then a session for each measurement series whose
  * strings name the load. A series maps per charge to a string of shot velocities (m/s) that varies
  * the charge; shot pressures, the display settings and every other part are listed as not read.
- * A format other than 1 gives a warning. Ids come from the content (a session's also from its
- * place in the file), so a file read again gives the same records. Throws with the reason on a file that is no load file of this format. The caller
- * checks each record with the user record schema.
+ * A format other than 1 gives a warning. Ids come from the content (a repeated series of the same
+ * content also from its count), so a file read again gives the same records. Throws with the
+ * reason on a file that is no load file of this format. The caller checks each record with the
+ * user record schema.
  */
 export function readCsrLoad(xml: string, saved: string): GrtLoadRead {
   const root = parseXml(xml.replace(/^﻿/, ''))

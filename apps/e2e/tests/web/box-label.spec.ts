@@ -67,6 +67,9 @@ for (const language of languages)
 
 test('a printed box label opens its load by photo, by camera and by its text', async ({ page }) => {
   await page.addInitScript(() => {
+    // Save writes a file: the origin private file system stands in for the save dialog
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
     window.print = () => {}
     // the fake camera: a canvas stream of the label image the test hands over, calls counted
     const w = window as unknown as Record<string, unknown>
