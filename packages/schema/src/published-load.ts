@@ -173,6 +173,10 @@ export const publishedLoad = z
     const issue = (message: string) => ctx.addIssue({ code: 'custom', path: ['charges'], message })
     if (new Set(kinds).size !== kinds.length) issue('one charge of each kind')
     if (kinds.includes('single') && kinds.length > 1) issue('a single load stands alone')
+    const start = l.charges.find((c) => c.kind === 'start')?.charge.value
+    const max = l.charges.find((c) => c.kind === 'max')?.charge.value
+    if (start !== undefined && max !== undefined && start > max)
+      issue('the start charge is above the maximum charge')
   })
 
 /**

@@ -167,6 +167,11 @@
                                 "pattern": "^(lead|lead-alloy|copper|copper-alloy|tin|tungsten|steel|compressed-powder)-core$"
                               }
                             ]
+                          },
+                          "nameOnly": {
+                            "type": "boolean",
+                            "const": true,
+                            "description": "A record that only names the bullet: it has no product number."
                           }
                         },
                         "required": [
@@ -24448,11 +24453,6 @@
                               "burnForm"
                             ],
                             "additionalProperties": false
-                          },
-                          "nameOnly": {
-                            "type": "boolean",
-                            "const": true,
-                            "description": "A record that only names the bullet: it has no product number."
                           }
                         },
                         "required": ["id", "manufacturer", "name"],

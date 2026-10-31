@@ -69,6 +69,7 @@ export function warning(
   return { code: id, severity, inputs: [...inputs], message, fix, ...extra }
 }
 
+// a case-contact value is no C.I.P. figure, so it is not set against the C.I.P. Pmax
 const compared = new Set(['transducer', 'piezo', null])
 /** A simulated pressure in whole bar, with more decimals while rounding would put it on or across the limit. */
 function bar(pa: number, limit: number) {

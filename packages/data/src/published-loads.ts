@@ -67,20 +67,22 @@ export type PublishedLoadTargets = {
 type Printed = 'mass' | 'velocity' | 'pressure' | 'length'
 const factors: Record<Printed, Record<string, number>> = {
   mass: { g: 1, gr: 0.06479891, grs: 0.06479891, grain: 0.06479891, grains: 0.06479891 },
-  velocity: { 'm/s': 1, ms: 1, 'ft/s': 0.3048, fps: 0.3048 },
+  velocity: { 'm/s': 1, ms: 1, 'ft/s': 0.3048, 'ft/sec': 0.3048, fps: 0.3048 },
   // 1 psi = 0.45359237 kg * 9.80665 m/s2 / (0.0254 m)2, in bar
   pressure: { bar: 1, psi: 0.0689475729316836 },
-  length: { mm: 1, m: 1000, in: 25.4, '"': 25.4, inch: 25.4, inches: 25.4 },
+  length: { mm: 1, cm: 10, m: 1000, in: 25.4, '"': 25.4, '″': 25.4, inch: 25.4, inches: 25.4 },
 }
 
 /** The relative difference below which a stored value follows its printed number (7 significant digits). */
 const tolerance = 1e-6
 
 /** The readings of a printed number: with commas as thousands marks, and with a comma as decimal mark. */
-const readings = (text: string) => [
-  Number(text.replace(/,/g, '')),
-  Number(text.replace(/\./g, '').replace(',', '.')),
-]
+const readings = (text: string) => {
+  const plain = /^\.?\d+$|^\d+\.\d+$/.test(text) ? [Number(text)] : []
+  const commas = /^\d{1,3}(,\d{3})+(\.\d+)?$/.test(text) ? [Number(text.replace(/,/g, ''))] : []
+  const decimal = /^\d+,\d+$/.test(text) ? [Number(text.replace(',', '.'))] : []
+  return [...plain, ...commas, ...decimal]
+}
 
 /**
  * Whether `value` follows the printed `raw` of a figure of `kind`: some number printed in `raw`,
@@ -94,8 +96,8 @@ function follows(
   twist: boolean,
 ) {
   const table = factors[kind]
-  const text = twist ? figure.raw.replace(/^\s*1\s*[:-]\s*/, '') : figure.raw
-  const found = [...text.matchAll(/(\d[\d.,]*|\.\d+)\s*("|[A-Za-z]+(?:\/[A-Za-z]+)?)?/g)]
+  const text = twist ? figure.raw.replace(/^\s*1\s*(?:[:/-]|in\b)\s*/, '') : figure.raw
+  const found = [...text.matchAll(/(\d[\d.,]*|\.\d+)\s*("|″|[A-Za-z]+(?:\/[A-Za-z]+)?)?/g)]
   let known = false
   for (const [i, [, number, unit]] of found.entries()) {
     const factor = table[(unit ?? (i === 0 ? figure.assumedUnit : undefined) ?? '').toLowerCase()]
@@ -117,7 +119,7 @@ function* figures(l: PublishedLoad) {
   const at = (
     path: string,
     kind: Printed,
-    figure: { value?: number | undefined; raw: string },
+    figure: { value?: number | undefined; raw: string; assumedUnit?: string | undefined },
     twist = false,
   ) =>
     figure.value === undefined
@@ -133,7 +135,22 @@ function* figures(l: PublishedLoad) {
     if (c.velocity) yield* at(`charges.${i}.velocity`, 'velocity', c.velocity)
     if (c.velocity?.point?.distance)
       yield* at(`charges.${i}.velocity.point.distance`, 'length', c.velocity.point.distance)
-    if (c.pressure) yield* at(`charges.${i}.pressure.peak`, 'pressure', c.pressure.peak)
+    if (c.pressure)
+      yield* at(`charges.${i}.pressure.peak`, 'pressure', {
+        ...c.pressure.peak,
+        assumedUnit: c.pressure.peak.assumedUnit ?? c.pressure.unit,
+      })
+  }
+}
+
+/** A pressure whose printed text names a unit other than its `unit`. */
+function checkPressureUnits(l: PublishedLoad, where: string, errors: string[]) {
+  for (const [i, c] of l.charges.entries()) {
+    const p = c.pressure
+    if (p && /[a-z]/i.test(p.peak.raw) && !p.peak.raw.toLowerCase().includes(p.unit.toLowerCase()))
+      errors.push(
+        `${where}: loads ${l.id}: charges.${i}.pressure.unit ${p.unit} is not in "${p.peak.raw}"`,
+      )
   }
 }
 
@@ -226,6 +243,7 @@ export function checkPublishedLoads(
     for (const l of file.loads) {
       checkLoadReferences(l, where, known, errors)
       checkPrintedFigures(l, where, errors)
+      checkPressureUnits(l, where, errors)
     }
   }
 }

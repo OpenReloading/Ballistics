@@ -210,6 +210,18 @@ describe('publishedLoads', () => {
     expectIssueAt(publishedLoad, { ...load, charges: [] }, 'charges')
   })
 
+  it('refuses a start charge above the maximum charge', () => {
+    const charge = (kind: string, value: number) => ({ kind, charge: { value, raw: `${value} g` } })
+    expectIssueAt(
+      publishedLoad,
+      { ...load, charges: [charge('start', 4), charge('max', 3)] },
+      'charges',
+    )
+    expect(
+      publishedLoad.safeParse({ ...load, charges: [charge('start', 3), charge('max', 3)] }).success,
+    ).toBe(true)
+  })
+
   it('names a source of the file that exists', () => {
     expectIssueAt(publishedLoads, { ...file, loads: [{ ...load, source: 2 }] }, 'loads.0.source')
   })

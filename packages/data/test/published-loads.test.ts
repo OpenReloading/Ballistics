@@ -303,6 +303,30 @@ describe('published load files', () => {
     expect(errors).toEqual([])
   })
 
+  it('rejects a value shifted by a decimal mark and a pressure unit the text does not print', () => {
+    const where = 'loads/test-cartridge/test-manufacturer.json: loads a'
+    const shifted = load('a', {
+      bullet: { printed: 'x', mass: { value: 330, raw: '3,30 g' } },
+      barrel: { length: { value: 71120, raw: '2.800"' } },
+      charges: [
+        {
+          kind: 'max',
+          charge: { value: 1, raw: '1 g' },
+          pressure: { unit: 'bar', peak: { value: 3792.3, raw: '55,000 psi' } },
+        },
+      ],
+    })
+    const errors = errorsOf(file([shifted]))
+    expect(errors).toContain(`${where}: bullet.mass: value 330 does not follow "3,30 g"`)
+    expect(errors).toContain(`${where}: barrel.length: value 71120 does not follow "2.800""`)
+    expect(errors).toContain(`${where}: charges.0.pressure.unit bar is not in "55,000 psi"`)
+  })
+
+  it('reads a twist written 1 in 10', () => {
+    const l = load('a', { barrel: { twist: { value: 254, raw: '1 in 10"' } } })
+    expect(errorsOf(file([l]))).toEqual([])
+  })
+
   it('refuses a full bullet record without its diameter or product number, and a name-only one with a product number', () => {
     const { errors } = readAfter((write) => {
       write('bullets/full-bullet.json', {

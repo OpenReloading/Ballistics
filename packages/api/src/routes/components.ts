@@ -97,7 +97,6 @@ const powderList = page(
       .unwrap()
       .pick({ vivacity: true, pressureExponent: true, referencePressure: true, burnForm: true })
       .optional(),
-    nameOnly: bullet.shape.nameOnly,
   }),
 )
 
@@ -118,6 +117,7 @@ const bulletList = page(
     construction: z
       .union([structure.unwrap(), z.templateLiteral([core.unwrap().shape.material, '-core'])])
       .optional(),
+    nameOnly: bullet.shape.nameOnly,
   }),
 )
 
