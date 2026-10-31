@@ -67,7 +67,6 @@ import { NumberField } from './number-field.tsx'
 import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
-import { RecordSourcesLink } from './sources.tsx'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
@@ -208,14 +207,6 @@ const recordRow = (label: string, value: ReactNode, unit?: string) =>
       {unit && <span className="record-unit">{unit}</span>}
     </div>
   )
-
-/** The powder record's link to its sources: a design has no record page, paper cannot follow it. */
-function PowderSourceRow() {
-  const { powder, powderDesign, printing, printMedia } = useLoad()
-  const { t } = useTranslation()
-  if (!powder || powderDesign || printing || printMedia) return null
-  return recordRow(t('Source'), <RecordSourcesLink kind="powders" id={powder.id} />)
-}
 
 /** A length in mm as the cards show it: the number in the length unit, inches below 1 as ".3". */
 const lengthCell = (system: UnitSystem, mm: number) =>
@@ -507,6 +498,19 @@ export function StartCard({ onAct }: { onAct?: () => void }) {
   )
 }
 
+/**
+ * Where the cartridge figure stands: D and E show it as a result tab (`short`); E from 100em as a
+ * fifth column of the band, and in the tab (`inTab`) while the Cartridge tab is open.
+ */
+function useFigurePlace(layout: ProtoLayout | undefined) {
+  const wide = useMediaQuery('(min-width: 75em)', false) ?? false
+  const fifth = (useMediaQuery('(min-width: 100em)', false) ?? false) && layout === 'e'
+  const low = useMediaQuery(shortFrame, false) ?? false
+  const { tab } = useResult()
+  const short = low || (wide && (layout === 'd' || (layout === 'e' && !fifth)))
+  return { short, inTab: short || (fifth && tab === 'cartridge') }
+}
+
 /** The input cards Cartridge, Bullet, Gun, Powder with the figure, and the Run bar. */
 export function InputCards() {
   const {
@@ -525,10 +529,7 @@ export function InputCards() {
   // the server and the first render lay out a tall window; a low one moves Gun once mounted
   const { t } = useTranslation()
   const { layout } = useProto()
-  const wide = useMediaQuery('(min-width: 75em)', false) ?? false
-  // D and E show the cartridge figure as a result tab
-  const short =
-    (useMediaQuery(shortFrame, false) ?? false) || (wide && (layout === 'd' || layout === 'e'))
+  const { short, inTab } = useFigurePlace(layout)
   const [figureCard, setFigureCard] = useState<HTMLDivElement | null>(null)
   const { figureTab } = useLoad()
   /** The card's record is chosen: the head shows its name as text. */
@@ -571,7 +572,7 @@ export function InputCards() {
           ))}
         </div>
       )}
-      <LoadFigure host={short ? figureTab : figureCard} />
+      <LoadFigure host={inTab ? figureTab : figureCard} />
       <div className="run-bar">
         <RunButton />
         <span className="run-hint">{t('or {shortcut}', { shortcut: shortcutLabel('run') })}</span>
@@ -1145,15 +1146,12 @@ function CardSummary({ panel }: { panel: InputPanel }) {
     ) : panel === 'bullet' ? (
       <BulletRows split={dense(layout)} />
     ) : panel === 'powder' ? (
-      <>
-        {recordRow(
-          t('Bulk density'),
-          powder?.bulkDensity &&
-            formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
-          system.density.symbol,
-        )}
-        <PowderSourceRow />
-      </>
+      recordRow(
+        t('Bulk density'),
+        powder?.bulkDensity &&
+          formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
+        system.density.symbol,
+      )
     ) : null
   // A and E show Powder's and Bullet's values as rows of the grid
   return layout && !(dense(layout) && panel !== 'cartridge') ? (

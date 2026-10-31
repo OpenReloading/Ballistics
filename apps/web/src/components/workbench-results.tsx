@@ -403,14 +403,21 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
   // in a low desktop window the burn-rate figure stands in the inputs' second column
   const short = useMediaQuery(shortFrame, false) ?? false
   const list = useRef<HTMLDivElement>(null)
-  const shownTabs = useMemo(() => resultTabs.filter(([v]) => short || v !== 'cartridge'), [short])
+  const { layout } = useProto()
+  // E always has the Cartridge tab: the figure sits in the inputs band too when the window is wide
+  const desktop = useMediaQuery('(min-width: 75em)', false) ?? false
+  const cartridgeTab = short || (layout === 'e' && desktop)
+  const shownTabs = useMemo(
+    () => resultTabs.filter(([v]) => cartridgeTab || v !== 'cartridge'),
+    [cartridgeTab],
+  )
   // by tab value: the Cartridge tab comes and goes
   const widths = useRef(new Map<ResultTab, number>())
   const [fit, setFit] = useState<number>(resultTabs.length)
   // a window grown out of the low frame has no Cartridge tab
   useEffect(() => {
-    if (!short && tab === 'cartridge') setTab('results')
-  }, [short, tab, setTab])
+    if (!cartridgeTab && tab === 'cartridge') setTab('results')
+  }, [cartridgeTab, tab, setTab])
   // biome-ignore lint/correctness/useExhaustiveDependencies: the tabs show once there is an outcome
   useEffect(() => {
     const row = list.current
@@ -435,7 +442,7 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
     observer.observe(row)
     return () => observer.disconnect()
   }, [framed, hasOutcome, shownTabs])
-  return { framed, short, list, shownTabs, fit }
+  return { framed, short, cartridgeTab, list, shownTabs, fit }
 }
 
 /** The results list with the chosen powder's burn rate beside it; an error in their place. */
@@ -508,7 +515,7 @@ function LadderBody() {
 }
 
 /** The panels of the result tabs. */
-function ResultPanels({ short }: { short: boolean }) {
+function ResultPanels({ cartridgeTab }: { cartridgeTab: boolean }) {
   const { t } = useTranslation()
   const {
     ok,
@@ -535,7 +542,7 @@ function ResultPanels({ short }: { short: boolean }) {
           notRun(msg('Run the simulation to see the breech pressure curve.'), t)
         )}
       </Tabs.Panel>
-      {short && (
+      {cartridgeTab && (
         <Tabs.Panel value="cartridge" data-before-run>
           <FigureTab />
         </Tabs.Panel>
@@ -609,7 +616,11 @@ export const ResultsArea = memo(function ResultsArea() {
     setTab(v)
     setSeen((s) => (s.has(v) ? s : new Set([...s, v])))
   }
-  const { framed, short, list, shownTabs, fit } = useTabFit(tab, setTab, outcome !== undefined)
+  const { framed, short, cartridgeTab, list, shownTabs, fit } = useTabFit(
+    tab,
+    setTab,
+    outcome !== undefined,
+  )
   // prototypes: the tabs open the pane, the load line, readouts and notes belong to the Results tab
   const top = useProto().layout !== undefined
   const tabList = (
@@ -664,7 +675,7 @@ export const ResultsArea = memo(function ResultsArea() {
           {/* the ladder bar sits directly above the tabs and drives every tab */}
           <ShownStrip />
           {!top && tabList}
-          <ResultPanels short={short} />
+          <ResultPanels cartridgeTab={cartridgeTab} />
         </div>
       </Tabs>
     </section>

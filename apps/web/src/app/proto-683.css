@@ -230,7 +230,8 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   }
 
   .workbench.proto-e .panels {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 28rem));
+    justify-content: start;
     gap: 0 0.75rem;
   }
 
@@ -312,80 +313,6 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   border-top: 1px solid var(--border);
 }
 
-@media screen and (min-width: 62em) {
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
-    --field-height: 1.6875rem;
-    --field-column: 8rem;
-  }
-
-  /* one row grid in every card: a label of at least 7.5rem, one value cell that fills the row's height */
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields > *,
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    .seating-slot
-    > :not(.seating-controls, .seating-values),
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    .seating-slot
-    :is(.seating-controls, .seating-values)
-    > * {
-    padding-block: 0;
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields > .mantine-InputWrapper-root,
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .seating-slot .mantine-InputWrapper-root,
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs :is(.record-row, .seating-row) {
-    grid-template-columns: minmax(7.5rem, 1fr) calc(var(--field-column) - 3rem) 2.625rem;
-    column-gap: 0.375rem;
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .model-row {
-    grid-template-columns: minmax(7.5rem, 1fr) var(--field-column);
-    column-gap: 0.375rem;
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row {
-    min-height: var(--field-height);
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > :nth-child(2):not(:last-child) {
-    padding-right: 0.375rem;
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > :nth-child(2):last-child {
-    grid-column: 2 / -1;
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > .record-unit {
-    text-align: left;
-  }
-
-  /* the value cell's whole border at rest: 3:1 against the card (WCAG 1.4.11) */
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .mantine-Input-input:where(:not([data-error])) {
-    border-color: var(--input-border);
-  }
-}
-
-@media screen and (min-width: 62em) {
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    .mantine-InputWrapper-root
-    > .mantine-InputWrapper-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-@media screen and (min-width: 108em) {
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
-    --field-column: 9.25rem;
-  }
-}
-
 @media screen and (min-width: 75em) {
   /* no pinned row: the columns start at the top */
   .workbench:is(.proto-a, .proto-e) .panels > .panel-column {
@@ -393,8 +320,9 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   }
 
   .workbench.proto-a .panels {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 28rem));
     grid-template-rows: minmax(0, 1fr);
+    justify-content: start;
   }
 
   .workbench.proto-a .panels > .panel-column:first-child {
@@ -413,7 +341,7 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   }
 
   .workbench.proto-a .panels {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 28rem));
   }
 
   .workbench.proto-a .panels > .panel-column:nth-child(2) {
@@ -460,60 +388,175 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   }
 }
 
-/* a unit column wide enough for "gr H2O": the unit, its gap and the value's padding follow one variable */
+/* E: the band scrolls, so the open record keeping grows the card instead of floating out of the band */
+.workbench.proto-e .keeping[open] > .keeping-fields {
+  position: static;
+  box-shadow: none;
+}
+
+/* ---------- round 3: one row grid for A and E ---------- */
+
+/* a card is one column of rows at every width; the grid has no pairs of label and value */
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .panel {
+  max-width: 28rem;
+}
+
 @media screen and (min-width: 62em) {
   .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --field-height: 1.6875rem;
+    --value-col: 5.5rem;
     --unit-col: 3.25rem;
+    --row-gap: 0.375rem;
+    --row-cols: minmax(7.5rem, 1fr) var(--value-col) var(--unit-col);
   }
 
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .field-unit {
-    width: var(--unit-col);
-  }
-
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .mantine-Input-input {
-    padding-inline-end: calc(var(--unit-col) + 0.75rem);
-  }
-
+  /* every row: a label, a value cell, a unit cell outside the box, in the same columns */
   .workbench:is(.proto-a, .proto-e) .workspace-inputs .panel-fields > .mantine-InputWrapper-root,
   .workbench:is(.proto-a, .proto-e) .workspace-inputs .seating-slot .mantine-InputWrapper-root,
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs :is(.record-row, .seating-row) {
-    grid-template-columns: minmax(7.5rem, 1fr) calc(
-        var(--field-column) -
-        var(--unit-col) -
-        0.375rem
-      ) var(--unit-col);
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs :is(.record-row, .seating-row, .model-row) {
+    grid-template-columns: var(--row-cols);
+    column-gap: var(--row-gap);
   }
 
-  /* a flag or action (seating, record) stands between the digits and the unit */
-  .workbench:is(.proto-a, .proto-e)
-    .workspace-inputs
-    :is(.panel-fields, .seating-slot)
-    .mantine-Input-wrapper:has(.field-flag, .field-action)
-    .mantine-Input-input {
-    padding-inline-end: calc(var(--unit-col) + 1.75rem);
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .pair-row {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, 1fr) 2rem calc(var(--value-col) - 2.375rem) var(
+        --unit-col
+      );
+    column-gap: var(--row-gap);
+    align-items: center;
   }
 
-  /* the ladder's count and step size keep their own narrow columns */
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .pair-row .field-unit {
-    width: 2.625rem;
-  }
-
-  .workbench:is(.proto-a, .proto-e) .workspace-inputs .pair-row .ladder-steps .mantine-Input-input {
-    padding-inline-end: 0.375rem;
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .pair-row > .ladder-steps {
+    grid-column: 2;
   }
 
   .workbench:is(.proto-a, .proto-e)
     .workspace-inputs
     .pair-row
-    > .mantine-InputWrapper-root:last-child
+    > .mantine-InputWrapper-root:not(.ladder-steps) {
+    grid-column: 3 / -1;
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-InputWrapper-root
+    > .mantine-Input-wrapper {
+    grid-column: 2 / -1;
+  }
+
+  /* the value cell fills its column and the row's height */
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
     .mantine-Input-input {
-    padding-inline-end: 2.875rem;
+    box-sizing: border-box;
+    width: var(--value-col);
+    height: var(--field-height);
+    min-height: var(--field-height);
+    padding-inline: 0.375rem 0.5rem;
+    background: var(--bg);
+    text-align: right;
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-Input-input:where(:not([data-error])) {
+    border-color: var(--input-border);
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .mantine-Input-input:focus {
+    border-color: var(--focus);
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .pair-row
+    > .ladder-steps
+    .mantine-Input-input {
+    width: 100%;
+    padding-inline: 0.25rem;
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .pair-row
+    > .mantine-InputWrapper-root:not(.ladder-steps)
+    .mantine-Input-input {
+    width: calc(var(--value-col) - 2.375rem);
+    field-sizing: fixed;
+    padding-inline: 0.375rem 0.25rem;
+  }
+
+  /* the unit in its own column, left aligned, after the box */
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    :is(.panel-fields, .seating-slot)
+    .field-unit {
+    right: 0;
+    width: var(--unit-col);
+    padding: 0;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .field-end {
+    padding-inline-start: var(--row-gap);
+  }
+
+  /* a flag or action stands inside the box, at its right end */
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .field-end > :is(.field-flag, .field-action) {
+    right: calc(100% + var(--row-gap) + 0.25rem);
+  }
+
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .mantine-Input-wrapper:has(.field-flag, .field-action)
+    .mantine-Input-input {
+    padding-inline-end: 2.25rem;
+  }
+
+  /* a record's value: the value column's right edge, the unit in the unit column */
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row {
+    min-height: var(--field-height);
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > :nth-child(2) {
+    justify-self: stretch;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > :nth-child(2):last-child {
+    grid-column: 2 / -1;
+    padding-right: calc(var(--unit-col) + var(--row-gap));
+  }
+
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs .record-row > .record-unit {
+    text-align: left;
+  }
+
+  /* labels cut on one line with the full text in the hover title */
+  .workbench:is(.proto-a, .proto-e)
+    .workspace-inputs
+    .mantine-InputWrapper-root
+    > .mantine-InputWrapper-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (min-width: 108em) {
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --value-col: 6.5rem;
   }
 }
 
@@ -524,6 +567,32 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   }
 }
 
+/* E from 100em: the cartridge figure is the band's fifth column, as tall as the band */
+@media screen and (min-width: 100em) {
+  .workbench.proto-e {
+    --band-height: clamp(10rem, calc(100dvh - 45rem), 60rem);
+  }
+
+  .workbench.proto-e .panels {
+    grid-template-columns: repeat(4, minmax(0, 28rem)) minmax(10rem, 17rem);
+  }
+
+  .workbench.proto-e .panels .figure-host {
+    position: sticky;
+    inset-block-start: 0;
+    display: flex;
+    grid-column: 5;
+    grid-row: 1;
+    flex-direction: column;
+    height: var(--band-height);
+    min-height: 0;
+  }
+
+  .workbench.proto-e .panels .figure-host:empty {
+    display: none;
+  }
+}
+
 @media screen and (max-width: 47.99em) {
   .workbench:is(.proto-a, .proto-e)
     .workspace-inputs
@@ -531,10 +600,4 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
     .mantine-Input-input:where(:not([data-error])) {
     border-color: var(--input-border);
   }
-}
-
-/* E: the band scrolls, so the open record keeping grows the card instead of floating out of the band */
-.workbench.proto-e .keeping[open] > .keeping-fields {
-  position: static;
-  box-shadow: none;
 }
