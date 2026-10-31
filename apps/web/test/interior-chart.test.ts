@@ -216,7 +216,7 @@ const cip: Limit = {
 
 describe('limitLines', () => {
   const system = presetUnits('metric-grains')
-  it('draws the first compared limit and its reference lines', () => {
+  it('draws the compared limit and its reference lines', () => {
     const lines = limitLines([{ ...cip, compared: false }, cip], system, english.t)
     expect(lines?.map((l) => l.label)).toEqual([
       'CIP Pmax 4150 bar',

@@ -4465,11 +4465,13 @@
                             "properties": {
                               "mass": {
                                 "type": "number",
-                                "description": "Projectile mass, kg."
+                                "maximum": 0.2,
+                                "description": "Projectile mass, kg, at most 0.2."
                               },
                               "diameter": {
                                 "type": "number",
-                                "description": "Reference diameter, m."
+                                "maximum": 0.04,
+                                "description": "Reference diameter, m, at most 0.04."
                               },
                               "length": {
                                 "description": "Projectile length, m. Stability, spin drift and jump need it.",
@@ -4844,7 +4846,9 @@
                       },
                       "muzzleVelocity": {
                         "type": "number",
-                        "description": "Muzzle velocity along the bore, relative to the ground, m/s."
+                        "minimum": 1,
+                        "maximum": 3000,
+                        "description": "Muzzle velocity along the bore, relative to the ground, m/s, 1 to 3000."
                       },
                       "firearm": {
                         "type": "object",
@@ -4896,8 +4900,10 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
-                        "type": "number"
+                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "type": "number",
+                        "exclusiveMinimum": -1.5707963267948966,
+                        "exclusiveMaximum": 1.5707963267948966
                       },
                       "wind": {
                         "description": "Wind by horizontal distance segment, default none.",
@@ -4952,8 +4958,10 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, default 0.",
-                                "type": "number"
+                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "type": "number",
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966
                               },
                               "air": {
                                 "description": "Air of the zero, default the shot's air.",
@@ -5016,11 +5024,15 @@
                             "properties": {
                               "elevationAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore above the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
                               },
                               "windageAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore to the right of the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -6080,11 +6092,13 @@
                             "properties": {
                               "mass": {
                                 "type": "number",
-                                "description": "Projectile mass, kg."
+                                "maximum": 0.2,
+                                "description": "Projectile mass, kg, at most 0.2."
                               },
                               "diameter": {
                                 "type": "number",
-                                "description": "Reference diameter, m."
+                                "maximum": 0.04,
+                                "description": "Reference diameter, m, at most 0.04."
                               },
                               "length": {
                                 "description": "Projectile length, m. Stability, spin drift and jump need it.",
@@ -6459,7 +6473,9 @@
                       },
                       "muzzleVelocity": {
                         "type": "number",
-                        "description": "Muzzle velocity along the bore, relative to the ground, m/s."
+                        "minimum": 1,
+                        "maximum": 3000,
+                        "description": "Muzzle velocity along the bore, relative to the ground, m/s, 1 to 3000."
                       },
                       "firearm": {
                         "type": "object",
@@ -6511,8 +6527,10 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
-                        "type": "number"
+                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "type": "number",
+                        "exclusiveMinimum": -1.5707963267948966,
+                        "exclusiveMaximum": 1.5707963267948966
                       },
                       "wind": {
                         "description": "Wind by horizontal distance segment, default none.",
@@ -6567,8 +6585,10 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, default 0.",
-                                "type": "number"
+                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "type": "number",
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966
                               },
                               "air": {
                                 "description": "Air of the zero, default the shot's air.",
@@ -6631,11 +6651,15 @@
                             "properties": {
                               "elevationAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore above the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
                               },
                               "windageAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore to the right of the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -8036,11 +8060,13 @@
                             "properties": {
                               "mass": {
                                 "type": "number",
-                                "description": "Projectile mass, kg."
+                                "maximum": 0.2,
+                                "description": "Projectile mass, kg, at most 0.2."
                               },
                               "diameter": {
                                 "type": "number",
-                                "description": "Reference diameter, m."
+                                "maximum": 0.04,
+                                "description": "Reference diameter, m, at most 0.04."
                               },
                               "length": {
                                 "description": "Projectile length, m. Stability, spin drift and jump need it.",
@@ -8415,7 +8441,9 @@
                       },
                       "muzzleVelocity": {
                         "type": "number",
-                        "description": "Muzzle velocity along the bore, relative to the ground, m/s."
+                        "minimum": 1,
+                        "maximum": 3000,
+                        "description": "Muzzle velocity along the bore, relative to the ground, m/s, 1 to 3000."
                       },
                       "firearm": {
                         "type": "object",
@@ -8467,8 +8495,10 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
-                        "type": "number"
+                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "type": "number",
+                        "exclusiveMinimum": -1.5707963267948966,
+                        "exclusiveMaximum": 1.5707963267948966
                       },
                       "wind": {
                         "description": "Wind by horizontal distance segment, default none.",
@@ -8523,8 +8553,10 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, default 0.",
-                                "type": "number"
+                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "type": "number",
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966
                               },
                               "air": {
                                 "description": "Air of the zero, default the shot's air.",
@@ -8587,11 +8619,15 @@
                             "properties": {
                               "elevationAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore above the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
                               },
                               "windageAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore to the right of the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -9780,11 +9816,13 @@
                             "properties": {
                               "mass": {
                                 "type": "number",
-                                "description": "Projectile mass, kg."
+                                "maximum": 0.2,
+                                "description": "Projectile mass, kg, at most 0.2."
                               },
                               "diameter": {
                                 "type": "number",
-                                "description": "Reference diameter, m."
+                                "maximum": 0.04,
+                                "description": "Reference diameter, m, at most 0.04."
                               },
                               "length": {
                                 "description": "Projectile length, m. Stability, spin drift and jump need it.",
@@ -10159,7 +10197,9 @@
                       },
                       "muzzleVelocity": {
                         "type": "number",
-                        "description": "Muzzle velocity along the bore, relative to the ground, m/s."
+                        "minimum": 1,
+                        "maximum": 3000,
+                        "description": "Muzzle velocity along the bore, relative to the ground, m/s, 1 to 3000."
                       },
                       "firearm": {
                         "type": "object",
@@ -10211,8 +10251,10 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
-                        "type": "number"
+                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "type": "number",
+                        "exclusiveMinimum": -1.5707963267948966,
+                        "exclusiveMaximum": 1.5707963267948966
                       },
                       "wind": {
                         "description": "Wind by horizontal distance segment, default none.",
@@ -10267,8 +10309,10 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, default 0.",
-                                "type": "number"
+                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "type": "number",
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966
                               },
                               "air": {
                                 "description": "Air of the zero, default the shot's air.",
@@ -10331,11 +10375,15 @@
                             "properties": {
                               "elevationAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore above the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
                               },
                               "windageAngle": {
                                 "type": "number",
-                                "description": "Angle of the bore to the right of the line of sight, rad."
+                                "exclusiveMinimum": -1.5707963267948966,
+                                "exclusiveMaximum": 1.5707963267948966,
+                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -13417,7 +13465,7 @@
                     },
                     "required": ["chargeStep", "stepCount"],
                     "additionalProperties": false,
-                    "description": "A charge ladder from load.charge: stepCount runs with charges chargeStep apart."
+                    "description": "A charge ladder from load.charge: stepCount runs with charges chargeStep apart. A failed step carries its error; when no step has a result the answer is 422 with the reason of the first step."
                   },
                   "sampling": {
                     "type": "object",
@@ -13618,6 +13666,10 @@
                             "symbol": {
                               "type": "string",
                               "description": "Symbol of the limit"
+                            },
+                            "variant": {
+                              "type": "string",
+                              "description": "Variant of that limit"
                             },
                             "pressure": {
                               "type": "number",
@@ -15238,7 +15290,7 @@
                         "description": "Target value in the unit of kind, or a percentage with unit percentOfLimit."
                       },
                       "unit": {
-                        "description": "Only for peakPressure: value is a percentage of the first compared CIP limit of cartridge.",
+                        "description": "Only for peakPressure: value is a percentage of the compared CIP limit of cartridge. A cartridge whose compared limits differ by variant is refused with 422 severalLimits.",
                         "type": "string",
                         "const": "percentOfLimit"
                       }

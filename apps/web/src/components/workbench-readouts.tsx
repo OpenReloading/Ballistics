@@ -31,7 +31,7 @@ import {
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import { bandNotice, firstPressureLimit, resultBand } from '../lib/workbench.ts'
+import { bandNotice, pressureLimit, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -510,12 +510,12 @@ function notComparedReason(reason: string | undefined, t: Translator['t']) {
 }
 
 /**
- * The pressure range of the result on a bar from 0 with its nominal and the first compared limit
- * (`firstPressureLimit`, as the chart's limit line); nothing without that limit.
+ * The pressure range of the result on a bar from 0 with its nominal and the compared limit
+ * (`pressureLimit`, as the chart's limit line); nothing without that limit.
  */
 function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSystem }) {
   const { t } = useTranslation()
-  const limit = firstPressureLimit(body.limits)
+  const limit = pressureLimit(body.limits)
   if (limit?.pressure === undefined) return null
   const { lowPressure: low, highPressure: high, nominalPressure: nominal } = body.pressureRange
   const end = niceTicks(0, Math.max(high, limit.pressure) * 1.05).at(-1) ?? limit.pressure

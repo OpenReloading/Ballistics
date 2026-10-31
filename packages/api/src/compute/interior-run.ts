@@ -164,8 +164,10 @@ async function interiorAnswer(
       },
     }
   const one = steps ? undefined : await run(body.load.charge)
-  if (one && 'error' in one)
-    return { status: 422, payload: { ...unprocessable, ...one.error, notice } }
+  // a ladder without one valid step is refused as a failed single run, with its first step's reason
+  const failed = one ?? (steps?.every((s) => 'error' in s) ? steps[0] : undefined)
+  if (failed && 'error' in failed)
+    return { status: 422, payload: { ...unprocessable, ...failed.error, notice } }
   const { cartridge } = resolved
   return {
     status: 200,
