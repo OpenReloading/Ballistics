@@ -56,14 +56,14 @@ example:
   node packages/cli/dist/bin.js operations`,
 }
 
-/** Parses a command line, an unknown or malformed option is bad input with the usage. */
-function parse<T extends ParseArgsConfig>(config: T) {
+/** Parses a command line, an unknown or malformed option is bad input with `help`. */
+function parse<T extends ParseArgsConfig>(config: T, help = usage) {
   try {
     return parseArgs(config)
   } catch (error) {
     // parseArgs reports an unknown or malformed option as a TypeError with a code
     if (error instanceof TypeError && 'code' in error)
-      throw new UsageError(`${error.message}\n\n${usage}`)
+      throw new UsageError(`${error.message}\n\n${help}`)
     throw error
   }
 }
@@ -168,19 +168,22 @@ async function operate(
 ) {
   const { listOperations, runOperation } = await import('./operations.ts')
   if (command === 'operations') {
-    parse({ args, strict: true, options: { json: { type: 'boolean' } } })
+    parse({ args, strict: true, options: { json: { type: 'boolean' } } }, commandHelp.operations)
     return listOperations()
   }
-  const { values, positionals } = parse({
-    args,
-    strict: true,
-    allowPositionals: true,
-    options: {
-      input: { type: 'string' },
-      records: { type: 'string', multiple: true },
-      json: { type: 'boolean' },
+  const { values, positionals } = parse(
+    {
+      args,
+      strict: true,
+      allowPositionals: true,
+      options: {
+        input: { type: 'string' },
+        records: { type: 'string', multiple: true },
+        json: { type: 'boolean' },
+      },
     },
-  })
+    commandHelp.run,
+  )
   const [name, ...extra] = positionals
   if (name === undefined || extra.length > 0 || values.input === undefined)
     throw new UsageError(commandHelp.run)
