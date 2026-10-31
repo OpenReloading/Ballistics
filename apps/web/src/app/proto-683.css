@@ -297,16 +297,12 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   color: var(--fg);
 }
 
-/* results: tabs open the pane; the load line, the readout list, the burn figure and the notes belong to
-   the Results tab, the three key figures and the ladder strip stay on every tab */
+/* results: tabs open the pane; the load line, the key figures and readout list, the burn figure, the
+   notes and the ladder strip belong to the Results tab */
 .workbench[class*="proto-"]
   .result:not([data-tab="results"])
-  :is(.run-line, .readout-list, .burn-figure, .result-notes, .next-steps) {
+  :is(.run-line, .results-head, .burn-figure, .result-notes, .next-steps, .ladder-strip) {
   display: none;
-}
-
-.workbench[class*="proto-"] .result:not([data-tab="results"]) .results-head {
-  grid-template-columns: minmax(0, 1fr);
 }
 
 .workbench[class*="proto-"] .result[data-tab] .result-tabs > .workbench-centre > [role="tabpanel"] {
@@ -405,7 +401,7 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
   max-width: 28rem;
 }
 
-@media screen and (min-width: 62em) {
+@media screen and (max-width: 47.99em), screen and (min-width: 62em) {
   .workbench:is(.proto-a, .proto-e) .workspace-inputs {
     --field-height: 1.6875rem;
     --value-col: 5.5rem;
@@ -575,5 +571,129 @@ html[data-proto-run="auto"] .workbench .run-bar::before {
 
   .workbench.proto-e .panels .figure-host:empty {
     display: none;
+  }
+}
+
+/* ---------- round 4 ---------- */
+
+/* a phone's rows are 44 px with a 36 px box; the unit stays outside it as from 62em */
+@media screen and (max-width: 47.99em) {
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --field-height: 2.25rem;
+    --value-col: 6.5rem;
+    --unit-col: 3.5rem;
+    --row-height: 2.75rem;
+  }
+}
+
+@media screen and (min-width: 62em) {
+  .workbench:is(.proto-a, .proto-e) .workspace-inputs {
+    --row-height: 1.75rem;
+  }
+}
+
+/* a segmented choice takes the card's width and an input row's height: the input's fill, no
+   border, no spacing inside; the chosen segment is the selection's colour as the ladder chips */
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .segmented-row {
+  min-height: var(--row-height);
+  padding: 0;
+}
+
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .segmented-row > fieldset {
+  height: var(--field-height);
+  gap: 0;
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+}
+
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .segmented-row label {
+  padding: 0 0.25rem;
+}
+
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .segmented-row label:has(input:checked) {
+  background: var(--mantine-primary-color-light);
+  box-shadow: none;
+  color: var(--mantine-primary-color-light-color);
+  font-weight: 600;
+}
+
+.workbench:is(.proto-a, .proto-e) .workspace-inputs .segmented-row label:has(input:focus-visible) {
+  outline-offset: -2px;
+}
+
+/* the ladder strip: its name, then one joined bar of the steps in the same fill; each step the
+   charge and its share of the pressure limit, the shown one in the selection's colour */
+/* block, not flex: a fieldset that is a flex container gave a scrolling row inside it less height than
+   its content; the margin keeps the strip's room above the tab panel */
+.workbench[class*="proto-"] .ladder-strip {
+  display: block;
+  margin-block-end: 0.375rem;
+}
+
+.workbench[class*="proto-"] .ladder-cells {
+  width: fit-content;
+  margin-block: 0;
+  max-width: 100%;
+  gap: 0;
+  padding: 0;
+  background: var(--surface);
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell {
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border: 0;
+  border-inline-start: 1px solid var(--bg);
+  background: none;
+  color: var(--fg);
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell:first-child {
+  border-inline-start: 0;
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell .cell-percent {
+  color: var(--muted);
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell[data-selected] {
+  background: var(--mantine-primary-color-light);
+  box-shadow: inset 0 -2px 0 var(--mantine-primary-color-filled);
+  color: var(--mantine-primary-color-light-color);
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell[data-selected] .cell-percent {
+  color: inherit;
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell:has(.flag) {
+  box-shadow: inset 0 -2px 0 var(--warn-fg);
+}
+
+.workbench[class*="proto-"] .ladder-cells > .ladder-cell:has(input:focus-visible) {
+  outline-offset: -2px;
+}
+
+/* 75em to 100em: the cards are 19 rem, so a label such as "Usable case volume" keeps its words */
+@media screen and (min-width: 75em) and (max-width: 99.99em) {
+  .workbench.proto-a .workspace-tabs {
+    grid-template-columns: 38.375rem minmax(0, 1fr);
+  }
+
+  .workbench.proto-a .panels {
+    grid-template-columns: repeat(2, 19rem);
+  }
+}
+
+/* one flow below 75em: Cartridge, Gun, Powder, Bullet, then the cartridge figure last */
+@media screen and (max-width: 74.99em) {
+  .workbench.proto-a .panels {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .workbench.proto-a .panel-column > :is(.figure-host, .burn-figure) {
+    order: 1;
   }
 }

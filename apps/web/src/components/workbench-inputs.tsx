@@ -1236,7 +1236,7 @@ function BulletRows() {
     <>
       {recordRow(
         t('Diameter'),
-        bullet && lengthCell(system, bullet.diameter.value),
+        bullet?.diameter && lengthCell(system, bullet.diameter.value),
         system.length.symbol,
       )}
       {recordRow(
@@ -1598,6 +1598,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
 function GunPicker() {
   const { pickFirearm, firearm, firearms, readDesigns, system } = useLoad()
   const { t } = useTranslation()
+  const { layout } = useProto()
   const dialog = useChooser()
   const { rows, placeholder } = useMemo(
     () => gunPicker(firearms, loadExample.firearm, t),
@@ -1631,7 +1632,10 @@ function GunPicker() {
             dialog.open(typed)
           },
         }}
-        clear={{ label: t('Clear the firearm'), onClear: () => pickFirearm(null) }}
+        // the prototypes show the browse button of the other cards in place of the clear button
+        clear={
+          layout ? undefined : { label: t('Clear the firearm'), onClear: () => pickFirearm(null) }
+        }
       />
       <FirearmChooser
         opened={dialog.opened}
@@ -1743,7 +1747,6 @@ function MoreRows({ panel }: { panel: InputPanel }) {
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
-  if (panel === 'firearm') return null
   return (
     <>
       <BulletValueFields more />
