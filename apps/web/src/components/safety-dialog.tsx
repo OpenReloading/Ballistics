@@ -53,6 +53,39 @@ function SafetyText({
   )
 }
 
+/** The footer: Decline and I accept while the notice is required, else one Close. */
+export function SafetyActions({
+  required,
+  onAccept,
+  onDecline,
+  onClose,
+}: {
+  required: boolean
+  onAccept: () => void
+  onDecline: () => void
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <Group justify="flex-end" p="md">
+      {required ? (
+        <>
+          <Button variant="default" onClick={onDecline}>
+            {t('Decline')}
+          </Button>
+          <Button color="yellow" c="dark" onClick={onAccept}>
+            {t('I accept')}
+          </Button>
+        </>
+      ) : (
+        <Button variant="default" onClick={onClose}>
+          {t('Close')}
+        </Button>
+      )}
+    </Group>
+  )
+}
+
 /**
  * The README Safety text as a disclaimer dialog. On the first visit it must be accepted (no close
  * button, Escape or outside click); Decline leaves the site. `openSafety` shows it again. In another
@@ -110,14 +143,12 @@ export function SafetyDialog() {
       // keys scroll it
       bodyProps={{ tabIndex: 0, 'data-autofocus': true, className: 'safety-text' }}
       footer={
-        <Group justify="flex-end" p="md">
-          <Button variant="default" onClick={decline}>
-            {t('Decline')}
-          </Button>
-          <Button color="yellow" c="dark" onClick={accept}>
-            {t('I accept')}
-          </Button>
-        </Group>
+        <SafetyActions
+          required={required}
+          onAccept={accept}
+          onDecline={decline}
+          onClose={() => setOpened(false)}
+        />
       }
     >
       <div className="safety-columns">
