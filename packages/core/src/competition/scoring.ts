@@ -78,6 +78,9 @@ export function hitFactor(points: number, time: number): number {
 
 /** The points and hit factor of a stage, with the typed stage points of the official result. */
 export function stagePoints(stage: PracticalStage, rules: HitFactorRules): StageScore {
+  const typed = stage.stagePoints
+  if (typed !== undefined && (!(typed >= 0) || !Number.isFinite(typed)))
+    throw new InputError('stage points must be 0 or more')
   const points = stageRawPoints(stage, rules)
   return {
     points,

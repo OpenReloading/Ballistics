@@ -115,6 +115,11 @@ describe('input checks', () => {
     expect(() => ringTotal({ shots: [-1] })).toThrow('ring value')
     expect(() => ringTotal({ total: -5 })).toThrow('ring value')
     expect(() => ringTotal({ total: Number.NaN })).toThrow('ring value')
+    const typedStage = { ...(event[0] as PracticalStage), stagePoints: -1 }
+    expect(() => stagePoints(typedStage, ipsc)).toThrow('stage points')
+    expect(() =>
+      stagePoints({ ...typedStage, stagePoints: Number.POSITIVE_INFINITY }, ipsc),
+    ).toThrow('stage points')
   })
 })
 
