@@ -44,6 +44,28 @@ describe('the default of each field', () => {
     expect(suggest({ cartridge, bullet }).boreArea).toBeUndefined()
   })
 
+  it("takes the firearm's measured bore diameter over the record's F, naming F", () => {
+    const measured = { ...gun, boreDiameter: 0.00765 }
+    expect(suggest({ cartridge, firearm: measured }).boreDiameter).toEqual({
+      si: 0.00765,
+      source: 'your firearm Range rifle',
+      fromFirearm: true,
+      record: 0.00762,
+    })
+    expect(suggest({ cartridge, firearm: gun }).boreDiameter?.si).toBe(0.00762)
+  })
+
+  it("drops the record's Q for a firearm with a measured bore or groove diameter", () => {
+    const withQ = { ...cartridge, boreArea: 47.51e-6 }
+    expect(suggest({ cartridge: withQ, firearm: gun }).boreArea?.si).toBe(47.51e-6)
+    expect(
+      suggest({ cartridge: withQ, firearm: { ...gun, grooveDiameter: 0.00785 } }).boreArea,
+    ).toBeUndefined()
+    expect(
+      suggest({ cartridge: withQ, firearm: { ...gun, boreDiameter: 0.00765 } }).boreArea,
+    ).toBeUndefined()
+  })
+
   it('takes the bore diameter from the record land diameter F, else from the bullet diameter', () => {
     expect(suggest({ cartridge, bullet }).boreDiameter).toEqual({
       si: 0.00762,
@@ -63,6 +85,7 @@ describe('the default of each field', () => {
       si: 0.254,
       source: 'your firearm Range rifle',
       fromFirearm: true,
+      record: 0.305,
     })
     expect(suggest({ cartridge }).twist).toEqual({
       si: 0.305,

@@ -95,6 +95,8 @@ A typed limit is marked `typed` and names no sheet or method: it is the user's o
 
 Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
 
+The workbench replaces the 1 % of the chamber volume with a tolerance from the source of the case capacity ([Case capacity, tolerance of the volume](./case-capacity.md#tolerance-of-the-volume)); a typed volume keeps the 1 %.
+
 ### Powder lot rows
 
 The workbench's Ladder table runs every charge of a charge ladder at the burn coefficient moved to both ends by one stated fraction $t_b$ (3 % unless changed), with every other input at its nominal value:

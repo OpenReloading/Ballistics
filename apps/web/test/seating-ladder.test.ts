@@ -92,6 +92,13 @@ describe('seatingLadder', () => {
     expect(r.steps[2]?.travel).toBeCloseTo(0.5285, 12)
   })
 
+  it('carries the jump of each step, for the engraving ramp of its run', () => {
+    const jumping = seat({ at: (v) => ({ volume: 3.5e-6, travel: 0.5, jump: 0.0712 - v }) })
+    const r = seatingLadder(jumping, 0.071, 0.0005, 2, 'up', show, english.t)
+    if (!('steps' in r)) throw new Error(r.error)
+    expect(r.steps.map((s) => s.jump)).toEqual([0.0002, -0.0003].map((v) => expect.closeTo(v, 12)))
+  })
+
   it('names the empty length it starts from, CBTO for a bullet seated by its ogive', () => {
     expect(
       seatingLadder(

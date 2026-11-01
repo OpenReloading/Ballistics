@@ -15,6 +15,7 @@ import {
   unfitTitles,
   vivacityUnit,
 } from '../lib/burn-rate.ts'
+import { powderRowIncomplete } from '../lib/complete-records.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { baseLine, baseText, grainFormText } from '../lib/list-values.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
@@ -44,6 +45,7 @@ import {
 } from './directory-table.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-sources.tsx'
+import { MissingMark } from './missing-mark.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList } from './states.tsx'
@@ -99,7 +101,17 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       value: (r) => r.manufacturerName,
       cell: (r) => r.manufacturerName,
     },
-    { key: 'name', label: msg('Name'), value: (r) => r.name, cell: (r) => r.name },
+    {
+      key: 'name',
+      label: msg('Name'),
+      value: (r) => r.name,
+      cell: (r) => (
+        <>
+          {r.name}
+          {powderRowIncomplete(r) && <MissingMark />}
+        </>
+      ),
+    },
     {
       key: 'form',
       label: msg('Form'),

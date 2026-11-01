@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { interiorBody } from '@open-reloading/api/compute'
-import { recordResistance } from '@open-reloading/core'
+import { interior, recordResistance } from '@open-reloading/core'
 import { powder } from '@open-reloading/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { exampleInterior } from '../src/lib/example-data.ts'
-import { interiorRequest } from '../src/lib/interior-request.ts'
+import { interiorRequest, rampAtJump } from '../src/lib/interior-request.ts'
 import { tuneActionKey, tuneBaseKey, tuneLoadKey, writeTuneLoad } from '../src/lib/powder-tune.ts'
 import { readTuneAction, readTuneBase, readTuneLoad, readTuneTable } from '../src/lib/tune-load.ts'
 
@@ -188,6 +188,47 @@ it('sends no bore resistance without a powder record or a link', () => {
   const r = interiorRequest({ values, powder: undefined })
   expect(r.bulkDensity).toBeUndefined()
   expect(r.body.load.resistance).toBeUndefined()
+})
+
+it('moves an engraving ramp to the jump, to 0 for a bullet jammed into the lands, the friction kept', () => {
+  const ramp = {
+    friction: 5e6,
+    engraving: [
+      { travel: 0, pressure: 4e7 },
+      { travel: 0.004, pressure: 0 },
+    ],
+  }
+  expect(rampAtJump(ramp, 0.001)).toEqual({
+    friction: 5e6,
+    engraving: [
+      { travel: 0.001, pressure: 4e7 },
+      { travel: 0.005, pressure: 0 },
+    ],
+  })
+  expect(rampAtJump(ramp, -0.0005)).toEqual(ramp)
+  // a ladder step moves the run's ramp from the run's jump to its own
+  expect(rampAtJump(rampAtJump(ramp, 0.001), 0.0002)?.engraving?.[1]?.travel).toBeCloseTo(
+    0.0042,
+    12,
+  )
+  expect(rampAtJump(ramp, undefined)).toBe(ramp)
+  expect(rampAtJump({ friction: 5e6 }, 0.001)).toEqual({ friction: 5e6 })
+})
+
+it('simulates a load with a jump and the same load jammed into the lands differently, with a ramp', () => {
+  const ramp = { ...values, engravingPressure: 6e7, engravingLength: 0.005 }
+  const run = (jump: number) =>
+    interiorRequest({ values: ramp, powder: undefined, boreArea: 4.7e-5, jump }).body.load
+  const [jumped, jammed] = [run(0.0015), run(-0.0003)]
+  expect(jumped.resistance?.engraving?.[0]?.travel).toBe(0.0015)
+  expect(jammed.resistance?.engraving?.[0]?.travel).toBe(0)
+  const [a, b] = [interior(jumped), interior(jammed)]
+  if (!a.valid || !b.valid) throw new Error('both runs should be valid')
+  expect(b.peakBreechPressure).toBeGreaterThan(a.peakBreechPressure * 1.001)
+  // without a ramp the jump changes nothing
+  const plain = (jump: number) =>
+    interiorRequest({ values, powder: undefined, boreArea: 4.7e-5, jump }).body.load
+  expect(plain(0.0015)).toEqual(plain(-0.0003))
 })
 
 it('gives a powder without its own coefficient the default of its grain form, and says so', () => {

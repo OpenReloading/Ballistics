@@ -284,6 +284,8 @@ export interface PowderRow {
   high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
   burnRateOrder?: number
+  /** The powder has the burn values of an interior model (`complete-records.ts`), with or without a curve. */
+  modelled?: true
   /** Load-table rows and cartridges the model was fitted to, and the day its fitted sources were read. */
   trainingRows?: number | undefined
   trainingCartridges?: number | undefined
@@ -307,6 +309,7 @@ export function orderPowders(
       name: s.name,
       grainForm: s.grainForm,
       propellantBase: s.propellantBase,
+      ...(s.interior && { modelled: true as const }),
       ...(s.interior?.trainingRows !== undefined && {
         trainingRows: s.interior.trainingRows,
         trainingCartridges: s.interior.trainingCartridges,

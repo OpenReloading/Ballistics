@@ -75,6 +75,8 @@ export interface BulletSummary {
   construction?: string
   /** Derived from the construction (`leadFree` of the schema); absent where the wording does not settle it. */
   leadFree?: boolean
+  /** A record that only names the bullet (`complete-records.ts`). */
+  nameOnly?: true
 }
 
 /** A case as `GET /cases` lists it. */
