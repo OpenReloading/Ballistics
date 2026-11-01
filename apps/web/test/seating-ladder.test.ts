@@ -99,6 +99,23 @@ describe('seatingLadder', () => {
     expect(r.steps.map((s) => s.jump)).toEqual([0.0002, -0.0003].map((v) => expect.closeTo(v, 12)))
   })
 
+  it("carries each step's cavity bracket of a hollow base", () => {
+    const hollow = seat({
+      at: (v) => ({
+        volume: 3.5e-6 + 30e-6 * (v - 0.071),
+        travel: 0.6 - v,
+        cavityRange: { low: v * 1e-5, high: v * 2e-5 },
+      }),
+    })
+    const r = seatingLadder(hollow, 0.071, 0.0005, 2, 'up', show, english.t)
+    if (!('steps' in r)) throw new Error(r.error)
+    expect(r.steps.map((s) => s.cavityRange?.low)).toEqual(
+      [0.071e-5, 0.0715e-5].map((v) => expect.closeTo(v, 15)),
+    )
+    const plain = seatingLadder(seat(), 0.071, 0.0005, 1, 'up', show, english.t)
+    expect('steps' in plain && plain.steps[0]).not.toHaveProperty('cavityRange')
+  })
+
   it('names the empty length it starts from, CBTO for a bullet seated by its ogive', () => {
     expect(
       seatingLadder(
