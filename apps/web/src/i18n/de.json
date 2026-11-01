@@ -206,6 +206,7 @@
   "COAL {coal}, seating depth {depth}, jump {jump}, contact with leade.": "COAL {coal}, Setztiefe {depth}, Freiflug {jump}, Kontakt mit dem Übergangskegel.",
   "COAL {coal}, seating depth {depth}, jump {jump}, contact with the lands.": "COAL {coal}, Setztiefe {depth}, Freiflug {jump}, Kontakt mit den Feldern.",
   "COAL {coal}, seating depth {depth}, jump {jump}.": "COAL {coal}, Setztiefe {depth}, Freiflug {jump}.",
+  "COAL {coal}": "COAL {coal}",
   "COAL measured": "COAL gemessen",
   "COAL, CIP maximum L6": "COAL, CIP-Maximum L6",
   "Caliber": "Kaliber",

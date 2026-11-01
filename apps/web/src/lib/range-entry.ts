@@ -27,6 +27,51 @@ export interface RangeStep {
   charge: number | undefined
 }
 
+/** The references of a load the range page names, by the API kind of their records. */
+export type ComponentKind = 'cartridges' | 'bullets' | 'powders' | 'primers'
+
+/** The record references of `load` to name, by kind; a described bullet or powder needs none. */
+export function componentRefs(load: Load): [ComponentKind, string][] {
+  const refs: [ComponentKind, string | undefined][] = [
+    ['cartridges', load.cartridge],
+    ['bullets', typeof load.bullet === 'string' ? load.bullet : undefined],
+    ['powders', typeof load.powder === 'string' ? load.powder : undefined],
+    ['primers', load.primer?.record],
+  ]
+  return refs.flatMap(([kind, ref]) => (ref ? [[kind, ref] as [ComponentKind, string]] : []))
+}
+
+/**
+ * The load in two lines: the cartridge and the bullet, then the powder with the charge, the primer
+ * and the COAL where the load has them. A reference without a known name (`nameOf`) is left out.
+ */
+export function loadSummary(
+  load: Load,
+  nameOf: (kind: ComponentKind, ref: string) => string | undefined,
+  system: UnitSystem,
+  t: Translator['t'],
+): string[] {
+  const named = (kind: ComponentKind, ref: string | undefined) =>
+    ref ? nameOf(kind, ref) : undefined
+  const bullet =
+    typeof load.bullet === 'object'
+      ? `${load.bullet.model} ${withUnit('mass', system, toSi('mass', load.bullet.bulletMass.value))}`
+      : named('bullets', load.bullet)
+  const powder = typeof load.powder === 'object' ? load.powder.name : named('powders', load.powder)
+  const charge = load.charge && withUnit('charge', system, toSi('mass', load.charge.value))
+  const coal =
+    load.seating?.by === 'overallLength'
+      ? t('COAL {coal}', {
+          coal: withUnit('length', system, toSi('length', load.seating.value.value)),
+        })
+      : undefined
+  const lines = [
+    [named('cartridges', load.cartridge), bullet],
+    [[powder, charge].filter(Boolean).join(' '), named('primers', load.primer?.record), coal],
+  ]
+  return lines.map((parts) => parts.filter(Boolean).join(', ')).filter(Boolean)
+}
+
 /** The charge ladder of `load` as steps, lowest first; a load without a usable ladder has one step. */
 export function rangeSteps(load: Load): RangeStep[] {
   const charge = load.charge?.value
