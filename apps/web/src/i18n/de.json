@@ -4197,5 +4197,16 @@
   "case length: trim length of your brass group {name} {length}": "Hülsenlänge: Länge nach dem Kürzen Ihrer Hülsengruppe {name} {length}",
   "Trim length of your brass group {name}.": "Länge nach dem Kürzen Ihrer Hülsengruppe {name}.",
   "Trim length of your brass group {name}. The CIP L3 is {value}.": "Länge nach dem Kürzen Ihrer Hülsengruppe {name}. Das CIP-L3 beträgt {value}.",
-  "The jump to the lands has no effect without an engraving ramp.": "Der Freiflug bis zu den Feldern wirkt sich ohne Einpressrampe nicht aus."
+  "The jump to the lands has no effect without an engraving ramp.": "Der Freiflug bis zu den Feldern wirkt sich ohne Einpressrampe nicht aus.",
+  "{name} (values missing)": "{name} (Werte fehlen)",
+  "{name} has no burn values, so it cannot run.": "{name} hat keine Abbrandwerte und kann daher nicht gerechnet werden.",
+  "{name} has no burn values, so it cannot run. Choose a similar powder on the burn-rate chart, or fit the values from your chronograph strings on the tuning page.": "{name} hat keine Abbrandwerte und kann daher nicht gerechnet werden. Wählen Sie ein ähnliches Treibladungspulver in der Abbrandübersicht oder passen Sie die Werte auf der Abstimmungsseite an Ihre Chronographen-Schussreihen an.",
+  "Choose a similar powder on the burn-rate chart": "Ähnliches Treibladungspulver in der Abbrandübersicht wählen",
+  "Complete records only": "Nur vollständige Datensätze",
+  "Fit the values from your chronograph strings": "Werte an Ihre Chronographen-Schussreihen anpassen",
+  "Not in this record, which only names the bullet: choose the base type.": "Nicht in diesem Datensatz, der vom Geschoss nur den Namen enthält: Wählen Sie die Bodenform.",
+  "Not in this record, which only names the bullet: type the value.": "Nicht in diesem Datensatz, der vom Geschoss nur den Namen enthält: Geben Sie den Wert ein.",
+  "Values missing": "Werte fehlen",
+  "Values missing: no burn values": "Werte fehlen: keine Abbrandwerte",
+  "Values missing: the record only names the bullet": "Werte fehlen: Der Datensatz enthält vom Geschoss nur den Namen"
 }

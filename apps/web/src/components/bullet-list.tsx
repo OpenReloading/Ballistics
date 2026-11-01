@@ -26,6 +26,7 @@ import {
   bulletMatches,
 } from '../lib/bullet-rows.ts'
 import { compareHref, maxComparedBullets } from '../lib/compare-ids.ts'
+import { bulletIncomplete } from '../lib/complete-records.ts'
 import { facetNames } from '../lib/facets.ts'
 import { listTitles } from '../lib/list-titles.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
@@ -57,6 +58,7 @@ import {
   useResolved,
   useUserRecords,
 } from './list-sources.tsx'
+import { MissingMark } from './missing-mark.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyList } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
@@ -144,7 +146,17 @@ export function BulletList({
       value: (b) => b.manufacturerName,
       cell: (b) => b.manufacturerName,
     },
-    { key: 'name', label: msg('Name'), value: (b) => b.name, cell: (b) => b.name },
+    {
+      key: 'name',
+      label: msg('Name'),
+      value: (b) => b.name,
+      cell: (b) => (
+        <>
+          {b.name}
+          {bulletIncomplete(b) && <MissingMark />}
+        </>
+      ),
+    },
     {
       key: 'cal',
       label: msg('Caliber'),

@@ -53,6 +53,7 @@ import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
+import { powderIncomplete } from '../lib/complete-records.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -659,6 +660,17 @@ const caseLengthOf = (brass: OwnCase | undefined, cip: number | undefined) =>
   brass?.trimLength === undefined
     ? { mm: cip, brass: undefined }
     : { mm: brass.trimLength, brass: { name: brass.name, mm: brass.trimLength, cip } }
+
+/** The name of a powder record without burn values whose model fields are not all typed; it cannot run. */
+function burnlessOf(
+  powder: Powder | undefined,
+  design: unknown,
+  fields: Fields,
+  label: string | undefined,
+) {
+  if (!powder || design || !powderIncomplete(powder)) return
+  return requiredModelKeys.some((k) => fields[k]?.si === undefined) ? label : undefined
+}
 
 /** The note on a bullet below the firearm's measured groove diameter (SI): the gap the model leaves out. */
 function undersizeNote(
@@ -1645,6 +1657,11 @@ export function useWorkbenchState() {
     fixedFieldText,
   )
   const fields = form.values
+  /**
+   * The powder record without burn values while its model fields are not all typed: it cannot run.
+   * Its name, else undefined.
+   */
+  const burnless = burnlessOf(powder, powderDesign, fields, powderLabel)
   const { grooveM, qUsed } = boreOf(gunData, { recordGrooveM, qM, landM }, fields.boreDiameter?.si)
 
   /**
@@ -2129,8 +2146,25 @@ export function useWorkbenchState() {
     if (powderMoreFields.some((k) => errors[k])) setMore('powder')
   }
 
+  /** The message of a powder without burn values, with the two ways on. */
+  const burnlessText = (name: string) =>
+    t(
+      '{name} has no burn values, so it cannot run. Choose a similar powder on the burn-rate chart, or fit the values from your chronograph strings on the tuning page.',
+      { name },
+    )
+
+  /** Why no run can start: a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
+  const refusal = (as: unknown) =>
+    specError() ?? (as || !burnless ? undefined : burnlessText(burnless))
+  /** The seating a run reads: now, or this render's for a Powders tab row (`as`), as its values. */
+  const seatedFor = (as: unknown) => (as ? seated : seatedNow.current)
+
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
+    if (burnless) {
+      setStatus(burnlessText(burnless))
+      return false
+    }
     let invalid = false
     flushSync(() => {
       const { hasErrors, errors } = form.validate()
@@ -2183,8 +2217,8 @@ export function useWorkbenchState() {
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
-    const typedError = specError()
-    if (typedError) throw new Error(typedError)
+    const refused = refusal(as)
+    if (refused) throw new Error(refused)
     const chosen = as?.powder ?? chosenPowder
     const { body, bulkDensity, missing } = interiorRequest({
       // the form's values now, not this render's: a run pressed after a seated volume was written
@@ -2204,7 +2238,7 @@ export function useWorkbenchState() {
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
       // the engraving ramp starts at the seated bullet's jump, current as the form's values are
-      jump: (as ? seated : seatedNow.current).jump,
+      jump: seatedFor(as).jump,
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
@@ -3302,6 +3336,7 @@ export function useWorkbenchState() {
     setTypedBullet,
     specs: spec.values,
     recordSpecs: spec.record,
+    burnless,
     caseLengthBrass,
     typedSpecFields: spec.typed,
     setTypedSpec: spec.setTyped,

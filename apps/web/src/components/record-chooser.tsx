@@ -7,6 +7,7 @@ import {
   Loader,
   SegmentedControl,
   Select,
+  Switch,
   TextInput,
 } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
@@ -14,6 +15,7 @@ import { Funnel, MagnifyingGlass } from '@phosphor-icons/react'
 import Link from 'next/link'
 import {
   type ReactNode,
+  useCallback,
   useDeferredValue,
   useEffect,
   useId,
@@ -23,9 +25,12 @@ import {
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import { completeFirst } from '../lib/complete-records.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
+import { MissingMark } from './missing-mark.tsx'
 import { EmptyNote, ErrorNote } from './states.tsx'
+import { useCompleteOnly } from './use-complete-only.ts'
 
 /** Rows drawn at once: a narrower search shows the rest. */
 const shownRows = 100
@@ -129,6 +134,11 @@ export interface ChooserKind<R extends ChooserRow> {
   facts: (row: R, system: UnitSystem, t: Translator['t']) => [Message, string | undefined][]
   /** The page of a catalogue record, if it has one. */
   href?: (row: R) => string | undefined
+  /**
+   * A record with values missing (`complete-records.ts`): the filter "Complete records only"
+   * hides it, else it follows the complete ones with a mark.
+   */
+  incomplete?: (row: R) => boolean
 }
 
 type Catalogue<R> =
@@ -237,6 +247,7 @@ function ResultRow<R extends ChooserRow>({
               {t('Your design')}
             </Badge>
           )}
+          {kind.incomplete?.(row) && <MissingMark />}
         </span>
       </span>
       {kind.columns.map((c) => (
@@ -390,7 +401,15 @@ function ChooserBody<R extends ChooserRow>({
     [rows, picked, origin, kind],
   )
   const typed = useDeferredValue(query)
-  const results = useMemo(() => kind.search(kept, typed, sort), [kept, typed, kind, sort])
+  const [completeOnly, setCompleteOnly] = useCompleteOnly()
+  const search = useCallback(
+    (q: string) => {
+      const found = kind.search(kept, q, sort)
+      return kind.incomplete ? completeFirst(found, kind.incomplete, completeOnly) : found
+    },
+    [kept, kind, sort, completeOnly],
+  )
+  const results = useMemo(() => search(typed), [search, typed])
   // after a failed read only the error shows, so no listbox or highlight is left behind
   const shownOf = (found: R[]) => (state.status === 'error' ? [] : found.slice(0, shownRows))
   const shown = shownOf(results)
@@ -413,7 +432,7 @@ function ChooserBody<R extends ChooserRow>({
 
   // the keys act on the list of the text in the box, also before that list has rendered
   function keyList() {
-    const found = typed === query ? results : kind.search(kept, query, sort)
+    const found = typed === query ? results : search(query)
     return { list: listKey(found), shown: shownOf(found) }
   }
 
@@ -480,6 +499,13 @@ function ChooserBody<R extends ChooserRow>({
           />
         ))}
         {filters}
+        {kind.incomplete && (
+          <Switch
+            label={t('Complete records only')}
+            checked={completeOnly}
+            onChange={(e) => setCompleteOnly(e.currentTarget.checked)}
+          />
+        )}
         {designs.length > 0 && (
           <SegmentedControl
             aria-label={t('Source')}

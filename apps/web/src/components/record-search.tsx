@@ -58,6 +58,16 @@ async function matches<T>(
   return { status: 'ok', items: body.items, total: body.total }
 }
 
+/**
+ * The matches after `arrange`, the total less the ones it left out. shortcut: a match left out
+ * beyond the first page still counts in the total; a list query parameter would make it exact.
+ */
+function arranged<T>(state: State<T>, arrange: ((items: T[]) => T[]) | undefined): State<T> {
+  if (state.status !== 'ok' || !arrange) return state
+  const items = arrange(state.items)
+  return { ...state, items, total: state.total - (state.items.length - items.length) }
+}
+
 /** The status line under the field: what the search is doing or found. */
 function statusLine<T>(
   state: State<T>,
@@ -140,6 +150,7 @@ export function RecordSearch<T extends { id: string }>({
   browse,
   clear,
   find,
+  arrange,
 }: {
   label: string
   describe: (item: T) => string
@@ -166,6 +177,8 @@ export function RecordSearch<T extends { id: string }>({
   browse?: { label: string; onOpen: (typed: string) => void }
   /** A button that clears the choice, shown while `picked` in place of `browse`. */
   clear?: { label: string; onClear: () => void } | undefined
+  /** Orders and filters the matches, as "Complete records only" (`complete-records.ts`). */
+  arrange?: ((items: T[]) => T[]) | undefined
 } & (
   | { kind: ApiKind; find?: Find<T> }
   /** The matches of the typed text in place of the API search. */
@@ -209,10 +222,11 @@ export function RecordSearch<T extends { id: string }>({
     }
   }, [q, kind, params, find])
 
-  const items = state.status === 'ok' ? state.items : []
+  const found = arranged(state, arrange)
+  const items = found.status === 'ok' ? found.items : []
   const typed = q.trim().toLowerCase()
   const local = extra.filter((e) => e.label.toLowerCase().includes(typed))
-  const message = statusLine(state, q.trim() !== '', noneText, unreachableText, t)
+  const message = statusLine(found, q.trim() !== '', noneText, unreachableText, t)
 
   const submit = (id: string) => {
     if (id.startsWith('extra:')) onExtra?.(id.slice('extra:'.length))

@@ -15,6 +15,7 @@ import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
@@ -32,6 +33,7 @@ import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import type { CartridgeRow } from '../lib/cartridge-rows.ts'
+import { bulletIncomplete, completeFirst, powderIncomplete } from '../lib/complete-records.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
@@ -82,6 +84,7 @@ import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { RecordSourcesLink } from './sources.tsx'
+import { useCompleteOnly } from './use-complete-only.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
@@ -977,7 +980,7 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
       error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
       mark={(s) =>
         changes[key] === undefined
-          ? undefined
+          ? missingValueMark(bulletRecord, value === undefined, t)
           : t('Changed from the record value {value}.', {
               value: valueWithUnit(spec.quantity, s, changes[key]),
             })
@@ -1097,6 +1100,8 @@ function BulletValueFields({ more }: { more?: boolean }) {
     const model = key === 'bulletBcG1' ? 'G1' : key === 'bulletBcG7' ? 'G7' : undefined
     if (key in typedBulletFields) return true
     if (!bulletRecord) return false
+    // a name-only record asks for one BC to type
+    if (bulletIncomplete(bulletRecord) && key === 'bulletBcG1') return true
     return model ? bandCount(bulletRecord, model) > 0 : true
   }
   const [first, second] = bulletFields.filter((s) => s.key.includes('Bc') && shown(s.key))
@@ -1120,6 +1125,25 @@ function BaseFormFields() {
       {boatTailed(type) && <BulletValueField name="bulletBaseDiameter" />}
       {hollowBased(type) && <BulletValueField name="bulletCavityDiameter" />}
     </>
+  )
+}
+
+/** The note on a powder record without burn values: it cannot run, and the two ways on. */
+function BurnlessNote() {
+  const { burnless } = useLoad()
+  const { t } = useTranslation()
+  if (!burnless) return null
+  return (
+    <p className="note wide">
+      {t('{name} has no burn values, so it cannot run.', { name: burnless })}{' '}
+      <Anchor component={Link} href="/powders/burn-rates" size="sm">
+        {t('Choose a similar powder on the burn-rate chart')}
+      </Anchor>
+      {' · '}
+      <Anchor component={Link} href="/powders/tune" size="sm">
+        {t('Fit the values from your chronograph strings')}
+      </Anchor>
+    </p>
   )
 }
 
@@ -1194,6 +1218,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
           <SpecValueField name="bulkDensity" />
         )}
         <PowderSourceRow />
+        <BurnlessNote />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
@@ -1287,6 +1312,7 @@ function BulletPicker() {
   } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
+  const [completeOnly] = useCompleteOnly()
   const designRows = useMemo(() => userBulletRows(designs), [designs])
   const fit = useMemo(
     () => (bulletParams ? fitOf(cartridge) : undefined),
@@ -1316,8 +1342,9 @@ function BulletPicker() {
         describe={(b) =>
           b.origin
             ? t('{name} (your design)', { name: b.name })
-            : describeBullet(b as BulletSummary)
+            : missingMark(describeBullet(b as BulletSummary), bulletIncomplete(b), t)
         }
+        arrange={(items) => completeFirst(items, bulletIncomplete, completeOnly)}
         onSelect={(b) => {
           const design = userRecordId(b.id)
           if (design) pickDesign(design)
@@ -1420,6 +1447,20 @@ function CartridgePicker() {
   )
 }
 
+/** The mark of a value a name-only bullet record lacks and nobody typed: a field to type. */
+const missingValueMark = (
+  record: { nameOnly?: true | undefined } | undefined,
+  empty: boolean,
+  t: Translator['t'],
+) =>
+  record && bulletIncomplete(record) && empty
+    ? t('Not in this record, which only names the bullet: type the value.')
+    : undefined
+
+/** A chooser entry's name with the mark of a record that misses values. */
+const missingMark = (name: string, incomplete: boolean, t: Translator['t']) =>
+  incomplete ? t('{name} (values missing)', { name }) : name
+
 /** The powder search, with the chosen powder, the link's name or the typed parameters as its text. */
 function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames> }) {
   const {
@@ -1435,6 +1476,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
+  const [completeOnly] = useCompleteOnly()
   const chosen = (() => {
     if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
     if (powderLabel) return powderLabel
@@ -1451,7 +1493,8 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         kind="powders"
         label={t('Search powders by manufacturer and name')}
         chosen={chosen}
-        describe={(p) => productLabel(p, names)}
+        describe={(p) => missingMark(productLabel(p, names), powderIncomplete(p), t)}
+        arrange={(items) => completeFirst(items, powderIncomplete, completeOnly)}
         onSelect={(p) => pickPowder(p.id)}
         // the browser's powder designs in the same list, first
         extra={powderDesigns.map((d) => ({
