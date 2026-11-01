@@ -14,6 +14,7 @@ import {
 } from '@mantine/core'
 import type { Bullet } from '@open-reloading/schema'
 import { Flask, Plus } from '@phosphor-icons/react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { type CSSProperties, type ReactNode, useState } from 'react'
@@ -33,11 +34,15 @@ import { nth } from '../lib/nth.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { controlSize } from '../lib/theme.ts'
 import { say } from '../lib/wording.ts'
-import { bulletKind } from './bullet-search-dialog.tsx'
 import { Panel } from './panel.tsx'
-import { RecordChooser } from './record-chooser.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
 import { useUnits } from './units-settings.tsx'
+
+/** The bullet search, a chunk of its own: the comparison loads it on the first Add bullet. */
+const CompareAddChooser = dynamic(
+  () => import('./compare-add-chooser.tsx').then((m) => m.CompareAddChooser),
+  { ssr: false },
+)
 
 const markText = { max: msg('largest'), min: msg('smallest') } as const
 
@@ -47,6 +52,8 @@ function AddBullet({ ids }: { ids: string[] }) {
   const { system } = useUnits()
   const router = useRouter()
   const [opened, setOpened] = useState(false)
+  // mounted from the first click on: the search's code loads then
+  const [wanted, setWanted] = useState(false)
   if (ids.length >= maxComparedBullets) return null
   return (
     <>
@@ -55,22 +62,24 @@ function AddBullet({ ids }: { ids: string[] }) {
         size={controlSize.row.button}
         leftSection={<Plus aria-hidden="true" />}
         className="screen-only"
-        onClick={() => setOpened(true)}
+        onClick={() => {
+          setWanted(true)
+          setOpened(true)
+        }}
       >
         {t('Add bullet')}
       </Button>
-      <RecordChooser
-        kind={bulletKind}
-        opened={opened}
-        onClose={() => setOpened(false)}
-        text=""
-        designs={[]}
-        system={system}
-        onChoose={(row) => {
-          setOpened(false)
-          if (!ids.includes(row.id)) router.push(compareHref([...ids, row.id]))
-        }}
-      />
+      {wanted && (
+        <CompareAddChooser
+          opened={opened}
+          onClose={() => setOpened(false)}
+          system={system}
+          onChoose={(row) => {
+            setOpened(false)
+            if (!ids.includes(row.id)) router.push(compareHref([...ids, row.id]))
+          }}
+        />
+      )}
     </>
   )
 }
