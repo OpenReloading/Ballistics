@@ -38,6 +38,13 @@ export function metricsOf(items: readonly Outcome[], halfWidth: number | null): 
   const velocity = used.map(velocityError)
   const pressure = used.flatMap((o) => pressureError(o) ?? [])
   const pressureStats = stats(pressure)
+  const bases = new Map<string, number[]>()
+  for (const o of used) {
+    const error = pressureError(o)
+    if (error === undefined) continue
+    const basis = o.row.pressureBasis ?? 'unstated'
+    bases.set(basis, [...(bases.get(basis) ?? []), error])
+  }
   return {
     rows: {
       inSplit: items.length,
@@ -51,6 +58,14 @@ export function metricsOf(items: readonly Outcome[], halfWidth: number | null): 
     },
     velocity: stats(velocity),
     pressure: pressureStats && { ...pressureStats, rows: pressure.length },
+    pressureByBasis: Object.fromEntries(
+      [...bases]
+        .toSorted(([a], [b]) => byText(a, b))
+        .map(([basis, errors]) => [
+          basis,
+          { ...(stats(errors) as NonNullable<ReturnType<typeof stats>>), rows: errors.length },
+        ]),
+    ),
     interval:
       halfWidth === null || velocity.length === 0
         ? null

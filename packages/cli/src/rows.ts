@@ -11,8 +11,10 @@ export interface Row {
   powder: string
   /** Charge, g. */
   charge: number
-  /** Printed muzzle velocity, m/s. */
+  /** Printed muzzle velocity, m/s; a velocity printed at `muzzleDistance` is corrected to the muzzle before the error. */
   velocity: number
+  /** The velocity as printed where `velocity` is corrected to the muzzle, m/s. */
+  printedVelocity?: number | undefined
   /** Printed peak pressure, bar. */
   pressure?: number | undefined
   /** Barrel length, mm. */
@@ -21,16 +23,18 @@ export interface Row {
   temperature?: number | undefined
   /** Cartridge overall length, mm. */
   coal?: number | undefined
-  /** The basis the printed peak pressure was measured on (free text), carried, not read yet. */
+  /** The basis the printed peak pressure was measured on (free text): pressure errors are grouped by it, `unstated` without one. */
   pressureBasis?: string | undefined
   /** Bullet bearing length, mm, carried, not read yet. */
   bearing?: number | undefined
-  /** Distance of the chronograph from the muzzle, m, carried, not read yet. */
+  /** Distance of the measuring point from the muzzle, m: the printed velocity is corrected to the muzzle. */
   muzzleDistance?: number | undefined
   /** Session, rifle and lot ids (free text), carried, not read yet. */
   session?: string | undefined
   rifle?: string | undefined
   lot?: string | undefined
+  /** Printed bullet mass, g, of a published row whose bullet is a stand-in. */
+  bulletMass?: number | undefined
   /** A free label of the source table: carried with the row, never part of a result. */
   table?: string | undefined
 }

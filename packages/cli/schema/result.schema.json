@@ -7,7 +7,7 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 1
+          "const": 2
         },
         "notice": {
           "type": "string",
@@ -34,6 +34,39 @@
             }
           },
           "required": ["rows", "records"],
+          "additionalProperties": false
+        },
+        "published": {
+          "description": "With `--rows catalogue` or a folder of published loads: what the files gave.",
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Published load files read."
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows they gave: one per printed charge with a velocity."
+            },
+            "skipped": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": ["noVelocity", "customerTable", "noPowderRecord", "noCartridge"]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "description": "Printed charges that gave no row, by reason; a reason without charges is left out."
+            }
+          },
+          "required": ["files", "rows", "skipped"],
           "additionalProperties": false
         },
         "command": {
@@ -101,7 +134,8 @@
                       "noBulletShape",
                       "noBarrelLength",
                       "missingCartridgeValue",
-                      "modelRefused"
+                      "modelRefused",
+                      "noBulletDrag"
                     ]
                   },
                   "additionalProperties": {
@@ -165,7 +199,34 @@
                   "type": "null"
                 }
               ],
-              "description": "Absolute relative error of the peak pressure over the used rows that print one."
+              "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+            },
+            "pressureByBasis": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "median": {
+                    "type": "number",
+                    "description": "Median of the absolute relative error, as a fraction."
+                  },
+                  "p90": {
+                    "type": "number",
+                    "description": "90th percentile of the absolute relative error, as a fraction."
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": ["median", "p90", "rows"],
+                "additionalProperties": false
+              },
+              "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
             },
             "interval": {
               "anyOf": [
@@ -187,7 +248,7 @@
               "description": "Coverage of the 90 % interval; null without rows or without an interval."
             }
           },
-          "required": ["rows", "velocity", "pressure", "interval"],
+          "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
           "additionalProperties": false
         },
         "byFamily": {
@@ -227,7 +288,8 @@
                         "noBulletShape",
                         "noBarrelLength",
                         "missingCartridgeValue",
-                        "modelRefused"
+                        "modelRefused",
+                        "noBulletDrag"
                       ]
                     },
                     "additionalProperties": {
@@ -291,7 +353,34 @@
                     "type": "null"
                   }
                 ],
-                "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+              },
+              "pressureByBasis": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "median": {
+                      "type": "number",
+                      "description": "Median of the absolute relative error, as a fraction."
+                    },
+                    "p90": {
+                      "type": "number",
+                      "description": "90th percentile of the absolute relative error, as a fraction."
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": ["median", "p90", "rows"],
+                  "additionalProperties": false
+                },
+                "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
               },
               "interval": {
                 "anyOf": [
@@ -313,7 +402,7 @@
                 "description": "Coverage of the 90 % interval; null without rows or without an interval."
               }
             },
-            "required": ["rows", "velocity", "pressure", "interval"],
+            "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
             "additionalProperties": false
           },
           "description": "By powder family, `<propellant base>/<grain form>` of the powder record."
@@ -355,7 +444,8 @@
                         "noBulletShape",
                         "noBarrelLength",
                         "missingCartridgeValue",
-                        "modelRefused"
+                        "modelRefused",
+                        "noBulletDrag"
                       ]
                     },
                     "additionalProperties": {
@@ -419,7 +509,34 @@
                     "type": "null"
                   }
                 ],
-                "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+              },
+              "pressureByBasis": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "median": {
+                      "type": "number",
+                      "description": "Median of the absolute relative error, as a fraction."
+                    },
+                    "p90": {
+                      "type": "number",
+                      "description": "90th percentile of the absolute relative error, as a fraction."
+                    },
+                    "rows": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": ["median", "p90", "rows"],
+                  "additionalProperties": false
+                },
+                "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
               },
               "interval": {
                 "anyOf": [
@@ -441,7 +558,7 @@
                 "description": "Coverage of the 90 % interval; null without rows or without an interval."
               }
             },
-            "required": ["rows", "velocity", "pressure", "interval"],
+            "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
             "additionalProperties": false
           },
           "description": "By powder id."
@@ -491,7 +608,8 @@
                             "noBulletShape",
                             "noBarrelLength",
                             "missingCartridgeValue",
-                            "modelRefused"
+                            "modelRefused",
+                            "noBulletDrag"
                           ]
                         },
                         "additionalProperties": {
@@ -555,7 +673,34 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "pressureByBasis": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                   },
                   "interval": {
                     "anyOf": [
@@ -577,7 +722,7 @@
                     "description": "Coverage of the 90 % interval; null without rows or without an interval."
                   }
                 },
-                "required": ["rows", "velocity", "pressure", "interval"],
+                "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                 "additionalProperties": false
               }
             }
@@ -618,7 +763,8 @@
                       "noBulletShape",
                       "noBarrelLength",
                       "missingCartridgeValue",
-                      "modelRefused"
+                      "modelRefused",
+                      "noBulletDrag"
                     ]
                   },
                   "additionalProperties": {
@@ -682,7 +828,34 @@
                   "type": "null"
                 }
               ],
-              "description": "Absolute relative error of the peak pressure over the used rows that print one."
+              "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+            },
+            "pressureByBasis": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "median": {
+                    "type": "number",
+                    "description": "Median of the absolute relative error, as a fraction."
+                  },
+                  "p90": {
+                    "type": "number",
+                    "description": "90th percentile of the absolute relative error, as a fraction."
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": ["median", "p90", "rows"],
+                "additionalProperties": false
+              },
+              "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
             },
             "interval": {
               "anyOf": [
@@ -710,7 +883,7 @@
               "description": "Powders left out, one at a time, each without a value."
             }
           },
-          "required": ["rows", "velocity", "pressure", "interval", "powders"],
+          "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval", "powders"],
           "additionalProperties": false
         }
       },
@@ -735,7 +908,7 @@
       "properties": {
         "schemaVersion": {
           "type": "number",
-          "const": 1
+          "const": 2
         },
         "notice": {
           "type": "string",
@@ -762,6 +935,39 @@
             }
           },
           "required": ["rows", "records"],
+          "additionalProperties": false
+        },
+        "published": {
+          "description": "With `--rows catalogue` or a folder of published loads: what the files gave.",
+          "type": "object",
+          "properties": {
+            "files": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Published load files read."
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991,
+              "description": "Rows they gave: one per printed charge with a velocity."
+            },
+            "skipped": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "enum": ["noVelocity", "customerTable", "noPowderRecord", "noCartridge"]
+              },
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "description": "Printed charges that gave no row, by reason; a reason without charges is left out."
+            }
+          },
+          "required": ["files", "rows", "skipped"],
           "additionalProperties": false
         },
         "command": {
@@ -832,7 +1038,8 @@
                           "noBulletShape",
                           "noBarrelLength",
                           "missingCartridgeValue",
-                          "modelRefused"
+                          "modelRefused",
+                          "noBulletDrag"
                         ]
                       },
                       "additionalProperties": {
@@ -896,7 +1103,34 @@
                       "type": "null"
                     }
                   ],
-                  "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "pressureByBasis": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                 },
                 "interval": {
                   "anyOf": [
@@ -918,7 +1152,7 @@
                   "description": "Coverage of the 90 % interval; null without rows or without an interval."
                 }
               },
-              "required": ["rows", "velocity", "pressure", "interval"],
+              "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
               "additionalProperties": false
             },
             "byFamily": {
@@ -958,7 +1192,8 @@
                             "noBulletShape",
                             "noBarrelLength",
                             "missingCartridgeValue",
-                            "modelRefused"
+                            "modelRefused",
+                            "noBulletDrag"
                           ]
                         },
                         "additionalProperties": {
@@ -1022,7 +1257,34 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "pressureByBasis": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                   },
                   "interval": {
                     "anyOf": [
@@ -1044,7 +1306,7 @@
                     "description": "Coverage of the 90 % interval; null without rows or without an interval."
                   }
                 },
-                "required": ["rows", "velocity", "pressure", "interval"],
+                "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                 "additionalProperties": false
               },
               "description": "By powder family, `<propellant base>/<grain form>` of the powder record."
@@ -1086,7 +1348,8 @@
                             "noBulletShape",
                             "noBarrelLength",
                             "missingCartridgeValue",
-                            "modelRefused"
+                            "modelRefused",
+                            "noBulletDrag"
                           ]
                         },
                         "additionalProperties": {
@@ -1150,7 +1413,34 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "pressureByBasis": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                   },
                   "interval": {
                     "anyOf": [
@@ -1172,7 +1462,7 @@
                     "description": "Coverage of the 90 % interval; null without rows or without an interval."
                   }
                 },
-                "required": ["rows", "velocity", "pressure", "interval"],
+                "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                 "additionalProperties": false
               },
               "description": "By powder id."
@@ -1222,7 +1512,8 @@
                                 "noBulletShape",
                                 "noBarrelLength",
                                 "missingCartridgeValue",
-                                "modelRefused"
+                                "modelRefused",
+                                "noBulletDrag"
                               ]
                             },
                             "additionalProperties": {
@@ -1286,7 +1577,34 @@
                             "type": "null"
                           }
                         ],
-                        "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                        "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                      },
+                      "pressureByBasis": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "median": {
+                              "type": "number",
+                              "description": "Median of the absolute relative error, as a fraction."
+                            },
+                            "p90": {
+                              "type": "number",
+                              "description": "90th percentile of the absolute relative error, as a fraction."
+                            },
+                            "rows": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": ["median", "p90", "rows"],
+                          "additionalProperties": false
+                        },
+                        "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                       },
                       "interval": {
                         "anyOf": [
@@ -1308,7 +1626,7 @@
                         "description": "Coverage of the 90 % interval; null without rows or without an interval."
                       }
                     },
-                    "required": ["rows", "velocity", "pressure", "interval"],
+                    "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                     "additionalProperties": false
                   }
                 }
@@ -1349,7 +1667,8 @@
                           "noBulletShape",
                           "noBarrelLength",
                           "missingCartridgeValue",
-                          "modelRefused"
+                          "modelRefused",
+                          "noBulletDrag"
                         ]
                       },
                       "additionalProperties": {
@@ -1413,7 +1732,34 @@
                       "type": "null"
                     }
                   ],
-                  "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "pressureByBasis": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                 },
                 "interval": {
                   "anyOf": [
@@ -1441,7 +1787,14 @@
                   "description": "Powders left out, one at a time, each without a value."
                 }
               },
-              "required": ["rows", "velocity", "pressure", "interval", "powders"],
+              "required": [
+                "rows",
+                "velocity",
+                "pressure",
+                "pressureByBasis",
+                "interval",
+                "powders"
+              ],
               "additionalProperties": false
             }
           },
@@ -1512,7 +1865,8 @@
                           "noBulletShape",
                           "noBarrelLength",
                           "missingCartridgeValue",
-                          "modelRefused"
+                          "modelRefused",
+                          "noBulletDrag"
                         ]
                       },
                       "additionalProperties": {
@@ -1576,7 +1930,34 @@
                       "type": "null"
                     }
                   ],
-                  "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "pressureByBasis": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                 },
                 "interval": {
                   "anyOf": [
@@ -1598,7 +1979,7 @@
                   "description": "Coverage of the 90 % interval; null without rows or without an interval."
                 }
               },
-              "required": ["rows", "velocity", "pressure", "interval"],
+              "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
               "additionalProperties": false
             },
             "byFamily": {
@@ -1638,7 +2019,8 @@
                             "noBulletShape",
                             "noBarrelLength",
                             "missingCartridgeValue",
-                            "modelRefused"
+                            "modelRefused",
+                            "noBulletDrag"
                           ]
                         },
                         "additionalProperties": {
@@ -1702,7 +2084,34 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "pressureByBasis": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                   },
                   "interval": {
                     "anyOf": [
@@ -1724,7 +2133,7 @@
                     "description": "Coverage of the 90 % interval; null without rows or without an interval."
                   }
                 },
-                "required": ["rows", "velocity", "pressure", "interval"],
+                "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                 "additionalProperties": false
               },
               "description": "By powder family, `<propellant base>/<grain form>` of the powder record."
@@ -1766,7 +2175,8 @@
                             "noBulletShape",
                             "noBarrelLength",
                             "missingCartridgeValue",
-                            "modelRefused"
+                            "modelRefused",
+                            "noBulletDrag"
                           ]
                         },
                         "additionalProperties": {
@@ -1830,7 +2240,34 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                    "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                  },
+                  "pressureByBasis": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "median": {
+                          "type": "number",
+                          "description": "Median of the absolute relative error, as a fraction."
+                        },
+                        "p90": {
+                          "type": "number",
+                          "description": "90th percentile of the absolute relative error, as a fraction."
+                        },
+                        "rows": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": ["median", "p90", "rows"],
+                      "additionalProperties": false
+                    },
+                    "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                   },
                   "interval": {
                     "anyOf": [
@@ -1852,7 +2289,7 @@
                     "description": "Coverage of the 90 % interval; null without rows or without an interval."
                   }
                 },
-                "required": ["rows", "velocity", "pressure", "interval"],
+                "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                 "additionalProperties": false
               },
               "description": "By powder id."
@@ -1902,7 +2339,8 @@
                                 "noBulletShape",
                                 "noBarrelLength",
                                 "missingCartridgeValue",
-                                "modelRefused"
+                                "modelRefused",
+                                "noBulletDrag"
                               ]
                             },
                             "additionalProperties": {
@@ -1966,7 +2404,34 @@
                             "type": "null"
                           }
                         ],
-                        "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                        "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                      },
+                      "pressureByBasis": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {
+                          "type": "object",
+                          "properties": {
+                            "median": {
+                              "type": "number",
+                              "description": "Median of the absolute relative error, as a fraction."
+                            },
+                            "p90": {
+                              "type": "number",
+                              "description": "90th percentile of the absolute relative error, as a fraction."
+                            },
+                            "rows": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": ["median", "p90", "rows"],
+                          "additionalProperties": false
+                        },
+                        "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                       },
                       "interval": {
                         "anyOf": [
@@ -1988,7 +2453,7 @@
                         "description": "Coverage of the 90 % interval; null without rows or without an interval."
                       }
                     },
-                    "required": ["rows", "velocity", "pressure", "interval"],
+                    "required": ["rows", "velocity", "pressure", "pressureByBasis", "interval"],
                     "additionalProperties": false
                   }
                 }
@@ -2029,7 +2494,8 @@
                           "noBulletShape",
                           "noBarrelLength",
                           "missingCartridgeValue",
-                          "modelRefused"
+                          "modelRefused",
+                          "noBulletDrag"
                         ]
                       },
                       "additionalProperties": {
@@ -2093,7 +2559,34 @@
                       "type": "null"
                     }
                   ],
-                  "description": "Absolute relative error of the peak pressure over the used rows that print one."
+                  "description": "Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together."
+                },
+                "pressureByBasis": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "median": {
+                        "type": "number",
+                        "description": "Median of the absolute relative error, as a fraction."
+                      },
+                      "p90": {
+                        "type": "number",
+                        "description": "90th percentile of the absolute relative error, as a fraction."
+                      },
+                      "rows": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": ["median", "p90", "rows"],
+                    "additionalProperties": false
+                  },
+                  "description": "The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out."
                 },
                 "interval": {
                   "anyOf": [
@@ -2121,7 +2614,14 @@
                   "description": "Powders left out, one at a time, each without a value."
                 }
               },
-              "required": ["rows", "velocity", "pressure", "interval", "powders"],
+              "required": [
+                "rows",
+                "velocity",
+                "pressure",
+                "pressureByBasis",
+                "interval",
+                "powders"
+              ],
               "additionalProperties": false
             }
           },
