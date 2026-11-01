@@ -1,18 +1,18 @@
 {
-  "id": "demo-bullet-308-140-mono",
-  "manufacturer": "demo-bullets",
-  "productNumber": "M140",
-  "name": "30 Cal 140 gr Copper Demo",
+  "id": "demo-bullet-277-130-mono",
+  "manufacturer": "demo-projectiles",
+  "productNumber": "M130",
+  "name": "277 Cal 130 gr Copper Demo",
   "productLine": "Demo Hunt",
-  "caliber": ".308",
+  "caliber": ".277",
   "diameter": {
-    "value": 7.823
+    "value": 7.04
   },
   "mass": {
-    "value": 9.072
+    "value": 8.424
   },
   "length": {
-    "value": 30.9
+    "value": 32.0
   },
   "base": {
     "type": "boat-tail",
@@ -20,7 +20,7 @@
       "value": 3.0
     },
     "diameter": {
-      "value": 6.98
+      "value": 6.2
     },
     "angle": {
       "value": 8
@@ -32,20 +32,20 @@
   "tip": {
     "type": "hollow-point",
     "mouthDiameter": {
-      "value": 1.6
+      "value": 1.5
     }
   },
   "meplatDiameter": {
-    "value": 2.0
+    "value": 1.9
   },
   "noseLength": {
-    "value": 16.9
+    "value": 17.0
   },
   "baseToOgive": {
-    "value": 14.0
+    "value": 15.0
   },
   "bearingLength": {
-    "value": 11.0
+    "value": 12.0
   },
   "construction": {
     "raw": "Solid copper, no core",
@@ -55,7 +55,7 @@
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
-      "value": 0.41
+      "value": 0.43
     }
   ],
   "recommendedTwist": {
