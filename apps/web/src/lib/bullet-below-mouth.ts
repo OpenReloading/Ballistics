@@ -186,8 +186,9 @@ export function belowMouth(a: {
       ...basis,
     }
   } catch (e) {
-    // the outline of these lengths is refused
-    if (e instanceof RangeError) return { kind: 'refused', missing: [], because }
+    // the outline of these lengths is refused (a light, wide bullet, a mass typed wrong): a length of the record would give one
+    if (e instanceof RangeError)
+      return { kind: 'refused', missing: [msg('a bullet length that gives an outline')], because }
     throw e
   }
 }
