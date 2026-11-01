@@ -1120,15 +1120,20 @@ const moreHolding = (errors: Record<string, unknown>) =>
       ? ('firearm' as const)
       : undefined
 
-/** The volume tolerance of the cavity bracket of a hollow base, when the run's volume follows the seated bullet. */
-function cavityFractionOf(a: {
-  seated: Seated
-  fields: Fields
-  previewed: Partial<Record<PreviewKey, number>>
-  bullet: Parameters<typeof cavityVolumeFraction>[0]
-}) {
-  if (!fromSeatingOf(a.seated, a.fields, a.previewed).includes('volume')) return
-  return cavityVolumeFraction(a.bullet, a.seated.depth, a.fields.volume?.si)
+/** The values a run reads, taken once: the fields, the seated bullet and the values the seating preview wrote. */
+type RunValues = { seated: Seated; fields: Fields; previewed: Partial<Record<PreviewKey, number>> }
+
+/**
+ * What a run reads of the seating in `now`, so the request and the result read the same (#970): the
+ * volume tolerance of the cavity bracket of a hollow base while the run's volume follows the seated
+ * bullet, and the seated values still in the fields.
+ */
+export function runSeatingOf(now: RunValues, bullet: Parameters<typeof cavityVolumeFraction>[0]) {
+  const fromSeating = fromSeatingOf(now.seated, now.fields, now.previewed)
+  const volumeFraction = fromSeating.includes('volume')
+    ? cavityVolumeFraction(bullet, now.seated.depth, now.fields.volume?.si)
+    : undefined
+  return { volumeFraction, fromSeating }
 }
 
 /** The seated values still the ones the seating preview wrote. */
@@ -2380,16 +2385,17 @@ export function useWorkbenchState() {
   /** Why no run can start: a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
   const refusal = (as: unknown) =>
     specError() ?? (as || !burnless ? undefined : burnlessText(burnless))
-  /** What the volume tolerance reads, now as the run's values, or this render's for a Powders tab row (`as`). */
-  const volumeNow = (as: unknown) => ({
-    volume: (as ? fields : form.getValues()).volume?.si,
-    seated: seatedFor(as),
-    previewed: as ? previewed : previewedNow.current,
-    suggestion: suggestions.volume,
-    followed,
-  })
-  /** The seating a run reads: now, or this render's for a Powders tab row (`as`), as its values. */
-  const seatedFor = (as: unknown) => (as ? seated : seatedNow.current)
+  /**
+   * The values a run reads, taken once: the form's values and the seating now, not this render's: a
+   * run pressed after a seated volume was written and before it was drawn sends that volume, not an
+   * empty field's error (#870), and the seating that came with it (#938, #970). The Powders tab's
+   * rows (`as`) read the values of the render their batch started from, so every row of a batch
+   * simulates the same load whatever is typed meanwhile.
+   */
+  const runValues = (as: unknown): RunValues =>
+    as
+      ? { seated, fields, previewed }
+      : { seated: seatedNow.current, fields: form.getValues(), previewed: previewedNow.current }
 
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
@@ -2438,8 +2444,6 @@ export function useWorkbenchState() {
     return
   }
 
-  const cavityFraction = cavityFractionOf({ seated, fields, previewed, bullet: bulletNow })
-
   /**
    * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
    * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
@@ -2455,17 +2459,10 @@ export function useWorkbenchState() {
     const refused = refusal(as)
     if (refused) throw new Error(refused)
     const chosen = as?.powder ?? chosenPowder
+    const now = runValues(as)
+    const seating = runSeatingOf(now, bulletNow)
     const { body, bulkDensity, missing, sensitivityDefault } = interiorRequest({
-      // the form's values now, not this render's: a run pressed after a seated volume was written
-      // and before it was drawn sends that volume, not an empty field's error (#870). The Powders
-      // tab's rows (`as`) read the values of the render their batch started from, so every row of a
-      // batch simulates the same load whatever is typed meanwhile
-      values: powderValues(
-        siValues(as ? fields : form.getValues()),
-        chosenPowder,
-        as,
-        suggestions.startPressure?.si,
-      ),
+      values: powderValues(siValues(now.fields), chosenPowder, as, suggestions.startPressure?.si),
       powder: chosen,
       // a missing powder record: the bulk density and the bore resistance its link carried
       linked: as ? undefined : linkedPowder,
@@ -2474,16 +2471,22 @@ export function useWorkbenchState() {
       boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
-      volumeFraction: cavityFraction,
+      volumeFraction: seating.volumeFraction,
       pressureLimit: typedSpec(spec.typed, 'pmax'),
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
       // the engraving ramp starts at the seated bullet's jump, current as the form's values are
-      jump: seatedFor(as).jump,
+      jump: now.seated.jump,
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
-    const { fraction: volumeTolerance, rule: volumeRule } = runVolumeTolerance(volumeNow(as))
+    const { fraction: volumeTolerance, rule: volumeRule } = runVolumeTolerance({
+      volume: now.fields.volume?.si,
+      seated: now.seated,
+      previewed: now.previewed,
+      suggestion: suggestions.volume,
+      followed,
+    })
     const recordInputs = [
       chosenPowder?.id,
       bulletLength,
@@ -2504,7 +2507,10 @@ export function useWorkbenchState() {
       recordInputs,
       volumeRule,
       // the jump the request's ramp starts at, for the result's note
-      jump: seatedFor(as).jump,
+      jump: now.seated.jump,
+      // the values the request read, for the result and its printed sheet
+      run: now,
+      fromSeating: seating.fromSeating,
       sensitivityDefault,
       castHardness,
     }
@@ -2568,6 +2574,8 @@ export function useWorkbenchState() {
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
     volumeRule: CapacityRule | undefined
     jump: number | undefined
+    run: RunValues
+    fromSeating: PreviewKey[]
     sensitivityDefault: ReturnType<typeof loadRequest>['sensitivityDefault']
     castHardness: number | undefined
     table: string | undefined
@@ -2600,11 +2608,11 @@ export function useWorkbenchState() {
       cartridgeDesign: cartridgeDesign?.name,
       volumeMeasured: volumeMeasured({
         measuredCapacity: measuredWaterCapacity,
-        volume: fields.volume?.si,
+        volume: a.run.fields.volume?.si,
         // an estimated default is no measured capacity
         derived: [
           suggestions.volume?.approximate ? undefined : suggestions.volume?.si,
-          seated.volume,
+          a.run.seated.volume,
         ],
       }),
       powderDesign: powderDesign?.name,
@@ -2619,12 +2627,12 @@ export function useWorkbenchState() {
         linkedPowder,
       }),
       printed: {
-        seated,
+        seated: a.run.seated,
         firearm: firearmList.find((f) => f.id === firearm)?.name,
         firearmMass: gunWeightUsed.si,
         gasFactor: gasFactorOf(a.table),
         gasFactorNote: a.gasFactorNote,
-        fromSeating: fromSeatingOf(seated, fields, previewed),
+        fromSeating: a.fromSeating,
       },
       announce: false,
     }
