@@ -14,6 +14,13 @@ const labels: Record<string, Record<string, Message>> = {
     propellantBase: msg('Base'),
     interior: msg('Model parameters'),
     listedCartridges: msg('Listed by the manufacturer for'),
+    // the Thermochemistry rows of the powder page (`powderRowGroups`)
+    'thermochemistry.loadingDensity': msg('Loading density'),
+    'thermochemistry.flameTemperature': msg('Flame temperature'),
+    'thermochemistry.impetus': msg('Impetus'),
+    'thermochemistry.gamma': msg('Ratio of specific heats'),
+    'thermochemistry.molarMass': msg('Molar mass'),
+    'thermochemistry.covolume': msg('Covolume'),
   },
 }
 
