@@ -353,6 +353,16 @@ export function sideTapers(o: Outline) {
 }
 
 /**
+ * Whether a base end that reaches one side later than the other is a straight face at an angle (a
+ * slanted base face, or the corner of a turned axis), not a shadow: the early side's corner is
+ * sharp (from 0.5 to 0.9 of its shank line within `early` = 1 sample) and the late side ramps on
+ * evenly, `lead` samples from 0.1 to 0.5 of its line and `tail` from 0.5 to 0.9, equal within one
+ * sample and a tenth. A ramp of 2 samples or less tells the two apart no better than chance.
+ */
+const straightFace = (early: number, lead: number, tail: number) =>
+  early <= 1 && Math.max(lead, tail) >= 3 && Math.abs(lead - tail) <= 1 + 0.1 * Math.max(lead, tail)
+
+/**
  * The outline with a shadow offset towards the base trimmed off: the shadow then carries the
  * cut-out on past the base face. There one side reaches half its shank line 3 or more samples
  * before the other; the late side is the shadow's edge until it meets the bullet's base face, which
@@ -360,7 +370,8 @@ export function sideTapers(o: Outline) {
  * ramps on as far again). The bullet's base is there; the samples before it are left out, the
  * axis' origin moves to it and the shadow is named on the early side. Where one side is late by 3
  * or more samples but does not cross so, the base end is softer on that side: the outline is kept
- * and the shadow named, as not removed. Unchanged otherwise.
+ * and the shadow named, as not removed, unless it is a straight face at an angle (`straightFace`).
+ * Unchanged otherwise.
  */
 function withoutOverhang(o: Outline): Outline {
   const sides = o.sides
@@ -377,8 +388,16 @@ function withoutOverhang(o: Outline): Outline {
   const lateAt = Math.max(iL, iR)
   const cut = late.findIndex((v, i) => i >= lateAt && v >= 0.9 * levelAt(o, line, i))
   // a turned axis's corner ramps on past half its line as far again; the bullet's own base face, blurred, is crossed in a few samples
-  if (cut < 0 || cut > o.r.length / 4 || cut - lateAt > 0.2 * (lateAt - early))
-    return { ...o, shadow: { side, removed: false } }
+  if (cut < 0 || cut > o.r.length / 4 || cut - lateAt > 0.2 * (lateAt - early)) {
+    const [sharp, sharpLine] =
+      side === 'right' ? [sides.right, lines.right] : [sides.left, lines.left]
+    const face = straightFace(
+      reach(sharp, sharpLine, 0.9) - early,
+      lateAt - reach(late, line, 0.1),
+      cut < 0 ? Number.POSITIVE_INFINITY : cut - lateAt,
+    )
+    return face ? o : { ...o, shadow: { side, removed: false } }
+  }
   const zb = at(o.z, cut) - 1
   const keep = <T>(xs: readonly T[]) => xs.slice(cut)
   return {

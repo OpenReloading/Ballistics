@@ -293,7 +293,12 @@ describe('a shadow towards the base or far along the axis', () => {
     base: { type: 'flat' },
   }
   /** A product-style image of `t` at `k` px per mm with `shadow`, measured at the scale its diameter gives. */
-  const atDiameter = (t: BulletDimensions, k: number, shadow: NonNullable<PhotoSpec['shadow']>) => {
+  const atDiameter = (
+    t: BulletDimensions,
+    k: number,
+    shadow: PhotoSpec['shadow'],
+    obliqueBase?: number,
+  ) => {
     const [length, a] = [t.length * k, (t.diameter / 2) * k]
     const margin = Math.max(60, 0.15 * length)
     const photo = renderPhoto({
@@ -311,6 +316,7 @@ describe('a shadow towards the base or far along the axis', () => {
       blur: 1,
       seed: 11,
       shadow,
+      obliqueBase,
     })
     const seg = segmentPhoto(photo.image)
     const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
@@ -370,6 +376,23 @@ describe('a shadow towards the base or far along the axis', () => {
     expect(Math.abs(outline.length - 15.5 * 30)).toBeLessThan(5)
     expect(Math.abs(outline.angle - (3 * Math.PI) / 180)).toBeLessThan((1 * Math.PI) / 180)
   })
+
+  // #963: a clean flat base cut at an angle (a slanted sprue cut) reaches one side later, as a
+  // shadow past the base does, but its late side ramps on evenly and its early corner is sharp
+  for (const [name, t, k, slant] of [
+    ['pistol', pistol, 40, 2],
+    ['pistol', pistol, 60, 5],
+    ['rifle', rifle, 40, 5],
+    ['rifle', rifle, 60, 2],
+  ] as const)
+    it(`a ${name} bullet's base face cut ${slant} degrees off at ${k} px per mm: no shadow named`, () => {
+      const { outline, m } = atDiameter(t, k, undefined, slant)
+      expect(outline.shadow).toBeUndefined()
+      const length = defined(m.values.length)
+      expect(Math.abs(length.value - t.length)).toBeLessThanOrEqual(
+        Math.max(0.01 * t.length, 3 * length.uncertainty),
+      )
+    })
 })
 
 describe('an axis direction the user typed', () => {
