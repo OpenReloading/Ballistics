@@ -22,6 +22,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useContext, useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import dark from '../assets/ballistics-dark.svg'
 import light from '../assets/ballistics-light.svg'
 import { useTranslation } from '../i18n/language.ts'
@@ -30,6 +31,7 @@ import { docsUrl } from '../lib/docs-url.ts'
 import { repositoryUrl } from '../lib/repository-url.ts'
 import { pageCoversRoute, sections } from '../lib/sections.ts'
 import { shortcutAriaKeys } from '../lib/shortcuts.ts'
+import { useBarEnd } from './bar-end.ts'
 import { DocsLink } from './docs-link.tsx'
 import { InstallButton } from './install-button.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -250,6 +252,25 @@ export function SiteHeader() {
     afterDrawer.current = then
     close()
   }
+  // from 75em the page bar sits in the top bar before these (globals.css): in its end slot they
+  // follow its actions in the keyboard order as on screen
+  const shownEnd = useBarEnd()
+  const barEnd = wide ? shownEnd : null
+  const topEnd = (
+    <div className="top-end">
+      {/* a slot kept while nothing is offered, so an offer moves nothing; from 75em Install is
+          at the sidebar's foot, which leaves the page bar its width */}
+      <Box hiddenFrom="lg" className="install-slot">
+        <InstallButton position="bottom" />
+      </Box>
+      <Box hiddenFrom="lg">
+        <SafetyBarButton iconOnly />
+      </Box>
+      <ReportIssueButton url={repository} onOpen={() => setReporting(true)} />
+      <RepositoryLink url={repository} />
+      <ThemeSwitch />
+    </div>
+  )
   return (
     <>
       <AppShellHeader px="md">
@@ -265,19 +286,7 @@ export function SiteHeader() {
           />
           <Brand full={route === '/'} />
           {/* from 75em the page bar sits between the wordmark and these (globals.css) */}
-          <div className="top-end">
-            {/* a slot kept while nothing is offered, so an offer moves nothing; from 75em Install is
-                at the sidebar's foot, which leaves the page bar its width */}
-            <Box hiddenFrom="lg" className="install-slot">
-              <InstallButton position="bottom" />
-            </Box>
-            <Box hiddenFrom="lg">
-              <SafetyBarButton iconOnly />
-            </Box>
-            <ReportIssueButton url={repository} onOpen={() => setReporting(true)} />
-            <RepositoryLink url={repository} />
-            <ThemeSwitch />
-          </div>
+          {barEnd ? createPortal(topEnd, barEnd) : topEnd}
         </Group>
       </AppShellHeader>
       <AppShellNavbar component="div" visibleFrom="lg" p="sm" className="sidebar">

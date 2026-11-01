@@ -1,7 +1,7 @@
 import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { MatchRounds } from '../src/components/match-rounds.tsx'
+import { MatchReadout, MatchRounds } from '../src/components/match-rounds.tsx'
 import { matchCourse, matchRounds } from '../src/lib/match-rounds.ts'
 
 const fields = { shots: 60, sighters: 0, events: 1, reserve: 10, onHand: undefined }
@@ -70,10 +70,28 @@ it('renders the derived shots with the result, or the typed field where no targe
   const counted = page([{ shotCount: 60 }, { shotCount: 60 }])
   expect(counted).toContain('Shots per event: 60')
   expect(counted).toContain('Rule book: Any number')
-  expect(counted).toMatch(/role="status"[^>]*>Needed 66</)
+  expect(counted).toMatch(/role="status".*<dt>Rounds needed<\/dt><dd>66<\/dd>/)
+  // the fields in planning order: events, sighters, reserve, rounds on hand
+  const labels = [...counted.matchAll(/<label[^>]*>([^<]+)</g)].map((m) => m[1])
+  expect(labels).toEqual(['Events', 'Sighters per event', 'Reserve, %', 'Rounds on hand'])
   const typed = page([{}])
   expect(typed).toContain('The targets of this discipline state no shot count.')
-  expect(typed).toMatch(/role="status"[^>]*><\/p>/)
+  expect(typed).toMatch(/role="status"[^>]*><\/div>/)
+  expect([...typed.matchAll(/<label[^>]*>([^<]+)</g)].map((m) => m[1])[0]).toBe('Shots per event')
   for (const out of [counted, typed])
     expect(out).not.toMatch(/\b(safe|enough|ready|recommended)\b/i)
+})
+
+it('reads out the rounds needed and, with rounds on hand, the rounds short or left over', () => {
+  const readout = (result: ReturnType<typeof matchRounds>) =>
+    renderToStaticMarkup(<MatchReadout result={result} />)
+  expect(readout({ needed: 66 })).toBe(
+    '<div role="status"><dl class="readouts match-readouts"><div><dt>Rounds needed</dt><dd>66</dd></div></dl></div>',
+  )
+  expect(readout({ needed: 202, difference: -112 })).toContain(
+    '<dt>Rounds short</dt><dd class="exceeded">112</dd>',
+  )
+  expect(readout({ needed: 60, difference: 10 })).toContain('<dt>Rounds left over</dt><dd>10</dd>')
+  expect(readout({ needed: 60, difference: 0 })).toContain('<dt>Rounds left over</dt><dd>0</dd>')
+  expect(readout(undefined)).toBe('<div role="status"></div>')
 })

@@ -268,7 +268,7 @@ export function NotesPanel({
         title={
           canAdd
             ? t('A note on the target; values inserted from the picker follow the shots.')
-            : t('Mark a reference first.')
+            : t('Mark a reference first (Calibrate).')
         }
         onClick={onAdd}
       >

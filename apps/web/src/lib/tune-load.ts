@@ -1,6 +1,6 @@
 import { interiorBody } from '@open-reloading/api/compute'
 import { powder } from '@open-reloading/schema'
-import { tuneBaseKey, tuneLoadKey } from './powder-tune.ts'
+import { tuneBaseKey, tuneLoadKey, tuneTableKey } from './powder-tune.ts'
 
 /**
  * The load the workbench handed over for load `load` (a reference), parsed as the workbench's run
@@ -25,6 +25,17 @@ export function readTuneBase(load: string) {
     if (text === null) return
     const r = powder.safeParse(JSON.parse(text))
     return r.success ? r.data : undefined
+  } catch {
+    return
+  }
+}
+
+/** The CIP table of the cartridge record handed over with the load for load `load`; undefined when there is none. */
+export function readTuneTable(load: string) {
+  try {
+    const text = sessionStorage.getItem(tuneTableKey(load))
+    const table: unknown = text === null ? undefined : JSON.parse(text)
+    return typeof table === 'string' ? table : undefined
   } catch {
     return
   }

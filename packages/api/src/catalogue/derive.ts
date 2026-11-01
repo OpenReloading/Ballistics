@@ -8,6 +8,7 @@ import {
   compareKeys,
   type Discipline,
   type Federation,
+  leadFree,
   type Manufacturer,
   type Powder,
   type Primer,
@@ -199,7 +200,9 @@ export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => (
     ...compact({
       country: b.country,
       tipType: b.tip?.type,
+      baseType: b.base?.type,
       construction: constructionOf(b),
+      leadFree: leadFree(b.construction),
       nameOnly: b.nameOnly,
     }),
   },

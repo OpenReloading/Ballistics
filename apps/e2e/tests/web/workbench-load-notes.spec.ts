@@ -93,6 +93,10 @@ test('a changed powder lot between two sessions is a note on the load and its se
     .getByRole('button', { name: (await storedLoads(page))[0]?.name ?? '', exact: true })
     .click()
   await expect(page.locator('.file-state')).toContainText('Saved')
+  // the usable volume follows the seated bullet once the records are back: a run before it refuses (#870)
+  await expect(
+    page.getByRole('form', { name: 'Load' }).getByRole('textbox', { name: /^Usable case volume/ }),
+  ).not.toHaveValue('')
   await runLine(page)
   await page.getByRole('tab', { name: 'Notes', exact: true }).click()
   await expect(lots.getByLabel('Powder lot', { exact: true })).toHaveValue('P2')

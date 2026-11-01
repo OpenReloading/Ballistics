@@ -21,7 +21,7 @@ export const DesignerField = memo(function DesignerField({
   flag,
   changed,
   error,
-  unit = 'text',
+  unit = 'switch',
   symbol,
   dispatch,
 }: {
@@ -33,8 +33,11 @@ export const DesignerField = memo(function DesignerField({
   flag?: FieldFlag['kind'] | undefined
   changed: boolean
   error?: string | undefined
-  /** `none` where the grid's column header names the unit. */
-  unit?: 'text' | 'none' | undefined
+  /**
+   * The unit suffix: a one-click switch of this field to the quantity's other unit (the messages keep
+   * naming their own unit), plain text, or `none` where the grid's column header names the unit.
+   */
+  unit?: 'switch' | 'text' | 'none' | undefined
   /** The drawing's symbol of the value, shown before the label; focus marks it in the drawing. */
   symbol?: string | undefined
   dispatch: (a: FieldAction) => void

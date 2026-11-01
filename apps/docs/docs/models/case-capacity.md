@@ -206,6 +206,13 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
 - A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.
+- Effects on the capacity that were looked at and are left out:
+  - Cannelure: a groove 0.002 in deep and 0.030 in wide, as in two patents on a frangible .223 bullet ([US 7,322,297 B2](../bibliography.md#us-7322297), [US 7,143,679 B2](../bibliography.md#us-7143679)), takes 1 to 7 mm³ below the mouth (unverified estimate), 0.03 to 0.23 % of a .308 case and 0.2 to 1.2 % of a 9 mm case.
+  - Meplat: it lies above the mouth, so it changes the capacity by 0 %.
+  - Bullet materials: the capacity uses the outline, not mass and density. A jacket share of 0.15 to 0.35 of the bullet mass moves the density of the bullet mix by ±2.6 % (unverified); no published jacket share was found.
+  - Firings: 49.14 gr of water after one firing and 49.05 gr after four (n = 50), 0.18 % less capacity and 0.34 % more pressure (forum figures, unverified).
+  - Plating: +0.33 % pressure at 5 µm (unverified). Case mass: a standard deviation of 0.41 gr (unverified) is 0.0031 cm³ of brass at 8.5 g/cm³, about 0.10 % of the 3.19 cm³ that 49.14 gr of water fill.
+  - Case material: the only capacity claim found is a maker's statement, relayed by [Merrill 2017](../bibliography.md#merrill-2017), that a nickel-alloy 9 mm case with an aluminium head holds about 2 % more than brass (unverified). The `material` values of a case record have no nickel alloy.
 
 ## Sources
 

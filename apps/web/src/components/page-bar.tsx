@@ -15,6 +15,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import { tipEvents } from '../lib/theme.ts'
+import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
 /**
@@ -74,6 +75,14 @@ function useWholeText(box: HTMLElement | null) {
   return text
 }
 
+/** The panel's actions: the folded ones first, in their own box (globals.css). */
+const withFold = (fold: ReactNode, actions: ReactNode) => (
+  <>
+    {fold && <div className="page-bar-fold">{fold}</div>}
+    {actions}
+  </>
+)
+
 /**
  * The page's top bar: its only
  * `h1`, what follows the title (the open load, a record's badges), one status line and the page's
@@ -87,6 +96,7 @@ export function PageBar({
   after,
   status,
   actions,
+  fold,
   single = false,
   reserve = false,
   titleHidden = false,
@@ -99,6 +109,12 @@ export function PageBar({
   /** The status line's own content, such as a list's count. */
   status?: ReactNode
   actions?: ReactNode
+  /**
+   * Actions before `actions` that fold behind "Page actions" from 48em to 75em, where `actions`
+   * (Open, Save, Units) stay in the bar: a designer's Undo, Redo and New. From 75em and on a phone
+   * they are actions like the others. One instance at every width.
+   */
+  fold?: ReactNode
   /** One action only: below 75em it shows as itself in the bar, not behind "Page actions". */
   single?: boolean
   /**
@@ -129,6 +145,7 @@ export function PageBar({
   const root = useRef<HTMLDivElement>(null)
   const id = useId()
   const mounted = useMounted()
+  const endSlot = useBarEndSlot()
   // the phone panel closes on a press outside the bar and the menus and dialogs it opened
   useEffect(() => {
     if (!open) return
@@ -147,6 +164,7 @@ export function PageBar({
       className="page-bar"
       data-open={open || undefined}
       data-single={(actions && single) || undefined}
+      data-fold={(actions && fold && !single) || undefined}
       onKeyDown={(e) => {
         // not from a menu's portalled dropdown: that one closes itself
         if (e.key !== 'Escape' || !open || !e.currentTarget.contains(e.target as Node)) return
@@ -206,10 +224,17 @@ export function PageBar({
             onClick={(e) => {
               const t =
                 e.target instanceof Element ? e.target.closest('button, [role="menuitem"]') : null
-              if (open && t && !t.hasAttribute('aria-haspopup')) setOpen(false)
+              // an aria-disabled action does nothing: the panel stays, its tooltip says why
+              if (
+                open &&
+                t &&
+                !t.hasAttribute('aria-haspopup') &&
+                t.getAttribute('aria-disabled') !== 'true'
+              )
+                setOpen(false)
             }}
           >
-            <BarStatus value={statusLine}>{actions}</BarStatus>
+            <BarStatus value={statusLine}>{withFold(fold, actions)}</BarStatus>
           </div>
         </>
       )}
@@ -222,6 +247,8 @@ export function PageBar({
       )}
       {/* on every page from 75em; below it the top bar's icon button (site-header.tsx) */}
       <SafetyBarButton iconOnly={compact} className="page-bar-safety" />
+      {/* from 75em the top bar's Report, repository and theme buttons, after the actions as shown */}
+      <div ref={endSlot} className="page-bar-end" />
     </div>
   )
 }
