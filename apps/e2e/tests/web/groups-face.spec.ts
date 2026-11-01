@@ -395,7 +395,8 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
   await expect(page.getByRole('textbox', { name: 'Line 1 (mm)', exact: true })).toHaveValue('155.5')
   await expect(status(page)).toHaveText('Line 1 added.')
   // the popover closed: its message goes with it
-  await page.keyboard.press('Escape')
+  await page.getByRole('button', { name: 'Calibrate', exact: true }).click()
+  await expect(page.getByRole('textbox', { name: 'Known length (mm)', exact: true })).toBeHidden()
   await expect(status(page)).toHaveText('')
   // the face is chosen for scoring: no ring marks, no point of aim, the origin is the photo corner
   await scoreFace(page).selectOption('issf-10m-air-pistol')
