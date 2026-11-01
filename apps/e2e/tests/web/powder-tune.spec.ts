@@ -93,6 +93,45 @@ test('the Measurements tab opens the route with the load strings, and an added s
   }
 })
 
+// a cartridge chosen after the run: its record (groove, bore area Q) is held back, so the link waits
+// for it and shows once the record loads, or once its request fails (#966)
+for (const answer of ['loads', 'fails'] as const)
+  test(`the Measurements tab holds the tuning link while the cartridge record loads, and shows it once the record ${answer}`, async ({
+    page,
+  }) => {
+    await page.goto('/workbench')
+    await applyExampleLoad(page)
+    await runLine(page)
+    await page.getByRole('tab', { name: 'Measurements', exact: true }).click()
+    await page
+      .locator('input[type="file"]#measurements-file')
+      .setInputFiles({ name: 'day1.csv', mimeType: 'text/csv', buffer: Buffer.from(file) })
+    const link = page.getByRole('link', { name: 'Fit a powder from these strings' })
+    await expect(link).toBeVisible()
+
+    let release = () => {}
+    const held = new Promise<void>((done) => {
+      release = done
+    })
+    await page.route(/\/api\/cartridges\/300-win-mag\.json$/, async (route) => {
+      await held
+      await (answer === 'loads' ? route.continue() : route.fulfill({ status: 404 }))
+    })
+    await loadForm(page)
+      .getByRole('combobox', { name: 'Search cartridges by name' })
+      .fill('300 Win')
+    await page
+      .getByRole('option', { name: /^300 Win\. Mag\./ })
+      .first()
+      .click()
+    await expect(
+      page.getByText('Fit a powder from these strings: once the records of this load have loaded.'),
+    ).toBeVisible()
+    await expect(link).toHaveCount(0)
+    release()
+    await expect(link).toBeVisible()
+  })
+
 /**
  * Milliseconds from each of `moves` arrow key presses on the first hand-tuning slider to the
  * redraw of the curve, measured in the page; half the moves go right, then back left.
