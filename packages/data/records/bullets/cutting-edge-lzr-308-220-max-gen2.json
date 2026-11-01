@@ -17,6 +17,10 @@
     "value": 46.3,
     "raw": "1.823\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -54,6 +58,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .308, Grains 220, Minimum Required Twist *1-8\", Part Number LZR 308 220 MAX GEN2, G1 BC .646 (A.B.) / .645 (Oehler 89), G7 BC .332 (A.B.) / .323 (Oehler 89), OAL 1.823\", Bullet Projection 1.292\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

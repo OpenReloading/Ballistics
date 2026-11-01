@@ -17,6 +17,10 @@
     "value": 46.71,
     "raw": "1.839\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 8, Enhanced System Projectile (ESP): Caliber .338, Grains 225, Minimum Required Twist 1-9.5\", Part Number ESP D225 Raptor, G1 BC w/o tip .150, G1 BC w/tip .410, OAL w/o tip 1.420\", OAL w/tip 1.839\", Bullet Projection w/o tip .406\", Bullet Projection w/tip .825\", Blunt Trauma Base™ ~ Retained Weight (grains) 179"
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

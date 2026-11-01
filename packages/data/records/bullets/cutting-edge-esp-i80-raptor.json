@@ -17,6 +17,10 @@
     "value": 31.55,
     "raw": "1.242\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 8, Enhanced System Projectile (ESP): Caliber .257, Grains 80, Minimum Required Twist 1-9\", Part Number ESP I80 Raptor, G1 BC w/o tip .125, G1 BC w/tip .275, OAL w/o tip .949\", OAL w/tip 1.242\", Bullet Projection w/o tip .411\", Bullet Projection w/tip .704\", Blunt Trauma Base™ ~ Retained Weight (grains) 54"
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },
