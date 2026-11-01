@@ -4136,6 +4136,8 @@ main .library-head.page-panel-head > .page-panel-title {
      beside the burn-rate figure */
   .workbench .readouts > .readout-wide {
     grid-template-columns: max-content max-content minmax(0, 1fr);
+    /* the range never runs into the unit of the value ("40919 psi38368 bis 43679") */
+    column-gap: 0.5rem;
   }
 
   .workbench .readouts > .readout-wide dd.readout-note {
@@ -5792,12 +5794,21 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .panel-head:has(> .lot-field) > .search {
-    min-width: 4rem;
+    flex: 1 1 0;
+    /* narrower, axe cannot read the contrast of its placeholder */
+    min-width: 3.5rem;
   }
 
-  /* what the icon, the search's least width, the lot, the menu and the four gaps leave */
+  /* a longer title (German "Treibladungspulver") takes its room from the search first; the lot
+     keeps its width (narrower, axe cannot read the contrast of its empty field) and the menu
+     stays whole: the title ends in an ellipsis only after the search is at its least width */
+  .workbench .panel-head > .mantine-ActionIcon-root {
+    flex-shrink: 0;
+  }
+
   .workbench .panel-head:has(> .lot-field) > .panel-title {
-    max-width: calc(100% - 1.125rem - 4rem - 4.5rem - var(--field-height) - 4 * 0.375rem);
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -6797,6 +6808,13 @@ main .library-head.page-panel-head > .page-panel-title {
     padding: 0.3125rem 0.5rem 0.375rem;
     border: 1px solid var(--border);
     background: var(--bg);
+  }
+
+  /* the peak pressure's value keeps its width and 0.5 rem before the range, in any font: the
+     range and the share take what is left */
+  .workbench .readouts.readout-keys > .readout-wide {
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.5rem;
   }
 
   .workbench .readouts.readout-keys dt {
@@ -8360,6 +8378,12 @@ main .field-table tr.field-group > th {
   .report-chart {
     break-before: page;
     break-inside: avoid;
+  }
+
+  /* the sections the reader left out in the Print menu (print-sections.tsx) */
+  html[data-report-omit~="chart"] .report-chart,
+  .print-report .report-inputs[hidden] {
+    display: none;
   }
 
   .report-chart svg {

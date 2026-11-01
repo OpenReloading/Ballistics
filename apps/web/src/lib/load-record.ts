@@ -164,6 +164,8 @@ export interface LoadParts {
     | undefined
   /** The base form typed over the bullet record's. */
   bulletBase?: BaseType | undefined
+  /** The Powders tab's charge mode and filters, stored units; none while they are the defaults. */
+  powders?: Analysis['powders']
   /** The chronograph sessions of the Measurements tab, as references. */
   sessions: readonly string[]
   /** The lots as typed, and what the load was at each session. */
@@ -177,12 +179,14 @@ function analysisOf(
   overrides: Record<string, number>,
   ladder: LoadParts['ladder'],
   bulletBase: BaseType | undefined,
+  powders?: Analysis['powders'],
 ) {
   const typed = Object.keys(overrides).length > 0
-  if (!typed && !ladder && !bulletBase) return
+  if (!typed && !ladder && !bulletBase && !powders) return
   return {
     ...(typed && { overrides }),
     ...(bulletBase && { bulletBase }),
+    ...(powders && { powders }),
     ...(ladder && {
       ladder: {
         // the charge is the default kind and stays out
@@ -220,7 +224,7 @@ export function toLoad(p: LoadParts): Load {
     capacity: p.capacity,
     seating: p.seating && { by: p.seating.by, value: storedOf('length', p.seating.value) },
     note: p.notes || undefined,
-    analysis: analysisOf(overrides, ladder, p.bulletBase),
+    analysis: analysisOf(overrides, ladder, p.bulletBase, p.powders),
     sessions: p.sessions.length > 0 ? [...p.sessions] : undefined,
     powderLot: p.lots?.powder.trim() || undefined,
     primer: primerOf(p.primerRecord, p.lots),
@@ -273,6 +277,7 @@ export function toApiLoad(
     sessions: [],
     lots: undefined,
     snapshots: undefined,
+    powders: undefined,
   })
 }
 

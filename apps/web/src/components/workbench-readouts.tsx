@@ -1,7 +1,7 @@
 'use client'
 
 import { Popover, UnstyledButton } from '@mantine/core'
-import { freeRecoil } from '@open-reloading/core'
+import { type FreeRecoil, freeRecoil } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { memo, useEffect, useRef } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -17,6 +17,7 @@ import {
 import { translateMessage } from '../lib/core-messages.ts'
 import { limitShare, limitWithValue } from '../lib/limit-text.ts'
 import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
+import { momentumParts, momentumText, momentumUnit } from '../lib/momentum.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
 import { type RunnableLadderKind, seatingLengthName } from '../lib/seating-ladder.ts'
 import { niceTicks } from '../lib/ticks.ts'
@@ -209,6 +210,18 @@ export function peakFacts(
     .join(' ')
 }
 
+/** The print's pressure range: the corner-case range (`resultBand` of a print), named, with its unit. */
+const printedRange = (
+  range: { low: number; high: number },
+  system: UnitSystem,
+  t: Translator['t'],
+) =>
+  t('Corner-case range, input tolerances: {low} to {high} {unit}', {
+    low: formatQuantity('pressure', system, range.low),
+    high: formatQuantity('pressure', system, range.high),
+    unit: system.pressure.symbol,
+  })
+
 /** A value that is a phrase, not a number: smaller, so it stays on one line in a tile. */
 const readoutPhrase = 'readout-phrase'
 
@@ -255,6 +268,22 @@ const gasFactorNotes: Record<string, Message> = {
   'cartridge record without a CIP table': msg('cartridge record without a CIP table'),
 }
 
+/** The momentum of the free recoil, total, of the bullet and of the gas, in the unit of the page. */
+function momentumNote(
+  recoil: FreeRecoil,
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
+  const parts = momentumParts(recoil, ok.load.bullet.mass, ok.body.result.muzzleVelocity)
+  return t('Momentum {total} {unit} (bullet {bullet}, gas {gas})', {
+    total: momentumText(system, parts.total),
+    bullet: momentumText(system, parts.bullet),
+    gas: momentumText(system, parts.gas),
+    unit: momentumUnit(system).symbol,
+  })
+}
+
 /** The free recoil of the firearm, when its mass is known. */
 function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; system: UnitSystem }) {
   const { t } = useTranslation()
@@ -281,6 +310,7 @@ function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; syst
         '{summary}. Kinetic energy and velocity of the free firearm. Momentum of the bullet plus the powder gas (charge mass times {factor} times muzzle velocity); muzzle devices not counted.',
         { summary: recoilNote, factor: gasFactor },
       )
+  const momentum = momentumNote(recoil, ok, system, t)
   return (
     <div title={recoilTitle}>
       <dt>{t('Free recoil')}</dt>
@@ -288,6 +318,7 @@ function RecoilItem({ ok, system }: { ok: Extract<Outcome, { kind: 'ok' }>; syst
         {unit(formatNumber(system.energy.fromSi(recoil.energy), 1), system.energy.symbol)},{' '}
         {unit(formatNumber(system.velocity.fromSi(recoil.velocity), 2), system.velocity.symbol)}
       </dd>
+      <dd className="readout-note">{momentum}</dd>
       {readoutFact(recoilTitle)}
     </div>
   )
@@ -411,13 +442,20 @@ export function Readouts({
             {big(formatQuantity('pressure', system, range.nominalPressure), system.pressure.symbol)}
           </dd>
           <dd className="readout-note">
-            <span className="visually-hidden">
-              {band.sampled ? t('5th to 95th percentile') : t('range')}{' '}
-            </span>
-            {t('{low} to {high}', {
-              low: formatQuantity('pressure', system, band.pressure.low),
-              high: formatQuantity('pressure', system, band.pressure.high),
-            })}
+            {printed ? (
+              // the print has room for what the range is and its unit
+              printedRange(band.pressure, system, t)
+            ) : (
+              <>
+                <span className="visually-hidden">
+                  {band.sampled ? t('5th to 95th percentile') : t('range')}{' '}
+                </span>
+                {t('{low} to {high}', {
+                  low: formatQuantity('pressure', system, band.pressure.low),
+                  high: formatQuantity('pressure', system, band.pressure.high),
+                })}
+              </>
+            )}
           </dd>
           <dd className="readout-share">
             {ofMax ? limits : <span className="readout-phrase">{t('no comparable limit')}</span>}

@@ -21,8 +21,9 @@ import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { chartCopy } from './print-report.tsx'
 import { ResultNotes } from './result-notes.tsx'
+import { RunDownloads } from './run-downloads.tsx'
 import { ErrorNote, Loading } from './states.tsx'
-import { useInputEcho, useResult } from './workbench-context.ts'
+import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
 import { Checklist, shortFrame } from './workbench-inputs.tsx'
 import {
@@ -184,6 +185,14 @@ const ResultChart = memo(function ResultChart() {
       strip={strip}
       playKey={`${ok.id} ${ok.selected}`}
       z1={z1}
+      downloads={
+        <RunDownloads
+          body={ok.body}
+          charge={ok.load.charge}
+          mass={ok.load.bullet.mass}
+          system={system}
+        />
+      }
     />
   )
 })
@@ -510,6 +519,12 @@ function LadderBody() {
   )
 }
 
+/** The Powders tab, set afresh from what an opened load kept. */
+function PowdersPanel({ system }: { system: UnitSystem }) {
+  const { powderTab } = useLoad()
+  return <PowderCompare key={powderTab.key} system={system} />
+}
+
 /** The panels of the result tabs. */
 function ResultPanels({ short }: { short: boolean }) {
   const { t } = useTranslation()
@@ -576,7 +591,7 @@ function ResultPanels({ short }: { short: boolean }) {
         {/* not in the report: no print heading either */}
         {!ok
           ? notRun(msg('Run the simulation to see the powder comparison.'), t)
-          : opened('powders') && <PowderCompare system={system} />}
+          : opened('powders') && <PowdersPanel system={system} />}
       </Tabs.Panel>
       <Tabs.Panel value="notes">
         {heading('notes', t)}

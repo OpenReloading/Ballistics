@@ -186,6 +186,7 @@ import { useBulletValues } from './use-bullet-values.ts'
 import { useCommit } from './use-commit.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
+import { usePowderTab } from './use-powder-tab.ts'
 import { useSpecValues } from './use-spec-values.ts'
 import type { LoadNotesState } from './workbench-context.ts'
 import {
@@ -1490,6 +1491,7 @@ export function useWorkbenchState() {
   const gunPending = useRef(false)
   /** Counts the opened loads: the same firearm chosen again is no change of `firearm`. */
   const [opens, setOpens] = useState(0)
+  const powderTab = usePowderTab()
   /** The name the user typed; undefined: the generated name follows the load. */
   const [customName, setCustomName] = useState<string>()
   const [figureView, setFigureView] = useState<FigureView>('cartridge')
@@ -2036,6 +2038,7 @@ export function useWorkbenchState() {
 
   function reset() {
     setCustomName(undefined)
+    powderTab.open(undefined)
     setAsked({})
     setDropped([])
     setLinked({})
@@ -3149,6 +3152,7 @@ export function useWorkbenchState() {
     setLots(lotsFrom(d))
     setSnapshots(d.snapshots ?? [])
     openSessions(sessions)
+    powderTab.open(d.analysis?.powders)
   }
 
   /** The powder of an opened load: a catalogue record is chosen, a design of this browser is read. */
@@ -3507,6 +3511,7 @@ export function useWorkbenchState() {
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
     bulletBase: savedBaseType,
     sessions: sessionRefs,
+    powders: powderTab.saved,
   }
   const loadFile = toLoad(loadParts)
   // the file for the API: every value of the moment typed, the catalogue records only
@@ -3627,6 +3632,7 @@ export function useWorkbenchState() {
   })
 
   return {
+    powderTab,
     allDiameters,
     bc,
     bulletNow,
