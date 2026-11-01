@@ -36,6 +36,7 @@
 . CurveWarning
 . DispersionInput
 . DispersionResult
+. DownrangeReading
 . DragInput
 . DragInterpolation
 . DragModel
@@ -329,6 +330,7 @@
 . missingLoadKeys
 . momentSlopeFromStability
 . movingTargetLead
+. muzzleVelocityFromDownrange
 . normalGravity
 . outlineDragMach
 . outsideDomain
