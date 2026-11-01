@@ -151,6 +151,7 @@ test('a changed field goes back to the record value by its own button, and the r
   await expect(back).toHaveCount(1)
   await back.click()
   await expect(diameter).toHaveValue(record)
+  await expect(diameter).toBeFocused()
   await expect(back).toHaveCount(0)
   // the whole-record reset stays in the toolbar
   await expect(
