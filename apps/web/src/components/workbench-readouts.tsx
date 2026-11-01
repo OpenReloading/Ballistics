@@ -197,6 +197,18 @@ export function peakFacts(
     .join(' ')
 }
 
+/** The print's pressure range: the corner-case range (`resultBand` of a print), named, with its unit. */
+const printedRange = (
+  range: { low: number; high: number },
+  system: UnitSystem,
+  t: Translator['t'],
+) =>
+  t('Corner-case range, input tolerances: {low} to {high} {unit}', {
+    low: formatQuantity('pressure', system, range.low),
+    high: formatQuantity('pressure', system, range.high),
+    unit: system.pressure.symbol,
+  })
+
 /** A value that is a phrase, not a number: smaller, so it stays on one line in a tile. */
 const readoutPhrase = 'readout-phrase'
 
@@ -407,13 +419,20 @@ export function Readouts({
             {big(formatQuantity('pressure', system, range.nominalPressure), system.pressure.symbol)}
           </dd>
           <dd className="readout-note">
-            <span className="visually-hidden">
-              {band.sampled ? t('5th to 95th percentile') : t('range')}{' '}
-            </span>
-            {t('{low} to {high}', {
-              low: formatQuantity('pressure', system, band.pressure.low),
-              high: formatQuantity('pressure', system, band.pressure.high),
-            })}
+            {printed ? (
+              // the print has room for what the range is and its unit
+              printedRange(band.pressure, system, t)
+            ) : (
+              <>
+                <span className="visually-hidden">
+                  {band.sampled ? t('5th to 95th percentile') : t('range')}{' '}
+                </span>
+                {t('{low} to {high}', {
+                  low: formatQuantity('pressure', system, band.pressure.low),
+                  high: formatQuantity('pressure', system, band.pressure.high),
+                })}
+              </>
+            )}
           </dd>
           <dd className="readout-share">
             {ofMax ? limits : <span className="readout-phrase">{t('no comparable limit')}</span>}

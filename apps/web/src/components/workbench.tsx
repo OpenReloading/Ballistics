@@ -31,6 +31,7 @@ import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { loadFitMark } from '../lib/powder-record.ts'
+import { printedField, printedValue } from '../lib/print-format.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -106,14 +107,14 @@ function seatingRow(
     return [
       name,
       k === (ok?.ladder.seatingBy ?? 'overallLength')
-        ? t('{value}, set', { value: shownLength('diameter', system, stepSeating.value) })
+        ? t('{value}, set', { value: printedValue('length', system, stepSeating.value) })
         : undefined,
     ]
   const v = runSeated?.[k]
   // a seated bullet without a base-to-ogive prints why CBTO is missing
   if (v === undefined)
     return [name, runSeated?.mode ? t('needs the bullet base-to-ogive') : undefined]
-  const value = shownLength('diameter', system, v)
+  const value = printedValue('length', system, v)
   if (!runSeated?.mode) return [name, value]
   return [
     name,
@@ -143,7 +144,10 @@ function approximateNote(ok: OkOutcome | undefined, t: Translate) {
 /** A field as the print shows it: its label and its value with the unit; none while empty. */
 function printRow(load: Load, key: string, t: Translate): [string, string | undefined] {
   const spec = interiorFields.find((f) => f.key === key)
-  return [spec ? specText(t, spec.label) : key, spec && load.shown(key, spec.quantity)]
+  return [
+    spec ? specText(t, spec.label) : key,
+    spec && printedField(spec.quantity, load.system, load.fields[key]),
+  ]
 }
 
 function cartridgePrintRows(
@@ -176,16 +180,18 @@ function cartridgePrintRows(
         : undefined,
     ],
     ...seatingRows,
-    [t('Seating depth'), depth === undefined ? undefined : shownLength('diameter', system, depth)],
+    [t('Seating depth'), depth === undefined ? undefined : printedValue('length', system, depth)],
   ] as PrintRows
 }
 
 function bulletPrintRows(load: Load, t: Translate): PrintRows {
-  const { bulletLabel, bulletDesign, bulletValues, siLength, bc } = load
+  const { bulletLabel, bulletDesign, bulletValues, bc, system } = load
+  const length = (si: number | undefined) =>
+    si === undefined ? undefined : printedValue('length', system, si)
   return [
     [t('Bullet'), bulletLabel ?? bulletDesign?.name],
-    [t('Diameter'), siLength(bulletValues.bulletDiameter)],
-    [t('Length'), siLength(bulletValues.bulletLength)],
+    [t('Diameter'), length(bulletValues.bulletDiameter)],
+    [t('Length'), length(bulletValues.bulletLength)],
     [t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
     printRow(load, 'bulletMass', t),
   ]
@@ -350,6 +356,12 @@ function ReportAfter({
   )
 }
 
+/** The print's result title of the main step: its charge, or the seating or temperature a ladder of those varies. */
+const mainResultTitle = (ok: OkOutcome, value: string, t: Translate) =>
+  singleCharge(ok)
+    ? t('Result, {value}', { value: t('{label} main', { label: value }) })
+    : t('Result, main charge: {value}', { value })
+
 /** The workbench's print view: the load, its inputs, the result, the warnings and what follows. */
 function Report(props: ReportProps) {
   const { ok, chartSlot, steps, loadTitle, stale, fromDesign, approximate, printGroups } = props
@@ -383,10 +395,12 @@ function Report(props: ReportProps) {
       </div>
       <h2>
         {steps.length > 1 && shownStep
-          ? t('Result, step {step}: {value}', {
-              step: selectedLabel(ok),
-              value: stepValue(shownStep),
-            })
+          ? selectedLabel(ok) === '0'
+            ? mainResultTitle(ok, stepValue(shownStep), t)
+            : t('Result, step {step}: {value}', {
+                step: selectedLabel(ok),
+                value: stepValue(shownStep),
+              })
           : t('Result')}
       </h2>
       <Readouts ok={ok} system={system} stale={false} printed />
@@ -453,7 +467,7 @@ function sheetSteps(
     charge: stepValue(s),
     pressure:
       s.at &&
-      `${withUnit('pressure', system, s.at.body.pressureRange.nominalPressure)} (${formatQuantity('pressure', system, s.at.body.pressureRange.lowPressure)} to ${withUnit('pressure', system, s.at.body.pressureRange.highPressure)})`,
+      `${withUnit('pressure', system, s.at.body.pressureRange.nominalPressure)} (${withUnit('pressure', system, s.at.body.pressureRange.lowPressure)} to ${withUnit('pressure', system, s.at.body.pressureRange.highPressure)})`,
     ofMax: s.d?.ofMax && `${formatNumber(s.d.ofMax.percent, 0)} %`,
     velocity: s.at && velocity(s.at.body.result),
     energy: s.at && withUnit('energy', system, s.at.body.result.muzzleEnergy),

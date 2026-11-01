@@ -82,7 +82,7 @@ export function LoadSheets({
               <th scope="col">{stepName}</th>
               {simulated && (
                 <>
-                  <th scope="col">{t('Peak pressure, simulated (range)')}</th>
+                  <th scope="col">{t('Peak pressure, simulated (corner-case range)')}</th>
                   <th scope="col">{t('Of max.')}</th>
                   <th scope="col">{t('Velocity, simulated')}</th>
                   <th scope="col">{t('Flag')}</th>
@@ -127,9 +127,11 @@ export function LoadSheets({
       {steps.map((s) => (
         <section key={s.n} className="load-sheet step">
           <h1>
-            {s.label === '0'
-              ? t('Step {label}, main: {value}', { label: s.label, value: s.charge })
-              : t('Step {label}: {value}', { label: s.label, value: s.charge })}
+            {s.label !== '0'
+              ? t('Step {label}: {value}', { label: s.label, value: s.charge })
+              : by
+                ? t('{label} main', { label: s.charge })
+                : t('Main charge: {value}', { value: s.charge })}
           </h1>
           <p className="sheet-sub">{title}</p>
           {table}
