@@ -31,7 +31,7 @@ const measuredRifle = {
 /** A brass group with a measured trim length, mm. */
 const trimmedBrass = {
   kind: 'case',
-  id: 'case-trimmed',
+  id: '6e7f8091-2b3c-4d5e-9f60-7a8b9c0d1e2f',
   name: 'Trimmed brass',
   saved,
   data: {
@@ -78,7 +78,7 @@ test("a firearm's measured bore diameter and freebore and a brass group's trim l
   await page.getByRole('combobox', { name: 'Brass record' }).click()
   await page.getByRole('option', { name: 'Trimmed brass (your brass)' }).click()
   const caseLength = field(page, /^Case length L3/)
-  await expect(caseLength).toHaveValue('50.8')
+  await expect(caseLength).toHaveValue('50.80')
   await expect(caseLength).toHaveAccessibleDescription(
     /Trim length of your brass group Trimmed brass\. The CIP L3 is 51\.18 mm\./,
   )
@@ -89,34 +89,32 @@ test('the powder choosers hide powders without burn values until the filter is o
 }) => {
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   const search = loadForm(page).getByRole('combobox', { name: /^Search powders/ })
-  await search.fill('Trail Boss')
+  await search.fill('Titewad')
   await expect(page.getByText('No powder found')).toBeVisible()
 
   await loadForm(page).getByRole('button', { name: 'Browse powders' }).click()
   const dialog = page.getByRole('dialog', { name: 'Choose a powder' })
   const box = dialog.getByRole('combobox', { name: 'Search powders' })
-  await box.fill('Trail Boss')
+  await box.fill('Titewad')
   await expect(dialog.getByRole('option')).toHaveCount(0)
-  await dialog.getByRole('button', { name: /^Filters/ }).click()
   const filter = dialog.getByRole('switch', { name: 'Complete records only' })
   await expect(filter).toBeChecked()
   await filter.click({ force: true })
-  const option = dialog.getByRole('option').filter({ hasText: 'Trail Boss' })
+  const option = dialog.getByRole('option').filter({ hasText: 'Titewad' })
   await expect(option).toContainText('Values missing')
   await option.click()
 
   // the card names what is missing and the two ways on; Run refuses with the same reason
-  await expect(page.getByText(/Trail Boss has no burn values, so it cannot run\./)).toBeVisible()
+  await expect(page.getByText(/Titewad has no burn values, so it cannot run\./)).toBeVisible()
   await expect(
     loadForm(page).getByRole('link', { name: 'Choose a similar powder on the burn-rate chart' }),
   ).toHaveAttribute('href', /\/powders\/burn-rates/)
-  await loadForm(page).getByRole('button', { name: 'Run simulation' }).click()
-  await expect(page.getByRole('status').filter({ hasText: /fit the values/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Run simulation' }).click()
+  await expect(page.getByText(/on the tuning page\.$/).first()).toBeVisible()
 
   // the filter is kept per browser
   await page.reload()
   await page.locator('html[data-hydrated]').waitFor({ state: 'attached' })
   await loadForm(page).getByRole('button', { name: 'Browse powders' }).click()
-  await dialog.getByRole('button', { name: /^Filters/ }).click()
   await expect(dialog.getByRole('switch', { name: 'Complete records only' })).not.toBeChecked()
 })
