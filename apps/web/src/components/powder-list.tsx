@@ -12,6 +12,7 @@ import {
   overlayHref,
   type PowderRow,
   rateDomain,
+  unfitTitles,
   vivacityUnit,
 } from '../lib/burn-rate.ts'
 import { listTitles } from '../lib/list-titles.ts'
@@ -46,6 +47,14 @@ import { DeleteRow, SourceFilter, sourceColumn, useUserRecords } from './list-so
 import { BarCount, PageBar } from './page-bar.tsx'
 import { RateBar, RateTicks, scaleWidth } from './rate-scale.tsx'
 import { EmptyList } from './states.tsx'
+
+/** The Training rows column's help: the column, then the burn-rate page's sentence for a powder without fitted parameters. */
+export const trainingRowsHelp = [
+  msg(
+    'Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
+  ),
+  unfitTitles.none,
+] as const
 
 const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2))
 
@@ -133,9 +142,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     {
       key: 'rows',
       label: msg('Training rows'),
-      help: msg(
-        'Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating. Empty without fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.',
-      ),
+      help: trainingRowsHelp,
       width: '13rem',
       num: true,
       value: (r) => r.trainingRows,
