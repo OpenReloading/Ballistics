@@ -21,6 +21,10 @@
     "value": 18.25,
     "raw": "Nose length including tip is .7184″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -50,6 +54,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/277-cal-122gr-hammer-hht/: Minimum required twist is 1-10″ or faster | Bullet length including tip is 1.295″ | Nose length including tip is .7184″ | Tip length is .143″ | Bullet weight is 122gr | Recommended use: Big Game Hunting | g7-bc= .216 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

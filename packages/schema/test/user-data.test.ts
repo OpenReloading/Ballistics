@@ -515,13 +515,13 @@ describe('a record of the earlier load format', () => {
 })
 
 describe('withoutUnknownKinds', () => {
-  const event = { kind: 'event', id: 'e1', name: 'Club match', saved, data: {} }
+  const event = { kind: 'logEntry', id: 'e1', name: 'Range day', saved, data: {} }
 
   it('leaves out the records of an unknown kind and counts them by kind', () => {
     const json = file([event, loadRecord, { ...event, id: 'e2' }])
     const { json: known, skipped } = withoutUnknownKinds(json)
     expect(userDataFile.parse(known).records).toEqual([loadRecord])
-    expect(skipped).toEqual([{ kind: 'event', count: 2 }])
+    expect(skipped).toEqual([{ kind: 'logEntry', count: 2 }])
     expect(json.records).toHaveLength(3)
   })
 
@@ -534,6 +534,104 @@ describe('withoutUnknownKinds', () => {
     ])
     expect(withoutUnknownKinds(json)).toEqual({ json, skipped: [] })
     expect(withoutUnknownKinds('text')).toEqual({ json: 'text', skipped: [] })
+  })
+})
+
+describe('competition event', () => {
+  const eventId = '00000000-0000-4000-8000-0000000000e1'
+  const sheet = `user:${uuid}`
+  const ringEvent = {
+    kind: 'event',
+    id: eventId,
+    name: 'Landesmeisterschaft 25 m',
+    saved,
+    data: {
+      date: '2026-06-14',
+      place: 'Hannover',
+      eventType: 'catalogue:dsb-meisterschaft',
+      level: 'Landesmeisterschaft',
+      discipline: 'catalogue:dsb-25m-sportpistole',
+      firearm: `user:${other}`,
+      state: 'completed',
+      results: {
+        method: 'rings',
+        series: [{ shots: [10, 9, 10, 8, 9], targetSheet: sheet }, { total: 47 }],
+      },
+    },
+  } as const
+  const practicalEvent = {
+    ...ringEvent,
+    id: '00000000-0000-4000-8000-0000000000e2',
+    name: 'Club match',
+    data: {
+      date: '2026-07-04',
+      eventType: 'catalogue:ipsc-handgun',
+      level: 'Level I',
+      division: 'Production',
+      rounds: 96,
+      state: 'disqualified',
+      results: {
+        method: 'hit-factor',
+        stages: [
+          {
+            name: 'Stage 1',
+            hits: { A: 10, C: 4, D: 1, metal: 2 },
+            misses: 1,
+            noShoots: 0,
+            procedurals: 1,
+            time: 12.5,
+            powerFactor: 'minor',
+            stagePoints: 88.1234,
+          },
+        ],
+      },
+    },
+  } as const
+
+  it('opens a file with a ring and a practical event', () => {
+    const parsed = userDataFile.parse(file([ringEvent, practicalEvent]))
+    expect(parsed.records.map((r) => r.kind)).toEqual(['event', 'event'])
+    expect(withoutUnknownKinds(file([ringEvent])).skipped).toEqual([])
+  })
+
+  it('is skipped and reported by a reader that does not know the kind (#700)', () => {
+    // a reader of an earlier version: the event kind renamed to one this version does not know
+    const later = { ...ringEvent, kind: 'eventOfALaterVersion' }
+    const { json, skipped } = withoutUnknownKinds(file([later, loadRecord]))
+    expect(skipped).toEqual([{ kind: 'eventOfALaterVersion', count: 1 }])
+    expect(userDataFile.parse(json).records).toEqual([loadRecord])
+  })
+
+  it('needs a UUID id, a catalogue event type and a series with shots or a total', () => {
+    expect(userRecord.safeParse({ ...ringEvent, id: 'e1' }).success).toBe(false)
+    const userType = { ...ringEvent.data, eventType: `user:${uuid}` }
+    expect(userRecord.safeParse({ ...ringEvent, data: userType }).success).toBe(false)
+    const empty = { ...ringEvent.data, results: { method: 'rings', series: [{}] } }
+    expect(userRecord.safeParse({ ...ringEvent, data: empty }).success).toBe(false)
+    const state = { ...ringEvent.data, state: 'da' }
+    expect(userRecord.safeParse({ ...ringEvent, data: state }).success).toBe(false)
+  })
+
+  it('takes ring values in tenths only and a total that agrees with the shots', () => {
+    const withSeries = (series: unknown[]) => ({
+      ...ringEvent,
+      data: { ...ringEvent.data, results: { method: 'rings', series } },
+    })
+    expect(userRecord.safeParse(withSeries([{ shots: [10.4, 9.9], total: 20.3 }])).success).toBe(
+      true,
+    )
+    expect(userRecord.safeParse(withSeries([{ shots: [9.95] }])).success).toBe(false)
+    expect(userRecord.safeParse(withSeries([{ total: 95.55 }])).success).toBe(false)
+    expect(userRecord.safeParse(withSeries([{ shots: [10, 9], total: 20 }])).success).toBe(false)
+  })
+
+  it('reports a firearm, load or target sheet it names that the file does not hold', () => {
+    const r = userRecord.parse(ringEvent)
+    expect(checkUserRefs([r]).map((d) => d.field)).toEqual([
+      'firearm',
+      'results.series.0.targetSheet',
+    ])
+    expect(userRefFields(r)).toEqual(['firearm', 'results.series.0.targetSheet'])
   })
 })
 

@@ -17,6 +17,10 @@
     "value": 17.78,
     "raw": "Bullet length is .7″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -44,6 +48,13 @@
         "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "https://hammerbullets.com/product/204-cal-39gr-hammer-hunter/: Recommended minimum twist rate is 9.5″ | Bullet length is .7″ | Bullet weight is 39gr | Recommended use: Varmint and small game hunting | g7-bc= .112 estimated | g1-bc= .234 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

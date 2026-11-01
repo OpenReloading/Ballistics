@@ -16,6 +16,18 @@
     "value": 18.64,
     "raw": "Bullet OAL .734 +/-"
   },
+  "construction": {
+    "raw": "cast lead bullets",
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 18,
+        "raw": "Brinell 18"
+      }
+    },
+    "gasCheck": false
+  },
   "note": "Listed as 180 Grain WFN Flat-Base. Brinell 18. .357 Magnum. For Maximum Energy.",
   "provenance": {
     "kind": "published",
@@ -25,8 +37,20 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length"],
+        "fields": ["diameter", "mass", "length", "construction.core.hardness"],
         "note": "358180WFN, .357 Pugnose (https://missouribullet.com/details.php?prodId=201): .358 Diameter, 180 Grain WFN Flat-Base, Brinell 18, Bullet OAL .734 +/-"
+      },
+      {
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": [
+          "construction.raw",
+          "construction.structure",
+          "construction.core",
+          "construction.gasCheck"
+        ],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }

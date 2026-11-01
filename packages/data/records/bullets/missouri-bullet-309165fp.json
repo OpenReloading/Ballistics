@@ -16,6 +16,18 @@
     "value": 23.52,
     "raw": "Bullet OAL .926 +/-"
   },
+  "construction": {
+    "raw": "cast lead bullets",
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 18,
+        "raw": "Brinell 18"
+      }
+    },
+    "gasCheck": false
+  },
   "note": "Listed as 165 Grain RNFP. Brinell 18. For .30-.30 Lever Guns.",
   "provenance": {
     "kind": "published",
@@ -25,8 +37,20 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length"],
+        "fields": ["diameter", "mass", "length", "construction.core.hardness"],
         "note": "309165FP, #1 Whitetail (https://missouribullet.com/details.php?prodId=102): .309 Diameter, 165 Grain RNFP, Brinell 18, Bullet OAL .926 +/-"
+      },
+      {
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": [
+          "construction.raw",
+          "construction.structure",
+          "construction.core",
+          "construction.gasCheck"
+        ],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }

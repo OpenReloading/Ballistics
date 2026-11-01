@@ -15,7 +15,7 @@
   },
   "construction": {
     "raw": "Copper",
-    "unmapped": true
+    "structure": "monolithic"
   },
   "ballisticCoefficients": [
     {
@@ -43,7 +43,7 @@
       {
         "source": "mapping-of-the-maker-wording-to-construction-fields",
         "kind": "derived",
-        "fields": ["construction.unmapped"]
+        "fields": ["construction.structure"]
       }
     ]
   }
