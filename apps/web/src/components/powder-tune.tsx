@@ -711,9 +711,11 @@ export function PowderTune() {
   useEffect(() => {
     if (!load) return
     const aborts = new AbortController()
-    tuneTable(load, aborts.signal).then((t) => {
-      if (!aborts.signal.aborted) setTable(t)
-    })
+    tuneTable(load, aborts.signal)
+      .then((t) => {
+        if (!aborts.signal.aborted) setTable(t)
+      })
+      .catch(() => {})
     return () => aborts.abort()
   }, [load])
 
