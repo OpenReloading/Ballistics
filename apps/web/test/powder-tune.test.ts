@@ -8,6 +8,7 @@ import {
   parseVelocities,
   revolverLeakNote,
   sessionStrings,
+  tuneDetail,
   tuneHeld,
   tuneHref,
   tuneSessionIds,
@@ -242,5 +243,19 @@ describe('tuneHeld', () => {
     expect(tuneHeld({ bullet: { id: 'user:b1' }, powder: { id: 'p', failed: true } })).toBe(true)
     // every record loaded: the link hands over the load
     expect(tuneHeld({})).toBe(false)
+  })
+})
+
+describe('tuneDetail', () => {
+  it('holds the tuning link while the cartridge detail record loads, not after it loads or fails (#966)', () => {
+    // the detail request of cartridge c1 pending: no record yet, or the one of the cartridge before
+    expect(tuneHeld({ detail: tuneDetail('c1', undefined, undefined) })).toBe(true)
+    expect(tuneHeld({ detail: tuneDetail('c1', 'c0', 'c0') })).toBe(true)
+    // loaded
+    expect(tuneHeld({ detail: tuneDetail('c1', 'c1', undefined) })).toBe(false)
+    // failed (offline, 404): a hold would never end
+    expect(tuneHeld({ detail: tuneDetail('c1', undefined, 'c1') })).toBe(false)
+    // no cartridge chosen
+    expect(tuneHeld({ detail: tuneDetail(undefined, undefined, undefined) })).toBe(false)
   })
 })

@@ -116,7 +116,7 @@ import { nth } from '../lib/nth.ts'
 import { powderValues, recordFill } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
-import { tuneHeld, writeTuneLoad } from '../lib/powder-tune.ts'
+import { tuneDetail, tuneHeld, writeTuneLoad } from '../lib/powder-tune.ts'
 import {
   droppedIds,
   linkedId,
@@ -1363,6 +1363,8 @@ export function useWorkbenchState() {
   /** Groove diameter Z of the chosen cartridge, mm, for the bore resistance of a fitted powder. */
   /** The chosen cartridge's record: its groove diameter and the values the figure draws. */
   const [groove, setGroove] = useState<Groove | undefined>(undefined)
+  /** The cartridge id whose record request failed (offline, not found): the tuning link stops waiting for it. */
+  const [grooveFailed, setGrooveFailed] = useState<string | undefined>(undefined)
   const { grooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
   const [allDiameters, setAllDiameters] = useState(false)
   /** The browser's bullet designs that have a mass, resolved against the catalogue. */
@@ -2578,17 +2580,14 @@ export function useWorkbenchState() {
     const id = cartridge?.id
     if (!id) return
     const controller = new AbortController()
+    setGrooveFailed(undefined)
     fetchRecord<CartridgeDetail>('cartridges', id, controller.signal)
-      .then(
-        (c) =>
-          c &&
-          setGroove({
-            id,
-            z: cartridgeGrooveDiameterMm(c),
-            record: c,
-          }),
+      .then((c) =>
+        c ? setGroove({ id, z: cartridgeGrooveDiameterMm(c), record: c }) : setGrooveFailed(id),
       )
-      .catch(() => {})
+      .catch(() => {
+        if (!controller.signal.aborted) setGrooveFailed(id)
+      })
     return () => controller.abort()
   }, [cartridge?.id])
 
@@ -3625,7 +3624,7 @@ export function useWorkbenchState() {
     loadNotes,
     sessionRefCount: sessionRefs.length,
     handOffTune,
-    tuneHeld: tuneHeld(asked),
+    tuneHeld: tuneHeld({ ...asked, detail: tuneDetail(cartridge?.id, groove?.id, grooveFailed) }),
     setSeen,
     setStepsDraft,
     setTab,
