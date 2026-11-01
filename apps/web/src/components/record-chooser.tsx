@@ -285,27 +285,25 @@ function Results<R extends ChooserRow>({
   )
 }
 
-/**
- * The record picker of a workbench card as a dialog, for one record `kind`: a search box over the
- * whole catalogue and the browser's own designs, filters, a result list and a preview of the
- * highlighted record. The search box keeps the focus: arrow keys highlight, Enter or a click
- * chooses. `filters` and `chips` hold a kind's own filters, which `kind.search` reads; `count` is
- * how many of them are set. `catalogue` gives the rows of a kind without `load`, such as the
- * user's firearms.
- */
-export function RecordChooser<R extends ChooserRow>({
-  kind,
-  opened,
-  onClose,
-  text,
-  designs,
-  system,
-  onChoose,
-  filters,
-  count = 0,
-  chips,
-  catalogue: given,
-}: {
+/** The highlighted row and the list it was chosen in: another list highlights its first row. */
+export interface Highlight {
+  list: string
+  index: number
+}
+
+/** A key of a result list: the same list, found again, keeps its highlight. */
+export const listKey = (rows: readonly ChooserRow[]) => `${rows.length}:${rows[0]?.id}`
+
+/** The row of the list `list` the highlight is on: its first row when the highlight was set in another list. */
+export const highlighted = (h: Highlight, list: string) => (h.list === list ? h.index : 0)
+
+/** The highlight moved `by` rows within a list of `length` shown rows. */
+export function moveHighlight(h: Highlight, list: string, length: number, by: number): Highlight {
+  if (length === 0) return h
+  return { list, index: Math.max(0, Math.min(length - 1, highlighted(h, list) + by)) }
+}
+
+interface ChooserProps<R extends ChooserRow> {
   kind: ChooserKind<R>
   opened: boolean
   onClose: () => void
@@ -319,58 +317,92 @@ export function RecordChooser<R extends ChooserRow>({
   count?: number
   chips?: ReactNode
   catalogue?: readonly R[]
-}) {
+}
+
+/**
+ * The record picker of a workbench card as a dialog, for one record `kind`: a search box over the
+ * whole catalogue and the browser's own designs, filters, a result list and a preview of the
+ * highlighted record. The search box keeps the focus: arrow keys highlight, Enter or a click
+ * chooses. `filters` and `chips` hold a kind's own filters, which `kind.search` reads; `count` is
+ * how many of them are set. `catalogue` gives the rows of a kind without `load`, such as the
+ * user's firearms.
+ */
+export function RecordChooser<R extends ChooserRow>(props: ChooserProps<R>) {
+  const { kind, opened, onClose, catalogue: given } = props
   const { t } = useTranslation()
-  const { texts } = kind
   const read = useCatalogue(opened, kind.load)
   const state = useMemo<Catalogue<R>>(
     () => (given ? { status: 'ok', rows: given } : read.state),
     [given, read.state],
   )
   const phone = useMediaQuery('(max-width: 47.99em)')
-  const [query, setQuery] = useState('')
+  // each opening mounts a new body, which starts from the card's text and no filter in its first render
+  const [opening, setOpening] = useState({ opened, count: 0 })
+  if (opening.opened !== opened) setOpening({ opened, count: opening.count + (opened ? 1 : 0) })
+  return (
+    <AppModal
+      opened={opened}
+      onClose={onClose}
+      title={t(kind.texts.title)}
+      size="64rem"
+      fullScreen={phone}
+      className="bd-modal"
+      closeButton={{ 'aria-label': t(kind.texts.close) }}
+    >
+      <ChooserBody key={opening.count} {...props} state={state} retry={read.retry} phone={phone} />
+    </AppModal>
+  )
+}
+
+function ChooserBody<R extends ChooserRow>({
+  kind,
+  text,
+  designs,
+  system,
+  onChoose,
+  filters,
+  count = 0,
+  chips,
+  state,
+  retry,
+  phone,
+}: ChooserProps<R> & { state: Catalogue<R>; retry: () => void; phone: boolean | undefined }) {
+  const { t } = useTranslation()
+  const { texts } = kind
+  const [query, setQuery] = useState(text)
   const [picked, setPicked] = useState<readonly string[]>([])
   const [origin, setOrigin] = useState<'all' | 'catalogue' | 'designs'>('all')
   const [sort, setSort] = useState(kind.sorts[0]?.value ?? '')
-  const [active, setActive] = useState(0)
+  const [highlight, setHighlight] = useState<Highlight>({ list: '', index: 0 })
   const [filtersOpen, setFiltersOpen] = useState(false)
   const id = useId()
   const searchBox = useRef<HTMLInputElement>(null)
 
-  // each opening starts from the card's text and no filter
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on opening only
-  useEffect(() => {
-    if (!opened) return
-    setQuery(text)
-    setPicked([])
-    setOrigin('all')
-    setSort(kind.sorts[0]?.value ?? '')
-    setFiltersOpen(false)
-  }, [opened])
-
   const catalogue = state.status === 'ok' ? state.rows : []
   const rows = useMemo<R[]>(() => [...designs, ...catalogue], [designs, catalogue])
+  const kept = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          (origin === 'all' || (origin === 'designs') === (r.origin === 'user')) &&
+          kind.selects.every((s, i) => !picked[i] || s.keep(r, picked[i])),
+      ),
+    [rows, picked, origin, kind],
+  )
   const typed = useDeferredValue(query)
-  const results = useMemo(() => {
-    const kept = rows.filter(
-      (r) =>
-        (origin === 'all' || (origin === 'designs') === (r.origin === 'user')) &&
-        kind.selects.every((s, i) => !picked[i] || s.keep(r, picked[i])),
-    )
-    return kind.search(kept, typed, sort)
-  }, [rows, typed, picked, origin, kind, sort])
+  const results = useMemo(() => kind.search(kept, typed, sort), [kept, typed, kind, sort])
   // after a failed read only the error shows, so no listbox or highlight is left behind
-  const shown = state.status === 'error' ? [] : results.slice(0, shownRows)
-  // another list highlights its first row; the same list, found again, keeps the highlight
-  const listKey = `${results.length}:${results[0]?.id}`
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the list
-  useEffect(() => setActive(0), [listKey])
+  const shownOf = (found: R[]) => (state.status === 'error' ? [] : found.slice(0, shownRows))
+  const shown = shownOf(results)
+  // the highlight belongs to the list it was set in, so a new list never takes back a later key press
+  const list = listKey(results)
+  const active = highlighted(highlight, list)
   const current = shown[Math.min(active, shown.length - 1)]
   const optionId = (i: number) => `${id}-option-${i}`
   useEffect(() => {
-    if (opened && current)
+    if (current)
       document.getElementById(`${id}-option-${active}`)?.scrollIntoView({ block: 'nearest' })
-  }, [active, opened, current, id])
+  }, [active, current, id])
 
   const options = useMemo(
     () => kind.selects.map((s) => s.options(catalogue, rows, t)),
@@ -379,119 +411,120 @@ export function RecordChooser<R extends ChooserRow>({
   const filterCount = picked.filter(Boolean).length + count + (origin === 'all' ? 0 : 1)
   const message = statusMessage(state, texts, results.length, rows.length, t)
 
+  // the keys act on the list of the text in the box, also before that list has rendered
+  function keyList() {
+    const found = typed === query ? results : kind.search(kept, query, sort)
+    return { list: listKey(found), shown: shownOf(found) }
+  }
+
   function move(by: number) {
-    if (shown.length === 0) return
-    setActive((i) => Math.max(0, Math.min(shown.length - 1, i + by)))
+    const keys = keyList()
+    setHighlight((h) => moveHighlight(h, keys.list, keys.shown.length, by))
+  }
+
+  function chooseHighlighted() {
+    const keys = keyList()
+    choose(keys.shown[Math.min(highlighted(highlight, keys.list), keys.shown.length - 1)])
   }
 
   function choose(row: R | undefined) {
     if (row) onChoose(row)
   }
 
-  const list = shown.length > 0
+  const listed = shown.length > 0
   const listAria = { 'aria-controls': `${id}-list`, 'aria-activedescendant': optionId(active) }
   const columns = `minmax(0, 1fr) ${kind.columns.map((c) => c.width).join(' ')}`
   return (
-    <AppModal
-      opened={opened}
-      onClose={onClose}
-      title={t(texts.title)}
-      size="64rem"
-      fullScreen={phone}
-      className="bd-modal"
-      closeButton={{ 'aria-label': t(texts.close) }}
-    >
-      <div className="bd" style={{ '--bd-columns': columns } as React.CSSProperties}>
-        <TextInput
-          ref={searchBox}
-          data-autofocus
-          label={t(texts.search)}
-          description={t(texts.help)}
-          autoComplete="off"
-          value={query}
-          rightSection={state.status === 'loading' ? <Loader size="xs" /> : undefined}
-          onChange={(e) => setQuery(e.currentTarget.value)}
-          role="combobox"
-          aria-expanded={list}
-          {...(list && listAria)}
-          aria-autocomplete="list"
-          onKeyDown={(e) => searchKey(e, () => choose(current), move)}
-        />
-        <div className="bd-filter-bar">
-          <Button
-            className="bd-filters-toggle"
-            variant="default"
-            leftSection={<Funnel size={16} aria-hidden="true" />}
-            aria-expanded={filtersOpen}
-            aria-controls={`${id}-filters`}
-            onClick={() => setFiltersOpen((o) => !o)}
-          >
-            {filterCount > 0 ? t('Filters ({count})', { count: filterCount }) : t('Filters')}
-          </Button>
-        </div>
-        <div className="bd-filters" id={`${id}-filters`} data-open={filtersOpen}>
-          {kind.selects.map((s, i) => (
-            <Select
-              key={s.label}
-              label={t(s.label)}
-              placeholder={t('Any')}
-              data={options[i] ?? []}
-              value={picked[i] || null}
-              searchable
-              clearable
-              nothingFoundMessage={t(s.nothingFound)}
-              onChange={(v) =>
-                setPicked((p) => kind.selects.map((_, j) => (j === i ? (v ?? '') : (p[j] ?? ''))))
-              }
-            />
-          ))}
-          {filters}
-          {designs.length > 0 && (
-            <SegmentedControl
-              aria-label={t('Source')}
-              data={[
-                { value: 'all', label: t('All') },
-                { value: 'catalogue', label: t('Catalogue') },
-                { value: 'designs', label: t('My designs') },
-              ]}
-              value={origin}
-              onChange={(v) => setOrigin(v as typeof origin)}
-            />
-          )}
-          <Select
-            className="bd-sort"
-            label={t('Sort by')}
-            data={kind.sorts.map((o) => ({ value: o.value, label: t(o.label) }))}
-            value={sort}
-            allowDeselect={false}
-            onChange={(v) => {
-              if (!v) return
-              setSort(v)
-              // the choice reorders the list under the search box, which keeps the focus
-              searchBox.current?.focus()
-            }}
-          />
-        </div>
-        {chips}
-        <p role="status" className="search-status bd-status">
-          {message}
-        </p>
-        <div className="bd-body">
-          <Results
-            status={state.status}
-            retry={read.retry}
-            shown={shown}
-            kind={kind}
-            id={id}
-            active={active}
-            system={system}
-            onActive={setActive}
-            onChoose={choose}
-          />
-          {current && !phone && <Preview row={current} kind={kind} system={system} />}
-        </div>
+    <div className="bd" style={{ '--bd-columns': columns } as React.CSSProperties}>
+      <TextInput
+        ref={searchBox}
+        data-autofocus
+        label={t(texts.search)}
+        description={t(texts.help)}
+        autoComplete="off"
+        value={query}
+        rightSection={state.status === 'loading' ? <Loader size="xs" /> : undefined}
+        onChange={(e) => setQuery(e.currentTarget.value)}
+        role="combobox"
+        aria-expanded={listed}
+        {...(listed && listAria)}
+        aria-autocomplete="list"
+        onKeyDown={(e) => searchKey(e, chooseHighlighted, move)}
+      />
+      <div className="bd-filter-bar">
+        <Button
+          className="bd-filters-toggle"
+          variant="default"
+          leftSection={<Funnel size={16} aria-hidden="true" />}
+          aria-expanded={filtersOpen}
+          aria-controls={`${id}-filters`}
+          onClick={() => setFiltersOpen((o) => !o)}
+        >
+          {filterCount > 0 ? t('Filters ({count})', { count: filterCount }) : t('Filters')}
+        </Button>
       </div>
-    </AppModal>
+      <div className="bd-filters" id={`${id}-filters`} data-open={filtersOpen}>
+        {kind.selects.map((s, i) => (
+          <Select
+            key={s.label}
+            label={t(s.label)}
+            placeholder={t('Any')}
+            data={options[i] ?? []}
+            value={picked[i] || null}
+            searchable
+            clearable
+            nothingFoundMessage={t(s.nothingFound)}
+            onChange={(v) =>
+              setPicked((p) => kind.selects.map((_, j) => (j === i ? (v ?? '') : (p[j] ?? ''))))
+            }
+          />
+        ))}
+        {filters}
+        {designs.length > 0 && (
+          <SegmentedControl
+            aria-label={t('Source')}
+            data={[
+              { value: 'all', label: t('All') },
+              { value: 'catalogue', label: t('Catalogue') },
+              { value: 'designs', label: t('My designs') },
+            ]}
+            value={origin}
+            onChange={(v) => setOrigin(v as typeof origin)}
+          />
+        )}
+        <Select
+          className="bd-sort"
+          label={t('Sort by')}
+          data={kind.sorts.map((o) => ({ value: o.value, label: t(o.label) }))}
+          value={sort}
+          allowDeselect={false}
+          onChange={(v) => {
+            if (!v) return
+            setSort(v)
+            // the choice reorders the list under the search box, which keeps the focus
+            searchBox.current?.focus()
+          }}
+        />
+      </div>
+      {chips}
+      <p role="status" className="search-status bd-status">
+        {message}
+      </p>
+      <div className="bd-body">
+        <Results
+          status={state.status}
+          retry={retry}
+          shown={shown}
+          kind={kind}
+          id={id}
+          active={active}
+          system={system}
+          onActive={(index) => setHighlight({ list, index })}
+          onChoose={choose}
+        />
+        {current && !phone && <Preview row={current} kind={kind} system={system} />}
+      </div>
+    </div>
   )
 }
 

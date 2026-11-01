@@ -1,6 +1,13 @@
 import { expect, it } from 'vitest'
 import { bulletKind } from '../src/components/bullet-search-dialog.tsx'
-import { type ChooserKind, type ChooserRow, searchKey } from '../src/components/record-chooser.tsx'
+import {
+  type ChooserKind,
+  type ChooserRow,
+  highlighted,
+  listKey,
+  moveHighlight,
+  searchKey,
+} from '../src/components/record-chooser.tsx'
 import {
   cartridgeKind,
   caseKind,
@@ -267,4 +274,25 @@ it('Enter in the search box chooses the highlighted row, but not while it confir
   expect(press('ArrowDown', false)).toEqual(['move 1'])
   expect(press('Enter', true)).toEqual([])
   expect(press('ArrowDown', true)).toEqual([])
+})
+
+it('the highlight belongs to the list it was moved in, so a list rendered later cannot take it back (#884)', () => {
+  const all = listKey([
+    { id: 'a-150', name: '150' },
+    { id: 'a-168', name: '168' },
+    { id: 'b', name: 'b' },
+  ])
+  const demo = listKey([
+    { id: 'a-150', name: '150' },
+    { id: 'a-168', name: '168' },
+  ])
+  // ArrowDown pressed for the list of the typed text, before that list has rendered
+  const moved = moveHighlight({ list: all, index: 0 }, demo, 2, 1)
+  // the list still shown highlights its first row; the typed text's list, once rendered, the second
+  expect(highlighted(moved, all)).toBe(0)
+  expect(highlighted(moved, demo)).toBe(1)
+  // the highlight stops at the ends; an empty list leaves it as it was
+  expect(moveHighlight(moved, demo, 2, 8)).toEqual({ list: demo, index: 1 })
+  expect(moveHighlight(moved, demo, 2, -8)).toEqual({ list: demo, index: 0 })
+  expect(moveHighlight(moved, listKey([]), 0, 1)).toBe(moved)
 })
