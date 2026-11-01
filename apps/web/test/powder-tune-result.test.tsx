@@ -58,10 +58,10 @@ answerPowderFit({ id: 1, load: load(0.38), strings }, (r) => replies.push(r))
 const [fitted, ranged] = replies
 if (fitted?.kind !== 'fit' || ranged?.kind !== 'range') throw new Error('no fit')
 
-const text = (state: PowderFitState) =>
+const text = (state: PowderFitState, interior = load(0.38), table?: string) =>
   renderToStaticMarkup(
     <MantineProvider>
-      <TuneNotes loaded={undefined} interior={load(0.38)} fit={state} />
+      <TuneNotes loaded={undefined} interior={interior} fit={state} table={table} />
     </MantineProvider>,
   ).replaceAll('&#x27;', "'")
 
@@ -198,6 +198,17 @@ describe('refusals and rules on the screen', () => {
     expect(html).toContain('Fewer than 3 charges, or charges less than 10 % apart')
     expect(html).toContain('Try the other values anyway')
     expect(html).not.toContain('they move together')
+  })
+
+  it('notes a revolver fit without a leak area, not one with a leak area or a rifle fit', () => {
+    const state = { fit: fitted, range: ranged, running: false }
+    const note = 'If this load is fired from a revolver: no leak area is set'
+    expect(text(state, load(0.38), 'IV')).toContain(note)
+    const leaking = { ...load(0.38), leakage: { area: [{ travel: 0, area: 1e-7 }] } }
+    expect(text(state, leaking, 'IV')).not.toContain(note)
+    expect(text(state, load(0.38), 'I')).not.toContain(note)
+    expect(text(state)).not.toContain(note)
+    expect(text({ running: true }, load(0.38), 'IV')).not.toContain(note)
   })
 
   it('says why held values stay at their start values', () => {

@@ -36,11 +36,12 @@ import {
   loadStrings,
   loadsWithPowder,
   parseVelocities,
+  revolverLeakNote,
   type TuneString,
   tunePowder,
   tuneSessionIds,
 } from '../lib/powder-tune.ts'
-import { readTuneBase, readTuneLoad } from '../lib/tune-load.ts'
+import { readTuneBase, readTuneLoad, readTuneTable } from '../lib/tune-load.ts'
 import { type Quantity, withUnit } from '../lib/units.ts'
 import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { userRef } from '../lib/variants.ts'
@@ -284,12 +285,15 @@ function FitResult({
   strings,
   save,
   onAnyway,
+  revolver = false,
 }: {
   state: PowderFitState
   rows: readonly ChargeRow[]
   strings: readonly TuneString[]
   save?: TuneSave | undefined
   onAnyway: () => void
+  /** The load may be fired from a revolver and has no leak area (`revolverLeakNote`). */
+  revolver?: boolean
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -361,6 +365,13 @@ function FitResult({
         </Message>
       )}
       <HeldNote rule={fit?.rule} />
+      {fit && revolver && (
+        <Message severity="warning">
+          {t(
+            'If this load is fired from a revolver: no leak area is set, so the fitted values take up the gas lost at the cylinder gap, and the simulated pressure can come out too low.',
+          )}
+        </Message>
+      )}
       {range && range.confidence.reasons.length > 0 && (
         <ul className="fit-reasons" aria-label={t('Reasons for the label')}>
           {range.confidence.reasons.map((r) => (
@@ -557,6 +568,7 @@ export function TuneNotes({
   onAnyway = () => {},
   sensitivity = '',
   onSensitivity = () => {},
+  table,
 }: {
   loaded: ReturnType<typeof loadStrings> | undefined
   /** The load the workbench handed over, before a sensitivity typed here. */
@@ -573,6 +585,8 @@ export function TuneNotes({
   /** The temperature sensitivity typed for a load without one, 1/K. */
   sensitivity?: string
   onSensitivity?: (text: string) => void
+  /** The CIP table of the load's cartridge record the workbench handed over. */
+  table?: string | undefined
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -628,7 +642,14 @@ export function TuneNotes({
         </>
       )}
       {interior && (
-        <FitResult state={fit} rows={rows} strings={strings} save={save} onAnyway={onAnyway} />
+        <FitResult
+          state={fit}
+          rows={rows}
+          strings={strings}
+          save={save}
+          onAnyway={onAnyway}
+          revolver={revolverLeakNote(table, interior)}
+        />
       )}
     </>
   )
@@ -645,6 +666,7 @@ export function PowderTune() {
   const { system } = useUnits()
   const [loaded, setLoaded] = useState<ReturnType<typeof loadStrings>>()
   const [interior, setInterior] = useState<InteriorLoad>()
+  const [table, setTable] = useState<string>()
   const [save, setSave] = useState<TuneSave>()
   const [choices, setChoices] = useState<{ id: string; name: string }[]>()
   const [added, setAdded] = useState<TuneString[]>([])
@@ -664,6 +686,7 @@ export function PowderTune() {
           setLoaded(found)
           if (!found.load) return
           setInterior(readTuneLoad(found.load))
+          setTable(readTuneTable(found.load))
           const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
           const base = readTuneBase(found.load)
           const sessions = own.map((r) => r.id)
@@ -754,6 +777,7 @@ export function PowderTune() {
           onAnyway={() => setAnyway(true)}
           sensitivity={sensitivity}
           onSensitivity={setSensitivity}
+          table={table}
         />
         {choices &&
           (choices.length > 0 ? (
