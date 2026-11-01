@@ -148,8 +148,8 @@ The workbench sets the pressure range's tolerance of the chamber volume from whe
 | --- | --- |
 | Measured, with the spread $s$ of the brass group | $s / C$ |
 | Measured, without a spread | 0.5 % (assumption) |
-| Capacity records of two or more case makers for the cartridge | standard deviation over mean of those records |
-| One catalogue or case record, or the first of the cartridge | 2 % (assumption without a published source) |
+| A catalogue or case record, while the cartridge has capacity records of two or more case makers | standard deviation over mean of those records |
+| A catalogue or case record otherwise, or records that agree exactly | 2 % (assumption without a published source) |
 
 The range moves the volume behind the bullet $V$, so the capacity's part is taken relative to it, and the interval $h$ of an estimated bullet volume (above) adds to it:
 

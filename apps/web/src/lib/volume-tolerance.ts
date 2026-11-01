@@ -50,7 +50,9 @@ export function capacityFraction(a: {
     const values = made.map((r) => r.waterCapacity.value)
     const mean = values.reduce((s, v) => s + v, 0) / values.length
     const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / (values.length - 1)
-    return { fraction: Math.sqrt(variance) / mean, rule: 'makers' }
+    const fraction = Math.sqrt(variance) / mean
+    // records that agree exactly say nothing about the spread: the default stays
+    if (fraction > 0) return { fraction, rule: 'makers' }
   }
   return { fraction: capacityTolerance.catalogue, rule: 'catalogue' }
 }

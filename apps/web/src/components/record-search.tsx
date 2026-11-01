@@ -50,22 +50,29 @@ async function matches<T>(
   params: string,
   find: Find<T> | undefined,
   signal: AbortSignal,
+  limit: number,
 ): Promise<State<T>> {
   // the props give `kind` whenever they give no `find`
-  const body = await (find?.(text, 20) ??
-    searchRecords<T>(kind as ApiKind, text, 20, params, signal))
+  const body = await (find?.(text, limit) ??
+    searchRecords<T>(kind as ApiKind, text, limit, params, signal))
   if (text.length < 2 && body.items.length === 0) return { status: 'idle' }
   return { status: 'ok', items: body.items, total: body.total }
 }
 
+/** The matches the field lists. */
+const shownMatches = 20
+/** The matches read for an `arrange`, which may leave some out. */
+const arrangedPage = 100
+
 /**
- * The matches after `arrange`, the total less the ones it left out. shortcut: a match left out
- * beyond the first page still counts in the total; a list query parameter would make it exact.
+ * The first matches after `arrange`, the total less the ones it left out. shortcut: a match left
+ * out beyond the page read still counts in the total; a list query parameter would make it exact.
  */
 function arranged<T>(state: State<T>, arrange: ((items: T[]) => T[]) | undefined): State<T> {
   if (state.status !== 'ok' || !arrange) return state
-  const items = arrange(state.items)
-  return { ...state, items, total: state.total - (state.items.length - items.length) }
+  const kept = arrange(state.items)
+  const total = state.total - (state.items.length - kept.length)
+  return { ...state, items: kept.slice(0, shownMatches), total }
 }
 
 /** The status line under the field: what the search is doing or found. */
@@ -190,6 +197,8 @@ export function RecordSearch<T extends { id: string }>({
   const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() })
 
   const shownParams = useRef(params)
+  // the page read depends on whether matches are arranged, not on the function, new each render
+  const arranging = arrange !== undefined
 
   useEffect(() => {
     // matches of other params (for example another diameter) must not stay choosable
@@ -202,13 +211,15 @@ export function RecordSearch<T extends { id: string }>({
       setState({ status: 'idle' })
       return
     }
+    // an `arrange` that leaves matches out reads a longer page, of which 20 are shown
+    const limit = arranging ? arrangedPage : shownMatches
     const controller = new AbortController()
     const timer = setTimeout(
       async () => {
         // a first key lists what `find` has for it; with nothing, the field stays quiet
         if (text.length >= 2) setState({ status: 'loading' })
         try {
-          const next = await matches<T>(kind, text, params, find, controller.signal)
+          const next = await matches<T>(kind, text, params, find, controller.signal, limit)
           if (!controller.signal.aborted) setState(next)
         } catch {
           if (!controller.signal.aborted) setState({ status: 'error' })
@@ -220,7 +231,7 @@ export function RecordSearch<T extends { id: string }>({
       clearTimeout(timer)
       controller.abort()
     }
-  }, [q, kind, params, find])
+  }, [q, kind, params, find, arranging])
 
   const found = arranged(state, arrange)
   const items = found.status === 'ok' ? found.items : []

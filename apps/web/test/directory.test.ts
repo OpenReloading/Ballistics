@@ -187,6 +187,8 @@ it('packs bullets into rows and back', () => {
       construction: 'lead-core',
       leadFree: false,
     }),
+    // a name-only record keeps its mark through the page props
+    b({ id: 'c', diameter: null, nameOnly: true }),
   ]
   expect(unpackBullets(packBullets(rows))).toEqual(rows)
 })

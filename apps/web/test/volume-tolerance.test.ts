@@ -28,6 +28,11 @@ describe('capacityFraction', () => {
       fraction: capacityTolerance.catalogue,
       rule: 'catalogue',
     })
+    // makers whose records agree exactly give no spread: the default stays
+    const same = [maker(54, 'catalogue:a'), maker(54, 'catalogue:b')]
+    expect(capacityFraction({ source: 'capacity', grams: 54, records: same }).rule).toBe(
+      'catalogue',
+    )
   })
 })
 

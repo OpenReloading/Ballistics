@@ -664,9 +664,11 @@ function boreOf(
   record: { recordGrooveM: number | undefined; qM: number | undefined; landM: number | undefined },
   boreDiameter: number | undefined,
 ) {
-  const measured = gun?.boreDiameter !== undefined || gun?.grooveDiameter !== undefined
+  // a field the editor allows to hold 0 is no measurement
+  const groove = positiveOr(gun?.grooveDiameter)
+  const measured = positiveOr(gun?.boreDiameter) !== undefined || groove !== undefined
   return {
-    grooveM: gun?.grooveDiameter ?? record.recordGrooveM,
+    grooveM: groove ?? record.recordGrooveM,
     qUsed: measured ? undefined : recordBoreArea(record.qM, record.landM, boreDiameter),
   }
 }
@@ -690,6 +692,8 @@ function burnlessOf(
   if (!powder || design || !powderIncomplete(powder)) return
   return requiredModelKeys.some((k) => fields[k]?.si === undefined) ? label : undefined
 }
+
+const positiveOr = (x: number | undefined) => (x !== undefined && x > 0 ? x : undefined)
 
 /** The note on a bullet below the firearm's measured groove diameter (SI): the gap the model leaves out. */
 function undersizeNote(
@@ -2266,6 +2270,14 @@ export function useWorkbenchState() {
   /** Why no run can start: a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
   const refusal = (as: unknown) =>
     specError() ?? (as || !burnless ? undefined : burnlessText(burnless))
+  /** What the volume tolerance reads, now as the run's values, or this render's for a Powders tab row (`as`). */
+  const volumeNow = (as: unknown) => ({
+    volume: (as ? fields : form.getValues()).volume?.si,
+    seated: seatedFor(as),
+    previewed: as ? previewed : previewedNow.current,
+    suggestion: suggestions.volume,
+    followed,
+  })
   /** The seating a run reads: now, or this render's for a Powders tab row (`as`), as its values. */
   const seatedFor = (as: unknown) => (as ? seated : seatedNow.current)
 
@@ -2358,13 +2370,7 @@ export function useWorkbenchState() {
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
-    const { fraction: volumeTolerance, rule: volumeRule } = runVolumeTolerance({
-      volume: fields.volume?.si,
-      seated,
-      previewed,
-      suggestion: suggestions.volume,
-      followed,
-    })
+    const { fraction: volumeTolerance, rule: volumeRule } = runVolumeTolerance(volumeNow(as))
     const recordInputs = [
       chosenPowder?.id,
       bulletLength,
