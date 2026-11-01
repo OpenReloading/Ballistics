@@ -15,6 +15,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import { tipEvents } from '../lib/theme.ts'
+import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
 /**
@@ -135,6 +136,7 @@ export function PageBar({
   const root = useRef<HTMLDivElement>(null)
   const id = useId()
   const mounted = useMounted()
+  const endSlot = useBarEndSlot()
   // the phone panel closes on a press outside the bar and the menus and dialogs it opened
   useEffect(() => {
     if (!open) return
@@ -219,7 +221,14 @@ export function PageBar({
             onClick={(e) => {
               const t =
                 e.target instanceof Element ? e.target.closest('button, [role="menuitem"]') : null
-              if (open && t && !t.hasAttribute('aria-haspopup')) setOpen(false)
+              // an aria-disabled action does nothing: the panel stays, its tooltip says why
+              if (
+                open &&
+                t &&
+                !t.hasAttribute('aria-haspopup') &&
+                t.getAttribute('aria-disabled') !== 'true'
+              )
+                setOpen(false)
             }}
           >
             <BarStatus value={statusLine}>{actions}</BarStatus>
@@ -235,6 +244,8 @@ export function PageBar({
       )}
       {/* on every page from 75em; below it the top bar's icon button (site-header.tsx) */}
       <SafetyBarButton iconOnly={compact} className="page-bar-safety" />
+      {/* from 75em the top bar's Report, repository and theme buttons, after the actions as shown */}
+      <div ref={endSlot} className="page-bar-end" />
     </div>
   )
 }

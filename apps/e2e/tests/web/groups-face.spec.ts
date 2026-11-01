@@ -91,7 +91,8 @@ const field = (page: Page, label: string, unit = 'mm') =>
 const faceSelect = (page: Page) =>
   page.getByRole('combobox', { name: 'Target on the photo', exact: true })
 const scoreFace = (page: Page) => page.getByRole('combobox', { name: 'Target', exact: true })
-const acceptAll = (page: Page) => page.getByRole('button', { name: /^Accept all/ })
+const acceptSure = (page: Page) => page.getByRole('button', { name: /^Accept sure/ })
+const status = (page: Page) => page.locator('.target-status')
 const resultLine = (page: Page) => page.locator('[data-detect-result]')
 const shotField = (page: Page) => page.getByRole('spinbutton', { name: /^Shot \d+ x$/ })
 
@@ -202,18 +203,33 @@ test('a known hole size: from choosing the photo to Accept is 2 actions, no shot
   await setMarker(page, '4.5')
   const { count, act } = counter()
   await act(() => load(page, png))
-  await expect(acceptAll(page)).toHaveText('Accept all (6)', { timeout: 30_000 })
+  await expect(acceptSure(page)).toHaveText('Accept sure (6)', { timeout: 30_000 })
   await expect(resultLine(page)).toContainText('Air Pistol')
   await expect(resultLine(page)).toContainText('1 reference')
-  await expect(resultLine(page)).toContainText('6 proposed')
+  await expect(resultLine(page)).toContainText('6 proposed, 0 maybe')
+  await expect(status(page)).toHaveText('6 proposed, 0 maybe: accept them to add shots.')
   // the marker's size preselects its caliber class, which the line names with the size
   await expect(resultLine(page)).toContainText('4.5 mm (.177) air (4.50)')
   // no slider on the main path, and the proposals are no shots yet
   await expect(page.locator('.detect-step').getByRole('slider')).toHaveCount(0)
   await expect(shotField(page)).toHaveCount(0)
-  await act(() => acceptAll(page).click())
+  await act(() => acceptSure(page).click())
   await expect(shotField(page)).toHaveCount(6)
+  // the message says what the click did, not what was proposed before it
+  await expect(status(page)).toHaveText('6 shots added.')
   expect(count.n).toBe(2)
+  // at 1280 x 650 the shot list scrolls in its own box and Notes stays in view below it
+  await page.setViewportSize({ width: 1280, height: 650 })
+  const side = page.getByRole('complementary', { name: 'Statistics and shots' })
+  await expect(side.getByRole('heading', { name: 'Notes' })).toBeInViewport()
+  await expect(side.getByRole('button', { name: 'Add note' })).toBeInViewport()
+  expect(await side.evaluate((e) => e.scrollHeight - e.clientHeight)).toBeLessThanOrEqual(1)
+  // the rows beyond the key values open on request
+  const more = side.getByRole('button', { name: 'All statistics' })
+  await expect(more).toHaveAttribute('aria-expanded', 'false')
+  await expect(side.getByRole('rowheader', { name: 'Width', exact: true })).toHaveCount(0)
+  await more.click()
+  await expect(side.getByRole('rowheader', { name: 'Width', exact: true })).toBeVisible()
 })
 
 test('an unknown hole size: the typed size is the third action, and the shots sit on the holes', async ({
@@ -242,9 +258,9 @@ test('an unknown hole size: the typed size is the third action, and the shots si
     await field(page, 'Hole size').fill('4.5')
     await field(page, 'Hole size').press('Enter')
   })
-  await expect(acceptAll(page)).toHaveText('Accept all (6)', { timeout: 30_000 })
+  await expect(acceptSure(page)).toHaveText('Accept sure (6)', { timeout: 30_000 })
   await expect(shotField(page)).toHaveCount(0)
-  await act(() => acceptAll(page).click())
+  await act(() => acceptSure(page).click())
   expect(count.n).toBe(3)
   // the shots sit where the holes were drawn: target mm, y up, the face centre at 0
   const shots: [number, number][] = []
@@ -283,7 +299,8 @@ test('each item of the result line opens its editor', async ({ page }) => {
   const png = await facePng(page, 'issf-10m-air-pistol', sixHoles)
   await setMarker(page, '4.5')
   await load(page, png)
-  await expect(acceptAll(page)).toHaveText('Accept all (6)', { timeout: 30_000 })
+  await expect(acceptSure(page)).toHaveText('Accept sure (6)', { timeout: 30_000 })
+  await expect(status(page)).toHaveText(/^6 proposed/)
   const line = resultLine(page)
   // the caliber: the hole size field in the line
   await line.getByRole('button', { name: 'Change the hole size' }).click()
@@ -291,6 +308,8 @@ test('each item of the result line opens its editor', async ({ page }) => {
   // the target: the Scale step with the target found
   await line.getByRole('button', { name: 'Change the target' }).click()
   await expect(step(page, 'Scale')).toHaveAttribute('aria-current', 'step')
+  // a step chosen: the message of the run before it goes
+  await expect(status(page)).toHaveText('')
   await expect(faceSelect(page)).toHaveValue('issf-10m-air-pistol|10m-air-pistol')
   await backToLine(page)
   // the scale: Calibrate
@@ -300,7 +319,7 @@ test('each item of the result line opens its editor', async ({ page }) => {
   // the holes: the Review step
   await resultLine(page).getByRole('button', { name: 'Change the holes' }).click()
   await expect(step(page, 'Review')).toHaveAttribute('aria-current', 'step')
-  await expect(acceptAll(page)).toHaveText('Accept all (6)')
+  await expect(acceptSure(page)).toHaveText('Accept sure (6)')
   // nothing was accepted on the way
   await expect(shotField(page)).toHaveCount(0)
 })
@@ -322,7 +341,7 @@ test('a photo below the minimum quality names the problem and waits for Detect a
   await expect(notes).toContainText('Retake in an even light')
   await expect(notes).toContainText('Detection waits.')
   // the face is applied, the run is not started
-  await expect(acceptAll(page)).toHaveCount(0)
+  await expect(acceptSure(page)).toHaveCount(0)
   const { violations } = await new AxeBuilder({ page })
     .include('.quality-notes')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
@@ -374,7 +393,11 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
     await page.mouse.click(p.x, p.y)
   }
   await expect(page.getByRole('textbox', { name: 'Line 1 (mm)', exact: true })).toHaveValue('155.5')
-  await page.keyboard.press('Escape')
+  await expect(status(page)).toHaveText('Line 1 added.')
+  // the popover closed: its message goes with it
+  await page.getByRole('button', { name: 'Calibrate', exact: true }).click()
+  await expect(page.getByRole('textbox', { name: 'Known length (mm)', exact: true })).toBeHidden()
+  await expect(status(page)).toHaveText('')
   // the face is chosen for scoring: no ring marks, no point of aim, the origin is the photo corner
   await scoreFace(page).selectOption('issf-10m-air-pistol')
   await goStep(page, 'Example')
@@ -382,7 +405,7 @@ test('a face chosen for scoring on a sheet calibrated by a line does not move th
   await field(page, 'Hole size').blur()
   await goStep(page, 'Detect')
   await page.getByRole('button', { name: 'Detect holes' }).click()
-  await expect(acceptAll(page)).toHaveText('Accept all (3)', {
+  await expect(acceptSure(page)).toHaveText('Accept sure (3)', {
     timeout: 30_000,
   })
 })
@@ -414,6 +437,49 @@ test('no target fits: the ellipses are shown and a typed black diameter sets the
   await expect(page.locator('.detect-step')).toContainText('1 reference')
 })
 
+/** The group panel and the photo popover of a sheet with a photo and no scale, at 1280 x 650. */
+async function layoutWithoutScale(page: Page) {
+  await page.setViewportSize({ width: 1280, height: 650 })
+  const panel = page.getByRole('complementary', { name: 'Groups' })
+  const box = async (l: ReturnType<Page['locator']>) => {
+    const b = await l.boundingBox()
+    if (!b) throw new Error('not shown')
+    return b
+  }
+  // Federation, Discipline and Target span the column, each select naming its option in its title
+  const name = await box(panel.getByRole('textbox', { name: 'Group name', exact: true }))
+  for (const label of ['Federation', 'Discipline', 'Target']) {
+    const select = panel.getByRole('combobox', { name: label, exact: true })
+    expect((await box(select)).width, label).toBeGreaterThan(2 * name.width)
+  }
+  await expect(scoreFace(page)).toHaveAttribute('title', 'None')
+  // without a target the scoring rows take no room: Detect follows the Target row
+  const target = await box(scoreFace(page))
+  const detect = await box(panel.getByRole('heading', { name: 'Detect', exact: true }))
+  expect(detect.y - (target.y + target.height)).toBeLessThan(24)
+  // the point of aim's x and y of one width beside the label, Set and Clear below them
+  const x = await box(panel.getByLabel('Point of aim x', { exact: true }))
+  const y = await box(panel.getByLabel('Point of aim y', { exact: true }))
+  expect(Math.abs(x.width - y.width)).toBeLessThanOrEqual(1)
+  expect(Math.abs(x.y - y.y)).toBeLessThanOrEqual(1)
+  const set = panel.getByRole('button', { name: 'Set', exact: true })
+  expect((await box(set)).y).toBeGreaterThan(x.y + x.height - 1)
+  // the buttons that wait for a scale say so
+  for (const button of [set, page.getByRole('button', { name: 'Add shot' }).first()])
+    await expect(button).toHaveAttribute('title', 'Mark a reference first (Calibrate).')
+  // the photo filters show their value and reset to the photo as it is
+  await toolbarPopover(page, 'Photo')
+  const contrast = page.getByRole('slider', { name: 'Contrast' })
+  const reset = page.getByRole('button', { name: 'Reset Contrast' })
+  await expect(reset).toBeDisabled()
+  await contrast.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(page.locator('.filter-readout').first()).toHaveText('1.1')
+  await reset.click()
+  await expect(page.locator('.filter-readout').first()).toHaveText('1.0')
+  await page.keyboard.press('Escape')
+}
+
 test('a photo without any face: the guided steps ask for the scale as before', async ({ page }) => {
   test.setTimeout(detectionBudget)
   await page.goto('/groups')
@@ -434,8 +500,29 @@ test('a photo without any face: the guided steps ask for the scale as before', a
     timeout: 30_000,
   })
   await expect(step(page, 'Rotate')).toHaveAttribute('aria-current', 'step')
+  // without a scale the guided run cannot start, and says why under its button
+  await goStep(page, 'Detect')
+  await expect(page.getByRole('button', { name: 'Detect holes' })).toBeDisabled()
+  await expect(page.locator('[data-detect-blocked]')).toHaveText('Set the scale first (step 2).')
+  await expect(page.getByRole('button', { name: 'Detect holes' })).toHaveAccessibleDescription(
+    'Set the scale first (step 2).',
+  )
+  // the steps are cells of one width, and Back and Next stay where they are on every step
+  const cells = await page
+    .getByRole('list', { name: 'Detection steps' })
+    .getByRole('button')
+    .evaluateAll((b) => b.map((e) => Math.round(e.getBoundingClientRect().width)))
+  expect(new Set(cells).size).toBe(1)
+  const back = page.getByRole('button', { name: 'Back', exact: true })
+  const at: number[] = []
+  for (const name of ['Rotate', 'Scale', 'Example', 'Detect', 'Review']) {
+    await goStep(page, name)
+    at.push(Math.round((await back.boundingBox())?.y ?? 0))
+  }
+  expect(new Set(at).size, at.join(' ')).toBe(1)
   await goStep(page, 'Scale')
   await expect(faceSelect(page)).toBeDisabled()
+  await layoutWithoutScale(page)
   // the Face row of the Scale step is part of the page
   const { violations } = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
