@@ -9,6 +9,7 @@ import {
   cartridgeBulletDiameterMm,
   cartridgeDiameters,
   cartridgeGrooveDiameterMm,
+  coldPeakInterval,
   gasVelocityFactor,
   type InteriorLoad,
   plainBaseCastHardness,
@@ -2036,7 +2037,7 @@ export function useWorkbenchState() {
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? chosenPowder
-    const { body, bulkDensity, missing } = interiorRequest({
+    const { body, bulkDensity, missing, sensitivityDefault } = interiorRequest({
       values: powderValues(siValues(fields), chosenPowder, as),
       powder: chosen,
       // a missing powder record: the bulk density and the bore resistance its link carried
@@ -2058,7 +2059,7 @@ export function useWorkbenchState() {
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
     ]
-    return { body, bulkDensity, resistanceMissing, recordInputs }
+    return { body, bulkDensity, resistanceMissing, recordInputs, sensitivityDefault }
   }
 
   /**
@@ -2114,6 +2115,7 @@ export function useWorkbenchState() {
     plan: Partial<Step>[] | undefined
     bulkDensity: number | undefined
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
+    sensitivityDefault: ReturnType<typeof loadRequest>['sensitivityDefault']
     table: string | undefined
     gasFactorNote: string | undefined
   }) {
@@ -2134,6 +2136,13 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
+      sensitivityDefault: a.sensitivityDefault && {
+        form: a.sensitivityDefault.form,
+        coldPeak: coldPeakInterval(
+          stepLoad(body.load, nth(steps, first)),
+          a.sensitivityDefault.coldInterval,
+        ),
+      },
       castHardness: plainBaseCastHardness(bulletRecord?.construction),
       roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
       design: bulletDesign?.name,

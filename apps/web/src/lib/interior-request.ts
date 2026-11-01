@@ -1,4 +1,9 @@
-import { overrideResistance, recordResistance } from '@open-reloading/core'
+import {
+  defaultSensitivity,
+  overrideResistance,
+  recordResistance,
+  sensitivityReferenceDefault,
+} from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'
@@ -77,11 +82,23 @@ export function interiorRequest(s: InteriorSources) {
   if (applied) body.load.resistance = applied
   if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
   const sensitivity = powder?.temperatureSensitivity
+  // a powder record without its own coefficient takes the default of its grain form
+  const fallback = powder && !sensitivity ? defaultSensitivity(powder.grainForm) : undefined
   if (sensitivity)
     body.load.propellant.temperatureSensitivity = {
       reference: sensitivity.reference.value,
       cold: sensitivity.cold.value,
       hot: sensitivity.hot.value,
     }
-  return { body, bulkDensity, missing }
+  else if (fallback && powder)
+    body.load.propellant.temperatureSensitivity = {
+      reference: powder.interior
+        ? toSi('temperature', powder.interior.propellantTemperature.value)
+        : sensitivityReferenceDefault,
+      cold: fallback.cold,
+      hot: fallback.hot,
+    }
+  const sensitivityDefault =
+    fallback && powder?.grainForm ? { form: powder.grainForm, ...fallback } : undefined
+  return { body, bulkDensity, missing, sensitivityDefault }
 }

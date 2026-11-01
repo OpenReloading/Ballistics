@@ -138,6 +138,23 @@ describe('resultNotes', () => {
     expect(warningsText(at(1.5e8, 18), english.t)).toContain('gas may leak past it')
   })
 
+  it('marks a run on the default temperature coefficient, and gives the cold side as an interval', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const lines = (o: Ok) => resultNotes(o, [], units, english.t).map((n) => n.line)
+    expect(lines(ok({ ...plain, sensitivityDefault: { form: 'ball' } }))).toContain(
+      'Default temperature coefficient of ball powder: the powder record gives none.',
+    )
+    const cold = lines(
+      ok({ ...plain, sensitivityDefault: { form: 'extruded', coldPeak: [3.1e8, 3.4e8] } }),
+    )
+    expect(
+      cold.some((l) =>
+        /^Cold side: peak pressure .+ to .+ with the default coefficient\.$/.test(l),
+      ),
+    ).toBe(true)
+    expect(lines(ok(plain)).some((l) => l.startsWith('Default temperature'))).toBe(false)
+  })
+
   it('notes a round count of the firearm: the velocity may be lower than simulated', () => {
     const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
     const worn = (o: Ok) =>

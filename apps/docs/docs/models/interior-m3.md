@@ -223,7 +223,23 @@ Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`
 
 Without temperature sensitivities, $\tau_T = 1$.
 
-A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
+A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder. A powder record without the field takes the default of its grain form below; one of grain form `other` or without a grain form has none, so $\tau_T = 1$ for it.
+
+#### Default by grain form
+
+The default is approximate: a value of the grain form, not of the powder. Its reference $T_\text{ref}$ is the propellant temperature of the record's fitted model (`interior.propellantTemperature`), else 294.15 K (21 °C).
+
+| Grain form | $\sigma_h$ (1/K) | Interval of $\sigma_h$ | $\sigma_c$ the run takes | Interval of $\sigma_c$ | Source |
+|---|---|---|---|---|---|
+| ball | 0.0027 | 0.0023 to 0.0031 | 0.0012 | 0 to 0.0030 | [Boulkadid 2016](../bibliography.md#boulkadid-2016): closed-vessel burn-rate sensitivity of deterred ball powders, flattened 0.229 and spherical 0.305 %/K above 21 °C, 0.115 and 0.121 %/K below (as quoted in issue #842; the tables were not re-read for this page, unverified) |
+| extruded, flake | 0.0010 | 0.0001 to 0.0029 | 0.0010 | 0 to 0.0030 | [Hodgdon 2012](../bibliography.md#hodgdon-2012): velocities at 70 and 125 °F of 14 extruded powders outside the Extreme line, converted through this model on stand-in loads ([research entry](../research/powder-temperature-default.md)) |
+| other | none | | | | |
+
+Code: `packages/core/src/interior/temperature-default.ts`, `defaultSensitivity`, `coldPeakInterval`. `apps/web/src/lib/interior-request.ts`, `interiorRequest`.
+
+The record's own coefficient always wins. The result notes of a run on the default name it ("Default temperature coefficient of ... powder"). Below the reference the peak pressure is given as an interval, the peaks at $\sigma_c = 0$ and $\sigma_c = 0.0030$, never as a single drop: the measured cold changes of the peak pressure of ball powders (Boulkadid 2016, 0.022 and 0.037 %/K, each within its uncertainty of 0) were not significant, while the model with the measured cold burn-rate sensitivity over-predicts the cold fall of the peak (-13.0 % against about -1.65 % measured at -75 K, issue #842).
+
+Limits: the extruded value rests on maker data whose shots and lots are not stated, and the conversion depends on the stand-in load: the three loads of the entry give 0.0006 to 0.0015 1/K. The ball value is for deterred ball powders with about 10 % nitroglycerin. No value is claimed for the cold side of extruded and flake powders; the run takes the hot value there. The default is applied by the workbench and its powder tuning route; the record runs of the command line (`recordLoad`), which run at the powder's fit temperature unless a row gives another, keep $\tau_T = 1$ for a powder without its own coefficient. Temperature-stabilised lines (such as the Hodgdon Extreme powders, whose velocity moved by about 0.006 %/K in the same table) are not told apart: no record field marks them.
 
 The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
 

@@ -5,13 +5,15 @@ import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
 import { nth } from '../lib/nth.ts'
+import { rawWording } from '../lib/record-values.ts'
 import type {
   LadderDirection,
   RunnableLadderKind,
   SeatingLengthKind,
   SeatingStep,
 } from '../lib/seating-ladder.ts'
-import { type UnitSystem, withUnit } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
+import { say } from '../lib/wording.ts'
 import {
   bandLine,
   bulletLeadTime,
@@ -72,6 +74,11 @@ export type Outcome =
       castHardness?: number | undefined
       /** Rounds fired through the chosen firearm's barrel, its record's `roundCount`. */
       roundCount?: number | undefined
+      /**
+       * The powder record has no temperature coefficient and the run took the default of its grain
+       * form; `coldPeak`: the peak breech pressure over the cold sensitivity interval, Pa, below the reference.
+       */
+      sensitivityDefault?: { form: string; coldPeak?: [number, number] | undefined } | undefined
       /** The user bullet design whose mass the run used. */
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
@@ -309,6 +316,39 @@ export function resultNotes(
         ]
       : []),
     ...designs.flatMap((line) => (line ? [{ kind: 'note' as const, line }] : [])),
+    ...(ok.sensitivityDefault
+      ? [
+          {
+            kind: 'note' as const,
+            line: t(
+              'Default temperature coefficient of {form} powder: the powder record gives none.',
+              {
+                form: say(t, rawWording(ok.sensitivityDefault.form)),
+              },
+            ),
+            text: t(
+              'The burn rate follows the propellant temperature by a coefficient of the grain form, not of this powder (ball: measured burn rates; extruded and flake: a maker table through the model), with a wide interval. Results at another temperature than the reference are approximate.',
+            ),
+          },
+          ...(ok.sensitivityDefault.coldPeak
+            ? [
+                {
+                  kind: 'note' as const,
+                  line: t(
+                    'Cold side: peak pressure {low} to {high} with the default coefficient.',
+                    {
+                      low: formatQuantity('pressure', system, ok.sensitivityDefault.coldPeak[0]),
+                      high: withUnit('pressure', system, ok.sensitivityDefault.coldPeak[1]),
+                    },
+                  ),
+                  text: t(
+                    'Below the reference temperature the default gives no single value of the peak pressure: measured cold changes of ball grains were not significant, so the cold coefficient spans 0 to 0.0030 per K.',
+                  ),
+                },
+              ]
+            : []),
+        ]
+      : []),
     ...(ok.roundCount
       ? [
           {

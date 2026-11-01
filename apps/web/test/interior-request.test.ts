@@ -150,13 +150,34 @@ it("takes the record's bulk density and temperature sensitivity", () => {
     cold: 0.001,
     hot: 0.002,
   })
+  // the demo powder has none of its own: it takes the default of its grain form, extruded
+  expect(demo.temperatureSensitivity).toBeUndefined()
   expect(
     interiorRequest({ values, powder: demo }).body.load.propellant.temperatureSensitivity,
-  ).toBe(undefined)
+  ).toMatchObject({ hot: 0.001, cold: 0.001 })
 })
 
 it('sends no bore resistance without a powder record or a link', () => {
   const r = interiorRequest({ values, powder: undefined })
   expect(r.bulkDensity).toBeUndefined()
   expect(r.body.load.resistance).toBeUndefined()
+})
+
+it('gives a powder without its own coefficient the default of its grain form, and says so', () => {
+  const { temperatureSensitivity: _, ...without } = demo
+  const ball = interiorRequest({ values, powder: { ...without, grainForm: 'ball' } })
+  expect(ball.body.load.propellant.temperatureSensitivity).toMatchObject({
+    hot: 0.0027,
+    cold: 0.0012,
+  })
+  expect(ball.sensitivityDefault?.form).toBe('ball')
+  // the reference is the fitted propellant temperature of the record, else 21 °C
+  const reference = without.interior
+    ? without.interior.propellantTemperature.value + 273.15
+    : 294.15
+  expect(ball.body.load.propellant.temperatureSensitivity?.reference).toBeCloseTo(reference, 9)
+  const other = interiorRequest({ values, powder: { ...without, grainForm: 'other' } })
+  expect(other.body.load.propellant.temperatureSensitivity).toBeUndefined()
+  expect(other.sensitivityDefault).toBeUndefined()
+  expect(interiorRequest({ values, powder: undefined }).sensitivityDefault).toBeUndefined()
 })
