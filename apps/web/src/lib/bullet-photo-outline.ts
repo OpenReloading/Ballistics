@@ -3,6 +3,7 @@
  * symmetry line of both edges, and the half-width profile along it. Lengths are in photo px, y
  * down. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
+import { fromSi } from '@open-reloading/schema'
 import type { Cutout } from './bullet-photo.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -23,6 +24,8 @@ export interface Outline {
   r: number[]
   /** The distance of each side's edge from the axis at each sample: the side to the left of the axis seen from the base, and the one to the right. */
   sides?: { left: number[]; right: number[] } | undefined
+  /** For an axis the user typed: how far it is from the symmetry line of the shank's two sides, degrees (`typedAxisOff`). */
+  typedOff?: number | undefined
   /** The side a shadow widens (`withoutShadow`): `removed` when it is taken out, by measuring the other side mirrored about the axis, with nothing left to doubt. */
   shadow?: { side: 'left' | 'right'; removed: boolean } | undefined
   /** Whether the nose end was told apart from the base end by its longer taper only within 15 %, so a flip may be right. */
@@ -299,6 +302,14 @@ export function sideTapers(o: Outline) {
     )
   const [lineL, lineR] = [shankLine(sides.left), shankLine(sides.right)]
   if (!lineL || !lineR) return
+  // the standard uncertainty of a shank line's slope: its residual scatter, not below an edge's, over the spread of z
+  const zm = sum(z) / z.length
+  const sxx = sum(z.map((v) => (v - zm) ** 2))
+  const slopeU = (line: { a: number; b: number }, side: readonly number[]) => {
+    const rss = sum(use.map((i, k) => (at(side, i) - line.a - line.b * at(z, k)) ** 2))
+    return Math.max(o.edge, Math.sqrt(rss / Math.max(1, use.length - 2))) / Math.sqrt(sxx)
+  }
+  const slopeError = Math.max(slopeU(lineL, sides.left), slopeU(lineR, sides.right))
   const level = (line: { a: number; b: number }, i: number) => line.a + line.b * at(o.z, i)
   const reached = o.z.findIndex(
     (_, i) =>
@@ -309,18 +320,20 @@ export function sideTapers(o: Outline) {
   const settled = (i: number) =>
     Math.abs(at(sides.left, i + 1) - at(sides.left, i)) < 1 &&
     Math.abs(at(sides.right, i + 1) - at(sides.right, i)) < 1
+  // the base lies in the outline's first half: a flat base's shank starts right after its corner
+  const limit = Math.floor(o.r.length / 2) - baseCount - 1
   let start = reached
-  while (start < first && !settled(start)) start++
-  // a corner that does not settle before the shank (an axis turned far off on a squat bullet): two past it
-  if (start + 1 + baseCount > first) start = reached + 1
+  while (start < limit && !settled(start)) start++
+  // a corner that does not settle (an axis turned far off on a squat bullet): two past it
+  if (start >= limit) start = reached + 1
   const base: [number, number] = [start + 1, start + 1 + baseCount]
-  if (base[1] > first) return
+  if (base[1] > o.r.length / 2) return
   const zb = median(o.z.slice(...base))
   const taper = (line: { a: number; b: number }, side: readonly number[]) => ({
     line,
     taper: line.a + line.b * zb - median(side.slice(...base)),
   })
-  return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base }
+  return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base, slopeError }
 }
 
 /** One side tapers at the base by more than this, px or share of the half width, while the other does not: a shadow, not a boat tail. */
@@ -387,6 +400,23 @@ function withoutShadow(o: Outline): Outline {
   }
 }
 
+/** A typed axis this many degrees or more from the shank's symmetry line is named, and never below three standard uncertainties of that angle. */
+const typedAxisTolerance = 1
+
+/**
+ * The outline of an axis the user typed, with how far that axis is from the symmetry line of the
+ * shank's two sides where it is `typedAxisTolerance` or more and three standard uncertainties of
+ * the half difference (a short shank or a coarse edge gives an uncertain slope): the two shank
+ * lines then run apart from the axis by equal and opposite slopes, half their difference the turn.
+ */
+function typedAxisOff(o: Outline): Outline {
+  const t = sideTapers(o)
+  if (!t) return o
+  const off = fromSi('angle', Math.abs(Math.atan(t.left.line.b) - Math.atan(t.right.line.b)) / 2)
+  const least = Math.max(typedAxisTolerance, 3 * fromSi('angle', t.slopeError / Math.SQRT2))
+  return off >= least ? { ...o, typedOff: off } : o
+}
+
 /**
  * The outline of the segmented bullet. The axis starts at the long axis of the pixels and is
  * turned and shifted until the middle of the two edges lies on it: the symmetry line of both
@@ -404,5 +434,5 @@ export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | und
   const o =
     turned && profileOf(seg, turned, turned.ambiguous, edgeUncertaintyOf(opt.edgeSpread ?? 0))
   // an axis the user fixed is not the symmetry line, so the two sides need not agree
-  return o && (fixed ? o : withoutShadow(o))
+  return o && (fixed ? typedAxisOff(o) : withoutShadow(o))
 }
