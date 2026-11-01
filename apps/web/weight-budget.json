@@ -75,7 +75,7 @@
     "records": {
       "budget": {
         "initial": 506000,
-        "total": 557000
+        "total": 560000
       },
       "routes": {
         "/bullets/[id]": {
