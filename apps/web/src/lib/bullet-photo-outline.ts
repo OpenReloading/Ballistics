@@ -391,11 +391,12 @@ function withoutOverhang(o: Outline): Outline {
   if (cut < 0 || cut > o.r.length / 4 || cut - lateAt > 0.2 * (lateAt - early)) {
     const [sharp, sharpLine] =
       side === 'right' ? [sides.right, lines.right] : [sides.left, lines.left]
-    const face = straightFace(
-      reach(sharp, sharpLine, 0.9) - early,
-      lateAt - reach(late, line, 0.1),
-      cut < 0 ? Number.POSITIVE_INFINITY : cut - lateAt,
-    )
+    const sharpAt = reach(sharp, sharpLine, 0.9)
+    // a side that never reaches its line is no straight face
+    const face =
+      cut >= 0 &&
+      sharpAt >= 0 &&
+      straightFace(sharpAt - early, lateAt - reach(late, line, 0.1), cut - lateAt)
     return face ? o : { ...o, shadow: { side, removed: false } }
   }
   const zb = at(o.z, cut) - 1
