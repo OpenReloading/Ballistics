@@ -137,8 +137,8 @@ export const loadAnalysis = z.object({
       targetPressure: z.number().positive().describe('Target peak pressure, bar.').optional(),
       targetPercent: z.number().positive().describe('Target, % of CIP Pmax.').optional(),
       manufacturer: catalogueRef('manufacturer').optional(),
-      base: text(200).min(1).optional(),
-      form: text(200).min(1).optional(),
+      base: text(200).min(1).describe('Base filter.').optional(),
+      form: text(200).min(1).describe('Form filter.').optional(),
     })
     .describe('Powders tab mode and filters (GLOSSARY `powders`).')
     .optional(),

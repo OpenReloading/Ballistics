@@ -4065,12 +4065,14 @@
                           "base": {
                             "type": "string",
                             "minLength": 1,
-                            "maxLength": 200
+                            "maxLength": 200,
+                            "description": "Base filter."
                           },
                           "form": {
                             "type": "string",
                             "minLength": 1,
-                            "maxLength": 200
+                            "maxLength": 200,
+                            "description": "Form filter."
                           }
                         },
                         "required": [
