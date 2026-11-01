@@ -189,7 +189,7 @@ export function BulletCompare({
                             {delta && (
                               <span className="compare-delta">
                                 {' '}
-                                <span className="visually-hidden">
+                                <span className="visually-hidden delta-name">
                                   {t('difference to the first bullet')}
                                 </span>{' '}
                                 ({delta})

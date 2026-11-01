@@ -134,7 +134,7 @@ it('keeps a repeated label once per repeat', () => {
   ).toEqual(['0.507'])
 })
 
-it("takes each bullet's own first G1 into the key values, whatever its velocity bands", () => {
+it("takes each bullet's first G1 into the key values with its band: one band, one row", () => {
   const banded = record({
     ballisticCoefficients: [
       { dragModel: 'G1', value: 0.5, minVelocity: { value: 600 } },
@@ -145,13 +145,20 @@ it("takes each bullet's own first G1 into the key values, whatever its velocity 
     id: 'y',
     ballisticCoefficients: [{ dragModel: 'G1', value: 0.45 }],
   } as Partial<Bullet>)
-  const groups = compareGroups([banded, single], presetUnits('us'))
-  const g1 = groups[0]?.rows.find((r) => say(english, r.label) === 'BC G1')
-  expect(g1).toMatchObject({ values: ['0.500', '0.450'], unit: 'lb/in²' })
-  expect(g1?.from).toBeUndefined()
-  // the second band stays with the coefficients, the single G1 is not repeated there
-  const rest = groups.find((g) => say(english, g.title) === 'Ballistic coefficients')
-  expect(rest?.rows.map((r) => r.values)).toEqual([['0.480', undefined]])
+  const twin = record({
+    id: 'z',
+    ballisticCoefficients: [{ dragModel: 'G1', value: 0.47, minVelocity: { value: 500 } }],
+  } as Partial<Bullet>)
+  const groups = compareGroups([banded, single, twin], presetUnits('metric-grams'))
+  const g1 = groups[0]?.rows.filter((r) => say(english, r.label) === 'BC G1')
+  // a band compares only with the same band: the banded and the unbanded first G1 are two rows
+  expect(g1?.map((r) => [r.from, r.values])).toEqual([
+    ['600 m/s', ['0.500', undefined, undefined]],
+    [undefined, [undefined, '0.450', undefined]],
+    ['500 m/s', ['0.480', undefined, '0.470']],
+  ])
+  // the 500 m/s band moved whole: no row of it is left with n/a for the third bullet
+  expect(groups.some((g) => say(english, g.title) === 'Ballistic coefficients')).toBe(false)
 })
 
 it('gives each value after the first its difference to the first, as shown', () => {

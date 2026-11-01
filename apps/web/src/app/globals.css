@@ -11322,6 +11322,14 @@ main .compare-table {
   font-weight: 400;
 }
 
+/* paper prints the hidden notes of a table (`.field-table td .visually-hidden`), not this name:
+   the legend says what the brackets hold */
+@media print {
+  .field-table td .delta-name {
+    display: none;
+  }
+}
+
 /* a column's Use in workbench: a small link under the name */
 .compare-workbench {
   display: inline-flex;

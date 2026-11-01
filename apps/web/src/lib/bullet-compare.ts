@@ -87,46 +87,63 @@ const keyRows: { group: Wording; key: string }[] = [
   { group: msg('Size'), key: 'Mass#' },
   { group: msg('Size'), key: 'Diameter#' },
   { group: msg('Size'), key: 'Length#' },
-  { group: msg('Computed'), key: 'Sectional density#' },
 ]
 
-/** The drag models of the Key group, each a row of its own. */
+/** The drag models of the Key group. */
 const keyModels = ['G1', 'G7']
 
-/**
- * The Key group: the first row of each of `keyRows` the bullets have, taken out of its own group,
- * and before the sectional density a row per drag model of `bc`.
- */
-function keyGroup(
-  groups: Map<string, Map<string, CompareRow>>,
-  bc: CompareRow[],
-): Map<string, CompareRow> {
-  const key = new Map<string, CompareRow>()
-  for (const k of keyRows) {
-    if (k.key === 'Sectional density#') for (const r of bc) key.set(keyOf(r.label), r)
-    const rows = groups.get(keyOf(k.group))
-    const found = [...(rows?.keys() ?? [])].find((r) => r.startsWith(k.key))
-    const row = found === undefined ? undefined : rows?.get(found)
-    if (found === undefined || !row) continue
-    rows?.delete(found)
-    key.set(found, row)
-  }
-  return key
+/** The first row of `group` whose key starts with `start`, taken out of it, with its key. */
+function take(groups: Map<string, Map<string, CompareRow>>, group: Wording, start: string) {
+  const rows = groups.get(keyOf(group))
+  const found = [...(rows?.keys() ?? [])].find((r) => r.startsWith(start))
+  const row = found === undefined ? undefined : rows?.get(found)
+  if (found === undefined || !row) return []
+  rows?.delete(found)
+  return [[found, row] as const]
+}
+
+/** The coefficient rows `ids`, taken out of the Ballistic coefficients group, labelled "BC G1", "BC G7". */
+function takeCoefficients(groups: Map<string, Map<string, CompareRow>>, ids: string[]) {
+  const coefficients = groups.get(keyOf(msg('Ballistic coefficients')))
+  return ids.flatMap((id) => {
+    const row = coefficients?.get(id)
+    if (!row) return []
+    coefficients?.delete(id)
+    const model = typeof row.label === 'object' && 'verbatim' in row.label ? row.label.verbatim : ''
+    return [[id, { ...row, label: worded(msg('BC {model}'), { model }) }] as const]
+  })
 }
 
 /**
- * A bullet's coefficient rows split: the first of each drag model of `keyModels` (its first band,
- * the Key group's value) and the others (the Ballistic coefficients group).
+ * The Key group: mass, diameter and length taken out of Size, the coefficient rows `bc` (moved
+ * whole, their band kept) and the sectional density out of Computed.
  */
-function splitCoefficients(rows: FieldRow[]) {
-  const first = new Map<string, FieldRow>()
-  const rest: FieldRow[] = []
-  for (const r of rows) {
-    const model = typeof r.label === 'object' && 'verbatim' in r.label ? r.label.verbatim : ''
-    if (keyModels.includes(model) && !first.has(model)) first.set(model, r)
-    else rest.push(r)
-  }
-  return { first, rest }
+function keyGroup(
+  groups: Map<string, Map<string, CompareRow>>,
+  bc: string[],
+): Map<string, CompareRow> {
+  return new Map<string, CompareRow>([
+    ...keyRows.flatMap((k) => take(groups, k.group, k.key)),
+    ...takeCoefficients(groups, bc),
+    ...take(groups, msg('Computed'), 'Sectional density#'),
+  ])
+}
+
+/**
+ * The merged row keys (`mergeRows`) of each bullet's first coefficient of each of `keyModels`,
+ * G1 before G7, each once: a band of its own is a row of its own.
+ */
+function keyCoefficients(bullets: Bullet[], system: UnitSystem): string[] {
+  return keyModels.flatMap((model) => [
+    ...new Set(
+      bullets.flatMap((b) => {
+        const c = b.ballisticCoefficients?.find((x) => x.dragModel === model)
+        if (!c) return []
+        const from = c.minVelocity && ` from ${withUnit('velocity', system, c.minVelocity.value)}`
+        return [`${keyOf({ verbatim: model })}${from ?? ''}#0`]
+      }),
+    ),
+  ])
 }
 
 /**
@@ -148,22 +165,10 @@ export function compareGroups(
       return [keyOf(title), new Map()]
     }),
   )
-  // each bullet's own first G1 and G7, whatever its bands: one row per drag model
-  const bc: CompareRow[] = keyModels.map((model) => ({
-    label: worded(msg('BC {model}'), { model }),
-    unit: system.ballisticCoefficient.symbol,
-    values: Array.from({ length: bullets.length }, () => undefined),
-  }))
   bullets.forEach((b, i) => {
-    const { first, rest } = splitCoefficients(ballisticCoefficientRows(b))
-    keyModels.forEach((model, k) => {
-      const r = first.get(model)
-      const row = bc[k]
-      if (r && row) row.values[i] = rowParts(r, system, t).number
-    })
     const own: FieldGroup[] = [
       ...bulletDataGroups(b),
-      { title: msg('Ballistic coefficients'), rows: rest },
+      { title: msg('Ballistic coefficients'), rows: ballisticCoefficientRows(b) },
     ]
     for (const g of own) {
       const wording = g.title ?? untitled
@@ -174,10 +179,7 @@ export function compareGroups(
       mergeRows(rows, g.rows, i, bullets.length, system, t)
     }
   })
-  const key = keyGroup(
-    groups,
-    bc.filter((r) => r.values.some((v) => v !== undefined)),
-  )
+  const key = keyGroup(groups, keyCoefficients(bullets, system))
   return [
     { title: msg('Key values') as Wording, rows: [...key.values()] },
     ...[...groups].map(([title, rows]) => ({

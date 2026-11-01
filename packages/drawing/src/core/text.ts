@@ -29,10 +29,20 @@ export function labelText(
     d.symbol === 'Rt/R'
       ? String(d.value)
       : fixed && unit === 'mm'
-        ? d.value.toFixed(2)
+        ? fixedMm(d.value)
         : lengthText(d.value, unit)
   const text = `${d.kind === 'diameter' ? face.diameterSign : ''}${d.symbol} ${value}`
   return d.derived ? `(${text})` : text
+}
+
+/**
+ * A length in mm to 2 decimals, rounded as its decimal text reads (2.675 to 2.68, where `toFixed`
+ * rounds the binary value down), the zeros kept.
+ */
+function fixedMm(mm: number) {
+  // a number written with an exponent (1e-7) has no decimal text to round
+  if (String(mm).includes('e')) return mm.toFixed(2)
+  return Number(`${Math.round(Number(`${mm}e2`))}e-2`).toFixed(2)
 }
 
 /** Decimal degrees with up to four decimals, as the values tables print them: 40°, 71.4331°. */
