@@ -2040,19 +2040,28 @@ export function useWorkbenchState() {
     return 'error' in plan ? plan.error : undefined
   }
 
+  /**
+   * Opens the groups that hold an invalid field, so focus can reach it: an invalid model parameter
+   * (on a phone), a powder field under More, and a refused typed bulk density, which sits in the
+   * Model parameters group when the record has none.
+   */
+  function revealInvalid(errors: Record<string, unknown>, refused: string | undefined) {
+    if (modelFields.some((k) => errors[k]) || refused === 'bulkDensity') setModelShown(true)
+    if (powderMoreFields.some((k) => errors[k])) setMore('powder')
+  }
+
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
     let invalid = false
     flushSync(() => {
       const { hasErrors, errors } = form.validate()
-      // an invalid model parameter on a phone: the group opens, so focus can reach it
-      if (modelFields.some((k) => errors[k])) setModelShown(true)
-      if (powderMoreFields.some((k) => errors[k])) setMore('powder')
+      const refused = refusedSpec()
+      revealInvalid(errors, refused?.key)
       const ladderInvalid = stepError()
       setLadderError(ladderInvalid)
       // the seating ladder's reasons are about the seating, not about one field: the status line names them too
       if (ladderInvalid && ladderKind !== 'charge') setStatus(ladderInvalid)
-      invalid = hasErrors || ladderInvalid !== undefined || specError() !== undefined
+      invalid = hasErrors || ladderInvalid !== undefined || refused !== undefined
       // on phones the field sits in the Load tab, which is hidden while Results is open
       if (invalid) workspace.current?.showInputs()
     })
@@ -2071,10 +2080,15 @@ export function useWorkbenchState() {
 
   /** The message of a typed Pmax, L3 or bulk density its field refuses: a run would read the record's instead. */
   function specError() {
+    return refusedSpec()?.error
+  }
+
+  /** The first typed spec its field refuses, with the field's message. */
+  function refusedSpec() {
     for (const f of specFields) {
       const v = spec.typed[f.key]
       const error = v?.text.trim() ? fieldError(f, v, system, t) : undefined
-      if (error) return error
+      if (error) return { key: f.key, error }
     }
     return
   }
