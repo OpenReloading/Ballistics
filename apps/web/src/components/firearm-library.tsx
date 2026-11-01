@@ -186,7 +186,7 @@ function firearmColumns(
       unit: system.range.symbol,
       help: msg('The first optic of the active configuration and its zero range.'),
       width: '11.5rem',
-      value: (r) => cells(r).optic || undefined,
+      value: (r) => cells(r).opticZero,
       cell: (r) => [cells(r).optic, cells(r).zero].filter(Boolean).join(' · '),
     },
     {
