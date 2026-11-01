@@ -33,6 +33,9 @@ exclude = [
   '^https://www\.accurateshooter\.com/\?p=2477$', # a bot filter answers 307 without a target to automated clients
   '^https://www\.knsa\.nl/$', # the server sends a certificate chain that does not verify (openssl: unable to verify the first certificate)
   '^https://www\.knsa\.nl/media/1956/swr-delen-i-x-samengevoegd\.pdf$', # same broken chain
+  '^https://hdl\.handle\.net/11104/0129879$', # answers 404 to the CI runner on two runs in a row, 302 to a page that answers 200 elsewhere
+  '^https://www\.gesetze-im-internet\.de/markeng/__23\.html$', # times out from the CI runner on two runs in a row, 200 elsewhere
+  '^https://www\.gesetze-im-internet\.de/urhg/__2\.html$', # same timeout from the CI runner, 200 elsewhere
   # Single-page apps that route by the fragment, which is not an anchor in the served HTML.
   '^https://chromedevtools\.github\.io/devtools-protocol/#/Emulation\.setCPUThrottlingRate$',
   '^https://euipo\.europa\.eu/eSearch/#details/trademarks/018980378$',
