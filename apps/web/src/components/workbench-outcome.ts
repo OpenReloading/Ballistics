@@ -4,6 +4,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
+import { limitShare } from '../lib/limit-text.ts'
 import { nth } from '../lib/nth.ts'
 import type {
   LadderDirection,
@@ -316,13 +317,7 @@ export function resultLine(
   const values = [
     single ? t('Peak {pressure}', { pressure }) : t('peak {pressure}', { pressure }),
     ...(ofMax?.limit.pressure
-      ? [
-          t('{percent} % of CIP {symbol} {limit}', {
-            percent: formatNumber(ofMax.percent, 0),
-            symbol: ofMax.limit.symbol,
-            limit: p(ofMax.limit.pressure),
-          }),
-        ]
+      ? [limitShare(ofMax.limit, formatNumber(ofMax.percent, 0), t, p(ofMax.limit.pressure))]
       : []),
     withUnit('velocity', system, ok.body.result.muzzleVelocity),
   ].join(', ')
@@ -350,9 +345,10 @@ export function stepFlag(ok: Shown, t: Translator['t']) {
   // its maximum
   const name = (l: NonNullable<typeof limits>[number]) => `CIP ${l.symbol}`
   const peak = limits?.find((l) => l.nominalExceeded)
-  if (peak) return t('above {name}', { name: name(peak) })
+  if (peak) return peak.typed ? t('above your Pmax') : t('above {name}', { name: name(peak) })
   const range = limits?.find((l) => l.exceeded)
-  if (range) return t('range above {name}', { name: name(range) })
+  if (range)
+    return range.typed ? t('range above your Pmax') : t('range above {name}', { name: name(range) })
   if (warnings.some((w) => modelCodes.includes(w.code)) || derived(ok, t).fill)
     return t('model flag')
   return

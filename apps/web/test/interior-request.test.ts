@@ -120,6 +120,21 @@ it('names the groove diameter of a cartridge record not loaded yet, and runs wit
   expect(r.body.load.resistance).toBeUndefined()
 })
 
+it("hands a typed Pmax over as the pressure limit and a typed bulk density over the record's", () => {
+  const sensitive = { ...demo, bulkDensity: { value: 0.95 } }
+  const r = interiorRequest({
+    values,
+    powder: sensitive,
+    pressureLimit: 3.6e8,
+    bulkDensity: 880,
+  })
+  expect(r.body.pressureLimit).toBe(3.6e8)
+  expect(r.bulkDensity).toBe(880)
+  const plain = interiorRequest({ values, powder: sensitive })
+  expect(plain.body).not.toHaveProperty('pressureLimit')
+  expect(plain.bulkDensity).toBeCloseTo(950, 9)
+})
+
 it('lets a typed bore friction replace the friction of the law', () => {
   const r = interiorRequest({ values: { ...values, boreFriction: 3e7 }, powder: demo })
   expect(r.body.load.resistance?.friction).toBe(3e7)

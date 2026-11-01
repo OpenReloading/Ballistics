@@ -162,9 +162,12 @@ export interface InteriorResponse {
   /** The sampled band of the run (`sampling`), `POST /interior`; `failed` is set by the web app when its request did not answer. */
   sampled?: SampledBand
   limits?: {
-    cartridge: string
+    /** Absent for a Pmax the user typed (`typed`). */
+    cartridge?: string | undefined
     /** Date of the sheet revision, `revised` or else `published`. */
-    revised: string
+    revised?: string | undefined
+    /** A Pmax the user typed in place of the sheet's. */
+    typed?: boolean | undefined
     symbol: string
     method: string | null
     variant?: string | undefined

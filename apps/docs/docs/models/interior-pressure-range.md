@@ -70,6 +70,18 @@ The answer also names the dominant input: the single input whose two ends differ
 
 The class and the message state where the entered number lies against the simulated range, nothing about a load. `inputPlausible` means only that the number is within the spread of the simulation. `modelDiscrepancy` means the simulation and the number do not agree for these inputs, and the model error that the range leaves out can be the cause. The stored limit of a cartridge is not an entered maximum: the limit check is unchanged.
 
+### Pressure limit
+
+A request with a cartridge compares the range with the Pmax of the cartridge's C.I.P. sheet, one limit per variant. A `pressureLimit` typed with the request replaces them: it is the one limit, compared whether or not a cartridge is named. With $p_\text{lim}$ the limit:
+
+$$
+\text{nominalExceeded} = p_\text{nom} > p_\text{lim}, \qquad \text{exceeded} = p_\text{high} > p_\text{lim}
+$$
+
+Code: `packages/api/src/compute/limits.ts`, `typedLimit`, `limitCheck`.
+
+A typed limit is marked `typed` and names no sheet or method: it is the user's own number, no C.I.P. value, and the answers and the workbench say "your Pmax". The percentage charge target (`unit: percentOfLimit`) reads the same limit.
+
 ### Default tolerances
 
 | Input | Default tolerance |

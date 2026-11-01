@@ -39,7 +39,7 @@ import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-typ
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { type BaseType, type BulletValues, typedBullet } from '../lib/bullet.ts'
 import { designShape } from '../lib/bullet-designer.ts'
-import { drawable } from '../lib/cartridge-sheet.ts'
+import { drawable, withCaseLength } from '../lib/cartridge-sheet.ts'
 import {
   measuredWaterCapacitySpec,
   renamedCasePath,
@@ -343,6 +343,8 @@ type PreviewProps = {
     values?: BulletValues | undefined
     /** The base form typed over the record's. */
     baseType?: BaseType | undefined
+    /** The case length L3 typed over the sheet's, mm. */
+    caseLength?: number | undefined
   }
   /**
    * Where the controls go instead of beside the drawing: case capacity, seating and the
@@ -532,12 +534,16 @@ function useGeometry(o: {
   design: UserBulletView | undefined
   values: BulletValues | undefined
   baseType: BaseType | undefined
+  caseLength: number | undefined
   shown: RefObject<UnitSystem>
   lands: LandsMm | undefined
 }) {
-  const { draft, detail, record, design: chosen, values, baseType, shown, lands } = o
+  const { draft, detail, record, design: chosen, values, baseType, caseLength, shown, lands } = o
   const draftSpec = draft?.spec
-  const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
+  const spec = useMemo(() => {
+    const own = specOf(draftSpec, detail)
+    return own && caseLength !== undefined ? withCaseLength(own, caseLength) : own
+  }, [draftSpec, detail, caseLength])
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
   const capacities = capacitiesOf(detail)
   // the typed values in place, one object per record, design or values, so the shape is not rebuilt for each render
@@ -875,6 +881,7 @@ function useSeatingModel(p: PreviewProps) {
   const { spec, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
     values: p.linked?.values,
     baseType: p.linked?.baseType,
+    caseLength: p.linked?.caseLength,
     draft,
     detail,
     record,
@@ -2013,6 +2020,15 @@ function JumpRow({ m, seating }: RowsProps) {
   )
 }
 
+/** The seating depth's note: where the case length comes from. */
+function seatingNote(m: Model, chamber: Chamber, t: Translator['t']) {
+  const length = m.mm(chamber.caseLength)
+  if (m.p.linked?.caseLength !== undefined) return t('case length: L3 typed {length}', { length })
+  return m.designed
+    ? t('case length: cartridge L3 of the design {length}', { length })
+    : t('case length: CIP L3 maximum {length}', { length })
+}
+
 function SeatingValues({ m, seating, chamber }: RowsProps) {
   const { t } = useTranslation()
   const { card, mode, slots, design, contact } = m
@@ -2041,13 +2057,7 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
           value={m.len(seating.depth.value)}
           unit={m.length.symbol}
           tag={seating.depth.tag}
-          note={
-            m.designed
-              ? t('case length: cartridge L3 of the design {length}', {
-                  length: m.mm(chamber.caseLength),
-                })
-              : t('case length: CIP L3 maximum {length}', { length: m.mm(chamber.caseLength) })
-          }
+          note={seatingNote(m, chamber, t)}
         />
         {aside(slots, <CaseVolumeRow {...rows} />, more)}
         {/* in the workbench the field "Usable case volume" shows it, flagged "from seating" */}

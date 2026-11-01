@@ -39,6 +39,6 @@ test('a copied link runs the same load where its bullet and powder records are m
     'Demo Powder Co. DP40 (from the link)',
   )
   // the cartridge record's limit is read from its file after the page loads
-  await expect(form.getByText('CIP Pmax', { exact: true }).locator('..')).toContainText('4150')
+  await expect(form.getByRole('textbox', { name: /^Pmax/ })).toHaveValue('4150')
   expect(await runLine(missing)).toBe(withRecords)
 })

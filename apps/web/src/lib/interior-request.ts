@@ -24,6 +24,10 @@ export interface InteriorSources {
   grooveDiameter?: number | undefined
   /** The bullet record's length, mm. */
   bulletLength?: number | undefined
+  /** The Pmax the user typed, Pa: the limit of the run instead of the cartridge's CIP Pmax. */
+  pressureLimit?: number | undefined
+  /** The bulk density the user typed, kg/m3, instead of the powder record's. */
+  bulkDensity?: number | undefined
 }
 
 /** The bore resistance of a run: the record's law, else what a link carried of it, with what the law could not apply. */
@@ -66,10 +70,11 @@ export function interiorRequest(s: InteriorSources) {
     { ...values, boreArea: values.boreArea ?? s.boreArea },
     s.cartridge?.id,
     s.grooveDiameter,
+    s.pressureLimit,
   )
-  const bulkDensity = powder?.bulkDensity
-    ? toSi('density', powder.bulkDensity.value)
-    : s.linked?.bulkDensity
+  const bulkDensity =
+    s.bulkDensity ??
+    (powder?.bulkDensity ? toSi('density', powder.bulkDensity.value) : s.linked?.bulkDensity)
   const { resistance, missing } = resistanceFor(s, body)
   const applied = overrideResistance(resistance, values)
   if (applied) body.load.resistance = applied
