@@ -2398,6 +2398,13 @@ export function useWorkbenchState() {
   })
   /** The seating a run reads: now, or this render's for a Powders tab row (`as`), as its values. */
   const seatedFor = (as: unknown) => (as ? seated : seatedNow.current)
+  /** The cavity bracket's volume tolerance, read like `volumeNow`. */
+  const cavityNow = (as: unknown) =>
+    cavityFractionOf({
+      seated: seatedFor(as),
+      fields: as ? fields : form.getValues(),
+      previewed: as ? previewed : previewedNow.current,
+    })
 
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
@@ -2446,8 +2453,6 @@ export function useWorkbenchState() {
     return
   }
 
-  const cavityFraction = cavityFractionOf({ seated, fields, previewed })
-
   /**
    * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
    * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
@@ -2482,7 +2487,7 @@ export function useWorkbenchState() {
       boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
-      volumeFraction: cavityFraction,
+      volumeFraction: cavityNow(as),
       pressureLimit: typedSpec(spec.typed, 'pmax'),
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
