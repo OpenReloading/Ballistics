@@ -94,7 +94,7 @@ Each record that uses granted values cites the grant as one source in `provenanc
 | `publisher` | The maker |
 | `url` | The maker's product page the values were read from |
 | `retrieved` | The day the values were read, ISO 8601 |
-| `license` | `"LicenseRef-`<maker>`"`, one token of letters, digits, `.`, `+` and `-` |
+| `license` | `"LicenseRef-<maker>"`, with `<maker>` replaced by one token of letters, digits, `.`, `+` and `-` |
 | `terms` | A note of the grant: its date, who granted it (a role, not a person's name), the fields and the scope as granted, and any attribution asked for |
 | `fields` | Only when the grant covers some fields: their dot paths |
 
