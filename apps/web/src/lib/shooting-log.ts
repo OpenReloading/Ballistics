@@ -14,7 +14,7 @@ import {
 import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
-import { roundsDue, withSessionRounds } from './firearm.ts'
+import { countedFor, roundsDue, withSessionRounds } from './firearm.ts'
 import { userDataText } from './user-data.ts'
 
 /** A new entry: today, no rounds yet. */
@@ -151,12 +151,13 @@ export function cleanEntry(e: ShootingLogEntry): ShootingLogEntry {
 
 /**
  * The rounds of entry `id` (`rounds` rounds) that the count of the firearm record does not hold
- * yet: the rounds less those counted for the entry before. 0 for a record that is no firearm or
- * has no count.
+ * yet: the rounds less those counted for the entry before and for the competition event it links
+ * (`event`, the same match, #919). 0 for a record that is no firearm or has no count.
  */
-export function entryRoundsDue(record: UserRecord, id: string, rounds: number) {
+export function entryRoundsDue(record: UserRecord, id: string, rounds: number, event?: string) {
   if (record.kind !== 'firearm' || record.data.roundCount === undefined) return 0
-  return roundsDue(record.data, entryRef(id), record.data.roundCount, rounds)
+  const due = roundsDue(record.data, entryRef(id), record.data.roundCount, rounds)
+  return Math.max(0, due - (event ? countedFor(record.data, [event]) : 0))
 }
 
 /**
@@ -164,8 +165,14 @@ export function entryRoundsDue(record: UserRecord, id: string, rounds: number) {
  * `countedSessions` under the entry's reference, so a saved entry is counted once; undefined,
  * leaving the record, when nothing is due.
  */
-export function withEntryRounds(record: UserRecord, id: string, rounds: number, now = new Date()) {
-  const due = entryRoundsDue(record, id, rounds)
+export function withEntryRounds(
+  record: UserRecord,
+  id: string,
+  rounds: number,
+  now = new Date(),
+  event?: string,
+) {
+  const due = entryRoundsDue(record, id, rounds, event)
   if (record.kind !== 'firearm' || due < 1) return
   return withSessionRounds(record, entryRef(id), record.data.roundCount, rounds, due, now)
 }

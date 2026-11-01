@@ -1,5 +1,6 @@
 import { type ShootingLogRecord, type UserRecord, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { eventRoundsDue, withEventRounds } from '../src/lib/firearm.ts'
 import {
   blankEntry,
   cleanEntry,
@@ -220,6 +221,27 @@ describe('the round count of an entry', () => {
     expect(f.kind === 'firearm' && f.data.roundCount).toBe(1330)
     expect(entryRoundsDue(f, ids[0], 30)).toBe(0)
     expect(withEntryRounds(f, ids[0], 30, now)).toBeUndefined()
+  })
+
+  it('adds the rounds of a match once when its event and an entry linking it are both offered (#919)', () => {
+    const event = 'user:00000000-0000-4000-8000-0000000000e1'
+    const entryRefs = [`user:${ids[0]}`]
+    // the event first (60 rounds), then the entry of the same match with 70 (10 sighting shots)
+    const afterEvent = defined(withEventRounds(firearm({ roundCount: 1000 }), event, 60, 60, now))
+    expect(entryRoundsDue(afterEvent, ids[0], 70, event)).toBe(10)
+    const both = defined(withEntryRounds(afterEvent, ids[0], 70, now, event))
+    expect(both.kind === 'firearm' && both.data.roundCount).toBe(1070)
+    expect(both.kind === 'firearm' && eventRoundsDue(both.data, event, 60, entryRefs)).toBe(0)
+    // the entry first: the event offers only the rounds beyond it
+    const afterEntry = defined(
+      withEntryRounds(firearm({ roundCount: 1000 }), ids[0], 50, now, event),
+    )
+    expect(
+      afterEntry.kind === 'firearm' && eventRoundsDue(afterEntry.data, event, 60, entryRefs),
+    ).toBe(10)
+    const other = defined(withEventRounds(afterEntry, event, 60, 60, now, entryRefs))
+    expect(other.kind === 'firearm' && other.data.roundCount).toBe(1060)
+    expect(entryRoundsDue(other, ids[0], 50, event)).toBe(0)
   })
 
   it('changes nothing for a firearm without a count or for no rounds', () => {
