@@ -1,6 +1,8 @@
 'use client'
 
 import type { Cartridge, Powder } from '@open-reloading/schema'
+import { ChartBar } from '@phosphor-icons/react'
+import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -23,11 +25,13 @@ import {
 import { fittedEnergyRatio } from '../lib/powder-record.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { powderParameterGroups, powderRowGroups, powderStrip } from '../lib/record-fields.ts'
+import { tunePowderHref } from '../lib/tune-href.ts'
 import { type BurnRatePlace, BurnRateSummary, type Neighbour } from './burn-rate-section.tsx'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldPanel, FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { PowderFit } from './powder-fit.tsx'
+import { LinkButton } from './record-actions.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 import { VivacityPanel } from './vivacity-panel.tsx'
@@ -76,6 +80,7 @@ async function cartridgeNamesOf(ids: string[], signal: AbortSignal) {
 }
 
 function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extras) {
+  const { t } = useTranslation()
   const manufacturerName = names.get(p.manufacturer)
   const curve = classifyPowder(p, names)
   const ratio = fittedEnergyRatio(p)
@@ -95,6 +100,14 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       className="record-chart"
       compare={isFitted(curve) ? `/powders/burn-rates?add=${encodeURIComponent(p.id)}` : undefined}
       workbench={workbenchHref('powder', p.id)}
+      more={
+        <LinkButton
+          href={tunePowderHref(`catalogue:${p.id}`)}
+          icon={<ChartBar aria-hidden="true" />}
+        >
+          {t('Tune from strings')}
+        </LinkButton>
+      }
       provenance={p.provenance}
       kind="powders"
       strip={
