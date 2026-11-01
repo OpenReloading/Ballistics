@@ -20,7 +20,11 @@
     "raw": "cast lead bullets",
     "structure": "cast",
     "core": {
-      "material": "lead-alloy"
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 18,
+        "raw": "Brinell 18"
+      }
     },
     "gasCheck": false
   },
@@ -33,7 +37,7 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length"],
+        "fields": ["diameter", "mass", "length", "construction.core.hardness"],
         "note": "357135M, IDP #8 (https://missouribullet.com/details.php?prodId=158): .357 Diameter, 135 Grain RN, Brinell 18, Bullet OAL .620 +/-"
       },
       {

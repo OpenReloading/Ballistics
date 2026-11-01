@@ -16,7 +16,11 @@
     "raw": "cast lead bullets",
     "structure": "cast",
     "core": {
-      "material": "lead-alloy"
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 12,
+        "raw": "Brinell 12"
+      }
     },
     "gasCheck": false
   },
@@ -29,7 +33,7 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass"],
+        "fields": ["diameter", "mass", "construction.core.hardness"],
         "note": "BP-358105CB, Cowboy #16 - Black Powder (https://missouribullet.com/details.php?prodId=436): .358 Diameter, 105 Grain TCFP, Brinell 12"
       },
       {
