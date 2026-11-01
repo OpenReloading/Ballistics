@@ -435,10 +435,13 @@ function totalLine(
   t: Translator['t'],
   e: CompetitionEvent,
   totals: EventTotals | undefined,
+  type: EventType | undefined,
 ): string {
   if (e.state === 'disqualified') return t('Disqualified: no total.')
   if (totals?.total !== undefined)
     return t('Event total: {total}', { total: scoreText(totals.total) })
+  // without its type (not in the catalogue) the event cannot be scored here
+  if (!type) return t('Event total: {total}', { total: '–' })
   const parts = e.results.method === 'rings' ? e.results.series : e.results.stages
   // no totals for results that exist: a value the scoring refuses, such as a stage time of 0
   if (!totals && parts.length) return t('Check the event: a value is out of its range.')
@@ -482,7 +485,7 @@ function ResultsEditor({
         />
       )}
       <Text fw={600} mt="sm" className="event-total">
-        {totalLine(t, e, totals)}
+        {totalLine(t, e, totals, type)}
       </Text>
     </>
   )
@@ -749,7 +752,7 @@ function EventSheet({
           </Table.Tbody>
         </Table>
       )}
-      <p>{totalLine(t, e, totals)}</p>
+      <p>{totalLine(t, e, totals, type)}</p>
       {e.notes && <p>{e.notes}</p>}
     </div>
   )
