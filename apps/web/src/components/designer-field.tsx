@@ -84,7 +84,14 @@ export const DesignerField = memo(function DesignerField({
             ? {
                 kind: 'restore',
                 text: `${t('Back to the record value.')} ${help}`,
-                onClick: () => revert({ type: 'revert', key: spec.key, system }),
+                onClick: () => {
+                  // the button goes with the change: the field keeps the focus
+                  const input = document.activeElement
+                    ?.closest('.designer-field')
+                    ?.querySelector<HTMLInputElement>('input')
+                  revert({ type: 'revert', key: spec.key, system })
+                  input?.focus()
+                },
               }
             : undefined
         }

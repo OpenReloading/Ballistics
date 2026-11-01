@@ -1,12 +1,13 @@
 'use client'
 
 import { NativeSelect, Table, Text, TextInput } from '@mantine/core'
-import { useDebouncedValue } from '@mantine/hooks'
+import { useDebouncedValue, useElementSize } from '@mantine/hooks'
 import { chamberOf } from '@open-reloading/drawing/seating'
 import type { UserCartridge } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
 import {
+  type CSSProperties,
   memo,
   type ReactNode,
   useCallback,
@@ -383,9 +384,13 @@ function ParameterHead({
   seat: ReactNode
 }) {
   const { t } = useTranslation()
+  // the column head sticks under the pinned search, whose status line can take one or two lines
+  const { ref: startBox, height: startHeight } = useElementSize<HTMLDivElement>()
   return (
     <>
-      <StartSearch start={start} chosen={design.origin?.title} />
+      <div ref={startBox} className="designer-start">
+        <StartSearch start={start} chosen={design.origin?.title} />
+      </div>
       <div className="prop-grid designer-grid">
         <NameField
           value={design.name ?? ''}
@@ -407,7 +412,15 @@ function ParameterHead({
             {seat}
           </div>
           {/* the unit once per column; screen readers have it in each field's name */}
-          <div className="side-row side-head" aria-hidden="true">
+          <div
+            className="side-row side-head"
+            aria-hidden="true"
+            style={
+              startHeight
+                ? ({ '--start-search-height': `${startHeight}px` } as CSSProperties)
+                : undefined
+            }
+          >
             <span>{t('Symbol')}</span>
             <span>{t('Cartridge, {unit}', { unit })}</span>
             <span>{t('Chamber, {unit}', { unit })}</span>
@@ -554,7 +567,9 @@ export function CartridgeDesigner() {
       <FileMenu
         ref={fileMenu}
         kind="cartridge"
-        name={designFileName(fileDesign)}
+        name={designFileName(fileDesign, t('Cartridge design'))}
+        // a name typed is a change to save
+        nameKey={fileDesign.name?.trim() ?? ''}
         data={fileValue}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}

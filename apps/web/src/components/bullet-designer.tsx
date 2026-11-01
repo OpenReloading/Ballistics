@@ -132,18 +132,21 @@ const StartSearch = memo(function StartSearch({
   const names = useManufacturerNames()
   const { t } = useTranslation()
   return (
-    <RecordSearch<BulletSummary>
-      kind="bullets"
-      label={t('Start from a record')}
-      chosen={chosen ?? t('Start from a record')}
-      picked={chosen !== undefined}
-      describe={(b) =>
-        `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}`
-      }
-      onSelect={(b) => start(b.id)}
-      noneText={t('No bullet found')}
-      unreachableText={t('The database is unreachable. The designer still works.')}
-    />
+    // pinned at the top of the Parameters while the fields scroll (globals.css)
+    <div className="designer-start">
+      <RecordSearch<BulletSummary>
+        kind="bullets"
+        label={t('Start from a record')}
+        chosen={chosen ?? t('Start from a record')}
+        picked={chosen !== undefined}
+        describe={(b) =>
+          `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}`
+        }
+        onSelect={(b) => start(b.id)}
+        noneText={t('No bullet found')}
+        unreachableText={t('The database is unreachable. The designer still works.')}
+      />
+    </div>
   )
 })
 

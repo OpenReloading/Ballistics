@@ -131,7 +131,7 @@ const places = (page: Page) =>
     const top = form.getBoundingClientRect().top
     // hidden inputs (the sliders' values) have no box; the start search stays pinned at the top
     return [...form.querySelectorAll('input:not([type="hidden"])')]
-      .filter((i) => !i.closest('.prop-form > .search'))
+      .filter((i) => !i.closest('.designer-start'))
       .map((i) => {
         const r = i.getBoundingClientRect()
         return [r.left, r.top - top, r.width].map(Math.round)

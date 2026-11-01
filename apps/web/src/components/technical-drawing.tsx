@@ -287,6 +287,7 @@ export function TechnicalDrawing({
   children,
   reserve,
   level,
+  readable = false,
 }: {
   id: string
   title: string
@@ -306,6 +307,11 @@ export function TechnicalDrawing({
   reserve?: { model: FigureModel; tallest: number } | undefined
   /** Screen: the model is laid out level (medium print), shown with `data-level`. */
   level?: boolean
+  /**
+   * Screen: the page sizes the drawing itself (the cartridge designer) and keeps its text 11 px with
+   * the width `--readable` and the height to width `--aspect` the drawing states.
+   */
+  readable?: boolean | undefined
 }) {
   const { medium, em, frame, scale } = model
   const layers: Partial<Record<Side | 'combined' | 'bullet', Layout>> = model.layers
@@ -323,9 +329,10 @@ export function TechnicalDrawing({
           : ({
               '--full': `${n(w * unit)}px`,
               '--fit': fitWidth(model, tallest),
-              // a page that sizes the drawing itself keeps its text 11 px with these (the designers)
-              '--readable': readableWidth(model),
-              '--aspect': (h / w).toFixed(4),
+              ...(readable && {
+                '--readable': readableWidth(model),
+                '--aspect': (h / w).toFixed(4),
+              }),
               ...(reserve && reserved({ model, tallest }, reserve)),
             } as CSSProperties)
       }

@@ -1520,6 +1520,17 @@ td.nowrap {
   }
 }
 
+/* the Combined line's focusable short text only where the caption shows; the whole definition where
+   it is for screen readers only */
+.caption-combined-full,
+.designer .workspace-scroll:has(.seating-figure .drawing) .caption-combined-short {
+  display: none;
+}
+
+.designer .workspace-scroll:has(.seating-figure .drawing) .caption-combined-full {
+  display: inline;
+}
+
 @media screen and (min-width: 62em) {
   .designer .workspace-scroll:has(.seating-figure .drawing) {
     overflow-y: auto;
@@ -1726,31 +1737,29 @@ td.nowrap {
   box-shadow: var(--mantine-shadow-md);
 }
 
-/* the designers' start-from search stays at the top of the Parameters while the fields scroll, so
-   another record can be started and the design's source stays in view; the cartridge designer's
-   column head sticks under it */
-@media screen and (min-width: 48em) {
-  .designer .prop-form > .search {
+/* the designers' start-from search stays at the top of the Parameters while the fields scroll (from
+   62em, where they scroll in their own box), so another record can be started and the design's
+   source stays in view; the cartridge designer's column head sticks under it at the height it
+   measures (`--start-search-height`, inline) */
+.designer-start {
+  display: flow-root;
+}
+
+@media screen and (min-width: 62em) {
+  .designer .prop-form > .designer-start {
     position: sticky;
     top: 0;
     z-index: 3;
-    margin: 0;
-    padding-bottom: 0.25rem;
     background: var(--bg);
   }
 
-  .designer .prop-form:has(> .search) .side-head {
-    top: var(--start-search-height);
+  .designer .prop-form:has(> .designer-start) .side-head {
+    top: var(--start-search-height, 2.75rem);
   }
 
-  .designer .workspace-inputs:has(.prop-form > .search) {
-    scroll-padding-top: calc(var(--start-search-height) + 1.75rem);
+  .designer .workspace-inputs:has(.prop-form > .designer-start) {
+    scroll-padding-top: 4.5rem;
   }
-}
-
-:root {
-  /* the sticky start-from search: field and its status line */
-  --start-search-height: 2.75rem;
 }
 
 .designer-fieldset {

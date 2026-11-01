@@ -272,14 +272,17 @@ describe('history', () => {
     expect(reduce(blank, { type: 'revert', key: 'cartridge.L3', system: metric })).toBe(blank)
   })
 
-  it('types a name as one step, keeps it through a reset and drops it for a new design', () => {
+  it('keeps a name out of the undo steps, through a reset, and drops it for a new design', () => {
     const named = run(
       win308(),
+      type('cartridge.L3', '52'),
       { type: 'name', value: 'Wild' },
       { type: 'name', value: 'Wildcat A' },
     )
     expect(named.present.name).toBe('Wildcat A')
     expect(named.past).toHaveLength(1)
+    expect(named.last).toBe('cartridge.L3')
+    expect(reduce(named, { type: 'undo' }).present.name).toBe('Wildcat A')
     const reset = [type('cartridge.L3', '52'), { type: 'reset', system: metric } as Action].reduce(
       reduce,
       named,
@@ -294,6 +297,7 @@ describe('history', () => {
     expect(designFileName({ ...base, name: ' Wildcat A ' })).toBe('Wildcat A')
     expect(designFileName({ ...base, name: '  ' })).toBe(base.origin?.title)
     expect(designFileName(newDesign())).toBe('Cartridge design')
+    expect(designFileName(newDesign(), 'Patronenentwurf')).toBe('Patronenentwurf')
   })
 
   it('changes the table of the drawing rules as one step', () => {

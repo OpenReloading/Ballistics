@@ -530,6 +530,8 @@ function CombinedCaption({ unit }: { unit: LengthUnit }) {
               )}
         </span>
       </Tooltip>
+      {/* in place of the line where the caption is for screen readers only (a seated bullet) */}
+      <span className="caption-combined-full">{definition}</span>
     </span>
   )
 }
@@ -642,6 +644,8 @@ function Outline({
         tallest={tallest}
         linked={linked}
         reserve={reserve}
+        // the designer's figure: its CSS keeps the text 11 px (globals.css)
+        readable={switchable}
       />
       {print && (
         <PrintFigures

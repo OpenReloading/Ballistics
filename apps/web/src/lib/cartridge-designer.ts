@@ -32,7 +32,7 @@ import {
   siToStored,
   storedToSi,
 } from './field-spec.ts'
-import { designReduce, editHistory, type History as H, historyOf, pushHistory } from './history.ts'
+import { designReduce, type History as H, historyOf, mapHistory, pushHistory } from './history.ts'
 import { nth } from './nth.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
 import { type ResolvedCartridge, revisionOf } from './variants.ts'
@@ -376,7 +376,8 @@ export function reduce(h: History, a: Action): History {
     case 'table':
       return pushHistory(h, { ...h.present, table: a.value })
     case 'name':
-      return editHistory(h, { ...h.present, name: a.value }, 'name')
+      // the name is no drawing input: not an undo step, and every step keeps it
+      return mapHistory(h, (d) => ({ ...d, name: a.value }))
     case 'new':
       return historyOf(newDesign(h.present))
     case 'reset': {
@@ -731,9 +732,9 @@ function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derive
   return [...derivedAngles(figure, values, t), ...(volume ? [volume] : [])]
 }
 
-/** The name a design is saved under: the name typed, else its base's title, else a generic name. */
-export const designFileName = (d: Pick<Design, 'name' | 'origin'>) =>
-  d.name?.trim() || d.origin?.title || 'Cartridge design'
+/** The name a design is saved under: the name typed, else its base's title, else `fallback`. */
+export const designFileName = (d: Pick<Design, 'name' | 'origin'>, fallback = 'Cartridge design') =>
+  d.name?.trim() || d.origin?.title || fallback
 
 /**
  * What a saved cartridge design gives the workbench: the spec its preview draws and seats in, the
