@@ -66,6 +66,27 @@ describe('the message table', () => {
     }
   })
 
+  it('translates the rule text of a refused record in a file, keeping the marks and the path', () => {
+    const capacity = {
+      kind: 'caseCapacity',
+      id: 'c1',
+      name: 'Capacity',
+      saved: '2026-01-01T00:00:00.000Z',
+      data: {
+        origin: 'user',
+        cartridge: 'catalogue:308-win',
+        waterCapacity: { value: 3.62 },
+        convention: 'water-to-mouth',
+      },
+    }
+    const read = parseUserDataFile(userDataText([capacity] as never))
+    if (read.ok) throw new Error('not refused')
+    expect(read.reason).toContain('✖ Replaced by primerState and fillLevel')
+    const shown = reasonText(read.reason, german.t)
+    expect(shown).toContain('✖ Ersetzt durch primerState und fillLevel')
+    expect(shown).toContain('→ at records[0].data.convention')
+  })
+
   it('leaves a long text as it is without matching it', () => {
     const text = 'x'.repeat(200_000)
     const start = performance.now()

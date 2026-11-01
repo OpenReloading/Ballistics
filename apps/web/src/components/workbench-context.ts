@@ -85,6 +85,8 @@ export type ResultState = {
   ownFirearm: string | undefined
   /** Hands the load the run simulates to the powder tuning route, on its link. */
   handOffTune: () => void
+  /** The tuning link waits: a record the load takes values from is still loading. */
+  tuneHeld: boolean
   loadNotes: LoadNotesState
   /** The name of a manufacturer reference; empty for none or an unknown one. */
   manufacturerName: (ref: string | undefined) => string

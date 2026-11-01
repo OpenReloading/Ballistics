@@ -429,21 +429,30 @@ export function eventRounds(e: CompetitionEvent): number | undefined {
   return shots
 }
 
+/** The rounds `countedSessions` of `f` holds for the references `keys`. */
+export const countedFor = (f: Firearm, keys: readonly string[]) =>
+  (f.countedSessions ?? []).reduce((n, c) => (keys.includes(c.session) ? n + c.rounds : n), 0)
+
 /**
  * The rounds of the event `event` (its reference, `user:<id>`, with `rounds` rounds) that the
- * count of `f` does not hold yet: the rounds less those counted for the event before. 0 without a
- * count. The event shares `countedSessions` with the sessions, so it is counted once (#633).
+ * count of `f` does not hold yet: the rounds less those counted for the event before and for the
+ * shooting log entries that link it (`entries`, their references: the same match, #919). 0 without
+ * a count. The event shares `countedSessions` with the sessions, so it is counted once (#633).
  */
-export function eventRoundsDue(f: Firearm, event: string, rounds: number) {
+export function eventRoundsDue(
+  f: Firearm,
+  event: string,
+  rounds: number,
+  entries: readonly string[] = [],
+) {
   if (f.roundCount === undefined) return 0
-  const counted = f.countedSessions?.find((c) => c.session === event)?.rounds ?? 0
-  return Math.max(0, rounds - counted)
+  return Math.max(0, rounds - countedFor(f, [event, ...entries]))
 }
 
 /**
  * The stored firearm `record` with `n` of the event's rounds added to its count, through the same
  * one-confirm flow as a session's rounds. undefined, leaving the record, when it is no firearm or
- * {@link eventRoundsDue} is 0.
+ * {@link eventRoundsDue} (with the linking `entries`) is 0.
  */
 export function withEventRounds(
   record: UserRecord,
@@ -451,9 +460,10 @@ export function withEventRounds(
   rounds: number,
   n: number,
   now = new Date(),
+  entries: readonly string[] = [],
 ): UserRecord | undefined {
   if (record.kind !== 'firearm' || n < 1) return undefined
-  const due = eventRoundsDue(record.data, event, rounds)
+  const due = eventRoundsDue(record.data, event, rounds, entries)
   return due < 1 ? undefined : withCountedRounds(record, event, Math.min(n, due), now)
 }
 

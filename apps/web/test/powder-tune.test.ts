@@ -8,6 +8,7 @@ import {
   parseVelocities,
   revolverLeakNote,
   sessionStrings,
+  tuneHeld,
   tuneHref,
   tuneSessionIds,
 } from '../src/lib/powder-tune.ts'
@@ -230,5 +231,16 @@ describe('revolver leak note', () => {
   it('keeps the table IV rule for a firearm without the field or no firearm', () => {
     expect(revolverLeakNote('IV', load, undefined)).toBe(true)
     expect(revolverLeakNote('I', load, undefined)).toBe(false)
+  })
+})
+
+describe('tuneHeld', () => {
+  it('holds the tuning link while a record the load takes values from is still loading (#927)', () => {
+    // a saved load whose bore diameter follows the cartridge record, opened and not loaded yet
+    expect(tuneHeld({ cartridge: { id: 'catalogue:308-win' } })).toBe(true)
+    expect(tuneHeld({ cartridge: { id: 'catalogue:308-win', failed: true } })).toBe(false)
+    expect(tuneHeld({ bullet: { id: 'user:b1' }, powder: { id: 'p', failed: true } })).toBe(true)
+    // every record loaded: the link hands over the load
+    expect(tuneHeld({})).toBe(false)
   })
 })

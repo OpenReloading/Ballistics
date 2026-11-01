@@ -22,6 +22,10 @@ exclude = [
   '^https://doi\.org/10\.1111/j\.1469-1809\.1936\.tb02137\.x$', # Wiley refuses automated clients
   '^https://doi\.org/10\.1103/RevModPhys\.93\.025010$', # the DOI resolver answers 403 to automated clients
   '^https://doi\.org/10\.1137/1\.9781611970319$', # SIAM answers 403 to automated clients
+  '^https://doi\.org/10\.1177/00368504211016954$', # SAGE answers 403 to automated clients
+  '^https://doi\.org/10\.1364/AO\.15\.000668$', # Optica's bot filter holds automated clients until the timeout
+  # The DOI resolves (302), its target host www.wydawnictwa.ipo.waw.pl has no DNS record (2026-11-01); the DOI stays the citation.
+  '^https://doi\.org/10\.22211/cejem/67229$',
   '^https://www\.npmjs\.com/org/open-reloading$', # npmjs.com answers 403 to automated clients
   '^https://www\.accurateshooter\.com/\?p=2477$', # a bot filter answers 307 without a target to automated clients
   '^https://www\.knsa\.nl/$', # the server sends a certificate chain that does not verify (openssl: unable to verify the first certificate)
