@@ -1,107 +1,108 @@
 {
-  "id": "hodgdon",
-  "maker": "hodgdon",
+  "id": "demo-powder",
+  "maker": "demo-powder",
   "producedBy": "maker",
   "cartridgeName": "308 Winchester",
   "cartridge": "catalogue:308-win",
   "loads": [
     {
-      "id": "proto-175-sie-hpbt-imr-4064",
+      "id": "demo-168-hpbt-dp40",
       "bullet": {
-        "printed": "175 GR. SIE HPBT",
-        "mass": { "value": 11.33981, "raw": "175 GR." },
+        "printed": "168 GR. DEMO HPBT",
+        "mass": { "value": 10.88622, "raw": "168 GR." },
         "diameter": { "value": 7.8232, "raw": ".308\"" },
-        "record": "catalogue:sierra-2275"
+        "record": "catalogue:demo-bullet-168"
       },
-      "powder": { "printed": "IMR 4064", "record": "catalogue:imr-4064" },
-      "primer": { "printed": "Federal 210M, LR Match" },
-      "case": "Winchester",
+      "powder": { "printed": "Demo DP40", "record": "catalogue:demo-powder-dp40" },
+      "primer": { "printed": "Demo LR primer" },
+      "case": "Demo brass",
       "coal": { "value": 71.12, "raw": "2.800\"" },
       "barrel": {
         "length": { "value": 609.6, "raw": "24\"" },
-        "twist": { "value": 304.8, "raw": "1:12\"" }
-      },
-      "charges": [
-        {
-          "kind": "start",
-          "charge": { "value": 2.689155, "raw": "41.5 Grs" },
-          "velocity": { "value": 762, "raw": "2500", "assumedUnit": "ft/s" },
-          "pressure": {
-            "unit": "psi",
-            "peak": { "value": 3116.43, "raw": "45,200 PSI" },
-            "method": "case-contact",
-            "methodBasis": "from-unit"
-          }
-        },
-        {
-          "kind": "max",
-          "charge": { "value": 2.95483, "raw": "45.6C Grs" },
-          "velocity": { "value": 831.4944, "raw": "2728", "assumedUnit": "ft/s" },
-          "pressure": {
-            "unit": "psi",
-            "peak": { "value": 4102.381, "raw": "59,500 PSI" },
-            "method": "case-contact",
-            "methodBasis": "from-unit"
-          },
-          "marks": ["compressed"]
-        }
-      ],
-      "page": "117"
-    },
-    {
-      "id": "proto-175-sie-hpbt-varget",
-      "bullet": {
-        "printed": "175 GR. SIE HPBT",
-        "mass": { "value": 11.33981, "raw": "175 GR." },
-        "diameter": { "value": 7.8232, "raw": ".308\"" },
-        "record": "catalogue:sierra-2275"
-      },
-      "powder": { "printed": "Varget", "record": "catalogue:hodgdon-varget" },
-      "primer": { "printed": "Federal 210M, LR Match" },
-      "case": "Winchester",
-      "coal": { "value": 71.12, "raw": "2.800\"" },
-      "barrel": {
-        "length": { "value": 609.6, "raw": "24\"" },
-        "twist": { "value": 304.8, "raw": "1:12\"" }
+        "twist": { "value": 254, "raw": "1:10\"" }
       },
       "charges": [
         {
           "kind": "start",
           "charge": { "value": 2.721554, "raw": "42.0 Grs" },
-          "velocity": { "value": 787.2984, "raw": "2583", "assumedUnit": "ft/s" },
+          "velocity": { "value": 777.24, "raw": "2550", "assumedUnit": "ft/s" },
+          "pressure": {
+            "unit": "psi",
+            "peak": { "value": 3171.588, "raw": "46,000 PSI" },
+            "method": "case-contact",
+            "methodBasis": "from-unit"
+          }
+        },
+        {
+          "kind": "max",
+          "charge": { "value": 2.94835, "raw": "45.5C Grs" },
+          "velocity": { "value": 822.96, "raw": "2700", "assumedUnit": "ft/s" },
+          "pressure": {
+            "unit": "psi",
+            "peak": { "value": 4136.854, "raw": "60,000 PSI" },
+            "method": "case-contact",
+            "methodBasis": "from-unit"
+          },
+          "marks": ["compressed"]
+        }
+      ],
+      "page": "1"
+    },
+    {
+      "id": "demo-168-hpbt-dp40-cup",
+      "bullet": {
+        "printed": "168 GR. DEMO HPBT",
+        "mass": { "value": 10.88622, "raw": "168 GR." },
+        "diameter": { "value": 7.8232, "raw": ".308\"" },
+        "record": "catalogue:demo-bullet-168"
+      },
+      "powder": { "printed": "Demo DP40", "record": "catalogue:demo-powder-dp40" },
+      "primer": { "printed": "Demo LR primer" },
+      "case": "Demo brass",
+      "coal": { "value": 71.12, "raw": "2.800\"" },
+      "barrel": {
+        "length": { "value": 609.6, "raw": "24\"" },
+        "twist": { "value": 254, "raw": "1:10\"" }
+      },
+      "charges": [
+        {
+          "kind": "start",
+          "charge": { "value": 2.656755, "raw": "41.0 Grs" },
+          "velocity": { "value": 768.096, "raw": "2520", "assumedUnit": "ft/s" },
           "pressure": {
             "unit": "CUP",
-            "peak": { "raw": "42,600 CUP" },
+            "peak": { "raw": "43,000 CUP" },
             "method": "crusher",
             "methodBasis": "from-unit"
           }
         },
         {
           "kind": "max",
-          "charge": { "value": 2.915951, "raw": "45.0C Grs" },
-          "velocity": { "value": 819.912, "raw": "2690", "assumedUnit": "ft/s" },
+          "charge": { "value": 2.851152, "raw": "44.0C Grs" },
+          "velocity": { "value": 810.768, "raw": "2660", "assumedUnit": "ft/s" },
           "pressure": {
             "unit": "CUP",
-            "peak": { "raw": "48,600 CUP" },
+            "peak": { "raw": "49,000 CUP" },
             "method": "crusher",
             "methodBasis": "from-unit"
           },
           "marks": ["compressed"]
         }
       ],
-      "page": "117"
+      "page": "1"
     }
   ],
   "provenance": {
     "kind": "published",
     "sources": [
       {
-        "title": "Hodgdon Annual Manual 2025, rifle and pistol tables (308 Winchester: barrel and twist on page 115, the 175 GR. SIE HPBT loads on page 117)",
-        "publisher": "Hodgdon Powder Co.",
-        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "title": "Invented demo rows for the #827 prototype",
+        "publisher": "Demo Powder Co.",
+        "url": "https://github.com/OpenReloading/Ballistics/blob/main/packages/data/records/sources/synthetic-test-data.json",
         "retrieved": "2026-11-01",
-        "sha256": "ee592615a3488b87301033eb0544b880557bfc4e6ec2bbf78c59dac5d81a01dc",
-        "origin": "manufacturer"
+        "license": "CC0-1.0",
+        "origin": "public",
+        "note": "Invented values in the form of the synthetic-test-data source; not a real product and not load data."
       }
     ]
   }

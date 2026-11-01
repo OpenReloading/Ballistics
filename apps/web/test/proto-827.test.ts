@@ -14,10 +14,10 @@ import {
   withinPrinted,
 } from '../src/lib/proto-827.ts'
 
-const run = { cartridge: '308-win', powder: 'imr-4064', bulletMass: 11.34 }
-const [start, max] = matchingRows(publishedFile, run)
-const varget = matchingRows(publishedFile, { ...run, powder: 'hodgdon-varget' })
-if (!start || !max || !varget[0]) throw new Error('fixture rows missing')
+const run = { cartridge: '308-win', powder: 'demo-powder-dp40', bulletMass: 10.886 }
+const rows = matchingRows(publishedFile, run)
+const [start, max, crusher] = rows
+if (!start || !max || !crusher) throw new Error('fixture rows missing')
 
 describe('the #827 prototype fixture', () => {
   it('is a published load file of the schema', () => {
@@ -27,18 +27,20 @@ describe('the #827 prototype fixture', () => {
 
 describe('matchingRows', () => {
   it('takes the rows of the cartridge, the powder record and the printed bullet mass', () => {
-    expect([start.key, max.key]).toEqual([
-      'proto-175-sie-hpbt-imr-4064/start',
-      'proto-175-sie-hpbt-imr-4064/max',
+    expect(rows.map((e) => e.key)).toEqual([
+      'demo-168-hpbt-dp40/start',
+      'demo-168-hpbt-dp40/max',
+      'demo-168-hpbt-dp40-cup/start',
+      'demo-168-hpbt-dp40-cup/max',
     ])
-    expect(matchingRows(publishedFile, { ...run, bulletMass: 10.89 })).toEqual([])
+    expect(matchingRows(publishedFile, { ...run, bulletMass: 11.34 })).toEqual([])
     expect(matchingRows(publishedFile, { ...run, cartridge: '30-06-spring' })).toEqual([])
     expect(matchingRows(publishedFile, { ...run, powder: undefined })).toEqual([])
   })
 
   it('matches a mass that rounds to the printed figure', () => {
-    expect(withinPrinted({ value: 11.33981, raw: '175 GR.' }, 11.34)).toBe(true)
-    expect(withinPrinted({ value: 11.33981, raw: '175 GR.' }, 11.38)).toBe(false)
+    expect(withinPrinted({ value: 10.88622, raw: '168 GR.' }, 10.886)).toBe(true)
+    expect(withinPrinted({ value: 10.88622, raw: '168 GR.' }, 10.93)).toBe(false)
     expect(withinPrinted({ value: 3.3, raw: '3.30 g' }, 3.304)).toBe(true)
     expect(withinPrinted({ value: 3.3, raw: 'n/a' }, 3.3)).toBe(false)
   })
@@ -47,8 +49,8 @@ describe('matchingRows', () => {
 describe('comparison', () => {
   it('compares a case-contact row by velocity and pressure against the bands', () => {
     expect(notComparable(start)).toEqual({})
-    const d = deviationOf(start, { velocity: 777.24, pressure: 3116.43e5 * 1.1 })
-    expect(d.velocity?.delta).toBeCloseTo(15.24, 9)
+    const d = deviationOf(start, { velocity: 792.7848, pressure: 3171.588e5 * 1.1 })
+    expect(d.velocity?.delta).toBeCloseTo(15.5448, 9)
     expect(d.velocity?.percent).toBeCloseTo(2, 9)
     expect(d.velocity?.band).toBe(7.24)
     expect(d.pressure?.percent).toBeCloseTo(10, 9)
@@ -56,11 +58,10 @@ describe('comparison', () => {
   })
 
   it('compares a crusher row by velocity only', () => {
-    const [row] = varget as [Entry]
-    expect(notComparable(row)).toEqual({
+    expect(notComparable(crusher)).toEqual({
       pressure: 'Crusher pressure (CUP, LUP): compared by velocity only',
     })
-    expect(deviationOf(row, { velocity: 800, pressure: 3e8 })).toEqual({
+    expect(deviationOf(crusher, { velocity: 800, pressure: 3e8 })).toEqual({
       velocity: expect.objectContaining({ band: 7.24 }),
     })
   })
@@ -75,7 +76,7 @@ describe('comparison', () => {
       velocity: 'Barrel not printed',
       pressure: 'Barrel not printed',
     })
-    const point = { ...start.charge.velocity, value: 762, raw: '2500', point: { label: 'V5' } }
+    const point = { ...start.charge.velocity, value: 777.24, raw: '2550', point: { label: 'V5' } }
     expect(notComparable(without({}, { velocity: point, pressure: undefined }))).toEqual({
       velocity: 'Velocity printed at a distance: not corrected to the muzzle yet',
       pressure: 'No pressure printed',
@@ -95,7 +96,7 @@ describe('rowLoad', () => {
   it('fires the row from its test barrel with the bullet base moved by the COAL step', () => {
     const row = rowLoad(load, seating, start)
     const base = seating.barrel - load.barrel.length
-    expect(row?.charge).toBeCloseTo(2.689155e-3, 12)
+    expect(row?.charge).toBeCloseTo(2.721554e-3, 12)
     expect(row?.barrel.length).toBeCloseTo(0.6096 - (base + 0.00002), 12)
     expect(row?.chamber.volume).toBeCloseTo(load.chamber.volume + load.chamber.boreArea * 2e-5, 15)
   })

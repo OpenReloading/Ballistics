@@ -11,7 +11,7 @@ import { type Message, msg } from '../i18n/translate.ts'
 import type { InteriorBody } from './interior-input.ts'
 import fixture from './proto-827-loads.json'
 
-/** The cited fixture: Hodgdon Annual Manual 2025, 308 Winchester; the unit test parses it with the schema. */
+/** The fixture: invented demo rows for 308 Winchester; the unit test parses it with the schema. */
 export const publishedFile = fixture as PublishedLoads
 
 /** P90 of the absolute validation error, percent (#823 note, `[fit]`): the band a deviation is drawn against. */
@@ -37,7 +37,7 @@ const idOf = (ref: string | undefined) => ref?.replace(/^catalogue:/, '')
 
 /**
  * Whether `grams` is the printed mass: it rounds to the printed figure at the digits printed, so a
- * record of 11.34 g matches a printed `175 GR.` (11.33981 g).
+ * record of 10.886 g matches a printed `168 GR.` (10.88622 g).
  */
 export function withinPrinted(printed: { value: number; raw: string }, grams: number): boolean {
   const number = /\d+(?:\.(\d+))?/.exec(printed.raw)

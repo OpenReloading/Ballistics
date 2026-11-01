@@ -4,12 +4,12 @@ import { storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
 
 // throwaway prototype of #827: published load rows next to the simulation, behind ?proto= only
-// rows match by cartridge, powder record and printed bullet mass (175 gr), not by bullet record
-const load = 'cartridge=308-win&bullet=cutting-edge-m-308-175-fcg'
+// rows match by cartridge, powder record and printed bullet mass (168 gr), not by bullet record
+const load = 'cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40'
 
 test.beforeEach(({ page }) => storeUnits(page))
 
-/** Runs the 175 gr load; 308 Win. has no capacity record, so the test types one (a test input, not a record value). */
+/** Runs the 168 gr demo load; 308 Win. has no capacity record, so the test types one (a test input, not a record value). */
 async function run(page: Page, query: string) {
   await gotoHydrated(page, `/workbench?${query}`)
   const form = loadForm(page)
@@ -25,24 +25,24 @@ async function run(page: Page, query: string) {
   })
 }
 
-test('the rows of the cited table show with the simulation, the deviation and the maker source', async ({
+test('the rows of the demo table show with the simulation, the deviation and the source', async ({
   page,
 }) => {
-  await run(page, `proto=c&${load}&powder=imr-4064`)
-  await expect(page.getByText('Published loads: 2 matching')).toBeVisible()
+  await run(page, `proto=c&${load}`)
+  await expect(page.getByText('Published loads: 4 matching')).toBeVisible()
   await page.getByRole('button', { name: 'Show rows' }).click()
   const table = page.getByRole('table', { name: /^Published loads/ })
-  await expect(table.getByRole('row')).toHaveCount(3)
+  await expect(table.getByRole('row')).toHaveCount(5)
   await expect(
-    table.getByRole('link', { name: 'Hodgdon Powder Co., page 117' }).first(),
-  ).toHaveAttribute('href', /AM25\.pdf$/)
-  await expect(table).toContainText('45,200 PSI')
+    table.getByRole('link', { name: 'Demo Powder Co., page 1' }).first(),
+  ).toHaveAttribute('href', /synthetic-test-data\.json$/)
+  await expect(table).toContainText('46,000 PSI')
   await expect(table).toContainText(/band ±7[.,]2 %/)
   await expect(table).toContainText(/band ±37[.,]9 %/)
 })
 
 test('a crusher row is compared by velocity only', async ({ page }) => {
-  await run(page, `proto=a&${load}&powder=hodgdon-varget`)
+  await run(page, `proto=a&${load}`)
   // at 1280 px the tab does not fit its row and sits in the More menu
   const tab = page.getByRole('tab', { name: 'Published loads' })
   if (await tab.isVisible()) await tab.click()
@@ -51,7 +51,7 @@ test('a crusher row is compared by velocity only', async ({ page }) => {
     await page.getByRole('menuitem', { name: 'Published loads' }).click()
   }
   const table = page.getByRole('table', { name: /^Published loads/ })
-  await expect(table).toContainText('42,600 CUP')
+  await expect(table).toContainText('43,000 CUP')
   await expect(
     table.getByText('Crusher pressure (CUP, LUP): compared by velocity only'),
   ).toHaveCount(2)
@@ -59,7 +59,7 @@ test('a crusher row is compared by velocity only', async ({ page }) => {
 })
 
 test('the workbench without the flag shows no published loads', async ({ page }) => {
-  await run(page, `${load}&powder=imr-4064`)
+  await run(page, load)
   await expect(page.getByRole('tab', { name: 'Published loads' })).toHaveCount(0)
   await expect(page.getByText(/^Published loads/)).toHaveCount(0)
 })
