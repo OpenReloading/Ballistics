@@ -3319,9 +3319,23 @@ main .library-head.page-panel-head > .page-panel-title {
   line-height: 1.125rem;
 }
 
-.result-notes-guide {
+.result-notes-control {
+  display: grid;
   flex: none;
+  align-items: start;
+  justify-items: start;
+}
+
+.result-notes-control > * {
+  grid-area: 1 / 1;
+}
+
+.result-notes-control > a {
   line-height: 1.125rem;
+}
+
+.result-notes-control > [data-hidden] {
+  visibility: hidden;
 }
 
 .workbench-centre > .result-notes {
@@ -3345,10 +3359,6 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .result-notes :is(li[data-kind="note"], .result-notes-none) {
   color: var(--muted);
-}
-
-.result-notes > button {
-  flex: none;
 }
 
 .result-notes-group h3 {

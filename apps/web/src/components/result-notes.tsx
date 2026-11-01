@@ -36,6 +36,7 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
   const [Dialog, setDialog] = useState<typeof ResultNotesDialog>()
   const [open, setOpen] = useState(false)
   const first = notes[0]
+  const hasMore = scrolls || notes.some((n) => n.text)
   return (
     <fieldset aria-label={t('Result notes')} className="result-notes screen-only">
       {/* the count and the most important entry, announced when a run brings a new warning */}
@@ -57,9 +58,12 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
           )
         })}
       </ul>
-      {scrolls || notes.some((n) => n.text) ? (
+      {/* More and the guide link share one cell as wide as the wider, the other hidden: a swap
+          between them changes no width, so the list cannot start and stop scrolling over it */}
+      <div className="result-notes-control">
         <Button
           ref={more}
+          data-hidden={hasMore ? undefined : true}
           variant="default"
           size={controlSize.row.button}
           aria-haspopup="dialog"
@@ -75,11 +79,10 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
         >
           {t('More ({count})', { count: notes.length })}
         </Button>
-      ) : (
-        // without More the dialog that links the guide is out of reach: the link in its place
-        howCloseGuide && (
+        {/* without More the dialog that links the guide is out of reach: the link in its place */}
+        {howCloseGuide && (
           <Anchor
-            className="result-notes-guide"
+            data-hidden={hasMore ? true : undefined}
             href={howCloseGuide}
             target="_blank"
             rel="noopener"
@@ -87,8 +90,8 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
           >
             {t('How close a result is')}
           </Anchor>
-        )
-      )}
+        )}
+      </div>
       {Dialog && (
         <Dialog
           notes={notes}
