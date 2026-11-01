@@ -23,8 +23,10 @@ function best(run: () => unknown, rounds = 15) {
 describe('catalogue budgets', () => {
   const bundle = loadBundle()
 
-  it('has the index of the public bundle ready in under 50 ms from the records', () => {
-    expect(best(() => openCatalogue(buildCatalogue(bundle)))).toBeLessThan(50)
+  // about 17 ms on a desktop and 50 to 70 ms on a CI runner under the coverage run, since the bundle grew
+  // with the published records (#850)
+  it('has the index of the public bundle ready in under 100 ms from the records', () => {
+    expect(best(() => openCatalogue(buildCatalogue(bundle)))).toBeLessThan(100)
   })
 
   it('has it ready in under 9 ms from the prebuilt index text', () => {
