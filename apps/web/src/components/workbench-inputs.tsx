@@ -1126,6 +1126,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
     cartridge,
     powder,
     recordSpecs,
+    typedSpecFields,
     bulletNote,
     modelShown,
     setModelShown,
@@ -1163,7 +1164,11 @@ function CardBody({ panel }: { panel: InputPanel }) {
     return (
       <div className="panel-fields">
         <ReplacedNote panel={panel} />
-        {recordSpecs.bulkDensity !== undefined && <SpecValueField name="bulkDensity" />}
+        {/* a record's, or a typed one without a record (a link): either is in use, so it shows */}
+        {(recordSpecs.bulkDensity !== undefined ||
+          (powder === undefined && 'bulkDensity' in typedSpecFields)) && (
+          <SpecValueField name="bulkDensity" />
+        )}
         <PowderSourceRow />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}

@@ -553,10 +553,12 @@ function useGeometry(o: {
     unit,
   } = o
   const draftSpec = draft?.spec
-  const spec = useMemo(() => {
-    const own = specOf(draftSpec, detail)
-    return own && caseLength !== undefined ? withCaseLength(own, caseLength) : own
-  }, [draftSpec, detail, caseLength])
+  // the record's own spec, apart from a typed L3: the seating starts again only when it changes
+  const own = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
+  const spec = useMemo(
+    () => (own && caseLength !== undefined ? withCaseLength(own, caseLength) : own),
+    [own, caseLength],
+  )
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
   const capacities = capacitiesOf(detail)
   // the typed values in place, one object per record, design or values, so the shape is not rebuilt for each render
@@ -590,7 +592,7 @@ function useGeometry(o: {
   const refused = useMemo(() => refusalOf(shaped, unit), [shaped, unit])
   const shape = refused ? undefined : shaped
   const fixed = useMemo(() => fixedOf(spec, chamber, shape, lands), [spec, chamber, shape, lands])
-  return { spec, chamber, capacities, bulletRecord, shaped, refused, shape, fixed }
+  return { spec, own, chamber, capacities, bulletRecord, shaped, refused, shape, fixed }
 }
 
 const capacitiesOf = (detail: Load<CartridgeDetail>): Capacity[] =>
@@ -615,6 +617,8 @@ function startOf(
 function useStart(o: {
   range: readonly [number, number] | undefined
   chamber: Chamber | undefined
+  /** What the seating starts for, apart from a typed L3: the same one keeps the position. */
+  startFor: unknown
   designed: boolean
   shape: Shape | undefined
   canCbto: boolean
@@ -627,9 +631,16 @@ function useStart(o: {
 }) {
   const { range, chamber, designed, shape, canCbto, mode, shown, setMode, setPos, setStarted } = o
   const [initialBy, initialValue] = [o.initial?.seating?.by, o.initial?.seating?.value]
+  const { startFor } = o
+  const startedFor = useRef<unknown[]>(undefined)
   useEffect(() => {
     // a design starts empty: a seating the user did not enter would be a default
     if (!range || !chamber || designed) return
+    // a typed L3 rebuilds the chamber: the chosen position stays, its depth and volume follow
+    const key = [startFor, initialBy, initialValue, canCbto]
+    const same = startedFor.current?.every((v, i) => v === key[i])
+    startedFor.current = key
+    if (same) return
     const start = startOf(range, chamber, initialBy, initialValue, canCbto)
     setMode(start.mode)
     setPos({ text: fixedFieldText('length', shown.current, start.si), si: start.si })
@@ -637,6 +648,7 @@ function useStart(o: {
   }, [
     range,
     chamber,
+    startFor,
     designed,
     initialBy,
     initialValue,
@@ -894,7 +906,7 @@ function useSeatingModel(p: PreviewProps) {
   /** The position and mode the preview last started at by itself. */
   const [started, setStarted] = useState<{ si: number; mode: Mode }>()
   useUnitRewrite(system, shown, setBarrel, setPos)
-  const { spec, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
+  const { spec, own, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
     values: p.linked?.values,
     baseType: p.linked?.baseType,
     caseLength: p.linked?.caseLength,
@@ -925,6 +937,7 @@ function useSeatingModel(p: PreviewProps) {
   useStart({
     range,
     chamber,
+    startFor: own,
     designed,
     shape,
     canCbto,

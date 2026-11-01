@@ -125,7 +125,7 @@ import {
 } from '../lib/query.ts'
 import { withStoredSessions } from '../lib/range-entry.ts'
 import { changedFromRecord, recordValuesOf } from '../lib/record-changes.ts'
-import { pmaxBar, specValueKeys, typedSpec } from '../lib/record-specs.ts'
+import { pmaxBar, type SpecKey, specValueKeys, typedSpec } from '../lib/record-specs.ts'
 import {
   type LadderDirection,
   type RunnableLadderKind,
@@ -990,16 +990,23 @@ const typedSpecOf = (query: URLSearchParams, system: UnitSystem): Fields =>
     ),
   )
 
-/** What the load's references give again of the specs: the sheet's Pmax and L3, the powder's bulk density. */
+/**
+ * What the load's references give again of the specs: the sheet's Pmax and L3, the powder's bulk
+ * density; a value the user typed stays theirs, even when it equals the record's (`typed`).
+ */
 function specsGiven(
   record: Record<string, number | undefined>,
   cartridgeRef: string | undefined,
   powderRef: string | undefined,
+  typed: Fields,
 ) {
-  return {
+  const given: Record<string, number | undefined> = {
     ...(cartridgeRef && { pmax: record.pmax, caseLength: record.caseLength }),
     ...(powderRef && { bulkDensity: record.bulkDensity }),
   }
+  return Object.fromEntries(
+    Object.entries(given).filter(([key]) => typedSpec(typed, key as SpecKey) === undefined),
+  )
 }
 
 /** The bulk density the powder record gives, else the one its link carried, SI. */
@@ -2045,7 +2052,12 @@ export function useWorkbenchState() {
       setLadderError(ladderInvalid)
       // the seating ladder's reasons are about the seating, not about one field: the status line names them too
       if (ladderInvalid && ladderKind !== 'charge') setStatus(ladderInvalid)
-      invalid = hasErrors || ladderInvalid !== undefined
+      // a typed Pmax, L3 or bulk density the field refuses: the run would read the record's instead
+      const specInvalid = specFields.some((f) => {
+        const v = spec.typed[f.key]
+        return !!v?.text.trim() && fieldError(f, v, system, t) !== undefined
+      })
+      invalid = hasErrors || ladderInvalid !== undefined || specInvalid
       // on phones the field sits in the Load tab, which is hidden while Results is open
       if (invalid) workspace.current?.showInputs()
     })
@@ -2861,6 +2873,7 @@ export function useWorkbenchState() {
       spec.record,
       cartridgeRef,
       savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
+      spec.typed,
     ),
     defaults,
     defaulted,
@@ -2921,7 +2934,8 @@ export function useWorkbenchState() {
   const dropCartridgeChanges = () => {
     const keys = changedFieldKeys(changes)
     noteReplaced('cartridge')
-    spec.unset(specValueKeys)
+    // the cartridge's own specs: a typed bulk density belongs to the powder and stays
+    spec.unset(['pmax', 'caseLength'])
     for (const k of keys) form.setFieldValue(k, emptyStep)
     setFollowed((f) => new Set([...f, ...keys.filter(isFollowKey)]))
   }
