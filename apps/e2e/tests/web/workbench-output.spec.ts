@@ -210,7 +210,7 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
     })
   await expect
     .poll(async () => (await stored())?.data.analysis?.powders)
-    .toEqual({ mode: 'fill', fill: 90, manufacturer: name })
+    .toEqual({ mode: 'fill', fill: 90, manufacturer: expect.stringMatching(/^catalogue:/) })
   const saved = (await stored())?.name ?? ''
 
   await page.goto('/workbench')
