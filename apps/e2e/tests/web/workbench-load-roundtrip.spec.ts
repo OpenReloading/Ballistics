@@ -138,7 +138,7 @@ test('a diameter and length typed over the bullet record are saved as typed valu
   await expect(diameter).toHaveClass(/field-default/)
 })
 
-test('a load of records keeps the charge, the travel and the start pressure of the bullet construction and reopens with the records filling the rest', async ({
+test('a load of records keeps the charge and the travel, runs the powder at the start pressure of its fit, and reopens with the records filling the rest', async ({
   page,
 }) => {
   await page.addInitScript(() => {
@@ -157,8 +157,9 @@ test('a load of records keeps the charge, the travel and the start pressure of t
   await (await barButton(page, 'Save')).click()
   await expect.poll(async () => (await storedLoads(page)).length).toBe(1)
   const [{ name, data }] = await storedLoads(page)
-  // the start pressure of the jacketed bullet in a rifle (29.2 MPa) is not a default a load file can name
-  expect(data.analysis).toEqual({ overrides: { startPressure: 292, travel: 533.4 } })
+  // the powder record has no start pressure of its own: in a rifle it runs at the 30 MPa of its
+  // fit, the default a load file names, not at the 29.2 MPa of the jacketed bullet
+  expect(data.analysis).toEqual({ overrides: { travel: 533.4 } })
   expect(data.charge).toEqual({ value: 2.4 })
 
   await page.goto('/workbench')
