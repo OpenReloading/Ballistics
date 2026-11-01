@@ -1128,10 +1128,32 @@ describe('shootingLogEntry', () => {
     expect(userRecord.safeParse({ ...entry({}), id: 'entry-1' }).success).toBe(false)
   })
 
-  it('reports a firearm or load the set does not hold, and names them as user references', () => {
-    const r = userRecord.parse(entry({ firearm: `user:${uuid}`, load: `user:${designUuid}` }))
-    expect(checkUserRefs([r]).map((d) => d.field)).toEqual(['firearm', 'load'])
-    expect(userRefFields(r)).toEqual(['firearm', 'load'])
+  it('reports a firearm, load or event the set does not hold, and names them as user references', () => {
+    const r = userRecord.parse(
+      entry({ firearm: `user:${uuid}`, load: `user:${designUuid}`, event: `user:${uuid}` }),
+    )
+    expect(checkUserRefs([r]).map((d) => d.field)).toEqual(['firearm', 'load', 'event'])
+    expect(userRefFields(r)).toEqual(['firearm', 'load', 'event'])
+  })
+
+  it('takes an event reference that names a record of kind event, not another kind', () => {
+    const event = {
+      kind: 'event',
+      id: uuid,
+      name: 'LM',
+      saved,
+      data: {
+        date: '2026-10-12',
+        eventType: 'catalogue:dsb-meisterschaft',
+        level: 'Landesmeisterschaft',
+        state: 'completed',
+        results: { method: 'rings', series: [] },
+      },
+    }
+    const r = userRecord.parse(entry({ event: `user:${uuid}` }))
+    expect(checkUserRefs([r, userRecord.parse(event)])).toEqual([])
+    const maker = userRecord.parse({ ...event, kind: 'manufacturer', data: { origin: 'user' } })
+    expect(checkUserRefs([r, maker]).map((d) => d.field)).toEqual(['event'])
   })
 
   it('is a known kind, so the reader keeps it', () => {

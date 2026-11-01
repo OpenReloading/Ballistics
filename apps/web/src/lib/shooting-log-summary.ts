@@ -1,10 +1,11 @@
 /**
  * The yearly summary of the shooting log: rounds per firearm and per cartridge, entries (range
- * days) per month, and the entries linked to a competition event, read from the entries of one
+ * days) per month, and the competition events of the year with the entries that link them, read from the entries of one
  * calendar year. The firearm's `roundCount` stays the one counter (#604): the summary is a sum of
  * the log, not a second total.
  */
 import type { ShootingLogRecord, UserRecord } from '@open-reloading/schema'
+import type { EventRecord } from './competition-events.ts'
 import { toCsv } from './csv.ts'
 import { entryYear, userIdOf } from './shooting-log.ts'
 
@@ -34,8 +35,8 @@ export interface YearSummary {
   withoutLoad: number
   /** Entries (range days) per month, January first: 12 counts. */
   months: number[]
-  /** The entries of the year linked to a competition event, by date. */
-  events: ShootingLogRecord[]
+  /** The competition events dated in the year, by date, each with the log entries that link it. */
+  events: { event: EventRecord; entries: ShootingLogRecord[] }[]
 }
 
 /**
@@ -64,7 +65,7 @@ const byRounds = (a: SummaryRow, b: SummaryRow) => b.rounds - a.rounds || a.ref.
 
 /**
  * The summary of `year` from the log `entries` and the browser's `records` (for the cartridge of
- * each load): only the entries dated in that calendar year count. An entry without a load counts
+ * each load, and the competition events): only the entries and events dated in that calendar year count. An entry without a load counts
  * under its firearm only; a load whose cartridge is unknown counts under `ref` ''.
  */
 export function yearSummary(
@@ -100,7 +101,13 @@ export function yearSummary(
     cartridges: [...cartridgeRows.values()].sort(byRounds),
     withoutLoad,
     months,
-    events: shown.filter((r) => r.data.event !== undefined),
+    events: records
+      .filter((r): r is EventRecord => r.kind === 'event' && entryYear(r.data) === year)
+      .sort((a, b) => a.data.date.localeCompare(b.data.date))
+      .map((event) => ({
+        event,
+        entries: entries.filter((r) => r.data.event === `user:${event.id}`),
+      })),
   }
 }
 
@@ -117,7 +124,8 @@ export const monthKey = (year: string, index: number) =>
 /**
  * The summary as CSV rows: `Year`, then a header `Section`, `Name`, `Rounds`, `Entries` and one row
  * per total, the sections `Firearm`, `Cartridge`, `Without a load`, `Month` (named `YYYY-MM`, entries
- * only), `Competition` (an entry linked to a competition event, named by its day) and `Total`;
+ * only), `Competition` (a competition event of the year, named by its day and name, with the rounds
+ * and entries of the log entries that link it) and `Total`;
  * documented in the shooting log guide.
  */
 export function summaryRows(s: YearSummary, names: SummaryNames): (string | number)[][] {
@@ -128,7 +136,12 @@ export function summaryRows(s: YearSummary, names: SummaryNames): (string | numb
     ...s.cartridges.map((r) => ['Cartridge', names.cartridge(r.ref), r.rounds, r.entries]),
     ...(s.withoutLoad > 0 ? [['Without a load', '', s.withoutLoad, '']] : []),
     ...s.months.map((n, i) => ['Month', monthKey(s.year, i), '', n]),
-    ...s.events.map((r) => ['Competition', r.data.date, r.data.rounds, 1]),
+    ...s.events.map(({ event, entries }) => [
+      'Competition',
+      `${event.data.date} ${event.name}`,
+      entries.reduce((n, r) => n + r.data.rounds, 0),
+      entries.length,
+    ]),
     ['Total', '', s.rounds, s.entries],
   ]
 }
