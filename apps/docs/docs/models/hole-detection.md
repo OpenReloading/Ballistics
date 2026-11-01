@@ -39,7 +39,7 @@ The bar for face search and hole detection on a set of photos with reference hol
 - Face search per set: right first choice, wrong first choice, found but not first, not found, each split by whether the first choice is sure. A sure wrong first choice is the worst case.
 - Statistics: the median and the 90th percentile of the corrections. A 90th percentile needs 20 or more usable photos in the set; below that the maximum is given with the set size.
 
-The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. These are defaults that wait for a measurement on real target photos; no measured result is claimed. Meeting the bar never means that a photo is good or a detection right.
+The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. These are defaults; on the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right.
 
 ## Equations
 
