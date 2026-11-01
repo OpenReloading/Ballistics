@@ -23,6 +23,7 @@ import {
 import { fittedEnergyRatio } from '../lib/powder-record.ts'
 import { workbenchHref } from '../lib/query.ts'
 import { powderParameterGroups, powderRowGroups, powderStrip } from '../lib/record-fields.ts'
+import { tunePowderHref } from '../lib/tune-href.ts'
 import { type BurnRatePlace, BurnRateSummary, type Neighbour } from './burn-rate-section.tsx'
 import { FieldStrip } from './field-strip.tsx'
 import { FieldPanel, FieldTable } from './field-table.tsx'
@@ -95,6 +96,7 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       className="record-chart"
       compare={isFitted(curve) ? `/powders/burn-rates?add=${encodeURIComponent(p.id)}` : undefined}
       workbench={workbenchHref('powder', p.id)}
+      tune={tunePowderHref(`catalogue:${p.id}`)}
       provenance={p.provenance}
       kind="powders"
       strip={

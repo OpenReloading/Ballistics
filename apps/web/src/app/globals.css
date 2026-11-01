@@ -12646,9 +12646,72 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   }
 }
 
+/* the tuning page: one column, the chart after the hand tuning; from 64em the chart in a second
+   column beside the rest, held in view while the sliders move (powder-tune.tsx FitResult) */
+.tune-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+@media screen and (min-width: 64em) {
+  .tune-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-auto-flow: row dense;
+    column-gap: 1.5rem;
+  }
+
+  .tune-layout > * {
+    grid-column: 1;
+  }
+
+  /* spans every row of the left column, so no left row grows with it */
+  .tune-layout > .tune-figure {
+    position: sticky;
+    top: calc(var(--app-shell-header-offset, 0rem) + 0.5rem);
+    grid-row: 1 / span 40;
+    grid-column: 2;
+    align-self: start;
+  }
+}
+
+/* the empty state and the add form share one width */
+.powder-tune :is(.empty-state, .tune-add) {
+  max-width: 44rem;
+}
+
+.tune-add {
+  margin: 0.5rem 0;
+}
+
+/* level with the fields, under their one-line labels */
+.tune-add .tune-add-button {
+  margin-top: calc(var(--mantine-font-size-sm) * var(--mantine-line-height) + 0.125rem);
+}
+
 /* the string whose charge the model cannot run, named in the refusal */
 .powder-tune .string-fault td {
   background: var(--warn-bg);
+}
+
+/* the pressure range's label: neutral, no traffic-light colour, which would read as a verdict */
+.powder-fit-state .fit-label {
+  display: inline-block;
+  margin: 0.5rem 0 0;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.fit-reasons h2 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: var(--mantine-font-size-sm);
+}
+
+.fit-reasons ul {
+  margin: 0 0 0.5rem;
 }
 
 .hand-tune {
@@ -12665,35 +12728,80 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
   justify-self: start;
 }
 
-.tune-chart {
+.hand-tune .hand-offset {
+  color: var(--muted);
+}
+
+/* the labels of the slider's ticks: the ends' values and the fit, at its tick */
+.hand-tune .hand-range {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  min-height: 1.25rem;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+}
+
+.hand-tune .hand-range > :nth-child(2) {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.tune-chart-size {
   width: 100%;
-  max-width: 40rem;
-  height: auto;
+  max-width: 48rem;
+}
+
+.tune-chart {
+  display: block;
   font-size: 11px;
   fill: var(--fg);
 }
 
-.tune-chart .ladder-range {
-  fill: var(--border);
-  opacity: 0.35;
+.tune-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0.5rem 0 0.25rem;
+  padding: 0;
+  font-size: var(--mantine-font-size-xs);
+  list-style: none;
+}
+
+.tune-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.tune-swatch {
+  flex: none;
+  fill: var(--fg);
+}
+
+/* a share of the text colour: visible on the light and the dark background alike */
+:is(.tune-chart, .tune-swatch) .ladder-range {
+  fill: color-mix(in srgb, var(--fg) 12%, transparent);
 }
 
 .tune-chart .grid {
   stroke: var(--border);
 }
 
-.tune-chart .band {
+:is(.tune-chart, .tune-swatch) .band {
   fill: var(--link);
   opacity: 0.2;
 }
 
-.tune-chart .curve {
+:is(.tune-chart, .tune-swatch) .curve {
   fill: none;
   stroke: var(--link);
   stroke-width: 2;
 }
 
-.tune-chart .measured line {
+:is(.tune-chart, .tune-swatch) .measured line {
   stroke: var(--fg);
   stroke-width: 1.5;
 }

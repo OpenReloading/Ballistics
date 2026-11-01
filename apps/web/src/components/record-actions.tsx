@@ -19,6 +19,7 @@ import {
   LinkSimple,
   PencilSimple,
   Printer,
+  SlidersHorizontal,
   Target,
 } from '@phosphor-icons/react'
 import Link from 'next/link'
@@ -64,7 +65,7 @@ export function LinkButton({
 
 /**
  * Every record page's actions, one component so they cannot drift: Use in
- * workbench or Open in shot groups (filled, the primary action), Open in designer, Compare, each where the record has
+ * workbench or Open in shot groups (filled, the primary action), Open in designer, Compare, Tune from strings, each where the record has
  * one, then the record pages' Tour, Units, Copy link and Print as icon buttons with their names on
  * hover and focus. The bullet comparison shows the icon buttons alone.
  */
@@ -73,12 +74,15 @@ export function RecordActions({
   workbench,
   groups,
   design,
+  tune,
   tour,
 }: {
   compare?: string | undefined
   workbench?: string | undefined
   groups?: string | undefined
   design?: string | undefined
+  /** "Tune from strings" link of a powder record. */
+  tune?: string | undefined
   /** The Tour button of the record pages. */
   tour?: boolean
 }) {
@@ -104,6 +108,11 @@ export function RecordActions({
       {compare && (
         <LinkButton href={compare} icon={<ArrowsLeftRight aria-hidden="true" />}>
           {t('Compare')}
+        </LinkButton>
+      )}
+      {tune && (
+        <LinkButton href={tune} icon={<SlidersHorizontal aria-hidden="true" />}>
+          {t('Tune from strings')}
         </LinkButton>
       )}
       {tour && <TourButton page="record" />}
