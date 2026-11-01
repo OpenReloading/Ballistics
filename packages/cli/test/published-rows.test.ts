@@ -355,6 +355,20 @@ describe('verify on published loads', () => {
     expect(r.interval.trainingRows).toBe(3)
   })
 
+  it('leaves out a source record that does not parse', async () => {
+    const extra = mkdtempSync(join(tmpdir(), 'cli-bad-source-'))
+    mkdirSync(join(extra, 'sources'))
+    writeFileSync(join(extra, 'sources', 'broken.json'), '{ not json')
+    const folder = writeLoads([validation(), training()])
+    const r = await verify({
+      rows: folder,
+      records: [...recordRoots, extra],
+      split: 'validation',
+      final: false,
+    })
+    expect(r.overall.rows.used).toBe(3)
+  })
+
   it('compares a V5 row uncorrected only where it has no distance', () => {
     const own = loadRecords(recordRoots)
     const row: Row = {

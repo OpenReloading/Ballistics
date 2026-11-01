@@ -60,7 +60,19 @@ function isPublishedFolder(path: string) {
   return !entries.some((e) => /\.csv$/i.test(e.name)) && entries.some((e) => e.isDirectory())
 }
 
-/** The source records of every root, by id, as the published load files resolve them. */
+/** The JSON of `path`; an unreadable or malformed file is undefined, which no schema accepts. */
+function readJson(path: string): unknown {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) // NOSONAR: a file of a records root the user gave
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * The source records of every root, by id, as the published load files resolve them. A source file
+ * that does not read or parse is left out: the record check reports it.
+ */
 function sourcesOf(roots: readonly string[]) {
   const byId = new Map<string, SourceRecord>()
   for (const root of roots) {
@@ -68,7 +80,7 @@ function sourcesOf(roots: readonly string[]) {
     if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) continue // NOSONAR: as above
     for (const name of readdirSync(dir).filter((n) => n.endsWith('.json'))) {
       // NOSONAR: as above
-      const parsed = sourceRecord.safeParse(JSON.parse(readFileSync(join(dir, name), 'utf8')))
+      const parsed = sourceRecord.safeParse(readJson(join(dir, name)))
       if (parsed.success && !byId.has(parsed.data.id)) byId.set(parsed.data.id, parsed.data)
     }
   }
