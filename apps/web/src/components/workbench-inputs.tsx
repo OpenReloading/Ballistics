@@ -740,7 +740,7 @@ function loadFieldMark(
   }: LoadFieldMarkArgs,
   t: Translator['t'],
 ) {
-  if (defaulted.has(key)) return defaultMark(key, defaults, t)
+  // a default that follows the load (`input-defaults.ts`) says where its value comes from now
   if (given?.fromFirearm)
     return given.record === undefined
       ? t('From {source}.', { source: given.source })
@@ -749,6 +749,7 @@ function loadFieldMark(
           value: valueWithUnit(spec.quantity, s, given.record),
         })
   if (given) return t('Default: {source}.', { source: given.source })
+  if (defaulted.has(key)) return defaultMark(key, defaults, t)
   if (fromRecord !== undefined)
     return fields[key]?.si === undefined
       ? t("From the powder record's bore-resistance law. A typed value replaces it.")

@@ -1,6 +1,6 @@
 ---
 title: Case capacity and seating
-description: Case volume from the water capacity, the volume the seated bullet takes from it, the volume behind the bullet, the bullet travel and the jump to the lands.
+description: Case volume from the water capacity, the volume the seated bullet takes from it, the volume behind the bullet, an estimate of the bullet volume where it has no outline, the bullet travel and the jump to the lands.
 ---
 
 # Case capacity and seating
@@ -107,6 +107,39 @@ Code: `packages/drawing/src/seating/seating.ts`, `intrusion`, `bulletLengthToler
 
 The lower bound of $V_b$ is clamped at 0. Both tolerances are assumptions without a source.
 
+### Bullet without a seated outline
+
+A bullet chosen but not seated has no outline to subtract: its record has no length or no diameter, the outline is refused, the cartridge has no case length, CBTO is chosen and the bullet has no base-to-ogive, or no seating length is entered. The workbench then does not leave the whole case volume as the volume behind the bullet. It subtracts an estimate of $V_b$ and tags the volume approximate with an interval.
+
+With a record that has a length and a diameter the outline is built and only the seating is missing: $V_b$ is the volume of that outline below the mouth, as for a seated bullet. With a diameter and a mass but no length, the length follows from the mass $m$ and the effective density $\rho_\mathrm{eff}$ of the construction class, the mass over the volume of a cylinder of the bullet's diameter and length, so the shape of nose and base is in it:
+
+$$
+\hat L = \frac{m}{\rho_\mathrm{eff}\,\frac{\pi}{4} d^2}
+$$
+
+Code: `packages/drawing/src/seating/seating.ts`, `estimateIntrusion`.
+
+The bullet is seated at the COAL entered, else at the cartridge maximum overall length $L_6$ (the start of the seating preview), so $s = L_3 - (\mathrm{COAL} - \hat L)$, and $V_b$ is the volume below the mouth of the outline that `bulletOutline` builds from the diameter and $\hat L$ (every other proportion assumed). The class error $e$ is the 90th percentile of $|\hat L - L| / L$ over the records of the class, so the true length lies between $\hat L / (1 + e)$ and $\hat L / (1 - e)$, and $V_b$ between the volumes for those lengths: a longer bullet takes more of the case.
+
+Code: `packages/drawing/src/seating/seating.ts`, `estimateIntrusion`, `intrusion`.
+
+The diameter is the record's, else the typed one, else the groove diameter $Z$ of the cartridge. The default of the chamber volume is the case volume less $V_b$, with the interval of the volume behind the bullet in its source text, which names the class, what the length rests on and why the bullet is not seated; a typed volume replaces it. A record with a length never takes the estimate. While the field holds this default, the run takes its interval as the tolerance of the chamber volume of the pressure range, relative to the volume and at most 0.2, the limit of the API. Without the diameter, the mass (no outline), $L_3$ or a COAL the volume is not estimated: the field stays empty and the card names the missing value.
+
+Code: `apps/web/src/lib/bullet-below-mouth.ts`, `belowMouth`, `lessBullet`.
+
+The class comes from the record's `construction.structure`; a record without one, and swaged, plated and frangible bullets, take the pooled value. The values are medians of the bullet records with a maker-published length (in-sample; the jacketed class covers two makers and the cast class one):
+
+| Class (`construction.structure`) | $\rho_\mathrm{eff}$ in g/cm3 | $e$ | Records |
+| --- | --- | --- | --- |
+| cast | 9.1 | 0.093 | 192 |
+| monolithic | 6.5 | 0.184 | 792 |
+| jacketed (cup-and-core, bonded, partitioned) | 7.3 | 0.214 | 261 |
+| unknown (pooled) | 6.8 | 0.332 | 1245 |
+
+Code: `apps/web/src/lib/bullet-construction.ts`, `effectiveDensity`, `classOf`.
+
+The records are not in the repository. The material densities (lead 11.34, copper 8.94 g/cm3, [PubChem lead](https://pubchem.ncbi.nlm.nih.gov/compound/5352425), [PubChem copper](https://pubchem.ncbi.nlm.nih.gov/compound/23978)) lie above every effective density: the shape factor of the nose and base and the jacket and core make the difference, and a material density is not used.
+
 ### Leade contact and jump
 
 The contact $z_\mathrm{c}$ is where the bullet diameter $d$ meets the leade, from the case head. It reads the chamber values of the C.I.P. sheet listed under Symbols:
@@ -184,6 +217,8 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 | $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere), the whole cavity | no kind | mm³ |
 | $\sigma_k$ | Sign of segment $k$ of the profile: rising $+1$, falling $-1$ | 1 | 1 |
 | $V_c$ | Chamber volume behind the bullet | no kind | cm³ (m³ in `core`) |
+| $m$, $\rho_\mathrm{eff}$, $\hat L$ | Bullet mass, effective density, estimated length | g, g/cm3, mm | g, g/cm3, mm |
+| $e$ | 90th percentile of the relative length error of a class | 1 | 1 |
 | $d$ | Bullet diameter | mm | mm |
 | $\Delta L$ | Bullet length tolerance | mm | mm |
 | $L_{3,\mathrm{ch}}$, $s_\mathrm{ch}$, $G$ | Chamber case length, leade start and leade end past it (C.I.P.) | mm | mm |
@@ -200,6 +235,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - The cavity of a hollow base is a cone of half angle 45° or a hemisphere, as deep as its radius, and it is empty: no wad or lubricant in it.
 - Only the mouth position bounds the bullet volume. The neck diameter and the case wall do not enter.
 - The case does not change its volume with pressure or temperature.
+- A bullet without a length takes the effective density of its class (table above) and is seated at the COAL entered, else at $L_6$.
 
 ## Limits
 
@@ -210,6 +246,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
 - A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.
+- The bounds of a bullet without a length are the 90th percentile of the class in-sample, not an interval of confidence: one record in ten lies outside. They hold the length error of the density, and the assumed proportions of the outline are inside it. The classes were taken from the same records they are measured on, and the cast class from one maker.
 - Effects on the capacity that were looked at and are left out:
   - Cannelure: a groove 0.002 in deep and 0.030 in wide, as in two patents on a frangible .223 bullet ([US 7,322,297 B2](../bibliography.md#us-7322297), [US 7,143,679 B2](../bibliography.md#us-7143679)), takes 1 to 7 mm³ below the mouth (unverified estimate), 0.03 to 0.23 % of a .308 case and 0.2 to 1.2 % of a 9 mm case.
   - Meplat: it lies above the mouth, so it changes the capacity by 0 %.
@@ -221,5 +258,6 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 ## Sources
 
 - [Tanaka 2001](../bibliography.md#tanaka-2001): density of water at 20 °C, table, pp. 301 to 309 (the table value is unverified, not re-read from the paper).
+- [PubChem lead](https://pubchem.ncbi.nlm.nih.gov/compound/5352425), [PubChem copper](https://pubchem.ncbi.nlm.nih.gov/compound/23978): density of lead and of copper, for the comparison with the effective densities.
 - [C.I.P. TDCC](../bibliography.md#cip-tdcc): cartridge length $L_3$ and the chamber values $L_3$, $s$, $G$, $G_1$, $F$ and $i$, per cartridge sheet.
 - Research log: [placing a maximum pressure against the tolerance range](../research/interior-ceiling-classification.md).

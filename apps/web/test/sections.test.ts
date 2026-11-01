@@ -57,7 +57,7 @@ it('marks Database current on the federation pages and the burn-rate overlay it 
 })
 
 it('marks the Database current on the firearms, the old My cases route and the case group editor', () => {
-  for (const r of ['/firearms', '/my-cases', '/cases/editor', '/cases/some-id'])
+  for (const r of ['/firearms', '/my-cases', '/events', '/cases/editor', '/cases/some-id'])
     expect(
       hrefs.filter((h) => pageCoversRoute(h, r)),
       r,

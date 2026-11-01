@@ -14,10 +14,14 @@ export type Suggestion = {
   fromFirearm?: true
   /** The cartridge record's value the firearm's replaces, SI: the mark names it. */
   record?: number | undefined
+  /** The value rests on an estimate: it is not a measured one. */
+  approximate?: true
+  /** Relative half-width of the interval of an approximate value, 1: the run's tolerance of it. */
+  halfWidth?: number
 }
 
 /** The form fields that follow a default until typed; the barrel length is the seating's own field. */
-export const followKeys = ['volume', 'boreDiameter', 'boreArea', 'twist'] as const
+export const followKeys = ['volume', 'boreDiameter', 'boreArea', 'twist', 'startPressure'] as const
 export type FollowKey = (typeof followKeys)[number]
 export const isFollowKey = (key: string): key is FollowKey =>
   (followKeys as readonly string[]).includes(key)

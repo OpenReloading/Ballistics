@@ -7,6 +7,7 @@ import {
   bulletOutline,
   chamberOf,
   coalRange,
+  estimateIntrusion,
   intrusion,
   jumpNote,
   landsContactCoal,
@@ -645,5 +646,51 @@ describe('previewDrawn', () => {
   it('names the missing values', () => {
     const values = spec.values.filter((v) => v.symbol !== 'P1')
     expect(previewDrawn(values, 'I', 80)).toEqual({ missing: ['cartridge P1', 'chamber P1'] })
+  })
+})
+
+describe('estimateIntrusion', () => {
+  const density = { value: 7.3, error: 0.214 }
+  const [diameter, coal, caseLength] = [7.823, 71.12, 51.18]
+  const area = (Math.PI / 4) * diameter ** 2
+  /** The mass of a bullet of length `length` (mm) and effective density `rho` (g/cm³). */
+  const massOf = (length: number, rho: number) => (rho * area * length) / 1000
+  const truth = (b: BulletDimensions) =>
+    intrusion({ bullet: b, caseLength, coal, lengthSource: 'measured' }).volume.value
+
+  it('takes the length from the mass over the effective density and the cylinder area', () => {
+    const e = estimateIntrusion({ diameter, mass: massOf(30, 7.3), density, caseLength, coal })
+    expect(e.length).toBeCloseTo(30, 9)
+    expect(e.volume.tag).toBe('approximate')
+    expect(e.notes.join(' ')).toMatch(/estimated/)
+    // the point is the volume of the outline of that length, as for a bullet with it
+    expect(e.volume.value).toBeCloseTo(truth({ diameter, length: 30 }), 9)
+  })
+
+  it('bounds the volume by the length error and keeps a bullet inside the band of its class', () => {
+    // a bullet whose effective density is at either end of the band of the length error
+    for (const factor of [1 - density.error, 1 + density.error]) {
+      for (const base of [flat, boatTail]) {
+        const mass = massOf(base.length, density.value * factor)
+        const e = estimateIntrusion({ diameter, mass, density, caseLength, coal })
+        expect(e.low).toBeLessThan(e.volume.value)
+        expect(e.high).toBeGreaterThan(e.volume.value)
+        // the volume of the same length, with the proportions the outline assumes
+        const v = truth({ diameter, length: base.length })
+        expect(v).toBeGreaterThanOrEqual(e.low - 1e-9)
+        expect(v).toBeLessThanOrEqual(e.high + 1e-9)
+      }
+    }
+  })
+
+  it('takes the whole bullet when it is seated wholly below the mouth', () => {
+    const e = estimateIntrusion({ diameter, mass: massOf(30, 7.3), density, caseLength, coal: 40 })
+    expect(e.volume.value).toBeGreaterThan(0)
+    expect(e.notes.join(' ')).toMatch(/whole bullet/)
+  })
+
+  it('gives no volume for a bullet that stays out of the case', () => {
+    const e = estimateIntrusion({ diameter, mass: massOf(30, 7.3), density, caseLength, coal: 90 })
+    expect(e.volume.value).toBe(0)
   })
 })

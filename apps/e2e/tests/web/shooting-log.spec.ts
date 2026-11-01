@@ -259,3 +259,55 @@ test('the yearly summary shows only the entries of its year, the same numbers in
   expect(lines).toContain('Month,2025-06,,1')
   expect(lines.at(-1)).toBe('Total,,50,1')
 })
+
+test('an entry linked to a competition event shows the event, and the summary of its year lists the event once', async ({
+  page,
+}) => {
+  await page.goto('/firearms/log')
+  await seed(page)
+  const match = '9c3e5a71-2b4d-4e6f-8a1c-3d5e7f9a1b2c'
+  await putRecords(page, [
+    {
+      kind: 'event',
+      id: match,
+      name: 'LM Luftpistole',
+      saved: '2026-10-20T00:00:00.000Z',
+      data: {
+        date: '2026-06-14',
+        eventType: 'catalogue:dsb-meisterschaft',
+        level: 'Landesmeisterschaft',
+        state: 'completed',
+        results: { method: 'rings', series: [{ total: 95 }, { total: 97 }] },
+      },
+    },
+    // a second entry of the same event, already linked
+    {
+      kind: 'shootingLogEntry',
+      id: '00000000-0000-4000-8000-000000000009',
+      name: '2026-06-14',
+      saved: '2026-10-20T00:00:00.000Z',
+      data: { date: '2026-06-14', rounds: 10, event: `user:${match}` },
+    },
+  ])
+  await page.reload()
+
+  await (await barButton(page, 'New entry')).click()
+  const form = page.locator('section.log-editor')
+  await form.getByLabel('Date').fill('2026-06-14')
+  await form.getByLabel('Rounds fired').fill('40')
+  await form.getByRole('combobox', { name: 'Competition event' }).click()
+  await page.getByRole('option', { name: /LM Luftpistole/ }).click()
+  // an empty result takes the event's total
+  await expect(form.getByLabel('Result')).toHaveValue('192')
+  await form.getByRole('button', { name: 'Save entry' }).click()
+
+  const rows = page.locator('.directory table tbody tr')
+  await expect(rows).toHaveCount(2)
+  await expect(rows.filter({ hasText: '192' })).toContainText('LM Luftpistole')
+
+  const summary = page.locator('section.log-summary')
+  await expect(summary.locator('.log-summary-events li')).toHaveCount(1)
+  await expect(summary.locator('.log-summary-events li')).toContainText(
+    'LM Luftpistole · 192 · 2 entries',
+  )
+})

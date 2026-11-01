@@ -69,6 +69,8 @@ export type Outcome =
       bulkDensity: number | undefined
       /** A powder record was chosen at the run. */
       powderChosen: boolean
+      /** The powder has no temperature coefficient: `reference` is the temperature of its record's fit, K. */
+      noCoefficient?: { reference: number } | undefined
       /** The record's bore-resistance law the run could not apply, with what was missing. */
       resistanceMissing?: { powder: string; missing: string[] } | undefined
       /** The user bullet design whose mass the run used. */
@@ -242,6 +244,33 @@ const fillActions = {
   volume: msg('Enter the usable case volume in the Cartridge card.'),
 }
 
+/** The temperature below which two propellant temperatures count as one, K. */
+const sameTemperature = 0.01
+
+/** The message of a powder without a temperature coefficient run at another temperature than its fit's. */
+function temperatureMessage(
+  ok: Extract<Outcome, { kind: 'ok' }>,
+  system: UnitSystem,
+  t: Translator['t'],
+): ResultNote[] {
+  const reference = ok.noCoefficient?.reference
+  const at = ok.load.propellantTemperature
+  if (reference === undefined || !(Math.abs(at - reference) > sameTemperature)) return []
+  return [
+    {
+      kind: 'message',
+      line: t('No temperature coefficient'),
+      text: t(
+        'The run ignores the powder temperature {temperature}: the burn rate is that at {reference}, the temperature of its fit.',
+        {
+          temperature: withUnit('temperature', system, at),
+          reference: withUnit('temperature', system, reference),
+        },
+      ),
+    },
+  ]
+}
+
 /**
  * Everything the result panel says about the shown step, warnings first, then messages, then
  * notes, each in the order of its source.
@@ -288,6 +317,7 @@ export function resultNotes(
           },
         ]
       : []),
+    ...temperatureMessage(ok, system, t),
     ...(ok.volumeMeasured
       ? []
       : [{ kind: 'message' as const, line: t(volumeNote.title), text: t(volumeNote.text) }]),

@@ -74,6 +74,7 @@ export interface LogNames {
   firearm: (ref: string | undefined) => string
   load: (ref: string | undefined) => string
   discipline: (ref: string | undefined) => string
+  event: (ref: string | undefined) => string
 }
 
 /** The load of an entry, or its factory ammunition; empty without either. */
