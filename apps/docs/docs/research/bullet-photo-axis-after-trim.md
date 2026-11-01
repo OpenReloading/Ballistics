@@ -33,7 +33,7 @@ On all 24 renders the length is within 1 % or 3 u, or a shadow is named, before 
 
 ## Result
 
-Improved: adopted. A trimmed outline is fitted again (the axis of the trimmed renders moves closer to the rendered one on two of three, by 0.13 degrees the other way on the third), and a base end softer on one side gets the shadow note. Neither changes the length of an untrimmed render: a shadow towards the base still widens the shank and lengthens the cut-out, named, not corrected.
+Improved: adopted. A trimmed outline is fitted again (the axis of the trimmed renders moves closer to the rendered one on two of three, by 0.13 degrees the other way on the third), and a base end softer on one side gets the shadow note. Neither changes the length of an untrimmed render: a shadow towards the base still widens the shank and lengthens the cut-out, named, not corrected. The accept rule asked for unchanged catalogue numbers; the one change, a warning on a 32nd of 32 photographs in F, is accepted as a deviation from it: every F photograph has a drop shadow, that one read 3 % long without a note, and no value of A to H moved.
 
 ## Data basis
 
