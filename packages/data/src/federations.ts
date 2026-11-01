@@ -3,13 +3,29 @@ import type { Bundle } from './records.ts'
 import { resolveId } from './renames.ts'
 
 /** The federations, disciplines and faces by id. */
-type Lookup = {
+export type Lookup = {
   federations: Map<string, Federation>
   disciplines: Map<string, Discipline>
   faces: Map<string, TargetFace>
   worldBody: (id: string) => boolean
   /** The id that replaces `id` of a kind in `renames.json`, else `id`. */
   now: (kind: 'federations' | 'disciplines' | 'target-faces', id: string) => string
+}
+
+/** The lookup of a bundle, shared by the federation and event type checks so renames resolve in one place. */
+export function lookupOf(
+  bundle: Pick<Bundle, 'federations' | 'disciplines' | 'renames'> &
+    Partial<Pick<Bundle, 'targetFaces'>>,
+): Lookup {
+  const federations = new Map(bundle.federations.map((f) => [f.id, f]))
+  return {
+    federations,
+    disciplines: new Map(bundle.disciplines.map((d) => [d.id, d])),
+    faces: new Map((bundle.targetFaces ?? []).map((f) => [f.id, f])),
+    worldBody: (id) =>
+      federations.get(resolveId(bundle.renames, 'federations', id))?.country === 'international',
+    now: (kind, id) => resolveId(bundle.renames, kind, id),
+  }
 }
 
 /** A federation's international federation is a world body. */
@@ -104,15 +120,7 @@ export function checkFederations(
   >,
 ): string[] {
   const errors: string[] = []
-  const federations = new Map(bundle.federations.map((f) => [f.id, f]))
-  const lookup: Lookup = {
-    federations,
-    disciplines: new Map(bundle.disciplines.map((d) => [d.id, d])),
-    faces: new Map(bundle.targetFaces.map((f) => [f.id, f])),
-    worldBody: (id) =>
-      federations.get(resolveId(bundle.renames, 'federations', id))?.country === 'international',
-    now: (kind, id) => resolveId(bundle.renames, kind, id),
-  }
+  const lookup = lookupOf(bundle)
   checkFederationReferences(bundle.federations, lookup, errors)
   checkFaceFederations(bundle.targetFaces, lookup, errors)
   checkDisciplineReferences(bundle.disciplines, lookup, errors)
