@@ -143,7 +143,8 @@ test('in German the pressure range keeps its gap and the Powder card head its me
       ? Number.POSITIVE_INFINITY
       : note.left - unit.right
   })
-  expect(gap).toBeGreaterThanOrEqual(8)
+  // the 0.5 rem column gap, less a pixel or two of the glyphs' side bearing and rounding
+  expect(gap).toBeGreaterThanOrEqual(6)
   const head = page.locator('.panel[data-panel="powder"] .panel-head')
   const box = await head.boundingBox()
   const menu = await head.getByRole('button', { name: /^Mehr zu/ }).boundingBox()
