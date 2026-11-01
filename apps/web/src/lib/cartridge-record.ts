@@ -10,7 +10,7 @@ import { formatNumber, localizeNumber, plainNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator, translator } from '../i18n/translate.ts'
 import type { CartridgeDetail } from './api-types.ts'
 import { fieldSpecs, type Group, groups } from './cartridge-designer.ts'
-import { degreeText, inchText, type UnitSystem } from './units.ts'
+import { inchText, type UnitSystem } from './units.ts'
 
 type Translate = Translator['t']
 
@@ -35,6 +35,8 @@ const meanings = new Map<string, string>([
   [' Pmax', 'maximum mean pressure'],
   [' PE', 'proof pressure'],
   [' M', 'measuring position'],
+  // the sheet prints EE in joules under "Pressures (Energies)" and does not spell it out
+  [' EE', 'energy, as printed under Pressures (Energies)'],
 ])
 const shotshellMeanings = new Map<string, string>([
   ['cartridge g', 'rim diameter'],
@@ -53,10 +55,7 @@ const shotshellMeanings = new Map<string, string>([
   ['chamber alpha1', 'included angle of the forcing cone'],
 ])
 
-/**
- * What the symbols stand for, by their English text, as messages. "measuring position" is left out:
- * the catalogue test requires the word for a shooting position in every text that says position.
- */
+/** What the symbols stand for, by their English text, as messages. */
 const meaningMessages: Readonly<Record<string, Message>> = {
   'rim diameter at the head': msg('rim diameter at the head'),
   'head to the start of P1; in the chamber the depth of the rim recess': msg(
@@ -104,6 +103,10 @@ const meaningMessages: Readonly<Record<string, Message>> = {
   'bore cross-section area': msg('bore cross-section area'),
   'maximum mean pressure': msg('maximum mean pressure'),
   'proof pressure': msg('proof pressure'),
+  'measuring position': msg('measuring position'),
+  'energy, as printed under Pressures (Energies)': msg(
+    'energy, as printed under Pressures (Energies)',
+  ),
   'body diameter at the head': msg('body diameter at the head'),
   'body diameter at l2': msg('body diameter at l2'),
   'diameter at the mouth (l)': msg('diameter at the mouth (l)'),
@@ -152,12 +155,14 @@ const sideSymbol = {
   chamber: msg('Chamber {symbol}'),
 } as const
 
+/** An angle in degrees to 2 decimals at most (35°, 1.97°); the text as printed (1°57'57") is its note. */
+const angleText = (x: number) => `${localizeNumber(String(Number(x.toFixed(2))))}°`
+
 /** A value's own notes in `t`: basic, the text as printed where it says more. */
 type ValueNote = { kind: 'basic' } | { kind: 'printed'; raw: string }
 
 function valueNotes(v: SpecValue): ValueNote[] {
-  const stored =
-    v.quantity === 'angle' && v.value !== undefined ? `${localizeNumber(degreeText(v.value))}°` : ''
+  const stored = v.quantity === 'angle' && v.value !== undefined ? angleText(v.value) : ''
   return [
     ...(v.basic ? [{ kind: 'basic' } as const] : []),
     ...(v.raw && v.value !== undefined && v.raw !== stored && v.raw !== String(v.value)
@@ -267,9 +272,9 @@ const stored = { length: 'mm', pressure: 'bar', energy: 'J', area: 'mm²' } as c
 type Converted = keyof typeof stored
 export const converted = (q: string): q is Converted => Object.hasOwn(stored, q)
 
-/** A stored number in the preset's unit: as recorded in the record's own unit, else rounded to the unit's decimals. */
+/** A stored number in the preset's unit: as recorded in the record's own unit, else rounded to the unit's decimals; an angle to 2 decimals. */
 export function specValueText(q: string, x: number, system: UnitSystem) {
-  if (q === 'angle') return `${localizeNumber(degreeText(x))}°`
+  if (q === 'angle') return angleText(x)
   if (!converted(q)) return plainNumber(x)
   const symbol = stored[q]
   const unit = system[q]
@@ -287,6 +292,14 @@ export function toleranceText(v: SpecValue, system: UnitSystem) {
   return [t?.lower !== undefined && part(t.lower), t?.upper !== undefined && part(t.upper), v.limit]
     .filter(Boolean)
     .join(' ')
+}
+
+/** A difference in the preset's length unit with its sign, minus as U+2212, as the drawing's callouts write it; zero as ±0 in the column's decimals ("±.0000", "±0.00"). */
+export function signedLength(x: number, system: UnitSystem) {
+  const text = specValueText('length', Math.abs(x), system)
+  if (text !== '0') return x < 0 ? `−${text}` : `+${text}`
+  const zero = formatNumber(0, system.length.decimals)
+  return `±${system.length.symbol === 'in' ? zero.slice(1) : zero}`
 }
 
 /** What the clearance note after a chamber value stands for. */
@@ -542,6 +555,17 @@ export function variantMatrix(
 /** The values of the pressure strip: pressures, energies and positions without a side or variant. */
 export const pressureStripValues = (spec: Sheet) => spec.values.filter((v) => !v.side && !v.variant)
 
-/** Hover lines of a pressure strip value: symbol and meaning, or none when the symbol has neither. */
+/** The cartridge dimensions of the fact row, in this order: case length, maximum overall length, bullet diameter. */
+const stripDimensions = ['L3', 'L6', 'G1']
+
+/** The fact row's cartridge dimensions (L3, L6, G1) the record gives as a number, outside a shotshell variant. */
+export const dimensionStripValues = (spec: Sheet) =>
+  stripDimensions.flatMap((symbol) =>
+    spec.values.filter(
+      (v) => v.side === 'cartridge' && v.symbol === symbol && !v.variant && v.value !== undefined,
+    ),
+  )
+
+/** Hover lines of a fact row value: symbol and meaning (on its side), or none when the symbol has neither. */
 export const pressureStripNote = (v: SpecValue, table?: string, t: Translate = english) =>
-  nameLine(v.symbol, [undefined], table, t)
+  nameLine(v.symbol, [v.side], table, t)
