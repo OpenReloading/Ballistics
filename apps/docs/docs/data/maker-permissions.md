@@ -28,7 +28,7 @@ Hello,
 
 I maintain OpenReloading (https://github.com/OpenReloading/Ballistics), an open-source reference for handloaders. Its code is under the MIT licence and its data under CC BY 4.0. It describes cartridges, bullets, powders, cases and primers; its results are simulations, not load data.
 
-**What we would use.** Specifications you already publish for <product range or page URL>:
+**What we would use.** Specifications you already publish for `<product range or page URL>`:
 - bullets: diameter, mass, length, ogive form, ballistic coefficient with its drag reference;
 - powders: name, class, grain form;
 - cases: mass, water capacity, flash hole, primer pocket;
@@ -36,7 +36,7 @@ I maintain OpenReloading (https://github.com/OpenReloading/Ballistics), an open-
 
 We would not use photographs, descriptive text, drawings, logos or load data. Company and product names would only name the records.
 
-**What we publish.** Each value is shown with <maker> named as the source, a link to your page and the date we read it. The data set is public under CC BY 4.0: anyone may copy and reuse the values with attribution, also commercially. You can withdraw the permission at any time by writing to us; we then remove the values from the next release. Copies made before that keep the licence they were published with.
+**What we publish.** Each value is shown with `<maker>` named as the source, a link to your page and the date we read it. The data set is public under CC BY 4.0: anyone may copy and reuse the values with attribution, also commercially. You can withdraw the permission at any time by writing to us; we then remove the values from the next release. Copies made before that keep the licence they were published with.
 
 **What we ask.** May we publish these values on these terms?
 
@@ -49,8 +49,8 @@ We would not use photographs, descriptive text, drawings, logos or load data. Co
 Please also tell us who we may name as having granted the permission (a role is enough).
 
 Kind regards,
-<name>
-<contact address>
+`<name>`
+`<contact address>`
 
 ### Deutsch
 
@@ -60,7 +60,7 @@ Guten Tag,
 
 ich betreue OpenReloading (https://github.com/OpenReloading/Ballistics), ein Open-Source-Nachschlagewerk für Wiederlader. Der Code steht unter der MIT-Lizenz, die Daten unter CC BY 4.0. Es beschreibt Patronen, Geschosse, Pulver, Hülsen und Zündhütchen; seine Ergebnisse sind Simulationen, keine Ladedaten.
 
-**Was wir verwenden würden.** Angaben, die Sie für <Produktreihe oder Seiten-URL> bereits veröffentlichen:
+**Was wir verwenden würden.** Angaben, die Sie für `<Produktreihe oder Seiten-URL>` bereits veröffentlichen:
 - Geschosse: Durchmesser, Masse, Länge, Ogivenform, ballistischer Koeffizient mit seiner Widerstandsfunktion (zum Beispiel G1, G7);
 - Pulver: Name, Klasse, Kornform;
 - Hülsen: Masse, Hülsenvolumen (Wasser), Zündkanal, Zündglocke;
@@ -68,7 +68,7 @@ ich betreue OpenReloading (https://github.com/OpenReloading/Ballistics), ein Ope
 
 Fotos, Beschreibungstexte, Zeichnungen, Logos und Ladedaten würden wir nicht verwenden. Firmen- und Produktnamen dienen nur zur Benennung der Datensätze.
 
-**Was wir veröffentlichen.** Jeder Wert wird mit <Hersteller> als Quelle, einem Link auf Ihre Seite und dem Datum unseres Abrufs angezeigt. Der Datensatz ist unter CC BY 4.0 öffentlich: Jeder darf die Werte mit Namensnennung kopieren und weiterverwenden, auch kommerziell. Sie können die Erlaubnis jederzeit schriftlich widerrufen; wir entfernen die Werte dann im nächsten Release. Kopien, die vorher entstanden sind, behalten die Lizenz, unter der sie veröffentlicht wurden.
+**Was wir veröffentlichen.** Jeder Wert wird mit `<Hersteller>` als Quelle, einem Link auf Ihre Seite und dem Datum unseres Abrufs angezeigt. Der Datensatz ist unter CC BY 4.0 öffentlich: Jeder darf die Werte mit Namensnennung kopieren und weiterverwenden, auch kommerziell. Sie können die Erlaubnis jederzeit schriftlich widerrufen; wir entfernen die Werte dann im nächsten Release. Kopien, die vorher entstanden sind, behalten die Lizenz, unter der sie veröffentlicht wurden.
 
 **Was wir fragen.** Dürfen wir diese Werte zu diesen Bedingungen veröffentlichen?
 
@@ -81,8 +81,8 @@ Fotos, Beschreibungstexte, Zeichnungen, Logos und Ladedaten würden wir nicht ve
 Bitte nennen Sie uns auch, wen wir als Erteiler der Erlaubnis angeben dürfen (eine Funktion genügt).
 
 Mit freundlichen Grüßen
-<Name>
-<Kontaktadresse>
+`<Name>`
+`<Kontaktadresse>`
 
 ## Recording a grant
 
@@ -94,7 +94,7 @@ Each record that uses granted values cites the grant as one source in `provenanc
 | `publisher` | The maker |
 | `url` | The maker's product page the values were read from |
 | `retrieved` | The day the values were read, ISO 8601 |
-| `license` | `"LicenseRef-<maker>"`, one token of letters, digits, `.`, `+` and `-` |
+| `license` | `"LicenseRef-`<maker>`"`, one token of letters, digits, `.`, `+` and `-` |
 | `terms` | A note of the grant: its date, who granted it (a role, not a person's name), the fields and the scope as granted, and any attribution asked for |
 | `fields` | Only when the grant covers some fields: their dot paths |
 
