@@ -16,7 +16,6 @@ import {
 } from '../src/components/powder-tune.tsx'
 import { TuneChart } from '../src/components/powder-tune-chart.tsx'
 import { formatNumber } from '../src/i18n/number.ts'
-import { chargeRows } from '../src/lib/measurements.ts'
 import { nth } from '../src/lib/nth.ts'
 import type { PowderFitReply, PowderFitState } from '../src/lib/powder-fit.ts'
 import { answerPowderFit, handCurve, handLoad } from '../src/lib/powder-fit-answer.ts'
@@ -82,16 +81,20 @@ describe('the result view of the tuning route', () => {
     })
   })
 
-  it('shows the fitted values, a residual per string, the chart and the band line', () => {
+  it('shows the fitted values with a unit column, the chart with its legend and the band line', () => {
     expect(html).toContain('Fitted values')
     expect(html).toContain('Standard uncertainty')
     expect(html).toContain('Vivacity')
-    // fitted values, residuals and chart data, each with its head row
-    expect(html.match(/<tr role="row">/g)?.length).toBe(
-      2 + strings.length + 1 + fitted.band.length + 1,
-    )
-    expect(html).toContain('Residual per charge')
+    // fitted values and chart data, each with its head row: the residuals are in the strings table
+    expect(html.match(/<tr role="row">/g)?.length).toBe(2 + fitted.band.length + 1)
+    expect(html).not.toContain('Residual')
+    // the unit in its own column, the numbers alone and right-aligned under right-aligned heads
+    expect(html).toMatch(/<td role="cell">1\/s<\/td>/)
+    expect(html).toMatch(/<th scope="col" class="num" role="columnheader">Fitted<\/th>/)
     expect(html).toContain('role="img"')
+    expect(html).toContain('aria-label="Legend"')
+    for (const key of ['Fitted curve', '90 % band', 'Measured mean with 1 SD', 'Ladder range'])
+      expect(html).toContain(key)
     expect(html).toContain(
       'Band: uncertainty of the fitted parameters only, not model error. Simulation, not load data.',
     )
@@ -106,6 +109,10 @@ describe('the result view of the tuning route', () => {
     }
     const shown = text(state)
     for (const r of all) expect(shown).toContain(`<li>${reasonTexts[r]}</li>`)
+    // under a visible heading, and the label in no colour of a verdict
+    expect(shown).toContain('<h2 id="fit-because">Because</h2>')
+    expect(shown).toMatch(/<p class="fit-label">Pressure range: \w+, plus and minus/)
+    expect(shown).not.toMatch(/\bsafe\b/i)
     expect(reasonTexts['residual-trend']).toBe('Residuals may show a trend')
   })
 
@@ -179,6 +186,11 @@ describe('hand tuning', () => {
     expect(html.match(/role="slider"/g)).toHaveLength(1)
     expect(html).toContain('aria-label="Vivacity"')
     expect(html).toContain('aria-valuenow="0"')
+    // the distance from the fit, and a tick with its label at the fitted value
+    expect(html).toContain('at the fit')
+    expect(html).toMatch(
+      /class="hand-range"[^>]*><span>[^<]+<\/span><span style="inset-inline-start:50%">Fitted</,
+    )
     expect(html).not.toContain('Hand-tuned')
     expect(html).toMatch(/<button[^>]*disabled=""[^>]*>.*Back to the fit/)
   })
@@ -218,16 +230,68 @@ describe('refusals and rules on the screen', () => {
   })
 
   it('highlights the string whose charge the model cannot run', () => {
-    const rows = chargeRows(
-      [2.6e-3, 3.5e-3].map((charge) => ({ charge, shots: [{ velocity: { value: 800 } }] })),
-      [],
-    )
-    const html = renderToStaticMarkup(
-      <MantineProvider>
-        <TuneStrings rows={rows} fault={3.5e-3} />
-      </MantineProvider>,
-    )
+    const html = table({
+      strings: [2.6e-3, 3.5e-3].map((charge) => ({
+        charge,
+        shots: [{ velocity: { value: 800 } }],
+      })),
+      fault: 3.5e-3,
+    })
     expect(html.match(/class="string-fault"/g)).toHaveLength(1)
     expect(html).toMatch(/class="string-fault".*Cannot run/)
+  })
+})
+
+/** The strings table as the server renders it, in metric units with grains. */
+const table = (props: Parameters<typeof TuneStrings>[0]) =>
+  renderToStaticMarkup(
+    <MantineProvider>
+      <TuneStrings {...props} />
+    </MantineProvider>,
+  )
+
+describe('the strings table', () => {
+  const tuned = strings.map((s, i) => ({
+    charge: s.charge,
+    shots: s.velocities.map((value) => ({ velocity: { value } })),
+    ...(i === 3 && { temperature: 263.15 }),
+  }))
+  const heads = (html: string) =>
+    [...html.matchAll(/<th scope="col"[^>]*>([^<]*)<\/th>/g)].map((m) => m[1])
+
+  it('has one row per string with its temperature, and no fit columns before a fit', () => {
+    const html = table({ strings: tuned })
+    expect(heads(html)).toEqual([
+      'Charge (gr)',
+      'Temperature (°C)',
+      'Shots',
+      'Mean (m/s)',
+      'SD (m/s)',
+    ])
+    expect(html.match(/<tr role="row">/g)).toHaveLength(1 + tuned.length)
+    expect(html).toContain('<td class="num" role="cell">-10.0</td>')
+  })
+
+  it('puts the simulated velocity and the residual of the fit on each string', () => {
+    const html = table({ strings: tuned, residuals: fitted.fit.residuals })
+    expect(heads(html).slice(5)).toEqual(['Simulated (m/s)', 'Residual (m/s)'])
+    const v = (ms: number) => formatNumber(ms, 1)
+    for (const r of fitted.fit.residuals)
+      expect(html).toContain(
+        `<td class="num" role="cell">${v(r.predicted)}</td><td class="num" role="cell">${v(r.residual)}</td>`,
+      )
+  })
+
+  it('leaves out residuals of other strings, such as those of a fit before a string was added', () => {
+    const more = [...tuned, { charge: 3e-3, shots: [{ velocity: { value: 900 } }] }]
+    expect(heads(table({ strings: more, residuals: fitted.fit.residuals }))).toHaveLength(5)
+  })
+
+  it('offers Remove on the strings added on the page only', () => {
+    const html = table({ strings: tuned, removable: 2 })
+    expect(heads(html).at(-1)).toBe('Added here')
+    expect(html.match(/>Remove</g)).toHaveLength(tuned.length - 2)
+    expect(html).toContain('aria-label="Remove the string at')
+    expect(table({ strings: tuned })).not.toContain('Remove')
   })
 })

@@ -41,7 +41,7 @@ describe('the notes of the tuning route', () => {
       fit: { fit: fitted, running: true },
     })
     expect(html).toContain(
-      '<td class="num" role="cell">1.234 1/s</td><td class="num" role="cell">0.050 1/s</td>',
+      '<td role="cell">1/s</td><td class="num" role="cell">1.000</td><td class="num" role="cell">1.234</td><td class="num" role="cell">0.050</td>',
     )
     expect(html).toContain('Working out the pressure range')
     expect(html).not.toContain('Save the load')

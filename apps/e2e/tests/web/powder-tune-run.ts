@@ -37,7 +37,7 @@ export async function openFit(page: Page) {
   await page.getByRole('link', { name: 'Fit a powder from these strings' }).click()
   await expect(page).toHaveURL(/\/powders\/tune\/?\?session=/)
   await expect(
-    page.getByRole('table', { name: 'Strings per charge' }).locator('tbody tr'),
+    page.getByRole('table', { name: 'Strings', exact: true }).locator('tbody tr'),
   ).toHaveCount(5)
   await expect(page.getByRole('table', { name: 'Fitted values' })).toBeVisible({ timeout: 60_000 })
 }
