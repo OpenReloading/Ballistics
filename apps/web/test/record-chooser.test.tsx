@@ -295,4 +295,11 @@ it('the highlight belongs to the list it was moved in, so a list rendered later 
   expect(moveHighlight(moved, demo, 2, 8)).toEqual({ list: demo, index: 1 })
   expect(moveHighlight(moved, demo, 2, -8)).toEqual({ list: demo, index: 0 })
   expect(moveHighlight(moved, listKey([]), 0, 1)).toBe(moved)
+  // a re-sorted list of the same count and first row is another list
+  const resorted = listKey([
+    { id: 'a-150', name: '150' },
+    { id: 'b', name: 'b' },
+    { id: 'a-168', name: '168' },
+  ])
+  expect(resorted).not.toBe(all)
 })

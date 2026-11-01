@@ -91,7 +91,7 @@ interface ChooserColumn<R> {
 }
 
 /** What a chooser's dialog says, each a message of one record kind. */
-export interface ChooserTexts {
+interface ChooserTexts {
   title: Message
   close: Message
   search: Message
@@ -291,8 +291,8 @@ export interface Highlight {
   index: number
 }
 
-/** A key of a result list: the same list, found again, keeps its highlight. */
-export const listKey = (rows: readonly ChooserRow[]) => `${rows.length}:${rows[0]?.id}`
+/** A key of a result list, its row ids in order: the same list, found again, keeps its highlight; a re-sorted one is another list. */
+export const listKey = (rows: readonly ChooserRow[]) => rows.map((r) => r.id).join('\n')
 
 /** The row of the list `list` the highlight is on: its first row when the highlight was set in another list. */
 export const highlighted = (h: Highlight, list: string) => (h.list === list ? h.index : 0)
