@@ -181,6 +181,7 @@ The documents and web pages of the makers that the bullet, powder, case capacity
 ### Hammer Bullets
 
 - Hammer Bullets store (WooCommerce Store API).
+- Hammer Bullets, home page. <https://hammerbullets.com/>
 
 ### Hodgdon Powder Co.
 
