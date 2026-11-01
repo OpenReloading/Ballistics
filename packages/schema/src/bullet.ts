@@ -136,6 +136,19 @@ export function leadFree(c: ConstructionFields | undefined): boolean | undefined
   return material && material !== 'compressed-powder' ? true : undefined
 }
 
+/** The fields of a bullet's list item that `bulletListFields` derives from the record. */
+export interface BulletListFields {
+  /** The first G1 coefficient, lb/in2; null without one. */
+  ballisticCoefficientG1: number | null
+  /** The first G7 coefficient, lb/in2; null without one. */
+  ballisticCoefficientG7: number | null
+  tipType: z.infer<typeof tipTypes> | undefined
+  baseType: z.infer<typeof baseTypes> | undefined
+  /** The structure, else `<material>-core`. */
+  construction: string | undefined
+  leadFree: boolean | undefined
+}
+
 /**
  * The fields a bullet record gives its list item (the API's catalogue rows and the browser's
  * designs): the first G1 and G7 coefficient, null without one (a banded sheet lists the top band
@@ -144,7 +157,7 @@ export function leadFree(c: ConstructionFields | undefined): boolean | undefined
  */
 export function bulletListFields(
   b: Pick<Bullet, 'tip' | 'base' | 'construction' | 'ballisticCoefficients'>,
-) {
+): BulletListFields {
   const first = (model: 'G1' | 'G7') =>
     b.ballisticCoefficients?.find((c) => c.dragModel === model)?.value ?? null
   const material = b.construction?.core?.material
