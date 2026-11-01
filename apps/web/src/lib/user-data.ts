@@ -29,12 +29,15 @@ export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn
   if (reason === notJsonMessage) return t('The file is not JSON.')
   if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
   // a refused record: zod's lines `✖ <message>` and `  → at <path>`, then `problemsText`'s count
+  // on the last line only (a key in the file may carry a line of its own into a message)
   if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
   return reason
     .replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
     .replace(/^ {2}→ at (.+)$/gm, (_, path: string) => `  ${t('→ at {path}', { path })}`)
-    .replace(/^and (\d+) more problems?$/m, (_, n: string) =>
-      tn(Number(n), 'and {count} more problem', 'and {count} more problems'),
+    .replace(
+      /\nand (\d+) more problems?$/,
+      (_, n: string) =>
+        `\n${tn(Number(n), 'and {count} more problem', 'and {count} more problems')}`,
     )
 }
 
