@@ -66,9 +66,8 @@ const samples = [
   'cip-6mm-me-flobert-court-2006-05-24',
   'cip-22-long-shot-2000-06-07',
   'cip-22-bb-cap-2000-06-07',
-  // VII shotshell with its cone, VIII the shortest (a blank), IX, X the longest (noG1)
+  // VII shotshell with its cone, IX, X the longest (noG1)
   'cip-9-c-f-mori-2006-09-19',
-  'cip-4-mm-randz-court-blanc-1992-06-10',
   'cip-35-r-gr-1994-03-01',
   'cip-18-x-81-2000-06-07',
 ]

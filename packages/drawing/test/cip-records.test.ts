@@ -247,21 +247,10 @@ it('draws every record with the reviewed notes', () => {
     ['cip-10-x-22-t-2004-09-27', 'cartridge', 'shoulderPartial'],
     ['cip-10-x-22-t-2004-09-27', 'cartridge', 'closedFront'],
     ['cip-10-x-22-t-2004-09-27', 'chamber', 'missing:R1'],
-    ['cip-10-x-23-t-2005-05-25', 'cartridge', 'shoulderPartial'],
-    ['cip-10-x-23-t-2005-05-25', 'cartridge', 'closedFront'],
-    ['cip-10-x-31-2016-10-18', 'cartridge', 'closedFront'],
-    ['cip-10-x-31-2016-10-18', 'chamber', 'cartridgeR'],
-    ['cip-10tk-2017-05-17', 'cartridge', 'closedFront'],
-    ['cip-10tk-2017-05-17', 'chamber', 'cartridgeR'],
     ['cip-11-5-fk-2021-04-07', 'chamber', 'headBelowP1'],
     ['cip-12-7-x-70-500-sch-ler-2002-05-15', 'chamber', 'headBelowP1'],
-    ['cip-14-mm-piexon-2004-09-27', 'cartridge', 'shoulderPartial'],
-    ['cip-14-mm-piexon-2004-09-27', 'cartridge', 'closedFront'],
-    ['cip-14-mm-piexon-2004-09-27', 'chamber', 'shoulderPartial'],
-    ['cip-14-mm-piexon-2004-09-27', 'chamber', 'mouthStep'],
     ['cip-17-libra-2002-05-15', 'cartridge', 'grooveAngle'],
     ['cip-18-x-81-2000-06-07', 'chamber', 'noG1'],
-    ['cip-22-long-blanc-1994-03-01', 'cartridge', 'closedFront'],
     ['cip-22-long-rifle-shot-claybirding-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-22-long-shot-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-264-leroy-n-e-2002-05-15', 'cartridge', 'grooveAngle'],
@@ -272,24 +261,15 @@ it('draws every record with the reviewed notes', () => {
     ['cip-30-super-belt-riml-h-h-2002-05-15', 'chamber', 'missing:R1,P1,L3,H2'],
     ['cip-30-super-carry-2025-05-13', 'chamber', 'noLeade'],
     ['cip-300-savage-2002-05-15', 'chamber', 'leadeAngle'],
-    ['cip-315-blanc-1994-03-01', 'cartridge', 'shoulderPartial'],
-    ['cip-315-blanc-1994-03-01', 'cartridge', 'closedFront'],
-    ['cip-315-blanc-1994-03-01', 'chamber', 'missing:R1'],
     ['cip-32-40-win-2002-05-15', 'cartridge', 'shoulderPartial'],
     ['cip-32-40-win-2002-05-15', 'chamber', 'shoulderPartial'],
     ['cip-32-40-win-2002-05-15', 'chamber', 'mouthCone'],
     ['cip-32-40-win-2002-05-15', 'chamber', 'leadeStartBelowH'],
     ['cip-32-win-sl-2002-05-15', 'cartridge', 'grooveDerivedE'],
-    ['cip-320-court-blanc-1994-03-01', 'cartridge', 'closedFront'],
-    ['cip-320-court-blanc-1994-03-01', 'chamber', 'leadeAngle'],
     ['cip-333-riml-n-e-2002-05-15', 'chamber', 'headBelowP1'],
-    ['cip-35-blanc-1994-06-01', 'cartridge', 'grooveAngle'],
-    ['cip-35-blanc-1994-06-01', 'cartridge', 'shoulderPartial'],
-    ['cip-35-blanc-1994-06-01', 'chamber', 'missing:R1'],
     ['cip-35-gr-1994-06-01', 'cartridge', 'grooveAngle'],
     ['cip-35-gr-1994-06-01', 'cartridge', 'closedFront'],
     ['cip-35-gr-1994-06-01', 'chamber', 'missing:R1'],
-    ['cip-35-r-blanc-1994-03-01', 'cartridge', 'shoulderPartial'],
     ['cip-35-r-gr-1994-03-01', 'cartridge', 'closedFront'],
     ['cip-357-magnum-carb-2005-11-02', 'cartridge', 'missing:R1,R,P1,L3,H2'],
     ['cip-375-h-lderlin-2007-05-14', 'chamber', 'headBelowP1'],
@@ -300,16 +280,8 @@ it('draws every record with the reviewed notes', () => {
     ['cip-38-45-acp-2000-06-07', 'cartridge', 'grooveAngle'],
     ['cip-38-special-carb-1995-05-10', 'cartridge', 'missing:R1,R,P1,L3,H2'],
     ['cip-38-spl-amu-2008-09-23', 'cartridge', 'grooveDerivedE'],
-    ['cip-380-alfa-2002-05-15', 'cartridge', 'shoulderPartial'],
     ['cip-380-gr-9-mm-r-gr-1994-03-01', 'cartridge', 'closedFront'],
-    ['cip-380-me-gum-2002-05-15', 'cartridge', 'shoulderPartial'],
-    ['cip-380r-blanc-9-mm-r-blanc-1995-05-10', 'cartridge', 'closedFront'],
-    ['cip-380r-blanc-9-mm-r-blanc-1995-05-10', 'chamber', 'leadeAngle'],
     ['cip-4-6-x-30-2025-03-17', 'cartridge', 'grooveAngle'],
-    ['cip-4-mm-randz-court-blanc-1992-06-10', 'cartridge', 'closedFront'],
-    ['cip-4-mm-randz-long-blanc-1992-06-10', 'cartridge', 'closedFront'],
-    ['cip-40-x-46-deftec-2008-04-15', 'cartridge', 'missing:R1,R,P1,L3,H2'],
-    ['cip-40-x-46-deftec-2008-04-15', 'chamber', 'missing:R1,R,P1,L3,H2'],
     ['cip-400-legend-2023-11-08', 'cartridge', 'chamferSkipped'],
     ['cip-400-legend-2023-11-08', 'chamber', 'mouthStep'],
     ['cip-401-win-sl-2002-05-15', 'cartridge', 'grooveDerivedE'],
@@ -323,23 +295,18 @@ it('draws every record with the reviewed notes', () => {
     ['cip-45-blaser-2022-04-26', 'chamber', 'headBelowP1'],
     ['cip-45-colt-carb-1995-05-10', 'cartridge', 'missing:R1,R,P1,L3,H2'],
     ['cip-45-gap-2011-05-25', 'chamber', 'headBelowP1'],
-    ['cip-45-k-blanc-1994-03-01', 'cartridge', 'closedFront'],
-    ['cip-45-k-blanc-1994-03-01', 'chamber', 'leadeAngle'],
     ['cip-45-l-gr-1993-10-20', 'cartridge', 'closedFront'],
     ['cip-45-s-w-schofield-carb-2000-02-15', 'cartridge', 'missing:R1,R,P1,L3,H2'],
     ['cip-450-sch-2013-05-22', 'chamber', 'headBelowP1'],
     ['cip-454-casull-2015-05-19', 'cartridge', 'grooveDerivedE'],
     ['cip-458-socom-2021-11-09', 'chamber', 'headBelowP1'],
     ['cip-5-45x18-2006-09-19', 'cartridge', 'grooveDerivedE'],
-    ['cip-5-56-mm-fx-2017-05-17', 'chamber', 'headBelowP1'],
-    ['cip-5-56-mm-mt-x-2024-05-14', 'chamber', 'headBelowP1'],
     ['cip-5-6-mm-flobert-plombs-dc-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-5-6-mm-flobert-plombs-sc-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-50-70-govt-2017-05-17', 'chamber', 'mouthStep'],
     ['cip-50-90-sharps-2-1-2-2017-05-17', 'cartridge', 'shoulderPartial'],
     ['cip-50-90-sharps-2-1-2-2017-05-17', 'chamber', 'shoulderPartial'],
     ['cip-50-90-sharps-2-1-2-2017-05-17', 'chamber', 'mouthStep'],
-    ['cip-57tk-2017-05-17', 'cartridge', 'closedFront'],
     ['cip-6-5-x-54-mauser-2002-05-15', 'chamber', 'headBelowP1'],
     ['cip-6-5-x-57-r-2002-05-15', 'chamber', 'leadeStartBelowH'],
     ['cip-6-5-x-58-mauser-2002-05-15', 'chamber', 'headBelowP1'],
@@ -351,7 +318,6 @@ it('draws every record with the reviewed notes', () => {
     ['cip-6-5-x-70-r-2002-05-15', 'chamber', 'shoulderPartial'],
     ['cip-6-8-mm-rem-spc-2006-05-16', 'chamber', 'leadeAngle'],
     ['cip-6-8-western-2022-11-22', 'chamber', 'leadeStartBelowH'],
-    ['cip-6-mm-flobert-blanc-2008-04-15', 'cartridge', 'closedFront'],
     ['cip-6-mm-rem-2023-05-09', 'chamber', 'throatDatum'],
     ['cip-7-21-firebird-2008-09-23', 'cartridge', 'grooveAngle'],
     ['cip-7-62-nagant-2000-06-07', 'cartridge', 'shoulderOrder'],
@@ -364,8 +330,6 @@ it('draws every record with the reviewed notes', () => {
     ['cip-7-x-67-r-luyven-2006-05-16', 'cartridge', 'missing:R1'],
     ['cip-8-5-mm-messner-mag-2013-05-22', 'chamber', 'headBelowP1'],
     ['cip-8-5-x-68-fanzoj-2012-05-30', 'chamber', 'headBelowP1'],
-    ['cip-8-mm-blanc-2008-09-23', 'cartridge', 'shoulderPartial'],
-    ['cip-8-mm-blanc-2008-09-23', 'chamber', 'missing:R1'],
     ['cip-8-mm-gr-1994-03-01', 'cartridge', 'grooveAngle'],
     ['cip-8-mm-gr-1994-03-01', 'cartridge', 'closedFront'],
     ['cip-8-mm-gr-1994-03-01', 'chamber', 'missing:R1'],
@@ -384,10 +348,6 @@ it('draws every record with the reviewed notes', () => {
     ['cip-9-3-x-72-r-2002-05-15', 'chamber', 'shoulderPartial'],
     ['cip-9-5-x-66-se-v-h-2002-05-15', 'chamber', 'headBelowP1'],
     ['cip-9-mm-fx-cqt-2022-04-26', 'chamber', 'shoulderPartial'],
-    ['cip-9-mm-mt-x-2022-04-26', 'cartridge', 'shoulderPartial'],
-    ['cip-9-mm-pa-blanc-1994-03-01', 'cartridge', 'shoulderPartial'],
-    ['cip-9-mm-pa-blanc-1994-03-01', 'cartridge', 'closedFront'],
-    ['cip-9-mm-pa-blanc-1994-03-01', 'chamber', 'missing:R1'],
     ['cip-9-x-39-2018-05-16', 'chamber', 'headBelowP1'],
     ['cip-9-x-39-2018-05-16', 'chamber', 'mouthStep'],
     ['cip-9-x-57-2004-05-18', 'chamber', 'leadeStartBelowH'],
@@ -551,8 +511,8 @@ it('draws the rim chamfer where f and beta are stored, beta from the head face l
       counts.notTimesTan++
   }
   expect(counts).toEqual({
-    both: 444,
-    drawn: 443,
+    both: 428,
+    drawn: 427,
     notTimesTan: 194,
     skipped: ['cip-400-legend-2023-11-08'],
     withR0: 0,
@@ -606,7 +566,7 @@ it('keeps the chamber body around the cartridge body', () => {
     const gap = Math.min(...zs.map((z) => rAt(ch.points, z) - rAt(c.points, z)))
     if (!(gap >= -0.01)) gaps.push([id, Number(gap.toFixed(3))])
   }
-  expect(checked).toBe(518)
+  expect(checked).toBe(512)
   // Reviewed: chamber R, a minimum, is below cartridge R, a maximum, by 0.02 to 0.1 mm, so the
   // stored rim is thicker than the stored recess; between the two R the rim (R1/2) meets the
   // chamber body (P1/2). 22 BB Cap and 22 CB Cap: R 1.12 against 1.1, R1 7.06 against P1 5.76;
@@ -1083,10 +1043,10 @@ it('lays out every layer of every figure in both media clear of overlaps, inside
   for (const figure of allFigures) figureChecks(figure, referencePx, tally)
   const { failures, headBelowP1, beltWiderThanRim, longLeaders, acrossAxis, arrowheads } = tally
   expect(failures).toEqual([])
-  expect(headBelowP1).toBe(31)
+  expect(headBelowP1).toBe(29)
   expect(beltWiderThanRim).toBe(13)
   expect(longLeaders).toHaveLength(14)
-  expect(acrossAxis).toHaveLength(17)
+  expect(acrossAxis).toHaveLength(16)
   expect(new Set(arrowheads).size).toBe(18)
   expect({ longLeaders, acrossAxis, arrowheads: [...new Set(arrowheads)] }).toMatchSnapshot()
 })
@@ -1263,7 +1223,7 @@ it('counts the chamber recess steps and lists the other outline features under 1
     if (features.some((f) => f.recess)) recess++
     for (const { side, px } of features.filter((f) => !f.recess)) small.push([name, side, px])
   }
-  expect(small).toHaveLength(14)
+  expect(small).toHaveLength(13)
   expect({ recess, small }).toMatchSnapshot()
 })
 
@@ -1287,9 +1247,9 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
     return [defined(sorted[0]), defined(sorted[sorted.length - 1])].map((s) => [s.name, s[key]])
   }
   expect({ figures: sizes.length, tables }).toEqual({
-    figures: 607,
+    figures: 587,
     // chamber only: a closed front, or a cartridge without its base values; cartridge only: a
-    // chamber without them (VIII: 35 Blanc and 8 mm Blanc; 35 R Blanc draws both)
+    // chamber without them
     tables: {
       I: { both: 214 },
       II: { both: 144, chamber: 2 },
@@ -1297,9 +1257,8 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
       IV: { both: 88, chamber: 7 },
       V: { both: 23, chamber: 6 },
       VII: { both: 55 },
-      VIII: { both: 1, chamber: 8, cartridge: 2 },
       IX: { chamber: 4 },
-      X: { both: 9, chamber: 4 },
+      X: { both: 4 },
     },
   })
   // text size in mm, screen px per mm at 390 px, screen height and print width in mm

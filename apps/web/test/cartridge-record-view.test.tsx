@@ -10,6 +10,7 @@ import {
   StandardFacts,
   VariantMatrix,
 } from '../src/components/cartridge-record.tsx'
+import { Cartridge } from '../src/components/cartridge-record-page.tsx'
 import { msg } from '../src/i18n/translate.ts'
 import {
   combinedRows,
@@ -27,6 +28,9 @@ import { type PresetId, presetUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
 import { replaceUntilStable } from './markup.ts'
 import { sheetRecord } from './records.ts'
+
+// the record page draws its figures in the self-hosted drawing font
+vi.mock('next/font/local', () => ({ default: () => ({ variable: 'drawing-font', className: '' }) }))
 
 // the list renders its tab bar, which reads the route and the router
 vi.mock('next/navigation', () => ({
@@ -81,6 +85,30 @@ describe('the cartridge list row', () => {
   it('puts the facts line under the name in the preset units', () => {
     expect(facts('metric-grams')).toBe('.308 · L3 51.18 mm · L6 71.12 mm · 4150 bar · rimless')
     expect(facts('us')).toBe('.308 · L3 2.015 in · L6 2.800 in · 60191 psi · rimless')
+  })
+})
+
+describe('a cartridge record without values', () => {
+  // no C.I.P. record of the data lacks values, so the gap is a record with its values left out
+  const gap = { ...sheetRecord('cip-308-win-2008-09-23'), values: [] }
+
+  it('is marked as a gap: badge, one line, no unit switch or designer link', () => {
+    const page = html('metric-grams', <Cartridge c={gap} />)
+    expect(page.match(/class="gap-badge /g)).toHaveLength(1)
+    expect(text(page)).toMatch(/^308 Win\. CIP Gap /)
+    expect(text(page)).toContain('No dimensions or pressures in this record')
+    expect(page).not.toContain('role="radiogroup"')
+    expect(page).not.toContain('/cartridges/designer')
+    expect(text(page)).toContain('Use in workbench')
+    expect(
+      html('metric-grams', <Cartridge c={sheetRecord('cip-308-win-2008-09-23')} />),
+    ).not.toContain('gap-badge')
+  })
+
+  it('is marked in the list too', () => {
+    const row = { id: gap.id, name: gap.name, aliases: [] }
+    const list = html('metric-grams', <CartridgeList packed={packCartridges([row])} />)
+    expect(list.match(/gap-badge/g)).toHaveLength(1)
   })
 })
 
