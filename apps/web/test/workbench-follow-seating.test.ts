@@ -4,6 +4,7 @@ import {
   approximateVolumeTolerance,
   followPlan,
   noCoefficientOf,
+  runVolumeTolerance,
   seatingOwnsVolume,
   typedOverSeating,
 } from '../src/components/use-workbench-load.ts'
@@ -84,4 +85,23 @@ it('hands the interval of an approximate volume to the run while the field still
   expect(approximateVolumeTolerance({ si: 3e-6, source: '' }, 3e-6, following)).toBeUndefined()
   // the API takes at most 0.2
   expect(approximateVolumeTolerance({ ...volume, halfWidth: 0.5 }, 3e-6, following)).toBe(0.2)
+})
+
+it("takes the capacity's tolerance while the volume follows the seating, none for a typed one", () => {
+  const seated = {
+    caseVolume: 0.86e-6,
+    volume: 0.55e-6,
+    capacity: { fraction: 0.02, rule: 'catalogue' as const },
+  }
+  const run = (volume: number) =>
+    runVolumeTolerance({
+      volume,
+      seated,
+      previewed: { volume: 0.55e-6 },
+      suggestion: undefined,
+      followed: new Set(),
+    })
+  expect(run(0.55e-6).rule).toBe('catalogue')
+  expect(run(0.55e-6).fraction).toBeCloseTo((0.02 * 0.86) / 0.55, 12)
+  expect(run(0.6e-6)).toEqual({ fraction: undefined, rule: undefined })
 })

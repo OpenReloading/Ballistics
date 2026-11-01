@@ -80,6 +80,7 @@ import {
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
+import { type CapacityRule, capacityFraction } from '../lib/volume-tolerance.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { RecordSearch, useChooser } from './record-search.tsx'
@@ -145,6 +146,8 @@ export type Seated = {
   depth?: number
   /** Jump to the lands or the leade, m, below 0 into them: the engraving ramp of a run starts there. */
   jump?: number
+  /** The tolerance of the case capacity, relative to it, and its rule (`volume-tolerance.ts`). */
+  capacity?: { fraction: number; rule: CapacityRule }
   barrel?: number
   /** The barrel length of the preview's field, m, seated or not: the start pressure rule reads it. */
   barrelField?: number
@@ -803,6 +806,23 @@ const figureOf = (spec: Spec | undefined, seating: Seating | undefined) =>
       }
     : undefined
 
+/**
+ * The tolerance of the capacity in use (`capacityFraction`): a measured one with the spread of the
+ * chosen brass group when the measured value is the group's.
+ */
+function capacityOf(
+  water: { grams: number; source: 'measured' | 'capacity' | 'case' } | undefined,
+  records: readonly Capacity[],
+  own: readonly OwnCase[] | undefined,
+  ownId: string | undefined,
+) {
+  if (!water) return
+  const group = own?.find((c) => c.id === ownId)
+  const theirs =
+    group?.grams !== undefined && Math.abs(group.grams - water.grams) <= 1e-9 * water.grams
+  return capacityFraction({ ...water, spread: theirs ? group.spread : undefined, records })
+}
+
 /** What the page's fields follow, from the seating; none seated reports `{}`. */
 function seatedReport(o: {
   caseVolume: number | undefined
@@ -812,13 +832,15 @@ function seatedReport(o: {
   mode: Mode
   atStart: boolean
   figure: Seated['figure']
+  capacity: Seated['capacity']
 }): Seated {
-  const { caseVolume, unseated, seating, barrel, mode, atStart, figure } = o
+  const { caseVolume, unseated, seating, barrel, mode, atStart, figure, capacity } = o
   const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
   const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
   const jump = seating?.jump.value
   return {
     ...(caseVolume !== undefined && { caseVolume }),
+    ...(caseVolume !== undefined && capacity && { capacity }),
     ...(unseated && { unseated }),
     ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
     ...(travel !== undefined && { travel: toSi('length', travel) }),
@@ -853,9 +875,10 @@ function useReportSeated(
     [],
   )
   useEffect(() => () => send.cancel(), [send])
-  const { caseVolume, unseated, seating, barrel, mode, atStart, figure } = o
+  const { caseVolume, unseated, seating, barrel, mode, atStart, figure, capacity } = o
   const key = [
     caseVolume,
+    capacity?.fraction,
     JSON.stringify(unseated),
     seating?.volumeBehindBullet?.value,
     seating?.travel?.value,
@@ -870,7 +893,16 @@ function useReportSeated(
   // no seated bullet reports {}: the page forgets the earlier seating
   // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
   useEffect(() => {
-    const values = seatedReport({ caseVolume, unseated, seating, barrel, mode, atStart, figure })
+    const values = seatedReport({
+      caseVolume,
+      unseated,
+      seating,
+      barrel,
+      mode,
+      atStart,
+      figure,
+      capacity,
+    })
     if (sliding) return send.push(values)
     send.cancel()
     startTransition(() => seated.current(values))
@@ -1141,7 +1173,16 @@ function useSeatingModel(p: PreviewProps) {
   })
   useReportSeated(
     p.onSeated,
-    { caseVolume, unseated, seating, barrel: barrel.si, mode: seatMode, atStart, figure },
+    {
+      caseVolume,
+      unseated,
+      seating,
+      barrel: barrel.si,
+      mode: seatMode,
+      atStart,
+      figure,
+      capacity: capacityOf(water, capacities, p.ownCases, p.ownCaseId),
+    },
     sliding,
   )
 

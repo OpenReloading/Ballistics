@@ -161,6 +161,7 @@ import {
   userCartridges,
   userRef,
 } from '../lib/variants.ts'
+import { type CapacityRule, volumeFraction } from '../lib/volume-tolerance.ts'
 import { type InputPanel, maxVolumeFraction, type Status, statusText } from '../lib/workbench.ts'
 import {
   type DefaultKey,
@@ -828,6 +829,27 @@ export function approximateVolumeTolerance(
   // the field holds the default, up to the rounding of its text
   if (Math.abs(value - suggestion.si) > 1e-9 * suggestion.si) return undefined
   return Math.min(suggestion.halfWidth, maxVolumeFraction)
+}
+
+/**
+ * The run's tolerance of the volume behind the bullet and the capacity's rule (`volume-tolerance.ts`):
+ * the capacity's tolerance while the field holds the seated volume or the followed default, plus
+ * the interval of an estimated bullet volume; none for a typed volume, which keeps the API's 1 %.
+ */
+export function runVolumeTolerance(a: {
+  volume: number | undefined
+  seated: Seated
+  previewed: Partial<Record<PreviewKey, number>>
+  suggestion: Suggestion | undefined
+  followed: ReadonlySet<FollowKey>
+}): { fraction: number | undefined; rule: CapacityRule | undefined } {
+  const { volume, seated } = a
+  if (volume === undefined) return { fraction: undefined, rule: undefined }
+  const bullet = approximateVolumeTolerance(a.suggestion, volume, a.followed)
+  const followsDefault = a.followed.has('volume') && a.suggestion?.si === volume
+  const capacity = volume === a.previewed.volume || followsDefault ? seated.capacity : undefined
+  const fraction = volumeFraction({ capacity, caseVolume: seated.caseVolume, volume, bullet })
+  return { fraction, rule: fraction === undefined ? undefined : capacity?.rule }
 }
 
 /** `base` with the start pressure default: the barrel of the preview's field (typed, seated or not), else the start's own, and the bullet's construction. */
@@ -2336,11 +2358,13 @@ export function useWorkbenchState() {
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
-    const volumeTolerance = approximateVolumeTolerance(
-      suggestions.volume,
-      fields.volume?.si,
+    const { fraction: volumeTolerance, rule: volumeRule } = runVolumeTolerance({
+      volume: fields.volume?.si,
+      seated,
+      previewed,
+      suggestion: suggestions.volume,
       followed,
-    )
+    })
     const recordInputs = [
       chosenPowder?.id,
       bulletLength,
@@ -2356,6 +2380,7 @@ export function useWorkbenchState() {
       bulkDensity,
       resistanceMissing,
       recordInputs,
+      volumeRule,
     }
   }
 
@@ -2414,6 +2439,7 @@ export function useWorkbenchState() {
     plan: Partial<Step>[] | undefined
     bulkDensity: number | undefined
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
+    volumeRule: CapacityRule | undefined
     table: string | undefined
     gasFactorNote: string | undefined
   }) {
@@ -2434,6 +2460,7 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
+      volumeRule: a.volumeRule,
       ...noCoefficientOf(chosenPowder),
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,

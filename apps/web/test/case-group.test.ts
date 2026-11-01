@@ -80,6 +80,7 @@ it('reads the measured capacity through the record the group names', () => {
       capacity: c.capacity,
       grams: 3.62,
       trimLength: 51.1,
+      spread: 0.04,
     },
   ])
 })

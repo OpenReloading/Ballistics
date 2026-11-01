@@ -4312,5 +4312,10 @@
   "No competition event in this year.": "Kein Wettkampf in diesem Jahr.",
   "Competition event": "Wettkampf",
   "Fills an empty result with the event's total.": "Füllt ein leeres Ergebnis mit dem Gesamtergebnis des Wettkampfs.",
-  "No competition event saved yet": "Noch kein Wettkampf gespeichert"
+  "No competition event saved yet": "Noch kein Wettkampf gespeichert",
+  "a catalogue capacity of one maker, 2 % assumed without a published source": "einem Hülsenvolumen aus dem Katalog von einem Hersteller, 2 % angenommen ohne veröffentlichte Quelle",
+  "a measured capacity without its spread, 0.5 % assumed": "einem gemessenen Hülsenvolumen ohne Streuung, 0,5 % angenommen",
+  "the spread of the capacity records of different makers over their mean": "der Streuung der Hülsenvolumen-Datensätze verschiedener Hersteller über ihrem Mittelwert",
+  "the spread of your measured cases over their capacity": "der Streuung Ihrer gemessenen Hülsen über ihrem Hülsenvolumen",
+  "volume {value}, from {rule}": "Volumen {value}, aus {rule}"
 }

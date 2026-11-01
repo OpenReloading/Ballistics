@@ -14,6 +14,7 @@ import type {
   SeatingStep,
 } from '../lib/seating-ladder.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
+import type { CapacityRule } from '../lib/volume-tolerance.ts'
 import {
   bandLine,
   bulletLeadTime,
@@ -73,6 +74,8 @@ export type Outcome =
       noCoefficient?: { reference: number } | undefined
       /** The record's bore-resistance law the run could not apply, with what was missing. */
       resistanceMissing?: { powder: string; missing: string[] } | undefined
+      /** The rule of the range's volume tolerance from the capacity's source; none: the API's default. */
+      volumeRule?: CapacityRule | undefined
       /** The user bullet design whose mass the run used. */
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
