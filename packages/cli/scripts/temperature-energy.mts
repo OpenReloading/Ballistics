@@ -20,6 +20,7 @@
 import { parseArgs } from 'node:util'
 import {
   fitPowder,
+  InputError,
   type InteriorLoad,
   interior,
   type LadderPoint,
@@ -189,8 +190,10 @@ function fitted(fitRows: readonly Entry[], energy: number): InteriorLoad | undef
       parameters: ['burnRate', 'temperatureFactor'],
       maxIterations: 60,
     }).load
-  } catch {
-    return undefined
+  } catch (error) {
+    // a refusal of the fit (PowderFitError and the other InputErrors of core) is a failed fit; anything else is a defect
+    if (error instanceof InputError) return undefined
+    throw error
   }
 }
 
@@ -201,7 +204,13 @@ function predictAt(model: InteriorLoad, load: InteriorLoad) {
     charge: load.charge,
     propellantTemperature: load.propellantTemperature,
   })
-  return r.valid ? r : undefined
+  // as `predict` of the CLI: a value that is not finite would turn every statistic into NaN
+  return r.valid &&
+    Number.isFinite(r.muzzleVelocity) &&
+    r.muzzleVelocity > 0 &&
+    Number.isFinite(r.peakBreechPressure)
+    ? r
+    : undefined
 }
 
 /**
