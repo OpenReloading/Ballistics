@@ -20,9 +20,9 @@ it('a local build says so, and leaves out a missing commit', () => {
   )
 })
 
-it('the printed tag names the release by its version, the next edition and a local build by their commit', () => {
+it('the printed tag names the release by its version, the next edition and a local build by their commit or else the version', () => {
   expect(buildTag({ ...build, edition: 'release' })).toBe('Ballistics 0.0.4')
   expect(buildTag({ ...build, edition: 'next' })).toBe('Ballistics next abc1234')
   expect(buildTag({ ...build, edition: 'development' })).toBe('Ballistics development abc1234')
-  expect(buildTag({ ...build, edition: 'next', commit: '' })).toBe('Ballistics next')
+  expect(buildTag({ ...build, edition: 'next', commit: '' })).toBe('Ballistics next 0.0.4')
 })
