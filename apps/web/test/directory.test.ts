@@ -1,13 +1,12 @@
 import { expect, it } from 'vitest'
 import { english, translator } from '../src/i18n/translate.ts'
+import { bulletKinds, bulletSectionalDensity } from '../src/lib/bullet-kinds.ts'
 import {
   type BulletItem,
   bulletBallisticCoefficient,
   bulletCells,
   bulletFacets,
-  bulletKinds,
   bulletMatches,
-  bulletSectionalDensity,
   bulletTypeText,
   coefficientText,
   constructionText,

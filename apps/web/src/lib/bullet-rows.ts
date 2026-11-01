@@ -1,16 +1,9 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
-import {
-  type Bullet,
-  constructionFields,
-  fold,
-  leadFree,
-  score,
-  searchKey,
-  toSi,
-} from '@open-reloading/schema'
+import { fold, score, searchKey, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { BulletSummary } from './api-types.ts'
+import { bulletSectionalDensity } from './bullet-kinds.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import { present } from './directory.ts'
 import type { Facet } from './facets.ts'
@@ -134,12 +127,6 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
   }
 }
 
-/** Sectional density, mass over diameter squared, kg/m² (as `computedBulletRows`); undefined without both. */
-export function bulletSectionalDensity(b: Pick<BulletRow, 'mass' | 'diameter'>) {
-  if (b.mass === null || b.diameter === null || b.diameter <= 0) return
-  return toSi('mass', b.mass) / toSi('length', b.diameter) ** 2
-}
-
 /** A G1 or G7 column's cell: the coefficient to 3 decimals, lb/in²; empty without one. */
 export const coefficientText = (value: number | null) =>
   value === null ? '' : formatNumber(value, 3)
@@ -232,45 +219,16 @@ export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
     }),
   )
 
-/** The structure of a bullet's construction, else its core material as `<material>-core`: the list item's `construction`. */
-function constructionKey(c: Bullet['construction']) {
-  const material = c?.core?.material
-  return c?.structure ?? (material ? `${material}-core` : undefined)
-}
-
-/** The record's first coefficient of drag model `model`, lb/in², as the list item gives it. */
-const firstCoefficient = (b: Pick<Bullet, 'ballisticCoefficients'>, model: 'G1' | 'G7') =>
-  b.ballisticCoefficients?.find((c) => c.dragModel === model)?.value ?? null
-
-/**
- * The list fields a bullet record gives a design's row as the API gives a catalogue item: the
- * first G1 and G7, tip, base, construction and lead-free.
- */
-export const bulletKinds = (
-  b: Pick<Bullet, 'tip' | 'base' | 'construction' | 'ballisticCoefficients'>,
-) => ({
-  ballisticCoefficientG1: firstCoefficient(b, 'G1'),
-  ballisticCoefficientG7: firstCoefficient(b, 'G7'),
-  ...present({
-    tipType: b.tip?.type ?? null,
-    baseType: b.base?.type ?? null,
-    construction: constructionKey(b.construction) ?? null,
-    leadFree: leadFree(b.construction) ?? null,
-  }),
-})
-
 const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 /** A tip, base or structure value as a word, hyphens as spaces: "hollow point". */
 const kindWord = (t: Translator['t'], value: string) =>
   say(t, rawWording(value)).replaceAll('-', ' ')
 
-const structures = new Set<string>(constructionFields.shape.structure.unwrap().options)
-
 /** A list item's construction as a name: "Cup and core", "Lead core". */
 export function constructionText(t: Translator['t'], value: string) {
-  // a structure ("cup-and-core") is no core material
-  const core = structures.has(value) ? undefined : /^(.+)-core$/.exec(value)?.[1]
+  // the one structure that ends in "-core" is no core material
+  const core = value === 'cup-and-core' ? undefined : /^(.+)-core$/.exec(value)?.[1]
   return capitalised(
     core ? t('{material} core', { material: say(t, spacedWording(core)) }) : kindWord(t, value),
   )

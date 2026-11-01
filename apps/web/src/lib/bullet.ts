@@ -1,7 +1,6 @@
 import { millerStability, type Projectile } from '@open-reloading/core'
 import { type Bullet, baseTypes, fromSi, toSi } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
-import { bulletSectionalDensity } from './bullet-rows.ts'
 import type { FieldRow } from './record-fields.ts'
 import { metersPerFoot, pascalsPerInHg } from './units.ts'
 
@@ -232,9 +231,9 @@ export function bulletDrag(record: Bullet, model: 'G1' | 'G7', choice?: number):
   }
 }
 
-/** Sectional density, mass over diameter squared, kg/m2: the list's value (`bulletSectionalDensity`). */
+/** Sectional density, mass over diameter squared, kg/m2. */
 const sectionalDensity = (r: Pick<Bullet, 'mass' | 'diameter'>) =>
-  bulletSectionalDensity({ mass: r.mass.value, diameter: r.diameter?.value ?? null })
+  r.diameter && toSi('mass', r.mass.value) / toSi('length', r.diameter.value) ** 2
 
 /**
  * Gyroscopic stability factor the Miller twist gives (Litz's recommended minimum, B. Litz, Applied

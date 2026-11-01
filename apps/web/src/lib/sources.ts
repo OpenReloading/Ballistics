@@ -1,6 +1,6 @@
 /** List sources: OpenReloading records and the user records of the browser. */
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { type BulletRow, bulletKinds } from './bullet-rows.ts'
+import type { BulletRow } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 import type { UserBulletView, UserCartridgeView } from './variants.ts'
 
@@ -82,7 +82,10 @@ export const designerHref = (
 ) => `/${kind}/designer?record=${encodeURIComponent(userRecordId(rowId) ?? rowId)}`
 
 /** User bullets with a diameter as list rows: lengths in mm, mass in g; absent values stay absent. */
-export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
+export function userBulletRows(
+  views: readonly UserBulletView[],
+  kinds?: (record: UserBulletView['resolved']['record']) => Partial<BulletRow>,
+): BulletRow[] {
   return views.flatMap(({ id, name, manufacturerName, resolved: { record } }) => {
     // the diameter is the designer's one required value: a bullet without it has no caliber to list
     if (record.diameter === undefined) return []
@@ -95,7 +98,10 @@ export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
         diameter: record.diameter.value,
         mass: record.mass?.value ?? null,
         length: record.length?.value ?? null,
-        ...bulletKinds(record),
+        ballisticCoefficientG1: null,
+        ballisticCoefficientG7: null,
+        // the bullet list's own fields, where it asks for them: other pages need not load them
+        ...kinds?.(record),
       },
     ]
   })

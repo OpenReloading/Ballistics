@@ -3998,8 +3998,6 @@
   "G1": "G1",
   "G7": "G7",
   "Pick 2 to {max}": "2 bis {max} auswählen",
-  "Sectional density: mass over diameter squared, computed from the record.": "Querschnittsbelastung: Masse durch Durchmesser im Quadrat, aus dem Datensatz berechnet.",
-  "The manufacturer's published G1 ballistic coefficient, the record's first.": "Der vom Hersteller veröffentlichte ballistische Koeffizient G1, der erste des Datensatzes.",
-  "The manufacturer's published G7 ballistic coefficient, the record's first.": "Der vom Hersteller veröffentlichte ballistische Koeffizient G7, der erste des Datensatzes.",
-  "Tip and base of the bullet, as the record gives them.": "Spitze und Boden des Geschosses, wie der Datensatz sie angibt."
+  "Sectional density, computed: mass over diameter squared.": "Querschnittsbelastung, berechnet: Masse durch Durchmesser im Quadrat.",
+  "The manufacturer's first published BC of this drag model.": "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
 }

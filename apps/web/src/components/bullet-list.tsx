@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useDeferredValue, useMemo } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
+import { bulletKinds, bulletSectionalDensity } from '../lib/bullet-kinds.ts'
 import {
   type BulletRow,
   ballisticCoefficientText,
@@ -16,7 +17,6 @@ import {
   bulletFacets,
   bulletKey,
   bulletMatches,
-  bulletSectionalDensity,
   bulletTypeText,
   coefficientText,
   type PackedBullet,
@@ -74,7 +74,7 @@ export function BulletList({
   const mine = useResolved(records, userBullets)
   // the browser's designs first: a few rows would sit unseen behind 1684 catalogue rows
   const items = useMemo<BulletRow[]>(
-    () => [...userBulletRows(mine), ...unpackBullets(packed)],
+    () => [...userBulletRows(mine, bulletKinds), ...unpackBullets(packed)],
     [mine, packed],
   )
   const { system } = useUnits()
@@ -174,7 +174,7 @@ export function BulletList({
       key: 'sd',
       label: msg('column\u0004SD'),
       unit: system.sectionalDensity.symbol,
-      help: msg('Sectional density: mass over diameter squared, computed from the record.'),
+      help: msg('Sectional density, computed: mass over diameter squared.'),
       num: true,
       width: '5rem',
       wide: true,
@@ -185,7 +185,7 @@ export function BulletList({
       key: 'g1',
       label: msg('G1'),
       unit: 'lb/in²',
-      help: msg("The manufacturer's published G1 ballistic coefficient, the record's first."),
+      help: msg("The manufacturer's first published BC of this drag model."),
       num: true,
       width: '4.5rem',
       value: (b) => b.ballisticCoefficientG1,
@@ -195,7 +195,7 @@ export function BulletList({
       key: 'g7',
       label: msg('G7'),
       unit: 'lb/in²',
-      help: msg("The manufacturer's published G7 ballistic coefficient, the record's first."),
+      help: msg("The manufacturer's first published BC of this drag model."),
       num: true,
       width: '4.5rem',
       value: (b) => b.ballisticCoefficientG7,
@@ -204,7 +204,6 @@ export function BulletList({
     {
       key: 'type',
       label: msg('Type'),
-      help: msg('Tip and base of the bullet, as the record gives them.'),
       width: '11rem',
       wide: true,
       value: (b) => typeOf(b) || undefined,
