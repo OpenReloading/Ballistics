@@ -331,6 +331,31 @@ function modeOf(
   return { kind: 'typed' }
 }
 
+/**
+ * The target field: its unit, why the typed value is no target, and whether to show that. A share
+ * of Pmax stays a share without a cartridge (a load opened before its cartridge record, or with a
+ * design): it is not read as a pressure, and Compute waits for the cartridge.
+ */
+function targetOf(
+  text: number | string,
+  left: boolean,
+  percent: boolean,
+  withCartridge: boolean,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
+  const unit = targetUnit('peakPressure', system, percent)
+  const reason =
+    percent && !withCartridge
+      ? t("A share of Pmax needs the cartridge's CIP Pmax.")
+      : targetError(text, unit, t)
+  return {
+    unit,
+    valid: reason === undefined,
+    shown: text !== '' || left ? reason : undefined,
+  }
+}
+
 const modeValid = (kind: CompareMode['kind'], fillValid: boolean, targetValid: boolean) =>
   (kind !== 'fill' || fillValid) && (kind !== 'target' || targetValid)
 
@@ -578,13 +603,11 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   // the target of the charge target dialog: a peak pressure, or a share of the cartridge's CIP Pmax
   const [targetText, setTargetText] = useState<number | string>(first.targetText)
   const [percent, setPercent] = useState(first.percent)
-  const asPercent = percent && cartridge !== undefined
-  const unit = targetUnit('peakPressure', system, asPercent)
   // the reason shows for a typed value, and for an empty field once it was left
   const [targetLeft, setTargetLeft] = useState(false)
-  const targetReason = targetError(targetText, unit, t)
-  const targetValid = targetReason === undefined
-  const targetShown = targetText !== '' || targetLeft ? targetReason : undefined
+  const targetField = targetOf(targetText, targetLeft, percent, cartridge !== undefined, system, t)
+  const { unit, valid: targetValid, shown: targetShown } = targetField
+  const asPercent = percent && cartridge !== undefined
   const mode = modeOf(
     kind,
     fillValid ? (fill as number) / 100 : undefined,
@@ -697,11 +720,12 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
         <Button
           size={controlSize.row.button}
           variant="default"
-          aria-pressed={asPercent}
-          disabled={kind !== 'target' || cartridge === undefined}
+          aria-pressed={percent}
+          // a share kept by a load opened without its cartridge can still be switched off
+          disabled={kind !== 'target' || (cartridge === undefined && !percent)}
           title={t("Read the target as a percentage of the cartridge's CIP Pmax")}
           onClick={() => {
-            setPercent(!asPercent)
+            setPercent(!percent)
             setTargetText('')
             setTargetLeft(false)
           }}

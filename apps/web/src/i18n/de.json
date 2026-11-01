@@ -4366,5 +4366,6 @@
   "the spread of the capacity records of different makers over their mean": "der Streuung der Hülsenvolumen-Datensätze verschiedener Hersteller über ihrem Mittelwert",
   "the spread of your measured cases over their capacity": "der Streuung Ihrer gemessenen Hülsen über ihrem Hülsenvolumen",
   "volume {value}, from {rule}": "Volumen {value}, aus {rule}",
-  "The seated jump has no effect without an engraving ramp.": "Der Freiflug des gesetzten Geschosses wirkt sich ohne Einpressrampe nicht aus."
+  "The seated jump has no effect without an engraving ramp.": "Der Freiflug des gesetzten Geschosses wirkt sich ohne Einpressrampe nicht aus.",
+  "A share of Pmax needs the cartridge's CIP Pmax.": "Ein Anteil am Pmax braucht den CIP-Pmax der Patrone."
 }
