@@ -29,6 +29,7 @@ export interface BulletValues {
         diameter?: StoredQuantity | undefined
         angle?: StoredQuantity | undefined
         cavityDiameter?: StoredQuantity | undefined
+        cavityDepth?: StoredQuantity | undefined
       }
     | undefined
   ogive?:
@@ -81,7 +82,10 @@ export const bulletSymbols: readonly BulletSymbol[] = [
 ]
 
 /** Stored fields the drawing reads but never dimensions. */
-const undimensionable = [{ path: 'base.angle', name: 'boat-tail angle' }]
+const undimensionable = [
+  { path: 'base.angle', name: 'boat-tail angle' },
+  { path: 'base.cavityDepth', name: 'cavity depth' },
+]
 
 const baseDimensions = (base: NonNullable<BulletValues['base']>) => ({
   ...(base.type && { type: base.type }),
@@ -89,6 +93,7 @@ const baseDimensions = (base: NonNullable<BulletValues['base']>) => ({
   ...(base.diameter && { diameter: base.diameter.value }),
   ...(base.angle && { angle: base.angle.value }),
   ...(base.cavityDiameter && { cavityDiameter: base.cavityDiameter.value }),
+  ...(base.cavityDepth && { cavityDepth: base.cavityDepth.value }),
 })
 
 const ogiveDimensions = (ogive: NonNullable<BulletValues['ogive']>) => ({

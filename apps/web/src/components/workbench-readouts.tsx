@@ -32,6 +32,7 @@ import {
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
+import { type CapacityRule, capacityRuleText } from '../lib/volume-tolerance.ts'
 import { bandNotice, maxVolumeFraction, pressureLimit, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
@@ -132,6 +133,16 @@ export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'erro
   )
 }
 
+/** The volume's part of the range's list: its tolerance, and the rule it follows (`volume-tolerance.ts`). */
+function volumeText(fraction: number, rule: CapacityRule | undefined, t: Translator['t']) {
+  const value = percentText(fraction)
+  if (fraction >= maxVolumeFraction)
+    return t('volume {value}, the limit of the range: the volume estimate can be wider', { value })
+  return rule
+    ? t('volume {value}, from {rule}', { value, rule: t(capacityRuleText[rule]) })
+    : t('volume {value}', { value })
+}
+
 /** The facts of the peak pressure readout: its time and travel and what the range covers. */
 export function peakFacts(
   ok: Extract<Outcome, { kind: 'ok' }>,
@@ -168,11 +179,7 @@ export function peakFacts(
       : `${formatNumber(tol.temperatureKelvin, 1)} K`
   const covered = [
     t('charge {value}', { value: percentText(tol.chargeFraction) }),
-    tol.volumeFraction >= maxVolumeFraction
-      ? t('volume {value}, the limit of the range: the volume estimate can be wider', {
-          value: percentText(tol.volumeFraction),
-        })
-      : t('volume {value}', { value: percentText(tol.volumeFraction) }),
+    volumeText(tol.volumeFraction, ok.volumeRule, t),
     ...(tol.massFraction > 0
       ? [t('bullet mass {value}', { value: percentText(tol.massFraction) })]
       : []),

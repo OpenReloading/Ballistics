@@ -437,6 +437,20 @@ describe('issueText', () => {
     )
   })
 
+  it('names no raw key for the source rules of the country and the listed cartridges', () => {
+    // the raw key as the label, as labelOf falls back to it: the sentence leaves it out
+    const text = (key: string) =>
+      issueText(
+        { code: 'custom', path: [key], message: `needs a source with fields ${key}` },
+        key,
+        t,
+      )
+    expect(text('country')).toBe('Add a source that gives the country.')
+    expect(text('listedCartridges')).toBe(
+      'Add a source that gives the cartridges the powder is listed for.',
+    )
+  })
+
   it('names the field of an issue without a sentence of its own', () => {
     const issue = {
       code: 'invalid_type',

@@ -7,7 +7,17 @@ type Target = HTMLElement | string | null | undefined
  * where the control is in the phone panel, which is hidden again by then.
  */
 export function focusBack(...targets: Target[]) {
+  focusLater(false, targets)
+}
+
+/** `focusBack` only while the focus is still lost when the frame comes: a field focused meanwhile keeps it. */
+export function focusIfLost(...targets: Target[]) {
+  focusLater(true, targets)
+}
+
+function focusLater(ifLost: boolean, targets: Target[]) {
   requestAnimationFrame(() => {
+    if (ifLost && document.activeElement && document.activeElement !== document.body) return
     for (const t of targets) {
       const el = typeof t === 'string' ? document.querySelector<HTMLElement>(t) : t
       if (!el || el.getClientRects().length === 0) continue

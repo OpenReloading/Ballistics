@@ -172,6 +172,10 @@ Code: `packages/core/src/interior/model.ts`, `gasState` (`resistance`), `profile
 
 $p_e(x)$ is interpolated linearly between `{ travel, pressure }` points with increasing travel and is 0 before the first and after the last point. Free travel before the lands is a profile that starts at the jump distance.
 
+The workbench starts a typed or record engraving ramp at the jump of the seated bullet (seating figure): every point moves by the jump, so the first is at the jump, or at 0 for a bullet touching or jammed into the lands. Each step of a seating ladder starts the ramp at its own jump. Without a ramp the jump changes nothing, and the result notes say so; no default ramp is added. On the example load with a stand-in ramp of 60 MPa over 5 mm, 0.5 mm of jump lowered the peak from 420 to 325 MPa against the jammed load ([research entry](../research/interior-engraving-ramp-at-jump.md)); the size depends on the ramp, which has no source.
+
+Code: `apps/web/src/lib/interior-request.ts`, `rampAtJump`; `apps/web/src/components/workbench-outcome.ts`, `stepLoad`.
+
 The bore-resistance law of the load-table powder fit builds both terms from the cartridge and the bullet: friction stress $\tau_f$ on the bullet side area, raised by the oversize $o$ of the bullet over the groove diameter, and an engraving pressure that falls linearly over the bearing length:
 
 $$
@@ -182,6 +186,7 @@ Code: `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `oversi
 
 - $o$ is taken as 0 without $Z$ and above `maxOversizePercent` (5 %).
 - $G_1$ and $Z$ are C.I.P. tolerance limits, not measurements. A run reads $G_1$ from the cartridge record, else the bore diameter.
+- The workbench keeps the record's $Z$ in $o$ when the chosen firearm has a measured groove diameter: $G_1$ stays a nominal limit, and a measured $Z$ against it would give an oversize no bullet was measured for. A bullet below the measured groove diameter gets a note, as gas passing the bullet is not in the model.
 - The bullet length stands in for the bearing length $L$. The workbench takes the length typed over the bullet record's (`bulletLength`), and `POST /v1/interior/load-file` takes a `bulletLength` override over the record's the same way.
 - $\tau_f$, $c$ and $\phi_e$ are stored with the fitted powder parameters.
 - A load file can replace the friction pressure (`boreFriction`) and the start and length of the engraving ramp (`engravingPressure`, `engravingLength`).
@@ -215,6 +220,22 @@ The circle of the mean of $F$ and $Z$ is a choice of the model, not taken from a
 
 The load-table fit, the load file (`interiorLoad`) and the workbench read the same function, so one cartridge has one bore area.
 
+In the workbench, the firearm chosen from the library replaces the record's values with its measured ones where they are set: its bore diameter is the default of the bore diameter field instead of $F$, and its groove diameter replaces $Z$ in the circle above. Either measured value drops $Q_\text{CIP}$, which describes the record's bore, so the area is the circle of the mean of the measured bore and groove diameters, with the record's $F$ or $Z$ for the one not measured. A typed bore diameter or bore area still wins. The firearm's freebore is the leade start $s$ past the chamber L3 of the seating figure, so the jump to the leade follows it; a lands contact measured with the seated bullet replaces both.
+
+Code: `apps/web/src/lib/input-defaults.ts`, `suggestDefaults`; `apps/web/src/components/use-workbench-load.ts` (`grooveM`, `qUsed`).
+
+### Throat wear
+
+A worn throat lengthens the space behind the bullet: the bullet still seats in the case, but the bore it meets starts further forward. The optional Throat wear $w$ in the More of the Gun card (the load value `throatWear`, `chamber.throatWear` of the run, m) adds that length times the bore area to the volume behind the bullet the solver starts from; the travel is unchanged, and the case fill and the solid fill keep reading the case volume $V_0$:
+
+$$
+V_0' = V_0 + w A
+$$
+
+Code: `packages/core/src/interior/throat-wear.ts`, `wornVolume`. `packages/core/src/interior/model.ts`, `scaleInteriorLoad`. `packages/core/src/interior/load-file.ts`, `interiorLoad`.
+
+The default is 0. The wear is a typed value: no rate per round is applied. One barrel measured by [Vuong 2026](../bibliography.md#vuong-2026) (5.56x45 mm, 361 mm, 10-shot means) lost velocity from 840.6 m/s new to 821.3 m/s at 8000 and 785.8 m/s at 16000 rounds, while its chamber grew from 49.20 to 54.62 mm; those values are stored with authors, DOI and licence in `vuong2026` (`packages/core/src/interior/throat-wear-measurement.ts`). Rates do not carry over to another cartridge or firing regime, and an automatic value would need an interval of about 0 to 0.3 to 0.8 mm per 1000 rounds (unverified). When the chosen firearm has a `roundCount` and no throat wear is entered, the result notes say that the velocity may be lower than simulated and give the measured 5.56 rates as an example: 0.29 % per 1000 rounds from 0 to 8000 and 0.54 % per 1000 rounds from 8000 to 16000. The count itself is described in [Firearm round count](../research/firearm-round-count-age.md).
+
 ### Temperature of the propellant
 
 The burn rate of the [burn law](interior-burn-forms.md) is multiplied by a factor of the propellant temperature, with separate sensitivities below and above the reference temperature:
@@ -227,7 +248,23 @@ Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`
 
 Without temperature sensitivities, $\tau_T = 1$.
 
-A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it. No default coefficient is assumed. When such a powder runs at a propellant temperature other than that of its record's fit, the result panel says that the run ignores the temperature for this powder (`apps/web/src/components/workbench-outcome.ts`, `resultNotes`).
+A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder. A powder record without the field takes the default of its grain form below; one of grain form `other` or without a grain form has none, so $\tau_T = 1$ for it. When such a powder runs at a propellant temperature other than that of its record's fit, the result panel says that the run ignores the temperature for this powder (`apps/web/src/components/workbench-outcome.ts`, `resultNotes`).
+
+#### Default by grain form
+
+The default is approximate: a value of the grain form, not of the powder. Its reference $T_\text{ref}$ is the propellant temperature of the record's fitted model (`interior.propellantTemperature`), else 294.15 K (21 °C).
+
+| Grain form | $\sigma_h$ (1/K) | Interval of $\sigma_h$ | $\sigma_c$ the run takes | Interval of $\sigma_c$ | Source |
+|---|---|---|---|---|---|
+| ball | 0.0027 | 0.0023 to 0.0031 | 0.0012 | 0 to 0.0030 | [Boulkadid 2016](../bibliography.md#boulkadid-2016): closed-vessel burn-rate sensitivity of deterred ball powders, flattened 0.229 and spherical 0.305 %/K above 21 °C, 0.115 and 0.121 %/K below (as quoted in issue #842; the tables were not re-read for this page, unverified) |
+| extruded, flake | 0.0010 | 0.0001 to 0.0029 | 0.0010 | 0 to 0.0030 | [Hodgdon 2012](../bibliography.md#hodgdon-2012): velocities at 70 and 125 °F of 14 extruded powders outside the Extreme line, converted through this model on stand-in loads ([research entry](../research/powder-temperature-default.md)) |
+| other | none | | | | |
+
+Code: `packages/core/src/interior/temperature-default.ts`, `defaultSensitivity`, `recordSensitivity`, `coldPeakInterval`. `apps/web/src/lib/interior-request.ts`, `interiorRequest`.
+
+The record's own coefficient always wins. The result notes of a run on the default name it ("Default temperature coefficient of ... powder"). Below the reference the peak pressure is given as an interval, the peaks at $\sigma_c = 0$ and $\sigma_c = 0.0030$, never as a single drop: the measured cold changes of the peak pressure of ball powders (Boulkadid 2016, 0.022 and 0.037 %/K, each within its uncertainty of 0) were not significant, while the model with the measured cold burn-rate sensitivity over-predicts the cold fall of the peak (-13.0 % against about -1.65 % measured at -75 K, issue #842).
+
+Limits: the extruded value rests on maker data whose shots and lots are not stated, and the conversion depends on the stand-in load: the three loads of the entry give 0.0006 to 0.0015 1/K. The ball value is for deterred ball powders with about 10 % nitroglycerin. No value is claimed for the cold side of extruded and flake powders; the run takes the hot value there. The default is applied by the workbench, its powder tuning route and the API's load-file route (`recordSensitivity`, which reads the record's own coefficient first), so a load file runs there as in the workbench; the record runs of the command line (`recordLoad`), which run at the powder's fit temperature unless a row gives another, keep $\tau_T = 1$ for a powder without its own coefficient. Temperature-stabilised lines (such as the Hodgdon Extreme powders, whose velocity moved by about 0.006 %/K in the same table) are not told apart: no record field marks them.
 
 The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
 
@@ -504,6 +541,18 @@ A powder record may carry `listedCartridges`: the ids of the cartridge records t
 When the powder record has a list and the chosen cartridge record is not in it, the workbench's result notes carry one warning: "<cartridge> is not among the cartridges the manufacturer lists this powder for." A listed cartridge, a powder without a list or a run without a cartridge record give none. The powder record page shows the list as "Listed by the manufacturer for", its source with the record's other sources.
 
 Code: `apps/web/src/components/workbench-outcome.ts`, `unlistedCartridge`. `packages/data/src/references.ts`, `checkCartridgeReferences` (each id names a current cartridge record).
+
+### Cast bullet hardness
+
+A plain-base cast bullet that is harder than the pressure behind it can upset does not swell to fill the bore, and gas can leak past it. The rule of thumb for the pressure that upsets a cast bullet is 1422 psi per Brinell hardness number, about 9.80 MPa per BHN, for plain-base cast bullets only (Fryxell, "Cast Bullet Alloys and Obturation", quoted by [Wikipedia, Obturation](https://en.wikipedia.org/wiki/Obturation); the essay itself was not retrieved, unverified):
+
+$$
+p_\text{ob} = 9.80\ \text{MPa} \cdot \text{BHN}
+$$
+
+Code: `packages/core/src/interior/obturation.ts`, `obturationPressurePerBrinell`, `plainBaseCastHardness`, `castHarderThanPeak`. `apps/web/src/components/workbench-outcome.ts`, `derived`.
+
+The workbench's result notes carry the warning "possible gas leakage" when the bullet record has `construction.structure` `cast`, no gas check (`gasCheck` absent or `false`), a `construction.core.hardness`, and $p_\text{ob}$ is above the simulated peak breech pressure. Any of the three missing gives none. The warning states no number, and the run is not changed: the model has no leak past the bullet, no default leak area and no coefficient for a gas check, since no source gives one. The research entry [cast bullet hardness against peak pressure](../research/cast-bullet-hardness-peak-pressure.md) has the solver's response to a leak area.
 
 ## Sources
 

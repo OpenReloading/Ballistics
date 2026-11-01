@@ -4,7 +4,9 @@ import {
   approximateVolumeTolerance,
   followPlan,
   noCoefficientOf,
+  runVolumeTolerance,
   seatingOwnsVolume,
+  typedOverSeating,
 } from '../src/components/use-workbench-load.ts'
 
 const plan = (
@@ -54,6 +56,15 @@ it('keeps the case volume default out of a seating without a volume behind the b
   expect(seatingOwnsVolume({})).toBe(false)
 })
 
+it('blocks a seating ladder only on a volume or travel typed over the seating it followed (#938)', () => {
+  const arrived = { volume: 3.6e-6, travel: 0.53, overallLength: 0.071 }
+  const fields = { volume: { si: 3.6e-6 }, travel: { si: 0.53 } }
+  // the seating, the fields and what they followed read at once: nothing typed
+  expect(typedOverSeating(arrived, fields, { volume: 3.6e-6, travel: 0.53 })).toEqual([])
+  expect(typedOverSeating(arrived, { ...fields, travel: { si: 0.5 } }, arrived)).toEqual(['travel'])
+  expect(typedOverSeating({}, { volume: { si: 1e-6 } }, {})).toEqual([])
+})
+
 const powder = (extra: object) =>
   ({ id: 'p', interior: { propellantTemperature: { value: 21 } }, ...extra }) as unknown as Powder
 
@@ -74,4 +85,23 @@ it('hands the interval of an approximate volume to the run while the field still
   expect(approximateVolumeTolerance({ si: 3e-6, source: '' }, 3e-6, following)).toBeUndefined()
   // the API takes at most 0.2
   expect(approximateVolumeTolerance({ ...volume, halfWidth: 0.5 }, 3e-6, following)).toBe(0.2)
+})
+
+it("takes the capacity's tolerance while the volume follows the seating, none for a typed one", () => {
+  const seated = {
+    caseVolume: 0.86e-6,
+    volume: 0.55e-6,
+    capacity: { fraction: 0.02, rule: 'catalogue' as const },
+  }
+  const run = (volume: number) =>
+    runVolumeTolerance({
+      volume,
+      seated,
+      previewed: { volume: 0.55e-6 },
+      suggestion: undefined,
+      followed: new Set(),
+    })
+  expect(run(0.55e-6).rule).toBe('catalogue')
+  expect(run(0.55e-6).fraction).toBeCloseTo((0.02 * 0.86) / 0.55, 12)
+  expect(run(0.6e-6)).toEqual({ fraction: undefined, rule: undefined })
 })

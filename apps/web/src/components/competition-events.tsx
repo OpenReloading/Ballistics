@@ -774,7 +774,11 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
       name,
     })
   const ref = `user:${id}`
-  const due = eventRoundsDue(found.data.data, ref, rounds)
+  // the shooting log entries of the same match: their counted rounds are the event's (#919)
+  const entries = (await storedRecords()).records
+    .filter((r) => r.kind === 'shootingLogEntry' && r.data.event === ref)
+    .map((r) => `user:${r.id}`)
+  const due = eventRoundsDue(found.data.data, ref, rounds, entries)
   if (due < 1) return ''
   const ok = await confirmDialog({
     title: t('Add to the round count?'),
@@ -789,7 +793,9 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
   if (!ok) return t('The round count of {name} is unchanged.', { name })
   const written = await updateRecord(firearmId, (raw) => {
     const stored = userRecord.safeParse(raw)
-    return stored.success ? withEventRounds(stored.data, ref, rounds, due) : undefined
+    return stored.success
+      ? withEventRounds(stored.data, ref, rounds, due, new Date(), entries)
+      : undefined
   })
   return written?.kind === 'firearm' && written.data.roundCount !== undefined
     ? t('Round count of {name}: {count}.', { name, count: written.data.roundCount })

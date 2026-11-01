@@ -443,6 +443,7 @@
       "a ring value must be 0 or more",
       "stage points must be 0 or more",
       "a series needs its shots or its total"
-    ]
+    ],
+    "schema rules of a user data file": ["Replaced by primerState and fillLevel"]
   }
 }

@@ -14,6 +14,7 @@ const bulletValueKeys = [
   'bulletBaseLength',
   'bulletBaseDiameter',
   'bulletCavityDiameter',
+  'bulletCavityDepth',
 ] as const
 export type BulletValueKey = (typeof bulletValueKeys)[number]
 
@@ -35,6 +36,7 @@ const baseDimensions = {
   bulletBaseLength: 'length',
   bulletBaseDiameter: 'diameter',
   bulletCavityDiameter: 'cavityDiameter',
+  bulletCavityDepth: 'cavityDepth',
 } as const
 
 /** The keys of the typed base dimensions. */
@@ -165,7 +167,7 @@ function typedBase(
     base[field] = { value: fromSi('length', si) }
     changed = true
     // length, diameter and angle fix one another: the angle the record gives would contradict the typed one
-    if (field !== 'cavityDiameter') delete base.angle
+    if (field !== 'cavityDiameter' && field !== 'cavityDepth') delete base.angle
   }
   if (type !== undefined && type !== own?.type) {
     base.type = type
@@ -177,7 +179,10 @@ function typedBase(
     delete base.diameter
     delete base.angle
   }
-  if (!hollowBased(base.type)) delete base.cavityDiameter
+  if (!hollowBased(base.type)) {
+    delete base.cavityDiameter
+    delete base.cavityDepth
+  }
   return base
 }
 

@@ -15,6 +15,7 @@ import { boreArea } from '@open-reloading/core'
 import { type Bullet, toSi } from '@open-reloading/schema'
 import { DotsThree } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { type ReactNode, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
@@ -32,6 +33,7 @@ import { fitOf, summaryFitSource } from '../lib/bullet-fit.ts'
 import type { BulletRow } from '../lib/bullet-rows.ts'
 import { findBullets } from '../lib/bullet-search.ts'
 import type { CartridgeRow } from '../lib/cartridge-rows.ts'
+import { bulletIncomplete, completeFirst, powderIncomplete } from '../lib/complete-records.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { dayText } from '../lib/dates.ts'
 import { capacityGuide } from '../lib/docs-url.ts'
@@ -47,6 +49,7 @@ import {
 import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { bulletFields, burnFormError, interiorFields, specFields } from '../lib/interior-input.ts'
+import { hasSensitivity } from '../lib/interior-request.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
@@ -82,6 +85,7 @@ import { PrimerChoice } from './primer-choice.tsx'
 import { RecordSearch, useChooser } from './record-search.tsx'
 import { SegmentedRow } from './segmented-row.tsx'
 import { RecordSourcesLink } from './sources.tsx'
+import { useCompleteOnly } from './use-complete-only.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
@@ -112,6 +116,8 @@ export const modelFields = [
   'formQ',
   'formZ1',
 ] as const
+/** The Gun card's optional throat wear, in its More popover. */
+export const firearmMoreFields = ['throatWear'] as const
 /** The Powder card's optional leak and bore resistance fields, in its More popover. */
 export const powderMoreFields = [
   'leakArea',
@@ -376,7 +382,7 @@ function LadderChoices() {
             k,
             ladderKind,
             powderLabel,
-            powder?.temperatureSensitivity !== undefined,
+            hasSensitivity(powder),
             seatingBlock,
             t,
           ),
@@ -738,6 +744,13 @@ function loadFieldMark(
   t: Translator['t'],
 ) {
   // a default that follows the load (`input-defaults.ts`) says where its value comes from now
+  if (given?.fromFirearm)
+    return given.record === undefined
+      ? t('From {source}.', { source: given.source })
+      : t('From {source}. The cartridge record gives {value}.', {
+          source: given.source,
+          value: valueWithUnit(spec.quantity, s, given.record),
+        })
   if (given) return t('Default: {source}.', { source: given.source })
   if (defaulted.has(key)) return defaultMark(key, defaults, t)
   if (fromRecord !== undefined)
@@ -865,7 +878,7 @@ function LoadField({ name: key }: { name: string }) {
         { cartridgeBoreArea, grooveDiameter },
         t,
       )}
-      muted={given !== undefined}
+      muted={given !== undefined && !given.fromFirearm}
       // texts naming a unit follow the units the field shows
       mark={(s) =>
         loadFieldMark(
@@ -971,7 +984,7 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
       error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
       mark={(s) =>
         changes[key] === undefined
-          ? undefined
+          ? missingValueMark(bulletRecord, value === undefined, t)
           : t('Changed from the record value {value}.', {
               value: valueWithUnit(spec.quantity, s, changes[key]),
             })
@@ -1009,6 +1022,7 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
     printMedia,
     changes,
     resetKeys,
+    caseLengthBrass,
   } = useLoad()
   const { t } = useTranslation()
   const spec = specFields.find((s) => s.key === key)
@@ -1033,7 +1047,7 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
       error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
       mark={(s) =>
         changes[key] === undefined
-          ? undefined
+          ? brassMark(key, typed === undefined ? caseLengthBrass : undefined, s, t)
           : t('Changed from the record value {value}.', {
               value: valueWithUnit(spec.quantity, s, changes[key]),
             })
@@ -1055,6 +1069,22 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
   )
 }
 
+/** The case length's mark while it holds the chosen brass's trim length, with the sheet's L3. */
+function brassMark(
+  key: SpecKey,
+  brass: LoadValues['caseLengthBrass'],
+  s: UnitSystem,
+  t: Translator['t'],
+) {
+  if (key !== 'caseLength' || !brass) return
+  return brass.cip === undefined
+    ? t('Trim length of your brass group {name}.', { name: brass.name })
+    : t('Trim length of your brass group {name}. The CIP L3 is {value}.', {
+        name: brass.name,
+        value: valueWithUnit('length', s, toSi('length', brass.cip)),
+      })
+}
+
 /** The spec rows of a card once its record is chosen, or while a value is typed. */
 function SpecValueFields({ keys, chosen }: { keys: readonly SpecKey[]; chosen: boolean }) {
   const { typedSpecFields } = useLoad()
@@ -1074,6 +1104,8 @@ function BulletValueFields({ more }: { more?: boolean }) {
     const model = key === 'bulletBcG1' ? 'G1' : key === 'bulletBcG7' ? 'G7' : undefined
     if (key in typedBulletFields) return true
     if (!bulletRecord) return false
+    // a name-only record asks for one BC to type
+    if (bulletIncomplete(bulletRecord) && key === 'bulletBcG1') return true
     return model ? bandCount(bulletRecord, model) > 0 : true
   }
   const [first, second] = bulletFields.filter((s) => s.key.includes('Bc') && shown(s.key))
@@ -1096,7 +1128,27 @@ function BaseFormFields() {
       {boatTailed(type) && <BulletValueField name="bulletBaseLength" />}
       {boatTailed(type) && <BulletValueField name="bulletBaseDiameter" />}
       {hollowBased(type) && <BulletValueField name="bulletCavityDiameter" />}
+      {hollowBased(type) && <BulletValueField name="bulletCavityDepth" />}
     </>
+  )
+}
+
+/** The note on a powder record without burn values: it cannot run, and the two ways on. */
+function BurnlessNote() {
+  const { burnless } = useLoad()
+  const { t } = useTranslation()
+  if (!burnless) return null
+  return (
+    <p className="note wide">
+      {t('{name} has no burn values, so it cannot run.', { name: burnless })}{' '}
+      <Anchor component={Link} href="/powders/burn-rates" size="sm">
+        {t('Choose a similar powder on the burn-rate chart')}
+      </Anchor>
+      {' · '}
+      <Anchor component={Link} href="/powders/tune" size="sm">
+        {t('Fit the values from your chronograph strings')}
+      </Anchor>
+    </p>
   )
 }
 
@@ -1171,6 +1223,7 @@ function CardBody({ panel }: { panel: InputPanel }) {
           <SpecValueField name="bulkDensity" />
         )}
         <PowderSourceRow />
+        <BurnlessNote />
         <NewerFitNote />
         {fieldsOf(panelFields.powder)}
         <LadderInputs />
@@ -1264,6 +1317,7 @@ function BulletPicker() {
   } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
+  const [completeOnly] = useCompleteOnly()
   const designRows = useMemo(() => userBulletRows(designs), [designs])
   const fit = useMemo(
     () => (bulletParams ? fitOf(cartridge) : undefined),
@@ -1293,8 +1347,9 @@ function BulletPicker() {
         describe={(b) =>
           b.origin
             ? t('{name} (your design)', { name: b.name })
-            : describeBullet(b as BulletSummary)
+            : missingMark(describeBullet(b as BulletSummary), bulletIncomplete(b), t)
         }
+        arrange={(items) => completeFirst(items, bulletIncomplete, completeOnly)}
         onSelect={(b) => {
           const design = userRecordId(b.id)
           if (design) pickDesign(design)
@@ -1397,6 +1452,20 @@ function CartridgePicker() {
   )
 }
 
+/** The mark of a value a name-only bullet record lacks and nobody typed: a field to type. */
+const missingValueMark = (
+  record: { nameOnly?: true | undefined } | undefined,
+  empty: boolean,
+  t: Translator['t'],
+) =>
+  record && bulletIncomplete(record) && empty
+    ? t('Not in this record, which only names the bullet: type the value.')
+    : undefined
+
+/** A chooser entry's name with the mark of a record that misses values. */
+const missingMark = (name: string, incomplete: boolean, t: Translator['t']) =>
+  incomplete ? t('{name} (values missing)', { name }) : name
+
 /** The powder search, with the chosen powder, the link's name or the typed parameters as its text. */
 function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames> }) {
   const {
@@ -1412,6 +1481,7 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
   } = useLoad()
   const { t } = useTranslation()
   const dialog = useChooser()
+  const [completeOnly] = useCompleteOnly()
   const chosen = (() => {
     if (powderDesign) return t('{name} (your design)', { name: powderDesign.name })
     if (powderLabel) return powderLabel
@@ -1428,7 +1498,8 @@ function PowderPicker({ names }: { names: ReturnType<typeof useManufacturerNames
         kind="powders"
         label={t('Search powders by manufacturer and name')}
         chosen={chosen}
-        describe={(p) => productLabel(p, names)}
+        describe={(p) => missingMark(productLabel(p, names), powderIncomplete(p), t)}
+        arrange={(items) => completeFirst(items, powderIncomplete, completeOnly)}
         onSelect={(p) => pickPowder(p.id)}
         // the browser's powder designs in the same list, first
         extra={powderDesigns.map((d) => ({
@@ -1605,7 +1676,7 @@ function MoreRows({ panel }: { panel: InputPanel }) {
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
-  if (panel === 'firearm') return null
+  if (panel === 'firearm') return <>{fieldsOf(firearmMoreFields)}</>
   return (
     <>
       <BulletValueFields more />
@@ -1620,6 +1691,12 @@ function MoreRows({ panel }: { panel: InputPanel }) {
     </>
   )
 }
+
+/** The case length the seating reads, mm: the typed L3, else the chosen brass group's trim length, named. */
+const linkedCaseLength = (typed: number | undefined, brass: LoadValues['caseLengthBrass']) =>
+  typed === undefined
+    ? { caseLength: brass?.mm, caseLengthBrass: brass?.name }
+    : { caseLength: typed }
 
 /** The lands contact of the chosen firearm as it applies to the chosen bullet record or design. */
 function landsChoice(
@@ -1672,15 +1749,27 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     bulletBaseType,
     specs,
     typedSpecFields,
+    caseLengthBrass,
   } = useLoad()
   const { ok, stale } = useResult()
   // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
   // record's, so a typed length (which they would no longer add up to) stays out
-  const { bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter } =
-    bulletValues
+  const {
+    bulletDiameter,
+    bulletBaseLength,
+    bulletBaseDiameter,
+    bulletCavityDiameter,
+    bulletCavityDepth,
+  } = bulletValues
   const seatValues = useMemo(
-    () => ({ bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter }),
-    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter],
+    () => ({
+      bulletDiameter,
+      bulletBaseLength,
+      bulletBaseDiameter,
+      bulletCavityDiameter,
+      bulletCavityDepth,
+    }),
+    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter, bulletCavityDepth],
   )
   // the figure draws the selected step of a seating ladder while its result is current
   const seatingStep = ok?.steps[ok.selected]?.seating
@@ -1701,11 +1790,8 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   useEffect(() => {
     if (node && host) host.append(node)
   }, [node, host])
-  const lands = landsChoice(
-    firearmList.find((f) => f.id === firearm)?.data.lands,
-    bullet,
-    bulletDesign,
-  )
+  const gun = firearmList.find((f) => f.id === firearm)?.data
+  const lands = landsChoice(gun?.lands, bullet, bulletDesign)
   const shown = cartridge !== undefined || cartridgeDesign !== undefined
   const moreOpen = more === 'cartridge'
   useEffect(() => {
@@ -1729,16 +1815,17 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       draft={designLoad && { spec: designLoad.spec, title: designLoad.title, card: true }}
       system={system}
       initial={previewInitial}
-      barrelLength={firearmList.find((f) => f.id === firearm)?.data.barrelLength}
+      barrelLength={gun?.barrelLength}
       lands={lands.contact}
       landsOther={lands.other}
+      freebore={gun?.freebore}
       barrelDefault={suggestions.barrelLength}
       linked={{
         bullet: bullet?.id,
         design: bulletDesign?.id,
         values: seatValues,
         baseType: bulletBaseType,
-        caseLength: typedCaseLength(typedSpecFields),
+        ...linkedCaseLength(typedCaseLength(typedSpecFields), caseLengthBrass),
       }}
       slots={{
         cartridge: seatingSlots.cartridge ?? null,

@@ -63,7 +63,7 @@ with $z_\mathrm{lo} < z_\mathrm{hi}$ the ends of segment $k$ in z, $r_\mathrm{lo
 
 A hollow base (`conical-hollow-base`, `rounded-hollow-base`) has a cavity open to the powder in the base face, of the diameter $2 r_c$ where it opens. The base face may sit on a boat tail described by the tail length, base diameter and angle, else it is flat. The cavity is not bullet volume: it enters the profile as the falling segments above, so $V_b$ is the metal below the mouth and the cavity inside the mouth is free volume behind the bullet.
 
-The depth of the cavity is not an input. A depth would be a second dimension that only a section cut gives, while the diameter at the opening is printed or measured on the base. The depth follows from the shape instead: a cone of half angle 45° ($h = r_c$), or a hemisphere ($h = r_c$). A cavity of another depth moves the result, so the volume of a bullet with a cavity is flagged approximate and the cavity is drawn dashed. The part of the cavity below the mouth, cone and hemisphere:
+No maker publishes the depth of the cavity: it is a second dimension that only a section cut or a fill gives, while the diameter at the opening is printed or measured on the base. Without a given depth it follows from the shape: a cone of half angle 45° ($h = r_c$), or a hemisphere ($h = r_c$). A cavity of another depth moves the result, so the volume of a bullet with a cavity of assumed depth is flagged approximate, the cavity is drawn dashed, and the depth carries the bracket of [Cavity depth](#cavity-depth). The part of the cavity below the mouth, cone and hemisphere:
 
 $$
 V_\mathrm{cone}(c) = \frac{\pi}{3} r_c^2 h \left(1 - \left(1 - \frac{c}{h}\right)^3\right), \qquad V_\mathrm{hemi}(c) = \pi \left(r_c^2 c - \frac{c^3}{3}\right), \qquad c \le h = r_c
@@ -79,11 +79,23 @@ $$
 
 Code: `packages/drawing/src/seating/seating.ts`, `intrusion`, `seat`, `packages/drawing/src/bullet/outline.ts`, `revolutionVolume`.
 
+#### Cavity depth
+
+A depth $h$ given with the cavity (`base.cavityDepth` of a record, or Cavity depth typed in the Bullet card) wins over the assumed one: the cone runs from its apex at $h$ to the opening, the rounded cavity is a half ellipsoid of semi-axes $r_c$ and $h$, and neither is flagged approximate nor drawn dashed; the outline's note says the depth is typed. A water or wax fill gives the cavity volume $V$ in one measurement; the depth of the shape is then $h = 3V / (\pi r_c^2)$ for the cone and $h = 3V / (2 \pi r_c^2)$ for the rounded cavity.
+
+$$
+V_\mathrm{cone} = \frac{\pi}{3} r_c^2 h, \qquad V_\mathrm{ell} = \frac{2 \pi}{3} r_c^2 h
+$$
+
+Code: `packages/drawing/src/bullet/outline.ts`, `cavityGeometry`, `cavityVolumeBracket`.
+
+Without a given depth the depth is bracketed from half to three times the assumed one, $0.5\, r_c \le h \le 3\, r_c$ (`cavityDepthBracket`, an assumption without a source). At $r_c$ = 3 mm the whole cone cavity then lies between 0.014 and 0.085 cm³, around the assumed 0.028 cm³ (cone) and 0.057 cm³ (hemisphere). The seating gives the volume behind the bullet at both ends (`cavityRange` of `seat`). When the run's volume follows the seated bullet, the workbench adds the larger move of $V_b$ over the bracket, relative to the run's volume, to the default volume tolerance of 1 % of the [pressure range](interior-pressure-range.md) (`apps/web/src/lib/cavity-range.ts`, `cavityVolumeFraction`, at most the 0.2 the API takes). The tolerance is symmetric, so the range covers the bracket on its wider side; a move above 19 % of the volume is not covered in full. A deepest bracket cavity that would cut through the wall is made shallower until the outline holds. A seating ladder sends the tolerance of the seated preview with every step, though deeper steps move more.
+
 A bullet without a cavity diameter, whatever its base type, is drawn and counted as before. A hollow base type without a cavity diameter is drawn with a flat face and a note.
 
 A case length L3 typed in the workbench replaces the cartridge side's L3 of the sheet for the cartridge figure and the seating (`apps/web/src/lib/cartridge-sheet.ts`, `withCaseLength`). The chamber's L3 and the sheet's other values stay.
 
-The workbench takes the base type, the boat-tail length, the base face diameter and the cavity diameter typed over the bullet record's (`apps/web/src/lib/bullet.ts`, `typedBullet`): the outline and $V_b$ follow them. A flat base keeps no diameter, angle or cavity, a boat tail no cavity. A typed boat-tail length drops the record's bearing length, and a typed boat-tail length or base diameter its boat-tail angle: the outline derives them from the other dimensions, which would otherwise contradict the typed value.
+The workbench takes the base type, the boat-tail length, the base face diameter, the cavity diameter and the cavity depth typed over the bullet record's (`apps/web/src/lib/bullet.ts`, `typedBullet`): the outline and $V_b$ follow them. A flat base keeps no diameter, angle or cavity, a boat tail no cavity. A typed boat-tail length drops the record's bearing length, and a typed boat-tail length or base diameter its boat-tail angle: the outline derives them from the other dimensions, which would otherwise contradict the typed value.
 
 ### Volume behind the bullet
 
@@ -95,7 +107,7 @@ Code: `packages/drawing/src/seating/seating.ts`, `seat` (`volumeBehindBullet`).
 
 No volume behind the bullet is given, with a note, when the seating depth is above the case length (the base would sit behind the case head) or when $V_c \le 0$ (the bullet below the mouth takes the whole case volume).
 
-The value is flagged approximate when the part of the outline below the mouth rests on an assumed proportion, or when the bullet has a cavity and any of it is below the mouth.
+The value is flagged approximate when the part of the outline below the mouth rests on an assumed proportion, or when the bullet has a cavity of assumed depth and any of it is below the mouth.
 
 At fixed COAL a bullet length error $\Delta L$ moves the seating depth by $\Delta L$, and every slice of the bullet, a cavity taken off, is at most the cylinder of the bullet diameter $d$, so
 
@@ -139,6 +151,29 @@ The class comes from the record's `construction.structure` (`bulletStructures` i
 Code: `apps/web/src/lib/bullet-construction.ts`, `effectiveDensity`, `classOf`.
 
 The records are not in the repository. The material densities (lead 11.34, copper 8.94 g/cm3, [PubChem lead](https://pubchem.ncbi.nlm.nih.gov/compound/5352425), [PubChem copper](https://pubchem.ncbi.nlm.nih.gov/compound/23978)) lie above every effective density: the shape factor of the nose and base and the jacket and core make the difference, and a material density is not used.
+
+### Tolerance of the volume
+
+The workbench sets the pressure range's tolerance of the chamber volume from where the case capacity $C$ comes from, while the volume field holds the seated volume or the followed default. The capacity's tolerance $f_C$, relative to $C$:
+
+| Source of $C$ | $f_C$ |
+| --- | --- |
+| Measured, with the spread $s$ of the brass group | $s / C$ |
+| Measured, without a spread | 0.5 % (assumption) |
+| A catalogue or case record, while the cartridge has capacity records of two or more case makers | standard deviation over mean of those records |
+| A catalogue or case record otherwise, or records that agree exactly | 2 % (assumption without a published source) |
+
+The range moves the volume behind the bullet $V$, so the capacity's part is taken relative to it, and the interval $h$ of an estimated bullet volume (above) adds to it:
+
+$$
+f_V = \min\left(\frac{f_C\, C}{V} + h,\; 0.2\right)
+$$
+
+Code: `apps/web/src/lib/volume-tolerance.ts`, `capacityFraction`, `volumeFraction`; `apps/web/src/components/use-workbench-load.ts`, `runVolumeTolerance`.
+
+0.2 is the limit of the API. A small case with a deep bullet gets the wider tolerance: with 2 % of the capacity, a .308 case (3.6 cm³, 3.1 cm³ behind the bullet) gets 2.3 %, a 9 mm case (0.86 cm³, 0.55 cm³ behind the bullet) 3.1 % of $V$. A typed volume keeps the API's 1 %. The range's help names the rule that applies.
+
+Evidence for the defaults, all of it weak: within one lot of 50 new 6.5 Creedmoor cases a standard deviation of 0.13 gr on 49.14 gr, 0.26 % ([Ammolytics, brass sorting part one](https://blog.ammolytics.com/2020-01-08/brass-sorting-part-one.html), medium-low confidence); between four makers of .308 cases, 53.4 to 54.8 gr, a standard deviation of 1.05 % (a magazine chart quoted in a forum, unverified). The 0.5 % and the 2 % are assumptions above both.
 
 ### Leade contact and jump
 
@@ -214,7 +249,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 | $c$ | Length of the bullet below the mouth | mm | mm |
 | $V_b$ | Bullet volume below the mouth | no kind | cm³ |
 | $r_c$, $h$ | Radius of the cavity at the base face, its depth | mm | mm |
-| $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere), the whole cavity | no kind | mm³ |
+| $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{ell}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere, half ellipsoid), the whole cavity | no kind | mm³ |
 | $\sigma_k$ | Sign of segment $k$ of the profile: rising $+1$, falling $-1$ | 1 | 1 |
 | $V_c$ | Chamber volume behind the bullet | no kind | cm³ (m³ in `core`) |
 | $m$, $\rho_\mathrm{eff}$, $\hat L$ | Bullet mass, effective density, estimated length | g, g/cm3, mm | g, g/cm3, mm |
@@ -232,7 +267,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 - The default of a capacity record without `fillLevel`: the water fills the case to the mouth, at 20 °C. A record without `primerState` has no default primer state: `caseCondition` does not define one.
 - The bullet is a solid of revolution with the outline `bulletOutline` builds. Missing dimensions take stated proportions, which the notes name.
-- The cavity of a hollow base is a cone of half angle 45° or a hemisphere, as deep as its radius, and it is empty: no wad or lubricant in it.
+- The cavity of a hollow base is a cone or a half ellipsoid, as deep as its radius unless a depth is given, and it is empty: no wad or lubricant in it.
 - Only the mouth position bounds the bullet volume. The neck diameter and the case wall do not enter.
 - The case does not change its volume with pressure or temperature.
 - A bullet without a length takes the effective density of its class (table above) and is seated at the COAL entered, else at $L_6$.
@@ -243,8 +278,9 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - A capacity measured unprimed and one measured with a spent primer differ by the primer pocket volume behind the anvil; neither is corrected, since no sourced primer pocket volume per primer size exists.
 - A primer swap is stated as an uncertainty of the start pressure, not applied: the solver keeps one start pressure whatever primer a load names. Peterson Cartridge fired one .22 Creedmoor load with Federal Match large rifle magnum and standard large rifle primers, five new cases each, 24 in barrel; the magnum primers gave on average 25 fps more velocity and 1,500 psi more pressure ([Peterson Cartridge, 22 Creedmoor Load Data](https://petersoncartridge.com/blog/22-creedmoor-load-data), section Maximum Pressure Load Data, retrieved 2026-11-01). That is one load and one primer brand, and the page says the result holds only for that load: it gives the size of the effect, not a correction.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
+- The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/drawing/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
-- A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
+- Without a given depth the cavity is as deep as its radius, with the bracket of half to three times that depth in the pressure range only, not in the drawn outline. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.
 - The bounds of a bullet without a length are the 90th percentile of the class in-sample, not an interval of confidence: one record in ten lies outside. They hold the length error of the density, and the assumed proportions of the outline are inside it. The classes were taken from the same records they are measured on, and the cast class from one maker.
 - Effects on the capacity that were looked at and are left out:
@@ -260,4 +296,4 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - [Tanaka 2001](../bibliography.md#tanaka-2001): density of water at 20 °C, table, pp. 301 to 309 (the table value is unverified, not re-read from the paper).
 - [PubChem lead](https://pubchem.ncbi.nlm.nih.gov/compound/5352425), [PubChem copper](https://pubchem.ncbi.nlm.nih.gov/compound/23978): density of lead and of copper, for the comparison with the effective densities.
 - [C.I.P. TDCC](../bibliography.md#cip-tdcc): cartridge length $L_3$ and the chamber values $L_3$, $s$, $G$, $G_1$, $F$ and $i$, per cartridge sheet.
-- Research log: [placing a maximum pressure against the tolerance range](../research/interior-ceiling-classification.md).
+- Research log: [placing a maximum pressure against the tolerance range](../research/interior-ceiling-classification.md), [volume tolerance from the capacity source](../research/interior-volume-tolerance-capacity-source.md).

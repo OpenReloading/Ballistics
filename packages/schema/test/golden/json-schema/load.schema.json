@@ -320,6 +320,11 @@
               "unit": "mm",
               "description": "The value of `bulletCavityDiameter` in mm."
             },
+            "bulletCavityDepth": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `bulletCavityDepth` in mm."
+            },
             "pmax": {
               "type": "number",
               "unit": "bar",
@@ -414,6 +419,11 @@
               "type": "number",
               "unit": "mm2",
               "description": "The value of `leakArea` in mm2."
+            },
+            "throatWear": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `throatWear` in mm."
             },
             "boreFriction": {
               "type": "number",

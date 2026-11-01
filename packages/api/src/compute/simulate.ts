@@ -13,6 +13,7 @@ import {
   type PressureRange,
   recordBoreArea,
   recordResistance,
+  recordSensitivity,
   solidFill,
   solidFillLimit,
 } from '@open-reloading/core'
@@ -268,6 +269,12 @@ const bulkDensityOf = (values: Record<string, number>, powder: Powder | undefine
   bulkDensityTyped: values.bulkDensity !== undefined,
 })
 
+/** Sets the temperature sensitivity a run of `powder` takes on `load` (`recordSensitivity`); none leaves it. */
+function takeSensitivity(load: InteriorLoad, powder: Powder | undefined) {
+  const taken = powder && recordSensitivity(powder)
+  if (taken) load.propellant.temperatureSensitivity = taken.sensitivity
+}
+
 /** One `POST /interior/load-file` request (`query`, the load file `json`): the status and body of the answer. */
 export async function simulate(
   context: { catalogue: Catalogue; compute: ComputeRunner },
@@ -337,6 +344,9 @@ export async function simulate(
         grooveDiameter: cartridgeGrooveDiameterMm(cartridge),
       }),
     )
+  // the temperature sensitivity of the powder record, its own or the default of its grain form, as
+  // the workbench adds it to a run
+  takeSensitivity(load, powder)
   // the bore resistance of the powder record's fit, as the workbench adds it to a run
   const { resistance, missing } = recordResistance(powder ?? {}, {
     boreDiameter: load.chamber.boreDiameter,

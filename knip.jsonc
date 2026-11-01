@@ -33,7 +33,7 @@
       ]
     },
     "packages/cli": {
-      "entry": ["src/bin.ts"]
+      "entry": ["src/bin.ts", "scripts/*.mts"]
     },
     "packages/api": {
       "entry": [

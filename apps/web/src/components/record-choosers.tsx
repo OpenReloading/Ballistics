@@ -8,6 +8,7 @@ import { msg, type Translator } from '../i18n/translate.ts'
 import { type PowderRow, vivacityUnit } from '../lib/burn-rate.ts'
 import { caliberOptions, commonCaliber } from '../lib/caliber.ts'
 import { type CartridgeRow, cartridgeCells } from '../lib/cartridge-rows.ts'
+import { powderRowIncomplete } from '../lib/complete-records.ts'
 import { countryName, parseCountries } from '../lib/countries.ts'
 import type { FirearmRow } from '../lib/firearm.ts'
 import { baseText, caseTypeText, grainFormText, kebabValue } from '../lib/list-values.ts'
@@ -122,6 +123,7 @@ export const powderKind: ChooserKind<PowderRow> = {
     ],
   ],
   href: (row) => `/powders/${row.id}`,
+  incomplete: powderRowIncomplete,
 }
 
 /** The cartridges as a kind of the record chooser. */
@@ -390,6 +392,7 @@ export function PowderChooser({
           name: d.name,
           grainForm: d.powder.grainForm,
           propellantBase: d.powder.propellantBase,
+          ...(d.powder.interior && { modelled: true as const }),
         }),
       ),
     [designs],

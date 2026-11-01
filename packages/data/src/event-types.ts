@@ -1,6 +1,6 @@
-import type { Discipline, EventType, Federation } from '@open-reloading/schema'
+import type { EventType, Federation } from '@open-reloading/schema'
+import { type Lookup, lookupOf } from './federations.ts'
 import type { Bundle } from './records.ts'
-import { resolveId } from './renames.ts'
 
 /**
  * A division listed twice among the power factors, and a magazine limit of a division without a
@@ -21,13 +21,6 @@ function checkDivisions(t: EventType, where: string, errors: string[]) {
     else if (m.powerFactor === 'major' && floor.major === undefined)
       errors.push(`${where}: magazine limits major in division "${m.division}", which has none`)
   }
-}
-
-/** The ids that replace an id of a kind in `renames.json`, and the records by id. */
-type Lookup = {
-  now: (kind: 'federations' | 'disciplines', id: string) => string
-  federations: Map<string, Federation>
-  disciplines: Map<string, Discipline>
 }
 
 /** The federation is a record and lists the rule book; returns the federation. */
@@ -63,11 +56,7 @@ export function checkEventTypes(
   bundle: Pick<Bundle, 'eventTypes' | 'federations' | 'disciplines' | 'renames'>,
 ): string[] {
   const errors: string[] = []
-  const lookup: Lookup = {
-    now: (kind, id) => resolveId(bundle.renames, kind, id),
-    federations: new Map(bundle.federations.map((f) => [f.id, f])),
-    disciplines: new Map(bundle.disciplines.map((d) => [d.id, d])),
-  }
+  const lookup = lookupOf(bundle)
   for (const t of bundle.eventTypes ?? []) {
     const where = `event-types/${t.id}.json`
     const federation = checkFederation(t, where, lookup, errors)

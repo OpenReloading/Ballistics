@@ -84,6 +84,7 @@ it('resets a changed base form with the base dimensions typed for it', () => {
     'bulletBaseLength',
     'bulletBaseDiameter',
     'bulletCavityDiameter',
+    'bulletCavityDepth',
   ])
   // a base form equal to the record's is nothing to reset
   const same = { ...targets, baseChanged: false, unsetTypedBullet: vi.fn() }
