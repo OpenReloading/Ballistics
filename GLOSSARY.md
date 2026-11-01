@@ -616,6 +616,25 @@ A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue re
 **Target face design**:
 A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
 
+**Competition event**:
+A user record of kind `event` (id a UUID): a competition the user shot, with `date`, `place`, `eventType` (`catalogue:` reference to an event type), `level` (one of the type's levels), `discipline`, `division`, `firearm` and `load` (`user:` references), `rounds` (fired, for the round count), `notes`, `state` and `results`. A self-recorded score is never an official result.
+_Avoid_: match, competition record
+
+**Result state**:
+`state` of a competition event: `completed`, `did-not-finish` or `disqualified`. A disqualified event has no total.
+_Avoid_: DQ, status
+
+**Event results**:
+`results` of a competition event, by `method`: `rings` with `series` (per series the ring value of each shot in `shots`, or its `total`, and the `targetSheet` it was scored on), or `hit-factor` with `stages`.
+
+**Practical stage**:
+One entry of `stages`: `name`, `hits` (`A`, `C`, `D`, `metal`), `misses`, `noShoots` (penalized no-shoot hits), `procedurals`, `time` (s), `powerFactor` and `stagePoints` (typed from the official result).
+_Avoid_: course of fire (for the record)
+
+**Hit factor**:
+The points of a practical stage, hits less penalties and at least 0, over its time, 1/s (`hitFactor` in `core`).
+_Avoid_: HF
+
 **Powder design**:
 A user record of kind `powder`: `origin` (`user`), the `provenanceKind` and the `draft`, the powder's grain form, bulk density, composition, thermochemistry and burn law in stored units, each optional while the draft is unfinished. The workbench and the charge target tool offer a design that builds a valid `Powder` as `<name> (your design)`, a saved load names it as `user:<id>`, and every result from it says the powder values are from a user design.
 
