@@ -36,15 +36,23 @@ export const tuneBaseKey = (load: string) => storageName(`tunePowder:${load}`)
 export const tuneTableKey = (load: string) => storageName(`tuneTable:${load}`)
 
 /**
+ * The session storage key of the id of the cartridge record of the load handed over for load
+ * `load`, a reference, kept when the record was still loading, so the tuning route reads its table.
+ */
+export const tuneCartridgeKey = (load: string) => storageName(`tuneCartridge:${load}`)
+
+/**
  * Hands `interior`, the load the workbench's run simulates, `powder`, its powder record, and
  * `table`, the CIP table of its cartridge record, to the tuning route for the strings of load
- * `load` (a reference); undefined removes one handed over before.
+ * `load` (a reference); undefined removes one handed over before. `cartridge`, the id of a
+ * cartridge record still loading, is handed over without a table, for the route to fetch it.
  */
 export function writeTuneLoad(
   load: string,
   interior: InteriorLoad | undefined,
   powder?: Powder | undefined,
   table?: string | undefined,
+  cartridge?: string | undefined,
 ) {
   const put = (key: string, value: unknown) => {
     if (value) sessionStorage.setItem(key, JSON.stringify(value))
@@ -54,6 +62,7 @@ export function writeTuneLoad(
     put(tuneLoadKey(load), interior)
     put(tuneBaseKey(load), interior && powder)
     put(tuneTableKey(load), interior && table)
+    put(tuneCartridgeKey(load), interior && !table && cartridge)
   } catch {}
 }
 
