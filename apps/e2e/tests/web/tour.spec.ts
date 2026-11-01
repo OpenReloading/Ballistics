@@ -54,9 +54,16 @@ test('from 75em a popover beside a target taller than the window starts below th
     else expect(at.x).toBeGreaterThanOrEqual(target.x + target.width)
     if (title === 'Figure') {
       // a scroll during the tour places it again, still below the bar
+      const scrolled = await page.evaluate(() => window.scrollY)
       await page.mouse.wheel(0, 300)
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrolled)
+      // the target starts under the bar now, and driver.js places the popover again on the scroll
+      await expect
+        .poll(async () => (await box(page.locator('.driver-active-element'))).y)
+        .toBeLessThan(bar.y + bar.height)
       await expect.poll(async () => (await box(p)).y).toBeGreaterThanOrEqual(bar.y + bar.height)
       await page.mouse.wheel(0, -300)
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrolled)
     }
     await p.getByRole('button', { name: 'Next' }).click()
   }
