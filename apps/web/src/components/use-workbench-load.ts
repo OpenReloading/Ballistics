@@ -642,6 +642,15 @@ function boreOf(
   }
 }
 
+/**
+ * The case length, mm: the chosen brass group's measured trim length (`brass`, with its name and
+ * the sheet's L3), else the sheet's L3 (`cip`).
+ */
+const caseLengthOf = (brass: OwnCase | undefined, cip: number | undefined) =>
+  brass?.trimLength === undefined
+    ? { mm: cip, brass: undefined }
+    : { mm: brass.trimLength, brass: { name: brass.name, mm: brass.trimLength, cip } }
+
 /** The note on a bullet below the firearm's measured groove diameter (SI): the gap the model leaves out. */
 function undersizeNote(
   bullet: number | undefined,
@@ -2891,9 +2900,14 @@ export function useWorkbenchState() {
   const mmText = (mm: number | undefined) =>
     mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
   /** The cartridge sheet's and the powder's values the user may type over them: the records', the typed and the ones a run reads. */
+  const l3 = caseLengthOf(
+    cartridgeCases.find((c) => c.id === chosenOwnCase),
+    specValue('cartridge', 'L3'),
+  )
+  const caseLengthBrass = l3.brass
   const spec = useSpecValues(system, {
     pmax: specValue(undefined, 'Pmax'),
-    caseLength: specValue('cartridge', 'L3'),
+    caseLength: l3.mm,
     bulkDensity: recordBulkDensity(chosenPowder, linkedPowder),
   })
   /** The Pmax a readout names, bar: the typed one, else the sheet's. */
@@ -3265,6 +3279,7 @@ export function useWorkbenchState() {
     setTypedBullet,
     specs: spec.values,
     recordSpecs: spec.record,
+    caseLengthBrass,
     typedSpecFields: spec.typed,
     setTypedSpec: spec.setTyped,
     bulletFit,

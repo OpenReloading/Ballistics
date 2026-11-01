@@ -73,7 +73,14 @@ it('reads the measured capacity through the record the group names', () => {
   expect(groupCapacity(c, [])).toBeUndefined()
   expect(groupCapacity(group, [capacity])).toBeUndefined()
   expect(ownCases([capacity, caseRecord(c)])).toEqual([
-    { id: caseId, name: 'Match brass, lot 3', cartridge, capacity: c.capacity, grams: 3.62 },
+    {
+      id: caseId,
+      name: 'Match brass, lot 3',
+      cartridge,
+      capacity: c.capacity,
+      grams: 3.62,
+      trimLength: 51.1,
+    },
   ])
 })
 

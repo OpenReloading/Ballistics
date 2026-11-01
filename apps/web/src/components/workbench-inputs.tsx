@@ -1015,6 +1015,7 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
     printMedia,
     changes,
     resetKeys,
+    caseLengthBrass,
   } = useLoad()
   const { t } = useTranslation()
   const spec = specFields.find((s) => s.key === key)
@@ -1039,7 +1040,7 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
       error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
       mark={(s) =>
         changes[key] === undefined
-          ? undefined
+          ? brassMark(key, typed === undefined ? caseLengthBrass : undefined, s, t)
           : t('Changed from the record value {value}.', {
               value: valueWithUnit(spec.quantity, s, changes[key]),
             })
@@ -1059,6 +1060,22 @@ function SpecValueField({ name: key }: { name: SpecKey }) {
       }
     />
   )
+}
+
+/** The case length's mark while it holds the chosen brass's trim length, with the sheet's L3. */
+function brassMark(
+  key: SpecKey,
+  brass: LoadValues['caseLengthBrass'],
+  s: UnitSystem,
+  t: Translator['t'],
+) {
+  if (key !== 'caseLength' || !brass) return
+  return brass.cip === undefined
+    ? t('Trim length of your brass group {name}.', { name: brass.name })
+    : t('Trim length of your brass group {name}. The CIP L3 is {value}.', {
+        name: brass.name,
+        value: valueWithUnit('length', s, toSi('length', brass.cip)),
+      })
 }
 
 /** The spec rows of a card once its record is chosen, or while a value is typed. */
@@ -1627,6 +1644,12 @@ function MoreRows({ panel }: { panel: InputPanel }) {
   )
 }
 
+/** The case length the seating reads, mm: the typed L3, else the chosen brass group's trim length, named. */
+const linkedCaseLength = (typed: number | undefined, brass: LoadValues['caseLengthBrass']) =>
+  typed === undefined
+    ? { caseLength: brass?.mm, caseLengthBrass: brass?.name }
+    : { caseLength: typed }
+
 /** The lands contact of the chosen firearm as it applies to the chosen bullet record or design. */
 function landsChoice(
   lands: Parameters<typeof landsFor>[0],
@@ -1678,6 +1701,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     bulletBaseType,
     specs,
     typedSpecFields,
+    caseLengthBrass,
   } = useLoad()
   const { ok, stale } = useResult()
   // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
@@ -1707,11 +1731,8 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   useEffect(() => {
     if (node && host) host.append(node)
   }, [node, host])
-  const lands = landsChoice(
-    firearmList.find((f) => f.id === firearm)?.data.lands,
-    bullet,
-    bulletDesign,
-  )
+  const gun = firearmList.find((f) => f.id === firearm)?.data
+  const lands = landsChoice(gun?.lands, bullet, bulletDesign)
   const shown = cartridge !== undefined || cartridgeDesign !== undefined
   const moreOpen = more === 'cartridge'
   useEffect(() => {
@@ -1735,17 +1756,17 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       draft={designLoad && { spec: designLoad.spec, title: designLoad.title, card: true }}
       system={system}
       initial={previewInitial}
-      barrelLength={firearmList.find((f) => f.id === firearm)?.data.barrelLength}
+      barrelLength={gun?.barrelLength}
       lands={lands.contact}
       landsOther={lands.other}
-      freebore={firearmList.find((f) => f.id === firearm)?.data.freebore}
+      freebore={gun?.freebore}
       barrelDefault={suggestions.barrelLength}
       linked={{
         bullet: bullet?.id,
         design: bulletDesign?.id,
         values: seatValues,
         baseType: bulletBaseType,
-        caseLength: typedCaseLength(typedSpecFields),
+        ...linkedCaseLength(typedCaseLength(typedSpecFields), caseLengthBrass),
       }}
       slots={{
         cartridge: seatingSlots.cartridge ?? null,

@@ -345,8 +345,10 @@ type PreviewProps = {
     values?: BulletValues | undefined
     /** The base form typed over the record's. */
     baseType?: BaseType | undefined
-    /** The case length L3 typed over the sheet's, mm. */
+    /** The case length L3 typed over the sheet's, or the trim length of the chosen brass, mm. */
     caseLength?: number | undefined
+    /** The name of the brass whose trim length `caseLength` is; none: the length was typed. */
+    caseLengthBrass?: string | undefined
   }
   /**
    * Where the controls go instead of beside the drawing: case capacity, seating and the
@@ -2073,6 +2075,12 @@ function JumpRow({ m, seating }: RowsProps) {
 /** The seating depth's note: where the case length comes from. */
 function seatingNote(m: Model, chamber: Chamber, t: Translator['t']) {
   const length = m.mm(chamber.caseLength)
+  const brass = m.p.linked?.caseLengthBrass
+  if (brass !== undefined)
+    return t('case length: trim length of your brass group {name} {length}', {
+      name: brass,
+      length,
+    })
   if (m.p.linked?.caseLength !== undefined) return t('case length: L3 typed {length}', { length })
   return m.designed
     ? t('case length: cartridge L3 of the design {length}', { length })

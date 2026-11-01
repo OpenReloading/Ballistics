@@ -4193,5 +4193,8 @@
   "From {source}.": "Quelle: {source}.",
   "From {source}. The cartridge record gives {value}.": "Quelle: {source}. Der Patronendatensatz gibt {value} vor.",
   "The leade starts at your firearm's measured freebore past the chamber L3, not at the CIP s.": "Der Übergangskegel beginnt bei der gemessenen Freibohrung Ihrer Schusswaffe hinter dem Patronenlager-L3, nicht beim CIP-s.",
-  "The bullet diameter {diameter} is below the measured groove diameter {groove} of your firearm: gas passes the bullet, which the model leaves out.": "Der Geschossdurchmesser {diameter} liegt unter dem gemessenen Zugdurchmesser {groove} Ihrer Schusswaffe: Gas strömt am Geschoss vorbei, was das Modell nicht berücksichtigt."
+  "The bullet diameter {diameter} is below the measured groove diameter {groove} of your firearm: gas passes the bullet, which the model leaves out.": "Der Geschossdurchmesser {diameter} liegt unter dem gemessenen Zugdurchmesser {groove} Ihrer Schusswaffe: Gas strömt am Geschoss vorbei, was das Modell nicht berücksichtigt.",
+  "case length: trim length of your brass group {name} {length}": "Hülsenlänge: Länge nach dem Kürzen Ihrer Hülsengruppe {name} {length}",
+  "Trim length of your brass group {name}.": "Länge nach dem Kürzen Ihrer Hülsengruppe {name}.",
+  "Trim length of your brass group {name}. The CIP L3 is {value}.": "Länge nach dem Kürzen Ihrer Hülsengruppe {name}. Das CIP-L3 beträgt {value}."
 }
