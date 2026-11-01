@@ -65,6 +65,25 @@ it('keeps the value of before where the construction of a rifle bullet or the ba
   }
 })
 
+it('keeps the start pressure of the fit for a rifle and a powder fitted without one', () => {
+  const fitted = (barrel: number, current = cited) =>
+    startPressureDefault({
+      barrel,
+      construction: { structure: 'monolithic' },
+      current,
+      fittedPowder: true,
+      show,
+      t: english.t,
+    })
+  expect(fitted(rifle)).toEqual({
+    si: 30e6,
+    source: 'the start pressure the powder record was fitted at, barrel 300 mm or longer',
+  })
+  // the handgun rows of the fit ran at the value of their construction
+  expect(fitted(pistol).si).toBe(50e6)
+  expect(fitted(rifle, 28e6).si).toBe(28e6)
+})
+
 it("keeps the user's own default of Settings", () => {
   const own = of(pistol, 'cast', 28e6)
   expect(own.si).toBe(28e6)

@@ -154,9 +154,11 @@ The workbench takes the construction from the bullet record's `construction.stru
 | monolithic | monolithic |
 | frangible, a construction without a structure | jacketed, marked as assumed |
 
-A record without a `construction` gives no construction, and a barrel length that is not known gives no class: the field keeps the value of 30 MPa. A plated bullet in a rifle takes it too. The field follows this default until a value is typed, and the help gives the 95 % interval of the construction. A powder record's own start pressure replaces it, a record without one leaves the field following it. Load files and the API still take the rifle value of 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure as a value.
+A record without a `construction` counts as jacketed, marked as assumed, in a handgun, as `defaultStartPressure` does; in a rifle it gives no construction, and a barrel length that is not known gives no class: the field keeps the value of 30 MPa. A plated bullet in a rifle takes it too. The field follows this default until a value is typed, and the help gives the 95 % interval of the construction. A powder record's own start pressure replaces it. A powder model without one (every powder record now) was fitted at `defaultStartPressure` of each load's barrel without a construction for its rifle rows, 30 MPa: in a rifle barrel the field keeps 30 MPa for it, so the model runs at the start pressure of its fit, and the help says so; in a handgun barrel the rule by construction stands, as in the fit. The rule by construction thus reaches a rifle only with model parameters typed by hand. The rows of the Powders tab run each record without a start pressure at the same default. Load files and the API still take the rifle value of 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure as a value.
 
-Code: `packages/core/src/interior/start-pressure.ts`, `constructionOf`, `startPressureOf`.
+The table is `bulletStructures` in core, which also gives each structure the class of its effective density for a bullet without a length ([case capacity](./case-capacity.md)).
+
+Code: `packages/core/src/interior/start-pressure.ts`, `bulletStructures`, `constructionOf`, `startPressureOf`; `apps/web/src/lib/start-pressure.ts`, `startPressureDefault`.
 
 ### Bore resistance
 
