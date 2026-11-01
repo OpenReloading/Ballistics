@@ -6,7 +6,7 @@ import { segmentPhoto } from '../src/lib/bullet-photo-colour.ts'
 import { measureOutline } from '../src/lib/bullet-photo-measure.ts'
 import { fitOutline } from '../src/lib/bullet-photo-outline.ts'
 import { renderPhoto } from '../src/lib/bullet-photo-sample.ts'
-import { resolveScale } from '../src/lib/bullet-photo-scale.ts'
+import { resolveScale, withBasis } from '../src/lib/bullet-photo-scale.ts'
 import { say, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
@@ -52,6 +52,27 @@ function photographed() {
 
 describe('the scale from caliper sizes', () => {
   const { px, outline, ruler } = photographed()
+
+  /** The notes of the measurement at the scale `resolveScale` gives, with what that scale rests on. */
+  const valueNotes = (r: ReturnType<typeof resolveScale>) =>
+    text(withBasis(measureOutline(outline, defined(r.scale)), r.basis).notes)
+
+  it('says what a scale from the diameter alone rests on, and nothing of the kind with a ruler', () => {
+    const fromDiameter = resolveScale(px, undefined, { diameter: 7.82 })
+    expect(fromDiameter.basis).toBe('diameter')
+    expect(valueNotes(fromDiameter)).toMatch(
+      /scale comes from the diameter entered, without a ruler.*square side view.*10 degrees.*1\.5 % short.*product image may not be drawn to scale/,
+    )
+    const withRuler = resolveScale(px, ruler, { diameter: 7.82 })
+    expect(withRuler.basis).toBe('ruler')
+    expect(valueNotes(withRuler)).not.toMatch(/scale comes from/)
+    expect(valueNotes(resolveScale(px, undefined, { diameter: 7.82, length: 30 }))).toMatch(
+      /diameter and the overall length entered, without a ruler.*more than 2 % apart, about 11 degrees/,
+    )
+    expect(valueNotes(resolveScale(px, undefined, { length: 30 }))).toMatch(
+      /overall length entered, without a ruler.*1\.5 % too wide/,
+    )
+  })
 
   it('takes the scale from the diameter and the length without a ruler, and measures with it', () => {
     const { scale, notes } = resolveScale(px, undefined, { diameter: 7.82, length: 30 })

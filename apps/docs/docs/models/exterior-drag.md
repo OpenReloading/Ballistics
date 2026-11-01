@@ -119,6 +119,20 @@ Code: `packages/core/src/exterior/drag.ts`, `heldSegment` (`narrowSegment`, `ste
 
 The extension of such a segment can reach zero or negative drag within one trial step. No segment of the standard tables meets either condition.
 
+### Speed measured downrange
+
+An optical screen reads the speed some metres from the muzzle, after the drag has slowed the bullet. Along a flat path, with the drag acceleration above and a drag coefficient $C_D$ on area $\pi d^2/4$, the speed falls with distance $s$ as
+
+$$
+\frac{\mathrm{d}v}{\mathrm{d}s} = -\frac{\pi}{8}\,\frac{\rho\,C_D(M)\,d^2}{m}\,v
+$$
+
+Code: `packages/core/src/exterior/muzzle-velocity.ts`, `muzzleVelocityFromDownrange`.
+
+The equation is the point-mass equation of motion ([McCoy 1999](../bibliography.md#mccoy-1999), chapter unverified). For a constant $C_D$ this is $v(s) = v_0\,e^{-ks}$ with $k = \pi\rho C_D d^2/(8m)$, a cross-check only: a constant coefficient is wrong near Mach 1. The muzzle velocity is the $v_0$ whose flown speed at $s$ equals the measured one, over the bullet's own drag law. The speed flown at $s$ rises with $v_0$ at a slope near one, so the search moves the guess by the miss until the miss is below $10^{-6}$ m/s (four to five passes).
+
+The bore is taken as horizontal, the air as still and uniform, and the measuring point as the middle of the gates, where the speed read is the speed at that distance. The mass, diameter and drag of the bullet are needed: a session record does not carry them, a saved load does. Results are simulations, not load data.
+
 ## Symbols
 
 | Symbol | Meaning | Stored unit | Unit in `core` |

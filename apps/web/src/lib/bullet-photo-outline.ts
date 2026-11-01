@@ -21,6 +21,10 @@ export interface Outline {
   z: number[]
   /** Half the width of the bullet at each sample. */
   r: number[]
+  /** The distance of each side's edge from the axis at each sample: the side to the left of the axis seen from the base, and the one to the right. */
+  sides?: { left: number[]; right: number[] } | undefined
+  /** The side a shadow widens (`withoutShadow`): `removed` when it is taken out, by measuring the other side mirrored about the axis, with nothing left to doubt. */
+  shadow?: { side: 'left' | 'right'; removed: boolean } | undefined
   /** Whether the nose end was told apart from the base end by its longer taper only within 15 %, so a flip may be right. */
   ambiguous: boolean
   /** Standard uncertainty of an edge position, px: `edgeUncertainty` of a sharp edge, more where the edge is spread. */
@@ -241,8 +245,145 @@ function profileOf(seg: Cutout, axis: Axis, ambiguous: boolean, edge: number): O
     length: tip - base,
     z: cols.map((c) => c.s - base),
     r: cols.map((c) => (c.bottom - c.top) / 2),
+    sides: { left: cols.map((c) => -c.top), right: cols.map((c) => c.bottom) },
     ambiguous,
     edge,
+  }
+}
+
+/** The line `y = a + b x` through the points by least squares; undefined for fewer than two distinct x. */
+function lineOf(xs: readonly number[], ys: readonly number[]) {
+  const n = xs.length
+  const [sx, sy] = [sum(xs), sum(ys)]
+  const sxx = sum(xs.map((v) => v * v))
+  const sxy = sum(xs.map((v, i) => v * at(ys, i)))
+  const det = n * sxx - sx * sx
+  if (!(det > 0)) return
+  const b = (n * sxy - sx * sy) / det
+  return { a: (sy - b * sx) / n, b }
+}
+
+const median = (xs: readonly number[]) => {
+  const a = [...xs].sort((p, q) => p - q)
+  const m = a.length >> 1
+  return a.length % 2 ? at(a, m) : (at(a, m - 1) + at(a, m)) / 2
+}
+
+/** The shank is where the half width is at least this share of its widest. */
+const shankShare = 0.97
+
+/** The base's samples: this many, from where both sides have reached half their shank line and move by less than a px per sample, clear of the corner, which a slightly turned axis moves along one side. */
+const baseCount = 6
+
+/**
+ * How far each side's edge at the base lies inside the line of that side's shank, px (left, right),
+ * with each side's shank line and the samples `base` (start, end) taken as the base; undefined
+ * without sides or a shank. The shank is where the half width is within 3 % of its widest, from
+ * where it starts up to its middle.
+ */
+export function sideTapers(o: Outline) {
+  const sides = o.sides
+  if (!sides || o.r.length < 40) return
+  const widest = Math.max(...o.r)
+  const shank = o.r.flatMap((v, i) => (v >= shankShare * widest ? [i] : []))
+  const first = shank[0]
+  const last = shank.at(-1)
+  if (first === undefined || last === undefined) return
+  const use = shank.filter((i) => i <= (first + last) / 2 || i - first < 10)
+  if (use.length < 10) return
+  const z = use.map((i) => at(o.z, i))
+  const shankLine = (side: readonly number[]) =>
+    lineOf(
+      z,
+      use.map((i) => at(side, i)),
+    )
+  const [lineL, lineR] = [shankLine(sides.left), shankLine(sides.right)]
+  if (!lineL || !lineR) return
+  const level = (line: { a: number; b: number }, i: number) => line.a + line.b * at(o.z, i)
+  const reached = o.z.findIndex(
+    (_, i) =>
+      at(sides.left, i) >= 0.5 * level(lineL, i) && at(sides.right, i) >= 0.5 * level(lineR, i),
+  )
+  if (reached < 0) return
+  // past the corner, where neither side moves by a px from one sample to the next
+  const settled = (i: number) =>
+    Math.abs(at(sides.left, i + 1) - at(sides.left, i)) < 1 &&
+    Math.abs(at(sides.right, i + 1) - at(sides.right, i)) < 1
+  let start = reached
+  while (start < first && !settled(start)) start++
+  // a corner that does not settle before the shank (an axis turned far off on a squat bullet): two past it
+  if (start + 1 + baseCount > first) start = reached + 1
+  const base: [number, number] = [start + 1, start + 1 + baseCount]
+  if (base[1] > first) return
+  const zb = median(o.z.slice(...base))
+  const taper = (line: { a: number; b: number }, side: readonly number[]) => ({
+    line,
+    taper: line.a + line.b * zb - median(side.slice(...base)),
+  })
+  return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base }
+}
+
+/** One side tapers at the base by more than this, px or share of the half width, while the other does not: a shadow, not a boat tail. */
+const oneSidedTaper = (halfWidth: number) => Math.max(2.5, 0.02 * halfWidth)
+
+/**
+ * The outline with a one-sided shadow taken out. A body of revolution is symmetric about its axis;
+ * a soft shadow beside it widens the cut-out on one side only, and where the shadow is offset along
+ * the axis it leaves that side short at the base, so the base looks tapered on that side alone.
+ * When one side's edge at the base lies inside its shank line by more than `oneSidedTaper` more
+ * than the other's, the shadow is on that side. Where the shadow leaves the base clear, the base's
+ * width plus the other (sharp) side's own taper is the shank's half width `a`. When both sides run
+ * parallel over the base samples (the shadow's blurred end does not reach them) and `a` is below
+ * the cut-out's shank half width (a shadow only widens it), the sharp side, taken from its shank
+ * line, is measured for both sides, about the axis it gives, and where the shadow carries the
+ * cut-out on past a flat tip the bullet ends with the sharp side. A flat tip with no such gap may
+ * still carry the shadow in its length: the shadow is then named as not removed. Otherwise the
+ * shadow is named and the outline kept.
+ */
+function withoutShadow(o: Outline): Outline {
+  const t = sideTapers(o)
+  if (!t || !o.sides) return o
+  const gap = t.right.taper - t.left.taper
+  const half = median(o.r.slice(...t.base))
+  const tol = oneSidedTaper(half)
+  if (Math.abs(gap) <= tol) return o
+  const [sharp, line, blurred, side] =
+    gap > 0
+      ? [o.sides.left, t.left, o.sides.right, 'right' as const]
+      : [o.sides.right, t.right, o.sides.left, 'left' as const]
+  // over the base samples a clear base runs parallel on both sides; a shadow's blurred end rises
+  const [b0, b1] = t.base
+  const rise = (v: readonly number[]) => median(v.slice(b1 - 2, b1)) - median(v.slice(b0, b0 + 2))
+  const a = half + Math.max(0, line.taper)
+  const widest = Math.max(...o.r)
+  const shank = median(o.r.filter((v) => v >= shankShare * widest))
+  const clear = a < shank && Math.abs(rise(blurred) - rise(sharp)) <= tol / 2
+  if (!clear) return { ...o, shadow: { side, removed: false } }
+  const r = o.z.map((z, i) => Math.max(0, at(sharp, i) - (line.line.a + line.line.b * z) + a))
+  // beyond a flat tip the shadow alone can carry the cut-out on along the axis: the bullet ends
+  // where the sharp side does, half a sample past its last
+  const end = r.findLastIndex((v) => v > 0.5)
+  const trimmed = end >= 0 && r.length - 1 - end >= 3
+  const keep = trimmed ? end + 1 : r.length
+  const kept = r.slice(0, keep)
+  // a flat tip the shadow runs past by less than its meplat leaves no gap to trim: its length may still carry the shadow
+  const flatTip = median(kept.slice(-3)) > Math.max(2, 0.1 * a)
+  // the axis the sharp side gives: moved across to it and turned along its shank line
+  const s = side === 'right' ? -1 : 1
+  const shift = s * (line.line.a - a)
+  const angle = o.angle + Math.atan(s * line.line.b)
+  return {
+    ...o,
+    origin: {
+      x: o.origin.x - Math.sin(o.angle) * shift,
+      y: o.origin.y + Math.cos(o.angle) * shift,
+    },
+    angle,
+    ...(trimmed && { length: at(o.z, end) + 0.5 }),
+    z: o.z.slice(0, keep),
+    r: kept,
+    sides: { left: kept, right: kept },
+    shadow: { side, removed: trimmed || !flatTip },
   }
 }
 
@@ -250,7 +391,8 @@ function profileOf(seg: Cutout, axis: Axis, ambiguous: boolean, edge: number): O
  * The outline of the segmented bullet. The axis starts at the long axis of the pixels and is
  * turned and shifted until the middle of the two edges lies on it: the symmetry line of both
  * edges. The nose end is the end with the longer taper. A fixed `angle` is kept and only the offset
- * is fitted. Undefined without a bullet.
+ * is fitted. A shadow that widens one side is taken out (`withoutShadow`) when the axis is found,
+ * not fixed. Undefined without a bullet.
  */
 export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | undefined {
   const m = momentsOf(seg)
@@ -259,5 +401,8 @@ export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | und
   const axis = settleAxis(seg, { o: { x: m.x, y: m.y }, theta: opt.angle ?? m.theta }, fixed)
   if (!axis) return
   const turned = fixed ? { ...axis, ambiguous: false } : orient(seg, axis)
-  return turned && profileOf(seg, turned, turned.ambiguous, edgeUncertaintyOf(opt.edgeSpread ?? 0))
+  const o =
+    turned && profileOf(seg, turned, turned.ambiguous, edgeUncertaintyOf(opt.edgeSpread ?? 0))
+  // an axis the user fixed is not the symmetry line, so the two sides need not agree
+  return o && (fixed ? o : withoutShadow(o))
 }

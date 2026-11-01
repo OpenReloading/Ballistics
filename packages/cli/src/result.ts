@@ -1,10 +1,11 @@
 import { z } from 'zod'
 import { reasons } from './evaluate.ts'
 import { groupings } from './metrics.ts'
+import { skipReasons } from './published-rows.ts'
 import { splits } from './split.ts'
 
 /** Version of the JSON shape every result carries as `schemaVersion`. */
-export const schemaVersion = 1
+export const schemaVersion = 2
 
 const count = z.int().nonnegative()
 const fraction = z.number().describe('A fraction: 0.034 is 3.4 %.')
@@ -30,7 +31,14 @@ const metrics = z.object({
   pressure: errorStats
     .extend({ rows: count.describe('Used rows that print a peak pressure.') })
     .nullable()
-    .describe('Absolute relative error of the peak pressure over the used rows that print one.'),
+    .describe(
+      'Absolute relative error of the peak pressure over the used rows that print one in bar, every basis together.',
+    ),
+  pressureByBasis: z
+    .record(z.string(), errorStats.extend({ rows: count }))
+    .describe(
+      'The pressure error per basis, the measuring method a row prints (`transducer`, `case-contact`, `piezo`, ..., `unstated` without one); a basis is never compared with another. A basis without a used row in bar is left out.',
+    ),
   interval: z
     .object({
       coverage: fraction.describe(
@@ -89,12 +97,26 @@ const inputs = z.object({
 /** The label every result carries, the notice of the API's answers. */
 export const notice = 'simulation, not load data'
 
+const published = z
+  .object({
+    files: count.describe('Published load files read.'),
+    rows: count.describe('Rows they gave: one per printed charge with a velocity.'),
+    skipped: z
+      .partialRecord(z.enum(skipReasons), count)
+      .describe(
+        'Printed charges that gave no row, by reason; a reason without charges is left out.',
+      ),
+  })
+  .optional()
+  .describe('With `--rows catalogue` or a folder of published loads: what the files gave.')
+
 const common = {
   schemaVersion: z.literal(schemaVersion),
   notice: z.literal(notice),
   split: z.enum(splits),
   final: z.boolean().describe('True for a run of the test split, which needs `--final`.'),
   inputs,
+  published,
 }
 
 /** The result of `verify`. */

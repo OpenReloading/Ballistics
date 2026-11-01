@@ -163,13 +163,19 @@ function fieldLabel(text: string, unit: string): ReactNode {
   )
 }
 
-/** The field's description: help, mark and flag; a flag that repeats the help is not said twice. */
+/**
+ * The field's description: help, mark and flag; a flag that repeats the help is not said twice. An
+ * error (`exceeded`) leads: the focused field's help line shows two lines, so a long help would hide it.
+ */
 const describedByOf = (
   help: string | undefined,
   mark: string | undefined,
   flag: FieldFlag | undefined,
-) =>
-  [help, mark, flag?.text === help ? undefined : flag?.text].filter(Boolean).join(' ') || undefined
+) => {
+  const said = flag?.text === help ? undefined : flag?.text
+  const parts = flag?.kind === 'exceeded' ? [said, help, mark] : [help, mark, said]
+  return parts.filter(Boolean).join(' ') || undefined
+}
 
 /** A twist typed as "8" or "1 in 8" reads "1:8" once the field is left; none when it is as is. */
 function retypedTwist(quantity: Quantity, text: string, si: number | undefined) {

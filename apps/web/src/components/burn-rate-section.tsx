@@ -3,7 +3,7 @@
 import type { Powder } from '@open-reloading/schema'
 import Link from 'next/link'
 import { useTranslation } from '../i18n/language.ts'
-import { formatNumber, plainNumber } from '../i18n/number.ts'
+import { formatNumber } from '../i18n/number.ts'
 import { msg } from '../i18n/translate.ts'
 import {
   classifyPowder,
@@ -20,7 +20,7 @@ import { FieldTable } from './field-table.tsx'
 import { Panel } from './panel.tsx'
 import { RateBar, RateTicks } from './rate-scale.tsx'
 
-/** A powder of the burn-rate order as a neighbour link. */
+/** A powder of the burn-rate order as a neighbour link; `label` leaves out the page powder's manufacturer. */
 export type Neighbour = { id: string; label: string; order: number; rate?: number | undefined }
 
 /** The powder's place in the burn-rate order of all fitted powders (`neighbours` in `burn-rate.ts`). */
@@ -33,6 +33,7 @@ export interface BurnRatePlace {
   domain: RateDomain
 }
 
+/** A neighbour list: the unit of the mean vivacities once, in the heading. */
 function Neighbours({ title, rows }: { title: string; rows: Neighbour[] }) {
   const { t } = useTranslation()
   return (
@@ -81,23 +82,9 @@ export function BurnRateSummary({
   const p = classifyPowder(powder, names)
   const n2 = (x: number) => formatNumber(x, 2)
   const m = isFitted(p) ? meanRate(p) : undefined
+  // the burn-rate order is the strip's Burn rate card: not repeated here
   const rows: FieldRow[] = isFitted(p)
     ? [
-        ...(place
-          ? [
-              {
-                label: msg('Burn-rate order'),
-                text: `${place.order} of ${place.total}`,
-                words: [
-                  worded(msg('{order} of {total}'), {
-                    order: plainNumber(place.order),
-                    total: plainNumber(place.total),
-                  }),
-                ],
-                method: msg('1 = fastest.'),
-              },
-            ]
-          : []),
         {
           label: msg('Mean vivacity'),
           text: `${n2(m?.value ?? 0)}${m?.low === undefined || m.high === undefined ? '' : ` (${n2(m.low)} to ${n2(m.high)})`}`,
@@ -133,8 +120,14 @@ export function BurnRateSummary({
           {/* the only fitted powder has no neighbours: no "None" twice */}
           {place && place.faster.length + place.slower.length > 0 && (
             <div className="burn-neighbours">
-              <Neighbours title={t('Faster')} rows={place.faster} />
-              <Neighbours title={t('Slower')} rows={place.slower} />
+              <Neighbours
+                title={t('Faster ({unit})', { unit: vivacityUnit })}
+                rows={place.faster}
+              />
+              <Neighbours
+                title={t('Slower ({unit})', { unit: vivacityUnit })}
+                rows={place.slower}
+              />
               <p className="record-note">
                 {t(
                   'A neighbour is a candidate, not a substitute: it needs a new charge workup before it replaces this powder.',

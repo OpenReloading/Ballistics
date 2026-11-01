@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { MagnifyingGlass } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
@@ -104,10 +105,29 @@ export function SlashBreaks({ text }: { text: string }) {
   )
 }
 
+/** A row's links, as the listed cartridges of a powder: separated as the plain text is, free to wrap. */
+function RowLinks({ links }: { links: NonNullable<FieldRow['links']> }) {
+  return links.map((l, i) => (
+    <Fragment key={l.href}>
+      {i > 0 && '; '}
+      <Link href={l.href}>{l.text}</Link>
+    </Fragment>
+  ))
+}
+
 function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
   const { t } = useTranslation()
-  const value = <SlashBreaks text={rowValue(row, system, t)} />
   const notes = rowNotes(row, t)
+  if (row.links)
+    return (
+      <TableTr>
+        <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
+        <TableTd className="field-links">
+          <RowLinks links={row.links} />
+        </TableTd>
+      </TableTr>
+    )
+  const value = <SlashBreaks text={rowValue(row, system, t)} />
   return (
     <TableTr>
       <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>

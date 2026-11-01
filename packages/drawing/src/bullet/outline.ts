@@ -71,6 +71,9 @@ interface Refused {
   fields: string[]
 }
 
+/** A note of the outline, or one whose lengths are written once the length unit is known. */
+type Note = string | ((length: LengthText) => string)
+
 /** The half profile of a bullet with the quantities derived from it, in mm, mm², mm³ and degrees. */
 export interface Outline {
   /**
@@ -178,19 +181,24 @@ export function profileCrossesItself(points: SectionPoint[]): boolean {
 /**
  * Bullet outline from the given dimensions; stated proportions stand in for missing ones and
  * are named in the notes. Input that cannot form an outline returns a reason. Ogive radius and
- * Rt/R as defined by McCoy, ARBRL-TR-02293, 1981, PDF p. 13. A refusal writes its lengths in `unit`.
+ * Rt/R as defined by McCoy, ARBRL-TR-02293, 1981, PDF p. 13. A refusal and the notes write their
+ * lengths in `unit`.
  */
 export function bulletOutline(
   b: BulletDimensions,
   given: 'sourced' | 'entered' = 'sourced',
   unit: LengthUnit = 'mm',
 ): Outline | Refusal {
-  const o = outlineOf(b, given)
+  const o = outlineOf(b, given, inUnit(unit))
   return 'reason' in o ? { reason: o.reason(inUnit(unit)), fields: o.fields } : o
 }
 
-/** The outline of `bulletOutline`, or a refusal not yet written in a length unit. */
-function outlineOf(b: BulletDimensions, given: 'sourced' | 'entered'): Outline | Refused {
+/** The outline of `bulletOutline` with its notes in `length`, or a refusal not yet written in a length unit. */
+function outlineOf(
+  b: BulletDimensions,
+  given: 'sourced' | 'entered',
+  length: LengthText,
+): Outline | Refused {
   const { diameter: d, length: L } = b
   if (!(d > 0) || !(L > 0))
     return fail(
@@ -198,7 +206,7 @@ function outlineOf(b: BulletDimensions, given: 'sourced' | 'entered'): Outline |
       ...(d > 0 ? [] : ['diameter']),
       ...(L > 0 ? [] : ['length']),
     )
-  const notes: string[] = []
+  const notes: Note[] = []
   const front = noseFront(b, given, notes)
   if ('reason' in front) return front
   const { base, n, nTag, z0, m, mTag, curve, noseTag } = front
@@ -226,11 +234,19 @@ function outlineOf(b: BulletDimensions, given: 'sourced' | 'entered'): Outline |
     mTag,
     ...mouth,
   })
-  return closeOutline(assembled, { cavity, tip, n, nTag, bearingLength: z0 - base.t, L, notes })
+  return closeOutline(assembled, {
+    cavity,
+    tip,
+    n,
+    nTag,
+    bearingLength: z0 - base.t,
+    L,
+    notes: notes.map((n) => (typeof n === 'string' ? n : n(length))),
+  })
 }
 
 /** The base, nose length, meplat and nose curve of a bullet: everything up to the tip and the groove. */
-function noseFront(b: BulletDimensions, given: 'sourced' | 'entered', notes: string[]) {
+function noseFront(b: BulletDimensions, given: 'sourced' | 'entered', notes: Note[]) {
   const base = baseGeometry(b, given, notes)
   if ('reason' in base) return base
   const nose = noseLengthOf(b, base, notes)
@@ -384,12 +400,12 @@ function tailFromDiameterAngle({ ac, given, start }: TailInput, gd: number, ga: 
   return { ...start, rb, rbTag: given, t: (ac - rb) / tan(ga), tTag: 'derived' as const }
 }
 
-function tailFromLength({ ac, start }: TailInput, gl: number, a: number, notes: string[]) {
+function tailFromLength({ ac, start }: TailInput, gl: number, a: number, notes: Note[]) {
   notes.push(`Boat tail drawn at an assumed ${assumedBoatTailAngle} degree angle.`)
   return { ...start, t: gl, rb: Math.max(ac - gl * tan(assumedBoatTailAngle), 0.5 * a) }
 }
 
-function tailFromDiameter({ ac, given, start }: TailInput, gd: number, notes: string[]) {
+function tailFromDiameter({ ac, given, start }: TailInput, gd: number, notes: Note[]) {
   const rb = gd / 2
   if (!(rb < ac)) return noBoatTail(gd)
   notes.push(
@@ -405,7 +421,7 @@ function tailFromDiameter({ ac, given, start }: TailInput, gd: number, notes: st
 }
 
 /** The boat tail from the given length, diameter and angle; assumed values are named in `notes`. */
-function boatTail(c: TailInput, a: number, notes: string[]): Tail | Refused {
+function boatTail(c: TailInput, a: number, notes: Note[]): Tail | Refused {
   const { gl, gd, ga } = c
   if (gl !== undefined && gd !== undefined) return tailFromLengthDiameter(c, gl, gd)
   if (gl !== undefined && ga !== undefined) return tailFromLengthAngle(c, gl, ga)
@@ -445,12 +461,12 @@ function shapedTail(
   b: BulletDimensions,
   given: 'sourced' | 'entered',
   start: Tail,
-  notes: string[],
+  notes: Note[],
 ): Tail | Refused {
   let s = 0
   if (b.base?.type === 'rebated-boat-tail') {
     s = 0.015 * b.diameter
-    notes.push(`The rebate depth is assumed: 0.015 d, ${mm(s)}.`)
+    notes.push((l) => `The rebate depth is assumed: 0.015 d, ${l(s)}.`)
   }
   const { length: gl, diameter: gd, angle: ga } = b.base ?? {}
   const a = b.diameter / 2
@@ -460,12 +476,13 @@ function shapedTail(
 }
 
 /** A base without a boat tail: flat, with a note where the record names no flat base. */
-function unshapedTail(start: Tail, flatFaced: boolean, gl: number | undefined, notes: string[]) {
+function unshapedTail(start: Tail, flatFaced: boolean, gl: number | undefined, notes: Note[]) {
   if (!flatFaced)
     notes.push(
       gl === undefined
         ? 'The record has no base type: the base is drawn flat.'
-        : `The record gives a base length of ${gl} mm without a base type: the base is drawn flat.`,
+        : (l) =>
+            `The record gives a base length of ${l(gl)} without a base type: the base is drawn flat.`,
     )
   return start
 }
@@ -474,7 +491,7 @@ function unshapedTail(start: Tail, flatFaced: boolean, gl: number | undefined, n
 function baseGeometry(
   b: BulletDimensions,
   given: 'sourced' | 'entered',
-  notes: string[],
+  notes: Note[],
 ): BaseGeometry | Refused {
   const { diameter: d, length: L } = b
   const a = d / 2
@@ -518,7 +535,7 @@ interface Cavity {
 function cavityGeometry(
   b: BulletDimensions,
   rb: number,
-  notes: string[],
+  notes: Note[],
 ): Cavity | Refused | undefined {
   const type = b.base?.type
   if (!isHollow(type)) return
@@ -543,7 +560,8 @@ function cavityGeometry(
     )
   const shape = type === 'conical-hollow-base' ? 'cone' : 'hemisphere'
   notes.push(
-    `The cavity depth is assumed: a ${shape} as deep as its opening is wide at its radius, ${mm(r)}.`,
+    (l) =>
+      `The cavity depth is assumed: a ${shape} as deep as its opening is wide at its radius, ${l(r)}.`,
   )
   const points: SectionPoint[] =
     type === 'conical-hollow-base'
@@ -566,7 +584,7 @@ function cavityGeometry(
 function noseLengthOf(
   b: BulletDimensions,
   { t, tailKnown }: BaseGeometry,
-  notes: string[],
+  notes: Note[],
 ): { n: number; nTag: Tag } | Refused {
   const { diameter: d, length: L } = b
   const bearing = b.bearingLength
@@ -604,7 +622,8 @@ function noseLengthOf(
   }
   const n = Math.min(Math.min(2 * d, 0.6 * L), L - t)
   notes.push(
-    `The record has no nose length: an assumed nose of ${n.toFixed(2)} mm is drawn and no jump is given.`,
+    (l) =>
+      `The record has no nose length: an assumed nose of ${l(n)} is drawn and no jump is given.`,
   )
   return { n, nTag: 'approximate' }
 }
@@ -613,7 +632,7 @@ function noseLengthOf(
 function meplatRadius(
   b: BulletDimensions,
   given: 'sourced' | 'entered',
-  notes: string[],
+  notes: Note[],
 ): { m: number; mTag: Tag } | Refused {
   const d = b.diameter
   const form = b.ogive?.form
@@ -672,7 +691,7 @@ function ogiveRatio(
   form: string | undefined,
   given: number | undefined,
   { n, k, rt }: { n: number; k: number; rt: number },
-  notes: string[],
+  notes: Note[],
 ): { used: number; formTag: Tag } | Refused {
   let q = given
   let formTag: Tag = 'derived'
@@ -730,7 +749,7 @@ function hybridNose(
   { L, a, z0, m, rt, R }: NoseFrame,
   zSteps: number[],
   formTag: Tag,
-  notes: string[],
+  notes: Note[],
 ): NoseCurve | Refused {
   const r1 = rt / 2
   const c1: SectionPoint = [a - r1, z0]
@@ -764,12 +783,7 @@ function hybridNose(
  * a cone, a secant or tangent ogive of radius R = Rt / (Rt/R), or a hybrid of a blend arc and a
  * secant arc.
  */
-function noseCurve(
-  b: BulletDimensions,
-  n: number,
-  m: number,
-  notes: string[],
-): NoseCurve | Refused {
+function noseCurve(b: BulletDimensions, n: number, m: number, notes: Note[]): NoseCurve | Refused {
   const L = b.length
   const a = b.diameter / 2
   const z0 = L - n
@@ -814,7 +828,7 @@ function tipSplit(
   b: BulletDimensions,
   n: number,
   noseTag: Tag,
-  notes: string[],
+  notes: Note[],
 ): { tipStart: number; tag: Tag } | Refused | undefined {
   if (b.tip?.type !== 'polymer-tip') return
   const tl = b.tip.length ?? 0.2 * n
@@ -833,7 +847,7 @@ function hollowPointMouth(
   b: BulletDimensions,
   m: number,
   given: 'sourced' | 'entered',
-  notes: string[],
+  notes: Note[],
 ): { mouth: number; mouthTag: Tag } | Refused {
   let mouth = 0
   let mouthTag: Tag = given
@@ -867,7 +881,7 @@ function cannelureGeometry(
   b: BulletDimensions,
   t: number,
   z0: number,
-  notes: string[],
+  notes: Note[],
 ): Groove | Refused | undefined {
   const cn = b.cannelure
   if (!cn) return
