@@ -1842,7 +1842,7 @@
                             "required": ["value"],
                             "additionalProperties": false,
                             "unit": "g",
-                            "description": "Mass of water filling the case to the level `fillLevel` names, the mouth when absent."
+                            "description": "Mass of water filling the case to `fillLevel`."
                           },
                           "caseManufacturer": {
                             "type": "string",
@@ -1857,16 +1857,16 @@
                           "primerState": {
                             "type": "string",
                             "enum": ["primed-spent", "unprimed"],
-                            "description": "The primer pocket when the water was filled: a spent primer seated, or no primer. Absent: the source does not state it. The volume derived from `waterCapacity` does not read it."
+                            "description": "Primer pocket when filled: a spent primer seated, or none. Absent: not stated."
                           },
                           "fillLevel": {
                             "type": "string",
                             "enum": ["mouth"],
-                            "description": "How high the water was filled: to the case mouth. Absent: the source does not state it, and the mouth is taken."
+                            "description": "How high the water was filled. Absent: not stated, the mouth is taken."
                           },
                           "convention": {
                             "not": {},
-                            "description": "Refused: the earlier free text, replaced by `primerState` and `fillLevel`."
+                            "description": "Refused, see primerState."
                           },
                           "note": {
                             "type": "string",
@@ -19991,7 +19991,7 @@
                                   },
                                   "required": ["value"],
                                   "unit": "g",
-                                  "description": "Mass of water filling the case to the level `fillLevel` names, the mouth when absent."
+                                  "description": "Mass of water filling the case to `fillLevel`."
                                 },
                                 "caseManufacturer": {
                                   "type": "string",
@@ -20006,16 +20006,16 @@
                                 "primerState": {
                                   "type": "string",
                                   "enum": ["primed-spent", "unprimed"],
-                                  "description": "The primer pocket when the water was filled: a spent primer seated, or no primer. Absent: the source does not state it. The volume derived from `waterCapacity` does not read it."
+                                  "description": "Primer pocket when filled: a spent primer seated, or none. Absent: not stated."
                                 },
                                 "fillLevel": {
                                   "type": "string",
                                   "enum": ["mouth"],
-                                  "description": "How high the water was filled: to the case mouth. Absent: the source does not state it, and the mouth is taken."
+                                  "description": "How high the water was filled. Absent: not stated, the mouth is taken."
                                 },
                                 "convention": {
                                   "not": {},
-                                  "description": "Refused: the earlier free text, replaced by `primerState` and `fillLevel`."
+                                  "description": "Refused, see primerState."
                                 },
                                 "note": {
                                   "type": "string",

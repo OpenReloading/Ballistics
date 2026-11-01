@@ -18,9 +18,7 @@ export const caseCapacity = z
       .enum(['catalogue', 'user', 'shared'])
       .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
     cartridge: ref('cartridge'),
-    waterCapacity: quantity('mass').describe(
-      'Mass of water filling the case to the level `fillLevel` names, the mouth when absent.',
-    ),
+    waterCapacity: quantity('mass').describe('Mass of water filling the case to `fillLevel`.'),
     caseManufacturer: ref('manufacturer')
       .describe('The manufacturer of the case, when the source names one.')
       .optional(),
@@ -30,22 +28,15 @@ export const caseCapacity = z
       .optional(),
     primerState: z
       .enum(['primed-spent', 'unprimed'])
-      .describe(
-        'The primer pocket when the water was filled: a spent primer seated, or no primer. Absent: the source does not state it. The volume derived from `waterCapacity` does not read it.',
-      )
+      .describe('Primer pocket when filled: a spent primer seated, or none. Absent: not stated.')
       .optional(),
     fillLevel: z
       .enum(['mouth'])
-      .describe(
-        'How high the water was filled: to the case mouth. Absent: the source does not state it, and the mouth is taken.',
-      )
+      .describe('How high the water was filled. Absent: not stated, the mouth is taken.')
       .optional(),
     convention: z
-      .never({
-        error:
-          'convention is gone: state primerState and fillLevel, and the water temperature in note (no migration before 1.0)',
-      })
-      .describe('Refused: the earlier free text, replaced by `primerState` and `fillLevel`.')
+      .never({ error: 'Replaced by primerState and fillLevel' })
+      .describe('Refused, see primerState.')
       .optional(),
     note: z.string().min(1).describe('Notes on the measurement.').optional(),
     provenance: provenance
