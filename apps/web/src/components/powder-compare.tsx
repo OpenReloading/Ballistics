@@ -375,8 +375,10 @@ function useKeptTab(
   names: ReadonlyMap<string, string>,
 ) {
   const { powderTab } = useLoad()
+  // what the load kept when the tab opened (the tab mounts afresh for each opened load)
+  const [opened] = useState(powderTab.saved)
   const idOf = (name: string) => [...names].find(([, n]) => n === name)?.[0]
-  const saved = sameTab(now, first, idOf) ? powderTab.saved : savedPowderTab(now, system, idOf)
+  const saved = sameTab(now, first, idOf) ? opened : savedPowderTab(now, system, idOf)
   const save = powderTab.set
   useEffect(() => save(saved), [save, saved])
 }
@@ -594,7 +596,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
   // the load keeps the mode and the filters; a filter stays while Compute fills the rows again
   const { filters, setFilters, maker, setMaker } = useKeptFilters(first, names)
-  useKeptTab({ kind, fill, targetText, percent: asPercent, filters, maker }, first, system, names)
+  useKeptTab({ kind, fill, targetText, percent, filters, maker }, first, system, names)
   const [sort, setSort] = useState<ColumnSort | undefined>()
   // the columns follow the mode the rows were computed for, not the one chosen since
   const target = study.mode?.kind === 'target'
