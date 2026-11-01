@@ -1,5 +1,7 @@
 {
   "Add at least one ingredient.": "Fügen Sie mindestens einen Bestandteil hinzu.",
+  "{label}: add at least one entry.": "{label}: Fügen Sie mindestens einen Eintrag hinzu.",
+  "{label}: not accepted by the powder record.": "{label}: vom Datensatz des Treibladungspulvers nicht angenommen.",
   "Burn form: 1 + a × z1 must be above 0, and Form q below 1 where Form z1 is below 1.": "Abbrandform: 1 + a × z1 muss größer als 0 sein und Form q kleiner als 1, wenn Form z1 kleiner als 1 ist.",
   "Choose an entry for Values came about by.": "Wählen Sie einen Eintrag für Herkunft der Werte.",
   "Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more.": "Zusammensetzung: Die Min-Anteile müssen zusammen höchstens 100 ergeben und die Max-Anteile mindestens 100.",
