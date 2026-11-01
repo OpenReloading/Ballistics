@@ -352,7 +352,7 @@ function ExportCsvButton({
   onClick,
 }: {
   disabled: boolean
-  /** The browser's firearms are read: before, no reason is given. */
+  /** The browser's firearms were read: before, or after a failed read, no reason is given. */
   loaded: boolean
   onClick: () => void
 }) {
@@ -854,7 +854,7 @@ export function FirearmLibrary() {
             />
             <ExportCsvButton
               disabled={!list?.length}
-              loaded={list !== undefined}
+              loaded={list !== undefined && !readError}
               onClick={() =>
                 list &&
                 void import('../lib/records-csv.ts')
