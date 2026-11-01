@@ -57,6 +57,8 @@ export interface DirectoryColumn<T> {
   help?: Message | undefined
   /** Not printed, as a row action. */
   screenOnly?: boolean
+  /** Held at the box's right edge while the table scrolls sideways, as a row menu. */
+  sticky?: boolean
   /** Shown only in a list box of 64rem or more, so the name keeps its room on a tablet. */
   wide?: boolean
   /** At the header's end, after its label: a scale's ticks. */
@@ -148,7 +150,13 @@ function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
 const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
   c.key === link
     ? 'name-cell'
-    : [c.num && 'num', c.screenOnly && 'screen-only', c.wide && 'wide-only', repeat && 'repeat']
+    : [
+        c.num && 'num',
+        c.screenOnly && 'screen-only',
+        c.wide && 'wide-only',
+        c.sticky && 'sticky-end',
+        repeat && 'repeat',
+      ]
         .filter(Boolean)
         .join(' ') || undefined
 

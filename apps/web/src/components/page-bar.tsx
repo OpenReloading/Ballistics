@@ -206,7 +206,14 @@ export function PageBar({
             onClick={(e) => {
               const t =
                 e.target instanceof Element ? e.target.closest('button, [role="menuitem"]') : null
-              if (open && t && !t.hasAttribute('aria-haspopup')) setOpen(false)
+              // an aria-disabled action does nothing: the panel stays, its tooltip says why
+              if (
+                open &&
+                t &&
+                !t.hasAttribute('aria-haspopup') &&
+                t.getAttribute('aria-disabled') !== 'true'
+              )
+                setOpen(false)
             }}
           >
             <BarStatus value={statusLine}>{actions}</BarStatus>

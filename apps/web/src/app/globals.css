@@ -3036,9 +3036,9 @@ td.nowrap {
   }
 }
 
-/* the firearm table's columns all have a width (93rem): below a window of about 1600 px the table
-   scrolls sideways in its box, above it the filler column takes the room left and the name keeps
-   its width */
+/* the firearm table's columns all have a width (72rem): a 1280 px window holds them, below it the
+   table scrolls sideways in its box with the row menu held at its edge, above it the filler column
+   takes the room left and the name keeps its width */
 @media screen and (min-width: 48em) {
   .library > .directory > .directory-scroll {
     overflow-x: auto;
@@ -3089,8 +3089,16 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
+  color: var(--fg);
+  font-size: var(--mantine-font-size-lg);
+  letter-spacing: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* the card's title is its largest heading: the data card's sections step below it */
+.library-editor .firearm-card h3 {
+  font-size: var(--mantine-font-size-md);
 }
 
 .library-editor .mantine-Input-wrapper {
@@ -3192,6 +3200,11 @@ main .library-head.page-panel-head > .page-panel-title {
 .library-editor .firearm-card {
   display: block;
   overflow-x: auto;
+}
+
+/* the property table's labels in a column of their own width, not half the card */
+.firearm-card tbody th {
+  width: 12em;
 }
 
 @media print {
@@ -10299,8 +10312,38 @@ main .page-bar h1 {
   }
 }
 
-.page-bar-status .file-status > span + span:not(:empty)::before {
-  content: " ";
+/* the state, a message and a failure as parts of one line, not sentences run together */
+.page-bar-status .file-status > span:not(:empty) ~ span:not(:empty)::before {
+  content: " · ";
+}
+
+/* a list's count beside the file status (the firearm library): the count first in its fixed width,
+   the save status after a rule, so a status that comes and goes moves nothing */
+.page-bar-status:has(> .bar-count):has(> .file-status) {
+  display: flex;
+  align-items: baseline;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > :is(.bar-count, .file-status) {
+  margin-inline-start: 0;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > .bar-count {
+  flex: none;
+  order: -1;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > .file-status {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.page-bar-status:has(> .bar-count) > .file-status:has(> :not(:empty)) {
+  margin-inline-start: 0.75rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--border);
 }
 
 .page-bar-actions {
@@ -10559,6 +10602,12 @@ main .page-bar h1 {
   /* a window-high frame is a flex column, where the margin does not merge and the step would take
      8 px of the frame's height: the bar's own 8 px below it in the band is the step */
   .page-shell[data-frame] .page-top > main::before {
+    display: none;
+  }
+
+  /* a Database page starts with its tab strip at the top bar's rule on every tab, framed or not
+     (the frame's lists have no step above the strip) */
+  .page-top > main:has(> .library-tabs)::before {
     display: none;
   }
 }
@@ -10957,6 +11006,24 @@ main .page-bar h1 {
 
 .directory-table .field-note:is(:hover, :focus-visible) {
   text-decoration: underline dotted var(--muted);
+}
+
+/* a row menu held at the box's right edge while the table scrolls sideways (the firearm table),
+   with the row's background and a rule on its left */
+.directory-table :is(th, td).sticky-end {
+  position: sticky;
+  right: 0;
+  background: var(--bg);
+  box-shadow: inset 1px 0 0 var(--border);
+}
+
+.directory-table thead :is(th, td).sticky-end {
+  z-index: 2;
+  background: var(--surface);
+}
+
+.directory-table tr[data-row]:hover > td.sticky-end {
+  background: var(--surface);
 }
 
 /* a group of rows ends: the heavier rule of the record's tables (the browser's own rows end before
