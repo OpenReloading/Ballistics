@@ -12,6 +12,7 @@ import {
   boatTailed,
   hollowBased,
 } from '../lib/bullet.ts'
+import { bulletIncomplete } from '../lib/complete-records.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
 import { say } from '../lib/wording.ts'
@@ -58,6 +59,11 @@ export function BaseFormField() {
     <NativeSelect
       size={controlSize.row.input}
       label={t('Base type')}
+      description={
+        bulletIncomplete(bulletRecord) && !recorded && !bulletBaseType
+          ? t('Not in this record, which only names the bullet: choose the base type.')
+          : undefined
+      }
       value={bulletBaseType ?? recorded ?? ''}
       data={[
         ...(recorded ? [] : [{ value: '', label: t('Not given') }]),

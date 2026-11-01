@@ -15,6 +15,7 @@ import {
   rateDomain,
   uncertaintyFactor,
 } from '../lib/burn-rate.ts'
+import { powderIncomplete } from '../lib/complete-records.ts'
 import { countryOf } from '../lib/countries.ts'
 import {
   fetchManufacturerNames,
@@ -96,7 +97,7 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       // a phone: the name alone, the strip's first card names the manufacturer
       short={p.name}
       // form and base are cards of the strip
-      badges={[]}
+      badges={powderIncomplete(p) ? [msg('Values missing: no burn values')] : []}
       className="record-chart"
       compare={isFitted(curve) ? `/powders/burn-rates?add=${encodeURIComponent(p.id)}` : undefined}
       workbench={workbenchHref('powder', p.id)}

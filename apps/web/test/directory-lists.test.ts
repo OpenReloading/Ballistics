@@ -143,6 +143,8 @@ it('orders powders fastest first and keeps the global order under the search', (
   expect(fast.low).toBeLessThan(fast.meanVivacity as number)
   expect(fast.high).toBeGreaterThan(fast.meanVivacity as number)
   expect(rows.find((r) => r.id === 'h-none')?.burnRateOrder).toBeUndefined()
+  // a row carries whether its record has burn values, for "Complete records only"
+  expect(fast.modelled).toBe(true)
   // searched: Delta's fastest keeps order 2
   expect(rows.filter((r) => powderMatches(r, 'delta')).map((r) => r.burnRateOrder)).toEqual([3, 2])
   expect(unpackPowders(packPowders(rows))).toEqual(rows)
@@ -280,6 +282,18 @@ it('gives a browser design with a curve its mean vivacity, so the overlay can ta
   expect(inOverlay(defined(fitted))).toBe(true)
   expect(unfinished?.meanVivacity).toBeUndefined()
   expect(inOverlay(defined(unfinished))).toBe(false)
+  // a whole interior model counts as burn values, a partly entered one does not
+  expect(fitted?.modelled).toBe(true)
+  const [partial] = userPowderRows([
+    {
+      kind: 'powder',
+      id: 'p3',
+      name: 'Partial',
+      saved,
+      data: { origin: 'user', draft: { interior: { vivacity: interior.vivacity } } },
+    },
+  ])
+  expect(partial?.modelled).toBeUndefined()
 
   const design = (id: string, data: object) => ({
     kind: 'powder' as const,

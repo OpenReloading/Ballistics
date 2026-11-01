@@ -281,10 +281,16 @@ export function landsFor(lands: LandsContact | undefined, bulletRef: string | un
   return { contact: same ? lands : undefined, other: lands !== undefined && !same }
 }
 
-/** What a firearm gives the workbench's Gun card: twist, barrel length (m), mass (kg) and lands contact. */
+/**
+ * What a firearm gives the workbench: twist, barrel length, measured bore and groove diameter and
+ * freebore (m), mass (kg) and lands contact.
+ */
 export const gunValues = (f: Firearm) => ({
   twist: siOf('length', f.twist),
   barrelLength: siOf('length', f.barrelLength),
+  boreDiameter: siOf('length', f.boreDiameter),
+  grooveDiameter: siOf('length', f.grooveDiameter),
+  freebore: siOf('length', f.freebore),
   firearmMass: siOf('mass', f.firearmMass),
   lands: landsOf(f),
 })

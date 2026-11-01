@@ -5,6 +5,7 @@ import { Flask } from '@phosphor-icons/react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { compareFrom } from '../lib/compare-ids.ts'
+import { bulletIncomplete } from '../lib/complete-records.ts'
 import { countryOf } from '../lib/countries.ts'
 import {
   fetchManufacturerNames,
@@ -35,6 +36,7 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
     b.productLine && worded(msg('Line {line}'), { line: b.productLine }),
     b.caliber && worded(msg('Caliber {caliber}'), { caliber: b.caliber }),
     b.productNumber && worded(msg('Product {number}'), { number: b.productNumber }),
+    bulletIncomplete(b) && msg('Values missing: the record only names the bullet'),
   ].filter((x): x is Wording => !!x)
   const coefficients = ballisticCoefficientRows(b)
   return (

@@ -13,6 +13,7 @@ import {
 } from '../lib/bullet-rows.ts'
 import { type BulletSort, fetchBulletCatalogue, searchBullets } from '../lib/bullet-search.ts'
 import { caliberOptions, commonCaliber } from '../lib/caliber.ts'
+import { bulletIncomplete } from '../lib/complete-records.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { type ChooserKind, manufacturerSelect, RecordChooser } from './record-chooser.tsx'
 
@@ -98,6 +99,7 @@ export const bulletKind: ChooserKind<BulletRow> = {
     ]
   },
   href: (row) => `/bullets/${row.id}`,
+  incomplete: bulletIncomplete,
 }
 
 /**

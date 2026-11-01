@@ -80,6 +80,7 @@ import {
 } from '../lib/units.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { type UserBulletView, userBullets } from '../lib/variants.ts'
+import { type CapacityRule, capacityFraction } from '../lib/volume-tolerance.ts'
 import { AppModal } from './app-modal.tsx'
 import { NumberField } from './number-field.tsx'
 import { RecordSearch, useChooser } from './record-search.tsx'
@@ -143,6 +144,10 @@ export type Seated = {
   baseToOgive?: number
   /** Seating depth and the barrel length of the seating, m, for print. */
   depth?: number
+  /** Jump to the lands or the leade, m, below 0 into them: the engraving ramp of a run starts there. */
+  jump?: number
+  /** The tolerance of the case capacity, relative to it, and its rule (`volume-tolerance.ts`). */
+  capacity?: { fraction: number; rule: CapacityRule }
   barrel?: number
   /** The barrel length of the preview's field, m, seated or not: the start pressure rule reads it. */
   barrelField?: number
@@ -318,6 +323,8 @@ type PreviewProps = {
    */
   lands?: LandsContact | undefined
   landsOther?: boolean | undefined
+  /** The chosen firearm's measured freebore, m: the leade starts there past the chamber L3 instead of at the CIP s. */
+  freebore?: number | undefined
   /** The seating at another length, for a seating ladder; undefined while no bullet is seated. */
   onSeatLadder?: (seatAt: SeatingLengths | undefined) => void
   /**
@@ -349,8 +356,10 @@ type PreviewProps = {
     values?: BulletValues | undefined
     /** The base form typed over the record's. */
     baseType?: BaseType | undefined
-    /** The case length L3 typed over the sheet's, mm. */
+    /** The case length L3 typed over the sheet's, or the trim length of the chosen brass, mm. */
     caseLength?: number | undefined
+    /** The name of the brass whose trim length `caseLength` is; none: the length was typed. */
+    caseLengthBrass?: string | undefined
   }
   /**
    * Where the controls go instead of beside the drawing: case capacity, seating and the
@@ -543,6 +552,8 @@ function useGeometry(o: {
   caseLength: number | undefined
   shown: RefObject<UnitSystem>
   lands: LandsMm | undefined
+  /** The firearm's freebore, mm: the chamber's leade start s. */
+  freebore: number | undefined
   /** The page's length unit, for the lengths in a refusal's reason. */
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
@@ -556,6 +567,7 @@ function useGeometry(o: {
     caseLength,
     shown,
     lands,
+    freebore,
     unit,
   } = o
   const draftSpec = draft?.spec
@@ -565,7 +577,10 @@ function useGeometry(o: {
     () => (own && caseLength !== undefined ? withCaseLength(own, caseLength) : own),
     [own, caseLength],
   )
-  const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
+  const chamber = useMemo(() => {
+    const c = spec && chamberOf(spec.values)
+    return c && freebore !== undefined ? { ...c, leadeStart: freebore } : c
+  }, [spec, freebore])
   const capacities = capacitiesOf(detail)
   // the typed values in place, one object per record, design or values, so the shape is not rebuilt for each render
   const design = useMemo(
@@ -775,6 +790,7 @@ function seatAtOf(
       return {
         volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
         travel: s.travel && toSi('length', s.travel.value),
+        jump: s.jump.value === undefined ? undefined : toSi('length', s.jump.value),
       }
     },
   }
@@ -790,6 +806,23 @@ const figureOf = (spec: Spec | undefined, seating: Seating | undefined) =>
       }
     : undefined
 
+/**
+ * The tolerance of the capacity in use (`capacityFraction`): a measured one with the spread of the
+ * chosen brass group when the measured value is the group's.
+ */
+function capacityOf(
+  water: { grams: number; source: 'measured' | 'capacity' | 'case' } | undefined,
+  records: readonly Capacity[],
+  own: readonly OwnCase[] | undefined,
+  ownId: string | undefined,
+) {
+  if (!water) return
+  const group = own?.find((c) => c.id === ownId)
+  const theirs =
+    group?.grams !== undefined && Math.abs(group.grams - water.grams) <= 1e-9 * water.grams
+  return capacityFraction({ ...water, spread: theirs ? group.spread : undefined, records })
+}
+
 /** What the page's fields follow, from the seating; none seated reports `{}`. */
 function seatedReport(o: {
   caseVolume: number | undefined
@@ -799,18 +832,22 @@ function seatedReport(o: {
   mode: Mode
   atStart: boolean
   figure: Seated['figure']
+  capacity: Seated['capacity']
 }): Seated {
-  const { caseVolume, unseated, seating, barrel, mode, atStart, figure } = o
+  const { caseVolume, unseated, seating, barrel, mode, atStart, figure, capacity } = o
   const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
   const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
+  const jump = seating?.jump.value
   return {
     ...(caseVolume !== undefined && { caseVolume }),
+    ...(caseVolume !== undefined && capacity && { capacity }),
     ...(unseated && { unseated }),
     ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
     ...(travel !== undefined && { travel: toSi('length', travel) }),
     ...(coal !== undefined && { overallLength: toSi('length', coal) }),
     ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
     ...(depth !== undefined && { depth: toSi('length', depth) }),
+    ...(jump !== undefined && { jump: toSi('length', jump) }),
     ...(coal !== undefined && barrel !== undefined && { barrel }),
     ...(barrel !== undefined && { barrelField: barrel }),
     ...(coal !== undefined && { mode, atStart }),
@@ -838,15 +875,17 @@ function useReportSeated(
     [],
   )
   useEffect(() => () => send.cancel(), [send])
-  const { caseVolume, unseated, seating, barrel, mode, atStart, figure } = o
+  const { caseVolume, unseated, seating, barrel, mode, atStart, figure, capacity } = o
   const key = [
     caseVolume,
+    capacity?.fraction,
     JSON.stringify(unseated),
     seating?.volumeBehindBullet?.value,
     seating?.travel?.value,
     seating?.coal.value,
     seating?.cbto?.value,
     seating?.depth.value,
+    seating?.jump.value,
     barrel,
     mode,
     atStart,
@@ -854,7 +893,16 @@ function useReportSeated(
   // no seated bullet reports {}: the page forgets the earlier seating
   // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
   useEffect(() => {
-    const values = seatedReport({ caseVolume, unseated, seating, barrel, mode, atStart, figure })
+    const values = seatedReport({
+      caseVolume,
+      unseated,
+      seating,
+      barrel,
+      mode,
+      atStart,
+      figure,
+      capacity,
+    })
     if (sliding) return send.push(values)
     send.cancel()
     startTransition(() => seated.current(values))
@@ -982,6 +1030,7 @@ function useSeatingModel(p: PreviewProps) {
     design,
     shown,
     lands,
+    freebore: p.freebore === undefined ? undefined : fromSi('length', p.freebore),
     unit: drawingLengthUnit(system),
   })
   const chosenCase =
@@ -1124,7 +1173,16 @@ function useSeatingModel(p: PreviewProps) {
   })
   useReportSeated(
     p.onSeated,
-    { caseVolume, unseated, seating, barrel: barrel.si, mode: seatMode, atStart, figure },
+    {
+      caseVolume,
+      unseated,
+      seating,
+      barrel: barrel.si,
+      mode: seatMode,
+      atStart,
+      figure,
+      capacity: capacityOf(water, capacities, p.ownCases, p.ownCaseId),
+    },
     sliding,
   )
 
@@ -1981,9 +2039,11 @@ function FigureValues({ m, seating }: { m: Model; seating: Seating }) {
 function SeatingNotes({
   seating,
   landsOther,
+  freebore,
 }: {
   seating: Seating
   landsOther?: boolean | undefined
+  freebore?: boolean | undefined
 }) {
   const { t } = useTranslation()
   return (
@@ -1998,6 +2058,13 @@ function SeatingNotes({
           'Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth changes pressure.',
         )}
       </p>
+      {freebore && seating.jump.source === 'chamber' && (
+        <p className="note">
+          {t(
+            "The leade starts at your firearm's measured freebore past the chamber L3, not at the CIP s.",
+          )}
+        </p>
+      )}
       {landsOther && (
         <p className="note">
           {t(
@@ -2148,6 +2215,12 @@ function JumpRow({ m, seating }: RowsProps) {
 /** The seating depth's note: where the case length comes from. */
 function seatingNote(m: Model, chamber: Chamber, t: Translator['t']) {
   const length = m.mm(chamber.caseLength)
+  const brass = m.p.linked?.caseLengthBrass
+  if (brass !== undefined)
+    return t('case length: trim length of your brass group {name} {length}', {
+      name: brass,
+      length,
+    })
   if (m.p.linked?.caseLength !== undefined) return t('case length: L3 typed {length}', { length })
   return m.designed
     ? t('case length: cartridge L3 of the design {length}', { length })
@@ -2192,7 +2265,13 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         {aside(slots, <JumpRow {...rows} />, more)}
       </dl>
       {contact && !card && <ErrorNote color="orange">{contact}</ErrorNote>}
-      {!card && <SeatingNotes seating={seating} landsOther={m.p.landsOther} />}
+      {!card && (
+        <SeatingNotes
+          seating={seating}
+          landsOther={m.p.landsOther}
+          freebore={m.p.freebore !== undefined}
+        />
+      )}
     </div>
   )
 }
@@ -2212,7 +2291,11 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
         seating &&
         createPortal(
           <div>
-            <SeatingNotes seating={seating} landsOther={m.p.landsOther} />
+            <SeatingNotes
+              seating={seating}
+              landsOther={m.p.landsOther}
+              freebore={m.p.freebore !== undefined}
+            />
           </div>,
           slots.more,
         )}
