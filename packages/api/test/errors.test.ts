@@ -93,6 +93,7 @@ describe('error bodies', () => {
         'target-mappings',
         'target-faces',
         'caliber-classes',
+        'event-types',
       ]) {
         const res = await app.inject({ url: `${API_PREFIX}/${list}?tables=I` })
         expect([list, res.statusCode]).toEqual([list, 400])

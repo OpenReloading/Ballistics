@@ -5,6 +5,7 @@ import {
   summaryCsv,
   summaryFileName,
   summaryRows,
+  summaryYears,
   yearSummary,
 } from '../src/lib/shooting-log-summary.ts'
 
@@ -36,7 +37,27 @@ const firearm = (id: string, name: string, cartridge: string) =>
 const load = (id: string, name: string, data: Record<string, unknown>) =>
   userRecord.parse({ kind: 'load', id, name, saved, data: { origin: 'user', ...data } })
 
+const match = '4f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
+const event = (id: string, name: string, date: string) =>
+  userRecord.parse({
+    kind: 'event',
+    id,
+    name,
+    saved,
+    data: {
+      date,
+      eventType: 'catalogue:dsb-meisterschaft',
+      level: 'Landesmeisterschaft',
+      state: 'completed',
+      results: { method: 'rings', series: [{ total: 95 }] },
+    },
+  })
+
 const records: UserRecord[] = [
+  event(match, 'Club match', '2026-07-01'),
+  // an event of the year that no entry links, and one of another year
+  event('5f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13', 'Open day', '2026-09-12'),
+  event('6f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13', 'Winter cup', '2025-12-06'),
   firearm(rifle, 'Bench rifle', 'catalogue:308-win'),
   firearm(pistol, 'Club pistol', 'catalogue:9-mm-luger'),
   load(ownLoad, 'Load A', { cartridge: 'catalogue:308-win', firearm: `user:${rifle}` }),
@@ -52,7 +73,7 @@ const entries = [
     firearm: `user:${pistol}`,
     load: `user:${pistolLoad}`,
     rounds: 100,
-    event: `user:${rifle.replace('3f', '4f')}`,
+    event: `user:${match}`,
     result: '2nd place',
   }),
   // no load: counted under its firearm only
@@ -97,10 +118,24 @@ describe('yearSummary', () => {
     expect(yearSummary([lost], [], '2026').cartridges).toEqual([{ ref: '', rounds: 3, entries: 1 }])
   })
 
-  it('counts the entries per month and lists the competitions of the year', () => {
+  it('counts the entries per month and lists the competition events of the year once, with the entries that link them', () => {
     const s = yearSummary(entries, records, '2026')
     expect(s.months).toEqual([0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 1])
-    expect(s.events.map((r) => r.data.date)).toEqual(['2026-07-01'])
+    expect(s.events.map((e) => [e.event.name, e.entries.map((r) => r.id)])).toEqual([
+      ['Club match', [entries[3]?.id]],
+      ['Open day', []],
+    ])
+    expect(yearSummary(entries, records, '2025').events.map((e) => e.event.name)).toEqual([
+      'Winter cup',
+    ])
+    // an entry of another year that links the event is not counted under it
+    const late = entry(8, { date: '2027-01-02', rounds: 7, event: `user:${match}` })
+    expect(yearSummary([...entries, late], records, '2026').events[0]?.entries).toHaveLength(1)
+  })
+
+  it('offers the years of the entries and of the events', () => {
+    const events = records.filter((r) => r.kind === 'event')
+    expect(summaryYears(entries.slice(1, 2), events as never)).toEqual(['2026', '2025'])
   })
 })
 
@@ -129,7 +164,10 @@ describe('summary CSV', () => {
     expect(rows.find((r) => r[0] === 'Without a load')).toEqual(['Without a load', '', 45, ''])
     expect(rows.filter((r) => r[0] === 'Month')).toHaveLength(12)
     expect(rows.find((r) => r[1] === '2026-03')).toEqual(['Month', '2026-03', '', 2])
-    expect(rows.find((r) => r[0] === 'Competition')).toEqual(['Competition', '2026-07-01', 100, 1])
+    expect(rows.filter((r) => r[0] === 'Competition')).toEqual([
+      ['Competition', '2026-07-01 Club match', 100, 1],
+      ['Competition', '2026-09-12 Open day', 0, 0],
+    ])
     expect(rows.at(-1)).toEqual(['Total', '', 195, 5])
     expect(summaryCsv(s, names).startsWith('﻿Year,2026\n')).toBe(true)
   })

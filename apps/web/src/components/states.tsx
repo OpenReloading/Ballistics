@@ -273,6 +273,7 @@ const unavailableLines = {
   Cartridge: msg('Cartridge data is unavailable right now.'),
   Case: msg('Brass data is unavailable right now.'),
   Discipline: msg('Discipline data is unavailable right now.'),
+  'Event type': msg('Event type data is unavailable right now.'),
   Federation: msg('Federation data is unavailable right now.'),
   Powder: msg('Powder data is unavailable right now.'),
   Primer: msg('Primer data is unavailable right now.'),

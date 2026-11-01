@@ -126,7 +126,7 @@ export const sections = [
           'The published records, each with its source, and your own next to them: your firearms, cartridges, brass, primers, powders, bullets, targets, disciplines and federations.',
         ),
         tabs: databaseTabs,
-        covers: ['/my-cases'],
+        covers: ['/my-cases', '/events'],
       },
     ],
   },

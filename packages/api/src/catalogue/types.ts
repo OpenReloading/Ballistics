@@ -7,6 +7,7 @@ import type {
   CatalogueCase,
   CatalogueCaseCapacity,
   Discipline,
+  EventType,
   Federation,
   Manufacturer,
   Powder,
@@ -32,6 +33,7 @@ export type CatalogueKind =
   | 'discipline'
   | 'targetMapping'
   | 'caliberClass'
+  | 'eventType'
 
 /** The record type of each {@link CatalogueKind}. */
 export interface RecordOfKind {
@@ -49,6 +51,7 @@ export interface RecordOfKind {
   discipline: Discipline
   targetMapping: TargetMapping
   caliberClass: CaliberClass
+  eventType: EventType
 }
 
 /**
@@ -240,6 +243,14 @@ export interface CaliberClassItem {
   diameterMm: number
 }
 
+/** An event type of the list: its federation and scoring method. */
+export interface EventTypeItem {
+  id: string
+  name: string
+  federation: string
+  method: 'hit-factor' | 'rings'
+}
+
 /**
  * A row of the index: the list item, the key it is ordered by (`sortKey` of the schema package)
  * and the key it is searched by (`searchKey`). Rows are stored in the default order of their list.
@@ -257,7 +268,7 @@ export const catalogueFormat = 1
  * The version of what `derive.ts` computes (list items, sort and search keys, revisions). Raise it
  * with any change to those, so a build made by older code is refused instead of read as current.
  */
-export const deriveVersion = 6
+export const deriveVersion = 7
 
 /** The first fields of the index and of the record file: what built them. */
 export interface CatalogueHeader {
@@ -278,6 +289,7 @@ export interface CatalogueIndex extends CatalogueHeader {
   disciplines: IndexRow<DisciplineItem>[]
   targetMappings: IndexRow<TargetMappingItem>[]
   caliberClasses: IndexRow<CaliberClassItem>[]
+  eventTypes: IndexRow<EventTypeItem>[]
   /** The capacity record ids of each cartridge that has any, ordered by id. */
   capacities: Record<string, string[]>
   /** The ids that no longer name a record, by kind, each with the id that replaces it. */
@@ -303,6 +315,8 @@ export interface CatalogueSource {
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
   caliberClasses: CaliberClass[]
+  /** Absent: none, as in a bundle without event types. */
+  eventTypes?: EventType[] | undefined
   /** `renames.json` of the records; absent: none. */
   renames?: Renames | undefined
 }
@@ -341,6 +355,8 @@ export interface Catalogue {
   }): CataloguePage<TargetMappingItem>
   /** Caliber classes by nominal diameter. */
   caliberClasses(): CataloguePage<CaliberClassItem>
+  /** Event types by name. */
+  eventTypes(): CataloguePage<EventTypeItem>
   /** The record `id` of `kind`; undefined if unknown. */
   get<K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined
   /** The id that replaces `id` of a route kind where it was renamed or removed; undefined otherwise. */

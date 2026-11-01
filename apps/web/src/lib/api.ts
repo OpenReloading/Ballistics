@@ -1,4 +1,11 @@
-import type { Bullet, CatalogueCase, Powder, Primer, TargetFace } from '@open-reloading/schema'
+import type {
+  Bullet,
+  CatalogueCase,
+  EventType,
+  Powder,
+  Primer,
+  TargetFace,
+} from '@open-reloading/schema'
 import { cacheLife } from 'next/cache'
 import type {
   BulletSummary,
@@ -80,6 +87,7 @@ export const getCase = getOne<CatalogueCase>('/cases')
 export const getTargetFace = getOne<TargetFace>('/target-faces')
 export const getDiscipline = getOne<DisciplineRecord>('/disciplines')
 export const getFederation = getOne<FederationRecord>('/federations')
+export const getEventType = getOne<EventType>('/event-types')
 
 /** The items of a list route that takes no paging (target faces, federations, disciplines, target mappings). */
 async function listItems<T>(path: string): Promise<Fetched<T[]>> {
@@ -95,6 +103,7 @@ export const listAllTargetFaces = () => listItems<{ id: string; name: string }>(
 export const listDisciplines = () => listItems<DisciplineSummary>('/disciplines')
 export const listFederations = () => listItems<FederationListItem>('/federations')
 export const listCaliberClasses = () => listItems<CaliberClassSummary>('/caliber-classes')
+export const listEventTypes = () => listItems<{ id: string }>('/event-types')
 
 /**
  * `generateStaticParams` of a detail route: every id of the list, or for `PRERENDER=sample` the

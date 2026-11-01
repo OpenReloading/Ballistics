@@ -29,6 +29,7 @@ export const shellPages = [
   '/groups',
   '/firearms',
   '/firearms/log',
+  '/events',
   '/cases/editor',
   '/range',
   '/bullets/designer',
