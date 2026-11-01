@@ -647,8 +647,10 @@ function seatBuilder(o: {
   water: number | undefined
   barrel: number | undefined
   lands: LandsMm | undefined
+  /** The page's length unit, for the lengths in the outline's notes. */
+  unit: ReturnType<typeof drawingLengthUnit>
 }) {
-  const { chamber, shape, mode, canCbto, water, barrel, lands } = o
+  const { chamber, shape, mode, canCbto, water, barrel, lands, unit } = o
   if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
   return (by: number) =>
     seat({
@@ -659,6 +661,7 @@ function seatBuilder(o: {
       barrelLength: barrel === undefined ? undefined : fromSi('length', barrel),
       by: { kind: mode, value: by },
       lands,
+      unit,
     })
 }
 
@@ -943,8 +946,9 @@ function useSeatingModel(p: PreviewProps) {
         water: waterUsed,
         barrel: barrel.si,
         lands,
+        unit,
       }),
-    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, lands],
+    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, lands, unit],
   )
   const seating = useMemo(
     () => (seatBy && seatValue !== undefined ? seatBy(seatValue) : undefined),

@@ -6,7 +6,7 @@ import {
   revolutionVolume,
   type Tag,
 } from '../bullet/outline.ts'
-import { deg } from '../core/units.ts'
+import { deg, type LengthUnit } from '../core/units.ts'
 import type { SeatingValues } from './chamber.ts'
 
 export {
@@ -74,6 +74,8 @@ interface SeatInput {
   by: { kind: 'overallLength' | 'baseToOgive'; value: number }
   /** The firearm's measured lands contact of this bullet: it replaces the chamber-derived jump. */
   lands?: LandsContact | undefined
+  /** The page's length unit: the outline's notes write their lengths in it (mm by default). */
+  unit?: LengthUnit | undefined
 }
 
 /**
@@ -135,8 +137,9 @@ export function seat({
   barrelLength,
   by,
   lands,
+  unit = 'mm',
 }: SeatInput): Seating {
-  const outline = bulletOutline(bullet)
+  const outline = bulletOutline(bullet, 'sourced', unit)
   if ('reason' in outline) throw new RangeError(outline.reason)
   const notes = [...outline.notes]
   const { base, coal, cbto } = seatLengths(bullet, by)
@@ -318,6 +321,8 @@ interface IntrusionInput {
   coal: number
   /** Required, so no length counts as measured by default. */
   lengthSource: 'measured' | 'estimated'
+  /** The page's length unit: the outline's notes write their lengths in it (mm by default). */
+  unit?: LengthUnit | undefined
 }
 
 /** The bullet volume below the case mouth with bounds from the length tolerance. */
@@ -338,8 +343,14 @@ interface Intrusion {
  * pi d^2 / 4 dL, which gives the bounds (the lower one
  * clamped at 0).
  */
-export function intrusion({ bullet, caseLength, coal, lengthSource }: IntrusionInput): Intrusion {
-  const outline = bulletOutline(bullet)
+export function intrusion({
+  bullet,
+  caseLength,
+  coal,
+  lengthSource,
+  unit = 'mm',
+}: IntrusionInput): Intrusion {
+  const outline = bulletOutline(bullet, 'sourced', unit)
   if ('reason' in outline) throw new RangeError(outline.reason)
   const notes = [...outline.notes]
   const depth = caseLength - (coal - bullet.length)

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { lengthText } from '../src/core/units.ts'
 import {
   assumedBoatTailAngle,
   type BulletDimensions,
@@ -306,6 +307,26 @@ describe('leadeContact', () => {
 
 describe('seat', () => {
   const base = { chamber, waterCapacity: 3.571, waterDensity, barrelLength: 610 }
+
+  it("writes the outline notes' lengths in the page unit, mm by default", () => {
+    const rebated: BulletDimensions = {
+      ...boatTail,
+      base: { type: 'rebated-boat-tail', length: 5.664 },
+    }
+    const by = { kind: 'overallLength', value: 71.12 } as const
+    const notes = (unit?: 'mm' | 'in') => seat({ ...base, bullet: rebated, by, unit }).notes
+    const depth = 0.015 * rebated.diameter
+    expect(notes().join(' ')).toContain(`0.015 d, ${+depth.toFixed(3)} mm.`)
+    expect(notes('in').join(' ')).toContain(`0.015 d, ${lengthText(depth, 'in')} in.`)
+    expect(notes('in').join(' ')).not.toMatch(/\bmm\b/)
+    const tip = {
+      bullet: rebated,
+      caseLength: 51.18,
+      coal: 71.12,
+      lengthSource: 'measured' as const,
+    }
+    expect(intrusion({ ...tip, unit: 'in' }).notes.join(' ')).toContain(' in.')
+  })
 
   it('moves the bullet base with COAL: seating depth is length - (COAL - L3)', () => {
     for (const coal of [69, 70, 71.12]) {
