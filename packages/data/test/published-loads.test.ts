@@ -1,7 +1,9 @@
-import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import type { PublishedLoads } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { checkPublishedLoadPlausibility } from '../src/published-loads.ts'
 import { readRecords } from '../src/records.ts'
 
 const fixtures = join(import.meta.dirname, 'fixtures', 'valid')
@@ -381,5 +383,138 @@ describe('published load files', () => {
     expect(errors).toContain(
       'bullets/named-bullet.json: productNumber: a name-only record has no product number',
     )
+  })
+})
+
+describe('plausibility warnings of published loads', () => {
+  const where = 'loads/test-cartridge/test-manufacturer.json: loads a'
+  const testCartridge = JSON.parse(
+    readFileSync(join(fixtures, 'cartridges', 'test-cartridge.json'), 'utf8'),
+  )
+  /** The test cartridge with a maximum cartridge length L6 of 60 mm. */
+  const withL6 = {
+    ...testCartridge,
+    values: [
+      ...testCartridge.values,
+      { side: 'cartridge', symbol: 'L6', quantity: 'length', value: 60 },
+    ],
+  }
+  const bar = (value: number, method = 'transducer') => ({
+    unit: 'bar',
+    peak: { value, raw: `${value} bar` },
+    method,
+    methodBasis: 'stated',
+  })
+  const charge = (kind: string, grams: number, extra: object = {}) => ({
+    kind,
+    charge: { value: grams, raw: `${grams} g` },
+    ...extra,
+  })
+  const velocity = (value: number) => ({ value, raw: `${value} m/s` })
+  /** A start and a max charge in order, each with a velocity and a transducer pressure. */
+  const consistent = [
+    charge('start', 2.5, { velocity: velocity(700), pressure: bar(3000) }),
+    charge('max', 2.8, { velocity: velocity(750), pressure: bar(3500) }),
+  ]
+  const readWith = (extra: object, cartridge: object = withL6) =>
+    readAfter((write) => {
+      write('cartridges/test-cartridge.json', cartridge)
+      write('loads/test-cartridge/test-manufacturer.json', file([load('a', extra)]))
+    })
+
+  it('finds nothing in a consistent load', () => {
+    const { errors, warnings } = readWith({
+      charges: consistent,
+      coal: { value: 59, raw: '59 mm' },
+    })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([])
+  })
+
+  it('warns, without an error, of a start charge above the max charge', () => {
+    const { errors, warnings } = readWith({
+      charges: [charge('start', 3), charge('max', 2.8)],
+    })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([
+      `${where}: start-above-max: the start charge 3 g is above the max charge 2.8 g`,
+    ])
+  })
+
+  it('warns of a max charge velocity below the start charge at the same point only', () => {
+    const slow = [
+      charge('start', 2.5, { velocity: velocity(760) }),
+      charge('max', 2.8, { velocity: velocity(750) }),
+    ]
+    const { errors, warnings } = readWith({ charges: slow })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([
+      `${where}: velocity-order: the velocity of the max charge, 750 m/s, is below that of the start charge, 760 m/s`,
+    ])
+    const elsewhere = [
+      charge('start', 2.5, { velocity: { ...velocity(760), point: { label: 'V0' } } }),
+      charge('max', 2.8, { velocity: { ...velocity(750), point: { label: 'V5' } } }),
+    ]
+    expect(readWith({ charges: elsewhere }).warnings).toEqual([])
+  })
+
+  it('warns of a max charge pressure below the start charge on the same unit and method only', () => {
+    const low = [
+      charge('start', 2.5, { pressure: bar(3500) }),
+      charge('max', 2.8, { pressure: bar(3000) }),
+    ]
+    const { errors, warnings } = readWith({ charges: low })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([
+      `${where}: pressure-order: the pressure of the max charge, 3000 bar, is below that of the start charge, 3500 bar`,
+    ])
+    const otherMethod = [
+      charge('start', 2.5, { pressure: bar(3500) }),
+      charge('max', 2.8, { pressure: bar(3000, 'case-contact') }),
+    ]
+    expect(readWith({ charges: otherMethod }).warnings).toEqual([])
+  })
+
+  it('warns of a pressure above Pmax on the cartridge record method, and compares no other basis', () => {
+    const high = [charge('max', 2.8, { pressure: bar(4100) })]
+    const { errors, warnings } = readWith({ charges: high })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([
+      `${where}: pressure-above-cartridge-max: the max pressure 4100 bar (transducer) is above Pmax 4000 bar of test-cartridge`,
+    ])
+    const cup = {
+      unit: 'CUP',
+      peak: { raw: '60,000 CUP' },
+      method: 'crusher',
+      methodBasis: 'from-unit',
+    }
+    for (const pressure of [
+      bar(4100, 'case-contact'),
+      cup,
+      { unit: 'bar', peak: { value: 4100, raw: '4100 bar' } },
+    ])
+      expect(readWith({ charges: [charge('max', 2.8, { pressure })] }).warnings).toEqual([])
+    const { pressureMethod: _, ...noMethod } = withL6
+    expect(readWith({ charges: high }, noMethod).warnings).toEqual([])
+  })
+
+  it('warns of a COAL above L6', () => {
+    const { errors, warnings } = readWith({ coal: { value: 61, raw: '61 mm' } })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([
+      `${where}: coal-above-cartridge-max: COAL 61 mm is above L6 60 mm of test-cartridge`,
+    ])
+    // without an L6 the COAL is not compared
+    expect(readWith({ coal: { value: 61, raw: '61 mm' } }, testCartridge).warnings).toEqual([])
+  })
+
+  it('checks only the order without a cartridge record', () => {
+    const findings = checkPublishedLoadPlausibility(
+      file([
+        load('a', { charges: [charge('start', 3), charge('max', 2.8)] }),
+      ]) as unknown as PublishedLoads,
+      undefined,
+    )
+    expect(findings.map((f) => [f.load, f.finding])).toEqual([['a', 'start-above-max']])
   })
 })
