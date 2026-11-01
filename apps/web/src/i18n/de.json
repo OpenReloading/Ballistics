@@ -1,5 +1,5 @@
 {
-  "Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating. Empty without fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.": "Zeilen der Ladetabellen, an die die Modellparameter angepasst wurden, die Patronen, die sie abdecken, und der Tag, an dem die Ladetabellen gelesen wurden; die Datensatzseite listet sie je Ladetabelle. Eine Anzahl, keine Bewertung. Leer ohne angepasste Parameter: Die Anpassung an die Ladetabellen liefert Parameter nur für Treibladungspulver mit mindestens 10 Trainingszeilen aus mindestens 2 Patronen.",
+  "Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating.": "Zeilen der Ladetabellen, an die die Modellparameter angepasst wurden, die Patronen, die sie abdecken, und der Tag, an dem die Ladetabellen gelesen wurden; die Datensatzseite listet sie je Ladetabelle. Eine Anzahl, keine Bewertung.",
   "Training rows": "Trainingszeilen",
   "{count} training row|{count} training rows": {
     "one": "{count} Trainingszeile",
