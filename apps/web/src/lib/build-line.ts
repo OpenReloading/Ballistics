@@ -24,3 +24,14 @@ export function buildLine({ edition, version, commit, day }: Build): string {
         : [web, commit]
   return [...parts, day].filter(Boolean).join(', ')
 }
+
+/**
+ * The short build name on a printed report, so a filed sheet traces to the build that computed it:
+ * `Ballistics 0.0.4`, in the next edition `Ballistics next abc1234`, in a local build
+ * `Ballistics development abc1234`, the version where a build has no commit. The same in every language, like the
+ * build line.
+ */
+export function buildTag({ edition, version, commit }: Build): string {
+  const parts = edition === 'release' ? [version] : [edition, commit || version]
+  return ['Ballistics', ...parts].join(' ')
+}
