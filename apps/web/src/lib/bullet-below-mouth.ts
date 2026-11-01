@@ -1,3 +1,4 @@
+import type { DensityClass } from '@open-reloading/core'
 import {
   type BulletDimensions,
   estimateIntrusion,
@@ -5,7 +6,7 @@ import {
 } from '@open-reloading/drawing/seating'
 import type { Bullet } from '@open-reloading/schema'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import { classOf, type DensityClass, effectiveDensity } from './bullet-construction.ts'
+import { classOf, effectiveDensity } from './bullet-construction.ts'
 import type { Suggestion } from './input-defaults.ts'
 
 /** Why the bullet is not seated: the record has no length or diameter, its outline is refused, the cartridge has no case length, CBTO needs a base-to-ogive, no seating is entered. */

@@ -127,7 +127,7 @@ The diameter is the record's, else the typed one, else the groove diameter $Z$ o
 
 Code: `apps/web/src/lib/bullet-below-mouth.ts`, `belowMouth`, `lessBullet`.
 
-The class comes from the record's `construction.structure`; a record without one, and swaged, plated and frangible bullets, take the pooled value. The values are medians of the bullet records with a maker-published length (in-sample; the jacketed class covers two makers and the cast class one):
+The class comes from the record's `construction.structure` (`bulletStructures` in `packages/core/src/interior/start-pressure.ts`, the table that also gives the construction of the start pressure); a record without one, and swaged, plated and frangible bullets, take the pooled value (the cast class was measured on cast bullets only). The values are medians of the bullet records with a maker-published length (in-sample; the jacketed class covers two makers and the cast class one):
 
 | Class (`construction.structure`) | $\rho_\mathrm{eff}$ in g/cm3 | $e$ | Records |
 | --- | --- | --- | --- |

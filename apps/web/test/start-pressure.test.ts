@@ -1,3 +1,5 @@
+import { bulletStructures } from '@open-reloading/core'
+import { constructionFields } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { followWrites } from '../src/components/use-workbench-load.ts'
 import { english } from '../src/i18n/translate.ts'
@@ -49,8 +51,14 @@ it('gives a rifle barrel the rifle value of the construction, with the class in 
   expect(of(rifle, 'cup-and-core').si).toBe(29.2e6)
 })
 
-it('keeps the value of before where the construction or the barrel is not known', () => {
-  for (const s of [of(pistol), of(rifle, 'plated'), of(undefined, 'cast')]) {
+it('counts a handgun bullet without a construction as jacketed, assumed', () => {
+  const s = of(pistol)
+  expect(s.si).toBe(30.8e6)
+  expect(s.source).toContain('jacketed, assumed')
+})
+
+it('keeps the value of before where the construction of a rifle bullet or the barrel is not known', () => {
+  for (const s of [of(rifle), of(rifle, 'plated'), of(undefined, 'cast')]) {
     expect(s.si).toBe(cited)
     expect(s.approximate).toBeUndefined()
     expect(s.source).toBe('approximate model default for barrels of 300 mm and longer')
@@ -79,4 +87,10 @@ const written = (followed: boolean, now: number, suggestion: number) => {
 it('writes the default of a new bullet over the one before, and never over a typed value', () => {
   expect(written(true, cited, 24.3e6)).toEqual([['startPressure', 24.3e6]])
   expect(written(false, 31e6, 24.3e6)).toEqual([])
+})
+
+it('maps every structure of the bullet schema in the one table of core', () => {
+  const structures = constructionFields.shape.structure.unwrap().options
+  expect(structures.filter((s) => !Object.hasOwn(bulletStructures, s))).toEqual([])
+  expect(Object.keys(bulletStructures).sort()).toEqual([...structures].sort())
 })
