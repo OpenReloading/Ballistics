@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mth-308-175",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 308 175",
+  "name": "MTH 308 175 (MTH, 175 gr)",
+  "productLine": "MTH",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.34,
+    "raw": "175 gr"
+  },
+  "length": {
+    "value": 35.94,
+    "raw": "1.415\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.515,
+      "note": "G1 BC, printed \".515 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.264,
+      "note": "G7 BC, printed \".264 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .308, Grains 175, Minimum Required Twist 1-10\", Part Number MTH 308 175, G1 BC .515 (A.B.), G7 BC .264 (A.B.), OAL 1.415\", Bullet Projection .785\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .785\"."
+}

@@ -1,0 +1,35 @@
+{
+  "id": "dsb-meisterschaft",
+  "name": "DSB-Meisterschaft",
+  "federation": "dsb",
+  "ruleBook": "dsb-sportordnung-2027",
+  "scoring": { "method": "rings" },
+  "levels": [
+    "Kreis-/Gaumeisterschaft",
+    "Bezirks-/Gaumeisterschaft",
+    "Landesmeisterschaft",
+    "Deutsche Meisterschaft"
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "Impressum, Seite 1, PDF p. 3 (title, edition 01.01.2027)",
+        "fields": ["federation", "ruleBook"]
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.11.3, Teil 0 Seite 39, PDF p. 57",
+        "fields": ["scoring.method"],
+        "note": "Each valid shot scores the ring it hits, the higher ring where the hole touches its outer line. The series and the ring values come from the discipline the event is shot in (its discipline record and target mapping); a few Auflage disciplines score tenths at Landes- and Deutsche Meisterschaft (Teil 9, 9.4)."
+      },
+      {
+        "source": "dsb-sportordnung-2027",
+        "page": "0.9.3.3, Teil 0 Seite 32, PDF p. 50",
+        "fields": ["levels"],
+        "note": "The championships of each sport year, from the lowest: the rule book lists Kreis- or Gau-, Bezirks- or Gau- and Landesmeisterschaft as examples, and the Landesmeisterschaft qualifies for the Deutsche Meisterschaft. Championships below the Landesmeisterschaft are run by the Landesverband."
+      }
+    ]
+  }
+}

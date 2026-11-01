@@ -1,6 +1,7 @@
 import { leastSpecValue } from '@open-reloading/core'
 import {
   type Bullet,
+  bulletListFields,
   type CaliberClass,
   type Cartridge,
   type CaseType,
@@ -140,11 +141,38 @@ function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] | 
   }
 }
 
-/** The part of the M3 parameters of a powder that the burn-rate curve reads. */
-function interiorItem({ interior }: Powder): PowderItem['interior'] {
+/**
+ * The part of the M3 parameters of a powder that the burn-rate curve reads, with the training rows
+ * and cartridges of the fit and the day its fitted sources were read (the latest of them).
+ */
+function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] {
   if (!interior) return
-  const { vivacity, pressureExponent, referencePressure, burnForm } = interior
-  return compact({ vivacity, pressureExponent, referencePressure, burnForm })
+  const {
+    vivacity,
+    pressureExponent,
+    referencePressure,
+    burnForm,
+    trainingRows,
+    trainingCartridges,
+  } = interior
+  const retrieved = provenance.sources
+    .filter(
+      (s) =>
+        (s.kind ?? provenance.kind) === 'fitted' &&
+        (!s.fields || s.fields.some((f) => f === 'interior' || f.startsWith('interior.'))),
+    )
+    .flatMap((s) => (s.retrieved ? [s.retrieved] : []))
+    .sort()
+    .at(-1)
+  return compact({
+    vivacity,
+    pressureExponent,
+    referencePressure,
+    burnForm,
+    trainingRows,
+    trainingCartridges,
+    retrieved,
+  })
 }
 
 /** The index row of a powder of manufacturer `m`. */
@@ -175,36 +203,31 @@ export const primerRow = (p: Primer, m: Manufacturer): IndexRow<PrimerItem> => (
   ...componentKeys(m, { name: p.name, aliases: p.productNumber ? [p.productNumber] : undefined }),
 })
 
-/** The first coefficient of a drag model, null without one (a banded sheet lists the top band first). */
-const firstCoefficient = (b: Bullet, model: 'G1' | 'G7') =>
-  b.ballisticCoefficients?.find((c) => c.dragModel === model)?.value ?? null
-
-/** The structure of a bullet's construction, else its core material as `<material>-core`. */
-function constructionOf({ construction }: Bullet) {
-  const material = construction?.core?.material
-  return construction?.structure ?? (material ? `${material}-core` : undefined)
-}
-
 /** The index row of a bullet of manufacturer `m`. */
-export const bulletRow = (b: Bullet, m: Manufacturer): IndexRow<BulletItem> => ({
-  item: {
-    id: b.id,
-    manufacturer: b.manufacturer,
-    name: b.name,
-    diameter: b.diameter?.value ?? null,
-    mass: b.mass.value,
-    length: b.length?.value ?? null,
-    ballisticCoefficientG1: firstCoefficient(b, 'G1'),
-    ballisticCoefficientG7: firstCoefficient(b, 'G7'),
-    ...compact({
-      country: b.country,
-      tipType: b.tip?.type,
-      construction: constructionOf(b),
-      nameOnly: b.nameOnly,
-    }),
-  },
-  ...componentKeys(m, b),
-})
+export function bulletRow(b: Bullet, m: Manufacturer): IndexRow<BulletItem> {
+  const f = bulletListFields(b)
+  return {
+    item: {
+      id: b.id,
+      manufacturer: b.manufacturer,
+      name: b.name,
+      diameter: b.diameter?.value ?? null,
+      mass: b.mass.value,
+      length: b.length?.value ?? null,
+      ballisticCoefficientG1: f.ballisticCoefficientG1,
+      ballisticCoefficientG7: f.ballisticCoefficientG7,
+      ...compact({
+        country: b.country,
+        tipType: f.tipType,
+        baseType: f.baseType,
+        construction: f.construction,
+        leadFree: f.leadFree,
+        nameOnly: b.nameOnly,
+      }),
+    },
+    ...componentKeys(m, b),
+  }
+}
 
 /**
  * The index row of a case of manufacturer `m` for the cartridge with id `cartridge` (the current

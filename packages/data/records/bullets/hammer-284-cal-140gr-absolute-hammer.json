@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-140gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8279",
+  "name": ".284 Cal-140gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "length": {
+    "value": 34.93,
+    "raw": "Bullet length is 1.375″"
+  },
+  "noseLength": {
+    "value": 20.04,
+    "raw": "Nose length is .789″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.225,
+      "note": "Hammer Bullets: \"G7-BC= .225 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "Recommended minimum twist rate is 1-9.25″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We tested this 140gr Absolute Hammer™ in my personal 280ai with a 22″ barrel. My previous load was with the 143gr Hammer Hunter™ at a velocity of 3126 fps. The 140gr Absolute Hammer™ load settled in at 3387 fps. This is exceptional from a short barreled rifle. Absolute Hammer™s do not line up with conventional load data so they should be used by experience hand loaders only.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-140gr-absolute-hammer/: Recommended minimum twist rate is 1-9.25″ | Bullet length is 1.375″ | Bullet weight is 140gr | Nose length is .789″ | Recommended use: Big Game Hunting | G7-BC= .225 calculated from shot drops"
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "44-rem-mag-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:44-rem-mag",
+  "waterCapacity": {
+    "value": 2.456,
+    "raw": "37.9 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .44 Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.44_Magnum&oldid=1368987370",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 37.9 gr H2O (2.46 cm3)."
+      }
+    ]
+  }
+}

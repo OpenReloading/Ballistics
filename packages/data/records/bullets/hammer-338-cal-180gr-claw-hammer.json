@@ -1,0 +1,56 @@
+{
+  "id": "hammer-338-cal-180gr-claw-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869067831",
+  "name": ".338 Cal-180gr Claw Hammer®",
+  "productLine": "Claw Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "length": {
+    "value": 25.15,
+    "raw": "Bullet length: .990″"
+  },
+  "noseLength": {
+    "value": 11.14,
+    "raw": "Nose length: .4384″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.281,
+      "note": "Hammer Bullets: \"g1-bc= .281 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6,
+    "raw": "Minimum required twist is 1-19″ or faster"
+  },
+  "note": "Meplat diameter: .2618″. Recommended use: Big Game Hunting. The product page also says: \"This 180gr .338 Cal Claw Hammer® utilizes our dangerous game bullet design with the cupped meplat. This cupped meplat is proven to create a larger permanent wound channel than a flat nosed bullet at slow impact velocities under 1500 fps. At high velocity impacts, above 2600 fps, this design will deform into a perfectly flat meplat that is approximately 1.3 times caliber in diameter. We hunted red stag with this bullet running over 3300 fps in a 338 Winchester Magnum and terminal performance was stunning. Initial impact of this bullet is extremely hard, since it is already in its terminal form and long straight-line penetration is exceptional due to its relative short length for weight, creating high terminal stability in standard .338 caliber twist rates. This bullet will be ideal for low velocity cartridges like the 338 ARC as well as anything bigger including .338 magnum cartridges.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-180gr-claw-hammer/: Minimum required twist is 1-19″ or faster | Bullet length: .990″ | Nose length: .4384″ | Bullet weight: 180gr | Meplat diameter: .2618″ | Recommended use: Big Game Hunting | g1-bc= .281 estimated"
+      }
+    ]
+  }
+}

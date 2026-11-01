@@ -1,0 +1,56 @@
+{
+  "id": "hammer-375-cal-331gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "871",
+  "name": ".375 Cal-331gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 21.513,
+    "raw": "332 gr"
+  },
+  "length": {
+    "value": 41.91,
+    "raw": "Bullet length is 1.65″"
+  },
+  "noseLength": {
+    "value": 16.38,
+    "raw": "Nose length is .645″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.527,
+      "note": "Hammer Bullets: \"G1-BC=.527 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "Recommended twist rate is 1-14″ minimum"
+  },
+  "note": "Minimum required twist rate for dangerous game hunting is 1-12″. Recommended use: Big game and Dangerous game hunting. The product name says 331 gr; the specification says 332 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/375-cal-331gr-stone-hammer/: Recommended twist rate is 1-14″ minimum | Minimum required twist rate for dangerous game hunting is 1-12″ | Bullet length is 1.65″ | Nose length is .645″ | Bullet weight is 332gr | Recommended use: Big game and Dangerous game hunting | G1-BC=.527 estimated"
+      }
+    ]
+  }
+}

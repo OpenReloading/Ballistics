@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-401170m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "401170M",
+  "name": "IDP #2, 170 Grain SWC",
+  "caliber": ".401",
+  "diameter": {
+    "value": 10.185,
+    "raw": ".401 Diameter"
+  },
+  "mass": {
+    "value": 11.016,
+    "raw": "170 Grain"
+  },
+  "length": {
+    "value": 16.08,
+    "raw": "Bullet OAL .633 +/-"
+  },
+  "note": "Listed as 170 Grain SWC. Brinell 18. .40 S&W/10mm. For Major Power Factor.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "401170M, IDP #2 (https://missouribullet.com/details.php?prodId=58): .401 Diameter, 170 Grain SWC, Brinell 18, Bullet OAL .633 +/-"
+      }
+    ]
+  }
+}

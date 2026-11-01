@@ -1,0 +1,61 @@
+{
+  "id": "hammer-224-cal-060gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027750",
+  "name": ".224 Cal-60gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 3.888,
+    "raw": "60 gr"
+  },
+  "length": {
+    "value": 22.61,
+    "raw": "Bullet length is .89″"
+  },
+  "noseLength": {
+    "value": 11.25,
+    "raw": "Nose length is .443″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.142,
+      "note": "Hammer Bullets: \"g7-bc= .142 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.285,
+      "note": "Hammer Bullets: \"g1-bc= .285 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "Minimum required twist rate is 1-9″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This pure copper Hammer Hunter™ will maximize the weight for 9″ twist rifles giving great normal to mid long performance on game from coyotes to deer and pigs.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/224-cal-060gr-hammer-hunter/: Minimum required twist rate is 1-9″ | Bullet length is .89″ | Nose length is .443″ | Bullet weight is 60gr | Recommended use: Big Game Hunting | g7-bc= .142 estimated | g1-bc= .285 estimated"
+      }
+    ]
+  }
+}

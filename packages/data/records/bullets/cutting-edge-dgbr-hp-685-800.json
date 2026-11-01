@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-dgbr-hp-685-800",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP 685 800",
+  "name": "DGBR-HP 685 800 (Safari Raptor, Solid & Lever+, 800 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".685",
+  "diameter": {
+    "value": 17.399,
+    "raw": ".685"
+  },
+  "mass": {
+    "value": 51.839,
+    "raw": "800 gr"
+  },
+  "length": {
+    "value": 31.62,
+    "raw": "1.245\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.16,
+      "note": "G1 BC (Est.), printed \".160\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "10",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 10, Safari Raptor, Solid, & Lever+: Caliber .685, Grains 800, Part Number DGBR-HP 685 800, OAL 1.245\", Bullet Projection .700\", G1 BC (Est.) .160"
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .700\"."
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-180-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "10132",
+  "name": ".308 Cal-180 Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "length": {
+    "value": 37.59,
+    "raw": "Bullet length is 1.48″"
+  },
+  "noseLength": {
+    "value": 21.72,
+    "raw": "Nose length is .855"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.243,
+      "note": "Hammer Bullets: \"g7-bc= .243 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This new 180gr Hammer Hunter™ will be fully stable in a 1-10″ twist barrel.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-180-hammer-hunter/: Recommended minimum twist rate is 1-10″ | Bullet length is 1.48″ | Nose length is .855 | Bullet weight is 180gr | Recommended use: Big Game Hunting | g7-bc= .243 calculated from shot drops"
+      }
+    ]
+  }
+}

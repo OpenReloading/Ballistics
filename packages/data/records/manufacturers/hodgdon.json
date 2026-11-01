@@ -1,0 +1,15 @@
+{
+  "id": "hodgdon",
+  "name": "Hodgdon",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-powder-co-product-page-700x-shotshell",
+        "url": "https://shop.hodgdon.com/hodgdon-hi-skor-700-x/",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

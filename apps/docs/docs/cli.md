@@ -11,6 +11,7 @@ description: One compute operation of the API offline, the list of operations wi
 npm run build
 node packages/cli/dist/bin.js verify --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records --baseline verify.json --candidate ./my-model.mjs
+node packages/cli/dist/bin.js verify --rows catalogue --split validation
 ```
 
 `--help` (or `-h`), alone or after a command, prints the usage and the options and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
@@ -45,10 +46,22 @@ One CSV file, or a folder of `.csv` files read in name order, with a header line
 | `barrel_mm` | Barrel length, mm; a row without it is not used (`noBarrelLength`) | no |
 | `temperature_c` | Propellant temperature, degC; default the temperature of the powder's fit | no |
 | `coal_mm` | Cartridge overall length, mm; default the sheet's L6 | no |
-| `pressure_basis`, `bearing_mm`, `muzzle_distance_m`, `session`, `rifle`, `lot` | What a later model may read: carried with the row, unused | no |
+| `pressure_basis` | The basis the pressure was measured on (`transducer`, `case-contact`, ...); pressure errors are grouped by it, `unstated` without one | no |
+| `muzzle_distance_m` | Distance of the measuring point from the muzzle, m; the velocity is corrected to the muzzle ([below](#muzzle-distance)) | no |
+| `bearing_mm`, `session`, `rifle`, `lot` | What a later model may read: carried with the row, unused | no |
 | `table` | A free label of the source table: carried, never part of a result | no |
 
 A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted. A number is a plain decimal or exponent form (`0.5`, `2.5e1`); `0x1F` and `0b11` are not numbers.
+
+### Published loads
+
+`--rows catalogue` reads the [published load files](data/published-loads.md) of the records instead of a CSV file; `--rows <folder>` does the same for a folder laid out as `records/loads/` (named `loads`, with one folder per cartridge): only the files of that folder are read, their source references resolved from the source records of `--records`, and a file that fails is left out with a note on stderr. Each printed charge with a velocity `value` of a maker table is one row (`rowsFromPublished`, `src/published-rows.ts`):
+
+- `charge`, `velocity` (as printed, at the printed point), `coal` and `barrel` (`barrel.length`) from their `value`; `pressure` only with a value in bar, so a crusher figure (CUP, LUP) gives a row with its velocity only; the pressure basis is the figure's `method`, `unstated` without one; the muzzle distance is `velocity.point.distance`, and a velocity without one is a muzzle value;
+- `bullet` is the bullet record, else a stand-in record per cartridge and printed mass: the cartridge's G1 as diameter, the printed mass, and the length of a least-squares fit of ln length on ln mass and ln diameter over the bullet records with a length; it has no ballistic coefficient;
+- a row without a barrel length takes the median printed barrel of its cartridge, else 610 mm for a case (L3) longer than 33 mm and 120 mm for a shorter one, as on the [validation page](models/validation.md).
+
+A table of loads customers sent (`producedBy: customer`) is never read. Charges that give no row are counted by reason in `published.skipped`: `noVelocity`, `customerTable`, `noPowderRecord`, `noCartridge` (no cartridge record). `published` also carries the number of files and rows. `inputs.rows` is the SHA-256 over the SHA-256 of each file's JSON, in cartridge and file order.
 
 The records are read with `readRecords` of `@open-reloading/data`: `--records <dir>` (repeatable, read as one set; `BALLISTICS_RECORDS` is a `:`-separated list), by default the records of the data package. The problems the reader reports (a record that fails its schema is left out, a duplicate id is kept) are counted in a note on stderr. The default rows path is `BALLISTICS_ROWS`; `--rows -` reads one rows file from standard input. A cartridge's chamber volume is its water capacity (a capacity record, else a case record with a stated capacity, the first by id) less the volume of the seated bullet, as the [seating](models/case-capacity.md) computes it.
 
@@ -62,7 +75,15 @@ All errors are absolute relative errors, as fractions: for the velocity $|v_\tex
 
 The 90 % interval has the half width $h$, the 90th percentile of the velocity error of the used training rows of the same model; the interval of a row is the model velocity times $(1 \pm h)$, so a row is inside when $|v_\text{model} - v_\text{printed}| / v_\text{model} \le h$ (the distance is taken against the model's velocity, not the printed one, so it differs from the error above). The coverage is the share of used rows inside. It comes from the training split and is not a prediction interval of the model's inputs.
 
-Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet`, `unknownPowder`, `noPowderModel` (no interior parameters), `noCaseCapacity`, `noBulletLength`, `noBulletShape`, `noBarrelLength`, `missingCartridgeValue`, `modelRefused`.
+Rows that are not used are counted by reason: `unknownCartridge`, `unknownBullet`, `unknownPowder`, `noPowderModel` (no interior parameters), `noCaseCapacity`, `noBulletLength`, `noBulletShape`, `noBarrelLength`, `missingCartridgeValue`, `modelRefused`, `noBulletDrag` (a velocity printed at a distance whose bullet has no drag to fly back to the muzzle, see below).
+
+### Pressure by basis
+
+A pressure is compared only with pressures of its own basis: `pressureByBasis` of each group holds the median and P90 of the pressure error and the rows for each basis (`transducer`, `case-contact`, `piezo`, `unstated`, ...). No value is converted between bases. `pressure` stays the error over every row in bar, all bases together.
+
+### Muzzle distance
+
+A row with a muzzle distance above 0 (a velocity printed at `V5`, for example) is compared at the muzzle: its printed velocity is turned into the muzzle velocity whose flown speed at that distance equals it, with `muzzleVelocityFromDownrange` of core ([model page](models/exterior-drag.md#speed-measured-downrange)), over the bullet record's G7 ballistic coefficients (else its G1 ones) in the ICAO standard atmosphere at sea level, before the error and the interval. A bullet without a coefficient, such as a stand-in, or with two of one model that share a band start, gives `noBulletDrag`. A row without a distance is a muzzle value and is not corrected.
 
 The powder parameters are those of the records (`--params records`, the only mode). A fit of each powder on its training rows and by-session checks need a fit from rows and are not part of this version.
 
@@ -94,7 +115,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (1) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (2: `pressureByBasis`, `published` and the reason `noBulletDrag` came with it) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 

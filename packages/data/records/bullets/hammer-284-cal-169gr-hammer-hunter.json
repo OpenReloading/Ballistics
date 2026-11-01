@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-169gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "1705",
+  "name": ".284 Cal-169gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 10.886,
+    "raw": "168 gr"
+  },
+  "length": {
+    "value": 39.67,
+    "raw": "Bullet length is 1.562″"
+  },
+  "noseLength": {
+    "value": 20.5,
+    "raw": "Nose length is .8072″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.272,
+      "note": "Hammer Bullets: \"G7-bc= .272 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 209.55,
+    "raw": "Recommended minimum twist rate is 1-8.25″"
+  },
+  "note": "Recommended Use: Big Game Hunting. The product page also says: \"This Hammer Hunter™ is designed for those who have a minimum twist rate of 1-8.25″ with 1-8″ or faster preferred. Another great normal to long range hunting bullet that will always retain 70% of its weight regardless of impact velocity.\" The product name says 169 gr; the specification says 168 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-169gr-hammer-hunter/: Recommended minimum twist rate is 1-8.25″ | Bullet length is 1.562″ | Nose length is .8072″ | Bullet weight is 168gr | Recommended Use: Big Game Hunting | G7-bc= .272 estimated"
+      }
+    ]
+  }
+}

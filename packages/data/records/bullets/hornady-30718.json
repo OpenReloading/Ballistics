@@ -1,0 +1,30 @@
+{
+  "id": "hornady-30718",
+  "manufacturer": "hornady",
+  "productNumber": "30718",
+  "name": "30 Cal. Sub-X (30-30 Win), .308, 175 gr",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308\""
+  },
+  "mass": {
+    "value": 11.34,
+    "raw": "175 gr"
+  },
+  "note": "The catalog prints BC .300 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "92",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "30 Cal. Sub-X (30-30 Win), .308\", 175 gr., Ballistic Coef. .300, Sec. Den. .264, Item # 30718"
+      }
+    ]
+  }
+}

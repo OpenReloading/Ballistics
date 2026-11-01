@@ -1,0 +1,56 @@
+{
+  "id": "hammer-416-cal-300gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869028332",
+  "name": ".416 Cal-300gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566,
+    "raw": ".416"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 33.43,
+    "raw": "Bullet length is 1.316″"
+  },
+  "noseLength": {
+    "value": 16.04,
+    "raw": "Nose length is .6314″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.33,
+      "note": "Hammer Bullets: \"g1-bc= .330 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 508,
+    "raw": "Required twist is 1-20″ or faster"
+  },
+  "note": "Required twist for Dangerous Game is 1-17″ or faster. Recommended use: Dangerous Game Hunting / Big Game Hunting. The product page also says: \"Designed for Dangerous Game Hunting, this Stone Hammer™ spent 2021 in South Africa getting put through the paces by Trophy Game Safari. After a year of stellar results another batch were sent for 2022. This pure copper Hammer will give extra vel and deep straight line penetration with a bit less recoil. A great setup for any of the North American game too.\" The weight is taken from the product name (300gr).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/416-cal-300gr-stone-hammer/: Required twist is 1-20″ or faster | Required twist for Dangerous Game is 1-17″ or faster | Bullet length is 1.316″ | Nose length is .6314″ | Recommended use: Dangerous Game Hunting / Big Game Hunting | g1-bc= .330 estimated"
+      }
+    ]
+  }
+}

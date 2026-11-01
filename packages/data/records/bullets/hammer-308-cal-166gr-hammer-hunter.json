@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-166gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "285",
+  "name": ".308 Cal-166gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.757,
+    "raw": "166 gr"
+  },
+  "length": {
+    "value": 35.74,
+    "raw": "Bullet length is 1.407″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.227,
+      "note": "Hammer Bullets: \"G7-BC=.227 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 266.7,
+    "raw": "Recommended twist rate is 1-10.5″ or faster"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-166gr-hammer-hunter/: Recommended twist rate is 1-10.5″ or faster | Bullet length is 1.407″ | Bullet weight is 166 grains | Recommended use: Big game hunting | G7-BC=.227 estimated"
+      }
+    ]
+  }
+}

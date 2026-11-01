@@ -1,0 +1,21 @@
+{
+  "id": "10-mm-auto-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:10-mm-auto",
+  "waterCapacity": {
+    "value": 1.562,
+    "raw": "24.1 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 10mm Auto",
+        "url": "https://en.wikipedia.org/w/index.php?title=10mm_Auto&oldid=1379060078",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 1.56 cm3 (24.1 gr H2O)."
+      }
+    ]
+  }
+}

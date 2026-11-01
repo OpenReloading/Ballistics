@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-mtac-311-124",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 311 124",
+  "name": "MTAC 311 124 (MTAC, 124 gr)",
+  "productLine": "MTAC",
+  "caliber": ".311",
+  "diameter": {
+    "value": 7.899,
+    "raw": ".311"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 gr"
+  },
+  "length": {
+    "value": 26.34,
+    "raw": "1.037\""
+  },
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "1-12\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .311, Grains 124, Minimum Required Twist 1-12\", Part Number MTAC 311 124, OAL 1.037\", Bullet Projection .680\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .680\"."
+}

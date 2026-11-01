@@ -1,0 +1,58 @@
+{
+  "id": "sierra-8430",
+  "manufacturer": "sierra",
+  "productNumber": "8430",
+  "name": "10MM 150 GR JHP SPORTS MASTER",
+  "caliber": "0.400",
+  "diameter": {
+    "value": 10.16,
+    "raw": "0.400 in"
+  },
+  "mass": {
+    "value": 9.72,
+    "raw": "150 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.12,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/10mm-150-gr-jhp-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "e5e692be48a28d2e5e2bc6b869c721e9d4e563c4978d719d84016159d6539c08",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8430, Bullet Type: Jacketed Hollow Point (JHP), Bullet Diameter: 0.400, Bullet Weight (Grains): 150, G1 BC: 0.120, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

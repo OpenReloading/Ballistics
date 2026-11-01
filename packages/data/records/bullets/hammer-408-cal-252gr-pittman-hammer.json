@@ -1,0 +1,56 @@
+{
+  "id": "hammer-408-cal-252gr-pittman-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869027534",
+  "name": ".408 Cal-252gr Pittman Hammer",
+  "productLine": "Pittman Hammer",
+  "caliber": ".408",
+  "diameter": {
+    "value": 10.363,
+    "raw": ".408"
+  },
+  "mass": {
+    "value": 16.329,
+    "raw": "252 gr"
+  },
+  "length": {
+    "value": 32.39,
+    "raw": "Bullet length is 1.275″"
+  },
+  "noseLength": {
+    "value": 17.84,
+    "raw": "Nose length is .7024″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.308,
+      "note": "Hammer Bullets: \"g1-bc= .308 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6,
+    "raw": "Minimum required twist rate is 1-19″"
+  },
+  "note": "Recommended use: Smokeless muzzle loader Big Game Hunting. The product page also says: \"Pittman Hammer smokeless muzzle loader bullet designed in collaboration with Pittman Bullets. These pure copper bullets with a 2mm hollow point will be hard hitters for your normal to mid range hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/408-cal-252gr-pittman-hammer/: Minimum required twist rate is 1-19″ | Bullet length is 1.275″ | Nose length is .7024″ | Bullet weight is 252gr | Recommended use: Smokeless muzzle loader Big Game Hunting. | g1-bc= .308 estimated"
+      }
+    ]
+  }
+}

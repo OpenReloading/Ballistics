@@ -1,0 +1,21 @@
+{
+  "id": "300-rem-ultra-mag-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:300-rem-ultra-mag",
+  "waterCapacity": {
+    "value": 7.141,
+    "raw": "110.2 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .300 Remington Ultra Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1313173783",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 110.2 gr H2O (7.14 cm3). The text gives 122.5 gr (7.30 cm3) overflow capacity, which is inconsistent and not used."
+      }
+    ]
+  }
+}

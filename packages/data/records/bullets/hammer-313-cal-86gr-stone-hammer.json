@@ -1,0 +1,38 @@
+{
+  "id": "hammer-313-cal-86gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "7398",
+  "name": ".313 Cal-86gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95,
+    "raw": ".313"
+  },
+  "mass": {
+    "value": 5.573,
+    "raw": "86 gr"
+  },
+  "length": {
+    "value": 16.51,
+    "raw": "Bullet length is .65″"
+  },
+  "slowestTwist": {
+    "value": 508,
+    "raw": "Recommended min twist rate is 1-20″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This bullet was designed for the 32-20 Winchester lever action. This pure copper projectile with it’s 4mm hollow point will be perfect for hunting game up to deer size.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/313-cal-86gr-stone-hammer/: Recommended min twist rate is 1-20″ | Bullet length is .65″ | Bullet weight is 86gr | Recommended use: Big Game Hunting"
+      }
+    ]
+  }
+}

@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { MagnifyingGlass } from '@phosphor-icons/react'
+import Link from 'next/link'
 import { Fragment, type KeyboardEvent, type ReactNode, useId, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Translator, translator } from '../i18n/translate.ts'
@@ -104,10 +105,29 @@ export function SlashBreaks({ text }: { text: string }) {
   )
 }
 
+/** A row's links, as the listed cartridges of a powder: separated as the plain text is, free to wrap. */
+function RowLinks({ links }: { links: NonNullable<FieldRow['links']> }) {
+  return links.map((l, i) => (
+    <Fragment key={l.href}>
+      {i > 0 && '; '}
+      <Link href={l.href}>{l.text}</Link>
+    </Fragment>
+  ))
+}
+
 function Row({ row, system }: { row: FieldRow; system: UnitSystem }) {
   const { t } = useTranslation()
-  const value = <SlashBreaks text={rowValue(row, system, t)} />
   const notes = rowNotes(row, t)
+  if (row.links)
+    return (
+      <TableTr>
+        <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
+        <TableTd className="field-links">
+          <RowLinks links={row.links} />
+        </TableTd>
+      </TableTr>
+    )
+  const value = <SlashBreaks text={rowValue(row, system, t)} />
   return (
     <TableTr>
       <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
@@ -137,10 +157,13 @@ function SymbolRow({
   system,
   tabbable,
   off,
+  symbolColumn,
 }: {
   row: FieldRow
   system: UnitSystem
   tabbable: boolean
+  /** The Symbol column is drawn. */
+  symbolColumn: boolean
   /** Left out by the filter or the search: hidden on screen, printed. */
   off: boolean
 }) {
@@ -149,9 +172,11 @@ function SymbolRow({
   const { number, unit } = rowParts(row, system, t)
   return (
     <TableTr data-symbol={row.symbol} data-off={off || undefined}>
-      <TableTd className="field-symbol">
-        {row.symbol && <SymbolStop tabIndex={tabbable ? 0 : -1}>{row.symbol}</SymbolStop>}
-      </TableTd>
+      {symbolColumn && (
+        <TableTd className="field-symbol">
+          {row.symbol && <SymbolStop tabIndex={tabbable ? 0 : -1}>{row.symbol}</SymbolStop>}
+        </TableTd>
+      )}
       <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
       <TableTd className="nowrap num">
         {notes.length > 0 ? <Noted value={number} notes={notes} /> : number}
@@ -167,15 +192,18 @@ function SymbolRow({
  * A record's values as Symbol, Quantity, Value and Unit, a heading row per group, every row with a
  * drawing symbol carrying it as `data-symbol` for the linked marking. One tab stop for the
  * symbols, the arrow keys move between them. Rows not in `on` are hidden on screen and printed.
+ * Without `symbolColumn` (a record without a drawing: case, primer) the Symbol column is left out.
  */
 function SymbolTable({
   label,
   groups,
   on,
+  symbolColumn,
 }: {
   label: string
   groups: FieldGroup[]
   on: Set<FieldRow>
+  symbolColumn: boolean
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -201,9 +229,11 @@ function SymbolTable({
       >
         <TableThead>
           <TableTr>
-            <TableTh scope="col" className="field-symbol">
-              {t('Symbol')}
-            </TableTh>
+            {symbolColumn && (
+              <TableTh scope="col" className="field-symbol">
+                {t('Symbol')}
+              </TableTh>
+            )}
             <TableTh scope="col">{t('Quantity')}</TableTh>
             <TableTh scope="col" className="num">
               {t('Value')}
@@ -218,7 +248,7 @@ function SymbolTable({
           <TableTbody key={i} data-off={g.rows.some((r) => on.has(r)) ? undefined : true}>
             {g.title && (
               <TableTr className="field-group">
-                <TableTh scope="rowgroup" colSpan={4}>
+                <TableTh scope="rowgroup" colSpan={symbolColumn ? 4 : 3}>
                   {say(t, g.title)}
                 </TableTh>
               </TableTr>
@@ -231,6 +261,7 @@ function SymbolTable({
                 system={system}
                 tabbable={!!row.symbol && row.symbol === stop && on.has(row)}
                 off={!on.has(row)}
+                symbolColumn={symbolColumn}
               />
             ))}
           </TableTbody>
@@ -261,19 +292,23 @@ export function searchGroups(
 /**
  * A titled panel of a record's values as a symbol table: a group filter (All and each group's
  * `filter` or title) in its title row where there are two filters or more, a search field over
- * symbols and names above the table where it has more than 20 rows.
+ * symbols and names above the table where it has more than 20 rows. A search looks through every
+ * group (the filter shows All while it has text); choosing a group clears it.
  */
 export function FieldPanel({
   id,
   title,
   groups,
   className,
+  symbols = true,
   children,
 }: {
   id: string
   title: Wording
   groups: FieldGroup[]
   className?: string
+  /** false: no Symbol column, for a record whose rows have no drawing symbol (case, primer). */
+  symbols?: boolean
   /** Under the table: the record's note. */
   children?: ReactNode
 }) {
@@ -285,12 +320,14 @@ export function FieldPanel({
   const filters = [
     ...new Map(groups.flatMap((g) => g.filter ?? g.title ?? []).map((w) => [key(w), w])).entries(),
   ]
+  // a search looks through every group: the filter shows All while it has text
+  const scope = q.trim() ? 'All' : group
   const shown = searchGroups(
-    group === 'All'
+    scope === 'All'
       ? groups
       : groups.filter((g) => {
           const w = g.filter ?? g.title
-          return w !== undefined && key(w) === group
+          return w !== undefined && key(w) === scope
         }),
     q,
     t,
@@ -313,8 +350,12 @@ export function FieldPanel({
                 label: say(t, w).replace(' and ', ', ').replace(' und ', ', '),
               })),
             ]}
-            value={group}
-            onChange={setGroup}
+            value={scope}
+            onChange={(v) => {
+              // a group chosen while searching shows that group, not the search
+              setQ('')
+              setGroup(v)
+            }}
           />
         )
       }
@@ -328,16 +369,23 @@ export function FieldPanel({
           aria-label={t('Search {title}', {
             title: language === 'en' ? name.toLowerCase() : name,
           })}
-          placeholder={t('Symbol or name')}
+          placeholder={symbols ? t('Symbol or name') : t('Name')}
           leftSection={<MagnifyingGlass aria-hidden="true" />}
           value={q}
           onChange={(e) => setQ(e.currentTarget.value)}
         />
       )}
       {/* every row stays in the table: print has them all */}
-      <SymbolTable label={name} groups={groups} on={new Set(shown.flatMap((g) => g.rows))} />
+      <SymbolTable
+        label={name}
+        groups={groups}
+        on={new Set(shown.flatMap((g) => g.rows))}
+        symbolColumn={symbols}
+      />
       {shown.length === 0 && (
-        <p className="record-note">{t('No row matches {query}.', { query: q.trim() })}</p>
+        <p className="record-note">
+          {t('No row of {table} matches {query}.', { table: name, query: q.trim() })}
+        </p>
       )}
       {children}
     </Panel>

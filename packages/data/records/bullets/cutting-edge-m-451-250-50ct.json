@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-m-451-250-50ct",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.451 250 50ct",
+  "name": "M.451 250 50ct (MAXIMUS, 250 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".451",
+  "diameter": {
+    "value": 11.455,
+    "raw": ".451"
+  },
+  "mass": {
+    "value": 16.2,
+    "raw": "250 gr"
+  },
+  "length": {
+    "value": 23.16,
+    "raw": ".912\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.2,
+      "note": "G1 BC, printed \".200\". No method mark: method not stated. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.1,
+      "note": "G7 BC, printed \".100 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 762,
+    "raw": "1-30\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .451, Grains 250, Minimum Required Twist 1-30\", Part Number M.451 250 50ct, G1 BC .200, G7 BC .100 EST, OAL .912\", BULLET PROJECTION .540\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .540\"."
+}

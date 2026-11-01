@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-cal-83gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "1327",
+  "name": ".243 Cal-083gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 5.184,
+    "raw": "80 gr"
+  },
+  "length": {
+    "value": 26.42,
+    "raw": "Bullet length is 1.04″"
+  },
+  "noseLength": {
+    "value": 14.97,
+    "raw": "Nose length is .5893″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.345,
+      "note": "Hammer Bullets: \"G1-BC= .345 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 234.95,
+    "raw": "Recommended minimum twist rate: 1-9.25″"
+  },
+  "note": "Recommended use: Small to Big Game Hunting. The product page also says: \"This Stone Hammer™ bullet is designed with a 2.5mm hollow point for easy opening on small to big game. With an 80% weight retention this bullet will work very well for big game hunting. This Stone Hammer™ has a little longer nose and shorter baring surface giving it a little better bc.\" The product name says 83 gr; the specification says 80 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-83gr-stone-hammer/: Recommended minimum twist rate: 1-9.25″ | Bullet length is 1.04″ | Nose length is .5893″ | Bullet weight is 80gr | Recommended use: Small to Big Game Hunting | G1-BC= .345 estimated"
+      }
+    ]
+  }
+}

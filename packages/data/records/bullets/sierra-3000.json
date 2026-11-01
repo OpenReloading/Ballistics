@@ -1,0 +1,63 @@
+{
+  "id": "sierra-3000",
+  "manufacturer": "sierra",
+  "productNumber": "3000",
+  "name": "375 CAL 300 GR SBT GAMEKING (SGK)",
+  "caliber": "0.375",
+  "diameter": {
+    "value": 9.525,
+    "raw": "0.375 in"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.475,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.239,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/375-cal-300-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "901da6f7dfee8d705b2a32bf20f9910c828ac90d88daf0dfe6bd8b090aaa25f2",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 3000, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.375, Bullet Weight (Grains): 300, G1 BC: 0.475, G7 BC: 0.239, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

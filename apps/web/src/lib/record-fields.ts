@@ -62,6 +62,8 @@ export interface FieldRow {
   method?: Wording | undefined
   /** SI velocity: the lower bound of a ballistic coefficient's band, after the label. */
   fromVelocity?: number
+  /** The value as links, each with its text, in place of `text` on screen; `text` stays the plain value. */
+  links?: { href: string; text: string }[]
 }
 
 /** Rows under a group heading row (Dimensions, Computed, Coefficients); no title, no heading row. */
@@ -340,6 +342,25 @@ const computed = (label: Message, unit: string, r: ComputedRange): FieldRow => (
   method: worded(msg('Over the composition ranges: {min} to {max}.'), { min: r.min, max: r.max }),
 })
 
+/** The cartridges the manufacturer lists a powder for, each a link to its record page. */
+function listedRows(
+  ids: readonly string[] | undefined,
+  names: ReadonlyMap<string, string>,
+): FieldRow[] {
+  if (!ids?.length) return []
+  const links = ids.map((id) => ({
+    href: `/cartridges/${encodeURIComponent(id)}`,
+    text: names.get(id) ?? id,
+  }))
+  return [
+    {
+      label: msg('Listed by the manufacturer for'),
+      text: links.map((l) => l.text).join('; '),
+      links,
+    },
+  ]
+}
+
 /**
  * The groups of a powder page's Properties table, in record order; absent fields are left out.
  * Manufacturer, form, base, bulk density and country are the cards of `powderStrip`.
@@ -353,10 +374,7 @@ export function powderRowGroups(
     {
       rows: [
         ...text(msg('Aliases'), p.aliases?.join('; ')),
-        ...text(
-          msg('Listed by the manufacturer for'),
-          p.listedCartridges?.map((id) => cartridgeNames.get(id) ?? id).join('; '),
-        ),
+        ...listedRows(p.listedCartridges, cartridgeNames),
       ],
     },
     {
@@ -628,22 +646,36 @@ const bcItem = (dragModel: string, rows: FieldRow[]): StripItem[] =>
       ]
     : []
 
+/** A bullet's type for the strip: its tip and its base as words ("hollow-point, boat-tail"), what the record gives. */
+const bulletType = (b: Bullet): FieldRow[] => {
+  const parts = [b.tip?.type, b.base?.type].flatMap((x): string[] => (x ? [x] : []))
+  return parts.length === 0
+    ? []
+    : [{ label: msg('Type'), text: parts.join(', '), words: parts.map((p) => rawWording(p)) }]
+}
+
 /**
- * The bullet strip: diameter, mass, length, the BC (G7 where given, else G1, its drag model in the
- * label) and the sectional density; only what the record has.
+ * The bullet strip: diameter, mass, length, the BCs G1 and G7 (one card), the sectional density
+ * and the type (tip and base); only what the record has.
  */
 export function bulletStrip(b: Bullet): StripItem[] {
   const bcs = b.ballisticCoefficients ?? []
-  const bc =
-    bcs.find((c) => c.dragModel === 'G7') ?? bcs.find((c) => c.dragModel === 'G1') ?? bcs[0]
+  const shown = ['G1', 'G7'].flatMap((m) => {
+    const c = bcs.find((x) => x.dragModel === m)
+    return c ? [c] : []
+  })
   const item = stripItem
   const sd = computedBulletRows(b).find((r) => r.value?.quantity === 'sectionalDensity')
   return [
     ...item('diameter', msg('Diameter'), length(msg('Diameter'), b.diameter)),
     ...item('mass', msg('Mass'), stored('mass', 'g')(msg('Mass'), b.mass)),
     ...item('length', msg('Length'), length(msg('Length'), b.length)),
-    ...(bc ? bcItem(bc.dragModel, ballisticCoefficientRows({ ballisticCoefficients: [bc] })) : []),
+    // the same icon: `FieldStrip` puts both in one card
+    ...shown.flatMap((bc) =>
+      bcItem(bc.dragModel, ballisticCoefficientRows({ ballisticCoefficients: [bc] })),
+    ),
     ...item('sectionalDensity', msg('Sectional density'), sd ? [sd] : []),
+    ...item('form', msg('Type'), bulletType(b)),
   ]
 }
 

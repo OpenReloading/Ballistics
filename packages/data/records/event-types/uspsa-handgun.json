@@ -1,0 +1,205 @@
+{
+  "id": "uspsa-handgun",
+  "name": "USPSA Handgun and PCC",
+  "federation": "uspsa",
+  "ruleBook": "uspsa-competition-rules-2026-09",
+  "scoring": {
+    "method": "hit-factor",
+    "points": {
+      "major": { "A": 5, "C": 4, "D": 2, "metal": 5 },
+      "minor": { "A": 5, "C": 3, "D": 1, "metal": 5 }
+    },
+    "penalties": { "miss": 10, "noShoot": 10, "procedural": 10 },
+    "powerFactors": [
+      { "division": "Open", "minor": 125, "major": 165 },
+      { "division": "Limited", "minor": 125, "major": 165 },
+      { "division": "Limited-10", "minor": 125, "major": 165 },
+      { "division": "Production", "minor": 125 },
+      { "division": "Single-Stack", "minor": 125, "major": 165 },
+      { "division": "Revolver", "minor": 125, "major": 165 },
+      { "division": "Carry Optics", "minor": 125 },
+      { "division": "Pistol Caliber Carbine", "minor": 125 },
+      { "division": "Limited Optics", "minor": 125 }
+    ]
+  },
+  "levels": ["Level I", "Level II", "Level III", "Nationals"],
+  "magazine": [
+    {
+      "division": "Open",
+      "maxLength": { "value": 171.25, "raw": "6.742 in (171.25 mm)" }
+    },
+    {
+      "division": "Limited",
+      "maxLength": { "value": 141.25, "raw": "5.561 in (141.25 mm)" },
+      "note": "171.25 mm in single stack handguns."
+    },
+    {
+      "division": "Limited-10",
+      "maxRounds": 10,
+      "maxLength": { "value": 141.25, "raw": "5.561 in (141.25 mm)" },
+      "note": "171.25 mm in single stack handguns."
+    },
+    { "division": "Production", "maxRounds": 15 },
+    { "division": "Single-Stack", "powerFactor": "major", "maxRounds": 8 },
+    { "division": "Single-Stack", "powerFactor": "minor", "maxRounds": 10 },
+    {
+      "division": "Carry Optics",
+      "maxLength": { "value": 141.25, "raw": "141.25 mm (5.561 in)" }
+    },
+    {
+      "division": "Limited Optics",
+      "maxLength": { "value": 141.25, "raw": "5.561 in (141.25 mm)" },
+      "note": "171.25 mm in single stack handguns."
+    }
+  ],
+  "movingTargets": true,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Contents page (title, edition 2026-09)",
+        "fields": ["federation", "ruleBook"]
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "9.2.1 and 9.2.3.1, p. 53",
+        "url": "https://rules.uspsa.org/uspsa/section/9.2",
+        "sha256": "b93bc89e5687f0e9402987bacac707708eb780782fd7ca2cbca8c1e440359597",
+        "fields": ["scoring.method"],
+        "note": "Comstock and Virginia Count stages score by hit factor: the best hits less the penalties, divided by the stage time; the best hit factor earns the stage's maximum points. Fixed Time stages (9.2.4) score points without the time and are not covered by this record."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix B1, pp. 86-89 (cardboard target zones per power factor)",
+        "url": "https://rules.uspsa.org/uspsa/appendix/B1",
+        "sha256": "e7717799e48f90533b3b54644134dc22dc120fc085ef2530b913c3256d350814",
+        "fields": [
+          "scoring.points.major.A",
+          "scoring.points.major.C",
+          "scoring.points.major.D",
+          "scoring.points.minor.A",
+          "scoring.points.minor.C",
+          "scoring.points.minor.D"
+        ],
+        "note": "A B zone on an older USPSA target scores as C."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix B2, p. 90 (poppers)",
+        "url": "https://rules.uspsa.org/uspsa/appendix/B2",
+        "sha256": "484816fef961ab5285145784c8db2aaad983337469b6e1e20aed6b2a4ec48c8c",
+        "fields": ["scoring.points.major.metal", "scoring.points.minor.metal"],
+        "note": "Poppers score 5 with either power factor; metal plates likewise (Appendix B3, p. 91)."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix B3, p. 91 (metal plates)",
+        "url": "https://rules.uspsa.org/uspsa/appendix/B3",
+        "sha256": "055eb74fa65374409278afbf2b0553fa918ab38c13e79f6aeff985311d61f114",
+        "fields": ["scoring.points.major.metal", "scoring.points.minor.metal"]
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "9.4.2 to 9.4.4, p. 54",
+        "url": "https://rules.uspsa.org/uspsa/section/9.4",
+        "sha256": "afbc10d5fd104d8530499668d9020221f1a352678f8aa64e96f68f083fb9c1a1",
+        "fields": ["scoring.penalties.miss", "scoring.penalties.noShoot"],
+        "note": "A miss and each no-shoot hit cost twice the best scoring hit, 10 points with the 5-point A zone; the rule sets no cap on penalized hits per no-shoot. Fixed Time stages and disappearing targets incur no miss penalty."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "10.1.2, p. 62",
+        "url": "https://rules.uspsa.org/uspsa/section/10.1",
+        "sha256": "5002784a4fcd7ea44949993ac4a9d869b2e1e74d0227792e3819520ab4c80750",
+        "fields": ["scoring.penalties.procedural"],
+        "note": "A procedural penalty is twice the best cardboard hit, 10 points, except the case of rule 9.4.6.2."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D1 items 1-2, p. 101",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D1",
+        "sha256": "1304b000c7d9e0b02656044aad5279c7b682259e6b050ea4954d4a0865e87448",
+        "fields": ["scoring.powerFactors", "magazine"],
+        "note": "Open: item 8 limits the magazine length, item 9 sets no round limit."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D2 items 1-2, 8, p. 102",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D2",
+        "sha256": "c6d67617b4811847c208770f49f3534f057e5bcd289365fedfe40a69e9f001de",
+        "fields": ["scoring.powerFactors", "magazine"]
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D3 items 1-2, 8-9, p. 103",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D3",
+        "sha256": "f7da655f0ffd4ebb67fa9a5807ae8e55b16b63563bd429cac857511bdf49b04c",
+        "fields": ["scoring.powerFactors", "magazine"],
+        "note": "Limited-10: at most 10 rounds in any magazine after the start signal."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D4 items 1-2, 7-9, pp. 104-109",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D4",
+        "sha256": "bdb1b26ee0c00c72213f140ea19588bc576afe2665806dcfe7e5b58afe0ca70b",
+        "fields": ["scoring.powerFactors", "magazine"],
+        "note": "Production: at most 15 rounds in any magazine after the start signal; the handgun with an empty magazine must fit a gauge box (item 7), so no length is recorded."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D5 items 1-2, 7-9, pp. 110-112",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D5",
+        "sha256": "ec605050648af3d46a42a3a786da4eafa8901ab92b0cd7b3eb291c2ccd57c9af",
+        "fields": ["scoring.powerFactors", "magazine"],
+        "note": "Single-Stack: at most 8 rounds per magazine after the start signal with major, 10 with minor; size by gauge box (item 7)."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D6 items 1-2, 9, p. 113",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D6",
+        "sha256": "ac563d7274e0c08ce4b0b5cf9936dd88d9c451b9925379cf8be53ec69f7c2817",
+        "fields": ["scoring.powerFactors"],
+        "note": "Revolver has no magazine limit; item 9 limits the rounds fired before a reload instead (6 with major, 8 with minor), which this record does not hold."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D7 items 1-2, 8, pp. 114-118",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D7",
+        "sha256": "5c99996fc19bed9af639ae9b536a967fd34311a900f3c58e38e1f7c2e3467569",
+        "fields": ["scoring.powerFactors", "magazine"]
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D8 items 3, 5, pp. 119-120",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D8",
+        "sha256": "434e1a55aa84a2ed8da5bcd70e45f68db2c50840f6f5362af94cbff54e346d86",
+        "fields": ["scoring.powerFactors"],
+        "note": "Pistol Caliber Carbine scores minor only and has no magazine limit."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix D9 items 1-2, 8, p. 121",
+        "url": "https://rules.uspsa.org/uspsa/appendix/D9",
+        "sha256": "2e90c37cc551679bb8144a06c128c6c915c40e29dc9d43103ea31107d127f8e9",
+        "fields": ["scoring.powerFactors", "magazine"]
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix A1, p. 76",
+        "url": "https://rules.uspsa.org/uspsa/appendix/A1",
+        "sha256": "3c05498c56a43592131c8e8bcc39f4cb22bab152561e3273aa0c329737f81595",
+        "fields": ["levels"],
+        "note": "Level I club matches, Level II section or state matches, Level III Area championships, and the annual national championship."
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "9.9.1 and 9.9.2, p. 59",
+        "url": "https://rules.uspsa.org/uspsa/section/9.9",
+        "sha256": "21234b4a2a716cbcae608269a0b78d327805786284a90d4c338b84430b7daf33",
+        "fields": ["movingTargets"],
+        "note": "Activated targets that move, appear or disappear may be used; 9.9 says when they incur miss penalties. 2.1.8.4 (p. 14) also limits the angle of moving IPSC targets at rest."
+      }
+    ]
+  }
+}

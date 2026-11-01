@@ -1,0 +1,26 @@
+{
+  "id": "alliant-blue-dot",
+  "manufacturer": "alliant",
+  "name": "Blue Dot",
+  "grainForm": "flake",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "alliant-powder-reloader-s-guide-2023",
+        "url": "https://www.alliantpowder.com/resources/catalog/AP399_2023AlliantPowderReloadersGuide_SinglePgsNoCrops.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      },
+      {
+        "source": "alliant-safety-data-sheet-15-25-smokeless-powder",
+        "page": "section 9",
+        "url": "https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm"],
+        "note": "Section 9 gives the appearance \"Small black/gray flakes\"; the Alliant SDS listing (https://www.alliantpowder.com/resources/sds.aspx) links this sheet for Blue Dot. The Power Pro Series sheet prints the same appearance, while the Power Pro product pages state spherical grains, so the line may not be specific to this powder.",
+        "kind": "derived"
+      }
+    ]
+  }
+}

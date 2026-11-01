@@ -46,7 +46,7 @@ test('switching steps, changing an input and the units move nothing below the no
 
   // an input change marks the result stale
   await form.getByLabel(/^Charge mass/).fill('2.5')
-  await expect(page.getByText('Inputs changed since this result').first()).toBeAttached()
+  await expect(page.getByText('Inputs changed', { exact: true }).first()).toBeAttached()
   expect(await below(page)).toEqual(before)
 
   // the units of the notes change with the preset

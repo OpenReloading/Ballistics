@@ -1,0 +1,21 @@
+{
+  "id": "44-s-w-special-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:44-s-w-special",
+  "waterCapacity": {
+    "value": 2.171,
+    "raw": "33.5 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .44 Special",
+        "url": "https://en.wikipedia.org/w/index.php?title=.44_Special&oldid=1368969599",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 33.5 gr H2O (2.17 cm3)."
+      }
+    ]
+  }
+}

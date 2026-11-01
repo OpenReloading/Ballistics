@@ -1,0 +1,69 @@
+{
+  "id": "berger-30425",
+  "manufacturer": "berger",
+  "productNumber": "30425",
+  "name": "30 Cal 168 gr Hybrid Target",
+  "productLine": "Target",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 32.69
+  },
+  "base": {
+    "length": {
+      "value": 5.664
+    }
+  },
+  "noseLength": {
+    "value": 20.193
+  },
+  "baseToOgive": {
+    "value": 14.3
+  },
+  "bearingLength": {
+    "value": 6.833
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.515
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.264,
+      "note": "G7 form factor 0.960"
+    }
+  ],
+  "recommendedTwist": {
+    "value": 304.8,
+    "raw": "1:12\""
+  },
+  "note": "Berger's 'Hybrid' is a tangent ogive at the shank that goes secant forward of it; the form is named by the maker and the radius is not published.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "berger-bullets-quick-reference-sheet-2020",
+        "url": "https://bergerbullets.com/pdf/Quick-Reference-Sheets.pdf",
+        "retrieved": "2026-09-05",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base.length",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "0.308 in; OAL 1.287, Boat Tail 0.223, Nose Length 0.795, Base to Ogive 0.563, Bearing Surface 0.269 in; SD 0.253; G1 0.515, G7 0.264, G7 FF 0.960; 1:12\". 'For reference only and do not reflect exact numbers for every lot.'"
+      }
+    ]
+  }
+}

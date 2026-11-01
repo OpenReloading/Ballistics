@@ -1,0 +1,30 @@
+{
+  "id": "hornady-2640",
+  "manufacturer": "hornady",
+  "productNumber": "2640",
+  "name": "6.5mm RN, .264, 160 gr",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264\""
+  },
+  "mass": {
+    "value": 10.368,
+    "raw": "160 gr"
+  },
+  "note": "The catalog prints BC .283 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "86",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "6.5mm RN, .264\", 160 gr., Ballistic Coef. .283, Sec. Den. .328, Item # 2640"
+      }
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "id": "vihtavuori-3n37",
+  "manufacturer": "vihtavuori",
+  "name": "3N37",
+  "country": "FI",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 3.0281,
+      "standardUncertainty": 0.25
+    },
+    "energy": {
+      "value": 2744500,
+      "standardUncertainty": 110000
+    },
+    "gamma": 1.2425,
+    "covolume": {
+      "value": 0.001059
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    },
+    "trainingRows": 102,
+    "trainingCartridges": 6
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "page": "1",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"],
+        "note": "Lists 3N37 in the product identifier; section 9 gives \"Cylindrical, T or Diskette grains\" for the whole sheet."
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "page": "section 3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["propellantBase"],
+        "kind": "derived",
+        "note": "Section 3 lists cellulose nitrate and no nitroglycerin: single base."
+      },
+      {
+        "title": "Vihtavuori product page, 3N37",
+        "publisher": "Vihtavuori",
+        "url": "https://vihtavuori.com/powder/3n37-powder/",
+        "retrieved": "2026-10-13",
+        "fields": ["grainForm"],
+        "note": "Calls 3N37 a tubular powder type.",
+        "origin": "manufacturer"
+      },
+      {
+        "source": "vihtavuori-reloading-data-release-14-9-2026",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/09/LecasyFile14.9.2026-10.34.48.json",
+        "retrieved": "2026-10-12",
+        "fields": ["interior"],
+        "kind": "fitted",
+        "run": {
+          "version": "40b22919fd09b0cb",
+          "report": "docs/research/interior-load-table-fit-parameters.md"
+        },
+        "note": "102 training rows of this table (hold-out by cartridge, docs/data/published-loads.md); M3 parameters vivacity, energy fitted by the load-table fit (docs/research/interior-load-table-fit-parameters.md), candidate B; single base prior; the other values of interior are fixed inputs of the fit; start pressure per row from defaultStartPressure in core: 30.0 MPa at a barrel of 300 mm and longer; below by the bullet construction of the printed bullet type: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa. Effective model parameters, not load data."
+      },
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-revised-03",
+        "page": "section 1.3",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Supplier of the safety data sheet: Nammo Vihtavuori Oy, Ruutitehtaantie 80, 41330 Vihtavuori, Finland."
+      }
+    ]
+  }
+}

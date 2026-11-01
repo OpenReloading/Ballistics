@@ -1,0 +1,56 @@
+{
+  "id": "hammer-338-cal-267gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869042153",
+  "name": ".338 Cal-267gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 17.301,
+    "raw": "267 gr"
+  },
+  "length": {
+    "value": 47.63,
+    "raw": "Bullet length including tip is 1.875″"
+  },
+  "noseLength": {
+    "value": 24.41,
+    "raw": "Nose length including tip is .9609″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.334,
+      "note": "Hammer Bullets: \"g7-bc= .334 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Minimum required twist rate is 1-10″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"This is our heavy hitter in the .338 caliber bullets and still feed from a magazine. Designed to be able to run in the factory 1-10″ twist rifles and be fully stable for unprecedented terminal performance at long range or up close. This pure copper bullet will handle all of your hunting needs around the world up to the biggest of the dangerous game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-267gr-hammer-hht/: Minimum required twist rate is 1-10″ or faster | Bullet length including tip is 1.875″ | Nose length including tip is .9609″ | Tip length is .143″ | Bullet weight is 267gr | Recommended use: Big Game Hunting | g7-bc= .334 estimated"
+      }
+    ]
+  }
+}

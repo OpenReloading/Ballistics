@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mth-375-400-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 375 400 MAX",
+  "name": "MTH 375 400 MAX (MTH, 400 gr)",
+  "productLine": "MTH",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 25.92,
+    "raw": "400 gr"
+  },
+  "length": {
+    "value": 56.01,
+    "raw": "2.205\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.909,
+      "note": "G1 BC, printed \".909 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.456,
+      "note": "G7 BC, printed \".456 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "*1-9\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .375, Grains 400, Minimum Required Twist *1-9\", Part Number MTH 375 400 MAX, G1 BC .909 (A.B.), G7 BC .456 (A.B.), OAL 2.205\", Bullet Projection 1.609\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.609\"."
+}

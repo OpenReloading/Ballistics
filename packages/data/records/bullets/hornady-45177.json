@@ -1,0 +1,33 @@
+{
+  "id": "hornady-45177",
+  "manufacturer": "hornady",
+  "productNumber": "45177",
+  "name": "45 Cal. FMJ-RN, .451, 230 gr",
+  "caliber": ".451",
+  "diameter": {
+    "value": 11.455,
+    "raw": ".451\""
+  },
+  "mass": {
+    "value": 14.904,
+    "raw": "230 gr"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "note": "Item numbers 45177, 451771, 45177B (box counts). The catalog prints BC .184 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "97",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "tip.type"],
+        "note": "45 Cal. FMJ-RN, .451\", 230 gr., Ballistic Coef. .184, Sec. Den. .162, Item # 45177/451771/45177B"
+      }
+    ]
+  }
+}

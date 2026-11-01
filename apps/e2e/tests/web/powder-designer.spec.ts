@@ -35,7 +35,7 @@ async function design(page: Page) {
   await gotoHydrated(page, '/powders/designer')
   await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Mine DP')
   await page.getByLabel('Values came about by').selectOption({ label: 'Fitted to data' })
-  await page.getByRole('checkbox', { name: 'Vivacity' }).check()
+  await page.getByRole('checkbox', { name: 'Vivacity (moved by the fit)' }).check()
   for (const [label, value] of burnLaw) await field(page, label).fill(value)
 }
 
@@ -81,6 +81,26 @@ test('checks the draft against the powder schema at its fields', async ({ page }
   await expect(page.getByText('Usable in the workbench')).toBeHidden()
 })
 
+test('lists everything a hand-entered burn law lacks at once, in plain words', async ({ page }) => {
+  await gotoHydrated(page, '/powders/designer')
+  await page.getByRole('textbox', { name: 'Name', exact: true }).fill('Typed DP')
+  await page.getByLabel('Values came about by').selectOption({ label: 'Published' })
+  for (const [label, value] of burnLaw) await field(page, label).fill(value)
+  // one published thermochemistry value: its empty Min and Max are the value
+  await field(page, 'Gamma value').fill('1.22')
+  const list = page.locator('.powder-problems')
+  await expect(list.getByText('Tick at least one fitted parameter.')).toBeVisible()
+  await expect(list.getByText('Set Values came about by to Fitted to data.')).toBeVisible()
+  await expect(list.getByText('Add at least one ingredient.')).toBeVisible()
+  await expect(list).not.toContainText('Gamma min')
+  await expect(page.getByText('does not pass the powder schema')).toBeHidden()
+  await field(page, 'Vivacity').fill('-3')
+  await expect(field(page, 'Vivacity')).toHaveAttribute('aria-invalid', 'true')
+  await expect(list.getByText('Vivacity must be greater than 0.')).toBeVisible()
+  await field(page, 'Gamma').fill('0.9')
+  await expect(list.getByText('Gamma must be above 1.')).toBeVisible()
+})
+
 test('keeps the draft in the browser and reopens it from the Open menu', async ({ page }) => {
   await design(page)
   await expect(page.getByText('Saved in this browser')).toBeVisible()
@@ -110,8 +130,8 @@ test('a powder design fills the model values, is marked and named in the run and
   await expect(vivacity).toHaveValue('0.612')
   await expect(vivacity).toHaveAccessibleDescription(/user design/)
 
-  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('168')
-  await page.getByRole('option', { name: /168 gr/ }).click()
+  await form.getByRole('combobox', { name: /^Search bullets/ }).fill('demo 168')
+  await page.getByRole('option', { name: /^Demo Bullets 30 Cal 168 gr/ }).click()
   await form.getByRole('combobox', { name: 'Search cartridges by name' }).fill('308 Win')
   await page
     .getByRole('option', { name: /^308 Win/ })

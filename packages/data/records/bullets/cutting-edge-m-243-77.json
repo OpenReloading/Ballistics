@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-m-243-77",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.243 77",
+  "name": "M.243 77 (MAXIMUS, 77 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 4.99,
+    "raw": "77 gr"
+  },
+  "length": {
+    "value": 25.93,
+    "raw": "1.021\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.344,
+      "note": "G1 BC, printed \".344 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.172,
+      "note": "G7 BC, printed \".172 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .243, Grains 77, Minimum Required Twist 1-10\", Part Number M.243 77, G1 BC .344 EST, G7 BC .172 EST, OAL 1.021\", BULLET PROJECTION .615\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .615\"."
+}

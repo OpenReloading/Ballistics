@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mth-323-256-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 323 256 MAX",
+  "name": "MTH 323 256 MAX (MTH, 256 gr)",
+  "productLine": "MTH",
+  "caliber": ".323 (8mm)",
+  "diameter": {
+    "value": 8.204,
+    "raw": ".323 (8mm)"
+  },
+  "mass": {
+    "value": 16.589,
+    "raw": "256 gr"
+  },
+  "length": {
+    "value": 47.8,
+    "raw": "1.882\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.75,
+      "note": "G1 BC, printed \".750\". No method mark: method not stated. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.366,
+      "note": "G7 BC, printed \".366est.\". Marked est.: estimated, within +/- 5% (page footnote). The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "*1-9\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .323 (8mm), Grains 256, Minimum Required Twist *1-9\", Part Number MTH 323 256 MAX, G1 BC .750, G7 BC .366est., OAL 1.882\", Bullet Projection 1.317\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.317\"."
+}

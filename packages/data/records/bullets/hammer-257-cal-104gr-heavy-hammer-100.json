@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-104gr-heavy-hammer-100",
+  "manufacturer": "hammer",
+  "productNumber": "658",
+  "name": ".257 Cal-104gr Heavy Hammer Hunter®",
+  "productLine": "Heavy Hammer Hunter",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 6.739,
+    "raw": "104 gr"
+  },
+  "length": {
+    "value": 28.96,
+    "raw": "Bullet Length is 1.140″"
+  },
+  "noseLength": {
+    "value": 13.04,
+    "raw": "Nose length is .5132″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.196,
+      "note": "Hammer Bullets: \"G7-BC=.196 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Required twist rate is 1-10″ or faster"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-104gr-heavy-hammer-100/: Required twist rate is 1-10″ or faster | Bullet Length is 1.140″ | Nose length is .5132″ | Bullet weight is 104gr | Recommended use: Big game hunting | G7-BC=.196 estimated"
+      }
+    ]
+  }
+}

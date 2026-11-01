@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-115gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869028356",
+  "name": ".264 Cal-115gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "length": {
+    "value": 32.94,
+    "raw": "Bullet length is 1.297″"
+  },
+  "noseLength": {
+    "value": 16.47,
+    "raw": "Nose length is .6484″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.346,
+      "note": "Hammer Bullets: \"g1-bc= .346 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9,
+    "raw": "Required twist rate is 1-8.5″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"At 115gr this Power Hammer™ is a fantastic weight for any of the 6.5mm cartridges. This bullet weight will produce very good velocity yet still have plenty of bullet for most any big game. This pure copper bullet is very attractive in the 6.5 Creedmoor at about 3100 fps as well as about 3600 fps in a 6.5 PRC.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-115gr-power-hammer/: Required twist rate is 1-8.5″ or faster | Bullet length is 1.297″ | Nose length is .6484″ | Bullet weight is 115gr | Recommended use: Big Game Hunting | g1-bc= .346 calculated from shot drops"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "berger",
+  "name": "Berger",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "berger-bullets-quick-reference-sheet-2020",
+        "url": "https://bergerbullets.com/pdf/Quick-Reference-Sheets.pdf",
+        "retrieved": "2026-09-05",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgbr-y04ne",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR Y04NE",
+  "name": "DGBR Y04NE (Safari Raptor, Solid & Lever+, 650 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".585",
+  "diameter": {
+    "value": 14.859,
+    "raw": ".585"
+  },
+  "mass": {
+    "value": 42.119,
+    "raw": "650 gr"
+  },
+  "length": {
+    "value": 31.93,
+    "raw": "1.257\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "10",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length"],
+        "note": "Page 10, Safari Raptor, Solid, & Lever+: Caliber .585, Grains 650, Part Number DGBR Y04NE, OAL 1.257\", Bullet Projection .496\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .496\"."
+}

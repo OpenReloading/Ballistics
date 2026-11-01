@@ -1,0 +1,61 @@
+{
+  "id": "cutting-edge-mtac-224-79-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 224 79 MAX",
+  "name": "MTAC 224 79 MAX (MTAC, 79 gr)",
+  "productLine": "MTAC",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 5.119,
+    "raw": "79 gr"
+  },
+  "length": {
+    "value": 30.1,
+    "raw": "1.185\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.431,
+      "note": "G1 BC, above the part number line, printed \".431 (A.B.)\". Marked (A.B.): independent testing (page footnote). Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.459,
+      "note": "G1 BC, below the part number line, printed \".459 (O89)\". Marked (O89): Oehler 89 system. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.221,
+      "note": "G7 BC, above the part number line, printed \".221 (A.B.)\". Marked (A.B.): independent testing (page footnote). Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.226,
+      "note": "G7 BC, below the part number line, printed \".226 (O89)\". Marked (O89): Oehler 89 system. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 177.8,
+    "raw": "*1-7\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .224, Grains 79, Minimum Required Twist *1-7\", Part Number MTAC 224 79 MAX, G1 BC .431 (A.B.) / .459 (O89), G7 BC .221 (A.B.) / .226 (O89), OAL 1.185\", Bullet Projection .773\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .773\"."
+}

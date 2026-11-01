@@ -1,0 +1,36 @@
+{
+  "id": "hornady-2442",
+  "manufacturer": "hornady",
+  "productNumber": "2442",
+  "name": "6mm BTHP, .243, 87 gr",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243\""
+  },
+  "mass": {
+    "value": 5.638,
+    "raw": "87 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "note": "The catalog prints BC .376 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "91",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "base.type", "tip.type"],
+        "note": "6mm BTHP, .243\", 87 gr., Ballistic Coef. .376, Sec. Den. .210, Item # 2442"
+      }
+    ]
+  }
+}

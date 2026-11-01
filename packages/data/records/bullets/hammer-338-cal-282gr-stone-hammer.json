@@ -1,0 +1,45 @@
+{
+  "id": "hammer-338-cal-282gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "863",
+  "name": ".338 Cal-282gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 18.273,
+    "raw": "282 gr"
+  },
+  "length": {
+    "value": 44.37,
+    "raw": "Bullet length is 1.747″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.553,
+      "note": "Hammer Bullets: \"G1-BC=.553 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Recommended twist rate is 1-11″ minimum"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/338-cal-282gr-stone-hammer/: Recommended twist rate is 1-11″ minimum | Bullet length is 1.747″ | Bullet weight is 282gr | Recommended use: Big game hunting | G1-BC=.553 estimated"
+      }
+    ]
+  }
+}

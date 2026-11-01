@@ -1,0 +1,21 @@
+{
+  "id": "9-mm-browning-court-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:9-mm-browning-court",
+  "waterCapacity": {
+    "value": 0.765,
+    "raw": "11.8 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .380 ACP",
+        "url": "https://en.wikipedia.org/w/index.php?title=.380_ACP&oldid=1363481298",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 11.8 grains H2O."
+      }
+    ]
+  }
+}

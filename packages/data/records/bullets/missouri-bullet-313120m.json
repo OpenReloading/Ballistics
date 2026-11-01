@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-313120m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "313120M",
+  "name": "#1 .32-20, 120 Grain RNFP",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95,
+    "raw": ".313 Diameter"
+  },
+  "mass": {
+    "value": 7.776,
+    "raw": "120 Grain"
+  },
+  "length": {
+    "value": 16.74,
+    "raw": "Bullet OAL .659 +/-"
+  },
+  "note": "Listed as 120 Grain RNFP. Brinell 18. For Lever Guns.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "313120M, #1 .32-20 (https://missouribullet.com/details.php?prodId=114): .313 Diameter, 120 Grain RNFP, Brinell 18, Bullet OAL .659 +/-"
+      }
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-esp-k300-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ESP K300 Raptor",
+  "name": "ESP K300 Raptor (ESP Raptor, 300 gr)",
+  "productLine": "ESP Raptor",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744,
+    "raw": ".423"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 40.16,
+    "raw": "1.581\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.32,
+      "note": "G1 BC w/tip, printed \".320 est.\". With the tip installed, determined at 250 yards (page footnote). Marked est.: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "1-14\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "8",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 8, Enhanced System Projectile (ESP): Caliber .423, Grains 300, Minimum Required Twist 1-14\", Part Number ESP K300 Raptor, G1 BC w/o tip TBD, G1 BC w/tip .320 est., OAL w/o tip 1.268\", OAL w/tip 1.581\", Bullet Projection w/o tip .380\", Bullet Projection w/tip .693\", Blunt Trauma Base™ ~ Retained Weight (grains) 221"
+      }
+    ]
+  },
+  "note": "G1 BC w/o tip is printed \"TBD\". Also printed: OAL w/o tip 1.268\" (the length stored is with the tip). Bullet projection (from the SealTite band to the tip, page footnote) printed: w/o tip .380\"; w/tip .693\"."
+}

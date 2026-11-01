@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  ActionIcon,
-  Button,
-  NativeSelect,
-  SegmentedControl,
-  SimpleGrid,
-  Stack,
-  Tooltip,
-} from '@mantine/core'
+import { Button, NativeSelect, SegmentedControl, SimpleGrid, Stack, Tooltip } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { Ruler } from '@phosphor-icons/react'
 import {
@@ -298,7 +290,7 @@ export function UnitsForm() {
           ]}
         />
       </div>
-      <SimpleGrid minColWidth="9rem" spacing="0.75rem" verticalSpacing="xs">
+      <SimpleGrid minColWidth="9rem" spacing="0.75rem" verticalSpacing="0.25rem">
         {choices.map(([q, label]) => (
           <NativeSelect
             key={q}
@@ -328,27 +320,37 @@ export function UnitsForm() {
   )
 }
 
-/** "Units: <preset>", ", custom" with an override: the name of the Units buttons. */
+/** "Units: <preset>", ", custom" with an override: the name of the Units buttons, and the preset's own. */
 function useUnitsName() {
   const { choice } = useUnits()
-  return `Units: ${presetNames[choice.preset]}${hasOverrides(choice) ? ', custom' : ''}`
+  const { t } = useTranslation()
+  const preset = t(presetNames[choice.preset])
+  const name = hasOverrides(choice)
+    ? t('Units: {preset}, custom', { preset })
+    : t('Units: {preset}', { preset })
+  return { name, preset }
 }
 
-/** Units in every page bar: an icon button named "Units: <preset>", the name on hover and focus. */
+/**
+ * Units in every page bar: a button with the preset's name, named "Units: <preset>", that name on
+ * hover and focus; in the phone panel the row shows the whole name (globals.css).
+ */
 export function UnitsIconButton() {
   const open = useContext(SettingsDialog)
-  const name = useUnitsName()
+  const { name, preset } = useUnitsName()
   return (
     <Tooltip label={name}>
-      <ActionIcon
+      <Button
         variant="default"
         className="units-link"
+        leftSection={<Ruler size={18} aria-hidden="true" />}
         aria-label={name}
         aria-haspopup="dialog"
         onClick={() => open('units')}
       >
-        <Ruler aria-hidden="true" />
-      </ActionIcon>
+        <span className="units-preset">{preset}</span>
+        <span className="units-full">{name}</span>
+      </Button>
     </Tooltip>
   )
 }

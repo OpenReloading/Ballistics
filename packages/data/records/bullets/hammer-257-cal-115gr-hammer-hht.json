@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-115gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869043981",
+  "name": ".257 Cal-115gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "length": {
+    "value": 34.57,
+    "raw": "Bullet length including tip is 1.3610″"
+  },
+  "noseLength": {
+    "value": 16.33,
+    "raw": "Nose length including tip is .6429″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.237,
+      "note": "Hammer Bullets: \"g7-bc= .237 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 215.9,
+    "raw": "Minimum required twist rate is 1-8.5″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"For you guys that have a faster than standard twist .257 cal and want to run a bit heavier bullet, here is some more love for the quarter bore. Requiring a minimum twist rate of 1-8.5″ this Hammer HHT™ will bring great velocity along with plenty of weight for any big game hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-115gr-hammer-hht/: Minimum required twist rate is 1-8.5″ or faster | Bullet length including tip is 1.3610″ | Nose length including tip is .6429″ | Tip length is .143″ | Bullet weight is 115gr | Recommended use: Big Game Hunting | g7-bc= .237 estimated"
+      }
+    ]
+  }
+}

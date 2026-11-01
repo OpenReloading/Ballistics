@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-358158sgl",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-358158SGL",
+  "name": ".38 Match-Grooveless, 158 Grain SWC - Grooveless",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 10.238,
+    "raw": "158 Grain"
+  },
+  "length": {
+    "value": 17.37,
+    "raw": "Bullet OAL .684 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 158 Grain SWC - Grooveless. Brinell 12. .38 Special. For Target Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-358158SGL, .38 Match-Grooveless (https://missouribullet.com/details.php?prodId=415): .358 Diameter, 158 Grain SWC - Grooveless, Brinell 12, Bullet OAL .684 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

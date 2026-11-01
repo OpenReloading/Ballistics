@@ -1,0 +1,64 @@
+{
+  "id": "sierra-1711c",
+  "manufacturer": "sierra",
+  "productNumber": "1711C",
+  "name": "6.5MM 100 GR HPBT MatchKing (SMK)",
+  "caliber": "0.264",
+  "diameter": {
+    "value": 6.706,
+    "raw": "0.264 in"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.361,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.182,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "The page title says HPBT, the specification of item 1711C Hollow Point (HP).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/6-5mm-100-gr-hpbt-matchking-smk/",
+        "retrieved": "2026-10-08",
+        "sha256": "1ae123b6c24d1e33f96a3eb005067bbd07093d45cba9c87919ab7c29b6a2792f",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1711C, Bullet Type: Hollow Point (HP), Bullet Diameter: 0.264, Bullet Weight (Grains): 100, G1 BC: 0.361, G7 BC: 0.182, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

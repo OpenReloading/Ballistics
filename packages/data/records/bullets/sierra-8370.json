@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8370",
+  "manufacturer": "sierra",
+  "productNumber": "8370",
+  "name": "38 CAL 180 GR FPJ TOURNAMENT MASTER",
+  "caliber": "0.357",
+  "diameter": {
+    "value": 9.068,
+    "raw": "0.357 in"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.147,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/38-cal-180-gr-fpj-tournament-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "835f58dea9788b0028fecbb363c3d28e4f0b0cde1f40f38558097a9f9fd77c52",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8370, Bullet Type: Full Profile Jacket (FPJ), Bullet Diameter: 0.357, Bullet Weight (Grains): 180, G1 BC: 0.147, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -44,7 +44,7 @@ The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, o
 
 Checks in `packages/api/test/`: `catalogue.test.ts` (derive, build, open, files) and `catalogue-budget.test.ts`; `app.test.ts` and `competition-order.test.ts` hold the answers of the routes.
 
-The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, one machine): about 10 ms from the records, 1 ms from the prebuilt index (460 kB, the record file is 3.6 MB and read on the first `get`).
+The budgets, tested as the best of fifteen runs after a warm-up (other test files share the CPU): the index of the public bundle from its records in under 50 ms, from the prebuilt index text in under 9 ms, a ranked page of 50 cartridges in under 5 ms. Measured on the public bundle (577 cartridges, 1,686 bullets, 248 powders, one machine): about 19 ms from the records, 3 ms from the prebuilt index (1.40 MB, the record file is 8.2 MB and read on the first `get`).
 
 ## Renames and the format guard
 
@@ -59,9 +59,11 @@ The index and the record file begin with two numbers. `format` is the layout of 
 
 ## The static site's data files
 
-`writeStaticApi` (`packages/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 3.6 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; the data file and the API route build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
+`writeStaticApi` (`packages/api/src/static.ts`) writes `api/catalogue/index.json`, the index as `buildCatalogue` returns it (the record file stays out: 8.2 MB, read only on `get`), and one file per record, `api/<kind>/<id>.json`, the body of `GET /<kind>/<id>`; the data file and the API route build the cartridge body with `cartridgeAnswer`. The browser fetches the index once, opens it with `openCatalogue` and answers every list, with its filters, `q`, paging and order, through the catalogue (`apps/web/src/lib/static-api.ts`). A record is one file fetch. There are no per-kind list files, no `search.json` and no per-cartridge bullet lists: the `cartridge` filter of the bullets runs `bulletWindow` over the index.
 
-In the public data the index is 460 kB (62 kB gzipped). `catalogue-budget.test.ts` caps it at 600 kB and 80 kB gzipped. The service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
+In the public data the index is 1.40 MB (152 kB gzipped), 0.86 MB of it the bullet and powder rows (about 450 bytes per bullet, 390 per powder). `catalogue-budget.test.ts` caps it at 1.5 MB and 160 KB gzipped: the cap of the 577 cartridges (600 kB, 80 KB gzipped) did not hold the published bullets and powders. The service worker precaches it with the build's static files and answers it from the shell cache (`apps/web/src/lib/offline.ts`), so a list opens offline after the first visit and the index always belongs to its build.
+
+The Pages export of the public data is 340 MB per edition (bullet pages 146 MB, the docs site 58 MB, cartridge pages 48 MB, disciplines 34 MB, powder pages 21 MB, the data files 18 MB), 680 MB for the two editions against the 1 GB limit of the site (`apps/docs/docs/ci-tools.md`).
 
 `apps/web/test/static-api.test.ts` compares the browser's answers with the API's for every list, paging, filters, ranked queries in both word orders, the default order and the refusals of the query schemas.
 

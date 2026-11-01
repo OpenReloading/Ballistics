@@ -97,6 +97,26 @@ test('at 390 x 640 I accept and Decline are in view without scrolling', async ({
     await expect(dialog.getByRole('button', { name })).toBeInViewport({ ratio: 1 })
 })
 
+test('the buttons of the Safety notice pass the axe contrast check in light and dark', async ({
+  page,
+}) => {
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme })
+    await page.goto('/powders')
+    await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme', colorScheme)
+    const dialog = page.getByRole('dialog', { name: /Safety notice and disclaimer/ })
+    await expect(dialog.getByRole('button', { name: 'I accept' })).toBeVisible()
+    // the opening transition ends at full opacity: axe measures the final colours
+    await expect(dialog).toHaveCSS('opacity', '1')
+    const { violations, passes } = await new AxeBuilder({ page })
+      .include('[role="dialog"] .mantine-Group-root')
+      .withRules(['color-contrast'])
+      .analyze()
+    expect(violations.map((v) => `${colorScheme}: ${v.id}`)).toEqual([])
+    expect(passes.map((p) => p.id)).toContain('color-contrast')
+  }
+})
+
 test('the Safety buttons pass the axe contrast check in light and dark at 1280 and 390 px', async ({
   page,
 }) => {

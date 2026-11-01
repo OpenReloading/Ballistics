@@ -1,7 +1,6 @@
 'use client'
 
-import { Group, MultiSelect, Pill } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { Button, Group, MultiSelect, Pill } from '@mantine/core'
 import type { Powder } from '@open-reloading/schema'
 import { ChartLine } from '@phosphor-icons/react'
 import Link from 'next/link'
@@ -10,7 +9,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowder } from '../lib/api-client.ts'
 import {
-  bandAndBarsNote,
+  bandNote,
   classifyPowder,
   dashes,
   describeCurve,
@@ -25,6 +24,9 @@ import {
   unfitTitles,
   unfittedGroups,
 } from '../lib/burn-rate.ts'
+import { designCurves } from '../lib/powder-rows.ts'
+import { userRecordId, userRowId } from '../lib/sources.ts'
+import { storedRecords } from '../lib/user-store.ts'
 import { say } from '../lib/wording.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
@@ -56,7 +58,8 @@ function writeAdd(picks: OverlayPick[]) {
   const p = new URLSearchParams(window.location.search)
   if (picks.length > 0) p.set('add', picks.map((s) => s.id).join(','))
   else p.delete('add')
-  const s = p.toString().replaceAll('%2C', ',')
+  // commas and the colon of a design's `user:` id as typed: the link stays readable
+  const s = p.toString().replaceAll('%2C', ',').replaceAll('%3A', ':')
   window.history.replaceState(null, '', `${pathname}${s ? `?${s}` : ''}`)
 }
 
@@ -65,22 +68,20 @@ function OverlayBody({
   picks,
   loading,
   series,
-  wide,
 }: {
   read: boolean
   picks: number
   loading: boolean
   series: { powder: FittedPowder; slot: number }[]
-  wide: boolean | undefined
 }) {
   const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
   if (!read || loading) return <Loading what="curves" />
   if (picks === 0)
     return (
       <EmptyNote
         icon={<ChartLine size={24} aria-hidden="true" />}
         title={t('No powder in the overlay.')}
-        description={t('Tick powders in the powder list to add them.')}
       />
     )
   // every pick failed: the error note above stands alone
@@ -89,17 +90,29 @@ function OverlayBody({
     <>
       <LazyVivacityChart
         series={series}
-        height={wide ? 420 : 300}
         title={t('Dynamic vivacity of the chosen powders, model output')}
         description={series.map((s) => describeCurve(s.powder, t)).join(' ')}
       />
-      <details className="values-details">
-        <summary>{t('Values table')}</summary>
+      <p className="screen-only record-note">
+        {t(modelCaption)}
+        {series.length === 1 && series[0]?.powder.spread !== undefined && ` ${t(bandNote)}`}
+      </p>
+      <Button
+        className="curve-toggle"
+        variant={open ? 'light' : 'subtle'}
+        size="compact-xs"
+        aria-expanded={open}
+        aria-controls="overlay-values"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {t('Values table')}
+      </Button>
+      <div id="overlay-values" className="curve-values" data-open={open || undefined}>
         <CurveTable
           powders={series.map((s) => s.powder)}
           caption={t('Dynamic vivacity of the chosen powders')}
         />
-      </details>
+      </div>
     </>
   )
 }
@@ -109,16 +122,44 @@ function OverlayBody({
  * its line sample; colour slots stay with their powder when another is removed. The picks live in
  * `?add=` only (a powder page sends its id, the powder list's Compare its picks), no preset and no
  * stored overlay; each burn law is fetched when its powder is picked, so the page carries
- * only the names.
+ * only the names. The powder designs of this browser with a curve are offered after the catalogue
+ * as `user:<id>`, each marked as a user design.
  */
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
-  // the chart is taller on a wide window (the same breakpoint as the placeholder's CSS)
-  const wide = useMediaQuery('(min-width: 88em)')
   const { t } = useTranslation()
   const [picks, setPicks] = useState<OverlayPick[]>([])
   const [read, setRead] = useState(false)
   const [records, setRecords] = useState<Record<string, Powder | 'error'>>({})
   const names = useManufacturerNames()
+  // the browser's designs, undefined until read: the URL's user picks wait for them
+  const [designs, setDesigns] = useState<ReturnType<typeof designCurves>>()
+  useEffect(() => {
+    storedRecords().then(
+      (r) => setDesigns(designCurves(r.records)),
+      () => setDesigns(new Map()),
+    )
+  }, [])
+  const mine = useMemo(
+    () =>
+      new Map(
+        [...(designs ?? new Map<string, FittedPowder>())].map(
+          ([recordId, p]): [string, FittedPowder] => {
+            const id = userRowId(recordId)
+            return [id, { ...p, id, label: t('{name} (user design)', { name: p.label }) }]
+          },
+        ),
+      ),
+    [designs, t],
+  )
+  const choices = useMemo(
+    () => [
+      ...options,
+      ...[...mine.values()]
+        .map((p) => ({ value: p.id, label: p.label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    ],
+    [options, mine],
+  )
   // classified at render, so the labels get the manufacturer names when they arrive after a record
   const laws = useMemo(
     () =>
@@ -131,14 +172,20 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
       ),
     [records, names],
   )
-  const known = useMemo(() => new Set(options.map((o) => o.value)), [options])
+  // the ids alone: a language switch relabels the designs but must not read the URL again
+  const mineIds = [...mine.keys()].join(',')
+  const known = useMemo(
+    () => new Set([...options.map((o) => o.value), ...mineIds.split(',').filter(Boolean)]),
+    [options, mineIds],
+  )
   const requested = useRef(new Set<string>())
 
-  // the URL is read after mounting, so the page stays prerendered
+  // the URL is read after mounting, so the page stays prerendered; once the browser's designs are read
   useEffect(() => {
+    if (designs === undefined) return
     setPicks(overlayFrom(window.location.search, maxOverlay).filter((p) => known.has(p.id)))
     setRead(true)
-  }, [known])
+  }, [known, designs])
 
   useEffect(() => {
     if (!read) return
@@ -147,7 +194,8 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
 
   useEffect(() => {
     for (const { id } of picks) {
-      if (records[id] || requested.current.has(id)) continue
+      // a design's burn law is in this browser already
+      if (userRecordId(id) || records[id] || requested.current.has(id)) continue
       requested.current.add(id)
       fetchPowder(id)
         .then((record) => setRecords((l) => ({ ...l, [id]: record ?? 'error' })))
@@ -164,7 +212,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   }
 
   const series = picks.flatMap(({ id, slot }) => {
-    const powder = laws[id]
+    const powder = mine.get(id) ?? laws[id]
     return powder && powder !== 'error' ? [{ powder, slot }] : []
   })
   const failed = picks.filter((p) => laws[p.id] === 'error')
@@ -177,7 +225,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
         classNames={{ label: 'visually-hidden' }}
         description={t('Up to {max}', { max: maxOverlay })}
         placeholder={t('Add powder')}
-        data={options}
+        data={choices}
         value={picks.map((p) => p.id)}
         onChange={change}
         maxValues={maxOverlay}
@@ -204,24 +252,20 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
             )
           }}
         >
-          {failed.map((p) => options.find((o) => o.value === p.id)?.label ?? p.id).join(', ')}
+          {failed.map((p) => choices.find((o) => o.value === p.id)?.label ?? p.id).join(', ')}
         </ErrorNote>
       )}
-      <OverlayBody read={read} picks={picks.length} loading={loading} series={series} wide={wide} />
+      <OverlayBody read={read} picks={picks.length} loading={loading} series={series} />
     </Panel>
   )
 }
 
-/** The lead of the burn-rate page: what the curves are and what the interval covers. */
+/** The lead of the burn-rate page. */
 export function BurnRatesLead() {
   const { t } = useTranslation()
   return (
     <p className="muted page-lead">
-      {t('Dynamic vivacity, the burn rate per pressure, over burnt fraction.')}{' '}
-      <span className="screen-only">
-        {t(modelCaption)} {t(bandAndBarsNote)}{' '}
-      </span>
-      {t('The interval scales the whole curve.')}
+      {t('Dynamic vivacity, the burn rate per pressure, over burnt fraction.')}
     </p>
   )
 }

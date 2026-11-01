@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-dgbr-w26",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR W26",
+  "name": "DGBR W26 (Safari Raptor, Solid & Lever+, 450 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".500",
+  "diameter": {
+    "value": 12.7,
+    "raw": ".500"
+  },
+  "mass": {
+    "value": 29.16,
+    "raw": "450 gr"
+  },
+  "length": {
+    "value": 30.15,
+    "raw": "1.187\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.18,
+      "note": "G1 BC (Est.), printed \".180\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "10",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 10, Safari Raptor, Solid, & Lever+: Caliber .500, Grains 450, Part Number DGBR W26, OAL 1.187\", Bullet Projection .700\", G1 BC (Est.) .180"
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .700\"."
+}

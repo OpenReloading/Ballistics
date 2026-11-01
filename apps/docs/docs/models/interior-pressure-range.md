@@ -121,7 +121,7 @@ The rows show the simulated effect of a powder lot that burns faster or slower t
 
 - Model error is not part of the range: the range of an input that the model gets wrong is wrong as well.
 - The bullet mass tolerance is 0 by default, so the input does not move until a caller sets it. The seating depth changes the chamber volume and the bullet travel and has no tolerance of its own. Inputs without a tolerance (bore area, energy, form function, resistance and others) do not move.
-- The range is not a probability statement.
+- The range is not a probability statement. The variation of real loads and the held-out error of the model: [How close a result is](../how-close.md).
 - Research log: [placing a maximum pressure against the range](../research/interior-ceiling-classification.md).
 - Research log: [how the range combines input tolerances](../research/interior-pressure-range-method.md).
 

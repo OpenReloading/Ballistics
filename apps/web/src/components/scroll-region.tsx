@@ -122,7 +122,7 @@ function cellRole(type: string | undefined, scope: string | undefined, inBody: b
 
 /**
  * A panel's value table in a ScrollRegion (`withTableRoles`): its caption, one header row of `columns` (`numeric`:
- * every header cell `num`) and the body rows as children.
+ * every header cell `num`; a column given as `{ label, num: true }`: that header cell) and the body rows as children.
  */
 export function PanelTable({
   label,
@@ -137,7 +137,7 @@ export function PanelTable({
   className?: string
   testId?: string
   caption: ReactNode
-  columns: readonly string[]
+  columns: readonly (string | { label: string; num: true })[]
   numeric?: boolean
   children: ReactNode
 }) {
@@ -148,11 +148,15 @@ export function PanelTable({
           <caption>{caption}</caption>
           <thead>
             <tr>
-              {columns.map((c) => (
-                <th key={c} scope="col" className={numeric ? 'num' : undefined}>
-                  {c}
-                </th>
-              ))}
+              {columns.map((c) => {
+                const label = typeof c === 'string' ? c : c.label
+                const num = numeric || typeof c !== 'string'
+                return (
+                  <th key={label} scope="col" className={num ? 'num' : undefined}>
+                    {label}
+                  </th>
+                )
+              })}
             </tr>
           </thead>
           <tbody>{children}</tbody>

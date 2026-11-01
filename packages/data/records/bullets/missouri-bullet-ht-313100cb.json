@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-313100cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-313100CB",
+  "name": "Cowboy #6 - Hi-Tek, 100 Grain RNFP",
+  "caliber": ".313",
+  "diameter": {
+    "value": 7.95,
+    "raw": ".313 Diameter"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 Grain"
+  },
+  "length": {
+    "value": 14.5,
+    "raw": "Bullet OAL .571 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 100 Grain RNFP. Brinell 12. .32 H&R. For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-313100CB, Cowboy #6 - Hi-Tek (https://missouribullet.com/details.php?prodId=337): .313 Diameter, 100 Grain RNFP, Brinell 12, Bullet OAL .571 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

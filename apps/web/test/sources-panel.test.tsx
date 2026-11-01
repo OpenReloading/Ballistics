@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import type { Source } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { RecordSourcesLink, Sources } from '../src/components/sources.tsx'
+import { groupSources, RecordSourcesLink, Sources } from '../src/components/sources.tsx'
 import { dayText } from '../src/lib/dates.ts'
 
 const hash = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
@@ -70,7 +70,8 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
     /Source<\/th><th[^>]*>Origin<\/th><th[^>]*>Retrieved<\/th><th[^>]*>License<\/th><th[^>]*>Covers<\/th><\/tr>/,
   )
   expect(html).toContain('2 fields')
-  expect(html).toContain('diameter, mass')
+  // no kind: the keys humanised
+  expect(html).toContain('Diameter, Mass')
   expect(render(sheet)).not.toContain('Origin')
   expect(render(sheet)).not.toContain('Covers')
   const both = renderToStaticMarkup(
@@ -85,10 +86,69 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
   expect(both).toContain('1 field')
 })
 
+it("names the fields a source covers by the record kind's field labels, a key without one humanised", () => {
+  const html = renderToStaticMarkup(
+    <MantineProvider>
+      <Sources
+        kind="powders"
+        provenance={{
+          kind: 'fitted',
+          sources: [
+            {
+              title: 'Fit',
+              fields: [
+                'name',
+                'grainForm',
+                'listedCartridges',
+                'interior',
+                'temperatureSensitivity',
+              ],
+            },
+          ],
+        }}
+      />
+    </MantineProvider>,
+  )
+  expect(html).toContain(
+    'Name, Form, Listed by the manufacturer for, Model parameters, Temperature sensitivity',
+  )
+})
+
 // below 48em the cells are blocks: WebKit keeps the table semantics only with explicit roles
 it('gives every table element of the sources its ARIA role', () => {
   const tags = [...render(sheet).matchAll(/<(table|thead|tbody|tr|th|td)\b([^>]*)>/g)]
   expect(tags.length).toBeGreaterThan(6)
   for (const [tag, , attrs] of tags) expect(attrs, tag).toMatch(/ role="[a-z]+"/)
   expect(render(sheet)).toContain('scope="row" role="rowheader"')
+})
+
+it('groups the sources of one document: title, publisher, edition and hash once, a row per page', () => {
+  const book = { ...sheet, title: 'Rule book', edition: '2025' }
+  const html = renderToStaticMarkup(
+    <MantineProvider>
+      <Sources
+        provenance={{
+          kind: 'published',
+          sources: [
+            { ...book, page: 'p. 39', fields: ['name'] },
+            { title: 'Manual' },
+            { ...book, page: 'p. 342', note: 'Stated for the section.' },
+            { ...book, retrieved: undefined },
+          ],
+        }}
+      />
+    </MantineProvider>,
+  )
+  expect(groupSources([book, { title: 'Manual' }, book]).map((g) => g.length)).toEqual([2, 1])
+  expect(html.match(/>Rule book<\/a>/g)).toHaveLength(1)
+  expect(html.match(/<code>/g)).toHaveLength(1)
+  expect(html).toMatch(/class="[^"]*source-group/)
+  // the head row spans the columns (source, retrieved, license, covers, note)
+  expect(html).toMatch(/<td(?=[^>]*colSpan="5")(?=[^>]*source-document)/)
+  // the pages in the order cited, each with its own values; the document's first place kept
+  expect(html).toMatch(
+    /Page p\. 39<\/th>[\s\S]*Page p\. 342<\/th>[\s\S]*No page stated<\/th>[\s\S]*Manual/,
+  )
+  expect(html).toContain('Stated for the section.')
+  expect(html.match(/<tbody/g)).toHaveLength(2)
 })

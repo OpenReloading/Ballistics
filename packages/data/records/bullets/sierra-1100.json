@@ -1,0 +1,55 @@
+{
+  "id": "sierra-1100",
+  "manufacturer": "sierra",
+  "productNumber": "1100",
+  "name": "223 CAL 40 GR Hornet VarmintKing (SVK)",
+  "caliber": "0.223",
+  "diameter": {
+    "value": 5.664,
+    "raw": "0.223 in"
+  },
+  "mass": {
+    "value": 2.592,
+    "raw": "40 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.117,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/223-cal-40-gr-hornet-varmintking-svk/",
+        "retrieved": "2026-10-08",
+        "sha256": "e8c4f770a7e8ce4a82b47ff6fc47a25fbb8d806ba2a1a5ad2048d0b108fcae19",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1100, Bullet Type: Hornet, Bullet Diameter: 0.223, Bullet Weight (Grains): 40, G1 BC: 0.117, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

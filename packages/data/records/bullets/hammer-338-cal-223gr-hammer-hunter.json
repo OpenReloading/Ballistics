@@ -1,0 +1,45 @@
+{
+  "id": "hammer-338-cal-223gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "6434",
+  "name": ".338 Cal-223gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 14.45,
+    "raw": "223 gr"
+  },
+  "length": {
+    "value": 40.64,
+    "raw": "Bullet length is 1.60″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.253,
+      "note": "Hammer Bullets: \"G7-BC= .253 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Recommended minimum twist rate is 1-11″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This is a classic bullet weight for the 338 Winchester Magnum. With it’s aggressive secant ogive, this Hammer Hunter™ bullet will have a great speed to bc ratio for normal to long range hunting.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/338-cal-223gr-hammer-hunter/: Recommended minimum twist rate is 1-11″ | Bullet length is 1.60″ | Bullet weight is 223gr | Recommended use: Big Game Hunting | G7-BC= .253 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-125gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869039731",
+  "name": ".264 Cal-125gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 gr"
+  },
+  "length": {
+    "value": 36.32,
+    "raw": "Bullet length including tip is 1.430″"
+  },
+  "noseLength": {
+    "value": 19.02,
+    "raw": "Nose length including tip is .7489″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.256,
+      "note": "Hammer Bullets: \"g7-bc= .256 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Minimum required twist rate is 1-8″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"The Hammer HT 125gr designed for the 8″ twist 6.5mm. With superior on game performance and an exceptional speed to bc ratio, this bullet is destined for greatness. This is an all around performer in any 6.5mm cartridge with an 8″ twist.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-125gr-hammer-hht/: Minimum required twist rate is 1-8″ or faster | Bullet length including tip is 1.430″ | Nose length including tip is .7489″ | Tip length is .143″ | Bullet weight is 125gr | Recommended use: Big Game Hunting | g7-bc= .256 estimated"
+      }
+    ]
+  }
+}

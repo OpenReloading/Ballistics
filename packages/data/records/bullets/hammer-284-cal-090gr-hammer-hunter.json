@@ -1,0 +1,61 @@
+{
+  "id": "hammer-284-cal-090gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027737",
+  "name": ".284 Cal-090gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "length": {
+    "value": 22.94,
+    "raw": "Bullet length is .903″"
+  },
+  "noseLength": {
+    "value": 13.86,
+    "raw": "Nose length is .5456″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.133,
+      "note": "Hammer Bullets: \"g7-bc= .133 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.275,
+      "note": "Hammer Bullets: \"g1-bc= .275 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 342.9,
+    "raw": "Minimum required twist rate is 1-13.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Here is the 7mm pure copper Hammer Hunter™ speed demon. Just think about running this in your 7 mag at 3700 fps plus, or in your 7mm-08 at pushing close to 3500 fps. Laser comes to mind!\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-090gr-hammer-hunter/: Minimum required twist rate is 1-13.5″ | Bullet length is .903″ | Nose length is .5456″ | Bullet weight is 90gr | Recommended use: Big Game Hunting | g7-bc= .133 estimated | g1-bc= .275 estimated"
+      }
+    ]
+  }
+}

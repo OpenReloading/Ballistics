@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-124gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "5731",
+  "name": ".308 Cal-124gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 gr"
+  },
+  "length": {
+    "value": 26.92,
+    "raw": "Bullet length is 1.06″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.157,
+      "note": "Hammer Bullets: \"G7-BC= .157 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "Recommended minimum twist rate is 1-13″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"If you want to have some fun with your 30 cal, this is the one. With the short baring surface and light weight of this Hammer Hunter™ it will make your ‘ol 30 cal a laser. This little bullet flat gets it done on big game with the vel that it can be pushed to.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-124gr-hammer-hunter/: Recommended minimum twist rate is 1-13″ | Bullet length is 1.06″ | Bullet weight is 124gr | Recommended use: Big Game Hunting | G7-BC= .157 estimated"
+      }
+    ]
+  }
+}

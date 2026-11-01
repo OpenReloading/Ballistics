@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-196gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "2332",
+  "name": ".308 Cal-196gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 12.506,
+    "raw": "193 gr"
+  },
+  "length": {
+    "value": 39.37,
+    "raw": "Bullet Length is 1.55″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.245,
+      "note": "Hammer Bullets: \"G7-BC= .245 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended Use: Big Game Hunting. The product page also says: \"We designed this bullet for the guys who have standard 1-10″ twist barrels that feel better shooting a bullet in the 200gr class with a good bc. The 196gr Hammer Hunter™ has the classic nose design of the other Hammer Hunters™ but with a shortened boat tail and longer baring surface in order to get the weight up. This one will be a great normal to long range hunting bullet.\" The product name says 196 gr; the specification says 193 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-196gr-hammer-hunter/: Recommended minimum twist rate is 1-10″ | Bullet Length is 1.55″ | Bullet weight is 193gr | Recommended Use: Big Game Hunting | G7-BC= .245 estimated"
+      }
+    ]
+  }
+}

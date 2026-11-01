@@ -1,0 +1,56 @@
+{
+  "id": "hammer-423-cal-307gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869035658",
+  "name": ".423 Cal-307gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744,
+    "raw": ".423"
+  },
+  "mass": {
+    "value": 19.893,
+    "raw": "307 gr"
+  },
+  "length": {
+    "value": 33.53,
+    "raw": "Bullet length is 1.320″"
+  },
+  "noseLength": {
+    "value": 17.39,
+    "raw": "Nose length is .6846″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.377,
+      "note": "Hammer Bullets: \"g1-bc= .377 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 508,
+    "raw": "Minimum required twist for normal hunting is 1-20″ or faster"
+  },
+  "note": "Minimum required twist for dangerous game is 1-18″ or faster. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"This 307gr pure copper Stone Hammer™ was designed for the modern 404 Jeffery. At this weight, muzzle velocity in the neighborhood of 2800 fps should be easily achievable. This will make a devastating combo for big game and dangerous game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/423-cal-307gr-stone-hammer/: Minimum required twist for dangerous game is 1-18″ or faster | Minimum required twist for normal hunting is 1-20″ or faster | Bullet length is 1.320″ | Nose length is .6846″ | Bullet weight is 307gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .377 estimated"
+      }
+    ]
+  }
+}

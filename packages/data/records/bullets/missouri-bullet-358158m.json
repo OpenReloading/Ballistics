@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-358158m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358158M",
+  "name": ".357 Action!, 158 Grain SWC",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 10.238,
+    "raw": "158 Grain"
+  },
+  "length": {
+    "value": 18.01,
+    "raw": "Bullet OAL .709 +/-"
+  },
+  "note": "Listed as 158 Grain SWC. Brinell 18. .357 Magnum. For Magnum Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "358158M, .357 Action! (https://missouribullet.com/details.php?prodId=41): .358 Diameter, 158 Grain SWC, Brinell 18, Bullet OAL .709 +/-"
+      }
+    ]
+  }
+}

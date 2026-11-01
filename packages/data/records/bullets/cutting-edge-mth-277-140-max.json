@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mth-277-140-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTH 277 140 MAX",
+  "name": "MTH 277 140 MAX (MTH, 140 gr)",
+  "productLine": "MTH",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 gr"
+  },
+  "length": {
+    "value": 34.24,
+    "raw": "1.348\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.48,
+      "note": "G1 BC, printed \".480 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.241,
+      "note": "G7 BC, printed \".241 (O89)\". Marked (O89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "1-9\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "2",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .277, Grains 140, Minimum Required Twist 1-9\", Part Number MTH 277 140 MAX, G1 BC .480 (O89), G7 BC .241 (O89), OAL 1.348\", Bullet Projection .863\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .863\"."
+}

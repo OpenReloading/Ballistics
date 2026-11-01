@@ -1,0 +1,69 @@
+{
+  "id": "berger-30410",
+  "manufacturer": "berger",
+  "productNumber": "30410",
+  "name": "30 Cal 168 gr VLD Target",
+  "productLine": "Target",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 31.775
+  },
+  "base": {
+    "length": {
+      "value": 4.343
+    }
+  },
+  "noseLength": {
+    "value": 19.05
+  },
+  "baseToOgive": {
+    "value": 14.122
+  },
+  "bearingLength": {
+    "value": 8.382
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.507
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.26,
+      "note": "G7 form factor 0.973"
+    }
+  ],
+  "recommendedTwist": {
+    "value": 330.2,
+    "raw": "1:13\""
+  },
+  "note": "A VLD is a secant ogive; Berger names the form and does not publish the radius.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "berger-bullets-quick-reference-sheet-2020",
+        "url": "https://bergerbullets.com/pdf/Quick-Reference-Sheets.pdf",
+        "retrieved": "2026-09-05",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base.length",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "0.308 in; OAL 1.251, Boat Tail 0.171, Nose Length 0.750, Base to Ogive 0.556, Bearing Surface 0.330 in; SD 0.253; G1 0.507, G7 0.260, G7 FF 0.973; 1:13\". 'For reference only and do not reflect exact numbers for every lot.'"
+      }
+    ]
+  }
+}

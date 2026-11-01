@@ -1,0 +1,45 @@
+{
+  "id": "hammer-358-cal-220gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "663",
+  "name": ".358 Cal-220gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 14.385,
+    "raw": "222 gr"
+  },
+  "length": {
+    "value": 33.53,
+    "raw": "Bullet length is 1.32″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.204,
+      "note": "Hammer Bullets: \"G7-BC=.204 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 381,
+    "raw": "Recommended twist rate is 1-15″ or faster"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"G7-BC= .204 estimated\" The product name says 220 gr; the specification says 222 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/358-cal-220gr-power-hammer/: Recommended twist rate is 1-15″ or faster | Bullet length is 1.32″ | Bullet weight is 222gr | Recommended use: Big game hunting | G7-BC=.204 estimated"
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-204-cal-41gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869045181",
+  "name": ".204 Cal-41gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".204",
+  "diameter": {
+    "value": 5.182,
+    "raw": ".204"
+  },
+  "mass": {
+    "value": 2.657,
+    "raw": "41 gr"
+  },
+  "length": {
+    "value": 21.59,
+    "raw": "Bullet length including the tip is .850″"
+  },
+  "noseLength": {
+    "value": 12.7,
+    "raw": "Nose length including the tip is .500″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.134,
+      "note": "Hammer Bullets: \"g7-bc= .134 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "Minimum required twist rate is 1-9″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Small to medium game hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"This pure copper 20 cal Hammer HHT™ at 41gr is designed to be fully stable in a 1-9″ or faster barrel. Brian used this bullet in testing on a whitetail doe on a frontal shot and recovered the bullet just in front of the off side hind quarter and the deer simply dropped straight down. This is a great bullet for any game from deer and pigs down.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/204-cal-41gr-hammer-hht/: Minimum required twist rate is 1-9″ or faster | Bullet length including the tip is .850″ | Nose length including the tip is .500″ | Tip length is .143″ | Bullet weight is 41gr | Recommended use: Small to medium game hunting | g7-bc= .134 estimated"
+      }
+    ]
+  }
+}

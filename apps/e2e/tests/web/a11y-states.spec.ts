@@ -348,6 +348,7 @@ const states: State[] = [
       await gotoHydrated(page, '/workbench?cartridge=308-win')
       await loadForm(page).getByRole('button', { name: 'Browse bullets' }).click()
       const dialog = await dialogOf('Choose a bullet')(page)
+      await dialog.getByRole('combobox', { name: 'Search bullets' }).fill('demo')
       await expect(dialog.getByRole('option')).toHaveCount(2)
       // the narrow layout keeps the filters behind their button
       const filters = dialog.getByRole('button', { name: /^Filters/ })
@@ -372,13 +373,13 @@ const states: State[] = [
     name: 'Database list with ticked rows',
     scrolls: true,
     open: async (page, check) => {
-      await gotoHydrated(page, '/bullets')
+      await gotoHydrated(page, '/bullets?q=demo')
       const boxes = page.getByRole('checkbox', { name: /^Select Demo Bullets / })
       await expect(boxes).toHaveCount(2)
       await boxes.first().click()
       await boxes.last().click()
-      // below 48em Clear selection moves into the popover of the picks
-      await expect(page.getByText('2 of 4 selected')).toHaveText(/2 of 4 selected/)
+      // below 48em Clear shows as its icon and the count steps aside
+      await expect(page.getByText('2 selected (max 4)')).toHaveText(/2 selected \(max 4\)/)
       await check('page')
     },
   },

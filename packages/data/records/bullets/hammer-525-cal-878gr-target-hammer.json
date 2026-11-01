@@ -1,0 +1,56 @@
+{
+  "id": "hammer-525-cal-878gr-target-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869049703",
+  "name": ".525 Cal-878gr Target Hammer®",
+  "productLine": "Target Hammer",
+  "caliber": ".525",
+  "diameter": {
+    "value": 13.335,
+    "raw": ".525"
+  },
+  "mass": {
+    "value": 56.893,
+    "raw": "878 gr"
+  },
+  "length": {
+    "value": 64.01,
+    "raw": "Bullet length is 2.520″"
+  },
+  "noseLength": {
+    "value": 36.22,
+    "raw": "Nose length is 1.4259″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.433,
+      "note": "Hammer Bullets: \"g7-bc= .433 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 406.4,
+    "raw": "Minimum required twist rate is 1-16″ or faster"
+  },
+  "note": "Recommended use: Target Shooting. The product page also says: \"This Target Hammer™ was designed to match the original bullet for the T-Gewehr. Also known as the Tankgewehr M1918 and the Mauser 13mm anti tank rifle. We matched the physical dimensions of the original steel core armor piercing bullet which made this bullet heavier than the original due to the higher material density of copper vs steel. The only change we made to the original design was to incorporate our PDR drive band design for reduced pressure.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/525-cal-878gr-target-hammer/: Minimum required twist rate is 1-16″ or faster | Bullet length is 2.520″ | Nose length is 1.4259″ | Bullet weight is 878gr | Recommended use: Target Shooting | g7-bc= .433 estimated"
+      }
+    ]
+  }
+}

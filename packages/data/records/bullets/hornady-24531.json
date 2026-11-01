@@ -1,0 +1,42 @@
+{
+  "id": "hornady-24531",
+  "manufacturer": "hornady",
+  "productNumber": "24531",
+  "name": "6mm A-Tip Match, .243, 110 gr",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243\""
+  },
+  "mass": {
+    "value": 7.128,
+    "raw": "110 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.604,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.304,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 24531, 245312 (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "72",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "6mm A-Tip Match, .243\", 110 gr., G1 .604, G7 .304, Sec. Den. .266, Item # 24531/245312"
+      }
+    ]
+  }
+}

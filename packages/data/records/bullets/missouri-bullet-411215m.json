@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-411215m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "411215M",
+  "name": ".41 Trooper, 215 Grain Keith-Style SWC",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439,
+    "raw": ".411 Diameter"
+  },
+  "mass": {
+    "value": 13.932,
+    "raw": "215 Grain"
+  },
+  "length": {
+    "value": 18.11,
+    "raw": "Bullet OAL .713 +/-"
+  },
+  "note": "Listed as 215 Grain Keith-Style SWC. Brinell 18. .41 Magnum. For Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "411215M, .41 Trooper (https://missouribullet.com/details.php?prodId=82): .411 Diameter, 215 Grain Keith-Style SWC, Brinell 18, Bullet OAL .713 +/-"
+      }
+    ]
+  }
+}

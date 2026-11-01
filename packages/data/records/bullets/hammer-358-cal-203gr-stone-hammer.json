@@ -1,0 +1,45 @@
+{
+  "id": "hammer-358-cal-203gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "902",
+  "name": ".358 Cal-203gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 13.154,
+    "raw": "203 gr"
+  },
+  "length": {
+    "value": 29.46,
+    "raw": "Bullet length is 1.16″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.302,
+      "note": "Hammer Bullets: \"G1-BC=.302 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 431.8,
+    "raw": "Recommended twist rate is 1-17″ minimum"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"With the 4mm hollow point in these Stone Hammers™ they are able to be used in tubular magazines.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/358-cal-203gr-stone-hammer/: Recommended twist rate is 1-17″ minimum | Bullet length is 1.16″ | Bullet weight is 203gr | Recommended use: Big game hunting | G1-BC=.302 estimated"
+      }
+    ]
+  }
+}

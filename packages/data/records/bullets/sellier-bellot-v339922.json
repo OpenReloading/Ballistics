@@ -1,0 +1,39 @@
+{
+  "id": "sellier-bellot-v339922",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339922",
+  "name": "FMJ, .312, 124 gr (bullet 2907)",
+  "productLine": "FMJ",
+  "caliber": ".312",
+  "diameter": {
+    "value": 7.925,
+    "raw": ".312 in (7,92 mm)"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 grs (8 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.286,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type", "ballisticCoefficients"],
+        "note": "V339922 | 2907 | FMJ | 124 | 8 | 7,62 | 7,92 | .312 | 0,286. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

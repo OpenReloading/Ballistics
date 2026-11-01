@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-dgsc-348-200",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGSC 348 200",
+  "name": "DGSC 348 200 (Safari Raptor, Solid & Lever+, 200 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".348",
+  "diameter": {
+    "value": 8.839,
+    "raw": ".348"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 25.25,
+    "raw": ".994\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.18,
+      "note": "G1 BC (Est.), printed \".180\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .348, Grains 200, Part Number DGSC 348 200, OAL .994\", Bullet Projection .540\", G1 BC (Est.) .180"
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .540\"."
+}

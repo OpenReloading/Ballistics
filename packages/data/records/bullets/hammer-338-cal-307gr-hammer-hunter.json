@@ -1,0 +1,45 @@
+{
+  "id": "hammer-338-cal-307gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "294",
+  "name": ".338 Cal-304gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 19.569,
+    "raw": "302 gr"
+  },
+  "length": {
+    "value": 54.36,
+    "raw": "Bullet Length is 2.14″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.38,
+      "note": "Hammer Bullets: \"G7-BC=.380 from shot drops\" (from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended twist rate is 1-8″ or faster"
+  },
+  "note": "Recommended use: Big game hunting. The product name says 304 gr; the specification says 302 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/338-cal-307gr-hammer-hunter/: Recommended twist rate is 1-8″ or faster | Bullet Length is 2.14″ | Bullet weight is 302 grains | Recommended use: Big game hunting | G7-BC=.380 from shot drops"
+      }
+    ]
+  }
+}

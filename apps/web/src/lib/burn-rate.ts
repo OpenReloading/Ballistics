@@ -13,7 +13,7 @@ import { nth } from './nth.ts'
 import { say, type Wording, worded } from './wording.ts'
 
 /** Dash pattern per colour slot of the burn-rate charts: identity is not carried by colour alone. */
-export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '1 5'] as const
+export const dashes = ['', '8 4', '2 3', '12 3 3 3', '4 4', '6 2 1 2'] as const
 
 /** Number of standard uncertainties in the vivacity interval (2). */
 export const uncertaintyFactor = 2
@@ -213,11 +213,6 @@ export const bandNote = msg(
   'Plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
 )
 
-/** `bandNote` as the end of `modelCaption`: what the band and the bars of the burn-rate page's curves are. */
-export const bandAndBarsNote = msg(
-  'Band and bars: plus and minus 2 standard uncertainties of the fitted vivacity, a lower bound.',
-)
-
 const n2 = (v: number) => formatNumber(v, 2)
 
 /** The order scalar with its interval, as text. */
@@ -289,6 +284,10 @@ export interface PowderRow {
   high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
   burnRateOrder?: number
+  /** Load-table rows and cartridges the model was fitted to, and the day its fitted sources were read. */
+  trainingRows?: number | undefined
+  trainingCartridges?: number | undefined
+  retrieved?: string | undefined
 }
 
 /** The list rows of `summaries` in their order, each fitted powder with its global order. */
@@ -308,6 +307,11 @@ export function orderPowders(
       name: s.name,
       grainForm: s.grainForm,
       propellantBase: s.propellantBase,
+      ...(s.interior?.trainingRows !== undefined && {
+        trainingRows: s.interior.trainingRows,
+        trainingCartridges: s.interior.trainingCartridges,
+        retrieved: s.interior.retrieved,
+      }),
     }
     if (!isFitted(p)) return row
     const m = meanRate(p)
@@ -374,7 +378,7 @@ function step(v: number, dir: -1 | 1): number {
 export function rateDomain(rows: readonly PowderRow[]): RateDomain {
   const values = rows
     .flatMap((r) => [r.low ?? r.meanVivacity, r.high ?? r.meanVivacity])
-    .filter((v): v is number => v !== undefined && v > 0)
+    .filter((v): v is number => v !== undefined && v > 0 && Number.isFinite(v))
   if (values.length === 0) return [1, 10]
   const lo = step(Math.min(...values), -1)
   const hi = step(Math.max(...values), 1)

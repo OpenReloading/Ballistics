@@ -7,6 +7,7 @@ import { measureOutline, type PhotoField } from '../src/lib/bullet-photo-measure
 import { fitOutline, type Outline } from '../src/lib/bullet-photo-outline.ts'
 import { minWidthPx, outlineHints } from '../src/lib/bullet-photo-quality.ts'
 import { type PhotoSpec, renderPhoto } from '../src/lib/bullet-photo-sample.ts'
+import { resolveScale } from '../src/lib/bullet-photo-scale.ts'
 import { say, type Wording } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
@@ -181,6 +182,158 @@ describe('soft edges', () => {
     const r = measured(spec({ shadow: { dx: 0, dy: 40, blur: 14, depth: 0.3 } }))
     expect(text(r.seg.warnings)).toMatch(/soft/)
     expectNear(r, 3)
+  })
+})
+
+describe('a drop shadow beside a product-style image', () => {
+  // the research evaluation's scenario F (`apps/docs/docs/research/bullet-photo-catalogue-geometry.md`):
+  // 450 px long, no ruler, scale from the diameter, the shadow offset 2 and 3 % of the length,
+  // blurred 2 %, depth 0.2
+  const flat: Record<string, BulletDimensions> = {
+    'a tangent rifle bullet': {
+      diameter: 7.82,
+      length: 30,
+      noseLength: 17.5,
+      meplatDiameter: 0.5,
+      ogive: { form: 'tangent', radiusRatio: 1 },
+      base: { type: 'flat' },
+    },
+    'a secant ogive': {
+      diameter: 6.71,
+      length: 34,
+      noseLength: 20,
+      meplatDiameter: 0.4,
+      ogive: { form: 'secant', radiusRatio: 0.6 },
+      base: { type: 'flat' },
+    },
+    'a short pistol bullet': {
+      diameter: 9.02,
+      length: 15.5,
+      noseLength: 7.5,
+      meplatDiameter: 2.5,
+      ogive: { form: 'tangent', radiusRatio: 1 },
+      base: { type: 'flat' },
+    },
+  }
+  const product = (t: BulletDimensions, shadow: boolean): PhotoSpec => {
+    const k = 450 / t.length
+    const a = (t.diameter / 2) * k
+    const margin = 67.5
+    const top = margin + a
+    return {
+      shape: t,
+      pxPerMm: k,
+      width: Math.ceil(450 + 2 * margin),
+      height: Math.ceil(top + a + 450 * Math.sin((3 * Math.PI) / 180) + margin),
+      base: { x: margin, y: top },
+      angle: (3 * Math.PI) / 180,
+      paper: 235,
+      bullet: 115,
+      gradient: 10,
+      shading: 30,
+      noise: 3,
+      blur: 1,
+      seed: 11,
+      shadow: shadow ? { dx: 9, dy: 13.5, blur: 9, depth: 0.2 } : undefined,
+    }
+  }
+  /** The photograph measured at the scale its diameter gives, as the tool does without a ruler. */
+  const atDiameter = (t: BulletDimensions, shadow: boolean) => {
+    const seg = segmentPhoto(renderPhoto(product(t, shadow)).image)
+    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+    const px = measureOutline(outline, { pxPerMm: 1, relUncertainty: 0 })
+    const scale = defined(resolveScale(px, undefined, { diameter: t.diameter }).scale)
+    return { outline, m: measureOutline(outline, scale) }
+  }
+
+  for (const [name, t] of Object.entries(flat))
+    it(`${name}: no boat tail, the length within 1 % or 3 uncertainties, and the shadow named`, () => {
+      const { outline, m } = atDiameter(t, true)
+      expect(m.baseType).toBe('flat')
+      expect(m.values['base.length']).toBeUndefined()
+      const length = defined(m.values.length)
+      expect(Math.abs(length.value - t.length)).toBeLessThanOrEqual(
+        Math.max(0.01 * t.length, 3 * length.uncertainty),
+      )
+      expect(Math.abs(length.value - t.length)).toBeLessThan(0.01 * t.length)
+      expect(text(outlineHints(outline).hints)).toMatch(/shadow beside the bullet/)
+    })
+
+  it('names no shadow without one', () => {
+    for (const t of Object.values(flat)) {
+      const { outline, m } = atDiameter(t, false)
+      expect(outline.shadow).toBeUndefined()
+      expect(m.baseType).toBe('flat')
+    }
+  })
+
+  it('keeps a boat tail whose two sides taper, and names a shadow that reaches the base', () => {
+    const r = measured(spec({ shadow: { dx: 0, dy: 40, blur: 14, depth: 0.3 } }))
+    expect(r.m.baseType).toBe('boat-tail')
+    expect(r.outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    expect(text(outlineHints(r.outline).hints)).toMatch(/wider than the other/)
+  })
+})
+
+describe('an axis direction the user typed', () => {
+  // the photograph's bullet lies 3 degrees off level; 40 px per mm makes the base face wide enough to show a turn
+  const typed = (over: Partial<PhotoSpec>, offDegrees: number) => {
+    const s = spec({
+      pxPerMm: 40,
+      width: 1800,
+      height: 840,
+      base: { x: 260, y: 400 },
+      ruler: undefined,
+      ...over,
+    })
+    const seg = segmentPhoto(renderPhoto(s).image)
+    const angle = ((3 + offDegrees) * Math.PI) / 180
+    const outline = defined(fitOutline(seg, { angle, edgeSpread: seg.edgeSpread }))
+    return { outline, m: measureOutline(outline, { pxPerMm: 40, relUncertainty: 0 }) }
+  }
+  const flatBase = { shape: { ...shape, base: { type: 'flat' as const } } }
+
+  it('3 degrees off: no boat tail on a flat base, and a note that the axis is off', () => {
+    for (const off of [3, -3]) {
+      const { outline, m } = typed(flatBase, off)
+      expect(m.baseType).toBe('flat')
+      expect(text(outlineHints(outline).hints)).toMatch(/about 3 degrees off the bullet's own axis/)
+    }
+  })
+
+  it('typed on a short bullet at a low resolution: no note from the noise of its short shank', () => {
+    const short: BulletDimensions = {
+      diameter: 9.02,
+      length: 15.5,
+      noseLength: 7.5,
+      meplatDiameter: 2.5,
+      ogive: { form: 'tangent', radiusRatio: 1 },
+      base: { type: 'flat' },
+    }
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const s = spec({
+        shape: short,
+        pxPerMm: 8,
+        width: 300,
+        height: 200,
+        base: { x: 80, y: 100 },
+        ruler: undefined,
+        seed,
+        noise: 3,
+      })
+      const seg = segmentPhoto(renderPhoto(s).image)
+      const o = defined(fitOutline(seg, { angle: (3 * Math.PI) / 180, edgeSpread: seg.edgeSpread }))
+      expect(o.typedOff, `seed ${seed}`).toBeUndefined()
+    }
+  })
+
+  it('on the bullet: no note, and a boat tail typed off keeps its tail', () => {
+    const on = typed(flatBase, 0)
+    expect(on.outline.typedOff).toBeUndefined()
+    expect(text(outlineHints(on.outline).hints)).not.toMatch(/axis direction typed:/)
+    const tail = typed({}, 3).m
+    expect(tail.baseType).toBe('boat-tail')
+    expect(Math.abs(defined(tail.values['base.length']).value - 5.5)).toBeLessThan(0.3)
   })
 })
 

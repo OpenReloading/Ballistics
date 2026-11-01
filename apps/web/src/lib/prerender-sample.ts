@@ -29,6 +29,8 @@ export const sampleIds: Record<string, readonly string[]> = {
     '6mm-me-flobert-court',
     '40-x-46-deftec',
     '223-rem',
+    // a cartridge no catalogue bullet fits (component-records.spec.ts)
+    '4-bore-rifle',
   ],
   bullet: ['demo-bullet-168', 'demo-bullet-150'],
   powder: ['demo-powder-dp40'],

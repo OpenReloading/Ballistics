@@ -75,6 +75,68 @@ test('the firearm library searches its table, counts the example and offers to c
   )
 })
 
+test('the firearm table fits a 1280 px window with its row menu, one save status and the strip as high as on the other lists', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await storeUnits(page)
+  // the tab strip as high as on a framed list (56 px: under the top bar's rule)
+  const strip = page.locator('.library-tabs')
+  const stripTop = async () => (await strip.boundingBox())?.y
+  await page.goto('/bullets')
+  await expect(page.locator('tbody tr[data-row]').first()).toBeVisible()
+  await expect.poll(stripTop).toBe(56)
+  await page.goto('/firearms')
+  await expect(page.locator('tbody tr[data-row]')).toHaveCount(1)
+  await expect.poll(stripTop).toBe(56)
+  // the example alone: Export CSV says why it exports nothing; nothing open, nothing to print
+  await expect(page.getByRole('button', { name: 'Export CSV' })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  )
+  await expect(page.getByRole('button', { name: 'Export CSV' })).toHaveAccessibleDescription(
+    'No firearm saved in this browser yet; the example is not exported.',
+  )
+  await expect(page.getByRole('button', { name: 'Print' })).toHaveAccessibleDescription(
+    'Open a firearm to print its data card.',
+  )
+  await seed(page, ['Bench rifle'])
+  await page.reload()
+  await expect(page.locator('tbody tr[data-row]')).toHaveCount(2)
+  // no hint line under a listed firearm
+  await expect(page.getByText('Your firearms in this browser show here.')).toHaveCount(0)
+  // the columns fit the box, the twist carries its hand, the row menu is in view
+  const box = page.locator('.directory-scroll')
+  expect(await box.evaluate((b) => b.scrollWidth <= b.clientWidth)).toBe(true)
+  const row = page.locator('tbody tr[data-row]').first()
+  await expect(row.locator('td[data-col="twist"]')).toHaveText(/^1:254 R$/)
+  await expect(row.getByRole('button', { name: 'Actions for Bench rifle' })).toBeInViewport()
+  await expect(page.getByRole('button', { name: 'Export CSV' })).not.toHaveAttribute(
+    'aria-disabled',
+  )
+  // a narrower window scrolls the table sideways, the row menu held at the box's edge
+  await page.setViewportSize({ width: 1024, height: 650 })
+  expect(await box.evaluate((b) => b.scrollWidth > b.clientWidth)).toBe(true)
+  await expect(row.getByRole('button', { name: 'Actions for Bench rifle' })).toBeInViewport()
+  await page.setViewportSize({ width: 1280, height: 650 })
+  // a focused row's ring runs around the sticky menu cell, and the menu opens with a click
+  await row.getByRole('link', { name: 'Bench rifle', exact: true }).focus()
+  await page.keyboard.press('Shift+Tab')
+  await page.keyboard.press('Tab')
+  await expect(row.locator('td.sticky-end')).toHaveCSS('box-shadow', /-2px 0px 0px 0px inset/)
+  await row.getByRole('button', { name: 'Actions for Bench rifle' }).click()
+  await expect(page.getByRole('menu')).toBeVisible()
+  await page.keyboard.press('Escape')
+  // Save without a name: one status, the refusal in the state's place, gone with the name
+  await page.getByRole('button', { name: 'New firearm' }).click()
+  const status = page.locator('.page-bar-status .file-status')
+  await expect(status).toHaveText('Not saved to a file')
+  await page.keyboard.press('ControlOrMeta+s')
+  await expect(status).toHaveText('Not saved: Enter a name.')
+  await page.getByRole('textbox', { name: 'Name' }).fill('Varmint rifle')
+  await expect(status).toHaveText('Unsaved')
+})
+
 test('a record link does not put its loading status in the alert line', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('safety-ack', '3')

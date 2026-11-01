@@ -1,0 +1,21 @@
+{
+  "id": "ramshot-grand",
+  "manufacturer": "ramshot",
+  "name": "Grand",
+  "grainForm": "ball",
+  "propellantBase": "double",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, Ramshot Grand® Rifle Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/ramshot-grand/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Product details: Form \"Spherical\", Base \"Double\".",
+        "origin": "manufacturer"
+      }
+    ]
+  }
+}

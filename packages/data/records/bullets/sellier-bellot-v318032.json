@@ -1,0 +1,33 @@
+{
+  "id": "sellier-bellot-v318032",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318032",
+  "name": "JHP, .452, 255 gr (for 460 S&W MAG)",
+  "productLine": "JHP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 in (11,49 mm)"
+  },
+  "mass": {
+    "value": 16.524,
+    "raw": "255 grs (16,5 g)"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "note": "Recommended for 460 S&W MAG.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type"],
+        "note": "V318032 | 460 S&W MAG. | JHP | 255 | 16,5 | 460 | 11,49 | .452. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

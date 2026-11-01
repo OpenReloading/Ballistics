@@ -1,0 +1,56 @@
+{
+  "id": "hammer-264-cal-112gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869047606",
+  "name": ".264 Cal-112gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 7.257,
+    "raw": "112 gr"
+  },
+  "length": {
+    "value": 33.02,
+    "raw": "Bullet length including the tip is 1.30″"
+  },
+  "noseLength": {
+    "value": 16.99,
+    "raw": "Nose length including the tip is .6689″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.219,
+      "note": "Hammer Bullets: \"g7-bc= .219 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3,
+    "raw": "Minimum required twist rate is 1-9.5″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"With a minimum required twist rate of 1-9.5″ this will be a great choice for the older .264’s that have factory barrel twist of 1-9″. Being able to run north of 3500 fps and having a bullet that can hold up to the demands of shooting big game, is a game changer! Calculated at 1000′ above sea level this would carry 1700 fps to 900y and have a max point blank range capability to 425y.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/264-cal-112gr-hammer-hht/: Minimum required twist rate is 1-9.5″ or faster | Bullet length including the tip is 1.30″ | Nose length including the tip is .6689″ | Tip length is .143″ | Bullet weight is 112gr | Recommended use: Big Game Hunting | g7-bc= .219 estimated"
+      }
+    ]
+  }
+}

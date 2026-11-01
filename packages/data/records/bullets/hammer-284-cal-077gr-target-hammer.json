@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-077gr-target-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869051012",
+  "name": ".284 Cal-077gr Target Hammer®",
+  "productLine": "Target Hammer",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 4.99,
+    "raw": "77 gr"
+  },
+  "length": {
+    "value": 17.02,
+    "raw": "Bullet length is .670″"
+  },
+  "noseLength": {
+    "value": 11.15,
+    "raw": "Nose length is .4389″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.157,
+      "note": "Hammer Bullets: \"g1-bc= .157 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 457.2,
+    "raw": "Minimum required twist rate is 1-18″ or faster"
+  },
+  "note": "Recommended use: Target Shooting / plinking. The product page also says: \"This pure copper Target Hammer™ was designed for the 7×33 Sako. It could also be used for any 7mm cartridge for target shooting or plinking.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-077gr-target-hammer/: Minimum required twist rate is 1-18″ or faster | Bullet length is .670″ | Nose length is .4389″ | Bullet weight is 77gr | Recommended use: Target Shooting / plinking | g1-bc= .157 estimated"
+      }
+    ]
+  }
+}

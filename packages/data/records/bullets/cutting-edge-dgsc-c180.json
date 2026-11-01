@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-dgsc-c180",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGSC C180",
+  "name": "DGSC C180 (Safari Raptor, Solid & Lever+, 180 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "length": {
+    "value": 29.21,
+    "raw": "1.150\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.21,
+      "note": "G1 BC (Est.), printed \".210\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .308, Grains 180, Part Number DGSC C180, OAL 1.150\", Bullet Projection .745\", G1 BC (Est.) .210"
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .745\"."
+}

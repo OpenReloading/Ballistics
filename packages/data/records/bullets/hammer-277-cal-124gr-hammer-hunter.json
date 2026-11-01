@@ -1,0 +1,56 @@
+{
+  "id": "hammer-277-cal-124gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "10403",
+  "name": ".277 Cal-124gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 8.035,
+    "raw": "124 gr"
+  },
+  "length": {
+    "value": 31.17,
+    "raw": "Bullet length is 1.227″"
+  },
+  "noseLength": {
+    "value": 16.61,
+    "raw": "Nose length is .654″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.21,
+      "note": "Hammer Bullets: \"g7-bc= .210 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This is the heaviest Hammer Hunter™ that will properly stabilize in a factory 1-10″ twist barrel. Great velocity and outstanding terminal performance will make this a perfect choice for your factory 270 caliber hunting rifle.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-124gr-hammer-hunter/: Recommended minimum twist rate is 1-10″ | Bullet length is 1.227″ | Nose length is .654″ | Bullet weight is 124gr | Recommended use: Big Game Hunting | g7-bc= .210 estimated"
+      }
+    ]
+  }
+}

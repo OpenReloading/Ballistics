@@ -1,0 +1,30 @@
+{
+  "id": "hornady-2830",
+  "manufacturer": "hornady",
+  "productNumber": "2830",
+  "name": "7mm SP, .284, 154 gr",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284\""
+  },
+  "mass": {
+    "value": 9.979,
+    "raw": "154 gr"
+  },
+  "note": "The catalog prints BC .433 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "86",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "7mm SP, .284\", 154 gr., Ballistic Coef. .433, Sec. Den. .273, Item # 2830"
+      }
+    ]
+  }
+}

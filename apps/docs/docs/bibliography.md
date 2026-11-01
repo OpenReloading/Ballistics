@@ -38,6 +38,8 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="amcp-706-140"></a>**AMCP 706-140.** US Army Materiel Command: *Engineering Design Handbook, Ballistics Series: Trajectories, Differential Effects, and Data for Projectiles*. AMCP 706-140, Washington, DC, August 1963.
 - <a id="amcp-706-150"></a>**AMCP 706-150.** US Army Materiel Command: *Engineering Design Handbook, Ballistics Series: Interior Ballistics of Guns*. AMCP 706-150, Washington DC, 1965.
 - <a id="baer-1962"></a>**Baer 1962.** P. G. Baer, J. M. Frankle: *The Simulation of Interior Ballistic Performance of Guns by Digital Computer Program*. BRL Report 1183, Ballistic Research Laboratories, Aberdeen Proving Ground, 1962.
+- <a id="boyle-2012-friction"></a>**Boyle 2012a.** P. Boyle, A. Humphrey, S. Proctor, M. Courtney: *Measuring Barrel Friction in the 5.56mm NATO*. US Air Force Academy, DTIC report ADA555779, 2012. doi:10.21236/ADA555779. (abstract read; full text not read)
+- <a id="boyle-2012-coatings"></a>**Boyle 2012b.** P. Boyle, A. Humphrey, M. Courtney: *Quantifying Friction Effects of Molybdenum Disulfide, Tungsten Disulfide, Hexagonal Boron Nitride, and Lubalox as Bullet Coatings*. US Air Force Academy, DTIC report ADA568594, 2012. (abstract read; full text not read)
 - <a id="brl-drag-functions"></a>**BRL standard drag functions.** US Army Ballistic Research Laboratory: standard drag functions G1, G2, G5, G6, G7, G8, GI and the 9/16 in sphere (GS), drag coefficient against Mach number, as JBM Ballistics publishes them at <https://jbmballistics.com/downloads.html>. The files and SHA-256 checksums of the tables used are listed in `packages/core/src/drag-tables.ts`.
 - <a id="carlson-2021"></a>**Carlson 2021.** J. J. Carlson, J. N. Beer: *Performance Comparison of Circular and Spherical Error Probable Estimators*. Sandia National Laboratories, Albuquerque, NM, April 2021. SAND2021-3798, doi:10.2172/1777092. <https://doi.org/10.2172/1777092>
 - <a id="hoover-1984"></a>**Hoover 1984.** W. E. Hoover: *Algorithms for Confidence Circles and Ellipses*. NOAA Technical Report NOS 107 C&GS 3, National Oceanic and Atmospheric Administration, Rockville, MD, September 1984.
@@ -55,9 +57,13 @@ Measurement data imported as values carry their license: public domain in the US
 
 - <a id="andrew-1979"></a>**Andrew 1979.** A. M. Andrew: *Another efficient algorithm for convex hulls in two dimensions*. Information Processing Letters 9(5), 216-219, 1979. doi:10.1016/0020-0190(79)90072-3. <https://doi.org/10.1016/0020-0190(79)90072-3>
 - <a id="bilenko-2011"></a>**Bilenko 2011.** O. I. Bilenko, V. V. Pashchenko: *Improving methods for solving the direct problem of interior ballistics for smoothbore small arms* (in Ukrainian). Zbirnyk naukovykh prats Akademii vnutrishnikh viisk MVS Ukrainy 2(18), 2011, pp. 48-53. doi:10.33405/2409-7470/2011/2/18/166217. <https://znp.nangu.edu.ua/article/view/166217>
+- <a id="boulkadid-2016"></a>**Boulkadid 2016.** M. K. Boulkadid, M. H. Lefebvre, L. Jeunieau, A. Dejeaifve: *Temperature Sensitivity of Propellant Combustion and Temperature Coefficients of Gun Performance*. Central European Journal of Energetic Materials 13(4), 1005-1022, 2016. doi:10.22211/cejem/67229. <https://doi.org/10.22211/cejem/67229>
 - <a id="codata-2018"></a>**CODATA 2018.** E. Tiesinga, P. J. Mohr, D. B. Newell, B. N. Taylor: *CODATA recommended values of the fundamental physical constants: 2018*. Reviews of Modern Physics 93(2), 025010, 2021. doi:10.1103/RevModPhys.93.025010. <https://doi.org/10.1103/RevModPhys.93.025010>
 - <a id="coope-1993"></a>**Coope 1993.** I. D. Coope: *Circle fitting by linear and nonlinear least squares*. Journal of Optimization Theory and Applications 76(2), 381-388, 1993. doi:10.1007/BF00939613. <https://doi.org/10.1007/BF00939613>
+- <a id="courtney-2014"></a>**Courtney 2014.** E. Courtney, A. Courtney, P. D. Summer, M. Courtney: *Performance testing of lead free primers: blast waves, velocity variations, and environmental testing*. arXiv:1410.6390, 2014. <https://arxiv.org/abs/1410.6390>
+- <a id="courtney-2017"></a>**Courtney 2017.** E. Courtney, R. Couvillion, A. Courtney, M. Courtney: *Effects of Sound Suppressors on Muzzle Velocity, Bullet Yaw, and Drag*. 30th International Symposium on Ballistics, DEStech, 2017. doi:10.12783/ballistics2017/16879. <https://doi.org/10.12783/ballistics2017/16879>. Preprint: arXiv:1802.05748. <https://arxiv.org/abs/1802.05748>
 - <a id="cramer-1993"></a>**Cramer 1993.** O. Cramer: "The variation of the specific heat ratio and the speed of sound in air with temperature, pressure, humidity, and CO2 concentration". *Journal of the Acoustical Society of America* 93(5), 1993, 2510-2516. doi:10.1121/1.405827.
+- <a id="courtney-2015"></a>**Courtney 2015.** E. Courtney, M. Courtney: *Powder Lot Variations: A Case Study with Varget – Hodgdon Extreme*. arXiv:1501.07163, 2015. <https://arxiv.org/abs/1501.07163>
 - <a id="deng-2022"></a>**Deng 2022.** S. Deng, T.-C. Ken, J. Wang, T.-C. Wu, C.-C. Lin: *Interior ballistics analysis of shotgun using discrete element method*. Finite Elements in Analysis and Design 201, 2022, 103698. doi:10.1016/j.finel.2021.103698. <https://doi.org/10.1016/j.finel.2021.103698>
 - <a id="dormand-1980"></a>**Dormand 1980.** J. R. Dormand, P. J. Prince: "A family of embedded Runge-Kutta formulae". *Journal of Computational and Applied Mathematics* 6(1), 1980, 19-26. doi:10.1016/0771-050X(80)90013-3.
 - <a id="dowell-1971"></a>**Dowell 1971.** M. Dowell, P. Jarratt: *A modified regula falsi method for computing the root of an equation*. BIT Numerical Mathematics 11, 1971, pp. 168-174. doi:10.1007/BF01934364 (unverified).
@@ -80,11 +86,13 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="maksimuk-2004"></a>**Maksimuk 2004.** Yu. V. Maksimuk, K. Růžička, V. Diky: "Enthalpy of Formation of Dibutyl Phthalate". *International Journal of Thermophysics* 25(2), 2004, 379-385. doi:10.1023/B:IJOT.0000028475.70749.d6. <https://doi.org/10.1023/B:IJOT.0000028475.70749.d6>
 - <a id="marquardt-1963"></a>**Marquardt 1963.** D. W. Marquardt: *An algorithm for least-squares estimation of nonlinear parameters*. Journal of the Society for Industrial and Applied Mathematics 11(2), 1963, 431-441. doi:10.1137/0111030.
 - <a id="marquardt-1970"></a>**Marquardt 1970.** D. W. Marquardt: *Generalized inverses, ridge regression, biased linear estimation, and nonlinear estimation*. Technometrics 12(3), 1970, 591-612.
+- <a id="mickovic-2010"></a>**Micković 2010.** D. Micković: *Treatment of Deterred Propellants in Interior Ballistic Calculations*. FME Transactions 38(3), 137-141, 2010. <https://simlab.mas.bg.ac.rs/_media/istrazivanje/fme/vol38/3/05_dmickovic.pdf>
 - <a id="miller-2005"></a>**Miller 2005.** D. G. Miller: "A New Rule for Estimating Rifling Twist: An Aid to Choosing Bullets and Rifles". *Precision Shooting*, March 2005. Pages unverified.
 - <a id="otsu-1979"></a>**Otsu 1979.** N. Otsu: *A threshold selection method from gray-level histograms*. IEEE Transactions on Systems, Man, and Cybernetics 9(1), 62-66, 1979. doi:10.1109/TSMC.1979.4310076. <https://doi.org/10.1109/TSMC.1979.4310076>
 - <a id="picard-2008"></a>**Picard 2008.** A. Picard, R. S. Davis, M. Gläser, K. Fujii: "Revised formula for the density of moist air (CIPM-2007)". *Metrologia* 45(2), 2008, 149-155. doi:10.1088/0026-1394/45/2/004.
 - <a id="scott-1969"></a>**Scott 1969.** G. D. Scott, D. M. Kilgour: "The density of random close packing of spheres". *Journal of Physics D: Applied Physics* 2(6), 1969, 863-866. doi:10.1088/0022-3727/2/6/311.
 - <a id="shampine-1986"></a>**Shampine 1986.** L. F. Shampine: "Some practical Runge-Kutta formulas". *Mathematics of Computation* 46(173), 1986, 135-150. doi:10.1090/S0025-5718-1986-0815836-3.
+- <a id="silva-rivera-2021"></a>**Silva-Rivera 2021.** U. S. Silva-Rivera, L. A. Zúñiga-Avilés, A. H. Vilchis-González, P. A. Tamayo-Meza, W. D. Wong-Angel: *Internal ballistics of polygonal and grooved barrels: A comparative study*. Science Progress 104(2), 2021. doi:10.1177/00368504211016954. <https://doi.org/10.1177/00368504211016954>
 - <a id="steffen-1990"></a>**Steffen 1990.** M. Steffen: "A simple method for monotonic interpolation in one dimension". *Astronomy and Astrophysics* 239, 1990, 443-450.
 - <a id="tanaka-2001"></a>**Tanaka 2001.** M. Tanaka, G. Girard, R. Davis, A. Peuto, N. Bignell: *Recommended table for the density of water between 0 °C and 40 °C based on recent experimental reports*. Metrologia 38(4), 301-309, 2001. doi:10.1088/0026-1394/38/4/3. <https://doi.org/10.1088/0026-1394/38/4/3>
 - <a id="van-herk-1992"></a>**van Herk 1992.** M. van Herk: *A fast algorithm for local minimum and maximum filters on rectangular and octagonal kernels*. Pattern Recognition Letters 13(7), 517-521, 1992. doi:10.1016/0167-8655(92)90069-C. <https://doi.org/10.1016/0167-8655(92)90069-C>
@@ -100,45 +108,342 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="dsb-2027"></a>**DSB 2027.** Deutscher Schützenbund: *Sportordnung des Deutschen Schützenbundes, Stand 01.01.2027*. <https://www.dsb.de/fileadmin/DSB.DE/PDF/PDF_2026/DSB-Sportordnung_2027.pdf>
 - <a id="dsu-2018"></a>**DSU 2018.** Deutsche Schießsport Union: *DSU Sporthandbuch, genehmigte Ausgabe Stand 2018*. <https://www.bva.bund.de/SharedDocs/Downloads/DE/Buerger/Ausweis-Dokumente-Recht/Waffenrecht/Schiesssport/dsu-sporthandbuch.pdf?__blob=publicationFile&v=2>
 - <a id="icao-1993"></a>**ICAO 1993.** International Civil Aviation Organization: *Manual of the ICAO Standard Atmosphere*. Doc 7488/3, 3rd edition, Montreal, 1993.
+- <a id="ipsc-2026"></a>**IPSC 2026.** International Practical Shooting Confederation: *IPSC Handgun Competition Rules, January 2026 Edition*. IPSC, Mallorca, 2025. <https://www.ipscstore.com/upload/ipsc_rules/IPSC-Handgun-Competition-Rules-Jan-2026-Edition-Final-29-Dec-2025.pdf>. The IPSC Handgun event type cites it.
 - <a id="issf-2022"></a>**ISSF 2022.** International Shooting Sport Federation: *ISSF Rules for Paper Target Scoring (Annex to the General Technical Rules), Edition 2022 (First Print 01/2023), effective 1 January 2022*. ISSF, 2023. <https://backoffice.issf-sports.org/getfile.aspx?mod=docf&pane=1&inst=31&iist=29&file=ISSF-Rules-for-Paper-Target-Scoring.pdf>
 - <a id="issf-2025-third"></a>**ISSF 2025, Third Print.** International Shooting Sport Federation: *ISSF Official Statutes, Rules and Regulations, Edition 2025 (Third Print 10/2026), effective 19 October 2026*. ISSF, 2026. <https://backoffice.issf-sports.org/getfile.aspx?mod=docf&pane=1&inst=455&file=ISSF-Rule-Book-2026-Edition-2025-Third-Print-10-2026-Effective-19-October-2026.pdf>. The ISSF records cite it.
 - <a id="itu-r-bt-601"></a>**ITU-R BT.601.** International Telecommunication Union: *Recommendation ITU-R BT.601-7, Studio encoding parameters of digital television for standard 4:3 and wide-screen 16:9 aspect ratios*. ITU, Geneva, March 2011. <https://www.itu.int/rec/R-REC-BT.601>
 - <a id="jcgm-100-2008"></a>**JCGM 100:2008.** Joint Committee for Guides in Metrology: *Evaluation of measurement data: Guide to the expression of uncertainty in measurement*. JCGM 100:2008, BIPM, Sèvres, 2008. <https://www.bipm.org/documents/20126/2071204/JCGM_100_2008_E.pdf>
 - <a id="jcgm-101-2008"></a>**JCGM 101:2008.** Joint Committee for Guides in Metrology: *Evaluation of measurement data: Supplement 1 to the "Guide to the expression of uncertainty in measurement": Propagation of distributions using a Monte Carlo method*. JCGM 101:2008, BIPM, Sèvres, 2008. <https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>
 - <a id="knsa-2026"></a>**KNSA 2026.** Koninklijke Nederlandse Schietsport Associatie: *Schiet- en Wedstrijdreglement (SWR)*, parts I to X in one document, part I of 1 October 2026, part IV (Groot Kaliber Geweer) of 1 October 2024. <https://www.knsa.nl/media/1956/swr-delen-i-x-samengevoegd.pdf>
+- <a id="mil-c-9963f"></a>**MIL-C-9963F.** US Department of Defense: *Military Specification, Cartridge, 5.56mm, Ball, M193*. MIL-C-9963F, 15 October 1976. <https://archive.org/details/mil-c-9963-f>
 - <a id="nist-sp-811"></a>**NIST SP 811.** A. Thompson, B. N. Taylor: *Guide for the Use of the International System of Units (SI)*. NIST Special Publication 811, 2008 edition, National Institute of Standards and Technology, Gaithersburg, MD, March 2008. Conversion factors in Appendix B.8 and B.9. doi:10.6028/NIST.SP.811e2008. <https://doi.org/10.6028/NIST.SP.811e2008>
 - <a id="nra-2026"></a>**NRA 2026.** National Rifle Association of America: *NRA High Power Rifle Rules, Official Rules and Regulations*, revised January 2026. <https://competitions.nra.org/media/10581/2026_high_power_rifle_rules.pdf>
 - <a id="nsra-2024"></a>**NSRA 2024.** National Small-bore Rifle Association: *Rules and Regulations for the conduct of small-bore and air rifle, small-bore and air pistol and crossbow competitions*, amendments effective as at 15 April 2024. <https://www.nsra.co.uk/s/Rules-Regs-2024.pdf>
 - <a id="oesb-2025"></a>**ÖSB 2025.** Österreichischer Schützenbund: *Österreichische Schießordnung (ÖSchO)*, 1st edition, 15th revision, valid from 1 September 2025. <https://www.schuetzenbund.at/wp-content/uploads/2020/12/OeSchO_1_Ausgabe_Revision_15_.pdf>
 - <a id="saami-2018"></a>**SAAMI 2018.** Sporting Arms and Ammunition Manufacturers' Institute: *Gun Recoil - Technical*, "Free Recoil Energy", Rev. 7/9/2018. <https://saami.org/wp-content/uploads/2025/03/Gun-Recoil-Formulae-2018-07-9.pdf>
+- <a id="saami-z299-4-2025"></a>**SAAMI Z299.4-2025.** Sporting Arms and Ammunition Manufacturers' Institute: *Voluntary Industry Performance Standards for Pressure and Velocity of Centerfire Rifle Ammunition for the Use of Commercial Manufacturers*. ANSI/SAAMI Z299.4-2025, approved 10 February 2025. <https://saami.org/wp-content/uploads/2026/04/SAAMI-Z299.4-CFR-2025-Centerfire-Rifle-Approved-2-10-2025-2026-04-27.pdf>
 - <a id="ssv-2022"></a>**SSV 2022.** Schweizer Schiesssportverband: *Regeln für das sportliche Schiessen (RSpS)*, Ausgabe 2022, with parts A to I, revision of 9 July 2021. <https://www.swissshooting.ch/media/0xikjm12/dok-1104020_4029-d.pdf>
 - <a id="stanag-4355"></a>**STANAG 4355.** NATO: STANAG 4355 Edition 4 and AOP-4355 Edition A, *The Lieske Modified Point Mass and Five Degrees of Freedom Trajectory Models*. Adopted as ČOS 109001, 4th edition, *Lieskeho model dráhy letu modifikovaného hmotného bodu a model dráhy letu s pěti stupni volnosti*, Praha, 2019. Equation numbers on the model pages are those of ČOS 109001.
+- <a id="uspsa-2026"></a>**USPSA 2026.** United States Practical Shooting Association: *USPSA Competition Rules*, Edition 2026-09, effective 2026-09-01, online rule book. <https://rules.uspsa.org/uspsa>. The USPSA event type cites it, each fact with the URL of its section page.
 - <a id="vdrbw"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr: *Schießsportordnung des VdRBw e.V.*, approved 18 December 2023. <https://www.bva.bund.de/SharedDocs/Downloads/DE/Buerger/Ausweis-Dokumente-Recht/Waffenrecht/Schiesssport/vdrbw_sportordnung.pdf?__blob=publicationFile&v=2>
 - <a id="wmo-no-8"></a>**WMO-No. 8.** World Meteorological Organization: *Guide to Meteorological Instruments and Methods of Observation*. WMO-No. 8, Geneva, Annex 4.B. Edition unverified.
 
+## Component data sources
+
+The documents and web pages of the makers that the bullet, powder, case capacity and manufacturer records cite, by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project licence on what the makers published (`packages/data/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
+
+### Accurate
+
+- Accurate SDS "Double Base Powders - Accurate", May 2026 (inner sheet St. Marks Powder, revision 1, 02/08/2023). <https://hodgdonpowderco.com/wp-content/uploads/2023/06/2022-Accurate-Double-Base-St-Marks-SDS.pdf>
+- Accurate SDS "Single Base Powders - Accurate", March 2022 (inner sheet General Dynamics SDS-18F003 rev. 2). <https://hodgdonpowderco.com/wp-content/uploads/2023/06/2022-Accurate-Single-Base-SDS.pdf>
+
+### ADI World Class Powders
+
+- ADI load data web pages (rifle and pistol), 2026-10-13.
+- ADI World Class Powders news, "Bench Mark 8208 launches at Shot Show", 13 June 2012. <https://www.adiworldclass.com.au/2012/06/13/bench-mark-8208-launches-at-shot-show/>
+- ADI World Class Powders news, "Technological Advancement Results In New Pistol and Shotgun Propellant", 31 May 2018.
+- ADI World Class Powders, contact page.
+- ADI World Class Powders, FAQ "Is Hodgdon propellant the same as ADI propellant?".
+- ADI World Class Powders, pistol load data page, powder list.
+- ADI World Class Powders, rifle load data page, powder list.
+
+### Alliant Powder
+
+- Alliant Powder product page, Power Pro 1200-R. <https://www.alliantpowder.com/products/powder/power_pro_1200-r.aspx>
+- Alliant Powder product page, Power Pro 2000-MR. <https://www.alliantpowder.com/products/powder/power_pro_2000.aspx>
+- Alliant Powder product page, Power Pro 4000-MR. <https://www.alliantpowder.com/products/powder/power_pro_4000.aspx>
+- Alliant Powder product page, Power Pro Varmint. <https://www.alliantpowder.com/products/powder/power_pro_varmint.aspx>
+- Alliant Powder Reloader's Guide 2023.
+- Alliant Powder SDS "15-25 Smokeless Powder", revision 03/01/2017, version 2.0. <https://www.alliantpowder.com/downloads/sds/15-25_Smokeless_Powder.pdf>
+- Alliant Powder SDS "30-40 Smokeless Powder", revision 03/01/2017, version 2.1.
+- Alliant Powder SDS "Reloder Series Smokeless Powders, AR-Comp", revision 03/02/2017, version 2.0.
+- Alliant Reloader's Guide 2023, metallic tables.
+- Alliant safety data sheet "15-25 Smokeless Powder", revision 03/01/2017.
+- Alliant safety data sheet "30-40 Smokeless Powder", revision 03/01/2017.
+- Alliant safety data sheet "American Select". <https://www.alliantpowder.com/downloads/sds/AmericanSelect.pdf>
+- Alliant safety data sheet "Reloder Series Smokeless Powders, AR-Comp".
+- Alliant safety data sheet for Reloder 17, 26, 33 and 50.
+
+### Berger Bullets
+
+- Berger Bullets, Quick Reference Sheet 2020.
+
+### Cutting Edge Bullets
+
+- Cutting Edge Bullets technical data sheets 2026.
+
+### Explosia a.s.
+
+- Explosia a.s., Propellants civil catalogue 2023 (EN).
+- LOVEX Reloading Guide EN 37 (Explosia a.s.).
+- LOVEX Reloading Guide EN 37 (Explosia).
+
+### Hammer Bullets
+
+- Hammer Bullets store (WooCommerce Store API).
+
+### Hodgdon Powder Co.
+
+- Hodgdon Annual Manual 2025.
+- Hodgdon Annual Manual 2025, rifle and pistol tables.
+- Hodgdon Powder Co. product page, 700X® Shotshell Powder.
+- Hodgdon Powder Co. product page, Accuarte No. 5® Pistol Powder. <https://shop.hodgdon.com/accurate-no-5/>
+- Hodgdon Powder Co. product page, Accurate #11FS® Pistol Powder. <https://shop.hodgdon.com/accurate-11fs/>
+- Hodgdon Powder Co. product page, Accurate #7 Pistol Powder. <https://shop.hodgdon.com/accurate-no-7/>
+- Hodgdon Powder Co. product page, Accurate #9® Pistol Powder. <https://shop.hodgdon.com/accurate-no-9/>
+- Hodgdon Powder Co. product page, Accurate 1680® Rifle Powder.
+- Hodgdon Powder Co. product page, Accurate 2015® Rifle Powder. <https://shop.hodgdon.com/accurate-2015/>
+- Hodgdon Powder Co. product page, Accurate 2200® Rifle Powder. <https://shop.hodgdon.com/accurate-2200/>
+- Hodgdon Powder Co. product page, Accurate 2230® Rifle Powder. <https://shop.hodgdon.com/accurate-2230/>
+- Hodgdon Powder Co. product page, Accurate 2460® Rifle Powder. <https://shop.hodgdon.com/accurate-2460/>
+- Hodgdon Powder Co. product page, Accurate 2495® Rifle Powder. <https://shop.hodgdon.com/accurate-2495/>
+- Hodgdon Powder Co. product page, Accurate 2520® Rifle Powder. <https://shop.hodgdon.com/accurate-2520/>
+- Hodgdon Powder Co. product page, Accurate 2700® Rifle Powder. <https://shop.hodgdon.com/accurate-2700/>
+- Hodgdon Powder Co. product page, Accurate 4064® Rifle Powder. <https://shop.hodgdon.com/accurate-4064/>
+- Hodgdon Powder Co. product page, Accurate 4100® Pistol Powder. <https://shop.hodgdon.com/accurate-4100/>
+- Hodgdon Powder Co. product page, Accurate 4350® Rifle Powder. <https://shop.hodgdon.com/accurate-4350/>
+- Hodgdon Powder Co. product page, Accurate 5744® Rifle Powder. <https://shop.hodgdon.com/accurate-5744/>
+- Hodgdon Powder Co. product page, Accurate LT30® Rifle Powder. <https://shop.hodgdon.com/accurate-lt-30/>
+- Hodgdon Powder Co. product page, Accurate LT32® Rifle Powder. <https://shop.hodgdon.com/accurate-lt-32/>
+- Hodgdon Powder Co. product page, Accurate MAGPRO® Rifle Powder. <https://shop.hodgdon.com/accurate-magpro/>
+- Hodgdon Powder Co. product page, Accurate Nitro 100NF. <https://shop.hodgdon.com/nitro-100-new-formulation/>
+- Hodgdon Powder Co. product page, Accurate No.2® Pistol Powder. <https://shop.hodgdon.com/accurate-no-2/>
+- Hodgdon Powder Co. product page, Accurate TCM® Pistol Powder. <https://shop.hodgdon.com/accurate-tcm/>
+- Hodgdon Powder Co. product page, CFE 223® Rifle Powder. <https://shop.hodgdon.com/hodgdon-cfe-223/>
+- Hodgdon Powder Co. product page, H1000® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h1000/>
+- Hodgdon Powder Co. product page, H110® Shotshell and Pistol Powder. <https://shop.hodgdon.com/hodgdon-h110/>
+- Hodgdon Powder Co. product page, H335® Rifle Powder. <https://shop.hodgdon.com/hodgdon-h335/>
+- Hodgdon Powder Co. product page, H4198® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h4198/>
+- Hodgdon Powder Co. product page, H4350® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h4350/>
+- Hodgdon Powder Co. product page, H4831SC® Extreme Rifle Powder. <https://shop.hodgdon.com/hodgdon-h4831sc/>
+- Hodgdon Powder Co. product page, H4831® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h4831/>
+- Hodgdon Powder Co. product page, H4895® Extreme Rifle Powder. <https://shop.hodgdon.com/hodgdon-h4895/>
+- Hodgdon Powder Co. product page, Hodgdon 322® Extreme Rifle Powder. <https://shop.hodgdon.com/hodgdon-h322/>
+- Hodgdon Powder Co. product page, Hodgdon 50BMG Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-h50bmg/>
+- Hodgdon Powder Co. product page, Hodgdon Benchmark® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-benchmark/>
+- Hodgdon Powder Co. product page, Hodgdon BL-C(2)® Rifle Powder. <https://shop.hodgdon.com/hodgdon-bl-c-2/>
+- Hodgdon Powder Co. product page, Hodgdon CFE® Black BLK Rifle Powder. <https://shop.hodgdon.com/hodgdon-cfe-blk/>
+- Hodgdon Powder Co. product page, Hodgdon CFE® Pistol Handgun Powder. <https://shop.hodgdon.com/hodgdon-cfe-pistol/>
+- Hodgdon Powder Co. product page, Hodgdon Clays® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-clays/>
+- Hodgdon Powder Co. product page, Hodgdon H380® Rifle Powder. <https://shop.hodgdon.com/hodgdon-h380/>
+- Hodgdon Powder Co. product page, Hodgdon HP-38® Pistol Powder. <https://shop.hodgdon.com/hodgdon-hp-38/>
+- Hodgdon Powder Co. product page, Hodgdon HS-6® Shotshell and Pistol Powder. <https://shop.hodgdon.com/hodgdon-hs-6/>
+- Hodgdon Powder Co. product page, Hodgdon LEVERevolution® by Hornady Rifle Powder. <https://shop.hodgdon.com/hodgdon-leverevolution/>
+- Hodgdon Powder Co. product page, Hodgdon Lil'Gun® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-lil-gun/>
+- Hodgdon Powder Co. product page, Hodgdon Longshot® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-longshot/>
+- Hodgdon Powder Co. product page, Hodgdon Retumbo® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-retumbo/>
+- Hodgdon Powder Co. product page, Hodgdon Superformance® by Hornady Rifle Powder. <https://shop.hodgdon.com/hodgdon-suprform/>
+- Hodgdon Powder Co. product page, Hodgdon Titewad® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-titewad/>
+- Hodgdon Powder Co. product page, Hodgdon Trail Boss® Cowboy Action Powder. <https://shop.hodgdon.com/hodgdon-trail-boss/>
+- Hodgdon Powder Co. product page, Hodgdon Universal® Shotshell Powder. <https://shop.hodgdon.com/hodgdon-universal/>
+- Hodgdon Powder Co. product page, Hybrid 100V® Rifle Powder. <https://shop.hodgdon.com/hodgdon-hybrid-100v/>
+- Hodgdon Powder Co. product page, IMR 3031® Rifle Powder. <https://shop.hodgdon.com/imr-3031/>
+- Hodgdon Powder Co. product page, IMR 4064® Rifle Powder. <https://shop.hodgdon.com/imr-4064/>
+- Hodgdon Powder Co. product page, IMR 4198® Rifle Powder. <https://shop.hodgdon.com/imr-4198/>
+- Hodgdon Powder Co. product page, IMR 4227® Rifle Powder. <https://shop.hodgdon.com/imr-4227/>
+- Hodgdon Powder Co. product page, IMR 4350® Rifle Powder. <https://shop.hodgdon.com/imr-4350/>
+- Hodgdon Powder Co. product page, IMR 4831® Rifle Powder. <https://shop.hodgdon.com/imr-4831/>
+- Hodgdon Powder Co. product page, IMR 4895® Rifle Powder. <https://shop.hodgdon.com/imr-4895/>
+- Hodgdon Powder Co. product page, IMR 7828 SSC® Rifle Powder. <https://shop.hodgdon.com/imr-7828-ssc/>
+- Hodgdon Powder Co. product page, IMR 8208 XBR® Extreme Rifle Powder. <https://shop.hodgdon.com/imr-8208-xbr/>
+- Hodgdon Powder Co. product page, Ramshot Big Game® Rifle Powder.
+- Hodgdon Powder Co. product page, Ramshot Competition® Shotshell Powder. <https://shop.hodgdon.com/ramshot-competition/>
+- Hodgdon Powder Co. product page, Ramshot Enforcer® Pistol Powder. <https://shop.hodgdon.com/ramshot-enforcer/>
+- Hodgdon Powder Co. product page, Ramshot Grand® Rifle Powder. <https://shop.hodgdon.com/ramshot-grand/>
+- Hodgdon Powder Co. product page, Ramshot Hunter® Rifle Powder. <https://shop.hodgdon.com/ramshot-hunter/>
+- Hodgdon Powder Co. product page, Ramshot LRT® Rifle Powder. <https://shop.hodgdon.com/ramshot-lrt/>
+- Hodgdon Powder Co. product page, Ramshot Magnum® Rifle Powder. <https://shop.hodgdon.com/ramshot-magnum/>
+- Hodgdon Powder Co. product page, Ramshot Silhouette® Pistol Powder. <https://shop.hodgdon.com/ramshot-silhouette/>
+- Hodgdon Powder Co. product page, Ramshot TAC® Rifle Powder. <https://shop.hodgdon.com/ramshot-tac/>
+- Hodgdon Powder Co. product page, Ramshot True Blue® Pistol Powder. <https://shop.hodgdon.com/ramshot-true-blue/>
+- Hodgdon Powder Co. product page, Ramshot X-Terminator® Rifle Powder. <https://shop.hodgdon.com/ramshot-x-terminator/>
+- Hodgdon Powder Co. product page, Ramshot Zip® Pistol Powder. <https://shop.hodgdon.com/ramshot-zip/>
+- Hodgdon Powder Co. product page, Titegroup® Pistol and Shotshell Powder. <https://shop.hodgdon.com/hodgdon-titegroup/>
+- Hodgdon Powder Co. product page, US 869® Rifle Powder. <https://shop.hodgdon.com/hodgdon-us-869/>
+- Hodgdon Powder Co. product page, Varget® Extreme Rifle® Powder. <https://shop.hodgdon.com/hodgdon-varget/>
+- Hodgdon Powder Co. product page, Winchester 231® Pistol Powder. <https://shop.hodgdon.com/winchester-231/>
+- Hodgdon Powder Co. product page, Winchester 296® Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-296/>
+- Hodgdon Powder Co. product page, Winchester 572® Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-572/>
+- Hodgdon Powder Co. product page, Winchester 748® Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-748/>
+- Hodgdon Powder Co. product page, Winchester 760® Rifle Powder. <https://shop.hodgdon.com/winchester-760/>
+- Hodgdon Powder Co. product page, Winchester AA Super Field Shotshell and Pistol Powder. <https://shop.hodgdon.com/winchester-super-field/>
+- Hodgdon Powder Co. product page, Winchester AutoComp® Pistol Powder. <https://shop.hodgdon.com/winchester-autocomp/>
+- Hodgdon Powder Co. product page, Winchester StaBALL 6.5® Rifle Powder. <https://shop.hodgdon.com/winchester-staball-6-5/>
+- Hodgdon Powder Co. product page, Winchester StaBALL HD® Rifle Powder. <https://shop.hodgdon.com/winchester-staball-hd/>
+- Hodgdon Powder Co. product page, Winchester StaBALL Match® Rifle Powder. <https://shop.hodgdon.com/winchester-staball-match/>
+- Hodgdon Powder Co. product page, Winchester Super Target® Shotshell Powder. <https://shop.hodgdon.com/winchester-wst/>
+- Hodgdon Powder Co. product page, Winchester WinClean 244® Pistol Powder. <https://shop.hodgdon.com/winchester-winclean-244/>
+- Hodgdon safety data sheet "Spherical Powders", February 2022 cover. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-hodgdon-spherical-powders-sds.pdf>
+- Hodgdon SDS "Extruded Rifle Powders", February 2022 (inner sheet "Propellant AR22 Series", Chemwatch 5189-29, version 7.1).
+- Hodgdon SDS "Extruded Rifle Powders", February 2022, Benchmark (inner sheet "Propellant BM2", Chemwatch 4693-84). <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-bm2-sds.pdf>
+- Hodgdon SDS "Spherical Powders", February 2022 (inner sheet St. Marks Powder "BALL POWDER Propellant", revision 10, 12/11/2021).
+
+### Hornady Manufacturing
+
+- Hornady 2026 Product Catalog.
+- Hornady Manufacturing. <https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match>
+
+### IMR
+
+- IMR safety data sheet "Single Base Powders", February 2022 cover. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/2022-imr-single-base-sds.pdf>
+- IMR SDS "Single Base Powders", February 2022 (inner sheet General Dynamics OTS Canada Valleyfield, SDS-19C001 rev. 1).
+
+### Lapua
+
+- Lapua.
+
+### Lehigh Defense
+
+- Lehigh Defense store, product attributes (GraphQL).
+
+### Missouri Bullet Company
+
+- Missouri Bullet Company, pricing page.
+
+### Norma
+
+- Norma product page, Norma 200.
+- Norma product page, Norma 201. <https://www.norma-ammunition.com/products/components/gunpowder/norma-201---20902015>
+- Norma product page, Norma 202. <https://www.norma-ammunition.com/products/components/gunpowder/norma-202---20902025>
+- Norma product page, Norma 203-B. <https://www.norma-ammunition.com/products/components/gunpowder/norma-203-b---20902035>
+- Norma product page, Norma 204. <https://www.norma-ammunition.com/products/components/gunpowder/norma-204---20902045>
+- Norma product page, Norma 217. <https://www.norma-ammunition.com/products/components/gunpowder/norma-217---20902175>
+- Norma product page, Norma MRP. <https://www.norma-ammunition.com/products/components/gunpowder/norma-mrp---20902155>
+- Norma product page, Norma URP. <https://www.norma-ammunition.com/products/components/gunpowder/norma-urp---20902195>
+- Norma reloading data web pages, 2026-10-13.
+
+### Nosler
+
+- Nosler.
+
+### Ramshot
+
+- Ramshot SDS "Double Base Powders - Ramshot", March 2022, TAC (inner sheet St. Marks Powder, revision 10, 12/11/2021). <https://hodgdonpowderco.com/wp-content/uploads/2023/06/2022-Ramshot-TAC-SDS.pdf>
+
+### Reload Swiss
+
+- Reload Swiss data sheet RS12 (EN).
+- Reload Swiss data sheet RS14 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS14/RS14-EN.pdf>
+- Reload Swiss data sheet RS20 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS20/RS20-EN.pdf>
+- Reload Swiss data sheet RS24 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS24/RS24-EN.pdf>
+- Reload Swiss data sheet RS30 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS30/RS30-EN.pdf>
+- Reload Swiss data sheet RS36 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS36/RS36-EN.pdf>
+- Reload Swiss data sheet RS40 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS40/RS40-EN.pdf>
+- Reload Swiss data sheet RS50 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS50/RS50-EN.pdf>
+- Reload Swiss data sheet RS52 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS52/RS52-EN.pdf>
+- Reload Swiss data sheet RS60 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS60/RS60-EN.pdf>
+- Reload Swiss data sheet RS62 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS62/RS62-EN.pdf>
+- Reload Swiss data sheet RS70 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS70/RS70-EN.pdf>
+- Reload Swiss data sheet RS76 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS76/RS76-EN.pdf>
+- Reload Swiss data sheet RS80 (EN). <https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS80/RS80-EN.pdf>
+- Reload Swiss loading data web table, 2026-10-12.
+
+### RWS
+
+- RWS reloading data page (Wiederladen), powder column.
+- RWS reloading data web table (Rottweil powders), 2026-10-13.
+
+### Sako
+
+- Sako reloading data (PDF).
+
+### Sellier & Bellot
+
+- Sellier & Bellot, component bullets (pistol and revolver table).
+- Sellier & Bellot, component bullets (rifle table).
+
+### Sierra Bullets
+
+- Sierra Bullets.
+- Sierra Bullets, contact page.
+
+### Vectan
+
+- Vectan catalogue 12/2023, powder ranges.
+- Vectan catalogue 2023-12.
+
+### Vihtavuori
+
+- Vihtavuori product page, 3N37. <https://vihtavuori.com/powder/3n37-powder/>
+- Vihtavuori product page, N310. <https://vihtavuori.com/powder/n310-handgun-powder/>
+- Vihtavuori product page, N320. <https://vihtavuori.com/powder/n320-handgun-powder/>
+- Vihtavuori product page, N340. <https://vihtavuori.com/powder/n340-handgun-powder/>
+- Vihtavuori reloading data, release 14.9.2026.
+- Vihtavuori safety data sheet "N-Powder (Centralite)", revised 03/12/2025, version 2.
+- Vihtavuori safety data sheet "N-Powder High Energy N500 series", revised 04/12/2025, version 2.
+- Vihtavuori safety data sheet "N-Powder", revised 03/12/2025, version 2.
+- Vihtavuori SDS "N-Powder (Centralite)", revised 03/12/2025, version 2.
+- Vihtavuori SDS "N-Powder High Energy N500 series", revised 04/12/2025, version 2.
+- Vihtavuori SDS "N-Powder", revised 03/12/2025, version 2.
+
+### Western Powders
+
+- Western Powders Handloading Guide 8.0.
+- Western Powders Handloading Guide 8.0 (Accurate, Ramshot).
+
+### Winchester
+
+- Winchester SDS "BALL Powder Propellant", November 2022 (inner sheet St. Marks Powder, revision 10, 12/11/2021).
+
+### OpenReloading
+
+- Mapping of the maker wording to the construction fields (docs/data/bullet-construction.md).
+- OpenReloading constant-volume equilibrium solver.
+
+### Wikipedia
+
+- Wikipedia, .223 Remington. <https://en.wikipedia.org/w/index.php?title=.223_Remington&oldid=1371182787>
+- Wikipedia, .300 Remington Ultra Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Remington_Ultra_Magnum&oldid=1313173783>
+- Wikipedia, .300 Winchester Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Magnum&oldid=1368911320>
+- Wikipedia, .300 Winchester Short Magnum. <https://en.wikipedia.org/w/index.php?title=.300_Winchester_Short_Magnum&oldid=1351061051>
+- Wikipedia, .338 Lapua Magnum. <https://en.wikipedia.org/w/index.php?title=.338_Lapua_Magnum&oldid=1374066412>
+- Wikipedia, .357 Magnum. <https://en.wikipedia.org/w/index.php?title=.357_Magnum&oldid=1368987349>
+- Wikipedia, .38 Special. <https://en.wikipedia.org/w/index.php?title=.38_Special&oldid=1376197673>
+- Wikipedia, .380 ACP. <https://en.wikipedia.org/w/index.php?title=.380_ACP&oldid=1363481298>
+- Wikipedia, .40 S&W. <https://en.wikipedia.org/w/index.php?title=.40_S%26W&oldid=1371072783>
+- Wikipedia, .44 Magnum. <https://en.wikipedia.org/w/index.php?title=.44_Magnum&oldid=1368987370>
+- Wikipedia, .44 Special. <https://en.wikipedia.org/w/index.php?title=.44_Special&oldid=1368969599>
+- Wikipedia, 10mm Auto. <https://en.wikipedia.org/w/index.php?title=10mm_Auto&oldid=1379060078>
+- Wikipedia, 6.5mm Creedmoor. <https://en.wikipedia.org/w/index.php?title=6.5mm_Creedmoor&oldid=1375349834>
+- Wikipedia, 6.5mm Grendel. <https://en.wikipedia.org/w/index.php?title=6.5mm_Grendel&oldid=1345549433>
+- Wikipedia, 6.5x47mm Lapua. <https://en.wikipedia.org/w/index.php?title=6.5%C3%9747mm_Lapua&oldid=1292319718>
+- Wikipedia, 7.62x25mm Tokarev. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9725mm_Tokarev&oldid=1373994969>
+- Wikipedia, 7.62x39mm. <https://en.wikipedia.org/w/index.php?title=7.62%C3%9739mm&oldid=1371601372>
+- Wikipedia, 9x19mm Parabellum. <https://en.wikipedia.org/w/index.php?title=9%C3%9719mm_Parabellum&oldid=1379172502>
+
 ## Online references
 
+- <a id="bbti-9mm"></a>**BBTI 9 mm.** Ballistics By The Inch: *9mm Luger results*, velocity by barrel length, 3 shots per barrel, measured 15 ft from the muzzle. <http://www.ballisticsbytheinch.com/9luger.html>
 - <a id="bdmp-home"></a>**BDMP.** Bund Deutscher Militär- und Polizeischützen e.V.: *Homepage*. <https://www.bdmp.de/>
 - <a id="bds-home"></a>**BDS.** Bund Deutscher Sportschützen 1975 e. V.: *Homepage*. <https://www.bdsnet.de/>
+- <a id="castleman-2023"></a>**Castleman 2023.** W. L. Castleman: *Comparison of 223 Remington Brass for AR-15 Service Rifle*, 2023, revised 2025. <https://www.wlcastleman.com/equip/shoot/223bt/index.htm>
 - <a id="cdp-emulation"></a>**DevTools Protocol, Emulation.** Chrome DevTools Protocol: *Emulation domain, setCPUThrottlingRate*. <https://chromedevtools.github.io/devtools-protocol/#/Emulation.setCPUThrottlingRate>
 - <a id="dlmf"></a>**DLMF.** F. W. J. Olver, A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, R. F. Boisvert, C. W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, M. A. McClain (eds.): *NIST Digital Library of Mathematical Functions*. NIST, Gaithersburg, MD. <https://dlmf.nist.gov/>
 - <a id="dsb-home"></a>**DSB.** Deutscher Schützenbund e.V.: *Homepage*. <https://www.dsb.de/>
 - <a id="dsu-home"></a>**DSU.** Deutsche Schießsport Union e.V.: *Homepage*. <https://www.d-s-u.de/>
 - <a id="event-timing"></a>**Event Timing.** W3C: *Event Timing API*. <https://w3c.github.io/event-timing/>
+- <a id="faber-steel-jackets"></a>**Faber.** S. R. Faber: *[AMMO] steel vs copper jackets*. Usenet post, undated, archived at <https://yarchive.net/gun/engraving_force.html>
 - <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: *Homepage*. <https://www.issf-sports.org/>
+- <a id="hodgdon-2012"></a>**Hodgdon 2012.** Hodgdon Powder Co.: *Extreme Rifle Powders, test results for temperature sensitivity*, 13 July 2012. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/hodgdon-extreme-series-powders-test-results-for-temperature-sensitivity-1.pdf>
 - <a id="layout-instability"></a>**Layout Instability.** W3C Web Platform Incubator Community Group: *Layout Instability API*. <https://wicg.github.io/layout-instability/>
 - <a id="longtasks"></a>**Long Tasks.** W3C: *Long Tasks API*. <https://w3c.github.io/longtasks/>
+- <a id="merrill-2017"></a>**Merrill 2017.** A. Merrill: *Goodbye, Brass?* NRA Shooting Sports USA, 13 February 2017. <https://www.ssusa.org/articles/2017/2/13/goodbye-brass/>
 - <a id="nist-webbook"></a>**NIST WebBook.** P. J. Linstrom, W. G. Mallard (eds.): *NIST Chemistry WebBook*, NIST Standard Reference Database 69. NIST, Gaithersburg, MD. Condensed-phase thermochemistry of CAS 64-17-5, 84-74-2, 85-98-3, 121-14-2 and 611-92-7. doi:10.18434/T4D303. <https://webbook.nist.gov/chemistry/>
 - <a id="nist-sematech"></a>**NIST/SEMATECH.** National Institute of Standards and Technology, SEMATECH: *NIST/SEMATECH e-Handbook of Statistical Methods*. NIST, Gaithersburg, MD. <https://www.itl.nist.gov/div898/handbook/>
 - <a id="knsa-home"></a>**KNSA.** Koninklijke Nederlandse Schietsport Associatie: *Homepage*. <https://www.knsa.nl/>
 - <a id="nra-home"></a>**NRA.** National Rifle Association of America: *Homepage*. <https://www.nra.org/>
 - <a id="nsra-home"></a>**NSRA.** National Small-bore Rifle Association: *Homepage*. <https://www.nsra.co.uk/>
 - <a id="oesb-home"></a>**ÖSB.** Österreichischer Schützenbund: *Homepage*. <https://www.schuetzenbund.at/>
+- <a id="rifleshooter-2014"></a>**Rifleshooter 2014.** Rifleshooter.com: *308 Winchester / 7.62x51mm NATO: Barrel Length versus Velocity (28″ to 16.5″)*, December 2014. <https://rifleshooter.com/2014/12/308-winchester-7-62x51mm-nato-barrel-length-versus-velocity-28-to-16-5/>
 - <a id="ssv-home"></a>**SSV.** Schweizer Schiesssportverband: *Swiss Shooting, Homepage*. <https://www.swissshooting.ch/>
 - <a id="vdrbw-home"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr e.V.: *Homepage*. <https://www.reservistenverband.de/>
+- <a id="vihtavuori-2018-moisture"></a>**Vihtavuori 2018.** A. Vapola: *Did you know? Powder moist content*. Vihtavuori, 18 July 2018. <https://vihtavuori.com/know-powder-moist-content/>
+- <a id="vihtavuori-2021-n568"></a>**Vihtavuori 2021.** Vihtavuori: *Introducing the new N568 rifle powder*. Vihtavuori, 1 February 2021. <https://vihtavuori.com/introducing-the-new-n568-rifle-powder/>
 - <a id="wmo-2025"></a>**WMO 2025.** World Meteorological Organization: *Records of Weather and Climate Extremes*, as of 31 July 2025. Table of the WMO World Weather and Climate Extremes Archive. <https://wmo.int/sites/default/files/2025-07/Table_Records_25Jul2025.pdf>
 
 ## Patents
 
+- <a id="us-7143679"></a>**US 7,143,679 B2.** D. S. Yaich: *Cannelured frangible cartridge and method of canneluring a frangible projectible*. US Patent 7,143,679 B2, granted 5 December 2006. <https://patents.google.com/patent/US7143679B2/en>
+- <a id="us-7322297"></a>**US 7,322,297 B2.** D. S. Yaich: *Cannelured frangible projectile and method of canneluring a frangible projectile*. US Patent 7,322,297 B2, granted 29 January 2008. <https://patents.google.com/patent/US7322297B2/en>
 - <a id="us-10690463"></a>**US 10,690,463 B2.** J. A. Carbone, J. Kutney, S. Fitzsimonds, L. P. Head, B. Peterson, R. Hurt, J. J. Foley: *Extended range bullet*. US Patent 10,690,463 B2, granted 23 June 2020. <https://patents.google.com/patent/US10690463B2/en>
 - <a id="us-12467728"></a>**US 12,467,728 B2.** M. Muster, D. Meyer, P. Howald, M. Grünig: *Deformation bullet for police and authority ammunition*. US Patent 12,467,728 B2, granted 11 November 2025. <https://patents.google.com/patent/US12467728B2/en>

@@ -1,0 +1,36 @@
+{
+  "id": "sellier-bellot-v339572",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V339572",
+  "name": "SP, .366, 285 gr (bullet 2952)",
+  "productLine": "SP",
+  "caliber": ".366",
+  "diameter": {
+    "value": 9.296,
+    "raw": ".366 in (9,3 mm)"
+  },
+  "mass": {
+    "value": 18.468,
+    "raw": "285 grs (18,5 g)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.308,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "V339572 | 2952 | SP | 285 | 18,5 | 9,3 | 9,3 | .366 | 0,308. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

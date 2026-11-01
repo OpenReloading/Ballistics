@@ -1,0 +1,63 @@
+{
+  "id": "sierra-2610",
+  "manufacturer": "sierra",
+  "productNumber": "2610",
+  "name": "338 CAL 215 GR SBT GAMEKING (SGK)",
+  "caliber": "0.338",
+  "diameter": {
+    "value": 8.585,
+    "raw": "0.338 in"
+  },
+  "mass": {
+    "value": 13.932,
+    "raw": "215 gr"
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.485,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.243,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/338-cal-215-gr-sbt-gameking-sgk/",
+        "retrieved": "2026-10-08",
+        "sha256": "81d18e8bbc4e1d1c7a5ad87a4fba17d29c1421ae28fd014cd3a793549ddcf639",
+        "fields": ["diameter", "mass", "base.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2610, Bullet Type: Spitzer Boat Tail (SBT), Bullet Diameter: 0.338, Bullet Weight (Grains): 215, G1 BC: 0.485, G7 BC: 0.243, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,49 @@
+{
+  "id": "sierra-3100",
+  "manufacturer": "sierra",
+  "productNumber": "3100",
+  "name": "40 CAL 200 GR JHP PRO-HUNTER",
+  "caliber": "0.400",
+  "diameter": {
+    "value": 10.16,
+    "raw": "0.400 in"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "note": "The page title says JHP, the specification of item 3100 Roundnose (RN). The page's product fields name item 2800 (Jacketed Hollow Point (JHP), 0.350 in, 200 gr), which its specification does not list; this record follows the specification of item 3100.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/40-cal-200-gr-jhp-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "3405a1dc20a7cb5f4535267789d275e79a4be48feaf2ec2ddc5965309b4663bd",
+        "fields": ["diameter", "mass", "construction.raw"],
+        "note": "Item #: 3100, Bullet Type: Roundnose (RN), Bullet Diameter: 0.400, Bullet Weight (Grains): 200, G1 BC: NA, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

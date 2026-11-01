@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-181gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "843",
+  "name": ".308 Cal-181gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.729,
+    "raw": "181 gr"
+  },
+  "length": {
+    "value": 35.05,
+    "raw": "Bullet length is 1.38″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.429,
+      "note": "Hammer Bullets: \"G1-BC=.429 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 292.1,
+    "raw": "Recommended twist rate is 1-11.5″ minimum"
+  },
+  "note": "Recommended use: Big game hunting.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-181gr-stone-hammer/: Recommended twist rate is 1-11.5″ minimum | Bullet length is 1.38″ | Bullet weight is 181gr | Recommended use: Big game hunting | G1-BC=.429 estimated"
+      }
+    ]
+  }
+}

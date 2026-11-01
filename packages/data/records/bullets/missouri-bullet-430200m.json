@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-430200m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "430200M",
+  "name": ".44 Stalker, 200 Grain RNFP",
+  "caliber": ".430",
+  "diameter": {
+    "value": 10.922,
+    "raw": ".430 Diameter"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 Grain"
+  },
+  "length": {
+    "value": 14.88,
+    "raw": "Bullet OAL .586 +/-"
+  },
+  "note": "Listed as 200 Grain RNFP. Brinell 18. .44 Magnum. For Magnum Loads.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "430200M, .44 Stalker (https://missouribullet.com/details.php?prodId=339): .430 Diameter, 200 Grain RNFP, Brinell 18, Bullet OAL .586 +/-"
+      }
+    ]
+  }
+}

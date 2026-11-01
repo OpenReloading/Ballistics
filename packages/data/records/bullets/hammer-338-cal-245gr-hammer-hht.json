@@ -1,0 +1,56 @@
+{
+  "id": "hammer-338-cal-245gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869048886",
+  "name": ".338 Cal-245gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 15.876,
+    "raw": "245 gr"
+  },
+  "length": {
+    "value": 46.02,
+    "raw": "Bullet length including the tip is 1.812″"
+  },
+  "noseLength": {
+    "value": 24.38,
+    "raw": "Nose length including the tip is .960″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.292,
+      "note": "Hammer Bullets: \"g7-bc= .292 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 273.05,
+    "raw": "Minimum required twist rate is 1-10.75″ or faster"
+  },
+  "note": "Tip length is .23″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"This 245gr Hammer HHT™ will be a great choice for the big magnum 338’s with 1-10.75″ twist or faster barrels. Cartridges like 338 RUM and 338 Lapua Magnum will shine with this weight bullet running north of 3000 fps. This will be an outstanding all-around hunting combo for short range and long range hunting all in the same bullet.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-245gr-hammer-hht/: Minimum required twist rate is 1-10.75″ or faster | Bullet length including the tip is 1.812″ | Nose length including the tip is .960″ | Tip length is .23″ | Bullet weight is 245gr | Recommended use: Big Game Hunting | g7-bc= .292 estimated"
+      }
+    ]
+  }
+}

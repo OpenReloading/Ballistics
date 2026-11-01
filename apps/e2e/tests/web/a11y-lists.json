@@ -266,6 +266,17 @@
       "node": "driver-popover-close-btn",
       "where": ["Page tour"],
       "reason": "Close button of the page tour: its only visible content is the glyph x, hidden from assistive technology, so the name is its label Close the tour."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "-tab-\\/",
+      "reason": "Tab of the library strip that scrolls sideways on a phone: the tab at the strip's edge is partly cut, so axe cannot match it to a background. The label is the tab text colour on the page background, unchanged by the scrolling, 5:1 or more in both themes."
+    },
+    {
+      "rule": "color-contrast",
+      "node": "",
+      "where": ["Settings"],
+      "reason": "Text of the Settings dialog at the edge of its scrolling tab area, partly clipped by the box or the pinned footer, so axe cannot match it to a background. It is the text or muted colour on the dialog background, 5:1 or more in both themes."
     }
   ]
 }

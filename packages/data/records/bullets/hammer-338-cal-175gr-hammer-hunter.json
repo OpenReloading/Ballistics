@@ -1,0 +1,56 @@
+{
+  "id": "hammer-338-cal-175gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869025113",
+  "name": ".338 Cal-175gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 11.34,
+    "raw": "175 gr"
+  },
+  "length": {
+    "value": 31.5,
+    "raw": "Bullet length is 1.24″"
+  },
+  "noseLength": {
+    "value": 18.75,
+    "raw": "Nose length is .738″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.198,
+      "note": "Hammer Bullets: \"g7-bc= .198 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "Minimum required twist rate: 1-14″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We designed this pure copper Hammer Hunter™ in a light weight form to put the 338’s into a whole new velocity bracket. We loaded this hot rod into our .338 Lap imp for testing and reached a comfortable velocity of 3900 fps! Even with this impressive velocity it still shot solid sub 1″ at 200y. Translate this to the 338 Winchester Mag and we should be able to push the 3400 fps mark. With a bullet that will not come apart and deforms rapidly this is an extremely hard hitter.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-175gr-hammer-hunter/: Minimum required twist rate: 1-14″ | Bullet length is 1.24″ | Nose length is .738″ | Bullet weight is 175gr | Recommended use: Big Game Hunting | g7-bc= .198 estimated"
+      }
+    ]
+  }
+}

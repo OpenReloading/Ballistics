@@ -1,0 +1,55 @@
+{
+  "id": "sierra-1830",
+  "manufacturer": "sierra",
+  "productNumber": "1830",
+  "name": "270 CAL 130 GR SPT Pro-Hunter",
+  "caliber": "0.277",
+  "diameter": {
+    "value": 7.036,
+    "raw": "0.277 in"
+  },
+  "mass": {
+    "value": 8.424,
+    "raw": "130 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.37,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/270-cal-130-gr-spt-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "218ffcc85b8629b4da00387f738d2835a6e9ee760e8d1d59800c8c2f4a3ce6c1",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1830, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.277, Bullet Weight (Grains): 130, G1 BC: 0.370, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

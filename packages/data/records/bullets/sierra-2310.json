@@ -1,0 +1,55 @@
+{
+  "id": "sierra-2310",
+  "manufacturer": "sierra",
+  "productNumber": "2310",
+  "name": "303 CAL 180 GR SPT PRO-HUNTER",
+  "caliber": "0.311",
+  "diameter": {
+    "value": 7.899,
+    "raw": "0.311 in"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.411,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/303-cal-180-gr-spt-pro-hunter/",
+        "retrieved": "2026-10-08",
+        "sha256": "bbf556b9757c8c0f1ab324b0c39e716b731ecc7e5032aefb49894ac125fbadf2",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 2310, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.311, Bullet Weight (Grains): 180, G1 BC: 0.411, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

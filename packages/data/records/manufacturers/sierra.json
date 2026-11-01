@@ -1,0 +1,15 @@
+{
+  "id": "sierra",
+  "name": "Sierra",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/20-cal-32-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

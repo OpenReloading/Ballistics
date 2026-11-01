@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-mtac-308-132",
+  "manufacturer": "cutting-edge",
+  "productNumber": "MTAC 308 132",
+  "name": "MTAC 308 132 (MTAC, 132 gr)",
+  "productLine": "MTAC",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 8.553,
+    "raw": "132 gr"
+  },
+  "length": {
+    "value": 28.14,
+    "raw": "1.108\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.367,
+      "note": "G1 BC, printed \".367 (O89)\". Marked (O89): Oehler 89 system. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.184,
+      "note": "G7 BC, printed \".184 (O89)\". Marked (O89): Oehler 89 system. Page footnote: \"Highlighted bullets were tested through the Oehler 43 system\"; which bullets is not read. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 355.6,
+    "raw": "*1-14\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "3",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 3, MTAC - Match, Tactical: Caliber .308, Grains 132, Minimum Required Twist *1-14\", Part Number MTAC 308 132, G1 BC .367 (O89), G7 BC .184 (O89), OAL 1.108\", Bullet Projection .700\""
+      }
+    ]
+  },
+  "note": "The twist is marked \"*\"; page footnote: \"*If shooting through transonic, a twist rate increase of 1 inch is recommended (ex: 1:9\" instead of 1:10\")\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .700\"."
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-375-cal-256gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "865",
+  "name": ".375 Cal-256gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 16.589,
+    "raw": "256 gr"
+  },
+  "length": {
+    "value": 33.02,
+    "raw": "Bullet length is 1.30″"
+  },
+  "noseLength": {
+    "value": 13.88,
+    "raw": "Nose length is .5463″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.41,
+      "note": "Hammer Bullets: \"G1-BC=.410 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 431.8,
+    "raw": "Recommended twist rate is 1-17″ minimum"
+  },
+  "note": "Minimum required twist for dangerous game hunting is 1-15″. Recommended use: Big game and Dangerous game hunting. Minimum required twist rate for dangerous game hunting is 1-15″.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/375-cal-256gr-stone-hammer/: Recommended twist rate is 1-17″ minimum | Minimum required twist for dangerous game hunting is 1-15″ | Bullet length is 1.30″ | Nose length is .5463″ | Bullet weight is 256gr | Recommended use: Big game and Dangerous game hunting | G1-BC=.410 estimated | Minimum required twist rate for dangerous game hunting is 1-15″"
+      }
+    ]
+  }
+}

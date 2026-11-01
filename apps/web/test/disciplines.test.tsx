@@ -28,6 +28,7 @@ import {
 } from '../src/lib/disciplines.ts'
 import { facetRows } from '../src/lib/facets.ts'
 import { rowText } from '../src/lib/record-fields.ts'
+import { formatQuantity, presetUnits } from '../src/lib/units.ts'
 import { say } from '../src/lib/wording.ts'
 import { defined } from './defined.ts'
 
@@ -239,10 +240,13 @@ it('shows the rule facts a record states, converted where the unit differs, and 
   ])
   expect(rows.filter((r) => r.label === 'Time limit').every((r) => r.numeric)).toBe(true)
   expect(rows.find((r) => r.label === 'Magnification up to')?.numeric).toBe(true)
-  expect(rows.find((r) => r.label === 'Trigger weight from')?.value).toEqual({
-    quantity: 'mass',
-    si: 1.5,
-  })
+  const trigger = defined(rows.find((r) => r.label === 'Trigger weight from')?.value)
+  expect(trigger).toEqual({ quantity: 'firearmMass', si: 1.5 })
+  const shown = (preset: 'metric-grams' | 'us') => {
+    const system = presetUnits(preset)
+    return `${formatQuantity(trigger.quantity, system, trigger.si)} ${system[trigger.quantity].symbol}`
+  }
+  expect([shown('metric-grams'), shown('us')]).toEqual(['1.50 kg', '3.31 lb'])
   expect(rows.find((r) => r.label === 'Barrel length up to')?.value?.si).toBeCloseTo(0.762)
   const german = translator(de, 'de').t
   const words = (label: string) =>

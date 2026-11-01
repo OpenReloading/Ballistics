@@ -1,0 +1,56 @@
+{
+  "id": "hammer-243-cal-87gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "10092",
+  "name": ".243 Cal-087gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 5.638,
+    "raw": "87 gr"
+  },
+  "length": {
+    "value": 29.57,
+    "raw": "Bullet length is 1.164″"
+  },
+  "noseLength": {
+    "value": 18.31,
+    "raw": "Nose length is .721″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.175,
+      "note": "Hammer Bullets: \"g7-bc= .175\"; the method is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended minimum twist rate is 1-8″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"An Absolute Hammer™ for a 1-8″ or faster barrel twist. This one will run great in the newer 6mm rifles and customs with fast enough twist to fully stabilize this one. This one has enough retained weight and shed weight to be very effective on big game. Pair that with higher than expected velocities from the Absolute Hammer™ and this one will be quite the killer. The Absolute Hammer™ will not line up with conventional bullet load data. It will need more or faster than expected charge weights due to the very low engraving pressure. They should only be loaded by experienced load developers that are competent at reading pressure signs.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/243-cal-87gr-absolute-hammer/: Recommended minimum twist rate is 1-8″ | Bullet length is 1.164″ | Nose length is .721″ | Bullet weight is 87gr | Recommended use: Big Game Hunting | g7-bc= .175"
+      }
+    ]
+  }
+}

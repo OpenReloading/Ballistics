@@ -1,0 +1,48 @@
+{
+  "id": "sako-266d",
+  "manufacturer": "sako",
+  "productNumber": "266D",
+  "name": "SAKO SUPER HAMMERHEAD 266D",
+  "productLine": "SUPER HAMMERHEAD",
+  "diameter": {
+    "value": 9.3,
+    "raw": "9,30mm"
+  },
+  "mass": {
+    "value": 18.532,
+    "raw": "18,6g/286gr"
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Bonded Soft Point",
+    "structure": "bonded"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.286,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "21",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "SAKO SUPER HAMMERHEAD 266D: Diameter 9,30mm, Weight 18,6g/286gr, Ballistic Coefficient 0.286, Bullet Type Bonded Soft Point, Sectional density 0.305"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.structure"]
+      }
+    ]
+  }
+}

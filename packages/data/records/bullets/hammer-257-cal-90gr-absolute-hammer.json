@@ -1,0 +1,56 @@
+{
+  "id": "hammer-257-cal-90gr-absolute-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "8581",
+  "name": ".257 Cal-090gr Absolute Hammer™",
+  "productLine": "Absolute Hammer",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257"
+  },
+  "mass": {
+    "value": 5.832,
+    "raw": "90 gr"
+  },
+  "length": {
+    "value": 26.67,
+    "raw": "Bullet length is 1.05″"
+  },
+  "noseLength": {
+    "value": 15.06,
+    "raw": "Nose length is .593″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.177,
+      "note": "Hammer Bullets: \"g7-bc= .177\"; the method is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Recommended minimum twist rate is 1-10″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Ok quarter bore guys, we got you the rocket sled ready to run. 1-10″ twist 90gr Absolute Hammer™ is going to be fun for sure. Just think a 257 Weatherby Mag running at 3900fps. I think Roy has a grin right now. Absolute Hammer™s should be loaded with caution as they will not line up with conventional load data.\" The weight is taken from the product name (090gr).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/257-cal-90gr-absolute-hammer/: Recommended minimum twist rate is 1-10″ | Bullet length is 1.05″ | Nose length is .593″ | Recommended use: Big Game Hunting | g7-bc= .177"
+      }
+    ]
+  }
+}

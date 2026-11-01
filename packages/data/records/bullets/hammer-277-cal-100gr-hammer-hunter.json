@@ -1,0 +1,61 @@
+{
+  "id": "hammer-277-cal-100gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869027588",
+  "name": ".277 Cal-100gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 6.48,
+    "raw": "100 gr"
+  },
+  "length": {
+    "value": 26.16,
+    "raw": "Bullet length is 1.03″"
+  },
+  "noseLength": {
+    "value": 15.67,
+    "raw": "Nose length is .6171″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.155,
+      "note": "Hammer Bullets: \"g7-bc= .155 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.31,
+      "note": "Hammer Bullets: \"g1-bc= .310 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 292.1,
+    "raw": "Minimum required twist is 1-11.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Here is a 100gr pure copper Hammer Hunter™ that will take your 270 Winchester to about 3600 fps. Or think about running a 270wsm at around 3800 fps. Big game hunting with really fast bullets that can hold together is very cool!\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/277-cal-100gr-hammer-hunter/: Minimum required twist is 1-11.5″ | Bullet length is 1.03″ | Nose length is .6171″ | Bullet weight is 100gr | Recommended use: Big Game Hunting | g7-bc= .155 estimated | g1-bc= .310 estimated"
+      }
+    ]
+  }
+}

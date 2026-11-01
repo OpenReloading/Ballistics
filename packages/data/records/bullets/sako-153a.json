@@ -1,0 +1,49 @@
+{
+  "id": "sako-153a",
+  "manufacturer": "sako",
+  "productNumber": "153A",
+  "name": "SAKO GAMEHEAD 153A",
+  "productLine": "GAMEHEAD",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0,308”"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "11,7g/180gr"
+  },
+  "tip": {
+    "type": "soft-point"
+  },
+  "construction": {
+    "raw": "Soft Point",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.365,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "note": "The printed sectional density 0.269 does not match the printed weight and diameter (0.271).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "4, 13, 18",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "SAKO GAMEHEAD 153A: Diameter 0,308”, Weight 11,7g/180gr, Ballistic Coefficient 0.365, Bullet Type Soft Point, Sectional density 0.269"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

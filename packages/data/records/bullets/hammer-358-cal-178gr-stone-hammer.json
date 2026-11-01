@@ -1,0 +1,56 @@
+{
+  "id": "hammer-358-cal-178gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "900",
+  "name": ".358 Cal-178gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 11.534,
+    "raw": "178 gr"
+  },
+  "length": {
+    "value": 26.42,
+    "raw": "Bullet length is 1.04″"
+  },
+  "noseLength": {
+    "value": 14.27,
+    "raw": "Nose length is .5619″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.315,
+      "note": "Hammer Bullets: \"G1-BC=.315 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 482.6,
+    "raw": "Recommended twist rate is 1-19″ minimum"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"With the 4mm hollow point in these Stone Hammer™s they are able to be used in tubular magazines.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/358-cal-178gr-stone-hammer/: Recommended twist rate is 1-19″ minimum | Bullet length is 1.04″ | Nose length is .5619″ | Bullet weight is 178gr | Recommended use: Big game hunting | G1-BC=.315 estimated"
+      }
+    ]
+  }
+}

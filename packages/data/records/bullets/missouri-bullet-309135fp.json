@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-309135fp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "309135FP",
+  "name": "#2 Whitetail, 135 Grain RNFP",
+  "caliber": ".309",
+  "diameter": {
+    "value": 7.849,
+    "raw": ".309 Diameter"
+  },
+  "mass": {
+    "value": 8.748,
+    "raw": "135 Grain"
+  },
+  "length": {
+    "value": 19.38,
+    "raw": "Bullet OAL .763 +/-"
+  },
+  "note": "Listed as 135 Grain RNFP. Brinell 18. For .30-.30 Lever Guns.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "309135FP, #2 Whitetail (https://missouribullet.com/details.php?prodId=105): .309 Diameter, 135 Grain RNFP, Brinell 18, Bullet OAL .763 +/-"
+      }
+    ]
+  }
+}

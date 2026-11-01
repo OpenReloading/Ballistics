@@ -126,12 +126,16 @@ export interface ManufacturerItem {
   website?: string
 }
 
-/** The part of a powder's M3 parameters the burn-rate curve reads. */
+/** The part of a powder's M3 parameters the burn-rate curve reads, with what the fit rests on. */
 export interface PowderInteriorItem {
   vivacity?: unknown
   pressureExponent?: number
   referencePressure?: unknown
   burnForm?: unknown
+  trainingRows?: number
+  trainingCartridges?: number
+  /** ISO date the fitted sources were read, the latest of them. */
+  retrieved?: string
 }
 
 /** A powder of the list. */
@@ -168,7 +172,9 @@ export interface BulletItem {
   ballisticCoefficientG7: number | null
   country?: string
   tipType?: string
+  baseType?: string
   construction?: string
+  leadFree?: boolean
   nameOnly?: true
 }
 
@@ -251,7 +257,7 @@ export const catalogueFormat = 1
  * The version of what `derive.ts` computes (list items, sort and search keys, revisions). Raise it
  * with any change to those, so a build made by older code is refused instead of read as current.
  */
-export const deriveVersion = 4
+export const deriveVersion = 6
 
 /** The first fields of the index and of the record file: what built them. */
 export interface CatalogueHeader {

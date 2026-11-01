@@ -1,0 +1,15 @@
+{
+  "id": "western",
+  "name": "Western",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "western-powders-handloading-guide-8-0",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2023/04/WesternPowdersHandloadingGuide8.0_WEB-1.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

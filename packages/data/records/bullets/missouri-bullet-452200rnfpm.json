@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-452200rnfpm",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "452200RNFPM",
+  "name": "IDP #4-XD, 200 Grain RNFP",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452 Diameter"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 Grain"
+  },
+  "length": {
+    "value": 13.82,
+    "raw": "Bullet OAL .544 +/-"
+  },
+  "note": "Listed as 200 Grain RNFP. Brinell 18. .45 ACP. For Major Power Factor.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "452200RNFPM, IDP #4-XD (https://missouribullet.com/details.php?prodId=78): .452 Diameter, 200 Grain RNFP, Brinell 18, Bullet OAL .544 +/-"
+      }
+    ]
+  }
+}

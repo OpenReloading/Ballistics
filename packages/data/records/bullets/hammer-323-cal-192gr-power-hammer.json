@@ -1,0 +1,45 @@
+{
+  "id": "hammer-323-cal-192gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "6773",
+  "name": ".323 Cal-192gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".323",
+  "diameter": {
+    "value": 8.204,
+    "raw": ".323"
+  },
+  "mass": {
+    "value": 12.441,
+    "raw": "192 gr"
+  },
+  "length": {
+    "value": 36.58,
+    "raw": "Bullet length is 1.44″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.404,
+      "note": "Hammer Bullets: \"G1-BC= .404 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 292.1,
+    "raw": "Minimum recommended twist rate is 1-11.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This sleek Power Hammer™ features a 2mm hollow point to give a bit better bc than we typically see in the Stone Hammer™ line of bullets. This will make a great all around big game hunting bullet in the 8mm’s with great vel and hard hitting for any of the North American big game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/323-cal-192gr-power-hammer/: Minimum recommended twist rate is 1-11.5″ | Bullet length is 1.44″ | Bullet weight is 192gr | Recommended use: Big Game Hunting | G1-BC= .404 estimated"
+      }
+    ]
+  }
+}

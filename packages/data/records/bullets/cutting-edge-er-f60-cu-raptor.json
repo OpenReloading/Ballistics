@@ -1,0 +1,46 @@
+{
+  "id": "cutting-edge-er-f60-cu-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "ER F60 Cu Raptor",
+  "name": "ER F60 Cu Raptor (ER Raptor, 60 gr)",
+  "productLine": "ER Raptor",
+  "caliber": ".243",
+  "diameter": {
+    "value": 6.172,
+    "raw": ".243"
+  },
+  "mass": {
+    "value": 3.888,
+    "raw": "60 gr"
+  },
+  "length": {
+    "value": 26.44,
+    "raw": "1.041\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.27,
+      "note": "G1 BC, printed \".270\". No method mark: method not stated. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "1-8\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "7",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 7, Extended Range (ER) Raptor: Caliber .243, Grains 60, Minimum Required Twist 1-8\", Part Number ER F60 Cu Raptor, G1 BC .270, OAL 1.041\", Bullet Projection .655\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .655\"."
+}

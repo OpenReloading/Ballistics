@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@mantine/core'
 import type { SpecValue } from '@open-reloading/schema'
-import { Certificate, Crosshair, Cylinder, Gauge } from '@phosphor-icons/react'
+import { Crosshair, Cylinder, Gauge, Ruler } from '@phosphor-icons/react'
 import {
   type CSSProperties,
   createContext,
@@ -23,7 +23,6 @@ import {
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 import {
   type CombinedRow,
@@ -35,6 +34,7 @@ import {
   type MatrixRow,
   rowGroups,
   sideHint,
+  signedLength,
   specValueText,
   toleranceText,
 } from '../lib/cartridge-record.ts'
@@ -68,7 +68,7 @@ function Value({ v, system }: { v: SpecValue; system: UnitSystem }) {
 /** The slot's two notes: the tolerance or limit, then the clearance (chamber rows that are a fit). */
 const slotNotes = (v: SpecValue, clearance: number | undefined, system: UnitSystem) => [
   toleranceText(v, system),
-  clearance === undefined ? '' : signed(clearance, system),
+  clearance === undefined ? '' : signedLength(clearance, system),
 ]
 
 /** The clearance note: hover (and the symbol's hint for the keyboard), a screen reader reads "Clearance"; a negative one is red. */
@@ -88,46 +88,46 @@ function Clearance({ text, negative }: { text: string; negative: boolean }) {
 }
 
 /**
- * A Dimensions cell: the value right-aligned in a fixed width, then a fixed slot for its
- * tolerance or limit and, in the chamber table, the clearance, so the decimals of a column line up
- * and a unit switch moves nothing.
+ * A Dimensions row's two cells: the value right-aligned in a fixed width, then, in a column of its
+ * own, a fixed slot for its tolerance or limit and, in the chamber table, the clearance, so the
+ * decimals of a column line up and a unit switch moves nothing.
  */
-function Slotted({
+function SlotCells({
   v,
   clearance,
   system,
 }: {
-  v: SpecValue
+  v: SpecValue | undefined
   clearance?: number | undefined
   system: UnitSystem
 }) {
   const text = (u: UnitSystem) =>
-    v.value === undefined
+    v?.value === undefined
       ? ''
       : `${specValueText(v.quantity, v.value, u)}${unitAfter(v.quantity, u)}`
-  if (v.value === undefined) return <span className="dim-value">{v.raw}</span>
-  const [tolerance, gap] = slotNotes(v, clearance, system)
+  const [tolerance, gap] = v?.value === undefined ? [] : slotNotes(v, clearance, system)
   return (
     <>
-      <span className="dim-value">
-        <Sized now={text(system)} also={slotUnits.map(text)} />
-      </span>{' '}
-      <span className="dim-slot tolerance">
-        {tolerance}
-        {tolerance && gap && ' '}
-        {gap && <Clearance text={gap} negative={(clearance ?? 0) < 0} />}
-      </span>
+      <TableTd className="num">
+        {v && (
+          <span className="dim-value">
+            {v.value === undefined ? (
+              v.raw
+            ) : (
+              <Sized now={text(system)} also={slotUnits.map(text)} />
+            )}
+          </span>
+        )}
+      </TableTd>
+      <TableTd className="dim-slot-cell">
+        <span className="dim-slot tolerance">
+          {tolerance}
+          {tolerance && gap && ' '}
+          {gap && <Clearance text={gap} negative={(clearance ?? 0) < 0} />}
+        </span>
+      </TableTd>
     </>
   )
-}
-
-/** A difference in the preset's length unit with its sign, minus as U+2212, as the drawing's callouts write it. */
-function signed(x: number, system: UnitSystem) {
-  const text = specValueText('length', Math.abs(x), system)
-  if (text !== '0') return x < 0 ? `−${text}` : `+${text}`
-  // zero in the column's decimals, as "+.0012" beside it: ".0000", "0.00"
-  const zero = formatNumber(0, system.length.decimals)
-  return system.length.symbol === 'in' ? zero.slice(1) : zero
 }
 
 /** The record's own length unit (the switch beside the facts), the shotshell variant shown, and their setters. */
@@ -355,6 +355,7 @@ function SidePanel({
   const length = system.length.symbol
   const limit = (unit: string) =>
     side === 'cartridge' ? t('Max ({unit})', { unit }) : t('Min ({unit})', { unit })
+  const slotTitle = side === 'cartridge' ? t('Tolerance') : t('Tolerance, clearance')
   // the characters of the longest tolerance or limit with its clearance in either unit: the slot of every row
   const slot = Math.max(
     0,
@@ -406,6 +407,9 @@ function SidePanel({
                 </TableTh>
                 <TableTh scope="col" className="num">
                   <Sized now={limit(length)} also={slotUnits.map((u) => limit(u.length.symbol))} />
+                </TableTh>
+                <TableTh scope="col" className="dim-slot-cell">
+                  <span className="dim-slot-head">{slotTitle}</span>
                 </TableTh>
               </TableTr>
             </TableThead>
@@ -464,15 +468,11 @@ function SideRow({
           <SymbolStop tabIndex={tabIndex}>{r.symbol}</SymbolStop>
         )}
       </TableTh>
-      <TableTd className="num">
-        {value && (
-          <Slotted
-            v={value}
-            clearance={side === 'chamber' ? r.clearance : undefined}
-            system={system}
-          />
-        )}
-      </TableTd>
+      <SlotCells
+        v={value}
+        clearance={side === 'chamber' ? r.clearance : undefined}
+        system={system}
+      />
     </TableTr>
   )
 }
@@ -556,39 +556,37 @@ const factMeanings = {
 }
 
 /**
- * The record's facts as cards under the page bar: Pressure (Pmax, PK,
- * PE), Test barrel (M, EE), Standard (table, revision date, country) and Case (derived case type,
- * measuring method), each fact a label over its value, in the preset's units. A card without facts
- * is left out. Every fact keeps a fixed minimum width, so the preset applying after mounting moves
- * nothing.
+ * The record's facts as cards under the page bar: Pressure (Pmax, PK, PE), Test barrel (M, EE),
+ * Dimensions (the cartridge's L3, L6 and G1) and Case (derived case type), each fact a label over
+ * its value, in the preset's units, what a symbol stands for on hover; then `children` (the link to
+ * the fitting bullets). A card without facts is left out. Every fact keeps a fixed minimum width,
+ * so the preset applying after mounting moves nothing. The standard's table, date, country and
+ * measuring method are in the Sources panel (`StandardFacts`).
  */
 export function RecordFacts({
   values,
   notes,
-  standard,
-  build,
+  caseType,
+  children,
 }: {
   values: SpecValue[]
   notes: string[][]
-  standard: {
-    table?: string | undefined
-    date?: { label: Message; value: string }
-    countries?: { name: string; code?: string | undefined }[] | undefined
-  }
-  build: { caseType?: string | undefined; method?: Wording | undefined }
+  caseType?: string | undefined
+  children?: ReactNode
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
   const items = values.map((v, i) => ({ v, notes: notes[i] ?? [] }))
-  const pressures = items.filter(({ v }) => v.quantity === 'pressure')
-  const test = items.filter(({ v }) => v.quantity !== 'pressure')
+  const pressures = items.filter(({ v }) => !v.side && v.quantity === 'pressure')
+  const test = items.filter(({ v }) => !v.side && v.quantity !== 'pressure')
+  const sized = items.filter(({ v }) => v.side)
   const fact = ({ v, notes }: (typeof items)[number], lead = false) => {
     const now = factParts(v, system)
     const also = slotUnits.map((u) => factParts(v, u))
     const text = (p: typeof now) => `${p.number}${p.tolerance ? ` ${p.tolerance}` : ''}`
     return (
       <Fact
-        key={v.symbol}
+        key={`${v.side ?? ''} ${v.symbol}`}
         label={v.symbol}
         notes={notes}
         lead={lead}
@@ -612,36 +610,70 @@ export function RecordFacts({
         <FactCard icon={Gauge}>{pressures.map((p, i) => fact(p, i === 0))}</FactCard>
       )}
       {test.length > 0 && <FactCard icon={Crosshair}>{test.map((t) => fact(t))}</FactCard>}
-      {(standard.table || standard.date || standard.countries) && (
-        <FactCard icon={Certificate}>
-          {standard.table && (
-            <Fact label={t('Table')} notes={[t(factMeanings.table)]}>
-              {standard.table}
-            </Fact>
-          )}
-          {standard.date && <Fact label={t(standard.date.label)}>{standard.date.value}</Fact>}
-          {standard.countries && (
-            <Fact label={t('Country')}>
-              <Countries items={standard.countries} as="span" />
-            </Fact>
-          )}
-        </FactCard>
-      )}
-      {(build.caseType || build.method) && (
+      {sized.length > 0 && <FactCard icon={Ruler}>{sized.map((d) => fact(d))}</FactCard>}
+      {caseType && (
         <FactCard icon={Cylinder}>
-          {build.caseType && (
-            <Fact label={t('Case')} notes={[t(factMeanings.case)]}>
-              {caseTypeText(t, build.caseType)}
-            </Fact>
-          )}
-          {build.method && (
-            <Fact label={t('Method')} notes={[t(factMeanings.method)]}>
-              {say(t, build.method)}
-            </Fact>
-          )}
+          <Fact label={t('Case')} notes={[t(factMeanings.case)]}>
+            {caseTypeText(t, caseType)}
+          </Fact>
         </FactCard>
       )}
+      {children && <div className="fact-link">{children}</div>}
     </FactCards>
+  )
+}
+
+/**
+ * The standard's facts over the sources of a cartridge record: the CIP table, the revision (else
+ * publication) date, the country and the pressure measuring method, each named, those without a
+ * value left out.
+ */
+export function StandardFacts({
+  table,
+  date,
+  countries,
+  method,
+}: {
+  table?: string | undefined
+  date?: { label: Message; value: string } | undefined
+  countries?: { name: string; code?: string | undefined }[] | undefined
+  method?: Wording | undefined
+}) {
+  const { t } = useTranslation()
+  if (!table && !date && !countries && !method) return null
+  return (
+    <dl className="standard-facts">
+      {table && (
+        <div>
+          <dt>
+            <Label text={t('Table')} notes={[t(factMeanings.table)]} />
+          </dt>
+          <dd>{table}</dd>
+        </div>
+      )}
+      {date && (
+        <div>
+          <dt>{t(date.label)}</dt>
+          <dd>{date.value}</dd>
+        </div>
+      )}
+      {countries && (
+        <div>
+          <dt>{t('Country')}</dt>
+          <dd>
+            <Countries items={countries} as="span" />
+          </dd>
+        </div>
+      )}
+      {method && (
+        <div>
+          <dt>
+            <Label text={t('Method')} notes={[t(factMeanings.method)]} />
+          </dt>
+          <dd>{say(t, method)}</dd>
+        </div>
+      )}
+    </dl>
   )
 }
 

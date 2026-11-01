@@ -1,0 +1,41 @@
+{
+  "id": "hornady-30951",
+  "manufacturer": "hornady",
+  "productNumber": "30951",
+  "name": "30 Cal. ELD Match, .308, 195 gr",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308\""
+  },
+  "mass": {
+    "value": 12.636,
+    "raw": "195 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.584,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated. Hornady states ELD Match BCs are measured by Doppler radar and corrected to standard atmospheric conditions."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.294,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated. Hornady states ELD Match BCs are measured by Doppler radar and corrected to standard atmospheric conditions."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "75",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "30 Cal. ELD Match, .308\", 195 gr., G1 .584, G7 .294, Sec. Den. .294, Item # 30951"
+      }
+    ]
+  }
+}

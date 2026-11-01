@@ -134,6 +134,7 @@ const kindNames: Record<UserRecordKind, Message> = {
   session: msg('chronograph sessions'),
   targetSheet: msg('target sheets'),
   targetFaceDesign: msg('target designs'),
+  shootingLogEntry: msg('shooting log entries'),
 }
 
 /** A line of the status, written when it is shown so that a change of language reaches it. */
@@ -251,6 +252,12 @@ const keptText: Record<string, Message | ''> = {
   failed: msg('Not saved in this browser'),
 }
 
+/** The file state's text; `brief` is the page bar's shorter one, where `text` is the tooltip. */
+interface StateText {
+  text: string
+  brief?: string
+}
+
 /** The file state shown in the page bar. */
 function stateText(
   {
@@ -267,16 +274,18 @@ function stateText(
     unsaved: boolean
   },
   t: Translator['t'],
-) {
+): StateText {
   if (saved) {
-    if (!dirty) return t('Saved: {file}', { file: saved.file })
+    if (!dirty) return { text: t('Saved: {file}', { file: saved.file }) }
     return autosaved
-      ? t('Changed since {file}', { file: saved.file })
-      : t('Unsaved changes ({file})', { file: saved.file })
+      ? { text: t('Changed since {file}', { file: saved.file }) }
+      : { text: t('Unsaved changes ({file})', { file: saved.file }), brief: t('Unsaved') }
   }
   // an autosaved record is kept in the browser until a file is written
-  if (autosaved) return t(keptText[kept ?? ''] ?? msg('Saved in this browser'))
-  return unsaved ? t('Unsaved changes, not saved to a file') : t('Not saved to a file')
+  if (autosaved) return { text: t(keptText[kept ?? ''] ?? msg('Saved in this browser')) }
+  return unsaved
+    ? { text: t('Unsaved changes, not saved to a file'), brief: t('Unsaved') }
+    : { text: t('Not saved to a file') }
 }
 
 /** The question while it shows: a second way out asked meanwhile waits for the same answer. */
@@ -585,6 +594,23 @@ function isUnsaved(
   return initial !== undefined && now !== initial
 }
 
+/**
+ * Whether the failure shown is why Save refused the record (`problem`): set when it is shown,
+ * reset when a file action starts; a changed problem (mended or another) clears that failure.
+ */
+function useRefusal(problem: unknown, setFailure: () => void) {
+  const said = useRef(false)
+  const clear = useRef(setFailure)
+  clear.current = setFailure
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the problem changes
+  useEffect(() => {
+    if (!said.current) return
+    said.current = false
+    clear.current()
+  }, [problem])
+  return said
+}
+
 /** The status in the page bar's status line when there is one, else in place. */
 const inBar = (bar: HTMLElement | null | undefined, status: ReactNode) =>
   bar === undefined ? status : bar && createPortal(status, bar)
@@ -678,9 +704,11 @@ function FolderItems({
 function FileStatus({
   idle,
   state,
+  brief,
   folderName,
   lines,
   failure,
+  refused,
   unsaved,
   autosaved,
   kept,
@@ -688,17 +716,23 @@ function FileStatus({
   /** No record is open: the status shows messages only. */
   idle: boolean | undefined
   state: string
+  /** The state shortened for a page bar; `state` is then the tooltip's text. */
+  brief: string | undefined
   /** The workspace folder named after the state, none when it is not in use. */
   folderName: string | undefined
   lines: string
   failure: string
+  /** The failure is why Save refused the record: it shows instead of the state. */
+  refused: boolean
   unsaved: boolean
   autosaved: string | undefined
   kept: string | undefined
 }) {
   const { t } = useTranslation()
+  const short = useContext(BarStatus) ? brief : undefined
   const folder = folderName ? t(', folder {name}', { name: folderName }) : ''
-  const shown = !idle
+  // one save status: a refused save's reason takes the state's place
+  const shown = !idle && !(refused && failure)
   return (
     <span className="file-status">
       <span
@@ -706,9 +740,10 @@ function FileStatus({
         data-dirty={unsaved || (autosaved && kept === 'failed') || undefined}
         // also after a file is written, when the text is the file's state
         data-saving={(autosaved && kept === 'saving') || undefined}
+        data-full={(shown && short && `${state}${folder}`) || undefined}
         aria-live="polite"
       >
-        {shown && state}
+        {shown && (short ?? state)}
         {shown && folder}
       </span>
       <span role="status" className="file-message">
@@ -949,6 +984,8 @@ function FileMenuOf<K extends UserRecordKind>({
   const [failureSaid, setFailureSaid] = useState<Said>()
   const setMessage = lineSetter(setLineSaid)
   const setFailure = lineSetter(setFailureSaid)
+  /** The failure shown is a refused save's `problem`, cleared when the problem changes. */
+  const problemSaid = useRefusal(problem, setFailure)
   const message = shownLine(lineSaid, tr)
   const failure = shownLine(failureSaid, tr)
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
@@ -1111,10 +1148,12 @@ function FileMenuOf<K extends UserRecordKind>({
   const status = (
     <FileStatus
       idle={idle}
-      state={state}
+      state={state.text}
+      brief={state.brief}
       folderName={ready?.name}
       lines={lines}
       failure={failure}
+      refused={problemSaid.current}
       unsaved={unsaved}
       autosaved={autosaved}
       kept={kept}
@@ -1125,6 +1164,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const act = (failed: Message, f: () => Promise<void>) => () => {
     setMessage()
     setFailure()
+    problemSaid.current = false
     f().catch((e: unknown) => setFailure(({ t }) => t(failed, { error: errorText(e) })))
   }
 
@@ -1132,6 +1172,7 @@ function FileMenuOf<K extends UserRecordKind>({
   async function prepareSave(as: boolean) {
     if (problem) {
       setFailure(({ t }) => t('Not saved: {reason}', { reason: problem }))
+      problemSaid.current = true
       return
     }
     const recordId = as || !id.current ? newId() : id.current

@@ -9,7 +9,7 @@ import { runExample } from './workbench-run.ts'
 test.beforeEach(({ page }) => storeUnits(page))
 
 const resultLine = (page: Page) => page.locator('.result').getByText(/^Simulation done\. /)
-const stale = (page: Page) => page.getByText('Inputs changed since this result').first()
+const stale = (page: Page) => page.getByText('Inputs changed', { exact: true }).first()
 const charge = (page: Page) => loadForm(page).getByLabel(/^Charge mass/)
 
 /** Writes a charge 5 % below the shown one, as typed. */

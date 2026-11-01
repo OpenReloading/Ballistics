@@ -1,0 +1,55 @@
+{
+  "id": "sierra-8600",
+  "manufacturer": "sierra",
+  "productNumber": "8600",
+  "name": "44 CAL 180 GR JHC SPORTS MASTER",
+  "caliber": "0.4295",
+  "diameter": {
+    "value": 10.909,
+    "raw": "0.4295 in"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.13,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/44-cal-180-gr-jhc-sports-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "91a5290a7113b10025420ca2f6146f9807e199113882edc4a6165f699dd275ce",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8600, Bullet Type: Jacketed Hollow Cavity (JHC), Bullet Diameter: 0.4295, Bullet Weight (Grains): 180, G1 BC: 0.130, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "40-s-w-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:40-s-w",
+  "waterCapacity": {
+    "value": 1.251,
+    "raw": "19.3 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .40 S&W",
+        "url": "https://en.wikipedia.org/w/index.php?title=.40_S%26W&oldid=1371072783",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 19.3 gr H2O (1.25 cm3)."
+      }
+    ]
+  }
+}

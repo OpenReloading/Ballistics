@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-lzr-458-575-max",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 458 575 MAX",
+  "name": "LZR 458 575 MAX (Lazer, 575 gr)",
+  "productLine": "Lazer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 37.259,
+    "raw": "575 gr"
+  },
+  "length": {
+    "value": 59.74,
+    "raw": "2.352\""
+  },
+  "slowestTwist": {
+    "value": 330.2,
+    "raw": "1-13\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .458, Grains 575, Minimum Required Twist 1-13\", Part Number LZR 458 575 MAX, G1 BC TBD, G7 BC TBD, OAL 2.352\", Bullet Projection 1.608\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". G7 BC is printed \"TBD\". Bullet projection (from the SealTite band to the tip, page footnote) printed: 1.608\"."
+}

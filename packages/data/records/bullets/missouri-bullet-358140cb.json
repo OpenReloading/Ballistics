@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-358140cb",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358140CB",
+  "name": "Cowboy #14, 140 Grain TCFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 Grain"
+  },
+  "length": {
+    "value": 15.57,
+    "raw": "Bullet OAL .613 +/-"
+  },
+  "note": "Listed as 140 Grain TCFP. Brinell 12. 38 Special. For Cowboy Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "358140CB, Cowboy #14 (https://missouribullet.com/details.php?prodId=121): .358 Diameter, 140 Grain TCFP, Brinell 12, Bullet OAL .613 +/-"
+      }
+    ]
+  }
+}

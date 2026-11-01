@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-158gr-target-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "426",
+  "name": ".308 Cal-160gr Target Hammer®",
+  "productLine": "Target Hammer",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.368,
+    "raw": "160 gr"
+  },
+  "length": {
+    "value": 34.26,
+    "raw": "Bullet length is 1.349″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.25,
+      "note": "Hammer Bullets: \"G7-BC=.250 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Recommended twist rate is 1-11″ or faster"
+  },
+  "note": "Recommended use: Target. The product page also says: \"Bullet length is 1.34″\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-158gr-target-hammer/: Recommended twist rate is 1-11″ or faster | Bullet length is 1.349″ | Bullet weight is 160gr | Recommended use: Target | G7-BC=.250 estimated"
+      }
+    ]
+  }
+}

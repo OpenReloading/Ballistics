@@ -1,0 +1,42 @@
+{
+  "id": "cutting-edge-dgbr-hp-k06",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGBR-HP K06",
+  "name": "DGBR-HP K06 (Safari Raptor, Solid & Lever+, 325 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".423",
+  "diameter": {
+    "value": 10.744,
+    "raw": ".423"
+  },
+  "mass": {
+    "value": 21.06,
+    "raw": "325 gr"
+  },
+  "length": {
+    "value": 33.68,
+    "raw": "1.326\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.16,
+      "note": "G1 BC (Est.), printed \".160\". Column \"G1 BC (Est.)\": estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .423, Grains 325, Part Number DGBR-HP K06, OAL 1.326\", Bullet Projection .655\", G1 BC (Est.) .160"
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .655\"."
+}

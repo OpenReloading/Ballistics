@@ -21,7 +21,7 @@ export const DesignerField = memo(function DesignerField({
   flag,
   changed,
   error,
-  unit = 'text',
+  unit = 'switch',
   symbol,
   dispatch,
 }: {
@@ -33,15 +33,20 @@ export const DesignerField = memo(function DesignerField({
   flag?: FieldFlag['kind'] | undefined
   changed: boolean
   error?: string | undefined
-  /** `none` where the grid's column header names the unit. */
-  unit?: 'text' | 'none' | undefined
+  /**
+   * The unit suffix: a one-click switch of this field to the quantity's other unit (the messages keep
+   * naming their own unit), plain text, or `none` where the grid's column header names the unit.
+   */
+  unit?: 'switch' | 'text' | 'none' | undefined
   /** The drawing's symbol of the value, shown before the label; focus marks it in the drawing. */
   symbol?: string | undefined
   dispatch: (a: FieldAction) => void
 }) {
-  // the message leads the help: the description, the label's title and the flag's tooltip
-  const text = error ? `${error} ${help}` : help
-  const kind = error ? 'exceeded' : flag
+  // the error and the help stay apart: the label's title is the help, the flag's tooltip the error
+  // while it applies, and the description for screen readers says both, each as its own sentence
+  const marker = error
+    ? { kind: 'exceeded' as const, text: error }
+    : flag && { kind: flag, text: help }
   return (
     <div
       className="designer-field"
@@ -52,12 +57,12 @@ export const DesignerField = memo(function DesignerField({
       style={symbol ? ({ '--symbol': `"${symbol}"` } as CSSProperties) : undefined}
     >
       <NumberField
-        spec={{ ...spec, help: text }}
+        spec={{ ...spec, help }}
         system={system}
         value={value}
         error={!!error}
         unit={unit}
-        flag={kind && { kind, text }}
+        flag={marker}
         onChange={(v) => dispatch({ type: 'field', key: spec.key, value: v })}
       />
     </div>

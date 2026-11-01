@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-m-308-200-fcg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.308 200 FCG",
+  "name": "M.308 200 FCG (MAXIMUS, 200 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 12.96,
+    "raw": "200 gr"
+  },
+  "length": {
+    "value": 40.01,
+    "raw": "1.575\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.536,
+      "note": "G1 BC, printed \".536 (O89)\". Marked (O89): Oehler 89 system. Page footer: the coefficient numbers are confirmed by independent testing and by the Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.268,
+      "note": "G7 BC, printed \".268 (O89)\". Marked (O89): Oehler 89 system. Page footer: the coefficient numbers are confirmed by independent testing and by the Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .308, Grains 200, Minimum Required Twist 1-10\", Part Number M.308 200 FCG, G1 BC .536 (O89), G7 BC .268 (O89), OAL 1.575\", BULLET PROJECTION .785\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .785\"."
+}

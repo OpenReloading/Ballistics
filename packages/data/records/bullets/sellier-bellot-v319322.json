@@ -1,0 +1,33 @@
+{
+  "id": "sellier-bellot-v319322",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V319322",
+  "name": "FMJ, .355, 140 gr (for 9 mm LUGER SUBSONIC, 357 SIG)",
+  "productLine": "FMJ",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.017,
+    "raw": ".355 in (9,03 mm)"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 grs (9 g)"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "note": "Recommended for 9 mm LUGER SUBSONIC, 357 SIG.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "tip.type"],
+        "note": "V319322 | 9 mm LUGER SUBSONIC, 357 SIG | FMJ | 140 | 9 | 9 | 9,03 | .355. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

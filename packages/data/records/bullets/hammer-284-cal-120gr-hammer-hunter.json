@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-120gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "6126",
+  "name": ".284 Cal-120gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 7.776,
+    "raw": "120 gr"
+  },
+  "length": {
+    "value": 29.59,
+    "raw": "Bullet length is 1.165″"
+  },
+  "noseLength": {
+    "value": 17.65,
+    "raw": "Nose length is .6949″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.193,
+      "note": "Hammer Bullets: \"G7-BC= .193 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 266.7,
+    "raw": "Recommended minimum twist rate is 1-10.5″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"120gr Hammer Hunter™ is a great weight for the 7-08 Remington giving excellent vel for fast and flat trajectory big game performance. For that matter it will be great for any 7mm. Also a great choice for those who would like to keep recoil low.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-120gr-hammer-hunter/: Recommended minimum twist rate is 1-10.5″ | Bullet length is 1.165″ | Nose length is .6949″ | Bullet weight is 120gr | Recommended use: Big Game Hunting | G7-BC= .193 estimated"
+      }
+    ]
+  }
+}

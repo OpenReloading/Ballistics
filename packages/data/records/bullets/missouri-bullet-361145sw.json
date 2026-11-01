@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-361145sw",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "361145SW",
+  "name": ".38 S&W, 145 Grain RN",
+  "caliber": ".361",
+  "diameter": {
+    "value": 9.169,
+    "raw": ".361 Diameter"
+  },
+  "mass": {
+    "value": 9.396,
+    "raw": "145 Grain"
+  },
+  "length": {
+    "value": 16.26,
+    "raw": "Bullet OAL .640 +/-"
+  },
+  "note": "Listed as 145 Grain RN. Brinell 12. .38 S&W. For .38 S&W.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "361145SW, .38 S&W (https://missouribullet.com/details.php?prodId=132): .361 Diameter, 145 Grain RN, Brinell 12, Bullet OAL .640 +/-"
+      }
+    ]
+  }
+}

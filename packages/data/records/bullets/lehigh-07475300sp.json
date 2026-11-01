@@ -1,0 +1,50 @@
+{
+  "id": "lehigh-07475300sp",
+  "manufacturer": "lehigh",
+  "productNumber": "07475300SP",
+  "name": ".475 diameter, 300 grain Xtreme Penetrator Bullets (50 count)",
+  "productLine": "Xtreme Penetrator",
+  "caliber": ".475",
+  "diameter": {
+    "value": 12.065,
+    "raw": ".475 in"
+  },
+  "mass": {
+    "value": 19.44,
+    "raw": "300 gr"
+  },
+  "length": {
+    "value": 22.73,
+    "raw": ".895 in"
+  },
+  "construction": {
+    "raw": "Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.223,
+      "note": "Lehigh Defense product data; the method and the velocity are not stated."
+    }
+  ],
+  "note": "Ogive length 0.32 in as listed.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lehigh-defense-store-product-attributes-graphql",
+        "url": "https://lehighdefense.com/graphql?query=%7Bproducts%28filter%3A%7Bcategory_uid%3A%7Beq%3A%22MTA%3D%22%7D%7D%2CpageSize%3A500%29%7Btotal_count%20items%7Bsku%20name%20url_key%20all_reloading_diameter%20all_reloading_weight_grains%20all_reloading_ld_tech%20all_reloading_ld_material%20all_reloading_ld_g1%20all_reloading_ld_g7%20all_reloading_ld_length%20all_reloading_ld_ogive_length%20all_reloading_ld_minimum_twist%20all_reloading_ld_sectional%7D%7D%7D",
+        "retrieved": "2026-10-08",
+        "sha256": "99a33bfb22d332a0ea790da76dd204d25e6261dc593c26fd63e88239192bfa51",
+        "fields": ["diameter", "mass", "length", "construction.raw", "ballisticCoefficients"],
+        "note": "07475300SP, https://lehighdefense.com/475-diameter-300-grain-xtreme-penetrator-bullets-50-count.html: Bullet Diameter .475, Bullet Weight (grains) 300, Ballistic Coefficient (G1) 0.223, Ballistic Coefficient (G7) N/A, Bullet Length .895, Ogive Length (inches) 0.32, Sectional Density .190. Option labels from the attribute metadata query (sha256 c1644366c98defb88490b9314a0bf5ad53600f6d27828fe7ceaff7c6c47411fd)."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

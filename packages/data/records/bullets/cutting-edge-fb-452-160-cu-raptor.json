@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-fb-452-160-cu-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB 452 160 CU Raptor",
+  "name": "FB 452 160 CU Raptor (Flat Base Raptor, 160 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452"
+  },
+  "mass": {
+    "value": 10.368,
+    "raw": "160 gr"
+  },
+  "length": {
+    "value": 22.05,
+    "raw": ".868\""
+  },
+  "slowestTwist": {
+    "value": 711.2,
+    "raw": "1-28\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .452, Grains 160, Minimum Required Twist 1-28\", Part Number FB 452 160 CU Raptor**, G1 BC TBD, OAL .868\", Bullet Projection .580\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .580\". The part number is printed with \"**\"; page footnote: \"** Part numbers highlighted in Bold are Lead Free Options\"."
+}

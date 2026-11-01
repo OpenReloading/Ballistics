@@ -1,0 +1,45 @@
+{
+  "id": "hammer-411-cal-293gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869035676",
+  "name": ".411 Cal-293gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439,
+    "raw": ".411"
+  },
+  "mass": {
+    "value": 18.986,
+    "raw": "293 gr"
+  },
+  "length": {
+    "value": 32.51,
+    "raw": "Bullet length is 1.280″"
+  },
+  "noseLength": {
+    "value": 16.51,
+    "raw": "Nose length is .6499″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.353,
+      "note": "Hammer Bullets: \"g1-bc= .353 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist for Dangerous Game hunting is 1-17″ or faster. Minimum required twist for Big Game hunting is 1-20″ or faster. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"This pure copper lead free bullet designed for the 405 Winchester should be the ideal combo for the old cartridge. A great balance of speed and weight, along with the 3mm hollow point design for hard hitting and deep penetration, causing massive trauma on any big game animal. Including dangerous game. This Stone Hammer™ will work well in any of the 405 Winchester rifles, including the lever actions.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/411-cal-293gr-stone-hammer/: Minimum required twist for Dangerous Game hunting is 1-17″ or faster | Minimum required twist for Big Game hunting is 1-20″ or faster | Bullet length is 1.280″ | Nose length is .6499″ | Bullet weight is 293gr | Recommended use: Big Game and Dangerous Game Hunting. | g1-bc= .353 estimated"
+      }
+    ]
+  }
+}

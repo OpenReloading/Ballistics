@@ -1,0 +1,30 @@
+{
+  "id": "hornady-17016",
+  "manufacturer": "hornady",
+  "productNumber": "17016",
+  "name": "17 Cal. NTX, .172, 15.5 gr",
+  "caliber": ".172",
+  "diameter": {
+    "value": 4.369,
+    "raw": ".172\""
+  },
+  "mass": {
+    "value": 1.004,
+    "raw": "15.5 gr"
+  },
+  "note": "The catalog prints BC .115 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "91",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "17 Cal. NTX, .172\", 15.5 gr., Ballistic Coef. .115, Sec. Den. .075, Item # 17016"
+      }
+    ]
+  }
+}

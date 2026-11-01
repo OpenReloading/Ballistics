@@ -13,7 +13,7 @@ export type EditorProposal = HoleProposal & { id: number }
 
 /**
  * Confidence tier (a starting value): a proposal below it is a maybe, shown on the photo but left
- * out of Accept all and the proposal count.
+ * out of Accept sure and the sure count.
  */
 const MAYBE_BELOW = 0.5
 

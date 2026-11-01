@@ -1,0 +1,66 @@
+{
+  "id": "hornady-30501",
+  "manufacturer": "hornady",
+  "productNumber": "30501",
+  "name": "30 Cal .308 168 gr BTHP Match",
+  "productLine": "Match",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "ogive": {
+    "form": "secant"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.45,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hornady Manufacturing",
+        "publisher": "Hornady Manufacturing",
+        "url": "https://www.hornady.com/bullets/rifle/30-cal-308-168-gr-bthp-match",
+        "retrieved": "2026-10-08",
+        "fields": ["diameter", "mass", "ogive.form", "base.type", "tip.type", "construction.raw"],
+        "note": ".308 in, 168 gr; 'Secant Ogive Profile', boat tail, AMP jacket, swaged lead core; no length on the page.",
+        "origin": "manufacturer"
+      },
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "78",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["ballisticCoefficients"],
+        "note": "PDF page 80. Item # 30501/305016/30501B: .308 in, 168 gr, G1 .450, SD .253."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.structure", "construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "construction": {
+    "raw": "AMP jacket, swaged lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  }
+}

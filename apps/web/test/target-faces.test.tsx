@@ -56,6 +56,9 @@ it('filters by federation, discipline, event distance and ring count, each count
   const options = facetOptions(rows, rows, facets, { org: ['ISSF'] })
   const dist = defined(options.get('dist'))
   expect(dist.find((o) => o.value === '25')).toMatchObject({ text: '25 m' })
+  // a distance stored as 27.34 yd (24.999696 m) is the 25 m option, in either range unit
+  const near = { ...rows[0], distances: [24.999696] } as (typeof rows)[number]
+  expect(defined(facets.find((f) => f.key === 'dist')).values(near)).toEqual(['25'])
   // the federation's own count ignores its choice; the distances count within ISSF
   const issf = rows.filter((r) => r.organization === 'ISSF')
   expect(defined(options.get('org')).find((o) => o.value === 'ISSF')?.count).toBe(issf.length)

@@ -1,0 +1,21 @@
+{
+  "id": "7-62-x-25-tokarev-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:7-62-x-25-tokarev",
+  "waterCapacity": {
+    "value": 1.089,
+    "raw": "16.8 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, 7.62x25mm Tokarev",
+        "url": "https://en.wikipedia.org/w/index.php?title=7.62%C3%9725mm_Tokarev&oldid=1373994969",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Infobox, Case capacity: 1.09 cm3 (16.8 gr H2O)."
+      }
+    ]
+  }
+}

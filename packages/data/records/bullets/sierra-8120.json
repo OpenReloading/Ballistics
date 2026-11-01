@@ -1,0 +1,58 @@
+{
+  "id": "sierra-8120",
+  "manufacturer": "sierra",
+  "productNumber": "8120",
+  "name": "9MM 125 GR FMJ TOURNAMENT MASTER",
+  "caliber": "0.355",
+  "diameter": {
+    "value": 9.017,
+    "raw": "0.355 in"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 gr"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.115,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/9mm-125-gr-fmj-tournament-master/",
+        "retrieved": "2026-10-08",
+        "sha256": "91ac497e2dd5dbd4b04bdbdcf29b92bfd6c6015b07e5a9786f4cb57baac048fb",
+        "fields": ["diameter", "mass", "tip.type", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 8120, Bullet Type: Full Metal Jacket (FMJ), Bullet Diameter: 0.355, Bullet Weight (Grains): 125, G1 BC: 0.115, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Non-Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

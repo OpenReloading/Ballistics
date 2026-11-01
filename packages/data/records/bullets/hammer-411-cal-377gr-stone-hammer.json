@@ -1,0 +1,45 @@
+{
+  "id": "hammer-411-cal-377gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869035663",
+  "name": ".411 Cal-377gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".411",
+  "diameter": {
+    "value": 10.439,
+    "raw": ".411"
+  },
+  "mass": {
+    "value": 24.429,
+    "raw": "377 gr"
+  },
+  "length": {
+    "value": 40.89,
+    "raw": "Bullet length is 1.61″"
+  },
+  "noseLength": {
+    "value": 19.3,
+    "raw": "Nose length is .7599″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.425,
+      "note": "Hammer Bullets: \"g1-bc= .425 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist for Dangerous Game is 1-14″ for faster. Minimum required twist for Big Game is 1-16″ or faster. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"This is our heaviest of the .411 Cal Hammer Bullets. It is a bit longer in the nose, so will likely be a bit long for the 405 Winchester lever actions. It should work well in the single shot rifles as well as bolt actions. This will be a great option for guys that have built dangerous game rifles based on other cartridges with the .411 caliber. With the 3mm Lever Hammer design hollow point, this will be a very hard hitting bullet.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/411-cal-377gr-stone-hammer/: Minimum required twist for Dangerous Game is 1-14″ for faster | Minimum required twist for Big Game is 1-16″ or faster | Bullet length is 1.61″ | Nose length is .7599″ | Bullet weight is 377gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .425 estimated"
+      }
+    ]
+  }
+}

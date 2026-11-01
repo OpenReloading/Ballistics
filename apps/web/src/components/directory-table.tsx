@@ -18,7 +18,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   type DirectorySort,
   type DirectoryState,
@@ -46,15 +46,19 @@ export interface DirectoryColumn<T> {
   cell: (row: T, tabIndex: number) => ReactNode
   /** Sort key; columns without one do not sort. */
   value?: (row: T) => string | number | null | undefined
+  /** Ascending order of two rows, where the key's own order is not the column's. */
+  compare?: (a: T, b: T) => number
   num?: boolean
   /** A value equal to the row above's is set muted (a manufacturer's name once per run of its rows). */
   dim?: boolean
   /** Column width (CSS); one column without it takes the rest. */
   width?: string
-  /** Help on the header, shown on hover, focus and touch. */
-  help?: Message | undefined
+  /** Help on the header, shown on hover, focus and touch: one message, or several joined with a space. */
+  help?: Message | readonly Message[] | undefined
   /** Not printed, as a row action. */
   screenOnly?: boolean
+  /** Held at the box's right edge while the table scrolls sideways, as a row menu. */
+  sticky?: boolean
   /** Shown only in a list box of 64rem or more, so the name keeps its room on a tablet. */
   wide?: boolean
   /** At the header's end, after its label: a scale's ticks. */
@@ -146,7 +150,13 @@ function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
 const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
   c.key === link
     ? 'name-cell'
-    : [c.num && 'num', c.screenOnly && 'screen-only', c.wide && 'wide-only', repeat && 'repeat']
+    : [
+        c.num && 'num',
+        c.screenOnly && 'screen-only',
+        c.wide && 'wide-only',
+        c.sticky && 'sticky-end',
+        repeat && 'repeat',
+      ]
         .filter(Boolean)
         .join(' ') || undefined
 
@@ -201,6 +211,7 @@ const printedLines: Record<ListNoun, Message> = {
   faces: msg('Printed: the first {limit} of {total} targets in this selection.'),
   federations: msg('Printed: the first {limit} of {total} federations in this selection.'),
   firearms: msg('Printed: the first {limit} of {total} firearms in this selection.'),
+  'log entries': msg('Printed: the first {limit} of {total} entries in this selection.'),
   powders: msg('Printed: the first {limit} of {total} powders in this selection.'),
   primers: msg('Printed: the first {limit} of {total} primers in this selection.'),
 }
@@ -250,6 +261,9 @@ function useWindowedRows(count: number) {
 /** Sorts the rows by the sort's column when it has a value, else keeps the list order. */
 function sortedRows<T>(rows: readonly T[], columns: DirectoryColumn<T>[], sort: DirectorySort) {
   const by = columns.find((c) => c.key === sort?.column)
+  const { compare } = by ?? {}
+  if (sort && compare)
+    return rows.toSorted((a, b) => (sort.dir === 'ascending' ? 1 : -1) * compare(a, b))
   return sort && by?.value ? sortRows(rows, (r) => by.value?.(r) ?? undefined, sort.dir) : rows
 }
 
@@ -546,6 +560,10 @@ export function DirectoryTable<T extends { id: string }>({
   )
 }
 
+/** A column's help in the shown language, its messages joined with a space. */
+export const helpText = (help: Message | readonly Message[], t: Translator['t']) =>
+  (typeof help === 'string' ? [help] : help).map((m) => t(m)).join(' ')
+
 const nextSort = (key: string, dir: 'ascending' | 'descending' | undefined): DirectorySort => {
   if (dir === undefined) return { column: key, dir: 'ascending' }
   return dir === 'ascending' ? { column: key, dir: 'descending' } : undefined
@@ -584,8 +602,9 @@ function HeadCell<T>({
       {c.head && <span className="th-end">{c.head}</span>}
       {c.value ? (
         <Tooltip
-          label={c.help && t(c.help)}
+          label={c.help && helpText(c.help, t)}
           disabled={!c.help}
+          position="bottom"
           events={tipEvents}
           multiline
           w={260}
@@ -596,7 +615,7 @@ function HeadCell<T>({
           </UnstyledButton>
         </Tooltip>
       ) : c.help ? (
-        <Noted inline value={<HeadLabel column={c} />} notes={[t(c.help)]} />
+        <Noted inline value={<HeadLabel column={c} />} notes={[helpText(c.help, t)]} />
       ) : (
         <HeadLabel column={c} />
       )}
@@ -714,7 +733,10 @@ function openInPage(e: ReactMouseEvent<HTMLAnchorElement>, open: () => void) {
 function Cell({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
   return children === '' || children == null ? (
-    <span className="missing">{t('n/a')}</span>
+    <span className="missing">
+      <span aria-hidden="true">-</span>
+      <span className="visually-hidden">{t('n/a')}</span>
+    </span>
   ) : (
     children
   )
@@ -800,6 +822,8 @@ function SortSelect({
   onSort: (sort: DirectorySort) => void
 }) {
   const { t } = useTranslation()
+  // the input shows the chosen option as "Sort: Burn rate, low to high", the list the option alone
+  const plain = new Map<string, string>()
   const data = columns
     .filter((c) => c.value)
     .flatMap((c) => {
@@ -807,13 +831,16 @@ function SortSelect({
       return [
         {
           value: `${c.key} ascending`,
-          label: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
+          text: c.num ? t('{label}, low to high', { label }) : t('{label}, A to Z', { label }),
         },
         {
           value: `${c.key} descending`,
-          label: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
+          text: c.num ? t('{label}, high to low', { label }) : t('{label}, Z to A', { label }),
         },
-      ]
+      ].map(({ value, text }) => {
+        plain.set(value, text)
+        return { value, label: t('Sort: {text}', { text }) }
+      })
     })
   return (
     <Select
@@ -823,6 +850,7 @@ function SortSelect({
       size={controlSize.row.input}
       clearable
       data={data}
+      renderOption={({ option }) => plain.get(option.value)}
       value={sort ? `${sort.column} ${sort.dir}` : null}
       onChange={(v) => {
         const [column, dir] = v?.split(' ') ?? []

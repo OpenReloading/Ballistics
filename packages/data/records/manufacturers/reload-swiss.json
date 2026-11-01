@@ -1,0 +1,15 @@
+{
+  "id": "reload-swiss",
+  "name": "Reload Swiss",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "reload-swiss-data-sheet-rs12-en",
+        "url": "https://www.reload-swiss.com/Reload%20Swiss/Produkte/RS12/RS12-EN.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

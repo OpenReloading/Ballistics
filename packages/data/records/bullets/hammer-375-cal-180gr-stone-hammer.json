@@ -1,0 +1,56 @@
+{
+  "id": "hammer-375-cal-180gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869040026",
+  "name": ".375 Cal-180gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "length": {
+    "value": 25.4,
+    "raw": "Bullet length is 1.00″"
+  },
+  "noseLength": {
+    "value": 12.6,
+    "raw": "Nose length is .4959″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.244,
+      "note": "Hammer Bullets: \"g1-bc= .244 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 508,
+    "raw": "Minimum required twist rate is 1-20″ or faster"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"Designed with the 375 Winchester in mind this 180gr Stone Hammer™ should get the velocity of the old lever action a bit higher, near 2600 fps. This will be a hard hitter in the lever action or any .375 caliber cartridge for that matter.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/375-cal-180gr-stone-hammer/: Minimum required twist rate is 1-20″ or faster | Bullet length is 1.00″ | Nose length is .4959″ | Bullet weight is 180gr | Recommended use: Big Game Hunting | g1-bc= .244 estimated"
+      }
+    ]
+  }
+}

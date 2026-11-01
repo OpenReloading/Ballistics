@@ -1,0 +1,42 @@
+{
+  "id": "hornady-30904",
+  "manufacturer": "hornady",
+  "productNumber": "30904",
+  "name": "30 Cal. ELD Match, .308, 225 gr",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308\""
+  },
+  "mass": {
+    "value": 14.58,
+    "raw": "225 gr"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.777,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated. Hornady states ELD Match BCs are measured by Doppler radar and corrected to standard atmospheric conditions."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.391,
+      "note": "Hornady 2026 catalog; the velocity it applies to is not stated. Hornady states ELD Match BCs are measured by Doppler radar and corrected to standard atmospheric conditions."
+    }
+  ],
+  "note": "The catalog marks the weight with an asterisk; the footnote on the facing page 74: \"To achieve optimal performance, non-standard magazine length, chamber and faster twist rate barrel may be required.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "75",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "30 Cal. ELD Match, .308\", 225 gr., G1 .777, G7 .391, Sec. Den. .339, Item # 30904"
+      }
+    ]
+  }
+}

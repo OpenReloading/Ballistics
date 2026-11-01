@@ -50,6 +50,11 @@ export type Group = keyof typeof groups
 export interface DesignerSpec extends FieldSpec {
   label: Message
   group: Group
+  /**
+   * SI range of a plausible bullet value: outside it the field asks to check the unit, a soft
+   * flag that blocks nothing (the ranges of issue #788).
+   */
+  plausible?: [number, number]
 }
 
 const len = (key: string, label: Message, group: Group): DesignerSpec => ({
@@ -60,9 +65,27 @@ const len = (key: string, label: Message, group: Group): DesignerSpec => ({
   min: 0,
 })
 
+/** The SI range of `low` to `high` units of `perUnit` SI each. */
+const range = (low: number, high: number, perUnit: number): [number, number] => [
+  low * perUnit,
+  high * perUnit,
+]
+
 export const designerSpecs: DesignerSpec[] = [
-  { ...len('diameter', msg('Diameter'), 'size'), required: true },
-  { key: 'mass', label: msg('Mass'), quantity: 'mass', group: 'size', min: 0 },
+  {
+    ...len('diameter', msg('Diameter'), 'size'),
+    required: true,
+    plausible: range(0.05, 1.5, metersPerInch),
+  },
+  {
+    key: 'mass',
+    label: msg('Mass'),
+    quantity: 'mass',
+    group: 'size',
+    min: 0,
+    positive: true,
+    plausible: range(5, 1000, kilogramsPerGrain),
+  },
   len('length', msg('Length'), 'size'),
   len('noseLength', msg('Nose length'), 'nose'),
   len('ogive.radius', msg('Ogive radius'), 'nose'),
@@ -94,6 +117,10 @@ export const designerSpecs: DesignerSpec[] = [
   len('tip.length', msg('Polymer tip length'), 'tip'),
   len('tip.mouthDiameter', msg('Hollow-point mouth diameter'), 'tip'),
 ]
+
+/** Whether the SI value `si` of the field `s` is outside its plausible range: a unit to check. */
+export const implausible = (s: DesignerSpec, si: number | undefined) =>
+  si !== undefined && s.plausible !== undefined && (si < s.plausible[0] || si > s.plausible[1])
 
 /** The choices, keyed by record path, with their options ('' for not given): the record schema's enums. */
 export const choiceOptions = {
@@ -643,7 +670,7 @@ export function evaluate(
 ): Evaluation {
   const { choices } = design
   const { v, states } = fieldStates(design)
-  const sdOk = v.mass !== undefined && v.diameter !== undefined && v.diameter > 0
+  const sdOk = v.mass !== undefined && v.mass > 0 && v.diameter !== undefined && v.diameter > 0
   const computed = sdOk
     ? computedBulletRows({
         mass: { value: v.mass as number },
@@ -660,7 +687,7 @@ export function evaluate(
   const completed = completeShape(v, choices)
   const shape = shapeFromValues(v, choices, completed.L, completed.n)
   const given = designerSpecs.map((s) => s.key).filter((k) => v[k] !== undefined)
-  const p = bulletProfile(shape, (f) => given.includes(f), 'entered')
+  const p = bulletProfile(shape, (f) => given.includes(f), 'entered', drawingLengthUnit(system))
   if ('reason' in p) {
     const field =
       p.fields.find((f) => f === last) ??

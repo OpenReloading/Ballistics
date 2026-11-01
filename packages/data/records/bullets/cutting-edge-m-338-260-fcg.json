@@ -1,0 +1,51 @@
+{
+  "id": "cutting-edge-m-338-260-fcg",
+  "manufacturer": "cutting-edge",
+  "productNumber": "M.338 260 FCG",
+  "name": "M.338 260 FCG (MAXIMUS, 260 gr)",
+  "productLine": "MAXIMUS",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 16.848,
+    "raw": "260 gr"
+  },
+  "length": {
+    "value": 43.74,
+    "raw": "1.722\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.607,
+      "note": "G1 BC, printed \".607 (O89)\". Marked (O89): Oehler 89 system. Page footer: the coefficient numbers are confirmed by independent testing and by the Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.304,
+      "note": "G7 BC, printed \".304 EST\". Marked EST: estimated; the page states no accuracy. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "5",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 5, MAXIMUS Bullets: Caliber .338, Grains 260, Minimum Required Twist 1-10\", Part Number M.338 260 FCG, G1 BC .607 (O89), G7 BC .304 EST, OAL 1.722\", BULLET PROJECTION .940\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .940\"."
+}

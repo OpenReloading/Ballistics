@@ -1,0 +1,61 @@
+{
+  "id": "hammer-358-cal-215gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869048880",
+  "name": ".358 Cal-215gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358"
+  },
+  "mass": {
+    "value": 13.932,
+    "raw": "215 gr"
+  },
+  "length": {
+    "value": 37.11,
+    "raw": "Bullet length including tip is 1.461″"
+  },
+  "noseLength": {
+    "value": 21.49,
+    "raw": "Nose length including tip is .8459″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.228,
+      "note": "Hammer Bullets: \"g7-bc= .228 estimated\" (estimated)."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.454,
+      "note": "Hammer Bullets: \"g1-bc= .454 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 381,
+    "raw": "Minimum required twist rate is 1-15″ or faster"
+  },
+  "note": "Tip length is .230″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"This pure copper Hammer HHT™ for the 35 caliber rifles comes in at 215gr for rifles with a 1-15″ twist or faster. This will make a great all-around combo in the 35 Whelen as well as any of the magnum 358’s. Fast enough to reach out and big enough for heavy game.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/358-cal-215gr-hammer-hht/: Minimum required twist rate is 1-15″ or faster | Bullet length including tip is 1.461″ | Nose length including tip is .8459″ | Tip length is .230″ | Bullet weight is 215gr | Recommended use: Big Game Hunting | g7-bc= .228 estimated | g1-bc= .454 estimated"
+      }
+    ]
+  }
+}

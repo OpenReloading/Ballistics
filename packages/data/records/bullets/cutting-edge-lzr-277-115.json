@@ -1,0 +1,61 @@
+{
+  "id": "cutting-edge-lzr-277-115",
+  "manufacturer": "cutting-edge",
+  "productNumber": "LZR 277 115",
+  "name": "LZR 277 115 (Lazer, 115 gr)",
+  "productLine": "Lazer",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.036,
+    "raw": ".277"
+  },
+  "mass": {
+    "value": 7.452,
+    "raw": "115 gr"
+  },
+  "length": {
+    "value": 32.03,
+    "raw": "1.261\""
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.438,
+      "note": "G1 BC, above the part number line, printed \".438 (Oehler 89)\". Marked (Oehler 89): Oehler 89 system. The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.434,
+      "note": "G1 BC, below the part number line, printed \".434 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.223,
+      "note": "G7 BC, above the part number line, printed \".223 (A.B.)\". Marked (A.B.): independent testing (page footnote). The velocity it applies to is not stated."
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.218,
+      "note": "G7 BC, below the part number line, printed \".218 (Oehler 89)\". Marked (Oehler 89): Oehler 89 system. The velocity it applies to is not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "1-10\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "4",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .277, Grains 115, Minimum Required Twist 1-10\", Part Number LZR 277 115, G1 BC .438 (Oehler 89) / .434 (A.B.), G7 BC .223 (A.B.) / .218 (Oehler 89), OAL 1.261\", Bullet Projection .772\""
+      }
+    ]
+  },
+  "note": "Bullet projection (from the SealTite band to the tip, page footnote) printed: .772\"."
+}

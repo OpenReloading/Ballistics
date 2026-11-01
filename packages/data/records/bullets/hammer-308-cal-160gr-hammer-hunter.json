@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-cal-160gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "10167",
+  "name": ".308 Cal-160gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.368,
+    "raw": "160 gr"
+  },
+  "length": {
+    "value": 33.91,
+    "raw": "Bullet Length is 1.335″"
+  },
+  "noseLength": {
+    "value": 19.9,
+    "raw": "Nose Length is .7833″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.219,
+      "note": "Hammer Bullets: \"g7-bc= .219 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Recommended minimum twist rate is 1-11″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"For you 30 cal Tikka shooters. Here is a pure copper bullet that will fully stabilize in your 1-11″ twist Tikka. This 160gr Hammer Hunter™ will be a stellar big game hunting bullet for any big game animals from plains game to deer and elk on down.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-160gr-hammer-hunter/: Recommended minimum twist rate is 1-11″ | Bullet Length is 1.335″ | Nose Length is .7833″ | Bullet weight is 160gr | Recommended use: Big Game Hunting | g7-bc= .219 estimated"
+      }
+    ]
+  }
+}

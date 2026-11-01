@@ -1,0 +1,56 @@
+{
+  "id": "hammer-452-cal-221gr-stone-hammer-bushmaster",
+  "manufacturer": "hammer",
+  "productNumber": "813869027352",
+  "name": ".452 Cal-221gr Stone Hammer® Bushmaster",
+  "productLine": "Stone Hammer Bushmaster",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452"
+  },
+  "mass": {
+    "value": 14.321,
+    "raw": "221 gr"
+  },
+  "length": {
+    "value": 22.1,
+    "raw": "Bullet length is .870″"
+  },
+  "noseLength": {
+    "value": 14.19,
+    "raw": "Nose length is .5587″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.206,
+      "note": "Hammer Bullets: \"g1-bc= .206 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 762,
+    "raw": "Minimum required twist rate is 1-30″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This Hammer Bullet is designed specifically for the 450 Bushmaster as a dedicated big game hunting combo. At 221gr this Stone Hammer™ will achieve higher velocities than are typically seen with the Bushmaster resulting in outstanding performance on game. With the 4mm hollow point expansion is rapid and retained weight is constant at high or low vel impacts.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/452-cal-221gr-stone-hammer-bushmaster/: Minimum required twist rate is 1-30″ | Bullet length is .870″ | Nose length is .5587″ | Bullet weight is 221gr | Recommended use: Big Game Hunting | g1-bc= .206 estimated"
+      }
+    ]
+  }
+}

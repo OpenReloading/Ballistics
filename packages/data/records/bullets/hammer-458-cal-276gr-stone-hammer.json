@@ -1,0 +1,45 @@
+{
+  "id": "hammer-458-cal-276gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "7382",
+  "name": ".458 Cal-276gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".458",
+  "diameter": {
+    "value": 11.633,
+    "raw": ".458"
+  },
+  "mass": {
+    "value": 17.884,
+    "raw": "276 gr"
+  },
+  "length": {
+    "value": 25.48,
+    "raw": "Bullet length is 1.003″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.25,
+      "note": "Hammer Bullets: \"g1-bc= .250 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 711.2,
+    "raw": "Recommended minimum twist is 1-28″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This Stone Hammer™ was designed for the 45-70 to get the muzzle velocity higher for excellent flat shooting in the old cartridge. This one should get to 2400 fps nicely.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/458-cal-276gr-stone-hammer/: Recommended minimum twist is 1-28″ | Bullet length is 1.003″ | Bullet weight is 276gr | Recommended use: Big Game Hunting | g1-bc= .250 estimated"
+      }
+    ]
+  }
+}

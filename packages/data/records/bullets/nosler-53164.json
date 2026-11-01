@@ -1,0 +1,42 @@
+{
+  "id": "nosler-53164",
+  "manufacturer": "nosler",
+  "productNumber": "53164",
+  "name": "30 Caliber 168 gr HPBT Custom Competition",
+  "productLine": "Custom Competition",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 10.886
+  },
+  "length": {
+    "value": 30.48
+  },
+  "base": {
+    "type": "boat-tail"
+  },
+  "tip": {
+    "type": "hollow-point"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.462
+    }
+  ],
+  "note": "Nosler does not name the ogive form.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "nosler",
+        "url": "https://www.nosler.com/30-caliber-168gr-hpbt-custom-competition-100ct.html",
+        "retrieved": "2026-09-05",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "base.type", "tip.type"],
+        "note": "0.308 in, 168 gr, OAL 1.200 in, SD 0.253, BC G1 0.462; hollow point, boat tail, no cannelure."
+      }
+    ]
+  }
+}

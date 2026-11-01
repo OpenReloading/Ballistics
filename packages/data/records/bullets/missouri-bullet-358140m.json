@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-358140m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "358140M",
+  "name": ".357 Zinger, 140 Grain TCFP",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.093,
+    "raw": ".358 Diameter"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 Grain"
+  },
+  "length": {
+    "value": 15.57,
+    "raw": "Bullet OAL .613 +/-"
+  },
+  "note": "Listed as 140 Grain TCFP. Brinell 18. .357 Magnum. For Fast Action Velocities.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "358140M, .357 Zinger (https://missouribullet.com/details.php?prodId=161): .358 Diameter, 140 Grain TCFP, Brinell 18, Bullet OAL .613 +/-"
+      }
+    ]
+  }
+}

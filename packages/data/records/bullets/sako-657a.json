@@ -1,0 +1,46 @@
+{
+  "id": "sako-657a",
+  "manufacturer": "sako",
+  "productNumber": "657A",
+  "name": "SAKO BLADE 657A",
+  "productLine": "BLADE",
+  "diameter": {
+    "value": 7.823,
+    "raw": "0,308”"
+  },
+  "mass": {
+    "value": 10.886,
+    "raw": "11g/168gr"
+  },
+  "construction": {
+    "raw": "Expanding Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.41,
+      "note": "Sako reloading data: G1 measured from the speed difference between 10 m and 100 m."
+    }
+  ],
+  "note": "The printed sectional density 0.256 does not match the printed weight and diameter (0.253).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sako-reloading-data-pdf",
+        "url": "https://media.sako.global/image/upload/v1716205194/Sako-RELO-kaikki-kaliiperit-checked_kqmd86.pdf",
+        "page": "9, 16, 20",
+        "retrieved": "2026-10-08",
+        "sha256": "aa0c8376b7f5260e7b7526d7b11d194d0293a0b59d3cb73e719f8f4aa99ebbce",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "SAKO BLADE 657A: Diameter 0,308”, Weight 11g/168gr, Ballistic Coefficient 0.410, Bullet Type Expanding Copper, Sectional density 0.256"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

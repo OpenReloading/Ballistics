@@ -1,0 +1,22 @@
+{
+  "id": "300-win-mag-wikipedia",
+  "origin": "catalogue",
+  "cartridge": "catalogue:300-win-mag",
+  "waterCapacity": {
+    "value": 6.078,
+    "raw": "93.8 gr H2O"
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Wikipedia, .300 Winchester Magnum",
+        "url": "https://en.wikipedia.org/w/index.php?title=.300_Winchester_Magnum&oldid=1368911320",
+        "retrieved": "2026-10-08",
+        "license": "CC-BY-SA-4.0",
+        "note": "Text, a figure for Winchester brass: 93.8 grains of H2O (6.08 ml). Infobox gives 94 gr H2O; SAAMI specification 91.5 grains."
+      }
+    ]
+  },
+  "caseManufacturer": "catalogue:winchester"
+}

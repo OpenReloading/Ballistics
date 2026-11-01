@@ -1,0 +1,61 @@
+{
+  "id": "hammer-308-cal-158gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869066844",
+  "name": ".308 Cal-158gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 10.238,
+    "raw": "158 gr"
+  },
+  "length": {
+    "value": 36.32,
+    "raw": "Bullet length including tip: 1.43″"
+  },
+  "noseLength": {
+    "value": 21.16,
+    "raw": "Nose length including tip: .833″ (May require single feeding)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.25,
+      "note": "Hammer Bullets: \"g7-bc= .250\"; the page says \"Calculated from shot drops at 865y, 4200′ elevation, MV of 3150 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.54,
+      "note": "Hammer Bullets: \"g1-bc= .540\"; the page says \"Calculated from shot drops at 865y, 4200′ elevation, MV of 3150 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Minimum required twist rate is 1-11″ or faster"
+  },
+  "note": "PDR drive band spacing: .200″ (recommend two bands in the case neck for concentricity) Recommended use: Big Game Hunting. The product page also says: \"It ain’t your grandpa’s 30-06 anymore! Running at 3100 fps and 4000′ elevation, this combo reaches 850y still maintaining 1800 fps at impact. It arrives at 400y with an impact vel of 2440 fps. That’s the muzzle vel of typical 200gr conventional loads! Designed to be fully stable in 1-11″ twist, or faster barrels, this pure copper Hammer HBC™ bullet will be fully stable in most factory rifles including the Sako and Tikka.\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-cal-158gr-hammer-hbc/: Minimum required twist rate is 1-11″ or faster | Bullet length including tip: 1.43″ | Nose length including tip: .833″ (May require single feeding) | PDR drive band spacing: .200″ (recommend two bands in the case neck for concentricity) | Bullet weight: 158gr | Recommended use: Big Game Hunting | g7-bc= .250 | g1-bc= .540 | Calculated from shot drops at 865y, 4200′ elevation, MV of 3150 fps"
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "id": "cutting-edge-fb-r180-raptor",
+  "manufacturer": "cutting-edge",
+  "productNumber": "FB R180 Raptor",
+  "name": "FB R180 Raptor (Flat Base Raptor, 180 gr)",
+  "productLine": "Flat Base Raptor",
+  "caliber": ".416",
+  "diameter": {
+    "value": 10.566,
+    "raw": ".416"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "length": {
+    "value": 27.91,
+    "raw": "1.099\""
+  },
+  "slowestTwist": {
+    "value": 431.8,
+    "raw": "1:17\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "6",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length", "slowestTwist"],
+        "note": "Page 6, Flat Base Raptors (FB): Caliber .416, Grains 180, Minimum Required Twist 1:17\", Part Number FB R180 Raptor, G1 BC TBD, OAL 1.099\", Bullet Projection .833\""
+      }
+    ]
+  },
+  "note": "G1 BC is printed \"TBD\". Bullet projection (from the SealTite band to the tip, page footnote) printed: .833\"."
+}

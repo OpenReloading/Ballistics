@@ -1,0 +1,13 @@
+{
+  "id": "winchester",
+  "name": "Winchester",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "winchester-sds-ball-powder-propellant-november",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "id": "hammer-308-cal-181gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "287",
+  "name": ".308 Cal-181gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 gr"
+  },
+  "length": {
+    "value": 39.04,
+    "raw": "Bullet length is 1.537″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.272,
+      "note": "Hammer Bullets: \"G7-BC=.272 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 241.3,
+    "raw": "Recommended twist rate is 1-9.5″ or faster"
+  },
+  "note": "Recommended use: Big game hunting. The product page also says: \"The 181gr Hammer Hunter™ is one of our most popular bullets. One of the 1st bullets that we designed. It has been a stellar performer for many hunters including us in our own rifles. Technically this bullet really needs a 1-9.5″ twist to be fully stable not the 1-10″ that it was previously advertised as. Those who have run this bullet well in your 1-10″ twist go ahead and continue with it. Other wise we recommend the 180gr Hammer Hunter™ for 1-10″ twist rifles.\" The product name says 181 gr; the specification says 180 gr.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=4",
+        "retrieved": "2026-10-08",
+        "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/308-cal-181gr-hammer-hunter/: Recommended twist rate is 1-9.5″ or faster | Bullet length is 1.537″ | Bullet weight is 180 grains | Recommended use: Big game hunting | G7-BC=.272 calculated from shot drops"
+      }
+    ]
+  }
+}

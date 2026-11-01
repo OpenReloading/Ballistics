@@ -125,6 +125,7 @@ May not say:
 - The error is against printed values, which carry their own conventions and scatter. A small error is agreement with the printed rows, not an accuracy of the physical quantity.
 - The interval is built from training rows of the same model. It describes how far the model sat from printed values in the past and is not a prediction interval for the inputs of one load.
 - Held-out cartridges stand for cartridges the fit has not seen, not for every rifle, lot or temperature.
+- The held-out error next to the known sources of variation of a load, split by rifle and handgun: [How close a result is](../how-close.md).
 - With few cartridges in a family the metrics of that family are noisy; the aggregate rule above hides them rather than correcting them.
 
 ## Sources

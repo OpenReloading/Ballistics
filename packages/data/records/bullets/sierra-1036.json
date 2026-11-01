@@ -1,0 +1,56 @@
+{
+  "id": "sierra-1036",
+  "manufacturer": "sierra",
+  "productNumber": "1036",
+  "name": "20 CAL 36 GR Tipped VarmintKing (TVK)",
+  "caliber": "0.204",
+  "diameter": {
+    "value": 5.182,
+    "raw": "0.204 in"
+  },
+  "mass": {
+    "value": 2.333,
+    "raw": "36 gr"
+  },
+  "construction": {
+    "raw": "Jacketed Lead",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {}
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.255,
+      "note": "Sierra product page; the velocity it applies to is not stated."
+    }
+  ],
+  "note": "Item numbers 1036, 1036C (box counts).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sierra-bullets",
+        "url": "https://sierrabullets.com/20-cal-36-gr-tipped-varmintking-tvk/",
+        "retrieved": "2026-10-08",
+        "sha256": "6b130b810e34ea9e61670efbce8c1d855c8696b7fde0f92adbf170b16f94a1d2",
+        "fields": ["diameter", "mass", "construction.raw", "ballisticCoefficients"],
+        "note": "Item #: 1036, Bullet Type: Spitzer (SPT), Bullet Diameter: 0.204, Bullet Weight (Grains): 36, G1 BC: 0.255, Bullet Material: Jacketed Lead, Tipped/Non-Tipped: Tipped"
+      },
+      {
+        "source": "sierra-bullets-contact-page",
+        "url": "https://sierrabullets.com/contact-us/",
+        "retrieved": "2026-10-19",
+        "fields": ["country"],
+        "note": "Company address: 1400 W Henry St, Sedalia, MO 65301, United States."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.core", "construction.jacket"]
+      }
+    ]
+  },
+  "country": "US"
+}

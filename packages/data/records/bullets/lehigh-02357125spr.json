@@ -1,0 +1,42 @@
+{
+  "id": "lehigh-02357125spr",
+  "manufacturer": "lehigh",
+  "productNumber": "02357125SPR",
+  "name": ".357 diameter, 125 grain Controlled Fracturing Bullets, Rifle or Handgun (50 count)",
+  "productLine": "Controlled Fracturing",
+  "caliber": ".357",
+  "diameter": {
+    "value": 9.068,
+    "raw": ".357 in"
+  },
+  "mass": {
+    "value": 8.1,
+    "raw": "125 gr"
+  },
+  "length": {
+    "value": 18.42,
+    "raw": "0.725 in"
+  },
+  "construction": {
+    "raw": "Copper",
+    "unmapped": true
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lehigh-defense-store-product-attributes-graphql",
+        "url": "https://lehighdefense.com/graphql?query=%7Bproducts%28filter%3A%7Bcategory_uid%3A%7Beq%3A%22MTA%3D%22%7D%7D%2CpageSize%3A500%29%7Btotal_count%20items%7Bsku%20name%20url_key%20all_reloading_diameter%20all_reloading_weight_grains%20all_reloading_ld_tech%20all_reloading_ld_material%20all_reloading_ld_g1%20all_reloading_ld_g7%20all_reloading_ld_length%20all_reloading_ld_ogive_length%20all_reloading_ld_minimum_twist%20all_reloading_ld_sectional%7D%7D%7D",
+        "retrieved": "2026-10-08",
+        "sha256": "99a33bfb22d332a0ea790da76dd204d25e6261dc593c26fd63e88239192bfa51",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "02357125SPR, https://lehighdefense.com/357-diameter-125-grain-controlled-fracturing-bullets-50-count-02357125spr.html: Bullet Diameter .357, Bullet Weight (grains) 125, Bullet Length 0.725, Sectional Density 0.14. Option labels from the attribute metadata query (sha256 c1644366c98defb88490b9314a0bf5ad53600f6d27828fe7ceaff7c6c47411fd)."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

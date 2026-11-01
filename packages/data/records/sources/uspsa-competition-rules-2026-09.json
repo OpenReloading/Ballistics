@@ -1,0 +1,11 @@
+{
+  "id": "uspsa-competition-rules-2026-09",
+  "title": "USPSA Competition Rules (online rule book)",
+  "publisher": "United States Practical Shooting Association",
+  "edition": "Edition 2026-09, effective 2026-09-01",
+  "url": "https://rules.uspsa.org/uspsa",
+  "retrieved": "2026-11-01",
+  "sha256": "96d1676bc107837ff0051d3a108add5cd12dbfe050aa0b1245488dba48cf55d3",
+  "terms": "Page footer: copyright 2026 United States Practical Shooting Association, all rights reserved. The records hold the facts in our own words with rule citations; no rule text is copied and the pages are not distributed.",
+  "note": "USPSA publishes this edition as web pages, one per section or appendix; the PDF on uspsa.org answered 403 to the download client on the retrieval date. The SHA-256 is that of the contents page as retrieved; each citation gives the URL and SHA-256 of the page it was read from. Pages print the section page of the print edition."
+}

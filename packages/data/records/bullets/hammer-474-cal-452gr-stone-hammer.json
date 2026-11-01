@@ -1,0 +1,45 @@
+{
+  "id": "hammer-474-cal-452gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "813869050358",
+  "name": ".474 Cal-452gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".474",
+  "diameter": {
+    "value": 12.04,
+    "raw": ".474"
+  },
+  "mass": {
+    "value": 29.289,
+    "raw": "452 gr"
+  },
+  "length": {
+    "value": 36.83,
+    "raw": "Bullet length is 1.45″"
+  },
+  "noseLength": {
+    "value": 15.09,
+    "raw": "Nose length is .5941″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.379,
+      "note": "Hammer Bullets: \"g1-bc= .379 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum required twist 1-20″ or faster for Dangerous Game Hunting. Recommended use: Big Game and Dangerous Game Hunting. The product page also says: \"We designed this pure copper Stone Hammer™ for our friends at Trophy Game Safari in South Africa. Professional Hunter Tino, uses this bullet in his 470 Nitro as backup for the most dangerous animals on the planet. When lives are on the line this is his bullet of choice. Running at 2300 fps plus, this bullet hits extremely hard and straight line penetrates very deep.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/474-cal-452gr-stone-hammer/: Minimum required twist 1-20″ or faster for Dangerous Game Hunting | Bullet length is 1.45″ | Nose length is .5941″ | Bullet weight is 452gr | Recommended use: Big Game and Dangerous Game Hunting | g1-bc= .379 estimated"
+      }
+    ]
+  }
+}

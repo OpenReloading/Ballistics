@@ -1,0 +1,30 @@
+{
+  "id": "sellier-bellot-v318952",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V318952",
+  "name": "TFMJ, .400, 180 gr (for 40 S&W)",
+  "productLine": "TFMJ",
+  "caliber": ".400",
+  "diameter": {
+    "value": 10.16,
+    "raw": ".400 in (10,17 mm)"
+  },
+  "mass": {
+    "value": 11.664,
+    "raw": "180 grs (11,7 g)"
+  },
+  "note": "Recommended for 40 S&W.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-pistol-and",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass"],
+        "note": "V318952 | 40 S&W | TFMJ | 180 | 11,7 | 40 | 10,17 | .400. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "lehigh-04375270sp",
+  "manufacturer": "lehigh",
+  "productNumber": "04375270SP",
+  "name": ".375 diameter, 270 grain Wide Flat Nose Bullets (50 count)",
+  "productLine": "Wide Flat Nose",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375 in"
+  },
+  "mass": {
+    "value": 17.496,
+    "raw": "270 gr"
+  },
+  "length": {
+    "value": 33.02,
+    "raw": "1.300 in"
+  },
+  "construction": {
+    "raw": "Copper",
+    "unmapped": true
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.279,
+      "note": "Lehigh Defense product data; the method and the velocity are not stated."
+    }
+  ],
+  "slowestTwist": {
+    "value": 304.8,
+    "raw": "1:12"
+  },
+  "note": "Ogive length 0.696 in as listed. The listed sectional density .277 does not match the listed weight and diameter (0.274).",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "lehigh-defense-store-product-attributes-graphql",
+        "url": "https://lehighdefense.com/graphql?query=%7Bproducts%28filter%3A%7Bcategory_uid%3A%7Beq%3A%22MTA%3D%22%7D%7D%2CpageSize%3A500%29%7Btotal_count%20items%7Bsku%20name%20url_key%20all_reloading_diameter%20all_reloading_weight_grains%20all_reloading_ld_tech%20all_reloading_ld_material%20all_reloading_ld_g1%20all_reloading_ld_g7%20all_reloading_ld_length%20all_reloading_ld_ogive_length%20all_reloading_ld_minimum_twist%20all_reloading_ld_sectional%7D%7D%7D",
+        "retrieved": "2026-10-08",
+        "sha256": "99a33bfb22d332a0ea790da76dd204d25e6261dc593c26fd63e88239192bfa51",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "construction.raw",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "04375270SP, https://lehighdefense.com/375-diameter-270-grain-wide-flat-nose-bullets-50-count.html: Bullet Diameter .375, Bullet Weight (grains) 270, Ballistic Coefficient (G1) 0.279, Ballistic Coefficient (G7) N/A, Bullet Length 1.300, Ogive Length (inches) 0.696, Sectional Density .277, Minimum Twist Rate 1:12. Option labels from the attribute metadata query (sha256 c1644366c98defb88490b9314a0bf5ad53600f6d27828fe7ceaff7c6c47411fd)."
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

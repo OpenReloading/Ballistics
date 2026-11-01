@@ -15,7 +15,7 @@
     "shell": {
       "budget": {
         "initial": 424000,
-        "total": 472000
+        "total": 474000
       },
       "routes": {
         "/": {
@@ -75,7 +75,7 @@
     "records": {
       "budget": {
         "initial": 506000,
-        "total": 554000
+        "total": 556000
       },
       "routes": {
         "/bullets/[id]": {
@@ -174,6 +174,10 @@
           "initial": 509123,
           "total": 549226
         },
+        "/firearms/log": {
+          "initial": 463900,
+          "total": 505900
+        },
         "/groups": {
           "initial": 555700,
           "total": 595803
@@ -190,7 +194,7 @@
     },
     "workbench": {
       "budget": {
-        "initial": 626000,
+        "initial": 628000,
         "total": 1045000
       },
       "routes": {

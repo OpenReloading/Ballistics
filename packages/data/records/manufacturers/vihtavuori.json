@@ -1,0 +1,15 @@
+{
+  "id": "vihtavuori",
+  "name": "Vihtavuori",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "vihtavuori-safety-data-sheet-n-powder-centralite",
+        "url": "https://vihtavuori.com/wp-content/uploads/2026/08/N-Powder-Centralite-RELO-18-01-2026-en.pdf",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

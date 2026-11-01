@@ -1,0 +1,36 @@
+{
+  "id": "sellier-bellot-v338472",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338472",
+  "name": "SP, .257, 117 gr (bullet 2925)",
+  "productLine": "SP",
+  "caliber": ".257",
+  "diameter": {
+    "value": 6.528,
+    "raw": ".257 in (6,58 mm)"
+  },
+  "mass": {
+    "value": 7.581,
+    "raw": "117 grs (7,6 g)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.223,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "V338472 | 2925 | SP | 117 | 7,6 | 6,5 | 6,58 | .257 | 0,223. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

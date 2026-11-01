@@ -2162,7 +2162,14 @@ export function useWorkbenchState() {
     try {
       if (!menu?.snapshot().unsaved) load = loadRequest().body.load
     } catch {}
-    writeTuneLoad(ref, load, chosenPowder)
+    // a record still loading: the tuning route fetches its table; before the first answer only the
+    // catalogue id asked for is known (a user design's is not fetched)
+    const asking =
+      !cartridge && !cartridgeDesign && asked.cartridge?.id
+        ? catalogueIdOf(asked.cartridge.id)
+        : undefined
+    const pending = cartridge ? (groove?.id !== cartridge.id ? cartridge.id : undefined) : asking
+    writeTuneLoad(ref, load, chosenPowder, recordTable, pending)
   }
   const tuning = useRef(handTuneLoad)
   tuning.current = handTuneLoad

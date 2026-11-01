@@ -1,0 +1,61 @@
+{
+  "id": "hammer-338-cal-218gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869065568",
+  "name": ".338 Cal-218gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 14.126,
+    "raw": "218 gr"
+  },
+  "length": {
+    "value": 41.73,
+    "raw": "Bullet length including the tip: 1.643″"
+  },
+  "noseLength": {
+    "value": 22.35,
+    "raw": "Nose length: .880″ (May require single feeding)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.298,
+      "note": "Hammer Bullets: \"g7-bc= .298\"; the page says \"Calculated from shot drops at 860y, 4200′ elevation, MV of 3105 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.592,
+      "note": "Hammer Bullets: \"g1-bc= .592\"; the page says \"Calculated from shot drops at 860y, 4200′ elevation, MV of 3105 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 279.4,
+    "raw": "Minimum required twist rate is 1-11″ or faster"
+  },
+  "note": "PDR drive band spacing: .200″ (recommend two drive bands in the case neck for concentricity) Tip length: .143″. Recommended use: Big Game Hunting. Form factor= .915. The product page also says: \"This 218gr Hammer HBC™ was designed with the 338 Winchester Mag in mind. This pure copper bullet will be fully stable in 1-11″ or faster barrels covering most factory rifles. Our test rifle in 338 Win Mag is running these very comfortably at 3100 fps. At 4000′ elevation this bullet will carry 1800 fps to 1000y. Talk about a game changer for the Win Mag! Think about it in a Lapua or 338 Remington Ultra Mag!\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/338-cal-218gr-hammer-hbc/: Minimum required twist rate is 1-11″ or faster | Bullet length including the tip: 1.643″ | Nose length: .880″ (May require single feeding) | PDR drive band spacing: .200″ (recommend two drive bands in the case neck for concentricity) | Tip length: .143″ | Bullet weight: 218gr | Recommended use: Big Game Hunting | g7-bc= .298 | g1-bc= .592 | Form factor= .915 | Calculated from shot drops at 860y, 4200′ elevation, MV of 3105 fps"
+      }
+    ]
+  }
+}

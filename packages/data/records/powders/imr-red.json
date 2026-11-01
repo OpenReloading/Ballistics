@@ -1,0 +1,18 @@
+{
+  "id": "imr-red",
+  "manufacturer": "imr",
+  "name": "Red",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-annual-manual-2025",
+        "page": "147",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-10-12",
+        "fields": ["name"],
+        "note": "Printed as IMR Red in the load tables; no product page found on shop.hodgdon.com on the retrieval date."
+      }
+    ]
+  }
+}

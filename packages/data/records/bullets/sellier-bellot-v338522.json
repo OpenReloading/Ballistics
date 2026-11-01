@@ -1,0 +1,36 @@
+{
+  "id": "sellier-bellot-v338522",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338522",
+  "name": "SP, .264, 131 gr (bullet 2923)",
+  "productLine": "SP",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264 in (6,7 mm)"
+  },
+  "mass": {
+    "value": 8.489,
+    "raw": "131 grs (8,5 g)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.389,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "V338522 | 2923 | SP | 131 | 8,5 | 6,5 | 6,7 | .264 | 0,389. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

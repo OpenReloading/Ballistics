@@ -55,7 +55,6 @@ function FederationRecordView({
       figure={<FederationRuleBooks books={f.ruleBooks} />}
       values={
         <FederationData
-          abbreviation={f.abbreviation}
           country={f.country}
           member={
             f.internationalFederation

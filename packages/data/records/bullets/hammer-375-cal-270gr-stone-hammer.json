@@ -1,0 +1,45 @@
+{
+  "id": "hammer-375-cal-270gr-stone-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "12230",
+  "name": ".375 Cal-270gr Stone Hammer®",
+  "productLine": "Stone Hammer",
+  "caliber": ".375",
+  "diameter": {
+    "value": 9.525,
+    "raw": ".375"
+  },
+  "mass": {
+    "value": 17.496,
+    "raw": "270 gr"
+  },
+  "length": {
+    "value": 36.58,
+    "raw": "Bullet length is 1.440″"
+  },
+  "noseLength": {
+    "value": 18.27,
+    "raw": "Nose length is .7191″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.422,
+      "note": "Hammer Bullets: \"g1-bc= .422 estimated\" (estimated)."
+    }
+  ],
+  "note": "Minimum recommended twist rate for Dangerous Game hunting is 1-13.5″. Minimum recommended twist rate for Big Game hunting is 1-15.5″. Recommended use: Dangerous Game and Big Game Hunting. The product page also says: \"This is an all around big game hunting bullet but we are going to go ahead and give it a Dangerous Game designation. This bullet was designed, with the help of our hunters in Australia, specifically for use on the big Asiatic buffalo. This Stone Hammer™ has a 3mm hollow point with a heavy meplat, like all the Lever Hammers, with a 60% weight retention design to maximize the trauma from the big shed petals and still maintain plenty of weight for full penetration of the big tough game animals. Fired from the magnum .375 caliber rifles this bullet will be tough to beat. As well as superior high velocity performance this bullet will work down to 1800 fps with perfect perfect weight retention the same as it does at high velocity impacts. Use this bullet with confidence for all your big game needs. This is a proven Dangerous Game combo in the 375 H&H but may have magazine restriction issues in some rifles.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
+        "note": "https://hammerbullets.com/product/375-cal-270gr-stone-hammer/: Minimum recommended twist rate for Dangerous Game hunting is 1-13.5″ | Minimum recommended twist rate for Big Game hunting is 1-15.5″ | Bullet length is 1.440″ | Nose length is .7191″ | Bullet weight is 270gr | Recommended use: Dangerous Game and Big Game Hunting | g1-bc= .422 estimated"
+      }
+    ]
+  }
+}

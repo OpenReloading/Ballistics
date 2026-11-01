@@ -1,0 +1,15 @@
+{
+  "id": "ramshot",
+  "name": "Ramshot",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hodgdon-powder-co-product-page-ramshot-big-game",
+        "url": "https://shop.hodgdon.com/ramshot-big-game/",
+        "retrieved": "2026-10-13",
+        "fields": ["name"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-308-189gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "813869025124",
+  "name": ".308 Cal-189gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823,
+    "raw": ".308"
+  },
+  "mass": {
+    "value": 12.247,
+    "raw": "189 gr"
+  },
+  "length": {
+    "value": 38.35,
+    "raw": "Bullet length is 1.510″"
+  },
+  "noseLength": {
+    "value": 17.55,
+    "raw": "Nose length is .691″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.223,
+      "note": "Hammer Bullets: \"g7-bc= .223 calculated from shot drops.\" (calculated from shot drops.)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Minimum required twist rate: 1-10″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"This short nosed Hammer Hunter™ was designed to keep the weight high and still fit into the short SAAMI spec magazines that are out there in many rifles. With a nose length of .69″ there will be no problem fitting these into WSM’s and maintain smooth feeding.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/308-189gr-hammer-hunter/: Minimum required twist rate: 1-10″ | Bullet length is 1.510″ | Nose length is .691″ | Bullet weight is 189gr | Recommended use: Big Game Hunting | g7-bc= .223 calculated from shot drops."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "hammer-284-cal-132gr-hammer-hht",
+  "manufacturer": "hammer",
+  "productNumber": "813869039785",
+  "name": ".284 Cal-132gr Hammer HHT®",
+  "productLine": "Hammer HHT",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 8.553,
+    "raw": "132 gr"
+  },
+  "length": {
+    "value": 34.44,
+    "raw": "Bullet length including tip is 1.356″"
+  },
+  "noseLength": {
+    "value": 20.04,
+    "raw": "Nose length including tip is .789″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.223,
+      "note": "Hammer Bullets: \"g7-bc= .223 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 254,
+    "raw": "Minimum required twist rate is 1-10″ or faster"
+  },
+  "note": "Tip length is .143″. Recommended use: Big Game Hunting. The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\" The product page also says: \"For those that want to run their 7mm’s faster or for those slower factory barrels in 1- 9.5″ and 1-10″ commonly used, this 132gr lead-free bullet is plenty for any of your big game hunting needs.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=2",
+        "retrieved": "2026-10-08",
+        "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-132gr-hammer-hht/: Minimum required twist rate is 1-10″ or faster | Bullet length including tip is 1.356″ | Nose length including tip is .789″ | Tip length is .143″ | Bullet weight is 132gr | Recommended use: Big Game Hunting | g7-bc= .223 estimated"
+      }
+    ]
+  }
+}

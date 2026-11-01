@@ -1,0 +1,36 @@
+{
+  "id": "sellier-bellot-v338672",
+  "manufacturer": "sellier-bellot",
+  "productNumber": "V338672",
+  "name": "SP, .284, 140 gr (bullet 2931)",
+  "productLine": "SP",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284 in (7,25 mm)"
+  },
+  "mass": {
+    "value": 9.072,
+    "raw": "140 grs (9,1 g)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.231,
+      "note": "Sellier & Bellot component bullets page; the method and the velocity are not stated."
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "sellier-bellot-component-bullets-rifle-table",
+        "url": "https://www.sellier-bellot.cz/en/products/components/bullets/",
+        "retrieved": "2026-10-08",
+        "sha256": "b177335f3ba9262d8c7155851b79b99ee408ec25c10219cfcff329e237a45ad9",
+        "fields": ["diameter", "mass", "ballisticCoefficients"],
+        "note": "V338672 | 2931 | SP | 140 | 9,1 | 7 | 7,25 | .284 | 0,231. The page states the weight as a nominal value without manufacturing tolerances."
+      }
+    ]
+  }
+}

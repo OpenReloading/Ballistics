@@ -1,0 +1,29 @@
+{
+  "id": "hodgdon-h4831sc",
+  "manufacturer": "hodgdon",
+  "name": "H4831SC",
+  "aliases": ["ADI AR2213SC"],
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Powder Co. product page, H4831SC® Extreme Rifle Powder",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://shop.hodgdon.com/hodgdon-h4831sc/",
+        "retrieved": "2026-10-13",
+        "fields": ["name", "grainForm", "propellantBase"],
+        "note": "Product details: Form \"Extruded\", Base \"Single\".",
+        "origin": "manufacturer"
+      },
+      {
+        "source": "adi-world-class-powders-faq-is-hodgdon",
+        "url": "https://www.adiworldclass.com.au/faq-items/is-hodgdon-propellant-the-same-as-adi-propellant/",
+        "retrieved": "2026-10-13",
+        "fields": ["aliases"],
+        "note": "States that ADI exports propellants that Hodgdon Powder Company rebrands; its table pairs ADI AR2213SC with H4831SC."
+      }
+    ]
+  }
+}

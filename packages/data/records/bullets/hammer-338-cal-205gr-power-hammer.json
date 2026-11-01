@@ -1,0 +1,45 @@
+{
+  "id": "hammer-338-cal-205gr-power-hammer",
+  "manufacturer": "hammer",
+  "productNumber": "5721",
+  "name": ".338 Cal-205gr Power Hammer™",
+  "productLine": "Power Hammer",
+  "caliber": ".338",
+  "diameter": {
+    "value": 8.585,
+    "raw": ".338"
+  },
+  "mass": {
+    "value": 13.284,
+    "raw": "205 gr"
+  },
+  "length": {
+    "value": 35.56,
+    "raw": "Bullet length is 1.40″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.394,
+      "note": "Hammer Bullets: \"G1-BC= .394 estimated\" (estimated)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 323.85,
+    "raw": "Recommended minimum twist rate is 1-12.75″"
+  },
+  "note": "Recommended use: Big Game Hunting. The product page also says: \"We designed this bullet with the .338 Winchester Magnum in mind. We put a 2mm hollow point in this one, that is relatively deep, for about 60% weight retention and to ensure easy expansion. This bullet will load very nicely for feeding from the magazine and have a great velocity for hunting big game out to medium/long range.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
+        "note": "https://hammerbullets.com/product/338-cal-205gr-power-hammer/: Recommended minimum twist rate is 1-12.75″ | Bullet length is 1.40″ | Bullet weight is 205gr | Recommended use: Big Game Hunting | G1-BC= .394 estimated"
+      }
+    ]
+  }
+}

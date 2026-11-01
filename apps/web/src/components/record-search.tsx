@@ -287,7 +287,15 @@ export function RecordSearch<T extends { id: string }>({
           </Combobox.Options>
         </Combobox.Dropdown>
       </Combobox>
-      <p role="status" className="search-status">
+      {/* the list covers the line: its text stays in the live region */}
+      <p
+        role="status"
+        className="search-status"
+        data-covered={
+          (state.status === 'ok' && combobox.dropdownOpened && items.length + local.length > 0) ||
+          undefined
+        }
+      >
         {message}
       </p>
     </div>

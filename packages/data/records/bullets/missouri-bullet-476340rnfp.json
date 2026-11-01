@@ -1,0 +1,33 @@
+{
+  "id": "missouri-bullet-476340rnfp",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "476340RNFP",
+  "name": ".475 Thumper, 340 Grain RNFP-Flat Base",
+  "caliber": ".476",
+  "diameter": {
+    "value": 12.09,
+    "raw": ".476 Diameter"
+  },
+  "mass": {
+    "value": 22.032,
+    "raw": "340 Grain"
+  },
+  "length": {
+    "value": 20.93,
+    "raw": "Bullet OAL .824 +/-"
+  },
+  "note": "Listed as 340 Grain RNFP-Flat Base. Brinell 18. .475 Linebaugh, .480 Ruger. For Vicious Critters.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length"],
+        "note": "476340RNFP, .475 Thumper (https://missouribullet.com/details.php?prodId=376): .476 Diameter, 340 Grain RNFP-Flat Base, Brinell 18, Bullet OAL .824 +/-"
+      }
+    ]
+  }
+}

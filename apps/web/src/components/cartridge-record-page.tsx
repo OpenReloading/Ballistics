@@ -8,6 +8,7 @@ import { apiFetch } from '../lib/api-fetch.ts'
 import type { CartridgeDetail } from '../lib/api-types.ts'
 import {
   combinedRows,
+  dimensionStripValues,
   inReadingOrder,
   pressureStripNote,
   pressureStripValues,
@@ -25,6 +26,7 @@ import {
   CartridgeSides,
   RecordFacts,
   RecordScope,
+  StandardFacts,
   VariantMatrix,
   VariantSelect,
 } from './cartridge-record.tsx'
@@ -73,7 +75,7 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
   const list = recordFigures(sheet)
   const rows = inReadingOrder(combinedRows(c, list, t))
   const matrix = variantMatrix(c, t)
-  const pressures = pressureStripValues(c)
+  const facts = [...pressureStripValues(c), ...dimensionStripValues(c)]
   const aliases = c.aliases ?? []
   const date = c.revised ?? c.published
   // a record without values: nothing to switch, draw or design
@@ -101,21 +103,23 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
         workbench={workbenchHref('cartridge', c.id)}
         design={gap ? undefined : `/cartridges/designer?from=${encodeURIComponent(c.id)}`}
         provenance={c.provenance}
+        sourceFacts={
+          <StandardFacts
+            table={c.table}
+            date={{ label: c.revised ? msg('Revised') : msg('Published'), value: date }}
+            countries={c.country ? parseCountries(c.country) : undefined}
+            method={c.pressureMethod && methodWording(c.pressureMethod)}
+          />
+        }
         strip={
           <>
             <RecordFacts
-              values={pressures}
-              notes={pressures.map((v) => pressureStripNote(v, c.table, t))}
-              standard={{
-                table: c.table,
-                date: { label: c.revised ? msg('Revised') : msg('Published'), value: date },
-                countries: c.country ? parseCountries(c.country) : undefined,
-              }}
-              build={{
-                caseType: c.caseType,
-                method: c.pressureMethod && methodWording(c.pressureMethod),
-              }}
-            />
+              values={facts}
+              notes={facts.map((v) => pressureStripNote(v, c.table, t))}
+              caseType={c.caseType}
+            >
+              {bullets > 0 && <CartridgeBullets id={c.id} count={bullets} />}
+            </RecordFacts>
             {gap && <p className="record-gap">{t('No dimensions or pressures in this record')}</p>}
             {/* a shotshell's pressures and lengths by variant, across the page */}
             {matrix.rows.length > 0 && (
@@ -145,7 +149,6 @@ function Cartridge({ c }: { c: CartridgeDetail }) {
             />
           )
         }
-        side={bullets > 0 && <CartridgeBullets id={c.id} count={bullets} />}
       />
     </RecordScope>
   )

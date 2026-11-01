@@ -1,0 +1,61 @@
+{
+  "id": "hammer-284-cal-141gr-hammer-hbc",
+  "manufacturer": "hammer",
+  "productNumber": "813869056261",
+  "name": ".284 Cal-141gr Hammer HBC™",
+  "productLine": "Hammer HBC",
+  "caliber": ".284",
+  "diameter": {
+    "value": 7.214,
+    "raw": ".284"
+  },
+  "mass": {
+    "value": 9.137,
+    "raw": "141 gr"
+  },
+  "length": {
+    "value": 38.1,
+    "raw": "Bullet length including tip is 1.50″"
+  },
+  "noseLength": {
+    "value": 20.07,
+    "raw": "Nose length including tip is .790″ (may require single feeding)"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G7",
+      "value": 0.277,
+      "note": "Hammer Bullets: \"g7-bc= .277\"; the page says \"calculated from shot drops at 900y, 4200′ elevation, MV of 3230 fps\"."
+    },
+    {
+      "dragModel": "G1",
+      "value": 0.55,
+      "note": "Hammer Bullets: \"g1-bc= .550\"; the page says \"calculated from shot drops at 900y, 4200′ elevation, MV of 3230 fps\"."
+    }
+  ],
+  "slowestTwist": {
+    "value": 228.6,
+    "raw": "Required minimum twist rate is 1-9″ or faster"
+  },
+  "note": "PDR drive band spacing is .200″ (recommend two drive bands in case neck for concentricity) Tip length is .143″. Recommended use: Big Game Hunting. form factor= .902. The product page also says: \"This Hammer HBC™ designed to run in a 1-9″ or faster barrel twist will be very comfortable to shoot in magnum rifles and carry plenty of range for long range hunting. It will be great for extending the range of modest 7mm’s like the 7mm-08. Whatever your hunting needs, this pure copper Hammer HBC™ will cover a wide range of distances and animals. The Hammer HBC™ is designed to maximize ballistic coefficient for the bullet weight. Make sure the bullet specifications will work in your cartridge and rifle system. May require single feeding.\" The product page also says: \"AT THIS TIME TIPS ARE CONSUMER INSTALLED\" The product page also says: \"TIPPING BLOCK INCLUDED WITH EACH ORDER\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=1",
+        "retrieved": "2026-10-08",
+        "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/284-cal-141gr-hammer-hbc/: Required minimum twist rate is 1-9″ or faster | Bullet length including tip is 1.50″ | Nose length including tip is .790″ (may require single feeding) | PDR drive band spacing is .200″ (recommend two drive bands in case neck for concentricity) | Tip length is .143″ | Bullet weight is 141gr | Recommended use: Big Game Hunting | g7-bc= .277 | g1-bc= .550 | form factor= .902 | calculated from shot drops at 900y, 4200′ elevation, MV of 3230 fps"
+      }
+    ]
+  }
+}

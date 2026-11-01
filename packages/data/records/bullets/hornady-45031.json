@@ -1,0 +1,30 @@
+{
+  "id": "hornady-45031",
+  "manufacturer": "hornady",
+  "productNumber": "45031",
+  "name": "45 Cal. Sub-X (450 Bushmaster), .452, 395 gr",
+  "caliber": ".452",
+  "diameter": {
+    "value": 11.481,
+    "raw": ".452\""
+  },
+  "mass": {
+    "value": 25.596,
+    "raw": "395 gr"
+  },
+  "note": "The catalog prints BC .300 without naming the drag model.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hornady-2026-product-catalog",
+        "url": "https://static.hornady.media/presscenter/docs/1411008168-1768498925-Hornady-2026-Product-Catalog.pdf",
+        "page": "92",
+        "retrieved": "2026-10-08",
+        "sha256": "c80e75ca1fc5f66bb009e6e2f0520b77003f3cce3f4853b9cd9306421cc420d7",
+        "fields": ["diameter", "mass"],
+        "note": "45 Cal. Sub-X (450 Bushmaster), .452\", 395 gr., Ballistic Coef. .300, Sec. Den. .276, Item # 45031"
+      }
+    ]
+  }
+}

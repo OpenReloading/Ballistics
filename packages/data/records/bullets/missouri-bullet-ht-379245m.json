@@ -1,0 +1,42 @@
+{
+  "id": "missouri-bullet-ht-379245m",
+  "manufacturer": "missouri-bullet",
+  "productNumber": "HT-379245M",
+  "name": "#1 Ballard - Hi-Tek, 245 Grain RNFP",
+  "caliber": ".379",
+  "diameter": {
+    "value": 9.627,
+    "raw": ".379 Diameter"
+  },
+  "mass": {
+    "value": 15.876,
+    "raw": "245 Grain"
+  },
+  "length": {
+    "value": 23.14,
+    "raw": "Bullet OAL .911 +/-"
+  },
+  "construction": {
+    "raw": "Hi-Tek 2-Extreme Coating",
+    "unmapped": true
+  },
+  "note": "Listed as 245 Grain RNFP. Brinell 18. For The High Plains.",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "missouri-bullet-company-pricing-page",
+        "url": "https://missouribullet.com/pricing.php",
+        "retrieved": "2026-10-08",
+        "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
+        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "note": "HT-379245M, #1 Ballard - Hi-Tek (https://missouribullet.com/details.php?prodId=230): .379 Diameter, 245 Grain RNFP, Brinell 18, Bullet OAL .911 +/-, Hi-Tek 2-Extreme Coating"
+      },
+      {
+        "source": "mapping-of-the-maker-wording-to-construction-fields",
+        "kind": "derived",
+        "fields": ["construction.unmapped"]
+      }
+    ]
+  }
+}

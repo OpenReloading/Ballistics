@@ -1,0 +1,56 @@
+{
+  "id": "hammer-224-cal-70gr-hammer-hunter",
+  "manufacturer": "hammer",
+  "productNumber": "5781",
+  "name": ".224 Cal-70gr Hammer Hunter®",
+  "productLine": "Hammer Hunter",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69,
+    "raw": ".224"
+  },
+  "mass": {
+    "value": 4.536,
+    "raw": "70 gr"
+  },
+  "length": {
+    "value": 25.91,
+    "raw": "Bullet length is 1.02″"
+  },
+  "noseLength": {
+    "value": 11.87,
+    "raw": "Nose length is .4672″"
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.3,
+      "note": "Hammer Bullets: \"G1-BC= .300 calculated from shot drops\" (calculated from shot drops)."
+    }
+  ],
+  "slowestTwist": {
+    "value": 203.2,
+    "raw": "Recommended minimum twist rate is 1-8″"
+  },
+  "note": "Recommended use: Big Game Hunting (deer, hogs, etc.) The product page also says: \"Run this 70gr Hammer Hunter™ in your rifles with 1-8″ barrel twist or faster. Make sure you check your barrel twist since most rifles are not this fast unless they are wearing a custom barrel. This bullet tested very well on several Oklahoma white tail deer.\"",
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "hammer-bullets-store-woocommerce-store-api",
+        "url": "https://hammerbullets.com/wp-json/wc/store/v1/products?per_page=100&page=3",
+        "retrieved": "2026-10-08",
+        "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "noseLength",
+          "ballisticCoefficients",
+          "slowestTwist"
+        ],
+        "note": "https://hammerbullets.com/product/224-cal-70gr-hammer-hunter/: Recommended minimum twist rate is 1-8″ | Bullet length is 1.02″ | Nose length is .4672″ | Bullet weight is 70gr | Recommended use: Big Game Hunting (deer, hogs, etc.) | G1-BC= .300 calculated from shot drops"
+      }
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "cutting-edge-dgsc-g155",
+  "manufacturer": "cutting-edge",
+  "productNumber": "DGSC G155",
+  "name": "DGSC G155 (Safari Raptor, Solid & Lever+, 155 gr)",
+  "productLine": "Safari Raptor, Solid & Lever+",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.706,
+    "raw": ".264"
+  },
+  "mass": {
+    "value": 10.044,
+    "raw": "155 gr"
+  },
+  "length": {
+    "value": 34.85,
+    "raw": "1.372\""
+  },
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "cutting-edge-bullets-technical-data-sheets-2026",
+        "url": "https://cdn.shopify.com/s/files/1/0838/7185/8986/files/TechDataSheets2026.pdf",
+        "page": "9",
+        "retrieved": "2026-10-08",
+        "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
+        "fields": ["diameter", "mass", "length"],
+        "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .264, Grains 155, Part Number DGSC G155, OAL 1.372\", Bullet Projection .905\""
+      }
+    ]
+  },
+  "note": "Bullet projection printed: .905\"."
+}
