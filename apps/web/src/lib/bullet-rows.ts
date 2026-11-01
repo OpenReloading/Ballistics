@@ -3,7 +3,6 @@ import { fold, score, searchKey, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
-import { present } from './directory.ts'
 import { inchText, kilogramsPerGrain, type UnitSystem } from './units.ts'
 
 /** A catalogue bullet of the list: the summary with the name of its manufacturer. */
@@ -125,71 +124,6 @@ export function bulletBallisticCoefficient(
   return shown && (other ? { ...shown, other } : shown)
 }
 
-/** Sort key of the BC column: the drag model first (G1, then G7), then the value. */
-export function bulletBallisticCoefficientSort(
-  b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>,
-) {
-  const bc = bulletBallisticCoefficient(b)
-  if (!bc) return
-  // BCs lie below 10 lb/in²
-  return bc.model === 'G1' ? bc.value : 10 + bc.value
-}
-
 /** A BC as the list shows it: "0.264 G7". */
 export const ballisticCoefficientText = (bc: BallisticCoefficient) =>
   `${formatNumber(bc.value, 3)} ${bc.model}`
-
-/** A bullet item as one array: the list page's props carry no key names. */
-export type PackedBullet = [
-  string,
-  string,
-  string,
-  string,
-  number | null,
-  number,
-  number | null,
-  number | null,
-  number | null,
-  string[] | null,
-]
-
-export const packBullets = (rows: readonly BulletItem[]): PackedBullet[] =>
-  rows.map((b) => [
-    b.id,
-    b.manufacturer,
-    b.manufacturerName,
-    b.name,
-    b.diameter,
-    b.mass,
-    b.length,
-    b.ballisticCoefficientG1,
-    b.ballisticCoefficientG7,
-    b.manufacturerAliases ?? null,
-  ])
-
-export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
-  rows.map(
-    ([
-      id,
-      manufacturer,
-      manufacturerName,
-      name,
-      diameter,
-      mass,
-      length,
-      ballisticCoefficientG1,
-      ballisticCoefficientG7,
-      manufacturerAliases,
-    ]) => ({
-      id,
-      manufacturer,
-      manufacturerName,
-      name,
-      diameter,
-      mass,
-      length,
-      ballisticCoefficientG1,
-      ballisticCoefficientG7,
-      ...present({ manufacturerAliases }),
-    }),
-  )
