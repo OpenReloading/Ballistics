@@ -62,6 +62,7 @@ import { confirmDialog, offerUndo } from './confirm.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
+import { LogSummary } from './shooting-log-summary.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
@@ -77,6 +78,8 @@ const ownRecordLine = msg(
 
 /** What the browser holds for the log: its entries, the firearms and the saved loads. */
 interface LogData {
+  /** Every valid record of the browser, for the summary's loads and cartridge designs. */
+  records: UserRecord[]
   entries: ShootingLogRecord[]
   firearms: FirearmRecord[]
   loads: LoadRecord[]
@@ -353,6 +356,7 @@ function LogSheet({
 async function readLog(): Promise<LogData> {
   const { records } = await storedRecords()
   return {
+    records,
     entries: logEntries(records),
     firearms: records
       .filter((r): r is FirearmRecord => r.kind === 'firearm')
@@ -684,7 +688,7 @@ function useLogData() {
       (d) => read === reads.current && setData(d),
       (e) => {
         if (read !== reads.current) return
-        setData({ entries: [], firearms: [], loads: [] })
+        setData({ records: [], entries: [], firearms: [], loads: [] })
         setReadError(errorText(e))
       },
     )
@@ -964,6 +968,15 @@ export function ShootingLog() {
           />
         </section>
       </div>
+      {data && (
+        <LogSummary
+          entries={data.entries}
+          records={data.records}
+          years={logYears(data.entries)}
+          year={lf.row.year}
+          firearmName={names.firearm}
+        />
+      )}
       <LogSheet entries={shown} names={names} period={periodText(t, lf.filter, lf.firearmName)} />
     </>
   )
