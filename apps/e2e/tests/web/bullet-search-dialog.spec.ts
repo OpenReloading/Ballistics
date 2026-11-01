@@ -43,11 +43,17 @@ test('the keyboard finds, highlights and chooses a bullet', async ({ page }) => 
   )
 
   await page.keyboard.press('Enter')
+  // the reopened dialog shows the list of the last search until its own (all bullets) renders, and a new list
+  // highlights its first row: the keys go to the new list only
+  await expect.poll(() => options.count()).toBeGreaterThan(2)
   await box(page).fill('demo')
   await expect(options).toHaveCount(2)
-  await page.keyboard.press('ArrowDown')
-  // Enter chooses the highlighted option: only once ArrowDown has moved the highlight
-  await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true')
+  // the new list's reset to its first row can land after an early ArrowDown (#884); the highlight stops at the
+  // last row, so ArrowDown again until the second row is highlighted, then Enter chooses it
+  await expect(async () => {
+    await page.keyboard.press('ArrowDown')
+    await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true', { timeout: 1_000 })
+  }).toPass()
   await page.keyboard.press('Enter')
   await expect(dialog(page)).toBeHidden()
   await expect(loadForm(page).getByRole('combobox', { name: /^Search bullets/ })).toHaveAttribute(
