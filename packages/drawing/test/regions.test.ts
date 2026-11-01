@@ -93,7 +93,7 @@ describe('regions', () => {
       count += checkDifferences(id, values, conflicts)
       checkBothSides(id, values)
     }
-    expect(count).toBe(2576)
+    expect(count).toBe(2581)
     // Reviewed: the 6 rim records (chamber R, a minimum, below cartridge R, a maximum), P1 and H2
     // pairs 0.01 to 0.02 mm the wrong way round, and 5,7 mm UCC Voere (table XI, not drawn)
     expect(conflicts).toEqual([
