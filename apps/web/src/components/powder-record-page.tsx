@@ -36,14 +36,15 @@ import { VivacityPanel } from './vivacity-panel.tsx'
 function place(
   list: PowderSummary[],
   names: ManufacturerNames,
-  id: string,
+  p: Powder,
 ): BurnRatePlace | undefined {
   const rows = orderPowders(withManufacturerName(list, names))
-  const n = neighbours(rows, id)
+  const n = neighbours(rows, p.id)
   if (!n) return undefined
   const link = (r: (typeof n.faster)[number]): Neighbour => ({
     id: r.id,
-    label: productLabel(r),
+    // a neighbour of the same manufacturer by its name alone: the page names the manufacturer
+    label: r.manufacturer === p.manufacturer ? r.name : productLabel(r),
     order: r.burnRateOrder ?? 0,
     rate: r.meanVivacity,
   })
@@ -87,12 +88,15 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
   return (
     <RecordPage
       title={productLabel(p, names)}
+      // a phone: the name alone, the strip's first card names the manufacturer
+      short={p.name}
       // form and base are cards of the strip
       badges={[]}
       className="record-chart"
       compare={isFitted(curve) ? `/powders/burn-rates?add=${encodeURIComponent(p.id)}` : undefined}
       workbench={workbenchHref('powder', p.id)}
       provenance={p.provenance}
+      kind="powders"
       strip={
         <FieldStrip
           items={powderStrip(p, placed, manufacturerName)}
@@ -137,7 +141,7 @@ export function PowderRecordPage({ id, name }: { id: string; name: string }) {
       extras={async (p, signal) => {
         const names = await fetchManufacturerNames()
         const placed = isFitted(classifyPowder(p, names))
-          ? place(await fetchPowderList(signal), names, p.id)
+          ? place(await fetchPowderList(signal), names, p)
           : undefined
         const cartridgeNames = await cartridgeNamesOf(p.listedCartridges ?? [], signal)
         return { names, placed, cartridgeNames }

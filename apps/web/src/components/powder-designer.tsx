@@ -31,7 +31,6 @@ import {
   type PowderSpec,
   type Problem,
   powderSpecs,
-  problemLabel,
   propellantBases,
   provenanceKinds,
   reduce,
@@ -68,10 +67,11 @@ const provenanceText: Record<(typeof provenanceKinds)[number], Marked> = {
   computed: msg('Computed by a model'),
 }
 
+/** The fitted parameters' checkboxes: named apart from the fields of the same values. */
 const fittedText: Record<(typeof fittedKeys)[number], Marked> = {
-  vivacity: msg('Vivacity'),
-  energy: msg('Specific energy'),
-  'form.a': msg('Form a'),
+  vivacity: msg('Vivacity (moved by the fit)'),
+  energy: msg('Specific energy (moved by the fit)'),
+  'form.a': msg('Form a (moved by the fit)'),
 }
 
 /** The thermochemistry's ranges: the name in the record and the label of its row. */
@@ -144,14 +144,10 @@ function RecordPanel({
         {status}
       </Text>
       {problems.length > 0 && edited ? (
-        <Message severity="warning" title={t('The record does not pass the powder schema yet')}>
+        <Message severity="warning" title={t('Still needed for a powder record')}>
           <ul className="powder-problems">
             {problems.map((p) => (
-              <li key={`${p.key ?? ''}${p.message}`}>
-                {p.key
-                  ? t('{part}: {message}', { part: problemLabel(p.key, t), message: p.message })
-                  : p.message}
-              </li>
+              <li key={`${p.key ?? ''}${p.message}`}>{p.message}</li>
             ))}
           </ul>
         </Message>
@@ -234,13 +230,20 @@ export function PowderDesigner() {
 
   const field = (spec: PowderSpec, text: 'text' | 'none' = 'text') => {
     const value = fieldAt(design, spec.key)
+    const help = [
+      spec.help && specText(t, spec.help),
+      // an empty extreme of a thermochemistry range is built as its value (`powderOf`)
+      /^thermochemistry\..+\.(min|max)$/.test(spec.key) && t('Empty: same as Value.'),
+    ]
+      .filter(Boolean)
+      .join(' ')
     return (
       <DesignerField
         key={spec.key}
         spec={spec}
         system={system}
         value={value}
-        help={spec.help ? specText(t, spec.help) : ''}
+        help={help}
         changed={false}
         error={fieldError(spec, value, system, t) ?? shown(spec.key)}
         unit={text}
@@ -421,7 +424,7 @@ export function PowderDesigner() {
       title: t('Burn law (interior model)'),
       content: (
         <>
-          <p className="note">
+          <p className="note powder-fit-link">
             <Link href={tuneHref}>{t('Fit a powder from chronograph strings')}</Link>
           </p>
           <div className="prop-grid designer-grid">

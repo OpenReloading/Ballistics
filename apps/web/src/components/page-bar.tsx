@@ -83,6 +83,36 @@ const withFold = (fold: ReactNode, actions: ReactNode) => (
   </>
 )
 
+/** The bar's h1; `short` in its place below 48em, `hydrated` the page's e2e ready signal. */
+function PageTitle({
+  title,
+  short,
+  hidden,
+  hydrated,
+}: {
+  title: string
+  short: string | undefined
+  hidden: boolean
+  hydrated: boolean
+}) {
+  return (
+    <h1
+      title={title}
+      className={hidden ? 'visually-hidden' : undefined}
+      data-hydrated={hydrated || undefined}
+    >
+      {short && short !== title ? (
+        <>
+          <span className="page-title-long">{title}</span>
+          <span className="page-title-short">{short}</span>
+        </>
+      ) : (
+        title
+      )}
+    </h1>
+  )
+}
+
 /**
  * The page's top bar: its only
  * `h1`, what follows the title (the open load, a record's badges), one status line and the page's
@@ -93,6 +123,7 @@ const withFold = (fold: ReactNode, actions: ReactNode) => (
 export function PageBar({
   title: given,
   translated,
+  short,
   after,
   status,
   actions,
@@ -104,6 +135,11 @@ export function PageBar({
 }: {
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
   titleHidden?: boolean
+  /**
+   * The h1 below 48em, where the bar has room for little more than a name: a powder's name
+   * without its manufacturer, which the first card of the strip names.
+   */
+  short?: string | undefined
   /** Beside the title: the workbench's open loads, a record's standard badges. */
   after?: ReactNode
   /** The status line's own content, such as a list's count. */
@@ -174,13 +210,7 @@ export function PageBar({
     >
       <div className="page-bar-title">
         {/* `data-hydrated`: the e2e ready signal of the page, which hydrates after the layout */}
-        <h1
-          title={title}
-          className={titleHidden ? 'visually-hidden' : undefined}
-          data-hydrated={mounted || undefined}
-        >
-          {title}
-        </h1>
+        <PageTitle title={title} short={short} hidden={titleHidden} hydrated={mounted} />
         {after}
       </div>
       {/* the line ends in an ellipsis where it is too long: its whole text on hover, focus and tap */}

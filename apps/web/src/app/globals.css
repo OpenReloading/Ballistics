@@ -1792,6 +1792,11 @@ td.nowrap {
   margin-top: 0.25rem;
 }
 
+.powder-designer .powder-fit-link {
+  margin: 0 0 0.25rem;
+  font-size: var(--mantine-font-size-sm);
+}
+
 .powder-designer .designer-checks {
   display: grid;
   margin: 0;
@@ -10372,6 +10377,21 @@ main .page-bar h1 {
 
 .page-bar-title > :not(h1) {
   flex: none;
+}
+
+/* a phone: the short title alone (page-bar.tsx `short`), the long one from 48em */
+.page-title-short {
+  display: none;
+}
+
+@media screen and (max-width: 47.99em) {
+  .page-title-long {
+    display: none;
+  }
+
+  .page-title-short {
+    display: inline;
+  }
 }
 
 .page-bar-status {

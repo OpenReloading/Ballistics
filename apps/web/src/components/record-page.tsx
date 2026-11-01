@@ -19,6 +19,7 @@ import { MutedBadge } from './standard-badge.tsx'
  */
 export function RecordPage({
   title,
+  short,
   badges,
   className,
   compare,
@@ -31,9 +32,12 @@ export function RecordPage({
   values,
   side,
   provenance,
+  kind,
   sourceFacts,
 }: {
   title: string
+  /** The title on a phone, where the bar has room for the name alone (`PageBar`). */
+  short?: string | undefined
   /** Facts beside the title (line, caliber, product number), not repeated in the tables. */
   badges: Wording[]
   /** A layout of the grid, such as `record-chart` (powder) or `cartridge-record`. */
@@ -57,6 +61,8 @@ export function RecordPage({
   /** The side column: coefficients, notes. */
   side?: ReactNode | undefined
   provenance: Provenance
+  /** The record kind (`powders`), whose field labels name the fields a source covers. */
+  kind?: string | undefined
   /** Over the sources table: facts of the record's standard (the cartridge record's table, date, country and method). */
   sourceFacts?: ReactNode
 }) {
@@ -66,6 +72,7 @@ export function RecordPage({
     <div className={`record record-frame${className ? ` ${className}` : ''}`}>
       <PageBar
         title={title}
+        short={short}
         after={
           badgeNodes ??
           facts.map((b, i) => (
@@ -105,7 +112,7 @@ export function RecordPage({
           className="record-sources"
         >
           {sourceFacts}
-          <Sources provenance={provenance} />
+          <Sources provenance={provenance} kind={kind} />
         </Panel>
       </div>
     </div>
