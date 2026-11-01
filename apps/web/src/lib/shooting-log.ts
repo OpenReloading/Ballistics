@@ -37,7 +37,7 @@ export const entryName = (e: ShootingLogEntry, firearmName: string | undefined) 
   [e.date, firearmName || e.place].filter(Boolean).join(' ').slice(0, 200)
 
 /** The calendar year of an entry, as text. */
-export const entryYear = (e: Pick<ShootingLogEntry, 'date'>) => e.date.slice(0, 4)
+const entryYear = (e: Pick<ShootingLogEntry, 'date'>) => e.date.slice(0, 4)
 
 /** The years the entries fall in, latest first. */
 export const logYears = (entries: readonly ShootingLogRecord[]) =>
