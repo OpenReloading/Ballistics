@@ -28,7 +28,9 @@ import {
 } from '../lib/powder-compare.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, shownLength, type UnitSystem } from '../lib/units.ts'
+import { powderTableCsv, restoredPowderTab, savedPowderTab } from './powder-csv.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
+import { TableCsv } from './table-csv.tsx'
 import {
   type CompareMessage,
   type CompareRow,
@@ -73,8 +75,6 @@ const rangeColumn: Column = {
 }
 const columnsFor = (target: boolean) =>
   target ? columns.map((c) => (c.key === 'peak' ? rangeColumn : c)) : columns
-
-const noFilters: PowderFilters = { manufacturerName: '', base: '', form: '' }
 
 const nextSort = (
   key: string,
@@ -313,8 +313,6 @@ const Rows = memo(function Rows({
 const isFillValid = (fill: number | string) =>
   typeof fill === 'number' && fill >= caseFillPercentRange.min && fill <= caseFillPercentRange.max
 
-const isFiltering = (f: PowderFilters) => Boolean(f.manufacturerName || f.base || f.form)
-
 /** The mode the chosen charge kind and its valid value give; the typed charge otherwise. */
 function modeOf(
   kind: CompareMode['kind'],
@@ -515,12 +513,15 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const { t } = useTranslation()
   const { loadRequest, powder, powderDesign, pickPowder, applyCharge, fields, cartridge } =
     useLoad()
-  const [kind, setKind] = useState<CompareMode['kind']>('typed')
-  const [fill, setFill] = useState<number | string>(caseFillPercentRange.initial)
+  const { powderTab } = useLoad()
+  // the mode and the filters the load was saved with (`key` on this tab: an opened load starts afresh)
+  const [first] = useState(() => restoredPowderTab(powderTab.saved, system))
+  const [kind, setKind] = useState<CompareMode['kind']>(first.kind)
+  const [fill, setFill] = useState<number | string>(first.fill)
   const fillValid = isFillValid(fill)
   // the target of the charge target dialog: a peak pressure, or a share of the cartridge's CIP Pmax
-  const [targetText, setTargetText] = useState<number | string>('')
-  const [percent, setPercent] = useState(false)
+  const [targetText, setTargetText] = useState<number | string>(first.targetText)
+  const [percent, setPercent] = useState(first.percent)
   const asPercent = percent && cartridge !== undefined
   const unit = targetUnit('peakPressure', system, asPercent)
   // the reason shows for a typed value, and for an empty field once it was left
@@ -537,9 +538,11 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const study = usePowderCompare(loadRequest, mode)
   // another powder picked mid-run writes its parameters into the fields the later rows read
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
-  const [filters, setFilters] = useState(noFilters)
-  // Compute empties the rows and with them the facets the filters name
-  if (study.rows.length === 0 && isFiltering(filters)) setFilters(noFilters)
+  const [filters, setFilters] = useState(first.filters)
+  // the load keeps the mode and the filters; a filter stays while Compute fills the rows again
+  const saved = savedPowderTab({ kind, fill, targetText, percent, filters }, system)
+  const save = powderTab.set
+  useEffect(() => save(saved), [save, saved])
   const [sort, setSort] = useState<ColumnSort | undefined>()
   // the columns follow the mode the rows were computed for, not the one chosen since
   const target = study.mode?.kind === 'target'
@@ -558,6 +561,17 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const manufacturers = useMemo(() => distinctValues(study.rows, 'manufacturerName'), [study.rows])
   const bases = useMemo(() => distinctValues(study.rows, 'base'), [study.rows])
   const forms = useMemo(() => distinctValues(study.rows, 'form'), [study.rows])
+  const reason = (r: CompareRow) =>
+    r.refusal
+      ? refusalText(
+          r.refusal,
+          'peakPressure',
+          system,
+          study.mode?.kind === 'target' && study.mode.percent,
+          t,
+        )
+      : reasonText(r.reason ?? '', t)
+  const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
   const failed = study.rows.filter((r) => !r.values).length
   // the rows were computed for another load or charge than the fields hold now
@@ -592,7 +606,8 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     <FilterSelect
       label={label}
       searchable={key === 'manufacturerName'}
-      data={data}
+      // a filter of the saved load shows before Compute lists its facets
+      data={filters[key] && !data.includes(filters[key]) ? [filters[key], ...data] : data}
       value={filters[key]}
       onChange={(v) => setFilters((f) => ({ ...f, [key]: v }))}
     />
@@ -649,6 +664,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
         {select('manufacturerName', t('Manufacturer'), manufacturers)}
         {select('base', t('Base'), bases)}
         {select('form', t('Form'), forms)}
+        <TableCsv csv={csv} disabled={shown.length === 0} />
       </div>
       <p className="barrel-status" aria-hidden="true">
         <span className="barrel-status-text" title={text}>

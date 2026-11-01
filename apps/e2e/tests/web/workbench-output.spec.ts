@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
+import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
 import { storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
@@ -138,4 +139,89 @@ test('in German the pressure range keeps its gap and the Powder card head its me
   if (!box || !menu) throw new Error('no powder card head')
   expect(menu.x + menu.width).toBeLessThanOrEqual(box.x + box.width)
   await expect(page.getByPlaceholder('Zündhütchen', { exact: true })).toBeVisible()
+})
+
+/** A tab of the results: on the phone behind the Results tab, maybe in the More menu. */
+async function openTab(page: Page, name: string) {
+  const direct = page.getByRole('tab', { name, exact: true })
+  const more = page.getByRole('button', { name: 'More', exact: true })
+  await expect(direct.or(more).first()).toBeVisible()
+  if (await direct.isVisible()) await direct.click()
+  else {
+    await more.click()
+    await page.getByRole('menuitem', { name }).click()
+  }
+  await expect(page.getByRole('tabpanel', { name })).toBeVisible()
+  return page.getByRole('tabpanel', { name })
+}
+
+test('the Powders tab copies its table as CSV and keeps its mode and filters with the saved load', async ({
+  page,
+}) => {
+  test.setTimeout(240_000)
+  await page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await runExample(page)
+  let tab = await openTab(page, 'Powders')
+  await tab
+    .locator('label')
+    .filter({ hasText: /^Case fill$/ })
+    .click()
+  await tab.getByRole('textbox', { name: 'Case fill' }).fill('90')
+  await tab.getByRole('button', { name: 'Compute' }).click()
+  // every powder of the catalogue runs, three at a time
+  await expect(tab.getByRole('status')).toHaveText(/^\d+ powders, \d+ not computed\.$/, {
+    timeout: 150_000,
+  })
+  const [file] = await Promise.all([
+    page.waitForEvent('download'),
+    tab.getByRole('button', { name: 'Download CSV' }).click(),
+  ])
+  const csv = await readFile(await file.path(), 'utf8')
+  expect(csv.split('\n')[0]).toBe(
+    'Powder,Charge (gr),Flags,Peak pressure (psi),Percent of maximum (%),Muzzle velocity (ft/s),Case fill (%),Burnt at the muzzle (%),Burnout (in)',
+  )
+  const maker = tab.getByRole('combobox', { name: 'Manufacturer' })
+  await maker.click()
+  await maker.press('ArrowDown')
+  await maker.press('Enter')
+  const name = await maker.inputValue()
+  expect(name).not.toBe('')
+
+  await (await barButton(page, 'Save')).click()
+  const stored = () =>
+    page.evaluate(async () => {
+      const db: IDBDatabase = await new Promise((ok, no) => {
+        const r = indexedDB.open('openreloading-user-data')
+        r.onsuccess = () => ok(r.result)
+        r.onerror = () => no(r.error)
+      })
+      const all: { kind: string; name: string; data: { analysis?: { powders?: unknown } } }[] =
+        await new Promise((ok, no) => {
+          const r = db.transaction('records').objectStore('records').getAll()
+          r.onsuccess = () => ok(r.result)
+          r.onerror = () => no(r.error)
+        })
+      db.close()
+      return all.find((r) => r.kind === 'load')
+    })
+  await expect
+    .poll(async () => (await stored())?.data.analysis?.powders)
+    .toEqual({ mode: 'fill', fill: 90, manufacturer: name })
+  const saved = (await stored())?.name ?? ''
+
+  await page.goto('/workbench')
+  await (await barButton(page, 'Open')).click()
+  await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
+  await page.getByRole('button', { name: saved, exact: true }).click()
+  await loadForm(page)
+    .getByLabel(/^Charge mass/)
+    .press('Control+Enter')
+  tab = await openTab(page, 'Powders')
+  await expect(tab.getByRole('radio', { name: 'Case fill' })).toBeChecked()
+  await expect(tab.getByRole('textbox', { name: 'Case fill' })).toHaveValue('90 %')
+  await expect(tab.getByRole('combobox', { name: 'Manufacturer' })).toHaveValue(name)
 })

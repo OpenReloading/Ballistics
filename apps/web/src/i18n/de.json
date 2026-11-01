@@ -4194,5 +4194,8 @@
   "Results (CSV)": "Ergebnisse (CSV)",
   "Barrel length study, main step (simulation)": "Studie zur Lauflänge, Hauptstufe (Simulation)",
   "Barrel length study": "Studie zur Lauflänge",
-  "Report sections": "Abschnitte des Berichts"
+  "Report sections": "Abschnitte des Berichts",
+  "Download CSV": "CSV herunterladen",
+  "Pressure range, low": "Druckbereich, unten",
+  "Pressure range, high": "Druckbereich, oben"
 }

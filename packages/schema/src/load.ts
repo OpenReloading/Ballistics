@@ -130,6 +130,38 @@ export const loadAnalysis = z.object({
     ])
     .describe('The ladder of the load: step count, step size and direction.')
     .optional(),
+  powders: z
+    .strictObject({
+      mode: z
+        .enum(['typed', 'fill', 'target'])
+        .describe(
+          'The charge each powder is run at: the typed charge, a case fill, or the charge found for a target peak pressure.',
+        ),
+      fill: z
+        .number()
+        .min(10)
+        .max(120)
+        .describe('Case fill of the `fill` mode, percent of the free volume behind the bullet.')
+        .optional(),
+      targetPressure: z
+        .number()
+        .positive()
+        .describe('Target peak pressure of the `target` mode, bar.')
+        .optional(),
+      targetPercent: z
+        .number()
+        .positive()
+        .describe("Target peak pressure of the `target` mode, percent of the cartridge's CIP Pmax.")
+        .optional(),
+      manufacturer: text(200)
+        .min(1)
+        .describe('Manufacturer filter: the name the list shows.')
+        .optional(),
+      base: text(200).min(1).describe('Base filter: the base the list shows.').optional(),
+      form: text(200).min(1).describe('Grain form filter: the form the list shows.').optional(),
+    })
+    .describe("The Powders tab's charge mode and filters, kept with the load.")
+    .optional(),
 })
 
 const component = {

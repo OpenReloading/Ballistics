@@ -400,7 +400,7 @@ _Avoid_: twistLength
 A record of kind `primers`: a primer product as its manufacturer sells it, with `manufacturer`, `name`, `productNumber`, `size` (`small-rifle`, `large-rifle`, `small-pistol`, `large-pistol` or `shotshell`), `magnum`, `cup`, `compound` (`lead-styphnate` or `lead-free`), `intendedUse` and `performance`. Served by `GET /v1/primers` and `GET /v1/primers/{id}`, named by a load's `primer.record`. No value of it enters a calculation.
 
 **Load**:
-One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer` (`record`, a `catalogue:` primer reference, and `lot`), `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold a `manufacturer` reference and `lot`, the bullet `model` and `bulletMass`, and the powder `name`.
+One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer` (`record`, a `catalogue:` primer reference, and `lot`), `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, `ladder`, and `powders`, the charge mode and filters of the Powders tab) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold a `manufacturer` reference and `lot`, the bullet `model` and `bulletMass`, and the powder `name`.
 
 **Lot**:
 `lot`: lot number of a load component as printed on the package.
@@ -661,6 +661,8 @@ _Avoid_: si
 `notes`: free text of a firearm; a load's is `note`. On a target sheet the list of sheet notes.
 
 **Ladder**:
+`powders`: on a load, `analysis.powders`: the Powders tab's `mode` (`typed`, `fill` or `target`), `fill` (percent of the free volume), `targetPressure` (bar) or `targetPercent` (percent of the CIP Pmax), and the filters `manufacturer`, `base` and `form`.
+
 `ladder`: a series of runs around or beyond a base value. On a load, `analysis.ladder`: `kind` (`charge`, `seating` or `temperature`), `stepCount` (2 to 21), `step` (g for a charge ladder, mm for seating, K for temperature) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
 _Avoid_: `step`, `steps` (of a ladder)
 
