@@ -4,6 +4,7 @@ import { basename, dirname, join, resolve } from 'node:path'
 import {
   compareKeys,
   type PublishedLoads,
+  parseRef,
   publishedLoads,
   sourceRecord,
 } from '@open-reloading/schema'
@@ -14,7 +15,7 @@ import {
   withLoadIds,
 } from './published-load-merge.ts'
 import { readKind } from './read-kind.ts'
-import { resolveRecord, sourceIndex } from './sources.ts'
+import { resolveRecord, type SourceIndex, sourceIndex } from './sources.ts'
 
 const repository = join(import.meta.dirname, '..', '..', '..')
 
@@ -40,15 +41,20 @@ export function parseMergeArgs(
     (a) => option(a) && !['--accept', '--accept-all', '--dry-run'].includes(a),
   )
   if (unknown !== undefined) return { error: `unknown option ${unknown}\n${usage}` }
-  // the ids follow --accept up to the next option
-  const at = args.indexOf('--accept')
-  const after = at < 0 ? [] : args.slice(at + 1)
-  const end = after.findIndex(option)
-  const ids = end < 0 ? after : after.slice(0, end)
-  const folders = args.filter((a, i) => !option(a) && (at < 0 || i < at || i > at + ids.length))
+  // the ids follow each --accept up to the next option
+  const ids: string[] = []
+  const folders: string[] = []
+  let accepting = false
+  for (const a of args) {
+    if (option(a)) accepting = a === '--accept'
+    else (accepting ? ids : folders).push(a)
+  }
   const all = args.includes('--accept-all')
-  if (folders.length !== 1) return { error: `one incoming folder\n${usage}` }
-  if (all && at >= 0) return { error: `--accept and --accept-all exclude each other\n${usage}` }
+  if (folders.length !== 1) return { error: `one incoming folder, before the options\n${usage}` }
+  if (args.includes('--accept') && ids.length === 0)
+    return { error: `--accept needs the ids of the loads\n${usage}` }
+  if (all && ids.length > 0)
+    return { error: `--accept and --accept-all exclude each other\n${usage}` }
   return {
     incoming: resolve(cwd, folders[0] as string),
     records,
@@ -99,14 +105,33 @@ function incomingFiles(folder: string) {
     )
 }
 
+/** The rules of a file's place: its folder is its cartridge, its name its id, the maker's table. */
+function placement(path: string, file: PublishedLoads) {
+  const found: string[] = []
+  const folder = basename(dirname(path))
+  if ((parseRef(file.cartridge)?.id ?? file.cartridge) !== folder)
+    found.push(`${path}: cartridge "${file.cartridge}" is not the folder "${folder}"`)
+  if (file.id !== basename(path, '.json'))
+    found.push(`${path}: id "${file.id}" does not match the file name`)
+  const name = file.producedBy === 'customer' ? `${file.maker}-customer` : file.maker
+  if (file.id !== name)
+    found.push(`${path}: a table produced by the ${file.producedBy} is named "${name}"`)
+  return found
+}
+
+/** A source entry as it compares: a reference resolved to its source record. */
+const resolving = (sources: SourceIndex) => (entry: unknown) =>
+  (
+    resolveRecord({ provenance: { sources: [entry] } }, sources, 'source', []) as {
+      provenance: { sources: unknown[] }
+    }
+  ).provenance.sources[0]
+
 /**
  * Reads and checks every incoming file against `publishedLoads`, its ids set by the id rule and
  * its source references resolved from the records' sources. Nothing is merged when one fails.
  */
-function readIncoming(options: MergeOptions, errors: string[]) {
-  const sources = sourceIndex(
-    readKind([options.records], 'sources', sourceRecord, { errors, optional: true }),
-  )
+function readIncoming(options: MergeOptions, sources: SourceIndex, errors: string[]) {
   const read: { path: string; file: IncomingLoads }[] = []
   for (const path of incomingFiles(options.incoming)) {
     let json: IncomingLoads
@@ -127,8 +152,7 @@ function readIncoming(options: MergeOptions, errors: string[]) {
     if (!parsed.success)
       for (const issue of parsed.error.issues)
         errors.push(`${path}: ${issue.path.join('.') || '(root)'}: ${issue.message}`)
-    else if (json.id !== basename(path, '.json'))
-      errors.push(`${path}: id "${json.id}" does not match the file name`)
+    else errors.push(...placement(path, parsed.data))
     if (errors.length === before) read.push({ path, file: json })
   }
   return read
@@ -141,7 +165,10 @@ function readIncoming(options: MergeOptions, errors: string[]) {
  */
 export function mergeLoadFolder(options: MergeOptions): MergeRun {
   const errors: string[] = []
-  const read = readIncoming(options, errors)
+  const sources = sourceIndex(
+    readKind([options.records], 'sources', sourceRecord, { errors, optional: true }),
+  )
+  const read = readIncoming(options, sources, errors)
   if (errors.length > 0) return { files: [], errors }
   const files: FileOutcome[] = read.map(({ path, file }) => {
     const cartridge = basename(dirname(path))
@@ -151,7 +178,7 @@ export function mergeLoadFolder(options: MergeOptions): MergeRun {
     const existing = existsSync(target)
       ? (JSON.parse(readFileSync(target, 'utf8')) as PublishedLoads)
       : undefined
-    const merged = mergePublishedLoads(existing, file, options.accept)
+    const merged = mergePublishedLoads(existing, file, options.accept, resolving(sources))
     if (merged.written && !options.dryRun) {
       mkdirSync(dirname(target), { recursive: true })
       writeFileSync(target, formatRecord(merged.file))

@@ -187,6 +187,15 @@ describe('mergePublishedLoads', () => {
     expect(file.cartridgeName).toBe('Test cartridge')
   })
 
+  it('maps the source a load of the incoming file cites to the merged sources', () => {
+    const c = load('FMJ', 'Powder C', '27.0', { source: 1 })
+    const incoming = table([a, c], 2026)
+    incoming.provenance.sources = [edition(2025), edition(2026)]
+    const { file } = mergePublishedLoads(first, incoming, new Set())
+    expect(file.provenance.sources).toEqual([edition(2025), edition(2026)])
+    expect(defined(file.loads.find((l) => l.id === loadId(first, c))).source).toBe(1)
+  })
+
   it('replaces an id the incoming file carries', () => {
     const { file } = mergePublishedLoads(undefined, table([{ ...a, id: 'carried' }]), new Set())
     expect(file.loads.map((l) => l.id)).toEqual([loadId(file, a)])
@@ -233,7 +242,19 @@ describe('npm run loads:merge', () => {
       dryRun: true,
     })
     expect(parseMergeArgs(['/in', '--accept-all'], '/w', '/r')).toMatchObject({ accept: 'all' })
-    for (const args of [[], ['a', 'b'], ['a', '--nope'], ['a', '--accept-all', '--accept', 'x']])
+    expect(
+      parseMergeArgs(['in', '--accept', 'x', '--dry-run', '--accept', 'y'], '/w', '/r'),
+    ).toMatchObject({
+      accept: new Set(['x', 'y']),
+    })
+    for (const args of [
+      [],
+      ['a', 'b'],
+      ['a', '--nope'],
+      ['a', '--accept-all', '--accept', 'x'],
+      ['a', '--accept', '--dry-run'],
+      ['--accept', 'x', 'a'],
+    ])
       expect(parseMergeArgs(args, '/w', '/r')).toHaveProperty('error')
   })
 
@@ -345,6 +366,27 @@ describe('npm run loads:merge', () => {
     })
     expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([])
     expect(readRecords(records).errors).toEqual([])
+    // the same source written out in full is the referenced one, not a second source
+    write(incoming, target, table([a, b]))
+    expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([])
+    const merged = JSON.parse(readFileSync(join(records, target), 'utf8')) as PublishedLoads
+    expect(merged.provenance.sources).toEqual([{ source: 'test-table' }])
+    expect(merged.loads).toHaveLength(2)
+    expect(readRecords(records).errors).toEqual([])
+  })
+
+  it('refuses a file that is not in its cartridge folder or not named for its maker', () => {
+    const records = temp()
+    const incoming = temp()
+    write(incoming, 'loads/other-cartridge/test-manufacturer.json', table([a]))
+    write(incoming, 'loads/test-cartridge/test-manufacturer-customer.json', {
+      ...table([a]),
+      id: 'test-manufacturer-customer',
+    })
+    expect(mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false }).errors).toEqual([
+      'loads/other-cartridge/test-manufacturer.json: cartridge "catalogue:test-cartridge" is not the folder "other-cartridge"',
+      'loads/test-cartridge/test-manufacturer-customer.json: a table produced by the maker is named "test-manufacturer"',
+    ])
   })
 
   it('exits 0 on a merge, 1 on schema errors and 2 on a wrong command line', () => {

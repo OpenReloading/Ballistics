@@ -1,6 +1,5 @@
 export * from './coverage.ts'
 export * from './load-tables.ts'
 export * from './plausibility.ts'
-export * from './published-load-merge.ts'
 export * from './published-loads.ts'
 export * from './records.ts'

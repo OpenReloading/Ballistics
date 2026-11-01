@@ -166,11 +166,14 @@ function classify(
  * from {@link withLoadIds}; any id they carry is replaced. The loads come out sorted by id. The
  * file's other fields stay those of the repository; with no file there, the incoming file is
  * the start. `written` is false when the merge leaves the repository file as it is.
+ * `resolveSource` turns a source entry into the form two entries compare in, so a reference to a
+ * source record and the same source written out are one source.
  */
 export function mergePublishedLoads(
   existing: PublishedLoads | undefined,
   incoming: IncomingLoads,
   accept: ReadonlySet<string> | 'all',
+  resolveSource: (source: unknown) => unknown = (source) => source,
 ): MergeResult {
   const loads = withLoadIds(incoming).loads
   const base: PublishedLoads = existing ?? {
@@ -181,7 +184,8 @@ export function mergePublishedLoads(
   const sources = [...base.provenance.sources]
   const sourceIndex = (i: number) => {
     const s = incoming.provenance.sources[i]
-    const at = sources.findIndex((t) => canonical(t) === canonical(s))
+    const key = canonical(resolveSource(s))
+    const at = sources.findIndex((t) => canonical(resolveSource(t)) === key)
     if (at >= 0) return at
     sources.push(s as (typeof sources)[number])
     return sources.length - 1
