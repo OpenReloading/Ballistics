@@ -418,6 +418,26 @@ describe('sampled band', () => {
     expect(text).toContain('500 draws (seed 1)')
     expect(text).toContain('The band covers the input tolerances only, no model error')
   })
+
+  it('says when the volume tolerance is the limit of the range', () => {
+    const result = { maxPressureTime: 1e-4, maxPressureTravel: 0.01 } as InteriorResponse['result']
+    const at = (volumeFraction: number) =>
+      peakFacts(
+        {
+          body: body({
+            result,
+            pressureRange: {
+              ...pressureRange,
+              tolerances: { ...pressureRange.tolerances, volumeFraction },
+            },
+          }),
+        } as Extract<Outcome, { kind: 'ok' }>,
+        presetUnits('metric-grains'),
+        english.t,
+      )
+    expect(at(0.2)).toContain('the limit of the range: the volume estimate can be wider')
+    expect(at(0.01)).not.toContain('the limit of the range')
+  })
 })
 
 describe('in German', () => {

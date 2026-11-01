@@ -158,7 +158,7 @@ import {
   userCartridges,
   userRef,
 } from '../lib/variants.ts'
-import { type InputPanel, type Status, statusText } from '../lib/workbench.ts'
+import { type InputPanel, maxVolumeFraction, type Status, statusText } from '../lib/workbench.ts'
 import {
   type DefaultKey,
   defaultKeys,
@@ -738,9 +738,6 @@ function revertRecordFill(
   }
   return back
 }
-
-/** The API's largest tolerance of the chamber volume (`packages/api/src/compute/interior-schema.ts`). */
-const maxVolumeFraction = 0.2
 
 /** The range tolerance of a chamber volume that still is the approximate default, with its interval: none for a typed or measured one. */
 export function approximateVolumeTolerance(
@@ -2145,6 +2142,8 @@ export function useWorkbenchState() {
       groove?.id === cartridge?.id ? groove?.z : undefined,
       // a compared powder without its own start pressure runs at this default
       suggestions.startPressure?.si,
+      // the range tolerance of an approximate volume, which the body of the rows does not hold
+      volumeTolerance,
     ]
     return {
       body: volumeTolerance ? { ...body, tolerances: { volumeFraction: volumeTolerance } } : body,

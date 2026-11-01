@@ -2119,6 +2119,7 @@
   "vertical Coriolis": "vertikale Coriolis-Kraft",
   "vivacity {value} 1/s, plus and minus {factor} times {sigma}": "Vivacity {value} 1/s, plus und minus {factor} mal {sigma}",
   "volume {value}": "Volumen {value}",
+  "volume {value}, the limit of the range: the volume estimate can be wider": "Volumen {value}, die Grenze des Bereichs: Die Volumenschätzung kann breiter sein",
   "wadcutter": "Wadcutter",
   "wax lube": "Wachsschmierung",
   "white": "weiß",

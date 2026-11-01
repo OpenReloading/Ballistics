@@ -31,7 +31,7 @@ import {
   unitsOf,
   withUnit,
 } from '../lib/units.ts'
-import { bandNotice, pressureLimit, resultBand } from '../lib/workbench.ts'
+import { bandNotice, maxVolumeFraction, pressureLimit, resultBand } from '../lib/workbench.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
 import { NavIcon } from './nav-icons.tsx'
@@ -167,7 +167,11 @@ export function peakFacts(
       : `${formatNumber(tol.temperatureKelvin, 1)} K`
   const covered = [
     t('charge {value}', { value: percentText(tol.chargeFraction) }),
-    t('volume {value}', { value: percentText(tol.volumeFraction) }),
+    tol.volumeFraction >= maxVolumeFraction
+      ? t('volume {value}, the limit of the range: the volume estimate can be wider', {
+          value: percentText(tol.volumeFraction),
+        })
+      : t('volume {value}', { value: percentText(tol.volumeFraction) }),
     ...(tol.massFraction > 0
       ? [t('bullet mass {value}', { value: percentText(tol.massFraction) })]
       : []),

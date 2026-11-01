@@ -320,3 +320,6 @@ export function bandLine(
     notice,
   })
 }
+
+/** The API's largest tolerance of the chamber volume (`packages/api/src/compute/interior-schema.ts`); a wider volume estimate is capped at it. */
+export const maxVolumeFraction = 0.2
