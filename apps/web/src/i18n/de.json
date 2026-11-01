@@ -3671,6 +3671,7 @@
   "Velocity and band per charge step (simulation)": "Geschwindigkeit und Band je Ladungsstufe (Simulation)",
   "An input left out of the pressure range": "Eine Eingabe fehlt im Druckbereich",
   "Band: uncertainty of the fitted parameters only, not model error. Simulation, not load data.": "Band: nur die Unsicherheit der angepassten Parameter, kein Modellfehler. Simulation, keine Ladedaten.",
+  "If these strings were shot from a revolver: no leak area is set, so the fitted values take up the gas lost at the cylinder gap, and the simulated pressure can come out too low.": "Wurden diese Schussreihen aus einem Revolver geschossen: Es ist keine Leckfläche gesetzt, daher nehmen die angepassten Werte den Gasverlust am Trommelspalt auf, und der simulierte Gasdruck kann zu niedrig ausfallen.",
   "Case capacity estimated": "Hülsenvolumen geschätzt",
   "Chamber volume factor": "Faktor Patronenlagervolumen",
   "Fitted values": "Angepasste Werte",
