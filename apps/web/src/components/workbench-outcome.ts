@@ -4,6 +4,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
+import { rampAtJump } from '../lib/interior-request.ts'
 import { limitShare } from '../lib/limit-text.ts'
 import { nth } from '../lib/nth.ts'
 import { rawWording } from '../lib/record-values.ts'
@@ -14,6 +15,7 @@ import type {
   SeatingStep,
 } from '../lib/seating-ladder.ts'
 import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
+import type { CapacityRule } from '../lib/volume-tolerance.ts'
 import { say } from '../lib/wording.ts'
 import {
   bandLine,
@@ -53,6 +55,7 @@ export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['loa
   ...(s.seating && {
     chamber: { ...load.chamber, volume: s.seating.volume },
     barrel: { ...load.barrel, length: s.seating.travel },
+    ...(load.resistance && { resistance: rampAtJump(load.resistance, s.seating.jump) }),
   }),
 })
 
@@ -73,6 +76,10 @@ export type Outcome =
       noCoefficient?: { reference: number } | undefined
       /** The record's bore-resistance law the run could not apply, with what was missing. */
       resistanceMissing?: { powder: string; missing: string[] } | undefined
+      /** The rule of the range's volume tolerance from the capacity's source; none: the API's default. */
+      volumeRule?: CapacityRule | undefined
+      /** The seated jump the run's engraving ramp started at, m; none without a seating. */
+      jump?: number | undefined
       /** Brinell hardness of the bullet record when it is cast with a plain base (`plainBaseCastHardness`). */
       castHardness?: number | undefined
       /** Rounds fired through the chosen firearm's barrel, its record's `roundCount`. */
@@ -260,6 +267,15 @@ export type NoteKind = (typeof noteKinds)[number]
 /** One entry of the result's notes: its line, and the full reason with what clears it where the line is short. */
 export type ResultNote = { kind: NoteKind; line: string; text?: string | undefined }
 
+/** The note of a run with a seated jump and no engraving ramp to start at it. */
+const noRampNote = msg('The seated jump has no effect without an engraving ramp.')
+
+/** The note of a run with a seated jump and no engraving ramp, or none. */
+const noRampNotes = (ok: Extract<Outcome, { kind: 'ok' }>, t: Translator['t']): ResultNote[] =>
+  ok.jump !== undefined && !ok.load.resistance?.engraving
+    ? [{ kind: 'note', line: t(noRampNote) }]
+    : []
+
 /** What clears a missing case fill, by the reason `loadRatioText` gives. */
 const fillActions = {
   powder: msg('Choose a powder record in the Powder card.'),
@@ -354,6 +370,7 @@ export function resultNotes(
         ]
       : []),
     ...designs.flatMap((line) => (line ? [{ kind: 'note' as const, line }] : [])),
+    ...noRampNotes(ok, t),
     ...(ok.sensitivityDefault
       ? [
           {

@@ -106,6 +106,10 @@ export interface OwnCase {
   capacity?: string | undefined
   /** That capacity, g, when its record is in the browser. */
   grams?: number | undefined
+  /** The measured trim length, mm. */
+  trimLength?: number | undefined
+  /** The standard deviation of the water capacity over the cases measured, g. */
+  spread?: number | undefined
 }
 
 /** The groups of cases among `records`, with their measured capacity. */
@@ -119,6 +123,8 @@ export const ownCases = (records: readonly UserRecord[]): OwnCase[] =>
             cartridge: r.data.cartridge,
             capacity: r.data.capacity,
             grams: groupCapacity(r.data, records),
+            trimLength: r.data.trimLength?.value,
+            spread: r.data.spread?.value,
           },
         ]
       : [],

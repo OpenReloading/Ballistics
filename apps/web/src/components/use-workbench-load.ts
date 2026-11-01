@@ -56,6 +56,7 @@ import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
 import { cavityVolumeFraction } from '../lib/cavity-range.ts'
+import { powderIncomplete } from '../lib/complete-records.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -163,6 +164,7 @@ import {
   userCartridges,
   userRef,
 } from '../lib/variants.ts'
+import { type CapacityRule, volumeFraction } from '../lib/volume-tolerance.ts'
 import { type InputPanel, maxVolumeFraction, type Status, statusText } from '../lib/workbench.ts'
 import {
   type DefaultKey,
@@ -302,6 +304,15 @@ function pendingLink<L extends { id: string }>(
 ) {
   return !record && askedId === linked?.id ? linked : undefined
 }
+
+type Previewed = Partial<Record<PreviewKey, number>>
+
+/** The volume and travel fields that hold another value than the seated bullet's, which they followed. */
+export const typedOverSeating = (
+  seated: Seated,
+  fields: Record<string, { si?: number | undefined } | undefined>,
+  previewed: Previewed,
+) => previewKeys.filter((k) => seated[k] !== undefined && fields[k]?.si !== previewed[k])
 
 /** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
 function seatingBlockOf(
@@ -654,12 +665,82 @@ function capacityRefsOf(
 const resultLineOf = (outcome: Outcome, system: UnitSystem, t: Translator['t']) =>
   outcome.kind === 'ok' ? resultLine(outcome, system, t) : undefined
 
-/** The firearm the defaults read: its name, twist and barrel length. */
+/**
+ * The groove diameter Z (m) and the record's bore area Q (m2) a run reads: the firearm's measured
+ * groove replaces the record's Z; Q holds while the bore diameter is the land diameter it describes
+ * and the firearm measured neither bore nor groove (`suggestDefaults` drops it the same way).
+ */
+function boreOf(
+  gun: { boreDiameter?: number | undefined; grooveDiameter?: number | undefined } | undefined,
+  record: { recordGrooveM: number | undefined; qM: number | undefined; landM: number | undefined },
+  boreDiameter: number | undefined,
+) {
+  // a field the editor allows to hold 0 is no measurement
+  const groove = positiveOr(gun?.grooveDiameter)
+  const measured = positiveOr(gun?.boreDiameter) !== undefined || groove !== undefined
+  return {
+    grooveM: groove ?? record.recordGrooveM,
+    qUsed: measured ? undefined : recordBoreArea(record.qM, record.landM, boreDiameter),
+  }
+}
+
+/**
+ * The case length, mm: the chosen brass group's measured trim length (`brass`, with its name and
+ * the sheet's L3), else the sheet's L3 (`cip`).
+ */
+const caseLengthOf = (brass: OwnCase | undefined, cip: number | undefined) =>
+  brass?.trimLength === undefined
+    ? { mm: cip, brass: undefined }
+    : { mm: brass.trimLength, brass: { name: brass.name, mm: brass.trimLength, cip } }
+
+/** The name of a powder record without burn values whose model fields are not all typed; it cannot run. */
+function burnlessOf(
+  powder: Powder | undefined,
+  design: unknown,
+  fields: Fields,
+  label: string | undefined,
+) {
+  if (!powder || design || !powderIncomplete(powder)) return
+  return requiredModelKeys.some((k) => fields[k]?.si === undefined) ? label : undefined
+}
+
+const positiveOr = (x: number | undefined) => (x !== undefined && x > 0 ? x : undefined)
+
+/** The note on a bullet below the firearm's measured groove diameter (SI): the gap the model leaves out. */
+function undersizeNote(
+  bullet: number | undefined,
+  groove: number | undefined,
+  length: (si: number | undefined) => string | undefined,
+  t: Translator['t'],
+) {
+  if (bullet === undefined || groove === undefined || !(groove > bullet)) return ''
+  return t(
+    'The bullet diameter {diameter} is below the measured groove diameter {groove} of your firearm: gas passes the bullet, which the model leaves out.',
+    { diameter: length(bullet) ?? '', groove: length(groove) ?? '' },
+  )
+}
+
+/** The firearm the defaults read: its name, twist, barrel length and measured bore and groove diameter. */
 const gunSource = (
   gun:
-    | { name: string; data: { twist?: number | undefined; barrelLength?: number | undefined } }
+    | {
+        name: string
+        data: {
+          twist?: number | undefined
+          barrelLength?: number | undefined
+          boreDiameter?: number | undefined
+          grooveDiameter?: number | undefined
+        }
+      }
     | undefined,
-) => gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength }
+) =>
+  gun && {
+    name: gun.name,
+    twist: gun.data.twist,
+    barrelLength: gun.data.barrelLength,
+    boreDiameter: gun.data.boreDiameter,
+    grooveDiameter: gun.data.grooveDiameter,
+  }
 
 type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
@@ -763,6 +844,27 @@ export function approximateVolumeTolerance(
   // the field holds the default, up to the rounding of its text
   if (Math.abs(value - suggestion.si) > 1e-9 * suggestion.si) return undefined
   return Math.min(suggestion.halfWidth, maxVolumeFraction)
+}
+
+/**
+ * The run's tolerance of the volume behind the bullet and the capacity's rule (`volume-tolerance.ts`):
+ * the capacity's tolerance while the field holds the seated volume or the followed default, plus
+ * the interval of an estimated bullet volume; none for a typed volume, which keeps the API's 1 %.
+ */
+export function runVolumeTolerance(a: {
+  volume: number | undefined
+  seated: Seated
+  previewed: Partial<Record<PreviewKey, number>>
+  suggestion: Suggestion | undefined
+  followed: ReadonlySet<FollowKey>
+}): { fraction: number | undefined; rule: CapacityRule | undefined } {
+  const { volume, seated } = a
+  if (volume === undefined) return { fraction: undefined, rule: undefined }
+  const bullet = approximateVolumeTolerance(a.suggestion, volume, a.followed)
+  const followsDefault = a.followed.has('volume') && a.suggestion?.si === volume
+  const capacity = volume === a.previewed.volume || followsDefault ? seated.capacity : undefined
+  const fraction = volumeFraction({ capacity, caseVolume: seated.caseVolume, volume, bullet })
+  return { fraction, rule: fraction === undefined ? undefined : capacity?.rule }
 }
 
 /** `base` with the start pressure default: the barrel of the preview's field (typed, seated or not), else the start's own, and the bullet's construction. */
@@ -1364,7 +1466,7 @@ export function useWorkbenchState() {
   /** Groove diameter Z of the chosen cartridge, mm, for the bore resistance of a fitted powder. */
   /** The chosen cartridge's record: its groove diameter and the values the figure draws. */
   const [groove, setGroove] = useState<Groove | undefined>(undefined)
-  const { grooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
+  const { grooveM: recordGrooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
   const [allDiameters, setAllDiameters] = useState(false)
   /** The browser's bullet designs that have a mass, resolved against the catalogue. */
   const [designs, setDesigns] = useState<UserBulletView[]>([])
@@ -1389,6 +1491,8 @@ export function useWorkbenchState() {
     name: r.name,
     data: gunValues((r as FirearmRecord).data),
   }))
+  /** The chosen firearm's values: its measured bore and groove diameter, freebore and the others. */
+  const gunData = firearmList.find((f) => f.id === firearm)?.data
   /** The chosen firearm's active sight, for the Trajectory tab. */
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
@@ -1554,7 +1658,14 @@ export function useWorkbenchState() {
     seating?: Seating
   }>()
   /** SI values the preview wrote into the fields. */
-  const [previewed, setPreviewed] = useState<Partial<Record<PreviewKey, number>>>({})
+  const [previewed, setPreviewedState] = useState<Previewed>({})
+  // the run reads the seating at once, as `seatedNow` (#938): a run pressed while a seating
+  // arrives plans the seating ladder from it, not from the render before
+  const previewedNow = useRef(previewed)
+  const setPreviewed = useCallback((next: Previewed | ((p: Previewed) => Previewed)) => {
+    previewedNow.current = typeof next === 'function' ? next(previewedNow.current) : next
+    setPreviewedState(previewedNow.current)
+  }, [])
   /** The seated bullet's values, SI, none while no bullet is seated: an emptied field takes them again. */
   const [seated, setSeatedState] = useState<Seated>({})
   // the seating reports run in transitions: `seated` lags them, so an effect that must not write
@@ -1748,8 +1859,12 @@ export function useWorkbenchState() {
     fixedFieldText,
   )
   const fields = form.values
-  /** The record's bore area Q while the bore diameter is the land diameter it describes. */
-  const qUsed = recordBoreArea(qM, landM, fields.boreDiameter?.si)
+  /**
+   * The powder record without burn values while its model fields are not all typed: it cannot run.
+   * Its name, else undefined.
+   */
+  const burnless = burnlessOf(powder, powderDesign, fields, powderLabel)
+  const { grooveM, qUsed } = boreOf(gunData, { recordGrooveM, qM, landM }, fields.boreDiameter?.si)
 
   /**
    * Writes that complete the start of a new load (the defaults, the first seating) are no edit: a
@@ -2183,19 +2298,24 @@ export function useWorkbenchState() {
   }
 
   /** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
-  const typedKeys = previewKeys.filter(
-    (k) => seated[k] !== undefined && fields[k]?.si !== previewed[k],
-  )
-  const seatingBlock = seatingBlockOf(seatAt, typedKeys, t)
+  const seatingBlock = seatingBlockOf(seatAt, typedOverSeating(seated, fields, previewed), t)
+  /** `seatingBlock` from the seating and the fields now, not this render's (#938). */
+  const seatingBlockNow = () =>
+    seatingBlockOf(
+      seatAt,
+      typedOverSeating(seatedNow.current, form.getValues(), previewedNow.current),
+      t,
+    )
 
-  /** The steps of the seating ladder from the seating field, or what stops it, in the shown units. */
+  /** The steps of the seating ladder from the seating now, or what stops it, in the shown units. */
   function seatingPlan(shown = system) {
-    const start = seatAt && seated[seatAt.lengthKind]
+    const start = seatAt && seatedNow.current[seatAt.lengthKind]
     const step = seatStep.seatStep?.si
     if (!seatAt || step === undefined)
       return {
         error:
-          seatingBlock ?? t('{label} is empty.', { label: specText(t, seatingStepSpec.label) }),
+          seatingBlockNow() ??
+          t('{label} is empty.', { label: specText(t, seatingStepSpec.label) }),
       }
     const show = (m: number) => withUnit('length', shown, m)
     return seatingLadder(seatAt, start, step, ladderSteps, direction, show, t)
@@ -2234,7 +2354,7 @@ export function useWorkbenchState() {
     })
     const own = ownStepError(spec, v, shown, t)
     if (own || ladderKind === 'charge') return own
-    const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlock
+    const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlockNow()
     if (blocked) return blocked
     const plan = ladderKind === 'temperature' ? temperaturePlan(shown) : seatingPlan(shown)
     return 'error' in plan ? plan.error : undefined
@@ -2251,8 +2371,33 @@ export function useWorkbenchState() {
     if (holding) setMore(holding)
   }
 
+  /** The message of a powder without burn values, with the two ways on. */
+  const burnlessText = (name: string) =>
+    t(
+      '{name} has no burn values, so it cannot run. Choose a similar powder on the burn-rate chart, or fit the values from your chronograph strings on the tuning page.',
+      { name },
+    )
+
+  /** Why no run can start: a refused typed spec, else a powder without burn values (not for a Powders tab row, `as`). */
+  const refusal = (as: unknown) =>
+    specError() ?? (as || !burnless ? undefined : burnlessText(burnless))
+  /** What the volume tolerance reads, now as the run's values, or this render's for a Powders tab row (`as`). */
+  const volumeNow = (as: unknown) => ({
+    volume: (as ? fields : form.getValues()).volume?.si,
+    seated: seatedFor(as),
+    previewed: as ? previewed : previewedNow.current,
+    suggestion: suggestions.volume,
+    followed,
+  })
+  /** The seating a run reads: now, or this render's for a Powders tab row (`as`), as its values. */
+  const seatedFor = (as: unknown) => (as ? seated : seatedNow.current)
+
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
+    if (burnless) {
+      setStatus(burnlessText(burnless))
+      return false
+    }
     let invalid = false
     flushSync(() => {
       const { hasErrors, errors } = form.validate()
@@ -2308,8 +2453,8 @@ export function useWorkbenchState() {
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
-    const typedError = specError()
-    if (typedError) throw new Error(typedError)
+    const refused = refusal(as)
+    if (refused) throw new Error(refused)
     const chosen = as?.powder ?? chosenPowder
     const { body, bulkDensity, missing, sensitivityDefault } = interiorRequest({
       // the form's values now, not this render's: a run pressed after a seated volume was written
@@ -2334,14 +2479,12 @@ export function useWorkbenchState() {
       pressureLimit: typedSpec(spec.typed, 'pmax'),
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
+      // the engraving ramp starts at the seated bullet's jump, current as the form's values are
+      jump: seatedFor(as).jump,
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
-    const volumeTolerance = approximateVolumeTolerance(
-      suggestions.volume,
-      fields.volume?.si,
-      followed,
-    )
+    const { fraction: volumeTolerance, rule: volumeRule } = runVolumeTolerance(volumeNow(as))
     const recordInputs = [
       chosenPowder?.id,
       bulletLength,
@@ -2360,6 +2503,9 @@ export function useWorkbenchState() {
       bulkDensity,
       resistanceMissing,
       recordInputs,
+      volumeRule,
+      // the jump the request's ramp starts at, for the result's note
+      jump: seatedFor(as).jump,
       sensitivityDefault,
       castHardness,
     }
@@ -2421,6 +2567,8 @@ export function useWorkbenchState() {
     plan: Partial<Step>[] | undefined
     bulkDensity: number | undefined
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
+    volumeRule: CapacityRule | undefined
+    jump: number | undefined
     sensitivityDefault: ReturnType<typeof loadRequest>['sensitivityDefault']
     castHardness: number | undefined
     table: string | undefined
@@ -2443,6 +2591,8 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
+      volumeRule: a.volumeRule,
+      jump: a.jump,
       sensitivityDefault: withoutColdPeak(a.sensitivityDefault),
       castHardness: a.castHardness,
       roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
@@ -3088,9 +3238,14 @@ export function useWorkbenchState() {
   const mmText = (mm: number | undefined) =>
     mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
   /** The cartridge sheet's and the powder's values the user may type over them: the records', the typed and the ones a run reads. */
+  const l3 = caseLengthOf(
+    cartridgeCases.find((c) => c.id === chosenOwnCase),
+    specValue('cartridge', 'L3'),
+  )
+  const caseLengthBrass = l3.brass
   const spec = useSpecValues(system, {
     pmax: specValue(undefined, 'Pmax'),
-    caseLength: specValue('cartridge', 'L3'),
+    caseLength: l3.mm,
     bulkDensity: recordBulkDensity(chosenPowder, linkedPowder),
   })
   /** The Pmax a readout names, bar: the typed one, else the sheet's. */
@@ -3355,12 +3510,15 @@ export function useWorkbenchState() {
   const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
   const apiKey = JSON.stringify(apiFile)
   const apiData = useMemo(() => JSON.parse(apiKey) as Load, [apiKey])
-  /** A followed field's default while it is the field's value; the seating owns the volume once a bullet is seated. */
+  /**
+   * A followed field's default or firearm value while it is the field's value; the seating owns the
+   * volume once a bullet is seated.
+   */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
     if (!k || !followed.has(k) || (k === 'volume' && seatingOwnsVolume(seated))) return
     const given = suggestions[k]
-    return given && !given.fromFirearm && fields[key]?.si === given.si ? given : undefined
+    return given && fields[key]?.si === given.si ? given : undefined
   }
   const suggestionKey = JSON.stringify(followKeys.map((k) => suggestions[k]?.si))
   const seatedVolume = seatingOwnsVolume(seated)
@@ -3445,7 +3603,7 @@ export function useWorkbenchState() {
           g1: mmLength(system, clearedBullet.g1),
         },
       )
-    : ''
+    : undersizeNote(bulletValues.bulletDiameter, gunData?.grooveDiameter, siLength, t)
 
   const recordLink = recordLinkOf({
     asked,
@@ -3470,6 +3628,8 @@ export function useWorkbenchState() {
     setTypedBullet,
     specs: spec.values,
     recordSpecs: spec.record,
+    burnless,
+    caseLengthBrass,
     typedSpecFields: spec.typed,
     setTypedSpec: spec.setTyped,
     bulletFit,

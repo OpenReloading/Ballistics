@@ -152,6 +152,29 @@ Code: `apps/web/src/lib/bullet-construction.ts`, `effectiveDensity`, `classOf`.
 
 The records are not in the repository. The material densities (lead 11.34, copper 8.94 g/cm3, [PubChem lead](https://pubchem.ncbi.nlm.nih.gov/compound/5352425), [PubChem copper](https://pubchem.ncbi.nlm.nih.gov/compound/23978)) lie above every effective density: the shape factor of the nose and base and the jacket and core make the difference, and a material density is not used.
 
+### Tolerance of the volume
+
+The workbench sets the pressure range's tolerance of the chamber volume from where the case capacity $C$ comes from, while the volume field holds the seated volume or the followed default. The capacity's tolerance $f_C$, relative to $C$:
+
+| Source of $C$ | $f_C$ |
+| --- | --- |
+| Measured, with the spread $s$ of the brass group | $s / C$ |
+| Measured, without a spread | 0.5 % (assumption) |
+| A catalogue or case record, while the cartridge has capacity records of two or more case makers | standard deviation over mean of those records |
+| A catalogue or case record otherwise, or records that agree exactly | 2 % (assumption without a published source) |
+
+The range moves the volume behind the bullet $V$, so the capacity's part is taken relative to it, and the interval $h$ of an estimated bullet volume (above) adds to it:
+
+$$
+f_V = \min\left(\frac{f_C\, C}{V} + h,\; 0.2\right)
+$$
+
+Code: `apps/web/src/lib/volume-tolerance.ts`, `capacityFraction`, `volumeFraction`; `apps/web/src/components/use-workbench-load.ts`, `runVolumeTolerance`.
+
+0.2 is the limit of the API. A small case with a deep bullet gets the wider tolerance: with 2 % of the capacity, a .308 case (3.6 cm³, 3.1 cm³ behind the bullet) gets 2.3 %, a 9 mm case (0.86 cm³, 0.55 cm³ behind the bullet) 3.1 % of $V$. A typed volume keeps the API's 1 %. The range's help names the rule that applies.
+
+Evidence for the defaults, all of it weak: within one lot of 50 new 6.5 Creedmoor cases a standard deviation of 0.13 gr on 49.14 gr, 0.26 % ([Ammolytics, brass sorting part one](https://blog.ammolytics.com/2020-01-08/brass-sorting-part-one.html), medium-low confidence); between four makers of .308 cases, 53.4 to 54.8 gr, a standard deviation of 1.05 % (a magazine chart quoted in a forum, unverified). The 0.5 % and the 2 % are assumptions above both.
+
 ### Leade contact and jump
 
 The contact $z_\mathrm{c}$ is where the bullet diameter $d$ meets the leade, from the case head. It reads the chamber values of the C.I.P. sheet listed under Symbols:
@@ -273,4 +296,4 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - [Tanaka 2001](../bibliography.md#tanaka-2001): density of water at 20 °C, table, pp. 301 to 309 (the table value is unverified, not re-read from the paper).
 - [PubChem lead](https://pubchem.ncbi.nlm.nih.gov/compound/5352425), [PubChem copper](https://pubchem.ncbi.nlm.nih.gov/compound/23978): density of lead and of copper, for the comparison with the effective densities.
 - [C.I.P. TDCC](../bibliography.md#cip-tdcc): cartridge length $L_3$ and the chamber values $L_3$, $s$, $G$, $G_1$, $F$ and $i$, per cartridge sheet.
-- Research log: [placing a maximum pressure against the tolerance range](../research/interior-ceiling-classification.md).
+- Research log: [placing a maximum pressure against the tolerance range](../research/interior-ceiling-classification.md), [volume tolerance from the capacity source](../research/interior-volume-tolerance-capacity-source.md).
