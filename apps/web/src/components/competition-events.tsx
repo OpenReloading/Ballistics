@@ -4,7 +4,6 @@ import {
   ActionIcon,
   Button,
   Group,
-  Menu,
   NumberInput,
   Select,
   SimpleGrid,
@@ -21,7 +20,7 @@ import {
   type UserRecord,
   userRecord,
 } from '@open-reloading/schema'
-import { DotsThreeVertical, Plus, Trash } from '@phosphor-icons/react'
+import { Plus, Trash } from '@phosphor-icons/react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -67,9 +66,9 @@ import {
 } from '../lib/user-store.ts'
 import { confirmDialog, offerUndo } from './confirm.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
+import { BarButton, useDisciplines } from './log-parts.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { LinkButton, PrintButton } from './record-actions.tsx'
-import { BarButton, useDisciplines } from './shooting-log.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
@@ -844,39 +843,29 @@ async function importEvents(f: File, { t, tn }: Translator) {
     .join(' ')
 }
 
-/** The row menu: Edit and Delete. */
+/** The row's Delete; the row's link opens the event to edit. */
 function RowActions({
   record,
   tabIndex,
-  onEdit,
   onDelete,
 }: {
   record: EventRecord
   tabIndex?: number | undefined
-  onEdit: () => void
   onDelete: () => void
 }) {
   const { t } = useTranslation()
   return (
-    <Menu position="bottom-end" withinPortal>
-      <Menu.Target>
-        <ActionIcon
-          className="row-action"
-          tabIndex={tabIndex}
-          size={controlSize.row.icon}
-          variant="subtle"
-          aria-label={t('Actions for {name}', { name: record.name })}
-        >
-          <DotsThreeVertical size={18} aria-hidden="true" />
-        </ActionIcon>
-      </Menu.Target>
-      <Menu.Dropdown>
-        <Menu.Item onClick={onEdit}>{t('Edit')}</Menu.Item>
-        <Menu.Item color="red" onClick={onDelete}>
-          {t('Delete')}
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+    <ActionIcon
+      className="row-action"
+      tabIndex={tabIndex}
+      size={controlSize.row.icon}
+      variant="subtle"
+      color="red"
+      aria-label={t('Delete {name}', { name: record.name })}
+      onClick={onDelete}
+    >
+      <Trash size={18} aria-hidden="true" />
+    </ActionIcon>
   )
 }
 
@@ -1100,7 +1089,7 @@ export function CompetitionEvents({ types }: { types: EventType[] }) {
   }
   const nothing = exported.length === 0 && t('No saved event to export.')
   const actions = (r: EventRecord, tabIndex?: number) => (
-    <RowActions record={r} tabIndex={tabIndex} onEdit={() => open(r)} onDelete={() => remove(r)} />
+    <RowActions record={r} tabIndex={tabIndex} onDelete={() => remove(r)} />
   )
 
   return (

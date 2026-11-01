@@ -20,7 +20,7 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
@@ -34,8 +34,6 @@ import { dayText } from '../lib/dates.ts'
 import type { DirectorySort } from '../lib/directory.ts'
 import { download } from '../lib/download.ts'
 import { errorText } from '../lib/error-text.ts'
-import type { FederationData } from '../lib/face-disciplines.ts'
-import { fetchFederationData } from '../lib/face-records.ts'
 import { countText, filterText, widestCount } from '../lib/lists.ts'
 import { newId } from '../lib/new-id.ts'
 import {
@@ -68,6 +66,7 @@ import {
 } from '../lib/user-store.ts'
 import { confirmDialog, offerUndo } from './confirm.tsx'
 import { type DirectoryColumn, DirectoryTable, useListState } from './directory-table.tsx'
+import { BarButton, useDisciplines } from './log-parts.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { LogSummary } from './shooting-log-summary.tsx'
@@ -93,28 +92,6 @@ interface LogData {
   loads: LoadRecord[]
   /** The competition events, the latest first, for the entry's link. */
   events: EventRecord[]
-}
-
-/** The disciplines of the catalogue as select options, by federation; empty while unreachable. */
-export function useDisciplines() {
-  const [data, setData] = useState<FederationData>()
-  useEffect(() => {
-    // unreachable: no discipline to choose, a stored one shows by its id
-    fetchFederationData().then(setData, () => {})
-  }, [])
-  return useMemo(() => {
-    const names = new Map<string, string>()
-    const groups = new Map<string, { value: string; label: string }[]>()
-    const federation = new Map(data?.federations.map((f) => [f.id, f.name]) ?? [])
-    for (const d of data?.disciplines ?? []) {
-      const label = [d.number, d.name].filter(Boolean).join(' ')
-      names.set(`catalogue:${d.id}`, label)
-      const group = federation.get(d.federation) ?? d.federation
-      groups.set(group, [...(groups.get(group) ?? []), { value: `catalogue:${d.id}`, label }])
-    }
-    const options = [...groups].map(([group, items]) => ({ group, items }))
-    return { options, names }
-  }, [data])
 }
 
 /** The names of an entry's references, from this browser's records and the catalogue. */
@@ -605,27 +582,6 @@ function logColumns(
       cell: (r, tabIndex) => actions(r, tabIndex),
     },
   ]
-}
-
-/** A bar button that says in its title why it does nothing while `nothing` holds a reason. */
-export function BarButton({
-  nothing,
-  onClick,
-  children,
-}: {
-  nothing: string | false
-  onClick: () => void
-  children: ReactNode
-}) {
-  return (
-    <Button
-      variant="default"
-      {...(nothing && { 'data-disabled': true, 'aria-disabled': true, title: nothing })}
-      onClick={nothing ? undefined : onClick}
-    >
-      {children}
-    </Button>
-  )
 }
 
 /** The filter row: firearm, year and a day range. */
