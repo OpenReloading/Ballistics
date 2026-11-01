@@ -968,7 +968,8 @@ export function ShootingLog() {
           />
         </section>
       </div>
-      {data && (
+      {/* after a failed read the records are an empty stand-in: no summary of nothing */}
+      {data && !readError && (
         <LogSummary
           entries={data.entries}
           records={data.records}
