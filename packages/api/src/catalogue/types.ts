@@ -168,7 +168,9 @@ export interface BulletItem {
   ballisticCoefficientG7: number | null
   country?: string
   tipType?: string
+  baseType?: string
   construction?: string
+  leadFree?: boolean
   nameOnly?: true
 }
 

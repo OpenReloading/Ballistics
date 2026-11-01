@@ -1,10 +1,14 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
-import { fold, score, searchKey, toSi } from '@open-reloading/schema'
+import { type Bullet, fold, leadFree, score, searchKey, toSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import type { BulletSummary } from './api-types.ts'
 import { caliberLabel, commonCaliber } from './caliber.ts'
 import { present } from './directory.ts'
+import type { Facet } from './facets.ts'
+import { rawWording, spacedWording } from './record-values.ts'
 import { inchText, kilogramsPerGrain, type UnitSystem } from './units.ts'
+import { say } from './wording.ts'
 
 /** A catalogue bullet of the list: the summary with the name of its manufacturer. */
 export type BulletItem = BulletSummary & {
@@ -94,10 +98,24 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
       b.diameter === null
         ? ''
         : `${inchText(formatNumber(system.length.fromSi(toSi('length', b.diameter)), lengthIn ? 4 : 3), system.length.symbol)} ${system.length.symbol}`,
+    // the Diameter column: inches to 4 decimals, mm to 3, the unit in the header
+    diameterValue:
+      b.diameter === null
+        ? ''
+        : inchText(
+            formatNumber(system.length.fromSi(toSi('length', b.diameter)), lengthIn ? 4 : 3),
+            system.length.symbol,
+          ),
     mass:
       b.mass === null
         ? ''
         : formatNumber(system.mass.fromSi(toSi('mass', b.mass)), system.mass.decimals),
+    sectionalDensity: (() => {
+      const sd = bulletSectionalDensity(b)
+      return sd === undefined
+        ? ''
+        : formatNumber(system.sectionalDensity.fromSi(sd), system.sectionalDensity.decimals)
+    })(),
     length:
       b.length === null
         ? ''
@@ -107,6 +125,16 @@ export function bulletCells(b: BulletRow, system: UnitSystem) {
           ),
   }
 }
+
+/** Sectional density, mass over diameter squared, kg/m² (as `computedBulletRows`); undefined without both. */
+export function bulletSectionalDensity(b: Pick<BulletRow, 'mass' | 'diameter'>) {
+  if (b.mass === null || b.diameter === null || b.diameter <= 0) return
+  return toSi('mass', b.mass) / toSi('length', b.diameter) ** 2
+}
+
+/** A G1 or G7 column's cell: the coefficient to 3 decimals, lb/in²; empty without one. */
+export const coefficientText = (value: number | null) =>
+  value === null ? '' : formatNumber(value, 3)
 
 type BallisticCoefficient = { model: 'G1' | 'G7'; value: number }
 
@@ -125,16 +153,6 @@ export function bulletBallisticCoefficient(
   return shown && (other ? { ...shown, other } : shown)
 }
 
-/** Sort key of the BC column: the drag model first (G1, then G7), then the value. */
-export function bulletBallisticCoefficientSort(
-  b: Pick<BulletSummary, 'ballisticCoefficientG1' | 'ballisticCoefficientG7'>,
-) {
-  const bc = bulletBallisticCoefficient(b)
-  if (!bc) return
-  // BCs lie below 10 lb/in²
-  return bc.model === 'G1' ? bc.value : 10 + bc.value
-}
-
 /** A BC as the list shows it: "0.264 G7". */
 export const ballisticCoefficientText = (bc: BallisticCoefficient) =>
   `${formatNumber(bc.value, 3)} ${bc.model}`
@@ -151,6 +169,10 @@ export type PackedBullet = [
   number | null,
   number | null,
   string[] | null,
+  string | null,
+  string | null,
+  string | null,
+  boolean | null,
 ]
 
 export const packBullets = (rows: readonly BulletItem[]): PackedBullet[] =>
@@ -165,6 +187,10 @@ export const packBullets = (rows: readonly BulletItem[]): PackedBullet[] =>
     b.ballisticCoefficientG1,
     b.ballisticCoefficientG7,
     b.manufacturerAliases ?? null,
+    b.tipType ?? null,
+    b.baseType ?? null,
+    b.construction ?? null,
+    b.leadFree ?? null,
   ])
 
 export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
@@ -180,6 +206,10 @@ export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
       ballisticCoefficientG1,
       ballisticCoefficientG7,
       manufacturerAliases,
+      tipType,
+      baseType,
+      construction,
+      leadFree,
     ]) => ({
       id,
       manufacturer,
@@ -190,6 +220,81 @@ export const unpackBullets = (rows: readonly PackedBullet[]): BulletItem[] =>
       length,
       ballisticCoefficientG1,
       ballisticCoefficientG7,
-      ...present({ manufacturerAliases }),
+      ...present({ manufacturerAliases, tipType, baseType, construction, leadFree }),
     }),
   )
+
+/** The structure of a bullet's construction, else its core material as `<material>-core`: the list item's `construction`. */
+function constructionKey(c: Bullet['construction']) {
+  const material = c?.core?.material
+  return c?.structure ?? (material ? `${material}-core` : undefined)
+}
+
+/** The list fields a bullet record gives a design's row: tip, base, construction and lead-free. */
+export const bulletKinds = (b: Pick<Bullet, 'tip' | 'base' | 'construction'>) =>
+  present({
+    tipType: b.tip?.type ?? null,
+    baseType: b.base?.type ?? null,
+    construction: constructionKey(b.construction) ?? null,
+    leadFree: leadFree(b.construction) ?? null,
+  })
+
+const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+
+/** A tip, base or structure value as a word, hyphens as spaces: "hollow point". */
+const kindWord = (t: Translator['t'], value: string) =>
+  say(t, rawWording(value)).replaceAll('-', ' ')
+
+/** A list item's construction as a name: "Cup and core", "Lead core". */
+export function constructionText(t: Translator['t'], value: string) {
+  const core = /^(.+)-core$/.exec(value)?.[1]
+  return capitalised(
+    core ? t('{material} core', { material: say(t, spacedWording(core)) }) : kindWord(t, value),
+  )
+}
+
+/** A tip or base value as a name: "Hollow point", "Boat tail". */
+const kindText = (t: Translator['t'], value: string) => capitalised(kindWord(t, value))
+
+/** The Type column: tip and base, "Hollow point, boat tail"; empty without either. */
+export function bulletTypeText(t: Translator['t'], b: Pick<BulletRow, 'tipType' | 'baseType'>) {
+  const words = [b.tipType, b.baseType].flatMap((v) => (v ? [kindWord(t, v)] : []))
+  return capitalised(words.join(', '))
+}
+
+/** URL keys of the bullet list's choice filters. */
+export const bulletFacetKeys = ['construction', 'tip', 'base', 'leadfree']
+
+/**
+ * The bullet list's choice filters: construction, tip, base and lead-free, each over the values
+ * the rows have. A filter whose rows give it one value only is left out (`facetOptions`).
+ */
+export function bulletFacets(t: Translator['t']): Facet<BulletRow>[] {
+  return [
+    {
+      key: 'construction',
+      label: msg('Construction'),
+      values: (b) => (b.construction ? [b.construction] : []),
+      text: (v) => constructionText(t, v),
+    },
+    {
+      key: 'tip',
+      label: msg('Tip'),
+      values: (b) => (b.tipType ? [b.tipType] : []),
+      text: (v) => kindText(t, v),
+    },
+    {
+      key: 'base',
+      label: msg('Base type'),
+      values: (b) => (b.baseType ? [b.baseType] : []),
+      text: (v) => kindText(t, v),
+    },
+    {
+      key: 'leadfree',
+      label: msg('Lead-free'),
+      values: (b) => (b.leadFree === undefined ? [] : [b.leadFree ? 'yes' : 'no']),
+      text: (v) => t(v === 'yes' ? msg('Yes') : msg('No')),
+      order: (a, b) => (a === b ? 0 : a === 'yes' ? -1 : 1),
+    },
+  ]
+}

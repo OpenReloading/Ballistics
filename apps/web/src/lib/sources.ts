@@ -1,6 +1,6 @@
 /** List sources: OpenReloading records and the user records of the browser. */
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import type { BulletRow } from './bullet-rows.ts'
+import { type BulletRow, bulletKinds } from './bullet-rows.ts'
 import type { CartridgeRow } from './cartridge-rows.ts'
 import type { UserBulletView, UserCartridgeView } from './variants.ts'
 
@@ -97,6 +97,7 @@ export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
         length: record.length?.value ?? null,
         ballisticCoefficientG1: null,
         ballisticCoefficientG7: null,
+        ...bulletKinds(record),
       },
     ]
   })

@@ -378,8 +378,8 @@ const states: State[] = [
       await expect(boxes).toHaveCount(2)
       await boxes.first().click()
       await boxes.last().click()
-      // below 48em Clear selection moves into the popover of the picks
-      await expect(page.getByText('2 of 4 selected')).toHaveText(/2 of 4 selected/)
+      // below 48em Clear shows as its icon and the count steps aside
+      await expect(page.getByText('2 selected (max 4)')).toHaveText(/2 selected \(max 4\)/)
       await check('page')
     },
   },

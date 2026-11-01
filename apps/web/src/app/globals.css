@@ -10579,16 +10579,16 @@ main .page-bar h1 {
   border-bottom: 1px solid var(--border);
 }
 
-/* the rows picked for Compare, also those a filter hides: chips in the bar's status
-   line after the count. They keep their width; those that do not fit the slot are hidden (still
-   measured) and "n selected" with a popover stands in, so a pick moves nothing */
-.page-bar-status:has(.picked-slot) {
-  display: flex;
+/* the rows picked for Compare, also those a filter hides: "2 selected (max 4)" and Clear in the
+   bar's status line after the count, one line whatever is picked */
+.selection-summary {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  vertical-align: middle;
 }
 
-.page-bar-status:has(.picked-slot) > :is(span, .clear-picks) {
+.selection-summary > * {
   flex: none;
 }
 
@@ -10597,81 +10597,54 @@ main .page-bar h1 {
   outline-offset: -2px;
 }
 
-/* a phone's status line is 150 px: while rows are picked, the chip that opens the picks has it and
-   the count steps aside, still read by screen readers */
+/* Compare keeps the width of its widest label ("Compare 4"): the stacked labels share one cell */
+.compare-label {
+  display: inline-grid;
+}
+
+.compare-label > span {
+  grid-area: 1 / 1;
+}
+
+.compare-label > span + span {
+  visibility: hidden;
+}
+
+/* a phone's status line is 150 px: while rows are picked, the summary has it and the count steps
+   aside, still read by screen readers; Clear is its icon */
 @media screen and (max-width: 47.99em) {
-  /* the icon alone, and only while the chips are listed: the chip that opens the picks holds
-     Clear selection in its popover */
-  .clear-picks .clear-picks-text,
-  .picked-slot[data-over] + .clear-picks {
+  .clear-picks .clear-picks-text {
     display: none;
+  }
+
+  /* the line has the height of Clear (a 24 px target) also without picks, so a pick moves nothing */
+  .page-bar-status:has(> .selection-summary) {
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  .page-bar-status .clear-picks {
+    height: 1.5rem;
+    min-height: 0;
   }
 
   .clear-picks .mantine-Button-section {
     margin-inline-end: 0;
   }
 
-  .page-bar-status:has(.picked-slot) > span:first-child {
+  /* after the count (margin from the rule of the status line's parts), which steps aside */
+  .page-bar-status > .bar-count + .selection-summary:not(:empty) {
+    margin-inline-start: 0;
+  }
+
+  .page-bar-status:has(.selection-summary:not(:empty)) > .bar-count {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
   }
-}
-
-.picked-slot {
-  position: relative;
-  display: flex;
-  flex: 1 1 0;
-  align-items: center;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.picked-slot[data-over] {
-  flex: none;
-}
-
-.picked-slot[data-over] > .picked-chips {
-  position: absolute;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.picked-chips,
-.picked-list {
-  display: flex;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.picked-chips {
-  flex: none;
-}
-
-.picked-list {
-  flex-direction: column;
-}
-
-:is(.picked-chips, .picked-list) li {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 0.125rem;
-  max-width: 20rem;
-  padding: 0 0.125rem 0 0.5rem;
-  border: 1px solid var(--border);
-  color: var(--fg);
-  font-size: var(--mantine-font-size-xs);
-}
-
-:is(.picked-chips, .picked-list) span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .directory-table {
@@ -10856,11 +10829,6 @@ main .page-bar h1 {
   text-decoration: underline dotted var(--muted);
 }
 
-.bc-model {
-  color: var(--muted);
-  font-size: var(--mantine-font-size-xs);
-}
-
 /* a group of rows ends: the heavier rule of the record's tables (the browser's own rows end before
    the catalogue's) */
 .directory-table tr[data-break] > td {
@@ -10911,8 +10879,8 @@ main .page-bar h1 {
   font-weight: 400;
 }
 
-/* a wide window: the name keeps a column of 32 rem and the filler column takes the rest, so the
-   values stay within reach of the name they belong to (1920 px: 1000 px of name column before) */
+/* the name column takes the width the others leave, also in a wide window, so the value columns
+   stay together at the table's end and no empty band is left beside them */
 .directory-scroll {
   container-type: inline-size;
   /* a row focused from below does not stop under the sticky head (2.5rem) */
@@ -10954,16 +10922,6 @@ main .page-bar h1 {
     .directory-table :is(.rate-ticks, .rate-cell svg) {
       display: none;
     }
-  }
-}
-
-@container (min-width: 90rem) {
-  .directory-table col.name-cell {
-    width: 32rem;
-  }
-
-  .directory-table col.filler {
-    width: auto;
   }
 }
 
@@ -11226,8 +11184,7 @@ main .page-bar h1 {
 
 @media print {
   .directory-table .select-cell,
-  .page-bar .selection-count,
-  .picked-slot {
+  .page-bar .selection-summary {
     display: none;
   }
 }
