@@ -35,7 +35,7 @@
     "lists": {
       "budget": {
         "initial": 446000,
-        "total": 494000
+        "total": 496000
       },
       "routes": {
         "/bullets": {
@@ -163,7 +163,7 @@
     "tools": {
       "budget": {
         "initial": 569000,
-        "total": 609000
+        "total": 611000
       },
       "routes": {
         "/cases/editor": {
@@ -194,7 +194,7 @@
     },
     "workbench": {
       "budget": {
-        "initial": 628000,
+        "initial": 630000,
         "total": 1045000
       },
       "routes": {

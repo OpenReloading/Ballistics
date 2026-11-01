@@ -203,10 +203,10 @@ _Avoid_: l3
 _Avoid_: l6
 
 **Case capacity**:
-One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `convention`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
+One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `primerState`, `fillLevel`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
 
 **Water capacity**:
-`waterCapacity`: mass of water filling a case to the mouth, g, on a case capacity.
+`waterCapacity`: mass of water filling a case to the mouth (or the level `fillLevel` names), g, on a case capacity.
 _Avoid_: capacity
 
 **Measured water capacity**:
@@ -216,8 +216,13 @@ _Avoid_: ownCapacity
 **Case condition**:
 `caseCondition`: state of the case when its capacity was measured: `new`, `fired` or `sized`.
 
-**Capacity convention**:
-`convention`: how the water was filled for a case capacity (fill level, water temperature, primer state), free text as the source states it. Absent: the default convention of the case capacity model page. It does not enter the derived volume.
+**Primer state**:
+`primerState`: the primer pocket when the water of a case capacity was filled: `primed-spent` (a spent primer seated) or `unprimed` (no primer). Absent: the source does not state it. It does not enter the derived volume.
+_Avoid_: convention, primed
+
+**Fill level**:
+`fillLevel`: how high the water of a case capacity was filled: `mouth`. Absent: the source does not state it, and the mouth is taken. It does not enter the derived volume.
+_Avoid_: convention
 
 **Caliber class**:
 A record of kind `caliber-classes`: a class of bullet diameter with `name`, `diameter` and the member `cartridges`. `caliberClasses`: on a discipline an object with the ids of the class records it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
@@ -616,6 +621,25 @@ A user record of kind `cartridge`: `origin` (`user`), the `basedOn` catalogue re
 **Target face design**:
 A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiameter`, `blackHeight`, `decimal` and `events` of a face in mm, each optional while the draft is unfinished. The shot group and hit probability tools offer a design that builds a valid `TargetFace` as `User design <name>` (face id `user-<record id>`).
 
+**Competition event**:
+A user record of kind `event` (id a UUID): a competition the user shot, with `date`, `place`, `eventType` (`catalogue:` reference to an event type), `level` (one of the type's levels), `discipline`, `division`, `firearm` and `load` (`user:` references), `rounds` (fired, for the round count), `notes`, `state` and `results`. A self-recorded score is never an official result.
+_Avoid_: match, competition record
+
+**Result state**:
+`state` of a competition event: `completed`, `did-not-finish` or `disqualified`. A disqualified event has no total.
+_Avoid_: DQ, status
+
+**Event results**:
+`results` of a competition event, by `method`: `rings` with `series` (per series the ring value of each shot in `shots`, or its `total`, and the `targetSheet` it was scored on), or `hit-factor` with `stages`.
+
+**Practical stage**:
+One entry of `stages`: `name`, `hits` (`A`, `C`, `D`, `metal`), `misses`, `noShoots` (penalized no-shoot hits), `procedurals`, `time` (s), `powerFactor` and `stagePoints` (typed from the official result).
+_Avoid_: course of fire (for the record)
+
+**Hit factor**:
+The points of a practical stage, hits less penalties and at least 0, over its time, 1/s (`hitFactor` in `core`).
+_Avoid_: HF
+
 **Powder design**:
 A user record of kind `powder`: `origin` (`user`), the `provenanceKind` and the `draft`, the powder's grain form, bulk density, composition, thermochemistry and burn law in stored units, each optional while the draft is unfinished. The workbench and the charge target tool offer a design that builds a valid `Powder` as `<name> (your design)`, a saved load names it as `user:<id>`, and every result from it says the powder values are from a user design.
 
@@ -644,7 +668,7 @@ _Avoid_: `step`, `steps` (of a ladder)
 `sessions`: the references (`user:<UUID>` or `catalogue:<id>`) of the chronograph sessions the Measurements tab shows for a load, in the order shown. The sessions are records of their own.
 
 **Firearm**:
-A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per session, so a session is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
+A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per chronograph session or competition event, so each is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
 _Avoid_: rifle, gun
 
 **Freebore**:

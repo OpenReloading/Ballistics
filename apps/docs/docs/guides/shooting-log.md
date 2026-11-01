@@ -1,6 +1,6 @@
 ---
 title: Shooting log
-description: The range days of the shooting log (Schießbuch) in the web app, how their rounds reach a firearm's round count, and the columns of its print, CSV and JSON.
+description: The range days of the shooting log (Schießbuch) in the web app, how their rounds reach a firearm's round count, the yearly summary, and the columns of its print, CSV and JSON.
 ---
 
 # Shooting log
@@ -50,3 +50,21 @@ The firearm and year filters are kept in the address; From and To narrow the ent
 A text a spreadsheet would read as a formula starts with an apostrophe.
 
 - **Export JSON** writes `openreloading-shooting-log-<day>.json`, a user data file with the entries. **Import JSON** reads it back: new entries are added, equal ones left, and entries that differ from the browser's are replaced after one question. An entry whose id another record of the browser holds is not imported, and the report counts it. The firearms and loads the entries name are not in the file; in another browser their names show as not in this browser.
+
+## Yearly summary
+
+Under the entries, **Yearly summary** adds up the entries of one calendar year: the year the year filter names, else the latest year with entries; **Summary year** picks another until the year filter changes. It sums the log. The firearm's round count stays the one counter, and the summary does not change it.
+
+- **Rounds per firearm**: the rounds and entries of each firearm, most rounds first. Entries without a firearm count on a row of their own.
+- **Rounds per cartridge**: the cartridge of the entry's saved load, or of the load's firearm when the load names no cartridge. An entry without a saved load (factory ammunition) counts under its firearm only, and a line under the table gives its rounds.
+- **Range days per month**: the entries of each month.
+- **Competitions**: the entries of the year linked to a competition event, each with its day, firearm, rounds and result.
+
+**Print summary** prints the summary alone. **Export summary CSV** writes `openreloading-shooting-log-<year>-summary.csv` (UTF-8 with a byte order mark) with the same numbers as the screen and the print: a row `Year`, then a header and one row per total.
+
+| Column | Content |
+| --- | --- |
+| `Section` | `Firearm`, `Cartridge`, `Without a load`, `Month`, `Competition` or `Total`. |
+| `Name` | The firearm's or cartridge's name, the month as `YYYY-MM`, or the competition's day as `YYYY-MM-DD`; empty for `Without a load`, for `Total` and for entries without a firearm or a known cartridge. |
+| `Rounds` | Rounds fired; empty for a month. |
+| `Entries` | Entries; empty for `Without a load`. |

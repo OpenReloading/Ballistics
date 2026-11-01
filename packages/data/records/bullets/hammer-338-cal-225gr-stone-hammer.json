@@ -17,6 +17,10 @@
     "value": 36.98,
     "raw": "Bullet length is 1.456″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -44,6 +48,13 @@
         "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "https://hammerbullets.com/product/338-cal-225gr-stone-hammer/: Recommended twist rate is 1-12.5″ minimum | Bullet length is 1.456″ | Bullet weight is 225gr | Recommended use: Big game hunting | G7-BC=.216 calculated | G1-BC=.442 calculated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

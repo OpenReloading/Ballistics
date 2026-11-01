@@ -174,7 +174,7 @@ describe('user data files', () => {
   })
 
   describe('records of a kind this version does not know', () => {
-    const event = { kind: 'event', id: 'e1', name: 'Club match', saved, data: { day: 1 } }
+    const event = { kind: 'logEntry', id: 'e1', name: 'Range day', saved, data: { day: 1 } }
     const stage = { ...event, kind: 'stage', id: 's1' }
     const fileOf = (records: unknown[]) => userDataText(records as UserRecord[])
 
@@ -185,7 +185,7 @@ describe('user data files', () => {
         ok: true,
         records: [bullet, load],
         skipped: [
-          { kind: 'event', count: 2 },
+          { kind: 'logEntry', count: 2 },
           { kind: 'stage', count: 1 },
         ],
       })
@@ -195,7 +195,7 @@ describe('user data files', () => {
       expect(parseUserDataFile(fileOf([event]))).toEqual({
         ok: true,
         records: [],
-        skipped: [{ kind: 'event', count: 1 }],
+        skipped: [{ kind: 'logEntry', count: 1 }],
       })
     })
 
@@ -223,11 +223,11 @@ describe('user data files', () => {
       expect(notes).toEqual([
         {
           name: 'later.json',
-          note: 'Skipped records of a kind this version does not know: 2 × event, 1 × stage. They are not kept, so a file this version exports leaves them out.',
+          note: 'Skipped records of a kind this version does not know: 2 × logEntry, 1 × stage. They are not kept, so a file this version exports leaves them out.',
         },
       ])
       const german = readNote(parseUserDataFile(fileOf([event])), translator(de, 'de').t)
-      expect(german).toContain('1 × event')
+      expect(german).toContain('1 × logEntry')
       expect(german).toContain('diese Version nicht kennt')
     })
 

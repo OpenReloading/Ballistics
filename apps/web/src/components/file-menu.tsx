@@ -134,6 +134,7 @@ const kindNames: Record<UserRecordKind, Message> = {
   session: msg('chronograph sessions'),
   targetSheet: msg('target sheets'),
   targetFaceDesign: msg('target designs'),
+  event: msg('competition events'),
   shootingLogEntry: msg('shooting log entries'),
 }
 

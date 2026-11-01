@@ -21,6 +21,10 @@
     "value": 20.5,
     "raw": "Nose length is .8072″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -50,6 +54,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/284-cal-169gr-hammer-hunter/: Recommended minimum twist rate is 1-8.25″ | Bullet length is 1.562″ | Nose length is .8072″ | Bullet weight is 168gr | Recommended Use: Big Game Hunting | G7-bc= .272 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

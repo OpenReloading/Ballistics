@@ -17,6 +17,10 @@
     "value": 14.05,
     "raw": ".553\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -39,6 +43,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .224, Grains 32, Minimum Required Twist 1-16\", Part Number HGHP 22 32, G1 BC .122 (A.B.), OAL .553\", Bullet Projection .410\" | Page 11, HG RAPTOR - HG SOLID: Caliber 5.7/.224, Grains 32, Part Number HGHP 22 32, OAL .553\", Bullet Projection .410\", Blunt Trauma Base™ ~ Retained Weight (grains) 5 to 6 blades, ~ 6 grs each"
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

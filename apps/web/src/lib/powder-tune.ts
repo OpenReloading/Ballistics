@@ -77,10 +77,6 @@ export const revolverLeakNote = (table: string | undefined, load: InteriorLoad |
   cartridgeClass(table) === 'pistol' &&
   !load.leakage?.area.some((p) => p.area > 0)
 
-/** The tuning route opened for the powder `powder` (a reference): it lists the saved loads that use it. */
-export const tunePowderHref = (powder: string) =>
-  `/powders/tune?${new URLSearchParams([['powder', powder]])}`
-
 /** The powder reference a search string of the tuning route names. */
 export const tunePowder = (search: string) => new URLSearchParams(search).get('powder') ?? undefined
 

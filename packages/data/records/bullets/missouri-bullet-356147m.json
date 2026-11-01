@@ -16,6 +16,18 @@
     "value": 17.12,
     "raw": "Bullet OAL .674 +/-"
   },
+  "construction": {
+    "raw": "cast lead bullets",
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 18,
+        "raw": "Brinell 18"
+      }
+    },
+    "gasCheck": false
+  },
   "note": "Listed as 147 Grain 9MM FP. Brinell 18. 9mm Parabellum. For Subsonic Work.",
   "provenance": {
     "kind": "published",
@@ -25,8 +37,20 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length"],
+        "fields": ["diameter", "mass", "length", "construction.core.hardness"],
         "note": "356147M, SubSonic (https://missouribullet.com/details.php?prodId=66): .356 Diameter, 147 Grain 9MM FP, Brinell 18, Bullet OAL .674 +/-"
+      },
+      {
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": [
+          "construction.raw",
+          "construction.structure",
+          "construction.core",
+          "construction.gasCheck"
+        ],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }

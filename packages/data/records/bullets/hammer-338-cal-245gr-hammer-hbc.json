@@ -21,6 +21,10 @@
     "value": 26.95,
     "raw": "Nose length including the tip: 1.061″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -55,6 +59,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/338-cal-245gr-hammer-hbc/: Minimum required twist rate is 1-9″ or faster | Bullet length is including tip: 1.875″ | Nose length including the tip: 1.061″ | PDR drive band spacing is .200″ (recommend two drive bands in the case neck for concentricity) | Tip length: .143″ | Bullet weight: 245gr | Recommended use: Big Game Hunting | g7-bc= .366 | g1-bc= .731 | form factor = .837"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

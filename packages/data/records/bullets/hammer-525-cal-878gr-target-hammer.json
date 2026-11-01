@@ -21,6 +21,10 @@
     "value": 36.22,
     "raw": "Nose length is 1.4259″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -50,6 +54,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/525-cal-878gr-target-hammer/: Minimum required twist rate is 1-16″ or faster | Bullet length is 2.520″ | Nose length is 1.4259″ | Bullet weight is 878gr | Recommended use: Target Shooting | g7-bc= .433 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

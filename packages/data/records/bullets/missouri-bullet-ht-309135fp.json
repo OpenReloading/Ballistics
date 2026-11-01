@@ -18,7 +18,15 @@
   },
   "construction": {
     "raw": "Hi-Tek 2-Extreme Coating",
-    "unmapped": true
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 18,
+        "raw": "Brinell 18"
+      }
+    },
+    "gasCheck": false
   },
   "note": "Listed as 135 Grain RNFP. Brinell 18. For .30-.30 Lever Guns.",
   "provenance": {
@@ -29,13 +37,15 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "fields": ["diameter", "mass", "length", "construction.raw", "construction.core.hardness"],
         "note": "HT-309135FP, #2 Whitetail - Hi-Tek (https://missouribullet.com/details.php?prodId=266): .309 Diameter, 135 Grain RNFP, Brinell 18, Bullet OAL .763 +/-, Hi-Tek 2-Extreme Coating"
       },
       {
-        "source": "mapping-of-the-maker-wording-to-construction-fields",
-        "kind": "derived",
-        "fields": ["construction.unmapped"]
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.structure", "construction.core", "construction.gasCheck"],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }
