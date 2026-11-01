@@ -28,7 +28,9 @@ export function reasonText(reason: string, t: Translator['t']) {
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
   if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
-  return translateMessage(reason, t)
+  // a refused record: zod's lines `✖ <message>` and `  → at <path>`, each message translated
+  if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
+  return reason.replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
 }
 
 /** The size of `text` as a file, UTF-8 bytes, as Open and Import compare it with `maxFileBytes`. */

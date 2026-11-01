@@ -438,7 +438,7 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
     return t('{name} has no round count; set one on the Firearms page to add the log to it.', {
       name,
     })
-  const due = entryRoundsDue(found.data, id, entry.rounds)
+  const due = entryRoundsDue(found.data, id, entry.rounds, entry.event)
   if (due < 1) return ''
   const ok = await confirmDialog({
     title: t('Add to the round count?'),
@@ -453,7 +453,9 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
   if (!ok) return t('The round count of {name} is unchanged.', { name })
   const written = await updateRecord(firearmId, (raw) => {
     const stored = userRecord.safeParse(raw)
-    return stored.success ? withEntryRounds(stored.data, id, entry.rounds) : undefined
+    return stored.success
+      ? withEntryRounds(stored.data, id, entry.rounds, new Date(), entry.event)
+      : undefined
   })
   return written?.kind === 'firearm' && written.data.roundCount !== undefined
     ? t('Round count of {name}: {count}.', { name, count: written.data.roundCount })

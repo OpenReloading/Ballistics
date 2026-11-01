@@ -51,6 +51,10 @@ describe('German term table', () => {
     }
   })
 
+  it('lists the German term of a row among its forms, where the row names forms', () => {
+    for (const t of terms) if ('forms' in t) expect(t.forms, t.key).toContain(t.german)
+  })
+
   it('gives a decided row one of its at least two distinct, sourced candidates and a decision', () => {
     for (const t of terms.filter((r) => r.status === 'decided')) {
       expect(t.candidates.length, t.key).toBeGreaterThanOrEqual(2)
