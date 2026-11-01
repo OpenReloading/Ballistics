@@ -17,6 +17,10 @@
     "value": 31.9,
     "raw": "1.256\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -39,6 +43,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 6, Flat Base Raptors (FB): Caliber .458, Grains 258, Minimum Required Twist 1-20\", Part Number FB S258, G1 BC .216 (O89), OAL 1.256\", Bullet Projection .670\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

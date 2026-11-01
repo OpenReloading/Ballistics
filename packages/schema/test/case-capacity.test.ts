@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { caseCapacity, catalogueCaseCapacity, loadWaterCapacity, userRecord } from '../src/index.ts'
-import { expectIssueAt } from './issue-at.ts'
+import { expectIssueAt, issuePaths } from './issue-at.ts'
 
 const provenance = { kind: 'published', sources: [{ title: 'Example manual' }] }
 const catalogue = {
@@ -26,12 +26,22 @@ describe('CaseCapacity', () => {
     expect(catalogueCaseCapacity.safeParse(user).success).toBe(false)
   })
 
-  it('takes an optional convention string, not an empty one', () => {
-    expect(caseCapacity.parse(user).convention).toBeUndefined()
+  it('takes an optional primer state and fill level, and rejects the old convention text', () => {
+    expect(caseCapacity.parse(user).primerState).toBeUndefined()
+    expect(caseCapacity.parse(user).fillLevel).toBeUndefined()
+    for (const primerState of ['primed-spent', 'unprimed'])
+      expect(caseCapacity.parse({ ...user, primerState }).primerState).toBe(primerState)
+    expect(catalogueCaseCapacity.parse({ ...catalogue, fillLevel: 'mouth' }).fillLevel).toBe(
+      'mouth',
+    )
+    expectIssueAt(caseCapacity, { ...user, primerState: 'primed' }, 'primerState')
+    expectIssueAt(caseCapacity, { ...user, fillLevel: 'shoulder' }, 'fillLevel')
     const convention = 'to the mouth, water at 20 C, primer seated'
-    expect(caseCapacity.parse({ ...user, convention }).convention).toBe(convention)
-    expect(catalogueCaseCapacity.parse({ ...catalogue, convention }).convention).toBe(convention)
-    expectIssueAt(caseCapacity, { ...user, convention: '' }, 'convention')
+    expect(issuePaths(caseCapacity, { ...user, convention })).toEqual(['convention'])
+    expect(issuePaths(catalogueCaseCapacity, { ...catalogue, convention })).toEqual(['convention'])
+    expect(catalogueCaseCapacity.parse({ ...catalogue, primerState: 'unprimed' }).primerState).toBe(
+      'unprimed',
+    )
   })
 
   it('needs an id and provenance in a catalogue record, which names catalogue records only', () => {

@@ -21,6 +21,10 @@
     "value": 18.81,
     "raw": "Nose length is .7406″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -39,6 +43,13 @@
         "sha256": "7556f37c1d0ef81e0e9cef8315b5a815e8dd2d4dee69e949c812ea808f341d60",
         "fields": ["diameter", "mass", "length", "noseLength", "ballisticCoefficients"],
         "note": "https://hammerbullets.com/product/458-cal-400gr-stone-hammer/: Minimum required twist rate is 1-19″ dangerous game or 1-22″ big game | Bullet length is 1.44″ | Nose length is .7406″ | Bullet weight is 404gr | Recommended use: Dangerous Game Hunting and Big Game Hunting | g1-bc= .393 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

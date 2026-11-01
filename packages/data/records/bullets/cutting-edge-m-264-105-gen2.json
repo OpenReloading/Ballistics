@@ -17,6 +17,10 @@
     "value": 28.88,
     "raw": "1.137\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 5, MAXIMUS Bullets: Caliber .264, Grains 105, Minimum Required Twist 1-9.5\", Part Number M.264 105 Gen2, G1 BC .423 EST, G7 BC .212 EST, OAL 1.137\", BULLET PROJECTION .710\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

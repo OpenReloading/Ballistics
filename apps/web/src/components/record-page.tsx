@@ -27,6 +27,7 @@ export function RecordPage({
   workbench,
   groups,
   design,
+  more,
   strip,
   figure,
   values,
@@ -54,6 +55,8 @@ export function RecordPage({
   groups?: string | undefined
   /** "Open in designer" link. */
   design?: string | undefined
+  /** More links after Compare (the powder's Tune from strings). */
+  more?: ReactNode
   /** The figure section; a record whose values carry their own figures (the cartridge's) has none. */
   figure?: ReactNode
   /** The values section: the record's table. */
@@ -88,6 +91,7 @@ export function RecordPage({
             workbench={workbench}
             groups={groups}
             design={design}
+            more={more}
             tour
           />
         }

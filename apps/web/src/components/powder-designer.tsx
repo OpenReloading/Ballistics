@@ -37,9 +37,9 @@ import {
   rowId,
   specOf,
 } from '../lib/powder-designer.ts'
-import { tunePowderHref } from '../lib/powder-tune.ts'
 import { rawWording } from '../lib/record-values.ts'
 import { controlSize } from '../lib/theme.ts'
+import { tunePowderHref } from '../lib/tune-href.ts'
 import { namedKey } from '../lib/user-data.ts'
 import { userRef } from '../lib/variants.ts'
 import { say, verbatim } from '../lib/wording.ts'

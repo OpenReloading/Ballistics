@@ -11,6 +11,7 @@ import {
   tuneHref,
   tuneSessionIds,
 } from '../src/lib/powder-tune.ts'
+import { powdersWithStrings, readStringForm, stringResiduals } from '../src/lib/tune-strings.ts'
 
 const session = (strings: SessionRecord['data']['strings']): SessionRecord => ({
   kind: 'session',
@@ -118,6 +119,81 @@ describe('the saved loads of a powder', () => {
       { id: '1', name: 'B' },
     ])
     expect(loadsWithPowder(records, 'user:q')).toEqual([])
+  })
+
+  it('offers each powder of a saved load with mapped strings once, not a powder typed by name', () => {
+    const typed = {
+      ...load('5', 'E', 'x', ['user:m']),
+      data: { origin: 'user', powder: { manufacturer: 'M', name: 'N' }, sessions: ['user:m'] },
+    } as UserRecord
+    const records: UserRecord[] = [
+      mapped,
+      unmapped,
+      load('1', 'B', 'user:p', ['user:m']),
+      load('2', 'A', 'user:p', ['user:m']),
+      load('3', 'C', 'user:q', ['user:u']),
+      load('4', 'D', 'catalogue:x', ['user:m']),
+      typed,
+    ]
+    expect(powdersWithStrings(records)).toEqual(['user:p', 'catalogue:x'])
+  })
+})
+
+describe('the residual of each string', () => {
+  const shot = (value: number, excluded?: 'other') => ({
+    velocity: { value },
+    ...(excluded && { excluded }),
+  })
+  const strings = [
+    { charge: 2.6e-3, shots: [shot(800)] },
+    { charge: 2.7e-3, shots: [shot(810, 'other')] },
+    { charge: 2.8e-3, shots: [shot(820)] },
+  ]
+  const r = (charge: number, kind = 'velocity') => ({ kind, charge, residual: 1 })
+
+  it('pairs the residuals with the strings the fit read, a string without a shot left empty', () => {
+    const pressure = r(2.6e-3, 'pressure')
+    const out = stringResiduals(strings, [r(2.6e-3), pressure, r(2.8e-3)])
+    expect(out.map((x) => x?.charge)).toEqual([2.6e-3, undefined, 2.8e-3])
+  })
+
+  it('gives none for residuals of other strings', () => {
+    expect(stringResiduals(strings, [r(2.6e-3)])).toEqual([undefined, undefined, undefined])
+    expect(stringResiduals(strings, [r(2.6e-3), r(2.9e-3)])).toEqual([
+      undefined,
+      undefined,
+      undefined,
+    ])
+    expect(stringResiduals(strings, undefined)).toEqual([undefined, undefined, undefined])
+  })
+})
+
+describe('the add form', () => {
+  const units = {
+    charge: (x: number) => x / 1000,
+    velocity: (x: number) => x,
+    temperature: (x: number) => x + 273.15,
+  }
+
+  it('reads a charge, velocities and a temperature in SI', () => {
+    expect(readStringForm({ charge: '2.5', shots: '800 810', temperature: '-5' }, units)).toEqual({
+      string: {
+        charge: 0.0025,
+        shots: [{ velocity: { value: 800 } }, { velocity: { value: 810 } }],
+        temperature: 268.15,
+      },
+    })
+    const plain = readStringForm({ charge: '2.5', shots: '800', temperature: '' }, units)
+    expect('string' in plain && plain.string.temperature).toBe(undefined)
+  })
+
+  it('names each field that does not read', () => {
+    expect(readStringForm({ charge: '0', shots: '', temperature: 'warm' }, units)).toEqual({
+      errors: { charge: true, shots: true, temperature: true },
+    })
+    expect(readStringForm({ charge: '2.5', shots: '800 -1', temperature: '' }, units)).toEqual({
+      errors: { shots: true },
+    })
   })
 })
 

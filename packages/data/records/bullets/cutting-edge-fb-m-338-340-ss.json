@@ -17,6 +17,10 @@
     "value": 53.85,
     "raw": "2.120\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -28,6 +32,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length"],
         "note": "Page 5, MAXIMUS Bullets: Caliber .338, Grains 340, Minimum Required Twist 1-3\", Part Number FB M. 338 340 SS, G1 BC TBD, G7 BC TBD, OAL 2.120\", BULLET PROJECTION 1.120\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },
