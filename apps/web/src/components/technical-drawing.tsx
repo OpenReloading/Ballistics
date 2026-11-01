@@ -156,9 +156,13 @@ function Axis({ at }: { at?: [number, number] | undefined }) {
   )
 }
 
-/** The screen width a figure fits: the window height less the page's rows above (`--drawing-chrome`, 7rem unless a page sets it), but no smaller than 11 px text (whole px: layout rounds down). */
-function fitWidth({ em, frame: [, , w, h] }: FigureModel | BulletModel, tallest = h) {
-  return `max(calc((100svh - var(--drawing-chrome, 7rem)) * ${(w / tallest).toFixed(4)}), ${Math.ceil((w * face.minTextPx) / em)}px)`
+/** The screen width at which a figure's text renders 11 px (whole px: layout rounds down). */
+const readableWidth = ({ em, frame: [, , w] }: FigureModel | BulletModel) =>
+  `${Math.ceil((w * face.minTextPx) / em)}px`
+
+/** The screen width a figure fits: the window height less the page's rows above (`--drawing-chrome`, 7rem unless a page sets it), but no smaller than 11 px text. */
+function fitWidth(model: FigureModel | BulletModel, tallest = model.frame[3]) {
+  return `max(calc((100svh - var(--drawing-chrome, 7rem)) * ${(model.frame[2] / tallest).toFixed(4)}), ${readableWidth(model)})`
 }
 
 /**
@@ -319,6 +323,9 @@ export function TechnicalDrawing({
           : ({
               '--full': `${n(w * unit)}px`,
               '--fit': fitWidth(model, tallest),
+              // a page that sizes the drawing itself keeps its text 11 px with these (the designers)
+              '--readable': readableWidth(model),
+              '--aspect': (h / w).toFixed(4),
               ...(reserve && reserved({ model, tallest }, reserve)),
             } as CSSProperties)
       }

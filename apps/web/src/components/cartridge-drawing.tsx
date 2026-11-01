@@ -1,4 +1,4 @@
-import { SegmentedControl } from '@mantine/core'
+import { SegmentedControl, Tooltip } from '@mantine/core'
 import { angleText, face, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
   type Drawn,
@@ -16,13 +16,14 @@ import {
   signedLengthText,
   valueParts,
 } from '@open-reloading/drawing/cartridge'
+import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { conflictText, differenceText } from '../lib/cartridge-record.ts'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { nth } from '../lib/nth.ts'
-import { controlSize } from '../lib/theme.ts'
+import { controlSize, tipEvents } from '../lib/theme.ts'
 import { type Linked, TechnicalDrawing } from './technical-drawing.tsx'
 
 /** What the drawing reads of a record (`drawable`). */
@@ -64,6 +65,7 @@ export function CartridgeDrawing({
   caption,
   view,
   onView,
+  controls,
   unit = 'mm',
 }: {
   spec: Drawable
@@ -82,6 +84,8 @@ export function CartridgeDrawing({
   /** The view picked in the designer; shown while it draws, else Combined, else the drawn side. */
   view?: View | undefined
   onView?: ((view: View) => void) | undefined
+  /** The designer's panel header, where the view switch of a single figure goes; null until mounted. */
+  controls?: HTMLElement | null | undefined
   unit?: LengthUnit | undefined
 }) {
   const all = list.filter((f) => f.drawn.length)
@@ -113,6 +117,8 @@ export function CartridgeDrawing({
         scale={1}
         view={view}
         onView={onView}
+        // one switch for one figure; a figure per variant keeps its own
+        controls={laid.length === 1 ? controls : undefined}
         unit={unit}
         {...l}
       />
@@ -412,35 +418,41 @@ function ViewSwitch({
   reason,
   enabled,
   onView,
+  slot,
 }: {
   id: string
   shown: string
   reason: Reason
   enabled: (v: string) => boolean
   onView?: ((view: View) => void) | undefined
+  /** Where the switch goes instead of above the figure; null while it is not mounted. */
+  slot?: HTMLElement | null | undefined
 }) {
   const { t } = useTranslation()
+  const controls = (
+    <div className="drawing-controls">
+      {/* named with the figure title: a table VII record has one switch per variant */}
+      <span id={`${id}-legend`} className="visually-hidden">
+        {t('View')}
+      </span>
+      <SegmentedControl
+        size={controlSize.row.toggle}
+        aria-labelledby={`${id}-legend ${id}-title`}
+        aria-describedby={reason ? `${id}-reason` : undefined}
+        name={`${id}-view`}
+        value={shown}
+        onChange={(v) => onView?.(v as View)}
+        data={views.map(([value, label]) => ({
+          value,
+          label: t(label),
+          disabled: !enabled(value),
+        }))}
+      />
+    </div>
+  )
   return (
     <>
-      <div className="drawing-controls">
-        {/* named with the figure title: a table VII record has one switch per variant */}
-        <span id={`${id}-legend`} className="visually-hidden">
-          {t('View')}
-        </span>
-        <SegmentedControl
-          size={controlSize.row.toggle}
-          aria-labelledby={`${id}-legend ${id}-title`}
-          aria-describedby={reason ? `${id}-reason` : undefined}
-          name={`${id}-view`}
-          value={shown}
-          onChange={(v) => onView?.(v as View)}
-          data={views.map(([value, label]) => ({
-            value,
-            label: t(label),
-            disabled: !enabled(value),
-          }))}
-        />
-      </div>
+      {slot === undefined ? controls : slot && createPortal(controls, slot)}
       {reason && (
         <p id={`${id}-reason`} className="views-reason">
           {reason.text}
@@ -491,6 +503,37 @@ function PrintFigures({
   ))
 }
 
+/**
+ * The Combined view's line of the caption, one line: its definition in a tooltip (hover, focus and
+ * tap) and as the line's name for screen readers.
+ */
+function CombinedCaption({ unit }: { unit: LengthUnit }) {
+  const { t } = useTranslation()
+  const definition =
+    unit === 'mm'
+      ? t(
+          'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in mm, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+        )
+      : t(
+          'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in inches, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+        )
+  return (
+    <span className="caption-combined">
+      {' '}
+      <Tooltip label={definition} events={tipEvents} multiline maw={360}>
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: the keyboard reaches the definition's tooltip */}
+        <span className="caption-combined-short" role="note" aria-label={definition} tabIndex={0}>
+          {unit === 'mm'
+            ? t('Combined: nominal minimum difference per region, chamber minus cartridge, in mm.')
+            : t(
+                'Combined: nominal minimum difference per region, chamber minus cartridge, in inches.',
+              )}
+        </span>
+      </Tooltip>
+    </span>
+  )
+}
+
 function FigureCaption({
   caption,
   differences,
@@ -510,18 +553,7 @@ function FigureCaption({
   return (
     <figcaption>
       {caption}
-      {differences !== undefined && differences.length > 0 && (
-        <span className="caption-combined">
-          {' '}
-          {unit === 'mm'
-            ? t(
-                'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in mm, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
-              )
-            : t(
-                'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in inches, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
-              )}
-        </span>
-      )}
+      {differences !== undefined && differences.length > 0 && <CombinedCaption unit={unit} />}
       {/* the select names the variant on screen */}
       {variant !== undefined && (
         <span className="print-only">{` ${t('Variant {variant}.', { variant })}`}</span>
@@ -553,6 +585,7 @@ function Outline({
   caption,
   view,
   onView,
+  controls,
   unit,
   linked,
   reserve,
@@ -565,6 +598,8 @@ function Outline({
   linked?: Linked | undefined
   view?: View | undefined
   onView?: ((view: View) => void) | undefined
+  /** The designer's panel header for the view switch (`CartridgeDrawing`). */
+  controls?: HTMLElement | null | undefined
   figure: Figure
   /** The screen model. */
   model: FigureModel
@@ -590,7 +625,14 @@ function Outline({
       data-view={combined ? 'combined' : switchable ? shown : undefined}
     >
       {switchable && (
-        <ViewSwitch id={id} shown={shown} reason={reason} enabled={enabled} onView={onView} />
+        <ViewSwitch
+          id={id}
+          shown={shown}
+          reason={reason}
+          enabled={enabled}
+          onView={onView}
+          slot={controls}
+        />
       )}
       <TechnicalDrawing
         id={id}

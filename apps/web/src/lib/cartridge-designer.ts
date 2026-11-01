@@ -32,7 +32,7 @@ import {
   siToStored,
   storedToSi,
 } from './field-spec.ts'
-import { designReduce, type History as H, historyOf, pushHistory } from './history.ts'
+import { designReduce, editHistory, type History as H, historyOf, pushHistory } from './history.ts'
 import { nth } from './nth.ts'
 import { exactFieldText, type UnitSystem } from './units.ts'
 import { type ResolvedCartridge, revisionOf } from './variants.ts'
@@ -150,6 +150,8 @@ interface Origin {
 }
 
 export interface Design {
+  /** The name typed for the design: the file's and the workbench's name of it; blank, the base's. */
+  name?: string | undefined
   /** The CIP table whose drawing rules apply (table III: belt). */
   table: string
   fields: Fields
@@ -357,6 +359,7 @@ export const tables = [...drawnTables]
 export type Action =
   | { type: 'field'; key: string; value: FieldValue }
   | { type: 'table'; value: string }
+  | { type: 'name'; value: string }
   | { type: 'start'; design: Design }
   | { type: 'new' }
   | { type: 'reset'; system: UnitSystem }
@@ -371,8 +374,15 @@ export function reduce(h: History, a: Action): History {
   switch (a.type) {
     case 'table':
       return pushHistory(h, { ...h.present, table: a.value })
+    case 'name':
+      return editHistory(h, { ...h.present, name: a.value }, 'name')
     case 'new':
       return historyOf(newDesign(h.present))
+    case 'reset': {
+      // the record's values, the name typed for the design stays
+      const r = designReduce(h, a, fieldSpecs, fromOrigin)
+      return r === h ? h : { ...r, present: { ...r.present, name: h.present.name } }
+    }
     default:
       return designReduce(h, a, fieldSpecs, fromOrigin)
   }
@@ -719,6 +729,10 @@ function derive(figure: Figure, values: SpecValue[], t: Translator['t']): Derive
   const volume = approximateCaseVolume(figure, values, t)
   return [...derivedAngles(figure, values, t), ...(volume ? [volume] : [])]
 }
+
+/** The name a design is saved under: the name typed, else its base's title, else a generic name. */
+export const designFileName = (d: Pick<Design, 'name' | 'origin'>) =>
+  d.name?.trim() || d.origin?.title || 'Cartridge design'
 
 /**
  * What a saved cartridge design gives the workbench: the spec its preview draws and seats in, the

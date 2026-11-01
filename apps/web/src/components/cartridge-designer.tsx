@@ -1,12 +1,20 @@
 'use client'
 
-import { NativeSelect, Text } from '@mantine/core'
+import { NativeSelect, Table, Text, TextInput } from '@mantine/core'
 import { useDebouncedValue } from '@mantine/hooks'
 import { chamberOf } from '@open-reloading/drawing/seating'
 import type { UserCartridge } from '@open-reloading/schema'
 import { Ruler } from '@phosphor-icons/react'
 import dynamic from 'next/dynamic'
-import { memo, useCallback, useDeferredValue, useMemo, useRef, useState } from 'react'
+import {
+  memo,
+  type ReactNode,
+  useCallback,
+  useDeferredValue,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, localizeNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -17,6 +25,7 @@ import {
   type CartridgeFieldSpec,
   type Derived,
   type Design,
+  designFileName,
   draws,
   type Evaluation,
   evaluate,
@@ -149,6 +158,29 @@ const StartSearch = memo(function StartSearch({
   )
 })
 
+/** The design's name: the file's name and the workbench's title of the design. */
+const NameField = memo(function NameField({
+  value,
+  placeholder,
+  dispatch,
+}: {
+  value: string
+  /** The name saved while none is typed. */
+  placeholder: string
+  dispatch: (a: Action) => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <TextInput
+      label={t('Name')}
+      maxLength={200}
+      value={value}
+      placeholder={placeholder}
+      onChange={(ev) => dispatch({ type: 'name', value: ev.currentTarget.value })}
+    />
+  )
+})
+
 const TableSelect = memo(function TableSelect({
   value,
   dispatch,
@@ -174,22 +206,28 @@ const TableSelect = memo(function TableSelect({
   )
 })
 
-/** The derived values in two reserved lines; each value with its basis is in the line's title. */
-function DerivedLine({ rows, system }: { rows: Derived[]; system: UnitSystem }) {
+/** The derived values as a table of label and value; a row's title has the value's basis. */
+function DerivedTable({ rows, system }: { rows: Derived[]; system: UnitSystem }) {
   const { t } = useTranslation()
-  const value = (d: Derived) => `${d.label} ${valueText(d.quantity, system, d.si)}`
+  if (rows.length === 0) return null
   return (
-    <Text
-      component="p"
-      inherit
+    <Table
+      className="derived-table"
       fz="sm"
-      m="0.25rem 0 0"
-      className="derived-line"
-      title={rows.map((d) => `${value(d)}: ${d.basis}`).join('\n') || undefined}
+      verticalSpacing={2}
+      horizontalSpacing="xs"
+      withRowBorders={false}
     >
-      {rows.length > 0 &&
-        t('Derived from the design: {values}.', { values: rows.map(value).join(', ') })}
-    </Text>
+      <Table.Caption>{t('Derived from the design')}</Table.Caption>
+      <Table.Tbody>
+        {rows.map((d) => (
+          <Table.Tr key={d.key} title={d.basis}>
+            <Table.Th scope="row">{d.label}</Table.Th>
+            <Table.Td>{valueText(d.quantity, system, d.si)}</Table.Td>
+          </Table.Tr>
+        ))}
+      </Table.Tbody>
+    </Table>
   )
 }
 
@@ -254,6 +292,7 @@ function DrawingFigure({
   title,
   view,
   onView,
+  controls,
   unit,
 }: {
   drawn: Evaluation | undefined
@@ -262,6 +301,8 @@ function DrawingFigure({
   title: string
   view: View | undefined
   onView: (v: View) => void
+  /** The panel header's slot for the view switch. */
+  controls: HTMLElement | null
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
   const { t } = useTranslation()
@@ -275,6 +316,7 @@ function DrawingFigure({
           caption={t("Changed values are drawn as entered, without the record's tolerances.")}
           view={view}
           onView={onView}
+          controls={controls}
           unit={unit}
         />
       </div>
@@ -330,18 +372,26 @@ function ParameterHead({
   shotshell,
   dispatch,
   unit,
+  seat,
 }: {
   start: (id: string) => void
   design: Design
   shotshell: boolean
   dispatch: (a: Action) => void
   unit: string
+  /** The Seat a bullet block: the most used fields, before the long CIP groups. */
+  seat: ReactNode
 }) {
   const { t } = useTranslation()
   return (
     <>
       <StartSearch start={start} chosen={design.origin?.title} />
       <div className="prop-grid designer-grid">
+        <NameField
+          value={design.name ?? ''}
+          placeholder={design.origin?.title ?? t('Cartridge design')}
+          dispatch={dispatch}
+        />
         <TableSelect value={design.table} dispatch={dispatch} />
       </div>
       {shotshell ? (
@@ -351,12 +401,18 @@ function ParameterHead({
           )}
         </p>
       ) : (
-        // the unit once per column; screen readers have it in each field's name
-        <div className="side-row side-head" aria-hidden="true">
-          <span>{t('Symbol')}</span>
-          <span>{t('Cartridge, {unit}', { unit })}</span>
-          <span>{t('Chamber, {unit}', { unit })}</span>
-        </div>
+        <>
+          <div className="designer-seat">
+            <h3 className="prop-head">{t('Seat a bullet')}</h3>
+            {seat}
+          </div>
+          {/* the unit once per column; screen readers have it in each field's name */}
+          <div className="side-row side-head" aria-hidden="true">
+            <span>{t('Symbol')}</span>
+            <span>{t('Cartridge, {unit}', { unit })}</span>
+            <span>{t('Chamber, {unit}', { unit })}</span>
+          </div>
+        </>
       )}
     </>
   )
@@ -371,6 +427,8 @@ export function CartridgeDesigner() {
   const { t } = useTranslation()
   /** The view picked; Combined once both sides draw until one is picked. */
   const [view, setView] = useState<View>()
+  // the view switch goes in the Drawing panel's header row
+  const [viewSlot, setViewSlot] = useState<HTMLElement | null>(null)
   const { system, history, design, dispatch, loading, fileMenu, start, toolbarDispatch } =
     useDesigner<Design, Action>({
       reduce,
@@ -401,9 +459,12 @@ export function CartridgeDesigner() {
     (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity ?? f),
     fixedFieldText,
   )
-  const designName = design.origin
-    ? t('design from {name}', { name: design.origin.title })
-    : t('new cartridge')
+  const typed = design.name?.trim()
+  const designName = typed
+    ? typed
+    : design.origin
+      ? t('design from {name}', { name: design.origin.title })
+      : t('new cartridge')
   const title = t('Outline, {name}', { name: designName })
   const { seatSpec, canSeat } = seating(drawn)
   const draft = useMemo(
@@ -466,8 +527,11 @@ export function CartridgeDesigner() {
   const fileDesign = useDeferredValue(design)
   const fileValue = useMemo(() => fileData(fileDesign), [fileDesign])
   const openFile = useCallback(
-    async (d: UserCartridge) =>
-      dispatch({ type: 'start', design: fromUser(d, await resolveCartridge(d), system) }),
+    async (d: UserCartridge, name: string) =>
+      dispatch({
+        type: 'start',
+        design: { ...fromUser(d, await resolveCartridge(d), system), name },
+      }),
     [system, dispatch],
   )
 
@@ -489,7 +553,7 @@ export function CartridgeDesigner() {
       <FileMenu
         ref={fileMenu}
         kind="cartridge"
-        name={fileDesign.origin?.title ?? 'Cartridge design'}
+        name={designFileName(fileDesign)}
         data={fileValue}
         problem={fileDesign.locked?.reason}
         onOpen={openFile}
@@ -512,28 +576,24 @@ export function CartridgeDesigner() {
               shotshell={shotshell}
               dispatch={dispatch}
               unit={system.length.symbol}
+              seat={
+                canSeat ? (
+                  <div ref={setSeatSlot} className="seating-slot" />
+                ) : (
+                  <p className="note">{seatMissing(drawn?.spec !== undefined, t)}</p>
+                )
+              }
             />
           }
           message={loading ?? designMessage(design, t)}
           sections={
             shotshell
               ? []
-              : [
-                  ...(Object.keys(groups) as Group[]).map((g) => ({
-                    key: g,
-                    title: groupLabel(groups[g], t),
-                    content: groupFields(g),
-                  })),
-                  {
-                    key: 'seat',
-                    title: t('Seat a bullet'),
-                    content: canSeat ? (
-                      <div ref={setSeatSlot} className="seating-slot" />
-                    ) : (
-                      <p className="note">{seatMissing(drawn?.spec !== undefined, t)}</p>
-                    ),
-                  },
-                ]
+              : (Object.keys(groups) as Group[]).map((g) => ({
+                  key: g,
+                  title: groupLabel(groups[g], t),
+                  content: groupFields(g),
+                }))
           }
         />
       </fieldset>
@@ -552,6 +612,7 @@ export function CartridgeDesigner() {
     <>
       <div className="page-panel-head designer-panel-head">
         <h2 className="page-panel-title record-heading">{t('Drawing')}</h2>
+        <div ref={setViewSlot} className="designer-view-slot" />
       </div>
       {/* a slot of its own: a refusal does not move the drawing */}
       <Text component="p" inherit fz="sm" m={0} className="stale-line" title={refusal?.reason}>
@@ -564,6 +625,7 @@ export function CartridgeDesigner() {
         title={title}
         view={view}
         onView={setView}
+        controls={viewSlot}
         unit={drawingLengthUnit(system)}
       />
       {draft && (
@@ -578,7 +640,7 @@ export function CartridgeDesigner() {
         />
       )}
       {/* of the drawing shown: a refusal keeps them with the earlier drawing */}
-      <DerivedLine rows={drawn?.derived ?? []} system={system} />
+      <DerivedTable rows={drawn?.derived ?? []} system={system} />
       <div className="print-only">
         <FieldTable caption={msg('Values of the design')} groups={[{ rows: values }]} />
       </div>

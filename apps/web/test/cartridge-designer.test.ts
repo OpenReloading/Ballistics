@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   type Action,
   type Design,
+  designFileName,
   draftSpec,
   draws,
   evaluate,
@@ -254,6 +255,30 @@ describe('history', () => {
     })
     expect(defined(h.present.fields['cartridge.L3']).text).toBe('51.18')
     expect(h.past).toHaveLength(3)
+  })
+
+  it('types a name as one step, keeps it through a reset and drops it for a new design', () => {
+    const named = run(
+      win308(),
+      { type: 'name', value: 'Wild' },
+      { type: 'name', value: 'Wildcat A' },
+    )
+    expect(named.present.name).toBe('Wildcat A')
+    expect(named.past).toHaveLength(1)
+    const reset = [type('cartridge.L3', '52'), { type: 'reset', system: metric } as Action].reduce(
+      reduce,
+      named,
+    )
+    expect(reset.present.name).toBe('Wildcat A')
+    expect(defined(reset.present.fields['cartridge.L3']).text).toBe('51.18')
+    expect(reduce(named, { type: 'new' }).present.name).toBeUndefined()
+  })
+
+  it('saves under the name typed, else the base record, else a generic name', () => {
+    const base = win308()
+    expect(designFileName({ ...base, name: ' Wildcat A ' })).toBe('Wildcat A')
+    expect(designFileName({ ...base, name: '  ' })).toBe(base.origin?.title)
+    expect(designFileName(newDesign())).toBe('Cartridge design')
   })
 
   it('changes the table of the drawing rules as one step', () => {

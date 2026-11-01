@@ -1412,21 +1412,31 @@ td.nowrap {
     max-height: none;
   }
 
+  /* they grow with the drawing's least height (11 px text), never shrink below it */
   .designer :is(div.designer-drawing, .drawing-figure) {
     display: flex;
-    flex: 1 1 0;
+    flex: 1 0 auto;
     flex-direction: column;
-    min-height: 0;
     margin: 0;
   }
 
-  /* fitted to the column, at most three times the 8 px per mm of a record page */
+  /* fitted to the column, at most three times the 8 px per mm of a record page, and no lower than
+     its text at 11 px (technical-drawing.tsx `--readable`): a short window scrolls the column */
   .designer .drawing.screen-only {
     flex: 1 1 0;
     width: 100%;
     max-width: calc(var(--full) * 3);
-    min-height: 0;
+    min-height: calc(var(--readable, 0px) * var(--aspect, 0));
     margin: 0 auto;
+  }
+
+  /* the column scrolls instead: its lines (stale line, captions, derived values) keep their height */
+  .designer .workspace-scroll {
+    overflow-y: auto;
+  }
+
+  .designer .workspace-scroll > * {
+    flex-shrink: 0;
   }
 
   .designer figcaption {
@@ -1575,11 +1585,103 @@ td.nowrap {
   }
 }
 
-/* a phone's sticky drawing keeps its height for the figure */
+/* a phone's sticky drawing keeps its height for the figure: of the title row only the view switch */
 @media screen and (max-width: 47.99em) {
-  .designer-panel-head {
+  .designer-panel-head:not(:has(.drawing-controls)) {
     display: none;
   }
+
+  .designer-panel-head > .page-panel-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* the cartridge designer's Seat a bullet block in the rows of the designer grid
+   (`.prop-grid.designer-grid`): label in the label track, field after it, its help below the field */
+.designer-seat {
+  padding-top: 0.75rem;
+}
+
+.designer-seat .seating-controls {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.designer-seat :is(.seating-controls, .search) > .mantine-InputWrapper-root {
+  display: grid;
+  grid-template-columns: minmax(0, var(--label-column)) minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.5rem;
+  min-height: 1.6875rem;
+}
+
+.designer-seat .mantine-InputWrapper-root > * {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.designer-seat .mantine-InputWrapper-root > .mantine-InputWrapper-label {
+  grid-column: 1;
+  margin: 0;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 400;
+}
+
+.designer-seat
+  .mantine-InputWrapper-root
+  > :is(.mantine-InputWrapper-description, .mantine-InputWrapper-error) {
+  grid-row: 2;
+  margin: 0;
+}
+
+.designer-seat .mantine-Input-wrapper {
+  --input-height-sm: var(--field-height);
+  --input-height-xs: var(--field-height);
+}
+
+.designer-seat .mantine-Input-input {
+  font-size: var(--mantine-font-size-sm);
+}
+
+.designer-seat .search-status:empty {
+  display: none;
+}
+
+/* the cartridge designer's view switch at the end of the Drawing title row */
+.designer-view-slot:empty {
+  display: none;
+}
+
+/* the cartridge designer's derived values: label and value, one row each; a row's title has its basis */
+.designer .derived-table {
+  width: auto;
+  margin-top: 0.25rem;
+}
+
+.designer .derived-table caption {
+  padding: 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
+  text-align: start;
+  caption-side: top;
+}
+
+.designer .derived-table :is(th, td) {
+  padding: 0.0625rem 1rem 0.0625rem 0;
+  border: 0;
+}
+
+.designer .derived-table th {
+  font-weight: 400;
+}
+
+.designer .derived-table td {
+  font-variant-numeric: tabular-nums;
 }
 
 .designer-legend {
