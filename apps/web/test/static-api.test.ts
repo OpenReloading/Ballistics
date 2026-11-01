@@ -91,6 +91,7 @@ describe('the static site answers reads as the API', () => {
     'disciplines',
     'target-mappings',
     'caliber-classes',
+    'event-types',
   ]
   /** The kinds that page; the others refuse `limit` and `offset`. */
   const paged = kinds.slice(0, 5)

@@ -17,6 +17,7 @@ import {
   cartridgeRow,
   caseRow,
   disciplineRow,
+  eventTypeRow,
   federationRow,
   manufacturerRow,
   powderRow,
@@ -152,6 +153,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
         (a, b) => a.diameter.value - b.diameter.value,
         (c) => c.id,
       ),
+      eventTypes: byKey((source.eventTypes ?? []).map(eventTypeRow)),
       capacities: Object.fromEntries(capacities),
       renames,
     },
@@ -170,6 +172,7 @@ export function buildCatalogue(source: CatalogueSource): CatalogueData & { recor
       discipline: byId(source.disciplines),
       targetMapping: byId(source.targetMappings),
       caliberClass: byId(source.caliberClasses),
+      eventType: byId(source.eventTypes ?? []),
     },
   }
 }

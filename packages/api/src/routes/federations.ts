@@ -2,6 +2,7 @@ import {
   caliberClass,
   discipline,
   disciplineCategory,
+  eventType,
   federation,
   recordId,
   targetFace,
@@ -59,13 +60,18 @@ const disciplineList = page(
 const caliberClassList = page(
   caliberClass.pick({ id: true, name: true }).extend({ diameterMm: z.number() }),
 )
+const eventTypeList = page(
+  eventType
+    .pick({ id: true, name: true, federation: true })
+    .extend({ method: z.enum(['hit-factor', 'rings']).describe('Scoring method.') }),
+)
 const mappingList = page(
   targetMapping.pick({ id: true, discipline: true, face: true, event: true, stage: true }).extend({
     gaugeMm: z.number().optional(),
   }),
 )
 
-/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings`, `GET /caliber-classes` and their `/:id` routes. */
+/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings`, `GET /caliber-classes`, `GET /event-types` and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -161,11 +167,25 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
     },
     (_request, reply) => reply.send(catalogue.caliberClasses()),
   )
+  app.get(
+    '/event-types',
+    {
+      schema: { querystring: noQuery },
+      config: {
+        response: eventTypeList,
+        summary: 'List event types',
+        description:
+          'The competition event types with their federation and scoring method (hit factor or rings), ordered by name.',
+      },
+    },
+    (_request, reply) => reply.send(catalogue.eventTypes()),
+  )
   for (const [path, kind, noun, record] of [
     ['/federations', 'federation', 'federation', federation],
     ['/disciplines', 'discipline', 'discipline', discipline],
     ['/target-mappings', 'targetMapping', 'target mapping', targetMapping],
     ['/caliber-classes', 'caliberClass', 'caliber class', caliberClass],
+    ['/event-types', 'eventType', 'event type', eventType],
   ] as const) {
     app.get<{ Params: { id: string } }>(
       `${path}/:id`,

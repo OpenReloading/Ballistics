@@ -253,7 +253,7 @@ describe('GET /target-faces', () => {
   })
 })
 
-describe('GET /federations, /disciplines, /target-mappings and /caliber-classes', () => {
+describe('GET /federations, /disciplines, /target-mappings, /caliber-classes and /event-types', () => {
   it('lists summaries and returns whole records', async () => {
     expect((await get(`${API_PREFIX}/federations`)).body).toEqual({
       total: 1,
@@ -298,14 +298,32 @@ describe('GET /federations, /disciplines, /target-mappings and /caliber-classes'
       total: 1,
       items: [{ id: 'air-4-5', name: '4.5 mm (.177) air', diameterMm: 4.5 }],
     })
+    expect((await get(`${API_PREFIX}/event-types`)).body).toEqual({
+      total: 1,
+      items: [
+        {
+          id: 'test-championship',
+          name: 'Test championship',
+          federation: 'test-federation',
+          method: 'rings',
+        },
+      ],
+    })
     for (const [path, record] of [
       ['federations/test-federation', bundle.federations[0]],
       ['disciplines/test-discipline', bundle.disciplines[0]],
       ['target-mappings/test-discipline-test-face', bundle.targetMappings[0]],
       ['caliber-classes/air-4-5', bundle.caliberClasses[0]],
+      ['event-types/test-championship', bundle.eventTypes?.[0]],
     ] as const)
       expect((await get(`${API_PREFIX}/${path}`)).body).toEqual(record)
-    for (const path of ['federations', 'disciplines', 'target-mappings', 'caliber-classes']) {
+    for (const path of [
+      'federations',
+      'disciplines',
+      'target-mappings',
+      'caliber-classes',
+      'event-types',
+    ]) {
       expect((await get(`${API_PREFIX}/${path}/unknown`)).status).toBe(404)
       expect((await get(`${API_PREFIX}/${path}/Not_An_Id`)).status).toBe(400)
     }
