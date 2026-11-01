@@ -146,7 +146,10 @@ export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
         ...(m && { meanVivacity: r3(m.value), low: r3(m.low), high: r3(m.high) }),
         ...(fit?.trainingRows && { trainingRows: fit.trainingRows }),
         ...(fit?.trainingCartridges && { trainingCartridges: fit.trainingCartridges }),
-        ...(r.data.draft?.interior && { modelled: true as const }),
+        // a draft saves its interior field by field: only a whole model counts
+        ...(interiorSchema.safeParse(r.data.draft?.interior).success && {
+          modelled: true as const,
+        }),
       },
     ]
   })

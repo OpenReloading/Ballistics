@@ -282,6 +282,18 @@ it('gives a browser design with a curve its mean vivacity, so the overlay can ta
   expect(inOverlay(defined(fitted))).toBe(true)
   expect(unfinished?.meanVivacity).toBeUndefined()
   expect(inOverlay(defined(unfinished))).toBe(false)
+  // a whole interior model counts as burn values, a partly entered one does not
+  expect(fitted?.modelled).toBe(true)
+  const [partial] = userPowderRows([
+    {
+      kind: 'powder',
+      id: 'p3',
+      name: 'Partial',
+      saved,
+      data: { origin: 'user', draft: { interior: { vivacity: interior.vivacity } } },
+    },
+  ])
+  expect(partial?.modelled).toBeUndefined()
 
   const design = (id: string, data: object) => ({
     kind: 'powder' as const,
