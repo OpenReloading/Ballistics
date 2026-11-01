@@ -134,6 +134,26 @@ it('keeps a repeated label once per repeat', () => {
   ).toEqual(['0.507'])
 })
 
+it("takes each bullet's own first G1 into the key values, whatever its velocity bands", () => {
+  const banded = record({
+    ballisticCoefficients: [
+      { dragModel: 'G1', value: 0.5, minVelocity: { value: 600 } },
+      { dragModel: 'G1', value: 0.48, minVelocity: { value: 500 } },
+    ],
+  } as Partial<Bullet>)
+  const single = record({
+    id: 'y',
+    ballisticCoefficients: [{ dragModel: 'G1', value: 0.45 }],
+  } as Partial<Bullet>)
+  const groups = compareGroups([banded, single], presetUnits('us'))
+  const g1 = groups[0]?.rows.find((r) => say(english, r.label) === 'BC G1')
+  expect(g1).toMatchObject({ values: ['0.500', '0.450'], unit: 'lb/in²' })
+  expect(g1?.from).toBeUndefined()
+  // the second band stays with the coefficients, the single G1 is not repeated there
+  const rest = groups.find((g) => say(english, g.title) === 'Ballistic coefficients')
+  expect(rest?.rows.map((r) => r.values)).toEqual([['0.480', undefined]])
+})
+
 it('gives each value after the first its difference to the first, as shown', () => {
   expect(differenceToFirst(['168.0', '150.0', '175.5'])).toEqual([undefined, '−18.0', '+7.5'])
   expect(differenceToFirst(['.3080', '.3080'])).toEqual([undefined, '±0.0000'])
@@ -143,6 +163,9 @@ it('gives each value after the first its difference to the first, as shown', () 
   expect(differenceToFirst(['tangent', 'secant'])).toEqual([undefined, undefined])
   expect(differenceToFirst(['1.2', undefined])).toEqual([undefined, undefined])
   expect(differenceToFirst([undefined, '1.2'])).toEqual([undefined, undefined])
+  // no text, or more than one mark, is no number
+  expect(differenceToFirst(['1.2', ''])).toEqual([undefined, undefined])
+  expect(differenceToFirst(['1,234.5', '1.2'])).toEqual([undefined, undefined])
 })
 
 it('finds a row differing where its shown values are not all the same', () => {

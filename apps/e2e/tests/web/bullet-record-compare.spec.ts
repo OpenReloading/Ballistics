@@ -112,7 +112,7 @@ test('a compared bullet has Use in workbench; Add bullet opens the bullet search
 }) => {
   await gotoHydrated(page, '/bullets/compare?ids=demo-bullet-168,demo-bullet-150')
   await expect(
-    page.getByRole('link', { name: 'Use Demo Bullets 30 Cal 168 gr HPBT Demo in workbench' }),
+    page.getByRole('link', { name: 'Use in workbench: Demo Bullets 30 Cal 168 gr HPBT Demo' }),
   ).toHaveAttribute('href', '/workbench/?bullet=demo-bullet-168')
   const unit = page.locator('.page-bar').getByRole('radiogroup', {
     name: 'Length unit of the page: drawings and table',

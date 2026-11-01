@@ -83,30 +83,50 @@ function mergeRows(
  * The rows compared first, in this order, from the group they are taken out of: each by the start
  * of its key (a coefficient's key goes on with its band), the label it takes in the Key group.
  */
-const keyRows: { group: Wording; key: string; label?: Wording }[] = [
+const keyRows: { group: Wording; key: string }[] = [
   { group: msg('Size'), key: 'Mass#' },
   { group: msg('Size'), key: 'Diameter#' },
   { group: msg('Size'), key: 'Length#' },
-  ...['G1', 'G7'].map((model) => ({
-    group: msg('Ballistic coefficients'),
-    key: keyOf({ verbatim: model }),
-    label: worded(msg('BC {model}'), { model }),
-  })),
   { group: msg('Computed'), key: 'Sectional density#' },
 ]
 
-/** The Key group: the first row of each of `keyRows` the bullets have, taken out of its own group. */
-function keyGroup(groups: Map<string, Map<string, CompareRow>>): Map<string, CompareRow> {
+/** The drag models of the Key group, each a row of its own. */
+const keyModels = ['G1', 'G7']
+
+/**
+ * The Key group: the first row of each of `keyRows` the bullets have, taken out of its own group,
+ * and before the sectional density a row per drag model of `bc`.
+ */
+function keyGroup(
+  groups: Map<string, Map<string, CompareRow>>,
+  bc: CompareRow[],
+): Map<string, CompareRow> {
   const key = new Map<string, CompareRow>()
   for (const k of keyRows) {
+    if (k.key === 'Sectional density#') for (const r of bc) key.set(keyOf(r.label), r)
     const rows = groups.get(keyOf(k.group))
     const found = [...(rows?.keys() ?? [])].find((r) => r.startsWith(k.key))
     const row = found === undefined ? undefined : rows?.get(found)
     if (found === undefined || !row) continue
     rows?.delete(found)
-    key.set(found, k.label ? { ...row, label: k.label } : row)
+    key.set(found, row)
   }
   return key
+}
+
+/**
+ * A bullet's coefficient rows split: the first of each drag model of `keyModels` (its first band,
+ * the Key group's value) and the others (the Ballistic coefficients group).
+ */
+function splitCoefficients(rows: FieldRow[]) {
+  const first = new Map<string, FieldRow>()
+  const rest: FieldRow[] = []
+  for (const r of rows) {
+    const model = typeof r.label === 'object' && 'verbatim' in r.label ? r.label.verbatim : ''
+    if (keyModels.includes(model) && !first.has(model)) first.set(model, r)
+    else rest.push(r)
+  }
+  return { first, rest }
 }
 
 /**
@@ -128,10 +148,22 @@ export function compareGroups(
       return [keyOf(title), new Map()]
     }),
   )
+  // each bullet's own first G1 and G7, whatever its bands: one row per drag model
+  const bc: CompareRow[] = keyModels.map((model) => ({
+    label: worded(msg('BC {model}'), { model }),
+    unit: system.ballisticCoefficient.symbol,
+    values: Array.from({ length: bullets.length }, () => undefined),
+  }))
   bullets.forEach((b, i) => {
+    const { first, rest } = splitCoefficients(ballisticCoefficientRows(b))
+    keyModels.forEach((model, k) => {
+      const r = first.get(model)
+      const row = bc[k]
+      if (r && row) row.values[i] = rowParts(r, system, t).number
+    })
     const own: FieldGroup[] = [
       ...bulletDataGroups(b),
-      { title: msg('Ballistic coefficients'), rows: ballisticCoefficientRows(b) },
+      { title: msg('Ballistic coefficients'), rows: rest },
     ]
     for (const g of own) {
       const wording = g.title ?? untitled
@@ -142,7 +174,10 @@ export function compareGroups(
       mergeRows(rows, g.rows, i, bullets.length, system, t)
     }
   })
-  const key = keyGroup(groups)
+  const key = keyGroup(
+    groups,
+    bc.filter((r) => r.values.some((v) => v !== undefined)),
+  )
   return [
     { title: msg('Key values') as Wording, rows: [...key.values()] },
     ...[...groups].map(([title, rows]) => ({
@@ -179,8 +214,11 @@ export function differenceMarks(
 }
 
 /** A shown value as a number: a decimal comma reads as a point, a twist by its length per turn after `turnPrefix`. */
-const shownNumber = (s: string, turnPrefix: string) =>
-  Number((s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s).replace(',', '.'))
+const shownNumber = (s: string, turnPrefix: string) => {
+  const text = (s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s).trim()
+  // one decimal mark at most (the values are shown without grouping); no text is no number
+  return text === '' || /[.,].*[.,]/.test(text) ? Number.NaN : Number(text.replace(',', '.'))
+}
 
 /**
  * The difference of each value to the first bullet's, as shown: signed (minus U+2212, ±0 where

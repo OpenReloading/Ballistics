@@ -1464,7 +1464,7 @@
   "Usable case volume and bullet travel from the seated bullet: derived from approximate bullet and case geometry.": "Hülsennutzraum und Geschossweg aus dem gesetzten Geschoss: abgeleitet aus der näherungsweisen Geometrie von Geschoss und Hülse.",
   "Usable case volume from the seated bullet: derived from approximate bullet and case geometry.": "Hülsennutzraum aus dem gesetzten Geschoss: abgeleitet aus der näherungsweisen Geometrie von Geschoss und Hülse.",
   "Use in workbench": "In der Werkbank verwenden",
-  "Use {name} in workbench": "{name} in der Werkbank verwenden",
+  "Use in workbench: {name}": "In der Werkbank verwenden: {name}",
   "Add bullet": "Geschoss hinzufügen",
   "Key values": "Kennwerte",
   "difference to the first bullet": "Unterschied zum ersten Geschoss",

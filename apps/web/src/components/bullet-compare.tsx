@@ -127,7 +127,7 @@ export function BulletCompare({
                         <Link
                           href={workbenchHref('bullet', b.id)}
                           className="compare-workbench screen-only"
-                          aria-label={t('Use {name} in workbench', { name: productLabel(b) })}
+                          aria-label={t('Use in workbench: {name}', { name: productLabel(b) })}
                         >
                           <Flask aria-hidden="true" />
                           {t('Use in workbench')}
