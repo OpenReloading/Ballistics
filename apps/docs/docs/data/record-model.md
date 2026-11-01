@@ -74,7 +74,7 @@ One envelope on every entity: `id`, `kind`, `origin`, `name`, `provenance`, `bas
 | `user` | the records of this browser's owner |
 | `shared` | received through a file or a share link, kept as a copy owned by the receiver, with the sender's file cited in its provenance |
 
-The finer standing of a citation (manufacturer, public, community) stays in `provenance.sources[].origin`. `manufacturer` is data the maker supplied or published and claims no permission: a permission or terms it states go in `terms`, and such a source carries no project licence (`apps/docs/docs/data/published-loads.md`). How a maker's written grant is asked for and recorded: [Maker permissions](maker-permissions.md). That field is renamed `standing` so one word has one meaning.
+The finer standing of a citation (manufacturer, public, community) stays in `provenance.sources[].origin`. `manufacturer` is data the maker supplied or published and claims no permission: a permission or terms it states go in `terms`, and such a source carries no project licence (`apps/docs/docs/data/published-loads.md`). That field is renamed `standing` so one word has one meaning.
 
 ### Entities
 

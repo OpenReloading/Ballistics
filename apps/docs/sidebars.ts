@@ -82,7 +82,6 @@ const sidebars: SidebarsConfig = {
     'data/cases',
     'data/primers',
     'data/published-loads',
-    'data/maker-permissions',
     'data/bullet-construction',
     'data/record-model',
     'data/firearm-records',
