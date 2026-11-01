@@ -190,13 +190,20 @@ function cartridgePrintRows(
 }
 
 function bulletPrintRows(load: Load, t: Translate): PrintRows {
-  const { bulletLabel, bulletDesign, bulletValues, bc, system } = load
-  const length = (si: number | undefined) =>
-    si === undefined ? undefined : printedValue('length', system, si)
+  const { bulletLabel, bulletDesign, bulletValues, bc, system, typedBulletFields } = load
+  // a typed value prints as typed (.30857 in); a record's with the field's decimals
+  const length = (key: 'bulletDiameter' | 'bulletLength') => {
+    const si = bulletValues[key]
+    if (si === undefined) return
+    const typed = typedBulletFields[key]
+    return typed?.si === si
+      ? printedField('length', system, typed)
+      : printedValue('length', system, si)
+  }
   return [
     [t('Bullet'), bulletLabel ?? bulletDesign?.name],
-    [t('Diameter'), length(bulletValues.bulletDiameter)],
-    [t('Length'), length(bulletValues.bulletLength)],
+    [t('Diameter'), length('bulletDiameter')],
+    [t('Length'), length('bulletLength')],
     [t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
     printRow(load, 'bulletMass', t),
   ]
@@ -315,6 +322,8 @@ type ReportProps = {
   warnings: ReturnType<typeof warningLines> | undefined
   /** The sections the reader chose to print (the chart: `usePrintChoice`'s print rule). */
   sections: PrintChoice
+  /** The main charge as its field shows it, while the run is of that charge. */
+  mainCharge?: string | undefined
   t: Translate
 }
 
@@ -368,6 +377,17 @@ function ReportAfter({
   )
 }
 
+/** The charge field's text (37.04 gr) while the run's main charge is that value; none otherwise. */
+function mainChargeText(load: Load, ok: OkOutcome | undefined) {
+  const typed = load.fields.charge
+  // the title is the main step's only: then the shown run is the main charge's
+  const main = ok?.load.charge
+  if (typed?.si === undefined || main === undefined) return
+  return Math.abs(typed.si - main) <= 1e-9 * main
+    ? printedField('charge', load.system, typed)
+    : undefined
+}
+
 /** The print's result title of the main step: its charge, or the seating or temperature a ladder of those varies. */
 const mainResultTitle = (ok: OkOutcome, value: string, t: Translate) =>
   singleCharge(ok)
@@ -408,7 +428,7 @@ function Report(props: ReportProps) {
       <h2>
         {steps.length > 1 && shownStep
           ? selectedLabel(ok) === '0'
-            ? mainResultTitle(ok, stepValue(shownStep), t)
+            ? mainResultTitle(ok, props.mainCharge ?? stepValue(shownStep), t)
             : t('Result, step {step}: {value}', {
                 step: selectedLabel(ok),
                 value: stepValue(shownStep),
@@ -946,6 +966,7 @@ function PrintViews({
       stepValue={stepValue}
       warnings={warnings}
       sections={sections}
+      mainCharge={mainChargeText(load, ok)}
       t={t}
     />
   )
