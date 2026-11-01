@@ -42,6 +42,8 @@ export type Step = {
   seating?: SeatingStep
   /** A temperature ladder's step: the propellant temperature, K. */
   temperature?: number
+  /** A seating ladder's step: its volume tolerance (`tolerances.volumeFraction`), none for the default. */
+  volumeFraction?: number | undefined
 }
 
 /**
@@ -56,6 +58,15 @@ export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['loa
     chamber: { ...load.chamber, volume: s.seating.volume },
     barrel: { ...load.barrel, length: s.seating.travel },
     ...(load.resistance && { resistance: rampAtJump(load.resistance, s.seating.jump) }),
+  }),
+})
+
+/** The run's request at step `s`: its load, and a seating ladder step's own volume tolerance. */
+export const stepBody = (body: InteriorBody, s: Step): InteriorBody => ({
+  ...body,
+  load: stepLoad(body.load, s),
+  ...(s.seating && {
+    tolerances: s.volumeFraction === undefined ? undefined : { volumeFraction: s.volumeFraction },
   }),
 })
 

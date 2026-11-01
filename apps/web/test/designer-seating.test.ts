@@ -10,9 +10,10 @@ import {
   historyOf,
   reduce,
 } from '../src/lib/cartridge-designer.ts'
+import { cavityVolumeFraction } from '../src/lib/cavity-range.ts'
 import { exampleRecords } from '../src/lib/example-data.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
-import { presetUnits, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
+import { presetUnits, unitsOf, waterDensityGramsPerCm3 } from '../src/lib/units.ts'
 import { sheetRecord } from './records.ts'
 
 const metric = presetUnits('metric-grams')
@@ -108,5 +109,13 @@ describe('seating from design values', () => {
       waterCapacity: 56,
     })
     expect(hollow.volumeBehindBullet?.tag).toBe('approximate')
+    // the deepest cavity of the bracket, three times the assumed 2 mm, moves the most: pi r^2 (3r - r) / 3
+    const cm3 = unitsOf.capacity.cm3.toSi
+    const range = hollow.cavityRange
+    const v = cm3(hollow.volumeBehindBullet?.value as number)
+    const move = (2 * Math.PI * 2 ** 3) / 3 / 1000
+    expect(
+      cavityVolumeFraction(range && { low: cm3(range.low), high: cm3(range.high) }, v),
+    ).toBeCloseTo(0.01 + cm3(move) / v, 9)
   })
 })

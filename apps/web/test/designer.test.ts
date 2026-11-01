@@ -619,6 +619,37 @@ describe('hollow base', () => {
     expect(o && !('reason' in o) && o.cavity).toMatchObject({ radius: 2.5 })
   })
 
+  it('offers the cavity depth for a hollow base, assumed as the cavity radius while empty', () => {
+    const d = hollow()
+    expect(fieldInUse('base.cavityDepth', d)).toBe(true)
+    const flat = newDesign(metric)
+    expect(fieldInUse('base.cavityDepth', flat)).toBe(false)
+    const e = evaluate(d, metric)
+    const depth = e.states['base.cavityDepth']
+    expect(depth).toMatchObject({ kind: 'assumed', basis: '0.5 dc' })
+    expect(depth && 'si' in depth && depth.si).toBeCloseTo(2.5e-3, 12)
+  })
+
+  it('reads, draws and keeps a stored cavity depth', () => {
+    const record: Bullet = {
+      ...targetBullet,
+      base: {
+        ...targetBullet.base,
+        type: 'conical-hollow-base',
+        cavityDiameter: { value: 5 },
+        cavityDepth: { value: 4 },
+      },
+    }
+    const d = fromRecord(record, metric)
+    expect(d.fields['base.cavityDepth']?.si).toBeCloseTo(4e-3, 12)
+    const e = evaluate(d, metric)
+    expect(e.states['base.cavityDepth']).toMatchObject({ kind: 'record' })
+    expect(e.drawing?.shape.base?.cavityDepth).toBeCloseTo(4, 9)
+    expect(e.drawing?.profile.outline.cavity).toMatchObject({ depth: 4, typed: true })
+    const typed = run(d, type('base.cavityDepth', '6')).present
+    expect(fileData(typed).overrides).toMatchObject({ base: { cavityDepth: { value: 6 } } })
+  })
+
   it('refuses a cavity as wide as the base at the cavity field', () => {
     const d = hollow()
     const e = evaluate(
