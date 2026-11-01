@@ -808,7 +808,7 @@ async function offerRounds(id: string, e: CompetitionEvent, { t, tn }: Translato
  */
 async function importEvents(f: File, { t, tn }: Translator) {
   const parsed = parseUserDataFile(await f.text())
-  if (!parsed.ok) throw new Error(reasonText(parsed.reason, t))
+  if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn }))
   const incoming = eventRecords(parsed.records)
   const stored = await storedRecords()
   const plan = planImport(incoming, stored.records, stored.invalid)

@@ -116,11 +116,11 @@ describe('user data files', () => {
 
   it('refuses another format and another version with one sentence in the language shown', () => {
     installCoreMessages()
-    const german = translator(de, 'de').t
+    const german = translator(de, 'de')
     const reason = (json: unknown) => {
       const p = parseUserDataFile(JSON.stringify(json))
       if (p.ok) throw new Error('not refused')
-      return [reasonText(p.reason, english.t), reasonText(p.reason, german)]
+      return [reasonText(p.reason, english), reasonText(p.reason, german)]
     }
     for (const json of [{ format: 'other', version: 9 }, { version: 1, records: [] }, [], null])
       expect(reason(json)).toEqual([
@@ -159,6 +159,26 @@ describe('user data files', () => {
     expect(skipped).toHaveLength(1)
     expect(defined(skipped[0]).name).toBe('bad.json')
     expect(defined(skipped[0]).reason).toContain('records[1].data.overrides.mass.value')
+  })
+
+  it('writes the path lines and the count of more problems in the language shown', () => {
+    installCoreMessages()
+    const german = translator(de, 'de')
+    const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
+    const reason = (n: number) => {
+      const p = parseUserDataFile(userDataText(Array(n).fill(bad) as UserRecord[]))
+      if (p.ok) throw new Error('not refused')
+      return [reasonText(p.reason, english), reasonText(p.reason, german)]
+    }
+    const [en5, de5] = reason(5)
+    expect(en5).toMatch(/^ {2}→ at records\[0\]\.data\.overrides\.mass\.value$/m)
+    expect(en5).toMatch(/\nand 2 more problems$/)
+    expect(de5).toMatch(/^ {2}→ bei records\[0\]\.data\.overrides\.mass\.value$/m)
+    expect(de5).toMatch(/\nund 2 weitere Probleme$/)
+    expect(de5).not.toMatch(/→ at|more problem/)
+    const [en4, de4] = reason(4)
+    expect(en4).toMatch(/\nand 1 more problem$/)
+    expect(de4).toMatch(/\nund 1 weiteres Problem$/)
   })
 
   it('skips a file over the size limit', async () => {

@@ -74,7 +74,7 @@
     },
     "records": {
       "budget": {
-        "initial": 506000,
+        "initial": 507000,
         "total": 560000
       },
       "routes": {
@@ -162,7 +162,7 @@
     },
     "tools": {
       "budget": {
-        "initial": 569000,
+        "initial": 570000,
         "total": 613000
       },
       "routes": {

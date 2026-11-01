@@ -60,7 +60,7 @@ describe('the message table', () => {
       if (read?.ok !== false) throw new Error('not refused')
       expect(read.reason).toMatch(/\nand 997 more problems$/)
       const start = performance.now()
-      shown(read.reason, german.t)
+      shown(read.reason, german)
       // guards against polynomial backtracking, which takes seconds; a loaded runner stalls past a tight bound
       expect(performance.now() - start).toBeLessThan(5000)
     }
@@ -82,9 +82,9 @@ describe('the message table', () => {
     const read = parseUserDataFile(userDataText([capacity] as never))
     if (read.ok) throw new Error('not refused')
     expect(read.reason).toContain('✖ Replaced by primerState and fillLevel')
-    const shown = reasonText(read.reason, german.t)
+    const shown = reasonText(read.reason, german)
     expect(shown).toContain('✖ Ersetzt durch primerState und fillLevel')
-    expect(shown).toContain('→ at records[0].data.convention')
+    expect(shown).toContain('→ bei records[0].data.convention')
   })
 
   it('leaves a long text as it is without matching it', () => {

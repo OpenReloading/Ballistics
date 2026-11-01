@@ -53,6 +53,8 @@ extend-ignore-re = [
   "Kein Maßstab: Das Foto hat keine Referenz\\.",
   # German refusal of a file in another format that the user data test expects
   "Die Datei ist keine OpenReloading-Datendatei\\.",
+  # German count of the problems a refused file does not list, that the user data test expects
+  "und 2 weitere Probleme",
   # German repeated-id warning that the core message test expects
   "Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren\\.",
   # German umlaut folded to its transliteration by the table import
