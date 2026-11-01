@@ -6742,6 +6742,13 @@ main .library-head.page-panel-head > .page-panel-title {
     background: var(--bg);
   }
 
+  /* the peak pressure's value keeps its width and 0.5 rem before the range, in any font: the
+     range and the share take what is left */
+  .workbench .readouts.readout-keys > .readout-wide {
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.5rem;
+  }
+
   .workbench .readouts.readout-keys dt {
     grid-area: label;
     flex-basis: auto;
