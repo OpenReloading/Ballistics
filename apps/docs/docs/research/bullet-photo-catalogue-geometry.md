@@ -14,7 +14,7 @@ Seated volume and bullet records: can the [bullet from a photo](../models/bullet
 Decided before the run.
 
 - **Data coverage.** Count the bullet records (`packages/data/records/bullets/`, 1,686 files on 2026-11-01) by maker and by geometry field.
-- **Accuracy.** Truth: the drawing (`bulletDimensions`, `bulletOutline`) of every sixth record with a length of each maker (Berger, Cutting Edge, Hammer, Lehigh, Missouri Bullet, Nosler and the two demo records, 29 bullets) and three boat tails of the existing photo tests, 32 bullets from 10.5 to 58 mm long. A record with a boat-tail length and no base type (Berger) is drawn as a boat tail. Each bullet is rendered with `renderPhoto` in eight scenarios and measured with the steps of the tool's worker (`segmentPhoto`, `fitOutline`, `outlineHints`, `resolveScale`, `measureOutline`):
+- **Accuracy.** Truth: the drawing (`bulletDimensions`, `bulletOutline`) of up to six records with a length per maker, taken from its files in name order at a step of the maker's count over six (a maker with fewer than twelve gives its first six, one with six or fewer all of them): Cutting Edge, Hammer, Lehigh and Missouri Bullet six each, Berger 2, Nosler 1 and the two demo records, 29 bullets and three boat tails of the existing photo tests, 32 bullets from 10.5 to 58 mm long. A record with a boat-tail length and no base type (Berger) is drawn as a boat tail. Each bullet is rendered with `renderPhoto` in eight scenarios and measured with the steps of the tool's worker (`segmentPhoto`, `fitOutline`, `outlineHints`, `resolveScale`, `measureOutline`):
   - A: own photograph beside a ruler, 24 px per mm, scale from the ruler.
   - B, C, D: product-style image (light background, side shading, noise 3, blur 1 px, no ruler) with the bullet 900, 450 and 225 px long, scale from the record's diameter only.
   - E: C through a JPEG of quality 70. F: C with a soft drop shadow (offset 2 and 3 % of the length, depth 0.2). G: C with the scale from the diameter and the length. H: C with the bullet turned 10 degrees towards the camera.
@@ -56,7 +56,7 @@ In millimetres the length P90 is 0.050 (A), 0.14 (C), 0.27 (D), 4.3 (F) and 0.69
 
 ## Result
 
-No change. Measuring catalogue geometry from online images is not adopted: the tool is accurate enough on a true side view at a known scale (P90 below 0.8 % of the length down to 225 px, also through JPEG), but the makers' images are not true side views at a known scale, a drop shadow or a tilt of 10 degrees takes it beyond the accept rule, and the tilt and the normalised render cannot be told from the image. The evaluation is kept as an opt-in research test. Lengths have to come from a printed source (#860) or a caliper; follow-ups are in the issues linked from the pull request.
+No change. Measuring catalogue geometry from online images is not adopted: the tool is accurate enough on a true side view at a known scale (P90 below 0.8 % of the length down to 225 px, also through JPEG), but the makers' images are not true side views at a known scale, a drop shadow or a tilt of 10 degrees takes it beyond the accept rule, and the tool gave no warning on the tilt and is not built to tell a frame-fitted render from a true one; whether either can be told from an image at all was not tested. The evaluation is kept as an opt-in research test. Lengths have to come from a printed source (#860) or a caliper; follow-ups are in the issues linked from the pull request.
 
 ## Data basis
 
