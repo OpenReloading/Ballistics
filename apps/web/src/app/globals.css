@@ -3319,6 +3319,11 @@ main .library-head.page-panel-head > .page-panel-title {
   line-height: 1.125rem;
 }
 
+.result-notes-guide {
+  flex: none;
+  line-height: 1.125rem;
+}
+
 .workbench-centre > .result-notes {
   margin-top: 0.25rem;
 }

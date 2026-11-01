@@ -1,10 +1,11 @@
 'use client'
 
-import { Button } from '@mantine/core'
+import { Anchor, Button } from '@mantine/core'
 import { Info, Question, Warning } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
+import { howCloseGuide } from '../lib/docs-url.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { ResultNotesDialog } from './result-notes-dialog.tsx'
 import { useScrolls } from './states.tsx'
@@ -23,7 +24,8 @@ export const noteLooks: Record<
 
 /**
  * The notes of the shown result in a box of fixed height, so a step, an input or the units that
- * change them move nothing below. Its list scrolls; More opens every entry with its reason.
+ * change them move nothing below. Its list scrolls; More opens every entry with its reason (and the
+ * guide on how close a result is, linked in its place when there is no More).
  */
 export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
   const { warnings, system } = useResult()
@@ -55,7 +57,7 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
           )
         })}
       </ul>
-      {(scrolls || notes.some((n) => n.text)) && (
+      {scrolls || notes.some((n) => n.text) ? (
         <Button
           ref={more}
           variant="default"
@@ -73,6 +75,19 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
         >
           {t('More ({count})', { count: notes.length })}
         </Button>
+      ) : (
+        // without More the dialog that links the guide is out of reach: the link in its place
+        howCloseGuide && (
+          <Anchor
+            className="result-notes-guide"
+            href={howCloseGuide}
+            target="_blank"
+            rel="noopener"
+            size="sm"
+          >
+            {t('How close a result is')}
+          </Anchor>
+        )
       )}
       {Dialog && (
         <Dialog

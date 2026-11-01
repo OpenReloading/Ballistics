@@ -36,6 +36,16 @@ it('docsPage: the page under the docs site with or without its closing slash, no
   expect(docsPage(undefined, 'photo-guide/')).toBeUndefined()
 })
 
-it('the result notes link the page on how close a result is', () => {
-  expect(howCloseGuide).toMatch(/\/docs\/how-close\/$/)
+it('the result notes link the page on how close a result is, under the docs site in use', () => {
+  expect(howCloseGuide).toBe(
+    docsPage(
+      docsUrl(process.env.NEXT_PUBLIC_DOCS_URL, undefined, process.env.NEXT_PUBLIC_NO_DOCS),
+      'how-close/',
+    ),
+  )
+  expect(docsPage('https://example.org/docs/', 'how-close/')).toBe(
+    'https://example.org/docs/how-close/',
+  )
+  // no docs site: no link
+  expect(docsPage(docsUrl(undefined, undefined, '1'), 'how-close/')).toBeUndefined()
 })
