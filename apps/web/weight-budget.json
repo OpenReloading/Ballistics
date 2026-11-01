@@ -75,7 +75,7 @@
     "records": {
       "budget": {
         "initial": 506000,
-        "total": 556000
+        "total": 560000
       },
       "routes": {
         "/bullets/[id]": {
@@ -118,7 +118,7 @@
     },
     "curve charts": {
       "budget": {
-        "initial": 467000,
+        "initial": 468000,
         "total": 710000
       },
       "routes": {
@@ -194,7 +194,7 @@
     },
     "workbench": {
       "budget": {
-        "initial": 630000,
+        "initial": 636000,
         "total": 1045000
       },
       "routes": {
