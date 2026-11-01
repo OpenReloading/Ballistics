@@ -68,6 +68,13 @@ describe('temperatureEnergyCheck', () => {
     expect(JSON.stringify(result)).not.toMatch(/demo-|308-win/)
   })
 
+  it('fits and scores no crusher pressure', () => {
+    const rows = truthRows([-10, 10, 30]).map((r) => ({ ...r, pressureBasis: 'crusher' }))
+    const result = temperatureEnergyCheck(rows, records)
+    expect(result.spans.extrapolating.heldOut).toEqual({ velocity: 3, pressure: 0 })
+    expect(result.skipped.pressureBasis).toBe(6)
+  })
+
   it('counts a ladder without a span', () => {
     const result = temperatureEnergyCheck(truthRows([20, 25]), records)
     expect(result.skipped).toEqual({ 'noSpan:interpolating': 1, 'noSpan:extrapolating': 1 })

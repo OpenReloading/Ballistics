@@ -38,7 +38,7 @@ const assumedSensitivity = 0.004
 const velocitySigma = 3
 const pressureShare = 0.03
 const minSpan = 20
-const bases: readonly string[] = ['transducer', 'piezo', 'case-contact', 'crusher', 'energy']
+const bases: readonly string[] = ['transducer', 'piezo', 'case-contact', 'energy']
 
 type Model = 'A' | 'B'
 type SpanName = 'interpolating' | 'extrapolating'
@@ -77,7 +77,7 @@ const count = (m: Record<string, number>, k: string) => {
 
 /** The ladders of `rows`: each row at the muzzle with its load, grouped by setup. */
 function laddersOf(rows: readonly Row[], records: Records, skipped: Record<string, number>) {
-  const ladders = new Map<string, { row: Row; load: InteriorLoad }[]>()
+  const ladders = new Map<string, Entry[]>()
   for (const raw of rows) {
     if (raw.temperature === undefined) {
       count(skipped, 'noTemperature')
@@ -94,10 +94,7 @@ function laddersOf(rows: readonly Row[], records: Records, skipped: Record<strin
       continue
     }
     const key = [row.powder, row.cartridge, row.bullet, row.barrel, row.coal, row.rifle].join('|')
-    ladders.set(key, [
-      ...(ladders.get(key) ?? []),
-      { row, load: withReference(load, row, records) },
-    ])
+    ladders.set(key, [...(ladders.get(key) ?? []), entryOf(load, row, records)])
   }
   return [...ladders.values()]
 }
@@ -122,7 +119,7 @@ export function spansOf<T extends { row: Row }>(ladder: readonly T[]) {
   return out
 }
 
-/** The pressure basis all rows share, or undefined when one lacks a pressure or the bases differ. */
+/** The pressure basis all rows share, or undefined when one lacks a pressure or the bases differ; crusher values are never compared with the model. */
 function sharedBasis(rows: readonly Row[]): PressureBasis | undefined {
   const b = rows[0]?.pressureBasis
   if (!b || !bases.includes(b)) return undefined
@@ -131,37 +128,49 @@ function sharedBasis(rows: readonly Row[]): PressureBasis | undefined {
     : undefined
 }
 
+type Entry = { row: Row; load: InteriorLoad; fitTemperature: number }
+
 /**
  * `load` with a temperature sensitivity: the record's, else the assumed one about the temperature of
- * the powder's fit, the temperature its specific energy belongs to.
+ * the powder's fit, the temperature its specific energy belongs to (`fitTemperature`, K).
  */
-function withReference(load: InteriorLoad, row: Row, records: Records): InteriorLoad {
-  if (load.propellant.temperatureSensitivity) return load
+function entryOf(load: InteriorLoad, row: Row, records: Records): Entry {
   const fit = records.powders.get(row.powder)?.interior?.propellantTemperature.value
-  const reference = fit === undefined ? load.propellantTemperature : kelvin(fit)
+  const fitTemperature = fit === undefined ? load.propellantTemperature : kelvin(fit)
+  if (load.propellant.temperatureSensitivity) return { row, load, fitTemperature }
+  const sensitivity = {
+    reference: fitTemperature,
+    cold: assumedSensitivity,
+    hot: assumedSensitivity,
+  }
+  return {
+    row,
+    load: { ...load, propellant: { ...load.propellant, temperatureSensitivity: sensitivity } },
+    fitTemperature,
+  }
+}
+
+/**
+ * The load a fit starts from: the energy coefficient set, the specific energy moved so it holds at
+ * the powder's fit temperature, since core scales it about the sensitivity's reference.
+ */
+function startOf({ load, fitTemperature }: Entry, energy: number): InteriorLoad {
+  const reference = load.propellant.temperatureSensitivity?.reference ?? fitTemperature
   return {
     ...load,
     propellant: {
       ...load.propellant,
-      temperatureSensitivity: { reference, cold: assumedSensitivity, hot: assumedSensitivity },
+      specificEnergy:
+        load.propellant.specificEnergy * Math.exp(-energy * (fitTemperature - reference)),
+      energyTemperature: energy,
     },
   }
 }
 
-/** The load a fit starts from: the energy coefficient set. */
-const startOf = (load: InteriorLoad, energy: number): InteriorLoad => ({
-  ...load,
-  propellant: { ...load.propellant, energyTemperature: energy },
-})
-
-/** Adds the held-out residuals of one fit to `sums`; false when the fit failed. */
-function fitAndPredict(
-  span: { fit: { row: Row; load: InteriorLoad }[]; held: { row: Row; load: InteriorLoad }[] },
-  energy: number,
-  sums: Sums,
-): boolean {
-  const basis = sharedBasis(span.fit.map((x) => x.row))
-  const ladder: LadderPoint[] = span.fit.map(({ row }) => ({
+/** The load fitted to the span's fit rows, or undefined when the fit fails. */
+function fitted(fitRows: readonly Entry[], energy: number): InteriorLoad | undefined {
+  const basis = sharedBasis(fitRows.map((x) => x.row))
+  const ladder: LadderPoint[] = fitRows.map(({ row }) => ({
     charge: toSi('mass', row.charge),
     muzzleVelocity: row.velocity,
     velocitySigma,
@@ -173,33 +182,65 @@ function fitAndPredict(
         pressureBasis: basis,
       }),
   }))
-  const first = span.fit[0]
-  if (!first) return false
-  let fitted: InteriorLoad
+  const first = fitRows[0]
+  if (!first) return undefined
   try {
-    fitted = fitPowder(startOf(first.load, energy), ladder, {
+    return fitPowder(startOf(first, energy), ladder, {
       parameters: ['burnRate', 'temperatureFactor'],
       maxIterations: 60,
     }).load
   } catch {
-    return false
+    return undefined
   }
-  for (const { row, load } of span.held) {
-    const r = interior({
-      ...fitted,
-      charge: load.charge,
-      propellantTemperature: load.propellantTemperature,
-    })
-    if (!r.valid) continue
-    sums.velocity += (r.muzzleVelocity - row.velocity) ** 2
-    sums.velocityRows++
-    if (row.pressure !== undefined) {
-      const printed = toSi('pressure', row.pressure)
-      sums.pressure += ((100 * (r.peakBreechPressure - printed)) / printed) ** 2
-      sums.pressureRows++
-    }
+}
+
+/** The prediction of `model` at a held-out row's charge and temperature; undefined when invalid. */
+function predictAt(model: InteriorLoad, load: InteriorLoad) {
+  const r = interior({
+    ...model,
+    charge: load.charge,
+    propellantTemperature: load.propellantTemperature,
+  })
+  return r.valid ? r : undefined
+}
+
+/**
+ * Adds the residuals of a held-out row to `sums` for both models, only where both are valid. The
+ * pressure counts where its basis is one the model is compared on and, when the fit used pressures,
+ * the fit's own basis.
+ */
+function addRow(
+  sums: Record<Model, Sums>,
+  models: Record<Model, InteriorLoad>,
+  { row, load }: Entry,
+  fitBasis: PressureBasis | undefined,
+  skipped: Record<string, number>,
+) {
+  const a = predictAt(models.A, load)
+  const b = predictAt(models.B, load)
+  if (!a || !b) {
+    count(skipped, 'modelRefused')
+    return
   }
-  return true
+  const basis = row.pressureBasis
+  const pressure =
+    row.pressure !== undefined &&
+    basis !== undefined &&
+    bases.includes(basis) &&
+    (!fitBasis || basis === fitBasis)
+      ? toSi('pressure', row.pressure)
+      : undefined
+  if (row.pressure !== undefined && pressure === undefined) count(skipped, 'pressureBasis')
+  for (const [m, r] of [
+    ['A', a],
+    ['B', b],
+  ] as const) {
+    sums[m].velocity += (r.muzzleVelocity - row.velocity) ** 2
+    sums[m].velocityRows++
+    if (pressure === undefined) continue
+    sums[m].pressure += ((100 * (r.peakBreechPressure - pressure)) / pressure) ** 2
+    sums[m].pressureRows++
+  }
 }
 
 const rms = (sum: number, n: number) => (n > 0 ? Math.sqrt(sum / n) : null)
@@ -207,11 +248,10 @@ const changeOf = (b: number | null, a: number | null) =>
   a === null || b === null || a === 0 ? null : (100 * (b - a)) / a
 
 const zero = (): Sums => ({ velocity: 0, velocityRows: 0, pressure: 0, pressureRows: 0 })
-const sumKeys = ['velocity', 'velocityRows', 'pressure', 'pressureRows'] as const
 
 /** One span over every ladder: pooled RMS of both models on the same held-out rows. */
 function spanOver(
-  ladders: { row: Row; load: InteriorLoad }[][],
+  ladders: Entry[][],
   name: SpanName,
   skipped: Record<string, number>,
 ): Aggregate['spans'][SpanName] {
@@ -225,13 +265,14 @@ function spanOver(
       continue
     }
     // a ladder whose fit fails for one model counts for neither, so both see the same rows
-    const trial: Record<Model, Sums> = { A: zero(), B: zero() }
-    if (!fitAndPredict(span, 0, trial.A) || !fitAndPredict(span, energyCoefficient, trial.B)) {
+    const [A, B] = [fitted(span.fit, 0), fitted(span.fit, energyCoefficient)]
+    if (!A || !B) {
       failedFits++
       continue
     }
     used++
-    for (const m of ['A', 'B'] as const) for (const k of sumKeys) sums[m][k] += trial[m][k]
+    const fitBasis = sharedBasis(span.fit.map((x) => x.row))
+    for (const entry of span.held) addRow(sums, { A, B }, entry, fitBasis, skipped)
   }
   const result = (m: Model) => ({
     velocity: rms(sums[m].velocity, sums[m].velocityRows),
