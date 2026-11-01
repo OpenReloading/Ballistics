@@ -5,7 +5,6 @@ import { DownloadSimple } from '@phosphor-icons/react'
 import { useTranslation } from '../i18n/language.ts'
 import type { InteriorResponse } from '../lib/api-types.ts'
 import { download } from '../lib/download.ts'
-import { curvesCsv, resultsCsv } from '../lib/run-csv.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 
@@ -36,7 +35,11 @@ export function RunDownloads({
         size={controlSize.row.button}
         variant="default"
         leftSection={icon}
-        onClick={() => saveCsv(curvesCsv(body.result.points, mass, system, t), 'run-curves.csv')}
+        onClick={async () => {
+          // the builders load on the first download: the page carries none of them
+          const { curvesCsv } = await import('../lib/run-csv.ts')
+          saveCsv(curvesCsv(body.result.points, mass, system, t), 'run-curves.csv')
+        }}
       >
         {t('Curves (CSV)')}
       </Button>
@@ -44,7 +47,10 @@ export function RunDownloads({
         size={controlSize.row.button}
         variant="default"
         leftSection={icon}
-        onClick={() => saveCsv(resultsCsv(body, charge, system, t), 'run-results.csv')}
+        onClick={async () => {
+          const { resultsCsv } = await import('../lib/run-csv.ts')
+          saveCsv(resultsCsv(body, charge, system, t), 'run-results.csv')
+        }}
       >
         {t('Results (CSV)')}
       </Button>
