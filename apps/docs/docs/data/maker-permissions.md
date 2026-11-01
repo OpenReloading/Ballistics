@@ -18,7 +18,7 @@ This page is not legal advice.
 
 ## The letter
 
-Placeholders: `<maker>`, `<product range or page URL>`, `<name>`, `<contact address>` (in the German letter `<Hersteller>`, `<Produktreihe oder Seiten-URL>`, `<Name>`, `<Kontaktadresse>`). Delete the field lines that do not apply to the maker: a powder maker gets only the powder line.
+Placeholders: `<maker>`, `<product range or page URL>`, `<name>`, `<contact address>` (the German letter has its own words for them). Delete the field lines that do not apply to the maker: a powder maker gets only the powder line.
 
 ### English
 
@@ -54,6 +54,8 @@ Kind regards,
 
 ### Deutsch
 
+<!-- typos: off -->
+
 Betreff: Erlaubnis zur Veröffentlichung von Produktdaten in OpenReloading
 
 Guten Tag,
@@ -83,6 +85,8 @@ Bitte nennen Sie uns auch, wen wir als Erteiler der Erlaubnis angeben dürfen (e
 Mit freundlichen Grüßen
 `<Name>`
 `<Kontaktadresse>`
+
+<!-- typos: on -->
 
 ## Recording a grant
 

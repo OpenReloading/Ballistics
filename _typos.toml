@@ -53,6 +53,8 @@ extend-ignore-re = [
   "Die Datei ist keine OpenReloading-Datendatei\\.",
   # German repeated-id warning that the core message test expects
   "Ändern Sie Name, Hersteller, Durchmesser oder Masse der Zeile 3, um sie als eigenen Datensatz zu importieren\\.",
+  # a German text quoted whole in the docs (the maker permission letter), between these markers
+  "(?s)<!-- typos: off -->.*?<!-- typos: on -->",
   # German umlaut folded to its transliteration by the table import
   "replaceAll\\('ü', 'ue'\\)",
 ]
