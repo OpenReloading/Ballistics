@@ -135,14 +135,28 @@ The second term of $g_\text{start}$ is a choice of the model.
 
 Without a start pressure, a caller can take `defaultStartPressure`:
 
-- Barrel of 0.3 m and longer: an assumed 30 MPa.
-- Shorter barrel: one value per bullet construction, fitted by the load-table powder fit: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa ([research entry](../research/interior-start-pressure-rules.md)). A construction not given counts as jacketed, an unknown name is an input error.
+- Barrel of 0.3 m and longer: one value per bullet construction (lead 30.0, jacketed 29.2, monolithic 35.3 MPa), fitted by the load-table powder fit. Plated bullets have no rifle rows and a construction not given takes an assumed 30 MPa.
+- Shorter barrel: one value per bullet construction, fitted by the same fit: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa ([research entry](../research/interior-start-pressure-rules.md)). A construction not given counts as jacketed, an unknown name is an input error.
 
 These are effective values of the model, not measured shot-start pressures.
 
 The barrel length of 0.3 m that separates the two cases is a choice of the model.
 
 Code: `packages/core/src/interior/start-pressure.ts`, `defaultStartPressure`, `handgunBarrelLengthLimit`.
+
+The workbench takes the construction from the bullet record's `construction.structure` and the barrel length of the seating (else the firearm's, the Settings default or the one assumed for the cartridge class):
+
+| `construction.structure` | Construction |
+| --- | --- |
+| cast, swaged | lead |
+| plated | plated |
+| cup-and-core, bonded, partitioned | jacketed |
+| monolithic | monolithic |
+| frangible, a construction without a structure | jacketed, marked as assumed |
+
+A record without a `construction` gives no construction, and a barrel length that is not known gives no class: the field keeps the value of 30 MPa. A plated bullet in a rifle takes it too. The field follows this default until a value is typed, and the help gives the 95 % interval of the construction. A powder record's own start pressure replaces it, a record without one leaves the field following it. Load files and the API still take the rifle value of 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure as a value.
+
+Code: `packages/core/src/interior/start-pressure.ts`, `constructionOf`, `startPressureOf`.
 
 ### Bore resistance
 
@@ -211,7 +225,7 @@ Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`tauT`, `coef`
 
 Without temperature sensitivities, $\tau_T = 1$.
 
-A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it.
+A powder record carries them as `temperatureSensitivity`: `reference` in K, `cold` and `hot` in 1/K (`packages/schema/src/powder.ts`). The workbench passes them to the run and offers the temperature ladder for such a powder; a powder without the field has none, so $\tau_T = 1$ for it. No default coefficient is assumed. When such a powder runs at a propellant temperature other than that of its record's fit, the result panel says that the run ignores the temperature for this powder (`apps/web/src/components/workbench-outcome.ts`, `resultNotes`).
 
 The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
 

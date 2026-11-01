@@ -1,6 +1,7 @@
 'use client'
 
 import { Anchor, NativeSelect } from '@mantine/core'
+import { cartridgeDiameters } from '@open-reloading/core'
 import { fullSection, svgPath, toPartFrame } from '@open-reloading/drawing'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { drawnTables } from '@open-reloading/drawing/cartridge'
@@ -38,6 +39,7 @@ import { apiFetch } from '../lib/api-fetch.ts'
 import type { BulletSummary, CartridgeDetail, CaseSummary } from '../lib/api-types.ts'
 import type { StripFigure } from '../lib/barrel-strip.ts'
 import { type BaseType, type BulletValues, typedBullet } from '../lib/bullet.ts'
+import { type BelowMouth, belowMouth, unseatedBecause } from '../lib/bullet-below-mouth.ts'
 import { designShape } from '../lib/bullet-designer.ts'
 import { drawable, withCaseLength } from '../lib/cartridge-sheet.ts'
 import {
@@ -142,12 +144,16 @@ export type Seated = {
   /** Seating depth and the barrel length of the seating, m, for print. */
   depth?: number
   barrel?: number
+  /** The barrel length of the preview's field, m, seated or not: the start pressure rule reads it. */
+  barrelField?: number
   /** The length the bullet is seated by; the other one is derived. */
   mode?: Mode | undefined
   /** The seating is the preview's own start (initial, L6 or mid-range), not a user move. */
   atStart?: boolean
   /** What the chart's barrel strip draws. */
   figure?: StripFigure
+  /** The bullet volume below the mouth where a chosen bullet is not seated: estimated or refused. */
+  unseated?: BelowMouth
 }
 
 /** A record fetched through `apiFetch`; a later id aborts the earlier request. */
@@ -592,7 +598,9 @@ function useGeometry(o: {
   const refused = useMemo(() => refusalOf(shaped, unit), [shaped, unit])
   const shape = refused ? undefined : shaped
   const fixed = useMemo(() => fixedOf(spec, chamber, shape, lands), [spec, chamber, shape, lands])
-  return { spec, own, chamber, capacities, bulletRecord, shaped, refused, shape, fixed }
+  /** The record or design with the typed values in place. */
+  const bulletNow = design ? design.resolved.record : bulletRecord
+  return { spec, own, chamber, capacities, bulletRecord, bulletNow, shaped, refused, shape, fixed }
 }
 
 const capacitiesOf = (detail: Load<CartridgeDetail>): Capacity[] =>
@@ -785,23 +793,26 @@ const figureOf = (spec: Spec | undefined, seating: Seating | undefined) =>
 /** What the page's fields follow, from the seating; none seated reports `{}`. */
 function seatedReport(o: {
   caseVolume: number | undefined
+  unseated: BelowMouth | undefined
   seating: Seating | undefined
   barrel: number | undefined
   mode: Mode
   atStart: boolean
   figure: Seated['figure']
 }): Seated {
-  const { caseVolume, seating, barrel, mode, atStart, figure } = o
+  const { caseVolume, unseated, seating, barrel, mode, atStart, figure } = o
   const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
   const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
   return {
     ...(caseVolume !== undefined && { caseVolume }),
+    ...(unseated && { unseated }),
     ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
     ...(travel !== undefined && { travel: toSi('length', travel) }),
     ...(coal !== undefined && { overallLength: toSi('length', coal) }),
     ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
     ...(depth !== undefined && { depth: toSi('length', depth) }),
     ...(coal !== undefined && barrel !== undefined && { barrel }),
+    ...(barrel !== undefined && { barrelField: barrel }),
     ...(coal !== undefined && { mode, atStart }),
     ...(figure && { figure }),
   }
@@ -827,9 +838,10 @@ function useReportSeated(
     [],
   )
   useEffect(() => () => send.cancel(), [send])
-  const { caseVolume, seating, barrel, mode, atStart, figure } = o
+  const { caseVolume, unseated, seating, barrel, mode, atStart, figure } = o
   const key = [
     caseVolume,
+    JSON.stringify(unseated),
     seating?.volumeBehindBullet?.value,
     seating?.travel?.value,
     seating?.coal.value,
@@ -842,7 +854,7 @@ function useReportSeated(
   // no seated bullet reports {}: the page forgets the earlier seating
   // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
   useEffect(() => {
-    const values = seatedReport({ caseVolume, seating, barrel, mode, atStart, figure })
+    const values = seatedReport({ caseVolume, unseated, seating, barrel, mode, atStart, figure })
     if (sliding) return send.push(values)
     send.cancel()
     startTransition(() => seated.current(values))
@@ -868,6 +880,59 @@ function useLive(announce: string) {
     return () => clearTimeout(timer)
   }, [announce])
   return live
+}
+
+type UnseatedArgs = {
+  chosenBullet: Partial<Bullet> | undefined
+  seating: unknown
+  cartridgeRead: boolean
+  detail: Load<CartridgeDetail>
+  shape: Shape | undefined
+  chamber: Chamber | undefined
+  shaped: boolean
+  refused: boolean
+  seatMode: Mode
+  seatValue: number | undefined
+  initialSeat: NonNullable<PreviewProps['initial']>['seating']
+  cbtoMissing: boolean
+}
+
+/** A bullet chosen and not seated takes an estimated volume below the mouth, never none. */
+function useUnseated(a: UnseatedArgs): BelowMouth | undefined {
+  const { chosenBullet, seating, cartridgeRead, detail, shape, chamber } = a
+  const { shaped, refused, seatMode, seatValue, initialSeat, cbtoMissing } = a
+  const groove = detail.status === 'ok' ? cartridgeDiameters(detail.value)?.groove : undefined
+  // the COAL entered or loaded, when the seating is by COAL
+  const coal =
+    seatMode === 'overallLength'
+      ? (seatValue ??
+        (initialSeat?.by === 'overallLength' ? fromSi('length', initialSeat.value) : undefined))
+      : undefined
+  return useMemo(
+    () =>
+      chosenBullet && !seating && cartridgeRead
+        ? belowMouth({
+            record: chosenBullet,
+            shape,
+            groove,
+            chamber,
+            coal,
+            because: unseatedBecause({ shaped, refused, chamber: !!chamber, cbto: cbtoMissing }),
+          })
+        : undefined,
+    [
+      chosenBullet,
+      seating,
+      cartridgeRead,
+      shape,
+      groove,
+      chamber,
+      coal,
+      shaped,
+      refused,
+      cbtoMissing,
+    ],
+  )
 }
 
 /** The seating's state and values: every hook of the preview, so its parts only draw. */
@@ -1042,9 +1107,24 @@ function useSeatingModel(p: PreviewProps) {
   const figure = useMemo(() => figureOf(spec, seating), [spec, seating])
   const atStart = seatPos.si === started?.si && seatMode === started?.mode
   const caseVolume = caseVolumeOf(measured, water)
+  const { bulletNow: chosenBullet, shaped, refused } = geometry
+  const unseated = useUnseated({
+    chosenBullet,
+    seating,
+    cartridgeRead: draft !== undefined || detail.status === 'ok',
+    detail,
+    shape,
+    chamber,
+    shaped: !!shaped,
+    refused: !!refused,
+    seatMode,
+    seatValue,
+    initialSeat: initial?.seating,
+    cbtoMissing: seatMode === 'baseToOgive' && !canCbto,
+  })
   useReportSeated(
     p.onSeated,
-    { caseVolume, seating, barrel: barrel.si, mode: seatMode, atStart, figure },
+    { caseVolume, unseated, seating, barrel: barrel.si, mode: seatMode, atStart, figure },
     sliding,
   )
 
@@ -1087,6 +1167,7 @@ function useSeatingModel(p: PreviewProps) {
     capacities,
     capacity,
     stock,
+    unseated,
     caseList,
     chosenCase,
     setCaseId,
@@ -1319,7 +1400,7 @@ function BulletPicker({ m }: { m: Model }) {
 /** What the bullet choice stands at: loading, failed, the record or design in use, and why it does not seat. */
 function BulletStatus({ m }: { m: Model }) {
   const { t } = useTranslation()
-  const { design, record, bulletRecord, shaped, refused, names } = m
+  const { design, record, bulletRecord, shaped, refused, unseated, names } = m
   return (
     <>
       {!design && record.status === 'loading' && <Loading what="the bullet record" inline />}
@@ -1344,7 +1425,19 @@ function BulletStatus({ m }: { m: Model }) {
         </p>
       )}
       {bulletRecord && !shaped && (
-        <p>{t('This bullet record has no length: the preview needs it.')}</p>
+        <p>
+          {bulletRecord.length
+            ? t('This bullet record has no diameter: the preview needs it.')
+            : t('This bullet record has no length: the preview needs it.')}
+        </p>
+      )}
+      {unseated?.kind === 'refused' && (
+        <p>
+          {t(
+            'Volume behind the bullet not given: the bullet volume below the case mouth cannot be estimated. Missing: {missing}.',
+            { missing: unseated.missing.map((x) => t(x)).join(', ') },
+          )}
+        </p>
       )}
       {refused && (
         <p>

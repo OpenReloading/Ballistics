@@ -10,6 +10,7 @@ export type ListNoun =
   | 'cartridges'
   | 'cases'
   | 'disciplines'
+  | 'events'
   | 'faces'
   | 'federations'
   | 'firearms'
@@ -43,6 +44,11 @@ const countLines: Record<
     all: (tn, n) => tn(n, '{count} discipline', '{count} disciplines'),
     some: (tn, shown, n) =>
       tn(n, '{shown} of {count} discipline', '{shown} of {count} disciplines', { shown }),
+  },
+  events: {
+    all: (tn, n) => tn(n, '{count} event', '{count} events'),
+    some: (tn, shown, n) =>
+      tn(n, '{shown} of {count} event', '{shown} of {count} events', { shown }),
   },
   faces: {
     all: (tn, n) => tn(n, '{count} target', '{count} targets'),

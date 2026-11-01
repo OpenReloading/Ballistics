@@ -45,7 +45,7 @@ Fitted values, MPa (95 % interval): one value 30.3 (25.6 to 34.5). By constructi
 
 ## Result
 
-Improved for handguns: median 6.16 % to 5.70 %, P90 13.58 % to 12.99 %. Adopted in a reduced form: the fixed 30 MPa for rifles, one value per construction for handguns, and a barrel of 300 mm or longer counts as a rifle. Not adopted: one fitted value, per construction alone, the floor (handgun median 5.70 % to 5.68 %, P90 12.99 % to 13.01 %) and fitted rifle values (rifle medians differ by at most 0.03 points).
+Improved for handguns: median 6.16 % to 5.70 %, P90 13.58 % to 12.99 %. Adopted in a reduced form for a caller that gives no bullet construction: the fixed 30 MPa for rifles, one value per construction for handguns, and a barrel of 300 mm or longer counts as a rifle. Not adopted: one fitted value, per construction alone and the floor (handgun median 5.70 % to 5.68 %, P90 12.99 % to 13.01 %). The fitted rifle values change the velocity error by at most 0.03 points; the core takes them for a given bullet construction, and the workbench for a chosen bullet record, for the peak pressure (monolithic rifle 35.3 MPa against 30 MPa: peak +2.5 % on a .308 168 gr stand-in at a full charge).
 
 ## Data basis
 

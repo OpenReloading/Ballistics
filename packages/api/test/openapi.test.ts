@@ -25,6 +25,8 @@ describe('buildOpenApi', () => {
         'GET /v1/cases/{id}',
         'GET /v1/disciplines',
         'GET /v1/disciplines/{id}',
+        'GET /v1/event-types',
+        'GET /v1/event-types/{id}',
         'GET /v1/exterior/stability',
         'GET /v1/federations',
         'GET /v1/federations/{id}',

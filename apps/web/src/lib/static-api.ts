@@ -36,6 +36,7 @@ const listKinds = new Set([
   'disciplines',
   'target-mappings',
   'caliber-classes',
+  'event-types',
 ])
 const searchKinds = new Set(['cartridges', 'bullets', 'powders', 'cases', 'primers'])
 /** A compute body above this many bytes is refused with 413: an interior body is under 1 KiB, so the cap keeps a pasted file out of the Worker. */
@@ -155,6 +156,8 @@ async function list(kind: string, query: URLSearchParams) {
       return answer(200, c.disciplines({ federation }))
     case 'caliber-classes':
       return answer(200, c.caliberClasses())
+    case 'event-types':
+      return answer(200, c.eventTypes())
     default:
       return answer(200, c.targetMappings({ discipline, face }))
   }

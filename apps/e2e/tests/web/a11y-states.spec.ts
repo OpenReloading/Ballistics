@@ -416,6 +416,20 @@ const states: State[] = [
     },
   },
   {
+    name: 'Competition event with a stage',
+    scrolls: true,
+    open: async (page, check) => {
+      await gotoHydrated(page, '/events')
+      await (await barButton(page, 'New event')).click()
+      const form = page.locator('section.event-editor')
+      await form.getByRole('combobox', { name: 'Event type' }).click()
+      await page.getByRole('option', { name: 'IPSC Handgun' }).click()
+      await form.getByRole('button', { name: 'Add stage' }).click()
+      await expect(form.getByRole('group', { name: 'Stage 1' })).toBeVisible()
+      await check('page')
+    },
+  },
+  {
     name: 'Site search',
     open: async (page, check) => {
       await gotoHydrated(page, '/powders')

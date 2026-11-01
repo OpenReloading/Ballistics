@@ -8,6 +8,7 @@ import {
   type CatalogueCase,
   compareKeys,
   type Discipline,
+  type EventType,
   type Federation,
   type Manufacturer,
   type Powder,
@@ -23,6 +24,7 @@ import type {
   CartridgeItem,
   CaseItem,
   DisciplineItem,
+  EventTypeItem,
   FederationItem,
   IndexRow,
   ManufacturerItem,
@@ -317,6 +319,13 @@ export const caliberClassRow = (c: CaliberClass): IndexRow<CaliberClassItem> => 
   item: { id: c.id, name: c.name, diameterMm: c.diameter.value },
   sortKey: sortKey(c.name),
   search: searchKey([c.name]),
+})
+
+/** The index row of an event type. */
+export const eventTypeRow = (e: EventType): IndexRow<EventTypeItem> => ({
+  item: { id: e.id, name: e.name, federation: e.federation, method: e.scoring.method },
+  sortKey: sortKey(e.name),
+  search: searchKey([e.name]),
 })
 
 /** Rows in the order of their sort keys, ties by id. */

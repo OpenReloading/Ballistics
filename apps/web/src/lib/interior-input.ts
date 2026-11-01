@@ -155,7 +155,7 @@ export const interiorFields = [
     key: 'startPressure',
     label: msg('Start pressure'),
     help: msg(
-      'Mean pressure below which the bullet does not move, in the pressure unit shown; the bore resistance can hold it longer. Approximate defaults of the model, not measurements: an assumed 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel fitted by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
+      'Mean pressure below which the bullet does not move, in the pressure unit shown; the bore resistance can hold it longer. Approximate defaults of the model by bullet construction, fitted, not measured: barrel of 0.3 m and longer, lead 30 MPa, jacketed 29 MPa, monolithic 35 MPa, else an assumed 30 MPa; shorter barrel, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
     ),
     quantity: 'pressure',
     required: true,
@@ -361,6 +361,8 @@ export type InteriorBody = {
   model: 'm3'
   load: InteriorLoad
   cartridge?: string | undefined
+  /** The tolerance of the chamber volume of the range, relative: the interval of an approximate volume. */
+  tolerances?: { volumeFraction: number }
   /** A pressure limit the user typed, Pa: the one limit instead of the cartridge's CIP Pmax. */
   pressureLimit?: number | undefined
 }

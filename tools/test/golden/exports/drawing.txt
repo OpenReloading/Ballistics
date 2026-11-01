@@ -109,6 +109,7 @@
 ./bullet sourceTitle
 ./bullet triangleArea2
 ./seating BulletDimensions
+./seating EffectiveDensity
 ./seating LandsContact
 ./seating Seating
 ./seating SeatingValues
@@ -118,6 +119,7 @@
 ./seating bulletOutline
 ./seating chamberOf
 ./seating coalRange
+./seating estimateIntrusion
 ./seating intrusion
 ./seating jumpNote
 ./seating landsContactCoal

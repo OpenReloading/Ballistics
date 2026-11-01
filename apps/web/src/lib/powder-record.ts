@@ -112,8 +112,6 @@ export function recordMark(
 ) {
   const from = origin[key]
   if (from === undefined) return
-  if (matchesRecordValue(from, si) && key === 'startPressure' && !p.interior?.startPressure)
-    return t("From the fit's start pressure rule for barrels of 300 mm and longer.")
   const fitted = p.interior?.fitted.some((k) => k === fittedKey[key])
   if (fitted && fit) return t('From the user design: {mark}.', { mark: fit })
   if (matchesRecordValue(from, si)) {
