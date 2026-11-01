@@ -155,7 +155,7 @@ export const interiorFields = [
     key: 'startPressure',
     label: msg('Start pressure'),
     help: msg(
-      'Mean pressure at which the bullet starts to move, in the pressure unit shown. Defaults of the model, effective values and not measurements: 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
+      'Mean pressure at which the bullet starts to move, in the pressure unit shown. Approximate defaults of the model, not measurements: an assumed 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel fitted by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
     ),
     quantity: 'pressure',
     required: true,
