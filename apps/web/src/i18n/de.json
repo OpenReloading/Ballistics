@@ -3487,6 +3487,8 @@
   "Close navigation": "Navigation schließen",
   "Home": "Startseite",
   "Units settings": "Einstellungen der Einheiten",
+  "Units: {preset}": "Einheiten: {preset}",
+  "Units: {preset}, custom": "Einheiten: {preset}, benutzerdefiniert",
   "Workbench settings": "Einstellungen der Werkbank",
   "Safety notice": "Sicherheitsregeln",
   "Theme: system": "Farbschema: System",
