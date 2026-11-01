@@ -22,23 +22,13 @@ exclude = [
   '^https://doi\.org/10\.1111/j\.1469-1809\.1936\.tb02137\.x$', # Wiley refuses automated clients
   '^https://doi\.org/10\.1103/RevModPhys\.93\.025010$', # the DOI resolver answers 403 to automated clients
   '^https://doi\.org/10\.1137/1\.9781611970319$', # SIAM answers 403 to automated clients
-  '^https://query\.wikidata\.org/sparql\?format=json\&query=SELECT%20\(COUNT\(\*\)%20AS%20%3Fc\)%20WHERE%20%7B%3Fi%20wdt%3AP31%20wd%3AQ22704163%7D$', # the query service answers 403 to automated clients
-  '^https://support\.gunbroker\.com/hc/en-us/articles/37115383662491-Current-User-Agreement$', # help centre answers 403 to automated clients
   '^https://www\.npmjs\.com/org/open-reloading$', # npmjs.com answers 403 to automated clients
-  '^https://nso\.nato\.int/nso/nsdd/main/standards$',
-  '^https://www\.acic\.gov\.au/copyright$',
-  '^https://www\.brownells\.com/help/technical-support/terms-of-use/$',
-  '^https://www\.guns\.com/terms-and-conditions$',
-  '^https://www\.iso\.org/copyright\.html$', # answers 403 to automated clients
   '^https://www\.accurateshooter\.com/\?p=2477$', # a bot filter answers 307 without a target to automated clients
   '^https://www\.knsa\.nl/$', # the server sends a certificate chain that does not verify (openssl: unable to verify the first certificate)
   '^https://www\.knsa\.nl/media/1956/swr-delen-i-x-samengevoegd\.pdf$', # same broken chain
   '^https://hdl\.handle\.net/11104/0129879$', # 404 to the CI runner on scheduled runs in a row, 302 to a 200 page elsewhere
-  '^https://www\.gesetze-im-internet\.de/markeng/__23\.html$', # times out from the CI runner, 200 elsewhere
-  '^https://www\.gesetze-im-internet\.de/urhg/__2\.html$', # times out from the CI runner, 200 elsewhere
   # Single-page apps that route by the fragment, which is not an anchor in the served HTML.
   '^https://chromedevtools\.github\.io/devtools-protocol/#/Emulation\.setCPUThrottlingRate$',
-  '^https://euipo\.europa\.eu/eSearch/#details/trademarks/018980378$',
   '^https://tsdr\.uspto\.gov/#caseNumber=98007111&caseType=SERIAL_NO&searchType=statusSearch$',
   # The site root serves the docs of the latest release, and no release has them yet. Drop these at the first release.
   '^https://openreloading\.github\.io/Ballistics/docs/feedback-tasks/$',

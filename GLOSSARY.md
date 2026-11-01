@@ -69,10 +69,10 @@ _Avoid_: maker
 `fields`: dot paths of the record fields a source supports. Absent: the whole record.
 
 **License**:
-`license`: SPDX id of the license the data of a source is used under, or `LicenseRef-<name>` for the publisher's own terms or a written permission.
+`license`: SPDX id of the license the data of a source is used under, or `LicenseRef-<name>` for the publisher's own terms.
 
 **Terms**:
-`terms`: URL or note of the publisher's terms or permission where no SPDX license covers the use.
+`terms`: URL or note of the publisher's terms where no SPDX license covers the use.
 
 **Source origin**:
 `origin`: who stands behind a source: `manufacturer`, `public` or `community`.
