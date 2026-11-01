@@ -16,6 +16,14 @@
     "value": 16.74,
     "raw": "Bullet OAL .659 +/-"
   },
+  "construction": {
+    "raw": "cast lead bullets",
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy"
+    },
+    "gasCheck": false
+  },
   "note": "Listed as 120 Grain RNFP. Brinell 18. For Lever Guns.",
   "provenance": {
     "kind": "published",
@@ -27,6 +35,18 @@
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
         "fields": ["diameter", "mass", "length"],
         "note": "313120M, #1 .32-20 (https://missouribullet.com/details.php?prodId=114): .313 Diameter, 120 Grain RNFP, Brinell 18, Bullet OAL .659 +/-"
+      },
+      {
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": [
+          "construction.raw",
+          "construction.structure",
+          "construction.core",
+          "construction.gasCheck"
+        ],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }

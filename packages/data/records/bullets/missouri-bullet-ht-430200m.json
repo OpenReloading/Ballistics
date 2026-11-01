@@ -18,7 +18,11 @@
   },
   "construction": {
     "raw": "Hi-Tek 2-Extreme Coating",
-    "unmapped": true
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy"
+    },
+    "gasCheck": false
   },
   "note": "Listed as 200 Grain RNFP. Brinell 18. .44 Magnum. For Magnum Loads.",
   "provenance": {
@@ -33,9 +37,11 @@
         "note": "HT-430200M, .44 Stalker - Hi-Tek (https://missouribullet.com/details.php?prodId=340): .430 Diameter, 200 Grain RNFP, Brinell 18, Bullet OAL .586 +/-, Hi-Tek 2-Extreme Coating"
       },
       {
-        "source": "mapping-of-the-maker-wording-to-construction-fields",
-        "kind": "derived",
-        "fields": ["construction.unmapped"]
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.structure", "construction.core", "construction.gasCheck"],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }
