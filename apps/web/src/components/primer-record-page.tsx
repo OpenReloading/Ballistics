@@ -32,7 +32,6 @@ export function PrimerRecordPage({ id, name }: { id: string; name: string }) {
             title={productLabel({ name: p.name, ...(maker && { manufacturerName: maker }) })}
             badges={[]}
             provenance={p.provenance}
-            kind="primers"
             strip={<FieldStrip items={primerStrip(p, maker)} />}
             values={
               <Panel id="record-data" title={msg('Properties')} translated>

@@ -32,7 +32,6 @@ function CaseRecord({ c, names, cartridge }: { c: CatalogueCase } & Extras) {
       title={productLabel({ name: c.name, ...(maker && { manufacturerName: maker }) })}
       badges={[]}
       provenance={c.provenance}
-      kind="cases"
       strip={<FieldStrip items={caseStrip(c, maker)} />}
       values={
         <Panel id="record-data" title={msg('Properties')} translated>

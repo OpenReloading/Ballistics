@@ -44,7 +44,6 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
         compare={compareFrom(b.id, b.diameter?.value)}
         design={`/bullets/designer?from=${encodeURIComponent(b.id)}`}
         provenance={b.provenance}
-        kind="bullets"
         strip={
           <FieldStrip
             items={bulletStrip(b)}
