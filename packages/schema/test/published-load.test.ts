@@ -210,15 +210,10 @@ describe('publishedLoads', () => {
     expectIssueAt(publishedLoad, { ...load, charges: [] }, 'charges')
   })
 
-  it('refuses a start charge above the maximum charge', () => {
+  it('keeps a start charge above the maximum charge as printed (a data:validate warning)', () => {
     const charge = (kind: string, value: number) => ({ kind, charge: { value, raw: `${value} g` } })
-    expectIssueAt(
-      publishedLoad,
-      { ...load, charges: [charge('start', 4), charge('max', 3)] },
-      'charges',
-    )
     expect(
-      publishedLoad.safeParse({ ...load, charges: [charge('start', 3), charge('max', 3)] }).success,
+      publishedLoad.safeParse({ ...load, charges: [charge('start', 4), charge('max', 3)] }).success,
     ).toBe(true)
   })
 
