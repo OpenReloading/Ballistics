@@ -6,7 +6,7 @@ import {
   revolutionVolume,
   type Tag,
 } from '../bullet/outline.ts'
-import { deg, type LengthUnit } from '../core/units.ts'
+import { deg, type LengthUnit, lengthText } from '../core/units.ts'
 import type { SeatingValues } from './chamber.ts'
 
 export {
@@ -29,11 +29,13 @@ export interface Tagged {
 /**
  * Where the bullet's diameter d meets the leade, from the head: chamber L3 + s + (G1 - d) / 2 /
  * tan(i). Without s the leade starts at L3 + G - (G1 - F) / 2 / tan(i), as the outline draws it.
- * Own derivation, not a CIP value and not checked against a measurement.
+ * Own derivation, not a CIP value and not checked against a measurement. The notes write their
+ * lengths in `unit`.
  */
 export function leadeContact(
   ch: SeatingValues,
   d: number,
+  unit: LengthUnit = 'mm',
 ): { z: number; note?: string | undefined } | { missing: string[] } | { none: string } {
   const { chamberL3: L3, G1, F, leadeEnd: G, leadeStart: s, leadeAngle: i } = ch
   const missing = [
@@ -47,13 +49,15 @@ export function leadeContact(
   // `missing` names every one of them that is undefined
   const [l3, g1, f, angle] = [L3, G1, F, i] as [number, number, number, number]
   const t = Math.tan(angle * deg)
+  // a length as the notes write it: as given in mm, as the figure labels write it in inches
+  const l = (x: number) => (unit === 'mm' ? `${x} mm` : `${lengthText(x, 'in')} in`)
   if (d <= f)
-    return { none: `The bullet diameter ${d} mm is not above F ${f} mm: no land contact.` }
+    return { none: `The bullet diameter ${l(d)} is not above F ${l(f)}: no land contact.` }
   const start = l3 + (s ?? (G as number) - (g1 - f) / 2 / t)
   if (d >= g1)
     return {
       z: start,
-      note: `The bullet diameter ${d} mm is not below G1 ${g1} mm: contact taken at the leade start.`,
+      note: `The bullet diameter ${l(d)} is not below G1 ${l(g1)}: contact taken at the leade start.`,
     }
   return { z: start + (g1 - d) / 2 / t }
 }
@@ -150,7 +154,7 @@ export function seat({
   const { caseVolume, volume } = seatVolumes(outline, cut, waterCapacity, waterDensity)
   const behind = volumeBehind(volume, depthValue > chamber.caseLength, notes)
   const byCbto = by.kind === 'baseToOgive'
-  const contact = landContact(chamber, bullet, outline, byCbto)
+  const contact = landContact(chamber, bullet, outline, byCbto, unit)
   notes.push(...contact.notes)
   const { leade, missing } = contact
   const { jump, contactCoal } = jumpOf({
@@ -285,9 +289,10 @@ function landContact(
   bullet: BulletDimensions,
   outline: Outline,
   byCbto: boolean,
+  unit: LengthUnit,
 ) {
   const notes: string[] = []
-  const contactAt = leadeContact(chamber, bullet.diameter)
+  const contactAt = leadeContact(chamber, bullet.diameter, unit)
   if ('note' in contactAt && contactAt.note) notes.push(contactAt.note)
   if ('none' in contactAt) notes.push(contactAt.none)
   const leade = 'z' in contactAt ? contactAt.z : undefined

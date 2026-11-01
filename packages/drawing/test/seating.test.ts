@@ -325,7 +325,24 @@ describe('seat', () => {
       coal: 71.12,
       lengthSource: 'measured' as const,
     }
-    expect(intrusion({ ...tip, unit: 'in' }).notes.join(' ')).toContain(' in.')
+    expect(intrusion({ ...tip, unit: 'in' }).notes.join(' ')).toContain(
+      `0.015 d, ${lengthText(depth, 'in')} in.`,
+    )
+    expect(intrusion(tip).notes.join(' ')).toContain(`0.015 d, ${+depth.toFixed(3)} mm.`)
+  })
+
+  it('writes the leade contact note in the page unit, mm by default', () => {
+    const g1 = defined(chamber.G1)
+    const at = (unit?: 'mm' | 'in') => {
+      const c = leadeContact(chamber, g1 + 0.1, unit)
+      return 'note' in c ? c.note : undefined
+    }
+    expect(at()).toBe(
+      `The bullet diameter ${g1 + 0.1} mm is not below G1 ${g1} mm: contact taken at the leade start.`,
+    )
+    expect(at('in')).toBe(
+      `The bullet diameter ${lengthText(g1 + 0.1, 'in')} in is not below G1 ${lengthText(g1, 'in')} in: contact taken at the leade start.`,
+    )
   })
 
   it('moves the bullet base with COAL: seating depth is length - (COAL - L3)', () => {
