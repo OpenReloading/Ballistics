@@ -158,6 +158,16 @@ function readIncoming(options: MergeOptions, sources: SourceIndex, errors: strin
   return read
 }
 
+/** The published load file at `path` in the records, or undefined where there is none yet. */
+function readStored(path: string): PublishedLoads | undefined {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) as PublishedLoads
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === 'ENOENT') return undefined
+    throw e
+  }
+}
+
 /**
  * Merges every incoming file into the records' `loads/` folder (see {@link mergePublishedLoads}).
  * A file whose cartridge folder is no cartridge record is not written and is reported as waiting.
@@ -175,9 +185,7 @@ export function mergeLoadFolder(options: MergeOptions): MergeRun {
     if (!existsSync(join(options.records, 'cartridges', `${cartridge}.json`)))
       return { path, status: 'waiting' }
     const target = join(options.records, path)
-    const existing = existsSync(target)
-      ? (JSON.parse(readFileSync(target, 'utf8')) as PublishedLoads)
-      : undefined
+    const existing = readStored(target)
     const merged = mergePublishedLoads(existing, file, options.accept, resolving(sources))
     if (merged.written && !options.dryRun) {
       mkdirSync(dirname(target), { recursive: true })

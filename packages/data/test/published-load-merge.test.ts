@@ -304,6 +304,16 @@ describe('npm run loads:merge', () => {
     expect(readRecords(records).errors).toEqual([])
   })
 
+  it('stops on a records file it cannot read', () => {
+    const records = temp()
+    const incoming = temp()
+    write(incoming, target, table([a]))
+    mkdirSync(join(records, target), { recursive: true })
+    expect(() => mergeLoadFolder({ incoming, records, accept: 'all', dryRun: false })).toThrow(
+      /EISDIR/,
+    )
+  })
+
   it('lists an absent load as kept', () => {
     const records = temp()
     const incoming = temp()
