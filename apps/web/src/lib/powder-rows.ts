@@ -1,9 +1,14 @@
 /** The powder list's rows: search, the packed page props and the browser's powders. */
-import type { UserRecord } from '@open-reloading/schema'
-import { classifyPowder, isFitted, meanRate, type PowderRow } from './burn-rate.ts'
+import { powder, type UserRecord } from '@open-reloading/schema'
+import {
+  classifyPowder,
+  type FittedPowder,
+  isFitted,
+  meanRate,
+  type PowderRow,
+} from './burn-rate.ts'
 import { present } from './directory.ts'
 import { matchesQuery } from './lists.ts'
-import { powderDesigns } from './powder-designer.ts'
 import { userRowId } from './sources.ts'
 
 /** Whether a powder row matches the search `query`. */
@@ -86,21 +91,42 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
 /** 3 decimals, as the catalogue rows carry them (`orderPowders`). */
 const r3 = (x: number | undefined) => (x === undefined ? undefined : Number(x.toFixed(3)))
 
+const interiorSchema = powder.shape.interior.unwrap()
+
+/**
+ * The burn-rate curves of the powder designs among `records` by record id: a design whose burn law
+ * passes the powder schema's interior, with the kind "Fitted to data" the schema asks of it, and a
+ * curve (`classifyPowder`). Labelled with the design's name. Checks the burn law only, not the whole
+ * record: the list and the overlay load no designer code.
+ */
+export function designCurves(records: readonly UserRecord[]): Map<string, FittedPowder> {
+  return new Map(
+    records.flatMap((r): [string, FittedPowder][] => {
+      if (r.kind !== 'powder' || r.data.provenanceKind !== 'fitted') return []
+      const interior = interiorSchema.safeParse(r.data.draft?.interior)
+      if (!interior.success) return []
+      const p = classifyPowder({
+        id: r.id,
+        manufacturer: '',
+        name: r.name,
+        interior: interior.data,
+      })
+      return isFitted(p) ? [[r.id, p]] : []
+    }),
+  )
+}
+
 /**
  * The powders among `records` as Mine rows: no manufacturer (a design has none), the grain form and
  * base of the draft, and the mean vivacity of a design that builds a powder with a curve (no
  * burn-rate order: that is the catalogue's).
  */
 export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
-  const curves = new Map(
-    powderDesigns(records).flatMap((d) => {
-      const p = classifyPowder(d.powder)
-      return isFitted(p) ? [[d.id, meanRate(p)] as const] : []
-    }),
-  )
+  const curves = designCurves(records)
   return records.flatMap((r) => {
     if (r.kind !== 'powder') return []
-    const m = curves.get(r.id)
+    const curve = curves.get(r.id)
+    const m = curve && meanRate(curve)
     return [
       {
         id: userRowId(r.id),

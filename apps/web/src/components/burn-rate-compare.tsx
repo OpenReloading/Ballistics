@@ -24,7 +24,7 @@ import {
   unfitTitles,
   unfittedGroups,
 } from '../lib/burn-rate.ts'
-import { type PowderDesign, powderDesigns } from '../lib/powder-designer.ts'
+import { designCurves } from '../lib/powder-rows.ts'
 import { userRecordId, userRowId } from '../lib/sources.ts'
 import { storedRecords } from '../lib/user-store.ts'
 import { say } from '../lib/wording.ts'
@@ -132,22 +132,22 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   const [records, setRecords] = useState<Record<string, Powder | 'error'>>({})
   const names = useManufacturerNames()
   // the browser's designs, undefined until read: the URL's user picks wait for them
-  const [designs, setDesigns] = useState<PowderDesign[]>()
+  const [designs, setDesigns] = useState<ReturnType<typeof designCurves>>()
   useEffect(() => {
     storedRecords().then(
-      (r) => setDesigns(powderDesigns(r.records)),
-      () => setDesigns([]),
+      (r) => setDesigns(designCurves(r.records)),
+      () => setDesigns(new Map()),
     )
   }, [])
   const mine = useMemo(
     () =>
       new Map(
-        (designs ?? []).flatMap((d): [string, FittedPowder][] => {
-          const p = classifyPowder(d.powder)
-          const id = userRowId(d.id)
-          const label = t('{name} (user design)', { name: d.name })
-          return isFitted(p) ? [[id, { ...p, id, label }]] : []
-        }),
+        [...(designs ?? new Map<string, FittedPowder>())].map(
+          ([recordId, p]): [string, FittedPowder] => {
+            const id = userRowId(recordId)
+            return [id, { ...p, id, label: t('{name} (user design)', { name: p.label }) }]
+          },
+        ),
       ),
     [designs, t],
   )
