@@ -18,7 +18,15 @@
   },
   "construction": {
     "raw": "Hi-Tek 2-Extreme Coating",
-    "unmapped": true
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 20,
+        "raw": "Brinell 20"
+      }
+    },
+    "gasCheck": false
   },
   "note": "Listed as 215 Grain FP - Grooveless. Brinell 20.",
   "provenance": {
@@ -29,13 +37,15 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length", "construction.raw"],
+        "fields": ["diameter", "mass", "length", "construction.raw", "construction.core.hardness"],
         "note": "HT-309215BLK, OEM Blackout-Grooveless (https://missouribullet.com/details.php?prodId=347): .309 Diameter, 215 Grain FP - Grooveless, Brinell 20, Bullet OAL 1.207+/-, Hi-Tek 2-Extreme Coating"
       },
       {
-        "source": "mapping-of-the-maker-wording-to-construction-fields",
-        "kind": "derived",
-        "fields": ["construction.unmapped"]
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.structure", "construction.core", "construction.gasCheck"],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }
