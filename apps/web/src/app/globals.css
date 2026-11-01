@@ -3036,9 +3036,9 @@ td.nowrap {
   }
 }
 
-/* the firearm table's columns all have a width (93rem): below a window of about 1600 px the table
-   scrolls sideways in its box, above it the filler column takes the room left and the name keeps
-   its width */
+/* the firearm table's columns all have a width (72rem): a 1280 px window holds them, below it the
+   table scrolls sideways in its box with the row menu held at its edge, above it the filler column
+   takes the room left and the name keeps its width */
 @media screen and (min-width: 48em) {
   .library > .directory > .directory-scroll {
     overflow-x: auto;
@@ -3089,8 +3089,16 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
+  color: var(--fg);
+  font-size: var(--mantine-font-size-lg);
+  letter-spacing: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* the card's title is its largest heading: the data card's sections step below it */
+.library-editor .firearm-card h3 {
+  font-size: var(--mantine-font-size-md);
 }
 
 .library-editor .mantine-Input-wrapper {
@@ -3192,6 +3200,11 @@ main .library-head.page-panel-head > .page-panel-title {
 .library-editor .firearm-card {
   display: block;
   overflow-x: auto;
+}
+
+/* the property table's labels in a column of their own width, not half the card */
+.firearm-card tbody th {
+  width: 12em;
 }
 
 @media print {
@@ -9242,7 +9255,7 @@ main .session-shots th:nth-child(-n + 2) {
   cursor: grab;
 }
 
-/* below the confidence tier: sparser dashes, not in Accept all */
+/* below the confidence tier: sparser dashes, not in Accept sure */
 .target-canvas .proposal.maybe {
   stroke-dasharray: 2 4;
   opacity: 0.7;
@@ -9318,14 +9331,25 @@ main .session-shots th:nth-child(-n + 2) {
 /* three buttons: the value takes the room the label leaves */
 .prop-grid > .mantine-InputWrapper-root.colour-row,
 .prop-grid > .prop-row.aim-row,
+.prop-grid > .prop-row.filter-row,
 .prop-grid > .prop-row.score-align,
 .prop-grid > .prop-row.detect-wide {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
-/* without a face its rows keep their room, hidden, so choosing a face moves nothing */
+/* without a face its rows take no room: Detect follows the Target row */
 .score-rows[data-off] {
-  visibility: hidden;
+  display: none;
+}
+
+/* a select whose names are long: the label above, the select across the column */
+.prop-grid > .mantine-InputWrapper-root.full-row {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.125rem;
+}
+
+.prop-grid .mantine-InputWrapper-root.full-row > * {
+  grid-column: 1;
 }
 
 .prop-grid .score-status {
@@ -9355,10 +9379,28 @@ main .session-shots th:nth-child(-n + 2) {
   background: var(--link);
 }
 
-/* hole detection: numbered steps, one step's controls */
-.detect-steps {
+/* a photo filter: the slider, its value and a reset */
+.prop-grid .filter-row-value {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.prop-grid .filter-row-value > .mantine-Slider-root {
+  flex: 1 1 auto;
+}
+
+.prop-grid .filter-readout {
+  flex: none;
+  min-width: 2.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* hole detection: numbered steps in cells of one width (3 and 2), one step's controls */
+.detect-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.125rem;
   margin: 0 0 0.25rem;
   padding: 0;
@@ -9366,8 +9408,11 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .detect-steps button {
-  min-width: 1.5rem;
+  width: 100%;
   min-height: 1.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: 0 0.25rem;
   border: 1px solid var(--border);
   background: none;
@@ -9383,9 +9428,20 @@ main .session-shots th:nth-child(-n + 2) {
   color: var(--bg);
 }
 
-/* as tall as the tallest step, so a step change moves nothing below */
+/* as tall as the tallest step (Review, its help in the 17rem column), so Back and Next stay put */
 .detect-step {
-  min-height: 7.2rem;
+  min-height: 8.5rem;
+}
+
+:lang(de) .detect-step {
+  min-height: 11.75rem;
+}
+
+/* why the guided run cannot start, under its button */
+.prop-grid .detect-blocked {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
 }
 
 .detect-nav {
@@ -9709,6 +9765,14 @@ main .session-shots th:nth-child(-n + 2) {
   cursor: pointer;
 }
 
+/* the Statistics rows beyond the key values, on request */
+.stats-side .stats-more {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  color: var(--link);
+  font-size: var(--mantine-font-size-xs);
+}
+
 .overlay-list {
   display: grid;
   gap: 0.25rem;
@@ -9775,27 +9839,37 @@ main .session-shots th:nth-child(-n + 2) {
   appearance: none;
 }
 
-/* the x and y fields go below Set and Clear when the row has no room for a value */
+/* the point of aim's x and y side by side beside the label, below it when a longer label or wider
+   text spacing leaves them too little room; Set and Clear on the row below */
+.prop-grid > .prop-row.aim-row {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
 .prop-grid .aim-row > .prop-label {
   white-space: nowrap;
 }
 
 .prop-grid .aim-fields {
-  flex-wrap: wrap;
+  display: flex;
+  flex: 1 1 11rem;
+  gap: 0.5rem;
 }
 
 .prop-grid .aim-axis {
   display: flex;
-  flex: 1 1 4.5rem;
+  flex: 1 1 0;
   align-items: center;
   gap: 0.25rem;
   min-width: 0;
 }
 
-/* the point of aim's x and y share the value column; a decimal comma makes them text fields */
+/* the point of aim's x and y share the value column; a decimal comma makes them text fields; no
+   intrinsic input width widens the row */
 .prop-grid .aim-fields input:is([type="number"], [type="text"]) {
   flex: 1 1 0;
-  width: auto;
+  width: 0;
   min-width: 0;
 }
 
@@ -10238,8 +10312,38 @@ main .page-bar h1 {
   }
 }
 
-.page-bar-status .file-status > span + span:not(:empty)::before {
-  content: " ";
+/* the state, a message and a failure as parts of one line, not sentences run together */
+.page-bar-status .file-status > span:not(:empty) ~ span:not(:empty)::before {
+  content: " · ";
+}
+
+/* a list's count beside the file status (the firearm library): the count first in its fixed width,
+   the save status after a rule, so a status that comes and goes moves nothing */
+.page-bar-status:has(> .bar-count):has(> .file-status) {
+  display: flex;
+  align-items: baseline;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > :is(.bar-count, .file-status) {
+  margin-inline-start: 0;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > .bar-count {
+  flex: none;
+  order: -1;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > .file-status {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.page-bar-status:has(> .bar-count) > .file-status:has(> :not(:empty)) {
+  margin-inline-start: 0.75rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--border);
 }
 
 .page-bar-actions {
@@ -10258,6 +10362,16 @@ main .page-bar h1 {
 /* the tour button's Indicator keeps a box, so its dot sits on the button */
 .page-bar-actions > .mantine-Indicator-root {
   display: inline-flex;
+}
+
+/* the top bar's buttons come here from 75em only (site-header.tsx); below it no grid cell */
+.page-bar-end {
+  display: none;
+}
+
+/* the Units button shows its preset; the phone panel's row the whole name, as the icon buttons' rows */
+.units-full {
+  display: none;
 }
 
 /* Save's chevron: a square of the bar's control height */
@@ -10410,6 +10524,14 @@ main .page-bar h1 {
     height: 0.8125rem;
   }
 
+  .page-bar:not([data-single]) .page-bar-actions .units-preset {
+    display: none;
+  }
+
+  .page-bar:not([data-single]) .page-bar-actions .units-full {
+    display: inline;
+  }
+
   /* the Tour button fills its row, so the unseen dot sits on its corner */
   .page-bar:not([data-single]) .page-bar-actions > .mantine-Indicator-root > .mantine-Button-root {
     flex: 1;
@@ -10483,6 +10605,21 @@ main .page-bar h1 {
     margin-top: 1px;
   }
 
+  /* in the bar's end slot (site-header.tsx), so they follow its actions in the keyboard order: the
+     bar reaches to the top bar's padding and centres them with its own buttons */
+  .page-bar-end {
+    display: contents;
+  }
+
+  :root .page-bar:has(> .page-bar-end > .top-end) {
+    right: var(--mantine-spacing-md);
+  }
+
+  /* no auto margin of its own: the workbench's status pushes the actions right with one */
+  .page-bar-end > .top-end {
+    margin: 0;
+  }
+
   .page-bar {
     column-gap: 0.5rem;
   }
@@ -10500,6 +10637,12 @@ main .page-bar h1 {
   .page-shell[data-frame] .page-top > main::before {
     display: none;
   }
+
+  /* a Database page starts with its tab strip at the top bar's rule on every tab, framed or not
+     (the frame's lists have no step above the strip) */
+  .page-top > main:has(> .library-tabs)::before {
+    display: none;
+  }
 }
 
 /* up to 80em the two icons leave the workbench's bar too little room: its load switcher gives it,
@@ -10507,6 +10650,29 @@ main .page-bar h1 {
 @media screen and (min-width: 75em) and (max-width: 79.99em) {
   :root:has(.report-issue) .load-switch {
     width: 7.75rem;
+  }
+}
+
+/* the Units button as an icon, named by its whole name, until its preset leaves a record's title
+   its room (German, three page actions) */
+@media screen and (min-width: 75em) and (max-width: 104.99em) {
+  /* beats the bar's left-section padding, so the icon sits in the middle */
+  .page-bar .units-link.mantine-Button-root[data-with-left-section] {
+    width: var(--button-height, 2.25rem);
+    padding: 0;
+  }
+
+  .page-bar .units-link .mantine-Button-section[data-position="left"] {
+    margin: 0;
+  }
+
+  .page-bar .units-link .mantine-Button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
@@ -10541,6 +10707,7 @@ main .page-bar h1 {
 
   .page-bar-status,
   .page-bar-actions,
+  .page-bar-end,
   .page-bar-toggle,
   .load-strip > button,
   .load-switch,
@@ -10896,6 +11063,24 @@ main .page-bar h1 {
 
 .directory-table .field-note:is(:hover, :focus-visible) {
   text-decoration: underline dotted var(--muted);
+}
+
+/* a row menu held at the box's right edge while the table scrolls sideways (the firearm table),
+   with the row's background and a rule on its left */
+.directory-table :is(th, td).sticky-end {
+  position: sticky;
+  right: 0;
+  background: var(--bg);
+  box-shadow: inset 1px 0 0 var(--border);
+}
+
+.directory-table thead :is(th, td).sticky-end {
+  z-index: 2;
+  background: var(--surface);
+}
+
+.directory-table tr[data-row]:hover > td.sticky-end {
+  background: var(--surface);
 }
 
 /* a group of rows ends: the heavier rule of the record's tables (the browser's own rows end before

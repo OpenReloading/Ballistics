@@ -193,6 +193,7 @@ Code: `packages/core/src/interior/model.ts`, `convectiveDefaults`.
 ## Limits
 
 - No default leak area: no measurement constrains it. A leak area is an input to fit or measure.
+- The convective heat loss exists and stays off by default. Turning it on needs a new fit of every powder, and no measured heat loss for a rifle or handgun bore was found (see the gun-bore check below), so the term cannot be checked. It is revisited when such a measurement exists ([#848](https://github.com/OpenReloading/Ballistics/issues/848)).
 - Input checks: at least one leak-area point, travels finite, at least 0 and strictly increasing, areas, back pressure and discharge coefficient finite and at least 0. Heat model: flame temperature, viscosity, Prandtl number and wall temperature positive, factor at least 0.
 - `closedVessel` with leakage describes a vented vessel with the leak area at travel 0.
 - Research log: [isentropic blowdown closed form](../research/interior-leakage-blowdown-closed-form.md).
