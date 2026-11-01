@@ -403,8 +403,8 @@ async function openSharedLink<K extends UserRecordKind>(
   window.history.replaceState(window.history.state, '', window.location.href.split('#')[0])
   if (!p.ok) {
     const { reason } = p
-    return page.say(({ t }) =>
-      t('Shared link not opened: {reason}', { reason: linkReasonText(reason, t) }),
+    return page.say(({ t, tn }) =>
+      t('Shared link not opened: {reason}', { reason: linkReasonText(reason, { t, tn }) }),
     )
   }
   const r = p.records.find((x): x is Of<K> => x.kind === kind)
@@ -506,8 +506,8 @@ async function readOpened<K extends UserRecordKind>(file: File, kind: K) {
       : await readLoadFile(new TextEncoder().encode(text))
   if (!parsed.ok) {
     const { reason } = parsed
-    const problem: Said = ({ t }) =>
-      t('{file} not opened: {reason}', { file: file.name, reason: reasonText(reason, t) })
+    const problem: Said = ({ t, tn }) =>
+      t('{file} not opened: {reason}', { file: file.name, reason: reasonText(reason, { t, tn }) })
     return { problem }
   }
   const mine = parsed.records.filter((r): r is Of<K> => r.kind === kind)
@@ -779,7 +779,7 @@ function ImportReport({
           {report.skipped.map((s) => (
             <li key={s.name}>
               <strong>{s.name}</strong>:{' '}
-              <span className="file-reason">{reasonText(s.reason, t)}</span>
+              <span className="file-reason">{reasonText(s.reason, tr)}</span>
             </li>
           ))}
         </ul>
@@ -1182,7 +1182,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const checked = checkedUserDataText(await withMakers(record), await photosOf([record]))
     if (!checked.ok) {
       const { reason } = checked
-      setFailure(({ t }) => t('Not saved: {reason}', { reason: reasonText(reason, t) }))
+      setFailure(({ t, tn }) => t('Not saved: {reason}', { reason: reasonText(reason, { t, tn }) }))
       return
     }
     return { recordId, record, text: checked.text }
@@ -1296,7 +1296,9 @@ function FileMenuOf<K extends UserRecordKind>({
     if (problem) return setFailure(({ t }) => t('Not shared: {reason}', { reason: problem }))
     const refused = shareProblem(current())
     if (refused)
-      return setFailure(({ t }) => t('Not shared: {reason}', { reason: reasonText(refused, t) }))
+      return setFailure(({ t, tn }) =>
+        t('Not shared: {reason}', { reason: reasonText(refused, { t, tn }) }),
+      )
     const page = window.location.origin + window.location.pathname
     const link = await shareLink(await withMakers(current()), page)
     if (!link) return setFailure(({ t }) => tooLongText(kind, t))
@@ -1316,7 +1318,7 @@ function FileMenuOf<K extends UserRecordKind>({
     const checked = checkedUserDataText([{ ...current(), data: apiData }])
     if (checked.ok) return checked.text
     const { reason } = checked
-    setFailure(({ t }) => t('Not written: {reason}', { reason: reasonText(reason, t) }))
+    setFailure(({ t, tn }) => t('Not written: {reason}', { reason: reasonText(reason, { t, tn }) }))
   }
 
   async function remove(records: Of<K>[], question: string) {
@@ -1444,7 +1446,9 @@ function FileMenuOf<K extends UserRecordKind>({
     const checked = exportAllText(records, await photosOf(records), invalid)
     if (!checked.ok) {
       const { reason } = checked
-      setFailure(({ t }) => t('Not exported: {reason}', { reason: reasonText(reason, t) }))
+      setFailure(({ t, tn }) =>
+        t('Not exported: {reason}', { reason: reasonText(reason, { t, tn }) }),
+      )
       return false
     }
     const day = localDay(new Date())
