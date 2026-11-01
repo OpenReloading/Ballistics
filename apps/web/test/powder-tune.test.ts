@@ -218,4 +218,17 @@ describe('revolver leak note', () => {
     expect(revolverLeakNote(undefined, load)).toBe(false)
     expect(revolverLeakNote('IV', undefined)).toBe(false)
   })
+
+  it('follows the linked firearm where it states its action, whatever the cartridge table', () => {
+    expect(revolverLeakNote('I', load, 'revolver')).toBe(true)
+    expect(revolverLeakNote(undefined, load, 'revolver')).toBe(true)
+    expect(revolverLeakNote(undefined, leak(1e-7), 'revolver')).toBe(false)
+    expect(revolverLeakNote('IV', load, 'pistol')).toBe(false)
+    expect(revolverLeakNote('IV', load, 'rifle')).toBe(false)
+  })
+
+  it('keeps the table IV rule for a firearm without the field or no firearm', () => {
+    expect(revolverLeakNote('IV', load, undefined)).toBe(true)
+    expect(revolverLeakNote('I', load, undefined)).toBe(false)
+  })
 })

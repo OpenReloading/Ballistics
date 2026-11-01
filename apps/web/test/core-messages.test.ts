@@ -248,6 +248,9 @@ describe('the warnings of an interior answer', () => {
     ).warnings,
     ...limitCheck(range(done), sheet('transducer', 9000), small(1e7, 1e6)).warnings,
     ...limitCheck(range(done), sheet('transducer', 9000), small(1e6, 1e7)).warnings,
+    // a typed Pmax in place of the sheet's, as above: the nominal, then the upper end of the range
+    ...limitCheck(range(done), undefined, undefined, 3800e5).warnings,
+    ...limitCheck(range(done), undefined, undefined, 4300e5).warnings,
   ]
   // the load file route writes these with the words of the workbench's own check
   const fromLoadFile = [
@@ -296,7 +299,7 @@ describe('the warnings of an interior answer', () => {
     const count = (code: WarningCode) => produced.filter((w) => w.code === code).length
     expect(count('noCartridge')).toBe(1)
     expect(count('noComparableLimit')).toBe(1)
-    expect(count('limitExceeded')).toBe(2)
+    expect(count('limitExceeded')).toBe(4)
     expect(count('rangeIncomplete')).toBe(1)
     expect(count('chargeTooSmall')).toBe(2)
   })

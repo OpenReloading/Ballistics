@@ -148,6 +148,25 @@ describe('POST /interior/charge-target', () => {
     expect(body.resolved.cartridge.id).toBe('twice-rifle')
   })
 
+  it('reads a percentage of a typed limit, with or without a cartridge', async () => {
+    for (const cartridge of [undefined, 'crusher-rifle']) {
+      const { status, body } = await post({
+        load,
+        cartridge,
+        pressureLimit: 2 * nominal.peakBreechPressure,
+        target: { kind: 'peakPressure', value: 50, unit: 'percentOfLimit' },
+      })
+      expect(status).toBe(200)
+      expect(body.target.limit).toEqual({
+        typed: true,
+        symbol: 'Pmax',
+        pressure: 2 * nominal.peakBreechPressure,
+      })
+      expect(body.limits).toHaveLength(1)
+      expect(body.limits[0]).toMatchObject({ typed: true, method: 'typed', compared: true })
+    }
+  })
+
   it('refuses a percentage without a compared limit', async () => {
     const target = { kind: 'peakPressure', value: 50, unit: 'percentOfLimit' }
     for (const cartridge of [undefined, 'crusher-rifle']) {

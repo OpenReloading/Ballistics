@@ -22,7 +22,7 @@ it('leaves the volume to the seating while a bullet is seated, and takes the gun
     volume: { si: 3e-6, source: 'x' },
     boreDiameter: { si: 0.0078, source: 'y' },
   }
-  const base = { origin: undefined, bullet: {}, suggestions, firearmMass: 3.2 }
+  const base = { origin: undefined, bullet: {}, specs: {}, suggestions, firearmMass: 3.2 }
   expect(recordValuesOf({ ...base, seatingOwnsVolume: false })).toMatchObject({
     volume: 3e-6,
     boreDiameter: 0.0078,
@@ -33,21 +33,30 @@ it('leaves the volume to the seating while a bullet is seated, and takes the gun
 
 it('resets each kind of value its own way and counts the resets', () => {
   const targets = {
-    changes: { vivacity: 1.8, boreDiameter: 0.0078, bulletLength: 0.03, firearmMass: 3.2 },
+    changes: {
+      vivacity: 1.8,
+      boreDiameter: 0.0078,
+      bulletLength: 0.03,
+      firearmMass: 3.2,
+      pmax: 3.5e7,
+    },
     system: presetUnits('metric-grams'),
     bulletKeys: new Set(['bulletLength']),
+    specKeys: new Set(['pmax']),
     baseChanged: false,
     setField: vi.fn(),
     clearError: vi.fn(),
     unsetTypedBullet: vi.fn(),
+    unsetTypedSpec: vi.fn(),
     follow: vi.fn(),
     setGunWeight: vi.fn(),
   }
   const n = resetToRecord(
-    ['vivacity', 'boreDiameter', 'bulletLength', 'firearmMass', 'gamma'],
+    ['vivacity', 'boreDiameter', 'bulletLength', 'firearmMass', 'gamma', 'pmax'],
     targets,
   )
-  expect(n).toBe(4)
+  expect(n).toBe(5)
+  expect(targets.unsetTypedSpec).toHaveBeenCalledWith(['pmax'])
   expect(targets.unsetTypedBullet).toHaveBeenCalledWith(['bulletLength'])
   expect(targets.follow).toHaveBeenCalledWith(['boreDiameter'])
   expect(targets.setField).toHaveBeenCalledWith('boreDiameter', { text: '', si: undefined })
@@ -60,10 +69,12 @@ it('resets a changed base form with the base dimensions typed for it', () => {
     changes: { bulletLength: 0.03 },
     system: presetUnits('metric-grams'),
     bulletKeys: new Set(['bulletLength']),
+    specKeys: new Set(['pmax']),
     baseChanged: true,
     setField: vi.fn(),
     clearError: vi.fn(),
     unsetTypedBullet: vi.fn(),
+    unsetTypedSpec: vi.fn(),
     follow: vi.fn(),
     setGunWeight: vi.fn(),
   }

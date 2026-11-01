@@ -13,4 +13,4 @@ body:
     id: source
     attributes:
       label: Source
-      description: Document or URL and its terms of use. Every record cites its source, so values without one cannot be added.
+      description: Document or URL. Every record cites its source, so values without one cannot be added.

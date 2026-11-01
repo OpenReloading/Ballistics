@@ -9,9 +9,9 @@ import { sha256 } from './shared.ts'
 export const provenanceKind = z.enum(['published', 'measured', 'derived', 'fitted', 'computed'])
 
 /**
- * Who stands behind a source: the `manufacturer` (data it supplied or published; a permission or
- * terms it states go in `terms`, the origin claims none), `public` data under an open license or in
- * the public domain (it can come from a manufacturer too), or `community` contributions.
+ * Who stands behind a source: the `manufacturer` (data it supplied or published; terms it states
+ * go in `terms`), `public` data under an open license or in the public domain (it can come from a
+ * manufacturer too), or `community` contributions.
  * Inferred type: {@link SourceOrigin}.
  */
 export const sourceOrigin = z.enum(['manufacturer', 'public', 'community'])
@@ -68,7 +68,7 @@ export const source = z.object({
     .optional(),
   /**
    * SPDX id of the license the data is used under ("CC-BY-4.0"; "LicenseRef-US-Gov-PD" for a US Government work),
-   * or `LicenseRef-<name>` for the publisher's own terms or a written permission, described in `terms`.
+   * or `LicenseRef-<name>` for the publisher's own terms, described in `terms`.
    * Without a license, a source of a record distributed by `@open-reloading/data` is covered by its
    * data licence, CC BY 4.0 (`packages/data/LICENSE`), except one with `origin: manufacturer`: data a
    * manufacturer published carries no project licence, only the terms the manufacturer states.
@@ -78,11 +78,11 @@ export const source = z.object({
     .string()
     .regex(/^(LicenseRef-)?[A-Za-z0-9.+-]+$/)
     .describe(
-      'SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`.',
+      'SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`.',
     )
     .optional(),
   /**
-   * URL or note of the publisher's terms or permission, where no SPDX license covers the use. A
+   * URL or note of the publisher's terms, where no SPDX license covers the use. A
    * text starting with http:// or https:// is a link (`isWebLink`) and must be a URL. Any other
    * text is a note.
    */
@@ -93,7 +93,7 @@ export const source = z.object({
       message: 'a text starting with http:// or https:// must be a URL',
     })
     .describe(
-      'URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link.',
+      'URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link.',
     )
     .optional(),
   /** Who stands behind the source; `title` names the actual source (for example the site and the table). */

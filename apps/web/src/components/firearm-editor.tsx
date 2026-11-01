@@ -244,6 +244,20 @@ export function FirearmEditor({
               value={data.model ?? ''}
               onChange={(e) => patch({ model: e.currentTarget.value })}
             />
+            <NativeSelect
+              label={t('Kind of firearm')}
+              description={t('A revolver gets the cylinder gap note of the powder fit.')}
+              data={[
+                { value: '', label: t('Not stated') },
+                { value: 'rifle', label: t('Rifle') },
+                { value: 'pistol', label: t('Pistol') },
+                { value: 'revolver', label: t('Revolver') },
+              ]}
+              value={data.action ?? ''}
+              onChange={(e) =>
+                patch({ action: (e.currentTarget.value || undefined) as Firearm['action'] })
+              }
+            />
             {firearmFields.map((spec) => (
               <SiField
                 key={spec.key}

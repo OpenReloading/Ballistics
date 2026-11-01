@@ -643,6 +643,13 @@ describe('firearm', () => {
   const [scope, dot] = firearmRecord.data.optics
   const config = firearmRecord.data.configurations[0]
 
+  it('states its action optionally: a record without it stays valid', () => {
+    expect('action' in firearmRecord.data).toBe(false)
+    expect(paths({})).toBeUndefined()
+    for (const action of ['rifle', 'pistol', 'revolver']) expect(paths({ action })).toBeUndefined()
+    expect(paths({ action: 'shotgun' })).toEqual(['data.action'])
+  })
+
   it('rejects a mount of an optic the firearm does not list', () => {
     expect(
       paths({ configurations: [{ ...config, mounts: [{ ...config.mounts[0], optic: 'o9' }] }] }),
@@ -671,7 +678,7 @@ describe('firearm', () => {
     ).toContain('data.optics')
     const counted = { session: 'user:00000000-0000-4000-8000-000000000001', rounds: 3 }
     expect(paths({ countedSessions: [counted] })).toBeUndefined()
-    expect(paths({ countedSessions: Array(201).fill(counted) })).toEqual(['data.countedSessions'])
+    expect(paths({ countedSessions: Array(5001).fill(counted) })).toEqual(['data.countedSessions'])
     expect(paths({ countedSessions: [{ ...counted, rounds: -1 }] })).toEqual([
       'data.countedSessions.0.rounds',
     ])

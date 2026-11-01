@@ -173,12 +173,13 @@ function limitExceededText(
     name,
     unit: u.symbol,
     limit: limitNumber(pressure, system, d),
-    revised: l.revised,
+    revised: l.revised ?? '',
     method: translateMessage(l.method ?? 'measuring method not stated', t),
     nominal: formatNumber(u.fromSi(range.nominalPressure), d),
     low: formatNumber(u.fromSi(range.lowPressure), u.decimals),
     high: formatNumber(u.fromSi(range.highPressure), d),
   }
+  if (l.typed) return typedLimitExceededText(l, shown, t)
   return l.nominalExceeded
     ? {
         text: t(
@@ -196,6 +197,40 @@ function limitExceededText(
       }
 }
 
+/** The warning of a Pmax the user typed: no sheet and no method to name. */
+function typedLimitExceededText(
+  l: Limit,
+  shown: Readonly<Record<string, string | number>>,
+  t: Translator['t'],
+): { text: string; name: string } {
+  return l.nominalExceeded
+    ? {
+        text: t(
+          'Simulated peak pressure {nominal} {unit} (range {low} to {high} {unit}) is above your Pmax {limit} {unit}.',
+          shown,
+        ),
+        name: t('above your Pmax'),
+      }
+    : {
+        text: t(
+          'The upper end of the simulated peak pressure range, {high} {unit}, is above your Pmax {limit} {unit}; the nominal value is {nominal} {unit}.',
+          shown,
+        ),
+        name: t('range above your Pmax'),
+      }
+}
+
+/** The limit a `limitExceeded` warning names: its sheet (a typed Pmax has none), symbol, variant and method. */
+const warnedLimit = (x: Limit, w: InteriorResponse['warnings'][number]) =>
+  x.exceeded &&
+  (x.typed
+    ? w.spec === undefined
+    : x.cartridge !== undefined &&
+      sheetId({ id: x.cartridge, published: x.revised ?? '' }) === w.spec) &&
+  x.symbol === w.symbol &&
+  x.variant === w.variant &&
+  x.method === w.method
+
 /**
  * The API's warnings of `body` in the pressure unit of `system`, each with its short name: an
  * exceeded limit (the warning's sheet, symbol, variant and method) is written again from the
@@ -209,17 +244,7 @@ export function shownWarnings(
   t: Translator['t'],
 ): { text: string; name?: string | undefined }[] {
   return body.warnings.map((w) => {
-    const l =
-      w.code === 'limitExceeded'
-        ? body.limits?.find(
-            (x) =>
-              x.exceeded &&
-              sheetId({ id: x.cartridge, published: x.revised }) === w.spec &&
-              x.symbol === w.symbol &&
-              x.variant === w.variant &&
-              x.method === w.method,
-          )
-        : undefined
+    const l = w.code === 'limitExceeded' ? body.limits?.find((x) => warnedLimit(x, w)) : undefined
     if (l?.pressure === undefined || !l.exceeded)
       return {
         text: translateMessage(convertBarMessage(w.message, system), t),

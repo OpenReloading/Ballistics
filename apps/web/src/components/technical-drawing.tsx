@@ -156,9 +156,13 @@ function Axis({ at }: { at?: [number, number] | undefined }) {
   )
 }
 
-/** The screen width a figure fits: the window height less the page's rows above (`--drawing-chrome`, 7rem unless a page sets it), but no smaller than 11 px text (whole px: layout rounds down). */
-function fitWidth({ em, frame: [, , w, h] }: FigureModel | BulletModel, tallest = h) {
-  return `max(calc((100svh - var(--drawing-chrome, 7rem)) * ${(w / tallest).toFixed(4)}), ${Math.ceil((w * face.minTextPx) / em)}px)`
+/** The screen width at which a figure's text renders 11 px (whole px: layout rounds down). */
+const readableWidth = ({ em, frame: [, , w] }: FigureModel | BulletModel) =>
+  `${Math.ceil((w * face.minTextPx) / em)}px`
+
+/** The screen width a figure fits: the window height less the page's rows above (`--drawing-chrome`, 7rem unless a page sets it), but no smaller than 11 px text. */
+function fitWidth(model: FigureModel | BulletModel, tallest = model.frame[3]) {
+  return `max(calc((100svh - var(--drawing-chrome, 7rem)) * ${(model.frame[2] / tallest).toFixed(4)}), ${readableWidth(model)})`
 }
 
 /**
@@ -283,6 +287,7 @@ export function TechnicalDrawing({
   children,
   reserve,
   level,
+  readable = false,
 }: {
   id: string
   title: string
@@ -302,6 +307,11 @@ export function TechnicalDrawing({
   reserve?: { model: FigureModel; tallest: number } | undefined
   /** Screen: the model is laid out level (medium print), shown with `data-level`. */
   level?: boolean
+  /**
+   * Screen: the page sizes the drawing itself (the cartridge designer) and keeps its text 11 px with
+   * the width `--readable` and the height to width `--aspect` the drawing states.
+   */
+  readable?: boolean | undefined
 }) {
   const { medium, em, frame, scale } = model
   const layers: Partial<Record<Side | 'combined' | 'bullet', Layout>> = model.layers
@@ -319,6 +329,10 @@ export function TechnicalDrawing({
           : ({
               '--full': `${n(w * unit)}px`,
               '--fit': fitWidth(model, tallest),
+              ...(readable && {
+                '--readable': readableWidth(model),
+                '--aspect': (h / w).toFixed(4),
+              }),
               ...(reserve && reserved({ model, tallest }, reserve)),
             } as CSSProperties)
       }
