@@ -125,7 +125,7 @@ function namesOf(
 }
 
 /** The period the filters name, for the printed sheet's heading. */
-function periodText(t: Translator['t'], f: LogFilter) {
+function periodText(t: Translator['t'], f: LogFilter, firearm?: string) {
   const range =
     f.from || f.to
       ? t('{from} to {to}', {
@@ -134,7 +134,8 @@ function periodText(t: Translator['t'], f: LogFilter) {
         })
       : ''
   const year = f.years?.[0] ? t('Year {year}', { year: f.years[0] }) : ''
-  return [year, range].filter(Boolean).join(', ') || t('All entries')
+  const period = [year, range].filter(Boolean).join(', ') || t('All entries')
+  return firearm ? `${firearm}, ${period}` : period
 }
 
 /** The form of one entry: day, place, discipline, firearm, load or ammunition, rounds, result, notes, confirmation. */
@@ -156,7 +157,7 @@ function EntryForm({
   loads: LoadRecord[]
   disciplines: { group: string; items: { value: string; label: string }[] }[]
   disciplineName: (ref: string | undefined) => string
-  problem: string | undefined
+  problem: Message | undefined
   onSave: () => void
   onCancel: () => void
   isNew: boolean
@@ -279,7 +280,7 @@ function EntryForm({
           onChange={(e) => patch({ notes: e.currentTarget.value })}
         />
       </SimpleGrid>
-      {problem && <ErrorNote>{t('Not saved: {reason}', { reason: problem })}</ErrorNote>}
+      {problem && <ErrorNote>{t('Not saved: {reason}', { reason: t(problem) })}</ErrorNote>}
       <Group gap="xs" mt="md">
         <Button onClick={onSave}>{t('Save entry')}</Button>
         <Button variant="default" onClick={onCancel}>
@@ -445,25 +446,34 @@ async function importEntries(f: File, { t, tn }: Translator) {
   const stored = await storedRecords()
   const plan = planImport(incoming, stored.records, stored.invalid)
   await putRecords(plan.added)
+  // only an entry replaces an entry: another kind with the id, or an invalid record, holds it
+  const conflicts = plan.conflicts.filter((c) => c.stored.kind === 'shootingLogEntry')
+  const held = plan.blocked.length + plan.conflicts.length - conflicts.length
   const replace =
-    plan.conflicts.length > 0 &&
+    conflicts.length > 0 &&
     (await confirmDialog({
       title: t('Replace entries?'),
       message: tn(
-        plan.conflicts.length,
+        conflicts.length,
         '{count} entry of the file differs from the one in this browser. Replace it?',
         '{count} entries of the file differ from the ones in this browser. Replace them?',
       ),
       confirmLabel: t('Replace'),
     }))
-  if (replace) await putRecords(plan.conflicts.map((c) => c.incoming))
+  if (replace) await putRecords(conflicts.map((c) => c.incoming))
   const others = parsed.records.length - incoming.length
   return [
     t('{added} entries added, {equal} already in this browser, {replaced} replaced.', {
       added: plan.added.length,
       equal: plan.equal.length,
-      replaced: replace ? plan.conflicts.length : 0,
+      replaced: replace ? conflicts.length : 0,
     }),
+    held > 0 &&
+      tn(
+        held,
+        '{count} entry not imported: a record of this browser has its id.',
+        '{count} entries not imported: records of this browser have their ids.',
+      ),
     others > 0 &&
       tn(
         others,
@@ -641,6 +651,7 @@ function useLogFilter(data: LogData | undefined, t: Translator['t']) {
   return {
     filter,
     named,
+    firearmName: firearm ? firearmName : undefined,
     sort: filters.sort,
     setSort: (sort: typeof filters.sort) => setFilters({ sort }),
     clear: () => {
@@ -953,7 +964,7 @@ export function ShootingLog() {
           />
         </section>
       </div>
-      <LogSheet entries={shown} names={names} period={periodText(t, lf.filter)} />
+      <LogSheet entries={shown} names={names} period={periodText(t, lf.filter, lf.firearmName)} />
     </>
   )
 }

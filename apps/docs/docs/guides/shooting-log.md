@@ -18,20 +18,20 @@ The shooting log on the Firearms page (**Shooting log**, `/firearms/log`) keeps 
 | Load or factory ammunition | A saved load, or the factory ammunition as text; not both. |
 | Rounds fired | Required, 0 or more. |
 | Result | As you write it, such as rings or a placing. |
-| Confirmed by, Confirmed on | Who confirmed the entry, as you type it, and the day. |
+| Confirmed by, Confirmed on | Who confirmed the entry, as you type it, and the day; a day needs a name. |
 | Notes | Plain text. |
 
 The record is a user record of kind `shootingLogEntry` ([Glossary](https://github.com/OpenReloading/Ballistics/blob/main/GLOSSARY.md)). An app version without this kind skips such records when it opens a file and says how many it skipped.
 
 ## Round count
 
-Saving an entry with a firearm that has a round count asks once whether to add the entry's rounds to it. Only a yes changes the count; No leaves it as it was. The firearm notes the rounds it took from the entry, so saving the entry again asks only about rounds added since. A firearm without a round count is not changed: set a count on the Firearms page first. The shooting log keeps no second total: the firearm's round count is the one counter.
+Saving an entry with a firearm that has a round count asks once whether to add the entry's rounds to it. Only a yes changes the count; No leaves it as it was. The firearm notes the rounds it took from the entry, so saving the entry again asks only about rounds added since. A firearm without a round count is not changed: set a count on the Firearms page first. The count only grows through the log: changing an entry's firearm, lowering its rounds or deleting it takes no rounds back from a count, so correct the count on the Firearms page then. The shooting log keeps no second total: the firearm's round count is the one counter.
 
 ## Filters, print and export
 
 The firearm and year filters are kept in the address; From and To narrow the entries to a day range. Print, Export CSV and Export JSON take the entries the filters show.
 
-- **Print** gives one line per entry with a blank Signature column for the club's confirmation, the period the filters name, and the number of entries and rounds.
+- **Print** gives one line per entry with a blank Signature column for the club's confirmation, the firearm and period the filters name, and the number of entries and rounds. It leaves out the notes and writes the confirmation's name and day in one column.
 - **Export CSV** writes `openreloading-shooting-log-<day>.csv`, UTF-8 with a byte order mark, one row per entry in the order of the dates:
 
 | Column | Content |
@@ -49,4 +49,4 @@ The firearm and year filters are kept in the address; From and To narrow the ent
 
 A text a spreadsheet would read as a formula starts with an apostrophe.
 
-- **Export JSON** writes `openreloading-shooting-log-<day>.json`, a user data file with the entries. **Import JSON** reads it back: new entries are added, equal ones left, and entries that differ from the browser's are replaced after one question. The firearms and loads the entries name are not in the file; in another browser their names show as not in this browser.
+- **Export JSON** writes `openreloading-shooting-log-<day>.json`, a user data file with the entries. **Import JSON** reads it back: new entries are added, equal ones left, and entries that differ from the browser's are replaced after one question. An entry whose id another record of the browser holds is not imported, and the report counts it. The firearms and loads the entries name are not in the file; in another browser their names show as not in this browser.

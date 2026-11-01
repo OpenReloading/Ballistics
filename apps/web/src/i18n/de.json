@@ -4120,5 +4120,13 @@
   "Who confirmed the entry, as you type it.": "Wer den Eintrag bestätigt hat, so, wie Sie es eingeben.",
   "Year": "Jahr",
   "year {year}": "Jahr {year}",
-  "Year {year}": "Jahr {year}"
+  "Year {year}": "Jahr {year}",
+  "Enter the date.": "Geben Sie das Datum ein.",
+  "Enter who confirmed the entry, or clear the day of the confirmation.": "Geben Sie ein, wer den Eintrag bestätigt hat, oder leeren Sie den Tag der Bestätigung.",
+  "Give a load or factory ammunition, not both.": "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides.",
+  "Check the entry: a value is out of its range.": "Prüfen Sie den Eintrag: Ein Wert liegt außerhalb seines Bereichs.",
+  "{count} entry not imported: a record of this browser has its id.|{count} entries not imported: records of this browser have their ids.": {
+    "one": "{count} Eintrag nicht importiert: Ein Datensatz dieses Browsers hat seine ID.",
+    "other": "{count} Einträge nicht importiert: Datensätze dieses Browsers haben ihre IDs."
+  }
 }

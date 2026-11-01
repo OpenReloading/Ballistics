@@ -11,6 +11,7 @@ import {
   shootingLogEntry,
   type UserRecord,
 } from '@open-reloading/schema'
+import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
 import { roundsDue, withSessionRounds } from './firearm.ts'
@@ -124,12 +125,17 @@ export const logFileName = (ext: 'csv' | 'json', now = new Date()) =>
   `openreloading-shooting-log-${localDay(now)}.${ext}`
 
 /**
- * Why `e` cannot be saved, as the schema's first message; undefined when it can. Empty optional
+ * Why `e` cannot be saved, in words the page translates; undefined when it can. Empty optional
  * texts are left out before the check, as Save writes them.
  */
-export function entryProblem(e: ShootingLogEntry): string | undefined {
-  const r = shootingLogEntry.safeParse(cleanEntry(e))
-  return r.success ? undefined : r.error.issues[0]?.message
+export function entryProblem(e: ShootingLogEntry): Message | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return msg('Enter the date.')
+  if (e.confirmation?.date && !e.confirmation.by?.trim())
+    return msg('Enter who confirmed the entry, or clear the day of the confirmation.')
+  if (e.load && e.ammunition) return msg('Give a load or factory ammunition, not both.')
+  return shootingLogEntry.safeParse(cleanEntry(e)).success
+    ? undefined
+    : msg('Check the entry: a value is out of its range.')
 }
 
 /** `e` without empty optional texts and an empty confirmation, as it is stored. */
