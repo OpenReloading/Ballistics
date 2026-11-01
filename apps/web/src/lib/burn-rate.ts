@@ -284,6 +284,10 @@ export interface PowderRow {
   high?: number | undefined
   /** 1 for the fastest fitted powder; kept when a filter hides others. */
   burnRateOrder?: number
+  /** Load-table rows and cartridges the model was fitted to, and the day its fitted sources were read. */
+  trainingRows?: number | undefined
+  trainingCartridges?: number | undefined
+  retrieved?: string | undefined
 }
 
 /** The list rows of `summaries` in their order, each fitted powder with its global order. */
@@ -303,6 +307,11 @@ export function orderPowders(
       name: s.name,
       grainForm: s.grainForm,
       propellantBase: s.propellantBase,
+      ...(s.interior?.trainingRows !== undefined && {
+        trainingRows: s.interior.trainingRows,
+        trainingCartridges: s.interior.trainingCartridges,
+        retrieved: s.interior.retrieved,
+      }),
     }
     if (!isFitted(p)) return row
     const m = meanRate(p)
@@ -369,7 +378,7 @@ function step(v: number, dir: -1 | 1): number {
 export function rateDomain(rows: readonly PowderRow[]): RateDomain {
   const values = rows
     .flatMap((r) => [r.low ?? r.meanVivacity, r.high ?? r.meanVivacity])
-    .filter((v): v is number => v !== undefined && v > 0)
+    .filter((v): v is number => v !== undefined && v > 0 && Number.isFinite(v))
   if (values.length === 0) return [1, 10]
   const lo = step(Math.min(...values), -1)
   const hi = step(Math.max(...values), 1)

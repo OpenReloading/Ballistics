@@ -55,6 +55,8 @@ export interface Laid {
   variant?: string | undefined
   /** The unit of the length texts, mm by default. */
   unit?: LengthUnit | undefined
+  /** The length texts in the unit's fixed decimals (the bullet drawing). */
+  fixedDecimals?: boolean | undefined
 }
 
 /** Distance from p to the segment from a to b. */
@@ -68,7 +70,7 @@ const polyDistance = (q: PartPoint, line: PartPoint[]) =>
   Math.min(...line.slice(1).map((b, n) => segDistance(q, defined(line[n]), b)))
 
 /** Every value text shows the record's stored value of its symbol, side and variant. */
-export function storedValues({ side, p, layout, values, variant, unit }: Laid) {
+export function storedValues({ side, p, layout, values, variant, unit, fixedDecimals }: Laid) {
   const failures: string[] = []
   const { dimensions, angles, radii } = p.annotation
   for (const d of [...dimensions, ...angles, ...radii]) {
@@ -81,7 +83,7 @@ export function storedValues({ side, p, layout, values, variant, unit }: Laid) {
         (!x.variant || x.variant === variant),
     )
     const texts = layout.labels.filter((l) => l.owner === d.symbol).map((l) => l.text)
-    const want = v && labelText({ ...d, value: v.value as number }, unit)
+    const want = v && labelText({ ...d, value: v.value as number }, unit, fixedDecimals)
     if (!want) failures.push(`${d.symbol} not stored`)
     else if (texts.length !== 1 || texts[0] !== want)
       failures.push(`${d.symbol} text ${texts.join('|') || 'missing'}, stored ${want}`)

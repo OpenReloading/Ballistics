@@ -11291,6 +11291,14 @@ main .page-bar h1 {
   text-align: right;
 }
 
+/* the powder list's training rows: the count, then its cartridges and the day in a muted line */
+.fit-rows {
+  display: grid;
+  justify-items: end;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
 .directory-table th .th-end {
   float: right;
   margin-top: 0.375rem;
@@ -11715,6 +11723,43 @@ main .compare-table {
   font-size: var(--mantine-font-size-xs);
 }
 
+/* a value's difference to the first bullet's, muted after it */
+.compare-delta {
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 400;
+}
+
+/* paper prints the hidden notes of a table (`.field-table td .visually-hidden`), not this name:
+   the legend says what the brackets hold */
+@media print {
+  .field-table td .delta-name {
+    display: none;
+  }
+}
+
+/* a column's Use in workbench: a small link under the name */
+.compare-workbench {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 400;
+  overflow-wrap: normal;
+}
+
+/* the drawings below the table */
+.bullet-compare #compare-drawings,
+.bullet-compare > section + section {
+  margin-top: var(--panel-gap);
+}
+
+/* nothing chosen yet: the note set off from the bar */
+.compare-view .mantine-EmptyState-root {
+  padding-top: 1.5rem;
+}
+
 /* the quantity stays beside the symbol while a phone scrolls the bullets */
 @media screen and (max-width: 47.99em) {
   main .compare-table {
@@ -11881,12 +11926,41 @@ main .page-panel-head > .page-panel-title {
   color: var(--muted);
 }
 
-/* the bullet record's drawing: centred in its panel, at most the 8 px per mm of full size, so its
-   labels are no larger than a cartridge drawing's */
+/* the bullet record's drawing: scaled with its panel, at most as tall as the window leaves room for */
 @media screen {
   .bullet-record .record-figure .drawing.screen-only {
-    width: min(var(--full), 100%);
+    width: 100%;
+    height: auto;
+    max-height: calc(100svh - 14rem);
     margin-inline: auto;
+  }
+}
+
+/* the bullet data: the value column stays close to its label */
+.bullet-record .symbol-table {
+  max-width: 40em;
+}
+
+/* the line, caliber and product badges of the bullet and powder strips: 12 px */
+.fact-tags .mantine-Badge-root {
+  height: auto;
+  font-size: var(--mantine-font-size-xs);
+}
+
+/* the record's primary action on a phone and tablet, where the bar keeps it behind Page actions */
+.phone-action {
+  margin: 0 0 0.5rem;
+}
+
+@media (min-width: 75em) {
+  .phone-action {
+    display: none;
+  }
+}
+
+@media print {
+  .phone-action {
+    display: none;
   }
 }
 
