@@ -26,6 +26,18 @@ test('a diameter far outside a bullet asks to check the unit and still draws', a
   await expect(diameter).not.toHaveAccessibleDescription(/Check the unit/)
 })
 
+test('a hollow base offers the cavity depth, its radius assumed while empty', async ({ page }) => {
+  await storeUnits(page)
+  await gotoHydrated(page, '/bullets/designer')
+  await page.getByRole('textbox', { name: /Diameter \(mm\)$/ }).fill('9')
+  await page.getByRole('combobox', { name: 'Base type' }).selectOption('conical-hollow-base')
+  await page.getByRole('textbox', { name: /Cavity diameter \(mm\)$/ }).fill('5')
+  const depth = page.getByRole('textbox', { name: /Cavity depth \(mm\)$/ })
+  await expect(depth).toHaveAccessibleDescription(/Assumed: 2\.50? mm \(0\.5 dc\)/)
+  await depth.fill('4')
+  await expect(depth).not.toHaveAccessibleDescription(/Assumed/)
+})
+
 test('the photograph dialog is about 34 rem wide until a photograph is loaded', async ({
   page,
 }) => {
