@@ -244,6 +244,24 @@ describe('the round count of an entry', () => {
     expect(entryRoundsDue(other, ids[0], 50, event)).toBe(0)
   })
 
+  it('counts two entries linking one event the same in either order with the event (#961)', () => {
+    const event = 'user:00000000-0000-4000-8000-0000000000e1'
+    const [a, b] = [ids[0], '00000000-0000-4000-9000-0000000000b2']
+    const refs = [`user:${a}`, `user:${b}`]
+    // two days of one match: 40 rounds each with 10 sighting shots, 60 match rounds
+    const entry = (f: UserRecord, id: string, other: string) =>
+      withEntryRounds(f, id, 40, now, event, [{ id: other, rounds: 40 }]) ?? f
+    const count = (f: UserRecord) => (f.kind === 'firearm' ? f.data.roundCount : undefined)
+    const start = firearm({ roundCount: 1000 })
+    const eventOf = (f: UserRecord) => withEventRounds(f, event, 60, 60, now, refs) ?? f
+    const eventFirst = entry(entry(eventOf(start), a, b), b, a)
+    const entriesFirst = eventOf(entry(entry(start, a, b), b, a))
+    const between = entry(eventOf(entry(start, a, b)), b, a)
+    expect(count(eventFirst)).toBe(1080)
+    expect(count(entriesFirst)).toBe(1080)
+    expect(count(between)).toBe(1080)
+  })
+
   it('changes nothing for a firearm without a count or for no rounds', () => {
     expect(entryRoundsDue(firearm(), ids[0], 30)).toBe(0)
     expect(withEntryRounds(firearm(), ids[0], 30, now)).toBeUndefined()
