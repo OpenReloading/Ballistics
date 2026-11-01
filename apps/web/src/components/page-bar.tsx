@@ -1,7 +1,7 @@
 'use client'
 
 import { ActionIcon, Tooltip } from '@mantine/core'
-import { useMounted } from '@mantine/hooks'
+import { useMediaQuery, useMounted } from '@mantine/hooks'
 import { DotsThree } from '@phosphor-icons/react'
 import {
   type CSSProperties,
@@ -75,10 +75,14 @@ function useWholeText(box: HTMLElement | null) {
   return text
 }
 
-/** The panel's actions: the folded ones first, in their own box (globals.css). */
-const withFold = (fold: ReactNode, actions: ReactNode) => (
+/** The panel's actions: the folded ones first, in their own box `foldId` (globals.css). */
+const withFold = (fold: ReactNode, actions: ReactNode, foldId: string) => (
   <>
-    {fold && <div className="page-bar-fold">{fold}</div>}
+    {fold && (
+      <div id={foldId} className="page-bar-fold">
+        {fold}
+      </div>
+    )}
     {actions}
   </>
 )
@@ -180,6 +184,12 @@ export function PageBar({
   const toggle = useRef<HTMLButtonElement>(null)
   const root = useRef<HTMLDivElement>(null)
   const id = useId()
+  const foldId = `${id}-fold`
+  // from 48em to 75em only the folded actions are behind the toggle (globals.css `data-fold`)
+  const foldShown = useMediaQuery('screen and (min-width: 48em) and (max-width: 74.99em)', false, {
+    getInitialValueInEffect: true,
+  })
+  const folds = Boolean(fold) && foldShown
   const mounted = useMounted()
   const endSlot = useBarEndSlot()
   // the phone panel closes on a press outside the bar and the menus and dialogs it opened
@@ -239,7 +249,8 @@ export function PageBar({
             variant="default"
             aria-label={t('Page actions')}
             aria-expanded={open}
-            aria-controls={id}
+            // what it shows and hides: the folded box where the other actions stay in the bar
+            aria-controls={folds ? foldId : id}
             onClick={() => setOpen((o) => !o)}
           >
             <DotsThree size={20} aria-hidden="true" />
@@ -264,7 +275,7 @@ export function PageBar({
                 setOpen(false)
             }}
           >
-            <BarStatus value={statusLine}>{withFold(fold, actions)}</BarStatus>
+            <BarStatus value={statusLine}>{withFold(fold, actions, foldId)}</BarStatus>
           </div>
         </>
       )}

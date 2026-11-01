@@ -1,8 +1,14 @@
 import { interiorBody } from '@open-reloading/api/compute'
-import { powder } from '@open-reloading/schema'
+import { firearmAction, powder } from '@open-reloading/schema'
 import { fetchRecord } from './api-fetch.ts'
 import type { CartridgeDetail } from './api-types.ts'
-import { tuneBaseKey, tuneCartridgeKey, tuneLoadKey, tuneTableKey } from './powder-tune.ts'
+import {
+  tuneActionKey,
+  tuneBaseKey,
+  tuneCartridgeKey,
+  tuneLoadKey,
+  tuneTableKey,
+} from './powder-tune.ts'
 
 /**
  * The load the workbench handed over for load `load` (a reference), parsed as the workbench's run
@@ -38,6 +44,18 @@ export function readTuneTable(load: string) {
     const text = sessionStorage.getItem(tuneTableKey(load))
     const table: unknown = text === null ? undefined : JSON.parse(text)
     return typeof table === 'string' ? table : undefined
+  } catch {
+    return
+  }
+}
+
+/** The `action` of the firearm the load links, handed over with the load for load `load`; undefined when there is none. */
+export function readTuneAction(load: string) {
+  try {
+    const text = sessionStorage.getItem(tuneActionKey(load))
+    if (text === null) return
+    const r = firearmAction.safeParse(JSON.parse(text))
+    return r.success ? r.data : undefined
   } catch {
     return
   }

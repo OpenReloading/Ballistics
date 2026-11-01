@@ -1,5 +1,11 @@
 import type { ChronographString, InteriorLoad } from '@open-reloading/core'
-import { type Powder, type SessionRecord, toSi, type UserRecord } from '@open-reloading/schema'
+import {
+  type Firearm,
+  type Powder,
+  type SessionRecord,
+  toSi,
+  type UserRecord,
+} from '@open-reloading/schema'
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
 import { storageName } from './edition.ts'
@@ -41,11 +47,15 @@ export const tuneTableKey = (load: string) => storageName(`tuneTable:${load}`)
  */
 export const tuneCartridgeKey = (load: string) => storageName(`tuneCartridge:${load}`)
 
+/** The session storage key of the `action` of the firearm the load links, handed over for load `load`, a reference. */
+export const tuneActionKey = (load: string) => storageName(`tuneAction:${load}`)
+
 /**
  * Hands `interior`, the load the workbench's run simulates, `powder`, its powder record, and
  * `table`, the CIP table of its cartridge record, to the tuning route for the strings of load
  * `load` (a reference); undefined removes one handed over before. `cartridge`, the id of a
  * cartridge record still loading, is handed over without a table, for the route to fetch it.
+ * `action` is that of the firearm the load links, where its record states one.
  */
 export function writeTuneLoad(
   load: string,
@@ -53,6 +63,7 @@ export function writeTuneLoad(
   powder?: Powder | undefined,
   table?: string | undefined,
   cartridge?: string | undefined,
+  action?: Firearm['action'],
 ) {
   const put = (key: string, value: unknown) => {
     if (value) sessionStorage.setItem(key, JSON.stringify(value))
@@ -63,18 +74,23 @@ export function writeTuneLoad(
     put(tuneBaseKey(load), interior && powder)
     put(tuneTableKey(load), interior && table)
     put(tuneCartridgeKey(load), interior && !table && cartridge)
+    put(tuneActionKey(load), interior && action)
   } catch {}
 }
 
 /**
- * Whether the fit of `load` gets the revolver note: the cartridge record is in the CIP table of the
- * pistol and revolver cartridges (`table`, see `cartridgeClass`), so the load may be fired from a
- * revolver, and the load has no leak area above 0, so a fit puts the cylinder gap loss into the
- * burn values. No firearm field states a revolver, so pistol loads of that table get the note too.
+ * Whether the fit of `load` gets the revolver note: the load has no leak area above 0, so a fit puts
+ * the cylinder gap loss into the burn values, and it may be fired from a revolver: the `action` of
+ * the firearm it links is `revolver`, or, where no firearm states its action, the cartridge record
+ * is in the CIP table of the pistol and revolver cartridges (`table`, see `cartridgeClass`).
  */
-export const revolverLeakNote = (table: string | undefined, load: InteriorLoad | undefined) =>
+export const revolverLeakNote = (
+  table: string | undefined,
+  load: InteriorLoad | undefined,
+  action?: Firearm['action'],
+) =>
   load !== undefined &&
-  cartridgeClass(table) === 'pistol' &&
+  (action ? action === 'revolver' : cartridgeClass(table) === 'pistol') &&
   !load.leakage?.area.some((p) => p.area > 0)
 
 /** The powder reference a search string of the tuning route names. */

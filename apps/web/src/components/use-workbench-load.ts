@@ -1296,6 +1296,9 @@ export function useWorkbenchState() {
   const readDesigns = () =>
     storedRecords()
       .then(async ({ records }) => {
+        // the firearms read the records only: set before the waits, so a tuning handoff that
+        // follows the opened load's firearm finds it
+        setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
         const [bullets, cartridges] = await Promise.all([
           userBullets(records),
           userCartridges(records),
@@ -1308,7 +1311,6 @@ export function useWorkbenchState() {
           ),
         )
         setPowderDesignList(powderDesigns(records))
-        setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
         setCases(ownCases(records))
       })
       .catch(() => {})
@@ -2188,7 +2190,9 @@ export function useWorkbenchState() {
         ? catalogueIdOf(asked.cartridge.id)
         : undefined
     const pending = cartridge ? (groove?.id !== cartridge.id ? cartridge.id : undefined) : asking
-    writeTuneLoad(ref, load, chosenPowder, recordTable, pending)
+    // the linked library firearm's action, where its record states one (the example states none)
+    const action = firearms.find((r) => r.id === firearm)?.data.action
+    writeTuneLoad(ref, load, chosenPowder, recordTable, pending, action)
   }
   const tuning = useRef(handTuneLoad)
   tuning.current = handTuneLoad
