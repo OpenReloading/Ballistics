@@ -4129,5 +4129,22 @@
   "{count} entry not imported: a record of this browser has its id.|{count} entries not imported: records of this browser have their ids.": {
     "one": "{count} Eintrag nicht importiert: Ein Datensatz dieses Browsers hat seine ID.",
     "other": "{count} Einträge nicht importiert: Datensätze dieses Browsers haben ihre IDs."
-  }
+  },
+  "{count} round of entries without a saved load is under its firearm only.|{count} rounds of entries without a saved load are under their firearms only.": {
+    "one": "{count} Schuss von Einträgen ohne gespeicherte Laborierung zählt nur bei seiner Schusswaffe.",
+    "other": "{count} Schuss von Einträgen ohne gespeicherte Laborierung zählen nur bei ihren Schusswaffen."
+  },
+  "{year}: {entries}, {rounds}": "{year}: {entries}, {rounds}",
+  "Cartridge not known": "Patrone nicht bekannt",
+  "Competitions": "Wettkämpfe",
+  "Export summary CSV": "Übersicht als CSV exportieren",
+  "Month": "Monat",
+  "No entry of this year is linked to a competition.": "Kein Eintrag dieses Jahres ist mit einem Wettkampf verknüpft.",
+  "Print summary": "Übersicht drucken",
+  "Range days per month": "Schießtage je Monat",
+  "Rounds per cartridge": "Schuss je Patrone",
+  "Rounds per firearm": "Schuss je Schusswaffe",
+  "Summary year": "Jahr der Übersicht",
+  "Yearly summary": "Jahresübersicht",
+  "Yearly summary of the shooting log, {year}": "Jahresübersicht des Schießbuchs, {year}"
 }
