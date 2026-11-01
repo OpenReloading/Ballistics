@@ -146,8 +146,14 @@ async function openTab(page: Page, name: string) {
   const direct = page.getByRole('tab', { name, exact: true })
   const more = page.getByRole('button', { name: 'More', exact: true })
   await expect(direct.or(more).first()).toBeVisible()
-  if (await direct.isVisible()) await direct.click()
-  else {
+  // the row measures its tabs again while the page settles: a tab can move into the More menu
+  const clicked =
+    (await direct.isVisible()) &&
+    (await direct.click({ timeout: 3000 }).then(
+      () => true,
+      () => false,
+    ))
+  if (!clicked) {
     await more.click()
     await page.getByRole('menuitem', { name }).click()
   }
