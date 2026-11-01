@@ -48,7 +48,7 @@ An event type is a kind of competition event of one federation as its rule book 
 
 ### Magazine limit
 
-One entry of `magazine`: `division`, `powerFactor` where the limit holds for one power factor only, `maxRounds` (rounds in a magazine at the start signal), `maxLength` (mm, the printed figure in `raw`) and a `note` for a condition such as a longer limit for single stack handguns. An entry has `maxRounds`, `maxLength` or both. A division whose rule limits the handgun with its magazine by a gauge box, or the rounds fired before a reload, has no entry; the source note says so.
+One entry of `magazine`: `division`, `powerFactor` where the limit holds for one power factor only, `maxRounds` (rounds in a magazine, timed as the rule book says: IPSC counts them at the start signal, USPSA after it; the source note says which), `maxLength` (mm, the printed figure in `raw`) and a `note` for a condition such as a longer limit for single stack handguns. An entry has `maxRounds`, `maxLength` or both. A division whose rule limits the handgun with its magazine by a gauge box, or the rounds fired before a reload, has no entry; the source note says so.
 
 ## Checks
 

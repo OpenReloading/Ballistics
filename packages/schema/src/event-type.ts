@@ -66,8 +66,9 @@ export const ringScoring = z.strictObject({
 export const eventScoring = z.discriminatedUnion('method', [hitFactorScoring, ringScoring])
 
 /**
- * A magazine limit of one division: the most rounds loaded at the start signal, the greatest
- * magazine length, or both. `powerFactor`: the limit applies to that power factor only.
+ * A magazine limit of one division: the most rounds in a magazine (from the start signal on, as
+ * the rule book times it: IPSC at the signal, USPSA after it), the greatest magazine length, or
+ * both. `powerFactor`: the limit applies to that power factor only.
  */
 const magazineLimit = z
   .strictObject({

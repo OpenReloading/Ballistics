@@ -593,7 +593,7 @@ _Avoid_: class
 `levels` of an event type: the level names as the rule book prints them, lowest first ("Level I", "Landesmeisterschaft").
 
 **Magazine limit**:
-One entry of `magazine` of an event type: per `division` (and `powerFactor`, where the limit applies to one) the `maxRounds` at the start signal and the `maxLength` (mm), with a `note` for a condition.
+One entry of `magazine` of an event type: per `division` (and `powerFactor`, where the limit applies to one) the `maxRounds` in a magazine from the start signal on (as the rule book times it) and the `maxLength` (mm), with a `note` for a condition.
 
 ### User data files
 
