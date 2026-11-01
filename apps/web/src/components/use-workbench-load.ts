@@ -2115,7 +2115,8 @@ export function useWorkbenchState() {
    * another powder record chosen (its model parameters over the fields, as `choosePowder` writes
    * them) and optionally another charge (kg): the Powders tab's runs. The chosen powder itself keeps
    * the fields as they stand (edited or opened parameters). `recordInputs` lists what the records'
-   * bore resistance reads besides the body: the key of the Powders tab's rows.
+   * bore resistance reads besides the body, and the start pressure default a compared powder without
+   * its own runs at: the key of the Powders tab's rows.
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? chosenPowder
@@ -2142,6 +2143,8 @@ export function useWorkbenchState() {
       bulletLength,
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
+      // a compared powder without its own start pressure runs at this default
+      suggestions.startPressure?.si,
     ]
     return {
       body: volumeTolerance ? { ...body, tolerances: { volumeFraction: volumeTolerance } } : body,
