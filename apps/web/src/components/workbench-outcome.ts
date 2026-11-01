@@ -1,4 +1,4 @@
-import { loadRatio } from '@open-reloading/core'
+import { castHarderThanPeak, loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -68,6 +68,8 @@ export type Outcome =
       powderChosen: boolean
       /** The record's bore-resistance law the run could not apply, with what was missing. */
       resistanceMissing?: { powder: string; missing: string[] } | undefined
+      /** Brinell hardness of the bullet record when it is cast with a plain base (`plainBaseCastHardness`). */
+      castHardness?: number | undefined
       /** The user bullet design whose mass the run used. */
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
@@ -160,7 +162,7 @@ export const singleCharge = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =
 /** What a result's derived values and flag read; the Powders tab builds it per powder. */
 type Shown = Pick<
   Extract<Outcome, { kind: 'ok' }>,
-  'body' | 'load' | 'bulkDensity' | 'resistanceMissing'
+  'body' | 'load' | 'bulkDensity' | 'resistanceMissing' | 'castHardness'
 >
 
 /** A result's derived values. */
@@ -186,6 +188,16 @@ export function derived(ok: Shown, t: Translator['t']) {
         ]
       : []),
     ...(fill ? [fill] : []),
+    ...(ok.castHardness !== undefined && castHarderThanPeak(ok.castHardness, r.peakBreechPressure)
+      ? [
+          {
+            text: t(
+              'The bullet is cast with a plain base, and its alloy is harder than the simulated peak pressure upsets by the rule of thumb: the base may not seal the bore, so gas may leak past it. The model does not include such a leak.',
+            ),
+            name: t('possible gas leakage'),
+          },
+        ]
+      : []),
   ]
   return {
     ofMax: percentOfPressureLimit(r.peakBreechPressure, ok.body.limits),

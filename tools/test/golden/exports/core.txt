@@ -14,6 +14,7 @@
 . CandidatePlan
 . CartridgeDiameters
 . CartridgeSpecs
+. CastConstruction
 . ChargeExtreme
 . ChargeRange
 . ChargeRefusal
@@ -248,6 +249,7 @@
 . cartridgeDiameters
 . cartridgeGrooveDiameterMm
 . cartridgeLandDiameterMm
+. castHarderThanPeak
 . chargeLadder
 . chargeSolverMaxRuns
 . chargeSolverTolerance
@@ -332,12 +334,14 @@
 . movingTargetLead
 . muzzleVelocityFromDownrange
 . normalGravity
+. obturationPressurePerBrinell
 . outlineDragMach
 . outsideDomain
 . overlay
 . overrideResistance
 . oversizePercent
 . placeMaximum
+. plainBaseCastHardness
 . planTruingStrings
 . pointDispersion
 . pooledDefaults

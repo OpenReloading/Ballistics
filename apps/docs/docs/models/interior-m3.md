@@ -489,6 +489,18 @@ When the powder record has a list and the chosen cartridge record is not in it, 
 
 Code: `apps/web/src/components/workbench-outcome.ts`, `unlistedCartridge`. `packages/data/src/references.ts`, `checkCartridgeReferences` (each id names a current cartridge record).
 
+### Cast bullet hardness
+
+A plain-base cast bullet that is harder than the pressure behind it can upset does not swell to fill the bore, and gas can leak past it. The rule of thumb for the pressure that upsets a cast bullet is 1422 psi per Brinell hardness number, about 9.80 MPa per BHN, for plain-base cast bullets only (Fryxell, "Cast Bullet Alloys and Obturation", quoted by [Wikipedia, Obturation](https://en.wikipedia.org/wiki/Obturation); the essay itself was not retrieved, unverified):
+
+$$
+p_\text{ob} = 9.80\ \text{MPa} \cdot \text{BHN}
+$$
+
+Code: `packages/core/src/interior/obturation.ts`, `obturationPressurePerBrinell`, `plainBaseCastHardness`, `castHarderThanPeak`. `apps/web/src/components/workbench-outcome.ts`, `derived`.
+
+The workbench's result notes carry the warning "possible gas leakage" when the bullet record has `construction.structure` `cast`, no gas check (`gasCheck` absent or `false`), a `construction.core.hardness`, and $p_\text{ob}$ is above the simulated peak breech pressure. Any of the three missing gives none. The warning states no number, and the run is not changed: the model has no leak past the bullet, no default leak area and no coefficient for a gas check, since no source gives one. The research entry [cast bullet hardness against peak pressure](../research/cast-bullet-hardness-peak-pressure.md) has the solver's response to a leak area.
+
 ## Sources
 
 - [Kneubuehl 2018](../bibliography.md#kneubuehl-2018), p. 76 eq. (3.3:27): energy balance with the free volume and covolume.

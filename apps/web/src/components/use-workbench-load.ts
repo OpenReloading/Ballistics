@@ -11,6 +11,7 @@ import {
   cartridgeGrooveDiameterMm,
   gasVelocityFactor,
   type InteriorLoad,
+  plainBaseCastHardness,
   powderModelValues,
   recordBoreArea,
   recordResistance,
@@ -2129,6 +2130,7 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
+      castHardness: plainBaseCastHardness(bulletRecord?.construction),
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
       volumeMeasured: volumeMeasured({

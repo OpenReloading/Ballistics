@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  derived,
   type Outcome,
   resultNotes,
   unlistedCartridge,
@@ -118,6 +119,23 @@ describe('resultNotes', () => {
       },
     ])
     expect(listed(ok(plain))).toEqual([])
+  })
+
+  it('warns of possible gas leakage when a plain-base cast bullet is harder than the peak upsets', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const at = (peak: number, castHardness: number | undefined) =>
+      ok({
+        ...plain,
+        castHardness,
+        body: { ...ok().body, result: { ...ok().body.result, peakBreechPressure: peak } },
+      })
+    const leak = (o: Ok) =>
+      derived(o, english.t).own.filter((w) => w.name === 'possible gas leakage')
+    // Brinell 18 is about 176 MPa
+    expect(leak(at(1.5e8, 18))).toHaveLength(1)
+    expect(leak(at(2.32e8, 18))).toEqual([])
+    expect(leak(at(1.5e8, undefined))).toEqual([])
+    expect(warningsText(at(1.5e8, 18), english.t)).toContain('gas may leak past it')
   })
 
   it('counts the unlisted cartridge as a warning, so a result with only that one is announced', () => {
