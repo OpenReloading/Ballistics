@@ -9303,13 +9303,13 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 /* a photo filter: the slider, its value and a reset */
-.prop-grid .filter-value {
+.prop-grid .filter-row-value {
   display: flex;
   align-items: center;
   gap: 0.375rem;
 }
 
-.prop-grid .filter-value > .mantine-Slider-root {
+.prop-grid .filter-row-value > .mantine-Slider-root {
   flex: 1 1 auto;
 }
 

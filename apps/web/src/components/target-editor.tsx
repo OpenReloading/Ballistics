@@ -437,18 +437,21 @@ function CoordInput({
 function Row({
   label,
   help,
+  className,
   children,
 }: {
   label: string
   help?: string | undefined
+  /** More classes of the row, and of its value as `<class>-value`. */
+  className?: string
   children: ReactNode
 }) {
   return (
-    <div className="prop-row">
+    <div className={className ? `prop-row ${className}` : 'prop-row'}>
       <span className="prop-label" title={help}>
         {label}
       </span>
-      <span className="prop-value">{children}</span>
+      <span className={className ? `prop-value ${className}-value` : 'prop-value'}>{children}</span>
     </div>
   )
 }
@@ -603,35 +606,35 @@ function FilterPanel({ ed }: { ed: Ed }) {
     range: { min: number; max: number; step: number; none: number },
     text: (v: number) => string,
   ) => (
-    <div className="prop-row filter-row">
-      <span className="prop-label" title={t('Display only; the photo file stays as it is.')}>
-        {label}
-      </span>
-      <span className="prop-value filter-value">
-        <Slider
-          size="sm"
-          min={range.min}
-          max={range.max}
-          step={range.step}
-          disabled={!sheet.photo}
-          value={filter[key]}
-          onChange={(v) => setFilter({ ...filter, [key]: v })}
-          thumbLabel={label}
-          label={null}
-        />
-        <output className="filter-readout">{text(filter[key])}</output>
-        <ActionIcon
-          variant="subtle"
-          size={controlSize.row.icon}
-          aria-label={t('Reset {label}', { label })}
-          title={t('Reset {label}', { label })}
-          disabled={filter[key] === range.none}
-          onClick={() => setFilter({ ...filter, [key]: range.none })}
-        >
-          <ArrowCounterClockwise size={12} aria-hidden="true" />
-        </ActionIcon>
-      </span>
-    </div>
+    <Row
+      key={key}
+      label={label}
+      help={t('Display only; the photo file stays as it is.')}
+      className="filter-row"
+    >
+      <Slider
+        size="sm"
+        min={range.min}
+        max={range.max}
+        step={range.step}
+        disabled={!sheet.photo}
+        value={filter[key]}
+        onChange={(v) => setFilter({ ...filter, [key]: v })}
+        thumbLabel={label}
+        label={null}
+      />
+      <output className="filter-readout">{text(filter[key])}</output>
+      <ActionIcon
+        variant="subtle"
+        size={controlSize.row.icon}
+        aria-label={t('Reset {label}', { label })}
+        title={t('Reset {label}', { label })}
+        disabled={filter[key] === range.none}
+        onClick={() => setFilter({ ...filter, [key]: range.none })}
+      >
+        <ArrowCounterClockwise size={12} aria-hidden="true" />
+      </ActionIcon>
+    </Row>
   )
   return (
     <div className="prop-grid">
@@ -1373,7 +1376,7 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
                 </Table.Tr>
               )
             })}
-          {offset && !brief && (
+          {offset && !ed.compact && (
             <>
               <Table.Tr>
                 <Table.Th scope="row" title={t('Group center from the point of aim.')}>
@@ -1446,7 +1449,7 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
           )}
         </Table.Tbody>
       </Table>
-      {!optic && offset && !brief && options.length > 0 && (
+      {!optic && offset && !ed.compact && options.length > 0 && (
         <NativeSelect
           size={controlSize.row.input}
           label={t('Optic for clicks')}
@@ -2406,14 +2409,16 @@ function startNote(photo: boolean, scaled: boolean, t: Translator['t']) {
 /** The statistics column of the wide layout, with the shots, the notes and the ladder. */
 function StatsSide({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
-  const { group, stats, uid, shotsOpen, panel, charges, notesPanel } = ed
+  const { group, stats, uid, shotsOpen, panel, charges, notesPanel, keyValues } = ed
   // the key values stay open, the other rows on request: the shot list keeps its room
   const [allStats, setAllStats] = useState(false)
+  const more = keyValues.some((r) => !keyReadouts.includes(r.key))
   return (
     <aside className={`target-side stats-side${panel}`} aria-label={t('Statistics and shots')}>
       <SideHead ed={ed} title={t('Statistics')} />
       <Headline ed={ed} />
-      {group && stats && (
+      {group && stats && !more && <StatsPanel ed={ed} />}
+      {group && stats && more && (
         <>
           <div id={`${uid}-stats`}>
             <StatsPanel ed={ed} brief={!allStats} />
@@ -2697,7 +2702,7 @@ function toolHintOf(
   if (tool === 'origin') return t('Click the photo point of target (0, 0). {keys}', { keys })
   if (tool === 'aim') return t('Click the point of aim of the active group. {keys}', { keys })
   if (tool !== 'shot') return
-  return frame ? t('Click a hole to add a shot to the active group.') : t('Mark a reference first.')
+  return frame ? t('Click a hole to add a shot to the active group.') : t(noReference)
 }
 
 /** The state the File menu shows for the sheet. */
@@ -2845,10 +2850,10 @@ export function TargetEditor({
   const uid = useId()
   /** The toolbar popovers: Photo, Calibrate, Overlays; one open at a time. */
   const [pop, setPop] = useState<'photo' | 'calibrate' | 'overlays'>()
-  // a toolbar popover closed: the message of what was done in it goes too
+  // a toolbar popover closed: the routine message of what was done in it goes too; an alert stays
   const poppedUp = useRef(pop)
   useEffect(() => {
-    if (poppedUp.current && !pop) setStatus({ text: '', alert: false })
+    if (poppedUp.current && !pop) setStatus((x) => (x.alert ? x : { text: '', alert: false }))
     poppedUp.current = pop
   }, [pop])
   const [renaming, setRenaming] = useState(false)

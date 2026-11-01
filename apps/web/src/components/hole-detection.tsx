@@ -378,7 +378,8 @@ export function useHoleDetection({
     setFlagged(m.flagged)
     const count = list.filter((p) => !isMaybe(p)).length
     if (list.length) {
-      if (auto) {
+      // only maybes: the Review step, where Accept maybes is
+      if (auto && count) {
         setStep(undefined)
         setResult(true)
       } else setStep(4)

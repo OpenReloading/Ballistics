@@ -668,7 +668,7 @@ function ScorePanel(p: PanelProps) {
   return (
     <>
       <FaceSelects {...p} />
-      {/* the rows of a face keep their room without one, so choosing a face moves nothing */}
+      {/* without a face its rows take no room (`data-off`): Detect follows the Target row */}
       <div className="prop-grid score-rows" data-off={choice ? undefined : true}>
         {/* a face a discipline names takes the event of its mapping, so only another face adds the row */}
         {record && !mappedFace(p.mappings, record.id) && (
