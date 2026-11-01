@@ -3290,6 +3290,7 @@
       "english": "Series",
       "status": "verified",
       "german": "Serien",
+      "forms": ["Serie", "Serien"],
       "sources": [
         {
           "doc": "DSB",

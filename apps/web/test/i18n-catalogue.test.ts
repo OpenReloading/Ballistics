@@ -288,15 +288,21 @@ describe('German catalogue', () => {
         // German word when the lists are as long as each other, else the whole German text
         const english = t.english.split(', ')
         const german = (t.german ?? '').split(', ')
+        // a row's `forms` (singular and plural, 'Serie, Serien') are each accepted
+        const forms = 'forms' in t ? t.forms : undefined
         return english.map((word, i) => ({
           word,
-          german: (german.length === english.length ? german[i] : t.german) ?? '',
+          german: forms ?? [(german.length === english.length ? german[i] : t.german) ?? ''],
         }))
       })
     for (const [key, entry] of Object.entries(de)) {
       if (key in otherSense) continue
+      const text = fold(textOf(entry))
       for (const w of words.filter((w) => occurs(w.word, key)))
-        expect(fold(textOf(entry)), `${key}: ${w.german}`).toContain(fold(w.german))
+        expect(
+          w.german.some((g) => text.includes(fold(g))),
+          `${key}: ${w.german.join(' or ')}`,
+        ).toBe(true)
     }
   })
 
