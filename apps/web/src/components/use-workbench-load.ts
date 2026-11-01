@@ -1212,6 +1212,9 @@ export function useWorkbenchState() {
   const readDesigns = () =>
     storedRecords()
       .then(async ({ records }) => {
+        // the firearms read the records only: set before the waits, so a tuning handoff that
+        // follows the opened load's firearm finds it
+        setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
         const [bullets, cartridges] = await Promise.all([
           userBullets(records),
           userCartridges(records),
@@ -1224,7 +1227,6 @@ export function useWorkbenchState() {
           ),
         )
         setPowderDesignList(powderDesigns(records))
-        setFirearms(records.filter((r): r is (typeof firearms)[number] => r.kind === 'firearm'))
         setCases(ownCases(records))
       })
       .catch(() => {})
