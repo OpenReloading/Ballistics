@@ -10196,6 +10196,16 @@ main .page-bar h1 {
   display: inline-flex;
 }
 
+/* the top bar's buttons come here from 75em only (site-header.tsx); below it no grid cell */
+.page-bar-end {
+  display: none;
+}
+
+/* the Units button shows its preset; the phone panel's row the whole name, as the icon buttons' rows */
+.units-full {
+  display: none;
+}
+
 /* Save's chevron: a square of the bar's control height */
 .save-more {
   width: var(--button-height, 2.25rem);
@@ -10346,6 +10356,14 @@ main .page-bar h1 {
     height: 0.8125rem;
   }
 
+  .page-bar:not([data-single]) .page-bar-actions .units-preset {
+    display: none;
+  }
+
+  .page-bar:not([data-single]) .page-bar-actions .units-full {
+    display: inline;
+  }
+
   .page-bar-actions .save-group > :first-child {
     flex: 1;
   }
@@ -10414,6 +10432,20 @@ main .page-bar h1 {
     margin-top: 1px;
   }
 
+  /* in the bar's end slot (site-header.tsx), so they follow its actions in the keyboard order: the
+     bar reaches to the top bar's padding and centres them with its own buttons */
+  .page-bar-end {
+    display: contents;
+  }
+
+  :root .page-bar:has(> .page-bar-end > .top-end) {
+    right: var(--mantine-spacing-md);
+  }
+
+  .page-bar-end > .top-end {
+    margin-top: 0;
+  }
+
   .page-bar {
     column-gap: 0.5rem;
   }
@@ -10438,6 +10470,28 @@ main .page-bar h1 {
 @media screen and (min-width: 75em) and (max-width: 79.99em) {
   :root:has(.report-issue) .load-switch {
     width: 7.75rem;
+  }
+}
+
+/* the Units button as an icon, named by its whole name, until its preset leaves a record's title
+   its room (German, three page actions) */
+@media screen and (min-width: 75em) and (max-width: 104.99em) {
+  .page-bar .units-link {
+    width: var(--button-height, 2.25rem);
+    padding: 0;
+  }
+
+  .page-bar .units-link .mantine-Button-section {
+    margin: 0;
+  }
+
+  .page-bar .units-link .mantine-Button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
@@ -10472,6 +10526,7 @@ main .page-bar h1 {
 
   .page-bar-status,
   .page-bar-actions,
+  .page-bar-end,
   .page-bar-toggle,
   .load-strip > button,
   .load-switch,

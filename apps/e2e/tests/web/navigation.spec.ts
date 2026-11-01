@@ -197,3 +197,28 @@ test('the Alpha badge gives its note by pointer and keyboard, and the open note 
   await expect(brand).toBeFocused()
   await expect(note).toBeVisible()
 })
+
+test('from 75em the top bar buttons follow the page actions in the keyboard order, as on screen', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await gotoHydrated(page, '/cartridges/308-win')
+  const safety = page.locator('.page-bar').getByRole('button', { name: 'Safety', exact: true })
+  const after = [...(repository ? ['Report an issue', 'Source code on GitHub'] : []), 'Dark theme']
+  await safety.focus()
+  let left = (await safety.boundingBox())?.x ?? 0
+  for (const name of after) {
+    await page.keyboard.press('Tab')
+    const focused = page.locator(':focus')
+    await expect(focused).toHaveAccessibleName(name)
+    // each one right of the one before
+    const x = (await focused.boundingBox())?.x ?? 0
+    expect(x).toBeGreaterThan(left)
+    left = x
+  }
+  // below 75em they stay in the top bar, before the page bar's row
+  await page.setViewportSize({ width: 390, height: 844 })
+  await expect(
+    page.locator('header .top-end').getByRole('button', { name: 'Dark theme' }),
+  ).toBeVisible()
+})
