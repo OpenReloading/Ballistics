@@ -69,7 +69,7 @@ A bar or psi figure has a `value` in bar. A crusher figure has none, and a crush
 
 ## Sources and licence
 
-Maker data carries no project licence. A table's source names the maker as `publisher`, the URL and the retrieval date, and has `origin: manufacturer`: data the maker published or supplied, which claims no permission. The maker's own terms go in `terms` where it states any, with a `license` of the form `LicenseRef-<name>`. A published load source with a project licence (an SPDX id) fails validation. Fitted parameters derived from these rows are the project's own data under the data licence.
+Maker data carries no project licence. A table's source names the maker as `publisher`, the URL and the retrieval date, and has `origin: manufacturer`: data the maker published or supplied, which claims no permission. The maker's own terms go in `terms` where it states any, with a `license` of the form `LicenseRef-<name>`. A published load source with a project licence (an SPDX id) fails validation. A maker's written grant is recorded the same way ([Maker permissions](maker-permissions.md#recording-a-grant)). Fitted parameters derived from these rows are the project's own data under the data licence.
 
 A table that several files cite is a source record (`records/sources/`). The raw download stays out of the repository; the source record keeps its `sha256`.
 
