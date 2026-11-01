@@ -114,9 +114,12 @@ const bulletList = page(
     ballisticCoefficientG7: z.number().nullable(),
     country: bullet.shape.country,
     tipType: bullet.shape.tip.unwrap().shape.type.optional(),
+    baseType: bullet.shape.base.unwrap().shape.type.optional(),
     construction: z
       .union([structure.unwrap(), z.templateLiteral([core.unwrap().shape.material, '-core'])])
       .optional(),
+    // derived from the construction (`leadFree` of the schema); absent where it does not settle it
+    leadFree: z.boolean().optional(),
     nameOnly: bullet.shape.nameOnly,
   }),
 )

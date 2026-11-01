@@ -441,7 +441,7 @@ describe('GET /powders and /bullets', () => {
     })
   })
 
-  it('lists the country of a bullet and a powder and the tip type of a bullet', async () => {
+  it('lists the country of a bullet and a powder and the tip, base and lead-free of a bullet', async () => {
     await otherApi.load({
       ...bundle,
       powders: [{ ...bundle.powders[0], country: 'FI' }, bundle.powders[1]] as Bundle['powders'],
@@ -450,12 +450,22 @@ describe('GET /powders and /bullets', () => {
           ...defined(bundle.bullets[0]),
           country: 'US',
           tip: { type: 'hollow-point' },
+          base: { type: 'boat-tail' },
           construction: { raw: 'Jacketed Lead', core: { material: 'lead' }, jacket: {} },
         },
         {
           ...defined(bundle.bullets[0]),
           id: 'bonded-1',
           construction: { raw: 'Bonded Soft Point', structure: 'bonded' },
+        },
+        {
+          ...defined(bundle.bullets[0]),
+          id: 'copper-1',
+          construction: {
+            raw: 'Monolithic Copper',
+            structure: 'monolithic',
+            core: { material: 'copper' },
+          },
         },
         { ...defined(bundle.bullets[0]), id: 'plain-1' },
       ] as Bundle['bullets'],
@@ -468,10 +478,15 @@ describe('GET /powders and /bullets', () => {
     expect(byId('example-a-1')).toMatchObject({
       country: 'US',
       tipType: 'hollow-point',
+      baseType: 'boat-tail',
       construction: 'lead-core',
+      leadFree: false,
     })
     expect(byId('bonded-1').construction).toBe('bonded')
+    expect(byId('bonded-1')).not.toHaveProperty('leadFree')
+    expect(byId('copper-1')).toMatchObject({ construction: 'monolithic', leadFree: true })
     expect(byId('plain-1')).not.toHaveProperty('construction')
+    expect(byId('plain-1')).not.toHaveProperty('baseType')
   })
 
   it('pages bullets with the same manufacturer and name by id', async () => {

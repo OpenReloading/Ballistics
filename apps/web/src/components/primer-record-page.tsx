@@ -9,8 +9,7 @@ import {
 } from '../lib/manufacturers.ts'
 import { primerRowGroups, primerStrip } from '../lib/record-fields.ts'
 import { FieldStrip } from './field-strip.tsx'
-import { FieldTable } from './field-table.tsx'
-import { Panel } from './panel.tsx'
+import { FieldPanel } from './field-table.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 
@@ -33,11 +32,16 @@ export function PrimerRecordPage({ id, name }: { id: string; name: string }) {
             badges={[]}
             provenance={p.provenance}
             strip={<FieldStrip items={primerStrip(p, maker)} />}
+            className="plain-record"
             values={
-              <Panel id="record-data" title={msg('Properties')} translated>
-                <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={groups} />
+              <FieldPanel
+                id="record-data"
+                title={msg('Properties')}
+                groups={groups}
+                symbols={false}
+              >
                 {p.note && <p className="record-note">{p.note}</p>}
-              </Panel>
+              </FieldPanel>
             }
           />
         )

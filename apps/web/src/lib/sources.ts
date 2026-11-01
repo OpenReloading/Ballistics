@@ -82,7 +82,10 @@ export const designerHref = (
 ) => `/${kind}/designer?record=${encodeURIComponent(userRecordId(rowId) ?? rowId)}`
 
 /** User bullets with a diameter as list rows: lengths in mm, mass in g; absent values stay absent. */
-export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
+export function userBulletRows(
+  views: readonly UserBulletView[],
+  kinds?: (record: UserBulletView['resolved']['record']) => Partial<BulletRow>,
+): BulletRow[] {
   return views.flatMap(({ id, name, manufacturerName, resolved: { record } }) => {
     // the diameter is the designer's one required value: a bullet without it has no caliber to list
     if (record.diameter === undefined) return []
@@ -97,6 +100,8 @@ export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
         length: record.length?.value ?? null,
         ballisticCoefficientG1: null,
         ballisticCoefficientG7: null,
+        // the bullet list's own fields, where it asks for them: other pages need not load them
+        ...kinds?.(record),
       },
     ]
   })

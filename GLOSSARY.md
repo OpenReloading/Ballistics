@@ -339,7 +339,7 @@ _Avoid_: `mass` (on range firings and load bullets)
 `length`: overall length of a bullet record and its list item (mm), of an exterior `projectile` and the stability query (m).
 
 **Bullet base**:
-`base`: `type` (`flat`, `boat-tail`, `rebated-boat-tail`), `length` (mm), and for a boat tail `diameter` of the base face (mm) and `angle`, the half-angle of the conical tail (deg).
+`base`: `type` (`flat`, `boat-tail`, `rebated-boat-tail`), `length` (mm), and for a boat tail `diameter` of the base face (mm) and `angle`, the half-angle of the conical tail (deg). The bullet list item carries `baseType`.
 
 **Ogive**:
 `ogive`: `form` (`tangent`, `secant`, `hybrid`), `radius` of the nose arc (mm) and `radiusRatio`, the head-shape parameter Rt/R (0 for a cone, 1 for a tangent ogive), at least one of them.
@@ -362,7 +362,7 @@ _Avoid_: cbto
 `bearingLength`: length of the full-diameter part of a bullet, mm.
 
 **Construction**:
-`construction`: how a bullet is built, read from the manufacturer's wording in `raw`: `structure`, `core.material` and `core.hardness` (Brinell, lead cores), `jacket.material` and `jacket.thickness` (a present `jacket` means jacketed), `surface` (coatings), `gasCheck` (cast bullets), `drivingBands` (monolithic bullets), and `unmapped` when no structured field could be derived. Lead-free is not stored: `leadFree` derives it from core and surface (`apps/docs/docs/data/bullet-construction.md`). A bullet list item carries the structure or `<material>-core`.
+`construction`: how a bullet is built, read from the manufacturer's wording in `raw`: `structure`, `core.material` and `core.hardness` (Brinell, lead cores), `jacket.material` and `jacket.thickness` (a present `jacket` means jacketed), `surface` (coatings), `gasCheck` (cast bullets), `drivingBands` (monolithic bullets), and `unmapped` when no structured field could be derived. Lead-free is not stored: `leadFree` derives it from core and surface (`apps/docs/docs/data/bullet-construction.md`). A bullet list item carries the structure or `<material>-core`, and `leadFree` where it is derived.
 
 **Ballistic coefficient**:
 `ballisticCoefficients`: the coefficients a manufacturer publishes for a bullet, each with `dragModel`, `value` (lb/in2), `minVelocity` and `note`. In exterior bodies a `bc` drag has `bands` of `ballisticCoefficient` (kg/m2) and `minVelocity`. Bullet list items carry the first G1 and G7 values as `ballisticCoefficientG1` and `ballisticCoefficientG7` (lb/in2). The UI label is BC.
