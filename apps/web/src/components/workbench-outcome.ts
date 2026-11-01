@@ -367,7 +367,7 @@ export function resultNotes(
               },
             ),
             text: t(
-              'A worn throat adds volume behind the bullet. One measured 5.56x45 mm barrel lost 0.29 % of its muzzle velocity per 1000 rounds up to 8000 rounds and 0.54 % per 1000 rounds from 8000 to 16000 (Vuong et al. 2026); rates do not carry over to other cartridges or firing. Enter a measured length in Throat wear of the Firearm card.',
+              'A worn throat adds volume behind the bullet. One measured 5.56x45 mm barrel lost 0.29 % of its muzzle velocity per 1000 rounds up to 8000 rounds and 0.54 % per 1000 rounds from 8000 to 16000 (Vuong et al. 2026); rates do not carry over to other cartridges or firing. Enter a measured length in Throat wear of the Gun card.',
             ),
           },
         ]

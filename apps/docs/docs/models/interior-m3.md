@@ -201,7 +201,7 @@ The load-table fit, the load file (`interiorLoad`) and the workbench read the sa
 
 ### Throat wear
 
-A worn throat lengthens the space behind the bullet: the bullet still seats in the case, but the bore it meets starts further forward. The optional Throat wear $w$ of the Firearm card (the load value `throatWear`, `chamber.throatWear` of the run, m) adds that length times the bore area to the volume behind the bullet the solver starts from; the travel is unchanged, and the case fill and the solid fill keep reading the case volume $V_0$:
+A worn throat lengthens the space behind the bullet: the bullet still seats in the case, but the bore it meets starts further forward. The optional Throat wear $w$ of the Gun card (the load value `throatWear`, `chamber.throatWear` of the run, m) adds that length times the bore area to the volume behind the bullet the solver starts from; the travel is unchanged, and the case fill and the solid fill keep reading the case volume $V_0$:
 
 $$
 V_0' = V_0 + w A
