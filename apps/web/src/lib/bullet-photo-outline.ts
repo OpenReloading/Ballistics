@@ -278,13 +278,14 @@ const shankShare = 0.97
 /** The base's samples: this many, from where both sides have reached half their shank line and move by less than a px per sample, clear of the corner, which a slightly turned axis moves along one side. */
 const baseCount = 6
 
+type Line = { a: number; b: number }
+
 /**
- * How far each side's edge at the base lies inside the line of that side's shank, px (left, right),
- * with each side's shank line and the samples `base` (start, end) taken as the base; undefined
- * without sides or a shank. The shank is where the half width is within 3 % of its widest, from
- * where it starts up to its middle.
+ * Each side's shank line `a + b z`, px, from where the shank starts up to its middle (at least 10
+ * samples), and the larger standard uncertainty of the two slopes; undefined without sides or a shank. The shank is where the half width is within 3 % of
+ * its widest.
  */
-export function sideTapers(o: Outline) {
+function shankLines(o: Outline): { left: Line; right: Line; slopeError: number } | undefined {
   const sides = o.sides
   if (!sides || o.r.length < 40) return
   const widest = Math.max(...o.r)
@@ -300,20 +301,35 @@ export function sideTapers(o: Outline) {
       z,
       use.map((i) => at(side, i)),
     )
-  const [lineL, lineR] = [shankLine(sides.left), shankLine(sides.right)]
-  if (!lineL || !lineR) return
+  const [left, right] = [shankLine(sides.left), shankLine(sides.right)]
+  if (!left || !right) return
   // the standard uncertainty of a shank line's slope: its residual scatter, not below an edge's, over the spread of z
   const zm = sum(z) / z.length
   const sxx = sum(z.map((v) => (v - zm) ** 2))
-  const slopeU = (line: { a: number; b: number }, side: readonly number[]) => {
+  const slopeU = (line: Line, side: readonly number[]) => {
     const rss = sum(use.map((i, k) => (at(side, i) - line.a - line.b * at(z, k)) ** 2))
     return Math.max(o.edge, Math.sqrt(rss / Math.max(1, use.length - 2))) / Math.sqrt(sxx)
   }
-  const slopeError = Math.max(slopeU(lineL, sides.left), slopeU(lineR, sides.right))
-  const level = (line: { a: number; b: number }, i: number) => line.a + line.b * at(o.z, i)
+  return { left, right, slopeError: Math.max(slopeU(left, sides.left), slopeU(right, sides.right)) }
+}
+
+/** A side's shank line at sample `i`. */
+const levelAt = (o: Outline, line: Line, i: number) => line.a + line.b * at(o.z, i)
+
+/**
+ * How far each side's edge at the base lies inside the line of that side's shank, px (left, right),
+ * with each side's shank line, the samples `base` (start, end) taken as the base and the larger
+ * standard uncertainty of the two lines' slopes; undefined without sides or a shank.
+ */
+export function sideTapers(o: Outline) {
+  const sides = o.sides
+  const lines = sides && shankLines(o)
+  if (!sides || !lines) return
+  const { left: lineL, right: lineR, slopeError } = lines
   const reached = o.z.findIndex(
     (_, i) =>
-      at(sides.left, i) >= 0.5 * level(lineL, i) && at(sides.right, i) >= 0.5 * level(lineR, i),
+      at(sides.left, i) >= 0.5 * levelAt(o, lineL, i) &&
+      at(sides.right, i) >= 0.5 * levelAt(o, lineR, i),
   )
   if (reached < 0) return
   // past the corner, where neither side moves by a px from one sample to the next
@@ -329,11 +345,48 @@ export function sideTapers(o: Outline) {
   const base: [number, number] = [start + 1, start + 1 + baseCount]
   if (base[1] > o.r.length / 2) return
   const zb = median(o.z.slice(...base))
-  const taper = (line: { a: number; b: number }, side: readonly number[]) => ({
+  const taper = (line: Line, side: readonly number[]) => ({
     line,
     taper: line.a + line.b * zb - median(side.slice(...base)),
   })
   return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base, slopeError }
+}
+
+/**
+ * The outline with a shadow offset towards the base trimmed off: the shadow then carries the
+ * cut-out on past the base face. There one side reaches half its shank line 3 or more samples
+ * before the other; the late side is the shadow's edge until it meets the bullet's base face, which
+ * it crosses within a fifth of those samples to 0.9 of its shank line (the corner of a turned axis
+ * ramps on as far again). The bullet's base is there; the samples before it are left out, the
+ * axis' origin moves to it and the shadow is named on the early side. Unchanged otherwise.
+ */
+function withoutOverhang(o: Outline): Outline {
+  const sides = o.sides
+  const lines = sides && shankLines(o)
+  if (!sides || !lines) return o
+  const reach = (side: readonly number[], line: Line, share: number) =>
+    side.findIndex((v, i) => v >= share * levelAt(o, line, i))
+  const [iL, iR] = [reach(sides.left, lines.left, 0.5), reach(sides.right, lines.right, 0.5)]
+  if (iL < 0 || iR < 0 || Math.abs(iL - iR) < 3) return o
+  const [late, line, early, side] =
+    iL > iR
+      ? [sides.left, lines.left, iR, 'right' as const]
+      : [sides.right, lines.right, iL, 'left' as const]
+  const lateAt = Math.max(iL, iR)
+  const cut = late.findIndex((v, i) => i >= lateAt && v >= 0.9 * levelAt(o, line, i))
+  // a turned axis's corner ramps on past half its line as far again; the bullet's own base face, blurred, is crossed in a few samples
+  if (cut < 0 || cut > o.r.length / 4 || cut - lateAt > 0.2 * (lateAt - early)) return o
+  const zb = at(o.z, cut) - 1
+  const keep = <T>(xs: readonly T[]) => xs.slice(cut)
+  return {
+    ...o,
+    origin: { x: o.origin.x + Math.cos(o.angle) * zb, y: o.origin.y + Math.sin(o.angle) * zb },
+    length: o.length - zb,
+    z: keep(o.z).map((z) => z - zb),
+    r: keep(o.r),
+    sides: { left: keep(sides.left), right: keep(sides.right) },
+    shadow: { side, removed: false },
+  }
 }
 
 /** One side tapers at the base by more than this, px or share of the half width, while the other does not: a shadow, not a boat tail. */
@@ -434,5 +487,15 @@ export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | und
   const o =
     turned && profileOf(seg, turned, turned.ambiguous, edgeUncertaintyOf(opt.edgeSpread ?? 0))
   // an axis the user fixed is not the symmetry line, so the two sides need not agree
-  return o && (fixed ? typedAxisOff(o) : withoutShadow(o))
+  if (!o) return
+  if (fixed) return typedAxisOff(o)
+  const checked = withoutShadow(o)
+  const trimmed = withoutOverhang(o)
+  // a shadow taken out on one side with what may also be a shadow past the base: kept, but the values may be off
+  if (checked.shadow?.removed)
+    return trimmed === o ? checked : { ...checked, shadow: { ...checked.shadow, removed: false } }
+  // what a shadow on one side could not take out may be a shadow past the base: trimmed, and the rest checked again
+  if (trimmed === o) return checked
+  const again = withoutShadow(trimmed)
+  return again.shadow ? again : { ...again, shadow: trimmed.shadow }
 }
