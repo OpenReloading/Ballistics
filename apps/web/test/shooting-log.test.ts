@@ -16,6 +16,7 @@ import {
   logRows,
   logYears,
   userIdOf,
+  withEntryDeclined,
   withEntryRounds,
 } from '../src/lib/shooting-log.ts'
 import { parseUserDataFile } from '../src/lib/user-data.ts'
@@ -260,6 +261,29 @@ describe('the round count of an entry', () => {
     expect(count(eventFirst)).toBe(1080)
     expect(count(entriesFirst)).toBe(1080)
     expect(count(between)).toBe(1080)
+  })
+
+  it('counts an event the same in either order when an entry linking it was declined (#974)', () => {
+    const event = 'user:00000000-0000-4000-8000-0000000000e1'
+    const [a, b] = [ids[0], '00000000-0000-4000-9000-0000000000b2']
+    const refs = [`user:${a}`, `user:${b}`]
+    const sibling = (other: string) => [{ id: other, rounds: 40 }]
+    const count = (f: UserRecord) => (f.kind === 'firearm' ? f.data.roundCount : undefined)
+    const start = firearm({ roundCount: 1000 })
+    const eventOf = (f: UserRecord) => withEventRounds(f, event, 60, 60, now, refs) ?? f
+    // A is offered and declined, B is added
+    const declineA = (f: UserRecord) => {
+      expect(entryRoundsDue(f, a, 40, event, sibling(b))).toBeGreaterThan(0)
+      return withEntryDeclined(f, a, now) ?? f
+    }
+    const addB = (f: UserRecord) => withEntryRounds(f, b, 40, now, event, sibling(a)) ?? f
+    const eventFirst = addB(declineA(eventOf(start)))
+    const entriesFirst = eventOf(addB(declineA(start)))
+    expect(count(eventFirst)).toBe(1060)
+    expect(count(entriesFirst)).toBe(1060)
+    // a decline changes no count, and an entry counted before keeps its rounds
+    expect(count(declineA(start))).toBe(1000)
+    expect(withEntryDeclined(addB(start), b, now)).toBeUndefined()
   })
 
   it('changes nothing for a firearm without a count or for no rounds', () => {
