@@ -135,6 +135,7 @@ const kindNames: Record<UserRecordKind, Message> = {
   targetSheet: msg('target sheets'),
   targetFaceDesign: msg('target designs'),
   event: msg('competition events'),
+  shootingLogEntry: msg('shooting log entries'),
 }
 
 /** A line of the status, written when it is shown so that a change of language reaches it. */

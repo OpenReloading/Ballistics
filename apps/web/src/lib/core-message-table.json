@@ -441,6 +441,7 @@
       "a hit, miss or penalty count must be a whole number of 0 or more",
       "the stage time must be positive",
       "a ring value must be 0 or more",
+      "stage points must be 0 or more",
       "a series needs its shots or its total"
     ]
   }

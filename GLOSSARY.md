@@ -638,6 +638,10 @@ _Avoid_: HF
 **Powder design**:
 A user record of kind `powder`: `origin` (`user`), the `provenanceKind` and the `draft`, the powder's grain form, bulk density, composition, thermochemistry and burn law in stored units, each optional while the draft is unfinished. The workbench and the charge target tool offer a design that builds a valid `Powder` as `<name> (your design)`, a saved load names it as `user:<id>`, and every result from it says the powder values are from a user design.
 
+**Shooting log entry**:
+A user record of kind `shootingLogEntry` (id a UUID), one range day of the shooting log (German UI: Schießbuch): `date`, `place` (text), `discipline` (`catalogue:` reference), `firearm` and `load` (`user:` references), `ammunition` (factory ammunition as text, in place of a `load`), `rounds` (fired, for the round count), `result` (text), `event` (`user:` reference to a competition event), `notes` and `confirmation` (`by`, who confirmed it as text, and its `date`). The log is the person's own record; the app claims no standing with a club or an authority. Rounds reach the firearm's `roundCount` only after one confirm, noted in `countedSessions` under the entry's reference.
+_Avoid_: Schiessbuch entry, range session (for the record)
+
 **Base record**:
 `basedOn`: the catalogue record a design is a variant of, as `catalogue:<id>`. The resolved record is the base with the `overrides` applied (`applyOverrides`).
 

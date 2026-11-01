@@ -363,6 +363,7 @@ const noMatchLines = {
   disciplines: msg('No disciplines match these filters.'),
   federations: msg('No federations match these filters.'),
   firearms: msg('No firearms match these filters.'),
+  'log entries': msg('No entries match these filters.'),
   powders: msg('No powders match these filters.'),
   primers: msg('No primers match these filters.'),
   'target faces': msg('No targets match these filters.'),

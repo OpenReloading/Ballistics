@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { lengthText } from '../src/core/units.ts'
 import {
   assumedBoatTailAngle,
   type BulletDimensions,
@@ -306,6 +307,43 @@ describe('leadeContact', () => {
 
 describe('seat', () => {
   const base = { chamber, waterCapacity: 3.571, waterDensity, barrelLength: 610 }
+
+  it("writes the outline notes' lengths in the page unit, mm by default", () => {
+    const rebated: BulletDimensions = {
+      ...boatTail,
+      base: { type: 'rebated-boat-tail', length: 5.664 },
+    }
+    const by = { kind: 'overallLength', value: 71.12 } as const
+    const notes = (unit?: 'mm' | 'in') => seat({ ...base, bullet: rebated, by, unit }).notes
+    const depth = 0.015 * rebated.diameter
+    expect(notes().join(' ')).toContain(`0.015 d, ${+depth.toFixed(3)} mm.`)
+    expect(notes('in').join(' ')).toContain(`0.015 d, ${lengthText(depth, 'in')} in.`)
+    expect(notes('in').join(' ')).not.toMatch(/\bmm\b/)
+    const tip = {
+      bullet: rebated,
+      caseLength: 51.18,
+      coal: 71.12,
+      lengthSource: 'measured' as const,
+    }
+    expect(intrusion({ ...tip, unit: 'in' }).notes.join(' ')).toContain(
+      `0.015 d, ${lengthText(depth, 'in')} in.`,
+    )
+    expect(intrusion(tip).notes.join(' ')).toContain(`0.015 d, ${+depth.toFixed(3)} mm.`)
+  })
+
+  it('writes the leade contact note in the page unit, mm by default', () => {
+    const g1 = defined(chamber.G1)
+    const at = (unit?: 'mm' | 'in') => {
+      const c = leadeContact(chamber, g1 + 0.1, unit)
+      return 'note' in c ? c.note : undefined
+    }
+    expect(at()).toBe(
+      `The bullet diameter ${g1 + 0.1} mm is not below G1 ${g1} mm: contact taken at the leade start.`,
+    )
+    expect(at('in')).toBe(
+      `The bullet diameter ${lengthText(g1 + 0.1, 'in')} in is not below G1 ${lengthText(g1, 'in')} in: contact taken at the leade start.`,
+    )
+  })
 
   it('moves the bullet base with COAL: seating depth is length - (COAL - L3)', () => {
     for (const coal of [69, 70, 71.12]) {
