@@ -288,7 +288,7 @@ describe('German catalogue', () => {
         // German word when the lists are as long as each other, else the whole German text
         const english = t.english.split(', ')
         const german = (t.german ?? '').split(', ')
-        // a row's `forms` (singular and plural, 'Serie, Serien') are each accepted
+        // each of a row's `forms` (its singular and plural) is accepted
         const forms = 'forms' in t ? t.forms : undefined
         return english.map((word, i) => ({
           word,

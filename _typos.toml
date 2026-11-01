@@ -26,6 +26,8 @@ extend-ignore-re = [
   "8\\. Februar 2026",
   "Alle Sch\\\\u00FCsse",
   "Sek\\. Serie",
+  # the singular and plural forms of the German term for a series (german-terms.json, translating.md)
+  "\\[\"Serie\", \"Serien\"\\]",
   # German organization name in the bibliography
   "Bund Deutscher",
   # a product page title as the maker prints it (it misspells the name) and a powder trade name, in the bibliography
