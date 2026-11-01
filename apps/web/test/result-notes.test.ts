@@ -135,7 +135,7 @@ describe('resultNotes', () => {
     expect(leak(at(1.5e8, 18))).toHaveLength(1)
     expect(leak(at(2.32e8, 18))).toEqual([])
     expect(leak(at(1.5e8, undefined))).toEqual([])
-    expect(warningsText(at(1.5e8, 18), english.t)).toContain('gas may leak past it')
+    expect(warningsText(at(1.5e8, 18), english.t)).toContain('gas may leak past its base')
   })
 
   it('marks a run on the default temperature coefficient, and gives the cold side as an interval', () => {
@@ -170,7 +170,7 @@ describe('resultNotes', () => {
       expect.objectContaining({
         kind: 'note',
         line: 'The barrel has fired 4000 rounds: the velocity may be lower than simulated.',
-        text: expect.stringContaining('0.29 % of its muzzle velocity per 1000 rounds'),
+        text: expect.stringContaining('0.29 % of its velocity per 1000 rounds'),
       }),
     ])
     expect(worn(ok(plain))).toEqual([])

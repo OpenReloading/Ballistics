@@ -1,4 +1,4 @@
-import { castHarderThanPeak, coldPeakInterval, loadRatio } from '@open-reloading/core'
+import { castHarderThanPeak, loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -208,7 +208,7 @@ export function derived(ok: Shown, t: Translator['t']) {
       ? [
           {
             text: t(
-              'The bullet is cast with a plain base, and its alloy is harder than the simulated peak pressure upsets by the rule of thumb: the base may not seal the bore, so gas may leak past it. The model does not include such a leak.',
+              'A plain-base cast bullet harder than the peak pressure can upset (rule of thumb): gas may leak past its base. The model has no such leak.',
             ),
             name: t('possible gas leakage'),
           },
@@ -334,7 +334,7 @@ export function resultNotes(
               },
             ),
             text: t(
-              'The burn rate follows the propellant temperature by a coefficient of the grain form, not of this powder (ball: measured burn rates; extruded and flake: a maker table through the model), with a wide interval. Results at another temperature than the reference are approximate.',
+              'A coefficient of the grain form, not of this powder, with a wide interval: results away from the reference temperature are approximate.',
             ),
           },
           ...(ok.sensitivityDefault.coldPeak
@@ -349,7 +349,7 @@ export function resultNotes(
                     },
                   ),
                   text: t(
-                    'Below the reference temperature the default gives no single value of the peak pressure: measured cold changes of ball grains were not significant, so the cold coefficient spans 0 to 0.0030 per K.',
+                    'Below the reference the default gives the peak over a cold coefficient of 0 to 0.0030 per K, not one value.',
                   ),
                 },
               ]
@@ -367,7 +367,7 @@ export function resultNotes(
               },
             ),
             text: t(
-              'A worn throat adds volume behind the bullet. One measured 5.56x45 mm barrel lost 0.29 % of its muzzle velocity per 1000 rounds up to 8000 rounds and 0.54 % per 1000 rounds from 8000 to 16000 (Vuong et al. 2026); rates do not carry over to other cartridges or firing. Enter a measured length in Throat wear under More of the Gun card.',
+              'A worn throat adds volume. One 5.56x45 mm barrel lost 0.29 % of its velocity per 1000 rounds to 8000 and 0.54 % from 8000 to 16000 (Vuong et al. 2026). Enter a measured Throat wear under More of the Gun card.',
             ),
           },
         ]
@@ -435,30 +435,20 @@ export function stepFlag(ok: Shown, t: Translator['t']) {
   return
 }
 
-/** The default sensitivity of a run with the cold-side peak interval of the load it shows (`coldPeakInterval`). */
-export function withColdPeak(
+/** A default sensitivity without its cold-side interval, which belongs to one step and is fetched for it. */
+export const withoutColdPeak = (
   d: { form: string; coldInterval: readonly [number, number] } | undefined,
-  load: InteriorBody['load'],
-): Extract<Outcome, { kind: 'ok' }>['sensitivityDefault'] {
-  return (
-    d && {
-      form: d.form,
-      coldInterval: d.coldInterval,
-      coldPeak: coldPeakInterval(load, d.coldInterval),
-    }
-  )
-}
+) => d && { form: d.form, coldInterval: d.coldInterval }
 
-/** The outcome showing step `i`; the cold-side interval of a default sensitivity follows the step. */
+/** The outcome showing step `i`; the cold-side interval of a default sensitivity is fetched for the step. */
 export function atStep(ok: Extract<Outcome, { kind: 'ok' }>, i: number) {
   const s = nth(ok.steps, i)
-  const load = stepLoad(ok.load, s)
   return {
     ...ok,
     body: s.body ?? ok.body,
-    load,
+    load: stepLoad(ok.load, s),
     selected: i,
-    sensitivityDefault: withColdPeak(ok.sensitivityDefault, load),
+    sensitivityDefault: withoutColdPeak(ok.sensitivityDefault),
   }
 }
 

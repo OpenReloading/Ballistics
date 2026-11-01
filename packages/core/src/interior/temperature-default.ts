@@ -19,6 +19,7 @@ export interface SensitivityDefault {
   /** Interval of `cold`, 1/K: the cold-side peak pressure is given over it, never as a point. */
   coldInterval: readonly [number, number]
   approximate: true
+  /** Short citation; the values and their derivation are on the M3 page, "Default by grain form". */
   source: string
 }
 
@@ -37,8 +38,7 @@ const ball: SensitivityDefault = {
   cold: 0.0012,
   coldInterval,
   approximate: true,
-  source:
-    'Boulkadid, Lefebvre, Jeunieau, Dejeaifve 2016 (doi:10.22211/cejem/67229): closed-vessel burn-rate sensitivity of deterred ball powders, spherical 0.305 and flattened 0.229 %/K above 21 °C, 0.121 and 0.115 %/K below',
+  source: 'Boulkadid 2016, doi:10.22211/cejem/67229',
 }
 
 const extruded: SensitivityDefault = {
@@ -47,8 +47,7 @@ const extruded: SensitivityDefault = {
   cold: 0.001,
   coldInterval,
   approximate: true,
-  source:
-    'Hodgdon 2012 temperature table, 14 extruded powders outside the Extreme line, velocity at 70 and 125 °F converted through the M3 model on stand-in loads at 380 MPa (apps/docs/docs/research/powder-temperature-default.md); maker data, shots and lots not stated',
+  source: 'Hodgdon 2012 through the model (apps/docs/docs/research/powder-temperature-default.md)',
 }
 
 const defaults: Partial<Record<GrainForm, SensitivityDefault>> = {

@@ -230,6 +230,7 @@
 . VivacityBurn
 . VivacityForm
 . WeakReason
+. WearMeasurement
 . WindSegment
 . ZeroSpec
 . advisoryIds

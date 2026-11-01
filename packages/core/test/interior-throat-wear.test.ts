@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { interiorLoad } from '../src/interior/load-file.ts'
 import { type InteriorLoad, interior } from '../src/interior/model.ts'
-import { vuong2026, wornVolume } from '../src/interior/throat-wear.ts'
+import { wornVolume } from '../src/interior/throat-wear.ts'
+import { vuong2026 } from '../src/interior/throat-wear-measurement.ts'
 
 describe('wornVolume', () => {
   it('adds the wear length times the bore area', () => {
@@ -107,7 +108,7 @@ describe('throat wear against Vuong et al. 2026', () => {
     // the peak falls 16.8 % against their 15.6 %: within 1.5 points, not 1 (research log)
     expect(Math.abs(dp - vuong2026.modelChange.peakPressure)).toBeLessThan(0.015)
     // and the velocity change lies within 2 points of the measured -6.5 %
-    const [first, last] = [vuong2026.velocity[0][1], vuong2026.velocity[5][1]]
+    const [first, last] = [vuong2026.velocity.at(0)?.[1] ?? 0, vuong2026.velocity.at(-1)?.[1] ?? 0]
     expect(Math.abs(dv - (last / first - 1))).toBeLessThan(0.02)
   })
 })

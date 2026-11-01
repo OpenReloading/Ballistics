@@ -130,7 +130,7 @@ export const interiorFields = [
     key: 'throatWear',
     label: msg('Throat wear'),
     help: msg(
-      'Optional. Length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Empty: no wear.',
+      'Optional. Extra length behind the bullet; times the bore area it adds to the volume. Empty: none.',
     ),
     quantity: 'length',
     min: 0,
@@ -237,7 +237,7 @@ export const bulletFields = [
     key: 'bulletCavityDepth',
     label: msg('Cavity depth'),
     help: msg(
-      'Measured depth of the hollow base from the base face. Empty: as deep as the opening is wide at its radius, an assumption whose range widens the pressure range, by up to 20 % of the volume.',
+      'Measured depth of the hollow base. Empty: its radius, an assumption the pressure range covers up to 20 % of the volume.',
     ),
     quantity: 'length',
     min: 0,

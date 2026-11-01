@@ -38,7 +38,7 @@ Public. Vuong 2026, CC BY 4.0: tables 1 to 3 and the CMM chamber lengths, stored
 
 ## Where in the app
 
-- `packages/core/src/interior/throat-wear.ts`, `wornVolume`, `vuong2026`.
+- `packages/core/src/interior/throat-wear.ts`, `wornVolume`; `packages/core/src/interior/throat-wear-measurement.ts`, `vuong2026`.
 - `packages/core/src/interior/load-file.ts`, the `throatWear` value of a load, and `packages/core/src/interior/model.ts`, where the solver adds it.
 - `apps/web/src/components/workbench-outcome.ts`, the round count note.
 - Model page: [M3, throat wear](../models/interior-m3.md#throat-wear).

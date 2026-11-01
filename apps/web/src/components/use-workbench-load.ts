@@ -211,7 +211,7 @@ import {
   stepsOf,
   unlistedCartridge,
   warningsText,
-  withColdPeak,
+  withoutColdPeak,
 } from './workbench-outcome.ts'
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
@@ -928,6 +928,48 @@ function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> 
     .catch(() => failed)
 }
 
+/**
+ * The peak breech pressure (Pa) of `body` at both ends of the cold sensitivity interval `interval`,
+ * [low, high], as two runs of the same request (`coldPeakInterval` in core does the same); none at
+ * or above the reference, or when a run gives no result.
+ */
+async function fetchColdPeak(
+  body: { load: Parameters<typeof stepLoad>[0] },
+  interval: readonly [number, number],
+  signal: AbortSignal,
+): Promise<[number, number] | undefined> {
+  const { load } = body
+  const s = load.propellant.temperatureSensitivity
+  if (!s || !(load.propellantTemperature < s.reference)) return
+  const peak = (cold: number) =>
+    postInterior(
+      {
+        ...body,
+        load: {
+          ...load,
+          propellant: { ...load.propellant, temperatureSensitivity: { ...s, cold } },
+        },
+      },
+      signal,
+    )
+      .then((r) => (r.ok ? r.json() : undefined))
+      .then((a: InteriorResponse | undefined) => a?.result?.peakBreechPressure)
+      .catch(() => undefined)
+  const [a, b] = await Promise.all(interval.map(peak))
+  return a === undefined || b === undefined ? undefined : [Math.min(a, b), Math.max(a, b)]
+}
+
+/** The outcome with the cold-side interval of step `step`, when it is still the run's result showing it. */
+function withColdPeak(
+  o: Outcome | undefined,
+  id: number,
+  step: number,
+  coldPeak: [number, number],
+) {
+  if (o?.kind !== 'ok' || o.id !== id || o.selected !== step || !o.sensitivityDefault) return o
+  return { ...o, sensitivityDefault: { ...o.sensitivityDefault, coldPeak } }
+}
+
 /** The outcome with the sampled band of the step shown first, when it is still the run's result. */
 function withBand(o: Outcome | undefined, id: number, first: number, sampled: SampledBand) {
   if (o?.kind !== 'ok' || o.id !== id) return o
@@ -1495,6 +1537,7 @@ export function useWorkbenchState() {
   const running = useRef<AbortController | null>(null)
   // the sampled band request of the shown result: an edit leaves it running, a new run ends it
   const bandRequest = useRef<AbortController | null>(null)
+  const coldRequest = useRef<AbortController | null>(null)
   /** Bullet and powder record requests; only the latest of each kind may set its record. */
   const picking = useRef<Partial<Record<'cartridges' | 'bullets' | 'powders', AbortController>>>({})
   const runs = useRef(0)
@@ -1625,6 +1668,21 @@ export function useWorkbenchState() {
     setPreviewed((p) => ({ ...p, [k]: v }))
   }
 
+  /** Fetches the cold-side interval of a default sensitivity for step `step` of `ok`; aborts the one before. */
+  const requestColdPeak = useCallback((ok: Extract<Outcome, { kind: 'ok' }>, step: number) => {
+    coldRequest.current?.abort()
+    const d = ok.sensitivityDefault
+    const s = ok.steps[step]
+    if (!d || !s) return
+    const controller = new AbortController()
+    coldRequest.current = controller
+    const body = { model: 'm3' as const, load: stepLoad(ok.load, s), cartridge: ok.cartridge }
+    void fetchColdPeak(body, d.coldInterval, controller.signal).then((coldPeak) => {
+      if (coldPeak && !controller.signal.aborted)
+        setOutcome((o) => withColdPeak(o, ok.id, step, coldPeak))
+    })
+  }, [])
+
   /** Shows ladder step `i` in the readouts, warnings and chart; a step without a result is skipped. */
   const select = useCallback(
     (i: number) => {
@@ -1632,10 +1690,11 @@ export function useWorkbenchState() {
         showChart(undefined)
         const shown = { ...atStep(outcome, i), announce: false }
         setOutcome(shown)
+        requestColdPeak(shown, i)
         setStatus({ prefix: '' })
       }
     },
-    [outcome, showChart],
+    [outcome, showChart, requestColdPeak],
   )
 
   /** A new request for a record kind; aborts the one before. */
@@ -2154,10 +2213,7 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
-      sensitivityDefault: withColdPeak(
-        a.sensitivityDefault,
-        stepLoad(body.load, nth(steps, first)),
-      ),
+      sensitivityDefault: withoutColdPeak(a.sensitivityDefault),
       castHardness: a.castHardness,
       roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
       design: bulletDesign?.name,
@@ -2204,12 +2260,14 @@ export function useWorkbenchState() {
     ).then((sampled) => {
       if (!bandController.signal.aborted) setOutcome((o) => withBand(o, ok.id, first, sampled))
     })
+    requestColdPeak(ok, first)
   }
 
   async function send() {
     clearTimeout(autoTimer.current)
     running.current?.abort()
     bandRequest.current?.abort()
+    coldRequest.current?.abort()
     let req: ReturnType<typeof loadRequest>
     try {
       req = loadRequest()
