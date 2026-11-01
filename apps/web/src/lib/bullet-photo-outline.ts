@@ -307,7 +307,7 @@ export function sideTapers(o: Outline) {
   const sxx = sum(z.map((v) => (v - zm) ** 2))
   const slopeU = (line: { a: number; b: number }, side: readonly number[]) => {
     const rss = sum(use.map((i, k) => (at(side, i) - line.a - line.b * at(z, k)) ** 2))
-    return Math.max(edgeUncertainty, Math.sqrt(rss / Math.max(1, use.length - 2))) / Math.sqrt(sxx)
+    return Math.max(o.edge, Math.sqrt(rss / Math.max(1, use.length - 2))) / Math.sqrt(sxx)
   }
   const slopeError = Math.max(slopeU(lineL, sides.left), slopeU(lineR, sides.right))
   const level = (line: { a: number; b: number }, i: number) => line.a + line.b * at(o.z, i)
