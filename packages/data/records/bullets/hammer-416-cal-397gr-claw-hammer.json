@@ -17,6 +17,10 @@
     "value": 38.43,
     "raw": "Bullets length is 1.513″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -35,6 +39,13 @@
         "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients"],
         "note": "https://hammerbullets.com/product/416-cal-397gr-claw-hammer/: Required twist rate for dangerous game hunting is 1-16″ or faster. The faster the twist the deeper and straighter the penetration. | Bullets length is 1.513″ | Bullet weight is 397gr | Recommended use: Dangerous Game Hunting and Big Game Hunting | G1-BC= .436 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

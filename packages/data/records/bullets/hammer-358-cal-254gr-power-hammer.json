@@ -17,6 +17,10 @@
     "value": 38.46,
     "raw": "Bullet length is 1.514″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -39,6 +43,13 @@
         "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "https://hammerbullets.com/product/358-cal-254gr-power-hammer/: Recommended minimum twist rate is 1-13″ | Bullet length is 1.514″ | Bullet weight is 254gr | Recommended use: Big Game Hunting | G7-bc=.235 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

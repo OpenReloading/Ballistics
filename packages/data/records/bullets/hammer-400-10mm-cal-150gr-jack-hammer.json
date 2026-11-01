@@ -21,6 +21,10 @@
     "value": 6.8,
     "raw": "Nose length is .2678″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "slowestTwist": {
     "value": 889,
     "raw": "Required twist is 1-35″ or faster"
@@ -36,6 +40,13 @@
         "sha256": "53aafa6284ea961ae5b4cb779dd97257c4b3192b31f8de372b34263b7161746f",
         "fields": ["diameter", "mass", "length", "noseLength", "slowestTwist"],
         "note": "https://hammerbullets.com/product/400-10mm-cal-150gr-jack-hammer/: Required twist is 1-35″ or faster | Bullet length is .600″ | Nose length is .2678″ | Bullet weight is 150gr | Recommended use: Personal defense / Hunting"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

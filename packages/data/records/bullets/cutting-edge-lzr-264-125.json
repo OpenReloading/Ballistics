@@ -17,6 +17,10 @@
     "value": 36.65,
     "raw": "1.443\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -54,6 +58,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .264, Grains 125, Minimum Required Twist 1-8\", Part Number LZR 264 125, G1 BC .520 (Oehler 89) / .532 (A.B.), G7 BC .273 (A.B.) / .269 (Oehler 89), OAL 1.443\", Bullet Projection .970\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

@@ -17,6 +17,10 @@
     "value": 48.59,
     "raw": "1.913\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .338, Grains 265, Minimum Required Twist *1-10\", Part Number LZR 338 265 GEN2, G1 BC .720 (A.B.), G7 BC .369 (A.B.), OAL 1.913\", Bullet Projection 1.029\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

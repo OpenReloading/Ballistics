@@ -64,7 +64,7 @@ export function LinkButton({
 
 /**
  * Every record page's actions, one component so they cannot drift: Use in
- * workbench or Open in shot groups (filled, the primary action), Open in designer, Compare, each where the record has
+ * workbench or Open in shot groups (filled, the primary action), Open in designer, Compare, Tune from strings, each where the record has
  * one, then the record pages' Tour, Units, Copy link and Print as icon buttons with their names on
  * hover and focus. The bullet comparison shows the icon buttons alone.
  */
@@ -73,12 +73,15 @@ export function RecordActions({
   workbench,
   groups,
   design,
+  more,
   tour,
 }: {
   compare?: string | undefined
   workbench?: string | undefined
   groups?: string | undefined
   design?: string | undefined
+  /** More links after Compare: the powder record's Tune from strings. */
+  more?: ReactNode
   /** The Tour button of the record pages. */
   tour?: boolean
 }) {
@@ -106,6 +109,7 @@ export function RecordActions({
           {t('Compare')}
         </LinkButton>
       )}
+      {more}
       {tour && <TourButton page="record" />}
       <UnitsIconButton />
       {/* the name stays, so a copy moves nothing */}

@@ -17,6 +17,10 @@
     "value": 32.39,
     "raw": "Bullet length is 1.275″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -39,6 +43,13 @@
         "sha256": "18947d0dcdf828be1ec325ddfd9ad6e141a9b8be8a8704c12e0450bb78d71f39",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "https://hammerbullets.com/product/410-254gr-stone-hammer/: Minimum required twist rate is 1-19″ or faster | Bullet length is 1.275″ | Bullet weight is 254gr | Recommended use: Big Game Hunting | g1-bc= .308 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

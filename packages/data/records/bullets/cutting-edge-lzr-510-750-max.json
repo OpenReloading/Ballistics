@@ -17,6 +17,10 @@
     "value": 63.47,
     "raw": "2.499\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -28,6 +32,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length"],
         "note": "Page 4, Lazer - Ultra Long Range Hunting: Caliber .510, Grains 750, Minimum Required Twist STANDARD, Part Number LZR 510 750 MAX, G1 BC TBD, G7 BC TBD, OAL 2.499\", Bullet Projection 1.698\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },
