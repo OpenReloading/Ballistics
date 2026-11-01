@@ -49,6 +49,7 @@ export type DesignAction<D> =
   | { type: 'field'; key: string; value: FieldValue }
   | { type: 'start'; design: D }
   | { type: 'reset'; system: UnitSystem }
+  | { type: 'revert'; key: string; system: UnitSystem }
   | { type: 'undo' }
   | { type: 'redo' }
   | { type: 'units'; system: UnitSystem }
@@ -72,6 +73,15 @@ export function designReduce<D extends { fields: Fields; origin?: O | undefined 
       return historyOf(a.design)
     case 'reset':
       return h.present.origin ? pushHistory(h, fromOrigin(h.present.origin, a.system)) : h
+    case 'revert': {
+      // one field back to the record's value, one step; the other fields stay
+      if (!h.present.origin) return h
+      const value = fromOrigin(h.present.origin, a.system).fields[a.key] ?? {
+        text: '',
+        si: undefined,
+      }
+      return pushHistory(h, { ...h.present, fields: { ...h.present.fields, [a.key]: value } })
+    }
     case 'undo':
       return undo(h)
     case 'redo':

@@ -476,7 +476,7 @@ describe('withSessionRounds', () => {
   })
 
   it('offers the shots not counted yet and keeps the latest sessions at the limit', () => {
-    const many = Array.from({ length: 200 }, (_, i) => ({
+    const many = Array.from({ length: 5000 }, (_, i) => ({
       session: `user:00000000-0000-4000-8000-${String(i).padStart(12, '0')}`,
       rounds: 1,
     }))
@@ -485,7 +485,7 @@ describe('withSessionRounds', () => {
     expect(roundsDue(f, a, undefined, 3)).toBe(0)
     const next = defined(withSessionRounds({ ...counted, data: f }, b, 400, 2, 2, now))
     const entries = next.kind === 'firearm' ? (next.data.countedSessions ?? []) : []
-    expect(entries).toHaveLength(200)
+    expect(entries).toHaveLength(5000)
     expect(entries.at(-1)).toEqual({ session: b, rounds: 2 })
     expect(entries[0]?.session).toBe(many[2]?.session)
   })

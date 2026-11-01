@@ -4407,6 +4407,15 @@
                     "maxLength": 200,
                     "description": "Model name."
                   },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "rifle",
+                      "pistol",
+                      "revolver"
+                    ],
+                    "description": "What kind of firearm it is: a revolver has a gap between cylinder and barrel. Absent: not stated."
+                  },
                   "cartridge": {
                     "type": "string",
                     "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
@@ -4598,7 +4607,7 @@
                     "description": "Day the round count was last set, ISO 8601."
                   },
                   "countedSessions": {
-                    "maxItems": 200,
+                    "maxItems": 5000,
                     "type": "array",
                     "items": {
                       "type": "object",

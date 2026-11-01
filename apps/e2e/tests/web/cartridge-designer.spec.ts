@@ -61,7 +61,7 @@ test('a change redraws, is marked with the record value and undoes', async ({ pa
     /^Head to the shoulder start \(P2\)\. Changed; record 39\.62 mm\. .*differs from the .* degrees of the shoulder/,
   )
   await expect(field(page, 'Cartridge L1')).not.toHaveAttribute('aria-invalid', 'true')
-  await expect(page.locator('.derived-line')).toContainText('Cartridge shoulder angle')
+  await expect(page.locator('.derived-table')).toContainText('Cartridge shoulder angle')
   // a CIP plausibility finding at both fields, the drawing kept
   await field(page, 'Cartridge P1').fill('12.5')
   await expect(field(page, 'Cartridge P1')).toHaveAccessibleDescription(
@@ -129,11 +129,13 @@ test('a new cartridge without its base values gives a reason, not an empty page'
 const places = (page: Page) =>
   page.locator('form').evaluate((form) => {
     const top = form.getBoundingClientRect().top
-    // hidden inputs (the sliders' values) have no box
-    return [...form.querySelectorAll('input:not([type="hidden"])')].map((i) => {
-      const r = i.getBoundingClientRect()
-      return [r.left, r.top - top, r.width].map(Math.round)
-    })
+    // hidden inputs (the sliders' values) have no box; the start search stays pinned at the top
+    return [...form.querySelectorAll('input:not([type="hidden"])')]
+      .filter((i) => !i.closest('.designer-start'))
+      .map((i) => {
+        const r = i.getBoundingClientRect()
+        return [r.left, r.top - top, r.width].map(Math.round)
+      })
   })
 const drawingTop = (page: Page) =>
   page.locator('.designer-drawing').evaluate((d) => {
@@ -172,7 +174,10 @@ test('keyboard: arrow keys step the field, no slider, changes are announced', as
   )
   // for screen readers only: not shown and not printed
   expect((await status.boundingBox())?.width).toBeLessThanOrEqual(1)
-  // no unit menu in the grid: Tab goes on to the chamber's L1 in the same row
+  // no unit menu in the grid: Tab goes to the changed field's way back to the record value (#796),
+  // then on to the chamber's L1 in the same row
+  await page.keyboard.press('Tab')
+  await expect(page.getByRole('button', { name: /^Back to the record value\./ })).toBeFocused()
   await page.keyboard.press('Tab')
   await expect(field(page, 'Chamber L1')).toBeFocused()
 })

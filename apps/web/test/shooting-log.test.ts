@@ -18,6 +18,7 @@ import {
   withEntryRounds,
 } from '../src/lib/shooting-log.ts'
 import { parseUserDataFile } from '../src/lib/user-data.ts'
+import { defined } from './defined.ts'
 
 const rifle = '3f1c2b4e-9a7d-4c1e-8b25-6d0f4a9e7c13'
 const pistol = '7a2d9c10-5b3e-4f68-9d41-0c8e2b6a1f57'
@@ -207,6 +208,17 @@ describe('the round count of an entry', () => {
     // edited to more rounds: only the new ones
     const more = once && withEntryRounds(once, ids[0], 40, now)
     expect(more?.kind === 'firearm' && more.data.roundCount).toBe(1040)
+  })
+
+  it('offers nothing again for an entry saved after 300 other entries were counted', () => {
+    let f = defined(withEntryRounds(firearm({ roundCount: 1000 }), ids[0], 30, now))
+    for (let i = 1; i <= 300; i++)
+      f = defined(
+        withEntryRounds(f, `00000000-0000-4000-9000-${String(i).padStart(12, '0')}`, 1, now),
+      )
+    expect(f.kind === 'firearm' && f.data.roundCount).toBe(1330)
+    expect(entryRoundsDue(f, ids[0], 30)).toBe(0)
+    expect(withEntryRounds(f, ids[0], 30, now)).toBeUndefined()
   })
 
   it('changes nothing for a firearm without a count or for no rounds', () => {

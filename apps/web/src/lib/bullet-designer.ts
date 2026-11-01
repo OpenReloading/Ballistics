@@ -372,6 +372,7 @@ export type Action =
   | { type: 'start'; design: Design }
   | { type: 'new'; system: UnitSystem }
   | { type: 'reset'; system: UnitSystem }
+  | { type: 'revert'; key: string; system: UnitSystem }
   | { type: 'undo' }
   | { type: 'redo' }
   | { type: 'units'; system: UnitSystem }

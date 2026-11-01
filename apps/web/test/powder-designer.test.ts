@@ -1,5 +1,6 @@
 import { powder as powderSchema, type UserPowder, type UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
+import { english } from '../src/i18n/translate.ts'
 import { fieldValueFromText } from '../src/lib/field-spec.ts'
 import { historyOf } from '../src/lib/history.ts'
 import {
@@ -7,6 +8,7 @@ import {
   type Design,
   fileData,
   fromFile,
+  issueText,
   newDesign,
   powderDesignNote,
   powderDesigns,
@@ -371,5 +373,79 @@ describe('the user design mark', () => {
       },
     ]
     expect(powderDesigns(records).map((d) => [d.id, d.name])).toEqual([[id, 'Good']])
+  })
+})
+
+describe('issueText', () => {
+  const t = english.t
+  /** Issues as the powder schema raises them on a broken draft. */
+  const parsed = powderSchema.safeParse({
+    id,
+    manufacturer: 'user',
+    name: 'n',
+    aliases: [],
+    composition: 'x',
+    grainForm: 'q',
+    provenance: { kind: 'published', sources: [{ title: 'Own work' }] },
+  })
+  const schemaIssues = parsed.success ? [] : parsed.error.issues
+  const issues = [
+    ...schemaIssues,
+    {
+      code: 'too_small',
+      origin: 'array',
+      minimum: 1,
+      inclusive: true,
+      path: ['composition'],
+      message: 'Too small: expected array to have >=1 items',
+    },
+    { code: 'unrecognized_keys', keys: ['extra'], path: [], message: 'Unrecognized key: "extra"' },
+    { code: 'invalid_union', errors: [], path: ['interior'], message: 'Invalid input' },
+    {
+      code: 'custom',
+      path: ['listedCartridges'],
+      message: 'needs a source with fields listedCartridges',
+    },
+  ]
+
+  it('covers each zod code the test means to feed', () => {
+    expect(new Set(issues.map((i) => i.code))).toEqual(
+      new Set([
+        'too_small',
+        'invalid_value',
+        'invalid_type',
+        'unrecognized_keys',
+        'invalid_union',
+        'custom',
+      ]),
+    )
+  })
+
+  it("keeps zod's message out of every sentence and names the field", () => {
+    for (const issue of issues) {
+      const text = issueText(issue as Parameters<typeof issueText>[0], 'Field', t)
+      expect(text).not.toContain(issue.message)
+      expect(text).not.toMatch(/Invalid|Unrecognized|Too small|expected/)
+    }
+  })
+
+  it('says to add an ingredient for an empty composition, and an entry for another empty list', () => {
+    const empty = { code: 'too_small', origin: 'array', path: ['composition'], message: 'x' }
+    expect(issueText(empty, 'Composition', t)).toBe('Add at least one ingredient.')
+    expect(issueText({ ...empty, path: ['aliases'] }, 'Aliases', t)).toBe(
+      'Aliases: add at least one entry.',
+    )
+  })
+
+  it('names the field of an issue without a sentence of its own', () => {
+    const issue = {
+      code: 'invalid_type',
+      expected: 'array',
+      path: ['composition'],
+      message: 'Invalid input',
+    }
+    expect(issueText(issue, 'Composition', t)).toBe(
+      'Composition: not accepted by the powder record.',
+    )
   })
 })
