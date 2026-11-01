@@ -296,6 +296,15 @@ function pendingLink<L extends { id: string }>(
   return !record && askedId === linked?.id ? linked : undefined
 }
 
+type Previewed = Partial<Record<PreviewKey, number>>
+
+/** The volume and travel fields that hold another value than the seated bullet's, which they followed. */
+export const typedOverSeating = (
+  seated: Seated,
+  fields: Record<string, { si?: number | undefined } | undefined>,
+  previewed: Previewed,
+) => previewKeys.filter((k) => seated[k] !== undefined && fields[k]?.si !== previewed[k])
+
 /** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
 function seatingBlockOf(
   seatAt: SeatingLengths | undefined,
@@ -1436,7 +1445,14 @@ export function useWorkbenchState() {
     seating?: Seating
   }>()
   /** SI values the preview wrote into the fields. */
-  const [previewed, setPreviewed] = useState<Partial<Record<PreviewKey, number>>>({})
+  const [previewed, setPreviewedState] = useState<Previewed>({})
+  // the run reads the seating at once, as `seatedNow` (#938): a run pressed while a seating
+  // arrives plans the seating ladder from it, not from the render before
+  const previewedNow = useRef(previewed)
+  const setPreviewed = useCallback((next: Previewed | ((p: Previewed) => Previewed)) => {
+    previewedNow.current = typeof next === 'function' ? next(previewedNow.current) : next
+    setPreviewedState(previewedNow.current)
+  }, [])
   /** The seated bullet's values, SI, none while no bullet is seated: an emptied field takes them again. */
   const [seated, setSeatedState] = useState<Seated>({})
   // the seating reports run in transitions: `seated` lags them, so an effect that must not write
@@ -2042,19 +2058,24 @@ export function useWorkbenchState() {
   }
 
   /** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
-  const typedKeys = previewKeys.filter(
-    (k) => seated[k] !== undefined && fields[k]?.si !== previewed[k],
-  )
-  const seatingBlock = seatingBlockOf(seatAt, typedKeys, t)
+  const seatingBlock = seatingBlockOf(seatAt, typedOverSeating(seated, fields, previewed), t)
+  /** `seatingBlock` from the seating and the fields now, not this render's (#938). */
+  const seatingBlockNow = () =>
+    seatingBlockOf(
+      seatAt,
+      typedOverSeating(seatedNow.current, form.getValues(), previewedNow.current),
+      t,
+    )
 
-  /** The steps of the seating ladder from the seating field, or what stops it, in the shown units. */
+  /** The steps of the seating ladder from the seating now, or what stops it, in the shown units. */
   function seatingPlan(shown = system) {
-    const start = seatAt && seated[seatAt.lengthKind]
+    const start = seatAt && seatedNow.current[seatAt.lengthKind]
     const step = seatStep.seatStep?.si
     if (!seatAt || step === undefined)
       return {
         error:
-          seatingBlock ?? t('{label} is empty.', { label: specText(t, seatingStepSpec.label) }),
+          seatingBlockNow() ??
+          t('{label} is empty.', { label: specText(t, seatingStepSpec.label) }),
       }
     const show = (m: number) => withUnit('length', shown, m)
     return seatingLadder(seatAt, start, step, ladderSteps, direction, show, t)
@@ -2092,7 +2113,7 @@ export function useWorkbenchState() {
     })
     const own = ownStepError(spec, v, shown, t)
     if (own || ladderKind === 'charge') return own
-    const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlock
+    const blocked = ladderKind === 'temperature' ? temperatureBlock : seatingBlockNow()
     if (blocked) return blocked
     const plan = ladderKind === 'temperature' ? temperaturePlan(shown) : seatingPlan(shown)
     return 'error' in plan ? plan.error : undefined

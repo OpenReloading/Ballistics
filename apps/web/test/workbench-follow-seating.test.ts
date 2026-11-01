@@ -1,5 +1,9 @@
 import { expect, it } from 'vitest'
-import { followPlan, seatingOwnsVolume } from '../src/components/use-workbench-load.ts'
+import {
+  followPlan,
+  seatingOwnsVolume,
+  typedOverSeating,
+} from '../src/components/use-workbench-load.ts'
 
 const plan = (
   values: Parameters<typeof followPlan>[0],
@@ -46,4 +50,13 @@ it('keeps the case volume default out of a seating without a volume behind the b
   // no seating: the case volume default fills the field
   expect(seatingOwnsVolume({ caseVolume: 4e-6 })).toBe(false)
   expect(seatingOwnsVolume({})).toBe(false)
+})
+
+it('blocks a seating ladder only on a volume or travel typed over the seating it followed (#938)', () => {
+  const arrived = { volume: 3.6e-6, travel: 0.53, overallLength: 0.071 }
+  const fields = { volume: { si: 3.6e-6 }, travel: { si: 0.53 } }
+  // the seating, the fields and what they followed read at once: nothing typed
+  expect(typedOverSeating(arrived, fields, { volume: 3.6e-6, travel: 0.53 })).toEqual([])
+  expect(typedOverSeating(arrived, { ...fields, travel: { si: 0.5 } }, arrived)).toEqual(['travel'])
+  expect(typedOverSeating({}, { volume: { si: 1e-6 } }, {})).toEqual([])
 })
