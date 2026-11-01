@@ -104,6 +104,13 @@ export function interiorRequest(s: InteriorSources) {
   return { body, bulkDensity, missing, sensitivityDefault }
 }
 
+/** Whether a run of `powder` has a temperature sensitivity: its own, or the default of its grain form. */
+export const hasSensitivity = (
+  powder: Pick<Powder, 'temperatureSensitivity' | 'grainForm'> | undefined,
+) =>
+  powder?.temperatureSensitivity !== undefined ||
+  defaultSensitivity(powder?.grainForm) !== undefined
+
 /** The reference of a default sensitivity, K: the propellant temperature of the record's fit, else 21 °C. */
 export function sensitivityReferenceOf(powder: Pick<Powder, 'interior'>): number {
   return powder.interior

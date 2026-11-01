@@ -87,7 +87,7 @@ import {
   type interiorBody,
   interiorFields,
 } from '../lib/interior-input.ts'
-import { interiorRequest, sensitivityReferenceOf } from '../lib/interior-request.ts'
+import { hasSensitivity, interiorRequest, sensitivityReferenceOf } from '../lib/interior-request.ts'
 import {
   dismissed,
   effectiveSnapshots,
@@ -2032,12 +2032,8 @@ export function useWorkbenchState() {
     return seatingLadder(seatAt, start, step, ladderSteps, direction, show, t)
   }
 
-  /** Why a temperature ladder cannot run: the powder record has no temperature sensitivity. */
-  const temperatureBlock = temperatureLadderBlockReason(
-    powderLabel,
-    powder?.temperatureSensitivity !== undefined,
-    t,
-  )
+  /** Why a temperature ladder cannot run: the powder has no temperature sensitivity, own or default. */
+  const temperatureBlock = temperatureLadderBlockReason(powderLabel, hasSensitivity(powder), t)
 
   /** The propellant temperatures of the temperature ladder from the Powder temperature field, or what stops it. */
   function temperaturePlan(shown = system) {

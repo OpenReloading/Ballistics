@@ -32,15 +32,39 @@ const leadStructures = new Set(['cast', 'swaged', 'plated'])
 const leadCores = new Set(['lead', 'lead-alloy'])
 const copperCores = new Set(['copper', 'copper-alloy'])
 
-/** The material class of a construction; undefined where it does not settle one. */
+/** The class of a core material: lead, copper, or another metal that settles no bound. */
+const coreClass = (m: string | undefined): 'lead' | 'copper' | 'other' | undefined => {
+  if (m === undefined) return
+  if (leadCores.has(m)) return 'lead'
+  return copperCores.has(m) ? 'copper' : 'other'
+}
+
+/** The class the jacket or the structure states, none where they state none. */
+function structureClass(c: DensityConstruction): MaterialClass | undefined {
+  const structure = c.structure ?? ''
+  if (c.jacket || jacketedStructures.has(structure)) return 'jacketed'
+  if (structure === 'monolithic') return 'copper'
+  if (leadStructures.has(structure)) return 'lead'
+}
+
+/** The core each class goes with: a jacketed bullet has a lead core. */
+const coreOf: Record<MaterialClass, 'lead' | 'copper'> = {
+  jacketed: 'lead',
+  copper: 'copper',
+  lead: 'lead',
+}
+
+/**
+ * The material class of a construction; undefined where it does not settle one, as for a core of
+ * another metal or a core that contradicts the structure.
+ */
 export function materialClass(c: DensityConstruction | undefined): MaterialClass | undefined {
   if (!c || c.unmapped) return
-  if (c.jacket || (c.structure && jacketedStructures.has(c.structure))) return 'jacketed'
-  if (c.structure === 'monolithic') return 'copper'
-  if (c.structure && leadStructures.has(c.structure)) return 'lead'
-  const core = c.core?.material
-  if (core && leadCores.has(core)) return 'lead'
-  if (core && copperCores.has(core)) return 'copper'
+  const core = coreClass(c.core?.material)
+  if (core === 'other') return
+  const structure = structureClass(c)
+  if (!structure) return core
+  return core === undefined || core === coreOf[structure] ? structure : undefined
 }
 
 /**

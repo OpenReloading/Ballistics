@@ -1082,8 +1082,8 @@ export function revolutionVolume(points: SectionPoint[], cut: number): number {
  * {@link cavityDepthBracket} instead of its assumed depth: `low` with the deepest cavity, `high` with
  * the shallowest. Undefined without a cavity of assumed depth, with nothing below the cut, or when a
  * bracket depth gives no outline. A deepest cavity that would reach the length is held just below
- * it; one that would cut through the wall (a boat tail, a short shank) is made shallower, down to
- * the assumed depth, until the outline holds.
+ * it; one that would cut through the wall (a boat tail, a short shank) is made shallower, to the
+ * deepest depth whose outline holds (bisection down to the assumed depth).
  */
 export function cavityVolumeBracket(
   b: BulletDimensions,
@@ -1096,10 +1096,17 @@ export function cavityVolumeBracket(
     const at = bulletOutline({ ...b, base: { ...b.base, cavityDepth: depth } })
     return 'reason' in at ? undefined : revolutionVolume(at.points, Math.min(cut, b.length))
   }
-  const deep = [cavityDepthBracket.high, 2.5, 2, 1.5, 1].map((f) =>
-    Math.min(f * r, 0.999 * b.length),
-  )
-  const low = deep.map(below).find((v) => v !== undefined)
+  // the deepest depth up to the bracket's end whose outline holds: bisection from the assumed depth
+  let ok = r
+  let bad = Math.min(cavityDepthBracket.high * r, 0.999 * b.length)
+  if (below(bad) !== undefined) ok = bad
+  else
+    for (let i = 0; i < 30 && bad - ok > 1e-6 * r; i++) {
+      const mid = (ok + bad) / 2
+      if (below(mid) === undefined) bad = mid
+      else ok = mid
+    }
+  const low = below(ok)
   const high = below(cavityDepthBracket.low * r)
   return low === undefined || high === undefined ? undefined : { low, high }
 }

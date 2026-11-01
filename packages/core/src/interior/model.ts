@@ -402,7 +402,8 @@ function scaleInteriorLoad(load: InteriorLoad) {
   const eta = propellant.covolume
   const solid = mc / propellant.density
   const e0 = mc * energyAtTemperature(load)
-  if (!(vc - solid > 0) || !(vc - eta * mc > 0))
+  // the charge sits in the case: a worn throat adds gas volume, not room for the powder
+  if (!(chamber.volume - solid > 0) || !(chamber.volume - eta * mc > 0))
     return { valid: false, reason: 'chamberVolume' } as InteriorInvalid
 
   // effective mass with rotation and gas kinetic energy

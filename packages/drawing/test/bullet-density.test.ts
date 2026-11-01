@@ -91,3 +91,19 @@ describe('jacketedDensity', () => {
     expect(jacketedDensity(0.35)).toBeCloseTo(10.37, 2)
   })
 })
+
+describe('materialClass with a recorded core of another metal', () => {
+  it('settles no bound when the core contradicts the structure', () => {
+    expect(
+      materialClass({ structure: 'monolithic', core: { material: 'tungsten' } }),
+    ).toBeUndefined()
+    expect(
+      materialClass({ structure: 'cup-and-core', core: { material: 'steel' } }),
+    ).toBeUndefined()
+    expect(materialClass({ jacket: {}, core: { material: 'tungsten' } })).toBeUndefined()
+    expect(materialClass({ structure: 'monolithic', core: { material: 'copper-alloy' } })).toBe(
+      'copper',
+    )
+    expect(materialClass({ structure: 'bonded', core: { material: 'lead' } })).toBe('jacketed')
+  })
+})

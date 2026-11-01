@@ -47,6 +47,7 @@ import {
 import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { bulletFields, burnFormError, interiorFields } from '../lib/interior-input.ts'
+import { hasSensitivity } from '../lib/interior-request.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
@@ -377,7 +378,7 @@ function LadderChoices() {
             k,
             ladderKind,
             powderLabel,
-            powder?.temperatureSensitivity !== undefined,
+            hasSensitivity(powder),
             seatingBlock,
             t,
           ),

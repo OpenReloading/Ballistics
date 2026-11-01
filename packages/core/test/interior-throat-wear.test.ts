@@ -112,3 +112,30 @@ describe('throat wear against Vuong et al. 2026', () => {
     expect(Math.abs(dv - (last / first - 1))).toBeLessThan(0.02)
   })
 })
+
+describe('the charge fit with a worn throat', () => {
+  it('checks the charge against the case volume, not the gas volume the wear adds', () => {
+    const load = interiorLoad({
+      volume: 3.4e-6,
+      boreDiameter: 7.62e-3,
+      boreArea: 4.7e-5,
+      travel: 0.56,
+      twist: 0.254,
+      bulletMass: 0.0108,
+      // a solid volume of 3.5 cm3: above the case, below case plus 10 mm of wear
+      charge: 5.6e-3,
+      propellantEnergy: 3.8e6,
+      gamma: 1.24,
+      density: 1600,
+      covolume: 1e-3,
+      vivacity: 900,
+      exponent: 1,
+      referencePressure: 1e8,
+      propellantTemperature: 294.15,
+      ignitionPressure: 5e6,
+      startPressure: 3e7,
+      throatWear: 10e-3,
+    })
+    expect(interior(load)).toMatchObject({ valid: false, reason: 'chamberVolume' })
+  })
+})
