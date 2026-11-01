@@ -4233,7 +4233,6 @@
   "case length: trim length of your brass group {name} {length}": "Hülsenlänge: Länge nach dem Kürzen Ihrer Hülsengruppe {name} {length}",
   "Trim length of your brass group {name}.": "Länge nach dem Kürzen Ihrer Hülsengruppe {name}.",
   "Trim length of your brass group {name}. The CIP L3 is {value}.": "Länge nach dem Kürzen Ihrer Hülsengruppe {name}. Das CIP-L3 beträgt {value}.",
-  "The jump to the lands has no effect without an engraving ramp.": "Der Freiflug bis zu den Feldern wirkt sich ohne Einpressrampe nicht aus.",
   "{name} (values missing)": "{name} (Werte fehlen)",
   "{name} has no burn values, so it cannot run.": "{name} hat keine Abbrandwerte und kann daher nicht gerechnet werden.",
   "{name} has no burn values, so it cannot run. Choose a similar powder on the burn-rate chart, or fit the values from your chronograph strings on the tuning page.": "{name} hat keine Abbrandwerte und kann daher nicht gerechnet werden. Wählen Sie ein ähnliches Treibladungspulver in der Abbrandübersicht oder passen Sie die Werte auf der Abstimmungsseite an Ihre Chronographen-Schussreihen an.",
@@ -4333,5 +4332,6 @@
   "a measured capacity without its spread, 0.5 % assumed": "einem gemessenen Hülsenvolumen ohne Streuung, 0,5 % angenommen",
   "the spread of the capacity records of different makers over their mean": "der Streuung der Hülsenvolumen-Datensätze verschiedener Hersteller über ihrem Mittelwert",
   "the spread of your measured cases over their capacity": "der Streuung Ihrer gemessenen Hülsen über ihrem Hülsenvolumen",
-  "volume {value}, from {rule}": "Volumen {value}, aus {rule}"
+  "volume {value}, from {rule}": "Volumen {value}, aus {rule}",
+  "The seated jump has no effect without an engraving ramp.": "Der Freiflug des gesetzten Geschosses wirkt sich ohne Einpressrampe nicht aus."
 }

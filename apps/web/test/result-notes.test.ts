@@ -113,9 +113,9 @@ describe('resultNotes', () => {
     const plain = ok({ volumeMeasured: true, bulkDensity: 900, design: undefined })
     const { sampled: _, ...body } = plain.body
     const jumped = { ...plain, body, cartridgeDesign: undefined, powderDesign: undefined }
-    const seated = { printed: { ...plain.printed, seated: { jump: 0.0005 } } }
+    const seated = { jump: 0.0005 }
     expect(resultNotes({ ...jumped, ...seated }, [], units, english.t)).toEqual([
-      { kind: 'note', line: 'The jump to the lands has no effect without an engraving ramp.' },
+      { kind: 'note', line: 'The seated jump has no effect without an engraving ramp.' },
     ])
     const ramp = { ...jumped.load, resistance: { engraving: [{ travel: 0.0005, pressure: 5e7 }] } }
     expect(resultNotes({ ...jumped, ...seated, load: ramp }, [], units, english.t)).toEqual([])

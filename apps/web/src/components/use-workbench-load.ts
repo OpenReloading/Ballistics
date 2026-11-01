@@ -2501,6 +2501,8 @@ export function useWorkbenchState() {
       resistanceMissing,
       recordInputs,
       volumeRule,
+      // the jump the request's ramp starts at, for the result's note
+      jump: seatedFor(as).jump,
       sensitivityDefault,
       castHardness,
     }
@@ -2563,6 +2565,7 @@ export function useWorkbenchState() {
     bulkDensity: number | undefined
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
     volumeRule: CapacityRule | undefined
+    jump: number | undefined
     sensitivityDefault: ReturnType<typeof loadRequest>['sensitivityDefault']
     castHardness: number | undefined
     table: string | undefined
@@ -2586,6 +2589,7 @@ export function useWorkbenchState() {
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
       volumeRule: a.volumeRule,
+      jump: a.jump,
       sensitivityDefault: withoutColdPeak(a.sensitivityDefault),
       castHardness: a.castHardness,
       roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,

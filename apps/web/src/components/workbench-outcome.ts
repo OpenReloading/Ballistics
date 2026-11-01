@@ -78,6 +78,8 @@ export type Outcome =
       resistanceMissing?: { powder: string; missing: string[] } | undefined
       /** The rule of the range's volume tolerance from the capacity's source; none: the API's default. */
       volumeRule?: CapacityRule | undefined
+      /** The seated jump the run's engraving ramp started at, m; none without a seating. */
+      jump?: number | undefined
       /** Brinell hardness of the bullet record when it is cast with a plain base (`plainBaseCastHardness`). */
       castHardness?: number | undefined
       /** Rounds fired through the chosen firearm's barrel, its record's `roundCount`. */
@@ -266,11 +268,11 @@ export type NoteKind = (typeof noteKinds)[number]
 export type ResultNote = { kind: NoteKind; line: string; text?: string | undefined }
 
 /** The note of a run with a seated jump and no engraving ramp to start at it. */
-const noRampNote = msg('The jump to the lands has no effect without an engraving ramp.')
+const noRampNote = msg('The seated jump has no effect without an engraving ramp.')
 
 /** The note of a run with a seated jump and no engraving ramp, or none. */
 const noRampNotes = (ok: Extract<Outcome, { kind: 'ok' }>, t: Translator['t']): ResultNote[] =>
-  ok.printed.seated.jump !== undefined && !ok.load.resistance?.engraving
+  ok.jump !== undefined && !ok.load.resistance?.engraving
     ? [{ kind: 'note', line: t(noRampNote) }]
     : []
 
