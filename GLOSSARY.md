@@ -648,7 +648,7 @@ A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero
 _Avoid_: rifle, gun
 
 **Firearm action**:
-`action` of a firearm record: `rifle`, `pistol` or `revolver`, optional (absent: not stated). It says what kind of firearm it is where a model needs it: a revolver has a gap between cylinder and barrel, which the powder fit's revolver note reads. German UI: Waffenart (Gewehr, Pistole, Revolver).
+`action` of a firearm record: `rifle`, `pistol` or `revolver`, optional (absent: not stated). It says what kind of firearm it is where a model needs it: a revolver has a gap between cylinder and barrel, which the powder fit's revolver note reads. German UI: Art der Schusswaffe (Gewehr, Pistole, Revolver).
 _Avoid_: type, kind (of a firearm)
 
 **Freebore**:
