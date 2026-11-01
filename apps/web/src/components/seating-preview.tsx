@@ -144,6 +144,8 @@ export type Seated = {
   /** Seating depth and the barrel length of the seating, m, for print. */
   depth?: number
   barrel?: number
+  /** The barrel length of the preview's field, m, seated or not: the start pressure rule reads it. */
+  barrelField?: number
   /** The length the bullet is seated by; the other one is derived. */
   mode?: Mode | undefined
   /** The seating is the preview's own start (initial, L6 or mid-range), not a user move. */
@@ -780,6 +782,7 @@ function seatedReport(o: {
     ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
     ...(depth !== undefined && { depth: toSi('length', depth) }),
     ...(coal !== undefined && barrel !== undefined && { barrel }),
+    ...(barrel !== undefined && { barrelField: barrel }),
     ...(coal !== undefined && { mode, atStart }),
     ...(figure && { figure }),
   }

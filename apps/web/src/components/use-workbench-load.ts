@@ -751,7 +751,7 @@ export function approximateVolumeTolerance(
   return Math.min(suggestion.halfWidth, maxVolumeFraction)
 }
 
-/** `base` with the start pressure default: the barrel of the seating, else the start's own, and the bullet's construction. */
+/** `base` with the start pressure default: the barrel of the preview's field (typed, seated or not), else the start's own, and the bullet's construction. */
 function withStartPressure(
   base: Suggestions,
   a: {
@@ -2916,7 +2916,7 @@ export function useWorkbenchState() {
     t,
   )
   const suggestions = withStartPressure(baseSuggestions, {
-    barrel: seated.barrel,
+    barrel: seated.barrelField,
     construction: bulletRecord?.construction,
     current: defaults.startPressure,
     system,
