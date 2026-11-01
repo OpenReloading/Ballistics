@@ -1,6 +1,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readPublishedLoads } from '@open-reloading/data'
+import { type SourceRecord, sourceRecord } from '@open-reloading/schema'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
@@ -58,39 +60,41 @@ function isPublishedFolder(path: string) {
   return !entries.some((e) => /\.csv$/i.test(e.name)) && entries.some((e) => e.isDirectory())
 }
 
-/** The published load files of `records` in the folder `folder`, or all for none. */
-function publishedIn(records: Records, folder: string | undefined) {
-  if (folder === undefined) return records.published
-  const files = new Set(
-    readdirSync(folder, { withFileTypes: true }) // NOSONAR: as above
-      .filter((e) => e.isDirectory())
-      .flatMap((e) =>
-        readdirSync(join(folder, e.name)) // NOSONAR: as above
-          .filter((f) => f.endsWith('.json'))
-          .map((f) => `${e.name}/${f.slice(0, -'.json'.length)}`),
-      ),
-  )
-  return records.published.filter((f) => {
-    const cartridge = f.cartridge.replace(/^catalogue:/, '')
-    return files.has(`${cartridge}/${f.id}`)
-  })
+/** The source records of every root, by id, as the published load files resolve them. */
+function sourcesOf(roots: readonly string[]) {
+  const byId = new Map<string, SourceRecord>()
+  for (const root of roots) {
+    const dir = join(root, 'sources')
+    if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) continue // NOSONAR: as above
+    for (const name of readdirSync(dir).filter((n) => n.endsWith('.json'))) {
+      // NOSONAR: as above
+      const parsed = sourceRecord.safeParse(JSON.parse(readFileSync(join(dir, name), 'utf8')))
+      if (parsed.success && !byId.has(parsed.data.id)) byId.set(parsed.data.id, parsed.data)
+    }
+  }
+  return { byId, cited: new Set<string>(), embedded: new Map<string, Set<string>>() }
 }
 
 /**
- * The rows of the catalogue's published load files (`catalogue`), or of a folder laid out as
- * `records/loads/`, read through the records with the folder's parent as one more root.
+ * The rows of the catalogue's published load files (`catalogue`), or of the files of a folder laid
+ * out as `records/loads/` only, their source references resolved from the records' sources.
  */
 function catalogueRows(options: Options) {
   const folder = options.rows === 'catalogue' ? undefined : resolve(options.rows)
   if (folder !== undefined && basename(folder) !== 'loads')
     throw new UsageError('a --rows folder of published loads is named loads, as records/loads/')
-  const roots =
-    options.records.length > 0 ? options.records.map((r) => resolve(r)) : [packageRecords()]
-  const parent = folder && dirname(folder)
-  const records = loadRecords(parent && !roots.includes(parent) ? [...roots, parent] : roots)
-  const files = publishedIn(records, folder).toSorted((a, b) =>
-    byText(`${a.cartridge}/${a.id}`, `${b.cartridge}/${b.id}`),
-  )
+  const records = loadRecords(options.records)
+  const errors: string[] = []
+  const roots = options.records.length > 0 ? options.records : [packageRecords()]
+  const files = (
+    folder === undefined
+      ? records.published
+      : readPublishedLoads([dirname(folder)], sourcesOf(roots), errors).map((l) => l.file)
+  ).toSorted((a, b) => byText(`${a.cartridge}/${a.id}`, `${b.cartridge}/${b.id}`))
+  if (errors.length > 0)
+    options.warn?.(
+      `${errors.length} problem(s) in the published load files; those files are left out\n`,
+    )
   const { rows, skipped } = rowsFromPublished(files, new Set(records.cartridges.keys()))
   if (rows.length === 0) throw new UsageError('the published loads give no row')
   const published = { files: files.length, rows: rows.length, skipped }

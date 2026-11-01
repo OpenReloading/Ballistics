@@ -1,3 +1,4 @@
+import { cartridgeBulletDiameterMm } from '@open-reloading/core'
 import type { Bullet, Cartridge, PublishedLoads } from '@open-reloading/schema'
 import { parseRef } from '@open-reloading/schema'
 import type { Records } from './records.ts'
@@ -152,7 +153,7 @@ export function lengthModel(bullets: Iterable<Bullet>) {
 /**
  * The inputs published rows do not carry, as `apps/docs/docs/models/validation.md` takes them:
  * - a stand-in bullet record per cartridge and printed mass (the id of {@link standInId}): the
- *   cartridge's G1 as diameter, the printed mass, and the length of {@link lengthModel}; no
+ *   cartridge's G1 (the smallest cartridge-side value) as diameter, the printed mass, and the length of {@link lengthModel}; no
  *   construction, no drag, so a stand-in row printed at a distance is not corrected;
  * - a row without a barrel length takes the median printed barrel of its cartridge, else 610 mm for
  *   a case (L3) longer than 33 mm and 120 mm for a shorter one.
@@ -163,7 +164,7 @@ export function fillInputs(rows: readonly Row[], records: Records): Row[] {
   for (const row of rows) {
     if (records.bullets.has(row.bullet) || !row.bullet.startsWith('stand-in-')) continue
     const cartridge = records.cartridges.get(row.cartridge)
-    const diameter = cartridgeValue(cartridge, 'G1')
+    const diameter = cartridge && cartridgeBulletDiameterMm(cartridge)
     const mass = row.bulletMass
     if (diameter === undefined || mass === undefined || !length) continue
     records.bullets.set(row.bullet, standIn(row.bullet, mass, diameter, length(mass, diameter)))

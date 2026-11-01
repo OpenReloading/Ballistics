@@ -55,7 +55,7 @@ A problem in the file is reported as file, line and column with a reason, never 
 
 ### Published loads
 
-`--rows catalogue` reads the [published load files](data/published-loads.md) of the records instead of a CSV file; `--rows <folder>` does the same for a folder laid out as `records/loads/` (named `loads`, with one folder per cartridge), read with its parent as one more records root. Each printed charge with a velocity `value` of a maker table is one row (`rowsFromPublished`, `src/published-rows.ts`):
+`--rows catalogue` reads the [published load files](data/published-loads.md) of the records instead of a CSV file; `--rows <folder>` does the same for a folder laid out as `records/loads/` (named `loads`, with one folder per cartridge): only the files of that folder are read, their source references resolved from the source records of `--records`, and a file that fails is left out with a note on stderr. Each printed charge with a velocity `value` of a maker table is one row (`rowsFromPublished`, `src/published-rows.ts`):
 
 - `charge`, `velocity` (as printed, at the printed point), `coal` and `barrel` (`barrel.length`) from their `value`; `pressure` only with a value in bar, so a crusher figure (CUP, LUP) gives a row with its velocity only; the pressure basis is the figure's `method`, `unstated` without one; the muzzle distance is `velocity.point.distance`, and a velocity without one is a muzzle value;
 - `bullet` is the bullet record, else a stand-in record per cartridge and printed mass: the cartridge's G1 as diameter, the printed mass, and the length of a least-squares fit of ln length on ln mass and ln diameter over the bullet records with a length; it has no ballistic coefficient;

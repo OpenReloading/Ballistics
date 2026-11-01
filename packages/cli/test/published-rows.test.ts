@@ -535,4 +535,32 @@ describe('verify on published loads', () => {
     expect(text).toContain('published loads: 2 files, 3 rows; skipped: customerTable 3')
     expect(text).not.toContain('pressure by basis')
   })
+
+  it('reads a folder only from its own files, with source records of the records roots', async () => {
+    const catalogue = writeLoads([validation(), training()])
+    const root = join(catalogue, '..')
+    mkdirSync(join(root, 'sources'), { recursive: true })
+    writeFileSync(
+      join(root, 'sources', 'synthetic-table.json'),
+      JSON.stringify({ id: 'synthetic-table', ...source }),
+    )
+    const cited = {
+      ...validation(),
+      provenance: { kind: 'published', sources: [{ source: 'synthetic-table' }] },
+    }
+    const folder = writeLoads([cited as unknown as PublishedLoads])
+    writeFileSync(join(folder, '308-win', 'broken.json'), '{}')
+    let warned = ''
+    const r = await verify({
+      rows: folder,
+      records: [...recordRoots, root],
+      split: 'validation',
+      final: false,
+      warn: (t) => {
+        warned += t
+      },
+    })
+    expect(r.published).toEqual({ files: 1, rows: 3, skipped: {} })
+    expect(warned).toContain('problem(s) in the published load files')
+  })
 })
