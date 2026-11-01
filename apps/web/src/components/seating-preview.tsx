@@ -498,8 +498,8 @@ function shapeOf(
 }
 
 /** Why a record whose dimensions cannot form an outline is not seated. */
-function refusalOf(shaped: ReturnType<typeof shapeOf>) {
-  const o = shaped && bulletOutline(shaped)
+function refusalOf(shaped: ReturnType<typeof shapeOf>, unit: ReturnType<typeof drawingLengthUnit>) {
+  const o = shaped && bulletOutline(shaped, 'sourced', unit)
   return o && 'reason' in o ? o.reason : undefined
 }
 
@@ -534,8 +534,10 @@ function useGeometry(o: {
   baseType: BaseType | undefined
   shown: RefObject<UnitSystem>
   lands: LandsMm | undefined
+  /** The page's length unit, for the lengths in a refusal's reason. */
+  unit: ReturnType<typeof drawingLengthUnit>
 }) {
-  const { draft, detail, record, design: chosen, values, baseType, shown, lands } = o
+  const { draft, detail, record, design: chosen, values, baseType, shown, lands, unit } = o
   const draftSpec = draft?.spec
   const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
@@ -568,7 +570,7 @@ function useGeometry(o: {
     [design, bulletRecord, shown],
   )
   // a record whose dimensions cannot form an outline is not seated; its reason is shown
-  const refused = useMemo(() => refusalOf(shaped), [shaped])
+  const refused = useMemo(() => refusalOf(shaped, unit), [shaped, unit])
   const shape = refused ? undefined : shaped
   const fixed = useMemo(() => fixedOf(spec, chamber, shape, lands), [spec, chamber, shape, lands])
   return { spec, chamber, capacities, bulletRecord, shaped, refused, shape, fixed }
@@ -647,8 +649,10 @@ function seatBuilder(o: {
   water: number | undefined
   barrel: number | undefined
   lands: LandsMm | undefined
+  /** The page's length unit, for the lengths in the outline's notes. */
+  unit: ReturnType<typeof drawingLengthUnit>
 }) {
-  const { chamber, shape, mode, canCbto, water, barrel, lands } = o
+  const { chamber, shape, mode, canCbto, water, barrel, lands, unit } = o
   if (!chamber || !shape || (mode === 'baseToOgive' && !canCbto)) return
   return (by: number) =>
     seat({
@@ -659,6 +663,7 @@ function seatBuilder(o: {
       barrelLength: barrel === undefined ? undefined : fromSi('length', barrel),
       by: { kind: mode, value: by },
       lands,
+      unit,
     })
 }
 
@@ -881,6 +886,7 @@ function useSeatingModel(p: PreviewProps) {
     design,
     shown,
     lands,
+    unit: drawingLengthUnit(system),
   })
   const chosenCase =
     caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
@@ -943,8 +949,9 @@ function useSeatingModel(p: PreviewProps) {
         water: waterUsed,
         barrel: barrel.si,
         lands,
+        unit,
       }),
-    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, lands],
+    [chamber, shape, seatMode, canCbto, waterUsed, barrel.si, lands, unit],
   )
   const seating = useMemo(
     () => (seatBy && seatValue !== undefined ? seatBy(seatValue) : undefined),
