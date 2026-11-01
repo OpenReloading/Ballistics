@@ -9,7 +9,7 @@ import {
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { chamberOf, seat } from '@open-reloading/drawing/seating'
 import type { Bullet, Cartridge } from '@open-reloading/schema'
-import { loadWaterCapacity, toSi } from '@open-reloading/schema'
+import { bulletListFields, loadWaterCapacity, toSi } from '@open-reloading/schema'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
@@ -48,11 +48,10 @@ export interface Outcome {
   prediction: Prediction
 }
 
-/** The construction of a bullet record, for grouping. */
+/** The construction of a bullet record as its list item gives it (`bulletListFields`), for grouping. */
 export const constructionOf = (bullet: Bullet | undefined) => {
   if (!bullet) return 'unknown'
-  const { structure, core } = bullet.construction ?? {}
-  return structure ?? (core?.material ? `${core.material}-core` : 'unspecified')
+  return bulletListFields(bullet).construction ?? 'unspecified'
 }
 
 /** The volume behind the seated bullet (m3) and the bullet travel (m) of a row, or why they are not known. */
