@@ -3,7 +3,7 @@ import type { Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
 import { toCsv } from './csv.ts'
 import type { PlaybackSample } from './playback.ts'
-import { formatQuantity, lengthText, type UnitSystem } from './units.ts'
+import { formatQuantity, lengthText, msText, type UnitSystem } from './units.ts'
 import { percentOfPressureLimit, resultBand } from './workbench.ts'
 
 type T = Translator['t']
@@ -11,8 +11,12 @@ type T = Translator['t']
 /** A number as the page shows it, with the point a file and a spreadsheet read. */
 const plain = (text: string) => canonicalNumberText(text)
 
-/** A heading with its unit: "Breech pressure (psi)". */
-const head = (name: string, unit: string) => (unit ? `${name} (${unit})` : name)
+/** A heading with its unit: "Breech pressure (psi)"; a soft hyphen of the German text stays out. */
+const head = (name: string, unit: string) =>
+  (unit ? `${name} (${unit})` : name).replaceAll('\u00AD', '')
+
+/** A time in s as the chart's data table shows it, in ms without the symbol. */
+const ms = (s: number) => plain(msText(s).replace(/\s*ms$/, ''))
 
 /**
  * The curves of a run as CSV, one row per time step of the result: time, travel, breech pressure,
@@ -35,7 +39,7 @@ export function curvesCsv(
       head(t('Burnt'), '%'),
     ],
     ...points.map((p) => [
-      plain(formatNumber(p.time * 1e3, 3)),
+      ms(p.time),
       plain(lengthText('travel', system, p.travel)),
       plain(formatQuantity('pressure', system, p.breechPressure)),
       plain(formatQuantity('velocity', system, p.velocity)),
@@ -57,7 +61,6 @@ export function resultsCsv(body: InteriorResponse, charge: number, system: UnitS
   const unit = (q: 'pressure' | 'velocity' | 'energy' | 'charge') => system[q].symbol
   const value = (q: 'pressure' | 'velocity' | 'energy' | 'charge', si: number) =>
     plain(formatQuantity(q, system, si))
-  const ms = (s: number) => plain(formatNumber(s * 1e3, 3))
   const length = (m: number) => plain(lengthText('travel', system, m))
   const rows: (string | number)[][] = [
     [t('Charge'), value('charge', charge), unit('charge')],
@@ -84,5 +87,6 @@ export function resultsCsv(body: InteriorResponse, charge: number, system: UnitS
       r.burnout ? system.length.symbol : '',
     ],
   ]
-  return toCsv([[t('Quantity'), t('Value'), t('Unit')], ...rows])
+  // a soft hyphen of the German names stays out of the file
+  return toCsv([[t('Quantity'), t('Value'), t('Unit')], ...rows]).replaceAll('\u00AD', '')
 }
