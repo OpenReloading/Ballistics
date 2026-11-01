@@ -2035,7 +2035,9 @@ export function useWorkbenchState() {
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? chosenPowder
     const { body, bulkDensity, missing } = interiorRequest({
-      values: powderValues(siValues(fields), chosenPowder, as),
+      // the form's values now, not this render's: a run pressed after a seated volume was written
+      // and before it was drawn sends that volume, not an empty field's error (#870)
+      values: powderValues(siValues(form.getValues()), chosenPowder, as),
       powder: chosen,
       // a missing powder record: the bulk density and the bore resistance its link carried
       linked: as ? undefined : linkedPowder,
