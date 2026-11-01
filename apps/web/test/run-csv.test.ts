@@ -48,7 +48,13 @@ const body = {
     muzzleBurntFraction: 1,
     burnout: { time: 9e-4, travel: 0.3 },
   },
-  pressureRange: { nominalPressure: 2.8e8, lowPressure: 2.6e8, highPressure: 3.0e8 },
+  pressureRange: {
+    nominalPressure: 2.8e8,
+    lowPressure: 2.6e8,
+    highPressure: 3.0e8,
+    complete: true,
+    cases: [],
+  },
   limits: [],
 } as unknown as InteriorResponse
 
@@ -111,5 +117,20 @@ describe('the results download', () => {
     expect(row('Charge')).toEqual(['Charge', '40.1', 'gr'])
     expect(row('Barrel time')).toEqual(['Barrel time', '1.100', 'ms'])
     expect(row('Burnout at')).toEqual(['Burnout at', '11.81', 'in'])
+  })
+})
+
+describe('the results download of an incomplete range', () => {
+  it('says how many range cases were not computed', () => {
+    const incomplete = {
+      ...body,
+      pressureRange: {
+        ...body.pressureRange,
+        complete: false,
+        cases: [{ maxPressure: 3e8 }, { maxPressure: null }, { maxPressure: null }],
+      },
+    } as unknown as InteriorResponse
+    expect(resultsCsv(incomplete, 0.0026, us, t)).toContain('Range cases not computed,2,')
+    expect(resultsCsv(body, 0.0026, us, t)).not.toContain('Range cases not computed')
   })
 })

@@ -169,6 +169,7 @@ const otherSense: Record<string, string> = {
   'Corner-case range, input tolerances: {low} to {high} {unit}':
     'corner case: an extreme combination of inputs',
   'Corner-case range, low': 'corner case: an extreme combination of inputs',
+  'Range cases not computed': 'case: one computed combination of inputs',
   'Corner-case range, high': 'corner case: an extreme combination of inputs',
   'Peak pressure, simulated (corner cases)': 'corner case: an extreme combination of inputs',
   Rifle:

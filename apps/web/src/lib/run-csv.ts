@@ -67,6 +67,16 @@ export function resultsCsv(body: InteriorResponse, charge: number, system: UnitS
     [t('Peak pressure'), value('pressure', range.nominalPressure), unit('pressure')],
     [t('Corner-case range, low'), value('pressure', range.lowPressure), unit('pressure')],
     [t('Corner-case range, high'), value('pressure', range.highPressure), unit('pressure')],
+    // the page says the true range can be wider: so does the file
+    ...(range.complete
+      ? []
+      : [
+          [
+            t('Range cases not computed'),
+            range.cases.filter((c) => c.maxPressure === null).length,
+            '',
+          ],
+        ]),
     ...(band.sampled
       ? [
           [t('5th percentile'), value('pressure', band.pressure.low), unit('pressure')],
