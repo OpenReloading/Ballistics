@@ -21,7 +21,7 @@ export const interiorFields = [
     key: 'boreDiameter',
     label: msg('Bore diameter'),
     help: msg(
-      'Diameter of the bore across the lands, in the length unit shown. An empty bore area is computed from it.',
+      'Diameter of the bore across the lands, in the length unit shown. An empty bore area falls back on it as the Bore area help says.',
     ),
     quantity: 'length',
     required: true,
@@ -155,7 +155,7 @@ export const interiorFields = [
     key: 'startPressure',
     label: msg('Start pressure'),
     help: msg(
-      'Mean pressure at which the bullet starts to move, in the pressure unit shown. Approximate defaults of the model, not measurements: an assumed 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel fitted by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
+      'Mean pressure below which the bullet does not move, in the pressure unit shown; the bore resistance can hold it longer. Approximate defaults of the model, not measurements: an assumed 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel fitted by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
     ),
     quantity: 'pressure',
     required: true,
@@ -198,7 +198,7 @@ export const interiorFields = [
     key: 'formZ1',
     label: msg('Burn form z1'),
     help: msg(
-      'Burnt fraction at which the second stage of the two-stage form starts, 0 to 1, without a unit.',
+      'Burnt fraction at which the second stage of the two-stage form starts, above 0 and at most 1, without a unit.',
     ),
     quantity: 'ratio',
     min: 0,

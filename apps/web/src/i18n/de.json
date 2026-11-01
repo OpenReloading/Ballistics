@@ -4164,9 +4164,7 @@
   "Summary year": "Jahr der Übersicht",
   "Yearly summary": "Jahresübersicht",
   "Yearly summary of the shooting log, {year}": "Jahresübersicht des Schießbuchs, {year}",
-  "Burnt fraction at which the second stage of the two-stage form starts, 0 to 1, without a unit.": "Verbrannter Anteil, bei dem die zweite Stufe der zweistufigen Form beginnt, 0 bis 1, ohne Einheit.",
   "Corner-case range, input tolerances: {low} to {high} {unit}": "Eckfallbereich, Toleranzen der Eingaben: {low} bis {high} {unit}",
-  "Diameter of the bore across the lands, in the length unit shown. An empty bore area is computed from it.": "Durchmesser des Laufs über die Felder, in der angezeigten Längeneinheit. Ein leerer Laufquerschnitt wird daraus berechnet.",
   "Exponent of the first stage of the two-stage form, (1 + a z) to the power m, without a unit.": "Exponent der ersten Stufe der zweistufigen Form, (1 + a z) hoch m, ohne Einheit.",
   "Exponent of the pressure in the burn law, without a unit: at 1 the burn rate is proportional to the pressure.": "Exponent des Drucks im Abbrandgesetz, ohne Einheit: Bei 1 ist die Abbrandgeschwindigkeit proportional zum Druck.",
   "Exponent of the second stage of the two-stage form, after z1, without a unit; below 1 when z1 is below 1.": "Exponent der zweiten Stufe der zweistufigen Form, nach z1, ohne Einheit; unter 1, wenn z1 unter 1 liegt.",
@@ -4197,5 +4195,7 @@
   "Pressure range, low": "Druckbereich, unten",
   "Pressure range, high": "Druckbereich, oben",
   "Peak pressure, simulated (corner cases)": "Gasdruck, simuliert (Eckfälle)",
-  "Mean pressure at which the bullet starts to move, in the pressure unit shown. Approximate defaults of the model, not measurements: an assumed 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel fitted by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).": "Mittlerer Druck, bei dem sich das Geschoss zu bewegen beginnt, in der angezeigten Druckeinheit. Näherungsweise Vorgaben des Modells, keine Messungen: angenommene 30 MPa für einen Lauf ab 0,3 m; für einen kürzeren Lauf nach Geschossbauart angepasst, Blei 24 MPa, Mantelgeschoss 31 MPa, galvanisch beschichtet 31 MPa, monolithisch 50 MPa (1 MPa = 10 bar = 145 psi)."
+  "Burnt fraction at which the second stage of the two-stage form starts, above 0 and at most 1, without a unit.": "Verbrannter Anteil, bei dem die zweite Stufe der zweistufigen Form beginnt, über 0 und höchstens 1, ohne Einheit.",
+  "Diameter of the bore across the lands, in the length unit shown. An empty bore area falls back on it as the Bore area help says.": "Durchmesser des Laufs über die Felder, in der angezeigten Längeneinheit. Ein leerer Laufquerschnitt greift auf ihn zurück, wie die Hilfe zum Laufquerschnitt sagt.",
+  "Mean pressure below which the bullet does not move, in the pressure unit shown; the bore resistance can hold it longer. Approximate defaults of the model, not measurements: an assumed 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel fitted by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).": "Mittlerer Druck, unter dem sich das Geschoss nicht bewegt, in der angezeigten Druckeinheit; der Widerstand im Lauf kann es länger halten. Näherungsweise Vorgaben des Modells, keine Messungen: angenommene 30 MPa für einen Lauf ab 0,3 m; für einen kürzeren Lauf nach Geschossbauart angepasst, Blei 24 MPa, Mantelgeschoss 31 MPa, galvanisch beschichtet 31 MPa, monolithisch 50 MPa (1 MPa = 10 bar = 145 psi)."
 }
