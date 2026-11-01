@@ -1,7 +1,7 @@
 'use client'
 
 import type { Cartridge, Powder } from '@open-reloading/schema'
-import { SlidersHorizontal } from '@phosphor-icons/react'
+import { ChartBar } from '@phosphor-icons/react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { fetchPowderList } from '../lib/api-client.ts'
@@ -103,7 +103,7 @@ function PowderRecord({ p, names, placed, cartridgeNames }: { p: Powder } & Extr
       more={
         <LinkButton
           href={tunePowderHref(`catalogue:${p.id}`)}
-          icon={<SlidersHorizontal aria-hidden="true" />}
+          icon={<ChartBar aria-hidden="true" />}
         >
           {t('Tune from strings')}
         </LinkButton>
