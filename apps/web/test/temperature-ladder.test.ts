@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { stepLoad } from '../src/components/workbench-outcome.ts'
+import { stepBody, stepLoad } from '../src/components/workbench-outcome.ts'
 import type { InteriorBody } from '../src/lib/interior-input.ts'
 import { presetUnits, resolveUnits } from '../src/lib/units.ts'
 
@@ -19,6 +19,29 @@ describe('temperature ladder step', () => {
 
   it('leaves the temperature of a charge or seating step alone', () => {
     expect(stepLoad(load, { charge: 0.004 }).propellantTemperature).toBe(294.15)
+  })
+})
+
+describe('seating ladder step body', () => {
+  const body = {
+    model: 'm3',
+    load: { charge: 0.003, chamber: { volume: 4e-6 }, barrel: { length: 0.6 } },
+    tolerances: { volumeFraction: 0.05 },
+  } as unknown as InteriorBody
+  const seating = { value: 0.07, volume: 3.9e-6, travel: 0.53 }
+
+  it("sends a seating step's own volume tolerance, or none, instead of the preview's", () => {
+    const own = stepBody(body, { charge: 0.003, seating, volumeFraction: 0.08 })
+    expect(own.tolerances).toEqual({ volumeFraction: 0.08 })
+    expect(own.load.chamber.volume).toBe(3.9e-6)
+    expect(stepBody(body, { charge: 0.003, seating }).tolerances).toBeUndefined()
+  })
+
+  it('keeps the run tolerance for a charge or temperature step', () => {
+    expect(stepBody(body, { charge: 0.004 }).tolerances).toEqual({ volumeFraction: 0.05 })
+    expect(stepBody(body, { charge: 0.003, temperature: 300 }).tolerances).toEqual({
+      volumeFraction: 0.05,
+    })
   })
 })
 

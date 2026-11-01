@@ -1,48 +1,30 @@
 import { interiorBody } from '@open-reloading/api/compute'
-import type { Bullet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { cavityVolumeFraction } from '../src/lib/cavity-range.ts'
 import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorRequest } from '../src/lib/interior-request.ts'
 
-/** A 9 mm hollow base wadcutter: a cavity of 6 mm opening, depth assumed 3 mm. */
-const wadcutter = (cavityDepth?: number): Partial<Bullet> => ({
-  diameter: { value: 9 },
-  length: { value: 15 },
-  mass: { value: 9.5 },
-  base: {
-    type: 'conical-hollow-base',
-    cavityDiameter: { value: 6 },
-    ...(cavityDepth !== undefined && { cavityDepth: { value: cavityDepth } }),
-  },
-  provenance: { kind: 'published', sources: [{ title: 'fixture' }] },
-})
-
 describe('cavityVolumeFraction', () => {
-  it('reaches the cone at three times the assumed depth: pi r^3 less pi r^3 / 3', () => {
-    // seated 10 mm deep, 0.6 cm3 behind the bullet
-    const f = cavityVolumeFraction(wadcutter(), 10e-3, 0.6e-6)
-    const r = 3
-    const move = Math.PI * r ** 3 - (Math.PI * r ** 3) / 3
-    // the default 1 % of the capacity plus the cavity's move
-    expect(f).toBeCloseTo(0.01 + move / 1e9 / 0.6e-6, 6)
+  // made-up seating: 0.6 cm3 behind the bullet, 0.02 cm3 less at the deepest cavity, 0.05 cm3 more at the shallowest
+  const range = { low: 0.58e-6, high: 0.65e-6 }
+
+  it('adds the larger move over the bracket, relative to the volume, to the default 1 %', () => {
+    expect(cavityVolumeFraction(range, 0.6e-6)).toBeCloseTo(0.01 + 0.05 / 0.6, 9)
+    // a larger volume at the same bracket: a smaller share
+    expect(cavityVolumeFraction({ low: 9.98e-6, high: 10.01e-6 }, 10e-6)).toBeCloseTo(
+      0.01 + 0.02 / 10,
+      9,
+    )
   })
 
-  it('gives none for a typed depth, a solid base or no seating depth', () => {
-    expect(cavityVolumeFraction(wadcutter(4), 10e-3, 0.6e-6)).toBeUndefined()
-    expect(
-      cavityVolumeFraction({ ...wadcutter(), base: { type: 'flat' } }, 10e-3, 0.6e-6),
-    ).toBeUndefined()
-    // a large case: the move adds little to the default 1 %
-    expect(cavityVolumeFraction(wadcutter(), 10e-3, 10e-6)).toBeCloseTo(
-      0.01 + (Math.PI * 18) / 1e9 / 10e-6,
-      6,
-    )
-    expect(cavityVolumeFraction(wadcutter(), undefined, 0.6e-6)).toBeUndefined()
+  it('gives none without a bracket (typed depth, solid base) or a volume', () => {
+    expect(cavityVolumeFraction(undefined, 0.6e-6)).toBeUndefined()
+    expect(cavityVolumeFraction(range, undefined)).toBeUndefined()
+    expect(cavityVolumeFraction(range, 0)).toBeUndefined()
   })
 
   it('is capped at the 0.2 the API takes', () => {
-    expect(cavityVolumeFraction(wadcutter(), 10e-3, 0.1e-6)).toBe(0.2)
+    expect(cavityVolumeFraction({ low: 0.05e-6, high: 0.2e-6 }, 0.1e-6)).toBe(0.2)
   })
 })
 

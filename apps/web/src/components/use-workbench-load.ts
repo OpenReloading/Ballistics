@@ -214,6 +214,7 @@ import {
   previewKeys,
   resultLine,
   type Step,
+  stepBody,
   stepLoad,
   stepsOf,
   unlistedCartridge,
@@ -984,10 +985,23 @@ function plannedLadder<S, T>(
   return plans.temperatureBlock ? { error: plans.temperatureBlock } : plans.temperature()
 }
 
-/** The per-step overrides of a planned ladder's steps. */
-function planRows(kind: RunnableLadderKind, steps: SeatingStep[] | number[]): Partial<Step>[] {
+/**
+ * The per-step overrides of a planned ladder's steps. A seating step has the volume tolerance of its
+ * own cavity bracket, added to the approximate default volume's (`volumeTolerance`).
+ */
+function planRows(
+  kind: RunnableLadderKind,
+  steps: SeatingStep[] | number[],
+  volumeTolerance: number | undefined,
+): Partial<Step>[] {
   return kind === 'seating'
-    ? (steps as SeatingStep[]).map((seating) => ({ seating }))
+    ? (steps as SeatingStep[]).map((seating) => ({
+        seating,
+        volumeFraction: combinedVolumeFraction(
+          volumeTolerance,
+          cavityVolumeFraction(seating.cavityRange, seating.volume),
+        ),
+      }))
     : (steps as number[]).map((temperature) => ({ temperature }))
 }
 
@@ -1060,10 +1074,7 @@ async function runRequest(
   }
   const answers: Answer[] = []
   await runBatch(plan, 4, signal, async (row, i) => {
-    const res = await postInterior(
-      { ...body, load: stepLoad(body.load, { charge, ...row }) },
-      signal,
-    )
+    const res = await postInterior(stepBody(body, { charge, ...row }), signal)
     answers[i] = { res, json: await res.json().catch(() => undefined) }
   })
   if (signal.aborted) return
@@ -1128,10 +1139,10 @@ type RunValues = { seated: Seated; fields: Fields; previewed: Partial<Record<Pre
  * volume tolerance of the cavity bracket of a hollow base while the run's volume follows the seated
  * bullet, and the seated values still in the fields.
  */
-export function runSeatingOf(now: RunValues, bullet: Parameters<typeof cavityVolumeFraction>[0]) {
+export function runSeatingOf(now: RunValues) {
   const fromSeating = fromSeatingOf(now.seated, now.fields, now.previewed)
   const volumeFraction = fromSeating.includes('volume')
-    ? cavityVolumeFraction(bullet, now.seated.depth, now.fields.volume?.si)
+    ? cavityVolumeFraction(now.seated.cavityRange, now.seated.volume)
     : undefined
   return { volumeFraction, fromSeating }
 }
@@ -2460,7 +2471,7 @@ export function useWorkbenchState() {
     if (refused) throw new Error(refused)
     const chosen = as?.powder ?? chosenPowder
     const now = runValues(as)
-    const seating = runSeatingOf(now, bulletNow)
+    const seating = runSeatingOf(now)
     const { body, bulkDensity, missing, sensitivityDefault } = interiorRequest({
       values: powderValues(siValues(now.fields), chosenPowder, as, suggestions.startPressure?.si),
       powder: chosen,
@@ -2513,6 +2524,7 @@ export function useWorkbenchState() {
       fromSeating: seating.fromSeating,
       sensitivityDefault,
       castHardness,
+      volumeTolerance,
     }
   }
 
@@ -2647,7 +2659,7 @@ export function useWorkbenchState() {
     const bandController = new AbortController()
     bandRequest.current = bandController
     void fetchBand(
-      { ...body, load: stepLoad(body.load, nth(steps, first)), sampling: {} },
+      { ...stepBody(body, nth(steps, first)), sampling: {} },
       bandController.signal,
     ).then((sampled) => {
       if (!bandController.signal.aborted) setOutcome((o) => withBand(o, ok.id, first, sampled))
@@ -2680,7 +2692,7 @@ export function useWorkbenchState() {
       setStatus(planned.error)
       return
     }
-    const plan = planned && planRows(ladderKind, planned.steps)
+    const plan = planned && planRows(ladderKind, planned.steps, req.volumeTolerance)
     const request = ladderRequest(body, plan, ladderSteps, ladder.ladderStep?.si, direction)
     const controller = new AbortController()
     running.current = controller

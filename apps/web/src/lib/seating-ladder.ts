@@ -90,16 +90,30 @@ export type SeatingLengths = {
   lengthKind: SeatingLengthKind
   /** Slider range of the length it seats by, m. */
   range: readonly [number, number]
-  /** Case volume behind the bullet (m³), bullet travel and jump (m) at `value` (m); absent without the record values. */
+  /**
+   * Case volume behind the bullet (m³), bullet travel and jump (m) at `value` (m), absent without
+   * the record values; with a hollow base of assumed depth the bracket of the volume
+   * (`cavityRange`, m³).
+   */
   at: (value: number) => {
     volume?: number | undefined
     travel?: number | undefined
     jump?: number | undefined
+    cavityRange?: CavityRange | undefined
   }
 }
 
+/** Bounds of the volume behind the bullet over the depth bracket of a hollow base's cavity, m³. */
+export type CavityRange = { low: number; high: number }
+
 /** One step of a seating ladder: the length the bullet is seated by (m) and what follows from it. */
-export type SeatingStep = { value: number; volume: number; travel: number; jump?: number }
+export type SeatingStep = {
+  value: number
+  volume: number
+  travel: number
+  jump?: number
+  cavityRange?: CavityRange | undefined
+}
 
 /**
  * The steps of a seating ladder from `start`, or the reason it cannot run. `show` writes a length
@@ -130,7 +144,7 @@ export function seatingLadder(
     }
   const out: SeatingStep[] = []
   for (const value of lengths) {
-    const { volume, travel, jump } = seat.at(value)
+    const { volume, travel, jump, cavityRange } = seat.at(value)
     if (volume === undefined || travel === undefined)
       return { error: t('The seating ladder needs a case capacity and a barrel length.') }
     if (volume <= 0)
@@ -140,7 +154,13 @@ export function seatingLadder(
           value: show(value),
         }),
       }
-    out.push({ value, volume, travel, ...(jump !== undefined && { jump }) })
+    out.push({
+      value,
+      volume,
+      travel,
+      ...(jump !== undefined && { jump }),
+      ...(cavityRange && { cavityRange }),
+    })
   }
   return { steps: out }
 }

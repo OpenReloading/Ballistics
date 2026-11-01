@@ -58,7 +58,7 @@ import type { Suggestion } from '../lib/input-defaults.ts'
 import { productLabel, refName } from '../lib/manufacturers.ts'
 import { nth } from '../lib/nth.ts'
 import type { CaseRow } from '../lib/record-choosers.ts'
-import { type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
+import { type CavityRange, type SeatingLengths, seatingLengthName } from '../lib/seating-ladder.ts'
 import {
   type ChargeFill,
   chargeFill,
@@ -139,6 +139,8 @@ export type Seated = {
   /** The case volume to the mouth, m³ (the capacity record or the measured one), seated or not. */
   caseVolume?: number
   volume?: number | undefined
+  /** Bounds of `volume` over the depth bracket of a hollow base's cavity of assumed depth, m³. */
+  cavityRange?: CavityRange
   travel?: number | undefined
   overallLength?: number
   baseToOgive?: number
@@ -791,10 +793,18 @@ function seatAtOf(
         volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
         travel: s.travel && toSi('length', s.travel.value),
         jump: s.jump.value === undefined ? undefined : toSi('length', s.jump.value),
+        cavityRange: cavityRangeOf(s),
       }
     },
   }
 }
+
+/** The seating's cavity bracket in m³. */
+const cavityRangeOf = (s: Seating | undefined): CavityRange | undefined =>
+  s?.cavityRange && {
+    low: unitsOf.capacity.cm3.toSi(s.cavityRange.low),
+    high: unitsOf.capacity.cm3.toSi(s.cavityRange.high),
+  }
 
 const figureOf = (spec: Spec | undefined, seating: Seating | undefined) =>
   spec && seating
@@ -838,11 +848,13 @@ function seatedReport(o: {
   const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
   const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
   const jump = seating?.jump.value
+  const cavityRange = cavityRangeOf(seating)
   return {
     ...(caseVolume !== undefined && { caseVolume }),
     ...(caseVolume !== undefined && capacity && { capacity }),
     ...(unseated && { unseated }),
     ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
+    ...(cavityRange && { cavityRange }),
     ...(travel !== undefined && { travel: toSi('length', travel) }),
     ...(coal !== undefined && { overallLength: toSi('length', coal) }),
     ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
@@ -881,6 +893,8 @@ function useReportSeated(
     capacity?.fraction,
     JSON.stringify(unseated),
     seating?.volumeBehindBullet?.value,
+    seating?.cavityRange?.low,
+    seating?.cavityRange?.high,
     seating?.travel?.value,
     seating?.coal.value,
     seating?.cbto?.value,

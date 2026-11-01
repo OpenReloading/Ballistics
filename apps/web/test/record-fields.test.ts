@@ -44,6 +44,19 @@ const dataRows = (b: Bullet) =>
     .filter((g) => g.title !== 'Computed')
     .flatMap((g) => g.rows)
 
+it('lists the cavity diameter and a measured cavity depth of a hollow base', () => {
+  const b: Bullet = {
+    ...target,
+    base: { type: 'conical-hollow-base', cavityDiameter: { value: 5 }, cavityDepth: { value: 4 } },
+  }
+  const rows = dataRows(b)
+  expect(shown(rows, si).filter(([label]) => String(label).startsWith('Cavity'))).toEqual([
+    ['Cavity diameter', '5.00 mm'],
+    ['Cavity depth', '4.00 mm'],
+  ])
+  expect(rows.find((r) => r.label === 'Cavity depth')?.symbol).toBeUndefined()
+})
+
 it('splits the build into structure, jacket, core and surface, the manufacturer wording as printed on the first', () => {
   const row = (construction: Bullet['construction']) => shown(buildRows(construction))
   const notes = (construction: Bullet['construction']) =>
