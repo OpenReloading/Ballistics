@@ -54,6 +54,7 @@ import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
+import { cavityVolumeFraction } from '../lib/cavity-range.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -2045,6 +2046,9 @@ export function useWorkbenchState() {
       boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
+      volumeFraction: fromSeatingOf(seated, fields, previewed).includes('volume')
+        ? cavityVolumeFraction(bulletNow, seated.depth, fields.volume?.si)
+        : undefined,
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined

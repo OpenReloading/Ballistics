@@ -172,6 +172,25 @@
             "value"
           ],
           "unit": "mm"
+        },
+        "cavityDepth": {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "In mm."
+            },
+            "raw": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The value as written in the source, when it differed."
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "unit": "mm"
         }
       }
     },

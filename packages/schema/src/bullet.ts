@@ -173,8 +173,8 @@ export function bulletListFields(
 
 /**
  * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
- * a cone or a hemisphere whose depth follows from its diameter (`cavityDiameter`), on a flat base or
- * on the boat tail the other fields describe.
+ * a cone or a hemisphere whose depth follows from its diameter (`cavityDiameter`) unless a measured
+ * `cavityDepth` gives it, on a flat base or on the boat tail the other fields describe.
  */
 export const baseTypes = z.enum([
   'flat',
@@ -219,6 +219,12 @@ const bulletBase = z
     angle: quantity('angle', z.number().gt(0).lt(90)).optional(),
     /** Diameter of the cavity where it opens in the base face. Needed by, and only with, a hollow base type. */
     cavityDiameter: quantity('length', z.number().positive()).optional(),
+    /**
+     * Depth of the cavity from the base face, where it is measured (a section, or the volume of a
+     * water or wax fill converted by the shape). Only with a hollow base type; without it the depth
+     * is the cavity's radius, an assumption.
+     */
+    cavityDepth: quantity('length', z.number().positive()).optional(),
   })
   .superRefine((base, ctx) => {
     const hollow = base.type === 'conical-hollow-base' || base.type === 'rounded-hollow-base'
@@ -229,6 +235,7 @@ const bulletBase = z
       if (base[key] && !tail) issue(key, 'only with a boat-tail or hollow base type')
     }
     if (base.cavityDiameter && !hollow) issue('cavityDiameter', 'only with a hollow base type')
+    if (base.cavityDepth && !hollow) issue('cavityDepth', 'only with a hollow base type')
     if (hollow && !base.cavityDiameter) issue('cavityDiameter', 'needed by a hollow base type')
   })
 
@@ -415,8 +422,14 @@ export const bullet = z
       d === undefined ? undefined : d / 2,
       'the radius',
     )
-    // The depth is not stored: it is half the opening (`bulletOutline`).
-    if (cavity !== undefined && b.length && !(cavity / 2 < b.length.value))
+    below(['base', 'cavityDepth'], b.base?.cavityDepth?.value, b.length?.value, 'the length')
+    // Without a stored depth it is half the opening (`bulletOutline`).
+    if (
+      cavity !== undefined &&
+      b.base?.cavityDepth === undefined &&
+      b.length &&
+      !(cavity / 2 < b.length.value)
+    )
       issue(
         ['base', 'cavityDiameter'],
         'half of it, the cavity depth, must be smaller than the length',

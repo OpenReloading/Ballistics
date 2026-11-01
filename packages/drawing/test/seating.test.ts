@@ -202,6 +202,33 @@ describe('hollow base', () => {
     expect(h.volumeBehindBullet?.tag).toBe('approximate')
     expect(s.volumeBehindBullet?.tag).toBe('derived')
   })
+
+  it('brackets the volume behind the bullet over half to three times the assumed cavity depth', () => {
+    const seated = (bullet: BulletDimensions) =>
+      seat({
+        bullet,
+        chamber,
+        waterCapacity: 40,
+        waterDensity,
+        by: { kind: 'overallLength', value: 60 },
+      })
+    const h = seated(hollow('conical-hollow-base'))
+    const v = defined(h.volumeBehindBullet).value
+    const range = defined(h.cavityRange)
+    // the cone at depth rc / 2 and 3 rc: pi rc^2 h / 3 against pi rc^3 / 3
+    const cone = (depth: number) => (Math.PI * rc ** 2 * depth) / 3 / 1000
+    expect(range.low).toBeCloseTo(v - (cone(rc) - cone(rc / 2)), 9)
+    expect(range.high).toBeCloseTo(v + (cone(3 * rc) - cone(rc)), 9)
+    expect(seated(solid).cavityRange).toBeUndefined()
+    // a typed depth wins: no bracket, and the volume is no longer approximate for the cavity
+    const typed = seated({
+      ...hollow('conical-hollow-base'),
+      base: { type: 'conical-hollow-base', cavityDiameter: 5, cavityDepth: 4 },
+    })
+    expect(typed.cavityRange).toBeUndefined()
+    expect(defined(typed.volumeBehindBullet).value).toBeCloseTo(v + cone(4) - cone(rc), 9)
+    expect(typed.volumeBehindBullet?.tag).toBe('derived')
+  })
 })
 
 describe('intrusion', () => {

@@ -106,6 +106,8 @@
 ./bullet bulletProfile
 ./bullet bulletScreenEm
 ./bullet bulletSymbols
+./bullet cavityDepthBracket
+./bullet cavityVolumeBracket
 ./bullet copperDensity
 ./bullet jacketedDensity
 ./bullet leadDensity

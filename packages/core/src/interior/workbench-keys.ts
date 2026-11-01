@@ -46,6 +46,7 @@ const otherKeys = [
   'bulletBaseLength',
   'bulletBaseDiameter',
   'bulletCavityDiameter',
+  'bulletCavityDepth',
 ] as const
 
 /** Every key a load keeps: `interiorValueKeys` and the keys the interior solver does not take. */

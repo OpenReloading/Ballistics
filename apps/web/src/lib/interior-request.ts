@@ -24,6 +24,8 @@ export interface InteriorSources {
   grooveDiameter?: number | undefined
   /** The bullet record's length, mm. */
   bulletLength?: number | undefined
+  /** The volume tolerance that covers the cavity depth of a hollow base (`cavityVolumeFraction`). */
+  volumeFraction?: number | undefined
 }
 
 /** The bore resistance of a run: the record's law, else what a link carried of it, with what the law could not apply. */
@@ -73,6 +75,7 @@ export function interiorRequest(s: InteriorSources) {
   const { resistance, missing } = resistanceFor(s, body)
   const applied = overrideResistance(resistance, values)
   if (applied) body.load.resistance = applied
+  if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
   const sensitivity = powder?.temperatureSensitivity
   if (sensitivity)
     body.load.propellant.temperatureSensitivity = {

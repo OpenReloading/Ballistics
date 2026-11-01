@@ -34,7 +34,9 @@ function label(type: string, t: Translator['t']) {
 /** The typed base dimensions a base form cannot have. */
 function foreignKeys(type: BaseType | undefined) {
   return baseDimensionKeys.filter((key) =>
-    key === 'bulletCavityDiameter' ? !hollowBased(type) : !boatTailed(type),
+    key === 'bulletCavityDiameter' || key === 'bulletCavityDepth'
+      ? !hollowBased(type)
+      : !boatTailed(type),
   )
 }
 

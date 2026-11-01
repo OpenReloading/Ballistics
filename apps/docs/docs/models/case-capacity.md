@@ -63,7 +63,7 @@ with $z_\mathrm{lo} < z_\mathrm{hi}$ the ends of segment $k$ in z, $r_\mathrm{lo
 
 A hollow base (`conical-hollow-base`, `rounded-hollow-base`) has a cavity open to the powder in the base face, of the diameter $2 r_c$ where it opens. The base face may sit on a boat tail described by the tail length, base diameter and angle, else it is flat. The cavity is not bullet volume: it enters the profile as the falling segments above, so $V_b$ is the metal below the mouth and the cavity inside the mouth is free volume behind the bullet.
 
-The depth of the cavity is not an input. A depth would be a second dimension that only a section cut gives, while the diameter at the opening is printed or measured on the base. The depth follows from the shape instead: a cone of half angle 45° ($h = r_c$), or a hemisphere ($h = r_c$). A cavity of another depth moves the result, so the volume of a bullet with a cavity is flagged approximate and the cavity is drawn dashed. The part of the cavity below the mouth, cone and hemisphere:
+No maker publishes the depth of the cavity: it is a second dimension that only a section cut or a fill gives, while the diameter at the opening is printed or measured on the base. Without a given depth it follows from the shape: a cone of half angle 45° ($h = r_c$), or a hemisphere ($h = r_c$). A cavity of another depth moves the result, so the volume of a bullet with a cavity of assumed depth is flagged approximate, the cavity is drawn dashed, and the depth carries the bracket of [Cavity depth](#cavity-depth). The part of the cavity below the mouth, cone and hemisphere:
 
 $$
 V_\mathrm{cone}(c) = \frac{\pi}{3} r_c^2 h \left(1 - \left(1 - \frac{c}{h}\right)^3\right), \qquad V_\mathrm{hemi}(c) = \pi \left(r_c^2 c - \frac{c^3}{3}\right), \qquad c \le h = r_c
@@ -79,9 +79,21 @@ $$
 
 Code: `packages/drawing/src/seating/seating.ts`, `intrusion`, `seat`, `packages/drawing/src/bullet/outline.ts`, `revolutionVolume`.
 
+#### Cavity depth
+
+A depth $h$ given with the cavity (`base.cavityDepth` of a record, or Cavity depth typed in the Bullet card) wins over the assumed one: the cone runs from its apex at $h$ to the opening, the rounded cavity is a half ellipsoid of semi-axes $r_c$ and $h$, and neither is flagged approximate nor drawn dashed; the outline's note says the depth is typed. A water or wax fill gives the cavity volume $V$ in one measurement; the depth of the shape is then $h = 3V / (\pi r_c^2)$ for the cone and $h = 3V / (2 \pi r_c^2)$ for the rounded cavity.
+
+$$
+V_\mathrm{cone} = \frac{\pi}{3} r_c^2 h, \qquad V_\mathrm{ell} = \frac{2 \pi}{3} r_c^2 h
+$$
+
+Code: `packages/drawing/src/bullet/outline.ts`, `cavityGeometry`, `cavityVolumeBracket`.
+
+Without a given depth the depth is bracketed from half to three times the assumed one, $0.5\, r_c \le h \le 3\, r_c$ (`cavityDepthBracket`, an assumption without a source). At $r_c$ = 3 mm the whole cone cavity then lies between 0.014 and 0.085 cm³, around the assumed 0.028 cm³ (cone) and 0.057 cm³ (hemisphere). The seating gives the volume behind the bullet at both ends (`cavityRange` of `seat`). The workbench widens the volume tolerance of the [pressure range](interior-pressure-range.md) to the larger move of $V_b$ over the bracket, relative to the run's volume, when that is above the default 1 % and the run's volume follows the seated bullet (`apps/web/src/lib/cavity-range.ts`, `cavityVolumeFraction`, at most the 0.2 the API takes). The tolerance is symmetric, so the range covers the bracket on its wider side.
+
 A bullet without a cavity diameter, whatever its base type, is drawn and counted as before. A hollow base type without a cavity diameter is drawn with a flat face and a note.
 
-The workbench takes the base type, the boat-tail length, the base face diameter and the cavity diameter typed over the bullet record's (`apps/web/src/lib/bullet.ts`, `typedBullet`): the outline and $V_b$ follow them. A flat base keeps no diameter, angle or cavity, a boat tail no cavity. A typed boat-tail length drops the record's bearing length, and a typed boat-tail length or base diameter its boat-tail angle: the outline derives them from the other dimensions, which would otherwise contradict the typed value.
+The workbench takes the base type, the boat-tail length, the base face diameter, the cavity diameter and the cavity depth typed over the bullet record's (`apps/web/src/lib/bullet.ts`, `typedBullet`): the outline and $V_b$ follow them. A flat base keeps no diameter, angle or cavity, a boat tail no cavity. A typed boat-tail length drops the record's bearing length, and a typed boat-tail length or base diameter its boat-tail angle: the outline derives them from the other dimensions, which would otherwise contradict the typed value.
 
 ### Volume behind the bullet
 
@@ -93,7 +105,7 @@ Code: `packages/drawing/src/seating/seating.ts`, `seat` (`volumeBehindBullet`).
 
 No volume behind the bullet is given, with a note, when the seating depth is above the case length (the base would sit behind the case head) or when $V_c \le 0$ (the bullet below the mouth takes the whole case volume).
 
-The value is flagged approximate when the part of the outline below the mouth rests on an assumed proportion, or when the bullet has a cavity and any of it is below the mouth.
+The value is flagged approximate when the part of the outline below the mouth rests on an assumed proportion, or when the bullet has a cavity of assumed depth and any of it is below the mouth.
 
 At fixed COAL a bullet length error $\Delta L$ moves the seating depth by $\Delta L$, and every slice of the bullet, a cavity taken off, is at most the cylinder of the bullet diameter $d$, so
 
@@ -179,7 +191,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 | $c$ | Length of the bullet below the mouth | mm | mm |
 | $V_b$ | Bullet volume below the mouth | no kind | cm³ |
 | $r_c$, $h$ | Radius of the cavity at the base face, its depth | mm | mm |
-| $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere), the whole cavity | no kind | mm³ |
+| $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{ell}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere, half ellipsoid), the whole cavity | no kind | mm³ |
 | $\sigma_k$ | Sign of segment $k$ of the profile: rising $+1$, falling $-1$ | 1 | 1 |
 | $V_c$ | Chamber volume behind the bullet | no kind | cm³ (m³ in `core`) |
 | $d$ | Bullet diameter | mm | mm |
@@ -195,7 +207,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 - The default convention of a capacity record without `convention`: the water fills the case to the mouth, at 20 °C. The primer state is not part of the default: `caseCondition` does not define one.
 - The bullet is a solid of revolution with the outline `bulletOutline` builds. Missing dimensions take stated proportions, which the notes name.
-- The cavity of a hollow base is a cone of half angle 45° or a hemisphere, as deep as its radius, and it is empty: no wad or lubricant in it.
+- The cavity of a hollow base is a cone or a half ellipsoid, as deep as its radius unless a depth is given, and it is empty: no wad or lubricant in it.
 - Only the mouth position bounds the bullet volume. The neck diameter and the case wall do not enter.
 - The case does not change its volume with pressure or temperature.
 
@@ -205,7 +217,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
 - The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/drawing/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
-- A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
+- Without a given depth the cavity is as deep as its radius, with the bracket of half to three times that depth in the pressure range only, not in the drawn outline. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.
 - Effects on the capacity that were looked at and are left out:
   - Cannelure: a groove 0.002 in deep and 0.030 in wide, as in two patents on a frangible .223 bullet ([US 7,322,297 B2](../bibliography.md#us-7322297), [US 7,143,679 B2](../bibliography.md#us-7143679)), takes 1 to 7 mm³ below the mouth (unverified estimate), 0.03 to 0.23 % of a .308 case and 0.2 to 1.2 % of a 9 mm case.

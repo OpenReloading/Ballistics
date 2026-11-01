@@ -320,6 +320,11 @@
               "unit": "mm",
               "description": "The value of `bulletCavityDiameter` in mm."
             },
+            "bulletCavityDepth": {
+              "type": "number",
+              "unit": "mm",
+              "description": "The value of `bulletCavityDepth` in mm."
+            },
             "propellantEnergy": {
               "type": "number",
               "unit": "J/kg",

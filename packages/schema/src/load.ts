@@ -19,6 +19,7 @@ const kinds = {
   bulletBaseLength: 'length',
   bulletBaseDiameter: 'length',
   bulletCavityDiameter: 'length',
+  bulletCavityDepth: 'length',
   propellantEnergy: 'specificEnergy',
   gamma: 'dimensionless',
   density: 'density',

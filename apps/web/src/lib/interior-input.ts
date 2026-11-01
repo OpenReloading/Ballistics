@@ -217,7 +217,19 @@ export const bulletFields = [
   {
     key: 'bulletCavityDiameter',
     label: msg('Cavity diameter'),
-    help: msg('Opening of the hollow base. Its depth follows from it.'),
+    help: msg(
+      'Opening of the hollow base. Its depth follows from it unless Cavity depth is given.',
+    ),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletCavityDepth',
+    label: msg('Cavity depth'),
+    help: msg(
+      'Measured depth of the hollow base from the base face. Empty: as deep as the opening is wide at its radius, an assumption whose range the pressure range covers.',
+    ),
     quantity: 'length',
     min: 0,
     positive: true,
@@ -238,7 +250,13 @@ export function burnFormError(
 
 export type InteriorKey = (typeof interiorFields)[number]['key']
 
-export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string | undefined }
+export type InteriorBody = {
+  model: 'm3'
+  load: InteriorLoad
+  cartridge?: string | undefined
+  /** Tolerances of the pressure range the run sets apart from the defaults. */
+  tolerances?: { volumeFraction: number } | undefined
+}
 
 /**
  * `POST /interior` body from SI field values; the mapping is `interiorLoad` of core, shared with

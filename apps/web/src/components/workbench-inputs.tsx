@@ -1024,6 +1024,7 @@ function BaseFormFields() {
       {boatTailed(type) && <BulletValueField name="bulletBaseLength" />}
       {boatTailed(type) && <BulletValueField name="bulletBaseDiameter" />}
       {hollowBased(type) && <BulletValueField name="bulletCavityDiameter" />}
+      {hollowBased(type) && <BulletValueField name="bulletCavityDepth" />}
     </>
   )
 }
@@ -1613,11 +1614,22 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   const { ok, stale } = useResult()
   // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
   // record's, so a typed length (which they would no longer add up to) stays out
-  const { bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter } =
-    bulletValues
+  const {
+    bulletDiameter,
+    bulletBaseLength,
+    bulletBaseDiameter,
+    bulletCavityDiameter,
+    bulletCavityDepth,
+  } = bulletValues
   const seatValues = useMemo(
-    () => ({ bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter }),
-    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter],
+    () => ({
+      bulletDiameter,
+      bulletBaseLength,
+      bulletBaseDiameter,
+      bulletCavityDiameter,
+      bulletCavityDepth,
+    }),
+    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter, bulletCavityDepth],
   )
   // the figure draws the selected step of a seating ladder while its result is current
   const seatingStep = ok?.steps[ok.selected]?.seating
