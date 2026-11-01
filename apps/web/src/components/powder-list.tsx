@@ -68,12 +68,12 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     () => items.filter((r) => inOrigins(r, filters.sources) && powderMatches(r, filters.query)),
     [items, filters],
   )
-  const byId = useMemo(() => new Map(items.map((r) => [r.id, r])), [items])
+  const ids = useMemo(() => new Set(items.map((r) => r.id)), [items])
   const [picked, , replace] = usePicks(
     maxOverlay,
     state.compareIds,
     (pick) => set({ compareIds: pick }),
-    (id) => byId.has(id),
+    (id) => ids.has(id),
   )
 
   const query = state.query.trim()

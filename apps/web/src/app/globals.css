@@ -10634,11 +10634,11 @@ main .page-bar h1 {
   }
 
   /* after the count (margin from the rule of the status line's parts), which steps aside */
-  .page-bar-status > .bar-count + .selection-summary:not(:empty) {
+  .page-bar-status > .bar-count + .selection-summary {
     margin-inline-start: 0;
   }
 
-  .page-bar-status:has(.selection-summary:not(:empty)) > .bar-count {
+  .page-bar-status:has(> .selection-summary[data-picked]) > .bar-count {
     position: absolute;
     width: 1px;
     height: 1px;

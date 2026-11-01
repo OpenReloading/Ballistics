@@ -103,14 +103,17 @@ export function BulletList({
     [items, system],
   )
   const cell = (b: BulletRow) => cells.get(b.id) ?? bulletCells(b, system)
-  const byId = useMemo(() => new Map(items.map((b) => [b.id, b])), [items])
+  const ids = useMemo(() => new Set(items.map((b) => b.id)), [items])
+  // the Type column's text, once per row and language: also its sort key
+  const types = useMemo(() => new Map(items.map((b) => [b.id, bulletTypeText(t, b)])), [items, t])
+  const typeOf = (b: BulletRow) => types.get(b.id) ?? bulletTypeText(t, b)
   // the bullets ticked for Compare, in the order ticked: the compare view's columns. A bullet
   // record's Compare (`compareFrom`) links with that bullet ticked
   const [picked, , replace] = usePicks(
     maxComparedBullets,
     state.compareIds,
     (pick) => set({ compareIds: pick }),
-    (id) => byId.has(id),
+    (id) => ids.has(id),
   )
 
   const on = readOrigins(state.sources)
@@ -136,7 +139,7 @@ export function BulletList({
       key: 'cal',
       label: msg('Caliber'),
       width: '4.5rem',
-      value: (b) => b.diameter,
+      // no sort of its own: Diameter sorts by the same value
       cell: (b) => cell(b).caliber,
     },
     {
@@ -204,8 +207,8 @@ export function BulletList({
       help: msg('Tip and base of the bullet, as the record gives them.'),
       width: '11rem',
       wide: true,
-      value: (b) => bulletTypeText(t, b) || undefined,
-      cell: (b) => bulletTypeText(t, b),
+      value: (b) => typeOf(b) || undefined,
+      cell: typeOf,
     },
     ...(counts.user > 0 ? [sourceColumn<BulletRow>(productLabel, removeRow)] : []),
   ]
@@ -218,7 +221,7 @@ export function BulletList({
       c.caliber,
       c.mass && `${c.mass} ${system.mass.symbol}`,
       bc && ballisticCoefficientText(bc),
-      bulletTypeText(t, b),
+      typeOf(b),
     ]
       .filter(Boolean)
       .join(' · ')

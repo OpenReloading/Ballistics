@@ -87,26 +87,40 @@ it('names the type by tip and base, and the construction by structure or core', 
   expect(bulletTypeText(de.t, b({ tipType: 'hollow-point', baseType: 'boat-tail' }))).toBe(
     'Hohlspitze, Bootsheck',
   )
+  // a structure that ends in "-core" is no core material
+  const deBuild = translator(
+    { 'cup-and-core': 'Mantel mit Kern', lead: 'Blei', '{material} core': 'Kern aus {material}' },
+    'de',
+  )
+  expect(constructionText(deBuild.t, 'cup-and-core')).toBe('Mantel mit Kern')
+  expect(constructionText(deBuild.t, 'lead-core')).toBe('Kern aus Blei')
 })
 
-it("takes a design's tip, base, construction and lead-free from its record", () => {
+it("takes a design's first G1 and G7, tip, base, construction and lead-free from its record", () => {
   expect(
     bulletKinds({
       tip: { type: 'polymer-tip' },
       base: { type: 'boat-tail' },
       construction: { raw: 'Copper', structure: 'monolithic', core: { material: 'copper' } },
+      ballisticCoefficients: [
+        { dragModel: 'G7', value: 0.3 },
+        { dragModel: 'G7', value: 0.28 },
+      ],
     }),
   ).toEqual({
+    ballisticCoefficientG1: null,
+    ballisticCoefficientG7: 0.3,
     tipType: 'polymer-tip',
     baseType: 'boat-tail',
     construction: 'monolithic',
     leadFree: true,
   })
   expect(bulletKinds({ construction: { raw: 'Lead core', core: { material: 'lead' } } })).toEqual({
+    ballisticCoefficientG1: null,
+    ballisticCoefficientG7: null,
     construction: 'lead-core',
     leadFree: false,
   })
-  expect(bulletKinds({})).toEqual({})
 })
 
 it('filters by construction, tip, base and lead-free, and leaves out a filter of one value', () => {

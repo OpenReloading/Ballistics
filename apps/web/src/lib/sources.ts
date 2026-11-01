@@ -95,8 +95,6 @@ export function userBulletRows(views: readonly UserBulletView[]): BulletRow[] {
         diameter: record.diameter.value,
         mass: record.mass?.value ?? null,
         length: record.length?.value ?? null,
-        ballisticCoefficientG1: null,
-        ballisticCoefficientG7: null,
         ...bulletKinds(record),
       },
     ]

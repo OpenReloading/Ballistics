@@ -1,5 +1,13 @@
 /** The bullet list's rows: search text, filters, cells, the BC column and the packed page props. */
-import { type Bullet, fold, leadFree, score, searchKey, toSi } from '@open-reloading/schema'
+import {
+  type Bullet,
+  constructionFields,
+  fold,
+  leadFree,
+  score,
+  searchKey,
+  toSi,
+} from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { BulletSummary } from './api-types.ts'
@@ -230,14 +238,26 @@ function constructionKey(c: Bullet['construction']) {
   return c?.structure ?? (material ? `${material}-core` : undefined)
 }
 
-/** The list fields a bullet record gives a design's row: tip, base, construction and lead-free. */
-export const bulletKinds = (b: Pick<Bullet, 'tip' | 'base' | 'construction'>) =>
-  present({
+/** The record's first coefficient of drag model `model`, lb/in², as the list item gives it. */
+const firstCoefficient = (b: Pick<Bullet, 'ballisticCoefficients'>, model: 'G1' | 'G7') =>
+  b.ballisticCoefficients?.find((c) => c.dragModel === model)?.value ?? null
+
+/**
+ * The list fields a bullet record gives a design's row as the API gives a catalogue item: the
+ * first G1 and G7, tip, base, construction and lead-free.
+ */
+export const bulletKinds = (
+  b: Pick<Bullet, 'tip' | 'base' | 'construction' | 'ballisticCoefficients'>,
+) => ({
+  ballisticCoefficientG1: firstCoefficient(b, 'G1'),
+  ballisticCoefficientG7: firstCoefficient(b, 'G7'),
+  ...present({
     tipType: b.tip?.type ?? null,
     baseType: b.base?.type ?? null,
     construction: constructionKey(b.construction) ?? null,
     leadFree: leadFree(b.construction) ?? null,
-  })
+  }),
+})
 
 const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
@@ -245,9 +265,12 @@ const capitalised = (text: string) => text.charAt(0).toUpperCase() + text.slice(
 const kindWord = (t: Translator['t'], value: string) =>
   say(t, rawWording(value)).replaceAll('-', ' ')
 
+const structures = new Set<string>(constructionFields.shape.structure.unwrap().options)
+
 /** A list item's construction as a name: "Cup and core", "Lead core". */
 export function constructionText(t: Translator['t'], value: string) {
-  const core = /^(.+)-core$/.exec(value)?.[1]
+  // a structure ("cup-and-core") is no core material
+  const core = structures.has(value) ? undefined : /^(.+)-core$/.exec(value)?.[1]
   return capitalised(
     core ? t('{material} core', { material: say(t, spacedWording(core)) }) : kindWord(t, value),
   )

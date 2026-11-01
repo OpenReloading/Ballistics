@@ -49,24 +49,23 @@ export function SelectionSummary({
     focusSearch()
   }
   return (
-    <span aria-live="polite" className="selection-summary">
+    <span className="selection-summary" data-picked={count > 0 || undefined}>
+      {/* only the text is live: the button is no news */}
+      <span aria-live="polite" className="selection-count">
+        {count > 0 && t('{count} selected (max {max})', { count, max })}
+      </span>
       {count > 0 && (
-        <>
-          <span className="selection-count">
-            {t('{count} selected (max {max})', { count, max })}
-          </span>
-          <Button
-            className="clear-picks"
-            variant="subtle"
-            size={controlSize.row.button}
-            px={6}
-            aria-label={t('Clear selection')}
-            leftSection={<X size={12} aria-hidden="true" />}
-            onClick={clear}
-          >
-            <span className="clear-picks-text">{t('Clear')}</span>
-          </Button>
-        </>
+        <Button
+          className="clear-picks"
+          variant="subtle"
+          size={controlSize.row.button}
+          px={6}
+          aria-label={t('Clear selection')}
+          leftSection={<X size={12} aria-hidden="true" />}
+          onClick={clear}
+        >
+          <span className="clear-picks-text">{t('Clear')}</span>
+        </Button>
       )}
     </span>
   )
