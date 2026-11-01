@@ -5,14 +5,14 @@ exports[`adds the detail letters on screen without changing the frame or any oth
   "cartridge A 10": 168,
   "cartridge A 2": 9,
   "cartridge A 20": 26,
-  "cartridge A 5": 318,
-  "chamber A 10": 335,
+  "cartridge A 5": 319,
+  "chamber A 10": 336,
   "chamber A 2": 40,
   "chamber A 20": 56,
   "chamber A 5": 116,
   "chamber B 10": 48,
   "chamber B 2": 91,
-  "chamber B 20": 206,
+  "chamber B 20": 207,
   "chamber B 5": 99,
   "chamber B 50": 98,
 }
@@ -20,7 +20,7 @@ exports[`adds the detail letters on screen without changing the frame or any oth
 
 exports[`counts the chamber recess steps and lists the other outline features under 1 px at 390 px 1`] = `
 {
-  "recess": 211,
+  "recess": 212,
   "small": [
     [
       "cip-10-3-x-60-r-2025-05-13",
