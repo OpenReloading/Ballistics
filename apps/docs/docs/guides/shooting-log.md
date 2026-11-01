@@ -59,7 +59,7 @@ Under the entries, **Yearly summary** adds up the entries of one calendar year: 
 - **Rounds per firearm**: the rounds and entries of each firearm, most rounds first. Entries without a firearm count on a row of their own.
 - **Rounds per cartridge**: the cartridge of the entry's saved load, or of the load's firearm when the load names no cartridge. An entry without a saved load (factory ammunition) counts under its firearm only, and a line under the table gives its rounds.
 - **Range days per month**: the entries of each month.
-- **Competitions**: the [competition events](competition-events.md) dated in the year, each once, with its day, name, total and the number of entries that link it.
+- **Competitions**: the [competition events](competition-events.md) dated in the year, each once, with its day, name, total and the number of the year's entries that link it. **Summary year** also offers a year with events but no entries.
 
 **Print summary** prints the summary alone. **Export summary CSV** writes `openreloading-shooting-log-<year>-summary.csv` (UTF-8 with a byte order mark) with the same numbers as the screen and the print: a row `Year`, then a header and one row per total.
 
@@ -67,5 +67,5 @@ Under the entries, **Yearly summary** adds up the entries of one calendar year: 
 | --- | --- |
 | `Section` | `Firearm`, `Cartridge`, `Without a load`, `Month`, `Competition` or `Total`. |
 | `Name` | The firearm's or cartridge's name, the month as `YYYY-MM`, or the competition event's day (`YYYY-MM-DD`) and name; empty for `Without a load`, for `Total` and for entries without a firearm or a known cartridge. |
-| `Rounds` | Rounds fired (for a competition event, of the entries that link it); empty for a month. |
+| `Rounds` | Rounds fired (for a competition event, of the year's entries that link it); empty for a month. |
 | `Entries` | Entries; empty for `Without a load`. |

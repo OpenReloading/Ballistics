@@ -56,6 +56,7 @@ import {
   userIdOf,
   withEntryRounds,
 } from '../lib/shooting-log.ts'
+import { summaryYears } from '../lib/shooting-log-summary.ts'
 import { controlSize } from '../lib/theme.ts'
 import { parseUserDataFile, planImport, reasonText } from '../lib/user-data.ts'
 import {
@@ -1037,7 +1038,7 @@ export function ShootingLog() {
         <LogSummary
           entries={data.entries}
           records={data.records}
-          years={logYears(data.entries)}
+          years={summaryYears(data.entries, data.events)}
           year={lf.row.year}
           firearmName={names.firearm}
         />

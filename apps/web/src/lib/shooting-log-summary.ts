@@ -35,7 +35,7 @@ export interface YearSummary {
   withoutLoad: number
   /** Entries (range days) per month, January first: 12 counts. */
   months: number[]
-  /** The competition events dated in the year, by date, each with the log entries that link it. */
+  /** The competition events dated in the year, by date, each with the entries of the year that link it. */
   events: { event: EventRecord; entries: ShootingLogRecord[] }[]
 }
 
@@ -106,10 +106,19 @@ export function yearSummary(
       .sort((a, b) => a.data.date.localeCompare(b.data.date))
       .map((event) => ({
         event,
-        entries: entries.filter((r) => r.data.event === `user:${event.id}`),
+        entries: shown.filter((r) => r.data.event === `user:${event.id}`),
       })),
   }
 }
+
+/** The years with entries or competition events, latest first: the years the summary offers. */
+export const summaryYears = (
+  entries: readonly ShootingLogRecord[],
+  events: readonly EventRecord[],
+) =>
+  [...new Set([...entries, ...events].map((r) => entryYear(r.data)))].sort((a, b) =>
+    b.localeCompare(a),
+  )
 
 /** The names the summary shows for its references. */
 export interface SummaryNames {

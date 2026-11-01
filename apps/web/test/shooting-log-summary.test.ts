@@ -5,6 +5,7 @@ import {
   summaryCsv,
   summaryFileName,
   summaryRows,
+  summaryYears,
   yearSummary,
 } from '../src/lib/shooting-log-summary.ts'
 
@@ -127,6 +128,14 @@ describe('yearSummary', () => {
     expect(yearSummary(entries, records, '2025').events.map((e) => e.event.name)).toEqual([
       'Winter cup',
     ])
+    // an entry of another year that links the event is not counted under it
+    const late = entry(8, { date: '2027-01-02', rounds: 7, event: `user:${match}` })
+    expect(yearSummary([...entries, late], records, '2026').events[0]?.entries).toHaveLength(1)
+  })
+
+  it('offers the years of the entries and of the events', () => {
+    const events = records.filter((r) => r.kind === 'event')
+    expect(summaryYears(entries.slice(1, 2), events as never)).toEqual(['2026', '2025'])
   })
 })
 
