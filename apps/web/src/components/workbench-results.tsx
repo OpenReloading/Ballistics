@@ -21,6 +21,7 @@ import { LotPanel } from './lot-rows.tsx'
 import { NavIcon } from './nav-icons.tsx'
 import { chartCopy } from './print-report.tsx'
 import { ResultNotes } from './result-notes.tsx'
+import { RunDownloads } from './run-downloads.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { useInputEcho, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
@@ -184,6 +185,14 @@ const ResultChart = memo(function ResultChart() {
       strip={strip}
       playKey={`${ok.id} ${ok.selected}`}
       z1={z1}
+      downloads={
+        <RunDownloads
+          body={ok.body}
+          charge={ok.load.charge}
+          mass={ok.load.bullet.mass}
+          system={system}
+        />
+      }
     />
   )
 })
