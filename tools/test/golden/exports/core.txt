@@ -43,7 +43,10 @@
 . DynamicStabilityInput
 . Ellipse
 . EstimatedInput
+. EventClaims
+. EventMismatch
 . EventTotals
+. EventTypeOffer
 . Firearm
 . FiringSite
 . FittedPowderParameter
@@ -289,6 +292,7 @@
 . earthRotationRate
 . ellipseProbability
 . estimateDragFromOutline
+. eventMismatches
 . fQuantileTwoNumeratorDegrees
 . fillLoadRatioLimit
 . fitPowder

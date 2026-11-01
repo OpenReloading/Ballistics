@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  eventMismatches,
   type HitFactorRules,
   hitFactor,
   type PracticalStage,
@@ -112,5 +113,52 @@ describe('input checks', () => {
     expect(() => stageRawPoints(stage({ hits: { A: 1.5, C: 0, D: 0 } }), ipsc)).toThrow('count')
     expect(() => ringTotal({})).toThrow('shots or its total')
     expect(() => ringTotal({ shots: [-1] })).toThrow('ring value')
+  })
+})
+
+describe('eventMismatches', () => {
+  const type = (id: string) =>
+    JSON.parse(
+      readFileSync(
+        new URL(`../../../data/records/event-types/${id}.json`, import.meta.url),
+        'utf8',
+      ),
+    )
+  const practical = (powerFactor: 'major' | 'minor') => ({
+    method: 'hit-factor' as const,
+    stages: [{ powerFactor }],
+  })
+
+  it('accepts an event that fits its type', () => {
+    const fits = { level: 'Level II', division: 'Open', results: practical('major') }
+    expect(eventMismatches(fits, type('ipsc-handgun'))).toEqual([])
+    const ring = { level: 'Landesmeisterschaft', results: { method: 'rings' as const } }
+    expect(eventMismatches(ring, type('dsb-meisterschaft'))).toEqual([])
+  })
+
+  it('names a foreign level, results of another method, an unknown division and major without a major rating', () => {
+    const ipsc = type('ipsc-handgun')
+    expect(eventMismatches({ level: 'Nationals', results: practical('minor') }, ipsc)).toEqual([
+      { problem: 'level', level: 'Nationals' },
+    ])
+    expect(
+      eventMismatches({ level: 'Level I', results: { method: 'rings' as const } }, ipsc),
+    ).toEqual([{ problem: 'method', method: 'rings' }])
+    expect(
+      eventMismatches({ level: 'Level I', division: 'Limited', results: practical('minor') }, ipsc),
+    ).toEqual([{ problem: 'division', division: 'Limited' }])
+    expect(
+      eventMismatches(
+        { level: 'Level I', division: 'Production', results: practical('major') },
+        ipsc,
+      ),
+    ).toEqual([{ problem: 'major', division: 'Production', stage: 0 }])
+  })
+})
+
+describe('an event without results', () => {
+  it('has no total, by rings or by hit factor', () => {
+    expect(ringEventTotals([], 'completed')).toEqual({ parts: [] })
+    expect(practicalEventTotals([], ipsc, 'completed')).toEqual({ parts: [] })
   })
 })

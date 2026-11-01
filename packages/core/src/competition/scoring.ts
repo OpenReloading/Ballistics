@@ -115,11 +115,12 @@ export interface EventTotals {
 }
 
 /**
- * The totals of a ring event: each series and their sum. A disqualified event has no total.
+ * The totals of a ring event: each series and their sum. A disqualified event, or one without
+ * series, has no total.
  */
 export function ringEventTotals(series: readonly RingSeries[], state: ResultState): EventTotals {
   const parts = series.map(ringTotal)
-  if (state === 'disqualified') return { parts }
+  if (state === 'disqualified' || parts.length === 0) return { parts }
   return { total: parts.reduce((sum, p) => sum + Math.round(p * 10), 0) / 10, parts }
 }
 
@@ -137,4 +138,52 @@ export function practicalEventTotals(
   const typed = parts.every((p) => p.stagePoints !== undefined)
   if (state === 'disqualified' || !typed || parts.length === 0) return { parts }
   return { total: parts.reduce((sum, p) => sum + (p.stagePoints ?? 0), 0), parts }
+}
+
+/** What an event type offers an event: its levels, scoring method and, for hit factor, its divisions. */
+export interface EventTypeOffer {
+  levels: readonly string[]
+  scoring:
+    | { method: 'rings' }
+    | {
+        method: 'hit-factor'
+        powerFactors: readonly { division: string; major?: number | undefined }[]
+      }
+}
+
+/** What an event records that its type has to know. */
+export interface EventClaims {
+  level: string
+  division?: string | undefined
+  results:
+    | { method: 'rings' }
+    | { method: 'hit-factor'; stages: readonly Pick<PracticalStage, 'powerFactor'>[] }
+}
+
+/** A way an event does not fit its type. */
+export type EventMismatch =
+  | { problem: 'level'; level: string }
+  | { problem: 'method'; method: string }
+  | { problem: 'division'; division: string }
+  | { problem: 'major'; division: string; stage: number }
+
+/**
+ * Where an event does not fit its event type: a level the type does not name, results of another
+ * scoring method, a division the type does not name, or a stage scored major in a division without
+ * a major rating. Empty when it fits. The scoring above trusts these; a caller checks first.
+ */
+export function eventMismatches(event: EventClaims, type: EventTypeOffer): EventMismatch[] {
+  const found: EventMismatch[] = []
+  if (!type.levels.includes(event.level)) found.push({ problem: 'level', level: event.level })
+  if (event.results.method !== type.scoring.method)
+    return [...found, { problem: 'method', method: event.results.method }]
+  if (type.scoring.method !== 'hit-factor' || event.results.method !== 'hit-factor') return found
+  if (event.division === undefined) return found
+  const floor = type.scoring.powerFactors.find((p) => p.division === event.division)
+  if (!floor) return [...found, { problem: 'division', division: event.division }]
+  event.results.stages.forEach((s, stage) => {
+    if (s.powerFactor === 'major' && floor.major === undefined && event.division)
+      found.push({ problem: 'major', division: event.division, stage })
+  })
+  return found
 }

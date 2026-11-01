@@ -4543,13 +4543,13 @@
                         "session": {
                           "type": "string",
                           "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$",
-                          "description": "Reference to the session."
+                          "description": "Reference to the chronograph session or competition event whose rounds were added."
                         },
                         "rounds": {
                           "type": "integer",
                           "minimum": 0,
                           "maximum": 9007199254740991,
-                          "description": "Rounds of the session added to `roundCount`."
+                          "description": "Rounds of the session or event added to `roundCount`."
                         }
                       },
                       "required": [
@@ -4558,7 +4558,7 @@
                       ],
                       "additionalProperties": false
                     },
-                    "description": "Sessions whose rounds were added to `roundCount`, the latest last, so a session is counted once."
+                    "description": "Sessions and competition events whose rounds were added to `roundCount`, the latest last, so each is counted once."
                   },
                   "noteAtRoundCount": {
                     "type": "integer",

@@ -440,13 +440,8 @@ export function withEventRounds(
   now = new Date(),
 ): UserRecord | undefined {
   if (record.kind !== 'firearm' || n < 1) return undefined
-  if (eventRoundsDue(record.data, event, rounds) < 1) return undefined
-  return withCountedRounds(
-    record,
-    event,
-    Math.min(n, eventRoundsDue(record.data, event, rounds)),
-    now,
-  )
+  const due = eventRoundsDue(record.data, event, rounds)
+  return due < 1 ? undefined : withCountedRounds(record, event, Math.min(n, due), now)
 }
 
 /** The first `<prefix><n>` not in `taken`; optic and configuration ids are local to a firearm. */

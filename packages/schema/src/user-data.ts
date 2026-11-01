@@ -261,6 +261,9 @@ const practicalStage = z.strictObject({
     .optional(),
 })
 
+/** Whether `v` is a whole number of tenths, within the rounding of a decimal number. */
+const inTenths = (v: number) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6
+
 /** One ring series: the ring value of each shot, or its total, and the scored sheet behind it. */
 const ringSeries = z
   .strictObject({
@@ -278,6 +281,16 @@ const ringSeries = z
   .refine((s) => s.shots !== undefined || s.total !== undefined, {
     message: 'A series needs its shots or its total.',
   })
+  .refine((s) => [...(s.shots ?? []), s.total ?? 0].every(inTenths), {
+    message: 'Ring values and totals are whole rings or tenths.',
+  })
+  .refine(
+    (s) =>
+      s.shots === undefined ||
+      s.total === undefined ||
+      Math.round(s.shots.reduce((sum, v) => sum + v * 10, 0)) === Math.round(s.total * 10),
+    { message: 'The total differs from the sum of the shots.', path: ['total'] },
+  )
 
 /**
  * The results of an event: ring series or practical stages, by the scoring method of its event

@@ -45,9 +45,13 @@ $$
 
 Code: `packages/core/src/competition/scoring.ts`, `ringTotal`, `ringEventTotals`.
 
+## Fit to the event type
+
+The scoring trusts that an event fits its type. `eventMismatches` (`packages/core/src/competition/scoring.ts`) names where it does not: a level the type does not list, results of another scoring method, a division the type does not list, or a stage scored major in a division without a major rating. A ring value is a whole ring or tenths, and a series that gives both its shots and its total must agree; the schema refuses anything else.
+
 ## Result state
 
-An event ends `completed`, `did-not-finish` or `disqualified`. A disqualified event has no total; the series or stages it holds are still scored one by one.
+An event ends `completed`, `did-not-finish` or `disqualified`. A disqualified event, or one without series or stages, has no total; the series or stages it holds are still scored one by one.
 
 ## Rounds for the firearm count
 

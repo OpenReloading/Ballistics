@@ -612,6 +612,19 @@ describe('competition event', () => {
     expect(userRecord.safeParse({ ...ringEvent, data: state }).success).toBe(false)
   })
 
+  it('takes ring values in tenths only and a total that agrees with the shots', () => {
+    const withSeries = (series: unknown[]) => ({
+      ...ringEvent,
+      data: { ...ringEvent.data, results: { method: 'rings', series } },
+    })
+    expect(userRecord.safeParse(withSeries([{ shots: [10.4, 9.9], total: 20.3 }])).success).toBe(
+      true,
+    )
+    expect(userRecord.safeParse(withSeries([{ shots: [9.95] }])).success).toBe(false)
+    expect(userRecord.safeParse(withSeries([{ total: 95.55 }])).success).toBe(false)
+    expect(userRecord.safeParse(withSeries([{ shots: [10, 9], total: 20 }])).success).toBe(false)
+  })
+
   it('reports a firearm, load or target sheet it names that the file does not hold', () => {
     const r = userRecord.parse(ringEvent)
     expect(checkUserRefs([r]).map((d) => d.field)).toEqual([
