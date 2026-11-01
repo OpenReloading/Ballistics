@@ -8,6 +8,15 @@ const browse = (page: Page) => loadForm(page).getByRole('button', { name: 'Brows
 const dialog = (page: Page) => page.getByRole('dialog', { name: 'Choose a bullet' })
 const box = (page: Page) => dialog(page).getByRole('combobox', { name: 'Search bullets' })
 
+/** The dialog closed with the 168 gr demo bullet chosen on the card. */
+async function chosen168(page: Page) {
+  await expect(dialog(page)).toBeHidden()
+  await expect(loadForm(page).getByRole('combobox', { name: /^Search bullets/ })).toHaveAttribute(
+    'placeholder',
+    'Demo Bullets 30 Cal 168 gr HPBT Demo',
+  )
+}
+
 test('the keyboard finds, highlights and chooses a bullet', async ({ page }) => {
   await gotoHydrated(page, '/workbench?cartridge=308-win')
   await browse(page).focus()
@@ -51,11 +60,7 @@ test('the keyboard finds, highlights and chooses a bullet', async ({ page }) => 
   await page.keyboard.press('ArrowDown')
   await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true')
   await page.keyboard.press('Enter')
-  await expect(dialog(page)).toBeHidden()
-  await expect(loadForm(page).getByRole('combobox', { name: /^Search bullets/ })).toHaveAttribute(
-    'placeholder',
-    'Demo Bullets 30 Cal 168 gr HPBT Demo',
-  )
+  await chosen168(page)
 })
 
 test('Sort by reorders the result and the focus returns to the search box', async ({ page }) => {
@@ -97,11 +102,7 @@ test('keys pressed right after typing act on the list of the typed text (#884)',
   await box(page).fill('demo')
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('Enter')
-  await expect(dialog(page)).toBeHidden()
-  await expect(loadForm(page).getByRole('combobox', { name: /^Search bullets/ })).toHaveAttribute(
-    'placeholder',
-    'Demo Bullets 30 Cal 168 gr HPBT Demo',
-  )
+  await chosen168(page)
 })
 
 test('the reopened dialog never shows the rows of the previous search (#884)', async ({ page }) => {
