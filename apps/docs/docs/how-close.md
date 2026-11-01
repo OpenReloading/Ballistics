@@ -20,10 +20,10 @@ npm run build
 node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split validation --json
 ```
 
-| Quantity | Rows | Median error | P90 error | 90 % interval coverage |
+| Quantity | Rows | Median error | P90 error | Interval coverage |
 | --- | --- | --- | --- | --- |
 | Muzzle velocity | 10,497 | 3.32 % | 8.87 % | 89.6 % |
-| Peak pressure (rows that print one in bar) | 4,060 | 15.0 % | 38.1 % | not stated |
+| Peak pressure (rows that print one in bar) | 4,060 | 15.0 % | 38.1 % | not measured |
 
 The family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows) are on the validation page. Not measured: the sealed test split, and a powder that is not in the fitted set.
 
@@ -35,8 +35,9 @@ The family lines and the [pooled powder fit](models/validation.md#pooled-powder-
 | --- | --- | --- | --- | --- |
 | Fixed 30 MPa | 2.76 % | 7.22 % | 6.16 % | 13.58 % |
 | One value per construction and class | 2.75 % | 7.18 % | 5.70 % | 12.99 % |
+| As the model runs: fixed for rifles, per construction for handguns | 2.76 % | 7.22 % | 5.70 % | 12.99 % |
 
-Muzzle velocity only. The model keeps the fixed 30 MPa for rifles and one value per construction for handguns; a barrel of 300 mm or longer counts as a rifle.
+Muzzle velocity only; a barrel of 300 mm or longer counts as a rifle. The research entry names no model version, and its powder parameters are refitted, not the records' values of the table above. No command in the repository reproduces this split yet: the rows are not in the repository and `verify` has no firearm-class grouping.
 
 ## Sources of variation of a load
 
@@ -44,21 +45,21 @@ Each line gives a size from one source, with the conditions it was measured unde
 
 | Source of variation | Size | Conditions | Source |
 | --- | --- | --- | --- |
-| Shot to shot, one load | standard deviation 7 to 14 ft/s at 2740 to 2771 ft/s, depending on the case make | .223 Rem, 77 gr bullet, 20 in barrel, 20 shots per case make | [Castleman 2023](bibliography.md#castleman-2023) |
+| Shot to shot, one load | standard deviation 7 to 14 ft/s (means 2740 to 2771 ft/s), depending on the case make | .223 Rem, 77 gr bullet, 20 in barrel, 20 shots per case make | [Castleman 2023](bibliography.md#castleman-2023) |
 | Shot to shot, handgun | no measured source found | | |
 | Powder temperature | over 0 to 125 °F, a velocity spread of 67 to 127 ft/s for IMR 4350, Reloder 19, Win 748 and IMR 4831, and of 4 to 10 ft/s for H4350, Varget and H4831SC | maker's test, .30-06, .308 and .300 Win Mag; shots per point not stated | [Hodgdon 2012](bibliography.md#hodgdon-2012) |
 | Powder lot | lots of one powder 7.9 to 15.3 ft/s (53 gr bullet) and 23.4 to 45.6 ft/s (69 gr) faster than the slowest lot | Varget in .223, 10 shots per lot | [Courtney 2015](bibliography.md#courtney-2015) |
 | Case capacity, within a lot | standard deviation 0.07 to 0.21 gr of water | .223 Rem cases of several makes, 20 per make | [Castleman 2023](bibliography.md#castleman-2023) |
-| Case capacity, between makes and lots | 0.96 gr of water between the largest and the smallest make; 1.06 % between two lots of one make | .223 Rem | [Castleman 2023](bibliography.md#castleman-2023) |
-| Case capacity, between makes | 56.8 against 56.2 gr of water | .308 Win, once-fired cases of two makes | [Courtney 2015](bibliography.md#courtney-2015) |
-| Barrel, same length | 1125 to 1181 ft/s from three 5 in barrels | 9 mm Luger, one 115 gr factory load, 3 shots per barrel | [BBTI 9 mm](bibliography.md#bbti-9mm) |
-| Barrel, factory tolerance | velocities within ±90 ft/s of the tabulated values | SAAMI test barrels, factory ammunition | [SAAMI Z299.4-2025](bibliography.md#saami-z299-4-2025) |
-| Barrel length | 20.9 to 24.6 ft/s per inch | .308 Win, four factory loads, one barrel cut from 28 to 16.5 in, 5 shots per length | [Rifleshooter 2014](bibliography.md#rifleshooter-2014) |
-| Barrel length, handgun | 948 ft/s from a 2 in and 1166 ft/s from a 5 in barrel | 9 mm Luger, one 115 gr factory load, 3 shots per barrel | [BBTI 9 mm](bibliography.md#bbti-9mm) |
+| Case capacity, between makes and lots | 0.96 gr of water between the makes with the largest and the smallest mean capacity; 1.06 % between two lots of one make | .223 Rem | [Castleman 2023](bibliography.md#castleman-2023) |
+| Case capacity, between makes | 56.8 (R-P) against 56.2 gr of water (Lapua) | .308 Win, once-fired cases | [Courtney 2015](bibliography.md#courtney-2015) |
+| Barrel, same length | 1125 to 1181 ft/s from three 5 in barrels | 9 mm Luger, one 115 gr factory load, 3 shots per barrel, measured 15 ft from the muzzle | [BBTI 9 mm](bibliography.md#bbti-9mm) |
+| Factory ammunition, velocity tolerance | within ±90 ft/s of the tabulated values | factory ammunition in SAAMI test barrels | [SAAMI Z299.4-2025](bibliography.md#saami-z299-4-2025) |
+| Barrel length | 24.6 ft/s per inch (147 gr FMJ) and 20.9 ft/s per inch (168 gr match), 22.7 on average over four factory loads | .308 Win, one barrel cut from 28 to 16.5 in, 5 shots per length | [Rifleshooter 2014](bibliography.md#rifleshooter-2014) |
+| Barrel length, handgun | 948 ft/s from a 2 in and 1166 ft/s from a 5 in barrel | 9 mm Luger, one 115 gr factory load, 3 shots per barrel, measured 15 ft from the muzzle | [BBTI 9 mm](bibliography.md#bbti-9mm) |
 | Pressure measurement method | maximum average pressure 52,000 CUP against 55,000 psi (.223 Rem), 50,000 against 60,000 (.30-06), 52,000 against 62,000 (.308 Win) | copper crusher against piezo transducer, same cartridge | [SAAMI Z299.4-2025](bibliography.md#saami-z299-4-2025) |
 | Seating depth | no primary sized source found | | |
 
-The barrel length is an input of the model, so its effect is part of a result when the length is entered; the other lines are not inputs. The case capacity enters as the chamber volume. The pressure method sets which printed pressures a result can be compared with: the crusher and piezo values above differ by a varying amount, so neither converts to the other by one factor.
+Some lines are inputs of the model: the barrel length, the case capacity (as the chamber volume), the powder temperature, and the powder lot through the burn coefficient (the [lot rows](models/interior-pressure-range.md#powder-lot-rows) move it by 3 %). Their effect is part of a result when the value is entered. Shot-to-shot spread, barrel-to-barrel differences and the pressure method are not inputs. The pressure method sets which printed pressures a result can be compared with: the crusher and piezo values above differ by a varying amount, so neither converts to the other by one factor.
 
 Primer make, moisture, ageing, suppressors, polygonal rifling, bullet coatings and jackets, and the small effects on the case capacity are listed with their sources in the Limits of the [M3 model](models/interior-m3.md#limits), [burn forms](models/interior-burn-forms.md#limits), [leakage and heat loss](models/interior-leakage-heat.md#limits) and [case capacity](models/case-capacity.md#limits) pages.
 

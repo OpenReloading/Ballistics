@@ -42,7 +42,7 @@ export function ResultNotesDialog({
         )
       })}
       {howCloseGuide && (
-        <p>
+        <p className="note">
           <Anchor href={howCloseGuide} target="_blank" rel="noopener" size="sm">
             {t('How close a result is')}
           </Anchor>
