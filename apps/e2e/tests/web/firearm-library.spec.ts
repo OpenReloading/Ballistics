@@ -119,6 +119,14 @@ test('the firearm table fits a 1280 px window with its row menu, one save status
   expect(await box.evaluate((b) => b.scrollWidth > b.clientWidth)).toBe(true)
   await expect(row.getByRole('button', { name: 'Actions for Bench rifle' })).toBeInViewport()
   await page.setViewportSize({ width: 1280, height: 650 })
+  // a focused row's ring runs around the sticky menu cell, and the menu opens with a click
+  await row.getByRole('link', { name: 'Bench rifle', exact: true }).focus()
+  await page.keyboard.press('Shift+Tab')
+  await page.keyboard.press('Tab')
+  await expect(row.locator('td.sticky-end')).toHaveCSS('box-shadow', /-2px 0px 0px 0px inset/)
+  await row.getByRole('button', { name: 'Actions for Bench rifle' }).click()
+  await expect(page.getByRole('menu')).toBeVisible()
+  await page.keyboard.press('Escape')
   // Save without a name: one status, the refusal in the state's place, gone with the name
   await page.getByRole('button', { name: 'New firearm' }).click()
   const status = page.locator('.page-bar-status .file-status')

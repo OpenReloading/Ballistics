@@ -1,6 +1,8 @@
 import { interiorBody } from '@open-reloading/api/compute'
 import { powder } from '@open-reloading/schema'
-import { tuneBaseKey, tuneLoadKey, tuneTableKey } from './powder-tune.ts'
+import { fetchRecord } from './api-fetch.ts'
+import type { CartridgeDetail } from './api-types.ts'
+import { tuneBaseKey, tuneCartridgeKey, tuneLoadKey, tuneTableKey } from './powder-tune.ts'
 
 /**
  * The load the workbench handed over for load `load` (a reference), parsed as the workbench's run
@@ -39,4 +41,24 @@ export function readTuneTable(load: string) {
   } catch {
     return
   }
+}
+
+/**
+ * The CIP table of the cartridge record of the load handed over for load `load`: the table handed
+ * over, else that of the cartridge record whose id was handed over while it was still loading,
+ * fetched (as the workbench's run does); undefined when there is neither or the record has none.
+ */
+export async function tuneTable(load: string, signal?: AbortSignal) {
+  const handed = readTuneTable(load)
+  if (handed !== undefined) return handed
+  let id: unknown
+  try {
+    const text = sessionStorage.getItem(tuneCartridgeKey(load))
+    id = text === null ? undefined : JSON.parse(text)
+  } catch {
+    return
+  }
+  if (typeof id !== 'string') return
+  const record = await fetchRecord<CartridgeDetail>('cartridges', id, signal).catch(() => undefined)
+  return record?.table
 }

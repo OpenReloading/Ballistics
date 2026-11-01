@@ -41,7 +41,7 @@ import {
   tunePowder,
   tuneSessionIds,
 } from '../lib/powder-tune.ts'
-import { readTuneBase, readTuneLoad, readTuneTable } from '../lib/tune-load.ts'
+import { readTuneBase, readTuneLoad, tuneTable } from '../lib/tune-load.ts'
 import { type Quantity, withUnit } from '../lib/units.ts'
 import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { userRef } from '../lib/variants.ts'
@@ -686,7 +686,6 @@ export function PowderTune() {
           setLoaded(found)
           if (!found.load) return
           setInterior(readTuneLoad(found.load))
-          setTable(readTuneTable(found.load))
           const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
           const base = readTuneBase(found.load)
           const sessions = own.map((r) => r.id)
@@ -706,6 +705,19 @@ export function PowderTune() {
         .then(({ records }) => setChoices(loadsWithPowder(records, powder)))
         .catch(() => setChoices([]))
   }, [])
+
+  // the table handed over, else that of a cartridge record handed over while it was loading
+  const load = loaded?.load
+  useEffect(() => {
+    if (!load) return
+    const aborts = new AbortController()
+    tuneTable(load, aborts.signal)
+      .then((t) => {
+        if (!aborts.signal.aborted) setTable(t)
+      })
+      .catch(() => {})
+    return () => aborts.abort()
+  }, [load])
 
   const c = system.charge
   const v = system.velocity

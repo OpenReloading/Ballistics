@@ -103,12 +103,32 @@ describe('checkDesign', () => {
     expect('powder' in checkDesign(d, id)).toBe(true)
   })
 
-  it('shows the zod message at the field of a value out of range', () => {
+  it('says a value out of range in plain words with its limit, at its field', () => {
     const built = checkDesign(typed(draft(), 'interior.gamma', '0.9'), id)
     if (!('problems' in built)) throw new Error('built a powder')
     const at = built.problems.filter((p) => p.key === 'interior.gamma')
-    expect(at).toHaveLength(1)
-    expect(defined(at[0]).message).toMatch(/>\s*1/)
+    expect(at).toEqual([{ key: 'interior.gamma', message: 'Gamma must be above 1.' }])
+  })
+
+  it('says an ingredient percentage above 100 in plain words', () => {
+    const start = draft()
+    const row = defined(start.rows[0]).id
+    const built = checkDesign(typed(start, `comp.${row}.max`, '120'), id)
+    if (!('problems' in built)) throw new Error('built a powder')
+    expect(built.problems).toContainEqual({
+      key: `comp.${row}.max`,
+      message: 'Ingredient 1 max percent must be at most 100.',
+    })
+    expect(built.problems.every((p) => !/expected|Too big/.test(p.message))).toBe(true)
+  })
+
+  it('refuses a vivacity that is not above 0', () => {
+    const built = checkDesign(typed(draft(), 'interior.vivacity.value', '-3'), id)
+    if (!('problems' in built)) throw new Error('built a powder')
+    expect(built.problems).toContainEqual({
+      key: 'interior.vivacity.value',
+      message: 'Vivacity must be greater than 0.',
+    })
   })
 
   it('shows the zod message at the field of a burn form the schema refuses', () => {
@@ -129,7 +149,9 @@ describe('checkDesign', () => {
     )
     const built = checkDesign(d, id)
     if (!('problems' in built)) throw new Error('built a powder')
-    const required = built.problems.filter((p) => p.message === 'Required.').map((p) => p.key)
+    const required = built.problems
+      .filter((p) => p.message.startsWith('Enter a number for '))
+      .map((p) => p.key)
     expect(required).toContain('interior.vivacity.value')
     expect(required).toContain('interior.burnForm.a.value')
     expect(required).not.toContain('interior.gamma')
@@ -140,27 +162,106 @@ describe('checkDesign', () => {
     if (!('problems' in measured)) throw new Error('built a powder')
     expect(measured.problems).toContainEqual({
       key: 'provenanceKind',
-      message: 'The burn law needs the kind "Fitted to data".',
+      message: 'Set Values came about by to Fitted to data.',
     })
     const none = draft()
     none.fitted = []
     const built = checkDesign(none, id)
     if (!('problems' in built)) throw new Error('built a powder')
-    expect(built.problems.some((p) => p.key === 'fitted')).toBe(true)
+    expect(built.problems).toContainEqual({
+      key: 'fitted',
+      message: 'Tick at least one fitted parameter.',
+    })
+  })
+
+  it('lists everything a hand-entered burn law lacks at once', () => {
+    const d = draft({
+      origin: 'user',
+      provenanceKind: 'published',
+      draft: {
+        thermochemistry: defined(sample.draft?.thermochemistry),
+        interior: { ...defined(sample.draft?.interior), fitted: [] as never },
+      },
+    })
+    d.fitted = []
+    const built = checkDesign(d, id)
+    if (!('problems' in built)) throw new Error('built a powder')
+    expect(built.problems).toEqual([
+      { key: 'fitted', message: 'Tick at least one fitted parameter.' },
+      { key: 'provenanceKind', message: 'Set Values came about by to Fitted to data.' },
+      { message: 'Add at least one ingredient.' },
+    ])
+  })
+
+  it('asks for the value alone of a missing thermochemistry range, not its Min and Max', () => {
+    const d = draft({
+      ...sample,
+      draft: {
+        ...sample.draft,
+        thermochemistry: { loadingDensity: { value: 0.2 }, gamma: { value: 1.22 } as never },
+      },
+    })
+    const built = checkDesign(d, id)
+    if (!('problems' in built)) throw new Error('built a powder')
+    const keys = built.problems.map((p) => p.key)
+    expect(keys).toContain('thermochemistry.impetus.value')
+    expect(keys.some((k) => /\.(min|max)$/.test(k ?? ''))).toBe(false)
+  })
+
+  it('numbers the ingredients as the form does and lists every problem of a row', () => {
+    const start = draft({
+      ...sample,
+      draft: { ...sample.draft, composition: [{ name: 'Nitrocellulose', min: 90, max: 100 }] },
+    })
+    const blank = { id: 'blank-row', name: '', cas: '' }
+    const third = { id: 'third-row', name: '', cas: '' }
+    const rows = { ...start, rows: [...start.rows, blank, third] }
+    const d = typed(typed(rows, 'comp.third-row.min', 'x'), 'comp.third-row.max', '5')
+    const built = checkDesign(d, id)
+    if (!('problems' in built)) throw new Error('built a powder')
+    const messages = built.problems.map((p) => p.message)
+    expect(messages).toContain('Enter a number for Ingredient 3 min percent.')
+    expect(messages).toContain('Enter Ingredient 3 name.')
+  })
+
+  it('builds an empty Min or Max of a thermochemistry range as its value', () => {
+    const d = draft({
+      ...sample,
+      draft: {
+        ...sample.draft,
+        thermochemistry: {
+          ...defined(sample.draft?.thermochemistry),
+          gamma: { value: 1.22 } as never,
+          impetus: { value: 1.05e6, min: 1.0e6 } as never,
+        },
+      },
+    })
+    const built = checkDesign(d, id)
+    if (!('powder' in built)) throw new Error(JSON.stringify(built.problems))
+    expect(built.powder.thermochemistry?.gamma).toEqual({ value: 1.22, min: 1.22, max: 1.22 })
+    expect(built.powder.thermochemistry?.impetus).toEqual({
+      value: 1.05e6,
+      min: 1.0e6,
+      max: 1.05e6,
+    })
+    // the draft keeps what was entered
+    expect(fileData(d).draft?.thermochemistry?.gamma).toEqual({ value: 1.22 })
   })
 
   it('needs a composition for the thermochemistry and ranges that admit 100 %', () => {
     const noComposition = draft({ ...sample, draft: { ...sample.draft, composition: [] } })
     const built = checkDesign(noComposition, id)
     if (!('problems' in built)) throw new Error('built a powder')
-    expect(built.problems.map((p) => p.message)).toContain('Thermochemistry: needs a composition')
+    expect(built.problems.map((p) => p.message)).toContain('Add at least one ingredient.')
     const low = draft({
       ...sample,
       draft: { ...sample.draft, composition: [{ name: 'Only', min: 10, max: 20 }] },
     })
     const sum = checkDesign(low, id)
     if (!('problems' in sum)) throw new Error('built a powder')
-    expect(sum.problems.some((p) => p.message.includes('summing to 100 %'))).toBe(true)
+    expect(sum.problems.map((p) => p.message)).toContain(
+      'Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more.',
+    )
   })
 
   it('shows a range of an ingredient that needs min <= max at its row', () => {
@@ -168,9 +269,10 @@ describe('checkDesign', () => {
     const d = typed(start, `comp.${defined(start.rows[0]).id}.min`, '70')
     const built = checkDesign(d, id)
     if (!('problems' in built)) throw new Error('built a powder')
-    expect(
-      built.problems.some((p) => p.key?.startsWith('comp.') && /min <= max/.test(p.message)),
-    ).toBe(true)
+    expect(built.problems).toContainEqual({
+      key: `comp.${defined(start.rows[0]).id}.min`,
+      message: 'Ingredient 1: Min must not be above Max.',
+    })
   })
 })
 
@@ -253,6 +355,19 @@ describe('the user design mark', () => {
         name: 'No kind yet',
         saved: '2026-10-26T10:00:00.000Z',
         data: { origin: 'user' },
+      },
+      {
+        kind: 'powder',
+        id: '8b3e0d21-6c4f-4a79-8e52-1d9f3c7b2a68',
+        name: 'Negative vivacity',
+        saved: '2026-10-26T10:00:00.000Z',
+        data: {
+          ...sample,
+          draft: {
+            ...sample.draft,
+            interior: { ...defined(sample.draft?.interior), vivacity: { value: -3 } },
+          },
+        },
       },
     ]
     expect(powderDesigns(records).map((d) => [d.id, d.name])).toEqual([[id, 'Good']])

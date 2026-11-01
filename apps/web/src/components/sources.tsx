@@ -5,6 +5,7 @@ import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
 import Link from 'next/link'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
+import { fieldLabel } from '../lib/field-labels.ts'
 import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
@@ -78,13 +79,14 @@ function SourceMeta({ source: s }: { source: Source }) {
   )
 }
 
-function CoversCell({ fields }: { fields: string[] | undefined }) {
+/** The fields a source covers: their count, the list of their labels on hover and on focus. */
+function CoversCell({ fields, kind }: { fields: string[] | undefined; kind: string | undefined }) {
   const { t, tn } = useTranslation()
   if (!fields) return t('whole record')
   return (
     <Noted
       value={tn(fields.length, '{count} field', '{count} fields')}
-      notes={[fields.join(', ')]}
+      notes={[fields.map((f) => fieldLabel(f, kind, t)).join(', ')]}
     />
   )
 }
@@ -92,7 +94,17 @@ function CoversCell({ fields }: { fields: string[] | undefined }) {
 /**
  * One source as a row. `inGroup`: a row under its document's head row, headed by its page (or "No page stated"), the document's title, publisher, edition, terms and hash being in the head.
  */
-function SourceRow({ source: s, has, inGroup }: { source: Source; has: Has; inGroup?: boolean }) {
+function SourceRow({
+  source: s,
+  has,
+  kind,
+  inGroup,
+}: {
+  source: Source
+  has: Has
+  kind: string | undefined
+  inGroup?: boolean
+}) {
   const { t } = useTranslation()
   const origin = s.origin && origins[s.origin]
   return (
@@ -126,7 +138,7 @@ function SourceRow({ source: s, has, inGroup }: { source: Source; has: Has; inGr
       )}
       {has('fields') && (
         <TableTd role="cell" className="nowrap" data-label={t('Covers')}>
-          <CoversCell fields={s.fields} />
+          <CoversCell fields={s.fields} kind={kind} />
         </TableTd>
       )}
       {has('note') && (
@@ -158,7 +170,17 @@ export function groupSources(list: readonly Source[]): Source[][] {
  * A document cited at several pages: a head row with its title and data (a cell across the row: a
  * header there would head no data cell), a row per page under it.
  */
-function SourceGroup({ sources, has, span }: { sources: Source[]; has: Has; span: number }) {
+function SourceGroup({
+  sources,
+  has,
+  span,
+  kind,
+}: {
+  sources: Source[]
+  has: Has
+  span: number
+  kind: string | undefined
+}) {
   const first = sources[0] as Source
   // a page can be cited twice with other fields: the key counts repeats of the same content
   const seen = new Map<string, number>()
@@ -179,7 +201,7 @@ function SourceGroup({ sources, has, span }: { sources: Source[]; has: Has; span
         </TableTd>
       </TableTr>
       {sources.map((s, i) => (
-        <SourceRow key={keys[i]} source={s} has={has} inGroup />
+        <SourceRow key={keys[i]} source={s} has={has} kind={kind} inGroup />
       ))}
     </TableTbody>
   )
@@ -193,7 +215,14 @@ function SourceGroup({ sources, has, span }: { sources: Source[]; has: Has; span
  * document cited at several pages are one group: the document once, a row per page under it. Below 48em a source is a block, each value after its column's name
  * (`data-label`), so every table element carries its ARIA role.
  */
-export function Sources({ provenance }: { provenance: Provenance }) {
+export function Sources({
+  provenance,
+  kind,
+}: {
+  provenance: Provenance
+  /** The record kind (`powders`), whose field labels name the fields a source covers. */
+  kind?: string | undefined
+}) {
   const { t } = useTranslation()
   const list = provenance.sources
   const has = (k: keyof Source) => list.some((s) => s[k] !== undefined)
@@ -213,10 +242,11 @@ export function Sources({ provenance }: { provenance: Provenance }) {
                 sources={group}
                 has={has}
                 span={span}
+                kind={kind}
               />
             ) : (
               <TableTbody role="rowgroup" key={documentKey(group[0] as Source)}>
-                <SourceRow source={group[0] as Source} has={has} />
+                <SourceRow source={group[0] as Source} has={has} kind={kind} />
               </TableTbody>
             ),
           )}
