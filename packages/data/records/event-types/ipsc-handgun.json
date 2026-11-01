@@ -1,0 +1,89 @@
+{
+  "id": "ipsc-handgun",
+  "name": "IPSC Handgun",
+  "federation": "ipsc",
+  "ruleBook": "ipsc-handgun-rules-2026-01",
+  "scoring": {
+    "method": "hit-factor",
+    "points": {
+      "major": { "A": 5, "C": 4, "D": 2, "metal": 5 },
+      "minor": { "A": 5, "C": 3, "D": 1, "metal": 5 }
+    },
+    "penalties": { "miss": 10, "noShoot": 10, "procedural": 10 },
+    "noShootMaxHits": 2,
+    "powerFactors": [
+      { "division": "Open", "minor": 125, "major": 160 },
+      { "division": "Standard", "minor": 125, "major": 170 },
+      { "division": "Classic", "minor": 125, "major": 170 },
+      { "division": "Production", "minor": 125 },
+      { "division": "Production Optics", "minor": 125 },
+      { "division": "Revolver", "minor": 125, "major": 170 },
+      { "division": "Optics", "minor": 125 }
+    ]
+  },
+  "levels": ["Level I", "Level II", "Level III", "Level IV", "Level V"],
+  "magazine": [
+    { "division": "Open", "maxLength": { "value": 170, "raw": "170 mm" } },
+    { "division": "Classic", "powerFactor": "major", "maxRounds": 8 },
+    { "division": "Classic", "powerFactor": "minor", "maxRounds": 10 },
+    { "division": "Production", "maxRounds": 15 },
+    { "division": "Production Optics", "maxRounds": 15 },
+    {
+      "division": "Optics",
+      "maxLength": { "value": 141.25, "raw": "141.25 mm" },
+      "note": "170 mm in single stack handguns."
+    }
+  ],
+  "movingTargets": true,
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "Title page, PDF p. 1",
+        "fields": ["federation", "ruleBook"]
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "9.2.1.1, p. 29 (PDF p. 35)",
+        "fields": ["scoring.method"],
+        "note": "The best hits per target less the penalties, divided by the stage time, give the hit factor; the best hit factor of the stage earns the stage's maximum points and the others get points in proportion."
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "9.4.1, p. 29 (PDF p. 35); Appendix B2 IPSC Target, p. 49 (PDF p. 55); Appendix C2 IPSC Poppers, p. 52 (PDF p. 58); Appendix C3 IPSC Metal Plates, p. 53 (PDF p. 59)",
+        "fields": ["scoring.points"],
+        "note": "Zone values of the paper target per power factor; a handgun hit on a scoring popper or plate is worth 5 points with either power factor. The IPSC Mini Target of Appendix B3 has the same values."
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "9.4.2 to 9.4.4, p. 29 (PDF p. 35); 10.1.2, p. 33 (PDF p. 39)",
+        "fields": ["scoring.penalties", "scoring.noShootMaxHits"],
+        "note": "Each miss, each penalized no-shoot hit and each procedural penalty takes 10 points off; on one paper or metal no-shoot at most two hits are penalized. A disappearing target (9.9.2) incurs no miss penalty."
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "5.6.1, p. 14 (PDF p. 20); Appendix D1 item 1-2, p. 55 (PDF p. 61); D2, p. 56 (PDF p. 62); D3, p. 57 (PDF p. 63); D4, p. 58 (PDF p. 64); D4a, p. 60 (PDF p. 66); D5, p. 62 (PDF p. 68); D6, p. 63 (PDF p. 69)",
+        "fields": ["scoring.powerFactors"],
+        "note": "Production, Production Optics and Optics state no major rating. In Revolver, a revolver holding 7 or more rounds does not qualify for major (Appendix D5 item 15)."
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "Appendix A1 IPSC Match Levels, p. 43 (PDF p. 49)",
+        "fields": ["levels"]
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "Appendix D1 item 8, p. 55 (PDF p. 61); D3 item 20, p. 57 (PDF p. 63); D4 item 18.2, p. 58 (PDF p. 64); D4a item 18.2, p. 60 (PDF p. 66); D6 item 8, p. 63 (PDF p. 69)",
+        "fields": ["magazine"],
+        "note": "Round limits count the rounds in a magazine at the start signal. Standard Division limits the handgun with its magazine by a gauge box (Appendix D2 item 15), not by a length or a count, so it has no entry; Revolver has no cylinder limit (D5 item 15)."
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "4.1.6, p. 8 (PDF p. 14); 9.9.1 and 9.9.2, p. 32 (PDF p. 38)",
+        "fields": ["movingTargets"],
+        "note": "Moving targets may be used, set off by IPSC targets or by mechanical or electrical devices; 9.9 says when a moving target counts as disappearing."
+      }
+    ]
+  }
+}

@@ -52,8 +52,9 @@ function resolveSource(entry: unknown, at: string, { index, file, errors }: Reso
 }
 
 /**
- * The record `json` of `file` with each source reference of its provenance resolved, and each
- * rule book of a federation (a source record id) resolved to title, edition, URL and SHA-256.
+ * The record `json` of `file` with each source reference of its provenance resolved, each rule
+ * book of a federation (a source record id) resolved to title, edition, URL and SHA-256, and the
+ * rule book of an event type to title, edition, publisher, URL and SHA-256.
  */
 export function resolveRecord(json: unknown, index: SourceIndex, file: string, errors: string[]) {
   if (!isObject(json)) return json
@@ -84,6 +85,16 @@ export function resolveRecord(json: unknown, index: SourceIndex, file: string, e
         }
       )
     })
+  }
+  if (typeof json.ruleBook === 'string') {
+    const record = cite(json.ruleBook, index, `${file}: ruleBook`, errors)
+    out.ruleBook = record && {
+      title: record.title,
+      edition: record.edition,
+      publisher: record.publisher,
+      url: record.url,
+      sha256: record.sha256,
+    }
   }
   return out
 }
