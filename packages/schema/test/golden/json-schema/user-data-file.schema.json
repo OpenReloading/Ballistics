@@ -4032,23 +4032,23 @@
                               "fill",
                               "target"
                             ],
-                            "description": "The charge each powder is run at: the typed charge, a case fill, or the charge found for a target peak pressure."
+                            "description": "Charge of each run."
                           },
                           "fill": {
                             "type": "number",
                             "minimum": 10,
                             "maximum": 120,
-                            "description": "Case fill of the `fill` mode, percent of the free volume behind the bullet."
+                            "description": "Case fill, %."
                           },
                           "targetPressure": {
                             "type": "number",
                             "exclusiveMinimum": 0,
-                            "description": "Target peak pressure of the `target` mode, bar."
+                            "description": "Target peak pressure, bar."
                           },
                           "targetPercent": {
                             "type": "number",
                             "exclusiveMinimum": 0,
-                            "description": "Target peak pressure of the `target` mode, percent of the cartridge's CIP Pmax."
+                            "description": "Target, % of CIP Pmax."
                           },
                           "manufacturer": {
                             "type": "string",
@@ -4060,26 +4060,24 @@
                                 "pattern": "^catalogue:"
                               }
                             ],
-                            "description": "Manufacturer filter: a catalogue manufacturer."
+                            "description": "Reference `catalogue:<record id>` to a catalogue manufacturer."
                           },
                           "base": {
                             "type": "string",
                             "minLength": 1,
-                            "maxLength": 200,
-                            "description": "Base filter: the base the list shows."
+                            "maxLength": 200
                           },
                           "form": {
                             "type": "string",
                             "minLength": 1,
-                            "maxLength": 200,
-                            "description": "Grain form filter: the form the list shows."
+                            "maxLength": 200
                           }
                         },
                         "required": [
                           "mode"
                         ],
                         "additionalProperties": false,
-                        "description": "The Powders tab's charge mode and filters, kept with the load."
+                        "description": "Powders tab mode and filters (GLOSSARY `powders`)."
                       }
                     },
                     "description": "The typed solver values and the ladder the load is analysed with."

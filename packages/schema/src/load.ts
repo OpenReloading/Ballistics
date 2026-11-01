@@ -132,34 +132,15 @@ export const loadAnalysis = z.object({
     .optional(),
   powders: z
     .strictObject({
-      mode: z
-        .enum(['typed', 'fill', 'target'])
-        .describe(
-          'The charge each powder is run at: the typed charge, a case fill, or the charge found for a target peak pressure.',
-        ),
-      fill: z
-        .number()
-        .min(10)
-        .max(120)
-        .describe('Case fill of the `fill` mode, percent of the free volume behind the bullet.')
-        .optional(),
-      targetPressure: z
-        .number()
-        .positive()
-        .describe('Target peak pressure of the `target` mode, bar.')
-        .optional(),
-      targetPercent: z
-        .number()
-        .positive()
-        .describe("Target peak pressure of the `target` mode, percent of the cartridge's CIP Pmax.")
-        .optional(),
-      manufacturer: catalogueRef('manufacturer')
-        .describe('Manufacturer filter: a catalogue manufacturer.')
-        .optional(),
-      base: text(200).min(1).describe('Base filter: the base the list shows.').optional(),
-      form: text(200).min(1).describe('Grain form filter: the form the list shows.').optional(),
+      mode: z.enum(['typed', 'fill', 'target']).describe('Charge of each run.'),
+      fill: z.number().min(10).max(120).describe('Case fill, %.').optional(),
+      targetPressure: z.number().positive().describe('Target peak pressure, bar.').optional(),
+      targetPercent: z.number().positive().describe('Target, % of CIP Pmax.').optional(),
+      manufacturer: catalogueRef('manufacturer').optional(),
+      base: text(200).min(1).optional(),
+      form: text(200).min(1).optional(),
     })
-    .describe("The Powders tab's charge mode and filters, kept with the load.")
+    .describe('Powders tab mode and filters (GLOSSARY `powders`).')
     .optional(),
 })
 
