@@ -27,7 +27,7 @@ None new. Shot start as on the [M3 model](../models/interior-m3.md) page, "Shot 
 
 ## Result
 
-Improved: adopted. In a barrel of 300 mm or longer the start pressure field of a powder model without its own start pressure keeps 30 MPa and names it as the value of the fit; the rule by construction reaches a rifle only with a model typed by hand. A handgun bullet without a construction counts as jacketed, assumed. The structure table is one (`bulletStructures`), with the density class of the bullet volume below the mouth beside the construction; swaged stays of unknown density, since the cast class was measured on cast bullets only. A refit of the powder records at the rule by construction (#944, option b) is not done.
+Improved: adopted. In a barrel of 300 mm or longer the start pressure field of a powder record whose model has no start pressure of its own keeps 30 MPa and names it as the value of the fit; the rule by construction reaches a rifle only with a powder design or a model typed by hand. A handgun bullet without a construction counts as jacketed, assumed. The structure table is one (`bulletStructures`), with the density class of the bullet volume below the mouth beside the construction; swaged stays of unknown density, since the cast class was measured on cast bullets only. A refit of the powder records at the rule by construction (#944, option b) is not done.
 
 ## Data basis
 

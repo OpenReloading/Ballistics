@@ -3005,14 +3005,12 @@ export function useWorkbenchState() {
   }
   const suggestions = withStartPressure(baseSuggestions, {
     ...startInputs,
-    fittedPowder: fittedAtDefaultStart(chosenPowder),
+    // a powder design was typed, not fitted: it takes the rule by construction
+    fittedPowder: fittedAtDefaultStart(powder),
   })
   // a compared powder record without a start pressure of its own runs at the default of its fit
-  const fittedStart = startPressureDefault({
-    ...startInputs,
-    fittedPowder: true,
-    show: { text: String, unit: '' },
-  }).si
+  const fittedStart = withStartPressure(baseSuggestions, { ...startInputs, fittedPowder: true })
+    .startPressure?.si
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
