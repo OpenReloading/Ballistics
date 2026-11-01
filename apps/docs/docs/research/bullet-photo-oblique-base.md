@@ -36,7 +36,7 @@ Every render with a slanted face reads its length within 1 % or 3 u, before and 
 
 ## Result
 
-Improved: adopted. 26 of the 40 slanted faces that got a shadow named no longer do; the 14 left ramp over 2 samples or less (cut 0.5 to 2 degrees off, or at 15 px per mm with a 2 px blur), where a straight face and a shadow's end look alike. An axis fitted 0.3 to 0.5 degrees off named no shadow in any of its 96 renders with #964 already. The one catalogue photograph that loses its note keeps its length within its stated uncertainty; a straight base end and a shadow's end that both ramp on evenly cannot be told apart from the outline alone.
+Improved: adopted. 26 of the 40 slanted faces that got a shadow named no longer do; the 14 left ramp over 2 samples or less (cut 0.5 to 2 degrees off, or at 15 px per mm with a 2 px blur), where a straight face and a shadow's end look alike. An axis fitted 0.3 to 0.5 degrees off named no shadow in any of its 96 renders with #964 already. The one catalogue photograph that loses its note keeps its length within 3 times its stated uncertainty; a straight base end and a shadow's end that both ramp on evenly cannot be told apart from the outline alone.
 
 ## Data basis
 
