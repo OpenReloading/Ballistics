@@ -11,20 +11,20 @@ import { defined } from './defined.ts'
 const provenance = { sources: [{ title: 'fixture' }] }
 const q = (value: number) => ({ value })
 
-/** Missouri Bullet 309115RN (#1 Carbine, 115 gr RN): cast, 7.452 g, 7.849 by 17.25 mm. */
+/** An invented .309 cast round nose of 115 gr: 7.45 g, 7.85 by 17.2 mm, more than its outline holds in lead. */
 const castRoundNose = {
-  diameter: q(7.849),
-  length: q(17.25),
-  mass: q(7.452),
+  diameter: q(7.85),
+  length: q(17.2),
+  mass: q(7.45),
   construction: { structure: 'cast', core: { material: 'lead-alloy' } },
   provenance,
 }
 
-/** Hammer .172 18 gr Dead Blow Hammer: monolithic copper, 1.166 g, 4.369 by 12.7 mm. */
+/** An invented .172 copper spitzer: monolithic copper, 1.10 g, 4.37 by 12.6 mm. */
 const copperSpitzer = {
-  diameter: q(4.369),
-  length: q(12.7),
-  mass: q(1.166),
+  diameter: q(4.37),
+  length: q(12.6),
+  mass: q(1.1),
   construction: { structure: 'monolithic' },
   provenance,
 }

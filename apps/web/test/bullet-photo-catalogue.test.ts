@@ -43,7 +43,7 @@ function sample(): Truth[] {
     const r = JSON.parse(readFileSync(new URL(f, records), 'utf8'))
     const given = bulletDimensions(r)
     if (!given) continue
-    // a record with a boat-tail length and no base type (Berger) is drawn as a boat tail
+    // a record with a boat-tail length and no base type is drawn as a boat tail
     const dims: BulletDimensions =
       given.base?.length && !given.base.type
         ? { ...given, base: { ...given.base, type: 'boat-tail' } }

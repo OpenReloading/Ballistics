@@ -1,0 +1,91 @@
+{
+  "id": "demo-bullet-224-55",
+  "manufacturer": "demo-projectiles",
+  "productNumber": "B055",
+  "name": "22 Cal 55 gr FMJ Boat Tail Demo",
+  "productLine": "Demo Range",
+  "caliber": ".224",
+  "diameter": {
+    "value": 5.69
+  },
+  "mass": {
+    "value": 3.564
+  },
+  "length": {
+    "value": 18.8
+  },
+  "base": {
+    "type": "boat-tail",
+    "length": {
+      "value": 2.1
+    },
+    "diameter": {
+      "value": 5.02
+    },
+    "angle": {
+      "value": 9
+    }
+  },
+  "ogive": {
+    "form": "tangent"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "meplatDiameter": {
+    "value": 1.4
+  },
+  "noseLength": {
+    "value": 9.9
+  },
+  "baseToOgive": {
+    "value": 8.9
+  },
+  "bearingLength": {
+    "value": 6.8
+  },
+  "construction": {
+    "raw": "Full metal jacket, gilding metal over a lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {
+      "material": "gilding-metal"
+    }
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.255
+    }
+  ],
+  "recommendedTwist": {
+    "value": 305
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

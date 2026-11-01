@@ -1,0 +1,64 @@
+{
+  "id": "demo-powder-dp70",
+  "manufacturer": "demo-powder",
+  "name": "DP70",
+  "grainForm": "extruded",
+  "propellantBase": "single",
+  "listedCartridges": ["300-win-mag", "6-5-creedmoor"],
+  "interior": {
+    "model": "m3",
+    "fitted": ["vivacity", "energy"],
+    "vivacity": {
+      "value": 0.38,
+      "standardUncertainty": 0.02
+    },
+    "energy": {
+      "value": 3450000,
+      "standardUncertainty": 170000
+    },
+    "gamma": 1.24,
+    "covolume": {
+      "value": 0.00105
+    },
+    "density": {
+      "value": 1.6
+    },
+    "pressureExponent": 1,
+    "referencePressure": {
+      "value": 0.980665
+    },
+    "ignitionPressure": {
+      "value": 50
+    },
+    "propellantTemperature": {
+      "value": 21
+    },
+    "resistance": {
+      "stress": {
+        "value": 4.2
+      },
+      "oversize": 1.3,
+      "engraving": 0
+    },
+    "burnForm": {
+      "kind": "twoStage",
+      "a": {
+        "value": 0.02
+      },
+      "m": 0.5,
+      "q": 0.5,
+      "z1": 0.8
+    }
+  },
+  "provenance": {
+    "kind": "fitted",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "fitted",
+        "fields": ["name", "grainForm", "propellantBase", "listedCartridges", "interior"],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}
