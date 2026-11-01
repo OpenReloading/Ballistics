@@ -2,6 +2,7 @@ import {
   defaultSensitivity,
   overrideResistance,
   recordResistance,
+  recordSensitivity,
   sensitivityReferenceDefault,
 } from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
@@ -86,26 +87,23 @@ export function interiorRequest(s: InteriorSources) {
   const applied = overrideResistance(resistance, values)
   if (applied) body.load.resistance = applied
   if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
-  const sensitivity = powder?.temperatureSensitivity
-  // a powder record without its own coefficient takes the default of its grain form; a missing
-  // record, what its link carried of it
-  const form = powder ? (sensitivity ? undefined : powder.grainForm) : s.linked?.grainForm
-  const fallback = defaultSensitivity(form)
-  if (sensitivity)
+  // the record's own coefficient, else the default of its grain form (`recordSensitivity`, which
+  // the API's load-file route reads too); a missing record, what its link carried of it
+  const linked = s.linked
+  const taken = powder
+    ? recordSensitivity(powder)
+    : linked?.grainForm && recordSensitivity({ grainForm: linked.grainForm })
+  if (taken) {
     body.load.propellant.temperatureSensitivity = {
-      reference: sensitivity.reference.value,
-      cold: sensitivity.cold.value,
-      hot: sensitivity.hot.value,
+      ...taken.sensitivity,
+      ...(!powder &&
+        linked?.sensitivityReference !== undefined && {
+          reference: linked.sensitivityReference,
+        }),
     }
-  else if (fallback)
-    body.load.propellant.temperatureSensitivity = {
-      reference: powder
-        ? sensitivityReferenceOf(powder)
-        : (s.linked?.sensitivityReference ?? sensitivityReferenceDefault),
-      cold: fallback.cold,
-      hot: fallback.hot,
-    }
-  const sensitivityDefault = fallback && form ? { form, ...fallback } : undefined
+  }
+  const sensitivityDefault =
+    taken?.fallback && taken.form ? { form: taken.form, ...taken.fallback } : undefined
   return { body, bulkDensity, missing, sensitivityDefault }
 }
 

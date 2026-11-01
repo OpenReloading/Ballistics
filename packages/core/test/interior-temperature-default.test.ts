@@ -3,6 +3,7 @@ import { type InteriorLoad, interior } from '../src/interior/model.ts'
 import {
   coldPeakInterval,
   defaultSensitivity,
+  recordSensitivity,
   sensitivityReferenceDefault,
 } from '../src/interior/temperature-default.ts'
 
@@ -76,5 +77,34 @@ describe('coldPeakInterval', () => {
     expect(point.peakBreechPressure).toBeLessThan(range[1])
     expect(coldPeakInterval(at(sensitivityReferenceDefault + 10), [0, 0.003])).toBeUndefined()
     expect(coldPeakInterval(load, [0, 0.003])).toBeUndefined()
+  })
+})
+
+describe('recordSensitivity', () => {
+  const own = {
+    temperatureSensitivity: {
+      reference: { value: 290 },
+      cold: { value: 1e-3 },
+      hot: { value: 2e-3 },
+    },
+  }
+  it("takes the record's own coefficient first", () => {
+    expect(recordSensitivity({ ...own, grainForm: 'ball' })).toEqual({
+      sensitivity: { reference: 290, cold: 1e-3, hot: 2e-3 },
+    })
+  })
+  it('else the grain form default at the fit temperature, else at 21 degC', () => {
+    const fit = recordSensitivity({
+      grainForm: 'ball',
+      interior: { propellantTemperature: { value: 15 } },
+    })
+    expect(fit?.form).toBe('ball')
+    expect(fit?.sensitivity.reference).toBeCloseTo(288.15, 9)
+    expect(fit?.sensitivity).toMatchObject({ cold: 0.0012, hot: 0.0027 })
+    expect(recordSensitivity({ grainForm: 'flake' })?.sensitivity.reference).toBe(
+      sensitivityReferenceDefault,
+    )
+    expect(recordSensitivity({ grainForm: 'other' })).toBeUndefined()
+    expect(recordSensitivity({})).toBeUndefined()
   })
 })

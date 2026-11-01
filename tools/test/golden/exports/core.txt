@@ -200,6 +200,7 @@
 . SeatingNote
 . SeatingReading
 . SensitivityDefault
+. SensitivityPowder
 . SessionReading
 . SessionsTruingResult
 . Settings
@@ -382,6 +383,7 @@
 . recordBoreArea
 . recordLoad
 . recordResistance
+. recordSensitivity
 . ringEventTotals
 . ringTotal
 . rk45

@@ -85,3 +85,45 @@ export function coldPeakInterval(
   if (a === undefined || b === undefined) return
   return [Math.min(a, b), Math.max(a, b)]
 }
+
+/** The powder record fields {@link recordSensitivity} reads, in stored units. */
+export interface SensitivityPowder {
+  grainForm?: string | undefined
+  /** Burn-rate sensitivity: `reference` in K, `cold` and `hot` in 1/K. */
+  temperatureSensitivity?:
+    | { reference: { value: number }; cold: { value: number }; hot: { value: number } }
+    | undefined
+  /** The fitted model: its propellant temperature, degC. */
+  interior?: { propellantTemperature: { value: number } } | undefined
+}
+
+/**
+ * The temperature sensitivity a run of `powder` takes, K and 1/K: the record's own, else the default
+ * of its grain form with the reference of the record's fit (else {@link sensitivityReferenceDefault});
+ * `form` names the grain form when the default was taken. None for a powder without either. The
+ * workbench and the API's load-file route both read it, so a load runs alike in both.
+ */
+export function recordSensitivity(powder: SensitivityPowder):
+  | {
+      sensitivity: { reference: number; cold: number; hot: number }
+      form?: string
+      fallback?: SensitivityDefault
+    }
+  | undefined {
+  const own = powder.temperatureSensitivity
+  if (own)
+    return {
+      sensitivity: { reference: own.reference.value, cold: own.cold.value, hot: own.hot.value },
+    }
+  const fallback = defaultSensitivity(powder.grainForm)
+  if (!fallback || powder.grainForm === undefined) return
+  // the record stores degrees Celsius; inline, as core cannot import the schema's units
+  const reference = powder.interior
+    ? powder.interior.propellantTemperature.value + 273.15
+    : sensitivityReferenceDefault
+  return {
+    sensitivity: { reference, cold: fallback.cold, hot: fallback.hot },
+    form: powder.grainForm,
+    fallback,
+  }
+}
