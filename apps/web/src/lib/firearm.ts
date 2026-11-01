@@ -1,4 +1,5 @@
 import {
+  type CompetitionEvent,
   type Firearm,
   firearm,
   fromSi,
@@ -381,19 +382,73 @@ export function withSessionRounds(
   now = new Date(),
 ): UserRecord | undefined {
   if (record.kind !== 'firearm' || n < 1) return undefined
+  if (roundsDue(record.data, session, base, shots) < 1) return undefined
+  return withCountedRounds(record, session, n, now)
+}
+
+/** The firearm `record` with `n` rounds added for `key` in `countedSessions`, the oldest entry dropped at the limit. */
+function withCountedRounds(
+  record: Extract<UserRecord, { kind: 'firearm' }>,
+  key: string,
+  n: number,
+  now: Date,
+): UserRecord | undefined {
   const f = record.data
-  if (f.roundCount === undefined || roundsDue(f, session, base, shots) < 1) return undefined
+  if (f.roundCount === undefined) return undefined
   const entries = f.countedSessions ?? []
-  const counted = entries.find((c) => c.session === session)?.rounds ?? 0
+  const counted = entries.find((c) => c.session === key)?.rounds ?? 0
   const countedSessions = [
-    ...entries.filter((c) => c.session !== session),
-    { session, rounds: counted + n },
+    ...entries.filter((c) => c.session !== key),
+    { session: key, rounds: counted + n },
   ].slice(-maxCountedSessions)
   return userRecord.parse({
     ...record,
     saved: now.toISOString(),
     data: { ...firearmPatch(f, { roundCount: f.roundCount + n }, now), countedSessions },
   })
+}
+
+/**
+ * The rounds a competition event adds to a firearm's count: its `rounds`, else the shots of its
+ * ring series when every series lists them; undefined when neither tells.
+ */
+export function eventRounds(e: CompetitionEvent): number | undefined {
+  if (e.rounds !== undefined) return e.rounds
+  if (e.results.method !== 'rings' || e.results.series.length === 0) return undefined
+  let shots = 0
+  for (const s of e.results.series) {
+    if (!s.shots) return undefined
+    shots += s.shots.length
+  }
+  return shots
+}
+
+/**
+ * The rounds of the event `event` (its reference, `user:<id>`, with `rounds` rounds) that the
+ * count of `f` does not hold yet: the rounds less those counted for the event before. 0 without a
+ * count. The event shares `countedSessions` with the sessions, so it is counted once (#633).
+ */
+export function eventRoundsDue(f: Firearm, event: string, rounds: number) {
+  if (f.roundCount === undefined) return 0
+  const counted = f.countedSessions?.find((c) => c.session === event)?.rounds ?? 0
+  return Math.max(0, rounds - counted)
+}
+
+/**
+ * The stored firearm `record` with `n` of the event's rounds added to its count, through the same
+ * one-confirm flow as a session's rounds. undefined, leaving the record, when it is no firearm or
+ * {@link eventRoundsDue} is 0.
+ */
+export function withEventRounds(
+  record: UserRecord,
+  event: string,
+  rounds: number,
+  n: number,
+  now = new Date(),
+): UserRecord | undefined {
+  if (record.kind !== 'firearm' || n < 1) return undefined
+  const due = eventRoundsDue(record.data, event, rounds)
+  return due < 1 ? undefined : withCountedRounds(record, event, Math.min(n, due), now)
 }
 
 /** The first `<prefix><n>` not in `taken`; optic and configuration ids are local to a firearm. */

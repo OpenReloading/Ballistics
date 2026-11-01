@@ -21,6 +21,10 @@
     "value": 21.34,
     "raw": "Nose length including tip is .840″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -55,6 +59,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/338-cal-190gr-hammer-hht/: Minimum required twist rate is 1-13″ or faster | Bullet length including tip is 1.501″ | Nose length including tip is .840″ | Tip length is .230″ | Bullet weight is 190gr | Recommended use: Big Game Hunting | g1-bc= .469 estimated | g7-bc= .226 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

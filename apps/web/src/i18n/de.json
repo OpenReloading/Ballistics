@@ -3012,6 +3012,12 @@
   "chronograph sessions": "Chronograph-Sitzungen",
   "target sheets": "Zielscheibenblätter",
   "target designs": "Scheibenentwürfe",
+  "competition events": "Wettkämpfe",
+  "a hit, miss or penalty count must be a whole number of 0 or more": "eine Anzahl von Treffern, Fehlschüssen oder Strafen muss eine ganze Zahl von 0 oder mehr sein",
+  "the stage time must be positive": "die Zeit der Stage muss größer als 0 sein",
+  "a ring value must be 0 or more": "eine Wertung muss 0 oder mehr sein",
+  "stage points must be 0 or more": "die Punkte einer Stage müssen 0 oder mehr sein",
+  "a series needs its shots or its total": "jede der Serien braucht ihre Schüsse oder ihre Summe",
   "Its manufacturer could not be kept in this browser; Save still writes it into the file.": "Der Hersteller konnte in diesem Browser nicht gespeichert werden; Speichern schreibt ihn dennoch in die Datei.",
   "The browser did not grant persistent storage and may clear its records; Export all keeps a copy.": "Der Browser hat keinen dauerhaften Speicher gewährt und kann seine Datensätze löschen; Alles exportieren sichert eine Kopie.",
   "Saving in this browser": "Wird in diesem Browser gespeichert",
@@ -4137,5 +4143,22 @@
   "{count} entry not imported: a record of this browser has its id.|{count} entries not imported: records of this browser have their ids.": {
     "one": "{count} Eintrag nicht importiert: Ein Datensatz dieses Browsers hat seine ID.",
     "other": "{count} Einträge nicht importiert: Datensätze dieses Browsers haben ihre IDs."
-  }
+  },
+  "{count} round of entries without a saved load is under its firearm only.|{count} rounds of entries without a saved load are under their firearms only.": {
+    "one": "{count} Schuss von Einträgen ohne gespeicherte Laborierung zählt nur bei seiner Schusswaffe.",
+    "other": "{count} Schuss von Einträgen ohne gespeicherte Laborierung zählen nur bei ihren Schusswaffen."
+  },
+  "{year}: {entries}, {rounds}": "{year}: {entries}, {rounds}",
+  "Cartridge not known": "Patrone nicht bekannt",
+  "Competitions": "Wettkämpfe",
+  "Export summary CSV": "Übersicht als CSV exportieren",
+  "Month": "Monat",
+  "No entry of this year is linked to a competition.": "Kein Eintrag dieses Jahres ist mit einem Wettkampf verknüpft.",
+  "Print summary": "Übersicht drucken",
+  "Range days per month": "Schießtage je Monat",
+  "Rounds per cartridge": "Schuss je Patrone",
+  "Rounds per firearm": "Schuss je Schusswaffe",
+  "Summary year": "Jahr der Übersicht",
+  "Yearly summary": "Jahresübersicht",
+  "Yearly summary of the shooting log, {year}": "Jahresübersicht des Schießbuchs, {year}"
 }

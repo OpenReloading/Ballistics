@@ -274,13 +274,18 @@ export const firearm = z
     countedSessions: z
       .array(
         z.strictObject({
-          session: ref('session').describe('Reference to the session.'),
-          rounds: z.int().nonnegative().describe('Rounds of the session added to `roundCount`.'),
+          session: ref('session').describe(
+            'Reference to the chronograph session or competition event whose rounds were added.',
+          ),
+          rounds: z
+            .int()
+            .nonnegative()
+            .describe('Rounds of the session or event added to `roundCount`.'),
         }),
       )
       .max(5000)
       .describe(
-        'Sessions whose rounds were added to `roundCount`, the latest last, so a session is counted once.',
+        'Sessions and competition events whose rounds were added to `roundCount`, the latest last, so each is counted once.',
       )
       .optional(),
     noteAtRoundCount: z

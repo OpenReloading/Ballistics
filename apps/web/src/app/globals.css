@@ -3183,7 +3183,32 @@ td.nowrap {
   border-collapse: collapse;
 }
 
+.log-summary {
+  margin-top: 2rem;
+}
+
+.log-summary-table caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+}
+
+.log-summary-sheet {
+  display: none;
+}
+
 @media print {
+  /* Print summary: the summary alone, not the entries */
+  html[data-print="log-summary"] .log-sheet {
+    display: none;
+  }
+
+  html[data-print="log-summary"] .log-summary-sheet {
+    display: block;
+    color: #000;
+    font-size: 9pt;
+  }
+
   /* the list and the form: the sheet holds the entries on paper */
   .library.shooting-log {
     display: none;

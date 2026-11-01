@@ -17,6 +17,10 @@
     "value": 43.28,
     "raw": "1.704\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 2, MTH-Match, Tactical, Hunting: Caliber .323 (8mm), Grains 225, Minimum Required Twist *1-10\", Part Number MTH 323 225 MAX, G1 BC .640, G7 BC .317est., OAL 1.704\", Bullet Projection 1.139\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

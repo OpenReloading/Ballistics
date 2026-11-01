@@ -1,4 +1,4 @@
-import type { UserRecord } from '@open-reloading/schema'
+import type { CompetitionEvent, UserRecord } from '@open-reloading/schema'
 import { toSi, userRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import de from '../src/i18n/de.json'
@@ -11,6 +11,8 @@ import {
   catalogueCartridgeId,
   clickOptions,
   clickText,
+  eventRounds,
+  eventRoundsDue,
   fieldSi,
   fieldStored,
   firearmCells,
@@ -24,6 +26,7 @@ import {
   roundsDue,
   sightOptions,
   sightPicker,
+  withEventRounds,
   withSessionRounds,
 } from '../src/lib/firearm.ts'
 import { presetUnits } from '../src/lib/units.ts'
@@ -546,5 +549,48 @@ describe('sightPicker', () => {
       ...exampleLabels,
     ])
     expect(picker.none).toBe('None')
+  })
+})
+
+describe('rounds of a competition event', () => {
+  const now = new Date(2026, 9, 12, 18, 0)
+  const event = 'user:00000000-0000-4000-8000-0000000000e1'
+  const session = 'user:00000000-0000-4000-8000-00000000000a'
+  const counted = { ...rifle, data: { ...rifle.data, roundCount: 400 } }
+  const ringEvent = (series: CompetitionEvent['results']): CompetitionEvent => ({
+    date: '2026-10-11',
+    eventType: 'catalogue:dsb-meisterschaft',
+    level: 'Landesmeisterschaft',
+    state: 'completed',
+    results: series,
+  })
+
+  it('takes the typed rounds, else the shots of ring series that all list them', () => {
+    const shots = { method: 'rings' as const, series: [{ shots: [10, 9] }, { shots: [8] }] }
+    expect(eventRounds(ringEvent(shots))).toBe(3)
+    expect(eventRounds({ ...ringEvent(shots), rounds: 40 })).toBe(40)
+    const total = { method: 'rings' as const, series: [{ shots: [10] }, { total: 96 }] }
+    expect(eventRounds(ringEvent(total))).toBeUndefined()
+    expect(eventRounds(ringEvent({ method: 'hit-factor', stages: [] }))).toBeUndefined()
+  })
+
+  it('adds the rounds once, next to the counted sessions', () => {
+    const withSession = defined(withSessionRounds(counted, session, 400, 10, 10, now))
+    const next = defined(withEventRounds(withSession, event, 60, 60, now))
+    expect(next.kind === 'firearm' && next.data).toMatchObject({
+      roundCount: 470,
+      countedSessions: [
+        { session, rounds: 10 },
+        { session: event, rounds: 60 },
+      ],
+    })
+    expect(withEventRounds(next, event, 60, 60, now)).toBeUndefined()
+    expect(next.kind === 'firearm' && eventRoundsDue(next.data, event, 65)).toBe(5)
+  })
+
+  it('adds nothing without a count, to a record that is no firearm, or for no rounds', () => {
+    expect(withEventRounds(rifle, event, 60, 60, now)).toBeUndefined()
+    expect(withEventRounds(counted, event, 60, 0, now)).toBeUndefined()
+    expect(eventRoundsDue({ ...rifle.data, roundCount: undefined } as never, event, 60)).toBe(0)
   })
 })

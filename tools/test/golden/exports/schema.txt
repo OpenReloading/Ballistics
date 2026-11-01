@@ -19,6 +19,7 @@
 . CatalogueSession
 . ChronoSession
 . ChronoShot
+. CompetitionEvent
 . ConstructionFields
 . DanglingRef
 . Discipline
@@ -126,6 +127,7 @@
 . compareMappings
 . compareNames
 . compareTargetFaces
+. competitionEvent
 . constructionFields
 . designIdProblem
 . discipline

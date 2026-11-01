@@ -17,6 +17,10 @@
     "value": 41.28,
     "raw": "Bullet length is 1.625″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -39,6 +43,13 @@
         "sha256": "743a9e18189689f4656e4cad1486c952b3fb8c209f863683c9f25f452de519be",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "https://hammerbullets.com/product/308-cal-199gr-hammer-hunter/: Recommended twist rate is 1-9.25″ minimum | Bullet length is 1.625″ | Bullet weight is 197gr | Recommended use: Big game hunting | G7-BC=.299 from shot drops"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }

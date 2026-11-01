@@ -35,7 +35,13 @@ const sidebars: SidebarsConfig = {
       'exterior-truing',
       'exterior-truing-strings',
     ]),
-    category('Targets and groups', ['groups', 'hit-probability', 'ring-scoring', 'hole-detection']),
+    category('Targets and groups', [
+      'groups',
+      'hit-probability',
+      'ring-scoring',
+      'hole-detection',
+      'competition-scoring',
+    ]),
     'photo-guide',
     {
       type: 'category',

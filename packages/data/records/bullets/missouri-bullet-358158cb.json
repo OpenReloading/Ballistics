@@ -16,6 +16,18 @@
     "value": 17.4,
     "raw": "Bullet OAL .685 +/-"
   },
+  "construction": {
+    "raw": "cast lead bullets",
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 12,
+        "raw": "Brinell 12"
+      }
+    },
+    "gasCheck": false
+  },
   "note": "Listed as 158 Grain RN. Brinell 12. .38 Special. For Cowboy Velocities.",
   "provenance": {
     "kind": "published",
@@ -25,8 +37,20 @@
         "url": "https://missouribullet.com/pricing.php",
         "retrieved": "2026-10-08",
         "sha256": "c44788147ec77caae41cb1c385508a89843eb844fef1eaa06207dec3d87cf127",
-        "fields": ["diameter", "mass", "length"],
+        "fields": ["diameter", "mass", "length", "construction.core.hardness"],
         "note": "358158CB, Cowboy #11 (https://missouribullet.com/details.php?prodId=76): .358 Diameter, 158 Grain RN, Brinell 12, Bullet OAL .685 +/-"
+      },
+      {
+        "source": "missouri-bullet-company-home-page",
+        "url": "https://missouribullet.com/",
+        "retrieved": "2026-11-01",
+        "fields": [
+          "construction.raw",
+          "construction.structure",
+          "construction.core",
+          "construction.gasCheck"
+        ],
+        "note": "Home page: \"We make cast lead bullets.\"; alloys \"2% tin, 6% antimony, balance lead\" (18 BHN) and \"2% tin, 4% antimony, balance lead\"; \"We don't do gas-checked bullets.\""
       }
     ]
   }

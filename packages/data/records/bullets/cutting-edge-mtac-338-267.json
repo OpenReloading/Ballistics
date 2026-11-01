@@ -17,6 +17,10 @@
     "value": 46.15,
     "raw": "1.817\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -39,6 +43,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 3, MTAC - Match, Tactical: Caliber .338, Grains 267, Minimum Required Twist *1-10\", Part Number MTAC 338 267, G1 BC .800, OAL 1.817\", Bullet Projection 1.036\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

@@ -44,6 +44,10 @@
 . DynamicStabilityInput
 . Ellipse
 . EstimatedInput
+. EventClaims
+. EventMismatch
+. EventTotals
+. EventTypeOffer
 . Firearm
 . FiringSite
 . FittedPowderParameter
@@ -59,6 +63,7 @@
 . GroupStatistics
 . GyroscopicStabilityInput
 . HeldPowderParameter
+. HitFactorRules
 . HitResult
 . IcaoConstants
 . Identifiability
@@ -152,6 +157,7 @@
 . PowderRangePoint
 . PowderSession
 . PowderSessionsFit
+. PracticalStage
 . PressureBasis
 . PressureCase
 . PressureCurveFit
@@ -177,7 +183,9 @@
 . ResistanceCartridge
 . ResistanceRun
 . ResistanceTerms
+. ResultState
 . Rhs
+. RingSeries
 . Rk45Event
 . Rk45Hit
 . Rk45Options
@@ -198,6 +206,7 @@
 . SimilarPowder
 . SimilarPowdersPrior
 . SkippedInput
+. StageScore
 . StartPressureDefault
 . StepBudget
 . TargetMotion
@@ -229,6 +238,7 @@
 . WeakReason
 . WindSegment
 . ZeroSpec
+. ZonePoints
 . advisoryIds
 . advisoryRule
 . advisoryRules
@@ -283,6 +293,7 @@
 . earthRotationRate
 . ellipseProbability
 . estimateDragFromOutline
+. eventMismatches
 . fQuantileTwoNumeratorDegrees
 . fillLoadRatioLimit
 . fitPowder
@@ -297,6 +308,7 @@
 . gyroscopicStability
 . handgunBarrelLengthLimit
 . heldSegment
+. hitFactor
 . hitProbability
 . icao
 . identifiability
@@ -349,6 +361,7 @@
 . powderInputDefaults
 . powderModelValues
 . powderPressureRange
+. practicalEventTotals
 . predictPooled
 . predictPowder
 . predictionEllipse
@@ -360,6 +373,8 @@
 . recordBoreArea
 . recordLoad
 . recordResistance
+. ringEventTotals
+. ringTotal
 . rk45
 . sampledBand
 . saturationVapourPressure
@@ -377,6 +392,8 @@
 . solveCharge
 . speedOfSound
 . spinDrift
+. stagePoints
+. stageRawPoints
 . standardAtmosphere
 . stringLadder
 . subtendedAngle

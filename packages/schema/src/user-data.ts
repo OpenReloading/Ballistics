@@ -232,6 +232,93 @@ export const targetFaceDesign = z.object({
     .describe('Events shot on the face.'),
 })
 
+const hitCount = z.int().nonnegative().max(10000).describe('A count from the score sheet.')
+
+/** A practical stage from the score sheet: hits per zone, penalties, time (s), power factor. */
+const practicalStage = z.strictObject({
+  name: z.string().min(1).max(200).describe('Stage name.'),
+  hits: z
+    .strictObject({ A: hitCount, C: hitCount, D: hitCount, metal: hitCount.optional() })
+    .describe('Scoring hits per zone.'),
+  misses: hitCount,
+  noShoots: hitCount,
+  procedurals: hitCount,
+  time: z.number().positive().max(3600).describe('Stage time, s.'),
+  powerFactor: z.enum(['major', 'minor']).describe('Power factor.'),
+  stagePoints: z.number().nonnegative().describe('Stage points of the official result.').optional(),
+})
+
+/** Whether `v` is a whole number of tenths, within the rounding of a decimal number. */
+const inTenths = (v: number) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6
+
+/**
+ * One ring series: the ring value of each shot (whole rings or tenths), or its total, or both
+ * when they agree, and the target sheet it was scored on.
+ */
+const ringSeries = z
+  .strictObject({
+    shots: z
+      .array(z.number().nonnegative().max(10.9))
+      .min(1)
+      .max(100)
+      .describe('Ring value per shot.')
+      .optional(),
+    total: z.number().nonnegative().max(1090).describe('Series total.').optional(),
+    targetSheet: userRef('target sheet').optional(),
+  })
+  .refine(
+    ({ shots, total }) =>
+      (shots ?? total) !== undefined &&
+      [...(shots ?? []), total ?? 0].every(inTenths) &&
+      (shots === undefined ||
+        total === undefined ||
+        Math.round(shots.reduce((sum, v) => sum + v * 10, 0)) === Math.round(total * 10)),
+    'A series needs its shots or its total, in tenths at most, agreeing when both are given.',
+  )
+
+const method = 'Scoring method of the event type.'
+
+/**
+ * A competition event the person shot, with their own results: ring series or practical stages,
+ * by the scoring method of its event type. Never an official result.
+ * Inferred type: {@link CompetitionEvent}.
+ */
+export const competitionEvent = z.strictObject({
+  date: z.iso.date().describe('Day, ISO 8601.'),
+  place: text(200).describe('Place.').optional(),
+  eventType: catalogueRef('event type'),
+  level: z.string().min(1).max(200).describe("One of the event type's levels."),
+  discipline: catalogueRef('discipline').optional(),
+  division: z.string().min(1).max(200).describe("One of the event type's divisions.").optional(),
+  firearm: userRef('firearm').optional(),
+  load: userRef('load').optional(),
+  rounds: z
+    .int()
+    .nonnegative()
+    .max(100000)
+    .describe('Rounds fired, for the round count.')
+    .optional(),
+  notes: text(10000).describe('Notes, plain text.').optional(),
+  state: z
+    .enum(['completed', 'did-not-finish', 'disqualified'])
+    .describe('How the event ended: a disqualified event has no total.'),
+  results: z
+    .discriminatedUnion('method', [
+      z.strictObject({
+        method: z.literal('rings').describe(method),
+        series: z.array(ringSeries).max(100).describe('Series in the order shot.'),
+      }),
+      z.strictObject({
+        method: z.literal('hit-factor').describe(method),
+        stages: z.array(practicalStage).max(100).describe('Stages in the order shot.'),
+      }),
+    ])
+    .describe('Results, by the scoring method of the event type.'),
+})
+
+/** A competition event of the user with their own results. */
+export interface CompetitionEvent extends z.infer<typeof competitionEvent> {}
+
 /**
  * One entry of the shooting log (Schiessbuch): a range day of the person, as their own record.
  * Whether a club or an authority accepts it is up to them; the record claims no such standing.
@@ -338,6 +425,7 @@ export const userRecord = z.discriminatedUnion(
       cartridgeCase,
       designId,
     ),
+    record('event', 'A competition event; never an official result.', competitionEvent, designId),
     record(
       'shootingLogEntry',
       "An entry of the shooting log, the person's own record.",
@@ -455,7 +543,8 @@ export interface DanglingRef {
  * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its case, a bullet's and a firearm's `manufacturer`, a firearm's `landsBullet`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a case's `cartridge`, `manufacturer` and `capacity`, a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
- * its group shots, and a shooting log entry's `firearm` and `load`. A
+ * its group shots, an event's `firearm`, `load` and the `targetSheet` of its ring series, and a
+ * shooting log entry's `firearm` and `load`. A
  * `user:<id>` reference names a record by its id, a
  * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
@@ -553,6 +642,19 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
       return [
         ['manufacturer', r.data.manufacturer, 'manufacturer', true],
         ['landsBullet', r.data.landsBullet, 'bullet', true],
+      ]
+    case 'event':
+      return [
+        ['firearm', r.data.firearm, 'firearm', true],
+        ['load', r.data.load, 'load', true],
+        ...(r.data.results.method === 'rings' ? r.data.results.series : []).map(
+          (s, i): [string, string | undefined, UserRecordKind, boolean] => [
+            `results.series.${i}.targetSheet`,
+            s.targetSheet,
+            'targetSheet',
+            true,
+          ],
+        ),
       ]
     case 'shootingLogEntry':
       return [
