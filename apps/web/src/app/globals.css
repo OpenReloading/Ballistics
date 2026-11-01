@@ -3032,6 +3032,74 @@ td.nowrap {
   width: 10rem;
 }
 
+/* Competition events: each series or stage a framed group of fields; on paper the open event alone */
+.event-editor {
+  max-width: 60rem;
+}
+
+.event-parts {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.event-part {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.75rem;
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-sm);
+}
+
+.event-part legend {
+  padding-inline: 0.25rem;
+  font-weight: 600;
+}
+
+.event-part-total {
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  /* with an event open, the sheet holds it on paper */
+  .library.competition-events.screen-only {
+    display: none;
+  }
+
+  .event-sheet {
+    color: #000;
+    font-size: 10pt;
+  }
+
+  .event-sheet-name {
+    font-size: 14pt;
+    font-weight: 600;
+  }
+
+  .event-sheet dl > div {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .event-sheet dt::after {
+    content: ":";
+  }
+
+  .event-sheet dd {
+    margin: 0;
+  }
+
+  .event-sheet :is(th, td) {
+    padding: 1mm 1.5mm;
+    border: 1px solid #000;
+  }
+
+  .event-sheet .num {
+    text-align: right;
+  }
+}
+
 .log-sheet table {
   width: 100%;
   border-collapse: collapse;

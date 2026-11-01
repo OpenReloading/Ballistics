@@ -23,6 +23,13 @@ import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
+import {
+  type EventRecord,
+  eventRecords,
+  ownTotal,
+  scoreText,
+  stateLabels,
+} from '../lib/competition-events.ts'
 import { dayText } from '../lib/dates.ts'
 import type { DirectorySort } from '../lib/directory.ts'
 import { download } from '../lib/download.ts'
@@ -83,10 +90,12 @@ interface LogData {
   entries: ShootingLogRecord[]
   firearms: FirearmRecord[]
   loads: LoadRecord[]
+  /** The competition events, the latest first, for the entry's link. */
+  events: EventRecord[]
 }
 
 /** The disciplines of the catalogue as select options, by federation; empty while unreachable. */
-function useDisciplines() {
+export function useDisciplines() {
   const [data, setData] = useState<FederationData>()
   useEffect(() => {
     // unreachable: no discipline to choose, a stored one shows by its id
@@ -114,7 +123,10 @@ function namesOf(
   t: Translator['t'],
 ): LogNames {
   const own = new Map(
-    [...(data?.firearms ?? []), ...(data?.loads ?? [])].map((r) => [r.id, r.name]),
+    [...(data?.firearms ?? []), ...(data?.loads ?? []), ...(data?.events ?? [])].map((r) => [
+      r.id,
+      r.name,
+    ]),
   )
   const named = (ref: string | undefined) => {
     if (ref === undefined) return ''
@@ -123,6 +135,7 @@ function namesOf(
   return {
     firearm: named,
     load: named,
+    event: named,
     discipline: (ref) => (ref === undefined ? '' : (disciplines.get(ref) ?? ref.slice(10))),
   }
 }
@@ -141,12 +154,50 @@ function periodText(t: Translator['t'], f: LogFilter, firearm?: string) {
   return firearm ? `${firearm}, ${period}` : period
 }
 
+/** The result an entry takes from its competition event: the total, or how the event ended. */
+function eventResult(r: EventRecord, t: Translator['t']) {
+  return r.data.state === 'completed' ? scoreText(ownTotal(r.data)) : t(stateLabels[r.data.state])
+}
+
+/** The competition event of an entry; choosing one fills an empty result with the event's. */
+function EventSelect({
+  events,
+  entry,
+  patch,
+}: {
+  events: EventRecord[]
+  entry: ShootingLogEntry
+  patch: (p: Partial<ShootingLogEntry>) => void
+}) {
+  const { t } = useTranslation()
+  return (
+    <Select
+      label={t('Competition event')}
+      description={t("Fills an empty result with the event's total.")}
+      placeholder={events.length ? t('None') : t('No competition event saved yet')}
+      searchable
+      clearable
+      data={events.map((r) => ({
+        value: `user:${r.id}`,
+        label: `${dayText(r.data.date)} ${r.name}`,
+      }))}
+      value={entry.event ?? null}
+      onChange={(v) => {
+        const linked = events.find((r) => `user:${r.id}` === v)
+        const result = linked && !entry.result?.trim() ? eventResult(linked, t) : undefined
+        patch({ event: v ?? undefined, ...(result && { result }) })
+      }}
+    />
+  )
+}
+
 /** The form of one entry: day, place, discipline, firearm, load or ammunition, rounds, result, notes, confirmation. */
 function EntryForm({
   entry,
   setEntry,
   firearms,
   loads,
+  events,
   disciplines,
   disciplineName,
   problem,
@@ -158,6 +209,7 @@ function EntryForm({
   setEntry: (update: (e: ShootingLogEntry) => ShootingLogEntry) => void
   firearms: FirearmRecord[]
   loads: LoadRecord[]
+  events: EventRecord[]
   disciplines: { group: string; items: { value: string; label: string }[] }[]
   disciplineName: (ref: string | undefined) => string
   problem: Message | undefined
@@ -253,6 +305,7 @@ function EntryForm({
           value={entry.result ?? ''}
           onChange={(e) => patch({ result: e.currentTarget.value })}
         />
+        <EventSelect events={events} entry={entry} patch={patch} />
         <TextInput
           label={t('Confirmed by')}
           description={t('Who confirmed the entry, as you type it.')}
@@ -364,6 +417,7 @@ async function readLog(): Promise<LogData> {
     loads: records
       .filter((r): r is LoadRecord => r.kind === 'load')
       .sort((a, b) => a.name.localeCompare(b.name)),
+    events: eventRecords(records),
   }
 }
 
@@ -539,6 +593,7 @@ function logColumns(
       cell: (r) => r.data.rounds,
     },
     text('result', msg('Result'), '8rem', (r) => r.data.result ?? ''),
+    text('event', msg('Competition event'), '10rem', (r) => names.event(r.data.event)),
     text('confirmed', msg('Confirmed by'), '8rem', (r) => r.data.confirmation?.by ?? ''),
     {
       key: 'actions',
@@ -552,7 +607,7 @@ function logColumns(
 }
 
 /** A bar button that says in its title why it does nothing while `nothing` holds a reason. */
-function BarButton({
+export function BarButton({
   nothing,
   onClick,
   children,
@@ -694,7 +749,7 @@ function useLogData() {
       },
       (e) => {
         if (current !== reads.current) return
-        setData({ records: [], entries: [], firearms: [], loads: [] })
+        setData({ records: [], entries: [], firearms: [], loads: [], events: [] })
         setRead(false)
         setReadError(errorText(e))
       },
@@ -766,6 +821,7 @@ function LogBody({
           tn(r.data.rounds, '{count} round', '{count} rounds'),
           r.data.place,
           r.data.result,
+          names.event(r.data.event),
         ]
           .filter(Boolean)
           .join(' · ')
@@ -938,6 +994,7 @@ export function ShootingLog() {
             setEntry={(update) => setEditing((s) => (s ? { ...s, entry: update(s.entry) } : s))}
             firearms={data?.firearms ?? []}
             loads={data?.loads ?? []}
+            events={data?.events ?? []}
             disciplines={disciplines.options}
             disciplineName={names.discipline}
             problem={tried ? problem : undefined}

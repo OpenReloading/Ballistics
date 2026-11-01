@@ -55,6 +55,7 @@ const names: LogNames = {
     ({ [`user:${rifle}`]: 'Bench rifle', [`user:${pistol}`]: 'Club pistol' })[ref ?? ''] ?? '',
   load: (ref) => (ref === `user:${load}` ? 'Load A' : ''),
   discipline: (ref) => ref ?? '',
+  event: () => '',
 }
 
 const firearm = (data: Record<string, unknown> = {}) =>
