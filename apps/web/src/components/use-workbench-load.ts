@@ -2052,12 +2052,7 @@ export function useWorkbenchState() {
       setLadderError(ladderInvalid)
       // the seating ladder's reasons are about the seating, not about one field: the status line names them too
       if (ladderInvalid && ladderKind !== 'charge') setStatus(ladderInvalid)
-      // a typed Pmax, L3 or bulk density the field refuses: the run would read the record's instead
-      const specInvalid = specFields.some((f) => {
-        const v = spec.typed[f.key]
-        return !!v?.text.trim() && fieldError(f, v, system, t) !== undefined
-      })
-      invalid = hasErrors || ladderInvalid !== undefined || specInvalid
+      invalid = hasErrors || ladderInvalid !== undefined || specError() !== undefined
       // on phones the field sits in the Load tab, which is hidden while Results is open
       if (invalid) workspace.current?.showInputs()
     })
@@ -2074,6 +2069,16 @@ export function useWorkbenchState() {
     return true
   }
 
+  /** The message of a typed Pmax, L3 or bulk density its field refuses: a run would read the record's instead. */
+  function specError() {
+    for (const f of specFields) {
+      const v = spec.typed[f.key]
+      const error = v?.text.trim() ? fieldError(f, v, system, t) : undefined
+      if (error) return error
+    }
+    return
+  }
+
   /**
    * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
    * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
@@ -2084,6 +2089,9 @@ export function useWorkbenchState() {
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
+    // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
+    const typedError = specError()
+    if (typedError) throw new Error(typedError)
     const chosen = as?.powder ?? chosenPowder
     const { body, bulkDensity, missing } = interiorRequest({
       values: powderValues(siValues(fields), chosenPowder, as),

@@ -637,7 +637,7 @@ function useStart(o: {
     // a design starts empty: a seating the user did not enter would be a default
     if (!range || !chamber || designed) return
     // a typed L3 rebuilds the chamber: the chosen position stays, its depth and volume follow
-    const key = [startFor, initialBy, initialValue, canCbto]
+    const key = [startFor, shape, initialBy, initialValue, canCbto]
     const same = startedFor.current?.every((v, i) => v === key[i])
     startedFor.current = key
     if (same) return
@@ -649,6 +649,7 @@ function useStart(o: {
     range,
     chamber,
     startFor,
+    shape,
     designed,
     initialBy,
     initialValue,
