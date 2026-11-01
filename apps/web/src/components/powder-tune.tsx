@@ -11,6 +11,7 @@ import type {
 } from '@open-reloading/core'
 import {
   chronoSession,
+  type Firearm,
   type Powder,
   parseRef,
   type SessionRecord,
@@ -46,7 +47,7 @@ import {
 } from '../lib/powder-tune.ts'
 import { stringStats } from '../lib/string-stats.ts'
 import { tunePowderHref } from '../lib/tune-href.ts'
-import { readTuneBase, readTuneLoad, tuneTable } from '../lib/tune-load.ts'
+import { readTuneAction, readTuneBase, readTuneLoad, tuneTable } from '../lib/tune-load.ts'
 import {
   powdersWithStrings,
   readStringForm,
@@ -793,6 +794,7 @@ export function TuneNotes({
   sensitivity = '',
   onSensitivity = () => {},
   table,
+  action,
 }: {
   loaded: ReturnType<typeof loadStrings> | undefined
   /** The load the workbench handed over, before a sensitivity typed here. */
@@ -811,6 +813,8 @@ export function TuneNotes({
   onSensitivity?: (text: string) => void
   /** The CIP table of the load's cartridge record the workbench handed over. */
   table?: string | undefined
+  /** The action of the firearm the load links, where its record states one. */
+  action?: Firearm['action']
 }) {
   const { t } = useTranslation()
   const { system } = useUnits()
@@ -867,7 +871,7 @@ export function TuneNotes({
           strings={strings}
           save={save}
           onAnyway={onAnyway}
-          revolver={revolverLeakNote(table, interior)}
+          revolver={revolverLeakNote(table, interior, action)}
         />
       )}
     </>
@@ -996,6 +1000,7 @@ export function PowderTune() {
   const [loaded, setLoaded] = useState<ReturnType<typeof loadStrings>>()
   const [interior, setInterior] = useState<InteriorLoad>()
   const [table, setTable] = useState<string>()
+  const [action, setAction] = useState<Firearm['action']>()
   const [save, setSave] = useState<TuneSave>()
   const [records, setRecords] = useState<UserRecord[]>()
   const [powder, setPowder] = useState<string>()
@@ -1015,6 +1020,7 @@ export function PowderTune() {
           setLoaded(found)
           if (!found.load) return
           setInterior(readTuneLoad(found.load))
+          setAction(readTuneAction(found.load))
           const own = s.filter((r) => r.data.strings.some((str) => str.load === found.load))
           const base = readTuneBase(found.load)
           const sessions = own.map((r) => r.id)
@@ -1135,6 +1141,7 @@ export function PowderTune() {
           sensitivity={sensitivity}
           onSensitivity={setSensitivity}
           table={table}
+          action={action}
         />
         {ladderGuide && temperatureGuide && (
           <p className="note">

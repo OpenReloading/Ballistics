@@ -272,7 +272,11 @@ export function RecordSearch<T extends { id: string }>({
             }}
           />
         </Combobox.Target>
-        <Combobox.Dropdown hidden={items.length === 0 && local.length === 0}>
+        {/* a border and a shadow: the list stands apart from the page under it (globals.css) */}
+        <Combobox.Dropdown
+          className="record-search-list"
+          hidden={items.length === 0 && local.length === 0}
+        >
           <Combobox.Options aria-label={t('Matches')} mah={280} style={{ overflowY: 'auto' }}>
             {local.map((e) => (
               <Combobox.Option value={`extra:${e.id}`} key={`extra:${e.id}`}>

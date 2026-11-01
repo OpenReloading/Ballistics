@@ -58,23 +58,23 @@ function percentTarget(
 ):
   | {
       target: ChargeTarget
-      limit?: Pick<Limit, 'cartridge' | 'revised' | 'symbol' | 'variant'> & { pressure: number }
+      limit?: Pick<Limit, 'cartridge' | 'revised' | 'typed' | 'symbol' | 'variant'> & {
+        pressure: number
+      }
     }
   | { refusal: ReturnType<typeof unprocessableAnswer> } {
   const target: ChargeTarget = { kind: body.target.kind, value: body.target.value }
   if (body.target.unit !== 'percentOfLimit') return { target }
-  const compared = cartridge
-    ? (limitCheck(emptyPressureRange, cartridge).limits ?? []).filter(
-        (l) => l.compared && l.pressure !== undefined,
-      )
-    : []
+  const compared = (
+    limitCheck(emptyPressureRange, cartridge, undefined, body.pressureLimit).limits ?? []
+  ).filter((l) => l.compared && l.pressure !== undefined)
   const [found] = compared
   if (found?.pressure === undefined)
     return {
       refusal: unprocessableAnswer(
         'noComparableLimit',
         body.cartridge === undefined
-          ? 'a percentage target needs a cartridge id'
+          ? 'a percentage target needs a cartridge id or a pressureLimit'
           : `${body.cartridge} has no CIP Pmax measured by transducer or piezo`,
       ),
     }
@@ -86,8 +86,9 @@ function percentTarget(
       ),
     }
   const limit = {
-    cartridge: found.cartridge,
-    revised: found.revised,
+    ...(found.cartridge !== undefined && { cartridge: found.cartridge }),
+    ...(found.revised !== undefined && { revised: found.revised }),
+    ...(found.typed && { typed: found.typed }),
     symbol: found.symbol,
     ...(found.variant !== undefined && { variant: found.variant }),
     pressure: found.pressure,
@@ -212,7 +213,7 @@ export async function runChargeTarget(
     tolerances,
   })
   if (!result.valid || !range) throw new Error('the solved run is not valid')
-  const checked = limitCheck(range, cartridge, { result, load })
+  const checked = limitCheck(range, cartridge, { result, load }, body.pressureLimit)
   return {
     status: 200,
     payload: chargeAnswer({ solution, target: echoTarget, run: result, range, checked, powder }),

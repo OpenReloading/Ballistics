@@ -69,10 +69,10 @@ _Avoid_: maker
 `fields`: dot paths of the record fields a source supports. Absent: the whole record.
 
 **License**:
-`license`: SPDX id of the license the data of a source is used under, or `LicenseRef-<name>` for the publisher's own terms or a written permission.
+`license`: SPDX id of the license the data of a source is used under, or `LicenseRef-<name>` for the publisher's own terms.
 
 **Terms**:
-`terms`: URL or note of the publisher's terms or permission where no SPDX license covers the use.
+`terms`: URL or note of the publisher's terms where no SPDX license covers the use.
 
 **Source origin**:
 `origin`: who stands behind a source: `manufacturer`, `public` or `community`.
@@ -672,6 +672,10 @@ _Avoid_: `step`, `steps` (of a ladder)
 **Firearm**:
 A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per chronograph session or competition event, so each is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
 _Avoid_: rifle, gun
+
+**Firearm action**:
+`action` of a firearm record: `rifle`, `pistol` or `revolver`, optional (absent: not stated). It says what kind of firearm it is where a model needs it: a revolver has a gap between cylinder and barrel, which the powder fit's revolver note reads. German UI: Art der Schusswaffe (Gewehr, Pistole, Revolver).
+_Avoid_: type, kind (of a firearm)
 
 **Freebore**:
 `freebore`: unrifled length of the throat from the case mouth to the start of the rifling, mm, on a firearm.

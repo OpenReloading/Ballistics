@@ -15,7 +15,7 @@
     "shell": {
       "budget": {
         "initial": 424000,
-        "total": 476000
+        "total": 478000
       },
       "routes": {
         "/": {
@@ -75,7 +75,7 @@
     "records": {
       "budget": {
         "initial": 506000,
-        "total": 557500
+        "total": 560000
       },
       "routes": {
         "/bullets/[id]": {
@@ -194,7 +194,7 @@
     },
     "workbench": {
       "budget": {
-        "initial": 632000,
+        "initial": 636000,
         "total": 1056000
       },
       "routes": {

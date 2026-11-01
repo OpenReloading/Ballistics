@@ -121,6 +121,8 @@ function loadFileRecords(catalogue: Catalogue, record: Load) {
 type SummaryInputs = {
   /** Bulk density of the propellant, kg/m3. */
   bulkDensity: number | undefined
+  /** The file types the bulk density: the powder record's is not read. */
+  bulkDensityTyped?: boolean
   chamberVolume: number
   /** Solid density of the propellant, kg/m3. */
   density: number
@@ -228,7 +230,7 @@ function simulateAnswer(
         powder:
           powder &&
           resolvedRecord(powder, [
-            ...(summary.bulkDensity ? ['bulkDensity'] : []),
+            ...(summary.bulkDensity && !summary.bulkDensityTyped ? ['bulkDensity'] : []),
             ...(powder.interior?.resistance ? ['interior.resistance'] : []),
           ]),
       },
@@ -260,6 +262,12 @@ function needChargesAboveZero(charge: number, ladder: InteriorBody['ladder']) {
   if (lowest <= 0) throw new InputError(`ladder charge ${grams(lowest)} g must be above 0`)
 }
 
+/** The bulk density of the run, kg/m3: the file's own, else the powder record's. */
+const bulkDensityOf = (values: Record<string, number>, powder: Powder | undefined) => ({
+  bulkDensity: values.bulkDensity ?? (powder && powderBulkDensity(powder)),
+  bulkDensityTyped: values.bulkDensity !== undefined,
+})
+
 /** One `POST /interior/load-file` request (`query`, the load file `json`): the status and body of the answer. */
 export async function simulate(
   context: { catalogue: Catalogue; compute: ComputeRunner },
@@ -285,6 +293,7 @@ export async function simulate(
         model: 'm3',
         load: resistance ? { ...load, resistance } : load,
         ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
+        ...(values.pmax !== undefined && { pressureLimit: values.pmax }),
         ...(withLadder && {
           ladder: {
             chargeStep: step,
@@ -357,7 +366,7 @@ export async function simulate(
     powder,
     resistance,
     summary: {
-      bulkDensity: powder && powderBulkDensity(powder),
+      ...bulkDensityOf(values, powder),
       chamberVolume: load.chamber.volume,
       density: load.propellant.density,
       powderLabel,

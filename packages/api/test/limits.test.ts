@@ -48,6 +48,34 @@ describe('limitCheck', () => {
     ])
   })
 
+  it('compares a typed limit instead of the sheet values and says it is typed', () => {
+    const sheet = cartridge([{ symbol: 'Pmax', quantity: 'pressure', value: 4200 }])
+    const { limits, warnings, cartridge: echoed } = limitCheck(range, sheet, undefined, 3.7e8)
+    expect(limits).toEqual([
+      {
+        symbol: 'Pmax',
+        method: 'typed',
+        typed: true,
+        pressure: 3.7e8,
+        compared: true,
+        exceeded: true,
+        nominalExceeded: true,
+      },
+    ])
+    expect(warnings.map((w) => [w.code, w.method, w.spec])).toEqual([
+      ['limitExceeded', 'typed', undefined],
+    ])
+    expect(warnings[0]?.message).toBe(
+      'Simulated peak pressure 3900 bar (range 3500 to 4300 bar) is above the typed Pmax 3700 bar.',
+    )
+    expect(echoed?.id).toBe('x')
+    // a limit above the range exceeds nothing, and needs neither a cartridge nor a method
+    const above = limitCheck(range, undefined, undefined, 5e8)
+    expect(above.limits?.[0]).toMatchObject({ exceeded: false, nominalExceeded: false })
+    expect(above.warnings).toEqual([])
+    expect(above.cartridge).toBeUndefined()
+  })
+
   it('ignores other symbols, lists values without a number', () => {
     const { limits, warnings } = limitCheck(
       range,

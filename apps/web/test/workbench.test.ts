@@ -172,6 +172,29 @@ describe('shownWarnings', () => {
     expect(small.text).toContain('250 bar')
   })
 
+  it("writes a typed Pmax as the reader's own, with no sheet and no method", () => {
+    const typed = {
+      pressureRange: { nominalPressure: 4766e5, lowPressure: 4174e5, highPressure: 5460e5 },
+      limits: [
+        {
+          symbol: 'Pmax',
+          method: 'typed',
+          typed: true,
+          compared: true,
+          pressure: 4150e5,
+          exceeded: true,
+          nominalExceeded: true,
+        },
+      ],
+      warnings: [{ code: 'limitExceeded', symbol: 'Pmax', method: 'typed', message: 'in bar' }],
+    } as unknown as InteriorResponse
+    const [line = missing()] = shownWarnings(typed, presetUnits('metric-grains'), english.t)
+    expect(line).toEqual({
+      text: 'Simulated peak pressure 4766 bar (range 4174 to 5460 bar) is above your Pmax 4150 bar.',
+      name: 'above your Pmax',
+    })
+  })
+
   it('writes each exceeded limit with its own variant and value', () => {
     const exceeded = (variant: string, pressure: number) => ({
       limit: limit({ variant, pressure, exceeded: true, nominalExceeded: true }),

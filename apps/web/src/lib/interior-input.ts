@@ -311,6 +311,38 @@ export const bulletFields = [
   },
 ] as const satisfies readonly FieldSpec[]
 
+/**
+ * The cartridge sheet's and the powder record's values the user may type over them
+ * (`record-specs.ts`). Not interior inputs: the Pmax is the limit the readouts, the chart and the
+ * charge target compare with, the case length L3 the seating reads, the bulk density the load ratio.
+ */
+export const specFields = [
+  {
+    key: 'pmax',
+    label: msg('Pmax'),
+    help: msg('A typed value is your limit, not a CIP value. Empty: the CIP sheet.'),
+    quantity: 'pressure',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'caseLength',
+    label: msg('Case length L3'),
+    help: msg('Used by the seating and the cartridge figure. Empty: the CIP sheet.'),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulkDensity',
+    label: msg('Bulk density'),
+    help: msg('Used by the load ratio and the case fill. Empty: the powder record.'),
+    quantity: 'density',
+    min: 0,
+    positive: true,
+  },
+] as const satisfies readonly FieldSpec[]
+
 /** A partly filled burn form's error on the empty field `key`; undefined otherwise. */
 export function burnFormError(
   values: Record<string, number | undefined>,
@@ -325,7 +357,13 @@ export function burnFormError(
 
 export type InteriorKey = (typeof interiorFields)[number]['key']
 
-export type InteriorBody = { model: 'm3'; load: InteriorLoad; cartridge?: string | undefined }
+export type InteriorBody = {
+  model: 'm3'
+  load: InteriorLoad
+  cartridge?: string | undefined
+  /** A pressure limit the user typed, Pa: the one limit instead of the cartridge's CIP Pmax. */
+  pressureLimit?: number | undefined
+}
 
 /**
  * `POST /interior` body from SI field values; the mapping is `interiorLoad` of core, shared with
@@ -335,11 +373,13 @@ export function interiorBody(
   values: Record<string, number | undefined>,
   cartridge?: string | undefined,
   grooveDiameter?: number | undefined,
+  pressureLimit?: number | undefined,
 ): InteriorBody {
   const label = (key: string) => interiorFields.find((s) => s.key === key)?.label ?? key
   return {
     model: 'm3',
     load: interiorLoad(values, label, grooveDiameter),
     ...(cartridge && { cartridge }),
+    ...(pressureLimit !== undefined && { pressureLimit }),
   }
 }

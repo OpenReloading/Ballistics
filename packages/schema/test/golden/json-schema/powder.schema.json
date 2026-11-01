@@ -664,12 +664,12 @@
               "license": {
                 "type": "string",
                 "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
-                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`."
               },
               "terms": {
                 "type": "string",
                 "minLength": 1,
-                "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                "description": "URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link."
               },
               "origin": {
                 "type": "string",

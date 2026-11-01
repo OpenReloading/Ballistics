@@ -34,6 +34,8 @@ export interface Givers {
   origin?: Record<string, number> | undefined
   /** The bullet record's or design's values by key, only while the load keeps a reference to it. */
   bullet?: BulletValues | undefined
+  /** The cartridge sheet's and the powder's values (`record-specs.ts`), only while the load keeps a reference to that record. */
+  specs?: Record<string, number | undefined> | undefined
   /** The Settings defaults and the fields still holding one. */
   defaults: Record<string, number | undefined>
   defaulted: ReadonlySet<string>
@@ -58,6 +60,7 @@ export function givenKeys(values: Record<string, number | undefined>, g: Givers)
     if (
       same(g.origin?.[key], si) ||
       same(g.bullet?.[key as BulletValueKey], si) ||
+      same(g.specs?.[key], si) ||
       (g.defaulted.has(key) && same(g.defaults[key], si)) ||
       (g.followed.has(key) && same(g.suggestions[key], si)) ||
       (g.seatingKept && si === g.previewed[key]) ||

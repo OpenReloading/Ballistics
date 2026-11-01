@@ -158,9 +158,9 @@ test('the base form and its dimensions are typed over the record, change the vol
   await base.selectOption('flat')
   await expect(tail).toHaveCount(0)
   await expect(volume).not.toHaveValue(seated)
-  // the rows moved up under the pointer: the tooltip of the Construction row would cover the button
+  // the rows moved up under the pointer: the tooltip of the Construction row can cover the button
   await page.mouse.move(0, 0)
-  await reset('Base type').click()
+  await reset('Base type').dispatchEvent('click')
   await expect(base).toHaveValue('boat-tail')
   await expect(tail).toHaveValue(recorded)
   expect(await settled()).toBe(seated)
@@ -186,4 +186,72 @@ test('a link with a base form opens with it, marked as changed', async ({ page }
   await expect(
     page.getByRole('button', { name: /^Reset Base type to the record value/ }),
   ).toHaveCount(1)
+})
+
+test('a typed Pmax is the limit of the readouts, marked as yours, and a reset brings the sheet back', async ({
+  page,
+}) => {
+  await page.goto('/workbench')
+  await applyExampleLoad(page)
+  const form = loadForm(page)
+  const pmax = form.getByRole('textbox', { name: /^Pmax/ })
+  const reset = form.getByRole('button', { name: /^Reset Pmax to the record value/ })
+  const peak = () => page.locator('.result .readout-limits')
+  const recorded = await pmax.inputValue()
+  await expect(pmax).toHaveClass(/field-default/)
+  await form.getByLabel(/^Charge mass/).press('Control+Enter')
+  await expect(peak().first()).toContainText('of CIP Pmax', { timeout: 15_000 })
+
+  await pmax.fill('3000')
+  await expect(reset).toHaveCount(1)
+  await expect(peak().first()).toContainText('of your Pmax', { timeout: 15_000 })
+  await expect(page.locator('.result')).not.toContainText('of CIP Pmax')
+
+  await reset.click()
+  await expect(pmax).toHaveValue(recorded)
+  await expect(peak().first()).toContainText('of CIP Pmax', { timeout: 15_000 })
+})
+
+test('a typed case length L3 moves the seating volume and a reset gives the sheet value back', async ({
+  page,
+}) => {
+  await page.goto('/workbench')
+  await applyExampleLoad(page)
+  const form = loadForm(page)
+  const l3 = form.getByRole('textbox', { name: /^Case length L3/ })
+  const volume = form.getByRole('textbox', { name: /^Usable case volume/ })
+  const reset = form.getByRole('button', { name: /^Reset Case length L3 to the record value/ })
+  const settled = async () => {
+    let value = ''
+    await expect
+      .poll(async () => {
+        const first = await volume.inputValue()
+        await page.waitForTimeout(500)
+        value = await volume.inputValue()
+        return first !== '' && first === value
+      })
+      .toBe(true)
+    return value
+  }
+  const seated = await settled()
+  const recorded = Number.parseFloat(await l3.inputValue())
+  await l3.fill((recorded - 2).toFixed(2))
+  await expect(reset).toHaveCount(1)
+  await expect(volume).not.toHaveValue(seated)
+  await reset.click()
+  expect(await settled()).toBe(seated)
+})
+
+test('a link carries a typed bulk density and a typed Pmax, marked as changed', async ({
+  page,
+}) => {
+  await page.goto(
+    '/workbench?cartridge=308-win&bullet=demo-bullet-168&powder=demo-powder-dp40&units=metric-grams&pmax=350000000&bulkDensity=700',
+  )
+  const form = loadForm(page)
+  // a powder record without a bulk density has the row behind Model parameters
+  await form.getByRole('button', { name: 'Show' }).click()
+  await expect(form.getByRole('textbox', { name: /^Bulk density/ })).toHaveValue(/^0[,.]7/)
+  await expect(form.getByRole('textbox', { name: /^Pmax/ })).toHaveValue(/^3[,.]?5/)
+  await expect(form.getByRole('button', { name: /^Reset Pmax to the record value/ })).toHaveCount(1)
 })

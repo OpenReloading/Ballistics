@@ -37,6 +37,12 @@ export const warningMessages = {
     msg(
       'The upper end of the simulated peak pressure range, {high}, is above {name} {limit} ({spec}; {method}); the nominal value is {nominal}.',
     ),
+    msg(
+      'Simulated peak pressure {nominal} (range {low} to {high}) is above the typed {name} {limit}.',
+    ),
+    msg(
+      'The upper end of the simulated peak pressure range, {high}, is above the typed {name} {limit}; the nominal value is {nominal}.',
+    ),
   ],
   noCartridge: [msg('No cartridge id was given, so no CIP Pmax was checked.')],
   noComparableLimit: [
