@@ -17,7 +17,7 @@ import {
   rowParts,
 } from './record-fields.ts'
 import { type UnitSystem, withUnit } from './units.ts'
-import type { Wording } from './wording.ts'
+import { type Wording, worded } from './wording.ts'
 
 /** A row of the comparison: one value per bullet as shown in the preset, undefined where absent. */
 interface CompareRow {
@@ -80,9 +80,77 @@ function mergeRows(
 }
 
 /**
- * The bullets' data tables merged: the groups of the bullet record's data table, then the
- * ballistic coefficients, each row once in the order first met (a repeated label once per
- * repeat), a value per bullet where its record has the row.
+ * The rows compared first, in this order, from the group they are taken out of: each by the start
+ * of its key (a coefficient's key goes on with its band), the label it takes in the Key group.
+ */
+const keyRows: { group: Wording; key: string }[] = [
+  { group: msg('Size'), key: 'Mass#' },
+  { group: msg('Size'), key: 'Diameter#' },
+  { group: msg('Size'), key: 'Length#' },
+]
+
+/** The drag models of the Key group. */
+const keyModels = ['G1', 'G7']
+
+/** The first row of `group` whose key starts with `start`, taken out of it, with its key. */
+function take(groups: Map<string, Map<string, CompareRow>>, group: Wording, start: string) {
+  const rows = groups.get(keyOf(group))
+  const found = [...(rows?.keys() ?? [])].find((r) => r.startsWith(start))
+  const row = found === undefined ? undefined : rows?.get(found)
+  if (found === undefined || !row) return []
+  rows?.delete(found)
+  return [[found, row] as const]
+}
+
+/** The coefficient rows `ids`, taken out of the Ballistic coefficients group, labelled "BC G1", "BC G7". */
+function takeCoefficients(groups: Map<string, Map<string, CompareRow>>, ids: string[]) {
+  const coefficients = groups.get(keyOf(msg('Ballistic coefficients')))
+  return ids.flatMap((id) => {
+    const row = coefficients?.get(id)
+    if (!row) return []
+    coefficients?.delete(id)
+    const model = typeof row.label === 'object' && 'verbatim' in row.label ? row.label.verbatim : ''
+    return [[id, { ...row, label: worded(msg('BC {model}'), { model }) }] as const]
+  })
+}
+
+/**
+ * The Key group: mass, diameter and length taken out of Size, the coefficient rows `bc` (moved
+ * whole, their band kept) and the sectional density out of Computed.
+ */
+function keyGroup(
+  groups: Map<string, Map<string, CompareRow>>,
+  bc: string[],
+): Map<string, CompareRow> {
+  return new Map<string, CompareRow>([
+    ...keyRows.flatMap((k) => take(groups, k.group, k.key)),
+    ...takeCoefficients(groups, bc),
+    ...take(groups, msg('Computed'), 'Sectional density#'),
+  ])
+}
+
+/**
+ * The merged row keys (`mergeRows`) of each bullet's first coefficient of each of `keyModels`,
+ * G1 before G7, each once: a band of its own is a row of its own.
+ */
+function keyCoefficients(bullets: Bullet[], system: UnitSystem): string[] {
+  return keyModels.flatMap((model) => [
+    ...new Set(
+      bullets.flatMap((b) => {
+        const c = b.ballisticCoefficients?.find((x) => x.dragModel === model)
+        if (!c) return []
+        const from = c.minVelocity && ` from ${withUnit('velocity', system, c.minVelocity.value)}`
+        return [`${keyOf({ verbatim: model })}${from ?? ''}#0`]
+      }),
+    ),
+  ])
+}
+
+/**
+ * The bullets' data tables merged: the Key group (mass, diameter, length, BC G1 and G7, sectional
+ * density), then the rest of the groups of the bullet record's data table and the ballistic
+ * coefficients, each row once in the order first met (a repeated label once per repeat), a value
+ * per bullet where its record has the row.
  */
 export function compareGroups(
   bullets: Bullet[],
@@ -111,9 +179,14 @@ export function compareGroups(
       mergeRows(rows, g.rows, i, bullets.length, system, t)
     }
   })
-  return [...groups]
-    .map(([title, rows]) => ({ title: titles.get(title) ?? untitled, rows: [...rows.values()] }))
-    .filter((g) => g.rows.length > 0)
+  const key = keyGroup(groups, keyCoefficients(bullets, system))
+  return [
+    { title: msg('Key values') as Wording, rows: [...key.values()] },
+    ...[...groups].map(([title, rows]) => ({
+      title: titles.get(title) ?? untitled,
+      rows: [...rows.values()],
+    })),
+  ].filter((g) => g.rows.length > 0)
 }
 
 /** Whether a row's shown values are not all the same. An absent value differs from a present one. */
@@ -140,6 +213,38 @@ export function differenceMarks(
   const [lo, hi] = [Math.min(...present), Math.max(...present)]
   if (present.length < 2 || lo === hi) return xs.map(() => undefined)
   return xs.map((x) => (x === hi ? 'max' : x === lo ? 'min' : undefined))
+}
+
+/** A shown value as a number: a decimal comma reads as a point, a twist by its length per turn after `turnPrefix`. */
+const shownNumber = (s: string, turnPrefix: string) => {
+  const text = (s.startsWith(turnPrefix) ? s.slice(turnPrefix.length) : s).trim()
+  // one decimal mark at most (the values are shown without grouping); no text is no number
+  return text === '' || /[.,].*[.,]/.test(text) ? Number.NaN : Number(text.replace(',', '.'))
+}
+
+/**
+ * The difference of each value to the first bullet's, as shown: signed (minus U+2212, ±0 where
+ * equal), in the decimals of the longer of the two, with the decimal mark the values use. None for
+ * the first column, an absent or a non-numeric value.
+ */
+export function differenceToFirst(
+  shown: readonly (string | undefined)[],
+  turnPrefix = turnPrefixOf(translator().t),
+): (string | undefined)[] {
+  const [first] = shown
+  const base = first === undefined ? Number.NaN : shownNumber(first, turnPrefix)
+  const decimals = (s: string) => s.match(/[.,](\d+)$/)?.[1]?.length ?? 0
+  const difference = (s: string | undefined, i: number): string | undefined => {
+    if (i === 0 || s === undefined || first === undefined) return undefined
+    const x = shownNumber(s, turnPrefix)
+    if (!Number.isFinite(x) || !Number.isFinite(base)) return undefined
+    const digits = Math.max(decimals(s), decimals(first))
+    const d = Number((x - base).toFixed(digits))
+    const text = Math.abs(d).toFixed(digits)
+    const marked = s.includes(',') || first.includes(',') ? text.replace('.', ',') : text
+    return d === 0 ? `±${marked}` : `${d < 0 ? '−' : '+'}${marked}`
+  }
+  return shown.map((s, i) => difference(s, i))
 }
 
 /**

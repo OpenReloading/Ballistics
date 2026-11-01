@@ -65,7 +65,7 @@ Three record kinds describe who defines a discipline, what the discipline is and
 | `seriesShots` | Shots of one series, where the score is split into series |
 | `timeLimits` | List of `duration` (s, with the printed figure in `raw`), what it `covers` (`discipline`, `stage`, `series`, `shot`) and `includesSighters` where stated |
 
-A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](record-model.md)). Power factors, which are no single stored quantity, are not recorded.
+A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](record-model.md)). Power factors, which are no single stored quantity, are not recorded on disciplines; the event types of practical shooting hold them per division ([Event types](event-types.md)).
 
 ### Which facts the rule books state
 

@@ -1,6 +1,8 @@
 'use client'
 
+import { Anchor } from '@mantine/core'
 import { useTranslation } from '../i18n/language.ts'
+import { howCloseGuide } from '../lib/docs-url.ts'
 import { AppModal } from './app-modal.tsx'
 import { noteLooks } from './result-notes.tsx'
 import { noteKinds, type ResultNote } from './workbench-outcome.ts'
@@ -39,6 +41,13 @@ export function ResultNotesDialog({
           </section>
         )
       })}
+      {howCloseGuide && (
+        <p className="note">
+          <Anchor href={howCloseGuide} target="_blank" rel="noopener" size="sm">
+            {t('How close a result is')}
+          </Anchor>
+        </p>
+      )}
     </AppModal>
   )
 }

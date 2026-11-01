@@ -40,6 +40,8 @@ function laid(r: Bullet, p: BulletProfile, medium: 'screen' | 'print') {
     layout: model.layers.bullet,
     axis: model.axis.bullet,
     em: model.em,
+    // the bullet drawing prints mm to 2 decimals, inches to 4 (`labelText`)
+    fixedDecimals: true,
     values: bulletSymbols.map((s) => ({
       side: 'cartridge' as const,
       symbol: s.symbol,

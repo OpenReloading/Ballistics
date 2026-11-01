@@ -5,6 +5,7 @@ import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
 import Link from 'next/link'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
+import { fieldLabel } from '../lib/field-labels.ts'
 import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
@@ -78,28 +79,48 @@ function SourceMeta({ source: s }: { source: Source }) {
   )
 }
 
-function CoversCell({ fields }: { fields: string[] | undefined }) {
+/** The fields a source covers: their count, the list of their labels on hover and on focus. */
+function CoversCell({ fields, kind }: { fields: string[] | undefined; kind: string | undefined }) {
   const { t, tn } = useTranslation()
   if (!fields) return t('whole record')
   return (
     <Noted
       value={tn(fields.length, '{count} field', '{count} fields')}
-      notes={[fields.join(', ')]}
+      notes={[fields.map((f) => fieldLabel(f, kind, t)).join(', ')]}
     />
   )
 }
 
-function SourceRow({ source: s, has }: { source: Source; has: Has }) {
+/**
+ * One source as a row. `inGroup`: a row under its document's head row, headed by its page (or "No page stated"), the document's title, publisher, edition, terms and hash being in the head.
+ */
+function SourceRow({
+  source: s,
+  has,
+  kind,
+  inGroup,
+}: {
+  source: Source
+  has: Has
+  kind: string | undefined
+  inGroup?: boolean
+}) {
   const { t } = useTranslation()
   const origin = s.origin && origins[s.origin]
   return (
-    <TableTr role="row">
-      <TableTh scope="row" role="rowheader">
-        <span className="source-title">
-          <SourceLink source={s} />
-        </span>
-        <SourceMeta source={s} />
-      </TableTh>
+    <TableTr role="row" className={inGroup ? 'source-page-row' : undefined}>
+      {inGroup ? (
+        <TableTh scope="row" role="rowheader" className="source-page">
+          {s.page ? t('Page {page}', { page: s.page }) : t('No page stated')}
+        </TableTh>
+      ) : (
+        <TableTh scope="row" role="rowheader">
+          <span className="source-title">
+            <SourceLink source={s} />
+          </span>
+          <SourceMeta source={s} />
+        </TableTh>
+      )}
       {has('origin') && (
         <TableTd role="cell" data-label={t('Origin')}>
           {origin ? t(origin) : s.origin}
@@ -117,7 +138,7 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
       )}
       {has('fields') && (
         <TableTd role="cell" className="nowrap" data-label={t('Covers')}>
-          <CoversCell fields={s.fields} />
+          <CoversCell fields={s.fields} kind={kind} />
         </TableTd>
       )}
       {has('note') && (
@@ -129,17 +150,84 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
   )
 }
 
+/** The document a source cites: the sources of one document share these. */
+const documentKey = (s: Source) =>
+  [s.title, s.url, s.publisher, s.edition, s.sha256, s.terms].map((v) => v ?? '').join('\u0000')
+
+/** The sources in their order, those of one document together at the place of its first. */
+export function groupSources(list: readonly Source[]): Source[][] {
+  const groups = new Map<string, Source[]>()
+  for (const s of list) {
+    const key = documentKey(s)
+    const group = groups.get(key)
+    if (group) group.push(s)
+    else groups.set(key, [s])
+  }
+  return [...groups.values()]
+}
+
+/**
+ * A document cited at several pages: a head row with its title and data (a cell across the row: a
+ * header there would head no data cell), a row per page under it.
+ */
+function SourceGroup({
+  sources,
+  has,
+  span,
+  kind,
+}: {
+  sources: Source[]
+  has: Has
+  span: number
+  kind: string | undefined
+}) {
+  const first = sources[0] as Source
+  // a page can be cited twice with other fields: the key counts repeats of the same content
+  const seen = new Map<string, number>()
+  const keys = sources.map((s) => {
+    const base = `${s.page ?? ''} ${s.fields?.join(',') ?? ''} ${s.note ?? ''}`
+    const n = (seen.get(base) ?? 0) + 1
+    seen.set(base, n)
+    return `${base} ${n}`
+  })
+  return (
+    <TableTbody role="rowgroup" className="source-group">
+      <TableTr role="row">
+        <TableTd role="cell" colSpan={span} className="source-document">
+          <span className="source-title">
+            {first.url ? <a href={first.url}>{first.title}</a> : first.title}
+          </span>
+          <SourceMeta source={first} />
+        </TableTd>
+      </TableTr>
+      {sources.map((s, i) => (
+        <SourceRow key={keys[i]} source={s} has={has} kind={kind} inGroup />
+      ))}
+    </TableTbody>
+  )
+}
+
 /**
  * The sources of a record as a table, one row per source: the title (linked) with publisher,
  * edition, terms and hash (copyable) under it, the origin, the retrieval day, the license, the
  * record fields it covers (the list on hover; "whole record" beside a source with a field list),
- * its note; then the provenance note. A column no source fills is left out. Below 48em a source is a block, each value after its column's name
+ * its note; then the provenance note. A column no source fills is left out. The sources of one
+ * document cited at several pages are one group: the document once, a row per page under it. Below 48em a source is a block, each value after its column's name
  * (`data-label`), so every table element carries its ARIA role.
  */
-export function Sources({ provenance }: { provenance: Provenance }) {
+export function Sources({
+  provenance,
+  kind,
+}: {
+  provenance: Provenance
+  /** The record kind (`powders`), whose field labels name the fields a source covers. */
+  kind?: string | undefined
+}) {
   const { t } = useTranslation()
   const list = provenance.sources
   const has = (k: keyof Source) => list.some((s) => s[k] !== undefined)
+  const span = 1 + columns.filter(([key]) => has(key)).length
+  const groups = groupSources(list)
   return (
     <>
       <ScrollRegion label={t('Sources table')}>
@@ -147,11 +235,21 @@ export function Sources({ provenance }: { provenance: Provenance }) {
           <TableThead role="rowgroup">
             <SourcesHead has={has} />
           </TableThead>
-          <TableTbody role="rowgroup">
-            {list.map((s) => (
-              <SourceRow key={`${s.title} ${s.url ?? ''} ${s.page ?? ''}`} source={s} has={has} />
-            ))}
-          </TableTbody>
+          {groups.map((group) =>
+            group.length > 1 ? (
+              <SourceGroup
+                key={documentKey(group[0] as Source)}
+                sources={group}
+                has={has}
+                span={span}
+                kind={kind}
+              />
+            ) : (
+              <TableTbody role="rowgroup" key={documentKey(group[0] as Source)}>
+                <SourceRow source={group[0] as Source} has={has} kind={kind} />
+              </TableTbody>
+            ),
+          )}
         </Table>
       </ScrollRegion>
       {provenance.note && <p>{note(provenance.note)}</p>}

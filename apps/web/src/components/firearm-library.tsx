@@ -9,6 +9,7 @@ import {
   Menu,
   Text,
   Title,
+  Tooltip,
   UnstyledButton,
 } from '@mantine/core'
 import {
@@ -26,12 +27,12 @@ import {
   useCallback,
   useDeferredValue,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
 } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import {
@@ -75,7 +76,7 @@ import { FirearmEditor } from './firearm-editor.tsx'
 import type { FirearmRangeCards, LoadRangeCard } from './firearm-range-cards.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
-import { PrintButton } from './record-actions.tsx'
+import { LinkButton, PrintButton } from './record-actions.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useManufacturers } from './use-manufacturers.ts'
@@ -115,8 +116,14 @@ const tableCaption = (t: Translator['t'], named: unknown[]) =>
 /** The filters set, named for the empty list and the caption. */
 const namedFilters = (t: Translator['t'], query: string) => [matchingText(t, query)].filter(Boolean)
 
-/** The hand of the twist as the record stores it, in the language shown. */
-const hands: Record<string, Message> = { right: msg('right'), left: msg('left') }
+/** The twist with its hand as one cell ("1:12 R"); a hand the record does not know shows as stored. */
+const twists: Record<string, Message> = { right: msg('1:{twist} R'), left: msg('1:{twist} L') }
+
+const twistText = (t: Translator['t'], { twist, hand }: { twist: string; hand: string }) => {
+  if (!twist) return ''
+  const message = twists[hand]
+  return message ? t(message, { twist }) : `1:${twist} ${hand}`.trim()
+}
 
 type Cells = ReturnType<typeof firearmCells>
 
@@ -134,8 +141,9 @@ function firearmColumns(
     {
       key: 'name',
       label: msg('Name'),
-      // every column has a width: the table scrolls sideways before the name is squeezed
-      width: '12rem',
+      // every column has a width: the table scrolls sideways before the name is squeezed; the
+      // widths add up to 72rem, which a 1280 px window holds
+      width: '12.5rem',
       value: nameOf,
       cell: (r) =>
         r === example ? (
@@ -149,7 +157,7 @@ function firearmColumns(
     {
       key: 'cartridge',
       label: msg('Cartridge'),
-      width: '9rem',
+      width: '8.5rem',
       value: (r) => cartridgeName(r.data.cartridge),
       cell: (r) => cartridgeName(r.data.cartridge) ?? '',
     },
@@ -158,7 +166,7 @@ function firearmColumns(
       label: msg('Barrel'),
       unit: system.barrelLength.symbol,
       num: true,
-      width: '6rem',
+      width: '4.5rem',
       value: (r) => r.data.barrelLength?.value,
       cell: (r) => cells(r).barrel,
     },
@@ -166,45 +174,26 @@ function firearmColumns(
       key: 'twist',
       label: msg('Twist'),
       unit: t('{unit} per turn', { unit: system.twist.symbol }),
-      help: msg('Barrel length per turn of the rifling.'),
+      help: msg('Barrel length per turn of the rifling, R right hand, L left hand.'),
       num: true,
-      width: '6.5rem',
+      width: '6rem',
       value: (r) => r.data.twist?.value,
-      cell: (r) => cells(r).twist,
-    },
-    {
-      key: 'hand',
-      label: msg('Hand'),
-      width: '7.5rem',
-      value: (r) => cells(r).hand || undefined,
-      cell: (r) => {
-        const hand = cells(r).hand
-        return hands[hand] ? t(hands[hand]) : hand
-      },
+      cell: (r) => twistText(t, cells(r)),
     },
     {
       key: 'optic',
-      label: msg('Optic'),
-      help: msg('The first optic of the active configuration.'),
-      width: '9.5rem',
-      value: (r) => cells(r).optic || undefined,
-      cell: (r) => cells(r).optic,
-    },
-    {
-      key: 'zero',
-      label: msg('Zero'),
+      label: msg('Optic, zero'),
       unit: system.range.symbol,
-      help: msg('Zero range of that optic.'),
-      num: true,
-      width: '5.5rem',
-      value: (r) => Number(canonicalNumberText(cells(r).zero)) || undefined,
-      cell: (r) => cells(r).zero,
+      help: msg('The first optic of the active configuration and its zero range.'),
+      width: '11.5rem',
+      value: (r) => cells(r).optic || undefined,
+      cell: (r) => [cells(r).optic, cells(r).zero].filter(Boolean).join(' · '),
     },
     {
       key: 'configuration',
-      label: msg('Active configuration'),
+      label: msg('Configuration'),
       help: msg('The configuration the trajectory form offers first.'),
-      width: '9.5rem',
+      width: '8rem',
       value: (r) => cells(r).configuration || undefined,
       cell: (r) => cells(r).configuration,
     },
@@ -213,7 +202,7 @@ function firearmColumns(
       label: msg('Loads'),
       help: msg('Saved loads with this firearm.'),
       num: true,
-      width: '6.25rem',
+      width: '4rem',
       value: (r) => usageOf(r).loads,
       cell: (r) => usageOf(r).loads,
     },
@@ -221,7 +210,7 @@ function firearmColumns(
       key: 'lastSession',
       label: msg('Last session'),
       help: msg('The latest dated chronograph session of those loads.'),
-      width: '8rem',
+      width: '6.5rem',
       value: (r) => usageOf(r).last,
       cell: (r) => {
         const last = usageOf(r).last
@@ -232,15 +221,17 @@ function firearmColumns(
       key: 'notes',
       label: msg('Notes'),
       help: msg('Saved loads of another cartridge, or no saved load.'),
-      width: '12rem',
+      width: '7.5rem',
       value: (r) => notesOf(r).join(' ') || undefined,
       cell: (r) => notesOf(r).join(' '),
     },
     {
       key: 'actions',
       label: msg('Actions'),
-      width: '4rem',
+      width: '3rem',
       screenOnly: true,
+      // the row menu stays in view while the table scrolls sideways
+      sticky: true,
       cell: (r, tabIndex) => actionsMenu(r, tabIndex),
     },
   ]
@@ -351,12 +342,51 @@ function FirearmCard({
   )
 }
 
+/**
+ * Export CSV of the firearms in this browser; without one it says why in its tooltip, focusable
+ * (aria-disabled, as a disabled button shows no tooltip).
+ */
+function ExportCsvButton({
+  disabled,
+  loaded,
+  onClick,
+}: {
+  disabled: boolean
+  /** The browser's firearms were read: before, or after a failed read, no reason is given. */
+  loaded: boolean
+  onClick: () => void
+}) {
+  const { t } = useTranslation()
+  const why = useId()
+  const reason = loaded
+    ? t('No firearm saved in this browser yet; the example is not exported.')
+    : ''
+  return (
+    <>
+      <Tooltip label={reason} disabled={!disabled || !reason} multiline maw={320}>
+        <Button
+          variant="default"
+          {...(disabled && { 'data-disabled': true, 'aria-disabled': true })}
+          aria-describedby={disabled && reason ? why : undefined}
+          onClick={disabled ? undefined : onClick}
+        >
+          {t('Export CSV')}
+        </Button>
+      </Tooltip>
+      {disabled && reason && (
+        <span id={why} className="visually-hidden">
+          {reason}
+        </span>
+      )}
+    </>
+  )
+}
+
 /** The list area: the read error, the loading state, the cards beside an open firearm or the table. */
 function LibraryBody({
   readError,
   onRetry,
   loaded,
-  hint,
   cards,
   empty,
   table,
@@ -364,7 +394,6 @@ function LibraryBody({
   readError: string
   onRetry: () => void
   loaded: boolean
-  hint: boolean
   /** The cards of the compact list beside an editor; none for the table. */
   cards: ReactNode[] | undefined
   empty: ReactNode
@@ -378,13 +407,10 @@ function LibraryBody({
       </ErrorNote>
     )
   if (!loaded) return <Loading what="firearms" />
-  const listed = cards?.some(Boolean)
-  return (
-    <>
-      {cards ? listed ? <ul>{cards}</ul> : empty : table}
-      {hint && <p className="note screen-only">{t('Your firearms in this browser show here.')}</p>}
-    </>
-  )
+  // no hint line under the list: the example row is always listed, and a search without a match
+  // shows the empty note
+  if (!cards) return table
+  return cards.some(Boolean) ? <ul>{cards}</ul> : empty
 }
 
 /** An optic's name, else its place in the list; the ids stay internal. */
@@ -816,6 +842,7 @@ export function FirearmLibrary() {
             <Button leftSection={<Plus aria-hidden="true" />} onClick={newFirearm}>
               {t('New firearm')}
             </Button>
+            <LinkButton href="/firearms/log">{t('Shooting log')}</LinkButton>
             <FileMenu
               ref={menu}
               kind="firearm"
@@ -826,20 +853,20 @@ export function FirearmLibrary() {
               onOpen={onOpen}
               onStored={refresh}
             />
-            <Button
-              variant="default"
+            <ExportCsvButton
               disabled={!list?.length}
+              loaded={list !== undefined && !readError}
               onClick={() =>
                 list &&
                 void import('../lib/records-csv.ts')
                   .then((m) => m.saveFirearmsCsv(list, uses, cartridgeName))
                   .catch((e) => setFailure(errorText(e)))
               }
-            >
-              {t('Export CSV')}
-            </Button>
+            />
             <UnitsIconButton />
-            <PrintButton disabled={!editing && !viewing} />
+            <PrintButton
+              disabled={!editing && !viewing && t('Open a firearm to print its data card.')}
+            />
           </>
         }
       />
@@ -866,7 +893,6 @@ export function FirearmLibrary() {
             readError={readError}
             onRetry={refresh}
             loaded={shown !== undefined}
-            hint={list?.length === 0 && named.length === 0}
             cards={compact ? cardsOf(shown, exampleShown, card) : undefined}
             empty={<EmptyList noun="firearms" filters={filterText(named)} onClear={clearFilters} />}
             table={

@@ -1,0 +1,27 @@
+{
+  "id": "ipsc",
+  "name": "International Practical Shooting Confederation",
+  "abbreviation": "IPSC",
+  "country": "international",
+  "ruleBooks": ["ipsc-handgun-rules-2026-01"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "Title page, PDF p. 1 (name, seat in Mallorca, Spain); 6.4 Regional Teams, p. 19 (member Regions of several countries)",
+        "fields": ["name", "country"]
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "Page 2, PDF p. 2 (the acronym IPSC)",
+        "fields": ["abbreviation"]
+      },
+      {
+        "source": "ipsc-handgun-rules-2026-01",
+        "page": "Title page, PDF p. 1 (title, January 2026 Edition)",
+        "fields": ["ruleBooks"]
+      }
+    ]
+  }
+}

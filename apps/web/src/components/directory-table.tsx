@@ -18,7 +18,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
-import { type Message, msg } from '../i18n/translate.ts'
+import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import {
   type DirectorySort,
   type DirectoryState,
@@ -53,10 +53,12 @@ export interface DirectoryColumn<T> {
   dim?: boolean
   /** Column width (CSS); one column without it takes the rest. */
   width?: string
-  /** Help on the header, shown on hover, focus and touch. */
-  help?: Message | undefined
+  /** Help on the header, shown on hover, focus and touch: one message, or several joined with a space. */
+  help?: Message | readonly Message[] | undefined
   /** Not printed, as a row action. */
   screenOnly?: boolean
+  /** Held at the box's right edge while the table scrolls sideways, as a row menu. */
+  sticky?: boolean
   /** Shown only in a list box of 64rem or more, so the name keeps its room on a tablet. */
   wide?: boolean
   /** At the header's end, after its label: a scale's ticks. */
@@ -148,7 +150,13 @@ function sideTarget(key: string, row: HTMLElement, cell: HTMLElement) {
 const cellClass = <T,>(c: DirectoryColumn<T>, link: string, repeat = false) =>
   c.key === link
     ? 'name-cell'
-    : [c.num && 'num', c.screenOnly && 'screen-only', c.wide && 'wide-only', repeat && 'repeat']
+    : [
+        c.num && 'num',
+        c.screenOnly && 'screen-only',
+        c.wide && 'wide-only',
+        c.sticky && 'sticky-end',
+        repeat && 'repeat',
+      ]
         .filter(Boolean)
         .join(' ') || undefined
 
@@ -203,6 +211,7 @@ const printedLines: Record<ListNoun, Message> = {
   faces: msg('Printed: the first {limit} of {total} targets in this selection.'),
   federations: msg('Printed: the first {limit} of {total} federations in this selection.'),
   firearms: msg('Printed: the first {limit} of {total} firearms in this selection.'),
+  'log entries': msg('Printed: the first {limit} of {total} entries in this selection.'),
   powders: msg('Printed: the first {limit} of {total} powders in this selection.'),
   primers: msg('Printed: the first {limit} of {total} primers in this selection.'),
 }
@@ -551,6 +560,10 @@ export function DirectoryTable<T extends { id: string }>({
   )
 }
 
+/** A column's help in the shown language, its messages joined with a space. */
+export const helpText = (help: Message | readonly Message[], t: Translator['t']) =>
+  (typeof help === 'string' ? [help] : help).map((m) => t(m)).join(' ')
+
 const nextSort = (key: string, dir: 'ascending' | 'descending' | undefined): DirectorySort => {
   if (dir === undefined) return { column: key, dir: 'ascending' }
   return dir === 'ascending' ? { column: key, dir: 'descending' } : undefined
@@ -589,7 +602,7 @@ function HeadCell<T>({
       {c.head && <span className="th-end">{c.head}</span>}
       {c.value ? (
         <Tooltip
-          label={c.help && t(c.help)}
+          label={c.help && helpText(c.help, t)}
           disabled={!c.help}
           position="bottom"
           events={tipEvents}
@@ -602,7 +615,7 @@ function HeadCell<T>({
           </UnstyledButton>
         </Tooltip>
       ) : c.help ? (
-        <Noted inline value={<HeadLabel column={c} />} notes={[t(c.help)]} />
+        <Noted inline value={<HeadLabel column={c} />} notes={[helpText(c.help, t)]} />
       ) : (
         <HeadLabel column={c} />
       )}

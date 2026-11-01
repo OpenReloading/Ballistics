@@ -7,6 +7,7 @@ import { cartridge } from './cartridge.ts'
 import { cartridgeCase } from './case.ts'
 import { caseCapacity } from './case-capacity.ts'
 import { chronoSession } from './chrono-session.ts'
+import { eventType } from './event-type.ts'
 import { discipline, federation, targetMapping } from './federation.ts'
 import { firingSeries } from './firing.ts'
 import { load } from './load.ts'
@@ -45,6 +46,7 @@ for (const [name, schema] of Object.entries({
   discipline,
   manufacturer,
   'target-mapping': targetMapping,
+  'event-type': eventType,
 })) {
   const json = z.toJSONSchema(schema, { io: 'input' })
   writeFileSync(join(out, `${name}.schema.json`), `${JSON.stringify(json, null, 2)}\n`)

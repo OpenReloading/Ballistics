@@ -249,7 +249,7 @@ _Avoid_: `base` (on a powder)
 `thermochemistry`: constant-volume burning at `loadingDensity` (g/cm3) computed from the composition: `flameTemperature` (K), `impetus` (J/kg), `gamma`, `molarMass` (kg/kmol) and `covolume` (m3/kg), each a value with `min` and `max`.
 
 **Interior parameters**:
-`interior`: the M3 parameters of a powder fitted to load tables, with the fixed inputs of the fit: `model` (`m3`), `fitted`, `vivacity`, `energy`, `gamma`, `covolume`, `density`, `pressureExponent`, `referencePressure`, `ignitionPressure`, `startPressure`, `propellantTemperature`, `burnForm`, `resistance`, `trainingRows`, `trainingCartridges`. Effective values of the model version. Powder list items carry `vivacity`, `pressureExponent`, `referencePressure` and `burnForm`.
+`interior`: the M3 parameters of a powder fitted to load tables, with the fixed inputs of the fit: `model` (`m3`), `fitted`, `vivacity`, `energy`, `gamma`, `covolume`, `density`, `pressureExponent`, `referencePressure`, `ignitionPressure`, `startPressure`, `propellantTemperature`, `burnForm`, `resistance`, `trainingRows`, `trainingCartridges`. Effective values of the model version. Powder list items carry `vivacity`, `pressureExponent`, `referencePressure`, `burnForm`, `trainingRows`, `trainingCartridges` and `retrieved`, the latest day the fitted sources were read.
 
 **Fitted parameters**:
 `fitted`: the interior parameters the fit moved (`vivacity`, `energy`, `form.a`). The others are fixed inputs.
@@ -339,7 +339,7 @@ _Avoid_: `mass` (on range firings and load bullets)
 `length`: overall length of a bullet record and its list item (mm), of an exterior `projectile` and the stability query (m).
 
 **Bullet base**:
-`base`: `type` (`flat`, `boat-tail`, `rebated-boat-tail`), `length` (mm), and for a boat tail `diameter` of the base face (mm) and `angle`, the half-angle of the conical tail (deg).
+`base`: `type` (`flat`, `boat-tail`, `rebated-boat-tail`), `length` (mm), and for a boat tail `diameter` of the base face (mm) and `angle`, the half-angle of the conical tail (deg). The bullet list item carries `baseType`.
 
 **Ogive**:
 `ogive`: `form` (`tangent`, `secant`, `hybrid`), `radius` of the nose arc (mm) and `radiusRatio`, the head-shape parameter Rt/R (0 for a cone, 1 for a tangent ogive), at least one of them.
@@ -362,7 +362,7 @@ _Avoid_: cbto
 `bearingLength`: length of the full-diameter part of a bullet, mm.
 
 **Construction**:
-`construction`: how a bullet is built, read from the manufacturer's wording in `raw`: `structure`, `core.material` and `core.hardness` (Brinell, lead cores), `jacket.material` and `jacket.thickness` (a present `jacket` means jacketed), `surface` (coatings), `gasCheck` (cast bullets), `drivingBands` (monolithic bullets), and `unmapped` when no structured field could be derived. Lead-free is not stored: `leadFree` derives it from core and surface (`apps/docs/docs/data/bullet-construction.md`). A bullet list item carries the structure or `<material>-core`.
+`construction`: how a bullet is built, read from the manufacturer's wording in `raw`: `structure`, `core.material` and `core.hardness` (Brinell, lead cores), `jacket.material` and `jacket.thickness` (a present `jacket` means jacketed), `surface` (coatings), `gasCheck` (cast bullets), `drivingBands` (monolithic bullets), and `unmapped` when no structured field could be derived. Lead-free is not stored: `leadFree` derives it from core and surface (`apps/docs/docs/data/bullet-construction.md`). A bullet list item carries the structure or `<material>-core`, and `leadFree` where it is derived.
 
 **Ballistic coefficient**:
 `ballisticCoefficients`: the coefficients a manufacturer publishes for a bullet, each with `dragModel`, `value` (lb/in2), `minVelocity` and `note`. In exterior bodies a `bc` drag has `bands` of `ballisticCoefficient` (kg/m2) and `minVelocity`. Bullet list items carry the first G1 and G7 values as `ballisticCoefficientG1` and `ballisticCoefficientG7` (lb/in2). The UI label is BC.
@@ -574,6 +574,27 @@ A record of kind `target-mappings`: one discipline shot on one face event, with 
 `shotCount`: a number of shots: those that count on a face in a discipline (target mapping), and those behind a range string entry or chronograph reading.
 _Avoid_: `shots` (as a count), n
 
+**Event type**:
+A record of kind `event-types`: a kind of competition event of one `federation` as its `ruleBook` defines it (title, `edition`, `publisher`, `url`, `sha256`; in the file the id of its source record), with `scoring`, `levels`, `magazine` and `movingTargets`.
+_Avoid_: match type, competition type
+
+**Event scoring**:
+`scoring` of an event type, by `method`: `hit-factor` with `points` (per power factor `major` and `minor`, per zone `A`, `C`, `D` and `metal`), `penalties` (`miss`, `noShoot`, `procedural`, points taken off each), `noShootMaxHits` and `powerFactors`; or `rings` with an optional fixed `discipline` and `seriesShots`.
+
+**Power factor**:
+`powerFactor`: `major` or `minor`, the rating of a competitor's ammunition that sets the points of a hit. `powerFactors` on a hit-factor scoring: per `division` the least power factor for `minor` and for `major` (absent: no major rating).
+_Avoid_: PF
+
+**Division**:
+`division`: an equipment division of a practical rule book as it names it ("Production Optics").
+_Avoid_: class
+
+**Level**:
+`levels` of an event type: the level names as the rule book prints them, lowest first ("Level I", "Landesmeisterschaft").
+
+**Magazine limit**:
+One entry of `magazine` of an event type: per `division` (and `powerFactor`, where the limit applies to one) the `maxRounds` in a magazine from the start signal on (as the rule book times it) and the `maxLength` (mm), with a `note` for a condition.
+
 ### User data files
 
 **User data file**:
@@ -597,6 +618,10 @@ A user record of kind `targetFaceDesign`: the `rings`, `innerTen`, `blackDiamete
 
 **Powder design**:
 A user record of kind `powder`: `origin` (`user`), the `provenanceKind` and the `draft`, the powder's grain form, bulk density, composition, thermochemistry and burn law in stored units, each optional while the draft is unfinished. The workbench and the charge target tool offer a design that builds a valid `Powder` as `<name> (your design)`, a saved load names it as `user:<id>`, and every result from it says the powder values are from a user design.
+
+**Shooting log entry**:
+A user record of kind `shootingLogEntry` (id a UUID), one range day of the shooting log (German UI: Schießbuch): `date`, `place` (text), `discipline` (`catalogue:` reference), `firearm` and `load` (`user:` references), `ammunition` (factory ammunition as text, in place of a `load`), `rounds` (fired, for the round count), `result` (text), `event` (`user:` reference to a competition event), `notes` and `confirmation` (`by`, who confirmed it as text, and its `date`). The log is the person's own record; the app claims no standing with a club or an authority. Rounds reach the firearm's `roundCount` only after one confirm, noted in `countedSessions` under the entry's reference.
+_Avoid_: Schiessbuch entry, range session (for the record)
 
 **Base record**:
 `basedOn`: the catalogue record a design is a variant of, as `catalogue:<id>`. The resolved record is the base with the `overrides` applied (`applyOverrides`).

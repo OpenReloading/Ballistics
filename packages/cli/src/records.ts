@@ -6,6 +6,7 @@ import type {
   CatalogueCase,
   CatalogueCaseCapacity,
   Powder,
+  PublishedLoads,
 } from '@open-reloading/schema'
 import { parseRef } from '@open-reloading/schema'
 import { UsageError } from './errors.ts'
@@ -18,6 +19,8 @@ export interface Records {
   powders: Map<string, Powder>
   capacities: Map<string, CatalogueCaseCapacity>
   cases: Map<string, CatalogueCase>
+  /** The published load files of the records. */
+  published: PublishedLoads[]
   /** Problems the records reader reported; the records that have none still serve. */
   issues: number
 }
@@ -47,13 +50,14 @@ export function readBundle(roots: readonly string[]) {
 
 /** The records of {@link readBundle} by id. */
 export function loadRecords(roots: readonly string[]): Records {
-  const { bundle, errors } = readBundle(roots)
+  const { bundle, errors, publishedLoads } = readBundle(roots)
   return {
     cartridges: byId(bundle.cartridges),
     bullets: byId(bundle.bullets),
     powders: byId(bundle.powders),
     capacities: firstPerCartridge(bundle.capacities),
     cases: firstPerCartridge(bundle.cases.filter((c) => c.waterCapacity)),
+    published: publishedLoads,
     issues: errors.length,
   }
 }

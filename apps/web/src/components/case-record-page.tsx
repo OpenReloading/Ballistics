@@ -11,10 +11,9 @@ import {
 } from '../lib/manufacturers.ts'
 import { caseRowGroups, caseStrip } from '../lib/record-fields.ts'
 import { refId } from '../lib/record-metadata.ts'
-import { CaseCartridgeNote } from './case-cartridge-note.tsx'
+import { CaseCartridgeFact } from './case-cartridge-fact.tsx'
 import { FieldStrip } from './field-strip.tsx'
-import { FieldTable } from './field-table.tsx'
-import { Panel } from './panel.tsx'
+import { FieldPanel } from './field-table.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 
@@ -32,13 +31,16 @@ function CaseRecord({ c, names, cartridge }: { c: CatalogueCase } & Extras) {
       title={productLabel({ name: c.name, ...(maker && { manufacturerName: maker }) })}
       badges={[]}
       provenance={c.provenance}
-      strip={<FieldStrip items={caseStrip(c, maker)} />}
+      strip={
+        <FieldStrip items={caseStrip(c, maker)}>
+          {cartridge && <CaseCartridgeFact id={cartridge.id} name={cartridge.name} />}
+        </FieldStrip>
+      }
+      className="plain-record"
       values={
-        <Panel id="record-data" title={msg('Properties')} translated>
-          <FieldTable caption={msg('Properties')} labelledBy="record-data" groups={groups} />
-          {cartridge && <CaseCartridgeNote id={cartridge.id} name={cartridge.name} />}
+        <FieldPanel id="record-data" title={msg('Properties')} groups={groups} symbols={false}>
           {c.note && <p className="record-note">{c.note}</p>}
-        </Panel>
+        </FieldPanel>
       }
     />
   )

@@ -2,6 +2,7 @@
 . AnalysisOverrides
 . BallisticCoefficient
 . Bullet
+. BulletListFields
 . BulletOverrides
 . CaliberClass
 . CalibrationReference
@@ -24,11 +25,13 @@
 . DisciplineKey
 . DisciplineRules
 . EmbeddedFile
+. EventType
 . Federation
 . Firearm
 . FiringSeries
 . GroupFace
 . GroupShot
+. HitFactorScoring
 . Load
 . LoadAnalysis
 . LoadTable
@@ -58,9 +61,12 @@
 . RefScope
 . RenameKind
 . Renames
+. RingScoring
 . SessionRecord
 . SessionSnapshot
 . SheetNote
+. ShootingLogEntry
+. ShootingLogRecord
 . ShotGroup
 . SiMap
 . SkippedKind
@@ -94,6 +100,7 @@
 . ballisticCoefficient
 . baseTypes
 . bullet
+. bulletListFields
 . bulletOverrides
 . caliberClass
 . calibrationReference
@@ -126,6 +133,8 @@
 . disciplineRules
 . distanceUnit
 . embeddedFile
+. eventScoring
+. eventType
 . faceColour
 . federation
 . firearm
@@ -133,6 +142,7 @@
 . fold
 . fromSi
 . groupShot
+. hitFactorScoring
 . isWebLink
 . ladderStepKinds
 . leadFree
@@ -172,11 +182,13 @@
 . ref
 . renameKind
 . renames
+. ringScoring
 . score
 . searchKey
 . sessionSnapshot
 . sheetId
 . sheetNote
+. shootingLogEntry
 . shotGroup
 . shotString
 . siMaps

@@ -15,6 +15,7 @@ import {
 import { useTranslation } from '../i18n/language.ts'
 import type { Message } from '../i18n/translate.ts'
 import { tipEvents } from '../lib/theme.ts'
+import { useBarEndSlot } from './bar-end.ts'
 import { SafetyBarButton } from './safety-dialog.tsx'
 
 /**
@@ -74,6 +75,44 @@ function useWholeText(box: HTMLElement | null) {
   return text
 }
 
+/** The panel's actions: the folded ones first, in their own box (globals.css). */
+const withFold = (fold: ReactNode, actions: ReactNode) => (
+  <>
+    {fold && <div className="page-bar-fold">{fold}</div>}
+    {actions}
+  </>
+)
+
+/** The bar's h1; `short` in its place below 48em, `hydrated` the page's e2e ready signal. */
+function PageTitle({
+  title,
+  short,
+  hidden,
+  hydrated,
+}: {
+  title: string
+  short: string | undefined
+  hidden: boolean
+  hydrated: boolean
+}) {
+  return (
+    <h1
+      title={title}
+      className={hidden ? 'visually-hidden' : undefined}
+      data-hydrated={hydrated || undefined}
+    >
+      {short && short !== title ? (
+        <>
+          <span className="page-title-long">{title}</span>
+          <span className="page-title-short">{short}</span>
+        </>
+      ) : (
+        title
+      )}
+    </h1>
+  )
+}
+
 /**
  * The page's top bar: its only
  * `h1`, what follows the title (the open load, a record's badges), one status line and the page's
@@ -84,9 +123,11 @@ function useWholeText(box: HTMLElement | null) {
 export function PageBar({
   title: given,
   translated,
+  short,
   after,
   status,
   actions,
+  fold,
   single = false,
   reserve = false,
   titleHidden = false,
@@ -94,11 +135,22 @@ export function PageBar({
 }: {
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
   titleHidden?: boolean
+  /**
+   * The h1 below 48em, where the bar has room for little more than a name: a powder's name
+   * without its manufacturer, which the first card of the strip names.
+   */
+  short?: string | undefined
   /** Beside the title: the workbench's open loads, a record's standard badges. */
   after?: ReactNode
   /** The status line's own content, such as a list's count. */
   status?: ReactNode
   actions?: ReactNode
+  /**
+   * Actions before `actions` that fold behind "Page actions" from 48em to 75em, where `actions`
+   * (Open, Save, Units) stay in the bar: a designer's Undo, Redo and New. From 75em and on a phone
+   * they are actions like the others. One instance at every width.
+   */
+  fold?: ReactNode
   /** One action only: below 75em it shows as itself in the bar, not behind "Page actions". */
   single?: boolean
   /**
@@ -129,6 +181,7 @@ export function PageBar({
   const root = useRef<HTMLDivElement>(null)
   const id = useId()
   const mounted = useMounted()
+  const endSlot = useBarEndSlot()
   // the phone panel closes on a press outside the bar and the menus and dialogs it opened
   useEffect(() => {
     if (!open) return
@@ -147,6 +200,7 @@ export function PageBar({
       className="page-bar"
       data-open={open || undefined}
       data-single={(actions && single) || undefined}
+      data-fold={(actions && fold && !single) || undefined}
       onKeyDown={(e) => {
         // not from a menu's portalled dropdown: that one closes itself
         if (e.key !== 'Escape' || !open || !e.currentTarget.contains(e.target as Node)) return
@@ -156,13 +210,7 @@ export function PageBar({
     >
       <div className="page-bar-title">
         {/* `data-hydrated`: the e2e ready signal of the page, which hydrates after the layout */}
-        <h1
-          title={title}
-          className={titleHidden ? 'visually-hidden' : undefined}
-          data-hydrated={mounted || undefined}
-        >
-          {title}
-        </h1>
+        <PageTitle title={title} short={short} hidden={titleHidden} hydrated={mounted} />
         {after}
       </div>
       {/* the line ends in an ellipsis where it is too long: its whole text on hover, focus and tap */}
@@ -206,10 +254,17 @@ export function PageBar({
             onClick={(e) => {
               const t =
                 e.target instanceof Element ? e.target.closest('button, [role="menuitem"]') : null
-              if (open && t && !t.hasAttribute('aria-haspopup')) setOpen(false)
+              // an aria-disabled action does nothing: the panel stays, its tooltip says why
+              if (
+                open &&
+                t &&
+                !t.hasAttribute('aria-haspopup') &&
+                t.getAttribute('aria-disabled') !== 'true'
+              )
+                setOpen(false)
             }}
           >
-            <BarStatus value={statusLine}>{actions}</BarStatus>
+            <BarStatus value={statusLine}>{withFold(fold, actions)}</BarStatus>
           </div>
         </>
       )}
@@ -222,6 +277,8 @@ export function PageBar({
       )}
       {/* on every page from 75em; below it the top bar's icon button (site-header.tsx) */}
       <SafetyBarButton iconOnly={compact} className="page-bar-safety" />
+      {/* from 75em the top bar's Report, repository and theme buttons, after the actions as shown */}
+      <div ref={endSlot} className="page-bar-end" />
     </div>
   )
 }

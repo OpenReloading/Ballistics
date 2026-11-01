@@ -41,6 +41,7 @@ export function createPlacer(
   keepCorners: boolean,
 ) {
   const { points, annotation, unit: lengthUnit } = part
+  const fixedDecimals = part.fixedDecimals === true
   const k = em / face.baseEm
   const [lane0, pitch] = [face.firstLaneOffset * k, face.lanePitch * k]
   const arrowLen = face.arrow.length
@@ -341,6 +342,7 @@ export function createPlacer(
     points,
     annotation,
     lengthUnit,
+    fixedDecimals,
     em,
     horizontal,
     k,

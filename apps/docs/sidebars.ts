@@ -49,6 +49,7 @@ const sidebars: SidebarsConfig = {
         'guides/chronograph-ladder',
       ],
     },
+    'guides/shooting-log',
     category('Case and firearm', [
       'case-capacity',
       'bullet-fit',
@@ -59,6 +60,7 @@ const sidebars: SidebarsConfig = {
     ]),
     'models/least-squares',
     'models/validation',
+    'how-close',
     {
       type: 'category',
       label: 'Research log',
@@ -69,6 +71,7 @@ const sidebars: SidebarsConfig = {
   ],
   data: [
     'data/federations',
+    'data/event-types',
     'data/manufacturers',
     'data/cases',
     'data/primers',

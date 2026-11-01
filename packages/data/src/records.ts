@@ -17,6 +17,8 @@ import {
   catalogueSession,
   type Discipline,
   discipline,
+  type EventType,
+  eventType,
   type Federation,
   type FiringSeries,
   federation,
@@ -43,6 +45,7 @@ import {
 import { z } from 'zod'
 import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'
+import { checkEventTypes } from './event-types.ts'
 import { checkFederations } from './federations.ts'
 import { checkFittedSources } from './load-tables.ts'
 import { checkNames, type LocatedFinding } from './names.ts'
@@ -55,6 +58,7 @@ import {
   checkSpec,
 } from './plausibility.ts'
 import {
+  checkPublishedLoadPlausibility,
   checkPublishedLoads,
   type LocatedPublishedLoads,
   readPublishedLoads,
@@ -139,6 +143,8 @@ export type Bundle = {
   federations: Federation[]
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
+  /** Event types of competitions (`records/event-types/`); absent: none. */
+  eventTypes?: EventType[] | undefined
   /** `renames.json` of the records roots; absent: none. */
   renames?: Renames | undefined
 }
@@ -152,6 +158,8 @@ export type ReadRecordsResult = {
   bundle: Bundle
   publishedLoads: PublishedLoads[]
   errors: string[]
+  /** Plausibility findings that do not fail validation: a published load stays as printed. */
+  warnings: string[]
 }
 
 /** Reads every kind directory of `roots`, in this order, the source records first. */
@@ -179,6 +187,7 @@ function readBundle(
     federations: read('federations', federation),
     disciplines: read('disciplines', discipline),
     targetMappings: read('target-mappings', targetMapping),
+    eventTypes: read('event-types', eventType, true),
     renames: readRenames(roots, errors),
   }
   const published = readPublishedLoads(roots, sources, errors)
@@ -227,6 +236,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
     ['federations', bundle.federations],
     ['disciplines', bundle.disciplines],
     ['target-mappings', bundle.targetMappings],
+    ['event-types', bundle.eventTypes ?? []],
   ] as const) {
     for (const record of records) {
       for (const error of checkCoverage(record)) errors.push(`${dir}/${record.id}.json: ${error}`)
@@ -294,6 +304,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   }
   checkSourceCoverage(bundle, errors)
   errors.push(...checkFederations(bundle))
+  errors.push(...checkEventTypes(bundle))
   errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')
@@ -326,7 +337,15 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
     },
     errors,
   )
-  for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
+  const cartridges = new Map(bundle.cartridges.map((c) => [c.id, c]))
+  for (const f of collectFindings(bundle, cartridges))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
-  return { bundle, publishedLoads: published.map((p) => p.file), errors }
+  const warnings = published.flatMap(({ folder, file }) =>
+    // a folder under an old cartridge id reads the record that replaces it
+    checkPublishedLoadPlausibility(
+      file,
+      cartridges.get(folder) ?? cartridges.get(bundle.renames?.cartridges?.[folder] ?? ''),
+    ).map((f) => `loads/${folder}/${file.id}.json: loads ${f.load}: ${f.finding}: ${f.message}`),
+  )
+  return { bundle, publishedLoads: published.map((p) => p.file), errors, warnings }
 }

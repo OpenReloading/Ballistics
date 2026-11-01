@@ -6,7 +6,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorRequest } from '../src/lib/interior-request.ts'
 import { tuneBaseKey, tuneLoadKey, writeTuneLoad } from '../src/lib/powder-tune.ts'
-import { readTuneBase, readTuneLoad } from '../src/lib/tune-load.ts'
+import { readTuneBase, readTuneLoad, readTuneTable } from '../src/lib/tune-load.ts'
 
 beforeEach(() => {
   const store = new Map<string, string>()
@@ -34,6 +34,14 @@ it('hands the tuning route the load the workbench runs, as its run parses it', (
   writeTuneLoad('user:a', body.load)
   expect(readTuneLoad('user:a')).toStrictEqual(interiorBody.parse(body).load)
   expect(readTuneLoad('user:b')).toBeUndefined()
+})
+
+it('hands the CIP table of the cartridge record with the load, and removes it with the load', () => {
+  const { body } = interiorRequest({ values, powder: undefined })
+  writeTuneLoad('user:a', body.load, undefined, 'IV')
+  expect(readTuneTable('user:a')).toBe('IV')
+  writeTuneLoad('user:a', undefined, undefined, 'IV')
+  expect(readTuneTable('user:a')).toBeUndefined()
 })
 
 it('removes the load of an edit not saved, and refuses one the run would refuse', () => {

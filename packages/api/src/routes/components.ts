@@ -95,7 +95,20 @@ const powderList = page(
     country: powder.shape.country,
     interior: powder.shape.interior
       .unwrap()
-      .pick({ vivacity: true, pressureExponent: true, referencePressure: true, burnForm: true })
+      .pick({
+        vivacity: true,
+        pressureExponent: true,
+        referencePressure: true,
+        burnForm: true,
+        trainingRows: true,
+        trainingCartridges: true,
+      })
+      .extend({
+        retrieved: z.iso
+          .date()
+          .optional()
+          .describe('ISO date the fitted sources were read, the latest of them.'),
+      })
       .optional(),
   }),
 )
@@ -114,9 +127,12 @@ const bulletList = page(
     ballisticCoefficientG7: z.number().nullable(),
     country: bullet.shape.country,
     tipType: bullet.shape.tip.unwrap().shape.type.optional(),
+    baseType: bullet.shape.base.unwrap().shape.type.optional(),
     construction: z
       .union([structure.unwrap(), z.templateLiteral([core.unwrap().shape.material, '-core'])])
       .optional(),
+    // derived from the construction (`leadFree` of the schema); absent where it does not settle it
+    leadFree: z.boolean().optional(),
     nameOnly: bullet.shape.nameOnly,
   }),
 )

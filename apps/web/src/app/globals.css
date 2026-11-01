@@ -661,6 +661,15 @@ td.nowrap {
   .record tbody tr:nth-child(even) > :is(td, th) {
     background: var(--surface);
   }
+
+  /* the sources band by document: a document with its page rows is one band */
+  .record .sources tbody tr:nth-child(even) > :is(td, th) {
+    background: none;
+  }
+
+  .record .sources tbody:nth-of-type(even) > tr > :is(td, th) {
+    background: var(--surface);
+  }
 }
 
 /* sticky headers stick to the window once the table fits the page */
@@ -778,6 +787,8 @@ td.nowrap {
   --page-width: none;
   /* the field level of the control scale (theme.ts): inputs of the dense property grids */
   --field-height: 1.5rem;
+  /* the label track of the designers' rows: every row's field starts at the same x */
+  --label-column: 9rem;
 }
 
 /* document pages: text keeps the reading measure, tables and cards use the column */
@@ -1614,18 +1625,6 @@ td.nowrap {
   min-width: 0;
 }
 
-/* the designers' rows: label left, a 9rem field, about 28 px */
-.designer-grid > .mantine-InputWrapper-root,
-.designer-grid > .designer-field > .mantine-InputWrapper-root {
-  grid-template-columns: minmax(0, 1fr) 9rem;
-}
-
-/* a select 1.5rem wider for its chevron, so a German value ("Nicht angegeben") is not cut */
-.designer-grid > .mantine-InputWrapper-root:has(select),
-.designer-grid > .designer-field > .mantine-InputWrapper-root:has(select) {
-  grid-template-columns: minmax(0, 1fr) 10.5rem;
-}
-
 .designer :is(.prop-grid, .side-grid) .mantine-InputWrapper-label {
   font-size: var(--mantine-font-size-sm);
 }
@@ -1791,6 +1790,11 @@ td.nowrap {
 
 .powder-designer .side-grid > button {
   margin-top: 0.25rem;
+}
+
+.powder-designer .powder-fit-link {
+  margin: 0 0 0.25rem;
+  font-size: var(--mantine-font-size-sm);
 }
 
 .powder-designer .designer-checks {
@@ -3014,6 +3018,53 @@ td.nowrap {
   border-top: 1px solid var(--mantine-color-default-border);
 }
 
+/* Shooting log: the own-record line and the entry form above the table; on paper the sheet alone,
+   one line per entry with a blank signature column */
+.log-own-record {
+  margin: 0;
+}
+
+.log-editor {
+  max-width: 60rem;
+}
+
+.log-filters :is(.mantine-Select-root, .mantine-TextInput-root) {
+  width: 10rem;
+}
+
+.log-sheet table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+@media print {
+  /* the list and the form: the sheet holds the entries on paper */
+  .library.shooting-log {
+    display: none;
+  }
+
+  .log-sheet {
+    color: #000;
+    font-size: 9pt;
+  }
+
+  .log-sheet :is(th, td) {
+    height: 8mm;
+    padding: 1mm 1.5mm;
+    text-align: left;
+    vertical-align: top;
+    border: 1px solid #000;
+  }
+
+  .log-sheet td.num {
+    text-align: right;
+  }
+
+  .log-sheet .log-signature {
+    width: 30mm;
+  }
+}
+
 /* Firearm library: the table across the page. With a firearm open, the card list sticky beside
    the editor from 62em */
 .library {
@@ -3036,9 +3087,9 @@ td.nowrap {
   }
 }
 
-/* the firearm table's columns all have a width (93rem): below a window of about 1600 px the table
-   scrolls sideways in its box, above it the filler column takes the room left and the name keeps
-   its width */
+/* the firearm table's columns all have a width (72rem): a 1280 px window holds them, below it the
+   table scrolls sideways in its box with the row menu held at its edge, above it the filler column
+   takes the room left and the name keeps its width */
 @media screen and (min-width: 48em) {
   .library > .directory > .directory-scroll {
     overflow-x: auto;
@@ -3089,8 +3140,16 @@ main .library-head.page-panel-head > .page-panel-title {
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
+  color: var(--fg);
+  font-size: var(--mantine-font-size-lg);
+  letter-spacing: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* the card's title is its largest heading: the data card's sections step below it */
+.library-editor .firearm-card h3 {
+  font-size: var(--mantine-font-size-md);
 }
 
 .library-editor .mantine-Input-wrapper {
@@ -3192,6 +3251,11 @@ main .library-head.page-panel-head > .page-panel-title {
 .library-editor .firearm-card {
   display: block;
   overflow-x: auto;
+}
+
+/* the property table's labels in a column of their own width, not half the card */
+.firearm-card tbody th {
+  width: 12em;
 }
 
 @media print {
@@ -3319,6 +3383,25 @@ main .library-head.page-panel-head > .page-panel-title {
   line-height: 1.125rem;
 }
 
+.result-notes-control {
+  display: grid;
+  flex: none;
+  align-items: start;
+  justify-items: start;
+}
+
+.result-notes-control > * {
+  grid-area: 1 / 1;
+}
+
+.result-notes-control > a {
+  line-height: 1.125rem;
+}
+
+.result-notes-control > [data-hidden] {
+  visibility: hidden;
+}
+
 .workbench-centre > .result-notes {
   margin-top: 0.25rem;
 }
@@ -3340,10 +3423,6 @@ main .library-head.page-panel-head > .page-panel-title {
 
 .result-notes :is(li[data-kind="note"], .result-notes-none) {
   color: var(--muted);
-}
-
-.result-notes > button {
-  flex: none;
 }
 
 .result-notes-group h3 {
@@ -6800,6 +6879,18 @@ main .record-sources .sources tbody th {
   margin: 0.5rem 0 0;
 }
 
+/* a document cited at several pages: its title and data once in a head row, a row per page under
+   it, indented */
+main .record-sources .sources td.source-document {
+  border-bottom: 0;
+  padding-bottom: 0.125rem;
+}
+
+main .record-sources .sources th.source-page {
+  padding-inline-start: 1.5rem;
+  white-space: normal;
+}
+
 /* a phone: one block per source, each value after its column's name, nothing to scroll sideways */
 @media screen and (max-width: 47.99em) {
   .record-sources .sources :is(tbody, tr, th, td) {
@@ -6815,7 +6906,7 @@ main .record-sources .sources tbody th {
     white-space: nowrap;
   }
 
-  .record-sources .sources tr + tr {
+  .record-sources .sources :is(tr + tr, tbody + tbody) {
     border-top: 1px solid var(--border);
   }
 
@@ -6955,6 +7046,14 @@ main .record-sources .sources tbody th {
 
   .record-sources {
     grid-area: sources;
+  }
+
+  /* a record without a figure (case, primer): the values across the page */
+  .plain-record .record-grid {
+    grid-template-areas:
+      "values values"
+      "side side"
+      "sources sources";
   }
 }
 
@@ -7572,8 +7671,8 @@ main .field-table tr.field-group > th {
   .cartridge-sides {
     --drawing-chrome: 16.25rem;
 
-    /* the chamber's table has a column more: its panel a little wider, both drawings keep their width */
-    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+    /* the chamber's table is a little wider (its clearances): its panel too, both drawings keep their width */
+    grid-template-columns: minmax(0, 0.985fr) minmax(0, 1.015fr);
   }
 
   /* a side without a drawing takes the width of its table */
@@ -7594,10 +7693,25 @@ main .field-table tr.field-group > th {
     justify-content: center;
   }
 
-  /* the table is the scroll box once the panel would pass the window's foot */
+  /* the table is the scroll box once the panel would pass the window's foot, with a scrollbar
+     that stays (an overlay scrollbar shows nothing until scrolled) */
   .side-body > .scroll {
     max-height: calc(100svh - 14.75rem);
     overflow: auto;
+  }
+
+  .side-body > .scroll::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  .side-body > .scroll::-webkit-scrollbar-thumb {
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--muted) 55%, transparent);
+  }
+
+  .side-body > .scroll::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--muted) 12%, transparent);
   }
 
   .has-variants .side-body > .scroll {
@@ -7756,18 +7870,53 @@ main .field-table tr.field-group > th {
   font-weight: 400;
 }
 
-.fact .countries {
+/* a cartridge fact label with its meaning on hover (Pmax, M, EE): dotted, as a value with notes */
+.cartridge-record .fact dt .field-note {
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 0.2em;
+}
+
+/* the cartridge record's link to its fitting bullets: the last item of the fact row */
+.fact-link {
+  display: flex;
+  align-items: center;
+}
+
+/* the standard of a cartridge record over its sources: Table, date, country, method in one line */
+.standard-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.standard-facts > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.standard-facts dt {
+  font-weight: 600;
+}
+
+.standard-facts dd {
+  margin: 0;
+  color: var(--mantine-color-text);
+}
+
+:is(.fact, .standard-facts) .countries {
   display: inline-flex;
   gap: 0.75rem;
 }
 
-.fact .country {
+:is(.fact, .standard-facts) .country {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
 }
 
-.fact .flag {
+:is(.fact, .standard-facts) .flag {
   width: auto;
   height: 0.875em;
   box-shadow: 0 0 0 1px var(--border);
@@ -8338,6 +8487,12 @@ main .field-table tr.field-group > th {
   .message-slot {
     height: 4.5rem;
   }
+}
+
+/* the photograph tool before a photograph: no reserved room, the slot grows with a message */
+.bullet-photo [data-idle="true"] > .message-slot {
+  height: auto;
+  margin: 0;
 }
 
 /* forced colours drop the selected segment's fill (the indicator, and the label's ::before until the
@@ -9178,7 +9333,7 @@ main .session-shots th:nth-child(-n + 2) {
   cursor: grab;
 }
 
-/* below the confidence tier: sparser dashes, not in Accept all */
+/* below the confidence tier: sparser dashes, not in Accept sure */
 .target-canvas .proposal.maybe {
   stroke-dasharray: 2 4;
   opacity: 0.7;
@@ -9254,14 +9409,25 @@ main .session-shots th:nth-child(-n + 2) {
 /* three buttons: the value takes the room the label leaves */
 .prop-grid > .mantine-InputWrapper-root.colour-row,
 .prop-grid > .prop-row.aim-row,
+.prop-grid > .prop-row.filter-row,
 .prop-grid > .prop-row.score-align,
 .prop-grid > .prop-row.detect-wide {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
-/* without a face its rows keep their room, hidden, so choosing a face moves nothing */
+/* without a face its rows take no room: Detect follows the Target row */
 .score-rows[data-off] {
-  visibility: hidden;
+  display: none;
+}
+
+/* a select whose names are long: the label above, the select across the column */
+.prop-grid > .mantine-InputWrapper-root.full-row {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.125rem;
+}
+
+.prop-grid .mantine-InputWrapper-root.full-row > * {
+  grid-column: 1;
 }
 
 .prop-grid .score-status {
@@ -9291,10 +9457,28 @@ main .session-shots th:nth-child(-n + 2) {
   background: var(--link);
 }
 
-/* hole detection: numbered steps, one step's controls */
-.detect-steps {
+/* a photo filter: the slider, its value and a reset */
+.prop-grid .filter-row-value {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.prop-grid .filter-row-value > .mantine-Slider-root {
+  flex: 1 1 auto;
+}
+
+.prop-grid .filter-readout {
+  flex: none;
+  min-width: 2.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* hole detection: numbered steps in cells of one width (3 and 2), one step's controls */
+.detect-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.125rem;
   margin: 0 0 0.25rem;
   padding: 0;
@@ -9302,8 +9486,11 @@ main .session-shots th:nth-child(-n + 2) {
 }
 
 .detect-steps button {
-  min-width: 1.5rem;
+  width: 100%;
   min-height: 1.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: 0 0.25rem;
   border: 1px solid var(--border);
   background: none;
@@ -9319,9 +9506,20 @@ main .session-shots th:nth-child(-n + 2) {
   color: var(--bg);
 }
 
-/* as tall as the tallest step, so a step change moves nothing below */
+/* as tall as the tallest step (Review, its help in the 17rem column), so Back and Next stay put */
 .detect-step {
-  min-height: 7.2rem;
+  min-height: 8.5rem;
+}
+
+:lang(de) .detect-step {
+  min-height: 11.75rem;
+}
+
+/* why the guided run cannot start, under its button */
+.prop-grid .detect-blocked {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--mantine-font-size-xs);
 }
 
 .detect-nav {
@@ -9385,6 +9583,21 @@ main .session-shots th:nth-child(-n + 2) {
   margin-top: 0;
 }
 
+/* the designers' groups: the same room above each heading but the first, 6 px to its rows */
+.designer .prop-form .prop-head {
+  margin: 1rem 0 0.375rem;
+}
+
+.designer .prop-form > :not(:has(> .prop-head)) + :has(> .prop-head) > .prop-head {
+  margin-top: 0;
+}
+
+/* Add ring, Add event, Add ingredient: apart from the rows above and the next heading */
+.designer :is(.prop-grid, .side-grid) > .mantine-Button-root {
+  justify-self: start;
+  margin: 0.5rem 0 0.75rem;
+}
+
 .prop-grid {
   display: grid;
   gap: 0.125rem;
@@ -9403,6 +9616,20 @@ main .session-shots th:nth-child(-n + 2) {
   align-items: center;
   column-gap: 0.5rem;
   min-height: 1.6875rem;
+}
+
+/* the designers' rows: the label in a fixed track, the field in the rest of the row; a number at
+   most 10rem wide with its unit, text (Manufacturer, Name) and choices as wide as the cell */
+.prop-grid.designer-grid > .mantine-InputWrapper-root,
+.prop-grid.designer-grid > .designer-field > .mantine-InputWrapper-root {
+  grid-template-columns: minmax(0, var(--label-column)) minmax(0, 1fr);
+}
+
+.prop-grid.designer-grid
+  > .designer-field
+  > .mantine-InputWrapper-root:not(:has(select))
+  > .mantine-Input-wrapper {
+  max-width: 10rem;
 }
 
 /* Mantine sets --input-height inline from the size's variable, defined on the wrapper's class */
@@ -9645,6 +9872,14 @@ main .session-shots th:nth-child(-n + 2) {
   cursor: pointer;
 }
 
+/* the Statistics rows beyond the key values, on request */
+.stats-side .stats-more {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  color: var(--link);
+  font-size: var(--mantine-font-size-xs);
+}
+
 .overlay-list {
   display: grid;
   gap: 0.25rem;
@@ -9711,27 +9946,37 @@ main .session-shots th:nth-child(-n + 2) {
   appearance: none;
 }
 
-/* the x and y fields go below Set and Clear when the row has no room for a value */
+/* the point of aim's x and y side by side beside the label, below it when a longer label or wider
+   text spacing leaves them too little room; Set and Clear on the row below */
+.prop-grid > .prop-row.aim-row {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
 .prop-grid .aim-row > .prop-label {
   white-space: nowrap;
 }
 
 .prop-grid .aim-fields {
-  flex-wrap: wrap;
+  display: flex;
+  flex: 1 1 11rem;
+  gap: 0.5rem;
 }
 
 .prop-grid .aim-axis {
   display: flex;
-  flex: 1 1 4.5rem;
+  flex: 1 1 0;
   align-items: center;
   gap: 0.25rem;
   min-width: 0;
 }
 
-/* the point of aim's x and y share the value column; a decimal comma makes them text fields */
+/* the point of aim's x and y share the value column; a decimal comma makes them text fields; no
+   intrinsic input width widens the row */
 .prop-grid .aim-fields input:is([type="number"], [type="text"]) {
   flex: 1 1 0;
-  width: auto;
+  width: 0;
   min-width: 0;
 }
 
@@ -9832,6 +10077,46 @@ main .session-shots th:nth-child(-n + 2) {
 
 .sheet-body .target-side {
   overflow-y: auto;
+}
+
+/* the designers on a phone and under a coarse pointer: 44 px fields with 16 px text, so iOS does
+   not zoom; the unit switch and the remove buttons keep at least 24 px */
+@media screen and (max-width: 47.99em), (pointer: coarse) {
+  .designer {
+    --field-height: 2.75rem;
+  }
+
+  .designer :is(.prop-grid, .side-grid, .powder-row) :is(.mantine-Input-input, select) {
+    font-size: 16px;
+  }
+
+  .designer .field-unit-switch {
+    min-height: 24px;
+  }
+
+  .designer :is(.face-row, .powder-row) > .mantine-ActionIcon-root {
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  /* a ring's two colour choices stay side by side in the larger text */
+  .designer .face-colours > * {
+    min-width: 0;
+  }
+}
+
+/* a phone: no drawing yet is one compact note above the inputs, without the panel's title and the
+   empty lines it reserves for a drawing */
+@media screen and (max-width: 47.99em) {
+  .designer
+    .workspace-results:has(.mantine-EmptyState-root)
+    :is(.designer-panel-head, .derived-line:empty, .stale-line:empty) {
+    display: none;
+  }
+
+  .designer .workspace-results .mantine-EmptyState-root {
+    margin-block: 0.5rem;
+  }
 }
 
 /* coarse pointers: 44 px targets and 16 px text in fields, so iOS does not zoom */
@@ -10141,6 +10426,21 @@ main .page-bar h1 {
   flex: none;
 }
 
+/* a phone: the short title alone (page-bar.tsx `short`), the long one from 48em */
+.page-title-short {
+  display: none;
+}
+
+@media screen and (max-width: 47.99em) {
+  .page-title-long {
+    display: none;
+  }
+
+  .page-title-short {
+    display: inline;
+  }
+}
+
 .page-bar-status {
   flex: 1 1 0;
   min-width: 0;
@@ -10174,8 +10474,38 @@ main .page-bar h1 {
   }
 }
 
-.page-bar-status .file-status > span + span:not(:empty)::before {
-  content: " ";
+/* the state, a message and a failure as parts of one line, not sentences run together */
+.page-bar-status .file-status > span:not(:empty) ~ span:not(:empty)::before {
+  content: " · ";
+}
+
+/* a list's count beside the file status (the firearm library): the count first in its fixed width,
+   the save status after a rule, so a status that comes and goes moves nothing */
+.page-bar-status:has(> .bar-count):has(> .file-status) {
+  display: flex;
+  align-items: baseline;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > :is(.bar-count, .file-status) {
+  margin-inline-start: 0;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > .bar-count {
+  flex: none;
+  order: -1;
+}
+
+.page-bar-status:has(> .bar-count):has(> .file-status) > .file-status {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.page-bar-status:has(> .bar-count) > .file-status:has(> :not(:empty)) {
+  margin-inline-start: 0.75rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--border);
 }
 
 .page-bar-actions {
@@ -10185,8 +10515,10 @@ main .page-bar h1 {
   gap: 0.25rem;
 }
 
-/* the actions' wrappers (a tool's button group, the File menu) are no boxes of their own */
+/* the actions' wrappers (a tool's button group, the File menu, the folded actions) are no boxes of
+   their own; from 48em to 75em the folded actions are the panel (below) */
 .page-bar-actions > div,
+.page-bar-fold > div,
 .page-bar-actions .file-menu {
   display: contents;
 }
@@ -10194,6 +10526,16 @@ main .page-bar h1 {
 /* the tour button's Indicator keeps a box, so its dot sits on the button */
 .page-bar-actions > .mantine-Indicator-root {
   display: inline-flex;
+}
+
+/* the top bar's buttons come here from 75em only (site-header.tsx); below it no grid cell */
+.page-bar-end {
+  display: none;
+}
+
+/* the Units button shows its preset; the phone panel's row the whole name, as the icon buttons' rows */
+.units-full {
+  display: none;
 }
 
 /* Save's chevron: a square of the bar's control height */
@@ -10346,6 +10688,19 @@ main .page-bar h1 {
     height: 0.8125rem;
   }
 
+  .page-bar:not([data-single]) .page-bar-actions .units-preset {
+    display: none;
+  }
+
+  .page-bar:not([data-single]) .page-bar-actions .units-full {
+    display: inline;
+  }
+
+  /* the Tour button fills its row, so the unseen dot sits on its corner */
+  .page-bar:not([data-single]) .page-bar-actions > .mantine-Indicator-root > .mantine-Button-root {
+    flex: 1;
+  }
+
   .page-bar-actions .save-group > :first-child {
     flex: 1;
   }
@@ -10360,6 +10715,73 @@ main .page-bar h1 {
     border: 0;
     background: none;
     box-shadow: none;
+  }
+}
+
+/* a designer from 48em to 75em: Open, Save and Units stay in the bar, "Page actions" holds only
+   Undo, Redo and New (`fold` of page-bar.tsx); on a phone all of them are rows of the panel */
+@media screen and (min-width: 48em) and (max-width: 74.99em) {
+  .page-bar[data-fold] {
+    grid-template: "title actions toggle" auto "status actions toggle" auto / minmax(0, 1fr) auto auto;
+  }
+
+  .page-bar[data-fold] .page-bar-actions {
+    grid-area: actions;
+    position: static;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .page-bar[data-fold] .page-bar-fold {
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    min-width: 12rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--mantine-color-body);
+    box-shadow: var(--mantine-shadow-sm);
+  }
+
+  .page-bar[data-fold][data-open] .page-bar-fold {
+    display: flex;
+  }
+
+  /* the actions in the bar keep their bar look, not the panel's rows */
+  .page-bar[data-fold] .page-bar-actions .mantine-ActionIcon-root:not(.page-bar-fold *) {
+    justify-content: revert-layer;
+    gap: revert-layer;
+    width: revert-layer;
+    padding-inline: revert-layer;
+    font-size: revert-layer;
+    font-weight: revert-layer;
+    white-space: revert-layer;
+  }
+
+  .page-bar[data-fold] .page-bar-actions .mantine-ActionIcon-root:not(.page-bar-fold *)::after {
+    content: none;
+  }
+
+  .page-bar[data-fold]
+    .page-bar-actions
+    .mantine-ActionIcon-root:not(.page-bar-fold *)
+    :is(.mantine-ActionIcon-icon, .mantine-ActionIcon-icon > svg) {
+    width: revert-layer;
+    height: revert-layer;
+  }
+
+  .page-bar[data-fold] .page-bar-actions .save-group > :first-child {
+    flex: none;
   }
 }
 
@@ -10414,6 +10836,21 @@ main .page-bar h1 {
     margin-top: 1px;
   }
 
+  /* in the bar's end slot (site-header.tsx), so they follow its actions in the keyboard order: the
+     bar reaches to the top bar's padding and centres them with its own buttons */
+  .page-bar-end {
+    display: contents;
+  }
+
+  :root .page-bar:has(> .page-bar-end > .top-end) {
+    right: var(--mantine-spacing-md);
+  }
+
+  /* no auto margin of its own: the workbench's status pushes the actions right with one */
+  .page-bar-end > .top-end {
+    margin: 0;
+  }
+
   .page-bar {
     column-gap: 0.5rem;
   }
@@ -10431,6 +10868,12 @@ main .page-bar h1 {
   .page-shell[data-frame] .page-top > main::before {
     display: none;
   }
+
+  /* a Database page starts with its tab strip at the top bar's rule on every tab, framed or not
+     (the frame's lists have no step above the strip) */
+  .page-top > main:has(> .library-tabs)::before {
+    display: none;
+  }
 }
 
 /* up to 80em the two icons leave the workbench's bar too little room: its load switcher gives it,
@@ -10438,6 +10881,29 @@ main .page-bar h1 {
 @media screen and (min-width: 75em) and (max-width: 79.99em) {
   :root:has(.report-issue) .load-switch {
     width: 7.75rem;
+  }
+}
+
+/* the Units button as an icon, named by its whole name, until its preset leaves a record's title
+   its room (German, three page actions) */
+@media screen and (min-width: 75em) and (max-width: 104.99em) {
+  /* beats the bar's left-section padding, so the icon sits in the middle */
+  .page-bar .units-link.mantine-Button-root[data-with-left-section] {
+    width: var(--button-height, 2.25rem);
+    padding: 0;
+  }
+
+  .page-bar .units-link .mantine-Button-section[data-position="left"] {
+    margin: 0;
+  }
+
+  .page-bar .units-link .mantine-Button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
@@ -10472,6 +10938,7 @@ main .page-bar h1 {
 
   .page-bar-status,
   .page-bar-actions,
+  .page-bar-end,
   .page-bar-toggle,
   .load-strip > button,
   .load-switch,
@@ -10579,16 +11046,16 @@ main .page-bar h1 {
   border-bottom: 1px solid var(--border);
 }
 
-/* the rows picked for Compare, also those a filter hides: chips in the bar's status
-   line after the count. They keep their width; those that do not fit the slot are hidden (still
-   measured) and "n selected" with a popover stands in, so a pick moves nothing */
-.page-bar-status:has(.picked-slot) {
-  display: flex;
+/* the rows picked for Compare, also those a filter hides: "2 selected (max 4)" and Clear in the
+   bar's status line after the count, one line whatever is picked */
+.selection-summary {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  vertical-align: middle;
 }
 
-.page-bar-status:has(.picked-slot) > :is(span, .clear-picks) {
+.selection-summary > * {
   flex: none;
 }
 
@@ -10597,81 +11064,54 @@ main .page-bar h1 {
   outline-offset: -2px;
 }
 
-/* a phone's status line is 150 px: while rows are picked, the chip that opens the picks has it and
-   the count steps aside, still read by screen readers */
+/* Compare keeps the width of its widest label ("Compare 4"): the stacked labels share one cell */
+.compare-label {
+  display: inline-grid;
+}
+
+.compare-label > span {
+  grid-area: 1 / 1;
+}
+
+.compare-label > span + span {
+  visibility: hidden;
+}
+
+/* a phone's status line is 150 px: while rows are picked, the summary has it and the count steps
+   aside, still read by screen readers; Clear is its icon */
 @media screen and (max-width: 47.99em) {
-  /* the icon alone, and only while the chips are listed: the chip that opens the picks holds
-     Clear selection in its popover */
-  .clear-picks .clear-picks-text,
-  .picked-slot[data-over] + .clear-picks {
+  .clear-picks .clear-picks-text {
     display: none;
+  }
+
+  /* the line has the height of Clear (a 24 px target) also without picks, so a pick moves nothing */
+  .page-bar-status:has(> .selection-summary) {
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  .page-bar-status .clear-picks {
+    height: 1.5rem;
+    min-height: 0;
   }
 
   .clear-picks .mantine-Button-section {
     margin-inline-end: 0;
   }
 
-  .page-bar-status:has(.picked-slot) > span:first-child {
+  /* after the count (margin from the rule of the status line's parts), which steps aside */
+  .page-bar-status > .bar-count + .selection-summary {
+    margin-inline-start: 0;
+  }
+
+  .page-bar-status:has(> .selection-summary[data-picked]) > .bar-count {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
   }
-}
-
-.picked-slot {
-  position: relative;
-  display: flex;
-  flex: 1 1 0;
-  align-items: center;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.picked-slot[data-over] {
-  flex: none;
-}
-
-.picked-slot[data-over] > .picked-chips {
-  position: absolute;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.picked-chips,
-.picked-list {
-  display: flex;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.picked-chips {
-  flex: none;
-}
-
-.picked-list {
-  flex-direction: column;
-}
-
-:is(.picked-chips, .picked-list) li {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 0.125rem;
-  max-width: 20rem;
-  padding: 0 0.125rem 0 0.5rem;
-  border: 1px solid var(--border);
-  color: var(--fg);
-  font-size: var(--mantine-font-size-xs);
-}
-
-:is(.picked-chips, .picked-list) span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .directory-table {
@@ -10856,9 +11296,22 @@ main .page-bar h1 {
   text-decoration: underline dotted var(--muted);
 }
 
-.bc-model {
-  color: var(--muted);
-  font-size: var(--mantine-font-size-xs);
+/* a row menu held at the box's right edge while the table scrolls sideways (the firearm table),
+   with the row's background and a rule on its left */
+.directory-table :is(th, td).sticky-end {
+  position: sticky;
+  right: 0;
+  background: var(--bg);
+  box-shadow: inset 1px 0 0 var(--border);
+}
+
+.directory-table thead :is(th, td).sticky-end {
+  z-index: 2;
+  background: var(--surface);
+}
+
+.directory-table tr[data-row]:hover > td.sticky-end {
+  background: var(--surface);
 }
 
 /* a group of rows ends: the heavier rule of the record's tables (the browser's own rows end before
@@ -10900,6 +11353,14 @@ main .page-bar h1 {
   text-align: right;
 }
 
+/* the powder list's training rows: the count, then its cartridges and the day in a muted line */
+.fit-rows {
+  display: grid;
+  justify-items: end;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
 .directory-table th .th-end {
   float: right;
   margin-top: 0.375rem;
@@ -10911,8 +11372,8 @@ main .page-bar h1 {
   font-weight: 400;
 }
 
-/* a wide window: the name keeps a column of 32 rem and the filler column takes the rest, so the
-   values stay within reach of the name they belong to (1920 px: 1000 px of name column before) */
+/* the name column takes the width the others leave, also in a wide window, so the value columns
+   stay together at the table's end and no empty band is left beside them */
 .directory-scroll {
   container-type: inline-size;
   /* a row focused from below does not stop under the sticky head (2.5rem) */
@@ -10957,16 +11418,6 @@ main .page-bar h1 {
   }
 }
 
-@container (min-width: 90rem) {
-  .directory-table col.name-cell {
-    width: 32rem;
-  }
-
-  .directory-table col.filler {
-    width: auto;
-  }
-}
-
 @media print {
   .directory-table .filler {
     display: none;
@@ -10994,6 +11445,49 @@ main .page-bar h1 {
 .directory-table td.name-cell a:focus-visible::after {
   outline: 2px solid var(--link);
   outline-offset: -2px;
+}
+
+/* a row with a menu held at the box's edge: the sticky cell lies over the link's box, so the
+   focused row's cells draw the ring instead, the menu cell its right end beside its rule */
+@media screen and (min-width: 48em) {
+  .directory-table
+    tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
+    > td:not(.filler) {
+    box-shadow:
+      inset 0 2px 0 var(--link),
+      inset 0 -2px 0 var(--link);
+  }
+
+  .directory-table
+    tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
+    > td:first-child {
+    box-shadow:
+      inset 2px 0 0 var(--link),
+      inset 0 2px 0 var(--link),
+      inset 0 -2px 0 var(--link);
+  }
+
+  .directory-table
+    tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
+    > td.sticky-end {
+    box-shadow:
+      inset -2px 0 0 var(--link),
+      inset 0 2px 0 var(--link),
+      inset 0 -2px 0 var(--link),
+      inset 1px 0 0 var(--border);
+  }
+
+  .directory-table tr[data-row]:has(> td.sticky-end) td.name-cell a:focus-visible::after {
+    outline: none;
+  }
+}
+
+/* forced colours drop the cells' shadows that ring a focused row: the link's outline marks it */
+@media (forced-colors: active) {
+  .directory-table tr[data-row]:has(> td.sticky-end) td.name-cell a:focus-visible::after {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 
 .directory-table .missing {
@@ -11098,6 +11592,26 @@ main .page-bar h1 {
   /* the page scrolls: a row focused from below stops under the app header and the head (2.5rem) */
   html:has(.directory-scroll) {
     scroll-padding-top: calc(var(--app-shell-header-offset, 0rem) + 2.5rem);
+  }
+}
+
+/* a list page without the window-high frame scrolls the page at every width: the header sticks
+   under the top bar there too */
+@media screen and (min-width: 62em) {
+  .page-shell:not([data-frame]) .directory-table thead :is(th, td) {
+    top: var(--app-shell-header-offset, 0rem);
+  }
+
+  html:has(.page-shell:not([data-frame]) .directory-scroll) {
+    scroll-padding-top: calc(var(--app-shell-header-offset, 0rem) + 2.5rem);
+  }
+}
+
+/* the firearm library's table scrolls sideways in its own box from 48em: its head sticks in that
+   box, at its top */
+@media screen and (min-width: 48em) {
+  .library > .directory > .directory-scroll .directory-table thead :is(th, td) {
+    top: 0;
   }
 }
 
@@ -11226,8 +11740,7 @@ main .page-bar h1 {
 
 @media print {
   .directory-table .select-cell,
-  .page-bar .selection-count,
-  .picked-slot {
+  .page-bar .selection-summary {
     display: none;
   }
 }
@@ -11313,6 +11826,43 @@ main .compare-table {
   margin: 0.25rem 0 0;
   color: var(--muted);
   font-size: var(--mantine-font-size-xs);
+}
+
+/* a value's difference to the first bullet's, muted after it */
+.compare-delta {
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 400;
+}
+
+/* paper prints the hidden notes of a table (`.field-table td .visually-hidden`), not this name:
+   the legend says what the brackets hold */
+@media print {
+  .field-table td .delta-name {
+    display: none;
+  }
+}
+
+/* a column's Use in workbench: a small link under the name */
+.compare-workbench {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 400;
+  overflow-wrap: normal;
+}
+
+/* the drawings below the table */
+.bullet-compare #compare-drawings,
+.bullet-compare > section + section {
+  margin-top: var(--panel-gap);
+}
+
+/* nothing chosen yet: the note set off from the bar */
+.compare-view .mantine-EmptyState-root {
+  padding-top: 1.5rem;
 }
 
 /* the quantity stays beside the symbol while a phone scrolls the bullets */
@@ -11467,18 +12017,12 @@ main .page-panel-head > .page-panel-title {
   height: 0.8125rem;
 }
 
-/* the cartridge record's link to its bullets: under the two sides; not printed, the sheet keeps
-   the drawings and tables */
+/* the cartridge record's link to its bullets, in the fact row: not printed, the sheet keeps the
+   drawings and tables */
 @media print {
   .cartridge-bullets {
     display: none;
   }
-}
-
-/* the cartridge record's link to its bullets, under the two sides */
-.cartridge-record .record-side {
-  margin-top: var(--panel-gap);
-  font-size: var(--mantine-font-size-sm);
 }
 
 /* a record without values: the one line where the panels would be */
@@ -11487,12 +12031,41 @@ main .page-panel-head > .page-panel-title {
   color: var(--muted);
 }
 
-/* the bullet record's drawing: centred in its panel, at most the 8 px per mm of full size, so its
-   labels are no larger than a cartridge drawing's */
+/* the bullet record's drawing: scaled with its panel, at most as tall as the window leaves room for */
 @media screen {
   .bullet-record .record-figure .drawing.screen-only {
-    width: min(var(--full), 100%);
+    width: 100%;
+    height: auto;
+    max-height: calc(100svh - 14rem);
     margin-inline: auto;
+  }
+}
+
+/* the bullet data: the value column stays close to its label */
+.bullet-record .symbol-table {
+  max-width: 40em;
+}
+
+/* the line, caliber and product badges of the bullet and powder strips: 12 px */
+.fact-tags .mantine-Badge-root {
+  height: auto;
+  font-size: var(--mantine-font-size-xs);
+}
+
+/* the record's primary action on a phone and tablet, where the bar keeps it behind Page actions */
+.phone-action {
+  margin: 0 0 0.5rem;
+}
+
+@media (min-width: 75em) {
+  .phone-action {
+    display: none;
+  }
+}
+
+@media print {
+  .phone-action {
+    display: none;
   }
 }
 
@@ -11645,6 +12218,24 @@ main .cartridge-values .dim-slot {
 
 main .cartridge-values .clearance {
   cursor: help;
+}
+
+/* the head of the tolerance column: as narrow as its slot, the words wrap */
+main .cartridge-values th.dim-slot-cell {
+  white-space: normal;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
+main .cartridge-values td.dim-slot-cell {
+  padding-left: 0;
+}
+
+/* a word per line where the head is longer than its slot: the column keeps the slot's width */
+.dim-slot-head {
+  display: inline-block;
+  width: min-content;
 }
 
 /* the groups are one tbody each (named for a screen reader): a heavier rule above the next group */
@@ -12135,6 +12726,14 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     display: block;
     width: 210mm;
     height: 297mm;
+  }
+}
+
+/* from 75em a tour's target taller than the window scrolls to its top below the fixed top bar (56 px),
+   with room for the stage's 10 px and 8 px more, so the popover beside it starts below the bar too */
+@media screen and (min-width: 75em) {
+  html:has(> body.driver-active) {
+    scroll-padding-top: 4.625rem;
   }
 }
 

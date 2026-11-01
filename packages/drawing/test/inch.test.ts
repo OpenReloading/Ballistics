@@ -41,6 +41,21 @@ describe('length texts', () => {
     ).toBe('H2 −.0010 conflict')
   })
 
+  it('prints fixed lengths (the bullet drawing) in mm to 2 decimals, rounded as the decimal text reads', () => {
+    const fixed = (value: number, unit: 'mm' | 'in' = 'mm') =>
+      labelText({ kind: 'length', symbol: 'L', value }, unit, true)
+    expect(fixed(30.5)).toBe('L 30.50')
+    expect(fixed(7.823)).toBe('L 7.82')
+    // toFixed would give 31.77 and 2.67: the binary value is a hair below the midpoint
+    expect(fixed(31.775)).toBe('L 31.78')
+    expect(fixed(2.675)).toBe('L 2.68')
+    expect(fixed(30.5, 'in')).toBe('L 1.2008')
+    // the ratio and angles are not lengths
+    expect(labelText({ kind: 'radius', symbol: 'Rt/R', value: 0.55 }, 'mm', true)).toBe('Rt/R 0.55')
+    // not fixed: the value as stored
+    expect(labelText({ kind: 'length', symbol: 'L', value: 30.5 })).toBe('L 30.5')
+  })
+
   it('names the unit and gives the scale bar in it', () => {
     const mm = figureFrame([0, -5, 60, 5], 'screen', 2, 0)
     const inch = figureFrame([0, -5, 60, 5], 'screen', 2, 0, 'in')

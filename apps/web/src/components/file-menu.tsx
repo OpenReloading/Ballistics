@@ -134,6 +134,7 @@ const kindNames: Record<UserRecordKind, Message> = {
   session: msg('chronograph sessions'),
   targetSheet: msg('target sheets'),
   targetFaceDesign: msg('target designs'),
+  shootingLogEntry: msg('shooting log entries'),
 }
 
 /** A line of the status, written when it is shown so that a change of language reaches it. */
@@ -593,6 +594,23 @@ function isUnsaved(
   return initial !== undefined && now !== initial
 }
 
+/**
+ * Whether the failure shown is why Save refused the record (`problem`): set when it is shown,
+ * reset when a file action starts; a changed problem (mended or another) clears that failure.
+ */
+function useRefusal(problem: unknown, setFailure: () => void) {
+  const said = useRef(false)
+  const clear = useRef(setFailure)
+  clear.current = setFailure
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the problem changes
+  useEffect(() => {
+    if (!said.current) return
+    said.current = false
+    clear.current()
+  }, [problem])
+  return said
+}
+
 /** The status in the page bar's status line when there is one, else in place. */
 const inBar = (bar: HTMLElement | null | undefined, status: ReactNode) =>
   bar === undefined ? status : bar && createPortal(status, bar)
@@ -690,6 +708,7 @@ function FileStatus({
   folderName,
   lines,
   failure,
+  refused,
   unsaved,
   autosaved,
   kept,
@@ -703,6 +722,8 @@ function FileStatus({
   folderName: string | undefined
   lines: string
   failure: string
+  /** The failure is why Save refused the record: it shows instead of the state. */
+  refused: boolean
   unsaved: boolean
   autosaved: string | undefined
   kept: string | undefined
@@ -710,7 +731,8 @@ function FileStatus({
   const { t } = useTranslation()
   const short = useContext(BarStatus) ? brief : undefined
   const folder = folderName ? t(', folder {name}', { name: folderName }) : ''
-  const shown = !idle
+  // one save status: a refused save's reason takes the state's place
+  const shown = !idle && !(refused && failure)
   return (
     <span className="file-status">
       <span
@@ -962,6 +984,8 @@ function FileMenuOf<K extends UserRecordKind>({
   const [failureSaid, setFailureSaid] = useState<Said>()
   const setMessage = lineSetter(setLineSaid)
   const setFailure = lineSetter(setFailureSaid)
+  /** The failure shown is a refused save's `problem`, cleared when the problem changes. */
+  const problemSaid = useRefusal(problem, setFailure)
   const message = shownLine(lineSaid, tr)
   const failure = shownLine(failureSaid, tr)
   const [folder, setFolder] = useState<{ handle: FileSystemDirectoryHandle; allowed: boolean }>()
@@ -1129,6 +1153,7 @@ function FileMenuOf<K extends UserRecordKind>({
       folderName={ready?.name}
       lines={lines}
       failure={failure}
+      refused={problemSaid.current}
       unsaved={unsaved}
       autosaved={autosaved}
       kept={kept}
@@ -1139,6 +1164,7 @@ function FileMenuOf<K extends UserRecordKind>({
   const act = (failed: Message, f: () => Promise<void>) => () => {
     setMessage()
     setFailure()
+    problemSaid.current = false
     f().catch((e: unknown) => setFailure(({ t }) => t(failed, { error: errorText(e) })))
   }
 
@@ -1146,6 +1172,7 @@ function FileMenuOf<K extends UserRecordKind>({
   async function prepareSave(as: boolean) {
     if (problem) {
       setFailure(({ t }) => t('Not saved: {reason}', { reason: problem }))
+      problemSaid.current = true
       return
     }
     const recordId = as || !id.current ? newId() : id.current

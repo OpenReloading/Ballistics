@@ -2,14 +2,17 @@ import {
   InputError,
   type InteriorLoad,
   type interior,
+  muzzleVelocityFromDownrange,
+  type Projectile,
   recordLoad,
+  standardAtmosphere,
   ValueError,
   waterDensityGramsPerCm3,
 } from '@open-reloading/core'
 import { bulletDimensions } from '@open-reloading/drawing/bullet'
 import { chamberOf, seat } from '@open-reloading/drawing/seating'
 import type { Bullet, Cartridge } from '@open-reloading/schema'
-import { loadWaterCapacity, toSi } from '@open-reloading/schema'
+import { bulletListFields, loadWaterCapacity, toSi } from '@open-reloading/schema'
 import type { Records } from './records.ts'
 import type { Row } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
@@ -30,6 +33,7 @@ export const reasons = [
   'noBarrelLength',
   'missingCartridgeValue',
   'modelRefused',
+  'noBulletDrag',
 ] as const
 
 /** One of {@link reasons}. */
@@ -48,11 +52,10 @@ export interface Outcome {
   prediction: Prediction
 }
 
-/** The construction of a bullet record, for grouping. */
+/** The construction of a bullet record as its list item gives it (`bulletListFields`), for grouping. */
 export const constructionOf = (bullet: Bullet | undefined) => {
   if (!bullet) return 'unknown'
-  const { structure, core } = bullet.construction ?? {}
-  return structure ?? (core?.material ? `${core.material}-core` : 'unspecified')
+  return bulletListFields(bullet).construction ?? 'unspecified'
 }
 
 /** The volume behind the seated bullet (m3) and the bullet travel (m) of a row, or why they are not known. */
@@ -142,6 +145,57 @@ export function predict(row: Row, records: Records, model: InteriorModel): Predi
   }
 }
 
+/**
+ * The drag of a bullet record for the flight to the measuring point: its G7 ballistic coefficients
+ * as velocity bands, else its G1 ones; undefined without one, or with two of one model that share a
+ * band start (alternatives, not bands).
+ */
+function projectileOf(bullet: Bullet | undefined): Projectile | undefined {
+  if (!bullet?.diameter) return undefined
+  for (const model of ['G7', 'G1'] as const) {
+    const bands = (bullet.ballisticCoefficients ?? [])
+      .filter((c) => c.dragModel === model)
+      .map((c) => ({
+        ballisticCoefficient: toSi('ballisticCoefficient', c.value),
+        minVelocity: c.minVelocity?.value ?? 0,
+      }))
+    if (bands.length === 0) continue
+    if (new Set(bands.map((b) => b.minVelocity)).size < bands.length) return undefined
+    return {
+      mass: toSi('mass', bullet.mass.value),
+      diameter: toSi('length', bullet.diameter.value),
+      drag: { kind: 'bc', model, bands },
+    }
+  }
+}
+
+/** Air of the flight to the measuring point: the ICAO standard atmosphere at sea level. */
+const seaLevel = standardAtmosphere(0)
+
+/**
+ * `row` with its printed velocity corrected to the muzzle where it was printed at a distance
+ * (`muzzleDistance` above 0), with `muzzleVelocityFromDownrange` of core over the bullet record's
+ * drag in the standard atmosphere at sea level; `noBulletDrag` without a drag to fly. A row without
+ * a distance is a muzzle value and stays as it is.
+ */
+export function atMuzzle(row: Row, records: Records): Row | { reason: 'noBulletDrag' } {
+  if (row.muzzleDistance === undefined || row.muzzleDistance === 0) return row
+  const projectile = projectileOf(records.bullets.get(row.bullet))
+  if (!projectile) return { reason: 'noBulletDrag' }
+  try {
+    const velocity = muzzleVelocityFromDownrange({
+      projectile,
+      air: seaLevel,
+      distance: row.muzzleDistance,
+      velocity: row.velocity,
+    })
+    return { ...row, velocity, printedVelocity: row.velocity }
+  } catch (error) {
+    if (error instanceof InputError) return { reason: 'noBulletDrag' }
+    throw error
+  }
+}
+
 /** The outcome of each row of the splits in `wanted`; other rows are left out. */
 export function outcomes(
   rows: readonly Row[],
@@ -154,6 +208,10 @@ export function outcomes(
     if (!wanted.includes(split)) return []
     const family = familyOf(records.powders.get(row.powder))
     const construction = constructionOf(records.bullets.get(row.bullet))
-    return [{ row, split, family, construction, prediction: predict(row, records, model) }]
+    const prediction = predict(row, records, model)
+    // the correction applies to a row the model gave a result for, so the other reasons come first
+    const corrected = 'velocity' in prediction ? atMuzzle(row, records) : row
+    if ('reason' in corrected) return [{ row, split, family, construction, prediction: corrected }]
+    return [{ row: corrected, split, family, construction, prediction }]
   })
 }

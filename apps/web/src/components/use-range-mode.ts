@@ -1,13 +1,16 @@
 'use client'
 
-import { type Load, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
+import { type Load, parseRef, type SessionRecord, toSi, userRecord } from '@open-reloading/schema'
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import type { Translator } from '../i18n/translate.ts'
+import { fetchRecord } from '../lib/api-fetch.ts'
 import { errorText } from '../lib/error-text.ts'
 import { roundsDue, withSessionRounds } from '../lib/firearm.ts'
 import {
   addShot,
+  type ComponentKind,
+  componentRefs,
   localDate,
   parseVelocity,
   parseWeather,
@@ -53,6 +56,60 @@ export interface RangeLoad {
   id: string
   name: string
   data: Load
+}
+
+/**
+ * The names of the records `load` names: a record of this browser from the store, a catalogue record
+ * from the API; none for a reference that cannot be read (offline, or deleted).
+ */
+async function componentNames(load: Load) {
+  const names = new Map<string, string>()
+  // each record read once, so the manufacturer of two components too
+  const reads = new Map<string, ReturnType<typeof namedRecord>>()
+  const read = (kind: string, ref: string | undefined) => {
+    const key = `${kind} ${ref}`
+    const next = reads.get(key) ?? namedRecord(kind, ref).catch(() => undefined)
+    reads.set(key, next)
+    return next
+  }
+  await Promise.all(
+    componentRefs(load).map(async ([kind, ref]) => {
+      const record = await read(kind, ref)
+      if (typeof record?.name !== 'string') return
+      // a bullet, powder or primer record names its product only ("2015"): its manufacturer first
+      const maker =
+        kind === 'bullets' || kind === 'powders' || kind === 'primers'
+          ? (await read('manufacturers', manufacturerRef(record.manufacturer)))?.name
+          : undefined
+      const name =
+        typeof maker === 'string' && !record.name.startsWith(maker)
+          ? `${maker} ${record.name}`
+          : record.name
+      names.set(`${kind} ${ref}`, name)
+    }),
+  )
+  return (kind: ComponentKind, ref: string) => names.get(`${kind} ${ref}`)
+}
+
+/** A catalogue manufacturer id or a reference as a reference, undefined for anything else. */
+const manufacturerRef = (m: unknown) =>
+  typeof m !== 'string' ? undefined : parseRef(m) ? m : `catalogue:${m}`
+
+/** The record a reference names, from this browser's store or the API; undefined when it cannot be read. */
+async function namedRecord(
+  kind: string,
+  ref: string | undefined,
+): Promise<{ name?: unknown; manufacturer?: unknown } | undefined> {
+  const target = ref ? parseRef(ref) : undefined
+  if (!target) return undefined
+  if (target.scope === 'user') {
+    const r = await storedRecord(target.id).catch(() => undefined)
+    const data = r?.data as { manufacturer?: unknown } | undefined
+    return r && { name: r.name, manufacturer: data?.manufacturer }
+  }
+  return fetchRecord<{ name?: unknown; manufacturer?: unknown }>(kind, target.id).catch(
+    () => undefined,
+  )
 }
 
 /** The reference a load or session record has as another record's reference. */
@@ -180,6 +237,20 @@ export function useRangeMode() {
 
   const load = loads?.find((l) => l.id === loadId)
   const steps = load ? rangeSteps(load.data) : []
+  // the names of the chosen load's cartridge, bullet, powder and primer, once read
+  const [nameOf, setNameOf] = useState<(kind: ComponentKind, ref: string) => string | undefined>()
+  useEffect(() => {
+    setNameOf(undefined)
+    if (!load) return
+    let current = true
+    componentNames(load.data).then(
+      (f) => current && setNameOf(() => f),
+      () => current && setNameOf(() => () => undefined),
+    )
+    return () => {
+      current = false
+    }
+  }, [load])
   const step: RangeStep | undefined =
     steps.find((s) => s.key === stepKey) ?? steps.find((s) => s.offset === 0) ?? steps[0]
   const index = step ? stringIndex(session, step) : -1
@@ -393,6 +464,7 @@ export function useRangeMode() {
     failure,
     load,
     loadId,
+    nameOf,
     choose: setLoadId,
     steps,
     step,

@@ -1,0 +1,25 @@
+{
+  "id": "uspsa",
+  "name": "United States Practical Shooting Association",
+  "abbreviation": "USPSA",
+  "country": "US",
+  "ruleBooks": ["uspsa-competition-rules-2026-09"],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Contents page, title and footer (full name and the short name USPSA)",
+        "fields": ["name", "abbreviation", "ruleBooks"]
+      },
+      {
+        "source": "uspsa-competition-rules-2026-09",
+        "page": "Appendix A1, p. 76 (match levels up to the annual national championship of the association)",
+        "url": "https://rules.uspsa.org/uspsa/appendix/A1",
+        "sha256": "3c05498c56a43592131c8e8bcc39f4cb22bab152561e3273aa0c329737f81595",
+        "fields": ["country"],
+        "note": "The country is read from the name and from the levels, whose championships are those of USPSA Areas and a national one. The rule book does not name USPSA a member Region of IPSC (6.4.1 only lets members of an IPSC Region compete), so internationalFederation stays absent."
+      }
+    ]
+  }
+}

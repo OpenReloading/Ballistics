@@ -23,15 +23,19 @@ function best(run: () => unknown, rounds = 15) {
 describe('catalogue budgets', () => {
   const bundle = loadBundle()
 
-  it('has the index of the public bundle ready in under 50 ms from the records', () => {
-    expect(best(() => openCatalogue(buildCatalogue(bundle)))).toBeLessThan(50)
+  // about 17 ms on a desktop and 50 to 70 ms on a CI runner under the coverage run, since the bundle grew
+  // with the published records (#850)
+  it('has the index of the public bundle ready in under 100 ms from the records', () => {
+    expect(best(() => openCatalogue(buildCatalogue(bundle)))).toBeLessThan(100)
   })
 
-  it('has it ready in under 9 ms from the prebuilt index text', () => {
+  // about 3 ms on a desktop and 9 to 10 ms on a CI runner under the coverage run, since the index
+  // carries the bullet construction columns (#872) and the powders' training rows (#885)
+  it('has it ready in under 15 ms from the prebuilt index text', () => {
     const text = JSON.stringify(buildCatalogue(bundle).index)
     expect(
       best(() => openCatalogue({ index: JSON.parse(text), records: () => ({}) as never })),
-    ).toBeLessThan(9)
+    ).toBeLessThan(15)
   })
 
   it('answers a ranked page of cartridges in under 5 ms', () => {

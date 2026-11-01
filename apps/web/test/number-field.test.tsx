@@ -61,3 +61,30 @@ describe('a number field under German', () => {
     expect(inputOf(field({ quantity: 'range', min: 0 }, '100'))).toContain('value="100"')
   })
 })
+
+describe('the description of a flagged field', () => {
+  const described = (flag: { kind: 'exceeded' | 'record'; text: string }) => {
+    const html = renderToStaticMarkup(
+      <MantineProvider>
+        <NumberField
+          spec={{ key: 'x', label: 'Value', quantity: 'mass', min: 0, help: 'A long help.' }}
+          system={system}
+          value={{ text: '2', si: 2 }}
+          onChange={() => {}}
+          unit="none"
+          flag={flag}
+        />
+      </MantineProvider>,
+    )
+    return /<p[^>]*>([^<]*)<\/p>/.exec(html)?.[1]
+  }
+
+  it('says an error first, so the two-line help line cannot hide it', () => {
+    expect(described({ kind: 'exceeded', text: 'Above the limit.' })).toBe(
+      'Above the limit. A long help.',
+    )
+    expect(described({ kind: 'record', text: 'From the record.' })).toBe(
+      'A long help. From the record.',
+    )
+  })
+})

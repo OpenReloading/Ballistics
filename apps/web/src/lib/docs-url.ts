@@ -37,3 +37,6 @@ export const ladderGuide = docsPage(docs, 'guides/chronograph-ladder/')
 
 /** The guide to measuring powder temperature. */
 export const temperatureGuide = docsPage(docs, 'guides/powder-temperature/')
+
+/** How close a result is: the known sources of variation of a load and the held-out error of the model. */
+export const howCloseGuide = docsPage(docs, 'how-close/')

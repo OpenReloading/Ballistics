@@ -22,7 +22,7 @@ import {
   Target,
 } from '@phosphor-icons/react'
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { type ReactNode, useId } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import { AppPopover, popoverWidth } from './app-popover.tsx'
@@ -147,21 +147,36 @@ export function PrintButton({
   hint,
 }: {
   onClick?: () => void
-  disabled?: boolean
+  /** Why nothing prints yet, shown as the tooltip; the button stays focusable, so it is read. */
+  disabled?: string | false | undefined
   hint?: string
 }) {
   const { t } = useTranslation()
+  const why = useId()
+  const label = disabled || hint
   return (
-    <Tooltip label={hint ?? t('Print')} multiline={!!hint} maw={hint ? 320 : undefined}>
-      <ActionIcon
-        variant="default"
-        aria-label={t('Print')}
-        {...(disabled !== undefined && { disabled })}
-        onClick={onClick}
-      >
-        <Printer aria-hidden="true" />
-      </ActionIcon>
-    </Tooltip>
+    <>
+      <Tooltip label={label ?? t('Print')} multiline={!!label} maw={label ? 320 : undefined}>
+        <ActionIcon
+          variant="default"
+          aria-label={t('Print')}
+          // aria-disabled, not disabled: a disabled button shows no tooltip and takes no focus
+          {...(disabled && {
+            'data-disabled': true,
+            'aria-disabled': true,
+            'aria-describedby': why,
+          })}
+          onClick={disabled ? undefined : onClick}
+        >
+          <Printer aria-hidden="true" />
+        </ActionIcon>
+      </Tooltip>
+      {disabled && (
+        <span id={why} className="visually-hidden">
+          {disabled}
+        </span>
+      )}
+    </>
   )
 }
 
