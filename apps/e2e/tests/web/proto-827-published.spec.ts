@@ -29,7 +29,7 @@ test('the rows of the cited table show with the simulation, the deviation and th
   page,
 }) => {
   await run(page, `proto=c&${load}&powder=imr-4064`)
-  await expect(page.getByText('Published loads: 2 rows match')).toBeVisible()
+  await expect(page.getByText('Published loads: 2 matching')).toBeVisible()
   await page.getByRole('button', { name: 'Show rows' }).click()
   const table = page.getByRole('table', { name: /^Published loads/ })
   await expect(table.getByRole('row')).toHaveCount(3)

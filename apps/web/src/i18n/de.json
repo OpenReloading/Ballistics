@@ -4311,11 +4311,13 @@
   "Printed": "Gedruckt",
   "Published loads": "Veröffentlichte Laborierungen",
   "Published loads (maker values) and the simulation at their conditions": "Veröffentlichte Laborierungen (Herstellerwerte) und die Simulation unter ihren Bedingungen",
-  "Published loads: {count} rows match": "Veröffentlichte Laborierungen: {count} Zeilen passen",
   "Run the simulation to compare it with published loads.": "Starten Sie die Simulation, um sie mit veröffentlichten Laborierungen zu vergleichen.",
   "Show rows": "Zeilen zeigen",
   "Use this row": "Diese Zeile übernehmen",
   "velocity {value}": "Geschwindigkeit {value}",
   "Velocity deviation": "Abweichung Geschwindigkeit",
-  "Velocity printed at a distance: not corrected to the muzzle yet": "Geschwindigkeit in einem Abstand gedruckt: noch nicht auf die Mündung umgerechnet"
+  "Velocity printed at a distance: not corrected to the muzzle yet": "Geschwindigkeit in einem Abstand gedruckt: noch nicht auf die Mündung umgerechnet",
+  "Published loads: {count} matching": "Veröffentlichte Laborierungen: {count} passend",
+  "No seated bullet: the row cannot be placed": "Kein gesetztes Geschoss: die Zeile lässt sich nicht einordnen",
+  "Published rows compare with a charge ladder only.": "Veröffentlichte Zeilen werden nur mit einer Ladeleiter verglichen."
 }

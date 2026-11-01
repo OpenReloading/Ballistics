@@ -6,9 +6,10 @@ import { fromSi } from '@open-reloading/schema'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
-import type { Translator } from '../i18n/translate.ts'
+import { msg, type Translator } from '../i18n/translate.ts'
 import { apiFetch } from '../lib/api-fetch.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import type { InteriorBody } from '../lib/interior-input.ts'
 import {
   type Deviation,
   deviationOf,
@@ -28,12 +29,13 @@ import { notReached, type Outcome } from './workbench-outcome.ts'
 type Ok = Extract<Outcome, { kind: 'ok' }>
 type Sim = { velocity: number; pressure: number } | { failed: string }
 
-// shared by the header row and the tab of layout c, so a row is simulated once per run
+const noSeat = msg('No seated bullet: the row cannot be placed')
+const chargeOnly = msg('Published rows compare with a charge ladder only.')
+
+// shared by the header row and the tab of layout c, keyed by the request: a row is simulated once
 const runs = new Map<string, Promise<Sim>>()
 
-async function simulate(ok: Ok, entry: Entry): Promise<Sim> {
-  const load = rowLoad(ok.load, ok.printed.seated, entry)
-  if (!load) return { failed: 'no seated bullet' }
+async function request(load: InteriorBody['load']): Promise<Sim> {
   try {
     const res = await apiFetch('interior', {
       method: 'POST',
@@ -48,40 +50,60 @@ async function simulate(ok: Ok, entry: Entry): Promise<Sim> {
   }
 }
 
-/** The matching rows of the shown run, their simulations and whether the cartridge is in-sample. */
+/** The simulation of a row at the maker's conditions; a failure is not kept, so a later run asks again. */
+async function simulate(ok: Ok, entry: Entry): Promise<Sim> {
+  const load = rowLoad(ok.load, ok.printed.seated, entry)
+  if (!load) return { failed: noSeat }
+  const key = JSON.stringify(load)
+  const known = runs.get(key)
+  if (known) return known
+  const asked = request(load)
+  runs.set(key, asked)
+  const sim = await asked
+  if ('failed' in sim) runs.delete(key)
+  return sim
+}
+
+/**
+ * The matching rows of the shown run, their simulations and whether the cartridge is in-sample. A
+ * stale run shows none: the chosen powder may no longer be the run's. A seating or temperature
+ * ladder shows none either: its step's travel and volume are not the seating the rows move from.
+ */
 function usePublished() {
-  const { ok, powder } = useResult()
+  const { ok: run, powder, stale } = useResult()
+  const ok = run && !stale ? run : undefined
+  const charge = ok?.ladder.kind === 'charge'
   const entries = useMemo(
     () =>
-      ok
+      ok && charge
         ? matchingRows(publishedFile, {
             cartridge: ok.cartridge,
             powder: powder?.id,
             bulletMass: fromSi('mass', ok.load.bullet.mass),
           })
         : [],
-    [ok, powder],
+    [ok, charge, powder],
   )
-  const [sims, setSims] = useState<{ id: number; values: Map<string, Sim> }>()
+  const [sims, setSims] = useState<{ ok: Ok; values: Map<string, Sim> }>()
   const [sample, setSample] = useState(false)
   useEffect(() => {
     if (!ok || entries.length === 0) return
     let live = true
-    Promise.all(
-      entries.map(async (e) => {
-        const key = `${ok.id}|${e.key}`
-        if (!runs.has(key)) runs.set(key, simulate(ok, e))
-        return [e.key, await runs.get(key)] as const
-      }),
-    ).then((pairs) => {
-      if (live) setSims({ id: ok.id, values: new Map(pairs as [string, Sim][]) })
+    Promise.all(entries.map(async (e) => [e.key, await simulate(ok, e)] as const)).then((pairs) => {
+      if (live) setSims({ ok, values: new Map(pairs) })
     })
     inSample(ok.cartridge ?? '').then((s) => live && setSample(s))
     return () => {
       live = false
     }
   }, [ok, entries])
-  return { ok, entries, sims: sims?.id === ok?.id ? sims?.values : undefined, sample }
+  return {
+    ok,
+    charge,
+    entries,
+    sims: sims && sims.ok === ok ? sims.values : undefined,
+    sample,
+  }
 }
 
 const signed = (x: number, digits: number) => `${x > 0 ? '+' : ''}${formatNumber(x, digits)}`
@@ -199,7 +221,9 @@ function RowCells({
   const pending = sim === undefined ? t('Simulating') : undefined
   const failed =
     sim && 'failed' in sim
-      ? t('Not computed: {reason}', { reason: translateMessage(sim.failed, t) })
+      ? t('Not computed: {reason}', {
+          reason: sim.failed === noSeat ? t(noSeat) : translateMessage(sim.failed, t),
+        })
       : undefined
   return (
     <tr>
@@ -245,13 +269,14 @@ const notice = (t: Translator['t']) =>
 /** The list of matching rows: the tab of layouts a and c, the opened header row of b. */
 export function PublishedRows() {
   const { t } = useTranslation()
-  const { ok, entries, sims, sample } = usePublished()
+  const { ok, charge, entries, sims, sample } = usePublished()
   if (!ok)
     return (
       <p className="prompt empty-state">
         {t('Run the simulation to compare it with published loads.')}
       </p>
     )
+  if (!charge) return <p className="prompt empty-state">{t(chargeOnly)}</p>
   if (entries.length === 0)
     return (
       <p className="prompt empty-state">
@@ -300,7 +325,7 @@ export function PublishedHeader({
       className="proto-827-head"
       style={{ display: 'flex', flexWrap: 'wrap', gap: '0 12px', alignItems: 'baseline' }}
     >
-      <strong>{t('Published loads: {count} rows match', { count: entries.length })}</strong>
+      <strong>{t('Published loads: {count} matching', { count: entries.length })}</strong>
       {near && (
         <span>
           {t('Nearest: {row}', { row: `${near.load.powder.printed} ${printedText(near, t)}` })}
