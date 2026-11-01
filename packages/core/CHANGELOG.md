@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/core-v0.0.3...core-v0.0.4) (2026-11-01)
+
+
+### Features
+
+* **api:** classify an entered maximum pressure against the tolerance range ([#420](https://github.com/OpenReloading/Ballistics/issues/420)) ([4c057f9](https://github.com/OpenReloading/Ballistics/commit/4c057f9528dbf35e8257f854ccba1e8fd0128d8f))
+* **cli:** verify and compare held-out model evaluation ([#406](https://github.com/OpenReloading/Ballistics/issues/406)) ([d0b9202](https://github.com/OpenReloading/Ballistics/commit/d0b920239073991dfe5f06b690747d0c0b5b9d83))
+* **cli:** verify and compare read the catalogue's published loads, muzzle-corrected, pressure by basis ([#913](https://github.com/OpenReloading/Ballistics/issues/913)) ([054e5c0](https://github.com/OpenReloading/Ballistics/commit/054e5c0810ff684ee3e8dc3312e3157048f824fa))
+* **core:** bullets and core model batch ([#847](https://github.com/OpenReloading/Ballistics/issues/847), [#845](https://github.com/OpenReloading/Ballistics/issues/845), [#846](https://github.com/OpenReloading/Ballistics/issues/846), [#843](https://github.com/OpenReloading/Ballistics/issues/843), [#842](https://github.com/OpenReloading/Ballistics/issues/842)) ([#947](https://github.com/OpenReloading/Ballistics/issues/947)) ([73e97e2](https://github.com/OpenReloading/Ballistics/commit/73e97e2ab2a1312e2a281d9dbf631ce6232a90a5))
+* **core:** named refusals on the strings plan and a divergence of the velocity and drag fits ([#423](https://github.com/OpenReloading/Ballistics/issues/423)) ([c880f8f](https://github.com/OpenReloading/Ballistics/commit/c880f8f7b6906a7593210b29399ffb40f67b1426))
+* **core:** one advisory registry for warnings and ignored inputs ([#421](https://github.com/OpenReloading/Ballistics/issues/421)) ([d9cfa7a](https://github.com/OpenReloading/Ballistics/commit/d9cfa7a761852444ad27730626203e35c992c56d))
+* **core:** powder fit domain on every axis of a prediction ([#417](https://github.com/OpenReloading/Ballistics/issues/417)) ([3d1c339](https://github.com/OpenReloading/Ballistics/commit/3d1c33985eaf4b03a453ec2d3f539e0f90fe82f5))
+* **core:** report the stop rule and whether the outlier weights settled ([#419](https://github.com/OpenReloading/Ballistics/issues/419)) ([70aa613](https://github.com/OpenReloading/Ballistics/commit/70aa61363d65c3fd05553c9ce1824fa585ce378d))
+* **core:** require the pressure basis of a ladder pressure and refuse mixed bases ([#418](https://github.com/OpenReloading/Ballistics/issues/418)) ([b4c9d77](https://github.com/OpenReloading/Ballistics/commit/b4c9d778d1ff0d2fa94e90e44455295089ac6255))
+* point of impact per charge of a ladder from linked chronograph shots ([#757](https://github.com/OpenReloading/Ballistics/issues/757)) ([4d4e32f](https://github.com/OpenReloading/Ballistics/commit/4d4e32ffc648000bed71ee9e68f66b65aeb6dfb0))
+* pre-release batch of firearm views, box label, load-file importer and research entries ([#656](https://github.com/OpenReloading/Ballistics/issues/656)) ([5d38b2c](https://github.com/OpenReloading/Ballistics/commit/5d38b2cd057a9f0d6e2757dcf833501a1ab0268e))
+* pre-release batch of fits, hit probability, tuning and docs ([#569](https://github.com/OpenReloading/Ballistics/issues/569)) ([3a5c6a4](https://github.com/OpenReloading/Ballistics/commit/3a5c6a4a7be9d52d20eca911cdccd49ad2d104c4))
+* pre-release batch of limits, tests and research entries ([#589](https://github.com/OpenReloading/Ballistics/issues/589)) ([7b36740](https://github.com/OpenReloading/Ballistics/commit/7b36740b42ca2804b65cb0d707c1c51702b82b3e))
+* pre-release batch of tests, fixes and research entries ([#612](https://github.com/OpenReloading/Ballistics/issues/612)) ([df1f134](https://github.com/OpenReloading/Ballistics/commit/df1f1347845b62b98a153896a7f27caefd56befb))
+* pre-release batch of workbench record chooser, notes area, print fixes, photo guide and command line operations ([#688](https://github.com/OpenReloading/Ballistics/issues/688)) ([db2b2da](https://github.com/OpenReloading/Ballistics/commit/db2b2dae53086aa27177764e6dc91d0f0699e78f))
+* pre-release integration of the 1.0 work ([#493](https://github.com/OpenReloading/Ballistics/issues/493)) ([46ace26](https://github.com/OpenReloading/Ballistics/commit/46ace26932aa37546eaf95f905870c0606abfb8d))
+* **schema,core:** competition event record and scoring of ring series and practical stages ([#920](https://github.com/OpenReloading/Ballistics/issues/920)) ([44223df](https://github.com/OpenReloading/Ballistics/commit/44223dfdfb12d5b52be430d47278d65cb253e35c))
+* **schema,data:** published loads, name-only bullets, primer text and the case-contact pressure basis ([#833](https://github.com/OpenReloading/Ballistics/issues/833)) ([a008085](https://github.com/OpenReloading/Ballistics/commit/a00808567c82c600a8b8d6b6beac1915124f60e0))
+* **web,api:** type Pmax, case length L3 and bulk density over the record, read as "your Pmax" ([#869](https://github.com/OpenReloading/Ballistics/issues/869)) ([1364375](https://github.com/OpenReloading/Ballistics/commit/13643750a3b5cecf3bf3023c791bdc80aa608b68))
+* **web,schema:** choose the bullet base form and type its dimensions over the record ([#851](https://github.com/OpenReloading/Ballistics/issues/851)) ([2c865e8](https://github.com/OpenReloading/Ballistics/commit/2c865e82dba94b25301718605792c09f8d944b3e)), closes [#758](https://github.com/OpenReloading/Ballistics/issues/758)
+* **web:** edit bullet diameter, length and BC on the Bullet card ([#759](https://github.com/OpenReloading/Ballistics/issues/759)) ([9d98d6a](https://github.com/OpenReloading/Ballistics/commit/9d98d6a137256bfb07324fedae210bbbe398c2f0))
+* **web:** mark values changed over their record, reset them, and follow a typed bore diameter ([#832](https://github.com/OpenReloading/Ballistics/issues/832)) ([deea0de](https://github.com/OpenReloading/Ballistics/commit/deea0deeb1635623edabb6c8fd01090080d33512))
+* **web:** velocity SD interval, shots needed and string comparison in the session summary ([#416](https://github.com/OpenReloading/Ballistics/issues/416)) ([910d048](https://github.com/OpenReloading/Ballistics/commit/910d0483043fb8bda24321e64634a280e7d2a3ac))
+
+
+### Bug fixes
+
+* **web:** model inputs follow bullet, powder and cartridge records ([#852](https://github.com/OpenReloading/Ballistics/issues/852)) ([1f33264](https://github.com/OpenReloading/Ballistics/commit/1f33264975a1ca2c088dbb9816e1421541a0e4a9))
+
+
+### Documentation
+
+* add npm READMEs and package metadata to the published libraries ([#527](https://github.com/OpenReloading/Ballistics/issues/527)) ([21db896](https://github.com/OpenReloading/Ballistics/commit/21db896a6800ead1892216fb9918258dbb20834f))
+* **core:** state the spin drift and jump fits against the modified point mass ([#430](https://github.com/OpenReloading/Ballistics/issues/430)) ([051c116](https://github.com/OpenReloading/Ballistics/commit/051c1166bddd722ffca6c3140ad85ba5d3f07046))
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/core-v0.0.2...core-v0.0.3) (2026-10-27)
 
 

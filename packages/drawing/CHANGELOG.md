@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.3...drawing-v0.0.4) (2026-11-01)
+
+
+### Features
+
+* **core:** bullets and core model batch ([#847](https://github.com/OpenReloading/Ballistics/issues/847), [#845](https://github.com/OpenReloading/Ballistics/issues/845), [#846](https://github.com/OpenReloading/Ballistics/issues/846), [#843](https://github.com/OpenReloading/Ballistics/issues/843), [#842](https://github.com/OpenReloading/Ballistics/issues/842)) ([#947](https://github.com/OpenReloading/Ballistics/issues/947)) ([73e97e2](https://github.com/OpenReloading/Ballistics/commit/73e97e2ab2a1312e2a281d9dbf631ce6232a90a5))
+* pre-release batch of firearm views, box label, load-file importer and research entries ([#656](https://github.com/OpenReloading/Ballistics/issues/656)) ([5d38b2c](https://github.com/OpenReloading/Ballistics/commit/5d38b2cd057a9f0d6e2757dcf833501a1ab0268e))
+* pre-release batch of fits, hit probability, tuning and docs ([#569](https://github.com/OpenReloading/Ballistics/issues/569)) ([3a5c6a4](https://github.com/OpenReloading/Ballistics/commit/3a5c6a4a7be9d52d20eca911cdccd49ad2d104c4))
+* pre-release batch of tests, fixes and research entries ([#612](https://github.com/OpenReloading/Ballistics/issues/612)) ([df1f134](https://github.com/OpenReloading/Ballistics/commit/df1f1347845b62b98a153896a7f27caefd56befb))
+* pre-release integration of the 1.0 work ([#493](https://github.com/OpenReloading/Ballistics/issues/493)) ([46ace26](https://github.com/OpenReloading/Ballistics/commit/46ace26932aa37546eaf95f905870c0606abfb8d))
+* **schema,data:** published loads, name-only bullets, primer text and the case-contact pressure basis ([#833](https://github.com/OpenReloading/Ballistics/issues/833)) ([a008085](https://github.com/OpenReloading/Ballistics/commit/a00808567c82c600a8b8d6b6beac1915124f60e0))
+* **web:** bullet record facts and filter, bullet compare key values, differences and Add bullet ([#890](https://github.com/OpenReloading/Ballistics/issues/890)) ([1acd01c](https://github.com/OpenReloading/Ballistics/commit/1acd01c5471ea6504ed4f286216e15ca3a4142d6))
+
+
+### Bug fixes
+
+* **drawing:** bullet outline notes write their lengths in the page unit ([#912](https://github.com/OpenReloading/Ballistics/issues/912)) ([0ac1b75](https://github.com/OpenReloading/Ballistics/commit/0ac1b75cedc25bf5a986ea9620f22f0a192c6609))
+* second batch of audit fixes for messages, contrast, German layout and offline start ([#744](https://github.com/OpenReloading/Ballistics/issues/744)) ([c01a781](https://github.com/OpenReloading/Ballistics/commit/c01a7816faea53693d1941ffc830c536764a88e7))
+* **web:** bullet designer refusal in the page unit, Check the unit flag, narrower photo dialog ([#897](https://github.com/OpenReloading/Ballistics/issues/897)) ([7c133fe](https://github.com/OpenReloading/Ballistics/commit/7c133fe887dd4b430ef85f94ce1043dd2a59ee40))
+* **web:** model inputs follow bullet, powder and cartridge records ([#852](https://github.com/OpenReloading/Ballistics/issues/852)) ([1f33264](https://github.com/OpenReloading/Ballistics/commit/1f33264975a1ca2c088dbb9816e1421541a0e4a9))
+* **web:** seating preview writes its notes' lengths in the page unit ([#926](https://github.com/OpenReloading/Ballistics/issues/926)) ([099bac7](https://github.com/OpenReloading/Ballistics/commit/099bac71f999dc09ce7b4b45d0e52dc6d89f3bf3))
+
+
+### Documentation
+
+* add npm READMEs and package metadata to the published libraries ([#527](https://github.com/OpenReloading/Ballistics/issues/527)) ([21db896](https://github.com/OpenReloading/Ballistics/commit/21db896a6800ead1892216fb9918258dbb20834f))
+
 ## [0.0.3](https://github.com/OpenReloading/Ballistics/compare/drawing-v0.0.2...drawing-v0.0.3) (2026-10-27)
 
 
