@@ -57,6 +57,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="bilenko-2011"></a>**Bilenko 2011.** O. I. Bilenko, V. V. Pashchenko: *Improving methods for solving the direct problem of interior ballistics for smoothbore small arms* (in Ukrainian). Zbirnyk naukovykh prats Akademii vnutrishnikh viisk MVS Ukrainy 2(18), 2011, pp. 48-53. doi:10.33405/2409-7470/2011/2/18/166217. <https://znp.nangu.edu.ua/article/view/166217>
 - <a id="codata-2018"></a>**CODATA 2018.** E. Tiesinga, P. J. Mohr, D. B. Newell, B. N. Taylor: *CODATA recommended values of the fundamental physical constants: 2018*. Reviews of Modern Physics 93(2), 025010, 2021. doi:10.1103/RevModPhys.93.025010. <https://doi.org/10.1103/RevModPhys.93.025010>
 - <a id="coope-1993"></a>**Coope 1993.** I. D. Coope: *Circle fitting by linear and nonlinear least squares*. Journal of Optimization Theory and Applications 76(2), 381-388, 1993. doi:10.1007/BF00939613. <https://doi.org/10.1007/BF00939613>
+- <a id="courtney-2015"></a>**Courtney 2015.** E. Courtney, M. Courtney: *Powder Lot Variations: A Case Study with Varget – Hodgdon Extreme*. arXiv:1501.07163, 2015. <https://arxiv.org/abs/1501.07163>
 - <a id="cramer-1993"></a>**Cramer 1993.** O. Cramer: "The variation of the specific heat ratio and the speed of sound in air with temperature, pressure, humidity, and CO2 concentration". *Journal of the Acoustical Society of America* 93(5), 1993, 2510-2516. doi:10.1121/1.405827.
 - <a id="deng-2022"></a>**Deng 2022.** S. Deng, T.-C. Ken, J. Wang, T.-C. Wu, C.-C. Lin: *Interior ballistics analysis of shotgun using discrete element method*. Finite Elements in Analysis and Design 201, 2022, 103698. doi:10.1016/j.finel.2021.103698. <https://doi.org/10.1016/j.finel.2021.103698>
 - <a id="dormand-1980"></a>**Dormand 1980.** J. R. Dormand, P. J. Prince: "A family of embedded Runge-Kutta formulae". *Journal of Computational and Applied Mathematics* 6(1), 1980, 19-26. doi:10.1016/0771-050X(80)90013-3.
@@ -111,6 +112,7 @@ Measurement data imported as values carry their license: public domain in the US
 - <a id="nsra-2024"></a>**NSRA 2024.** National Small-bore Rifle Association: *Rules and Regulations for the conduct of small-bore and air rifle, small-bore and air pistol and crossbow competitions*, amendments effective as at 15 April 2024. <https://www.nsra.co.uk/s/Rules-Regs-2024.pdf>
 - <a id="oesb-2025"></a>**ÖSB 2025.** Österreichischer Schützenbund: *Österreichische Schießordnung (ÖSchO)*, 1st edition, 15th revision, valid from 1 September 2025. <https://www.schuetzenbund.at/wp-content/uploads/2020/12/OeSchO_1_Ausgabe_Revision_15_.pdf>
 - <a id="saami-2018"></a>**SAAMI 2018.** Sporting Arms and Ammunition Manufacturers' Institute: *Gun Recoil - Technical*, "Free Recoil Energy", Rev. 7/9/2018. <https://saami.org/wp-content/uploads/2025/03/Gun-Recoil-Formulae-2018-07-9.pdf>
+- <a id="saami-z299-4-2025"></a>**SAAMI Z299.4-2025.** Sporting Arms and Ammunition Manufacturers' Institute: *Voluntary Industry Performance Standards for Pressure and Velocity of Centerfire Rifle Ammunition for the Use of Commercial Manufacturers*. ANSI/SAAMI Z299.4-2025, approved 10 February 2025. <https://saami.org/wp-content/uploads/2026/04/SAAMI-Z299.4-CFR-2025-Centerfire-Rifle-Approved-2-10-2025-2026-04-27.pdf>
 - <a id="ssv-2022"></a>**SSV 2022.** Schweizer Schiesssportverband: *Regeln für das sportliche Schiessen (RSpS)*, Ausgabe 2022, with parts A to I, revision of 9 July 2021. <https://www.swissshooting.ch/media/0xikjm12/dok-1104020_4029-d.pdf>
 - <a id="stanag-4355"></a>**STANAG 4355.** NATO: STANAG 4355 Edition 4 and AOP-4355 Edition A, *The Lieske Modified Point Mass and Five Degrees of Freedom Trajectory Models*. Adopted as ČOS 109001, 4th edition, *Lieskeho model dráhy letu modifikovaného hmotného bodu a model dráhy letu s pěti stupni volnosti*, Praha, 2019. Equation numbers on the model pages are those of ČOS 109001.
 - <a id="vdrbw"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr: *Schießsportordnung des VdRBw e.V.*, approved 18 December 2023. <https://www.bva.bund.de/SharedDocs/Downloads/DE/Buerger/Ausweis-Dokumente-Recht/Waffenrecht/Schiesssport/vdrbw_sportordnung.pdf?__blob=publicationFile&v=2>
@@ -401,13 +403,16 @@ The documents and web pages of the makers that the bullet, powder, case capacity
 
 ## Online references
 
+- <a id="bbti-9mm"></a>**BBTI 9 mm.** Ballistics By The Inch: *9mm Luger results*, velocity by barrel length, 3 shots per barrel, measured 15 ft from the muzzle. <http://www.ballisticsbytheinch.com/9luger.html>
 - <a id="bdmp-home"></a>**BDMP.** Bund Deutscher Militär- und Polizeischützen e.V.: *Homepage*. <https://www.bdmp.de/>
 - <a id="bds-home"></a>**BDS.** Bund Deutscher Sportschützen 1975 e. V.: *Homepage*. <https://www.bdsnet.de/>
+- <a id="castleman-2023"></a>**Castleman 2023.** W. L. Castleman: *Comparison of 223 Remington Brass for AR-15 Service Rifle*, 2023, revised 2025. <https://www.wlcastleman.com/equip/shoot/223bt/index.htm>
 - <a id="cdp-emulation"></a>**DevTools Protocol, Emulation.** Chrome DevTools Protocol: *Emulation domain, setCPUThrottlingRate*. <https://chromedevtools.github.io/devtools-protocol/#/Emulation.setCPUThrottlingRate>
 - <a id="dlmf"></a>**DLMF.** F. W. J. Olver, A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, R. F. Boisvert, C. W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, M. A. McClain (eds.): *NIST Digital Library of Mathematical Functions*. NIST, Gaithersburg, MD. <https://dlmf.nist.gov/>
 - <a id="dsb-home"></a>**DSB.** Deutscher Schützenbund e.V.: *Homepage*. <https://www.dsb.de/>
 - <a id="dsu-home"></a>**DSU.** Deutsche Schießsport Union e.V.: *Homepage*. <https://www.d-s-u.de/>
 - <a id="event-timing"></a>**Event Timing.** W3C: *Event Timing API*. <https://w3c.github.io/event-timing/>
+- <a id="hodgdon-2012"></a>**Hodgdon 2012.** Hodgdon Powder Co.: *Extreme Rifle Powders, test results for temperature sensitivity*, 13 July 2012. <https://hodgdonpowderco.com/wp-content/uploads/2023/04/hodgdon-extreme-series-powders-test-results-for-temperature-sensitivity-1.pdf>
 - <a id="issf-home"></a>**ISSF.** International Shooting Sport Federation: *Homepage*. <https://www.issf-sports.org/>
 - <a id="layout-instability"></a>**Layout Instability.** W3C Web Platform Incubator Community Group: *Layout Instability API*. <https://wicg.github.io/layout-instability/>
 - <a id="longtasks"></a>**Long Tasks.** W3C: *Long Tasks API*. <https://w3c.github.io/longtasks/>
@@ -417,6 +422,7 @@ The documents and web pages of the makers that the bullet, powder, case capacity
 - <a id="nra-home"></a>**NRA.** National Rifle Association of America: *Homepage*. <https://www.nra.org/>
 - <a id="nsra-home"></a>**NSRA.** National Small-bore Rifle Association: *Homepage*. <https://www.nsra.co.uk/>
 - <a id="oesb-home"></a>**ÖSB.** Österreichischer Schützenbund: *Homepage*. <https://www.schuetzenbund.at/>
+- <a id="rifleshooter-2014"></a>**Rifleshooter 2014.** Rifleshooter.com: *308 Winchester / 7.62x51mm NATO: Barrel Length versus Velocity (28″ to 16.5″)*, December 2014. <https://rifleshooter.com/2014/12/308-winchester-7-62x51mm-nato-barrel-length-versus-velocity-28-to-16-5/>
 - <a id="ssv-home"></a>**SSV.** Schweizer Schiesssportverband: *Swiss Shooting, Homepage*. <https://www.swissshooting.ch/>
 - <a id="vdrbw-home"></a>**VdRBw.** Verband der Reservisten der Deutschen Bundeswehr e.V.: *Homepage*. <https://www.reservistenverband.de/>
 - <a id="wmo-2025"></a>**WMO 2025.** World Meteorological Organization: *Records of Weather and Climate Extremes*, as of 31 July 2025. Table of the WMO World Weather and Climate Extremes Archive. <https://wmo.int/sites/default/files/2025-07/Table_Records_25Jul2025.pdf>

@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
 import { DocsLink } from '../src/components/docs-link.tsx'
-import { docsPage, docsUrl } from '../src/lib/docs-url.ts'
+import { docsPage, docsUrl, howCloseGuide } from '../src/lib/docs-url.ts'
 
 const render = (url?: string | undefined, drawer?: boolean) =>
   renderToStaticMarkup(
@@ -34,4 +34,8 @@ it('docsPage: the page under the docs site with or without its closing slash, no
     'https://example.org/docs/photo-guide/',
   )
   expect(docsPage(undefined, 'photo-guide/')).toBeUndefined()
+})
+
+it('the result notes link the page on how close a result is', () => {
+  expect(howCloseGuide).toMatch(/\/docs\/how-close\/$/)
 })
