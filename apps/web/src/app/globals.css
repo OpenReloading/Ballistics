@@ -11400,6 +11400,14 @@ main .page-bar h1 {
   }
 }
 
+/* forced colours drop the cells' shadows that ring a focused row: the link's outline marks it */
+@media (forced-colors: active) {
+  .directory-table tr[data-row]:has(> td.sticky-end) td.name-cell a:focus-visible::after {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+
 .directory-table .missing {
   color: var(--muted);
 }
