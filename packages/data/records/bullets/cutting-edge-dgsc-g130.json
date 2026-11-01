@@ -17,6 +17,10 @@
     "value": 29.36,
     "raw": "1.156\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -28,6 +32,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length"],
         "note": "Page 9, Safari Raptor, Solid, & Lever+: Caliber .264, Grains 130, Part Number DGSC G130, OAL 1.156\", Bullet Projection .759\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

@@ -17,6 +17,10 @@
     "value": 41.25,
     "raw": "1.624\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "slowestTwist": {
     "value": 177.8,
     "raw": "1-7\""
@@ -32,6 +36,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "slowestTwist"],
         "note": "Page 6, Flat Base Raptors (FB): Caliber .308, Grains 215, Minimum Required Twist 1-7\", Part Number FB 308 215 SS**, G1 BC TBD, OAL 1.624\", Bullet Projection Blackout: .859\" / Whisper: .732\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

@@ -17,6 +17,10 @@
     "value": 34.62,
     "raw": "1.363\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "provenance": {
     "kind": "published",
     "sources": [
@@ -28,6 +32,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length"],
         "note": "Page 6, Flat Base Raptors (FB): Caliber .423, Grains 257, Minimum Required Twist Standard, Part Number DGBR-HP K05CA, G1 BC TBD, OAL 1.363\", Bullet Projection .650\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },
