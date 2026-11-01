@@ -73,7 +73,7 @@ export function SafetyActions({
           <Button variant="default" onClick={onDecline}>
             {t('Decline')}
           </Button>
-          <Button color="yellow" c="dark" onClick={onAccept}>
+          <Button color="yellow" c="dark.9" onClick={onAccept}>
             {t('I accept')}
           </Button>
         </>
