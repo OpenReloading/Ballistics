@@ -1,7 +1,7 @@
 /**
  * What the outline of a bullet photograph says about whether the photograph can be measured
- * (`apps/docs/docs/models/bullet-photo.md`): the bullet's width in pixels, its proportions and how
- * ragged its sides are. Plain sentences for the user; a photograph too poor to measure gets no
+ * (`apps/docs/docs/models/bullet-photo.md`): the bullet's width in pixels, its proportions, a
+ * shadow on one side and how ragged its sides are. Plain sentences for the user; a photograph too poor to measure gets no
  * values rather than wrong ones. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
 import { msg } from '../i18n/translate.ts'
@@ -36,7 +36,7 @@ const widthOf = (o: Outline) =>
 /** A value to one decimal, for a sentence. */
 const tenths = (x: number) => Math.round(10 * x) / 10
 
-/** The sentences the outline's size, proportions and raggedness give, and the reason it cannot be measured. */
+/** The sentences the outline's size, proportions, shadow and raggedness give, and the reason it cannot be measured. */
 export function outlineHints(o: Outline): OutlineHints {
   const width = widthOf(o)
   const ratio = o.length / Math.max(width, 1e-9)
@@ -73,6 +73,16 @@ export function outlineHints(o: Outline): OutlineHints {
           good: goodWidthPx * 2,
         },
       ),
+    )
+  if (o.shadow)
+    hints.push(
+      o.shadow.removed
+        ? msg(
+            'A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out of the cut-out, or take the photograph in even light, for a more exact outline.',
+          )
+        : msg(
+            'One side of the cut-out is wider than the other, as a shadow beside the bullet makes it: the diameter and every length may be off by more than their uncertainty. Brush the shadow out of the cut-out, or take the photograph in even light.',
+          ),
     )
   const s = shankOf(o)
   if (s.sigma > Math.max(raggedPx, raggedShare * width))

@@ -65,6 +65,7 @@ const sidebars: SidebarsConfig = {
     ]),
     'models/least-squares',
     'models/validation',
+    'how-close',
     {
       type: 'category',
       label: 'Research log',

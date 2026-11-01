@@ -58,6 +58,7 @@ import {
   checkSpec,
 } from './plausibility.ts'
 import {
+  checkPublishedLoadPlausibility,
   checkPublishedLoads,
   type LocatedPublishedLoads,
   readPublishedLoads,
@@ -157,6 +158,8 @@ export type ReadRecordsResult = {
   bundle: Bundle
   publishedLoads: PublishedLoads[]
   errors: string[]
+  /** Plausibility findings that do not fail validation: a published load stays as printed. */
+  warnings: string[]
 }
 
 /** Reads every kind directory of `roots`, in this order, the source records first. */
@@ -334,7 +337,15 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
     },
     errors,
   )
-  for (const f of collectFindings(bundle, new Map(bundle.cartridges.map((c) => [c.id, c]))))
+  const cartridges = new Map(bundle.cartridges.map((c) => [c.id, c]))
+  for (const f of collectFindings(bundle, cartridges))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
-  return { bundle, publishedLoads: published.map((p) => p.file), errors }
+  const warnings = published.flatMap(({ folder, file }) =>
+    // a folder under an old cartridge id reads the record that replaces it
+    checkPublishedLoadPlausibility(
+      file,
+      cartridges.get(folder) ?? cartridges.get(bundle.renames?.cartridges?.[folder] ?? ''),
+    ).map((f) => `loads/${folder}/${file.id}.json: loads ${f.load}: ${f.finding}: ${f.message}`),
+  )
+  return { bundle, publishedLoads: published.map((p) => p.file), errors, warnings }
 }

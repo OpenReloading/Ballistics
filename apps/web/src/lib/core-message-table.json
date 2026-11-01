@@ -405,7 +405,12 @@
       "zero range {n} m not reached ({stop})",
       "zero did not converge (miss {h} m, {w} m)",
       "range {n}",
-      "range {n} m not reached"
+      "range {n} m not reached",
+      "distance must not be negative",
+      "velocity must be positive",
+      "distance {n} m not reached ({stop})",
+      "the speed measured is lower than the bullet can keep over the distance",
+      "muzzle velocity did not converge"
     ],
     "advisory registry": [
       "The simulated peak pressure is above a CIP maximum pressure of the cartridge.",

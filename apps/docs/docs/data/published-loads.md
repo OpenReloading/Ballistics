@@ -87,3 +87,13 @@ The split of a row follows from its cartridge: the first byte of the SHA-256 of 
 - a printed primer size or magnum that differs from the primer record;
 - a `value` that does not follow its `raw`;
 - a source without publisher, URL, retrieval date or origin, a kind other than `published`, and a project licence on maker data.
+
+It also prints plausibility warnings, each with the file, the load id and a finding id (`checkPublishedLoadPlausibility`). A printed value that looks wrong is still the maker's value: a warning never removes or changes a row and does not fail the validation, which exits 0 when there are only warnings.
+
+| Finding | When |
+|---|---|
+| `start-above-max` | The start charge is above the max charge of the same load |
+| `velocity-order` | The velocity of the max charge is below that of the start charge, both at the same point |
+| `pressure-order` | The pressure of the max charge is below that of the start charge, both with a value in bar and the same unit and method |
+| `pressure-above-cartridge-max` | A pressure with a value in bar whose method is the cartridge record's `pressureMethod` is above the record's `Pmax` (the largest one where the record has variants). A pressure on another basis (case-contact, crusher in CUP or LUP, no method) is not compared: no value is converted between bases |
+| `coal-above-cartridge-max` | The COAL is above the cartridge record's `L6`, the maximum cartridge length |

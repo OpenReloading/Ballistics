@@ -39,3 +39,20 @@ it('adds the country of the manufacturer, then each tag, also two that read the 
   expect(html.match(/mantine-Badge-label">Target</g)).toHaveLength(2)
   expect(html.indexOf('Germany')).toBeLessThan(html.indexOf('fact-tags'))
 })
+
+it('puts items with one icon in one card and names the velocity band of a coefficient', () => {
+  const html = render({
+    items: bulletStrip({
+      ...targetBullet,
+      ballisticCoefficients: [
+        { dragModel: 'G1', value: 0.5, minVelocity: { value: 600 } },
+        { dragModel: 'G7', value: 0.25 },
+      ],
+    }).filter((i) => i.icon === 'ballisticCoefficient'),
+  })
+  expect(html.match(/class="fact-card"/g)).toHaveLength(1)
+  // the server render's units: m/s
+  expect(html).toContain('BC G1 from 600 m/s')
+  expect(html).toContain('BC G7')
+  expect(html).not.toContain('BC G7 from')
+})

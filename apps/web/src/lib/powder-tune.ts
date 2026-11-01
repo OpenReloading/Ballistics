@@ -3,6 +3,7 @@ import { type Powder, type SessionRecord, toSi, type UserRecord } from '@open-re
 import { parseNumber } from '../i18n/number.ts'
 import type { Shot } from './chrono.ts'
 import { storageName } from './edition.ts'
+import { cartridgeClass } from './input-defaults.ts'
 import { sessionRef, stringCharge } from './measurements.ts'
 
 /** A string on the tuning screen: charge, kg, its shots and the powder temperature, K; default the load's. */
@@ -31,14 +32,19 @@ export const tuneLoadKey = (load: string) => storageName(`tuneLoad:${load}`)
 /** The session storage key of the powder record of the load handed over for load `load`, a reference. */
 export const tuneBaseKey = (load: string) => storageName(`tunePowder:${load}`)
 
+/** The session storage key of the CIP table of the cartridge record of the load handed over for load `load`, a reference. */
+export const tuneTableKey = (load: string) => storageName(`tuneTable:${load}`)
+
 /**
- * Hands `interior`, the load the workbench's run simulates, and `powder`, its powder record, to the
- * tuning route for the strings of load `load` (a reference); undefined removes one handed over before.
+ * Hands `interior`, the load the workbench's run simulates, `powder`, its powder record, and
+ * `table`, the CIP table of its cartridge record, to the tuning route for the strings of load
+ * `load` (a reference); undefined removes one handed over before.
  */
 export function writeTuneLoad(
   load: string,
   interior: InteriorLoad | undefined,
   powder?: Powder | undefined,
+  table?: string | undefined,
 ) {
   const put = (key: string, value: unknown) => {
     if (value) sessionStorage.setItem(key, JSON.stringify(value))
@@ -47,8 +53,20 @@ export function writeTuneLoad(
   try {
     put(tuneLoadKey(load), interior)
     put(tuneBaseKey(load), interior && powder)
+    put(tuneTableKey(load), interior && table)
   } catch {}
 }
+
+/**
+ * Whether the fit of `load` gets the revolver note: the cartridge record is in the CIP table of the
+ * pistol and revolver cartridges (`table`, see `cartridgeClass`), so the load may be fired from a
+ * revolver, and the load has no leak area above 0, so a fit puts the cylinder gap loss into the
+ * burn values. No firearm field states a revolver, so pistol loads of that table get the note too.
+ */
+export const revolverLeakNote = (table: string | undefined, load: InteriorLoad | undefined) =>
+  load !== undefined &&
+  cartridgeClass(table) === 'pistol' &&
+  !load.leakage?.area.some((p) => p.area > 0)
 
 /** The tuning route opened for the powder `powder` (a reference): it lists the saved loads that use it. */
 export const tunePowderHref = (powder: string) =>

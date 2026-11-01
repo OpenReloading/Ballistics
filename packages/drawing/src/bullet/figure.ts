@@ -40,7 +40,7 @@ type Laid = { layout: Layout; axis: [number, number]; box: [number, number, numb
 const laid = layoutCache((p: BulletProfile, medium: Medium, em: number, unit: LengthUnit): Laid => {
   const axis = axisReach(p)
   const layout = annotate(
-    { points: p.points, annotation: p.annotation, unit },
+    { points: p.points, annotation: p.annotation, unit, fixedDecimals: true },
     em,
     readingDirection(medium),
     axis,

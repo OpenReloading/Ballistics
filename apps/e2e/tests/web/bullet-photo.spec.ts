@@ -81,4 +81,8 @@ test('the diameter and the overall length from a caliper give the scale without 
   await dialog.getByRole('spinbutton', { name: /^Overall length, caliper/ }).fill('31.4')
   await expect(dialog.getByText(/^Scale \d+\.\d+ px\/mm, uncertainty/)).toBeVisible()
   await expect(length).toContainText(/31\.\d+ ± /)
+  // what a scale from the sizes entered without a ruler rests on, shown with the values
+  await expect(
+    dialog.getByText(/The scale comes from the diameter and the overall length entered/),
+  ).toBeVisible()
 })

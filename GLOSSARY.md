@@ -249,7 +249,7 @@ _Avoid_: `base` (on a powder)
 `thermochemistry`: constant-volume burning at `loadingDensity` (g/cm3) computed from the composition: `flameTemperature` (K), `impetus` (J/kg), `gamma`, `molarMass` (kg/kmol) and `covolume` (m3/kg), each a value with `min` and `max`.
 
 **Interior parameters**:
-`interior`: the M3 parameters of a powder fitted to load tables, with the fixed inputs of the fit: `model` (`m3`), `fitted`, `vivacity`, `energy`, `gamma`, `covolume`, `density`, `pressureExponent`, `referencePressure`, `ignitionPressure`, `startPressure`, `propellantTemperature`, `burnForm`, `resistance`, `trainingRows`, `trainingCartridges`. Effective values of the model version. Powder list items carry `vivacity`, `pressureExponent`, `referencePressure` and `burnForm`.
+`interior`: the M3 parameters of a powder fitted to load tables, with the fixed inputs of the fit: `model` (`m3`), `fitted`, `vivacity`, `energy`, `gamma`, `covolume`, `density`, `pressureExponent`, `referencePressure`, `ignitionPressure`, `startPressure`, `propellantTemperature`, `burnForm`, `resistance`, `trainingRows`, `trainingCartridges`. Effective values of the model version. Powder list items carry `vivacity`, `pressureExponent`, `referencePressure`, `burnForm`, `trainingRows`, `trainingCartridges` and `retrieved`, the latest day the fitted sources were read.
 
 **Fitted parameters**:
 `fitted`: the interior parameters the fit moved (`vivacity`, `energy`, `form.a`). The others are fixed inputs.

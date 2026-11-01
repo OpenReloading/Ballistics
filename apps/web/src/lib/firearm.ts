@@ -26,15 +26,19 @@ export const firearmFields = [
   { key: 'freebore', label: msg('Freebore'), quantity: 'length', min: 0 },
   {
     key: 'baseToOgiveAtLands',
-    label: msg('Base to ogive at the lands, measured'),
-    help: msg('Cartridge length to the bullet ogive with the bullet touching the lands.'),
+    label: msg('Base to ogive at the lands'),
+    help: msg(
+      'Base to ogive at the lands, measured: cartridge length to the bullet ogive with the bullet touching the lands.',
+    ),
     quantity: 'length',
     min: 0,
   },
   {
     key: 'overallLengthAtLands',
-    label: msg('Overall length at the lands, measured'),
-    help: msg('Cartridge overall length with the bullet touching the lands.'),
+    label: msg('Overall length at the lands'),
+    help: msg(
+      'Overall length at the lands, measured: cartridge overall length with the bullet touching the lands.',
+    ),
     quantity: 'length',
     min: 0,
   },

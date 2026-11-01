@@ -72,9 +72,6 @@ export function BulletDrawing({
   const id = `${record.id}-drawing`
   const title = t('Outline, {name}', { name: label })
   const model = bulletFigureModel(p, 'screen', bulletScreenEm(p, unit), 0, unit)
-  const symbols = [...p.annotation.dimensions, ...p.annotation.radii].map(
-    (d) => `${d.symbol} ${nameOf(d.symbol)}`,
-  )
   const assumed = p.outline.segments.some((s) => s.approximate)
   const notes = [
     t(
@@ -87,7 +84,6 @@ export function BulletDrawing({
           ),
         ]
       : []),
-    t('Symbols: {symbols}.', { symbols: symbols.join(', ') }),
     ...(p.undimensioned.length > 0
       ? [t('Not dimensioned: {parts}.', { parts: p.undimensioned.join(', ') })]
       : []),

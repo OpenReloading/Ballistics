@@ -100,9 +100,9 @@ describe('start', () => {
     const e = evaluate(d, metric)
     for (const k of ['diameter', 'mass', 'length', 'noseLength', 'bearingLength', 'baseToOgive'])
       expect(e.states[k]).toEqual({ kind: 'record' })
-    // stored values come back as stored, not with the noise of the SI round trip
+    // stored values come back in the drawing's fixed 2 mm decimals, not with the noise of the SI round trip
     expect(e.drawing?.screen.layers.bullet.labels.find((l) => l.owner === 'd')?.text).toBe(
-      '∅d 7.823',
+      '∅d 7.82',
     )
     // the computed values of the bullet page
     const r = targetBullet
@@ -294,9 +294,13 @@ describe('history', () => {
     expect(u.present.fields.length).toEqual({ text: '1.1811', si: 30e-3 })
     expect(defined(u.past.at(-1)?.fields.length).text).toBe('1.1811')
     expect(defined(u.present.fields.mass).text).toBe('168')
-    // the same outline, its labels in inches
+    // the same outline, its labels and the lengths of its notes in inches
     const [inch, mm] = [evaluate(u.present, us).drawing, evaluate(h.present, metric).drawing]
-    expect(inch?.profile).toEqual(mm?.profile)
+    const shape = (p: typeof inch) =>
+      p && { ...p.profile, outline: { ...p.profile.outline, notes: [] } }
+    expect(shape(inch)).toEqual(shape(mm))
+    expect(inch?.profile.outline.notes.join(' ')).toMatch(/assumed nose of \.6160 in is drawn/)
+    expect(mm?.profile.outline.notes.join(' ')).toMatch(/assumed nose of 15\.646 mm is drawn/)
     expect(inch?.screen.scale.note).toBe('Dimensions in inches')
     expect(mm?.screen.scale.note).toBe('Dimensions in mm')
   })

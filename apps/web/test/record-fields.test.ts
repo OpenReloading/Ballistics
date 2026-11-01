@@ -430,12 +430,13 @@ it('gives the fitted values with intervals, the fixed inputs from their stored u
   expect(shown(modelInputRows(p), us)[6]).toEqual(['Propellant temperature', '69.8 °F'])
 })
 
-it('the bullet strip has diameter, mass, length, the G7 BC where given and the sectional density, nothing the record lacks', () => {
+it('the bullet strip has diameter, mass, length, the G1 and G7 BCs, the sectional density and the type, nothing the record lacks', () => {
   const strip = bulletStrip(target)
   expect(strip.map((i) => i.label)).toEqual([
     'Diameter',
     'Mass',
     'Length',
+    'BC G1',
     'BC G7',
     'Sectional density',
   ])
@@ -444,10 +445,24 @@ it('the bullet strip has diameter, mass, length, the G7 BC where given and the s
     '168.0 gr',
     '1.2598 in',
   ])
-  const bc = target.ballisticCoefficients?.find((c) => c.dragModel === 'G7')
-  expect(rowValue(defined(strip[3]).row, us)).toBe(`${bc?.value.toFixed(3)} lb/in²`)
+  // one icon: the strip draws both in one card
+  expect(strip.slice(3, 5).map((i) => i.icon)).toEqual([
+    'ballisticCoefficient',
+    'ballisticCoefficient',
+  ])
+  expect(strip.slice(3, 5).map((i) => rowValue(i.row, us))).toEqual([
+    '0.500 lb/in²',
+    '0.250 lb/in²',
+  ])
   const bare = { ...target, length: undefined, ballisticCoefficients: undefined }
   expect(bulletStrip(bare).map((i) => i.label)).toEqual(['Diameter', 'Mass', 'Sectional density'])
+  // the type: tip and base, what the record gives
+  const typed = { ...target, tip: { type: 'hollow-point' }, base: { type: 'boat-tail' } } as Bullet
+  const type = bulletStrip(typed).at(-1)
+  expect([type?.label, type && rowValue(type.row, us)]).toEqual(['Type', 'hollow-point, boat-tail'])
+  expect(bulletStrip({ ...target, tip: { type: 'soft-point' } } as Bullet).at(-1)?.label).toBe(
+    'Type',
+  )
 })
 
 it('the powder strip has manufacturer, form, base, the burn-rate position, the solid and the bulk density where known', () => {
