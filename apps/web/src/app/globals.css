@@ -3018,6 +3018,53 @@ td.nowrap {
   border-top: 1px solid var(--mantine-color-default-border);
 }
 
+/* Shooting log: the own-record line and the entry form above the table; on paper the sheet alone,
+   one line per entry with a blank signature column */
+.log-own-record {
+  margin: 0;
+}
+
+.log-editor {
+  max-width: 60rem;
+}
+
+.log-filters :is(.mantine-Select-root, .mantine-TextInput-root) {
+  width: 10rem;
+}
+
+.log-sheet table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+@media print {
+  /* the list and the form: the sheet holds the entries on paper */
+  .library.shooting-log {
+    display: none;
+  }
+
+  .log-sheet {
+    color: #000;
+    font-size: 9pt;
+  }
+
+  .log-sheet :is(th, td) {
+    height: 8mm;
+    padding: 1mm 1.5mm;
+    text-align: left;
+    vertical-align: top;
+    border: 1px solid #000;
+  }
+
+  .log-sheet td.num {
+    text-align: right;
+  }
+
+  .log-sheet .log-signature {
+    width: 30mm;
+  }
+}
+
 /* Firearm library: the table across the page. With a firearm open, the card list sticky beside
    the editor from 62em */
 .library {

@@ -65,6 +65,8 @@
 . SessionRecord
 . SessionSnapshot
 . SheetNote
+. ShootingLogEntry
+. ShootingLogRecord
 . ShotGroup
 . SiMap
 . SkippedKind
@@ -186,6 +188,7 @@
 . sessionSnapshot
 . sheetId
 . sheetNote
+. shootingLogEntry
 . shotGroup
 . shotString
 . siMaps

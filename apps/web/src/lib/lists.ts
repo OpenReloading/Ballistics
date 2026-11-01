@@ -13,6 +13,7 @@ export type ListNoun =
   | 'faces'
   | 'federations'
   | 'firearms'
+  | 'log entries'
   | 'powders'
   | 'primers'
 
@@ -57,6 +58,11 @@ const countLines: Record<
     all: (tn, n) => tn(n, '{count} firearm', '{count} firearms'),
     some: (tn, shown, n) =>
       tn(n, '{shown} of {count} firearm', '{shown} of {count} firearms', { shown }),
+  },
+  'log entries': {
+    all: (tn, n) => tn(n, '{count} entry', '{count} entries'),
+    some: (tn, shown, n) =>
+      tn(n, '{shown} of {count} entry', '{shown} of {count} entries', { shown }),
   },
   powders: {
     all: (tn, n) => tn(n, '{count} powder', '{count} powders'),

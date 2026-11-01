@@ -134,6 +134,7 @@ const kindNames: Record<UserRecordKind, Message> = {
   session: msg('chronograph sessions'),
   targetSheet: msg('target sheets'),
   targetFaceDesign: msg('target designs'),
+  shootingLogEntry: msg('shooting log entries'),
 }
 
 /** A line of the status, written when it is shown so that a change of language reaches it. */
