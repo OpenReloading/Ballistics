@@ -5,6 +5,7 @@ import { isWebLink, type Provenance, type Source } from '@open-reloading/schema'
 import Link from 'next/link'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg } from '../i18n/translate.ts'
+import { fieldLabel } from '../lib/field-labels.ts'
 import { Day } from './day.tsx'
 import { Noted } from './field-table.tsx'
 import { CopyHash } from './record-actions.tsx'
@@ -78,18 +79,27 @@ function SourceMeta({ source: s }: { source: Source }) {
   )
 }
 
-function CoversCell({ fields }: { fields: string[] | undefined }) {
+/** The fields a source covers: their count, the list of their labels on hover and on focus. */
+function CoversCell({ fields, kind }: { fields: string[] | undefined; kind: string | undefined }) {
   const { t, tn } = useTranslation()
   if (!fields) return t('whole record')
   return (
     <Noted
       value={tn(fields.length, '{count} field', '{count} fields')}
-      notes={[fields.join(', ')]}
+      notes={[fields.map((f) => fieldLabel(f, kind, t)).join(', ')]}
     />
   )
 }
 
-function SourceRow({ source: s, has }: { source: Source; has: Has }) {
+function SourceRow({
+  source: s,
+  has,
+  kind,
+}: {
+  source: Source
+  has: Has
+  kind: string | undefined
+}) {
   const { t } = useTranslation()
   const origin = s.origin && origins[s.origin]
   return (
@@ -117,7 +127,7 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
       )}
       {has('fields') && (
         <TableTd role="cell" className="nowrap" data-label={t('Covers')}>
-          <CoversCell fields={s.fields} />
+          <CoversCell fields={s.fields} kind={kind} />
         </TableTd>
       )}
       {has('note') && (
@@ -136,7 +146,14 @@ function SourceRow({ source: s, has }: { source: Source; has: Has }) {
  * its note; then the provenance note. A column no source fills is left out. Below 48em a source is a block, each value after its column's name
  * (`data-label`), so every table element carries its ARIA role.
  */
-export function Sources({ provenance }: { provenance: Provenance }) {
+export function Sources({
+  provenance,
+  kind,
+}: {
+  provenance: Provenance
+  /** The record kind (`powders`), whose field labels name the fields a source covers. */
+  kind?: string | undefined
+}) {
   const { t } = useTranslation()
   const list = provenance.sources
   const has = (k: keyof Source) => list.some((s) => s[k] !== undefined)
@@ -149,7 +166,12 @@ export function Sources({ provenance }: { provenance: Provenance }) {
           </TableThead>
           <TableTbody role="rowgroup">
             {list.map((s) => (
-              <SourceRow key={`${s.title} ${s.url ?? ''} ${s.page ?? ''}`} source={s} has={has} />
+              <SourceRow
+                key={`${s.title} ${s.url ?? ''} ${s.page ?? ''}`}
+                source={s}
+                has={has}
+                kind={kind}
+              />
             ))}
           </TableTbody>
         </Table>

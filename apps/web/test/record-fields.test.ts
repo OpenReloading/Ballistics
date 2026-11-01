@@ -285,6 +285,11 @@ it('names the cartridges the manufacturer lists, by record id where no name is k
   expect(shown(identity.rows)).toEqual([
     ['Listed by the manufacturer for', '308 Win.; 6-5-creedmoor'],
   ])
+  // each a link to its cartridge page
+  expect(identity.rows[0]?.links).toEqual([
+    { href: '/cartridges/308-win', text: '308 Win.' },
+    { href: '/cartridges/6-5-creedmoor', text: '6-5-creedmoor' },
+  ])
 })
 
 it('gives the aliases, the composition and the computed thermochemistry with its range on hover', () => {

@@ -84,6 +84,7 @@ function useWholeText(box: HTMLElement | null) {
 export function PageBar({
   title: given,
   translated,
+  short,
   after,
   status,
   actions,
@@ -94,6 +95,11 @@ export function PageBar({
 }: {
   /** The h1 for screen readers only: the home page shows the wordmark instead. */
   titleHidden?: boolean
+  /**
+   * The h1 below 48em, where the bar has room for little more than a name: a powder's name
+   * without its manufacturer, which the first card of the strip names.
+   */
+  short?: string | undefined
   /** Beside the title: the workbench's open loads, a record's standard badges. */
   after?: ReactNode
   /** The status line's own content, such as a list's count. */
@@ -161,7 +167,14 @@ export function PageBar({
           className={titleHidden ? 'visually-hidden' : undefined}
           data-hydrated={mounted || undefined}
         >
-          {title}
+          {short && short !== title ? (
+            <>
+              <span className="page-title-long">{title}</span>
+              <span className="page-title-short">{short}</span>
+            </>
+          ) : (
+            title
+          )}
         </h1>
         {after}
       </div>

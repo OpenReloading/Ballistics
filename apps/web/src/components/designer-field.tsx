@@ -39,9 +39,11 @@ export const DesignerField = memo(function DesignerField({
   symbol?: string | undefined
   dispatch: (a: FieldAction) => void
 }) {
-  // the message leads the help: the description, the label's title and the flag's tooltip
-  const text = error ? `${error} ${help}` : help
-  const kind = error ? 'exceeded' : flag
+  // the error and the help stay apart: the label's title is the help, the flag's tooltip the error
+  // while it applies, and the description for screen readers says both, each as its own sentence
+  const marker = error
+    ? { kind: 'exceeded' as const, text: error }
+    : flag && { kind: flag, text: help }
   return (
     <div
       className="designer-field"
@@ -52,12 +54,12 @@ export const DesignerField = memo(function DesignerField({
       style={symbol ? ({ '--symbol': `"${symbol}"` } as CSSProperties) : undefined}
     >
       <NumberField
-        spec={{ ...spec, help: text }}
+        spec={{ ...spec, help }}
         system={system}
         value={value}
         error={!!error}
         unit={unit}
-        flag={kind && { kind, text }}
+        flag={marker}
         onChange={(v) => dispatch({ type: 'field', key: spec.key, value: v })}
       />
     </div>

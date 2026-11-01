@@ -165,13 +165,16 @@ export const powderSpecs: readonly PowderSpec[] = [
     'specificVolume',
     msg('Covolume of the combustion gas, with its extremes.'),
   ),
-  burn(
-    'interior.vivacity.value',
-    msg('Vivacity'),
-    msg('Burn rate scale of the vivacity law at the reference pressure.'),
-    'vivacity',
-    'burnRate',
-  ),
+  {
+    ...burn(
+      'interior.vivacity.value',
+      msg('Vivacity'),
+      msg('Burn rate scale of the vivacity law at the reference pressure.'),
+      'vivacity',
+      'burnRate',
+    ),
+    positive: true,
+  },
   burn(
     'interior.energy.value',
     msg('Specific energy'),
@@ -451,36 +454,128 @@ export function fromFile(data: UserPowder, name: string, system: UnitSystem): De
 /** A reason the draft is no powder: the field it belongs to, else it is about the record as a whole. */
 export interface Problem {
   key?: string | undefined
+  /** A sentence that names its field, so the list of problems reads without the form. */
   message: string
 }
 
-/** The name of the place a problem is at, for the list of problems. */
-export function problemLabel(key: string, t: Translator['t'] = untranslated()) {
-  if (key === 'provenanceKind') return t('Provenance')
-  if (key === 'fitted') return t('Burn law')
-  return key.startsWith('comp.') ? t('Composition') : specText(t, specOf(key).label)
-}
-
-/** One issue of the powder schema. */
+/** One issue of the powder schema, with the bounds zod reports for a number out of range. */
 interface Issue {
   path: PropertyKey[]
   message: string
+  code?: string
+  expected?: string
+  origin?: string
+  minimum?: number | bigint
+  maximum?: number | bigint
+  inclusive?: boolean
 }
 
-/** The record data builds this powder, or the issues of the powder schema by path. */
+/** The empty Min and Max of a thermochemistry range with a value: the same as the value. */
+function withRanges(draft: UserPowder['draft']): UserPowder['draft'] {
+  const thermo = draft?.thermochemistry as Tree | undefined
+  if (!thermo) return draft
+  const filled = Object.fromEntries(
+    Object.entries(thermo).map(([k, v]) => {
+      const r = v as { value?: unknown; min?: unknown; max?: unknown }
+      if (k === 'loadingDensity' || typeof r?.value !== 'number') return [k, v]
+      return [k, { ...r, min: r.min ?? r.value, max: r.max ?? r.value }]
+    }),
+  )
+  return {
+    ...draft,
+    thermochemistry: filled as NonNullable<UserPowder['draft']>['thermochemistry'],
+  }
+}
+
+/**
+ * The record data builds this powder, or the issues of the powder schema by path. An empty Min or
+ * Max of a thermochemistry range counts as its value.
+ */
 export function powderOf(
   data: UserPowder,
   name: string,
   id: string,
 ): { powder: Powder } | { issues: Issue[] } {
   const parsed = powderSchema.safeParse({
-    ...data.draft,
+    ...withRanges(data.draft),
     id,
     manufacturer: userMaker,
     name: name.trim() || fallbackName,
     provenance: { kind: data.provenanceKind, sources: [{ title: userSource }] },
   })
-  return parsed.success ? { powder: parsed.data } : { issues: parsed.error.issues }
+  return parsed.success
+    ? { powder: parsed.data }
+    : { issues: parsed.error.issues as unknown as Issue[] }
+}
+
+/** The message of a missing value in the powder schema. */
+const required = /received undefined/
+
+/** The texts of the schema's own rules (`packages/schema/src/powder.ts`), in plain words. */
+const ruleTexts: Record<string, Message> = {
+  'needs min <= value <= max': msg('{label} must lie between Min and Max.'),
+  'needs min <= max': msg('{label}: Min must not be above Max.'),
+  'needs 1 + a z1 > 0, and q < 1 when z1 < 1': msg(
+    'Burn form: 1 + a × z1 must be above 0, and Form q below 1 where Form z1 is below 1.',
+  ),
+  'the ranges admit no composition summing to 100 %': msg(
+    'Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more.',
+  ),
+}
+
+/** The name of the place of an issue at `path`, in the words of the form. */
+function labelOf(d: Design, path: PropertyKey[], t: Translator['t']): string {
+  const [head, index, part] = path
+  const row = typeof index === 'number' ? liveRows(d)[index] : undefined
+  if (head === 'composition' && row) {
+    // numbered as the form numbers its rows, blank ones included
+    const n = d.rows.indexOf(row) + 1
+    if (part === 'name') return t('Ingredient {n} name', { n })
+    if (part === 'cas') return t('Ingredient {n} CAS number', { n })
+    if (part === 'min') return t('Ingredient {n} min percent', { n })
+    if (part === 'max') return t('Ingredient {n} max percent', { n })
+    return t('Ingredient {n}', { n })
+  }
+  const key = path.join('.')
+  const spec = specByKey.get(key) ?? specByKey.get(`${key}.value`)
+  if (spec) return specText(t, spec.label)
+  const section = typeof head === 'string' ? sectionLabels[head] : undefined
+  return section ? t(section) : key
+}
+
+/** A schema issue in plain words with its limit, naming the field `label`. */
+function issueText(issue: Issue, label: string, t: Translator['t']): string {
+  const rule = ruleTexts[issue.message]
+  if (rule) return t(rule, { label })
+  if (required.test(issue.message))
+    return issue.expected === 'string'
+      ? t('Enter {label}.', { label })
+      : t('Enter a number for {label}.', { label })
+  if (issue.code === 'too_small' && issue.origin === 'string') return t('Enter {label}.', { label })
+  if (issue.origin === 'number') {
+    const bounded = boundText(issue, label, t)
+    if (bounded) return bounded
+  }
+  if (issue.code === 'invalid_format')
+    return t('{label}: write the CAS number as digits and hyphens, as 9004-70-0.', { label })
+  return t('{part}: {message}', { part: label, message: issue.message })
+}
+
+/** A number below or above a bound of the schema, with the bound; undefined for another issue. */
+function boundText(issue: Issue, label: string, t: Translator['t']): string | undefined {
+  if (issue.code === 'too_small') {
+    const min = Number(issue.minimum)
+    if (issue.inclusive) return t('{label} must be at least {min}{unit}.', { label, min, unit: '' })
+    return min === 0
+      ? t('{label} must be greater than 0{unit}.', { label, unit: '' })
+      : t('{label} must be above {min}.', { label, min })
+  }
+  if (issue.code === 'too_big') {
+    const max = Number(issue.maximum)
+    return issue.inclusive
+      ? t('{label} must be at most {max}{unit}.', { label, max, unit: '' })
+      : t('{label} must be below {max}.', { label, max })
+  }
 }
 
 const sectionLabels: Record<string, Message> = {
@@ -492,35 +587,70 @@ const sectionLabels: Record<string, Message> = {
 }
 
 /**
- * The field a schema issue belongs to. A value the record needs and the draft lacks is reported
- * at each empty field below that place ("Required."); `fitted` and the provenance kind have their
- * own keys.
+ * What the draft lacks for the schema's rules across its parts, all at once: the schema checks
+ * them only once every part passes on its own, so they would surface one at a time. The rules stay
+ * the schema's: the burn law holds effective fitted values (a fitted parameter and the kind
+ * "Fitted to data"), the thermochemistry is computed from a composition.
  */
-/** The message of a missing value in the powder schema. */
-const required = /received undefined/
+function draftProblems(d: Design, data: UserPowder, t: Translator['t']): Problem[] {
+  const draft = data.draft
+  const problems: Problem[] = []
+  if (draft?.interior) {
+    if (d.fitted.length === 0)
+      problems.push({ key: 'fitted', message: t('Tick at least one fitted parameter.') })
+    if (d.provenanceKind !== 'fitted')
+      problems.push({
+        key: 'provenanceKind',
+        message: t('Set Values came about by to Fitted to data.'),
+      })
+  }
+  if (draft?.thermochemistry && !draft.composition)
+    problems.push({ message: t('Add at least one ingredient.') })
+  const vivacity = fieldAt(d, 'interior.vivacity.value').si
+  if (vivacity !== undefined && vivacity <= 0)
+    problems.push({
+      key: 'interior.vivacity.value',
+      message: t('{label} must be greater than 0{unit}.', { label: t('Vivacity'), unit: '' }),
+    })
+  return problems
+}
 
+/**
+ * The problems of the schema issues: at the field an issue belongs to, else about a section. A value
+ * the record needs and the draft lacks is reported at each empty field below that place.
+ */
 function problemsOf(d: Design, issues: Issue[], t: Translator['t']): Problem[] {
   const live = liveRows(d)
   return issues.flatMap((issue): Problem[] => {
     const key = keyOf(live, issue.path)
-    if (key === 'provenanceKind' && issue.path[0] === 'interior')
-      return [{ key, message: t('The burn law needs the kind "Fitted to data".') }]
-    if (key)
-      return [{ key, message: required.test(issue.message) ? t('Required.') : issue.message }]
+    if (key === 'provenanceKind')
+      return [
+        {
+          key,
+          message:
+            issue.path[0] === 'interior'
+              ? t('Set Values came about by to Fitted to data.')
+              : t('Choose an entry for Values came about by.'),
+        },
+      ]
+    if (key === 'fitted') return [{ key, message: t('Tick at least one fitted parameter.') }]
+    if (key) return [{ key, message: issueText(issue, labelOf(d, issue.path, t), t) }]
+    if (issue.message === 'needs a composition')
+      return [{ message: t('Add at least one ingredient.') }]
     const prefix = `${issue.path.join('.')}.`
+    // an empty Min or Max of a thermochemistry range is built as its value: only the value is asked for
     const empty = powderSpecs.filter(
-      (s) => s.key.startsWith(prefix) && fieldAt(d, s.key).text.trim() === '',
+      (s) =>
+        s.key.startsWith(prefix) &&
+        !/^thermochemistry\..+\.(min|max)$/.test(s.key) &&
+        fieldAt(d, s.key).text.trim() === '',
     )
     if (required.test(issue.message) && empty.length > 0)
-      return empty.map((s) => ({ key: s.key, message: t('Required.') }))
-    const part = typeof issue.path[0] === 'string' ? sectionLabels[issue.path[0]] : undefined
-    return [
-      {
-        message: part
-          ? t('{part}: {message}', { part: t(part), message: issue.message })
-          : issue.message,
-      },
-    ]
+      return empty.map((s) => ({
+        key: s.key,
+        message: t('Enter a number for {label}.', { label: specText(t, s.label) }),
+      }))
+    return [{ message: issueText(issue, labelOf(d, issue.path, t), t) }]
   })
 }
 
@@ -558,7 +688,8 @@ export const powderDesigns = (records: readonly UserRecord[]): PowderDesign[] =>
   records.flatMap((r) => {
     if (r.kind !== 'powder') return []
     const built = powderOf(r.data, r.name, r.id)
-    return 'powder' in built
+    // the designer's own check beyond the schema: a vivacity above 0
+    return 'powder' in built && (built.powder.interior?.vivacity.value ?? 1) > 0
       ? [{ id: r.id, name: r.name, powder: built.powder, fit: r.data.fit }]
       : []
   })
@@ -591,13 +722,28 @@ export function checkDesign(
   id: string,
   t: Translator['t'] = untranslated(),
 ): { powder: Powder } | { problems: Problem[] } {
-  const built = powderOf(fileData(d), d.name, id)
+  const data = fileData(d)
+  const built = powderOf(data, d.name, id)
   // a typed text that reads as no number is left out of the record, so the record is not done
+  const labelled = (key: string) => {
+    const [, row, part] = key.split('.')
+    if (!key.startsWith('comp.')) return specText(t, specOf(key).label)
+    const n = d.rows.findIndex((r) => r.id === row) + 1
+    return part === 'max'
+      ? t('Ingredient {n} max percent', { n })
+      : t('Ingredient {n} min percent', { n })
+  }
   const unread = Object.entries(d.fields)
     .filter(([, v]) => v.text.trim() !== '' && v.si === undefined)
-    .map(([key]) => ({ key, message: t('Not a number.') }))
-  if ('powder' in built) return unread.length > 0 ? { problems: unread } : built
-  return { problems: [...unread, ...problemsOf(d, built.issues, t)] }
+    .map(([key]) => ({ key, message: t('Enter a number for {label}.', { label: labelled(key) }) }))
+  const own = [...unread, ...draftProblems(d, data, t)]
+  if ('powder' in built) return own.length > 0 ? { problems: own } : built
+  // a rule the draft's own check reports already is not said twice
+  const said = new Set(own.map((p) => `${p.key ?? ''} ${p.message}`))
+  const schema = problemsOf(d, built.issues, t).filter(
+    (p) => !said.has(`${p.key ?? ''} ${p.message}`),
+  )
+  return { problems: [...own, ...schema] }
 }
 
 export type Action =

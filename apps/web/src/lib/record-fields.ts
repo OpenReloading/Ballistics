@@ -62,6 +62,8 @@ export interface FieldRow {
   method?: Wording | undefined
   /** SI velocity: the lower bound of a ballistic coefficient's band, after the label. */
   fromVelocity?: number
+  /** The value as links, each with its text, in place of `text` on screen; `text` stays the plain value. */
+  links?: { href: string; text: string }[]
 }
 
 /** Rows under a group heading row (Dimensions, Computed, Coefficients); no title, no heading row. */
@@ -340,6 +342,25 @@ const computed = (label: Message, unit: string, r: ComputedRange): FieldRow => (
   method: worded(msg('Over the composition ranges: {min} to {max}.'), { min: r.min, max: r.max }),
 })
 
+/** The cartridges the manufacturer lists a powder for, each a link to its record page. */
+function listedRows(
+  ids: readonly string[] | undefined,
+  names: ReadonlyMap<string, string>,
+): FieldRow[] {
+  if (!ids?.length) return []
+  const links = ids.map((id) => ({
+    href: `/cartridges/${encodeURIComponent(id)}`,
+    text: names.get(id) ?? id,
+  }))
+  return [
+    {
+      label: msg('Listed by the manufacturer for'),
+      text: links.map((l) => l.text).join('; '),
+      links,
+    },
+  ]
+}
+
 /**
  * The groups of a powder page's Properties table, in record order; absent fields are left out.
  * Manufacturer, form, base, bulk density and country are the cards of `powderStrip`.
@@ -353,10 +374,7 @@ export function powderRowGroups(
     {
       rows: [
         ...text(msg('Aliases'), p.aliases?.join('; ')),
-        ...text(
-          msg('Listed by the manufacturer for'),
-          p.listedCartridges?.map((id) => cartridgeNames.get(id) ?? id).join('; '),
-        ),
+        ...listedRows(p.listedCartridges, cartridgeNames),
       ],
     },
     {

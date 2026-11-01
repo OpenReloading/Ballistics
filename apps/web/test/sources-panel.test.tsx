@@ -70,7 +70,8 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
     /Source<\/th><th[^>]*>Origin<\/th><th[^>]*>Retrieved<\/th><th[^>]*>License<\/th><th[^>]*>Covers<\/th><\/tr>/,
   )
   expect(html).toContain('2 fields')
-  expect(html).toContain('diameter, mass')
+  // no kind: the keys humanised
+  expect(html).toContain('Diameter, Mass')
   expect(render(sheet)).not.toContain('Origin')
   expect(render(sheet)).not.toContain('Covers')
   const both = renderToStaticMarkup(
@@ -83,6 +84,34 @@ it('is a table of source, retrieval day, license and the fields it covers, a col
   expect(both).toContain('>Covers</th>')
   expect(both).toContain('whole record')
   expect(both).toContain('1 field')
+})
+
+it("names the fields a source covers by the record kind's field labels, a key without one humanised", () => {
+  const html = renderToStaticMarkup(
+    <MantineProvider>
+      <Sources
+        kind="powders"
+        provenance={{
+          kind: 'fitted',
+          sources: [
+            {
+              title: 'Fit',
+              fields: [
+                'name',
+                'grainForm',
+                'listedCartridges',
+                'interior',
+                'temperatureSensitivity',
+              ],
+            },
+          ],
+        }}
+      />
+    </MantineProvider>,
+  )
+  expect(html).toContain(
+    'Name, Form, Listed by the manufacturer for, Model parameters, Temperature sensitivity',
+  )
 })
 
 // below 48em the cells are blocks: WebKit keeps the table semantics only with explicit roles
