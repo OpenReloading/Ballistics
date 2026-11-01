@@ -23,9 +23,9 @@ A primer record describes one primer product as its manufacturer sells it. A loa
 | `performance` | Output or sensitivity figures a source publishes, each a `property` and a `value` as the source prints it, with its unit |
 | `provenance` | Sources, each listing the fields it supports |
 
-Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated. A source other than a fact source (a standard, an official specification) needs a `license` in its record.
+Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated. A source other than a fact source (a standard, an official specification) needs a `license` or the maker's `terms` in its record.
 
-`packages/data/records/primers/` holds the synthetic demo records (CC0-1.0), invented for tests and the example. No record of a real product is in the catalogue yet: no primer source whose terms allow publishing the values has been found.
+`packages/data/records/primers/` holds the synthetic demo records (CC0-1.0), invented for tests and the example. No record of a real product is in the catalogue yet.
 
 ## In a load
 

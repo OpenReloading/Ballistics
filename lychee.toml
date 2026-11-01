@@ -29,7 +29,6 @@ exclude = [
   '^https://hdl\.handle\.net/11104/0129879$', # 404 to the CI runner on scheduled runs in a row, 302 to a 200 page elsewhere
   # Single-page apps that route by the fragment, which is not an anchor in the served HTML.
   '^https://chromedevtools\.github\.io/devtools-protocol/#/Emulation\.setCPUThrottlingRate$',
-  '^https://tsdr\.uspto\.gov/#caseNumber=98007111&caseType=SERIAL_NO&searchType=statusSearch$',
   # The site root serves the docs of the latest release, and no release has them yet. Drop these at the first release.
   '^https://openreloading\.github\.io/Ballistics/docs/feedback-tasks/$',
   '^https://openreloading\.github\.io/Ballistics/docs/libraries/core/$',

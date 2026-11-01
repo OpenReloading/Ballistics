@@ -127,7 +127,7 @@ Proposed, in order, each with acceptance criteria a test can check.
 
 ## Decision brief
 
-**Question 1, scope of the first release.** Recommended: **B**.
+**Scope of the first release.** Recommended: **B**.
 
 - **A. Names only.** Keep the user firearm as it is; offer the manufacturer list in the editor as a suggestion. Smallest; the shooter still types barrel length and twist.
 - **B. Models and variants, build as a user record (recommended).** The schema of this page without barrel records, copy into the library, parts list on the user firearm. Delivers barrel length, twist, chamber and mass with the gun; later steps follow without breaking files.
