@@ -231,6 +231,10 @@ describe('signedLength', () => {
     expect(signedLength(-0.02, metric)).toBe('−0.02')
     expect(signedLength(0, us)).toBe('±.0000')
     expect(signedLength(0, metric)).toBe('±0.00')
+    expect(signedLength(19.15 - 19.15, us)).toBe('±.0000')
+    // below the decimals shown (inches), the sign stays: a negative clearance is a conflict
+    expect(signedLength(-0.001, us)).toBe('−.0000')
+    expect(signedLength(0.001, us)).toBe('+.0000')
   })
 })
 

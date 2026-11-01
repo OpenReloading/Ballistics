@@ -294,12 +294,18 @@ export function toleranceText(v: SpecValue, system: UnitSystem) {
     .join(' ')
 }
 
-/** A difference in the preset's length unit with its sign, minus as U+2212, as the drawing's callouts write it; zero as ±0 in the column's decimals ("±.0000", "±0.00"). */
+/**
+ * A difference in the preset's length unit with its sign, minus as U+2212, as the drawing's
+ * callouts write it; one that rounds to zero keeps its sign ("−0.00" stays a conflict), an exact
+ * zero is "±0" in the column's decimals ("±.0000", "±0.00").
+ */
 export function signedLength(x: number, system: UnitSystem) {
   const text = specValueText('length', Math.abs(x), system)
   if (text !== '0') return x < 0 ? `−${text}` : `+${text}`
   const zero = formatNumber(0, system.length.decimals)
-  return `±${system.length.symbol === 'in' ? zero.slice(1) : zero}`
+  const shown = system.length.symbol === 'in' ? zero.slice(1) : zero
+  // a difference of two printed values: an exact zero up to floating point noise
+  return `${Math.abs(x) < 1e-9 ? '±' : x < 0 ? '−' : '+'}${shown}`
 }
 
 /** What the clearance note after a chamber value stands for. */

@@ -7779,8 +7779,8 @@ main .field-table tr.field-group > th {
   font-weight: 400;
 }
 
-/* a fact label with its meaning on hover: dotted, as a value with notes */
-.fact dt .field-note {
+/* a cartridge fact label with its meaning on hover (Pmax, M, EE): dotted, as a value with notes */
+.cartridge-record .fact dt .field-note {
   text-decoration: underline dotted var(--muted);
   text-underline-offset: 0.2em;
 }

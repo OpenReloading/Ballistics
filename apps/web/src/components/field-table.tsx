@@ -342,7 +342,7 @@ export function FieldPanel({
           aria-label={t('Search {title}', {
             title: language === 'en' ? name.toLowerCase() : name,
           })}
-          placeholder={t('Symbol or name')}
+          placeholder={symbols ? t('Symbol or name') : t('Name')}
           leftSection={<MagnifyingGlass aria-hidden="true" />}
           value={q}
           onChange={(e) => setQ(e.currentTarget.value)}
