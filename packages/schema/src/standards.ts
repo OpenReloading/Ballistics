@@ -4,8 +4,8 @@ import { quantityKind } from './units.ts'
 /**
  * Method that measured a chamber pressure, which is also the basis a pressure is compared on.
  * `transducer` is the C.I.P. method, `case-contact` a conformal transducer that rests against
- * the outside of the case near the case mouth (as some maker tables print it), `crusher` a copper
- * crusher. The values are not converted into one another.
+ * the outside of the case wall at a specified point of the chamber (as some maker tables print
+ * it), `crusher` a copper crusher. The values are not converted into one another.
  */
 export const pressureMethod = z.enum(['transducer', 'piezo', 'case-contact', 'crusher', 'energy'])
 
