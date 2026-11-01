@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.0.5](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.4...schema-v0.0.5) (2026-11-01)
+
+
+### Features
+
+* **core:** bullets and core model batch ([#847](https://github.com/OpenReloading/Ballistics/issues/847), [#845](https://github.com/OpenReloading/Ballistics/issues/845), [#846](https://github.com/OpenReloading/Ballistics/issues/846), [#843](https://github.com/OpenReloading/Ballistics/issues/843), [#842](https://github.com/OpenReloading/Ballistics/issues/842)) ([#947](https://github.com/OpenReloading/Ballistics/issues/947)) ([73e97e2](https://github.com/OpenReloading/Ballistics/commit/73e97e2ab2a1312e2a281d9dbf631ce6232a90a5))
+* **data,schema:** event type records for IPSC Handgun, USPSA and DSB championships ([#915](https://github.com/OpenReloading/Ballistics/issues/915)) ([af593ca](https://github.com/OpenReloading/Ballistics/commit/af593cad4bb9bb5592f221fb97f505b1be2517e5))
+* **data:** plausibility warnings for published loads in data:validate ([#910](https://github.com/OpenReloading/Ballistics/issues/910)) ([3acb5a4](https://github.com/OpenReloading/Ballistics/commit/3acb5a4a65730403f1cd69e03f829bc409707ad7))
+* **data:** rule facts per discipline and stage ([#432](https://github.com/OpenReloading/Ballistics/issues/432)) ([be5fcd5](https://github.com/OpenReloading/Ballistics/commit/be5fcd55a456a33e3c823890a229f8c5d3fd7195))
+* pre-release batch of command line, importer, firearm and size check work ([#659](https://github.com/OpenReloading/Ballistics/issues/659)) ([e468295](https://github.com/OpenReloading/Ballistics/commit/e46829524214011f7e7c6f7bb26752b6ffb8cff7))
+* pre-release batch of firearm views, box label, load-file importer and research entries ([#656](https://github.com/OpenReloading/Ballistics/issues/656)) ([5d38b2c](https://github.com/OpenReloading/Ballistics/commit/5d38b2cd057a9f0d6e2757dcf833501a1ab0268e))
+* pre-release batch of fits, hit probability, tuning and docs ([#569](https://github.com/OpenReloading/Ballistics/issues/569)) ([3a5c6a4](https://github.com/OpenReloading/Ballistics/commit/3a5c6a4a7be9d52d20eca911cdccd49ad2d104c4))
+* pre-release batch of workbench record chooser, notes area, print fixes, photo guide and command line operations ([#688](https://github.com/OpenReloading/Ballistics/issues/688)) ([db2b2da](https://github.com/OpenReloading/Ballistics/commit/db2b2dae53086aa27177764e6dc91d0f0699e78f))
+* pre-release integration of the 1.0 work ([#493](https://github.com/OpenReloading/Ballistics/issues/493)) ([46ace26](https://github.com/OpenReloading/Ballistics/commit/46ace26932aa37546eaf95f905870c0606abfb8d))
+* **schema,core:** competition event record and scoring of ring series and practical stages ([#920](https://github.com/OpenReloading/Ballistics/issues/920)) ([44223df](https://github.com/OpenReloading/Ballistics/commit/44223dfdfb12d5b52be430d47278d65cb253e35c))
+* **schema,data:** catalogue maker data batch ([#840](https://github.com/OpenReloading/Ballistics/issues/840), [#860](https://github.com/OpenReloading/Ballistics/issues/860)) ([#950](https://github.com/OpenReloading/Ballistics/issues/950)) ([751bf26](https://github.com/OpenReloading/Ballistics/commit/751bf266293b3883513e5efe51536f84533f679b))
+* **schema,data:** published loads, name-only bullets, primer text and the case-contact pressure basis ([#833](https://github.com/OpenReloading/Ballistics/issues/833)) ([a008085](https://github.com/OpenReloading/Ballistics/commit/a00808567c82c600a8b8d6b6beac1915124f60e0))
+* **schema:** export the JSON Schemas and leave the build script out of the tarball ([#530](https://github.com/OpenReloading/Ballistics/issues/530)) ([2e69b08](https://github.com/OpenReloading/Ballistics/commit/2e69b08995e26a12d43486d2fa1ab67165d2f560))
+* **schema:** record the measuring convention of a case capacity ([#422](https://github.com/OpenReloading/Ballistics/issues/422)) ([f41453b](https://github.com/OpenReloading/Ballistics/commit/f41453b38e31592820ce961693776236506a45dd))
+* **web,api:** type Pmax, case length L3 and bulk density over the record, read as "your Pmax" ([#869](https://github.com/OpenReloading/Ballistics/issues/869)) ([1364375](https://github.com/OpenReloading/Ballistics/commit/13643750a3b5cecf3bf3023c791bdc80aa608b68))
+* **web,schema:** choose the bullet base form and type its dimensions over the record ([#851](https://github.com/OpenReloading/Ballistics/issues/851)) ([2c865e8](https://github.com/OpenReloading/Ballistics/commit/2c865e82dba94b25301718605792c09f8d944b3e)), closes [#758](https://github.com/OpenReloading/Ballistics/issues/758)
+* **web,schema:** shooting log entries with print, CSV and the firearm round count ([#933](https://github.com/OpenReloading/Ballistics/issues/933)) ([13b133c](https://github.com/OpenReloading/Ballistics/commit/13b133c676d49c9d8edba808a81128a11a8fa159))
+* **web:** competition events page and shooting log links to events ([#863](https://github.com/OpenReloading/Ballistics/issues/863), [#936](https://github.com/OpenReloading/Ballistics/issues/936)) ([#959](https://github.com/OpenReloading/Ballistics/issues/959)) ([7dbbbfb](https://github.com/OpenReloading/Ballistics/commit/7dbbbfbbe1738b8eda52079fd30577ca518fceab))
+* **web:** edit bullet diameter, length and BC on the Bullet card ([#759](https://github.com/OpenReloading/Ballistics/issues/759)) ([9d98d6a](https://github.com/OpenReloading/Ballistics/commit/9d98d6a137256bfb07324fedae210bbbe398c2f0))
+* **web:** shared choice filters for Disciplines, Federations and Targets, discipline distance unit ([#427](https://github.com/OpenReloading/Ballistics/issues/427)) ([61737a0](https://github.com/OpenReloading/Ballistics/commit/61737a0d9269d0cb9930860c2d7b563f7c6b6b4b))
+* **web:** skip unknown record kinds of a user data file and report them ([#702](https://github.com/OpenReloading/Ballistics/issues/702)) ([f5346fe](https://github.com/OpenReloading/Ballistics/commit/f5346fe56db073969f0bb633c4d7bd9c466af38e))
+
+
+### Bug fixes
+
+* batch of audit fixes for scoring, German text and layout ([#722](https://github.com/OpenReloading/Ballistics/issues/722)) ([2e2a601](https://github.com/OpenReloading/Ballistics/commit/2e2a6015ff24a4b54ee052fc2098f34bbe9db207))
+* **web,schema:** small fixes batch ([#876](https://github.com/OpenReloading/Ballistics/issues/876), [#906](https://github.com/OpenReloading/Ballistics/issues/906), [#928](https://github.com/OpenReloading/Ballistics/issues/928), [#898](https://github.com/OpenReloading/Ballistics/issues/898), [#792](https://github.com/OpenReloading/Ballistics/issues/792), [#796](https://github.com/OpenReloading/Ballistics/issues/796)) ([#946](https://github.com/OpenReloading/Ballistics/issues/946)) ([fd88ad9](https://github.com/OpenReloading/Ballistics/commit/fd88ad943867e8409f524ac7622c515992c1aa83))
+
+
+### Documentation
+
+* add npm READMEs and package metadata to the published libraries ([#527](https://github.com/OpenReloading/Ballistics/issues/527)) ([21db896](https://github.com/OpenReloading/Ballistics/commit/21db896a6800ead1892216fb9918258dbb20834f))
+* remove maker licensing and permission discussion ([#960](https://github.com/OpenReloading/Ballistics/issues/960)) ([1a4c17e](https://github.com/OpenReloading/Ballistics/commit/1a4c17e17bbe6e86db54b6fac15cc69d2c179324))
+
 ## [0.0.4](https://github.com/OpenReloading/Ballistics/compare/schema-v0.0.3...schema-v0.0.4) (2026-10-27)
 
 
