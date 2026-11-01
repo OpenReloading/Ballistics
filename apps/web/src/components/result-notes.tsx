@@ -59,39 +59,42 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
         })}
       </ul>
       {/* More and the guide link share one cell as wide as the wider, the other hidden: a swap
-          between them changes no width, so the list cannot start and stop scrolling over it */}
-      <div className="result-notes-control">
-        <Button
-          ref={more}
-          data-hidden={hasMore ? undefined : true}
-          variant="default"
-          size={controlSize.row.button}
-          aria-haspopup="dialog"
-          onClick={() =>
-            // a plain import() on first open: next/dynamic would count the dialog in the route's weight
-            Dialog
-              ? setOpen(true)
-              : import('./result-notes-dialog.tsx').then((m) => {
-                  setDialog(() => m.ResultNotesDialog)
-                  setOpen(true)
-                })
-          }
-        >
-          {t('More ({count})', { count: notes.length })}
-        </Button>
-        {/* without More the dialog that links the guide is out of reach: the link in its place */}
-        {howCloseGuide && (
-          <Anchor
-            data-hidden={hasMore ? true : undefined}
-            href={howCloseGuide}
-            target="_blank"
-            rel="noopener"
-            size="sm"
+          between them changes no width, so the list cannot start and stop scrolling over it.
+          Without a docs site More is alone, and only there when needed. */}
+      {(hasMore || howCloseGuide) && (
+        <div className="result-notes-control">
+          <Button
+            ref={more}
+            data-hidden={hasMore ? undefined : true}
+            variant="default"
+            size={controlSize.row.button}
+            aria-haspopup="dialog"
+            onClick={() =>
+              // a plain import() on first open: next/dynamic would count the dialog in the route's weight
+              Dialog
+                ? setOpen(true)
+                : import('./result-notes-dialog.tsx').then((m) => {
+                    setDialog(() => m.ResultNotesDialog)
+                    setOpen(true)
+                  })
+            }
           >
-            {t('How close a result is')}
-          </Anchor>
-        )}
-      </div>
+            {t('More ({count})', { count: notes.length })}
+          </Button>
+          {/* without More the dialog that links the guide is out of reach: the link in its place */}
+          {howCloseGuide && (
+            <Anchor
+              data-hidden={hasMore ? true : undefined}
+              href={howCloseGuide}
+              target="_blank"
+              rel="noopener"
+              size="sm"
+            >
+              {t('How close a result is')}
+            </Anchor>
+          )}
+        </div>
+      )}
       {Dialog && (
         <Dialog
           notes={notes}
