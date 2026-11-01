@@ -74,6 +74,14 @@ function useWholeText(box: HTMLElement | null) {
   return text
 }
 
+/** The panel's actions: the folded ones first, in their own box (globals.css). */
+const withFold = (fold: ReactNode, actions: ReactNode) => (
+  <>
+    {fold && <div className="page-bar-fold">{fold}</div>}
+    {actions}
+  </>
+)
+
 /**
  * The page's top bar: its only
  * `h1`, what follows the title (the open load, a record's badges), one status line and the page's
@@ -87,6 +95,7 @@ export function PageBar({
   after,
   status,
   actions,
+  fold,
   single = false,
   reserve = false,
   titleHidden = false,
@@ -99,6 +108,12 @@ export function PageBar({
   /** The status line's own content, such as a list's count. */
   status?: ReactNode
   actions?: ReactNode
+  /**
+   * Actions before `actions` that fold behind "Page actions" from 48em to 75em, where `actions`
+   * (Open, Save, Units) stay in the bar: a designer's Undo, Redo and New. From 75em and on a phone
+   * they are actions like the others. One instance at every width.
+   */
+  fold?: ReactNode
   /** One action only: below 75em it shows as itself in the bar, not behind "Page actions". */
   single?: boolean
   /**
@@ -147,6 +162,7 @@ export function PageBar({
       className="page-bar"
       data-open={open || undefined}
       data-single={(actions && single) || undefined}
+      data-fold={(actions && fold && !single) || undefined}
       onKeyDown={(e) => {
         // not from a menu's portalled dropdown: that one closes itself
         if (e.key !== 'Escape' || !open || !e.currentTarget.contains(e.target as Node)) return
@@ -209,7 +225,7 @@ export function PageBar({
               if (open && t && !t.hasAttribute('aria-haspopup')) setOpen(false)
             }}
           >
-            <BarStatus value={statusLine}>{actions}</BarStatus>
+            <BarStatus value={statusLine}>{withFold(fold, actions)}</BarStatus>
           </div>
         </>
       )}

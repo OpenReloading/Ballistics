@@ -27,7 +27,8 @@ async function design(page: Page) {
   }
   await page.getByLabel('Ring 3 fill').selectOption('black')
   await page.getByLabel('Ring 4 fill').selectOption('black')
-  await page.getByLabel('Black area diameter').fill('90')
+  // the label with its unit: the unit switch's name also holds "Black area diameter"
+  await page.getByLabel('Black area diameter (mm)').fill('90')
   await page.getByLabel('Event 1 name').fill('25 m')
   await page.getByLabel('Event 1 distance').fill('25')
 }
