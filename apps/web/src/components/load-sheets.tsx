@@ -82,7 +82,7 @@ export function LoadSheets({
               <th scope="col">{stepName}</th>
               {simulated && (
                 <>
-                  <th scope="col">{t('Peak pressure, simulated (corner-case range)')}</th>
+                  <th scope="col">{t('Peak pressure, simulated (corner cases)')}</th>
                   <th scope="col">{t('Of max.')}</th>
                   <th scope="col">{t('Velocity, simulated')}</th>
                   <th scope="col">{t('Flag')}</th>

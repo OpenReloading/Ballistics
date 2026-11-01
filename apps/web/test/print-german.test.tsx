@@ -119,7 +119,7 @@ describe('the load sheets', () => {
     expect(heads(english, 'temperature')[0]).toBe('Powder temperature')
     expect(heads(german, 'temperature')[0]).toBe('Pulvertemperatur')
     expect(heads(english)).not.toContain('Step')
-    expect(heads(english)).toContain('Peak pressure, simulated (corner-case range)')
+    expect(heads(english)).toContain('Peak pressure, simulated (corner cases)')
     expect(heads(german)).not.toContain('Schritt')
     expect(sheets(english)).toContain('41,0 gr main')
     expect(sheets(german, 'temperature')).toContain('Stufen nach Pulvertemperatur')

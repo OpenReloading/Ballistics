@@ -4174,7 +4174,6 @@
   "Mass of one bullet, in the mass unit shown.": "Masse eines Geschosses, in der angezeigten Masseneinheit.",
   "Mean pressure at which the bullet starts to move, in the pressure unit shown. Defaults of the model, effective values and not measurements: 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).": "Mittlerer Druck, bei dem sich das Geschoss zu bewegen beginnt, in der angezeigten Druckeinheit. Vorgaben des Modells, effektive Werte und keine Messungen: 30 MPa für einen Lauf ab 0,3 m; für einen kürzeren Lauf nach Geschossbauart Blei 24 MPa, Mantelgeschoss 31 MPa, galvanisch beschichtet 31 MPa, monolithisch 50 MPa (1 MPa = 10 bar = 145 psi).",
   "Momentum {total} {unit} (bullet {bullet}, gas {gas})": "Impuls {total} {unit} (Geschoss {bullet}, Gas {gas})",
-  "Peak pressure, simulated (corner-case range)": "Gasdruck, simuliert (Eckfallbereich)",
   "Powder mass of one round, in the mass unit shown.": "Pulvermasse einer Patrone, in der angezeigten Masseneinheit.",
   "Pressure of the gas present when the run starts, the primer gas taken as powder gas, in the pressure unit shown.": "Druck des Gases, das beim Start der Rechnung vorhanden ist, das Gas des Zündhütchens als Pulvergas genommen, in der angezeigten Druckeinheit.",
   "Pressure the vivacity burn law refers to, in the pressure unit shown.": "Druck, auf den sich das Vivacity-Abbrandgesetz bezieht, in der angezeigten Druckeinheit.",
@@ -4197,5 +4196,6 @@
   "Report sections": "Abschnitte des Berichts",
   "Download CSV": "CSV herunterladen",
   "Pressure range, low": "Druckbereich, unten",
-  "Pressure range, high": "Druckbereich, oben"
+  "Pressure range, high": "Druckbereich, oben",
+  "Peak pressure, simulated (corner cases)": "Gasdruck, simuliert (Eckfälle)"
 }
