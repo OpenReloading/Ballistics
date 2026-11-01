@@ -1,8 +1,6 @@
+import { type DensityClass, structureOf } from '@open-reloading/core'
 import type { Bullet } from '@open-reloading/schema'
 import { type Message, msg } from '../i18n/translate.ts'
-
-/** The classes of an effective bullet density, by the construction fields of the record. */
-export type DensityClass = 'cast' | 'monolithic' | 'jacketed' | 'unknown'
 
 /**
  * Effective bullet density by class, g/cm³ (mass over the volume of a cylinder of the diameter and
@@ -20,16 +18,6 @@ export const effectiveDensity: Record<
   unknown: { value: 6.8, error: 0.332, name: msg('construction unknown') },
 }
 
-const classes: Record<string, DensityClass> = {
-  cast: 'cast',
-  monolithic: 'monolithic',
-  'cup-and-core': 'jacketed',
-  bonded: 'jacketed',
-  partitioned: 'jacketed',
-}
-
-/** The class of the record's `construction.structure`; swaged, plated, frangible and not stated are unknown. */
+/** The class of the record's `construction.structure` (`bulletStructures` of core); not stated is unknown. */
 export const classOf = (construction: Bullet['construction'] | undefined): DensityClass =>
-  construction?.structure !== undefined && Object.hasOwn(classes, construction.structure)
-    ? (classes[construction.structure] as DensityClass)
-    : 'unknown'
+  structureOf(construction?.structure)?.density ?? 'unknown'

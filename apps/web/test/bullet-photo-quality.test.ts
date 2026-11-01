@@ -293,7 +293,12 @@ describe('a shadow towards the base or far along the axis', () => {
     base: { type: 'flat' },
   }
   /** A product-style image of `t` at `k` px per mm with `shadow`, measured at the scale its diameter gives. */
-  const atDiameter = (t: BulletDimensions, k: number, shadow: NonNullable<PhotoSpec['shadow']>) => {
+  const atDiameter = (
+    t: BulletDimensions,
+    k: number,
+    shadow: PhotoSpec['shadow'],
+    obliqueBase?: number,
+  ) => {
     const [length, a] = [t.length * k, (t.diameter / 2) * k]
     const margin = Math.max(60, 0.15 * length)
     const photo = renderPhoto({
@@ -311,6 +316,7 @@ describe('a shadow towards the base or far along the axis', () => {
       blur: 1,
       seed: 11,
       shadow,
+      obliqueBase,
     })
     const seg = segmentPhoto(photo.image)
     const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
@@ -344,6 +350,49 @@ describe('a shadow towards the base or far along the axis', () => {
     // the cut-out ran on past the base face by most of the shadow's 18 px offset
     expect(outline.length).toBeLessThan(30 * 30 + 3)
   })
+
+  // the second reader's sweep (#934): a pistol bullet at 30 px per mm, the shadow 0.6 and 1.2 mm
+  // towards the base and 0.9 mm across, blur 0.6 mm; the second read 25 px long with no shadow named
+  for (const along of [0.6, 1.2])
+    it(`a pistol bullet with a shadow ${along} mm towards the base and 0.9 mm across: the shadow named`, () => {
+      const { outline, m, hints } = atDiameter(pistol, 30, {
+        dx: -along * 30,
+        dy: 27,
+        blur: 18,
+        depth: 0.2,
+      })
+      const length = defined(m.values.length)
+      const within =
+        Math.abs(length.value - pistol.length) <=
+        Math.max(0.01 * pistol.length, 3 * length.uncertainty)
+      expect(within || /shadow beside the bullet/.test(text(hints))).toBe(true)
+      expect(outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    })
+
+  it('fits the axis again after a trim', () => {
+    // 1.2 mm towards the base, 0.3 mm across: the axis turned 1.7 degrees off with the overhang in the cut-out
+    const { outline } = atDiameter(pistol, 30, { dx: -36, dy: 9, blur: 18, depth: 0.2 })
+    expect(outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    expect(Math.abs(outline.length - 15.5 * 30)).toBeLessThan(5)
+    expect(Math.abs(outline.angle - (3 * Math.PI) / 180)).toBeLessThan((1 * Math.PI) / 180)
+  })
+
+  // #963: a clean flat base cut at an angle (a slanted sprue cut) reaches one side later, as a
+  // shadow past the base does, but its late side ramps on evenly and its early corner is sharp
+  for (const [name, t, k, slant] of [
+    ['pistol', pistol, 40, 2],
+    ['pistol', pistol, 60, 5],
+    ['rifle', rifle, 40, 5],
+    ['rifle', rifle, 60, 2],
+  ] as const)
+    it(`a ${name} bullet's base face cut ${slant} degrees off at ${k} px per mm: no shadow named`, () => {
+      const { outline, m } = atDiameter(t, k, undefined, slant)
+      expect(outline.shadow).toBeUndefined()
+      const length = defined(m.values.length)
+      expect(Math.abs(length.value - t.length)).toBeLessThanOrEqual(
+        Math.max(0.01 * t.length, 3 * length.uncertainty),
+      )
+    })
 })
 
 describe('an axis direction the user typed', () => {

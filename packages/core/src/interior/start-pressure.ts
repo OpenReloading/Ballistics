@@ -86,31 +86,47 @@ export interface StructureFields {
   structure?: string | undefined
 }
 
-/** `construction.structure` of a bullet record by core construction; a frangible bullet is not listed. */
-const constructions: Record<string, BulletConstruction> = {
-  cast: 'lead',
-  swaged: 'lead',
-  plated: 'plated',
-  'cup-and-core': 'jacketed',
-  bonded: 'jacketed',
-  partitioned: 'jacketed',
-  monolithic: 'monolithic',
-}
+/**
+ * The class of a bullet's effective density, mass over the volume of the cylinder of its diameter
+ * and length, by which the web app estimates the volume of a bullet without a length
+ * (`apps/docs/docs/models/case-capacity.md`, "Bullet without a length"); `unknown` is the pooled class.
+ */
+export type DensityClass = 'cast' | 'monolithic' | 'jacketed' | 'unknown'
 
 /**
- * The construction of a bullet record's `construction`: cast and swaged are lead, plated is plated,
- * cup-and-core, bonded and partitioned are jacketed, monolithic is monolithic. A frangible bullet
- * and a construction without a structure count as jacketed, `assumed`. Undefined where the record
- * gives no construction at all.
+ * Each `construction.structure` of a bullet record: the construction its start pressure is fitted
+ * for and the class of its effective density. Swaged is lead for the start pressure, of unknown
+ * density: the cast class was measured on cast bullets only. A frangible bullet has no construction.
+ */
+export const bulletStructures: Readonly<
+  Record<string, { construction?: BulletConstruction; density: DensityClass }>
+> = {
+  'cup-and-core': { construction: 'jacketed', density: 'jacketed' },
+  bonded: { construction: 'jacketed', density: 'jacketed' },
+  partitioned: { construction: 'jacketed', density: 'jacketed' },
+  monolithic: { construction: 'monolithic', density: 'monolithic' },
+  cast: { construction: 'lead', density: 'cast' },
+  swaged: { construction: 'lead', density: 'unknown' },
+  plated: { construction: 'plated', density: 'unknown' },
+  frangible: { density: 'unknown' },
+}
+
+/** The entry of `bulletStructures` for a structure; undefined for none or one not listed. */
+export const structureOf = (structure: string | undefined) =>
+  structure !== undefined && Object.hasOwn(bulletStructures, structure)
+    ? bulletStructures[structure]
+    : undefined
+
+/**
+ * The construction of a bullet record's `construction` (`bulletStructures`). A frangible bullet and
+ * a construction without a structure count as jacketed, `assumed`. Undefined where the record gives
+ * no construction at all.
  */
 export function constructionOf(
   fields: StructureFields | undefined,
 ): { construction: BulletConstruction; assumed: boolean } | undefined {
   if (!fields) return undefined
-  const mapped =
-    fields.structure !== undefined && Object.hasOwn(constructions, fields.structure)
-      ? constructions[fields.structure]
-      : undefined
+  const mapped = structureOf(fields.structure)?.construction
   return { construction: mapped ?? 'jacketed', assumed: mapped === undefined }
 }
 
@@ -122,16 +138,21 @@ export interface StartPressureRule extends StartPressureDefault {
 
 /**
  * The default start pressure for a barrel length in m and a bullet's `construction` record: the
- * value of its construction and firearm class. Without a barrel length or a construction it is the
- * rifle assumption, the value before the construction rule.
+ * value of its construction and firearm class. A handgun without a construction counts as
+ * jacketed, assumed, as in `defaultStartPressure`. Without a barrel length, and for a rifle without
+ * a construction, it is the rifle assumption, the value before the construction rule.
  */
 export function startPressureOf(
   barrel: number | undefined,
   fields: StructureFields | undefined,
 ): StartPressureRule {
-  const found = constructionOf(fields)
-  if (!found || barrel === undefined || !(barrel > 0))
-    return defaultStartPressure(handgunBarrelLengthLimit)
+  if (barrel === undefined || !(barrel > 0)) return defaultStartPressure(handgunBarrelLengthLimit)
+  const found =
+    constructionOf(fields) ??
+    (barrel < handgunBarrelLengthLimit
+      ? { construction: 'jacketed' as const, assumed: true }
+      : undefined)
+  if (!found) return defaultStartPressure(barrel)
   return {
     ...defaultStartPressure(barrel, found.construction),
     construction: found.construction,

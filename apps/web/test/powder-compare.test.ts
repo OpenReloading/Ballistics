@@ -12,6 +12,7 @@ import {
   compareKey,
   distinctValues,
   filterPowderRows,
+  fittedAtDefaultStart,
   powderValues,
   sortForMode,
   sortPowderRows,
@@ -147,6 +148,15 @@ describe('powderValues', () => {
       29.2e6,
     )
     expect(powderValues(withStart, { id: 'p1' }, { powder: own }, 29.2e6).startPressure).toBe(25e6)
+  })
+
+  it('tells a model fitted without a start pressure of its own', () => {
+    const own = rec('p2', 0.5)
+    const { startPressure: _own, ...rest } = own.interior as NonNullable<Powder['interior']>
+    expect(fittedAtDefaultStart({ ...own, interior: rest } as Powder)).toBe(true)
+    expect(fittedAtDefaultStart(own)).toBe(false)
+    expect(fittedAtDefaultStart({ id: 'p3' } as Powder)).toBe(false)
+    expect(fittedAtDefaultStart(undefined)).toBe(false)
   })
 })
 
