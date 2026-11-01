@@ -70,7 +70,98 @@ test('from 48em to 75em Open, Save and Units stay in the bar, Undo, Redo and New
   await expect(bar.getByRole('button', { name: /^Units: / })).toBeVisible()
   const undo = bar.getByRole('button', { name: 'Undo' })
   await expect(undo).toBeHidden()
-  await bar.getByRole('button', { name: 'Page actions' }).click()
+  const toggle = bar.getByRole('button', { name: 'Page actions' })
+  // the toggle names the folded box only: Open and Save, outside it, stay on screen (#906)
+  await expect(toggle).toHaveAttribute('aria-controls', /-fold$/)
+  const controlled = page.locator(`[id="${await toggle.getAttribute('aria-controls')}"]`)
+  await expect(controlled).toHaveClass(/page-bar-fold/)
+  await toggle.click()
   await expect(undo).toBeVisible()
+  await expect(controlled.getByRole('button', { name: 'Undo' })).toBeVisible()
+  await expect(controlled.getByRole('button', { name: 'Open' })).toHaveCount(0)
   await expect(bar.getByRole('button', { name: 'New bullet' })).toBeVisible()
+})
+
+test('on a phone the Page actions toggle names the whole actions box', async ({ page }) => {
+  await storeUnits(page)
+  await page.setViewportSize({ width: 390, height: 844 })
+  await gotoHydrated(page, '/bullets/designer')
+  const toggle = page.locator('.page-bar').getByRole('button', { name: 'Page actions' })
+  const controlled = page.locator(`[id="${await toggle.getAttribute('aria-controls')}"]`)
+  await expect(controlled).toHaveClass(/page-bar-actions/)
+  await toggle.click()
+  await expect(controlled.getByRole('button', { name: 'Open' })).toBeVisible()
+})
+
+test('a cartridge design takes a name, seats a bullet before the CIP groups and shows its derived values as a table (#792)', async ({
+  page,
+}) => {
+  await storeUnits(page)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await gotoHydrated(page, '/cartridges/designer?from=308-win')
+  const name = page.getByRole('textbox', { name: 'Name', exact: true })
+  await expect(name).toHaveAttribute('placeholder', 'CIP 308 Win.')
+  await name.fill('Wildcat A')
+  await expect(page.locator('.designer-drawing svg.screen-only > title')).toHaveText(
+    'Outline, Wildcat A',
+  )
+  const seat = await page.getByRole('heading', { name: 'Seat a bullet' }).boundingBox()
+  const head = await page.getByRole('heading', { name: 'Head, rim and groove' }).boundingBox()
+  if (!(seat && head)) throw new Error('no boxes')
+  expect(seat.y).toBeLessThan(head.y)
+  const derived = page.getByRole('table', { name: 'Derived from the design' })
+  await expect(derived.getByRole('rowheader', { name: 'Case volume (approximate)' })).toBeAttached()
+})
+
+test('the cartridge view switch sits in the Drawing header and the figure text renders at 11 px or more (#792)', async ({
+  page,
+}) => {
+  await storeUnits(page)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await gotoHydrated(page, '/cartridges/designer?from=308-win')
+  const header = page.locator('.designer-panel-head')
+  await header.getByText('Chamber', { exact: true }).click()
+  await expect(page.locator('.drawing-figure')).toHaveAttribute('data-view', 'chamber')
+  const smallest = await page.evaluate(() => {
+    const texts = Array.from(
+      document.querySelectorAll<SVGTextElement>('.designer-drawing svg.screen-only text'),
+    ).filter((e) => e.getClientRects().length > 0 && getComputedStyle(e).display !== 'none')
+    return Math.min(
+      ...texts.map((e) => {
+        const m = e.getScreenCTM()
+        return m ? Number.parseFloat(getComputedStyle(e).fontSize) * Math.hypot(m.a, m.b) : 0
+      }),
+    )
+  })
+  expect(smallest).toBeGreaterThanOrEqual(10.9)
+})
+
+test('a changed field goes back to the record value by its own button, and the record search stays in view (#796)', async ({
+  page,
+}) => {
+  await storeUnits(page)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await gotoHydrated(page, '/bullets/designer?from=berger-30410')
+  const diameter = page.getByRole('textbox', { name: /Diameter \(mm\)$/ })
+  await expect(diameter).not.toHaveValue('')
+  const record = await diameter.inputValue()
+  await diameter.fill('7.9')
+  await diameter.blur()
+  const back = page.getByRole('button', { name: /^Back to the record value\. .*Changed/ })
+  await expect(back).toHaveCount(1)
+  await back.click()
+  await expect(diameter).toHaveValue(record)
+  await expect(diameter).toBeFocused()
+  await expect(back).toHaveCount(0)
+  // the whole-record reset stays in the toolbar
+  await expect(
+    page.locator('.page-bar').getByRole('button', { name: 'Reset to record' }),
+  ).toBeAttached()
+  const inputs = page.locator('.workspace-inputs')
+  await inputs.evaluate((e) => e.scrollTo(0, e.scrollHeight))
+  const search = await page.getByRole('combobox', { name: 'Start from a record' }).boundingBox()
+  const column = await inputs.boundingBox()
+  if (!(search && column)) throw new Error('no boxes')
+  expect(search.y).toBeGreaterThanOrEqual(column.y - 1)
+  expect(search.y).toBeLessThan(column.y + 80)
 })

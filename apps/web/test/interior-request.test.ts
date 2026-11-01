@@ -5,8 +5,8 @@ import { powder } from '@open-reloading/schema'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { exampleInterior } from '../src/lib/example-data.ts'
 import { interiorRequest } from '../src/lib/interior-request.ts'
-import { tuneBaseKey, tuneLoadKey, writeTuneLoad } from '../src/lib/powder-tune.ts'
-import { readTuneBase, readTuneLoad, readTuneTable } from '../src/lib/tune-load.ts'
+import { tuneActionKey, tuneBaseKey, tuneLoadKey, writeTuneLoad } from '../src/lib/powder-tune.ts'
+import { readTuneAction, readTuneBase, readTuneLoad, readTuneTable } from '../src/lib/tune-load.ts'
 
 beforeEach(() => {
   const store = new Map<string, string>()
@@ -42,6 +42,18 @@ it('hands the CIP table of the cartridge record with the load, and removes it wi
   expect(readTuneTable('user:a')).toBe('IV')
   writeTuneLoad('user:a', undefined, undefined, 'IV')
   expect(readTuneTable('user:a')).toBeUndefined()
+})
+
+it('hands the action of the linked firearm with the load, and removes it with the load', () => {
+  const { body } = interiorRequest({ values, powder: undefined })
+  writeTuneLoad('user:a', body.load, undefined, 'I', undefined, 'revolver')
+  expect(readTuneAction('user:a')).toBe('revolver')
+  writeTuneLoad('user:a', body.load, undefined, 'I')
+  expect(readTuneAction('user:a')).toBeUndefined()
+  writeTuneLoad('user:a', undefined, undefined, 'I', undefined, 'revolver')
+  expect(readTuneAction('user:a')).toBeUndefined()
+  sessionStorage.setItem(tuneActionKey('user:a'), JSON.stringify('cannon'))
+  expect(readTuneAction('user:a')).toBeUndefined()
 })
 
 it('removes the load of an edit not saved, and refuses one the run would refuse', () => {

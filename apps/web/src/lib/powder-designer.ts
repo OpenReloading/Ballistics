@@ -521,6 +521,8 @@ const ruleTexts: Record<string, Message> = {
   'the ranges admit no composition summing to 100 %': msg(
     'Composition: the Min percentages must add up to 100 or less, and the Max percentages to 100 or more.',
   ),
+  'needs a composition': msg('Add at least one ingredient.'),
+  'needs a fitted source': msg('Set Values came about by to Fitted to data.'),
 }
 
 /** The name of the place of an issue at `path`, in the words of the form. */
@@ -543,8 +545,11 @@ function labelOf(d: Design, path: PropertyKey[], t: Translator['t']): string {
   return section ? t(section) : key
 }
 
-/** A schema issue in plain words with its limit, naming the field `label`. */
-function issueText(issue: Issue, label: string, t: Translator['t']): string {
+/**
+ * A schema issue in plain words with its limit, naming the field `label`. An issue without a sentence
+ * of its own names its field only: zod's English message stays out of the interface.
+ */
+export function issueText(issue: Issue, label: string, t: Translator['t']): string {
   const rule = ruleTexts[issue.message]
   if (rule) return t(rule, { label })
   if (required.test(issue.message))
@@ -558,7 +563,12 @@ function issueText(issue: Issue, label: string, t: Translator['t']): string {
   }
   if (issue.code === 'invalid_format')
     return t('{label}: write the CAS number as digits and hyphens, as 9004-70-0.', { label })
-  return t('{part}: {message}', { part: label, message: issue.message })
+  if (issue.code === 'too_small' && issue.origin === 'array')
+    return issue.path[0] === 'composition'
+      ? t('Add at least one ingredient.')
+      : t('{label}: add at least one entry.', { label })
+  console.debug('powder designer: unmapped schema issue', issue)
+  return t('{label}: not accepted by the powder record.', { label })
 }
 
 /** A number below or above a bound of the schema, with the bound; undefined for another issue. */
