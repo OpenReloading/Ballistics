@@ -11365,6 +11365,41 @@ main .page-bar h1 {
   outline-offset: -2px;
 }
 
+/* a row with a menu held at the box's edge: the sticky cell lies over the link's box, so the
+   focused row's cells draw the ring instead, the menu cell its right end beside its rule */
+@media screen and (min-width: 48em) {
+  .directory-table
+    tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
+    > td:not(.filler) {
+    box-shadow:
+      inset 0 2px 0 var(--link),
+      inset 0 -2px 0 var(--link);
+  }
+
+  .directory-table
+    tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
+    > td:first-child {
+    box-shadow:
+      inset 2px 0 0 var(--link),
+      inset 0 2px 0 var(--link),
+      inset 0 -2px 0 var(--link);
+  }
+
+  .directory-table
+    tr[data-row]:has(> td.sticky-end):has(td.name-cell a:focus-visible)
+    > td.sticky-end {
+    box-shadow:
+      inset -2px 0 0 var(--link),
+      inset 0 2px 0 var(--link),
+      inset 0 -2px 0 var(--link),
+      inset 1px 0 0 var(--border);
+  }
+
+  .directory-table tr[data-row]:has(> td.sticky-end) td.name-cell a:focus-visible::after {
+    outline: none;
+  }
+}
+
 .directory-table .missing {
   color: var(--muted);
 }
