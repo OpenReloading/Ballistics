@@ -97,10 +97,12 @@ function LoadChoice({ r }: { r: ReturnType<typeof useRangeMode> }) {
           ...r.loads.map((l) => ({ value: l.id, label: l.name })),
         ]}
       />
-      {summary.length > 0 && (
-        <div className="range-load-summary" data-load-summary>
-          {summary.map((line) => (
-            <Text key={line} size="sm" c="dimmed" mt={4}>
+      {r.load && (
+        // room for both lines from the start: the names read later move nothing below
+        <div className="range-load-summary" data-load-summary style={{ minHeight: '2.875rem' }}>
+          {summary.map((line, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: at most two lines in a fixed order
+            <Text key={i} size="sm" c="dimmed" mt={4}>
               {line}
             </Text>
           ))}
@@ -111,13 +113,13 @@ function LoadChoice({ r }: { r: ReturnType<typeof useRangeMode> }) {
 }
 
 /** The count, mean, SD and ES of the step's shots, under Add shot. */
-function RangeStats({ r }: { r: ReturnType<typeof useRangeMode> }) {
+function RangeStats({ r, step }: { r: ReturnType<typeof useRangeMode>; step: string }) {
   const { t } = useTranslation()
   const stats = rangeStats(r.string)
   if (!stats) return null
   const shown = (ms: number | undefined) => velocityText(ms, r.system, t)
   return (
-    <section aria-label={t('Statistics')}>
+    <section aria-label={t('Statistics, {step}', { step })}>
       <dl
         style={{
           display: 'grid',
@@ -187,7 +189,7 @@ export function RangeMode() {
                 className="range-steps"
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(7rem, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(7rem, 1fr))',
                   gap: 'var(--mantine-spacing-xs)',
                 }}
               >
@@ -253,7 +255,7 @@ export function RangeMode() {
                 </Button>
               </Stack>
             </form>
-            <RangeStats r={r} />
+            <RangeStats r={r} step={stepName(r.step, system, t)} />
             <div role="status" aria-live="polite">
               {r.saved}
             </div>

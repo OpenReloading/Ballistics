@@ -31,12 +31,14 @@ it('names the cartridge and bullet, then the powder with its charge, the primer 
   ])
 })
 
-it('leaves out the primer and the COAL the load does not have, and a COAL given as base to ogive', () => {
+it('leaves out the primer the load does not have, and names a seating by base to ogive CBTO', () => {
   const { primer: _, ...noPrimer } = full
   expect(summary({ ...noPrimer, seating: { by: 'baseToOgive', value: { value: 55 } } })).toEqual([
     '308 Win., Demo 168 gr HPBT',
-    'N140 2.90 g',
+    'N140 2.90 g, CBTO 55.00 mm',
   ])
+  const { seating: __, ...unseated } = noPrimer
+  expect(summary(unseated)).toEqual(['308 Win., Demo 168 gr HPBT', 'N140 2.90 g'])
 })
 
 it('leaves out a reference whose name is not known (offline), and an empty line', () => {
@@ -44,13 +46,20 @@ it('leaves out a reference whose name is not known (offline), and an empty line'
   expect(summary({}, () => undefined)).toEqual([])
 })
 
-it('names a described bullet and powder of a measured load without a record', () => {
-  expect(
-    summary({
-      bullet: { model: 'HPBT Match', bulletMass: { value: 10.89 } },
-      powder: { name: 'N140' },
-    } as Partial<Load>),
-  ).toEqual(['HPBT Match 10.89 g', 'N140'])
+it('names a described bullet and powder of a measured load with their manufacturers where known', () => {
+  const described = {
+    bullet: { manufacturer: 'catalogue:sierra', model: 'HPBT Match', bulletMass: { value: 10.89 } },
+    powder: { manufacturer: 'catalogue:vihtavuori', name: 'N140' },
+  } as Partial<Load>
+  const makers: Record<string, string> = { 'manufacturers catalogue:vihtavuori': 'Vihtavuori' }
+  expect(summary(described, (kind, ref) => makers[`${kind} ${ref}`])).toEqual([
+    'HPBT Match 10.89 g',
+    'Vihtavuori N140',
+  ])
+  expect(componentRefs({ origin: 'user', ...described } as Load)).toEqual([
+    ['manufacturers', 'catalogue:sierra'],
+    ['manufacturers', 'catalogue:vihtavuori'],
+  ])
 })
 
 it('asks for the names of the references only, by the kind of their records', () => {
@@ -60,5 +69,5 @@ it('asks for the names of the references only, by the kind of their records', ()
     ['powders', 'catalogue:vihtavuori-n140'],
     ['primers', 'catalogue:cci-br2'],
   ])
-  expect(componentRefs({ origin: 'user', powder: { name: 'N140' } } as unknown as Load)).toEqual([])
+  expect(componentRefs({ origin: 'user' } as Load)).toEqual([])
 })

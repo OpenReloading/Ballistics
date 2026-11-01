@@ -28,22 +28,26 @@ export interface RangeStep {
 }
 
 /** The references of a load the range page names, by the API kind of their records. */
-export type ComponentKind = 'cartridges' | 'bullets' | 'powders' | 'primers'
+export type ComponentKind = 'cartridges' | 'bullets' | 'powders' | 'primers' | 'manufacturers'
 
-/** The record references of `load` to name, by kind; a described bullet or powder needs none. */
+/** The record references of `load` to name, by kind; a described bullet or powder names its manufacturer. */
 export function componentRefs(load: Load): [ComponentKind, string][] {
+  const { bullet, powder } = load
   const refs: [ComponentKind, string | undefined][] = [
     ['cartridges', load.cartridge],
-    ['bullets', typeof load.bullet === 'string' ? load.bullet : undefined],
-    ['powders', typeof load.powder === 'string' ? load.powder : undefined],
+    ['bullets', typeof bullet === 'string' ? bullet : undefined],
+    ['powders', typeof powder === 'string' ? powder : undefined],
     ['primers', load.primer?.record],
+    ['manufacturers', typeof bullet === 'object' ? bullet.manufacturer : undefined],
+    ['manufacturers', typeof powder === 'object' ? powder.manufacturer : undefined],
   ]
   return refs.flatMap(([kind, ref]) => (ref ? [[kind, ref] as [ComponentKind, string]] : []))
 }
 
 /**
  * The load in two lines: the cartridge and the bullet, then the powder with the charge, the primer
- * and the COAL where the load has them. A reference without a known name (`nameOf`) is left out.
+ * and the COAL (or CBTO) where the load has them. A reference without a known name (`nameOf`) is
+ * left out; a described bullet or powder comes with its manufacturer's name where that is known.
  */
 export function loadSummary(
   load: Load,
@@ -53,21 +57,27 @@ export function loadSummary(
 ): string[] {
   const named = (kind: ComponentKind, ref: string | undefined) =>
     ref ? nameOf(kind, ref) : undefined
+  const made = (manufacturer: string, product: string) =>
+    [named('manufacturers', manufacturer), product].filter(Boolean).join(' ')
+  const { bullet: b, powder: p, seating } = load
   const bullet =
-    typeof load.bullet === 'object'
-      ? `${load.bullet.model} ${withUnit('mass', system, toSi('mass', load.bullet.bulletMass.value))}`
-      : named('bullets', load.bullet)
-  const powder = typeof load.powder === 'object' ? load.powder.name : named('powders', load.powder)
+    typeof b === 'object'
+      ? made(
+          b.manufacturer,
+          `${b.model} ${withUnit('mass', system, toSi('mass', b.bulletMass.value))}`,
+        )
+      : named('bullets', b)
+  const powder = typeof p === 'object' ? made(p.manufacturer, p.name) : named('powders', p)
   const charge = load.charge && withUnit('charge', system, toSi('mass', load.charge.value))
-  const coal =
-    load.seating?.by === 'overallLength'
-      ? t('COAL {coal}', {
-          coal: withUnit('length', system, toSi('length', load.seating.value.value)),
-        })
-      : undefined
+  const seated = seating && withUnit('length', system, toSi('length', seating.value.value))
+  const length =
+    seated &&
+    (seating?.by === 'overallLength'
+      ? t('COAL {coal}', { coal: seated })
+      : t('CBTO {cbto}', { cbto: seated }))
   const lines = [
     [named('cartridges', load.cartridge), bullet],
-    [[powder, charge].filter(Boolean).join(' '), named('primers', load.primer?.record), coal],
+    [[powder, charge].filter(Boolean).join(' '), named('primers', load.primer?.record), length],
   ]
   return lines.map((parts) => parts.filter(Boolean).join(', ')).filter(Boolean)
 }

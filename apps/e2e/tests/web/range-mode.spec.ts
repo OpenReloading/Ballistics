@@ -267,7 +267,9 @@ test('the chosen load names its components, the statistics follow Add shot, and 
     // the select may cut the name: the lines under it name the cartridge, bullet, powder, primer and COAL
     const summary = page.locator('[data-load-summary]')
     await expect(summary).toContainText('308 Win., Berger 30 Cal 168 gr VLD Target')
-    await expect(summary).toContainText('Accurate 2015 2.90 g, Large Rifle Demo, COAL 71.12 mm')
+    await expect(summary).toContainText(
+      'Accurate 2015 2.90 g, Demo Primers Large Rifle Demo, COAL 71.12 mm',
+    )
     // five steps: cells of one width
     const widths = await page
       .getByRole('group', { name: 'Ladder step' })
@@ -278,7 +280,7 @@ test('the chosen load names its components, the statistics follow Add shot, and 
     // the statistics sit right under Add shot, above the shot list, whatever the number of shots
     for (const v of [850, 852, 849, 851, 853, 848]) await shoot(page, v)
     const add = await page.getByRole('button', { name: 'Add shot' }).boundingBox()
-    const stats = page.getByRole('region', { name: 'Statistics', exact: true })
+    const stats = page.getByRole('region', { name: /^Statistics, / })
     await expect(stats).toContainText('Shots counted6')
     const box = await stats.boundingBox()
     const list = await page.getByRole('region', { name: 'Shots of this step' }).boundingBox()

@@ -64,14 +64,22 @@ export interface RangeLoad {
  */
 async function componentNames(load: Load) {
   const names = new Map<string, string>()
+  // each record read once, so the manufacturer of two components too
+  const reads = new Map<string, ReturnType<typeof namedRecord>>()
+  const read = (kind: string, ref: string | undefined) => {
+    const key = `${kind} ${ref}`
+    const next = reads.get(key) ?? namedRecord(kind, ref).catch(() => undefined)
+    reads.set(key, next)
+    return next
+  }
   await Promise.all(
     componentRefs(load).map(async ([kind, ref]) => {
-      const record = await namedRecord(kind, ref)
+      const record = await read(kind, ref)
       if (typeof record?.name !== 'string') return
-      // a bullet or powder record names its product only ("2015"): its manufacturer comes first
+      // a bullet, powder or primer record names its product only ("2015"): its manufacturer first
       const maker =
-        kind === 'bullets' || kind === 'powders'
-          ? (await namedRecord('manufacturers', manufacturerRef(record.manufacturer)))?.name
+        kind === 'bullets' || kind === 'powders' || kind === 'primers'
+          ? (await read('manufacturers', manufacturerRef(record.manufacturer)))?.name
           : undefined
       const name =
         typeof maker === 'string' && !record.name.startsWith(maker)
@@ -96,7 +104,8 @@ async function namedRecord(
   if (!target) return undefined
   if (target.scope === 'user') {
     const r = await storedRecord(target.id).catch(() => undefined)
-    return r && { name: r.name, manufacturer: (r.data as { manufacturer?: unknown }).manufacturer }
+    const data = r?.data as { manufacturer?: unknown } | undefined
+    return r && { name: r.name, manufacturer: data?.manufacturer }
   }
   return fetchRecord<{ name?: unknown; manufacturer?: unknown }>(kind, target.id).catch(
     () => undefined,
@@ -234,7 +243,10 @@ export function useRangeMode() {
     setNameOf(undefined)
     if (!load) return
     let current = true
-    void componentNames(load.data).then((f) => current && setNameOf(() => f))
+    componentNames(load.data).then(
+      (f) => current && setNameOf(() => f),
+      () => current && setNameOf(() => () => undefined),
+    )
     return () => {
       current = false
     }
