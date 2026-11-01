@@ -177,6 +177,33 @@ it('takes the volume of a record with a length from its outline, not from its ma
   expect(e.volume).toBeLessThan(capacity)
 })
 
+it('takes the length of a record without a diameter at the groove diameter, not its mass', () => {
+  const e = estimate({ ...nameOnly, length: { value: 31 } }, 'dimensions')
+  if (e.kind !== 'estimate') throw new Error('estimate expected')
+  expect(e.from).toBe('length')
+  expect(e.volume).toBeGreaterThan(0)
+  expect(e.volume).toBeLessThan(capacity)
+})
+
+it('refuses a mass or a diameter that is not positive instead of throwing', () => {
+  const missing = (r: BelowMouth) => (r.kind === 'refused' ? r.missing : undefined)
+  expect(missing(estimate({ ...nameOnly, mass: { value: 0 } }, 'dimensions'))).toEqual([
+    'bullet mass',
+  ])
+  expect(
+    missing(
+      belowMouth({
+        record: { ...nameOnly, diameter: { value: 0 } },
+        shape: undefined,
+        groove: 0,
+        chamber,
+        coal: undefined,
+        because: 'dimensions',
+      }),
+    ),
+  ).toEqual(['bullet diameter'])
+})
+
 it('gives no default when the bullet volume is refused, and leaves a seated bullet alone', () => {
   const refused = belowMouth({
     record: nameOnly,

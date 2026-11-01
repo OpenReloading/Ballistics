@@ -99,12 +99,60 @@ export function lessBullet(
   }
 }
 
+/** What keeps the bullet volume below the mouth from being estimated. */
+function missingOf(o: {
+  diameter: number | undefined
+  mass: number | undefined
+  outline: BulletDimensions | undefined
+  chamber: object | undefined
+  coal: number | undefined
+}): Message[] {
+  return [
+    ...(o.diameter === undefined ? [msg('bullet diameter')] : []),
+    ...(o.mass === undefined && !o.outline ? [msg('bullet mass')] : []),
+    ...(o.chamber === undefined ? [msg('case length L3')] : []),
+    ...(o.chamber && o.coal === undefined ? [msg('overall length COAL or L6')] : []),
+  ]
+}
+
+/** The volume below the mouth, m³, from an outline, else from diameter, mass and the density class; throws `RangeError` for a refused outline. */
+function volumeOf(o: {
+  outline: BulletDimensions | undefined
+  diameter: number | undefined
+  mass: number | undefined
+  record: Partial<Bullet>
+  caseLength: number
+  coal: number
+}): { volume: number; low: number; high: number; from: 'length' | DensityClass } {
+  const { caseLength, coal } = o
+  const si = (e: { volume: { value: number }; low: number; high: number }) => ({
+    volume: e.volume.value * cm3,
+    low: e.low * cm3,
+    high: e.high * cm3,
+  })
+  if (o.outline) {
+    const e = intrusion({ bullet: o.outline, caseLength, coal, lengthSource: 'measured' })
+    return { ...si(e), from: 'length' }
+  }
+  const density = classOf(o.record.construction)
+  const e = estimateIntrusion({
+    diameter: o.diameter as number,
+    mass: o.mass as number,
+    density: effectiveDensity[density],
+    caseLength,
+    coal,
+  })
+  return { ...si(e), from: density }
+}
+
 /**
  * The volume the bullet takes below the mouth when it is not seated
  * (`apps/docs/docs/models/case-capacity.md`, "Bullet without a seated outline"), at the COAL
  * entered, else at the cartridge's maximum overall length L6. With the `shape` of the record (its
- * outline is built, only the seating is missing) from that outline; else from its diameter (the
- * record, typed, or the cartridge's groove diameter Z), mass and the effective density of its construction class.
+ * outline is built, only the seating is missing) from that outline; a record with a length and no
+ * diameter from its length at the cartridge's groove diameter Z; else from its diameter (the record,
+ * typed, or Z), mass and the effective density of its construction class. A mass or a length that
+ * is not positive counts as missing, and an outline refused for these lengths refuses the volume.
  */
 export function belowMouth(a: {
   /** The record with the typed values in place. */
@@ -120,48 +168,26 @@ export function belowMouth(a: {
   because: Unseated
 }): BelowMouth {
   const { record, shape, chamber, because } = a
-  const diameter = shape?.diameter ?? record.diameter?.value ?? a.groove
-  const mass = record.mass?.value
+  const positive = (v: number | undefined) => (v !== undefined && v > 0 ? v : undefined)
+  const diameter = positive(shape?.diameter ?? record.diameter?.value ?? a.groove)
+  const length = positive(record.length?.value)
+  const mass = positive(record.mass?.value)
   const coal = a.coal ?? chamber?.cartridgeL6
-  const missing = [
-    ...(diameter === undefined ? [msg('bullet diameter')] : []),
-    ...(mass === undefined && !shape ? [msg('bullet mass')] : []),
-    ...(chamber === undefined ? [msg('case length L3')] : []),
-    ...(chamber && coal === undefined ? [msg('overall length COAL or L6')] : []),
-  ]
+  // a record with a length but no diameter of its own: its length at the diameter found
+  const outline = shape ?? (diameter && length ? { diameter, length } : undefined)
+  const missing = missingOf({ diameter, mass, outline, chamber, coal })
   if (missing.length > 0 || !chamber || coal === undefined)
     return { kind: 'refused', missing, because }
   const basis = { because, coal: a.coal === undefined ? ('L6' as const) : ('entered' as const) }
-  if (shape) {
-    const e = intrusion({
-      bullet: shape,
-      caseLength: chamber.caseLength,
-      coal,
-      lengthSource: 'measured',
-    })
+  try {
     return {
       kind: 'estimate',
-      volume: e.volume.value * cm3,
-      low: e.low * cm3,
-      high: e.high * cm3,
-      from: 'length',
+      ...volumeOf({ outline, diameter, mass, record, caseLength: chamber.caseLength, coal }),
       ...basis,
     }
-  }
-  const density = classOf(record.construction)
-  const e = estimateIntrusion({
-    diameter: diameter as number,
-    mass: mass as number,
-    density: effectiveDensity[density],
-    caseLength: chamber.caseLength,
-    coal,
-  })
-  return {
-    kind: 'estimate',
-    volume: e.volume.value * cm3,
-    low: e.low * cm3,
-    high: e.high * cm3,
-    from: density,
-    ...basis,
+  } catch (e) {
+    // the outline of these lengths is refused
+    if (e instanceof RangeError) return { kind: 'refused', missing: [], because }
+    throw e
   }
 }
