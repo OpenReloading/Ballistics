@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { expect, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
 import { showGerman } from './german.ts'
-import { storeUnits } from './units.ts'
+import { choosePreset, storeUnits } from './units.ts'
 import { loadForm } from './workbench.ts'
 import { runExample } from './workbench-run.ts'
 
@@ -173,14 +173,62 @@ async function openTab(page: Page, name: string) {
   return page.getByRole('tabpanel', { name })
 }
 
+/** Save writes its file to the origin's private storage instead of asking where. */
+const stubSavePicker = (page: Page) =>
+  page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+
+/** The saved load as the browser stores it. */
+const storedLoad = (page: Page) =>
+  page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((ok, no) => {
+      const r = indexedDB.open('openreloading-user-data')
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => no(r.error)
+    })
+    const all: {
+      kind: string
+      name: string
+      data: { analysis?: { powders?: { targetPressure?: number } } }
+    }[] = await new Promise((ok, no) => {
+      const r = db.transaction('records').objectStore('records').getAll()
+      r.onsuccess = () => ok(r.result)
+      r.onerror = () => no(r.error)
+    })
+    db.close()
+    return all.find((r) => r.kind === 'load')
+  })
+
+test('the Powders tab keeps a typed target the same pressure when the units change', async ({
+  page,
+}) => {
+  await stubSavePicker(page)
+  await runExample(page)
+  const tab = await openTab(page, 'Powders')
+  await tab
+    .locator('label')
+    .filter({ hasText: /^Target$/ })
+    .click()
+  const target = tab.getByRole('textbox', { name: 'Target peak pressure' })
+  await target.fill('50000')
+  await choosePreset(page, 'Metric (SI)')
+  await expect(target).toHaveValue('3447 bar')
+  // the load keeps the pressure typed in psi, not 3447 bar read back
+  await (await barButton(page, 'Save')).click()
+  await expect
+    .poll(async () => (await storedLoad(page))?.data.analysis?.powders?.targetPressure)
+    .toBeCloseTo(3447.38, 2)
+  await choosePreset(page, 'US customary')
+  await expect(target).toHaveValue('50000 psi')
+})
+
 test('the Powders tab copies its table as CSV and keeps its mode and filters with the saved load', async ({
   page,
 }) => {
   test.setTimeout(240_000)
-  await page.addInitScript(() => {
-    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
-      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
-  })
+  await stubSavePicker(page)
   await page.setViewportSize({ width: 1280, height: 900 })
   await runExample(page)
   let tab = await openTab(page, 'Powders')
@@ -210,22 +258,7 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
   expect(name).not.toBe('')
 
   await (await barButton(page, 'Save')).click()
-  const stored = () =>
-    page.evaluate(async () => {
-      const db: IDBDatabase = await new Promise((ok, no) => {
-        const r = indexedDB.open('openreloading-user-data')
-        r.onsuccess = () => ok(r.result)
-        r.onerror = () => no(r.error)
-      })
-      const all: { kind: string; name: string; data: { analysis?: { powders?: unknown } } }[] =
-        await new Promise((ok, no) => {
-          const r = db.transaction('records').objectStore('records').getAll()
-          r.onsuccess = () => ok(r.result)
-          r.onerror = () => no(r.error)
-        })
-      db.close()
-      return all.find((r) => r.kind === 'load')
-    })
+  const stored = () => storedLoad(page)
   await expect
     .poll(async () => (await stored())?.data.analysis?.powders)
     .toEqual({ mode: 'fill', fill: 90, manufacturer: expect.stringMatching(/^catalogue:/) })

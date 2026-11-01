@@ -33,6 +33,8 @@ import {
   powderTableCsv,
   restoredPowderTab,
   savedPowderTab,
+  switchedTarget,
+  targetPressure,
 } from './powder-csv.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
 import { TableCsv } from './table-csv.tsx'
@@ -359,6 +361,21 @@ function targetOf(
 const modeValid = (kind: CompareMode['kind'], fillValid: boolean, targetValid: boolean) =>
   (kind !== 'fill' || fillValid) && (kind !== 'target' || targetValid)
 
+/** The typed target and the pressure it keeps: a unit switch shows it in the new unit, as the workbench fields do. */
+function useTargetText(first: PowderTabState, percent: boolean, system: UnitSystem) {
+  const [target, setTarget] = useState<Pick<PowderTabState, 'targetText' | 'targetKept'>>({
+    targetText: first.targetText,
+    targetKept: first.targetKept,
+  })
+  const [shown, setShown] = useState(system)
+  if (shown !== system) {
+    setShown(system)
+    setTarget(switchedTarget({ ...target, percent }, shown, system))
+  }
+  const setTargetText = (targetText: number | string) => setTarget((s) => ({ ...s, targetText }))
+  return { ...target, setTargetText }
+}
+
 /** Whether the tab shows what it opened with: the manufacturer filter compared by its id. */
 function sameTab(
   now: PowderTabState,
@@ -601,8 +618,8 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const [fill, setFill] = useState<number | string>(first.fill)
   const fillValid = isFillValid(fill)
   // the target of the charge target dialog: a peak pressure, or a share of the cartridge's CIP Pmax
-  const [targetText, setTargetText] = useState<number | string>(first.targetText)
   const [percent, setPercent] = useState(first.percent)
+  const { targetText, targetKept, setTargetText } = useTargetText(first, percent, system)
   // the reason shows for a typed value, and for an empty field once it was left
   const [targetLeft, setTargetLeft] = useState(false)
   const targetField = targetOf(targetText, targetLeft, percent, cartridge !== undefined, system, t)
@@ -611,7 +628,11 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const mode = modeOf(
     kind,
     fillValid ? (fill as number) / 100 : undefined,
-    targetValid ? unit.toSi(targetNumber(targetText)) : undefined,
+    // a share of Pmax is no pressure: its unit reads the percentage
+    targetValid
+      ? (targetPressure({ targetText, targetKept, percent }, system) ??
+          unit.toSi(targetNumber(targetText)))
+      : undefined,
     asPercent,
   )
   const study = usePowderCompare(loadRequest, mode)
@@ -619,7 +640,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
   // the load keeps the mode and the filters; a filter stays while Compute fills the rows again
   const { filters, setFilters, maker, setMaker } = useKeptFilters(first, names)
-  useKeptTab({ kind, fill, targetText, percent, filters, maker }, first, system, names)
+  useKeptTab({ kind, fill, targetText, targetKept, percent, filters, maker }, first, system, names)
   const [sort, setSort] = useState<ColumnSort | undefined>()
   // the columns follow the mode the rows were computed for, not the one chosen since
   const target = study.mode?.kind === 'target'
