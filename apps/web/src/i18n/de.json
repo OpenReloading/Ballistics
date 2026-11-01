@@ -3875,6 +3875,7 @@
   "Result notes": "Hinweise zum Ergebnis",
   "No notes for this result.": "Keine Hinweise zu diesem Ergebnis.",
   "More ({count})": "Mehr ({count})",
+  "How close a result is": "Wie nah ein Ergebnis liegt",
   "Choose a powder record in the Powder card.": "Wählen Sie in der Karte Treibladungspulver einen Treibladungspulver-Datensatz.",
   "The powder record gives no bulk density. Choose a powder record that gives one.": "Der Treibladungspulver-Datensatz nennt kein Schüttgewicht. Wählen Sie einen Treibladungspulver-Datensatz, der eines nennt.",
   "{count} result note|{count} result notes": {

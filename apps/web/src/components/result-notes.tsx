@@ -1,10 +1,11 @@
 'use client'
 
-import { Button } from '@mantine/core'
+import { Anchor, Button } from '@mantine/core'
 import { Info, Question, Warning } from '@phosphor-icons/react'
 import { useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
+import { howCloseGuide } from '../lib/docs-url.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { ResultNotesDialog } from './result-notes-dialog.tsx'
 import { useScrolls } from './states.tsx'
@@ -23,7 +24,8 @@ export const noteLooks: Record<
 
 /**
  * The notes of the shown result in a box of fixed height, so a step, an input or the units that
- * change them move nothing below. Its list scrolls; More opens every entry with its reason.
+ * change them move nothing below. Its list scrolls; More opens every entry with its reason (and the
+ * guide on how close a result is, linked in its place when there is no More).
  */
 export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
   const { warnings, system } = useResult()
@@ -34,6 +36,7 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
   const [Dialog, setDialog] = useState<typeof ResultNotesDialog>()
   const [open, setOpen] = useState(false)
   const first = notes[0]
+  const hasMore = scrolls || notes.some((n) => n.text)
   return (
     <fieldset aria-label={t('Result notes')} className="result-notes screen-only">
       {/* the count and the most important entry, announced when a run brings a new warning */}
@@ -55,24 +58,42 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
           )
         })}
       </ul>
-      {(scrolls || notes.some((n) => n.text)) && (
-        <Button
-          ref={more}
-          variant="default"
-          size={controlSize.row.button}
-          aria-haspopup="dialog"
-          onClick={() =>
-            // a plain import() on first open: next/dynamic would count the dialog in the route's weight
-            Dialog
-              ? setOpen(true)
-              : import('./result-notes-dialog.tsx').then((m) => {
-                  setDialog(() => m.ResultNotesDialog)
-                  setOpen(true)
-                })
-          }
-        >
-          {t('More ({count})', { count: notes.length })}
-        </Button>
+      {/* More and the guide link share one cell as wide as the wider, the other hidden: a swap
+          between them changes no width, so the list cannot start and stop scrolling over it.
+          Without a docs site More is alone, and only there when needed. */}
+      {(hasMore || howCloseGuide) && (
+        <div className="result-notes-control">
+          <Button
+            ref={more}
+            data-hidden={hasMore ? undefined : true}
+            variant="default"
+            size={controlSize.row.button}
+            aria-haspopup="dialog"
+            onClick={() =>
+              // a plain import() on first open: next/dynamic would count the dialog in the route's weight
+              Dialog
+                ? setOpen(true)
+                : import('./result-notes-dialog.tsx').then((m) => {
+                    setDialog(() => m.ResultNotesDialog)
+                    setOpen(true)
+                  })
+            }
+          >
+            {t('More ({count})', { count: notes.length })}
+          </Button>
+          {/* without More the dialog that links the guide is out of reach: the link in its place */}
+          {howCloseGuide && (
+            <Anchor
+              data-hidden={hasMore ? true : undefined}
+              href={howCloseGuide}
+              target="_blank"
+              rel="noopener"
+              size="sm"
+            >
+              {t('How close a result is')}
+            </Anchor>
+          )}
+        </div>
       )}
       {Dialog && (
         <Dialog
