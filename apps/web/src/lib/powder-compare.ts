@@ -33,19 +33,32 @@ export function compareCharge(
   return bulkDensity ? mode.fill * toSi('density', bulkDensity) * volume : undefined
 }
 
+/** The model parameters a powder record fills: without a start pressure of its own the field is left to its default. */
+export function recordFill(p: Powder) {
+  const all = powderModelValues(p)
+  if (!all || p.interior?.startPressure) return all
+  return Object.fromEntries(Object.entries(all).filter(([k]) => k !== 'startPressure'))
+}
+
 /**
  * The SI field values of a run: the fields, with the model parameters of the record `as.powder` laid
  * over them unless it is the powder `current` of the fields (their edited or opened values stand),
- * and `as.charge` (kg) when given.
+ * and `as.charge` (kg) when given. A record without a start pressure of its own runs at
+ * `startDefault` (SI), the default of the field, not at the start pressure of the current powder.
  */
 export function powderValues(
   fields: Record<string, number | undefined>,
   current: { id: string } | undefined,
   as?: { powder: Powder; charge?: number },
+  startDefault?: number,
 ): Record<string, number | undefined> {
+  const other = as && as.powder.id !== current?.id
   return {
     ...fields,
-    ...(as && as.powder.id !== current?.id && powderModelValues(as.powder)),
+    ...(other && recordFill(as.powder)),
+    ...(other &&
+      !as.powder.interior?.startPressure &&
+      startDefault !== undefined && { startPressure: startDefault }),
     ...(as?.charge !== undefined && { charge: as.charge }),
   }
 }

@@ -134,3 +134,29 @@ describe('resultNotes', () => {
     expect(unlistedCartridge({ listedCartridges: ['308-win'] }, undefined)).toBeUndefined()
   })
 })
+
+describe('temperature of a powder without a temperature coefficient', () => {
+  /** The shown step at 273.15 K for a powder whose record was fitted at 294.15 K, the run's own message among the notes. */
+  const note = (extra: Partial<Ok>) =>
+    resultNotes(ok(extra), [], units, english.t).filter(
+      (n) => n.line === 'No temperature coefficient',
+    )
+
+  it('says that the run ignores a powder temperature other than the fit temperature', () => {
+    const load = { ...ok().load, propellantTemperature: 273.15 }
+    expect(note({ load, noCoefficient: { reference: 294.15 } })).toEqual([
+      {
+        kind: 'message',
+        line: 'No temperature coefficient',
+        text: expect.stringMatching(/^The run ignores the powder temperature .*its fit\.$/),
+      },
+    ])
+  })
+
+  it('says nothing at the fit temperature, nor for a powder with a coefficient', () => {
+    const [at, other] = [294.15, 273.15]
+    const load = (T: number) => ({ ...ok().load, propellantTemperature: T })
+    expect(note({ load: load(at), noCoefficient: { reference: 294.15 } })).toEqual([])
+    expect(note({ load: load(other) })).toEqual([])
+  })
+})

@@ -379,6 +379,64 @@ export function intrusion({
   }
 }
 
+/**
+ * An effective bullet density, g/cm³: the mass over the volume of a cylinder of the bullet's diameter
+ * and length, so the shape of the nose and base is in it, with the relative error of the length it
+ * gives (the 90th percentile of the records it was taken from).
+ */
+export interface EffectiveDensity {
+  value: number
+  /** Relative to the true length, 1: the estimated length is within this fraction of it for 90 % of the records. */
+  error: number
+}
+
+/** Input of `estimateIntrusion`: diameter (mm), mass (g), density and the case and cartridge lengths (mm). */
+interface EstimateInput {
+  diameter: number
+  mass: number
+  density: EffectiveDensity
+  /** Case length to the mouth, mm. */
+  caseLength: number
+  coal: number
+}
+
+/** The bullet volume below the mouth of a bullet known by diameter and mass only. */
+interface IntrusionEstimate {
+  /** Estimated bullet length, mm. */
+  length: number
+  /** Bullet volume below the mouth, cm³, always `approximate`. */
+  volume: Tagged
+  /** Bounds of `volume` for the length error, cm³. */
+  low: number
+  high: number
+  notes: string[]
+}
+
+/**
+ * The bullet volume below the mouth without a bullet length (`apps/docs/docs/models/case-capacity.md`,
+ * "Bullet without a length"): the length is mass / (effective density * cylinder area), then
+ * `intrusion` at the given COAL with the outline of assumed proportions. The bounds are the volumes
+ * for the true lengths that the error of the density allows, length / (1 + error) and length / (1 - error): a longer bullet takes more of the case.
+ */
+export function estimateIntrusion(i: EstimateInput): IntrusionEstimate {
+  const { diameter, mass, density, caseLength, coal } = i
+  const length = ((mass / density.value) * 1000) / ((Math.PI / 4) * diameter ** 2)
+  const at = (l: number) =>
+    intrusion({ bullet: { diameter, length: l }, caseLength, coal, lengthSource: 'estimated' })
+  const [mid, short, long] = [
+    at(length),
+    at(length / (1 + density.error)),
+    at(length / (1 - density.error)),
+  ]
+  return {
+    length,
+    volume: { value: mid.volume.value, tag: 'approximate' },
+    low: short.volume.value,
+    high: long.volume.value,
+    notes: mid.notes,
+  }
+}
+
 /** The basis line of the jump row: what is missing first when no jump can be given. */
 export function jumpNote(jump: Seating['jump']): string {
   if (jump.value === undefined)

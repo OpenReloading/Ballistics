@@ -274,6 +274,8 @@ export type InteriorBody = {
   model: 'm3'
   load: InteriorLoad
   cartridge?: string | undefined
+  /** The tolerance of the chamber volume of the range, relative: the interval of an approximate volume. */
+  tolerances?: { volumeFraction: number }
   /** A pressure limit the user typed, Pa: the one limit instead of the cartridge's CIP Pmax. */
   pressureLimit?: number | undefined
 }
