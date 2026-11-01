@@ -19,6 +19,7 @@ import { baseLine, baseText, grainFormText } from '../lib/list-values.ts'
 import { countText, filterText, matchingText, widestCount } from '../lib/lists.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
+  inOverlay,
   type PackedPowder,
   powderMatches,
   unpackPowders,
@@ -32,7 +33,8 @@ import {
   originNames,
   readOrigins,
 } from '../lib/sources.ts'
-import { CompareButton, PickedChips, usePicks } from './compare-picks.tsx'
+import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
+import { Day } from './day.tsx'
 import {
   type DirectoryColumn,
   DirectoryFilters,
@@ -55,25 +57,26 @@ const n2 = (v: number | undefined) => (v === undefined ? '' : formatNumber(v, 2)
  */
 export function PowderList({ packed }: { packed: PackedPowder[] }) {
   const tr = useTranslation()
-  const { t } = tr
+  const { t, tn } = tr
   const [records, removeRow] = useUserRecords()
   const catalogue = useMemo(() => unpackPowders(packed), [packed])
   // the browser's powders first: a few rows would sit unseen behind the catalogue's
   const items = useMemo(() => [...userPowderRows(records), ...catalogue], [records, catalogue])
   const [state, set, clear] = useListState()
   const filters = useDeferredValue(state)
-  const domain = useMemo(() => rateDomain(catalogue), [catalogue])
+  // over every row: a design faster or slower than the catalogue keeps its place on the scale
+  const domain = useMemo(() => rateDomain(items), [items])
   const counts = useMemo(() => countOrigins(items), [items])
   const shown = useMemo(
     () => items.filter((r) => inOrigins(r, filters.sources) && powderMatches(r, filters.query)),
     [items, filters],
   )
-  const byId = useMemo(() => new Map(items.map((r) => [r.id, r])), [items])
-  const [picked, toggle, replace] = usePicks(
+  const ids = useMemo(() => new Set(items.map((r) => r.id)), [items])
+  const [picked, , replace] = usePicks(
     maxOverlay,
     state.compareIds,
     (pick) => set({ compareIds: pick }),
-    (id) => byId.has(id),
+    (id) => ids.has(id),
   )
 
   const query = state.query.trim()
@@ -127,6 +130,28 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
           </span>
         ),
     },
+    {
+      key: 'rows',
+      label: msg('Training rows'),
+      help: msg(
+        'Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating. Empty without fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.',
+      ),
+      width: '13rem',
+      num: true,
+      value: (r) => r.trainingRows,
+      cell: (r) =>
+        r.trainingRows === undefined ? null : (
+          <span className="fit-rows">
+            <span>{r.trainingRows}</span>
+            <Text component="span" inherit c="dimmed" fz="xs">
+              {r.trainingCartridges !== undefined &&
+                tn(r.trainingCartridges, '{count} cartridge', '{count} cartridges')}
+              {r.trainingCartridges !== undefined && r.retrieved && ' · '}
+              {r.retrieved && <Day day={r.retrieved} />}
+            </Text>
+          </span>
+        ),
+    },
     ...(counts.user > 0 ? [sourceColumn<PowderRow>(productLabel, removeRow)] : []),
   ]
   const facts = (r: PowderRow) =>
@@ -135,6 +160,8 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       r.origin === 'user' && t(originNames.user),
       r.manufacturerName,
       r.burnRateOrder !== undefined && t('burn-rate order {order}', { order: r.burnRateOrder }),
+      r.trainingRows !== undefined &&
+        tn(r.trainingRows, '{count} training row', '{count} training rows'),
       r.grainForm && grainFormText(t, r.grainForm),
       r.propellantBase && baseLine(t, r.propellantBase),
     ]
@@ -150,16 +177,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             <BarCount widest={widestCount(tr, items.length, 'powders')}>
               {countText(tr, shown.length, items.length, 'powders')}
             </BarCount>
-            <PickedChips
-              ids={picked}
-              max={maxOverlay}
-              name={(id) => {
-                const r = byId.get(id)
-                return r ? productLabel(r) : id
-              }}
-              onRemove={toggle}
-              onClear={() => replace([])}
-            />
+            <SelectionSummary count={picked.length} max={maxOverlay} onClear={() => replace([])} />
           </>
         }
         actions={
@@ -167,6 +185,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             <CompareButton
               count={picked.length}
               min={0}
+              max={maxOverlay}
               href={overlayHref(picked)}
               idle={t('Burn rates')}
             />
@@ -213,7 +232,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             ids: picked,
             max: maxOverlay,
             onChange: replace,
-            can: (r) => r.burnRateOrder !== undefined,
+            can: inOverlay,
           }}
           phoneAction={(r, tabIndex) =>
             r.origin === 'user' ? (

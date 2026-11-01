@@ -243,15 +243,20 @@ function PhotoTool({
   system,
   record,
   onOpen,
+  onPhoto,
 }: {
   system: UnitSystem
   record: Design['origin']
   onOpen: (d: Design) => Promise<boolean>
+  /** Called with whether a photograph is loaded: the dialog widens for one. */
+  onPhoto: (loaded: boolean) => void
 }) {
   const p = useBulletPhoto(system, record)
   const { t } = useTranslation()
   const id = useId()
   const { size, points, found, scale, drawing } = p
+  const loaded = size !== undefined
+  useEffect(() => onPhoto(loaded), [loaded, onPhoto])
   const shown = useRef<HTMLCanvasElement>(null)
   const [tool, setTool] = useState<Tool>('scale')
   const [brush, setBrush] = useState(12)
@@ -428,7 +433,8 @@ function PhotoTool({
           </>
         )}
       </Flex>
-      <div style={{ flex: '1 1 100%' }}>
+      {/* data-idle: no reserved message room before a photograph (globals.css) */}
+      <div style={{ flex: '1 1 100%' }} data-idle={!loaded}>
         <MessageSlot label={t('Photograph messages')} messages={messages} />
         {p.rows.length > 0 && <ValuesTable rows={p.rows} system={system} record={record} />}
         <Flex gap="xs" mt="sm" align="center" wrap="wrap">
@@ -466,16 +472,19 @@ export function BulletPhoto({
 }) {
   const phone = useMediaQuery('(max-width: 47.99em)')
   const { t } = useTranslation()
+  // narrow while it only offers a photograph; the canvas and its controls side by side with one
+  const [photo, setPhoto] = useState(false)
   return (
     <AppModal
       opened={opened}
       onClose={onClose}
       title={t('Bullet from a photograph')}
-      size="min(72rem, 96vw)"
+      size={photo ? 'min(72rem, 96vw)' : 'min(34rem, 96vw)'}
       fullScreen={phone}
       closeButton={{ 'aria-label': t('Close the photograph tool') }}
     >
       <PhotoTool
+        onPhoto={setPhoto}
         system={system}
         record={record}
         onOpen={async (d) => {

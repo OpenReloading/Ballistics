@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { barButton } from './bar.ts'
+import { showGerman } from './german.ts'
 import { exported, gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
 
@@ -226,4 +227,29 @@ test('Settings turns the single-key shortcuts off: "/" and "?" do nothing, the c
   await expect(again).toBeHidden()
   await press('?')
   await expect(help).toBeVisible()
+})
+
+test('the Units button shows its preset from 105em, an icon below, and its name in German', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await gotoHydrated(page, '/cartridges/308-win')
+  const button = page.locator('.page-bar').getByRole('button', { name: /^Units: / })
+  // the record's title keeps its room: the button is as wide as the bar's icon buttons
+  await expect.poll(() => button.evaluate((b) => b.getBoundingClientRect().width)).toBe(36)
+  // its icon in the middle
+  const offCentre = await button.evaluate((b) => {
+    const [r, i] = [b.getBoundingClientRect(), b.querySelector('svg')?.getBoundingClientRect()]
+    return i ? Math.abs(i.left + i.width / 2 - (r.left + r.width / 2)) : Number.POSITIVE_INFINITY
+  })
+  expect(offCentre).toBeLessThanOrEqual(1)
+  await page.setViewportSize({ width: 1920, height: 900 })
+  await expect(button).toContainText('Metric (SI)')
+  await expect
+    .poll(() => button.evaluate((b) => b.getBoundingClientRect().width))
+    .toBeGreaterThan(36)
+  await showGerman(page)
+  await expect(
+    page.locator('.page-bar').getByRole('button', { name: /^Einheiten: Metrisch \(SI\)/ }),
+  ).toContainText('Metrisch (SI)')
 })

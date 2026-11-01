@@ -69,8 +69,12 @@ export interface BulletSummary {
   country?: string | undefined
   /** The tip type of the record. */
   tipType?: string
+  /** The base type of the record. */
+  baseType?: string
   /** The construction structure of the record, else "<core material>-core". */
   construction?: string
+  /** Derived from the construction (`leadFree` of the schema); absent where the wording does not settle it. */
+  leadFree?: boolean
 }
 
 /** A case as `GET /cases` lists it. */
@@ -110,11 +114,19 @@ export interface PowderSummary {
   propellantBase?: Powder['propellantBase']
   /** ISO 3166-1 alpha-2 code of the manufacturer's country. */
   country?: string | undefined
-  /** The fitted model's fields the burn-rate curve needs. */
+  /** The fitted model's fields the burn-rate curve needs, with the training rows and cartridges of the fit. */
   interior?: Pick<
     NonNullable<Powder['interior']>,
-    'vivacity' | 'pressureExponent' | 'referencePressure' | 'burnForm'
-  >
+    | 'vivacity'
+    | 'pressureExponent'
+    | 'referencePressure'
+    | 'burnForm'
+    | 'trainingRows'
+    | 'trainingCartridges'
+  > & {
+    /** ISO date the fitted sources were read, the latest of them. */
+    retrieved?: string | undefined
+  }
 }
 
 export interface ListOf<T> {

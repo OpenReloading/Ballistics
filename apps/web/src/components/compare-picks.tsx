@@ -1,13 +1,12 @@
 'use client'
 
-import { Button, CloseButton, Popover, Tooltip } from '@mantine/core'
+import { Button, Tooltip } from '@mantine/core'
 import { ArrowsLeftRight, X } from '@phosphor-icons/react'
 import Link from 'next/link'
-import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { useId } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { togglePick } from '../lib/selection.ts'
 import { controlSize } from '../lib/theme.ts'
-import { AppPopover } from './app-popover.tsx'
 import { focusSearch } from './directory-table.tsx'
 
 /**
@@ -29,107 +28,33 @@ export function usePicks(
   return [picked, toggle, replace] as const
 }
 
-/** The picks as removable chips, one `li` each. */
-function ChipItems({
-  ids,
-  name,
-  onRemove,
-}: {
-  ids: readonly string[]
-  name: (id: string) => string
-  onRemove: (id: string) => void
-}) {
-  const { t } = useTranslation()
-  return ids.map((id) => (
-    <li key={id}>
-      <span title={name(id)}>{name(id)}</span>
-      <CloseButton
-        aria-label={t('Remove {name}', { name: name(id) })}
-        onClick={() => onRemove(id)}
-      />
-    </li>
-  ))
-}
-
 /**
- * The picks for the page bar's status line, after the list's count: "n of max" and one removable
- * chip each, also for rows a filter hides. Chips that do not fit the line's width give way to
- * "n selected" with the full list in a popover, so a pick moves nothing and no name is cut.
- * "Clear selection" unticks them all.
+ * The picks for the page bar's status line, after the list's count: "2 selected (max 4)" and
+ * Clear, which unticks them all; the ticked rows show which. One line of fixed height, so a pick
+ * moves nothing.
  */
-export function PickedChips({
-  ids,
+export function SelectionSummary({
+  count,
   max,
-  name,
-  onRemove,
   onClear,
 }: {
-  ids: readonly string[]
+  count: number
   max: number
-  name: (id: string) => string
-  onRemove: (id: string) => void
   onClear: () => void
 }) {
   const { t } = useTranslation()
-  // the Clear buttons leave with the picks: the focus goes to the search box
+  // Clear leaves with the picks: the focus goes to the search box
   const clear = () => {
     onClear()
     focusSearch()
   }
-  const slot = useRef<HTMLDivElement>(null)
-  const list = useRef<HTMLUListElement>(null)
-  const [over, setOver] = useState(false)
-  // the chip list keeps its natural width (hidden while it does not fit), so it can be measured again
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the refs appear with the first pick
-  useLayoutEffect(() => {
-    const s = slot.current
-    const l = list.current
-    if (!s || !l) return
-    const measure = () => setOver(l.scrollWidth > s.clientWidth)
-    const observer = new ResizeObserver(measure)
-    observer.observe(s)
-    observer.observe(l)
-    measure()
-    return () => observer.disconnect()
-  }, [ids.length > 0])
   return (
-    <>
-      <span
-        aria-live="polite"
-        className={over ? 'selection-count visually-hidden' : 'selection-count'}
-      >
-        {ids.length > 0 && ` · ${t('{count} of {max} selected', { count: ids.length, max })}`}
+    <span className="selection-summary" data-picked={count > 0 || undefined}>
+      {/* only the text is live: the button is no news */}
+      <span aria-live="polite" className="selection-count">
+        {count > 0 && t('{count} selected (max {max})', { count, max })}
       </span>
-      {ids.length > 0 && (
-        <div className="picked-slot" data-over={over || undefined} ref={slot}>
-          <ul className="picked-chips" aria-label={t('Selected for Compare')} ref={list}>
-            <ChipItems ids={ids} name={name} onRemove={onRemove} />
-          </ul>
-          {over && (
-            <AppPopover position="bottom-start" withArrow>
-              <Popover.Target>
-                <Button size={controlSize.row.button} variant="default" px={6}>
-                  {t('{count} selected', { count: ids.length })}
-                </Button>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <ul className="picked-list" aria-label={t('Selected for Compare')}>
-                  <ChipItems ids={ids} name={name} onRemove={onRemove} />
-                </ul>
-                <Button
-                  variant="subtle"
-                  size={controlSize.row.button}
-                  leftSection={<X size={12} aria-hidden="true" />}
-                  onClick={clear}
-                >
-                  {t('Clear selection')}
-                </Button>
-              </Popover.Dropdown>
-            </AppPopover>
-          )}
-        </div>
-      )}
-      {ids.length > 0 && (
+      {count > 0 && (
         <Button
           className="clear-picks"
           variant="subtle"
@@ -142,29 +67,42 @@ export function PickedChips({
           <span className="clear-picks-text">{t('Clear')}</span>
         </Button>
       )}
-    </>
+    </span>
   )
 }
 
 /**
  * "Compare n" to `href` from `min` picks; below that a disabled button saying how many it needs.
- * `idle` names the button without picks (a page that opens empty).
+ * `idle` names the button without picks (a page that opens empty). With `max`, the button keeps
+ * the width of "Compare max", so the buttons beside it do not shift with a pick.
  */
 export function CompareButton({
   count,
   min,
+  max,
   href,
   need,
   idle,
 }: {
   count: number
   min: number
+  max?: number
   href: string
   need?: string
   idle?: string
 }) {
   const { t } = useTranslation()
-  const label = count > 0 ? t('Compare {count}', { count }) : (idle ?? t('Compare'))
+  const text = count > 0 ? t('Compare {count}', { count }) : (idle ?? t('Compare'))
+  // the widest label under the shown one, unseen: the slot's width
+  const label =
+    max === undefined ? (
+      text
+    ) : (
+      <span className="compare-label">
+        <span>{text}</span>
+        <span aria-hidden="true">{t('Compare {count}', { count: max })}</span>
+      </span>
+    )
   const hint = useId()
   // aria-disabled, not disabled: the button stays focusable, so its hint is read
   return count < min ? (

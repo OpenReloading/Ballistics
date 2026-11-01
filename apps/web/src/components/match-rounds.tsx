@@ -9,6 +9,13 @@ import { Panel } from './panel.tsx'
 /** A field's number, `undefined` while empty. */
 const typed = (v: number | string) => (typeof v === 'number' ? v : undefined)
 
+const below: ('label' | 'input' | 'description' | 'error')[] = [
+  'label',
+  'input',
+  'description',
+  'error',
+]
+
 /**
  * The rounds a match of the discipline takes, against the rounds on hand typed. Nothing is
  * stored: the fields live while the page is open.
@@ -28,19 +35,28 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
     onHand: typed(onHand),
   })
   const whole = { min: 0, allowDecimal: false, allowNegative: false, hideControls: true }
+  // a field's description under it: the fields of the row stay level
   return (
     <Panel id="match-rounds" title={t('Rounds for a match')}>
-      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg" verticalSpacing="sm">
-        {course.shots === undefined ? (
+      {course.shots !== undefined && (
+        <p className="record-note">{t('Shots per event: {count}', { count: course.shots })}</p>
+      )}
+      {/* one row from 48em, in the order a match is planned: shots where no target states them */}
+      <SimpleGrid
+        cols={{ base: 2, sm: course.shots === undefined ? 5 : 4 }}
+        spacing="sm"
+        verticalSpacing="sm"
+        className="match-fields"
+      >
+        {course.shots === undefined && (
           <NumberInput
             label={t('Shots per event')}
             description={t('The targets of this discipline state no shot count.')}
+            inputWrapperOrder={below}
             {...whole}
             value={shots}
             onChange={setShots}
           />
-        ) : (
-          <p>{t('Shots per event: {count}', { count: course.shots })}</p>
         )}
         <NumberInput
           label={t('match\u0004Events')}
@@ -50,6 +66,7 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
         />
         <NumberInput
           label={t('Sighters per event')}
+          inputWrapperOrder={below}
           {...(course.openSighters && {
             description: t('Rule book: {value}', {
               value: course.openSighters === 'unlimited' ? t('Any number') : t('Not stated'),
@@ -69,21 +86,34 @@ export function MatchRounds({ course }: { course: MatchCourse }) {
         />
         <NumberInput label={t('Rounds on hand')} {...whole} value={onHand} onChange={setOnHand} />
       </SimpleGrid>
-      <p role="status">
-        {result?.difference === undefined
-          ? result && t('Needed {needed}', { needed: result.needed })
-          : result.difference < 0
-            ? t('Needed {needed}, typed {typed}: short by {difference}', {
-                needed: result.needed,
-                typed: result.needed + result.difference,
-                difference: -result.difference,
-              })
-            : t('Needed {needed}, typed {typed}: {difference} over', {
-                needed: result.needed,
-                typed: result.needed + result.difference,
-                difference: result.difference,
-              })}
-      </p>
+      <MatchReadout result={result} />
     </Panel>
+  )
+}
+
+/**
+ * The rounds needed as a readout, and with rounds on hand typed the rounds short (marked) or left
+ * over. Empty while a field it needs is empty; a live region either way.
+ */
+export function MatchReadout({ result }: { result: ReturnType<typeof matchRounds> }) {
+  const { t } = useTranslation()
+  const difference = result?.difference
+  return (
+    <div role="status">
+      {result && (
+        <dl className="readouts match-readouts">
+          <div>
+            <dt>{t('Rounds needed')}</dt>
+            <dd>{result.needed}</dd>
+          </div>
+          {difference !== undefined && (
+            <div>
+              <dt>{difference < 0 ? t('Rounds short') : t('Rounds left over')}</dt>
+              <dd className={difference < 0 ? 'exceeded' : undefined}>{Math.abs(difference)}</dd>
+            </div>
+          )}
+        </dl>
+      )}
+    </div>
   )
 }

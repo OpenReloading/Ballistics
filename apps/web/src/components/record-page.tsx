@@ -31,6 +31,7 @@ export function RecordPage({
   values,
   side,
   provenance,
+  sourceFacts,
 }: {
   title: string
   /** Facts beside the title (line, caliber, product number), not repeated in the tables. */
@@ -56,6 +57,8 @@ export function RecordPage({
   /** The side column: coefficients, notes. */
   side?: ReactNode | undefined
   provenance: Provenance
+  /** Over the sources table: facts of the record's standard (the cartridge record's table, date, country and method). */
+  sourceFacts?: ReactNode
 }) {
   const { t } = useTranslation()
   const facts = badges.map((b) => say(t, b))
@@ -101,6 +104,7 @@ export function RecordPage({
           title={t('Sources ({kind})', { kind: t(provenanceKinds[provenance.kind]) })}
           className="record-sources"
         >
+          {sourceFacts}
           <Sources provenance={provenance} />
         </Panel>
       </div>

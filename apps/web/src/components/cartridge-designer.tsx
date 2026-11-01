@@ -50,7 +50,7 @@ import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { EmptyNote, Loading } from './states.tsx'
-import { useFieldUnits } from './units-settings.tsx'
+import { UnitsIconButton, useFieldUnits } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
 import { Workspace } from './workspace.tsx'
 
@@ -474,16 +474,18 @@ export function CartridgeDesigner() {
   // New bullet or cartridge starts a new record
 
   const toolbar = (
+    <DesignerToolbar
+      undo={history.past.length > 0}
+      redo={history.future.length > 0}
+      reset={design.origin !== undefined}
+      newLabel={t('New cartridge')}
+      resetLabel={t('Reset to record')}
+      system={system}
+      dispatch={toolbarDispatch}
+    />
+  )
+  const actions = (
     <>
-      <DesignerToolbar
-        undo={history.past.length > 0}
-        redo={history.future.length > 0}
-        reset={design.origin !== undefined}
-        newLabel={t('New cartridge')}
-        resetLabel={t('Reset to record')}
-        system={system}
-        dispatch={toolbarDispatch}
-      />
       <FileMenu
         ref={fileMenu}
         kind="cartridge"
@@ -493,6 +495,7 @@ export function CartridgeDesigner() {
         onOpen={openFile}
         reportBox={t('Include the design')}
       />
+      <UnitsIconButton />
     </>
   )
 
@@ -584,7 +587,7 @@ export function CartridgeDesigner() {
 
   return (
     <>
-      <PageBar title={msg('Cartridge designer')} translated actions={toolbar} />
+      <PageBar title={msg('Cartridge designer')} translated fold={toolbar} actions={actions} />
       <div className="designer">
         {/* outside the tabs: the results panel is hidden on the phone Inputs tab */}
         <p role="status" className="status visually-hidden">

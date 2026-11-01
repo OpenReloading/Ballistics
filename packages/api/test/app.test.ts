@@ -364,11 +364,32 @@ describe('GET /powders and /bullets', () => {
       pressureExponent: 1,
       referencePressure: { value: 0.980665 },
       burnForm: { kind: 'twoStage', a: { value: 0 }, m: 0.5, q: 0.5, z1: 0.8 },
+      trainingRows: 153,
+      trainingCartridges: 4,
+    }
+    const provenance = {
+      kind: 'fitted',
+      sources: [
+        { title: 'Table A', kind: 'fitted', fields: ['interior'], retrieved: '2026-10-11' },
+        {
+          title: 'Table B',
+          kind: 'fitted',
+          fields: ['interior.vivacity'],
+          retrieved: '2026-10-12',
+        },
+        { title: 'Data sheet', kind: 'published', fields: ['name'], retrieved: '2026-10-30' },
+      ],
     }
     await otherApi.load({
       ...bundle,
       powders: [
-        { ...bundle.powders[0], grainForm: 'ball', propellantBase: 'double', interior },
+        {
+          ...bundle.powders[0],
+          grainForm: 'ball',
+          propellantBase: 'double',
+          interior,
+          provenance,
+        },
         bundle.powders[1],
       ] as Bundle['powders'],
     })
@@ -379,12 +400,15 @@ describe('GET /powders and /bullets', () => {
       name: 'Fast',
       grainForm: 'ball',
       propellantBase: 'double',
-      // only what the burn-rate curve needs
+      // what the burn-rate curve needs and what the fit rests on, read on the latest fitted source's day
       interior: {
         vivacity: interior.vivacity,
         pressureExponent: 1,
         referencePressure: interior.referencePressure,
         burnForm: interior.burnForm,
+        trainingRows: 153,
+        trainingCartridges: 4,
+        retrieved: '2026-10-12',
       },
     })
     expect(slow).toEqual({ id: 'example-b-slow', manufacturer: 'example-b', name: 'Slow' })
@@ -441,7 +465,7 @@ describe('GET /powders and /bullets', () => {
     })
   })
 
-  it('lists the country of a bullet and a powder and the tip type of a bullet', async () => {
+  it('lists the country of a bullet and a powder and the tip, base and lead-free of a bullet', async () => {
     await otherApi.load({
       ...bundle,
       powders: [{ ...bundle.powders[0], country: 'FI' }, bundle.powders[1]] as Bundle['powders'],
@@ -450,12 +474,22 @@ describe('GET /powders and /bullets', () => {
           ...defined(bundle.bullets[0]),
           country: 'US',
           tip: { type: 'hollow-point' },
+          base: { type: 'boat-tail' },
           construction: { raw: 'Jacketed Lead', core: { material: 'lead' }, jacket: {} },
         },
         {
           ...defined(bundle.bullets[0]),
           id: 'bonded-1',
           construction: { raw: 'Bonded Soft Point', structure: 'bonded' },
+        },
+        {
+          ...defined(bundle.bullets[0]),
+          id: 'copper-1',
+          construction: {
+            raw: 'Monolithic Copper',
+            structure: 'monolithic',
+            core: { material: 'copper' },
+          },
         },
         { ...defined(bundle.bullets[0]), id: 'plain-1' },
       ] as Bundle['bullets'],
@@ -468,10 +502,15 @@ describe('GET /powders and /bullets', () => {
     expect(byId('example-a-1')).toMatchObject({
       country: 'US',
       tipType: 'hollow-point',
+      baseType: 'boat-tail',
       construction: 'lead-core',
+      leadFree: false,
     })
     expect(byId('bonded-1').construction).toBe('bonded')
+    expect(byId('bonded-1')).not.toHaveProperty('leadFree')
+    expect(byId('copper-1')).toMatchObject({ construction: 'monolithic', leadFree: true })
     expect(byId('plain-1')).not.toHaveProperty('construction')
+    expect(byId('plain-1')).not.toHaveProperty('baseType')
   })
 
   it('pages bullets with the same manufacturer and name by id', async () => {

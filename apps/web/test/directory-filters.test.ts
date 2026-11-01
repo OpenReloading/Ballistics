@@ -1,10 +1,6 @@
 import { expect, it } from 'vitest'
-import {
-  type BulletItem,
-  bulletSearchText,
-  packBullets,
-  unpackBullets,
-} from '../src/lib/bullet-rows.ts'
+import { packBullets, unpackBullets } from '../src/lib/bullet-list-data.ts'
+import { type BulletItem, bulletSearchText } from '../src/lib/bullet-rows.ts'
 import { orderPowders } from '../src/lib/burn-rate.ts'
 import { type CartridgeRow, packCartridges, unpackCartridges } from '../src/lib/cartridge-rows.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
