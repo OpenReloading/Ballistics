@@ -46,6 +46,8 @@ test('the keyboard finds, highlights and chooses a bullet', async ({ page }) => 
   await box(page).fill('demo')
   await expect(options).toHaveCount(2)
   await page.keyboard.press('ArrowDown')
+  // Enter chooses the highlighted option: only once ArrowDown has moved the highlight
+  await expect(options.nth(1)).toHaveAttribute('aria-selected', 'true')
   await page.keyboard.press('Enter')
   await expect(dialog(page)).toBeHidden()
   await expect(loadForm(page).getByRole('combobox', { name: /^Search bullets/ })).toHaveAttribute(
