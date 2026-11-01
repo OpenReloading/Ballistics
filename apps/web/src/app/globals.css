@@ -3922,6 +3922,8 @@ main .library-head.page-panel-head > .page-panel-title {
      beside the burn-rate figure */
   .workbench .readouts > .readout-wide {
     grid-template-columns: max-content max-content minmax(0, 1fr);
+    /* the range never runs into the unit of the value ("40919 psi38368 bis 43679") */
+    column-gap: 0.5rem;
   }
 
   .workbench .readouts > .readout-wide dd.readout-note {
@@ -5578,12 +5580,24 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .panel-head:has(> .lot-field) > .search {
-    min-width: 4rem;
+    flex: 1 1 0;
+    min-width: 3.5rem;
   }
 
-  /* what the icon, the search's least width, the lot, the menu and the four gaps leave */
+  /* a longer title (German "Treibladungspulver") takes its room from the lot and the search first:
+     they shrink to their least widths, the title ends in an ellipsis only after that */
+  .workbench .panel-head > .lot-field {
+    flex-shrink: 100;
+    min-width: 3.25rem;
+  }
+
+  .workbench .panel-head > .mantine-ActionIcon-root {
+    flex-shrink: 0;
+  }
+
   .workbench .panel-head:has(> .lot-field) > .panel-title {
-    max-width: calc(100% - 1.125rem - 4rem - 4.5rem - var(--field-height) - 4 * 0.375rem);
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
