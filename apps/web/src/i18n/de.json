@@ -11,6 +11,8 @@
   "Form a (moved by the fit)": "Form a (von der Anpassung verschoben)",
   "Ingredient {n}": "Bestandteil {n}",
   "Set Values came about by to Fitted to data.": "Setzen Sie Herkunft der Werte auf An Daten angepasst.",
+  "Add a source that gives the country.": "Fügen Sie eine Quelle hinzu, die das Land angibt.",
+  "Add a source that gives the cartridges the powder is listed for.": "Fügen Sie eine Quelle hinzu, die die Patronen angibt, für die das Treibladungspulver gelistet ist.",
   "Slower ({unit})": "Langsamer ({unit})",
   "Specific energy (moved by the fit)": "Spezifische Energie (von der Anpassung verschoben)",
   "Still needed for a powder record": "Für den Datensatz des Treibladungspulvers fehlt noch",
