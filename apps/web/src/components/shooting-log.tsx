@@ -680,21 +680,28 @@ function useLogFilter(data: LogData | undefined, t: Translator['t']) {
 function useLogData() {
   const [data, setData] = useState<LogData>()
   const [readError, setReadError] = useState('')
+  // whether `data` is a read's answer: the empty stand-in after a failure stays one during a retry
+  const [read, setRead] = useState(false)
   const reads = useRef(0)
   const refresh = useCallback(() => {
-    const read = ++reads.current
+    const current = ++reads.current
     setReadError('')
     readLog().then(
-      (d) => read === reads.current && setData(d),
+      (d) => {
+        if (current !== reads.current) return
+        setData(d)
+        setRead(true)
+      },
       (e) => {
-        if (read !== reads.current) return
+        if (current !== reads.current) return
         setData({ records: [], entries: [], firearms: [], loads: [] })
+        setRead(false)
         setReadError(errorText(e))
       },
     )
   }, [])
   useEffect(refresh, [refresh])
-  return { data, readError, refresh }
+  return { data, read, readError, refresh }
 }
 
 type Editing = { id: string; entry: ShootingLogEntry; isNew: boolean }
@@ -795,7 +802,7 @@ function LogBody({
 export function ShootingLog() {
   const tr = useTranslation()
   const { t } = tr
-  const { data, readError, refresh } = useLogData()
+  const { data, read, readError, refresh } = useLogData()
   const [failure, setFailure] = useState('')
   const [note, setNote] = useState('')
   /** The entry in the form and its record id; undefined while no form is open. */
@@ -968,8 +975,8 @@ export function ShootingLog() {
           />
         </section>
       </div>
-      {/* after a failed read the records are an empty stand-in: no summary of nothing */}
-      {data && !readError && (
+      {/* after a failed read, and while its retry runs, the records are an empty stand-in */}
+      {data && read && (
         <LogSummary
           entries={data.entries}
           records={data.records}
