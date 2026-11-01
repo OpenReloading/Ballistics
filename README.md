@@ -54,4 +54,4 @@ Reloading and shooting are done at your own risk. This software comes without wa
 
 - Code: MIT, see [LICENSE](LICENSE).
 - Data records (`packages/data/records/`): an entry with a `license` field uses that licence, an entry without one is CC BY 4.0, except data a maker published (a source with `origin` `manufacturer`), which carries no project licence (see [packages/data/LICENSE](packages/data/LICENSE)).
-- The Ballistics logo: [OpenReloading/Artwork](https://github.com/OpenReloading/Artwork) (MIT), see [NOTICE](NOTICE).
+- The Ballistics logo: from the OpenReloading Artwork repository (MIT), see [NOTICE](NOTICE).

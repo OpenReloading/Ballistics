@@ -113,7 +113,7 @@ import { nth } from '../lib/nth.ts'
 import { powderValues, recordFill } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
-import { writeTuneLoad } from '../lib/powder-tune.ts'
+import { tuneHeld, writeTuneLoad } from '../lib/powder-tune.ts'
 import {
   droppedIds,
   linkedId,
@@ -2774,7 +2774,10 @@ export function useWorkbenchState() {
     const capacity = cases.find((c) => c.id === id)?.capacity
     if (capacity) return openCapacity(capacity, `catalogue:${cartridgeId}`, true)
     // a group without a measured capacity leaves none of the previous group's in the field
+    const opening = openingCapacity.current
     openingCapacity.current = undefined
+    // the opened load's capacity still loading is no longer awaited: kept in the load as not loaded
+    if (opening) lost('capacity', opening)
     if (!measuredFromGroup.current) return
     measuredFromGroup.current = false
     setMeasured({ measuredWaterCapacity: emptyStep })
@@ -3498,6 +3501,7 @@ export function useWorkbenchState() {
     loadNotes,
     sessionRefCount: sessionRefs.length,
     handOffTune,
+    tuneHeld: tuneHeld(asked),
     setSeen,
     setStepsDraft,
     setTab,

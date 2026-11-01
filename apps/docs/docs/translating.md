@@ -63,7 +63,7 @@ The German catalogue follows the term table `apps/web/src/i18n/german-terms.json
 
 A row has one of three statuses:
 
-- `verified`: one German term and its sources.
+- `verified`: one German term and its sources. `forms` lists the forms a string may write instead, for example `["Serie", "Serien"]` for a text about one series.
 - `decided`: the sources disagree. `german` holds the chosen candidate, `candidates` keeps all of them with their sources, and `decision` names the rule that chose. Changing the choice means changing `german` and `decision` and the catalogue strings that write the term; `i18n-catalogue.test.ts` fails for a string that writes a rejected candidate where the English word occurs.
 - `unverified`: no source found. The row keeps its candidate or none and the note starts "Accepted as candidate for 1.0".
 

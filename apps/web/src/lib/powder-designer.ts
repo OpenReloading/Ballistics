@@ -523,6 +523,10 @@ const ruleTexts: Record<string, Message> = {
   ),
   'needs a composition': msg('Add at least one ingredient.'),
   'needs a fitted source': msg('Set Values came about by to Fitted to data.'),
+  'needs a source with fields country': msg('Add a source that gives the country.'),
+  'needs a source with fields listedCartridges': msg(
+    'Add a source that gives the cartridges the powder is listed for.',
+  ),
 }
 
 /** The name of the place of an issue at `path`, in the words of the form. */
@@ -594,6 +598,8 @@ const sectionLabels: Record<string, Message> = {
   interior: msg('Burn law'),
   aliases: msg('Aliases'),
   bulkDensity: msg('Bulk density'),
+  country: msg('Country'),
+  listedCartridges: msg('Cartridges'),
 }
 
 /**
