@@ -8,6 +8,8 @@ import { type Part, workbookParts, zip } from './xlsx.ts'
 const main = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 const rel = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
 const sheet = 'xl/worksheets/sheet1.xml'
+/** Tests that read parts near the size limit: a few seconds on a desktop, over 5 s in CI's coverage run. */
+const slow = { timeout: 30_000 }
 const ws = (data: string, root = 'worksheet') =>
   `<${root} xmlns="${main}"><sheetData>${data}</sheetData></${root}>`
 
@@ -147,7 +149,7 @@ describe('readWorkbook parts', () => {
   })
 })
 
-describe('readWorkbook limits', () => {
+describe('readWorkbook limits', slow, () => {
   it('counts cells left out before a reference across all worksheets', async () => {
     const half = ws('<row><c r="IV1"/></row>'.repeat(Math.ceil(maxCells / 512)))
     const parts = workbookParts([
@@ -293,7 +295,7 @@ const letters = (column: number): string =>
     ? letters(Math.floor((column - 1) / 26)) + letters(((column - 1) % 26) + 1)
     : String.fromCharCode(64 + column)
 
-describe('readWorkbook in one pass', () => {
+describe('readWorkbook in one pass', slow, () => {
   it('returns the rows of the tree reader on generated worksheets', async () => {
     const random = mulberry32(40)
     for (let k = 0; k < 200; k++) {

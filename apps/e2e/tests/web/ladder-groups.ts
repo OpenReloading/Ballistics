@@ -24,12 +24,12 @@ const stored = (page: Page, kind: string) =>
     const db: IDBDatabase = await new Promise((ok, no) => {
       const r = indexedDB.open('openreloading-user-data')
       r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
+      r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
     })
     const all: { kind: string; id: string }[] = await new Promise((ok, no) => {
       const r = db.transaction('records').objectStore('records').getAll()
       r.onsuccess = () => ok(r.result)
-      r.onerror = () => no(r.error)
+      r.onerror = () => no(r.error ?? new Error('IndexedDB request failed'))
     })
     db.close()
     return all.filter((r) => r.kind === kind)

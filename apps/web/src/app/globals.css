@@ -6956,6 +6956,14 @@ main .record-sources .sources tbody th {
   .record-sources {
     grid-area: sources;
   }
+
+  /* a record without a figure (case, primer): the values across the page */
+  .plain-record .record-grid {
+    grid-template-areas:
+      "values values"
+      "side side"
+      "sources sources";
+  }
 }
 
 /* the target face record: the face drawn across its panel up to 28rem, printed at 120 mm; the
@@ -7572,8 +7580,8 @@ main .field-table tr.field-group > th {
   .cartridge-sides {
     --drawing-chrome: 16.25rem;
 
-    /* the chamber's table has a column more: its panel a little wider, both drawings keep their width */
-    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+    /* the chamber's table is a little wider (its clearances): its panel too, both drawings keep their width */
+    grid-template-columns: minmax(0, 0.985fr) minmax(0, 1.015fr);
   }
 
   /* a side without a drawing takes the width of its table */
@@ -7594,10 +7602,25 @@ main .field-table tr.field-group > th {
     justify-content: center;
   }
 
-  /* the table is the scroll box once the panel would pass the window's foot */
+  /* the table is the scroll box once the panel would pass the window's foot, with a scrollbar
+     that stays (an overlay scrollbar shows nothing until scrolled) */
   .side-body > .scroll {
     max-height: calc(100svh - 14.75rem);
     overflow: auto;
+  }
+
+  .side-body > .scroll::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  .side-body > .scroll::-webkit-scrollbar-thumb {
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--muted) 55%, transparent);
+  }
+
+  .side-body > .scroll::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--muted) 12%, transparent);
   }
 
   .has-variants .side-body > .scroll {
@@ -7756,18 +7779,53 @@ main .field-table tr.field-group > th {
   font-weight: 400;
 }
 
-.fact .countries {
+/* a cartridge fact label with its meaning on hover (Pmax, M, EE): dotted, as a value with notes */
+.cartridge-record .fact dt .field-note {
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 0.2em;
+}
+
+/* the cartridge record's link to its fitting bullets: the last item of the fact row */
+.fact-link {
+  display: flex;
+  align-items: center;
+}
+
+/* the standard of a cartridge record over its sources: Table, date, country, method in one line */
+.standard-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.standard-facts > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.standard-facts dt {
+  font-weight: 600;
+}
+
+.standard-facts dd {
+  margin: 0;
+  color: var(--mantine-color-text);
+}
+
+:is(.fact, .standard-facts) .countries {
   display: inline-flex;
   gap: 0.75rem;
 }
 
-.fact .country {
+:is(.fact, .standard-facts) .country {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
 }
 
-.fact .flag {
+:is(.fact, .standard-facts) .flag {
   width: auto;
   height: 0.875em;
   box-shadow: 0 0 0 1px var(--border);
@@ -8338,6 +8396,12 @@ main .field-table tr.field-group > th {
   .message-slot {
     height: 4.5rem;
   }
+}
+
+/* the photograph tool before a photograph: no reserved room, the slot grows with a message */
+.bullet-photo [data-idle="true"] > .message-slot {
+  height: auto;
+  margin: 0;
 }
 
 /* forced colours drop the selected segment's fill (the indicator, and the label's ::before until the
@@ -10346,6 +10410,11 @@ main .page-bar h1 {
     height: 0.8125rem;
   }
 
+  /* the Tour button fills its row, so the unseen dot sits on its corner */
+  .page-bar:not([data-single]) .page-bar-actions > .mantine-Indicator-root > .mantine-Button-root {
+    flex: 1;
+  }
+
   .page-bar-actions .save-group > :first-child {
     flex: 1;
   }
@@ -10579,16 +10648,16 @@ main .page-bar h1 {
   border-bottom: 1px solid var(--border);
 }
 
-/* the rows picked for Compare, also those a filter hides: chips in the bar's status
-   line after the count. They keep their width; those that do not fit the slot are hidden (still
-   measured) and "n selected" with a popover stands in, so a pick moves nothing */
-.page-bar-status:has(.picked-slot) {
-  display: flex;
+/* the rows picked for Compare, also those a filter hides: "2 selected (max 4)" and Clear in the
+   bar's status line after the count, one line whatever is picked */
+.selection-summary {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  vertical-align: middle;
 }
 
-.page-bar-status:has(.picked-slot) > :is(span, .clear-picks) {
+.selection-summary > * {
   flex: none;
 }
 
@@ -10597,81 +10666,54 @@ main .page-bar h1 {
   outline-offset: -2px;
 }
 
-/* a phone's status line is 150 px: while rows are picked, the chip that opens the picks has it and
-   the count steps aside, still read by screen readers */
+/* Compare keeps the width of its widest label ("Compare 4"): the stacked labels share one cell */
+.compare-label {
+  display: inline-grid;
+}
+
+.compare-label > span {
+  grid-area: 1 / 1;
+}
+
+.compare-label > span + span {
+  visibility: hidden;
+}
+
+/* a phone's status line is 150 px: while rows are picked, the summary has it and the count steps
+   aside, still read by screen readers; Clear is its icon */
 @media screen and (max-width: 47.99em) {
-  /* the icon alone, and only while the chips are listed: the chip that opens the picks holds
-     Clear selection in its popover */
-  .clear-picks .clear-picks-text,
-  .picked-slot[data-over] + .clear-picks {
+  .clear-picks .clear-picks-text {
     display: none;
+  }
+
+  /* the line has the height of Clear (a 24 px target) also without picks, so a pick moves nothing */
+  .page-bar-status:has(> .selection-summary) {
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  .page-bar-status .clear-picks {
+    height: 1.5rem;
+    min-height: 0;
   }
 
   .clear-picks .mantine-Button-section {
     margin-inline-end: 0;
   }
 
-  .page-bar-status:has(.picked-slot) > span:first-child {
+  /* after the count (margin from the rule of the status line's parts), which steps aside */
+  .page-bar-status > .bar-count + .selection-summary {
+    margin-inline-start: 0;
+  }
+
+  .page-bar-status:has(> .selection-summary[data-picked]) > .bar-count {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
   }
-}
-
-.picked-slot {
-  position: relative;
-  display: flex;
-  flex: 1 1 0;
-  align-items: center;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.picked-slot[data-over] {
-  flex: none;
-}
-
-.picked-slot[data-over] > .picked-chips {
-  position: absolute;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.picked-chips,
-.picked-list {
-  display: flex;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.picked-chips {
-  flex: none;
-}
-
-.picked-list {
-  flex-direction: column;
-}
-
-:is(.picked-chips, .picked-list) li {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 0.125rem;
-  max-width: 20rem;
-  padding: 0 0.125rem 0 0.5rem;
-  border: 1px solid var(--border);
-  color: var(--fg);
-  font-size: var(--mantine-font-size-xs);
-}
-
-:is(.picked-chips, .picked-list) span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .directory-table {
@@ -10856,11 +10898,6 @@ main .page-bar h1 {
   text-decoration: underline dotted var(--muted);
 }
 
-.bc-model {
-  color: var(--muted);
-  font-size: var(--mantine-font-size-xs);
-}
-
 /* a group of rows ends: the heavier rule of the record's tables (the browser's own rows end before
    the catalogue's) */
 .directory-table tr[data-break] > td {
@@ -10919,8 +10956,8 @@ main .page-bar h1 {
   font-weight: 400;
 }
 
-/* a wide window: the name keeps a column of 32 rem and the filler column takes the rest, so the
-   values stay within reach of the name they belong to (1920 px: 1000 px of name column before) */
+/* the name column takes the width the others leave, also in a wide window, so the value columns
+   stay together at the table's end and no empty band is left beside them */
 .directory-scroll {
   container-type: inline-size;
   /* a row focused from below does not stop under the sticky head (2.5rem) */
@@ -10962,16 +10999,6 @@ main .page-bar h1 {
     .directory-table :is(.rate-ticks, .rate-cell svg) {
       display: none;
     }
-  }
-}
-
-@container (min-width: 90rem) {
-  .directory-table col.name-cell {
-    width: 32rem;
-  }
-
-  .directory-table col.filler {
-    width: auto;
   }
 }
 
@@ -11234,8 +11261,7 @@ main .page-bar h1 {
 
 @media print {
   .directory-table .select-cell,
-  .page-bar .selection-count,
-  .picked-slot {
+  .page-bar .selection-summary {
     display: none;
   }
 }
@@ -11475,18 +11501,12 @@ main .page-panel-head > .page-panel-title {
   height: 0.8125rem;
 }
 
-/* the cartridge record's link to its bullets: under the two sides; not printed, the sheet keeps
-   the drawings and tables */
+/* the cartridge record's link to its bullets, in the fact row: not printed, the sheet keeps the
+   drawings and tables */
 @media print {
   .cartridge-bullets {
     display: none;
   }
-}
-
-/* the cartridge record's link to its bullets, under the two sides */
-.cartridge-record .record-side {
-  margin-top: var(--panel-gap);
-  font-size: var(--mantine-font-size-sm);
 }
 
 /* a record without values: the one line where the panels would be */
@@ -11653,6 +11673,24 @@ main .cartridge-values .dim-slot {
 
 main .cartridge-values .clearance {
   cursor: help;
+}
+
+/* the head of the tolerance column: as narrow as its slot, the words wrap */
+main .cartridge-values th.dim-slot-cell {
+  white-space: normal;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
+main .cartridge-values td.dim-slot-cell {
+  padding-left: 0;
+}
+
+/* a word per line where the head is longer than its slot: the column keeps the slot's width */
+.dim-slot-head {
+  display: inline-block;
+  width: min-content;
 }
 
 /* the groups are one tbody each (named for a screen reader): a heavier rule above the next group */
@@ -12143,6 +12181,14 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     display: block;
     width: 210mm;
     height: 297mm;
+  }
+}
+
+/* from 75em a tour's target taller than the window scrolls to its top below the fixed top bar (56 px),
+   with room for the stage's 10 px and 8 px more, so the popover beside it starts below the bar too */
+@media screen and (min-width: 75em) {
+  html:has(> body.driver-active) {
+    scroll-padding-top: 4.625rem;
   }
 }
 

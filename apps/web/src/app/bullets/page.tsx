@@ -5,7 +5,7 @@ import { PageBar } from '../../components/page-bar.tsx'
 import { ListLoading, ServerDataError } from '../../components/states.tsx'
 import { listAllBullets, listAllCartridges, listManufacturers } from '../../lib/api.ts'
 import { fitOf, summaryFitSource } from '../../lib/bullet-fit.ts'
-import { packBullets } from '../../lib/bullet-rows.ts'
+import { packBullets } from '../../lib/bullet-list-data.ts'
 import { listTitles } from '../../lib/list-titles.ts'
 import {
   manufacturerAliases,

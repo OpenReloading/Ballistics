@@ -11,6 +11,8 @@ import {
   pressureStripValues,
   rowGroups,
   sideHint,
+  signedLength,
+  specValueText,
   symbolText,
   toleranceText,
   variantMatrix,
@@ -217,6 +219,32 @@ describe('toleranceText', () => {
       '−0.2',
     )
     expect(r1 && toleranceText(r1, resolveUnits({ preset: 'us', overrides: {} }))).toBe('min')
+  })
+})
+
+describe('signedLength', () => {
+  const us = resolveUnits({ preset: 'us', overrides: {} })
+  const metric = resolveUnits({ preset: 'metric-grains', overrides: {} })
+
+  it('signs every difference, a zero as ±0 in the column decimals', () => {
+    expect(signedLength(0.26, us)).toBe('+.0102')
+    expect(signedLength(-0.02, metric)).toBe('−0.02')
+    expect(signedLength(0, us)).toBe('±.0000')
+    expect(signedLength(0, metric)).toBe('±0.00')
+    expect(signedLength(19.15 - 19.15, us)).toBe('±.0000')
+    // below the decimals shown (inches), the sign stays: a negative clearance is a conflict
+    expect(signedLength(-0.001, us)).toBe('−.0000')
+    expect(signedLength(0.001, us)).toBe('+.0000')
+  })
+})
+
+describe('specValueText of an angle', () => {
+  const us = resolveUnits({ preset: 'us', overrides: {} })
+
+  it('gives 2 decimals at most', () => {
+    expect(specValueText('angle', 71.43305555555555, us)).toBe('71.43°')
+    expect(specValueText('angle', 1.9658333333333333, us)).toBe('1.97°')
+    expect(specValueText('angle', 180, us)).toBe('180°')
   })
 })
 

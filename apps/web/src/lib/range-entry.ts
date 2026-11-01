@@ -27,6 +27,61 @@ export interface RangeStep {
   charge: number | undefined
 }
 
+/** The references of a load the range page names, by the API kind of their records. */
+export type ComponentKind = 'cartridges' | 'bullets' | 'powders' | 'primers' | 'manufacturers'
+
+/** The record references of `load` to name, by kind; a described bullet or powder names its manufacturer. */
+export function componentRefs(load: Load): [ComponentKind, string][] {
+  const { bullet, powder } = load
+  const refs: [ComponentKind, string | undefined][] = [
+    ['cartridges', load.cartridge],
+    ['bullets', typeof bullet === 'string' ? bullet : undefined],
+    ['powders', typeof powder === 'string' ? powder : undefined],
+    ['primers', load.primer?.record],
+    ['manufacturers', typeof bullet === 'object' ? bullet.manufacturer : undefined],
+    ['manufacturers', typeof powder === 'object' ? powder.manufacturer : undefined],
+  ]
+  return refs.flatMap(([kind, ref]) => (ref ? [[kind, ref] as [ComponentKind, string]] : []))
+}
+
+/**
+ * The load in two lines: the cartridge and the bullet, then the powder with the charge, the primer
+ * and the COAL (or CBTO) where the load has them. A reference without a known name (`nameOf`) is
+ * left out; a described bullet or powder comes with its manufacturer's name where that is known.
+ */
+export function loadSummary(
+  load: Load,
+  nameOf: (kind: ComponentKind, ref: string) => string | undefined,
+  system: UnitSystem,
+  t: Translator['t'],
+): string[] {
+  const named = (kind: ComponentKind, ref: string | undefined) =>
+    ref ? nameOf(kind, ref) : undefined
+  const made = (manufacturer: string, product: string) =>
+    [named('manufacturers', manufacturer), product].filter(Boolean).join(' ')
+  const { bullet: b, powder: p, seating } = load
+  const bullet =
+    typeof b === 'object'
+      ? made(
+          b.manufacturer,
+          `${b.model} ${withUnit('mass', system, toSi('mass', b.bulletMass.value))}`,
+        )
+      : named('bullets', b)
+  const powder = typeof p === 'object' ? made(p.manufacturer, p.name) : named('powders', p)
+  const charge = load.charge && withUnit('charge', system, toSi('mass', load.charge.value))
+  const seated = seating && withUnit('length', system, toSi('length', seating.value.value))
+  const length =
+    seated &&
+    (seating?.by === 'overallLength'
+      ? t('COAL {coal}', { coal: seated })
+      : t('CBTO {cbto}', { cbto: seated }))
+  const lines = [
+    [named('cartridges', load.cartridge), bullet],
+    [[powder, charge].filter(Boolean).join(' '), named('primers', load.primer?.record), length],
+  ]
+  return lines.map((parts) => parts.filter(Boolean).join(', ')).filter(Boolean)
+}
+
 /** The charge ladder of `load` as steps, lowest first; a load without a usable ladder has one step. */
 export function rangeSteps(load: Load): RangeStep[] {
   const charge = load.charge?.value
