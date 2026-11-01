@@ -75,8 +75,15 @@ export function formatRecord(json: unknown) {
       'format',
       '--stdin-file-path=packages/data/records/loads/merged.json',
     ],
-    { cwd: repository, input: JSON.stringify(json, null, 2), encoding: 'utf8' },
+    {
+      cwd: repository,
+      input: JSON.stringify(json, null, 2),
+      encoding: 'utf8',
+      // a record's loads are not capped: room beyond the default 1 MiB of output
+      maxBuffer: 256 * 1024 * 1024,
+    },
   )
+  if (run.error) throw new Error(`biome format failed: ${run.error.message}`)
   if (run.status !== 0) throw new Error(`biome format failed: ${run.stderr}`)
   return run.stdout.endsWith('\n') ? run.stdout : `${run.stdout}\n`
 }
