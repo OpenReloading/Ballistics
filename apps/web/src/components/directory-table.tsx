@@ -211,6 +211,7 @@ const printedLines: Record<ListNoun, Message> = {
   faces: msg('Printed: the first {limit} of {total} targets in this selection.'),
   federations: msg('Printed: the first {limit} of {total} federations in this selection.'),
   firearms: msg('Printed: the first {limit} of {total} firearms in this selection.'),
+  'log entries': msg('Printed: the first {limit} of {total} entries in this selection.'),
   powders: msg('Printed: the first {limit} of {total} powders in this selection.'),
   primers: msg('Printed: the first {limit} of {total} primers in this selection.'),
 }

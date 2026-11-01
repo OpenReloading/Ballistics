@@ -4058,5 +4058,76 @@
   "G7": "G7",
   "Pick 2 to {max}": "2 bis {max} auswählen",
   "Sectional density, computed: mass over diameter squared.": "Querschnittsbelastung, berechnet: Masse durch Durchmesser im Quadrat.",
-  "The manufacturer's first published BC of this drag model.": "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
+  "The manufacturer's first published BC of this drag model.": "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells.",
+  "{added} entries added, {equal} already in this browser, {replaced} replaced.": "{added} Einträge hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt.",
+  "{count} entry of the file differs from the one in this browser. Replace it?|{count} entries of the file differ from the ones in this browser. Replace them?": {
+    "one": "{count} Eintrag der Datei weicht von dem in diesem Browser ab. Ersetzen?",
+    "other": "{count} Einträge der Datei weichen von denen in diesem Browser ab. Ersetzen?"
+  },
+  "{count} entry|{count} entries": {
+    "one": "{count} Eintrag",
+    "other": "{count} Einträge"
+  },
+  "{count} record of another kind left out; Import of a File menu reads it.|{count} records of other kinds left out; Import of a File menu reads them.": {
+    "one": "{count} Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.",
+    "other": "{count} Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie."
+  },
+  "{from} to {to}": "{from} bis {to}",
+  "{name} has no round count; set one on the Firearms page to add the log to it.": "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um das Schießbuch hinzuzurechnen.",
+  "{shown} of {count} entry|{shown} of {count} entries": {
+    "one": "{shown} von {count} Eintrag",
+    "other": "{shown} von {count} Einträgen"
+  },
+  "Add {count} round of this entry to the round count of {name}?|Add {count} rounds of this entry to the round count of {name}?": {
+    "one": "{count} Schuss dieses Eintrags zur Schusszahl von {name} hinzufügen?",
+    "other": "{count} Schuss dieses Eintrags zur Schusszahl von {name} hinzufügen?"
+  },
+  "All entries": "Alle Einträge",
+  "All firearms": "Alle Schusswaffen",
+  "All years": "Alle Jahre",
+  "As you write it, such as rings or a placing.": "So, wie Sie es schreiben, etwa Ringe oder eine Platzierung.",
+  "Confirmed by": "Bestätigt von",
+  "Confirmed on": "Bestätigt am",
+  "Edit": "Bearbeiten",
+  "Edit entry": "Eintrag bearbeiten",
+  "Entries": "Einträge",
+  "Factory ammunition": "Fabrikmunition",
+  "firearm {name}": "Schusswaffe {name}",
+  "Import JSON": "JSON importieren",
+  "Load or ammunition": "Laborierung oder Munition",
+  "Maker and product, when no saved load was fired.": "Hersteller und Produkt, wenn keine gespeicherte Laborierung verschossen wurde.",
+  "New entry": "Neuer Eintrag",
+  "No discipline found": "Keine Disziplin gefunden",
+  "No entries match these filters.": "Keine Einträge passen zu diesen Filtern.",
+  "No entry shown to export or print.": "Kein Eintrag angezeigt, der exportiert oder gedruckt werden kann.",
+  "No entry yet. New entry adds the first range day.": "Noch kein Eintrag. Neuer Eintrag legt den ersten Schießtag an.",
+  "No firearm saved in this browser yet": "Noch keine Schusswaffe in diesem Browser gespeichert",
+  "Not imported: {reason}": "Nicht importiert: {reason}",
+  "Not in this browser": "Nicht in diesem Browser",
+  "Place": "Ort",
+  "Print the entries shown": "Die angezeigten Einträge drucken",
+  "Printed: the first {limit} of {total} entries in this selection.": "Gedruckt: die ersten {limit} von {total} Einträgen dieser Auswahl.",
+  "Replace entries?": "Einträge ersetzen?",
+  "Save entry": "Eintrag speichern",
+  "Shooting log": "Schießbuch",
+  "shooting log entries": "Schießbuch-Einträge",
+  "Shooting log entries in this browser": "Schießbuch-Einträge in diesem Browser",
+  "Shooting log, {filters}": "Schießbuch, {filters}",
+  "Signature": "Unterschrift",
+  "Stored": "Gespeichert",
+  "The round count of {name} holds this entry already.": "Die Schusszahl von {name} enthält diesen Eintrag schon.",
+  "The round count of {name} is unchanged.": "Die Schusszahl von {name} bleibt unverändert.",
+  "The shooting log is your own record. Whether a club or an authority accepts it is up to them.": "Das Schießbuch ist Ihre eigene Aufzeichnung. Ob ein Verein oder eine Behörde es anerkennt, entscheiden diese.",
+  "Who confirmed the entry, as you type it.": "Wer den Eintrag bestätigt hat, so, wie Sie es eingeben.",
+  "Year": "Jahr",
+  "year {year}": "Jahr {year}",
+  "Year {year}": "Jahr {year}",
+  "Enter the date.": "Geben Sie das Datum ein.",
+  "Enter who confirmed the entry, or clear the day of the confirmation.": "Geben Sie ein, wer den Eintrag bestätigt hat, oder leeren Sie den Tag der Bestätigung.",
+  "Give a load or factory ammunition, not both.": "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides.",
+  "Check the entry: a value is out of its range.": "Prüfen Sie den Eintrag: Ein Wert liegt außerhalb seines Bereichs.",
+  "{count} entry not imported: a record of this browser has its id.|{count} entries not imported: records of this browser have their ids.": {
+    "one": "{count} Eintrag nicht importiert: Ein Datensatz dieses Browsers hat seine ID.",
+    "other": "{count} Einträge nicht importiert: Datensätze dieses Browsers haben ihre IDs."
+  }
 }

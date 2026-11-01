@@ -232,6 +232,44 @@ export const targetFaceDesign = z.object({
     .describe('Events shot on the face.'),
 })
 
+/**
+ * One entry of the shooting log (Schiessbuch): a range day of the person, as their own record.
+ * Whether a club or an authority accepts it is up to them; the record claims no such standing.
+ * Inferred type: {@link ShootingLogEntry}.
+ */
+export const shootingLogEntry = z
+  .strictObject({
+    date: z.iso.date().describe('Day, ISO 8601.'),
+    place: text(200).describe('Place, such as the range or club.').optional(),
+    discipline: catalogueRef('discipline').optional(),
+    firearm: userRef('firearm').optional(),
+    load: userRef('load').optional(),
+    ammunition: z
+      .string()
+      .min(1)
+      .max(200)
+      .describe('Factory ammunition as the person names it, in place of a `load`.')
+      .optional(),
+    rounds: z.int().nonnegative().max(100000).describe('Rounds fired, for the round count.'),
+    result: text(200).describe('Result as the person writes it, plain text.').optional(),
+    event: ref('event')
+      .regex(/^user:/, 'Not a user event')
+      .describe('Reference `user:<UUID>` to the competition event of the entry.')
+      .optional(),
+    notes: text(10000).describe('Notes, plain text.').optional(),
+    confirmation: z
+      .strictObject({
+        by: z.string().min(1).max(200).describe('Who confirmed the entry, as text.'),
+        date: z.iso.date().describe('Day of the confirmation, ISO 8601.').optional(),
+      })
+      .describe('Who confirmed the entry and when, as the person typed it.')
+      .optional(),
+  })
+  .refine(
+    (e) => e.load === undefined || e.ammunition === undefined,
+    'Give a load or factory ammunition, not both.',
+  )
+
 const base = {
   id: z.string().min(1).max(64).describe('Id of the record in the browser library.'),
   name: z.string().min(1).max(200).describe('Name of the record. Save names the file after it.'),
@@ -298,6 +336,12 @@ export const userRecord = z.discriminatedUnion(
       'case',
       'A group of cases of the user with their measured values.',
       cartridgeCase,
+      designId,
+    ),
+    record(
+      'shootingLogEntry',
+      "An entry of the shooting log, the person's own record.",
+      shootingLogEntry,
       designId,
     ),
   ],
@@ -411,7 +455,7 @@ export interface DanglingRef {
  * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its case, a bullet's and a firearm's `manufacturer`, a firearm's `landsBullet`, a capacity's
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a case's `cartridge`, `manufacturer` and `capacity`, a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
- * its group shots. A
+ * its group shots, and a shooting log entry's `firearm` and `load`. A
  * `user:<id>` reference names a record by its id, a
  * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
@@ -510,6 +554,11 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
         ['manufacturer', r.data.manufacturer, 'manufacturer', true],
         ['landsBullet', r.data.landsBullet, 'bullet', true],
       ]
+    case 'shootingLogEntry':
+      return [
+        ['firearm', r.data.firearm, 'firearm', true],
+        ['load', r.data.load, 'load', true],
+      ]
     default:
       return []
   }
@@ -541,13 +590,17 @@ export type UserCaseCapacity = Extract<UserRecord, { kind: 'caseCapacity' }>
 export type UserCaseRecord = Extract<UserRecord, { kind: 'case' }>
 /** A target face of the face designer: rings, inner ten, black area and events, each optional. */
 export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
+/** An entry of the shooting log: day, place, firearm, load or ammunition, rounds and result. */
+export interface ShootingLogEntry extends z.infer<typeof shootingLogEntry> {}
+/** The user record of kind `shootingLogEntry`. */
+export type ShootingLogRecord = Extract<UserRecord, { kind: 'shootingLogEntry' }>
 /** The user record of kind `session`: a chronograph session. */
 export type SessionRecord = Extract<UserRecord, { kind: 'session' }>
 /** The user record of kind `targetSheet`. */
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
 /** One record of a user data file: `kind`, id, name, save time and `data`. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `powder`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet`, `targetFaceDesign` or `case`. */
+/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `powder`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet`, `targetFaceDesign`, `case` or `shootingLogEntry`. */
 export type UserRecordKind = UserRecord['kind']
 /** A base64 photo stored in a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}
