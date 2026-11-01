@@ -7,6 +7,7 @@ import { InputError, nth, overlay, type Settings } from '../errors.ts'
 import { icao } from '../exterior/atmosphere.ts'
 import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
 import { type Burn, burnError, burnForm } from './form.ts'
+import { wornVolume } from './throat-wear.ts'
 
 /** Unchecked read of a state vector the caller sizes and indexes by the same count (kept in this module so the integrator loops inline it). */
 const el = (a: Float64Array, i: number): number => a[i] as number
@@ -20,6 +21,11 @@ export interface InteriorLoad {
     boreArea: number
     /** Bore diameter, m: heat-loss area and the default radius of gyration. */
     boreDiameter: number
+    /**
+     * Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore
+     * area to `volume` (`apps/docs/docs/models/interior-m3.md`, "Throat wear"). Default 0.
+     */
+    throatWear?: number | undefined
   }
   barrel: {
     /** Projectile travel from the seated position to the muzzle, m. */
@@ -287,6 +293,7 @@ function bodyChecks(load: InteriorLoad): Check[] {
   const t = propellant.temperatureSensitivity
   return [
     ['chamber.volume', pos(chamber.volume)],
+    ['chamber.throatWear', chamber.throatWear === undefined || nonNeg(chamber.throatWear)],
     ['chamber.boreArea', pos(chamber.boreArea)],
     ['chamber.boreDiameter', pos(chamber.boreDiameter)],
     ['barrel.length', pos(barrel.length)],
@@ -385,7 +392,7 @@ interface Run {
  */
 function scaleInteriorLoad(load: InteriorLoad) {
   const { chamber, barrel, bullet, propellant } = load
-  const vc = chamber.volume
+  const vc = wornVolume(chamber.volume, chamber.boreArea, chamber.throatWear ?? 0)
   const area = chamber.boreArea
   const d = chamber.boreDiameter
   const xe = barrel.length

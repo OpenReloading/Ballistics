@@ -237,7 +237,7 @@ export const bulletFields = [
     key: 'bulletCavityDepth',
     label: msg('Cavity depth'),
     help: msg(
-      'Measured depth of the hollow base from the base face. Empty: as deep as the opening is wide at its radius, an assumption whose range the pressure range covers.',
+      'Measured depth of the hollow base from the base face. Empty: as deep as the opening is wide at its radius, an assumption whose range widens the pressure range, by up to 20 % of the volume.',
     ),
     quantity: 'length',
     min: 0,

@@ -1,4 +1,4 @@
-import { castHarderThanPeak, loadRatio } from '@open-reloading/core'
+import { castHarderThanPeak, coldPeakInterval, loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -78,7 +78,14 @@ export type Outcome =
        * The powder record has no temperature coefficient and the run took the default of its grain
        * form; `coldPeak`: the peak breech pressure over the cold sensitivity interval, Pa, below the reference.
        */
-      sensitivityDefault?: { form: string; coldPeak?: [number, number] | undefined } | undefined
+      sensitivityDefault?:
+        | {
+            form: string
+            /** The cold sensitivity interval of the default, 1/K. */
+            coldInterval: readonly [number, number]
+            coldPeak?: [number, number] | undefined
+          }
+        | undefined
       /** The user bullet design whose mass the run used. */
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
@@ -349,14 +356,14 @@ export function resultNotes(
             : []),
         ]
       : []),
-    ...(ok.roundCount
+    ...(ok.roundCount && !ok.load.chamber.throatWear
       ? [
           {
             kind: 'note' as const,
             line: t(
               'The barrel has fired {count} rounds: the velocity may be lower than simulated.',
               {
-                count: ok.roundCount,
+                count: formatNumber(ok.roundCount, 0),
               },
             ),
             text: t(
@@ -428,10 +435,31 @@ export function stepFlag(ok: Shown, t: Translator['t']) {
   return
 }
 
-/** The outcome showing step `i`. */
+/** The default sensitivity of a run with the cold-side peak interval of the load it shows (`coldPeakInterval`). */
+export function withColdPeak(
+  d: { form: string; coldInterval: readonly [number, number] } | undefined,
+  load: InteriorBody['load'],
+): Extract<Outcome, { kind: 'ok' }>['sensitivityDefault'] {
+  return (
+    d && {
+      form: d.form,
+      coldInterval: d.coldInterval,
+      coldPeak: coldPeakInterval(load, d.coldInterval),
+    }
+  )
+}
+
+/** The outcome showing step `i`; the cold-side interval of a default sensitivity follows the step. */
 export function atStep(ok: Extract<Outcome, { kind: 'ok' }>, i: number) {
   const s = nth(ok.steps, i)
-  return { ...ok, body: s.body ?? ok.body, load: stepLoad(ok.load, s), selected: i }
+  const load = stepLoad(ok.load, s)
+  return {
+    ...ok,
+    body: s.body ?? ok.body,
+    load,
+    selected: i,
+    sensitivityDefault: withColdPeak(ok.sensitivityDefault, load),
+  }
 }
 
 /** The steps of an answer: a ladder's, or the single result as step 1. */

@@ -9,7 +9,6 @@ import {
   cartridgeBulletDiameterMm,
   cartridgeDiameters,
   cartridgeGrooveDiameterMm,
-  coldPeakInterval,
   gasVelocityFactor,
   type InteriorLoad,
   plainBaseCastHardness,
@@ -211,6 +210,7 @@ import {
   stepsOf,
   unlistedCartridge,
   warningsText,
+  withColdPeak,
 } from './workbench-outcome.ts'
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
@@ -2059,7 +2059,8 @@ export function useWorkbenchState() {
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
     ]
-    return { body, bulkDensity, resistanceMissing, recordInputs, sensitivityDefault }
+    const castHardness = plainBaseCastHardness(bulletRecord?.construction)
+    return { body, bulkDensity, resistanceMissing, recordInputs, sensitivityDefault, castHardness }
   }
 
   /**
@@ -2116,6 +2117,7 @@ export function useWorkbenchState() {
     bulkDensity: number | undefined
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
     sensitivityDefault: ReturnType<typeof loadRequest>['sensitivityDefault']
+    castHardness: number | undefined
     table: string | undefined
     gasFactorNote: string | undefined
   }) {
@@ -2136,14 +2138,11 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
-      sensitivityDefault: a.sensitivityDefault && {
-        form: a.sensitivityDefault.form,
-        coldPeak: coldPeakInterval(
-          stepLoad(body.load, nth(steps, first)),
-          a.sensitivityDefault.coldInterval,
-        ),
-      },
-      castHardness: plainBaseCastHardness(bulletRecord?.construction),
+      sensitivityDefault: withColdPeak(
+        a.sensitivityDefault,
+        stepLoad(body.load, nth(steps, first)),
+      ),
+      castHardness: a.castHardness,
       roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,

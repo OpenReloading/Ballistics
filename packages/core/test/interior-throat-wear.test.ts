@@ -30,12 +30,22 @@ describe('interiorLoad with throat wear', () => {
     ignitionPressure: 5e6,
     startPressure: 3e7,
   }
-  it('shifts the volume by the wear times the bore area, none without wear', () => {
-    expect(interiorLoad(values).chamber.volume).toBe(3.4e-6)
-    expect(interiorLoad({ ...values, throatWear: 2e-3 }).chamber.volume).toBeCloseTo(
-      3.4e-6 + 2e-3 * 4.7e-5,
-      15,
-    )
+  it('carries the wear on the chamber and leaves the case volume as it is, none without wear', () => {
+    expect(interiorLoad(values).chamber).not.toHaveProperty('throatWear')
+    const worn = interiorLoad({ ...values, throatWear: 2e-3 }).chamber
+    expect(worn.volume).toBe(3.4e-6)
+    expect(worn.throatWear).toBe(2e-3)
+  })
+  it('runs a worn throat as the same load with the wear times the bore area added to its volume', () => {
+    const load = interiorLoad({ ...values, throatWear: 2e-3 })
+    const worn = interior(load)
+    const larger = interior({
+      ...load,
+      chamber: { ...load.chamber, volume: 3.4e-6 + 2e-3 * 4.7e-5, throatWear: undefined },
+    })
+    if (!worn.valid || !larger.valid) throw new Error('invalid')
+    expect(worn.peakBreechPressure).toBeCloseTo(larger.peakBreechPressure, 0)
+    expect(worn.muzzleVelocity).toBeCloseTo(larger.muzzleVelocity, 9)
   })
   it('refuses a negative wear', () => {
     expect(() => interiorLoad({ ...values, throatWear: -1e-3 })).toThrow(/at least 0/)
@@ -85,7 +95,12 @@ describe('throat wear against Vuong et al. 2026', () => {
   })
 
   it('the measured wear lowers the velocity within 1 percentage point of the authors model', () => {
-    const [fresh, worn] = [run(1.85e-6), run(wornVolume(1.85e-6, area, wear))]
+    const fresh = run(1.85e-6)
+    const worn = interior({
+      ...load(1.85e-6),
+      chamber: { ...load(1.85e-6).chamber, throatWear: wear },
+    })
+    if (!worn.valid) throw new Error(worn.reason)
     const dv = worn.muzzleVelocity / fresh.muzzleVelocity - 1
     const dp = worn.peakBreechPressure / fresh.peakBreechPressure - 1
     expect(Math.abs(dv - vuong2026.modelChange.muzzleVelocity)).toBeLessThan(0.01)

@@ -207,6 +207,13 @@ const m3Load = z
           .describe(
             'Bore diameter, m. Sets the heat-loss area and the default radius of gyration.',
           ),
+        throatWear: z
+          .number()
+          .min(0)
+          .describe(
+            'Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Default 0.',
+          )
+          .optional(),
       })
       .describe('Chamber and bore.'),
     barrel: z

@@ -15,7 +15,7 @@ The cavity volume was varied around the default on stand-in loads with a free vo
 
 ## Formulas
 
-Cone cavity $V = \pi r_c^2 h / 3$, rounded cavity (half ellipsoid) $V = 2 \pi r_c^2 h / 3$, both textbook solids of revolution. Bracket $0.5\, r_c \le h \le 3\, r_c$. The volume tolerance of the pressure range becomes $\max(V_b - V_{b,\mathrm{low}}, V_{b,\mathrm{high}} - V_b) / V_c$ when it is above the default 1 %, at most 0.2. See [case capacity, cavity depth](../models/case-capacity.md#cavity-depth).
+Cone cavity $V = \pi r_c^2 h / 3$, rounded cavity (half ellipsoid) $V = 2 \pi r_c^2 h / 3$, both textbook solids of revolution. Bracket $0.5\, r_c \le h \le 3\, r_c$. The volume tolerance of the pressure range becomes $0.01 + \max(V_b - V_{b,\mathrm{low}}, V_{b,\mathrm{high}} - V_b) / V_c$, the default 1 % plus the cavity's move, at most 0.2. See [case capacity, cavity depth](../models/case-capacity.md#cavity-depth).
 
 ## Numbers
 
@@ -27,7 +27,7 @@ Cavity radius 3 mm: cone 0.028 cm³, hemisphere 0.057 cm³, bracket 0.014 to 0.0
 | half the depth | +3.4 % / +2.0 % | +0.6 % / +0.4 % |
 | three times the depth (+0.056 cm³) | -10.9 % / -6.9 % | -2.1 % / -1.4 % |
 
-With the bracket a 9 mm hollow-base wadcutter (opening 6 mm, 0.6 cm³ behind the bullet) gets a volume tolerance of 9.4 % instead of 1 % (`apps/web/test/cavity-range.test.ts`).
+With the bracket a 9 mm hollow-base wadcutter (opening 6 mm, 0.6 cm³ behind the bullet) gets a volume tolerance of 10.4 % instead of 1 % (`apps/web/test/cavity-range.test.ts`).
 
 ## Result
 

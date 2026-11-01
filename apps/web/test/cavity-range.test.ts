@@ -24,16 +24,20 @@ describe('cavityVolumeFraction', () => {
     const f = cavityVolumeFraction(wadcutter(), 10e-3, 0.6e-6)
     const r = 3
     const move = Math.PI * r ** 3 - (Math.PI * r ** 3) / 3
-    expect(f).toBeCloseTo(move / 1e9 / 0.6e-6, 6)
+    // the default 1 % of the capacity plus the cavity's move
+    expect(f).toBeCloseTo(0.01 + move / 1e9 / 0.6e-6, 6)
   })
 
-  it('gives none for a typed depth, a solid base or a move below the default tolerance', () => {
+  it('gives none for a typed depth, a solid base or no seating depth', () => {
     expect(cavityVolumeFraction(wadcutter(4), 10e-3, 0.6e-6)).toBeUndefined()
     expect(
       cavityVolumeFraction({ ...wadcutter(), base: { type: 'flat' } }, 10e-3, 0.6e-6),
     ).toBeUndefined()
-    // a large case: the move is below 1 % of the volume
-    expect(cavityVolumeFraction(wadcutter(), 10e-3, 10e-6)).toBeUndefined()
+    // a large case: the move adds little to the default 1 %
+    expect(cavityVolumeFraction(wadcutter(), 10e-3, 10e-6)).toBeCloseTo(
+      0.01 + (Math.PI * 18) / 1e9 / 10e-6,
+      6,
+    )
     expect(cavityVolumeFraction(wadcutter(), undefined, 0.6e-6)).toBeUndefined()
   })
 

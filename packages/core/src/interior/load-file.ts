@@ -1,7 +1,6 @@
 import { InputError, nth } from '../errors.ts'
 import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'
-import { wornVolume } from './throat-wear.ts'
 import { burnFormKeys } from './workbench-keys.ts'
 
 /**
@@ -75,12 +74,12 @@ export function interiorLoad(
       `Burn form: ${missing.map(([, n]) => n).join(', ')} needed with the others, or leave all four empty.`,
     )
   }
-  const area = boreArea({ area: values.boreArea, boreDiameter, grooveDiameter })
   return {
     chamber: {
-      volume: wornVolume(v('volume'), area, wear),
-      boreArea: area,
+      volume: v('volume'),
+      boreArea: boreArea({ area: values.boreArea, boreDiameter, grooveDiameter }),
       boreDiameter,
+      ...(wear > 0 && { throatWear: wear }),
     },
     barrel: { length: v('travel'), twist: v('twist') },
     bullet: { mass: v('bulletMass') },

@@ -141,11 +141,18 @@ describe('resultNotes', () => {
   it('marks a run on the default temperature coefficient, and gives the cold side as an interval', () => {
     const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
     const lines = (o: Ok) => resultNotes(o, [], units, english.t).map((n) => n.line)
-    expect(lines(ok({ ...plain, sensitivityDefault: { form: 'ball' } }))).toContain(
-      'Default temperature coefficient of ball powder: the powder record gives none.',
-    )
+    expect(
+      lines(ok({ ...plain, sensitivityDefault: { form: 'ball', coldInterval: [0, 0.003] } })),
+    ).toContain('Default temperature coefficient of ball powder: the powder record gives none.')
     const cold = lines(
-      ok({ ...plain, sensitivityDefault: { form: 'extruded', coldPeak: [3.1e8, 3.4e8] } }),
+      ok({
+        ...plain,
+        sensitivityDefault: {
+          form: 'extruded',
+          coldInterval: [0, 0.003],
+          coldPeak: [3.1e8, 3.4e8],
+        },
+      }),
     )
     expect(
       cold.some((l) =>
@@ -168,6 +175,10 @@ describe('resultNotes', () => {
     ])
     expect(worn(ok(plain))).toEqual([])
     expect(worn(ok({ ...plain, roundCount: 0 }))).toEqual([])
+    // a typed throat wear already carries the wear: no note
+    const typed = ok({ ...plain, roundCount: 4000 })
+    const load = { ...typed.load, chamber: { ...typed.load.chamber, throatWear: 1e-3 } }
+    expect(worn({ ...typed, load })).toEqual([])
   })
 
   it('counts the unlisted cartridge as a warning, so a result with only that one is announced', () => {

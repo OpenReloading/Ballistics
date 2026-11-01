@@ -13,9 +13,10 @@ const volumeFractionMax = 0.2
 /**
  * The volume tolerance of a run whose volume follows the seated bullet, so that the pressure range
  * reaches the cavity depth bracket of a hollow base (`apps/docs/docs/models/case-capacity.md`,
- * "Cavity depth"): the larger move of the bullet volume below the mouth over the bracket, relative
- * to the run's volume, when it is above the default; else undefined. `depth` is the seating depth,
- * `volume` the run's volume behind the bullet, both SI. A typed cavity depth has no bracket.
+ * "Cavity depth"): the default tolerance plus the larger move of the bullet volume below the mouth
+ * over the bracket, relative to the run's volume, at most the 0.2 the API takes; undefined without
+ * a bracket. `depth` is the seating depth, `volume` the run's volume behind the bullet, both SI. A
+ * typed cavity depth has no bracket.
  */
 export function cavityVolumeFraction(
   bullet: Partial<Bullet> | undefined,
@@ -31,8 +32,6 @@ export function cavityVolumeFraction(
   const nominal = revolutionVolume(outline.points, cut)
   // mm3 to m3: the cube of one mm in m
   const move = Math.max(nominal - bracket.low, bracket.high - nominal) * toSi('length', 1) ** 3
-  const fraction = move / volume
-  return fraction > pressureToleranceDefaults.volumeFraction
-    ? Math.min(fraction, volumeFractionMax)
-    : undefined
+  if (!(move > 0)) return
+  return Math.min(pressureToleranceDefaults.volumeFraction + move / volume, volumeFractionMax)
 }
