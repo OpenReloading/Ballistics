@@ -39,7 +39,7 @@ import { formatQuantity, mmLength, shownLength, type UnitSystem, withUnit } from
 import { BarrelTable } from './barrel-length.tsx'
 import type { ChargeTargetDialog } from './charge-target-dialog.tsx'
 import { FileMenu } from './file-menu.tsx'
-import { focusBack } from './focus-back.ts'
+import { focusBack, focusIfLost } from './focus-back.ts'
 import { preloadInteriorChart } from './lazy-chart.tsx'
 import { LoadSheets, printSheets } from './load-sheets.tsx'
 import { LoadTabs } from './load-tabs.tsx'
@@ -1050,7 +1050,7 @@ export function Workbench() {
     const used = startCardUsed.current
     startCardUsed.current = false
     if (used && document.activeElement === document.body)
-      focusBack('.panel[data-next] :is(input, button)', '.panel :is(input, button)')
+      focusIfLost('.panel[data-next] :is(input, button)', '.panel :is(input, button)')
   }, [fresh])
 
   const ok = outcome?.kind === 'ok' ? outcome : undefined
