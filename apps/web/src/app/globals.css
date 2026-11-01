@@ -1720,6 +1720,39 @@ td.nowrap {
   margin-bottom: 0.25rem;
 }
 
+/* a record search's list of matches over the page: its own edge and a shadow */
+.record-search-list {
+  border: 1px solid var(--border);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+/* the designers' start-from search stays at the top of the Parameters while the fields scroll, so
+   another record can be started and the design's source stays in view; the cartridge designer's
+   column head sticks under it */
+@media screen and (min-width: 48em) {
+  .designer .prop-form > .search {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin: 0;
+    padding-bottom: 0.25rem;
+    background: var(--bg);
+  }
+
+  .designer .prop-form:has(> .search) .side-head {
+    top: var(--start-search-height);
+  }
+
+  .designer .workspace-inputs:has(.prop-form > .search) {
+    scroll-padding-top: calc(var(--start-search-height) + 1.75rem);
+  }
+}
+
+:root {
+  /* the sticky start-from search: field and its status line */
+  --start-search-height: 2.75rem;
+}
+
 .designer-fieldset {
   border: 0;
   margin: 0;

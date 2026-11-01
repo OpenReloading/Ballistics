@@ -1,12 +1,20 @@
 'use client'
 
 import { type CSSProperties, memo } from 'react'
+import { useTranslation } from '../i18n/language.ts'
 import type { FieldSpec, FieldValue } from '../lib/field-spec.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { type FieldFlag, NumberField } from './number-field.tsx'
 
 /** The edit a designer field dispatches. */
 type FieldAction = { type: 'field'; key: string; value: FieldValue }
+
+/** The field's value back to that of the record the design started from. */
+type RevertAction = { type: 'revert'; key: string; system: UnitSystem }
+
+/** The `revert` of a design's fields: the designer's dispatch while the design started from a record. */
+export const revertOf = <A,>(design: { origin?: unknown }, dispatch: A) =>
+  design.origin === undefined ? undefined : dispatch
 
 /**
  * A number field of a designer's property grid: no slider (arrow keys step the value), the
@@ -23,6 +31,7 @@ export const DesignerField = memo(function DesignerField({
   error,
   unit = 'switch',
   symbol,
+  revert,
   dispatch,
 }: {
   spec: FieldSpec
@@ -40,8 +49,14 @@ export const DesignerField = memo(function DesignerField({
   unit?: 'switch' | 'text' | 'none' | undefined
   /** The drawing's symbol of the value, shown before the label; focus marks it in the drawing. */
   symbol?: string | undefined
+  /**
+   * Given while the design started from a record: a changed value's flag becomes "back to the record
+   * value", which dispatches this (the designer's dispatch, stable for the memo).
+   */
+  revert?: ((a: RevertAction) => void) | undefined
   dispatch: (a: FieldAction) => void
 }) {
+  const { t } = useTranslation()
   // the error and the help stay apart: the label's title is the help, the flag's tooltip the error
   // while it applies, and the description for screen readers says both, each as its own sentence
   const marker = error
@@ -63,6 +78,16 @@ export const DesignerField = memo(function DesignerField({
         error={!!error}
         unit={unit}
         flag={marker}
+        // the tooltip keeps the help, which names the record's value
+        action={
+          revert && changed && !error
+            ? {
+                kind: 'restore',
+                text: `${t('Back to the record value.')} ${help}`,
+                onClick: () => revert({ type: 'revert', key: spec.key, system }),
+              }
+            : undefined
+        }
         onChange={(v) => dispatch({ type: 'field', key: spec.key, value: v })}
       />
     </div>

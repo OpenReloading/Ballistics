@@ -135,3 +135,32 @@ test('the cartridge view switch sits in the Drawing header and the figure text r
   })
   expect(smallest).toBeGreaterThanOrEqual(10.9)
 })
+
+test('a changed field goes back to the record value by its own button, and the record search stays in view (#796)', async ({
+  page,
+}) => {
+  await storeUnits(page)
+  await page.setViewportSize({ width: 1280, height: 650 })
+  await gotoHydrated(page, '/bullets/designer?from=berger-30410')
+  const diameter = page.getByRole('textbox', { name: /Diameter \(mm\)$/ })
+  await expect(diameter).not.toHaveValue('')
+  const record = await diameter.inputValue()
+  await diameter.fill('7.9')
+  await diameter.blur()
+  const back = page.getByRole('button', { name: /^Back to the record value\. .*Changed/ })
+  await expect(back).toHaveCount(1)
+  await back.click()
+  await expect(diameter).toHaveValue(record)
+  await expect(back).toHaveCount(0)
+  // the whole-record reset stays in the toolbar
+  await expect(
+    page.locator('.page-bar').getByRole('button', { name: 'Reset to record' }),
+  ).toBeAttached()
+  const inputs = page.locator('.workspace-inputs')
+  await inputs.evaluate((e) => e.scrollTo(0, e.scrollHeight))
+  const search = await page.getByRole('combobox', { name: 'Start from a record' }).boundingBox()
+  const column = await inputs.boundingBox()
+  if (!(search && column)) throw new Error('no boxes')
+  expect(search.y).toBeGreaterThanOrEqual(column.y - 1)
+  expect(search.y).toBeLessThan(column.y + 80)
+})

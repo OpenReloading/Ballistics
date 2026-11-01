@@ -42,7 +42,7 @@ import { drawingLengthUnit, formatQuantity, type UnitSystem, withUnit } from '..
 import { resolveBullet } from '../lib/variants.ts'
 import { say } from '../lib/wording.ts'
 import { description } from './bullet-drawing.tsx'
-import { DesignerField } from './designer-field.tsx'
+import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
 import { FileMenu } from './file-menu.tsx'
@@ -342,6 +342,9 @@ export function BulletDesigner() {
   const message = announcement(e.refusal, changed && changedText(changed, design, t), t)
   const [announced] = useDebouncedValue(message, 500)
 
+  // a changed field of a design from a record goes back to the record's value by its own button
+  const revertTo = revertOf(design, dispatch)
+
   const errorOf = (key: string) =>
     fieldError(
       designerSpecs.find((s) => s.key === key) as DesignerSpec,
@@ -384,6 +387,7 @@ export function BulletDesigner() {
               changed={changed}
               error={errorOf(s.key)}
               symbol={bulletSymbols.find((b) => b.path === s.key)?.symbol}
+              revert={revertTo}
               dispatch={dispatch}
             />
           )

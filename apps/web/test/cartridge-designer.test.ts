@@ -257,6 +257,21 @@ describe('history', () => {
     expect(h.past).toHaveLength(3)
   })
 
+  it('reverts one field to the record value as one step, the others kept', () => {
+    const h = run(win308(), type('cartridge.L3', '52'), type('chamber.G1', '7.9'), {
+      type: 'revert',
+      key: 'cartridge.L3',
+      system: metric,
+    })
+    expect(defined(h.present.fields['cartridge.L3']).text).toBe('51.18')
+    expect(defined(h.present.fields['chamber.G1']).text).toBe('7.9')
+    expect(h.past).toHaveLength(3)
+    expect(defined(reduce(h, { type: 'undo' }).present.fields['cartridge.L3']).text).toBe('52')
+    // a design without a record has nothing to revert to
+    const blank = historyOf(newDesign())
+    expect(reduce(blank, { type: 'revert', key: 'cartridge.L3', system: metric })).toBe(blank)
+  })
+
   it('types a name as one step, keeps it through a reset and drops it for a new design', () => {
     const named = run(
       win308(),

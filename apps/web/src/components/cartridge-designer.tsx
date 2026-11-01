@@ -50,7 +50,7 @@ import { drawingLengthUnit, fixedFieldText, formatQuantity, type UnitSystem } fr
 import { resolveCartridge } from '../lib/variants.ts'
 import { verbatim } from '../lib/wording.ts'
 import { CartridgeDrawing, type View } from './cartridge-drawing.tsx'
-import { DesignerField } from './designer-field.tsx'
+import { DesignerField, revertOf } from './designer-field.tsx'
 import { DesignerToolbar } from './designer-toolbar.tsx'
 import { FieldTable } from './field-table.tsx'
 import { FileMenu } from './file-menu.tsx'
@@ -503,6 +503,7 @@ export function CartridgeDesigner() {
         error={errorOf(s)}
         // the column header names the length unit; an angle keeps its own
         unit={s.quantity === 'length' ? 'none' : 'text'}
+        revert={revertOf(design, dispatch)}
         dispatch={dispatch}
       />
     )
