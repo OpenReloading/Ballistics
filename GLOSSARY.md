@@ -574,6 +574,27 @@ A record of kind `target-mappings`: one discipline shot on one face event, with 
 `shotCount`: a number of shots: those that count on a face in a discipline (target mapping), and those behind a range string entry or chronograph reading.
 _Avoid_: `shots` (as a count), n
 
+**Event type**:
+A record of kind `event-types`: a kind of competition event of one `federation` as its `ruleBook` defines it (title, `edition`, `publisher`, `url`, `sha256`; in the file the id of its source record), with `scoring`, `levels`, `magazine` and `movingTargets`.
+_Avoid_: match type, competition type
+
+**Event scoring**:
+`scoring` of an event type, by `method`: `hit-factor` with `points` (per power factor `major` and `minor`, per zone `A`, `C`, `D` and `metal`), `penalties` (`miss`, `noShoot`, `procedural`, points taken off each), `noShootMaxHits` and `powerFactors`; or `rings` with an optional fixed `discipline` and `seriesShots`.
+
+**Power factor**:
+`powerFactor`: `major` or `minor`, the rating of a competitor's ammunition that sets the points of a hit. `powerFactors` on a hit-factor scoring: per `division` the least power factor for `minor` and for `major` (absent: no major rating).
+_Avoid_: PF
+
+**Division**:
+`division`: an equipment division of a practical rule book as it names it ("Production Optics").
+_Avoid_: class
+
+**Level**:
+`levels` of an event type: the level names as the rule book prints them, lowest first ("Level I", "Landesmeisterschaft").
+
+**Magazine limit**:
+One entry of `magazine` of an event type: per `division` (and `powerFactor`, where the limit applies to one) the `maxRounds` in a magazine from the start signal on (as the rule book times it) and the `maxLength` (mm), with a `note` for a condition.
+
 ### User data files
 
 **User data file**:

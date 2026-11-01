@@ -70,6 +70,7 @@ const sidebars: SidebarsConfig = {
   ],
   data: [
     'data/federations',
+    'data/event-types',
     'data/manufacturers',
     'data/cases',
     'data/primers',

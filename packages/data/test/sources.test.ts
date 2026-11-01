@@ -28,6 +28,24 @@ describe('resolveRecord', () => {
       ],
     })
   })
+
+  it("resolves an event type's rule book with its publisher, or names the missing publisher", () => {
+    const errors: string[] = []
+    const published = { ...book, id: 'published', sha256: 'c'.repeat(64), publisher: 'Federation' }
+    const index = sourceIndex([book, published])
+    expect(resolveRecord({ ruleBook: 'published' }, index, 'e.json', errors)).toEqual({
+      ruleBook: {
+        title: 'Rule book',
+        edition: undefined,
+        url: undefined,
+        sha256: published.sha256,
+        publisher: 'Federation',
+      },
+    })
+    expect(errors).toEqual([])
+    resolveRecord({ ruleBook: 'book' }, index, 'e.json', errors)
+    expect(errors).toEqual(['e.json: ruleBook: source "book" names no publisher'])
+  })
 })
 
 describe('checkSources', () => {
