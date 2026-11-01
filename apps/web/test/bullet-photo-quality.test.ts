@@ -275,6 +275,77 @@ describe('a drop shadow beside a product-style image', () => {
   })
 })
 
+describe('a shadow towards the base or far along the axis', () => {
+  const rifle: BulletDimensions = {
+    diameter: 7.82,
+    length: 30,
+    noseLength: 17.5,
+    meplatDiameter: 0.5,
+    ogive: { form: 'tangent', radiusRatio: 1 },
+    base: { type: 'flat' },
+  }
+  const pistol: BulletDimensions = {
+    diameter: 9.02,
+    length: 15.5,
+    noseLength: 7.5,
+    meplatDiameter: 2.5,
+    ogive: { form: 'tangent', radiusRatio: 1 },
+    base: { type: 'flat' },
+  }
+  /** A product-style image of `t` at `k` px per mm with `shadow`, measured at the scale its diameter gives. */
+  const atDiameter = (t: BulletDimensions, k: number, shadow: NonNullable<PhotoSpec['shadow']>) => {
+    const [length, a] = [t.length * k, (t.diameter / 2) * k]
+    const margin = Math.max(60, 0.15 * length)
+    const photo = renderPhoto({
+      shape: t,
+      pxPerMm: k,
+      width: Math.ceil(length + 2 * margin),
+      height: Math.ceil(margin + 2 * a + length * Math.sin((3 * Math.PI) / 180) + margin),
+      base: { x: margin, y: margin + a },
+      angle: (3 * Math.PI) / 180,
+      paper: 235,
+      bullet: 115,
+      gradient: 10,
+      shading: 30,
+      noise: 3,
+      blur: 1,
+      seed: 11,
+      shadow,
+    })
+    const seg = segmentPhoto(photo.image)
+    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+    const px = measureOutline(outline, { pxPerMm: 1, relUncertainty: 0 })
+    const scale = defined(resolveScale(px, undefined, { diameter: t.diameter }).scale)
+    const hints = [...seg.warnings, ...outlineHints(outline).hints]
+    return { outline, m: measureOutline(outline, scale), hints }
+  }
+  // the research evaluation's drop shadow, offset towards the base instead of the tip, at 15 and
+  // 30 px per mm; and a pistol bullet's shadow 20 px along the axis and 6 across, blur 4
+  const cases: [string, BulletDimensions, number, NonNullable<PhotoSpec['shadow']>][] = [
+    ['towards the base, 15 px/mm', rifle, 15, { dx: -9, dy: 13.5, blur: 9, depth: 0.2 }],
+    ['towards the base, 30 px/mm', rifle, 30, { dx: -18, dy: 27, blur: 18, depth: 0.2 }],
+    ['far towards the tip, little blur', pistol, 15, { dx: 20, dy: 6, blur: 4, depth: 0.2 }],
+    ['far towards the base, little blur', pistol, 15, { dx: -20, dy: 6, blur: 4, depth: 0.2 }],
+  ]
+  for (const [name, t, k, shadow] of cases)
+    it(`${name}: no boat tail on the flat base, the length within 3 u or the shadow named`, () => {
+      const { m, hints } = atDiameter(t, k, shadow)
+      expect(m.baseType).toBe('flat')
+      const length = defined(m.values.length)
+      const within =
+        Math.abs(length.value - t.length) <= Math.max(0.01 * t.length, 3 * length.uncertainty)
+      expect(within || /shadow beside the bullet/.test(text(hints))).toBe(true)
+      expect(text(hints)).toMatch(/shadow beside the bullet/)
+    })
+
+  it('trims a shadow past the base and names it', () => {
+    const { outline } = atDiameter(rifle, 30, { dx: -18, dy: 27, blur: 18, depth: 0.2 })
+    expect(outline.shadow).toEqual({ side: 'right', removed: false })
+    // the cut-out ran on past the base face by most of the shadow's 18 px offset
+    expect(outline.length).toBeLessThan(30 * 30 + 3)
+  })
+})
+
 describe('an axis direction the user typed', () => {
   // the photograph's bullet lies 3 degrees off level; 40 px per mm makes the base face wide enough to show a turn
   const typed = (over: Partial<PhotoSpec>, offDegrees: number) => {
