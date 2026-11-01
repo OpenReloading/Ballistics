@@ -4,7 +4,7 @@ import { gotoHydrated } from './nav.ts'
 import { openFit } from './powder-tune-run.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
-import { applyExampleLoad, loadForm, openItem } from './workbench.ts'
+import { applyExampleLoad, loadForm } from './workbench.ts'
 import { runLine } from './workbench-run.ts'
 
 // The powder tuning route lists the chronograph strings of the open load per charge and takes more
