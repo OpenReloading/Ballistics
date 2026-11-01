@@ -647,6 +647,10 @@ _Avoid_: `step`, `steps` (of a ladder)
 A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per session, so a session is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
 _Avoid_: rifle, gun
 
+**Firearm action**:
+`action` of a firearm record: `rifle`, `pistol` or `revolver`, optional (absent: not stated). It says what kind of firearm it is where a model needs it: a revolver has a gap between cylinder and barrel, which the powder fit's revolver note reads. German UI: Waffenart (Gewehr, Pistole, Revolver).
+_Avoid_: type, kind (of a firearm)
+
 **Freebore**:
 `freebore`: unrifled length of the throat from the case mouth to the start of the rifling, mm, on a firearm.
 

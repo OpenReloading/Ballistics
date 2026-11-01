@@ -138,6 +138,7 @@
 . faceColour
 . federation
 . firearm
+. firearmAction
 . firingSeries
 . fold
 . fromSi

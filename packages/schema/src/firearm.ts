@@ -221,6 +221,12 @@ const unique = (ids: string[], path: (i: number) => PropertyKey[], ctx: z.Refine
   })
 
 /**
+ * What kind of firearm a firearm record is, where it states it: a revolver has a gap between cylinder
+ * and barrel that a pistol and a rifle do not.
+ */
+export const firearmAction = z.enum(['rifle', 'pistol', 'revolver'])
+
+/**
  * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
  * degC, bar and %. The maker is a manufacturer reference. Optic and configuration ids are unique, each
  * mount names an optic of the firearm and `active` names one of its configurations. A record of an
@@ -235,6 +241,11 @@ export const firearm = z
     name: text(200).describe('Name of the firearm as the library lists it.'),
     manufacturer: ref('manufacturer').describe('Reference to the maker of the firearm.').optional(),
     model: text(200).describe('Model name.').optional(),
+    action: firearmAction
+      .describe(
+        'What kind of firearm it is: a revolver has a gap between cylinder and barrel. Absent: not stated.',
+      )
+      .optional(),
     cartridge: ref('cartridge')
       .describe('Reference to the cartridge the firearm is chambered for.')
       .optional(),

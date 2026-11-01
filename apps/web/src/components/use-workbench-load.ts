@@ -2076,7 +2076,9 @@ export function useWorkbenchState() {
         ? catalogueIdOf(asked.cartridge.id)
         : undefined
     const pending = cartridge ? (groove?.id !== cartridge.id ? cartridge.id : undefined) : asking
-    writeTuneLoad(ref, load, chosenPowder, recordTable, pending)
+    // the linked library firearm's action, where its record states one (the example states none)
+    const action = firearms.find((r) => r.id === firearm)?.data.action
+    writeTuneLoad(ref, load, chosenPowder, recordTable, pending, action)
   }
   const tuning = useRef(handTuneLoad)
   tuning.current = handTuneLoad

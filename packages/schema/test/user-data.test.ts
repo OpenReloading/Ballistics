@@ -545,6 +545,13 @@ describe('firearm', () => {
   const [scope, dot] = firearmRecord.data.optics
   const config = firearmRecord.data.configurations[0]
 
+  it('states its action optionally: a record without it stays valid', () => {
+    expect('action' in firearmRecord.data).toBe(false)
+    expect(paths({})).toBeUndefined()
+    for (const action of ['rifle', 'pistol', 'revolver']) expect(paths({ action })).toBeUndefined()
+    expect(paths({ action: 'shotgun' })).toEqual(['data.action'])
+  })
+
   it('rejects a mount of an optic the firearm does not list', () => {
     expect(
       paths({ configurations: [{ ...config, mounts: [{ ...config.mounts[0], optic: 'o9' }] }] }),
