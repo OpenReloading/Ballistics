@@ -4,10 +4,16 @@ import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { CartridgeList } from '../src/components/cartridge-list.tsx'
-import { CartridgeSides, RecordFacts, VariantMatrix } from '../src/components/cartridge-record.tsx'
+import {
+  CartridgeSides,
+  RecordFacts,
+  StandardFacts,
+  VariantMatrix,
+} from '../src/components/cartridge-record.tsx'
 import { msg } from '../src/i18n/translate.ts'
 import {
   combinedRows,
+  dimensionStripValues,
   inReadingOrder,
   pressureStripNote,
   pressureStripValues,
@@ -81,34 +87,56 @@ describe('the cartridge list row', () => {
 describe('the cartridge record', () => {
   const c = sheetRecord('cip-308-win-2008-09-23')
   const strip = (preset: PresetId) => {
-    const pressures = pressureStripValues(c)
+    const facts = [...pressureStripValues(c), ...dimensionStripValues(c)]
     return html(
       preset,
+      // the API derives the case type from R1, P1 and R3
       <RecordFacts
-        values={pressures}
-        notes={pressures.map((v) => pressureStripNote(v, c.table))}
-        standard={{
-          table: c.table,
-          date: {
-            label: c.revised ? msg('Revised') : msg('Published'),
-            value: c.revised ?? c.published,
-          },
-          countries: c.country ? parseCountries(c.country) : undefined,
-        }}
-        // the API derives the case type from R1, P1 and R3
-        build={{ caseType: 'rimless', method: c.pressureMethod && methodWording(c.pressureMethod) }}
-      />,
+        values={facts}
+        notes={facts.map((v) => pressureStripNote(v, c.table))}
+        caseType="rimless"
+      >
+        <a href="/bullets/?fits=308-win">Bullets (2)</a>
+      </RecordFacts>,
     )
   }
 
-  it('shows the strip in the preset units: pressures, test barrel, standard, case and method', () => {
+  it('shows the strip in the preset units: pressures, test barrel, dimensions, case, then the bullets link', () => {
     const metric = strip('metric-grams')
     expect(metric.match(/class="fact-card"/g)).toHaveLength(4)
     expect(text(metric)).toBe(
-      'Pmax bar 4150 PK bar 4773 PE bar 5190 M mm 25 EE J 3920 Table I Revised 2008-09-23 Country United States Case rimless Method transducer',
+      'Pmax bar 4150 PK bar 4773 PE bar 5190 M mm 25 EE J 3920 L3 mm 51.18 L6 mm 71.12 G1 mm 7.85 Case rimless Bullets (2)',
     )
+    // the standard is in the Sources panel, not in the strip
+    expect(text(metric)).not.toMatch(/Table|Revised|Country|Method/)
     const us = text(strip('us'))
-    expect(us).toMatch(/^Pmax psi 60191 PK psi 69227 .* M in \.9843 /)
+    expect(us).toMatch(/^Pmax psi 60191 PK psi 69227 .* M in \.9843 .* L3 in 2\.0150 /)
+  })
+
+  it('names M, EE and the strip dimensions on hover', () => {
+    const facts = [...pressureStripValues(c), ...dimensionStripValues(c)]
+    const notes = Object.fromEntries(facts.map((v) => [v.symbol, pressureStripNote(v, c.table)]))
+    expect(notes.M).toEqual(['M: measuring position'])
+    expect(notes.EE).toEqual(['EE: energy, as printed under Pressures (Energies)'])
+    expect(notes.L3).toEqual(['L3: case length'])
+    expect(notes.G1).toEqual(['G1: bullet diameter'])
+  })
+
+  it('lists the standard over the sources: table, date, country and method', () => {
+    const facts = html(
+      'metric-grams',
+      <StandardFacts
+        table={c.table}
+        date={{
+          label: c.revised ? msg('Revised') : msg('Published'),
+          value: c.revised ?? c.published,
+        }}
+        countries={c.country ? parseCountries(c.country) : undefined}
+        method={c.pressureMethod && methodWording(c.pressureMethod)}
+      />,
+    )
+    expect(text(facts)).toBe('Table I Revised 2008-09-23 Country United States Method transducer')
+    expect(html('metric-grams', <StandardFacts />)).not.toContain('standard-facts')
   })
 
   it('heads the side tables with the limit in the length unit of the preset', () => {
@@ -128,8 +156,23 @@ describe('the cartridge record', () => {
         text(h),
       )
     }
-    expect(heads('metric-grams')).toEqual(['Symbol', 'Max (mm)', 'Symbol', 'Min (mm)'])
-    expect(heads('us')).toEqual(['Symbol', 'Max (in)', 'Symbol', 'Min (in)'])
+    // the tolerance (and in the chamber the clearance) has a column and a title of its own
+    expect(heads('metric-grams')).toEqual([
+      'Symbol',
+      'Max (mm)',
+      'Tolerance',
+      'Symbol',
+      'Min (mm)',
+      'Tolerance, clearance',
+    ])
+    expect(heads('us')).toEqual([
+      'Symbol',
+      'Max (in)',
+      'Tolerance',
+      'Symbol',
+      'Min (in)',
+      'Tolerance, clearance',
+    ])
   })
 })
 

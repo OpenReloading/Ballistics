@@ -33,6 +33,7 @@ export function RecordPage({
   side,
   provenance,
   kind,
+  sourceFacts,
 }: {
   title: string
   /** The title on a phone, where the bar has room for the name alone (`PageBar`). */
@@ -62,6 +63,8 @@ export function RecordPage({
   provenance: Provenance
   /** The record kind (`powders`), whose field labels name the fields a source covers. */
   kind?: string | undefined
+  /** Over the sources table: facts of the record's standard (the cartridge record's table, date, country and method). */
+  sourceFacts?: ReactNode
 }) {
   const { t } = useTranslation()
   const facts = badges.map((b) => say(t, b))
@@ -108,6 +111,7 @@ export function RecordPage({
           title={t('Sources ({kind})', { kind: t(provenanceKinds[provenance.kind]) })}
           className="record-sources"
         >
+          {sourceFacts}
           <Sources provenance={provenance} kind={kind} />
         </Panel>
       </div>

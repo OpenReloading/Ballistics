@@ -8,6 +8,7 @@ import {
 } from '../src/bullet/index.ts'
 import { profileCrossesItself, triangleArea2 } from '../src/bullet/outline.ts'
 import type { SectionPoint } from '../src/core/types.ts'
+import { lengthText } from '../src/core/units.ts'
 import { defined } from './defined.ts'
 
 const deg = Math.PI / 180
@@ -450,6 +451,16 @@ describe('refused input', () => {
       bulletOutline({ ...base, noseLength: 30, base: { type: 'boat-tail', length: 5 } }),
     ).toEqual({
       reason: expect.stringContaining('less the boat tail'),
+      fields: ['noseLength', 'length', 'base.length'],
+    })
+  })
+
+  it('writes the lengths of a refusal in the given unit, mm by default', () => {
+    const b = { ...base, noseLength: 30, base: { type: 'boat-tail' as const, length: 5 } }
+    const mmText = bulletOutline(b)
+    expect('reason' in mmText && mmText.reason).toMatch(/nose length 30 mm/)
+    expect(bulletOutline(b, 'sourced', 'in')).toEqual({
+      reason: `The nose length 1.1811 in is above the length less the boat tail, ${lengthText(base.length - 5, 'in')} in.`,
       fields: ['noseLength', 'length', 'base.length'],
     })
   })

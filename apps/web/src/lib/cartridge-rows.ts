@@ -32,7 +32,7 @@ export const cartridgeMatches = (
 ) => matchesQuery([text], query)
 
 const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
-const leadingNumber = /^\s*(\d+(?:[.,]\d+)?)([\s\S]*)$/
+const leadingNumber = /^\s*(\d+(?:[.,]\d+)?)/
 
 /** Orders cartridge names: a leading number by value (5,6 after 5,56), then the rest with numbers by value. */
 export function compareCartridgeNames(a: string, b: string): number {
@@ -41,7 +41,7 @@ export function compareCartridgeNames(a: string, b: string): number {
   if (x?.[1] && y?.[1])
     return (
       Number(x[1].replace(',', '.')) - Number(y[1].replace(',', '.')) ||
-      collator.compare(x[2] ?? '', y[2] ?? '')
+      collator.compare(a.slice(x[0].length), b.slice(y[0].length))
     )
   return x ? -1 : y ? 1 : collator.compare(a, b)
 }

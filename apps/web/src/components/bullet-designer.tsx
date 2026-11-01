@@ -29,6 +29,7 @@ import {
   fromUser,
   type Group,
   groups,
+  implausible,
   newDesign,
   reduce,
 } from '../lib/bullet-designer.ts'
@@ -368,14 +369,17 @@ export function BulletDesigner() {
           const value = design.fields[s.key]
           if (!(state && value)) return null
           const changed = state.kind === 'entered' && state.changed
+          // a soft flag: the value stays and the drawing follows it
+          const check = implausible(s, value.si)
+          const help = stateText(s, state, system, t)
           return (
             <DesignerField
               key={s.key}
               spec={s}
               system={system}
               value={value}
-              help={stateText(s, state, system, t)}
-              flag={changed ? 'changed' : flagOf[state.kind]}
+              help={check ? `${t('Check the unit.')} ${help}` : help}
+              flag={check ? 'exceeded' : changed ? 'changed' : flagOf[state.kind]}
               changed={changed}
               error={errorOf(s.key)}
               symbol={bulletSymbols.find((b) => b.path === s.key)?.symbol}
