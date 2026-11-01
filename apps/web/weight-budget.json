@@ -15,7 +15,7 @@
     "shell": {
       "budget": {
         "initial": 424000,
-        "total": 474000
+        "total": 476000
       },
       "routes": {
         "/": {
@@ -118,7 +118,7 @@
     },
     "curve charts": {
       "budget": {
-        "initial": 466000,
+        "initial": 468000,
         "total": 710000
       },
       "routes": {
@@ -195,7 +195,7 @@
     "workbench": {
       "budget": {
         "initial": 630000,
-        "total": 1045000
+        "total": 1056000
       },
       "routes": {
         "/workbench": {
