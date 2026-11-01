@@ -158,7 +158,8 @@ function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] 
   const retrieved = provenance.sources
     .filter(
       (s) =>
-        (s.kind ?? provenance.kind) === 'fitted' && (!s.fields || s.fields.includes('interior')),
+        (s.kind ?? provenance.kind) === 'fitted' &&
+        (!s.fields || s.fields.some((f) => f === 'interior' || f.startsWith('interior.'))),
     )
     .flatMap((s) => (s.retrieved ? [s.retrieved] : []))
     .sort()

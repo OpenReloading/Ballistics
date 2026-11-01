@@ -371,7 +371,12 @@ describe('GET /powders and /bullets', () => {
       kind: 'fitted',
       sources: [
         { title: 'Table A', kind: 'fitted', fields: ['interior'], retrieved: '2026-10-11' },
-        { title: 'Table B', kind: 'fitted', fields: ['interior'], retrieved: '2026-10-12' },
+        {
+          title: 'Table B',
+          kind: 'fitted',
+          fields: ['interior.vivacity'],
+          retrieved: '2026-10-12',
+        },
         { title: 'Data sheet', kind: 'published', fields: ['name'], retrieved: '2026-10-30' },
       ],
     }
