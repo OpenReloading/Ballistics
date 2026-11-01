@@ -199,6 +199,18 @@ The circle of the mean of $F$ and $Z$ is a choice of the model, not taken from a
 
 The load-table fit, the load file (`interiorLoad`) and the workbench read the same function, so one cartridge has one bore area.
 
+### Throat wear
+
+A worn throat lengthens the space behind the bullet: the bullet still seats in the case, but the bore it meets starts further forward. The optional Throat wear $w$ of the Firearm card (the load value `throatWear`, m) adds that length times the bore area to the volume behind the bullet; the travel is unchanged:
+
+$$
+V_0' = V_0 + w A
+$$
+
+Code: `packages/core/src/interior/throat-wear.ts`, `wornVolume`. `packages/core/src/interior/load-file.ts`, `interiorLoad`.
+
+The default is 0. The wear is a typed value: no rate per round is applied. One barrel measured by [Vuong 2026](../bibliography.md#vuong-2026) (5.56x45 mm, 361 mm, 10-shot means) lost velocity from 840.6 m/s new to 821.3 m/s at 8000 and 785.8 m/s at 16000 rounds, while its chamber grew from 49.20 to 54.62 mm; those values are stored with authors, DOI and licence in `vuong2026`. Rates do not carry over to another cartridge or firing regime, and an automatic value would need an interval of about 0 to 0.3 to 0.8 mm per 1000 rounds (unverified). When the chosen firearm has a `roundCount`, the result notes say that the velocity may be lower than simulated and give the measured 5.56 rates as an example: 0.29 % per 1000 rounds from 0 to 8000 and 0.54 % per 1000 rounds from 8000 to 16000. The count itself is described in [Firearm round count](../research/firearm-round-count-age.md).
+
 ### Temperature of the propellant
 
 The burn rate of the [burn law](interior-burn-forms.md) is multiplied by a factor of the propellant temperature, with separate sensitivities below and above the reference temperature:

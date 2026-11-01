@@ -25,6 +25,7 @@ const interiorKeys = [
   'formQ',
   'formZ1',
   'leakArea',
+  'throatWear',
   'boreFriction',
   'engravingPressure',
   'engravingLength',

@@ -36,6 +36,7 @@ const kinds = {
   formQ: 'dimensionless',
   formZ1: 'dimensionless',
   leakArea: 'area',
+  throatWear: 'length',
   boreFriction: 'pressure',
   engravingPressure: 'pressure',
   engravingLength: 'length',

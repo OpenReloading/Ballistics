@@ -1,6 +1,7 @@
 import { InputError, nth } from '../errors.ts'
 import { boreArea } from './bore-resistance.ts'
 import type { InteriorLoad } from './model.ts'
+import { wornVolume } from './throat-wear.ts'
 import { burnFormKeys } from './workbench-keys.ts'
 
 /**
@@ -63,6 +64,9 @@ export function interiorLoad(
   const leakArea = values.leakArea === undefined ? undefined : v('leakArea')
   if (leakArea !== undefined && leakArea < 0)
     throw new ValueError('leakArea', `${label('leakArea')} must be at least 0.`)
+  // a worn throat adds its length times the bore area behind the bullet (`apps/docs/docs/models/interior-m3.md`, "Throat wear")
+  const wear = values.throatWear === undefined ? 0 : v('throatWear')
+  if (wear < 0) throw new ValueError('throatWear', `${label('throatWear')} must be at least 0.`)
   const form = Object.entries(burnFormKeys).filter(([k]) => values[k] !== undefined)
   if (form.length > 0 && form.length < 4) {
     const missing = Object.entries(burnFormKeys).filter(([k]) => values[k] === undefined)
@@ -71,10 +75,11 @@ export function interiorLoad(
       `Burn form: ${missing.map(([, n]) => n).join(', ')} needed with the others, or leave all four empty.`,
     )
   }
+  const area = boreArea({ area: values.boreArea, boreDiameter, grooveDiameter })
   return {
     chamber: {
-      volume: v('volume'),
-      boreArea: boreArea({ area: values.boreArea, boreDiameter, grooveDiameter }),
+      volume: wornVolume(v('volume'), area, wear),
+      boreArea: area,
       boreDiameter,
     },
     barrel: { length: v('travel'), twist: v('twist') },

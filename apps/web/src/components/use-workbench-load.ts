@@ -2135,6 +2135,7 @@ export function useWorkbenchState() {
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
       castHardness: plainBaseCastHardness(bulletRecord?.construction),
+      roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
       volumeMeasured: volumeMeasured({

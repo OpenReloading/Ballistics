@@ -92,7 +92,7 @@ const panelFields: Record<InputPanel, readonly string[]> = {
   cartridge: ['volume', 'boreDiameter', 'boreArea'],
   bullet: ['bulletMass'],
   powder: ['charge', 'propellantTemperature'],
-  firearm: ['travel', 'twist'],
+  firearm: ['travel', 'twist', 'throatWear'],
 }
 /** The Powder panel's collapsed group "Model parameters". */
 export const modelFields = [

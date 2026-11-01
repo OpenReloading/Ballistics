@@ -138,6 +138,21 @@ describe('resultNotes', () => {
     expect(warningsText(at(1.5e8, 18), english.t)).toContain('gas may leak past it')
   })
 
+  it('notes a round count of the firearm: the velocity may be lower than simulated', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const worn = (o: Ok) =>
+      resultNotes(o, [], units, english.t).filter((n) => n.line.startsWith('The barrel has fired'))
+    expect(worn(ok({ ...plain, roundCount: 4000 }))).toEqual([
+      expect.objectContaining({
+        kind: 'note',
+        line: 'The barrel has fired 4000 rounds: the velocity may be lower than simulated.',
+        text: expect.stringContaining('0.29 % of its muzzle velocity per 1000 rounds'),
+      }),
+    ])
+    expect(worn(ok(plain))).toEqual([])
+    expect(worn(ok({ ...plain, roundCount: 0 }))).toEqual([])
+  })
+
   it('counts the unlisted cartridge as a warning, so a result with only that one is announced', () => {
     const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
     expect(warningsText(ok(plain), english.t)).toBe('')

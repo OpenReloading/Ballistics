@@ -70,6 +70,8 @@ export type Outcome =
       resistanceMissing?: { powder: string; missing: string[] } | undefined
       /** Brinell hardness of the bullet record when it is cast with a plain base (`plainBaseCastHardness`). */
       castHardness?: number | undefined
+      /** Rounds fired through the chosen firearm's barrel, its record's `roundCount`. */
+      roundCount?: number | undefined
       /** The user bullet design whose mass the run used. */
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
@@ -307,6 +309,22 @@ export function resultNotes(
         ]
       : []),
     ...designs.flatMap((line) => (line ? [{ kind: 'note' as const, line }] : [])),
+    ...(ok.roundCount
+      ? [
+          {
+            kind: 'note' as const,
+            line: t(
+              'The barrel has fired {count} rounds: the velocity may be lower than simulated.',
+              {
+                count: ok.roundCount,
+              },
+            ),
+            text: t(
+              'A worn throat adds volume behind the bullet. One measured 5.56x45 mm barrel lost 0.29 % of its muzzle velocity per 1000 rounds up to 8000 rounds and 0.54 % per 1000 rounds from 8000 to 16000 (Vuong et al. 2026); rates do not carry over to other cartridges or firing. Enter a measured length in Throat wear of the Firearm card.',
+            ),
+          },
+        ]
+      : []),
     ...(band ? [{ kind: 'note' as const, line: band }] : []),
   ]
   return noteKinds.flatMap((kind) => notes.filter((n) => n.kind === kind))

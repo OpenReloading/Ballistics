@@ -135,7 +135,7 @@ export const exampleInterior = {
 } satisfies Record<
   Exclude<
     InteriorKey,
-    'sebert' | 'leakArea' | 'boreFriction' | 'engravingPressure' | 'engravingLength'
+    'sebert' | 'leakArea' | 'throatWear' | 'boreFriction' | 'engravingPressure' | 'engravingLength'
   >,
   number
 >
@@ -226,7 +226,12 @@ type LoadExample = {
   interior: Record<
     Exclude<
       InteriorKey,
-      'sebert' | 'leakArea' | 'boreFriction' | 'engravingPressure' | 'engravingLength'
+      | 'sebert'
+      | 'leakArea'
+      | 'throatWear'
+      | 'boreFriction'
+      | 'engravingPressure'
+      | 'engravingLength'
     >,
     number
   >

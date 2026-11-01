@@ -127,6 +127,15 @@ export const interiorFields = [
     min: 0,
   },
   {
+    key: 'throatWear',
+    label: msg('Throat wear'),
+    help: msg(
+      'Optional. Length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Empty: no wear.',
+    ),
+    quantity: 'length',
+    min: 0,
+  },
+  {
     key: 'boreFriction',
     label: msg('Bore friction'),
     help: msg(
