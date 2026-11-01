@@ -81,6 +81,16 @@ test('a person adds an IPSC event with two stages and a DSB ring event, sees the
   await ring.getByRole('group', { name: 'Series 2' }).getByLabel('Series total').fill('95')
   await expect(ring.getByRole('group', { name: 'Series 1' })).toContainText('Total 29.5')
   await expect(ring.locator('.event-total')).toHaveText('Event total: 124.5')
+  // removing a series shows the next one's own shots in its place
+  await ring.getByRole('button', { name: 'Add series' }).click()
+  await ring.getByRole('group', { name: 'Series 3' }).getByLabel('Shots').fill('9 9')
+  await ring.getByRole('button', { name: 'Remove series 2' }).click()
+  await expect(ring.getByRole('group', { name: 'Series 2' }).getByLabel('Shots')).toHaveValue('9 9')
+  await expect(ring.locator('.event-total')).toHaveText('Event total: 47.5')
+  await ring.getByRole('button', { name: 'Remove series 2' }).click()
+  await ring.getByRole('button', { name: 'Add series' }).click()
+  await ring.getByRole('group', { name: 'Series 2' }).getByLabel('Series total').fill('95')
+  await expect(ring.locator('.event-total')).toHaveText('Event total: 124.5')
   await ring.getByRole('button', { name: 'Save event' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add to the round count?' })
   await expect(dialog).toContainText(

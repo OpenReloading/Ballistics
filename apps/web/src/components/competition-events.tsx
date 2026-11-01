@@ -14,7 +14,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
-import type { StageScore } from '@open-reloading/core'
+import type { EventTotals, StageScore } from '@open-reloading/core'
 import {
   type CompetitionEvent,
   type EventType,
@@ -186,6 +186,10 @@ function ShotsInput({
 }) {
   const { t } = useTranslation()
   const [text, setText] = useState(shots?.join(' ') ?? '')
+  // the text of another series (a series above was removed): show this one's shots
+  const typed = parseShots(text)
+  if (typed && (typed.length ? typed.join(' ') : undefined) !== shots?.join(' '))
+    setText(shots?.join(' ') ?? '')
   return (
     <TextInput
       label={label}
@@ -428,9 +432,17 @@ function StagesEditor({
 }
 
 /** The line of an event's total, or why it has none. */
-function totalLine(t: Translator['t'], e: CompetitionEvent, total: number | undefined): string {
+function totalLine(
+  t: Translator['t'],
+  e: CompetitionEvent,
+  totals: EventTotals | undefined,
+): string {
   if (e.state === 'disqualified') return t('Disqualified: no total.')
-  if (total !== undefined) return t('Event total: {total}', { total: scoreText(total) })
+  if (totals?.total !== undefined)
+    return t('Event total: {total}', { total: scoreText(totals.total) })
+  const parts = e.results.method === 'rings' ? e.results.series : e.results.stages
+  // no totals for results that exist: a value the scoring refuses, such as a stage time of 0
+  if (!totals && parts.length) return t('Check the event: a value is out of its range.')
   return e.results.method === 'hit-factor'
     ? t('Event total: type the stage points of each stage from the official result.')
     : t('Event total: add a series.')
@@ -470,8 +482,8 @@ function ResultsEditor({
           onChange={onChange}
         />
       )}
-      <Text fw={600} mt="sm" role="status" className="event-total">
-        {totalLine(t, e, totals?.total)}
+      <Text fw={600} mt="sm" className="event-total">
+        {totalLine(t, e, totals)}
       </Text>
     </>
   )
@@ -738,7 +750,7 @@ function EventSheet({
           </Table.Tbody>
         </Table>
       )}
-      <p>{totalLine(t, e, totals?.total)}</p>
+      <p>{totalLine(t, e, totals)}</p>
       {e.notes && <p>{e.notes}</p>}
     </div>
   )
