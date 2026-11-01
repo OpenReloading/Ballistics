@@ -115,7 +115,7 @@ it('groups the sources of one document: title, publisher, edition and hash once,
   expect(html.match(/<code>/g)).toHaveLength(1)
   expect(html).toMatch(/class="[^"]*source-group/)
   // the head row spans the columns (source, retrieved, license, covers, note)
-  expect(html).toMatch(/<th[^>]*scope="rowgroup"[^>]*colSpan="5"/)
+  expect(html).toMatch(/<td(?=[^>]*colSpan="5")(?=[^>]*source-document)/)
   // the pages in the order cited, each with its own values; the document's first place kept
   expect(html).toMatch(
     /Page p\. 39<\/th>[\s\S]*Page p\. 342<\/th>[\s\S]*No page stated<\/th>[\s\S]*Manual/,

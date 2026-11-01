@@ -6811,7 +6811,7 @@ main .record-sources .sources tbody th {
 
 /* a document cited at several pages: its title and data once in a head row, a row per page under
    it, indented */
-main .record-sources .sources .source-group tr:first-child > th {
+main .record-sources .sources td.source-document {
   border-bottom: 0;
   padding-bottom: 0.125rem;
 }

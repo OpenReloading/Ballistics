@@ -154,7 +154,10 @@ export function groupSources(list: readonly Source[]): Source[][] {
   return [...groups.values()]
 }
 
-/** A document cited at several pages: a head row with its title and data, a row per page. */
+/**
+ * A document cited at several pages: a head row with its title and data (a cell across the row: a
+ * header there would head no data cell), a row per page under it.
+ */
 function SourceGroup({ sources, has, span }: { sources: Source[]; has: Has; span: number }) {
   const first = sources[0] as Source
   // a page can be cited twice with other fields: the key counts repeats of the same content
@@ -168,12 +171,12 @@ function SourceGroup({ sources, has, span }: { sources: Source[]; has: Has; span
   return (
     <TableTbody role="rowgroup" className="source-group">
       <TableTr role="row">
-        <TableTh scope="rowgroup" role="rowheader" colSpan={span}>
+        <TableTd role="cell" colSpan={span} className="source-document">
           <span className="source-title">
             {first.url ? <a href={first.url}>{first.title}</a> : first.title}
           </span>
           <SourceMeta source={first} />
-        </TableTh>
+        </TableTd>
       </TableTr>
       {sources.map((s, i) => (
         <SourceRow key={keys[i]} source={s} has={has} inGroup />
