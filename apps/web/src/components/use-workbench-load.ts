@@ -2199,7 +2199,12 @@ export function useWorkbenchState() {
   }
 
   /** Why a temperature ladder cannot run: the powder has no temperature sensitivity, own or default. */
-  const temperatureBlock = temperatureLadderBlockReason(powderLabel, hasSensitivity(powder), t)
+  const temperatureBlock = temperatureLadderBlockReason(
+    powderLabel,
+    // the chosen powder: a record, or a design that keeps its grain form
+    hasSensitivity(chosenPowder),
+    t,
+  )
 
   /** The propellant temperatures of the temperature ladder from the Powder temperature field, or what stops it. */
   function temperaturePlan(shown = system) {
