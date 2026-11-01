@@ -38,7 +38,7 @@ export const stateLabels: Record<CompetitionEvent['state'], Message> = {
  * The total of `e` without its event type's rules, for the shooting log: the rings of its series,
  * or the sum of the typed stage points when every stage has them; undefined otherwise.
  */
-export function ownTotal(e: CompetitionEvent): number | undefined {
+function ownTotal(e: CompetitionEvent): number | undefined {
   if (e.results.method === 'rings')
     try {
       return ringEventTotals(e.results.series, e.state).total
@@ -49,6 +49,12 @@ export function ownTotal(e: CompetitionEvent): number | undefined {
   if (e.state === 'disqualified' || !points.length || points.some((p) => p === undefined)) return
   return points.reduce((sum: number, p) => sum + (p ?? 0), 0)
 }
+
+/** An event's result as text: its own total, and how it ended when it was not completed ("185, Did not finish"). */
+export const resultText = (e: CompetitionEvent, t: (m: Message) => string) =>
+  [scoreText(ownTotal(e)), e.state !== 'completed' && t(stateLabels[e.state])]
+    .filter(Boolean)
+    .join(', ')
 
 /** Empty results of a scoring method. */
 const emptyResults = (method: EventType['scoring']['method']): Results =>

@@ -23,13 +23,7 @@ import { DotsThreeVertical, Plus } from '@phosphor-icons/react'
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
-import {
-  type EventRecord,
-  eventRecords,
-  ownTotal,
-  scoreText,
-  stateLabels,
-} from '../lib/competition-events.ts'
+import { type EventRecord, eventRecords, resultText } from '../lib/competition-events.ts'
 import { dayText } from '../lib/dates.ts'
 import type { DirectorySort } from '../lib/directory.ts'
 import { download } from '../lib/download.ts'
@@ -132,11 +126,6 @@ function periodText(t: Translator['t'], f: LogFilter, firearm?: string) {
   return firearm ? `${firearm}, ${period}` : period
 }
 
-/** The result an entry takes from its competition event: the total, or how the event ended. */
-function eventResult(r: EventRecord, t: Translator['t']) {
-  return r.data.state === 'completed' ? scoreText(ownTotal(r.data)) : t(stateLabels[r.data.state])
-}
-
 /** The competition event of an entry; choosing one fills an empty result with the event's. */
 function EventSelect({
   events,
@@ -162,7 +151,7 @@ function EventSelect({
       value={entry.event ?? null}
       onChange={(v) => {
         const linked = events.find((r) => `user:${r.id}` === v)
-        const result = linked && !entry.result?.trim() ? eventResult(linked, t) : undefined
+        const result = linked && !entry.result?.trim() ? resultText(linked.data, t) : undefined
         patch({ event: v ?? undefined, ...(result && { result }) })
       }}
     />

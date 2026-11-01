@@ -9,6 +9,7 @@ import {
   eventsJson,
   eventTotals,
   parseShots,
+  resultText,
   totalText,
   withEventType,
 } from '../src/lib/competition-events.ts'
@@ -191,4 +192,11 @@ it('reads ring values typed with spaces, semicolons or a decimal comma', () => {
   expect(parseShots('10 9,5;10.2')).toEqual([10, 9.5, 10.2])
   expect(parseShots('  ')).toEqual([])
   expect(parseShots('10 x')).toBeUndefined()
+})
+
+it('gives the result text: the total, and how the event ended when it was not completed', () => {
+  const t = (m: string) => m
+  expect(resultText(ringEvent, t)).toBe('124.5')
+  expect(resultText({ ...ringEvent, state: 'did-not-finish' }, t)).toBe('124.5, Did not finish')
+  expect(resultText({ ...ringEvent, state: 'disqualified' }, t)).toBe('Disqualified')
 })
