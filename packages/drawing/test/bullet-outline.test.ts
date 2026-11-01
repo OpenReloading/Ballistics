@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  assumedBelow,
   assumedBoatTailAngle,
   type BulletDimensions,
   bulletOutline,
@@ -254,7 +255,7 @@ describe('hollow base', () => {
 
   it('conical cavity: the cone as deep as it is wide at the opening comes off the volume', () => {
     const o = drawn(hollow('conical-hollow-base'), 'entered')
-    expect(o.cavity).toEqual({ radius: 2.5, depth: 2.5 })
+    expect(o.cavity).toEqual({ radius: 2.5, depth: 2.5, typed: false })
     expect(o.points.slice(0, o.baseEdge + 1)).toEqual([
       [0, 2.5],
       [2.5, 0],
@@ -268,7 +269,7 @@ describe('hollow base', () => {
 
   it('rounded cavity: a hemisphere of the opening radius, within the sampling error of its volume', () => {
     const o = drawn(hollow('rounded-hollow-base'), 'entered')
-    expect(o.cavity).toEqual({ radius: 2.5, depth: 2.5 })
+    expect(o.cavity).toEqual({ radius: 2.5, depth: 2.5, typed: false })
     for (const [r, z] of o.points.slice(0, o.baseEdge - 1))
       expect(Math.hypot(r, z)).toBeCloseTo(2.5, 12)
     const hemisphere = (2 / 3) * Math.PI * 2.5 ** 3
@@ -289,6 +290,37 @@ describe('hollow base', () => {
     })
     expect(defined(o.segments[1]).approximate).toBe(false)
     expect(o.notes.join(' ')).toMatch(/cavity depth is assumed/)
+  })
+
+  it('a typed cavity depth wins over the assumed one and is drawn as given', () => {
+    const typed = (type: 'conical-hollow-base' | 'rounded-hollow-base') =>
+      drawn({ ...body, base: { type, cavityDiameter: 5, cavityDepth: 6 } }, 'entered')
+    const cone = typed('conical-hollow-base')
+    expect(cone.cavity).toEqual({ radius: 2.5, depth: 6, typed: true })
+    expect(cone.volume).toBeCloseTo(solid.volume - (Math.PI * 2.5 ** 2 * 6) / 3, 9)
+    expect(cone.tags.slice(0, 3)).toEqual(['entered', 'entered', 'entered'])
+    expect(cone.segments[0]?.approximate).toBe(false)
+    expect(cone.notes.join(' ')).toMatch(/cavity depth is typed: 6 mm/)
+    expect(cone.notes.join(' ')).not.toMatch(/assumed: a cone/)
+    expect(assumedBelow(cone, 20)).toBe(false)
+    expect(assumedBelow(drawn(hollow('conical-hollow-base'), 'entered'), 20)).toBe(true)
+    // a half ellipsoid of semi-axes 2.5 and 6: 2/3 pi r^2 h, within the sampling error
+    const round = typed('rounded-hollow-base')
+    const ellipsoid = (2 / 3) * Math.PI * 2.5 ** 2 * 6
+    expect(solid.volume - round.volume).toBeGreaterThan(ellipsoid * 0.997)
+    expect(solid.volume - round.volume).toBeLessThan(ellipsoid)
+  })
+
+  it('refuses a typed cavity depth that is not positive or not below the length', () => {
+    expect(
+      reason({ ...body, base: { type: 'conical-hollow-base', cavityDiameter: 5, cavityDepth: 0 } }),
+    ).toMatch(/must be positive/)
+    expect(
+      reason({
+        ...body,
+        base: { type: 'conical-hollow-base', cavityDiameter: 5, cavityDepth: 31 },
+      }),
+    ).toMatch(/not below the length/)
   })
 
   it('takes the boat-tail dimensions of a hollow base that gives them', () => {

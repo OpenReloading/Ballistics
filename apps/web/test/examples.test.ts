@@ -119,8 +119,15 @@ describe('interior example', () => {
   })
   if (resistance) load.resistance = resistance
 
-  it('fills every field but the optional ones: Sébert factor (Lagrange), leak area, bore friction and engraving', () => {
-    const optional = ['sebert', 'leakArea', 'boreFriction', 'engravingPressure', 'engravingLength']
+  it('fills every field but the optional ones: Sébert factor (Lagrange), leak area, throat wear, bore friction and engraving', () => {
+    const optional = [
+      'sebert',
+      'leakArea',
+      'throatWear',
+      'boreFriction',
+      'engravingPressure',
+      'engravingLength',
+    ]
     for (const f of interiorFields)
       expect(defined(filled[f.key]).text === '').toBe(optional.includes(f.key))
     expect(load).not.toHaveProperty('gradient')

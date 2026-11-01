@@ -533,6 +533,45 @@
                                     "type": "null"
                                   }
                                 ]
+                              },
+                              "cavityDepth": {
+                                "description": "The `base.cavityDepth` of the bullet record. `null` removes it.",
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "value": {
+                                        "description": "In mm.",
+                                        "anyOf": [
+                                          {
+                                            "type": "number",
+                                            "exclusiveMinimum": 0,
+                                            "description": "In mm."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "raw": {
+                                        "description": "The value as written in the source, when it differed.",
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "minLength": 1,
+                                            "description": "The value as written in the source, when it differed."
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
                               }
                             }
                           },
@@ -3821,6 +3860,11 @@
                             "unit": "mm",
                             "description": "The value of `bulletCavityDiameter` in mm."
                           },
+                          "bulletCavityDepth": {
+                            "type": "number",
+                            "unit": "mm",
+                            "description": "The value of `bulletCavityDepth` in mm."
+                          },
                           "pmax": {
                             "type": "number",
                             "unit": "bar",
@@ -3915,6 +3959,11 @@
                             "type": "number",
                             "unit": "mm2",
                             "description": "The value of `leakArea` in mm2."
+                          },
+                          "throatWear": {
+                            "type": "number",
+                            "unit": "mm",
+                            "description": "The value of `throatWear` in mm."
                           },
                           "boreFriction": {
                             "type": "number",

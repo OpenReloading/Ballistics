@@ -11,6 +11,8 @@ import {
   cartridgeGrooveDiameterMm,
   gasVelocityFactor,
   type InteriorLoad,
+  plainBaseCastHardness,
+  pressureToleranceDefaults,
   recordBoreArea,
   recordResistance,
   ValueError,
@@ -53,6 +55,7 @@ import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
 import { type OwnCase, ownCases } from '../lib/case-group.ts'
+import { cavityVolumeFraction } from '../lib/cavity-range.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { timeText } from '../lib/dates.ts'
 import { errorText } from '../lib/error-text.ts'
@@ -86,7 +89,7 @@ import {
   interiorFields,
   specFields,
 } from '../lib/interior-input.ts'
-import { interiorRequest } from '../lib/interior-request.ts'
+import { hasSensitivity, interiorRequest, sensitivityReferenceOf } from '../lib/interior-request.ts'
 import {
   dismissed,
   effectiveSnapshots,
@@ -189,6 +192,7 @@ import {
   directionOf,
   emptyStep,
   firearmMassSpec,
+  firearmMoreFields,
   ladderSpec,
   maxLadderSteps,
   modelFields,
@@ -212,6 +216,7 @@ import {
   stepsOf,
   unlistedCartridge,
   warningsText,
+  withoutColdPeak,
 } from './workbench-outcome.ts'
 import { type ResultTab, resultTabs } from './workbench-results.tsx'
 import type { WorkspaceHandle } from './workspace.tsx'
@@ -592,6 +597,11 @@ function recordLinkOf(a: {
             name: productLabel(powder, names),
             bulkDensity: powder.bulkDensity && toSi('density', powder.bulkDensity.value),
             ...a.recordBore,
+            // the default temperature coefficient of a powder without its own (`interiorRequest`)
+            ...(!powder.temperatureSensitivity && {
+              grainForm: powder.grainForm,
+              sensitivityReference: sensitivityReferenceOf(powder),
+            }),
           }
         : a.linkedPowder,
     } satisfies RecordValues,
@@ -798,10 +808,28 @@ function savedDefaulted(defaulted: ReadonlySet<string>, s: Suggestions): Readonl
 /** The run's `noCoefficient`: a powder record with a model and no temperature coefficient, at the temperature of its fit. */
 export function noCoefficientOf(powder: Powder | undefined) {
   const i = powder?.interior
-  if (!i || powder.temperatureSensitivity) return
+  // a grain form with a default coefficient (#842) runs with it
+  if (!i || hasSensitivity(powder)) return
   return {
     noCoefficient: { reference: toSi('temperature', i.propellantTemperature.value) },
   }
+}
+
+/**
+ * The volume tolerance of a run: the approximate default volume's (`approximateVolumeTolerance`) and
+ * the cavity bracket's (`cavityVolumeFraction`, which holds the default 1 %) added, at most
+ * `maxVolumeFraction`; either alone as it is.
+ */
+function combinedVolumeFraction(
+  approximate: number | undefined,
+  cavity: number | undefined,
+): number | undefined {
+  if (approximate === undefined) return cavity
+  if (cavity === undefined) return approximate
+  return Math.min(
+    approximate + cavity - pressureToleranceDefaults.volumeFraction,
+    maxVolumeFraction,
+  )
 }
 
 /** The followed fields with the start pressure added when `follow`. */
@@ -982,6 +1010,25 @@ function identityOf(a: {
   }
 }
 
+/** The card whose More popover holds an invalid field, so it opens and focus can reach the field. */
+const moreHolding = (errors: Record<string, unknown>) =>
+  powderMoreFields.some((k) => errors[k])
+    ? ('powder' as const)
+    : firearmMoreFields.some((k) => errors[k])
+      ? ('firearm' as const)
+      : undefined
+
+/** The volume tolerance of the cavity bracket of a hollow base, when the run's volume follows the seated bullet. */
+function cavityFractionOf(a: {
+  seated: Seated
+  fields: Fields
+  previewed: Partial<Record<PreviewKey, number>>
+  bullet: Parameters<typeof cavityVolumeFraction>[0]
+}) {
+  if (!fromSeatingOf(a.seated, a.fields, a.previewed).includes('volume')) return
+  return cavityVolumeFraction(a.bullet, a.seated.depth, a.fields.volume?.si)
+}
+
 /** The seated values still the ones the seating preview wrote. */
 const fromSeatingOf = (
   seated: Seated,
@@ -996,6 +1043,48 @@ function fetchBand(request: unknown, signal: AbortSignal): Promise<SampledBand> 
     .then((r) => (r.ok ? r.json() : undefined))
     .then((answer: { sampled?: SampledBand } | undefined) => answer?.sampled ?? failed)
     .catch(() => failed)
+}
+
+/**
+ * The peak breech pressure (Pa) of `body` at both ends of the cold sensitivity interval `interval`,
+ * [low, high], as two runs of the same request (`coldPeakInterval` in core does the same); none at
+ * or above the reference, or when a run gives no result.
+ */
+async function fetchColdPeak(
+  body: { load: Parameters<typeof stepLoad>[0] },
+  interval: readonly [number, number],
+  signal: AbortSignal,
+): Promise<[number, number] | undefined> {
+  const { load } = body
+  const s = load.propellant.temperatureSensitivity
+  if (!s || !(load.propellantTemperature < s.reference)) return
+  const peak = (cold: number) =>
+    postInterior(
+      {
+        ...body,
+        load: {
+          ...load,
+          propellant: { ...load.propellant, temperatureSensitivity: { ...s, cold } },
+        },
+      },
+      signal,
+    )
+      .then((r) => (r.ok ? r.json() : undefined))
+      .then((a: InteriorResponse | undefined) => a?.result?.peakBreechPressure)
+      .catch(() => undefined)
+  const [a, b] = await Promise.all(interval.map(peak))
+  return a === undefined || b === undefined ? undefined : [Math.min(a, b), Math.max(a, b)]
+}
+
+/** The outcome with the cold-side interval of step `step`, when it is still the run's result showing it. */
+function withColdPeak(
+  o: Outcome | undefined,
+  id: number,
+  step: number,
+  coldPeak: [number, number],
+) {
+  if (o?.kind !== 'ok' || o.id !== id || o.selected !== step || !o.sensitivityDefault) return o
+  return { ...o, sensitivityDefault: { ...o.sensitivityDefault, coldPeak } }
 }
 
 /** The outcome with the sampled band of the step shown first, when it is still the run's result. */
@@ -1609,6 +1698,7 @@ export function useWorkbenchState() {
   const running = useRef<AbortController | null>(null)
   // the sampled band request of the shown result: an edit leaves it running, a new run ends it
   const bandRequest = useRef<AbortController | null>(null)
+  const coldRequest = useRef<AbortController | null>(null)
   /** Bullet and powder record requests; only the latest of each kind may set its record. */
   const picking = useRef<Partial<Record<'cartridges' | 'bullets' | 'powders', AbortController>>>({})
   const runs = useRef(0)
@@ -1739,6 +1829,21 @@ export function useWorkbenchState() {
     setPreviewed((p) => ({ ...p, [k]: v }))
   }
 
+  /** Fetches the cold-side interval of a default sensitivity for step `step` of `ok`; aborts the one before. */
+  const requestColdPeak = useCallback((ok: Extract<Outcome, { kind: 'ok' }>, step: number) => {
+    coldRequest.current?.abort()
+    const d = ok.sensitivityDefault
+    const s = ok.steps[step]
+    if (!d || !s) return
+    const controller = new AbortController()
+    coldRequest.current = controller
+    const body = { model: 'm3' as const, load: stepLoad(ok.load, s), cartridge: ok.cartridge }
+    void fetchColdPeak(body, d.coldInterval, controller.signal).then((coldPeak) => {
+      if (coldPeak && !controller.signal.aborted)
+        setOutcome((o) => withColdPeak(o, ok.id, step, coldPeak))
+    })
+  }, [])
+
   /** Shows ladder step `i` in the readouts, warnings and chart; a step without a result is skipped. */
   const select = useCallback(
     (i: number) => {
@@ -1746,10 +1851,11 @@ export function useWorkbenchState() {
         showChart(undefined)
         const shown = { ...atStep(outcome, i), announce: false }
         setOutcome(shown)
+        requestColdPeak(shown, i)
         setStatus({ prefix: '' })
       }
     },
-    [outcome, showChart],
+    [outcome, showChart, requestColdPeak],
   )
 
   /** A new request for a record kind; aborts the one before. */
@@ -2092,10 +2198,11 @@ export function useWorkbenchState() {
     return seatingLadder(seatAt, start, step, ladderSteps, direction, show, t)
   }
 
-  /** Why a temperature ladder cannot run: the powder record has no temperature sensitivity. */
+  /** Why a temperature ladder cannot run: the powder has no temperature sensitivity, own or default. */
   const temperatureBlock = temperatureLadderBlockReason(
     powderLabel,
-    powder?.temperatureSensitivity !== undefined,
+    // the chosen powder: a record, or a design that keeps its grain form
+    hasSensitivity(chosenPowder),
     t,
   )
 
@@ -2137,7 +2244,8 @@ export function useWorkbenchState() {
    */
   function revealInvalid(errors: Record<string, unknown>, refused: string | undefined) {
     if (modelFields.some((k) => errors[k]) || refused === 'bulkDensity') setModelShown(true)
-    if (powderMoreFields.some((k) => errors[k])) setMore('powder')
+    const holding = moreHolding(errors)
+    if (holding) setMore(holding)
   }
 
   /** Validates and sends; false when a field is invalid (it then gets focus). */
@@ -2183,6 +2291,8 @@ export function useWorkbenchState() {
     return
   }
 
+  const cavityFraction = cavityFractionOf({ seated, fields, previewed, bullet: bulletNow })
+
   /**
    * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
    * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
@@ -2198,7 +2308,7 @@ export function useWorkbenchState() {
     const typedError = specError()
     if (typedError) throw new Error(typedError)
     const chosen = as?.powder ?? chosenPowder
-    const { body, bulkDensity, missing } = interiorRequest({
+    const { body, bulkDensity, missing, sensitivityDefault } = interiorRequest({
       // the form's values now, not this render's: a run pressed after a seated volume was written
       // and before it was drawn sends that volume, not an empty field's error (#870). The Powders
       // tab's rows (`as`) read the values of the render their batch started from, so every row of a
@@ -2217,6 +2327,7 @@ export function useWorkbenchState() {
       boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
+      volumeFraction: cavityFraction,
       pressureLimit: typedSpec(spec.typed, 'pmax'),
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
@@ -2238,11 +2349,16 @@ export function useWorkbenchState() {
       // the range tolerance of an approximate volume, which the body of the rows does not hold
       volumeTolerance,
     ]
+    const castHardness = plainBaseCastHardness(bulletRecord?.construction)
+    // the approximate default volume's interval and the cavity bracket of a hollow base add up
+    const volumeFraction = combinedVolumeFraction(volumeTolerance, body.tolerances?.volumeFraction)
     return {
-      body: volumeTolerance ? { ...body, tolerances: { volumeFraction: volumeTolerance } } : body,
+      body: volumeFraction ? { ...body, tolerances: { volumeFraction } } : body,
       bulkDensity,
       resistanceMissing,
       recordInputs,
+      sensitivityDefault,
+      castHardness,
     }
   }
 
@@ -2287,6 +2403,7 @@ export function useWorkbenchState() {
     if (err instanceof ValueError) {
       form.setFieldError(err.field, err.message)
       if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
+      if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
     setOutcome(undefined)
     const message = errorText(err)
@@ -2301,6 +2418,8 @@ export function useWorkbenchState() {
     plan: Partial<Step>[] | undefined
     bulkDensity: number | undefined
     resistanceMissing: Extract<Outcome, { kind: 'ok' }>['resistanceMissing']
+    sensitivityDefault: ReturnType<typeof loadRequest>['sensitivityDefault']
+    castHardness: number | undefined
     table: string | undefined
     gasFactorNote: string | undefined
   }) {
@@ -2321,6 +2440,9 @@ export function useWorkbenchState() {
       unlisted: unlistedCartridge(powder, cartridge),
       powderChosen: chosenPowder !== undefined || linkedPowder !== undefined,
       resistanceMissing: a.resistanceMissing,
+      sensitivityDefault: withoutColdPeak(a.sensitivityDefault),
+      castHardness: a.castHardness,
+      roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
       ...noCoefficientOf(chosenPowder),
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
@@ -2370,12 +2492,14 @@ export function useWorkbenchState() {
     ).then((sampled) => {
       if (!bandController.signal.aborted) setOutcome((o) => withBand(o, ok.id, first, sampled))
     })
+    requestColdPeak(ok, first)
   }
 
   async function send() {
     clearTimeout(autoTimer.current)
     running.current?.abort()
     bandRequest.current?.abort()
+    coldRequest.current?.abort()
     let req: ReturnType<typeof loadRequest>
     try {
       req = loadRequest()

@@ -4,6 +4,7 @@ import {
   overrideResistance,
   powderModelValues,
   recordResistance,
+  recordSensitivity,
   workbenchValueKeys,
 } from '@open-reloading/core'
 import { analysisKinds, legacyLoadProblem, toSi } from '@open-reloading/schema'
@@ -46,6 +47,15 @@ const ramped = {
   name: 'Ramped',
   interior: { ...model, resistance: { ...law, engraving: 0.5 } },
 }
+/** A fitted ball powder without its own temperature coefficient: it takes the grain form's default. */
+const ball = {
+  id: 'example-f-ball',
+  manufacturer: 'example-f',
+  name: 'Ball',
+  grainForm: 'ball',
+  interior: { ...model, propellantTemperature: { value: 21 } },
+  provenance: published,
+}
 /** A powder with a low bulk density: the example charge fills 1.37 of the case. */
 const fluffy = {
   id: 'example-f-fluffy',
@@ -84,7 +94,7 @@ const api = withApi({
   seed: {
     ...bundle,
     cartridges: cartridges as typeof bundle.cartridges,
-    powders: [...bundle.powders, fitted as never, ramped as never, fluffy as never],
+    powders: [...bundle.powders, fitted as never, ramped as never, fluffy as never, ball as never],
     bullets: [...bundle.bullets, longBullet],
   },
 })
@@ -181,6 +191,28 @@ describe('POST /interior/load-file', () => {
     const { body } = await simulate(file({ siValues }), '?curves=true')
     expect(body.points.length).toBeGreaterThan(10)
     expect(body.points[0]).toHaveProperty('time')
+  })
+
+  it("applies the temperature coefficient a powder record takes, its grain form's default here, as the workbench does", async () => {
+    const cold = { ...siValues, propellantTemperature: 273.15 }
+    const sim = await simulate(file({ siValues: cold, cartridge: 'beta-pistol', powder: ball.id }))
+    const taken = recordSensitivity(ball)
+    expect(taken?.form).toBe('ball')
+    const load = interiorLoad(withPowder(ball))
+    const at = {
+      ...load,
+      propellantTemperature: 273.15,
+      propellant: { ...load.propellant, temperatureSensitivity: taken?.sensitivity },
+    }
+    const int = await interior({ model: 'm3', load: at, cartridge: 'beta-pistol' })
+    expect(sim.status).toBe(200)
+    expect(sim.body.summary.peakPressure).toBe(int.body.pressureRange.nominalPressure)
+    const plain = await interior({
+      model: 'm3',
+      load: { ...load, propellantTemperature: 273.15 },
+      cartridge: 'beta-pistol',
+    })
+    expect(sim.body.summary.peakPressure).toBeLessThan(plain.body.pressureRange.nominalPressure)
   })
 
   it('applies the bore resistance of the powder record and gives the load ratio', async () => {

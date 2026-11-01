@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  derived,
   type Outcome,
   resultNotes,
   unlistedCartridge,
@@ -118,6 +119,66 @@ describe('resultNotes', () => {
       },
     ])
     expect(listed(ok(plain))).toEqual([])
+  })
+
+  it('warns of possible gas leakage when a plain-base cast bullet is harder than the peak upsets', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const at = (peak: number, castHardness: number | undefined) =>
+      ok({
+        ...plain,
+        castHardness,
+        body: { ...ok().body, result: { ...ok().body.result, peakBreechPressure: peak } },
+      })
+    const leak = (o: Ok) =>
+      derived(o, english.t).own.filter((w) => w.name === 'possible gas leakage')
+    // Brinell 18 is about 176 MPa
+    expect(leak(at(1.5e8, 18))).toHaveLength(1)
+    expect(leak(at(2.32e8, 18))).toEqual([])
+    expect(leak(at(1.5e8, undefined))).toEqual([])
+    expect(warningsText(at(1.5e8, 18), english.t)).toContain('gas may leak past its base')
+  })
+
+  it('marks a run on the default temperature coefficient, and gives the cold side as an interval', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const lines = (o: Ok) => resultNotes(o, [], units, english.t).map((n) => n.line)
+    expect(
+      lines(ok({ ...plain, sensitivityDefault: { form: 'ball', coldInterval: [0, 0.003] } })),
+    ).toContain('Default temperature coefficient of ball powder: the powder record gives none.')
+    const cold = lines(
+      ok({
+        ...plain,
+        sensitivityDefault: {
+          form: 'extruded',
+          coldInterval: [0, 0.003],
+          coldPeak: [3.1e8, 3.4e8],
+        },
+      }),
+    )
+    expect(
+      cold.some((l) =>
+        /^Cold side: peak pressure .+ to .+ with the default coefficient\.$/.test(l),
+      ),
+    ).toBe(true)
+    expect(lines(ok(plain)).some((l) => l.startsWith('Default temperature'))).toBe(false)
+  })
+
+  it('notes a round count of the firearm: the velocity may be lower than simulated', () => {
+    const plain = { volumeMeasured: true, bulkDensity: 900, cartridgeDesign: undefined }
+    const worn = (o: Ok) =>
+      resultNotes(o, [], units, english.t).filter((n) => n.line.startsWith('The barrel has fired'))
+    expect(worn(ok({ ...plain, roundCount: 4000 }))).toEqual([
+      expect.objectContaining({
+        kind: 'note',
+        line: 'The barrel has fired 4000 rounds: the velocity may be lower than simulated.',
+        text: expect.stringContaining('0.29 % of its velocity per 1000 rounds'),
+      }),
+    ])
+    expect(worn(ok(plain))).toEqual([])
+    expect(worn(ok({ ...plain, roundCount: 0 }))).toEqual([])
+    // a typed throat wear already carries the wear: no note
+    const typed = ok({ ...plain, roundCount: 4000 })
+    const load = { ...typed.load, chamber: { ...typed.load.chamber, throatWear: 1e-3 } }
+    expect(worn({ ...typed, load })).toEqual([])
   })
 
   it('counts the unlisted cartridge as a warning, so a result with only that one is announced', () => {

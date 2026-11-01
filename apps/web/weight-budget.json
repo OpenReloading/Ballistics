@@ -198,8 +198,8 @@
     },
     "workbench": {
       "budget": {
-        "initial": 636000,
-        "total": 1050000
+        "initial": 638000,
+        "total": 1052000
       },
       "routes": {
         "/workbench": {

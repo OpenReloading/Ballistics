@@ -2,6 +2,7 @@ import {
   assumedBelow,
   type BulletDimensions,
   bulletOutline,
+  cavityVolumeBracket,
   type Outline,
   revolutionVolume,
   type Tag,
@@ -105,6 +106,11 @@ export interface Seating {
   /** Case volume to the mouth and volume behind the bullet, cm³. */
   caseVolume?: Tagged
   volumeBehindBullet?: Tagged
+  /**
+   * Bounds of `volumeBehindBullet` over the depth bracket of a cavity of assumed depth below the
+   * mouth (`cavityVolumeBracket`), cm³; none without such a cavity.
+   */
+  cavityRange?: { low: number; high: number }
   travel?: Tagged
   /** Leade contact from the head, approximate. */
   leade?: number | undefined
@@ -153,6 +159,7 @@ export function seat({
   const cut = Math.min(Math.max(depthValue, 0), bullet.length)
   const { caseVolume, volume } = seatVolumes(outline, cut, waterCapacity, waterDensity)
   const behind = volumeBehind(volume, depthValue > chamber.caseLength, notes)
+  const bracket = behind && caseVolume && cavityVolumeBracket(bullet, cut)
   const byCbto = by.kind === 'baseToOgive'
   const contact = landContact(chamber, bullet, outline, byCbto, unit)
   notes.push(...contact.notes)
@@ -174,6 +181,13 @@ export function seat({
     depth: { value: depthValue, tag: 'derived' },
     ...(caseVolume && { caseVolume }),
     ...(behind && { volumeBehindBullet: behind }),
+    ...(bracket &&
+      caseVolume && {
+        cavityRange: {
+          low: Math.max(caseVolume.value - bracket.high / 1000, 0),
+          high: caseVolume.value - bracket.low / 1000,
+        },
+      }),
     ...(barrelLength !== undefined && {
       travel: { value: barrelLength - base, tag: 'derived' as const },
     }),

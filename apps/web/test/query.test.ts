@@ -187,8 +187,18 @@ it('carries the records a run reads, so the link gives the same bore resistance 
   const link = withRecordValues('units=metric-grams&bullet=b&powder=p', values)
   const back = recordValues(new URLSearchParams(link))
   expect(back).toEqual(values)
-  const { name: _, bulkDensity: __, ...terms } = back.powder ?? {}
+  const {
+    name: _,
+    bulkDensity: __,
+    grainForm: ___,
+    sensitivityReference: ____,
+    ...terms
+  } = back.powder ?? {}
   expect(overrideResistance(undefined, terms)).toEqual(resistance)
+  // the grain form and the reference of a default temperature coefficient travel; an unknown form does not
+  const sensitive = { powder: { grainForm: 'ball' as const, sensitivityReference: 294.15 } }
+  expect(recordValues(new URLSearchParams(withRecordValues('', sensitive)))).toEqual(sensitive)
+  expect(recordValues(new URLSearchParams('record.grainForm=granular')).powder).toBeUndefined()
   // nothing carried: no values; one engraving term alone is no ramp
   expect(recordValues(new URLSearchParams('units=metric-grams'))).toEqual({})
   expect(

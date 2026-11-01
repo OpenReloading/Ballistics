@@ -138,6 +138,7 @@ const siKey: Record<string, string> = {
   'chamber.volume': 'volume',
   'chamber.boreArea': 'boreArea',
   'chamber.boreDiameter': 'boreDiameter',
+  'chamber.throatWear': 'throatWear',
   'barrel.length': 'travel',
   'barrel.twist': 'twist',
   'bullet.mass': 'bulletMass',

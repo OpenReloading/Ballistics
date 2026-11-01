@@ -14,6 +14,7 @@
 . CandidatePlan
 . CartridgeDiameters
 . CartridgeSpecs
+. CastConstruction
 . ChargeExtreme
 . ChargeRange
 . ChargeRefusal
@@ -55,6 +56,7 @@
 . FreeRecoil
 . FreeRecoilInput
 . Grain
+. GrainForm
 . GroupConfidence
 . GroupCovariance
 . GroupInput
@@ -197,6 +199,8 @@
 . ScoringZone
 . SeatingNote
 . SeatingReading
+. SensitivityDefault
+. SensitivityPowder
 . SessionReading
 . SessionsTruingResult
 . Settings
@@ -211,6 +215,7 @@
 . StartPressureRule
 . StepBudget
 . StructureFields
+. TakenSensitivity
 . TargetMotion
 . TraceResiduals
 . Trajectory
@@ -238,6 +243,7 @@
 . VivacityBurn
 . VivacityForm
 . WeakReason
+. WearMeasurement
 . WindSegment
 . ZeroSpec
 . ZonePoints
@@ -260,6 +266,7 @@
 . cartridgeDiameters
 . cartridgeGrooveDiameterMm
 . cartridgeLandDiameterMm
+. castHarderThanPeak
 . chargeLadder
 . chargeSolverMaxRuns
 . chargeSolverTolerance
@@ -275,12 +282,14 @@
 . cipRounding
 . closedVessel
 . coefficientAt
+. coldPeakInterval
 . comparePlanCandidates
 . compareTruingFits
 . constructionOf
 . convectiveDefaults
 . cylinderInertia
 . defaultRounding
+. defaultSensitivity
 . defaultStartPressure
 . densityAltitude
 . dispersionEllipse
@@ -347,12 +356,14 @@
 . movingTargetLead
 . muzzleVelocityFromDownrange
 . normalGravity
+. obturationPressurePerBrinell
 . outlineDragMach
 . outsideDomain
 . overlay
 . overrideResistance
 . oversizePercent
 . placeMaximum
+. plainBaseCastHardness
 . planTruingStrings
 . pointDispersion
 . pooledDefaults
@@ -376,6 +387,7 @@
 . recordBoreArea
 . recordLoad
 . recordResistance
+. recordSensitivity
 . ringEventTotals
 . ringTotal
 . rk45
@@ -383,6 +395,7 @@
 . saturationVapourPressure
 . seatingTolerance
 . segmentCoefficient
+. sensitivityReferenceDefault
 . shotsNeeded
 . shotsToHit
 . shotshellInterior
@@ -409,7 +422,9 @@
 . trueMuzzleVelocity
 . unknownValueKeys
 . velocityStatistics
+. vuong2026
 . waterDensityGramsPerCm3
 . workbenchValueKeys
+. wornVolume
 . yawOfRepose
 . zeroAngles
