@@ -28,6 +28,8 @@ const humanised = (key: string) => {
 
 /** The label of the record field at the dot path `key` for a record of `kind`, in the language of `t`. */
 export function fieldLabel(key: string, kind: string | undefined, t: Translator['t']): string {
-  const own = kind ? labels[kind]?.[key] : undefined
+  const map = kind && Object.hasOwn(labels, kind) ? labels[kind] : undefined
+  // own keys only: a source's field `constructor` reads as its words, not as Object's
+  const own = map && Object.hasOwn(map, key) ? map[key] : undefined
   return t(own ?? (humanised(key) as Message))
 }
