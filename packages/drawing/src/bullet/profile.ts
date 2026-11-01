@@ -3,6 +3,7 @@ import {
   type BaseType,
   type BulletDimensions,
   bulletOutline,
+  type LengthText,
   type Outline,
   type Refusal,
 } from './outline.ts'
@@ -150,14 +151,16 @@ export interface BulletProfile extends Profile {
 
 /**
  * The outline of a bullet and the dimensions of the values `sourced` covers that the drawn
- * outline follows: a value the outline replaced, assumed or derived is never dimensioned.
+ * outline follows: a value the outline replaced, assumed or derived is never dimensioned. A
+ * refusal writes its lengths with `length` (mm by default).
  */
 export function bulletProfile(
   shape: BulletDimensions,
   sourced: (field: string) => boolean,
   given: 'sourced' | 'entered' = 'sourced',
+  length?: LengthText,
 ): BulletProfile | Refusal {
-  const o = bulletOutline(shape, given)
+  const o = bulletOutline(shape, given, length)
   if ('reason' in o) return o
   const L = shape.length
   const z0 = L - o.noseLength

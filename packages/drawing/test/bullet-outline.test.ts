@@ -453,6 +453,18 @@ describe('refused input', () => {
       fields: ['noseLength', 'length', 'base.length'],
     })
   })
+
+  it('writes the lengths of a refusal with the given length text, mm by default', () => {
+    const b = { ...base, noseLength: 30, base: { type: 'boat-tail' as const, length: 5 } }
+    const inches = (x: number) => `${(x / 25.4).toFixed(3)} in`
+    const mmText = bulletOutline(b)
+    const inText = bulletOutline(b, 'sourced', inches)
+    expect('reason' in mmText && mmText.reason).toMatch(/nose length 30 mm/)
+    expect(inText).toEqual({
+      reason: `The nose length 1.181 in is above the length less the boat tail, ${inches(base.length - 5)}.`,
+      fields: ['noseLength', 'length', 'base.length'],
+    })
+  })
 })
 
 /** Record paths of every `BulletDimensions` field. */

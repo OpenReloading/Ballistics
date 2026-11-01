@@ -24,6 +24,7 @@ import {
   fromUser,
   type History,
   historyOf,
+  implausible,
   newDesign,
   reduce,
 } from '../src/lib/bullet-designer.ts'
@@ -194,6 +195,18 @@ describe('refusals', () => {
     expect(evaluate(h.present, metric, 'length').refusal?.field).toBe('length')
   })
 
+  it('writes the lengths of an outline refusal in the page unit, inches with 3 decimals', () => {
+    const h = run(newDesign(metric), type('length', '30'), type('noseLength', '16'))
+    const e = run(h.present, type('length', '5.08'))
+    expect(evaluate(e.present, us, 'noseLength').refusal).toEqual({
+      reason: expect.stringContaining('nose length .630 in is above the length'),
+      field: 'noseLength',
+    })
+    expect(evaluate(e.present, metric, 'noseLength').refusal?.reason).toContain(
+      'nose length 16 mm is above the length',
+    )
+  })
+
   it('shows invalid text at its field and gives no drawing', () => {
     const h = run(newDesign(metric), type('length', '-3'))
     expect(evaluate(h.present, metric, 'length').refusal).toEqual({
@@ -223,6 +236,29 @@ describe('refusals', () => {
       reason: 'A cannelure needs a start and a width.',
       field: 'cannelure.width',
     })
+  })
+})
+
+describe('plausibility', () => {
+  const spec = (key: string) => defined(designerSpecs.find((s) => s.key === key))
+  it('flags a diameter outside 0.05 to 1.5 in and a mass outside 5 to 1000 gr, nothing else', () => {
+    const inch = 0.0254
+    const grain = 64.79891e-6
+    expect(implausible(spec('diameter'), 0.308 * inch)).toBe(false)
+    expect(implausible(spec('diameter'), 180 * inch)).toBe(true)
+    expect(implausible(spec('diameter'), 0.04 * inch)).toBe(true)
+    expect(implausible(spec('mass'), 168 * grain)).toBe(false)
+    expect(implausible(spec('mass'), 4 * grain)).toBe(true)
+    expect(implausible(spec('mass'), 1001 * grain)).toBe(true)
+    expect(implausible(spec('length'), 100)).toBe(false)
+    expect(implausible(spec('diameter'), undefined)).toBe(false)
+  })
+
+  it('does not block: an implausible diameter still draws', () => {
+    const h = run(newDesign(metric), type('diameter', '40'))
+    const e = evaluate(h.present, metric, 'diameter')
+    expect(e.refusal).toBeUndefined()
+    expect(e.drawing).toBeDefined()
   })
 })
 

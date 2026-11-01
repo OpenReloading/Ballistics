@@ -5,6 +5,7 @@ import {
   bulletFigureModel,
   bulletProfile,
   bulletScreenEm,
+  type LengthText,
 } from '@open-reloading/drawing/bullet'
 import {
   type Bullet,
@@ -14,7 +15,7 @@ import {
   tipTypes,
   type UserBullet,
 } from '@open-reloading/schema'
-import { untranslated } from '../i18n/number.ts'
+import { fixedNumber, plainNumber, untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'
 import {
@@ -31,7 +32,13 @@ import { designReduce, editHistory, type History as H, historyOf, pushHistory } 
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
 import type { FieldRow } from './record-fields.ts'
-import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
+import {
+  drawingLengthUnit,
+  inchText,
+  kilogramsPerGrain,
+  metersPerInch,
+  type UnitSystem,
+} from './units.ts'
 import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.ts'
 
 /** The field groups of the designer, in order. */
@@ -50,6 +57,11 @@ export type Group = keyof typeof groups
 export interface DesignerSpec extends FieldSpec {
   label: Message
   group: Group
+  /**
+   * SI range of a plausible bullet value: outside it the field asks to check the unit, a soft
+   * flag that blocks nothing (the ranges of issue #788).
+   */
+  plausible?: [number, number]
 }
 
 const len = (key: string, label: Message, group: Group): DesignerSpec => ({
@@ -60,9 +72,27 @@ const len = (key: string, label: Message, group: Group): DesignerSpec => ({
   min: 0,
 })
 
+/** The SI range of `low` to `high` units of `perUnit` SI each. */
+const range = (low: number, high: number, perUnit: number): [number, number] => [
+  low * perUnit,
+  high * perUnit,
+]
+
 export const designerSpecs: DesignerSpec[] = [
-  { ...len('diameter', msg('Diameter'), 'size'), required: true },
-  { key: 'mass', label: msg('Mass'), quantity: 'mass', group: 'size', min: 0, positive: true },
+  {
+    ...len('diameter', msg('Diameter'), 'size'),
+    required: true,
+    plausible: range(0.05, 1.5, metersPerInch),
+  },
+  {
+    key: 'mass',
+    label: msg('Mass'),
+    quantity: 'mass',
+    group: 'size',
+    min: 0,
+    positive: true,
+    plausible: range(5, 1000, kilogramsPerGrain),
+  },
   len('length', msg('Length'), 'size'),
   len('noseLength', msg('Nose length'), 'nose'),
   len('ogive.radius', msg('Ogive radius'), 'nose'),
@@ -94,6 +124,10 @@ export const designerSpecs: DesignerSpec[] = [
   len('tip.length', msg('Polymer tip length'), 'tip'),
   len('tip.mouthDiameter', msg('Hollow-point mouth diameter'), 'tip'),
 ]
+
+/** Whether the SI value `si` of the field `s` is outside its plausible range: a unit to check. */
+export const implausible = (s: DesignerSpec, si: number | undefined) =>
+  si !== undefined && s.plausible !== undefined && (si < s.plausible[0] || si > s.plausible[1])
 
 /** The choices, keyed by record path, with their options ('' for not given): the record schema's enums. */
 export const choiceOptions = {
@@ -631,6 +665,17 @@ function ogiveFills(
 }
 
 /**
+ * A length of a drawing refusal in the drawing's unit of `system`: "16 mm", ".630 in" (3
+ * decimals, the language's decimal mark).
+ */
+export function refusalLength(system: UnitSystem): LengthText {
+  const mmPerInch = fromSi('length', metersPerInch)
+  return drawingLengthUnit(system) === 'in'
+    ? (mm) => `${inchText(fixedNumber(mm / mmPerInch, 3), 'in')} in`
+    : (mm) => `${plainNumber(+mm.toFixed(3))} mm`
+}
+
+/**
  * The drawing, the field states and the computed values of a design. `last` is the field edited
  * last: a refusal naming it shows there, in the language of `t`. Invalid field text and refused
  * dimensions give no drawing, so the page keeps its last one.
@@ -660,7 +705,7 @@ export function evaluate(
   const completed = completeShape(v, choices)
   const shape = shapeFromValues(v, choices, completed.L, completed.n)
   const given = designerSpecs.map((s) => s.key).filter((k) => v[k] !== undefined)
-  const p = bulletProfile(shape, (f) => given.includes(f), 'entered')
+  const p = bulletProfile(shape, (f) => given.includes(f), 'entered', refusalLength(system))
   if ('reason' in p) {
     const field =
       p.fields.find((f) => f === last) ??

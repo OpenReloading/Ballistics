@@ -429,7 +429,7 @@ function PhotoTool({
         )}
       </Flex>
       <div style={{ flex: '1 1 100%' }}>
-        <MessageSlot label={t('Photograph messages')} messages={messages} />
+        <PhotoMessages photo={size !== undefined} messages={messages} />
         {p.rows.length > 0 && <ValuesTable rows={p.rows} system={system} record={record} />}
         <Flex gap="xs" mt="sm" align="center" wrap="wrap">
           <Button
@@ -447,6 +447,14 @@ function PhotoTool({
       </div>
     </Flex>
   )
+}
+
+/** The messages of the tool; no reserved room before a photograph, unless one failed to read. */
+function PhotoMessages({ photo, messages }: { photo: boolean; messages: MessageEntry[] }) {
+  const { t } = useTranslation()
+  return photo || messages.length > 0 ? (
+    <MessageSlot label={t('Photograph messages')} messages={messages} />
+  ) : null
 }
 
 /** The dialog of the bullet photo tool; loaded when it first opens. */
@@ -471,7 +479,7 @@ export function BulletPhoto({
       opened={opened}
       onClose={onClose}
       title={t('Bullet from a photograph')}
-      size="min(72rem, 96vw)"
+      size="min(34rem, 96vw)"
       fullScreen={phone}
       closeButton={{ 'aria-label': t('Close the photograph tool') }}
     >
