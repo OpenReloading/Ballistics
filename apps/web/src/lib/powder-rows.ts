@@ -111,7 +111,9 @@ export function designCurves(records: readonly UserRecord[]): Map<string, Fitted
         name: r.name,
         interior: interior.data,
       })
-      return isFitted(p) ? [[r.id, p]] : []
+      // a rate the curve can draw: a positive vivacity, a finite mean (a huge form overflows it)
+      if (!isFitted(p) || !(interior.data.vivacity.value > 0)) return []
+      return Number.isFinite(meanRate(p).value) ? [[r.id, p]] : []
     }),
   )
 }
@@ -127,6 +129,7 @@ export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
     if (r.kind !== 'powder') return []
     const curve = curves.get(r.id)
     const m = curve && meanRate(curve)
+    const fit = curve && r.data.draft?.interior
     return [
       {
         id: userRowId(r.id),
@@ -137,6 +140,8 @@ export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
         grainForm: r.data.draft?.grainForm ?? undefined,
         propellantBase: r.data.draft?.propellantBase ?? undefined,
         ...(m && { meanVivacity: r3(m.value), low: r3(m.low), high: r3(m.high) }),
+        ...(fit?.trainingRows && { trainingRows: fit.trainingRows }),
+        ...(fit?.trainingCartridges && { trainingCartridges: fit.trainingCartridges }),
       },
     ]
   })

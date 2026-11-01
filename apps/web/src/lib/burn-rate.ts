@@ -378,7 +378,7 @@ function step(v: number, dir: -1 | 1): number {
 export function rateDomain(rows: readonly PowderRow[]): RateDomain {
   const values = rows
     .flatMap((r) => [r.low ?? r.meanVivacity, r.high ?? r.meanVivacity])
-    .filter((v): v is number => v !== undefined && v > 0)
+    .filter((v): v is number => v !== undefined && v > 0 && Number.isFinite(v))
   if (values.length === 0) return [1, 10]
   const lo = step(Math.min(...values), -1)
   const hi = step(Math.max(...values), 1)

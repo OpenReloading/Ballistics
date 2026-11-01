@@ -280,4 +280,26 @@ it('gives a browser design with a curve its mean vivacity, so the overlay can ta
   expect(inOverlay(defined(fitted))).toBe(true)
   expect(unfinished?.meanVivacity).toBeUndefined()
   expect(inOverlay(defined(unfinished))).toBe(false)
+
+  const design = (id: string, data: object) => ({
+    kind: 'powder' as const,
+    id,
+    name: id,
+    saved,
+    data: { origin: 'user' as const, provenanceKind: 'fitted' as const, draft: { interior: data } },
+  })
+  const [trained, still, overflow] = userPowderRows([
+    // the fit's training counts carry into the row
+    design('trained', { ...interior, trainingRows: 12, trainingCartridges: 3 }),
+    // no curve for a vivacity of 0 or a mean rate that overflows
+    design('still', { ...interior, vivacity: { value: 0 } }),
+    design('overflow', {
+      ...interior,
+      burnForm: { ...interior.burnForm, a: { value: 1 }, m: 5000 },
+    }),
+  ])
+  expect(trained).toMatchObject({ trainingRows: 12, trainingCartridges: 3 })
+  expect(trained?.meanVivacity).toBeGreaterThan(0)
+  expect(still?.meanVivacity).toBeUndefined()
+  expect(overflow?.meanVivacity).toBeUndefined()
 })
