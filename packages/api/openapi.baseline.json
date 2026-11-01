@@ -21129,7 +21129,7 @@
                                   "description": "Day the round count was last set, ISO 8601."
                                 },
                                 "countedSessions": {
-                                  "maxItems": 200,
+                                  "maxItems": 5000,
                                   "type": "array",
                                   "items": {
                                     "type": "object",

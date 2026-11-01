@@ -573,7 +573,7 @@ describe('firearm', () => {
     ).toContain('data.optics')
     const counted = { session: 'user:00000000-0000-4000-8000-000000000001', rounds: 3 }
     expect(paths({ countedSessions: [counted] })).toBeUndefined()
-    expect(paths({ countedSessions: Array(201).fill(counted) })).toEqual(['data.countedSessions'])
+    expect(paths({ countedSessions: Array(5001).fill(counted) })).toEqual(['data.countedSessions'])
     expect(paths({ countedSessions: [{ ...counted, rounds: -1 }] })).toEqual([
       'data.countedSessions.0.rounds',
     ])

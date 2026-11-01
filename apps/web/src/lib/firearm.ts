@@ -328,8 +328,11 @@ export const catalogueCartridgeId = (ref: string | undefined) => {
   return parsed?.scope === 'catalogue' ? parsed.id : undefined
 }
 
-/** The entries `countedSessions` holds at most (the schema's limit). */
-const maxCountedSessions = 200
+/**
+ * The entries `countedSessions` holds at most (the schema's limit): a shooting log entry has no
+ * snapshot to fall back on, so a dropped one would offer its rounds again (#928).
+ */
+const maxCountedSessions = 5000
 
 /** A new firearm: no optics or configurations yet. */
 export const blankFirearm = (): Firearm => ({

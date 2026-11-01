@@ -267,7 +267,7 @@ export const firearm = z
           rounds: z.int().nonnegative().describe('Rounds of the session added to `roundCount`.'),
         }),
       )
-      .max(200)
+      .max(5000)
       .describe(
         'Sessions whose rounds were added to `roundCount`, the latest last, so a session is counted once.',
       )
