@@ -6,6 +6,7 @@ import { translator } from '../src/i18n/translate.ts'
 import {
   compareGroups,
   differenceMarks,
+  differenceToFirst,
   rowDiffers,
   sharedScale,
   turnPrefixOf,
@@ -70,7 +71,7 @@ const record = (over: Partial<Bullet>): Bullet =>
 
 const english = translator().t
 
-it('merges the data tables in the record groups, values in the preset, a missing one undefined', () => {
+it('merges the data tables: the key values first, then the record groups, values in the preset, a missing one undefined', () => {
   const a = record({
     length: { value: 31.5 },
     recommendedTwist: { value: 254 },
@@ -81,34 +82,40 @@ it('merges the data tables in the record groups, values in the preset, a missing
   } as Partial<Bullet>)
   const b = record({ id: 'y', noseLength: { value: 15 } } as Partial<Bullet>)
   const us = compareGroups([a, b], presetUnits('us'))
-  expect(us.map((g) => say(english, g.title))).toEqual([
-    'Size',
-    'Shape',
-    'Twist',
-    'Computed',
-    'Ballistic coefficients',
+  // Size and the coefficients give up every row to Key values, Computed its sectional density
+  expect(us.map((g) => say(english, g.title))).toEqual(['Key values', 'Shape', 'Twist', 'Computed'])
+  expect(defined(us[0]).rows.map((r) => say(english, r.label))).toEqual([
+    'Mass',
+    'Diameter',
+    'Length',
+    'BC G1',
+    'BC G7',
+    'Sectional density',
   ])
   const row = (title: string, label: string) =>
     us
       .find((g) => say(english, g.title) === title)
       ?.rows.find((r) => say(english, r.label) === label)
-  expect(row('Size', 'Diameter')).toEqual({
+  expect(row('Key values', 'Diameter')).toEqual({
     label: 'Diameter',
     symbol: 'd',
     unit: 'in',
     values: ['.3080', '.3080'],
   })
-  expect(row('Size', 'Mass')?.values).toEqual(['168.0', '168.0'])
-  expect(row('Size', 'Length')?.values).toEqual(['1.2402', undefined])
+  expect(row('Key values', 'Mass')?.values).toEqual(['168.0', '168.0'])
+  expect(row('Key values', 'Length')?.values).toEqual(['1.2402', undefined])
   expect(row('Shape', 'Nose length')?.values).toEqual([undefined, '.5906'])
   expect(row('Twist', 'Recommended twist')?.values).toEqual(['1 turn in 10.0', undefined])
-  expect(row('Ballistic coefficients', 'G7')?.values).toEqual(['0.260', undefined])
-  expect(row('Ballistic coefficients', 'G1')?.values).toEqual(['0.507', undefined])
+  expect(row('Key values', 'BC G7')?.values).toEqual(['0.260', undefined])
+  expect(row('Key values', 'BC G1')?.values).toEqual(['0.507', undefined])
   const metric = compareGroups([a], presetUnits('metric-grams'))
   expect(defined(metric[0]).rows.map((r) => [say(english, r.label), r.values[0], r.unit])).toEqual([
-    ['Diameter', '7.82', 'mm'],
     ['Mass', '10.89', 'g'],
+    ['Diameter', '7.82', 'mm'],
     ['Length', '31.50', 'mm'],
+    ['BC G1', '0.507', 'lb/in²'],
+    ['BC G7', '0.260', 'lb/in²'],
+    ['Sectional density', '177.9', 'kg/m²'],
   ])
 })
 
@@ -119,8 +126,23 @@ it('keeps a repeated label once per repeat', () => {
       { dragModel: 'G1', value: 0.49 },
     ],
   } as Partial<Bullet>)
-  const bc = compareGroups([b], presetUnits('us')).at(-1)
-  expect(bc?.rows.map((r) => r.values[0])).toEqual(['0.507', '0.490'])
+  // the first G1 is a key value, the second stays with the coefficients
+  const groups = compareGroups([b], presetUnits('us'))
+  expect(groups.at(-1)?.rows.map((r) => r.values[0])).toEqual(['0.490'])
+  expect(
+    groups[0]?.rows.filter((r) => say(english, r.label) === 'BC G1').map((r) => r.values[0]),
+  ).toEqual(['0.507'])
+})
+
+it('gives each value after the first its difference to the first, as shown', () => {
+  expect(differenceToFirst(['168.0', '150.0', '175.5'])).toEqual([undefined, '−18.0', '+7.5'])
+  expect(differenceToFirst(['.3080', '.3080'])).toEqual([undefined, '±0.0000'])
+  expect(differenceToFirst(['0,455', '0,392'])).toEqual([undefined, '−0,063'])
+  expect(differenceToFirst(['1 turn in 10.0', '1 turn in 12.0'])).toEqual([undefined, '+2.0'])
+  // nothing for an absent or a word value, or where the first has none
+  expect(differenceToFirst(['tangent', 'secant'])).toEqual([undefined, undefined])
+  expect(differenceToFirst(['1.2', undefined])).toEqual([undefined, undefined])
+  expect(differenceToFirst([undefined, '1.2'])).toEqual([undefined, undefined])
 })
 
 it('finds a row differing where its shown values are not all the same', () => {

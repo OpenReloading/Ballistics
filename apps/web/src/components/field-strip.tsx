@@ -46,6 +46,15 @@ const icons: Record<StripItem['icon'], Icon> = {
   black: RecordIcon,
 }
 
+/** The strip items as cards: items in a row with the same icon share one (a bullet's BCs G1 and G7). */
+const cards = (items: StripItem[]) =>
+  items.reduce<StripItem[][]>((all, i) => {
+    const last = all.at(-1)
+    if (last?.[0]?.icon === i.icon) last.push(i)
+    else all.push([i])
+    return all
+  }, [])
+
 /**
  * A bullet or powder record's facts under the page bar, as the cartridge record's cards: a card
  * per value of `items` in the Settings units, the unit after the label, then the manufacturer's
@@ -65,24 +74,27 @@ export function FieldStrip({
   if (items.length === 0 && !country && tags.length === 0) return null
   return (
     <FactCards>
-      {items.map((i) => {
-        const now = rowParts(i.row, system, t)
-        const also = slotUnits.map((u) => rowParts(i.row, u, t))
-        return (
-          <FactCard key={i.icon} icon={icons[i.icon]}>
-            <Fact
-              label={i.words ? say(t, i.words) : i.label}
-              notes={rowNotes(i.row, t)}
-              unit={{ now: now.unit, also: also.map((p) => p.unit) }}
-            >
-              <Sized
-                now={<span className="fact-number">{now.number}</span>}
-                also={also.map((p) => p.number)}
-              />
-            </Fact>
-          </FactCard>
-        )
-      })}
+      {cards(items).map((card) => (
+        <FactCard key={card[0]?.icon} icon={icons[card[0]?.icon ?? 'form']}>
+          {card.map((i) => {
+            const now = rowParts(i.row, system, t)
+            const also = slotUnits.map((u) => rowParts(i.row, u, t))
+            return (
+              <Fact
+                key={i.label}
+                label={i.words ? say(t, i.words) : i.label}
+                notes={rowNotes(i.row, t)}
+                unit={{ now: now.unit, also: also.map((p) => p.unit) }}
+              >
+                <Sized
+                  now={<span className="fact-number">{now.number}</span>}
+                  also={also.map((p) => p.number)}
+                />
+              </Fact>
+            )
+          })}
+        </FactCard>
+      ))}
       {country && (
         <FactCard icon={Globe}>
           <Fact label={t('Country')} notes={[t('Country of the manufacturer')]}>

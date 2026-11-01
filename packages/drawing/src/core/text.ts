@@ -15,16 +15,22 @@ export const greek: Record<string, string> = { alpha: 'α', alpha1: 'α1', beta:
 
 /**
  * Diameter sign, symbol and value in `unit`; derived values in parentheses; angles in decimal
- * degrees; the ratio Rt/R as stored.
+ * degrees; the ratio Rt/R as stored. `fixed`: lengths in the unit's fixed decimals (mm 2, in 4).
  */
 export function labelText(
   d: { kind: string; symbol: string; value: number; derived?: true },
   unit: LengthUnit = 'mm',
+  fixed = false,
 ) {
   if (d.kind === 'angle') {
     return `${greek[d.symbol] ?? d.symbol} ${angleText(d.value)}`
   }
-  const value = d.symbol === 'Rt/R' ? String(d.value) : lengthText(d.value, unit)
+  const value =
+    d.symbol === 'Rt/R'
+      ? String(d.value)
+      : fixed && unit === 'mm'
+        ? d.value.toFixed(2)
+        : lengthText(d.value, unit)
   const text = `${d.kind === 'diameter' ? face.diameterSign : ''}${d.symbol} ${value}`
   return d.derived ? `(${text})` : text
 }
