@@ -318,6 +318,8 @@ function cartridgeFindings(
     // only a value on the record's own basis; no value is converted between bases
     if (pmax === undefined || p?.peak.value === undefined) continue
     if (cartridge.pressureMethod === undefined || p.method !== cartridge.pressureMethod) continue
+    // a case-contact gauge reads on its own basis: Pmax is not its limit (#855)
+    if (p.method === 'case-contact') continue
     if (p.peak.value > pmax)
       found.push({
         finding: 'pressure-above-cartridge-max',
@@ -341,8 +343,8 @@ function cartridgeFindings(
  * - `pressure-order`: the pressure of the max charge is below that of the start charge (same unit
  *   and method, both with a value in bar);
  * - `pressure-above-cartridge-max`: a pressure with a value in bar whose method is the cartridge
- *   record's `pressureMethod` is above the record's largest `Pmax`. Other methods are not compared:
- *   no value is converted between pressure bases;
+ *   record's `pressureMethod` is above the record's largest `Pmax`. Other methods, and case-contact
+ *   pressure always, are not compared: no value is converted between pressure bases;
  * - `coal-above-cartridge-max`: COAL above the record's largest `L6` (maximum cartridge length).
  * Without a cartridge record only the order findings apply.
  */

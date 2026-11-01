@@ -333,9 +333,11 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   for (const f of collectFindings(bundle, cartridges))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
   const warnings = published.flatMap(({ folder, file }) =>
-    checkPublishedLoadPlausibility(file, cartridges.get(folder)).map(
-      (f) => `loads/${folder}/${file.id}.json: loads ${f.load}: ${f.finding}: ${f.message}`,
-    ),
+    // a folder under an old cartridge id reads the record that replaces it
+    checkPublishedLoadPlausibility(
+      file,
+      cartridges.get(folder) ?? cartridges.get(bundle.renames?.cartridges?.[folder] ?? ''),
+    ).map((f) => `loads/${folder}/${file.id}.json: loads ${f.load}: ${f.finding}: ${f.message}`),
   )
   return { bundle, publishedLoads: published.map((p) => p.file), errors, warnings }
 }

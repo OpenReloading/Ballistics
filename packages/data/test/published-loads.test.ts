@@ -515,6 +515,28 @@ describe('plausibility warnings of published loads', () => {
       expect(readWith({ charges: [charge('max', 2.8, { pressure })] }).warnings).toEqual([])
     const { pressureMethod: _, ...noMethod } = withL6
     expect(readWith({ charges: high }, noMethod).warnings).toEqual([])
+    // a case-contact pressure is not compared with Pmax, even on a case-contact record
+    const caseContact = [charge('max', 2.8, { pressure: bar(4100, 'case-contact') })]
+    expect(
+      readWith({ charges: caseContact }, { ...withL6, pressureMethod: 'case-contact' }).warnings,
+    ).toEqual([])
+  })
+
+  it('reads the cartridge record of a load folder under an old cartridge id', () => {
+    const { errors, warnings } = readAfter((write) => {
+      write('cartridges/test-cartridge.json', withL6)
+      write('renames.json', { cartridges: { 'old-cartridge': 'test-cartridge' } })
+      write(
+        'loads/old-cartridge/test-manufacturer.json',
+        file([load('a', { coal: { value: 61, raw: '61 mm' } })], {
+          cartridge: 'catalogue:old-cartridge',
+        }),
+      )
+    })
+    expect(errors).toEqual([])
+    expect(warnings).toEqual([
+      'loads/old-cartridge/test-manufacturer.json: loads a: coal-above-cartridge-max: COAL 61 mm is above L6 60 mm of test-cartridge',
+    ])
   })
 
   it('warns of a COAL above L6', () => {
