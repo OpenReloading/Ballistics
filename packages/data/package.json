@@ -43,6 +43,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node dist/build.js",
     "validate": "node src/validate.ts",
+    "loads:merge": "node src/merge-loads.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage"
   },

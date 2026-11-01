@@ -7,7 +7,8 @@
 import { fromSi } from '@open-reloading/schema'
 import { msg } from '../i18n/translate.ts'
 import { type Scale, solve } from './bullet-photo.ts'
-import { edgeUncertainty, type Outline } from './bullet-photo-outline.ts'
+import { edgeUncertainty, type Outline, sideTapers } from './bullet-photo-outline.ts'
+import type { ScaleBasis } from './bullet-photo-scale.ts'
 import { median1 } from './raster-ops.ts'
 import type { Wording } from './wording.ts'
 
@@ -47,6 +48,8 @@ export interface BulletMeasurement {
   baseType: 'flat' | 'boat-tail'
   /** Sentences about what is missing or doubtful. */
   notes: Wording[]
+  /** What gave the scale, when the worker resolved one (`resolveScale`). */
+  scaleBasis?: ScaleBasis
 }
 
 /** Standard uncertainty of where a pointed tip ends along the axis, px. */
@@ -274,12 +277,23 @@ export function shankOf(o: Outline): Shank {
 
 type Put = (key: PhotoField, px: number, uPx: number) => void
 
-/** The boat tail, if there is one: where its cone ends on the shank and that position's uncertainty, px. */
+/** Whether only one side of the outline lies inside its shank line at the base samples (the first five, as the boat tail's) by `least` px or more, the other by less than half of it: a shadow on one side, or an axis turned off a squat bullet, not a boat tail. */
+function oneSideTapers(o: Outline, least: number): boolean {
+  const t = sideTapers(o)
+  if (!t || !o.sides) return false
+  const deficit = (line: { a: number; b: number }, side: readonly number[]) =>
+    median1(o.z.slice(0, 5).map((z, i) => line.a + line.b * z - at(side, i)))
+  const [l, r] = [deficit(t.left.line, o.sides.left), deficit(t.right.line, o.sides.right)]
+  return Math.max(l, r) >= least && Math.min(l, r) < least / 2
+}
+
+/** The boat tail, if there is one: where its cone ends on the shank and that position's uncertainty, px. Both sides must taper. */
 function boatTailOf(o: Outline, s: Shank, put: Put, m: BulletMeasurement) {
   const flat = { z: 0, u: 0 }
   const base = median1(o.r.slice(0, 5))
   const deficit = s.rRef - base
-  if (deficit < Math.max(2.5, 0.04 * s.rRef) || s.first < 6) return flat
+  const least = Math.max(2.5, 0.04 * s.rRef)
+  if (deficit < least || s.first < 6 || oneSideTapers(o, least)) return flat
   // the middle of the cone, clear of the rounded corner at the base and of the one where it meets the shank
   const idx = o.r.flatMap((_, i) => (i >= 0.25 * s.first && i < 0.85 * s.first ? [i] : []))
   if (idx.length < 5) return flat

@@ -22,7 +22,9 @@ const usage = `usage:
   ballistics --help | --version
 
 options:
-  --rows <path>      a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS)
+  --rows <path>      a rows file, a folder of .csv files or - for stdin (default: BALLISTICS_ROWS);
+                     catalogue for the published loads of the records, or a folder
+                     laid out as records/loads/ (maker tables only)
   --records <dir>    a records root, repeatable (default: BALLISTICS_RECORDS, else the repository records)
   --split <name>     validation (default), training or test
   --final            required for the test split

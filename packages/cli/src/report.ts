@@ -29,6 +29,15 @@ const rowsOf = (name: string, m: Metrics) => [
 
 const metricHead = ['group', 'used', 'v med %', 'v P90 %', 'p med %', 'p P90 %', 'cover %']
 
+/** The line of the published load files a run read, none for CSV rows. */
+function publishedLines(p: VerifyResult['published']) {
+  if (!p) return []
+  const skipped = Object.entries(p.skipped).map(([k, n]) => `${k} ${n}`)
+  return [
+    `published loads: ${p.files} files, ${p.rows} rows${skipped.length > 0 ? `; skipped: ${skipped.join(', ')}` : ''}`,
+  ]
+}
+
 /** `verify` as text: the version, the interval and one line per group. */
 export function verifyTable(r: VerifyResult): string {
   const groups = [
@@ -46,11 +55,16 @@ export function verifyTable(r: VerifyResult): string {
       : []),
   ]
   const reasons = Object.entries(r.overall.rows.notUsed).map(([k, n]) => `${k} ${n}`)
+  const bases = Object.entries(r.overall.pressureByBasis).map(
+    ([k, p]) => `${k} ${pct(p.median)} / ${pct(p.p90)} % (${p.rows} rows)`,
+  )
   return [
     `model ${r.model}  version ${r.modelVersion}`,
+    ...publishedLines(r.published),
     `split ${r.split}  interval half width ${pct(r.interval.halfWidth)} % from ${r.interval.trainingRows} training rows`,
     table(metricHead, groups),
     ...(reasons.length > 0 ? [`not used: ${reasons.join(', ')}`] : []),
+    ...(bases.length > 0 ? [`pressure by basis, median / P90: ${bases.join(', ')}`] : []),
   ].join('\n')
 }
 
@@ -76,6 +90,7 @@ export function compareTable(r: CompareResult): string {
   return [
     `baseline ${r.baseline.model}  version ${r.baseline.modelVersion}`,
     `candidate ${r.candidate.model}  version ${r.candidate.modelVersion}`,
+    ...publishedLines(r.published),
     `split ${r.split}  change = candidate minus baseline, percentage points`,
     table(
       metricHead.map((h, i) => (i === 1 ? 'used' : h)),

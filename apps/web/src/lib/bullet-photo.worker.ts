@@ -9,7 +9,7 @@ import { measureOutline } from './bullet-photo-measure.ts'
 import { fitOutline } from './bullet-photo-outline.ts'
 import type { WorkerReply, WorkerRequest } from './bullet-photo-protocol.ts'
 import { outlineHints } from './bullet-photo-quality.ts'
-import { resolveScale } from './bullet-photo-scale.ts'
+import { resolveScale, withBasis } from './bullet-photo-scale.ts'
 import { errorText } from './error-text.ts'
 import type { RgbaImage } from './image.ts'
 
@@ -27,9 +27,9 @@ function measure(q: MeasureRequest): WorkerReply {
   // at 1 px per mm the values are px, which the caliper sizes turn into a scale when there is no ruler
   const unit =
     outline && !unusable ? measureOutline(outline, { pxPerMm: 1, relUncertainty: 0 }) : undefined
-  const { scale, notes } = unit
+  const { scale, notes, basis } = unit
     ? resolveScale(unit, q.scale, q.known ?? {})
-    : { scale: q.scale, notes: [] }
+    : { scale: q.scale, notes: [], basis: undefined }
   return {
     kind: 'measured',
     id: q.id,
@@ -37,7 +37,8 @@ function measure(q: MeasureRequest): WorkerReply {
     ...(unusable && { unusable }),
     ...(outline && { outline }),
     ...(scale && { scale }),
-    ...(outline && unit && { measurement: scale ? measureOutline(outline, scale) : unit }),
+    ...(outline &&
+      unit && { measurement: scale ? withBasis(measureOutline(outline, scale), basis) : unit }),
   }
 }
 

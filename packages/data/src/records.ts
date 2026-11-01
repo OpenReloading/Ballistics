@@ -17,6 +17,8 @@ import {
   catalogueSession,
   type Discipline,
   discipline,
+  type EventType,
+  eventType,
   type Federation,
   type FiringSeries,
   federation,
@@ -43,6 +45,7 @@ import {
 import { z } from 'zod'
 import { checkCaliberClasses } from './caliber-classes.ts'
 import { checkCoverage } from './coverage.ts'
+import { checkEventTypes } from './event-types.ts'
 import { checkFederations } from './federations.ts'
 import { checkFittedSources } from './load-tables.ts'
 import { checkNames, type LocatedFinding } from './names.ts'
@@ -140,6 +143,8 @@ export type Bundle = {
   federations: Federation[]
   disciplines: Discipline[]
   targetMappings: TargetMapping[]
+  /** Event types of competitions (`records/event-types/`); absent: none. */
+  eventTypes?: EventType[] | undefined
   /** `renames.json` of the records roots; absent: none. */
   renames?: Renames | undefined
 }
@@ -182,6 +187,7 @@ function readBundle(
     federations: read('federations', federation),
     disciplines: read('disciplines', discipline),
     targetMappings: read('target-mappings', targetMapping),
+    eventTypes: read('event-types', eventType, true),
     renames: readRenames(roots, errors),
   }
   const published = readPublishedLoads(roots, sources, errors)
@@ -230,6 +236,7 @@ function checkSourceCoverage(bundle: Bundle, errors: string[]) {
     ['federations', bundle.federations],
     ['disciplines', bundle.disciplines],
     ['target-mappings', bundle.targetMappings],
+    ['event-types', bundle.eventTypes ?? []],
   ] as const) {
     for (const record of records) {
       for (const error of checkCoverage(record)) errors.push(`${dir}/${record.id}.json: ${error}`)
@@ -297,6 +304,7 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   }
   checkSourceCoverage(bundle, errors)
   errors.push(...checkFederations(bundle))
+  errors.push(...checkEventTypes(bundle))
   errors.push(...checkCaliberClasses(bundle))
   checkRenames(bundle, errors)
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')

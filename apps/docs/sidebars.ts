@@ -59,6 +59,7 @@ const sidebars: SidebarsConfig = {
     ]),
     'models/least-squares',
     'models/validation',
+    'how-close',
     {
       type: 'category',
       label: 'Research log',
@@ -69,6 +70,7 @@ const sidebars: SidebarsConfig = {
   ],
   data: [
     'data/federations',
+    'data/event-types',
     'data/manufacturers',
     'data/cases',
     'data/primers',

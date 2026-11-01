@@ -1,9 +1,14 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { basename, dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { readPublishedLoads } from '@open-reloading/data'
+import { type SourceRecord, sourceRecord } from '@open-reloading/schema'
 import { Refusal, UsageError } from './errors.ts'
 import { type InteriorModel, outcomes } from './evaluate.ts'
 import { changeOf, evaluate, type Grouping, metricsOf } from './metrics.ts'
 import { builtInName, loadModel } from './model.ts'
-import { loadRecords } from './records.ts'
+import { fillInputs, rowsFromPublished } from './published-rows.ts'
+import { loadRecords, type Records } from './records.ts'
 import {
   type CompareResult,
   type Evaluation,
@@ -12,14 +17,14 @@ import {
   type VerifyResult,
   verifyResult,
 } from './result.ts'
-import { readRows } from './rows.ts'
+import { type Row, readRows } from './rows.ts'
 import { type Split, splitOf } from './split.ts'
 import { byText } from './stats.ts'
 import { inputsOf, modelVersion } from './version.ts'
 
 /** What `verify` and `compare` read: the rows, the records, the split and the sealed-split switch. */
 export interface Options {
-  /** Path of a rows file or of a folder of them. */
+  /** Path of a rows file or of a folder of them, `catalogue`, or a folder laid out as `records/loads/`. */
   rows: string
   /** Records roots, empty for the records of the data package. */
   records: string[]
@@ -43,16 +48,94 @@ function checkSealed({ split, final }: Options) {
     throw new Refusal('the test split is sealed: run it once per model version with --final')
 }
 
+/** The records folder of the data package, which `readRecords` reads without roots. */
+const packageRecords = () =>
+  fileURLToPath(new URL('../records', import.meta.resolve('@open-reloading/data')))
+
+/** Whether `path` is a folder of published load files: cartridge folders and no `.csv` file. */
+function isPublishedFolder(path: string) {
+  const stat = statSync(path, { throwIfNoEntry: false }) // NOSONAR: the path is the argument the user gave
+  if (!stat?.isDirectory()) return false
+  const entries = readdirSync(path, { withFileTypes: true }) // NOSONAR: as above
+  return !entries.some((e) => /\.csv$/i.test(e.name)) && entries.some((e) => e.isDirectory())
+}
+
+/** The JSON of `path`; an unreadable or malformed file is undefined, which no schema accepts. */
+function readJson(path: string): unknown {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8')) // NOSONAR: a file of a records root the user gave
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * The source records of every root, by id, as the published load files resolve them. A source file
+ * that does not read or parse is left out: the record check reports it.
+ */
+function sourcesOf(roots: readonly string[]) {
+  const byId = new Map<string, SourceRecord>()
+  for (const root of roots) {
+    const dir = join(root, 'sources')
+    if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) continue // NOSONAR: as above
+    for (const name of readdirSync(dir).filter((n) => n.endsWith('.json'))) {
+      // NOSONAR: as above
+      const parsed = sourceRecord.safeParse(readJson(join(dir, name)))
+      if (parsed.success && !byId.has(parsed.data.id)) byId.set(parsed.data.id, parsed.data)
+    }
+  }
+  return { byId, cited: new Set<string>(), embedded: new Map<string, Set<string>>() }
+}
+
+/**
+ * The rows of the catalogue's published load files (`catalogue`), or of the files of a folder laid
+ * out as `records/loads/` only, their source references resolved from the records' sources.
+ */
+function catalogueRows(options: Options) {
+  const folder = options.rows === 'catalogue' ? undefined : resolve(options.rows)
+  if (folder !== undefined && basename(folder) !== 'loads')
+    throw new UsageError('a --rows folder of published loads is named loads, as records/loads/')
+  const records = loadRecords(options.records)
+  const errors: string[] = []
+  const roots = options.records.length > 0 ? options.records : [packageRecords()]
+  const files = (
+    folder === undefined
+      ? records.published
+      : readPublishedLoads([dirname(folder)], sourcesOf(roots), errors).map((l) => l.file)
+  ).toSorted((a, b) => byText(`${a.cartridge}/${a.id}`, `${b.cartridge}/${b.id}`))
+  if (errors.length > 0)
+    options.warn?.(
+      `${errors.length} problem(s) in the published load files; those files are left out\n`,
+    )
+  const { rows, skipped } = rowsFromPublished(files, new Set(records.cartridges.keys()))
+  if (rows.length === 0) throw new UsageError('the published loads give no row')
+  const published = { files: files.length, rows: rows.length, skipped }
+  const bytes = files.map((f) => Buffer.from(JSON.stringify(f)))
+  return { rows: fillInputs(rows, records), files: bytes, records, published }
+}
+
 /** The data both commands evaluate models on. */
 function prepare(options: Options) {
-  const { rows, files } = readRows(options.rows)
-  const records = loadRecords(options.records)
+  const catalogue = options.rows === 'catalogue' || isPublishedFolder(options.rows)
+  const read: { rows: Row[]; files: Uint8Array[]; records: Records; published?: Published } =
+    catalogue
+      ? catalogueRows(options)
+      : { ...readRows(options.rows), records: loadRecords(options.records) }
+  const { rows, files, records } = read
   if (records.issues > 0)
     options.warn?.(
       `${records.issues} problem(s) in the records; check them before relying on the result\n`,
     )
-  return { rows, records, inputs: inputsOf(rows, files, records) }
+  return {
+    rows,
+    records,
+    inputs: inputsOf(rows, files, records),
+    ...(read.published && { published: read.published }),
+  }
 }
+
+/** What the published rows of a run were: files, rows and the charges left out by reason. */
+type Published = NonNullable<VerifyResult['published']>
 
 type Prepared = ReturnType<typeof prepare>
 
@@ -114,6 +197,7 @@ export async function verify(options: Options, spec = builtInName): Promise<Veri
     split: options.split,
     final: options.final,
     inputs: data.inputs,
+    ...(data.published && { published: data.published }),
     ...evaluation,
   }
 }
@@ -149,6 +233,7 @@ async function baselineOf(spec: string, options: Options, data: Prepared): Promi
     split,
     final: _f,
     inputs,
+    published: _p,
     ...evaluation
   } = savedResult(spec)
   if (split !== options.split)
@@ -182,6 +267,7 @@ export async function compare(
     split: options.split,
     final: options.final,
     inputs: data.inputs satisfies Inputs,
+    ...(data.published && { published: data.published }),
     baseline,
     candidate,
     change: {

@@ -466,6 +466,47 @@ describe('refused input', () => {
   })
 })
 
+describe('notes in the length unit', () => {
+  const rebated: BulletDimensions = {
+    ...base,
+    base: { type: 'rebated-boat-tail', length: 5, diameter: 6.5 },
+  }
+  const hollow: BulletDimensions = {
+    diameter: 8,
+    length: 30,
+    noseLength: 12,
+    meplatDiameter: 0,
+    ogive: { radiusRatio: 0 },
+    base: { type: 'conical-hollow-base', cavityDiameter: 5 },
+  }
+  const notesOf = (b: BulletDimensions, unit?: 'mm' | 'in') => {
+    const o = bulletOutline(b, 'entered', unit)
+    if ('reason' in o) throw new Error(o.reason)
+    return o.notes.join(' ')
+  }
+
+  it('writes the rebate depth and the cavity depth in mm by default', () => {
+    expect(notesOf(rebated)).toContain(`0.015 d, ${+(0.015 * d).toFixed(3)} mm.`)
+    expect(notesOf(hollow)).toContain('at its radius, 2.5 mm.')
+  })
+
+  it('writes them in inches on an inch page, the ratio as it is', () => {
+    expect(notesOf(rebated, 'in')).toContain(`0.015 d, ${lengthText(0.015 * d, 'in')} in.`)
+    expect(notesOf(hollow, 'in')).toContain(`at its radius, ${lengthText(2.5, 'in')} in.`)
+    expect(notesOf(rebated, 'in')).not.toMatch(/\bmm\b/)
+    expect(notesOf(hollow, 'in')).not.toMatch(/\bmm\b/)
+  })
+
+  it('writes a base length without a base type and an assumed nose in the unit, mm by default', () => {
+    const untyped = notesOf({ ...base, noseLength: undefined, base: { length: 5 } }, 'in')
+    expect(untyped).toContain(`a base length of ${lengthText(5, 'in')} in without a base type`)
+    expect(untyped).toContain(`an assumed nose of ${lengthText(2 * d, 'in')} in is drawn`)
+    const mmText = notesOf({ ...base, noseLength: undefined, base: { length: 5 } })
+    expect(mmText).toContain('a base length of 5 mm without a base type')
+    expect(mmText).toContain(`an assumed nose of ${+(2 * d).toFixed(3)} mm is drawn`)
+  })
+})
+
 /** Record paths of every `BulletDimensions` field. */
 const paths = [
   'diameter',

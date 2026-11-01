@@ -93,6 +93,7 @@ The workbench asks for the band of the step it shows first, in a second request 
 - Inputs without a tolerance do not move. The seating depth changes the chamber volume and the bullet travel and has no tolerance of its own.
 - The band is not a confidence interval and not a statement about a real load.
 - A ladder request takes no sampling. The workbench shows the sampled band of the step shown first; another step of a ladder shows the corner-case range.
+- The variation of real loads and the held-out error of the model, which the band leaves out: [How close a result is](../how-close.md).
 
 ## Sources
 

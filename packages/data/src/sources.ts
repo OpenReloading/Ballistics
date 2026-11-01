@@ -51,9 +51,18 @@ function resolveSource(entry: unknown, at: string, { index, file, errors }: Reso
   return { ...rest, ...own, ...(notes && { note: notes }) }
 }
 
+/** The title, edition, URL and SHA-256 of a source record that is a rule book. */
+const ruleBookOf = ({ title, edition, url, sha256 }: SourceRecord) => ({
+  title,
+  edition,
+  url,
+  sha256,
+})
+
 /**
- * The record `json` of `file` with each source reference of its provenance resolved, and each
- * rule book of a federation (a source record id) resolved to title, edition, URL and SHA-256.
+ * The record `json` of `file` with each source reference of its provenance resolved, each rule
+ * book of a federation (a source record id) resolved to title, edition, URL and SHA-256, and the
+ * rule book of an event type to title, edition, publisher, URL and SHA-256.
  */
 export function resolveRecord(json: unknown, index: SourceIndex, file: string, errors: string[]) {
   if (!isObject(json)) return json
@@ -75,15 +84,14 @@ export function resolveRecord(json: unknown, index: SourceIndex, file: string, e
         return id
       }
       const record = cite(id, index, at, errors)
-      return (
-        record && {
-          title: record.title,
-          edition: record.edition,
-          url: record.url,
-          sha256: record.sha256,
-        }
-      )
+      return record && ruleBookOf(record)
     })
+  }
+  if (typeof json.ruleBook === 'string') {
+    const at = `${file}: ruleBook`
+    const record = cite(json.ruleBook, index, at, errors)
+    if (record && !record.publisher) errors.push(`${at}: source "${record.id}" names no publisher`)
+    out.ruleBook = record && { ...ruleBookOf(record), publisher: record.publisher }
   }
   return out
 }

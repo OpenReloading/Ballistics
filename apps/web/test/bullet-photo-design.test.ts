@@ -110,6 +110,15 @@ describe('the values table', () => {
 
   it('says the scale and that no image is stored', () => {
     expect(photoNote(m, facts)).toMatch(/28\.\d+ px\/mm ± 0\.\d+ %/)
+    expect(photoNote(m, facts)).not.toMatch(/scale comes from/)
+  })
+
+  it('keeps what a scale from the diameter alone rests on', () => {
+    const note = photoNote({ ...m, scaleBasis: 'diameter' }, facts)
+    expect(note).toMatch(
+      /no image stored\)\. The scale comes from the diameter entered, without a ruler/,
+    )
+    expect(note).toMatch(/1\.5 % short.*Values with standard uncertainty/)
   })
 })
 
