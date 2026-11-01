@@ -8312,6 +8312,10 @@ main .field-table tr.field-group > th {
     color: #333;
   }
 
+  .print-report .report-build {
+    color: #666;
+  }
+
   .report-inputs {
     columns: 2;
     column-gap: 4mm;

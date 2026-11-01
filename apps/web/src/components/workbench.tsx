@@ -362,7 +362,8 @@ function Report(props: ReportProps) {
     <PrintReport chartSlot={chartSlot} after={<ReportAfter {...props} />}>
       <h1>{loadTitle}</h1>
       <p className="report-sub">
-        {`${t('Printed {date}', { date: localDay(new Date()) })}.`}
+        {t('Printed {date}', { date: localDay(new Date()) })}
+        <span className="report-build"> · {process.env.NEXT_PUBLIC_BUILD_TAG}</span>.
         {stale && ` ${t('Inputs changed since this result.')}`}
         {fromDesign && ` ${fromDesign}`}
         {approximate && ` ${approximate}`}
