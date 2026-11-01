@@ -18,6 +18,7 @@ import {
   unpackCartridges,
 } from '../src/lib/cartridge-rows.ts'
 import {
+  inOverlay,
   packPowders,
   powderMatches,
   unpackPowders,
@@ -147,6 +148,29 @@ it('orders powders fastest first and keeps the global order under the search', (
   expect(unpackPowders(packPowders(rows))).toEqual(rows)
 })
 
+it('carries the training rows, cartridges and day of a fit, and packs them back', () => {
+  const fitted = summary('a-fit', 0.5)
+  const rows = orderPowders([
+    {
+      ...fitted,
+      interior: {
+        ...defined(fitted.interior),
+        trainingRows: 153,
+        trainingCartridges: 4,
+        retrieved: '2026-10-12',
+      },
+    },
+    summary('h-none'),
+  ])
+  expect(rows[0]).toMatchObject({
+    trainingRows: 153,
+    trainingCartridges: 4,
+    retrieved: '2026-10-12',
+  })
+  expect(rows[1]?.trainingRows).toBeUndefined()
+  expect(unpackPowders(packPowders(rows))).toEqual(rows)
+})
+
 it('groups the powders without a curve by reason', () => {
   const unfitted = [
     summary('a', undefined),
@@ -216,4 +240,44 @@ it("lists the browser's powders as Mine rows without a manufacturer or burn rate
     },
   ])
   expect(powderMatches(defined(rows[0]), 'my powder')).toBe(true)
+})
+
+it('gives a browser design with a curve its mean vivacity, so the overlay can take it', () => {
+  const saved = '2026-10-26T10:00:00.000Z'
+  const interior = {
+    model: 'm3' as const,
+    fitted: ['vivacity' as const],
+    vivacity: { value: 0.6 },
+    energy: { value: 3.8e6 },
+    gamma: 1.24,
+    covolume: { value: 0.001 },
+    density: { value: 1.6 },
+    pressureExponent: 1,
+    referencePressure: { value: 0.980665 },
+    ignitionPressure: { value: 150 },
+    propellantTemperature: { value: 21 },
+    burnForm: { kind: 'twoStage' as const, a: { value: 0.1 }, m: 0.5, q: 0.1, z1: 0.8 },
+  }
+  const [fitted, unfinished] = userPowderRows([
+    {
+      kind: 'powder',
+      id: 'p1',
+      name: 'Fitted design',
+      saved,
+      data: { origin: 'user', provenanceKind: 'fitted', draft: { interior } },
+    },
+    // no provenance kind: no powder yet, so no curve
+    {
+      kind: 'powder',
+      id: 'p2',
+      name: 'Draft',
+      saved,
+      data: { origin: 'user', draft: { interior } },
+    },
+  ])
+  expect(fitted?.meanVivacity).toBeGreaterThan(0)
+  expect(fitted?.burnRateOrder).toBeUndefined()
+  expect(inOverlay(defined(fitted))).toBe(true)
+  expect(unfinished?.meanVivacity).toBeUndefined()
+  expect(inOverlay(defined(unfinished))).toBe(false)
 })

@@ -110,11 +110,19 @@ export interface PowderSummary {
   propellantBase?: Powder['propellantBase']
   /** ISO 3166-1 alpha-2 code of the manufacturer's country. */
   country?: string | undefined
-  /** The fitted model's fields the burn-rate curve needs. */
+  /** The fitted model's fields the burn-rate curve needs, with the training rows and cartridges of the fit. */
   interior?: Pick<
     NonNullable<Powder['interior']>,
-    'vivacity' | 'pressureExponent' | 'referencePressure' | 'burnForm'
-  >
+    | 'vivacity'
+    | 'pressureExponent'
+    | 'referencePressure'
+    | 'burnForm'
+    | 'trainingRows'
+    | 'trainingCartridges'
+  > & {
+    /** ISO date the fitted sources were read, the latest of them. */
+    retrieved?: string | undefined
+  }
 }
 
 export interface ListOf<T> {

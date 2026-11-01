@@ -126,12 +126,16 @@ export interface ManufacturerItem {
   website?: string
 }
 
-/** The part of a powder's M3 parameters the burn-rate curve reads. */
+/** The part of a powder's M3 parameters the burn-rate curve reads, with what the fit rests on. */
 export interface PowderInteriorItem {
   vivacity?: unknown
   pressureExponent?: number
   referencePressure?: unknown
   burnForm?: unknown
+  trainingRows?: number
+  trainingCartridges?: number
+  /** ISO date the fitted sources were read, the latest of them. */
+  retrieved?: string
 }
 
 /** A powder of the list. */

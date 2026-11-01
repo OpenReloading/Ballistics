@@ -364,11 +364,27 @@ describe('GET /powders and /bullets', () => {
       pressureExponent: 1,
       referencePressure: { value: 0.980665 },
       burnForm: { kind: 'twoStage', a: { value: 0 }, m: 0.5, q: 0.5, z1: 0.8 },
+      trainingRows: 153,
+      trainingCartridges: 4,
+    }
+    const provenance = {
+      kind: 'fitted',
+      sources: [
+        { title: 'Table A', kind: 'fitted', fields: ['interior'], retrieved: '2026-10-11' },
+        { title: 'Table B', kind: 'fitted', fields: ['interior'], retrieved: '2026-10-12' },
+        { title: 'Data sheet', kind: 'published', fields: ['name'], retrieved: '2026-10-30' },
+      ],
     }
     await otherApi.load({
       ...bundle,
       powders: [
-        { ...bundle.powders[0], grainForm: 'ball', propellantBase: 'double', interior },
+        {
+          ...bundle.powders[0],
+          grainForm: 'ball',
+          propellantBase: 'double',
+          interior,
+          provenance,
+        },
         bundle.powders[1],
       ] as Bundle['powders'],
     })
@@ -379,12 +395,15 @@ describe('GET /powders and /bullets', () => {
       name: 'Fast',
       grainForm: 'ball',
       propellantBase: 'double',
-      // only what the burn-rate curve needs
+      // what the burn-rate curve needs and what the fit rests on, read on the latest fitted source's day
       interior: {
         vivacity: interior.vivacity,
         pressureExponent: 1,
         referencePressure: interior.referencePressure,
         burnForm: interior.burnForm,
+        trainingRows: 153,
+        trainingCartridges: 4,
+        retrieved: '2026-10-12',
       },
     })
     expect(slow).toEqual({ id: 'example-b-slow', manufacturer: 'example-b', name: 'Slow' })

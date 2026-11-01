@@ -95,7 +95,20 @@ const powderList = page(
     country: powder.shape.country,
     interior: powder.shape.interior
       .unwrap()
-      .pick({ vivacity: true, pressureExponent: true, referencePressure: true, burnForm: true })
+      .pick({
+        vivacity: true,
+        pressureExponent: true,
+        referencePressure: true,
+        burnForm: true,
+        trainingRows: true,
+        trainingCartridges: true,
+      })
+      .extend({
+        retrieved: z.iso
+          .date()
+          .optional()
+          .describe('ISO date the fitted sources were read, the latest of them.'),
+      })
       .optional(),
   }),
 )

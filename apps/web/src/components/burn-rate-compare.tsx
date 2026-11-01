@@ -24,6 +24,9 @@ import {
   unfitTitles,
   unfittedGroups,
 } from '../lib/burn-rate.ts'
+import { type PowderDesign, powderDesigns } from '../lib/powder-designer.ts'
+import { userRecordId, userRowId } from '../lib/sources.ts'
+import { storedRecords } from '../lib/user-store.ts'
 import { say } from '../lib/wording.ts'
 import { CurveTable } from './curve-table.tsx'
 import { LazyVivacityChart } from './lazy-vivacity-chart.tsx'
@@ -55,7 +58,8 @@ function writeAdd(picks: OverlayPick[]) {
   const p = new URLSearchParams(window.location.search)
   if (picks.length > 0) p.set('add', picks.map((s) => s.id).join(','))
   else p.delete('add')
-  const s = p.toString().replaceAll('%2C', ',')
+  // commas and the colon of a design's `user:` id as typed: the link stays readable
+  const s = p.toString().replaceAll('%2C', ',').replaceAll('%3A', ':')
   window.history.replaceState(null, '', `${pathname}${s ? `?${s}` : ''}`)
 }
 
@@ -118,7 +122,8 @@ function OverlayBody({
  * its line sample; colour slots stay with their powder when another is removed. The picks live in
  * `?add=` only (a powder page sends its id, the powder list's Compare its picks), no preset and no
  * stored overlay; each burn law is fetched when its powder is picked, so the page carries
- * only the names.
+ * only the names. The powder designs of this browser with a curve are offered after the catalogue
+ * as `user:<id>`, each marked as a user design.
  */
 export function BurnRateCompare({ options }: { options: { value: string; label: string }[] }) {
   const { t } = useTranslation()
@@ -126,6 +131,35 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   const [read, setRead] = useState(false)
   const [records, setRecords] = useState<Record<string, Powder | 'error'>>({})
   const names = useManufacturerNames()
+  // the browser's designs, undefined until read: the URL's user picks wait for them
+  const [designs, setDesigns] = useState<PowderDesign[]>()
+  useEffect(() => {
+    storedRecords().then(
+      (r) => setDesigns(powderDesigns(r.records)),
+      () => setDesigns([]),
+    )
+  }, [])
+  const mine = useMemo(
+    () =>
+      new Map(
+        (designs ?? []).flatMap((d): [string, FittedPowder][] => {
+          const p = classifyPowder(d.powder)
+          const id = userRowId(d.id)
+          const label = t('{name} (user design)', { name: d.name })
+          return isFitted(p) ? [[id, { ...p, id, label }]] : []
+        }),
+      ),
+    [designs, t],
+  )
+  const choices = useMemo(
+    () => [
+      ...options,
+      ...[...mine.values()]
+        .map((p) => ({ value: p.id, label: p.label }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    ],
+    [options, mine],
+  )
   // classified at render, so the labels get the manufacturer names when they arrive after a record
   const laws = useMemo(
     () =>
@@ -138,14 +172,20 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
       ),
     [records, names],
   )
-  const known = useMemo(() => new Set(options.map((o) => o.value)), [options])
+  // the ids alone: a language switch relabels the designs but must not read the URL again
+  const mineIds = [...mine.keys()].join(',')
+  const known = useMemo(
+    () => new Set([...options.map((o) => o.value), ...mineIds.split(',').filter(Boolean)]),
+    [options, mineIds],
+  )
   const requested = useRef(new Set<string>())
 
-  // the URL is read after mounting, so the page stays prerendered
+  // the URL is read after mounting, so the page stays prerendered; once the browser's designs are read
   useEffect(() => {
+    if (designs === undefined) return
     setPicks(overlayFrom(window.location.search, maxOverlay).filter((p) => known.has(p.id)))
     setRead(true)
-  }, [known])
+  }, [known, designs])
 
   useEffect(() => {
     if (!read) return
@@ -154,7 +194,8 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
 
   useEffect(() => {
     for (const { id } of picks) {
-      if (records[id] || requested.current.has(id)) continue
+      // a design's burn law is in this browser already
+      if (userRecordId(id) || records[id] || requested.current.has(id)) continue
       requested.current.add(id)
       fetchPowder(id)
         .then((record) => setRecords((l) => ({ ...l, [id]: record ?? 'error' })))
@@ -171,7 +212,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
   }
 
   const series = picks.flatMap(({ id, slot }) => {
-    const powder = laws[id]
+    const powder = mine.get(id) ?? laws[id]
     return powder && powder !== 'error' ? [{ powder, slot }] : []
   })
   const failed = picks.filter((p) => laws[p.id] === 'error')
@@ -184,7 +225,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
         classNames={{ label: 'visually-hidden' }}
         description={t('Up to {max}', { max: maxOverlay })}
         placeholder={t('Add powder')}
-        data={options}
+        data={choices}
         value={picks.map((p) => p.id)}
         onChange={change}
         maxValues={maxOverlay}
@@ -211,7 +252,7 @@ export function BurnRateCompare({ options }: { options: { value: string; label: 
             )
           }}
         >
-          {failed.map((p) => options.find((o) => o.value === p.id)?.label ?? p.id).join(', ')}
+          {failed.map((p) => choices.find((o) => o.value === p.id)?.label ?? p.id).join(', ')}
         </ErrorNote>
       )}
       <OverlayBody read={read} picks={picks.length} loading={loading} series={series} />

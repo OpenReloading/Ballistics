@@ -140,11 +140,37 @@ function componentKeys(m: Manufacturer, c: { name: string; aliases?: string[] | 
   }
 }
 
-/** The part of the M3 parameters of a powder that the burn-rate curve reads. */
-function interiorItem({ interior }: Powder): PowderItem['interior'] {
+/**
+ * The part of the M3 parameters of a powder that the burn-rate curve reads, with the training rows
+ * and cartridges of the fit and the day its fitted sources were read (the latest of them).
+ */
+function interiorItem({ interior, provenance }: Powder): PowderItem['interior'] {
   if (!interior) return
-  const { vivacity, pressureExponent, referencePressure, burnForm } = interior
-  return compact({ vivacity, pressureExponent, referencePressure, burnForm })
+  const {
+    vivacity,
+    pressureExponent,
+    referencePressure,
+    burnForm,
+    trainingRows,
+    trainingCartridges,
+  } = interior
+  const retrieved = provenance.sources
+    .filter(
+      (s) =>
+        (s.kind ?? provenance.kind) === 'fitted' && (!s.fields || s.fields.includes('interior')),
+    )
+    .flatMap((s) => (s.retrieved ? [s.retrieved] : []))
+    .sort()
+    .at(-1)
+  return compact({
+    vivacity,
+    pressureExponent,
+    referencePressure,
+    burnForm,
+    trainingRows,
+    trainingCartridges,
+    retrieved,
+  })
 }
 
 /** The index row of a powder of manufacturer `m`. */
