@@ -8398,6 +8398,12 @@ main .field-table tr.field-group > th {
   }
 }
 
+/* the photograph tool before a photograph: no reserved room, the slot grows with a message */
+.bullet-photo [data-idle="true"] > .message-slot {
+  height: auto;
+  margin: 0;
+}
+
 /* forced colours drop the selected segment's fill (the indicator, and the label's ::before until the
    control has measured itself): its border marks it */
 @media (forced-colors: active) {

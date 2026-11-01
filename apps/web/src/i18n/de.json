@@ -3232,6 +3232,7 @@
   "Changed; catalog value not given": "Geändert; im Katalog kein Wert angegeben",
   "Changed; catalog {value}": "Geändert; Katalog {value}",
   "Derived: {value}": "Abgeleitet: {value}",
+  "Check the unit.": "Prüfen Sie die Einheit.",
   "Assumed: {value} ({basis})": "Angenommen: {value} ({basis})",
   "Assumed: {value}": "Angenommen: {value}",
   "{label} {value}. ": "{label} {value}. ",

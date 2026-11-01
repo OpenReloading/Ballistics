@@ -1,5 +1,5 @@
 import type { SectionPoint } from '../core/types.ts'
-import { deg } from '../core/units.ts'
+import { deg, type LengthUnit, lengthText } from '../core/units.ts'
 import { closedEdges, pairs } from '../core/vector.ts'
 
 /**
@@ -62,6 +62,15 @@ export interface Refusal {
   fields: string[]
 }
 
+/** A length given in mm as a refusal reason writes it, with its unit: "16 mm", ".6299 in". */
+type LengthText = (mm: number) => string
+
+/** A refusal whose reason is written once the length unit is known. */
+interface Refused {
+  reason: (length: LengthText) => string
+  fields: string[]
+}
+
 /** The half profile of a bullet with the quantities derived from it, in mm, mm², mm³ and degrees. */
 export interface Outline {
   /**
@@ -118,7 +127,11 @@ const worst = (...tags: Tag[]): Tag =>
       ? 'derived'
       : (tags[0] ?? 'derived')
 
-const mm = (x: number) => `${+x.toFixed(3)} mm`
+/** A length in mm to 3 decimals. */
+const mm: LengthText = (x) => `${+x.toFixed(3)} mm`
+/** A length in mm written in `unit`: mm to 3 decimals, inches as the figure labels write them. */
+const inUnit = (unit: LengthUnit): LengthText =>
+  unit === 'mm' ? mm : (x) => `${lengthText(x, 'in')} in`
 
 /** Twice the signed area of the triangle p, q, s. */
 export const triangleArea2 = (p: SectionPoint, q: SectionPoint, s: SectionPoint) =>
@@ -165,18 +178,26 @@ export function profileCrossesItself(points: SectionPoint[]): boolean {
 /**
  * Bullet outline from the given dimensions; stated proportions stand in for missing ones and
  * are named in the notes. Input that cannot form an outline returns a reason. Ogive radius and
- * Rt/R as defined by McCoy, ARBRL-TR-02293, 1981, PDF p. 13.
+ * Rt/R as defined by McCoy, ARBRL-TR-02293, 1981, PDF p. 13. A refusal writes its lengths in `unit`.
  */
 export function bulletOutline(
   b: BulletDimensions,
   given: 'sourced' | 'entered' = 'sourced',
+  unit: LengthUnit = 'mm',
 ): Outline | Refusal {
+  const o = outlineOf(b, given)
+  return 'reason' in o ? { reason: o.reason(inUnit(unit)), fields: o.fields } : o
+}
+
+/** The outline of `bulletOutline`, or a refusal not yet written in a length unit. */
+function outlineOf(b: BulletDimensions, given: 'sourced' | 'entered'): Outline | Refused {
   const { diameter: d, length: L } = b
   if (!(d > 0) || !(L > 0))
-    return {
-      reason: 'The diameter and the length must be positive.',
-      fields: [...(d > 0 ? [] : ['diameter']), ...(L > 0 ? [] : ['length'])],
-    }
+    return fail(
+      'The diameter and the length must be positive.',
+      ...(d > 0 ? [] : ['diameter']),
+      ...(L > 0 ? [] : ['length']),
+    )
   const notes: string[] = []
   const front = noseFront(b, given, notes)
   if ('reason' in front) return front
@@ -259,7 +280,7 @@ function closeOutline(
     L: number
     notes: string[]
   },
-): Outline | Refusal {
+): Outline | Refused {
   // section polygon closed along the axis; the full section mirrors it
   if (profileCrossesItself(points))
     return fail(
@@ -288,7 +309,10 @@ function closeOutline(
   }
 }
 
-const fail = (reason: string, ...fields: string[]): Refusal => ({ reason, fields })
+const fail = (reason: string | ((length: LengthText) => string), ...fields: string[]): Refused => ({
+  reason: typeof reason === 'string' ? () => reason : reason,
+  fields,
+})
 
 /** The base: tail length t, base edge radius rb, rebate depth s, their tags, and what is known. */
 interface BaseGeometry {
@@ -325,7 +349,7 @@ interface TailInput {
 const tan = (x: number) => Math.tan(x * deg)
 
 const noBoatTail = (gd: number) =>
-  fail(`The base diameter ${mm(gd)} leaves no boat tail.`, 'base.diameter', 'diameter')
+  fail((l) => `The base diameter ${l(gd)} leaves no boat tail.`, 'base.diameter', 'diameter')
 
 /** Length and diameter given; the angle, if given too, must agree with them. */
 function tailFromLengthDiameter({ ga, ac, given, start }: TailInput, gl: number, gd: number) {
@@ -334,7 +358,8 @@ function tailFromLengthDiameter({ ga, ac, given, start }: TailInput, gl: number,
   const implied = Math.atan((ac - rb) / gl) / deg
   if (ga !== undefined && Math.abs(implied - ga) > angleTolerance)
     return fail(
-      `The base length ${mm(gl)}, base diameter ${mm(gd)} and angle ${ga} degrees disagree: length and diameter give ${implied.toFixed(2)} degrees.`,
+      (l) =>
+        `The base length ${l(gl)}, base diameter ${l(gd)} and angle ${ga} degrees disagree: length and diameter give ${implied.toFixed(2)} degrees.`,
       'base.angle',
       'base.length',
       'base.diameter',
@@ -346,7 +371,7 @@ function tailFromLengthAngle({ ac, start }: TailInput, gl: number, ga: number) {
   const rb = ac - gl * tan(ga)
   if (!(rb > 0))
     return fail(
-      `The base length ${mm(gl)} at ${ga} degrees leaves no base.`,
+      (l) => `The base length ${l(gl)} at ${ga} degrees leaves no base.`,
       'base.length',
       'base.angle',
     )
@@ -380,7 +405,7 @@ function tailFromDiameter({ ac, given, start }: TailInput, gd: number, notes: st
 }
 
 /** The boat tail from the given length, diameter and angle; assumed values are named in `notes`. */
-function boatTail(c: TailInput, a: number, notes: string[]): Tail | Refusal {
+function boatTail(c: TailInput, a: number, notes: string[]): Tail | Refused {
   const { gl, gd, ga } = c
   if (gl !== undefined && gd !== undefined) return tailFromLengthDiameter(c, gl, gd)
   if (gl !== undefined && ga !== undefined) return tailFromLengthAngle(c, gl, ga)
@@ -395,7 +420,7 @@ function boatTail(c: TailInput, a: number, notes: string[]): Tail | Refusal {
 function baseInputRefusal(d: number, gl?: number, gd?: number, ga?: number) {
   if (gd !== undefined && !(gd > 0 && gd < d))
     return fail(
-      `The base diameter ${mm(gd)} is not between 0 and the diameter ${mm(d)}.`,
+      (l) => `The base diameter ${l(gd)} is not between 0 and the diameter ${l(d)}.`,
       'base.diameter',
       'diameter',
     )
@@ -421,7 +446,7 @@ function shapedTail(
   given: 'sourced' | 'entered',
   start: Tail,
   notes: string[],
-): Tail | Refusal {
+): Tail | Refused {
   let s = 0
   if (b.base?.type === 'rebated-boat-tail') {
     s = 0.015 * b.diameter
@@ -450,7 +475,7 @@ function baseGeometry(
   b: BulletDimensions,
   given: 'sourced' | 'entered',
   notes: string[],
-): BaseGeometry | Refusal {
+): BaseGeometry | Refused {
   const { diameter: d, length: L } = b
   const a = d / 2
   // base: tail length t, base edge radius rb, cone top radius ac (below a for a rebate)
@@ -469,7 +494,7 @@ function baseGeometry(
   const { t, rb, s, tTag, rbTag } = tail
   if (!(t < L))
     return fail(
-      `The boat tail ${mm(t)} is not shorter than the length ${mm(L)}.`,
+      (l) => `The boat tail ${l(t)} is not shorter than the length ${l(L)}.`,
       'base.length',
       'length',
     )
@@ -494,7 +519,7 @@ function cavityGeometry(
   b: BulletDimensions,
   rb: number,
   notes: string[],
-): Cavity | Refusal | undefined {
+): Cavity | Refused | undefined {
   const type = b.base?.type
   if (!isHollow(type)) return
   const cd = b.base?.cavityDiameter
@@ -505,14 +530,14 @@ function cavityGeometry(
   const r = cd / 2
   if (!(r > 0 && r < rb))
     return fail(
-      `The cavity diameter ${mm(cd)} is not between 0 and the base diameter ${mm(2 * rb)}.`,
+      (l) => `The cavity diameter ${l(cd)} is not between 0 and the base diameter ${l(2 * rb)}.`,
       'base.cavityDiameter',
       'base.diameter',
       'diameter',
     )
   if (!(r < b.length))
     return fail(
-      `The cavity depth ${mm(r)} is not below the length ${mm(b.length)}.`,
+      (l) => `The cavity depth ${l(r)} is not below the length ${l(b.length)}.`,
       'base.cavityDiameter',
       'length',
     )
@@ -542,7 +567,7 @@ function noseLengthOf(
   b: BulletDimensions,
   { t, tailKnown }: BaseGeometry,
   notes: string[],
-): { n: number; nTag: Tag } | Refusal {
+): { n: number; nTag: Tag } | Refused {
   const { diameter: d, length: L } = b
   const bearing = b.bearingLength
   if (b.noseLength !== undefined) {
@@ -550,14 +575,15 @@ function noseLengthOf(
     if (!(n > 0)) return fail('The nose length must be positive.', 'noseLength')
     if (n > L - t + 1e-9)
       return fail(
-        `The nose length ${mm(n)} is above the length less the boat tail, ${mm(L - t)}.`,
+        (l) => `The nose length ${l(n)} is above the length less the boat tail, ${l(L - t)}.`,
         'noseLength',
         'length',
         'base.length',
       )
     if (bearing !== undefined && tailKnown && Math.abs(t + bearing + n - L) > lengthTolerance)
       return fail(
-        `Boat tail ${mm(t)}, bearing ${mm(bearing)} and nose ${mm(n)} do not add up to the length ${mm(L)}.`,
+        (l) =>
+          `Boat tail ${l(t)}, bearing ${l(bearing)} and nose ${l(n)} do not add up to the length ${l(L)}.`,
         'noseLength',
         'bearingLength',
         'length',
@@ -569,7 +595,7 @@ function noseLengthOf(
     const n = L - t - bearing
     if (!(n > 0))
       return fail(
-        `Boat tail ${mm(t)} and bearing ${mm(bearing)} leave no nose of the length ${mm(L)}.`,
+        (l) => `Boat tail ${l(t)} and bearing ${l(bearing)} leave no nose of the length ${l(L)}.`,
         'bearingLength',
         'length',
         'base.length',
@@ -588,18 +614,19 @@ function meplatRadius(
   b: BulletDimensions,
   given: 'sourced' | 'entered',
   notes: string[],
-): { m: number; mTag: Tag } | Refusal {
+): { m: number; mTag: Tag } | Refused {
   const d = b.diameter
   const form = b.ogive?.form
   const tipType = b.tip?.type ?? ''
-  if (b.meplatDiameter !== undefined) {
-    if (!(b.meplatDiameter >= 0 && b.meplatDiameter < d))
+  const md = b.meplatDiameter
+  if (md !== undefined) {
+    if (!(md >= 0 && md < d))
       return fail(
-        `The meplat diameter ${mm(b.meplatDiameter)} is not below the diameter ${mm(d)}.`,
+        (l) => `The meplat diameter ${l(md)} is not below the diameter ${l(d)}.`,
         'meplatDiameter',
         'diameter',
       )
-    return { m: b.meplatDiameter / 2, mTag: given }
+    return { m: md / 2, mTag: given }
   }
   const share = form === 'flat-nose' ? 0.6 : flatTips.has(tipType) ? 0.15 : 0
   if (share) notes.push(`The meplat is assumed: ${share} d.`)
@@ -630,7 +657,8 @@ function ogiveInputRefusal(
     Math.abs(ratio - fromRadius) > ratioTolerance
   )
     return fail(
-      `The ogive radius ${mm(radius as number)} gives Rt/R ${fromRadius.toFixed(3)}, not the given ${ratio}.`,
+      (l) =>
+        `The ogive radius ${l(radius as number)} gives Rt/R ${fromRadius.toFixed(3)}, not the given ${ratio}.`,
       'ogive.radiusRatio',
       'ogive.radius',
     )
@@ -645,12 +673,13 @@ function ogiveRatio(
   given: number | undefined,
   { n, k, rt }: { n: number; k: number; rt: number },
   notes: string[],
-): { used: number; formTag: Tag } | Refusal {
+): { used: number; formTag: Tag } | Refused {
   let q = given
   let formTag: Tag = 'derived'
   if (q !== undefined && q > 1 + ratioTolerance)
     return fail(
-      `The ogive radius is below the tangent radius ${mm(rt)}: the nose would rise above the shank.`,
+      (l) =>
+        `The ogive radius is below the tangent radius ${l(rt)}: the nose would rise above the shank.`,
       'ogive.radius',
       'ogive.radiusRatio',
       'noseLength',
@@ -674,7 +703,8 @@ function ogiveRatio(
   q = Math.min(q ?? 1, 1)
   if (q > 0 && n < k - 1e-9)
     return fail(
-      `The nose length ${mm(n)} is below its radial drop ${mm(k)}: no ogive reaches the meplat.`,
+      (l) =>
+        `The nose length ${l(n)} is below its radial drop ${l(k)}: no ogive reaches the meplat.`,
       'noseLength',
       'meplatDiameter',
     )
@@ -701,7 +731,7 @@ function hybridNose(
   zSteps: number[],
   formTag: Tag,
   notes: string[],
-): NoseCurve | Refusal {
+): NoseCurve | Refused {
   const r1 = rt / 2
   const c1: SectionPoint = [a - r1, z0]
   const D: SectionPoint = [m - c1[0], L - c1[1]]
@@ -739,7 +769,7 @@ function noseCurve(
   n: number,
   m: number,
   notes: string[],
-): NoseCurve | Refusal {
+): NoseCurve | Refused {
   const L = b.length
   const a = b.diameter / 2
   const z0 = L - n
@@ -785,12 +815,12 @@ function tipSplit(
   n: number,
   noseTag: Tag,
   notes: string[],
-): { tipStart: number; tag: Tag } | Refusal | undefined {
+): { tipStart: number; tag: Tag } | Refused | undefined {
   if (b.tip?.type !== 'polymer-tip') return
   const tl = b.tip.length ?? 0.2 * n
   if (!(tl > 0 && tl < n))
     return fail(
-      `The polymer tip length ${mm(tl)} is not below the nose length ${mm(n)}.`,
+      (l) => `The polymer tip length ${l(tl)} is not below the nose length ${l(n)}.`,
       'tip.length',
       'noseLength',
     )
@@ -804,7 +834,7 @@ function hollowPointMouth(
   m: number,
   given: 'sourced' | 'entered',
   notes: string[],
-): { mouth: number; mouthTag: Tag } | Refusal {
+): { mouth: number; mouthTag: Tag } | Refused {
   let mouth = 0
   let mouthTag: Tag = given
   if (b.tip?.type === 'hollow-point') {
@@ -816,7 +846,7 @@ function hollowPointMouth(
     }
     if (mouth > m + 1e-9)
       return fail(
-        `The hollow-point mouth ${mm(2 * mouth)} is wider than the meplat ${mm(2 * m)}.`,
+        (l) => `The hollow-point mouth ${l(2 * mouth)} is wider than the meplat ${l(2 * m)}.`,
         'tip.mouthDiameter',
         'meplatDiameter',
       )
@@ -838,7 +868,7 @@ function cannelureGeometry(
   t: number,
   z0: number,
   notes: string[],
-): Groove | Refusal | undefined {
+): Groove | Refused | undefined {
   const cn = b.cannelure
   if (!cn) return
   const groove = {
@@ -855,7 +885,7 @@ function cannelureGeometry(
     )
   if (groove.start < t + 1e-9 || groove.start + groove.width > z0 + 1e-9)
     return fail(
-      `The cannelure is not on the shank between ${mm(t)} and ${mm(z0)}.`,
+      (l) => `The cannelure is not on the shank between ${l(t)} and ${l(z0)}.`,
       'cannelure.start',
       'cannelure.width',
     )
