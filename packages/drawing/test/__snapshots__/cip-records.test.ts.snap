@@ -2,25 +2,25 @@
 
 exports[`adds the detail letters on screen without changing the frame or any other mark 1`] = `
 {
-  "cartridge A 10": 168,
+  "cartridge A 10": 165,
   "cartridge A 2": 9,
   "cartridge A 20": 26,
-  "cartridge A 5": 318,
-  "chamber A 10": 335,
+  "cartridge A 5": 313,
+  "chamber A 10": 326,
   "chamber A 2": 40,
-  "chamber A 20": 56,
-  "chamber A 5": 116,
-  "chamber B 10": 48,
-  "chamber B 2": 91,
-  "chamber B 20": 206,
-  "chamber B 5": 99,
+  "chamber A 20": 52,
+  "chamber A 5": 113,
+  "chamber B 10": 44,
+  "chamber B 2": 86,
+  "chamber B 20": 204,
+  "chamber B 5": 96,
   "chamber B 50": 98,
 }
 `;
 
 exports[`counts the chamber recess steps and lists the other outline features under 1 px at 390 px 1`] = `
 {
-  "recess": 211,
+  "recess": 208,
   "small": [
     [
       "cip-10-3-x-60-r-2025-05-13",
@@ -78,11 +78,6 @@ exports[`counts the chamber recess steps and lists the other outline features un
       0.14,
     ],
     [
-      "cip-6-mm-flobert-blanc-2008-04-15",
-      "chamber",
-      0.96,
-    ],
-    [
       "cip-9-3-x-72-r-2002-05-15",
       "chamber",
       0.72,
@@ -110,8 +105,8 @@ exports[`counts the drawn sides per table and bounds text size, scale and frame 
   ],
   "height": [
     [
-      "cip-6-mm-flobert-blanc-2008-04-15",
-      30.8,
+      "cip-6mm-me-flobert-court-2006-05-24",
+      36,
     ],
     [
       "cip-12-7-x-108-2017-05-17",
@@ -120,8 +115,8 @@ exports[`counts the drawn sides per table and bounds text size, scale and frame 
   ],
   "print": [
     [
-      "cip-4-mm-randz-court-blanc-1992-06-10",
-      30.7,
+      "cip-6mm-me-flobert-court-2006-05-24",
+      38.2,
     ],
     [
       "cip-12-7-x-108-2017-05-17",
@@ -154,22 +149,20 @@ exports[`dimensions every stored symbol or lists it as undimensioned 2`] = `
   "VII chamber: B": 1,
   "VII chamber: alpha1": 1,
   "cartridge: E1": 2,
-  "cartridge: H1": 10,
-  "cartridge: L1": 1,
-  "cartridge: L2": 15,
-  "cartridge: beta": 18,
+  "cartridge: H1": 9,
+  "cartridge: L2": 9,
+  "cartridge: beta": 17,
   "cartridge: delta": 11,
   "cartridge: e": 1,
   "cartridge: f": 3,
-  "cartridge: r2": 1,
-  "chamber: F": 13,
+  "chamber: F": 4,
   "chamber: G": 1,
-  "chamber: H1": 12,
-  "chamber: L1": 2,
+  "chamber: H1": 11,
+  "chamber: L1": 1,
   "chamber: L2": 11,
-  "chamber: P2": 2,
-  "chamber: R": 103,
-  "chamber: alpha1": 121,
+  "chamber: P2": 1,
+  "chamber: R": 102,
+  "chamber: alpha1": 117,
   "chamber: i": 1,
 }
 `;
@@ -186,7 +179,6 @@ exports[`lays out every layer of every figure in both media clear of overlaps, i
     "cip-28-nosler-2023-05-09 cartridge print r2",
     "cip-300-savage-2002-05-15 cartridge print r2",
     "cip-357-sig-2008-09-23 chamber print r2",
-    "cip-5-56-mm-fx-2017-05-17 cartridge print r2",
     "cip-5-6-x-57-2002-05-15 cartridge print r2",
     "cip-6-5-284-norma-2008-04-15 cartridge print r2",
     "cip-6-5-x-68-2002-05-15 cartridge print r2",
