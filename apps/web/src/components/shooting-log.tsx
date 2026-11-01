@@ -71,7 +71,7 @@ type LoadRecord = Extract<UserRecord, { kind: 'load' }>
 const facetKeys = ['firearm', 'year'] as const
 
 /** The line on screen, in print and in the docs: the log claims no standing with anyone. */
-export const ownRecordLine = msg(
+const ownRecordLine = msg(
   'The shooting log is your own record. Whether a club or an authority accepts it is up to them.',
 )
 

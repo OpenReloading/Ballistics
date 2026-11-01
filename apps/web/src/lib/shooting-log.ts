@@ -24,7 +24,7 @@ export const blankEntry = (now = new Date()): ShootingLogEntry => ({
 })
 
 /** The reference `user:<id>` a firearm counts an entry's rounds under in `countedSessions`. */
-export const entryRef = (id: string) => `user:${id}`
+const entryRef = (id: string) => `user:${id}`
 
 /** The record id a `user:` reference names, else undefined. */
 export const userIdOf = (ref: string | undefined) => {
@@ -81,7 +81,7 @@ export const ammunitionText = (e: ShootingLogEntry, names: LogNames) =>
   e.load ? names.load(e.load) : (e.ammunition ?? '')
 
 /** The CSV columns, in order; documented in the shooting log guide. */
-export const logCsvHeader = [
+const logCsvHeader = [
   'Date',
   'Place',
   'Discipline',
