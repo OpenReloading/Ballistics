@@ -54,7 +54,7 @@ Records whose maker states the construction for a whole line or for the whole ra
 | Missouri Bullet | "Brinell N" of each product | `core.hardness` N | the [pricing page](https://missouribullet.com/pricing.php) row of each record |
 | Sako | Bullet Type "Full metal jacket" | `jacket` present | the reloading data row of each record |
 
-A monolithic bullet has no core: the whole bullet is the material the maker names, so `core` stays absent and `leadFree` is undefined for it. Hornady, Sellier & Bellot and the remaining Sako records state no construction in their sources and stay without one.
+For the monolithic rows above the maker names the material of the whole bullet, so these records have no `core` and their derived `leadFree` is undefined. That is a choice of these mappings, not a rule of the schema, where `structure` and `core` are independent; Hammer's "100% Lead Free" is the maker's statement and is not that value. Of the Hornady records, one keeps its construction wording in `construction.raw` (with fields mapped from it); the other Sako records keep their source wording in `construction.raw` with `unmapped: true`; Sellier & Bellot records state no construction.
 
 ## Values and their sources
 
