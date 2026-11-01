@@ -147,6 +147,16 @@
                               "open-meplat"
                             ]
                           },
+                          "baseType": {
+                            "type": "string",
+                            "enum": [
+                              "flat",
+                              "boat-tail",
+                              "rebated-boat-tail",
+                              "conical-hollow-base",
+                              "rounded-hollow-base"
+                            ]
+                          },
                           "construction": {
                             "anyOf": [
                               {
@@ -167,6 +177,9 @@
                                 "pattern": "^(lead|lead-alloy|copper|copper-alloy|tin|tungsten|steel|compressed-powder)-core$"
                               }
                             ]
+                          },
+                          "leadFree": {
+                            "type": "boolean"
                           },
                           "nameOnly": {
                             "type": "boolean",
@@ -20458,6 +20471,21 @@
                                           "unit": "lb/in2",
                                           "description": "The value of `bulletBcG7` in lb/in2."
                                         },
+                                        "bulletBaseLength": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletBaseLength` in mm."
+                                        },
+                                        "bulletBaseDiameter": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletBaseDiameter` in mm."
+                                        },
+                                        "bulletCavityDiameter": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletCavityDiameter` in mm."
+                                        },
                                         "propellantEnergy": {
                                           "type": "number",
                                           "unit": "J/kg",
@@ -20560,7 +20588,18 @@
                                         }
                                       },
                                       "additionalProperties": false,
-                                      "description": "Values the user typed: solver values and the bullet diameter, length and ballistic coefficients. Every other value follows the referenced records."
+                                      "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter). Every other value follows the referenced records."
+                                    },
+                                    "bulletBase": {
+                                      "type": "string",
+                                      "enum": [
+                                        "flat",
+                                        "boat-tail",
+                                        "rebated-boat-tail",
+                                        "conical-hollow-base",
+                                        "rounded-hollow-base"
+                                      ],
+                                      "description": "The base form the user chose for the bullet instead of the one of its record (`base.type`)."
                                     },
                                     "ladder": {
                                       "anyOf": [
@@ -23883,6 +23922,167 @@
                             }
                           },
                           "required": ["kind", "id", "name", "saved", "data"]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "shootingLogEntry",
+                              "description": "Kind of the record: `shootingLogEntry`."
+                            },
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                              "description": "Id of the record in the browser library: a UUID."
+                            },
+                            "name": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200,
+                              "description": "Name of the record. Save names the file after it."
+                            },
+                            "saved": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                              "description": "Time of the last save, ISO 8601 in UTC."
+                            },
+                            "imported": {
+                              "type": "object",
+                              "properties": {
+                                "source": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 500,
+                                  "description": "Where the imported values come from, as the user named it."
+                                },
+                                "file": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Name of the file the record was imported from."
+                                },
+                                "day": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day of the import, ISO 8601."
+                                }
+                              },
+                              "required": ["source", "file", "day"],
+                              "description": "The import the record came from. Not compared when a file is imported again."
+                            },
+                            "data": {
+                              "type": "object",
+                              "properties": {
+                                "date": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                  "description": "Day, ISO 8601."
+                                },
+                                "place": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Place, such as the range or club."
+                                },
+                                "discipline": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^catalogue:"
+                                    }
+                                  ],
+                                  "description": "Reference `catalogue:<record id>` to a catalogue discipline."
+                                },
+                                "firearm": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^user:"
+                                    }
+                                  ],
+                                  "description": "Reference `user:<UUID>` to a firearm of the user."
+                                },
+                                "load": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^user:"
+                                    }
+                                  ],
+                                  "description": "Reference `user:<UUID>` to a load of the user."
+                                },
+                                "ammunition": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 200,
+                                  "description": "Factory ammunition as the person names it, in place of a `load`."
+                                },
+                                "rounds": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "maximum": 100000,
+                                  "description": "Rounds fired, for the round count."
+                                },
+                                "result": {
+                                  "type": "string",
+                                  "maxLength": 200,
+                                  "description": "Result as the person writes it, plain text."
+                                },
+                                "event": {
+                                  "type": "string",
+                                  "allOf": [
+                                    {
+                                      "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                                    },
+                                    {
+                                      "pattern": "^user:"
+                                    }
+                                  ],
+                                  "description": "Reference `user:<UUID>` to the competition event of the entry."
+                                },
+                                "notes": {
+                                  "type": "string",
+                                  "maxLength": 10000,
+                                  "description": "Notes, plain text."
+                                },
+                                "confirmation": {
+                                  "type": "object",
+                                  "properties": {
+                                    "by": {
+                                      "type": "string",
+                                      "minLength": 1,
+                                      "maxLength": 200,
+                                      "description": "Who confirmed the entry, as text."
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date",
+                                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                      "description": "Day of the confirmation, ISO 8601."
+                                    }
+                                  },
+                                  "required": ["by"],
+                                  "additionalProperties": false,
+                                  "description": "Who confirmed the entry and when, as the person typed it."
+                                }
+                              },
+                              "required": ["date", "rounds"],
+                              "additionalProperties": false,
+                              "description": "An entry of the shooting log, the person's own record."
+                            }
+                          },
+                          "required": ["kind", "id", "name", "saved", "data"]
                         }
                       ]
                     },
@@ -24444,6 +24644,22 @@
                                 },
                                 "required": ["kind", "a", "m", "q", "z1"],
                                 "additionalProperties": false
+                              },
+                              "trainingRows": {
+                                "type": "integer",
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "trainingCartridges": {
+                                "type": "integer",
+                                "exclusiveMinimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "retrieved": {
+                                "description": "ISO date the fitted sources were read, the latest of them.",
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                               }
                             },
                             "required": [

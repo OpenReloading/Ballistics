@@ -75,7 +75,7 @@
     "records": {
       "budget": {
         "initial": 506000,
-        "total": 555000
+        "total": 556000
       },
       "routes": {
         "/bullets/[id]": {
@@ -173,6 +173,10 @@
         "/firearms": {
           "initial": 509123,
           "total": 549226
+        },
+        "/firearms/log": {
+          "initial": 463900,
+          "total": 505900
         },
         "/groups": {
           "initial": 555700,

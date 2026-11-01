@@ -3715,6 +3715,16 @@
       "candidates": []
     },
     {
+      "key": "shooting-log",
+      "group": "target-shooting",
+      "english": "Shooting log",
+      "status": "unverified",
+      "german": "Schießbuch",
+      "sources": [],
+      "candidates": [],
+      "note": "Accepted as candidate for 1.0. The term issue #864 names; no statute names a personal Schießbuch or its fields (WaffG §§ 14, 15 name the proof of need, not the log), and no rule book of the research was searched for the word."
+    },
+    {
       "key": "position",
       "group": "target-shooting",
       "english": "Position",

@@ -49,6 +49,7 @@ const sidebars: SidebarsConfig = {
         'guides/chronograph-ladder',
       ],
     },
+    'guides/shooting-log',
     category('Case and firearm', [
       'case-capacity',
       'bullet-fit',

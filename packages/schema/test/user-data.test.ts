@@ -980,3 +980,63 @@ describe('checkUserRefs', () => {
     expect(checkUserRefs([sheet, userRecord.parse({ ...loadRecord, id: 'gone' })])).toEqual([])
   })
 })
+
+describe('shootingLogEntry', () => {
+  const entry = (data: Record<string, unknown>) => ({
+    kind: 'shootingLogEntry',
+    id: other,
+    name: '2026-10-12 Range',
+    saved,
+    data: { date: '2026-10-12', rounds: 30, ...data },
+  })
+
+  it('round-trips an entry with every field through a user data file', () => {
+    const full = entry({
+      place: 'Club range',
+      discipline: 'catalogue:dsb-1-35',
+      firearm: `user:${uuid}`,
+      load: `user:${designUuid}`,
+      result: '285 rings',
+      event: `user:${uuid}`,
+      notes: 'Wind from the left',
+      confirmation: { by: 'Range officer', date: '2026-10-12' },
+    })
+    const parsed = userDataFile.parse(file([full]))
+    expect(JSON.parse(JSON.stringify(parsed)).records[0]).toEqual(full)
+  })
+
+  it('takes factory ammunition as text and refuses it together with a load', () => {
+    expect(userRecord.safeParse(entry({ ammunition: 'Maker 9 mm 124 gr' })).success).toBe(true)
+    expect(
+      userRecord.safeParse(entry({ ammunition: 'Maker 9 mm', load: `user:${designUuid}` })).success,
+    ).toBe(false)
+  })
+
+  it('refuses a missing date or rounds, a negative count, a catalogue firearm and an empty confirmer', () => {
+    for (const bad of [
+      { date: undefined },
+      { rounds: undefined },
+      { rounds: -1 },
+      { rounds: 1.5 },
+      { firearm: 'catalogue:rifle' },
+      { event: 'catalogue:match' },
+      { confirmation: { by: '' } },
+      { extra: 1 },
+    ])
+      expect(userRecord.safeParse(entry(bad)).success, JSON.stringify(bad)).toBe(false)
+  })
+
+  it('needs a UUID id, as the firearm counts its rounds under the reference', () => {
+    expect(userRecord.safeParse({ ...entry({}), id: 'entry-1' }).success).toBe(false)
+  })
+
+  it('reports a firearm or load the set does not hold, and names them as user references', () => {
+    const r = userRecord.parse(entry({ firearm: `user:${uuid}`, load: `user:${designUuid}` }))
+    expect(checkUserRefs([r]).map((d) => d.field)).toEqual(['firearm', 'load'])
+    expect(userRefFields(r)).toEqual(['firearm', 'load'])
+  })
+
+  it('is a known kind, so the reader keeps it', () => {
+    expect(withoutUnknownKinds(file([entry({})])).skipped).toEqual([])
+  })
+})

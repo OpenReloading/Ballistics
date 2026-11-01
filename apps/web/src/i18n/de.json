@@ -14,7 +14,7 @@
   "Still needed for a powder record": "Für den Datensatz des Treibladungspulvers fehlt noch",
   "Tick at least one fitted parameter.": "Kreuzen Sie mindestens einen angepassten Parameter an.",
   "Vivacity (moved by the fit)": "Vivacity (von der Anpassung verschoben)",
-  "Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating. Empty without fitted parameters: the load-table fit gives parameters only to powders with at least 10 training rows from at least 2 cartridges.": "Zeilen der Ladetabellen, an die die Modellparameter angepasst wurden, die Patronen, die sie abdecken, und der Tag, an dem die Ladetabellen gelesen wurden; die Datensatzseite listet sie je Ladetabelle. Eine Anzahl, keine Bewertung. Leer ohne angepasste Parameter: Die Anpassung an die Ladetabellen liefert Parameter nur für Treibladungspulver mit mindestens 10 Trainingszeilen aus mindestens 2 Patronen.",
+  "Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating.": "Zeilen der Ladetabellen, an die die Modellparameter angepasst wurden, die Patronen, die sie abdecken, und der Tag, an dem die Ladetabellen gelesen wurden; die Datensatzseite listet sie je Ladetabelle. Eine Anzahl, keine Bewertung.",
   "Training rows": "Trainingszeilen",
   "{count} training row|{count} training rows": {
     "one": "{count} Trainingszeile",
@@ -3363,6 +3363,7 @@
   "The overall length in the photograph is {percent} % away from the overall length entered at the ruler's scale. Check the scale points and the cut-out, and that the bullet lies flat and square to the camera.": "Die Gesamtlänge auf dem Foto weicht beim Maßstab des Lineals um {percent} % von der eingegebenen Gesamtlänge ab. Prüfen Sie die Maßstabspunkte und die Freistellung und ob das Geschoss flach und rechtwinklig zur Kamera liegt.",
   "The diameter and the overall length entered give scales {percent} % apart. Check the scale points and the cut-out, and that the bullet lies flat and square to the camera. The scale used is their weighted mean, with the difference in its uncertainty.": "Der eingegebene Durchmesser und die eingegebene Gesamtlänge ergeben Maßstäbe, die {percent} % auseinanderliegen. Prüfen Sie die Maßstabspunkte und die Freistellung und ob das Geschoss flach und rechtwinklig zur Kamera liegt. Verwendet wird ihr gewichtetes Mittel, mit der Differenz in seiner Unsicherheit.",
   "The edges of the bullet are soft, about {spread} px wide: a shadow beside the bullet, or the photograph is out of focus or moved. Measured values are less certain; a sharp photograph in even light gives a more exact outline.": "Die Kanten des Geschosses sind weich, etwa {spread} px breit: ein Schatten neben dem Geschoss, oder das Foto ist unscharf oder verwackelt. Gemessene Werte sind unsicherer; ein scharfes Foto in gleichmäßigem Licht ergibt einen genaueren Umriss.",
+  "The bullet's sides are not parallel to the axis direction typed: it is about {degrees} degrees off the bullet's own axis, or a shadow beside the bullet widens one side. The lengths and the base may read wrong; clear the axis direction to let the tool find it, or type it again.": "Die Seiten des Geschosses verlaufen nicht parallel zur eingegebenen Achsrichtung: Sie weicht um etwa {degrees} Grad von der Achse des Geschosses ab, oder ein Schatten neben dem Geschoss verbreitert eine Seite. Die Längen und der Boden können falsch gemessen werden; löschen Sie die Achsrichtung, damit das Werkzeug sie findet, oder geben Sie sie erneut ein.",
   "A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out of the cut-out, or take the photograph in even light, for a more exact outline.": "Ein Schatten neben dem Geschoss verbreitert eine Seite der Freistellung: Diese Seite bleibt außen vor, gemessen wird die andere Seite, an der Achse gespiegelt. Entfernen Sie den Schatten mit dem Pinsel aus der Freistellung oder fotografieren Sie in gleichmäßigem Licht, für einen genaueren Umriss.",
   "One side of the cut-out is wider than the other, as a shadow beside the bullet makes it: the diameter and every length may be off by more than their uncertainty. Brush the shadow out of the cut-out, or take the photograph in even light.": "Eine Seite der Freistellung ist breiter als die andere, wie es ein Schatten neben dem Geschoss bewirkt: Der Durchmesser und jede Länge können um mehr als ihre Unsicherheit abweichen. Entfernen Sie den Schatten mit dem Pinsel aus der Freistellung oder fotografieren Sie in gleichmäßigem Licht.",
   "The scale comes from the diameter entered, without a ruler, so the lengths assume a square side view of the bullet itself, drawn to scale: a bullet turned 10 degrees towards the camera reads 1.5 % short, and a maker's product image may not be drawn to scale.": "Der Maßstab kommt aus dem eingegebenen Durchmesser, ohne Lineal, daher setzen die Längen eine rechtwinklige, maßstabsgetreue Seitenansicht des Geschosses selbst voraus: Ein um 10 Grad zur Kamera gedrehtes Geschoss ergibt eine um 1,5 % zu kurze Länge, und ein Produktbild des Herstellers ist womöglich nicht maßstabsgetreu.",
@@ -4057,5 +4058,76 @@
   "G7": "G7",
   "Pick 2 to {max}": "2 bis {max} auswählen",
   "Sectional density, computed: mass over diameter squared.": "Querschnittsbelastung, berechnet: Masse durch Durchmesser im Quadrat.",
-  "The manufacturer's first published BC of this drag model.": "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells."
+  "The manufacturer's first published BC of this drag model.": "Der erste vom Hersteller veröffentlichte BC dieses Luftwiderstandsmodells.",
+  "{added} entries added, {equal} already in this browser, {replaced} replaced.": "{added} Einträge hinzugefügt, {equal} schon in diesem Browser, {replaced} ersetzt.",
+  "{count} entry of the file differs from the one in this browser. Replace it?|{count} entries of the file differ from the ones in this browser. Replace them?": {
+    "one": "{count} Eintrag der Datei weicht von dem in diesem Browser ab. Ersetzen?",
+    "other": "{count} Einträge der Datei weichen von denen in diesem Browser ab. Ersetzen?"
+  },
+  "{count} entry|{count} entries": {
+    "one": "{count} Eintrag",
+    "other": "{count} Einträge"
+  },
+  "{count} record of another kind left out; Import of a File menu reads it.|{count} records of other kinds left out; Import of a File menu reads them.": {
+    "one": "{count} Datensatz einer anderen Art ausgelassen; der Import eines Datei-Menüs liest ihn.",
+    "other": "{count} Datensätze anderer Arten ausgelassen; der Import eines Datei-Menüs liest sie."
+  },
+  "{from} to {to}": "{from} bis {to}",
+  "{name} has no round count; set one on the Firearms page to add the log to it.": "{name} hat keine Schusszahl; legen Sie auf der Seite Schusswaffen eine fest, um das Schießbuch hinzuzurechnen.",
+  "{shown} of {count} entry|{shown} of {count} entries": {
+    "one": "{shown} von {count} Eintrag",
+    "other": "{shown} von {count} Einträgen"
+  },
+  "Add {count} round of this entry to the round count of {name}?|Add {count} rounds of this entry to the round count of {name}?": {
+    "one": "{count} Schuss dieses Eintrags zur Schusszahl von {name} hinzufügen?",
+    "other": "{count} Schuss dieses Eintrags zur Schusszahl von {name} hinzufügen?"
+  },
+  "All entries": "Alle Einträge",
+  "All firearms": "Alle Schusswaffen",
+  "All years": "Alle Jahre",
+  "As you write it, such as rings or a placing.": "So, wie Sie es schreiben, etwa Ringe oder eine Platzierung.",
+  "Confirmed by": "Bestätigt von",
+  "Confirmed on": "Bestätigt am",
+  "Edit": "Bearbeiten",
+  "Edit entry": "Eintrag bearbeiten",
+  "Entries": "Einträge",
+  "Factory ammunition": "Fabrikmunition",
+  "firearm {name}": "Schusswaffe {name}",
+  "Import JSON": "JSON importieren",
+  "Load or ammunition": "Laborierung oder Munition",
+  "Maker and product, when no saved load was fired.": "Hersteller und Produkt, wenn keine gespeicherte Laborierung verschossen wurde.",
+  "New entry": "Neuer Eintrag",
+  "No discipline found": "Keine Disziplin gefunden",
+  "No entries match these filters.": "Keine Einträge passen zu diesen Filtern.",
+  "No entry shown to export or print.": "Kein Eintrag angezeigt, der exportiert oder gedruckt werden kann.",
+  "No entry yet. New entry adds the first range day.": "Noch kein Eintrag. Neuer Eintrag legt den ersten Schießtag an.",
+  "No firearm saved in this browser yet": "Noch keine Schusswaffe in diesem Browser gespeichert",
+  "Not imported: {reason}": "Nicht importiert: {reason}",
+  "Not in this browser": "Nicht in diesem Browser",
+  "Place": "Ort",
+  "Print the entries shown": "Die angezeigten Einträge drucken",
+  "Printed: the first {limit} of {total} entries in this selection.": "Gedruckt: die ersten {limit} von {total} Einträgen dieser Auswahl.",
+  "Replace entries?": "Einträge ersetzen?",
+  "Save entry": "Eintrag speichern",
+  "Shooting log": "Schießbuch",
+  "shooting log entries": "Schießbuch-Einträge",
+  "Shooting log entries in this browser": "Schießbuch-Einträge in diesem Browser",
+  "Shooting log, {filters}": "Schießbuch, {filters}",
+  "Signature": "Unterschrift",
+  "Stored": "Gespeichert",
+  "The round count of {name} holds this entry already.": "Die Schusszahl von {name} enthält diesen Eintrag schon.",
+  "The round count of {name} is unchanged.": "Die Schusszahl von {name} bleibt unverändert.",
+  "The shooting log is your own record. Whether a club or an authority accepts it is up to them.": "Das Schießbuch ist Ihre eigene Aufzeichnung. Ob ein Verein oder eine Behörde es anerkennt, entscheiden diese.",
+  "Who confirmed the entry, as you type it.": "Wer den Eintrag bestätigt hat, so, wie Sie es eingeben.",
+  "Year": "Jahr",
+  "year {year}": "Jahr {year}",
+  "Year {year}": "Jahr {year}",
+  "Enter the date.": "Geben Sie das Datum ein.",
+  "Enter who confirmed the entry, or clear the day of the confirmation.": "Geben Sie ein, wer den Eintrag bestätigt hat, oder leeren Sie den Tag der Bestätigung.",
+  "Give a load or factory ammunition, not both.": "Geben Sie eine Laborierung oder Fabrikmunition an, nicht beides.",
+  "Check the entry: a value is out of its range.": "Prüfen Sie den Eintrag: Ein Wert liegt außerhalb seines Bereichs.",
+  "{count} entry not imported: a record of this browser has its id.|{count} entries not imported: records of this browser have their ids.": {
+    "one": "{count} Eintrag nicht importiert: Ein Datensatz dieses Browsers hat seine ID.",
+    "other": "{count} Einträge nicht importiert: Datensätze dieses Browsers haben ihre IDs."
+  }
 }

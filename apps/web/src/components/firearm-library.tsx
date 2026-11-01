@@ -76,7 +76,7 @@ import { FirearmEditor } from './firearm-editor.tsx'
 import type { FirearmRangeCards, LoadRangeCard } from './firearm-range-cards.tsx'
 import { LibraryTabs } from './library-tabs.tsx'
 import { BarCount, PageBar } from './page-bar.tsx'
-import { PrintButton } from './record-actions.tsx'
+import { LinkButton, PrintButton } from './record-actions.tsx'
 import { EmptyList, ErrorNote, Loading } from './states.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useManufacturers } from './use-manufacturers.ts'
@@ -842,6 +842,7 @@ export function FirearmLibrary() {
             <Button leftSection={<Plus aria-hidden="true" />} onClick={newFirearm}>
               {t('New firearm')}
             </Button>
+            <LinkButton href="/firearms/log">{t('Shooting log')}</LinkButton>
             <FileMenu
               ref={menu}
               kind="firearm"
