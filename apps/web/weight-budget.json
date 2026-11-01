@@ -15,7 +15,7 @@
     "shell": {
       "budget": {
         "initial": 424000,
-        "total": 472000
+        "total": 473000
       },
       "routes": {
         "/": {
