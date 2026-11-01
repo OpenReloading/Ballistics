@@ -456,6 +456,25 @@ describe('plausibility warnings of published loads', () => {
       charge('max', 2.8, { velocity: { ...velocity(750), point: { label: 'V5' } } }),
     ]
     expect(readWith({ charges: elsewhere }).warnings).toEqual([])
+    const sameSymbol = [
+      charge('start', 2.5, { velocity: { ...velocity(760), point: { label: 'V0' } } }),
+      charge('max', 2.8, {
+        velocity: { ...velocity(750), point: { label: 'V0', distance: { value: 0, raw: '0 m' } } },
+      }),
+    ]
+    expect(readWith({ charges: sameSymbol }).warnings).toHaveLength(1)
+    const otherDistance = [
+      charge('start', 2.5, {
+        velocity: { ...velocity(760), point: { label: 'V', distance: { value: 0, raw: '0 m' } } },
+      }),
+      charge('max', 2.8, {
+        velocity: {
+          ...velocity(750),
+          point: { label: 'V', distance: { value: 5000, raw: '5 m' } },
+        },
+      }),
+    ]
+    expect(readWith({ charges: otherDistance }).warnings).toEqual([])
   })
 
   it('warns of a max charge pressure below the start charge on the same unit and method only', () => {

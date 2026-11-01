@@ -271,9 +271,13 @@ function largest(cartridge: Pick<Cartridge, 'values'>, symbol: string, side?: st
   return values.length > 0 ? Math.max(...values) : undefined
 }
 
-/** Where two velocities apply: equal when both print the same point, or both none. */
-const samePoint = (a: Charge['velocity'], b: Charge['velocity']) =>
-  JSON.stringify(a?.point ?? null) === JSON.stringify(b?.point ?? null)
+/** Where two velocities apply: the same printed symbol (or none), and the same distance where both print one. */
+function samePoint(a: Charge['velocity'], b: Charge['velocity']) {
+  const [p, q] = [a?.point, b?.point]
+  if (p?.label !== q?.label) return false
+  const [d, e] = [p?.distance?.value, q?.distance?.value]
+  return d === undefined || e === undefined || d === e
+}
 
 /** The order findings of a load's start and max charge: charge, velocity and pressure. */
 function orderFindings(l: PublishedLoad): Finding[] {

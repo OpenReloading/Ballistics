@@ -3,6 +3,7 @@
 . LoadTable
 . LoadTables
 . LocatedPublishedLoads
+. PublishedLoadFinding
 . PublishedLoadTargets
 . ReadRecordsResult
 . airTemperatureRange
@@ -13,6 +14,7 @@
 . checkCoverage
 . checkFittedSources
 . checkPowder
+. checkPublishedLoadPlausibility
 . checkPublishedLoads
 . checkSpec
 . readLoadTables
