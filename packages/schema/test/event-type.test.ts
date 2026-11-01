@@ -82,6 +82,15 @@ describe('eventType', () => {
     )
   })
 
+  it('needs the major floor above the minor floor', () => {
+    const inverted = [{ division: 'Open', minor: 160, major: 125 }]
+    expectIssueAt(
+      eventType,
+      { ...hitFactor, scoring: { ...hitFactor.scoring, powerFactors: inverted } },
+      'scoring.powerFactors.0.major',
+    )
+  })
+
   it('refuses a level listed twice and an empty level list', () => {
     expectIssueAt(eventType, { ...rings, levels: ['A', 'A'] }, 'levels')
     expectIssueAt(eventType, { ...rings, levels: [] }, 'levels')

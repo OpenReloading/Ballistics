@@ -2,20 +2,25 @@ import type { Discipline, EventType, Federation } from '@open-reloading/schema'
 import type { Bundle } from './records.ts'
 import { resolveId } from './renames.ts'
 
-/** The divisions an event type's hit-factor scoring names, where it has them. */
-const divisionsOf = (t: EventType) =>
-  t.scoring.method === 'hit-factor'
-    ? new Set(t.scoring.powerFactors.map((p) => p.division))
-    : undefined
-
-/** A division listed twice among the power factors, or a magazine limit of an unknown division. */
+/**
+ * A division listed twice among the power factors, and a magazine limit of a division without a
+ * power factor, or for a major rating the division lacks. Ring scoring has no divisions, so every
+ * magazine limit of a ring event type is an error.
+ */
 function checkDivisions(t: EventType, where: string, errors: string[]) {
-  const divisions = divisionsOf(t)
-  if (t.scoring.method === 'hit-factor' && divisions?.size !== t.scoring.powerFactors.length)
+  const floors =
+    t.scoring.method === 'hit-factor'
+      ? new Map(t.scoring.powerFactors.map((p) => [p.division, p]))
+      : new Map()
+  if (t.scoring.method === 'hit-factor' && floors.size !== t.scoring.powerFactors.length)
     errors.push(`${where}: a division is listed twice in scoring.powerFactors`)
-  for (const m of t.magazine ?? [])
-    if (divisions && !divisions.has(m.division))
+  for (const m of t.magazine ?? []) {
+    const floor = floors.get(m.division)
+    if (!floor)
       errors.push(`${where}: magazine names division "${m.division}" without a power factor`)
+    else if (m.powerFactor === 'major' && floor.major === undefined)
+      errors.push(`${where}: magazine limits major in division "${m.division}", which has none`)
+  }
 }
 
 /** The ids that replace an id of a kind in `renames.json`, and the records by id. */

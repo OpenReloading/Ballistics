@@ -18,12 +18,17 @@ const zonePoints = z.strictObject({
  * The least power factor of one division for a score to count (`minor`) and to be scored as
  * major (`major`; absent where the division has no major rating).
  */
-const powerFactorFloor = z.strictObject({
-  /** Division as the rule book names it ("Production Optics"). */
-  division: z.string().min(1),
-  minor: z.int().positive(),
-  major: z.int().positive().optional(),
-})
+const powerFactorFloor = z
+  .strictObject({
+    /** Division as the rule book names it ("Production Optics"). */
+    division: z.string().min(1),
+    minor: z.int().positive(),
+    major: z.int().positive().optional(),
+  })
+  .refine((p) => p.major === undefined || p.major > p.minor, {
+    message: 'the major floor must lie above the minor floor',
+    path: ['major'],
+  })
 
 /**
  * Hit-factor scoring (IPSC, USPSA): the points of the hits less the penalties, divided by the

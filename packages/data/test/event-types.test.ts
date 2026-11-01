@@ -171,6 +171,27 @@ describe('checkEventTypes', () => {
     ])
   })
 
+  it('finds a major magazine limit of a division without major, and any limit on ring scoring', () => {
+    const noMajor: EventType = {
+      ...practical,
+      scoring: {
+        ...(practical.scoring as Extract<EventType['scoring'], { method: 'hit-factor' }>),
+        powerFactors: [{ division: 'Open', minor: 125 }],
+      },
+      magazine: [{ division: 'Open', powerFactor: 'major', maxRounds: 8 }],
+    }
+    expect(checkEventTypes({ ...bundle, eventTypes: [noMajor] })).toEqual([
+      'event-types/practical.json: magazine limits major in division "Open", which has none',
+    ])
+    const ringsWithMagazine: EventType = {
+      ...rings(),
+      magazine: [{ division: 'Open', maxRounds: 5 }],
+    }
+    expect(checkEventTypes({ ...bundle, eventTypes: [ringsWithMagazine] })).toEqual([
+      'event-types/rings.json: magazine names division "Open" without a power factor',
+    ])
+  })
+
   it('finds a division listed twice and a magazine limit of an unknown division', () => {
     if (practical.scoring.method !== 'hit-factor') throw new Error('hit factor expected')
     const twice: EventType = {

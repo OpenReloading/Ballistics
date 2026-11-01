@@ -56,7 +56,8 @@ One entry of `magazine`: `division`, `powerFactor` where the limit holds for one
 
 - the federation is a record and lists the event type's rule book,
 - a ring scoring's `discipline` is a discipline of that federation,
-- no division appears twice among the power factors and every magazine limit names a division with a power factor,
+- no division appears twice among the power factors, every magazine limit names a division with a power factor (so a ring event type has none) and a limit for `major` only names a division with a major rating,
+- the rule book's source record names a publisher; the schema also wants a major floor above the minor one,
 - every field is covered by a cited source (as for every catalogue kind).
 
 ## Records
