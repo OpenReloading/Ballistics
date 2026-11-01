@@ -46,12 +46,13 @@ import {
 } from '../lib/field-spec.ts'
 import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
-import { bulletFields, burnFormError, interiorFields } from '../lib/interior-input.ts'
+import { bulletFields, burnFormError, interiorFields, specFields } from '../lib/interior-input.ts'
 import { hasSensitivity } from '../lib/interior-request.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
 import { constructionRows, structureText } from '../lib/record-fields.ts'
+import { type SpecKey, typedCaseLength } from '../lib/record-specs.ts'
 import {
   type LadderDirection,
   ladderKinds,
@@ -995,6 +996,76 @@ function BulletValueField({ name: key }: { name: BulletKey }) {
 }
 
 /**
+ * A value of the cartridge sheet or the powder record that the user may type over it: the record's
+ * value in muted text until typed, an emptied field gives the record's value again. A typed Pmax is
+ * the user's own limit, no CIP value.
+ */
+function SpecValueField({ name: key }: { name: SpecKey }) {
+  const {
+    system,
+    recordSpecs,
+    typedSpecFields,
+    setTypedSpec,
+    markChanged,
+    printing,
+    printMedia,
+    changes,
+    resetKeys,
+  } = useLoad()
+  const { t } = useTranslation()
+  const spec = specFields.find((s) => s.key === key)
+  if (!spec) throw new Error(`no field ${key}`)
+  const typed = typedSpecFields[key]
+  const recorded = recordSpecs[key]
+  const value =
+    typed ??
+    (recorded === undefined
+      ? undefined
+      : { text: fixedFieldText(spec.quantity, system, recorded), si: recorded })
+  return (
+    <NumberField
+      spec={spec}
+      system={system}
+      value={
+        (printing || printMedia) && value
+          ? { ...value, text: inchText(value.text, system[spec.quantity].symbol) }
+          : value
+      }
+      muted={typed === undefined}
+      error={typed?.text.trim() ? (s) => fieldError(spec, typed, s, t) : undefined}
+      mark={(s) =>
+        changes[key] === undefined
+          ? undefined
+          : t('Changed from the record value {value}.', {
+              value: valueWithUnit(spec.quantity, s, changes[key]),
+            })
+      }
+      action={changeAction(spec, changes[key], resetKeys, t)}
+      onChange={(v) => {
+        markChanged()
+        setTypedSpec((f) => ({ ...f, [key]: v }))
+      }}
+      // an emptied field follows the record again once it is left
+      onBlur={() =>
+        setTypedSpec((f) => {
+          if (f[key]?.text.trim() !== '') return f
+          const { [key]: _, ...rest } = f
+          return rest
+        })
+      }
+    />
+  )
+}
+
+/** The spec rows of a card once its record is chosen, or while a value is typed. */
+function SpecValueFields({ keys, chosen }: { keys: readonly SpecKey[]; chosen: boolean }) {
+  const { typedSpecFields } = useLoad()
+  return keys
+    .filter((k) => chosen || k in typedSpecFields)
+    .map((k) => <SpecValueField key={k} name={k} />)
+}
+
+/**
  * The Bullet card's value rows (the card's height is fixed by the window of 1280 x 650): diameter,
  * length and the first BC row of the drag models the record lists or the user typed (G7 before G1).
  * The second BC row is the card's More popover's (`more`).
@@ -1056,10 +1127,11 @@ function NewerFitNote() {
 function CardBody({ panel }: { panel: InputPanel }) {
   const {
     system,
+    cartridge,
     powder,
+    recordSpecs,
+    typedSpecFields,
     bulletNote,
-    pmax,
-    specValue,
     modelShown,
     setModelShown,
     printing,
@@ -1073,23 +1145,11 @@ function CardBody({ panel }: { panel: InputPanel }) {
   const { t } = useTranslation()
   // the gun weight's message waits for the end of the typing, as "0." on the way to "0.5" is no error
   const [gunLeft, setGunLeft] = useState(false)
-  const l3 = specValue('cartridge', 'L3')
   if (panel === 'cartridge')
     return (
       <div className="panel-fields">
         <ReplacedNote panel={panel} />
-        {recordRow(
-          t('CIP Pmax'),
-          pmax === undefined
-            ? undefined
-            : formatQuantity('pressure', system, toSi('pressure', pmax)),
-          system.pressure.symbol,
-        )}
-        {recordRow(
-          t('Case length, CIP L3'),
-          l3 === undefined ? undefined : lengthCell(system, l3),
-          system.length.symbol,
-        )}
+        <SpecValueFields keys={['pmax', 'caseLength']} chosen={cartridge !== undefined} />
         {fieldsOf(panelFields.cartridge)}
         {/* case capacity, COAL or CBTO and the seating values of the figure */}
         <SeatingSlot name="cartridge" />
@@ -1108,11 +1168,10 @@ function CardBody({ panel }: { panel: InputPanel }) {
     return (
       <div className="panel-fields">
         <ReplacedNote panel={panel} />
-        {recordRow(
-          t('Bulk density'),
-          powder?.bulkDensity &&
-            formatQuantity('density', system, toSi('density', powder.bulkDensity.value)),
-          system.density.symbol,
+        {/* a record's, or a typed one without a record (a link): either is in use, so it shows */}
+        {(recordSpecs.bulkDensity !== undefined ||
+          (powder === undefined && 'bulkDensity' in typedSpecFields)) && (
+          <SpecValueField name="bulkDensity" />
         )}
         <PowderSourceRow />
         <NewerFitNote />
@@ -1130,7 +1189,15 @@ function CardBody({ panel }: { panel: InputPanel }) {
             {modelShown ? t('Hide') : t('Show')}
           </Button>
         </div>
-        {(modelShown || printing || printMedia) && fieldsOf(modelFields)}
+        {(modelShown || printing || printMedia) && (
+          <>
+            {/* a powder record without a bulk density has no row of its own in the card */}
+            {powder !== undefined && recordSpecs.bulkDensity === undefined && (
+              <SpecValueField name="bulkDensity" />
+            )}
+            {fieldsOf(modelFields)}
+          </>
+        )}
       </div>
     )
   return (
@@ -1464,9 +1531,9 @@ function CardPicker({ panel }: { panel: InputPanel }) {
 
 /** The values of each card a record gives and the user may change. */
 export const cardKeys: Record<InputPanel, readonly string[]> = {
-  cartridge: panelFields.cartridge,
+  cartridge: [...panelFields.cartridge, 'pmax', 'caseLength'],
   bullet: ['bulletMass', ...bulletFields.map((s) => s.key)],
-  powder: [...modelFields, ...powderMoreFields],
+  powder: [...modelFields, ...powderMoreFields, 'bulkDensity'],
   firearm: ['twist', 'firearmMass'],
 }
 
@@ -1567,12 +1634,6 @@ function landsChoice(
   return landsFor(lands, ref)
 }
 
-/** The charge (kg) and the powder's bulk density (kg/m³) the figure's powder fill reads. */
-const figurePowder = (
-  charge: number | undefined,
-  powder: { bulkDensity?: { value: number } | undefined } | undefined,
-) => ({ charge, bulkDensity: powder?.bulkDensity && toSi('density', powder.bulkDensity.value) })
-
 /**
  * The cartridge figure with the seated bullet, once a cartridge is chosen, drawn into `host`: the
  * card of the inputs' second column or the result tab Cartridge. One node moves between them, so
@@ -1610,9 +1671,10 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     setSeatAt,
     suggestions,
     fields,
-    powder,
     bulletValues,
     bulletBaseType,
+    specs,
+    typedSpecFields,
   } = useLoad()
   const { ok, stale } = useResult()
   // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
@@ -1690,6 +1752,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         design: bulletDesign?.id,
         values: seatValues,
         baseType: bulletBaseType,
+        caseLength: typedCaseLength(typedSpecFields),
       }}
       slots={{
         cartridge: seatingSlots.cartridge ?? null,
@@ -1701,7 +1764,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       onSeated={follow}
       onSeatLadder={setSeatAt}
       ladderStep={ladderStep}
-      powder={figurePowder(fields.charge?.si, powder)}
+      powder={{ charge: fields.charge?.si, bulkDensity: specs.bulkDensity }}
       measuredWaterCapacity={
         measuredFor === measuredId ? measured.measuredWaterCapacity : emptyStep
       }

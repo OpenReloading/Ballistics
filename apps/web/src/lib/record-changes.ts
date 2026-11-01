@@ -29,16 +29,19 @@ export function changedFromRecord(
 
 /**
  * The values the chosen records give, by key, SI: the powder's model values, the bullet's, the
- * defaults of the followed fields (the volume only while no seating owns it) and the firearm's weight.
+ * sheet's and powder's specs, the defaults of the followed fields (the volume only while no seating
+ * owns it) and the firearm's weight.
  */
 export function recordValuesOf(a: {
   origin: Record<string, number> | undefined
   bullet: Record<string, number | undefined>
+  /** The cartridge sheet's Pmax and L3 and the powder's bulk density (`record-specs.ts`). */
+  specs: Record<string, number | undefined>
   suggestions: Suggestions
   seatingOwnsVolume: boolean
   firearmMass: number | undefined
 }): Record<string, number | undefined> {
-  const out: Record<string, number | undefined> = { ...a.origin, ...a.bullet }
+  const out: Record<string, number | undefined> = { ...a.origin, ...a.bullet, ...a.specs }
   for (const key of followKeys)
     if (key !== 'volume' || !a.seatingOwnsVolume) out[key] = a.suggestions[key]?.si
   out.firearmMass = a.firearmMass

@@ -229,6 +229,22 @@ describe('limitLines', () => {
     expect(lines?.some((l) => /safe/i.test(l.label))).toBe(false)
   })
 
+  it("names a typed Pmax as the reader's own, with no CIP label", () => {
+    const typed: Limit = {
+      symbol: 'Pmax',
+      method: 'typed',
+      typed: true,
+      compared: true,
+      pressure: 3.8e8,
+    }
+    const lines = limitLines([typed], system, english.t)
+    expect(lines?.map((l) => l.label)).toEqual([
+      'Your Pmax 3800 bar',
+      '85 % of your Pmax',
+      '75 % of your Pmax',
+    ])
+  })
+
   it('leaves out the source without a number and gives undefined without a compared limit', () => {
     expect(defined(limitLines([cip], system, english.t)?.[0]).label).toBe('CIP Pmax 4150 bar')
     expect(limitLines([{ ...cip, compared: false }], system, english.t)).toBeUndefined()

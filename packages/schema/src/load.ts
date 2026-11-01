@@ -20,6 +20,9 @@ const kinds = {
   bulletBaseDiameter: 'length',
   bulletCavityDiameter: 'length',
   bulletCavityDepth: 'length',
+  pmax: 'pressure',
+  caseLength: 'length',
+  bulkDensity: 'density',
   propellantEnergy: 'specificEnergy',
   gamma: 'dimensionless',
   density: 'density',
@@ -103,7 +106,7 @@ const ladderStep = z
 export const loadAnalysis = z.object({
   overrides: analysisOverrides
     .describe(
-      'Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter). Every other value follows the referenced records.',
+      'Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records.',
     )
     .optional(),
   bulletBase: baseTypes

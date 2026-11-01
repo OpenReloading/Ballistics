@@ -37,7 +37,7 @@ export interface InteriorValues extends Record<(typeof interiorKeys)[number], nu
 /** Field keys of the `values` of `interiorLoad`, the workbench fields a load keeps (`charge` and `analysis.overrides`). */
 export const interiorValueKeys: readonly (keyof InteriorValues)[] = interiorKeys
 
-/** Keys of a load the interior solver does not take: the gun weight (kg, free recoil) and the typed bullet values (m, lb/in2 in SI, the base dimensions in m) the exterior tabs and the bore resistance read. */
+/** Keys of a load the interior solver does not take: the gun weight (kg, free recoil) and the typed bullet values (m, lb/in2 in SI, the base dimensions in m) and the values of the records the solver does not read as such: the typed Pmax (Pa), the case length L3 (m) and the powder's bulk density (kg/m3) the exterior tabs and the bore resistance read. */
 const otherKeys = [
   'firearmMass',
   'bulletDiameter',
@@ -48,6 +48,9 @@ const otherKeys = [
   'bulletBaseDiameter',
   'bulletCavityDiameter',
   'bulletCavityDepth',
+  'pmax',
+  'caseLength',
+  'bulkDensity',
 ] as const
 
 /** Every key a load keeps: `interiorValueKeys` and the keys the interior solver does not take. */
