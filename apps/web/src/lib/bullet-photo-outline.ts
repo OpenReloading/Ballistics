@@ -358,7 +358,9 @@ export function sideTapers(o: Outline) {
  * before the other; the late side is the shadow's edge until it meets the bullet's base face, which
  * it crosses within a fifth of those samples to 0.9 of its shank line (the corner of a turned axis
  * ramps on as far again). The bullet's base is there; the samples before it are left out, the
- * axis' origin moves to it and the shadow is named on the early side. Unchanged otherwise.
+ * axis' origin moves to it and the shadow is named on the early side. Where one side is late by 3
+ * or more samples but does not cross so, the base end is softer on that side: the outline is kept
+ * and the shadow named, as not removed. Unchanged otherwise.
  */
 function withoutOverhang(o: Outline): Outline {
   const sides = o.sides
@@ -375,7 +377,8 @@ function withoutOverhang(o: Outline): Outline {
   const lateAt = Math.max(iL, iR)
   const cut = late.findIndex((v, i) => i >= lateAt && v >= 0.9 * levelAt(o, line, i))
   // a turned axis's corner ramps on past half its line as far again; the bullet's own base face, blurred, is crossed in a few samples
-  if (cut < 0 || cut > o.r.length / 4 || cut - lateAt > 0.2 * (lateAt - early)) return o
+  if (cut < 0 || cut > o.r.length / 4 || cut - lateAt > 0.2 * (lateAt - early))
+    return { ...o, shadow: { side, removed: false } }
   const zb = at(o.z, cut) - 1
   const keep = <T>(xs: readonly T[]) => xs.slice(cut)
   return {
@@ -387,6 +390,22 @@ function withoutOverhang(o: Outline): Outline {
     sides: { left: keep(sides.left), right: keep(sides.right) },
     shadow: { side, removed: false },
   }
+}
+
+/**
+ * The outline fitted again on the cut-out cleared behind a trimmed base (`withoutOverhang`): the
+ * axis was settled with the overhang in the cut-out, which turns it towards the shadow. Undefined
+ * where no outline is found.
+ */
+function refitTrimmed(seg: Cutout, t: Outline): Outline | undefined {
+  const f = frameOf(t.origin, t.angle)
+  const { width: w } = seg
+  const alpha = seg.alpha.slice()
+  for (let i = 0; i < alpha.length; i++)
+    if (((i % w) + 0.5 - f.ox) * f.ux + (Math.floor(i / w) + 0.5 - f.oy) * f.uy < 0) alpha[i] = 0
+  const cleared = { ...seg, alpha }
+  const axis = settleAxis(cleared, { o: t.origin, theta: t.angle }, false)
+  return axis && profileOf(cleared, axis, t.ambiguous, t.edge)
 }
 
 /** One side tapers at the base by more than this, px or share of the half width, while the other does not: a shadow, not a boat tail. */
@@ -490,12 +509,15 @@ export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | und
   if (!o) return
   if (fixed) return typedAxisOff(o)
   const checked = withoutShadow(o)
-  const trimmed = withoutOverhang(o)
+  const over = withoutOverhang(o)
+  if (over === o) return checked
   // a shadow taken out on one side with what may also be a shadow past the base: kept, but the values may be off
-  if (checked.shadow?.removed)
-    return trimmed === o ? checked : { ...checked, shadow: { ...checked.shadow, removed: false } }
-  // what a shadow on one side could not take out may be a shadow past the base: trimmed, and the rest checked again
-  if (trimmed === o) return checked
-  const again = withoutShadow(trimmed)
-  return again.shadow ? again : { ...again, shadow: trimmed.shadow }
+  if (checked.shadow?.removed) return { ...checked, shadow: { ...checked.shadow, removed: false } }
+  // a base end softer on one side, not trimmed: the shadow is named
+  if (over.length === o.length) return checked.shadow ? checked : over
+  // what a shadow on one side could not take out may be a shadow past the base: trimmed, the axis
+  // fitted again without it, and the rest checked again
+  const refit = refitTrimmed(seg, over) ?? over
+  const again = withoutShadow(refit)
+  return again.shadow ? again : { ...again, shadow: over.shadow }
 }

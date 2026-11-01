@@ -344,6 +344,32 @@ describe('a shadow towards the base or far along the axis', () => {
     // the cut-out ran on past the base face by most of the shadow's 18 px offset
     expect(outline.length).toBeLessThan(30 * 30 + 3)
   })
+
+  // the second reader's sweep (#934): a pistol bullet at 30 px per mm, the shadow 0.6 and 1.2 mm
+  // towards the base and 0.9 mm across, blur 0.6 mm; the second read 25 px long with no shadow named
+  for (const along of [0.6, 1.2])
+    it(`a pistol bullet with a shadow ${along} mm towards the base and 0.9 mm across: the shadow named`, () => {
+      const { outline, m, hints } = atDiameter(pistol, 30, {
+        dx: -along * 30,
+        dy: 27,
+        blur: 18,
+        depth: 0.2,
+      })
+      const length = defined(m.values.length)
+      const within =
+        Math.abs(length.value - pistol.length) <=
+        Math.max(0.01 * pistol.length, 3 * length.uncertainty)
+      expect(within || /shadow beside the bullet/.test(text(hints))).toBe(true)
+      expect(outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    })
+
+  it('fits the axis again after a trim', () => {
+    // 1.2 mm towards the base, 0.3 mm across: the axis turned 1.7 degrees off with the overhang in the cut-out
+    const { outline } = atDiameter(pistol, 30, { dx: -36, dy: 9, blur: 18, depth: 0.2 })
+    expect(outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    expect(Math.abs(outline.length - 15.5 * 30)).toBeLessThan(5)
+    expect(Math.abs(outline.angle - (3 * Math.PI) / 180)).toBeLessThan((1 * Math.PI) / 180)
+  })
 })
 
 describe('an axis direction the user typed', () => {
