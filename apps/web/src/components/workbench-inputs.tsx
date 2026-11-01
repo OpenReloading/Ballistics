@@ -92,7 +92,7 @@ const panelFields: Record<InputPanel, readonly string[]> = {
   cartridge: ['volume', 'boreDiameter', 'boreArea'],
   bullet: ['bulletMass'],
   powder: ['charge', 'propellantTemperature'],
-  firearm: ['travel', 'twist', 'throatWear'],
+  firearm: ['travel', 'twist'],
 }
 /** The Powder panel's collapsed group "Model parameters". */
 export const modelFields = [
@@ -111,6 +111,8 @@ export const modelFields = [
   'formQ',
   'formZ1',
 ] as const
+/** The Gun card's optional throat wear, in its More popover. */
+export const firearmMoreFields = ['throatWear'] as const
 /** The Powder card's optional leak and bore resistance fields, in its More popover. */
 export const powderMoreFields = [
   'leakArea',
@@ -1538,7 +1540,7 @@ function MoreRows({ panel }: { panel: InputPanel }) {
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
-  if (panel === 'firearm') return null
+  if (panel === 'firearm') return <>{fieldsOf(firearmMoreFields)}</>
   return (
     <>
       <BulletValueFields more />

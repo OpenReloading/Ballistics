@@ -181,3 +181,14 @@ it('gives a powder without its own coefficient the default of its grain form, an
   expect(other.sensitivityDefault).toBeUndefined()
   expect(interiorRequest({ values, powder: undefined }).sensitivityDefault).toBeUndefined()
 })
+
+it('takes the default of the grain form a link carried when the powder record is missing', () => {
+  const linked = { grainForm: 'ball' as const, sensitivityReference: 290 }
+  const r = interiorRequest({ values, powder: undefined, linked })
+  expect(r.body.load.propellant.temperatureSensitivity).toEqual({
+    reference: 290,
+    cold: 0.0012,
+    hot: 0.0027,
+  })
+  expect(r.sensitivityDefault?.form).toBe('ball')
+})

@@ -82,23 +82,31 @@ export function interiorRequest(s: InteriorSources) {
   if (applied) body.load.resistance = applied
   if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
   const sensitivity = powder?.temperatureSensitivity
-  // a powder record without its own coefficient takes the default of its grain form
-  const fallback = powder && !sensitivity ? defaultSensitivity(powder.grainForm) : undefined
+  // a powder record without its own coefficient takes the default of its grain form; a missing
+  // record, what its link carried of it
+  const form = powder ? (sensitivity ? undefined : powder.grainForm) : s.linked?.grainForm
+  const fallback = defaultSensitivity(form)
   if (sensitivity)
     body.load.propellant.temperatureSensitivity = {
       reference: sensitivity.reference.value,
       cold: sensitivity.cold.value,
       hot: sensitivity.hot.value,
     }
-  else if (fallback && powder)
+  else if (fallback)
     body.load.propellant.temperatureSensitivity = {
-      reference: powder.interior
-        ? toSi('temperature', powder.interior.propellantTemperature.value)
-        : sensitivityReferenceDefault,
+      reference: powder
+        ? sensitivityReferenceOf(powder)
+        : (s.linked?.sensitivityReference ?? sensitivityReferenceDefault),
       cold: fallback.cold,
       hot: fallback.hot,
     }
-  const sensitivityDefault =
-    fallback && powder?.grainForm ? { form: powder.grainForm, ...fallback } : undefined
+  const sensitivityDefault = fallback && form ? { form, ...fallback } : undefined
   return { body, bulkDensity, missing, sensitivityDefault }
+}
+
+/** The reference of a default sensitivity, K: the propellant temperature of the record's fit, else 21 °C. */
+export function sensitivityReferenceOf(powder: Pick<Powder, 'interior'>): number {
+  return powder.interior
+    ? toSi('temperature', powder.interior.propellantTemperature.value)
+    : sensitivityReferenceDefault
 }

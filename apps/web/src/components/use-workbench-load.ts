@@ -87,7 +87,7 @@ import {
   type interiorBody,
   interiorFields,
 } from '../lib/interior-input.ts'
-import { interiorRequest } from '../lib/interior-request.ts'
+import { interiorRequest, sensitivityReferenceOf } from '../lib/interior-request.ts'
 import {
   dismissed,
   effectiveSnapshots,
@@ -187,6 +187,7 @@ import {
   directionOf,
   emptyStep,
   firearmMassSpec,
+  firearmMoreFields,
   ladderSpec,
   maxLadderSteps,
   modelFields,
@@ -574,6 +575,11 @@ function recordLinkOf(a: {
             name: productLabel(powder, names),
             bulkDensity: powder.bulkDensity && toSi('density', powder.bulkDensity.value),
             ...a.recordBore,
+            // the default temperature coefficient of a powder without its own (`interiorRequest`)
+            ...(!powder.temperatureSensitivity && {
+              grainForm: powder.grainForm,
+              sensitivityReference: sensitivityReferenceOf(powder),
+            }),
           }
         : a.linkedPowder,
     } satisfies RecordValues,
@@ -897,6 +903,14 @@ function identityOf(a: {
       : (a.powderLabel ?? a.linkedPowder?.name),
   }
 }
+
+/** The card whose More popover holds an invalid field, so it opens and focus can reach the field. */
+const moreHolding = (errors: Record<string, unknown>) =>
+  powderMoreFields.some((k) => errors[k])
+    ? ('powder' as const)
+    : firearmMoreFields.some((k) => errors[k])
+      ? ('firearm' as const)
+      : undefined
 
 /** The seated values still the ones the seating preview wrote. */
 const fromSeatingOf = (
@@ -2004,7 +2018,8 @@ export function useWorkbenchState() {
       const { hasErrors, errors } = form.validate()
       // an invalid model parameter on a phone: the group opens, so focus can reach it
       if (modelFields.some((k) => errors[k])) setModelShown(true)
-      if (powderMoreFields.some((k) => errors[k])) setMore('powder')
+      const holding = moreHolding(errors)
+      if (holding) setMore(holding)
       const ladderInvalid = stepError()
       setLadderError(ladderInvalid)
       // the seating ladder's reasons are about the seating, not about one field: the status line names them too
@@ -2102,6 +2117,7 @@ export function useWorkbenchState() {
     if (err instanceof ValueError) {
       form.setFieldError(err.field, err.message)
       if ((powderMoreFields as readonly string[]).includes(err.field)) setMore('powder')
+      if ((firearmMoreFields as readonly string[]).includes(err.field)) setMore('firearm')
     }
     setOutcome(undefined)
     const message = errorText(err)
