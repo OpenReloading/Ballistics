@@ -12,7 +12,7 @@ import { quantity } from './units.ts'
  * Inferred type: {@link CaseCapacity}.
  */
 export const caseCapacity = z
-  .object({
+  .strictObject({
     id: recordId.describe('Id of a catalogue capacity, the file name without `.json`.').optional(),
     origin: z
       .enum(['catalogue', 'user', 'shared'])
@@ -26,11 +26,16 @@ export const caseCapacity = z
       .enum(['new', 'fired', 'sized'])
       .describe('The condition of the measured case.')
       .optional(),
-    convention: z
-      .string()
-      .min(1)
+    primerState: z
+      .enum(['primed-spent', 'unprimed'])
       .describe(
-        'How the water was filled: fill level, water temperature and primer state, as the source states them. Absent: the default convention of the docs. The volume derived from `waterCapacity` does not read it.',
+        'The primer pocket when the water was filled: a spent primer seated, or no primer. Absent: the source does not state it. The volume derived from `waterCapacity` does not read it.',
+      )
+      .optional(),
+    fillLevel: z
+      .enum(['mouth'])
+      .describe(
+        'How high the water was filled: to the case mouth. Absent: the source does not state it, the docs take the mouth.',
       )
       .optional(),
     note: z.string().min(1).describe('Notes on the measurement.').optional(),

@@ -3266,10 +3266,20 @@
                     ],
                     "description": "The condition of the measured case."
                   },
-                  "convention": {
+                  "primerState": {
                     "type": "string",
-                    "minLength": 1,
-                    "description": "How the water was filled: fill level, water temperature and primer state, as the source states them. Absent: the default convention of the docs. The volume derived from `waterCapacity` does not read it."
+                    "enum": [
+                      "primed-spent",
+                      "unprimed"
+                    ],
+                    "description": "The primer pocket when the water was filled: a spent primer seated, or no primer. Absent: the source does not state it. The volume derived from `waterCapacity` does not read it."
+                  },
+                  "fillLevel": {
+                    "type": "string",
+                    "enum": [
+                      "mouth"
+                    ],
+                    "description": "How high the water was filled: to the case mouth. Absent: the source does not state it, the docs take the mouth."
                   },
                   "note": {
                     "type": "string",
@@ -3421,6 +3431,7 @@
                   "cartridge",
                   "waterCapacity"
                 ],
+                "additionalProperties": false,
                 "description": "A case capacity the user measured, in g."
               }
             },

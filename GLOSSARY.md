@@ -203,7 +203,7 @@ _Avoid_: l3
 _Avoid_: l6
 
 **Case capacity**:
-One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `convention`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
+One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `primerState`, `fillLevel`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
 
 **Water capacity**:
 `waterCapacity`: mass of water filling a case to the mouth, g, on a case capacity.
@@ -216,8 +216,13 @@ _Avoid_: ownCapacity
 **Case condition**:
 `caseCondition`: state of the case when its capacity was measured: `new`, `fired` or `sized`.
 
-**Capacity convention**:
-`convention`: how the water was filled for a case capacity (fill level, water temperature, primer state), free text as the source states it. Absent: the default convention of the case capacity model page. It does not enter the derived volume.
+**Primer state**:
+`primerState`: the primer pocket when the water of a case capacity was filled: `primed-spent` (a spent primer seated) or `unprimed` (no primer). Absent: the source does not state it. It does not enter the derived volume.
+_Avoid_: convention, primed
+
+**Fill level**:
+`fillLevel`: how high the water of a case capacity was filled: `mouth`. Absent: the source does not state it, and the case capacity model page takes the mouth. It does not enter the derived volume.
+_Avoid_: convention
 
 **Caliber class**:
 A record of kind `caliber-classes`: a class of bullet diameter with `name`, `diameter` and the member `cartridges`. `caliberClasses`: on a discipline an object with the ids of the class records it allows and its `basis` (`stated` by the rule book or `derived` from a stated range). On a target face list item the ids of the classes of its events.
