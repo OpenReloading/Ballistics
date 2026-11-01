@@ -4,7 +4,7 @@ import { Text } from '@mantine/core'
 import type { LengthUnit } from '@open-reloading/drawing'
 import { type BulletProfile, recordProfile } from '@open-reloading/drawing/bullet'
 import type { Bullet } from '@open-reloading/schema'
-import { WarningCircle } from '@phosphor-icons/react'
+import { ArrowsLeftRight, WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
@@ -23,25 +23,37 @@ import { controlSize } from '../lib/theme.ts'
 import { BulletCompare } from './bullet-compare.tsx'
 import { description } from './bullet-drawing.tsx'
 import { ByLengthUnit } from './by-length-unit.tsx'
+import { RecordScope, UnitSwitch } from './cartridge-record.tsx'
 import { PageBar } from './page-bar.tsx'
 import { LinkButton, RecordActions } from './record-actions.tsx'
 import { DataError, EmptyNote, Loading } from './states.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
 
-/** The compare view cannot show these ids: what is wrong and the way back to the list. */
+/**
+ * The compare view cannot show these ids: what is wrong and the way back to the list; `empty`, no
+ * bullets chosen yet, is no error and has a neutral icon.
+ */
 function Problem({
   title,
   text,
   rest,
+  empty = false,
 }: {
   title: string
   text: string
   rest?: string[] | undefined
+  empty?: boolean
 }) {
   const { t } = useTranslation()
   return (
     <EmptyNote
-      icon={<WarningCircle size={24} aria-hidden="true" />}
+      icon={
+        empty ? (
+          <ArrowsLeftRight size={24} aria-hidden="true" />
+        ) : (
+          <WarningCircle size={24} aria-hidden="true" />
+        )
+      }
       title={title}
       description={text}
       action={
@@ -124,13 +136,24 @@ async function fetchBullets(ids: string[]): Promise<Fetched> {
   }
 }
 
-/** The page bar of the compare page; the actions only where they act on bullets. */
+/**
+ * The page bar of the compare page; the actions only where they act on bullets: the length unit of
+ * the whole page (drawings and table, inside `RecordScope`), then Units, Copy link and Print.
+ */
 export function CompareBar({ actions }: { actions: boolean }) {
+  const { t } = useTranslation()
   return (
     <PageBar
       title={msg('Compare bullets')}
       translated
-      actions={actions ? <RecordActions /> : undefined}
+      actions={
+        actions ? (
+          <>
+            <UnitSwitch label={t('Length unit of the page: drawings and table')} />
+            <RecordActions />
+          </>
+        ) : undefined
+      }
     />
   )
 }
@@ -157,11 +180,11 @@ export function CompareView() {
   const done =
     parsed.status === 'ok' && got.status === 'ok' && got.records.every((r) => r !== undefined)
   return (
-    <>
-      {/* Units, Copy link and Print only with bullets to show */}
+    <RecordScope>
+      {/* the length unit, Units, Copy link and Print only with bullets to show */}
       <CompareBar actions={done} />
       <CompareBody parsed={parsed} got={got} retry={() => setAttempt((n) => n + 1)} />
-    </>
+    </RecordScope>
   )
 }
 
@@ -179,6 +202,7 @@ function CompareBody({
   if (parsed.status === 'empty')
     return (
       <Problem
+        empty
         title={t('No bullets chosen.')}
         text={t('Tick 2 to 4 bullets in the list, then Compare.')}
       />
