@@ -1,0 +1,84 @@
+{
+  "id": "demo-bullet-358-158-cast",
+  "manufacturer": "demo-bullets",
+  "productNumber": "C158",
+  "name": "38 Cal 158 gr Cast Flat Nose Demo",
+  "productLine": "Demo Cast",
+  "caliber": ".358",
+  "diameter": {
+    "value": 9.09
+  },
+  "mass": {
+    "value": 10.238
+  },
+  "length": {
+    "value": 17.0
+  },
+  "base": {
+    "type": "flat"
+  },
+  "ogive": {
+    "form": "flat-nose"
+  },
+  "tip": {
+    "type": "open-meplat"
+  },
+  "meplatDiameter": {
+    "value": 6.4
+  },
+  "noseLength": {
+    "value": 7.0
+  },
+  "baseToOgive": {
+    "value": 10.0
+  },
+  "bearingLength": {
+    "value": 10.0
+  },
+  "construction": {
+    "raw": "Cast lead alloy, wax lube, plain base",
+    "structure": "cast",
+    "core": {
+      "material": "lead-alloy",
+      "hardness": {
+        "value": 18
+      }
+    },
+    "surface": ["wax-lube"],
+    "gasCheck": false
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.14
+    }
+  ],
+  "recommendedTwist": {
+    "value": 457
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

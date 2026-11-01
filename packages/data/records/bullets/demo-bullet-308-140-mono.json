@@ -1,0 +1,89 @@
+{
+  "id": "demo-bullet-308-140-mono",
+  "manufacturer": "demo-bullets",
+  "productNumber": "M140",
+  "name": "30 Cal 140 gr Copper Demo",
+  "productLine": "Demo Hunt",
+  "caliber": ".308",
+  "diameter": {
+    "value": 7.823
+  },
+  "mass": {
+    "value": 9.072
+  },
+  "length": {
+    "value": 30.9
+  },
+  "base": {
+    "type": "boat-tail",
+    "length": {
+      "value": 3.0
+    },
+    "diameter": {
+      "value": 6.98
+    },
+    "angle": {
+      "value": 8
+    }
+  },
+  "ogive": {
+    "form": "tangent"
+  },
+  "tip": {
+    "type": "hollow-point",
+    "mouthDiameter": {
+      "value": 1.6
+    }
+  },
+  "meplatDiameter": {
+    "value": 2.0
+  },
+  "noseLength": {
+    "value": 16.9
+  },
+  "baseToOgive": {
+    "value": 14.0
+  },
+  "bearingLength": {
+    "value": 11.0
+  },
+  "construction": {
+    "raw": "Solid copper, no core",
+    "structure": "monolithic",
+    "drivingBands": 3
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.41
+    }
+  ],
+  "recommendedTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

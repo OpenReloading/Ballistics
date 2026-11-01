@@ -1,0 +1,82 @@
+{
+  "id": "demo-bullet-355-124",
+  "manufacturer": "demo-bullets",
+  "productNumber": "P124",
+  "name": "9 mm 124 gr FMJ Round Nose Demo",
+  "productLine": "Demo Pistol",
+  "caliber": ".355",
+  "diameter": {
+    "value": 9.02
+  },
+  "mass": {
+    "value": 8.035
+  },
+  "length": {
+    "value": 15.5
+  },
+  "base": {
+    "type": "flat"
+  },
+  "ogive": {
+    "form": "round-nose"
+  },
+  "tip": {
+    "type": "full-metal-jacket"
+  },
+  "meplatDiameter": {
+    "value": 3.0
+  },
+  "noseLength": {
+    "value": 7.2
+  },
+  "baseToOgive": {
+    "value": 8.3
+  },
+  "bearingLength": {
+    "value": 8.3
+  },
+  "construction": {
+    "raw": "Full metal jacket, copper over a lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {
+      "material": "copper"
+    }
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.15
+    }
+  ],
+  "recommendedTwist": {
+    "value": 406
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

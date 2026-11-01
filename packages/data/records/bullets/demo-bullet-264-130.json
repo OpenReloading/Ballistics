@@ -1,0 +1,98 @@
+{
+  "id": "demo-bullet-264-130",
+  "manufacturer": "demo-bullets",
+  "productNumber": "B130",
+  "name": "6.5 mm 130 gr Hollow Point Demo",
+  "productLine": "Demo Match",
+  "caliber": ".264",
+  "diameter": {
+    "value": 6.71
+  },
+  "mass": {
+    "value": 8.424
+  },
+  "length": {
+    "value": 33.0
+  },
+  "base": {
+    "type": "boat-tail",
+    "length": {
+      "value": 4.0
+    },
+    "diameter": {
+      "value": 5.44
+    },
+    "angle": {
+      "value": 9
+    }
+  },
+  "ogive": {
+    "form": "secant"
+  },
+  "tip": {
+    "type": "hollow-point",
+    "mouthDiameter": {
+      "value": 0.9
+    }
+  },
+  "meplatDiameter": {
+    "value": 1.3
+  },
+  "noseLength": {
+    "value": 18.6
+  },
+  "baseToOgive": {
+    "value": 14.4
+  },
+  "bearingLength": {
+    "value": 10.4
+  },
+  "construction": {
+    "raw": "Cup-and-core, gilding metal jacket, lead core",
+    "structure": "cup-and-core",
+    "core": {
+      "material": "lead"
+    },
+    "jacket": {
+      "material": "gilding-metal"
+    }
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.56
+    },
+    {
+      "dragModel": "G7",
+      "value": 0.285
+    }
+  ],
+  "recommendedTwist": {
+    "value": 203
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}
