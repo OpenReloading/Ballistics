@@ -13,6 +13,7 @@ import {
   type PhotoField,
   photoFields,
 } from './bullet-photo-measure.ts'
+import { basisNote } from './bullet-photo-scale.ts'
 import { fieldOf, siToStored, storedToSi } from './field-spec.ts'
 import type { UnitSystem } from './units.ts'
 
@@ -114,8 +115,9 @@ export interface PhotoFacts {
 const noteUnits: Partial<Record<DesignerSpec['quantity'], string>> = { length: 'mm', angle: '°' }
 
 /**
- * The note kept on the design: that the values are measured from a photograph, at what scale, and
- * each value with its standard uncertainty in the stored units. No image is stored.
+ * The note kept on the design: that the values are measured from a photograph, at what scale, what
+ * a scale from sizes entered without a ruler rests on, and each value with its standard
+ * uncertainty in the stored units. No image is stored.
  */
 export function photoNote(m: BulletMeasurement, facts: PhotoFacts): string {
   const parts = specs.flatMap((s) => {
@@ -128,8 +130,10 @@ export function photoNote(m: BulletMeasurement, facts: PhotoFacts): string {
     ]
   })
   const { width, height, scale } = facts
+  const basis = basisNote(m.scaleBasis)
   return [
     `Measured from a photograph (${width} × ${height} px, ${scale.pxPerMm.toFixed(2)} px/mm ± ${(100 * scale.relUncertainty).toFixed(2)} %, no image stored).`,
+    ...(basis ? [basis] : []),
     `Values with standard uncertainty: ${parts.join('; ')}.`,
   ].join(' ')
 }

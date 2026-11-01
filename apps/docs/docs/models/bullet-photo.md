@@ -82,6 +82,16 @@ with $\mu$ the central second moments. It is then turned and shifted over four p
 
 Code: `apps/web/src/lib/bullet-photo-outline.ts`, `fitOutline`.
 
+**A shadow on one side.** Each side's edge is also kept as its own distance from the axis, $r_l(z)$ and $r_r(z)$. A body of revolution has both sides alike; a soft shadow beside the bullet widens the cut-out on one side only, and a shadow offset along the axis leaves that side short at the base, so the base looks tapered on that side alone. Each side's shank (where the half width is within 3 % of its widest, from where it starts to its middle) is fitted with a line, and each side's taper $t$ is how far its edge at the base lies inside that line. The base is six samples from where both sides have reached half their shank line and move by less than a pixel per sample (a slightly turned axis moves the corner along one side). When the two tapers differ by more than $\max(2.5\ \text{px},\ 0.02\, r_b)$, with $r_b$ the half width at the base, the side with the larger taper carries a shadow. Where the shadow leaves the base clear, the shank's half width is
+
+$$
+a = r_b + t_s
+$$
+
+Code: `apps/web/src/lib/bullet-photo-outline.ts`, `withoutShadow`.
+
+with $t_s$ the sharp side's taper. When both sides run parallel over the base samples (the shadow's blurred end does not reach them) and $a$ is below the cut-out's shank half width (a shadow only widens it), the sharp side is measured for both: $r(z) = r_s(z) - \ell_s(z) + a$, with $r_s$ its edge and $\ell_s$ its shank line, which also takes out the turn the shadow gives the axis. The axis is moved and turned to the one the sharp side gives, so the drawing on the photograph lies on the bullet. Where the shadow carries the cut-out on past a flat tip along the axis, the bullet ends where the sharp side does; a flat tip with no such gap may still carry the shadow in its length, and the note then says the values may be off. Otherwise the outline is kept and a note names the shadow. The check runs on an axis the tool found, not on one the user typed, which need not be the symmetry line. A boat tail is reported only when both sides taper (below), where the base's samples are found. Code: `apps/web/src/lib/bullet-photo-outline.ts`, `sideTapers`.
+
 ### Shank, base and nose
 
 The shank radius $a$ is the median of $r(z)$ where a running median of five samples is within 1 % (at least one pixel) of its maximum; $\sigma_a$ is the scatter of those samples (1.4826 times their median absolute deviation) and
@@ -94,7 +104,7 @@ Code: `apps/web/src/lib/bullet-photo-measure.ts`, `shankOf`.
 
 with $u_e = 0.3$ px the standard uncertainty of an edge position at a sharp edge (a uniform rounding error of one pixel, $1/\sqrt{12} \approx 0.29$ px, plus the grey's noise; more where the edge is spread, above) and $n$ the number of samples. The diameter is $d = 2a$.
 
-A **boat tail** is present when the radius at the base is lower than $a$ by more than 4 % (at least 2.5 px). Its cone is the line $r = r_0 + c z$ fitted to the middle of the cone (from a quarter to 85 % of the way to where the shank starts, clear of the rounded corner at the base and of the one where the cone meets the shank), and
+A **boat tail** is present when the radius at the base is lower than $a$ by more than 4 % (at least 2.5 px), and not when only one side tapers by that much while the other tapers by less than half of it (a shadow, above). Its cone is the line $r = r_0 + c z$ fitted to the middle of the cone (from a quarter to 85 % of the way to where the shank starts, clear of the rounded corner at the base and of the one where the cone meets the shank), and
 
 $$
 z_b = \frac{a - r_0}{c}, \qquad \text{base diameter } 2 r_0, \qquad \text{angle } \arctan c
@@ -149,6 +159,7 @@ A photograph too poor to measure gets sentences that say what is wrong and what 
 | Too small | The bullet is narrower than 16 px | No values; take the photograph closer or crop to the bullet, at least 80 px across |
 | Not a bullet's proportions | The cut-out is shorter than wide or more than 10 times as long | No values; brush the bullet in and the rest out, or retake it alone on a plain background |
 | Narrow | Narrower than 40 px | Values, with the best case of their uncertainty ($\sqrt{2} u_e$ over the width, below 40 px it is more than 1 %) |
+| Shadow on one side | One side tapers at the base and the other does not (above) | That side is left out and the other side, mirrored, is measured; or, where that cannot be told, that the values may be off by more than their uncertainty. Brush the shadow out or retake in even light |
 | Ragged | The scatter of the shank's sides is above 1.5 px and 2 % of the width | A reflection, a shadow or noise; retake in even soft light or brush the cut-out |
 | Soft edges | Edge spread above 4 px and 4 % of the thickness | Shadow beside the bullet, or out of focus or moved; values are less certain |
 | Low contrast | The cut-out used has the bullet within 60 grey levels of the background | The outline may be rough; a plainer or much lighter or darker background |
@@ -165,6 +176,8 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 | $u_p$ | Standard uncertainty of a placed point | no kind | 1 px |
 | $u_e$ | Standard uncertainty of an edge position | no kind | 0.3 px |
 | $r(z)$ | Half width of the bullet at $z$ along the axis | no kind | px |
+| $r_l(z)$, $r_r(z)$, $r_s(z)$ | Distance of the left, right and sharp side's edge from the axis | no kind | px |
+| $t$, $t_s$, $r_b$, $\ell_s$ | A side's taper at the base, the sharp side's, the half width at the base, the sharp side's shank line | no kind | px |
 | $a$, $d$ | Shank radius, diameter | mm | px, mm |
 | $z_b$ | Boat tail length | mm | px, mm |
 | $r_0$, $c$ | Radius of the boat tail cone at the base, its slope | mm, degrees | px, ratio |
@@ -180,6 +193,7 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - The bullet is a body of revolution, so its silhouette is symmetric about the axis.
 - The bullet differs from the background in brightness (at least 25 grey levels) or, where it does not, in colour.
 - The two points a user places on the ruler are at known graduation marks, and a size entered from a caliper is the bullet's own (a diameter of the shank, an overall length from base to tip).
+- Without a ruler, a scale from the sizes entered measures only the photograph's proportions: with the diameter alone, every length is the ratio of length to diameter in the photograph times the diameter entered. This assumes a square side view of the bullet itself, drawn to scale. A bullet turned by $\varphi$ towards the camera keeps its diameter and shows its length times $\cos\varphi$: 10 degrees reads 1.5 % short. A maker's product image may not be to scale at all: in the [catalogue evaluation](../research/bullet-photo-catalogue-geometry.md) two different bullets' product renders of one maker had the same length over diameter, 5.217, so they are fitted to the frame. With the diameter and the length entered, their check flags only scales more than 2 % apart, a turn of about 11 degrees. The values and the note kept on the design say which sizes gave the scale and what it rests on. Code: `apps/web/src/lib/bullet-photo-scale.ts`, `basisNote`.
 
 ## Limits
 
@@ -188,11 +202,12 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - A rebated boat tail or a cone that is not straight raises a note; the line fit then represents it poorly.
 - The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective (a caliper size entered with the length and the diameter flags a tilt, not corrects it), and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
 - The seeded design is a starting point. Its mass and manufacturer stay empty, and the note kept in it says the values are measured from a photograph, with the scale and every value's uncertainty. No image is stored.
-- A shadow beside the bullet is not taken out of the cut-out. It is told by its soft edge, which raises the uncertainty and adds a note; brushing it out of the cut-out measures the bullet alone. A shadow with a sharp edge cannot be told from the bullet.
+- A shadow beside the bullet is taken out only where it lies on one side and leaves the base clear (offset towards the tip); its soft edge still raises the uncertainty. A shadow that reaches the base gets a note and stays in the cut-out, and one offset towards the base, all round or beyond the tip is not told from the bullet by its shape: its soft edge then gives a note, a sharp one none. Without the correction a shadow widened the diameter, so a scale from the diameter shortened every length (10 % at the median in the [catalogue evaluation](../research/bullet-photo-catalogue-geometry.md); after it, 0.52 %: [drop shadow](../research/bullet-photo-drop-shadow.md)), and its taper read as a boat tail on every flat base. Brushing the shadow out of the cut-out measures the bullet alone.
+- A bullet turned towards the camera is not seen in the silhouette: in the [catalogue evaluation](../research/bullet-photo-catalogue-geometry.md) a turn of 10 degrees read the length 1.8 % short at the median, with 30 of 32 lengths outside three stated uncertainties. With a scale from the sizes entered, a note says what the scale rests on (Assumptions).
 - Perspective is not detected: a bullet or a camera tilted so that one end is nearer makes the sides of the shank converge, and no note says so.
 - A reflection that reaches the bullet's edge cuts into the outline there, with no note unless it makes the edge ragged.
 - A photograph of more than 2400 px on its longer side is shrunk to that while it is read.
-- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a bullet darker than the paper on one side and brighter on the other, a soft shadow, strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`), and the scale from caliper sizes without a ruler, and their checks against a ruler and each other (`apps/web/test/bullet-photo-scale.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
+- Tested on synthetic photographs rendered from the bullet drawing with known size, lighting gradient, side shading, noise and blur (`apps/web/test/bullet-photo.test.ts`), and with a pale tip, a reflection along the axis, bars along the edges, a colour that differs from the background's at the same brightness, a bullet darker than the paper on one side and brighter on the other, a soft shadow (also beside a product-style image with the scale from the diameter, the research evaluation's drop shadow), strong blur, low contrast and a small bullet (`apps/web/test/bullet-photo-quality.test.ts`), and the scale from caliper sizes without a ruler, and their checks against a ruler and each other (`apps/web/test/bullet-photo-scale.test.ts`). For each of these the values are within three uncertainties of the truth, or a note says they may not be, or none are given. Real photographs are unverified.
 
 ## Sources
 
@@ -202,4 +217,4 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - [Levenberg 1944](../bibliography.md#levenberg-1944), [Marquardt 1963](../bibliography.md#marquardt-1963): the damped least squares iteration.
 - [JCGM 100:2008](../bibliography.md#jcgm-100-2008): first-order propagation of uncertainty and the rectangular distribution.
 - [ITU-R BT.601](../bibliography.md#itu-r-bt-601): the luma weights.
-- Research log: [synthetic photographs](../research/bullet-photo-synthetic-renders.md).
+- Research log: [synthetic photographs](../research/bullet-photo-synthetic-renders.md), [catalogue bullets](../research/bullet-photo-catalogue-geometry.md), [a drop shadow](../research/bullet-photo-drop-shadow.md).
