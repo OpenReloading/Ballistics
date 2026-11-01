@@ -2182,6 +2182,8 @@ export function useWorkbenchState() {
       pressureLimit: typedSpec(spec.typed, 'pmax'),
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
+      // the engraving ramp starts at the seated bullet's jump, current as the form's values are
+      jump: (as ? seated : seatedNow.current).jump,
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined

@@ -4,6 +4,7 @@ import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import type { ErrorBody, InteriorLadderResponse, InteriorResponse } from '../lib/api-types.ts'
 import type { InteriorBody } from '../lib/interior-input.ts'
+import { rampAtJump } from '../lib/interior-request.ts'
 import { limitShare } from '../lib/limit-text.ts'
 import { nth } from '../lib/nth.ts'
 import type {
@@ -51,6 +52,7 @@ export const stepLoad = (load: InteriorBody['load'], s: Step): InteriorBody['loa
   ...(s.seating && {
     chamber: { ...load.chamber, volume: s.seating.volume },
     barrel: { ...load.barrel, length: s.seating.travel },
+    ...(load.resistance && { resistance: rampAtJump(load.resistance, s.seating.jump) }),
   }),
 })
 
@@ -230,6 +232,9 @@ export type NoteKind = (typeof noteKinds)[number]
 /** One entry of the result's notes: its line, and the full reason with what clears it where the line is short. */
 export type ResultNote = { kind: NoteKind; line: string; text?: string | undefined }
 
+/** The note of a run with a seated jump and no engraving ramp to start at it. */
+const noRampNote = msg('The jump to the lands has no effect without an engraving ramp.')
+
 /** What clears a missing case fill, by the reason `loadRatioText` gives. */
 const fillActions = {
   powder: msg('Choose a powder record in the Powder card.'),
@@ -296,6 +301,9 @@ export function resultNotes(
         ]
       : []),
     ...designs.flatMap((line) => (line ? [{ kind: 'note' as const, line }] : [])),
+    ...(ok.printed.seated.jump !== undefined && !ok.load.resistance?.engraving
+      ? [{ kind: 'note' as const, line: t(noRampNote) }]
+      : []),
     ...(band ? [{ kind: 'note' as const, line: band }] : []),
   ]
   return noteKinds.flatMap((kind) => notes.filter((n) => n.kind === kind))

@@ -1,4 +1,4 @@
-import { overrideResistance, recordResistance } from '@open-reloading/core'
+import { type InteriorLoad, overrideResistance, recordResistance } from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'
@@ -28,6 +28,23 @@ export interface InteriorSources {
   pressureLimit?: number | undefined
   /** The bulk density the user typed, kg/m3, instead of the powder record's. */
   bulkDensity?: number | undefined
+  /** The seated bullet's jump to the lands or the leade, m: the engraving ramp starts there. */
+  jump?: number | undefined
+}
+
+/**
+ * The resistance with its engraving ramp moved to start at `jump` (m), 0 for a bullet touching or
+ * jammed into the lands; unchanged without a ramp or a jump. The friction stays as it is.
+ */
+export function rampAtJump(
+  resistance: InteriorLoad['resistance'],
+  jump: number | undefined,
+): InteriorLoad['resistance'] {
+  const ramp = resistance?.engraving
+  const first = ramp?.[0]
+  if (!ramp || !first || jump === undefined) return resistance
+  const shift = Math.max(0, jump) - first.travel
+  return { ...resistance, engraving: ramp.map((p) => ({ ...p, travel: p.travel + shift })) }
 }
 
 /** The bore resistance of a run: the record's law, else what a link carried of it, with what the law could not apply. */
@@ -76,7 +93,8 @@ export function interiorRequest(s: InteriorSources) {
     s.bulkDensity ??
     (powder?.bulkDensity ? toSi('density', powder.bulkDensity.value) : s.linked?.bulkDensity)
   const { resistance, missing } = resistanceFor(s, body)
-  const applied = overrideResistance(resistance, values)
+  // the workbench's ramps (record law, typed, linked) start at travel 0: the jump moves them
+  const applied = rampAtJump(overrideResistance(resistance, values), s.jump)
   if (applied) body.load.resistance = applied
   const sensitivity = powder?.temperatureSensitivity
   if (sensitivity)

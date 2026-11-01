@@ -156,6 +156,10 @@ Code: `packages/core/src/interior/model.ts`, `gasState` (`resistance`), `profile
 
 $p_e(x)$ is interpolated linearly between `{ travel, pressure }` points with increasing travel and is 0 before the first and after the last point. Free travel before the lands is a profile that starts at the jump distance.
 
+The workbench starts a typed or record engraving ramp at the jump of the seated bullet (seating figure): every point moves by the jump, so the first is at the jump, or at 0 for a bullet touching or jammed into the lands. Each step of a seating ladder starts the ramp at its own jump. Without a ramp the jump changes nothing, and the result notes say so; no default ramp is added. On the example load with a stand-in ramp of 60 MPa over 5 mm, 0.5 mm of jump lowered the peak from 420 to 325 MPa against the jammed load ([research entry](../research/interior-engraving-ramp-at-jump.md)); the size depends on the ramp, which has no source.
+
+Code: `apps/web/src/lib/interior-request.ts`, `rampAtJump`; `apps/web/src/components/workbench-outcome.ts`, `stepLoad`.
+
 The bore-resistance law of the load-table powder fit builds both terms from the cartridge and the bullet: friction stress $\tau_f$ on the bullet side area, raised by the oversize $o$ of the bullet over the groove diameter, and an engraving pressure that falls linearly over the bearing length:
 
 $$

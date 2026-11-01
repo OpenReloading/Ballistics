@@ -141,6 +141,8 @@ export type Seated = {
   baseToOgive?: number
   /** Seating depth and the barrel length of the seating, m, for print. */
   depth?: number
+  /** Jump to the lands or the leade, m, below 0 into them: the engraving ramp of a run starts there. */
+  jump?: number
   barrel?: number
   /** The length the bullet is seated by; the other one is derived. */
   mode?: Mode | undefined
@@ -777,6 +779,7 @@ function seatAtOf(
       return {
         volume: s.volumeBehindBullet && unitsOf.capacity.cm3.toSi(s.volumeBehindBullet.value),
         travel: s.travel && toSi('length', s.travel.value),
+        jump: s.jump.value === undefined ? undefined : toSi('length', s.jump.value),
       }
     },
   }
@@ -804,6 +807,7 @@ function seatedReport(o: {
   const { caseVolume, seating, barrel, mode, atStart, figure } = o
   const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
   const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
+  const jump = seating?.jump.value
   return {
     ...(caseVolume !== undefined && { caseVolume }),
     ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
@@ -811,6 +815,7 @@ function seatedReport(o: {
     ...(coal !== undefined && { overallLength: toSi('length', coal) }),
     ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
     ...(depth !== undefined && { depth: toSi('length', depth) }),
+    ...(jump !== undefined && { jump: toSi('length', jump) }),
     ...(coal !== undefined && barrel !== undefined && { barrel }),
     ...(coal !== undefined && { mode, atStart }),
     ...(figure && { figure }),
@@ -845,6 +850,7 @@ function useReportSeated(
     seating?.coal.value,
     seating?.cbto?.value,
     seating?.depth.value,
+    seating?.jump.value,
     barrel,
     mode,
     atStart,

@@ -40,6 +40,7 @@ const ok = (extra: Partial<Ok> = {}) =>
     cartridgeDesign: 'Wildcat',
     powderDesign: 'My powder',
     design: 'My bullet',
+    printed: { seated: {} },
     ...extra,
   }) as Ok
 
@@ -105,6 +106,19 @@ describe('resultNotes', () => {
     })
     const { sampled: _, ...body } = plain.body
     expect(resultNotes({ ...plain, body }, [], units, english.t)).toEqual([])
+  })
+
+  it('notes a seated jump that no engraving ramp starts at', () => {
+    const plain = ok({ volumeMeasured: true, bulkDensity: 900, design: undefined })
+    const { sampled: _, ...body } = plain.body
+    const jumped = { ...plain, body, cartridgeDesign: undefined, powderDesign: undefined }
+    const seated = { printed: { ...plain.printed, seated: { jump: 0.0005 } } }
+    expect(resultNotes({ ...jumped, ...seated }, [], units, english.t)).toEqual([
+      { kind: 'note', line: 'The jump to the lands has no effect without an engraving ramp.' },
+    ])
+    const ramp = { ...jumped.load, resistance: { engraving: [{ travel: 0.0005, pressure: 5e7 }] } }
+    expect(resultNotes({ ...jumped, ...seated, load: ramp }, [], units, english.t)).toEqual([])
+    expect(resultNotes(jumped, [], units, english.t)).toEqual([])
   })
 
   it('warns when the powder record lists other cartridges only', () => {
