@@ -12,7 +12,7 @@ Hole detection proposes bullet holes on a target photo, inside a region or the p
 3. A top-hat against a morphological opening gives the hole shape. Three tests keep the real peaks.
 4. Each connected part of the hole mask counts as many shots as it holds peaks.
 
-Detection starts when a photo is added to the sheet: the target search, then the run on the target found. Its result is one line with the target, the scale, the number of holes proposed and the caliber (the bullet's caliber and diameter, else the hole size and its source), each with a change link to its editor, and Accept. Where no bullet, marker, typed or learned size gives the hole size, the line holds the hole size field and the run follows once it is entered. A run without holes and a photo without one sure target go on in the guided steps. A photo below the minimum quality waits for Detect anyway (Photo quality).
+Detection starts when a photo is added to the sheet: the target search, then the run on the target found. Its result is one line with the target, the scale, the number of holes proposed (sure and maybe) and the caliber (the bullet's caliber and diameter, else the hole size and its source), each with a change link to its editor, and Accept sure. Where no bullet, marker, typed or learned size gives the hole size, the line holds the hole size field and the run follows once it is entered. A run without holes and a photo without one sure target go on in the guided steps. A photo below the minimum quality waits for Detect anyway (Photo quality).
 
 The proposals stay apart from the shots until the user accepts them. The code is in `apps/web/src/lib/hole-detection.ts` and `apps/web/src/lib/hole-proposals.ts`.
 
@@ -24,8 +24,8 @@ An action is a file choice, a click, or a value typed and entered. A decision is
 
 | Hole size | Before: actions | After: actions | Decisions |
 | --- | --- | --- | --- |
-| Known (bullet or marker) | 3: choose the photo, Detect holes, Accept all | 2: choose the photo, Accept all | Accept |
-| Unknown | 6: choose the photo, Detect holes (the run stops at the Example step), type the hole size, open the Detect step, Detect holes, Accept all | 3: choose the photo, type the hole size in the result line, Accept all | the hole size, Accept |
+| Known (bullet or marker) | 3: choose the photo, Detect holes, Accept all | 2: choose the photo, Accept sure | Accept |
+| Unknown | 6: choose the photo, Detect holes (the run stops at the Example step), type the hole size, open the Detect step, Detect holes, Accept all | 3: choose the photo, type the hole size in the result line, Accept sure | the hole size, Accept |
 
 The after counts are asserted in `apps/e2e/tests/web/groups-face.spec.ts` (the known and the unknown hole size tests). The before counts are read from the code and the spec of the earlier flow and are not asserted. A photo below the minimum quality adds Detect anyway; a photo without one sure target goes on in the guided steps, which these counts do not cover.
 
@@ -167,7 +167,7 @@ A part is also print when it is a filled area with holes of the other polarity i
 
 Code: `apps/web/src/lib/hole-detection.ts`, `shotsFromParts`, `enclosesHoles`, `solved`, `THICK`, `SIZE_MIN`, `SIZE_MAX`.
 
-A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step, and Accept all and the proposal count leave it out. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
+A proposal with a confidence below 0.5 is shown as "maybe": the user accepts it on the photo or with Accept maybes in the Review step; Accept sure leaves it out, and the counts name the sure and the maybe proposals apart. On the drawn test photos every true hole scores at least 0.63, so the tier loses none of them.
 
 Code: `apps/web/src/lib/hole-proposals.ts`, `MAYBE_BELOW`, `isMaybe`.
 
