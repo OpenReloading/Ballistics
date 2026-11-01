@@ -232,114 +232,88 @@ export const targetFaceDesign = z.object({
     .describe('Events shot on the face.'),
 })
 
-const hitCount = z.int().nonnegative().max(10000)
+const hitCount = z.int().nonnegative().max(10000).describe('A count from the score sheet.')
 
-/** A practical stage as the person recorded it from the score sheet. */
+/** A practical stage from the score sheet: hits per zone, penalties, time (s), power factor. */
 const practicalStage = z.strictObject({
-  name: z.string().min(1).max(200).describe('Name or number of the stage.'),
+  name: z.string().min(1).max(200).describe('Stage name.'),
   hits: z
-    .strictObject({
-      A: hitCount.describe('Hits in the A zone.'),
-      C: hitCount.describe(
-        'Hits in the C zone (a B zone counts as C where the rule book says so).',
-      ),
-      D: hitCount.describe('Hits in the D zone.'),
-      metal: hitCount.describe('Scoring metal targets hit (poppers, plates).').optional(),
-    })
+    .strictObject({ A: hitCount, C: hitCount, D: hitCount, metal: hitCount.optional() })
     .describe('Scoring hits per zone.'),
-  misses: hitCount.describe('Misses.'),
-  noShoots: hitCount.describe('Penalized hits on no-shoots.'),
-  procedurals: hitCount.describe('Procedural penalties.'),
+  misses: hitCount,
+  noShoots: hitCount,
+  procedurals: hitCount,
   time: z.number().positive().max(3600).describe('Stage time, s.'),
-  powerFactor: z.enum(['major', 'minor']).describe('Power factor the stage was scored with.'),
-  stagePoints: z
-    .number()
-    .nonnegative()
-    .describe(
-      'Stage points of the official result, typed by the user: they need the best hit factor of the stage.',
-    )
-    .optional(),
+  powerFactor: z.enum(['major', 'minor']).describe('Power factor.'),
+  stagePoints: z.number().nonnegative().describe('Stage points of the official result.').optional(),
 })
 
 /** Whether `v` is a whole number of tenths, within the rounding of a decimal number. */
 const inTenths = (v: number) => Math.abs(v * 10 - Math.round(v * 10)) < 1e-6
 
-/** One ring series: the ring value of each shot, or its total, and the scored sheet behind it. */
+/**
+ * One ring series: the ring value of each shot (whole rings or tenths), or its total, or both
+ * when they agree, and the target sheet it was scored on.
+ */
 const ringSeries = z
   .strictObject({
     shots: z
       .array(z.number().nonnegative().max(10.9))
       .min(1)
       .max(100)
-      .describe('Ring value of each shot, tenths where the event scores them.')
+      .describe('Ring value per shot.')
       .optional(),
-    total: z.number().nonnegative().max(1090).describe('Total of the series.').optional(),
-    targetSheet: userRef('target sheet')
-      .describe('Reference to the target sheet the series was scored on.')
-      .optional(),
-  })
-  .refine((s) => s.shots !== undefined || s.total !== undefined, {
-    message: 'A series needs its shots or its total.',
-  })
-  .refine((s) => [...(s.shots ?? []), s.total ?? 0].every(inTenths), {
-    message: 'Ring values and totals are whole rings or tenths.',
+    total: z.number().nonnegative().max(1090).describe('Series total.').optional(),
+    targetSheet: userRef('target sheet').optional(),
   })
   .refine(
-    (s) =>
-      s.shots === undefined ||
-      s.total === undefined ||
-      Math.round(s.shots.reduce((sum, v) => sum + v * 10, 0)) === Math.round(s.total * 10),
-    { message: 'The total differs from the sum of the shots.', path: ['total'] },
+    ({ shots, total }) =>
+      (shots ?? total) !== undefined &&
+      [...(shots ?? []), total ?? 0].every(inTenths) &&
+      (shots === undefined ||
+        total === undefined ||
+        Math.round(shots.reduce((sum, v) => sum + v * 10, 0)) === Math.round(total * 10)),
+    'A series needs its shots or its total, in tenths at most, agreeing when both are given.',
   )
 
-/**
- * The results of an event: ring series or practical stages, by the scoring method of its event
- * type.
- */
-const eventResults = z.discriminatedUnion('method', [
-  z.strictObject({
-    method: z.literal('rings').describe('Ring scoring.'),
-    series: z.array(ringSeries).max(100).describe('The series in the order shot.'),
-  }),
-  z.strictObject({
-    method: z.literal('hit-factor').describe('Hit-factor scoring.'),
-    stages: z.array(practicalStage).max(100).describe('The stages in the order shot.'),
-  }),
-])
+const method = 'Scoring method of the event type.'
 
 /**
- * A competition event the person shot, with their own results. A self-recorded score is never an
- * official result. Inferred type: {@link CompetitionEvent}.
+ * A competition event the person shot, with their own results: ring series or practical stages,
+ * by the scoring method of its event type. Never an official result.
+ * Inferred type: {@link CompetitionEvent}.
  */
 export const competitionEvent = z.strictObject({
-  date: z.iso.date().describe('Day of the event, ISO 8601.'),
-  place: text(200).describe('Where the event took place.').optional(),
-  eventType: catalogueRef('event type').describe(
-    'Reference `catalogue:<record id>` to the event type the event was shot under.',
-  ),
-  level: z.string().min(1).max(200).describe("Level of the event, one of the event type's levels."),
-  discipline: catalogueRef('discipline')
-    .describe('Reference `catalogue:<record id>` to the discipline shot.')
-    .optional(),
-  division: z
-    .string()
-    .min(1)
-    .max(200)
-    .describe("Division shot, one of the event type's divisions.")
-    .optional(),
-  firearm: userRef('firearm').describe('Reference to the firearm shot.').optional(),
-  load: userRef('load').describe('Reference to the load shot.').optional(),
+  date: z.iso.date().describe('Day, ISO 8601.'),
+  place: text(200).describe('Place.').optional(),
+  eventType: catalogueRef('event type'),
+  level: z.string().min(1).max(200).describe("One of the event type's levels."),
+  discipline: catalogueRef('discipline').optional(),
+  division: z.string().min(1).max(200).describe("One of the event type's divisions.").optional(),
+  firearm: userRef('firearm').optional(),
+  load: userRef('load').optional(),
   rounds: z
     .int()
     .nonnegative()
     .max(100000)
-    .describe('Rounds fired at the event, for the firearm round count.')
+    .describe('Rounds fired, for the round count.')
     .optional(),
-  notes: text(10000).describe('Notes on the event, plain text.').optional(),
+  notes: text(10000).describe('Notes, plain text.').optional(),
   state: z
     .enum(['completed', 'did-not-finish', 'disqualified'])
-    .describe('How the event ended for the person: a disqualified event has no total.'),
-  results: eventResults.describe('Results of the person at the event.'),
+    .describe('How the event ended: a disqualified event has no total.'),
+  results: z
+    .discriminatedUnion('method', [
+      z.strictObject({
+        method: z.literal('rings').describe(method),
+        series: z.array(ringSeries).max(100).describe('Series in the order shot.'),
+      }),
+      z.strictObject({
+        method: z.literal('hit-factor').describe(method),
+        stages: z.array(practicalStage).max(100).describe('Stages in the order shot.'),
+      }),
+    ])
+    .describe('Results, by the scoring method of the event type.'),
 })
 
 /** A competition event of the user with their own results. */
@@ -408,17 +382,12 @@ export const userRecord = z.discriminatedUnion(
     record('targetSheet', 'A target sheet with its calibration and shot groups.', targetSheet),
     record('targetFaceDesign', 'A target face of the face designer.', targetFaceDesign),
     record(
-      'event',
-      "A competition event with the user's own results; never an official result.",
-      competitionEvent,
-      designId,
-    ),
-    record(
       'case',
       'A group of cases of the user with their measured values.',
       cartridgeCase,
       designId,
     ),
+    record('event', 'A competition event; never an official result.', competitionEvent, designId),
   ],
   {
     error: (issue) =>
