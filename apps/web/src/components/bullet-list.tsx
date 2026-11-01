@@ -9,18 +9,21 @@ import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { bulletKinds, bulletSectionalDensity } from '../lib/bullet-kinds.ts'
 import {
+  bulletFacetKeys,
+  bulletFacets,
+  bulletTypeText,
+  coefficientText,
+  listCells,
+  type PackedBullet,
+  unpackBullets,
+} from '../lib/bullet-list-data.ts'
+import {
   type BulletRow,
   ballisticCoefficientText,
   bulletBallisticCoefficient,
   bulletCells,
-  bulletFacetKeys,
-  bulletFacets,
   bulletKey,
   bulletMatches,
-  bulletTypeText,
-  coefficientText,
-  type PackedBullet,
-  unpackBullets,
 } from '../lib/bullet-rows.ts'
 import { compareHref, maxComparedBullets } from '../lib/compare-ids.ts'
 import { facetNames } from '../lib/facets.ts'
@@ -36,6 +39,7 @@ import {
   readOrigins,
   userBulletRows,
 } from '../lib/sources.ts'
+import type { UnitSystem } from '../lib/units.ts'
 import { userBullets } from '../lib/variants.ts'
 import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
 import {
@@ -59,6 +63,12 @@ import { UnitsIconButton, useUnits } from './units-settings.tsx'
 
 /** A cartridge of the "Fits cartridge" filter: its id, name and the CIP values of the fit. */
 type FitCartridge = { id: string; name: string; fit: CartridgeDiameters }
+
+/** A row's cells: the shared ones and the list's own Diameter and SD. */
+const rowCells = (b: BulletRow, system: UnitSystem) => ({
+  ...bulletCells(b, system),
+  ...listCells(b, system),
+})
 
 /** The bullet directory: page bar with the count, search row, windowed table. */
 export function BulletList({
@@ -99,10 +109,10 @@ export function BulletList({
   )
   const { shown, options } = useFacets(items, searched, facets, filters)
   const cells = useMemo(
-    () => new Map(items.map((b) => [b.id, bulletCells(b, system)])),
+    () => new Map(items.map((b) => [b.id, rowCells(b, system)])),
     [items, system],
   )
-  const cell = (b: BulletRow) => cells.get(b.id) ?? bulletCells(b, system)
+  const cell = (b: BulletRow) => cells.get(b.id) ?? rowCells(b, system)
   const ids = useMemo(() => new Set(items.map((b) => b.id)), [items])
   // the Type column's text, once per row and language: also its sort key
   const types = useMemo(() => new Map(items.map((b) => [b.id, bulletTypeText(t, b)])), [items, t])

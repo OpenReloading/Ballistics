@@ -2,16 +2,19 @@ import { expect, it } from 'vitest'
 import { english, translator } from '../src/i18n/translate.ts'
 import { bulletKinds, bulletSectionalDensity } from '../src/lib/bullet-kinds.ts'
 import {
-  type BulletItem,
-  bulletBallisticCoefficient,
-  bulletCells,
   bulletFacets,
-  bulletMatches,
   bulletTypeText,
   coefficientText,
   constructionText,
+  listCells,
   packBullets,
   unpackBullets,
+} from '../src/lib/bullet-list-data.ts'
+import {
+  type BulletItem,
+  bulletBallisticCoefficient,
+  bulletCells,
+  bulletMatches,
 } from '../src/lib/bullet-rows.ts'
 import { caliberLabel } from '../src/lib/caliber.ts'
 import { facetOptions, facetRows } from '../src/lib/facets.ts'
@@ -193,20 +196,29 @@ it('formats the columns by the preset, rounded for display', () => {
   expect(bulletCells(r, presetUnits('us'))).toEqual({
     caliber: '.308',
     diameter: '.3080 in',
-    diameterValue: '.3080',
     mass: '168.0',
-    sectionalDensity: '0.253',
     length: '1.287',
   })
   expect(bulletCells(r, presetUnits('metric-grams'))).toEqual({
     caliber: '.308',
     diameter: '7.823 mm',
-    diameterValue: '7.823',
     mass: '10.89',
-    sectionalDensity: '177.9',
     length: '32.69',
   })
   expect(bulletCells(r, presetUnits('metric-grains')).mass).toBe('168.0')
+  // the Diameter and SD columns: inches to 4 decimals, mm to 3, SD in lb/in² or kg/m²
+  expect(listCells(r, presetUnits('us'))).toEqual({
+    diameterValue: '.3080',
+    sectionalDensity: '0.253',
+  })
+  expect(listCells(r, presetUnits('metric-grams'))).toEqual({
+    diameterValue: '7.823',
+    sectionalDensity: '177.9',
+  })
+  expect(listCells({ ...r, diameter: null }, presetUnits('us'))).toEqual({
+    diameterValue: '',
+    sectionalDensity: '',
+  })
   // below one inch the zero before the point goes; a zero prints as 0
   expect(bulletCells({ ...r, length: 12 }, presetUnits('us')).length).toBe('.472')
   expect(bulletCells({ ...r, length: 0 }, presetUnits('us')).length).toBe('0')
