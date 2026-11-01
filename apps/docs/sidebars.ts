@@ -56,6 +56,7 @@ const sidebars: SidebarsConfig = {
       ],
     },
     'guides/shooting-log',
+    'guides/competition-events',
     category('Case and firearm', [
       'case-capacity',
       'bullet-fit',

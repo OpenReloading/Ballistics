@@ -1,4 +1,4 @@
-import { defaultStartPressure, handgunBarrelLengthLimit, icao } from '@open-reloading/core'
+import { icao, startPressureOf } from '@open-reloading/core'
 import { seat } from '@open-reloading/drawing/seating'
 import { fromSi, toSi } from '@open-reloading/schema'
 import type { InteriorKey } from './interior-input.ts'
@@ -127,7 +127,7 @@ export const exampleInterior = {
   exponent: powder.interior.pressureExponent,
   referencePressure: toSi('pressure', powder.interior.referencePressure),
   ignitionPressure: toSi('pressure', powder.interior.ignitionPressure),
-  startPressure: defaultStartPressure(handgunBarrelLengthLimit).value,
+  startPressure: startPressureOf(toSi('length', choices.barrel), undefined).value,
   formA: powder.interior.burnForm.a,
   formM: powder.interior.burnForm.m,
   formQ: powder.interior.burnForm.q,

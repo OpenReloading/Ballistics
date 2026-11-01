@@ -212,7 +212,9 @@
 . SkippedInput
 . StageScore
 . StartPressureDefault
+. StartPressureRule
 . StepBudget
+. StructureFields
 . TargetMotion
 . TraceResiduals
 . Trajectory
@@ -282,6 +284,7 @@
 . coldPeakInterval
 . comparePlanCandidates
 . compareTruingFits
+. constructionOf
 . convectiveDefaults
 . cylinderInertia
 . defaultRounding
@@ -407,6 +410,7 @@
 . stagePoints
 . stageRawPoints
 . standardAtmosphere
+. startPressureOf
 . stringLadder
 . subtendedAngle
 . toleranceRange

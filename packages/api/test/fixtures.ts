@@ -239,6 +239,23 @@ export const bundle: Bundle = {
       provenance: published,
     },
   ],
+  eventTypes: [
+    {
+      id: 'test-championship',
+      name: 'Test championship',
+      federation: 'test-federation',
+      ruleBook: {
+        title: 'Test rule book',
+        edition: '2026',
+        publisher: 'Test Federation',
+        url: 'https://example.org/rules.pdf',
+        sha256: 'a'.repeat(64),
+      },
+      scoring: { method: 'rings' },
+      levels: ['Club', 'National'],
+      provenance: published,
+    },
+  ],
   targetMappings: [
     {
       id: 'test-discipline-test-face',

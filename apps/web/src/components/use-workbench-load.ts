@@ -12,7 +12,7 @@ import {
   gasVelocityFactor,
   type InteriorLoad,
   plainBaseCastHardness,
-  powderModelValues,
+  pressureToleranceDefaults,
   recordBoreArea,
   recordResistance,
   ValueError,
@@ -50,6 +50,7 @@ import {
   recordBulletValues,
   typedBaseType,
 } from '../lib/bullet.ts'
+import { lessBullet } from '../lib/bullet-below-mouth.ts'
 import { fitOf } from '../lib/bullet-fit.ts'
 import { workbenchDesign } from '../lib/cartridge-designer.ts'
 import { measuredWaterCapacitySpec } from '../lib/case-capacity.ts'
@@ -112,7 +113,7 @@ import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { nth } from '../lib/nth.ts'
-import { powderValues } from '../lib/powder-compare.ts'
+import { powderValues, recordFill } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import { writeTuneLoad } from '../lib/powder-tune.ts'
@@ -138,6 +139,7 @@ import {
   temperatureLadder,
   temperatureLadderBlockReason,
 } from '../lib/seating-ladder.ts'
+import { startPressureDefault } from '../lib/start-pressure.ts'
 import {
   exactFieldText,
   fixedFieldText,
@@ -161,7 +163,7 @@ import {
   userCartridges,
   userRef,
 } from '../lib/variants.ts'
-import { type InputPanel, type Status, statusText } from '../lib/workbench.ts'
+import { type InputPanel, maxVolumeFraction, type Status, statusText } from '../lib/workbench.ts'
 import {
   type DefaultKey,
   defaultKeys,
@@ -414,14 +416,27 @@ type CartridgeSource = {
 }
 
 /** What the chosen cartridge, or its design, gives the defaults. */
-function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources['cartridge'] {
+function cartridgeSource(
+  a: CartridgeSource,
+  system: UnitSystem,
+  t: Translator['t'],
+): DefaultSources['cartridge'] {
   const { cartridge, design, designLoad, seated } = a
+  const show = {
+    text: (si: number) => formatQuantity('capacity', system, si),
+    unit: system.capacity.symbol,
+  }
   if (design)
     return {
       name: design.name,
       design: true,
       boreDiameter: designLoad?.boreDiameter,
-      capacity: designCapacityOf(seated, designLoad, design, t),
+      capacity: lessBullet(
+        designCapacityOf(seated, designLoad, design, t),
+        seated.unseated,
+        show,
+        t,
+      ),
     }
   if (!cartridge) return undefined
   return {
@@ -435,7 +450,7 @@ function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources
       a.boreDiameter,
     ),
     twist: mmToM(a.specValue('chamber', 'u')),
-    capacity:
+    capacity: lessBullet(
       seated.caseVolume === undefined
         ? undefined
         : {
@@ -444,6 +459,10 @@ function cartridgeSource(a: CartridgeSource, t: Translator['t']): DefaultSources
               ? t('your measured case capacity, without the bullet')
               : t('case capacity record of {name}, without the bullet', { name: cartridge.name }),
           },
+      seated.unseated,
+      show,
+      t,
+    ),
   }
 }
 
@@ -733,6 +752,90 @@ function revertRecordFill(
   return back
 }
 
+/** The range tolerance of a chamber volume that still is the approximate default, with its interval: none for a typed or measured one. */
+export function approximateVolumeTolerance(
+  suggestion: Suggestion | undefined,
+  value: number | undefined,
+  followed: ReadonlySet<FollowKey>,
+): number | undefined {
+  if (!suggestion?.halfWidth || value === undefined || !followed.has('volume')) return undefined
+  // the field holds the default, up to the rounding of its text
+  if (Math.abs(value - suggestion.si) > 1e-9 * suggestion.si) return undefined
+  return Math.min(suggestion.halfWidth, maxVolumeFraction)
+}
+
+/** `base` with the start pressure default: the barrel of the preview's field (typed, seated or not), else the start's own, and the bullet's construction. */
+function withStartPressure(
+  base: Suggestions,
+  a: {
+    barrel: number | undefined
+    construction: Parameters<typeof startPressureDefault>[0]['construction']
+    current: number
+    system: UnitSystem
+    t: Translator['t']
+  },
+): Suggestions {
+  const { barrel, construction, current, system, t } = a
+  const show = {
+    text: (si: number) => formatQuantity('pressure', system, si),
+    unit: system.pressure.symbol,
+  }
+  return {
+    ...base,
+    startPressure: startPressureDefault({
+      barrel: barrel ?? base.barrelLength?.si,
+      construction,
+      current,
+      show,
+      t,
+    }),
+  }
+}
+
+/** The defaults a reference gives again on opening: not the start pressure by construction (the approximate one), which a load file and the API do not know, so it is saved as a value. */
+function savedSuggestions(s: Suggestions): Suggestions {
+  if (!s.startPressure?.approximate) return s
+  const { startPressure: _byConstruction, ...rest } = s
+  return rest
+}
+
+/** The defaulted fields a load leaves out: not the start pressure by construction, saved as a value even where it equals the Settings default. */
+function savedDefaulted(defaulted: ReadonlySet<string>, s: Suggestions): ReadonlySet<string> {
+  if (!s.startPressure?.approximate || !defaulted.has('startPressure')) return defaulted
+  return new Set([...defaulted].filter((k) => k !== 'startPressure'))
+}
+
+/** The run's `noCoefficient`: a powder record with a model and no temperature coefficient, at the temperature of its fit. */
+export function noCoefficientOf(powder: Powder | undefined) {
+  const i = powder?.interior
+  // a grain form with a default coefficient (#842) runs with it
+  if (!i || hasSensitivity(powder)) return
+  return {
+    noCoefficient: { reference: toSi('temperature', i.propellantTemperature.value) },
+  }
+}
+
+/**
+ * The volume tolerance of a run: the approximate default volume's (`approximateVolumeTolerance`) and
+ * the cavity bracket's (`cavityVolumeFraction`, which holds the default 1 %) added, at most
+ * `maxVolumeFraction`; either alone as it is.
+ */
+function combinedVolumeFraction(
+  approximate: number | undefined,
+  cavity: number | undefined,
+): number | undefined {
+  if (approximate === undefined) return cavity
+  if (cavity === undefined) return approximate
+  return Math.min(
+    approximate + cavity - pressureToleranceDefaults.volumeFraction,
+    maxVolumeFraction,
+  )
+}
+
+/** The followed fields with the start pressure added when `follow`. */
+const followingStart = (s: ReadonlySet<FollowKey>, follow: boolean): ReadonlySet<FollowKey> =>
+  follow ? new Set([...s, 'startPressure']) : s
+
 /** Writes the powder record's model parameters into the fields, except the `keep` ones; the keys written. */
 function fillRecordValues(
   form: Form,
@@ -914,6 +1017,17 @@ const moreHolding = (errors: Record<string, unknown>) =>
     : firearmMoreFields.some((k) => errors[k])
       ? ('firearm' as const)
       : undefined
+
+/** The volume tolerance of the cavity bracket of a hollow base, when the run's volume follows the seated bullet. */
+function cavityFractionOf(a: {
+  seated: Seated
+  fields: Fields
+  previewed: Partial<Record<PreviewKey, number>>
+  bullet: Parameters<typeof cavityVolumeFraction>[0]
+}) {
+  if (!fromSeatingOf(a.seated, a.fields, a.previewed).includes('volume')) return
+  return cavityVolumeFraction(a.bullet, a.seated.depth, a.fields.volume?.si)
+}
 
 /** The seated values still the ones the seating preview wrote. */
 const fromSeatingOf = (
@@ -1161,7 +1275,7 @@ function followedValue(
 }
 
 /** The writes a followed field's new default makes; `written` records the defaults put in. */
-function followWrites(a: {
+export function followWrites(a: {
   followed: ReadonlySet<FollowKey>
   seatedVolume: boolean
   now: Fields
@@ -1995,7 +2109,7 @@ export function useWorkbenchState() {
     markChanged()
     setPowder(design ? undefined : p)
     setPowderDesign(design)
-    const values = powderModelValues(p)
+    const values = recordFill(p)
     const previous = originNow.current
     setOrigin(values)
     if (fill && !values && previous) {
@@ -2003,10 +2117,14 @@ export function useWorkbenchState() {
       // edit goes back to a new load's state (the cited default, else empty)
       const back = revertRecordFill(form, previous, defaults, unitsNow.current)
       setDefaulted((s) => new Set([...s, ...back]))
+      setFollowed((s) => followingStart(s, back.has('startPressure')))
     }
     if (!fill || !values) return
     const filledKeys = fillRecordValues(form, values, keep, unitsNow.current)
     setDefaulted((s) => new Set([...s].filter((k) => !filledKeys.has(k))))
+    // a start pressure the record or the opened load gives stays; else the field follows its default
+    const given = !!p.interior?.startPressure || keep.has('startPressure')
+    setFollowed((s) => followingStart(new Set([...s].filter((k) => !filledKeys.has(k))), !given))
   }
 
   /** A powder design of this browser in place of a record. */
@@ -2168,6 +2286,8 @@ export function useWorkbenchState() {
     return
   }
 
+  const cavityFraction = cavityFractionOf({ seated, fields, previewed, bullet: bulletNow })
+
   /**
    * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
    * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
@@ -2175,7 +2295,8 @@ export function useWorkbenchState() {
    * another powder record chosen (its model parameters over the fields, as `choosePowder` writes
    * them) and optionally another charge (kg): the Powders tab's runs. The chosen powder itself keeps
    * the fields as they stand (edited or opened parameters). `recordInputs` lists what the records'
-   * bore resistance reads besides the body: the key of the Powders tab's rows.
+   * bore resistance reads besides the body, and the start pressure default a compared powder without
+   * its own runs at: the key of the Powders tab's rows.
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
@@ -2187,7 +2308,12 @@ export function useWorkbenchState() {
       // and before it was drawn sends that volume, not an empty field's error (#870). The Powders
       // tab's rows (`as`) read the values of the render their batch started from, so every row of a
       // batch simulates the same load whatever is typed meanwhile
-      values: powderValues(siValues(as ? fields : form.getValues()), chosenPowder, as),
+      values: powderValues(
+        siValues(as ? fields : form.getValues()),
+        chosenPowder,
+        as,
+        suggestions.startPressure?.si,
+      ),
       powder: chosen,
       // a missing powder record: the bulk density and the bore resistance its link carried
       linked: as ? undefined : linkedPowder,
@@ -2196,23 +2322,39 @@ export function useWorkbenchState() {
       boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
-      volumeFraction: fromSeatingOf(seated, fields, previewed).includes('volume')
-        ? cavityVolumeFraction(bulletNow, seated.depth, fields.volume?.si)
-        : undefined,
+      volumeFraction: cavityFraction,
       pressureLimit: typedSpec(spec.typed, 'pmax'),
       // the powder chosen for a Powders tab run brings its own
       bulkDensity: typedDensityOf(spec.typed, as),
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
+    const volumeTolerance = approximateVolumeTolerance(
+      suggestions.volume,
+      fields.volume?.si,
+      followed,
+    )
     const recordInputs = [
       chosenPowder?.id,
       bulletLength,
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
+      // a compared powder without its own start pressure runs at this default
+      suggestions.startPressure?.si,
+      // the range tolerance of an approximate volume, which the body of the rows does not hold
+      volumeTolerance,
     ]
     const castHardness = plainBaseCastHardness(bulletRecord?.construction)
-    return { body, bulkDensity, resistanceMissing, recordInputs, sensitivityDefault, castHardness }
+    // the approximate default volume's interval and the cavity bracket of a hollow base add up
+    const volumeFraction = combinedVolumeFraction(volumeTolerance, body.tolerances?.volumeFraction)
+    return {
+      body: volumeFraction ? { ...body, tolerances: { volumeFraction } } : body,
+      bulkDensity,
+      resistanceMissing,
+      recordInputs,
+      sensitivityDefault,
+      castHardness,
+    }
   }
 
   /**
@@ -2296,12 +2438,17 @@ export function useWorkbenchState() {
       sensitivityDefault: withoutColdPeak(a.sensitivityDefault),
       castHardness: a.castHardness,
       roundCount: firearms.find((f) => f.id === firearm)?.data.roundCount,
+      ...noCoefficientOf(chosenPowder),
       design: bulletDesign?.name,
       cartridgeDesign: cartridgeDesign?.name,
       volumeMeasured: volumeMeasured({
         measuredCapacity: measuredWaterCapacity,
         volume: fields.volume?.si,
-        derived: [suggestions.volume?.si, seated.volume],
+        // an estimated default is no measured capacity
+        derived: [
+          suggestions.volume?.approximate ? undefined : suggestions.volume?.si,
+          seated.volume,
+        ],
       }),
       powderDesign: powderDesign?.name,
       identity: identityOf({
@@ -2946,7 +3093,7 @@ export function useWorkbenchState() {
       workbenchDesign(cartridgeDesign.data, cartridgeDesign.resolved, cartridgeDesign.name, system),
     [cartridgeDesign, system],
   )
-  const suggestions: Suggestions = suggestDefaults(
+  const baseSuggestions = suggestDefaults(
     {
       firearm: gunSource(gun),
       cartridge: cartridgeSource(
@@ -2960,6 +3107,7 @@ export function useWorkbenchState() {
           measuredCapacity: measuredWaterCapacity,
           boreDiameter: fields.boreDiameter?.si,
         },
+        system,
         t,
       ),
       bullet:
@@ -2970,6 +3118,13 @@ export function useWorkbenchState() {
     },
     t,
   )
+  const suggestions = withStartPressure(baseSuggestions, {
+    barrel: seated.barrelField,
+    construction: bulletRecord?.construction,
+    current: defaults.startPressure,
+    system,
+    t,
+  })
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
@@ -2981,6 +3136,7 @@ export function useWorkbenchState() {
     ...spec.values,
     firearmMass: gunWeightUsed.si,
   }
+  const saved = savedSuggestions(suggestions)
   const given = givenKeys(fieldValues, {
     origin,
     bullet: bulletGiven,
@@ -2991,10 +3147,10 @@ export function useWorkbenchState() {
       spec.typed,
     ),
     defaults,
-    defaulted,
+    defaulted: savedDefaulted(defaulted, suggestions),
     followed,
     suggestions: Object.fromEntries(
-      followKeys.map((k) => [k, referenced ? suggestions[k]?.si : undefined]),
+      followKeys.map((k) => [k, referenced ? saved[k]?.si : undefined]),
     ),
     previewed,
     seatingKept: seatingKeptOf(referenced, seated, suggestions),

@@ -134,6 +134,20 @@ describe('powderValues', () => {
     expect(v).toMatchObject({ vivacity: 0.5, ignitionPressure: 5e6, charge: 0.0025, mass: 0.01 })
     expect(powderValues(fields, undefined, { powder: rec('p2', 0.5) }).vivacity).toBe(0.5)
   })
+
+  it('keeps the start pressure of the fields for a record without one of its own', () => {
+    const own = rec('p2', 0.5)
+    const { startPressure: _own, ...rest } = own.interior as NonNullable<Powder['interior']>
+    const without = { ...own, interior: rest } as Powder
+    const withStart = { ...fields, startPressure: 24.3e6 }
+    expect(powderValues(withStart, { id: 'p1' }, { powder: own }).startPressure).toBe(25e6)
+    expect(powderValues(withStart, { id: 'p1' }, { powder: without }).startPressure).toBe(24.3e6)
+    // the default of the field, not the start pressure the current powder wrote
+    expect(powderValues(withStart, { id: 'p1' }, { powder: without }, 29.2e6).startPressure).toBe(
+      29.2e6,
+    )
+    expect(powderValues(withStart, { id: 'p1' }, { powder: own }, 29.2e6).startPressure).toBe(25e6)
+  })
 })
 
 describe('compareKey', () => {

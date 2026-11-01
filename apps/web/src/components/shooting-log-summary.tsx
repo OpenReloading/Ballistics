@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
+import { resultText } from '../lib/competition-events.ts'
 import { dayText } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import {
@@ -83,7 +84,7 @@ function TotalsTable({
   )
 }
 
-/** The summary's tables: per firearm, per cartridge, per month and the competitions of the year. */
+/** The summary's tables: per firearm, per cartridge, per month and the competition events of the year. */
 function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
   const { t, tn } = useTranslation()
   return (
@@ -137,17 +138,17 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
           </Text>
           {s.events.length === 0 ? (
             <Text size="sm" c="dimmed">
-              {t('No entry of this year is linked to a competition.')}
+              {t('No competition event in this year.')}
             </Text>
           ) : (
             <ul className="log-summary-events">
-              {s.events.map((r) => (
-                <li key={r.id}>
+              {s.events.map(({ event, entries }) => (
+                <li key={event.id}>
                   {[
-                    dayText(r.data.date),
-                    r.data.firearm && names.firearm(r.data.firearm),
-                    tn(r.data.rounds, '{count} round', '{count} rounds'),
-                    r.data.result,
+                    dayText(event.data.date),
+                    event.name,
+                    resultText(event.data, t),
+                    tn(entries.length, '{count} entry', '{count} entries'),
                   ]
                     .filter(Boolean)
                     .join(' · ')}
@@ -163,7 +164,7 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
 
 /**
  * The yearly summary of the shooting log: per calendar year the rounds per firearm and per cartridge,
- * the entries per month and the entries linked to a competition, with its own print and CSV. It sums
+ * the entries per month and the competition events of the year, with its own print and CSV. It sums
  * the log; the firearm's round count stays the one counter.
  */
 export function LogSummary({

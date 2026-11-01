@@ -544,7 +544,7 @@ export interface DanglingRef {
  * `cartridge` and `caseManufacturer` (only as `user:<id>`), a case's `cartridge`, `manufacturer` and `capacity`, a load's `sessions`, a session's device
  * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
  * its group shots, an event's `firearm`, `load` and the `targetSheet` of its ring series, and a
- * shooting log entry's `firearm` and `load`. A
+ * shooting log entry's `firearm`, `load` and `event`. A
  * `user:<id>` reference names a record by its id, a
  * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
  */
@@ -660,6 +660,7 @@ function userRefsOf(r: UserRecord): [string, string | undefined, UserRecordKind,
       return [
         ['firearm', r.data.firearm, 'firearm', true],
         ['load', r.data.load, 'load', true],
+        ['event', r.data.event, 'event', true],
       ]
     default:
       return []

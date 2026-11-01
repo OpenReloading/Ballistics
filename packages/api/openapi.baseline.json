@@ -12,7 +12,7 @@
     },
     {
       "name": "Competition",
-      "description": "Federations, their disciplines, target faces, the mapping between them and the caliber classes of the disciplines."
+      "description": "Federations, their disciplines, target faces, the mapping between them, the caliber classes of the disciplines and the event types with their scoring."
     },
     {
       "name": "Exterior",
@@ -3271,6 +3271,537 @@
                     "section",
                     "page",
                     "distance",
+                    "provenance"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "308": {
+            "description": "Permanent Redirect: the id was renamed, `Location` is the record that replaced it.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "URI Too Long",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/event-types": {
+      "get": {
+        "operationId": "getEventTypes",
+        "tags": ["Competition"],
+        "summary": "List event types",
+        "description": "The competition event types with their federation and scoring method (hit factor or rings), ordered by name.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "federation": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                          },
+                          "method": {
+                            "type": "string",
+                            "enum": ["hit-factor", "rings"],
+                            "description": "Scoring method."
+                          }
+                        },
+                        "required": ["id", "name", "federation", "method"],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": ["total", "items"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: a query parameter or field the route does not declare, or a value its schema refuses; `message` or `issues` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/event-types/{id}": {
+      "get": {
+        "operationId": "getEventTypesById",
+        "tags": ["Competition"],
+        "summary": "Get a event type",
+        "description": "The whole event type record with its provenance.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Record id.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "federation": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "ruleBook": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "edition": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "publisher": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "url": {
+                          "type": "string",
+                          "format": "uri"
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        }
+                      },
+                      "required": ["title", "edition", "publisher", "url", "sha256"],
+                      "additionalProperties": false
+                    },
+                    "scoring": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "method": {
+                              "type": "string",
+                              "const": "hit-factor"
+                            },
+                            "points": {
+                              "type": "object",
+                              "properties": {
+                                "major": {
+                                  "type": "object",
+                                  "properties": {
+                                    "A": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "C": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "D": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "metal": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    }
+                                  },
+                                  "required": ["A", "C", "D", "metal"],
+                                  "additionalProperties": false
+                                },
+                                "minor": {
+                                  "type": "object",
+                                  "properties": {
+                                    "A": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "C": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "D": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    },
+                                    "metal": {
+                                      "type": "integer",
+                                      "minimum": 0,
+                                      "maximum": 9007199254740991
+                                    }
+                                  },
+                                  "required": ["A", "C", "D", "metal"],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": ["major", "minor"],
+                              "additionalProperties": false
+                            },
+                            "penalties": {
+                              "type": "object",
+                              "properties": {
+                                "miss": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                },
+                                "noShoot": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                },
+                                "procedural": {
+                                  "type": "integer",
+                                  "exclusiveMinimum": 0,
+                                  "maximum": 9007199254740991
+                                }
+                              },
+                              "required": ["miss", "noShoot", "procedural"],
+                              "additionalProperties": false
+                            },
+                            "noShootMaxHits": {
+                              "type": "integer",
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991
+                            },
+                            "powerFactors": {
+                              "minItems": 1,
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "division": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "minor": {
+                                    "type": "integer",
+                                    "exclusiveMinimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "major": {
+                                    "type": "integer",
+                                    "exclusiveMinimum": 0,
+                                    "maximum": 9007199254740991
+                                  }
+                                },
+                                "required": ["division", "minor"],
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "required": ["method", "points", "penalties", "powerFactors"],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "method": {
+                              "type": "string",
+                              "const": "rings"
+                            },
+                            "discipline": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                            },
+                            "seriesShots": {
+                              "type": "integer",
+                              "exclusiveMinimum": 0,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": ["method"],
+                          "additionalProperties": false
+                        }
+                      ]
+                    },
+                    "levels": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "magazine": {
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "division": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "powerFactor": {
+                            "type": "string",
+                            "enum": ["major", "minor"]
+                          },
+                          "maxRounds": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "maxLength": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": "number",
+                                "exclusiveMinimum": 0,
+                                "description": "In mm."
+                              },
+                              "raw": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "The value as written in the source, when it differed."
+                              }
+                            },
+                            "required": ["value"],
+                            "additionalProperties": false,
+                            "unit": "mm"
+                          },
+                          "note": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "required": ["division"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "movingTargets": {
+                      "type": "boolean"
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["published", "measured", "derived", "fitted", "computed"],
+                          "description": "How the values came about."
+                        },
+                        "sources": {
+                          "minItems": 1,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Title of the source: the document, or the site and table."
+                              },
+                              "publisher": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Who issued the data: a maker, a standards body or the authors."
+                              },
+                              "edition": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Edition, print or date as the document states it."
+                              },
+                              "page": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Page or section of the document."
+                              },
+                              "url": {
+                                "type": "string",
+                                "format": "uri",
+                                "description": "An http or https URL of the source."
+                              },
+                              "retrieved": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+                                "description": "Date the source was retrieved, ISO 8601."
+                              },
+                              "sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$",
+                                "description": "SHA-256 of the retrieved file, 64 lowercase hex digits."
+                              },
+                              "fields": {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "description": "Dot paths of the record fields this source supports. Absent: the whole record."
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": ["published", "measured", "derived", "fitted", "computed"],
+                                "description": "Kind of this source values when it differs from the provenance kind of the record."
+                              },
+                              "license": {
+                                "type": "string",
+                                "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
+                                "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`."
+                              },
+                              "terms": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              },
+                              "origin": {
+                                "type": "string",
+                                "enum": ["manufacturer", "public", "community"],
+                                "description": "Who stands behind the source: manufacturer, public or community."
+                              },
+                              "run": {
+                                "type": "object",
+                                "properties": {
+                                  "version": {
+                                    "type": "string",
+                                    "pattern": "^[0-9a-f]{16}$",
+                                    "description": "Model version id the report names."
+                                  },
+                                  "report": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "Report of the evaluation of the fit."
+                                  }
+                                },
+                                "required": ["version", "report"],
+                                "additionalProperties": false,
+                                "description": "The fit run behind a `fitted` source."
+                              },
+                              "note": {
+                                "type": "string",
+                                "minLength": 1,
+                                "description": "Note on the source."
+                              }
+                            },
+                            "required": ["title"],
+                            "additionalProperties": false
+                          },
+                          "description": "The sources of the values, at least one."
+                        },
+                        "note": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Note on the provenance."
+                        }
+                      },
+                      "required": ["kind", "sources"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "federation",
+                    "ruleBook",
+                    "scoring",
+                    "levels",
                     "provenance"
                   ],
                   "additionalProperties": false

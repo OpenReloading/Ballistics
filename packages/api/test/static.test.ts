@@ -31,6 +31,7 @@ describe('writeStaticApi', () => {
       ['disciplines', data.index.disciplines],
       ['target-mappings', data.index.targetMappings],
       ['caliber-classes', data.index.caliberClasses],
+      ['event-types', data.index.eventTypes],
     ] as const
     const records = lists.flatMap(([route, list]) => list.map(({ item }) => [route, item.id]))
     expect(records.length).toBeGreaterThan(0)
