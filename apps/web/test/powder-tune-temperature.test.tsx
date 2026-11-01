@@ -3,7 +3,7 @@ import { type InteriorLoad, interior } from '@open-reloading/core'
 import { fromSi, type SessionRecord, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { TuneNotes } from '../src/components/powder-tune.tsx'
+import { AddString, TuneNotes } from '../src/components/powder-tune.tsx'
 import { nth } from '../src/lib/nth.ts'
 import { fileData, fromFile, powderDesigns } from '../src/lib/powder-designer.ts'
 import { type PowderFitReply, temperatureFit, withSensitivity } from '../src/lib/powder-fit.ts'
@@ -88,6 +88,13 @@ const notes = (interiorLoad: InteriorLoad, s: readonly TuneString[]) =>
     </MantineProvider>,
   )
 
+const addForm = (oneTemperature: boolean) =>
+  renderToStaticMarkup(
+    <MantineProvider>
+      <AddString onAdd={() => {}} oneTemperature={oneTemperature} />
+    </MantineProvider>,
+  )
+
 const oneTemperature = 'needs strings at two or more powder temperatures'
 const askSensitivity = 'the powder has no temperature sensitivity'
 
@@ -123,6 +130,7 @@ describe('the temperature factor from strings at several temperatures', () => {
       strings.map((s) => fromSi('temperature', s.temperature ?? 0)),
     )
     expect(notes(load(0.38), strings)).not.toContain(oneTemperature)
+    expect(addForm(false)).not.toContain(oneTemperature)
   })
 
   it('keeps the scaled sensitivities in the saved draft through a parse', () => {
@@ -141,7 +149,9 @@ describe('the temperature factor from strings at several temperatures', () => {
     expect(temperatureFit(load(), fitStrings(one))).toBe('one')
     const { fitted } = fitOf(load(0.38), one)
     expect(fitted.fit.parameters.map((p) => p.name)).toEqual(['burnRate'])
-    expect(notes(load(0.38), one)).toContain(oneTemperature)
+    // the note sits beside the temperature field of the add form, not among the notes
+    expect(notes(load(0.38), one)).not.toContain(oneTemperature)
+    expect(addForm(true)).toContain(oneTemperature)
   })
 
   it('asks for a sensitivity and fits no factor when the draft has none', () => {

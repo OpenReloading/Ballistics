@@ -217,7 +217,7 @@ describe('GET /cartridges/:id', () => {
   it('includes case capacities', async () => {
     const { body } = await get(`${API_PREFIX}/cartridges/alpha-rifle`)
     expect(body.capacities).toEqual(bundle.capacities)
-    expect(body.capacities[0].convention).toBe('to the mouth, water at 20 C, primer seated')
+    expect(body.capacities[0]).toMatchObject({ primerState: 'primed-spent', fillLevel: 'mouth' })
     expect((await get(`${API_PREFIX}/cartridges/beta-pistol`)).body.capacities).toEqual([])
   })
 

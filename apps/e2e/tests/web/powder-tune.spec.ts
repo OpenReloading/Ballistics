@@ -19,7 +19,7 @@ const file = [
   'A,852,m/s,,',
 ].join('\n')
 
-const table = (page: Page) => page.getByRole('table', { name: 'Strings per charge' })
+const table = (page: Page) => page.getByRole('table', { name: 'Strings', exact: true })
 
 const noSideScroll = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)
@@ -44,19 +44,45 @@ test('the Measurements tab opens the route with the load strings, and an added s
 
   const rows = table(page).locator('tbody tr')
   await expect(rows).toHaveCount(1)
-  // shots, mean and SD of the string 850, 854, 852 m/s
-  await expect(rows.first().locator('td').nth(1)).toHaveText('3')
-  await expect(rows.first().locator('td').nth(2)).toHaveText('852.0')
-  await expect(rows.first().locator('td').nth(3)).toHaveText('2.0')
+  // shots, mean and SD of the string 850, 854, 852 m/s, at the load's temperature
+  await expect(rows.first().locator('td').nth(1)).toHaveText('')
+  await expect(rows.first().locator('td').nth(2)).toHaveText('3')
+  await expect(rows.first().locator('td').nth(3)).toHaveText('852.0')
+  await expect(rows.first().locator('td').nth(4)).toHaveText('2.0')
   // the example load is not saved: its strings name no load, so no fit runs
   await expect(page.getByText('Save the load to fit a powder from its strings.')).toBeVisible()
   await expect(page.getByText(/^Fitted vivacity/)).toHaveCount(0)
 
-  await page.getByRole('textbox', { name: 'Charge (g)' }).fill('9.9')
-  await page.getByRole('textbox', { name: /^Shot velocities/ }).fill('900 904')
+  // a field that does not read says why on the field, and nothing is added
+  const charge = page.getByRole('textbox', { name: 'Charge (g)' })
+  const shots = page.getByRole('textbox', { name: /^Shot velocities/ })
+  const temperature = page.getByRole('textbox', { name: 'Temperature (°C)' })
+  await shots.fill('900 x')
+  await temperature.fill('warm')
+  await page.getByRole('button', { name: 'Add a string' }).click()
+  await expect(charge).toHaveAttribute('aria-invalid', 'true')
+  await expect(shots).toHaveAccessibleDescription(/One or more numbers above 0/)
+  await expect(temperature).toHaveAccessibleDescription(/A number, or empty/)
+  await expect(rows).toHaveCount(1)
+
+  await charge.fill('9.9')
+  await expect(charge).not.toHaveAttribute('aria-invalid', 'true')
+  await shots.fill('900 904')
+  await temperature.fill('5')
   await page.getByRole('button', { name: 'Add a string' }).click()
   await expect(rows).toHaveCount(2)
-  await expect(rows.last().locator('td').nth(2)).toHaveText('902.0')
+  await expect(rows.last().locator('td').nth(1)).toHaveText('5.0')
+  await expect(rows.last().locator('td').nth(3)).toHaveText('902.0')
+
+  // a string added here can be removed and brought back; the load's has no Remove
+  await expect(rows.first().getByRole('button', { name: /^Remove/ })).toHaveCount(0)
+  await rows
+    .last()
+    .getByRole('button', { name: /^Remove the string at 9\.9/ })
+    .click()
+  await expect(rows).toHaveCount(1)
+  await page.getByRole('button', { name: 'Undo', exact: true }).click()
+  await expect(rows).toHaveCount(2)
   await expect(
     page.getByText('All values on this screen are simulations, not load data.'),
   ).toBeVisible()
@@ -131,11 +157,73 @@ test('the Measurements link of a saved load fits the powder on the load the work
   await expect(back).toBeDisabled()
 })
 
-test('the powder designer links to the tuning route', async ({ page }) => {
+test('the powder designer links to the tuning route, where strings typed without a load say why there is no fit', async ({
+  page,
+}) => {
   await gotoHydrated(page, '/powders/designer')
   await page.getByRole('link', { name: 'Fit a powder from chronograph strings' }).click()
   await expect(page).toHaveURL(/\/powders\/tune\/?$/)
-  await expect(page.getByRole('button', { name: 'Add a string' })).toBeVisible()
+  await page.getByRole('textbox', { name: 'Charge (g)' }).fill('2.5')
+  await page.getByRole('textbox', { name: /^Shot velocities/ }).fill('800 804')
+  await page.getByRole('button', { name: 'Add a string' }).click()
+  await expect(table(page).locator('tbody tr')).toHaveCount(1)
+  await expect(
+    page.getByText("No fit: open this page from a saved load's Measurements tab."),
+  ).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Open the workbench' })).toBeVisible()
+})
+
+const sessionId = '3c1d4e8f-9a6b-4d2c-8e1f-7a300b5f7a2e'
+/** A saved load of the demo powder DP40 with a session whose string is mapped to a charge. */
+const savedLadder = [
+  {
+    kind: 'session',
+    id: sessionId,
+    name: 'Ladder',
+    saved: '2026-10-28T00:00:00.000Z',
+    data: {
+      origin: 'user',
+      device: { kind: 'doppler-radar' },
+      strings: [
+        {
+          variation: { kind: 'charge', value: { value: 2.5 } },
+          shots: [{ velocity: { value: 800 } }, { velocity: { value: 804 } }],
+        },
+      ],
+      provenance: { kind: 'measured', sources: [{ title: 'Ladder' }] },
+    },
+  },
+  {
+    kind: 'load',
+    id: '4d2e5f9a-0b7c-4e3d-9f2a-8b411c6a8b3f',
+    name: 'DP40 ladder',
+    saved: '2026-10-28T00:00:00.000Z',
+    data: {
+      origin: 'user',
+      powder: 'catalogue:demo-powder-dp40',
+      sessions: [`user:${sessionId}`],
+    },
+  },
+]
+
+test('the powder record links to the tuning route, whose powder select lists the saved loads of each powder', async ({
+  page,
+}) => {
+  await gotoHydrated(page, '/powders/demo-powder-dp40/')
+  await putRecords(page, savedLadder)
+  await page.getByRole('link', { name: 'Tune from strings' }).click()
+  await expect(page).toHaveURL(/\/powders\/tune\/?\?powder=catalogue%3Ademo-powder-dp40/)
+  const select = page.getByRole('combobox', { name: 'Powder' })
+  await expect(select.locator('option:checked')).toHaveText('Demo Powder Co. DP40')
+  const loads = page.getByRole('navigation', { name: 'Saved loads with this powder' })
+  await expect(loads.getByRole('link', { name: 'DP40 ladder' })).toBeVisible()
+
+  // opened bare, the select asks for a powder and its choice lists the loads
+  await gotoHydrated(page, '/powders/tune')
+  await expect(select.locator('option:checked')).toHaveText('Choose a powder')
+  await select.selectOption({ label: 'Demo Powder Co. DP40' })
+  await expect(page).toHaveURL(/\?powder=catalogue%3Ademo-powder-dp40/)
+  await expect(loads.getByRole('link', { name: 'DP40 ladder' })).toBeVisible()
 })
 
 test('a saved powder design opens the route with the saved loads that use it', async ({ page }) => {
