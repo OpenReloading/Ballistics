@@ -438,7 +438,18 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
     return t('{name} has no round count; set one on the Firearms page to add the log to it.', {
       name,
     })
-  const due = entryRoundsDue(found.data, id, entry.rounds, entry.event)
+  // the other entries of the same match on this firearm: they share the event's rounds (#961)
+  const siblings = entry.event
+    ? (await storedRecords()).records.flatMap((r) =>
+        r.kind === 'shootingLogEntry' &&
+        r.id !== id &&
+        r.data.event === entry.event &&
+        r.data.firearm === entry.firearm
+          ? [{ id: r.id, rounds: r.data.rounds }]
+          : [],
+      )
+    : []
+  const due = entryRoundsDue(found.data, id, entry.rounds, entry.event, siblings)
   if (due < 1) return ''
   const ok = await confirmDialog({
     title: t('Add to the round count?'),
@@ -454,7 +465,7 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
   const written = await updateRecord(firearmId, (raw) => {
     const stored = userRecord.safeParse(raw)
     return stored.success
-      ? withEntryRounds(stored.data, id, entry.rounds, new Date(), entry.event)
+      ? withEntryRounds(stored.data, id, entry.rounds, new Date(), entry.event, siblings)
       : undefined
   })
   return written?.kind === 'firearm' && written.data.roundCount !== undefined
@@ -468,7 +479,7 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
  */
 async function importEntries(f: File, { t, tn }: Translator) {
   const parsed = parseUserDataFile(await f.text())
-  if (!parsed.ok) throw new Error(reasonText(parsed.reason, t))
+  if (!parsed.ok) throw new Error(reasonText(parsed.reason, { t, tn }))
   const incoming = logEntries(parsed.records)
   const stored = await storedRecords()
   const plan = planImport(incoming, stored.records, stored.invalid)

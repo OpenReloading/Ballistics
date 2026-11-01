@@ -152,12 +152,28 @@ export function cleanEntry(e: ShootingLogEntry): ShootingLogEntry {
 /**
  * The rounds of entry `id` (`rounds` rounds) that the count of the firearm record does not hold
  * yet: the rounds less those counted for the entry before and for the competition event it links
- * (`event`, the same match, #919). 0 for a record that is no firearm or has no count.
+ * (`event`, the same match, #919). Of the event's counted rounds only the part that the other
+ * entries linking it on this firearm (`siblings`) do not cover is taken off, so the order the
+ * event and its entries are counted in does not change the total (#961). 0 for a record that is
+ * no firearm or has no count.
  */
-export function entryRoundsDue(record: UserRecord, id: string, rounds: number, event?: string) {
+export function entryRoundsDue(
+  record: UserRecord,
+  id: string,
+  rounds: number,
+  event?: string,
+  siblings: readonly { id: string; rounds: number }[] = [],
+) {
   if (record.kind !== 'firearm' || record.data.roundCount === undefined) return 0
-  const due = roundsDue(record.data, entryRef(id), record.data.roundCount, rounds)
-  return Math.max(0, due - (event ? countedFor(record.data, [event]) : 0))
+  const f = record.data
+  const due = roundsDue(f, entryRef(id), f.roundCount, rounds)
+  if (!event) return due
+  // a sibling's rounds its own count does not hold went into the event's count
+  const covered = siblings.reduce(
+    (n, s) => n + Math.max(0, s.rounds - countedFor(f, [entryRef(s.id)])),
+    0,
+  )
+  return Math.max(0, due - Math.max(0, countedFor(f, [event]) - covered))
 }
 
 /**
@@ -171,8 +187,9 @@ export function withEntryRounds(
   rounds: number,
   now = new Date(),
   event?: string,
+  siblings: readonly { id: string; rounds: number }[] = [],
 ) {
-  const due = entryRoundsDue(record, id, rounds, event)
+  const due = entryRoundsDue(record, id, rounds, event, siblings)
   if (record.kind !== 'firearm' || due < 1) return
   return withSessionRounds(record, entryRef(id), record.data.roundCount, rounds, due, now)
 }

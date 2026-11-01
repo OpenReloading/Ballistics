@@ -3660,6 +3660,11 @@
     "other": "{count} Datensätze ausgelassen, weil ungültige Browserdatensätze ihre IDs haben. Lade sie unter Öffnen, Ungültige Datensätze roh herunter, lösche sie und importiere erneut."
   },
   "and {count} more rejected rows": "und {count} weitere abgelehnte Zeilen",
+  "→ at {path}": "→ bei {path}",
+  "and {count} more problem|and {count} more problems": {
+    "one": "und {count} weiteres Problem",
+    "other": "und {count} weitere Probleme"
+  },
   "bullets": "Geschosse",
   "cartridges": "Patronen",
   "powders": "Treibladungspulver",

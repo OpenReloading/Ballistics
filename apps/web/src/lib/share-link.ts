@@ -20,9 +20,9 @@ const longLink = msg(
 const ownReasons: readonly Message[] = [damagedLink, longLink]
 
 /** A `reason` of a share link that was not opened, in the language of `t`. */
-export function linkReasonText(reason: string, t: Translator['t']) {
+export function linkReasonText(reason: string, tr: Pick<Translator, 't' | 'tn'>) {
   const own = ownReasons.find((m) => m === reason)
-  return own ? t(own) : reasonText(reason, t)
+  return own ? tr.t(own) : reasonText(reason, tr)
 }
 
 const through = async (
