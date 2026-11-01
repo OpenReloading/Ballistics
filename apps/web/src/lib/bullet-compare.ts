@@ -242,7 +242,7 @@ export function differenceToFirst(
     const marked = s.includes(',') || first.includes(',') ? text.replace('.', ',') : text
     return d === 0 ? `±${marked}` : `${d < 0 ? '−' : '+'}${marked}`
   }
-  return shown.map(difference)
+  return shown.map((s, i) => difference(s, i))
 }
 
 /**
