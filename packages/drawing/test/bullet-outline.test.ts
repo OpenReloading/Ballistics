@@ -8,6 +8,7 @@ import {
 } from '../src/bullet/index.ts'
 import { profileCrossesItself, triangleArea2 } from '../src/bullet/outline.ts'
 import type { SectionPoint } from '../src/core/types.ts'
+import { lengthText } from '../src/core/units.ts'
 import { defined } from './defined.ts'
 
 const deg = Math.PI / 180
@@ -454,14 +455,12 @@ describe('refused input', () => {
     })
   })
 
-  it('writes the lengths of a refusal with the given length text, mm by default', () => {
+  it('writes the lengths of a refusal in the given unit, mm by default', () => {
     const b = { ...base, noseLength: 30, base: { type: 'boat-tail' as const, length: 5 } }
-    const inches = (x: number) => `${(x / 25.4).toFixed(3)} in`
     const mmText = bulletOutline(b)
-    const inText = bulletOutline(b, 'sourced', inches)
     expect('reason' in mmText && mmText.reason).toMatch(/nose length 30 mm/)
-    expect(inText).toEqual({
-      reason: `The nose length 1.181 in is above the length less the boat tail, ${inches(base.length - 5)}.`,
+    expect(bulletOutline(b, 'sourced', 'in')).toEqual({
+      reason: `The nose length 1.1811 in is above the length less the boat tail, ${lengthText(base.length - 5, 'in')} in.`,
       fields: ['noseLength', 'length', 'base.length'],
     })
   })

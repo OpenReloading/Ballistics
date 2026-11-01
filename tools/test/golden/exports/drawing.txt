@@ -92,7 +92,6 @@
 ./bullet BulletModel
 ./bullet BulletProfile
 ./bullet BulletValues
-./bullet LengthText
 ./bullet Outline
 ./bullet Refusal
 ./bullet Tag

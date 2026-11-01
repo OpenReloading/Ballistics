@@ -5,7 +5,6 @@ import {
   bulletFigureModel,
   bulletProfile,
   bulletScreenEm,
-  type LengthText,
 } from '@open-reloading/drawing/bullet'
 import {
   type Bullet,
@@ -15,7 +14,7 @@ import {
   tipTypes,
   type UserBullet,
 } from '@open-reloading/schema'
-import { fixedNumber, plainNumber, untranslated } from '../i18n/number.ts'
+import { untranslated } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { computedBulletRows } from './bullet.ts'
 import {
@@ -32,13 +31,7 @@ import { designReduce, editHistory, type History as H, historyOf, pushHistory } 
 import { type ManufacturerNames, noManufacturerNames, productLabel } from './manufacturers.ts'
 import { nth } from './nth.ts'
 import type { FieldRow } from './record-fields.ts'
-import {
-  drawingLengthUnit,
-  inchText,
-  kilogramsPerGrain,
-  metersPerInch,
-  type UnitSystem,
-} from './units.ts'
+import { drawingLengthUnit, kilogramsPerGrain, metersPerInch, type UnitSystem } from './units.ts'
 import { dropPath, type ResolvedBullet, revisionOf, setPath } from './variants.ts'
 
 /** The field groups of the designer, in order. */
@@ -665,17 +658,6 @@ function ogiveFills(
 }
 
 /**
- * A length of a drawing refusal in the drawing's unit of `system`: "16 mm", ".630 in" (3
- * decimals, the language's decimal mark).
- */
-export function refusalLength(system: UnitSystem): LengthText {
-  const mmPerInch = fromSi('length', metersPerInch)
-  return drawingLengthUnit(system) === 'in'
-    ? (mm) => `${inchText(fixedNumber(mm / mmPerInch, 3), 'in')} in`
-    : (mm) => `${plainNumber(+mm.toFixed(3))} mm`
-}
-
-/**
  * The drawing, the field states and the computed values of a design. `last` is the field edited
  * last: a refusal naming it shows there, in the language of `t`. Invalid field text and refused
  * dimensions give no drawing, so the page keeps its last one.
@@ -705,7 +687,7 @@ export function evaluate(
   const completed = completeShape(v, choices)
   const shape = shapeFromValues(v, choices, completed.L, completed.n)
   const given = designerSpecs.map((s) => s.key).filter((k) => v[k] !== undefined)
-  const p = bulletProfile(shape, (f) => given.includes(f), 'entered', refusalLength(system))
+  const p = bulletProfile(shape, (f) => given.includes(f), 'entered', drawingLengthUnit(system))
   if ('reason' in p) {
     const field =
       p.fields.find((f) => f === last) ??

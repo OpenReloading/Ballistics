@@ -12,7 +12,7 @@ test('a refusal writes its lengths in inches on an inch page', async ({ page }) 
   const nose = page.getByRole('textbox', { name: /Nose length \(in\)$/ })
   await nose.fill('0.63')
   await length.fill('0.2')
-  await expect(page.getByText(/nose length \.630 in is above the length/).first()).toBeVisible()
+  await expect(page.getByText(/nose length \.6300 in is above the length/).first()).toBeVisible()
 })
 
 test('a diameter far outside a bullet asks to check the unit and still draws', async ({ page }) => {
@@ -26,7 +26,9 @@ test('a diameter far outside a bullet asks to check the unit and still draws', a
   await expect(diameter).not.toHaveAccessibleDescription(/Check the unit/)
 })
 
-test('the photograph dialog is about 34 rem wide', async ({ page }) => {
+test('the photograph dialog is about 34 rem wide until a photograph is loaded', async ({
+  page,
+}) => {
   await storeUnits(page)
   await page.setViewportSize({ width: 1280, height: 650 })
   await gotoHydrated(page, '/bullets/designer')
@@ -35,4 +37,8 @@ test('the photograph dialog is about 34 rem wide', async ({ page }) => {
   await expect(dialog.getByRole('button', { name: 'Try a sample' })).toBeVisible()
   const box = await dialog.boundingBox()
   expect(box?.width).toBeLessThanOrEqual(34 * 16 + 1)
+  // with a photograph the canvas and its controls get the room
+  await dialog.getByRole('button', { name: 'Try a sample' }).click()
+  await expect(dialog.getByText(/^Scale \d+\.\d+ px\/mm/)).toBeVisible({ timeout: 30_000 })
+  expect((await dialog.boundingBox())?.width).toBeGreaterThan(60 * 16)
 })

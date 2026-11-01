@@ -195,11 +195,11 @@ describe('refusals', () => {
     expect(evaluate(h.present, metric, 'length').refusal?.field).toBe('length')
   })
 
-  it('writes the lengths of an outline refusal in the page unit, inches with 3 decimals', () => {
+  it('writes the lengths of an outline refusal in the page unit, inches with 4 decimals', () => {
     const h = run(newDesign(metric), type('length', '30'), type('noseLength', '16'))
     const e = run(h.present, type('length', '5.08'))
     expect(evaluate(e.present, us, 'noseLength').refusal).toEqual({
-      reason: expect.stringContaining('nose length .630 in is above the length'),
+      reason: expect.stringContaining('nose length .6299 in is above the length'),
       field: 'noseLength',
     })
     expect(evaluate(e.present, metric, 'noseLength').refusal?.reason).toContain(

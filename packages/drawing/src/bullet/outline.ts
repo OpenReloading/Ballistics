@@ -1,5 +1,5 @@
 import type { SectionPoint } from '../core/types.ts'
-import { deg } from '../core/units.ts'
+import { deg, type LengthUnit, lengthText } from '../core/units.ts'
 import { closedEdges, pairs } from '../core/vector.ts'
 
 /**
@@ -62,8 +62,8 @@ export interface Refusal {
   fields: string[]
 }
 
-/** A length given in mm as a refusal reason writes it, with its unit: "16 mm", ".630 in". */
-export type LengthText = (mm: number) => string
+/** A length given in mm as a refusal reason writes it, with its unit: "16 mm", ".6299 in". */
+type LengthText = (mm: number) => string
 
 /** A refusal whose reason is written once the length unit is known. */
 interface Refused {
@@ -127,8 +127,11 @@ const worst = (...tags: Tag[]): Tag =>
       ? 'derived'
       : (tags[0] ?? 'derived')
 
-/** A length in mm to 3 decimals, the default of `LengthText`. */
+/** A length in mm to 3 decimals. */
 const mm: LengthText = (x) => `${+x.toFixed(3)} mm`
+/** A length in mm written in `unit`: mm to 3 decimals, inches as the figure labels write them. */
+const inUnit = (unit: LengthUnit): LengthText =>
+  unit === 'mm' ? mm : (x) => `${lengthText(x, 'in')} in`
 
 /** Twice the signed area of the triangle p, q, s. */
 export const triangleArea2 = (p: SectionPoint, q: SectionPoint, s: SectionPoint) =>
@@ -175,15 +178,15 @@ export function profileCrossesItself(points: SectionPoint[]): boolean {
 /**
  * Bullet outline from the given dimensions; stated proportions stand in for missing ones and
  * are named in the notes. Input that cannot form an outline returns a reason. Ogive radius and
- * Rt/R as defined by McCoy, ARBRL-TR-02293, 1981, PDF p. 13.
+ * Rt/R as defined by McCoy, ARBRL-TR-02293, 1981, PDF p. 13. A refusal writes its lengths in `unit`.
  */
 export function bulletOutline(
   b: BulletDimensions,
   given: 'sourced' | 'entered' = 'sourced',
-  length: LengthText = mm,
+  unit: LengthUnit = 'mm',
 ): Outline | Refusal {
   const o = outlineOf(b, given)
-  return 'reason' in o ? { reason: o.reason(length), fields: o.fields } : o
+  return 'reason' in o ? { reason: o.reason(inUnit(unit)), fields: o.fields } : o
 }
 
 /** The outline of `bulletOutline`, or a refusal not yet written in a length unit. */
