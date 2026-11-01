@@ -216,6 +216,13 @@ test('from 75em the top bar buttons follow the page actions in the keyboard orde
     expect(x).toBeGreaterThan(left)
     left = x
   }
+  // on the workbench, whose status does not fill the bar, at 1920 px too: Safety stays beside them
+  await page.setViewportSize({ width: 1920, height: 900 })
+  await gotoHydrated(page, '/workbench')
+  const notice = page.locator('.page-bar .page-bar-safety')
+  const next = page.locator('.page-bar .top-end').locator('button:visible, a:visible').first()
+  const [a, b] = [await notice.boundingBox(), await next.boundingBox()]
+  expect((b?.x ?? 0) - ((a?.x ?? 0) + (a?.width ?? 0))).toBeLessThanOrEqual(9)
   // below 75em they stay in the top bar, before the page bar's row
   await page.setViewportSize({ width: 390, height: 844 })
   await expect(

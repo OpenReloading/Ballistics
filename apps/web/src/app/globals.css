@@ -10442,8 +10442,9 @@ main .page-bar h1 {
     right: var(--mantine-spacing-md);
   }
 
+  /* no auto margin of its own: the workbench's status pushes the actions right with one */
   .page-bar-end > .top-end {
-    margin-top: 0;
+    margin: 0;
   }
 
   .page-bar {
@@ -10476,12 +10477,13 @@ main .page-bar h1 {
 /* the Units button as an icon, named by its whole name, until its preset leaves a record's title
    its room (German, three page actions) */
 @media screen and (min-width: 75em) and (max-width: 104.99em) {
-  .page-bar .units-link {
+  /* beats the bar's left-section padding, so the icon sits in the middle */
+  .page-bar .units-link.mantine-Button-root[data-with-left-section] {
     width: var(--button-height, 2.25rem);
     padding: 0;
   }
 
-  .page-bar .units-link .mantine-Button-section {
+  .page-bar .units-link .mantine-Button-section[data-position="left"] {
     margin: 0;
   }
 
