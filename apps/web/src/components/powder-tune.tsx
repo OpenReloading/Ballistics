@@ -368,7 +368,7 @@ function FitResult({
       {fit && revolver && (
         <Message severity="warning">
           {t(
-            'If this load is fired from a revolver: no leak area is set, so the fitted values take up the gas lost at the cylinder gap, and the simulated pressure can come out too low.',
+            'If these strings were shot from a revolver: no leak area is set, so the fitted values take up the gas lost at the cylinder gap, and the simulated pressure can come out too low.',
           )}
         </Message>
       )}

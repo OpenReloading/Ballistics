@@ -202,7 +202,7 @@ describe('refusals and rules on the screen', () => {
 
   it('notes a revolver fit without a leak area, not one with a leak area or a rifle fit', () => {
     const state = { fit: fitted, range: ranged, running: false }
-    const note = 'If this load is fired from a revolver: no leak area is set'
+    const note = 'If these strings were shot from a revolver: no leak area is set'
     expect(text(state, load(0.38), 'IV')).toContain(note)
     const leaking = { ...load(0.38), leakage: { area: [{ travel: 0, area: 1e-7 }] } }
     expect(text(state, leaking, 'IV')).not.toContain(note)
