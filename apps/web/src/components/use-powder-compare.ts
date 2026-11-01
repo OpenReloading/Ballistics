@@ -96,6 +96,7 @@ export function answerRow(
     body: { load: InteriorBody['load'] }
     bulkDensity?: number | undefined
     resistanceMissing?: { powder: string; missing: string[] } | undefined
+    castHardness?: number | undefined
   },
   charge: number,
   answer: InteriorResponse,
@@ -107,6 +108,7 @@ export function answerRow(
       load: { ...req.body.load, charge },
       bulkDensity: req.bulkDensity,
       resistanceMissing: req.resistanceMissing,
+      castHardness: req.castHardness,
     }
     const r = answer.result
     const flag = stepFlag(shown, english.t)

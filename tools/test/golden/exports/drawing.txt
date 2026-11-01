@@ -92,7 +92,10 @@
 ./bullet BulletModel
 ./bullet BulletProfile
 ./bullet BulletValues
+./bullet DensityConstruction
+./bullet MaterialClass
 ./bullet Outline
+./bullet OutlineDensity
 ./bullet Refusal
 ./bullet Tag
 ./bullet assumedBelow
@@ -103,6 +106,14 @@
 ./bullet bulletProfile
 ./bullet bulletScreenEm
 ./bullet bulletSymbols
+./bullet cavityDepthBracket
+./bullet cavityVolumeBracket
+./bullet copperDensity
+./bullet jacketedDensity
+./bullet leadDensity
+./bullet materialClass
+./bullet materialDensityBound
+./bullet outlineDensity
 ./bullet profileCrossesItself
 ./bullet recordProfile
 ./bullet revolutionVolume

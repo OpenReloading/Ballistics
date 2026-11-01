@@ -36,6 +36,8 @@ export interface BulletDimensions {
         angle?: number | undefined
         /** Diameter of the cavity of a hollow base where it opens in the base face. */
         cavityDiameter?: number | undefined
+        /** Depth of the cavity of a hollow base from the base face, measured or typed; without it the depth is assumed. */
+        cavityDepth?: number | undefined
       }
     | undefined
   /**
@@ -90,8 +92,11 @@ export interface Outline {
   approximate: [number, number][]
   /** Index in `points` of the edge of the base face. */
   baseEdge: number
-  /** The cavity of a hollow base: its radius at the base face and its depth, an assumed shape. */
-  cavity?: { radius: number; depth: number }
+  /**
+   * The cavity of a hollow base: its radius at the base face and its depth, assumed unless `typed`
+   * (a depth the input gives).
+   */
+  cavity?: { radius: number; depth: number; typed: boolean }
   noseLength: number
   noseAssumed: boolean
   /** Shank length between the boat tail and the nose, mm. */
@@ -313,7 +318,9 @@ function closeOutline(
     segments,
     approximate,
     baseEdge,
-    ...(cavity && { cavity: { radius: cavity.radius, depth: cavity.depth } }),
+    ...(cavity && {
+      cavity: { radius: cavity.radius, depth: cavity.depth, typed: cavity.typed },
+    }),
     noseLength: n,
     noseAssumed: nTag === 'approximate',
     bearingLength,
@@ -522,14 +529,22 @@ function baseGeometry(
 
 /**
  * The cavity of a hollow base, from its apex on the axis to its edge on the base face: a cone or a
- * hemisphere whose depth is its radius, the cone at a half angle of 45 degrees. Without a stated
- * depth the shape is assumed, so the cavity is always drawn as an assumed one.
+ * half ellipsoid (a hemisphere when the depth is the radius). Without a given depth it is as deep as
+ * its radius, the cone at a half angle of 45 degrees, an assumed shape drawn as an assumed one; a
+ * given depth (`typed`) is drawn as given.
  */
 interface Cavity {
   radius: number
   depth: number
+  typed: boolean
   points: SectionPoint[]
 }
+
+/**
+ * The bracket of the depth of a cavity whose depth is not given, as multiples of its radius: half
+ * to three times the assumed depth. An assumption without a source (no maker publishes a depth).
+ */
+export const cavityDepthBracket = Object.freeze({ low: 0.5, high: 3 })
 
 /** The cavity of a hollow base type with a cavity diameter; none otherwise. */
 function cavityGeometry(
@@ -552,32 +567,34 @@ function cavityGeometry(
       'base.diameter',
       'diameter',
     )
-  if (!(r < b.length))
+  const typed = b.base?.cavityDepth
+  if (typed !== undefined && !(typed > 0))
+    return fail('The cavity depth must be positive.', 'base.cavityDepth')
+  const h = typed ?? r
+  if (!(h < b.length))
     return fail(
-      (l) => `The cavity depth ${l(r)} is not below the length ${l(b.length)}.`,
-      'base.cavityDiameter',
+      (l) => `The cavity depth ${l(h)} is not below the length ${l(b.length)}.`,
+      typed === undefined ? 'base.cavityDiameter' : 'base.cavityDepth',
       'length',
     )
-  const shape = type === 'conical-hollow-base' ? 'cone' : 'hemisphere'
-  notes.push(
-    (l) =>
-      `The cavity depth is assumed: a ${shape} as deep as its opening is wide at its radius, ${l(r)}.`,
-  )
-  const points: SectionPoint[] =
-    type === 'conical-hollow-base'
-      ? [
-          [0, r],
-          [r, 0],
-        ]
-      : Array.from({ length: steps + 1 }, (_, j) =>
-          j === steps
-            ? [r, 0]
-            : [
-                r * Math.sin(((j / steps) * Math.PI) / 2),
-                r * Math.cos(((j / steps) * Math.PI) / 2),
-              ],
-        )
-  return { radius: r, depth: r, points }
+  const cone = type === 'conical-hollow-base'
+  if (typed === undefined)
+    notes.push(
+      (l) =>
+        `The cavity depth is assumed: a ${cone ? 'cone' : 'hemisphere'} as deep as its opening is wide at its radius, ${l(r)}.`,
+    )
+  else notes.push((l) => `The cavity depth is typed: ${l(h)}.`)
+  const points: SectionPoint[] = cone
+    ? [
+        [0, h],
+        [r, 0],
+      ]
+    : Array.from({ length: steps + 1 }, (_, j) =>
+        j === steps
+          ? [r, 0]
+          : [r * Math.sin(((j / steps) * Math.PI) / 2), h * Math.cos(((j / steps) * Math.PI) / 2)],
+      )
+  return { radius: r, depth: h, typed: typed !== undefined, points }
 }
 
 /** The nose length n: given, else the length less tail and bearing, else assumed. */
@@ -937,8 +954,9 @@ function addBottom({ given, cavity }: Parts, add: AddPoint) {
     add([0, 0], given, false)
     return
   }
+  const wall = cavity.typed ? given : 'approximate'
   for (const [j, p] of cavity.points.entries())
-    add(p, j === cavity.points.length - 1 ? given : 'approximate', j > 0)
+    add(p, j === cavity.points.length - 1 ? given : wall, !cavity.typed && j > 0)
 }
 
 /** The base edge and, past it, the boat tail's end and a rebate's step. */
@@ -1059,6 +1077,41 @@ export function revolutionVolume(points: SectionPoint[], cut: number): number {
   return v
 }
 
-/** Whether the bullet below `cut` mm rests on an assumed shape: an assumed range or a cavity. */
+/**
+ * The bullet volume below `cut` mm, mm³, with the cavity of a hollow base at the ends of
+ * {@link cavityDepthBracket} instead of its assumed depth: `low` with the deepest cavity, `high` with
+ * the shallowest. Undefined without a cavity of assumed depth, with nothing below the cut, or when a
+ * bracket depth gives no outline. A deepest cavity that would reach the length is held just below
+ * it; one that would cut through the wall (a boat tail, a short shank) is made shallower, to the
+ * deepest depth whose outline holds (bisection down to the assumed depth).
+ */
+export function cavityVolumeBracket(
+  b: BulletDimensions,
+  cut: number,
+): { low: number; high: number } | undefined {
+  const o = bulletOutline(b)
+  if ('reason' in o || !o.cavity || o.cavity.typed || !(cut > 0)) return
+  const r = o.cavity.radius
+  const below = (depth: number) => {
+    const at = bulletOutline({ ...b, base: { ...b.base, cavityDepth: depth } })
+    return 'reason' in at ? undefined : revolutionVolume(at.points, Math.min(cut, b.length))
+  }
+  // the deepest depth up to the bracket's end whose outline holds: bisection from the assumed depth
+  let ok = r
+  let bad = Math.min(cavityDepthBracket.high * r, 0.999 * b.length)
+  if (below(bad) !== undefined) ok = bad
+  else
+    for (let i = 0; i < 30 && bad - ok > 1e-6 * r; i++) {
+      const mid = (ok + bad) / 2
+      if (below(mid) === undefined) bad = mid
+      else ok = mid
+    }
+  const low = below(ok)
+  const high = below(cavityDepthBracket.low * r)
+  return low === undefined || high === undefined ? undefined : { low, high }
+}
+
+/** Whether the bullet below `cut` mm rests on an assumed shape: an assumed range or a cavity of assumed depth. */
 export const assumedBelow = (o: Outline, cut: number): boolean =>
-  (o.cavity !== undefined && cut > 0) || o.approximate.some(([z0, z1]) => z1 > z0 && z0 < cut)
+  (o.cavity !== undefined && !o.cavity.typed && cut > 0) ||
+  o.approximate.some(([z0, z1]) => z1 > z0 && z0 < cut)

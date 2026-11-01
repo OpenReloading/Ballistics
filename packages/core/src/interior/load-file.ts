@@ -63,6 +63,9 @@ export function interiorLoad(
   const leakArea = values.leakArea === undefined ? undefined : v('leakArea')
   if (leakArea !== undefined && leakArea < 0)
     throw new ValueError('leakArea', `${label('leakArea')} must be at least 0.`)
+  // a worn throat adds its length times the bore area behind the bullet (`apps/docs/docs/models/interior-m3.md`, "Throat wear")
+  const wear = values.throatWear === undefined ? 0 : v('throatWear')
+  if (wear < 0) throw new ValueError('throatWear', `${label('throatWear')} must be at least 0.`)
   const form = Object.entries(burnFormKeys).filter(([k]) => values[k] !== undefined)
   if (form.length > 0 && form.length < 4) {
     const missing = Object.entries(burnFormKeys).filter(([k]) => values[k] === undefined)
@@ -76,6 +79,7 @@ export function interiorLoad(
       volume: v('volume'),
       boreArea: boreArea({ area: values.boreArea, boreDiameter, grooveDiameter }),
       boreDiameter,
+      ...(wear > 0 && { throatWear: wear }),
     },
     barrel: { length: v('travel'), twist: v('twist') },
     bullet: { mass: v('bulletMass') },

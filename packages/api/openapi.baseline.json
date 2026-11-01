@@ -419,6 +419,24 @@
                           "required": ["value"],
                           "additionalProperties": false,
                           "unit": "mm"
+                        },
+                        "cavityDepth": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "description": "In mm."
+                            },
+                            "raw": {
+                              "type": "string",
+                              "minLength": 1,
+                              "description": "The value as written in the source, when it differed."
+                            }
+                          },
+                          "required": ["value"],
+                          "additionalProperties": false,
+                          "unit": "mm"
                         }
                       },
                       "additionalProperties": false
@@ -13429,6 +13447,11 @@
                           "boreDiameter": {
                             "type": "number",
                             "description": "Bore diameter, m. Sets the heat-loss area and the default radius of gyration."
+                          },
+                          "throatWear": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Default 0."
                           }
                         },
                         "required": ["volume", "boreArea", "boreDiameter"],
@@ -15270,6 +15293,11 @@
                           "boreDiameter": {
                             "type": "number",
                             "description": "Bore diameter, m. Sets the heat-loss area and the default radius of gyration."
+                          },
+                          "throatWear": {
+                            "type": "number",
+                            "minimum": 0,
+                            "description": "Throat wear, m: length a worn throat adds behind the bullet; the run adds it times the bore area to the volume. Default 0."
                           }
                         },
                         "required": ["volume", "boreArea", "boreDiameter"],
@@ -18033,6 +18061,45 @@
                                             },
                                             "cavityDiameter": {
                                               "description": "The `base.cavityDiameter` of the bullet record. `null` removes it.",
+                                              "anyOf": [
+                                                {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "value": {
+                                                      "description": "In mm.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "number",
+                                                          "exclusiveMinimum": 0,
+                                                          "description": "In mm."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "raw": {
+                                                      "description": "The value as written in the source, when it differed.",
+                                                      "anyOf": [
+                                                        {
+                                                          "type": "string",
+                                                          "minLength": 1,
+                                                          "description": "The value as written in the source, when it differed."
+                                                        },
+                                                        {
+                                                          "type": "null"
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+                                                },
+                                                {
+                                                  "type": "null"
+                                                }
+                                              ]
+                                            },
+                                            "cavityDepth": {
+                                              "description": "The `base.cavityDepth` of the bullet record. `null` removes it.",
                                               "anyOf": [
                                                 {
                                                   "type": "object",
@@ -21063,6 +21130,11 @@
                                           "unit": "mm",
                                           "description": "The value of `bulletCavityDiameter` in mm."
                                         },
+                                        "bulletCavityDepth": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `bulletCavityDepth` in mm."
+                                        },
                                         "pmax": {
                                           "type": "number",
                                           "unit": "bar",
@@ -21157,6 +21229,11 @@
                                           "type": "number",
                                           "unit": "mm2",
                                           "description": "The value of `leakArea` in mm2."
+                                        },
+                                        "throatWear": {
+                                          "type": "number",
+                                          "unit": "mm",
+                                          "description": "The value of `throatWear` in mm."
                                         },
                                         "boreFriction": {
                                           "type": "number",

@@ -214,6 +214,15 @@ export const interiorFields = [
     min: 0,
   },
   {
+    key: 'throatWear',
+    label: msg('Throat wear'),
+    help: msg(
+      'Optional. Extra length behind the bullet; times the bore area it adds to the volume. Empty: none.',
+    ),
+    quantity: 'length',
+    min: 0,
+  },
+  {
     key: 'boreFriction',
     label: msg('Bore friction'),
     help: msg(
@@ -304,7 +313,19 @@ export const bulletFields = [
   {
     key: 'bulletCavityDiameter',
     label: msg('Cavity diameter'),
-    help: msg('Opening of the hollow base. Its depth follows from it.'),
+    help: msg(
+      'Opening of the hollow base. Its depth follows from it unless Cavity depth is given.',
+    ),
+    quantity: 'length',
+    min: 0,
+    positive: true,
+  },
+  {
+    key: 'bulletCavityDepth',
+    label: msg('Cavity depth'),
+    help: msg(
+      'Measured depth of the hollow base. Empty: its radius, an assumption the pressure range covers up to 20 % of the volume.',
+    ),
     quantity: 'length',
     min: 0,
     positive: true,
@@ -362,7 +383,7 @@ export type InteriorBody = {
   load: InteriorLoad
   cartridge?: string | undefined
   /** The tolerance of the chamber volume of the range, relative: the interval of an approximate volume. */
-  tolerances?: { volumeFraction: number }
+  tolerances?: { volumeFraction: number } | undefined
   /** A pressure limit the user typed, Pa: the one limit instead of the cartridge's CIP Pmax. */
   pressureLimit?: number | undefined
 }
