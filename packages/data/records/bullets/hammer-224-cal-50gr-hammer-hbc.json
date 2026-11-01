@@ -21,6 +21,10 @@
     "value": 13.97,
     "raw": "Nose length including tip: .550″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G7",
@@ -55,6 +59,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/224-cal-50gr-hammer-hbc/: Minimum required twist rate is 1-10″ or faster | Bullet length including tip: .880″ | Nose length including tip: .550″ | Length of tip: .143″ | Bullet weight: 50gr | Recommended use: Small to Medium game Hunting | g7-bc= .136 | g1-bc= .287 | form factor= 1.05 | calculated from shot drops at 500y, 1000′ elevation, MV of 4250 fps"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }
