@@ -81,6 +81,8 @@ Code: `packages/drawing/src/seating/seating.ts`, `intrusion`, `seat`, `packages/
 
 A bullet without a cavity diameter, whatever its base type, is drawn and counted as before. A hollow base type without a cavity diameter is drawn with a flat face and a note.
 
+A case length L3 typed in the workbench replaces the cartridge side's L3 of the sheet for the cartridge figure and the seating (`apps/web/src/lib/cartridge-sheet.ts`, `withCaseLength`). The chamber's L3 and the sheet's other values stay.
+
 The workbench takes the base type, the boat-tail length, the base face diameter and the cavity diameter typed over the bullet record's (`apps/web/src/lib/bullet.ts`, `typedBullet`): the outline and $V_b$ follow them. A flat base keeps no diameter, angle or cavity, a boat tail no cavity. A typed boat-tail length drops the record's bearing length, and a typed boat-tail length or base diameter its boat-tail angle: the outline derives them from the other dimensions, which would otherwise contradict the typed value.
 
 ### Volume behind the bullet

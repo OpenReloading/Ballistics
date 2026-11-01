@@ -16,6 +16,7 @@ import {
 } from '../lib/charge-target.ts'
 import { translateMessage } from '../lib/core-messages.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
+import { typedSpec } from '../lib/record-specs.ts'
 import { formatQuantity, msText, withUnit } from '../lib/units.ts'
 import { AppModal } from './app-modal.tsx'
 import { useLoad } from './workbench-context.ts'
@@ -40,7 +41,7 @@ function requestKey(loadRequest: () => { body: object; bulkDensity?: number | un
  */
 export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClose: () => void }) {
   const { t } = useTranslation()
-  const { system, cartridge, loadRequest, applyCharge, powderDesign } = useLoad()
+  const { system, cartridge, loadRequest, applyCharge, powderDesign, typedSpecFields } = useLoad()
   const [kind, setKind] = useState<TargetKind>('peakPressure')
   const [percent, setPercent] = useState(false)
   const [value, setValue] = useState<string | number>('')
@@ -50,8 +51,9 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
   // the closed dialog builds no request: it is mounted on every workbench render
   const request = opened ? requestKey(loadRequest) : ''
   const answer = solved?.request === request ? solved : undefined
-  // a percentage needs the cartridge's CIP limit
-  const percentable = kind === 'peakPressure' && cartridge !== undefined
+  // a percentage needs the cartridge's CIP limit or a Pmax typed
+  const yours = typedSpec(typedSpecFields, 'pmax') !== undefined
+  const percentable = kind === 'peakPressure' && (cartridge !== undefined || yours)
   const asPercent = percentable && percent
   const unit = targetUnit(kind, system, asPercent)
 
@@ -157,7 +159,11 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
               <Button
                 variant="default"
                 aria-pressed={percent}
-                title={t("Read the value as a percentage of the cartridge's CIP Pmax")}
+                title={
+                  yours
+                    ? t('Read the value as a percentage of your Pmax')
+                    : t("Read the value as a percentage of the cartridge's CIP Pmax")
+                }
                 onClick={() => {
                   setPercent((p) => !p)
                   setValue('')

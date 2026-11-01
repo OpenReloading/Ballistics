@@ -217,6 +217,22 @@ describe('POST /interior/load-file', () => {
     expect(longer.body.summary.muzzleVelocity).not.toBe(record.body.summary.muzzleVelocity)
   })
 
+  it('takes a typed Pmax as the one compared limit and a typed bulk density for the load ratio', async () => {
+    const data = { cartridge: 'beta-pistol', bullet: longBullet.id, powder: fitted.id }
+    const record = await simulate(file({ ...data, siValues }))
+    const peak = record.body.summary.peakPressure
+    const typed = await simulate(file({ ...data, siValues: { ...siValues, pmax: peak / 2 } }))
+    expect(typed.body.limits).toEqual([
+      expect.objectContaining({ typed: true, method: 'typed', pressure: peak / 2, exceeded: true }),
+    ])
+    expect(typed.body.warnings.map((w: { code: string }) => w.code)).toContain('limitExceeded')
+    // the run itself does not read the Pmax
+    expect(typed.body.summary.muzzleVelocity).toBe(record.body.summary.muzzleVelocity)
+    const dense = await simulate(file({ ...data, siValues: { ...siValues, bulkDensity: 1000 } }))
+    expect(dense.body.summary.loadRatio).toBeCloseTo(0.0028 / 1000 / 3.4e-6, 12)
+    expect(dense.body.resolved.powder.suppliedFields).toEqual(['interior.resistance'])
+  })
+
   it('takes a leak area as an input: the load of /interior with a constant leak, a lower velocity', async () => {
     const leakArea = 5e-6
     const sim = await simulate(file({ siValues: { ...siValues, leakArea } }))

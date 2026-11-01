@@ -3,6 +3,7 @@
 import { plainNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import type { InteriorResponse } from './api-types.ts'
+import { limitShare, limitWithValue } from './limit-text.ts'
 import { nth } from './nth.ts'
 import { type PlaybackResult, type PlaybackSample, sampler } from './playback.ts'
 import { type UnitSystem, withUnit } from './units.ts'
@@ -168,14 +169,13 @@ const referenceLines = [85, 75] as const
 export function limitLines(limits: Limit[] | undefined, system: UnitSystem, t: Translator['t']) {
   const l = pressureLimit(limits)
   if (l?.pressure === undefined) return
-  const name = `CIP ${l.symbol}`
   const value = withUnit('pressure', system, l.pressure)
   const max = system.pressure.fromSi(l.pressure)
   return [
-    { y: max, label: `${name} ${value}` },
+    { y: max, label: limitWithValue(l, value, t) },
     ...referenceLines.map((m) => ({
       y: (max * m) / 100,
-      label: t('{percent} % of {name}', { percent: m, name }),
+      label: limitShare(l, m, t),
     })),
   ]
 }

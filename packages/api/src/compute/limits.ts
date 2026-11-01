@@ -22,12 +22,14 @@ export type CartridgeWithSpecs = Pick<
   'id' | 'name' | 'published' | 'revised' | 'pressureMethod' | 'provenance'
 > & { values: Pick<SpecValue, 'symbol' | 'value' | 'variant'>[] }
 
-/** One Pmax of a cartridge's C.I.P. sheet and its comparison with the simulated range. */
+/** One Pmax of a cartridge's C.I.P. sheet, or the one the caller typed, and its comparison with the simulated range. */
 export type Limit = {
-  /** Id of the cartridge. */
-  cartridge: string
-  /** Date of the sheet revision, `revised` or else `published`. */
-  revised: string
+  /** Id of the cartridge; absent for a typed limit. */
+  cartridge?: string
+  /** Date of the sheet revision, `revised` or else `published`; absent for a typed limit. */
+  revised?: string
+  /** The caller typed this limit (`pressureLimit`): it is no value of a sheet. */
+  typed?: true
   symbol: string
   method: string | null
   variant?: string
@@ -104,12 +106,35 @@ function limit(
   }
 }
 
+/** The limit the caller typed instead of a sheet's Pmax: always compared, with no sheet or method behind it. */
+function typedLimit(pressure: number, range: PressureRange): Limit {
+  return {
+    symbol: 'Pmax',
+    method: 'typed',
+    typed: true,
+    pressure,
+    compared: true,
+    exceeded: range.highPressure > pressure,
+    nominalExceeded: range.nominalPressure > pressure,
+  }
+}
+
 function exceededMessage(l: Limit, range: PressureRange) {
+  if (l.typed) return typedExceededMessage(l, range)
   const name = `CIP ${l.symbol}${l.variant ? ` (${l.variant})` : ''}`
-  const where = `${sheetId({ id: l.cartridge, published: l.revised })}; ${l.method ?? 'measuring method not stated in the record'}`
+  const where = `${sheetId({ id: l.cartridge as string, published: l.revised as string })}; ${l.method ?? 'measuring method not stated in the record'}`
   const limit = l.pressure as number
   // the limit with the decimals stored in the record
   const limitText = `${name} ${+fromSi('pressure', limit).toPrecision(12)} bar (${where})`
+  const { nominalPressure: p0, lowPressure: low, highPressure: high } = range
+  return l.nominalExceeded
+    ? `Simulated peak pressure ${bar(p0, limit)} (range ${Math.round(fromSi('pressure', low))} to ${bar(high, limit)}) is above ${limitText}.`
+    : `The upper end of the simulated peak pressure range, ${bar(high, limit)}, is above ${limitText}; the nominal value is ${bar(p0, limit)}.`
+}
+
+function typedExceededMessage(l: Limit, range: PressureRange) {
+  const limit = l.pressure as number
+  const limitText = `the typed ${l.symbol} ${+fromSi('pressure', limit).toPrecision(12)} bar`
   const { nominalPressure: p0, lowPressure: low, highPressure: high } = range
   return l.nominalExceeded
     ? `Simulated peak pressure ${bar(p0, limit)} (range ${Math.round(fromSi('pressure', low))} to ${bar(high, limit)}) is above ${limitText}.`
@@ -152,13 +177,38 @@ function chargeWarning(charge: {
   )
 }
 
+/** The `limitExceeded` warning of an exceeded limit; `sheet` the id of the C.I.P. sheet it comes from. */
+function exceededWarning(l: Limit, range: PressureRange, sheet: string | undefined) {
+  return warning(advisoryRule.limitExceeded, exceededMessage(l, range), {
+    ...(sheet !== undefined && { spec: sheet }),
+    symbol: l.symbol,
+    ...(l.variant !== undefined && { variant: l.variant }),
+    method: l.method,
+  })
+}
+
 /**
  * The Pmax limits of the C.I.P. sheet of `cartridge` against `range`, their warnings
  * (`noCartridge` without a cartridge, else `limitExceeded` per exceeded limit and
- * `noComparableLimit`) and the cartridge part of `resolved`.
+ * `noComparableLimit`) and the cartridge part of `resolved`. A typed pressure limit
+ * (`pressureLimit`, Pa) is the one limit instead: the sheet's values are not compared.
  */
-function cartridgeLimits(range: PressureRange, cartridge: CartridgeWithSpecs | undefined) {
+function cartridgeLimits(
+  range: PressureRange,
+  cartridge: CartridgeWithSpecs | undefined,
+  pressureLimit: number | undefined,
+) {
   const warnings: Warning[] = []
+  if (pressureLimit !== undefined) {
+    const typed = typedLimit(pressureLimit, range)
+    if (typed.exceeded) warnings.push(exceededWarning(typed, range, undefined))
+    const echo = cartridge && {
+      id: cartridge.id,
+      name: cartridge.name,
+      provenance: cartridge.provenance,
+    }
+    return { limits: [typed], warnings, resolved: echo }
+  }
   if (cartridge === undefined) {
     warnings.push(
       warning(advisoryRule.noCartridge, 'No cartridge id was given, so no CIP Pmax was checked.'),
@@ -169,15 +219,7 @@ function cartridgeLimits(range: PressureRange, cartridge: CartridgeWithSpecs | u
     .filter((v) => v.symbol === 'Pmax')
     .map((v) => limit(cartridge, v, range))
   for (const l of limits)
-    if (l.exceeded)
-      warnings.push(
-        warning(advisoryRule.limitExceeded, exceededMessage(l, range), {
-          spec: sheetId(cartridge),
-          symbol: l.symbol,
-          ...(l.variant !== undefined && { variant: l.variant }),
-          method: l.method,
-        }),
-      )
+    if (l.exceeded) warnings.push(exceededWarning(l, range, sheetId(cartridge)))
   if (!limits.some((l) => l.compared))
     warnings.push(
       warning(
@@ -224,13 +266,15 @@ interface ChargeRun {
 /**
  * Limits, warnings and the cartridge echo for a pressure range; `cartridge` undefined when no id
  * was given. `run` (M3 only) adds the charge-too-small check and the input rules of the registry.
+ * `pressureLimit` (Pa) is a limit the caller typed in place of the cartridge's Pmax values.
  */
 export function limitCheck(
   range: PressureRange,
   cartridge: CartridgeWithSpecs | undefined,
   run?: ChargeRun,
+  pressureLimit?: number,
 ): LimitCheck {
-  const { limits, warnings, resolved } = cartridgeLimits(range, cartridge)
+  const { limits, warnings, resolved } = cartridgeLimits(range, cartridge, pressureLimit)
   warnings.push(...rangeWarnings(range))
   const small =
     run &&

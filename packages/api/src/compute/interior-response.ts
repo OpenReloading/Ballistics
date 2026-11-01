@@ -175,10 +175,14 @@ const sampled = z
 const limits = z
   .array(
     z.looseObject({
-      cartridge: text('Id of the cartridge'),
-      revised: text('Date of the sheet revision'),
+      cartridge: text('Id of the cartridge, absent for a typed limit').optional(),
+      revised: text('Date of the sheet revision, absent for a typed limit').optional(),
+      typed: z.literal(true).optional().describe('The caller typed the limit (pressureLimit)'),
       symbol: text('Symbol of the limit, Pmax for CIP'),
-      method: z.string().nullable().describe('Measuring method, null when the record states none'),
+      method: z
+        .string()
+        .nullable()
+        .describe('Measuring method, null when the record states none, typed for a typed limit'),
       variant: text('Variant of the value').optional(),
       pressure: num('The limit, Pa, absent when the record holds no value').optional(),
       compared: z.boolean().describe('The limit is compared with the simulated range'),
@@ -188,7 +192,9 @@ const limits = z
     }),
   )
   .optional()
-  .describe('CIP pressure limits of the cartridge, absent without a cartridge id')
+  .describe(
+    'CIP pressure limits of the cartridge, or the one limit typed by the caller; absent without a cartridge id or a typed limit',
+  )
 
 const warnings = z
   .array(
@@ -380,8 +386,9 @@ export const chargeTargetResponse = z.looseObject({
       ).optional(),
       limit: z
         .looseObject({
-          cartridge: text('Id of the cartridge'),
-          revised: text('Date of the sheet revision'),
+          cartridge: text('Id of the cartridge, absent for a typed limit').optional(),
+          revised: text('Date of the sheet revision, absent for a typed limit').optional(),
+          typed: z.literal(true).optional().describe('The caller typed the limit (pressureLimit)'),
           symbol: text('Symbol of the limit'),
           variant: text('Variant of that limit').optional(),
           pressure: num('The limit, Pa'),

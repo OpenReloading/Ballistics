@@ -15,6 +15,7 @@ import {
   type UnfittedPowder,
 } from '../lib/burn-rate.ts'
 import { translateMessage } from '../lib/core-messages.ts'
+import { limitShare, limitWithValue } from '../lib/limit-text.ts'
 import { burnRateLabel, type Lot } from '../lib/lot-rows.ts'
 import { ipscPowerFactor, powerFactor } from '../lib/power-factor.ts'
 import { type RunnableLadderKind, seatingLengthName } from '../lib/seating-ladder.ts'
@@ -318,16 +319,11 @@ function PeakLimits({
   const pressure = ofMax.limit.pressure
   if (pressure === undefined) return null
   const percent = formatNumber(ofMax.percent, 0)
-  const symbol = ofMax.limit.symbol
   return (
     <span>
       {printed ? (
         // the report prints the limits table itself: the limit as text, no control
-        t('{percent} % of CIP {symbol} {limit}', {
-          percent,
-          symbol,
-          limit: withUnit('pressure', system, pressure),
-        })
+        limitShare(ofMax.limit, percent, t, withUnit('pressure', system, pressure))
       ) : (
         /* the limits table and its sources one click away */
         <AppPopover position="bottom" width={popoverWidth.table} withinPortal trapFocus>
@@ -335,12 +331,9 @@ function PeakLimits({
             <UnstyledButton
               className="readout-limits"
               aria-haspopup="dialog"
-              title={t('CIP {symbol} {limit}', {
-                symbol,
-                limit: withUnit('pressure', system, pressure),
-              })}
+              title={limitWithValue(ofMax.limit, withUnit('pressure', system, pressure), t)}
             >
-              {t('{percent} % of CIP {symbol}', { percent, symbol })}
+              {limitShare(ofMax.limit, percent, t)}
             </UnstyledButton>
           </Popover.Target>
           <Popover.Dropdown className="limits-popover">
@@ -528,10 +521,7 @@ function LimitRange({ body, system }: { body: InteriorResponse; system: UnitSyst
   const unit = system.pressure.symbol
   // the nominal's and the limit's labels on the far sides of their lines, so they never meet
   const below = nominal < limit.pressure
-  const name = t('CIP {symbol} {limit}', {
-    symbol: limit.symbol,
-    limit: `${text(limit.pressure)} ${unit}`,
-  })
+  const name = limitWithValue(limit, `${text(limit.pressure)} ${unit}`, t)
   return (
     <div
       className="limit-range"
@@ -610,14 +600,14 @@ export function LimitsView({
         {body.limits.map((l, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: two limits can share symbol, variant and method
           <tr key={i}>
-            <td data-label={heads[0]}>
-              <StandardBadge label="CIP" />
-            </td>
+            <td data-label={heads[0]}>{l.typed ? t('typed') : <StandardBadge label="CIP" />}</td>
             <td data-label={heads[1]}>
               {l.symbol}
               {l.variant && ` (${l.variant})`}
             </td>
-            <td data-label={heads[2]}>{l.method ?? t('not stated in the record')}</td>
+            <td data-label={heads[2]}>
+              {l.typed ? '' : (l.method ?? t('not stated in the record'))}
+            </td>
             <td data-label={heads[3]} className="num">
               {limitValue(l)}
             </td>
@@ -633,6 +623,7 @@ export function LimitsView({
       </PanelTable>
       {system && <LimitRange body={body} system={system} />}
       {resolved &&
+        !body.limits.every((l) => l.typed) &&
         (printed ? (
           <p className="limit-sources">
             {t('Pressure limits: C.I.P. TDCC, cartridge record {name}', { name: resolved.name })}

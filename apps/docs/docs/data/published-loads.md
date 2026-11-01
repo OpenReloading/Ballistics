@@ -67,9 +67,9 @@ A bar or psi figure has a `value` in bar. A crusher figure has none, and a crush
 
 `primer.printed` is the primer as the table prints it, so `RWS 5333 und 5341` stays whole. `primer.records` lists catalogue primers only where an explicit alias maps the printed text to them, never by matching. `primer.size` and `primer.magnum` are set only where the printed text states a size class (`Large Rifle Magnum`, `LRM`), never read from a model number. A primer the table does not print is absent. `data:validate` fails a printed `size` or `magnum` that differs from a primer record the load names.
 
-## Sources and licence
+## Sources
 
-Maker data carries no project licence. A table's source names the maker as `publisher`, the URL and the retrieval date, and has `origin: manufacturer`: data the maker published or supplied, which claims no permission. The maker's own terms go in `terms` where it states any, with a `license` of the form `LicenseRef-<name>`. A published load source with a project licence (an SPDX id) fails validation. Fitted parameters derived from these rows are the project's own data under the data licence.
+Maker data carries no project licence. A table's source names the maker as `publisher`, the URL and the retrieval date, and has `origin: manufacturer`: data the maker published or supplied. The maker's own terms go in `terms` where it states any, with a `license` of the form `LicenseRef-<name>`. A published load source with a project licence (an SPDX id) fails validation. Fitted parameters derived from these rows are the project's own data under the data licence.
 
 A table that several files cite is a source record (`records/sources/`). The raw download stays out of the repository; the source record keeps its `sha256`.
 

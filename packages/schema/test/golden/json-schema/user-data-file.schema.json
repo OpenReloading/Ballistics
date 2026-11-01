@@ -3369,12 +3369,12 @@
                             "license": {
                               "type": "string",
                               "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
-                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`."
                             },
                             "terms": {
                               "type": "string",
                               "minLength": 1,
-                              "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              "description": "URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link."
                             },
                             "origin": {
                               "type": "string",
@@ -3821,6 +3821,21 @@
                             "unit": "mm",
                             "description": "The value of `bulletCavityDiameter` in mm."
                           },
+                          "pmax": {
+                            "type": "number",
+                            "unit": "bar",
+                            "description": "The value of `pmax` in bar."
+                          },
+                          "caseLength": {
+                            "type": "number",
+                            "unit": "mm",
+                            "description": "The value of `caseLength` in mm."
+                          },
+                          "bulkDensity": {
+                            "type": "number",
+                            "unit": "g/cm3",
+                            "description": "The value of `bulkDensity` in g/cm3."
+                          },
                           "propellantEnergy": {
                             "type": "number",
                             "unit": "J/kg",
@@ -3923,7 +3938,7 @@
                           }
                         },
                         "additionalProperties": false,
-                        "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter). Every other value follows the referenced records."
+                        "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
                       },
                       "bulletBase": {
                         "type": "string",
@@ -4202,12 +4217,12 @@
                             "license": {
                               "type": "string",
                               "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
-                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`."
                             },
                             "terms": {
                               "type": "string",
                               "minLength": 1,
-                              "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              "description": "URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link."
                             },
                             "origin": {
                               "type": "string",
@@ -6189,12 +6204,12 @@
                             "license": {
                               "type": "string",
                               "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
-                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`."
                             },
                             "terms": {
                               "type": "string",
                               "minLength": 1,
-                              "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              "description": "URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link."
                             },
                             "origin": {
                               "type": "string",
@@ -7624,12 +7639,12 @@
                             "license": {
                               "type": "string",
                               "pattern": "^(LicenseRef-)?[A-Za-z0-9.+-]+$",
-                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms or a written permission described in `terms`."
+                              "description": "SPDX id of the license the data is used under, or `LicenseRef-<name>` for the publisher own terms described in `terms`."
                             },
                             "terms": {
                               "type": "string",
                               "minLength": 1,
-                              "description": "URL or note of the publisher terms or permission where no SPDX license covers the use. Text starting with http:// or https:// is a link."
+                              "description": "URL or note of the publisher terms where no SPDX license covers the use. Text starting with http:// or https:// is a link."
                             },
                             "origin": {
                               "type": "string",

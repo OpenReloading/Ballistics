@@ -41,7 +41,7 @@ import type { StripFigure } from '../lib/barrel-strip.ts'
 import { type BaseType, type BulletValues, typedBullet } from '../lib/bullet.ts'
 import { type BelowMouth, belowMouth, unseatedBecause } from '../lib/bullet-below-mouth.ts'
 import { designShape } from '../lib/bullet-designer.ts'
-import { drawable } from '../lib/cartridge-sheet.ts'
+import { drawable, withCaseLength } from '../lib/cartridge-sheet.ts'
 import {
   measuredWaterCapacitySpec,
   renamedCasePath,
@@ -349,6 +349,8 @@ type PreviewProps = {
     values?: BulletValues | undefined
     /** The base form typed over the record's. */
     baseType?: BaseType | undefined
+    /** The case length L3 typed over the sheet's, mm. */
+    caseLength?: number | undefined
   }
   /**
    * Where the controls go instead of beside the drawing: case capacity, seating and the
@@ -538,14 +540,31 @@ function useGeometry(o: {
   design: UserBulletView | undefined
   values: BulletValues | undefined
   baseType: BaseType | undefined
+  caseLength: number | undefined
   shown: RefObject<UnitSystem>
   lands: LandsMm | undefined
   /** The page's length unit, for the lengths in a refusal's reason. */
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
-  const { draft, detail, record, design: chosen, values, baseType, shown, lands, unit } = o
+  const {
+    draft,
+    detail,
+    record,
+    design: chosen,
+    values,
+    baseType,
+    caseLength,
+    shown,
+    lands,
+    unit,
+  } = o
   const draftSpec = draft?.spec
-  const spec = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
+  // the record's own spec, apart from a typed L3: the seating starts again only when it changes
+  const own = useMemo(() => specOf(draftSpec, detail), [draftSpec, detail])
+  const spec = useMemo(
+    () => (own && caseLength !== undefined ? withCaseLength(own, caseLength) : own),
+    [own, caseLength],
+  )
   const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
   const capacities = capacitiesOf(detail)
   // the typed values in place, one object per record, design or values, so the shape is not rebuilt for each render
@@ -581,7 +600,7 @@ function useGeometry(o: {
   const fixed = useMemo(() => fixedOf(spec, chamber, shape, lands), [spec, chamber, shape, lands])
   /** The record or design with the typed values in place. */
   const bulletNow = design ? design.resolved.record : bulletRecord
-  return { spec, chamber, capacities, bulletRecord, bulletNow, shaped, refused, shape, fixed }
+  return { spec, own, chamber, capacities, bulletRecord, bulletNow, shaped, refused, shape, fixed }
 }
 
 const capacitiesOf = (detail: Load<CartridgeDetail>): Capacity[] =>
@@ -606,6 +625,8 @@ function startOf(
 function useStart(o: {
   range: readonly [number, number] | undefined
   chamber: Chamber | undefined
+  /** What the seating starts for, apart from a typed L3: the same one keeps the position. */
+  startFor: unknown
   designed: boolean
   shape: Shape | undefined
   canCbto: boolean
@@ -618,9 +639,16 @@ function useStart(o: {
 }) {
   const { range, chamber, designed, shape, canCbto, mode, shown, setMode, setPos, setStarted } = o
   const [initialBy, initialValue] = [o.initial?.seating?.by, o.initial?.seating?.value]
+  const { startFor } = o
+  const startedFor = useRef<unknown[]>(undefined)
   useEffect(() => {
     // a design starts empty: a seating the user did not enter would be a default
     if (!range || !chamber || designed) return
+    // a typed L3 rebuilds the chamber: the chosen position stays, its depth and volume follow
+    const key = [startFor, shape, initialBy, initialValue, canCbto]
+    const same = startedFor.current?.every((v, i) => v === key[i])
+    startedFor.current = key
+    if (same) return
     const start = startOf(range, chamber, initialBy, initialValue, canCbto)
     setMode(start.mode)
     setPos({ text: fixedFieldText('length', shown.current, start.si), si: start.si })
@@ -628,6 +656,8 @@ function useStart(o: {
   }, [
     range,
     chamber,
+    startFor,
+    shape,
     designed,
     initialBy,
     initialValue,
@@ -942,9 +972,10 @@ function useSeatingModel(p: PreviewProps) {
   /** The position and mode the preview last started at by itself. */
   const [started, setStarted] = useState<{ si: number; mode: Mode }>()
   useUnitRewrite(system, shown, setBarrel, setPos)
-  const { spec, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
+  const { spec, own, chamber, capacities, shape, fixed, ...geometry } = useGeometry({
     values: p.linked?.values,
     baseType: p.linked?.baseType,
+    caseLength: p.linked?.caseLength,
     draft,
     detail,
     record,
@@ -972,6 +1003,7 @@ function useSeatingModel(p: PreviewProps) {
   useStart({
     range,
     chamber,
+    startFor: own,
     designed,
     shape,
     canCbto,
@@ -2113,6 +2145,15 @@ function JumpRow({ m, seating }: RowsProps) {
   )
 }
 
+/** The seating depth's note: where the case length comes from. */
+function seatingNote(m: Model, chamber: Chamber, t: Translator['t']) {
+  const length = m.mm(chamber.caseLength)
+  if (m.p.linked?.caseLength !== undefined) return t('case length: L3 typed {length}', { length })
+  return m.designed
+    ? t('case length: cartridge L3 of the design {length}', { length })
+    : t('case length: CIP L3 maximum {length}', { length })
+}
+
 function SeatingValues({ m, seating, chamber }: RowsProps) {
   const { t } = useTranslation()
   const { card, mode, slots, design, contact } = m
@@ -2141,13 +2182,7 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
           value={m.len(seating.depth.value)}
           unit={m.length.symbol}
           tag={seating.depth.tag}
-          note={
-            m.designed
-              ? t('case length: cartridge L3 of the design {length}', {
-                  length: m.mm(chamber.caseLength),
-                })
-              : t('case length: CIP L3 maximum {length}', { length: m.mm(chamber.caseLength) })
-          }
+          note={seatingNote(m, chamber, t)}
         />
         {aside(slots, <CaseVolumeRow {...rows} />, more)}
         {/* in the workbench the field "Usable case volume" shows it, flagged "from seating" */}
