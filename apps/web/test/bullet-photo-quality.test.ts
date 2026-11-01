@@ -297,14 +297,40 @@ describe('an axis direction the user typed', () => {
     for (const off of [3, -3]) {
       const { outline, m } = typed(flatBase, off)
       expect(m.baseType).toBe('flat')
-      expect(text(outlineHints(outline).hints)).toMatch(/axis direction typed is about 3 degrees/)
+      expect(text(outlineHints(outline).hints)).toMatch(/about 3 degrees off the bullet's own axis/)
+    }
+  })
+
+  it('typed on a short bullet at a low resolution: no note from the noise of its short shank', () => {
+    const short: BulletDimensions = {
+      diameter: 9.02,
+      length: 15.5,
+      noseLength: 7.5,
+      meplatDiameter: 2.5,
+      ogive: { form: 'tangent', radiusRatio: 1 },
+      base: { type: 'flat' },
+    }
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const s = spec({
+        shape: short,
+        pxPerMm: 8,
+        width: 300,
+        height: 200,
+        base: { x: 80, y: 100 },
+        ruler: undefined,
+        seed,
+        noise: 3,
+      })
+      const seg = segmentPhoto(renderPhoto(s).image)
+      const o = defined(fitOutline(seg, { angle: (3 * Math.PI) / 180, edgeSpread: seg.edgeSpread }))
+      expect(o.typedOff, `seed ${seed}`).toBeUndefined()
     }
   })
 
   it('on the bullet: no note, and a boat tail typed off keeps its tail', () => {
     const on = typed(flatBase, 0)
     expect(on.outline.typedOff).toBeUndefined()
-    expect(text(outlineHints(on.outline).hints)).not.toMatch(/axis direction typed/)
+    expect(text(outlineHints(on.outline).hints)).not.toMatch(/axis direction typed:/)
     const tail = typed({}, 3).m
     expect(tail.baseType).toBe('boat-tail')
     expect(Math.abs(defined(tail.values['base.length']).value - 5.5)).toBeLessThan(0.3)

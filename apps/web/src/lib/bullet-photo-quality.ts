@@ -78,7 +78,7 @@ export function outlineHints(o: Outline): OutlineHints {
     hints.push(
       worded(
         msg(
-          "The axis direction typed is about {degrees} degrees from the bullet's own axis: its sides are not parallel to it, so the lengths and the base may read wrong. Clear the axis direction to let the tool find it, or type it again.",
+          "The bullet's sides are not parallel to the axis direction typed: it is about {degrees} degrees off the bullet's own axis, or a shadow beside the bullet widens one side. The lengths and the base may read wrong; clear the axis direction to let the tool find it, or type it again.",
         ),
         { degrees: tenths(o.typedOff) },
       ),

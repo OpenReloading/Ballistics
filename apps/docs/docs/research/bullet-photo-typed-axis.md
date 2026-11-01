@@ -34,9 +34,11 @@ With a typed axis only the offset is fitted, so the axis need not be the symmetr
 
 The catalogue evaluation (found axis) is unchanged on every column of scenarios A to H.
 
+A first version named any turn of 1 degree or more. The second reader showed that a short shank fitted over 10 samples has a slope uncertainty of about 1.3 degrees on the half difference, so the note would fire about half the time on an axis typed right: the threshold now also needs three standard uncertainties of the angle. Five seeds of a 9.02 x 15.5 mm pistol bullet at 8 px per mm with the axis typed right give no note.
+
 ## Result
 
-Improved: adopted. A typed axis 1 degree or more off the shank's symmetry line is named with its angle, and the turned base face gives no boat tail. The lengths along a typed axis turned off are still read along it (0.6 % long at 3 degrees and 40 px/mm): the note asks to clear or retype the direction.
+Improved: adopted. A typed axis 1 degree and three standard uncertainties or more off the shank's symmetry line is named with its angle (or a shadow widening one side), and the turned base face gives no boat tail. The lengths along a typed axis turned off are still read along it (0.6 % long at 3 degrees and 40 px/mm): the note asks to clear or retype the direction.
 
 ## Data basis
 

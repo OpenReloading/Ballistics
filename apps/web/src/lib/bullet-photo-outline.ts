@@ -3,6 +3,7 @@
  * symmetry line of both edges, and the half-width profile along it. Lengths are in photo px, y
  * down. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
+import { fromSi } from '@open-reloading/schema'
 import type { Cutout } from './bullet-photo.ts'
 import type { Point } from './target-geometry.ts'
 
@@ -301,6 +302,14 @@ export function sideTapers(o: Outline) {
     )
   const [lineL, lineR] = [shankLine(sides.left), shankLine(sides.right)]
   if (!lineL || !lineR) return
+  // the standard uncertainty of a shank line's slope: its residual scatter, not below an edge's, over the spread of z
+  const zm = sum(z) / z.length
+  const sxx = sum(z.map((v) => (v - zm) ** 2))
+  const slopeU = (line: { a: number; b: number }, side: readonly number[]) => {
+    const rss = sum(use.map((i, k) => (at(side, i) - line.a - line.b * at(z, k)) ** 2))
+    return Math.max(edgeUncertainty, Math.sqrt(rss / Math.max(1, use.length - 2))) / Math.sqrt(sxx)
+  }
+  const slopeError = Math.max(slopeU(lineL, sides.left), slopeU(lineR, sides.right))
   const level = (line: { a: number; b: number }, i: number) => line.a + line.b * at(o.z, i)
   const reached = o.z.findIndex(
     (_, i) =>
@@ -324,7 +333,7 @@ export function sideTapers(o: Outline) {
     line,
     taper: line.a + line.b * zb - median(side.slice(...base)),
   })
-  return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base }
+  return { left: taper(lineL, sides.left), right: taper(lineR, sides.right), base, slopeError }
 }
 
 /** One side tapers at the base by more than this, px or share of the half width, while the other does not: a shadow, not a boat tail. */
@@ -391,19 +400,21 @@ function withoutShadow(o: Outline): Outline {
   }
 }
 
-/** A typed axis this many degrees or more from the shank's symmetry line is named. */
+/** A typed axis this many degrees or more from the shank's symmetry line is named, and never below three standard uncertainties of that angle. */
 const typedAxisTolerance = 1
 
 /**
  * The outline of an axis the user typed, with how far that axis is from the symmetry line of the
- * shank's two sides where it is `typedAxisTolerance` or more: the two shank lines then run apart
- * from the axis by equal and opposite slopes, half their difference the turn.
+ * shank's two sides where it is `typedAxisTolerance` or more and three standard uncertainties of
+ * the half difference (a short shank or a coarse edge gives an uncertain slope): the two shank
+ * lines then run apart from the axis by equal and opposite slopes, half their difference the turn.
  */
 function typedAxisOff(o: Outline): Outline {
   const t = sideTapers(o)
   if (!t) return o
-  const off = (Math.abs(Math.atan(t.left.line.b) - Math.atan(t.right.line.b)) / 2) * (180 / Math.PI)
-  return off >= typedAxisTolerance ? { ...o, typedOff: off } : o
+  const off = fromSi('angle', Math.abs(Math.atan(t.left.line.b) - Math.atan(t.right.line.b)) / 2)
+  const least = Math.max(typedAxisTolerance, 3 * fromSi('angle', t.slopeError / Math.SQRT2))
+  return off >= least ? { ...o, typedOff: off } : o
 }
 
 /**
