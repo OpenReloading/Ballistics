@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { shownLanguage } from '../i18n/shown.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
-import { ownTotal, scoreText } from '../lib/competition-events.ts'
+import { ownTotal, scoreText, stateLabels } from '../lib/competition-events.ts'
 import { dayText } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import {
@@ -147,7 +147,9 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
                   {[
                     dayText(event.data.date),
                     event.name,
-                    scoreText(ownTotal(event.data)),
+                    event.data.state === 'completed'
+                      ? scoreText(ownTotal(event.data))
+                      : t(stateLabels[event.data.state]),
                     tn(entries.length, '{count} entry', '{count} entries'),
                   ]
                     .filter(Boolean)
