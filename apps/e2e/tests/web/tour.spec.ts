@@ -2,7 +2,7 @@ import { expect, type Locator, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
 // a powder record: its figure and values columns are each taller than a 650 px window
-const record = '/powders/vihtavuori-n32c'
+const record = '/powders/demo-powder-dp40'
 
 const box = async (l: Locator) => {
   const b = await l.boundingBox()
@@ -62,7 +62,8 @@ test('from 75em a popover beside a target taller than the window starts below th
         .poll(async () => (await box(page.locator('.driver-active-element'))).y)
         .toBeLessThan(bar.y + bar.height)
       await expect.poll(async () => (await box(p)).y).toBeGreaterThanOrEqual(bar.y + bar.height)
-      await page.mouse.wheel(0, -300)
+      // back to where the tour placed it, whatever room the page has below
+      await page.evaluate((y) => window.scrollTo(0, y), scrolled)
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrolled)
     }
     await p.getByRole('button', { name: 'Next' }).click()

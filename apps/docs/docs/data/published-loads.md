@@ -65,7 +65,7 @@ A bar or psi figure has a `value` in bar. A crusher figure has none, and a crush
 
 ## Primer
 
-`primer.printed` is the primer as the table prints it, so `RWS 5333 und 5341` stays whole. `primer.records` lists catalogue primers only where an explicit alias maps the printed text to them, never by matching. `primer.size` and `primer.magnum` are set only where the printed text states a size class (`Large Rifle Magnum`, `LRM`), never read from a model number. A primer the table does not print is absent. `data:validate` fails a printed `size` or `magnum` that differs from a primer record the load names.
+`primer.printed` is the primer as the table prints it, so `Demo 101 und 102` stays whole. `primer.records` lists catalogue primers only where an explicit alias maps the printed text to them, never by matching. `primer.size` and `primer.magnum` are set only where the printed text states a size class (`Large Rifle Magnum`, `LRM`), never read from a model number. A primer the table does not print is absent. `data:validate` fails a printed `size` or `magnum` that differs from a primer record the load names.
 
 ## Sources
 

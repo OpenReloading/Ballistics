@@ -1,0 +1,16 @@
+{
+  "id": "fixture-sparse-cast",
+  "manufacturer": "fixture",
+  "productNumber": "sparse-cast",
+  "name": "Test fixture, cast bullet with diameter, length and mass only",
+  "diameter": { "value": 9.09 },
+  "mass": { "value": 10.24 },
+  "length": { "value": 17 },
+  "construction": {
+    "raw": "Cast lead alloy",
+    "structure": "cast",
+    "core": { "material": "lead-alloy" }
+  },
+  "note": "Synthetic test fixture, not a product: the drawing fills in the outline from the diameter, length, mass and construction.",
+  "provenance": { "kind": "derived", "sources": [{ "title": "Test fixture" }] }
+}
