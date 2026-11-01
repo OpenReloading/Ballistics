@@ -39,12 +39,7 @@ import {
   fitStrings,
   loadStrings,
   loadsWithPowder,
-  powdersWithStrings,
-  readStringForm,
   revolverLeakNote,
-  type StringForm,
-  type StringFormErrors,
-  stringResiduals,
   type TuneString,
   tunePowder,
   tuneSessionIds,
@@ -52,6 +47,13 @@ import {
 import { stringStats } from '../lib/string-stats.ts'
 import { tunePowderHref } from '../lib/tune-href.ts'
 import { readTuneBase, readTuneLoad, tuneTable } from '../lib/tune-load.ts'
+import {
+  powdersWithStrings,
+  readStringForm,
+  type StringForm,
+  type StringFormErrors,
+  stringResiduals,
+} from '../lib/tune-strings.ts'
 import { formatQuantity, type Quantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import { putRecords, storedRecord, storedRecords } from '../lib/user-store.ts'
 import { catalogueIdOf, userRef } from '../lib/variants.ts'

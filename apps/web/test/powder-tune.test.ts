@@ -6,14 +6,12 @@ import {
   loadStrings,
   loadsWithPowder,
   parseVelocities,
-  powdersWithStrings,
-  readStringForm,
   revolverLeakNote,
   sessionStrings,
-  stringResiduals,
   tuneHref,
   tuneSessionIds,
 } from '../src/lib/powder-tune.ts'
+import { powdersWithStrings, readStringForm, stringResiduals } from '../src/lib/tune-strings.ts'
 
 const session = (strings: SessionRecord['data']['strings']): SessionRecord => ({
   kind: 'session',
