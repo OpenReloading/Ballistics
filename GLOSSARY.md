@@ -206,7 +206,7 @@ _Avoid_: l6
 One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `primerState`, `fillLevel`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
 
 **Water capacity**:
-`waterCapacity`: mass of water filling a case to the mouth, g, on a case capacity.
+`waterCapacity`: mass of water filling a case to the mouth (or the level `fillLevel` names), g, on a case capacity.
 _Avoid_: capacity
 
 **Measured water capacity**:
@@ -221,7 +221,7 @@ _Avoid_: ownCapacity
 _Avoid_: convention, primed
 
 **Fill level**:
-`fillLevel`: how high the water of a case capacity was filled: `mouth`. Absent: the source does not state it, and the case capacity model page takes the mouth. It does not enter the derived volume.
+`fillLevel`: how high the water of a case capacity was filled: `mouth`. Absent: the source does not state it, and the mouth is taken. It does not enter the derived volume.
 _Avoid_: convention
 
 **Caliber class**:

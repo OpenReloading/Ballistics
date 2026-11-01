@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { caseCapacity, catalogueCaseCapacity, loadWaterCapacity, userRecord } from '../src/index.ts'
-import { expectIssueAt } from './issue-at.ts'
+import { expectIssueAt, issuePaths } from './issue-at.ts'
 
 const provenance = { kind: 'published', sources: [{ title: 'Example manual' }] }
 const catalogue = {
@@ -37,8 +37,11 @@ describe('CaseCapacity', () => {
     expectIssueAt(caseCapacity, { ...user, primerState: 'primed' }, 'primerState')
     expectIssueAt(caseCapacity, { ...user, fillLevel: 'shoulder' }, 'fillLevel')
     const convention = 'to the mouth, water at 20 C, primer seated'
-    expect(caseCapacity.safeParse({ ...user, convention }).success).toBe(false)
-    expect(catalogueCaseCapacity.safeParse({ ...catalogue, convention }).success).toBe(false)
+    expect(issuePaths(caseCapacity, { ...user, convention })).toEqual(['convention'])
+    expect(issuePaths(catalogueCaseCapacity, { ...catalogue, convention })).toEqual(['convention'])
+    expect(catalogueCaseCapacity.parse({ ...catalogue, primerState: 'unprimed' }).primerState).toBe(
+      'unprimed',
+    )
   })
 
   it('needs an id and provenance in a catalogue record, which names catalogue records only', () => {

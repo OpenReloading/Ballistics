@@ -3250,7 +3250,7 @@
                       "value"
                     ],
                     "unit": "g",
-                    "description": "Mass of water filling the case to the mouth."
+                    "description": "Mass of water filling the case to the level `fillLevel` names, the mouth when absent."
                   },
                   "caseManufacturer": {
                     "type": "string",
@@ -3279,7 +3279,11 @@
                     "enum": [
                       "mouth"
                     ],
-                    "description": "How high the water was filled: to the case mouth. Absent: the source does not state it, the docs take the mouth."
+                    "description": "How high the water was filled: to the case mouth. Absent: the source does not state it, and the mouth is taken."
+                  },
+                  "convention": {
+                    "not": {},
+                    "description": "Refused: the earlier free text, replaced by `primerState` and `fillLevel`."
                   },
                   "note": {
                     "type": "string",
@@ -3431,7 +3435,6 @@
                   "cartridge",
                   "waterCapacity"
                 ],
-                "additionalProperties": false,
                 "description": "A case capacity the user measured, in g."
               }
             },
