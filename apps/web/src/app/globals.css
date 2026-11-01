@@ -6956,6 +6956,14 @@ main .record-sources .sources tbody th {
   .record-sources {
     grid-area: sources;
   }
+
+  /* a record without a figure (case, primer): the values across the page */
+  .plain-record .record-grid {
+    grid-template-areas:
+      "values values"
+      "side side"
+      "sources sources";
+  }
 }
 
 /* the target face record: the face drawn across its panel up to 28rem, printed at 120 mm; the
@@ -7572,8 +7580,8 @@ main .field-table tr.field-group > th {
   .cartridge-sides {
     --drawing-chrome: 16.25rem;
 
-    /* the chamber's table has a column more: its panel a little wider, both drawings keep their width */
-    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+    /* the chamber's table is a little wider (its clearances): its panel too, both drawings keep their width */
+    grid-template-columns: minmax(0, 0.985fr) minmax(0, 1.015fr);
   }
 
   /* a side without a drawing takes the width of its table */
@@ -7594,10 +7602,25 @@ main .field-table tr.field-group > th {
     justify-content: center;
   }
 
-  /* the table is the scroll box once the panel would pass the window's foot */
+  /* the table is the scroll box once the panel would pass the window's foot, with a scrollbar
+     that stays (an overlay scrollbar shows nothing until scrolled) */
   .side-body > .scroll {
     max-height: calc(100svh - 14.75rem);
     overflow: auto;
+  }
+
+  .side-body > .scroll::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  .side-body > .scroll::-webkit-scrollbar-thumb {
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--muted) 55%, transparent);
+  }
+
+  .side-body > .scroll::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--muted) 12%, transparent);
   }
 
   .has-variants .side-body > .scroll {
@@ -7756,18 +7779,53 @@ main .field-table tr.field-group > th {
   font-weight: 400;
 }
 
-.fact .countries {
+/* a cartridge fact label with its meaning on hover (Pmax, M, EE): dotted, as a value with notes */
+.cartridge-record .fact dt .field-note {
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 0.2em;
+}
+
+/* the cartridge record's link to its fitting bullets: the last item of the fact row */
+.fact-link {
+  display: flex;
+  align-items: center;
+}
+
+/* the standard of a cartridge record over its sources: Table, date, country, method in one line */
+.standard-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.standard-facts > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.standard-facts dt {
+  font-weight: 600;
+}
+
+.standard-facts dd {
+  margin: 0;
+  color: var(--mantine-color-text);
+}
+
+:is(.fact, .standard-facts) .countries {
   display: inline-flex;
   gap: 0.75rem;
 }
 
-.fact .country {
+:is(.fact, .standard-facts) .country {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
 }
 
-.fact .flag {
+:is(.fact, .standard-facts) .flag {
   width: auto;
   height: 0.875em;
   box-shadow: 0 0 0 1px var(--border);
@@ -11429,18 +11487,12 @@ main .page-panel-head > .page-panel-title {
   height: 0.8125rem;
 }
 
-/* the cartridge record's link to its bullets: under the two sides; not printed, the sheet keeps
-   the drawings and tables */
+/* the cartridge record's link to its bullets, in the fact row: not printed, the sheet keeps the
+   drawings and tables */
 @media print {
   .cartridge-bullets {
     display: none;
   }
-}
-
-/* the cartridge record's link to its bullets, under the two sides */
-.cartridge-record .record-side {
-  margin-top: var(--panel-gap);
-  font-size: var(--mantine-font-size-sm);
 }
 
 /* a record without values: the one line where the panels would be */
@@ -11607,6 +11659,24 @@ main .cartridge-values .dim-slot {
 
 main .cartridge-values .clearance {
   cursor: help;
+}
+
+/* the head of the tolerance column: as narrow as its slot, the words wrap */
+main .cartridge-values th.dim-slot-cell {
+  white-space: normal;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
+main .cartridge-values td.dim-slot-cell {
+  padding-left: 0;
+}
+
+/* a word per line where the head is longer than its slot: the column keeps the slot's width */
+.dim-slot-head {
+  display: inline-block;
+  width: min-content;
 }
 
 /* the groups are one tbody each (named for a screen reader): a heavier rule above the next group */
