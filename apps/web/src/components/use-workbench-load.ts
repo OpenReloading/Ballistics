@@ -113,7 +113,7 @@ import { nth } from '../lib/nth.ts'
 import { powderValues, recordFill } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
-import { writeTuneLoad } from '../lib/powder-tune.ts'
+import { tuneHeld, writeTuneLoad } from '../lib/powder-tune.ts'
 import {
   droppedIds,
   linkedId,
@@ -3498,6 +3498,7 @@ export function useWorkbenchState() {
     loadNotes,
     sessionRefCount: sessionRefs.length,
     handOffTune,
+    tuneHeld: tuneHeld(asked),
     setSeen,
     setStepsDraft,
     setTab,

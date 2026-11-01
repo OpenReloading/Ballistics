@@ -3627,6 +3627,7 @@
   "All values on this screen are simulations, not load data.": "Alle Werte auf diesem Bildschirm sind Simulationen, keine Ladedaten.",
   "Fit a powder from chronograph strings": "Treibladungspulver an Chronographen-Schussreihen anpassen",
   "Fit a powder from these strings": "Treibladungspulver an diese Schussreihen anpassen",
+  "Fit a powder from these strings: once the records of this load have loaded.": "Treibladungspulver an diese Schussreihen anpassen: sobald die Datensätze dieser Laborierung geladen sind.",
   "Mean ({unit})": "Mittelwert ({unit})",
   "SD ({unit})": "SD ({unit})",
   "Separated by spaces": "Durch Leerzeichen getrennt",

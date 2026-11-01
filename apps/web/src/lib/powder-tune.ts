@@ -51,6 +51,14 @@ export const tuneCartridgeKey = (load: string) => storageName(`tuneCartridge:${l
 export const tuneActionKey = (load: string) => storageName(`tuneAction:${load}`)
 
 /**
+ * Whether the workbench holds the tuning link: a record the load may take values from (a bore
+ * diameter from the cartridge record, say) is asked for and not loaded yet, so no load could be
+ * handed over. A record that could not be fetched (`failed`) does not hold it.
+ */
+export const tuneHeld = (asked: Record<string, { id: string; failed?: true } | undefined>) =>
+  Object.values(asked).some((a) => a !== undefined && !a.failed)
+
+/**
  * Hands `interior`, the load the workbench's run simulates, `powder`, its powder record, and
  * `table`, the CIP table of its cartridge record, to the tuning route for the strings of load
  * `load` (a reference); undefined removes one handed over before. `cartridge`, the id of a
