@@ -136,7 +136,7 @@ The second term of $g_\text{start}$ is a choice of the model.
 Without a start pressure, a caller can take `defaultStartPressure`:
 
 - Barrel of 0.3 m and longer: an assumed 30 MPa.
-- Shorter barrel: one value per bullet construction (lead, plated, jacketed, monolithic), fitted by the load-table powder fit. A construction not given counts as jacketed, an unknown name is an input error.
+- Shorter barrel: one value per bullet construction, fitted by the load-table powder fit: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa ([research entry](../research/interior-start-pressure-rules.md)). A construction not given counts as jacketed, an unknown name is an input error.
 
 These are effective values of the model, not measured shot-start pressures.
 

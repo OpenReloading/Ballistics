@@ -17,7 +17,16 @@ export const interiorFields = [
     required: true,
     min: 0,
   },
-  { key: 'boreDiameter', label: msg('Bore diameter'), quantity: 'length', required: true, min: 0 },
+  {
+    key: 'boreDiameter',
+    label: msg('Bore diameter'),
+    help: msg(
+      'Diameter of the bore across the lands, in the length unit shown. An empty bore area is computed from it.',
+    ),
+    quantity: 'length',
+    required: true,
+    min: 0,
+  },
   {
     key: 'boreArea',
     label: msg('Bore area'),
@@ -43,8 +52,22 @@ export const interiorFields = [
     required: true,
     min: 0,
   },
-  { key: 'bulletMass', label: msg('Bullet mass'), quantity: 'mass', required: true, min: 0 },
-  { key: 'charge', label: msg('Charge mass'), quantity: 'charge', required: true, min: 0 },
+  {
+    key: 'bulletMass',
+    label: msg('Bullet mass'),
+    help: msg('Mass of one bullet, in the mass unit shown.'),
+    quantity: 'mass',
+    required: true,
+    min: 0,
+  },
+  {
+    key: 'charge',
+    label: msg('Charge mass'),
+    help: msg('Powder mass of one round, in the mass unit shown.'),
+    quantity: 'charge',
+    required: true,
+    min: 0,
+  },
   {
     key: 'propellantEnergy',
     label: msg('Propellant energy'),
@@ -56,6 +79,9 @@ export const interiorFields = [
   {
     key: 'gamma',
     label: msg('Ratio of specific heats'),
+    help: msg(
+      'Ratio of the specific heats of the powder gas, without a unit. The force constant is (ratio − 1) times the propellant energy.',
+    ),
     quantity: 'ratio',
     required: true,
     min: 1,
@@ -68,12 +94,40 @@ export const interiorFields = [
     required: true,
     min: 0,
   },
-  { key: 'covolume', label: msg('Covolume'), quantity: 'covolume', required: true, min: 0 },
-  { key: 'vivacity', label: msg('Vivacity'), quantity: 'vivacity', required: true, min: 0 },
-  { key: 'exponent', label: msg('Pressure exponent'), quantity: 'ratio', required: true, min: 0 },
+  {
+    key: 'covolume',
+    label: msg('Covolume'),
+    help: msg(
+      'Volume per mass of the powder gas that its molecules take up (Noble-Abel gas), in cm³/g.',
+    ),
+    quantity: 'covolume',
+    required: true,
+    min: 0,
+  },
+  {
+    key: 'vivacity',
+    label: msg('Vivacity'),
+    help: msg(
+      'Rate constant of the vivacity burn law, in 1/s: the larger it is, the faster the powder burns at the reference pressure.',
+    ),
+    quantity: 'vivacity',
+    required: true,
+    min: 0,
+  },
+  {
+    key: 'exponent',
+    label: msg('Pressure exponent'),
+    help: msg(
+      'Exponent of the pressure in the burn law, without a unit: at 1 the burn rate is proportional to the pressure.',
+    ),
+    quantity: 'ratio',
+    required: true,
+    min: 0,
+  },
   {
     key: 'referencePressure',
     label: msg('Reference pressure'),
+    help: msg('Pressure the vivacity burn law refers to, in the pressure unit shown.'),
     quantity: 'pressure',
     required: true,
     min: 0,
@@ -81,12 +135,18 @@ export const interiorFields = [
   {
     key: 'propellantTemperature',
     label: msg('Powder temperature'),
+    help: msg(
+      'Temperature of the powder when fired, in the temperature unit shown. It changes the burn rate only for a powder with a temperature sensitivity in its record.',
+    ),
     quantity: 'temperature',
     required: true,
   },
   {
     key: 'ignitionPressure',
     label: msg('Ignition pressure'),
+    help: msg(
+      'Pressure of the gas present when the run starts, the primer gas taken as powder gas, in the pressure unit shown.',
+    ),
     quantity: 'pressure',
     required: true,
     min: 0,
@@ -94,6 +154,9 @@ export const interiorFields = [
   {
     key: 'startPressure',
     label: msg('Start pressure'),
+    help: msg(
+      'Mean pressure at which the bullet starts to move, in the pressure unit shown. Defaults of the model, effective values and not measurements: 30 MPa for a barrel of 0.3 m and longer; for a shorter barrel by bullet construction, lead 24 MPa, jacketed 31 MPa, plated 31 MPa, monolithic 50 MPa (1 MPa = 10 bar = 145 psi).',
+    ),
     quantity: 'pressure',
     required: true,
     min: 0,
@@ -114,9 +177,33 @@ export const interiorFields = [
     help: msg('Two-stage form; a, m, q and z1 all empty: constant form.'),
     quantity: 'ratio',
   },
-  { key: 'formM', label: msg('Burn form m'), quantity: 'ratio' },
-  { key: 'formQ', label: msg('Burn form q'), quantity: 'ratio', min: 0 },
-  { key: 'formZ1', label: msg('Burn form z1'), quantity: 'ratio', min: 0, max: 1 },
+  {
+    key: 'formM',
+    label: msg('Burn form m'),
+    help: msg(
+      'Exponent of the first stage of the two-stage form, (1 + a z) to the power m, without a unit.',
+    ),
+    quantity: 'ratio',
+  },
+  {
+    key: 'formQ',
+    label: msg('Burn form q'),
+    help: msg(
+      'Exponent of the second stage of the two-stage form, after z1, without a unit; below 1 when z1 is below 1.',
+    ),
+    quantity: 'ratio',
+    min: 0,
+  },
+  {
+    key: 'formZ1',
+    label: msg('Burn form z1'),
+    help: msg(
+      'Burnt fraction at which the second stage of the two-stage form starts, 0 to 1, without a unit.',
+    ),
+    quantity: 'ratio',
+    min: 0,
+    max: 1,
+  },
   {
     key: 'leakArea',
     label: msg('Leak area'),
