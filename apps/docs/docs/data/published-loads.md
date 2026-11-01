@@ -77,6 +77,27 @@ A table that several files cite is a source record (`records/sources/`). The raw
 
 The split of a row follows from its cartridge: the first byte of the SHA-256 of the lower-case cartridge id is 0 to 50 for test, 51 to 101 for validation and 102 to 255 for training (`splitOf`, `packages/cli/src/split.ts`). It is not stored. Fit tooling reads training rows only, and model choices use the validation rows.
 
+## Import and re-import
+
+A collector writes the loads of a table edition to a folder of its own, laid out like the records: `loads/<cartridge id>/<table>.json`, the loads in the order the table prints them. The merge sets the load ids and merges each file into `packages/data/records/loads/`:
+
+```sh
+npm run loads:merge -w @open-reloading/data -- <incoming folder> [--accept <id>... | --accept-all] [--dry-run]
+```
+
+The id of a load is the first 10 hex digits of the SHA-1 of its natural key: maker, cartridge, printed bullet text and bullet mass, COAL with its limit, printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge. A figure counts by its `value` (its `raw` where it has none), so `55 gr` and `55 grs` are one key. Loads of equal key are counted in printed order: the first has the bare hash, the second `<hash>-2`, and so on. Edition, page, charge, velocity, pressure, primer and case are not in the key, so a newer edition finds its older load. An id the incoming file carries is replaced. Code: `loadId` and `mergePublishedLoads` in `packages/data/src/published-load-merge.ts`.
+
+By load id, the merge:
+
+- creates a load the repository does not have;
+- leaves a load whose content (everything but `id`, `source`, `page` and `url`) is equal as it is, so it keeps citing the edition and page that printed it;
+- lists a load with other content as changed, with the field paths that differ, and writes it only when its id follows `--accept` or with `--accept-all`;
+- keeps a load the incoming edition no longer prints and lists it as absent. A load is never deleted.
+
+An accepted load replaces the stored one whole, so a `record` link set in the repository and missing from the incoming file goes with it; the report lists such a link among the changed fields. A created or accepted load cites the incoming source, which is appended to `provenance.sources` where the file does not have it yet (a reference to a source record and the same source written out count as one). The other fields of a file in the repository stay as they are. The loads are written sorted by id, formatted the way `npm run format` formats the records, and a file the merge does not change is not written, so a second run of the same input changes no file and reports 0 created and 0 changed.
+
+The command prints per file and in total the created, changed (and how many not accepted), unchanged and absent loads. A file whose cartridge folder is no cartridge record is not written and is listed under "waiting for a cartridge record". When an incoming file fails the `publishedLoads` schema (its ids set, its source references resolved from `records/sources/`), nothing is merged and the command exits with 1. `--dry-run` reports and writes nothing. Run `npm run data:validate` after a merge.
+
 ## Validation
 
 `npm run data:validate` reports:
