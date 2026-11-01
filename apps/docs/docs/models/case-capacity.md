@@ -203,6 +203,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 - A capacity measured with water at another temperature than 20 °C is not corrected, whatever its `convention` says.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
+- The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/drawing/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.
 - A cavity of a different depth than its radius is not described. The cavity diameter must be below the base face diameter and its depth below the bullet length, else the outline is refused.
 - The bounds from the length tolerance cover the bullet length only, not the case capacity.

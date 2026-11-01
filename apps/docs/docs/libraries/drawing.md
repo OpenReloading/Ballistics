@@ -22,7 +22,7 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 |---|---|
 | `@open-reloading/drawing` | Shared geometry, layout, annotations and unit text |
 | `@open-reloading/drawing/cartridge` | Cartridge figures from CIP and shotshell specifications |
-| `@open-reloading/drawing/bullet` | Bullet outlines, profiles and their volume |
+| `@open-reloading/drawing/bullet` | Bullet outlines, profiles and their volume, the density a record's mass and outline imply against its material (`outlineDensity`) |
 | `@open-reloading/drawing/seating` | Seating a bullet: overall length, jump and intrusion |
 | `@open-reloading/drawing/target` | Target face figures |
 
