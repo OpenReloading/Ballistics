@@ -17,8 +17,9 @@ export function TourButton({ page }: { page: TourPage }) {
 
   async function start() {
     // a plain import() on first use keeps the library out of the route's initial weight
-    const [{ driver }] = await Promise.all([
+    const [{ driver }, { keepBelowTopBar }] = await Promise.all([
       import('driver.js'),
+      import('./tour-placement.ts'),
       import('driver.js/dist/driver.css'),
     ])
     // a step whose element is not shown (another layout, a closed tab) is left out
@@ -44,6 +45,7 @@ export function TourButton({ page }: { page: TourPage }) {
       doneBtnText: t('Done'),
       closeBtnLabel: t('Close the tour'),
       onPopoverRender: (p) => {
+        keepBelowTopBar(p.wrapper)
         p.wrapper.setAttribute('aria-modal', 'true')
         // the glyph is not the button's name: only the label is read
         const glyph = document.createElement('span')
