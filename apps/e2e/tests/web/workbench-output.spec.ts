@@ -127,12 +127,23 @@ test('in German the pressure range keeps its gap and the Powder card head its me
   await page.setViewportSize({ width: 1280, height: 650 })
   await runExample(page)
   await showGerman(page)
-  const tile = page.locator('.results-head .readout-keys .readout-wide')
-  const unit = await tile.locator('.readout-big .readout-unit').boundingBox()
-  const range = await tile.locator('.readout-note').boundingBox()
-  if (!unit || !range) throw new Error('no peak pressure tile')
-  // the range's text ends at its box's end: its box starts at least 0.5 rem after the unit
-  expect(range.x - (unit.x + unit.width)).toBeGreaterThanOrEqual(8)
+  // the gap between the unit's text and the range's text, px: their boxes may overlap where the
+  // range is set flush right in a wider cell
+  const gap = await page.locator('.results-head .readout-keys .readout-wide').evaluate((tile) => {
+    const textBox = (el: Element | null) => {
+      if (!el) throw new Error('no peak pressure tile')
+      const range = document.createRange()
+      range.selectNodeContents(el)
+      return range.getBoundingClientRect()
+    }
+    const unit = textBox(tile.querySelector('.readout-big .readout-unit'))
+    const note = textBox(tile.querySelector('.readout-note'))
+    // on one line only: a range under the value has no gap to keep
+    return Math.abs(note.top - unit.top) > unit.height
+      ? Number.POSITIVE_INFINITY
+      : note.left - unit.right
+  })
+  expect(gap).toBeGreaterThanOrEqual(8)
   const head = page.locator('.panel[data-panel="powder"] .panel-head')
   const box = await head.boundingBox()
   const menu = await head.getByRole('button', { name: /^Mehr zu/ }).boundingBox()
