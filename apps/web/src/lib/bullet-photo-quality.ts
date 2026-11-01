@@ -1,7 +1,7 @@
 /**
  * What the outline of a bullet photograph says about whether the photograph can be measured
  * (`apps/docs/docs/models/bullet-photo.md`): the bullet's width in pixels, its proportions, a
- * shadow on one side and how ragged its sides are. Plain sentences for the user; a photograph too poor to measure gets no
+ * shadow on one side, a typed axis off the bullet's and how ragged its sides are. Plain sentences for the user; a photograph too poor to measure gets no
  * values rather than wrong ones. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
  */
 import { msg } from '../i18n/translate.ts'
@@ -72,6 +72,15 @@ export function outlineHints(o: Outline): OutlineHints {
           percent: tenths((100 * Math.SQRT2 * edgeUncertainty) / width),
           good: goodWidthPx * 2,
         },
+      ),
+    )
+  if (o.typedOff !== undefined)
+    hints.push(
+      worded(
+        msg(
+          "The bullet's sides are not parallel to the axis direction typed: it is about {degrees} degrees off the bullet's own axis, or a shadow beside the bullet widens one side. The lengths and the base may read wrong; clear the axis direction to let the tool find it, or type it again.",
+        ),
+        { degrees: tenths(o.typedOff) },
       ),
     )
   if (o.shadow)

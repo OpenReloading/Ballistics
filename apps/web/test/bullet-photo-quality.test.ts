@@ -275,6 +275,68 @@ describe('a drop shadow beside a product-style image', () => {
   })
 })
 
+describe('an axis direction the user typed', () => {
+  // the photograph's bullet lies 3 degrees off level; 40 px per mm makes the base face wide enough to show a turn
+  const typed = (over: Partial<PhotoSpec>, offDegrees: number) => {
+    const s = spec({
+      pxPerMm: 40,
+      width: 1800,
+      height: 840,
+      base: { x: 260, y: 400 },
+      ruler: undefined,
+      ...over,
+    })
+    const seg = segmentPhoto(renderPhoto(s).image)
+    const angle = ((3 + offDegrees) * Math.PI) / 180
+    const outline = defined(fitOutline(seg, { angle, edgeSpread: seg.edgeSpread }))
+    return { outline, m: measureOutline(outline, { pxPerMm: 40, relUncertainty: 0 }) }
+  }
+  const flatBase = { shape: { ...shape, base: { type: 'flat' as const } } }
+
+  it('3 degrees off: no boat tail on a flat base, and a note that the axis is off', () => {
+    for (const off of [3, -3]) {
+      const { outline, m } = typed(flatBase, off)
+      expect(m.baseType).toBe('flat')
+      expect(text(outlineHints(outline).hints)).toMatch(/about 3 degrees off the bullet's own axis/)
+    }
+  })
+
+  it('typed on a short bullet at a low resolution: no note from the noise of its short shank', () => {
+    const short: BulletDimensions = {
+      diameter: 9.02,
+      length: 15.5,
+      noseLength: 7.5,
+      meplatDiameter: 2.5,
+      ogive: { form: 'tangent', radiusRatio: 1 },
+      base: { type: 'flat' },
+    }
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const s = spec({
+        shape: short,
+        pxPerMm: 8,
+        width: 300,
+        height: 200,
+        base: { x: 80, y: 100 },
+        ruler: undefined,
+        seed,
+        noise: 3,
+      })
+      const seg = segmentPhoto(renderPhoto(s).image)
+      const o = defined(fitOutline(seg, { angle: (3 * Math.PI) / 180, edgeSpread: seg.edgeSpread }))
+      expect(o.typedOff, `seed ${seed}`).toBeUndefined()
+    }
+  })
+
+  it('on the bullet: no note, and a boat tail typed off keeps its tail', () => {
+    const on = typed(flatBase, 0)
+    expect(on.outline.typedOff).toBeUndefined()
+    expect(text(outlineHints(on.outline).hints)).not.toMatch(/axis direction typed:/)
+    const tail = typed({}, 3).m
+    expect(tail.baseType).toBe('boat-tail')
+    expect(Math.abs(defined(tail.values['base.length']).value - 5.5)).toBeLessThan(0.3)
+  })
+})
+
 describe('the size of the bullet in the photograph', () => {
   const outlineOf = (halfWidth: number, length: number): Outline => ({
     origin: { x: 0, y: 0 },
