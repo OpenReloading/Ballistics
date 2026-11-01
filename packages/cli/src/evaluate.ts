@@ -97,7 +97,7 @@ function seated(
 }
 
 /** The load of a row from its records, or why it cannot be built. */
-function loadOf(row: Row, records: Records): InteriorLoad | Reason {
+export function loadOf(row: Row, records: Records): InteriorLoad | Reason {
   const cartridge = records.cartridges.get(row.cartridge)
   const bullet = records.bullets.get(row.bullet)
   const powder = records.powders.get(row.powder)

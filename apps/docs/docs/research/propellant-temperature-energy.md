@@ -89,7 +89,14 @@ No change. The energy term is not adopted: the model keeps its default of 0 and 
 
 Proposed text for the Limits of the [M3 page](../models/interior-m3.md) (added there in short): "The gas energy is independent of the initial temperature by default. For the loads tried it carries 17 to 22 % of the muzzle-velocity change and 5 to 9 % of the peak-pressure change for a temperature step (assumed coefficients, simulations); the fitted temperature factor absorbs it inside the calibrated temperature range."
 
-The measured part is pending and not in the repository: the held-out test on chronograph ladders of one powder at two or more temperatures at least 20 K apart, two spans, the energy coefficient fixed, passes when the velocity RMS and the pressure RMS are each at least 15 % lower than those of the current fit on both spans. It is run on private rows with `verify` of `packages/cli`, and only aggregates are posted. The load file and `recordLoad` do not carry the field, so that run sets it on the load first.
+The measured part is pending and not in the repository: the held-out test on chronograph ladders of one powder at two or more temperatures at least 20 K apart, two spans, the energy coefficient fixed, passes when the velocity RMS and the pressure RMS are each at least 15 % lower than those of the current fit on both spans. It runs on rows that are not published, on the machine that holds them:
+
+```sh
+npm ci && npm run build
+node packages/cli/scripts/temperature-energy.mts --rows <rows.csv|folder> [--records <dir>]
+```
+
+The rows are those of the [command line](../cli.md#rows), with `temperature_c` on every row and `pressure_bar` with `pressure_basis` where a pressure was measured. A ladder is the rows of one powder, cartridge, bullet, barrel, COAL and rifle. The interpolating span fits the coldest and the hottest temperature (at least 20 K apart) and holds out those between; the extrapolating span holds out the hottest and fits the temperatures at least 20 K colder (two or more). Each span fits (A) with the burn rate and the temperature factor free and (B) the same with the energy coefficient at 0.0003 1/K, weighted with 3 m/s and 3 %; a powder record without a temperature sensitivity starts from the assumed 0.004 1/K about the temperature of its fit. The script prints JSON with aggregates only, no record id, row, charge or temperature. Post it whole: the counts of ladders and rows, `skipped` by reason, per span the ladders used, the failed fits, the held-out rows and the pooled RMS of A and B, their change, and `supported`, the rule above.
 
 ## Data basis
 
@@ -101,6 +108,7 @@ Analytic: synthetic loads and a synthetic truth with the fitted model's own stru
 - `packages/core/src/interior/fit.ts`, `fitPowder`.
 - `packages/core/test/interior-energy-temperature.test.ts`.
 - `packages/core/scripts/propellant-temperature-energy.mts`.
+- `packages/cli/scripts/temperature-energy.mts`, the measured check.
 - Model pages: [M3 interior model](../models/interior-m3.md), [powder fit](../models/interior-powder-fit.md).
 
 ## Confidence
