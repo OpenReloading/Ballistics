@@ -373,7 +373,7 @@ const states: State[] = [
     name: 'Database list with ticked rows',
     scrolls: true,
     open: async (page, check) => {
-      await gotoHydrated(page, '/bullets?q=demo')
+      await gotoHydrated(page, '/bullets?q=demo%20bullets')
       const boxes = page.getByRole('checkbox', { name: /^Select Demo Bullets / })
       await expect(boxes).toHaveCount(2)
       await boxes.first().click()
