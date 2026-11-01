@@ -173,6 +173,13 @@ async function openTab(page: Page, name: string) {
   return page.getByRole('tabpanel', { name })
 }
 
+/** Save writes its file to the origin's private storage instead of asking where. */
+const stubSavePicker = (page: Page) =>
+  page.addInitScript(() => {
+    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
+      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
+  })
+
 /** The saved load as the browser stores it. */
 const storedLoad = (page: Page) =>
   page.evaluate(async () => {
@@ -197,6 +204,7 @@ const storedLoad = (page: Page) =>
 test('the Powders tab keeps a typed target the same pressure when the units change', async ({
   page,
 }) => {
+  await stubSavePicker(page)
   await runExample(page)
   const tab = await openTab(page, 'Powders')
   await tab
@@ -220,10 +228,7 @@ test('the Powders tab copies its table as CSV and keeps its mode and filters wit
   page,
 }) => {
   test.setTimeout(240_000)
-  await page.addInitScript(() => {
-    ;(window as unknown as Record<string, unknown>).showSaveFilePicker = async () =>
-      (await navigator.storage.getDirectory()).getFileHandle('export.json', { create: true })
-  })
+  await stubSavePicker(page)
   await page.setViewportSize({ width: 1280, height: 900 })
   await runExample(page)
   let tab = await openTab(page, 'Powders')
