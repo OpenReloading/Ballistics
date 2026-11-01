@@ -6,8 +6,8 @@ import { storageName } from '../lib/edition.ts'
 /** The workbench choosers' filter "Complete records only", on unless this browser turned it off. */
 const key = storageName('completeRecordsOnly')
 const listeners = new Set<() => void>()
-/** The state while the browser refuses storage: kept for the page only. */
-let unstored = true
+/** The state while the browser refuses to store it: kept for the page only, read before storage. */
+let unstored: boolean | undefined
 
 const subscribe = (notify: () => void) => {
   listeners.add(notify)
@@ -15,10 +15,11 @@ const subscribe = (notify: () => void) => {
 }
 
 function read() {
+  if (unstored !== undefined) return unstored
   try {
     return localStorage.getItem(key) !== 'false'
   } catch {
-    return unstored
+    return true
   }
 }
 
@@ -26,11 +27,12 @@ function read() {
 export function useCompleteOnly() {
   const on = useSyncExternalStore(subscribe, read, () => true)
   const set = (value: boolean) => {
-    unstored = value
     try {
       localStorage.setItem(key, String(value))
+      unstored = undefined
     } catch {
-      // no storage: the filter does not persist
+      // no storage, or a full one: the filter holds for the page only
+      unstored = value
     }
     for (const notify of listeners) notify()
   }

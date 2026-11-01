@@ -30,6 +30,7 @@ export type PackedPowder = [
   number | null,
   number | null,
   string | null,
+  true | null,
 ]
 
 /** Powder rows as arrays: the list page's props carry no key names. */
@@ -49,6 +50,7 @@ export const packPowders = (rows: readonly PowderRow[]): PackedPowder[] =>
     r.trainingRows ?? null,
     r.trainingCartridges ?? null,
     r.retrieved ?? null,
+    r.modelled ?? null,
   ])
 
 export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
@@ -68,6 +70,7 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
       trainingRows,
       trainingCartridges,
       retrieved,
+      modelled,
     ]) => ({
       id,
       manufacturer,
@@ -84,6 +87,7 @@ export const unpackPowders = (rows: readonly PackedPowder[]): PowderRow[] =>
         trainingRows,
         trainingCartridges,
         retrieved,
+        modelled,
       }),
     }),
   )
@@ -142,6 +146,7 @@ export function userPowderRows(records: readonly UserRecord[]): PowderRow[] {
         ...(m && { meanVivacity: r3(m.value), low: r3(m.low), high: r3(m.high) }),
         ...(fit?.trainingRows && { trainingRows: fit.trainingRows }),
         ...(fit?.trainingCartridges && { trainingCartridges: fit.trainingCartridges }),
+        ...(r.data.draft?.interior && { modelled: true as const }),
       },
     ]
   })

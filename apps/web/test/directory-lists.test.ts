@@ -143,6 +143,8 @@ it('orders powders fastest first and keeps the global order under the search', (
   expect(fast.low).toBeLessThan(fast.meanVivacity as number)
   expect(fast.high).toBeGreaterThan(fast.meanVivacity as number)
   expect(rows.find((r) => r.id === 'h-none')?.burnRateOrder).toBeUndefined()
+  // a row carries whether its record has burn values, for "Complete records only"
+  expect(fast.modelled).toBe(true)
   // searched: Delta's fastest keeps order 2
   expect(rows.filter((r) => powderMatches(r, 'delta')).map((r) => r.burnRateOrder)).toEqual([3, 2])
   expect(unpackPowders(packPowders(rows))).toEqual(rows)

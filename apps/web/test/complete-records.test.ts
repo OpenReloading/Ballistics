@@ -28,8 +28,7 @@ it('counts a name-only bullet and a powder without burn values as incomplete', (
   expect(bulletIncomplete({})).toBe(false)
   expect(powderIncomplete({ interior: { vivacity: 0.6 } })).toBe(false)
   expect(powderIncomplete({})).toBe(true)
-  expect(powderRowIncomplete({ meanVivacity: 0.6 })).toBe(false)
+  // a row with burn values, curve or not, is complete; a design without them is not
+  expect(powderRowIncomplete({ modelled: true })).toBe(false)
   expect(powderRowIncomplete({})).toBe(true)
-  // a powder design of the browser has its own model
-  expect(powderRowIncomplete({ origin: 'user' })).toBe(false)
 })

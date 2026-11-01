@@ -9,11 +9,8 @@ export const bulletIncomplete = (b: { nameOnly?: true | undefined }) => b.nameOn
 /** A powder list item without the burn values of an interior model. */
 export const powderIncomplete = (p: { interior?: unknown }) => p.interior === undefined
 
-/** A powder row of a list or chooser without a fit: a catalogue powder with no burn values. */
-export const powderRowIncomplete = (r: {
-  origin?: 'user' | undefined
-  meanVivacity?: number | undefined
-}) => !r.origin && r.meanVivacity === undefined
+/** A powder row of a list or chooser without the burn values of an interior model, a design's included. */
+export const powderRowIncomplete = (r: { modelled?: true | undefined }) => r.modelled !== true
 
 /**
  * `items` with the complete ones first, in their order, then the incomplete ones; without them

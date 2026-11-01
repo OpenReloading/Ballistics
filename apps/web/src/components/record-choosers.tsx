@@ -123,7 +123,6 @@ export const powderKind: ChooserKind<PowderRow> = {
     ],
   ],
   href: (row) => `/powders/${row.id}`,
-  // a catalogue powder without a fit has no burn values; a design of the browser has its own
   incomplete: powderRowIncomplete,
 }
 
@@ -393,6 +392,7 @@ export function PowderChooser({
           name: d.name,
           grainForm: d.powder.grainForm,
           propellantBase: d.powder.propellantBase,
+          ...(d.powder.interior && { modelled: true as const }),
         }),
       ),
     [designs],
