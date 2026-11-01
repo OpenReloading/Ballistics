@@ -340,7 +340,7 @@ const oneSidedTaper = (halfWidth: number) => Math.max(2.5, 0.02 * halfWidth)
  * still carry the shadow in its length: the shadow is then named as not removed. Otherwise the
  * shadow is named and the outline kept.
  */
-export function withoutShadow(o: Outline): Outline {
+function withoutShadow(o: Outline): Outline {
   const t = sideTapers(o)
   if (!t || !o.sides) return o
   const gap = t.right.taper - t.left.taper
