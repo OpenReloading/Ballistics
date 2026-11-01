@@ -17,6 +17,10 @@
     "value": 50.19,
     "raw": "1.976\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 3, MTAC - Match, Tactical: Caliber .416, Grains 422, Minimum Required Twist *1-13\", Part Number MTAC 416 422, G1 BC .801 (A.B.), G7 BC .410 (A.B.), OAL 1.976\", Bullet Projection 1.357\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },
