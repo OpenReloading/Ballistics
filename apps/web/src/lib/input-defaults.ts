@@ -12,6 +12,8 @@ export type Suggestion = {
   source: string
   /** The firearm's own value: used as the firearm's, not shown as a default. */
   fromFirearm?: true
+  /** The cartridge record's value the firearm's replaces, SI: the mark names it. */
+  record?: number | undefined
 }
 
 /** The form fields that follow a default until typed; the barrel length is the seating's own field. */
@@ -37,9 +39,15 @@ export const cartridgeClass = (table: string | undefined): CartridgeClass | unde
   table === undefined ? undefined : table === pistolTable ? 'pistol' : 'rifle'
 
 export type DefaultSources = {
-  /** The chosen firearm (of the firearm library); a twist of 0 is none. */
+  /** The chosen firearm (of the firearm library); a twist of 0 is none. Bore and groove diameter: measured. */
   firearm?:
-    | { name: string; twist?: number | undefined; barrelLength?: number | undefined }
+    | {
+        name: string
+        twist?: number | undefined
+        barrelLength?: number | undefined
+        boreDiameter?: number | undefined
+        grooveDiameter?: number | undefined
+      }
     | undefined
   /** The chosen cartridge with its record's values: land diameter F, bore area Q, twist u, case capacity as a volume. */
   cartridge?:
@@ -81,6 +89,35 @@ export function volumeMeasured(a: {
   )
 }
 
+/** The bore diameter's default: the firearm's measured one, else the record's F, else the bullet's diameter. */
+function boreDiameterDefault(
+  gun: DefaultSources['firearm'],
+  cartridge: DefaultSources['cartridge'],
+  bullet: DefaultSources['bullet'],
+  t: Translator['t'],
+): Suggestion | undefined {
+  if (positive(gun?.boreDiameter))
+    return {
+      si: gun.boreDiameter,
+      source: t('your firearm {name}', { name: gun.name }),
+      fromFirearm: true,
+      record: cartridge?.boreDiameter,
+    }
+  if (positive(cartridge?.boreDiameter))
+    return {
+      si: cartridge.boreDiameter,
+      source: cartridge.design
+        ? t('chamber F of the user design {name}', { name: cartridge.name })
+        : t('CIP land diameter F of {name}', { name: cartridge.name }),
+    }
+  if (bullet && positive(bullet.diameter))
+    return {
+      si: bullet.diameter,
+      source: t('diameter of {name}, the bore is smaller', { name: bullet.name }),
+    }
+  return
+}
+
 /** The default of each field from what is chosen, in the order firearm, cartridge record, Settings, class. */
 export function suggestDefaults(
   { firearm: gun, cartridge, bullet, settingsBarrelLength }: DefaultSources,
@@ -88,19 +125,14 @@ export function suggestDefaults(
 ): Suggestions {
   const out: Suggestions = {}
   if (cartridge?.capacity) out.volume = cartridge.capacity
-  if (positive(cartridge?.boreDiameter))
-    out.boreDiameter = {
-      si: cartridge.boreDiameter,
-      source: cartridge.design
-        ? t('chamber F of the user design {name}', { name: cartridge.name })
-        : t('CIP land diameter F of {name}', { name: cartridge.name }),
-    }
-  else if (bullet && positive(bullet.diameter))
-    out.boreDiameter = {
-      si: bullet.diameter,
-      source: t('diameter of {name}, the bore is smaller', { name: bullet.name }),
-    }
-  if (positive(cartridge?.boreArea))
+  const bore = boreDiameterDefault(gun, cartridge, bullet, t)
+  if (bore) out.boreDiameter = bore
+  // Q is the area of the record's bore: a measured bore or groove gives the circle of their mean instead
+  if (
+    positive(cartridge?.boreArea) &&
+    !positive(gun?.boreDiameter) &&
+    !positive(gun?.grooveDiameter)
+  )
     out.boreArea = {
       si: cartridge.boreArea,
       source: t('CIP bore area Q of {name}', { name: cartridge.name }),
@@ -110,6 +142,7 @@ export function suggestDefaults(
       si: gun.twist,
       source: t('your firearm {name}', { name: gun.name }),
       fromFirearm: true,
+      record: cartridge?.twist,
     }
   else if (positive(cartridge?.twist))
     out.twist = {

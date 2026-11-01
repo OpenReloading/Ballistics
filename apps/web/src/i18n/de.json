@@ -4189,5 +4189,9 @@
   "Rounds per firearm": "Schuss je Schusswaffe",
   "Summary year": "Jahr der Übersicht",
   "Yearly summary": "Jahresübersicht",
-  "Yearly summary of the shooting log, {year}": "Jahresübersicht des Schießbuchs, {year}"
+  "Yearly summary of the shooting log, {year}": "Jahresübersicht des Schießbuchs, {year}",
+  "From {source}.": "Quelle: {source}.",
+  "From {source}. The cartridge record gives {value}.": "Quelle: {source}. Der Patronendatensatz gibt {value} vor.",
+  "The leade starts at your firearm's measured freebore past the chamber L3, not at the CIP s.": "Der Übergangskegel beginnt bei der gemessenen Freibohrung Ihrer Schusswaffe hinter dem Patronenlager-L3, nicht beim CIP-s.",
+  "The bullet diameter {diameter} is below the measured groove diameter {groove} of your firearm: gas passes the bullet, which the model leaves out.": "Der Geschossdurchmesser {diameter} liegt unter dem gemessenen Zugdurchmesser {groove} Ihrer Schusswaffe: Gas strömt am Geschoss vorbei, was das Modell nicht berücksichtigt."
 }

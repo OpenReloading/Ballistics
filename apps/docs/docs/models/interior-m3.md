@@ -166,6 +166,7 @@ Code: `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `oversi
 
 - $o$ is taken as 0 without $Z$ and above `maxOversizePercent` (5 %).
 - $G_1$ and $Z$ are C.I.P. tolerance limits, not measurements. A run reads $G_1$ from the cartridge record, else the bore diameter.
+- The workbench keeps the record's $Z$ in $o$ when the chosen firearm has a measured groove diameter: $G_1$ stays a nominal limit, and a measured $Z$ against it would give an oversize no bullet was measured for. A bullet below the measured groove diameter gets a note, as gas passing the bullet is not in the model.
 - The bullet length stands in for the bearing length $L$. The workbench takes the length typed over the bullet record's (`bulletLength`), and `POST /v1/interior/load-file` takes a `bulletLength` override over the record's the same way.
 - $\tau_f$, $c$ and $\phi_e$ are stored with the fitted powder parameters.
 - A load file can replace the friction pressure (`boreFriction`) and the start and length of the engraving ramp (`engravingPressure`, `engravingLength`).
@@ -198,6 +199,10 @@ Code: `packages/core/src/interior/bore-resistance.ts`, `boreArea` and `recordBor
 The circle of the mean of $F$ and $Z$ is a choice of the model, not taken from a source.
 
 The load-table fit, the load file (`interiorLoad`) and the workbench read the same function, so one cartridge has one bore area.
+
+In the workbench, the firearm chosen from the library replaces the record's values with its measured ones where they are set: its bore diameter is the default of the bore diameter field instead of $F$, and its groove diameter replaces $Z$ in the circle above. Either measured value drops $Q_\text{CIP}$, which describes the record's bore, so the area is the circle of the mean of the measured bore and groove diameters, with the record's $F$ or $Z$ for the one not measured. A typed bore diameter or bore area still wins. The firearm's freebore is the leade start $s$ past the chamber L3 of the seating figure, so the jump to the leade follows it; a lands contact measured with the seated bullet replaces both.
+
+Code: `apps/web/src/lib/input-defaults.ts`, `suggestDefaults`; `apps/web/src/components/use-workbench-load.ts` (`grooveM`, `qUsed`).
 
 ### Temperature of the propellant
 

@@ -312,6 +312,8 @@ type PreviewProps = {
    */
   lands?: LandsContact | undefined
   landsOther?: boolean | undefined
+  /** The chosen firearm's measured freebore, m: the leade starts there past the chamber L3 instead of at the CIP s. */
+  freebore?: number | undefined
   /** The seating at another length, for a seating ladder; undefined while no bullet is seated. */
   onSeatLadder?: (seatAt: SeatingLengths | undefined) => void
   /**
@@ -537,6 +539,8 @@ function useGeometry(o: {
   caseLength: number | undefined
   shown: RefObject<UnitSystem>
   lands: LandsMm | undefined
+  /** The firearm's freebore, mm: the chamber's leade start s. */
+  freebore: number | undefined
   /** The page's length unit, for the lengths in a refusal's reason. */
   unit: ReturnType<typeof drawingLengthUnit>
 }) {
@@ -550,6 +554,7 @@ function useGeometry(o: {
     caseLength,
     shown,
     lands,
+    freebore,
     unit,
   } = o
   const draftSpec = draft?.spec
@@ -559,7 +564,10 @@ function useGeometry(o: {
     () => (own && caseLength !== undefined ? withCaseLength(own, caseLength) : own),
     [own, caseLength],
   )
-  const chamber = useMemo(() => spec && chamberOf(spec.values), [spec])
+  const chamber = useMemo(() => {
+    const c = spec && chamberOf(spec.values)
+    return c && freebore !== undefined ? { ...c, leadeStart: freebore } : c
+  }, [spec, freebore])
   const capacities = capacitiesOf(detail)
   // the typed values in place, one object per record, design or values, so the shape is not rebuilt for each render
   const design = useMemo(
@@ -917,6 +925,7 @@ function useSeatingModel(p: PreviewProps) {
     design,
     shown,
     lands,
+    freebore: p.freebore === undefined ? undefined : fromSi('length', p.freebore),
     unit: drawingLengthUnit(system),
   })
   const chosenCase =
@@ -1888,9 +1897,11 @@ function FigureValues({ m, seating }: { m: Model; seating: Seating }) {
 function SeatingNotes({
   seating,
   landsOther,
+  freebore,
 }: {
   seating: Seating
   landsOther?: boolean | undefined
+  freebore?: boolean | undefined
 }) {
   const { t } = useTranslation()
   return (
@@ -1905,6 +1916,13 @@ function SeatingNotes({
           'Staying at or below L6 says nothing about pressure, magazine fit or safety; seating depth changes pressure.',
         )}
       </p>
+      {freebore && seating.jump.source === 'chamber' && (
+        <p className="note">
+          {t(
+            "The leade starts at your firearm's measured freebore past the chamber L3, not at the CIP s.",
+          )}
+        </p>
+      )}
       {landsOther && (
         <p className="note">
           {t(
@@ -2099,7 +2117,13 @@ function SeatingValues({ m, seating, chamber }: RowsProps) {
         {aside(slots, <JumpRow {...rows} />, more)}
       </dl>
       {contact && !card && <ErrorNote color="orange">{contact}</ErrorNote>}
-      {!card && <SeatingNotes seating={seating} landsOther={m.p.landsOther} />}
+      {!card && (
+        <SeatingNotes
+          seating={seating}
+          landsOther={m.p.landsOther}
+          freebore={m.p.freebore !== undefined}
+        />
+      )}
     </div>
   )
 }
@@ -2119,7 +2143,11 @@ function PreviewBody({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Cham
         seating &&
         createPortal(
           <div>
-            <SeatingNotes seating={seating} landsOther={m.p.landsOther} />
+            <SeatingNotes
+              seating={seating}
+              landsOther={m.p.landsOther}
+              freebore={m.p.freebore !== undefined}
+            />
           </div>,
           slots.more,
         )}

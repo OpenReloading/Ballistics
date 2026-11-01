@@ -738,6 +738,13 @@ function loadFieldMark(
   t: Translator['t'],
 ) {
   if (defaulted.has(key)) return defaultMark(key, defaults, t)
+  if (given?.fromFirearm)
+    return given.record === undefined
+      ? t('From {source}.', { source: given.source })
+      : t('From {source}. The cartridge record gives {value}.', {
+          source: given.source,
+          value: valueWithUnit(spec.quantity, s, given.record),
+        })
   if (given) return t('Default: {source}.', { source: given.source })
   if (fromRecord !== undefined)
     return fields[key]?.si === undefined
@@ -864,7 +871,7 @@ function LoadField({ name: key }: { name: string }) {
         { cartridgeBoreArea, grooveDiameter },
         t,
       )}
-      muted={given !== undefined}
+      muted={given !== undefined && !given.fromFirearm}
       // texts naming a unit follow the units the field shows
       mark={(s) =>
         loadFieldMark(
@@ -1731,6 +1738,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
       barrelLength={firearmList.find((f) => f.id === firearm)?.data.barrelLength}
       lands={lands.contact}
       landsOther={lands.other}
+      freebore={firearmList.find((f) => f.id === firearm)?.data.freebore}
       barrelDefault={suggestions.barrelLength}
       linked={{
         bullet: bullet?.id,

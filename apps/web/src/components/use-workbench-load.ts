@@ -625,12 +625,58 @@ function capacityRefsOf(
 const resultLineOf = (outcome: Outcome, system: UnitSystem, t: Translator['t']) =>
   outcome.kind === 'ok' ? resultLine(outcome, system, t) : undefined
 
-/** The firearm the defaults read: its name, twist and barrel length. */
+/**
+ * The groove diameter Z (m) and the record's bore area Q (m2) a run reads: the firearm's measured
+ * groove replaces the record's Z; Q holds while the bore diameter is the land diameter it describes
+ * and the firearm measured neither bore nor groove (`suggestDefaults` drops it the same way).
+ */
+function boreOf(
+  gun: { boreDiameter?: number | undefined; grooveDiameter?: number | undefined } | undefined,
+  record: { recordGrooveM: number | undefined; qM: number | undefined; landM: number | undefined },
+  boreDiameter: number | undefined,
+) {
+  const measured = gun?.boreDiameter !== undefined || gun?.grooveDiameter !== undefined
+  return {
+    grooveM: gun?.grooveDiameter ?? record.recordGrooveM,
+    qUsed: measured ? undefined : recordBoreArea(record.qM, record.landM, boreDiameter),
+  }
+}
+
+/** The note on a bullet below the firearm's measured groove diameter (SI): the gap the model leaves out. */
+function undersizeNote(
+  bullet: number | undefined,
+  groove: number | undefined,
+  length: (si: number | undefined) => string | undefined,
+  t: Translator['t'],
+) {
+  if (bullet === undefined || groove === undefined || !(groove > bullet)) return ''
+  return t(
+    'The bullet diameter {diameter} is below the measured groove diameter {groove} of your firearm: gas passes the bullet, which the model leaves out.',
+    { diameter: length(bullet) ?? '', groove: length(groove) ?? '' },
+  )
+}
+
+/** The firearm the defaults read: its name, twist, barrel length and measured bore and groove diameter. */
 const gunSource = (
   gun:
-    | { name: string; data: { twist?: number | undefined; barrelLength?: number | undefined } }
+    | {
+        name: string
+        data: {
+          twist?: number | undefined
+          barrelLength?: number | undefined
+          boreDiameter?: number | undefined
+          grooveDiameter?: number | undefined
+        }
+      }
     | undefined,
-) => gun && { name: gun.name, twist: gun.data.twist, barrelLength: gun.data.barrelLength }
+) =>
+  gun && {
+    name: gun.name,
+    twist: gun.data.twist,
+    barrelLength: gun.data.barrelLength,
+    boreDiameter: gun.data.boreDiameter,
+    grooveDiameter: gun.data.grooveDiameter,
+  }
 
 type PreviewFields = Partial<Record<PreviewKey, FieldValue | undefined>>
 
@@ -1190,7 +1236,7 @@ export function useWorkbenchState() {
   /** Groove diameter Z of the chosen cartridge, mm, for the bore resistance of a fitted powder. */
   /** The chosen cartridge's record: its groove diameter and the values the figure draws. */
   const [groove, setGroove] = useState<Groove | undefined>(undefined)
-  const { grooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
+  const { grooveM: recordGrooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
   const [allDiameters, setAllDiameters] = useState(false)
   /** The browser's bullet designs that have a mass, resolved against the catalogue. */
   const [designs, setDesigns] = useState<UserBulletView[]>([])
@@ -1214,6 +1260,8 @@ export function useWorkbenchState() {
     name: r.name,
     data: gunValues((r as FirearmRecord).data),
   }))
+  /** The chosen firearm's values: its measured bore and groove diameter, freebore and the others. */
+  const gunData = firearmList.find((f) => f.id === firearm)?.data
   /** The chosen firearm's active sight, for the Trajectory tab. */
   const chosenSight = sightOptions(
     [loadExample.firearm, ...firearms].filter((r) => r.id === firearm) as UserRecord[],
@@ -1572,8 +1620,7 @@ export function useWorkbenchState() {
     fixedFieldText,
   )
   const fields = form.values
-  /** The record's bore area Q while the bore diameter is the land diameter it describes. */
-  const qUsed = recordBoreArea(qM, landM, fields.boreDiameter?.si)
+  const { grooveM, qUsed } = boreOf(gunData, { recordGrooveM, qM, landM }, fields.boreDiameter?.si)
 
   /**
    * Writes that complete the start of a new load (the defaults, the first seating) are no edit: a
@@ -3101,12 +3148,15 @@ export function useWorkbenchState() {
   const fileData = useMemo(() => JSON.parse(fileKey) as Load, [fileKey])
   const apiKey = JSON.stringify(apiFile)
   const apiData = useMemo(() => JSON.parse(apiKey) as Load, [apiKey])
-  /** A followed field's default while it is the field's value; the seating owns the volume once a bullet is seated. */
+  /**
+   * A followed field's default or firearm value while it is the field's value; the seating owns the
+   * volume once a bullet is seated.
+   */
   const defaultOf = (key: string) => {
     const k = followKeys.find((x) => x === key)
     if (!k || !followed.has(k) || (k === 'volume' && seatingOwnsVolume(seated))) return
     const given = suggestions[k]
-    return given && !given.fromFirearm && fields[key]?.si === given.si ? given : undefined
+    return given && fields[key]?.si === given.si ? given : undefined
   }
   const suggestionKey = JSON.stringify(followKeys.map((k) => suggestions[k]?.si))
   const seatedVolume = seatingOwnsVolume(seated)
@@ -3191,7 +3241,7 @@ export function useWorkbenchState() {
           g1: mmLength(system, clearedBullet.g1),
         },
       )
-    : ''
+    : undersizeNote(bulletValues.bulletDiameter, gunData?.grooveDiameter, siLength, t)
 
   const recordLink = recordLinkOf({
     asked,
