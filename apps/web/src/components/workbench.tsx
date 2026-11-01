@@ -152,8 +152,8 @@ function cartridgePrintRows(
   seatingRows: PrintRows,
   t: Translate,
 ) {
-  const { system, cartridge, cartridgeDesign, pmax, mmText, specValue, measuredFor, measured } =
-    load
+  const { system, cartridge, cartridgeDesign, pmax, siLength, specs } = load
+  const { measuredFor, measured, typedSpecFields } = load
   const depth = ok?.printed.seated?.depth
   return [
     [
@@ -162,10 +162,13 @@ function cartridgePrintRows(
         (cartridgeDesign && t('{name} (user design)', { name: cartridgeDesign.name })),
     ],
     [
-      t('CIP Pmax'),
+      typedSpecFields.pmax?.si ? t('Pmax, typed') : t('CIP Pmax'),
       pmax === undefined ? undefined : withUnit('pressure', system, toSi('pressure', pmax)),
     ],
-    [t('Case length, CIP L3'), mmText(specValue('cartridge', 'L3'))],
+    [
+      typedSpecFields.caseLength?.si ? t('Case length L3, typed') : t('Case length, CIP L3'),
+      siLength(specs.caseLength),
+    ],
     printRow(load, 'volume', t),
     printRow(load, 'boreDiameter', t),
     printRow(load, 'boreArea', t),
@@ -473,10 +476,11 @@ function linkFields(load: Load) {
 /** The query of Copy link: the inputs, and the Trajectory tab's while it is open. */
 function workbenchLinkQuery(load: Load) {
   const { choice, ladderSteps, ladderKind, direction, cartridge, recordLink, firearm } = load
-  const { measuredWaterCapacity, seating, tab, trajectory, gunWeightUsed, typedBulletFields } = load
+  const { measuredWaterCapacity, seating, tab, trajectory, gunWeightUsed } = load
+  const { typedBulletFields, typedSpecFields } = load
   const query = inputsQuery(
     choice.preset,
-    { ...linkFields(load), ...typedBulletFields, firearmMass: gunWeightUsed },
+    { ...linkFields(load), ...typedBulletFields, ...typedSpecFields, firearmMass: gunWeightUsed },
     {
       cartridge: cartridge?.id,
       bullet: recordLink.bulletId,

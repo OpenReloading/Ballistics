@@ -84,6 +84,7 @@ import {
   burnFormError,
   type interiorBody,
   interiorFields,
+  specFields,
 } from '../lib/interior-input.ts'
 import { interiorRequest } from '../lib/interior-request.ts'
 import {
@@ -124,6 +125,7 @@ import {
 } from '../lib/query.ts'
 import { withStoredSessions } from '../lib/range-entry.ts'
 import { changedFromRecord, recordValuesOf } from '../lib/record-changes.ts'
+import { pmaxBar, type SpecKey, specValueKeys, typedSpec } from '../lib/record-specs.ts'
 import {
   type LadderDirection,
   type RunnableLadderKind,
@@ -178,6 +180,7 @@ import { useBulletValues } from './use-bullet-values.ts'
 import { useCommit } from './use-commit.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
+import { useSpecValues } from './use-spec-values.ts'
 import type { LoadNotesState } from './workbench-context.ts'
 import {
   type CartridgeChoice,
@@ -979,6 +982,48 @@ const typedBulletOf = (query: URLSearchParams, system: UnitSystem): Fields => {
     : typed
 }
 
+/** The values of the cartridge sheet and the powder a link's query or an opened file types: the fields it holds. */
+const typedSpecOf = (query: URLSearchParams, system: UnitSystem): Fields =>
+  Object.fromEntries(
+    Object.entries(queryFields(query, specFields, system, fixedFieldText)).filter(
+      ([, f]) => f.si !== undefined,
+    ),
+  )
+
+/**
+ * What the load's references give again of the specs: the sheet's Pmax and L3, the powder's bulk
+ * density; a value the user typed stays theirs, even when it equals the record's (`typed`).
+ */
+function specsGiven(
+  record: Record<string, number | undefined>,
+  cartridgeRef: string | undefined,
+  powderRef: string | undefined,
+  typed: Fields,
+) {
+  const given: Record<string, number | undefined> = {
+    ...(cartridgeRef && { pmax: record.pmax, caseLength: record.caseLength }),
+    ...(powderRef && { bulkDensity: record.bulkDensity }),
+  }
+  return Object.fromEntries(
+    Object.entries(given).filter(([key]) => typedSpec(typed, key as SpecKey) === undefined),
+  )
+}
+
+/** The bulk density the powder record gives, else the one its link carried, SI. */
+const recordBulkDensity = (
+  chosen: { bulkDensity?: { value: number } | undefined } | undefined,
+  linked: { bulkDensity?: number | undefined } | undefined,
+) => (chosen?.bulkDensity ? toSi('density', chosen.bulkDensity.value) : linked?.bulkDensity)
+
+const typedDensityOf = (typed: Fields, another: unknown) =>
+  another ? undefined : typedSpec(typed, 'bulkDensity')
+
+/** The Cartridge card's changed field keys: its specs are typed values of their own, dropped apart. */
+const changedFieldKeys = (changes: Record<string, number>) =>
+  cardKeys.cartridge.filter((k) => changes[k] !== undefined && !isSpecKey(k))
+
+const isSpecKey = (key: string) => (specValueKeys as readonly string[]).includes(key)
+
 /** The error of every field whose typed value is outside its bounds. */
 const fieldErrorsOf = (linked: Fields, system: UnitSystem) =>
   Object.fromEntries(
@@ -1698,6 +1743,7 @@ export function useWorkbenchState() {
     setBullet(undefined)
     setBulletDesign(undefined)
     setTypedBullet({})
+    spec.setTyped({})
     setBulletNote(undefined)
     setAllDiameters(false)
     setPowder(undefined)
@@ -1996,19 +2042,28 @@ export function useWorkbenchState() {
     return 'error' in plan ? plan.error : undefined
   }
 
+  /**
+   * Opens the groups that hold an invalid field, so focus can reach it: an invalid model parameter
+   * (on a phone), a powder field under More, and a refused typed bulk density, which sits in the
+   * Model parameters group when the record has none.
+   */
+  function revealInvalid(errors: Record<string, unknown>, refused: string | undefined) {
+    if (modelFields.some((k) => errors[k]) || refused === 'bulkDensity') setModelShown(true)
+    if (powderMoreFields.some((k) => errors[k])) setMore('powder')
+  }
+
   /** Validates and sends; false when a field is invalid (it then gets focus). */
   function run() {
     let invalid = false
     flushSync(() => {
       const { hasErrors, errors } = form.validate()
-      // an invalid model parameter on a phone: the group opens, so focus can reach it
-      if (modelFields.some((k) => errors[k])) setModelShown(true)
-      if (powderMoreFields.some((k) => errors[k])) setMore('powder')
+      const refused = refusedSpec()
+      revealInvalid(errors, refused?.key)
       const ladderInvalid = stepError()
       setLadderError(ladderInvalid)
       // the seating ladder's reasons are about the seating, not about one field: the status line names them too
       if (ladderInvalid && ladderKind !== 'charge') setStatus(ladderInvalid)
-      invalid = hasErrors || ladderInvalid !== undefined
+      invalid = hasErrors || ladderInvalid !== undefined || refused !== undefined
       // on phones the field sits in the Load tab, which is hidden while Results is open
       if (invalid) workspace.current?.showInputs()
     })
@@ -2025,6 +2080,21 @@ export function useWorkbenchState() {
     return true
   }
 
+  /** The message of a typed Pmax, L3 or bulk density its field refuses: a run would read the record's instead. */
+  function specError() {
+    return refusedSpec()?.error
+  }
+
+  /** The first typed spec its field refuses, with the field's message. */
+  function refusedSpec() {
+    for (const f of specFields) {
+      const v = spec.typed[f.key]
+      const error = v?.text.trim() ? fieldError(f, v, system, t) : undefined
+      if (error) return { key: f.key, error }
+    }
+    return
+  }
+
   /**
    * The `POST /interior` body of the fields with the powder record's bore resistance, its bulk
    * density (g/cm3) and the resistance parameters it lacks; throws on an invalid field. The Run and
@@ -2035,6 +2105,9 @@ export function useWorkbenchState() {
    * bore resistance reads besides the body: the key of the Powders tab's rows.
    */
   function loadRequest(as?: { powder: Powder; charge?: number }) {
+    // every path that simulates (Run, auto-run, the charge target, the Powders tab) refuses it
+    const typedError = specError()
+    if (typedError) throw new Error(typedError)
     const chosen = as?.powder ?? chosenPowder
     const { body, bulkDensity, missing } = interiorRequest({
       // the form's values now, not this render's: a run pressed after a seated volume was written
@@ -2050,6 +2123,9 @@ export function useWorkbenchState() {
       boreArea: qUsed,
       grooveDiameter: grooveM,
       bulletLength,
+      pressureLimit: typedSpec(spec.typed, 'pmax'),
+      // the powder chosen for a Powders tab run brings its own
+      bulkDensity: typedDensityOf(spec.typed, as),
     })
     const resistanceMissing =
       chosen && missing.length > 0 ? { powder: productLabel(chosen, names), missing } : undefined
@@ -2403,6 +2479,7 @@ export function useWorkbenchState() {
     setFollowed(new Set(withDefaults ? followKeys.filter((k) => linked[k]?.si === undefined) : []))
     form.setValues(linked)
     setTypedBullet(typedBulletOf(query, system))
+    spec.setTyped(typedSpecOf(query, system))
     // a linked value outside its bounds shows as written with its error
     form.setErrors(fieldErrorsOf(linked, system))
     const queried = queryLadder(query, system)
@@ -2766,7 +2843,14 @@ export function useWorkbenchState() {
     si === undefined ? undefined : shownLength('diameter', system, si)
   const mmText = (mm: number | undefined) =>
     mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
-  const pmax = specValue(undefined, 'Pmax')
+  /** The cartridge sheet's and the powder's values the user may type over them: the records', the typed and the ones a run reads. */
+  const spec = useSpecValues(system, {
+    pmax: specValue(undefined, 'Pmax'),
+    caseLength: specValue('cartridge', 'L3'),
+    bulkDensity: recordBulkDensity(chosenPowder, linkedPowder),
+  })
+  /** The Pmax a readout names, bar: the typed one, else the sheet's. */
+  const pmax = pmaxBar(spec.values.pmax)
 
   // the defaults of volume, bore diameter, twist and barrel length from what is chosen
   const gun = firearmList.find((f) => f.id === firearm)
@@ -2805,14 +2889,22 @@ export function useWorkbenchState() {
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
   const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
+  const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
   const fieldValues: Record<string, number | undefined> = {
     ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
     ...bulletValues,
+    ...spec.values,
     firearmMass: gunWeightUsed.si,
   }
   const given = givenKeys(fieldValues, {
     origin,
     bullet: bulletGiven,
+    specs: specsGiven(
+      spec.record,
+      cartridgeRef,
+      savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
+      spec.typed,
+    ),
     defaults,
     defaulted,
     followed,
@@ -2829,6 +2921,7 @@ export function useWorkbenchState() {
     recordValuesOf({
       origin,
       bullet: recordBulletValues(bulletRecord),
+      specs: spec.record,
       suggestions,
       seatingOwnsVolume: seatingOwnsVolume(seated),
       firearmMass: gun?.data.firearmMass,
@@ -2841,6 +2934,7 @@ export function useWorkbenchState() {
       changes,
       system,
       bulletKeys: new Set(bulletFields.map((s) => s.key)),
+      specKeys: new Set(specValueKeys),
       baseChanged,
       setField: form.setFieldValue,
       clearError: form.clearFieldError,
@@ -2848,6 +2942,7 @@ export function useWorkbenchState() {
         setTypedBullet((f) =>
           Object.fromEntries(Object.entries(f).filter(([k]) => !drop.includes(k))),
         ),
+      unsetTypedSpec: spec.unset,
       follow: (add) => setFollowed((f) => new Set([...f, ...add])),
       setGunWeight: (v) => {
         gunFromFirearm.current = true
@@ -2867,8 +2962,10 @@ export function useWorkbenchState() {
   }
   /** A new cartridge takes the Cartridge card's changed values: they follow the record again. */
   const dropCartridgeChanges = () => {
-    const keys = cardKeys.cartridge.filter((k) => changes[k] !== undefined)
+    const keys = changedFieldKeys(changes)
     noteReplaced('cartridge')
+    // the cartridge's own specs: a typed bulk density belongs to the powder and stays
+    spec.unset(['pmax', 'caseLength'])
     for (const k of keys) form.setFieldValue(k, emptyStep)
     setFollowed((f) => new Set([...f, ...keys.filter(isFollowKey)]))
   }
@@ -2891,10 +2988,12 @@ export function useWorkbenchState() {
   }
   const pickPowder = (id: string) => {
     noteReplaced('powder')
+    spec.unset(['bulkDensity'])
     return choosePowder(id)
   }
   const pickPowderDesign = (id: string) => {
     noteReplaced('powder')
+    spec.unset(['bulkDensity'])
     choosePowderDesign(id)
   }
   const pickFirearm = (id: string | null) => {
@@ -2905,7 +3004,6 @@ export function useWorkbenchState() {
     ])
     chooseFirearm(id)
   }
-  const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
   // the measured capacity is a user record of its own, stored with the load (`storeLoad`); a
   // reference asked for and not loaded stays until a capacity is typed or chosen
   const { measuredCapacity, capacityRef } = capacityRefsOf(
@@ -3115,6 +3213,10 @@ export function useWorkbenchState() {
     baseChanged,
     typedBulletFields,
     setTypedBullet,
+    specs: spec.values,
+    recordSpecs: spec.record,
+    typedSpecFields: spec.typed,
+    setTypedSpec: spec.setTyped,
     bulletFit,
     bulletParams,
     describeBullet,

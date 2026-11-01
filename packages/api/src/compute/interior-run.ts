@@ -65,9 +65,10 @@ function checkPressureRange(
   range: PressureRange | undefined,
   cartridge: CartridgeWithSpecs | undefined,
   run?: Parameters<typeof limitCheck>[2],
+  pressureLimit?: number,
 ) {
   if (!range) throw new Error('no pressure range for a valid result')
-  const { limits, warnings, cartridge: echoed } = limitCheck(range, cartridge, run)
+  const { limits, warnings, cartridge: echoed } = limitCheck(range, cartridge, run, pressureLimit)
   return { pressureRange: range, limits, warnings, resolvedCartridge: echoed }
 }
 
@@ -101,7 +102,12 @@ function m3Runner(body: InteriorBody, { compute, cartridge, tolerances, resolved
           field: result.field,
         },
       }
-    const { resolvedCartridge, ...checked } = checkPressureRange(range, cartridge, { result, load })
+    const { resolvedCartridge, ...checked } = checkPressureRange(
+      range,
+      cartridge,
+      { result, load },
+      body.pressureLimit,
+    )
     resolved.cartridge = resolvedCartridge
     return {
       result,

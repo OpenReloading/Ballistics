@@ -72,10 +72,12 @@ function PeakPressure({
             <dt>{t('Percent of maximum')}</dt>
             <dd>{formatNumber(ofMax.percent, 0)} %</dd>
             <dd className="readout-note">
-              {t('of CIP {symbol} {limit}', {
-                symbol: ofMax.limit.symbol,
-                limit: p(ofMax.limit.pressure),
-              })}
+              {ofMax.limit.typed
+                ? t('of your Pmax {limit}', { limit: p(ofMax.limit.pressure) })
+                : t('of CIP {symbol} {limit}', {
+                    symbol: ofMax.limit.symbol,
+                    limit: p(ofMax.limit.pressure),
+                  })}
             </dd>
           </div>
         )}

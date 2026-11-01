@@ -8,7 +8,7 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
-import { bulletFields, interiorFields } from '../src/lib/interior-input.ts'
+import { bulletFields, interiorFields, specFields } from '../src/lib/interior-input.ts'
 import {
   capacityOfRecord,
   capacityRecord,
@@ -81,13 +81,16 @@ describe('the keys of a load', () => {
   it('are the workbench fields but the charge, the keys the solver reads', () => {
     expect([...overrideKeys, 'charge'].sort()).toEqual([...workbenchValueKeys].sort())
     const bulletKeys: string[] = bulletFields.map((f) => f.key)
+    const specKeys: string[] = specFields.map((f) => f.key)
     expect(interiorFields.map((f) => f.key).filter((k) => k !== 'charge')).toEqual(
       expect.arrayContaining(
-        overrideKeys.filter((k) => k !== 'firearmMass' && !bulletKeys.includes(k)),
+        overrideKeys.filter(
+          (k) => k !== 'firearmMass' && !bulletKeys.includes(k) && !specKeys.includes(k),
+        ),
       ),
     )
     // the keys no interior field has: the typed bullet values, in their own fields
-    expect(overrideKeys).toEqual(expect.arrayContaining(bulletKeys))
+    expect(overrideKeys).toEqual(expect.arrayContaining([...bulletKeys, ...specKeys]))
   })
 })
 

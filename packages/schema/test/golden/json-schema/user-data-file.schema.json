@@ -3821,6 +3821,21 @@
                             "unit": "mm",
                             "description": "The value of `bulletCavityDiameter` in mm."
                           },
+                          "pmax": {
+                            "type": "number",
+                            "unit": "bar",
+                            "description": "The value of `pmax` in bar."
+                          },
+                          "caseLength": {
+                            "type": "number",
+                            "unit": "mm",
+                            "description": "The value of `caseLength` in mm."
+                          },
+                          "bulkDensity": {
+                            "type": "number",
+                            "unit": "g/cm3",
+                            "description": "The value of `bulkDensity` in g/cm3."
+                          },
                           "propellantEnergy": {
                             "type": "number",
                             "unit": "J/kg",
@@ -3923,7 +3938,7 @@
                           }
                         },
                         "additionalProperties": false,
-                        "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter). Every other value follows the referenced records."
+                        "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
                       },
                       "bulletBase": {
                         "type": "string",

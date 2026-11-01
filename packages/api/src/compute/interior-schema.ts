@@ -183,6 +183,13 @@ const interiorSharedFields = {
       'Cartridge record id. Adds the comparison of the peak pressure with its CIP Pmax under limits.',
     )
     .optional(),
+  pressureLimit: z
+    .number()
+    .positive()
+    .describe(
+      'A pressure limit typed by the caller, Pa, in place of the CIP Pmax values of the cartridge: limits holds it as the one compared limit (method typed), and the warnings and the percentage target of the charge-target route read it. The cartridge id is then not needed for a limit.',
+    )
+    .optional(),
   maximumPressure: z
     .number()
     .positive()
