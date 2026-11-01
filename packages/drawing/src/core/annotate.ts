@@ -151,14 +151,14 @@ function splitDimensions(dims: Dimension[], zBreak: number) {
  * when it does not fit between the arrows) clear the others in that lane.
  */
 function stackLanes(
-  { lengthUnit, em, arrowLen, tailLen, zBreak, gap }: Placer,
+  { lengthUnit, fixedDecimals, em, arrowLen, tailLen, zBreak, gap }: Placer,
   stack: Dimension[],
 ) {
   const lanes: [number, number][][] = []
   const laneOf = new Map<Dimension, number>()
   for (const d of stack) {
     const [from, to] = [d.from, Math.min(d.to, zBreak)]
-    const w = textWidth(labelText(d, lengthUnit), em)
+    const w = textWidth(labelText(d, lengthUnit, fixedDecimals), em)
     const outside = to - from < face.shortSpan * arrowLen
     const fits = w + 2 * arrowLen < to - from
     const reach: [number, number] = [
@@ -185,14 +185,17 @@ function stackLanes(
  * part are placed past.
  */
 function layoutLanes(placer: Placer, frontOnAxis: boolean) {
-  const { annotation, lengthUnit, em, lane0, pitch, rMax, zBreak, segs } = placer
+  const { annotation, lengthUnit, fixedDecimals, em, lane0, pitch, rMax, zBreak, segs } = placer
   const dims = annotation.dimensions
   const { stack, heads, far, acrossDims, below, front } = splitDimensions(dims, zBreak)
 
   const { lanes, laneOf } = stackLanes(placer, stack)
   const stackBase = rMax + lane0
   const stackOuter = stackBase + Math.max(lanes.length - 1, 0) * pitch
-  const diameterW = Math.max(0, ...acrossDims.map((d) => textWidth(labelText(d, lengthUnit), em)))
+  const diameterW = Math.max(
+    0,
+    ...acrossDims.map((d) => textWidth(labelText(d, lengthUnit, fixedDecimals), em)),
+  )
   const farBase =
     rMax + lane0 + Math.max(heads.length * pitch, acrossDims.length ? diameterW + lane0 : 0)
   const farOuter = farBase + Math.max(far.length - 1, 0) * pitch
@@ -246,6 +249,7 @@ function laneLength(
 ) {
   const {
     lengthUnit,
+    fixedDecimals,
     em,
     arrowLen,
     tailLen,
@@ -271,7 +275,7 @@ function laneLength(
   if (isBroken) broken([from, y], [to, y], owner)
   else rule([from, y], [to, y], owner, outside)
   pending.push(() => {
-    const text = labelText(d, lengthUnit)
+    const text = labelText(d, lengthUnit, fixedDecimals)
     const w = textWidth(text, em)
     const ly = y + labelSide * (0.5 * em + gap)
     const ends = outside ? tailLen : 0
@@ -302,6 +306,7 @@ function laneLength(
 function headLengths(placer: Placer, pending: (() => void)[], heads: Dimension[]) {
   const {
     lengthUnit,
+    fixedDecimals,
     em,
     lane0,
     pitch,
@@ -325,7 +330,7 @@ function headLengths(placer: Placer, pending: (() => void)[], heads: Dimension[]
       if (z > 1e-9) segs.push({ a: [z, -start(z)], b: [z, y - face.overrun], kind: 'thin', owner })
     rule([d.from, y], [d.to, y], owner, outside)
     pending.push(() => {
-      const text = labelText(d, lengthUnit)
+      const text = labelText(d, lengthUnit, fixedDecimals)
       const w = textWidth(text, em)
       const x = Math.min(d.from, d.to) - (outside ? tailLen : 0) - gap - w / 2
       place(
@@ -344,6 +349,7 @@ function headDiameters(placer: Placer, pending: (() => void)[], below: Dimension
   const {
     points,
     lengthUnit,
+    fixedDecimals,
     em,
     lane0,
     pitch,
@@ -372,7 +378,7 @@ function headDiameters(placer: Placer, pending: (() => void)[], below: Dimension
       })
     rule([z, -r], [z, r], owner, 2 * r < face.shortSpan * arrowLen)
     pending.push(() => {
-      const text = labelText(d, lengthUnit)
+      const text = labelText(d, lengthUnit, fixedDecimals)
       const w = textWidth(text, em)
       const outer = Math.max(...below.map((b) => b.radius as number)) + tailLen + gap
       place(
@@ -395,6 +401,7 @@ function frontDiameters(
 ) {
   const {
     lengthUnit,
+    fixedDecimals,
     em,
     lane0,
     pitch,
@@ -421,7 +428,7 @@ function frontDiameters(
       })
     rule([z, -r], [z, r], owner, 2 * r < face.shortSpan * arrowLen)
     pending.push(() => {
-      const text = labelText(d, lengthUnit)
+      const text = labelText(d, lengthUnit, fixedDecimals)
       const w = textWidth(text, em)
       const beside = r + tailLen + gap + w / 2
       const places = [z + 0.5 * em + gap, z - 0.5 * em - gap, z + pitch, z + 2 * pitch].flatMap(
@@ -449,9 +456,10 @@ function layoutDiameters(
     farOuter,
   }: { acrossDims: Dimension[]; stackOuter: number; farOuter: number },
 ) {
-  const { points, annotation, lengthUnit, em, lane0, arrowLen, rMax, gap, place } = placer
+  const { points, annotation, lengthUnit, fixedDecimals, em, lane0, arrowLen, rMax, gap, place } =
+    placer
   for (const d of acrossDims) {
-    const text = labelText(d, lengthUnit)
+    const text = labelText(d, lengthUnit, fixedDecimals)
     const w = textWidth(text, em)
     const columns = [
       [-1, rMax + lane0],
@@ -567,11 +575,15 @@ function radiusLeader(
 
 /** Fillet radii: a 45 degree leader to the unrounded corner, the text along it. */
 function layoutRadii(placer: Placer) {
-  const { part, points, annotation, lengthUnit, em, gap, label, place } = placer
+  const { part, points, annotation, lengthUnit, fixedDecimals, em, gap, label, place } = placer
   for (const c of annotation.radii) {
     const owner = c.symbol
     const corner: PartPoint = [c.corner[1], c.corner[0]]
-    const text = labelText({ kind: 'radius', symbol: c.symbol, value: c.value }, lengthUnit)
+    const text = labelText(
+      { kind: 'radius', symbol: c.symbol, value: c.value },
+      lengthUnit,
+      fixedDecimals,
+    )
     const w = textWidth(text, em)
     const options: [number, number][] = [
       [-1, -1],

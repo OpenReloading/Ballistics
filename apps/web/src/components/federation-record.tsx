@@ -42,14 +42,15 @@ export function FederationRuleBooks({
   )
 }
 
-/** The federation's own values and its links: abbreviation, country, the international body, homepage. */
+/**
+ * The federation's own values and its links: country, the international body, homepage. The
+ * abbreviation is the chip beside the page title.
+ */
 export function FederationData({
-  abbreviation,
   country,
   member,
   website,
 }: {
-  abbreviation: string
   /** An ISO 3166-1 alpha-2 code, or `international` for a world body. */
   country: string
   /** The international federation this one belongs to: its id and name. */
@@ -70,10 +71,7 @@ export function FederationData({
         labelledBy="record-data"
         groups={[
           {
-            rows: [
-              { label: msg('Abbreviation'), text: abbreviation },
-              { label: msg('Country'), text: place },
-            ],
+            rows: [{ label: msg('Country'), text: place }],
           },
         ]}
       />
@@ -111,7 +109,10 @@ interface FederationDisciplineRow {
   faces: number
 }
 
-/** A federation's disciplines, with the link to the discipline list filtered to it. */
+/**
+ * A federation's disciplines, with the link to the discipline list filtered to it. The Number
+ * column only where a discipline has one; the numeric columns aligned right, head and values.
+ */
 export function FederationDisciplines({
   rows,
   listHref,
@@ -120,6 +121,7 @@ export function FederationDisciplines({
   listHref: string
 }) {
   const { t } = useTranslation()
+  const numbered = rows.some((d) => d.number)
   return (
     <Panel
       id="federation-disciplines"
@@ -141,15 +143,21 @@ export function FederationDisciplines({
           caption={
             <span className="visually-hidden">{t('The disciplines of this federation')}</span>
           }
-          columns={[t('Number'), t('Discipline'), t('Distance'), t('Category'), t('Targets')]}
+          columns={[
+            ...(numbered ? [t('Number')] : []),
+            t('Discipline'),
+            { label: t('Distance'), num: true },
+            t('Category'),
+            { label: t('Targets'), num: true },
+          ]}
         >
           {rows.map((d) => (
             <tr key={d.id}>
-              <td>{d.number && <SlashBreaks text={d.number} />}</td>
+              {numbered && <td>{d.number && <SlashBreaks text={d.number} />}</td>}
               <th scope="row">
                 <Link href={`/disciplines/${d.id}`}>{d.name}</Link>
               </th>
-              <td className="nowrap">{`${plainNumber(d.distanceM)} m`}</td>
+              <td className="num nowrap">{`${plainNumber(d.distanceM)} m`}</td>
               <td>{d.category && categoryWord(t, d.category)}</td>
               <td className="num">{d.faces}</td>
             </tr>
@@ -182,7 +190,7 @@ export function FederationFaces({ rows }: { rows: readonly FederationFaceRow[] }
           caption={
             <span className="visually-hidden">{t('The targets its disciplines are shot on')}</span>
           }
-          columns={[t('Target'), t('Disciplines')]}
+          columns={[t('Target'), { label: t('Disciplines'), num: true }]}
         >
           {rows.map((x) => (
             <tr key={x.id}>

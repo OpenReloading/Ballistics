@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   type Bullet,
+  type Cartridge,
   compareKeys,
   type Powder,
   type Primer,
@@ -10,6 +11,7 @@ import {
   parseRef,
   publishedLoads,
 } from '@open-reloading/schema'
+import type { Finding } from './plausibility.ts'
 import { readKind } from './read-kind.ts'
 import type { SourceIndex } from './sources.ts'
 
@@ -247,4 +249,113 @@ export function checkPublishedLoads(
       checkPressureUnits(l, where, errors)
     }
   }
+}
+
+/** A plausibility finding of one load of a published load file. */
+export type PublishedLoadFinding = Finding & { load: string }
+
+type Charge = PublishedLoad['charges'][number]
+
+/** The start and the max charge of a load, where it prints both. */
+function startAndMax(l: PublishedLoad): [Charge, Charge] | undefined {
+  const start = l.charges.find((c) => c.kind === 'start')
+  const max = l.charges.find((c) => c.kind === 'max')
+  return start && max ? [start, max] : undefined
+}
+
+/** The largest value of `symbol` (any variant) of a cartridge record, where it has one. */
+function largest(cartridge: Pick<Cartridge, 'values'>, symbol: string, side?: string) {
+  const values = cartridge.values
+    .filter((v) => v.symbol === symbol && (side === undefined || v.side === side))
+    .flatMap((v) => (v.value === undefined ? [] : [v.value]))
+  return values.length > 0 ? Math.max(...values) : undefined
+}
+
+/** Where two velocities apply: the same printed symbol (or none), and the same distance where both print one. */
+function samePoint(a: Charge['velocity'], b: Charge['velocity']) {
+  const [p, q] = [a?.point, b?.point]
+  if (p?.label !== q?.label) return false
+  const [d, e] = [p?.distance?.value, q?.distance?.value]
+  return d === undefined || e === undefined || d === e
+}
+
+/** The order findings of a load's start and max charge: charge, velocity and pressure. */
+function orderFindings(l: PublishedLoad): Finding[] {
+  const pair = startAndMax(l)
+  if (!pair) return []
+  const [start, max] = pair
+  const found: Finding[] = []
+  if (start.charge.value > max.charge.value)
+    found.push({
+      finding: 'start-above-max',
+      message: `the start charge ${start.charge.raw} is above the max charge ${max.charge.raw}`,
+    })
+  if (start.velocity && max.velocity && samePoint(start.velocity, max.velocity))
+    if (max.velocity.value < start.velocity.value)
+      found.push({
+        finding: 'velocity-order',
+        message: `the velocity of the max charge, ${max.velocity.raw}, is below that of the start charge, ${start.velocity.raw}`,
+      })
+  const [p, q] = [start.pressure, max.pressure]
+  if (p?.peak.value !== undefined && q?.peak.value !== undefined)
+    if (p.unit === q.unit && p.method === q.method && q.peak.value < p.peak.value)
+      found.push({
+        finding: 'pressure-order',
+        message: `the pressure of the max charge, ${q.peak.raw}, is below that of the start charge, ${p.peak.raw}`,
+      })
+  return found
+}
+
+/** The findings of a load against its cartridge record: pressure above Pmax, COAL above L6. */
+function cartridgeFindings(
+  l: PublishedLoad,
+  cartridge: Pick<Cartridge, 'id' | 'pressureMethod' | 'values'>,
+): Finding[] {
+  const found: Finding[] = []
+  const pmax = largest(cartridge, 'Pmax')
+  for (const c of l.charges) {
+    const p = c.pressure
+    // only a value on the record's own basis; no value is converted between bases
+    if (pmax === undefined || p?.peak.value === undefined) continue
+    if (cartridge.pressureMethod === undefined || p.method !== cartridge.pressureMethod) continue
+    // a case-contact gauge reads on its own basis: Pmax is not its limit (#855)
+    if (p.method === 'case-contact') continue
+    if (p.peak.value > pmax)
+      found.push({
+        finding: 'pressure-above-cartridge-max',
+        message: `the ${c.kind} pressure ${p.peak.raw} (${p.method}) is above Pmax ${pmax} bar of ${cartridge.id}`,
+      })
+  }
+  const l6 = largest(cartridge, 'L6', 'cartridge')
+  if (l6 !== undefined && l.coal?.value !== undefined && l.coal.value > l6)
+    found.push({
+      finding: 'coal-above-cartridge-max',
+      message: `COAL ${l.coal.raw} is above L6 ${l6} mm of ${cartridge.id}`,
+    })
+  return found
+}
+
+/**
+ * The plausibility findings of a published load file, each a warning: a printed value that looks
+ * wrong is still the maker's value and stays as printed. Findings:
+ * - `start-above-max`: the start charge is above the max charge of the same load;
+ * - `velocity-order`: the velocity of the max charge is below that of the start charge (same point);
+ * - `pressure-order`: the pressure of the max charge is below that of the start charge (same unit
+ *   and method, both with a value in bar);
+ * - `pressure-above-cartridge-max`: a pressure with a value in bar whose method is the cartridge
+ *   record's `pressureMethod` is above the record's largest `Pmax`. Other methods, and case-contact
+ *   pressure always, are not compared: no value is converted between pressure bases;
+ * - `coal-above-cartridge-max`: COAL above the record's largest `L6` (maximum cartridge length).
+ * Without a cartridge record only the order findings apply.
+ */
+export function checkPublishedLoadPlausibility(
+  file: PublishedLoads,
+  cartridge: Pick<Cartridge, 'id' | 'pressureMethod' | 'values'> | undefined,
+): PublishedLoadFinding[] {
+  return file.loads.flatMap((l) =>
+    [...orderFindings(l), ...(cartridge ? cartridgeFindings(l, cartridge) : [])].map((f) => ({
+      ...f,
+      load: l.id,
+    })),
+  )
 }

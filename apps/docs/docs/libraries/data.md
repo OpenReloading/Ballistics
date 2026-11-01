@@ -41,8 +41,10 @@ console.log(twistPlausible(254)) // true
 ```js
 import { readRecords } from '@open-reloading/data'
 
-const { bundle, errors } = readRecords('Ballistics/packages/data/records')
+const { bundle, errors, warnings } = readRecords('Ballistics/packages/data/records')
 ```
+
+`errors` fail the validation. `warnings` are plausibility findings of published loads, which stay as printed and do not fail it.
 
 ## Reference
 

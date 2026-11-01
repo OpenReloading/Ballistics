@@ -1,6 +1,8 @@
 'use client'
 
 import type { Bullet } from '@open-reloading/schema'
+import { Flask } from '@phosphor-icons/react'
+import { useTranslation } from '../i18n/language.ts'
 import { msg } from '../i18n/translate.ts'
 import { compareFrom } from '../lib/compare-ids.ts'
 import { countryOf } from '../lib/countries.ts'
@@ -19,6 +21,7 @@ import { RecordScope, UnitSwitch } from './cartridge-record.tsx'
 import { FieldStrip } from './field-strip.tsx'
 import { CoefficientTable, FieldPanel } from './field-table.tsx'
 import { Panel } from './panel.tsx'
+import { LinkButton } from './record-actions.tsx'
 import { RecordPage } from './record-page.tsx'
 import { RecordViewWith } from './record-view.tsx'
 
@@ -26,6 +29,7 @@ import { RecordViewWith } from './record-view.tsx'
 type Fits = { id: string; name: string }[]
 
 function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits }) {
+  const { t } = useTranslation()
   // each named, as a badge holds no heading
   const badges: Wording[] = [
     b.productLine && worded(msg('Line {line}'), { line: b.productLine }),
@@ -45,11 +49,22 @@ function BulletRecord({ b, label, fits }: { b: Bullet; label: string; fits: Fits
         design={`/bullets/designer?from=${encodeURIComponent(b.id)}`}
         provenance={b.provenance}
         strip={
-          <FieldStrip
-            items={bulletStrip(b)}
-            country={b.country ? countryOf(b.country) : undefined}
-            tags={badges}
-          />
+          <>
+            <FieldStrip
+              items={bulletStrip(b)}
+              country={b.country ? countryOf(b.country) : undefined}
+              tags={badges}
+            />
+            {/* below 75em the bar keeps its actions behind Page actions: the primary one stays in view */}
+            <LinkButton
+              href={workbenchHref('bullet', b.id)}
+              icon={<Flask aria-hidden="true" />}
+              primary
+              className="phone-action"
+            >
+              {t('Use in workbench')}
+            </LinkButton>
+          </>
         }
         figure={
           <>

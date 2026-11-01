@@ -34,4 +34,4 @@ The base position moves the chamber volume, which the [peak-pressure range](../m
 
 In the bullet designer, start from the catalogue bullet or a new design and enter Length under Mass, diameter and length, and Bearing length and Base to ogive under Shank. Save the design and choose it in the workbench. The seating figure then draws the bullet from your values, and COAL or CBTO places it.
 
-The lands values belong to the firearm: enter Base to ogive at the lands, measured, with the bullet you measured it with, and the workbench gives the jump for that bullet ([Firearm records](../data/firearm-records.md)).
+The lands values belong to the firearm: enter Base to ogive at the lands with the bullet you measured it with, and the workbench gives the jump for that bullet ([Firearm records](../data/firearm-records.md)).

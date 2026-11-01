@@ -272,7 +272,8 @@ export function searchGroups(
 /**
  * A titled panel of a record's values as a symbol table: a group filter (All and each group's
  * `filter` or title) in its title row where there are two filters or more, a search field over
- * symbols and names above the table where it has more than 20 rows.
+ * symbols and names above the table where it has more than 20 rows. A search looks through every
+ * group (the filter shows All while it has text); choosing a group clears it.
  */
 export function FieldPanel({
   id,
@@ -299,12 +300,14 @@ export function FieldPanel({
   const filters = [
     ...new Map(groups.flatMap((g) => g.filter ?? g.title ?? []).map((w) => [key(w), w])).entries(),
   ]
+  // a search looks through every group: the filter shows All while it has text
+  const scope = q.trim() ? 'All' : group
   const shown = searchGroups(
-    group === 'All'
+    scope === 'All'
       ? groups
       : groups.filter((g) => {
           const w = g.filter ?? g.title
-          return w !== undefined && key(w) === group
+          return w !== undefined && key(w) === scope
         }),
     q,
     t,
@@ -327,8 +330,12 @@ export function FieldPanel({
                 label: say(t, w).replace(' and ', ', ').replace(' und ', ', '),
               })),
             ]}
-            value={group}
-            onChange={setGroup}
+            value={scope}
+            onChange={(v) => {
+              // a group chosen while searching shows that group, not the search
+              setQ('')
+              setGroup(v)
+            }}
           />
         )
       }
@@ -356,7 +363,9 @@ export function FieldPanel({
         symbolColumn={symbols}
       />
       {shown.length === 0 && (
-        <p className="record-note">{t('No row matches {query}.', { query: q.trim() })}</p>
+        <p className="record-note">
+          {t('No row of {table} matches {query}.', { table: name, query: q.trim() })}
+        </p>
       )}
       {children}
     </Panel>

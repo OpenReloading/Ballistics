@@ -100,9 +100,9 @@ describe('start', () => {
     const e = evaluate(d, metric)
     for (const k of ['diameter', 'mass', 'length', 'noseLength', 'bearingLength', 'baseToOgive'])
       expect(e.states[k]).toEqual({ kind: 'record' })
-    // stored values come back as stored, not with the noise of the SI round trip
+    // stored values come back in the drawing's fixed 2 mm decimals, not with the noise of the SI round trip
     expect(e.drawing?.screen.layers.bullet.labels.find((l) => l.owner === 'd')?.text).toBe(
-      '∅d 7.823',
+      '∅d 7.82',
     )
     // the computed values of the bullet page
     const r = targetBullet

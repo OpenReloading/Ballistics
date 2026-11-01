@@ -47,11 +47,11 @@ import {
   Cursor,
   Eye,
   FilePlus,
+  FrameCorners,
   ImageBroken,
   Image as ImageIcon,
   PencilSimple,
   Plus,
-  Ruler,
   Target,
   Trash,
 } from '@phosphor-icons/react'
@@ -222,6 +222,9 @@ const refNames: Record<RefKind, Message> = {
   ringEdge: msg('Ring, three points'),
   rectangle: msg('Rectangle, four corners'),
 }
+/** Why placing on the target waits: no scale yet. */
+const noReference = msg('Mark a reference first (Calibrate).')
+
 const refHints: Record<RefKind, Message> = {
   line: msg('Click both ends of a known length.'),
   ringCentre: msg('Click the ring center, then a point on the ring.'),
@@ -434,18 +437,21 @@ function CoordInput({
 function Row({
   label,
   help,
+  className,
   children,
 }: {
   label: string
   help?: string | undefined
+  /** More classes of the row, and of its value as `<class>-value`. */
+  className?: string
   children: ReactNode
 }) {
   return (
-    <div className="prop-row">
+    <div className={className ? `prop-row ${className}` : 'prop-row'}>
       <span className="prop-label" title={help}>
         {label}
       </span>
-      <span className="prop-value">{children}</span>
+      <span className={className ? `prop-value ${className}-value` : 'prop-value'}>{children}</span>
     </div>
   )
 }
@@ -593,34 +599,54 @@ type Ed = {
 function FilterPanel({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
   const { sheet, filter, setFilter } = ed
+  /** A filter's row: the slider, its value beside it and a reset to `none`, the photo as it is. */
+  const row = (
+    key: 'contrast' | 'darken',
+    label: string,
+    range: { min: number; max: number; step: number; none: number },
+    text: (v: number) => string,
+  ) => (
+    <Row
+      key={key}
+      label={label}
+      help={t('Display only; the photo file stays as it is.')}
+      className="filter-row"
+    >
+      <Slider
+        size="sm"
+        min={range.min}
+        max={range.max}
+        step={range.step}
+        disabled={!sheet.photo}
+        value={filter[key]}
+        onChange={(v) => setFilter({ ...filter, [key]: v })}
+        thumbLabel={label}
+        label={null}
+      />
+      <output className="filter-readout">{text(filter[key])}</output>
+      <ActionIcon
+        variant="subtle"
+        size={controlSize.row.icon}
+        aria-label={t('Reset {label}', { label })}
+        title={t('Reset {label}', { label })}
+        disabled={filter[key] === range.none}
+        onClick={() => setFilter({ ...filter, [key]: range.none })}
+      >
+        <ArrowCounterClockwise size={12} aria-hidden="true" />
+      </ActionIcon>
+    </Row>
+  )
   return (
     <div className="prop-grid">
-      <Row label={t('Contrast')} help={t('Display only; the photo file stays as it is.')}>
-        <Slider
-          size="sm"
-          min={0.5}
-          max={3}
-          step={0.1}
-          disabled={!sheet.photo}
-          value={filter.contrast}
-          onChange={(v) => setFilter({ ...filter, contrast: v })}
-          thumbLabel={t('Contrast')}
-          label={(v) => fixedNumber(v, 1)}
-        />
-      </Row>
-      <Row label={t('Darken')} help={t('Display only; the photo file stays as it is.')}>
-        <Slider
-          size="sm"
-          min={0}
-          max={0.8}
-          step={0.05}
-          disabled={!sheet.photo}
-          value={filter.darken}
-          onChange={(v) => setFilter({ ...filter, darken: v })}
-          thumbLabel={t('Darken')}
-          label={(v) => `${plainNumber(Math.round(v * 100))} %`}
-        />
-      </Row>
+      {row('contrast', t('Contrast'), { min: 0.5, max: 3, step: 0.1, none: 1 }, (v) =>
+        fixedNumber(v, 1),
+      )}
+      {row(
+        'darken',
+        t('Darken'),
+        { min: 0, max: 0.8, step: 0.05, none: 0 },
+        (v) => `${plainNumber(Math.round(v * 100))} %`,
+      )}
     </div>
   )
 }
@@ -789,7 +815,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
       <SiField
         spec={{
           key: 'targetRotation',
-          label: msg('Rotation'),
+          label: msg('Target axis angle'),
           help: msg(
             "Angle of the target's x axis on the photo, counter-clockwise. Shots stay on their holes.",
           ),
@@ -1005,23 +1031,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
             >
               {t('Aim ({unit})', { unit: len.symbol })}
             </span>
-            <span className="prop-value row-buttons aim-fields">
-              <Button
-                size={controlSize.row.button}
-                variant={tool === 'aim' ? 'filled' : 'default'}
-                disabled={!frame}
-                onClick={() => startTool('aim')}
-              >
-                {t('Set')}
-              </Button>
-              <Button
-                size={controlSize.row.button}
-                variant="default"
-                disabled={!group.aim}
-                onClick={() => onGroup(({ aim: _, ...g }) => g)}
-              >
-                {t('Clear')}
-              </Button>
+            <span className="prop-value aim-fields">
               {(['x', 'y'] as const).map((axis) => (
                 <span key={axis} className="aim-axis">
                   <span aria-hidden="true">{axis}</span>
@@ -1040,6 +1050,25 @@ function GroupPanel({ ed }: { ed: Ed }) {
               ))}
             </span>
           </div>
+          <span className="row-buttons wide">
+            <Button
+              size={controlSize.row.button}
+              variant={tool === 'aim' ? 'filled' : 'default'}
+              disabled={!frame}
+              title={frame ? t('Click the point of aim on the target') : t(noReference)}
+              onClick={() => startTool('aim')}
+            >
+              {t('Set')}
+            </Button>
+            <Button
+              size={controlSize.row.button}
+              variant="default"
+              disabled={!group.aim}
+              onClick={() => onGroup(({ aim: _, ...g }) => g)}
+            >
+              {t('Clear')}
+            </Button>
+          </span>
           {score.panel}
         </>
       )}
@@ -1066,9 +1095,13 @@ function AddShotButton({ ed, addShot }: { ed: Ed; addShot: (q: Point) => void })
           root.current?.querySelector<SVGElement>(`[data-shot="${CSS.escape(at)}"]`)?.focus(),
         )
       }}
-      title={t(
-        'A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields.',
-      )}
+      title={
+        frame
+          ? t(
+              'A shot at the point of aim (or the origin); move it with Alt and the arrow keys or the fields.',
+            )
+          : t(noReference)
+      }
     >
       {t('Add shot')}
     </Button>
@@ -1209,12 +1242,11 @@ function ShotsPanel({ ed }: { ed: Ed }) {
 }
 
 /** The statistics of the active group: score, key values, offset and the clicks to the point of aim. */
-function StatsPanel({ ed }: { ed: Ed }) {
+function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
   const {
     group,
     stats,
     system,
-    compact,
     groupScore,
     score,
     keyValues,
@@ -1295,7 +1327,7 @@ function StatsPanel({ ed }: { ed: Ed }) {
             </>
           )}
           {keyValues
-            .filter((r) => !compact || keyReadouts.includes(r.key))
+            .filter((r) => !brief || keyReadouts.includes(r.key))
             .map((r) => {
               const [a, b] = angles(r.angle)
               const range = (iv: Interval) =>
@@ -1344,7 +1376,7 @@ function StatsPanel({ ed }: { ed: Ed }) {
                 </Table.Tr>
               )
             })}
-          {offset && !compact && (
+          {offset && !ed.compact && (
             <>
               <Table.Tr>
                 <Table.Th scope="row" title={t('Group center from the point of aim.')}>
@@ -1417,7 +1449,7 @@ function StatsPanel({ ed }: { ed: Ed }) {
           )}
         </Table.Tbody>
       </Table>
-      {!optic && offset && !compact && options.length > 0 && (
+      {!optic && offset && !ed.compact && options.length > 0 && (
         <NativeSelect
           size={controlSize.row.input}
           label={t('Optic for clicks')}
@@ -1847,7 +1879,7 @@ function CalibrateTool({ ed }: { ed: Ed }) {
       description={unscaled ? t('The photo has no scale yet.') : undefined}
       icon={
         <span className="icon-slot" aria-hidden="true">
-          <Ruler />
+          <FrameCorners />
         </span>
       }
       frame={(popover) => (
@@ -2377,12 +2409,36 @@ function startNote(photo: boolean, scaled: boolean, t: Translator['t']) {
 /** The statistics column of the wide layout, with the shots, the notes and the ladder. */
 function StatsSide({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
-  const { group, stats, uid, shotsOpen, panel, charges, notesPanel } = ed
+  const { group, stats, uid, shotsOpen, panel, charges, notesPanel, keyValues } = ed
+  // the key values stay open, the other rows on request: the shot list keeps its room
+  const [allStats, setAllStats] = useState(false)
+  const more = keyValues.some((r) => !keyReadouts.includes(r.key))
   return (
     <aside className={`target-side stats-side${panel}`} aria-label={t('Statistics and shots')}>
       <SideHead ed={ed} title={t('Statistics')} />
       <Headline ed={ed} />
-      {group && stats && <StatsPanel ed={ed} />}
+      {group && stats && !more && <StatsPanel ed={ed} />}
+      {group && stats && more && (
+        <>
+          <div id={`${uid}-stats`}>
+            <StatsPanel ed={ed} brief={!allStats} />
+          </div>
+          <button
+            type="button"
+            className="head-toggle stats-more"
+            aria-expanded={allStats}
+            aria-controls={`${uid}-stats`}
+            onClick={() => setAllStats((o) => !o)}
+          >
+            {allStats ? (
+              <CaretUp size={12} aria-hidden="true" />
+            ) : (
+              <CaretDown size={12} aria-hidden="true" />
+            )}
+            {t('All statistics')}
+          </button>
+        </>
+      )}
       <ShotsHead ed={ed} />
       <div id={`${uid}-shots`} className="shots-body" hidden={!shotsOpen}>
         {shotsOpen && group && <ShotsPanel ed={ed} />}
@@ -2646,7 +2702,7 @@ function toolHintOf(
   if (tool === 'origin') return t('Click the photo point of target (0, 0). {keys}', { keys })
   if (tool === 'aim') return t('Click the point of aim of the active group. {keys}', { keys })
   if (tool !== 'shot') return
-  return frame ? t('Click a hole to add a shot to the active group.') : t('Mark a reference first.')
+  return frame ? t('Click a hole to add a shot to the active group.') : t(noReference)
 }
 
 /** The state the File menu shows for the sheet. */
@@ -2794,6 +2850,12 @@ export function TargetEditor({
   const uid = useId()
   /** The toolbar popovers: Photo, Calibrate, Overlays; one open at a time. */
   const [pop, setPop] = useState<'photo' | 'calibrate' | 'overlays'>()
+  // a toolbar popover closed: the routine message of what was done in it goes too; an alert stays
+  const poppedUp = useRef(pop)
+  useEffect(() => {
+    if (poppedUp.current && !pop) setStatus((x) => (x.alert ? x : { text: '', alert: false }))
+    poppedUp.current = pop
+  }, [pop])
   const [renaming, setRenaming] = useState(false)
   const [shotsOpen, setShotsOpen] = useState(true)
   /** The phone's bottom sheet: open or only its summary strip. */

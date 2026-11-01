@@ -176,6 +176,8 @@ export interface Part {
   callouts?: Callout[]
   /** The unit of the length texts; mm by default. */
   unit?: LengthUnit | undefined
+  /** Length texts in the unit's fixed decimals (mm 2, in 4) instead of the value as stored (the bullet drawing). */
+  fixedDecimals?: boolean | undefined
 }
 
 /** A note flag (its number in a circle) or a detail letter, on a leader from the feature at `at`. */

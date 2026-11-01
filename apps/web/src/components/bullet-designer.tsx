@@ -54,6 +54,7 @@ import { PropertyGrid } from './property-grid.tsx'
 import { DrawingNotes } from './record-actions.tsx'
 import { RecordSearch } from './record-search.tsx'
 import { TechnicalDrawing } from './technical-drawing.tsx'
+import { UnitsIconButton } from './units-settings.tsx'
 import { useDesigner } from './use-designer.ts'
 import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useManufacturers } from './use-manufacturers.ts'
@@ -419,16 +420,18 @@ export function BulletDesigner() {
   // New bullet or cartridge starts a new record
 
   const toolbar = (
+    <DesignerToolbar
+      undo={history.past.length > 0}
+      redo={history.future.length > 0}
+      reset={design.origin !== undefined}
+      newLabel={t('New bullet')}
+      resetLabel={t('Reset to record')}
+      system={system}
+      dispatch={toolbarDispatch}
+    />
+  )
+  const actions = (
     <>
-      <DesignerToolbar
-        undo={history.past.length > 0}
-        redo={history.future.length > 0}
-        reset={design.origin !== undefined}
-        newLabel={t('New bullet')}
-        resetLabel={t('Reset to record')}
-        system={system}
-        dispatch={toolbarDispatch}
-      />
       <Button
         ref={photoButton}
         variant="default"
@@ -447,6 +450,7 @@ export function BulletDesigner() {
         onOpen={openFile}
         reportBox={t('Include the design')}
       />
+      <UnitsIconButton />
     </>
   )
 
@@ -579,7 +583,7 @@ export function BulletDesigner() {
 
   return (
     <>
-      <PageBar translated title={msg('Bullet designer')} actions={toolbar} />
+      <PageBar translated title={msg('Bullet designer')} fold={toolbar} actions={actions} />
       {/* biome-ignore lint/a11y/noStaticElementInteractions: follows focus and hover of the fields inside, takes none itself */}
       <div
         ref={root}
