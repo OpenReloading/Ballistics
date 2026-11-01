@@ -1,4 +1,4 @@
-import { loadRatio } from '@open-reloading/core'
+import { castHarderThanPeak, loadRatio } from '@open-reloading/core'
 import { fromSi } from '@open-reloading/schema'
 import { formatNumber } from '../i18n/number.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
@@ -7,14 +7,16 @@ import type { InteriorBody } from '../lib/interior-input.ts'
 import { rampAtJump } from '../lib/interior-request.ts'
 import { limitShare } from '../lib/limit-text.ts'
 import { nth } from '../lib/nth.ts'
+import { rawWording } from '../lib/record-values.ts'
 import type {
   LadderDirection,
   RunnableLadderKind,
   SeatingLengthKind,
   SeatingStep,
 } from '../lib/seating-ladder.ts'
-import { type UnitSystem, withUnit } from '../lib/units.ts'
+import { formatQuantity, type UnitSystem, withUnit } from '../lib/units.ts'
 import type { CapacityRule } from '../lib/volume-tolerance.ts'
+import { say } from '../lib/wording.ts'
 import {
   bandLine,
   bulletLeadTime,
@@ -76,6 +78,22 @@ export type Outcome =
       resistanceMissing?: { powder: string; missing: string[] } | undefined
       /** The rule of the range's volume tolerance from the capacity's source; none: the API's default. */
       volumeRule?: CapacityRule | undefined
+      /** Brinell hardness of the bullet record when it is cast with a plain base (`plainBaseCastHardness`). */
+      castHardness?: number | undefined
+      /** Rounds fired through the chosen firearm's barrel, its record's `roundCount`. */
+      roundCount?: number | undefined
+      /**
+       * The powder record has no temperature coefficient and the run took the default of its grain
+       * form; `coldPeak`: the peak breech pressure over the cold sensitivity interval, Pa, below the reference.
+       */
+      sensitivityDefault?:
+        | {
+            form: string
+            /** The cold sensitivity interval of the default, 1/K. */
+            coldInterval: readonly [number, number]
+            coldPeak?: [number, number] | undefined
+          }
+        | undefined
       /** The user bullet design whose mass the run used. */
       design?: string | undefined
       /** The user cartridge design whose values the run's fields took. */
@@ -168,7 +186,7 @@ export const singleCharge = (ok: Extract<Outcome, { kind: 'ok' }> | undefined) =
 /** What a result's derived values and flag read; the Powders tab builds it per powder. */
 type Shown = Pick<
   Extract<Outcome, { kind: 'ok' }>,
-  'body' | 'load' | 'bulkDensity' | 'resistanceMissing'
+  'body' | 'load' | 'bulkDensity' | 'resistanceMissing' | 'castHardness'
 >
 
 /** A result's derived values. */
@@ -194,6 +212,16 @@ export function derived(ok: Shown, t: Translator['t']) {
         ]
       : []),
     ...(fill ? [fill] : []),
+    ...(ok.castHardness !== undefined && castHarderThanPeak(ok.castHardness, r.peakBreechPressure)
+      ? [
+          {
+            text: t(
+              'A plain-base cast bullet harder than the peak pressure can upset (rule of thumb): gas may leak past its base. The model has no such leak.',
+            ),
+            name: t('possible gas leakage'),
+          },
+        ]
+      : []),
   ]
   return {
     ofMax: percentOfPressureLimit(r.peakBreechPressure, ok.body.limits),
@@ -239,6 +267,12 @@ export type ResultNote = { kind: NoteKind; line: string; text?: string | undefin
 
 /** The note of a run with a seated jump and no engraving ramp to start at it. */
 const noRampNote = msg('The jump to the lands has no effect without an engraving ramp.')
+
+/** The note of a run with a seated jump and no engraving ramp, or none. */
+const noRampNotes = (ok: Extract<Outcome, { kind: 'ok' }>, t: Translator['t']): ResultNote[] =>
+  ok.printed.seated.jump !== undefined && !ok.load.resistance?.engraving
+    ? [{ kind: 'note', line: t(noRampNote) }]
+    : []
 
 /** What clears a missing case fill, by the reason `loadRatioText` gives. */
 const fillActions = {
@@ -334,8 +368,55 @@ export function resultNotes(
         ]
       : []),
     ...designs.flatMap((line) => (line ? [{ kind: 'note' as const, line }] : [])),
-    ...(ok.printed.seated.jump !== undefined && !ok.load.resistance?.engraving
-      ? [{ kind: 'note' as const, line: t(noRampNote) }]
+    ...noRampNotes(ok, t),
+    ...(ok.sensitivityDefault
+      ? [
+          {
+            kind: 'note' as const,
+            line: t(
+              'Default temperature coefficient of {form} powder: the powder record gives none.',
+              {
+                form: say(t, rawWording(ok.sensitivityDefault.form)),
+              },
+            ),
+            text: t(
+              'A coefficient of the grain form, not of this powder, with a wide interval: results away from the reference temperature are approximate.',
+            ),
+          },
+          ...(ok.sensitivityDefault.coldPeak
+            ? [
+                {
+                  kind: 'note' as const,
+                  line: t(
+                    'Cold side: peak pressure {low} to {high} with the default coefficient.',
+                    {
+                      low: formatQuantity('pressure', system, ok.sensitivityDefault.coldPeak[0]),
+                      high: withUnit('pressure', system, ok.sensitivityDefault.coldPeak[1]),
+                    },
+                  ),
+                  text: t(
+                    'Below the reference the default gives the peak over a cold coefficient of 0 to 0.0030 per K, not one value.',
+                  ),
+                },
+              ]
+            : []),
+        ]
+      : []),
+    ...(ok.roundCount && !ok.load.chamber.throatWear
+      ? [
+          {
+            kind: 'note' as const,
+            line: t(
+              'The barrel has fired {count} rounds: the velocity may be lower than simulated.',
+              {
+                count: formatNumber(ok.roundCount, 0),
+              },
+            ),
+            text: t(
+              'A worn throat adds volume. One 5.56x45 mm barrel lost 0.29 % of its velocity per 1000 rounds to 8000 and 0.54 % from 8000 to 16000 (Vuong et al. 2026). Enter a measured Throat wear under More of the Gun card.',
+            ),
+          },
+        ]
       : []),
     ...(band ? [{ kind: 'note' as const, line: band }] : []),
   ]
@@ -395,10 +476,21 @@ export function stepFlag(ok: Shown, t: Translator['t']) {
   return
 }
 
-/** The outcome showing step `i`. */
+/** A default sensitivity without its cold-side interval, which belongs to one step and is fetched for it. */
+export const withoutColdPeak = (
+  d: { form: string; coldInterval: readonly [number, number] } | undefined,
+) => d && { form: d.form, coldInterval: d.coldInterval }
+
+/** The outcome showing step `i`; the cold-side interval of a default sensitivity is fetched for the step. */
 export function atStep(ok: Extract<Outcome, { kind: 'ok' }>, i: number) {
   const s = nth(ok.steps, i)
-  return { ...ok, body: s.body ?? ok.body, load: stepLoad(ok.load, s), selected: i }
+  return {
+    ...ok,
+    body: s.body ?? ok.body,
+    load: stepLoad(ok.load, s),
+    selected: i,
+    sensitivityDefault: withoutColdPeak(ok.sensitivityDefault),
+  }
 }
 
 /** The steps of an answer: a ladder's, or the single result as step 1. */

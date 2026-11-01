@@ -49,6 +49,7 @@ import {
 import { type FirearmRow, gunPicker, landsFor } from '../lib/firearm.ts'
 import { type FollowKey, followKeys } from '../lib/input-defaults.ts'
 import { bulletFields, burnFormError, interiorFields, specFields } from '../lib/interior-input.ts'
+import { hasSensitivity } from '../lib/interior-request.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import { newerFit } from '../lib/powder-designer.ts'
 import { loadFitMark, recordMark } from '../lib/powder-record.ts'
@@ -115,6 +116,8 @@ export const modelFields = [
   'formQ',
   'formZ1',
 ] as const
+/** The Gun card's optional throat wear, in its More popover. */
+export const firearmMoreFields = ['throatWear'] as const
 /** The Powder card's optional leak and bore resistance fields, in its More popover. */
 export const powderMoreFields = [
   'leakArea',
@@ -379,7 +382,7 @@ function LadderChoices() {
             k,
             ladderKind,
             powderLabel,
-            powder?.temperatureSensitivity !== undefined,
+            hasSensitivity(powder),
             seatingBlock,
             t,
           ),
@@ -1125,6 +1128,7 @@ function BaseFormFields() {
       {boatTailed(type) && <BulletValueField name="bulletBaseLength" />}
       {boatTailed(type) && <BulletValueField name="bulletBaseDiameter" />}
       {hollowBased(type) && <BulletValueField name="bulletCavityDiameter" />}
+      {hollowBased(type) && <BulletValueField name="bulletCavityDepth" />}
     </>
   )
 }
@@ -1672,7 +1676,7 @@ function MoreRows({ panel }: { panel: InputPanel }) {
       </>
     )
   if (panel === 'powder') return <>{fieldsOf(powderMoreFields)}</>
-  if (panel === 'firearm') return null
+  if (panel === 'firearm') return <>{fieldsOf(firearmMoreFields)}</>
   return (
     <>
       <BulletValueFields more />
@@ -1750,11 +1754,22 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
   const { ok, stale } = useResult()
   // the figure draws the record's shape at the typed diameter and base; its other dimensions are the
   // record's, so a typed length (which they would no longer add up to) stays out
-  const { bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter } =
-    bulletValues
+  const {
+    bulletDiameter,
+    bulletBaseLength,
+    bulletBaseDiameter,
+    bulletCavityDiameter,
+    bulletCavityDepth,
+  } = bulletValues
   const seatValues = useMemo(
-    () => ({ bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter }),
-    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter],
+    () => ({
+      bulletDiameter,
+      bulletBaseLength,
+      bulletBaseDiameter,
+      bulletCavityDiameter,
+      bulletCavityDepth,
+    }),
+    [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter, bulletCavityDepth],
   )
   // the figure draws the selected step of a seating ladder while its result is current
   const seatingStep = ok?.steps[ok.selected]?.seating

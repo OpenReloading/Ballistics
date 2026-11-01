@@ -104,8 +104,10 @@ export const workbenchHref = (kind: 'cartridge' | 'bullet' | 'powder', id: strin
 
 /**
  * What a run reads from the bullet and powder records, SI: the names, the bullet length, the bulk
- * density and the powder record's bore resistance under the keys of the fields that replace it. A
- * workbench link carries it under `record.`, so the load runs the same where a record is missing.
+ * density, the powder record's bore resistance under the keys of the fields that replace it, and for
+ * a powder without its own temperature coefficient its grain form and the reference of the default
+ * (`sensitivityReference`, K). A workbench link carries it under `record.`, so the load runs the
+ * same where a record is missing.
  */
 export type RecordValues = {
   bullet?: { name?: string | undefined; length?: number | undefined } | undefined
@@ -116,9 +118,15 @@ export type RecordValues = {
         boreFriction?: number | undefined
         engravingPressure?: number | undefined
         engravingLength?: number | undefined
+        grainForm?: GrainForm | undefined
+        sensitivityReference?: number | undefined
       }
     | undefined
 }
+
+const grainForms = ['ball', 'extruded', 'flake', 'other'] as const
+type GrainForm = (typeof grainForms)[number]
+const linkedGrainForm = (raw: string | null) => grainForms.find((f) => f === raw?.trim())
 
 const recordKeys = {
   bullet: { name: 'record.bullet', length: 'record.bulletLength' },
@@ -128,6 +136,8 @@ const recordKeys = {
     boreFriction: 'record.boreFriction',
     engravingPressure: 'record.engravingPressure',
     engravingLength: 'record.engravingLength',
+    grainForm: 'record.grainForm',
+    sensitivityReference: 'record.sensitivityReference',
   },
 } as const
 
@@ -164,6 +174,8 @@ export function recordValues(query: URLSearchParams): RecordValues {
     name: linkedName(query.get(k.powder.name)),
     bulkDensity: linkedNumber(query.get(k.powder.bulkDensity)),
     boreFriction: linkedNumber(query.get(k.powder.boreFriction)),
+    grainForm: linkedGrainForm(query.get(k.powder.grainForm)),
+    sensitivityReference: linkedNumber(query.get(k.powder.sensitivityReference)),
     ...(pressure !== undefined && length !== undefined
       ? { engravingPressure: pressure, engravingLength: length }
       : {}),

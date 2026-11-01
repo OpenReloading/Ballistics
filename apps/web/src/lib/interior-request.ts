@@ -1,4 +1,11 @@
-import { type InteriorLoad, overrideResistance, recordResistance } from '@open-reloading/core'
+import {
+  defaultSensitivity,
+  type InteriorLoad,
+  overrideResistance,
+  recordResistance,
+  recordSensitivity,
+  sensitivityReferenceDefault,
+} from '@open-reloading/core'
 import { type Powder, toSi } from '@open-reloading/schema'
 import { type InteriorBody, interiorBody } from './interior-input.ts'
 import type { RecordValues } from './query.ts'
@@ -24,6 +31,8 @@ export interface InteriorSources {
   grooveDiameter?: number | undefined
   /** The bullet record's length, mm. */
   bulletLength?: number | undefined
+  /** The volume tolerance that covers the cavity depth of a hollow base (`cavityVolumeFraction`). */
+  volumeFraction?: number | undefined
   /** The Pmax the user typed, Pa: the limit of the run instead of the cartridge's CIP Pmax. */
   pressureLimit?: number | undefined
   /** The bulk density the user typed, kg/m3, instead of the powder record's. */
@@ -96,12 +105,37 @@ export function interiorRequest(s: InteriorSources) {
   // the workbench's ramps (record law, typed, linked) start at travel 0: the jump moves them
   const applied = rampAtJump(overrideResistance(resistance, values), s.jump)
   if (applied) body.load.resistance = applied
-  const sensitivity = powder?.temperatureSensitivity
-  if (sensitivity)
+  if (s.volumeFraction !== undefined) body.tolerances = { volumeFraction: s.volumeFraction }
+  // the record's own coefficient, else the default of its grain form (`recordSensitivity`, which
+  // the API's load-file route reads too); a missing record, what its link carried of it
+  const linked = s.linked
+  const taken = powder
+    ? recordSensitivity(powder)
+    : linked?.grainForm && recordSensitivity({ grainForm: linked.grainForm })
+  if (taken) {
     body.load.propellant.temperatureSensitivity = {
-      reference: sensitivity.reference.value,
-      cold: sensitivity.cold.value,
-      hot: sensitivity.hot.value,
+      ...taken.sensitivity,
+      ...(!powder &&
+        linked?.sensitivityReference !== undefined && {
+          reference: linked.sensitivityReference,
+        }),
     }
-  return { body, bulkDensity, missing }
+  }
+  const sensitivityDefault =
+    taken?.fallback && taken.form ? { form: taken.form, ...taken.fallback } : undefined
+  return { body, bulkDensity, missing, sensitivityDefault }
+}
+
+/** Whether a run of `powder` has a temperature sensitivity: its own, or the default of its grain form. */
+export const hasSensitivity = (
+  powder: Pick<Powder, 'temperatureSensitivity' | 'grainForm'> | undefined,
+) =>
+  powder?.temperatureSensitivity !== undefined ||
+  defaultSensitivity(powder?.grainForm) !== undefined
+
+/** The reference of a default sensitivity, K: the propellant temperature of the record's fit, else 21 °C. */
+export function sensitivityReferenceOf(powder: Pick<Powder, 'interior'>): number {
+  return powder.interior
+    ? toSi('temperature', powder.interior.propellantTemperature.value)
+    : sensitivityReferenceDefault
 }
