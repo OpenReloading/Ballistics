@@ -11,7 +11,7 @@ A result is a simulation, not load data, and nothing on this page is a statement
 
 The model was compared with printed load rows of cartridges it was not fitted to, by the protocol of [Model validation](models/validation.md). The error of a row is the absolute relative difference between the model and the printed value. These numbers describe agreement with printed rows, which carry their own conventions and scatter, not the accuracy of a physical quantity.
 
-### All rows
+### All used rows
 
 From the [results](models/validation.md#results) of `verify` on the validation split, model version `67d67adf…`, powder parameters of the records. The command, run on rows that are not in the repository:
 
@@ -25,7 +25,7 @@ node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split v
 | Muzzle velocity | 10,497 | 3.32 % | 8.87 % | 89.6 % |
 | Peak pressure (rows that print one in bar) | 4,060 | 15.0 % | 38.1 % | not measured |
 
-The family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows) are on the validation page. Not measured: the sealed test split, and a powder that is not in the fitted set.
+The errors are over the rows the model ran: of the 16,871 rows in the split, 10,497 are used; 5,583 have no case capacity, 639 are refused by the model, 120 have no powder parameters and 32 no bullet shape ([results](models/validation.md#results)). The family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows) are on the validation page. Not measured: the sealed test split, and a powder that is not in the fitted set.
 
 ### Rifle and handgun
 
@@ -56,15 +56,15 @@ Each line gives a size from one source, with the conditions it was measured unde
 | Factory ammunition, velocity tolerance | within ±90 ft/s of the tabulated values | factory ammunition in SAAMI test barrels | [SAAMI Z299.4-2025](bibliography.md#saami-z299-4-2025) |
 | Barrel length | 24.6 ft/s per inch (147 gr FMJ) and 20.9 ft/s per inch (168 gr match), 22.7 on average over four factory loads | .308 Win, one barrel cut from 28 to 16.5 in, 5 shots per length | [Rifleshooter 2014](bibliography.md#rifleshooter-2014) |
 | Barrel length, handgun | 948 ft/s from a 2 in and 1166 ft/s from a 5 in barrel | 9 mm Luger, one 115 gr factory load, 3 shots per barrel, measured 15 ft from the muzzle | [BBTI 9 mm](bibliography.md#bbti-9mm) |
-| Pressure measurement method | maximum average pressure 52,000 CUP against 55,000 psi (.223 Rem), 50,000 against 60,000 (.30-06), 52,000 against 62,000 (.308 Win) | copper crusher against piezo transducer, same cartridge | [SAAMI Z299.4-2025](bibliography.md#saami-z299-4-2025) |
+| Pressure measurement method, limits | maximum average pressure 52,000 CUP against 55,000 psi (.223 Rem), 50,000 against 60,000 (.30-06), 52,000 against 62,000 (.308 Win) | the standard's limits for copper crusher and piezo transducer, same cartridge; not paired measurements of one load | [SAAMI Z299.4-2025](bibliography.md#saami-z299-4-2025) |
 | Seating depth | no primary sized source found | | |
 
-Some lines are inputs of the model: the barrel length, the case capacity (as the chamber volume), the powder temperature, and the powder lot through the burn coefficient (the [lot rows](models/interior-pressure-range.md#powder-lot-rows) move it by 3 %). Their effect is part of a result when the value is entered. Shot-to-shot spread, barrel-to-barrel differences and the pressure method are not inputs. The pressure method sets which printed pressures a result can be compared with: the crusher and piezo values above differ by a varying amount, so neither converts to the other by one factor.
+Some lines are inputs of the model: the barrel length, the case capacity (as the chamber volume), the powder temperature, and the powder lot through the burn coefficient (the [lot rows](models/interior-pressure-range.md#powder-lot-rows) move it by 3 %). Their effect is part of a result when the value is entered. Shot-to-shot spread, barrel-to-barrel differences and the pressure method are not inputs. The pressure method sets which printed pressures a result can be compared with. The standard sets the crusher and piezo limits of a cartridge apart by a ratio that changes from cartridge to cartridge, so its limits give no single factor between the methods; no paired measurement of one load by both methods is cited here.
 
 Primer make, moisture, ageing, suppressors, polygonal rifling, bullet coatings and jackets, and the small effects on the case capacity are listed with their sources in the Limits of the [M3 model](models/interior-m3.md#limits), [burn forms](models/interior-burn-forms.md#limits), [leakage and heat loss](models/interior-leakage-heat.md#limits) and [case capacity](models/case-capacity.md#limits) pages.
 
 ## Limits
 
-- The variation sizes come from single tests of named loads, mostly with few shots; they show an order of size, not a tolerance for another load.
+- The variation sizes come from single tests of named loads, mostly with few shots, except the two lines from the SAAMI standard, which are its tolerance and limits; they show an order of size, not a tolerance for another load.
 - The held-out error is against printed values and their conventions. Held-out cartridges stand for cartridges the fit has not seen, not for every firearm, lot or temperature ([Model validation, Limits](models/validation.md#limits)).
 - No rating or band of another program is used here, and no line on this page says that a load or a result is fit for use.
