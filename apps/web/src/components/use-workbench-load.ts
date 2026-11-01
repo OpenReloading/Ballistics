@@ -748,7 +748,9 @@ export function approximateVolumeTolerance(
   value: number | undefined,
   followed: ReadonlySet<FollowKey>,
 ): number | undefined {
-  if (!suggestion?.halfWidth || value !== suggestion.si || !followed.has('volume')) return undefined
+  if (!suggestion?.halfWidth || value === undefined || !followed.has('volume')) return undefined
+  // the field holds the default, up to the rounding of its text
+  if (Math.abs(value - suggestion.si) > 1e-9 * suggestion.si) return undefined
   return Math.min(suggestion.halfWidth, maxVolumeFraction)
 }
 
@@ -2118,7 +2120,7 @@ export function useWorkbenchState() {
   function loadRequest(as?: { powder: Powder; charge?: number }) {
     const chosen = as?.powder ?? chosenPowder
     const { body, bulkDensity, missing } = interiorRequest({
-      values: powderValues(siValues(fields), chosenPowder, as),
+      values: powderValues(siValues(fields), chosenPowder, as, suggestions.startPressure?.si),
       powder: chosen,
       // a missing powder record: the bulk density and the bore resistance its link carried
       linked: as ? undefined : linkedPowder,
@@ -2908,6 +2910,7 @@ export function useWorkbenchState() {
     ...bulletValues,
     firearmMass: gunWeightUsed.si,
   }
+  const saved = savedSuggestions(suggestions)
   const given = givenKeys(fieldValues, {
     origin,
     bullet: bulletGiven,
@@ -2915,7 +2918,7 @@ export function useWorkbenchState() {
     defaulted,
     followed,
     suggestions: Object.fromEntries(
-      followKeys.map((k) => [k, referenced ? savedSuggestions(suggestions)[k]?.si : undefined]),
+      followKeys.map((k) => [k, referenced ? saved[k]?.si : undefined]),
     ),
     previewed,
     seatingKept: seatingKeptOf(referenced, seated, suggestions),

@@ -142,6 +142,11 @@ describe('powderValues', () => {
     const withStart = { ...fields, startPressure: 24.3e6 }
     expect(powderValues(withStart, { id: 'p1' }, { powder: own }).startPressure).toBe(25e6)
     expect(powderValues(withStart, { id: 'p1' }, { powder: without }).startPressure).toBe(24.3e6)
+    // the default of the field, not the start pressure the current powder wrote
+    expect(powderValues(withStart, { id: 'p1' }, { powder: without }, 29.2e6).startPressure).toBe(
+      29.2e6,
+    )
+    expect(powderValues(withStart, { id: 'p1' }, { powder: own }, 29.2e6).startPressure).toBe(25e6)
   })
 })
 
