@@ -101,6 +101,8 @@ export function ringTotal(series: RingSeries): number {
     return series.shots.reduce((sum, s) => sum + Math.round(s * 10), 0) / 10
   }
   if (series.total === undefined) throw new InputError('a series needs its shots or its total')
+  if (!(series.total >= 0) || !Number.isFinite(series.total))
+    throw new InputError('a ring value must be 0 or more')
   return series.total
 }
 

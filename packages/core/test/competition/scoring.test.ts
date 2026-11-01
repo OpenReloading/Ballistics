@@ -113,6 +113,8 @@ describe('input checks', () => {
     expect(() => stageRawPoints(stage({ hits: { A: 1.5, C: 0, D: 0 } }), ipsc)).toThrow('count')
     expect(() => ringTotal({})).toThrow('shots or its total')
     expect(() => ringTotal({ shots: [-1] })).toThrow('ring value')
+    expect(() => ringTotal({ total: -5 })).toThrow('ring value')
+    expect(() => ringTotal({ total: Number.NaN })).toThrow('ring value')
   })
 })
 
