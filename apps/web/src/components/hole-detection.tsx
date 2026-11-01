@@ -382,7 +382,9 @@ export function useHoleDetection({
         setStep(undefined)
         setResult(true)
       } else setStep(4)
-      say(`${t('{count} proposed; accept them to add shots.', { count })}${flaggedNote(m.flagged)}`)
+      say(
+        `${t('{count} proposed, {maybe} maybe: accept them to add shots.', { count, maybe: list.length - count })}${flaggedNote(m.flagged)}`,
+      )
     }
     return list.length
   }
@@ -603,12 +605,18 @@ export function useHoleDetection({
     if (added === proposals.length) setResult(false)
     setProposals((x) => x.filter((p) => !ids.has(p.id)))
     if (added < list.length) say(t('A group holds at most 1000 shots.'), true)
+    else say(tn(added, '{count} shot added.', '{count} shots added.'))
   }
   const move = (id: number, p: Point) =>
     setProposals((x) => x.map((q) => (q.id === id ? { ...q, ...p } : q)))
   const remove = (id: number) => setProposals((x) => x.filter((q) => q.id !== id))
 
   const sure = proposals.filter((p) => !isMaybe(p))
+  /** A step chosen by the user: the message of the step before goes. */
+  const goStep = (update: number | undefined | ((s: number | undefined) => number | undefined)) => {
+    setStep(update)
+    say('')
+  }
 
   const hint = toolHint(tool, shape, pending.length, t)
 
@@ -738,12 +746,13 @@ export function useHoleDetection({
       target={record?.name}
       references={references}
       proposals={sure.length}
+      maybe={proposals.length - sure.length}
       size={size}
       sizeOpen={sizeOpen}
       running={running}
-      onTarget={() => setStep(1)}
+      onTarget={() => goStep(1)}
       onScale={openCalibrate}
-      onHoles={() => setStep(4)}
+      onHoles={() => goStep(4)}
       onSize={() => setSizeOpen(true)}
       onHoleSize={commitHoleSize}
       candidates={candidates}
@@ -759,7 +768,7 @@ export function useHoleDetection({
   const panel = group && sheet.photo && (
     <DetectPanel
       step={step}
-      setStep={setStep}
+      setStep={goStep}
       start={
         result ? resultLine : runButton(held ? msg('Detect anyway') : msg('Detect holes'), true)
       }
@@ -1008,6 +1017,7 @@ function ResultLine({
   target,
   references,
   proposals,
+  maybe,
   size,
   sizeOpen,
   running,
@@ -1024,7 +1034,9 @@ function ResultLine({
   target: string | undefined
   /** The number of scale references; undefined while the sheet has no scale. */
   references: number | undefined
+  /** The sure proposals; `maybe` the less certain ones. */
   proposals: number
+  maybe: number
   size: { diameter: number; source: keyof typeof sourceNames } | undefined
   /** The hole size field shows in place of the caliber (always without a size). */
   sizeOpen: boolean
@@ -1077,7 +1089,7 @@ function ResultLine({
       )}
       {item(
         t('Holes'),
-        t('{count} proposed', { count: proposals }),
+        t('{count} proposed, {maybe} maybe', { count: proposals, maybe }),
         t('Change the holes'),
         onHoles,
       )}
@@ -1128,13 +1140,13 @@ function ResultLine({
         )}
         onClick={onAccept}
       >
-        {t('Accept all ({count})', { count: proposals })}
+        {t('Accept sure ({count})', { count: proposals })}
       </Button>
     </div>
   )
 }
 
-function RunButton({
+export function RunButton({
   label,
   auto,
   progress,
@@ -1154,6 +1166,7 @@ function RunButton({
   onRun: () => void
 }) {
   const { t } = useTranslation()
+  const reason = useId()
   if (progress !== undefined)
     return (
       <Button
@@ -1166,20 +1179,30 @@ function RunButton({
         {t('Cancel ({pct} %)', { pct: Math.round(progress * 100) })}
       </Button>
     )
+  // the one-click start finds the scale and the hole size itself; the guided run needs both
+  const why = auto ? undefined : blocked
   const title = auto
     ? t('Find the holes on the target or in the region; the photo stays in this browser.')
-    : t(blocked ?? msg('Find the holes like the example hole.'))
+    : t('Find the holes like the example hole.')
   return (
-    <Button
-      size={controlSize.row.button}
-      className="wide"
-      data-detect-run
-      disabled={!photo}
-      title={title}
-      onClick={auto ? onStart : onRun}
-    >
-      {t(label)}
-    </Button>
+    <>
+      <Button
+        size={controlSize.row.button}
+        className="wide"
+        data-detect-run
+        disabled={!photo || !!why}
+        title={title}
+        aria-describedby={why ? reason : undefined}
+        onClick={auto ? onStart : onRun}
+      >
+        {t(label)}
+      </Button>
+      {why && (
+        <p id={reason} className="detect-blocked wide" data-detect-blocked>
+          {t(why)}
+        </p>
+      )}
+    </>
   )
 }
 
@@ -1390,7 +1413,7 @@ function ExampleStep({
   )
 }
 
-function ReviewStep({
+export function ReviewStep({
   proposals,
   maybe,
   flagged,
@@ -1416,7 +1439,7 @@ function ReviewStep({
         aria-describedby={help}
         onClick={onAccept}
       >
-        {t('Accept all ({count})', { count: proposals })}
+        {t('Accept sure ({count})', { count: proposals })}
       </Button>
       <span className="row-buttons wide">
         <Button
@@ -1508,7 +1531,7 @@ function RegionRow({
 }
 
 /** The Detect panel: its head, the step list, the step shown and Back and Next. */
-function DetectPanel({
+export function DetectPanel({
   step,
   setStep,
   start,
@@ -1533,6 +1556,7 @@ function DetectPanel({
           <li key={name}>
             <button
               type="button"
+              title={t(name)}
               aria-current={step === i ? 'step' : undefined}
               onClick={() => setStep(i)}
             >

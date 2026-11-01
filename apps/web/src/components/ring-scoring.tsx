@@ -151,6 +151,10 @@ function scoreStatus(o: {
   })
 }
 
+/** The label of the option `value`, for the title of a select whose text the column may cut. */
+const optionLabel = (options: readonly { value: string; label: string }[], value: string | null) =>
+  options.find((o) => o.value === value)?.label
+
 /** The Face select's options: the discipline's stages in the rule book's order, else the faces. */
 function faceOptionsOf(o: {
   list: FaceSummary[] | 'loading' | 'error'
@@ -201,11 +205,12 @@ function DisciplineSelect({
   return (
     <Select
       label={t('Discipline')}
+      className="full-row"
       size={controlSize.row.input}
       searchable
       allowDeselect={false}
       labelProps={{ title: t(disciplineHelp) }}
-      title={unreachable ? t(offline) : undefined}
+      title={unreachable ? t(offline) : optionLabel(choices, value)}
       disabled={unreachable || !choices.length}
       placeholder={unreachable ? t(offline) : undefined}
       nothingFoundMessage={t('None found')}
@@ -233,26 +238,29 @@ function EventSelect({
   onEvent: (event: string) => void
 }) {
   const { t } = useTranslation()
+  const options = [
+    ...record.events
+      .toSorted((a, b) =>
+        compareEvents(
+          { distance: a.distance.value, name: a.name },
+          { distance: b.distance.value, name: b.name },
+        ),
+      )
+      .map((e) => ({
+        value: e.id,
+        label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
+      })),
+    { value: '', label: t('Bullet') },
+  ]
   return (
     <NativeSelect
       label={t('Event')}
+      className="full-row"
       size={controlSize.row.input}
       description={t(eventHelp)}
       labelProps={{ title: t(eventHelp) }}
-      data={[
-        ...record.events
-          .toSorted((a, b) =>
-            compareEvents(
-              { distance: a.distance.value, name: a.name },
-              { distance: b.distance.value, name: b.name },
-            ),
-          )
-          .map((e) => ({
-            value: e.id,
-            label: `${e.name}${e.gauge ? `, ${mmLength(system, e.gauge.value)}` : ''}`,
-          })),
-        { value: '', label: t('Bullet') },
-      ]}
+      title={optionLabel(options, event ?? '')}
+      data={options}
       value={event ?? ''}
       onChange={(e) => onEvent(e.currentTarget.value)}
     />
@@ -610,13 +618,16 @@ function FaceSelects(p: PanelProps) {
   const { data, list, choice } = p
   const { t } = useTranslation()
   const federations = data ? federationsWithDisciplines(data) : []
+  const federation = federations.find((f) => f.id === p.fed)
   return (
     <>
       <NativeSelect
         label={t('Federation')}
+        className="full-row"
         size={controlSize.row.input}
         description={t(federationHelp)}
         labelProps={{ title: t(federationHelp) }}
+        title={federation ? `${federation.abbreviation}: ${federation.name}` : t('All')}
         disabled={!federations.length}
         data={[
           { value: '', label: t('All') },
@@ -633,10 +644,11 @@ function FaceSelects(p: PanelProps) {
       />
       <NativeSelect
         label={t('Target')}
+        className="full-row"
         size={controlSize.row.input}
         description={t(faceHelp)}
         labelProps={{ title: t(faceHelp) }}
-        title={list === 'error' ? t(offline) : undefined}
+        title={list === 'error' ? t(offline) : optionLabel(p.faceOptions, choice?.id ?? '')}
         disabled={list === 'error' || (list === 'loading' && !choice)}
         data={p.faceOptions}
         value={choice?.id ?? ''}
@@ -649,6 +661,10 @@ function FaceSelects(p: PanelProps) {
 function ScorePanel(p: PanelProps) {
   const { choice, record, result, status, system } = p
   const { t } = useTranslation()
+  const rings = (record?.rings ?? []).map((x) => ({
+    value: String(x.value),
+    label: `${plainNumber(x.value)}: ${mmLength(system, x.diameter.value)}`,
+  }))
   return (
     <>
       <FaceSelects {...p} />
@@ -671,14 +687,13 @@ function ScorePanel(p: PanelProps) {
         <AlignRow {...p} />
         <NativeSelect
           label={t('Ring')}
+          className="full-row"
           size={controlSize.row.input}
           description={t(ringHelp)}
           labelProps={{ title: t(ringHelp) }}
           disabled={!record}
-          data={(record?.rings ?? []).map((x) => ({
-            value: String(x.value),
-            label: `${plainNumber(x.value)}: ${mmLength(system, x.diameter.value)}`,
-          }))}
+          title={optionLabel(rings, String(p.ringValue ?? ''))}
+          data={rings}
           value={String(p.ringValue ?? '')}
           onChange={(e) => p.onRing(Number(e.currentTarget.value))}
         />
