@@ -28,9 +28,15 @@ import {
 } from '../lib/powder-compare.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, shownLength, type UnitSystem } from '../lib/units.ts'
-import { powderTableCsv, restoredPowderTab, savedPowderTab } from './powder-csv.ts'
+import {
+  type PowderTabState,
+  powderTableCsv,
+  restoredPowderTab,
+  savedPowderTab,
+} from './powder-csv.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
 import { TableCsv } from './table-csv.tsx'
+import { useManufacturerNames } from './use-manufacturer-names.ts'
 import {
   type CompareMessage,
   type CompareRow,
@@ -328,6 +334,53 @@ function modeOf(
 const modeValid = (kind: CompareMode['kind'], fillValid: boolean, targetValid: boolean) =>
   (kind !== 'fill' || fillValid) && (kind !== 'target' || targetValid)
 
+/** Whether the tab shows what it opened with: the manufacturer filter compared by its id. */
+function sameTab(
+  now: PowderTabState,
+  first: PowderTabState,
+  idOf: (name: string) => string | undefined,
+) {
+  const key = (s: PowderTabState) =>
+    JSON.stringify([
+      s.kind,
+      s.fill,
+      s.targetText,
+      s.percent,
+      s.filters.base,
+      s.filters.form,
+      s.filters.manufacturerName ? idOf(s.filters.manufacturerName) : s.maker,
+    ])
+  return key(now) === key(first)
+}
+
+/** The filters, from what the load kept: a kept manufacturer's name shows once the names arrive. */
+function useKeptFilters(first: PowderTabState, names: ReadonlyMap<string, string>) {
+  const [filters, setFilters] = useState(first.filters)
+  // a kept manufacturer filter whose name is not known yet; picking one clears it
+  const [maker, setMaker] = useState(first.maker)
+  const makerName = maker && names.get(maker)
+  if (makerName && !filters.manufacturerName)
+    setFilters((f) => ({ ...f, manufacturerName: makerName }))
+  return { filters, setFilters, maker, setMaker }
+}
+
+/**
+ * Writes the tab's state to the load as it changes. A tab only looked at keeps what the load kept,
+ * to the digit, in any unit: a target typed in bar and shown in psi is not rounded into the file.
+ */
+function useKeptTab(
+  now: PowderTabState,
+  first: PowderTabState,
+  system: UnitSystem,
+  names: ReadonlyMap<string, string>,
+) {
+  const { powderTab } = useLoad()
+  const idOf = (name: string) => [...names].find(([, n]) => n === name)?.[0]
+  const saved = sameTab(now, first, idOf) ? powderTab.saved : savedPowderTab(now, system, idOf)
+  const save = powderTab.set
+  useEffect(() => save(saved), [save, saved])
+}
+
 /** The rows were computed for another load or charge than the fields hold now. */
 function isStale(
   loadRequest: ReturnType<typeof useLoad>['loadRequest'],
@@ -515,7 +568,8 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     useLoad()
   const { powderTab } = useLoad()
   // the mode and the filters the load was saved with (`key` on this tab: an opened load starts afresh)
-  const [first] = useState(() => restoredPowderTab(powderTab.saved, system))
+  const names = useManufacturerNames()
+  const [first] = useState(() => restoredPowderTab(powderTab.saved, system, names))
   const [kind, setKind] = useState<CompareMode['kind']>(first.kind)
   const [fill, setFill] = useState<number | string>(first.fill)
   const fillValid = isFillValid(fill)
@@ -538,11 +592,9 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const study = usePowderCompare(loadRequest, mode)
   // another powder picked mid-run writes its parameters into the fields the later rows read
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
-  const [filters, setFilters] = useState(first.filters)
   // the load keeps the mode and the filters; a filter stays while Compute fills the rows again
-  const saved = savedPowderTab({ kind, fill, targetText, percent, filters }, system)
-  const save = powderTab.set
-  useEffect(() => save(saved), [save, saved])
+  const { filters, setFilters, maker, setMaker } = useKeptFilters(first, names)
+  useKeptTab({ kind, fill, targetText, percent: asPercent, filters, maker }, first, system, names)
   const [sort, setSort] = useState<ColumnSort | undefined>()
   // the columns follow the mode the rows were computed for, not the one chosen since
   const target = study.mode?.kind === 'target'
@@ -609,7 +661,10 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
       // a filter of the saved load shows before Compute lists its facets
       data={filters[key] && !data.includes(filters[key]) ? [filters[key], ...data] : data}
       value={filters[key]}
-      onChange={(v) => setFilters((f) => ({ ...f, [key]: v }))}
+      onChange={(v) => {
+        if (key === 'manufacturerName') setMaker(undefined)
+        setFilters((f) => ({ ...f, [key]: v }))
+      }}
     />
   )
   return (

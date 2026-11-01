@@ -29,12 +29,14 @@ export function TableCsv({
         size={controlSize.row.button}
         variant="default"
         disabled={disabled}
-        onClick={() =>
+        onClick={() => {
+          // no clipboard outside a secure context
+          if (!navigator.clipboard) return show('failed')
           navigator.clipboard.writeText(csv()).then(
             () => show(true),
             () => show('failed'),
           )
-        }
+        }}
       >
         {copied === 'failed' ? t('Copy failed') : copied ? t('Copied') : t('Copy as CSV')}
       </Button>

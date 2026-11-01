@@ -551,9 +551,15 @@
             },
             "manufacturer": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 200,
-              "description": "Manufacturer filter: the name the list shows."
+              "allOf": [
+                {
+                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                },
+                {
+                  "pattern": "^catalogue:"
+                }
+              ],
+              "description": "Manufacturer filter: a catalogue manufacturer."
             },
             "base": {
               "type": "string",

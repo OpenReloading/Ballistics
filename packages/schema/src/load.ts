@@ -153,9 +153,8 @@ export const loadAnalysis = z.object({
         .positive()
         .describe("Target peak pressure of the `target` mode, percent of the cartridge's CIP Pmax.")
         .optional(),
-      manufacturer: text(200)
-        .min(1)
-        .describe('Manufacturer filter: the name the list shows.')
+      manufacturer: catalogueRef('manufacturer')
+        .describe('Manufacturer filter: a catalogue manufacturer.')
         .optional(),
       base: text(200).min(1).describe('Base filter: the base the list shows.').optional(),
       form: text(200).min(1).describe('Grain form filter: the form the list shows.').optional(),

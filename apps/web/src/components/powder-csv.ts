@@ -18,8 +18,8 @@ type T = Translator['t']
 /** A number with the point a file and a spreadsheet read, whatever the language shown. */
 const plain = (x: number, digits: number) => formatNumber(x, digits, 'en')
 
-/** A heading with its unit: "Charge (gr)". */
-const head = (name: string, unit: string) => `${name} (${unit})`
+/** A heading with its unit: "Charge (gr)"; a soft hyphen of the German text stays out. */
+const head = (name: string, unit: string) => `${name} (${unit})`.replaceAll('\u00AD', '')
 
 /**
  * The Powders table as CSV: its columns with the units of its header, one row per powder in the
@@ -53,7 +53,14 @@ export function powderTableCsv(
     const charge =
       r.charge === undefined ? '' : plain(system.charge.fromSi(r.charge), system.charge.decimals)
     const v = r.values
-    if (!v) return [productLabel(r), charge, t('Not computed: {reason}', { reason: reason(r) })]
+    // the reason in the Flags column, the other cells empty: every row has the header's cells
+    if (!v)
+      return [
+        productLabel(r),
+        charge,
+        t('Not computed: {reason}', { reason: reason(r) }),
+        ...Array<string>(header.length - 3).fill(''),
+      ]
     return [
       productLabel(r),
       charge,
@@ -68,7 +75,7 @@ export function powderTableCsv(
         : canonicalNumberText(lengthText('travel', system, v.burnout)),
     ]
   })
-  return toCsv([header, ...body])
+  return toCsv([header, ...body]).replaceAll('\u00AD', '')
 }
 
 /** The tab's controls as the page holds them. */
@@ -80,9 +87,11 @@ export type PowderTabState = {
   /** The target is a share of the cartridge's CIP Pmax. */
   percent: boolean
   filters: PowderFilters
+  /** The manufacturer id of a kept filter whose name is not known yet (names load after the tab). */
+  maker?: string | undefined
 }
 
-export const noFilters: PowderFilters = { manufacturerName: '', base: '', form: '' }
+const noFilters: PowderFilters = { manufacturerName: '', base: '', form: '' }
 
 export const initialPowderTab: PowderTabState = {
   kind: 'typed',
@@ -95,8 +104,16 @@ export const initialPowderTab: PowderTabState = {
 const validNumber = (x: number | string) =>
   typeof x === 'number' ? x : x.trim() === '' ? Number.NaN : Number(x)
 
-/** The tab's state as the load keeps it; none while every control has its first value. */
-export function savedPowderTab(s: PowderTabState, system: UnitSystem): SavedPowderTab | undefined {
+/**
+ * The tab's state as the load keeps it; none while every control has its first value. The
+ * manufacturer filter is kept by reference: `idOf` gives the id of a manufacturer name.
+ */
+export function savedPowderTab(
+  s: PowderTabState,
+  system: UnitSystem,
+  idOf: (name: string) => string | undefined = () => undefined,
+): SavedPowderTab | undefined {
+  const maker = s.filters.manufacturerName ? idOf(s.filters.manufacturerName) : s.maker
   const fill = validNumber(s.fill)
   const target = validNumber(s.targetText)
   const hasFill = fill >= caseFillPercentRange.min && fill <= caseFillPercentRange.max
@@ -107,7 +124,7 @@ export function savedPowderTab(s: PowderTabState, system: UnitSystem): SavedPowd
     ...(hasFill && fill !== caseFillPercentRange.initial && { fill }),
     ...(hasTarget && s.percent && { targetPercent: target }),
     ...(pressure > 0 && { targetPressure: fromSi('pressure', pressure) }),
-    ...(s.filters.manufacturerName && { manufacturer: s.filters.manufacturerName }),
+    ...(maker && { manufacturer: `catalogue:${maker}` }),
     ...(s.filters.base && { base: s.filters.base }),
     ...(s.filters.form && { form: s.filters.form }),
   }
@@ -118,6 +135,7 @@ export function savedPowderTab(s: PowderTabState, system: UnitSystem): SavedPowd
 export function restoredPowderTab(
   saved: SavedPowderTab | undefined,
   system: UnitSystem,
+  names: ReadonlyMap<string, string> = new Map(),
 ): PowderTabState {
   if (!saved) return initialPowderTab
   const unit = targetUnit('peakPressure', system)
@@ -126,13 +144,15 @@ export function restoredPowderTab(
     (saved.targetPressure === undefined
       ? ''
       : Number(unit.fromSi(toSi('pressure', saved.targetPressure)).toFixed(unit.decimals)))
+  const maker = saved.manufacturer?.replace(/^catalogue:/, '')
   return {
+    maker,
     kind: saved.mode,
     fill: saved.fill ?? caseFillPercentRange.initial,
     targetText,
     percent: saved.targetPercent !== undefined,
     filters: {
-      manufacturerName: saved.manufacturer ?? '',
+      manufacturerName: (maker && names.get(maker)) ?? '',
       base: saved.base ?? '',
       form: saved.form ?? '',
     },

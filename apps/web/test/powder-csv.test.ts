@@ -49,7 +49,7 @@ describe('the Powders table as CSV', () => {
   it('gives each powder its values as numbers, and the reason of one not computed', () => {
     const lines = powderTableCsv(rows, false, us, t, (r) => r.reason ?? '').split('\n')
     expect(lines[1]).toBe('"Maker Fast, Ball",37.0,model note,44962,75,2625,95,99,11.81')
-    expect(lines[2]).toBe('Maker Slow,,Not computed: No fitted model parameters')
+    expect(lines[2]).toBe('Maker Slow,,Not computed: No fitted model parameters,,,,,,')
   })
 })
 
@@ -68,11 +68,18 @@ describe('the Powders tab kept with the load', () => {
         filters: { manufacturerName: 'Maker', base: '', form: 'ball' },
       },
       us,
+      (name) => (name === 'Maker' ? 'maker' : undefined),
     )
-    expect(saved).toMatchObject({ mode: 'target', fill: 90, manufacturer: 'Maker', form: 'ball' })
+    expect(saved).toMatchObject({
+      mode: 'target',
+      fill: 90,
+      manufacturer: 'catalogue:maker',
+      form: 'ball',
+    })
     expect(saved?.targetPressure).toBeCloseTo(3447.38, 2)
     expect(saved).not.toHaveProperty('base')
-    expect(restoredPowderTab(saved, us)).toEqual({
+    expect(restoredPowderTab(saved, us, new Map([['maker', 'Maker']]))).toEqual({
+      maker: 'maker',
       kind: 'target',
       fill: 90,
       targetText: 50000,
@@ -89,6 +96,12 @@ describe('the Powders tab kept with the load', () => {
     expect(saved).toEqual({ mode: 'target', targetPercent: 85 })
     expect(restoredPowderTab(saved, metric)).toMatchObject({ targetText: 85, percent: true })
   })
+
+  it('keeps a filter of a manufacturer whose name is not known yet by its id', () => {
+    const state = restoredPowderTab({ mode: 'typed', manufacturer: 'catalogue:maker' }, us)
+    expect(state.filters.manufacturerName).toBe('')
+    expect(savedPowderTab(state, us)).toEqual({ mode: 'typed', manufacturer: 'catalogue:maker' })
+  })
 })
 
 describe('the load file', () => {
@@ -97,12 +110,16 @@ describe('the load file', () => {
     given: new Set<string>(),
     notes: '',
     sessions: [],
-    powders: { mode: 'fill' as const, fill: 90, manufacturer: 'Maker' },
+    powders: { mode: 'fill' as const, fill: 90, manufacturer: 'catalogue:maker' },
   }
 
   it('keeps the Powders tab under analysis.powders, valid for the schema', () => {
     const load = toLoad(parts)
-    expect(load.analysis?.powders).toEqual({ mode: 'fill', fill: 90, manufacturer: 'Maker' })
+    expect(load.analysis?.powders).toEqual({
+      mode: 'fill',
+      fill: 90,
+      manufacturer: 'catalogue:maker',
+    })
     expect(loadSchema.safeParse(load).success).toBe(true)
   })
 

@@ -661,7 +661,7 @@ _Avoid_: si
 `notes`: free text of a firearm; a load's is `note`. On a target sheet the list of sheet notes.
 
 **Ladder**:
-`powders`: on a load, `analysis.powders`: the Powders tab's `mode` (`typed`, `fill` or `target`), `fill` (percent of the free volume), `targetPressure` (bar) or `targetPercent` (percent of the CIP Pmax), and the filters `manufacturer`, `base` and `form`.
+`powders`: on a load, `analysis.powders`: the Powders tab's `mode` (`typed`, `fill` or `target`), `fill` (percent of the free volume), `targetPressure` (bar) or `targetPercent` (percent of the CIP Pmax), and the filters `manufacturer` (a `catalogue:` reference), `base` and `form`.
 
 `ladder`: a series of runs around or beyond a base value. On a load, `analysis.ladder`: `kind` (`charge`, `seating` or `temperature`), `stepCount` (2 to 21), `step` (g for a charge ladder, mm for seating, K for temperature) and `direction` (`up`, `down`, `around`). In interior bodies a charge ladder from `load.charge` with `chargeStep` (kg), `stepCount` and `direction`, one interior run each.
 _Avoid_: `step`, `steps` (of a ladder)
