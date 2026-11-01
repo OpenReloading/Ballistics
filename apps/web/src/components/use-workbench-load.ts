@@ -786,6 +786,12 @@ function savedSuggestions(s: Suggestions): Suggestions {
   return rest
 }
 
+/** The defaulted fields a load leaves out: not the start pressure by construction, saved as a value even where it equals the Settings default. */
+function savedDefaulted(defaulted: ReadonlySet<string>, s: Suggestions): ReadonlySet<string> {
+  if (!s.startPressure?.approximate || !defaulted.has('startPressure')) return defaulted
+  return new Set([...defaulted].filter((k) => k !== 'startPressure'))
+}
+
 /** The run's `noCoefficient`: a powder record with a model and no temperature coefficient, at the temperature of its fit. */
 export function noCoefficientOf(powder: Powder | undefined) {
   const i = powder?.interior
@@ -2926,7 +2932,7 @@ export function useWorkbenchState() {
     origin,
     bullet: bulletGiven,
     defaults,
-    defaulted,
+    defaulted: savedDefaulted(defaulted, suggestions),
     followed,
     suggestions: Object.fromEntries(
       followKeys.map((k) => [k, referenced ? saved[k]?.si : undefined]),
