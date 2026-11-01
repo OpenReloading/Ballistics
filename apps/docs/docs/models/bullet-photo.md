@@ -218,4 +218,4 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - [Levenberg 1944](../bibliography.md#levenberg-1944), [Marquardt 1963](../bibliography.md#marquardt-1963): the damped least squares iteration.
 - [JCGM 100:2008](../bibliography.md#jcgm-100-2008): first-order propagation of uncertainty and the rectangular distribution.
 - [ITU-R BT.601](../bibliography.md#itu-r-bt-601): the luma weights.
-- Research log: [synthetic photographs](../research/bullet-photo-synthetic-renders.md), [catalogue bullets](../research/bullet-photo-catalogue-geometry.md), [a drop shadow](../research/bullet-photo-drop-shadow.md).
+- Research log: [synthetic photographs](../research/bullet-photo-synthetic-renders.md), [catalogue bullets](../research/bullet-photo-catalogue-geometry.md), [a drop shadow](../research/bullet-photo-drop-shadow.md), [a typed axis](../research/bullet-photo-typed-axis.md).
