@@ -163,7 +163,7 @@
     "tools": {
       "budget": {
         "initial": 569000,
-        "total": 611000
+        "total": 612500
       },
       "routes": {
         "/cases/editor": {
@@ -199,7 +199,7 @@
     "workbench": {
       "budget": {
         "initial": 636000,
-        "total": 1050000
+        "total": 1056000
       },
       "routes": {
         "/workbench": {
