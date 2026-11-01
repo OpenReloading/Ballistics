@@ -23,6 +23,8 @@ export interface Outline {
   r: number[]
   /** The distance of each side's edge from the axis at each sample: the side to the left of the axis seen from the base, and the one to the right. */
   sides?: { left: number[]; right: number[] } | undefined
+  /** For an axis the user typed: how far it is from the symmetry line of the shank's two sides, degrees (`typedAxisOff`). */
+  typedOff?: number | undefined
   /** The side a shadow widens (`withoutShadow`): `removed` when it is taken out, by measuring the other side mirrored about the axis, with nothing left to doubt. */
   shadow?: { side: 'left' | 'right'; removed: boolean } | undefined
   /** Whether the nose end was told apart from the base end by its longer taper only within 15 %, so a flip may be right. */
@@ -309,12 +311,14 @@ export function sideTapers(o: Outline) {
   const settled = (i: number) =>
     Math.abs(at(sides.left, i + 1) - at(sides.left, i)) < 1 &&
     Math.abs(at(sides.right, i + 1) - at(sides.right, i)) < 1
+  // the base lies in the outline's first half: a flat base's shank starts right after its corner
+  const limit = Math.floor(o.r.length / 2) - baseCount - 1
   let start = reached
-  while (start < first && !settled(start)) start++
-  // a corner that does not settle before the shank (an axis turned far off on a squat bullet): two past it
-  if (start + 1 + baseCount > first) start = reached + 1
+  while (start < limit && !settled(start)) start++
+  // a corner that does not settle (an axis turned far off on a squat bullet): two past it
+  if (start >= limit) start = reached + 1
   const base: [number, number] = [start + 1, start + 1 + baseCount]
-  if (base[1] > first) return
+  if (base[1] > o.r.length / 2) return
   const zb = median(o.z.slice(...base))
   const taper = (line: { a: number; b: number }, side: readonly number[]) => ({
     line,
@@ -387,6 +391,21 @@ function withoutShadow(o: Outline): Outline {
   }
 }
 
+/** A typed axis this many degrees or more from the shank's symmetry line is named. */
+const typedAxisTolerance = 1
+
+/**
+ * The outline of an axis the user typed, with how far that axis is from the symmetry line of the
+ * shank's two sides where it is `typedAxisTolerance` or more: the two shank lines then run apart
+ * from the axis by equal and opposite slopes, half their difference the turn.
+ */
+function typedAxisOff(o: Outline): Outline {
+  const t = sideTapers(o)
+  if (!t) return o
+  const off = (Math.abs(Math.atan(t.left.line.b) - Math.atan(t.right.line.b)) / 2) * (180 / Math.PI)
+  return off >= typedAxisTolerance ? { ...o, typedOff: off } : o
+}
+
 /**
  * The outline of the segmented bullet. The axis starts at the long axis of the pixels and is
  * turned and shifted until the middle of the two edges lies on it: the symmetry line of both
@@ -404,5 +423,5 @@ export function fitOutline(seg: Cutout, opt: OutlineOptions = {}): Outline | und
   const o =
     turned && profileOf(seg, turned, turned.ambiguous, edgeUncertaintyOf(opt.edgeSpread ?? 0))
   // an axis the user fixed is not the symmetry line, so the two sides need not agree
-  return o && (fixed ? o : withoutShadow(o))
+  return o && (fixed ? typedAxisOff(o) : withoutShadow(o))
 }
