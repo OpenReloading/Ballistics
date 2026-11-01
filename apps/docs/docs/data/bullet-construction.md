@@ -40,6 +40,22 @@ A jacket does not enter: the jackets of the schema hold no lead. The flag descri
 
 The record's `provenance` covers the construction as a whole (`fields: ["construction"]`) or by dot path (`construction.core.hardness`, `construction.gasCheck`). `npm run data:validate` fails a construction field no source covers (`checkCoverage`, `packages/data/src/coverage.ts`).
 
+## Maker wording
+
+Records whose maker states the construction for a whole line or for the whole range, mapped once per maker. The record names the source of each structured field in its provenance.
+
+| Maker | Wording | Fields | Source |
+|---|---|---|---|
+| Sierra | Bullet Material "Jacketed Lead" (product page) | `core.material` `lead`, `jacket` present | the product page of each record, for example [20 cal 32 gr TVK](https://sierrabullets.com/20-cal-32-gr-tipped-varmintking-tvk/) |
+| Lehigh Defense | material attribute "Copper", the only material named | `structure` `monolithic`, no core | the store's product attributes of each record, for example [.224 62 gr Maximum Expansion](https://lehighdefense.com/224-diameter-62-grain-maximum-expansion-bullets-50-count.html) (now redirects to [wilsoncombat.com](https://wilsoncombat.com/lehigh-defense/), whose product titles end in "Copper") |
+| Hammer Bullets | "using only the highest-quality solid copper", "pure copper", "100% Lead Free" | `structure` `monolithic`, no core | [hammerbullets.com](https://hammerbullets.com/), home page, retrieved 2026-11-01 |
+| Cutting Edge Bullets | "World-class solid copper bullets" | `structure` `monolithic`, no core | [cuttingedgebullets.com](https://cuttingedgebullets.com/), home page, retrieved 2026-11-01 |
+| Missouri Bullet | "We make cast lead bullets", alloys of tin, antimony and lead, "We don't do gas-checked bullets" | `structure` `cast`, `core.material` `lead-alloy`, `gasCheck` `false` | [missouribullet.com](https://missouribullet.com/), home page, retrieved 2026-11-01 |
+| Missouri Bullet | "Brinell N" of each product | `core.hardness` N | the [pricing page](https://missouribullet.com/pricing.php) row of each record |
+| Sako | Bullet Type "Full metal jacket" | `jacket` present | the reloading data row of each record |
+
+A monolithic bullet has no core: the whole bullet is the material the maker names, so `core` stays absent and `leadFree` is undefined for it. Hornady, Sellier & Bellot and the remaining Sako records state no construction in their sources and stay without one.
+
 ## Values and their sources
 
 Each value is read from a manufacturer's wording. The public sources found for the terms:

@@ -21,6 +21,10 @@
     "value": 13.08,
     "raw": "Nose length is .5151″"
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -50,6 +54,13 @@
           "slowestTwist"
         ],
         "note": "https://hammerbullets.com/product/284-cal-136gr-stone-hammer/: Recommended twist rate is 1-11″ minimum | Bullet length is 1.20″ | Nose length is .5151″ | Bullet weight is 136gr | Recommended use: Big game hunting | G1-BC=.381 estimated"
+      },
+      {
+        "source": "hammer-bullets-home-page",
+        "url": "https://hammerbullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"using only the highest-quality solid copper appropriate for the desired result\"; \"Because they are pure copper they do not disintegrate like lead core bullets\"; \"100% Lead Free\"."
       }
     ]
   }
