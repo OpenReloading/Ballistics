@@ -171,6 +171,7 @@ The documents and web pages of the makers that the bullet, powder, case capacity
 ### Cutting Edge Bullets
 
 - Cutting Edge Bullets technical data sheets 2026.
+- Cutting Edge Bullets, home page. <https://cuttingedgebullets.com/>
 
 ### Explosia a.s.
 
