@@ -69,8 +69,12 @@ export interface BulletSummary {
   country?: string | undefined
   /** The tip type of the record. */
   tipType?: string
+  /** The base type of the record. */
+  baseType?: string
   /** The construction structure of the record, else "<core material>-core". */
   construction?: string
+  /** Derived from the construction (`leadFree` of the schema); absent where the wording does not settle it. */
+  leadFree?: boolean
 }
 
 /** A case as `GET /cases` lists it. */

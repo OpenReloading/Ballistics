@@ -32,7 +32,7 @@ import {
   originNames,
   readOrigins,
 } from '../lib/sources.ts'
-import { CompareButton, PickedChips, usePicks } from './compare-picks.tsx'
+import { CompareButton, SelectionSummary, usePicks } from './compare-picks.tsx'
 import {
   type DirectoryColumn,
   DirectoryFilters,
@@ -68,12 +68,12 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
     () => items.filter((r) => inOrigins(r, filters.sources) && powderMatches(r, filters.query)),
     [items, filters],
   )
-  const byId = useMemo(() => new Map(items.map((r) => [r.id, r])), [items])
-  const [picked, toggle, replace] = usePicks(
+  const ids = useMemo(() => new Set(items.map((r) => r.id)), [items])
+  const [picked, , replace] = usePicks(
     maxOverlay,
     state.compareIds,
     (pick) => set({ compareIds: pick }),
-    (id) => byId.has(id),
+    (id) => ids.has(id),
   )
 
   const query = state.query.trim()
@@ -150,16 +150,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             <BarCount widest={widestCount(tr, items.length, 'powders')}>
               {countText(tr, shown.length, items.length, 'powders')}
             </BarCount>
-            <PickedChips
-              ids={picked}
-              max={maxOverlay}
-              name={(id) => {
-                const r = byId.get(id)
-                return r ? productLabel(r) : id
-              }}
-              onRemove={toggle}
-              onClear={() => replace([])}
-            />
+            <SelectionSummary count={picked.length} max={maxOverlay} onClear={() => replace([])} />
           </>
         }
         actions={
@@ -167,6 +158,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
             <CompareButton
               count={picked.length}
               min={0}
+              max={maxOverlay}
               href={overlayHref(picked)}
               idle={t('Burn rates')}
             />

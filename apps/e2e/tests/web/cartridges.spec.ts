@@ -123,18 +123,17 @@ test('a shift click ticks the rows between two boxes and Clear selection unticks
   await expect(boxes.last()).toBeChecked()
 })
 
-test('the tick boxes and value notes of a row are at least 24 px, as the row keeps its height', async ({
-  page,
-}) => {
+test('the tick box of a row is at least 24 px, as the row keeps its height', async ({ page }) => {
   await gotoHydrated(page, '/bullets')
   const row = page.locator('.directory-table tbody tr[data-row]').first()
+  // the bullet list's values are columns of their own: no value notes on hover in its rows
   const sizes = await row.locator('input[type="checkbox"], button.field-note').evaluateAll((els) =>
     els.map((e) => {
       const r = e.getBoundingClientRect()
       return Math.min(r.width, r.height)
     }),
   )
-  expect(sizes.length).toBeGreaterThan(1)
+  expect(sizes.length).toBeGreaterThan(0)
   for (const s of sizes) expect(s).toBeGreaterThanOrEqual(24)
   expect((await row.boundingBox())?.height).toBe(32)
 })
@@ -254,8 +253,11 @@ test('the record bar holds the badges and actions, the fact cards the pressures 
   await expect(
     page.getByRole('tooltip').filter({ hasText: 'Also printed as: 308 Winchester, 7,62 x 51' }),
   ).toBeVisible()
+  // the standard's country, table, date and method are over the sources, not in the fact cards
+  await expect(facts(page).getByText(/^(Table|Revised|Country|Method)$/)).toHaveCount(0)
+  await expect(page.locator('.record-sources .standard-facts dd').first()).toHaveText('I')
   await page.goto('/cartridges/10-3-capra')
-  const country = facts(page).locator('.country')
+  const country = page.locator('.record-sources .standard-facts .country')
   await expect(country).toHaveText('Germany')
   const flag = country.locator('svg.flag')
   await expect(flag).toHaveAttribute('aria-hidden', 'true')
@@ -270,17 +272,16 @@ test('the strip and table follow the US preset: psi and inches', async ({ page }
   // the drawings too; their labels in each unit: apps/web/test/cartridge-drawing.test.tsx
   await expect(figureOf(page, 'Cartridge').getByText('Dimensions in inches')).toHaveCount(1)
   // the case length is a fit: its clearance is the note after the chamber value
-  await expect(symbolRow(page, 'Cartridge', 'L3').getByRole('cell')).toHaveText([/^2\.0150\s*$/])
-  await expect(symbolRow(page, 'Chamber', 'L3').getByRole('cell')).toHaveText([
-    /^2\.0252\s+\+\.0102$/,
-  ])
+  await expect(symbolRow(page, 'Cartridge', 'L3').getByRole('cell')).toHaveText(['2.0150', ''])
+  await expect(symbolRow(page, 'Chamber', 'L3').getByRole('cell')).toHaveText(['2.0252', '+.0102'])
   await expect(
     symbolRow(page, 'Chamber', 'R1').getByRole('note', { name: 'Clearance +.0008' }),
   ).toHaveText('+.0008')
   // the tolerance in its slot, minus as U+2212
-  await expect(symbolRow(page, 'Cartridge', 'L1').getByRole('cell').first()).toHaveText(
-    '1.5598 −.0079',
-  )
+  await expect(symbolRow(page, 'Cartridge', 'L1').getByRole('cell')).toHaveText([
+    '1.5598',
+    '−.0079',
+  ])
 })
 
 test('the clearance note keeps its slot when the length unit switches', async ({ page }) => {
@@ -294,7 +295,7 @@ test('the clearance note keeps its slot when the length unit switches', async ({
     .getByRole('radiogroup', { name: 'Cartridge length unit' })
     .getByText('in', { exact: true })
     .click()
-  await expect(cell).toHaveText(/^\.4736 \+\.0008$/)
+  await expect(cell).toHaveText(['.4736', '+.0008'])
   expect(await slot()).toBe(metric)
 })
 
@@ -304,11 +305,12 @@ test('two tables: symbol and value, the chamber with its clearance as a note whe
   await storeUnits(page, 'metric-grams', {})
   await page.goto('/cartridges/308-win')
   await expect(dimensions(page, 'Cartridge').locator('thead').getByRole('columnheader')).toHaveText(
-    ['Symbol', 'Max (mm)'],
+    ['Symbol', 'Max (mm)', 'Tolerance'],
   )
   await expect(dimensions(page, 'Chamber').locator('thead').getByRole('columnheader')).toHaveText([
     'Symbol',
     'Min (mm)',
+    'Tolerance, clearance',
   ])
   await expect(dimensions(page, 'Cartridge').locator('tbody tr[data-symbol]')).toHaveCount(24)
   await expect(dimensions(page, 'Chamber').locator('tbody tr[data-symbol]')).toHaveCount(25)
@@ -336,16 +338,16 @@ test('two tables: symbol and value, the chamber with its clearance as a note whe
       'data-symbol',
       'L3',
     )
-  await expect(symbolRow(page, 'Cartridge', 'L1').getByRole('cell')).toHaveText(['39.62 −0.2'])
-  await expect(symbolRow(page, 'Chamber', 'L1').getByRole('cell')).toHaveText(['39.48'])
-  await expect(symbolRow(page, 'Chamber', 'R1').getByRole('cell')).toHaveText(['12.03 +0.02'])
-  await expect(symbolRow(page, 'Cartridge', 'L6').getByRole('cell')).toHaveText(['71.12'])
+  await expect(symbolRow(page, 'Cartridge', 'L1').getByRole('cell')).toHaveText(['39.62', '−0.2'])
+  await expect(symbolRow(page, 'Chamber', 'L1').getByRole('cell')).toHaveText(['39.48', ''])
+  await expect(symbolRow(page, 'Chamber', 'R1').getByRole('cell')).toHaveText(['12.03', '+0.02'])
+  await expect(symbolRow(page, 'Cartridge', 'L6').getByRole('cell')).toHaveText(['71.12', ''])
   await expect(symbolRow(page, 'Chamber', 'L6')).toHaveCount(0)
-  await expect(symbolRow(page, 'Cartridge', 'r1').getByRole('cell')).toHaveText(['0.76 min'])
-  await expect(symbolRow(page, 'Chamber', 'r1').getByRole('cell')).toHaveText(['0.76 max'])
-  // Greek letters as in the figure; r1 and R1 stay two rows
-  await expect(symbolRow(page, 'Cartridge', 'α').getByRole('cell')).toHaveText(['40°'])
-  await expect(symbolRow(page, 'Chamber', 'α1').getByRole('cell')).toHaveText(['71.4331°'])
+  await expect(symbolRow(page, 'Cartridge', 'r1').getByRole('cell')).toHaveText(['0.76', 'min'])
+  await expect(symbolRow(page, 'Chamber', 'r1').getByRole('cell')).toHaveText(['0.76', 'max'])
+  // Greek letters as in the figure; r1 and R1 stay two rows; angles to 2 decimals
+  await expect(symbolRow(page, 'Cartridge', 'α').getByRole('cell')).toHaveText(['40°', ''])
+  await expect(symbolRow(page, 'Chamber', 'α1').getByRole('cell')).toHaveText(['71.43°', ''])
   await expect(symbolRow(page, 'Cartridge', 'δ L')).toHaveCount(1)
   // the clearance note: its meaning on hover, "Clearance" for a screen reader, in the chamber table only
   await symbolRow(page, 'Chamber', 'R1').getByRole('note').hover()
@@ -361,6 +363,20 @@ test('two tables: symbol and value, the chamber with its clearance as a note whe
   ).toHaveCount(0)
   await expect(page.getByRole('textbox', { name: /search/i })).toHaveCount(0)
   await expect(page.getByRole('radiogroup', { name: 'Group' })).toHaveCount(0)
+})
+
+test('9 mm Luger: a zero clearance carries its sign, alpha1 stays as the sheet prints it', async ({
+  page,
+}) => {
+  await storeUnits(page, 'us', {})
+  await page.goto('/cartridges/9-mm-luger')
+  await expect(symbolRow(page, 'Chamber', 'L3').getByRole('cell')).toHaveText(['.7539', '±.0000'])
+  await expect(symbolRow(page, 'Chamber', 'α1').getByRole('cell')).toHaveText(['180°', ''])
+  // 1°57'57": 2 decimals, the text as printed in the hover
+  await expect(symbolRow(page, 'Chamber', 'i').getByRole('cell')).toHaveText(['1.97°', ''])
+  await expect(symbolRow(page, 'Chamber', 'i').locator('[tabindex]')).toHaveAccessibleDescription(
+    /Printed as 1°57'57"/,
+  )
 })
 
 test('the symbol notes show on keyboard focus; a table is one tab stop, the arrow keys move between its symbols', async ({

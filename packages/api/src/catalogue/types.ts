@@ -168,7 +168,9 @@ export interface BulletItem {
   ballisticCoefficientG7: number | null
   country?: string
   tipType?: string
+  baseType?: string
   construction?: string
+  leadFree?: boolean
   nameOnly?: true
 }
 
@@ -251,7 +253,7 @@ export const catalogueFormat = 1
  * The version of what `derive.ts` computes (list items, sort and search keys, revisions). Raise it
  * with any change to those, so a build made by older code is refused instead of read as current.
  */
-export const deriveVersion = 4
+export const deriveVersion = 5
 
 /** The first fields of the index and of the record file: what built them. */
 export interface CatalogueHeader {

@@ -17,7 +17,7 @@ import { useTranslation } from '../i18n/language.ts'
 import { decimalMark, formatNumber, plainNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
 import type { RangeStep } from '../lib/range-entry.ts'
-import { rangeStats } from '../lib/range-entry.ts'
+import { loadSummary, rangeStats } from '../lib/range-entry.ts'
 import { type UnitSystem, withUnit } from '../lib/units.ts'
 import { BarCount, PageBar } from './page-bar.tsx'
 import { EmptyNote, Message } from './states.tsx'
@@ -73,15 +73,89 @@ function RoundCount({ r }: { r: ReturnType<typeof useRangeMode> }) {
   )
 }
 
+/** A velocity with its unit, n/a without one. */
+const velocityText = (ms: number | undefined, system: UnitSystem, t: Translator['t']) =>
+  ms === undefined
+    ? t('n/a')
+    : `${formatNumber(system.velocity.fromSi(ms), 1)} ${system.velocity.symbol}`
+
+/** The saved load to enter shots for, and what its name in the select may cut: its components. */
+function LoadChoice({ r }: { r: ReturnType<typeof useRangeMode> }) {
+  const { t } = useTranslation()
+  if (!r.loads?.length) return null
+  const summary = r.load ? loadSummary(r.load.data, r.nameOf ?? (() => undefined), r.system, t) : []
+  return (
+    <div>
+      <NativeSelect
+        label={t('Saved load')}
+        size="lg"
+        title={r.load?.name}
+        value={r.loadId ?? ''}
+        onChange={(e) => r.choose(e.currentTarget.value || undefined)}
+        data={[
+          { value: '', label: t('Choose a load'), disabled: true },
+          ...r.loads.map((l) => ({ value: l.id, label: l.name })),
+        ]}
+      />
+      {r.load && (
+        // room for both lines from the start: the names read later move nothing below
+        <div className="range-load-summary" data-load-summary style={{ minHeight: '2.875rem' }}>
+          {summary.map((line, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: at most two lines in a fixed order
+            <Text key={i} size="sm" c="dimmed" mt={4}>
+              {line}
+            </Text>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** The count, mean, SD and ES of the step's shots, under Add shot. */
+function RangeStats({ r, step }: { r: ReturnType<typeof useRangeMode>; step: string }) {
+  const { t } = useTranslation()
+  const stats = rangeStats(r.string)
+  if (!stats) return null
+  const shown = (ms: number | undefined) => velocityText(ms, r.system, t)
+  return (
+    <section aria-label={t('Statistics, {step}', { step })}>
+      <dl
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'auto 1fr',
+          gap: '0 1rem',
+          margin: 0,
+        }}
+      >
+        <div style={{ display: 'contents' }}>
+          <dt>{t('Shots counted')}</dt>
+          <dd style={{ margin: 0 }}>{plainNumber(stats.count)}</dd>
+        </div>
+        <div style={{ display: 'contents' }}>
+          <dt>{t('Mean')}</dt>
+          <dd style={{ margin: 0 }}>{shown(stats.mean)}</dd>
+        </div>
+        <div style={{ display: 'contents' }}>
+          <dt>{t('SD')}</dt>
+          <dd style={{ margin: 0 }}>{shown(stats.standardDeviation)}</dd>
+        </div>
+        <div style={{ display: 'contents' }}>
+          <dt>{t('ES')}</dt>
+          <dd style={{ margin: 0 }}>{shown(stats.extremeSpread)}</dd>
+        </div>
+      </dl>
+    </section>
+  )
+}
+
 export function RangeMode() {
   const { t } = useTranslation()
   const r = useRangeMode()
   const online = useOnline()
   const { system } = r
   const unit = system.velocity.symbol
-  const stats = rangeStats(r.string)
-  const shown = (ms: number | undefined) =>
-    ms === undefined ? t('n/a') : `${formatNumber(system.velocity.fromSi(ms), 1)} ${unit}`
+  const shown = (ms: number | undefined) => velocityText(ms, system, t)
 
   return (
     <>
@@ -105,23 +179,20 @@ export function RangeMode() {
             }
           />
         )}
-        {r.loads && r.loads.length > 0 && (
-          <NativeSelect
-            label={t('Saved load')}
-            size="lg"
-            value={r.loadId ?? ''}
-            onChange={(e) => r.choose(e.currentTarget.value || undefined)}
-            data={[
-              { value: '', label: t('Choose a load'), disabled: true },
-              ...r.loads.map((l) => ({ value: l.id, label: l.name })),
-            ]}
-          />
-        )}
+        <LoadChoice r={r} />
         {r.load && r.step && (
           <>
             <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
               <legend className="visually-hidden">{t('Ladder step')}</legend>
-              <Group gap="xs">
+              {/* cells of one width, so the steps line up whatever their number */}
+              <div
+                className="range-steps"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(7rem, 1fr))',
+                  gap: 'var(--mantine-spacing-xs)',
+                }}
+              >
                 {r.steps.map((s) => (
                   <Button
                     key={s.key}
@@ -134,7 +205,7 @@ export function RangeMode() {
                     {stepName(s, system, t)}
                   </Button>
                 ))}
-              </Group>
+              </div>
             </fieldset>
             <form
               onSubmit={(e) => {
@@ -184,6 +255,7 @@ export function RangeMode() {
                 </Button>
               </Stack>
             </form>
+            <RangeStats r={r} step={stepName(r.step, system, t)} />
             <div role="status" aria-live="polite">
               {r.saved}
             </div>
@@ -219,33 +291,6 @@ export function RangeMode() {
                   </li>
                 ))}
               </ol>
-              {stats && (
-                <dl
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'auto 1fr',
-                    gap: '0 1rem',
-                    margin: '0.5rem 0 0',
-                  }}
-                >
-                  <div style={{ display: 'contents' }}>
-                    <dt>{t('Shots counted')}</dt>
-                    <dd style={{ margin: 0 }}>{plainNumber(stats.count)}</dd>
-                  </div>
-                  <div style={{ display: 'contents' }}>
-                    <dt>{t('Mean')}</dt>
-                    <dd style={{ margin: 0 }}>{shown(stats.mean)}</dd>
-                  </div>
-                  <div style={{ display: 'contents' }}>
-                    <dt>{t('SD')}</dt>
-                    <dd style={{ margin: 0 }}>{shown(stats.standardDeviation)}</dd>
-                  </div>
-                  <div style={{ display: 'contents' }}>
-                    <dt>{t('ES')}</dt>
-                    <dd style={{ margin: 0 }}>{shown(stats.extremeSpread)}</dd>
-                  </div>
-                </dl>
-              )}
             </section>
             <section aria-label={t('Conditions and note')}>
               <Text component="h2" fw={600} mb="xs">

@@ -1,4 +1,5 @@
 import type { Dimension, Profile, RadiusMark } from '../core/types.ts'
+import type { LengthUnit } from '../core/units.ts'
 import {
   type BaseType,
   type BulletDimensions,
@@ -150,14 +151,16 @@ export interface BulletProfile extends Profile {
 
 /**
  * The outline of a bullet and the dimensions of the values `sourced` covers that the drawn
- * outline follows: a value the outline replaced, assumed or derived is never dimensioned.
+ * outline follows: a value the outline replaced, assumed or derived is never dimensioned. A
+ * refusal writes its lengths in `unit`.
  */
 export function bulletProfile(
   shape: BulletDimensions,
   sourced: (field: string) => boolean,
   given: 'sourced' | 'entered' = 'sourced',
+  unit: LengthUnit = 'mm',
 ): BulletProfile | Refusal {
-  const o = bulletOutline(shape, given)
+  const o = bulletOutline(shape, given, unit)
   if ('reason' in o) return o
   const L = shape.length
   const z0 = L - o.noseLength
