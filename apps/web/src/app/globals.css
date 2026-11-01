@@ -1670,6 +1670,8 @@ td.nowrap {
 
 /* the cartridge designer's derived values: label and value, one row each; a row's title has its basis */
 .designer .derived-table {
+  /* as wide as its rows, not the column (a flex item) */
+  align-self: flex-start;
   width: auto;
   margin-top: 0.25rem;
 }
