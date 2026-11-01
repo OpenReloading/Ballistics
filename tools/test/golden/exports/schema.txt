@@ -2,6 +2,7 @@
 . AnalysisOverrides
 . BallisticCoefficient
 . Bullet
+. BulletListFields
 . BulletOverrides
 . CaliberClass
 . CalibrationReference
@@ -94,6 +95,7 @@
 . ballisticCoefficient
 . baseTypes
 . bullet
+. bulletListFields
 . bulletOverrides
 . caliberClass
 . calibrationReference
