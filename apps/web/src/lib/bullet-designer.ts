@@ -106,6 +106,7 @@ export const designerSpecs: DesignerSpec[] = [
   len('base.length', msg('Boat-tail length'), 'base'),
   len('base.diameter', msg('Base diameter'), 'base'),
   len('base.cavityDiameter', msg('Cavity diameter'), 'base'),
+  len('base.cavityDepth', msg('Cavity depth'), 'base'),
   {
     key: 'base.angle',
     label: msg('Boat-tail angle'),
@@ -180,7 +181,7 @@ export function fieldInUse(
   const hollow =
     c['base.type'] === 'conical-hollow-base' || c['base.type'] === 'rounded-hollow-base'
   const tail = c['base.type'] === 'boat-tail' || c['base.type'] === 'rebated-boat-tail'
-  if (key === 'base.cavityDiameter') return hollow
+  if (key === 'base.cavityDiameter' || key === 'base.cavityDepth') return hollow
   if (key.startsWith('base.')) return tail || hollow
   if (key.startsWith('ogive.'))
     return c['ogive.form'] !== 'round-nose' && c['ogive.form'] !== 'flat-nose'
@@ -522,6 +523,7 @@ function baseShape(v: StoredValues, choices: Choices): NonNullable<BulletDimensi
     ...(v['base.diameter'] !== undefined && { diameter: v['base.diameter'] }),
     ...(v['base.angle'] !== undefined && { angle: v['base.angle'] }),
     ...(v['base.cavityDiameter'] !== undefined && { cavityDiameter: v['base.cavityDiameter'] }),
+    ...(v['base.cavityDepth'] !== undefined && { cavityDepth: v['base.cavityDepth'] }),
   }
 }
 
@@ -596,6 +598,7 @@ function derivedFills(
     noseLength: [o.noseLength, noseFromRadius ? 'derived' : o.noseAssumed ? 'assumed' : 'derived'],
     bearingLength: [o.bearingLength, o.noseAssumed || baseAssumed ? 'assumed' : 'derived'],
     meplatDiameter: [2 * m, tag(tipIndex)],
+    ...(o.cavity?.typed === false && { 'base.cavityDepth': [o.cavity.depth, 'assumed', '0.5 dc'] }),
   }
   boatTailFills(fill, o, d, tag)
   ogiveFills(fill, o, v, choices, m)
