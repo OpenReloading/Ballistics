@@ -10346,6 +10346,11 @@ main .page-bar h1 {
     height: 0.8125rem;
   }
 
+  /* the Tour button fills its row, so the unseen dot sits on its corner */
+  .page-bar:not([data-single]) .page-bar-actions > .mantine-Indicator-root > .mantine-Button-root {
+    flex: 1;
+  }
+
   .page-bar-actions .save-group > :first-child {
     flex: 1;
   }
@@ -12135,6 +12140,14 @@ main :is(.cartridge-record, .burn-overlay, .no-curve) .page-panel-head > .page-p
     display: block;
     width: 210mm;
     height: 297mm;
+  }
+}
+
+/* from 75em a tour's target taller than the window scrolls to its top below the fixed top bar (56 px),
+   with room for the stage's 10 px and 8 px more, so the popover beside it starts below the bar too */
+@media screen and (min-width: 75em) {
+  html:has(> body.driver-active) {
+    scroll-padding-top: 4.625rem;
   }
 }
 

@@ -7,6 +7,29 @@ import { useTranslation } from '../i18n/language.ts'
 import { markTourSeen, type TourPage, tourSeen, tours } from '../lib/tours.ts'
 import { focusBack } from './focus-back.ts'
 
+/** Space between the fixed top bar and a popover beside its target, px. */
+const barGap = 8
+
+/**
+ * Keeps a popover placed beside its target (driver.js places it after this hook, and again on a
+ * scroll or resize) below the fixed top bar: beside a target that starts under the bar it would
+ * cover the page actions. A popover above or below its target, or at the window's foot, is left.
+ */
+function keepBelowTopBar(wrapper: HTMLElement) {
+  const place = () => {
+    if (!/driver-popover-side-(left|right)/.test(wrapper.className)) return
+    const bar = document.querySelector('.mantine-AppShell-header')?.getBoundingClientRect().bottom
+    const top = Number.parseFloat(wrapper.style.top)
+    // below 75em the top bar scrolls away with the page: its foot is then above the window
+    if (!bar || bar <= 0 || Number.isNaN(top) || top >= bar + barGap) return
+    wrapper.style.top = `${bar + barGap}px`
+  }
+  new MutationObserver(place).observe(wrapper, {
+    attributes: true,
+    attributeFilter: ['style', 'class'],
+  })
+}
+
 /** Starts the short tour of `page`; a dot marks it until the viewer has opened it once. */
 export function TourButton({ page }: { page: TourPage }) {
   const { t } = useTranslation()
@@ -44,6 +67,7 @@ export function TourButton({ page }: { page: TourPage }) {
       doneBtnText: t('Done'),
       closeBtnLabel: t('Close the tour'),
       onPopoverRender: (p) => {
+        keepBelowTopBar(p.wrapper)
         p.wrapper.setAttribute('aria-modal', 'true')
         // the glyph is not the button's name: only the label is read
         const glyph = document.createElement('span')
