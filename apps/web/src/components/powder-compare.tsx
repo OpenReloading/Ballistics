@@ -2,7 +2,7 @@
 
 import { Button, NumberInput, SegmentedControl, Select, UnstyledButton } from '@mantine/core'
 import { CaretDown, CaretUp } from '@phosphor-icons/react'
-import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
@@ -489,12 +489,32 @@ function ChargeInput({
 }
 
 /**
+ * Cancels the Powders tab's run when another powder is picked (a design's id before its powder's,
+ * which a record and its designs share): its parameters go into the fields the later
+ * rows read.
+ */
+function useCancelOnPick(
+  design: string | undefined,
+  powder: string | undefined,
+  cancel: () => void,
+) {
+  const picked = design ?? powder
+  const runFor = useRef(picked)
+  useEffect(() => {
+    if (runFor.current === picked) return
+    runFor.current = picked
+    cancel()
+  }, [picked, cancel])
+}
+
+/**
  * The Powders tab: every powder with model parameters for the load of the workbench. Nothing runs
  * until Compute.
  */
 export function PowderCompare({ system }: { system: UnitSystem }) {
   const { t } = useTranslation()
-  const { loadRequest, powder, pickPowder, applyCharge, fields, cartridge } = useLoad()
+  const { loadRequest, powder, powderDesign, pickPowder, applyCharge, fields, cartridge } =
+    useLoad()
   const [kind, setKind] = useState<CompareMode['kind']>('typed')
   const [fill, setFill] = useState<number | string>(caseFillPercentRange.initial)
   const fillValid = isFillValid(fill)
@@ -515,6 +535,8 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     asPercent,
   )
   const study = usePowderCompare(loadRequest, mode)
+  // another powder picked mid-run writes its parameters into the fields the later rows read
+  useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
   const [filters, setFilters] = useState(noFilters)
   // Compute empties the rows and with them the facets the filters name
   if (study.rows.length === 0 && isFiltering(filters)) setFilters(noFilters)

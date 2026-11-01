@@ -27,7 +27,7 @@ $$
 
 Code: `packages/core/src/water.ts`, `waterDensityGramsPerCm3`, `packages/drawing/src/seating/seating.ts`, `seat` (`caseVolume`).
 
-$\rho_w$ is the density of water at 20 °C. The `convention` of a case capacity record (free text: fill level, water temperature, primer state) says how its water was filled. It is recorded and echoed (the `capacities` of `GET /cartridges/:id`) and does not enter $V_\mathrm{case}$: the same mass gives the same volume under any convention. A record without a `convention` follows the default under Assumptions. A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
+$\rho_w$ is the density of water at 20 °C. The `primerState` (`primed-spent` or `unprimed`) and `fillLevel` (`mouth`) of a case capacity record say how its water was filled, where the source states it. They are recorded and echoed (the `capacities` of `GET /cartridges/:id`) and do not enter $V_\mathrm{case}$: the same mass gives the same volume either way. No volume correction for the primer pocket is applied until a sourced primer pocket volume per primer size exists. A record without `fillLevel` takes the mouth (Assumptions); one without `primerState` has no primer state. A water temperature the source states goes in `note`. The earlier free text field `convention` is gone, and a file that has it is refused (no migrations before 1.0). A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
 
 The display unit grain of water is the volume of one grain mass of water:
 
@@ -205,7 +205,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 ## Assumptions
 
-- The default convention of a capacity record without `convention`: the water fills the case to the mouth, at 20 °C. The primer state is not part of the default: `caseCondition` does not define one.
+- The default of a capacity record without `fillLevel`: the water fills the case to the mouth, at 20 °C. A record without `primerState` has no default primer state: `caseCondition` does not define one.
 - The bullet is a solid of revolution with the outline `bulletOutline` builds. Missing dimensions take stated proportions, which the notes name.
 - The cavity of a hollow base is a cone or a half ellipsoid, as deep as its radius unless a depth is given, and it is empty: no wad or lubricant in it.
 - Only the mouth position bounds the bullet volume. The neck diameter and the case wall do not enter.
@@ -213,7 +213,9 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 ## Limits
 
-- A capacity measured with water at another temperature than 20 °C is not corrected, whatever its `convention` says.
+- A capacity measured with water at another temperature than 20 °C is not corrected, whatever its `note` says.
+- A capacity measured unprimed and one measured with a spent primer differ by the primer pocket volume behind the anvil; neither is corrected, since no sourced primer pocket volume per primer size exists.
+- A primer swap is stated as an uncertainty of the start pressure, not applied: the solver keeps one start pressure whatever primer a load names. Peterson Cartridge fired one .22 Creedmoor load with Federal Match large rifle magnum and standard large rifle primers, five new cases each, 24 in barrel; the magnum primers gave on average 25 fps more velocity and 1,500 psi more pressure ([Peterson Cartridge, 22 Creedmoor Load Data](https://petersoncartridge.com/blog/22-creedmoor-load-data), section Maximum Pressure Load Data, retrieved 2026-11-01). That is one load and one primer brand, and the page says the result holds only for that load: it gives the size of the effect, not a correction.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
 - The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/drawing/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.

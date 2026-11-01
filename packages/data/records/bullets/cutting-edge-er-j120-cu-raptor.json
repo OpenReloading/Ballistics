@@ -17,6 +17,10 @@
     "value": 34.77,
     "raw": "1.369\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -39,6 +43,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 7, Extended Range (ER) Raptor: Caliber .284 (7mm), Grains 120, Minimum Required Twist 1-9.25\", Part Number ER J120 Cu Raptor, G1 BC .440, OAL 1.369\", Bullet Projection .750\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

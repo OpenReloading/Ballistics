@@ -17,6 +17,10 @@
     "value": 30.1,
     "raw": "1.185\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -54,6 +58,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 3, MTAC - Match, Tactical: Caliber .224, Grains 79, Minimum Required Twist *1-7\", Part Number MTAC 224 79 MAX, G1 BC .431 (A.B.) / .459 (O89), G7 BC .221 (A.B.) / .226 (O89), OAL 1.185\", Bullet Projection .773\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

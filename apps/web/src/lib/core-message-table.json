@@ -436,6 +436,13 @@
     "seating": [
       "The bullet base is behind the case head: the seating depth is above the case length. No volume behind the bullet is given.",
       "The bullet below the mouth takes the whole case volume: no volume behind the bullet is given."
+    ],
+    "competition scoring": [
+      "a hit, miss or penalty count must be a whole number of 0 or more",
+      "the stage time must be positive",
+      "a ring value must be 0 or more",
+      "stage points must be 0 or more",
+      "a series needs its shots or its total"
     ]
   }
 }

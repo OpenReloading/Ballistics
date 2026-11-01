@@ -17,6 +17,10 @@
     "value": 32.69,
     "raw": "1.287\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "ballisticCoefficients": [
     {
       "dragModel": "G1",
@@ -44,6 +48,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "ballisticCoefficients", "slowestTwist"],
         "note": "Page 5, MAXIMUS Bullets: Caliber .338, Grains 200, Minimum Required Twist 1-12\", Part Number M.338 200 FCG, G1 BC .399 (O89), G7 BC .200 EST, OAL 1.287\", BULLET PROJECTION .720\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

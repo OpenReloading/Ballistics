@@ -17,6 +17,10 @@
     "value": 45.97,
     "raw": "1.810\""
   },
+  "construction": {
+    "raw": "solid copper",
+    "structure": "monolithic"
+  },
   "slowestTwist": {
     "value": 228.6,
     "raw": "1-9\""
@@ -32,6 +36,13 @@
         "sha256": "4978ac25b95685841fa103ed922d14097e0ba5cec6afb12ed790fa2acecb9fdc",
         "fields": ["diameter", "mass", "length", "slowestTwist"],
         "note": "Page 5, MAXIMUS Bullets: Caliber .338, Grains 280, Minimum Required Twist 1-9\", Part Number FB M. 338 280 SS, G1 BC TBD, G7 BC TBD, OAL 1.810\", BULLET PROJECTION .960\""
+      },
+      {
+        "source": "cutting-edge-bullets-home-page",
+        "url": "https://cuttingedgebullets.com/",
+        "retrieved": "2026-11-01",
+        "fields": ["construction.raw", "construction.structure"],
+        "note": "Home page: \"World-class solid copper bullets\"."
       }
     ]
   },

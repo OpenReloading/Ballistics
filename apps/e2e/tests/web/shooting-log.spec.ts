@@ -192,3 +192,70 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
   // the import changes no round count
   expect(await roundCount(page, rifle)).toBe(150)
 })
+
+test('the yearly summary shows only the entries of its year, the same numbers in print and CSV', async ({
+  page,
+}) => {
+  await page.goto('/firearms/log')
+  await seed(page)
+  const entry = (n: number, date: string, firearm: string, rounds: number) => ({
+    kind: 'shootingLogEntry',
+    id: `00000000-0000-4000-8000-00000000000${n}`,
+    name: date,
+    saved: '2026-10-20T00:00:00.000Z',
+    data: { date, firearm: `user:${firearm}`, ammunition: 'Maker', rounds },
+  })
+  await putRecords(page, [
+    entry(1, '2025-06-01', pistol, 50),
+    entry(2, '2026-03-14', rifle, 30),
+    entry(3, '2026-03-28', pistol, 25),
+    entry(4, '2026-07-01', rifle, 20),
+  ])
+  await page.reload()
+  const summary = page.locator('section.log-summary')
+  // the latest year first
+  await expect(summary).toContainText('2026: 3 entries, 75 rounds')
+  const firearms = summary.locator('table', { hasText: 'Rounds per firearm' })
+  await expect(firearms.locator('tbody tr')).toHaveText(['Bench rifle502', 'Club pistol251'])
+  // factory ammunition: under the firearm only
+  await expect(summary).toContainText(
+    '75 rounds of entries without a saved load are under their firearms only.',
+  )
+  const months = summary.locator('table', { hasText: 'Range days per month' })
+  await expect(months.locator('tbody tr').nth(2)).toHaveText('March2')
+  await expect(months.locator('tbody tr').nth(6)).toHaveText('July1')
+
+  await summary.getByRole('combobox', { name: 'Summary year' }).click()
+  await page.getByRole('option', { name: '2025' }).click()
+  await expect(summary).toContainText('2025: 1 entry, 50 rounds')
+  await expect(firearms.locator('tbody tr')).toHaveText(['Club pistol501'])
+
+  // print: the summary sheet alone, with the numbers of the screen
+  await page.evaluate(() => {
+    document.documentElement.dataset.print = 'log-summary'
+  })
+  await page.emulateMedia({ media: 'print' })
+  const sheet = page.locator('.log-summary-sheet')
+  await expect(sheet).toBeVisible()
+  await expect(page.locator('.log-sheet')).toBeHidden()
+  await expect(sheet).toContainText('2025: 1 entry, 50 rounds')
+  await page.emulateMedia({ media: 'screen' })
+  await page.evaluate(() => {
+    delete document.documentElement.dataset.print
+  })
+
+  const [csv] = await Promise.all([
+    page.waitForEvent('download'),
+    summary.getByRole('button', { name: 'Export summary CSV' }).click(),
+  ])
+  expect(csv.suggestedFilename()).toBe('openreloading-shooting-log-2025-summary.csv')
+  const lines = (await readFile(await csv.path(), 'utf8')).replace(/^﻿/, '').trim().split('\n')
+  expect(lines.slice(0, 3)).toEqual([
+    'Year,2025',
+    'Section,Name,Rounds,Entries',
+    'Firearm,Club pistol,50,1',
+  ])
+  expect(lines).toContain('Without a load,,50,')
+  expect(lines).toContain('Month,2025-06,,1')
+  expect(lines.at(-1)).toBe('Total,,50,1')
+})

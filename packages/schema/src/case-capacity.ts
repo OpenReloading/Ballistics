@@ -18,7 +18,7 @@ export const caseCapacity = z
       .enum(['catalogue', 'user', 'shared'])
       .describe('Where the record lives: the git catalogue, this browser, or a received file.'),
     cartridge: ref('cartridge'),
-    waterCapacity: quantity('mass').describe('Mass of water filling the case to the mouth.'),
+    waterCapacity: quantity('mass').describe('Mass of water filling the case to `fillLevel`.'),
     caseManufacturer: ref('manufacturer')
       .describe('The manufacturer of the case, when the source names one.')
       .optional(),
@@ -26,12 +26,17 @@ export const caseCapacity = z
       .enum(['new', 'fired', 'sized'])
       .describe('The condition of the measured case.')
       .optional(),
+    primerState: z
+      .enum(['primed-spent', 'unprimed'])
+      .describe('Primer pocket when filled: a spent primer seated, or none. Absent: not stated.')
+      .optional(),
+    fillLevel: z
+      .enum(['mouth'])
+      .describe('How high the water was filled. Absent: not stated, the mouth is taken.')
+      .optional(),
     convention: z
-      .string()
-      .min(1)
-      .describe(
-        'How the water was filled: fill level, water temperature and primer state, as the source states them. Absent: the default convention of the docs. The volume derived from `waterCapacity` does not read it.',
-      )
+      .never({ error: 'Replaced by primerState and fillLevel' })
+      .describe('Refused, see primerState.')
       .optional(),
     note: z.string().min(1).describe('Notes on the measurement.').optional(),
     provenance: provenance
