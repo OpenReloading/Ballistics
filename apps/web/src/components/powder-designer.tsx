@@ -51,7 +51,7 @@ import { PageBar } from './page-bar.tsx'
 import { PropertyGrid } from './property-grid.tsx'
 import { useShortcuts } from './shortcuts.tsx'
 import { EmptyNote, ErrorNote, Message } from './states.tsx'
-import { useUnits } from './units-settings.tsx'
+import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
@@ -480,15 +480,17 @@ export function PowderDesigner() {
       <PageBar
         title={msg('Powder designer')}
         translated
+        fold={
+          <DesignerToolbar
+            undo={history.past.length > 0}
+            redo={history.future.length > 0}
+            newLabel={t('New powder')}
+            system={system}
+            dispatch={toolbar}
+          />
+        }
         actions={
           <>
-            <DesignerToolbar
-              undo={history.past.length > 0}
-              redo={history.future.length > 0}
-              newLabel={t('New powder')}
-              system={system}
-              dispatch={toolbar}
-            />
             <FileMenu
               ref={menu}
               kind="powder"
@@ -509,6 +511,7 @@ export function PowderDesigner() {
                 dispatch({ type: 'start', design: next })
               }}
             />
+            <UnitsIconButton />
           </>
         }
       />

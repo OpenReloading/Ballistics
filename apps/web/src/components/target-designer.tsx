@@ -34,7 +34,7 @@ import { PropertyGrid } from './property-grid.tsx'
 import { useShortcuts } from './shortcuts.tsx'
 import { EmptyNote, ErrorNote } from './states.tsx'
 import { TargetFaceFigure } from './target-face-drawing.tsx'
-import { useUnits } from './units-settings.tsx'
+import { UnitsIconButton, useUnits } from './units-settings.tsx'
 import { useKeptDraft } from './use-kept-draft.ts'
 import { recordLoadingText, useRecordLink } from './use-record-link.ts'
 import { Workspace } from './workspace.tsx'
@@ -120,7 +120,13 @@ export function TargetDesigner() {
     dispatch(a as Action)
   }
 
-  const field = (fieldKey: string, label: string, help: string) => {
+  /** `none` in the ring and event tables, whose column headers name the unit. */
+  const field = (
+    fieldKey: string,
+    label: string,
+    help: string,
+    unit: 'switch' | 'none' = 'none',
+  ) => {
     const spec = { ...specOf(fieldKey), label }
     const value = fieldAt(design, fieldKey)
     return (
@@ -132,7 +138,7 @@ export function TargetDesigner() {
         help={help}
         changed={false}
         error={fieldError(spec, value, system, t) ?? (edited ? keyed.get(fieldKey) : undefined)}
-        unit="none"
+        unit={unit}
         dispatch={dispatch}
       />
     )
@@ -239,8 +245,14 @@ export function TargetDesigner() {
             'black.diameter',
             t('Black area diameter'),
             t('Outside of the outermost black zone.'),
+            'switch',
           )}
-          {field('black.height', t('Black area height'), t('Height of an oval black area.'))}
+          {field(
+            'black.height',
+            t('Black area height'),
+            t('Height of an oval black area.'),
+            'switch',
+          )}
           <Checkbox
             label={t('Decimal scoring')}
             checked={design.decimal}
@@ -277,8 +289,18 @@ export function TargetDesigner() {
       title: t('Inner ten'),
       content: (
         <div className="prop-grid designer-grid">
-          {field('inner.diameter', t('Inner ten diameter'), t('Width of the inner ten circle.'))}
-          {field('inner.height', t('Inner ten height'), t('Height of an oval inner ten.'))}
+          {field(
+            'inner.diameter',
+            t('Inner ten diameter'),
+            t('Width of the inner ten circle.'),
+            'switch',
+          )}
+          {field(
+            'inner.height',
+            t('Inner ten height'),
+            t('Height of an oval inner ten.'),
+            'switch',
+          )}
           <NativeSelect
             label={t('Inner ten rule')}
             size={controlSize.row.input}
@@ -375,15 +397,17 @@ export function TargetDesigner() {
       <PageBar
         title={msg('Target designer')}
         translated
+        fold={
+          <DesignerToolbar
+            undo={history.past.length > 0}
+            redo={history.future.length > 0}
+            newLabel={t('New target')}
+            system={system}
+            dispatch={toolbar}
+          />
+        }
         actions={
           <>
-            <DesignerToolbar
-              undo={history.past.length > 0}
-              redo={history.future.length > 0}
-              newLabel={t('New target')}
-              system={system}
-              dispatch={toolbar}
-            />
             <FileMenu
               ref={menu}
               kind="targetFaceDesign"
@@ -404,6 +428,7 @@ export function TargetDesigner() {
                 dispatch({ type: 'start', design: next })
               }}
             />
+            <UnitsIconButton />
           </>
         }
       />

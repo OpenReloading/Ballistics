@@ -1,3 +1,4 @@
+import type { InteriorLoad } from '@open-reloading/core'
 import type { SessionRecord, UserRecord } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import {
@@ -5,6 +6,7 @@ import {
   loadStrings,
   loadsWithPowder,
   parseVelocities,
+  revolverLeakNote,
   sessionStrings,
   tuneHref,
   tuneSessionIds,
@@ -116,5 +118,28 @@ describe('the saved loads of a powder', () => {
       { id: '1', name: 'B' },
     ])
     expect(loadsWithPowder(records, 'user:q')).toEqual([])
+  })
+})
+
+describe('revolver leak note', () => {
+  const load = { charge: 3e-4 } as InteriorLoad
+  const leak = (area: number): InteriorLoad => ({
+    ...load,
+    leakage: { area: [{ travel: 0, area }] },
+  })
+
+  it('notes a load of the pistol and revolver table without a leak area', () => {
+    expect(revolverLeakNote('IV', load)).toBe(true)
+    expect(revolverLeakNote('IV', leak(0))).toBe(true)
+  })
+
+  it('leaves out a load with a leak area', () => {
+    expect(revolverLeakNote('IV', leak(1e-7))).toBe(false)
+  })
+
+  it('leaves out a rifle cartridge, a cartridge without a record and no load', () => {
+    expect(revolverLeakNote('I', load)).toBe(false)
+    expect(revolverLeakNote(undefined, load)).toBe(false)
+    expect(revolverLeakNote('IV', undefined)).toBe(false)
   })
 })

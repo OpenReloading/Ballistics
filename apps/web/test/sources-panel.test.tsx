@@ -2,7 +2,7 @@ import { MantineProvider } from '@mantine/core'
 import type { Source } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { expect, it } from 'vitest'
-import { RecordSourcesLink, Sources } from '../src/components/sources.tsx'
+import { groupSources, RecordSourcesLink, Sources } from '../src/components/sources.tsx'
 import { dayText } from '../src/lib/dates.ts'
 
 const hash = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
@@ -120,4 +120,35 @@ it('gives every table element of the sources its ARIA role', () => {
   expect(tags.length).toBeGreaterThan(6)
   for (const [tag, , attrs] of tags) expect(attrs, tag).toMatch(/ role="[a-z]+"/)
   expect(render(sheet)).toContain('scope="row" role="rowheader"')
+})
+
+it('groups the sources of one document: title, publisher, edition and hash once, a row per page', () => {
+  const book = { ...sheet, title: 'Rule book', edition: '2025' }
+  const html = renderToStaticMarkup(
+    <MantineProvider>
+      <Sources
+        provenance={{
+          kind: 'published',
+          sources: [
+            { ...book, page: 'p. 39', fields: ['name'] },
+            { title: 'Manual' },
+            { ...book, page: 'p. 342', note: 'Stated for the section.' },
+            { ...book, retrieved: undefined },
+          ],
+        }}
+      />
+    </MantineProvider>,
+  )
+  expect(groupSources([book, { title: 'Manual' }, book]).map((g) => g.length)).toEqual([2, 1])
+  expect(html.match(/>Rule book<\/a>/g)).toHaveLength(1)
+  expect(html.match(/<code>/g)).toHaveLength(1)
+  expect(html).toMatch(/class="[^"]*source-group/)
+  // the head row spans the columns (source, retrieved, license, covers, note)
+  expect(html).toMatch(/<td(?=[^>]*colSpan="5")(?=[^>]*source-document)/)
+  // the pages in the order cited, each with its own values; the document's first place kept
+  expect(html).toMatch(
+    /Page p\. 39<\/th>[\s\S]*Page p\. 342<\/th>[\s\S]*No page stated<\/th>[\s\S]*Manual/,
+  )
+  expect(html).toContain('Stated for the section.')
+  expect(html.match(/<tbody/g)).toHaveLength(2)
 })
