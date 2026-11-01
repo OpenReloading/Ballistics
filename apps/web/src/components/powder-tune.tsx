@@ -19,7 +19,7 @@ import {
   userRecord,
 } from '@open-reloading/schema'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { formatNumber, parseNumber } from '../i18n/number.ts'
 import { type Message as Marked, msg } from '../i18n/translate.ts'
@@ -490,9 +490,12 @@ function FitResult({
                   />
                   <div className="hand-range" aria-hidden="true">
                     <span>{value(p.name, p.value + min * u)}</span>
-                    <span style={{ insetInlineStart: `${(-min / (3 - min)) * 100}%` }}>
-                      {t('Fitted')}
-                    </span>
+                    {/* near the lower end the fit's label would sit on that end's value */}
+                    {-min / (3 - min) >= 0.2 && (
+                      <span style={{ insetInlineStart: `${(-min / (3 - min)) * 100}%` }}>
+                        {t('Fitted')}
+                      </span>
+                    )}
                     <span>{value(p.name, p.value + 3 * u)}</span>
                   </div>
                 </div>
@@ -991,7 +994,9 @@ export function PowderTune() {
   const [save, setSave] = useState<TuneSave>()
   const [records, setRecords] = useState<UserRecord[]>()
   const [powder, setPowder] = useState<string>()
-  const [added, setAdded] = useState<TuneString[]>([])
+  // the strings added here, each with its number in the order of adding, which Undo restores
+  const [added, setAdded] = useState<{ n: number; string: TuneString }[]>([])
+  const count = useRef(0)
   const [readFailed, setReadFailed] = useState(false)
   // the powder name lives here, so a new fit, which renders the save anew, keeps it
   const [name, setName] = useState<string>()
@@ -1042,7 +1047,10 @@ export function PowderTune() {
 
   const c = system.charge
   const first = loaded?.strings.length ?? 0
-  const strings = useMemo(() => [...(loaded?.strings ?? []), ...added], [loaded, added])
+  const strings = useMemo(
+    () => [...(loaded?.strings ?? []), ...added.map((a) => a.string)],
+    [loaded, added],
+  )
   const rows = chargeRows(strings, [])
   const [anyway, setAnyway] = useState(false)
   const [sensitivity, setSensitivity] = useState('')
@@ -1061,13 +1069,13 @@ export function PowderTune() {
     const j = i - first
     const gone = added[j]
     if (!gone) return
-    setAdded((a) => a.filter((_, x) => x !== j))
+    setAdded((a) => a.filter((x) => x !== gone))
     offerUndo(
       t('Removed the string at {charge} {unit}.', {
-        charge: formatNumber(c.fromSi(gone.charge), c.decimals),
+        charge: formatNumber(c.fromSi(gone.string.charge), c.decimals),
         unit: c.symbol,
       }),
-      () => setAdded((a) => [...a.slice(0, j), gone, ...a.slice(j)]),
+      () => setAdded((a) => [...a, gone].sort((x, y) => x.n - y.n)),
     )
   }
 
@@ -1101,7 +1109,10 @@ export function PowderTune() {
             )}
           </p>
         )}
-        <AddString onAdd={(s) => setAdded((a) => [...a, s])} oneTemperature={oneTemperature} />
+        <AddString
+          onAdd={(s) => setAdded((a) => [...a, { n: count.current++, string: s }])}
+          oneTemperature={oneTemperature}
+        />
         {noFit && (
           <p className="note">
             {t("No fit: open this page from a saved load's Measurements tab.")}{' '}
