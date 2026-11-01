@@ -901,12 +901,15 @@ function usePowderNames(refs: readonly string[], records: readonly UserRecord[])
           ),
         ),
       ),
-    ]).then(([makers, found]) => {
-      if (aborts.signal.aborted) return
-      const out = new Map(own)
-      for (const f of found) if (f) out.set(f[0], productLabel(f[1], makers))
-      setNames(out)
-    })
+    ])
+      .then(([makers, found]) => {
+        if (aborts.signal.aborted) return
+        const out = new Map(own)
+        for (const f of found) if (f) out.set(f[0], productLabel(f[1], makers))
+        setNames(out)
+      })
+      // each lookup already falls back to no name: nothing is left to fail
+      .catch(() => {})
     return () => aborts.abort()
   }, [key, records])
   return names
