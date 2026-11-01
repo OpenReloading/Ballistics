@@ -8162,6 +8162,12 @@ main .field-table tr.field-group > th {
     break-inside: avoid;
   }
 
+  /* the sections the reader left out in the Print menu (print-sections.tsx) */
+  html[data-report-omit~="chart"] .report-chart,
+  .print-report .report-inputs[hidden] {
+    display: none;
+  }
+
   .report-chart svg {
     display: block;
     width: 100%;

@@ -32,6 +32,7 @@ import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { loadFitMark } from '../lib/powder-record.ts'
 import { printedField, printedValue } from '../lib/print-format.ts'
+import type { PrintChoice } from '../lib/print-sections.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -47,6 +48,7 @@ import { LoadTabs } from './load-tabs.tsx'
 import { LotChartBlock, preloadLotChart } from './lot-rows.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PrintReport } from './print-report.tsx'
+import { PrintSectionItems, usePrintChoice } from './print-sections.tsx'
 import { useReportOptions } from './report-host.ts'
 import { SavedLoads, useExportReminder } from './saved-loads.tsx'
 import type { ScanLabelDialog } from './scan-label-dialog.tsx'
@@ -308,6 +310,8 @@ type ReportProps = {
   printGroups: [string, PrintRows][]
   stepValue: (s: ShownStep) => string
   warnings: ReturnType<typeof warningLines> | undefined
+  /** The sections the reader chose to print (the chart: `usePrintChoice`'s print rule). */
+  sections: PrintChoice
   t: Translate
 }
 
@@ -321,6 +325,7 @@ function ReportAfter({
   barrelError,
   notes,
   system,
+  sections,
   t,
 }: ReportProps) {
   const study =
@@ -333,7 +338,7 @@ function ReportAfter({
     )
   return (
     <>
-      {steps.length > 1 && (
+      {steps.length > 1 && sections.ladder && (
         <>
           <h2>{ladderName(ok, t)}</h2>
           {ladderTable}
@@ -343,10 +348,14 @@ function ReportAfter({
           <LotChartBlock lot={lot} system={system} note={false} />
         </>
       )}
-      <h2>{t('Barrel length')}</h2>
-      {study}
-      <LimitsView body={ok.body} printed />
-      {notes && (
+      {sections.barrel && (
+        <>
+          <h2>{t('Barrel length')}</h2>
+          {study}
+        </>
+      )}
+      {sections.limits && <LimitsView body={ok.body} printed />}
+      {notes && sections.notes && (
         <>
           <h2>{t('Notes')}</h2>
           <p>{notes}</p>
@@ -365,7 +374,7 @@ const mainResultTitle = (ok: OkOutcome, value: string, t: Translate) =>
 /** The workbench's print view: the load, its inputs, the result, the warnings and what follows. */
 function Report(props: ReportProps) {
   const { ok, chartSlot, steps, loadTitle, stale, fromDesign, approximate, printGroups } = props
-  const { stepValue, warnings, system, t } = props
+  const { stepValue, warnings, system, sections, t } = props
   const shownStep = steps.find((s) => s.n - 1 === ok.selected) ?? steps[0]
   return (
     <PrintReport chartSlot={chartSlot} after={<ReportAfter {...props} />}>
@@ -376,7 +385,7 @@ function Report(props: ReportProps) {
         {fromDesign && ` ${fromDesign}`}
         {approximate && ` ${approximate}`}
       </p>
-      <div className="report-inputs">
+      <div className="report-inputs" hidden={!sections.inputs}>
         {printGroups.map(([title, rows]) => (
           <table key={title} className="sheet-table">
             <caption>{title}</caption>
@@ -685,6 +694,7 @@ function PrintMenu({ ok, printReport }: { ok: OkOutcome | undefined; printReport
         <Menu.Item disabled={!ok} onClick={() => printSheets(true)}>
           {t('Load sheet and a page per charge')}
         </Menu.Item>
+        <PrintSectionItems />
       </Menu.Dropdown>
     </Menu>
   )
@@ -878,6 +888,7 @@ function PrintViews({
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
   const { t, tn } = useTranslation()
+  const sections = usePrintChoice()
   const steps = useMemo(() => shownSteps(ok, t), [ok, t])
   const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
@@ -930,6 +941,7 @@ function PrintViews({
       printGroups={printGroups}
       stepValue={stepValue}
       warnings={warnings}
+      sections={sections}
       t={t}
     />
   )
