@@ -23,14 +23,22 @@ const notJsonMessage = 'The file is not JSON.'
 const notDataFileMessage = 'The file is not an OpenReloading data file.'
 
 /** A `reason` of a file that was not read, in the language of `t`: the app's own three, else a message of the packages. */
-export function reasonText(reason: string, t: Translator['t']) {
+export function reasonText(reason: string, { t, tn }: Pick<Translator, 't' | 'tn'>) {
   if (reason === tooLargeMessage)
     return t('The file is larger than {size} MB.', { size: maxFileBytes / 1e6 })
   if (reason === notJsonMessage) return t('The file is not JSON.')
   if (reason === notDataFileMessage) return t('The file is not an OpenReloading data file.')
-  // a refused record: zod's lines `✖ <message>` and `  → at <path>`, each message translated
+  // a refused record: zod's lines `✖ <message>` and `  → at <path>`, then `problemsText`'s count
+  // on the last line only (a key in the file may carry a line of its own into a message)
   if (!reason.startsWith('✖ ')) return translateMessage(reason, t)
-  return reason.replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
+  return reason
+    .replace(/^✖ (.+)$/gm, (_, message: string) => `✖ ${translateMessage(message, t)}`)
+    .replace(/^ {2}→ at (.+)$/gm, (_, path: string) => `  ${t('→ at {path}', { path })}`)
+    .replace(
+      /\nand (\d+) more problems?$/,
+      (_, n: string) =>
+        `\n${tn(Number(n), 'and {count} more problem', 'and {count} more problems')}`,
+    )
 }
 
 /** The size of `text` as a file, UTF-8 bytes, as Open and Import compare it with `maxFileBytes`. */
@@ -128,7 +136,7 @@ const shownProblems = 3
 function problemsText(error: z.ZodError) {
   const text = z.prettifyError(new z.ZodError(error.issues.slice(0, shownProblems)))
   const more = error.issues.length - shownProblems
-  return more > 0 ? `${text}\nand ${more} more problems` : text
+  return more > 0 ? `${text}\nand ${more} more problem${more === 1 ? '' : 's'}` : text
 }
 
 /** The text of `userDataText`, or why Open and Import would reject it (too large, invalid). */
