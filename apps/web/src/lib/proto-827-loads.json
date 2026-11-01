@@ -1,0 +1,108 @@
+{
+  "id": "hodgdon",
+  "maker": "hodgdon",
+  "producedBy": "maker",
+  "cartridgeName": "308 Winchester",
+  "cartridge": "catalogue:308-win",
+  "loads": [
+    {
+      "id": "proto-175-sie-hpbt-imr-4064",
+      "bullet": {
+        "printed": "175 GR. SIE HPBT",
+        "mass": { "value": 11.33981, "raw": "175 GR." },
+        "diameter": { "value": 7.8232, "raw": ".308\"" },
+        "record": "catalogue:sierra-2275"
+      },
+      "powder": { "printed": "IMR 4064", "record": "catalogue:imr-4064" },
+      "primer": { "printed": "Federal 210M, LR Match" },
+      "case": "Winchester",
+      "coal": { "value": 71.12, "raw": "2.800\"" },
+      "barrel": {
+        "length": { "value": 609.6, "raw": "24\"" },
+        "twist": { "value": 304.8, "raw": "1:12\"" }
+      },
+      "charges": [
+        {
+          "kind": "start",
+          "charge": { "value": 2.689155, "raw": "41.5 Grs" },
+          "velocity": { "value": 762, "raw": "2500", "assumedUnit": "ft/s" },
+          "pressure": {
+            "unit": "psi",
+            "peak": { "value": 3116.43, "raw": "45,200 PSI" },
+            "method": "case-contact",
+            "methodBasis": "from-unit"
+          }
+        },
+        {
+          "kind": "max",
+          "charge": { "value": 2.95483, "raw": "45.6C Grs" },
+          "velocity": { "value": 831.4944, "raw": "2728", "assumedUnit": "ft/s" },
+          "pressure": {
+            "unit": "psi",
+            "peak": { "value": 4102.381, "raw": "59,500 PSI" },
+            "method": "case-contact",
+            "methodBasis": "from-unit"
+          },
+          "marks": ["compressed"]
+        }
+      ],
+      "page": "117"
+    },
+    {
+      "id": "proto-175-sie-hpbt-varget",
+      "bullet": {
+        "printed": "175 GR. SIE HPBT",
+        "mass": { "value": 11.33981, "raw": "175 GR." },
+        "diameter": { "value": 7.8232, "raw": ".308\"" },
+        "record": "catalogue:sierra-2275"
+      },
+      "powder": { "printed": "Varget", "record": "catalogue:hodgdon-varget" },
+      "primer": { "printed": "Federal 210M, LR Match" },
+      "case": "Winchester",
+      "coal": { "value": 71.12, "raw": "2.800\"" },
+      "barrel": {
+        "length": { "value": 609.6, "raw": "24\"" },
+        "twist": { "value": 304.8, "raw": "1:12\"" }
+      },
+      "charges": [
+        {
+          "kind": "start",
+          "charge": { "value": 2.721554, "raw": "42.0 Grs" },
+          "velocity": { "value": 787.2984, "raw": "2583", "assumedUnit": "ft/s" },
+          "pressure": {
+            "unit": "CUP",
+            "peak": { "raw": "42,600 CUP" },
+            "method": "crusher",
+            "methodBasis": "from-unit"
+          }
+        },
+        {
+          "kind": "max",
+          "charge": { "value": 2.915951, "raw": "45.0C Grs" },
+          "velocity": { "value": 819.912, "raw": "2690", "assumedUnit": "ft/s" },
+          "pressure": {
+            "unit": "CUP",
+            "peak": { "raw": "48,600 CUP" },
+            "method": "crusher",
+            "methodBasis": "from-unit"
+          },
+          "marks": ["compressed"]
+        }
+      ],
+      "page": "117"
+    }
+  ],
+  "provenance": {
+    "kind": "published",
+    "sources": [
+      {
+        "title": "Hodgdon Annual Manual 2025, rifle and pistol tables (308 Winchester: barrel and twist on page 115, the 175 GR. SIE HPBT loads on page 117)",
+        "publisher": "Hodgdon Powder Co.",
+        "url": "https://hodgdonpowderco.com/wp-content/uploads/2026/04/AM25.pdf",
+        "retrieved": "2026-11-01",
+        "sha256": "ee592615a3488b87301033eb0544b880557bfc4e6ec2bbf78c59dac5d81a01dc",
+        "origin": "manufacturer"
+      }
+    ]
+  }
+}

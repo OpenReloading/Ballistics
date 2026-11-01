@@ -10,6 +10,7 @@ import { canonicalNumberText } from '../i18n/number.ts'
 import { type Message, msg, type Translator } from '../i18n/translate.ts'
 import { vivacityUnit } from '../lib/burn-rate.ts'
 import { toCsv } from '../lib/csv.ts'
+import { useProto } from '../lib/proto.ts'
 import { controlSize } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { resultTabsFit } from '../lib/workbench.ts'
@@ -55,6 +56,15 @@ const TrajectoryForm = dynamic(
   },
 )
 
+// throwaway prototype of #827, behind ?proto= only
+const ProtoRows = dynamic(() => import('./proto-827-published.tsx').then((m) => m.PublishedRows), {
+  ssr: false,
+})
+const ProtoHeader = dynamic(
+  () => import('./proto-827-published.tsx').then((m) => m.PublishedHeader),
+  { ssr: false },
+)
+
 const GroupsTab = dynamic(() => import('./groups-tab.tsx').then((m) => m.GroupsTab), {
   ssr: false,
   loading: () => <Loading what="the shot groups" inline />,
@@ -72,7 +82,9 @@ export const resultTabs = [
   ['barrel', msg('Barrel length')],
   ['powders', msg('Powders')],
 ] as const
-export type ResultTab = (typeof resultTabs)[number][0]
+/** The tab of the #827 prototype (`?proto=a` and `c`). */
+const publishedTab = ['published', msg('Published loads')] as const
+export type ResultTab = (typeof resultTabs)[number][0] | (typeof publishedTab)[0]
 
 const notRun = (text: Message, t: Translator['t']) => (
   <p className="prompt empty-state">{t(text)}</p>
@@ -255,7 +267,7 @@ function TrajectoryPanel() {
 
 type ChecklistItems = ReturnType<typeof useResult>['todo']
 
-type ShownTabs = (typeof resultTabs)[number][]
+type ShownTabs = (readonly [ResultTab, Message])[]
 
 /** The tab row; from 62em the tabs that do not fit go into the More menu, which stays in the row. */
 function ResultTabBar({
@@ -406,7 +418,11 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
   // in a low desktop window the burn-rate figure stands in the inputs' second column
   const short = useMediaQuery(shortFrame, false) ?? false
   const list = useRef<HTMLDivElement>(null)
-  const shownTabs = useMemo(() => resultTabs.filter(([v]) => short || v !== 'cartridge'), [short])
+  const proto = useProto()
+  const shownTabs = useMemo((): ShownTabs => {
+    const tabs = resultTabs.filter(([v]) => short || v !== 'cartridge')
+    return proto === 'a' || proto === 'c' ? [...tabs, publishedTab] : tabs
+  }, [short, proto])
   // by tab value: the Cartridge tab comes and goes
   const widths = useRef(new Map<ResultTab, number>())
   const [fit, setFit] = useState<number>(resultTabs.length)
@@ -510,6 +526,19 @@ function LadderBody() {
   )
 }
 
+/** The tab panel of the #827 prototype, `?proto=a` and `c` only. */
+function ProtoPanel() {
+  const { stale, opened } = useResult()
+  const proto = useProto()
+  return (
+    (proto === 'a' || proto === 'c') && (
+      <Tabs.Panel value="published" data-stale={stale || undefined}>
+        {opened('published') && <ProtoRows />}
+      </Tabs.Panel>
+    )
+  )
+}
+
 /** The panels of the result tabs. */
 function ResultPanels({ short }: { short: boolean }) {
   const { t } = useTranslation()
@@ -527,6 +556,7 @@ function ResultPanels({ short }: { short: boolean }) {
   } = useResult()
   return (
     <>
+      <ProtoPanel />
       <Tabs.Panel value="results" className="results-panel" data-stale={stale || undefined}>
         {heading('results', t)}
         {ok ? (
@@ -613,6 +643,8 @@ export const ResultsArea = memo(function ResultsArea() {
     setSeen((s) => (s.has(v) ? s : new Set([...s, v])))
   }
   const { framed, short, list, shownTabs, fit } = useTabFit(tab, setTab, outcome !== undefined)
+  const proto = useProto()
+  const [protoOpen, setProtoOpen] = useState(false)
   const tabList = (
     <ResultTabBar
       shownTabs={shownTabs}
@@ -658,6 +690,13 @@ export const ResultsArea = memo(function ResultsArea() {
             next={next}
             short={short}
           />
+          {ok && (proto === 'b' || proto === 'c') && (
+            <ProtoHeader
+              opened={proto === 'b' ? protoOpen : undefined}
+              open={() => (proto === 'c' ? choose('published') : setProtoOpen((o) => !o))}
+            />
+          )}
+          {ok && proto === 'b' && protoOpen && <ProtoRows />}
           {ok && <ResultNotes ok={ok} />}
           {/* the ladder bar sits directly above the tabs and drives every tab */}
           <ShownStrip />
