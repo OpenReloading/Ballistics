@@ -15,7 +15,6 @@ export const sampleIds: Record<string, readonly string[]> = {
     '454-casull',
     '10-3-capra',
     '12-7-x-108',
-    '18-x-81',
     '243-win-super-short-mag',
     '8-x-51-r-lebel',
     // the rest of the default drawing baseline (`common` of drawing-baseline.spec.ts)

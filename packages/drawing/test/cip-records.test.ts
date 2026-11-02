@@ -250,7 +250,6 @@ it('draws every record with the reviewed notes', () => {
     ['cip-11-5-fk-2021-04-07', 'chamber', 'headBelowP1'],
     ['cip-12-7-x-70-500-sch-ler-2002-05-15', 'chamber', 'headBelowP1'],
     ['cip-17-libra-2002-05-15', 'cartridge', 'grooveAngle'],
-    ['cip-18-x-81-2000-06-07', 'chamber', 'noG1'],
     ['cip-22-long-rifle-shot-claybirding-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-22-long-shot-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-264-leroy-n-e-2002-05-15', 'cartridge', 'grooveAngle'],
@@ -512,8 +511,8 @@ it('draws the rim chamfer where f and beta are stored, beta from the head face l
       counts.notTimesTan++
   }
   expect(counts).toEqual({
-    both: 429,
-    drawn: 428,
+    both: 428,
+    drawn: 427,
     notTimesTan: 194,
     skipped: ['cip-400-legend-2023-11-08'],
     withR0: 0,
@@ -567,7 +566,7 @@ it('keeps the chamber body around the cartridge body', () => {
     const gap = Math.min(...zs.map((z) => rAt(ch.points, z) - rAt(c.points, z)))
     if (!(gap >= -0.01)) gaps.push([id, Number(gap.toFixed(3))])
   }
-  expect(checked).toBe(513)
+  expect(checked).toBe(512)
   // Reviewed: chamber R, a minimum, is below cartridge R, a maximum, by 0.02 to 0.1 mm, so the
   // stored rim is thicker than the stored recess; between the two R the rim (R1/2) meets the
   // chamber body (P1/2). 22 BB Cap and 22 CB Cap: R 1.12 against 1.1, R1 7.06 against P1 5.76;
@@ -1248,7 +1247,7 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
     return [defined(sorted[0]), defined(sorted[sorted.length - 1])].map((s) => [s.name, s[key]])
   }
   expect({ figures: sizes.length, tables }).toEqual({
-    figures: 588,
+    figures: 587,
     // chamber only: a closed front, or a cartridge without its base values; cartridge only: a
     // chamber without them
     tables: {
@@ -1259,7 +1258,7 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
       V: { both: 23, chamber: 6 },
       VII: { both: 55 },
       IX: { chamber: 4 },
-      X: { both: 4 },
+      X: { both: 3 },
     },
   })
   // text size in mm, screen px per mm at 390 px, screen height and print width in mm

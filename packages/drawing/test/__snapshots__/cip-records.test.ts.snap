@@ -3,11 +3,11 @@
 exports[`adds the detail letters on screen without changing the frame or any other mark 1`] = `
 {
   "cartridge A 10": 165,
-  "cartridge A 2": 9,
+  "cartridge A 2": 8,
   "cartridge A 20": 26,
   "cartridge A 5": 314,
   "chamber A 10": 327,
-  "chamber A 2": 40,
+  "chamber A 2": 39,
   "chamber A 20": 52,
   "chamber A 5": 113,
   "chamber B 10": 44,
@@ -155,15 +155,13 @@ exports[`dimensions every stored symbol or lists it as undimensioned 2`] = `
   "cartridge: delta": 11,
   "cartridge: e": 1,
   "cartridge: f": 3,
-  "chamber: F": 4,
-  "chamber: G": 1,
+  "chamber: F": 3,
   "chamber: H1": 11,
   "chamber: L1": 1,
   "chamber: L2": 11,
   "chamber: P2": 1,
   "chamber: R": 102,
   "chamber: alpha1": 117,
-  "chamber: i": 1,
 }
 `;
 
