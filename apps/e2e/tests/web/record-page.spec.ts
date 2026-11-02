@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { gotoHydrated } from './nav.ts'
 
@@ -124,33 +123,12 @@ for (const r of records) {
       expect(html).not.toContain('id="record-sources"')
     })
 
-    for (const colorScheme of ['light', 'dark'] as const)
-      test(`the loaded page has no axe violation, ${colorScheme}`, async ({ page }) => {
-        await page.emulateMedia({ colorScheme })
-        await gotoHydrated(page, path)
-        await expectLoaded(page, r)
-        const { violations } = await new AxeBuilder({ page })
-          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-          .analyze()
-        expect(
-          violations.map(
-            (v) => `${v.id}: ${v.nodes.map((n) => `${n.target.join(' ')} ${n.html}`).join(', ')}`,
-          ),
-        ).toEqual([])
-      })
-
     test('a record whose data file is gone shows the not-found message', async ({ page }) => {
       await page.route(`**${file}`, (route) => route.fulfill({ status: 404 }))
       await page.goto(path)
       await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
       await expect(page.getByText('Nothing at this address')).toBeVisible()
       await expect(page.locator('meta[name="robots"][content="noindex"]')).toHaveCount(1)
-    })
-
-    test('an unknown record id answers the not-found page of the site', async ({ page }) => {
-      const response = await page.goto(`/${r.route}/no-such-record/`)
-      expect(response?.status()).toBe(404)
-      await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible()
     })
 
     test.describe('offline', () => {

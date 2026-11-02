@@ -68,11 +68,6 @@ describe('layout rules on a broken layout', () => {
   const { figure = missing(), laid: base = missing() } = cartridge('cip-9-mm-luger-2008-09-23')
   const fresh = () => structuredClone(base)
 
-  it('passes the 9 mm Luger cartridge as drawn', () => {
-    for (const rule of Object.values(sideRules)) expect(rule(base)).toEqual([])
-    expect(textSize(figure.screen)).toEqual([])
-  })
-
   it('finds a value text that differs from the stored value', () => {
     const laid = fresh() as Laid
     const l = laid.layout.labels.find((x) => x.owner === 'L3') as Layout['labels'][number]

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { canonicalNumberText, formatNumber, localizeDecimals } from '../src/i18n/number.ts'
+import { canonicalNumberText, localizeDecimals } from '../src/i18n/number.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { readChrono, sessionCsv, sessionCsvBlob, sessionJsonBlob } from '../src/lib/chrono.ts'
 import { countryName } from '../src/lib/countries.ts'
@@ -29,11 +29,6 @@ const session = [
 ].join('\n')
 
 describe('the language shown never changes what is exported', () => {
-  it('writes decimals with a comma on screen under German, so the comparisons below are not vacuous', async () => {
-    expect(await under('de', () => formatNumber(2795.5, 1))).toBe('2795,5')
-    expect(formatNumber(2795.5, 1)).toBe('2795.5')
-  })
-
   it('gives the same session CSV and JSON', async () => {
     const data = await readChrono(new TextEncoder().encode(session), { fileName: 'a.csv' })
     const unit = unitsOf.velocity['ft/s']

@@ -23,7 +23,6 @@ import {
   labelCorners,
   polygonsOverlap,
   segHitsBox,
-  segsCross,
 } from '../src/core/geometry.ts'
 import { headFace, type PartPoint, radiusAt, steelBand } from '../src/core/section.ts'
 import type {
@@ -34,9 +33,9 @@ import type {
   SectionPoint,
   SpecValue,
 } from '../src/core/types.ts'
-import type { LengthUnit } from '../src/core/units.ts'
 import { pairs } from '../src/core/vector.ts'
 import { defined } from './defined.ts'
+import { arcLines, gapFailures } from './gaps.ts'
 import { type SpecRecord, sheets, undimensionedValues } from './sheets.ts'
 
 const current = sheets
@@ -788,18 +787,6 @@ interface LayerCtx {
 
 type Tip = { owner: string; corners: PartPoint[] }
 
-/** The chords of an arc, as a polyline of `steps` rules. */
-const arcLines = (a: Layout['arcs'][number], steps: number) =>
-  Array.from({ length: steps }, (_, k): LineSegment => {
-    const t = (n: number) => a.from + ((a.to - a.from) * n) / steps
-    return {
-      a: [a.c[0] + a.r * Math.cos(t(k)), a.c[1] + a.r * Math.sin(t(k))],
-      b: [a.c[0] + a.r * Math.cos(t(k + 1)), a.c[1] + a.r * Math.sin(t(k + 1))],
-      kind: 'rule',
-      owner: a.owner,
-    }
-  })
-
 /** The filled arrowheads as drawn, 1.1 by 0.7 mm. */
 const tipsOf = (layout: Layout): Tip[] =>
   layout.arrowheads.map((t) => ({ owner: t.owner, corners: arrowheadCorners(t) }))
@@ -1091,73 +1078,27 @@ it('lays out every layer of every figure in both media clear of overlaps, inside
   expect({ longLeaders, acrossAxis, arrowheads: [...new Set(arrowheads)] }).toMatchSnapshot()
 })
 
-// the record page prints each side upright: the screen layout at the print text size
+// the record page prints each side upright: the screen layout at the print text size; the
+// same checks in inches are in inch.test.ts, where the inch layouts are laid out once
 const layoutsDrawn = {
-  screen: (f: (typeof allFigures)[number], unit: LengthUnit) =>
-    unit === 'mm'
-      ? (models.get(f) as { screen: FigureModel }).screen
-      : figureModel(f.drawn, 'screen', screenEm([f.drawn], unit), 0, [], true, unit),
-  print: (f: (typeof allFigures)[number], unit: LengthUnit) =>
-    unit === 'mm'
-      ? (models.get(f) as { print: FigureModel }).print
-      : figureModel(f.drawn, 'print', face.printEm, 0, [], false, unit),
-  'page print': (f: (typeof allFigures)[number], unit: LengthUnit) =>
-    figureModel(f.drawn, 'screen', face.printEm, 0, [], false, unit),
+  screen: (f: Figure) => (models.get(f) as { screen: FigureModel }).screen,
+  print: (f: Figure) => (models.get(f) as { print: FigureModel }).print,
+  'page print': (f: Figure) => figureModel(f.drawn, 'screen', face.printEm, 0, []),
 }
 
-/** What is wrong with an angle's arc and its text: the text on the arc, its flank or arrowheads, a crossing arc. */
-function arcTextFailures(layout: Layout, a: Layout['arcs'][number], what: (x: string) => string) {
-  const failures: string[] = []
-  const l = layout.labels.find((x) => x.owner === a.owner) as Label
-  const own = [...arcLines(a, 24), ...layout.segs.filter((s) => s.owner === a.owner && !s.leader)]
-  if (own.some((s) => segHitsBox(s, l)))
-    failures.push(what(`${a.owner} arc or flank through its text`))
-  if (
-    layout.arrowheads.some(
-      (t) => t.owner === a.owner && polygonsOverlap(arrowheadCorners(t), labelCorners(l)),
-    )
-  )
-    failures.push(what(`${a.owner} arrowhead on its text`))
-  for (const b of layout.arcs)
-    if (b.owner > a.owner && arcsCross(a, b))
-      failures.push(what(`${a.owner} arc crosses ${b.owner} arc`))
-  return failures
-}
-
-/** What is wrong with one drawn side in one medium and unit: texts touching, an angle text on its arc. */
-function gapFailures(layout: Layout, em: number, what: (x: string) => string) {
-  const failures: string[] = []
-  const gap = 0.12 * em
-  for (const [k, l] of layout.labels.entries())
-    for (const m of layout.labels.slice(k + 1))
-      if (boxesOverlap(l, m, gap)) failures.push(what(`${l.owner} text touches ${m.owner}`))
-  for (const a of layout.arcs) failures.push(...arcTextFailures(layout, a, what))
-  return failures
-}
-
-/** Whether the chords of two arcs cross. */
-const arcsCross = (a: Layout['arcs'][number], b: Layout['arcs'][number]) =>
-  arcLines(a, 24).some((s) => arcLines(b, 24).some((t) => segsCross(s.a, s.b, t.a, t.b)))
-
-it.each(
-  (['mm', 'in'] as const).flatMap((unit) =>
-    (Object.keys(layoutsDrawn) as (keyof typeof layoutsDrawn)[]).map(
-      (medium) => [medium, unit] as const,
-    ),
-  ),
-)(
-  'keeps every text a gap from the others and every angle text off its own arc (%s, %s)',
-  (medium, unit) => {
+it.each(Object.keys(layoutsDrawn) as (keyof typeof layoutsDrawn)[])(
+  'keeps every text a gap from the others and every angle text off its own arc (%s, mm)',
+  (medium) => {
     const failures: string[] = []
     for (const figure of allFigures) {
       const { name, drawn } = figure
-      const model = layoutsDrawn[medium](figure, unit)
+      const model = layoutsDrawn[medium](figure)
       for (const { side } of drawn)
         failures.push(
           ...gapFailures(
             model.layers[side] as Layout,
             model.em,
-            (x) => `${name} ${side} ${medium} ${unit} ${x}`,
+            (x) => `${name} ${side} ${medium} mm ${x}`,
           ),
         )
     }

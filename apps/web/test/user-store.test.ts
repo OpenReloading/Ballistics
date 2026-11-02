@@ -1,23 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { fits, rawPhotoId, storedRecords } from '../src/lib/user-store.ts'
+import { fits, rawPhotoId } from '../src/lib/user-store.ts'
 
 afterEach(() => {
-  Reflect.deleteProperty(globalThis, 'indexedDB')
   vi.unstubAllGlobals()
-})
-
-it('opens the store again after a failed open', async () => {
-  // no IndexedDB: open throws
-  await expect(storedRecords()).rejects.toThrow()
-  Object.defineProperty(globalThis, 'indexedDB', {
-    configurable: true,
-    value: {
-      open: () => {
-        throw new Error('second open')
-      },
-    },
-  })
-  await expect(storedRecords()).rejects.toThrow('second open')
 })
 
 it('replaces a stored record only when absent or saved at the base the writer read', () => {

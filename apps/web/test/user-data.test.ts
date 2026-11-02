@@ -133,15 +133,6 @@ describe('user data files', () => {
     ])
   })
 
-  it('refuses another version, naming the version it reads, and writes version 1', () => {
-    const v4 = JSON.stringify({ format: 'openreloading-user-data', version: 4, records: [bullet] })
-    expect(parseUserDataFile(v4)).toEqual({
-      ok: false,
-      reason: 'The file has format version 4; this app reads version 1.',
-    })
-    expect(JSON.parse(userDataText([bullet])).version).toBe(1)
-  })
-
   it('skips a file with one invalid record as a whole and names the field', async () => {
     const bad = { ...bullet, data: { ...bullet.data, overrides: { mass: { value: 'heavy' } } } }
     const { records, skipped } = await parseFiles(

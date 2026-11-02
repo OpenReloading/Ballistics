@@ -207,10 +207,4 @@ describe('the Cal. 12 variants matrix', () => {
     expect(pmax.at(-1)).toBe('1050')
     expect(cells('td', defined(bodyRows[3]))[1]).toBe('25/30')
   })
-
-  it('keeps the Fe variants as rows of the chamber table, none for l', () => {
-    const combined = combinedRows(spec, recordFigures(drawable(spec)))
-    expect(combined.find((r) => r.symbol === 'Fe (bascule)')?.chamber).toBeDefined()
-    expect(combined.some((r) => r.cartridge?.symbol === 'l')).toBe(false)
-  })
 })

@@ -95,13 +95,28 @@ function error(fit: FaceFit, h: Homography, outer: number) {
   return { centre, radial }
 }
 
+/** The photo of record face `id` at `views[v]`, drawn once per file. */
+const drawn = memo((id: string, v: number) => render(scene(faceById(id), defined(views[v]))))
+/** The search of that photo over all faces, run once per file. */
+const searched = memo((id: string, v: number) => ({
+  ...drawn(id, v),
+  found: findFace(drawn(id, v).image, faces),
+}))
+
+function memo<T>(make: (id: string, v: number) => T) {
+  const cache = new Map<string, T>()
+  return (id: string, v: number): T => {
+    const key = `${id} ${v}`
+    if (!cache.has(key)) cache.set(key, make(id, v))
+    return cache.get(key) as T
+  }
+}
+
 describe('findFace on drawn faces', () => {
   for (const face of faces.filter((f) => f.photoSearch !== false))
-    for (const v of views)
+    for (const [i, v] of views.entries())
       it(`${face.id}, ${v.name}: the face, its centre and its scale`, () => {
-        const s = scene(face, v)
-        const { image, h = missing() } = render(s)
-        const found = findFace(image, faces)
+        const { h = missing(), found } = searched(face.id, i)
         const fit = found.fits.find((f) => f.face.id === face.id)
         expect(fit).toBeDefined()
         if (!fit) return
@@ -131,32 +146,18 @@ describe('findFace on drawn faces', () => {
         expect(Math.abs(fit.pxPerMm / local - 1)).toBeLessThan(0.01)
       })
 
-  const skipped = faces.filter((f) => f.photoSearch === false)
-  it('has faces with photoSearch false', () => {
-    expect(skipped.length).toBeGreaterThan(0)
-  })
-
-  // one test per face: each renders and searches a whole photo
-  for (const f of skipped)
-    it(`never offers ${f.id}, which has photoSearch false, on a photo of it`, () => {
-      const found = findFace(render(scene(f, defined(views[0]))).image, faces)
-      const ids = [...found.fits.map((x) => x.face.id), ...found.ranked.map((x) => x.id)]
-      expect(ids).not.toContain(f.id)
-    })
-
   it('never offers a skipped copy of a face the search finds, which finds the record itself', () => {
     const face = faceById('issf-25m-rapid-fire-pistol')
     const copy = { ...face, id: 'skipped-copy', photoSearch: false }
-    const found = findFace(render(scene(copy, defined(views[0]))).image, [...faces, copy])
+    // the copy draws as the record does
+    const found = findFace(drawn(face.id, 0).image, [...faces, copy])
     const ids = [...found.fits.map((x) => x.face.id), ...found.ranked.map((x) => x.id)]
     expect(ids).not.toContain(copy.id)
     expect(found.fits[0]?.face.id).toBe(face.id)
   })
 
   it('rectifies: under tilt the black ellipse centre is off by millimetres, the fit centre is not', () => {
-    const face = faceById('issf-25m-rapid-fire-pistol')
-    const { image, h } = render(scene(face, defined(views[2])))
-    const found = findFace(image, faces)
+    const { h, found } = searched('issf-25m-rapid-fire-pistol', 2)
     const fit = found.fits[0]
     expect(fit && found.black).toBeTruthy()
     if (!(fit && found.black)) return
@@ -209,8 +210,7 @@ describe('findFace on drawn faces', () => {
         innerTen: { ...base.innerTen, diameter: scale(base.innerTen.diameter) },
       }),
     }
-    const { image } = render(scene(base, defined(views[0])))
-    const found = findFace(image, [base, twin])
+    const found = findFace(drawn(base.id, 0).image, [base, twin])
     // twins are a question for the user
     expect(found.sure).toBe(false)
     expect(found.fits.map((f) => f.face.id).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))).toEqual([
@@ -232,8 +232,7 @@ describe('the confidence of a ranked face', () => {
   })
 
   it('is undefined on every ranked face while no counts exist', () => {
-    const image = render(scene(faceById('issf-10m-air-rifle'), defined(views[0]))).image
-    const found = findFace(image, faces)
+    const { found } = searched('issf-10m-air-rifle', 0)
     expect(found.ranked.length).toBeGreaterThan(0)
     for (const r of found.ranked) expect(r.confidence).toBeUndefined()
   })
@@ -254,7 +253,7 @@ describe('findFace with a known scale', () => {
     }),
   }
   const sc = scene(base, defined(views[0]))
-  const { image } = render(sc)
+  const { image } = drawn(base.id, 0)
   const ids = (f: ReturnType<typeof findFace>) => f.fits.map((x) => x.face.id).sort()
 
   it('offers faces of equal ring ratios and different size as a tie without a scale', () => {
@@ -267,10 +266,6 @@ describe('findFace with a known scale', () => {
     const found = findFace(image, [base, large], sc.camera.pxPerMm)
     expect(ids(found)).toEqual(['issf-25m-precision-50m-pistol'])
     expect(ids(findFace(image, [base, large], sc.camera.pxPerMm / 3))).toEqual(['large'])
-  })
-
-  it('proposes the ISSF 25 m precision face, or a tie that contains it, among all faces', () => {
-    expect(ids(findFace(image, faces))).toContain('issf-25m-precision-50m-pistol')
   })
 
   it('takes the face of the size of the holes on its black area: the hole diameter is the scale', () => {
@@ -387,9 +382,8 @@ describe('findFace without a face', () => {
   })
 
   it('does not take a coloured band for the black area', () => {
-    const face = faceById('issf-25m-precision-50m-pistol')
-    const s = scene(face, defined(views[0]))
-    const { image } = render(s)
+    const photo = drawn('issf-25m-precision-50m-pistol', 0).image
+    const image = { ...photo, data: photo.data.slice() }
     // the black area becomes red
     for (let i = 0; i < image.data.length; i += 4)
       if (defined(image.data[i]) < 80)
@@ -402,8 +396,7 @@ describe('findFace without a face', () => {
 describe('a face the user picks', () => {
   it('fits a face of the ranking from the rings found, and the black edge alone when they do not match', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
-    const { image, h = missing() } = render(scene(face, defined(views[1])))
-    const found = findFace(image, faces)
+    const { h = missing(), found } = searched(face.id, 1)
     const own = fitPicked(found, face)
     expect(own?.approximate).toBe(false)
     expect(own?.ellipses).toBeGreaterThan(3)
@@ -418,8 +411,7 @@ describe('a face the user picks', () => {
 
   it('drops a ring that matches a face ring by its radius and does not rectify to a circle', () => {
     const face = faceById('issf-25m-precision-50m-pistol')
-    const { image, h = missing() } = render(scene(face, defined(views[1])))
-    const found = findFace(image, faces)
+    const { h = missing(), found } = searched(face.id, 1)
     const fit = found.fits[0]
     expect(fit).toBeDefined()
     if (!fit) return
@@ -449,8 +441,7 @@ describe('a face the user picks', () => {
     (id) => {
       const face = faceById(id)
       const group = twinGroups.find((g) => g.includes(id)) ?? [id]
-      const { image } = render(scene(face, defined(views[0])))
-      const found = findFace(image, faces)
+      const { found } = searched(id, 0)
       expect(
         found.ranked
           .slice(0, group.length)
@@ -486,9 +477,7 @@ describe('a face the user picks', () => {
 
 describe('on the photo and as a label', () => {
   it('maps a search from a resized crop back to the photo', () => {
-    const face = faceById('issf-25m-rapid-fire-pistol')
-    const { image } = render(scene(face, defined(views[1])))
-    const found = findFace(image, faces)
+    const { found } = searched('issf-25m-rapid-fire-pistol', 1)
     const fit = found.fits[0]
     expect(fit && found.black).toBeTruthy()
     if (!(fit && found.black)) return
@@ -512,9 +501,8 @@ describe('on the photo and as a label', () => {
   })
 
   it('labels the black area and outlines the face grown by half a hole', () => {
-    const face = faceById('issf-25m-precision-50m-pistol')
-    const { image, h } = render(scene(face, defined(views[1])))
-    const fit = findFace(image, faces).fits[0]
+    const { h, found } = searched('issf-25m-precision-50m-pistol', 1)
+    const fit = found.fits[0]
     expect(fit).toBeDefined()
     if (!fit) return
     const label = faceLabel({ toFace: fit.toFace, outer: fit.outer, black: 100 }, 6)

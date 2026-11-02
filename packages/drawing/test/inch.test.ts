@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { bulletFigureModel, bulletScreenEm } from '../src/bullet/figure.ts'
-import { type FigureModel, figureModel, screenEm, screenWidth } from '../src/cartridge/figure.ts'
-import { recordFigures } from '../src/cartridge/figures.ts'
+import { type FigureModel, figureModel } from '../src/cartridge/figure.ts'
+import type { recordFigures } from '../src/cartridge/figures.ts'
 import { regions, regionText } from '../src/cartridge/regions.ts'
 import * as face from '../src/core/face.ts'
 import {
@@ -17,6 +17,7 @@ import { labelText } from '../src/core/text.ts'
 import type { Layout } from '../src/core/types.ts'
 import { lengthText, scaleLength } from '../src/core/units.ts'
 import { defined } from './defined.ts'
+import { inchFigures, inchGapFailures } from './inch-figures.ts'
 import { sheets } from './sheets.ts'
 
 // Labels in inches: the geometry stays in mm, only the length texts change.
@@ -141,18 +142,15 @@ function figureFailures(record: (typeof current)[number], f: Shown, em: number, 
 
 it('lays out every CIP figure in inches with its texts clear, inside the frame, at 11 px', () => {
   const failures: string[] = []
-  for (const record of current) {
-    const shown = recordFigures(record).filter((f) => f.drawn.length)
-    if (!shown.length) continue
-    const em = screenEm(
-      shown.map((f) => f.drawn),
-      'in',
-    )
-    const across = Math.max(...shown.map((f) => screenWidth(f.drawn, em, 'in')))
-    for (const f of shown) failures.push(...figureFailures(record, f, em, across))
-  }
+  for (const { record, f, em, across } of inchFigures)
+    failures.push(...figureFailures(record, f, em, across))
   expect(failures).toEqual([])
 }, 300_000)
+
+it('keeps every text a gap from the others and every angle text off its own arc (print, in)', () => {
+  // here, not in inch-gaps.test.ts: the sweep above already laid out the print models
+  expect(inchGapFailures('print')).toEqual([])
+}, 120_000)
 
 it('dimensions a bullet in inches, the ratio Rt/R unchanged', () => {
   const p = {

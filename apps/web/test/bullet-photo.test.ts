@@ -53,8 +53,15 @@ const bullets: Record<string, BulletDimensions> = {
   'tangent, boat tail, cannelure': sampleShape,
 }
 
-/** The photograph of `s` cut out, outlined and measured, with the exact scale of its ruler. */
+const cache = new Map<string, ReturnType<typeof measure>>()
+/** The photograph of `s` cut out, outlined and measured, with the exact scale of its ruler; once per spec in this file. */
 function measured(s: PhotoSpec) {
+  const key = JSON.stringify(s)
+  if (!cache.has(key)) cache.set(key, measure(s))
+  return defined(cache.get(key))
+}
+
+function measure(s: PhotoSpec) {
   const photo = renderPhoto(s)
   const span = defined(photo.span)
   const seg = segment(grayOf(photo.image), [span.a, span.b])
@@ -192,11 +199,8 @@ describe('bullets of known size, rendered with a ruler', () => {
   })
 
   it('states a wider uncertainty for a scale from two spans that disagree', () => {
-    const s = spec(tangent)
-    const photo = renderPhoto(s)
+    const { photo, outline, m: exact } = measured(spec(tangent))
     const span = defined(photo.span)
-    const outline = defined(fitOutline(segment(grayOf(photo.image), [span.a, span.b])))
-    const exact = measureOutline(outline, defined(scaleOf([span])))
     const off = measureOutline(
       outline,
       defined(
@@ -237,10 +241,9 @@ describe('the brush', () => {
   })
 
   it('moves the outline with the correction', () => {
-    const photo = renderPhoto(spec(tangent))
-    const span = defined(photo.span)
-    const seg = segment(grayOf(photo.image), [span.a, span.b])
-    const before = defined(fitOutline(seg))
+    const { seg: drawn, outline: before } = measured(spec(tangent))
+    // a copy: the brush paints in place
+    const seg = { ...drawn, alpha: drawn.alpha.slice() }
     // the base end rubbed out over its whole width
     paintDisc(seg, { x: 195, y: 252 }, 130, 0)
     expect(defined(fitOutline(seg)).length).toBeLessThan(before.length - 20)
