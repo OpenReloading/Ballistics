@@ -11,7 +11,7 @@ Interior ballistics, burn law: should the exponent stay at 1, does the dynamic v
 
 ## Method
 
-Four checks with the accept rules fixed before the work:
+Four checks, accept rules fixed before the work:
 
 1. Exponent: on closed-vessel curves of one powder at four or more loading densities, the coefficient of variation of $\int \bar p^n\, dt$ for $n$ = 0.67, 0.8 and 1.0. A different $n$ is adopted only if its spread is clearly below that of $n = 1$.
 2. Definition: a conversion from $L_d(z)$ to the closed-vessel quantity $L$ must equal $\dot p / (\bar p\, p_\text{max})$ computed from a central difference of the Noble-Abel closed-vessel pressure, to $10^{-6}$ relative, for the demo powder at $D$ = 0.1, 0.2 and 0.3 and $z$ from 0.05 to 0.95 (both sides of the form's break at 0.8). If the factor between the two stays within 15 percent, the definition is only stated.
@@ -57,7 +57,7 @@ No change. Item 2 is documented as a limit: the factor exceeds 15 percent, so th
 
 ## Data basis
 
-Analytic: the Noble-Abel closed-vessel pressure and the demo powder; the counts of items 1, 3 and 4 are of the records searched, no measured curve or ladder.
+Analytic: the Noble-Abel closed-vessel pressure and the demo powder. Items 1, 3 and 4 count the records searched; no measured curve or ladder.
 
 ## Where in the app
 
@@ -68,4 +68,4 @@ Analytic: the Noble-Abel closed-vessel pressure and the demo powder; the counts 
 
 ## Confidence
 
-High for item 2: the conversion is exact algebra checked numerically. Low for items 1, 3 and 4: not measured, the fallbacks rest on the lack of data, not on a result.
+High for item 2: the conversion is exact algebra checked numerically. Low for items 1, 3 and 4: not measured; the fallbacks rest on missing data.

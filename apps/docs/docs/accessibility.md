@@ -5,7 +5,7 @@ description: What was evaluated for accessibility, with which tools and on which
 
 # Accessibility
 
-This page says what was checked for accessibility in the web app, how, and what is known to fall short. The target is WCAG 2.2 Level AA ([W3C Recommendation, 12 December 2024](https://www.w3.org/TR/2024/REC-WCAG22-20241212/)). The method follows the sample-based evaluation of WCAG-EM 2.0 ([W3C Group Note](https://www.w3.org/TR/2026/NOTE-wcag-em-2-20260723/)). A sample cannot show that no error remains, so this page makes no claim of conformance and no claim under any law. It lists what was evaluated and the gaps found.
+The target is WCAG 2.2 Level AA ([W3C Recommendation, 12 December 2024](https://www.w3.org/TR/2024/REC-WCAG22-20241212/)). The method follows the sample-based evaluation of WCAG-EM 2.0 ([W3C Group Note](https://www.w3.org/TR/2026/NOTE-wcag-em-2-20260723/)). A sample cannot show that no error remains, so this page makes no claim of conformance and no claim under any law.
 
 Scope: the web app (the static browser app). The docs site and the REST reference are not covered.
 
@@ -13,7 +13,7 @@ Gated scope, where a failure of a Level A criterion blocks the 1.0 release: the 
 
 ## Audit of 2026-10-27
 
-An agent drove the app with Playwright and read the browser's accessibility tree, the focus order and the rendered pixels. No screen reader was run by the agent. The screen-reader evidence is the maintainer's manual pass (steps below); until its results are added to this page there is none.
+An agent drove the app with Playwright and read the browser's accessibility tree, the focus order and the rendered pixels. No screen reader was run by the agent. Screen-reader evidence comes from the maintainer's manual pass (steps below); there is none yet.
 
 ### Baseline
 
@@ -68,7 +68,7 @@ Severity: blocker is a failure of a Level A criterion in the gated scope. Major 
 | A-04 | major | 1.4.12 Text Spacing (AA) | Workbench at 1280 px with the spacing of the criterion applied; groups; designers at 320 px | Labels cut with an ellipsis: "Usable case v...", "Powder temper...", "Ladder steps...", "Diameter x le...", "Ballistic coeffi..."; the readout bar and the result head are cut; the tabs Groups and Notes move into More. On the shot groups the Set and Clear button labels are clipped by 3 px; at 320 px the labels of the bullet, powder and target designers are cut. In the random sample the record page's title (and a cartridge's alias badge) is cut in 3 of 106 pages at 1280 px or 320 px. The full text stays in each control's accessible name | Fixed: labels, readout names, segment labels, the record page's title and the alias badge wrap instead of ending in an ellipsis, rows grow, and a field widens for its value. The aim fields of the shot groups go below Set and Clear when the row has no room. Record names and the load title keep the ellipsis with the full text on hover. `text-spacing.spec.ts` applies the spacing and finds nothing cut on these states |
 | A-05 | major | 1.4.13 Content on Hover or Focus (AA) | Tooltips of buttons and symbols (record page symbols such as Pmax, sidebar and header icon buttons) | Escape dismisses them and they stay while hovered (4 s), but moving the pointer from the trigger onto the tooltip closes it, so it is not hoverable. The chart tooltip passes: it ignores the pointer and Escape hides it | Fixed: every tooltip stays open while the pointer moves from its trigger onto it, until the pointer leaves both, the trigger loses focus or Escape is pressed. `tooltip-hover.spec.ts` |
 | A-06 | minor | none of its own; 1.4.1 and 1.4.11 read under forced colours | Workbench in forced colours: segmented controls (COAL and CBTO, Charge, Seating and Temperature, Up, Down and Around, Cartridge, Chamber and Combined, the chart's series and axis toggles) | Chromium's forced-colours emulation removes the selected segment's fill, and no border or mark remains, so the selected value cannot be seen. The selected tab keeps its underline. The controls expose their state to assistive technology | Fixed: under forced colours the selected segment has a 2 px border in the system highlight colour (CSS in `globals.css`). `a11y-states.spec.ts` checks it with Chromium's emulation |
-| A-07 | blocker | 2.4.3 Focus Order (A) | Workbench start card, Saved loads drawer, photo tool | Focus falls to the start of the page after choosing a cartridge or "Try the example load" (the start card is replaced), after closing Saved loads with Escape (its opener, a menu item, is gone) and after closing the photo tool with Escape although its button still exists. The focus order itself is in reading order everywhere else | Fixed: the focus goes to the first control of the load form after the start card is replaced, back to Open (or Page actions below 75em) after Saved loads closes and back to From a photo (or Page actions) after the photo tool closes. It was a Level A failure in the gated scope, so a blocker for 1.0. `focus-return.spec.ts` |
+| A-07 | blocker | 2.4.3 Focus Order (A) | Workbench start card, Saved loads drawer, photo tool | Focus falls to the start of the page after choosing a cartridge or "Try the example load" (the start card is replaced), after closing Saved loads with Escape (its opener, a menu item, is gone) and after closing the photo tool with Escape although its button still exists. The focus order itself is in reading order everywhere else | Fixed: the focus goes to the first control of the load form after the start card is replaced, back to Open (or Page actions below 75em) after Saved loads closes and back to From a photo (or Page actions) after the photo tool closes. `focus-return.spec.ts` |
 | A-08 | minor | 3.3.1 wording | Workbench, status line after a refused run | The status text is "The API answered 422." although the browser app has no server, and it is announced | Fixed: the status line says "The model refused the load. The error panel gives the reason." Other failures name a data file that did not load or a failed computation with a step to take. `workbench-messages.spec.ts` |
 | A-09 | minor | 1.4.11 Non-text Contrast (AA) | Workbench chart, light theme | Rendered pixels: pressure line 3.20:1, velocity 4.42:1, energy 3.22:1 against white; one colour of the chart measured 2.78:1 (47 px of about 200,000, most likely the fainter lines of the other ladder steps). Dark theme: 4.66:1, 4.97:1, 5.31:1, no colour under 4.7:1 | Open. The Ladder table tab lists every step |
 | A-10 | minor | none (axe best practice `region`) | An open tooltip, for example the sidebar's Search button focused on a record page | The tooltip is outside every landmark | Open |
@@ -82,7 +82,7 @@ The random sample (106 pages, 424 states) found one failure type that the struct
 
 ## Candidate failures
 
-Six candidates found by reading the code before the audit, each checked in Chromium before any change.
+Found by reading the code before the audit, each checked in Chromium before any change.
 
 | Candidate | Criterion | Verdict | Evidence and test |
 |---|---|---|---|
@@ -105,8 +105,6 @@ Six candidates found by reading the code before the audit, each checked in Chrom
 | Reduced motion | no animation runs after load and after a run; Play shows the bullet at the muzzle; Play can be paused |
 
 ## Known list
-
-Open findings with the reason they are not fixed yet and the way round them. The two Level A failures found in the gated scope (A-01 and A-07) are fixed.
 
 | Id | Why it stays | Workaround |
 |---|---|---|

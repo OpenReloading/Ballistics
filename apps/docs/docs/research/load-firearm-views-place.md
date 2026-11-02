@@ -11,12 +11,9 @@ User records: where do the derived load and firearm views go (columns, notes and
 
 ## Method
 
-Decided before the review.
-
 - Gate: a handloader uses the view at the bench in under a minute, with what they know, and types nothing to keep it right. A column, note, filter, link or print on a page that exists comes before a new page ([load, firearm and data views without a tracker](./load-firearm-data-views.md)).
 - Place: for each kept view, the page that already shows its records, and whether that page can host it without a new control.
 - Filter: every discipline record and caliber class record of the data package, counted by the caliber classes and the category each discipline states. Accept rule for a stored firearm category: it is added only if the caliber class alone gives wrong matches that the list cannot already narrow, and the category would remove them.
-- Data: the repository's records, schema and web app at the time of the review. No user study.
 
 ## Formulas
 

@@ -1,6 +1,6 @@
 ---
 title: Hollow-base cavity depth interval and override
-description: How far the unknown depth of a hollow-base cavity moves the run, and the bracket and typed depth that now carry it.
+description: How far the unknown depth of a hollow-base cavity moves the run, and the bracket and typed depth that carry it.
 ---
 
 # Hollow-base cavity depth interval and override
@@ -15,7 +15,7 @@ The cavity volume was varied around the default on stand-in loads with a free vo
 
 ## Formulas
 
-Cone cavity $V = \pi r_c^2 h / 3$, rounded cavity (half ellipsoid) $V = 2 \pi r_c^2 h / 3$, both textbook solids of revolution. Bracket $0.5\, r_c \le h \le 3\, r_c$. The volume tolerance of the pressure range becomes $0.01 + \max(V_b - V_{b,\mathrm{low}}, V_{b,\mathrm{high}} - V_b) / V_c$, the default 1 % plus the cavity's move, at most 0.2. See [case capacity, cavity depth](../models/case-capacity.md#cavity-depth).
+Cone cavity $V = \pi r_c^2 h / 3$, rounded cavity (half ellipsoid) $V = 2 \pi r_c^2 h / 3$, both textbook solids of revolution. Bracket $0.5\, r_c \le h \le 3\, r_c$. The volume tolerance of the pressure range becomes $0.01 + \max(V_b - V_{b,\mathrm{low}}, V_{b,\mathrm{high}} - V_b) / V_c$, at most 0.2. See [case capacity, cavity depth](../models/case-capacity.md#cavity-depth).
 
 ## Numbers
 

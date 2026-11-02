@@ -11,7 +11,7 @@ Workbench UI: should the load workbench run the simulation by itself once every 
 
 ## Method
 
-Decided before the runs, on a throwaway branch with a prototype (`spike/354-auto-run-undo`, commit `4321d13934648619bcb8e374e297dd8b136b27e1`, specs and raw output in `spikes/354/`):
+Prototype on `spike/354-auto-run-undo`, commit `4321d13934648619bcb8e374e297dd8b136b27e1`, specs and raw output in `spikes/354/`:
 
 - Run time: the static export (`npm run static:build`) served locally, Chromium of the dev container image at 1280 x 800, the example load applied. The time from the start of a run (the result section gets `data-running`) to the end of the run with "Simulation done." in the result. 20 measured runs per case after one first run (worker start), median and P90 (nearest rank). Cases: the example as it is (a 5-step charge ladder), its charge alone (ladder steps 1) and a 21-step charge ladder of 0.15 gr. CPU throttle 1, 4 and 6 (`Emulation.setCPUThrottlingRate`), a stand-in for a phone, not a phone.
 - Main thread: the longest `longtask` entry (over 50 ms) during each run; one key typed into the charge field 20 ms after Run, with its Event Timing input delay and duration.
@@ -51,7 +51,7 @@ Variants (single charge unless named). Layout shift of the input column, the met
 | Variant | `4x` typed (the field keeps `4`) | Two edits in a row | Edit during a run | Stale marker | Verdict |
 | --- | --- | --- | --- | --- | --- |
 | Run only | no run | no run | not applicable | stays until Run | passes, today's behaviour |
-| Automatic after a pause | runs with 4 gr after the pause | one run | ladder: cancelled, one run follows; single charge: the run had ended | shown in the pause, cleared by the result | fails the half-typed rule (the retained 4 starts a run); a pause cannot tell a half-typed value from a finished one; blocks input on the phone stand-in |
+| Automatic after a pause | runs with 4 gr after the pause | one run | ladder: cancelled, one run follows; single charge: the run had ended | shown in the pause, cleared by the result | fails the half-typed rule (the retained 4 starts a run); blocks input on the phone stand-in |
 | Automatic as a setting, off by default | off: as Run only; on: as after a pause | on: one run | on: as after a pause | as after a pause | as after a pause when on |
 | Automatic for the plain run only | plain: as after a pause; ladder: no run | plain: one run | plain: the run had ended | plain: cleared; ladder: stays | as after a pause for the plain load, Run only for a ladder |
 

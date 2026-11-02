@@ -11,7 +11,7 @@ Free recoil: does a gas term other than the constant factor (1.75 for rifles, 1.
 
 ## Method
 
-The plan was to compare each form with measured free recoil (recoil velocity or impulse) of at least ten loads over several muzzle velocities, by the relative error. The repository holds no such measurements, and none with projectile mass, charge mass, muzzle velocity and firearm mass all known were at hand, so the forms were compared with each other instead: the energy of each form over the energy with today's factor, for ten typical loads (five handgun, five rifle, masses and velocities rounded), with the same firearm mass. Accept rule, set in advance: no change without measurements; if the forms differ by less than 5 % in energy for most loads, the model page states a band of plus or minus 5 %.
+Planned: compare each form by relative error with measured free recoil (recoil velocity or impulse) of at least ten loads over several muzzle velocities. No such measurement with projectile mass, charge mass, muzzle velocity and firearm mass all known was at hand, so the forms were compared with each other: the energy of each form over the energy with today's factor, for ten typical loads (five handgun, five rifle, masses and velocities rounded), with the same firearm mass. Accept rule, set in advance: no change without measurements; if the forms differ by less than 5 % in energy for most loads, the model page states a band of plus or minus 5 %.
 
 ## Formulas
 
@@ -38,7 +38,7 @@ The rifle extreme of the outflow form is the light, fast load (3.6 g at 990 m/s)
 
 ## Result
 
-No change. The forms differ by more than 5 % for most loads, so the fallback band of plus or minus 5 % does not hold, but without measurements none of them is shown to be better. All three forms are not adopted. Documented as a limit: the model page states the spread between the forms, not a measured error.
+No change. The forms differ by more than 5 % for most loads, so the fallback band of plus or minus 5 % does not hold, and without measurements none is shown to be better; none is adopted. Documented as a limit: the model page states the spread between the forms, not a measured error.
 
 ## Data basis
 

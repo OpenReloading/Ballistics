@@ -45,15 +45,15 @@ Shots needed (wanted chance 0.5, 0.9, 0.99): $p = 0.02$: 35, 114, 228; $p = 0.1$
 
 ## Result
 
-Improved. Both adopted. The offset is an optional argument of `ellipseProbability` and `hitProbability`; without it the result is bit for bit the centred one. `shotsToHit` returns the whole shots and the mean number of shots from the single-shot probability. The rules held: 0.126 against 0.5 percentage points, an interior maximum for $d > R$, and the formula reproduced. The model page Limits gain "An offset is the same for every shot. A centre that changes from group to group, and an offset that is not measured, are not modelled."; its assumption "the zero is right" now reads "unless an offset is given".
+Improved. Both adopted (0.126 against 0.5 percentage points, an interior maximum for $d > R$, the formula reproduced). The offset is an optional argument of `ellipseProbability` and `hitProbability`; without it the result is bit for bit the centred one. `shotsToHit` returns the whole shots and the mean number of shots from the single-shot probability. Assumptions and Limits on the [model page](../models/hit-probability.md).
 
-The offset is an input of a prediction, not a setting of the sight: the text beside it describes where the measured group centre lies against the point of aim and what that does to the probability, and gives no direction to move anything.
+The offset is an input of a prediction, not a sight setting: the text beside it says where the measured group centre lies against the point of aim and what that does to the probability, and gives no direction to move anything.
 
 Web wiring, not built (at most ten lines): an optional "Group centre against point of aim" pair in the hit-probability form, shown when a group is selected and prefilled from its `aimOffset` (`dx`, `dy`; `centre` gives zero), editable, empty meaning zero, passed to `hitProbability` as `offset`. A "Shots for a chance of at least one hit" readout beside the hit probability, with a wanted-chance choice of 50, 90 and 99 percent, from `shotsToHit(result.hit, wanted)`, and the mean shots to the first hit; no new typed field for the shots. A note when `dx` or `dy` exceeds the zone half-width that a tighter group lowers the probability there.
 
 ## Data basis
 
-Analytic. Synthetic cases, closed forms and a seeded Monte Carlo; no measured data.
+Analytic: synthetic cases, closed forms and a seeded Monte Carlo.
 
 ## Where in the app
 

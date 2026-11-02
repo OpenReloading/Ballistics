@@ -154,7 +154,7 @@ The workbench takes the construction from the bullet record's `construction.stru
 | monolithic | monolithic |
 | frangible, a construction without a structure | jacketed, marked as assumed |
 
-A record without a `construction` gives no construction, and a barrel length that is not known gives no class: the field keeps the value of 30 MPa. A plated bullet in a rifle takes it too. The field follows this default until a value is typed, and the help gives the 95 % interval of the construction. A powder record's own start pressure replaces it, a record without one leaves the field following it. Load files and the API still take the rifle value of 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure as a value.
+Without a `construction` or a known barrel length, and for a plated bullet in a rifle, the field takes 30 MPa. It follows this default until a value is typed; the help gives the 95 % interval of the construction. A powder record's own start pressure replaces the default. Load files and the API take 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure as a value.
 
 Code: `packages/core/src/interior/start-pressure.ts`, `constructionOf`, `startPressureOf`.
 
@@ -232,7 +232,7 @@ $$
 
 Code: `packages/core/src/interior/throat-wear.ts`, `wornVolume`. `packages/core/src/interior/model.ts`, `scaleInteriorLoad`. `packages/core/src/interior/load-file.ts`, `interiorLoad`.
 
-The default is 0. The wear is a typed value: no rate per round is applied. One barrel measured by [Vuong 2026](../bibliography.md#vuong-2026) (5.56x45 mm, 361 mm, 10-shot means) lost velocity from 840.6 m/s new to 821.3 m/s at 8000 and 785.8 m/s at 16000 rounds, while its chamber grew from 49.20 to 54.62 mm; those values are stored with authors, DOI and licence in `vuong2026` (`packages/core/src/interior/throat-wear-measurement.ts`). Rates do not carry over to another cartridge or firing regime, and an automatic value would need an interval of about 0 to 0.3 to 0.8 mm per 1000 rounds (unverified). When the chosen firearm has a `roundCount` and no throat wear is entered, the result notes say that the velocity may be lower than simulated and give the measured 5.56 rates as an example: 0.29 % per 1000 rounds from 0 to 8000 and 0.54 % per 1000 rounds from 8000 to 16000. The count itself is described in [Firearm round count](../research/firearm-round-count-age.md).
+The default is 0. The wear is a typed value: no rate per round is applied. One barrel measured by [Vuong 2026](../bibliography.md#vuong-2026) (5.56x45 mm, 361 mm, 10-shot means) lost velocity from 840.6 m/s new to 821.3 m/s at 8000 and 785.8 m/s at 16000 rounds, while its chamber grew from 49.20 to 54.62 mm; those values are stored with authors, DOI and licence in `vuong2026` (`packages/core/src/interior/throat-wear-measurement.ts`). Rates do not carry over to another cartridge or firing regime, and an automatic value would need an interval of about 0 to 0.3 to 0.8 mm per 1000 rounds (unverified). When the chosen firearm has a `roundCount` and no throat wear is entered, the result notes say that the velocity may be lower than simulated and give the measured 5.56 rates as an example: 0.29 % per 1000 rounds from 0 to 8000 and 0.54 % per 1000 rounds from 8000 to 16000. Round count: [Firearm round count](../research/firearm-round-count-age.md).
 
 ### Temperature of the propellant
 
@@ -250,7 +250,7 @@ A powder record carries them as `temperatureSensitivity`: `reference` in K, `col
 
 #### Default by grain form
 
-The default is approximate: a value of the grain form, not of the powder. Its reference $T_\text{ref}$ is the propellant temperature of the record's fitted model (`interior.propellantTemperature`), else 294.15 K (21 °C).
+The default is a value of the grain form, not of the powder. Its reference $T_\text{ref}$ is the propellant temperature of the record's fitted model (`interior.propellantTemperature`), else 294.15 K (21 °C).
 
 | Grain form | $\sigma_h$ (1/K) | Interval of $\sigma_h$ | $\sigma_c$ the run takes | Interval of $\sigma_c$ | Source |
 |---|---|---|---|---|---|
@@ -262,7 +262,7 @@ Code: `packages/core/src/interior/temperature-default.ts`, `defaultSensitivity`,
 
 The record's own coefficient always wins. The result notes of a run on the default name it ("Default temperature coefficient of ... powder"). Below the reference the peak pressure is given as an interval, the peaks at $\sigma_c = 0$ and $\sigma_c = 0.0030$, never as a single drop: the measured cold changes of the peak pressure of ball powders (Boulkadid 2016, 0.022 and 0.037 %/K, each within its uncertainty of 0) were not significant, while the model with the measured cold burn-rate sensitivity over-predicts the cold fall of the peak (-13.0 % against about -1.65 % measured at -75 K, issue #842).
 
-Limits: the extruded value rests on maker data whose shots and lots are not stated, and the conversion depends on the stand-in load: the three loads of the entry give 0.0006 to 0.0015 1/K. The ball value is for deterred ball powders with about 10 % nitroglycerin. No value is claimed for the cold side of extruded and flake powders; the run takes the hot value there. The default is applied by the workbench, its powder tuning route and the API's load-file route (`recordSensitivity`, which reads the record's own coefficient first), so a load file runs there as in the workbench; the record runs of the command line (`recordLoad`), which run at the powder's fit temperature unless a row gives another, keep $\tau_T = 1$ for a powder without its own coefficient. Temperature-stabilised lines (such as the Hodgdon Extreme powders, whose velocity moved by about 0.006 %/K in the same table) are not told apart: no record field marks them.
+Limits: the extruded value rests on maker data whose shots and lots are not stated, and the conversion depends on the stand-in load: the three loads of the entry give 0.0006 to 0.0015 1/K. The ball value is for deterred ball powders with about 10 % nitroglycerin. No value is claimed for the cold side of extruded and flake powders; the run takes the hot value there. The default is applied by the workbench, its powder tuning route and the API's load-file route (`recordSensitivity`), so a load file runs there as in the workbench; the record runs of the command line (`recordLoad`), which run at the powder's fit temperature unless a row gives another, keep $\tau_T = 1$ for a powder without its own coefficient. Temperature-stabilised lines (such as the Hodgdon Extreme powders, whose velocity moved by about 0.006 %/K in the same table) are not told apart: no record field marks them.
 
 The specific energy can follow the temperature too. The load option `propellant.energyTemperature`, $\beta_Q$ in 1/K, scales it by
 
@@ -356,7 +356,7 @@ Each curve point has time, travel, velocity, burnt fraction, the three pressures
 
 ### Load file
 
-`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `missingLoadKeys` lists the values it needs that no other source gave (all but the bore area, which falls back to the circle of the bore diameter), so a caller can name every missing value at once instead of the first. The load ratio, charge bulk volume over the volume behind the seated bullet, is:
+`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `missingLoadKeys` lists every needed value that no other source gave (all but the bore area, which falls back to the circle of the bore diameter). The load ratio, charge bulk volume over the volume behind the seated bullet, is:
 
 $$
 \Lambda = \frac{m_c}{\rho_\text{bulk} V_c}
@@ -518,7 +518,7 @@ The ratio 2.2 is the rounded low end of $r$ at the bound over the loads. With bo
 
 ### Advisories
 
-One registry in core lists every rule that tells a user something about a run: the seven warning codes of the API and the three input rules below. Each rule has a code, a severity, the input keys it reads, a short name, a message and a fix. An `error` blocks a run, a `warn` or `info` never changes a result: the rules read the load and the run, and the run is the same with or without them. A message states facts about the inputs and the model, never a statement about the load. The API warning enum, the `severity`, `inputs` and `fix` of each warning and the names in the workbench's warnings line all come from the registry.
+One registry in core holds every rule that tells a user something about a run: the API warning codes and the input rules below. Each rule has a code, a severity, the input keys it reads, a short name, a message and a fix. An `error` blocks a run; a `warn` or `info` never changes a result. A message states facts about the inputs and the model, never a statement about the load. The API warning enum, the `severity`, `inputs` and `fix` of each warning and the names in the workbench's warnings line all come from the registry.
 
 The input rules use the bore resistance at travel 0, the friction pressure plus the engraving pressure at travel 0 (the profile is 0 before its first point):
 

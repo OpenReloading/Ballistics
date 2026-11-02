@@ -11,7 +11,7 @@ description: Why the hole detector on target photos uses a click-calibrated colo
 
 ## Method
 
-Both detectors ran on the same photos with every marked hole used in turn as the example, a marked region, and 0.75 of the hand-marked hole size as the bullet size. Metric: shots found at the worst example and at the median example per photo.
+Both detectors ran on the same photos with each marked hole in turn as the example, a marked region, and 0.75 of the hand-marked hole size as the bullet size. Metric: shots found at the worst example and at the median example per photo.
 
 Variants of automatic detection (8 seed runs, the 4 strongest blob peaks of each polarity) were tried on the photos not in the repository: (a) the union of the shots of all seed runs; (b) seeds restricted to the surface kind (black area or paper); (c) the size refinement that runs again at the refined hole size, without a recognised face.
 
@@ -21,7 +21,7 @@ Blobs are peaks of the scale-normalised Hessian response at scales tied to the e
 
 ## Numbers
 
-The cause of the swings of the area-count detector: the editor took the expected hole size from the bullet diameter, but paper closes behind a bullet and a hole shows about 0.6 to 0.8 of it. A size off by 25 % or more removed most of its proposals.
+Why the area-count detector swung: the editor took the expected hole size from the bullet diameter, but paper closes behind a bullet and a hole shows about 0.6 to 0.8 of it. A size off by 25 % or more removed most of its proposals.
 
 Shots found, blob detector (area-count detector in brackets):
 
@@ -44,7 +44,7 @@ Improved: the blob detector replaced the area-count detector. The hole size is t
 
 ## Data basis
 
-Measured. The measurements are not in the repository.
+Measured; the measurements are not in the repository.
 
 ## Where in the app
 

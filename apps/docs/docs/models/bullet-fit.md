@@ -5,7 +5,7 @@ description: Which bullet diameters fit a cartridge, from its C.I.P. projectile,
 
 # Bullet fit
 
-The bullet fit decides which bullet diameters fit a cartridge from the cartridge's C.I.P. values only. A bullet fits when its diameter lies above the middle of the barrel's land and groove diameters and at most at the projectile diameter $G_1$ of the cartridge drawing. The API filters the bullet list of a cartridge with it. The web app lists the cartridges a bullet fits.
+A bullet fits a cartridge when its diameter lies above the middle of the barrel's land and groove diameters and at most at the projectile diameter $G_1$ of the cartridge drawing. The API filters the bullet list of a cartridge with it. The web app lists the cartridges a bullet fits.
 
 ## Equations
 

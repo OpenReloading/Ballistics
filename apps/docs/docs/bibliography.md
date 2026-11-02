@@ -131,7 +131,7 @@ Measurement data imported as values carry their license: public domain in the US
 
 ## Component data sources
 
-The documents and web pages of the makers that the bullet, powder, case capacity and manufacturer records cite, by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project licence on what the makers published (`packages/data/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
+Cited by the bullet, powder, case capacity and manufacturer records, grouped by maker, then the project's own methods and the Wikipedia pages (CC BY-SA 4.0) that case capacities cite. The makers hold the rights to their publications, and the records carry no project licence on what the makers published (`packages/data/LICENSE`). The records may keep selected source wording in fields such as `raw` and `note`; no source table or figure is copied.
 
 ### Accurate
 

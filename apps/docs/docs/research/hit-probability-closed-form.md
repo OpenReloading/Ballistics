@@ -11,7 +11,7 @@ Hit probability: does the numerical integral that gives the probability of a sho
 
 ## Method
 
-The integral of the [hit-probability model](../models/hit-probability.md) was compared with the closed form for four pairs of zone radius and standard deviation, chosen to cover a zone about as wide as the dispersion, a zone wider than the integration cut, and a zone much smaller than the dispersion. The accept rule, set before the run: an absolute difference below $5 \cdot 10^{-9}$ in every pair, the tolerance of the unit test.
+The integral of the [hit-probability model](../models/hit-probability.md) was compared with the closed form for four pairs of zone radius and standard deviation, covering a zone about as wide as the dispersion, a zone wider than the integration cut, and a zone much smaller than the dispersion. The accept rule, set before the run: an absolute difference below $5 \cdot 10^{-9}$ in every pair, the tolerance of the unit test.
 
 ## Formulas
 
@@ -36,7 +36,7 @@ The largest difference is $2.2 \cdot 10^{-15}$, about $4.4 \cdot 10^{-7}$ of the
 
 ## Result
 
-No change. The integral agrees with the closed form far inside the accept limit, so the Simpson rule with 2000 intervals and the cut at $8\sigma$ stay as they are.
+No change. The Simpson rule with 2000 intervals and the cut at $8\sigma$ stay.
 
 ## Data basis
 
@@ -50,4 +50,4 @@ Analytic: a closed form compared with the model, no measured data.
 
 ## Confidence
 
-High: the reference is exact, and the differences are at the rounding level of double precision. The check does not cover elliptical zones or unequal standard deviations, which have no closed form.
+High: the reference is exact and the differences are at double-precision rounding. The check does not cover elliptical zones or unequal standard deviations, which have no closed form.

@@ -11,7 +11,7 @@ Interior ballistics, pressure gradient: how large is the error of the Lagrange c
 
 ## Method
 
-Compare the breech and mean pressures over the base pressure of the uniform gas column with those of the self-similar column of an isentropic gas whose velocity also rises linearly from breech to base. Ratios $m_c/m_p'$ of 0.28, 0.51 and 1.03, ratio of specific heats $k$ of 1.24, 1.25 and 1.26. Metric: relative difference of each ratio. Accept rule fixed in advance: quote only the numbers the script reproduces.
+Compare the breech and mean pressures over the base pressure of the uniform gas column with those of the self-similar column of an isentropic gas whose velocity also rises linearly from breech to base. Ratios $m_c/m_p'$ of 0.28, 0.51 and 1.03, ratio of specific heats $k$ of 1.24, 1.25 and 1.26. Metric: relative difference of each ratio. Accept rule: quote only numbers the script reproduces.
 
 ## Formulas
 

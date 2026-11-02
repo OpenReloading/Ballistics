@@ -27,7 +27,7 @@ $$
 
 Code: `packages/core/src/water.ts`, `waterDensityGramsPerCm3`, `packages/drawing/src/seating/seating.ts`, `seat` (`caseVolume`).
 
-$\rho_w$ is the density of water at 20 °C. The `primerState` (`primed-spent` or `unprimed`) and `fillLevel` (`mouth`) of a case capacity record say how its water was filled, where the source states it. They are recorded and echoed (the `capacities` of `GET /cartridges/:id`) and do not enter $V_\mathrm{case}$: the same mass gives the same volume either way. No volume correction for the primer pocket is applied until a sourced primer pocket volume per primer size exists. A record without `fillLevel` takes the mouth (Assumptions); one without `primerState` has no primer state. A water temperature the source states goes in `note`. The earlier free text field `convention` is gone, and a file that has it is refused (no migrations before 1.0). A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
+$\rho_w$ is the density of water at 20 °C. The `primerState` (`primed-spent` or `unprimed`) and `fillLevel` (`mouth`) of a case capacity record say how its water was filled, where the source states it. They are recorded and echoed (the `capacities` of `GET /cartridges/:id`) and do not enter $V_\mathrm{case}$: the same mass gives the same volume either way. No volume correction for the primer pocket is applied until a sourced primer pocket volume per primer size exists. A record without `fillLevel` takes the mouth (Assumptions); one without `primerState` has no primer state. A water temperature the source states goes in `note`. A file with the field `convention` is refused (no migrations before 1.0). A case capacity the user measured, stored as a volume, takes the place of the record's water mass.
 
 The display unit grain of water is the volume of one grain mass of water:
 
@@ -91,7 +91,7 @@ Code: `packages/drawing/src/bullet/outline.ts`, `cavityGeometry`, `cavityVolumeB
 
 Without a given depth the depth is bracketed from half to three times the assumed one, $0.5\, r_c \le h \le 3\, r_c$ (`cavityDepthBracket`, an assumption without a source). At $r_c$ = 3 mm the whole cone cavity then lies between 0.014 and 0.085 cm³, around the assumed 0.028 cm³ (cone) and 0.057 cm³ (hemisphere). The seating gives the volume behind the bullet at both ends (`cavityRange` of `seat`). When the run's volume follows the seated bullet, the workbench adds the larger move of $V_b$ over the bracket, relative to the run's volume, to the default volume tolerance of 1 % of the [pressure range](interior-pressure-range.md) (`apps/web/src/lib/cavity-range.ts`, `cavityVolumeFraction`, at most the 0.2 the API takes). The tolerance is symmetric, so the range covers the bracket on its wider side; a move above 19 % of the volume is not covered in full. A deepest bracket cavity that would cut through the wall is made shallower until the outline holds. Each step of a seating ladder sends the tolerance of its own seating depth, from the bracket and the volume behind the bullet at that step.
 
-A bullet without a cavity diameter, whatever its base type, is drawn and counted as before. A hollow base type without a cavity diameter is drawn with a flat face and a note.
+A bullet without a cavity diameter, whatever its base type, has no cavity; a hollow base type is then drawn with a flat face and a note.
 
 A case length L3 typed in the workbench replaces the cartridge side's L3 of the sheet for the cartridge figure and the seating (`apps/web/src/lib/cartridge-sheet.ts`, `withCaseLength`). The chamber's L3 and the sheet's other values stay.
 
@@ -121,7 +121,7 @@ The lower bound of $V_b$ is clamped at 0. Both tolerances are assumptions withou
 
 ### Bullet without a seated outline
 
-A bullet chosen but not seated has no outline to subtract: its record has no length or no diameter, the outline is refused, the cartridge has no case length, CBTO is chosen and the bullet has no base-to-ogive, or no seating length is entered. The workbench then does not leave the whole case volume as the volume behind the bullet. It subtracts an estimate of $V_b$ and tags the volume approximate with an interval.
+A bullet chosen but not seated has no outline to subtract: its record has no length or no diameter, the outline is refused, the cartridge has no case length, CBTO is chosen and the bullet has no base-to-ogive, or no seating length is entered. The workbench then subtracts an estimate of $V_b$ from the case volume and tags the result approximate with an interval.
 
 With a record that has a length and a diameter the outline is built and only the seating is missing: $V_b$ is the volume of that outline below the mouth, as for a seated bullet. With a diameter and a mass but no length, the length follows from the mass $m$ and the effective density $\rho_\mathrm{eff}$ of the construction class, the mass over the volume of a cylinder of the bullet's diameter and length, so the shape of nose and base is in it:
 
@@ -193,7 +193,7 @@ $$
 
 Code: `packages/drawing/src/seating/seating.ts`, `leadeContact`, `jumpOf`.
 
-The contact position is derived here from the C.I.P. chamber drawing, not a C.I.P. value, and is not checked against a measurement. The jump is an estimate against the C.I.P. minimum chamber for either seating input: derived for a bullet seated by a measured CBTO, approximate from COAL.
+The contact position is derived from the C.I.P. chamber drawing, not a C.I.P. value, and is not checked against a measurement. The jump is an estimate against the C.I.P. minimum chamber for either seating input: derived for a bullet seated by a measured CBTO, approximate from COAL.
 
 #### Measured lands contact
 
@@ -276,7 +276,7 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 - A capacity measured with water at another temperature than 20 °C is not corrected, whatever its `note` says.
 - A capacity measured unprimed and one measured with a spent primer differ by the primer pocket volume behind the anvil; neither is corrected, since no sourced primer pocket volume per primer size exists.
-- A primer swap is stated as an uncertainty of the start pressure, not applied: the solver keeps one start pressure whatever primer a load names. Peterson Cartridge fired one .22 Creedmoor load with Federal Match large rifle magnum and standard large rifle primers, five new cases each, 24 in barrel; the magnum primers gave on average 25 fps more velocity and 1,500 psi more pressure ([Peterson Cartridge, 22 Creedmoor Load Data](https://petersoncartridge.com/blog/22-creedmoor-load-data), section Maximum Pressure Load Data, retrieved 2026-11-01). That is one load and one primer brand, and the page says the result holds only for that load: it gives the size of the effect, not a correction.
+- A primer swap is stated as an uncertainty of the start pressure, not applied: the solver keeps one start pressure whatever primer a load names. Peterson Cartridge fired one .22 Creedmoor load with Federal Match large rifle magnum and standard large rifle primers, five new cases each, 24 in barrel; the magnum primers gave on average 25 fps more velocity and 1,500 psi more pressure ([Peterson Cartridge, 22 Creedmoor Load Data](https://petersoncartridge.com/blog/22-creedmoor-load-data), section Maximum Pressure Load Data, retrieved 2026-11-01). The source says the result holds only for that one load and primer brand: it gives the size of the effect, not a correction.
 - A bullet base in front of the case mouth gives $V_b = 0$ with a note, and a bullet wholly below the mouth counts its whole volume.
 - The default outline undercounts the volume of many round-nose and flat-nose bullets: the mass over the outline volume (`outlineDensity`, `packages/drawing/src/bullet/density.ts`) lies above the density of the bullet's material on 157 of the 192 Missouri Bullet cast records with a length (median 12.24 g/cm³ against lead at 11.348 g/cm³), 102 of 354 Cutting Edge, 39 of 317 Hammer and 49 of 121 Lehigh records (copper at 8.935 g/cm³). The check flags such a record; it does not correct the outline. The effect on $V_b$ is limited to a nose below the mouth, as in short handgun cartridges and flush-seated wadcutters.
 - The jump needs the chamber values and the bullet nose length, or a measured lands contact of the firearm for the same bullet. Without either it is not given.

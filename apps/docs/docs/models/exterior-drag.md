@@ -5,7 +5,7 @@ description: Drag acceleration from a ballistic coefficient against a standard d
 
 # Drag
 
-The drag of a bullet enters the [point-mass model](exterior-point-mass.md) as an acceleration against the air-relative velocity. It comes from one of two inputs: a ballistic coefficient (BC) against one of the BRL standard drag functions, in one or more velocity bands, or the bullet's own drag coefficient curve against Mach number. Between the nodes of a table the drag coefficient is read linearly (default) or with a monotone cubic.
+Drag enters the [point-mass model](exterior-point-mass.md) as an acceleration against the air-relative velocity. It comes from a ballistic coefficient (BC) against one of the BRL standard drag functions, in one or more velocity bands, or from the bullet's own drag coefficient curve against Mach number.
 
 ## Equations
 
@@ -39,9 +39,9 @@ $$
 
 Code: `packages/core/src/exterior/drag.ts`, `lbPerSqInToKgPerSqM`.
 
-A BC names the reference atmosphere it was reduced to (`reference`: `icao` or `metro`). The model stores the reference and checks its value. It does not scale the drag by it: the standard functions are dimensionless and carry no air density, so every BC is used as given.
+A BC names the reference atmosphere it was reduced to (`reference`: `icao` or `metro`). The model stores and checks it but does not scale the drag by it: the standard functions are dimensionless and carry no air density, so every BC is used as given.
 
-The two references differ in sea-level air density. The older US Army standard ([AMCP 706-140](../bibliography.md#amcp-706-140)) uses 0.075126 lb/ft³ (1.2034 kg/m³), the ICAO atmosphere 1.2250 kg/m³ ([ICAO 1993](../bibliography.md#icao-1993), [U.S. Standard Atmosphere, 1976](https://ntrs.nasa.gov/citations/19770009539)), 1.8 % more. A BC reduced to the older density converts to the ICAO density by the factor 1.018 (1.2250 / 1.2034). The model does not apply it, so a `metro` BC used as given can differ by up to that factor ([research log](../research/exterior-reference-air-earth-curvature.md)).
+The older US Army standard ([AMCP 706-140](../bibliography.md#amcp-706-140)) has a sea-level air density of 0.075126 lb/ft³ (1.2034 kg/m³), the ICAO atmosphere 1.2250 kg/m³ ([ICAO 1993](../bibliography.md#icao-1993), [U.S. Standard Atmosphere, 1976](https://ntrs.nasa.gov/citations/19770009539)), 1.8 % more. Converting a BC between them takes the factor 1.018 (1.2250 / 1.2034). The model does not apply it, so a `metro` BC used as given can differ by up to that factor ([research log](../research/exterior-reference-air-earth-curvature.md)).
 
 ### Velocity bands
 
@@ -63,7 +63,7 @@ Code: `packages/core/src/drag-tables.ts`, `dragTables`, `packages/core/src/exter
 
 ### Linear interpolation
 
-Nodes $(M_j, c_j)$, $j = 0, \dots, n$, Mach strictly rising. On segment $k$, $M_k \le M \lt M_{k+1}$:
+The default. Nodes $(M_j, c_j)$, $j = 0, \dots, n$, Mach strictly rising. On segment $k$, $M_k \le M \lt M_{k+1}$:
 
 $$
 C(M) = c_k + (c_{k+1} - c_k)\,\frac{M - M_k}{M_{k+1} - M_k}
@@ -121,7 +121,7 @@ The extension of such a segment can reach zero or negative drag within one trial
 
 ### Speed measured downrange
 
-An optical screen reads the speed some metres from the muzzle, after the drag has slowed the bullet. Along a flat path, with the drag acceleration above and a drag coefficient $C_D$ on area $\pi d^2/4$, the speed falls with distance $s$ as
+A screen some metres from the muzzle reads a speed the drag has already lowered. Along a flat path, with a drag coefficient $C_D$ on area $\pi d^2/4$, the speed falls with distance $s$ as
 
 $$
 \frac{\mathrm{d}v}{\mathrm{d}s} = -\frac{\pi}{8}\,\frac{\rho\,C_D(M)\,d^2}{m}\,v
@@ -129,9 +129,9 @@ $$
 
 Code: `packages/core/src/exterior/muzzle-velocity.ts`, `muzzleVelocityFromDownrange`.
 
-The equation is the point-mass equation of motion ([McCoy 1999](../bibliography.md#mccoy-1999), chapter unverified). For a constant $C_D$ this is $v(s) = v_0\,e^{-ks}$ with $k = \pi\rho C_D d^2/(8m)$, a cross-check only: a constant coefficient is wrong near Mach 1. The muzzle velocity is the $v_0$ whose flown speed at $s$ equals the measured one, over the bullet's own drag law. The speed flown at $s$ rises with $v_0$ at a slope near one, so the search moves the guess by the miss until the miss is below $10^{-6}$ m/s (four to five passes).
+The equation is the point-mass equation of motion ([McCoy 1999](../bibliography.md#mccoy-1999), chapter unverified). For a constant $C_D$ this is $v(s) = v_0\,e^{-ks}$ with $k = \pi\rho C_D d^2/(8m)$, a cross-check only: a constant coefficient is wrong near Mach 1. The muzzle velocity is the $v_0$ whose flown speed at $s$, over the bullet's own drag law, equals the measured one. That speed rises with $v_0$ at a slope near one, so the search moves the guess by the miss until the miss is below $10^{-6}$ m/s (four to five passes).
 
-The bore is taken as horizontal, the air as still and uniform, and the measuring point as the middle of the gates, where the speed read is the speed at that distance. The mass, diameter and drag of the bullet are needed: a session record does not carry them, a saved load does. Results are simulations, not load data.
+The bore is taken as horizontal, the air as still and uniform, and the measuring point as the middle of the gates, where the speed read is the speed at that distance. It needs the mass, diameter and drag of the bullet, which a saved load carries and a session record does not. Results are simulations, not load data.
 
 ## Symbols
 

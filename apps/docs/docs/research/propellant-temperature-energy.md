@@ -13,7 +13,7 @@ Interior model ([M3](../models/interior-m3.md), [powder fit](../models/interior-
 
 ## Method
 
-Script: `node packages/core/scripts/propellant-temperature-energy.mts` from the repository root (about 9 minutes, one process, fixed seeds; the rule below is evaluated in the script). The option is `propellant.energyTemperature` (1/K, default 0) on the interior load.
+Script: `node packages/core/scripts/propellant-temperature-energy.mts` from the repository root (about 9 minutes, fixed seeds; it evaluates the rule below). The option is `propellant.energyTemperature` (1/K, default 0) on the interior load.
 
 Assumed figures, none with a source in the [bibliography](../bibliography.md), all unverified: energy coefficient 0.0003 1/K, burn-rate sensitivity 0.004 1/K on both sides of the reference 294.15 K, velocity noise 3 m/s per string mean, pressure noise 3 %.
 
@@ -45,7 +45,7 @@ Study 1, change for +5.6 K (burn sensitivity 0.004 1/K, energy coefficient 0.000
 | rifle, heavy charge 3.3 g | 0.347 | 971 | 0.377 / 5.72 | 0.095 / 0.33 | 0.472 / 6.07 | 20.1 % / 5.4 % |
 | pistol, 0.4 g | 0.050 | 333 | 0.413 / 2.08 | 0.094 / 0.21 | 0.507 / 2.30 | 18.5 % / 9.4 % |
 
-The energy term carries 17 to 22 % of the velocity change and 5 to 6.5 % of the pressure change on the rifle and gun loads, and 18.5 % and 9.4 % on the pistol load. The expectation of about 20 to 25 % for velocity and about 7 % for pressure holds in size: velocity at or a little below its lower end, pressure a little under.
+The energy term carries 17 to 22 % of the velocity change and 5 to 6.5 % of the pressure change on the rifle and gun loads, and 18.5 % and 9.4 % on the pistol load. The expected shares (about 20 to 25 % for velocity, about 7 % for pressure) hold in size: velocity at or a little below the lower end, pressure a little under on the rifle and gun loads.
 
 Study 2, pooled RMS over 50 replicates and 3 held-out charges (A: shared temperature factor, B: energy coefficient fixed at 0.0003 1/K):
 
@@ -81,15 +81,15 @@ Verdict by the rule (change of the RMS of B against A in percent, negative is lo
 | truth without term, velocity and pressure | interpolating (294 K) | 0.6 | -0.3 | yes |
 | truth without term, velocity and pressure | extrapolating (334 K) | 33.4 | 3.1 | no |
 
-The rule is not met. With the term in the truth, B is 15 % or more lower in velocity only at the extrapolating span (-17.1 and -22.9 %) and in pressure nowhere (-12.9 % at best); at the interpolating span the two fits are within 4 % in velocity and 2 % in pressure. With no term in the truth, B is 18.8 % and 33.4 % worse in velocity at the extrapolating span, above the 5 % allowed, and within the limit at the interpolating span.
+The rule is not met: with the term in the truth, B reaches 15 % lower only in velocity at the extrapolating span, never in pressure; with no term in the truth, B exceeds the 5 % allowed in velocity at the extrapolating span.
 
 ## Result
 
 No change. The energy term is not adopted: the model keeps its default of 0 and the option stays out of the powder record and the load file. Inside the calibrated temperature range the fitted temperature factor absorbs the term, for velocity and for pressure (differences below the noise of 3 m/s and 3 %). Beyond it a correct coefficient lowers the velocity error by about a fifth and a wrong one raises it by a fifth to a third, so the term helps only with a coefficient known better than the spread between powders.
 
-Proposed text for the Limits of the [M3 page](../models/interior-m3.md) (added there in short): "The gas energy is independent of the initial temperature by default. For the loads tried it carries 17 to 22 % of the muzzle-velocity change and 5 to 9 % of the peak-pressure change for a temperature step (assumed coefficients, simulations); the fitted temperature factor absorbs it inside the calibrated temperature range."
+Text for the Limits of the [M3 page](../models/interior-m3.md) (added there in short): "The gas energy is independent of the initial temperature by default. For the loads tried it carries 17 to 22 % of the muzzle-velocity change and 5 to 9 % of the peak-pressure change for a temperature step (assumed coefficients, simulations); the fitted temperature factor absorbs it inside the calibrated temperature range."
 
-The measured part is pending and not in the repository: the held-out test on chronograph ladders of one powder at three or more temperature levels, at least 20 K between the coldest and the hottest and between the hottest and the next level below it, two spans, the energy coefficient fixed, passes when the velocity RMS and the pressure RMS are each at least 15 % lower than those of the current fit on both spans. It runs on rows that are not published, on the machine that holds them:
+The measured part is pending: the held-out test on chronograph ladders of one powder at three or more temperature levels, at least 20 K between the coldest and the hottest and between the hottest and the next level below it, two spans, the energy coefficient fixed, passes when the velocity RMS and the pressure RMS are each at least 15 % lower than those of the current fit on both spans. It runs on unpublished rows, on the machine that holds them:
 
 ```sh
 npm ci && npm run build

@@ -29,7 +29,7 @@ The slope at an interior node is the three-point parabola slope $p_j$ limited to
 
 ## Numbers
 
-All five groups agree within $10^{-15}$ relative. The steep table checks which term sets the slope: the smaller secant 1 bounds it, not the parabola slope 3, so the slope is 2 and the values are 3/8 and 25/8.
+All five groups agree within $10^{-15}$ relative. On the steep table the smaller secant 1 bounds the slope, not the parabola slope 3, so the slope is 2 and the values are 3/8 and 25/8.
 
 ## Result
 

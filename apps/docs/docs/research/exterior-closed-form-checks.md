@@ -11,7 +11,7 @@ Exterior ballistics: do the point-mass and modified point-mass integrations repr
 
 ## Method
 
-Each case runs `trajectory` with a flat drag curve (one drag coefficient at every Mach number), no Coriolis term unless the case is about it, and compares with a closed form evaluated in the test. Accept limits, set before the runs: $10^{-3}$ relative for the flat-fire drop and the spin drift, $10^{-8}$ for the exact range-wind form, 0.5 percent for the free-fall deflection, $10^{-12}$ for the yaw-mode identities.
+Each case runs `trajectory` with a flat drag curve (one drag coefficient at every Mach number), no Coriolis term unless the case is about it, against a closed form evaluated in the test. Accept limits, set before the runs: $10^{-3}$ relative for the flat-fire drop and the spin drift, $10^{-8}$ for the exact range-wind form, 0.5 percent for the free-fall deflection, $10^{-12}$ for the yaw-mode identities.
 
 - Flat-fire drop: 9.5 g, 7.82 mm, $c_d$ 0.4, 830 m/s, sea-level standard air, bore angle 0 and 0.3 degrees, 100 to 1000 m.
 - Range wind: 11.3 g, 7.82 mm, $c_d$ 0.3, 850 m/s, no gravity, wind along the line of fire of -10, 10 and 50 m/s.

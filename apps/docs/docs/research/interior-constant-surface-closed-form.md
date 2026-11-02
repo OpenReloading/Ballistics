@@ -11,9 +11,9 @@ Interior ballistics: does the numerical run of the [M3 model](../models/interior
 
 ## Method
 
-The run was compared with the closed form for a synthetic rifle case. The case has a constant form function, pressure exponent 1, covolume equal to the inverse of the solid density, no bore resistance, no twist and a Sébert gradient (a single factor $s$ for both coefficients). Its inputs are chamber volume $3.4 \cdot 10^{-6}$ m³, bore area $3.75 \cdot 10^{-5}$ m², travel 0.6 m, projectile 0.0095 kg, charge 0.0028 kg, specific energy $3.9 \cdot 10^{6}$ J/kg, $k = 1.23$, solid density 1600 kg/m³, vivacity 0.56 at a reference pressure of 98066.5 Pa and $s = 0.5$.
+A synthetic rifle case with a constant form function, pressure exponent 1, covolume equal to the inverse of the solid density, no bore resistance, no twist and a Sébert gradient (a single factor $s$ for both coefficients): chamber volume $3.4 \cdot 10^{-6}$ m³, bore area $3.75 \cdot 10^{-5}$ m², travel 0.6 m, projectile 0.0095 kg, charge 0.0028 kg, specific energy $3.9 \cdot 10^{6}$ J/kg, $k = 1.23$, solid density 1600 kg/m³, vivacity 0.56 at a reference pressure of 98066.5 Pa and $s = 0.5$.
 
-Accept rules, set in the test before the comparison:
+Accept rules, set in the test:
 
 - relative difference below $10^{-5}$ for peak pressure, travel of the peak, burnout travel and muzzle velocity, at an ignition pressure of 100 Pa;
 - along the barrel, for every point with a burnt fraction $z \ge 0.1$, relative difference below $2 \cdot 10^{-6}/z$ in velocity, and in mean pressure up to burnout (the ignition gas shifts the numerical solution by a multiple of $z_0/z$);
@@ -47,17 +47,11 @@ $$
 
 ## Numbers
 
-| Quantity | Accept limit (relative) |
-| --- | --- |
-| peak pressure, travel of the peak, burnout travel, muzzle velocity | $10^{-5}$ |
-| velocity and mean pressure along the barrel, $z \ge 0.1$ | $2 \cdot 10^{-6}/z$ |
-| peak pressure and muzzle velocity, factor per tenfold lower ignition pressure | below 1/5 |
-
-All checks pass. The test asserts the limits, not the size of the differences. The case has $\theta_B$ above $0.23/2.46$, so the peak lies before burnout and burnout lies inside the barrel.
+All accept rules under Method pass. The test asserts the limits, not the size of the differences. The case has $\theta_B$ above $0.23/2.46$, so the peak lies before burnout and burnout lies inside the barrel.
 
 ## Result
 
-No change. The integrator, the ignition start and the event location agree with the exact solution to the limits above, and the deviation shrinks with the ignition pressure as the ignition-gas argument predicts. The model stays as it is.
+No change. The integrator, the ignition start and the event location agree with the exact solution to the limits above, and the deviation shrinks with the ignition pressure as the ignition-gas argument predicts.
 
 ## Data basis
 

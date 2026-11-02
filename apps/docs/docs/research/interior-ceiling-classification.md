@@ -14,10 +14,10 @@ Interior ballistics, [peak-pressure range](../models/interior-pressure-range.md)
 - Ceiling: every `Pmax` value of a cartridge sheet measured by transducer or piezo, or with no method stated, the values the limit check compares. Crusher values are left out, as there.
 - Range: `interiorPressureRange` with `pressureToleranceDefaults` (charge 0.5 %, volume 1 %, burn coefficient 3 %, temperature 5 K, start pressure 20 %, bullet mass 0) and the API's run options (`maxTime` 0.04 s, `maxSteps` 50000). The class is read as `placeMaximum` reads it: below the low end, above the high end, else inside. Dominant input: the single input whose two ends differ most in peak pressure.
 - Reference load: needs a charge, a barrel length, a bullet mass, a powder record with a fitted interior model and a water capacity of the cartridge. The load is built as the load file route builds it (`powderModelValues`, `interiorLoad`, `recordResistance`). Volume: water capacity (capacity or case record, the lower median per cartridge) less the seated part of the bullet. Bore: the sheet's F, Z and Q. Twist 305 mm, propellant temperature 21 degC.
-- Two tiers with the same throwaway script (not in the repository build):
+- Two tiers, one throwaway script (not in the repository build):
   1. The records of the repository only.
   2. The same plus records that are not in the repository: powder and capacity records, and the rows of published powder load tables flagged as maximum loads. Only counts are stated.
-- A cartridge without a reference load is left out with the missing input. No accept rule was fixed in advance; the question was whether the classes occur often enough to inform, and any wording states something about the range only.
+- A cartridge without a reference load is left out with the missing input. No accept rule was fixed in advance.
 
 ## Formulas
 
@@ -44,7 +44,7 @@ Tier 1, repository records only: 589 `Pmax` values on 551 of 577 cartridges. Lef
 Tier 2, with records outside the repository: 248 powders (224 with an interior model), a water capacity for 53 cartridges, 35,232 maximum-flag rows.
 
 - `Pmax` values left out: 12 crusher, 337 without a capacity and without a row, 187 without a capacity. 53 classified, one reference load per cartridge (the row with the lower-median nominal peak pressure).
-- Rows left out: 12,832 without a water capacity record, 2,302 without bullet mass, charge or barrel length, 166 with a powder without an interior model, 138 with an invalid nominal run. 16,942 rows run. These account for 32,380 of the 35,232 rows; the log has no reason for the other 2,852, and the script was not kept, so it cannot be recovered. One of the 53 per-cartridge ranges is incomplete (a case left the model).
+- Rows left out: 12,832 without a water capacity record, 2,302 without bullet mass, charge or barrel length, 166 with a powder without an interior model, 138 with an invalid nominal run. 16,942 rows run. These account for 32,380 of the 35,232 rows; the log gives no reason for the other 2,852 and the script was not kept, so the reason cannot be recovered. One of the 53 per-cartridge ranges is incomplete (a case left the model).
 
 | Class | Per cartridge (53) | Per row, start-pressure tolerance 20 % (16,942) | Per row, 10 % |
 | --- | --- | --- | --- |
@@ -66,7 +66,7 @@ Width and position per row (10th / 50th / 90th percentile): range width over nom
 
 ## Result
 
-No change to the model. All three classes occur, but "above" is the common case because published maximum loads sit below the sheet's `Pmax` (median nominal about 76 % of it), and "below" is rare (6 to 7 % of rows, none of the 53 reference loads). The range is wide (about 23 to 27 % of the nominal peak), so "inside" says only that the number lies within about an eighth of the simulated peak, not that an input is right, and the dominant input is the burn coefficient in 81 % of rows (96 % at a 10 % start-pressure tolerance). Adopted in a reduced form: the placement is a note for a maximum the user enters, never for the stored limit of a cartridge, and its message states where the number lies against the simulated range only (`maximumCheck`). The limit check is unchanged.
+No change to the model. All three classes occur, but "above" is the common case because published maximum loads sit below the sheet's `Pmax` (median nominal about 76 % of it), and "below" is rare (6 to 7 % of rows, none of the 53 reference loads). The range is wide (about 23 to 27 % of the nominal peak), so "inside" says only that the number lies within about an eighth of the simulated peak, not that an input is right. The dominant input is the burn coefficient in 81 % of rows (96 % at a 10 % start-pressure tolerance). Adopted in a reduced form: the placement is a note for a maximum the user enters, never for a cartridge's stored limit, and its message states only where the number lies against the simulated range (`maximumCheck`). The limit check is unchanged.
 
 ## Data basis
 
