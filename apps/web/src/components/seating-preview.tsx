@@ -1653,7 +1653,7 @@ function MeasuredCapacity({ m }: { m: Model }) {
           ...measuredWaterCapacitySpec,
           help: designed
             ? msg(
-                'Water to the mouth of your fired cases. Empty: the volume behind the bullet is not given.',
+                'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
               )
             : msg("Water to the mouth of your fired cases; replaces the record's value."),
         }}

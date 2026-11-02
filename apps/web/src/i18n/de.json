@@ -4316,7 +4316,7 @@
   "Volume behind the bullet not given; missing: {missing}.": "Volumen hinter dem Geschoss nicht angegeben; fehlend: {missing}.",
   "Water to the case mouth, as the manufacturer states.": "Wasser bis zum Hülsenmund, laut Hersteller.",
   "Water to the mouth of your fired cases; replaces the record's value.": "Wasser bis zum Hülsenmund Ihrer abgeschossenen Hülsen; ersetzt den Wert des Datensatzes.",
-  "Water to the mouth of your fired cases. Empty: the volume behind the bullet is not given.": "Wasser bis zum Hülsenmund Ihrer abgeschossenen Hülsen. Leer: Das Volumen hinter dem Geschoss ist nicht angegeben.",
+  "Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.": "Gemessen: Wasser bis zum Hülsenmund Ihrer abgeschossenen Hülsen. Leer: nicht angegeben, ebenso das Volumen hinter dem Geschoss.",
   "Where the next shot will land with 50 % or 95 % probability, from the shots of the group. Absent below 3 shots.": "Wo der nächste Schuss mit 50 % oder 95 % Wahrscheinlichkeit landet, aus den Schüssen der Gruppe. Fehlt unter 3 Schüssen.",
   "Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group.": "Wo gesucht wird: ein Rechteck (zwei gegenüberliegende Ecken) oder ein Polygon; ohne Angabe: die im Foto gefundene Zielscheibe. Wird mit dem Schussbild gespeichert.",
   "With scope and attachments; used only for free recoil.": "Mit Zielfernrohr und Anbauteilen; nur für den freien Rückstoß.",
