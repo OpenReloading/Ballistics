@@ -171,7 +171,7 @@ export const operations: readonly Operation[] = [
     name: 'interior/load-file',
     summary: 'Simulate a workbench load file',
     description:
-      "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. Values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. Every value no record gives is listed in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a workbench download for the API holds them all. Results are simulations, not load data.",
+      "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. Values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. Every value neither the file nor a record gives is listed in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a workbench download for the API holds them all. Results are simulations, not load data.",
     body: loadFileBody,
     response: loadFileResponse,
     example: loadFileExample,
