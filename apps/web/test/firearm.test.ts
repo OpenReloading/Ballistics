@@ -29,6 +29,7 @@ import {
   withEventRounds,
   withSessionRounds,
 } from '../src/lib/firearm.ts'
+import { sortRows } from '../src/lib/lists.ts'
 import { presetUnits } from '../src/lib/units.ts'
 import { defined, missing } from './defined.ts'
 
@@ -372,6 +373,7 @@ describe('cardFacts and clickText', () => {
       hand: 'left',
       optic: 'Scope',
       zero: '100',
+      opticZero: 'Scope\u001f100000',
       configuration: 'Summer',
     })
     expect(firearmCells({ ...f, active: undefined }, us, english)).toMatchObject({
@@ -384,8 +386,45 @@ describe('cardFacts and clickText', () => {
       hand: '',
       optic: '',
       zero: '',
+      opticZero: undefined,
       configuration: '',
     })
+  })
+  it('sorts the optic column by optic, then zero range as a number, rows without an optic last', () => {
+    const zeroed = (optic: string, zero: number) => ({
+      ...f,
+      optics: [{ id: 'o1', kind: 'scope' as const, name: optic }],
+      configurations: [
+        {
+          id: 'c1',
+          name: '',
+          mounts: [{ optic: 'o1', sightHeight: { value: 50 }, zeroRange: { value: zero } }],
+        },
+      ],
+      active: 'c1',
+    })
+    const rows = [
+      zeroed('Scope', 100000),
+      blankFirearm(),
+      zeroed('Scope', 25000),
+      zeroed('Irons', 300000),
+    ]
+    const order = (dir: 'ascending' | 'descending') =>
+      sortRows(rows, (r) => firearmCells(r, metric, english).opticZero, dir).map(
+        (r) => firearmCells(r, metric, english).opticZero,
+      )
+    expect(order('ascending')).toEqual([
+      'Irons\u001f300000',
+      'Scope\u001f25000',
+      'Scope\u001f100000',
+      undefined,
+    ])
+    expect(order('descending')).toEqual([
+      'Scope\u001f100000',
+      'Scope\u001f25000',
+      'Irons\u001f300000',
+      undefined,
+    ])
   })
   it('gives the click value in the turret marking, else in the chosen unit', () => {
     const o = { clickValue: 1e-4 }
