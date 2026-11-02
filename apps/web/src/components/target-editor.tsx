@@ -343,8 +343,8 @@ async function restoreCopy(t: Translator['t']) {
 
 /** Names of the group colours (`groupColours`), for the swatches' accessible names. */
 const colourNames = [
-  msg('Orange'),
   msg('Blue'),
+  msg('Orange'),
   msg('Green'),
   msg('Ochre'),
   msg('Pink'),
@@ -1887,7 +1887,7 @@ function CalibrateTool({ ed }: { ed: Ed }) {
           disabled={!unscaled}
           size={9}
           offset={3}
-          color="orange"
+          color="var(--warn-fg)"
           withBorder
           className="tool-indicator"
           data-unscaled={unscaled || undefined}
