@@ -293,7 +293,8 @@ describe('variantMatrix', () => {
   it('leaves the variant values out of the combined table, but the Fe variants', () => {
     const rows = combinedRows(spec, recordFigures(drawable(spec)))
     expect(rows.some((r) => r.cartridge?.symbol === 'l' || r.chamber?.symbol === 'L')).toBe(false)
-    expect(rows.map((r) => r.symbol)).toContain('Fe (bascule)')
+    // the Fe variants are rows of the chamber table
+    expect(rows.find((r) => r.symbol === 'Fe (bascule)')?.chamber).toBeDefined()
     expect(pressureStripValues(spec)).toEqual([])
   })
 

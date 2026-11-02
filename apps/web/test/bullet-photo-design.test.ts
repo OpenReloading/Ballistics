@@ -1,3 +1,4 @@
+import type { BulletDimensions } from '@open-reloading/drawing/bullet'
 import { applyOverrides, type Bullet, bullet, userBullet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { designerSpecs, evaluate, fileData } from '../src/lib/bullet-designer.ts'
@@ -19,7 +20,14 @@ import { targetBullet } from './fixtures/bullets.ts'
 
 const system = presetUnits('metric-grams')
 
-function measure(shape = sampleShape) {
+const measured = new Map<BulletDimensions, ReturnType<typeof measureOnce>>()
+/** The photograph of `shape` measured, once per shape in this file: no test changes the result. */
+function measure(shape: BulletDimensions = sampleShape) {
+  if (!measured.has(shape)) measured.set(shape, measureOnce(shape))
+  return defined(measured.get(shape))
+}
+
+function measureOnce(shape: BulletDimensions) {
   const photo = renderPhoto({
     shape,
     pxPerMm: 28,

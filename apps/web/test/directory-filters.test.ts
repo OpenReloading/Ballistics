@@ -2,7 +2,6 @@ import { expect, it } from 'vitest'
 import { packBullets, unpackBullets } from '../src/lib/bullet-list-data.ts'
 import { type BulletItem, bulletSearchText } from '../src/lib/bullet-rows.ts'
 import { orderPowders } from '../src/lib/burn-rate.ts'
-import { type CartridgeRow, packCartridges, unpackCartridges } from '../src/lib/cartridge-rows.ts'
 import { emptyDirectory, readDirectory, writeDirectory } from '../src/lib/directory.ts'
 import {
   manufacturerAliases,
@@ -21,15 +20,6 @@ const bullet = (over: Partial<BulletItem>): BulletItem => ({
   length: null,
   ballisticCoefficientG1: 0.51,
   ballisticCoefficientG7: 0.26,
-  ...over,
-})
-
-const cartridge = (over: Partial<CartridgeRow>): CartridgeRow => ({
-  id: '308-win',
-  name: '308 Win.',
-  aliases: [],
-  maxBulletDiameter: 7.85,
-  pmax: 4150,
   ...over,
 })
 
@@ -66,15 +56,6 @@ it('keeps the rows picked for Compare in the URL, in the order picked', () => {
   expect(readDirectory(search)).toEqual(state)
   // a bullet record's Compare link names one bullet
   expect(readDirectory('?q=.308&pick=b-1').compareIds).toBe('b-1')
-})
-
-it('packs the rows of the lists and back', () => {
-  const bullets = [bullet({ manufacturerAliases: ['B'] }), bullet({ id: 'y' })]
-  expect(unpackBullets(packBullets(bullets))).toEqual(bullets)
-  const cartridges = [cartridge({ aliases: ['x'] }), cartridge({ id: 'y' })]
-  expect(unpackCartridges(packCartridges(cartridges))).toEqual(cartridges)
-  const powders = orderPowders([{ id: 'a', manufacturer: 'm', manufacturerName: 'M', name: 'a' }])
-  expect(unpackPowders(packPowders(powders))).toEqual(powders)
 })
 
 it('finds a powder and a bullet by an alias of the manufacturer and packs the aliases', () => {

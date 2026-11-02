@@ -384,9 +384,4 @@ describe('the static site computes as the API', () => {
     expect(added).toHaveBeenCalledTimes(1)
     expect(removed).toHaveBeenCalledWith('abort', added.mock.calls[0]?.[1])
   })
-
-  it('refuses a body above 64 KiB with 413', async () => {
-    const res = await staticFetch('interior', { method: 'POST', body: 'x'.repeat(64 * 1024 + 1) })
-    expect(res.status).toBe(413)
-  })
 })

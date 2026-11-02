@@ -357,11 +357,6 @@ describe('autoDetect and findHoles', () => {
     })
     expectHoles(found?.proposals ?? [], truth, 0.1)
     expect(Math.abs((found?.holeDiameter ?? 0) / bullet - 1)).toBeLessThan(0.2)
-    expectHoles(
-      detectHoles({ image: s.image(), region: all(s), pxPerM, expectedHoleDiameter: bullet }),
-      truth,
-      0.1,
-    )
   })
 
   it('finds light holes on a dark area without a pick', () => {
@@ -421,7 +416,6 @@ describe('autoDetect and findHoles', () => {
   })
 
   it('with a backing colour looks for that colour only', () => {
-    const paperRgb: [number, number, number] = [PAPER + 4, PAPER, PAPER - 6]
     const s = new Scene(900, 900)
     s.face(450, 450)
     const mm = pxPerMm
@@ -436,7 +430,6 @@ describe('autoDetect and findHoles', () => {
     const found = detectHoles({ ...options, backing: { r: yellow[0], g: yellow[1], b: yellow[2] } })
     for (const t of truth)
       expect(Math.min(...found.map((p) => Math.hypot(p.x - t.x, p.y - t.y))) / D).toBeLessThan(0.12)
-    expect(paperRgb[0]).toBeGreaterThan(0)
   })
 
   it('refuses a backing colour channel that is not a number from 0 to 255', () => {

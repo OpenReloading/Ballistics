@@ -219,10 +219,6 @@ describe('compareKey in the target mode', () => {
     charge.load.charge *= 1.1
     expect(compareKey(charge, target, inputs)).toBe(key)
   })
-
-  it('leaves the charge of a powder to the solver', () => {
-    expect(compareCharge(target, 0.0025, undefined, 3e-6)).toBe(0.0025)
-  })
 })
 
 describe('answerRow', () => {

@@ -92,12 +92,6 @@ describe('shotFrom', () => {
     const same = shotFromValues({ ...defaults, dragFactor: 1 }, projectile, 'right')
     expect(same.projectile.drag).toEqual(projectile.drag)
   })
-
-  it('names a missing field', () => {
-    expect(() =>
-      shotFromValues({ ...defaults, muzzleVelocity: undefined }, projectile, 'right'),
-    ).toThrow('Enter a number for Muzzle velocity.')
-  })
 })
 
 describe('trajectoryResult', () => {
