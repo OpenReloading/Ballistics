@@ -59,6 +59,20 @@ export const tuneHeld = (asked: Record<string, { id: string; failed?: true } | u
   Object.values(asked).some((a) => a !== undefined && !a.failed)
 
 /**
+ * The detail request of the chosen cartridge's record (groove, bore area) as `tuneHeld` reads it:
+ * asked while `cartridge` is chosen and `loaded`, the id of the record loaded, is another;
+ * `failed` once `failedId`, the id whose request failed, is that cartridge.
+ */
+export const tuneDetail = (
+  cartridge: string | undefined,
+  loaded: string | undefined,
+  failedId: string | undefined,
+) =>
+  cartridge && loaded !== cartridge
+    ? { id: cartridge, ...(failedId === cartridge && { failed: true as const }) }
+    : undefined
+
+/**
  * Hands `interior`, the load the workbench's run simulates, `powder`, its powder record, and
  * `table`, the CIP table of its cartridge record, to the tuning route for the strings of load
  * `load` (a reference); undefined removes one handed over before. `cartridge`, the id of a

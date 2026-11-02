@@ -175,6 +175,8 @@ A saved recipe keeps only the keys the user typed, under `analysis.overrides`, v
 - A typed `pmax` is the user's own limit, not a C.I.P. value: the workbench compares the run with it in place of the sheet's Pmax, labelled "your Pmax" in the readouts, the chart, the charge target, the result line and the print. A typed `caseLength` moves the seating and the cartridge figure. A typed `bulkDensity` replaces the powder record's for the load ratio and the case fill; the solid fill keeps the solid density of the propellant.
 - The interior routes take the Pmax as `pressureLimit` (Pa), and `POST /v1/interior/load-file` reads the three keys from the load's overrides.
 
+The Powders tab's charge mode and filters are `analysis.powders`: `mode` (`typed`, `fill` or `target`), the case `fill` in percent, the target as `targetPressure` (bar) or `targetPercent` (of the C.I.P. Pmax), the manufacturer filter as a `catalogue:` reference and the filters `base` and `form` as the list names them. The workbench writes it only while a control differs from its first value, restores it when the load opens, and leaves it out of the file for the API.
+
 ## Session snapshots on a load
 
 - `Load.snapshots` (`sessionSnapshot` in `packages/schema/src/load.ts`, up to 50, at most one per entry of `Load.sessions`) keeps what the load was at each session: `powderLot`, `primerLot`, `caseLot`, `seating`, the firearm's `roundCount` at the start of the session, and the ids of the notes the user dismissed for that session. `Load.powderLot` sits beside `primer.lot` and `case.lot` (a powder is a bare reference, with no place for a lot). All fields are optional.
