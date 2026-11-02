@@ -74,6 +74,7 @@ test('the report and the load sheets print in German and stay inside the page', 
   await expect(report).toBeVisible()
   await expect(report.getByRole('heading', { name: 'Ergebnis' }).first()).toBeVisible()
   await expect(report).toContainText('Gedruckt am')
+  await expect(report.locator('.report-sub')).toContainText(/Gedruckt am \S+ · Ballistics \S/)
   await expect(report).toContainText('Lauflänge')
   await expect(report).toContainText('Treibladungspulver und Treibladung')
   expect(await report.innerText()).not.toMatch(english)

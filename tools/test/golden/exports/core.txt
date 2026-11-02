@@ -35,6 +35,7 @@
 . CurveReason
 . CurveResidual
 . CurveWarning
+. DensityClass
 . DispersionInput
 . DispersionResult
 . DownrangeReading
@@ -256,6 +257,7 @@
 . boreArea
 . boreResistance
 . bulletFits
+. bulletStructures
 . bulletWindow
 . burnError
 . burnForm
@@ -413,6 +415,7 @@
 . standardAtmosphere
 . startPressureOf
 . stringLadder
+. structureOf
 . subtendedAngle
 . toleranceRange
 . trajectory

@@ -135,6 +135,18 @@ export const loadAnalysis = z.object({
     ])
     .describe('The ladder of the load: step count, step size and direction.')
     .optional(),
+  powders: z
+    .strictObject({
+      mode: z.enum(['typed', 'fill', 'target']).describe('Charge of each run.'),
+      fill: z.number().min(10).max(120).describe('Case fill, %.').optional(),
+      targetPressure: z.number().positive().describe('Target peak pressure, bar.').optional(),
+      targetPercent: z.number().positive().describe('Target, % of CIP Pmax.').optional(),
+      manufacturer: catalogueRef('manufacturer').optional(),
+      base: text(200).min(1).describe('Base filter.').optional(),
+      form: text(200).min(1).describe('Form filter.').optional(),
+    })
+    .describe('Powders tab mode and filters (GLOSSARY `powders`).')
+    .optional(),
 })
 
 const component = {

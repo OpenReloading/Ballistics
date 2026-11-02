@@ -46,6 +46,7 @@ import {
   logJson,
   logYears,
   userIdOf,
+  withEntryDeclined,
   withEntryRounds,
 } from '../lib/shooting-log.ts'
 import { summaryYears } from '../lib/shooting-log-summary.ts'
@@ -461,7 +462,15 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
     ),
     confirmLabel: t('Add'),
   })
-  if (!ok) return t('The round count of {name} is unchanged.', { name })
+  if (!ok) {
+    // noted, so the other entries of the match do not count this one's rounds as the event's (#974)
+    if (entry.event)
+      await updateRecord(firearmId, (raw) => {
+        const stored = userRecord.safeParse(raw)
+        return stored.success ? withEntryDeclined(stored.data, id) : undefined
+      })
+    return t('The round count of {name} is unchanged.', { name })
+  }
   const written = await updateRecord(firearmId, (raw) => {
     const stored = userRecord.safeParse(raw)
     return stored.success

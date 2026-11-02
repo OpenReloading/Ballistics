@@ -242,13 +242,13 @@ test('the chosen load names its components, the statistics follow Add shot, and 
   const named = {
     ...load,
     id: '2c4e6a80-1b3d-4f5a-9c7e-8d0f2a4b6c1e',
-    name: '308 Win., Berger 30 Cal 168 gr VLD Target, Accurate 2015, a long name the select cuts',
+    name: '308 Win., Demo Bullets 30 Cal 168 gr HPBT Demo, Demo Powder Co. DP40, a long name the select cuts',
     data: {
       ...load.data,
       charge: { value: 2.9 },
       cartridge: 'catalogue:308-win',
-      bullet: 'catalogue:berger-30410',
-      powder: 'catalogue:accurate-2015',
+      bullet: 'catalogue:demo-bullet-168',
+      powder: 'catalogue:demo-powder-dp40',
       primer: { record: 'catalogue:demo-primer-large-rifle' },
       seating: { by: 'overallLength', value: { value: 71.12 } },
       analysis: { ladder: { stepCount: 5, step: 0.05, direction: 'around' } },
@@ -266,9 +266,9 @@ test('the chosen load names its components, the statistics follow Add shot, and 
     await openRange(page, id)
     // the select may cut the name: the lines under it name the cartridge, bullet, powder, primer and COAL
     const summary = page.locator('[data-load-summary]')
-    await expect(summary).toContainText('308 Win., Berger 30 Cal 168 gr VLD Target')
+    await expect(summary).toContainText('308 Win., Demo Bullets 30 Cal 168 gr HPBT Demo')
     await expect(summary).toContainText(
-      'Accurate 2015 2.90 g, Demo Primers Large Rifle Demo, COAL 71.12 mm',
+      'Demo Powder Co. DP40 2.90 g, Demo Primers Large Rifle Demo, COAL 71.12 mm',
     )
     // five steps: cells of one width
     const widths = await page
