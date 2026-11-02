@@ -76,8 +76,8 @@ export const jacketedDensity = (jacketShare: number) =>
 
 /**
  * The highest density of each class, g/cm³. A jacketed bullet takes lead: a copper jacket is
- * lighter than lead, so any jacket share lowers the mixture below it ({@link jacketedDensity}); no
- * source for the share of a jacket was found, so the bound does not assume one.
+ * lighter than lead, so any jacket share lowers the mixture below it ({@link jacketedDensity}); the
+ * bound assumes no share (no source for one).
  */
 export const materialDensityBound: Readonly<Record<MaterialClass, number>> = Object.freeze({
   lead: leadDensity,
@@ -100,8 +100,8 @@ export interface OutlineDensity {
  * The density a bullet record's mass and default outline imply (mass over the volume of
  * `bulletOutline`, a cavity taken off), against the highest density of its material class.
  * Undefined without a length, a diameter, an outline or a material class. A density above the bound
- * flags the record: the outline undercounts the volume (a round or flat nose drawn too slim) or a
- * value of the record is wrong.
+ * means the outline undercounts the volume (a round or flat nose drawn too slim) or a record value
+ * is wrong.
  */
 export function outlineDensity(
   r: BulletValues & { mass: { value: number }; construction?: DensityConstruction | undefined },

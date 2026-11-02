@@ -36,8 +36,8 @@ export function isOpenReloadingCsv(text: string): boolean {
 }
 
 /**
- * Parses an OpenReloading CSV template (first row names columns, delimiter read from it) into one
- * `ChronoImport`; velocities in the unit of the `velocityUnit` column or the `velocityUnit` option.
+ * Parses an OpenReloading CSV template (first row names columns, delimiter read from it);
+ * velocities in the unit of the `velocityUnit` column or the `velocityUnit` option.
  */
 export function parseOpenReloadingCsv(text: string, options: TemplateOptions = {}): ChronoImport {
   const h = templateHeader(text)

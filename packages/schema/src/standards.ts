@@ -72,5 +72,5 @@ export const plausibilityException = z.object({
   note: z.string().min(1),
 })
 
-/** One printed standard value: symbol, quantity kind, value in the stored unit, limit, tolerance. */
+/** One printed standard value. */
 export interface SpecValue extends z.infer<typeof specValue> {}

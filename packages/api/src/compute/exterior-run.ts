@@ -13,10 +13,7 @@ import type { RangeStringsFitBody, RangeStringsPlanBody } from './strings-schema
 import type { ComputeRunner } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
-/**
- * The compute runner and the bullet lookup an exterior request reads. The lookup fails an unknown
- * id with a 404 error.
- */
+/** The compute runner and the bullet lookup of an exterior request. The lookup fails an unknown id with a 404 error. */
 export type ExteriorContext = {
   compute: ComputeRunner
   /** The bullet record `id`. */

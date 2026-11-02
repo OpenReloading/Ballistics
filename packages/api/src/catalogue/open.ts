@@ -24,9 +24,8 @@ function checkHeader(what: string, file: Partial<CatalogueHeader>) {
 }
 
 /**
- * Opens a catalogue on an index and a record file: no I/O, the index is used as it is (a few
- * milliseconds for a parsed prebuilt one). A record file given as a function is read on the first
- * `get`, so a page that only lists never loads it.
+ * Opens a catalogue on an index and a record file: no I/O, the index is used as it is. A record
+ * file given as a function is read on the first `get`, so a page that only lists never loads it.
  */
 export function openCatalogue({ index, records }: CatalogueData): Catalogue {
   checkHeader('index', index)

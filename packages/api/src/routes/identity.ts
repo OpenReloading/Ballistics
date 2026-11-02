@@ -13,9 +13,9 @@ function inputOf({ body, query }: FastifyRequest) {
 }
 
 /**
- * Adds `inputHash`, `apiVersion` and `dataHash` to every 200 answer of the routes of `app`, so an
- * answer that was saved can be checked against a later run. Errors carry none. Registered on a
- * route plugin, it applies to that plugin's routes only.
+ * Adds `inputHash`, `apiVersion` and `dataHash` to every 200 answer of the routes of `app`, so a
+ * saved answer can be checked against a later run. Errors carry none. Registered on a route
+ * plugin, it applies to that plugin's routes only.
  */
 export function describeAnswers(app: FastifyInstance, catalogue: Catalogue) {
   app.addHook('preSerialization', async (request, reply, payload) => {
