@@ -74,6 +74,21 @@ test('the Print menu leaves out the sections unticked, also on the next visit', 
   await expect(report(page).locator('.report-chart')).toBeVisible()
 })
 
+// a run of the same load draws the same chart: the chart is not drawn again, the report keeps it
+test('the report keeps its chart after the same load runs again', async ({ page }) => {
+  await runExample(page)
+  const copy = report(page).locator('.report-chart svg')
+  await expect(copy).toBeAttached()
+  const first = await copy.elementHandle()
+  await loadForm(page)
+    .getByLabel(/^Charge mass/)
+    .press('Control+Enter')
+  // the new result drops the first run's copy
+  await expect.poll(() => first?.evaluate((e) => e.isConnected)).toBe(false)
+  await page.emulateMedia({ media: 'print' })
+  await expect(copy).toBeVisible()
+})
+
 test('the chart data dialog downloads the curves and the results as CSV', async ({ page }) => {
   await runExample(page)
   await page.getByRole('button', { name: 'Chart data' }).click()

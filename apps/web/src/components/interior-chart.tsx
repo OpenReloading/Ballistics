@@ -3,7 +3,7 @@
 import { Button, Group, SegmentedControl } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
 import type { ECharts } from 'echarts/core'
-import { type ReactNode, useMemo, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { type StripFigure, stripModel } from '../lib/barrel-strip.ts'
@@ -238,6 +238,16 @@ export function InteriorChart({
   const named = quantityName(quantity, t)
   const chart = useRef<ECharts | null>(null)
   const redraw = useRef<() => void>(undefined)
+  // a new run or step whose option is the one drawn does not draw again, so no draw reports it: the
+  // drawing stands for the new run too (the workbench drops its report copy on every new run)
+  const drawnFor = useRef(option)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once per new run or step, with that render's option
+  useEffect(() => {
+    if (chart.current && drawnFor.current === option) onRender?.(chart.current)
+  }, [playKey])
+  useEffect(() => {
+    drawnFor.current = option
+  }, [option])
   const firstShown = shown[0] ?? 'pressure'
   const split = powderSplit(r, at)
   const energy = energySplit(r.energy)
