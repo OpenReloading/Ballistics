@@ -140,7 +140,7 @@ export const powderSpecs: readonly PowderSpec[] = [
     [msg('Impetus value'), msg('Impetus min'), msg('Impetus max')],
     'specificEnergy',
     'specificEnergy',
-    '',
+    msg('Impetus of the burning, with its extremes.'),
   ),
   ...range(
     'gamma',
@@ -161,7 +161,7 @@ export const powderSpecs: readonly PowderSpec[] = [
     [msg('Covolume value'), msg('Covolume min'), msg('Covolume max')],
     'covolume',
     'specificVolume',
-    '',
+    msg('Covolume of the combustion gas, with its extremes.'),
   ),
   {
     ...burn(
@@ -181,7 +181,13 @@ export const powderSpecs: readonly PowderSpec[] = [
     'specificEnergy',
   ),
   burn('interior.gamma', msg('Gamma'), msg('Ratio of specific heats of the gas; above 1.')),
-  burn('interior.covolume.value', msg('Covolume'), '', 'covolume', 'specificVolume'),
+  burn(
+    'interior.covolume.value',
+    msg('Covolume'),
+    msg('Covolume of the gas.'),
+    'covolume',
+    'specificVolume',
+  ),
   burn(
     'interior.density.value',
     msg('Grain density'),
@@ -189,7 +195,11 @@ export const powderSpecs: readonly PowderSpec[] = [
     'density',
     'density',
   ),
-  burn('interior.pressureExponent', msg('Pressure exponent'), ''),
+  burn(
+    'interior.pressureExponent',
+    msg('Pressure exponent'),
+    msg('Exponent of the pressure in the burn law.'),
+  ),
   burn(
     'interior.referencePressure.value',
     msg('Reference pressure'),

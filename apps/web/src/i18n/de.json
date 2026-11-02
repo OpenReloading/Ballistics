@@ -4323,5 +4323,9 @@
   "Your firearms with their optics and zeros, kept in this browser; they fill the workbench's firearm fields.": "Ihre Schusswaffen mit Optiken und Daten zum Einschießen, gespeichert in diesem Browser; sie füllen die Schusswaffenfelder der Werkbank.",
   "Your own record, not an official result. The organiser publishes the official one.": "Ihre eigene Aufzeichnung, kein offizielles Ergebnis. Das offizielle veröffentlicht der Veranstalter.",
   "Your own record; a club or authority decides whether to accept it.": "Ihre eigene Aufzeichnung; ob ein Verein oder eine Behörde sie anerkennt, entscheiden diese.",
-  "Your records in this browser. A row opens its list.": "Ihre Datensätze in diesem Browser. Eine Zeile öffnet ihre Liste."
+  "Your records in this browser. A row opens its list.": "Ihre Datensätze in diesem Browser. Eine Zeile öffnet ihre Liste.",
+  "Impetus of the burning, with its extremes.": "Impetus des Abbrands, mit seinen Extremwerten.",
+  "Covolume of the combustion gas, with its extremes.": "Covolume des Verbrennungsgases, mit seinen Extremwerten.",
+  "Covolume of the gas.": "Covolume des Gases.",
+  "Exponent of the pressure in the burn law.": "Exponent des Drucks im Abbrandgesetz."
 }

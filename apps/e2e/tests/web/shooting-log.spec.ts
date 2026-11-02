@@ -66,9 +66,7 @@ async function addEntry(
   await form.getByLabel('Rounds fired').fill(String(e.rounds))
   await form.getByRole('button', { name: 'Save entry' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add to the round count?' })
-  await expect(dialog).toContainText(
-    `Add ${e.rounds} rounds of this entry to the round count of ${e.firearm}?`,
-  )
+  await expect(dialog).toContainText(`Add ${e.rounds} rounds to the round count of ${e.firearm}?`)
   await dialog.getByRole('button', { name: answer }).click()
 }
 
