@@ -18,7 +18,7 @@ Rows: load rows that are not in the repository, evaluated with `ballistics verif
 - Accept rule, fixed before any run: on validation the median velocity error falls by at least 0.1 percentage points, the P90 does not rise, the training median falls too, and no more rows are refused. Otherwise the simpler form stays. The mean signed peak-pressure error (model minus printed over printed) is reported and does not decide.
 - $c_p = 0$ reproduced the baseline exactly (every change 0, the same used rows).
 
-The doubling table runs a synthetic 76 mm proxy: bore 76.2 mm, travel 40 calibres, shot 6.2 kg, chamber 2.2 L, charge 1.6 kg and 75 % of it, a tubular grain of 6 by 1.5 by 150 mm, specific energy 3.6 MJ/kg, $k = 1.24$. The burn coefficient $10^{-9}$ m s⁻¹ Pa⁻¹ was set so that the full charge peaks near 300 MPa and burns out in the bore. The resistance values are guesses, not measurements: start pressure 25 MPa, an engraving ramp from 40 MPa to 0 over 25 mm, friction pressure 8 MPa. "Engraving doubled" doubles the ramp. Doubling the start pressure with it gives the same figures: the ramp at travel 0 plus the friction (48 MPa) already holds the shot longer than the start pressure. The code is in `spikes/360/` of the branch `spike/360-bore-friction` (never merged).
+The doubling table runs a synthetic 76 mm proxy: bore 76.2 mm, travel 40 calibres, shot 6.2 kg, chamber 2.2 L, charge 1.6 kg and 75 % of it, a tubular grain of 6 by 1.5 by 150 mm, specific energy 3.6 MJ/kg, $k = 1.24$. The burn coefficient $10^{-9}$ m s⁻¹ Pa⁻¹ was set so that the full charge peaks near 300 MPa and burns out in the bore. The resistance values are guesses, not measurements: start pressure 25 MPa, an engraving ramp from 40 MPa to 0 over 25 mm, friction pressure 8 MPa. "Engraving doubled" doubles the ramp. Doubling the start pressure as well gives the same figures: the ramp at travel 0 plus the friction (48 MPa) already holds the shot longer. The code is in `spikes/360/` of the branch `spike/360-bore-friction` (never merged).
 
 ## Formulas
 
@@ -56,7 +56,7 @@ Variant 1 on the training split:
 | 0.125 | 4.91 | 11.27 | +14.1 |
 | 0.15 | 5.65 | 12.13 | +17.8 |
 
-The training median rises monotonically, by 2.50 percentage points over the grid (P90 by 3.06), so with the record constants held $c_p$ is well identified, at 0. The chosen $c_p = 0$ is the baseline: validation change 0. For information only (not part of the rule), $c_p$ = 0.025 on validation: median +0.16, P90 +0.08 percentage points, the same used rows.
+With the record constants held, the training median rises monotonically, by 2.50 percentage points over the grid (P90 by 3.06), so $c_p = 0$ is chosen and the validation change is 0. For information only (not part of the rule), $c_p$ = 0.025 on validation: median +0.16, P90 +0.08 percentage points, the same used rows.
 
 Variant 2, change against the baseline:
 
@@ -73,7 +73,7 @@ Velocity median per bearing-length tercile, baseline to variant 2, in percent:
 | 18.5 to 29.1 mm | 4 787 | 3.11 to 3.04 | 4 275 | 3.15 to 3.09 |
 | Above 29.1 mm | 4 785 | 2.40 to 2.48 | 3 577 | 2.73 to 2.80 |
 
-The short bullets carry the largest error, and a lower start pressure for them makes it larger. Neither variant gains on training alone: both get worse on training and validation alike.
+Short bullets carry the largest error, and a lower start pressure for them makes it larger.
 
 Doubling on the 76 mm proxy (simulations of guessed values):
 
@@ -90,11 +90,11 @@ Doubling on the 76 mm proxy (simulations of guessed values):
 | Full charge | measured, doubled resistance, the term not stated (as quoted in the question, unverified) | about +10 % | about +6 m/s |
 | Reduced charge | the same | | about +30 m/s |
 
-The quoted measurements do not say which term was doubled. A doubled engraving ramp (and both terms) raises the velocity, more at the reduced charge, as the measurements do, but by several times their size; doubled friction lowers it slightly. With a burn coefficient twice as large (full-charge peak 1179 MPa) the engraving changes shrink to +14.7 % and +10 m/s at full charge and +21.0 % and +11 m/s at the reduced charge, so the size depends strongly on the guessed proxy.
+A doubled engraving ramp (and both terms) raises the velocity, more at the reduced charge, as the quoted measurements do, but several times as much; doubled friction lowers it slightly. With a burn coefficient twice as large (full-charge peak 1179 MPa) the engraving changes shrink to +14.7 % and +10 m/s at full charge and +21.0 % and +11 m/s at the reduced charge, so the size depends strongly on the guessed proxy.
 
 ## Result
 
-Worse. Neither variant passes the rule, so neither term is adopted and the present law stays. Variant 1 was tried for $c_p$ from 0 to 0.15: every value above 0 raises the training error, so the rule chooses $c_p = 0$ (no change). Variant 2 raises the validation median by 0.04 and the P90 by 0.67 percentage points.
+Worse. Neither variant passes the rule; the present law stays. Every $c_p$ above 0 raises the training error, so the rule chooses $c_p = 0$. Variant 2 raises the validation median by 0.04 and the P90 by 0.67 percentage points.
 
 ## Data basis
 

@@ -5,7 +5,7 @@ description: Miller's gyroscopic stability factor, the dynamic stability criteri
 
 # Stability, spin drift and jump
 
-A point mass has no axis, so the [point-mass trajectory](exterior-point-mass.md) takes the spin effects from separate formulas. Miller's rule estimates the gyroscopic stability factor from mass, diameter, length and twist, corrected for muzzle velocity and air. Linear theory gives the dynamic stability criterion when aerodynamic coefficients are known. Spin drift and the vertical jump from a crosswind at the muzzle come from empirical fits in the gyroscopic stability factor and are added to the integrated path. The [modified point mass](exterior-modified-point-mass.md) computes stability, drift and jump from aerodynamic coefficients instead.
+A point mass has no axis, so the [point-mass trajectory](exterior-point-mass.md) takes the spin effects from separate formulas: Miller's rule for the gyroscopic stability factor, linear theory for dynamic stability when aerodynamic coefficients are known, and empirical fits in the gyroscopic stability factor for spin drift and the vertical jump from a crosswind at the muzzle. The [modified point mass](exterior-modified-point-mass.md) computes stability, drift and jump from aerodynamic coefficients instead.
 
 ## Equations
 
@@ -39,7 +39,7 @@ $$
 
 Code: `packages/core/src/exterior/modified.ts`, `gyroscopicStability`, evaluated at the muzzle and at a point.
 
-Miller's rule with the speed and the air of a point behaves the other way: its speed term is $v^{1/3}$, a fit to the muzzle velocity at one twist, where the initial spin is proportional to the muzzle velocity. Along a flight the spin is not proportional to the speed, so the term has no meaning there, and its value falls with the speed while the factor of linear theory rises. For ordinary rifle loads that start above 1 at the muzzle this value fell below 1 late in a long flight, which the factor of linear theory does not do at a constant moment slope. The numbers are in [Along-path stability warning](../research/along-path-stability-warning.md).
+Miller's rule with the speed and the air of a point behaves the other way. Its speed term $v^{1/3}$ is a fit to the muzzle velocity at one twist, where the initial spin is proportional to the muzzle velocity. Along a flight the spin is not proportional to the speed, so the term has no meaning there: it falls with the speed while the factor of linear theory rises. For ordinary rifle loads that start above 1 at the muzzle it fell below 1 late in a long flight, which the factor of linear theory does not do at a constant moment slope ([Along-path stability warning](../research/along-path-stability-warning.md)).
 
 A bullet can lose stability in flight where the moment slope rises toward Mach 1, or from a low initial spin. Both need aerodynamic coefficients that Miller's inputs do not carry. Near Mach 1 the app gives no stability warning from the path; the result lists the transonic range instead.
 
@@ -128,7 +128,6 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 
 - Plastic tips and very long or very short bullets lie outside Miller's fit.
 - The workbench's Trajectory tab takes mass, diameter and length as typed over the bullet record on the Bullet card, so the stability factor belongs to the bullet the load runs with.
-- The result has no stability warning along the flight.
 - $S_g \lt 1$ predicts a tumbling bullet. The trajectory is still computed, and the caller shows the value.
 - The point mass cannot detect a dynamically unstable bullet. Dynamic stability needs the aerodynamic coefficients.
 - Steep and very long flights lie outside the spin drift fit.

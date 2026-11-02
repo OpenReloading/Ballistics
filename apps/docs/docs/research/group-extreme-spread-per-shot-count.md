@@ -60,7 +60,7 @@ Largest and smallest of a series of five-shot groups, relative to the expected e
 
 ## Result
 
-improved. Rule met: all four means are within 0.15 percent of the issue's values (limit 2 percent), and the stated range holds 89.9 to 90.1 percent of independent groups. Adopted as a table and a one-line comparison; the function `expectedExtremeSpread(n)` (a table of 19 rows, mean, 5th and 95th percentile in units of $\sigma$) and its test are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test reruns a seeded simulation of 20 000 groups for $n$ = 2, 3, 5, 10 and 20 and requires the table mean within 2 percent and the range to hold 88 to 92 percent of the groups, and checks $n = 2$ against $\sqrt{\pi}$.
+improved. Rule met (Numbers). Adopted as a table and a one-line comparison; the function `expectedExtremeSpread(n)` (a table of 19 rows, mean, 5th and 95th percentile in units of $\sigma$) and its test are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test reruns a seeded simulation of 20 000 groups for $n$ = 2, 3, 5, 10 and 20 and requires the table mean within 2 percent and the range to hold 88 to 92 percent of the groups, and checks $n = 2$ against $\sqrt{\pi}$.
 
 Proposed text for the Limits of [Groups](../models/groups.md), replacing the sentence "Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables, not reproduced here." with:
 
@@ -85,4 +85,4 @@ analytic. Seeded simulation of a stated distribution; no measured group is used.
 
 ## Confidence
 
-high: the simulation is large, the $n = 2$ row matches the closed form, the coverage holds on an independent seed, and the means match the issue's values to 0.15 percent. The circular normal assumption is the usual one for a rifle; real groups with unequal axes are not covered.
+high: the simulation is large, the $n = 2$ row matches the closed form, the coverage holds on an independent seed, and the means match the issue's values to 0.15 percent. Real groups with unequal axes are not covered.

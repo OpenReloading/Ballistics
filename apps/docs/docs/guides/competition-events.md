@@ -5,7 +5,7 @@ description: The competition events page of the web app, how it scores ring seri
 
 # Competition events
 
-The competition events page (**Competition events**, `/events`, linked from the shooting log) keeps the events you shot in this browser, each with your own scores and their totals. What you enter there is your own record, not an official result: the official result is the one the organiser publishes. The page says so on screen and in print.
+The competition events page (**Competition events**, `/events`, linked from the shooting log) keeps the events you shot in this browser, each with your own scores and their totals. These are your own records, not official results (the organiser publishes those); the page says so on screen and in print.
 
 ## An event
 
@@ -30,13 +30,13 @@ The record is a user record of kind `event` ([Glossary](https://github.com/OpenR
 
 ## Round count
 
-Saving an event with a firearm that has a round count asks once whether to add the event's rounds to it, as a shooting log entry does ([Shooting log](shooting-log.md#round-count)). Only a yes changes the count, and the firearm notes the rounds it took from the event, so saving it again asks only about rounds added since.
+Saving an event with a firearm that has a round count asks once whether to add the event's rounds to it, as a shooting log entry does ([Shooting log](shooting-log.md#round-count)).
 
 ## Print and export
 
 With an event open, Print, Export CSV and Export JSON take that event; with none open, the list of events.
 
-- **Print** of an open event gives its facts, one line per series or stage with its total or points and hit factor, and the event total. Without an open event it prints the list.
+- **Print** of an open event gives its facts, one line per series or stage with its total or points and hit factor, and the event total.
 - **Export CSV** writes `openreloading-events-<day>.csv`, UTF-8 with a byte order mark, one row per series or stage (an event without results has one row), the event's columns repeated on each:
 
 | Column | Content |

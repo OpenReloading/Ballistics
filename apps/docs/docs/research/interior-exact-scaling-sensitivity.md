@@ -11,14 +11,14 @@ Interior model: does `interior` agree with the exact solution of the constant-su
 
 ## Method
 
-Four checks in `packages/core/test/interior-exact.test.ts`, with the accept rules set before the run:
+Four checks in `packages/core/test/interior-exact.test.ts`:
 
 1. The exact solution below, integrated with a fixed-step Runge-Kutta rule (4000 steps, changing by less than $10^{-12}$ at 8000), against peak mean pressure, burnout travel and muzzle velocity of `interior`, for covolume 0, 1.0 and 1.2 $\cdot 10^{-3}$ m³/kg and start pressure 25 and 40 MPa (ignition pressure 1 MPa). Accept: relative difference below $10^{-8}$.
 2. A rifle load with a seven-perforation grain, engraving and friction resistance, twist and a start pressure, scaled by $s$ = 0.5, 2 and 5, heat model off. Accept: peak pressure and muzzle velocity within $10^{-6}$ relative to $s = 1$, barrel time within $10^{-6}$ of $s$ times the $s = 1$ value.
 3. Central differences ($\pm$ 0.5 %) of the muzzle velocity against chamber volume and against barrel length for the fixture load and a second rifle load. Accept: the slope against volume within 5 % of the relation below.
 4. Central differences ($\pm$ 0.5 %) of the muzzle velocity against shell mass, charge, chamber volume and shot travel of a load of 203 mm bore defined in the test (90 kg shell, 10 kg charge, seven-perforation grain, 238 MPa peak, 525 m/s). Accept: each within 0.1 of the typical value, which has no citable source here ("typical, source unverified"): $-0.4$, $+0.6$ to $0.7$, $-0.25$, $+0.2$. The pressure responses are reported, not asserted.
 
-Each check can fail: the reference of check 1 with covolume 1/density differs by far more than $10^{-6}$ (a permanent test), and the heat model on moves the result of check 2 by more than $10^{-3}$ (a permanent test).
+Permanent mutation tests show each check can fail: a check 1 reference with covolume 1/density differs by far more than $10^{-6}$, and the heat model on moves check 2 by more than $10^{-3}$.
 
 ## Formulas
 
@@ -78,7 +78,7 @@ The four tests run in about 0.3 s together.
 
 ## Result
 
-No change. `interior` reproduces the exact solution to about $10^{-13}$ for every covolume and start pressure tried, scales exactly, and satisfies the volume and length relation within 1 %. No defective term was found. The heat model is documented as the only size-dependent term in the Limits of the [M3 page](../models/interior-m3.md). The velocity elasticities agree with the typical figures within 0.1. The pressure responses to mass (0.92 against about 0.6), charge (2.4 against 1.6 to 1.8) and volume ($-1.41$ against about $-1.1$) differ from the typical figures and are not asserted.
+No change. `interior` reproduces the exact solution to about $10^{-13}$ for every covolume and start pressure tried, scales exactly, and satisfies the volume and length relation within 1 %. The heat model is documented as the only size-dependent term in the Limits of the [M3 page](../models/interior-m3.md). The velocity elasticities agree with the typical figures within 0.1. The pressure responses to mass (0.92 against about 0.6), charge (2.4 against 1.6 to 1.8) and volume ($-1.41$ against about $-1.1$) differ from the typical figures and are not asserted.
 
 ## Data basis
 

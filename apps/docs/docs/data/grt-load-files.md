@@ -70,8 +70,6 @@ Not read, listed on the card when they hold a value:
 - The burn-law coefficients, the explosive heat and the covolume of the propellant: they belong to another program's model, and this app's powder parameters are fitted for its own model ([M3 interior model](../models/interior-m3.md)). The covolume is declared in different units by different program versions.
 - Bullet lot, base shape, friction and start pressure of the projectile section, the ladder settings, the gun name, the embedded cartridge drawing (`caliberfile`), the program's view settings (`config`), and the appendix measurements and pictures.
 
-Shotshell loads: no shotshell file was available when the reader was written. A shotshell file is read with the same mapping and a warning.
-
 ## ChamberSim Reloaded load files (`.csrload`)
 
 An XML file whose root element is `ChamberSimReloaded`, with the attributes `format` and `version`. The reader is written for format `1`; a file of another format, or without one, is read with the same mapping and a warning to check every value. The load is in the element `load`, laid out as the load input of a GRT load file: the title, the sections `caliber`, `gun`, `projectile` and `propellant` and the appendix are read by the GRT rules and mapping above.
@@ -98,4 +96,4 @@ Rules of the measurements:
 
 Not read, listed on the card when they hold a value, in addition to the GRT list: the primer and the additional start pressure of the `caliber` section, and the section `physical`, the values of the program's own powder model. They are not this app's powder parameters and are never converted.
 
-Shotshell parts: no file with them was available when the reader was written; a section the reader does not know is listed as not read.
+Shotshell parts: the reader is not checked on them; a section it does not know is listed as not read.

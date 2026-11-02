@@ -25,9 +25,9 @@ Synthetic inputs, fixed before the run, no measured load. Shot: 11.3 g, 7.82 mm,
 
 Distances 100, 200, ..., 1000 m (the range of the issue; the distance limit of the web form was not checked, unverified). Reference distance $D_0 = 100$ m. The velocity-independent vertical dispersion is 6 mm at $D_0$ (0.06 mrad) and grows linearly with the distance; a second case uses 20 mm (0.2 mrad).
 
-Simulation: 5000 shots per load from a fixed seed (mulberry32), each with a muzzle speed drawn from the normal distribution and one trajectory run, plus a normal draw of the velocity-independent part. The standard deviation of the heights at each distance is the simulated value (sampling error about $1/\sqrt{2N} = 1$ percent). The group a shooter measures at $D_0$ is the simulated one, with its speed part inside. The model gets that group, $S_v$ from one extra run at the speed plus 1 m/s, and the speed SD, and returns the vertical SD at each distance. The linear baseline scales the same group by $D/D_0$.
+Simulation: 5000 shots per load from a fixed seed (mulberry32), each with a normally drawn muzzle speed and one trajectory run, plus a normal draw of the velocity-independent part. The simulated value is the standard deviation of the heights at each distance (sampling error about $1/\sqrt{2N} = 1$ percent). The group a shooter measures at $D_0$ is the simulated one, with its speed part inside. The model gets that group, $S_v$ from one extra run at the speed plus 1 m/s, and the speed SD, and returns the vertical SD at each distance. The linear baseline scales the same group by $D/D_0$.
 
-Run: `node packages/core/scripts/hit-probability-velocity.mts` (seeds fixed in the script; output is the table below and the worst errors).
+Run: `node packages/core/scripts/hit-probability-velocity.mts` (seeds fixed in the script).
 
 ## Formulas
 
@@ -72,13 +72,13 @@ With 20 mm of velocity-independent SD at 100 m the largest model error is 1.18 p
 
 ## Result
 
-Improved. Adopted: `pointDispersion` takes an optional speed spread (`sd`, `verticalPerSpeed`, `referenceVerticalPerSpeed`); empty means none and the result is unchanged. A speed part at $D_0$ that reaches the group's vertical SD is refused. The model page gets the equation, the symbols and one assumption; its Limits gain the sentence that the speed spread acts on the height only (spin drift is not varied with it). The rule held on every count: the term is within 5 percent everywhere (largest 1.2 percent), the linear baseline is not (up to 90 percent), and the share is at least 7 percent at 100 m for 3 m/s with the 6 mm group.
+Improved. Adopted: the term is within 5 percent everywhere (largest 1.2 percent), the linear baseline is not (up to 90 percent), and the share is at least 7 percent at 100 m for 3 m/s with the 6 mm group. `pointDispersion` takes an optional speed spread (`sd`, `verticalPerSpeed`, `referenceVerticalPerSpeed`); empty means none and the result is unchanged. A speed part at $D_0$ that reaches the group's vertical SD is refused. Equation, assumption and Limits (height only, spin drift not varied) on the [model page](../models/hit-probability.md).
 
 Web wiring, not built (at most ten lines): the optional field "Muzzle speed SD" in the hit-probability form, prefilled from the standard deviation of the chronograph session of the selected load (`apps/web/src/lib/string-stats.ts`) and empty meaning zero. `impactSensitivity` takes a second trajectory run with the speed plus 1 m/s at the same bore angles (`verticalPerSpeed` at each table range, `referenceVerticalPerSpeed` at the group's distance). The dispersion breakdown shows the speed part next to wind and range. The input of the group and the speed SD that make the subtraction non-positive show the refusal text.
 
 ## Data basis
 
-Analytic. Synthetic loads and a seeded simulation; no measured data. Every number is a simulation, not a statement about a real load.
+Analytic: synthetic loads and a seeded simulation. Every number is a simulation, not a statement about a real load.
 
 ## Where in the app
 

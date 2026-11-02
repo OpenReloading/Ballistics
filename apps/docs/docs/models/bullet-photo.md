@@ -5,11 +5,11 @@ description: The dimensions of a bullet from the silhouette in a photograph besi
 
 # Bullet from a photo
 
-The bullet designer's "From a photo" tool measures a bullet in a photograph taken beside a ruler. It cuts the bullet out, finds its axis, fits the outline and gives the dimensions of the designer's bullet drawing, each with a standard uncertainty. "Open in designer" seeds a new design with them.
+The bullet designer's "From a photo" tool cuts the bullet out of a photograph taken beside a ruler, finds its axis, fits the outline and gives the dimensions of the designer's bullet drawing, each with a standard uncertainty. "Open in designer" seeds a new design with them.
 
 The photograph is read and processed in the browser and is not stored or uploaded. The code is in `apps/web/src/lib/bullet-photo.ts` (cut-out and scale), `bullet-photo-outline.ts` (axis and profile), `bullet-photo-measure.ts` (fits and uncertainties) and `bullet-photo-design.ts` (the seeded design). The steps run in a Web Worker (`bullet-photo.worker.ts`).
 
-Measured values are never exact: the uncertainty shown with each is the model's, and a photograph that differs from the assumptions below can be off by more than it states.
+The uncertainty shown with each value is the model's: a photograph that differs from the assumptions below can be off by more.
 
 ## Equations
 
@@ -154,7 +154,7 @@ Ratios and angles take the scale out and carry the fit's uncertainty only. The f
 
 ### Quality of the photograph
 
-A photograph too poor to measure gets sentences that say what is wrong and what to do, and no values, rather than a wrong outline. The outline stays on the canvas, so the cut-out can be corrected with the brush and measured again.
+A photograph too poor to measure gets no values, only notes on what is wrong and what to do. The outline stays on the canvas, so the cut-out can be corrected with the brush and measured again.
 
 | Finding | When | What the user is told |
 | --- | --- | --- |
@@ -204,8 +204,8 @@ Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.
 - A hybrid or other nose that is not a circle arc is not classified: no ogive radius or $R_t/R$ is seeded, and a note says so.
 - A rebated boat tail or a cone that is not straight raises a note; the line fit then represents it poorly.
 - The standard uncertainties include the edge position, the fits and the scale's placement. They do not include the ruler's own error, lens distortion or perspective (a caliper size entered with the length and the diameter flags a tilt, not corrects it), and they are not a confidence interval of the real bullet's size: a manufacturing spread among bullets of one product is larger than the measurement uncertainty.
-- The seeded design is a starting point. Its mass and manufacturer stay empty, and the note kept in it says the values are measured from a photograph, with the scale and every value's uncertainty. No image is stored.
-- A shadow beside the bullet is taken out only where it lies on one side and leaves the base clear (offset towards the tip); its soft edge still raises the uncertainty. A shadow that reaches the base gets a note and stays in the cut-out; one offset towards the base is trimmed off past the base face and named, the shank still widened by it, only where the late side crosses 0.9 of its shank line within 0.2 times the gap between the two sides' reaches (above); other shadows towards the base stay in the cut-out and can go unnamed (in the second reader's synthetic sweep of #916 the trim ran on 3 of 24 such renders, and one was not named), and the axis is not fitted again after a trim (#934). A shadow all round, or beyond the tip with little sideways offset, is not told from the bullet by its shape: its soft edge then gives a note, a sharp one none (a pistol bullet with a shadow 20 px along and 6 px across read 9 % long). Without the correction a shadow widened the diameter, so a scale from the diameter shortened every length (10 % at the median in the [catalogue evaluation](../research/bullet-photo-catalogue-geometry.md); after it, 0.52 %: [drop shadow](../research/bullet-photo-drop-shadow.md)), and its taper read as a boat tail on every flat base. Brushing the shadow out of the cut-out measures the bullet alone.
+- The seeded design is a starting point. Its mass and manufacturer stay empty, and the note kept in it says the values are measured from a photograph, with the scale and every value's uncertainty.
+- A shadow beside the bullet is taken out only where it lies on one side and leaves the base clear (offset towards the tip); its soft edge still raises the uncertainty. A shadow that reaches the base gets a note and stays in the cut-out. One offset towards the base is trimmed off past the base face and named, the shank still widened by it, only where the late side crosses 0.9 of its shank line within 0.2 times the gap between the two sides' reaches (above). Other shadows towards the base stay in the cut-out and can go unnamed (the trim ran on 3 of 24 synthetic renders in #916, and one was not named), and the axis is not fitted again after a trim (#934). A shadow all round, or beyond the tip with little sideways offset, is not told from the bullet by its shape: its soft edge then gives a note, a sharp one none (a pistol bullet with a shadow 20 px along and 6 px across read 9 % long). An uncorrected shadow widens the diameter, so a scale from the diameter shortens every length (10 % at the median in the [catalogue evaluation](../research/bullet-photo-catalogue-geometry.md); 0.52 % with the correction: [drop shadow](../research/bullet-photo-drop-shadow.md)), and its taper reads as a boat tail on a flat base. Brushing the shadow out of the cut-out measures the bullet alone.
 - A bullet turned towards the camera is not seen in the silhouette: in the [catalogue evaluation](../research/bullet-photo-catalogue-geometry.md) a turn of 10 degrees read the length 1.8 % short at the median, with 30 of 32 lengths outside three stated uncertainties. With a scale from the sizes entered, a note says what the scale rests on (Assumptions).
 - Perspective is not detected: a bullet or a camera tilted so that one end is nearer makes the sides of the shank converge, and no note says so.
 - A reflection that reaches the bullet's edge cuts into the outline there, with no note unless it makes the edge ragged.

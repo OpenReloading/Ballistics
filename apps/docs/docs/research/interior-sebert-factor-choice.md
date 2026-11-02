@@ -11,7 +11,7 @@ Interior ballistics, pressure gradient: should a user-given Sébert factor $s$ s
 
 ## Method
 
-No comparison with measured pressures was run. The choice is a design decision of the [M3 model](../models/interior-m3.md), and this page records it. The checks that exist are tests of the two settings:
+The choice is a design decision of the [M3 model](../models/interior-m3.md); no comparison with measured pressures was run. Tests of the two settings:
 
 - the default Lagrange pair gives breech to base and mean to base pressure ratios of exactly $1 + m_c/(2 m_p')$ and $1 + m_c/(3 m_p')$ within $10^{-12}$ (without resistance);
 - `interiorLoad` maps `sebert: 0.3` to a gradient with `energy` 0.3 and `breech` 0.3;
@@ -49,4 +49,4 @@ Analytic: a modelling choice with algebraic checks, no measured data.
 
 ## Confidence
 
-Low: nothing in the repository compares a Sébert-factor run with a measured breech pressure, so the choice is a convenience and the size of the breech pressure error it can cause is unknown.
+Low: no Sébert-factor run is compared with a measured breech pressure, so the breech pressure error the choice can cause is unknown.

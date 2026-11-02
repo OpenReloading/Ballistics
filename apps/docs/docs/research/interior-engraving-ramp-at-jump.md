@@ -1,6 +1,6 @@
 ---
 title: Engraving ramp at the jump to the lands
-description: Moving the workbench's engraving ramp to start at the seated bullet's jump, clamped at 0 for a bullet touching or jammed into the lands, and what that does to peak pressure and muzzle velocity on the example load.
+description: Starting the workbench's engraving ramp at the seated bullet's jump (0 when touching or jammed) and its effect on peak pressure and muzzle velocity of the example load.
 ---
 
 # Engraving ramp at the jump to the lands
@@ -11,9 +11,9 @@ M3 interior model, bore resistance: should a typed or record engraving ramp star
 
 ## Method
 
-The workbench's run gets the seated bullet's jump (seating figure, `packages/drawing/src/seating/seating.ts`, `jumpOf`) and moves every point of the engraving profile by it, with the first point at the jump, or at 0 for a jump of 0 or less. A seating ladder moves the ramp of each step to that step's jump. Without a ramp nothing changes, and the result notes say the jump has no effect. No default ramp is added.
+The workbench's run gets the seated bullet's jump (seating figure, `packages/drawing/src/seating/seating.ts`, `jumpOf`) and moves every point of the engraving profile by it, with the first point at the jump, or at 0 for a jump of 0 or less. A seating ladder moves the ramp of each step to that step's jump. Without a ramp nothing changes and the result notes say so. No default ramp is added.
 
-Comparison: the workbench example load (`apps/web/src/lib/example-data.ts`, `exampleInterior`) with two typed ramps, at jumps of -0.3, 0, 0.5, 1.0, 1.5 and 3.0 mm, and without a ramp. Metric: peak breech pressure and muzzle velocity of `interior` (`packages/core/src/interior/model.ts`). Accept rule, set in advance: a jammed load and the same load with a jump give different results with a ramp, and identical results without one.
+Comparison: the workbench example load (`apps/web/src/lib/example-data.ts`, `exampleInterior`) with two typed ramps, at jumps of -0.3, 0, 0.5, 1.0, 1.5 and 3.0 mm, and without a ramp. Metric: peak breech pressure and muzzle velocity of `interior` (`packages/core/src/interior/model.ts`). Accept rule: a jammed load and the same load with a jump give different results with a ramp, and identical results without one.
 
 ## Formulas
 
@@ -36,7 +36,7 @@ Without a ramp: 259.3 MPa, 743.5 m/s at every jump. Before this change every row
 
 ## Result
 
-Improved: adopted. The jammed and jumped runs differ with a ramp and are identical without one. The size of the change depends on the ramp, which no default supplies: with the 60 MPa stand-in the first 0.5 mm of jump lowers the peak by 23 %, with the 30 MPa one by 12 %. These sizes were not compared with a measurement. A ramp fitted from measured pressures is needed before the numbers above say anything about a real load.
+Improved: adopted. The jammed and jumped runs differ with a ramp and are identical without one. The size of the change depends on the ramp, which no default supplies: with the 60 MPa stand-in the first 0.5 mm of jump lowers the peak by 23 %, with the 30 MPa one by 12 %. Not compared with a measurement: the numbers say nothing about a real load until a ramp is fitted from measured pressures.
 
 ## Data basis
 

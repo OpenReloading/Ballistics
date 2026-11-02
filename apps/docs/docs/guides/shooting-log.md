@@ -5,7 +5,7 @@ description: The range days of the shooting log (Schießbuch) in the web app, ho
 
 # Shooting log
 
-The shooting log on the Firearms page (**Shooting log**, `/firearms/log`) keeps one entry per range day in this browser. The log is your own record. Whether a club or an authority accepts it is up to them: the app does not claim that the log meets any rule. No statute names a personal shooting log or its fields; the proof of need for a firearm comes from the club or federation ([WaffG § 14 and § 15](https://www.gesetze-im-internet.de/waffg_2002/)).
+The shooting log on the Firearms page (**Shooting log**, `/firearms/log`) keeps one entry per range day in this browser. Whether a club or an authority accepts the log is up to them: the app does not claim that it meets any rule. No statute names a personal shooting log or its fields; the proof of need for a firearm comes from the club or federation ([WaffG § 14 and § 15](https://www.gesetze-im-internet.de/waffg_2002/)).
 
 ## An entry
 
@@ -26,7 +26,7 @@ The record is a user record of kind `shootingLogEntry` ([Glossary](https://githu
 
 ## Round count
 
-Saving an entry with a firearm that has a round count asks once whether to add the entry's rounds to it. Only a yes changes the count; No leaves it as it was. The firearm notes the rounds it took from the entry, so saving the entry again asks only about rounds added since. A firearm without a round count is not changed: set a count on the Firearms page first. The count only grows through the log: changing an entry's firearm, lowering its rounds or deleting it takes no rounds back from a count, so correct the count on the Firearms page then. The shooting log keeps no second total: the firearm's round count is the one counter.
+Saving an entry with a firearm that has a round count asks once whether to add the entry's rounds to it. Only a yes changes the count. The firearm notes the rounds it took from the entry, so saving the entry again asks only about rounds added since. A firearm without a round count is not changed: set a count on the Firearms page first. The count only grows through the log: changing an entry's firearm, lowering its rounds or deleting it takes no rounds back from a count, so correct the count on the Firearms page then. The shooting log keeps no second total: the firearm's round count is the one counter.
 
 ## Filters, print and export
 
@@ -54,7 +54,7 @@ A text a spreadsheet would read as a formula starts with an apostrophe.
 
 ## Yearly summary
 
-Under the entries, **Yearly summary** adds up the entries of one calendar year: the year the year filter names, else the latest year with entries; **Summary year** picks another until the year filter changes. It sums the log. The firearm's round count stays the one counter, and the summary does not change it.
+Under the entries, **Yearly summary** adds up the entries of one calendar year: the year the year filter names, else the latest year with entries; **Summary year** picks another until the year filter changes. It does not change the firearm's round count.
 
 - **Rounds per firearm**: the rounds and entries of each firearm, most rounds first. Entries without a firearm count on a row of their own.
 - **Rounds per cartridge**: the cartridge of the entry's saved load, or of the load's firearm when the load names no cartridge. An entry without a saved load (factory ammunition) counts under its firearm only, and a line under the table gives its rounds.

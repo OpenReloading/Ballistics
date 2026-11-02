@@ -11,14 +11,14 @@ Charge ladder: with 3 or 4 five-shot groups per charge over 4 grains in half-gra
 
 ## Method
 
-Decided before the run; the first three items fix what the issue leaves open.
+The first three items fix what the issue leaves open.
 
 - Ladder: 9 charges over 4 grains in half-grain steps; 25 ft/s per grain from 2800 ft/s; velocity standard deviation of a shot 8 ft/s; vertical standard deviation of a shot 0.06 in. The height of a shot is the drop slope 0.04 in per 30 ft/s times its velocity less the mean velocity of the ladder, plus the injected oscillation, plus the vertical scatter. The slope is known exactly in the main rows and wrong by 20 percent in one row.
 - Oscillation: amplitude 0.1 in, exactly one cycle over the charge range, phase uniformly random for each ladder. A row with 0.05 in and rows without oscillation are run for the false notes.
 - Statistic: for each charge the mean of the corrected shot heights (the residual centre) with the standard deviation of those heights; the note is shown when the heterogeneity statistic over the charges exceeds the chi-square quantile at the 99 percent level with 8 degrees of freedom. A false flag is a note shown with no oscillation injected.
 - Phase recovery: an ordinary least squares fit of a constant, a cosine and a sine of one cycle over the range to the 9 residual centres; the phase counts as recovered when it is within 45 degrees of the injected phase (chance level: 25 percent).
 - Flat spots: the existing `ladderFlatSpots` (95 percent bands) on the residual centres, counted as a second display check.
-- Rule: build as a note on the ladder only when the phase is recovered in more than 70 percent of 20 000 seeded ladders at 3 groups per charge and false flags stay under 5 percent. Otherwise nothing is built and the entry says the method did not meet its criteria (a statement about the method, not about the detectable size of a shift).
+- Rule: build as a note on the ladder only when the phase is recovered in more than 70 percent of 20 000 seeded ladders at 3 groups per charge and false flags stay under 5 percent. Otherwise nothing is built.
 
 Reproduce: `node tools/research/ladder-impact-per-charge.ts` (about 7 s), from commit `15a57e29ad802a10481a21d1188dc1844736f91b` (on the branch `research/group-statistics`; the script and the core functions it imports are in that commit, the seeds are in the script).
 
@@ -34,7 +34,7 @@ with $\bar{v}$ the mean velocity of the ladder, $\bar{r}$ the count-weighted mea
 
 ## Numbers
 
-Results of 20 000 seeded ladders per row, 9 charges. "Note" is the share with the 99 percent test exceeded; "phase" the share with the fitted phase within 45 degrees; "non-flat" the share with at least one non-flat segment of `ladderFlatSpots`; "run at extremum" the share where a flat run holds the step nearest a true trough or crest.
+20 000 seeded ladders per row, 9 charges. "Note" is the share with the 99 percent test exceeded; "phase" the share with the fitted phase within 45 degrees; "non-flat" the share with at least one non-flat segment of `ladderFlatSpots`; "run at extremum" the share where a flat run holds the step nearest a true trough or crest.
 
 | Groups per charge | Oscillation | Slope error | Note | Phase, all ladders | Phase, with note | Non-flat segment | Run at extremum |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -46,13 +46,13 @@ Results of 20 000 seeded ladders per row, 9 charges. "Note" is the share with th
 | 4 | none | 0 % | 1.1 % | 24.9 % | 24.8 % | 30.0 % | not meaningful |
 | 3 | none | 20 % | 6.6 % | 25.1 % | 24.6 % | 31.1 % | not meaningful |
 
-The standard error of a residual centre at 3 groups (15 shots) is $0.06 / \sqrt{15} = 0.016$ in, a tenth of the injected amplitude; the drop correction itself moves a centre by at most 0.13 in over the 100 ft/s of the ladder. The phase of the 25 percent rows is chance. With no oscillation and the exact slope the note is shown in 1.4 percent of ladders at 3 groups and 1.1 percent at 4; with the slope 20 percent off it is shown in 6.6 percent, because the uncorrected part of the drop is a trend with the charge and the test sees it. A flat spot display alone would show a non-flat segment in about 30 percent of flat ladders (eight segments at 95 percent bands), so it is shown only beside the note.
+The standard error of a residual centre at 3 groups (15 shots) is $0.06 / \sqrt{15} = 0.016$ in, a tenth of the injected amplitude; the drop correction itself moves a centre by at most 0.13 in over the 100 ft/s of the ladder. The phase of the 25 percent rows is chance. With the slope 20 percent off, false notes rise to 6.6 percent because the uncorrected part of the drop is a trend with the charge and the test sees it. A flat spot display alone would show a non-flat segment in about 30 percent of flat ladders (eight segments at 95 percent bands), so it is shown only beside the note.
 
 Not explored: oscillation amplitudes below 0.05 in, periods other than one cycle over the range, group size or velocity spread that change with the charge, and fewer than 3 groups per charge.
 
 ## Result
 
-improved. Rule met on the stated assumptions: the phase is recovered in 100 percent of 20 000 ladders at 3 groups per charge (limit 70 percent), false notes are 1.4 percent (limit 5 percent). Adopted in a reduced form, a note on the ladder with the warning that it needs 3 to 4 groups per charge and a drop slope. Tested false-note rates: 1.4 percent with an exact slope and 6.6 percent with a slope 20 percent off; slope errors in between were not tested. The function `ladderImpactResiduals(charges, slope, level)` (per charge the residual centre, its standard deviation and shot count in the shape of `LadderStep`, the heterogeneity statistic, its degrees of freedom and the flag; SI units) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test requires the note in more than 99 percent of 400 ladders with a 0.1 in oscillation and in under 5 percent of 400 without, and covers the input checks.
+improved. Rule met on the stated assumptions: the phase is recovered in 100 percent of 20 000 ladders at 3 groups per charge (limit 70 percent), false notes are 1.4 percent with an exact slope (limit 5 percent) and 6.6 percent with a slope 20 percent off; slope errors in between were not tested. Adopted in a reduced form: a note on the ladder with the warning that it needs 3 to 4 groups per charge and a drop slope. The function `ladderImpactResiduals(charges, slope, level)` (per charge the residual centre, its standard deviation and shot count in the shape of `LadderStep`, the heterogeneity statistic, its degrees of freedom and the flag; SI units) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test requires the note in more than 99 percent of 400 ladders with a 0.1 in oscillation and in under 5 percent of 400 without, and covers the input checks.
 
 Web wiring, not built (at most ten lines):
 
@@ -63,7 +63,7 @@ Web wiring, not built (at most ten lines):
 
 ## Data basis
 
-analytic. Seeded ladders from assumed values (the numbers of the issue for the drop slope, vertical scatter and oscillation size); no measured ladder is used. Whether a given rifle shows such an oscillation is unknown in advance.
+analytic. Seeded ladders from assumed values (the numbers of the issue for the drop slope, vertical scatter and oscillation size); no measured ladder is used.
 
 ## Where in the app
 

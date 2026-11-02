@@ -5,7 +5,7 @@ description: The aim point of a target that moves across the line of sight durin
 
 # Moving target lead
 
-A target that moves while the bullet is in flight is hit by aiming ahead of it. The [point-mass trajectory](exterior-point-mass.md) gives the time of flight to each range; the lead is the distance the target covers across the line of sight in that time.
+The [point-mass trajectory](exterior-point-mass.md) gives the time of flight to each range; the lead is the distance the target covers across the line of sight in that time.
 
 ## Equations
 

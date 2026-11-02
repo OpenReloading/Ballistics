@@ -5,7 +5,7 @@ description: The probability of a hit and the expected score on a target from th
 
 # Hit probability
 
-For a distance, a target and the dispersion of the user's group, the model gives the probability that a shot lands inside each scoring zone of the target, the probability of a hit, and the expected score. The group's dispersion is scaled linearly with distance. The uncertainty of the wind and of the range adds to it through the sensitivity of the trajectory. The result is a simulation of a dispersion model, not a prediction of a shooter's score.
+For a distance, a target and the dispersion of the user's group: the probability of a shot inside each scoring zone, the probability of a hit, and the expected score. The group's dispersion scales linearly with distance; the uncertainty of the wind and of the range adds to it through the sensitivity of the trajectory. The result is a simulation of a dispersion model, not a prediction of a shooter's score.
 
 ## Equations
 
@@ -29,7 +29,7 @@ Code: `packages/core/src/groups/hit-probability.ts`, `pointDispersion`.
 
 ### Muzzle speed spread
 
-Optionally the standard deviation $\sigma_v$ of the muzzle speed adds a height part. With $S_v$ the change of the height of impact per 1 m/s of muzzle speed at the distance, from a second trajectory run with the speed raised by 1 m/s at the same bore angles, and $S_{v,0}$ the same at the reference distance, the group at $D_0$ already holds the part $S_{v,0}\,\sigma_v$. It is taken out before the linear scaling and the part at the distance is added:
+The optional standard deviation $\sigma_v$ of the muzzle speed adds a height part. With $S_v$ the change of the height of impact per 1 m/s of muzzle speed at the distance, from a second trajectory run with the speed raised by 1 m/s at the same bore angles, and $S_{v,0}$ the same at the reference distance, the group at $D_0$ already holds the part $S_{v,0}\,\sigma_v$. It is taken out before the linear scaling and the part at the distance is added:
 
 $$
 \sigma_y = \sqrt{\left(\sigma_{g,y}^2 - \left(S_{v,0}\,\sigma_v\right)^2\right)\left(\frac{D}{D_0}\right)^2 + \left(S_v\,\sigma_v\right)^2 + \left(S_R\,\sigma_R\right)^2}
@@ -65,7 +65,7 @@ With $\Phi$ the standard normal distribution function. For a circular zone of ra
 
 ### Shots needed
 
-With $p$ the probability of a hit with one shot (the hit probability above) and independent shots, the chance of at least one hit in $n$ shots is $1 - (1-p)^n$. The smallest whole number of shots with a wanted chance $P_w$ and the mean number of shots to the first hit are
+With $p$ the hit probability of one shot and independent shots, the chance of at least one hit in $n$ shots is $1 - (1-p)^n$. The smallest whole number of shots with a wanted chance $P_w$ and the mean number of shots to the first hit are
 
 $$
 n = \left\lceil \frac{\ln(1 - P_w)}{\ln(1 - p)} \right\rceil, \qquad \bar n = \frac{1}{p}

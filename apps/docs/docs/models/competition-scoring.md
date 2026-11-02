@@ -5,7 +5,7 @@ description: How a person's own competition results are scored, ring series and 
 
 # Competition scoring
 
-A competition event record (user record kind `event`) holds a person's own results: ring series, or practical stages with their hits, penalties and time. The scoring below totals them with the points and penalties of the event's type record ([Event types](../data/event-types.md)), never with values written into the code. A self-recorded score is never an official result.
+A competition event record (user record kind `event`) holds a person's own results: ring series, or practical stages with their hits, penalties and time. Totals use the points and penalties of the event's type record ([Event types](../data/event-types.md)), never with values written into the code. A self-recorded score is never an official result.
 
 ## Practical stage
 

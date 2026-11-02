@@ -11,7 +11,7 @@ Interior ballistics, muzzle exit: can the state of the M3 run at the muzzle give
 
 ## Method
 
-Four estimates were computed from the lumped state at muzzle exit for the workbench example load: the sonic velocity of the gas, a quasi-steady choked outflow, a mean outflow velocity from the muzzle velocity and a fixed sound speed, and a blowdown time constant after exit. The forms are published; they are unverified here. Accept rule: show a value only if the forms agree or a measurement can choose between them.
+Four estimates from the lumped state at muzzle exit for the workbench example load: the sonic velocity of the gas, a quasi-steady choked outflow, a mean outflow velocity from the muzzle velocity and a fixed sound speed, and a blowdown time constant after exit. The forms are published, unverified here. Accept rule: show a value only if the forms agree or a measurement can choose between them.
 
 ## Formulas
 

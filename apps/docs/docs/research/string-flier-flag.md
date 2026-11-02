@@ -11,14 +11,11 @@ Velocity strings (and groups per axis): can one shot that lies far from the othe
 
 ## Method
 
-Decided before the run.
-
 - Statistic: for a string of $N$ shots, take the shot farthest from the string mean; its distance from the mean of the other $N - 1$ shots, in sample standard deviations of those $N - 1$ shots. The shot is flagged above a factor $k$. For the high end only the statistic is taken for the highest shot.
-- Calibration: for each $N$ from 5 to 30, 1 000 000 clean normal strings (the rule asks for at least 300 000) give $k$ for a false-flag rate per string of 5, 1 and 0.1 percent, either end and high end only.
+- Calibration: for each $N$ from 5 to 30, 1 000 000 clean normal strings (at least 300 000 required) give $k$ for a false-flag rate per string of 5, 1 and 0.1 percent, either end and high end only.
 - False-flag check: the 1 percent either-end $k$ is applied to 300 000 further clean strings of an independent seed for each $N$, so the 1 percent is not true by construction.
 - Detection: one shot of the 300 000 strings (per $N$ and size) is moved up by 4, 6 or 8 true standard deviations; it counts as found when the flagged shot is that shot.
 - Rule: build only for $N$ of 10 or more, with the 1 percent either-end $k$, when the false-flag rate on the independent seed is from 0.5 to 1.5 percent for $N$ = 8 to 30 and the planted 8 SD flier is found in more than 90 percent of strings for $N$ of 10 or more. At $N = 5$ the screen shows nothing.
-- The flag is advisory: it never sets the `excluded` flag of a shot, the standard deviation is shown with and without the flagged shot, and a cold-bore shot is a real effect.
 
 Reproduce: `node tools/research/string-flier-flag.ts` (about 65 s), from commit `15a57e29ad802a10481a21d1188dc1844736f91b` (on the branch `research/group-statistics`; the script and the core functions it imports are in that commit, the seeds are in the script).
 
@@ -65,7 +62,7 @@ Factors for $N$ = 10 to 30 at 1 percent, either end: 5.32, 5.09, 4.92, 4.78, 4.6
 
 ## Result
 
-improved. Rule met: the false-flag rate is inside 0.5 to 1.5 percent for every $N$ from 8 to 30, and the planted 8 SD flier is found in 95.1 percent of strings at $N = 10$ and more above (the smallest value for $N$ of 10 or more). Proposed for $N$ = 10 to 30 only; nothing is shown at $N = 5$ (an 8 SD flier is found in 31.5 percent of strings, and a flag needs about 11 standard deviations) or for $N$ of 6 to 9 (8 SD found in 55 to 92 percent), and none is calibrated above 30. The function `flierScreen(values)` (the factors for 10 to 30 as data; returns the farthest shot, its distance, the factor, the flag and the standard deviation with and without that shot; `undefined` outside 10 to 30) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The tests require 0.5 to 1.5 percent flagged on 100 000 clean strings each of 10, 20 and 30 shots and more than 90 percent found for a planted 8 SD flier at 10 and 20.
+improved. Rule met: the false-flag rate is inside 0.5 to 1.5 percent for every $N$ from 8 to 30, and the planted 8 SD flier is found in at least 95.1 percent of strings for $N$ of 10 or more. Proposed for $N$ = 10 to 30 only; nothing is shown at $N = 5$ (an 8 SD flier is found in 31.5 percent of strings, and a flag needs about 11 standard deviations) or for $N$ of 6 to 9 (8 SD found in 55 to 92 percent), and none is calibrated above 30. The function `flierScreen(values)` (the factors for 10 to 30 as data; returns the farthest shot, its distance, the factor, the flag and the standard deviation with and without that shot; `undefined` outside 10 to 30) and its tests are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The tests require 0.5 to 1.5 percent flagged on 100 000 clean strings each of 10, 20 and 30 shots and more than 90 percent found for a planted 8 SD flier at 10 and 20.
 
 The count of flags on real strings is not part of this entry: it waits for measured strings (issue 278). If real strings are flagged far more than 1 percent (heavy tails), the SD interval of the [Groups](../models/groups.md) assumes a normal string and the flag is not shown.
 

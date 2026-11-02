@@ -5,9 +5,9 @@ description: The records of competition event types, their rule books, scoring r
 
 # Event types
 
-An event type is a kind of competition event of one federation as its rule book defines it: IPSC Handgun, USPSA Handgun and PCC, a DSB championship. It holds what scoring and stage checks need: the scoring method with its points and penalties, the power factor floors, the level names, the magazine limits and whether moving targets are allowed. A person's own event and scores (the event user record) build on it; a score recorded by the person is never an official result.
+An event type is a kind of competition event of one federation as its rule book defines it: IPSC Handgun, USPSA Handgun and PCC, a DSB championship. It holds the scoring method with its points and penalties, the power factor floors, the level names, the magazine limits and whether moving targets are allowed. A person's own event and scores (the event user record) build on it; a score recorded by the person is never an official result.
 
-- Every fact is read from the current edition of the federation's own rule book and cited with its section and page (`fields` in the provenance). The rule is described in our own words; no rule book text is copied, and the rule books are not in the repository. A fact taken from anything but the rule book would be marked unverified in its source note; the records hold none.
+- Every fact is read from the current edition of the federation's own rule book and cited with its section and page (`fields` in the provenance). Rules are described in our own words; no rule book text is copied, and the rule books are not in the repository. A fact from any other source would be marked unverified in its source note; the records hold none.
 - Schema: `packages/schema/src/event-type.ts` (JSON Schema `event-type.schema.json`).
 - Records: `packages/data/records/event-types/`, with the federations in `federations/` and the rule books as source records in `sources/`.
 
@@ -68,6 +68,6 @@ One entry of `magazine`: `division`, `powerFactor` where the limit holds for one
 | `uspsa-handgun` | USPSA Competition Rules, Edition 2026-09 (online rule book) | Level I, II, III, Nationals (Appendix A1) |
 | `dsb-meisterschaft` | Sportordnung des DSB, Stand 01.01.2027 | Kreis-/Gau-, Bezirks-/Gau-, Landes-, Deutsche Meisterschaft (0.9.3.3) |
 
-- **IPSC.** The PDF was downloaded from the IPSC Store, which the IPSC website links as its official store; the rule book pages of ipsc.org refused the download client. Standard Division has no magazine entry (gauge box), Revolver none (no cylinder limit).
+- **IPSC.** The PDF is from the IPSC Store, which the IPSC website links as its official store. Standard Division has no magazine entry (gauge box), Revolver none (no cylinder limit).
 - **USPSA.** USPSA publishes the edition as web pages. The source record holds the SHA-256 of the contents page, and each citation the URL and SHA-256 of the page it was read from. Fixed Time stages, which score without the time, are not in this record. Revolver limits the rounds before a reload, which the record does not hold.
-- **DSB.** The Sportordnung lists the championships below the Landesmeisterschaft as examples that each Landesverband runs. The series and the ring values come from the discipline; a few Auflage disciplines score tenths at Landes- and Deutsche Meisterschaft (Teil 9, 9.4). The issue offered BDS instead of DSB at the owner's choice; DSB is the default.
+- **DSB.** The Sportordnung lists the championships below the Landesmeisterschaft as examples that each Landesverband runs. The series and the ring values come from the discipline; a few Auflage disciplines score tenths at Landes- and Deutsche Meisterschaft (Teil 9, 9.4).

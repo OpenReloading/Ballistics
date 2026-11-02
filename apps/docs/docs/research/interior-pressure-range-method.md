@@ -11,7 +11,7 @@ Interior ballistics, [pressure range](../models/interior-pressure-range.md): how
 
 ## Method
 
-Adopted method: each input alone at both ends of its tolerance, then all inputs together at the pressure-raising ends and at the pressure-lowering ends (13 runs with the inputs of the test load). Compared with: one input at a time only; the root-sum-square of sensitivity times standard uncertainty; Monte Carlo propagation; all $2^n$ vertices (32 runs). Test load: an M3 rifle load with temperature coefficients 0.003 and 0.004 per K and a start pressure of 30 MPa. Vertex check on 9 synthetic loads with a complete range. Metrics: the high and low ends of each method's range in percent of the nominal peak, the difference of the combined ends from the extremes over all vertices, and the number of runs and their wall time. The run states no accept rule fixed in advance; the result below rests on these metrics.
+Adopted method: each input alone at both ends of its tolerance, then all inputs together at the pressure-raising ends and at the pressure-lowering ends (13 runs with the inputs of the test load). Compared with: one input at a time only; the root-sum-square of sensitivity times standard uncertainty; Monte Carlo propagation; all $2^n$ vertices (32 runs). Test load: an M3 rifle load with temperature coefficients 0.003 and 0.004 per K and a start pressure of 30 MPa. Vertex check on 9 synthetic loads with a complete range. Metrics: the high and low ends of each method's range in percent of the nominal peak, the difference of the combined ends from the extremes over all vertices, and the number of runs and their wall time. No accept rule was fixed in advance.
 
 ## Formulas
 

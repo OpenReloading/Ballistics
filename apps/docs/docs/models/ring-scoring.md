@@ -5,14 +5,14 @@ description: Ring value, tenth-ring value and inner ten of a shot on a rule-book
 
 # Ring scoring
 
-Ring scoring gives each shot on a target:
+For each shot on a target:
 
 - the value of the highest ring its hole touches, or under outward gauging the highest ring it lies wholly inside
 - the tenth-ring value, where the target's rules allow it
 - whether it is an inner ten
 - the zone label of the bull it belongs to, on a target with several bulls
 
-A target is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Target records hold ring diameters in mm. Shots are hole centres in target m from the target centre (the sheet centre on a target with several bulls). The group stores the target id and the id of the event, which `lib/ring-scoring.ts` looks up in the target. The target and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). A target from the browser's target designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. The code is in `apps/web/src/lib/ring-scoring.ts`.
+A target is placed on the target sheet by fitting its centre and scale to points marked on two or more of its rings. Target records hold ring diameters in mm. Shots are hole centres in target m from the target centre (the sheet centre on a target with several bulls). The group stores the target id and the id of the event, which `lib/ring-scoring.ts` looks up in the target. The target and event of a group come from the target mapping of the discipline picked ([Federations, disciplines and target mappings](../data/federations.md)). A target from the browser's target designer scores like a record: its events have no target mapping, so each is listed under User design and its gauge is the scored hole. Code: `apps/web/src/lib/ring-scoring.ts`.
 
 ## Equations
 

@@ -14,7 +14,7 @@ node packages/cli/dist/bin.js compare --rows rows.csv --records /path/to/records
 node packages/cli/dist/bin.js verify --rows catalogue --split validation
 ```
 
-`--help` (or `-h`), alone or after a command, prints the usage and the options and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
+`--help` (or `-h`), alone or after a command, prints the usage and exits 0. `run --help` and `operations --help` print the help of that command with an example that runs on a committed synthetic body.
 
 ## Operations: `run` and `operations`
 
@@ -29,7 +29,7 @@ Record ids in a body (`cartridge`, `bullet`, `powder`) resolve against the recor
 
 `operations` writes one JSON document, `{"operations":[...]}`, with each operation's `name`, `summary`, `description`, `input` (the JSON Schema 2020-12 of the body) and `output` (that of the 200 answer). The schemas are written from the zod definitions the API's OpenAPI document is built from.
 
-What the two commands will not do: give load data (an answer is a simulation, `notice` on every interior answer), use the network or start a server, or ask a question on the terminal.
+Neither command uses the network, starts a server or prompts on the terminal. Every interior answer carries `notice`: a simulation, not load data.
 
 Real rows and real records are passed by path and are never committed. The repository holds no rows; its tests build a small synthetic set from the model itself, with errors known by construction.
 
@@ -85,13 +85,13 @@ A pressure is compared only with pressures of its own basis: `pressureByBasis` o
 
 A row with a muzzle distance above 0 (a velocity printed at `V5`, for example) is compared at the muzzle: its printed velocity is turned into the muzzle velocity whose flown speed at that distance equals it, with `muzzleVelocityFromDownrange` of core ([model page](models/exterior-drag.md#speed-measured-downrange)), over the bullet record's G7 ballistic coefficients (else its G1 ones) in the ICAO standard atmosphere at sea level, before the error and the interval. A bullet without a coefficient, such as a stand-in, or with two of one model that share a band start, gives `noBulletDrag`. A row without a distance is a muzzle value and is not corrected.
 
-The powder parameters are those of the records (`--params records`, the only mode). A fit of each powder on its training rows and by-session checks need a fit from rows and are not part of this version.
+The powder parameters are those of the records (`--params records`, the only mode).
 
 ### Powder not in the fitted set
 
 `verify --leave-one-powder-out` adds `notInFittedSet`, the line "powder not in the fitted set: no data". The fitted set is the powders the rows name (any split) whose record has interior parameters; their record values are the fit, nothing is fitted from rows. Each powder of that set with rows in the run's split is left out in turn and run without its interior parameters, as a powder without rows: it gets no value, so its rows count as `noPowderModel` (a row with an unknown cartridge or bullet as `unknownCartridge` or `unknownBullet`, which are checked first) and the line's velocity, pressure and coverage are null. The line carries the rows of all left-out powders and `powders`, their number, the count of powders without a value. Its rows of the split are only those of the run's split, so the test split stays sealed for the line too.
 
-A powder without rows gets no value, not an estimate, as the app refuses a powder without interior parameters. A family median estimate (each field of `interior.fitted` replaced by the median over the other powders of its family) measured a median velocity error of 15.7 %, a P90 of 61.7 % and an interval coverage of 31.9 % on a local run, too weak to show. Its code (`src/unseen.ts`) stays in the package with its tests, and no command calls it.
+A powder without rows gets no value, not an estimate, as the app refuses a powder without interior parameters. A family median estimate (each field of `interior.fitted` replaced by the median over the other powders of its family) measured a median velocity error of 15.7 %, a P90 of 61.7 % and an interval coverage of 31.9 % on a local run, too weak to show. Its code (`src/unseen.ts`) stays with its tests; no command calls it.
 
 ## Model version
 
@@ -115,7 +115,7 @@ The code of the evaluation itself (rows, split, the metrics and the percentiles,
 
 ## Output
 
-JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (2: `pressureByBasis`, `published` and the reason `noBulletDrag` came with it) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
+JSON when stdout is not a terminal or with `--json`, a table with `--table` or on a terminal. The JSON of `verify` and `compare` carries `schemaVersion` (2) and `notice: "simulation, not load data"`, the label of the API's answers. It is described by `packages/cli/schema/result.schema.json`, written from the zod definition in `src/result.ts` by `npm run schema -w @open-reloading/cli`; a test validates real output of both commands against it. The schema's `$id`, `https://openreloading.github.io/Ballistics/docs/result.schema.json`, is where the build of this site copies it.
 
 `--version` prints `ballistics <version>` and exits 0.
 

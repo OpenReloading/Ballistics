@@ -9,27 +9,22 @@ A result is a simulation, not load data, and nothing on this page is a statement
 
 ## Error of the model on held-out data
 
-The model was compared with printed load rows of cartridges it was not fitted to, by the protocol of [Model validation](models/validation.md). The error of a row is the absolute relative difference between the model and the printed value. These numbers describe agreement with printed rows, which carry their own conventions and scatter, not the accuracy of a physical quantity.
+The model was compared with printed load rows of cartridges it was not fitted to, by the protocol of [Model validation](models/validation.md). The error of a row is the absolute relative difference between the model and the printed value.
 
 ### All used rows
 
-From the [results](models/validation.md#results) of `verify` on the validation split, model version `67d67adf…`, powder parameters of the records. The command, run on rows that are not in the repository:
-
-```sh
-npm run build
-node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split validation --json
-```
+From the [results](models/validation.md#results) of `verify --json` on the validation split (rows not in the repository), model version `67d67adf…`, powder parameters of the records:
 
 | Quantity | Rows | Median error | P90 error | Interval coverage |
 | --- | --- | --- | --- | --- |
 | Muzzle velocity | 10,497 | 3.32 % | 8.87 % | 89.6 % |
 | Peak pressure (rows that print one in bar) | 4,060 | 15.0 % | 38.1 % | not measured |
 
-The errors are over the rows the model ran: of the 16,871 rows in the split, 10,497 are used; 5,583 have no case capacity, 639 are refused by the model, 120 have no powder parameters and 32 no bullet shape ([results](models/validation.md#results)). The family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows) are on the validation page. Not measured: the sealed test split, and a powder that is not in the fitted set.
+The errors are over the 10,497 of 16,871 rows in the split that the model ran. The [results](models/validation.md#results) give the reasons for the rest, the family lines and the [pooled powder fit](models/validation.md#pooled-powder-fit) (median 2.85 %, P90 7.84 % on 633 held-out rows). Not measured: the sealed test split, and a powder that is not in the fitted set.
 
 ### Rifle and handgun
 
-`verify --group-by` groups by powder, family, cartridge, bullet or construction, not by firearm class, so the split comes from the research entry [Shot-start pressure by bullet construction and firearm class](research/interior-start-pressure-rules.md). It scores the load-table fit with every powder refitted on the training split, on 14,238 validation rows, which is a different set-up from the table above:
+`verify --group-by` has no firearm class, so the split comes from the research entry [Shot-start pressure by bullet construction and firearm class](research/interior-start-pressure-rules.md). It scores the load-table fit with every powder refitted on the training split, on 14,238 validation rows, a different set-up from the table above:
 
 | Start pressure rule | Rifle median | Rifle P90 | Handgun median | Handgun P90 |
 | --- | --- | --- | --- | --- |
@@ -37,7 +32,7 @@ The errors are over the rows the model ran: of the 16,871 rows in the split, 10,
 | One value per construction and class | 2.75 % | 7.18 % | 5.70 % | 12.99 % |
 | As the model runs: fixed for rifles, per construction for handguns | 2.76 % | 7.22 % | 5.70 % | 12.99 % |
 
-Muzzle velocity only; a barrel of 300 mm or longer counts as a rifle. The research entry names no model version, and its powder parameters are refitted, not the records' values of the table above. No command in the repository reproduces this split yet: the rows are not in the repository and `verify` has no firearm-class grouping.
+Muzzle velocity only; a barrel of 300 mm or longer counts as a rifle. The research entry names no model version, and its powder parameters are refitted, not the records' values of the table above. No command in the repository reproduces this split.
 
 ## Sources of variation of a load
 
