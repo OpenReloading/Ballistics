@@ -12,32 +12,20 @@ import {
   powderPressureRange,
   similarPowdersPrior,
 } from '../src/index.ts'
+import { load as rifleLoad } from './powder-load.ts'
 
-/** Synthetic rifle load (apps/docs/docs/models/interior-powder-fit.md): truth B_a 0.45 1/s, p_st 30 MPa. */
-const load = (vivacity = 0.45): InteriorLoad => ({
-  chamber: { volume: 3.4e-6, boreArea: 3.75e-5, boreDiameter: 6.9e-3 },
-  barrel: { length: 0.6, twist: 0.254 },
-  bullet: { mass: 0.0095 },
-  charge: 0.0028,
-  propellant: {
-    specificEnergy: 3.9e6,
-    gamma: 1.23,
-    density: 1600,
-    covolume: 1e-3,
-    burn: {
-      kind: 'vivacity',
-      vivacity,
-      exponent: 1,
-      referencePressure: 98066.5,
-      form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
+/** The synthetic rifle load with a temperature sensitivity and bore friction. */
+const load = (vivacity = 0.45): InteriorLoad => {
+  const l = rifleLoad(vivacity)
+  return {
+    ...l,
+    propellant: {
+      ...l.propellant,
+      temperatureSensitivity: { reference: 294.15, cold: 0.004, hot: 0.004 },
     },
-    temperatureSensitivity: { reference: 294.15, cold: 0.004, hot: 0.004 },
-  },
-  propellantTemperature: 294.15,
-  ignitionPressure: 5e6,
-  startPressure: 30e6,
-  resistance: { friction: 2e6 },
-})
+    resistance: { friction: 2e6 },
+  }
+}
 const charges = [2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3, 3e-3]
 /** Fixed noise pattern in units of sigma. */
 const noise = [1, -1, 0.5, -1.5, 0.8]

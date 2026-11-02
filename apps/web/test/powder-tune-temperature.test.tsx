@@ -3,6 +3,7 @@ import { type InteriorLoad, interior } from '@open-reloading/core'
 import { fromSi, type SessionRecord, userRecord } from '@open-reloading/schema'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { load as rifleLoad } from '../../../packages/core/test/powder-load.ts'
 import { AddString, TuneNotes } from '../src/components/powder-tune.tsx'
 import { nth } from '../src/lib/nth.ts'
 import { fileData, fromFile, powderDesigns } from '../src/lib/powder-designer.ts'
@@ -15,33 +16,20 @@ import { presetUnits } from '../src/lib/units.ts'
 const sensitivity = { reference: 294.15, cold: 0.002, hot: 0.003 }
 
 /** Synthetic rifle load of the core fit tests with a temperature sensitivity. */
-const load = (vivacity = 0.45, factor = 1): InteriorLoad => ({
-  chamber: { volume: 3.4e-6, boreArea: 3.75e-5, boreDiameter: 6.9e-3 },
-  barrel: { length: 0.6, twist: 0.254 },
-  bullet: { mass: 0.0095 },
-  charge: 0.0028,
-  propellant: {
-    specificEnergy: 3.9e6,
-    gamma: 1.23,
-    density: 1600,
-    covolume: 1e-3,
-    burn: {
-      kind: 'vivacity',
-      vivacity,
-      exponent: 1,
-      referencePressure: 98066.5,
-      form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
+const load = (vivacity = 0.45, factor = 1): InteriorLoad => {
+  const l = rifleLoad(vivacity)
+  return {
+    ...l,
+    propellant: {
+      ...l.propellant,
+      temperatureSensitivity: {
+        ...sensitivity,
+        cold: sensitivity.cold * factor,
+        hot: sensitivity.hot * factor,
+      },
     },
-    temperatureSensitivity: {
-      ...sensitivity,
-      cold: sensitivity.cold * factor,
-      hot: sensitivity.hot * factor,
-    },
-  },
-  propellantTemperature: 294.15,
-  ignitionPressure: 5e6,
-  startPressure: 30e6,
-})
+  }
+}
 
 /** Strings of the truth load (sensitivities scaled by 1.5) at 263.15 K and 313.15 K. */
 const strings: TuneString[] = [263.15, 313.15].flatMap((temperature) =>
