@@ -1,0 +1,15 @@
+{
+  "id": "fixture-tail-no-type",
+  "manufacturer": "fixture",
+  "productNumber": "tail-no-type",
+  "name": "Test fixture, boat-tail length without a base type",
+  "diameter": { "value": 7.82 },
+  "mass": { "value": 10.89 },
+  "length": { "value": 31.8 },
+  "base": { "length": { "value": 4.3 } },
+  "noseLength": { "value": 19 },
+  "baseToOgive": { "value": 12.8 },
+  "bearingLength": { "value": 8.5 },
+  "note": "Synthetic test fixture, not a product: a boat-tail length with no base type, drawn as a boat tail.",
+  "provenance": { "kind": "derived", "sources": [{ "title": "Test fixture" }] }
+}
