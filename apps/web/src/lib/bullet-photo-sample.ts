@@ -49,6 +49,8 @@ export interface PhotoSpec {
   seed: number
   /** A soft shadow beside the bullet: its silhouette moved by (dx, dy) px and blurred by `blur` px darkens the paper by `depth` (0 to 1). */
   shadow?: { dx: number; dy: number; blur: number; depth: number } | undefined
+  /** The base face cut at this angle to the cross-section, degrees above 0 (a slanted sprue cut): it starts at the base on one side and runs on along the axis to the other; 0 or less leaves the face square. */
+  obliqueBase?: number | undefined
   /** A reflection along the axis from `from` mm to the tip, `widthPx` wide, as light as the paper. */
   glare?: { from: number; widthPx: number } | undefined
   /** The nose beyond `from` mm is of this grey (a bright metal tip). */
@@ -175,8 +177,12 @@ function silhouette(profile: readonly [number, number][], spec: PhotoSpec): Poin
     x: spec.base.x + (ux * z - uy * r) * spec.pxPerMm,
     y: spec.base.y + (uy * z + ux * r) * spec.pxPerMm,
   })
-  const upper = profile.map(([r, z]) => at(z, r))
-  const lower = profile.map(([r, z]) => at(z, -r)).reverse()
+  // an oblique base face: the plane through the base on the lower side, turned by `obliqueBase`
+  const slope = Math.tan(toSi('angle', spec.obliqueBase ?? 0))
+  const half = Math.max(...profile.map(([r]) => r))
+  const cut = (z: number, r: number) => Math.max(z, slope * (half + r))
+  const upper = profile.map(([r, z]) => at(cut(z, r), r))
+  const lower = profile.map(([r, z]) => at(cut(z, -r), -r)).reverse()
   return [...upper, ...lower]
 }
 

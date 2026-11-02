@@ -1,3 +1,5 @@
+import { bulletStructures } from '@open-reloading/core'
+import { constructionFields } from '@open-reloading/schema'
 import { expect, it } from 'vitest'
 import { followWrites } from '../src/components/use-workbench-load.ts'
 import { english } from '../src/i18n/translate.ts'
@@ -49,12 +51,37 @@ it('gives a rifle barrel the rifle value of the construction, with the class in 
   expect(of(rifle, 'cup-and-core').si).toBe(29.2e6)
 })
 
-it('keeps the value of before where the construction or the barrel is not known', () => {
-  for (const s of [of(pistol), of(rifle, 'plated'), of(undefined, 'cast')]) {
+it('counts a handgun bullet without a construction as jacketed, assumed', () => {
+  const s = of(pistol)
+  expect(s.si).toBe(30.8e6)
+  expect(s.source).toContain('jacketed, assumed')
+})
+
+it('keeps the value of before where the construction of a rifle bullet or the barrel is not known', () => {
+  for (const s of [of(rifle), of(rifle, 'plated'), of(undefined, 'cast')]) {
     expect(s.si).toBe(cited)
     expect(s.approximate).toBeUndefined()
     expect(s.source).toBe('approximate model default for barrels of 300 mm and longer')
   }
+})
+
+it('keeps the start pressure of the fit for a rifle and a powder fitted without one', () => {
+  const fitted = (barrel: number, current = cited) =>
+    startPressureDefault({
+      barrel,
+      construction: { structure: 'monolithic' },
+      current,
+      fittedPowder: true,
+      show,
+      t: english.t,
+    })
+  expect(fitted(rifle)).toEqual({
+    si: 30e6,
+    source: 'the start pressure the powder record was fitted at, barrel 300 mm or longer',
+  })
+  // the handgun rows of the fit ran at the value of their construction
+  expect(fitted(pistol).si).toBe(50e6)
+  expect(fitted(rifle, 28e6).si).toBe(28e6)
 })
 
 it("keeps the user's own default of Settings", () => {
@@ -79,4 +106,10 @@ const written = (followed: boolean, now: number, suggestion: number) => {
 it('writes the default of a new bullet over the one before, and never over a typed value', () => {
   expect(written(true, cited, 24.3e6)).toEqual([['startPressure', 24.3e6]])
   expect(written(false, 31e6, 24.3e6)).toEqual([])
+})
+
+it('maps every structure of the bullet schema in the one table of core', () => {
+  const structures = constructionFields.shape.structure.unwrap().options
+  expect(structures.filter((s) => !Object.hasOwn(bulletStructures, s))).toEqual([])
+  expect(Object.keys(bulletStructures).sort()).toEqual([...structures].sort())
 })
