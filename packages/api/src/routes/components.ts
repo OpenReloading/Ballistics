@@ -104,10 +104,7 @@ const powderList = page(
         trainingCartridges: true,
       })
       .extend({
-        retrieved: z.iso
-          .date()
-          .optional()
-          .describe('ISO date the fitted sources were read, the latest of them.'),
+        retrieved: z.iso.date().optional().describe('ISO date the latest fitted source was read.'),
       })
       .optional(),
   }),
@@ -167,7 +164,7 @@ const manufacturerList = page(
   manufacturer.pick({ id: true, name: true, aliases: true, website: true }),
 )
 
-/** `GET /manufacturers`, `GET /powders`, `GET /primers`, `GET /bullets`, `GET /cases` and their `/:id` routes. */
+/** `GET` of `/manufacturers`, `/powders`, `/primers`, `/bullets` and `/cases`, and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -181,7 +178,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: manufacturerList,
         summary: 'List manufacturers',
         description:
-          'Every manufacturer with its aliases and website, ordered by name, digit runs in numeric order.',
+          'Every manufacturer with aliases and website, ordered by name, digit runs in numeric order.',
       },
     },
     (_request, reply) => reply.send(catalogue.manufacturers()),
@@ -220,7 +217,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
       bulletQuery,
       bulletList,
       bullet.extend({ revision }),
-      'Each item carries diameter (mm, null where the record has none), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction. A record that only names the bullet carries nameOnly.',
+      'Each item carries diameter (mm, null where the record has none), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction. `nameOnly` marks a record that only names the bullet.',
     ],
   ] as const) {
     app.get<{ Querystring: BulletQuery }>(
@@ -247,7 +244,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
           errors: [404],
           moved: true,
           summary: `Get a ${noun}`,
-          description: `The whole ${noun} record with its provenance.${noun === 'bullet' ? ' `revision` is a hash of the stored record that changes with any field.' : ''}`,
+          description: `The ${noun} record with its provenance.${noun === 'bullet' ? ' `revision` is a hash of the stored record, changes with any field.' : ''}`,
         },
       },
       (request, reply) => {
@@ -267,7 +264,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: primerList,
         summary: 'List primers',
         description:
-          'A page of primer products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the primers whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. `size` and `compound` keep one size and one priming compound. Each item carries the size, the magnum flag and the priming compound where the record has them.',
+          'A page of primer products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the primers whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. `size` and `compound` keep one size and one priming compound. Each item carries size, magnum flag and compound where the record has them.',
       },
     },
     (request, reply) => reply.send(catalogue.primers(request.query)),
@@ -281,7 +278,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         errors: [404],
         moved: true,
         summary: 'Get a primer',
-        description: 'The whole primer record with its provenance.',
+        description: 'The primer record with its provenance.',
       },
     },
     (request, reply) => {
@@ -317,7 +314,7 @@ export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         moved: true,
         summary: 'Get a case',
         description:
-          'The whole case record with its provenance and `origin`. `revision` is a hash of the stored record that changes with any field.',
+          'The case record with its provenance and `origin`. `revision` is a hash of the stored record, changes with any field.',
       },
     },
     (request, reply) => {

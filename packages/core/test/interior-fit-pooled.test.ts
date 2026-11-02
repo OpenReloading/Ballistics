@@ -118,8 +118,12 @@ const parameter = (fit: PooledPowderFit, kind: string, group: string) => {
 }
 
 describe('fitPowderPooled', () => {
+  /** Exact strings of every setup and their fit, shared by the tests that read them. */
+  const data = strings(normals(1), charges, 0)
+  const exact = fitPowderPooled(data)
+
   it('recovers the burn coefficient per powder and the factor per rifle within 3 standard uncertainties', () => {
-    const fit = fitPowderPooled(strings(normals(1), charges, 0))
+    const fit = exact
     expect(fit.parameters.map((p) => p.kind)).toEqual([
       'burnRate',
       'burnRate',
@@ -197,7 +201,7 @@ describe('fitPowderPooled', () => {
   })
 
   it('adds the spread of a rifle it has not seen', () => {
-    const fit = fitPowderPooled(strings(normals(1), charges, 0))
+    const fit = exact
     const known = predictPooled(fit, nth(setups, 3), 2.8e-3)
     const unseen = predictPooled(fit, { ...nth(setups, 3), rifle: 'r9' }, 2.8e-3)
     expect(unseen.parameterUncertainty).toBeGreaterThan(0.9 * fit.rifleSigma * unseen.value)
@@ -226,8 +230,7 @@ describe('fitPowderPooled', () => {
   })
 
   it('holds a burn coefficient at a tight prior', () => {
-    const data = strings(normals(1), charges, 0)
-    const free = fitPowderPooled(data)
+    const free = exact
     const fit = fitPowderPooled(data, { priors: { C: { burnRate: { value: 0.6, sigma: 1e-6 } } } })
     expect(parameter(fit, 'burnRate', 'C').value).toBeCloseTo(0.6, 4)
     expect(parameter(free, 'burnRate', 'C').value).toBeCloseTo(0.55, 2)
@@ -261,8 +264,6 @@ describe('fitPowderPooled', () => {
   })
 
   describe('refusals', () => {
-    const data = strings(normals(1), charges, 0)
-
     it.each(['exponent', 'form'])('refuses the %s from velocities', (name) => {
       const error = failure(() =>
         fitPowderPooled(data, { parameters: ['burnRate', name as PooledRequest] }),

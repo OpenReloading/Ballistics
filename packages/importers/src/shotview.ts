@@ -74,8 +74,7 @@ const footerLabels: [string[], string[], string[]] = [
 ]
 
 /**
- * Parses a ShotView CSV text into one session with one string; velocity unit from the header
- * brackets.
+ * Parses a ShotView CSV text into one session with one string; velocity unit from the header brackets.
  */
 export function parseShotView(text: string, options: ChronoParserOptions = {}): ChronoImport {
   const lines = splitLines(text)
@@ -135,7 +134,7 @@ const dateLabels = ['DATE', 'DATUM']
 
 /**
  * Garmin Xero ShotView XLSX export: one session, one string per worksheet with a ShotView header
- * row. The date row is found by its label; the label is the first cell above the header.
+ * row. The date row is found by its label, the first cell above the header.
  */
 export function parseShotViewWorkbook(book: Workbook, options: WorkbookOptions = {}): ChronoImport {
   const warnings: string[] = []

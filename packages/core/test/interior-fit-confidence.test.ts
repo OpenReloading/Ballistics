@@ -12,32 +12,20 @@ import {
   powderPressureRange,
   similarPowdersPrior,
 } from '../src/index.ts'
+import { load as rifleLoad } from './powder-load.ts'
 
-/** Synthetic rifle load (apps/docs/docs/models/interior-powder-fit.md): truth B_a 0.45 1/s, p_st 30 MPa. */
-const load = (vivacity = 0.45): InteriorLoad => ({
-  chamber: { volume: 3.4e-6, boreArea: 3.75e-5, boreDiameter: 6.9e-3 },
-  barrel: { length: 0.6, twist: 0.254 },
-  bullet: { mass: 0.0095 },
-  charge: 0.0028,
-  propellant: {
-    specificEnergy: 3.9e6,
-    gamma: 1.23,
-    density: 1600,
-    covolume: 1e-3,
-    burn: {
-      kind: 'vivacity',
-      vivacity,
-      exponent: 1,
-      referencePressure: 98066.5,
-      form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
+/** The synthetic rifle load with a temperature sensitivity and bore friction. */
+const load = (vivacity = 0.45): InteriorLoad => {
+  const l = rifleLoad(vivacity)
+  return {
+    ...l,
+    propellant: {
+      ...l.propellant,
+      temperatureSensitivity: { reference: 294.15, cold: 0.004, hot: 0.004 },
     },
-    temperatureSensitivity: { reference: 294.15, cold: 0.004, hot: 0.004 },
-  },
-  propellantTemperature: 294.15,
-  ignitionPressure: 5e6,
-  startPressure: 30e6,
-  resistance: { friction: 2e6 },
-})
+    resistance: { friction: 2e6 },
+  }
+}
 const charges = [2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3, 3e-3]
 /** Fixed noise pattern in units of sigma. */
 const noise = [1, -1, 0.5, -1.5, 0.8]
@@ -64,9 +52,11 @@ const ladder = (withPressure: readonly number[] = [], n = 0, at = charges): Ladd
 const fitLadder = (points: LadderPoint[], start = load(0.4)): PowderFit => fitPowder(start, points)
 const velocityOnly = ladder()
 const withPressure = ladder([2.8e-3])
+/** The velocity-only fit and its pressure range, shared by the tests that read them. */
+const velocityFit = fitLadder(velocityOnly)
+const velocityRange = powderPressureRange(velocityFit, velocityOnly)
 
 describe('powder pressure range', () => {
-  const velocityRange = powderPressureRange(fitLadder(velocityOnly), velocityOnly)
   const pressureRange = powderPressureRange(fitLadder(withPressure), withPressure)
 
   it('is wider for a velocity-only fit than with one pressure row on the same ladder', () => {
@@ -135,7 +125,7 @@ describe('powder pressure range', () => {
       measured: 0.005,
       estimated: 0.03,
     })
-    const narrow = powderPressureRange(fitLadder(velocityOnly), velocityOnly, {
+    const narrow = powderPressureRange(velocityFit, velocityOnly, {
       inputs: { caseCapacity: { basis: 'measured' } },
     })
     expect(narrow.relativeHalfWidth).toBeLessThan(velocityRange.relativeHalfWidth)
@@ -143,7 +133,7 @@ describe('powder pressure range', () => {
       basis: 'measured',
       standardUncertainty: 0.005,
     })
-    const extra = powderPressureRange(fitLadder(velocityOnly), velocityOnly, {
+    const extra = powderPressureRange(velocityFit, velocityOnly, {
       inputs: {
         bulletMass: { standardUncertainty: 0.02 },
         boreFriction: { standardUncertainty: 0 },
@@ -167,7 +157,7 @@ describe('powder pressure range', () => {
   })
 
   it('marks points outside the ladder and evaluates at their conditions', () => {
-    const range = powderPressureRange(fitLadder(velocityOnly), velocityOnly, {
+    const range = powderPressureRange(velocityFit, velocityOnly, {
       points: [{ charge: 3.2e-3, barrelLength: 0.5 }, { charge: 2.8e-3 }],
     })
     expect(range.extrapolated).toBe(true)
@@ -176,19 +166,17 @@ describe('powder pressure range', () => {
   })
 
   it('reports an input whose refit fails and refuses bad options', () => {
-    const range = powderPressureRange(fitLadder(velocityOnly), velocityOnly, {
+    const range = powderPressureRange(velocityFit, velocityOnly, {
       // the shifted start pressure stays valid, a chamber twenty times larger has no valid run
       inputs: { caseCapacity: { standardUncertainty: 50 } },
     })
     expect(nth(range.contributions, 0).skipped).toBe('refit-failed')
     expect(() =>
-      powderPressureRange(fitLadder(velocityOnly), velocityOnly, {
+      powderPressureRange(velocityFit, velocityOnly, {
         inputs: { gamma: { standardUncertainty: -1 } },
       }),
     ).toThrow(InputError)
-    expect(() =>
-      powderPressureRange(fitLadder(velocityOnly), velocityOnly, { points: [] }),
-    ).toThrow(InputError)
+    expect(() => powderPressureRange(velocityFit, velocityOnly, { points: [] })).toThrow(InputError)
   })
 })
 
@@ -251,8 +239,6 @@ describe('prior from similar powders', () => {
 })
 
 describe('confidence label', () => {
-  const velocityFit = fitLadder(velocityOnly)
-  const velocityRange = powderPressureRange(velocityFit, velocityOnly)
   const rules = (range: typeof velocityRange, width: number) => ({
     ...range,
     relativeHalfWidth: width,
@@ -316,28 +302,21 @@ describe('confidence label', () => {
     const bent = ladder().map((x, i) => ({ ...x, muzzleVelocity: x.muzzleVelocity + (i - 2) * 6 }))
     const f = fitLadder(bent)
     expect(f.dataChiSquare / f.residuals.length).toBeGreaterThan(1)
-    const r = powderPressureRange(f, bent)
-    expect(powderConfidence(f, r).reasons).toContain('residual-trend')
-    const noisy = ladder([], 1)
-    const g = fitLadder(noisy)
-    expect(powderConfidence(g, powderPressureRange(g, noisy)).reasons).not.toContain(
-      'residual-trend',
-    )
+    // the trend is read from the fit alone: any range will do
+    expect(powderConfidence(f, velocityRange).reasons).toContain('residual-trend')
+    const g = fitLadder(ladder([], 1))
+    expect(powderConfidence(g, velocityRange).reasons).not.toContain('residual-trend')
     // an unweighted ladder is never tested for a trend
-    const bare = bent.map(({ velocitySigma: _, ...x }) => x)
-    const h = fitLadder(bare)
-    expect(powderConfidence(h, powderPressureRange(h, bare)).reasons).not.toContain(
-      'residual-trend',
-    )
+    const h = fitLadder(bent.map(({ velocitySigma: _, ...x }) => x))
+    expect(powderConfidence(h, velocityRange).reasons).not.toContain('residual-trend')
   })
 
   it('flags a start pressure that moves with the burn coefficient', () => {
     const f = fitPowder(load(0.4), ladder([2.6e-3, 3e-3]), {
       parameters: ['burnRate', 'startPressure'],
     })
-    const r = powderPressureRange(f, ladder([2.6e-3, 3e-3]), {
-      fit: { parameters: ['burnRate', 'startPressure'] },
-    })
+    // the correlation is read from the fit alone: any range will do
+    const r = velocityRange
     const correlated = {
       ...f,
       correlation: [

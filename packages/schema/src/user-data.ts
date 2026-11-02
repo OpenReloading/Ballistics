@@ -12,7 +12,7 @@ import { faceColour } from './target-face.ts'
 import { targetSheet } from './target-sheet.ts'
 import { quantity } from './units.ts'
 
-/** Value of `format` in every user data file, telling it apart from other JSON. */
+/** Value of `format` in every user data file. */
 export const userDataFormat = 'openreloading-user-data'
 /** Current `version` of a user data file: a file of any other version is refused. */
 export const userDataVersion = 1
@@ -29,7 +29,7 @@ const basedOnRevision = z
   .min(1)
   .max(64)
   .describe(
-    'The `revision` the base record had when the record was saved. A different revision on opening means the base changed since.',
+    'The `revision` of the base record when saved. A different revision on opening means the base changed.',
   )
 
 /**
@@ -105,9 +105,7 @@ export const userPowderFit = z.strictObject({
     .array(fitParameter)
     .min(1)
     .refine((ps) => new Set(ps).size === ps.length, 'Duplicate parameter')
-    .describe(
-      'The parameters the fit freed: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor`. The others kept the values of the input.',
-    ),
+    .describe('The parameters the fit freed. The others kept the values of the input.'),
   options: z
     .strictObject({
       prior: z
@@ -133,7 +131,7 @@ export const userPowderFit = z.strictObject({
             threshold: z.number().positive().describe('Threshold in sigmas of the rows, 1.'),
           }),
         ])
-        .describe('Loss of the fit: `quadratic`, or `huber` with its threshold.'),
+        .describe('Loss of the fit.'),
     })
     .describe('Prior and loss of the fit.'),
   date: z.iso.datetime().describe('Time of the fit, ISO 8601 in UTC.'),
@@ -375,7 +373,7 @@ const base = {
     .optional(),
 }
 
-/** Why a bullet, cartridge, powder or case group id that is no UUID is refused: a load refers to the record by `user:<UUID>`. */
+/** Why an id of a bullet, cartridge, powder or case group that is no UUID is refused: a load refers to it by `user:<UUID>`. */
 export const designIdProblem: string =
   'The id of a bullet, cartridge, powder or case group must be a UUID, so that a load can refer to it.'
 
@@ -386,7 +384,7 @@ const record = <K extends string, D extends z.ZodType>(
   id: z.ZodType<string> = base.id,
 ) =>
   z.object({
-    kind: z.literal(kind).describe(`Kind of the record: \`${kind}\`.`),
+    kind: z.literal(kind).describe('Kind of the record.'),
     ...base,
     id,
     data: data.describe(description),
@@ -508,13 +506,13 @@ export const embeddedFile = z.object({
  * its target sheets in the optional `files`.
  */
 export const userDataFile = z.object({
-  format: z.literal(userDataFormat).describe('Format of the file: `openreloading-user-data`.'),
+  format: z.literal(userDataFormat).describe('Format of the file.'),
   version: z.literal(userDataVersion).describe('Format version of the file.'),
   records: z
     .array(userRecord)
     .refine((rs) => new Set(rs.map((r) => r.id)).size === rs.length, 'Duplicate record id')
     .describe(
-      'The records of the file. The app skips a record of a kind it does not list here and reports the kind with its count, so that a later version can add kinds; it does not keep the skipped records.',
+      'The records of the file. The app skips a record of a kind not listed here and reports the kind with its count; it does not keep the skipped records.',
     ),
   files: z
     .array(embeddedFile)
@@ -523,10 +521,10 @@ export const userDataFile = z.object({
     .optional(),
 })
 
-/** Records of a user data file, as {@link checkUserRefs} takes them. */
+/** Records of a user data file. */
 export type UserRecords = UserRecord[]
 
-/** A reference of a user record that points at no record of the set given to {@link checkUserRefs}. */
+/** A reference that points at no record of the set given to {@link checkUserRefs}. */
 export interface DanglingRef {
   /** Id of the record that holds the reference. */
   record: string
@@ -540,13 +538,13 @@ export interface DanglingRef {
 
 /**
  * The references of `records` to user records that no record of `records` answers: a load's
- * `firearm`, `cartridge`, `bullet`, `powder`, `capacity` and `case.record`, the `manufacturer` of its case, a bullet's and a firearm's `manufacturer`, a firearm's `landsBullet`, a capacity's
- * `cartridge` and `caseManufacturer` (only as `user:<id>`), a case's `cartridge`, `manufacturer` and `capacity`, a load's `sessions`, a session's device
- * `manufacturer` and the `load` of its strings, and a target sheet's `load` and the `session` of
+ * `firearm`, `cartridge`, `bullet`, `powder`, `capacity`, `case.record`, `case.manufacturer` and
+ * `sessions`, a bullet's and a firearm's `manufacturer`, a firearm's `landsBullet`, a capacity's
+ * `cartridge` and `caseManufacturer`, a case's `cartridge`, `manufacturer` and `capacity`, a session's
+ * device `manufacturer` and the `load` of its strings, a target sheet's `load` and the `session` of
  * its group shots, an event's `firearm`, `load` and the `targetSheet` of its ring series, and a
- * shooting log entry's `firearm`, `load` and `event`. A
- * `user:<id>` reference names a record by its id, a
- * `catalogue:` reference is not checked here. Reports only: nothing is dropped.
+ * shooting log entry's `firearm`, `load` and `event`. A `user:<id>` reference names a record by its
+ * id; a `catalogue:` reference is not checked. Reports only: nothing is dropped.
  */
 export function checkUserRefs(records: UserRecords): DanglingRef[] {
   const kindOf = new Map(records.map((r) => [r.id, r.kind]))
@@ -563,7 +561,7 @@ export function checkUserRefs(records: UserRecords): DanglingRef[] {
   return dangling
 }
 
-/** A user record as {@link userRefFields} reads it: any {@link UserRecord}. */
+/** A user record as {@link userRefFields} reads it. */
 export interface RecordOfUser {
   kind: UserRecordKind
   data: unknown
@@ -677,33 +675,33 @@ export function versionProblem(json: unknown): string | undefined {
     return `The file has format version ${JSON.stringify(f.version)}; this app reads version ${userDataVersion}.`
 }
 
-/** A user manufacturer: its `name` is the record's name. */
+/** A user manufacturer. */
 export interface UserManufacturer extends z.infer<typeof userManufacturer> {}
-/** A user powder: the fields of a powder entered in the designer, a draft until the record is valid. */
+/** A user powder: the designer's fields, a draft until the record is valid. */
 export interface UserPowder extends z.infer<typeof userPowder> {}
-/** What a fitted user powder was fitted to: its points, freed parameters, options and result. */
+/** What a fitted user powder was fitted to. */
 export interface UserPowderFit extends z.infer<typeof userPowderFit> {}
 /** A user bullet: a variant of a catalogue bullet, or a bullet of its own. */
 export interface UserBullet extends z.infer<typeof userBullet> {}
 /** A user cartridge: a variant of a catalogue cartridge, or a cartridge of its own. */
 export interface UserCartridge extends z.infer<typeof userCartridge> {}
-/** The user record of kind `caseCapacity`: a case capacity the user measured. */
+/** The user record of kind `caseCapacity`. */
 export type UserCaseCapacity = Extract<UserRecord, { kind: 'caseCapacity' }>
-/** The user record of kind `case`: a group of the user's cases with their measured values. */
+/** The user record of kind `case`. */
 export type UserCaseRecord = Extract<UserRecord, { kind: 'case' }>
-/** A target face of the face designer: rings, inner ten, black area and events, each optional. */
+/** A target face of the face designer, each field optional. */
 export interface TargetFaceDesign extends z.infer<typeof targetFaceDesign> {}
-/** An entry of the shooting log: day, place, firearm, load or ammunition, rounds and result. */
+/** An entry of the shooting log. */
 export interface ShootingLogEntry extends z.infer<typeof shootingLogEntry> {}
 /** The user record of kind `shootingLogEntry`. */
 export type ShootingLogRecord = Extract<UserRecord, { kind: 'shootingLogEntry' }>
-/** The user record of kind `session`: a chronograph session. */
+/** The user record of kind `session`. */
 export type SessionRecord = Extract<UserRecord, { kind: 'session' }>
 /** The user record of kind `targetSheet`. */
 export type TargetSheetRecord = Extract<UserRecord, { kind: 'targetSheet' }>
-/** One record of a user data file: `kind`, id, name, save time and `data`. */
+/** One record of a user data file. */
 export type UserRecord = z.infer<typeof userRecord>
-/** Discriminator of a user record: `manufacturer`, `bullet`, `cartridge`, `powder`, `caseCapacity`, `load`, `firearm`, `session`, `targetSheet`, `targetFaceDesign`, `case` or `shootingLogEntry`. */
+/** Discriminator of a user record. */
 export type UserRecordKind = UserRecord['kind']
-/** A base64 photo stored in a user data file, referenced by id. */
+/** A base64 photo of a user data file, referenced by id. */
 export interface EmbeddedFile extends z.infer<typeof embeddedFile> {}

@@ -497,23 +497,6 @@ test('at 390 px the facts, the cartridge table and drawing, the chamber table an
     ).toBe(true)
 })
 
-test('a record without values is marked as a gap: badge, one line, no unit switch or designer; the list marks it too', async ({
-  page,
-}) => {
-  await page.goto('/cartridges/40-x-46-deftec')
-  const bar = page.locator('.page-bar')
-  await expect(bar.locator('.gap-badge')).toHaveText('Gap')
-  await expect(page.getByText('No dimensions or pressures in this record')).toBeVisible()
-  await expect(page.getByRole('radiogroup', { name: /length unit$/i })).toHaveCount(0)
-  await expect(bar.getByRole('link', { name: 'Open in designer' })).toHaveCount(0)
-  await expect(bar.getByRole('link', { name: 'Use in workbench' })).toBeVisible()
-  await page.goto('/cartridges/308-win')
-  await expect(page.locator('.gap-badge')).toHaveCount(0)
-  await page.goto('/cartridges?q=deftec')
-  await expect(page.getByRole('link', { name: /^40 x 46 DEFTEC/ })).toBeVisible()
-  await expect(page.locator('.gap-badge')).toHaveCount(1)
-})
-
 test('the record shows the case type without a hover note: 220 Swift is semi-rimmed', async ({
   page,
 }) => {

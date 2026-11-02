@@ -220,17 +220,13 @@ const unique = (ids: string[], path: (i: number) => PropertyKey[], ctx: z.Refine
       ctx.addIssue({ code: 'custom', message: 'Duplicate id', path: path(i) })
   })
 
-/**
- * What kind of firearm a firearm record is, where it states it: a revolver has a gap between cylinder
- * and barrel that a pistol and a rifle do not.
- */
+/** Kind of firearm where the record states it: a revolver has a gap between cylinder and barrel. */
 export const firearmAction = z.enum(['rifle', 'pistol', 'revolver'])
 
 /**
  * A firearm, one shape for every origin: lengths in mm, mass in g, angles in degrees, zero air in
- * degC, bar and %. The maker is a manufacturer reference. Optic and configuration ids are unique, each
- * mount names an optic of the firearm and `active` names one of its configurations. A record of an
- * older format with the maker as text fails the schema.
+ * degC, bar and %. Optic and configuration ids are unique, each mount names an optic of the firearm
+ * and `active` names one of its configurations. A record with the maker as text fails the schema.
  * Inferred type: {@link Firearm}.
  */
 export const firearm = z
@@ -242,9 +238,7 @@ export const firearm = z
     manufacturer: ref('manufacturer').describe('Reference to the maker of the firearm.').optional(),
     model: text(200).describe('Model name.').optional(),
     action: firearmAction
-      .describe(
-        'What kind of firearm it is: a revolver has a gap between cylinder and barrel. Absent: not stated.',
-      )
+      .describe('A revolver has a gap between cylinder and barrel. Absent: not stated.')
       .optional(),
     cartridge: ref('cartridge')
       .describe('Reference to the cartridge the firearm is chambered for.')

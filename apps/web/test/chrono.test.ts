@@ -23,14 +23,8 @@ import { stringStats } from '../src/lib/string-stats.ts'
 import { unitsOf } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 
-/** OpenReloading CSV template with made-up velocities. */
-const template = [
-  'string,velocity,velocityUnit,coldBore,excluded',
-  'A,2795,fps,yes,',
-  'A,2810,fps,,',
-  'A,2803,fps,,flyer',
-  'B,2831,fps,,',
-].join('\n')
+/** The CSV template the page offers, with made-up velocities. */
+const template = templateCsv
 const fps = 0.3048
 const bytes = (s: string) => new TextEncoder().encode(s)
 const shot = (value: number, excluded?: string): Shot => ({
@@ -151,12 +145,6 @@ it('offers a JSON template and exports a session as JSON that reads back', async
   expect(back.session.strings).toEqual(read.session.strings)
   expect(back.stringLabels).toEqual(['A', 'B'])
   expect(sessionJsonBlob(read).type).toBe('application/json')
-})
-
-it('offers a CSV template the importer reads as the template', async () => {
-  const read = await readChrono(new TextEncoder().encode(templateCsv), { fileName: 't.csv' })
-  expect(read.format).toBe('openreloading-csv')
-  expect(read.session.strings.map((s) => s.shots.length)).toEqual([3, 1])
 })
 
 describe('readSession', () => {

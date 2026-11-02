@@ -30,8 +30,8 @@ const parsesAsUrl = (text: string) => {
 }
 
 /**
- * One cited source: title, optional publisher, page, URL, retrieval date and SHA-256 of the file (64
- * lowercase hex digits), and the terms its data is used under.
+ * One cited source: title, publisher, page, URL, retrieval date, SHA-256 of the file and the terms
+ * its data is used under.
  * Inferred type: {@link Source}.
  */
 export const source = z.object({

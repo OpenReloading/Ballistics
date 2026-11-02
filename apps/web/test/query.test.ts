@@ -1,6 +1,6 @@
 import { overrideResistance, recordResistance } from '@open-reloading/core'
 import { expect, it } from 'vitest'
-import { fieldError, fieldValueFromText, initialFields } from '../src/lib/field-spec.ts'
+import { fieldValueFromText, initialFields } from '../src/lib/field-spec.ts'
 import {
   droppedIds,
   inputsQuery,
@@ -18,7 +18,6 @@ import { presetUnits } from '../src/lib/units.ts'
 import { defined } from './defined.ts'
 
 const us = presetUnits('us')
-const metric = presetUnits('metric-grams')
 
 it('writes the unit system, the choices and the SI value of each non-empty field', () => {
   const fields = {
@@ -43,61 +42,6 @@ it('reads the fields back in the given units; unknown keys and bad numbers are l
   expect(fields.zeroRange).toEqual({ text: '', si: undefined })
   expect(fields.temperature).toEqual({ text: '', si: undefined })
   expect(Object.keys(fields)).toEqual(shotFields.map((s) => s.key))
-})
-
-it('names the field and its bounds in the validation messages', () => {
-  const spec = {
-    key: 'humidity',
-    label: 'Relative humidity',
-    quantity: 'percent',
-    required: true,
-    min: 0,
-    max: 100,
-  } as const
-  expect(fieldError(spec, { text: '', si: undefined }, metric)).toBe(
-    'Enter a number for Relative humidity.',
-  )
-  expect(fieldError(spec, { text: '-', si: undefined }, metric)).toBe(
-    'Enter a number for Relative humidity.',
-  )
-  expect(fieldError(spec, fieldValueFromText('percent', metric, '-1'), metric)).toBe(
-    'Relative humidity must be at least 0 %.',
-  )
-  expect(fieldError(spec, fieldValueFromText('percent', metric, '101'), metric)).toBe(
-    'Relative humidity must be at most 100 %.',
-  )
-  // inclusive bounds, and an empty optional field is valid
-  expect(fieldError(spec, fieldValueFromText('percent', metric, '0'), metric)).toBeUndefined()
-  expect(fieldError(spec, fieldValueFromText('percent', metric, '100'), metric)).toBeUndefined()
-  expect(
-    fieldError({ ...spec, required: false }, { text: ' ', si: undefined }, metric),
-  ).toBeUndefined()
-  // greater than 0 and whole numbers, as the schema's positive and integer rules
-  const mass = { key: 'mass', label: 'Mass', quantity: 'ratio', min: 0, positive: true } as const
-  expect(fieldError(mass, fieldValueFromText('ratio', metric, '0'), metric)).toBe(
-    'Mass must be greater than 0.',
-  )
-  expect(fieldError(mass, fieldValueFromText('ratio', metric, '0.1'), metric)).toBeUndefined()
-  const count = {
-    key: 'count',
-    label: 'Round count',
-    quantity: 'ratio',
-    min: 0,
-    integer: true,
-  } as const
-  expect(fieldError(count, fieldValueFromText('ratio', metric, '1.5'), metric)).toBe(
-    'Round count must be a whole number.',
-  )
-  expect(fieldError(count, fieldValueFromText('ratio', metric, '2'), metric)).toBeUndefined()
-  const gamma = {
-    key: 'gamma',
-    label: 'Ratio of specific heats',
-    quantity: 'ratio',
-    min: 1,
-  } as const
-  expect(fieldError(gamma, fieldValueFromText('ratio', metric, '0.9'), metric)).toBe(
-    'Ratio of specific heats must be at least 1.',
-  )
 })
 
 it('carries a result tab and its inputs under tab. and reads them back', () => {

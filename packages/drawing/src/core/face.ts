@@ -12,7 +12,7 @@ export const arrowTailLengths = 2.2
 export const extensionGap = 0.5
 /** How far an extension line runs past its dimension line, mm. */
 export const overrun = 0.9
-/** Text size of the old face; the lane distances below are at this size. */
+/** Text size the lane distances below are given at, mm. */
 export const baseEm = 1.6
 /** At 1.6 em: distance from the widest radius to the first lane of length dimensions, mm. */
 export const firstLaneOffset = 3.0

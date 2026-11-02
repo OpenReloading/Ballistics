@@ -1,7 +1,7 @@
 /**
- * Response schemas of the interior compute routes, for the contract document. Every object is
- * loose, so fields core adds later do not break the document. A non-finite number in an interior
- * answer is a 422, so only the fields core defines as null are nullable.
+ * Response schemas of the interior compute routes. Every object is loose, so fields core adds
+ * later do not break the document. A non-finite number in an interior answer is a 422, so only the
+ * fields core defines as null are nullable.
  */
 import { advisoryIds } from '@open-reloading/core'
 import { provenance } from '@open-reloading/schema'

@@ -11,12 +11,18 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Ajv2020 } from 'ajv/dist/2020.js'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { run } from '../src/main.ts'
 import { result } from '../src/result.ts'
 import { resultJsonSchema } from '../src/write-json-schema.ts'
 import { rowsPath } from './data.ts'
 import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
+
+vi.mock('@open-reloading/data', async (original) =>
+  (await import('./records-memo.ts')).memoRecords(
+    await original<typeof import('@open-reloading/data')>(),
+  ),
+)
 
 const schemaPath = join(import.meta.dirname, '../schema/result.schema.json')
 const worse = new URL('./fixtures/worse-model.mjs', import.meta.url).pathname

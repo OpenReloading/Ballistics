@@ -114,7 +114,7 @@ import { generatedName, loadName } from '../lib/load-tabs.ts'
 import { type ManufacturerNames, productLabel } from '../lib/manufacturers.ts'
 import { attachLoad, sessionRef } from '../lib/measurements.ts'
 import { nth } from '../lib/nth.ts'
-import { powderValues, recordFill } from '../lib/powder-compare.ts'
+import { fittedAtDefaultStart, powderValues, recordFill } from '../lib/powder-compare.ts'
 import { type PowderDesign, powderDesigns, powderOf } from '../lib/powder-designer.ts'
 import { unchangedFromRecord } from '../lib/powder-record.ts'
 import { tuneDetail, tuneHeld, writeTuneLoad } from '../lib/powder-tune.ts'
@@ -875,11 +875,12 @@ function withStartPressure(
     barrel: number | undefined
     construction: Parameters<typeof startPressureDefault>[0]['construction']
     current: number
+    fittedPowder: boolean
     system: UnitSystem
     t: Translator['t']
   },
 ): Suggestions {
-  const { barrel, construction, current, system, t } = a
+  const { barrel, construction, current, fittedPowder, system, t } = a
   const show = {
     text: (si: number) => formatQuantity('pressure', system, si),
     unit: system.pressure.symbol,
@@ -890,6 +891,7 @@ function withStartPressure(
       barrel: barrel ?? base.barrelLength?.si,
       construction,
       current,
+      fittedPowder,
       show,
       t,
     }),
@@ -2476,7 +2478,7 @@ export function useWorkbenchState() {
     const now = runValues(as)
     const seating = runSeatingOf(now)
     const { body, bulkDensity, missing, sensitivityDefault } = interiorRequest({
-      values: powderValues(siValues(now.fields), chosenPowder, as, suggestions.startPressure?.si),
+      values: powderValues(siValues(now.fields), chosenPowder, as, fittedStart),
       powder: chosen,
       // a missing powder record: the bulk density and the bore resistance its link carried
       linked: as ? undefined : linkedPowder,
@@ -2507,7 +2509,7 @@ export function useWorkbenchState() {
       cartridge?.g1,
       groove?.id === cartridge?.id ? groove?.z : undefined,
       // a compared powder without its own start pressure runs at this default
-      suggestions.startPressure?.si,
+      fittedStart,
       // the range tolerance of an approximate volume, which the body of the rows does not hold
       volumeTolerance,
     ]
@@ -3304,13 +3306,21 @@ export function useWorkbenchState() {
     },
     t,
   )
-  const suggestions = withStartPressure(baseSuggestions, {
+  const startInputs = {
     barrel: seated.barrelField,
     construction: bulletRecord?.construction,
     current: defaults.startPressure,
     system,
     t,
+  }
+  const suggestions = withStartPressure(baseSuggestions, {
+    ...startInputs,
+    // a powder design was typed, not fitted: it takes the rule by construction
+    fittedPowder: fittedAtDefaultStart(powder),
   })
+  // a compared powder record without a start pressure of its own runs at the default of its fit
+  const fittedStart = withStartPressure(baseSuggestions, { ...startInputs, fittedPowder: true })
+    .startPressure?.si
   // the references the load keeps; one that cannot be written (a design or firearm whose id is no
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)

@@ -52,9 +52,9 @@ function merge(base: unknown, over: Plain): Plain {
  * as a whole, an explicit `null` removes a field. A quantity (an object with a `value`) replaces as
  * a whole. The exception is `values` of a cartridge: its entries are matched by
  * `(side, symbol, variant)`, an entry replaces the one with its key or is added at the end, and an
- * entry whose `value` is `null` removes that value. The one function behind every user variant of
- * a catalogue record (`basedOn` with `overrides`). Overrides on an empty base give a record of the
- * overridden fields alone.
+ * entry whose `value` is `null` removes that value. Behind every user variant of a catalogue record
+ * (`basedOn` with `overrides`). Overrides on an empty base give a record of the overridden fields
+ * alone.
  */
 export function applyOverrides<T extends object>(base: T, overrides: object | null | undefined): T {
   if (!overrides) return base
@@ -178,9 +178,9 @@ type PowderDraftFields = Overrides<
  * The fields of a powder in the powder designer while the draft is unfinished: any of the powder
  * record's fields but `id`, `manufacturer`, `name`, `country`, `provenance` and `listedCartridges`
  * (it needs a source naming it, which the designer does not write), every one optional, nested
- * objects likewise, in the stored units, the numbers without the powder record's bounds (a
- * half-typed value stays in the draft). The designer builds a {@link Powder} from it and
- * checks that against `powder`.
+ * objects likewise, in stored units, the numbers without the powder record's bounds (a half-typed
+ * value stays in the draft). The designer builds a {@link Powder} from it and checks that against
+ * `powder`.
  * Inferred type: {@link PowderDraft}.
  */
 export const powderDraft = overridesOf(
