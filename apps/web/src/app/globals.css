@@ -7950,6 +7950,28 @@ main .field-table tr.field-group > th {
     justify-content: center;
   }
 
+  /* the drawing first: it gives way down to the width of its 11 px text (at most the 358 px
+     phone column, face.phoneColumn), then the table, its own scroll box. The figure is the
+     column (100cqw) here, so its least width reaches the flex item */
+  .side-panel:not(.side-undrawn) .side-body {
+    display: flex;
+  }
+
+  .side-panel:not(.side-undrawn) .side-figure {
+    flex: 0 10000 26rem;
+    order: -1;
+    container-type: normal;
+  }
+
+  .side-panel:not(.side-undrawn) .side-figure .drawing-figure {
+    container-type: inline-size;
+    min-width: var(--figure-readable, 0);
+  }
+
+  .side-panel:not(.side-undrawn) .side-body > .scroll {
+    min-width: 0;
+  }
+
   /* the table is the scroll box once the panel would pass the window's foot, with a scrollbar
      that stays (an overlay scrollbar shows nothing until scrolled) */
   .side-body > .scroll {
