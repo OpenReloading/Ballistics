@@ -72,7 +72,7 @@ export type Overlay = keyof typeof overlayNames
 /** Hover text of an overlay switch. */
 export const overlayHelp: Partial<Record<Overlay, Message>> = {
   ellipses: msg(
-    'Where a further shot lands with the stated coverage (50 %, 95 %), from the shots of the group. Absent below 3 shots.',
+    'Where the next shot will land with 50 % or 95 % probability, from the shots of the group. Absent below 3 shots.',
   ),
   dispersion: msg(
     'Describes the shots fired: the ellipses holding 50 % and 95 % of a normal spread with their covariance; dashed. Absent below 2 shots.',
@@ -1027,7 +1027,7 @@ export function TargetCanvas({
       </svg>
       <p id={`${id}-keys`} className="visually-hidden">
         {t(
-          'Shots of the active group are buttons in one tab stop: arrow keys, Home and End move the focus between them, Alt with the arrow keys moves the focused shot by {step} (with Shift {big}), E or Space excludes or includes it, Delete removes it. With the focus on the sheet itself, the arrow keys pan the view, and a double click zooms in at the pointer. While a point is marked, the arrow keys move the marker by a screen pixel (with Shift 10) and Enter sets it.',
+          'Shots of the active group are buttons in one tab stop: arrow keys, Home and End move the focus, Alt with the arrow keys moves the focused shot by {step} (with Shift {big}), E or Space excludes or includes it, Delete removes it. With the focus on the sheet, the arrow keys pan the view and a double click zooms in at the pointer. While a point is marked, the arrow keys move the marker by a screen pixel (with Shift 10) and Enter sets it.',
           { step: mmLength(system, 0.1), big: mmLength(system, 1) },
         )}
       </p>

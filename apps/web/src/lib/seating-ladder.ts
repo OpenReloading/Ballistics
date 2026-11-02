@@ -35,7 +35,7 @@ export function temperatureLadderBlockReason(
         { label: powderLabel },
       )
     : t(
-        'No powder is chosen. The model varies the burn rate with temperature only through the temperature sensitivity of the powder record.',
+        "No powder chosen: the model varies the burn rate with temperature only through the powder record's temperature sensitivity.",
       )
 }
 
@@ -66,7 +66,7 @@ export function temperatureLadder(
   const lo = Math.min(...values)
   if (!(lo > 0))
     return {
-      error: t('The ladder reaches {temperature}: a temperature of 0 K or less is no state.', {
+      error: t('The ladder reaches {temperature}; a temperature must be above 0 K.', {
         temperature: show(lo),
       }),
     }

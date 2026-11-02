@@ -114,12 +114,12 @@ const targetRecords = [
   'No target fits the rings found (dashed): choose a target, type the black diameter or set the scale.',
   'No target: no score.',
   'No targets match these filters.',
-  'Printed: the first {limit} of {total} targets in this selection.',
+  'Printed: the first {limit} of {total} targets.',
   'Ring marks fit a target with one bull',
   'Ring value, with tenths where the target has them; X: inner ten. Excluded shots show their value and do not count in the total.',
-  'Rule-book disciplines and their federations: distance, caliber classes and the targets they are shot on, each with its source.',
-  'Rule-book targets: ring diameters, black area and the disciplines shot on them, each with its source.',
-  'Shooting federations with the rule books their disciplines and targets are read from, each with its source.',
+  'Rule-book disciplines: federation, distance, caliber classes and targets.',
+  'Rule-book targets: ring diameters, black area and the disciplines shot on them.',
+  'Shooting federations and the rule books their disciplines and targets come from.',
   'Target designer',
   'Target fitted to {count} marks, misfit {misfit}.',
   'Targets ({count})',
@@ -128,11 +128,11 @@ const targetRecords = [
   'Targets table',
   'Targets, {filters}',
   'Tenths in the 10 zone of this target: own rule. The 10 zone is wider than one ring and the rule book does not divide it; tenths of the ring width are counted inward from the touching edge, 10.9 for the rest of the centre.',
-  'The published records, each with its source, and your own next to them: your firearms, cartridges, brass, primers, powders, bullets, targets, disciplines and federations.',
+  'The published records, each with its source, and your own beside them.',
   'The rings may be those of the {face}: choose it in Target to use it.',
   "The rings of the active group's target and each shot's value, when a target is chosen (Group).",
-  'The rule-book target on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one target may fit the rings: choose. Without a fit the targets are ranked by how well their rings match.',
-  'The rule-book target that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.',
+  'The rule-book target, found from the black area and the ring lines. It sets the scale and center and scores the group. If several fit, choose one; without a fit, targets are ranked by how well their rings match.',
+  'Rule-book target that scores the group. Excluded shots show their value but do not count in the total.',
   'The target could not be read: {reason}',
   'The target has no ring {value}',
   'The targets and stages of this discipline',
@@ -152,9 +152,9 @@ const otherSense: Record<string, string> = {
   'Case fill': 'the load ratio, whose verified term (Ladedichte) names no case',
   'single shot': 'a firearm action that is loaded by hand for each shot (Einzellader)',
   'Powder temperature': 'the compound Pulvertemperatur, the usual word, in a label of one line',
-  'The band is the 5th to 95th percentile of {samples} draws (seed {seed}, {failed} left the model) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
+  'The band is the 5th to 95th percentile of {samples} input draws (seed {seed}, {failed} left the model), normal around nominal with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
     'corner case: an extreme combination of inputs',
-  'The band is the 5th to 95th percentile of {samples} draws (seed {seed}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
+  'The band is the 5th to 95th percentile of {samples} input draws (seed {seed}), normal around nominal with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.':
     'corner case: an extreme combination of inputs',
   'The sampled bands are {notice}: the corner-case range is shown.':
     'corner case: an extreme combination of inputs',
@@ -195,7 +195,7 @@ const otherSense: Record<string, string> = {
   'Click the ring center, then a point on the ring.': 'click: a mouse click',
   'Click three points on the ring.': 'click: a mouse click',
   'Click the corners: top left, top right, bottom right, bottom left.': 'click: a mouse click',
-  'Point of aim, each group its own: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.':
+  "Each group's point of aim: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.":
     'click: a mouse click',
   'A drawn target. Place shots, then click where each shot hit. Or add a photo of the target: choose, drop or paste one.':
     'click: a mouse click; hit: a shot lands, not a scored Treffer',
@@ -215,27 +215,27 @@ const otherSense: Record<string, string> = {
     'drop: drop a file onto the page, not a bullet drop',
   'Photo: choose, drop or paste one; it stays in this browser and is never uploaded':
     'drop: drop a file onto the page',
-  'Click or tap the graduation of the ruler at two points, A and B, then enter their distance. Drag a point to move it. A second pair, C and D, checks the first.':
+  'Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first.':
     'drag: move with the pointer, not air drag',
   'Include shot positions': 'where the shots are on the sheet, not a shooting position',
   'Select: drag shots, points of aim and reference points; drag the background to pan':
     'drag: move with the pointer, not air drag',
-  'The federation whose disciplines the Discipline list shows. All: every discipline, then the target events no discipline names.':
+  'Filters the Discipline list. All: every discipline, then the target events no discipline names.':
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
-  'The discipline sets the target, the event and with it the scored hole. Type to search by name, number or federation.':
+  'Sets the target, the event and with it the scored hole. Search by name, number or federation.':
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
   "A target no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.":
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
   'No hole size: set Marker, or choose a discipline or event with a gauge.':
     'events: the verified term of Event is Wettbewerb, a rejected candidate of Discipline',
-  'Where a further shot lands with the stated coverage (50 %, 95 %), from the shots of the group. Absent below 3 shots.':
+  'Where the next shot will land with 50 % or 95 % probability, from the shots of the group. Absent below 3 shots.':
     'lands: a shot lands, not the rifling lands',
   'Load a photo first.': 'load as the verb for a photo file, not a load (Laborierung)',
   'More than one target fits these rings: choose one in Target.':
     'the target is the record to choose in the field Target, whose German label is Scheibe',
-  'Diameter of the black area on the target, used when no target fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).':
+  'Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo).':
     'a target record that fits is a Scheibe, the paper target stays Zielscheibe',
-  'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.':
+  'Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.':
     'drag is the mouse action, not aerodynamic drag',
   '{label}. Double-click or Enter accepts it, drag or arrow keys move it, Delete removes it.':
     'drag is the mouse action, not aerodynamic drag',

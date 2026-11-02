@@ -173,11 +173,11 @@ export function refusalText(
     const range = { low: at(reachable.minValue), high: at(reachable.maxValue) }
     return reason === 'aboveRange'
       ? t(
-          'The simulation does not reach this high a value. Over the charges tried, the lowest value is {low} and the highest is {high}.',
+          'The simulation does not reach this high a value; over the charges tried it spans {low} to {high}.',
           range,
         )
       : t(
-          'The simulation does not reach this low a value. Over the charges tried, the lowest value is {low} and the highest is {high}.',
+          'The simulation does not reach this low a value; over the charges tried it spans {low} to {high}.',
           range,
         )
   }
@@ -198,7 +198,7 @@ export function refusalText(
     noValidRun: msg('No charge in the range gives a valid run with this value.'),
     noComparableLimit: noComparableLimitText,
     severalLimits: msg(
-      'The cartridge has a different CIP limit for each variant, so a percentage has no single limit. Enter the pressure instead.',
+      'The cartridge has a CIP limit per variant, so a percentage has no single limit. Enter the pressure instead.',
     ),
   }
   const known = reason && reasons[reason]

@@ -491,11 +491,11 @@ export function fittedParameterRows(
             method:
               ratio.median === undefined
                 ? msg(
-                    'The fitted energy over the energy of the thermochemistry (impetus over gamma minus 1). Below 1 is expected: the fitted energy also carries the losses the model leaves out.',
+                    'Fitted energy over thermochemistry energy (impetus over gamma minus 1). Below 1 is expected: the fit also carries the losses the model leaves out.',
                   )
                 : worded(
                     msg(
-                      'The fitted energy over the energy of the thermochemistry (impetus over gamma minus 1); median of the {powders} powders with thermochemistry {median}. Below 1 is expected: the fitted energy also carries the losses the model leaves out.',
+                      'Fitted energy over thermochemistry energy (impetus over gamma minus 1); median of the {powders} powders with thermochemistry {median}. Below 1 is expected: the fit also carries the losses the model leaves out.',
                     ),
                     { powders: ratio.powders ?? 0, median: formatNumber(ratio.median, 2) },
                   ),

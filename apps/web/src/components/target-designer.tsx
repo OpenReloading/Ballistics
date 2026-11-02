@@ -165,7 +165,7 @@ export function TargetDesigner() {
         {field(
           `ring.${r.id}.height`,
           t('Ring {n} height', { n: i + 1 }),
-          t('Height of an oval ring; empty for a circle.'),
+          t('For an oval; empty for a circle.'),
         )}
         {remove(t('Remove ring {n}', { n: i + 1 }), { type: 'removeRing', id: r.id })}
       </div>
@@ -180,7 +180,7 @@ export function TargetDesigner() {
             title={
               part === 'fill'
                 ? t('Colour of the zone this ring line bounds on the outside.')
-                : t('Colour of the ring line.')
+                : undefined
             }
             data={colourOptions(part, t)}
             value={r[part]}
@@ -250,7 +250,7 @@ export function TargetDesigner() {
           {field(
             'black.height',
             t('Black area height'),
-            t('Height of an oval black area.'),
+            t('For an oval; empty for a circle.'),
             'switch',
           )}
           <Checkbox
@@ -298,7 +298,7 @@ export function TargetDesigner() {
           {field(
             'inner.height',
             t('Inner ten height'),
-            t('Height of an oval inner ten.'),
+            t('For an oval; empty for a circle.'),
             'switch',
           )}
           <NativeSelect

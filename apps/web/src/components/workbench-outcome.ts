@@ -162,7 +162,7 @@ export type Outcome =
 const volumeNote = {
   title: msg('Chamber volume not measured'),
   text: msg(
-    'The volume comes from a record or a typed value, and the peak pressure and muzzle velocity follow it. Enter a measured case capacity in the Cartridge card and empty the volume field to follow it.',
+    'Peak pressure and muzzle velocity follow the volume, here from a record or a typed value. To use a measured case capacity, enter it in the Cartridge card and empty the volume field.',
   ),
 }
 
@@ -290,7 +290,7 @@ const noRampNotes = (ok: Extract<Outcome, { kind: 'ok' }>, t: Translator['t']): 
 /** What clears a missing case fill, by the reason `loadRatioText` gives. */
 const fillActions = {
   powder: msg('Choose a powder record in the Powder card.'),
-  density: msg('The powder record gives no bulk density. Choose a powder record that gives one.'),
+  density: msg('The powder record gives no bulk density: choose one that does.'),
   volume: msg('Enter the usable case volume in the Cartridge card.'),
 }
 

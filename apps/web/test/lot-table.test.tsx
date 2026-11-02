@@ -131,5 +131,5 @@ it('states no charge as safe or optimal in the table, the fields, the notes or t
     lotFractionError(1, english.t),
   ]
   for (const text of texts) expect(text).not.toMatch(/\b(safe|safely|optimal|best|ideal|node)\b/i)
-  expect(lotNote).toMatch(/computed value of the simulation/)
+  expect(lotNote).toMatch(/Barrel time is simulated, not measured/)
 })

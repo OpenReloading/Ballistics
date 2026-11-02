@@ -243,7 +243,7 @@ describe('user data files', () => {
       expect(notes).toEqual([
         {
           name: 'later.json',
-          note: 'Skipped records of a kind this version does not know: 2 × logEntry, 1 × stage. They are not kept, so a file this version exports leaves them out.',
+          note: 'Skipped records of a kind this version does not know: 2 × logEntry, 1 × stage. They are not kept or exported.',
         },
       ])
       const german = readNote(parseUserDataFile(fileOf([event])), translator(de, 'de').t)
@@ -606,7 +606,7 @@ describe('share links', () => {
     const big = { ...powder, name: noise(12000) } as UserRecord
     await expect(shareLink([big], base)).resolves.toBeUndefined()
     expect(tooLongText(big.kind, english.t)).toBe('Too long for a link: save the powder to a file')
-    expect(tooLongText(bullet.kind, english.t)).toContain('longer than 8000 characters')
+    expect(tooLongText(bullet.kind, english.t)).toContain('exceed 8000 characters')
   })
 
   it('round trip: a powder with a 5-charge fit reads back with the fit unchanged', async () => {

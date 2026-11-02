@@ -609,7 +609,7 @@ function FilterPanel({ ed }: { ed: Ed }) {
     <Row
       key={key}
       label={label}
-      help={t('Display only; the photo file stays as it is.')}
+      help={t('Display only; the file is unchanged.')}
       className="filter-row"
     >
       <Slider
@@ -662,7 +662,7 @@ function MarkerField({ ed }: { ed: Ed }) {
           key: 'markerDiameter',
           label: msg('Marker'),
           help: msg(
-            'Diameter of the shot marks; the bullet diameter centers a mark on a torn hole. Empty: a fixed size on screen.',
+            'Shot mark diameter; the bullet diameter centers a mark on a torn hole. Empty: fixed size on screen.',
           ),
           quantity: 'length',
           min: 0,
@@ -806,7 +806,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
         <Row
           label={t('Spread')}
           help={t(
-            'Largest minus smallest scale of the references over their mean: how far they disagree. A photo at an angle shows here; a rectangle corrects it.',
+            'Largest minus smallest reference scale over their mean. An angled photo shows here; a rectangle corrects it.',
           )}
         >
           {fixedNumber(cal.spread * 100, 2)} %
@@ -1026,7 +1026,7 @@ function GroupPanel({ ed }: { ed: Ed }) {
             <span
               className="prop-label"
               title={t(
-                'Point of aim, each group its own: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.',
+                "Each group's point of aim: Set, then click it on the target, or type x and y in target coordinates; drag it with Select.",
               )}
             >
               {t('Aim ({unit})', { unit: len.symbol })}
@@ -1306,7 +1306,7 @@ function StatsPanel({ ed, brief = ed.compact }: { ed: Ed; brief?: boolean }) {
               <Table.Tr>
                 <Table.Th
                   scope="row"
-                  title={`${t('Sum of the ring values of the included shots, the decimal sum in brackets; excluded shots do not count.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
+                  title={`${t('Sum of the ring values of the included shots; decimal sum in brackets.')}${groupScore?.usesOwnTenthRule ? ` ${score.ownRuleNote}` : ''}`}
                 >
                   {t('Score')}
                 </Table.Th>
@@ -1517,7 +1517,7 @@ function LadderPanel({ ed }: { ed: Ed }) {
           yLabel={t('Extreme spread ({unit})', { unit: turn.symbol })}
           title={t('Group extreme spread against charge')}
           description={t(
-            'Mean extreme spread of the groups at each ladder step, as an angle so groups at different distances compare, against its charge; the table lists the values.',
+            'Mean extreme spread per ladder step as an angle, so groups at different distances compare, against charge; the table lists the values.',
           )}
           height={200}
         />

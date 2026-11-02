@@ -59,11 +59,9 @@ test('a person adds an IPSC event with two stages and a DSB ring event, sees the
   await page.reload()
   await expect(count(page)).toHaveText('0 events')
   await expect(
-    page
-      .locator('.log-own-record')
-      .getByText('What you enter here is your own record, not an official result.', {
-        exact: false,
-      }),
+    page.locator('.log-own-record').getByText('Your own record, not an official result.', {
+      exact: false,
+    }),
   ).toBeVisible()
 
   // a DSB ring event: one series of shots, one of its total; its rounds go to the firearm's count

@@ -71,7 +71,7 @@ function stateMessages(p: PhotoState, t: Translator['t']): MessageEntry[] {
           {
             severity: 'info',
             text: t(
-              'Place two points on the ruler and enter the distance between them, or enter the diameter or overall length you measured with a caliper, to get values.',
+              'For values, place two points on the ruler and enter their distance, or enter a caliper diameter or overall length.',
             ),
           } as const,
         ]
@@ -146,7 +146,7 @@ function ScaleControls({ system, p }: { system: UnitSystem; p: PhotoState }) {
     <>
       <Text fz="sm">
         {t(
-          'Click or tap the graduation of the ruler at two points, A and B, then enter their distance. Drag a point to move it. A second pair, C and D, checks the first.',
+          'Click two ruler graduations, A and B, and enter their distance. Drag a point to move it. A second pair, C and D, checks the first.',
         )}
       </Text>
       <DistanceField
@@ -176,7 +176,7 @@ function ScaleControls({ system, p }: { system: UnitSystem; p: PhotoState }) {
       </Button>
       <Text fz="sm">
         {t(
-          'Sizes measured with a caliper give the scale where the photograph has no ruler, and check the ruler where it has. Both together also show a bullet that is tilted or a cut-out that includes a shadow.',
+          'Caliper sizes give the scale without a ruler and check it with one. Together they reveal a tilted bullet or a shadow in the cut-out.',
         )}
       </Text>
       <DistanceField
@@ -326,7 +326,7 @@ function PhotoTool({
         {!size && (
           <Text c="dimmed" fz="sm">
             {t(
-              'Choose a photograph of the bullet beside a ruler, or try the sample. It is read in this browser and never uploaded.',
+              'Choose a photograph of the bullet beside a ruler, or try the sample. It is never uploaded.',
             )}
           </Text>
         )}
@@ -446,7 +446,7 @@ function PhotoTool({
           </Button>
           <Text fz="sm" c="dimmed">
             {t(
-              'Seeds the designer with these values and a note that they are measured, with their uncertainties. The photograph is not stored.',
+              'Opens the designer with these values, marked as measured, with their uncertainties. The photograph is not stored.',
             )}
           </Text>
         </Flex>

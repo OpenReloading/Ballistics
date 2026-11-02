@@ -177,7 +177,7 @@ export function ShortcutsHelp() {
         </p>
       )}
       {active.includes('redo') && (
-        <p className="note">{t('On macOS Cmd in place of Ctrl, but Ctrl+Y.')}</p>
+        <p className="note">{t('On macOS, Cmd for Ctrl, except Ctrl+Y.')}</p>
       )}
     </AppModal>
   )

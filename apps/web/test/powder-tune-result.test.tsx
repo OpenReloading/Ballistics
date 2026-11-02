@@ -209,7 +209,7 @@ describe('refusals and rules on the screen', () => {
     const html = text({ fit: { ...fitted, rule: 'thin' }, running: false })
     expect(html).toContain('Fewer than 3 charges, or charges less than 10 % apart')
     expect(html).toContain('Try the other values anyway')
-    expect(html).not.toContain('they move together')
+    expect(html).not.toContain('the others keep their start values')
   })
 
   it('notes a revolver fit without a leak area, not one with a leak area or a rifle fit', () => {
@@ -225,7 +225,9 @@ describe('refusals and rules on the screen', () => {
 
   it('says why held values stay at their start values', () => {
     const html = text({ fit: { ...fitted, rule: 'held' }, running: false })
-    expect(html).toContain('they move together. They stay at their start values')
+    expect(html).toContain(
+      'only the burn coefficient is fitted and the others keep their start values',
+    )
     expect(html).not.toContain('Try the other values anyway')
   })
 

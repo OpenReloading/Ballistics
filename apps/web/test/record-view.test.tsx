@@ -33,7 +33,7 @@ it('shows the name and the loading rows while the record is read, with a notice 
   const html = page()
   expect(html).toContain('Example 168')
   expect(html).toContain('Loading bullet…')
-  expect(html).toContain('this page needs JavaScript')
+  expect(html).toContain('This page needs JavaScript')
   expect(html).not.toContain('noindex')
 })
 

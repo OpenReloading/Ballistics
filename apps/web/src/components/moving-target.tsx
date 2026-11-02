@@ -17,9 +17,7 @@ const specs = [
   {
     key: 'heading',
     label: msg('Heading'),
-    help: msg(
-      'Clockwise from directly away from the shooter: 90 crosses to the right, 270 to the left.',
-    ),
+    help: msg('Clockwise from straight downrange: 90 crosses to the right, 270 to the left.'),
     quantity: 'angle',
     required: true,
     initial: Math.PI / 2,

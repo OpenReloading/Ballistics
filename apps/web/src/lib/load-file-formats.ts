@@ -73,7 +73,7 @@ export const readNote = (p: ParsedUserFile, t: Translator['t']) =>
         ...(p.skipped?.length
           ? [
               t(
-                'Skipped records of a kind this version does not know: {kinds}. They are not kept, so a file this version exports leaves them out.',
+                'Skipped records of a kind this version does not know: {kinds}. They are not kept or exported.',
                 { kinds: p.skipped.map((k) => `${k.count} × ${k.kind}`).join(', ') },
               ),
             ]

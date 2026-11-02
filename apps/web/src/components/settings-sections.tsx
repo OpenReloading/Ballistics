@@ -70,7 +70,7 @@ function Keyboard() {
       onChange={(e) => setSingleKeys(e.currentTarget.checked)}
       label={t('Single-key shortcuts')}
       description={t(
-        '? opens the shortcut list and / searches the list on a page. Off, they do nothing; the shortcuts with Ctrl or Cmd stay.',
+        '? opens the shortcut list, / searches the list on a page. Shortcuts with Ctrl or Cmd always work.',
       )}
     />
   )
@@ -83,7 +83,7 @@ function Offline() {
     <Stack gap="sm" align="flex-start">
       <Text size="sm">
         {t(
-          'Without network, every page works except record pages you have not opened before. Workbench runs work for loads opened online in this browser, and your own records always do.',
+          'Offline, every page works except record pages you have not opened before. Workbench runs work for loads opened online in this browser and for your own records.',
         )}
       </Text>
       {install ? (
@@ -171,7 +171,7 @@ export function SettingsSections({
       </Tabs.Panel>
       <Tabs.Panel value="units">
         <Text size="sm" c="dimmed" mb="xs">
-          {t('Values are kept in SI units: a change converts what is shown, never a value.')}
+          {t('Values are stored in SI units; a change only converts the display.')}
         </Text>
         <UnitsForm />
       </Tabs.Panel>

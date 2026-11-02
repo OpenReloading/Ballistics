@@ -512,10 +512,10 @@ function CombinedCaption({ unit }: { unit: LengthUnit }) {
   const definition =
     unit === 'mm'
       ? t(
-          'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in mm, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+          'Combined: per region, published chamber minimum minus cartridge maximum (nominal minimum difference, in mm, signed); "conflict": these published dimensions contradict each other (check source).',
         )
       : t(
-          'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in inches, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+          'Combined: per region, published chamber minimum minus cartridge maximum (nominal minimum difference, in inches, signed); "conflict": these published dimensions contradict each other (check source).',
         )
   return (
     <span className="caption-combined">

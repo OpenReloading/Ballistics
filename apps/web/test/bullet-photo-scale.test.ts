@@ -61,16 +61,16 @@ describe('the scale from caliper sizes', () => {
     const fromDiameter = resolveScale(px, undefined, { diameter: 7.82 })
     expect(fromDiameter.basis).toBe('diameter')
     expect(valueNotes(fromDiameter)).toMatch(
-      /scale comes from the diameter entered, without a ruler.*square side view.*10 degrees.*1\.5 % short.*product image may not be drawn to scale/,
+      /Scale from the diameter entered, no ruler.*square side view.*10 degrees.*1\.5 % short.*product image may not be to scale/,
     )
     const withRuler = resolveScale(px, ruler, { diameter: 7.82 })
     expect(withRuler.basis).toBe('ruler')
-    expect(valueNotes(withRuler)).not.toMatch(/scale comes from/)
+    expect(valueNotes(withRuler)).not.toMatch(/Scale from/)
     expect(valueNotes(resolveScale(px, undefined, { diameter: 7.82, length: 30 }))).toMatch(
-      /diameter and the overall length entered, without a ruler.*more than 2 % apart, about 11 degrees/,
+      /diameter and overall length entered, no ruler.*beyond 2 % apart \(about 11 degrees\)/,
     )
     expect(valueNotes(resolveScale(px, undefined, { length: 30 }))).toMatch(
-      /overall length entered, without a ruler.*1\.5 % too wide/,
+      /overall length entered, no ruler.*1\.5 % too wide/,
     )
   })
 
