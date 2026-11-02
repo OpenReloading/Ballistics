@@ -28,8 +28,6 @@ export default defineConfig({
   testDir: './tests',
   // every test has its own browser context: the tests of one file run on several workers
   fullyParallel: true,
-  // CI: one worker per core (4 on ubuntu-latest) instead of the default half
-  workers: process.env.CI ? '100%' : undefined,
   // the default without {-projectName}: a renamed project still finds the committed snapshots
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-snapshotSuffix}{ext}',
