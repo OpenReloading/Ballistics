@@ -14,7 +14,7 @@ No server database for the catalogue. A typed index and a record file are built 
 Speed does not decide it (every option answers in under 3 ms at this size). These do:
 
 1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser: the API through the catalogue, the browser through `openCatalogue` over `catalogue/index.json`, the web lists through `matchesQuery` (`apps/web/src/lib/lists.ts`). A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
-2. **Three defects a database does not fix.** The JIT cost of PostgreSQL at default settings, two sort orders between the API and the data files, and word-order dependent search.
+2. **What a database did not fix.** PostgreSQL's JIT cost at default settings. The two sort orders between the API and the data files and the word-order dependent search it had are fixed by the shared `sortKey` and matcher below.
 3. **Less to run.** No SQL layer, database service, `DATABASE_URL` or database packages in code, containers or CI.
 
 Measured on the public bundle, one machine, medians:

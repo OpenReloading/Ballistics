@@ -154,7 +154,7 @@ The workbench takes the construction from the bullet record's `construction.stru
 | monolithic | monolithic |
 | frangible, a construction without a structure | jacketed, marked as assumed |
 
-In a handgun, a record without a `construction` counts as jacketed, marked as assumed, as in `defaultStartPressure`. In a rifle it gives no construction; an unknown barrel length gives no class; both keep the field at 30 MPa, as does a plated bullet in a rifle. The field follows this default until a value is typed; the help gives the 95 % interval of the construction. A powder record's own start pressure replaces the default.
+In a handgun, a record without a `construction` counts as jacketed, marked as assumed, as in `defaultStartPressure`. In a rifle it gives no construction; an unknown barrel length gives no class; both keep the field at the Settings default (30 MPa unless changed), as does a plated bullet in a rifle. A changed Settings default replaces the rule by construction. The field follows this default until a value is typed; the help gives the 95 % interval of the construction. A powder record's own start pressure replaces the default.
 
 No powder record has one now: each powder model was fitted at `defaultStartPressure` of each load's barrel with no construction, which is 30 MPa for its rifle rows. So in a rifle barrel the field keeps 30 MPa for a powder record, the model runs at the start pressure of its fit, and the help says so; in a handgun barrel the rule by construction applies, as in the fit. The rule by construction reaches a rifle only with a powder design or model parameters typed without a powder record. The Powders tab runs each record without a start pressure at the same default. Load files and the API still take the rifle value of 30 MPa for a powder record without a start pressure, so a workbench load is saved with its start pressure by construction as a value.
 
@@ -360,7 +360,7 @@ Each curve point has time, travel, velocity, burnt fraction, the three pressures
 
 ### Load file
 
-`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `missingLoadKeys` lists every needed value that no other source gave (all but the bore area, which falls back to the circle of the bore diameter). The load ratio, charge bulk volume over the volume behind the seated bullet, is:
+`interiorLoad` maps the values of a workbench load file (SI) onto the model input. The burn law is the vivacity law, with the two-stage form when all four form values are given and the constant form when none is. A leak area is constant over the whole travel. `missingLoadKeys` lists every needed value that no other source gave (all but the bore area, which falls back to the circle of the mean of bore and groove diameter, or of the bore diameter without a groove diameter). The load ratio, charge bulk volume over the volume behind the seated bullet, is:
 
 $$
 \Lambda = \frac{m_c}{\rho_\text{bulk} V_c}
