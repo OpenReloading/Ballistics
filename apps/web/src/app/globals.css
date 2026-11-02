@@ -5,9 +5,9 @@
   --border: #c9cfd8;
   --link: #0b57d0;
   --focus: #0b57d0;
-  --warn-bg: #fff4e5;
-  --warn-fg: #8a3b00;
-  /* the result notice: yellow, apart from the orange result warnings; 8:1 contrast */
+  --warn-bg: #fff9db;
+  --warn-fg: #7a4f00;
+  /* the result notice: yellow, a shade apart from the amber result warnings; 8:1 contrast */
   --caution-bg: #fff3bf;
   --caution-fg: #5c4400;
   /* message variants (Message in states.tsx): text on its own fill, at least 4.5:1 */
@@ -63,7 +63,7 @@
   --mantine-color-default-color: var(--fg);
   --mantine-color-default-border: var(--border);
   /* field errors: Mantine's red gives about 3.3:1 on white */
-  --mantine-color-error: var(--warn-fg);
+  --mantine-color-error: var(--error-fg);
   /* disabled text: Mantine's grey gives about 1.8:1 on its disabled fill */
   --mantine-color-disabled-color: var(--muted);
 }
@@ -77,8 +77,8 @@
     --border: #3d434d;
     --link: #8ab4f8;
     --focus: #8ab4f8;
-    --warn-bg: #3a2410;
-    --warn-fg: #ffc48a;
+    --warn-bg: #33290a;
+    --warn-fg: #ffe066;
     --caution-bg: #3a3000;
     --caution-fg: #ffe066;
     --info-bg: #1b2a44;
@@ -2373,8 +2373,8 @@ td.nowrap {
     --border: #c9cfd8;
     --link: #0b57d0;
     --focus: #0b57d0;
-    --warn-bg: #fff4e5;
-    --warn-fg: #8a3b00;
+    --warn-bg: #fff9db;
+    --warn-fg: #7a4f00;
     --caution-bg: #fff3bf;
     --caution-fg: #5c4400;
     --info-bg: #e8f0fe;
@@ -5195,7 +5195,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .safety-dialog .mantine-Modal-header {
-  background: var(--mantine-color-yellow-light);
+  background: var(--caution-bg);
 }
 
 .safety-dialog .mantine-Modal-title {
@@ -5206,7 +5206,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .safety-dialog .mantine-Modal-title svg {
-  color: var(--mantine-color-yellow-7);
+  color: var(--caution-fg);
 }
 
 /* the English text and its translation: side by side from 48em, stacked below */

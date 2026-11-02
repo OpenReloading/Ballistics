@@ -1,6 +1,6 @@
 'use client'
 
-import { Alert, Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
+import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
 import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
 import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
@@ -35,7 +35,7 @@ import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { EmptyNote, ErrorNote } from './states.tsx'
+import { EmptyNote, ErrorNote, Message } from './states.tsx'
 import { StringComparison } from './string-comparison.tsx'
 import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
@@ -357,14 +357,14 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
         ))}
       </Group>
       {warnings.length > 0 && (
-        <Alert color="yellow" variant="light" title={t('Import notes')} my="xs">
+        <Message severity="warning" title={t('Import notes')}>
           <ul>
             {warnings.map((w, k) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: warnings keep the importer order and may repeat
               <li key={k}>{translateMessage(w, t)}</li>
             ))}
           </ul>
-        </Alert>
+        </Message>
       )}
       <div className="session-panels">
         <Panel
