@@ -108,7 +108,7 @@ const publishedCharge = z.strictObject({
  * Inferred type: {@link PublishedPrimer}.
  */
 export const publishedPrimer = z.strictObject({
-  printed: z.string().min(1).describe('The primer as printed, `RWS 5333 und 5341` whole.'),
+  printed: z.string().min(1).describe('The primer as printed, `Demo 101 und 102` whole.'),
   records: z
     .array(catalogueRef('primer'))
     .min(1)

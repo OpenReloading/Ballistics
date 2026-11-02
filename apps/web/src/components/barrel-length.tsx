@@ -56,9 +56,11 @@ export function BarrelTable({ study, system }: { study: BarrelStudy; system: Uni
       label={t('Barrel length')}
       className="limits ladder-table barrel-table"
       caption={
-        ladder
-          ? t('Barrel length study, step {step} (simulation)', { step: step?.label ?? '' })
-          : t('Barrel length study (simulation)')
+        !ladder
+          ? t('Barrel length study (simulation)')
+          : step?.label === '0'
+            ? t('Barrel length study, main step (simulation)')
+            : t('Barrel length study, step {step} (simulation)', { step: step?.label ?? '' })
       }
       columns={columns.map((c) => t(c))}
     >

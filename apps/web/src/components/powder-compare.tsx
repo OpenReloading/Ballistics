@@ -28,7 +28,15 @@ import {
 } from '../lib/powder-compare.ts'
 import { controlSize } from '../lib/theme.ts'
 import { formatQuantity, shownLength, type UnitSystem } from '../lib/units.ts'
+import {
+  type PowderTabState,
+  powderTableCsv,
+  restoredPowderTab,
+  savedPowderTab,
+} from './powder-csv.ts'
 import { ScrollRegion, withTableRoles } from './scroll-region.tsx'
+import { TableCsv } from './table-csv.tsx'
+import { useManufacturerNames } from './use-manufacturer-names.ts'
 import {
   type CompareMessage,
   type CompareRow,
@@ -73,8 +81,6 @@ const rangeColumn: Column = {
 }
 const columnsFor = (target: boolean) =>
   target ? columns.map((c) => (c.key === 'peak' ? rangeColumn : c)) : columns
-
-const noFilters: PowderFilters = { manufacturerName: '', base: '', form: '' }
 
 const nextSort = (
   key: string,
@@ -313,8 +319,6 @@ const Rows = memo(function Rows({
 const isFillValid = (fill: number | string) =>
   typeof fill === 'number' && fill >= caseFillPercentRange.min && fill <= caseFillPercentRange.max
 
-const isFiltering = (f: PowderFilters) => Boolean(f.manufacturerName || f.base || f.form)
-
 /** The mode the chosen charge kind and its valid value give; the typed charge otherwise. */
 function modeOf(
   kind: CompareMode['kind'],
@@ -327,8 +331,82 @@ function modeOf(
   return { kind: 'typed' }
 }
 
+/**
+ * The target field: its unit, why the typed value is no target, and whether to show that. A share
+ * of Pmax stays a share without a cartridge (a load opened before its cartridge record, or with a
+ * design): it is not read as a pressure, and Compute waits for the cartridge.
+ */
+function targetOf(
+  text: number | string,
+  left: boolean,
+  percent: boolean,
+  withCartridge: boolean,
+  system: UnitSystem,
+  t: Translator['t'],
+) {
+  const unit = targetUnit('peakPressure', system, percent)
+  const reason =
+    percent && !withCartridge
+      ? t("A share of Pmax needs the cartridge's CIP Pmax.")
+      : targetError(text, unit, t)
+  return {
+    unit,
+    valid: reason === undefined,
+    shown: text !== '' || left ? reason : undefined,
+  }
+}
+
 const modeValid = (kind: CompareMode['kind'], fillValid: boolean, targetValid: boolean) =>
   (kind !== 'fill' || fillValid) && (kind !== 'target' || targetValid)
+
+/** Whether the tab shows what it opened with: the manufacturer filter compared by its id. */
+function sameTab(
+  now: PowderTabState,
+  first: PowderTabState,
+  idOf: (name: string) => string | undefined,
+) {
+  const key = (s: PowderTabState) =>
+    JSON.stringify([
+      s.kind,
+      s.fill,
+      s.targetText,
+      s.percent,
+      s.filters.base,
+      s.filters.form,
+      s.filters.manufacturerName ? idOf(s.filters.manufacturerName) : s.maker,
+    ])
+  return key(now) === key(first)
+}
+
+/** The filters, from what the load kept: a kept manufacturer's name shows once the names arrive. */
+function useKeptFilters(first: PowderTabState, names: ReadonlyMap<string, string>) {
+  const [filters, setFilters] = useState(first.filters)
+  // a kept manufacturer filter whose name is not known yet; picking one clears it
+  const [maker, setMaker] = useState(first.maker)
+  const makerName = maker && names.get(maker)
+  if (makerName && !filters.manufacturerName)
+    setFilters((f) => ({ ...f, manufacturerName: makerName }))
+  return { filters, setFilters, maker, setMaker }
+}
+
+/**
+ * Writes the tab's state to the load as it changes. A tab only looked at keeps what the load kept,
+ * to the digit, in any unit: a target typed in bar and shown in psi is not rounded into the file.
+ */
+function useKeptTab(
+  now: PowderTabState,
+  first: PowderTabState,
+  system: UnitSystem,
+  names: ReadonlyMap<string, string>,
+) {
+  const { powderTab } = useLoad()
+  // what the load kept when the tab opened (the tab mounts afresh for each opened load)
+  const [opened] = useState(powderTab.saved)
+  const idOf = (name: string) => [...names].find(([, n]) => n === name)?.[0]
+  const saved = sameTab(now, first, idOf) ? opened : savedPowderTab(now, system, idOf)
+  const save = powderTab.set
+  useEffect(() => save(saved), [save, saved])
+}
 
 /** The rows were computed for another load or charge than the fields hold now. */
 function isStale(
@@ -515,19 +593,21 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const { t } = useTranslation()
   const { loadRequest, powder, powderDesign, pickPowder, applyCharge, fields, cartridge } =
     useLoad()
-  const [kind, setKind] = useState<CompareMode['kind']>('typed')
-  const [fill, setFill] = useState<number | string>(caseFillPercentRange.initial)
+  const { powderTab } = useLoad()
+  // the mode and the filters the load was saved with (`key` on this tab: an opened load starts afresh)
+  const names = useManufacturerNames()
+  const [first] = useState(() => restoredPowderTab(powderTab.saved, system, names))
+  const [kind, setKind] = useState<CompareMode['kind']>(first.kind)
+  const [fill, setFill] = useState<number | string>(first.fill)
   const fillValid = isFillValid(fill)
   // the target of the charge target dialog: a peak pressure, or a share of the cartridge's CIP Pmax
-  const [targetText, setTargetText] = useState<number | string>('')
-  const [percent, setPercent] = useState(false)
-  const asPercent = percent && cartridge !== undefined
-  const unit = targetUnit('peakPressure', system, asPercent)
+  const [targetText, setTargetText] = useState<number | string>(first.targetText)
+  const [percent, setPercent] = useState(first.percent)
   // the reason shows for a typed value, and for an empty field once it was left
   const [targetLeft, setTargetLeft] = useState(false)
-  const targetReason = targetError(targetText, unit, t)
-  const targetValid = targetReason === undefined
-  const targetShown = targetText !== '' || targetLeft ? targetReason : undefined
+  const targetField = targetOf(targetText, targetLeft, percent, cartridge !== undefined, system, t)
+  const { unit, valid: targetValid, shown: targetShown } = targetField
+  const asPercent = percent && cartridge !== undefined
   const mode = modeOf(
     kind,
     fillValid ? (fill as number) / 100 : undefined,
@@ -537,9 +617,9 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const study = usePowderCompare(loadRequest, mode)
   // another powder picked mid-run writes its parameters into the fields the later rows read
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
-  const [filters, setFilters] = useState(noFilters)
-  // Compute empties the rows and with them the facets the filters name
-  if (study.rows.length === 0 && isFiltering(filters)) setFilters(noFilters)
+  // the load keeps the mode and the filters; a filter stays while Compute fills the rows again
+  const { filters, setFilters, maker, setMaker } = useKeptFilters(first, names)
+  useKeptTab({ kind, fill, targetText, percent, filters, maker }, first, system, names)
   const [sort, setSort] = useState<ColumnSort | undefined>()
   // the columns follow the mode the rows were computed for, not the one chosen since
   const target = study.mode?.kind === 'target'
@@ -558,6 +638,17 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const manufacturers = useMemo(() => distinctValues(study.rows, 'manufacturerName'), [study.rows])
   const bases = useMemo(() => distinctValues(study.rows, 'base'), [study.rows])
   const forms = useMemo(() => distinctValues(study.rows, 'form'), [study.rows])
+  const reason = (r: CompareRow) =>
+    r.refusal
+      ? refusalText(
+          r.refusal,
+          'peakPressure',
+          system,
+          study.mode?.kind === 'target' && study.mode.percent,
+          t,
+        )
+      : reasonText(r.reason ?? '', t)
+  const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
   const failed = study.rows.filter((r) => !r.values).length
   // the rows were computed for another load or charge than the fields hold now
@@ -592,9 +683,13 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     <FilterSelect
       label={label}
       searchable={key === 'manufacturerName'}
-      data={data}
+      // a filter of the saved load shows before Compute lists its facets
+      data={filters[key] && !data.includes(filters[key]) ? [filters[key], ...data] : data}
       value={filters[key]}
-      onChange={(v) => setFilters((f) => ({ ...f, [key]: v }))}
+      onChange={(v) => {
+        if (key === 'manufacturerName') setMaker(undefined)
+        setFilters((f) => ({ ...f, [key]: v }))
+      }}
     />
   )
   return (
@@ -625,11 +720,12 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
         <Button
           size={controlSize.row.button}
           variant="default"
-          aria-pressed={asPercent}
-          disabled={kind !== 'target' || cartridge === undefined}
+          aria-pressed={percent}
+          // a share kept by a load opened without its cartridge can still be switched off
+          disabled={kind !== 'target' || (cartridge === undefined && !percent)}
           title={t("Read the target as a percentage of the cartridge's CIP Pmax")}
           onClick={() => {
-            setPercent(!asPercent)
+            setPercent(!percent)
             setTargetText('')
             setTargetLeft(false)
           }}
@@ -649,6 +745,7 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
         {select('manufacturerName', t('Manufacturer'), manufacturers)}
         {select('base', t('Base'), bases)}
         {select('form', t('Form'), forms)}
+        <TableCsv csv={csv} disabled={shown.length === 0} />
       </div>
       <p className="barrel-status" aria-hidden="true">
         <span className="barrel-status-text" title={text}>

@@ -97,7 +97,8 @@ describe('the load sheets', () => {
     expect(page).toContain('Gedruckt am')
     expect(page).toContain('Treibladungen')
     expect(page).toContain('Streukreis')
-    expect(page).toContain('Stufe 0, Hauptstufe: 41,0 gr')
+    expect(page).toContain('Hauptladung: 41,0 gr')
+    expect(page).not.toContain('Stufe 0')
     expect(page).toContain('Simulierter Gasdruck 3500 bar')
     expect(page).toContain('Auf dem Schießstand')
     expect(page).toContain('Druckanzeichen')
@@ -107,6 +108,8 @@ describe('the load sheets', () => {
 
   it('name the length a seating ladder seats by', () => {
     expect(sheets(german, 'overallLength')).toContain('Stufen nach COAL')
+    expect(sheets(english, 'overallLength')).toContain('41,0 gr main')
+    expect(sheets(english, 'overallLength')).not.toContain('Main charge')
     expect(sheets(english, 'overallLength')).toContain('COAL steps')
   })
 
@@ -116,6 +119,7 @@ describe('the load sheets', () => {
     expect(heads(english, 'temperature')[0]).toBe('Powder temperature')
     expect(heads(german, 'temperature')[0]).toBe('Pulvertemperatur')
     expect(heads(english)).not.toContain('Step')
+    expect(heads(english)).toContain('Peak pressure, simulated (corner cases)')
     expect(heads(german)).not.toContain('Schritt')
     expect(sheets(english)).toContain('41,0 gr main')
     expect(sheets(german, 'temperature')).toContain('Stufen nach Pulvertemperatur')
@@ -124,7 +128,8 @@ describe('the load sheets', () => {
   it('stay English under the English setting', () => {
     const page = sheets(english)
     expect(page).toContain('Charges')
-    expect(page).toContain('Step 0, main: 41,0 gr')
+    expect(page).toContain('Main charge: 41,0 gr')
+    expect(page).not.toContain('Step 0')
     expect(page).not.toContain('Treibladungen')
   })
 })
