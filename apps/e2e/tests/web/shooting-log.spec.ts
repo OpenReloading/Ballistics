@@ -66,9 +66,7 @@ async function addEntry(
   await form.getByLabel('Rounds fired').fill(String(e.rounds))
   await form.getByRole('button', { name: 'Save entry' }).click()
   const dialog = page.getByRole('dialog', { name: 'Add to the round count?' })
-  await expect(dialog).toContainText(
-    `Add ${e.rounds} rounds of this entry to the round count of ${e.firearm}?`,
-  )
+  await expect(dialog).toContainText(`Add ${e.rounds} rounds to the round count of ${e.firearm}?`)
   await dialog.getByRole('button', { name: answer }).click()
 }
 
@@ -82,9 +80,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
   await expect(
     page
       .locator('.log-own-record')
-      .getByText(
-        'The shooting log is your own record. Whether a club or an authority accepts it is up to them.',
-      ),
+      .getByText('Your own record; a club or authority decides whether to accept it.'),
   ).toBeVisible()
 
   await addEntry(
@@ -137,7 +133,7 @@ test('the shooting log adds entries, counts rounds only after the confirm, print
   await expect(sheet.locator('tbody tr')).toHaveCount(2)
   await expect(sheet.locator('thead th').last()).toHaveText('Signature')
   await expect(sheet.locator('tbody td.log-signature').first()).toHaveText('')
-  await expect(sheet).toContainText('The shooting log is your own record.')
+  await expect(sheet).toContainText('Your own record; a club or authority decides')
   await expect(sheet).toContainText('2 entries, 80 rounds')
   await page.emulateMedia({ media: 'screen' })
 

@@ -53,7 +53,7 @@ const reasonText: Record<string, Message> = { noValue: msg('no value') }
 
 /** What an invalid run (the reasons of `InteriorReason` in core) means and what to change. */
 const invalidRunText: Record<string, Message> = {
-  input: msg('A value is outside what the model accepts. Check the field named below.'),
+  input: msg("A value is outside the model's range. Check the field named below."),
   chamberVolume: msg(
     'The charge does not fit the chamber: the solid powder and its covolume fill the usable case volume. Lower the charge or enter a larger usable case volume.',
   ),
@@ -64,7 +64,7 @@ const invalidRunText: Record<string, Message> = {
     'The bullet stopped in the bore before the muzzle. Raise the charge or lower the bore resistance.',
   ),
   integration: msg(
-    'The calculation did not converge. Check that the values are plausible, in particular the charge and the usable case volume.',
+    'The calculation did not converge. Check the values, in particular the charge and the usable case volume.',
   ),
   maxTime: msg(
     'The bullet did not reach the muzzle within the run time. Raise the charge or check the bullet travel and the barrel length.',
@@ -137,7 +137,7 @@ export function ErrorView({ outcome }: { outcome: Extract<Outcome, { kind: 'erro
 function volumeText(fraction: number, rule: CapacityRule | undefined, t: Translator['t']) {
   const value = percentText(fraction)
   if (fraction >= maxVolumeFraction)
-    return t('volume {value}, the limit of the range: the volume estimate can be wider', { value })
+    return t('volume {value} (capped; the real spread can be wider)', { value })
   return rule
     ? t('volume {value}, from {rule}', { value, rule: t(capacityRuleText[rule]) })
     : t('volume {value}', { value })
@@ -161,11 +161,11 @@ export function peakFacts(
   const sample = draws
     ? draws.failed
       ? t(
-          'The band is the 5th to 95th percentile of {samples} draws (seed {seed}, {failed} left the model) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.',
+          'The band is the 5th to 95th percentile of {samples} input draws (seed {seed}, {failed} left the model), normal around nominal with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.',
           { samples: draws.samples, seed: draws.seed, failed: draws.failed, ...band },
         )
       : t(
-          'The band is the 5th to 95th percentile of {samples} draws (seed {seed}) of the inputs, normal around their nominal values with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.',
+          'The band is the 5th to 95th percentile of {samples} input draws (seed {seed}), normal around nominal with the tolerance as the 90 % half width. The limit check uses the corner-case range {low} to {high} {unit}.',
           { samples: draws.samples, seed: draws.seed, ...band },
         )
     : sampled
@@ -592,7 +592,7 @@ export function LimitsView({
   if (!body.limits || body.limits.length === 0)
     return (
       <p className="prompt empty-state">
-        {t('No pressure limit for this result: choose a cartridge to compare with its limits.')}
+        {t('No pressure limit: choose a cartridge to compare with its limits.')}
       </p>
     )
   const heads = limitColumns.map((c) => t(c))

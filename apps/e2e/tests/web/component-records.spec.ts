@@ -31,7 +31,7 @@ test('a cartridge record links the bullet list of the bullets that fit it, the r
   const link = page.getByRole('link', { name: /^Bullets \(\d+\)$/ })
   await expect(link).toHaveAttribute('href', '/bullets/?fits=308-win')
   await link.focus()
-  await expect(page.getByRole('tooltip')).toContainText('over the middle of the land and groove')
+  await expect(page.getByRole('tooltip')).toContainText('above the mean of the land and groove')
   const count = Number((await link.innerText()).match(/\d+/)?.[0])
   await link.click()
   await expect(page).toHaveURL(/\/bullets\/\?fits=308-win$/)

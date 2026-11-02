@@ -368,7 +368,7 @@ describe('an axis direction the user typed', () => {
     for (const off of [3, -3]) {
       const { outline, m } = typed(flatBase, off)
       expect(m.baseType).toBe('flat')
-      expect(text(outlineHints(outline).hints)).toMatch(/about 3 degrees off the bullet's own axis/)
+      expect(text(outlineHints(outline).hints)).toMatch(/about 3 degrees off, or a shadow/)
     }
   })
 
@@ -401,7 +401,7 @@ describe('an axis direction the user typed', () => {
   it('on the bullet: no note, and a boat tail typed off keeps its tail', () => {
     const on = typed(flatBase, 0)
     expect(on.outline.typedOff).toBeUndefined()
-    expect(text(outlineHints(on.outline).hints)).not.toMatch(/axis direction typed:/)
+    expect(text(outlineHints(on.outline).hints)).not.toMatch(/typed axis direction:/)
     const tail = typed({}, 3).m
     expect(tail.baseType).toBe('boat-tail')
     expect(Math.abs(defined(tail.values['base.length']).value - 5.5)).toBeLessThan(0.3)
@@ -434,7 +434,7 @@ describe('the size of the bullet in the photograph', () => {
 
   it('refuses a cut-out that is not longer than wide', () => {
     const long = outlineHints(outlineOf(90, 120)).unusable
-    expect(text(long ? [long] : [])).toMatch(/not the shape of a bullet/)
+    expect(text(long ? [long] : [])).toMatch(/not a bullet seen from the side/)
   })
 
   it('gives a hint for a narrow bullet and none for a wide one', () => {

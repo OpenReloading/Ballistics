@@ -49,10 +49,9 @@ export function shareProblem(record: UserRecord): string | undefined {
 export const tooLongText = (kind: UserRecord['kind'], t: Translator['t']) =>
   kind === 'powder'
     ? t('Too long for a link: save the powder to a file')
-    : t(
-        'Not shared: the link would be longer than {max} characters; save the record to a file instead.',
-        { max: maxLinkChars },
-      )
+    : t('Not shared: the link would exceed {max} characters; save the record to a file.', {
+        max: maxLinkChars,
+      })
 
 /**
  * `page` with `records` in the fragment: the file text, deflate-compressed, base64url; the

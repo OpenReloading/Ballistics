@@ -35,9 +35,7 @@ describe('temperatureLadderBlockReason', () => {
   })
 
   it('says that no powder is chosen, and still gives a reason, without a powder', () => {
-    expect(temperatureLadderBlockReason(undefined, false, english.t)).toContain(
-      'No powder is chosen.',
-    )
+    expect(temperatureLadderBlockReason(undefined, false, english.t)).toContain('No powder chosen:')
     expect(temperatureLadderBlockReason('', false, english.t)).toBe(
       temperatureLadderBlockReason(undefined, false, english.t),
     )
@@ -67,7 +65,7 @@ describe('temperatureLadder', () => {
 
   it('stops at a step that reaches 0 K or less and names the temperature', () => {
     expect(temperatureLadder(20, 10, 3, 'down', show, english.t)).toEqual({
-      error: 'The ladder reaches 0 K: a temperature of 0 K or less is no state.',
+      error: 'The ladder reaches 0 K; a temperature must be above 0 K.',
     })
   })
 })

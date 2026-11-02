@@ -438,7 +438,7 @@ describe('sampled band', () => {
       }),
     } as Extract<Outcome, { kind: 'ok' }>
     const text = peakFacts(ok, presetUnits('metric-grains'), english.t)
-    expect(text).toContain('500 draws (seed 1)')
+    expect(text).toContain('500 input draws (seed 1)')
     expect(text).toContain('The band covers the input tolerances only, no model error')
   })
 
@@ -458,8 +458,8 @@ describe('sampled band', () => {
         presetUnits('metric-grains'),
         english.t,
       )
-    expect(at(0.2)).toContain('the limit of the range: the volume estimate can be wider')
-    expect(at(0.01)).not.toContain('the limit of the range')
+    expect(at(0.2)).toContain('(capped; the real spread can be wider)')
+    expect(at(0.01)).not.toContain('capped')
   })
 })
 

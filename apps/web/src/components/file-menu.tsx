@@ -445,7 +445,7 @@ function newerGuard(known: () => string | undefined, t: Translator['t']) {
     agreed = await confirmDialog({
       title: t('Overwrite the newer copy?'),
       message: t(
-        'A newer copy of this record was saved at {other} (another tab or window); this tab has the copy saved at {mine}.',
+        'Another tab or window saved a newer copy at {other}; this tab has the copy saved at {mine}.',
         { other: dateTimeText(new Date(other)), mine: dateTimeText(new Date(mine)) },
       ),
       confirmLabel: t('Overwrite'),
@@ -1210,7 +1210,7 @@ function FileMenuOf<K extends UserRecordKind>({
       return setFailure(
         plain(
           msg(
-            'Not saved: the opened file holds records of a kind this version does not know, which Save would leave out. Save as writes a new file.',
+            'Not saved: the opened file holds record kinds this version does not know, which Save would leave out. Save as writes a new file.',
           ),
         ),
       )
@@ -1741,7 +1741,7 @@ function FileMenuOf<K extends UserRecordKind>({
       >
         <p>
           {t(
-            'These records do not pass the current format. They stay in this browser, are not shown elsewhere and are in Export all as stored, which Import restores as invalid records.',
+            'These records fail the current format. They stay in this browser and show only here; Export all keeps them as stored, and Import restores them as invalid records.',
           )}
         </p>
         <ul className="file-records">
@@ -1775,7 +1775,6 @@ function FileMenuOf<K extends UserRecordKind>({
       >
         <Textarea
           label={t('User data file text')}
-          description={t('Checked as Import checks a file.')}
           autosize
           minRows={4}
           maxRows={12}

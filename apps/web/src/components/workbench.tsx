@@ -129,15 +129,10 @@ const seatingRowsOf = (ok: OkOutcome | undefined, system: UnitSystem, t: Transla
 function approximateNote(ok: OkOutcome | undefined, t: Translate) {
   if (!ok || ok.printed.fromSeating.length === 0) return
   const [first, second] = ok.printed.fromSeating
-  if (second)
-    return t(
-      'Usable case volume and bullet travel from the seated bullet: derived from approximate bullet and case geometry.',
-    )
+  if (second) return t('Usable case volume and bullet travel: approximate, from the seated bullet.')
   return first === 'volume'
-    ? t(
-        'Usable case volume from the seated bullet: derived from approximate bullet and case geometry.',
-      )
-    : t('Bullet travel from the seated bullet: derived from approximate bullet and case geometry.')
+    ? t('Usable case volume: approximate, from the seated bullet.')
+    : t('Bullet travel: approximate, from the seated bullet.')
 }
 
 /** A field as the print shows it: its label and its value with the unit; none while empty. */

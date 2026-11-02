@@ -143,9 +143,7 @@ test('the Measurements link of a saved load fits the powder on the load the work
   await hand.getByRole('slider', { name: 'Vivacity' }).focus()
   await page.keyboard.press('ArrowRight')
   await expect(mark).toBeVisible()
-  await expect(
-    hand.getByText('Hand-tuned values are yours, not a fit. Simulation, not load data.'),
-  ).toBeVisible()
+  await expect(hand.getByText('Not a fit. Simulation, not load data.')).toBeVisible()
   expect(await problems(page, 'powder tune, hand-tuned', '.hand-tune')).toEqual([])
 
   const times = (await redrawTimes(page, 30)).sort((a, b) => a - b)

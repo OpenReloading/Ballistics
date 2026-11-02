@@ -362,7 +362,7 @@ function softEdgeWarning(spread: number, thickness: number): Wording[] {
     ? [
         worded(
           msg(
-            'The edges of the bullet are soft, about {spread} px wide: a shadow beside the bullet, or the photograph is out of focus or moved. Measured values are less certain; a sharp photograph in even light gives a more exact outline.',
+            'The bullet edges are soft, about {spread} px wide: a shadow beside the bullet, or the photograph is out of focus or moved. Measured values are less certain; take a sharp photograph in even light.',
           ),
           { spread: Math.round(spread) },
         ),
@@ -509,7 +509,7 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
       ? [
           worded(
             msg(
-              'The bullet differs from the background by {gap} grey levels only: the outline may be rough. A plainer background, or one much lighter or darker than the bullet, gives a better cut-out.',
+              'The bullet differs from the background by {gap} grey levels only: the outline may be rough. Use a plainer background, or one much lighter or darker than the bullet.',
             ),
             { gap: Math.round(gap) },
           ),
@@ -518,7 +518,7 @@ export function segment(g: Gray, exclude: readonly Point[] = []): Segmentation {
     ...(rivals
       ? [
           msg(
-            'Another object about as large as the bullet is in the photograph. Check that the one cut out is the bullet, or photograph one bullet alone, or paint the others out with the brush.',
+            'Another object about as large as the bullet is in the photograph. Check that the cut-out is the bullet, photograph one bullet alone, or paint the others out with the brush.',
           ),
         ]
       : []),

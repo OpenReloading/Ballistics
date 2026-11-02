@@ -711,7 +711,7 @@ function DatabaseBullet({
         {drag?.kind === 'none' && <p className="note">{noBcText(recordModel, t)}</p>}
         {bcOptions?.kind === 'choose' && (
           <Radio.Group
-            label={t('The record lists several {model} BCs without velocity bands; choose one', {
+            label={t('Several {model} BCs without velocity bands; choose one', {
               model: recordModel,
             })}
             value={choice === undefined ? null : String(choice)}
@@ -759,9 +759,7 @@ function ManualBullet({
       <NativeSelect
         className="wide"
         label={t('Bullet design')}
-        description={t(
-          'From your bullet designs in this browser; fills mass, diameter and length.',
-        )}
+        description={t('Fills mass, diameter and length.')}
         value={design?.id ?? ''}
         onFocus={readDesigns}
         onChange={(e) => chooseDesign(e.currentTarget.value)}
@@ -843,9 +841,7 @@ function RifleFields({
           description={
             sightGone
               ? t('The chosen firearm is no longer in this browser; its values stay.')
-              : t(
-                  'From your firearm library; fills sight height, twist, zero range, zero air and drag factor.',
-                )
+              : t('Fills sight height, twist, zero range, zero air and drag factor.')
           }
           value={sight}
           onFocus={readSights}

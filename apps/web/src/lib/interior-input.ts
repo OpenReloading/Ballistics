@@ -10,9 +10,7 @@ export const interiorFields = [
   {
     key: 'volume',
     label: msg('Usable case volume'),
-    help: msg(
-      'The volume behind the seated bullet: case capacity less the bullet inside the case.',
-    ),
+    help: msg('Case capacity less the bullet inside the case.'),
     quantity: 'capacity',
     required: true,
     min: 0,
@@ -121,7 +119,7 @@ export const interiorFields = [
     key: 'leakArea',
     label: msg('Leak area'),
     help: msg(
-      'Optional. Gas leaking past the bullet through an area that is the same over the whole travel. Empty: no leakage.',
+      'Optional. Constant area through which gas leaks past the bullet. Empty: no leakage.',
     ),
     quantity: 'area',
     min: 0,
@@ -176,7 +174,7 @@ export const bulletFields = [
     key: 'bulletDiameter',
     label: msg('Diameter'),
     help: msg(
-      'Used by the trajectory, the stability estimate and the groups. The interior run takes the bore diameter of the Cartridge card.',
+      'Used by the trajectory, stability and groups. The interior run uses the bore diameter of the Cartridge card.',
     ),
     quantity: 'length',
     min: 0,
@@ -186,7 +184,7 @@ export const bulletFields = [
     key: 'bulletLength',
     label: msg('Length'),
     help: msg(
-      'Used by the stability estimate and by the bore resistance of a fitted powder, not by the cartridge drawing. Empty: the length of the record.',
+      "Used by the stability estimate and the bore resistance of a fitted powder, not the cartridge drawing. Empty: the record's length.",
     ),
     quantity: 'length',
     min: 0,

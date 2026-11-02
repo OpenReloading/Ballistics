@@ -75,7 +75,7 @@ export function BulletDrawing({
   const assumed = p.outline.segments.some((s) => s.approximate)
   const notes = [
     t(
-      'Simplified drawing from the values as stored in the record; only values with a source are dimensioned. The table remains the data.',
+      'Simplified drawing from the record; only values with a source are dimensioned. The table is the data.',
     ),
     ...(assumed
       ? [

@@ -59,12 +59,12 @@ describe('resultNotes', () => {
       {
         kind: 'message',
         line: 'Chamber volume not measured',
-        text: expect.stringMatching(/^The volume comes from a record/),
+        text: expect.stringMatching(/^Peak pressure and muzzle velocity follow the volume/),
       },
       {
         kind: 'message',
         line: 'Case fill: needs bulk density',
-        text: 'The powder record gives no bulk density. Choose a powder record that gives one.',
+        text: 'The powder record gives no bulk density: choose one that does.',
       },
       {
         kind: 'note',

@@ -13,9 +13,7 @@ export const tours = {
     {
       target: '.load-strip',
       title: msg('Loads'),
-      text: msg(
-        'Each open load has a tab. New load starts another; Saved loads lists the loads kept in this browser.',
-      ),
+      text: msg('Each open load has a tab. Saved loads lists the loads kept in this browser.'),
     },
     {
       target: '.workspace-inputs',
@@ -27,7 +25,7 @@ export const tours = {
     {
       target: '.bar-run, .workspace-bar',
       title: msg('Run'),
-      text: msg('Runs the simulation in this browser with the values entered.'),
+      text: msg('Runs the simulation in this browser.'),
     },
     {
       target: '.workspace-results, .workspace-tablist',
@@ -58,7 +56,7 @@ export const tours = {
       target: '.sheet',
       title: msg('Summary'),
       text: msg(
-        'Once a file is read: mean, spread and the other statistics of each string. Load example reads three made-up strings.',
+        'Mean, spread and other statistics of each string. Load example reads three made-up strings.',
       ),
     },
   ],
@@ -72,19 +70,17 @@ export const tours = {
     {
       target: '.record-values',
       title: msg('Values'),
-      text: msg('The values of the record, in the units chosen under Units.'),
+      text: msg('In the units chosen under Units.'),
     },
     {
       target: '.record-side',
       title: msg('Notes'),
-      text: msg('Further values and notes of the record.'),
+      text: msg('Further values and notes.'),
     },
     {
       target: '.record-sources',
       title: msg('Sources'),
-      text: msg(
-        'Where the values come from: each source with its origin and the date it was retrieved.',
-      ),
+      text: msg('Each source of the values, with its origin and retrieval date.'),
     },
     {
       target: '.page-bar-actions, .page-bar-toggle',

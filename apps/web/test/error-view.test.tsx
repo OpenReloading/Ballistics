@@ -31,7 +31,7 @@ it.each([
   ['stuck', 'The bullet stopped in the bore'],
   ['integration', 'The calculation did not converge'],
   ['maxTime', 'did not reach the muzzle'],
-  ['input', 'A value is outside what the model accepts'],
+  ['input', 'A value is outside the model&#x27;s range'],
 ])('an invalid run with reason %s says what is wrong in words', (reason, text) => {
   const html = renderToStaticMarkup(
     <ErrorView

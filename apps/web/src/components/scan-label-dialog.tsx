@@ -75,7 +75,7 @@ export function ScanLabelDialog({
     else if (found === 'missing')
       show('warning', (t) =>
         t(
-          'This load is not saved in this browser and edition. Saved loads stay where they were saved: export it there and import the file here.',
+          'This load is not saved in this browser and edition: export it where it was saved and import the file here.',
         ),
       )
     else {
@@ -94,9 +94,7 @@ export function ScanLabelDialog({
     setBusy(true)
     try {
       await openText(await readPhoto(file), (t) =>
-        t(
-          'No box label code found in this photo. Hold the camera closer, so the code fills more of the frame.',
-        ),
+        t('No box label code found in this photo. Hold the camera closer.'),
       )
     } catch (e) {
       show('error', (t) => t('The photo could not be read: {error}', { error: errorText(e) }))

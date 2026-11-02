@@ -65,7 +65,7 @@ export function LadderImpactNote({ impact, system }: { impact: LadderImpact; sys
         yLabel={t('Residual centre ({unit})', { unit: len.symbol })}
         title={t('Vertical centre of the groups against charge, velocity effect removed')}
         description={t(
-          'Mean height of the shots above the point of aim with the effect of their velocity removed, per charge, with a bar of one standard error; the table lists the values.',
+          'Mean shot height above the point of aim per charge, velocity effect removed, with a bar of one standard error; the table lists the values.',
         )}
         height={200}
         points
