@@ -22,11 +22,11 @@ declare module 'fastify' {
     errors?: number[]
     /** The route answers an unknown id that `renames.json` replaces with 308 and a `Location`. */
     moved?: boolean
-    /** One line on what the route answers, read by `buildOpenApi`. */
+    /** One line on what the route answers. */
     summary?: string
-    /** What the route reads or computes and how, read by `buildOpenApi`. */
+    /** What the route reads or computes. */
     description?: string
-    /** A valid request body, read by `buildOpenApi`. */
+    /** A valid request body. */
     example?: unknown
   }
 }
@@ -44,7 +44,7 @@ export interface OpenApiDocument {
 interface OpenApiOperation {
   /** `<method><path words>`, for example `getBulletsById`; unique per operation. */
   operationId?: string | undefined
-  /** The group of the route in the reference: one of `tags`. */
+  /** The group of the route in the reference, one of `tags`. */
   tags?: string[] | undefined
   /** One line on what the route answers. */
   summary?: string | undefined
@@ -90,13 +90,13 @@ const tags = [
   {
     name: 'Records',
     description:
-      'Cartridges with their C.I.P. sheet values, manufacturers, powders, primers, bullets and cartridge cases.',
+      'Cartridges with their C.I.P. sheet values, manufacturers, powders, primers, bullets and cases.',
     segments: ['cartridges', 'manufacturers', 'powders', 'primers', 'bullets', 'cases'],
   },
   {
     name: 'Competition',
     description:
-      'Federations, their disciplines, target faces, the mapping between them, the caliber classes of the disciplines and the event types with their scoring.',
+      'Federations, disciplines, target faces and their mapping, caliber classes and event types with their scoring.',
     segments: [
       'federations',
       'disciplines',
@@ -130,7 +130,7 @@ const tagOf = (url: string) => {
 /**
  * The body of every error answer: Fastify's (with `code`, for example `FST_ERR_VALIDATION`), the
  * schema 400 (`issues`), the compute answers (`reason`, `missing`, `notice` and more) and the 500
- * (`requestId`, the `reqId` of the server log line of the error).
+ * (`requestId`, the `reqId` of the server log line).
  */
 const errorBody: JsonSchema = {
   type: 'object',
@@ -154,7 +154,7 @@ const errorBody: JsonSchema = {
     missing: {
       type: 'array',
       description:
-        'The load file route with `reason` `missingValues`: every solver value the file lacks, with its key, its path in the file and its stored quantity.',
+        'The load file route with `reason` `missingValues`: every solver value the file lacks, with key, path in the file and stored quantity.',
       items: {
         type: 'object',
         properties: {
@@ -173,9 +173,9 @@ const errorBody: JsonSchema = {
 
 /**
  * The statuses of a route: 200; 400 when Fastify or zod validates its input (an undeclared query
- * parameter included); its own `errors`;
- * 413 (`bodyLimit`) and 415 (no JSON content type) when it takes a body; 414 when it has a path
- * parameter (the router's `maxParamLength`, 100 characters); 500.
+ * parameter included); its own `errors`; 413 (`bodyLimit`) and 415 (no JSON content type) when it
+ * takes a body; 414 when it has a path parameter (the router's `maxParamLength`, 100 characters);
+ * 500.
  */
 function responses(
   route: RouteOptions,
@@ -256,11 +256,10 @@ function operationOf(route: RouteOptions, method: string, url: string): OpenApiO
 }
 
 /**
- * The contract document of the running routes: every route registered by `buildApp`, with the
- * query, path and body schemas the routes declare (Fastify JSON schemas, or the zod schemas in the
- * route `config`), and the responses: 200 with the `config.response` schema, else any JSON object,
- * and each error status the route answers with the shared `Error` body (`responses`).
- * `GET /` (the liveness probe) is not part of the contract. `info.version` is `API_VERSION`.
+ * The contract document of the running routes: every route registered by `buildApp`, with its
+ * query, path and body schemas (Fastify JSON schemas, or the zod schemas in the route `config`)
+ * and responses: 200 with the `config.response` schema, else any JSON object, and each error
+ * status with the shared `Error` body. `GET /` (the liveness probe) is not part of the contract.
  */
 export async function buildOpenApi(): Promise<OpenApiDocument> {
   const routes: RouteOptions[] = []

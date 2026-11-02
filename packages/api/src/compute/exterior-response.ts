@@ -1,7 +1,7 @@
 /**
- * Response schemas of the exterior compute routes, for the contract document. Every object is
- * loose, so fields core adds later do not break the document. Paths where the route writes a NaN or
- * infinite number as null are nullable.
+ * Response schemas of the exterior compute routes. Every object is loose, so fields core adds
+ * later do not break the document. Paths where the route writes a NaN or infinite number as null
+ * are nullable.
  */
 import { dragModels } from '@open-reloading/core'
 import { provenance } from '@open-reloading/schema'

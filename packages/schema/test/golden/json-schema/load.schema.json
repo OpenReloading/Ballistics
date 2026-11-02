@@ -215,7 +215,7 @@
             "overallLength",
             "baseToOgive"
           ],
-          "description": "The length the bullet is seated by: cartridge overall length or base to ogive."
+          "description": "The length the bullet is seated by."
         },
         "value": {
           "type": "object",
@@ -447,7 +447,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
+          "description": "Values the user typed in place of the referenced records: solver values, bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), `pmax` (a limit typed in place of the cartridge sheet), case length L3 and powder bulk density. Every other value follows the records."
         },
         "bulletBase": {
           "type": "string",
@@ -472,7 +472,7 @@
                     "seating",
                     "temperature"
                   ],
-                  "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                  "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                 },
                 "stepCount": {
                   "type": "integer",
@@ -483,7 +483,7 @@
                 "step": {
                   "type": "number",
                   "exclusiveMinimum": 0,
-                  "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                  "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                 },
                 "direction": {
                   "type": "string",
@@ -509,7 +509,7 @@
                     "seating",
                     "temperature"
                   ],
-                  "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                  "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                 },
                 "stepCount": {
                   "type": "number",
@@ -530,7 +530,7 @@
                 "step": {
                   "type": "number",
                   "exclusiveMinimum": 0,
-                  "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                  "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                 },
                 "direction": {
                   "type": "string",
@@ -545,6 +545,65 @@
             }
           ],
           "description": "The ladder of the load: step count, step size and direction."
+        },
+        "powders": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "typed",
+                "fill",
+                "target"
+              ],
+              "description": "Charge of each run."
+            },
+            "fill": {
+              "type": "number",
+              "minimum": 10,
+              "maximum": 120,
+              "description": "Case fill, %."
+            },
+            "targetPressure": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Target peak pressure, bar."
+            },
+            "targetPercent": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Target, % of CIP Pmax."
+            },
+            "manufacturer": {
+              "type": "string",
+              "allOf": [
+                {
+                  "pattern": "^(?:catalogue:[a-z0-9]+(?:-[a-z0-9]+)*|user:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$"
+                },
+                {
+                  "pattern": "^catalogue:"
+                }
+              ],
+              "description": "Reference `catalogue:<record id>` to a catalogue manufacturer."
+            },
+            "base": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Base filter."
+            },
+            "form": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Form filter."
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false,
+          "description": "Powders tab mode and filters (GLOSSARY `powders`)."
         }
       },
       "description": "The typed solver values and the ladder the load is analysed with."
@@ -594,7 +653,7 @@
                   "overallLength",
                   "baseToOgive"
                 ],
-                "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+                "description": "The length the bullet was seated by."
               },
               "value": {
                 "type": "object",

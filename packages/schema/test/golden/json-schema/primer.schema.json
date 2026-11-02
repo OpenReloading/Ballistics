@@ -29,7 +29,7 @@
         "large-pistol",
         "shotshell"
       ],
-      "description": "Small or large, for rifle or pistol, or the shotshell primer."
+      "description": "Size class of the primer."
     },
     "magnum": {
       "type": "boolean",
@@ -78,7 +78,7 @@
         "lead-styphnate",
         "lead-free"
       ],
-      "description": "The priming compound: lead styphnate or lead-free."
+      "description": "The priming compound."
     },
     "intendedUse": {
       "type": "string",

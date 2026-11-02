@@ -54,12 +54,12 @@ const cartridgeResponse = cartridge.extend({
   revision,
 })
 
-/** The body of `GET /cartridges/:id`: the record, its aliases, case type and case capacities. */
+/** The body of `GET /cartridges/:id`. */
 export interface CartridgeAnswer extends Cartridge {
   aliases: string[]
   caseType?: CaseType
   capacities: CatalogueCaseCapacity[]
-  /** Hash of the stored record. It changes with any field. */
+  /** Hash of the stored record, changes with any field. */
   revision: string
 }
 
@@ -97,7 +97,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         response: listResponse,
         summary: 'List cartridges',
         description:
-          'A page of cartridges ordered by name, digit runs in numeric order. `q` keeps the cartridges whose name or alias holds every word of it, in any order, and ranks them by match (a word that starts a word of the name first), ties in the default order. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), its highest Pmax (bar) and the case type from its rim and belt dimensions.',
+          'A page of cartridges ordered by name, digit runs in numeric order. `q` keeps the cartridges whose name or alias holds every word of it, in any order, and ranks them by match (a word that starts a word of the name first), ties in the default order. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), highest Pmax (bar) and case type.',
       },
     },
     (request, reply) => reply.send(catalogue.cartridges(request.query)),
@@ -113,7 +113,7 @@ export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = asy
         moved: true,
         summary: 'Get a cartridge',
         description:
-          'The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities. `revision` is a hash of the stored record that changes with any field.',
+          'The cartridge record of its C.I.P. sheet with provenance, case type and case capacities. `revision` is a hash of the stored record, changes with any field.',
       },
     },
     (request, reply) => {

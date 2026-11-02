@@ -43,15 +43,25 @@ const spec = (over: Partial<PhotoSpec> = {}): PhotoSpec => ({
   ...over,
 })
 
+/** `f` run once per argument in this file: the photographs are slow to draw and cut out. */
+function once<A, R>(f: (a: A) => R): (a: A) => R {
+  const cache = new Map<string, R>()
+  return (a) => {
+    const key = JSON.stringify(a)
+    if (!cache.has(key)) cache.set(key, f(a))
+    return cache.get(key) as R
+  }
+}
+
 /** The photograph of `s` cut out (by luma, or by colour where luma does not tell), outlined and measured, with the exact scale of its ruler. */
-function measured(s: PhotoSpec) {
+const measured = once((s: PhotoSpec) => {
   const photo = renderPhoto(s)
   const span = defined(photo.span)
   const seg = segmentPhoto(photo.image, [span.a, span.b])
   const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
   const scale = defined(scaleOf([span]))
-  return { seg, outline, scale, m: measureOutline(outline, scale) }
-}
+  return { photo, seg, outline, scale, m: measureOutline(outline, scale) }
+})
 
 /** The length-like values of the drawing, mm. */
 const truth: Partial<Record<PhotoField, number>> = {
@@ -89,9 +99,8 @@ describe('a photograph that is hard to cut out', () => {
   })
 
   it('tells a bullet from a background of the same brightness by colour', () => {
-    const luma = segment(grayOf(renderPhoto(spec({ bullet: 190, chroma: 40 })).image))
-    expect(luma.warnings.length).toBeGreaterThan(0)
     const r = measured(spec({ bullet: 190, chroma: 40 }))
+    expect(segment(grayOf(r.photo.image)).warnings.length).toBeGreaterThan(0)
     expect(Math.abs(r.outline.length / r.scale.pxPerMm - 30)).toBeLessThan(0.2)
     expectNear(r, 3)
   })
@@ -293,32 +302,35 @@ describe('a shadow towards the base or far along the axis', () => {
     base: { type: 'flat' },
   }
   /** A product-style image of `t` at `k` px per mm with `shadow`, measured at the scale its diameter gives. */
-  const atDiameter = (t: BulletDimensions, k: number, shadow: NonNullable<PhotoSpec['shadow']>) => {
-    const [length, a] = [t.length * k, (t.diameter / 2) * k]
-    const margin = Math.max(60, 0.15 * length)
-    const photo = renderPhoto({
-      shape: t,
-      pxPerMm: k,
-      width: Math.ceil(length + 2 * margin),
-      height: Math.ceil(margin + 2 * a + length * Math.sin((3 * Math.PI) / 180) + margin),
-      base: { x: margin, y: margin + a },
-      angle: (3 * Math.PI) / 180,
-      paper: 235,
-      bullet: 115,
-      gradient: 10,
-      shading: 30,
-      noise: 3,
-      blur: 1,
-      seed: 11,
-      shadow,
-    })
-    const seg = segmentPhoto(photo.image)
-    const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
-    const px = measureOutline(outline, { pxPerMm: 1, relUncertainty: 0 })
-    const scale = defined(resolveScale(px, undefined, { diameter: t.diameter }).scale)
-    const hints = [...seg.warnings, ...outlineHints(outline).hints]
-    return { outline, m: measureOutline(outline, scale), hints }
-  }
+  const atDiameter = once(
+    ([t, k, shadow, obliqueBase]: [BulletDimensions, number, PhotoSpec['shadow'], number?]) => {
+      const [length, a] = [t.length * k, (t.diameter / 2) * k]
+      const margin = Math.max(60, 0.15 * length)
+      const photo = renderPhoto({
+        shape: t,
+        pxPerMm: k,
+        width: Math.ceil(length + 2 * margin),
+        height: Math.ceil(margin + 2 * a + length * Math.sin((3 * Math.PI) / 180) + margin),
+        base: { x: margin, y: margin + a },
+        angle: (3 * Math.PI) / 180,
+        paper: 235,
+        bullet: 115,
+        gradient: 10,
+        shading: 30,
+        noise: 3,
+        blur: 1,
+        seed: 11,
+        shadow,
+        obliqueBase,
+      })
+      const seg = segmentPhoto(photo.image)
+      const outline = defined(fitOutline(seg, { edgeSpread: seg.edgeSpread }))
+      const px = measureOutline(outline, { pxPerMm: 1, relUncertainty: 0 })
+      const scale = defined(resolveScale(px, undefined, { diameter: t.diameter }).scale)
+      const hints = [...seg.warnings, ...outlineHints(outline).hints]
+      return { outline, m: measureOutline(outline, scale), hints }
+    },
+  )
   // the research evaluation's drop shadow, offset towards the base instead of the tip, at 15 and
   // 30 px per mm; and a pistol bullet's shadow 20 px along the axis and 6 across, blur 4
   const cases: [string, BulletDimensions, number, NonNullable<PhotoSpec['shadow']>][] = [
@@ -329,7 +341,7 @@ describe('a shadow towards the base or far along the axis', () => {
   ]
   for (const [name, t, k, shadow] of cases)
     it(`${name}: no boat tail on the flat base, the length within 3 u or the shadow named`, () => {
-      const { m, hints } = atDiameter(t, k, shadow)
+      const { m, hints } = atDiameter([t, k, shadow])
       expect(m.baseType).toBe('flat')
       const length = defined(m.values.length)
       const within =
@@ -339,15 +351,58 @@ describe('a shadow towards the base or far along the axis', () => {
     })
 
   it('trims a shadow past the base and names it', () => {
-    const { outline } = atDiameter(rifle, 30, { dx: -18, dy: 27, blur: 18, depth: 0.2 })
+    const { outline } = atDiameter([rifle, 30, { dx: -18, dy: 27, blur: 18, depth: 0.2 }])
     expect(outline.shadow).toEqual({ side: 'right', removed: false })
     // the cut-out ran on past the base face by most of the shadow's 18 px offset
     expect(outline.length).toBeLessThan(30 * 30 + 3)
   })
+
+  // the second reader's sweep (#934): a pistol bullet at 30 px per mm, the shadow 0.6 and 1.2 mm
+  // towards the base and 0.9 mm across, blur 0.6 mm; the second read 25 px long with no shadow named
+  for (const along of [0.6, 1.2])
+    it(`a pistol bullet with a shadow ${along} mm towards the base and 0.9 mm across: the shadow named`, () => {
+      const { outline, m, hints } = atDiameter([
+        pistol,
+        30,
+        { dx: -along * 30, dy: 27, blur: 18, depth: 0.2 },
+      ])
+      const length = defined(m.values.length)
+      const within =
+        Math.abs(length.value - pistol.length) <=
+        Math.max(0.01 * pistol.length, 3 * length.uncertainty)
+      expect(within || /shadow beside the bullet/.test(text(hints))).toBe(true)
+      expect(outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    })
+
+  it('fits the axis again after a trim', () => {
+    // 1.2 mm towards the base, 0.3 mm across: the axis turned 1.7 degrees off with the overhang in the cut-out
+    const { outline } = atDiameter([pistol, 30, { dx: -36, dy: 9, blur: 18, depth: 0.2 }])
+    expect(outline.shadow).toEqual({ side: expect.any(String), removed: false })
+    expect(Math.abs(outline.length - 15.5 * 30)).toBeLessThan(5)
+    expect(Math.abs(outline.angle - (3 * Math.PI) / 180)).toBeLessThan((1 * Math.PI) / 180)
+  })
+
+  // #963: a clean flat base cut at an angle (a slanted sprue cut) reaches one side later, as a
+  // shadow past the base does, but its late side ramps on evenly and its early corner is sharp
+  for (const [name, t, k, slant] of [
+    ['pistol', pistol, 40, 2],
+    ['pistol', pistol, 60, 5],
+    ['rifle', rifle, 40, 5],
+    ['rifle', rifle, 60, 2],
+  ] as const)
+    it(`a ${name} bullet's base face cut ${slant} degrees off at ${k} px per mm: no shadow named`, () => {
+      const { outline, m } = atDiameter([t, k, undefined, slant])
+      expect(outline.shadow).toBeUndefined()
+      const length = defined(m.values.length)
+      expect(Math.abs(length.value - t.length)).toBeLessThanOrEqual(
+        Math.max(0.01 * t.length, 3 * length.uncertainty),
+      )
+    })
 })
 
 describe('an axis direction the user typed', () => {
   // the photograph's bullet lies 3 degrees off level; 40 px per mm makes the base face wide enough to show a turn
+  const cutOut = once((s: PhotoSpec) => segmentPhoto(renderPhoto(s).image))
   const typed = (over: Partial<PhotoSpec>, offDegrees: number) => {
     const s = spec({
       pxPerMm: 40,
@@ -357,7 +412,7 @@ describe('an axis direction the user typed', () => {
       ruler: undefined,
       ...over,
     })
-    const seg = segmentPhoto(renderPhoto(s).image)
+    const seg = cutOut(s)
     const angle = ((3 + offDegrees) * Math.PI) / 180
     const outline = defined(fitOutline(seg, { angle, edgeSpread: seg.edgeSpread }))
     return { outline, m: measureOutline(outline, { pxPerMm: 40, relUncertainty: 0 }) }

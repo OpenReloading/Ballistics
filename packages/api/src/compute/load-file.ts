@@ -1,10 +1,9 @@
 /**
- * `POST /interior/load-file` input: a load file (one record of kind `load`), read
- * to the `POST /interior` body. A value the workbench leaves out because its Settings, followed
- * defaults or seating give it (temperature, volume, bore diameter, twist, travel) is not
- * filled here: the route answers 422 with every such value. The field mapping is `interiorLoad` of core, the one the
- * workbench uses; this module adds the file check, the values the referenced records give and
- * the record lookups.
+ * `POST /interior/load-file` input: a load file (one record of kind `load`), read to the
+ * `POST /interior` body. A value the workbench leaves out because its Settings, followed defaults
+ * or seating give it (temperature, volume, bore diameter, twist, travel) is not filled here: the
+ * route answers 422 with every such value. The field mapping is `interiorLoad` of core, as in the
+ * workbench; this module adds the file check, the values of the referenced records and the lookups.
  */
 import {
   checkResistanceValues,
@@ -52,8 +51,8 @@ function unknownKeys(input: unknown, parsed: unknown, path: Path): Path[] {
 
 /**
  * The one `load` record of a load file. Throws a `ZodError` with the path of each problem: an
- * unknown field, an invalid value, a record of the old format, no or several loads, a `user:`
- * reference the server cannot resolve.
+ * unknown field, an invalid value, a record of the old format, no or several loads, an unresolvable
+ * `user:` reference.
  */
 export function readLoadFile(json: unknown): { path: Path; record: Load; name: string } {
   const problem = versionProblem(json)
@@ -99,9 +98,9 @@ export interface LoadRecords {
 }
 
 /**
- * The SI solver values of a load, by workbench key: what its powder record's model parameters and
- * its bullet record's mass give, then the values it overrides (stored units to SI), then its
- * charge. A value no record gives is absent.
+ * The SI solver values of a load, by workbench key: the powder record's model parameters and the
+ * bullet record's mass, then the load's overrides (stored units to SI), then its charge. A value no
+ * record gives is absent.
  */
 export function loadValues(data: Load, { powder, bullet }: LoadRecords): Record<string, number> {
   const typed = Object.entries(data.analysis?.overrides ?? {}).flatMap(([k, v]) =>
@@ -119,7 +118,7 @@ export function loadValues(data: Load, { powder, bullet }: LoadRecords): Record<
 export const bulletLengthMm = (values: Record<string, number>, bullet: Bullet | undefined) =>
   values.bulletLength === undefined ? bullet?.length?.value : fromSi('length', values.bulletLength)
 
-/** The catalogue record id of a `cartridge` or `bullet` of a load file: a plain id or a `catalogue:` reference. */
+/** The catalogue record id of a `cartridge` or `bullet` of a load file, a plain id or a `catalogue:` reference. */
 export const catalogueIdOf = (target: string) => parseRef(target)?.id ?? target
 
 /** The issues of a strict-object error with one issue per unknown key, at the key's path. */
@@ -194,10 +193,7 @@ export interface MissingValuesAnswer {
   }
 }
 
-/**
- * The 422 answer for a load file that lacks solver values, or undefined when it has them all: one
- * entry per missing value with its path in the file and its stored quantity.
- */
+/** The 422 answer for a load file that lacks solver values (one entry per value, with path and stored quantity), else undefined. */
 export function missingValuesAnswer(
   values: Record<string, number>,
   at: Path,

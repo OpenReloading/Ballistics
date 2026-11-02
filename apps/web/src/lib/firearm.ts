@@ -388,7 +388,7 @@ export function withSessionRounds(
 }
 
 /** The firearm `record` with `n` rounds added for `key` in `countedSessions`, the oldest entry dropped at the limit. */
-function withCountedRounds(
+export function withCountedRounds(
   record: Extract<UserRecord, { kind: 'firearm' }>,
   key: string,
   n: number,
@@ -681,6 +681,8 @@ export function firearmCells(f: Firearm, system: UnitSystem, t: Translator['t'])
     hand: f.twist?.value ? f.twistHand : '',
     optic: mount ? optic?.name || t('Optic') : '',
     zero: mount ? formatQuantity('range', system, toSi('length', mount.zeroRange.value)) : '',
+    // `sortRows` pads digit runs, so the stored zero range after the name orders as a number
+    opticZero: mount ? `${optic?.name || t('Optic')}\u001f${mount.zeroRange.value}` : undefined,
     configuration: config ? config.name || t('Configuration {n}', { n: i + 1 }) : '',
   }
 }

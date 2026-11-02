@@ -20,5 +20,5 @@ export const manufacturer = z.strictObject({
   provenance,
 })
 
-/** A manufacturer record: name, optional website and other names. */
+/** A manufacturer record. */
 export interface Manufacturer extends z.infer<typeof manufacturer> {}

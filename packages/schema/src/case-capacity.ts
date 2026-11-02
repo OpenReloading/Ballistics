@@ -54,10 +54,7 @@ export const caseCapacity = z
         issue([k], 'A catalogue capacity names catalogue records only')
   })
 
-/**
- * A capacity of the catalogue (`records/capacities`): {@link caseCapacity} with `origin`
- * `catalogue`, which also carries its id and provenance.
- */
+/** A capacity of the catalogue (`records/capacities`): {@link caseCapacity} with `origin` `catalogue`. */
 export const catalogueCaseCapacity: z.ZodType<CatalogueCaseCapacity> = caseCapacity.refine(
   (c): c is CatalogueCaseCapacity => c.origin === 'catalogue',
   { message: 'A catalogue record has origin catalogue', path: ['origin'] },

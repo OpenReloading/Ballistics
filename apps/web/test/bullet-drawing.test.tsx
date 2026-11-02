@@ -20,8 +20,13 @@ const { TechnicalDrawing } = await import('../src/components/technical-drawing.t
 
 const records = readRecords().bundle.bullets as Bullet[]
 
-/** No committed record has a polymer tip, and only an invented one a flat base: these two are test fixtures. */
-const fixtures = ['bullet-flat-base', 'bullet-polymer-tip'].map(
+/** No committed record has a polymer tip, and only an invented one a flat base; the sparse cast bullet and the boat-tail length without a base type keep the drawing's fill-in covered: test fixtures. */
+const fixtures = [
+  'bullet-flat-base',
+  'bullet-polymer-tip',
+  'bullet-sparse-cast',
+  'bullet-tail-no-type',
+].map(
   (f) => JSON.parse(readFileSync(new URL(`fixtures/${f}.json`, import.meta.url), 'utf8')) as Bullet,
 )
 
@@ -93,21 +98,14 @@ describe('bullet drawing over the records', () => {
     expect([...reasons]).toEqual(without ? [['The record has no length.', without]] : [])
   })
 
-  it('takes schema-valid fixtures for the flat base and the polymer tip', () => {
+  it('takes schema-valid fixtures', () => {
     for (const f of fixtures) expect(bullet.safeParse(f).error).toBeUndefined()
     expect(records.some((r) => r.tip?.type === 'polymer-tip')).toBe(false)
   })
 })
 
-/** The first record with a length of each maker, and every invented one: a golden file each (the other records draw and are checked above, without a file). Then the two fixtures. */
-const makers = new Set<string>()
-const sampled = records.filter((r) => {
-  if (!r.length) return false
-  if (r.manufacturer.startsWith('demo-')) return true
-  if (makers.has(r.manufacturer)) return false
-  makers.add(r.manufacturer)
-  return true
-})
+/** Every invented record with a length: a golden file each (the other records draw and are checked above, without a file). Then the fixtures. */
+const sampled = records.filter((r) => r.length && r.manufacturer.startsWith('demo-'))
 const goldens = [...sampled, ...fixtures]
 
 describe('bullet drawing markup', () => {

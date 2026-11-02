@@ -232,6 +232,12 @@ describe('a target of any pattern', () => {
       }
     return { width: W, height: H, data }
   }
+  const sharpAndLit = new Map<Pattern, RgbaImage>()
+  /** `draw(p)`, once per pattern: no check writes to the image. */
+  const drawn = (p: Pattern) => {
+    if (!sharpAndLit.has(p)) sharpAndLit.set(p, draw(p))
+    return sharpAndLit.get(p) as RgbaImage
+  }
   const soft = async (image: RgbaImage, sigma: number): Promise<RgbaImage> => {
     const raw = { width: W, height: H, channels: 4 as const }
     const out = await sharp(Buffer.from(image.data), { raw }).blur(sigma).raw().toBuffer()
@@ -299,11 +305,11 @@ describe('a target of any pattern', () => {
     describe(name, () => {
       for (const layout of [undefined, { dark: p.dark }, { dark: undefined }])
         it(`gives no warning when sharp and lit (layout ${JSON.stringify(layout)})`, () => {
-          expect(photoQuality(view(p, draw(p), layout))).toEqual([])
+          expect(photoQuality(view(p, drawn(p), layout))).toEqual([])
         })
 
       it('is still caught when out of focus', async () => {
-        expect(problems(photoQuality(view(p, await soft(draw(p), 6))))).toContain('blur')
+        expect(problems(photoQuality(view(p, await soft(drawn(p), 6))))).toContain('blur')
       })
 
       it('is still caught when underexposed', () => {
@@ -363,7 +369,7 @@ describe('a target of any pattern', () => {
       expect(
         photoQuality(view(white, draw(white, { at: { x: 1000, y: 700 } }), { dark: false })),
       ).toEqual([])
-      expect(photoQuality(view(rimmed, draw(mix), layout))).toEqual([])
+      expect(photoQuality(view(rimmed, drawn(mix), layout))).toEqual([])
     })
 
     it('is the whole sheet with a small black area', () => {

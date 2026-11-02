@@ -480,14 +480,15 @@ describe('profile', () => {
     expect(defined(p.notes[0]).symbols).toEqual(['G1', 'F'])
   })
 
-  it('ends the 18 x 81 chamber at H2 at L3 without G1 and names G and F', () => {
-    const chamber = { L3: 80.8, R1: 21.95, E: 6.24, P1: 21.95, H2: 19.2, G: 1.85, F: 18 }
+  it('ends a chamber without G1 at H2 at L3 and names G and F', () => {
+    // no stored record lacks G1: the 30 Super Carry chamber without it
+    const chamber = { L3: 21.01, R1: 8.77, E: 2.98, P1: 8.74, H2: 8.58, G: 1.79, F: 7.7 }
     const p = drawn(cipProfile([...values('chamber', chamber), angle('i', 17.97)], 'chamber'))
-    expect(p.points.at(-1)).toEqual([9.6, 80.8])
+    expect(p.points.at(-1)).toEqual([4.29, 21.01])
     expect(codes(p.notes)).toEqual(['noG1'])
     expect(defined(p.notes[0]).symbols).toEqual(['G1', 'G', 'F'])
     expect(defined(p.notes[0]).text).toBe(
-      'Chamber has no G1: the outline ends at H2 at L3, G 1.85, F 18 mm not drawn.',
+      'Chamber has no G1: the outline ends at H2 at L3, G 1.79, F 7.7 mm not drawn.',
     )
   })
 

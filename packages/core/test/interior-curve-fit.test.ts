@@ -93,8 +93,11 @@ const base: CurveFitOptions = { fallFraction: 0.35 }
 const within = (p: CurveParameterReport, value: number, k = 3) =>
   Math.abs(p.value - value) <= k * (p.standardUncertainty ?? Number.NaN)
 
+/** All five parameters of the noisy trace, shared by the tests that read the fit. */
+const full = fitPressureCurve(start(), noisy, { ...base, maxInflation: 500 })
+
 describe('curve fit of a synthetic trace', () => {
-  const fit = fitPressureCurve(start(), noisy, { ...base, maxInflation: 500 })
+  const fit = full
 
   it('recovers the form parameters, the exponent and the burn coefficient within their uncertainty', () => {
     const { parameters } = fit
@@ -187,7 +190,6 @@ describe('curve fit identifiability', () => {
   })
 
   it('gives up the exponent first when the fit is ill-conditioned', () => {
-    const full = fitPressureCurve(start(), noisy, { ...base, maxInflation: 500 })
     const fit = fitPressureCurve(start(), noisy, {
       ...base,
       maxCondition: full.conditionNumber / 2,

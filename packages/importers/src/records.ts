@@ -474,12 +474,12 @@ const isIssue = (x: Cells | RowIssue): x is RowIssue =>
   typeof x.row === 'number' && typeof x.reason === 'string'
 
 /**
- * The user records of `table` read with `map` as `kind`, saved at `now` (ISO 8601). Each row is
- * checked on its own: a row that fails is listed with row, column, cell and reason and never
- * blocks the others. Ids are deterministic (`idOfKey` of kind, name, maker and, for a bullet,
- * diameter and mass), so the same row read again gets the same id. A row whose id repeats an
- * earlier row's gets a warning naming both rows; the caller keeps the first record of an id. The
- * caller still parses each record with the user record schema before storing it.
+ * The user records of `table` read with `map` as `kind`, saved at `now` (ISO 8601). A row that
+ * fails is listed with row, column, cell and reason and never blocks the others. Ids are
+ * deterministic (`idOfKey` of kind, name, maker and, for a bullet, diameter and mass), so the same
+ * row read again gets the same id. A row whose id repeats an earlier row's gets a warning naming
+ * both rows; the caller keeps the first record of an id. The caller still parses each record with
+ * the user record schema before storing it.
  */
 export function buildRecords(
   table: Table,

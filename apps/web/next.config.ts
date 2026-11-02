@@ -3,7 +3,7 @@ import path from 'node:path'
 import type { NextConfig } from 'next'
 import packageJson from './package.json' with { type: 'json' }
 import { shortCommit } from './scripts/git-head.ts'
-import { buildLine } from './src/lib/build-line.ts'
+import { type Build, buildLine, buildTag } from './src/lib/build-line.ts'
 
 /**
  * The static export, served under this path (`''` at a domain root, `/Ballistics` on a project
@@ -16,6 +16,14 @@ const edition = process.env.PAGES_EDITION === 'next' ? 'next' : ''
 // the checkout's own commit: a release edition builds from its tag, not from the commit that started the run
 const commit = shortCommit(path.join(import.meta.dirname, '../..'))
 
+const build: Build = {
+  // a Pages build runs in CI (`CI` set there); anything else is a local build
+  edition: edition || (process.env.CI ? 'release' : 'development'),
+  version: packageJson.version,
+  commit,
+  day: new Date().toISOString().slice(0, 10),
+}
+
 const nextConfig: NextConfig = {
   output: 'export',
   basePath,
@@ -24,13 +32,8 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_PAGES_BASE_PATH: basePath,
     NEXT_PUBLIC_PAGES_EDITION: edition,
-    NEXT_PUBLIC_BUILD_LINE: buildLine({
-      // a Pages build runs in CI (`CI` set there); anything else is a local build
-      edition: edition || (process.env.CI ? 'release' : 'development'),
-      version: packageJson.version,
-      commit,
-      day: new Date().toISOString().slice(0, 10),
-    }),
+    NEXT_PUBLIC_BUILD_LINE: buildLine(build),
+    NEXT_PUBLIC_BUILD_TAG: buildTag(build),
   },
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),
   // the images are two SVG logos, served as files: no optimizer, so the image needs no sharp
