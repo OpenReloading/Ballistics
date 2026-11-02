@@ -5,6 +5,7 @@ import {
   powderTableCsv,
   restoredPowderTab,
   savedPowderTab,
+  switchedTarget,
 } from '../src/components/powder-csv.ts'
 import type { CompareRow } from '../src/components/use-powder-compare.ts'
 import { english } from '../src/i18n/translate.ts'
@@ -83,6 +84,7 @@ describe('the Powders tab kept with the load', () => {
       kind: 'target',
       fill: 90,
       targetText: 50000,
+      targetKept: { text: 50000, si: expect.closeTo(us.pressure.toSi(50000)) },
       percent: false,
       filters: { manufacturerName: 'Maker', base: '', form: 'ball' },
     })
@@ -95,6 +97,33 @@ describe('the Powders tab kept with the load', () => {
     )
     expect(saved).toEqual({ mode: 'target', targetPercent: 85 })
     expect(restoredPowderTab(saved, metric)).toMatchObject({ targetText: 85, percent: true })
+  })
+
+  it('keeps a typed target the same pressure when the unit system changes', () => {
+    const typed = { ...initialPowderTab, kind: 'target' as const, targetText: 3500 }
+    const inPsi = { ...typed, ...switchedTarget(typed, metric, us) }
+    expect(inPsi.targetText).toBe(50763)
+    // another control changed in psi: the file keeps the bar typed, not 50763 psi read back
+    expect(savedPowderTab({ ...inPsi, fill: 90 }, us)?.targetPressure).toBe(3500)
+    expect(switchedTarget(inPsi, us, metric).targetText).toBe(3500)
+    // a target typed after the switch is read in the new unit
+    expect(savedPowderTab({ ...inPsi, targetText: 50000 }, us)?.targetPressure).toBeCloseTo(
+      3447.38,
+      2,
+    )
+  })
+
+  it('leaves a share of Pmax as it is when the unit system changes', () => {
+    const share = { ...initialPowderTab, kind: 'target' as const, targetText: 85, percent: true }
+    expect(switchedTarget(share, us, metric)).toEqual({ targetText: 85, targetKept: undefined })
+  })
+
+  it('keeps a restored target to the digit when the unit system changes', () => {
+    const restored = restoredPowderTab({ mode: 'target', targetPressure: 3447.38 }, us)
+    expect(restored.targetText).toBe(50000)
+    const inBar = { ...restored, ...switchedTarget(restored, us, metric) }
+    expect(inBar.targetText).toBe(3447)
+    expect(savedPowderTab(inBar, metric)?.targetPressure).toBe(3447.38)
   })
 
   it('keeps a filter of a manufacturer whose name is not known yet by its id', () => {

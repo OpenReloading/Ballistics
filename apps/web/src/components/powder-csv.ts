@@ -1,7 +1,6 @@
 import { fromSi, toSi } from '@open-reloading/schema'
 import { canonicalNumberText, formatNumber } from '../i18n/number.ts'
 import type { Translator } from '../i18n/translate.ts'
-import { targetUnit } from '../lib/charge-target.ts'
 import { toCsv } from '../lib/csv.ts'
 import { productLabel } from '../lib/manufacturers.ts'
 import {
@@ -84,6 +83,8 @@ export type PowderTabState = {
   fill: number | string
   /** As typed, in the unit of `percent`. */
   targetText: number | string
+  /** The pressure in Pa shown as `text` after a unit switch or a restore: read while `targetText` is still `text`. */
+  targetKept?: { text: number | string; si: number } | undefined
   /** The target is a share of the cartridge's CIP Pmax. */
   percent: boolean
   filters: PowderFilters
@@ -104,6 +105,32 @@ export const initialPowderTab: PowderTabState = {
 const validNumber = (x: number | string) =>
   typeof x === 'number' ? x : x.trim() === '' ? Number.NaN : Number(x)
 
+type TargetState = Pick<PowderTabState, 'targetText' | 'targetKept' | 'percent'>
+
+/** The pressure target in Pa: the kept one while the text is unchanged, else the text read in `system`. */
+export function targetPressure(s: TargetState, system: UnitSystem): number | undefined {
+  if (s.percent) return undefined
+  if (s.targetKept?.text === s.targetText) return s.targetKept.si
+  const target = validNumber(s.targetText)
+  return Number.isFinite(target) && target > 0 ? system.pressure.toSi(target) : undefined
+}
+
+const shownPressure = (si: number, system: UnitSystem) =>
+  Number(system.pressure.fromSi(si).toFixed(system.pressure.decimals))
+
+/** The target after the units changed from `from` to `to`: a typed pressure shows in the new unit. */
+export function switchedTarget(
+  s: TargetState,
+  from: UnitSystem,
+  to: UnitSystem,
+): Pick<PowderTabState, 'targetText' | 'targetKept'> {
+  const si = targetPressure(s, from)
+  if (si === undefined || from.pressure === to.pressure)
+    return { targetText: s.targetText, targetKept: s.targetKept }
+  const targetText = shownPressure(si, to)
+  return { targetText, targetKept: { text: targetText, si } }
+}
+
 /**
  * The tab's state as the load keeps it; none while every control has its first value. The
  * manufacturer filter is kept by reference: `idOf` gives the id of a manufacturer name.
@@ -118,7 +145,7 @@ export function savedPowderTab(
   const target = validNumber(s.targetText)
   const hasFill = fill >= caseFillPercentRange.min && fill <= caseFillPercentRange.max
   const hasTarget = Number.isFinite(target) && target > 0
-  const pressure = hasTarget && !s.percent ? targetUnit('peakPressure', system).toSi(target) : 0
+  const pressure = targetPressure(s, system) ?? 0
   const saved: SavedPowderTab = {
     mode: s.kind,
     ...(hasFill && fill !== caseFillPercentRange.initial && { fill }),
@@ -138,18 +165,16 @@ export function restoredPowderTab(
   names: ReadonlyMap<string, string> = new Map(),
 ): PowderTabState {
   if (!saved) return initialPowderTab
-  const unit = targetUnit('peakPressure', system)
-  const targetText =
-    saved.targetPercent ??
-    (saved.targetPressure === undefined
-      ? ''
-      : Number(unit.fromSi(toSi('pressure', saved.targetPressure)).toFixed(unit.decimals)))
+  const si = saved.targetPressure === undefined ? undefined : toSi('pressure', saved.targetPressure)
+  const targetText = saved.targetPercent ?? (si === undefined ? '' : shownPressure(si, system))
   const maker = saved.manufacturer?.replace(/^catalogue:/, '')
   return {
     maker,
     kind: saved.mode,
     fill: saved.fill ?? caseFillPercentRange.initial,
     targetText,
+    targetKept:
+      saved.targetPercent === undefined && si !== undefined ? { text: targetText, si } : undefined,
     percent: saved.targetPercent !== undefined,
     filters: {
       manufacturerName: (maker && names.get(maker)) ?? '',
