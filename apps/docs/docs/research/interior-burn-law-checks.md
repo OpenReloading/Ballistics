@@ -32,7 +32,7 @@ $$
 L = \frac{\dot p}{\bar p\, p_\text{max}} = L_d\, \frac{1 + \chi}{(1 + \chi z)^2}
 $$
 
-For a burn law $\dot z = B \varphi(z)\, \bar p^n$ with a fixed form function, the integral over the time in which the burnt fraction rises from $z_a$ to $z_b$ is $\int \bar p^n\, dt = \int_{z_a}^{z_b} dz / (B \varphi(z))$, which does not depend on the loading density. A closed vessel ignites at a burnt fraction $z_0 \gt 0$, set by the igniter pressure, which changes with the loading density through $\bar p(z)$. The comparison therefore takes a common range with $z_a$ above the $z_0$ of every curve, not the whole burn from ignition ([Kneubuehl 2018](../bibliography.md#kneubuehl-2018), p. 106, for the dynamic vivacity; the integral follows from the burn law of the [burn forms page](../models/interior-burn-forms.md)).
+For a burn law $\dot z = B \varphi(z)\, \bar p^n$ with a fixed form function, the integral over the time in which the burnt fraction rises from $z_a$ to $z_b$ is $\int \bar p^n\, dt = \int_{z_a}^{z_b} dz / (B \varphi(z))$, which does not depend on the loading density. A closed vessel ignites at a burnt fraction $z_0 \gt 0$, set by the igniter pressure, and $z_0$ changes with the loading density through $\bar p(z)$. The comparison therefore takes a common range with $z_a$ above the $z_0$ of every curve, not the whole burn from ignition ([Kneubuehl 2018](../bibliography.md#kneubuehl-2018), p. 106, for the dynamic vivacity; the integral follows from the burn law of the [burn forms page](../models/interior-burn-forms.md)).
 
 ## Numbers
 

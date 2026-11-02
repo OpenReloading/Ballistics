@@ -5,6 +5,8 @@ description: How much of the effect of the propellant temperature on muzzle velo
 
 # Temperature dependence of the propellant gas energy
 
+Every number on this page comes from synthetic loads and ladders: simulations, not load data. The coefficients are assumptions, not measurements.
+
 ## Question
 
 Interior model ([M3](../models/interior-m3.md), [powder fit](../models/interior-powder-fit.md)): how large is the omitted dependence of the specific energy on the propellant temperature next to the burn-rate factor, and does a fit with the energy coefficient fixed predict held-out temperatures better than the fit whose shared temperature factor is free?
@@ -43,7 +45,7 @@ Study 1, change for +5.6 K (burn sensitivity 0.004 1/K, energy coefficient 0.000
 | rifle, heavy charge 3.3 g | 0.347 | 971 | 0.377 / 5.72 | 0.095 / 0.33 | 0.472 / 6.07 | 20.1 % / 5.4 % |
 | pistol, 0.4 g | 0.050 | 333 | 0.413 / 2.08 | 0.094 / 0.21 | 0.507 / 2.30 | 18.5 % / 9.4 % |
 
-The expected shares (about 20 to 25 % for velocity, about 7 % for pressure) hold in size: velocity at or a little below the lower end, pressure a little under.
+The energy term carries 17 to 22 % of the velocity change and 5 to 6.5 % of the pressure change on the rifle and gun loads, and 18.5 % and 9.4 % on the pistol load. The expected shares (about 20 to 25 % for velocity, about 7 % for pressure) hold in size: velocity at or a little below the lower end, pressure a little under on the rifle and gun loads.
 
 Study 2, pooled RMS over 50 replicates and 3 held-out charges (A: shared temperature factor, B: energy coefficient fixed at 0.0003 1/K):
 

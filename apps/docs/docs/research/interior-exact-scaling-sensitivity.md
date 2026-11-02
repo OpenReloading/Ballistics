@@ -18,7 +18,7 @@ Four checks in `packages/core/test/interior-exact.test.ts`:
 3. Central differences ($\pm$ 0.5 %) of the muzzle velocity against chamber volume and against barrel length for the fixture load and a second rifle load. Accept: the slope against volume within 5 % of the relation below.
 4. Central differences ($\pm$ 0.5 %) of the muzzle velocity against shell mass, charge, chamber volume and shot travel of a load of 203 mm bore defined in the test (90 kg shell, 10 kg charge, seven-perforation grain, 238 MPa peak, 525 m/s). Accept: each within 0.1 of the typical value, which has no citable source here ("typical, source unverified"): $-0.4$, $+0.6$ to $0.7$, $-0.25$, $+0.2$. The pressure responses are reported, not asserted.
 
-Permanent mutation tests show each check can fail: a check 1 reference with covolume 1/density differs by far more than $10^{-6}$, and the heat model on moves check 2 by more than $10^{-3}$.
+Each check can fail. Permanent tests show it for checks 1 and 2: a check 1 reference with covolume 1/density differs by far more than $10^{-6}$, and the heat model on moves check 2 by more than $10^{-3}$.
 
 ## Formulas
 

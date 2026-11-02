@@ -11,7 +11,7 @@ Interior ballistics, gas leakage: does `closedVessel` with a leak area reproduce
 
 ## Method
 
-A rifle chamber (volume $3.4 \cdot 10^{-6}$ m³, charge 0.0028 kg, specific energy $3.9 \cdot 10^{6}$ J/kg, $k = 1.23$, solid density 1600 kg/m³) with covolume 0 and a leak area of $3 \cdot 10^{-6}$ m² at back pressure 0 was started at a burnt fraction $z_0 = 1 - 10^{-9}$, so the rest burns away within 1 ms at a constant rate and the vessel then holds gas only. Pressure and escaped mass over the curve against the closed form. Accept limits: relative difference below $10^{-8}$ in pressure at every point, escaped mass within $10^{-8}$ of the initial gas mass, and a final pressure below 0.6 of the initial one (so the vessel loses a large part of its gas).
+A rifle chamber (volume $3.4 \cdot 10^{-6}$ m³, charge 0.0028 kg, specific energy $3.9 \cdot 10^{6}$ J/kg, $k = 1.23$, solid density 1600 kg/m³) with covolume 0 and a leak area of $3 \cdot 10^{-6}$ m² at back pressure 0 was started at a burnt fraction $z_0 = 1 - 10^{-9}$, so the rest burns away within 1 ms at a constant rate and the vessel then holds gas only. Pressure and escaped mass over the curve were compared with the closed form. Accept limits, from the test: relative difference below $10^{-8}$ in pressure at every point, escaped mass within $10^{-8}$ of the initial gas mass, and a final pressure below 0.6 of the initial one (so the vessel loses a large part of its gas).
 
 ## Formulas
 

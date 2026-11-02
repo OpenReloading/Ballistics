@@ -94,7 +94,7 @@ A doubled engraving ramp (and both terms) raises the velocity, more at the reduc
 
 ## Result
 
-Worse. Neither variant passes the rule; the present law stays. Every $c_p$ above 0 raises the training error, so the rule chooses $c_p = 0$. Variant 2 raises the validation median by 0.04 and the P90 by 0.67 percentage points.
+Worse. Neither variant passes the rule; the present law stays. Variant 1 was tried for $c_p$ from 0 to 0.15: every tried value above 0 raises the training error, so the rule chooses $c_p = 0$. Variant 2 raises the validation median by 0.04 and the P90 by 0.67 percentage points.
 
 ## Data basis
 

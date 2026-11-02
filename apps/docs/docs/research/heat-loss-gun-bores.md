@@ -11,7 +11,7 @@ Interior ballistics, convective heat loss: with its default settings, does `heat
 
 ## Method
 
-The reference figures come from the question text and are unverified (the source report was not found): plausibility targets only. They are heat lost up to shot exit of 3.40, 4.22, 4.64 and 4.99 MJ at the charges 13.6, 20.3, 25.1 and 29.5 kg of a 203 mm gun (6.9, 5.7, 5.2 and 4.7 percent of the energy released), and a range of 4.6 to 8.1 percent over guns of 40 to 203 mm. The same figures put the loss at roughly the square root of the charge to shot ratio.
+The reference figures come from the question text and are unverified (the source report was not found): plausibility targets only. They are heat lost up to shot exit of 3.40, 4.22, 4.64 and 4.99 MJ at the charges 13.6, 20.3, 25.1 and 29.5 kg of a 203 mm gun (6.9, 5.7, 5.2 and 4.7 percent of the energy released), and a range of 4.6 to 8.1 percent over guns of 40 to 203 mm. The same figures put the loss at roughly the square root of the charge-to-shot ratio.
 
 The proxies are synthetic loads: every number below is a simulation, not load data.
 
@@ -58,7 +58,7 @@ Proxy of the verdict (coefficient $1.4\cdot10^{-9}$):
 | 25.1 | 224 | 689 | 4.24 | 4.64 | 0.91 | 4.70 | 5.2 |
 | 29.5 | 342 | 769 | 4.63 | 4.99 | 0.93 | 4.36 | 4.7 |
 
-Heat grows with the charge to shot ratio to the power 0.66, the reference to the power 0.50, so the model's share falls less: 5.68 to 4.36 percent against 6.9 to 4.7 percent.
+Heat grows with the charge-to-shot ratio to the power 0.66, the reference to the power 0.50, so the model's share falls less: 5.68 to 4.36 percent against 6.9 to 4.7 percent.
 
 Sensitivity to the burn coefficient of the cord (same loads):
 

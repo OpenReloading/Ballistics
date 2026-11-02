@@ -5,7 +5,7 @@ description: The printed label for a box of loaded rounds, its values, its size 
 
 # Box label of a saved load
 
-The Saved loads drawer of the workbench prints a box label from a saved load (the print button of the load's row, "Print a box label"). The label is made from the stored record alone, so the same saved load always gives the same label. Nothing new is stored, nothing is sent: the names of the records the load refers to are read from this browser and the data files, as the CSV export of the saved loads reads them.
+The Saved loads drawer of the workbench prints a box label from a saved load (the print button of the load's row, "Print a box label"). The label is made from the stored record alone, so the same saved load gives the same label as long as the names of the records it refers to, the unit system and the language stay the same. Nothing new is stored, nothing is sent: the names of the records the load refers to are read from this browser and the data files, as the CSV export of the saved loads reads them.
 
 ## What the label prints
 

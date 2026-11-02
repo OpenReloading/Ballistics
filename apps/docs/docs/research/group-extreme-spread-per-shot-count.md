@@ -60,7 +60,7 @@ Largest and smallest of a series of five-shot groups, relative to the expected e
 
 ## Result
 
-improved. Rule met (Numbers). Adopted as a table and a one-line comparison; the function `expectedExtremeSpread(n)` (a table of 19 rows, mean, 5th and 95th percentile in units of $\sigma$) and its test are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test reruns a seeded simulation of 20 000 groups for $n$ = 2, 3, 5, 10 and 20 and requires the table mean within 2 percent and the range to hold 88 to 92 percent of the groups, and checks $n = 2$ against $\sqrt{\pi}$.
+improved. Rule met (Numbers). Proposed as a table and a one-line comparison; the function `expectedExtremeSpread(n)` (a table of 19 rows, mean, 5th and 95th percentile in units of $\sigma$) and its test are on the unmerged branch `research/group-statistics`, ready to cherry-pick. The test reruns a seeded simulation of 20 000 groups for $n$ = 2, 3, 5, 10 and 20 and requires the table mean within 2 percent and the range to hold 88 to 92 percent of the groups, and checks $n = 2$ against $\sqrt{\pi}$.
 
 Proposed text for the Limits of [Groups](../models/groups.md), replacing the sentence "Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables, not reproduced here." with:
 
