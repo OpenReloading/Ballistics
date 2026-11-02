@@ -1,6 +1,6 @@
 {
   "name": "@open-reloading/core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Interior and exterior ballistics models, group statistics and solvers as pure functions.",
   "keywords": [
     "reloading",
