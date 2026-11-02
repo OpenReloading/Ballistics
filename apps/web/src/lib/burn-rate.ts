@@ -69,7 +69,7 @@ interface RateInterval {
 }
 
 const noFitReason = msg(
-  'No fitted parameters: the fit needs at least 10 training rows from at least 2 cartridges.',
+  'No fitted parameters: the load-table fit needs at least 10 training rows from at least 2 cartridges.',
 )
 
 /** What `classifyPowder` reads: a powder record or a list summary, with its manufacturer's name where known. */

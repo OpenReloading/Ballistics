@@ -1652,7 +1652,9 @@ function MeasuredCapacity({ m }: { m: Model }) {
         spec={{
           ...measuredWaterCapacitySpec,
           help: designed
-            ? msg('Water to the mouth of your fired cases. Empty: no volume behind the bullet.')
+            ? msg(
+                'Water to the mouth of your fired cases. Empty: the volume behind the bullet is not given.',
+              )
             : msg("Water to the mouth of your fired cases; replaces the record's value."),
         }}
         system={system}
@@ -1815,11 +1817,11 @@ function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: 
   }
   return designed
     ? t(
-        'Half section of the {name} case (maximum outline) in its chamber (minimum outline), bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed: approximate geometry.',
+        'Half section of the {name} case (maximum outline, interior not shown) in its chamber (minimum outline), bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed: approximate geometry.',
         { ...values, name },
       )
     : t(
-        'Half section of the {name} case (CIP maximum outline) in its chamber (CIP minimum outline), bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed: approximate geometry.',
+        'Half section of the {name} case (CIP maximum outline, interior not shown) in its chamber (CIP minimum outline), bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed: approximate geometry.',
         { ...values, name: spec.name },
       )
 }

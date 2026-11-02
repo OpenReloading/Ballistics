@@ -851,7 +851,9 @@ export function TuneNotes({
           </Message>
           <TextInput
             label={t('Temperature sensitivity (1/K)')}
-            description={t('Any value above 0; the fit scales it from the strings.')}
+            description={t(
+              'Used above and below the load temperature. Any value above 0 starts the fit, which scales it from the strings.',
+            )}
             inputMode="decimal"
             value={sensitivity}
             onChange={(e) => onSensitivity(e.currentTarget.value)}
