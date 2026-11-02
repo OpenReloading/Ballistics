@@ -178,9 +178,7 @@ test('the cartridge list prints the selection, capped and said so', async ({ pag
   const n = await total(page)
   await page.emulateMedia({ media: 'print' })
   await expect(rows(page)).toHaveCount(200)
-  await expect(
-    page.getByText(`Printed: the first 200 of ${n} cartridges in this selection.`),
-  ).toBeVisible()
+  await expect(page.getByText(`Printed: the first 200 of ${n} cartridges.`)).toBeVisible()
   await expect(page.locator('.directory-filters')).toBeHidden()
 })
 

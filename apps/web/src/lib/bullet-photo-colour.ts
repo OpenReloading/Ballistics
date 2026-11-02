@@ -268,7 +268,7 @@ function raggedness({ alpha, width: w, height: h }: Segmentation): number {
 const ragged = 9
 
 const raggedNote = msg(
-  'The cut-out has a ragged edge: the background may be textured or busy. A plain background gives a better cut-out.',
+  'The cut-out has a ragged edge, likely from a busy background. Use a plain background.',
 )
 
 const rough = (s: Segmentation) => raggedness(s) > ragged

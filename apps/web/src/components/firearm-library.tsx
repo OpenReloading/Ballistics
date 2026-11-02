@@ -174,7 +174,7 @@ function firearmColumns(
       key: 'twist',
       label: msg('Twist'),
       unit: t('{unit} per turn', { unit: system.twist.symbol }),
-      help: msg('Barrel length per turn of the rifling, R right hand, L left hand.'),
+      help: msg('R right hand, L left hand.'),
       num: true,
       width: '6rem',
       value: (r) => r.data.twist?.value,
@@ -200,7 +200,6 @@ function firearmColumns(
     {
       key: 'loads',
       label: msg('Loads'),
-      help: msg('Saved loads with this firearm.'),
       num: true,
       width: '4rem',
       value: (r) => usageOf(r).loads,
@@ -209,7 +208,7 @@ function firearmColumns(
     {
       key: 'lastSession',
       label: msg('Last session'),
-      help: msg('The latest dated chronograph session of those loads.'),
+      help: msg('Latest chronograph session of these loads.'),
       width: '6.5rem',
       value: (r) => usageOf(r).last,
       cell: (r) => {

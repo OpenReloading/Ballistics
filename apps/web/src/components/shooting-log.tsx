@@ -74,9 +74,7 @@ type LoadRecord = Extract<UserRecord, { kind: 'load' }>
 const facetKeys = ['firearm', 'year'] as const
 
 /** The line on screen, in print and in the docs: the log claims no standing with anyone. */
-const ownRecordLine = msg(
-  'The shooting log is your own record. Whether a club or an authority accepts it is up to them.',
-)
+const ownRecordLine = msg('Your own record; a club or authority decides whether to accept it.')
 
 /** What the browser holds for the log: its entries, the firearms and the saved loads. */
 interface LogData {
@@ -268,7 +266,7 @@ function EntryForm({
         />
         <TextInput
           label={t('Result')}
-          description={t('As you write it, such as rings or a placing.')}
+          description={t('Such as rings or a placing.')}
           maxLength={200}
           value={entry.result ?? ''}
           onChange={(e) => patch({ result: e.currentTarget.value })}
@@ -276,7 +274,6 @@ function EntryForm({
         <EventSelect events={events} entry={entry} patch={patch} />
         <TextInput
           label={t('Confirmed by')}
-          description={t('Who confirmed the entry, as you type it.')}
           maxLength={200}
           value={entry.confirmation?.by ?? ''}
           onChange={(e) => {
@@ -456,8 +453,8 @@ async function offerRounds(id: string, entry: ShootingLogEntry, { t, tn }: Trans
     title: t('Add to the round count?'),
     message: tn(
       due,
-      'Add {count} round of this entry to the round count of {name}?',
-      'Add {count} rounds of this entry to the round count of {name}?',
+      'Add {count} round to the round count of {name}?',
+      'Add {count} rounds to the round count of {name}?',
       { name },
     ),
     confirmLabel: t('Add'),

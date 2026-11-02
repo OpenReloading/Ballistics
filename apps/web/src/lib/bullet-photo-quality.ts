@@ -45,7 +45,7 @@ export function outlineHints(o: Outline): OutlineHints {
       hints: [],
       unusable: worded(
         msg(
-          'The bullet is only {width} px across in the photograph, too small to measure. Take the photograph closer, or crop it to the bullet, so that the bullet is at least {good} px across.',
+          'The bullet is only {width} px across, too small to measure. Take the photograph closer or crop it to the bullet, to at least {good} px across.',
         ),
         { width: Math.round(width), good: goodWidthPx * 2 },
       ),
@@ -55,7 +55,7 @@ export function outlineHints(o: Outline): OutlineHints {
       hints: [],
       unusable: worded(
         msg(
-          'The cut-out is {ratio} times as long as it is wide, which is not the shape of a bullet seen from the side. Brush the bullet in and the rest out, or take the photograph again with the bullet alone on a plain background.',
+          'The cut-out is {ratio} times as long as wide, not a bullet seen from the side. Brush the bullet in and the rest out, or retake the photograph with the bullet alone on a plain background.',
         ),
         { ratio: tenths(ratio) },
       ),
@@ -65,7 +65,7 @@ export function outlineHints(o: Outline): OutlineHints {
     hints.push(
       worded(
         msg(
-          'The bullet is {width} px across, so each value is known to about {percent} % at best. Take the photograph closer, or crop it to the bullet; at least {good} px across gives a more exact outline.',
+          'The bullet is {width} px across, so each value is known to about {percent} % at best. Take the photograph closer or crop it to the bullet; {good} px across or more is more exact.',
         ),
         {
           width: Math.round(width),
@@ -78,7 +78,7 @@ export function outlineHints(o: Outline): OutlineHints {
     hints.push(
       worded(
         msg(
-          "The bullet's sides are not parallel to the axis direction typed: it is about {degrees} degrees off the bullet's own axis, or a shadow beside the bullet widens one side. The lengths and the base may read wrong; clear the axis direction to let the tool find it, or type it again.",
+          "The bullet's sides are not parallel to the typed axis direction: it is about {degrees} degrees off, or a shadow widens one side. Lengths and base may read wrong; clear the axis direction to detect it, or type it again.",
         ),
         { degrees: tenths(o.typedOff) },
       ),
@@ -87,10 +87,10 @@ export function outlineHints(o: Outline): OutlineHints {
     hints.push(
       o.shadow.removed
         ? msg(
-            'A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out of the cut-out, or take the photograph in even light, for a more exact outline.',
+            'A shadow beside the bullet widens one side of the cut-out: that side is left out and the other side, mirrored about the axis, is measured. Brush the shadow out or take the photograph in even light for a more exact outline.',
           )
         : msg(
-            'One side of the cut-out is wider than the other, as a shadow beside the bullet makes it: the diameter and every length may be off by more than their uncertainty. Brush the shadow out of the cut-out, or take the photograph in even light.',
+            'One side of the cut-out is wider than the other, as from a shadow beside the bullet: the diameter and every length may be off by more than their uncertainty. Brush the shadow out or take the photograph in even light.',
           ),
     )
   const s = shankOf(o)
@@ -98,7 +98,7 @@ export function outlineHints(o: Outline): OutlineHints {
     hints.push(
       worded(
         msg(
-          'The sides of the bullet are ragged (about {sigma} px): a reflection, a shadow or noise in the photograph. Retake it in even, soft light, or brush the cut-out where it is wrong.',
+          "The bullet's sides are ragged (about {sigma} px): a reflection, shadow or noise. Retake the photograph in even, soft light, or brush the cut-out where it is wrong.",
         ),
         { sigma: tenths(s.sigma) },
       ),

@@ -135,7 +135,7 @@ test('a printed box label opens its load by photo, by camera and by its text', a
   await page.getByRole('button', { name: 'Scan box label' }).click()
   await scan.getByLabel('Label text').fill('OR1:L:00000000-0000-4000-8000-000000000000')
   await page.keyboard.press('Enter')
-  await expect(scan).toContainText('This load is not saved in this browser and edition.')
+  await expect(scan).toContainText('This load is not saved in this browser and edition:')
   // the printed text
   await scan.getByLabel('Label text').fill(text)
   await page.keyboard.press('Enter')

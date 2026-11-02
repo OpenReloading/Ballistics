@@ -74,9 +74,7 @@ export function ManufacturersForm() {
   return (
     <Stack gap="xs">
       <Text size="sm" c="dimmed">
-        {t(
-          'A name typed in a manufacturer field that the catalogue does not have is kept here. One that no record uses can be deleted.',
-        )}
+        {t('Manufacturer names you typed that the catalogue lacks. Unused ones can be deleted.')}
       </Text>
       {failure && <ErrorNote>{failure}</ErrorNote>}
       {rows === undefined ? (

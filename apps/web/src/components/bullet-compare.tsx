@@ -215,7 +215,7 @@ export function BulletCompare({
         {/* the cells say "largest" or "smallest" themselves. Read alone, the legend lost its marks */}
         <p className="compare-legend" aria-hidden="true">
           {t(
-            'Tinted: the values differ. ▲ largest, ▼ smallest value of a row. In brackets: the difference to the first bullet.',
+            'Tinted: values differ. ▲ largest, ▼ smallest in a row. In brackets: difference to the first bullet.',
           )}
         </p>
       </Panel>

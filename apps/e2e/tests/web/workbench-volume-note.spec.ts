@@ -35,7 +35,9 @@ test('a record capacity and a volume typed over the measured capacity show the n
   // what to enter is its reason in the notes dialog
   await page.locator('.result-notes').getByRole('button', { name: /^More/ }).click()
   const dialog = page.getByRole('dialog', { name: 'Result notes' })
-  await expect(dialog).toContainText('Enter a measured case capacity in the Cartridge card')
+  await expect(dialog).toContainText(
+    'To use a measured case capacity, enter it in the Cartridge card',
+  )
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   // nothing scrolls, the page or the results column

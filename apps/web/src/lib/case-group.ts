@@ -19,7 +19,7 @@ export const caseGroupFields = [
   {
     key: 'casesMeasured',
     label: msg('Cases measured'),
-    help: msg('The number of cases the capacity and the other measured values come from.'),
+    help: msg('Cases the capacity and the other measured values come from.'),
     quantity: 'ratio',
     min: 1,
     positive: true,
@@ -39,7 +39,7 @@ export const caseGroupCapacitySpec = {
   key: 'capacity',
   label: msg('Water capacity to the mouth'),
   help: msg(
-    'Measured on the cases of this group, for example fired and sized. Mean of the cases measured. The workbench takes it as the measured case capacity.',
+    'Mean of the cases measured in this group, for example fired and sized. The workbench uses it as the measured case capacity.',
   ),
   quantity: 'capacity',
   min: 0,

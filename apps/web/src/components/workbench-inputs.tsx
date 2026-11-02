@@ -168,7 +168,7 @@ export const emptyStep: FieldValue = { text: '', si: undefined }
 export const firearmMassSpec = {
   key: 'firearmMass',
   label: msg('Gun weight'),
-  help: msg('With scope and attachments. Feeds the free recoil readout only.'),
+  help: msg('With scope and attachments; used only for free recoil.'),
   quantity: 'firearmMass',
   positive: true,
 } as const satisfies FieldSpec
@@ -421,7 +421,7 @@ function LadderInputs() {
           aria-hidden="true"
           title={
             direction === 'around'
-              ? t('Charges below and above the charge, which is the middle step.')
+              ? t('The charge is the middle step.')
               : t('The charge is step 1.')
           }
         >
@@ -794,7 +794,7 @@ function seatingFlag(
   return {
     kind: 'seating' as const,
     text: t(
-      'From the seated bullet in the Cartridge card, approximate: derived from the bullet and case geometry. A typed value replaces it; an emptied field follows again.',
+      'Approximate, from the seated bullet in the Cartridge card. A typed value replaces it; an emptied field follows it again.',
     ),
   }
 }

@@ -93,13 +93,13 @@ export const reasonTexts: Record<PowderConfidenceReason, Marked> = {
 /** Each refusal of `fitPowder` in plain words: the cause and one action. */
 export const refusalTexts: Record<PowderFitReason, Marked> = {
   underdetermined: msg(
-    'There are fewer charges than values to fit. Add a string at another charge, or fit the burn coefficient alone.',
+    'Fewer charges than values to fit. Add a string at another charge, or fit the burn coefficient alone.',
   ),
   unresolved: msg(
     'These strings cannot tell one of the values apart from the burn coefficient. Widen the charge spread, add a measured pressure, or fit the burn coefficient alone.',
   ),
   'ill-conditioned': msg(
-    'The charges are too close to separate the values you asked for. Add a string at a charge well apart from the others, or add a measured pressure.',
+    'The charges are too close to separate the chosen values. Add a string at a charge well apart, or a measured pressure.',
   ),
   invalid: msg(
     'The model cannot run one of the charges. Check the charge of the highlighted string against the case and the bullet.',
@@ -112,7 +112,7 @@ export const refusalTexts: Record<PowderFitReason, Marked> = {
 /** Why the burn coefficient was fitted alone although more was asked for. */
 const heldTexts = {
   held: msg(
-    'These strings cannot tell the start pressure or the chamber volume from the burn coefficient: they move together. They stay at their start values and only the burn coefficient is fitted. Add a measured pressure to fit more.',
+    'The strings cannot separate start pressure and chamber volume from the burn coefficient, so only the burn coefficient is fitted and the others keep their start values. Add a measured pressure to fit more.',
   ),
   temperature: msg(
     'These strings cannot tell the temperature factor from the burn coefficient. It stays at 1 and only the burn coefficient is fitted. Add strings at temperatures further apart.',
@@ -166,7 +166,7 @@ function HandMark({ strings, tuned }: { strings: readonly TuneString[]; tuned: b
           <Badge variant="light" mr="xs">
             {t('Hand-tuned')}
           </Badge>
-          {t('Hand-tuned values are yours, not a fit. Simulation, not load data.')}
+          {t('Not a fit. Simulation, not load data.')}
         </p>
       )}
     </>
@@ -189,7 +189,7 @@ export const saveFailures = {
   points: msg('A powder record holds at most 40 points, one per charge and powder temperature.'),
   record: msg('The fit does not make a valid powder record. {reason}'),
   store: msg(
-    'The fit cannot be stored as a powder record in this browser. {reason} Free browser storage or allow site storage for this page, then save again.',
+    'The browser could not store the powder. {reason} Free browser storage or allow site storage, then save again.',
   ),
 }
 
@@ -268,14 +268,12 @@ function SaveFit({
       </Group>
       {tuned && (
         <p className="note">
-          {t(
-            'Saves the fitted values. Hand-tuned values are not saved: type them on the workbench, where they are marked hand-tuned.',
-          )}
+          {t('Saves the fitted values, not the hand-tuned ones. Type those on the workbench.')}
         </p>
       )}
       {saved && (
         <Message severity="info">
-          {t('Saved as {name}. The Powder search of the workbench lists it as your design.', {
+          {t('Saved as {name}. The workbench Powder search lists it.', {
             name: saved,
           })}
         </Message>
@@ -854,7 +852,7 @@ export function TuneNotes({
           <TextInput
             label={t('Temperature sensitivity (1/K)')}
             description={t(
-              'Above and below the load temperature. The fit scales it from the strings, so any value above 0 starts it.',
+              'Used above and below the load temperature. Any value above 0 starts the fit, which scales it from the strings.',
             )}
             inputMode="decimal"
             value={sensitivity}
@@ -945,7 +943,7 @@ function PowderChoice({
       {refs.length > 0 ? (
         <NativeSelect
           label={t('Powder')}
-          description={t('The powders of your saved loads with chronograph strings')}
+          description={t('From your saved loads with chronograph strings')}
           value={powder ?? ''}
           onChange={(e) => onPowder(e.currentTarget.value)}
           data={[
@@ -964,7 +962,7 @@ function PowderChoice({
           <nav aria-label={t('Saved loads with this powder')}>
             <p>
               {t(
-                'Choose a saved load with strings of this powder. It opens in the workbench, where its Measurements link fits the powder.',
+                'Choose a load; it opens in the workbench, where its Measurements link fits the powder.',
               )}
             </p>
             <ul>
@@ -978,11 +976,7 @@ function PowderChoice({
             </ul>
           </nav>
         ) : (
-          <p className="note">
-            {t(
-              "No saved load uses this powder. Open a saved load's Measurements tab to fit a powder from its strings.",
-            )}
-          </p>
+          <p className="note">{t('No saved load uses this powder.')}</p>
         ))}
     </div>
   )

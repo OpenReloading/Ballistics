@@ -81,7 +81,7 @@ type Stage = Stages['stages'][number]
 
 /** On screen, in print and in the docs: the score is the person's, not an official result. */
 const ownRecordLine = msg(
-  'What you enter here is your own record, not an official result. The official result is the one the organiser publishes.',
+  'Your own record, not an official result. The organiser publishes the official one.',
 )
 
 /** What the browser holds for the events: the events and the records they can link. */
@@ -446,7 +446,7 @@ function totalLine(
   // no totals for results that exist: a value the scoring refuses, such as a stage time of 0
   if (!totals && parts.length) return t('Check the event: a value is out of its range.')
   return e.results.method === 'hit-factor'
-    ? t('Event total: type the stage points of each stage from the official result.')
+    ? t('Event total: enter the stage points from the official result.')
     : t('Event total: add a series.')
 }
 
@@ -983,7 +983,7 @@ function EventsBody({
       phoneAction={(r, tabIndex) => actions(r, tabIndex)}
       empty={
         <Text size="sm" c="dimmed">
-          {t('No event yet. New event adds the first one.')}
+          {t('No event yet.')}
         </Text>
       }
     />

@@ -37,7 +37,7 @@ function Pending({
         <Loading what={what.toLowerCase() as Loadable} rows={6} />
       )}
       <noscript>
-        <p>{t('The record is read and drawn by a script: this page needs JavaScript.')}</p>
+        <p>{t('This page needs JavaScript.')}</p>
       </noscript>
     </>
   )

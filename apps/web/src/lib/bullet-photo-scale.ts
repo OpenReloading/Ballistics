@@ -72,10 +72,10 @@ const againstRuler = (e: Estimate, ruler: { ppm: number }) =>
   worded(
     e.key === 'diameter'
       ? msg(
-          "The diameter in the photograph is {percent} % away from the diameter entered at the ruler's scale. Check the scale points and the cut-out, and that the bullet lies flat and square to the camera.",
+          "At the ruler's scale, the diameter in the photograph is {percent} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera.",
         )
       : msg(
-          "The overall length in the photograph is {percent} % away from the overall length entered at the ruler's scale. Check the scale points and the cut-out, and that the bullet lies flat and square to the camera.",
+          "At the ruler's scale, the overall length in the photograph is {percent} % off the one entered. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera.",
         ),
     { percent: percent(e.ppm, ruler.ppm) },
   )
@@ -84,7 +84,7 @@ const againstRuler = (e: Estimate, ruler: { ppm: number }) =>
 const againstEach = (a: Estimate, b: Estimate) =>
   worded(
     msg(
-      'The diameter and the overall length entered give scales {percent} % apart. Check the scale points and the cut-out, and that the bullet lies flat and square to the camera. The scale used is their weighted mean, with the difference in its uncertainty.',
+      'The diameter and overall length entered give scales {percent} % apart. Check the scale points, the cut-out, and that the bullet lies flat and square to the camera. The scale used is their weighted mean; the difference adds to its uncertainty.',
     ),
     { percent: percent(a.ppm, b.ppm) },
   )
@@ -103,15 +103,15 @@ export function basisNote(basis: ScaleBasis | undefined): Message | undefined {
   switch (basis) {
     case 'diameter':
       return msg(
-        "The scale comes from the diameter entered, without a ruler, so the lengths assume a square side view of the bullet itself, drawn to scale: a bullet turned 10 degrees towards the camera reads 1.5 % short, and a maker's product image may not be drawn to scale.",
+        "Scale from the diameter entered, no ruler: lengths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % short; a maker's product image may not be to scale.",
       )
     case 'length':
       return msg(
-        "The scale comes from the overall length entered, without a ruler, so the widths assume a square side view of the bullet itself, drawn to scale: a bullet turned 10 degrees towards the camera reads 1.5 % too wide, and a maker's product image may not be drawn to scale.",
+        "Scale from the overall length entered, no ruler: widths assume a square side view of the bullet drawn to scale. A bullet turned 10 degrees towards the camera reads 1.5 % too wide; a maker's product image may not be to scale.",
       )
     case 'diameter+length':
       return msg(
-        "The scale comes from the diameter and the overall length entered, without a ruler: their check catches a bullet turned towards the camera only where they are more than 2 % apart, about 11 degrees, and a maker's product image may not be drawn to scale.",
+        "Scale from the diameter and overall length entered, no ruler: their check catches a bullet turned towards the camera only beyond 2 % apart (about 11 degrees); a maker's product image may not be to scale.",
       )
     default:
       return undefined

@@ -159,7 +159,7 @@ function RecordPanel({
         <EmptyNote
           icon={<Flask size={24} aria-hidden="true" />}
           title={t('No powder yet')}
-          description={t('Enter a name and the values you have. The checks run as you type.')}
+          description={t('Enter a name and the values you have.')}
         />
       )}
       <div className="print-only">

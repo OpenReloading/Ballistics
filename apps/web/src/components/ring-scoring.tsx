@@ -60,13 +60,13 @@ type Scoring = ReturnType<typeof scoreGroupOnFace>
 
 const offline = msg('Targets need the network')
 const faceHelp = msg(
-  'The rule-book target that scores the group. Scores follow every edit; excluded shots show their value and do not count in the total.',
+  'Rule-book target that scores the group. Excluded shots show their value but do not count in the total.',
 )
 const federationHelp = msg(
-  'The federation whose disciplines the Discipline list shows. All: every discipline, then the target events no discipline names.',
+  'Filters the Discipline list. All: every discipline, then the target events no discipline names.',
 )
 const disciplineHelp = msg(
-  'The discipline sets the target, the event and with it the scored hole. Type to search by name, number or federation.',
+  'Sets the target, the event and with it the scored hole. Search by name, number or federation.',
 )
 const eventHelp = msg(
   "A target no discipline names: the event's gauge is the scored hole, as the rule book says; a black-powder event scores the hole centre. Bullet: the bullet diameter of the load, else Marker.",

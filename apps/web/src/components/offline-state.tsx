@@ -70,16 +70,14 @@ export function OfflineState({ links }: { links: PageLinks }) {
       <StandIn
         icon={WifiSlash}
         title={t('Works offline')}
-        description={t(
-          'The tools, your own records and the pages you opened before work without the network.',
-        )}
+        description={t('The tools, your own records and pages you opened before work offline.')}
         action={retry}
         links={links}
         linksLabel={linksLabel}
       />
     )
   const [before = '', after = ''] = t(
-    'The page {address} was not opened on this device before, so it is not stored. The tools, your own records and the pages you opened before work without the network.',
+    '{address} was never opened on this device, so it is not stored. The tools, your own records and pages you opened before work offline.',
     { address: '{address}' },
   ).split('{address}')
   return (

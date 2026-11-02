@@ -346,8 +346,8 @@ export function Measurements({
         title: t('Add to the round count?'),
         message: tn(
           shots,
-          'Add {count} shot of these strings to the round count of {name}?',
-          'Add {count} shots of these strings to the round count of {name}?',
+          'Add {count} shot to the round count of {name}?',
+          'Add {count} shots to the round count of {name}?',
           { name: firearm },
         ),
         confirmLabel: t('Add'),
@@ -476,9 +476,7 @@ export function Measurements({
   return (
     <div className="measurements">
       <p className="note">
-        {t(
-          'Sessions are kept in this browser and the saved load names them; a load file or copied link does not carry their shots.',
-        )}{' '}
+        {t('Sessions stay in this browser; a load file or copied link does not carry their shots.')}{' '}
         {before}
         <Link href="/range">{t('Range mode')}</Link>
         {after}{' '}
@@ -533,9 +531,7 @@ export function Measurements({
       )}
       {sessions.length > 0 && !steps && (
         <p className="prompt empty-state">
-          {t(
-            'Run the simulation, with a charge ladder for several charges, to map the strings to charges.',
-          )}
+          {t('Run the simulation with a charge ladder to map the strings to charges.')}
         </p>
       )}
       {table}
@@ -552,7 +548,7 @@ export function Measurements({
               yLabel={t('Velocity ({unit})', { unit: v.symbol })}
               title={t(chartName)}
               description={t(
-                'The line is the simulated muzzle velocity of the ladder steps; each series\' measured mean is a marker with a bar of one standard deviation, excluded shots are crosses. The table "{table}" gives the values.',
+                'Line: simulated muzzle velocity of the ladder steps. Markers: measured mean of each series, bar one standard deviation. Crosses: excluded shots. Values in the table "{table}".',
                 { table: t(tableName) },
               )}
               include={marks.map((ms) => v.fromSi(ms))}

@@ -262,7 +262,7 @@ function drawingNotes(drawing: Drawing | undefined, t: Translator['t']) {
   )
   const assumed = outline.segments.some((s) => s.approximate)
   const notes = [
-    t('Entered and catalog values are dimensioned, derived and assumed values are not.'),
+    t('Only entered and catalog values are dimensioned.'),
     ...(assumed
       ? [t('Dashed in the flag color: parts drawn from an assumed shape (see the notes).')]
       : []),

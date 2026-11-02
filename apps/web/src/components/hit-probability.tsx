@@ -177,7 +177,7 @@ export function HitProbability({
       <h3 id="hit-probability-title">{t('Hit probability')}</h3>
       <p className="note">
         {t(
-          "A simulation of a dispersion model, not a prediction of a shooter's score. It assumes your group is typical of the shots to come, that dispersion grows linearly with distance, that the zero is right, and that wind and range errors are independent and small enough for a first-order estimate. Hold and aim errors beyond the group are not included.",
+          'A dispersion model, not a prediction of a score. It assumes your group is typical of the shots to come, dispersion grows linearly with distance, the zero is right, and wind and range errors are independent and small enough for a first-order estimate. Hold and aim errors beyond the group are not included.',
         )}
       </p>
       <div className="hit-probability-fields">

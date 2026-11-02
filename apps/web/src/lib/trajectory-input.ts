@@ -55,7 +55,7 @@ export const shotFields = [
     key: 'zeroTemperature',
     label: msg('Zero temperature'),
     help: msg(
-      'Optional, the air of the zero: an empty field takes the shot value. The zero always takes the altitude of the shot.',
+      'Optional; empty takes the shot value. The zero always uses the altitude of the shot.',
     ),
     quantity: 'temperature',
   },
@@ -79,9 +79,7 @@ export const shotFields = [
   {
     key: 'dragFactor',
     label: msg('Drag factor'),
-    help: msg(
-      'Optional. Multiplies the drag of the bullet: 100 % is the bullet as given, 103 % has 3 % more drag.',
-    ),
+    help: msg('Optional. Multiplies the bullet drag: 103 % is 3 % more drag.'),
     quantity: 'dragFactor',
     min: 0,
     positive: true,

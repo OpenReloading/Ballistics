@@ -1100,7 +1100,7 @@ function ResultLine({
             key: 'expectedHoleDiameter',
             label: msg('Hole size'),
             help: msg(
-              'Expected hole diameter; a typed size comes before the bullet and the marker. The holes are found once it is entered.',
+              'Expected hole diameter; a typed size overrides the bullet and the marker. Detection runs once it is entered.',
             ),
             quantity: 'length',
             min: 0,
@@ -1137,7 +1137,7 @@ function ResultLine({
         className="wide"
         disabled={proposals === 0 || running}
         title={t(
-          'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
+          'Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
         )}
         onClick={onAccept}
       >
@@ -1222,9 +1222,7 @@ function RotateStep({
   return (
     <div className="prop-grid">
       <div className="prop-row">
-        <span className="prop-label" title={t('Turn the photo by a quarter turn.')}>
-          {t('Quarter turn')}
-        </span>
+        <span className="prop-label">{t('Quarter turn')}</span>
         <span className="prop-value row-buttons">
           <ActionIcon
             variant="default"
@@ -1253,7 +1251,7 @@ function RotateStep({
           key: 'photoRotation',
           label: msg('Photo angle'),
           help: msg(
-            'Turn of the photo on screen, counter-clockwise; type a small angle to straighten it. Holes, scale and aim point stay on the photo; the target axes stay on the screen.',
+            'Counter-clockwise turn of the photo on screen; type a small angle to straighten it. Holes, scale and aim point turn with the photo, the target axes do not.',
           ),
           quantity: 'angle',
         }}
@@ -1309,7 +1307,7 @@ function ScaleStep({
         <span
           className="prop-label"
           title={t(
-            'The rule-book target on the photo: found from the black area and the ring lines, it sets the scale and the center and scores the group. More than one target may fit the rings: choose. Without a fit the targets are ranked by how well their rings match.',
+            'The rule-book target, found from the black area and the ring lines. It sets the scale and center and scores the group. If several fit, choose one; without a fit, targets are ranked by how well their rings match.',
           )}
         >
           {t('Target')}
@@ -1330,7 +1328,7 @@ function ScaleStep({
           key: 'blackDiameter',
           label: msg('Black diameter'),
           help: msg(
-            'Diameter of the black area on the target, used when no target fits: it sets the scale and the center from the black area alone (the center is approximate on a tilted photo).',
+            'Diameter of the black area, used when no target fits: it sets scale and center from the black area alone (center approximate on a tilted photo).',
           ),
           quantity: 'length',
           min: 0,
@@ -1388,7 +1386,7 @@ function ExampleStep({
           label: msg('Hole size'),
           // the 3 is MIN_HOLES_TO_LEARN_SIZE: a spec's help takes no placeholder
           help: msg(
-            'Expected hole diameter; an example hole sets it to the measured size. Empty: the median of the measured holes of 3 or more accepted single holes, else the bullet diameter, else the marker.',
+            'Expected hole diameter; an example hole sets it to its measured size. Empty: the median of 3 or more accepted single holes, else the bullet diameter, else the marker.',
           ),
           quantity: 'length',
           min: 0,
@@ -1404,7 +1402,7 @@ function ExampleStep({
         className="wide"
         variant={tool === 'example' ? 'filled' : 'default'}
         disabled={!canPick}
-        title={calibrated ? t('Click one hole on the photo') : t('Set the scale first (step 2).')}
+        title={calibrated ? undefined : t('Set the scale first (step 2).')}
         onClick={onPick}
       >
         {t('Pick one hole')}
@@ -1465,7 +1463,7 @@ export function ReviewStep({
       </span>
       <p id={help} className="review-help wide">
         {t(
-          'Proposals are dashed on the photo; none counts until accepted. On the photo: double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
+          'Proposals are dashed; none counts until accepted. On the photo, double-click or Enter accepts one, drag or arrow keys move it, Delete removes it.',
         )}
       </p>
     </div>
@@ -1494,7 +1492,7 @@ function RegionRow({
       <span
         className="prop-label"
         title={`${t(
-          'Where to look: a rectangle (two opposite corners) or a polygon (its corners); absent: the target found in the photo. Saved with the group.',
+          'Where to look: a rectangle (two opposite corners) or a polygon; none: the target found in the photo. Saved with the group.',
         )} ${region ? t('Now {count} corners.', { count: region.length }) : t('None marked.')}`}
       >
         {t('Region')}

@@ -27,18 +27,14 @@ export const firearmFields = [
   {
     key: 'baseToOgiveAtLands',
     label: msg('Base to ogive at the lands'),
-    help: msg(
-      'Base to ogive at the lands, measured: cartridge length to the bullet ogive with the bullet touching the lands.',
-    ),
+    help: msg('Measured cartridge length to the ogive with the bullet touching the lands.'),
     quantity: 'length',
     min: 0,
   },
   {
     key: 'overallLengthAtLands',
     label: msg('Overall length at the lands'),
-    help: msg(
-      'Overall length at the lands, measured: cartridge overall length with the bullet touching the lands.',
-    ),
+    help: msg('Measured overall length with the bullet touching the lands.'),
     quantity: 'length',
     min: 0,
   },
@@ -46,7 +42,6 @@ export const firearmFields = [
   {
     key: 'roundCount',
     label: msg('Round count'),
-    help: msg('Rounds fired through the barrel so far.'),
     quantity: 'ratio',
     min: 0,
     integer: true,

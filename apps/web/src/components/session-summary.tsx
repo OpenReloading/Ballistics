@@ -150,12 +150,9 @@ export function SessionSummary() {
             id="chrono-file"
             label={t('Chronograph file')}
             variant="bar"
-            help={t(
-              'Reads {formats}. The file is read in this browser; it is not uploaded or stored.',
-              {
-                formats,
-              },
-            )}
+            help={t('Reads {formats} in this browser; nothing is uploaded or stored.', {
+              formats,
+            })}
             file={read?.fileName}
             onFiles={([picked]) => picked && readFile(picked, unit)}
           />
@@ -456,7 +453,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                       height={240}
                       title={t('Velocity per shot, {name}', { name })}
                       description={t(
-                        'Velocity of each of the {count} shots of {name} in {unit} over the shot number, with the mean {mean} as a line; excluded shots are left out. The shots table lists every value.',
+                        'Velocity of the {count} shots of {name} in {unit} by shot number, mean {mean} as a line, excluded shots left out. The shots table lists every value.',
                         { count: kept.length, name, unit: v.symbol, mean: speed(st.mean) },
                       )}
                     />

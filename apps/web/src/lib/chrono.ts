@@ -87,10 +87,10 @@ export const exampleCsv = `${[
 const maxFileBytes = 32 * 1024 * 1024
 const tooLarge = msg('The file is larger than 32 MiB.')
 const notWorkbook = msg(
-  "The workbook is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX and choose that file.",
+  "The workbook is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX.",
 )
 const notExport = msg(
-  "The file is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX and choose that file.",
+  "The file is not a recognized chronograph export. Reads {formats}: export the session from the device's app as CSV or XLSX.",
 )
 const ownMessages: readonly Message[] = [tooLarge, notWorkbook, notExport]
 

@@ -1298,14 +1298,13 @@ function unitFormats(system: UnitSystem) {
 const contactText = (seating: Seating | undefined, mm: (x: number) => string, t: T) =>
   seating?.contact &&
   (seating.jump.source === 'lands'
-    ? t(
-        'Contact with the lands (measured): the bullet reaches the lands at {coal} COAL; it is not moved back.',
-        { coal: mm(seating.contactCoal as number) },
-      )
-    : t(
-        'Contact with leade ({tag}): the bullet reaches the leade at {coal} COAL; it is not moved back.',
-        { tag: t(tagText[seating.jump.tag]), coal: mm(seating.contactCoal as number) },
-      ))
+    ? t('The bullet touches the lands (measured) at {coal} COAL and is not moved back.', {
+        coal: mm(seating.contactCoal as number),
+      })
+    : t('The bullet touches the leade ({tag}) at {coal} COAL and is not moved back.', {
+        tag: t(tagText[seating.jump.tag]),
+        coal: mm(seating.contactCoal as number),
+      }))
 
 function warningsOf(
   seating: Seating | undefined,
@@ -1370,12 +1369,9 @@ function gateOf(m: Model, t: T): { gate: ReactNode } | { spec: Spec; chamber: Ch
       <p>
         {designed
           ? t('Not given: the cartridge L3, which the seating needs.')
-          : t(
-              'No CIP drawing for {name}: the preview needs the CIP cartridge and chamber values.',
-              {
-                name,
-              },
-            )}
+          : t('No CIP cartridge and chamber drawing for {name}.', {
+              name,
+            })}
       </p>
     ),
   }
@@ -1456,7 +1452,6 @@ function BulletPicker({ m }: { m: Model }) {
       />
       <NativeSelect
         label={t('Or a bullet design')}
-        description={t('From your bullet designs in this browser.')}
         value={design?.id ?? ''}
         onFocus={m.readDesigns}
         onChange={(e) => m.setDesign(designs.find((d) => d.id === e.currentTarget.value))}
@@ -1482,9 +1477,7 @@ function BulletStatus({ m }: { m: Model }) {
           {t('Bullet: {name} (user design, not a catalogue record)', { name: design.name })}
         </p>
       )}
-      {design && !shaped && (
-        <p>{t('This bullet design has no length or does not draw: the preview needs both.')}</p>
-      )}
+      {design && !shaped && <p>{t('This bullet design has no length or does not draw.')}</p>}
       {bulletRecord && (
         <p className="record">
           {t('Bullet: {label}', { label: productLabel(bulletRecord, names) })} ({bulletRecord.id}
@@ -1499,16 +1492,15 @@ function BulletStatus({ m }: { m: Model }) {
       {bulletRecord && !shaped && (
         <p>
           {bulletRecord.length
-            ? t('This bullet record has no diameter: the preview needs it.')
-            : t('This bullet record has no length: the preview needs it.')}
+            ? t('This bullet record has no diameter.')
+            : t('This bullet record has no length.')}
         </p>
       )}
       {unseated?.kind === 'refused' && (
         <p>
-          {t(
-            'Volume behind the bullet not given: the bullet volume below the case mouth cannot be estimated. Missing: {missing}.',
-            { missing: unseated.missing.map((x) => t(x)).join(', ') },
-          )}
+          {t('Volume behind the bullet not given; missing: {missing}.', {
+            missing: unseated.missing.map((x) => t(x)).join(', '),
+          })}
         </p>
       )}
       {refused && (
@@ -1648,14 +1640,7 @@ function CapacityChoice({ m }: { m: Model }) {
         data={[{ value: '', label: t('None') }]}
       />
     )
-  return (
-    <p>
-      {t(
-        'No case capacity record for {name}: enter your measured case capacity for the volume behind the bullet.',
-        { name },
-      )}
-    </p>
-  )
+  return <p>{t('No case capacity record for {name}: enter your measured capacity.', { name })}</p>
 }
 
 function MeasuredCapacity({ m }: { m: Model }) {
@@ -1670,9 +1655,7 @@ function MeasuredCapacity({ m }: { m: Model }) {
             ? msg(
                 'Measured: water to the mouth of your fired cases. Empty: not given, and so is the volume behind the bullet.',
               )
-            : msg(
-                "Measured: water to the mouth of your fired cases. Replaces the capacity or brass record; empty: the record's value.",
-              ),
+            : msg("Water to the mouth of your fired cases; replaces the record's value."),
         }}
         system={system}
         value={measuredWaterCapacity}
@@ -1686,13 +1669,10 @@ function MeasuredCapacity({ m }: { m: Model }) {
             ? {
                 kind: 'record',
                 text: stock.record
-                  ? t(
-                      'From the capacity record {record}. Type a measured capacity to replace it.',
-                      {
-                        record: capacityText(stock.record, names, t),
-                      },
-                    )
-                  : t('From the brass record {record}. Type a measured capacity to replace it.', {
+                  ? t('From the capacity record {record}.', {
+                      record: capacityText(stock.record, names, t),
+                    })
+                  : t('From the brass record {record}.', {
                       record: chosenCase ? caseText(chosenCase, names, t) : '',
                     }),
               }
@@ -1778,7 +1758,7 @@ function SeatFields({ m, range }: { m: Model; range: readonly [number, number] }
           label: seatingLengthName[s],
           reason:
             s === 'baseToOgive' && !canCbto
-              ? t("CBTO needs the bullet's base-to-ogive length. This bullet record has none.")
+              ? t('This bullet record has no base-to-ogive length for CBTO.')
               : undefined,
         }))}
         onChange={m.changeMode}
@@ -1837,11 +1817,11 @@ function figureDesc(m: Model, spec: Spec, drawnSeating: Seating | undefined, t: 
   }
   return designed
     ? t(
-        'Half section of the case of the {name} (maximum outline, interior not shown) in its chamber (minimum outline) with the bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed lines are approximate geometry.',
+        'Half section of the {name} case (maximum outline, interior not shown) in its chamber (minimum outline), bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed: approximate geometry.',
         { ...values, name },
       )
     : t(
-        'Half section of the {name} case (CIP maximum outline, interior not shown) in its chamber (CIP minimum outline) with the bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed lines are approximate geometry.',
+        'Half section of the {name} case (CIP maximum outline, interior not shown) in its chamber (CIP minimum outline), bullet seated at COAL {coal}: seating depth {depth}, jump {jump}. Dashed: approximate geometry.',
         { ...values, name: spec.name },
       )
 }
@@ -1992,7 +1972,7 @@ function SeatingFigure({ m, spec, chamber }: { m: Model; spec: Spec; chamber: Ch
       {drawnSeating && (
         <p className="seating-legend">
           {t(
-            'Dashed in the flag colour: approximate geometry (see the notes). Faint: the bullet inside the case. Dashed ticks: leade contact, approximate.',
+            'Dashed in the flag colour: approximate geometry. Faint: the bullet inside the case. Dashed ticks: approximate leade contact.',
           )}
         </p>
       )}

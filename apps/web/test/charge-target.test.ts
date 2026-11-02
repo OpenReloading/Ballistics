@@ -68,9 +68,7 @@ describe('refusalText', () => {
       english.t,
     )
     expect(text).toContain('does not reach this high a value')
-    expect(text).toContain(
-      'the lowest value is 200 bar at 1.00 g and the highest is 4000 bar at 4.00 g',
-    )
+    expect(text).toContain('it spans 200 bar at 1.00 g to 4000 bar at 4.00 g')
   })
 
   it('pairs each extreme with its own charge where the curve is not monotone', () => {
@@ -85,8 +83,7 @@ describe('refusalText', () => {
       false,
       english.t,
     )
-    expect(text).toContain('lowest value is 200 bar at 4.00 g')
-    expect(text).toContain('highest is 4000 bar at 2.00 g')
+    expect(text).toContain('spans 200 bar at 4.00 g to 4000 bar at 2.00 g')
   })
 
   it('gives the reachable pressures as percentages of the limit for a percentage target', () => {
@@ -97,9 +94,7 @@ describe('refusalText', () => {
       true,
       english.t,
     )
-    expect(text).toContain(
-      'lowest value is 5.0 % of Pmax at 1.00 g and the highest is 100.0 % of Pmax at 4.00 g',
-    )
+    expect(text).toContain('spans 5.0 % of Pmax at 1.00 g to 100.0 % of Pmax at 4.00 g')
   })
 
   it('words the other reasons and falls back to the message', () => {
@@ -110,8 +105,8 @@ describe('refusalText', () => {
       refusalText({ statusCode: 500, message: 'boom' }, 'barrelTime', si, false, english.t),
     ).toBe('boom')
     const several = { statusCode: 422, reason: 'severalLimits' }
-    expect(refusalText(several, 'peakPressure', si, true, english.t)).toMatch(/each variant/)
-    expect(refusalText(several, 'peakPressure', si, true, german.t)).toMatch(/jede Variante/)
+    expect(refusalText(several, 'peakPressure', si, true, english.t)).toMatch(/limit per variant/)
+    expect(refusalText(several, 'peakPressure', si, true, german.t)).toMatch(/je Variante/)
   })
 
   it('names the failing run of the load for noValidRun, not the target', () => {
