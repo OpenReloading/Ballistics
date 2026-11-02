@@ -11,7 +11,7 @@ Interior ballistics, ignition: how much does the muzzle velocity change when the
 
 ## Method
 
-Run `interior` on the load-file example of the API (`loadFileExample`, start pressure 100 bar), converted to SI with `toSi`, with the ignition pressure set to 5, 50, 99, 100, 101 and 200 bar and everything else as given. Metric: muzzle velocity. A primer composition field on records is added only if the change is large and a record could carry it.
+Run `interior` on the load-file example of the API (`loadFileExample`, start pressure 100 bar), converted to SI with `toSi`, with the ignition pressure set to 5, 50, 99, 100, 101 and 200 bar and everything else as given. Metric: muzzle velocity.
 
 ## Formulas
 

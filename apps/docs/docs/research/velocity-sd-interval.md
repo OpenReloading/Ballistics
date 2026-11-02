@@ -11,12 +11,10 @@ Velocity strings: does the chi-square interval for the standard deviation of a s
 
 ## Method
 
-Decided before the run.
-
 - Five velocity distributions with a known population standard deviation: normal, skewed (gamma, shape 4), strongly skewed (lognormal, $\sigma$ = 0.5), heavy-tailed (Student t, 5 degrees of freedom) and stray shots (95 percent $N(0, 1)$ and 5 percent $N(0, 3^2)$).
 - For $n$ = 3, 5, 10, 20, 30 and 50 shots, 20 000 strings per cell (seed 338). Each string gives the sample standard deviation (divisor $n - 1$, as the session summary) and two intervals at 90 and 95 percent: the chi-square interval and a percentile bootstrap of the sample standard deviation with 1000 resamples.
 - Metric: the share of strings whose interval holds the population standard deviation, with the misses below and above; and the median half-width over the true standard deviation. The Monte Carlo standard error of a coverage near 95 percent is 0.2 points.
-- Check: the normal rows should land at the stated level within the Monte Carlo error, which checks the code. The shots needed for a relative half-width of 50, 30 and 20 percent are computed exactly from the chi-square quantiles, without simulation.
+- Check of the code: the normal rows must land at the stated level within the Monte Carlo error. The shots needed for a relative half-width of 50, 30 and 20 percent are computed exactly from the chi-square quantiles, without simulation.
 
 Reproduce: `node spikes/sd-interval/simulate.ts 20000 1000` (about 2 minutes), from commit `1dbfe96119871748fdc5d73902642c9f2704cbaa` (on the branch `spike/338-sd-interval`; the script imports `chiSquareQuantile` of core, the seed is in the script).
 
@@ -70,7 +68,7 @@ Shots needed for a relative half-width of the interval:
 
 improved. Adopted with a caveat, as described in [Groups](../models/groups.md#velocity-strings):
 
-- The chi-square interval with a caveat, not alone and not replaced by a bootstrap: it is exact for normal strings and uses the existing quantile, and its failure mode is an interval that is too narrow. Caveat: the interval assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow, and the real level is lower than the stated one (simulated: 76 to 90 percent for a stated 95 percent at 10 to 30 shots on such strings).
+- The chi-square interval, not a bootstrap: it is exact for normal strings and uses the existing quantile. Caveat shown with it: it assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow, so the real level is lower than the stated one (simulated: 76 to 90 percent for a stated 95 percent at 10 to 30 shots on such strings).
 - 95 percent by default (the default level of the group intervals), the level stated next to the interval.
 - Too few shots to rank below 10 shots: two strings whose intervals do not overlap are ranked only when each has 10 shots or more. Overlapping intervals read as a difference smaller than the uncertainty at any count. At 10 shots the intervals of two strings separate only when their standard deviations differ by a factor of 2.7 (1.83 / 0.69). No interval below 3 shots.
 - No interval for the extreme spread, which was not examined.
@@ -78,7 +76,7 @@ improved. Adopted with a caveat, as described in [Groups](../models/groups.md#ve
 
 ## Data basis
 
-analytic. Seeded simulation of stated distributions; the repository holds no shot-level velocity series, so the five distributions are stand-ins whose skewness and kurtosis are not measured from any string.
+analytic: a seeded simulation of stated distributions. The repository holds no shot-level velocity series, so the five distributions are stand-ins, not measured from any string.
 
 ## Where in the app
 

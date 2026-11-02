@@ -46,4 +46,4 @@ Analytic: synthetic strings from the solver with seeded noise.
 
 ## Confidence
 
-Medium: the intervals hold their stated coverage on strings the model generates itself; on real strings, where the drag curve and the noise model are only approximate, coverage is unverified.
+Medium: the intervals hold their stated coverage on strings the model generates itself; on real strings, where the drag curve and noise model are approximate, coverage is unverified.

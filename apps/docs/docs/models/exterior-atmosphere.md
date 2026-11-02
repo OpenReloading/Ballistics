@@ -19,7 +19,7 @@ $$
 
 Code: `packages/core/src/exterior/atmosphere.ts`, `standardAtmosphere` (`pressureExponent`), constants in `icao`.
 
-A sea-level pressure (QNH) converts to a station pressure through the same profile, $p_s = p_{\mathrm{QNH}}\,p(H)/p_0$. The model takes station pressure only. The caller does this conversion.
+A sea-level pressure (QNH) converts to a station pressure through the same profile, $p_s = p_{\mathrm{QNH}}\,p(H)/p_0$. The model takes station pressure only; the caller converts.
 
 ### Air along the trajectory
 
@@ -65,7 +65,7 @@ With $\phi = 0$ both reduce to the dry-air ICAO formulas.
 
 ### Density altitude
 
-The density altitude of an air is the altitude at which the standard atmosphere has the density $\rho$ of that air. In the troposphere $\rho \propto (T/T_0)^{g_0/(R_d L) - 1}$, so with the sea-level density $\rho_0$ of the standard atmosphere:
+The altitude at which the standard atmosphere has the density $\rho$ of the given air. In the troposphere $\rho \propto (T/T_0)^{g_0/(R_d L) - 1}$, so with the sea-level density $\rho_0$ of the standard atmosphere:
 
 $$
 H_\rho = \frac{T_0}{L}\left(1 - \left(\frac{\rho}{\rho_0}\right)^{1/(g_0/(R_d L) - 1)}\right)
@@ -114,7 +114,7 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 - Altitudes from -5000 m (`minAltitude`) to 11000 m (the tropopause). A trajectory that leaves this band stops with the reason `atmosphere`.
 - `checkAir` rejects a temperature at or below 0 K, a relative humidity outside 0 to 1, a pressure at or below the vapour pressure, non-finite values, and a pressure and temperature whose air density is not above 0 and at most 1000 kg/m³, `maxDensity` (the density overflows for a temperature near the smallest floating-point number and underflows for a pressure near it).
 - The Magnus constants are those for water. Below 0 degC the formula still gives the pressure over water, not over ice.
-- The sea-level density of the ICAO atmosphere, 1.2250 kg/m³, is 1.018 times the 1.2034 kg/m³ (0.075126 lb/ft³) of the older US Army reference atmosphere. Its sea-level speed of sound, 1120.27 ft/s (341.46 m/s, unverified), is 0.34 % above the dry ICAO value of 340.294 m/s. A BC carries its reference ([drag](exterior-drag.md#ballistic-coefficient-and-drag-curve)), but the air along the path is always this model's.
+- The older US Army reference atmosphere has a sea-level density of 1.2034 kg/m³ against the ICAO 1.2250 kg/m³ ([drag](exterior-drag.md#ballistic-coefficient-and-drag-curve)) and a sea-level speed of sound of 1120.27 ft/s (341.46 m/s, unverified), 0.34 % above the dry ICAO value of 340.294 m/s. A BC carries its reference, but the air along the path is always this model's.
 
 ## Sources
 

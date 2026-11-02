@@ -5,9 +5,9 @@ description: Six rules for a target photo that hole detection can read, each wit
 
 # Taking a photo the app can score
 
-Six rules for the photo you add to a sheet on the Shot groups page, so that hole detection finds the target and its holes with few corrections. Each rule names the quality note the app shows when a photo breaks it; one rule is not checked by the app at all.
+Six rules for the photo you add to a sheet on the Shot groups page, so that hole detection finds the target and its holes with few corrections.
 
-The quality check says what makes holes hard to find in a photo. It never says that a photo is good or that a detection is right, so look over the proposed holes before you accept them. The measures and their limits are on the model page [Hole detection](models/hole-detection.md#photo-quality).
+The in-app quality check never says that a photo is good or that a detection is right, so look over the proposed holes before you accept them. Its measures and limits: [Hole detection](models/hole-detection.md#photo-quality).
 
 ## 1. Nothing on the face
 

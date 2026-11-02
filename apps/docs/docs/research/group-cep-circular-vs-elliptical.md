@@ -7,7 +7,7 @@ description: How far the circular CEP overstates the CEP of an elongated group, 
 
 ## Question
 
-Groups: by how much does the circular CEP, which assumes equal, uncorrelated axes, overstate the radius that holds half of an elongated group, and does that justify showing the elliptical CEP as the main value?
+Groups: how much does the circular CEP (equal, uncorrelated axes assumed) overstate the radius that holds half of an elongated group, and does that justify showing the elliptical CEP as the main value?
 
 ## Method
 
@@ -50,4 +50,4 @@ Analytic: exact populations and a closed-form limit, no measured data.
 
 ## Confidence
 
-High: the elliptical CEP holds half of the population to rounding level and the limit agrees with its closed form. The populations are normal; a group with fliers or few shots departs from both values.
+High: the elliptical CEP holds half of the population to rounding and the limit agrees with its closed form. The populations are normal; a group with fliers or few shots departs from both values.

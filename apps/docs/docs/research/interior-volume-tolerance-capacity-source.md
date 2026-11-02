@@ -11,7 +11,7 @@ Pressure range of the M3 interior model: should the tolerance of the chamber vol
 
 ## Method
 
-The rule of the owner's comment on issue 836, decided before the change: a measured capacity with its spread takes spread over capacity, a measured one without a spread 0.5 %, capacity records of two or more makers their standard deviation over mean, any other record capacity 2 %. The capacity's part is converted to the volume behind the bullet, which the range moves, and the interval of an estimated bullet volume (the class length error of the effective density) adds to it, capped at the API's 0.2. Accept rule: a handgun case gets a wider tolerance than the former 1 % and wider than a rifle case of the same capacity rule; no default ships without its evidence named.
+Rule from the owner's comment on issue 836: a measured capacity with its spread takes spread over capacity, a measured one without a spread 0.5 %, capacity records of two or more makers their standard deviation over mean, any other record capacity 2 %. The capacity's part is converted to the volume behind the bullet, which the range moves, and the interval of an estimated bullet volume (the class length error of the effective density) adds to it, capped at the API's 0.2. Accept rule: a handgun case gets a wider tolerance than the former 1 % and wider than a rifle case of the same capacity rule; no default ships without its evidence named.
 
 ## Formulas
 

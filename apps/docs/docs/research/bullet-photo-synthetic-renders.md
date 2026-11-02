@@ -11,7 +11,7 @@ Bullet from a photo: do the lengths, diameters and ratios measured from a photog
 
 ## Method
 
-`renderPhoto` draws the bullet drawing of known dimensions beside a 45 mm ruler at 24 px per mm, 4 degrees off horizontal, with a slight blur, and the test runs the cut-out, the outline fit and the measurement on it with the scale from the ruler. The true values come from the same bullet drawing. Accept rules, set in the tests:
+`renderPhoto` draws the bullet drawing of known dimensions beside a 45 mm ruler at 24 px per mm, 4 degrees off horizontal, with a slight blur, and the test runs the cut-out, the outline fit and the measurement on it with the scale from the ruler. The true values come from the same drawing. Accept rules, set in the tests:
 
 - Six bullets (tangent and secant ogive, flat base and boat tail, a 2.2 mm meplat, a cannelure): every value within 2 px (3 px for the cannelure width) and within 3 standard uncertainties of the truth; nose form and base type named correctly.
 - The same at any angle with the nose to the left, with a lighting gradient, side shading, noise and blur, and for a light bullet on a dark background.
@@ -32,7 +32,7 @@ The cut-out threshold maximises the between-class variance of the grey levels ([
 
 ## Result
 
-No change. The tests are adopted as regression tests; real photographs stay unverified, as the model page states.
+No change. The tests are adopted as regression tests; real photographs stay unverified.
 
 ## Data basis
 

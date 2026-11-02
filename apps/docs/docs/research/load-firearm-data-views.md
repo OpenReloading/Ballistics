@@ -11,14 +11,11 @@ User records: which of the views planned from the link between a load and a fire
 
 ## Method
 
-Decided before the review.
-
 - Candidates: the seven views of the load and firearm connection map and the ten views of the data views map, merged where they are the same view.
 - Rule 1: a view that needs ongoing data entry (rounds made, on hand or fired, a yearly rounds summary, an over-time view that needs many logged sessions) is ruled out, unless it rests on one optional typed value shown with its date, and shown as stale when old.
 - Rule 2: a view derived from fields already stored (the firearm of a load, the cartridge of a firearm, the sessions of a load, the record defaults of a load's inputs) is kept, in its cheapest form: a column, a note, a filter, a print or a CSV before a page.
 - Rule 3: "enough rounds for the match" is kept only as a stateless sum compared with a number typed at that moment.
 - A question that would change a stored shape is not decided here; it becomes a grilling ticket for the owner.
-- Data: the repository's schema and web app at the time of the review. No user study.
 
 ## Formulas
 
@@ -54,7 +51,7 @@ Totals: 10 views kept (one of them exists), 7 ruled out, 0 stored-shape changes,
 
 ## Result
 
-no change. Nothing was built. The kept views are derived from records already stored and go to the existing pages as lines, notes, a filter, prints and CSV. The match check becomes a stateless sum against a typed number. Every view that rests on a count the user must keep up is ruled out: a skipped entry leaves a wrong number that looks right, and the screen cannot tell. The over-time views are ruled out because they say nothing until many sessions are logged; the sessions of a load are already listed with their statistics. The firearm round count stays the one counter, shown with its age.
+no change. Nothing was built. The kept views are derived from records already stored and go to the existing pages as lines, notes, a filter, prints and CSV. Every view that rests on a count the user must keep up is ruled out: a skipped entry leaves a wrong number that looks right, and the screen cannot tell. The over-time views are ruled out because they say nothing until many sessions are logged; the sessions of a load are already listed with their statistics. The firearm round count stays the one counter, shown with its age.
 
 ## Data basis
 

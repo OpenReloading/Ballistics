@@ -5,7 +5,7 @@ description: Bullet hole proposals on a target photo from a colour axis, a multi
 
 # Hole detection
 
-Hole detection proposes bullet holes on a target photo, inside a region or the printed target found on the photo:
+Proposes bullet holes on a target photo, inside a region or the printed target found on the photo:
 
 1. A colour axis separates the colour seen through a hole from its surroundings.
 2. A scale-normalised Hessian detector finds blobs on the projection onto that axis, at scales tied to the expected hole diameter.
@@ -20,18 +20,18 @@ Cancelling detection, changing the photo, sheet or group, or rotating the photo 
 
 ## Actions from photo to scored group
 
-An action is a file choice, a click, or a value typed and entered. A decision is what only the user can give or confirm. The counts run from choosing the photo to Accept on a rendered target found for sure, on `/groups`. Before is the flow where detection waited for a Detect holes click; after is detection started by the photo added.
+An action is a file choice, a click, or a value typed and entered. A decision is what only the user can give or confirm. The counts run from choosing the photo to Accept on a rendered target found for sure, on `/groups`.
 
-| Hole size | Before: actions | After: actions | Decisions |
-| --- | --- | --- | --- |
-| Known (bullet or marker) | 3: choose the photo, Detect holes, Accept all | 2: choose the photo, Accept sure | Accept |
-| Unknown | 6: choose the photo, Detect holes (the run stops at the Example step), type the hole size, open the Detect step, Detect holes, Accept all | 3: choose the photo, type the hole size in the result line, Accept sure | the hole size, Accept |
+| Hole size | Actions | Decisions |
+| --- | --- | --- |
+| Known (bullet or marker) | 2: choose the photo, Accept sure | Accept |
+| Unknown | 3: choose the photo, type the hole size in the result line, Accept sure | the hole size, Accept |
 
-The after counts are asserted in `apps/e2e/tests/web/groups-face.spec.ts` (the known and the unknown hole size tests). The before counts are read from the code and the spec of the earlier flow and are not asserted. A photo below the minimum quality adds Detect anyway; a photo without one sure target goes on in the guided steps, which these counts do not cover.
+The counts are asserted in `apps/e2e/tests/web/groups-face.spec.ts` (the known and the unknown hole size tests). A photo below the minimum quality adds Detect anyway; a photo without one sure target goes on in the guided steps, which these counts do not cover.
 
 ## Quality bar
 
-The bar for face search and hole detection on a set of photos with reference holes:
+For face search and hole detection on a set of photos with reference holes:
 
 - Usable photo: a photo with no bad-level problem (Photo quality). Photos held by one are counted per set as held and reported beside the corrections.
 - Matching: a proposal at or above the confidence tier matches a reference hole when the two lie within half a hole diameter, one to one, nearest pairs first. Found: a matched proposal. False: a proposal without a reference hole. Missed: a reference hole without a proposal.
@@ -39,7 +39,7 @@ The bar for face search and hole detection on a set of photos with reference hol
 - Face search per set: right first choice, wrong first choice, found but not first, not found, each split by whether the first choice is sure. A sure wrong first choice is the worst case.
 - Statistics: the median and the 90th percentile of the corrections. A 90th percentile needs 20 or more usable photos in the set; below that the maximum is given with the set size.
 
-The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. These are defaults; on the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right.
+The default bar: a median of 1 correction or fewer, a 90th percentile of 3 or fewer, the right first choice on 90 % of usable photos and a wrong one on 2 % or fewer. On the sealed holdout of real target photos the measured corrections miss them in two looks, and the face-search rates were not measured there ([Hole detection tuning candidates](../research/hole-detection-tuning-candidates.md)). Meeting the bar never means that a photo is good or a detection right.
 
 ## Equations
 
@@ -312,7 +312,7 @@ Code: `apps/web/src/lib/hole-detection.ts`, `autoDetect`, `runSeeds`, `SEED_MIN_
 
 ### Photo quality
 
-The target search also checks the photo for what makes holes hard to find, on the photo resized to 2000 px on its longer side, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right. How to take a photo that passes these checks, and what they cannot see: [Taking a photo the app can score](../photo-guide.md). Where the app has a docs site, the Photo panel links that page and each note links the rule of it that matches its problem (`guideRule`): framing and no edge found to One target, all of it; tilt to Straight from above; contrast, brightness, glare and uneven light to Even light; hole size to Close enough; sharpness to Steady.
+The target search also checks the photo, resized to 2000 px on its longer side, for what makes holes hard to find, and says what to change when retaking it. A problem has a level: fair (a note) or bad. A photo with a bad problem is below the minimum quality: when the target search finds exactly one sure fit, the run on an added photo applies the target and waits, and the button reads Detect anyway. With several fits or none the run goes on in the guided steps, which show no Detect anyway. Every other problem is a note beside the run. The check never says that a photo is good or that a detection is right. Taking a photo that passes these checks: [Taking a photo the app can score](../photo-guide.md). Where the app has a docs site, the Photo panel links that page and each note links the rule of it that matches its problem (`guideRule`): framing and no edge found to One target, all of it; tilt to Straight from above; contrast, brightness, glare and uneven light to Even light; hole size to Close enough; sharpness to Steady.
 
 With the black area found (ellipse axes $a \ge b$, centre $c$), the measures are:
 

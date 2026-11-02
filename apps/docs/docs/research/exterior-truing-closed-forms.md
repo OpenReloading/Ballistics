@@ -7,7 +7,7 @@ description: Whether the muzzle velocity and drag factor fits recover known valu
 
 ## Question
 
-Truing: do `trueMuzzleVelocity` and `trueDrag` recover the parameters that generated their observations, and do the fitted values and their standard uncertainties match the closed forms that hold in a vacuum and for velocity decay at a constant drag coefficient?
+Truing: do `trueMuzzleVelocity` and `trueDrag` recover the parameters that generated their observations, and do the fits and their standard uncertainties match the closed forms of a vacuum and of velocity decay at a constant drag coefficient?
 
 ## Method
 
@@ -28,7 +28,7 @@ With a constant drag coefficient and no gravity the speed falls as $v = v_0 e^{-
 - Round trips at fixed bore angles: both parameters within $10^{-6}$, residuals below $10^{-6}$, two degrees of freedom; the velocity observation at 800 m lies above Mach 1.
 - Re-zeroed at 100 m: within $10^{-4}$. Holding the bore angles of the nominal zero instead biases the muzzle velocity by more than $10^{-3}$, so the zero is recomputed per candidate.
 - Vacuum parabola: within $10^{-9}$, no standard uncertainty and no correlation with zero degrees of freedom.
-- One dimension: the limits above hold for both the factor and its standard uncertainty.
+- One dimension: the limits above hold for the factor and its standard uncertainty.
 - Mach-dependent factors: a constant factor is recovered at every knot, and a factor varying between knots is recovered at the knots (same test file).
 - Not tested: real firing data.
 
@@ -48,4 +48,4 @@ Analytic: closed forms and synthetic observations from the solver.
 
 ## Confidence
 
-High: each closed form is exact for its case and the fits agree within the limits set in the tests.
+High: each closed form is exact for its case and the fits agree within the test limits.

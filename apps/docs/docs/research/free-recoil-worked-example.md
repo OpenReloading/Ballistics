@@ -30,7 +30,7 @@ The velocity agrees to the printed digits. The energy differs in the third digit
 
 ## Result
 
-No change. The model follows the momentum balance, and the difference to the printed energy is the sheet's rounding, not a modelling difference. The tests pin the exact values and not the printed 30.22.
+No change. The difference to the printed energy is the sheet's rounding, not the model. The tests pin the exact values, not the printed 30.22.
 
 ## Data basis
 

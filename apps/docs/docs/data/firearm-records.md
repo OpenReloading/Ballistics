@@ -5,7 +5,7 @@ description: Recommended record kinds for firearm manufacturers, models, variant
 
 # Firearm records
 
-A shooter picks a gun in the workbench and its barrel length, twist, chamber and mass come with it. This page recommends how to model that, how values are imported, and ends with a decision brief. Nothing described here exists yet: no schema, importer or record is written, and no third-party data is in the repository.
+Goal: a shooter picks a gun in the workbench and its barrel length, twist, chamber and mass come with it. This is a proposal: no schema, importer or record exists yet, and no third-party data is in the repository.
 
 Results are simulations, not load data; a firearm record holds facts about the gun.
 
@@ -22,7 +22,7 @@ The first records are invented demo records. The choices are in the [decision br
 - The Gun card is a picker over the browser library (`GunPicker` in `apps/web/src/components/workbench-inputs.tsx`). `chooseFirearm` copies twist and mass into the form (`apps/web/src/components/use-workbench-load.ts`). The barrel length reaches the seating preview through the record (`LoadFigure` in `workbench-inputs.tsx`) and the defaults (`suggestDefaults` in `apps/web/src/lib/input-defaults.ts`), not through the form.
 - Catalogue records are one JSON file per record, the id equals the file name, ids are unique across roots (`checkRecordId` in `packages/data/src/read-kind.ts`). Every record has `provenance` (`packages/schema/src/provenance.ts`), whose sources (`source`) carry `origin` (`sourceOrigin`), `license`, `terms`, `page`, `retrieved` and `sha256`. A source cited by several records is stored once in `packages/data/records/sources/`. Kinds are read by `readRecords` in `packages/data/src/records.ts`. Stored units: length mm, mass g, angle deg, count 1 (`units` in `packages/schema/src/units.ts`).
 - `manufacturer` has `id`, `name`, `website`, `aliases` and `provenance`, and is documented as a maker of powders or bullets (`packages/schema/src/manufacturer.ts`, [Manufacturers](manufacturers.md)). Powder and bullet records reference it by id. Demo records use an invented name and a source of `synthetic-test-data`.
-- No field of `packages/core/src` or `packages/schema/src` mentions a gas port or gas system (search for `gas port`, `gasPort`, `gas system`). It has no effect on any computed quantity.
+- No field of `packages/core/src` or `packages/schema/src` mentions a gas port or gas system; it affects no computed quantity.
 - Sight height lives on the optic mount, not on the gun. A catalogue gun cannot supply it unless the record includes optic and mount.
 - `freebore`, `baseToOgiveAtLands` and `overallLengthAtLands` of the user firearm (`firearm.ts`) are measured values of one barrel. The two lands lengths need `landsBullet`, the reference to the bullet they were measured with; the workbench uses them for the jump only with that bullet. No source of the table below was seen to print them, so the catalogue does not carry them.
 
@@ -62,7 +62,7 @@ Catalogue records are `packages/data/records/<kind>/<id>.json`, stored units mm,
 | `firearmBarrel` (phase 2) | `id`, `manufacturer`, `name`, `chamber` | as variant | an aftermarket barrel is a catalogue part; the only part that carries ballistic data |
 | | `length`, `twist`, `twistHand`, `grooves`, diameters | as variant `barrel` | plus `profile` text, `mass` g |
 
-User records (browser and files) use the same shape and stored units as catalogue records (`packages/schema/src/firearm.ts`, [Record model](record-model.md) step 5). Changes to `firearm`:
+User records (browser and files) use the same shape and stored units as catalogue records (`packages/schema/src/firearm.ts`, [Record model](record-model.md#firearm)). Changes to `firearm`:
 
 | Field | Type, unit | Notes |
 |---|---|---|
@@ -70,7 +70,7 @@ User records (browser and files) use the same shape and stored units as catalogu
 | `parts` | array of `{ kind, name, manufacturer?, mass? }`, at most 20, optional | `kind`: receiver, barrel, gasSystem, handguard, stock, muzzleDevice, other; `mass` a quantity in g; descriptive, no solver reads it |
 | `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `firearmMass`, `cartridge`, optics | unchanged | these stay the only values the solvers read; the solvers get them in SI |
 
-Properties that matter for ballistics: barrel length, twist and hand, chamber (through the cartridge), bore and groove diameter where known, mass (recoil), sight height (optic mount, typed by the user). The gas system length matters for nothing the app computes, so it is a descriptive part, not a number. Receiver, handguard and stock are descriptive text.
+Properties that matter for ballistics: barrel length, twist and hand, chamber (through the cartridge), bore and groove diameter where known, mass (recoil), sight height (optic mount, typed by the user). Gas system, receiver, handguard and stock are descriptive parts, not numbers.
 
 Rules:
 
@@ -106,9 +106,9 @@ Rules:
 
 - Pick a catalogue gun: the Gun card gets a search over variants next to the library select, built like the powder search (`RecordSearch` in `apps/web/src/components/record-search.tsx`), listing manufacturer, model, designation and chamber. When a cartridge is chosen the list is filtered to variants whose `chamber.cartridge` equals it, and a variant with another chamber shows a warning.
 - Pick a variant: choosing a model shows its variants (barrel length, twist, chamber) in one select.
-- Copy, not link: "Use" creates a user `firearm` record in the browser library (name, manufacturer name, model, cartridge, `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `firearmMass`, `catalogue`) and sets `Load.firearm` to the reference `user:<UUID>` of that record (`packages/schema/src/load.ts`, unchanged). The existing `chooseFirearm` then runs (`use-workbench-load.ts`). It must also copy the barrel length to the form: today it reaches the figure only through the record. Files stay self-contained. The static site reads data files the API writes at build time (`writeStaticApi` in `packages/api/src/static.ts`), so the static output must include the model and variant lists for the search to have data there.
+- Copy, not link: "Use" creates a user `firearm` record in the browser library (name, manufacturer name, model, cartridge, `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `firearmMass`, `catalogue`) and sets `Load.firearm` to the reference `user:<UUID>` of that record (`packages/schema/src/load.ts`, unchanged). The existing `chooseFirearm` then runs (`use-workbench-load.ts`). It must also copy the barrel length to the form, which today reaches the figure only through the record. The static site reads data files the API writes at build time (`writeStaticApi` in `packages/api/src/static.ts`), so the static output must include the model and variant lists for the search to have data there.
 - Build: the firearm editor gets a "Build" section with the parts list. Choosing or typing the barrel fills barrel length, twist and chamber. Optics and mounts stay as they are, and the sight height stays a typed value of the optic mount.
-- The user's own firearms stay unchanged and listed first. A record without `catalogue` and `parts` behaves as now. No migration (pre-1.0).
+- The user's own firearms stay unchanged and listed first. No migration (pre-1.0).
 - API and data: `GET /v1/firearm-models` and `/v1/firearm-variants` filtered by `q`, `manufacturer` and `cartridge`, like the powder list ([Manufacturers](manufacturers.md), section API). A new model page in `apps/docs/docs/data/` documents the kinds once they exist.
 
 ## Follow-up issues

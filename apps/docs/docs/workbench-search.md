@@ -5,13 +5,13 @@ description: What the record search of the workbench cards does today, where it 
 
 # Searching records in the workbench
 
-A shooter picks a cartridge, bullet or powder in a workbench card by typing a name. This page records how that search behaves, where it fails when the catalogue holds thousands of records, and compares ways to replace it with a dialog. Every record picker of the workbench (bullet, powder, cartridge, the Gun card's firearm, the pinned row's primer and brass) has option C: one chooser dialog (`apps/web/src/components/record-chooser.tsx`) driven by a description per record kind (`bullet-search-dialog.tsx`, `record-choosers.tsx`). The case capacity record stays a select: it is a choice of the few capacity records of the cartridge, not a list to search. The Bullet card's field, the Ctrl+K palette and its dialog rank on one function; nothing else described under Options is built.
+A workbench card picks a cartridge, bullet or powder by a typed name. Below: where that search failed on thousands of records, and the options to replace it with a dialog. Every record picker of the workbench (bullet, powder, cartridge, the Gun card's firearm, the pinned row's primer and brass) has option C: one chooser dialog (`apps/web/src/components/record-chooser.tsx`) driven by a description per record kind (`bullet-search-dialog.tsx`, `record-choosers.tsx`). The case capacity record stays a select: it is a choice of the few capacity records of the cartridge, not a list to search. The Bullet card's field, the Ctrl+K palette and its dialog rank on one function; nothing else described under Options is built.
 
-How the numbers were made: one machine in the dev container, single runs unless a spread is given. The public tree holds 2 invented bullets and 1 powder, so the measurements ran on a larger test bundle of the same record format with 1,686 bullets, 248 powders and 577 cartridges (the bundle is not part of the repository). Bullet and powder results are given by query pattern and count only. The cartridge records are public, so their queries are given in full. The 10,000 row sets are the 1,686 bullets repeated with a suffix on id and name, so compressed sizes of them are optimistic: read the gzip figure.
+Numbers: one machine in the dev container, single runs unless a spread is given. The public tree holds 2 invented bullets and 1 powder, so the measurements ran on a larger test bundle of the same record format with 1,686 bullets, 248 powders and 577 cartridges (the bundle is not part of the repository). Bullet and powder results are given by query pattern and count only. The cartridge records are public, so their queries are given in full. The 10,000 row sets are the 1,686 bullets repeated with a suffix on id and name, so compressed sizes of them are optimistic: read the gzip figure.
 
 ## Recommendation
 
-Option C (inline field and dialog) with matching in the browser (E) and a "Sort by" choice (G). One ranking function serves the inline field, the Ctrl+K palette and the dialog, so the three give the same hits for the same words. E is the base up to about 10,000 rows per kind; the ranking and the filter state are the same for D, E and F, so the source can change later without redoing the dialog.
+Option C (inline field and dialog) with matching in the browser (E) and a "Sort by" choice (G). One ranking function serves the inline field, the Ctrl+K palette and the dialog. E is the base up to about 10,000 rows per kind; the ranking and the filter state are the same for D, E and F, so the source can change later without redoing the dialog.
 
 ## What the search does today
 
@@ -69,7 +69,7 @@ Cartridges (577 CIP records, `GET /cartridges?q=`), total found:
 | `45 acp` | 2 | 2 | 38-45 ACP, 45 Auto |
 | `5.56`, `nato`, `300 wm` | 0 | 0 | none |
 
-Spacing, hyphen and decimal separator variants (`30 06` against `30-06`, `7.62x51` against the printed `7,62 x 51`) are not treated as the same by either search. This is the largest group of misses for cartridges and applies to the directory list as well. `308` in the list also matches cartridges of the .308 caliber by their caliber text.
+Neither search treats spacing, hyphen and decimal separator variants (`30 06` against `30-06`, `7.62x51` against the printed `7,62 x 51`) as the same: the largest group of cartridge misses. `308` in the list also matches cartridges of the .308 caliber by their caliber text.
 
 Cost of the current path: the API answers `q` in a median of 4.5 ms (bullets), 2.4 ms (cartridges) and 1.4 ms (powders) on localhost, one request per pause in typing.
 
@@ -103,7 +103,7 @@ All three work in the browser and against the API.
 | later searches | 0 to 18 files, 0 to 12 KB | 0 to 20 files, 0 to 7 KB |
 | search time | 1 to 77 ms | 4 to 81 ms |
 
-F has small first loads and scales further than E, but it adds ten thousand files to the static site (about 300 MB already), a separate build step, no numeric range filter (weight and diameter ranges need buckets as filters), ranking weights per field only, and the browser's own designs and the cartridge fit are outside the index, which needs a second code path to merge them.
+F has small first loads and scales further than E, but adds ten thousand files to the static site (about 300 MB already), a separate build step, no numeric range filter (weight and diameter ranges need buckets as filters), ranking weights per field only, and the browser's own designs and the cartridge fit are outside the index, which needs a second code path to merge them.
 
 Where E stops: the whole-list read is linear, so 10,000 rows per kind cost about 0.2 MB gzip and 1 to 2 s on a slow device. Past about 50,000 rows (unverified) D or F is the better base.
 
@@ -113,9 +113,9 @@ Decision 1, the shape of the search:
 
 - **A. Improved inline combobox**: word matching in any order, ranking, grouped results. Smallest change. No filters, no weight or caliber range, no preview, and the phone list stays short; thousands of records stay a typing exercise.
 - **B. A dialog only**, opened from the card: query, filters, sortable result, preview. Best for browsing. The common case "I know the name" costs one more step, and the card head changes its behaviour.
-- **C. Both (recommended)**: the card's field keeps typing for a quick pick, a button at its end opens the dialog with the typed text. The Bullet card is C: its field, the Ctrl+K palette and the dialog rank in the browser.
+- **C. Both (recommended)**: the card's field keeps typing for a quick pick, a button at its end opens the dialog with the typed text.
 
-Decision 2, where matching runs: D, E (recommended up to about 10,000 rows per kind) or F, as in the previous section.
+Decision 2, where matching runs: D, E (recommended up to about 10,000 rows per kind) or F.
 
 Decision 3, sorting the result:
 

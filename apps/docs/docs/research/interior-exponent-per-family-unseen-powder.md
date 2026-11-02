@@ -1,13 +1,13 @@
 ---
 title: Pressure exponent per powder family, leave one powder out
-description: Whether a pressure exponent chosen per powder family still lowers the held-out velocity error when a powder's own rows are left out of its family's choice, which families are too small to choose one, and the fallback.
+description: Whether a per-family pressure exponent still lowers the held-out velocity error when the powder's own rows are left out of the choice, which families are too small, and the fallback.
 ---
 
 # Pressure exponent per powder family, leave one powder out
 
 ## Question
 
-[M3 interior model](../models/interior-m3.md) with the [powder fit](../models/interior-powder-fit.md): an earlier study (issue #391, branch `spike/391-burn-law-constants`) found that a pressure exponent chosen per powder family, with the vivacity refitted per powder, lowers the held-out velocity error. That choice used every powder of the family, including the one predicted. Does the gain hold when a powder's exponent comes from its family without its own rows, and which families are too small to choose an exponent?
+[M3 interior model](../models/interior-m3.md) with the [powder fit](../models/interior-powder-fit.md): an earlier study (issue #391, branch `spike/391-burn-law-constants`) found that a pressure exponent chosen per powder family, with the vivacity refitted per powder, lowers the held-out velocity error, but the choice included the powder predicted. Does the gain hold when a powder's exponent comes from its family without its own rows, and which families are too small to choose an exponent?
 
 ## Method
 
@@ -15,7 +15,7 @@ The [validation protocol](../models/validation.md): rows split by `splitOf` of t
 
 For each powder and each exponent of the grid 0.7 to 1.3 (step 0.1), the vivacity factor was fitted on the powder's training rows, minimising the summed squared log error of the velocity. For a powder P of family F (base and grain form of the record), the exponent is the grid value with the least summed error over the other powders of F; P's vivacity factor is the one fitted at that exponent. A family is too small when the other powders number fewer than 3 or their training rows come from fewer than 5 cartridges; the fallback is the exponent chosen over all other powders pooled.
 
-Accept rule, committed before any result and in the same form as the earlier study: on the validation split the median velocity error falls by at least 0.1 percentage points and by more than twice the bootstrap standard error of the paired change of the median (resampling the validation cartridges, 2,000 draws, fixed seed), the P90 does not rise, used rows fall by less than 1 %, the fitted vivacity stays positive and fewer than 1 % of perturbed held-out loads (charge +2 %, barrel -10 %) move the velocity the wrong way. Pressure is reported and never decides. The candidate was measured with `ballistics compare --candidate`; a per-row dump of the same rows gave the bootstrap and the direction check.
+Accept rule, committed before any result, as in the earlier study: on the validation split the median velocity error falls by at least 0.1 percentage points and by more than twice the bootstrap standard error of the paired change of the median (resampling the validation cartridges, 2,000 draws, fixed seed), the P90 does not rise, used rows fall by less than 1 %, the fitted vivacity stays positive and fewer than 1 % of perturbed held-out loads (charge +2 %, barrel -10 %) move the velocity the wrong way. Pressure is reported and never decides. The candidate was measured with `ballistics compare --candidate`; a per-row dump of the same rows gave the bootstrap and the direction check.
 
 The fit and analysis scripts were written by a language-model agent and judged by the same rule; nothing from it is part of a prediction. Scripts and tables: `spikes/594/` on the unmerged branch `spike/594-exponent-leave-one-powder-out`, commit `c2d6d798d5ff7e34c5645228f695311d2cdd3b89` (rule in `RULE.md`, the first commit of the branch; tables in `RESULT.md`).
 
@@ -25,7 +25,7 @@ The vivacity law of the [burn forms page](../models/interior-burn-forms.md): $\d
 
 ## Numbers
 
-Baseline, `ballistics verify` on the validation split: median velocity error 3.32 %, P90 8.87 %, 10,498 used rows from 11 cartridges, pressure median 14.95 %, P90 38.15 % on 4,060 rows.
+Baseline is `ballistics verify` on the validation split: 10,498 used rows from 11 cartridges, pressure on 4,060 rows.
 
 | Candidate | Median velocity | P90 velocity | Median pressure | P90 pressure |
 | --- | --- | --- | --- | --- |

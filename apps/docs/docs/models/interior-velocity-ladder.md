@@ -5,7 +5,7 @@ description: The slope of mean velocity against charge between neighbouring ladd
 
 # Velocity flat spots of a charge ladder
 
-A charge ladder fires one string per charge. The mean velocity of each string rises with charge, and where it rises least the velocity depends least on the charge. The analysis takes the mean, sample standard deviation and shot count of each string and returns the slope between neighbouring charges with a confidence band, and the charge ranges where that band includes zero. The result is a statistical observation about the strings fired, not a recommendation of a charge.
+The analysis takes the mean, sample standard deviation and shot count of each string of a charge ladder and returns the slope of mean velocity against charge between neighbouring charges with a confidence band, and the charge ranges where that band includes zero. The result is a statistical observation about the strings fired, not a recommendation of a charge.
 
 ## Equations
 

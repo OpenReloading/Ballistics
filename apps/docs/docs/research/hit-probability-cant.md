@@ -11,9 +11,9 @@ Hit probability (`hit-probability.md`): how large is the horizontal spread from 
 
 ## Method
 
-Accept rule, decided before any run: the closed form agrees with the figures of the question to 1 percent, and a seeded simulation of normally distributed cant agrees with the model standard deviation to 3 percent. The input is built only if a shooter can fill it from something they know; no typical cant standard deviation is known, so the default verdict is not to build it.
+Accept rule, decided before any run: the closed form agrees with the figures of the question to 1 percent, and a seeded simulation of normally distributed cant agrees with the model standard deviation to 3 percent. The input is built only if a shooter can fill it from something they know; no typical cant standard deviation is known, so the default is not to build it.
 
-Synthetic case: a rifle zeroed with the sight raised to compensate for drop, rolled about the bore by an angle $c$; the drops are 7.93 in at 200 yd and 296 in at 1000 yd (figures of the question, unverified). The closed form is compared with the drop vector rotated about the origin (the same trigonometry, so a check of the algebra, not an independent measurement). The simulation draws 400 000 cants per case from a fixed seed (mulberry32, Box-Muller) for cant standard deviations of 0.5, 1, 2, 3 and 5 degrees.
+Synthetic case: a rifle zeroed with the sight raised to compensate for drop, rolled about the bore by an angle $c$; the drops are 7.93 in at 200 yd and 296 in at 1000 yd (figures of the question, unverified). The closed form is compared with the drop vector rotated about the origin (the same trigonometry: a check of the algebra, not an independent measurement). The simulation draws 400 000 cants per case from a fixed seed (mulberry32, Box-Muller) for cant standard deviations of 0.5, 1, 2, 3 and 5 degrees.
 
 Run: `node packages/core/scripts/hit-probability-cant.mts`.
 
@@ -39,7 +39,7 @@ For scale, a group of 0.15 mrad standard deviation is 1.08 in at 200 yd and 5.4 
 
 ## Result
 
-No change. Documented as a limit, not built as an input. The formula and the sizes above are the result. The Limits of the model page gain: "Cant and aiming errors are not modelled: a rifle rolled by 1 degree moves the impact 5.2 in at 1000 yd, in proportion to the drop." The rule held: the closed form and the simulation agree (1.1 percent against the rounded 0.14 in is within the rounding of the figure, 0.7 percent against 5.2 in), and no typical cant standard deviation is known, so the field fails the gate. An optional input can be added later; the cost of leaving it out is low.
+No change. Documented as a limit (Limits of the [model page](../models/hit-probability.md)), not built as an input. The closed form and the simulation agree (1.1 percent against the rounded 0.14 in is within the rounding of the figure, 0.7 percent against 5.2 in), but no typical cant standard deviation is known, so the field fails the gate.
 
 ## Data basis
 

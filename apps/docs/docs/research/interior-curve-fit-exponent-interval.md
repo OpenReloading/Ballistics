@@ -11,7 +11,7 @@ Interior curve fit: which factor on the relative standard uncertainty of the pre
 
 ## Method
 
-The shipped `fitPressureCurves` at its default limits, with the traces, truths and starts of the [study of the exponent](interior-curve-fit-exponent.md): breech traces of the load of the [curve fit page](../models/interior-curve-fit.md) every 10 µs on a clock offset by 0.2 to 0.4 ms, Gaussian noise of a fixed fraction of the peak, the true burn coefficient scaled with the exponent so every truth has the same burn rate at 130 MPa, start values 3 % off for the burn coefficient, 5 % for the form and 20 % above the truth for the exponent, fall fraction 0.5.
+The shipped `fitPressureCurves` at its default limits, with the traces, truths and start values of the [study of the exponent](interior-curve-fit-exponent.md), fall fraction 0.5.
 
 Grid, 40 replicates per cell, seeds $1000\,(r + 1) + 16\,k$ for replicate $r$ and trace $k$:
 
@@ -72,7 +72,7 @@ A trace whose powder burns 5 % faster than the others (a different lot), three t
 
 ## Result
 
-Improved, adopted: the interval with $k = 2.2$ and the leave-one-trace-out check at $s_J$ above the full width of the interval, which names 2.9 % of noise-only fits. Documented as a limit: neither shows heat loss and bore friction. The check names model-error fits at about the rate of noise-only fits, because the missing physics biases every trace the same way, and the interval covers 18 to 23 % of them. The check does show a trace that disagrees with the others. A lower threshold names more model-error fits but as many noise-only fits more, so it was not taken.
+Improved, adopted: the interval with $k = 2.2$ and the leave-one-trace-out check at $s_J$ above the full width of the interval, which names 2.9 % of noise-only fits. Documented as a limit: neither shows heat loss and bore friction. The check names model-error fits at about the rate of noise-only fits, because the missing physics biases every trace the same way, and the interval covers 18 to 23 % of them. The check does show a trace that disagrees with the others. A lower threshold names as many more noise-only fits as model-error fits, so it was not taken.
 
 ## Data basis
 

@@ -11,7 +11,7 @@ When a saved load is shot again, the workbench compares each session with the on
 
 Every session of a load keeps a snapshot of the load as it was when the load was saved with that session: the powder, primer and case lot, the seating length and the firearm's round count (`Load.snapshots`, one per entry of `Load.sessions`). The velocity statistics come from the session's shot strings that are mapped to the load's own charge (within 0.1 mg), without the shots excluded in the session.
 
-Sessions are ordered by date when every session has one, otherwise in the order of `Load.sessions`. Each session is compared with the one before it; the first session has nothing before it.
+Sessions are ordered by date when every session has one, otherwise in the order of `Load.sessions`. The first session has nothing before it to compare.
 
 ## Rules
 

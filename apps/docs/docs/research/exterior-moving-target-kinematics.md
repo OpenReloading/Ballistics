@@ -15,7 +15,7 @@ The test calls `movingTargetLead` with a fixed time of flight and range and comp
 
 ## Formulas
 
-A target moving at $v_t$ with heading $\psi$ covers $L = v_t\, t \sin\psi$ across the line of sight during the time of flight $t$, seen at the angle $\theta = \arctan(L/R)$ from range $R$. This is the kinematics of constant velocity; no reference is cited.
+A target moving at $v_t$ with heading $\psi$ covers $L = v_t\, t \sin\psi$ across the line of sight during the time of flight $t$, seen at the angle $\theta = \arctan(L/R)$ from range $R$. Constant-velocity kinematics; no reference cited.
 
 ## Numbers
 
@@ -23,7 +23,7 @@ A target moving at $v_t$ with heading $\psi$ covers $L = v_t\, t \sin\psi$ acros
 - Heading 30 degrees: 0.6 m, half the crossing lead.
 - Headings 0 and 180 degrees: lead and angle below $10^{-12}$.
 - Each invalid input is refused with an input error.
-- Not tested: the error from the target's motion along the line of sight, which changes the range at impact and so the time of flight. The model does not iterate for it (page, Limits); its size is not computed here.
+- Not tested: the error from the target's motion along the line of sight, which changes the range at impact and so the time of flight. The model does not iterate for it (page, Limits); its size is not computed.
 
 ## Result
 
@@ -41,4 +41,4 @@ Analytic: the closed form of constant-velocity motion and synthetic inputs.
 
 ## Confidence
 
-High: the lead is a closed form and the code reproduces it to rounding; the untested along-the-line error is a stated limit.
+High: the code reproduces the closed form to rounding; the along-the-line error is a stated limit.

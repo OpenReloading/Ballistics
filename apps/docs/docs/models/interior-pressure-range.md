@@ -24,7 +24,7 @@ $$
 
 Code: `packages/core/src/interior/range.ts`, `relative`, `interiorApply`.
 
-The volume is the chamber volume. The burn coefficient is the vivacity or the coefficient of a geometric law.
+The burn coefficient is the vivacity or the coefficient of a geometric law.
 
 ### Direction of each input
 

@@ -28,7 +28,7 @@ $$
 r_a = \frac{\ln (p / p_t)}{\sigma}, \qquad r_b = \frac{\max\left(0,\ \ln (p / p_\text{max})\right)}{\sigma}
 $$
 
-Both are added to the velocity residuals of the weighted least-squares fit of the [powder fit](../models/interior-powder-fit.md).
+Both join the velocity residuals of the weighted least-squares [powder fit](../models/interior-powder-fit.md).
 
 ## Numbers
 

@@ -11,12 +11,9 @@ User records: which of eight inventory and lifecycle ideas (stock overview, batc
 
 ## Method
 
-Decided before the review.
-
 - Gate: a handloader fills the record in at the bench in under a minute, with what they know, and keeps it up without a reminder. Cheaper forms are compared first: a typed number, a filter, a print, a CSV.
 - For each idea: what the schema and the web app store today, what the user would type and how often, what the screen shows when the user stops typing it, and whether the stored shape must change before 1.0.
 - Accept rule: an idea is built only when it passes the gate and its failure mode shows no value or an age instead of a stale value. A record that only stays right while it is maintained is dropped. An idea that an open issue already covers is folded into it, not opened twice.
-- Data: the repository's schema and web app at the time of the review. No user study, no measured bench times: the bench time per idea is an estimate of the fields typed.
 
 ## Formulas
 

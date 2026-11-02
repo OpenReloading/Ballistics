@@ -19,11 +19,11 @@ A ring of relative radius $\rho$ matches a ring $\rho_j$ of a record when $|\rho
 
 ## Numbers
 
-The three pistol targets are found with 5 or 6 ellipses and applied. The four others are not found: an orange target and a red band have no black area, and a pistol target and a 100-yard target show a black area with at most two matching rings. An earlier version fitted the 100-yard target to the 10 m air pistol target with three matched rings: equal ring spacing is a coincidence often enough at three rings.
+The three pistol targets are found with 5 or 6 ellipses and applied. The four others are not found: an orange target and a red band have no black area, and a pistol target and a 100-yard target show a black area with at most two matching rings. With three matched rings the 100-yard target was fitted to the 10 m air pistol target: at three rings, equal ring spacing is often a coincidence.
 
 ## Result
 
-Improved: a target is applied without a question only when exactly one record fits (no other record within 0.5 of the top score with at least 3 matched rings), that record has at least 4 matched rings (`SURE_RINGS`) and a score of at least 2.5 (`SURE_SCORE`), and, without a known photo scale, no other record matches every ring it matches; otherwise it is proposed and the user confirms. Applying a target from three matched rings is not adopted. The rim test of the black area and the 3 % tolerance came from this case.
+Improved: a target is applied without a question only when exactly one record fits (no other record within 0.5 of the top score with at least 3 matched rings), that record has at least 4 matched rings (`SURE_RINGS`) and a score of at least 2.5 (`SURE_SCORE`), and, without a known photo scale, no other record matches every ring it matches; otherwise it is proposed and the user confirms. Applying a target from three matched rings is not adopted. This case also set the rim test of the black area and the 3 % tolerance.
 
 ## Data basis
 

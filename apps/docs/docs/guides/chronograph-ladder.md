@@ -5,7 +5,7 @@ description: How to plan and fire a charge ladder so that the powder fit can use
 
 # Reading a chronograph ladder for the powder fit
 
-A charge ladder fires one string at each of several charges. The [powder fit](../powder-tuning.md) fits the burn coefficient of the load's powder to the mean velocities, and the [flat-spot analysis](../models/interior-velocity-ladder.md) shows where the velocity rises least with the charge. All results are simulations, not load data.
+The [powder fit](../powder-tuning.md) fits the burn coefficient of the load's powder to the mean velocities, and the [flat-spot analysis](../models/interior-velocity-ladder.md) shows where the velocity rises least with the charge. All results are simulations, not load data.
 
 ## What it improves
 
