@@ -255,9 +255,9 @@ const cartridgeChoice = (c: CartridgeDetail): CartridgeChoice => ({
   ...cartridgeDiameters(c),
 })
 
-/** An answer of `POST /interior`: the response and its body, a result or an error body. */
 type FirearmRecord = Extract<UserRecord, { kind: 'firearm' }>
 
+/** An answer of `POST /interior`: the response and its body, a result or an error body. */
 type Answer = { res: Response; json: (InteriorResponse & ErrorBody) | undefined }
 
 type Kind = 'cartridge' | 'bullet' | 'powder' | 'capacity'
@@ -1472,7 +1472,6 @@ export function useWorkbenchState() {
   const [origin, setOrigin] = useState<Record<string, number> | undefined>(undefined)
   const originNow = useRef(origin)
   originNow.current = origin
-  /** Groove diameter Z of the chosen cartridge, mm, for the bore resistance of a fitted powder. */
   /** The chosen cartridge's record: its groove diameter and the values the figure draws. */
   const [groove, setGroove] = useState<Groove | undefined>(undefined)
   const { grooveM: recordGrooveM, qM, landM, recordTable } = grooveValues(cartridge, groove)
@@ -2031,7 +2030,6 @@ export function useWorkbenchState() {
     fields.bulletMass?.si,
     typedBulletFields,
   )
-  /** The bullet length a run reads, mm: the typed one or the record's, else the link's. */
   const bulletLength = bulletLengthOf(bulletValues, linkedBullet)
 
   function reset() {
@@ -2304,7 +2302,6 @@ export function useWorkbenchState() {
       })
   }
 
-  /** Why a seating ladder cannot run: no seating, or a volume or travel typed over it. */
   const seatingBlock = seatingBlockOf(seatAt, typedOverSeating(seated, fields, previewed), t)
   /** `seatingBlock` from the seating and the fields now, not this render's (#938). */
   const seatingBlockNow = () =>
@@ -3235,7 +3232,6 @@ export function useWorkbenchState() {
   /** The load's name: the typed one, else the generated one; Save names the record and the file by it. */
   const name = loadName(customName, generated)
 
-  /** The bullets that fit the cartridge (`GET /bullets?cartridge`); all without its CIP values or with all diameters on. */
   const { bulletFit, bulletParams } = bulletFilter(allDiameters, cartridge)
   const describeBullet = (b: BulletSummary) =>
     `${productLabel(b, names)}, ${withUnit('mass', system, toSi('mass', b.mass))}${b.diameter === null ? '' : `, ${withUnit('length', system, toSi('length', b.diameter))}`}`
@@ -3249,12 +3245,12 @@ export function useWorkbenchState() {
     si === undefined ? undefined : shownLength('diameter', system, si)
   const mmText = (mm: number | undefined) =>
     mm === undefined ? undefined : shownLength('diameter', system, toSi('length', mm))
-  /** The cartridge sheet's and the powder's values the user may type over them: the records', the typed and the ones a run reads. */
   const l3 = caseLengthOf(
     cartridgeCases.find((c) => c.id === chosenOwnCase),
     specValue('cartridge', 'L3'),
   )
   const caseLengthBrass = l3.brass
+  /** The cartridge sheet's and the powder's values the user may type over them: the records', the typed and the ones a run reads. */
   const spec = useSpecValues(system, {
     pmax: specValue(undefined, 'Pmax'),
     caseLength: l3.mm,
@@ -3554,7 +3550,6 @@ export function useWorkbenchState() {
   }, [suggestionKey, followed, seatedVolume])
   const bc = bcOf(bulletNow)
 
-  /** A new load with nothing chosen or typed: the start card replaces the cards. */
   const fresh = isFresh({
     chosen: [cartridge, cartridgeDesign, bullet, bulletDesign, powder, powderDesign, outcome],
     byHand,
@@ -3562,7 +3557,6 @@ export function useWorkbenchState() {
     defaulted,
   })
   const has = (keys: readonly string[]) => keys.every((k) => fields[k]?.si !== undefined)
-  /** What a run still needs, in the order of the cards; the first open one is next. */
   const todo = todoOf({
     cartridge,
     cartridgeDesign,
@@ -3573,7 +3567,6 @@ export function useWorkbenchState() {
     t,
   })
   const next = todo.findIndex((s) => !s.done)
-  /** The card of the next open step, marked until the first result (as the checklist). */
   const nextPanel = outcome ? undefined : nextPanelOf(next, has(['volume']))
 
   /**

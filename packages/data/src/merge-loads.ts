@@ -165,7 +165,6 @@ function readIncoming(options: MergeOptions, sources: SourceIndex, errors: strin
   return read
 }
 
-/** The published load file at `path` in the records, or undefined where there is none yet. */
 function readStored(path: string): PublishedLoads | undefined {
   try {
     return JSON.parse(readFileSync(path, 'utf8')) as PublishedLoads

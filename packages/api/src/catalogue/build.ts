@@ -34,7 +34,6 @@ import {
   type RecordFile,
 } from './types.ts'
 
-/** The records of `list` by id. */
 const byId = <T extends { id: string }>(list: readonly T[]) =>
   Object.fromEntries(list.map((r) => [r.id, r]))
 
@@ -55,7 +54,6 @@ function ordered<T extends { id: string }, R>(
     .map((r) => rows.get(r) as IndexRow<T>)
 }
 
-/** The record id a reference names. */
 const refId = (reference: string) => parseRef(reference)?.id ?? reference
 
 /** The manufacturer `id` of a component, an error naming the component when there is none. */

@@ -145,7 +145,6 @@ const change = z.object({
 /** The change of each metric from the baseline to the candidate. */
 export type Change = z.infer<typeof change>
 
-/** The result of `compare`. */
 const compareResult = z.object({
   ...common,
   command: z.literal('compare'),

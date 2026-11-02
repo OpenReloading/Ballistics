@@ -587,7 +587,6 @@ describe('powder fit prediction bands', () => {
         centre.pressure.standardUncertainty,
       )
     }
-    // farther out is wider still
     expect(predictPowder(fit, 3.3e-3).pressure.standardUncertainty).toBeGreaterThan(
       above.pressure.standardUncertainty,
     )

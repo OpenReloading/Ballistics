@@ -46,7 +46,7 @@ describe('start', () => {
   it('a record start fills the fields from the record, each from the record', () => {
     const d = win308()
     expect(d.fields['cartridge.L3']).toEqual({ text: '51.18', si: 51.18e-3 })
-    // shown rounded, the SI value the record's
+    // shown rounded; the SI value is the record's
     expect(defined(d.fields['chamber.alpha1']).text).toBe('71.4')
     expect(d.table).toBe('I')
     const e = evaluate(d, metric)

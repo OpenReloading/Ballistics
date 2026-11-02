@@ -80,8 +80,6 @@ import { ResultsArea } from './workbench-results.tsx'
 import { WorkbenchSearch } from './workbench-search.tsx'
 import { Toolbar, useCopyLink, Workspace } from './workspace.tsx'
 
-/** Imported by the unit tests from here. */
-
 /** The model parameters the typed burn law reads. */
 const burnKeys = ['vivacity', 'exponent', 'referencePressure', 'formA', 'formM', 'formQ', 'formZ1']
 
@@ -121,7 +119,6 @@ function seatingRow(
   ]
 }
 
-/** COAL and CBTO of the run. */
 const seatingRowsOf = (ok: OkOutcome | undefined, system: UnitSystem, t: Translate) =>
   (['overallLength', 'baseToOgive'] as const).map((k) => seatingRow(k, ok, system, t))
 
@@ -555,9 +552,7 @@ function runMarksOf(ok: OkOutcome | undefined, t: Translator['t']) {
 
 type PrintAsked = { key?: string | undefined; lot?: string | undefined; edits: number }
 
-/**
- * Prints once the longer runs have answered.
- */
+/** Prints once the longer runs have answered. */
 function usePrintWhenReady({
   printAsked,
   setPrintAsked,
@@ -573,8 +568,8 @@ function usePrintWhenReady({
   edits: number
   setPrinting: (printing: boolean) => void
 }) {
-  // The report is printed once the longer run has answered, with its values or its reason. A new
-  // run, load, range or edit of the inputs drops the request. `print()` is called from a frame, not from this effect:
+  // The report prints with the longer run's values or its reason. A new run, load, range or edit
+  // of the inputs drops the request. `print()` is called from a frame, not from this effect:
   // `flushSync` of the `beforeprint` handler does nothing inside a commit, and the print state
   // (every tab, the print-only fields) must be in the document when the browser takes its snapshot.
   useEffect(() => {
@@ -1062,9 +1057,7 @@ export function Workbench() {
     ? withUnit('charge', system, ok.load.charge)
     : (shown('charge', 'charge') ?? t('no charge'))
   const charge = useCallback((kg: number) => withUnit('charge', system, kg), [system])
-  /** What a ladder step varies, as the strip and the table show it: its seating, its temperature, else its charge. */
   const stepValue = useCallback((s: ShownStep) => stepValueOf(s, system), [system])
-  /** The load of the shown result: cartridge, bullet, mass, powder with charge. */
   const identity = useMemo(
     () => ok && identityOf(ok, bulletLabel, system, charge, t),
     [ok, bulletLabel, system, charge, t],
@@ -1092,7 +1085,6 @@ export function Workbench() {
     const typed = JSON.parse(typedKey) as (number | null)[]
     return typedBurn(Object.fromEntries(burnKeys.map((k, i) => [k, typed[i] ?? undefined])), t)
   }, [powder, names, typedKey, t])
-  /** Where the shown run starts, peaks and leaves the barrel on the burnt-fraction axis. */
   const runMarks = useMemo(() => runMarksOf(ok, t), [ok, t])
   const todoKey = JSON.stringify(todo)
   const shownTodo = useMemo(() => JSON.parse(todoKey) as typeof todo, [todoKey])

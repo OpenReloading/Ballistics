@@ -767,7 +767,6 @@ export function FirearmLibrary() {
   const newFirearm = () => start(blankFirearm())
   /** An open firearm or the example narrows the list to cards beside it. */
   const compact = editing || viewing
-  // the shared list pattern: the search, kept in the URL
   const [filters, setFilters, clearFilters] = useListState()
   const lines = (r: FirearmRecord) => {
     const facts = cardFacts(r.data, system, t)

@@ -327,7 +327,7 @@ function StepCountInput() {
       value={stepsDraft ?? (around ? (ladderSteps - 1) / 2 : ladderSteps)}
       onChange={(v) => {
         setStepsDraft(v)
-        // a number sets the count at once, so Enter runs it; an empty field keeps the count
+        // an empty field keeps the count
         if (typeof v !== 'number') return
         markChanged()
         setLadderSteps(around ? 2 * v + 1 : v)
@@ -642,7 +642,6 @@ function SeatingSlot({ name }: { name: SeatingSlotName }) {
   return <div ref={slotRefs[name]} className="seating-slot wide" />
 }
 
-/** The cards with a More popover. */
 const morePanels: readonly InputPanel[] = ['cartridge', 'bullet', 'powder', 'firearm']
 
 type LoadValues = ReturnType<typeof useLoad>
@@ -869,7 +868,6 @@ function LoadField({ name: key }: { name: string }) {
           ? { ...value, text: inchText(value.text, system[spec.quantity].symbol) }
           : value
       }
-      // what an optional empty field stands for
       placeholder={fieldPlaceholder(
         key,
         spec.quantity,
@@ -1172,7 +1170,6 @@ function NewerFitNote() {
   )
 }
 
-/** A card's fields and record rows. */
 function CardBody({ panel }: { panel: InputPanel }) {
   const {
     system,
@@ -1421,7 +1418,6 @@ function CartridgePicker() {
         }
         describe={cartridgeOptionText}
         onSelect={choose}
-        // the browser's cartridge designs in the same list, first
         extra={cartridgeDesigns.map((d) => ({
           id: d.id,
           label: t('{name} (your design)', { name: d.name }),

@@ -139,7 +139,6 @@ export interface LoadNotesState {
   dismiss: (session: string, rule: LoadNoteRule) => void
 }
 
-/** A workbench context; throws outside its provider. */
 function useWorkbenchContext<T>(context: Context<T | null>, name: string): T {
   const value = useContext(context)
   if (value === null) throw new Error(`${name} is read outside the workbench`)

@@ -200,7 +200,6 @@ describe('detectFromExample', () => {
     }
     const first = from(s, defined(truth[0]))?.proposals ?? []
     expect(new Set(first.map((p) => p.clusterId)).size).toBe(3)
-    // sorted by confidence
     expect(first.map((p) => p.confidence)).toEqual(
       first.map((p) => p.confidence).sort((a, b) => b - a),
     )

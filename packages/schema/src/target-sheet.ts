@@ -167,7 +167,6 @@ export const sheetNote = z.object({
   group: localId.describe('Id of the group whose values the placeholders show.').optional(),
 })
 
-/** Overlay switches of the editor, as the sheet was last shown. */
 const optionalFlag = (description: string) => z.boolean().describe(description).optional()
 const overlaySwitches = z
   .object({

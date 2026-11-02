@@ -866,7 +866,6 @@ export function useRingScoring({
 
   const hint = tool === 'rings' ? ringHint(ringValue, marks.length, ringsMarked, t) : undefined
 
-  /** The rings of the active group's face and the values of its shots; `still` leaves out marks. */
   const layer = (k: number, still?: boolean) =>
     frame ? (
       <FaceLayer

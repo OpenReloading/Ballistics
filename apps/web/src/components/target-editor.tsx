@@ -3585,8 +3585,6 @@ export function TargetEditor({
   const click = optic ?? options.find((o) => o.value === opticChoice)
   const { stats, keyValues } = statsOf(group)
 
-  // ----- panels -----
-
   // a Calibrate tool ended (set, cancelled): Calibrate opens again with the focus where it was
   const calReturnFrom = usePopoverReturn(
     tool,

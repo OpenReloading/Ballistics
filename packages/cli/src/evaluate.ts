@@ -36,7 +36,6 @@ export const reasons = [
   'noBulletDrag',
 ] as const
 
-/** One of {@link reasons}. */
 type Reason = (typeof reasons)[number]
 
 /** The model's muzzle velocity (m/s) and peak breech pressure (Pa) for a row, or why there is none. */

@@ -113,7 +113,6 @@ export function withTableRoles(node: ReactNode, inBody = false): ReactNode {
   })
 }
 
-/** The role of a header or data cell, else undefined. */
 function cellRole(type: string | undefined, scope: string | undefined, inBody: boolean) {
   if (type === 'td') return 'cell'
   if (type !== 'th') return
