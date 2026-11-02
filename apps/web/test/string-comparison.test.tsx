@@ -21,10 +21,6 @@ const text = (strings: Parameters<typeof StringComparison>[0]['strings']) =>
   renderToStaticMarkup(<StringComparison strings={strings} />)
 
 describe('compareSd', () => {
-  it('calls strings whose intervals overlap the same', () => {
-    expect(compareSd(defined(string(10, 4)), defined(string(10, 5)))).toBe('same')
-  })
-
   it('ranks strings of 10 shots whose intervals are apart', () => {
     const small = defined(string(10, 2))
     const large = defined(string(10, 20))

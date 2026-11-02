@@ -86,6 +86,14 @@ const failure = (f: () => unknown) => {
   }
   throw new Error('no error')
 }
+/** Burn coefficient and energy from noisy sessions at three barrel lengths, shared by the tests that read it. */
+const lengthFit = fitPowder(start, points(sessions(lengths, [294.15], 1)), {
+  parameters: ['burnRate', 'energy'],
+})
+/** Burn coefficient and temperature factor from noisy sessions at three temperatures, shared likewise. */
+const temperatureFit = fitPowder(start, points(sessions([0.6], temperatures, 1)), {
+  parameters: ['burnRate', 'temperatureFactor'],
+})
 /** Distance of a fitted value from the truth in its standard uncertainties. */
 const sigmas = (
   fit: { parameters: { name: string; value: number; standardUncertainty?: number }[] },
@@ -101,7 +109,7 @@ describe('powder fit over barrel lengths', () => {
   const parameters = ['burnRate', 'energy'] as const
 
   it('resolves the energy from three barrel lengths below the condition limit', () => {
-    const r = fitPowder(start, points(sessions(lengths, [294.15], 1)), { parameters })
+    const r = lengthFit
     expect(r.conditionNumber).toBeLessThan(1e3)
     expect(sigmas(r, 'burnRate', 0.45)).toBeLessThan(3)
     expect(sigmas(r, 'energy', 3.9e6)).toBeLessThan(3)
@@ -138,7 +146,7 @@ describe('powder fit over temperatures', () => {
   const parameters = ['burnRate', 'temperatureFactor'] as const
 
   it('recovers the temperature factor within its uncertainty', () => {
-    const r = fitPowder(start, points(sessions([0.6], temperatures, 1)), { parameters })
+    const r = temperatureFit
     expect(sigmas(r, 'temperatureFactor', 1.4)).toBeLessThan(3)
     expect(sigmas(r, 'burnRate', 0.45)).toBeLessThan(3)
     const { cold, hot } = r.load.propellant.temperatureSensitivity ?? { cold: 0, hot: 0 }
@@ -166,8 +174,7 @@ describe('powder fit over temperatures', () => {
   })
 
   it('predicts with the fitted factor', () => {
-    const r = fitPowder(start, points(sessions([0.6], temperatures, 1)), { parameters })
-    const p = predictPowder(r, 2.8e-3)
+    const p = predictPowder(temperatureFit, 2.8e-3)
     expect(p.velocity.standardUncertainty).toBeGreaterThan(0)
   })
 })
@@ -236,10 +243,9 @@ describe('powder fit over sessions', () => {
       ladder: s.ladder.map((x) => ({ ...x, barrelLength: s.barrelLength ?? 0.6 })),
     }))
     const parameters = ['burnRate', 'energy'] as const
-    const direct = fitPowder(start, points(list), { parameters })
     const r = fitPowderSessions(start, mislabelled, { parameters })
     expect(r.resolved).toEqual(parameters)
-    expect(nth(r.parameters, 1).value).toBe(nth(direct.parameters, 1).value)
+    expect(nth(r.parameters, 1).value).toBe(nth(lengthFit.parameters, 1).value)
   })
 
   it('holds the temperature factor that one hot temperature leaves ill-conditioned', () => {
@@ -279,9 +285,7 @@ describe('powder fit over sessions', () => {
     const parameters = ['burnRate', 'temperatureFactor'] as const
     const r = fitPowderSessions(start, mislabelled, { parameters })
     expect(r.resolved).toEqual(parameters)
-    expect(nth(r.parameters, 1).value).toBe(
-      nth(fitPowder(start, points(list), { parameters }).parameters, 1).value,
-    )
+    expect(nth(r.parameters, 1).value).toBe(nth(temperatureFit.parameters, 1).value)
   })
 
   it('holds the last open parameter when the sessions have fewer points than parameters', () => {

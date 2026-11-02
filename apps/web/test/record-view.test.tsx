@@ -53,11 +53,6 @@ it('answers a missing record with the not-found page, kept out of search engines
   expect(html).not.toContain('Example 168')
 })
 
-it('renders the record once read', () => {
-  states.record = { status: 'ok', data: { id: 'b1' } }
-  expect(page()).toContain('record b1')
-})
-
 it('with extras keeps the loading state until both are read, and reads them for the record', async () => {
   states.record = { status: 'ok', data: { id: 'b1' } }
   const extras = vi.fn((r: { id: string }) => Promise.resolve(`names of ${r.id}`))

@@ -25,15 +25,6 @@ const kinds: ChargeTargetKind[] = [
   'bulletLeadTime',
 ]
 
-/** The value of `kind` for `charge`, from a single run. */
-function valueAt(kind: ChargeTargetKind, charge: number) {
-  const run = interior({ ...base, charge })
-  if (!run.valid) throw new Error(run.reason)
-  const value = chargeTargetValue(kind, run, charge, base, bulkDensity)
-  if (value === undefined) throw new Error('no value')
-  return value
-}
-
 /** `interior` of `base` at a charge, computed once: the refusal tests scan the same 32 charges. */
 const scanRuns = new Map<number, InteriorResult>()
 const scanRun = (load: InteriorLoad): InteriorResult => {
@@ -43,6 +34,15 @@ const scanRun = (load: InteriorLoad): InteriorResult => {
     scanRuns.set(load.charge, run)
   }
   return run
+}
+
+/** The value of `kind` for `charge`, from a single run. */
+function valueAt(kind: ChargeTargetKind, charge: number) {
+  const run = scanRun({ ...base, charge })
+  if (!run.valid) throw new Error(run.reason)
+  const value = chargeTargetValue(kind, run, charge, base, bulkDensity)
+  if (value === undefined) throw new Error('no value')
+  return value
 }
 
 describe('solveCharge', () => {
@@ -63,7 +63,7 @@ describe('solveCharge', () => {
   })
 
   it('load ratio target is the closed form charge', () => {
-    const s = solveCharge(base, { kind: 'loadRatio', value: 0.8 }, { bulkDensity })
+    const s = solveCharge(base, { kind: 'loadRatio', value: 0.8 }, { bulkDensity, run: scanRun })
     if (!s.reached) throw new Error(s.reason)
     expect(s.charge / (bulkDensity * base.chamber.volume)).toBeCloseTo(0.8, 5)
   })
