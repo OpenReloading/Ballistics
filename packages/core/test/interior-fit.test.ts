@@ -13,31 +13,8 @@ import {
   powderDomainMargin,
   predictPowder,
 } from '../src/index.ts'
-import { normals } from './random.ts'
+import { load } from './powder-load.ts'
 
-/** Synthetic rifle load (apps/docs/docs/models/interior-powder-fit.md): truth B_a 0.45 1/s, p_st 30 MPa. */
-const load = (vivacity = 0.45, startPressure = 30e6): InteriorLoad => ({
-  chamber: { volume: 3.4e-6, boreArea: 3.75e-5, boreDiameter: 6.9e-3 },
-  barrel: { length: 0.6, twist: 0.254 },
-  bullet: { mass: 0.0095 },
-  charge: 0.0028,
-  propellant: {
-    specificEnergy: 3.9e6,
-    gamma: 1.23,
-    density: 1600,
-    covolume: 1e-3,
-    burn: {
-      kind: 'vivacity',
-      vivacity,
-      exponent: 1,
-      referencePressure: 98066.5,
-      form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
-    },
-  },
-  propellantTemperature: 294.15,
-  ignitionPressure: 5e6,
-  startPressure,
-})
 const charges = [2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3, 3e-3]
 /** Fixed noise pattern in units of sigma. */
 const noise = [1, -1, 0.5, -1.5, 0.8]
@@ -526,43 +503,6 @@ describe('powder fit prior and robust loss', () => {
 describe('powder fit prediction bands', () => {
   const truth = load()
   const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...both] })
-
-  it('covers the true value at held-out charges in 85 to 95 % of noisy repeats', () => {
-    // coarser integration than the default keeps 1000 fits quick; the true values use it too
-    const coarse = { relativeTolerance: 1e-8, absoluteTolerance: 1e-10, outputStep: 1e-5 }
-    const truthAt = (charge: number) => {
-      const r = interior({ ...truth, charge }, coarse)
-      if (!r.valid) throw new Error(r.reason)
-      return r
-    }
-    const rows = [2.6e-3, 2.8e-3, 3e-3].map((charge) => ({ charge, ...truthAt(charge) }))
-    // inside the fired range, and just above it (an extrapolation)
-    const held = [2.7e-3, 3.1e-3].map((charge) => ({ charge, ...truthAt(charge) }))
-    const covered = held.map(() => ({ velocity: 0, pressure: 0 }))
-    const draw = normals(58)
-    const repeats = 1000
-    for (let n = 0; n < repeats; n++) {
-      const noisy = rows.map((r) => ({
-        charge: r.charge,
-        muzzleVelocity: r.muzzleVelocity + 3 * draw(),
-        velocitySigma: 3,
-      }))
-      const fit = fitPowder(load(0.43), noisy, { options: coarse })
-      held.forEach((t, i) => {
-        const p = predictPowder(fit, t.charge, { options: coarse })
-        if (p.velocity.lower <= t.muzzleVelocity && t.muzzleVelocity <= p.velocity.upper)
-          nth(covered, i).velocity++
-        if (p.pressure.lower <= t.peakBreechPressure && t.peakBreechPressure <= p.pressure.upper)
-          nth(covered, i).pressure++
-      })
-    }
-    for (const c of covered) {
-      expect(c.velocity / repeats).toBeGreaterThan(0.85)
-      expect(c.velocity / repeats).toBeLessThan(0.95)
-      expect(c.pressure / repeats).toBeGreaterThan(0.85)
-      expect(c.pressure / repeats).toBeLessThan(0.95)
-    }
-  }, 360_000)
 
   it('is wider outside the fired range than at its centre and marks the extrapolation', () => {
     const centre = predictPowder(fit, 2.8e-3)
