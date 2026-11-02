@@ -71,10 +71,15 @@ const failure = (f: () => unknown) => {
   throw new Error('no error')
 }
 const rel = (a: number, b: number) => Math.abs(a / b - 1)
+const both = ['burnRate', 'startPressure'] as const
+/** The default fit of a velocity-only ladder, shared by the tests that read it. */
+const velocityFit = fitPowder(load(0.38), ladder(load(), 3, 0))
+/** Both parameters from a noisy ladder with pressures, shared by the tests that read it. */
+const noisy = fitPowder(load(0.38, 20e6), ladder(load(), 3, 5e6, 1), { parameters: both })
 
 describe('powder fit round trips', () => {
   it('fits the burn coefficient alone by default and keeps the start pressure', () => {
-    const r = fitPowder(load(0.38), ladder(load(), 3, 0))
+    const r = velocityFit
     expect(r.parameters.map((p) => p.name)).toEqual(['burnRate'])
     expect(nth(r.parameters, 0).initial).toBe(0.38)
     expect(rel(nth(r.parameters, 0).value, 0.45)).toBeLessThan(1e-6)
@@ -124,9 +129,6 @@ describe('powder fit round trips', () => {
 })
 
 describe('powder fit uncertainty', () => {
-  const both = ['burnRate', 'startPressure'] as const
-  const noisy = fitPowder(load(0.38, 20e6), ladder(load(), 3, 5e6, 1), { parameters: both })
-
   it('recovers both parameters with pressures within the reported uncertainty', () => {
     const truth = [0.45, 30e6]
     noisy.parameters.forEach((p, k) => {
@@ -201,7 +203,7 @@ describe('powder fit pressure basis', () => {
 
   it('reports the pressure rows of the one basis, none without pressures', () => {
     expect(fitPowder(load(0.38), ladder(load(), 3, 10e6)).pressureRows).toEqual({ transducer: 5 })
-    expect(fitPowder(load(0.38), ladder(load(), 3, 0)).pressureRows).toEqual({})
+    expect(velocityFit.pressureRows).toEqual({})
   })
 
   it('refuses a ladder whose pressure rows use two bases, with the rows per basis', () => {
@@ -298,7 +300,6 @@ describe('powder fit result', () => {
 })
 
 describe('powder fit failures', () => {
-  const both = ['burnRate', 'startPressure'] as const
   const points = ladder(load(), 3, 0)
 
   it('reports ill-conditioned ladders', () => {
@@ -414,7 +415,6 @@ describe('powder fit failures', () => {
 })
 
 describe('powder fit prior and robust loss', () => {
-  const both = ['burnRate', 'startPressure'] as const
   const priors = {
     burnRate: { value: 0.45, sigma: 0.3 },
     startPressure: { value: 30e6, sigma: 0.5 },
@@ -442,9 +442,8 @@ describe('powder fit prior and robust loss', () => {
   })
 
   it('matches the fit without a prior under a very wide prior', () => {
-    const points = ladder(load(), 3, 5e6, 1)
-    const plain = fitPowder(load(0.38, 20e6), points, { parameters: both })
-    const wide = fitPowder(load(0.38, 20e6), points, {
+    const plain = noisy
+    const wide = fitPowder(load(0.38, 20e6), ladder(load(), 3, 5e6, 1), {
       parameters: both,
       priors: { burnRate: { value: 0.1, sigma: 1e5 }, startPressure: { value: 9e6, sigma: 1e5 } },
     })
@@ -471,33 +470,30 @@ describe('powder fit prior and robust loss', () => {
     )
   })
 
-  it('limits the pull of a string 5 sigma off with the Huber loss', () => {
-    const points = ladder(load(), 3, 0)
-    const bad = points.map((x, i) =>
+  describe('with a string 5 sigma off', () => {
+    const bad = ladder(load(), 3, 0).map((x, i) =>
       i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
     )
-    const error = (r: { parameters: { value: number }[] }) =>
-      Math.abs(Math.log(nth(r.parameters, 0).value / 0.45))
     const plain = fitPowder(load(0.38), bad)
     const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
-    expect(error(robust)).toBeLessThan(error(plain))
-    expect(robust.loss).toBeLessThan(robust.chiSquare)
-    expect(robust.dataChiSquare).toBeGreaterThanOrEqual(plain.dataChiSquare)
-    // a threshold above every residual is the quadratic loss
-    const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
-    expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
-  })
 
-  it('reports the stop rule and whether the down-weighted rows settled', () => {
-    const points = ladder(load(), 3, 0)
-    const bad = points.map((x, i) =>
-      i === 2 ? { ...x, muzzleVelocity: x.muzzleVelocity + 15 } : x,
-    )
-    const robust = fitPowder(load(0.38), bad, { huberThreshold: 1.5 })
-    expect(robust.weightsSettled).toBe(true)
-    expect(['stalled', 'smallStep']).toContain(robust.stop)
-    // without a Huber loss no row is down-weighted
-    expect(fitPowder(load(0.38), bad).weightsSettled).toBe(true)
+    it('limits the pull of a string 5 sigma off with the Huber loss', () => {
+      const error = (r: { parameters: { value: number }[] }) =>
+        Math.abs(Math.log(nth(r.parameters, 0).value / 0.45))
+      expect(error(robust)).toBeLessThan(error(plain))
+      expect(robust.loss).toBeLessThan(robust.chiSquare)
+      expect(robust.dataChiSquare).toBeGreaterThanOrEqual(plain.dataChiSquare)
+      // a threshold above every residual is the quadratic loss
+      const loose = fitPowder(load(0.38), bad, { huberThreshold: 100 })
+      expect(nth(loose.parameters, 0).value).toBe(nth(plain.parameters, 0).value)
+    })
+
+    it('reports the stop rule and whether the down-weighted rows settled', () => {
+      expect(robust.weightsSettled).toBe(true)
+      expect(['stalled', 'smallStep']).toContain(robust.stop)
+      // without a Huber loss no row is down-weighted
+      expect(plain.weightsSettled).toBe(true)
+    })
   })
 
   it('rejects malformed priors and a Huber loss without sigmas', () => {
@@ -529,7 +525,7 @@ describe('powder fit prior and robust loss', () => {
 
 describe('powder fit prediction bands', () => {
   const truth = load()
-  const parameters = ['burnRate', 'startPressure'] as const
+  const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...both] })
 
   it('covers the true value at held-out charges in 85 to 95 % of noisy repeats', () => {
     // coarser integration than the default keeps 1000 fits quick; the true values use it too
@@ -569,7 +565,6 @@ describe('powder fit prediction bands', () => {
   }, 360_000)
 
   it('is wider outside the fired range than at its centre and marks the extrapolation', () => {
-    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
     const centre = predictPowder(fit, 2.8e-3)
     const below = predictPowder(fit, 2.4e-3)
     const above = predictPowder(fit, 3.2e-3)
@@ -597,7 +592,6 @@ describe('powder fit prediction bands', () => {
   })
 
   it('refuses a fit that names a parameter it has no setter for', () => {
-    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
     const renamed = {
       ...fit,
       parameters: fit.parameters.map((p, k) =>
@@ -609,7 +603,6 @@ describe('powder fit prediction bands', () => {
   })
 
   describe('domain', () => {
-    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
     const { domain } = fit
     const above = (x: number) => x * (1 + 1e-9)
     const below = (x: number) => x * (1 - 1e-9)
@@ -638,14 +631,13 @@ describe('powder fit prediction bands', () => {
     })
 
     it('takes the margin from the options and has no pressure range without pressures', () => {
-      const wide = fitPowder(load(0.4), ladder(truth, 3, 0, 1), { domainMargin: 0.25 })
+      const rows = ladder(truth, 3, 0, 1)
+      const wide = fitPowder(load(0.4), rows, { domainMargin: 0.25 })
       expect(wide.domain.margin).toBe(0.25)
       expect(wide.domain.charge.max).toBe(3e-3 * 1.25)
       expect(wide.domain.pressure).toBeUndefined()
       for (const domainMargin of [-0.1, 1, Number.NaN, '0.05' as unknown as number])
-        expect(() => fitPowder(load(0.4), ladder(truth, 3, 0, 1), { domainMargin })).toThrow(
-          InputError,
-        )
+        expect(() => fitPowder(load(0.4), rows, { domainMargin })).toThrow(InputError)
     })
 
     it('counts the charge at the edge as inside and names the side outside', () => {
@@ -716,7 +708,6 @@ describe('powder fit prediction bands', () => {
   })
 
   it('returns the model value, a symmetric interval and the chosen coverage', () => {
-    const fit = fitPowder(load(0.4), ladder(truth, 3, 2e6, 1), { parameters: [...parameters] })
     const p = predictPowder(fit, 2.85e-3)
     const r = interior({ ...fit.load, charge: 2.85e-3 })
     if (!r.valid) throw new Error(r.reason)
@@ -770,7 +761,7 @@ describe('powder fit chamber volume factor', () => {
 
   it('leaves the fit as it was with the factor off', () => {
     // values of the fit before the option existed: the default and a start pressure with pressures
-    const a = fitPowder(load(0.38), ladder(load(), 3, 0))
+    const a = velocityFit
     expect(a.parameters).toEqual([
       {
         name: 'burnRate',
