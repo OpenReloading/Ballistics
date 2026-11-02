@@ -123,7 +123,7 @@ export interface StartPressureRule extends StartPressureDefault {
 /**
  * The default start pressure for a barrel length in m and a bullet's `construction` record: the
  * value of its construction and firearm class. Without a barrel length or a construction it is the
- * rifle assumption, the value before the construction rule.
+ * rifle assumption.
  */
 export function startPressureOf(
   barrel: number | undefined,

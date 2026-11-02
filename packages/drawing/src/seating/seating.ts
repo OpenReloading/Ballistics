@@ -324,8 +324,8 @@ function landContact(
 }
 
 /**
- * Assumed bullet length uncertainty, mm: `measured` absolute, `estimated` relative to the length.
- * Unverified assumptions without a source; the estimated one follows an input finding.
+ * Assumed bullet length uncertainty: `measured` absolute (mm), `estimated` relative to the length.
+ * Unverified; the estimated one follows an input finding.
  */
 export const bulletLengthTolerance = Object.freeze({ measured: 0.05, estimated: 0.15 })
 
@@ -357,10 +357,9 @@ interface Intrusion {
 }
 
 /**
- * The bullet volume inside the case (`apps/docs/docs/models/case-capacity.md`, "Bullet volume below the mouth"): base = COAL -
- * length, so at fixed COAL a length error dL moves the depth by dL and the volume by at most
- * pi d^2 / 4 dL, which gives the bounds (the lower one
- * clamped at 0).
+ * The bullet volume inside the case (`apps/docs/docs/models/case-capacity.md`, "Bullet volume below
+ * the mouth"): base = COAL - length, so at fixed COAL a length error dL moves the depth by dL and
+ * the volume by at most pi d^2 / 4 dL, which gives the bounds (the lower one clamped at 0).
  */
 export function intrusion({
   bullet,
@@ -430,7 +429,8 @@ interface IntrusionEstimate {
  * The bullet volume below the mouth without a bullet length (`apps/docs/docs/models/case-capacity.md`,
  * "Bullet without a length"): the length is mass / (effective density * cylinder area), then
  * `intrusion` at the given COAL with the outline of assumed proportions. The bounds are the volumes
- * for the true lengths that the error of the density allows, length / (1 + error) and length / (1 - error): a longer bullet takes more of the case.
+ * at the lengths the density error allows, length / (1 + error) and length / (1 - error); a longer
+ * bullet takes more of the case.
  */
 export function estimateIntrusion(i: EstimateInput): IntrusionEstimate {
   const { diameter, mass, density, caseLength, coal } = i

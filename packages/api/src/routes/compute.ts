@@ -13,7 +13,7 @@ import { describeAnswers } from './identity.ts'
 /**
  * Exterior trajectory and truing, interior simulation and Miller stability.
  * Registered without fastify-plugin, so the error handler applies to these routes only. Solver
- * calls run on `compute` (a worker pool), stability runs here (closed form).
+ * calls run on `compute` (a worker pool), stability here (closed form).
  */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
@@ -68,7 +68,7 @@ export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
       response: stabilityResponse,
       summary: 'Gyroscopic stability',
       description:
-        'The gyroscopic stability factor of a bullet by the Miller twist rule from mass, diameter, length, twist and muzzle velocity, corrected for air temperature and pressure. A `bullet` id supplies the values the query leaves out.',
+        'The gyroscopic stability factor of a bullet by the Miller twist rule from mass, diameter, length, twist and muzzle velocity, corrected for air temperature and pressure. A `bullet` id supplies the values the query omits.',
     },
   }
   app.get('/exterior/stability', stabilityOptions, (request) =>

@@ -9,7 +9,7 @@ Units: a record file stores each quantity in one unit (`packages/schema/src/unit
 ### Shared shapes
 
 **Quantity**:
-A record field stored as `{ value, raw }` with `value` in the stored unit of its quantity kind. Every length, mass, pressure, velocity, angle and temperature of a record file is one.
+A record field stored as `{ value, raw }` with `value` in the stored unit of its quantity kind.
 _Avoid_: measurement
 
 **Value**:
@@ -19,7 +19,7 @@ The number of a field object: `value` of a quantity, of a spec value, of a publi
 `raw`: the text as the source prints it, kept where it differs from the parsed value. On quantities, spec values, powder `composition` entries and bullet `construction`.
 
 **Record id**:
-`id`: lowercase kebab-case id of a record, equal to its file name without `.json`. The `{id}` of every `GET /v1/<kind>/{id}` route and the value of every record reference.
+`id`: lowercase kebab-case id of a record, equal to its file name without `.json`. The `{id}` of `GET /v1/<kind>/{id}` routes and the value of record references.
 
 **Local id**:
 `id` inside a user data file: up to 64 characters, unique within its list. Records, optics, configurations, shot groups, sheet notes and embedded `files` carry one.
@@ -32,7 +32,7 @@ _Avoid_: record id (for user data)
 `note`: free text on a record, a provenance block, a source, a published ballistic coefficient or a plausibility exception.
 
 **Provenance**:
-`provenance`: where the values of a record come from, a `kind` and at least one source in `sources`, with an optional `note`. Every record kind and every record the API returns carries it.
+`provenance`: where the values of a record come from, a `kind` and at least one source in `sources`, with an optional `note`. Carried by every record, API answers included.
 
 **Provenance kind**:
 `kind` of a provenance block or a source: `published`, `measured`, `derived`, `fitted` or `computed`. A source's `kind` overrides the block's for that source's values.
@@ -89,7 +89,7 @@ _Avoid_: maker
 ### Manufacturers
 
 **Manufacturer**:
-A company that makes powders or bullets, or whose products other records name (a chronograph), a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers` and `GET /v1/manufacturers/{id}`.
+A company that makes powders or bullets, or whose products other records name (a chronograph), a record of kind `manufacturers` with `id`, `name`, `website`, `aliases` and `provenance`. Its id is the slug of its name without the legal form and never changes. Served by `GET /v1/manufacturers[/{id}]`.
 _Avoid_: maker, brand
 
 **Manufacturer reference**:
@@ -120,7 +120,7 @@ _Avoid_: maker
 A record of kind `cartridges`, one per C.I.P. sheet: `id`, `name`, `aliases`, `table`, `country`, `published`, `revised`, `pressureMethod`, `verification`, `values`, `exceptions`, `provenance` (the C.I.P. TDCC with the sheet's URL, SHA-256 and retrieval date). Served by `GET /v1/cartridges` and `GET /v1/cartridges/{id}`.
 
 **Cartridge reference**:
-`cartridge`: record id of a cartridge on case capacities, loads and firing series, a reference (`catalogue:<id>` or `user:<UUID>`) on a firearm, a reference on loads, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
+`cartridge`: record id of a cartridge on case capacities and firing series, a reference (`catalogue:<id>` or `user:<UUID>`) on a firearm and on loads, and in interior bodies (the cartridge whose pressure limits the answer compares). Also the bullet list filter `?cartridge=`.
 
 **Sheet id**:
 `sheetId`: `cip-<id>-<revised or published>`, the id of a cartridge's sheet revision. Figure ids and drawing baselines are named after it.
@@ -203,7 +203,7 @@ _Avoid_: l3
 _Avoid_: l6
 
 **Case capacity**:
-One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `primerState`, `fillLevel`, `note`. A catalogue capacity also has `id` and `provenance`. The cartridge record answer lists the catalogue ones in `capacities`.
+One entity for every `origin`: the catalogue record (`records/capacities`) and the user record of kind `caseCapacity`, a capacity the user measured. One water capacity of a case of one cartridge from one source, with `origin`, `cartridge` and `caseManufacturer` (references), `waterCapacity` (g), `caseCondition`, `primerState`, `fillLevel`, `note`. A catalogue capacity also has `id` and `provenance`.
 
 **Water capacity**:
 `waterCapacity`: mass of water filling a case to the mouth (or the level `fillLevel` names), g, on a case capacity.
@@ -231,7 +231,7 @@ _Avoid_: calibers, classes
 ### Powders
 
 **Powder**:
-A record of kind `powders`: a propellant as its manufacturer sells it, with `manufacturer`, `name`, `aliases`, `country`, `grainForm`, `propellantBase`, `bulkDensity`, `composition`, `thermochemistry`, `interior`. Served by `GET /v1/powders` and `GET /v1/powders/{id}`, and named by `powder` in charge-target bodies and workbench states.
+A record of kind `powders`: a propellant as its manufacturer sells it, with `manufacturer`, `name`, `aliases`, `country`, `grainForm`, `propellantBase`, `bulkDensity`, `composition`, `thermochemistry`, `interior`. Served by `GET /v1/powders[/{id}]`, and named by `powder` in charge-target bodies and workbench states.
 
 **Grain form**:
 `grainForm`: `ball` (spherical and flattened spherical grains), `extruded` (tubes, cylinders, sticks), `flake` or `other`.
@@ -257,7 +257,7 @@ _Avoid_: `base` (on a powder)
 `interior`: the M3 parameters of a powder fitted to load tables, with the fixed inputs of the fit: `model` (`m3`), `fitted`, `vivacity`, `energy`, `gamma`, `covolume`, `density`, `pressureExponent`, `referencePressure`, `ignitionPressure`, `startPressure`, `propellantTemperature`, `burnForm`, `resistance`, `trainingRows`, `trainingCartridges`. Effective values of the model version. Powder list items carry `vivacity`, `pressureExponent`, `referencePressure`, `burnForm`, `trainingRows`, `trainingCartridges` and `retrieved`, the latest day the fitted sources were read.
 
 **Fitted parameters**:
-`fitted`: the interior parameters the fit moved (`vivacity`, `energy`, `form.a`). The others are fixed inputs.
+`fitted`: the interior parameters the fit moved (`vivacity`, `energy`, `form.a`).
 
 **Estimate**:
 A fitted value with its `standardUncertainty`, both in the unit of the quantity: `interior.vivacity`, `interior.energy` and `burnForm.a`.
@@ -316,7 +316,7 @@ _Avoid_: `rows`, `cartridges` (of a powder fit)
 ### Bullets
 
 **Bullet**:
-A record of kind `bullets`: a projectile as its manufacturer sells it, with `manufacturer`, `productNumber`, `name`, `country`, `productLine`, `caliber`, `diameter`, `mass`, `length`, `base`, `ogive`, `tip`, `meplatDiameter`, `noseLength`, `baseToOgive`, `bearingLength`, `construction`, `ballisticCoefficients`, `recommendedTwist`, `slowestTwist`. Served by `GET /v1/bullets` and `GET /v1/bullets/{id}`, and named by `bullet` in exterior bodies, the stability query and workbench states.
+A record of kind `bullets`: a projectile as its manufacturer sells it, with `manufacturer`, `productNumber`, `name`, `country`, `productLine`, `caliber`, `diameter`, `mass`, `length`, `base`, `ogive`, `tip`, `meplatDiameter`, `noseLength`, `baseToOgive`, `bearingLength`, `construction`, `ballisticCoefficients`, `recommendedTwist`, `slowestTwist`. Served by `GET /v1/bullets[/{id}]`, and named by `bullet` in exterior bodies, the stability query and workbench states.
 
 **Product number**:
 `productNumber`: the manufacturer's product number of a bullet.
@@ -397,7 +397,7 @@ _Avoid_: twistLength
 ### Loads
 
 **Primer**:
-A record of kind `primers`: a primer product as its manufacturer sells it, with `manufacturer`, `name`, `productNumber`, `size` (`small-rifle`, `large-rifle`, `small-pistol`, `large-pistol` or `shotshell`), `magnum`, `cup`, `compound` (`lead-styphnate` or `lead-free`), `intendedUse` and `performance`. Served by `GET /v1/primers` and `GET /v1/primers/{id}`, named by a load's `primer.record`. No value of it enters a calculation.
+A record of kind `primers`: a primer product as its manufacturer sells it, with `manufacturer`, `name`, `productNumber`, `size` (`small-rifle`, `large-rifle`, `small-pistol`, `large-pistol` or `shotshell`), `magnum`, `cup`, `compound` (`lead-styphnate` or `lead-free`), `intendedUse` and `performance`. Served by `GET /v1/primers[/{id}]`, named by a load's `primer.record`. No value of it enters a calculation.
 
 **Load**:
 One cartridge recipe fired from one firearm, one shape for the catalogue (a record of kind `loads`), the user record of kind `load` and the load file, in stored units: `origin`, `cartridge`, `firearm`, `bullet` and `powder` (references, a measured catalogue load may describe the bullet and powder instead), `charge` (g), `capacity` (a reference to a case capacity, catalogue or the user's measured one), `primer` (`record`, a `catalogue:` primer reference, and `lot`), `case` (`firingCount`), `seating`, `note`, `analysis` (`overrides`, the solver values the user typed, and `ladder`) and `sessions` (references to the chronograph sessions of the Measurements tab). A catalogue load also has `id`, `name` and `provenance`; a user load is named by its record. Its components hold a `manufacturer` reference and `lot`, the bullet `model` and `bulletMass`, and the powder `name`.
@@ -474,7 +474,7 @@ A record of kind `firings`: rounds of one ammunition fired from one barrel, meas
 _Avoid_: `rounds` (as a count)
 
 **Published velocity**:
-`velocity` of a firing series: `point` (where it applies, as printed), `instrument`, `mean` (m/s) and the single-shot velocities `shots` (m/s). A `velocity` key of the stability query is not used (it takes `muzzleVelocity`).
+`velocity` of a firing series: `point` (where it applies, as printed), `instrument`, `mean` (m/s) and the single-shot velocities `shots` (m/s).
 
 **Published pressure**:
 `pressure` of a firing series: `method`, `instrument`, gauge `position` as printed and `meanPeak`, the mean of the peak pressure of each round (bar).
@@ -551,7 +551,7 @@ One entry of `ruleBooks`: `title`, `edition` (as the document states it), `url` 
 _Avoid_: documents
 
 **Discipline**:
-A record of kind `disciplines`: a match or course of fire of one `federation`, with `name`, `number` (as printed), `section` and `page` of the rule book, `distance`, `category`, `caliberClasses` and `internationalDiscipline`. The list filters `?federation=`. Its list item carries `distanceMm`.
+A record of kind `disciplines`: a match or course of fire of one `federation`, with `name`, `number` (as printed), `section` and `page` of the rule book, `distance`, `category`, `caliberClasses` and `internationalDiscipline`. The list filters `?federation=`.
 
 **International discipline**:
 `internationalDiscipline`: record id of the discipline of the international federation the rule book names as equivalent.
@@ -665,10 +665,10 @@ _Avoid_: si
 _Avoid_: `step`, `steps` (of a ladder)
 
 **Sessions of a load**:
-`sessions`: the references (`user:<UUID>` or `catalogue:<id>`) of the chronograph sessions the Measurements tab shows for a load, in the order shown. The sessions are records of their own.
+`sessions`: the references (`user:<UUID>` or `catalogue:<id>`) of the chronograph sessions the Measurements tab shows for a load, in the order shown.
 
 **Firearm**:
-A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per chronograph session or competition event, so each is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference. The `firearm` of exterior bodies is the sight and rifling of one shot.
+A firearm, one shape for every origin, in stored units (mm, g, degrees; the zero air in degC, bar and %). The user record of kind `firearm` holds `origin`, `name`, `manufacturer` (a reference), `model`, `cartridge` (a reference), `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `freebore`, `baseToOgiveAtLands`, `firearmMass`, `roundCount`, `roundCountDate` (the day the count was last set), `countedSessions` (the rounds added to the count per chronograph session or competition event, so each is counted once), `notes`, `optics`, `configurations`, `active` (the configuration on the firearm now). A workbench state names one by its local id in `firearm`, a load by a reference.
 _Avoid_: rifle, gun
 
 **Firearm action**:

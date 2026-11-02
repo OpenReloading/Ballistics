@@ -115,7 +115,7 @@ const partOf = (
   ],
 })
 
-/** The smallest text size of at least 1.8 mm that renders 11 CSS px when the widest of the figures fills the 358 px phone column (`fitEm`). */
+/** The smallest text size of at least 1.8 mm that renders 11 CSS px when the widest figure fills the 358 px phone column (`fitEm`). */
 export const screenEm = (figures: Drawn[], unit: LengthUnit = 'mm') =>
   fitEm((em) =>
     Math.max(

@@ -59,10 +59,7 @@ export function caseType(
   return d < -0.25 ? 'rebated' : 'rimless'
 }
 
-/**
- * A hash of `text` for change detection, 14 hex digits (53 bits, synchronous, the same in Node and
- * the browser). Not a security hash.
- */
+/** A hash of `text` for change detection: 14 hex digits (53 bits), synchronous, the same in Node and the browser. Not a security hash. */
 export function contentHash(text: string): string {
   let h1 = 0xdeadbeef
   let h2 = 0x41c6ce57

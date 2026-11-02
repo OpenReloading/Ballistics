@@ -134,17 +134,13 @@ export const chronoSession = z
     })
   })
 
-/**
- * A session of the catalogue (`records/chrono`): {@link chronoSession} with `origin` `catalogue`,
- * which also carries its id, date, device maker and model, air temperature and the load of every
- * string.
- */
+/** A session of the catalogue (`records/chrono`): {@link chronoSession} with `origin` `catalogue`. */
 export const catalogueSession: z.ZodType<CatalogueSession> = chronoSession.refine(
   (s): s is CatalogueSession => s.origin === 'catalogue',
   { message: 'A catalogue record has origin catalogue', path: ['origin'] },
 )
 
-/** One chronograph shot as parsed: velocity in m/s, cold-bore mark, exclusion reason. */
+/** One chronograph shot as parsed. */
 export interface ChronoShot extends z.infer<typeof chronoShot> {}
 /** What a shot string varies against its load: the charge (g) or the seating length (mm). */
 export type StringVariation = z.infer<typeof stringVariation>

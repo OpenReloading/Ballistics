@@ -15,10 +15,7 @@ import { caps } from './schemas.ts'
 import type { ComputeRunner, Results } from './tasks.ts'
 import { responseUnits } from './units.ts'
 
-/**
- * The compute runner and the record lookups a charge-target request reads. Each lookup fails an
- * unknown id with a 404 error.
- */
+/** The compute runner and the record lookups of a charge-target request. Each lookup fails an unknown id with a 404 error. */
 export type ChargeContext = {
   compute: ComputeRunner
   /** The cartridge record `id` with its values. */

@@ -56,7 +56,7 @@ export interface RecordOfKind {
 
 /**
  * A record as `Catalogue.get` answers it: the stored record with its `kind`, `origin` (always
- * `catalogue`) and `revision` (a hash of the stored record, it changes with any field). The
+ * `catalogue`) and `revision` (a hash of the stored record, changes with any field). The
  * generated record file holds none of the three.
  */
 export type Catalogued<K extends CatalogueKind> = RecordOfKind[K] & {
@@ -105,7 +105,7 @@ export interface CaseQuery extends PowderQuery {
   cartridge?: string | undefined
 }
 
-/** A cartridge of the list, the fields of `GET /cartridges`. Lengths and diameters in mm, `pmax` in bar. */
+/** A cartridge of the list (`GET /cartridges`). Lengths and diameters in mm, `pmax` in bar. */
 export interface CartridgeItem {
   id: string
   name: string
@@ -129,7 +129,7 @@ export interface ManufacturerItem {
   website?: string
 }
 
-/** The part of a powder's M3 parameters the burn-rate curve reads, with what the fit rests on. */
+/** The part of a powder's M3 parameters the burn-rate curve reads, with the fit's basis. */
 export interface PowderInteriorItem {
   vivacity?: unknown
   pressureExponent?: number
@@ -137,7 +137,7 @@ export interface PowderInteriorItem {
   burnForm?: unknown
   trainingRows?: number
   trainingCartridges?: number
-  /** ISO date the fitted sources were read, the latest of them. */
+  /** ISO date the latest fitted source was read. */
   retrieved?: string
 }
 
@@ -163,7 +163,7 @@ export interface PrimerItem {
   compound?: PrimerCompound
 }
 
-/** A bullet of the list: values of the record, null where it has none. Diameter, mass and length as stored (mm, g). */
+/** A bullet of the list: values of the record (mm, g), null where it has none. */
 export interface BulletItem {
   id: string
   manufacturer: string
@@ -193,10 +193,7 @@ export interface CaseItem {
   mass?: number
 }
 
-/**
- * A target face of the list, with the caliber classes and categories it is used for. `organization`
- * is the abbreviation of the face's federation, for display and search.
- */
+/** A target face of the list, with its caliber classes and categories. `organization` is the abbreviation of the face's federation. */
 export interface TargetFaceItem {
   id: string
   federation?: string | undefined
@@ -252,8 +249,8 @@ export interface EventTypeItem {
 }
 
 /**
- * A row of the index: the list item, the key it is ordered by (`sortKey` of the schema package)
- * and the key it is searched by (`searchKey`). Rows are stored in the default order of their list.
+ * A row of the index: the list item, its order key (`sortKey` of the schema package) and search
+ * key (`searchKey`). Rows are stored in the default order of their list.
  */
 export interface IndexRow<T> {
   item: T
@@ -321,14 +318,14 @@ export interface CatalogueSource {
   renames?: Renames | undefined
 }
 
-/** What `openCatalogue` opens: the index and the record file, or a function that reads it on the first `get`. */
+/** What `openCatalogue` opens: the index and the record file, or a function that reads it on first `get`. */
 export interface CatalogueData {
   index: CatalogueIndex
   /** The record file, or a function that reads it. */
   records: RecordFile | (() => RecordFile)
 }
 
-/** The read-only catalogue: lists in their default order, records by id. The same in the API server, the Pages build, the browser and tests. */
+/** The read-only catalogue: lists in default order, records by id. The same in the API server, the Pages build, the browser and tests. */
 export interface Catalogue {
   /** Cartridges, ranked by `q` where set. */
   cartridges(query?: CartridgeQuery): CataloguePage<CartridgeItem>

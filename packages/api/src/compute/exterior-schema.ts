@@ -174,9 +174,7 @@ export const shot = z
     air: air.describe('Station air at the firing point.'),
     lookAngle: angle()
       .optional()
-      .describe(
-        'Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.',
-      ),
+      .describe('Angle of the line of sight above the horizontal, rad, default 0.'),
     wind: wind.optional().describe('Wind by horizontal distance segment, default none.'),
     site: z
       .strictObject({
@@ -197,18 +195,14 @@ export const shot = z
       .union([
         z.strictObject({
           range: z.number().describe('Zero slant range, m.'),
-          lookAngle: angle()
-            .optional()
-            .describe('Look angle of the zero, rad, between -pi/2 and pi/2, default 0.'),
+          lookAngle: angle().optional().describe('Look angle of the zero, rad, default 0.'),
           air: air.optional().describe("Air of the zero, default the shot's air."),
           wind: wind.optional().describe('Wind of the zero, default none.'),
         }),
         z.strictObject({
-          elevationAngle: angle().describe(
-            'Angle of the bore above the line of sight, rad, between -pi/2 and pi/2.',
-          ),
+          elevationAngle: angle().describe('Angle of the bore above the line of sight, rad.'),
           windageAngle: angle().describe(
-            'Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2.',
+            'Angle of the bore to the right of the line of sight, rad.',
           ),
         }),
       ])

@@ -540,11 +540,11 @@ export interface TruingComparison {
 /**
  * Fits the same observations twice, the muzzle velocity alone and a constant drag factor together
  * with the muzzle velocity, and reports how far the two fitted shots disagree at the observed
- * ranges. Noiseless data that only a muzzle velocity error produced give a divergence of 0 (the
- * drag fit finds a factor of 1); with measurement noise the factor moves off 1 and the divergence
- * is positive without a drag error. A drag error the velocity fit has to absorb shows as a positive
- * divergence (`apps/docs/docs/models/exterior-truing.md`, "Divergence of the two fits").
- * Throws what either fit throws, so at least two observations that separate the two parameters.
+ * ranges. Noiseless data from a muzzle velocity error alone give a divergence of 0 (the drag fit
+ * finds a factor of 1); measurement noise gives a positive divergence without a drag error, and a
+ * drag error the velocity fit has to absorb gives a positive one too
+ * (`apps/docs/docs/models/exterior-truing.md`, "Divergence of the two fits").
+ * Throws what either fit throws, so needs at least two observations that separate the two parameters.
  */
 export function compareTruingFits(
   shot: TrajectoryInput,

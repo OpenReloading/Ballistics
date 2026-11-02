@@ -113,8 +113,8 @@ function readStrings(root: Obj): {
  * An OpenReloading session JSON file, the format the session summary exports:
  * `{ "format": "openreloading-session", "version": 1, "date"?, "device"?: { "kind",
  * "manufacturerName"?, "model"? }, "muzzleDistance"? (m), "note"?, "strings": [{ "label"?, "shots": [{ "velocity" (m/s),
- * "coldBore"?, "excluded"? }] }] }`. Velocities are m/s, so no unit is needed. The muzzle distance is m
- * in the file and mm (the stored unit) in the session.
+ * "coldBore"?, "excluded"? }] }] }`. Velocities are m/s. The muzzle distance is m in the file and mm
+ * (the stored unit) in the session.
  */
 export function parseOpenReloadingJson(
   text: string,

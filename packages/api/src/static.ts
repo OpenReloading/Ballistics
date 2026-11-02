@@ -31,7 +31,7 @@ const recordFiles = [
 
 /**
  * Starts the API on 127.0.0.1 at a free port over the catalogue of the bundle, compute in this
- * thread. `url` is its origin, `close` stops it, `data` is the catalogue's index and records.
+ * thread. `url` is its origin, `close` stops it, `data` the catalogue's index and records.
  */
 export async function startBundleApi() {
   const data = buildCatalogue(loadBundle())

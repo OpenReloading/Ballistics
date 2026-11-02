@@ -108,8 +108,7 @@ export interface TakenSensitivity {
 /**
  * The temperature sensitivity a run of `powder` takes, K and 1/K: the record's own, else the default
  * of its grain form with the reference of the record's fit (else {@link sensitivityReferenceDefault});
- * `form` names the grain form when the default was taken. None for a powder without either. The
- * workbench and the API's load-file route both read it, so a load runs alike in both.
+ * `form` names the grain form when the default was taken. None for a powder without either.
  */
 export function recordSensitivity(powder: SensitivityPowder): TakenSensitivity | undefined {
   const own = powder.temperatureSensitivity

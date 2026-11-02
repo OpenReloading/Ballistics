@@ -13,9 +13,8 @@ import { parseVelocity, parseVelocityUnit, resolveUnit } from './units.ts'
 export type Column = number | string
 
 /**
- * Which column holds what, each a column number counted from 1 or header text. `velocity` is
- * required. `string` labels the string of a shot, `velocityUnit` names the velocity unit per row,
- * `coldBore` and `excluded` flag a shot.
+ * Which column holds what. `velocity` is required. `string` labels the string of a shot,
+ * `velocityUnit` names the velocity unit per row, `coldBore` and `excluded` flag a shot.
  */
 export interface ColumnMap {
   velocity: Column
@@ -29,8 +28,7 @@ export interface ColumnMap {
 export type Delimiter = ',' | ';' | '\t' | 'none'
 
 /**
- * Column mapping (required), delimiter (detected when absent), number of file rows before the
- * data (numeric columns only), and the device.
+ * Options of `parseDelimited`; `columns` is required.
  */
 export interface DelimitedOptions extends ChronoParserOptions {
   columns: ColumnMap
@@ -90,8 +88,7 @@ interface Row {
 type MappedColumn = [keyof ColumnMap, Column]
 
 /**
- * Delimited text with a user column mapping: one row per shot in firing order.
- * Never detected; the caller names the columns.
+ * Delimited text with a user column mapping: one row per shot in firing order. Never detected.
  */
 export function parseDelimited(text: string, options: DelimitedOptions): ChronoImport {
   return parseDelimitedRows('delimited', text, options)

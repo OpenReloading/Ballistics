@@ -155,19 +155,19 @@ function classify(
 /**
  * Merges an incoming edition of a table into the file in the repository, by load id:
  * - a load the repository lacks is created;
- * - a load whose content (all but `id`, `source`, `page` and `url`) is equal stays as it is,
- *   citing the edition that printed it;
- * - a load with other content is listed with the changed field paths and is replaced only where
- *   its id is in `accept`, or `accept` is `'all'`;
- * - a load of the repository the incoming edition does not print is kept and listed as absent.
+ * - a load with equal content (all but `id`, `source`, `page` and `url`) stays as it is, citing the
+ *   edition that printed it;
+ * - a load with other content is listed with the changed field paths and replaced only where its
+ *   id is in `accept`, or `accept` is `'all'`;
+ * - a repository load the incoming edition does not print is kept and listed as absent.
  *
- * A created or accepted load cites the incoming source, appended to `provenance.sources` where the
- * file does not have it yet (the sources compare as JSON). The incoming file's loads get their ids
- * from {@link withLoadIds}; any id they carry is replaced. The loads come out sorted by id. The
- * file's other fields stay those of the repository; with no file there, the incoming file is
- * the start. `written` is false when the merge leaves the repository file as it is.
- * `resolveSource` turns a source entry into the form two entries compare in, so a reference to a
- * source record and the same source written out are one source.
+ * A created or accepted load cites the incoming source, appended to `provenance.sources` unless
+ * already there (sources compare as JSON). The incoming loads get their ids from
+ * {@link withLoadIds}, replacing any they carry. The loads come out sorted by id. The file's other
+ * fields stay those of the repository; with no file there, the incoming file is the start.
+ * `written` is false when the repository file is left as it is. `resolveSource` turns a source
+ * entry into the form two entries compare in, so a source record reference and the same source
+ * written out are one source.
  */
 export function mergePublishedLoads(
   existing: PublishedLoads | undefined,

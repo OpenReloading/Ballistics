@@ -4,7 +4,7 @@ import { provenance } from './provenance.ts'
 import { quantity } from './units.ts'
 
 /**
- * Sizes of a primer: small or large, for rifle or pistol cartridges, or the shotshell primer.
+ * Sizes of a primer.
  * Inferred type: {@link PrimerSize}.
  */
 export const primerSizes = z.enum([
@@ -18,10 +18,10 @@ export const primerSizes = z.enum([
 /** A size of {@link primerSizes}. */
 export type PrimerSize = z.infer<typeof primerSizes>
 
-/** Cup metals of a primer: `brass` and `nickel-plated-brass`, `copper`, `steel`. */
+/** Cup metals of a primer. */
 export const primerCupMaterials = z.enum(['brass', 'nickel-plated-brass', 'copper', 'steel'])
 
-/** Priming compounds of a primer: `lead-styphnate` based or `lead-free`. */
+/** Priming compounds of a primer. */
 export const primerCompounds = z.enum(['lead-styphnate', 'lead-free'])
 
 /** A compound of {@link primerCompounds}. */
@@ -54,15 +54,13 @@ export const primer = z.strictObject({
   manufacturer: recordId,
   name: z.string().min(1).describe('Name of the product as the manufacturer prints it.'),
   productNumber: z.string().min(1).describe('Product number.').optional(),
-  size: primerSizes.describe('Small or large, for rifle or pistol, or the shotshell primer.'),
+  size: primerSizes.describe('Size class of the primer.'),
   magnum: z
     .boolean()
     .describe('Whether the manufacturer sells the primer as a magnum primer.')
     .optional(),
   cup: primerCup.describe('The cup of the primer.').optional(),
-  compound: primerCompounds
-    .describe('The priming compound: lead styphnate or lead-free.')
-    .optional(),
+  compound: primerCompounds.describe('The priming compound.').optional(),
   intendedUse: z
     .string()
     .min(1)
@@ -77,5 +75,5 @@ export const primer = z.strictObject({
   provenance,
 })
 
-/** A primer record: product, size, magnum flag, cup, priming compound and published figures. */
+/** A primer record. */
 export interface Primer extends z.infer<typeof primer> {}

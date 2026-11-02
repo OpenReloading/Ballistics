@@ -1,8 +1,8 @@
 /**
  * Parts shared by the request schemas of the compute endpoints (`exterior-schema.ts`,
  * `strings-schema.ts`, `interior-schema.ts`, `charge-schema.ts`, `stability-schema.ts`) and the
- * step caps. Field names and units are those of the `@open-reloading/core` inputs (SI, rad, K). Objects are strict, so a misspelled key is an error instead of
- * being ignored. zod 4 `z.number()` rejects Infinity and NaN.
+ * step caps. Field names and units are those of the `@open-reloading/core` inputs (SI, rad, K).
+ * Objects are strict: a misspelled key is an error. zod 4 `z.number()` rejects Infinity and NaN.
  */
 import { recordIdRegex } from '@open-reloading/schema'
 import { z } from 'zod'
@@ -12,8 +12,8 @@ export const recordId = z.string().max(200).regex(recordIdRegex)
 
 /**
  * Step caps per integration (a trajectory runs at most 33 integrations), the truing iteration cap
- * and the truing step total over all its trajectories; the API passes each as the default.
- * `ladderSteps` caps the steps of an interior charge ladder, each one compute task.
+ * and the truing step total over all its trajectories; each is the API default. `ladderSteps` caps
+ * the steps of an interior charge ladder, one compute task each.
  */
 export interface StepCaps {
   trajectorySteps: 5000
