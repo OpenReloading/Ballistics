@@ -1,6 +1,6 @@
 ---
 title: Burn form and exponent from a pressure-time curve
-description: Weighted least-squares fit of the burn coefficient, the initial slope and transition point of a two-stage vivacity form and the pressure exponent of the M3 interior model to one measured pressure-time trace or to several traces of one powder at different charges, with the identifiability report of every parameter and the import of the user's own trace files.
+description: Weighted least-squares fit of the M3 burn coefficient, two-stage form parameters and pressure exponent to one or several measured pressure-time traces of one powder, with an identifiability report per parameter and the import of trace files.
 ---
 
 # Burn form and exponent from a pressure-time curve

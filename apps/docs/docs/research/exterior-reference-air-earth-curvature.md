@@ -26,7 +26,7 @@ ICAO density $\rho = p / (R_d T)$ with 101325 Pa, 287.05287 J/(kg K) and 288.15 
 
 ## Result
 
-No change. The density ratio is documented on the [drag](../models/exterior-drag.md) and [atmosphere](../models/exterior-atmosphere.md) pages and pinned by a test; the reference is still stored and not applied. The curvature effect is far below 0.1 mrad, so the [point-mass page](../models/exterior-point-mass.md#limits) states the run and no correction is added.
+No change. The density ratio is documented on the [drag](../models/exterior-drag.md) and [atmosphere](../models/exterior-atmosphere.md) pages and pinned by a test; the reference is still stored and not applied. The curvature effect is far below 0.1 mrad: the [point-mass page](../models/exterior-point-mass.md#limits) states the run, no correction is added.
 
 ## Data basis
 

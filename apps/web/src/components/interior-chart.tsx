@@ -3,7 +3,7 @@
 import { Button, Group, SegmentedControl } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
 import type { ECharts } from 'echarts/core'
-import { useMemo, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { type StripFigure, stripModel } from '../lib/barrel-strip.ts'
@@ -115,6 +115,7 @@ export function InteriorChart({
   strip,
   playKey,
   z1,
+  downloads,
 }: {
   /** Valid steps in ladder order, one without a ladder. `label`: the step as the page names it, relative to the main charge; `value`: its charge or seating as shown. */
   steps: {
@@ -139,6 +140,8 @@ export function InteriorChart({
   playKey?: string
   /** The run's burn form z1 (the two-stage form), for its event line. */
   z1?: number | undefined
+  /** What the data dialog offers to download, above its tables. */
+  downloads?: ReactNode
 }) {
   const { x, quantity } = view
   const { t, language } = useTranslation()
@@ -235,6 +238,16 @@ export function InteriorChart({
   const named = quantityName(quantity, t)
   const chart = useRef<ECharts | null>(null)
   const redraw = useRef<() => void>(undefined)
+  // a new run or step whose option is the one drawn does not draw again, so no draw reports it: the
+  // drawing stands for the new run too (the workbench drops its report copy on every new run)
+  const drawnFor = useRef(option)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once per new run or step, with that render's option
+  useEffect(() => {
+    if (chart.current && drawnFor.current === option) onRender?.(chart.current)
+  }, [playKey])
+  useEffect(() => {
+    drawnFor.current = option
+  }, [option])
   const firstShown = shown[0] ?? 'pressure'
   const split = powderSplit(r, at)
   const energy = energySplit(r.energy)
@@ -334,6 +347,7 @@ export function InteriorChart({
         title={t('Chart data')}
         size="auto"
       >
+        {downloads}
         <PanelTable
           label={t('Chart data')}
           className="limits"

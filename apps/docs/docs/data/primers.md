@@ -5,7 +5,7 @@ description: The primer records that describe a primer product by size, cup, pri
 
 # Primers
 
-A primer record describes one primer product as its manufacturer sells it. A load names it with `primer.record`, next to the lot of the primer. A primer takes no part in a calculation: no value of the record enters a solver. Schema: `packages/schema/src/primer.ts`. Records: `packages/data/records/primers/`.
+A primer record describes one primer product as its manufacturer sells it. A load names it with `primer.record`, next to the lot of the primer. No value of the record enters a solver. Schema: `packages/schema/src/primer.ts`. Records: `packages/data/records/primers/`.
 
 ## Record
 
@@ -29,9 +29,9 @@ Every data field needs a source that lists it in `fields`. A value a source does
 
 ## In a load
 
-`Load.primer` is `{ lot?, record? }`. `record` is a `catalogue:<id>` reference: there is no user primer record, so a `user:` reference is refused. The earlier fields `manufacturer` and `model` are gone, and a load file that has them is refused (no migrations before 1.0).
+`Load.primer` is `{ lot?, record? }`. `record` is a `catalogue:<id>` reference: there is no user primer record, so a `user:` reference is refused. A load file with `primer.manufacturer` or `primer.model` is refused (no migrations before 1.0).
 
-A published load row names its primer as printed text, optionally with catalogue references set through an explicit alias (`apps/docs/docs/data/published-loads.md`).
+A published load row names its primer as printed text, optionally with catalogue references set through an explicit alias ([Published loads](published-loads.md#primer)).
 
 ## API
 

@@ -33,7 +33,7 @@ The vivacity law of the [burn forms page](../models/interior-burn-forms.md): the
 
 ## Numbers
 
-Baseline, `ballistics verify` on the validation split: median velocity error 3.32 %, P90 8.87 %, 10,493 used rows (the validation page: 10,497; 4 rows more are refused with the converted rows), pressure median 14.94 %, P90 38.15 % on 4,056 rows; model version `8e17f2eace299766d9ba5212de610444398d027f56b7c18270c3ea5928a27fd3` (it differs from the validation page's because the hash covers the rows file and the records, which differ here); 11 cartridges, bootstrap standard error of the median 0.37 percentage points.
+Baseline, `ballistics verify` on the validation split: median velocity error 3.32 %, P90 8.87 %, 10,493 used rows (the validation page: 10,497; 4 rows more are refused with the converted rows), pressure median 14.94 %, P90 38.15 % on 4,056 rows; model version `8e17f2eace299766d9ba5212de610444398d027f56b7c18270c3ea5928a27fd3` (differs from the validation page's: the hash covers the rows file and the records); 11 cartridges, bootstrap standard error of the median 0.37 percentage points.
 
 | Candidate | Median velocity | P90 velocity | Median pressure | P90 pressure | Wrong direction | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -60,7 +60,7 @@ Per family, validation split, median and P90 velocity error:
 | Base not stated, extruded | 285 | 2.56 %, 6.07 % | 2.15 %, 5.63 % | 2.46 %, 6.01 % |
 | Base and form not stated | 1,464 | 2.98 %, 7.56 % | 2.68 %, 6.44 % | 2.50 %, 6.54 % |
 
-Leave-one-powder-out (powder not in the fitted set): 15.7 %, 61.7 % for the baseline. The per-powder candidates fall back to the present exponent and form for a powder they have not fitted, so their line stays within 0.2 percentage points of the baseline's (15.5 % and 15.6 %). The learners keep the powder's own training rows, so their line is not a measurement of an unseen powder and is not stated.
+Leave-one-powder-out (powder not in the fitted set): 15.7 %, 61.7 % for the baseline. The per-powder candidates fall back to the present exponent and form for an unfitted powder, so they stay within 0.2 percentage points of it (15.5 % and 15.6 %). The learners keep the powder's own training rows, so no line is stated for them.
 
 Noise floor: of 3,054 pairs of the same load in two source tables, 94.1 % print the same velocity (reprints, not repeated measurements); the 181 pairs that differ have a median of 1.93 % and a P90 of 8.23 % (an upper bound, some are different loads). The standard deviation of one powder's mean residual across cartridges: median 3.79 %, P90 7.89 % (212 powders with at least 3 cartridges).
 
@@ -81,7 +81,7 @@ No row prints a propellant temperature; the model peak pressure of one powder's 
 
 ## Result
 
-Improved, not adopted. The pressure exponent per powder family with the vivacity refitted per powder passes the rule (median 3.32 to 2.85 %, P90 8.87 to 7.19 %, pressure better too) and is recommended as the next model change in its own issue; the stored powder shape already carries `pressureExponent`. The richer form passes on velocity by a hair but doubles the pressure error: velocity rows do not identify four constants per powder, and a series of exponential terms with more constants was not fitted for that reason. The residual correction and the refit alone fail the margin. The machine-learning models correct the most but move the velocity the wrong way on 5.6 to 11.7 % of perturbed loads and are not adopted. The spread of one powder across cartridges is as large as the present error, so the 1 % target needs data per rifle rather than more constants per powder.
+Improved, not adopted. The pressure exponent per powder family with the vivacity refitted per powder passes the rule (median 3.32 to 2.85 %, P90 8.87 to 7.19 %, pressure better too) and is recommended as the next model change in its own issue; the stored powder shape already carries `pressureExponent`. The richer form passes on velocity by a hair but doubles the pressure error: velocity rows do not identify four constants per powder, so a series of exponential terms with more constants was not fitted. The residual correction and the refit alone fail the margin. The machine-learning models correct the most but move the velocity the wrong way on 5.6 to 11.7 % of perturbed loads and are not adopted. The spread of one powder across cartridges is as large as the present error, so the 1 % target needs data per rifle rather than more constants per powder.
 
 ## Data basis
 

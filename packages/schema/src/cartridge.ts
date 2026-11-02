@@ -10,7 +10,7 @@ import { plausibilityException, pressureMethod, specValue } from './standards.ts
  */
 export const caseTypes = z.enum(['rimless', 'semi-rimmed', 'rimmed', 'rebated', 'belted'])
 
-/** The case head of a cartridge: `rimless`, `semi-rimmed`, `rimmed`, `rebated` or `belted`. */
+/** The case head of a cartridge. */
 export type CaseType = z.infer<typeof caseTypes>
 
 /**
@@ -23,7 +23,7 @@ export const cartridge = z.object({
   name: z.string().min(1),
   /** Other names printed in the sheet's title or header, never derived from file names. */
   aliases: z.array(z.string().min(1)).min(1).optional(),
-  /** Table of the C.I.P. TDCC, for example `I` (rimless) to `VII` (shotshell). */
+  /** Table of the C.I.P. sheets, for example `I` (rimless) to `VII` (shotshell). */
   table: z.string().min(1),
   /** Country of origin as printed. */
   country: z.string().min(1).optional(),
@@ -37,7 +37,7 @@ export const cartridge = z.object({
   provenance,
 })
 
-/** A cartridge record: names, table, dates and values of its C.I.P. sheet. */
+/** A cartridge record: the values of its C.I.P. sheet. */
 export interface Cartridge extends z.infer<typeof cartridge> {}
 
 /** Id of a cartridge's sheet revision, `cip-<id>-<revised or published>`, as figure ids use it. */

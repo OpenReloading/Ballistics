@@ -37,7 +37,7 @@ export function YourDataForm({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
       <Text size="sm" c="dimmed">
-        {t('What you keep in this browser. A row opens its list with your records.')}
+        {t('Your records in this browser. A row opens its list.')}
       </Text>
       {failure && (
         <ErrorNote>

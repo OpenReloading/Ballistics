@@ -20,7 +20,7 @@ A tolerance is read as the 90 percent interval of a normal input, so for a respo
 
 ## Formulas
 
-The inputs are drawn and the model run once per draw, the percentiles read from the sorted outputs ([JCGM 101:2008](../bibliography.md#jcgm-101-2008), propagation of distributions, section numbers unverified). The standard error of the $p$ percentile of $N$ draws is $\sqrt{p(1-p)/N} / \varphi(z_p)$ in standard deviations of the output, with $\varphi$ the standard normal density and $z_{0.95} = 1.645$, so the limit of 4 errors is about 0.13 standard deviations for $N = 4000$ and 0.27 for $N = 1000$ (the asymptotic variance of a sample quantile, a standard result; no reference is cited).
+The inputs are drawn and the model run once per draw, the percentiles read from the sorted outputs ([JCGM 101:2008](../bibliography.md#jcgm-101-2008), propagation of distributions, section numbers unverified). The standard error of the $p$ percentile of $N$ draws is $\sqrt{p(1-p)/N} / \varphi(z_p)$ in standard deviations of the output, with $\varphi$ the standard normal density and $z_{0.95} = 1.645$, so the limit of 4 errors is about 0.13 standard deviations for $N = 4000$ and 0.27 for $N = 1000$ (asymptotic variance of a sample quantile; no reference cited).
 
 ## Numbers
 

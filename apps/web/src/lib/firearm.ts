@@ -27,18 +27,14 @@ export const firearmFields = [
   {
     key: 'baseToOgiveAtLands',
     label: msg('Base to ogive at the lands'),
-    help: msg(
-      'Base to ogive at the lands, measured: cartridge length to the bullet ogive with the bullet touching the lands.',
-    ),
+    help: msg('Measured cartridge length to the ogive with the bullet touching the lands.'),
     quantity: 'length',
     min: 0,
   },
   {
     key: 'overallLengthAtLands',
     label: msg('Overall length at the lands'),
-    help: msg(
-      'Overall length at the lands, measured: cartridge overall length with the bullet touching the lands.',
-    ),
+    help: msg('Measured overall length with the bullet touching the lands.'),
     quantity: 'length',
     min: 0,
   },
@@ -46,7 +42,6 @@ export const firearmFields = [
   {
     key: 'roundCount',
     label: msg('Round count'),
-    help: msg('Rounds fired through the barrel so far.'),
     quantity: 'ratio',
     min: 0,
     integer: true,
@@ -393,7 +388,7 @@ export function withSessionRounds(
 }
 
 /** The firearm `record` with `n` rounds added for `key` in `countedSessions`, the oldest entry dropped at the limit. */
-function withCountedRounds(
+export function withCountedRounds(
   record: Extract<UserRecord, { kind: 'firearm' }>,
   key: string,
   n: number,
@@ -686,6 +681,8 @@ export function firearmCells(f: Firearm, system: UnitSystem, t: Translator['t'])
     hand: f.twist?.value ? f.twistHand : '',
     optic: mount ? optic?.name || t('Optic') : '',
     zero: mount ? formatQuantity('range', system, toSi('length', mount.zeroRange.value)) : '',
+    // `sortRows` pads digit runs, so the stored zero range after the name orders as a number
+    opticZero: mount ? `${optic?.name || t('Optic')}\u001f${mount.zeroRange.value}` : undefined,
     configuration: config ? config.name || t('Configuration {n}', { n: i + 1 }) : '',
   }
 }

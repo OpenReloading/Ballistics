@@ -7,15 +7,15 @@ description: Whether the window from the middle of land and groove up to G1 give
 
 ## Question
 
-Bullet fit: does the window from the middle of the land and groove diameters up to the projectile diameter $G_1$ select the expected bullet diameters for cartridges of the records, and do its bounds fall where the page puts them?
+Bullet fit: does the window from the middle of the land and groove diameters up to the projectile diameter $G_1$ select the expected bullet diameters for the cartridge records, and do its bounds fall where the page puts them?
 
 ## Method
 
-`bulletFits` runs over eleven bullet diameters (the nominal inch sizes .224 to .452, converted to mm) for ten cartridges with the $G_1$, $F$ and $Z$ of their C.I.P. records. The accept rule, set in the test: the list of fitting bullets equals the expected list for every cartridge. The expected lists are the bullets the test names for each cartridge; that these are the bullets loaded in practice is not checked against a published source (unverified). A second case checks the bounds of one window ($G_1$ 7.85, $F$ 7.62, $Z$ 7.82 mm) on both sides.
+`bulletFits` runs over eleven bullet diameters (the nominal inch sizes .224 to .452, converted to mm) for ten cartridges with the $G_1$, $F$ and $Z$ of their C.I.P. records. Accept rule, set in the test: for every cartridge the fitting bullets equal the expected list the test names; that these are the bullets loaded in practice is not checked against a published source (unverified). A second case checks the bounds of one window ($G_1$ 7.85, $F$ 7.62, $Z$ 7.82 mm) on both sides.
 
 ## Formulas
 
-A bullet of diameter $d$ fits when $(F + Z)/2 \lt d \le G_1 + \delta$, with $\delta = 0.005$ mm, half the last printed digit of the two-decimal C.I.P. values ([C.I.P. TDCC](../bibliography.md#cip-tdcc) for the meaning of $G_1$, $F$ and $Z$; the window is this project's rule, see [bullet fit](../models/bullet-fit.md)).
+A bullet of diameter $d$ fits when $(F + Z)/2 \lt d \le G_1 + \delta$, with $\delta = 0.005$ mm, half the last printed digit of the two-decimal C.I.P. values ([C.I.P.](../bibliography.md#cip-tdcc) for the meaning of $G_1$, $F$ and $Z$; the window is this project's rule, see [bullet fit](../models/bullet-fit.md)).
 
 ## Numbers
 
@@ -26,7 +26,7 @@ A bullet of diameter $d$ fits when $(F + Z)/2 \lt d \le G_1 + \delta$, with $\de
 
 ## Result
 
-No change. The tests are adopted as regression tests; the 7,5 x 55 Suisse without a fitting .308 is documented by its test.
+No change. The tests stay as regression tests; the 7,5 x 55 Suisse without a fitting .308 is documented by its test.
 
 ## Data basis
 

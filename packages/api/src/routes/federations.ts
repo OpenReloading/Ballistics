@@ -71,7 +71,7 @@ const mappingList = page(
   }),
 )
 
-/** `GET /target-faces`, `GET /federations`, `GET /disciplines`, `GET /target-mappings`, `GET /caliber-classes`, `GET /event-types` and their `/:id` routes. */
+/** `GET` of `/target-faces`, `/federations`, `/disciplines`, `/target-mappings`, `/caliber-classes` and `/event-types`, and their `/:id` routes. */
 // biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
@@ -85,7 +85,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: targetFaceList,
         summary: 'List target faces',
         description:
-          'Every target face with its federation, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by federation, then the code printed in the name, then name.',
+          'Every target face with its federation, the caliber classes mapped to it and the categories of its events and disciplines. Ordered by federation, then the code printed in the name, then name.',
       },
     },
     (_request, reply) => reply.send(catalogue.targetFaces()),
@@ -100,7 +100,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         moved: true,
         summary: 'Get a target face',
         description:
-          'The target face record: federation id, ring diameters (mm), inner ten, events with their ids and provenance.',
+          'The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance.',
       },
     },
     (request, reply) => {
@@ -118,7 +118,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: federationList,
         summary: 'List federations',
         description:
-          'Every shooting federation with its abbreviation, country and international federation, ordered by abbreviation.',
+          'Every shooting federation with abbreviation, country and international federation, ordered by abbreviation.',
       },
     },
     (_request, reply) => reply.send(catalogue.federations()),
@@ -149,7 +149,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: mappingList,
         summary: 'List target mappings',
         description:
-          'Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies, in the order of the disciplines.',
+          'Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies, in discipline order.',
       },
     },
     (request, reply) => reply.send(catalogue.targetMappings(request.query)),
@@ -162,7 +162,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: caliberClassList,
         summary: 'List caliber classes',
         description:
-          'The caliber classes the disciplines name: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.',
+          'Caliber classes: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.',
       },
     },
     (_request, reply) => reply.send(catalogue.caliberClasses()),
@@ -175,7 +175,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
         response: eventTypeList,
         summary: 'List event types',
         description:
-          'The competition event types with their federation and scoring method (hit factor or rings), ordered by name.',
+          'Event types with federation and scoring method (hit factor or rings), ordered by name.',
       },
     },
     (_request, reply) => reply.send(catalogue.eventTypes()),
@@ -196,7 +196,7 @@ export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = as
           errors: [404],
           moved: true,
           summary: `Get a ${noun}`,
-          description: `The whole ${noun} record with its provenance.`,
+          description: `The ${noun} record with its provenance.`,
         },
       },
       (request, reply) => {

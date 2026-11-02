@@ -5,7 +5,7 @@ description: The questions of the models still waiting for a literature search, 
 
 # Open literature questions
 
-Each question becomes a [literature note](./index.md) with the same id once a search has been run, also when it finds nothing. Status is open for every question below.
+Each question becomes a [literature note](./index.md) with the same id once a search has been run, also when it finds nothing.
 
 | Id | Question | Model page | Issue | Status |
 | --- | --- | --- | --- | --- |

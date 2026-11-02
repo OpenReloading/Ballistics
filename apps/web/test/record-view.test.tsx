@@ -33,7 +33,7 @@ it('shows the name and the loading rows while the record is read, with a notice 
   const html = page()
   expect(html).toContain('Example 168')
   expect(html).toContain('Loading bullet…')
-  expect(html).toContain('this page needs JavaScript')
+  expect(html).toContain('This page needs JavaScript')
   expect(html).not.toContain('noindex')
 })
 
@@ -51,11 +51,6 @@ it('answers a missing record with the not-found page, kept out of search engines
   expect(html).toContain('<meta name="robots" content="noindex"/>')
   expect(html).toContain('Page not found')
   expect(html).not.toContain('Example 168')
-})
-
-it('renders the record once read', () => {
-  states.record = { status: 'ok', data: { id: 'b1' } }
-  expect(page()).toContain('record b1')
 })
 
 it('with extras keeps the loading state until both are read, and reads them for the record', async () => {

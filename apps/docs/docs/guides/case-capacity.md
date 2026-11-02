@@ -5,7 +5,7 @@ description: How to weigh the water capacity of your own cases, which cases and 
 
 # Measuring case capacity with water
 
-The case capacity is the mass of water that fills a case to the mouth. The workbench turns it into the case volume, takes off the part of the bullet seated below the mouth and runs the interior model in the volume that is left ([Case capacity and seating](../models/case-capacity.md)). A capacity measured on your own cases replaces the stated capacity of a brass record. All results are simulations, not load data.
+A capacity measured on your own cases replaces the stated capacity of a brass record; the workbench turns it into the volume behind the bullet ([Case capacity and seating](../models/case-capacity.md)). All results are simulations, not load data.
 
 ## What it improves
 
@@ -27,7 +27,7 @@ The case capacity sets the chamber volume of the simulation. The [peak-pressure 
 
 ## Water temperature
 
-The app turns the water mass into a volume with the density of water at 20 °C, 0.9982 g/cm³, whatever water you used ([Case volume](../models/case-capacity.md#case-volume)). Between 15 °C and 25 °C the density of water changes by about 0.2 % (from the table of [Tanaka 2001](../bibliography.md#tanaka-2001), values unverified, not re-read from the paper). Water near room temperature therefore keeps the volume within a fifth of the 1 % tolerance. The app does not correct a capacity measured at another temperature: write the temperature in the group's Notes.
+The app turns the water mass into a volume with the density of water at 20 °C, 0.9982 g/cm³, whatever water you used ([Case volume](../models/case-capacity.md#case-volume)). Between 15 °C and 25 °C the density of water changes by about 0.2 % (from the table of [Tanaka 2001](../bibliography.md#tanaka-2001), values unverified, not re-read from the paper). Water near room temperature keeps the volume within a fifth of the 1 % tolerance. The app does not correct a capacity measured at another temperature: write the temperature in the group's Notes.
 
 ## Mean and spread
 
@@ -45,4 +45,4 @@ To try a value without a group, type it straight into Case capacity (H₂O) in t
 
 ## What the value is not
 
-The water capacity to the mouth is the volume of the empty case. The volume the powder burns in is smaller by the part of the bullet below the mouth, which the app computes from the bullet's outline and the seating. A capacity measured with a bullet seated, or with water above the mouth, is not this value.
+The water capacity to the mouth is the volume of the empty case: the app takes off the part of the bullet below the mouth from the bullet's outline and the seating. A capacity measured with a bullet seated, or with water above the mouth, is not this value.

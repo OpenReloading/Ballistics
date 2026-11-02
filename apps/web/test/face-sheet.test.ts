@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { findFace } from '../src/lib/face-search.ts'
 import { calibrateSheetOnFace, faceGeometry } from '../src/lib/face-sheet.ts'
 import { frameOf, viewToTarget } from '../src/lib/target-editor.ts'
+import type { FaceFit } from '../src/lib/target-face.ts'
 import { apply3 } from '../src/lib/target-geometry.ts'
 import { defined } from './defined.ts'
-import { faceById, faces, project, render } from './face-render.ts'
+import { faceById, faces, type Homography, project, render } from './face-render.ts'
 
 // A face found on a photo as the calibration of the sheet
 const group = (id: string, face?: NonNullable<TargetSheet['groups'][number]['face']>) => ({
@@ -28,12 +29,20 @@ const sheet = (groups: TargetSheet['groups']): TargetSheet => ({
 const face = faceById('issf-25m-precision-50m-pistol')
 const camera = { width: 1200, height: 900, pxPerMm: 1.68, depth: 5 }
 const line = 2.2 / 1.68
+let front: { h: Homography; fit: FaceFit | undefined } | undefined
+/** The face seen from the front and its fit, drawn and searched once for the tests that share it. */
+function frontFit() {
+  if (!front) {
+    const { image, h } = render({ face, camera, line, noise: 2 })
+    front = { h, fit: findFace(image, faces).fits[0] }
+  }
+  return front
+}
 
 describe('faceSheet', () => {
   it('calibrates the sheet on the face: scale, perspective, centre and axes of the photo', () => {
     // seen from the front, the face's axes are the photo's: x right, y up
-    const { image, h } = render({ face, camera, line, noise: 2 })
-    const fit = findFace(image, faces).fits[0]
+    const { h, fit } = frontFit()
     expect(fit).toBeDefined()
     if (!fit) return
     const next = calibrateSheetOnFace(sheet([group('g1')]), 'g1', {
@@ -188,8 +197,7 @@ describe('faceGeometry', () => {
   })
 
   it('takes a sheet calibrated on the face: the origin is the centre, the aim is ignored', () => {
-    const { image, h } = render({ face, camera, line: 2.2 / 1.68, noise: 2 })
-    const fit = findFace(image, faces).fits[0]
+    const { h, fit } = frontFit()
     expect(fit).toBeDefined()
     if (!fit) return
     const calibrated = calibrateSheetOnFace(sheet0(), 'g1', {

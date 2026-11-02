@@ -5,7 +5,7 @@ description: The case records that name a cartridge, a manufacturer and the stat
 
 # Brass
 
-A case record describes one cartridge case product as its manufacturer sells it, for one cartridge. A load names it with `case.record`. The stated water capacity of a case record is the default capacity of a load that names it; a capacity the user measured stays the user's value and takes precedence (`apps/docs/docs/models/case-capacity.md`). Schema: `packages/schema/src/case.ts`. Records: `packages/data/records/cases/`.
+A case record describes one cartridge case product as its manufacturer sells it, for one cartridge. A load names it with `case.record`. The stated water capacity of a case record is the default capacity of a load that names it; a capacity the user measured stays the user's value and takes precedence ([Case capacity and seating](../models/case-capacity.md)). Schema: `packages/schema/src/case.ts`. Records: `packages/data/records/cases/`.
 
 ## Record
 

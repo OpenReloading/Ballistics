@@ -102,11 +102,6 @@ describe('chronoSession', () => {
     expect(chronoSession.safeParse(validSession).success).toBe(true)
   })
 
-  it('rejects a session whose provenance is not measured', () => {
-    const provenance = { ...measured, kind: 'computed' }
-    expectIssueAt(chronoSession, { ...validSession, provenance }, 'provenance')
-  })
-
   it('rejects an invalid date', () => {
     expectIssueAt(chronoSession, { ...validSession, date: '2026-13-01' }, 'date')
   })

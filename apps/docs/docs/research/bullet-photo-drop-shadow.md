@@ -11,10 +11,10 @@ Bullet from a photo: can the outline tell a soft drop shadow on one side of the 
 
 ## Method
 
-- **Data.** The [catalogue evaluation](./bullet-photo-catalogue-geometry.md) (`apps/web/test/bullet-photo-catalogue.test.ts`, run with `BULLET_PHOTO_EVAL=<out.json>`): 32 bullets (26 flat bases, 6 boat tails) drawn from bullet records and test shapes, each rendered in eight scenarios A to H and measured with the steps of the tool's worker. Scenario F is the product-style image of 500 px (the bullet 450 px long, no ruler, scale from the record's diameter) with a soft drop shadow offset 2 and 3 % of the length, blurred 2 %, depth 0.2.
+- **Data.** The [catalogue evaluation](./bullet-photo-catalogue-geometry.md) (`apps/web/test/bullet-photo-catalogue.test.ts`, run with `BULLET_PHOTO_EVAL=<out.json>`): 32 bullets (26 flat bases, 6 boat tails) drawn from bullet records and test shapes, each rendered in eight scenarios A to H and measured with the tool's worker steps. Scenario F is the product-style image of 500 px (the bullet 450 px long, no ruler, scale from the record's diameter) with a soft drop shadow offset 2 and 3 % of the length, blurred 2 %, depth 0.2.
 - **Compared.** The tool on `main` (7c133fe8) against the change, same renders and seeds.
 - **Metric.** Median and P90 of the absolute length error, false boat tails on flat bases, the count with a warning, and every other column of the evaluation for A to H.
-- **Accept rule** (the issue's acceptance, decided before the run). On F, every length within the larger of 1 % and 3 stated uncertainties of the truth, or a warning that names a shadow; no false boat tail on a flat base in F; scenarios A to E, G and H keep every number.
+- **Accept rule** (the issue's acceptance, fixed before the run). On F, every length within the larger of 1 % and 3 stated uncertainties of the truth, or a warning that names a shadow; no false boat tail on a flat base in F; scenarios A to E, G and H keep every number.
 
 ## Formulas
 
@@ -36,11 +36,11 @@ Before (main) and after, 32 photographs per scenario, median / P90 of the absolu
 | Lengths within 3 u | 32 | 32 |
 | With a warning | 24 | 31 |
 
-Scenarios A to E, G and H: every column unchanged (the shadow check finds no one-sided taper on them). The lengths above 1 % in F after the change are three squat pistol bullets 340, 395 and 315 px across: 1.96 % (3 u = 9.0 %, shadow named), 3.02 % (3 u = 7.9 %, no warning: the axis of a bullet 1.14 calibres long turns about 11 degrees with the shadow, and no side is clear) and 1.57 % (3 u = 10 %, shadow named). The stated length uncertainty stays about 3 to 11 % of the length on F: the soft edge still raises every edge position's uncertainty.
+Scenarios A to E, G and H: every column unchanged (no one-sided taper found). The lengths above 1 % in F after the change are three squat pistol bullets 340, 395 and 315 px across: 1.96 % (3 u = 9.0 %, shadow named), 3.02 % (3 u = 7.9 %, no warning: the axis of a bullet 1.14 calibres long turns about 11 degrees with the shadow, and no side is clear) and 1.57 % (3 u = 10 %, shadow named). The stated length uncertainty on F stays about 3 to 11 % of the length: the soft edge still raises every edge position's uncertainty.
 
 ## Result
 
-Improved: adopted. The accept rule is met: on F every length is within the larger of 1 % and 3 u, no flat base gets a boat tail, and A to E, G and H are unchanged. Shadows offset towards the base, far along the axis with little blur, or reaching the base are not taken out (#916, and a note where the base is not clear); an axis the user types is not checked (#917).
+Improved: adopted. The accept rule is met (Numbers). Shadows offset towards the base, far along the axis with little blur, or reaching the base are not taken out (#916, and a note where the base is not clear); an axis the user types is not checked (#917).
 
 ## Data basis
 

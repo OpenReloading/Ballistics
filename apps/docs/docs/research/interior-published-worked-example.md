@@ -11,7 +11,7 @@ Interior ballistics: does the [M3 model](../models/interior-m3.md) reproduce the
 
 ## Method
 
-The example's inputs were entered as printed on its first sheet: chamber volume $5.515 \cdot 10^{-5}$ m³, projectile 0.12 kg, charge 0.0505 kg, specific energy $3.517 \cdot 10^{6}$ J/kg, $k = 1.3$, solid density 1600 kg/m³, vivacity 0.262, Sébert factor 0.5, travel 1.7275 m, ignition pressure $10^{3}$ Pa. The bore area is the circle of a 20 mm bore plus 15 grooves of 2.5 mm by 0.425 mm. The printed values of sheets 1 to 3 were compared with the closed form (see the [constant-surface entry](interior-constant-surface-closed-form.md)) and with the numerical run. The accept limit, set in the test before the comparison: relative difference below $10^{-3}$, and below $2 \cdot 10^{-3}$ for the burnout travel.
+Inputs as printed on the first sheet: chamber volume $5.515 \cdot 10^{-5}$ m³, projectile 0.12 kg, charge 0.0505 kg, specific energy $3.517 \cdot 10^{6}$ J/kg, $k = 1.3$, solid density 1600 kg/m³, vivacity 0.262, Sébert factor 0.5, travel 1.7275 m, ignition pressure $10^{3}$ Pa. The bore area is the circle of a 20 mm bore plus 15 grooves of 2.5 mm by 0.425 mm. The printed values of sheets 1 to 3 were compared with the closed form (see the [constant-surface entry](interior-constant-surface-closed-form.md)) and with the numerical run. The accept limit, set in the test before the comparison: relative difference below $10^{-3}$, and below $2 \cdot 10^{-3}$ for the burnout travel.
 
 ## Formulas
 
@@ -33,11 +33,11 @@ The printed values are the handbook's rounded ones, so the limit is the rounding
 
 ## Result
 
-No change. Every printed value lies within its limit, which confirms the reading of the inputs (including the bore area with grooves) and the formulas. Nothing was changed in the model.
+No change. Every printed value lies within its limit, which confirms the reading of the inputs (including the bore area with grooves) and the formulas.
 
 ## Data basis
 
-Public: values printed in a handbook worked example. This page does not re-read the handbook; the values are those held by the test, unverified here.
+Public: values printed in a handbook worked example, as held by the test (not re-read from the handbook: unverified).
 
 ## Where in the app
 
@@ -47,4 +47,4 @@ Public: values printed in a handbook worked example. This page does not re-read 
 
 ## Confidence
 
-Medium: seven values agree, but they come from one example with a constant surface and no resistance, and they are rounded to three or four digits. A match does not show the handbook itself to be right.
+Medium: seven values from one example with a constant surface and no resistance, rounded to three or four digits. A match does not show the handbook itself to be right.

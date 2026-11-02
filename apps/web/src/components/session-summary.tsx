@@ -1,6 +1,6 @@
 'use client'
 
-import { Alert, Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
+import { Badge, Button, Flex, Group, NativeSelect, Tabs } from '@mantine/core'
 import type { ChronoImport, VelocityUnit } from '@open-reloading/importers'
 import { toSi } from '@open-reloading/schema'
 import { FileArrowUp } from '@phosphor-icons/react'
@@ -35,7 +35,7 @@ import { PageBar } from './page-bar.tsx'
 import { Panel } from './panel.tsx'
 import { PrintButton } from './record-actions.tsx'
 import { PanelTable } from './scroll-region.tsx'
-import { EmptyNote, ErrorNote } from './states.tsx'
+import { EmptyNote, ErrorNote, Message } from './states.tsx'
 import { StringComparison } from './string-comparison.tsx'
 import { TourButton } from './tour-button.tsx'
 import { UnitsIconButton, useUnits } from './units-settings.tsx'
@@ -150,12 +150,9 @@ export function SessionSummary() {
             id="chrono-file"
             label={t('Chronograph file')}
             variant="bar"
-            help={t(
-              'Reads {formats}. The file is read in this browser; it is not uploaded or stored.',
-              {
-                formats,
-              },
-            )}
+            help={t('Reads {formats} in this browser; nothing is uploaded or stored.', {
+              formats,
+            })}
             file={read?.fileName}
             onFiles={([picked]) => picked && readFile(picked, unit)}
           />
@@ -356,14 +353,14 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
         ))}
       </Group>
       {warnings.length > 0 && (
-        <Alert color="yellow" variant="light" title={t('Import notes')} my="xs">
+        <Message severity="warning" title={t('Import notes')}>
           <ul>
             {warnings.map((w, k) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: warnings keep the importer order and may repeat
               <li key={k}>{translateMessage(w, t)}</li>
             ))}
           </ul>
-        </Alert>
+        </Message>
       )}
       <div className="session-panels">
         <Panel
@@ -455,7 +452,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                       height={240}
                       title={t('Velocity per shot, {name}', { name })}
                       description={t(
-                        'Velocity of each of the {count} shots of {name} in {unit} over the shot number, with the mean {mean} as a line; excluded shots are left out. The shots table lists every value.',
+                        'Velocity of the {count} shots of {name} in {unit} by shot number, mean {mean} as a line, excluded shots left out. The shots table lists every value.',
                         { count: kept.length, name, unit: v.symbol, mean: speed(st.mean) },
                       )}
                     />

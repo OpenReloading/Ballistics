@@ -206,6 +206,73 @@ describe('mergePublishedLoads', () => {
     const { report } = mergePublishedLoads(first, table([withCase, b]), new Set())
     expect(report.changed[0]?.fields).toEqual(['case'])
   })
+
+  describe('catalogue links set in the repository', () => {
+    const primer = { printed: 'Test primer LRM' }
+    const plain = load('FMJ', 'Powder A', '30.0', { primer })
+    const id = loadId(first, plain)
+    const stored = mergePublishedLoads(undefined, table([plain]), new Set()).file
+    const linked: PublishedLoads = {
+      ...stored,
+      loads: stored.loads.map((l) => ({
+        ...l,
+        bullet: { ...l.bullet, record: 'catalogue:test-bullet' },
+        powder: { ...l.powder, record: 'catalogue:test-powder' },
+        primer: {
+          ...primer,
+          records: ['catalogue:test-primer'],
+          size: 'large-rifle',
+          magnum: true,
+        },
+      })),
+    }
+    const links = defined(linked.loads[0])
+
+    it('does not count a link the incoming load lacks as a change', () => {
+      const { file, report, written } = mergePublishedLoads(linked, table([plain], 2026), 'all')
+      expect(report.unchanged).toEqual([id])
+      expect(written).toBe(false)
+      expect(file).toBe(linked)
+    })
+
+    it('keeps the links on an accepted change of the load', () => {
+      const changed = load('FMJ', 'Powder A', '31.0', { primer })
+      const { file, report } = mergePublishedLoads(linked, table([changed], 2026), 'all')
+      expect(report.changed).toEqual([
+        { id, fields: ['charges.0.charge.raw', 'charges.0.charge.value'], accepted: true },
+      ])
+      const merged = defined(file.loads[0])
+      expect(merged.bullet.record).toBe(links.bullet.record)
+      expect(merged.powder.record).toBe(links.powder.record)
+      expect(merged.primer).toEqual(links.primer)
+      expect(Object.keys(merged.primer ?? {})).toEqual(['printed', 'records', 'size', 'magnum'])
+    })
+
+    it('reports a link the incoming load sets otherwise as a change', () => {
+      const other = load('FMJ', 'Powder A', '30.0', {
+        primer: { ...primer, magnum: false },
+        powder: { printed: 'Powder A', record: 'catalogue:other-powder' },
+      })
+      const { file, report } = mergePublishedLoads(linked, table([other], 2026), 'all')
+      expect(report.changed[0]?.fields).toEqual(['powder.record', 'primer.magnum'])
+      const merged = defined(file.loads[0])
+      expect(merged.powder.record).toBe('catalogue:other-powder')
+      expect(merged.primer?.magnum).toBe(false)
+      expect(merged.primer?.records).toEqual(links.primer?.records)
+    })
+
+    it('does not carry the primer links over to another printed primer', () => {
+      const other = load('FMJ', 'Powder A', '30.0', { primer: { printed: 'Other primer' } })
+      const { file, report } = mergePublishedLoads(linked, table([other], 2026), 'all')
+      expect(report.changed[0]?.fields).toEqual([
+        'primer.magnum',
+        'primer.printed',
+        'primer.records',
+        'primer.size',
+      ])
+      expect(defined(file.loads[0]).primer).toEqual({ printed: 'Other primer' })
+    })
+  })
 })
 
 /** A records root: the valid fixtures, the source records and the powders the loads name. */

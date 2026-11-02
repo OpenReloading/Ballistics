@@ -105,7 +105,7 @@ export function CaseList({
       wide: true,
       label: msg('Water capacity'),
       unit: system.capacity.symbol,
-      help: msg('The water the manufacturer states fills the case to the mouth.'),
+      help: msg('Water to the case mouth, as the manufacturer states.'),
       num: true,
       width: '8rem',
       value: (r) => r.waterCapacity,

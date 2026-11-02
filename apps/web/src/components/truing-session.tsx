@@ -254,7 +254,7 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
         />
         <TextInput
           label={t('Dispersion of one shot ({unit})', { unit: symbol })}
-          description={t('Plan only: the vertical spread of one shot.')}
+          description={t('Plan only; vertical spread.')}
           inputMode="decimal"
           value={dispersion}
           onChange={(e) => edit(() => setDispersion(e.currentTarget.value))}

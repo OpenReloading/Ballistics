@@ -5,9 +5,9 @@
   --border: #c9cfd8;
   --link: #0b57d0;
   --focus: #0b57d0;
-  --warn-bg: #fff4e5;
-  --warn-fg: #8a3b00;
-  /* the result notice: yellow, apart from the orange result warnings; 8:1 contrast */
+  --warn-bg: #fff9db;
+  --warn-fg: #7a4f00;
+  /* the result notice: yellow, a shade apart from the amber result warnings; 8:1 contrast */
   --caution-bg: #fff3bf;
   --caution-fg: #5c4400;
   /* message variants (Message in states.tsx): text on its own fill, at least 4.5:1 */
@@ -63,7 +63,7 @@
   --mantine-color-default-color: var(--fg);
   --mantine-color-default-border: var(--border);
   /* field errors: Mantine's red gives about 3.3:1 on white */
-  --mantine-color-error: var(--warn-fg);
+  --mantine-color-error: var(--error-fg);
   /* disabled text: Mantine's grey gives about 1.8:1 on its disabled fill */
   --mantine-color-disabled-color: var(--muted);
 }
@@ -77,8 +77,8 @@
     --border: #3d434d;
     --link: #8ab4f8;
     --focus: #8ab4f8;
-    --warn-bg: #3a2410;
-    --warn-fg: #ffc48a;
+    --warn-bg: #33290a;
+    --warn-fg: #ffe066;
     --caution-bg: #3a3000;
     --caution-fg: #ffe066;
     --info-bg: #1b2a44;
@@ -174,6 +174,9 @@ body {
 @media (max-width: 74.99em) {
   .mantine-AppShell-header {
     position: absolute;
+    /* a row wider than the window (four 72 px buttons at 320 px with 200 % text) scrolls inside the
+       bar: the page itself never scrolls sideways */
+    overflow-x: auto;
   }
 }
 
@@ -2370,8 +2373,8 @@ td.nowrap {
     --border: #c9cfd8;
     --link: #0b57d0;
     --focus: #0b57d0;
-    --warn-bg: #fff4e5;
-    --warn-fg: #8a3b00;
+    --warn-bg: #fff9db;
+    --warn-fg: #7a4f00;
     --caution-bg: #fff3bf;
     --caution-fg: #5c4400;
     --info-bg: #e8f0fe;
@@ -4133,6 +4136,8 @@ main .library-head.page-panel-head > .page-panel-title {
      beside the burn-rate figure */
   .workbench .readouts > .readout-wide {
     grid-template-columns: max-content max-content minmax(0, 1fr);
+    /* the range never runs into the unit of the value ("40919 psi38368 bis 43679") */
+    column-gap: 0.5rem;
   }
 
   .workbench .readouts > .readout-wide dd.readout-note {
@@ -5189,7 +5194,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .safety-dialog .mantine-Modal-header {
-  background: var(--mantine-color-yellow-light);
+  background: var(--caution-bg);
 }
 
 .safety-dialog .mantine-Modal-title {
@@ -5200,7 +5205,7 @@ main .library-head.page-panel-head > .page-panel-title {
 }
 
 .safety-dialog .mantine-Modal-title svg {
-  color: var(--mantine-color-yellow-7);
+  color: var(--caution-fg);
 }
 
 /* the English text and its translation: side by side from 48em, stacked below */
@@ -5788,12 +5793,21 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 
   .workbench .panel-head:has(> .lot-field) > .search {
-    min-width: 4rem;
+    flex: 1 1 0;
+    /* narrower, axe cannot read the contrast of its placeholder */
+    min-width: 3.5rem;
   }
 
-  /* what the icon, the search's least width, the lot, the menu and the four gaps leave */
+  /* a longer title (German "Treibladungspulver") takes its room from the search first; the lot
+     keeps its width (narrower, axe cannot read the contrast of its empty field) and the menu
+     stays whole: the title ends in an ellipsis only after the search is at its least width */
+  .workbench .panel-head > .mantine-ActionIcon-root {
+    flex-shrink: 0;
+  }
+
   .workbench .panel-head:has(> .lot-field) > .panel-title {
-    max-width: calc(100% - 1.125rem - 4rem - 4.5rem - var(--field-height) - 4 * 0.375rem);
+    flex: 0 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -6793,6 +6807,13 @@ main .library-head.page-panel-head > .page-panel-title {
     padding: 0.3125rem 0.5rem 0.375rem;
     border: 1px solid var(--border);
     background: var(--bg);
+  }
+
+  /* the peak pressure's value keeps its width and 0.5 rem before the range, in any font: the
+     range and the share take what is left */
+  .workbench .readouts.readout-keys > .readout-wide {
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.5rem;
   }
 
   .workbench .readouts.readout-keys dt {
@@ -7927,6 +7948,28 @@ main .field-table tr.field-group > th {
     justify-content: center;
   }
 
+  /* the drawing first: it gives way down to the width of its 11 px text (at most the 358 px
+     phone column, face.phoneColumn), then the table, its own scroll box. The figure is the
+     column (100cqw) here, so its least width reaches the flex item */
+  .side-panel:not(.side-undrawn) .side-body {
+    display: flex;
+  }
+
+  .side-panel:not(.side-undrawn) .side-figure {
+    flex: 0 10000 26rem;
+    order: -1;
+    container-type: normal;
+  }
+
+  .side-panel:not(.side-undrawn) .side-figure .drawing-figure {
+    container-type: inline-size;
+    min-width: var(--figure-readable, 0);
+  }
+
+  .side-panel:not(.side-undrawn) .side-body > .scroll {
+    min-width: 0;
+  }
+
   /* the table is the scroll box once the panel would pass the window's foot, with a scrollbar
      that stays (an overlay scrollbar shows nothing until scrolled) */
   .side-body > .scroll {
@@ -8307,6 +8350,10 @@ main .field-table tr.field-group > th {
     color: #333;
   }
 
+  .print-report .report-build {
+    color: #666;
+  }
+
   .report-inputs {
     columns: 2;
     column-gap: 4mm;
@@ -8355,6 +8402,12 @@ main .field-table tr.field-group > th {
   .report-chart {
     break-before: page;
     break-inside: avoid;
+  }
+
+  /* the sections the reader left out in the Print menu (print-sections.tsx) */
+  html[data-report-omit~="chart"] .report-chart,
+  .print-report .report-inputs[hidden] {
+    display: none;
   }
 
   .report-chart svg {

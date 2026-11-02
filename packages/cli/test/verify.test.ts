@@ -1,8 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
 import { rowsPath } from './data.ts'
 import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
+
+vi.mock('@open-reloading/data', async (original) =>
+  (await import('./records-memo.ts')).memoRecords(
+    await original<typeof import('@open-reloading/data')>(),
+  ),
+)
 
 const options = { rows: rowsPath, records: recordRoots, split: 'validation', final: false } as const
 

@@ -1,11 +1,11 @@
 ---
 title: Feedback tasks
-description: Seven short tasks in the web app before the 1.0 release, each with the page to open and what counts as done, and where to report what went wrong.
+description: Short tasks in the web app before the 1.0 release, each with the page to open and what counts as done, and where to report what went wrong.
 ---
 
 # Feedback tasks
 
-Try one or more of these tasks in the [web app](https://openreloading.github.io/Ballistics/) on your own, in any order, and tell us where you got stuck. Each task names the page to open and what counts as done. Nothing you enter leaves your browser.
+Try one or more of these tasks in the [web app](https://openreloading.github.io/Ballistics/) on your own, in any order, and tell us where you got stuck. Nothing you enter leaves your browser.
 
 | Task | Page | Done when |
 | --- | --- | --- |
@@ -24,4 +24,4 @@ Try one or more of these tasks in the [web app](https://openreloading.github.io/
 
 ## Post for the community channels
 
-> Ballistics is close to its 1.0 release, and we would like your feedback. There are seven short tasks to try in the web app: a first load, a chronograph session, truing, a shot group from a photo, powder tuning, an import and the German interface. Pick any of them, no sign-up needed: https://openreloading.github.io/Ballistics/docs/feedback-tasks/. Tell us where you got stuck with Report an issue in the app, an issue on GitHub, or here.
+> Ballistics is close to its 1.0 release, and we would like your feedback. Short tasks to try in the web app: a first load, a chronograph session, truing, a shot group from a photo, powder tuning, an import and the German interface. Pick any of them, no sign-up needed: https://openreloading.github.io/Ballistics/docs/feedback-tasks/. Tell us where you got stuck with Report an issue in the app, an issue on GitHub, or here.

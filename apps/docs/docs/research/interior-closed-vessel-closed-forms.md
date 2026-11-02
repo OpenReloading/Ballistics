@@ -42,7 +42,7 @@ All differences are below the limits listed under Method. The burn time at 314.1
 
 ## Result
 
-No change. Both the final pressure and the burn times agree with the integrals, so the burn law, the temperature factor and the form functions are implemented as written. The default integrator tolerances leave about $5 \cdot 10^{-7}$ in the two-stage burn time, which the test removes by tightening them.
+No change. Final pressure and burn times agree with the integrals, so the burn law, the temperature factor and the form functions are implemented as written. The default integrator tolerances leave about $5 \cdot 10^{-7}$ in the two-stage burn time; the test tightens them.
 
 ## Data basis
 

@@ -5,7 +5,7 @@ description: Size and dispersion of shot groups on a target, confidence interval
 
 # Shot groups
 
-The group statistics describe the shots of one group on a target:
+Statistics of one group on a target:
 
 - the centre of impact
 - sizes such as extreme spread and mean radius
@@ -13,7 +13,7 @@ The group statistics describe the shots of one group on a target:
 - the covariance with its principal axis
 - ellipses that hold a stated share of the shots
 
-The velocities of a chronograph string have their own statistics (mean, standard deviation, extreme spread, interval of the standard deviation, shots needed), see "Velocity strings".
+Chronograph strings have their own statistics, see [Velocity strings](#velocity-strings).
 
 Several groups of one load are pooled in angle, each about its own centre. Excluded shots enter only their count and the offset of their centre. A value whose minimum shot count is not met is undefined.
 
@@ -113,7 +113,7 @@ $$
 
 Code: `packages/core/src/groups/statistics.ts`, `ellipticalCep` (`outside`), `packages/core/src/bisect.ts`, `bisect`.
 
-The integral uses the trapezoid rule with 64 steps. $R$ comes from bisection on $[0, 1.2\sqrt{\lambda_1}]$.
+Trapezoid rule with 64 steps; $R$ comes from bisection on $[0, 1.2\sqrt{\lambda_1}]$.
 
 ### Dispersion and prediction ellipses
 
@@ -290,7 +290,6 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 | $\chi^2_{q,\nu}$ | Quantile of the chi-square distribution at probability $q$ | 1 | 1 |
 | $P$, $Q$ | Regularized lower and upper incomplete gamma functions | 1 | 1 |
 | $t$, $\theta$ | Student's t quantile and its angle $\arctan(t/\sqrt{\nu})$ | 1, no kind | 1, rad |
-| $v_i$ | Velocity of shot $i$ | m/s | m/s |
 | $r$, $b$ | Correlation of height with velocity, slope of height on velocity | 1, no kind | 1, m per m/s |
 | $L$, $D$ | Length in the target plane, distance from the muzzle to the target | mm | m |
 | $\alpha$ | Angle subtended at the muzzle | deg | rad |
@@ -307,7 +306,7 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 
 - Minimum shot counts: the centre and the aim offset need 1 shot, every dispersion value and the dispersion ellipse 2, the prediction ellipse 3, the velocity correlation 3 shots with a velocity, not all of one velocity or one height.
 - The interval of a velocity standard deviation holds its level only for normal velocities. In simulated strings of 10 to 30 shots from skewed, heavy-tailed or stray-shot populations, an interval stated at 95 % covered the true value 76 to 90 % of the time, and it is too narrow, not too wide. A percentile bootstrap covered less at these shot counts and is not used. ([research log](../research/velocity-sd-interval.md)) The extreme spread of a string carries no interval.
-- Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables, not reproduced here.
+- Mean radius, extreme spread, width, height, the pair distances and the elliptical CEP carry no interval. Their small-sample distributions exist only as tables.
 - The circular CEP overstates the CEP of an elongated group, by 6.9 % at an axis ratio of 2, 14.2 % at 3 and at most 23.5 % ([research log](../research/group-cep-circular-vs-elliptical.md)). The elliptical CEP holds for any axis ratio and equals the circular one for equal, uncorrelated axes.
 - The dispersion ellipse describes the shots fired. For small $n$ it holds less than the share $p$ of further shots.
 - The velocity correlation describes the data and names no cause. With few shots a large $\lvert r \rvert$ arises by chance.

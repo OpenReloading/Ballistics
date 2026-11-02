@@ -43,11 +43,9 @@ Mixture, virial over Noble-Abel pressure minus one, percent:
 | 3500 | 25.2 | -0.01 | -0.20 | -0.62 | -1.35 | -2.45 |
 | 4000 | 25.5 | -0.10 | -0.37 | -0.88 | -1.71 | -2.92 |
 
-Largest difference -2.92 % (4000 K, covolume fraction 0.3).
-
 ## Result
 
-no change; documented as a limit. The difference stays below 3 % over the grid, so the Noble-Abel gas stays. Its size, up to about 3 % in pressure at a covolume fraction of 0.3, is the size of the equation-of-state simplification. Peak pressure of a full M3 run with a virial gas was not computed; up to a covolume fraction of 0.2 the difference is below 1.8 %.
+no change; documented as a limit. The difference stays below 3 % over the grid (largest -2.92 % at 4000 K and covolume fraction 0.3), so the Noble-Abel gas stays; up to a covolume fraction of 0.2 it is below 1.8 %. Peak pressure of a full M3 run with a virial gas was not computed.
 
 ## Data basis
 

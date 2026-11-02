@@ -40,7 +40,7 @@ export const fractionSpec: FieldSpec = {
 
 /** What the lot rows say about barrel time: a computed value of the simulation. */
 export const lotNote = msg(
-  'Lot rows: the burn rate of each charge raised and lowered. Barrel time is a computed value of the simulation, not a measurement.',
+  'Lot rows: each charge with its burn rate raised and lowered. Barrel time is simulated, not measured.',
 )
 
 /** The chart of the lot rows' barrel times, with the note under it; nothing before the rows arrive. */

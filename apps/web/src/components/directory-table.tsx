@@ -204,17 +204,17 @@ function usePrinting() {
 
 /** The note under a printed list: whole sentences, one per kind. */
 const printedLines: Record<ListNoun, Message> = {
-  bullets: msg('Printed: the first {limit} of {total} bullets in this selection.'),
-  cartridges: msg('Printed: the first {limit} of {total} cartridges in this selection.'),
-  cases: msg('Printed: the first {limit} of {total} brass in this selection.'),
-  disciplines: msg('Printed: the first {limit} of {total} disciplines in this selection.'),
-  events: msg('Printed: the first {limit} of {total} events in this selection.'),
-  faces: msg('Printed: the first {limit} of {total} targets in this selection.'),
-  federations: msg('Printed: the first {limit} of {total} federations in this selection.'),
-  firearms: msg('Printed: the first {limit} of {total} firearms in this selection.'),
-  'log entries': msg('Printed: the first {limit} of {total} entries in this selection.'),
-  powders: msg('Printed: the first {limit} of {total} powders in this selection.'),
-  primers: msg('Printed: the first {limit} of {total} primers in this selection.'),
+  bullets: msg('Printed: the first {limit} of {total} bullets.'),
+  cartridges: msg('Printed: the first {limit} of {total} cartridges.'),
+  cases: msg('Printed: the first {limit} of {total} brass.'),
+  disciplines: msg('Printed: the first {limit} of {total} disciplines.'),
+  events: msg('Printed: the first {limit} of {total} events.'),
+  faces: msg('Printed: the first {limit} of {total} targets.'),
+  federations: msg('Printed: the first {limit} of {total} federations.'),
+  firearms: msg('Printed: the first {limit} of {total} firearms.'),
+  'log entries': msg('Printed: the first {limit} of {total} entries.'),
+  powders: msg('Printed: the first {limit} of {total} powders.'),
+  primers: msg('Printed: the first {limit} of {total} primers.'),
 }
 
 /** Rows printed at most. */

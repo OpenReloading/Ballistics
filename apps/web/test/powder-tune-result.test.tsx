@@ -1,13 +1,13 @@
 import { MantineProvider } from '@mantine/core'
 import {
   type ChronographString,
-  type InteriorLoad,
   interior,
   type PowderPrediction,
   predictPowder,
 } from '@open-reloading/core'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
+import { load } from '../../../packages/core/test/powder-load.ts'
 import {
   reasonTexts,
   refusalTexts,
@@ -20,30 +20,6 @@ import { nth } from '../src/lib/nth.ts'
 import type { PowderFitReply, PowderFitState } from '../src/lib/powder-fit.ts'
 import { answerPowderFit, handCurve, handLoad } from '../src/lib/powder-fit-answer.ts'
 import { presetUnits, withUnit } from '../src/lib/units.ts'
-
-/** Synthetic rifle load of the core fit tests: truth vivacity 0.45 1/s. */
-const load = (vivacity = 0.45): InteriorLoad => ({
-  chamber: { volume: 3.4e-6, boreArea: 3.75e-5, boreDiameter: 6.9e-3 },
-  barrel: { length: 0.6, twist: 0.254 },
-  bullet: { mass: 0.0095 },
-  charge: 0.0028,
-  propellant: {
-    specificEnergy: 3.9e6,
-    gamma: 1.23,
-    density: 1600,
-    covolume: 1e-3,
-    burn: {
-      kind: 'vivacity',
-      vivacity,
-      exponent: 1,
-      referencePressure: 98066.5,
-      form: { kind: 'twoStage', a: 0.8, m: 0.5, q: 0.5, z1: 0.8 },
-    },
-  },
-  propellantTemperature: 294.15,
-  ignitionPressure: 5e6,
-  startPressure: 30e6,
-})
 
 const strings: ChronographString[] = [2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3].map((charge, i) => {
   const r = interior({ ...load(), charge })
@@ -209,7 +185,7 @@ describe('refusals and rules on the screen', () => {
     const html = text({ fit: { ...fitted, rule: 'thin' }, running: false })
     expect(html).toContain('Fewer than 3 charges, or charges less than 10 % apart')
     expect(html).toContain('Try the other values anyway')
-    expect(html).not.toContain('they move together')
+    expect(html).not.toContain('the others keep their start values')
   })
 
   it('notes a revolver fit without a leak area, not one with a leak area or a rifle fit', () => {
@@ -225,7 +201,9 @@ describe('refusals and rules on the screen', () => {
 
   it('says why held values stay at their start values', () => {
     const html = text({ fit: { ...fitted, rule: 'held' }, running: false })
-    expect(html).toContain('they move together. They stay at their start values')
+    expect(html).toContain(
+      'only the burn coefficient is fitted and the others keep their start values',
+    )
     expect(html).not.toContain('Try the other values anyway')
   })
 

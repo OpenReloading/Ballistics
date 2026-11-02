@@ -11,7 +11,7 @@ Interior ballistics, bore resistance: does an engraving ramp lower the held-out 
 
 ## Method
 
-The resistance law of the [M3 model](../models/interior-m3.md#bore-resistance) was fitted to the training split with grids for the friction stress $\tau_f$ (0 to 4 MPa), the oversize coefficient $c$ (0 to 12 per percent) and the engraving fraction $\phi_e$ (0 to 4), every powder refitted (vivacity and energy). Variants scored on 12680 validation rows. Accept rule: the simplest variant within 0.1 percentage points of the lowest median absolute velocity error.
+The resistance law of the [M3 model](../models/interior-m3.md#bore-resistance) was fitted to the training split with grids for the friction stress $\tau_f$ (0 to 4 MPa), the oversize coefficient $c$ (0 to 12 per percent) and the engraving fraction $\phi_e$ (0 to 4), every powder refitted (vivacity and energy). Scored on 12680 validation rows. Accept rule: the simplest variant within 0.1 percentage points of the lowest median absolute velocity error.
 
 Barrel-length check: the burn coefficient fitted at 720 mm of a published firing series of 7 barrel lengths, the other 6 lengths predicted, error of the velocity change from 720 mm (measured spread of the series 18.34 m/s).
 

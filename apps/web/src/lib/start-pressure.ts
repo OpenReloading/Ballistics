@@ -19,13 +19,17 @@ const constructionName = {
  * the construction rule of the chosen bullet and the firearm class (barrel under 300 mm or not)
  * with its 95 % interval, else the value the field held before the rule (the Settings default or
  * the cited one). A default
- * the user changed in Settings is kept.
+ * the user changed in Settings is kept. A powder model fitted without a start pressure of its own
+ * (`fittedPowder`) ran at the rifle assumption on every rifle load of its fit, so a rifle barrel
+ * keeps that value for it.
  */
 export function startPressureDefault(a: {
   barrel: number | undefined
   construction: StructureFields | undefined
   /** The start pressure default of Settings, SI. */
   current: number
+  /** The powder's model has no start pressure of its own: it was fitted at `defaultStartPressure` of each load's barrel. */
+  fittedPowder?: boolean | undefined
   show: { text: (si: number) => string; unit: string }
   t: Translator['t']
 }): Suggestion {
@@ -36,8 +40,14 @@ export function startPressureDefault(a: {
     si: current,
     source: tuned ? t('your default from Settings') : t(cited.source),
   }
+  if (tuned) return fallback
+  if (a.fittedPowder && a.barrel !== undefined && a.barrel >= handgunBarrelLengthLimit)
+    return {
+      si: current,
+      source: t('the start pressure the powder record was fitted at, barrel 300 mm or longer'),
+    }
   const rule = startPressureOf(a.barrel, a.construction)
-  if (tuned || !rule.construction || !rule.interval) return fallback
+  if (!rule.construction || !rule.interval) return fallback
   const name = t(constructionName[rule.construction])
   const fill = {
     construction: rule.assumed ? t('{name}, assumed', { name }) : name,

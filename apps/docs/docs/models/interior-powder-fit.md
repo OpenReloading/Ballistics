@@ -1,13 +1,17 @@
 ---
 title: Powder fit from a chronograph ladder
-description: Weighted least-squares fit of the burn coefficient and, on request, the start pressure, a chamber volume correction factor, the specific energy and a factor on the temperature sensitivities of the M3 interior model to measured muzzle velocities and peak pressures of a charge ladder or of sessions at several barrel lengths and powder temperatures, with optional Gaussian priors and a Huber loss, the prediction band of the fitted load at a charge that was not fired, and the peak-pressure range that the fixed inputs add, with a prior from similar powders and a confidence label of the range.
+description: Weighted least-squares fit of the M3 burn coefficient and optional further parameters to the muzzle velocities and peak pressures of a charge ladder or of sessions at several barrel lengths and temperatures, with priors, a Huber loss, prediction bands, the peak-pressure range of the fixed inputs and a confidence label.
 ---
 
 # Powder fit from a chronograph ladder
 
 The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
 
-`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points of a ladder may be fired from another barrel length or at another powder temperature, which is what resolves the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)); `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve. The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values, their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. Optional Gaussian priors on the log parameters turn the fit into a maximum a posteriori estimate, and an optional Huber loss limits the pull of one outlying string. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data. `fitPowderPooled` fits the sessions of many rifles, powders and lots at once ([below](#pooled-fit-over-rifles-powders-and-lots)), with prediction intervals that hold a model error. `predictPowder` propagates the covariance to the muzzle velocity and the peak pressure at any charge, with an interval, and names each axis on which a prediction lies outside the data the fit was made from.
+`fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points fired from another barrel length or at another powder temperature resolve the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)). The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values with their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data.
+
+- `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve.
+- `fitPowderPooled` fits the sessions of many rifles, powders and lots at once ([below](#pooled-fit-over-rifles-powders-and-lots)), with prediction intervals that hold a model error.
+- `predictPowder` gives the muzzle velocity and the peak pressure at any charge with an interval, and names each axis on which a prediction lies outside the data of the fit.
 
 ## Equations
 
@@ -230,7 +234,7 @@ $$
 
 Code: `packages/core/src/interior/fit-confidence.ts`, `similarPowdersPrior`, `similarPowderRules`.
 
-With fewer than 3 neighbours the prior is weak: it is centred on the target's own value with $s = 1$, and `weak` is set. The floor of 0.05 keeps neighbours with nearly equal coefficients from fixing the fit. The caller passes plain values of the powders and takes the prior from the result into `priors.burnRate`. Core reads no records. A prior from one known powder is a `PowderPrior` the caller builds from that powder's value and the spread it states. The fit states its basis: `refined` when a prior on the burn coefficient was given, else `from-scratch` (Bard 1974 and Gelman 2013 for the estimate with a prior, see Sources). A prior pulls a short ladder toward its centre by its weight $1/s^2$ against the ladder rows.
+With fewer than 3 neighbours the prior is weak: it is centred on the target's own value with $s = 1$, and `weak` is set. The floor of 0.05 keeps neighbours with nearly equal coefficients from fixing the fit. The caller passes plain values of the powders and takes the prior from the result into `priors.burnRate`. Core reads no records. A prior from one known powder is a `PowderPrior` the caller builds from that powder's value and the spread it states. The fit states its basis: `refined` when a prior on the burn coefficient was given, else `from-scratch`. A prior pulls a short ladder toward its centre by its weight $1/s^2$ against the ladder rows.
 
 ### Confidence label
 
@@ -258,7 +262,7 @@ The reasons do not change the label. They say what the range rests on or does no
 | `extrapolated` | a point of the range lies outside the fit's domain on the charge or barrel length axis |
 | `input-refit-failed` | the refit for an input failed, so the input is not in the range |
 
-The result also carries the fit's basis. The thresholds are assumptions, to be tuned against real sessions. A `tight` label says that the inputs the range holds move the pressure little. It does not cover the model error of the inputs it leaves out, and a trend in the residuals, a prior far from the data or an extrapolation weaken it as the reasons say.
+The thresholds are assumptions, to be tuned against real sessions. A `tight` label says that the inputs the range holds move the pressure little. It does not cover the model error of the inputs it leaves out, and a trend in the residuals, a prior far from the data or an extrapolation weaken it as the reasons say.
 
 ### Identifiability
 

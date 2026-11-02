@@ -11,7 +11,7 @@ Interior ballistics, bullet: should a plain-base cast bullet whose alloy is hard
 
 ## Method
 
-The rule of thumb for the upset pressure of a plain-base cast bullet was compared with the simulated peak breech pressure. The effect of a leak was looked at by giving the solver's leak path a fixed area on two stand-in loads (9 mm Luger at 232 MPa and 332 m/s, a .308 Win. rifle load). Decided in advance: a leak model or a default leak area is adopted only with a published leak area or a controlled comparison of plain-base and gas-checked bullets; else a warning on the three conditions (cast, no gas check, hardness set) and no change of the run. The data step reads the "Brinell N" each Missouri Bullet record's pricing-page row prints into `construction.core.hardness`.
+The rule of thumb for the upset pressure of a plain-base cast bullet was compared with the simulated peak breech pressure. The effect of a leak was tested by giving the solver's leak path a fixed area on two stand-in loads (9 mm Luger at 232 MPa and 332 m/s, a .308 Win. rifle load). Decided in advance: a leak model or a default leak area is adopted only with a published leak area or a controlled comparison of plain-base and gas-checked bullets; else a warning on the three conditions (cast, no gas check, hardness set) and no change of the run. The data step reads the "Brinell N" each Missouri Bullet record's pricing-page row prints into `construction.core.hardness`.
 
 ## Formulas
 

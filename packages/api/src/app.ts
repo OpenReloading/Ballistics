@@ -28,10 +28,10 @@ type AppOptions = FastifyServerOptions & {
 }
 
 /**
- * Builds the Fastify app: the read routes over `catalogue`, the compute routes over `compute`, both under
- * `API_PREFIX`, with `openApi` its document (`/openapi.json`) and the Scalar viewer of it
- * (`/reference/`), and the connection-close handling while the server shuts down. Registers nothing on the network; the
- * caller listens (`server.ts`) or injects requests (tests).
+ * Builds the Fastify app: the read routes over `catalogue` and the compute routes over `compute`,
+ * both under `API_PREFIX`, with `openApi` as `/openapi.json` and its Scalar viewer at
+ * `/reference/`, and connection-close handling on shutdown. Does not listen; the caller does
+ * (`server.ts`) or injects requests (tests).
  */
 export function buildApp({
   catalogue,

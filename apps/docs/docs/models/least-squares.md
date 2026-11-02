@@ -5,13 +5,7 @@ description: The Levenberg-Marquardt loop, the conditioning check, the covarianc
 
 # Least squares on log parameters
 
-`logLeastSquares` fits parameters to observations by weighted least squares:
-
-- Levenberg-Marquardt steps with central-difference Jacobians
-- a conditioning check that refuses parameters the observations do not resolve or cannot separate
-- the covariance and the correlations of the parameters at the solution
-
-The callers write each positive parameter as the logarithm of its ratio to the start value, so every fitted value stays positive and a step is a relative change. `identifiability` computes the covariance and the collinearity measures of a weighted Jacobian without fitting. [Truing](exterior-truing.md), [truing from range strings](exterior-truing-strings.md) and the [powder fit](interior-powder-fit.md) supply the predictions and call these functions.
+`logLeastSquares` fits parameters to observations by weighted least squares with Levenberg-Marquardt steps, refuses parameters the observations do not resolve or cannot separate, and returns their covariance and correlations at the solution. The callers write each positive parameter as the logarithm of its ratio to the start value, so every fitted value stays positive and a step is a relative change. `identifiability` computes the covariance and the collinearity measures of a weighted Jacobian without fitting. [Truing](exterior-truing.md), [truing from range strings](exterior-truing-strings.md) and the [powder fit](interior-powder-fit.md) supply the predictions and call these functions.
 
 ## Equations
 

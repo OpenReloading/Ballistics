@@ -5,7 +5,7 @@ description: The printed label for a box of loaded rounds, its values, its size 
 
 # Box label of a saved load
 
-The Saved loads drawer of the workbench prints a label for a box of loaded rounds from a saved load (the print button of the load's row, "Print a box label"). The label is made from the stored record alone, so the same saved load always gives the same label. Nothing new is stored, nothing is sent: the names of the records the load refers to are read from this browser and the data files, as the CSV export of the saved loads reads them.
+The Saved loads drawer of the workbench prints a box label from a saved load (the print button of the load's row, "Print a box label"). The label is made from the stored record alone, so the same saved load gives the same label as long as the names of the records it refers to, the unit system and the language stay the same. Nothing new is stored, nothing is sent: the names of the records the load refers to are read from this browser and the data files, as the CSV export of the saved loads reads them.
 
 ## What the label prints
 
@@ -58,7 +58,6 @@ The code is QR model 2 with error correction level M (about 15 % of the code may
 ## Limits
 
 - The label shows the load as saved. Edits not yet saved in a tab are not on it.
-- The QR code identifies a load of one browser and edition. Another browser, device or edition finds it only after the load was exported there and imported.
 - One label per print. A sheet of several labels is not offered.
 - A label is bookkeeping. It says nothing about whether a load is fit for use; the results of this project are simulations, not load data.
 

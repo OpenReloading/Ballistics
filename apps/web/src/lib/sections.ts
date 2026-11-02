@@ -26,59 +26,53 @@ export const databaseTabs: readonly LibraryTab[] = [
     href: '/firearms',
     label: msg('Firearms'),
     description: msg(
-      'Your firearms with their optics and zeros, kept in this browser and in files; they fill the rifle fields of the workbench.',
+      "Your firearms with their optics and zeros, kept in this browser; they fill the workbench's firearm fields.",
     ),
   },
   {
     href: '/cartridges',
     label: msg('Cartridges'),
-    description: msg(
-      'CIP dimensions, drawings and maximum pressures, each with its source document.',
-    ),
+    description: msg('CIP dimensions, drawings and maximum pressures.'),
   },
   {
     href: '/cases',
     label: msg('Brass'),
     description: msg(
-      'Cartridge case products with material, primer pocket and stated water capacity, each with its sources.',
+      'Cartridge case products with material, primer pocket and stated water capacity.',
     ),
   },
   {
     href: '/primers',
     label: msg('Primers'),
-    description: msg('Primer products with size, cup and priming compound, each with its sources.'),
+    description: msg('Primer products with size, cup and priming compound.'),
   },
   {
     href: '/powders',
     label: msg('Powders'),
-    description: msg('Propellants and their recorded properties, each with its sources.'),
+    description: msg('Propellants and their recorded properties.'),
   },
   {
     href: '/bullets',
     label: msg('Bullets'),
-    description: msg(
-      'Diameters, masses, lengths and ballistic coefficients, each with its source.',
-    ),
+    description: msg('Diameters, masses, lengths and ballistic coefficients.'),
   },
   {
     href: '/targets',
     label: msg('Targets'),
     description: msg(
-      'Rule-book targets: ring diameters, black area and the disciplines shot on them, each with its source.',
+      'Rule-book targets: ring diameters, black area and the disciplines shot on them.',
     ),
   },
   {
     href: '/disciplines',
     label: msg('Disciplines'),
-    description: msg(
-      'Rule-book disciplines and their federations: distance, caliber classes and the targets they are shot on, each with its source.',
-    ),
+    description: msg('Rule-book disciplines: federation, distance, caliber classes and targets.'),
   },
   {
     href: '/federations',
     label: msg('Federations'),
     description: msg(
-      'Shooting federations with the rule books their disciplines and targets are read from, each with its source.',
+      'Shooting federations and the rule books their disciplines and targets come from.',
     ),
   },
 ]
@@ -93,7 +87,7 @@ export const sections = [
         label: msg('Load workbench'),
         icon: '/workbench',
         description: msg(
-          'Cartridge, bullet, powder and firearm in one view, with simulated velocity, pressure compared against CIP limits, and the trajectory in your browser.',
+          'Simulated velocity, pressure against CIP limits and trajectory for your cartridge, bullet, powder and firearm, computed in your browser.',
         ),
       },
       {
@@ -122,9 +116,7 @@ export const sections = [
         href: '/cartridges',
         label: msg('Database'),
         icon: 'database',
-        description: msg(
-          'The published records, each with its source, and your own next to them: your firearms, cartridges, brass, primers, powders, bullets, targets, disciplines and federations.',
-        ),
+        description: msg('The published records, each with its source, and your own beside them.'),
         tabs: databaseTabs,
         covers: ['/my-cases', '/events'],
       },

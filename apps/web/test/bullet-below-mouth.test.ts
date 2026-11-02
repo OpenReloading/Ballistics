@@ -311,3 +311,20 @@ it.each(Object.entries(paths))('never leaves the case capacity whole when %s', (
   )
   expect(given === undefined || given.si < capacity).toBe(true)
 })
+
+it('refuses and names a length where no outline can be built for the estimated length', () => {
+  // a light, wide bullet: its estimated nose is shorter than its radial drop
+  const e = belowMouth({
+    record: { ...nameOnly, diameter: { value: 11.5 }, mass: { value: 6.48 } },
+    shape: undefined,
+    groove,
+    chamber,
+    coal: undefined,
+    because: 'dimensions',
+  })
+  expect(e).toEqual({
+    kind: 'refused',
+    missing: ['a bullet length that gives an outline'],
+    because: 'dimensions',
+  })
+})

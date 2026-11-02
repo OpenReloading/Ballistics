@@ -5,7 +5,7 @@ description: Where to put the chronograph, what its distance from the muzzle mea
 
 # Setting up a chronograph
 
-The app reads chronograph velocities for two fits: the [powder fit](../powder-tuning.md) on the Measurements tab, which matches the simulated muzzle velocity, and [truing](../models/exterior-truing.md), which matches the trajectory. Both read the velocities as they are. All results are simulations, not load data.
+The app reads chronograph velocities for two fits: the [powder fit](../powder-tuning.md) on the Measurements tab, which matches the simulated muzzle velocity, and [truing](../models/exterior-truing.md), which matches the trajectory. All results are simulations, not load data.
 
 ## What it improves
 

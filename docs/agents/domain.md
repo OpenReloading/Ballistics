@@ -1,11 +1,11 @@
 # Domain Docs
 
-Single-context repository: one glossary for the whole monorepo, since the packages and apps share one domain. Skills that explore the codebase read these files when they exist:
+Single context: one glossary for the whole monorepo. Skills that explore the codebase read, when present:
 
 - `GLOSSARY.md` at the repository root.
 - `docs/adr/`: ADRs that touch the area being changed.
 
-A missing file is not an error: proceed without it. `mattpocock-skills:domain-modeling` creates them when terms or decisions get resolved.
+A missing file is not an error. `mattpocock-skills:domain-modeling` creates them when terms or decisions get resolved.
 
 ## Rules
 

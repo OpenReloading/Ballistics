@@ -401,9 +401,7 @@ function ParameterHead({
       </div>
       {shotshell ? (
         <p className="note">
-          {t(
-            'Shotshell dimensions (CIP table VII) are not edited in the designer; the drawing shows the record.',
-          )}
+          {t('Shotshell dimensions (CIP table VII) are read only; the drawing shows the record.')}
         </p>
       ) : (
         <>

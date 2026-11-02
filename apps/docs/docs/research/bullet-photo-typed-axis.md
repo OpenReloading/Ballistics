@@ -14,7 +14,7 @@ Bullet from a photo: when the user types the axis direction a few degrees off th
 - **Data.** Synthetic photographs (`renderPhoto`) of a 7.82 x 30 mm secant-ogive bullet lying 3 degrees off level, with a flat base and with a 5.5 mm boat tail, at 20 and 40 px per mm, measured with the axis direction typed 0, 0.5, 1, 2, 3, 5 and -3 degrees off the true one.
 - **Compared.** The tool of #918 against the change, same renders.
 - **Metric.** The base type and boat-tail length measured, and whether a note names the typed axis.
-- **Accept rule** (the issue's acceptance, decided before the run). A flat base with the axis typed 3 degrees off gives no boat tail, or a note that the axis direction does not match the bullet. The catalogue evaluation (`apps/web/test/bullet-photo-catalogue.test.ts`, scenarios A to H, found axis) keeps every number.
+- **Accept rule** (the issue's, set before the run). A flat base with the axis typed 3 degrees off gives no boat tail, or a note that the axis direction does not match the bullet. The catalogue evaluation (`apps/web/test/bullet-photo-catalogue.test.ts`, scenarios A to H, found axis) keeps every number.
 
 ## Formulas
 
@@ -34,7 +34,7 @@ With a typed axis only the offset is fitted, so the axis need not be the symmetr
 
 The catalogue evaluation (found axis) is unchanged on every column of scenarios A to H.
 
-A first version named any turn of 1 degree or more. The second reader showed that a short shank fitted over 10 samples has a slope uncertainty of about 1.3 degrees on the half difference, so the note would fire about half the time on an axis typed right: the threshold now also needs three standard uncertainties of the angle. Five seeds of a 9.02 x 15.5 mm pistol bullet at 8 px per mm with the axis typed right give no note.
+Naming any turn of 1 degree or more is not enough: the second reader showed that a short shank fitted over 10 samples has a slope uncertainty of about 1.3 degrees on the half difference, so the note would fire about half the time on an axis typed right. The threshold also needs three standard uncertainties of the angle. Five seeds of a 9.02 x 15.5 mm pistol bullet at 8 px per mm with the axis typed right give no note.
 
 ## Result
 

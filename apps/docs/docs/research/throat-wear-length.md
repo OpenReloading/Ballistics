@@ -26,7 +26,7 @@ $V_0' = V_0 + w A$, the added length times the bore area ([M3, throat wear](../m
 | Authors' model, 16000 rounds (table 2) | -15.6 % (350.0 to 295.5 MPa) | -5.1 % (854.56 to 811.19 m/s) |
 | Measured, 16000 rounds (table 3) | | -6.5 % (840.6 to 785.8 m/s) |
 
-The velocity change is 0.4 points from the authors' model and 1.0 point from the measurement; the pressure change is 1.2 points larger than theirs. A 7.62x39 slope of about 0.42 mm per 1000 rounds was derived on a proxy load in the issue (unverified).
+The velocity change is 0.4 points from the authors' model and 1.0 point from the measurement. A 7.62x39 slope of about 0.42 mm per 1000 rounds was derived on a proxy load in the issue (unverified).
 
 ## Result
 

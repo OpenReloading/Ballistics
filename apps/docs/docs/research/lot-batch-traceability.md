@@ -11,12 +11,9 @@ User records: which of eight traceability slices (lot record and picker, trace f
 
 ## Method
 
-Decided before the review.
-
 - Gate and accept rule of [inventory and lifecycle records worth keeping](./inventory-lifecycle-records.md): a handloader fills the record in at the bench in under a minute, with what they know, and keeps it up without a reminder; a record that only stays right while it is maintained is dropped; the cheaper form (a search, a print, a typed number) is compared first. A verdict of that entry or of the rounds-on-hand decision (nothing stored, a number typed when needed) is reused, not decided again.
 - Each slice: what the schema and the web app store today, what the user would type, and what the screen shows when the user stops typing.
 - Reminders: a system notification must reach a user whose app is closed, with no server, on the browsers the app supports. Checked against the browser compatibility data and the specifications.
-- Data: the repository's schema and web app at the time of the review; browser support from the MDN compatibility data. No user study.
 
 ## Formulas
 

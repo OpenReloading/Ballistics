@@ -409,10 +409,9 @@ export function SavedLoads({
               {read && groups.length === 0 && (
                 <Text size="sm" c="dimmed">
                   {records.length === 0
-                    ? t(
-                        'No saved loads yet. Save a load on the workbench with Save or {keys}, and it appears here.',
-                        { keys: shortcutLabel('save') },
-                      )
+                    ? t('No saved loads yet. Save one on the workbench with Save or {keys}.', {
+                        keys: shortcutLabel('save'),
+                      })
                     : t('No match.')}
                 </Text>
               )}
@@ -441,8 +440,8 @@ export function SavedLoads({
                 <p>
                   {tn(
                     older,
-                    '{count} saved load is in the format of an earlier version, which this app no longer reads. Open lists it under Invalid records.',
-                    '{count} saved loads are in the format of an earlier version, which this app no longer reads. Open lists them under Invalid records.',
+                    '{count} saved load has an earlier format this app no longer reads; Open lists it under Invalid records.',
+                    '{count} saved loads have an earlier format this app no longer reads; Open lists them under Invalid records.',
                   )}
                 </p>
               )}

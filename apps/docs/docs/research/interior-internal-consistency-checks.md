@@ -11,7 +11,7 @@ Interior ballistics: does the [M3 model](../models/interior-m3.md) keep its own 
 
 ## Method
 
-Four checks on synthetic loads, with the limit of each fixed in the test:
+Four checks on synthetic loads:
 
 - Energy: with every part switched on (Lagrange gradient, rotation, bore resistance, convective heat loss, seven-perforated grain, shot start), the energy terms of the muzzle state add up to $m_c Q z$ within a relative $10^{-12}$, and the resistance work equals the area under the resistance force over the travel within $10^{-6}$.
 - Isentrope: without heat loss, after burnout, $\bar p\, V_f^{\,k}$ is constant over more than 100 curve points within $10^{-12}$.
@@ -36,11 +36,11 @@ The resistance work for the test load is $A\,(p_f x_e + \text{area under the eng
 
 ## Numbers
 
-All checks pass within the limits above. The test notes that the first check holds by construction: the gas energy is defined by the same expression as the pressure, so the sum cannot differ. The same holds for the gradient ratios, which follow from the formulas the code evaluates.
+All checks pass within the limits above. The energy sum and the gradient ratios hold by construction: the gas energy uses the same expression as the pressure, and the ratios are the formulas the code evaluates.
 
 ## Result
 
-No change. The checks guard against a coding slip in the balances and the gradient, and show that the integrator settings are not what limits the results at the stated precision. The model stays as it is.
+No change. The checks guard against a coding slip in the balances and the gradient, and show that the integrator settings are not what limits the results at the stated precision.
 
 ## Data basis
 

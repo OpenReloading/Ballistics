@@ -5,7 +5,7 @@ description: The height of impact of each charge's shots with the effect of thei
 
 # Point of impact per charge in a ladder
 
-A charge ladder fires several shots per charge, and the velocity of a shot changes where it lands: a faster shot drops less. The analysis takes the height of each shot above the point of aim and its velocity, removes the part of the height that the velocity explains with a given slope, and averages what is left per charge. It then tests whether those averages differ between charges by more than the scatter of the shots. The result is a statistical observation about the shots fired, not a recommendation of a charge.
+The analysis takes the height of each shot above the point of aim and its velocity, removes the part of the height that the velocity explains with a given slope, and averages what is left per charge. It then tests whether those averages differ between charges by more than the scatter of the shots. The result is a statistical observation about the shots fired, not a recommendation of a charge.
 
 ## Equations
 

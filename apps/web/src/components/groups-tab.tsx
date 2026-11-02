@@ -68,7 +68,7 @@ export function GroupsTab({
   if (props.load === undefined)
     return (
       <p className="prompt empty-state">
-        {t('Save the load (Save in the page bar) to attach target sheets and shot groups to it.')}
+        {t('Save the load (Save in the page bar) to attach target sheets and shot groups.')}
       </p>
     )
   return (

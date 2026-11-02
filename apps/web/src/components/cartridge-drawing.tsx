@@ -1,5 +1,5 @@
 import { SegmentedControl, Tooltip } from '@mantine/core'
-import { angleText, face, type LengthUnit, lengthText } from '@open-reloading/drawing'
+import { angleText, face, fitEm, type LengthUnit, lengthText } from '@open-reloading/drawing'
 import {
   type Drawn,
   type Figure,
@@ -16,6 +16,7 @@ import {
   signedLengthText,
   valueParts,
 } from '@open-reloading/drawing/cartridge'
+import type { CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../i18n/language.ts'
 import { plainNumber } from '../i18n/number.ts'
@@ -24,7 +25,7 @@ import { conflictText, differenceText } from '../lib/cartridge-record.ts'
 import type { drawable } from '../lib/cartridge-sheet.ts'
 import { nth } from '../lib/nth.ts'
 import { controlSize, tipEvents } from '../lib/theme.ts'
-import { type Linked, TechnicalDrawing } from './technical-drawing.tsx'
+import { type Linked, readableWidth, TechnicalDrawing } from './technical-drawing.tsx'
 
 /** What the drawing reads of a record (`drawable`). */
 type Drawable = ReturnType<typeof drawable>
@@ -144,19 +145,8 @@ export function CartridgeDrawing({
   )
   if (shown.length === 0) return <Undrawn list={list} side={side} />
   const units = ['mm', 'in'] as const
-  const ems = units.map((u) =>
-    screenEm(
-      all.map((f) => f.drawn),
-      u,
-    ),
-  )
-  // one frame width and one height in both length units: the scale stays when the unit changes
-  // (a switch, or the Settings unit read after hydration)
-  const across = Math.max(
-    ...units.flatMap((u, i) => all.map((f) => screenWidth(f.drawn, nth(ems, i), u))),
-  )
-  const model = (f: { drawn: Drawn }, u: LengthUnit) =>
-    sideModel(nth(f.drawn, 0), nth(ems, units.indexOf(u)), across, u)
+  const { em, across } = recordScale(all)
+  const model = (f: { drawn: Drawn }, u: LengthUnit) => sideModel(nth(f.drawn, 0), em, across, u)
   // the figures of a record fit the window at one scale, the tallest's, the sides not shown here too
   const tallest = Math.max(...units.flatMap((u) => split.map((f) => model(f, u).frame[3])))
   const layout = (u: LengthUnit) => ({ models: shown.map((f) => model(f, u)), tallest })
@@ -179,6 +169,18 @@ export function CartridgeDrawing({
       linked
     />
   ))
+}
+
+/**
+ * The record page's text size and frame width, one in both length units: the scale stays when the
+ * unit changes (a switch, or the Settings unit read after hydration), and the text fitted to the
+ * wider unit's frame renders 11 px in the phone column in either unit (`fitEm`).
+ */
+function recordScale(all: Figure[]) {
+  const widest = (em: number) =>
+    Math.max(...(['mm', 'in'] as const).flatMap((u) => all.map((f) => screenWidth(f.drawn, em, u))))
+  const em = fitEm(widest)
+  return { em, across: widest(em) }
 }
 
 /** The screen models of one drawn side, by layout: a record page lays out every side for each panel and length unit. */
@@ -214,11 +216,7 @@ function Combined({
     (f) => f.drawn.length === 2 && (variant === undefined || f.variant === variant),
   )
   if (both.length === 0) return null
-  const em = screenEm(
-    all.map((f) => f.drawn),
-    unit,
-  )
-  const across = Math.max(...all.map((f) => screenWidth(f.drawn, em, unit)))
+  const { em, across } = recordScale(all)
   const differences = regions(spec.values)
   const models = both.map((f) =>
     figureModel(f.drawn, 'screen', em, across, differences, false, unit),
@@ -512,10 +510,10 @@ function CombinedCaption({ unit }: { unit: LengthUnit }) {
   const definition =
     unit === 'mm'
       ? t(
-          'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in mm, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+          'Combined: per region, published chamber minimum minus cartridge maximum (nominal minimum difference, in mm, signed); "conflict": these published dimensions contradict each other (check source).',
         )
       : t(
-          'Combined: per region the nominal minimum difference of published dimensions (chamber minimum minus cartridge maximum, in inches, signed); "conflict" marks a data conflict between published cartridge maximum and chamber minimum (check source).',
+          'Combined: per region, published chamber minimum minus cartridge maximum (nominal minimum difference, in inches, signed); "conflict": these published dimensions contradict each other (check source).',
         )
   return (
     <span className="caption-combined">
@@ -625,6 +623,8 @@ function Outline({
     <figure
       className="drawing-figure"
       data-view={combined ? 'combined' : switchable ? shown : undefined}
+      // the record page's two panels keep the drawing this wide (globals.css)
+      style={{ '--figure-readable': readableWidth(model) } as CSSProperties}
     >
       {switchable && (
         <ViewSwitch

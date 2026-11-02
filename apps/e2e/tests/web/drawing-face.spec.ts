@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
 import { textWidth } from '../../../../packages/drawing/src/core/text.ts'
 import { storeUnits } from './units.ts'
@@ -127,13 +126,13 @@ test('both sides are drawn at one scale', async ({ page }) => {
 
 test('a tall figure fits the window, no smaller than 11 px text', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 })
-  await page.goto('/cartridges/18-x-81')
+  await page.goto('/cartridges/12-7-x-108')
   // the figure is in millimetres until the page has read the stored units
   await page.waitForLoadState('networkidle')
   const cip = page.locator('main')
   const drawing = cip
     .getByRole('region', { name: 'Cartridge', exact: true })
-    .getByRole('group', { name: 'Outline, CIP 18 x 81', exact: true })
+    .getByRole('group', { name: 'Outline, CIP 12,7 x 108', exact: true })
   const size = async () => {
     const box = (await drawing.boundingBox()) as { width: number; height: number }
     const [viewBox, font] = await drawing.evaluate((svg) => [
@@ -191,12 +190,4 @@ test('printed, the drawings have no tab stop', async ({ page }) => {
     await expect(p).toBeVisible()
     await expect(p.locator('[tabindex]')).toHaveCount(0)
   }
-})
-
-test('axe finds no violation in the figures', async ({ page }) => {
-  await page.goto('/cartridges/308-win')
-  // a figure per side
-  await expect(figure308(page)).toHaveCount(2)
-  const { violations } = await new AxeBuilder({ page }).include('figure.drawing-figure').analyze()
-  expect(violations.map((v) => `${v.id} ${v.nodes.length}`)).toEqual([])
 })

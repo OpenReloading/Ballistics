@@ -7,7 +7,7 @@ description: The 5th, 50th and 95th percentile of the simulated peak pressure an
 
 `interiorSampledBand` draws the six inputs of the [peak-pressure range](interior-pressure-range.md) at random from their tolerances, runs the [M3 model](interior-m3.md) once per draw and reports the 5th, 50th and 95th percentile of the peak breech pressure and of the muzzle velocity. With several inputs varying the band is narrower than the corner-case range, which moves every input to its end at once, because few draws put every input near its end.
 
-The method is the propagation of distributions by Monte Carlo sampling of [JCGM 101:2008](../bibliography.md#jcgm-101-2008): the input distributions are sampled, the model is evaluated for every draw, and the sorted outputs approximate the output distribution. The band covers input tolerances only and is not a confidence interval.
+The method is the propagation of distributions by Monte Carlo sampling of [JCGM 101:2008](../bibliography.md#jcgm-101-2008). The band covers input tolerances only and is not a confidence interval.
 
 - The draws depend on the seed only (same seed, same band) and their number is fixed by the request.
 - The run has a time budget. When the draws do not finish within it, no band is reported: the answer keeps the corner-case range and says the sampling went over budget. A band from part of the draws would depend on the speed of the machine.
@@ -25,9 +25,7 @@ $$
 
 Code: `packages/core/src/interior/monte-carlo.ts`, `sampledBand` (`side`), `toleranceSigmas`; `packages/core/src/interior/range.ts`, `interiorApply`.
 
-JCGM 101:2008 gives an input known only by its bounds a rectangular distribution. Here the tolerance is read as the central 90 % interval of a normal distribution instead, so that the 5th and 95th percentile of the output coincide with the corner cases of a single varied input.
-
-The constant $c$ is the 95th percentile of the standard normal distribution. A tolerance is therefore the half width of the central 90 % interval of its input, so for a response that rises or falls steadily with one input the 5th and 95th percentile of the output are the values at the two ends of the tolerance, the values of the corner cases.
+JCGM 101:2008 gives an input known only by its bounds a rectangular distribution. Here the tolerance is instead the half width of the central 90 % interval of a normal distribution ($c$ is the 95th percentile of the standard normal distribution), so for a response that rises or falls steadily with one varied input the 5th and 95th percentile of the output are the corner cases.
 
 ### Standard normal numbers
 

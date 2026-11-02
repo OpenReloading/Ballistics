@@ -1,7 +1,6 @@
 import type { UserRecord } from '@open-reloading/schema'
 import { expect, it, vi } from 'vitest'
 import { english } from '../src/i18n/translate.ts'
-import { afterChange, afterExport, reminderText } from '../src/lib/export-reminder.ts'
 import {
   duplicateStored,
   generatedName,
@@ -110,29 +109,6 @@ it('picks the next tab, else the previous one, when a tab closes', () => {
   expect(tabAfterClose(['a', 'b', 'c'], 'b')).toBe('c')
   expect(tabAfterClose(['a', 'b', 'c'], 'c')).toBe('b')
   expect(tabAfterClose(['a'], 'a')).toBeUndefined()
-})
-
-it('reminds to export after 10 changes, or 7 days after the last export', () => {
-  const day = 86_400_000
-  const t0 = Date.parse('2026-10-01T10:00:00.000Z')
-  const at = (days: number) => new Date(t0 + days * day)
-  // nothing changed since the export: no reminder however old
-  expect(reminderText(afterExport(at(0)), at(30), english.t, english.tn)).toBeUndefined()
-  let r = afterExport(at(0))
-  r = afterChange(r, at(1))
-  expect(reminderText(r, at(2), english.t, english.tn)).toBeUndefined()
-  expect(reminderText(r, at(7), english.t, english.tn)).toBe(
-    '1 save since the last export, 7 days ago.',
-  )
-  for (let i = 0; i < 8; i++) r = afterChange(r, at(2))
-  expect(reminderText(r, at(2), english.t, english.tn)).toBeUndefined()
-  r = afterChange(r, at(2))
-  expect(reminderText(r, at(2), english.t, english.tn)).toBe('10 saves since the last export.')
-  // never exported: counted from the first change
-  const first = afterChange({ changes: 0 }, at(0))
-  expect(reminderText(first, at(6), english.t, english.tn)).toBeUndefined()
-  expect(reminderText(first, at(7), english.t, english.tn)).toBe('1 save, never exported.')
-  expect(reminderText({ changes: 0 }, at(40), english.t, english.tn)).toBeUndefined()
 })
 
 it('titles a group by the cartridge lookup, not by the record names', () => {

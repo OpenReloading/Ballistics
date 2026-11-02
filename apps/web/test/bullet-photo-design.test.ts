@@ -1,3 +1,4 @@
+import type { BulletDimensions } from '@open-reloading/drawing/bullet'
 import { applyOverrides, type Bullet, bullet, userBullet } from '@open-reloading/schema'
 import { describe, expect, it } from 'vitest'
 import { designerSpecs, evaluate, fileData } from '../src/lib/bullet-designer.ts'
@@ -19,7 +20,14 @@ import { targetBullet } from './fixtures/bullets.ts'
 
 const system = presetUnits('metric-grams')
 
-function measure(shape = sampleShape) {
+const measured = new Map<BulletDimensions, ReturnType<typeof measureOnce>>()
+/** The photograph of `shape` measured, once per shape in this file: no test changes the result. */
+function measure(shape: BulletDimensions = sampleShape) {
+  if (!measured.has(shape)) measured.set(shape, measureOnce(shape))
+  return defined(measured.get(shape))
+}
+
+function measureOnce(shape: BulletDimensions) {
   const photo = renderPhoto({
     shape,
     pxPerMm: 28,
@@ -110,14 +118,12 @@ describe('the values table', () => {
 
   it('says the scale and that no image is stored', () => {
     expect(photoNote(m, facts)).toMatch(/28\.\d+ px\/mm ± 0\.\d+ %/)
-    expect(photoNote(m, facts)).not.toMatch(/scale comes from/)
+    expect(photoNote(m, facts)).not.toMatch(/Scale from/)
   })
 
   it('keeps what a scale from the diameter alone rests on', () => {
     const note = photoNote({ ...m, scaleBasis: 'diameter' }, facts)
-    expect(note).toMatch(
-      /no image stored\)\. The scale comes from the diameter entered, without a ruler/,
-    )
+    expect(note).toMatch(/no image stored\)\. Scale from the diameter entered, no ruler/)
     expect(note).toMatch(/1\.5 % short.*Values with standard uncertainty/)
   })
 })

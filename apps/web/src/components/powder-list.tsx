@@ -53,7 +53,7 @@ import { EmptyList } from './states.tsx'
 /** The Training rows column's help: the column, then the burn-rate page's sentence for a powder without fitted parameters. */
 export const trainingRowsHelp = [
   msg(
-    'Load-table rows the model parameters were fitted to, the cartridges they cover and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
+    'Load-table rows the model was fitted to, their cartridges and the day the load tables were read; the record page lists them per load table. A count, not a rating.',
   ),
   unfitTitles.none,
 ] as const
@@ -131,7 +131,7 @@ export function PowderList({ packed }: { packed: PackedPowder[] }) {
       label: msg('Mean vivacity'),
       unit: vivacityUnit,
       help: msg(
-        'Dynamic vivacity averaged over burnt fraction 0.1 to 0.9 with its interval (plus and minus 2 standard uncertainties), on a log scale: model output from fitted M3 parameters, not manufacturer data. Empty without fitted parameters.',
+        'Dynamic vivacity averaged over burnt fraction 0.1 to 0.9, plus and minus 2 standard uncertainties, log scale. Model output from fitted M3 parameters, not manufacturer data.',
       ),
       width: `calc(var(--rate-scale, ${scaleWidth}px) + 11rem)`,
       head: <RateTicks domain={domain} />,

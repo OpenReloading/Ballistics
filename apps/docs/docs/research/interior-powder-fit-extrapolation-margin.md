@@ -11,7 +11,7 @@ description: How the coverage of the powder fit interval falls with the distance
 
 ## Method
 
-Synthetic ladders from the [M3 model](../models/interior-m3.md), fitted with `fitPowder` and predicted with `predictPowder` and `powderPressureRange`, 200 replicates per world with fixed seeds. The code measured was that of the default branch before the domain of every axis was added, when only the charge was flagged.
+Synthetic ladders from the [M3 model](../models/interior-m3.md), fitted with `fitPowder` and predicted with `predictPowder` and `powderPressureRange`, 200 replicates per world with fixed seeds. Measured on the default branch before every axis had a domain (only the charge was flagged).
 
 - Load: the synthetic rifle-like load of the core powder fit tests (0.6 m barrel, 6.9 mm bore), burn coefficient 0.45 1/s as truth. The fit starts at 0.38 and fits the burn coefficient only (the default).
 - Ladders: "narrow", 5 charges from 2.2 to 2.6 g, velocity noise 4 m/s (1 sigma, given as `velocitySigma`, so the normal quantile at level 0.9); "narrow+p", the same with pressure rows of 5 % uncertainty; "wide", 6 charges from 1.9 to 2.7 g; "two-barrels", the narrow charges at 0.5 and 0.6 m.
@@ -25,7 +25,7 @@ Synthetic ladders from the [M3 model](../models/interior-m3.md), fitted with `fi
   - bore diameter: fitted at 6.9 mm, predicted for a geometrically similar cartridge (length, area, chamber volume, charge and bullet mass scaled by the diameter ratio, 2.5 to 30 %), one scaling rule among many;
   - velocity and pressure are outputs: every charge prediction is binned by the distance of its predicted value outside the values of the ladder.
 - Metric per cell: the share of true values inside the 90 % interval, and the factor on the standard uncertainty that would give 90 %.
-- Accept rule for a margin, set before the run: the largest tested distance at which the coverage stays within 5 points of its in-range value or at least 85 %. The worlds `inputs` and `structure-mild` set the margin; `structure` is a sensitivity case.
+- Accept rule for a margin: the largest tested distance at which the coverage stays within 5 points of its in-range value or at least 85 %. The worlds `inputs` and `structure-mild` set the margin; `structure` is a sensitivity case.
 
 Reproduce: `node spikes/339/extrapolation.mts --reps 200 --worlds <world> --out spikes/339/out/<world>`, summaries with `node spikes/339/summarise.mts`, from commit `7ba7ae843753079d8e7926fb0b30dc766603b712` (on the unmerged branch `spike/339-powder-fit-margin`, with every table in `spikes/339/tables.md` and the raw cells in `spikes/339/out/`). Node runs the sources of `packages/core` directly.
 
@@ -127,7 +127,7 @@ Margins by the accept rule:
 
 ## Result
 
-No change. No margin keeps the interval at its stated level outside the fitted range once any model error is present, so the flag belongs at the range edge (margin 0, a rounding tolerance of 2.5 % above for barrel length and bore diameter at most) and the interval outside the range needs widening instead. Adopted after this entry: `powderDomainMargin` is 0 on every axis (it was 0.05), with a tolerance of 2.5 % above for barrel length and bore diameter. Proposed and not built: a fixed-input term for the velocity interval, as `powderPressureRange` has for the pressure; a model-error term that grows with the distance outside the range, sized from the factors above (in `structure-mild` 1.7 inside, 2.1 at +1 %, 2.6 at +5 %, 3.1 at +10 %, 3.9 at +25 %), whose size needs real sessions.
+No change. No margin keeps the interval at its stated level outside the fitted range once any model error is present, so the flag belongs at the range edge and the interval outside the range needs widening instead. Adopted after this entry: `powderDomainMargin` is 0 on every axis (it was 0.05), with a rounding tolerance of 2.5 % above for barrel length and bore diameter. Proposed and not built: a fixed-input term for the velocity interval, as `powderPressureRange` has for the pressure; a model-error term that grows with the distance outside the range, sized from the `structure-mild` factors $k_{90}$ above, whose size needs real sessions.
 
 ## Data basis
 

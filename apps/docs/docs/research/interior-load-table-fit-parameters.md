@@ -11,7 +11,7 @@ Interior ballistics, load-table powder fit: which parameters should be fitted pe
 
 ## Method
 
-M3 with the vivacity law and the two-stage form. Three candidates, fixed before the fit:
+M3 with the vivacity law and the two-stage form. Three candidates:
 
 - A: vivacity only.
 - B: vivacity and energy, the energy with a log-normal prior (sigma 0.1 for single and double base, 0.15 for an unknown base, from the thermochemistry range where one exists, at least 0.02).

@@ -11,13 +11,13 @@ Exterior ballistics, [stability](../models/exterior-stability.md): the trajector
 
 ## Method
 
-Three comparisons on the same flights, decided before the run.
+Three comparisons on the same flights, fixed before the run.
 
-1. Named cases: two .224 in loads that the warning flagged, three .308 in and 7.82 mm loads, and a 9.5 g 7.82 mm case. A bullet length that the case does not state was solved from its stated Miller value at the muzzle (standard sea-level air). A G7 ballistic coefficient was solved so that the stated speed or stated along-path value is reproduced; where nothing is stated the length and coefficient are assumed and marked.
-2. A synthetic grid of 144 bullets: calibres .224, .243, .264, .284, .308 and .338 in, sectional density 0.15, 0.20, 0.25 and 0.30 lb/in², twist 30, 40 and 54 calibres per turn, muzzle speed 2400 and 3300 ft/s. Mass is the sectional density times the squared calibre. Length is the mass over an effective density of 7600 kg/m³ times the cross-section (a jacketed lead-core bullet with an ogive and a boat tail). The G7 coefficient is the sectional density over a form factor of 1.1. Each bullet is flown over 0 to 1500 m in 25 m steps at standard sea-level air, zeroed at 100 m, once with the coefficient as stated and once at 80 and 120 percent of it.
-3. The factor of the modified point mass with the constant moment slope it estimates from Miller's muzzle value ([modified point mass](../models/exterior-modified-point-mass.md)) and a spin damping coefficient of $-0.012$, computed from the speed, spin and air density of each point, against the along-path Miller value. The mean absolute difference is taken over 0 to 1000 m in 25 m steps.
+1. Named cases: two .224 in loads that the warning flagged, three .308 in and 7.82 mm loads, and a 9.5 g 7.82 mm case. An unstated bullet length is solved from the stated Miller value at the muzzle (standard sea-level air), and the G7 ballistic coefficient so that the stated speed or along-path value is reproduced; where nothing is stated, both are assumed and marked.
+2. A synthetic grid of 144 bullets: calibres .224, .243, .264, .284, .308 and .338 in, sectional density 0.15, 0.20, 0.25 and 0.30 lb/in², twist 30, 40 and 54 calibres per turn, muzzle speed 2400 and 3300 ft/s. Mass is sectional density times squared calibre; length is mass over (7600 kg/m³ times the cross-section), the effective density of a jacketed lead-core boat-tail bullet; the G7 coefficient is sectional density over a form factor of 1.1. Each bullet is flown over 0 to 1500 m in 25 m steps at standard sea-level air, zeroed at 100 m, once with the coefficient as stated and once at 80 and 120 percent of it.
+3. The factor of the modified point mass ([modified point mass](../models/exterior-modified-point-mass.md)), with the constant moment slope it estimates from Miller's muzzle value, a spin damping coefficient of $-0.012$ and the speed, spin and air density of each point, against the along-path Miller value. The mean absolute difference is taken over 0 to 1000 m in 25 m steps.
 
-Accept rule: if the old method flags at least one of the ordinary .224 cases while the state-based factor flags none, the along-path warning is dropped; if it flags none of them, it is kept and relabelled. Bullets with a muzzle value below 1 are left out of the grid counts: the muzzle check already covers them and both methods flag them at 0 m.
+Accept rule: if the old method flags at least one ordinary .224 case and the state factor none, the along-path warning is dropped; if it flags none, it is kept and relabelled. Bullets below 1 at the muzzle are left out of the grid counts: the muzzle check covers them and both methods flag them at 0 m.
 
 ## Formulas
 
@@ -33,7 +33,7 @@ The old value is Miller's rule with the local speed and air: $S_g(x) \propto v(x
 
 ## Numbers
 
-All lengths and coefficients below are the stated or solved ones of the Method. "Old" is the first point of the 25 m grid where Miller's rule with the local speed and air is below 1; "state" is the factor above.
+"Old" is the first point of the 25 m grid where Miller's rule with the local speed and air is below 1; "state" is the modified point mass factor.
 
 | Case | Length (mm) | G7 BC (lb/in²) | Muzzle | Old value at the stated range | Old flag, BC −20 % / as set / +20 % (m) | State flag | Mean abs. difference 0–1000 m |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -45,11 +45,11 @@ All lengths and coefficients below are the stated or solved ones of the Method. 
 | 9.5 g 7.82 mm, 830 m/s, 12 in (length assumed) | 28.5 | 0.199 | 1.89 | 1.71 at 300 m | none | none | 3.1 |
 | 11.34 g 7.82 mm, 790 m/s, 10 in | 31.2 | 0.276 | 2.46 | 2.17 at 500 m, 1.86 at 1000 m | none | none | 2.3 |
 
-The stated values are reproduced: 0.97 and 0.98 at the stated ranges (the 25 m grid flags both at 0.99, at 575 and 850 m, a step before the stated range), 1.38 and 1.21 at 600 and 1000 yd at 1503 and 1021 ft/s (stated 1019 ft/s), and 2.17 and 1.86 for the last case (stated 2.17 and 1.85). The 9.5 g case reproduces the fall of the speed by 26 percent over 300 m and the fall of the old value by 9.6 percent. Two stated figures differ. The spin falls by 4 percent over 300 m only with a damping coefficient of about $-0.0055$, which gives a state factor $1.68$ times its muzzle value at 300 m (stated: 67 percent more); at the common $-0.012$ the spin falls by 8.5 percent and the factor rises by 52 percent. The state factor of the 168 gr case is 3.73 at 600 yd and 6.67 at 1000 yd over a muzzle value of 1.66, against 3.5 and 5.7 over 1.70 from an integration with a moment slope that varies with Mach number; a constant slope has no rise toward Mach 1 to hold the ratio down.
+Stated values reproduced: 0.97 and 0.98 at the stated ranges (the 25 m grid flags both at 0.99, at 575 and 850 m, a step before the stated range), 1.38 and 1.21 at 600 and 1000 yd at 1503 and 1021 ft/s (stated 1019 ft/s), and 2.17 and 1.86 for the last case (stated 2.17 and 1.85). The 9.5 g case reproduces the fall of the speed by 26 percent over 300 m and the fall of the old value by 9.6 percent. Two stated figures differ. The spin falls by 4 percent over 300 m only with a damping coefficient of about $-0.0055$, which gives a state factor $1.68$ times its muzzle value at 300 m (stated: 67 percent more); at the common $-0.012$ the spin falls by 8.5 percent and the factor rises by 52 percent. The state factor of the 168 gr case is 3.73 at 600 yd and 6.67 at 1000 yd over a muzzle value of 1.66, against 3.5 and 5.7 over 1.70 from an integration with a moment slope that varies with Mach number; a constant slope has no rise toward Mach 1 to hold the ratio down.
 
-With the moment-slope table of the last case (3.5 at Mach 0.7, 3.6 at 1.0, 3.0 at 1.4, 2.6 at 2.2), the state factor relative to its muzzle value is 1.21 at 250 m, 1.48 at 500 m, 2.35 at 1000 m and 2.78 at 1500 m. It does not dip below the muzzle value there either: the table rises by a ratio of 1.4 between Mach 2.3 and Mach 1.0, less than the gain from the speed.
+With the moment-slope table of the last case (3.5 at Mach 0.7, 3.6 at 1.0, 3.0 at 1.4, 2.6 at 2.2), the state factor relative to its muzzle value is 1.21 at 250 m, 1.48 at 500 m, 2.35 at 1000 m and 2.78 at 1500 m. It does not dip below the muzzle value: the table rises by a ratio of 1.4 between Mach 2.3 and Mach 1.0, less than the gain from the speed.
 
-Grid of 144 bullets, of which 30 are below 1 at the muzzle and left out, leaving 114:
+Grid: 144 bullets, 30 below 1 at the muzzle left out, 114 counted:
 
 | BC | Flagged by the old method | Flagged by the state factor | First flag, min / median / max (m) | Mean abs. difference 0–1000 m |
 | --- | --- | --- | --- | --- |
@@ -57,17 +57,17 @@ Grid of 144 bullets, of which 30 are below 1 at the muzzle and left out, leaving
 | as set | 25 | 0 | 175 / 775 / 1425 | 5.4 |
 | 120 % | 21 | 0 | 200 / 825 / 1500 | 3.8 |
 
-Decision number: 2 of 2 ordinary .224 in cases flagged by the old method (at 575 m and 850 m), 0 by the state factor, and 25 of 114 grid bullets against 0.
+Decision number: the old method flags 2 of 2 ordinary .224 in cases (575 m and 850 m) and 25 of 114 grid bullets; the state factor flags 0 and 0.
 
 ## Result
 
-Improved. Adopted: the along-path flag is removed (`firstLowStability`, `minStability`, the `lowStability` field of the web result and the line in the result notes), and the model page states that the result carries Miller's factor at the muzzle only and why. The muzzle value and the transonic-range line stay. The cost: a bullet that really loses stability near Mach 1 gets no flag from the path; the model page says so in one sentence.
+Improved. The along-path flag is removed (`firstLowStability`, `minStability`, the `lowStability` field of the web result and its line in the result notes); the model page states that the result carries Miller's factor at the muzzle only, and why. The muzzle value and the transonic-range line stay. Cost: a bullet that really loses stability near Mach 1 gets no flag from the path, which the model page states.
 
-Not built: the state factor with a moment-slope table (option c). Bullet records carry no moment-slope table, so it would fire on nothing, and the way back is to add it when records carry one.
+Not built: the state factor with a moment-slope table (option c). Bullet records carry no such table, so it would fire on nothing; add it when they do.
 
 ## Data basis
 
-Analytic: closed-form scalings and a synthetic grid with stated lengths and coefficients. No measured onset of instability along a flight is in the repository, so the comparison says what the old value tracks, not where a given bullet becomes unstable.
+Analytic: closed-form scalings and a synthetic grid with stated lengths and coefficients. The repository holds no measured onset of instability along a flight, so the comparison shows what the old value tracks, not where a given bullet becomes unstable.
 
 ## Where in the app
 

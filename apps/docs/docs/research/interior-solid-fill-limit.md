@@ -11,7 +11,7 @@ Interior ballistics: at which fraction of the chamber volume filled by solid pro
 
 ## Method
 
-The limit was set from the random close packing of equal spheres, the fill that free grains reach, and then checked in code against two consumers: the load ratio at the limit (`fillLoadRatioLimit`) and the charge ceiling of the charge solver. The checks use a solid density of 1600 kg/m³, a bulk density of 900 kg/m³ and the standard test chamber of $3.4 \cdot 10^{-6}$ m³. The accept limit is agreement to 12 digits.
+The limit is the random close packing of equal spheres, the fill that free grains reach, checked in code against two consumers: the load ratio at the limit (`fillLoadRatioLimit`) and the charge ceiling of the charge solver. The checks use a solid density of 1600 kg/m³, a bulk density of 900 kg/m³ and the standard test chamber of $3.4 \cdot 10^{-6}$ m³. The accept limit is agreement to 12 digits.
 
 ## Formulas
 
@@ -36,7 +36,7 @@ No change. Adopted: the limit of 0.64 for grains of every shape, a choice of the
 
 ## Data basis
 
-Public: the packing density of a published measurement of equal spheres. The grain shapes of powders are not spheres, and no measurement of their packing is in the repository.
+Public: the packing density of a published measurement of equal spheres; no measurement of powder grain packing is in the repository.
 
 ## Where in the app
 

@@ -118,7 +118,7 @@ export const powderSpecs: readonly PowderSpec[] = [
     'density',
     'density',
     'properties',
-    msg('Mass per volume of uncompressed powder, voids between the grains included.'),
+    msg('Mass per volume of loose powder, voids included.'),
   ),
   spec(
     'thermochemistry.loadingDensity.value',
@@ -126,16 +126,14 @@ export const powderSpecs: readonly PowderSpec[] = [
     'density',
     'density',
     'thermochemistry',
-    msg('The loading density of the constant-volume burning the values below are for.'),
+    msg('Loading density of the constant-volume burn the values below apply to.'),
   ),
   ...range(
     'flameTemperature',
     [msg('Flame temperature value'), msg('Flame temperature min'), msg('Flame temperature max')],
     'temperature',
     'absoluteTemperature',
-    msg(
-      'Flame temperature of the constant-volume burning, with its extremes over the composition ranges.',
-    ),
+    msg('At constant volume; min and max over the composition ranges.'),
   ),
   ...range(
     'impetus',
@@ -149,14 +147,14 @@ export const powderSpecs: readonly PowderSpec[] = [
     [msg('Gamma value'), msg('Gamma min'), msg('Gamma max')],
     'ratio',
     'dimensionless',
-    msg('Frozen ratio of specific heats at the flame temperature, with its extremes.'),
+    msg('Frozen ratio of specific heats at the flame temperature.'),
   ),
   ...range(
     'molarMass',
     [msg('Molar mass value'), msg('Molar mass min'), msg('Molar mass max')],
     'molarMass',
     'molarMass',
-    msg('Mean molar mass of the combustion gas, with its extremes.'),
+    msg('Mean molar mass of the combustion gas.'),
   ),
   ...range(
     'covolume',
@@ -178,7 +176,7 @@ export const powderSpecs: readonly PowderSpec[] = [
   burn(
     'interior.energy.value',
     msg('Specific energy'),
-    msg('Specific energy of the powder at constant volume.'),
+    msg('At constant volume.'),
     'specificEnergy',
     'specificEnergy',
   ),
@@ -219,14 +217,14 @@ export const powderSpecs: readonly PowderSpec[] = [
   burn(
     'interior.startPressure.value',
     msg('Start pressure'),
-    msg('Pressure at which the bullet starts to move. Empty: the default of the solver.'),
+    msg('Pressure at which the bullet starts to move. Empty: solver default.'),
     'pressure',
     'pressure',
   ),
   burn(
     'interior.propellantTemperature.value',
     msg('Propellant temperature'),
-    msg('Temperature of the propellant the parameters were fitted at.'),
+    msg('Temperature the parameters were fitted at.'),
     'temperature',
     'temperature',
   ),

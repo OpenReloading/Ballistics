@@ -169,9 +169,7 @@ export function RangeMode() {
           <EmptyNote
             icon={<Gauge size={32} aria-hidden="true" />}
             title={t('No saved loads in this browser')}
-            description={t(
-              'Save a load in the workbench while you are online, then open it here at the range.',
-            )}
+            description={t('Save a load in the workbench while online, then open it here.')}
             action={
               <Button component={Link} href="/workbench" mih={target}>
                 {t('Open the workbench')}

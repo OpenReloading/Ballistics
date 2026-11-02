@@ -285,8 +285,8 @@ function collectFindings(bundle: Bundle, cartridges: Map<string, Cartridge>): Lo
 
 /**
  * Reads, validates and cross-checks every record under `root`, or under each of several roots read
- * as one set (the first holds every kind directory; the `load-tables.json` of every root lists tables). Without
- * `root` it reads the `records/` folder of a repository checkout; the npm package ships none, so
+ * as one set (the first holds every kind directory; the `load-tables.json` of every root lists
+ * tables). Without `root` it reads the `records/` folder of a repository checkout; the npm package ships none, so
  * there it throws: pass the `records/` folder of a checkout, or read `bundle.json` instead.
  */
 export function readRecords(root: string | readonly string[] = recordsDir): ReadRecordsResult {

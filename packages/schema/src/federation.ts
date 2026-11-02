@@ -135,7 +135,7 @@ export const disciplineRules = z.strictObject({
   ...courseOfFire,
 })
 
-/** The rule facts of a discipline: firearm, position, sights, firearm limits, ammunition and course of fire. */
+/** The rule facts of a discipline. */
 export interface DisciplineRules extends z.infer<typeof disciplineRules> {}
 
 /**
@@ -185,7 +185,7 @@ export const discipline = z.strictObject({
   provenance,
 })
 
-/** A discipline record of one federation: distance in mm, caliber classes, equivalent international discipline. */
+/** A discipline record of one federation, distance in mm. */
 export interface Discipline extends z.infer<typeof discipline> {}
 
 /**
