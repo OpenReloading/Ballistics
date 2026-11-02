@@ -271,7 +271,6 @@ function PhotoTool({
   })
   const { cursor } = pointer
 
-  // the picture
   useEffect(() => {
     const g = shown.current?.getContext('2d')
     if (!(g && p.photo.current && p.tint.current)) return

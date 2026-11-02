@@ -8,8 +8,7 @@ export const titleFromKebab = (value: string) =>
 /**
  * Stored values of the schema's enumerations that a record page shows as words, by the form the page
  * writes them in: as stored (`rawWording`), with spaces for hyphens (`spacedWording`) or capitalised
- * with spaces (`titleWording`). The English text of each message is the text the page showed before
- * the language was a setting. A value no message names (a later schema value, or one left
+ * with spaces (`titleWording`). A value no message names (a later schema value, or one left
  * untranslated on purpose) shows as published, in the same form.
  */
 

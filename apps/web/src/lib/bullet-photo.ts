@@ -331,9 +331,10 @@ export const morphN = (mask: Uint8Array, w: number, box: Box, erode: boolean, n:
 
 /**
  * The width the grey takes to go from the background to the bullet at the edge of `mask`, px: the
- * contrast over the steepest slope, its upper quartile along the boundary (a shadow lies along one side only). A step blurred by a Gaussian of
- * standard deviation s has its 10 to 90 % rise over about 2.5 s, which is that ratio; a sharp
- * edge reads 1 to 2 px, a shadow or an out-of-focus edge much more.
+ * contrast over the steepest slope, its upper quartile along the boundary (a shadow lies along one
+ * side only). A step blurred by a Gaussian of standard deviation s has its 10 to 90 % rise over
+ * about 2.5 s, which is that ratio; a sharp edge reads 1 to 2 px, a shadow or an out-of-focus edge
+ * much more.
  */
 function edgeSpreadOf(
   flat: Float32Array,

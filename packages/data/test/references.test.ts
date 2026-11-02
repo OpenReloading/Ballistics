@@ -29,7 +29,6 @@ const bundle = (parts: object = {}) =>
     ...parts,
   }) as unknown as Bundle
 
-/** The errors of `check` over `b`. */
 const errorsOf = (check: (errors: string[]) => void) => {
   const errors: string[] = []
   check(errors)

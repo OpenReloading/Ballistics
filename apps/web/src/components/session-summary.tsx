@@ -267,7 +267,6 @@ function Headline({
   )
 }
 
-/** One string's row of the statistics table. */
 function StatsRow({
   name,
   st,

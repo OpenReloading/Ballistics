@@ -549,8 +549,6 @@ export function CartridgeDesigner() {
     [system, dispatch],
   )
 
-  // New bullet or cartridge starts a new record
-
   const toolbar = (
     <DesignerToolbar
       undo={history.past.length > 0}

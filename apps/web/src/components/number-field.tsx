@@ -423,14 +423,11 @@ export function NumberField({
   const actionText = action && at(action.text)
   const marker =
     action || flag ? <FieldMarker action={action} actionText={actionText} flag={flag} /> : undefined
-  // a flag that repeats the help is not said twice
   const describedBy = describedByOf(helpText, markText, flag)
   const units = unitList(spec.quantity)
   const switchable = unit === 'switch' && units.length > 1
-  // the longest symbol of the quantity: switching does not change the width of the suffix
   const longest = Math.max(...units.map(([, u]) => u.symbol.length))
   const common = {
-    // the unit shows once, as the field's suffix; the label keeps it for screen readers
     label: fieldLabel(specLabel, label),
     description: describedBy,
     // the dense workbench grid hides the description: the label shows it on hover
@@ -439,7 +436,6 @@ export function NumberField({
     placeholder: typeof placeholder === 'function' ? placeholder(shown) : placeholder,
     withAsterisk: false,
     error: refused ?? at(error),
-    // a twist typed as "8" or "1 in 8" reads "1:8" once the field is left
     onBlur: () => {
       setRefused(undefined)
       if (value.si !== undefined) setDraft(undefined)

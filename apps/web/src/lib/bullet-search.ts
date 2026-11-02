@@ -1,8 +1,7 @@
 /**
  * The bullet picker's search, the dialog's, the card's field's and Ctrl+K's: the schema's word
- * matcher over each bullet's text (`bulletScore`), the picker's filters, results
- * ordered by how well each bullet matches the typed words, and the whole catalogue read once per
- * page load.
+ * matcher over each bullet's text (`bulletScore`), the picker's filters, results ordered by how well
+ * each bullet matches the typed words, and the whole catalogue read once per page load.
  */
 import { bulletFits, type CartridgeDiameters } from '@open-reloading/core'
 import { compareKeys, fold, sortKey } from '@open-reloading/schema'

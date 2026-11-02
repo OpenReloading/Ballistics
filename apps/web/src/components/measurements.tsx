@@ -39,8 +39,7 @@ import { PanelTable } from './scroll-region.tsx'
 import { ErrorNote } from './states.tsx'
 import { useResult } from './workbench-context.ts'
 
-/** A step of the last run as the Measurements tab needs it. */
-/** `label`: the step relative to the main charge. */
+/** A step of the last run as the Measurements tab needs it; `label` is the step relative to the main charge. */
 type MeasuredStep = SimulatedStep & { n: number; label?: string | undefined }
 
 const columns = [

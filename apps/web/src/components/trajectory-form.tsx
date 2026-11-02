@@ -436,7 +436,6 @@ function ResultNotes({ result, system }: { result: Result; system: UnitSystem })
   )
 }
 
-/** The trajectory table of a result. */
 function ResultTable({ result, system }: { result: Result; system: UnitSystem }) {
   const { t } = useTranslation()
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
@@ -1424,7 +1423,7 @@ export function TrajectoryForm({
     }
   }, [loadSight, ...loadZeroAir, loadFactor, loadFactorSource])
   const loadBullet = load.bullet
-  /** The load has no bullet record: the tab offers its own bullet, as the former page did. */
+  /** The load has no bullet record: the tab offers its own bullet. */
   const own = !loadBullet
   const ownSight = loadSight === undefined && loadZero === undefined
   const lastBullet = useRef(loadBullet)

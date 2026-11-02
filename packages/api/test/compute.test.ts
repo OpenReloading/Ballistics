@@ -125,7 +125,6 @@ const json = (value: unknown) => JSON.parse(JSON.stringify(value))
 
 const ranges = [0, 100, 200, 300, 500]
 
-/** The API defaults of `POST /interior`. */
 describe('POST /exterior/trajectory', () => {
   it('returns the core trajectory for the same input', async () => {
     const { status, body } = await post(`${API_PREFIX}/exterior/trajectory`, { shot, ranges })

@@ -200,7 +200,6 @@ function layoutLanes(placer: Placer, frontOnAxis: boolean) {
     rMax + lane0 + Math.max(heads.length * pitch, acrossDims.length ? diameterW + lane0 : 0)
   const farOuter = farBase + Math.max(far.length - 1, 0) * pitch
 
-  // first every line whose place is fixed, then their labels, so each label sees all of them
   const pending: (() => void)[] = []
   // the length stack on +r, its labels inside the part side of the rules, at one row where they fit
   const band =

@@ -1,6 +1,7 @@
 /**
- * Burn-rate charts from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`, "Dynamic vivacity"): dynamic vivacity
- * in 1/(MPa s), interval plus and minus `uncertaintyFactor` standard uncertainties of the fitted vivacity.
+ * Burn-rate charts from fitted M3 parameters (`apps/docs/docs/models/interior-burn-forms.md`,
+ * "Dynamic vivacity"): dynamic vivacity in 1/(MPa s), interval plus and minus `uncertaintyFactor`
+ * standard uncertainties of the fitted vivacity.
  */
 
 import { dynamicVivacity, meanDynamicVivacity, type VivacityBurn } from '@open-reloading/core'

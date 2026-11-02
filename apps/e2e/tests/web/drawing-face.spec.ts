@@ -131,7 +131,6 @@ test('a tall figure fits the window, no smaller than 11 px text', async ({ page 
   // the figure is in millimetres until the page has read the stored units
   await page.waitForLoadState('networkidle')
   const cip = page.locator('main')
-  // the cartridge side's figure
   const drawing = cip
     .getByRole('region', { name: 'Cartridge', exact: true })
     .getByRole('group', { name: 'Outline, CIP 18 x 81', exact: true })

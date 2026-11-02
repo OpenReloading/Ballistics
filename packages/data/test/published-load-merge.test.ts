@@ -215,7 +215,6 @@ function recordsRoot() {
   return root
 }
 
-/** Writes `json` at `path` under `root`. */
 function write(root: string, path: string, json: unknown) {
   mkdirSync(dirname(join(root, path)), { recursive: true })
   writeFileSync(join(root, path), JSON.stringify(json))

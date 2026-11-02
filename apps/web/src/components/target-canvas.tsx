@@ -675,9 +675,9 @@ export function TargetCanvas({
   /** The outline of the active group's face in view units: a drawn target fits to it. */
   face?: Point[] | undefined
 }) {
-  // an id usable in url(#...) references
   const { system } = useUnits()
   const { t } = useTranslation()
+  // an id usable in url(#...) references
   const id = `tc${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
   const svg = useRef<SVGSVGElement>(null)
   const wrap = useRef<HTMLDivElement>(null)
@@ -688,7 +688,6 @@ export function TargetCanvas({
   const [dragging, setDragging] = useState(false)
   const [statsAt, setStatsAt] = useState({ x: 8, y: 8 })
 
-  /** The extent to fit: the photo, or every point drawn with a margin. */
   const extent = useMemo(() => extentOf(sheet, frame, photo, face), [photo, frame, sheet, face])
   const extentKey = `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
   // biome-ignore lint/correctness/useExhaustiveDependencies: fit once per photo and turn, not on every edit

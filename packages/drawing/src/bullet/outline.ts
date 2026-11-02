@@ -115,7 +115,6 @@ export interface Outline {
 /** Assumed boat-tail half angle, degrees, when the bullet gives only the tail length. */
 export const assumedBoatTailAngle = 8
 
-/** Whether the base type has a cavity. */
 const isHollow = (type: string | undefined) =>
   type === 'conical-hollow-base' || type === 'rounded-hollow-base'
 
@@ -135,7 +134,6 @@ const worst = (...tags: Tag[]): Tag =>
       ? 'derived'
       : (tags[0] ?? 'derived')
 
-/** A length in mm to 3 decimals. */
 const mm: LengthText = (x) => `${+x.toFixed(3)} mm`
 /** A length in mm written in `unit`: mm to 3 decimals, inches as the figure labels write them. */
 const inUnit = (unit: LengthUnit): LengthText =>

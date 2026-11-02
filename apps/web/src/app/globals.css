@@ -169,7 +169,7 @@ body {
   display: flow-root;
 }
 
-/* the phone top bar scrolls away with the page, as before the app shell; AppShell fixes it. From
+/* the phone top bar scrolls away with the page (AppShell fixes it). From
    75em it stays fixed over the page, as the sidebar does */
 @media (max-width: 74.99em) {
   .mantine-AppShell-header {
@@ -357,9 +357,6 @@ body {
   top: 0.5rem;
 }
 
-/* home: the full wordmark as the page's heading, the width of the content on a phone; paper is
-   light, so print takes the light one */
-/* a flex row, so the images are blocks without a display rule that would beat Mantine's scheme hiding */
 /* home: the lead line, then the Tools and Data cards in one row each (stacked on a phone): the
    icon left of the linked title, the text, then the card's button or count at its foot */
 .home-lead {
@@ -4896,7 +4893,6 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-/* workbench layout: input groups as property tables, keyed readouts, one toolbar row */
 .workbench .result-tablist .mantine-Tabs-tab {
   padding: 0.25rem 0.5rem;
 }
@@ -7011,7 +7007,6 @@ main .library-head.page-panel-head > .page-panel-title {
   }
 }
 
-/* database pages */
 /* The main is at least 100dvh tall; a print dialog that resolves dvh to more than the page
    area printed an empty second page after a one-page record or a short page */
 @media print {
@@ -12438,8 +12433,6 @@ main .symbol-table tbody th {
     text-decoration: none;
   }
 }
-
-/* print keeps the record sheet: no filters, no Description column (the meanings are on screen) */
 
 main .cartridge-values .dim-value {
   display: inline-block;

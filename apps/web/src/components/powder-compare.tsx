@@ -535,7 +535,6 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     asPercent,
   )
   const study = usePowderCompare(loadRequest, mode)
-  // another powder picked mid-run writes its parameters into the fields the later rows read
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
   const [filters, setFilters] = useState(noFilters)
   // Compute empties the rows and with them the facets the filters name
@@ -560,7 +559,6 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const forms = useMemo(() => distinctValues(study.rows, 'form'), [study.rows])
   const { progress, running, message } = study
   const failed = study.rows.filter((r) => !r.values).length
-  // the rows were computed for another load or charge than the fields hold now
   // `loadRequest` is a new function on each change of the load, so filter and sort changes skip it
   const stale = useMemo(
     () => isStale(loadRequest, mode, study.key, running),

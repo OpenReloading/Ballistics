@@ -1,8 +1,9 @@
 /**
  * What the outline of a bullet photograph says about whether the photograph can be measured
  * (`apps/docs/docs/models/bullet-photo.md`): the bullet's width in pixels, its proportions, a
- * shadow on one side, a typed axis off the bullet's and how ragged its sides are. Plain sentences for the user; a photograph too poor to measure gets no
- * values rather than wrong ones. Pure: no React, DOM or Next.js, so it can run in a Web Worker.
+ * shadow on one side, a typed axis off the bullet's and how ragged its sides are. Plain sentences
+ * for the user; a photograph too poor to measure gets no values rather than wrong ones. Pure: no
+ * React, DOM or Next.js, so it can run in a Web Worker.
  */
 import { msg } from '../i18n/translate.ts'
 import { shankOf } from './bullet-photo-measure.ts'

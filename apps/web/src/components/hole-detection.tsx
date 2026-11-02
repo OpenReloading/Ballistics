@@ -230,7 +230,6 @@ export function useHoleDetection({
     setFound(undefined)
     setResult(false)
   }, [turn])
-  // the record of the group's face
   const faceId = group?.face?.id
   useEffect(() => {
     setRecord(undefined)

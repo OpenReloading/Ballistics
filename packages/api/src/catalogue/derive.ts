@@ -252,7 +252,6 @@ export const caseRow = (
   ...componentKeys(m, { name: c.name, aliases: [c.productNumber] }),
 })
 
-/** The distinct defined values of `values`, sorted. */
 const distinct = (values: (string | undefined)[]) =>
   [...new Set(values.filter((v) => v !== undefined))].sort((a, b) => a.localeCompare(b, 'en'))
 

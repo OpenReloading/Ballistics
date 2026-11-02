@@ -6,7 +6,6 @@ import { nth } from './nth.ts'
 import type { LadderDirection } from './seating-ladder.ts'
 import { formatQuantity, type UnitSystem, unitsOf } from './units.ts'
 
-/** The barrel length study. */
 type Result = InteriorResponse['result']
 
 /** What a run gives: its points and the shot start the barrel time counts from. */
