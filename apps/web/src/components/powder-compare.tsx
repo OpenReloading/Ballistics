@@ -638,7 +638,6 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
     asPercent,
   )
   const study = usePowderCompare(loadRequest, mode)
-  // another powder picked mid-run writes its parameters into the fields the later rows read
   useCancelOnPick(powderDesign?.id, powder?.id, study.cancel)
   // the load keeps the mode and the filters; a filter stays while Compute fills the rows again
   const { filters, setFilters, maker, setMaker } = useKeptFilters(first, names)
@@ -674,7 +673,6 @@ export function PowderCompare({ system }: { system: UnitSystem }) {
   const csv = () => powderTableCsv(shown, target, system, t, reason)
   const { progress, running, message } = study
   const failed = study.rows.filter((r) => !r.values).length
-  // the rows were computed for another load or charge than the fields hold now
   // `loadRequest` is a new function on each change of the load, so filter and sort changes skip it
   const stale = useMemo(
     () => isStale(loadRequest, mode, study.key, running),

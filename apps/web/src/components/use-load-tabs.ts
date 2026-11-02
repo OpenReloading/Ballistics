@@ -77,7 +77,6 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
     tabs.map((tb) => (tb.key === active ? load.name : (tb.title ?? t('New load')))),
   )
 
-  /** The shown tab as a snapshot. */
   function snapshot(): Tab {
     const { load, tabs, active, unsaved } = live.current
     const menu = load.fileMenu.current

@@ -107,7 +107,6 @@ describe('groupStatistics: hand calculation', () => {
     close(c.sigma.upper, Math.sqrt(20 / lo8) * mm)
     close(c.radialStandardDeviation.lower, Math.SQRT2 * c.sigma.lower)
     close(c.cep.upper, Math.sqrt(2 * Math.LN2) * c.sigma.upper)
-    // the point estimate lies inside its interval
     expect(c.cep.lower).toBeLessThan(s.cep as number)
     expect(c.cep.upper).toBeGreaterThan(s.cep as number)
   })

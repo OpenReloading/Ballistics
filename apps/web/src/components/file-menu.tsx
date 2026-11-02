@@ -1047,8 +1047,7 @@ function FileMenuOf<K extends UserRecordKind>({
     return () => void shownManufacturerRefs.delete(key)
   }, [shownMaker])
 
-  // a share link: the record in the fragment, validated, opened as unsaved work
-  // on load, and on a link pasted into this tab (a fragment change, no reload)
+  // a share link opens on load and when pasted into this tab (a fragment change, no reload)
   // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
     if (!shareable.includes(kind)) return
@@ -1133,14 +1132,11 @@ function FileMenuOf<K extends UserRecordKind>({
     [],
   )
 
-  // unsaved work: the browser's leave-page prompt, a question before an in-app link or a router
-  // push or replace, and a guard history entry with this URL, so Back and Forward ask too
   useEffect(
     () => (unsaved ? guardLeaving(lineSetter(setLineSaid), () => latest.current.t) : undefined),
     [unsaved],
   )
 
-  // an autosaved record is kept in the browser until a file is written
   const state = stateText({ saved, dirty, autosaved, kept, unsaved }, t)
   const ready = folder?.allowed ? folder.handle : undefined
   // in a page bar the state and messages are its status line: one line, the whole text in its tooltip

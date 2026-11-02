@@ -8,7 +8,6 @@ import { percentile } from './stats.ts'
 /** Why a printed charge of a published load file gives no row. */
 export const skipReasons = ['noVelocity', 'customerTable', 'noPowderRecord', 'noCartridge'] as const
 
-/** One of {@link skipReasons}. */
 type SkipReason = (typeof skipReasons)[number]
 
 /** The rows of published load files and the charges left out, by reason. */

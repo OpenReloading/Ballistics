@@ -13,7 +13,6 @@ import {
 } from '../lib/api.ts'
 import { newestNews } from '../lib/news.ts'
 
-/** A list's record count. */
 async function Count({
   list,
 }: {

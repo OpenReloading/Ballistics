@@ -51,7 +51,6 @@ describe('solveCharge', () => {
     const target = valueAt(kind, charge)
     const s = solveCharge(base, { kind, value: target }, { bulkDensity })
     if (!s.reached) throw new Error(s.reason)
-    // the same run as a single interior call at the solved charge
     expect(s.run).toEqual(interior({ ...base, charge: s.charge }))
     expect(Math.abs(valueAt(kind, s.charge) - target)).toBeLessThanOrEqual(
       chargeSolverTolerance * target,

@@ -41,7 +41,6 @@ async function withDesigns<T>(
   catalogue: () => Promise<T[]>,
   designs: (faces: Face[]) => T[],
 ): Promise<T[]> {
-  // both reads start at once
   const [mine, listed] = await Promise.all([
     designFaces().then(designs),
     catalogue().then(

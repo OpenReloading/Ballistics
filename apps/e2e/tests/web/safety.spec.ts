@@ -74,7 +74,7 @@ test('the yellow Safety button of the top bar opens the Safety notice; print hid
       .getByRole('button', { name, exact: true })
       .locator('visible=true')
     await expect(button).toHaveText(label)
-    // light yellow, the caution note's colours: no longer the filled yellow of I accept
+    // light yellow, the caution note's colours, not the filled yellow of I accept
     await expect(button).toHaveCSS('background-color', 'rgb(255, 243, 191)')
     await expect(button).toHaveCSS('color', 'rgb(92, 68, 0)')
     await page.emulateMedia({ media: 'print' })

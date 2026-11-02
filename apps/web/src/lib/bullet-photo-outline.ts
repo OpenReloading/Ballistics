@@ -282,8 +282,7 @@ type Line = { a: number; b: number }
 
 /**
  * Each side's shank line `a + b z`, px, from where the shank starts up to its middle (at least 10
- * samples), and the larger standard uncertainty of the two slopes; undefined without sides or a shank. The shank is where the half width is within 3 % of
- * its widest.
+ * samples), and the larger standard uncertainty of the two slopes; undefined without sides or a shank.
  */
 function shankLines(o: Outline): { left: Line; right: Line; slopeError: number } | undefined {
   const sides = o.sides

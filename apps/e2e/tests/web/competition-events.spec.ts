@@ -42,7 +42,6 @@ const storedEvents = (page: Page) =>
     return all.filter((r) => r.kind === 'event').sort((a, b) => a.id.localeCompare(b.id))
   })
 
-/** Picks `option` in the select `name` of `scope`. */
 async function pick(page: Page, scope: ReturnType<Page['locator']>, name: string, option: string) {
   await scope.getByRole('combobox', { name }).click()
   await page.getByRole('option', { name: option, exact: true }).click()

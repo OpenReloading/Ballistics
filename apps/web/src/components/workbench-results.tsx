@@ -525,7 +525,6 @@ function PowdersPanel({ system }: { system: UnitSystem }) {
   return <PowderCompare key={powderTab.key} system={system} />
 }
 
-/** The panels of the result tabs. */
 function ResultPanels({ short }: { short: boolean }) {
   const { t } = useTranslation()
   const {
@@ -663,7 +662,6 @@ export const ResultsArea = memo(function ResultsArea() {
           {/* one line: the load and the notice; the run's time and the stale mark are in the page
               bar's status, and the status, which the readouts repeat, is for screen readers */}
           <RunLine ok={ok} identity={identity} status={status} echoed={echoed} />
-          {/* the results list with the chosen powder's burn rate beside it; an error in their place */}
           <ResultsHead
             outcome={outcome}
             ok={ok}

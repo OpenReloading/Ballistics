@@ -10,7 +10,6 @@ import type { Catalogue } from '../src/catalogue/types.ts'
 import type { ComputeRunner } from '../src/compute/tasks.ts'
 import { bundle } from './fixtures.ts'
 
-/** A data set without records. */
 const emptyBundle: Bundle = {
   cartridges: [],
   manufacturers: [],

@@ -134,7 +134,6 @@ describe('factors', () => {
 })
 
 describe('presets', () => {
-  // the preset table
   const table: [Quantity, string, string, string][] = [
     ['charge', 'gr', 'gr', 'g'],
     ['mass', 'gr', 'gr', 'g'],

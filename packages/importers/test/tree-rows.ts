@@ -1,9 +1,8 @@
 import { parseXml, type XmlElement } from '../src/xml.ts'
 import { defined } from './defined.ts'
 
-// Reference reader for the one-pass worksheet reader: the element-tree code that src/workbook.ts
-// used before it read shared strings and worksheets in one pass. Budgets and the cell column
-// checks are left out; the tests compare rows only.
+// Reference reader for the one-pass worksheet reader, built on the element tree of `parseXml`.
+// Budgets and the cell column checks are left out; the tests compare rows only.
 
 const elements = (e: XmlElement | undefined, name: string) =>
   (e?.children ?? []).filter((c): c is XmlElement => typeof c !== 'string' && c.name === name)

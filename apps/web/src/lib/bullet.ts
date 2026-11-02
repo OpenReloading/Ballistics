@@ -149,9 +149,9 @@ export function typedBullet<B extends Partial<Bullet>>(
 
 /**
  * The record's base with the typed form and dimensions in place, none where nothing differs. A form
- * keeps only what it can have (`bulletBase` in the schema): flat no dimension (its length is a boat tail's), a boat tail no
- * cavity. A typed dimension equal to the record's stays the record's; a typed length or diameter
- * leaves out the record's angle, which the outline derives from them.
+ * keeps only what it can have (`bulletBase` in the schema): flat no dimension (its length is a boat
+ * tail's), a boat tail no cavity. A typed dimension equal to the record's stays the record's; a
+ * typed length or diameter leaves out the record's angle, which the outline derives from them.
  */
 function typedBase(
   own: Bullet['base'],

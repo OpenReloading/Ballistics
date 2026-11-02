@@ -76,7 +76,6 @@ async function openSaved(page: Page, { name, values }: { name: string; values: s
   await runLine(page)
 }
 
-/** Opens the range page for the seeded load. */
 async function openRange(page: Page, id = loadId) {
   await gotoHydrated(page, `/range?load=${id}`)
   await expect(page.getByRole('group', { name: 'Number pad' })).toBeVisible()

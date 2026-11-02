@@ -91,7 +91,6 @@ export const m3Options = <T extends object>(maxSteps: number, options?: T) => ({
 /** Output points of one interior run at most (about 5 MB of JSON). */
 export const maxPoints = 20000
 
-/** An optional number from `min` to `max`. */
 const within = (min: number, max: number, text: string) =>
   z.number().min(min).max(max).describe(text).optional()
 const tol = pressureToleranceDefaults
@@ -429,7 +428,6 @@ export const interiorBody = interiorBase
     'One run of the M3 interior model with an optional sampled band, or a charge ladder, in SI units. Results are simulations, not load data.',
   )
 
-/** Above 0 and at most `max`. */
 const positive = (max: number) => z.number().positive().max(max)
 /** Bound of `propellant.bulkDensity`, kg/m3; also applied to the value of a powder record. */
 export const bulkDensityBound = positive(5000)

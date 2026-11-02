@@ -412,7 +412,6 @@ function scaleInteriorLoad(load: InteriorLoad) {
   const { energy: delta, breech: eps } = load.gradient ?? lagrangeGradient
   const me = mpr + delta * mc
 
-  // burn law
   const burn = propellant.burn
   const form = burnForm(burn)
   const tc = propellant.temperatureSensitivity
@@ -464,7 +463,6 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
   const { propellant } = load
   const { vc, area, d, xe, mc, k, eta, solid, e0, mpr, delta, eps, me, form, vr, ts } = s
 
-  // bore resistance
   const friction = load.resistance?.friction ?? 0
   const profile = load.resistance?.engraving ?? []
   const resistance = (x: number) => area * (friction + profileAt(profile, (pt) => pt.pressure, x))
@@ -481,7 +479,6 @@ function gasState(load: InteriorLoad, s: Scaling, phase: Phase) {
     .filter((x) => x < xe)
     .sort((a, b) => a - b)
 
-  // gas state
   const heat = load.heat ?? { model: 'none' }
   const gasR =
     heat.model === 'convective' ? ((k - 1) * propellant.specificEnergy) / heat.flameTemperature : 0

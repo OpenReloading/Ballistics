@@ -25,8 +25,8 @@ export const ManufacturerInput = memo(function ManufacturerInput({
   onChange: (ref: string | undefined) => void
   manufacturers: ReturnType<typeof useManufacturers>
 }) {
-  // undefined: not being edited, the field shows the name of `value`
   const { t } = useTranslation()
+  // undefined: not being edited, the field shows the name of `value`
   const [typed, setTyped] = useState<string>()
   const pending = useRef<string>(undefined)
   // Mantine calls onChange with the option's text right after onOptionSubmit

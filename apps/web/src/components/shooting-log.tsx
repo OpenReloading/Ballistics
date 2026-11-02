@@ -541,7 +541,6 @@ const entryRecord = (id: string, e: ShootingLogEntry, names: LogNames) => {
   }) as ShootingLogRecord
 }
 
-/** The table's columns. */
 function logColumns(
   names: LogNames,
   actions: (r: ShootingLogRecord, tabIndex?: number) => ReactNode,

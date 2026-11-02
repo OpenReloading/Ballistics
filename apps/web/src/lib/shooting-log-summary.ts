@@ -53,7 +53,6 @@ function cartridgeOfLoad(
   return load.data.cartridge ?? firearms.get(userIdOf(load.data.firearm) ?? '')?.data.cartridge
 }
 
-/** Adds `rounds` of one entry to the row of `ref`. */
 function add(rows: Map<string, SummaryRow>, ref: string, rounds: number) {
   const row = rows.get(ref) ?? { ref, rounds: 0, entries: 0 }
   row.rounds += rounds

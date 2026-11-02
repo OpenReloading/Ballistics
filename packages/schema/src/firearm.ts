@@ -78,9 +78,7 @@ export const opticMount = z.object({
     .optional(),
 })
 
-/** A count of shots, at least 1. */
 const shots = () => z.int().positive().max(10000)
-/** A number of turret clicks. */
 const clicks = (s: z.ZodNumber) => s.meta({ unit: '1' })
 
 /**
