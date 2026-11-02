@@ -372,7 +372,9 @@ function useTargetText(first: PowderTabState, percent: boolean, system: UnitSyst
     setShown(system)
     setTarget(switchedTarget({ ...target, percent }, shown, system))
   }
-  const setTargetText = (targetText: number | string) => setTarget((s) => ({ ...s, targetText }))
+  // a typed value is read in the shown unit: the pressure kept from a unit switch no longer applies
+  const setTargetText = (targetText: number | string) =>
+    setTarget({ targetText, targetKept: undefined })
   return { ...target, setTargetText }
 }
 
