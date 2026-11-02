@@ -157,7 +157,7 @@
               "printed": {
                 "type": "string",
                 "minLength": 1,
-                "description": "The primer as printed, `RWS 5333 und 5341` whole."
+                "description": "The primer as printed, `Demo 101 und 102` whole."
               },
               "records": {
                 "minItems": 1,
