@@ -31,6 +31,8 @@ import { shortName } from '../lib/load-tabs.ts'
 import { sampler } from '../lib/playback.ts'
 import { powderDesignNote } from '../lib/powder-designer.ts'
 import { loadFitMark } from '../lib/powder-record.ts'
+import { printedField, printedValue } from '../lib/print-format.ts'
+import type { PrintChoice } from '../lib/print-sections.ts'
 import { inputsQuery, withRecordValues, withTab } from '../lib/query.ts'
 import { seatingLengthName } from '../lib/seating-ladder.ts'
 import { shortcutAriaKeys, shortcutLabel, shortcuts } from '../lib/shortcuts.ts'
@@ -46,6 +48,7 @@ import { LoadTabs } from './load-tabs.tsx'
 import { LotChartBlock, preloadLotChart } from './lot-rows.tsx'
 import { PageBar } from './page-bar.tsx'
 import { PrintReport } from './print-report.tsx'
+import { PrintSectionItems, usePrintChoice } from './print-sections.tsx'
 import { useReportOptions } from './report-host.ts'
 import { SavedLoads, useExportReminder } from './saved-loads.tsx'
 import type { ScanLabelDialog } from './scan-label-dialog.tsx'
@@ -106,14 +109,14 @@ function seatingRow(
     return [
       name,
       k === (ok?.ladder.seatingBy ?? 'overallLength')
-        ? t('{value}, set', { value: shownLength('diameter', system, stepSeating.value) })
+        ? t('{value}, set', { value: printedValue('length', system, stepSeating.value) })
         : undefined,
     ]
   const v = runSeated?.[k]
   // a seated bullet without a base-to-ogive prints why CBTO is missing
   if (v === undefined)
     return [name, runSeated?.mode ? t('needs the bullet base-to-ogive') : undefined]
-  const value = shownLength('diameter', system, v)
+  const value = printedValue('length', system, v)
   if (!runSeated?.mode) return [name, value]
   return [
     name,
@@ -143,7 +146,10 @@ function approximateNote(ok: OkOutcome | undefined, t: Translate) {
 /** A field as the print shows it: its label and its value with the unit; none while empty. */
 function printRow(load: Load, key: string, t: Translate): [string, string | undefined] {
   const spec = interiorFields.find((f) => f.key === key)
-  return [spec ? specText(t, spec.label) : key, spec && load.shown(key, spec.quantity)]
+  return [
+    spec ? specText(t, spec.label) : key,
+    spec && printedField(spec.quantity, load.system, load.fields[key]),
+  ]
 }
 
 function cartridgePrintRows(
@@ -179,16 +185,25 @@ function cartridgePrintRows(
         : undefined,
     ],
     ...seatingRows,
-    [t('Seating depth'), depth === undefined ? undefined : shownLength('diameter', system, depth)],
+    [t('Seating depth'), depth === undefined ? undefined : printedValue('length', system, depth)],
   ] as PrintRows
 }
 
 function bulletPrintRows(load: Load, t: Translate): PrintRows {
-  const { bulletLabel, bulletDesign, bulletValues, siLength, bc } = load
+  const { bulletLabel, bulletDesign, bulletValues, bc, system, typedBulletFields } = load
+  // a typed value prints as typed (.30857 in); a record's with the field's decimals
+  const length = (key: 'bulletDiameter' | 'bulletLength') => {
+    const si = bulletValues[key]
+    if (si === undefined) return
+    const typed = typedBulletFields[key]
+    return typed?.si === si
+      ? printedField('length', system, typed)
+      : printedValue('length', system, si)
+  }
   return [
     [t('Bullet'), bulletLabel ?? bulletDesign?.name],
-    [t('Diameter'), siLength(bulletValues.bulletDiameter)],
-    [t('Length'), siLength(bulletValues.bulletLength)],
+    [t('Diameter'), length('bulletDiameter')],
+    [t('Length'), length('bulletLength')],
     [t('Ballistic coefficient'), bc && `${bc.dragModel} ${plainNumber(bc.value)}`],
     printRow(load, 'bulletMass', t),
   ]
@@ -305,6 +320,10 @@ type ReportProps = {
   printGroups: [string, PrintRows][]
   stepValue: (s: ShownStep) => string
   warnings: ReturnType<typeof warningLines> | undefined
+  /** The sections the reader chose to print (the chart: `usePrintChoice`'s print rule). */
+  sections: PrintChoice
+  /** The main charge as its field shows it, while the run is of that charge. */
+  mainCharge?: string | undefined
   t: Translate
 }
 
@@ -318,6 +337,7 @@ function ReportAfter({
   barrelError,
   notes,
   system,
+  sections,
   t,
 }: ReportProps) {
   const study =
@@ -330,7 +350,7 @@ function ReportAfter({
     )
   return (
     <>
-      {steps.length > 1 && (
+      {steps.length > 1 && sections.ladder && (
         <>
           <h2>{ladderName(ok, t)}</h2>
           {ladderTable}
@@ -340,10 +360,14 @@ function ReportAfter({
           <LotChartBlock lot={lot} system={system} note={false} />
         </>
       )}
-      <h2>{t('Barrel length')}</h2>
-      {study}
-      <LimitsView body={ok.body} printed />
-      {notes && (
+      {sections.barrel && (
+        <>
+          <h2>{t('Barrel length')}</h2>
+          {study}
+        </>
+      )}
+      {sections.limits && <LimitsView body={ok.body} printed />}
+      {notes && sections.notes && (
         <>
           <h2>{t('Notes')}</h2>
           <p>{notes}</p>
@@ -353,10 +377,27 @@ function ReportAfter({
   )
 }
 
+/** The charge field's text (37.04 gr) while the run's main charge is that value; none otherwise. */
+function mainChargeText(load: Load, ok: OkOutcome | undefined) {
+  const typed = load.fields.charge
+  // the title is the main step's only: then the shown run is the main charge's
+  const main = ok?.load.charge
+  if (typed?.si === undefined || main === undefined) return
+  return Math.abs(typed.si - main) <= 1e-9 * main
+    ? printedField('charge', load.system, typed)
+    : undefined
+}
+
+/** The print's result title of the main step: its charge, or the seating or temperature a ladder of those varies. */
+const mainResultTitle = (ok: OkOutcome, value: string, t: Translate) =>
+  singleCharge(ok)
+    ? t('Result, {value}', { value: t('{label} main', { label: value }) })
+    : t('Result, main charge: {value}', { value })
+
 /** The workbench's print view: the load, its inputs, the result, the warnings and what follows. */
 function Report(props: ReportProps) {
   const { ok, chartSlot, steps, loadTitle, stale, fromDesign, approximate, printGroups } = props
-  const { stepValue, warnings, system, t } = props
+  const { stepValue, warnings, system, sections, t } = props
   const shownStep = steps.find((s) => s.n - 1 === ok.selected) ?? steps[0]
   return (
     <PrintReport chartSlot={chartSlot} after={<ReportAfter {...props} />}>
@@ -367,7 +408,7 @@ function Report(props: ReportProps) {
         {fromDesign && ` ${fromDesign}`}
         {approximate && ` ${approximate}`}
       </p>
-      <div className="report-inputs">
+      <div className="report-inputs" hidden={!sections.inputs}>
         {printGroups.map(([title, rows]) => (
           <table key={title} className="sheet-table">
             <caption>{title}</caption>
@@ -386,10 +427,12 @@ function Report(props: ReportProps) {
       </div>
       <h2>
         {steps.length > 1 && shownStep
-          ? t('Result, step {step}: {value}', {
-              step: selectedLabel(ok),
-              value: stepValue(shownStep),
-            })
+          ? selectedLabel(ok) === '0'
+            ? mainResultTitle(ok, props.mainCharge ?? stepValue(shownStep), t)
+            : t('Result, step {step}: {value}', {
+                step: selectedLabel(ok),
+                value: stepValue(shownStep),
+              })
           : t('Result')}
       </h2>
       <Readouts ok={ok} system={system} stale={false} printed />
@@ -456,7 +499,7 @@ function sheetSteps(
     charge: stepValue(s),
     pressure:
       s.at &&
-      `${withUnit('pressure', system, s.at.body.pressureRange.nominalPressure)} (${formatQuantity('pressure', system, s.at.body.pressureRange.lowPressure)} to ${withUnit('pressure', system, s.at.body.pressureRange.highPressure)})`,
+      `${withUnit('pressure', system, s.at.body.pressureRange.nominalPressure)} (${withUnit('pressure', system, s.at.body.pressureRange.lowPressure)} to ${withUnit('pressure', system, s.at.body.pressureRange.highPressure)})`,
     ofMax: s.d?.ofMax && `${formatNumber(s.d.ofMax.percent, 0)} %`,
     velocity: s.at && velocity(s.at.body.result),
     energy: s.at && withUnit('energy', system, s.at.body.result.muzzleEnergy),
@@ -675,6 +718,7 @@ function PrintMenu({ ok, printReport }: { ok: OkOutcome | undefined; printReport
         <Menu.Item disabled={!ok} onClick={() => printSheets(true)}>
           {t('Load sheet and a page per charge')}
         </Menu.Item>
+        <PrintSectionItems />
       </Menu.Dropdown>
     </Menu>
   )
@@ -868,6 +912,7 @@ function PrintViews({
 }: PrintViewsProps) {
   const { system, chartSlot, notes } = load
   const { t, tn } = useTranslation()
+  const sections = usePrintChoice()
   const steps = useMemo(() => shownSteps(ok, t), [ok, t])
   const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
   const barrelError = barrel.errors && Object.values(barrel.errors).join(' ')
@@ -920,6 +965,8 @@ function PrintViews({
       printGroups={printGroups}
       stepValue={stepValue}
       warnings={warnings}
+      sections={sections}
+      mainCharge={mainChargeText(load, ok)}
       t={t}
     />
   )
