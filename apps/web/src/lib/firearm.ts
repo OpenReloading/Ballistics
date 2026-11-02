@@ -393,7 +393,7 @@ export function withSessionRounds(
 }
 
 /** The firearm `record` with `n` rounds added for `key` in `countedSessions`, the oldest entry dropped at the limit. */
-function withCountedRounds(
+export function withCountedRounds(
   record: Extract<UserRecord, { kind: 'firearm' }>,
   key: string,
   n: number,
