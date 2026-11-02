@@ -16,10 +16,10 @@ const loads = [
   {
     // psi and CUP in one load, the barrel with a twist
     id: 'example-a-150gr',
-    bullet: { printed: 'HDY SP', mass: { value: 9.719865, raw: '150 gr' } },
+    bullet: { printed: 'Demo SP', mass: { value: 9.719865, raw: '150 gr' } },
     powder: { printed: 'Example 4895', record: 'catalogue:example-4895' },
-    primer: { printed: 'Winchester LR, Large Rifle', size: 'large-rifle', magnum: false },
-    case: 'Winchester',
+    primer: { printed: 'Demo LR, Large Rifle', size: 'large-rifle', magnum: false },
+    case: 'Demo brass',
     coal: { value: 71.12, raw: '2.800"' },
     barrel: {
       length: { value: 609.6, raw: '24"' },
@@ -56,8 +56,8 @@ const loads = [
   {
     // no unit printed, no velocity
     id: 'example-b',
-    bullet: { printed: 'Norma FMJ', mass: { value: 8.0, raw: '123 gr' } },
-    powder: { printed: 'N-135' },
+    bullet: { printed: 'Demo FMJ', mass: { value: 8.0, raw: '123 gr' } },
+    powder: { printed: 'DP35' },
     charges: [
       {
         kind: 'max',
@@ -70,7 +70,7 @@ const loads = [
     // a minimum overall length that is flush, a velocity point with its distance
     id: 'example-c',
     bullet: {
-      printed: 'Sierra 1380',
+      printed: 'Demo 2001',
       mass: { value: 4.5, raw: '4,5 g / 69 grs' },
       diameter: { value: 7.823, raw: '.308' },
     },
@@ -94,7 +94,10 @@ const loads = [
     id: 'example-d',
     bullet: { printed: 'LRN', mass: { value: 10.2, raw: '158 gr' } },
     powder: { printed: 'Example Pistol' },
-    primer: { printed: 'RWS 5333 und 5341', records: ['catalogue:rws-5333', 'catalogue:rws-5341'] },
+    primer: {
+      printed: 'Demo 101 und 102',
+      records: ['catalogue:demo-primer-101', 'catalogue:demo-primer-102'],
+    },
     charges: [
       {
         kind: 'single',
@@ -289,7 +292,7 @@ describe('publishedLoads', () => {
     )
     expectIssueAt(
       publishedLoad,
-      { ...load, primer: { printed: 'x', records: ['rws-5333'] } },
+      { ...load, primer: { printed: 'x', records: ['demo-primer-101'] } },
       'primer.records.0',
     )
     expectIssueAt(

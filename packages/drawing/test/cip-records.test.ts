@@ -303,6 +303,7 @@ it('draws every record with the reviewed notes', () => {
     ['cip-5-45x18-2006-09-19', 'cartridge', 'grooveDerivedE'],
     ['cip-5-6-mm-flobert-plombs-dc-2000-06-07', 'cartridge', 'closedFront'],
     ['cip-5-6-mm-flobert-plombs-sc-2000-06-07', 'cartridge', 'closedFront'],
+    ['cip-5-mm-35-smc-2009-05-05', 'chamber', 'throatDatum'],
     ['cip-50-70-govt-2017-05-17', 'chamber', 'mouthStep'],
     ['cip-50-90-sharps-2-1-2-2017-05-17', 'cartridge', 'shoulderPartial'],
     ['cip-50-90-sharps-2-1-2-2017-05-17', 'chamber', 'shoulderPartial'],
@@ -511,8 +512,8 @@ it('draws the rim chamfer where f and beta are stored, beta from the head face l
       counts.notTimesTan++
   }
   expect(counts).toEqual({
-    both: 428,
-    drawn: 427,
+    both: 429,
+    drawn: 428,
     notTimesTan: 194,
     skipped: ['cip-400-legend-2023-11-08'],
     withR0: 0,
@@ -566,7 +567,7 @@ it('keeps the chamber body around the cartridge body', () => {
     const gap = Math.min(...zs.map((z) => rAt(ch.points, z) - rAt(c.points, z)))
     if (!(gap >= -0.01)) gaps.push([id, Number(gap.toFixed(3))])
   }
-  expect(checked).toBe(512)
+  expect(checked).toBe(513)
   // Reviewed: chamber R, a minimum, is below cartridge R, a maximum, by 0.02 to 0.1 mm, so the
   // stored rim is thicker than the stored recess; between the two R the rim (R1/2) meets the
   // chamber body (P1/2). 22 BB Cap and 22 CB Cap: R 1.12 against 1.1, R1 7.06 against P1 5.76;
@@ -1247,11 +1248,11 @@ it('counts the drawn sides per table and bounds text size, scale and frame', () 
     return [defined(sorted[0]), defined(sorted[sorted.length - 1])].map((s) => [s.name, s[key]])
   }
   expect({ figures: sizes.length, tables }).toEqual({
-    figures: 587,
+    figures: 588,
     // chamber only: a closed front, or a cartridge without its base values; cartridge only: a
     // chamber without them
     tables: {
-      I: { both: 214 },
+      I: { both: 215 },
       II: { both: 144, chamber: 2 },
       III: { both: 39, cartridge: 1 },
       IV: { both: 88, chamber: 7 },

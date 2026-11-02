@@ -1,0 +1,89 @@
+{
+  "id": "demo-bullet-277-130-mono",
+  "manufacturer": "demo-projectiles",
+  "productNumber": "M130",
+  "name": "277 Cal 130 gr Copper Demo",
+  "productLine": "Demo Hunt",
+  "caliber": ".277",
+  "diameter": {
+    "value": 7.04
+  },
+  "mass": {
+    "value": 8.424
+  },
+  "length": {
+    "value": 32.0
+  },
+  "base": {
+    "type": "boat-tail",
+    "length": {
+      "value": 3.0
+    },
+    "diameter": {
+      "value": 6.2
+    },
+    "angle": {
+      "value": 8
+    }
+  },
+  "ogive": {
+    "form": "tangent"
+  },
+  "tip": {
+    "type": "hollow-point",
+    "mouthDiameter": {
+      "value": 1.5
+    }
+  },
+  "meplatDiameter": {
+    "value": 1.9
+  },
+  "noseLength": {
+    "value": 17.0
+  },
+  "baseToOgive": {
+    "value": 15.0
+  },
+  "bearingLength": {
+    "value": 12.0
+  },
+  "construction": {
+    "raw": "Solid copper, no core",
+    "structure": "monolithic",
+    "drivingBands": 3
+  },
+  "ballisticCoefficients": [
+    {
+      "dragModel": "G1",
+      "value": 0.43
+    }
+  ],
+  "recommendedTwist": {
+    "value": 254
+  },
+  "provenance": {
+    "kind": "computed",
+    "sources": [
+      {
+        "source": "synthetic-test-data",
+        "kind": "computed",
+        "fields": [
+          "diameter",
+          "mass",
+          "length",
+          "base",
+          "tip",
+          "ogive",
+          "meplatDiameter",
+          "noseLength",
+          "baseToOgive",
+          "bearingLength",
+          "construction",
+          "ballisticCoefficients",
+          "recommendedTwist"
+        ],
+        "note": "Invented values for tests and the example; not a real product."
+      }
+    ]
+  }
+}

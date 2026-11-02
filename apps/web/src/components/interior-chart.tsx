@@ -3,7 +3,7 @@
 import { Button, Group, SegmentedControl } from '@mantine/core'
 import { useReducedMotion } from '@mantine/hooks'
 import type { ECharts } from 'echarts/core'
-import { useMemo, useRef, useState } from 'react'
+import { type ReactNode, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { type StripFigure, stripModel } from '../lib/barrel-strip.ts'
@@ -115,6 +115,7 @@ export function InteriorChart({
   strip,
   playKey,
   z1,
+  downloads,
 }: {
   /** Valid steps in ladder order, one without a ladder. `label`: the step as the page names it, relative to the main charge; `value`: its charge or seating as shown. */
   steps: {
@@ -139,6 +140,8 @@ export function InteriorChart({
   playKey?: string
   /** The run's burn form z1 (the two-stage form), for its event line. */
   z1?: number | undefined
+  /** What the data dialog offers to download, above its tables. */
+  downloads?: ReactNode
 }) {
   const { x, quantity } = view
   const { t, language } = useTranslation()
@@ -334,6 +337,7 @@ export function InteriorChart({
         title={t('Chart data')}
         size="auto"
       >
+        {downloads}
         <PanelTable
           label={t('Chart data')}
           className="limits"
