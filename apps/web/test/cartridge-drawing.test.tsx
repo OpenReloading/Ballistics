@@ -1,4 +1,5 @@
 import { MantineProvider } from '@mantine/core'
+import { face } from '@open-reloading/drawing'
 import { recordFigures } from '@open-reloading/drawing/cartridge'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
@@ -101,6 +102,22 @@ describe('CartridgeDrawing', () => {
     // a unit switch, or the Settings unit read after hydration, keeps the scale
     for (const side of ['cartridge', 'chamber'] as const)
       expect(sized(side, 'in')).toEqual(sized('cartridge'))
+  })
+
+  it('keeps the text of a side figure 11 px at its least fitted width, within the phone column, in either length unit (12,7 x 108)', () => {
+    for (const unit of ['mm', 'in'] as const)
+      for (const side of ['cartridge', 'chamber'] as const) {
+        const svg = render('cip-12-7-x-108-2017-05-17', side, unit).html.match(
+          /<svg[^>]*screen-only[^>]*viewBox="[\d.-]+ [\d.-]+ ([\d.]+) [\d.]+"[^>]*style="--full:[^;]+;--fit:max\(.*?, (\d+)px\)[^"]*"[\s\S]*?<g class="dims[^"]*" font-size="([\d.]+)"/,
+        )
+        const [viewBox = missing(), readable = missing(), font = missing()] = (svg ?? missing())
+          .slice(1)
+          .map(Number)
+        // the inch frame is the wider: its text size holds the mm figure too
+        expect(readable).toBeLessThanOrEqual(face.phoneColumn)
+        // the drawn font size (mm, 8 drawing units each) at the readable width
+        expect(((font * readable) / viewBox) * 8).toBeGreaterThanOrEqual(face.minTextPx)
+      }
   })
 
   it('flags the chamber notes of 32-40 Win. with the numbers of its caption', () => {

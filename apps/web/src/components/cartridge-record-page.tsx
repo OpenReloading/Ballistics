@@ -69,7 +69,8 @@ function useFittingBullets(id: string) {
   return count
 }
 
-function Cartridge({ c }: { c: CartridgeDetail }) {
+/** The page content of one cartridge record. */
+export function Cartridge({ c }: { c: CartridgeDetail }) {
   const { t } = useTranslation()
   const sheet = drawable(c)
   const list = recordFigures(sheet)
