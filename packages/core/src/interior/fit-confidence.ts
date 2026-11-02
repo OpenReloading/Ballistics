@@ -46,10 +46,9 @@ export interface InputDefault {
 }
 
 /**
- * Standard uncertainties used where the caller states none, one row per input. They are starting
- * values, stated as assumptions on the model page and to be tuned against real sessions. Inputs
- * not listed here (ignition pressure, gamma, covolume, bullet mass) contribute only when the
- * caller states an uncertainty.
+ * Standard uncertainties used where the caller states none, one row per input; assumptions stated on
+ * the model page. Inputs not listed here (ignition pressure, gamma, covolume, bullet mass)
+ * contribute only when the caller states an uncertainty.
  */
 export const powderInputDefaults: Readonly<Partial<Record<PowderInput, Readonly<InputDefault>>>> =
   Object.freeze({

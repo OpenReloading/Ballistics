@@ -5,7 +5,7 @@
     "format": {
       "type": "string",
       "const": "openreloading-user-data",
-      "description": "Format of the file: `openreloading-user-data`."
+      "description": "Format of the file."
     },
     "version": {
       "type": "number",
@@ -22,7 +22,7 @@
               "kind": {
                 "type": "string",
                 "const": "manufacturer",
-                "description": "Kind of the record: `manufacturer`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -99,7 +99,7 @@
               "kind": {
                 "type": "string",
                 "const": "bullet",
-                "description": "Kind of the record: `bullet`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -175,7 +175,7 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 64,
-                    "description": "The `revision` the base record had when the record was saved. A different revision on opening means the base changed since."
+                    "description": "The `revision` of the base record when saved. A different revision on opening means the base changed."
                   },
                   "overrides": {
                     "type": "object",
@@ -1513,7 +1513,7 @@
               "kind": {
                 "type": "string",
                 "const": "cartridge",
-                "description": "Kind of the record: `cartridge`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -1584,7 +1584,7 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 64,
-                    "description": "The `revision` the base record had when the record was saved. A different revision on opening means the base changed since."
+                    "description": "The `revision` of the base record when saved. A different revision on opening means the base changed."
                   },
                   "overrides": {
                     "type": "object",
@@ -1869,7 +1869,7 @@
               "kind": {
                 "type": "string",
                 "const": "powder",
-                "description": "Kind of the record: `powder`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -3015,7 +3015,7 @@
                             "temperatureFactor"
                           ]
                         },
-                        "description": "The parameters the fit freed: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor`. The others kept the values of the input."
+                        "description": "The parameters the fit freed. The others kept the values of the input."
                       },
                       "options": {
                         "type": "object",
@@ -3091,7 +3091,7 @@
                                 "additionalProperties": false
                               }
                             ],
-                            "description": "Loss of the fit: `quadratic`, or `huber` with its threshold."
+                            "description": "Loss of the fit."
                           }
                         },
                         "required": [
@@ -3202,7 +3202,7 @@
               "kind": {
                 "type": "string",
                 "const": "caseCapacity",
-                "description": "Kind of the record: `caseCapacity`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -3491,7 +3491,7 @@
               "kind": {
                 "type": "string",
                 "const": "load",
-                "description": "Kind of the record: `load`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -3755,7 +3755,7 @@
                           "overallLength",
                           "baseToOgive"
                         ],
-                        "description": "The length the bullet is seated by: cartridge overall length or base to ogive."
+                        "description": "The length the bullet is seated by."
                       },
                       "value": {
                         "type": "object",
@@ -3987,7 +3987,7 @@
                           }
                         },
                         "additionalProperties": false,
-                        "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
+                        "description": "Values the user typed in place of the referenced records: solver values, bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), `pmax` (a limit typed in place of the cartridge sheet), case length L3 and powder bulk density. Every other value follows the records."
                       },
                       "bulletBase": {
                         "type": "string",
@@ -4012,7 +4012,7 @@
                                   "seating",
                                   "temperature"
                                 ],
-                                "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                                "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                               },
                               "stepCount": {
                                 "type": "integer",
@@ -4023,7 +4023,7 @@
                               "step": {
                                 "type": "number",
                                 "exclusiveMinimum": 0,
-                                "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                                "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                               },
                               "direction": {
                                 "type": "string",
@@ -4049,7 +4049,7 @@
                                   "seating",
                                   "temperature"
                                 ],
-                                "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                                "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                               },
                               "stepCount": {
                                 "type": "number",
@@ -4070,7 +4070,7 @@
                               "step": {
                                 "type": "number",
                                 "exclusiveMinimum": 0,
-                                "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                                "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                               },
                               "direction": {
                                 "type": "string",
@@ -4134,7 +4134,7 @@
                                 "overallLength",
                                 "baseToOgive"
                               ],
-                              "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+                              "description": "The length the bullet was seated by."
                             },
                             "value": {
                               "type": "object",
@@ -4347,7 +4347,7 @@
               "kind": {
                 "type": "string",
                 "const": "firearm",
-                "description": "Kind of the record: `firearm`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -4429,7 +4429,7 @@
                       "pistol",
                       "revolver"
                     ],
-                    "description": "What kind of firearm it is: a revolver has a gap between cylinder and barrel. Absent: not stated."
+                    "description": "A revolver has a gap between cylinder and barrel. Absent: not stated."
                   },
                   "cartridge": {
                     "type": "string",
@@ -5755,7 +5755,7 @@
               "kind": {
                 "type": "string",
                 "const": "session",
-                "description": "Kind of the record: `session`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -6337,7 +6337,7 @@
               "kind": {
                 "type": "string",
                 "const": "targetSheet",
-                "description": "Kind of the record: `targetSheet`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -7133,7 +7133,7 @@
               "kind": {
                 "type": "string",
                 "const": "targetFaceDesign",
-                "description": "Kind of the record: `targetFaceDesign`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -7328,7 +7328,7 @@
               "kind": {
                 "type": "string",
                 "const": "case",
-                "description": "Kind of the record: `case`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -7772,7 +7772,7 @@
               "kind": {
                 "type": "string",
                 "const": "event",
-                "description": "Kind of the record: `event`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -8113,7 +8113,7 @@
               "kind": {
                 "type": "string",
                 "const": "shootingLogEntry",
-                "description": "Kind of the record: `shootingLogEntry`."
+                "description": "Kind of the record."
               },
               "id": {
                 "type": "string",
@@ -8285,7 +8285,7 @@
           }
         ]
       },
-      "description": "The records of the file. The app skips a record of a kind it does not list here and reports the kind with its count, so that a later version can add kinds; it does not keep the skipped records."
+      "description": "The records of the file. The app skips a record of a kind not listed here and reports the kind with its count; it does not keep the skipped records."
     },
     "files": {
       "type": "array",

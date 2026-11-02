@@ -8,11 +8,11 @@
   "tags": [
     {
       "name": "Records",
-      "description": "Cartridges with their C.I.P. sheet values, manufacturers, powders, primers, bullets and cartridge cases."
+      "description": "Cartridges with their C.I.P. sheet values, manufacturers, powders, primers, bullets and cases."
     },
     {
       "name": "Competition",
-      "description": "Federations, their disciplines, target faces, the mapping between them, the caliber classes of the disciplines and the event types with their scoring."
+      "description": "Federations, disciplines, target faces and their mapping, caliber classes and event types with their scoring."
     },
     {
       "name": "Exterior",
@@ -29,7 +29,7 @@
         "operationId": "getBullets",
         "tags": ["Records"],
         "summary": "List bullets",
-        "description": "A page of bullets ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the bullets whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. Each item carries diameter (mm, null where the record has none), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction. A record that only names the bullet carries nameOnly.",
+        "description": "A page of bullets ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the bullets whose manufacturer name or alias followed by the product name holds every word of it, in any order, and ranks them by match, ties in the default order. Each item carries diameter (mm, null where the record has none), mass (g), length (mm), the first G1 and G7 ballistic coefficients, tip type and construction. `nameOnly` marks a record that only names the bullet.",
         "parameters": [
           {
             "name": "q",
@@ -235,7 +235,7 @@
         "operationId": "getBulletsById",
         "tags": ["Records"],
         "summary": "Get a bullet",
-        "description": "The whole bullet record with its provenance. `revision` is a hash of the stored record that changes with any field.",
+        "description": "The bullet record with its provenance. `revision` is a hash of the stored record, changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -1000,7 +1000,7 @@
                     },
                     "revision": {
                       "type": "string",
-                      "description": "Hash of the stored record. It changes with any field."
+                      "description": "Hash of the stored record, changes with any field."
                     }
                   },
                   "required": ["id", "manufacturer", "name", "mass", "provenance", "revision"],
@@ -1067,7 +1067,7 @@
         "operationId": "getCaliberClasses",
         "tags": ["Competition"],
         "summary": "List caliber classes",
-        "description": "The caliber classes the disciplines name: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.",
+        "description": "Caliber classes: groups of cartridges whose bullets have the same diameter, with the nominal diameter (mm), ordered by diameter.",
         "parameters": [],
         "responses": {
           "200": {
@@ -1136,7 +1136,7 @@
         "operationId": "getCaliberClassesById",
         "tags": ["Competition"],
         "summary": "Get a caliber class",
-        "description": "The whole caliber class record with its provenance.",
+        "description": "The caliber class record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -1373,7 +1373,7 @@
         "operationId": "getCartridges",
         "tags": ["Records"],
         "summary": "List cartridges",
-        "description": "A page of cartridges ordered by name, digit runs in numeric order. `q` keeps the cartridges whose name or alias holds every word of it, in any order, and ranks them by match (a word that starts a word of the name first), ties in the default order. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), its highest Pmax (bar) and the case type from its rim and belt dimensions.",
+        "description": "A page of cartridges ordered by name, digit runs in numeric order. `q` keeps the cartridges whose name or alias holds every word of it, in any order, and ranks them by match (a word that starts a word of the name first), ties in the default order. Each item carries its smallest CIP bullet, bore and groove diameters, case and cartridge lengths (mm), highest Pmax (bar) and case type.",
         "parameters": [
           {
             "name": "q",
@@ -1525,7 +1525,7 @@
         "operationId": "getCartridgesById",
         "tags": ["Records"],
         "summary": "Get a cartridge",
-        "description": "The cartridge record of its C.I.P. sheet with its values, provenance, case type and case capacities. `revision` is a hash of the stored record that changes with any field.",
+        "description": "The cartridge record of its C.I.P. sheet with provenance, case type and case capacities. `revision` is a hash of the stored record, changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -2022,7 +2022,7 @@
                     },
                     "revision": {
                       "type": "string",
-                      "description": "Hash of the stored record. It changes with any field."
+                      "description": "Hash of the stored record, changes with any field."
                     }
                   },
                   "required": [
@@ -2259,7 +2259,7 @@
         "operationId": "getCasesById",
         "tags": ["Records"],
         "summary": "Get a case",
-        "description": "The whole case record with its provenance and `origin`. `revision` is a hash of the stored record that changes with any field.",
+        "description": "The case record with its provenance and `origin`. `revision` is a hash of the stored record, changes with any field.",
         "parameters": [
           {
             "name": "id",
@@ -2616,7 +2616,7 @@
                     },
                     "revision": {
                       "type": "string",
-                      "description": "Hash of the stored record. It changes with any field."
+                      "description": "Hash of the stored record, changes with any field."
                     }
                   },
                   "required": ["origin", "manufacturer", "cartridge", "material", "revision"],
@@ -2788,7 +2788,7 @@
         "operationId": "getDisciplinesById",
         "tags": ["Competition"],
         "summary": "Get a discipline",
-        "description": "The whole discipline record with its provenance.",
+        "description": "The discipline record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -3336,7 +3336,7 @@
         "operationId": "getEventTypes",
         "tags": ["Competition"],
         "summary": "List event types",
-        "description": "The competition event types with their federation and scoring method (hit factor or rings), ordered by name.",
+        "description": "Event types with federation and scoring method (hit factor or rings), ordered by name.",
         "parameters": [],
         "responses": {
           "200": {
@@ -3411,7 +3411,7 @@
         "operationId": "getEventTypesById",
         "tags": ["Competition"],
         "summary": "Get a event type",
-        "description": "The whole event type record with its provenance.",
+        "description": "The event type record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -3867,7 +3867,7 @@
         "operationId": "postExteriorRangeStringsFit",
         "tags": ["Exterior"],
         "summary": "Fit range strings",
-        "description": "Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with its identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.",
+        "description": "Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.",
         "parameters": [],
         "responses": {
           "200": {
@@ -5472,7 +5472,7 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
                         "type": "number",
                         "exclusiveMinimum": -1.5707963267948966,
                         "exclusiveMaximum": 1.5707963267948966
@@ -5530,7 +5530,7 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "description": "Look angle of the zero, rad, default 0.",
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966
@@ -5598,13 +5598,13 @@
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore above the line of sight, rad."
                               },
                               "windageAngle": {
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore to the right of the line of sight, rad."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -5957,7 +5957,7 @@
         "operationId": "postExteriorRangeStringsPlan",
         "tags": ["Exterior"],
         "summary": "Plan range strings",
-        "description": "Compares candidate range strings before any shot: for each candidate the identifiability status and expected standard uncertainty of muzzle velocity, drag factor, click value and zero offset, their variance inflation and the condition number of the design.",
+        "description": "Compares candidate range strings before any shot: per candidate the identifiability status, expected standard uncertainty and variance inflation of muzzle velocity, drag factor, click value and zero offset, and the condition number of the design.",
         "parameters": [],
         "responses": {
           "200": {
@@ -7099,7 +7099,7 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
                         "type": "number",
                         "exclusiveMinimum": -1.5707963267948966,
                         "exclusiveMaximum": 1.5707963267948966
@@ -7157,7 +7157,7 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "description": "Look angle of the zero, rad, default 0.",
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966
@@ -7225,13 +7225,13 @@
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore above the line of sight, rad."
                               },
                               "windageAngle": {
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore to the right of the line of sight, rad."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -7596,7 +7596,7 @@
         "operationId": "getExteriorStability",
         "tags": ["Exterior"],
         "summary": "Gyroscopic stability",
-        "description": "The gyroscopic stability factor of a bullet by the Miller twist rule from mass, diameter, length, twist and muzzle velocity, corrected for air temperature and pressure. A `bullet` id supplies the values the query leaves out.",
+        "description": "The gyroscopic stability factor of a bullet by the Miller twist rule from mass, diameter, length, twist and muzzle velocity, corrected for air temperature and pressure. A `bullet` id supplies the values the query omits.",
         "parameters": [
           {
             "name": "bullet",
@@ -7960,7 +7960,7 @@
         "operationId": "postExteriorTrajectory",
         "tags": ["Exterior"],
         "summary": "Compute a trajectory",
-        "description": "Integrates the flight of a projectile from the muzzle (point mass, or modified point mass with yaw of repose and spin) and answers its state at each requested slant range: distance, height, windage, time, velocity, energy and the holds. The zero gives the elevation and windage angles of the bore. A `bullet` id takes mass, diameter, length and ballistic coefficients from the record.",
+        "description": "Integrates the flight of a projectile from the muzzle (point mass, or modified point mass with yaw of repose and spin) and answers its state at each requested slant range: distance, height, windage, time, velocity, energy and holds. The zero gives the bore angles. A `bullet` id supplies mass, diameter, length and ballistic coefficients.",
         "parameters": [],
         "responses": {
           "200": {
@@ -9067,7 +9067,7 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
                         "type": "number",
                         "exclusiveMinimum": -1.5707963267948966,
                         "exclusiveMaximum": 1.5707963267948966
@@ -9125,7 +9125,7 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "description": "Look angle of the zero, rad, default 0.",
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966
@@ -9193,13 +9193,13 @@
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore above the line of sight, rad."
                               },
                               "windageAngle": {
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore to the right of the line of sight, rad."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -9347,7 +9347,7 @@
         "operationId": "postExteriorTruing",
         "tags": ["Exterior"],
         "summary": "True a trajectory to observations",
-        "description": "Fits the muzzle velocity, or drag factors (constant or at Mach knots) with or without the muzzle velocity, to measured heights, elevation holds or velocities at known ranges, by least squares on log parameters. Answers the fitted parameters with their standard uncertainties and correlations, the residuals and the trued shot.",
+        "description": "Fits the muzzle velocity, or drag factors (constant or at Mach knots) with or without the muzzle velocity, to measured heights, elevation holds or velocities at known ranges, by least squares on log parameters. Answers the fitted parameters with standard uncertainties and correlations, the residuals and the trued shot.",
         "parameters": [],
         "responses": {
           "200": {
@@ -10823,7 +10823,7 @@
                         "description": "Station air at the firing point."
                       },
                       "lookAngle": {
-                        "description": "Angle of the line of sight above the horizontal, rad, between -pi/2 and pi/2, default 0.",
+                        "description": "Angle of the line of sight above the horizontal, rad, default 0.",
                         "type": "number",
                         "exclusiveMinimum": -1.5707963267948966,
                         "exclusiveMaximum": 1.5707963267948966
@@ -10881,7 +10881,7 @@
                                 "description": "Zero slant range, m."
                               },
                               "lookAngle": {
-                                "description": "Look angle of the zero, rad, between -pi/2 and pi/2, default 0.",
+                                "description": "Look angle of the zero, rad, default 0.",
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966
@@ -10949,13 +10949,13 @@
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore above the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore above the line of sight, rad."
                               },
                               "windageAngle": {
                                 "type": "number",
                                 "exclusiveMinimum": -1.5707963267948966,
                                 "exclusiveMaximum": 1.5707963267948966,
-                                "description": "Angle of the bore to the right of the line of sight, rad, between -pi/2 and pi/2."
+                                "description": "Angle of the bore to the right of the line of sight, rad."
                               }
                             },
                             "required": ["elevationAngle", "windageAngle"],
@@ -11196,7 +11196,7 @@
         "operationId": "getFederations",
         "tags": ["Competition"],
         "summary": "List federations",
-        "description": "Every shooting federation with its abbreviation, country and international federation, ordered by abbreviation.",
+        "description": "Every shooting federation with abbreviation, country and international federation, ordered by abbreviation.",
         "parameters": [],
         "responses": {
           "200": {
@@ -11286,7 +11286,7 @@
         "operationId": "getFederationsById",
         "tags": ["Competition"],
         "summary": "Get a federation",
-        "description": "The whole federation record with its provenance.",
+        "description": "The federation record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -15965,7 +15965,7 @@
         "operationId": "postInteriorLoadFile",
         "tags": ["Interior"],
         "summary": "Simulate a workbench load file",
-        "description": "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. The values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives is listed, with every other such value, in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a download from the workbench for the API holds them all. Results are simulations, not load data.",
+        "description": "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. Values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. Every value no record gives is listed in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a workbench download for the API holds them all. Results are simulations, not load data.",
         "parameters": [
           {
             "name": "curves",
@@ -17585,7 +17585,7 @@
                   "format": {
                     "type": "string",
                     "const": "openreloading-user-data",
-                    "description": "Format of the file: `openreloading-user-data`."
+                    "description": "Format of the file."
                   },
                   "version": {
                     "type": "number",
@@ -17602,7 +17602,7 @@
                             "kind": {
                               "type": "string",
                               "const": "manufacturer",
-                              "description": "Kind of the record: `manufacturer`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -17667,7 +17667,7 @@
                             "kind": {
                               "type": "string",
                               "const": "bullet",
-                              "description": "Kind of the record: `bullet`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -17739,7 +17739,7 @@
                                   "type": "string",
                                   "minLength": 1,
                                   "maxLength": 64,
-                                  "description": "The `revision` the base record had when the record was saved. A different revision on opening means the base changed since."
+                                  "description": "The `revision` of the base record when saved. A different revision on opening means the base changed."
                                 },
                                 "overrides": {
                                   "type": "object",
@@ -19058,7 +19058,7 @@
                             "kind": {
                               "type": "string",
                               "const": "cartridge",
-                              "description": "Kind of the record: `cartridge`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -19125,7 +19125,7 @@
                                   "type": "string",
                                   "minLength": 1,
                                   "maxLength": 64,
-                                  "description": "The `revision` the base record had when the record was saved. A different revision on opening means the base changed since."
+                                  "description": "The `revision` of the base record when saved. A different revision on opening means the base changed."
                                 },
                                 "overrides": {
                                   "type": "object",
@@ -19384,7 +19384,7 @@
                             "kind": {
                               "type": "string",
                               "const": "powder",
-                              "description": "Kind of the record: `powder`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -20375,7 +20375,7 @@
                                           "temperatureFactor"
                                         ]
                                       },
-                                      "description": "The parameters the fit freed: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor`. The others kept the values of the input."
+                                      "description": "The parameters the fit freed. The others kept the values of the input."
                                     },
                                     "options": {
                                       "type": "object",
@@ -20443,7 +20443,7 @@
                                               "additionalProperties": false
                                             }
                                           ],
-                                          "description": "Loss of the fit: `quadratic`, or `huber` with its threshold."
+                                          "description": "Loss of the fit."
                                         }
                                       },
                                       "required": ["loss"],
@@ -20540,7 +20540,7 @@
                             "kind": {
                               "type": "string",
                               "const": "caseCapacity",
-                              "description": "Kind of the record: `caseCapacity`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -20788,7 +20788,7 @@
                             "kind": {
                               "type": "string",
                               "const": "load",
-                              "description": "Kind of the record: `load`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -21030,7 +21030,7 @@
                                     "by": {
                                       "type": "string",
                                       "enum": ["overallLength", "baseToOgive"],
-                                      "description": "The length the bullet is seated by: cartridge overall length or base to ogive."
+                                      "description": "The length the bullet is seated by."
                                     },
                                     "value": {
                                       "type": "object",
@@ -21257,7 +21257,7 @@
                                         }
                                       },
                                       "additionalProperties": false,
-                                      "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
+                                      "description": "Values the user typed in place of the referenced records: solver values, bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), `pmax` (a limit typed in place of the cartridge sheet), case length L3 and powder bulk density. Every other value follows the records."
                                     },
                                     "bulletBase": {
                                       "type": "string",
@@ -21278,7 +21278,7 @@
                                             "kind": {
                                               "type": "string",
                                               "enum": ["charge", "seating", "temperature"],
-                                              "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                                              "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                                             },
                                             "stepCount": {
                                               "type": "integer",
@@ -21289,7 +21289,7 @@
                                             "step": {
                                               "type": "number",
                                               "exclusiveMinimum": 0,
-                                              "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                                              "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                                             },
                                             "direction": {
                                               "type": "string",
@@ -21305,7 +21305,7 @@
                                             "kind": {
                                               "type": "string",
                                               "enum": ["charge", "seating", "temperature"],
-                                              "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                                              "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                                             },
                                             "stepCount": {
                                               "type": "number",
@@ -21315,7 +21315,7 @@
                                             "step": {
                                               "type": "number",
                                               "exclusiveMinimum": 0,
-                                              "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                                              "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                                             },
                                             "direction": {
                                               "type": "string",
@@ -21373,7 +21373,7 @@
                                           "by": {
                                             "type": "string",
                                             "enum": ["overallLength", "baseToOgive"],
-                                            "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+                                            "description": "The length the bullet was seated by."
                                           },
                                           "value": {
                                             "type": "object",
@@ -21559,7 +21559,7 @@
                             "kind": {
                               "type": "string",
                               "const": "firearm",
-                              "description": "Kind of the record: `firearm`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -21629,7 +21629,7 @@
                                 "action": {
                                   "type": "string",
                                   "enum": ["rifle", "pistol", "revolver"],
-                                  "description": "What kind of firearm it is: a revolver has a gap between cylinder and barrel. Absent: not stated."
+                                  "description": "A revolver has a gap between cylinder and barrel. Absent: not stated."
                                 },
                                 "cartridge": {
                                   "type": "string",
@@ -22827,7 +22827,7 @@
                             "kind": {
                               "type": "string",
                               "const": "session",
-                              "description": "Kind of the record: `session`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -23339,7 +23339,7 @@
                             "kind": {
                               "type": "string",
                               "const": "targetSheet",
-                              "description": "Kind of the record: `targetSheet`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -24029,7 +24029,7 @@
                             "kind": {
                               "type": "string",
                               "const": "targetFaceDesign",
-                              "description": "Kind of the record: `targetFaceDesign`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -24206,7 +24206,7 @@
                             "kind": {
                               "type": "string",
                               "const": "case",
-                              "description": "Kind of the record: `case`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -24603,7 +24603,7 @@
                             "kind": {
                               "type": "string",
                               "const": "event",
-                              "description": "Kind of the record: `event`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -24911,7 +24911,7 @@
                             "kind": {
                               "type": "string",
                               "const": "shootingLogEntry",
-                              "description": "Kind of the record: `shootingLogEntry`."
+                              "description": "Kind of the record."
                             },
                             "id": {
                               "type": "string",
@@ -25158,7 +25158,7 @@
         "operationId": "getManufacturers",
         "tags": ["Records"],
         "summary": "List manufacturers",
-        "description": "Every manufacturer with its aliases and website, ordered by name, digit runs in numeric order.",
+        "description": "Every manufacturer with aliases and website, ordered by name, digit runs in numeric order.",
         "parameters": [],
         "responses": {
           "200": {
@@ -25638,7 +25638,7 @@
                                 "maximum": 9007199254740991
                               },
                               "retrieved": {
-                                "description": "ISO date the fitted sources were read, the latest of them.",
+                                "description": "ISO date the latest fitted source was read.",
                                 "type": "string",
                                 "format": "date",
                                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -25692,7 +25692,7 @@
         "operationId": "getPowdersById",
         "tags": ["Records"],
         "summary": "Get a powder",
-        "description": "The whole powder record with its provenance.",
+        "description": "The powder record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -26423,7 +26423,7 @@
         "operationId": "getPrimers",
         "tags": ["Records"],
         "summary": "List primers",
-        "description": "A page of primer products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the primers whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. `size` and `compound` keep one size and one priming compound. Each item carries the size, the magnum flag and the priming compound where the record has them.",
+        "description": "A page of primer products ordered by manufacturer name and name, digit runs in numeric order. `q` keeps the primers whose manufacturer name or alias followed by the product name, or by the product number, holds every word of it, in any order, and ranks them by match. `size` and `compound` keep one size and one priming compound. Each item carries size, magnum flag and compound where the record has them.",
         "parameters": [
           {
             "name": "q",
@@ -26536,7 +26536,7 @@
                               "large-pistol",
                               "shotshell"
                             ],
-                            "description": "Small or large, for rifle or pistol, or the shotshell primer."
+                            "description": "Size class of the primer."
                           },
                           "magnum": {
                             "type": "boolean",
@@ -26545,7 +26545,7 @@
                           "compound": {
                             "type": "string",
                             "enum": ["lead-styphnate", "lead-free"],
-                            "description": "The priming compound: lead styphnate or lead-free."
+                            "description": "The priming compound."
                           }
                         },
                         "required": ["id", "manufacturer", "name", "size"],
@@ -26587,7 +26587,7 @@
         "operationId": "getPrimersById",
         "tags": ["Records"],
         "summary": "Get a primer",
-        "description": "The whole primer record with its provenance.",
+        "description": "The primer record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -26635,7 +26635,7 @@
                         "large-pistol",
                         "shotshell"
                       ],
-                      "description": "Small or large, for rifle or pistol, or the shotshell primer."
+                      "description": "Size class of the primer."
                     },
                     "magnum": {
                       "type": "boolean",
@@ -26675,7 +26675,7 @@
                     "compound": {
                       "type": "string",
                       "enum": ["lead-styphnate", "lead-free"],
-                      "description": "The priming compound: lead styphnate or lead-free."
+                      "description": "The priming compound."
                     },
                     "intendedUse": {
                       "type": "string",
@@ -26891,7 +26891,7 @@
         "operationId": "getTargetFaces",
         "tags": ["Competition"],
         "summary": "List target faces",
-        "description": "Every target face with its federation, the caliber classes of the disciplines mapped to it and the categories of its events and those disciplines. Ordered by federation, then the code printed in the name, then name.",
+        "description": "Every target face with its federation, the caliber classes mapped to it and the categories of its events and disciplines. Ordered by federation, then the code printed in the name, then name.",
         "parameters": [],
         "responses": {
           "200": {
@@ -26991,7 +26991,7 @@
         "operationId": "getTargetFacesById",
         "tags": ["Competition"],
         "summary": "Get a target face",
-        "description": "The target face record: federation id, ring diameters (mm), inner ten, events with their ids and provenance.",
+        "description": "The target face record: federation id, ring diameters (mm), inner ten, events with ids, and provenance.",
         "parameters": [
           {
             "name": "id",
@@ -27565,7 +27565,7 @@
         "operationId": "getTargetMappings",
         "tags": ["Competition"],
         "summary": "List target mappings",
-        "description": "Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies, in the order of the disciplines.",
+        "description": "Which target face a discipline shoots, per event and stage, with the scoring gauge diameter (mm) where one applies, in discipline order.",
         "parameters": [
           {
             "name": "discipline",
@@ -27669,7 +27669,7 @@
         "operationId": "getTargetMappingsById",
         "tags": ["Competition"],
         "summary": "Get a target mapping",
-        "description": "The whole target mapping record with its provenance.",
+        "description": "The target mapping record with its provenance.",
         "parameters": [
           {
             "name": "id",
@@ -28006,7 +28006,7 @@
           },
           "missing": {
             "type": "array",
-            "description": "The load file route with `reason` `missingValues`: every solver value the file lacks, with its key, its path in the file and its stored quantity.",
+            "description": "The load file route with `reason` `missingValues`: every solver value the file lacks, with key, path in the file and stored quantity.",
             "items": {
               "type": "object",
               "properties": {

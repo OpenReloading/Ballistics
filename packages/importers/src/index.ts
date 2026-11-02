@@ -165,9 +165,8 @@ const formats = [
 ] as const satisfies readonly ChronoFormat[]
 
 /**
- * Every chronograph format, listed to users in this order by `name`; detection walks the list. A
- * new format is its module plus one entry here. `delimited` has no `detect`: it needs a column
- * mapping.
+ * Every chronograph format, listed to users in this order by `name`; detection walks the list.
+ * `delimited` has no `detect`: it needs a column mapping.
  */
 export const chronoFormats: readonly ChronoFormat[] = formats
 

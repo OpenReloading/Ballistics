@@ -27,8 +27,8 @@ export interface ResistanceCartridge {
 /**
  * Bore area of a cartridge's chamber, in the square of the unit of the diameters: the C.I.P. area
  * Q (`area`) when the spec has it, else the circle of the mean of land diameter F and groove
- * diameter Z (`apps/docs/docs/models/interior-m3.md`, "Bore area"), else the circle of F. The load-table fit,
- * the load file and the workbench all read it, so one cartridge gives one area (and one friction
+ * diameter Z (`apps/docs/docs/models/interior-m3.md`, "Bore area"), else the circle of F. The load-table
+ * fit, the load file and the workbench share it, so one cartridge gives one area (and one friction
  * pressure, which divides by it).
  */
 export function boreArea(b: {

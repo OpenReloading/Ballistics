@@ -121,9 +121,9 @@ export const eventType = z.strictObject({
   provenance,
 })
 
-/** An event type record: federation, rule book, scoring, levels and limits. */
+/** An event type record. */
 export interface EventType extends z.infer<typeof eventType> {}
-/** Hit-factor scoring of an event type: points per zone and power factor, penalties, floors. */
+/** Hit-factor scoring of an event type. */
 export type HitFactorScoring = z.infer<typeof hitFactorScoring>
-/** Ring scoring of an event type: discipline and series length, where fixed. */
+/** Ring scoring of an event type. */
 export type RingScoring = z.infer<typeof ringScoring>

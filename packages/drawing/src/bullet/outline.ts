@@ -1079,11 +1079,11 @@ export function revolutionVolume(points: SectionPoint[], cut: number): number {
 
 /**
  * The bullet volume below `cut` mm, mm³, with the cavity of a hollow base at the ends of
- * {@link cavityDepthBracket} instead of its assumed depth: `low` with the deepest cavity, `high` with
- * the shallowest. Undefined without a cavity of assumed depth, with nothing below the cut, or when a
- * bracket depth gives no outline. A deepest cavity that would reach the length is held just below
- * it; one that would cut through the wall (a boat tail, a short shank) is made shallower, to the
- * deepest depth whose outline holds (bisection down to the assumed depth).
+ * {@link cavityDepthBracket}: `low` with the deepest cavity, `high` with the shallowest. Undefined
+ * without a cavity of assumed depth, with nothing below the cut, or when a bracket depth gives no
+ * outline. A deepest cavity that would reach the length is held just below it; one that would cut
+ * through the wall (a boat tail, a short shank) is made shallower, to the deepest depth whose
+ * outline holds (bisection down to the assumed depth).
  */
 export function cavityVolumeBracket(
   b: BulletDimensions,

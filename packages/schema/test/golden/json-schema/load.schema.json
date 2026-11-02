@@ -215,7 +215,7 @@
             "overallLength",
             "baseToOgive"
           ],
-          "description": "The length the bullet is seated by: cartridge overall length or base to ogive."
+          "description": "The length the bullet is seated by."
         },
         "value": {
           "type": "object",
@@ -447,7 +447,7 @@
             }
           },
           "additionalProperties": false,
-          "description": "Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records."
+          "description": "Values the user typed in place of the referenced records: solver values, bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), `pmax` (a limit typed in place of the cartridge sheet), case length L3 and powder bulk density. Every other value follows the records."
         },
         "bulletBase": {
           "type": "string",
@@ -472,7 +472,7 @@
                     "seating",
                     "temperature"
                   ],
-                  "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                  "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                 },
                 "stepCount": {
                   "type": "integer",
@@ -483,7 +483,7 @@
                 "step": {
                   "type": "number",
                   "exclusiveMinimum": 0,
-                  "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                  "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                 },
                 "direction": {
                   "type": "string",
@@ -509,7 +509,7 @@
                     "seating",
                     "temperature"
                   ],
-                  "description": "What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge."
+                  "description": "What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge."
                 },
                 "stepCount": {
                   "type": "number",
@@ -530,7 +530,7 @@
                 "step": {
                   "type": "number",
                   "exclusiveMinimum": 0,
-                  "description": "Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
+                  "description": "Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered."
                 },
                 "direction": {
                   "type": "string",
@@ -594,7 +594,7 @@
                   "overallLength",
                   "baseToOgive"
                 ],
-                "description": "The length the bullet was seated by: cartridge overall length or base to ogive."
+                "description": "The length the bullet was seated by."
               },
               "value": {
                 "type": "object",

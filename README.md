@@ -25,7 +25,7 @@ npm run dev:static                        # web app on port 3000, reading data f
 PORT=3010 npm start -w @open-reloading/api  # REST API on port 3010
 ```
 
-The web app is a static site. To host it, run `npm run pages:build` (set `PAGES_BASE_PATH` to the path it is served under, empty for a site root) and copy the `pages/` folder to any static host: the calculations run in the browser, so no server process is needed. The REST API is the container image `ghcr.io/openreloading/ballistics-api`, published with each API release (`docker run -p 3000:3000 ghcr.io/openreloading/ballistics-api:<version>`). `docker compose up` (or `podman compose up`) builds and starts the API on port 3000 and the documentation on port 3002. The libraries `schema`, `core`, `drawing`, `importers` and `data` are in `packages/` and tagged in [GitHub releases](https://github.com/OpenReloading/Ballistics/releases). Setup and the dev container: [CONTRIBUTING.md](CONTRIBUTING.md).
+To host the web app, run `npm run pages:build` (set `PAGES_BASE_PATH` to the path it is served under, empty for a site root) and copy `pages/` to any static host. The REST API is the container image `ghcr.io/openreloading/ballistics-api`, published with each API release (`docker run -p 3000:3000 ghcr.io/openreloading/ballistics-api:<version>`). `docker compose up` (or `podman compose up`) builds and starts the API on port 3000 and the documentation on port 3002. The libraries `schema`, `core`, `drawing`, `importers` and `data` are in `packages/` and tagged in [GitHub releases](https://github.com/OpenReloading/Ballistics/releases). Setup and the dev container: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Data
 

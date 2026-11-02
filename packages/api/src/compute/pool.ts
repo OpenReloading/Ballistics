@@ -26,7 +26,7 @@ export interface PoolOptions {
 }
 
 const workerCount = Math.max(1, availableParallelism() - 1)
-/** Default pool: one worker fewer than the available parallelism (at least 1), a queue of four tasks per worker, a 5000 ms deadline. */
+/** Default pool: one worker fewer than the available parallelism (at least 1), four queued tasks per worker, a 5000 ms deadline. */
 export const poolDefaults: Omit<PoolOptions, 'filename'> = {
   workerCount,
   maxQueue: 4 * workerCount,
@@ -53,13 +53,12 @@ type Job = {
 }
 
 /**
- * Creates a pool that starts up to `workerCount` workers on `filename` on demand. A task runs in the first
- * idle worker, else waits in the queue.
- * `run` rejects with `ComputeBusy` when every worker is busy and `maxQueue` tasks wait, or when no
- * worker thread can be started, with `ComputeTimeout` when the task has not finished `timeoutMs` ms
- * after submit (the worker of a running task is terminated; a queued task has none), and with
- * `Error` when the pool is closed or a worker fails.
- * `close` rejects the queued and running tasks and terminates the workers.
+ * Creates a pool that starts up to `workerCount` workers on `filename` on demand. A task runs in
+ * the first idle worker, else waits in the queue. `run` rejects with `ComputeBusy` when every
+ * worker is busy and `maxQueue` tasks wait, or when no worker thread can be started, with
+ * `ComputeTimeout` when the task has not finished `timeoutMs` ms after submit (the worker of a
+ * running task is terminated; a queued task has none), and with `Error` when the pool is closed or
+ * a worker fails. `close` rejects the queued and running tasks and terminates the workers.
  */
 export function createPool({ filename, workerCount, maxQueue, timeoutMs }: PoolOptions): Pool {
   const live = new Set<Worker>()

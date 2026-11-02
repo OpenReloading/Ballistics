@@ -178,9 +178,9 @@ export interface ShotsToHit {
 }
 
 /**
- * From the probability `p` of a hit with one shot, the number of independent shots after which at
- * least one hit has the chance `wanted` or more: the smallest whole n with 1 - (1 - p)^n >= wanted,
- * `ln(1 - wanted) / ln(1 - p)` rounded up, and the mean number of shots to the first hit.
+ * From the probability `p` of a hit with one shot, the smallest whole number n of independent shots
+ * with 1 - (1 - p)^n >= `wanted` (`ln(1 - wanted) / ln(1 - p)` rounded up), and the mean number of
+ * shots to the first hit.
  */
 export function shotsToHit(p: number, wanted: number): ShotsToHit {
   need(p >= 0 && p <= 1, 'the hit probability must be between 0 and 1')

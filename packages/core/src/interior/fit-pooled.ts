@@ -69,8 +69,8 @@ export interface PooledFitOptions {
 }
 
 /**
- * Default spreads of the random effects: assumptions, to be tuned on measured sessions. A rifle
- * moves the velocity by about 1 %, a lot the burn coefficient by about 3 %.
+ * Default spreads of the random effects (assumptions): a rifle moves the velocity by about 1 %, a
+ * lot the burn coefficient by about 3 %.
  */
 export const pooledDefaults = { rifleSigma: 0.01, lotSigma: 0.03 }
 

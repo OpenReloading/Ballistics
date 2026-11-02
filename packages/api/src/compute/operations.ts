@@ -1,7 +1,6 @@
 /**
- * The compute operations of the `POST` routes: what each reads, answers and runs. The routes and
- * their contract document read their texts, schemas and examples here, the command line runs
- * them offline, so neither can drift from the other.
+ * The compute operations of the `POST` routes. The routes and the contract document read their
+ * texts, schemas and examples here, the command line runs them offline, so none can drift.
  */
 import type { z } from 'zod'
 import type { Catalogue } from '../catalogue/types.ts'
@@ -53,7 +52,7 @@ export interface Operation {
   name: string
   /** One line on what it answers. */
   summary: string
-  /** What it reads or computes and how. */
+  /** What it reads and computes. */
   description: string
   /** The zod schema of the body. */
   body: z.ZodType
@@ -101,7 +100,7 @@ export const operations: readonly Operation[] = [
     name: 'exterior/trajectory',
     summary: 'Compute a trajectory',
     description:
-      'Integrates the flight of a projectile from the muzzle (point mass, or modified point mass with yaw of repose and spin) and answers its state at each requested slant range: distance, height, windage, time, velocity, energy and the holds. The zero gives the elevation and windage angles of the bore. A `bullet` id takes mass, diameter, length and ballistic coefficients from the record.',
+      'Integrates the flight of a projectile from the muzzle (point mass, or modified point mass with yaw of repose and spin) and answers its state at each requested slant range: distance, height, windage, time, velocity, energy and holds. The zero gives the bore angles. A `bullet` id supplies mass, diameter, length and ballistic coefficients.',
     body: trajectoryBody,
     response: trajectoryResponse,
     example: trajectoryExample,
@@ -115,7 +114,7 @@ export const operations: readonly Operation[] = [
     name: 'exterior/truing',
     summary: 'True a trajectory to observations',
     description:
-      'Fits the muzzle velocity, or drag factors (constant or at Mach knots) with or without the muzzle velocity, to measured heights, elevation holds or velocities at known ranges, by least squares on log parameters. Answers the fitted parameters with their standard uncertainties and correlations, the residuals and the trued shot.',
+      'Fits the muzzle velocity, or drag factors (constant or at Mach knots) with or without the muzzle velocity, to measured heights, elevation holds or velocities at known ranges, by least squares on log parameters. Answers the fitted parameters with standard uncertainties and correlations, the residuals and the trued shot.',
     body: truingBody,
     response: truingResponse,
     example: truingExample,
@@ -129,7 +128,7 @@ export const operations: readonly Operation[] = [
     name: 'exterior/range-strings/plan',
     summary: 'Plan range strings',
     description:
-      'Compares candidate range strings before any shot: for each candidate the identifiability status and expected standard uncertainty of muzzle velocity, drag factor, click value and zero offset, their variance inflation and the condition number of the design.',
+      'Compares candidate range strings before any shot: per candidate the identifiability status, expected standard uncertainty and variance inflation of muzzle velocity, drag factor, click value and zero offset, and the condition number of the design.',
     body: rangeStringsPlanBody,
     response: rangeStringsPlanResponse,
     example: rangeStringsPlanExample,
@@ -143,7 +142,7 @@ export const operations: readonly Operation[] = [
     name: 'exterior/range-strings/fit',
     summary: 'Fit range strings',
     description:
-      'Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with its identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.',
+      'Fits muzzle velocity, drag factor, click value and optionally a zero offset to the mean impacts or dialled corrections of strings at known ranges and an optional chronograph string. Answers each parameter with identifiability status, value and confidence interval, the residuals with their chi-square test and the condition of the fit.',
     body: rangeStringsFitBody,
     response: rangeStringsFitResponse,
     example: rangeStringsFitExample,
@@ -172,7 +171,7 @@ export const operations: readonly Operation[] = [
     name: 'interior/load-file',
     summary: 'Simulate a workbench load file',
     description:
-      "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. The values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. A value no record gives is listed, with every other such value, in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a download from the workbench for the API holds them all. Results are simulations, not load data.",
+      "Reads a load file saved by the workbench (a user data file with one load record), resolves its catalogue cartridge, bullet and powder references, runs the M3 model at its charge or over its charge ladder and answers a summary per step: peak pressure, muzzle velocity and energy, barrel time, load ratio and muzzle burnt fraction. Values the file does not type come from those records: the powder's model parameters, the bullet's mass and the cartridge's bore area. Every value no record gives is listed in one 422 (`reason` `missingValues`, `missing`: key, path in the file, quantity); a workbench download for the API holds them all. Results are simulations, not load data.",
     body: loadFileBody,
     response: loadFileResponse,
     example: loadFileExample,

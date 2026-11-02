@@ -57,7 +57,7 @@ export type AnalysisKey = keyof typeof kinds
  */
 export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = kinds
 
-/** The stored quantity of each kind of ladder: the charge in g, the seating length in mm, the propellant temperature step in K. */
+/** The stored quantity of each ladder kind: charge in g, seating length in mm, temperature step in K. */
 export const ladderStepKinds = {
   charge: 'mass',
   seating: 'length',
@@ -88,14 +88,14 @@ export const analysisOverrides = z.strictObject(
 const ladderKind = z
   .enum(['charge', 'seating', 'temperature'])
   .describe(
-    'What the ladder varies: the charge, the length the bullet is seated by (`seating.by`) or the propellant temperature. Absent: the charge.',
+    'What the ladder varies; `seating` varies the length set by `seating.by`. Absent: the charge.',
   )
   .optional()
 const ladderStep = z
   .number()
   .positive()
   .describe(
-    'Step between ladder steps in the stored unit of its kind: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered.',
+    'Step size: g for a charge ladder, mm for a seating ladder, K for a temperature ladder. Absent until entered.',
   )
   .optional()
 
@@ -106,7 +106,7 @@ const ladderStep = z
 export const loadAnalysis = z.object({
   overrides: analysisOverrides
     .describe(
-      'Values the user typed: solver values, the bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), the Pmax (`pmax`, a limit typed in place of the cartridge sheet), the case length L3 and the powder bulk density. Every other value follows the referenced records.',
+      'Values the user typed in place of the referenced records: solver values, bullet diameter, length, ballistic coefficients and base dimensions (boat-tail length, base face diameter, hollow-base cavity diameter), `pmax` (a limit typed in place of the cartridge sheet), case length L3 and powder bulk density. Every other value follows the records.',
     )
     .optional(),
   bulletBase: baseTypes
@@ -165,11 +165,7 @@ export const sessionSnapshot = z.strictObject({
   caseLot: component.lot.describe('Case lot of the load at the session.').optional(),
   seating: z
     .object({
-      by: z
-        .enum(['overallLength', 'baseToOgive'])
-        .describe(
-          'The length the bullet was seated by: cartridge overall length or base to ogive.',
-        ),
+      by: z.enum(['overallLength', 'baseToOgive']).describe('The length the bullet was seated by.'),
       value: quantity('length', z.number().positive()).describe('That length.'),
     })
     .describe('The seating of the load at the session.')
@@ -238,9 +234,7 @@ const loadShape = z.object({
     .optional(),
   seating: z
     .object({
-      by: z
-        .enum(['overallLength', 'baseToOgive'])
-        .describe('The length the bullet is seated by: cartridge overall length or base to ogive.'),
+      by: z.enum(['overallLength', 'baseToOgive']).describe('The length the bullet is seated by.'),
       value: quantity('length', z.number().positive()).describe('That length.'),
     })
     .describe('The length the bullet is seated by. The other one is derived.')
@@ -308,8 +302,8 @@ const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
 
 /**
  * One cartridge recipe fired from one firearm, for every origin. The cartridge, firearm, bullet, powder
- * and the case capacity are references; a catalogue load of publication data (provenance `measured`) may describe
- * its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
+ * and case capacity are references; a catalogue load of publication data (provenance `measured`) may
+ * describe its bullet and powder by maker and name where no record exists. A catalogue load carries its `id`
  * (the file name), `name`, `provenance`, cartridge, bullet, powder and charge; a user load keeps
  * what the workbench had and takes its name from its record. Charge and masses in g, lengths in mm,
  * the typed solver values in `analysis`.
@@ -332,10 +326,7 @@ export const load = loadShape.superRefine((l, ctx) => {
   })
 })
 
-/**
- * A load of the catalogue (`records/loads`): {@link load} with `origin` `catalogue`, which also
- * carries its id, provenance, cartridge, bullet, powder and charge.
- */
+/** A load of the catalogue (`records/loads`): {@link load} with `origin` `catalogue`. */
 export const catalogueLoad: z.ZodType<CatalogueLoad> = load.refine(
   (l): l is CatalogueLoad => l.origin === 'catalogue',
   {
@@ -346,7 +337,7 @@ export const catalogueLoad: z.ZodType<CatalogueLoad> = load.refine(
 
 /** The solver values a load overrides, in stored units. */
 export interface AnalysisOverrides extends z.infer<typeof analysisOverrides> {}
-/** What a load is analysed with: the typed solver values and the ladder. */
+/** What a load is analysed with. */
 export interface LoadAnalysis extends z.infer<typeof loadAnalysis> {}
 /** A cartridge recipe in stored units: references to its records, charge, seating and analysis. */
 export interface Load extends z.infer<typeof load> {}

@@ -3,7 +3,7 @@ import { catalogueRef, recordId, ref } from './ids.ts'
 import { type Provenance, provenance } from './provenance.ts'
 import { quantity } from './units.ts'
 
-/** Wall materials of a cartridge case: `brass` and `nickel-plated-brass`, steel with a lacquer or a polymer coating, `aluminium`. */
+/** Wall materials of a cartridge case. */
 export const caseMaterials = z.enum([
   'brass',
   'nickel-plated-brass',
@@ -116,7 +116,7 @@ export const catalogueCase: z.ZodType<CatalogueCase> = cartridgeCase.refine(
   { message: 'A catalogue record has origin catalogue', path: ['origin'] },
 )
 
-/** A cartridge case: a product with its material, primer pocket, flash hole, mass and stated water capacity, or a group of the user's cases with measured values. */
+/** A cartridge case: a product, or a group of the user's cases with measured values. */
 export interface Case extends z.infer<typeof cartridgeCase> {}
 
 /** A case of the catalogue: the fields {@link cartridgeCase} requires of one are present. */
