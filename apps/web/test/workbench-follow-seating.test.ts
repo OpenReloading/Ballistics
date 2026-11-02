@@ -4,6 +4,7 @@ import {
   approximateVolumeTolerance,
   followPlan,
   noCoefficientOf,
+  runSeatingOf,
   runVolumeTolerance,
   seatingOwnsVolume,
   typedOverSeating,
@@ -104,4 +105,28 @@ it("takes the capacity's tolerance while the volume follows the seating, none fo
   expect(run(0.55e-6).rule).toBe('catalogue')
   expect(run(0.55e-6).fraction).toBeCloseTo((0.02 * 0.86) / 0.55, 12)
   expect(run(0.6e-6)).toEqual({ fraction: undefined, rule: undefined })
+})
+
+it('reads the cavity bracket and the seated values in the fields from the snapshot a run takes (#970)', () => {
+  // a hollow base of assumed cavity depth (invented demo values): the render before seated it 8 mm
+  // deep, its volume in the field
+  const before = {
+    seated: { volume: 0.62e-6, depth: 8e-3, cavityRange: { low: 0.61e-6, high: 0.63e-6 } },
+    fields: { volume: { text: '0.62', si: 0.62e-6 } },
+    previewed: { volume: 0.62e-6 },
+  }
+  // a seating 10 mm deep arrived and was written into the field; the render has not caught up
+  const arrived = {
+    seated: { volume: 0.6e-6, depth: 10e-3, cavityRange: { low: 0.58e-6, high: 0.62e-6 } },
+    fields: { volume: { text: '0.6', si: 0.6e-6 } },
+    previewed: { volume: 0.6e-6 },
+  }
+  const run = runSeatingOf(arrived)
+  expect(run.volumeFraction).toBeDefined()
+  expect(run.volumeFraction).not.toBe(runSeatingOf(before).volumeFraction)
+  expect(run.fromSeating).toEqual(['volume'])
+  // the render's state mixed with the form's values now: the field no longer holds the seated
+  // volume, so the bracket is dropped
+  const mixed = runSeatingOf({ ...before, fields: arrived.fields })
+  expect(mixed).toMatchObject({ volumeFraction: undefined, fromSeating: [] })
 })
