@@ -1,10 +1,16 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { compare, verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
 import { rowsPath } from './data.ts'
 import { recordRoots, rowsCsv, writeRows } from './fixture.ts'
+
+vi.mock('@open-reloading/data', async (original) =>
+  (await import('./records-memo.ts')).memoRecords(
+    await original<typeof import('@open-reloading/data')>(),
+  ),
+)
 
 const options = { rows: rowsPath, records: recordRoots, split: 'validation', final: false } as const
 const worse = new URL('./fixtures/worse-model.mjs', import.meta.url).pathname

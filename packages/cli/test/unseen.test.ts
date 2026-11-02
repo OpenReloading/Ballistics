@@ -1,10 +1,16 @@
 import type { Powder } from '@open-reloading/schema'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { verify } from '../src/commands.ts'
 import { Refusal } from '../src/errors.ts'
 import { loadModel } from '../src/model.ts'
 import { unseenPowder } from '../src/unseen.ts'
 import { recordRoots, records, rowsCsv, writeRows } from './fixture.ts'
+
+vi.mock('@open-reloading/data', async (original) =>
+  (await import('./records-memo.ts')).memoRecords(
+    await original<typeof import('@open-reloading/data')>(),
+  ),
+)
 
 const powder = (id: string) => records.powders.get(`demo-powder-${id}`) as Powder
 

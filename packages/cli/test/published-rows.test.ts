@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { interior, lbPerSqInToKgPerSqM, standardAtmosphere, trajectory } from '@open-reloading/core'
 import type { PublishedLoads } from '@open-reloading/schema'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { compare, verify } from '../src/commands.ts'
 import { Refusal, UsageError } from '../src/errors.ts'
 import { atMuzzle, predict } from '../src/evaluate.ts'
@@ -13,6 +13,12 @@ import { loadRecords } from '../src/records.ts'
 import { result } from '../src/result.ts'
 import type { Row } from '../src/rows.ts'
 import { recordRoots, records } from './fixture.ts'
+
+vi.mock('@open-reloading/data', async (original) =>
+  (await import('./records-memo.ts')).memoRecords(
+    await original<typeof import('@open-reloading/data')>(),
+  ),
+)
 
 // Test data, not maker data: the printed figures of these tables are the model's own results
 // for the demo records, moved by known errors, as the synthetic rows of `data.ts`.

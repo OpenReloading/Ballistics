@@ -17,6 +17,7 @@ import { labelText } from '../src/core/text.ts'
 import type { Layout } from '../src/core/types.ts'
 import { lengthText, scaleLength } from '../src/core/units.ts'
 import { defined } from './defined.ts'
+import { gapFailures } from './gaps.ts'
 import { sheets } from './sheets.ts'
 
 // Labels in inches: the geometry stays in mm, only the length texts change.
@@ -139,20 +140,52 @@ function figureFailures(record: (typeof current)[number], f: Shown, em: number, 
   return failures
 }
 
+/** Every figure of every record with its text size and width across in inches, the figure objects shared by the tests below so their layouts are cached once. */
+const inchFigures = current.flatMap((record) => {
+  const shown = recordFigures(record).filter((f) => f.drawn.length)
+  if (!shown.length) return []
+  const em = screenEm(
+    shown.map((f) => f.drawn),
+    'in',
+  )
+  const across = Math.max(...shown.map((f) => screenWidth(f.drawn, em, 'in')))
+  return shown.map((f) => ({ record, f, em, across }))
+})
+
 it('lays out every CIP figure in inches with its texts clear, inside the frame, at 11 px', () => {
   const failures: string[] = []
-  for (const record of current) {
-    const shown = recordFigures(record).filter((f) => f.drawn.length)
-    if (!shown.length) continue
-    const em = screenEm(
-      shown.map((f) => f.drawn),
-      'in',
-    )
-    const across = Math.max(...shown.map((f) => screenWidth(f.drawn, em, 'in')))
-    for (const f of shown) failures.push(...figureFailures(record, f, em, across))
-  }
+  for (const { record, f, em, across } of inchFigures)
+    failures.push(...figureFailures(record, f, em, across))
   expect(failures).toEqual([])
 }, 300_000)
+
+// the record page prints each side upright: the screen layout at the print text size
+const layoutsDrawn = {
+  screen: (f: Shown) =>
+    figureModel(f.drawn, 'screen', screenEm([f.drawn], 'in'), 0, [], true, 'in'),
+  print: (f: Shown) => figureModel(f.drawn, 'print', face.printEm, 0, [], false, 'in'),
+  'page print': (f: Shown) => figureModel(f.drawn, 'screen', face.printEm, 0, [], false, 'in'),
+}
+
+it.each(Object.keys(layoutsDrawn) as (keyof typeof layoutsDrawn)[])(
+  'keeps every text a gap from the others and every angle text off its own arc (%s, in)',
+  (medium) => {
+    const failures: string[] = []
+    for (const { f } of inchFigures) {
+      const model = layoutsDrawn[medium](f)
+      for (const { side } of f.drawn)
+        failures.push(
+          ...gapFailures(
+            model.layers[side] as Layout,
+            model.em,
+            (x) => `${f.id} ${side} ${medium} in ${x}`,
+          ),
+        )
+    }
+    expect(failures).toEqual([])
+  },
+  120_000,
+)
 
 it('dimensions a bullet in inches, the ratio Rt/R unchanged', () => {
   const p = {
