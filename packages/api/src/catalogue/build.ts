@@ -71,8 +71,8 @@ function maker(
 
 /**
  * The index and the record file of `source`, every list in its default order. Pure: the same
- * records give the same output in Node and in the browser. The record file holds the records as
- * they are, without `kind`, `origin` and `revision`.
+ * records give the same output in Node and in the browser. The record file holds the records
+ * without `kind`, `origin` and `revision`.
  */
 export function buildCatalogue(source: CatalogueSource): CatalogueData & { records: RecordFile } {
   const manufacturers = new Map(source.manufacturers.map((m) => [m.id, m]))

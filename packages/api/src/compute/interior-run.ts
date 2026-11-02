@@ -26,10 +26,7 @@ const ladderBudgetMs = 14_000
 /** Output points of a whole ladder at most: five runs at the point cap, about 25 MB of JSON. */
 const ladderPoints = 5 * maxPoints
 
-/**
- * The compute runner and the cartridge lookup an interior request reads. The lookup fails an
- * unknown id with a 404 error.
- */
+/** The compute runner and the cartridge lookup of an interior request. The lookup fails an unknown id with a 404 error. */
 export type InteriorContext = {
   compute: ComputeRunner
   /** The cartridge record `id` with its values. */
@@ -187,10 +184,7 @@ async function interiorAnswer(
   }
 }
 
-/**
- * One interior request: the status and body of the answer. `known` is the cartridge record when
- * the caller has fetched it already.
- */
+/** One interior request: the status and body of the answer. `known` is the cartridge record if already fetched. */
 export async function runInterior(
   context: InteriorContext,
   body: InteriorBody,

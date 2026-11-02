@@ -15,7 +15,6 @@ export const sampleIds: Record<string, readonly string[]> = {
     '454-casull',
     '10-3-capra',
     '12-7-x-108',
-    '18-x-81',
     '243-win-super-short-mag',
     '8-x-51-r-lebel',
     // the rest of the default drawing baseline (`common` of drawing-baseline.spec.ts)
@@ -27,7 +26,6 @@ export const sampleIds: Record<string, readonly string[]> = {
     '12',
     // the specs of the record page and its drawing text
     '6mm-me-flobert-court',
-    '40-x-46-deftec',
     '223-rem',
     // a cartridge no catalogue bullet fits (component-records.spec.ts)
     '4-bore-rifle',

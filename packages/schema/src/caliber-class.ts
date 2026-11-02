@@ -28,5 +28,5 @@ export const caliberClass = z.strictObject({
   provenance,
 })
 
-/** A caliber class record: name, nominal bullet diameter and the member cartridges. */
+/** A caliber class record. */
 export interface CaliberClass extends z.infer<typeof caliberClass> {}

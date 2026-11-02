@@ -152,8 +152,7 @@ export interface BulletListFields {
 /**
  * The fields a bullet record gives its list item (the API's catalogue rows and the browser's
  * designs): the first G1 and G7 coefficient, null without one (a banded sheet lists the top band
- * first), the tip and base type, the construction (its structure, else its core material as
- * `<material>-core`) and `leadFree`; undefined where the record has none.
+ * first), tip and base type, construction and `leadFree`; undefined where the record has none.
  */
 export function bulletListFields(
   b: Pick<Bullet, 'tip' | 'base' | 'construction' | 'ballisticCoefficients'>,
@@ -173,8 +172,8 @@ export function bulletListFields(
 
 /**
  * Base types of a bullet. `conical-hollow-base` and `rounded-hollow-base`: a cavity open at the base,
- * a cone or a hemisphere whose depth follows from its diameter (`cavityDiameter`) unless a measured
- * `cavityDepth` gives it, on a flat base or on the boat tail the other fields describe.
+ * a cone or a hemisphere whose depth follows from `cavityDiameter` unless a measured `cavityDepth`
+ * gives it, on a flat base or on the boat tail the other fields describe.
  */
 export const baseTypes = z.enum([
   'flat',
@@ -199,10 +198,7 @@ export const tipTypes = z.enum([
   'open-meplat',
 ])
 
-/**
- * Base of a bullet: type, length, for a boat tail the base face diameter and the tail angle, and
- * for a hollow base the diameter of the cavity.
- */
+/** Base of a bullet: type, length, boat-tail base face diameter and angle, hollow-base cavity. */
 const bulletBase = z
   .object({
     type: baseTypes.optional(),
@@ -239,7 +235,7 @@ const bulletBase = z
     if (hollow && !base.cavityDiameter) issue('cavityDiameter', 'needed by a hollow base type')
   })
 
-/** Ogive of a bullet: form, radius or Rt/R, at least one of them. */
+/** Ogive of a bullet: at least one of form, radius and Rt/R. */
 const bulletOgive = z
   .object({
     /** Optional: a source may give the radius or Rt/R without naming the form. */
@@ -274,7 +270,7 @@ const bulletCannelure = z.object({
   depth: quantity('length', z.number().positive()).optional(),
 })
 
-/** Tip of a bullet: type, and the polymer tip length or the hollow-point mouth diameter. */
+/** Tip of a bullet: type, polymer tip length or hollow-point mouth diameter. */
 const bulletTip = z
   .object({
     type: tipTypes,

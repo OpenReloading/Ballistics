@@ -14,7 +14,7 @@ import {
 import { type Message, msg } from '../i18n/translate.ts'
 import { toCsv } from './csv.ts'
 import { localDay } from './dates.ts'
-import { countedFor, roundsDue, withSessionRounds } from './firearm.ts'
+import { countedFor, roundsDue, withCountedRounds, withSessionRounds } from './firearm.ts'
 import { userDataText } from './user-data.ts'
 
 /** A new entry: today, no rounds yet. */
@@ -154,8 +154,9 @@ export function cleanEntry(e: ShootingLogEntry): ShootingLogEntry {
  * yet: the rounds less those counted for the entry before and for the competition event it links
  * (`event`, the same match, #919). Of the event's counted rounds only the part that the other
  * entries linking it on this firearm (`siblings`) do not cover is taken off, so the order the
- * event and its entries are counted in does not change the total (#961). 0 for a record that is
- * no firearm or has no count.
+ * event and its entries are counted in does not change the total (#961). A sibling whose offer was
+ * declined ({@link withEntryDeclined}) covers none (#974). 0 for a record that is no firearm or has
+ * no count.
  */
 export function entryRoundsDue(
   record: UserRecord,
@@ -168,11 +169,11 @@ export function entryRoundsDue(
   const f = record.data
   const due = roundsDue(f, entryRef(id), f.roundCount, rounds)
   if (!event) return due
-  // a sibling's rounds its own count does not hold went into the event's count
-  const covered = siblings.reduce(
-    (n, s) => n + Math.max(0, s.rounds - countedFor(f, [entryRef(s.id)])),
-    0,
-  )
+  // a sibling's rounds its own count does not hold went into the event's count, unless declined
+  const covered = siblings.reduce((n, s) => {
+    const counted = f.countedSessions?.find((c) => c.session === entryRef(s.id))?.rounds
+    return counted === 0 ? n : n + Math.max(0, s.rounds - (counted ?? 0))
+  }, 0)
   return Math.max(0, due - Math.max(0, countedFor(f, [event]) - covered))
 }
 
@@ -192,4 +193,18 @@ export function withEntryRounds(
   const due = entryRoundsDue(record, id, rounds, event, siblings)
   if (record.kind !== 'firearm' || due < 1) return
   return withSessionRounds(record, entryRef(id), record.data.roundCount, rounds, due, now)
+}
+
+/**
+ * The firearm record with a declined offer for entry `id` noted as 0 rounds under the entry's
+ * reference in `countedSessions`, the count left as it is, so the entries linking the same event
+ * share its rounds the same in either order (#974); undefined, leaving the record, when it is no
+ * firearm, has no count or holds the entry already. shortcut: an entry counted before and declined
+ * after a raise keeps its rounds and so still covers the event; a separate declined field would
+ * tell them apart.
+ */
+export function withEntryDeclined(record: UserRecord, id: string, now = new Date()) {
+  if (record.kind !== 'firearm') return
+  if (record.data.countedSessions?.some((c) => c.session === entryRef(id))) return
+  return withCountedRounds(record, entryRef(id), 0, now)
 }

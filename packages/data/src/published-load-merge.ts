@@ -131,7 +131,27 @@ function citing(load: PublishedLoad, index: number): PublishedLoad {
   return out as PublishedLoad
 }
 
-/** Adds incoming load `l` to `report` against the repository's `old`; true where `l` is written. */
+/**
+ * `l` with the catalogue links of the stored load `old` that it lacks: `bullet.record`,
+ * `powder.record`, and the primer's `records`, `size` and `magnum` where both print the same primer.
+ * The links are curated in the repository, so a collector that does not set them keeps them.
+ */
+function withStoredLinks(old: PublishedLoad, l: PublishedLoad): PublishedLoad {
+  const record = <T>(incoming: T | undefined, stored: T | undefined) =>
+    (incoming ?? stored) === undefined ? {} : { record: incoming ?? stored }
+  return {
+    ...l,
+    bullet: { ...l.bullet, ...record(l.bullet.record, old.bullet.record) },
+    powder: { ...l.powder, ...record(l.powder.record, old.powder.record) },
+    ...(l.primer !== undefined &&
+      old.primer?.printed === l.primer.printed && { primer: { ...old.primer, ...l.primer } }),
+  }
+}
+
+/**
+ * Adds incoming load `l` to `report` against the repository's `old`; returns the load to write,
+ * `l` with the links of `old` it lacks, or undefined where nothing is written.
+ */
 function classify(
   old: PublishedLoad | undefined,
   l: PublishedLoad,
@@ -140,34 +160,38 @@ function classify(
 ) {
   if (old === undefined) {
     report.created.push(l.id)
-    return true
+    return l
   }
-  const fields = differences(content(old), content(l), '')
+  const linked = withStoredLinks(old, l)
+  const fields = differences(content(old), content(linked), '')
   if (fields.length === 0) {
     report.unchanged.push(l.id)
-    return false
+    return
   }
   const accepted = accept === 'all' || accept.has(l.id)
   report.changed.push({ id: l.id, fields, accepted })
-  return accepted
+  return accepted ? linked : undefined
 }
 
 /**
  * Merges an incoming edition of a table into the file in the repository, by load id:
  * - a load the repository lacks is created;
- * - a load whose content (all but `id`, `source`, `page` and `url`) is equal stays as it is,
- *   citing the edition that printed it;
- * - a load with other content is listed with the changed field paths and is replaced only where
- *   its id is in `accept`, or `accept` is `'all'`;
- * - a load of the repository the incoming edition does not print is kept and listed as absent.
+ * - a load with equal content (all but `id`, `source`, `page` and `url`) stays as it is, citing the
+ *   edition that printed it;
+ * - a load with other content is listed with the changed field paths and replaced only where its
+ *   id is in `accept`, or `accept` is `'all'`;
+ * - a catalogue link of a stored load (`bullet.record`, `powder.record`, the primer's `records`,
+ *   `size` and `magnum`) that the incoming load lacks is no change and stays on an accepted load;
+ *   one the incoming load sets otherwise is a change;
+ * - a repository load the incoming edition does not print is kept and listed as absent.
  *
- * A created or accepted load cites the incoming source, appended to `provenance.sources` where the
- * file does not have it yet (the sources compare as JSON). The incoming file's loads get their ids
- * from {@link withLoadIds}; any id they carry is replaced. The loads come out sorted by id. The
- * file's other fields stay those of the repository; with no file there, the incoming file is
- * the start. `written` is false when the merge leaves the repository file as it is.
- * `resolveSource` turns a source entry into the form two entries compare in, so a reference to a
- * source record and the same source written out are one source.
+ * A created or accepted load cites the incoming source, appended to `provenance.sources` unless
+ * already there (sources compare as JSON). The incoming loads get their ids from
+ * {@link withLoadIds}, replacing any they carry. The loads come out sorted by id. The file's other
+ * fields stay those of the repository; with no file there, the incoming file is the start.
+ * `written` is false when the repository file is left as it is. `resolveSource` turns a source
+ * entry into the form two entries compare in, so a source record reference and the same source
+ * written out are one source.
  */
 export function mergePublishedLoads(
   existing: PublishedLoads | undefined,
@@ -195,8 +219,8 @@ export function mergePublishedLoads(
   const printed = new Set<string>()
   for (const l of loads) {
     printed.add(l.id)
-    if (classify(byId.get(l.id), l, accept, report))
-      byId.set(l.id, citing(l, sourceIndex(l.source ?? 0)))
+    const toWrite = classify(byId.get(l.id), l, accept, report)
+    if (toWrite) byId.set(l.id, citing(toWrite, sourceIndex(toWrite.source ?? 0)))
   }
   for (const l of base.loads) if (!printed.has(l.id)) report.absent.push(l.id)
   for (const list of [report.created, report.unchanged, report.absent]) list.sort(compareKeys)

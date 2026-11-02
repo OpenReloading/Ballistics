@@ -156,9 +156,9 @@ function Axis({ at }: { at?: [number, number] | undefined }) {
   )
 }
 
-/** The screen width at which a figure's text renders 11 px (whole px: layout rounds down). */
-const readableWidth = ({ em, frame: [, , w] }: FigureModel | BulletModel) =>
-  `${Math.ceil((w * face.minTextPx) / em)}px`
+/** The screen width at which a figure's text, at its drawn size `n(em)`, renders 11 px (whole px: layout rounds down). */
+export const readableWidth = ({ em, frame: [, , w] }: FigureModel | BulletModel) =>
+  `${Math.ceil((w * face.minTextPx) / n(em))}px`
 
 /** The screen width a figure fits: the window height less the page's rows above (`--drawing-chrome`, 7rem unless a page sets it), but no smaller than 11 px text. */
 function fitWidth(model: FigureModel | BulletModel, tallest = model.frame[3]) {

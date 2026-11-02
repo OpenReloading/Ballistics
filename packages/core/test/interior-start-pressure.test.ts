@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { constructionOf, defaultStartPressure, InputError, startPressureOf } from '../src/index.ts'
+import {
+  bulletStructures,
+  constructionOf,
+  defaultStartPressure,
+  InputError,
+  startPressureOf,
+} from '../src/index.ts'
 
 describe('default start pressure', () => {
   it('gives the fitted value by construction and class, the rifle assumption where none is fitted', () => {
@@ -60,6 +66,12 @@ describe('construction of a bullet record', () => {
   it('gives none for a record without a construction', () => {
     expect(constructionOf(undefined)).toBeUndefined()
   })
+
+  it('gives each structure its construction and density class from one table', () => {
+    expect(bulletStructures.swaged).toEqual({ construction: 'lead', density: 'unknown' })
+    expect(bulletStructures.cast).toEqual({ construction: 'lead', density: 'cast' })
+    expect(bulletStructures.frangible?.construction).toBeUndefined()
+  })
 })
 
 describe('start pressure of a barrel and a bullet record', () => {
@@ -82,12 +94,17 @@ describe('start pressure of a barrel and a bullet record', () => {
     expect(rifle('plated').interval).toBeUndefined()
   })
 
-  it('keeps the rifle value where the barrel or the construction is not known', () => {
+  it('keeps the rifle value where the barrel is not known, and for a rifle without a construction', () => {
     const rifle = defaultStartPressure(0.3)
     expect(startPressureOf(undefined, { structure: 'cast' })).toEqual(rifle)
-    expect(startPressureOf(0.12, undefined)).toEqual(rifle)
     expect(startPressureOf(Number.NaN, { structure: 'cast' })).toEqual(rifle)
     expect(startPressureOf(0.61, undefined)).toEqual(rifle)
+  })
+
+  it('counts a handgun without a construction as jacketed, assumed, as defaultStartPressure does', () => {
+    const r = startPressureOf(0.12, undefined)
+    expect(r).toEqual({ ...defaultStartPressure(0.12), construction: 'jacketed', assumed: true })
+    expect(r.value).toBe(startPressureOf(0.12, {}).value)
   })
 
   it('marks a construction the record does not state as assumed', () => {

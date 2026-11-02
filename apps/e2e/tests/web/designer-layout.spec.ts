@@ -141,7 +141,7 @@ test('a changed field goes back to the record value by its own button, and the r
 }) => {
   await storeUnits(page)
   await page.setViewportSize({ width: 1280, height: 650 })
-  await gotoHydrated(page, '/bullets/designer?from=berger-30410')
+  await gotoHydrated(page, '/bullets/designer?from=demo-bullet-168')
   const diameter = page.getByRole('textbox', { name: /Diameter \(mm\)$/ })
   await expect(diameter).not.toHaveValue('')
   const record = await diameter.inputValue()

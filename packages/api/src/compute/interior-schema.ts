@@ -362,8 +362,8 @@ const m3Load = z
   .describe('The load: chamber, barrel, bullet, charge and propellant, SI units.')
 
 /**
- * The fields of the M3 interior body and of the charge-target body (`apps/docs/docs/models/interior-m3.md`): SI,
- * `load.propellantTemperature` in K.
+ * The fields of the M3 interior body and of the charge-target body
+ * (`apps/docs/docs/models/interior-m3.md`): SI, `load.propellantTemperature` in K.
  * `interiorBody` adds the sampling field.
  */
 export const interiorBase = z
