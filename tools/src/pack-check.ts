@@ -3,7 +3,8 @@
  * when the README or an entry point of `exports`, `main` or `types` is missing (a `*` pattern: no
  * packed file matches it), or when the list holds a test file, a source map without its sources, a
  * file outside the `files` field, or a bare import in a packed `.js` or `.d.ts` file of a package
- * that is not in `dependencies` or `peerDependencies`.
+ * that is not in `dependencies` or `peerDependencies`. Fails too on a dependency on a private
+ * workspace package, which npm never gets, so the published tarball would not install.
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
@@ -98,8 +99,31 @@ function packOf(dir: string): Packed | undefined {
   return (Array.isArray(listed) ? listed : Object.values(listed))[0]
 }
 
-/** What is wrong with the tarball of the package in `dir`, one line each. */
-export function packProblems(dir: string): string[] {
+/** The names of the workspace packages of `root` marked `private`, which are never published. */
+function privateWorkspaces(root: string) {
+  const { workspaces = [] } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
+    workspaces?: string[]
+  }
+  const manifests = workspaces.map(
+    (w) =>
+      JSON.parse(readFileSync(join(root, w, 'package.json'), 'utf8')) as Manifest & {
+        private?: boolean
+      },
+  )
+  return new Set(manifests.filter((m) => m.private === true).map((m) => m.name ?? ''))
+}
+
+/** The dependencies of `manifest` among the private workspace packages `privates`. */
+const privateDependencyProblems = (manifest: Manifest, privates: Set<string>) =>
+  Object.keys({ ...manifest.dependencies, ...manifest.peerDependencies })
+    .filter((name) => privates.has(name))
+    .map((name) => `depends on ${name}, a private workspace package that npm does not have`)
+
+/**
+ * What is wrong with the tarball of the package in `dir`, one line each. `privates` are the
+ * names of the unpublished workspace packages, which no published package may depend on.
+ */
+export function packProblems(dir: string, privates = new Set<string>()): string[] {
   const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
   const pack = packOf(dir)
   if (!pack) return ['npm pack listed no package']
@@ -107,6 +131,7 @@ export function packProblems(dir: string): string[] {
   const problems = ['README.md']
     .filter((f) => !files.has(f))
     .map((f) => `${f} is not in the tarball`)
+  problems.push(...privateDependencyProblems(manifest, privates))
   const entries = [manifest.main, manifest.types, ...exportTargets(manifest.exports)]
   for (const entry of new Set(entries.filter((e) => e !== undefined).map((e) => normalize(e))))
     if (!packed(entry, files)) problems.push(`entry point ${entry} is not in the tarball`)
@@ -123,8 +148,9 @@ export function packProblems(dir: string): string[] {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = fileURLToPath(new URL('../../', import.meta.url))
   let failed = false
+  const privates = privateWorkspaces(root)
   for (const name of published) {
-    const problems = packProblems(join(root, 'packages', name))
+    const problems = packProblems(join(root, 'packages', name), privates)
     for (const problem of problems) console.error(`@open-reloading/${name}: ${problem}`)
     failed ||= problems.length > 0
   }

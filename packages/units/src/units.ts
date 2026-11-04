@@ -35,7 +35,7 @@ export interface StoredUnits {
 }
 
 /** The stored unit of each quantity, see {@link StoredUnits}. */
-export const units: StoredUnits = {
+export const units: Readonly<StoredUnits> = {
   length: 'mm',
   area: 'mm2',
   volume: 'cm3',
@@ -71,8 +71,8 @@ export type UnitId = StoredUnits[QuantityKind] | 'in' | 'ft' | 'gr' | 'mph' | 'i
 
 /** Map from a unit to SI: `si = value * factor + offset`. */
 export interface SiMap {
-  factor: number
-  offset: number
+  readonly factor: number
+  readonly offset: number
 }
 
 const scale = (factor: number): SiMap => ({ factor, offset: 0 })
@@ -89,7 +89,7 @@ const gravity = 9.80665
  * temperature K. Customary factors are the exact definitions (NIST SP 811, appendix B), except the
  * conventional inch of mercury.
  */
-export const conversions: Record<UnitId, SiMap> = {
+export const conversions: Readonly<Record<UnitId, SiMap>> = {
   mm: scale(1e-3),
   mm2: scale(1e-6),
   cm3: scale(1e-6),
@@ -120,7 +120,7 @@ export const conversions: Record<UnitId, SiMap> = {
 }
 
 /** The map to SI of each quantity's stored unit: the conversion of `units[kind]`. */
-export const siMaps: Record<QuantityKind, SiMap> = {
+export const siMaps: Readonly<Record<QuantityKind, SiMap>> = {
   length: conversions.mm,
   area: conversions.mm2,
   volume: conversions.cm3,
@@ -153,15 +153,24 @@ export type Si<K extends QuantityKind> = number & { readonly siUnitOf: K }
 
 // toSi and fromSi read `conversions`, not `siMaps`, so a bundle that never imports `siMaps` drops it
 
-/** A value of quantity `kind` in its stored unit, in SI. */
-export const toSi = <K extends QuantityKind>(kind: K, stored: number): Si<K> => {
+/** A value of quantity `kind` in its stored unit, in SI. A value already in SI is refused. */
+export const toSi = <K extends QuantityKind>(
+  kind: K,
+  stored: number & { readonly siUnitOf?: never },
+): Si<K> => {
   const { factor, offset } = conversions[units[kind]]
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a brand has no runtime form: it is set here
   return (stored * factor + offset) as Si<K>
 }
 
-/** A value of quantity `kind` in SI, in its stored unit: the inverse of {@link toSi}. */
-export const fromSi = <K extends QuantityKind>(kind: K, si: number): Stored<K> => {
+/**
+ * A value of quantity `kind` in SI, in its stored unit: the inverse of {@link toSi}. A value already
+ * in its stored unit is refused.
+ */
+export const fromSi = <K extends QuantityKind>(
+  kind: K,
+  si: number & { readonly storedUnitOf?: never },
+): Stored<K> => {
   const { factor, offset } = conversions[units[kind]]
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a brand has no runtime form: it is set here
   return ((si - offset) / factor) as Stored<K>

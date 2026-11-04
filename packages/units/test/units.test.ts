@@ -61,3 +61,14 @@ it('marks stored and SI values per quantity kind for the type checker', () => {
   expectTypeOf<Si<'length'>>().not.toExtend<Stored<'length'>>()
   expectTypeOf<number>().not.toExtend<Si<'length'>>()
 })
+
+it('refuses a value that already has the unit a conversion produces', () => {
+  type ToSiInput = Parameters<typeof toSi<'length'>>[1]
+  type FromSiInput = Parameters<typeof fromSi<'length'>>[1]
+  expectTypeOf<number>().toExtend<ToSiInput>()
+  expectTypeOf<Stored<'length'>>().toExtend<ToSiInput>()
+  expectTypeOf<Si<'length'>>().not.toExtend<ToSiInput>()
+  expectTypeOf<number>().toExtend<FromSiInput>()
+  expectTypeOf<Si<'length'>>().toExtend<FromSiInput>()
+  expectTypeOf<Stored<'length'>>().not.toExtend<FromSiInput>()
+})

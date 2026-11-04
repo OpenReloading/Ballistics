@@ -5,13 +5,15 @@
 ```ts
 
 // @public
-export const conversions: Record<UnitId, SiMap>;
+export const conversions: Readonly<Record<UnitId, SiMap>>;
 
 // @public
 export type DecimalMark = '.' | ',';
 
 // @public
-export const fromSi: <K extends QuantityKind>(kind: K, si: number) => Stored<K>;
+export const fromSi: <K extends QuantityKind>(kind: K, si: number & {
+    readonly storedUnitOf?: never;
+}) => Stored<K>;
 
 // @public
 export interface NumberRange {
@@ -55,13 +57,13 @@ export type Si<K extends QuantityKind> = number & {
 // @public
 export interface SiMap {
     // (undocumented)
-    factor: number;
+    readonly factor: number;
     // (undocumented)
-    offset: number;
+    readonly offset: number;
 }
 
 // @public
-export const siMaps: Record<QuantityKind, SiMap>;
+export const siMaps: Readonly<Record<QuantityKind, SiMap>>;
 
 // @public
 export type Stored<K extends QuantityKind> = number & {
@@ -107,13 +109,15 @@ export interface StoredUnits {
 }
 
 // @public
-export const toSi: <K extends QuantityKind>(kind: K, stored: number) => Si<K>;
+export const toSi: <K extends QuantityKind>(kind: K, stored: number & {
+    readonly siUnitOf?: never;
+}) => Si<K>;
 
 // @public
 export type UnitId = StoredUnits[QuantityKind] | 'in' | 'ft' | 'gr' | 'mph' | 'inHg' | 'psi' | 'MOA';
 
 // @public
-export const units: StoredUnits;
+export const units: Readonly<StoredUnits>;
 
 // (No @packageDocumentation comment for this package)
 

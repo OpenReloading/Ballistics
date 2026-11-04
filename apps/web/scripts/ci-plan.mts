@@ -31,8 +31,8 @@ const webInputs = [
 /** Changes that no check reads: prose outside the documents the app, its tests and the tools read, and GitHub's templates. */
 const docsOnly = [
   // the docs site's pages are checked by the docs tests (bibliography and code lines), the home page
-  // prerenders the news items
-  /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/).*\.md$/,
+  // prerenders the news items, the build compares a package's API report (`*.api.md`)
+  /^(?!README\.md$)(?!apps\/docs\/docs\/)(?!apps\/web\/news\/)(?!.*\.api\.md$).*\.md$/,
   // the web tests read the user report template, the licence check the generated block of NOTICE
   /^\.github\/(ISSUE_TEMPLATE\/(?!user-report\.yml$)|pull_request_template\.md$)/,
   /^(LICENSE|\.coderabbit\.yaml)$/,

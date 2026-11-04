@@ -61,6 +61,8 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     '.github/workflows/release.yml',
     'README.md',
     'apps/docs/docs/models/bullet-fit.md',
+    // the units build compares its API report
+    'packages/units/units.api.md',
   ])
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: false })
   for (const f of [
