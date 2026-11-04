@@ -72,3 +72,12 @@ it('refuses a value that already has the unit a conversion produces', () => {
   expectTypeOf<Si<'length'>>().toExtend<FromSiInput>()
   expectTypeOf<Stored<'length'>>().not.toExtend<FromSiInput>()
 })
+
+it('refuses a value branded for another quantity kind', () => {
+  expectTypeOf<Stored<'mass'>>().not.toExtend<Parameters<typeof toSi<'length'>>[1]>()
+  expectTypeOf<Si<'mass'>>().not.toExtend<Parameters<typeof fromSi<'length'>>[1]>()
+  // @ts-expect-error -- a mass is no length, and `kind` alone sets the kind
+  toSi('length', fromSi('mass', 1))
+  // @ts-expect-error -- a mass is no length, and `kind` alone sets the kind
+  fromSi('length', toSi('mass', 1))
+})

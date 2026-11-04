@@ -13,6 +13,7 @@ export type DecimalMark = '.' | ',';
 // @public
 export const fromSi: <K extends QuantityKind>(kind: K, si: number & {
     readonly storedUnitOf?: never;
+    readonly siUnitOf?: NoInfer<K>;
 }) => Stored<K>;
 
 // @public
@@ -111,6 +112,7 @@ export interface StoredUnits {
 // @public
 export const toSi: <K extends QuantityKind>(kind: K, stored: number & {
     readonly siUnitOf?: never;
+    readonly storedUnitOf?: NoInfer<K>;
 }) => Si<K>;
 
 // @public

@@ -153,10 +153,13 @@ export type Si<K extends QuantityKind> = number & { readonly siUnitOf: K }
 
 // toSi and fromSi read `conversions`, not `siMaps`, so a bundle that never imports `siMaps` drops it
 
-/** A value of quantity `kind` in its stored unit, in SI. A value already in SI is refused. */
+/**
+ * A value of quantity `kind` in its stored unit, in SI. A value already in SI, or stored for another
+ * kind, is refused.
+ */
 export const toSi = <K extends QuantityKind>(
   kind: K,
-  stored: number & { readonly siUnitOf?: never },
+  stored: number & { readonly siUnitOf?: never; readonly storedUnitOf?: NoInfer<K> },
 ): Si<K> => {
   const { factor, offset } = conversions[units[kind]]
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a brand has no runtime form: it is set here
@@ -165,11 +168,11 @@ export const toSi = <K extends QuantityKind>(
 
 /**
  * A value of quantity `kind` in SI, in its stored unit: the inverse of {@link toSi}. A value already
- * in its stored unit is refused.
+ * in its stored unit, or in SI for another kind, is refused.
  */
 export const fromSi = <K extends QuantityKind>(
   kind: K,
-  si: number & { readonly storedUnitOf?: never },
+  si: number & { readonly storedUnitOf?: never; readonly siUnitOf?: NoInfer<K> },
 ): Stored<K> => {
   const { factor, offset } = conversions[units[kind]]
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- a brand has no runtime form: it is set here
