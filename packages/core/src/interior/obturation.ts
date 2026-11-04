@@ -3,8 +3,10 @@
  * hardness"): a rule of thumb, not a model of the leak. The run is not changed.
  */
 
+import { conversions } from '@open-reloading/units'
+
 /** Pa per pound-force per square inch (NIST SP 811, 2008, appendix B.9). */
-const pascalPerPsi = 6894.757293168
+const pascalPerPsi = conversions.psi.factor
 
 /**
  * Pressure per Brinell hardness number above which a plain-base cast bullet upsets to the bore, Pa:

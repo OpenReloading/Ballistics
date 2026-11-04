@@ -1,3 +1,8 @@
+import {
+  type NumberRange,
+  type ParsedNumber,
+  parseNumber as parseWithMark,
+} from '@open-reloading/units'
 import { shownLanguage } from './shown.ts'
 import { type Translator, translator } from './translate.ts'
 
@@ -7,6 +12,8 @@ import { type Translator, translator } from './translate.ts'
  * exported and sent to the packages. Only the screen writes the language's decimal mark, and only
  * what a person types or pastes is read through {@link parseNumber}.
  */
+
+export type { NumberRange, ParsedNumber }
 
 const marks = new Map<string, '.' | ','>()
 
@@ -77,105 +84,15 @@ export const fixedNumber = (x: number, digits: number, language = shownLanguage(
 export const plainNumber = (x: number, language = shownLanguage()) =>
   localizeNumber(String(x), language)
 
-/** The result of reading typed text as a number. */
-export type ParsedNumber =
-  | { kind: 'empty' }
-  /** `text` is the canonical form of what was typed: the sign, digits, a point and the exponent as given. */
-  | { kind: 'number'; value: number; text: string }
-  | { kind: 'invalid' }
-  /** A lone foreign separator before three digits: `decimal` and `grouped` are the two readings. */
-  | { kind: 'ambiguous'; decimal: number; grouped: number }
-
-/** What the field accepts: the bounds in the unit the text is typed in. */
-export interface NumberRange {
-  min?: number | undefined
-  max?: number | undefined
-  /** Only whole numbers are valid. */
-  integer?: boolean | undefined
-}
-
-const shape = /^([+-]?)([\d.,]+)(?:([eE])([+-]?\d{1,4}))?$/
-const grouped = (sep: string) => new RegExp(`^\\d{1,3}(?:\\${sep}\\d{3})+$`)
-
-const accepts = (x: number, { min, max, integer }: NumberRange) =>
-  (min === undefined || x >= min) &&
-  (max === undefined || x <= max) &&
-  (!integer || Number.isInteger(x))
-
-/** The canonical mantissa of digits with both marks: the last is the decimal mark, the other groups in threes. */
-function withBothMarks(body: string): string[] {
-  const at = Math.max(body.lastIndexOf('.'), body.lastIndexOf(','))
-  const group = body[at] === '.' ? ',' : '.'
-  const [whole, fraction] = [body.slice(0, at), body.slice(at + 1)]
-  return grouped(group).test(whole) && /^\d*$/.test(fraction)
-    ? [`${whole.replaceAll(group, '')}.${fraction}`]
-    : []
-}
-
 /**
- * The canonical mantissas the digits and marks of `body` can be read as: none when they are no
- * number, two (the decimal reading first) when a mark could be a decimal mark or a group.
+ * Reads typed or pasted text with either decimal mark; the mark of `language` settles a lone mark
+ * before three digits (`parseNumber` of `@open-reloading/units` has the rules).
  */
-function readings(body: string, own: string): string[] {
-  const dots = body.split('.').length - 1
-  const commas = body.split(',').length - 1
-  if (dots + commas === 0) return [body]
-  if (dots > 0 && commas > 0) return withBothMarks(body)
-  const sep = dots > 0 ? '.' : ','
-  if (dots + commas > 1)
-    return sep !== own && grouped(sep).test(body) ? [body.replaceAll(sep, '')] : []
-  const [whole = '', fraction = ''] = body.split(sep)
-  const decimal = `${whole}.${fraction}`
-  return sep !== own && fraction.length === 3 && /^[1-9]\d{0,2}$/.test(whole)
-    ? [decimal, whole + fraction]
-    : [decimal]
-}
-
-/**
- * Reads typed or pasted text. Both marks are accepted whatever the language: "1,5" and "1.5".
- *
- * - Empty text is empty. Letters (a unit), spaces and anything else that is no number are invalid;
- *   an exponent ("1e-3", "1,5E3") is read.
- * - A leading mark (",5"), a trailing mark ("1,") and a sign are read.
- * - With both marks the last one is the decimal mark and the other must group digits in threes
- *   ("1.234,5", "1,234.5").
- * - A mark that repeats groups digits in threes, which the language's own decimal mark never does
- *   ("1.234.567" in German, "1,234,567" in English); else the text is invalid.
- * - The language's own mark, once, is the decimal mark: "1.234" in English and "1,234" in German
- *   are 1.234.
- * - The other mark, once, is a decimal mark ("1,5" in English). With exactly three digits after
- *   it and one to three before ("1,234" in English, "1.234" in German) it could also group: the
- *   reading that falls inside `range` is taken when only one does, else the text is ambiguous.
- */
-export function parseNumber(
+export const parseNumber = (
   input: string,
   range: NumberRange = {},
   language = shownLanguage(),
-): ParsedNumber {
-  const text = input.trim().replace('\u2212', '-')
-  if (text === '') return { kind: 'empty' }
-  const m = shape.exec(text)
-  if (!m) return { kind: 'invalid' }
-  const [, sign = '', body = '', e = '', exp = ''] = m
-  if (!/\d/.test(body)) return { kind: 'invalid' }
-  const done = (mantissa: string): ParsedNumber => {
-    const value = Number(sign + mantissa + e + exp)
-    return Number.isFinite(value)
-      ? { kind: 'number', value, text: sign + mantissa + e + exp }
-      : { kind: 'invalid' }
-  }
-  const [first, second] = readings(body, decimalMark(language))
-  if (first === undefined) return { kind: 'invalid' }
-  const decimal = done(first)
-  if (second === undefined) return decimal
-  // the other mark before three digits: a decimal or a group
-  const asGroup = done(second)
-  if (decimal.kind !== 'number' || asGroup.kind !== 'number') return decimal
-  const [d, g] = [accepts(decimal.value, range), accepts(asGroup.value, range)]
-  if (d === g)
-    return d ? { kind: 'ambiguous', decimal: decimal.value, grouped: asGroup.value } : decimal
-  return d ? decimal : asGroup
-}
+): ParsedNumber => parseWithMark(input, decimalMark(language), range)
 
 /**
  * English text with its numbers in the language shown: what a caller that has no `t` gets, as

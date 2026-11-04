@@ -103,6 +103,7 @@ it('builds with the sample when the web app changed outside the record pages', (
 it('prerenders every record when record data, page code or shared parts changed', () => {
   for (const f of [
     'packages/data/records/powders/delta-2460.json',
+    'packages/units/src/units.ts',
     'packages/schema/src/units.ts',
     'packages/api/src/server.ts',
     'packages/drawing/src/index.ts',

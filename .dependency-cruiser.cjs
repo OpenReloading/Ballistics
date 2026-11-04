@@ -36,12 +36,20 @@ module.exports = {
       to: { couldNotResolve: true },
     },
     {
-      name: 'core-imports-nothing',
+      name: 'units-imports-nothing',
       severity: 'error',
       comment:
-        'packages/core has no I/O: it imports only its own files. A runtime dependency is allowed here by name.',
+        'packages/units is the bottom of the graph and has no I/O: it imports only its own files.',
+      from: { path: own('packages/units/src') },
+      to: { pathNot: own('packages/units/src') },
+    },
+    {
+      name: 'core-imports-units-only',
+      severity: 'error',
+      comment:
+        'packages/core has no I/O: it imports only @open-reloading/units and its own files. A runtime dependency is allowed here by name.',
       from: { path: own('packages/core/src') },
-      to: { pathNot: own('packages/core/src') },
+      to: { pathNot: `^(packages/core/src/|${pkg('units')})` },
     },
     ...Object.entries(drawingFolders).map(([name, may]) => ({
       name: `drawing-${name}-imports`,
@@ -67,11 +75,11 @@ module.exports = {
       to: { path: pkg('schema') },
     },
     {
-      name: 'schema-imports-no-workspace-package',
+      name: 'schema-imports-units-only',
       severity: 'error',
-      comment: 'packages/schema is the bottom of the graph: it imports no other workspace package.',
+      comment: 'packages/schema imports no workspace package but @open-reloading/units.',
       from: { path: own('packages/schema/src') },
-      to: workspaceExcept('packages/schema/src'),
+      to: workspaceExcept('packages/schema/src', 'units'),
     },
     {
       name: 'data-imports-schema-only',

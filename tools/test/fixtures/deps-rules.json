@@ -83,17 +83,29 @@
     "source": "import { geometry } from '../core/geometry.ts'\nexport { geometry }",
     "rules": ["drawing-target-imports"]
   },
+  "packages/units/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["units-imports-nothing"]
+  },
+  "packages/units/src/schema.ts": {
+    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "rules": ["not-to-unresolvable", "units-imports-nothing"]
+  },
+  "packages/core/src/units.ts": {
+    "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
+    "rules": ["not-to-unresolvable"]
+  },
   "packages/core/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
-    "rules": ["core-imports-nothing"]
+    "rules": ["core-imports-units-only"]
   },
   "packages/core/src/npm-package.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["core-imports-nothing", "not-to-unresolvable"]
+    "rules": ["core-imports-units-only", "not-to-unresolvable"]
   },
   "packages/core/src/missing.ts": {
     "source": "import './nope.ts'",
-    "rules": ["core-imports-nothing", "not-to-unresolvable"]
+    "rules": ["core-imports-units-only", "not-to-unresolvable"]
   },
   "packages/importers/src/types-of-schema.ts": {
     "source": "import type { ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
@@ -119,9 +131,13 @@
     "source": "import { z } from 'zod'\nexport { z }",
     "rules": ["not-to-unresolvable"]
   },
+  "packages/schema/src/units.ts": {
+    "source": "import { units } from '@open-reloading/units'\nexport { units }",
+    "rules": ["not-to-unresolvable"]
+  },
   "packages/schema/src/core.ts": {
     "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
-    "rules": ["not-to-unresolvable", "schema-imports-no-workspace-package"]
+    "rules": ["not-to-unresolvable", "schema-imports-units-only"]
   },
   "packages/data/src/schema-and-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",

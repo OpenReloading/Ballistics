@@ -35,12 +35,16 @@
   "files": [
     "dist",
     "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -b tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage --passWithNoTests"
+  },
+  "dependencies": {
+    "@open-reloading/units": "0.0.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^5.0.5",

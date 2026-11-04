@@ -11,6 +11,9 @@
         "@swc/core"
       ]
     },
+    "packages/units": {
+      "entry": ["src/index.ts"]
+    },
     "packages/schema": {
       "entry": ["src/index.ts", "src/write-json-schema.ts"]
     },
