@@ -21,5 +21,6 @@
         "logLevel": "none"
       }
     }
-  }
+  },
+  "newlineKind": "lf"
 }

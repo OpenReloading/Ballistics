@@ -1,6 +1,6 @@
 /**
  * The workbench state as a `Load` of the schema and back. The state holds SI values, the load
- * stored units (`packages/schema/src/units.ts`); a value goes through `storedOf`, which rounds to
+ * stored units (`packages/units/src/units.ts`); a value goes through `storedOf`, which rounds to
  * 12 significant digits, so saving what was opened gives the same load again.
  */
 import {

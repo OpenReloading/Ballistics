@@ -9,7 +9,9 @@ const root = fileURLToPath(new URL('../../', import.meta.url))
 /** The code that runs in the browser: the web app and the packages it bundles. */
 const browserSources = [
   'apps/web/src',
-  ...['core', 'drawing', 'schema', 'api', 'importers', 'data'].map((p) => `packages/${p}/src`),
+  ...['units', 'core', 'drawing', 'schema', 'api', 'importers', 'data'].map(
+    (p) => `packages/${p}/src`,
+  ),
 ]
 
 /**
