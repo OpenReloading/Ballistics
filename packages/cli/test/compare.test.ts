@@ -151,7 +151,12 @@ describe('compare', () => {
   it('includes the water density and the unit and capacity code in every version', async () => {
     const labels = (await loadModel('m3')).files.map((f) => f.label)
     expect(labels).toEqual(
-      expect.arrayContaining(['core/water.js', 'schema/units.js', 'schema/case-capacity.js']),
+      expect.arrayContaining([
+        'core/water.js',
+        'units/units.js',
+        'schema/units.js',
+        'schema/case-capacity.js',
+      ]),
     )
   })
 })

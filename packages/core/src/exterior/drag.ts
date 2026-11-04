@@ -2,6 +2,7 @@
  * Drag input and table lookup, BC reference atmosphere and monotone cubic interpolation,
  * `apps/docs/docs/models/exterior-drag.md`.
  */
+import { conversions } from '@open-reloading/units'
 import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
 
 /**
@@ -10,9 +11,8 @@ import { type DragModel, type DragTable, dragTables } from '../drag-tables.ts'
  */
 export const dragModels: readonly DragModel[] = ['G1', 'G2', 'G5', 'G6', 'G7', 'G8', 'GI', 'GS']
 
-// local: core cannot import the schema's units
 /** kg/m2 per lb/in2: converts a published ballistic coefficient to SI (exact). */
-export const lbPerSqInToKgPerSqM = 0.45359237 / 0.0254 ** 2
+export const lbPerSqInToKgPerSqM = conversions['lb/in2'].factor
 
 /** One velocity band of a ballistic coefficient: applies while the airspeed is at least `minVelocity`. */
 export interface BallisticCoefficientBand {

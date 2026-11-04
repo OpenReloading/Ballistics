@@ -267,7 +267,7 @@ const readingOrder: RowGroup[] = ['neck', 'shoulder', 'body', 'head', 'throat', 
 export const inReadingOrder = <T extends { group: RowGroup }>(rows: T[]): T[] =>
   [...rows].sort((a, b) => readingOrder.indexOf(a.group) - readingOrder.indexOf(b.group))
 
-/** The symbol of each quantity's stored unit (`packages/schema/src/units.ts`). */
+/** The symbol of each quantity's stored unit (`packages/units/src/units.ts`). */
 const stored = { length: 'mm', pressure: 'bar', energy: 'J', area: 'mm²' } as const
 type Converted = keyof typeof stored
 export const converted = (q: string): q is Converted => Object.hasOwn(stored, q)

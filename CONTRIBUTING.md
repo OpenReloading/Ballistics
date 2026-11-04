@@ -14,6 +14,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - `npm run build`, `npm run typecheck`, `npm run lint` (`npm run format` applies the fixes), `npm test`.
 - Record changes: `npm run data:validate`.
+- A change to the exports of `packages/units`: `npx api-extractor run --local` in that folder rewrites its API report `units.api.md`, which the build compares and the pull request shows.
 - API changes, in the dev container (the checks need oasdiff and Schemathesis): `npm run api:check` (a breaking change also rewrites the baseline: `npm run api-baseline -w @open-reloading/tools`) and `npm run api:conformance` against a running API.
 - CI (`.github/workflows/ci.yml`) also runs `npm run docs:check`, `npm audit` (`tools/src/audit.ts`: high and critical advisories, except the allowlisted ones without a fix), the licence policy (`tools/src/licences.ts`: licences of the production dependencies of the API image and the web app, and the list of them in `NOTICE`), the API contract checks, the e2e tests, the drawing baseline, the workflow lint (actionlint, zizmor) and the dependency review.
 

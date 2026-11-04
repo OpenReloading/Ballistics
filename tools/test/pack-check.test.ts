@@ -239,3 +239,14 @@ it('finds a test folder at the root and an .mjs test file, not a data file named
     ]),
   )
 })
+
+it('fails on a dependency on a private workspace package', () => {
+  const dir = pkg(
+    { ...manifest, dependencies: { units: '0.0.0', zod: '4.0.0' } },
+    { 'dist/index.js': '', 'dist/index.d.ts': '' },
+  )
+  expect(packProblems(dir, new Set(['units']))).toEqual([
+    'depends on units, a private workspace package that npm does not have',
+  ])
+  expect(packProblems(dir)).toEqual([])
+})

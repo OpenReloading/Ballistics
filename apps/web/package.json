@@ -25,6 +25,7 @@
     "@open-reloading/drawing": "0.0.4",
     "@open-reloading/importers": "0.0.5",
     "@open-reloading/schema": "0.0.5",
+    "@open-reloading/units": "0.0.0",
     "@phosphor-icons/react": "2.1.10",
     "country-flag-icons": "1.6.20",
     "driver.js": "1.10.2",

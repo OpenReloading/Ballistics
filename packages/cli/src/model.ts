@@ -41,12 +41,14 @@ function sharedFiles() {
     dirname(fileURLToPath(import.meta.resolve('@open-reloading/drawing/seating'))),
   )
   const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
+  const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))
   return {
     core,
     files: [
       ...closure(join(core, 'interior/record-load.js'), core, 'core'),
       // the water density turns every capacity into a chamber volume
       ...closure(join(core, 'water.js'), core, 'core'),
+      ...closure(join(units, 'units.js'), units, 'units'),
       ...closure(join(schema, 'units.js'), schema, 'schema'),
       ...closure(join(schema, 'case-capacity.js'), schema, 'schema'),
       ...closure(join(drawing, 'seating/index.js'), drawing, 'drawing'),

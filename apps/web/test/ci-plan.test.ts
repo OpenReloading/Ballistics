@@ -61,6 +61,8 @@ it('runs no e2e for unit tests, tools and other workflows, and nothing for prose
     '.github/workflows/release.yml',
     'README.md',
     'apps/docs/docs/models/bullet-fit.md',
+    // the units build compares its API report
+    'packages/units/units.api.md',
   ])
     expect(plan([f], closure), f).toMatchObject({ check: true, e2e: false })
   for (const f of [
@@ -103,6 +105,7 @@ it('builds with the sample when the web app changed outside the record pages', (
 it('prerenders every record when record data, page code or shared parts changed', () => {
   for (const f of [
     'packages/data/records/powders/delta-2460.json',
+    'packages/units/src/units.ts',
     'packages/schema/src/units.ts',
     'packages/api/src/server.ts',
     'packages/drawing/src/index.ts',

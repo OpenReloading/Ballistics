@@ -3,18 +3,19 @@
  * `apps/docs/docs/models/exterior-stability.md`. SI in and out; the empirical fits are
  * stated in customary units and converted here.
  */
+import { conversions } from '@open-reloading/units'
 import { InputError } from '../errors.ts'
 import type { Air } from './atmosphere.ts'
 
-// local factors: core cannot import the schema's units, and only these fits use them
-const grain = 0.45359237 / 7000
-const inch = 0.0254
-const foot = 0.3048
+// SI per customary unit of the empirical fits
+const grain = conversions.gr.factor
+const inch = conversions.in.factor
+const foot = conversions.ft.factor
 /** Pa per inch of mercury (conventional). */
-const inHg = 3386.389
+const inHg = conversions.inHg.factor
 /** 1 MOA (one sixtieth of a degree) in rad. */
-export const radPerMoa = Math.PI / 10800
-const mph = 0.44704
+export const radPerMoa = conversions.MOA.factor
+const mph = conversions.mph.factor
 
 /** Inputs of {@link millerStability}: mass kg, diameter, length and twist m, velocity m/s. */
 export interface MillerStabilityInput {
