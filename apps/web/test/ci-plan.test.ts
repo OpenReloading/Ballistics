@@ -189,6 +189,13 @@ it('tests every group for a change outside the workspaces, an unknown or empty s
   expect(plan(['packages/drawing/src/index.ts'], closure).tests).toEqual(testJobs())
   // a folder of packages/ that is no workspace: pnpm selects nothing for it
   expect(plan(['packages/stray/src/index.ts'], closure, []).tests).toEqual(testJobs())
+  // and it selects the workspaces beside it alone
+  expect(
+    plan(['packages/stray/src/index.ts', 'packages/drawing/src/index.ts'], closure, ['drawing'])
+      .tests,
+  ).toEqual(testJobs())
+  // a workspace that no group lists (a new one)
+  expect(testJobs(['drawing', 'stray'])).toEqual(testJobs())
   expect(plan(['apps/docs/docs/research/index.md'], closure, ['docs']).tests).toEqual(
     testJobs(['docs']),
   )
@@ -229,6 +236,11 @@ it('tests every workspace that has tests, in exactly one group', () => {
   })
   expect(members.length).toBe(new Set(members).size)
   expect([...members].sort()).toEqual(withTests.sort())
+})
+
+it('leaves the root project out of the selection: plan reads its files itself', () => {
+  expect(selected('openreloading')).toEqual([])
+  expect(selected('@open-reloading/cli')).toEqual(['cli'])
 })
 
 it('falls back in ci.yml to the test jobs of every group', () => {

@@ -143,10 +143,15 @@ export const testGroups: Record<string, string[]> = {
 /** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */
 export type TestJob = { name: string; filter: string; e2eUnit: boolean }
 
-/** The test jobs for the workspaces in `affected` (names without the scope); every group's for undefined. */
+/**
+ * The test jobs for the workspaces in `affected` (names without the scope); every group's for undefined and for a
+ * workspace no group lists (a new one), which the completeness test of `testGroups` then names.
+ */
 export function testJobs(affected?: string[]): TestJob[] {
+  const listed = Object.values(testGroups).flat()
+  const only = affected?.every((m) => listed.includes(m)) ? affected : undefined
   return Object.entries(testGroups).flatMap(([name, members]) => {
-    const hit = members.filter((m) => affected === undefined || affected.includes(m))
+    const hit = members.filter((m) => only === undefined || only.includes(m))
     const tested = hit.filter((m) => m !== 'e2e')
     const e2eUnit = hit.includes('e2e')
     if (tested.length === 0 && !e2eUnit) return []
@@ -170,8 +175,11 @@ const everything = (reason: string): Plan => ({
   reason,
 })
 
-/** A file of a workspace: pnpm finds the workspaces a change reaches from these alone. */
-const inWorkspace = /^((packages|apps)\/[^/]+|tools)\//
+/** A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone. */
+const inWorkspace = (file: string) => {
+  const folder = /^((packages|apps)\/[^/]+|tools)\//.exec(file)?.[1]
+  return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
+}
 
 /**
  * The plan for the changed files `all`; `affected` are the workspaces pnpm selects for them (names
@@ -188,9 +196,7 @@ export function plan(all: string[], closure = recordClosure(), affected?: string
       tests: [],
       reason: 'only prose changed',
     }
-  const tests = testJobs(
-    code.every((f) => inWorkspace.test(f)) && affected?.length ? affected : undefined,
-  )
+  const tests = testJobs(code.every(inWorkspace) && affected?.length ? affected : undefined)
   const changed = code.filter((f) => !ignored.some((re) => re.test(f)))
   if (!changed.some((f) => webInputs.some((re) => re.test(f)))) {
     const e2e = changed.some((f) => e2eInputs.some((re) => re.test(f)))
@@ -234,8 +240,11 @@ export function selected(filter: string): string[] | undefined {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
       }),
-    ) as { name: string }[]
-    return listed.map((p) => p.name.replace(/^@open-reloading\//, ''))
+    ) as { name: string; path: string }[]
+    // the root project: plan reads the files outside the workspaces itself
+    return listed
+      .filter((p) => path.resolve(p.path) !== path.resolve(repoRoot))
+      .map((p) => p.name.replace(/^@open-reloading\//, ''))
   } catch {
     return
   }
