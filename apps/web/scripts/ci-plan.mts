@@ -26,7 +26,7 @@ const repoRoot = path.join(webRoot, '../..')
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|statistics|schema|importers|core|drawing|data|api)\//,
+  /^packages\/(units|locale-format|statistics|schema|importers|core|drawing|data|api)\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
   /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
@@ -58,6 +58,7 @@ const ignored = [/^(apps|packages)\/[^/]+\/test\//, /^(apps|packages)\/[^/]+\/[^
 /** Files whose change needs every record page prerendered (`prerender=full`), besides the import closure. */
 const recordInputs = [
   /^packages\/units\//,
+  /^packages\/locale-format\//,
   /^packages\/statistics\//,
   /^packages\/data\//,
   /^packages\/schema\//,
@@ -140,6 +141,7 @@ export const testGroups: Record<string, string[]> = {
   web: ['web'],
   packages: [
     'units',
+    'locale-format',
     'statistics',
     'schema',
     'core',

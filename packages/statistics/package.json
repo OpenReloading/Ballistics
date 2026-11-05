@@ -34,15 +34,15 @@
     "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "0.18.5",
-    "@microsoft/api-extractor": "7.60.1",
+    "@arethetypeswrong/cli": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
     "@open-reloading/test-kit": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",
     "oxlint": "catalog:",
-    "oxlint-tsgolint": "7.0.2005",
-    "publint": "0.3.25",
+    "oxlint-tsgolint": "catalog:",
+    "publint": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

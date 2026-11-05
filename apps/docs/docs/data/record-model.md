@@ -78,7 +78,7 @@ A user bullet or cartridge (`userBullet`, `userCartridge` in `packages/schema/sr
 
 Stored entities use the stored units of `packages/units/src/units.ts` (re-exported by `@open-reloading/schema`) only; SI appears at solver calls. `toSi(kind, stored)` and `fromSi(kind, si)` convert between them. `siMaps` holds one entry per `QuantityKind`: `si = stored * factor + offset`. Temperature carries the offset of 273.15 (degC to K), percent is a fraction in SI, the ballistic coefficient is kg/m2.
 - The API's record resolution, limit check and bore area, and the web app's field specs, record rows, designers, seating preview and workbench load hook call these functions. No file outside the units package writes a factor between a stored unit and SI: `apps/web/test/unit-literals.test.ts` scans the sources of the API and the web app for the literals.
-- Display units (inch, grain, psi, ft/s) are in `apps/web/src/lib/units.ts`, which builds its metric units from the table. The solver package takes its customary factors (grain, inch, foot, inch of mercury, mph, MOA, psi, lb/in2) from the conversion table of `@open-reloading/units`; the drawing package keeps its own.
+- Display units (inch, grain, psi, ft/s) are in `packages/locale-format/src/display-units.ts`, which builds its metric units from the table. The solver package takes its customary factors (grain, inch, foot, inch of mercury, mph, MOA, psi, lb/in2) from the conversion table of `@open-reloading/units`; the drawing package keeps its own.
 - User files of the old SI format are rejected, since no migrations are written before 1.0.
 
 ## Manufacturer

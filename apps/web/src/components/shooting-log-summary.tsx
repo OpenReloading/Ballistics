@@ -4,10 +4,9 @@ import { Button, Group, Select, SimpleGrid, Table, Text, Title } from '@mantine/
 import { parseRef, type ShootingLogRecord, type UserRecord } from '@open-reloading/schema'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
-import { shownLanguage } from '../i18n/shown.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
 import { resultText } from '../lib/competition-events.ts'
-import { dayText } from '../lib/dates.ts'
+import { dayText, monthText } from '../lib/dates.ts'
 import { download } from '../lib/download.ts'
 import {
   type SummaryNames,
@@ -19,13 +18,6 @@ import {
 } from '../lib/shooting-log-summary.ts'
 import { controlSize } from '../lib/theme.ts'
 import { printAlone } from './print.ts'
-
-/** The month `index` (0 for January) by name in the language shown. */
-const monthName = (index: number) =>
-  new Intl.DateTimeFormat(shownLanguage() === 'en' ? 'en-GB' : shownLanguage(), {
-    month: 'long',
-    timeZone: 'UTC',
-  }).format(Date.UTC(2026, index, 1))
 
 /**
  * The names of the cartridges `refs` name: a design of this browser by its record name, a catalogue
@@ -126,7 +118,7 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
             {s.months.map((n, i) => (
               // oxlint-disable-next-line react/no-array-index-key -- the twelve months of a year
               <Table.Tr key={i}>
-                <Table.Td>{monthName(i)}</Table.Td>
+                <Table.Td>{monthText(i)}</Table.Td>
                 <Table.Td className="num">{n}</Table.Td>
               </Table.Tr>
             ))}

@@ -235,6 +235,22 @@
     "source": "import { useMemo } from 'react'\nexport { useMemo }",
     "rules": ["units-imports-nothing"]
   },
+  "packages/locale-format/src/units.ts": {
+    "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
+    "rules": []
+  },
+  "packages/locale-format/src/schema.ts": {
+    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "rules": ["locale-format-imports-units-only"]
+  },
+  "packages/locale-format/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["locale-format-imports-units-only"]
+  },
+  "packages/locale-format/src/dom.ts": {
+    "source": "export const w = () => navigator.language",
+    "rules": ["logic-no-dom"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]

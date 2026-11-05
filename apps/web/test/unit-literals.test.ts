@@ -14,7 +14,6 @@ const other: [file: string, text: string][] = [
   ['apps/web/src/lib/user-data.ts', 'maxFileBytes / 1e6'],
   ['apps/web/src/components/saved-loads.tsx', 'bytes'],
   ['packages/api/src/compute/pool.ts', 'timeoutMs / 1000'],
-  ['apps/web/src/lib/units.ts', 'msText'],
   ['apps/web/src/lib/charge-target.ts', "symbol: 'ms'"],
   ['apps/web/src/components/chart-playback.tsx', '/ 1000 / c.factor'],
   ['apps/web/src/components/chart-playback.tsx', 'factor / 1000'],
