@@ -135,6 +135,10 @@
     "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
     "rules": ["schema-imports-units-only"]
   },
+  "packages/schema/src/dom.ts": {
+    "source": "export const w = () => window.location.href",
+    "rules": ["logic-no-dom"]
+  },
   "packages/data/src/schema-and-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
     "rules": []

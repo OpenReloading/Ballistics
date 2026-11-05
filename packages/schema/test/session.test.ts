@@ -39,6 +39,10 @@ const catalogue = {
 
 const wrap = (id: string, kind: string, data: unknown) => ({ kind, id, name: id, saved, data })
 
+const strings = (variation: unknown) => [{ variation, shots: [shot(800)] }]
+
+const records = (...rs: unknown[]) => rs as UserRecords
+
 describe('chronoSession', () => {
   it('is one schema for an import, the workbench and the catalogue', () => {
     // an imported file and the session the workbench stores
@@ -67,7 +71,6 @@ describe('chronoSession', () => {
       }),
     )
     const load = userRecord.parse(wrap(loadId, 'load', { origin: 'user', sessions: [ref] }))
-    const records = (...rs: unknown[]) => rs as UserRecords
     expect(checkUserRefs(records(sheet, load))).toEqual([
       {
         record: sheetId,
@@ -80,7 +83,9 @@ describe('chronoSession', () => {
     const stored = userRecord.parse(wrap(sessionId, 'session', fromFile))
     expect(checkUserRefs(records(sheet, load, stored))).toEqual([])
   })
+})
 
+describe('chronoSession of the catalogue and string variations', () => {
   it('asks a catalogue session for what a file does not give', () => {
     for (const path of ['id', 'date', 'device.manufacturer', 'device.model', 'conditions']) {
       const [head = '', tail] = path.split('.')
@@ -107,7 +112,6 @@ describe('chronoSession', () => {
   })
 
   it('keeps what a string varies in its stored unit', () => {
-    const strings = (variation: unknown) => [{ variation, shots: [shot(800)] }]
     const charge = { kind: 'charge', value: { value: 2.48 } }
     const seating = { kind: 'seating', value: { value: 71.5 } }
     for (const variation of [charge, seating])
@@ -125,7 +129,9 @@ describe('chronoSession', () => {
       'strings.0.variation',
     )
   })
+})
 
+describe('chronoSession weather, notes and refusals', () => {
   it('keeps the weather and the note typed for a string', () => {
     const string = {
       shots: [shot(800)],

@@ -46,7 +46,7 @@ type Node = { properties?: Record<string, Node>; type?: string; pattern?: string
 >
 
 const hasPattern = (n: Node): boolean =>
-  !!n.pattern || (Array.isArray(n.allOf) && (n.allOf as Node[]).some(hasPattern))
+  !!n.pattern || (Array.isArray(n['allOf']) && (n['allOf'] as Node[]).some(hasPattern))
 
 /** Whether a string schema is bound by a pattern, also as one of several (`allOf`). */
 const patterned = (n: Node) => n.type === 'string' && hasPattern(n)

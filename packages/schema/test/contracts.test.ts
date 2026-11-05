@@ -3,15 +3,15 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-// The JSON Schemas the build writes (`src/write-json-schema.ts`), against the committed baseline.
+// The JSON Schemas the build writes (`scripts/write-json-schema.ts`), against the committed baseline.
 // `pnpm run baselines` at the root rewrites it.
 const built = new URL('../dist/json-schema/', import.meta.url)
 const baseline = new URL('golden/json-schema/', import.meta.url)
-const names = readdirSync(built).sort()
+const names = readdirSync(built).toSorted()
 
 describe('JSON Schema baseline', () => {
   it('has a file for each built schema and no other', () => {
-    expect(readdirSync(baseline).sort()).toEqual(names)
+    expect(readdirSync(baseline).toSorted()).toEqual(names)
   })
 
   it.each(names)('%s equals the baseline', async (name) => {

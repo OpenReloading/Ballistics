@@ -1,3 +1,4 @@
+/* oxlint-disable max-lines-per-function, max-params, unicorn/consistent-function-scoping, unicorn/no-array-sort -- these tests predate the package profile and come under it next */
 import { describe, expect, it } from 'vitest'
 import {
   compareDisciplines,

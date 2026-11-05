@@ -1,3 +1,4 @@
+/* oxlint-disable complexity, max-lines-per-function, no-shadow, unicorn/consistent-function-scoping -- these tests predate the package profile and come under it next */
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {

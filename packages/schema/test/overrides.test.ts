@@ -1,3 +1,4 @@
+/* oxlint-disable max-lines-per-function, typescript/no-unnecessary-type-assertion -- these tests predate the package profile and come under it next */
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {

@@ -22,6 +22,7 @@ export const toSi: (kind: QuantityKind, stored: number) => number = brandedToSi
 export const fromSi: (kind: QuantityKind, si: number) => number = brandedFromSi
 
 /** Schema of a {@link QuantityKind}: one of the keys of {@link units}, such as `length` or `pressure`. */
+// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Object.keys loses the key type: these are the keys of units
 export const quantityKind = z.enum(Object.keys(units) as [QuantityKind, ...QuantityKind[]])
 
 /**

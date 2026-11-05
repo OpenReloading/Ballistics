@@ -36,8 +36,9 @@ export const ref = (kind: string) =>
 /** The scope and id of a reference text, or undefined when `text` is no reference. */
 export function parseRef(text: string): { scope: RefScope; id: string } | undefined {
   if (!refPattern.test(text)) return undefined
-  const i = text.indexOf(':')
-  return { scope: text.slice(0, i) as RefScope, id: text.slice(i + 1) }
+  // the pattern admits the two scopes only
+  const scope = text.startsWith('user:') ? 'user' : 'catalogue'
+  return { scope, id: text.slice(text.indexOf(':') + 1) }
 }
 
 /** A reference to a catalogue record only: `"catalogue:<record id>"`. */
