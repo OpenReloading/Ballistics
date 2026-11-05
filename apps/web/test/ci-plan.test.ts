@@ -116,6 +116,7 @@ it('prerenders every record when record data, page code or shared parts changed'
     'pnpm-lock.yaml',
     'pnpm-workspace.yaml',
     '.github/pnpm/package-lock.json',
+    '.github/actions/pnpm/action.yml',
     '.github/workflows/ci.yml',
   ])
     expect(plan(['README.md', f], closure), f).toMatchObject({

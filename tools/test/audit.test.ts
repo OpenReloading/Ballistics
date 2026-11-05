@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest'
 import { type AuditReport, problems } from '../src/audit.ts'
 
-const advisory = (id: string, severity = 'high', patched = '<0.0.0') => ({
+const advisory = (id: string, severity = 'high', patched: string | null = null) => ({
   github_advisory_id: id,
   module_name: 'braces',
   title: 'braces advisory',

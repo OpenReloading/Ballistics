@@ -14,7 +14,7 @@ allow-licenses:
   - Unlicense
   - BlueOak-1.0.0
   - Python-2.0
-  # weak copyleft, the family's default list: axe-core and lightningcss (MPL-2.0), sharp's libvips (LGPL-3.0-or-later)
+  # weak copyleft, no GPL or AGPL: axe-core and lightningcss (MPL-2.0), sharp's libvips (LGPL-3.0-or-later)
   - MPL-2.0
   - LGPL-2.1-or-later
   - LGPL-3.0-or-later

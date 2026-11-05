@@ -19,8 +19,8 @@ export interface AuditReport {
       module_name: string
       severity: string
       title: string
-      /** `<0.0.0` when no version has the fix. */
-      patched_versions: string
+      /** The fixed versions; absent or null when pnpm finds none. */
+      patched_versions?: string | null
     }
   >
 }
@@ -31,7 +31,7 @@ type Advisory = AuditReport['advisories'][string]
 function problemOf(a: Advisory, allow: Record<string, string>) {
   const id = a.github_advisory_id
   if (!(id in allow)) return `${id} (${a.severity}, ${a.module_name}): ${a.title}`
-  if (a.patched_versions !== '<0.0.0')
+  if (a.patched_versions)
     return `${id} (${a.module_name}): a fix is available, update and remove it from the allowlist`
 }
 

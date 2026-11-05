@@ -25,7 +25,7 @@ const webInputs = [
   /^apps\/web\//,
   /^packages\/(units|schema|importers|core|drawing|data|api)\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
-  /^\.github\/pnpm\//,
+  /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
 ]
 
@@ -59,7 +59,7 @@ const recordInputs = [
   /^packages\/schema\//,
   /^packages\/api\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
-  /^\.github\/pnpm\//,
+  /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
   /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,
