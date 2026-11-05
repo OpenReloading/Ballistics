@@ -63,11 +63,8 @@ const ids: PresetId[] = ['metric-grains', 'us', 'metric-grams']
 
 describe('presets', () => {
   it('shows the units of the preset table', () => {
-    for (const [q, ...symbols] of table)
-      expect(
-        ids.map((p) => presetUnits(p)[q].symbol),
-        q,
-      ).toEqual(symbols)
+    const shown = table.map(([q]) => [q, ...ids.map((p) => presetUnits(p)[q].symbol)])
+    expect(shown).toEqual(table)
   })
 
   it('has a unit for every quantity in every preset', () => {
