@@ -54,7 +54,8 @@ it('names the rule each forbidden import or global breaks and passes the allowed
 })
 
 it('exits non-zero and prints the rule name', () => {
-  const run = lint()
+  // the default format, also on GitHub, where Oxlint would otherwise write annotations without the help text
+  const run = lint('--format', 'default')
   expect(run.status).toBeGreaterThan(0)
   expect(run.stdout).toContain('web-reads-api-only')
 })
