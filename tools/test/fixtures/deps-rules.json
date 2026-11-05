@@ -41,7 +41,7 @@
   },
   "packages/drawing/src/dynamic-react-dom.ts": {
     "source": "export const dom = await import('react-dom')",
-    "rules": ["drawing-core-imports", "not-to-unresolvable"]
+    "rules": ["drawing-core-imports"]
   },
   "packages/drawing/src/cartridge/to-bullet.ts": {
     "source": "import { outline } from '../bullet/outline.ts'\nexport { outline }",
@@ -61,11 +61,11 @@
   },
   "packages/drawing/src/seating/react.ts": {
     "source": "import { useMemo } from 'react'\nexport { useMemo }",
-    "rules": ["drawing-seating-imports", "not-to-unresolvable"]
+    "rules": ["drawing-seating-imports"]
   },
   "packages/drawing/src/seating/next.ts": {
     "source": "import Link from 'next/link'\nexport { Link }",
-    "rules": ["drawing-seating-imports", "not-to-unresolvable"]
+    "rules": ["drawing-seating-imports"]
   },
   "packages/drawing/src/seating/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
@@ -73,7 +73,7 @@
   },
   "packages/drawing/src/seating/workspace-package.ts": {
     "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
-    "rules": ["drawing-seating-imports", "not-to-unresolvable"]
+    "rules": ["drawing-seating-imports"]
   },
   "packages/drawing/src/seating/into-web.ts": {
     "source": "import type { SpecValue } from '../../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
@@ -89,11 +89,11 @@
   },
   "packages/units/src/schema.ts": {
     "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
-    "rules": ["not-to-unresolvable", "units-imports-nothing"]
+    "rules": ["units-imports-nothing"]
   },
   "packages/core/src/units.ts": {
     "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/core/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
@@ -101,15 +101,15 @@
   },
   "packages/core/src/npm-package.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["core-imports-units-only", "not-to-unresolvable"]
+    "rules": ["core-imports-units-only"]
   },
   "packages/core/src/missing.ts": {
     "source": "import './nope.ts'",
-    "rules": ["core-imports-units-only", "not-to-unresolvable"]
+    "rules": []
   },
   "packages/importers/src/types-of-schema.ts": {
     "source": "import type { ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/importers/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
@@ -117,43 +117,39 @@
   },
   "packages/importers/src/npm-package.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["importers-imports-schema-only", "not-to-unresolvable"]
+    "rules": ["importers-imports-schema-only"]
   },
-  "packages/importers/dist/clean.js": {
-    "source": "export const clean = 1",
-    "rules": []
-  },
-  "packages/importers/dist/runtime-schema.js": {
+  "packages/importers/src/runtime-schema.ts": {
     "source": "import { ChronoShot } from '@open-reloading/schema'\nexport { ChronoShot }",
-    "rules": ["importers-schema-for-types-only", "not-to-unresolvable"]
+    "rules": ["importers-schema-for-types-only"]
   },
   "packages/schema/src/zod.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/schema/src/units.ts": {
     "source": "import { units } from '@open-reloading/units'\nexport { units }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/schema/src/core.ts": {
     "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
-    "rules": ["not-to-unresolvable", "schema-imports-units-only"]
+    "rules": ["schema-imports-units-only"]
   },
   "packages/data/src/schema-and-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nimport { Load } from '@open-reloading/schema'\nexport { readFileSync, Load }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/data/src/core.ts": {
     "source": "import { waterDensity } from '@open-reloading/core'\nexport { waterDensity }",
-    "rules": ["data-imports-schema-only", "not-to-unresolvable"]
+    "rules": ["data-imports-schema-only"]
   },
   "packages/api/src/core-data-schema.ts": {
     "source": "import { waterDensity } from '@open-reloading/core'\nimport { readRecords } from '@open-reloading/data'\nimport { Load } from '@open-reloading/schema'\nimport Fastify from 'fastify'\nexport { waterDensity, readRecords, Load, Fastify }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/api/src/importers.ts": {
     "source": "import { parse } from '@open-reloading/importers'\nexport { parse }",
-    "rules": ["api-imports-core-data-schema-only", "not-to-unresolvable"]
+    "rules": ["api-imports-core-data-schema-only"]
   },
   "packages/cli/src/rows.ts": {
     "source": "export const rows = 1",
@@ -165,19 +161,19 @@
   },
   "packages/cli/src/libraries.ts": {
     "source": "import { interior } from '@open-reloading/core'\nimport { readRecords } from '@open-reloading/data'\nimport { seat } from '@open-reloading/drawing/seating'\nimport { toSi } from '@open-reloading/schema'\nexport { interior, readRecords, seat, toSi }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/cli/src/api.ts": {
     "source": "import { buildApp } from '@open-reloading/api'\nexport { buildApp }",
-    "rules": ["cli-imports-core-data-drawing-schema-only", "not-to-unresolvable"]
+    "rules": ["cli-imports-core-data-drawing-schema-only"]
   },
   "packages/cli/src/api-entries.ts": {
     "source": "import { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nexport { runTask, openCatalogue }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "packages/cli/src/api-static.ts": {
     "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
-    "rules": ["cli-imports-core-data-drawing-schema-only", "not-to-unresolvable"]
+    "rules": ["cli-imports-core-data-drawing-schema-only"]
   },
   "packages/cli/src/web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
@@ -189,7 +185,7 @@
   },
   "apps/web/src/lib/allowed.ts": {
     "source": "import { checkSpec } from '@open-reloading/data/plausibility'\nimport { runTask } from '@open-reloading/api/compute'\nimport { openCatalogue } from '@open-reloading/api/catalogue'\nimport { waterDensity } from '@open-reloading/core'\nimport { seating } from '@open-reloading/drawing/seating'\nexport { checkSpec, runTask, openCatalogue, waterDensity, seating }",
-    "rules": ["not-to-unresolvable"]
+    "rules": []
   },
   "apps/web/src/lib/alias.ts": {
     "source": "import type { SpecValue } from '@/lib/api-types.ts'\nexport type Spec = SpecValue",
@@ -205,14 +201,50 @@
   },
   "apps/web/src/lib/data-package.ts": {
     "source": "import { readRecords } from '@open-reloading/data'\nexport { readRecords }",
-    "rules": ["not-to-unresolvable", "web-reads-api-only"]
+    "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-static.ts": {
     "source": "import { startBundleApi } from '@open-reloading/api/static'\nexport { startBundleApi }",
-    "rules": ["not-to-unresolvable", "web-reads-api-only"]
+    "rules": ["web-reads-api-only"]
   },
   "apps/web/src/lib/api-server.ts": {
     "source": "import Fastify from 'fastify'\nexport { Fastify }",
-    "rules": ["not-to-unresolvable", "web-reads-api-only"]
+    "rules": ["web-reads-api-only"]
+  },
+  "packages/core/src/react.ts": {
+    "source": "import { useMemo } from 'react'\nexport { useMemo }",
+    "rules": ["core-imports-units-only"]
+  },
+  "packages/core/src/dom.ts": {
+    "source": "export const title = () => document.title",
+    "rules": ["logic-no-dom"]
+  },
+  "packages/core/src/into-web.ts": {
+    "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
+    "rules": ["core-imports-units-only"]
+  },
+  "packages/core/src/app-package.ts": {
+    "source": "import { App } from '@open-reloading/web'\nexport { App }",
+    "rules": ["core-imports-units-only"]
+  },
+  "packages/units/src/dom.ts": {
+    "source": "export const w = () => window.innerWidth",
+    "rules": ["logic-no-dom"]
+  },
+  "packages/units/src/react.ts": {
+    "source": "import { useMemo } from 'react'\nexport { useMemo }",
+    "rules": ["units-imports-nothing"]
+  },
+  "packages/schema/src/cycle-a.ts": {
+    "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
+    "rules": ["no-cycle"]
+  },
+  "packages/schema/src/cycle-b.ts": {
+    "source": "import { a } from './cycle-a.ts'\nexport const b = () => a",
+    "rules": ["no-cycle"]
+  },
+  "packages/importers/src/node-fs-type.ts": {
+    "source": "import type { Stats } from 'node:fs'\nexport type S = Stats",
+    "rules": ["importers-imports-schema-only"]
   }
 }

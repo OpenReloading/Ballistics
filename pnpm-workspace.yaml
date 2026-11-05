@@ -38,9 +38,3 @@ allowBuilds:
   '@swc/core': false
   core-js: false
   vue-demi: false
-
-# dependency-cruiser loads @swc/core, its parser (.dependency-cruiser.cjs), from its own folder.
-packageExtensions:
-  dependency-cruiser:
-    peerDependencies:
-      '@swc/core': '*'

@@ -220,7 +220,8 @@
       {
         "checkNaN": false
       }
-    ]
+    ],
+    "import/no-cycle": "error"
   },
   "overrides": [
     {
@@ -241,32 +242,72 @@
       }
     },
     {
-      "files": ["packages/drawing/src/**"],
+      "files": ["**/test/**", "apps/e2e/**"],
+      "rules": {
+        "unicorn/prefer-dom-node-text-content": "off",
+        "no-script-url": "off"
+      }
+    },
+    {
+      "files": [
+        "packages/schema/src/**",
+        "packages/core/src/**",
+        "packages/importers/src/**",
+        "packages/drawing/src/**"
+      ],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "window",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "document",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "navigator",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "location",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "localStorage",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "indexedDB",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/core/src/**"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
-            "paths": [
-              {
-                "name": "react",
-                "message": "The drawing library is pure: render in apps/web/src/components."
-              },
-              {
-                "name": "next",
-                "message": "The drawing library is pure: render in apps/web/src/components."
-              }
-            ],
+            "paths": [],
             "patterns": [
               {
-                "group": [
-                  "next/**",
-                  "node:*",
-                  "node:*/**",
-                  "react/**",
-                  "react-dom",
-                  "react-dom/**"
-                ],
-                "message": "The drawing library is pure: no framework or Node imports."
+                "group": ["@*/*", "@*/*/**", "!@open-reloading/units", "!@open-reloading/units/**"],
+                "message": "core-imports-units-only: packages/core has no I/O: it imports only @open-reloading/units and its own files."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "core-imports-units-only: packages/core has no I/O: it imports only @open-reloading/units and its own files."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "core-imports-units-only: packages/core has no I/O: it imports only @open-reloading/units and its own files."
               }
             ]
           }
@@ -274,10 +315,368 @@
       }
     },
     {
-      "files": ["**/test/**", "apps/e2e/**"],
+      "files": ["packages/drawing/src/*.ts", "packages/drawing/src/core/**"],
       "rules": {
-        "unicorn/prefer-dom-node-text-content": "off",
-        "no-script-url": "off"
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**"],
+                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+              },
+              {
+                "regex": "^(\\./|(\\.\\./)+)(cartridge|bullet|seating|target)/",
+                "message": "drawing-core-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its core folder imports only the folders core."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/drawing/src/cartridge/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**"],
+                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+              },
+              {
+                "regex": "^(\\.\\./)+(bullet|seating|target)/",
+                "message": "drawing-cartridge-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its cartridge folder imports only the folders core, cartridge."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/drawing/src/bullet/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**"],
+                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+              },
+              {
+                "regex": "^(\\.\\./)+(cartridge|seating|target)/",
+                "message": "drawing-bullet-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its bullet folder imports only the folders core, bullet."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/drawing/src/seating/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**"],
+                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+              },
+              {
+                "regex": "^(\\.\\./)+target/",
+                "message": "drawing-seating-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its seating folder imports only the folders core, cartridge, bullet, seating."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/drawing/src/target/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**"],
+                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+              },
+              {
+                "regex": "^((\\.\\./)+(core|cartridge|bullet|seating)/|\\.\\./[^/]+$)",
+                "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/importers/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@open-reloading/schema",
+                "allowTypeImports": true,
+                "message": "importers-schema-for-types-only: packages/importers uses @open-reloading/schema for types only."
+              }
+            ],
+            "patterns": [
+              {
+                "group": [
+                  "@*/*",
+                  "@*/*/**",
+                  "!@open-reloading/schema",
+                  "!@open-reloading/schema/**"
+                ],
+                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/schema/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/*",
+                  "@open-reloading/*/**",
+                  "!@open-reloading/units",
+                  "!@open-reloading/units/**"
+                ],
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/data/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/*",
+                  "@open-reloading/*/**",
+                  "!@open-reloading/schema",
+                  "!@open-reloading/schema/**"
+                ],
+                "message": "data-imports-schema-only: packages/data depends on @open-reloading/schema alone."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "data-imports-schema-only: packages/data depends on @open-reloading/schema alone."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/api/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/*",
+                  "@open-reloading/*/**",
+                  "!@open-reloading/core",
+                  "!@open-reloading/core/**",
+                  "!@open-reloading/data",
+                  "!@open-reloading/data/**",
+                  "!@open-reloading/schema",
+                  "!@open-reloading/schema/**"
+                ],
+                "message": "api-imports-core-data-schema-only: packages/api depends on core, data and schema."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "api-imports-core-data-schema-only: packages/api depends on core, data and schema."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/cli/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/*",
+                  "@open-reloading/*/**",
+                  "!@open-reloading/core",
+                  "!@open-reloading/core/**",
+                  "!@open-reloading/data",
+                  "!@open-reloading/data/**",
+                  "!@open-reloading/drawing",
+                  "!@open-reloading/drawing/**",
+                  "!@open-reloading/schema",
+                  "!@open-reloading/schema/**",
+                  "!@open-reloading/api/compute",
+                  "!@open-reloading/api/catalogue"
+                ],
+                "message": "cli-imports-core-data-drawing-schema-only: packages/cli is a thin layer over the libraries: core, data, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "cli-imports-core-data-drawing-schema-only: packages/cli is a thin layer over the libraries: core, data, drawing and schema, and of @open-reloading/api only the compute and catalogue entries the browser runs."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/web/src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/data",
+                  "@open-reloading/data/**",
+                  "!@open-reloading/data/plausibility",
+                  "@open-reloading/api",
+                  "@open-reloading/api/**",
+                  "!@open-reloading/api/compute",
+                  "!@open-reloading/api/catalogue",
+                  "fastify",
+                  "fastify/**",
+                  "@fastify/**"
+                ],
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute and catalogue entries of the static site run in the web app."
+              },
+              {
+                "regex": "^(\\.\\./)+packages/",
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute and catalogue entries of the static site run in the web app."
+              },
+              {
+                "regex": "^node:",
+                "message": "web-no-node-builtins: apps/web sources run in the browser or in route handlers that read the API: no node: modules. The news loader runs only in the prerender of the static export, which reads the news folder."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["apps/web/src/lib/news.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/data",
+                  "@open-reloading/data/**",
+                  "!@open-reloading/data/plausibility",
+                  "@open-reloading/api",
+                  "@open-reloading/api/**",
+                  "!@open-reloading/api/compute",
+                  "!@open-reloading/api/catalogue",
+                  "fastify",
+                  "fastify/**",
+                  "@fastify/**"
+                ],
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute and catalogue entries of the static site run in the web app."
+              },
+              {
+                "regex": "^(\\.\\./)+packages/",
+                "message": "web-reads-api-only: apps/web reads records through the API. Of @open-reloading/data only the plausibility checks and of @open-reloading/api only the compute and catalogue entries of the static site run in the web app."
+              }
+            ]
+          }
+        ]
       }
     }
   ]

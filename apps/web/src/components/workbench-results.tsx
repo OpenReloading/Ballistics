@@ -25,6 +25,7 @@ import { RunDownloads } from './run-downloads.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
+// oxlint-disable-next-line import/no-cycle -- workbench-inputs imports BurnFigure back; moving one of them breaks the cycle
 import { Checklist, shortFrame } from './workbench-inputs.tsx'
 import {
   type Outcome,

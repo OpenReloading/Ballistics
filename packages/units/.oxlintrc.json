@@ -52,6 +52,62 @@
       "rules": {
         "typescript/no-unsafe-type-assertion": "off"
       }
+    },
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**"],
+                "message": "units-imports-nothing: packages/units is the bottom of the graph and has no I/O: it imports only its own files."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "units-imports-nothing: packages/units is the bottom of the graph and has no I/O: it imports only its own files."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "units-imports-nothing: packages/units is the bottom of the graph and has no I/O: it imports only its own files."
+              }
+            ]
+          }
+        ],
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "window",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "document",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "navigator",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "location",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "localStorage",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "indexedDB",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          }
+        ]
+      }
     }
   ]
 }

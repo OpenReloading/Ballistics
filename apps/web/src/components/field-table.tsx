@@ -28,6 +28,7 @@ import {
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { say, type Wording } from '../lib/wording.ts'
+// oxlint-disable-next-line import/no-cycle -- fact-cards imports Noted back; moving one of them breaks the cycle
 import { Sized, slotUnits } from './fact-cards.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'

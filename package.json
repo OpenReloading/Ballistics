@@ -22,7 +22,6 @@
     "api:check": "pnpm --filter @open-reloading/tools run api-check",
     "api:conformance": "pnpm --filter @open-reloading/tools run api-conformance",
     "baselines": "pnpm --filter @open-reloading/schema --filter @open-reloading/web --filter @open-reloading/tools exec vitest run test/contracts.test.ts --update",
-    "deps:check": "depcruise packages/units/src packages/core/src packages/drawing/src packages/importers/src packages/importers/dist packages/schema/src packages/data/src packages/api/src packages/cli/src apps/web/src --config .dependency-cruiser.cjs --output-type err",
     "knip": "knip",
     "pack:check": "pnpm --filter @open-reloading/tools run pack-check",
     "docs:check": "pnpm --filter @open-reloading/docs run check",
@@ -30,8 +29,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",
-    "@swc/core": "^1.16.20",
-    "dependency-cruiser": "^18.7.0",
     "knip": "^6.43.0",
     "oxlint": "catalog:"
   }

@@ -3,10 +3,6 @@
   // The `exports` of the packages point into `dist`, which knip cannot map back to `src` (the build
   // uses another `rootDir` than `tsconfig.json`), so every entry file is listed with its source path.
   "workspaces": {
-    ".": {
-      // read by the `webpackConfig` of .dependency-cruiser.cjs by path, not by import
-      "entry": [".dependency-cruiser-alias.cjs"]
-    },
     "packages/units": {
       "entry": ["src/index.ts"]
     },

@@ -90,6 +90,7 @@ import { useManufacturerNames } from './use-manufacturer-names.ts'
 import { useLoad, useResult } from './workbench-context.ts'
 import { CartridgeFigure } from './workbench-figure.tsx'
 import { isPreviewKey, notReached } from './workbench-outcome.ts'
+// oxlint-disable-next-line import/no-cycle -- workbench-results imports Checklist back; moving one of them breaks the cycle
 import { BurnFigure } from './workbench-results.tsx'
 
 /** Interior fields of each panel, in reading order. */
