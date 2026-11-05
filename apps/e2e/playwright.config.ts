@@ -28,6 +28,8 @@ export default defineConfig({
   testDir: './tests',
   // every test has its own browser context: the tests of one file run on several workers
   fullyParallel: true,
+  // a `test.only` or `describe.only` left in a spec fails the CI run instead of skipping the rest
+  forbidOnly: !!process.env.CI,
   // the default without {-projectName}: a renamed project still finds the committed snapshots
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{-snapshotSuffix}{ext}',

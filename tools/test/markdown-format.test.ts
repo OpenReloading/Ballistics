@@ -44,16 +44,28 @@ it('formats Markdown without changing what it means', () => {
   expect(tree(format(page))).toBe(tree(page))
 })
 
-it('keeps the front matter of every page flat, which Biome would flatten when nested', () => {
+/**
+ * Whether the front matter of a page has an indented line. Biome 2.6 rewrites an indented block
+ * (a nested map, an indented list, a block list followed by a key and a block scalar) into other
+ * data, so front matter stays one key per line.
+ */
+const indentedFrontMatter = (text: string) =>
+  (/^---\n([\s\S]*?)\n---\n/.exec(text)?.[1] ?? '').split('\n').some((line) => /^\s+\S/.test(line))
+
+it('finds an indented line in front matter, not a blank one', () => {
+  for (const block of ['a:\n  b: 1', 'tags:\n  - x\n  - y', 'tags:\n- x\nnote: |\n  text'])
+    expect(indentedFrontMatter(`---\n${block}\n---\nText.\n`), block).toBe(true)
+  for (const flat of ['title: A\ntags: [x, y]', '\ntitle: A', ''])
+    expect(indentedFrontMatter(`---\n${flat}\n---\nText.\n`), flat).toBe(false)
+  expect(indentedFrontMatter('No front matter.\n  indented text\n')).toBe(false)
+})
+
+it('keeps the front matter of every page one key per line, which Biome leaves as it is', () => {
   const pages = execFileSync('git', ['ls-files', '*.md'], { cwd: root, encoding: 'utf8' })
     .split('\n')
     .filter(Boolean)
   expect(pages.length).toBeGreaterThan(100)
-  const nested = pages.filter((page) => {
-    const text = readFileSync(`${root}${page}`, 'utf8')
-    const data = /^---\n([\s\S]*?)\n---\n/.exec(text)?.[1]
-    const values = Object.values((data && (parse(data) as Record<string, unknown>)) ?? {})
-    return values.some((v) => typeof v === 'object' && v !== null && !Array.isArray(v))
-  })
-  expect(nested).toEqual([])
+  expect(
+    pages.filter((page) => indentedFrontMatter(readFileSync(`${root}${page}`, 'utf8'))),
+  ).toEqual([])
 })
