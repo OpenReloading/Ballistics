@@ -44,7 +44,7 @@ export function localizeDecimals(text: string, language: string): string;
 export function localizeNumber(text: string, language: string): string;
 
 // @public
-export const monthText: (index: number, language: string) => string;
+export function monthText(index: number, language: string): string;
 
 // @public
 export const msText: (s: number, language: string) => string;

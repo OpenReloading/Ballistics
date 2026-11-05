@@ -22,11 +22,17 @@ export function dayText(day: string, language: string): string {
   return format.format(new Date(day))
 }
 
+const monthFormats = new Map<string, Intl.DateTimeFormat>()
+
 /** The month `index` (0 for January) by name in `language`. */
-export const monthText = (index: number, language: string): string =>
-  new Intl.DateTimeFormat(localeOf(language), { month: 'long', timeZone: 'UTC' }).format(
-    Date.UTC(2026, index, 1),
-  )
+export function monthText(index: number, language: string): string {
+  let format = monthFormats.get(language)
+  if (!format) {
+    format = new Intl.DateTimeFormat(localeOf(language), { month: 'long', timeZone: 'UTC' })
+    monthFormats.set(language, format)
+  }
+  return format.format(Date.UTC(2026, index, 1))
+}
 
 /** A date and time in `language`; English follows the runtime's default locale. */
 export const dateTimeText = (d: Date, language: string): string =>

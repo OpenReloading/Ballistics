@@ -58,6 +58,7 @@ const ignored = [/^(apps|packages)\/[^/]+\/test\//, /^(apps|packages)\/[^/]+\/[^
 /** Files whose change needs every record page prerendered (`prerender=full`), besides the import closure. */
 const recordInputs = [
   /^packages\/units\//,
+  /^packages\/locale-format\//,
   /^packages\/data\//,
   /^packages\/schema\//,
   /^packages\/api\//,
