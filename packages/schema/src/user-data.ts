@@ -456,10 +456,9 @@ export interface SkippedKind {
  * `kind` or of kind `workbenchState` stays, for the schema to refuse as before.
  */
 export function withoutUnknownKinds(json: unknown): { json: unknown; skipped: SkippedKind[] } {
-  const records = isPlain(json) ? json['records'] : undefined
-  if (!isPlain(json) || !Array.isArray(records)) return { json, skipped: [] }
+  if (!isPlain(json) || !Array.isArray(json['records'])) return { json, skipped: [] }
   const counts = new Map<string, number>()
-  const kept = records.filter((r) => {
+  const kept = json['records'].filter((r) => {
     const kind = isPlain(r) ? r['kind'] : undefined
     if (typeof kind !== 'string' || knownKinds.has(kind) || kind === 'workbenchState') return true
     counts.set(kind, (counts.get(kind) ?? 0) + 1)

@@ -376,8 +376,8 @@ const bulletFields = z.object({
 type BulletFields = z.infer<typeof bulletFields>
 type Issue = (path: string[], message: string) => void
 
-/** A full record names its product and diameter; a name-only record has no product number. */
-function checkNameOnly(b: BulletFields, issue: Issue) {
+/** A name-only record has no product number; a full one needs a product number and a diameter. */
+function identityIssues(b: BulletFields, issue: Issue) {
   if (b.nameOnly) {
     if (b.productNumber !== undefined)
       issue(['productNumber'], 'a name-only record has no product number')
@@ -388,66 +388,51 @@ function checkNameOnly(b: BulletFields, issue: Issue) {
   if (b.diameter === undefined) issue(['diameter'], 'a full record needs a diameter')
 }
 
-const diameter = (b: BulletFields) => b.diameter?.value
-const length = (b: BulletFields) => b.length?.value
-
-/**
- * A size of a bullet that must be smaller than another size of it, where the record gives both:
- * the path of the size, the size, the limit and what the limit is.
- */
-type SmallerThan = [
+/** Reports `path` when the size `q` is not smaller than `limit`; nothing while either is unknown. */
+type Below = (
   path: string[],
-  size: (b: BulletFields) => number | undefined,
-  limit: (b: BulletFields) => number | undefined,
+  q: { value: number } | undefined,
+  limit: number | undefined,
   what: string,
-]
+) => void
 
-/** The meplat, base, cavity and tip within the diameter, the tip and base within the lengths. */
-const sizeLimits: SmallerThan[] = [
-  [['meplatDiameter'], (b) => b.meplatDiameter?.value, diameter, 'the diameter'],
-  [['base', 'diameter'], (b) => b.base?.diameter?.value, diameter, 'the diameter'],
+/** The meplat, base and tip within the diameter, the tip and base within the lengths. */
+function sizeIssues(b: BulletFields, below: Below) {
+  const d = b.diameter?.value
+  const length = b.length?.value
+  below(['meplatDiameter'], b.meplatDiameter, d, 'the diameter')
+  below(['base', 'diameter'], b.base?.diameter, d, 'the diameter')
   // Only against the diameter: the cited definition relates the mouth to the caliber, not to the meplat.
-  [['tip', 'mouthDiameter'], (b) => b.tip?.mouthDiameter?.value, diameter, 'the diameter'],
-  [['tip', 'length'], (b) => b.tip?.length?.value, length, 'the length'],
-  [['tip', 'length'], (b) => b.tip?.length?.value, (b) => b.noseLength?.value, 'the nose length'],
-  [['base', 'length'], (b) => b.base?.length?.value, length, 'the length'],
-  // against the base diameter where the record has one, else against the diameter
-  [
-    ['base', 'cavityDiameter'],
-    (b) => b.base?.cavityDiameter?.value,
-    (b) => b.base?.diameter?.value,
-    'the base diameter',
-  ],
-  [
-    ['base', 'cavityDiameter'],
-    (b) => b.base?.cavityDiameter?.value,
-    (b) => (b.base?.diameter ? undefined : diameter(b)),
-    'the diameter',
-  ],
-]
-
-/** The jacket within the radius, the cavity depth within the length. */
-const depthLimits: SmallerThan[] = [
-  [
-    ['construction', 'jacket', 'thickness'],
-    (b) => b.construction?.jacket?.thickness?.value,
-    (b) => b.diameter && b.diameter.value / 2,
-    'the radius',
-  ],
-  [['base', 'cavityDepth'], (b) => b.base?.cavityDepth?.value, length, 'the length'],
-]
-
-function checkSmallerThan(b: BulletFields, limits: SmallerThan[], issue: Issue) {
-  for (const [path, size, limit, what] of limits) {
-    const v = size(b)
-    const max = limit(b)
-    if (v !== undefined && max !== undefined && !(v < max))
-      issue(path, `must be smaller than ${what}`)
-  }
+  below(['tip', 'mouthDiameter'], b.tip?.mouthDiameter, d, 'the diameter')
+  below(['tip', 'length'], b.tip?.length, length, 'the length')
+  below(['tip', 'length'], b.tip?.length, b.noseLength?.value, 'the nose length')
+  below(['base', 'length'], b.base?.length, length, 'the length')
 }
 
-/** Without a stored depth the cavity is half its opening deep (`bulletOutline`), which must fit the length. */
-function checkCavityDepth(b: BulletFields, issue: Issue) {
+/** The cavity within the base diameter, or the diameter where the record gives no base diameter. */
+function cavityDiameterIssue(b: BulletFields, below: Below) {
+  below(
+    ['base', 'cavityDiameter'],
+    b.base?.cavityDiameter,
+    b.base?.diameter?.value ?? b.diameter?.value,
+    b.base?.diameter ? 'the base diameter' : 'the diameter',
+  )
+}
+
+/** The jacket within the radius. */
+function jacketIssue(b: BulletFields, below: Below) {
+  const d = b.diameter?.value
+  below(
+    ['construction', 'jacket', 'thickness'],
+    b.construction?.jacket?.thickness,
+    d === undefined ? undefined : d / 2,
+    'the radius',
+  )
+}
+
+/** The cavity depth within the length; without a stored depth it is half the opening (`bulletOutline`). */
+function cavityDepthIssues(b: BulletFields, issue: Issue, below: Below) {
+  below(['base', 'cavityDepth'], b.base?.cavityDepth, b.length?.value, 'the length')
   const cavity = b.base?.cavityDiameter?.value
   if (
     cavity !== undefined &&
@@ -494,11 +479,15 @@ function cannelureOnShank(b: BulletFields, issue: Issue) {
 export const bullet = bulletFields.superRefine((b, ctx) => {
   needsCountrySource(b, ctx)
   const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
-  checkNameOnly(b, issue)
-  checkSmallerThan(b, sizeLimits, issue)
+  const below: Below = (path, q, limit, what) => {
+    if (q && limit !== undefined && !(q.value < limit)) issue(path, `must be smaller than ${what}`)
+  }
+  identityIssues(b, issue)
+  sizeIssues(b, below)
+  cavityDiameterIssue(b, below)
   cannelureOnShank(b, issue)
-  checkSmallerThan(b, depthLimits, issue)
-  checkCavityDepth(b, issue)
+  jacketIssue(b, below)
+  cavityDepthIssues(b, issue, below)
 })
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */
