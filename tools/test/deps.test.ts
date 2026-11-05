@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterAll, beforeAll, expect, it } from 'vitest'
 
@@ -78,6 +78,12 @@ it('lets the config of a logic package add only its import rule to the base', ()
     return { file, keys: Object.keys(config).sort(), extends: config.extends, overrides }
   })
   expect(shapes.length).toBeGreaterThan(0)
+  // a config deeper in a package would replace the package's own for its folder
+  const nested = globSync('packages/*/*/**/.oxlintrc.json', {
+    cwd: root,
+    exclude: (p) => basename(p) === 'node_modules',
+  })
+  expect(nested).toEqual([])
   expect(shapes).toEqual(
     shapes.map(({ file, overrides }) => ({
       file,
