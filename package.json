@@ -7,7 +7,7 @@
     "node": ">=26"
   },
   "scripts": {
-    "lint": "oxlint --ignore-pattern \"packages/units/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
+    "lint": "oxlint --format default --ignore-pattern \"packages/units/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
     "format": "biome check --write .",
     "build": "pnpm --filter \"./packages/*\" run build",
     "typecheck": "pnpm --recursive --workspace-concurrency=1 run typecheck",
@@ -28,7 +28,7 @@
     "postinstall": "node hooks/install.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.2",
+    "@biomejs/biome": "2.6.4",
     "knip": "^6.43.0",
     "oxlint": "catalog:"
   }

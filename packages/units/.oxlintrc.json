@@ -105,6 +105,30 @@
           {
             "name": "indexedDB",
             "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "HTMLElement",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "Element",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "requestAnimationFrame",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "getComputedStyle",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "matchMedia",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+          },
+          {
+            "name": "alert",
+            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
           }
         ]
       }

@@ -284,6 +284,7 @@ S = \sum_j \left(0.6 + 0.4\, a_j\right) \left(1 - \frac{e_j}{0.06}\right) - 0.3\
 $$
 
 Code: `apps/web/src/lib/target-face.ts`, `matchFaces`, `scoreMatch`, `shareInFrame`.
+
 4. Every target within 0.5 of the best score with at least 3 rings matched is offered. Targets whose rings the photo shows in the same ratios (an insert card shows rings shared by several targets) are a choice for the user. Without a known scale, so is every target that matches all the rings the best target matches, whatever its score: a larger target with outer rings the photo does not show scores lower for them. The editor lists these first, smallest first, each with its outer diameter.
 5. The plane: the pair of matched ellipses farthest apart in radius gives the target plane by the conic pencil of two concentric circles, which removes the perspective. A plane whose ellipses do not rectify to circles of the target's radii within 1.5 % of the black radius (rms) drops its worst ring and tries again.
 

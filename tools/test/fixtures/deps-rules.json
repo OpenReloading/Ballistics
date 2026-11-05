@@ -246,5 +246,13 @@
   "packages/importers/src/node-fs-type.ts": {
     "source": "import type { Stats } from 'node:fs'\nexport type S = Stats",
     "rules": ["importers-imports-schema-only"]
+  },
+  "packages/importers/src/inline-type.ts": {
+    "source": "import { type ChronoShot } from '@open-reloading/schema'\nexport type Shot = ChronoShot",
+    "rules": ["no-import-type-side-effects"]
+  },
+  "packages/importers/src/schema-subpath.ts": {
+    "source": "import load from '@open-reloading/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
+    "rules": ["importers-imports-schema-only"]
   }
 }

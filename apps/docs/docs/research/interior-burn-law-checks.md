@@ -47,6 +47,7 @@ For a burn law $\dot z = B \varphi(z)\, \bar p^n$ with a fixed form function, th
 | 0.5 | −0.552 | 0.45    | 0.50      | 1.77      | 2.23    |
 
 The factor stays within 15 percent only at $D \le 0.1$ over the whole burn, and up to about $D = 0.2$ over $z$ = 0.1 to 0.9, the range of $\bar L_d$. Cartridge loading densities are near 0.5.
+
 3. Offset law: the velocity data holds no low-charge ladder of one powder in one rifle; load tables give a start and a maximum charge per load only. Not measured.
 4. Coated grains: the powder records hold no coating, only the grain form (`ball` among them). Not measured.
 

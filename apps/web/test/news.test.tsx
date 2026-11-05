@@ -58,8 +58,10 @@ describe('news', () => {
     expect(() => newestNews(5, dir)).toThrow('news/2026-10-01-a.md: expected a title')
   })
 
-  it('reads blank lines after the title and the link', () => {
-    const dir = folder({ '2026-10-01-a.md': '---\ntitle: A \n\n\r\nlink: /x\n \n---\nOne. Two.\n' })
+  it('reads blank lines after the opening line, the title and the link', () => {
+    const dir = folder({
+      '2026-10-01-a.md': '---\n\ntitle: A \n\n\r\nlink: /x\n \n---\nOne. Two.\n',
+    })
     expect(newestNews(5, dir)[0]).toMatchObject({ title: 'A', link: '/x', text: 'One. Two.' })
   })
 

@@ -30,11 +30,12 @@ afterAll(() => rmSync(mirror, { recursive: true, force: true }))
 const lint = (...args: string[]) =>
   spawnSync(oxlint, args, { cwd: mirror, encoding: 'utf8', maxBuffer: 64 << 20 })
 
-/** The boundary rule a diagnostic names: the `name:` its message starts with, or the cycle rule. */
+/** The boundary rule a diagnostic names: the `name:` its message starts with, the cycle rule or the type-import rule. */
 const ruleOf = (d: { code: string; message: string; help?: string }) =>
-  d.code === 'import(no-cycle)'
-    ? 'no-cycle'
-    : /\b([a-z]+(?:-[a-z]+)+): /.exec(`${d.help ?? ''} ${d.message}`)?.[1]
+  ({
+    'import(no-cycle)': 'no-cycle',
+    'typescript(no-import-type-side-effects)': 'no-import-type-side-effects',
+  })[d.code] ?? /\b([a-z]+(?:-[a-z]+)+): /.exec(`${d.help ?? ''} ${d.message}`)?.[1]
 
 it('names the rule each forbidden import or global breaks and passes the allowed ones', () => {
   const report = JSON.parse(lint('--format', 'json').stdout) as {
