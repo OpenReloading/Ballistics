@@ -95,6 +95,23 @@ async function catalogue() {
  * Other keys are refused, as the API refuses them, and so is a `q` holding a control character.
  */
 async function list(kind: string, query: URLSearchParams) {
+  const p = listQuery(kind, query)
+  if (!p) return refusal(400, 'Bad Request', 'querystring does not match the schema')
+  return listAnswer(await catalogue(), kind, p)
+}
+
+/** The parameters of a list as the API's query schemas read them. */
+type ListQuery = NonNullable<ReturnType<typeof listQuery>>
+
+/** A text filter of at most `max` characters without NUL, or none. */
+const text = (v: string | undefined, max: number) =>
+  v === undefined || (v.length >= 1 && v.length <= max && !v.includes('\0'))
+/** A record id filter, or none. */
+const id = (v: string | undefined) =>
+  v === undefined || (v.length <= maxRecordIdLength && recordIdRegex.test(v))
+
+/** The query of a list of `kind`; undefined where the API's query schema refuses it. */
+function listQuery(kind: string, query: URLSearchParams) {
   const paged = searchKinds.has(kind)
   const own = (name: string) =>
     filters[kind]?.includes(name) ? (query.get(name) ?? undefined) : undefined
@@ -113,12 +130,8 @@ async function list(kind: string, query: URLSearchParams) {
   ].map(own)
   const sizeOf = primerSizes.options.find((o) => o === size)
   const compoundOf = primerCompounds.options.find((o) => o === compound)
-  const text = (v: string | undefined, max: number) =>
-    v === undefined || (v.length >= 1 && v.length <= max && !v.includes('\0'))
-  const id = (v: string | undefined) =>
-    v === undefined || (v.length <= maxRecordIdLength && recordIdRegex.test(v))
   const known = [...(filters[kind] ?? []), ...(paged ? ['q', 'limit', 'offset'] : [])]
-  if (
+  const refused =
     [...query.keys()].some((k) => !known.includes(k)) ||
     /\p{Cc}/u.test(q ?? '') ||
     Number.isNaN(limit) ||
@@ -128,10 +141,26 @@ async function list(kind: string, query: URLSearchParams) {
     ![manufacturer, cartridge, federation, discipline, face].every(id) ||
     (size !== undefined && sizeOf === undefined) ||
     (compound !== undefined && compoundOf === undefined)
-  )
-    return refusal(400, 'Bad Request', 'querystring does not match the schema')
-  const c = await catalogue()
-  const paging = { limit, offset }
+  if (refused) return
+  return {
+    q,
+    limit,
+    offset,
+    table,
+    manufacturer,
+    cartridge,
+    federation,
+    discipline,
+    face,
+    size: sizeOf,
+    compound: compoundOf,
+  }
+}
+
+/** The catalogue's answer to a list of `kind`. */
+function listAnswer(c: Catalogue, kind: string, p: ListQuery) {
+  const { q, table, manufacturer, cartridge, federation, discipline, face } = p
+  const paging = { limit: p.limit, offset: p.offset }
   switch (kind) {
     case 'cartridges':
       return answer(200, c.cartridges({ q, table, ...paging }))
@@ -142,7 +171,7 @@ async function list(kind: string, query: URLSearchParams) {
     case 'primers':
       return answer(
         200,
-        c.primers({ q, manufacturer, size: sizeOf, compound: compoundOf, ...paging }),
+        c.primers({ q, manufacturer, size: p.size, compound: p.compound, ...paging }),
       )
     case 'cases':
       return answer(200, c.cases({ q, manufacturer, cartridge, ...paging }))

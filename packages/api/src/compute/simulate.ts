@@ -275,6 +275,17 @@ function takeSensitivity(load: InteriorLoad, powder: Powder | undefined) {
   if (taken) load.propellant.temperatureSensitivity = taken.sensitivity
 }
 
+/** The file's charge ladder as the interior body takes it; none for one step or another kind. */
+function chargeLadderOf(ladder: NonNullable<Load['analysis']>['ladder']) {
+  const step = ladder?.step && toSi(ladderStepKinds[ladder.kind ?? 'charge'], ladder.step)
+  return ladder &&
+    (ladder.kind ?? 'charge') === 'charge' &&
+    ladder.stepCount > 1 &&
+    step !== undefined
+    ? { chargeStep: step, stepCount: ladder.stepCount, direction: ladder.direction }
+    : undefined
+}
+
 /** One `POST /interior/load-file` request (`query`, the load file `json`): the status and body of the answer. */
 export async function simulate(
   context: { catalogue: Catalogue; compute: ComputeRunner },
@@ -290,9 +301,7 @@ export async function simulate(
   if (lacking) return lacking
   const load = fileLoad(values, path)
   const ladder = record.analysis?.ladder
-  const step = ladder?.step && toSi(ladderStepKinds[ladder.kind ?? 'charge'], ladder.step)
-  const withLadder =
-    ladder && (ladder.kind ?? 'charge') === 'charge' && ladder.stepCount > 1 && step !== undefined
+  const chargeLadder = chargeLadderOf(ladder)
   // the file is validated before any record is read: a bad file answers 400 whatever its ids
   const parseBody = (resistance?: InteriorLoad['resistance']) => {
     try {
@@ -301,13 +310,7 @@ export async function simulate(
         load: resistance ? { ...load, resistance } : load,
         ...(record.cartridge && { cartridge: catalogueIdOf(record.cartridge) }),
         ...(values.pmax !== undefined && { pressureLimit: values.pmax }),
-        ...(withLadder && {
-          ladder: {
-            chargeStep: step,
-            stepCount: ladder.stepCount,
-            direction: ladder.direction,
-          },
-        }),
+        ...(chargeLadder && { ladder: chargeLadder }),
       })
     } catch (error) {
       if (error instanceof z.ZodError)
@@ -370,7 +373,7 @@ export async function simulate(
   return simulateAnswer(payload, {
     name,
     load,
-    around: ladder?.direction === 'around' && Boolean(withLadder),
+    around: ladder?.direction === 'around' && Boolean(chargeLadder),
     curves: curves === 'true',
     bullet,
     powder,

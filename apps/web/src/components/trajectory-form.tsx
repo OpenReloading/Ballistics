@@ -639,6 +639,20 @@ type BulletFieldsProps = {
   group: (keys: string[]) => ReactNode[]
 }
 
+/** The record's drag with the chosen BC, its BC list and the chosen BC. */
+function recordBcs(
+  record: BulletFieldsProps['record'],
+  model: BulletFieldsProps['recordModel'],
+  choice: number | undefined,
+) {
+  const drag = record.status === 'ok' ? bulletDrag(record.record, model, choice) : undefined
+  // without `choice`, so the BC list stays while one value is chosen
+  const bcOptions = record.status === 'ok' ? bulletDrag(record.record, model) : undefined
+  const chosen =
+    bcOptions?.kind === 'choose' && choice !== undefined ? bcOptions.values[choice] : undefined
+  return { drag, bcOptions, chosen }
+}
+
 /** The bullet record the form draws the drag from: its search, drag model, BC choice and facts. */
 function DatabaseBullet({
   own,
@@ -655,11 +669,7 @@ function DatabaseBullet({
 }: BulletFieldsProps) {
   const { t } = useTranslation()
   const u = (q: Parameters<typeof formatQuantity>[0]) => system[q].symbol
-  const drag = record.status === 'ok' ? bulletDrag(record.record, recordModel, choice) : undefined
-  // without `choice`, so the BC list stays while one value is chosen
-  const bcOptions = record.status === 'ok' ? bulletDrag(record.record, recordModel) : undefined
-  const chosen =
-    bcOptions?.kind === 'choose' && choice !== undefined ? bcOptions.values[choice] : undefined
+  const { drag, bcOptions, chosen } = recordBcs(record, recordModel, choice)
   return (
     <>
       {own && (

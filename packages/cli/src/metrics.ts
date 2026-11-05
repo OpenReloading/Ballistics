@@ -123,12 +123,14 @@ const difference = (a: number | undefined, b: number | undefined) =>
 
 /** The change of every metric from `baseline` to `candidate`. */
 export function changeOf(baseline: Metrics | undefined, candidate: Metrics | undefined): Change {
+  const change = (pick: (m: Metrics) => number | undefined) =>
+    difference(baseline && pick(baseline), candidate && pick(candidate))
   return {
     usedRows: (candidate?.rows.used ?? 0) - (baseline?.rows.used ?? 0),
-    velocityMedian: difference(baseline?.velocity?.median, candidate?.velocity?.median),
-    velocityP90: difference(baseline?.velocity?.p90, candidate?.velocity?.p90),
-    pressureMedian: difference(baseline?.pressure?.median, candidate?.pressure?.median),
-    pressureP90: difference(baseline?.pressure?.p90, candidate?.pressure?.p90),
-    intervalCoverage: difference(baseline?.interval?.coverage, candidate?.interval?.coverage),
+    velocityMedian: change((m) => m.velocity?.median),
+    velocityP90: change((m) => m.velocity?.p90),
+    pressureMedian: change((m) => m.pressure?.median),
+    pressureP90: change((m) => m.pressure?.p90),
+    intervalCoverage: change((m) => m.interval?.coverage),
   }
 }
