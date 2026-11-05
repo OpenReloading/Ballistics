@@ -18,3 +18,4 @@ process.stdout.on('error', (error: NodeJS.ErrnoException) => {
 })
 
 process.exitCode = await run(argv, process.env, io)
+// probe for the affected-only CI, closed unmerged
