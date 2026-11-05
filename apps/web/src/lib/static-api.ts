@@ -101,19 +101,7 @@ async function list(kind: string, query: URLSearchParams) {
 }
 
 /** The parameters of a list as the API's query schemas read them. */
-type ListQuery = {
-  q: string | undefined
-  limit: number
-  offset: number
-  table: string | undefined
-  manufacturer: string | undefined
-  cartridge: string | undefined
-  federation: string | undefined
-  discipline: string | undefined
-  face: string | undefined
-  size: (typeof primerSizes.options)[number] | undefined
-  compound: (typeof primerCompounds.options)[number] | undefined
-}
+type ListQuery = NonNullable<ReturnType<typeof listQuery>>
 
 /** A text filter of at most `max` characters without NUL, or none. */
 const text = (v: string | undefined, max: number) =>
@@ -123,7 +111,7 @@ const id = (v: string | undefined) =>
   v === undefined || (v.length <= maxRecordIdLength && recordIdRegex.test(v))
 
 /** The query of a list of `kind`; undefined where the API's query schema refuses it. */
-function listQuery(kind: string, query: URLSearchParams): ListQuery | undefined {
+function listQuery(kind: string, query: URLSearchParams) {
   const paged = searchKinds.has(kind)
   const own = (name: string) =>
     filters[kind]?.includes(name) ? (query.get(name) ?? undefined) : undefined
@@ -153,7 +141,7 @@ function listQuery(kind: string, query: URLSearchParams): ListQuery | undefined 
     ![manufacturer, cartridge, federation, discipline, face].every(id) ||
     (size !== undefined && sizeOf === undefined) ||
     (compound !== undefined && compoundOf === undefined)
-  if (refused) return undefined
+  if (refused) return
   return {
     q,
     limit,

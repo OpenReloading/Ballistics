@@ -1617,7 +1617,6 @@ export function useWorkbenchState() {
   const [powder, setPowder] = useState<Powder | undefined>(undefined)
   /** The user powder design whose values the fields took; the powder record is then none. */
   const [powderDesign, setPowderDesign] = useState<PowderDesign>()
-  /** The powder the run reads: the record, else the design's. */
   const chosenPowder = chosenPowderOf(powder, powderDesign)
   const names = useManufacturerNames()
   /** The chosen records as "<manufacturer name> <product name>". */

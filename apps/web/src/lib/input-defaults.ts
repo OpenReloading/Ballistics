@@ -181,5 +181,4 @@ function barrelLengthDefault(
           ? t('pistol barrel, assumption, no source')
           : t('rifle barrel, assumption, no source'),
     }
-  return
 }

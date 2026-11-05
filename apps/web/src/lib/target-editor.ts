@@ -326,7 +326,6 @@ export function referenceOf(
   if (kind === 'line') return { kind: 'line', a: p0, b: p1, length: len }
   if (kind === 'ringCentre') return { kind: 'ringCentre', centre: p0, edge: p1, diameter: len }
   if (kind === 'ringEdge' && p2) return { kind: 'ringEdge', points: [p0, p1, p2], diameter: len }
-  return
 }
 
 function rectangleOf(known: KnownSize, points: Point[]): CalibrationReference | undefined {

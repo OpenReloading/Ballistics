@@ -309,7 +309,7 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
 
 /**
  * The fields of an unfolded table card: its kind, the column mapping with Save mapping, and the
- * file's source. A render helper, not a component: the typed mapping name stays with the card.
+ * file's source.
  */
 function tableFields(o: {
   e: Entry
