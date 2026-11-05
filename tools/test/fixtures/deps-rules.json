@@ -251,6 +251,14 @@
     "source": "export const w = () => navigator.language",
     "rules": ["logic-no-dom"]
   },
+  "packages/locale-format/src/cycle-a.ts": {
+    "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
+    "rules": ["no-cycle"]
+  },
+  "packages/locale-format/src/cycle-b.ts": {
+    "source": "import { a } from './cycle-a.ts'\nexport const b = () => a",
+    "rules": ["no-cycle"]
+  },
   "packages/schema/src/cycle-a.ts": {
     "source": "import { b } from './cycle-b.ts'\nexport const a = () => b",
     "rules": ["no-cycle"]

@@ -1,58 +1,7 @@
 {
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "import"],
-  "categories": {
-    "correctness": "error",
-    "suspicious": "error"
-  },
-  "rules": {
-    "complexity": [
-      "error",
-      {
-        "max": 10
-      }
-    ],
-    "max-depth": [
-      "error",
-      {
-        "max": 3
-      }
-    ],
-    "max-lines-per-function": [
-      "error",
-      {
-        "max": 50,
-        "skipBlankLines": true,
-        "skipComments": true
-      }
-    ],
-    "max-params": [
-      "error",
-      {
-        "max": 4
-      }
-    ],
-    "no-nested-ternary": "error",
-    "no-else-return": "error",
-    "no-lonely-if": "error",
-    "no-unneeded-ternary": "error",
-    "no-useless-return": "error",
-    "no-useless-catch": "error",
-    "prefer-const": "error",
-    "typescript/no-unnecessary-type-assertion": "error",
-    "typescript/no-unnecessary-boolean-literal-compare": "error",
-    "typescript/no-unnecessary-type-parameters": "error",
-    "typescript/no-non-null-assertion": "error",
-    "typescript/no-explicit-any": "error",
-    "typescript/ban-ts-comment": "error"
-  },
+  "extends": ["../oxlint.logic.json"],
   "overrides": [
-    {
-      "files": ["test/**"],
-      "rules": {
-        "typescript/no-unsafe-type-assertion": "off"
-      }
-    },
     {
       "files": ["src/**"],
       "rules": {
@@ -74,61 +23,6 @@
                 "message": "locale-format-imports-units-only: packages/locale-format has no I/O: it imports only @open-reloading/units and its own files."
               }
             ]
-          }
-        ],
-        "no-restricted-globals": [
-          "error",
-          {
-            "name": "window",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "document",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "navigator",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "location",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "localStorage",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "sessionStorage",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "indexedDB",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "HTMLElement",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "Element",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "requestAnimationFrame",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "getComputedStyle",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "matchMedia",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
-          },
-          {
-            "name": "alert",
-            "message": "logic-no-dom: units, locale-format, schema, core, importers and drawing run anywhere, so they read no browser global."
           }
         ]
       }
