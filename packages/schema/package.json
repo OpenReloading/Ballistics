@@ -52,6 +52,7 @@
     "@arethetypeswrong/cli": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "fast-check": "catalog:",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
     "publint": "catalog:",
