@@ -115,6 +115,9 @@ importers:
       '@docusaurus/types':
         specifier: 3.10.2
         version: 3.10.2(@swc/core@1.16.20(@swc/helpers@0.5.23))(clean-css@5.3.3)(cssnano@6.1.2(postcss@8.5.31))(csso@5.0.5)(html-minifier-terser@7.2.0)(lightningcss@1.33.0)(postcss@8.5.31)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(sharp@0.35.5(@types/node@26.6.6))(supports-color@8.1.1)(svgo@3.3.5)
+      '@open-reloading/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
       '@open-reloading/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -130,6 +133,12 @@ importers:
       '@open-reloading/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@open-reloading/tools':
+        specifier: workspace:*
+        version: link:../../tools
+      '@open-reloading/web':
+        specifier: workspace:*
+        version: link:../web
       typedoc:
         specifier: ^0.28.20
         version: 0.28.20(typescript@6.0.3)
@@ -142,6 +151,9 @@ importers:
       '@axe-core/playwright':
         specifier: ^4.14.0
         version: 4.14.0(playwright-core@1.64.1)
+      '@open-reloading/web':
+        specifier: workspace:*
+        version: link:../web
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
@@ -329,6 +341,9 @@ importers:
         specifier: workspace:*
         version: link:../units
     devDependencies:
+      '@open-reloading/data':
+        specifier: workspace:*
+        version: link:../data
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -369,6 +384,9 @@ importers:
 
   packages/drawing:
     devDependencies:
+      '@open-reloading/data':
+        specifier: workspace:*
+        version: link:../data
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
@@ -465,6 +483,15 @@ importers:
         specifier: workspace:*
         version: link:../packages/api
     devDependencies:
+      '@open-reloading/drawing':
+        specifier: workspace:*
+        version: link:../packages/drawing
+      '@open-reloading/importers':
+        specifier: workspace:*
+        version: link:../packages/importers
+      '@open-reloading/web':
+        specifier: workspace:*
+        version: link:../apps/web
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6

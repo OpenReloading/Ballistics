@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs'
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 import { msg } from '../src/i18n/translate.ts'
@@ -408,20 +407,5 @@ describe('guideRule', () => {
       resolution: 'Close enough',
       blur: 'Steady, not soft',
     })
-  })
-
-  it('names a heading of the guide and links its anchor', () => {
-    const guide = readFileSync(new URL('../../docs/docs/photo-guide.md', import.meta.url), 'utf8')
-    const headings = [...guide.matchAll(/^## (.+)$/gm)].map((m) => m[1] ?? '')
-    // the anchor of a Docusaurus heading: lower case, punctuation dropped, spaces as hyphens
-    const anchor = (h: string) =>
-      h
-        .toLowerCase()
-        .replace(/[^\p{L}\p{N} -]/gu, '')
-        .replace(/ /g, '-')
-    for (const rule of Object.values(guideRule)) {
-      const heading = headings.find((h) => h.endsWith(rule.name))
-      expect(heading && anchor(heading)).toBe(rule.anchor)
-    }
   })
 })

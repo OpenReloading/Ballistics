@@ -7,6 +7,12 @@ on:
   pull_request:
   # Ready for a merge queue on `main`; without one the push run checks every merge.
   merge_group:
+  # Every push to `main` runs everything. The weekly run, before the weekly release (release-weekly.yml), adds a full
+  # run in a week without merges and the checks whose result changes without a commit, such as the advisories that
+  # tools/src/audit.ts reads.
+  schedule:
+    - cron: "0 4 * * 1" # Monday 04:00
+      timezone: Europe/Berlin
 
 permissions: {}
 
@@ -25,11 +31,14 @@ env:
   LYCHEE_IMAGE: docker.io/lycheeverse/lychee:0.24.2@sha256:e2d19e57cf6ab037026f20b8e449a1f30d9d7f81eef4194763aab2eab20bd28d
   SCHEMATHESIS_IMAGE: docker.io/schemathesis/schemathesis:v4.29.4@sha256:16d21ecba0097fc8a3ca71b8d1db3797d2a057610d808715871216450e63f0a6
 
+# The jobs stay in this file until the shared gates workflow of ESchuderer/reusable-workflows is released; then they
+# become a call pinned by commit SHA, and `check` stays here (it names this file's jobs).
 jobs:
   # Which jobs run and what the e2e job exports: only a pull request may skip `check` (prose only) or `e2e` (no
-  # change to what the API, the web app, the export scripts or the e2e specs read), or export a sample of the
-  # cartridge pages. Every other event (the default branch, the merge queue) and every doubt runs everything; see
-  # apps/web/scripts/ci-plan.mts.
+  # change to what the API, the web app, the export scripts or the e2e specs read), test only the workspaces it
+  # reaches (pnpm's `--filter "...[<base>]"`, which adds every workspace that depends on a changed one), or export a
+  # sample of the cartridge pages. Every other event (the default branch, the merge queue, the weekly run) and every
+  # doubt runs everything; see apps/web/scripts/ci-plan.mts.
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -39,24 +48,24 @@ jobs:
       check: ${{ steps.plan.outputs.check }}
       e2e: ${{ steps.plan.outputs.e2e }}
       prerender: ${{ steps.plan.outputs.prerender }}
+      tests: ${{ steps.plan.outputs.tests }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # the base commit of a pull request must be present for the file list
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # pnpm selects the workspaces from the manifests and git; it needs no install
+      - uses: ./.github/actions/pnpm
         with:
-          node-version-file: .nvmrc
+          install: "false"
       - id: plan
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/ci-plan.mts >> "$GITHUB_OUTPUT"
 
-  # `check` is the required status check. It stands for the two jobs below, which run in parallel: `static` and
-  # `test` (one job per group of workspaces, the drawing and web suites being the slow ones). Their conditions are
-  # the old single job's, so the plan skips all of them together.
+  # The checks of the whole repository; the plan skips them for prose only.
   static:
     needs: changes
     # a failed `changes` job leaves the outputs empty, so the job runs
@@ -86,11 +95,14 @@ jobs:
       # licences of the production dependencies of the images and the generated list in NOTICE
       - run: node tools/src/licences.ts
 
-  # Together the groups are what the root `pnpm test` runs. The workspaces import each other's dist/, so each job builds.
+  # One job per group of workspaces (the drawing and web suites being the slow ones), each testing the workspaces of
+  # its group that the plan selects; together all groups are what the root `pnpm test` runs. The workspaces import
+  # each other's dist/, so each job builds. A failed `changes` job leaves the outputs empty, so every group runs
+  # (the fallback is testJobs() of the plan, which apps/web/test/ci-plan.test.ts compares).
   test:
     name: test (${{ matrix.name }})
     needs: changes
-    if: ${{ !cancelled() && needs.changes.outputs.check != 'false' }}
+    if: ${{ !cancelled() && needs.changes.outputs.check != 'false' && needs.changes.outputs.tests != '[]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -98,35 +110,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: drawing
-            workspaces: --filter @open-reloading/drawing
-          - name: web
-            workspaces: --filter @open-reloading/web
-          - name: packages
-            workspaces: --filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools
+        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools","e2eUnit":true}]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: ./.github/actions/pnpm
       - run: pnpm run build
-      - run: |
+      - if: matrix.filter != ''
+        run: |
           # unquoted on purpose: the value is several `--filter name` words
           # shellcheck disable=SC2086
           pnpm --workspace-concurrency=1 $WORKSPACES run test
         env:
-          WORKSPACES: ${{ matrix.workspaces }}
-      - if: matrix.name == 'packages'
+          WORKSPACES: ${{ matrix.filter }}
+      - if: matrix.e2eUnit
         run: pnpm --filter @open-reloading/e2e run test:unit
 
-  # Fails when a part failed or was cancelled; a skipped part (the plan) passes, as the old single job did when
-  # skipped. Stays the name the ruleset requires. It also checks the relative links and anchors of the Markdown
-  # files and the spelling of the tracked text files (typos, which skips `_typos.toml` itself) on every run:
-  # the plan skips `static` for prose that no other check reads, which is where a link or a word breaks. External
-  # links: links.yml.
+  # The one check the ruleset requires: it waits for every other job of this workflow and fails when one failed or
+  # was cancelled, or was skipped where the plan cannot skip it (only `static`, `test` and `e2e` may be). It also
+  # checks the relative links and anchors of the Markdown files and the spelling of the tracked text files (typos,
+  # which skips `_typos.toml` itself) on every run: the plan skips `static` for prose that no other check reads,
+  # which is where a link or a word breaks. External links: links.yml.
   check:
-    needs: [static, test]
+    needs: [changes, static, test, e2e, workflows, dependency-review]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -144,11 +151,12 @@ jobs:
           echo "$TYPOS_SHA256  $RUNNER_TEMP/typos.tar.gz" | sha256sum --check
           tar --extract --gzip --file "$RUNNER_TEMP/typos.tar.gz" --directory "$RUNNER_TEMP" ./typos
           "$RUNNER_TEMP/typos"
-      - env:
-          RESULTS: ${{ needs.static.result }} ${{ needs.test.result }}
+      - name: Results of the other jobs
+        env:
+          NEEDS: ${{ toJSON(needs) }}
         run: |
-          echo "static and test: $RESULTS"
-          case " $RESULTS " in *" failure "* | *" cancelled "*) exit 1 ;; esac
+          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS"
+          jq -e 'to_entries | all(.value.result == "success" or (.value.result == "skipped" and (.key | IN("static", "test", "e2e"))))' <<< "$NEEDS" > /dev/null
 
   # Workflow lint and security audit of .github/workflows and dependabot.yml.
   workflows:

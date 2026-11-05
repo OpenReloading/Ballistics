@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@open-reloading/web": "workspace:*",
     "@playwright/test": "catalog:",
     "vitest": "catalog:"
   }

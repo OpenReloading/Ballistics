@@ -1,5 +1,9 @@
 name: pnpm install
 description: Node from .nvmrc, the pnpm that .github/pnpm/package-lock.json pins, and the workspace installed without scripts.
+inputs:
+  install:
+    description: Whether to install the workspace; `false` sets up Node and pnpm only.
+    default: "true"
 runs:
   using: composite
   steps:
@@ -20,5 +24,6 @@ runs:
         arch=$(printf '%s' "$RUNNER_ARCH" | tr '[:upper:]' '[:lower:]')
         ln -s "$PWD/node_modules/@pnpm/exe.linux-$arch/pnpm" "$(dirname "$(command -v node)")/pnpm"
         pnpm --version
-    - shell: bash
+    - if: inputs.install == 'true'
+      shell: bash
       run: pnpm install --frozen-lockfile --ignore-scripts
