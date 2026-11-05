@@ -26,7 +26,7 @@ const repoRoot = path.join(webRoot, '../..')
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|schema|importers|core|drawing|data|api)\//,
+  /^packages\/(units|locale-format|schema|importers|core|drawing|data|api)\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
   /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
@@ -137,7 +137,19 @@ export function recordClosure(root = repoRoot) {
 export const testGroups: Record<string, string[]> = {
   drawing: ['drawing'],
   web: ['web'],
-  packages: ['units', 'schema', 'core', 'importers', 'data', 'api', 'cli', 'docs', 'tools', 'e2e'],
+  packages: [
+    'units',
+    'locale-format',
+    'schema',
+    'core',
+    'importers',
+    'data',
+    'api',
+    'cli',
+    'docs',
+    'tools',
+    'e2e',
+  ],
 }
 
 /** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */

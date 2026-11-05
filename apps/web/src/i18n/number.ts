@@ -1,3 +1,4 @@
+import * as locale from '@open-reloading/locale-format'
 import {
   type NumberRange,
   type ParsedNumber,
@@ -7,7 +8,8 @@ import { shownLanguage } from './shown.ts'
 import { type Translator, translator } from './translate.ts'
 
 /**
- * Numbers in the language shown. Inside the app a number is its canonical text: a point as the
+ * Numbers in the language shown: the formatting of `@open-reloading/locale-format` with the
+ * language shown as the default. Inside the app a number is its canonical text: a point as the
  * decimal mark, no grouping, what `Number(text)` reads. That text is what is stored, linked,
  * exported and sent to the packages. Only the screen writes the language's decimal mark, and only
  * what a person types or pastes is read through {@link parseNumber}.
@@ -15,74 +17,35 @@ import { type Translator, translator } from './translate.ts'
 
 export type { NumberRange, ParsedNumber }
 
-const marks = new Map<string, '.' | ','>()
-
 /** The decimal mark of `language` ("." or ","); the language shown by default. */
-export function decimalMark(language = shownLanguage()): '.' | ',' {
-  let mark = marks.get(language)
-  if (!mark) {
-    const part = new Intl.NumberFormat(language)
-      .formatToParts(1.1)
-      .find((p) => p.type === 'decimal')
-    mark = part?.value === ',' ? ',' : '.'
-    marks.set(language, mark)
-  }
-  return mark
-}
+export const decimalMark = (language = shownLanguage()) => locale.decimalMark(language)
+
+/** `localizeNumber` of `@open-reloading/locale-format`, in the language shown by default. */
+export const localizeNumber = (text: string, language = shownLanguage()) =>
+  locale.localizeNumber(text, language)
 
 /**
- * A canonical number text on screen: its point written as the language's decimal mark. A text with
- * no point or more than one (not a number) stays as it is, English always.
+ * `localizeDecimals` of `@open-reloading/locale-format` for text built on the server, which writes
+ * English; in the language shown by default.
  */
-export function localizeNumber(text: string, language = shownLanguage()): string {
-  const mark = decimalMark(language)
-  return mark === '.' || text.split('.').length !== 2 ? text : text.replace('.', mark)
-}
+export const localizeDecimals = (text: string, language = shownLanguage()) =>
+  locale.localizeDecimals(text, language)
 
-/**
- * Text made of numbers written with a point (built on the server, which writes English): each
- * point between digits written as the language's decimal mark. For text that is only numbers and
- * their units: a name or an identifier such as "2.21.1" is no such text.
- */
-export function localizeDecimals(text: string, language = shownLanguage()): string {
-  const mark = decimalMark(language)
-  return mark === '.' ? text : text.replace(/(?<=\d)\.(?=\d)/g, mark)
-}
-
-/**
- * Text of numbers and their units as shown on screen ("2,40 gr"), with each decimal mark between
- * digits written as a point, for a file or the clipboard: the inverse of {@link localizeDecimals}.
- */
-export function canonicalNumberText(text: string, language = shownLanguage()): string {
-  const mark = decimalMark(language)
-  return mark === '.' ? text : text.replaceAll(new RegExp(`(?<=\\d)\\${mark}(?=\\d)`, 'g'), '.')
-}
-
-const formats = new Map<string, Intl.NumberFormat>()
+/** `canonicalNumberText` of `@open-reloading/locale-format`, in the language shown by default. */
+export const canonicalNumberText = (text: string, language = shownLanguage()) =>
+  locale.canonicalNumberText(text, language)
 
 /** `x` with exactly `digits` decimals, no grouping and no minus sign on a value that rounds to 0. */
-export function formatNumber(x: number, digits: number, language = shownLanguage()): string {
-  const key = `${language}:${digits}`
-  let format = formats.get(key)
-  if (!format) {
-    format = new Intl.NumberFormat(language, {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-      signDisplay: 'negative',
-      useGrouping: false,
-    })
-    formats.set(key, format)
-  }
-  return format.format(x)
-}
+export const formatNumber = (x: number, digits: number, language = shownLanguage()) =>
+  locale.formatNumber(x, digits, language)
 
 /** `x.toFixed(digits)` on screen: the same digits, the language's decimal mark. */
 export const fixedNumber = (x: number, digits: number, language = shownLanguage()) =>
-  localizeNumber(x.toFixed(digits), language)
+  locale.fixedNumber(x, digits, language)
 
 /** A number as `String(x)` writes it, on screen. */
 export const plainNumber = (x: number, language = shownLanguage()) =>
-  localizeNumber(String(x), language)
+  locale.plainNumber(x, language)
 
 /**
  * Reads typed or pasted text with either decimal mark; the mark of `language` settles a lone mark

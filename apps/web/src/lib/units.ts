@@ -1,55 +1,29 @@
-import { radPerMoa, radPerMrad, waterDensityGramsPerCm3 } from '@open-reloading/core'
-import { fromSi, type QuantityKind, toSi } from '@open-reloading/schema'
-import { decimalMark, formatNumber, parseNumber } from '../i18n/number.ts'
+import { waterDensityGramsPerCm3 } from '@open-reloading/core'
+import type { PresetId, Quantity, UnitSystem } from '@open-reloading/locale-format'
+import * as locale from '@open-reloading/locale-format'
+import { fromSi, toSi } from '@open-reloading/schema'
+import { parseNumber } from '../i18n/number.ts'
+import { shownLanguage } from '../i18n/shown.ts'
 import { type Message, msg } from '../i18n/translate.ts'
 
 /**
- * Display units. Every value is held in SI; a unit converts to and from SI and has a fixed number
- * of decimals. Factors: NIST SP 811 Appendix B.8 (exact where NIST marks them exact); lb is
- * 0.45359237 kg and standard gravity 9.80665 m/s2 (ICAO Doc 7488/3), so psi and ft lbf are exact
- * products of those.
+ * The display unit tables and the unit formatting of `@open-reloading/locale-format`, in the
+ * language shown, the factors the app converts with and the text of unit fields.
  */
-export type Quantity =
-  | 'range'
-  | 'length'
-  | 'twist'
-  | 'barrelLength'
-  | 'lineOfSightOffset'
-  | 'velocity'
-  | 'windSpeed'
-  | 'mass'
-  | 'firearmMass'
-  | 'charge'
-  | 'energy'
-  | 'temperature'
-  | 'temperatureDifference'
-  | 'airPressure'
-  | 'pressure'
-  | 'area'
-  | 'altitude'
-  | 'capacity'
-  | 'specificEnergy'
-  | 'molarMass'
-  | 'ratio'
-  | 'density'
-  | 'covolume'
-  | 'vivacity'
-  | 'ballisticCoefficient'
-  | 'angle'
-  | 'correction'
-  | 'percent'
-  | 'dragFactor'
-  | 'sectionalDensity'
-
-export interface Unit {
-  symbol: string
-  toSi(x: number): number
-  fromSi(si: number): number
-  /** Decimals when formatted. */
-  decimals: number
-  /** Arrow-key step of a field, in this unit. */
-  step?: number | undefined
-}
+export {
+  localePreset,
+  type PresetId,
+  parseUnitChoice,
+  presetFromLink,
+  presetUnitIds,
+  presetUnits,
+  type Quantity,
+  resolveUnits,
+  type Unit,
+  type UnitChoice,
+  type UnitSystem,
+  unitsOf,
+} from '@open-reloading/locale-format'
 
 /** The volume in m3 of `grams` of water: a water capacity as the records store it. */
 export const waterVolume = (grams: number) =>
@@ -59,6 +33,7 @@ export const waterVolume = (grams: number) =>
 export const waterGrams = (m3: number) =>
   fromSi('mass', m3 * toSi('density', waterDensityGramsPerCm3))
 
+// NIST SP 811 Appendix B.8; lb is 0.45359237 kg and standard gravity 9.80665 m/s2 (ICAO Doc 7488/3)
 export const metersPerInch = 0.0254
 export const metersPerFoot = 0.3048
 export const metersPerYard = 0.9144
@@ -73,226 +48,10 @@ const poundForce = 0.45359237 * 9.80665
 export const psi = poundForce / metersPerInch ** 2
 export const footPound = metersPerFoot * poundForce
 
-/** A unit that is the stored unit of the quantity `kind`, converted by the schema's unit table. */
-function stored(kind: QuantityKind, symbol: string, decimals: number, step?: number): Unit {
-  return { symbol, toSi: (x) => toSi(kind, x), fromSi: (si) => fromSi(kind, si), decimals, step }
-}
-
-function linear(symbol: string, factor: number, decimals: number, step?: number): Unit {
-  return { symbol, toSi: (x) => x * factor, fromSi: (si) => si / factor, decimals, step }
-}
-
-/** The display units of each quantity, by unit id; the first is the SI-based one. */
-export const unitsOf = {
-  range: { m: linear('m', 1, 0), yd: linear('yd', metersPerYard, 0) },
-  length: { mm: stored('length', 'mm', 2, 0.01), in: linear('in', metersPerInch, 4, 0.0005) },
-  // barrel twist, length per turn: 1:10 in on rifles and in load data, 254 mm from barrel makers and C.I.P.
-  twist: { mm: stored('length', 'mm', 0), in: linear('in', metersPerInch, 1) },
-  // a firearm's barrel length: 24 in on rifles in common metric use, 610 mm in SI
-  barrelLength: { mm: stored('length', 'mm', 0, 1), in: linear('in', metersPerInch, 2, 0.25) },
-  lineOfSightOffset: {
-    cm: linear('cm', 1e-2, 1),
-    mm: stored('length', 'mm', 0),
-    in: linear('in', metersPerInch, 1),
-  },
-  velocity: { 'm/s': linear('m/s', 1, 0), 'ft/s': linear('ft/s', metersPerFoot, 0) },
-  windSpeed: { 'm/s': linear('m/s', 1, 1), mph: linear('mph', metersPerSecondPerMph, 1) },
-  mass: { g: stored('mass', 'g', 2), gr: linear('gr', kilogramsPerGrain, 1) },
-  // a firearm's mass: bullet mass units do not fit it
-  firearmMass: { kg: linear('kg', 1, 2), lb: linear('lb', 0.45359237, 2) },
-  charge: { g: stored('mass', 'g', 2, 0.01), gr: linear('gr', kilogramsPerGrain, 1, 0.1) },
-  energy: { J: linear('J', 1, 0), 'ft-lbf': linear('ft·lbf', footPound, 0) },
-  temperature: {
-    degC: stored('temperature', '°C', 1),
-    degF: {
-      symbol: '°F',
-      toSi: (t) => toSi('temperature', ((t - 32) * 5) / 9),
-      fromSi: (k) => (fromSi('temperature', k) * 9) / 5 + 32,
-      decimals: 1,
-    },
-  },
-  // a step between temperatures: no offset, and the unit follows the temperature's (`resolveUnits`)
-  temperatureDifference: {
-    degC: linear('°C', 1, 1, 0.5),
-    degF: linear('°F', 5 / 9, 1, 1),
-  },
-  airPressure: { hPa: linear('hPa', 100, 1), inHg: linear('inHg', pascalsPerInHg, 2) },
-  pressure: { bar: stored('pressure', 'bar', 0), psi: linear('psi', psi, 0) },
-  area: { mm2: stored('area', 'mm²', 2), in2: linear('in²', metersPerInch ** 2, 5) },
-  altitude: { m: linear('m', 1, 0), ft: linear('ft', metersPerFoot, 0) },
-  // gr H2O: the volume of that mass of water
-  capacity: {
-    cm3: linear('cm³', 1e-6, 3),
-    grH2O: linear('gr H₂O', kilogramsPerGrain / toSi('density', waterDensityGramsPerCm3), 1),
-  },
-  specificEnergy: { 'MJ/kg': linear('MJ/kg', 1e6, 3) },
-  molarMass: { 'kg/kmol': stored('molarMass', 'kg/kmol', 2) },
-  ratio: { '1': linear('', 1, 3) },
-  density: { 'g/cm3': stored('density', 'g/cm³', 3) },
-  covolume: { 'cm3/g': linear('cm³/g', 1e-3, 3) },
-  vivacity: { '1/s': linear('1/s', 1, 3) },
-  ballisticCoefficient: { 'lb/in2': stored('ballisticCoefficient', 'lb/in²', 3) },
-  angle: { deg: stored('angle', 'deg', 0) },
-  correction: {
-    MOA: linear('MOA', radPerMoa, 2),
-    mrad: linear('mrad', radPerMrad, 2),
-  },
-  percent: { '%': linear('%', 0.01, 0) },
-  // a multiplier on the drag, 100 % the nominal drag; one decimal keeps a fitted 1.034
-  dragFactor: { '%': linear('%', 0.01, 1) },
-  // a bullet's mass over its diameter squared, kg/m² in SI; makers print lb/in²
-  sectionalDensity: {
-    'kg/m2': linear('kg/m²', 1, 1),
-    'lb/in2': stored('ballisticCoefficient', 'lb/in²', 3),
-  },
-} as const satisfies Record<Quantity, Record<string, Unit>>
-
-/** Key of `unitsOf[Q]`, for example 'mm' or 'in' for length. */
-type UnitId<Q extends Quantity = Quantity> = keyof (typeof unitsOf)[Q] & string
-
-export type PresetId = 'metric-grains' | 'us' | 'metric-grams'
-
 export const presetNames: Record<PresetId, Message> = {
   'metric-grains': msg('Metric, common use'),
   us: msg('US customary'),
   'metric-grams': msg('Metric (SI)'),
-}
-
-const metricBase = {
-  firearmMass: 'kg',
-  range: 'm',
-  length: 'mm',
-  velocity: 'm/s',
-  windSpeed: 'm/s',
-  energy: 'J',
-  temperature: 'degC',
-  temperatureDifference: 'degC',
-  airPressure: 'hPa',
-  pressure: 'bar',
-  area: 'mm2',
-  altitude: 'm',
-} as const
-
-const single = {
-  specificEnergy: 'MJ/kg',
-  molarMass: 'kg/kmol',
-  ratio: '1',
-  density: 'g/cm3',
-  covolume: 'cm3/g',
-  vivacity: '1/s',
-  ballisticCoefficient: 'lb/in2',
-  angle: 'deg',
-  percent: '%',
-  dragFactor: '%',
-} as const
-
-/** The unit of each quantity per preset. */
-export const presetUnitIds: { [P in PresetId]: { [Q in Quantity]: UnitId<Q> } } = {
-  'metric-grains': {
-    ...metricBase,
-    ...single,
-    mass: 'gr',
-    charge: 'gr',
-    capacity: 'grH2O',
-    twist: 'in',
-    barrelLength: 'in',
-    lineOfSightOffset: 'cm',
-    correction: 'mrad',
-    // lb/in² where bullets weigh in grains, as maker sheets print it; no override in Settings
-    sectionalDensity: 'lb/in2',
-  },
-  us: {
-    ...single,
-    range: 'yd',
-    length: 'in',
-    velocity: 'ft/s',
-    windSpeed: 'mph',
-    energy: 'ft-lbf',
-    temperature: 'degF',
-    temperatureDifference: 'degF',
-    airPressure: 'inHg',
-    pressure: 'psi',
-    area: 'in2',
-    altitude: 'ft',
-    mass: 'gr',
-    firearmMass: 'lb',
-    charge: 'gr',
-    capacity: 'grH2O',
-    twist: 'in',
-    barrelLength: 'in',
-    lineOfSightOffset: 'in',
-    correction: 'MOA',
-    sectionalDensity: 'lb/in2',
-  },
-  'metric-grams': {
-    ...metricBase,
-    ...single,
-    mass: 'g',
-    charge: 'g',
-    capacity: 'cm3',
-    twist: 'mm',
-    barrelLength: 'mm',
-    lineOfSightOffset: 'mm',
-    correction: 'mrad',
-    sectionalDensity: 'kg/m2',
-  },
-}
-
-/** The viewer's choice: a preset and the quantities set to another unit. */
-export type UnitChoice = { preset: PresetId; overrides: Partial<Record<Quantity, string>> }
-
-/** Display units: the unit of every quantity. */
-export type UnitSystem = Readonly<Record<Quantity, Unit>>
-
-export function resolveUnits({ preset, overrides }: UnitChoice): UnitSystem {
-  const ids = { ...presetUnitIds[preset], ...overrides } as Record<Quantity, string>
-  ids.temperatureDifference = ids.temperature
-  return Object.fromEntries(
-    Object.entries(ids).map(([q, id]) => [q, (unitsOf[q as Quantity] as Record<string, Unit>)[id]]),
-  ) as Record<Quantity, Unit>
-}
-
-/** `UnitSystem` of preset `preset` with no per-quantity overrides. */
-export const presetUnits = (preset: PresetId): UnitSystem => resolveUnits({ preset, overrides: {} })
-
-function isPreset(x: unknown): x is PresetId {
-  return typeof x === 'string' && Object.hasOwn(presetUnitIds, x)
-}
-
-/** A stored choice; unknown presets, quantities and units are dropped, an override equal to the preset too. */
-export function parseUnitChoice(json: string | null): UnitChoice | undefined {
-  let value: unknown
-  try {
-    value = JSON.parse(json ?? '')
-  } catch {
-    return undefined
-  }
-  if (typeof value !== 'object' || value === null) return undefined
-  const { preset, overrides } = value as { preset?: unknown; overrides?: unknown }
-  if (!isPreset(preset)) return undefined
-  const kept: UnitChoice['overrides'] = {}
-  if (typeof overrides === 'object' && overrides !== null)
-    for (const [q, id] of Object.entries(overrides))
-      if (
-        Object.hasOwn(unitsOf, q) &&
-        typeof id === 'string' &&
-        Object.hasOwn(unitsOf[q as Quantity], id) &&
-        presetUnitIds[preset][q as Quantity] !== id
-      )
-        kept[q as Quantity] = id
-  return { preset, overrides: kept }
-}
-
-/** The preset of a link's `units`: a preset id, or the old `metric` and `imperial`. */
-export function presetFromLink(u: string | null): PresetId | undefined {
-  if (u === 'metric') return 'metric-grams'
-  if (u === 'imperial') return 'us'
-  return isPreset(u) ? u : undefined
-}
-
-/** The default preset of a locale: US customary in the US, else metric with grains. */
-export function localePreset(locale: string): PresetId {
-  return /-US\b/i.test(locale) ? 'us' : 'metric-grains'
 }
 
 /** The length unit of the technical drawings' labels: inches when lengths are shown in inches. */
@@ -304,35 +63,23 @@ export function degreeText(x: number): string {
   return String(Number(x.toFixed(4)))
 }
 
-/**
- * A formatted number in the unit `symbol`: inch values below 1 without the zero before the decimal
- * mark (".308", "-.25", as the drawings print them; English only: German writes the zero) and a
- * zero as "0"; other units unchanged. Takes the text with either mark.
- */
+/** `inchText` of `@open-reloading/locale-format` in the language shown. */
 export const inchText = (text: string, symbol: string) =>
-  symbol !== 'in'
-    ? text
-    : /^-?0[.,]0*$/.test(text)
-      ? '0'
-      : decimalMark() === '.'
-        ? text.replace(/^(-?)0\./, '$1.')
-        : text
+  locale.inchText(text, symbol, shownLanguage())
 
 /** An SI value in the unit of `q` in `system`, without the symbol. */
-export function formatQuantity(q: Quantity, system: UnitSystem, si: number): string {
-  const unit = system[q]
-  return inchText(formatNumber(unit.fromSi(si), unit.decimals), unit.symbol)
-}
+export const formatQuantity = (q: Quantity, system: UnitSystem, si: number) =>
+  locale.formatQuantity(q, system, si, shownLanguage())
 
 /** A time in s as milliseconds with 3 decimals: "1.234 ms". */
-export const msText = (s: number) => `${formatNumber(s * 1e3, 3)} ms`
+export const msText = (s: number) => locale.msText(s, shownLanguage())
 
 /** A fraction as a percentage with 1 decimal: "12.5 %". */
-export const percentText = (fraction: number) => `${formatNumber(fraction * 100, 1)} %`
+export const percentText = (fraction: number) => locale.percentText(fraction, shownLanguage())
 
 /** An SI value in the unit of `q` in `system`, with the unit's symbol. */
 export const withUnit = (q: Quantity, system: UnitSystem, si: number) =>
-  `${formatQuantity(q, system, si)} ${system[q].symbol}`
+  locale.withUnit(q, system, si, shownLanguage())
 
 /**
  * A twist as typed: "1:8", "1 in 8" or "8", one turn per
@@ -396,21 +143,13 @@ export function roundedFieldText(q: Quantity, system: UnitSystem, si: number): s
   return q === 'twist' ? twistLabel(text) : text
 }
 
-/** Workbench decimals of lengths by kind and unit. */
-const lengthDigits = { travel: { mm: 1, in: 2 }, diameter: { mm: 2, in: 3 } } as const
-
 /** A length in the display unit of `system` with the workbench decimals of its kind, without the symbol. */
-export function lengthText(kind: keyof typeof lengthDigits, system: UnitSystem, si: number) {
-  const unit = system.length
-  const digits = (lengthDigits[kind] as Record<string, number>)[unit.symbol] ?? unit.decimals
-  return formatNumber(unit.fromSi(si), digits)
-}
+export const lengthText = (kind: locale.LengthKind, system: UnitSystem, si: number) =>
+  locale.lengthText(kind, system, si, shownLanguage())
 
 /** A length in the display unit of `system` with the workbench decimals of its kind, and the symbol. */
-export function shownLength(kind: keyof typeof lengthDigits, system: UnitSystem, si: number) {
-  const { symbol } = system.length
-  return `${inchText(lengthText(kind, system, si), symbol)} ${symbol}`
-}
+export const shownLength = (kind: locale.LengthKind, system: UnitSystem, si: number) =>
+  locale.shownLength(kind, system, si, shownLanguage())
 
 /** A length given in mm in the display unit of `system`, with the symbol. */
 export const mmLength = (system: UnitSystem, mm: number) =>

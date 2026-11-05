@@ -1,10 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { canonicalNumberText, localizeDecimals } from '../src/i18n/number.ts'
+import { canonicalNumberText } from '../src/i18n/number.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { readChrono, sessionCsv, sessionCsvBlob, sessionJsonBlob } from '../src/lib/chrono.ts'
 import { countryName } from '../src/lib/countries.ts'
 import { toCsv } from '../src/lib/csv.ts'
-import { dayText } from '../src/lib/dates.ts'
 import { shareLink } from '../src/lib/share-link.ts'
 import { exactFieldText, presetUnits, unitsOf } from '../src/lib/units.ts'
 import { userDataText } from '../src/lib/user-data.ts'
@@ -71,22 +70,10 @@ describe('the language shown never changes what is exported', () => {
   })
 })
 
-describe('dates and country names follow the language shown', () => {
-  it('writes a day in the language and keeps English as it was', () => {
-    expect(dayText('2026-05-01', 'en')).toBe('1 May 2026')
-    expect(dayText('2026-05-01', 'de')).toBe('1. Mai 2026')
-    expect(dayText('May 2026', 'de')).toBe('May 2026')
-  })
-
+describe('country names follow the language shown', () => {
   it('names a country through Intl except in English', () => {
     expect(countryName('Germany', 'DE', 'en')).toBe('Germany')
     expect(countryName('Germany', 'DE', 'de')).toBe('Deutschland')
     expect(countryName('Atlantis', undefined, 'de')).toBe('Atlantis')
-  })
-
-  it('swaps the points of server-written numeric text and leaves prose points', () => {
-    expect(localizeDecimals('2.5 g, 0.308 in', 'de')).toBe('2,5 g, 0,308 in')
-    expect(localizeDecimals('2.5 g, 0.308 in', 'en')).toBe('2.5 g, 0.308 in')
-    expect(localizeDecimals('See section 2. Then 3', 'de')).toBe('See section 2. Then 3')
   })
 })

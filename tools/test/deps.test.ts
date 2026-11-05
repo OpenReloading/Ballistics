@@ -11,8 +11,12 @@ const fixture: Record<string, { source: string; rules: string[] }> = JSON.parse(
 )
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const oxlint = join(root, 'node_modules/.bin/oxlint')
-/** The configurations the mirror lints with: the root one and the own one of packages/units. */
-const configs = ['.oxlintrc.json', 'packages/units/.oxlintrc.json']
+/** The configurations the mirror lints with: the root one and the own ones of packages/units and packages/locale-format. */
+const configs = [
+  '.oxlintrc.json',
+  'packages/units/.oxlintrc.json',
+  'packages/locale-format/.oxlintrc.json',
+]
 
 let mirror = ''
 

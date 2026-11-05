@@ -1,0 +1,51 @@
+{
+  "name": "@open-reloading/locale-format",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Number, unit and date formatting on Intl and the display unit tables.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "packages/locale-format"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/*.tsbuildinfo",
+    "!dist/api-extractor",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json && api-extractor run",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
+    "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
+  },
+  "dependencies": {
+    "@open-reloading/units": "workspace:*"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "catalog:",
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "fast-check": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "publint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

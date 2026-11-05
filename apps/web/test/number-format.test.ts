@@ -1,18 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   ambiguousMessage,
-  canonicalNumberText,
-  decimalMark,
   fixedNumber,
   formatNumber,
-  localizeNumber,
   type ParsedNumber,
   parseNumber,
-  plainNumber,
 } from '../src/i18n/number.ts'
 import { setShownLanguage } from '../src/i18n/shown.ts'
 import { fieldError, fieldValueFromText, rangeOf, typedFieldValue } from '../src/lib/field-spec.ts'
-import { exactFieldText, inchText, presetUnits, roundedFieldText } from '../src/lib/units.ts'
+import { exactFieldText, presetUnits, roundedFieldText } from '../src/lib/units.ts'
 
 /** The value of a parse that read a number, else its kind. */
 const read = (text: string, language: string, range = {}) => {
@@ -21,32 +17,6 @@ const read = (text: string, language: string, range = {}) => {
 }
 
 describe('the decimal mark', () => {
-  it('is the language own', () => {
-    expect(decimalMark('en')).toBe('.')
-    expect(decimalMark('de')).toBe(',')
-  })
-
-  it('writes the point of a canonical text as the mark and leaves English as it is', () => {
-    expect(localizeNumber('1.5', 'de')).toBe('1,5')
-    expect(localizeNumber('-.25', 'de')).toBe('-,25')
-    expect(localizeNumber('1:8.5', 'de')).toBe('1:8,5')
-    expect(localizeNumber('1.5', 'en')).toBe('1.5')
-    // not one number: left alone
-    expect(localizeNumber('1.2.3', 'de')).toBe('1.2.3')
-    expect(localizeNumber('abc', 'de')).toBe('abc')
-  })
-
-  it('formats with the digits of the call in both languages', () => {
-    expect(formatNumber(1234.5678, 2, 'en')).toBe('1234.57')
-    expect(formatNumber(1234.5678, 2, 'de')).toBe('1234,57')
-    expect(formatNumber(-0.001, 1, 'de')).toBe('0,0')
-    expect(formatNumber(-0.001, 1, 'en')).toBe('0.0')
-    expect(fixedNumber(2.5, 3, 'de')).toBe('2,500')
-    expect(fixedNumber(2.5, 3, 'en')).toBe('2.500')
-    expect(plainNumber(0.308, 'de')).toBe('0,308')
-    expect(plainNumber(1e-7, 'de')).toBe('1e-7')
-  })
-
   it('follows the language shown by default', () => {
     setShownLanguage('de')
     try {
@@ -216,54 +186,9 @@ describe('reading typed numbers', () => {
     expect(text('+1,5')).toBe('+1.5')
     expect(text('  7 ')).toBe('7')
   })
-
-  it('writes a number shown on screen as the canonical text for a file or the clipboard', () => {
-    expect(canonicalNumberText('1,5', 'de')).toBe('1.5')
-    expect(canonicalNumberText('-0,25', 'de')).toBe('-0.25')
-    expect(canonicalNumberText('2,40 gr', 'de')).toBe('2.40 gr')
-    expect(canonicalNumberText('1,234 ms', 'de')).toBe('1.234 ms')
-    expect(canonicalNumberText('45 %', 'de')).toBe('45 %')
-    expect(canonicalNumberText('a,b', 'de')).toBe('a,b')
-    expect(canonicalNumberText('1.5', 'en')).toBe('1.5')
-    expect(canonicalNumberText('1,5', 'en')).toBe('1,5')
-  })
 })
 
 describe('format, then read', () => {
-  // a spread of magnitudes and signs, deterministic
-  const values = Array.from({ length: 400 }, (_, i) => {
-    const sign = i % 3 === 0 ? -1 : 1
-    return sign * ((i * 7919) % 1000003) * 10 ** (-(i % 7) + 2) * 1.0000001
-  })
-
-  it.each(['en', 'de'])('returns the value within the digits shown in %s', (language) => {
-    for (const x of values) {
-      for (const digits of [0, 1, 2, 3, 4]) {
-        const shown = formatNumber(x, digits, language)
-        const p = parseNumber(shown, { min: -1e12, max: 1e12 }, language)
-        // the language's own mark never reads as a group
-        expect(p.kind, shown).toBe('number')
-        const back = p.kind === 'number' ? p.value : Number.NaN
-        expect(Math.abs(back - x), `${x} as ${shown}`).toBeLessThanOrEqual(
-          0.5 * 10 ** -digits + 1e-9,
-        )
-      }
-    }
-  })
-
-  it.each(['en', 'de'])(
-    'reads the canonical text localized for the screen back in %s',
-    (language) => {
-      for (const x of values) {
-        const canonical = String(Number(x.toPrecision(6)))
-        const shown = localizeNumber(canonical, language)
-        const p = parseNumber(shown, {}, language)
-        const back = p.kind === 'number' ? p.value : Number.NaN
-        expect(back, `${canonical} as ${shown}`).toBe(Number(canonical))
-      }
-    },
-  )
-
   it('writes the canonical text of a field with a point under both languages', () => {
     const system = presetUnits('metric-grams')
     for (const language of ['en', 'de']) {
@@ -277,22 +202,6 @@ describe('format, then read', () => {
         setShownLanguage('en')
       }
     }
-  })
-})
-
-describe('inch values', () => {
-  it('drop the zero before the English point and keep it before the German comma', () => {
-    expect(inchText('0.308', 'in')).toBe('.308')
-    setShownLanguage('de')
-    try {
-      expect(inchText('0,308', 'in')).toBe('0,308')
-      expect(inchText('0,00', 'in')).toBe('0')
-      expect(inchText('-0,25', 'in')).toBe('-0,25')
-    } finally {
-      setShownLanguage('en')
-    }
-    expect(inchText('0.00', 'in')).toBe('0')
-    expect(inchText('0.308', 'mm')).toBe('0.308')
   })
 })
 
