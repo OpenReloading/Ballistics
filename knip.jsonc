@@ -10,7 +10,9 @@
       "entry": ["src/index.ts", "src/write-json-schema.ts"]
     },
     "packages/core": {
-      "entry": ["src/index.ts", "scripts/*.mts"]
+      "entry": ["src/index.ts", "scripts/*.mts"],
+      // the event types of data's records are read by path in the tests, declared so the CI plan tests core with them
+      "ignoreDependencies": ["@open-reloading/data"]
     },
     "packages/importers": {
       "entry": ["src/index.ts"]
@@ -19,6 +21,8 @@
       "entry": ["src/index.ts", "src/plausibility.ts", "src/build.ts"]
     },
     "packages/drawing": {
+      // the bullet records of data are read by path in the tests, declared so the CI plan tests drawing with them
+      "ignoreDependencies": ["@open-reloading/data"],
       "entry": [
         "src/index.ts",
         "src/cartridge/index.ts",
@@ -55,7 +59,12 @@
         "@open-reloading/data",
         "@open-reloading/drawing",
         "@open-reloading/importers",
-        "@open-reloading/schema"
+        "@open-reloading/schema",
+        // files these name in `Code:` lines and the research log, or that the docs tests import by path, so the CI
+        // plan tests the docs when they change
+        "@open-reloading/cli",
+        "@open-reloading/tools",
+        "@open-reloading/web"
       ]
     },
     "apps/web": {
@@ -67,7 +76,17 @@
         "test/fixtures/target-photos/make.mts"
       ]
     },
+    "apps/e2e": {
+      // the web app's catalogue is read by path in the unit tests, declared so the CI plan runs them when it changes
+      "ignoreDependencies": ["@open-reloading/web"]
+    },
     "tools": {
+      // their sources and exports are read by path in the tests, declared so the CI plan tests tools when they change
+      "ignoreDependencies": [
+        "@open-reloading/drawing",
+        "@open-reloading/importers",
+        "@open-reloading/web"
+      ],
       "ignoreBinaries": [
         // installed in the dev container and the CI image, not from npm
         "oasdiff",

@@ -1,8 +1,17 @@
 import { execFileSync } from 'node:child_process'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
-import { importSpecifiers, plan, recordClosure, testJobs } from '../scripts/ci-plan.mts'
+import {
+  importSpecifiers,
+  plan,
+  recordClosure,
+  selected,
+  testGroups,
+  testJobs,
+} from '../scripts/ci-plan.mts'
 
 const closure = recordClosure()
+const root = new URL('../../../', import.meta.url).pathname
 const script = new URL('../scripts/ci-plan.mts', import.meta.url).pathname
 
 it('walks the imports of the record pages', () => {
@@ -182,6 +191,48 @@ it('tests every group for a change outside the workspaces, an unknown selection,
     testJobs(['docs']),
   )
   expect(plan(['CONTRIBUTING.md'], closure, []).tests).toEqual([])
+})
+
+// A test reads these workspaces' files without importing them; each reader declares the workspace it reads as a
+// devDependency, so pnpm selects the reader when the read workspace changes.
+it.each([
+  ['data', 'core'], // the event types (core/test/competition)
+  ['data', 'drawing'], // the bullet records (drawing/test/bullet-outline.test.ts)
+  ['web', 'docs'], // files named in `Code:` lines, the photo checks (docs/scripts/photo-guide.test.mts)
+  ['web', 'e2e'], // the German catalogue (e2e/scripts/visual-check.test.ts)
+  ['web', 'tools'], // the browser sources (tools/test/browser-builtins.test.ts)
+  ['importers', 'docs'], // the table fields (docs/scripts/table-import.test.mts)
+  ['importers', 'tools'], // the browser sources and exports (tools/test)
+  ['drawing', 'tools'], // the browser sources and exports (tools/test)
+  ['cli', 'docs'], // files named in `Code:` lines and the research log
+  ['tools', 'docs'], // files named in `Code:` lines and the research log
+])('selects %s and its reader %s for a change of %s', (read, reader) => {
+  expect(selected(`...@open-reloading/${read}`)).toContain(reader)
+})
+
+it('tests every workspace that has tests, in exactly one group', () => {
+  const members = Object.values(testGroups).flat()
+  const dirs = [
+    ...['packages', 'apps'].flatMap((d) => readdirSync(`${root}${d}`).map((n) => `${d}/${n}`)),
+    'tools',
+  ]
+  const withTests = dirs.flatMap((dir) => {
+    const file = `${root}${dir}/package.json`
+    if (!existsSync(file)) return []
+    const { name, scripts } = JSON.parse(readFileSync(file, 'utf8')) as {
+      name: string
+      scripts?: Record<string, string>
+    }
+    return scripts?.test === undefined ? [] : [name.replace('@open-reloading/', '')]
+  })
+  expect(members.length).toBe(new Set(members).size)
+  expect([...members].sort()).toEqual(withTests.sort())
+})
+
+it('falls back in ci.yml to the test jobs of every group', () => {
+  expect(readFileSync(`${root}.github/workflows/ci.yml`, 'utf8')).toContain(
+    JSON.stringify(testJobs()),
+  )
 })
 
 it('falls back to a full build when the change list is empty', () => {

@@ -130,7 +130,10 @@ export function recordClosure(root = repoRoot) {
   return { files, packages }
 }
 
-/** The test jobs of ci.yml and their workspaces; of `e2e` only the unit tests run (`test:unit`), in `packages`. */
+/**
+ * The test jobs of ci.yml and their workspaces; of `e2e` only the unit tests run (`test:unit`), in `packages`. A test
+ * that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it.
+ */
 export const testGroups: Record<string, string[]> = {
   drawing: ['drawing'],
   web: ['web'],
@@ -216,12 +219,15 @@ const pnpmPath = [path.dirname(process.execPath), '/usr/local/bin', '/usr/bin', 
   .map((d) => `${d}/pnpm`)
   .find(existsSync)
 
-/** The workspaces pnpm selects for the changes since `base`, with their dependents; undefined when it fails. */
-function affectedSince(base: string): string[] | undefined {
+/**
+ * The workspaces (names without the scope) pnpm selects with `filter`, such as `...[<base>]`: the changed ones and
+ * every workspace that depends on them, devDependencies included; undefined when pnpm fails.
+ */
+export function selected(filter: string): string[] | undefined {
   try {
     if (pnpmPath === undefined) return
     const listed = JSON.parse(
-      execFileSync(pnpmPath, ['--filter', `...[${base}]`, 'ls', '--depth', '-1', '--json'], {
+      execFileSync(pnpmPath, ['--filter', filter, 'ls', '--depth', '-1', '--json'], {
         cwd: repoRoot,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -295,7 +301,11 @@ function decide(): Plan {
     const p: Plan =
       stampFile !== undefined && changed.length === 0
         ? { ...nothingChanged }
-        : plan(changed, recordClosure(), stampFile === undefined ? affectedSince(base) : undefined)
+        : plan(
+            changed,
+            recordClosure(),
+            stampFile === undefined ? selected(`...[${base}]`) : undefined,
+          )
     return settle(p, stampFile !== undefined, built)
   } catch (e) {
     return full(`plan failed: ${e instanceof Error ? e.message.split('\n')[0] : String(e)}`)

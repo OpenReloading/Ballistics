@@ -7,8 +7,9 @@ on:
   pull_request:
   # Ready for a merge queue on `main`; without one the push run checks every merge.
   merge_group:
-  # Every job on everything once a week, before the weekly release (release-weekly.yml), so a workspace that the
-  # selection below left out cannot stay broken longer than that.
+  # Every push to `main` runs everything. The weekly run, before the weekly release (release-weekly.yml), adds a full
+  # run in a week without merges and the checks whose result changes without a commit, such as the advisories that
+  # tools/src/audit.ts reads.
   schedule:
     - cron: "0 4 * * 1" # Monday 04:00
       timezone: Europe/Berlin
@@ -96,7 +97,8 @@ jobs:
 
   # One job per group of workspaces (the drawing and web suites being the slow ones), each testing the workspaces of
   # its group that the plan selects; together all groups are what the root `pnpm test` runs. The workspaces import
-  # each other's dist/, so each job builds. A failed `changes` job leaves the outputs empty, so every group runs.
+  # each other's dist/, so each job builds. A failed `changes` job leaves the outputs empty, so every group runs
+  # (the fallback is testJobs() of the plan, which apps/web/test/ci-plan.test.ts compares).
   test:
     name: test (${{ matrix.name }})
     needs: changes
