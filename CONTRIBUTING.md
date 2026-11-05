@@ -4,19 +4,19 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 ## Setup
 
-- Node 26 (`.nvmrc`) and npm, or the dev container in `.devcontainer/` (Node 26, Playwright Chromium, oasdiff, Schemathesis). The dev container runs with rootless podman only (`userns_mode: keep-id` in `.devcontainer/compose.yaml`, which Docker Engine does not accept).
-- `npm ci`, then `npm run build` (workspaces import each other's `dist/`).
-- `npm ci` also installs a pre-commit hook (`hooks/install.mjs`, shared by every git worktree). It runs Biome with the rules of `npm run lint` on the staged files and refuses the commit on a finding; `npm run format` applies the safe fixes. It runs no tests or type checks.
-  - The hook runs the checkout's `node_modules/.bin/biome`. With `npm ci` run in the dev container on a Linux host, the container need not be running. Where that binary does not run on the host (another operating system, no `npm ci` yet), the hook says so and the commit goes on unchecked: run `devcontainer exec --workspace-folder . npm run lint` before the pull request.
+- Node 26 (`.nvmrc`) and pnpm 12 next to it (`npm install --global pnpm@12.16.1`, the version of `.github/pnpm/package.json`; the scripts in `tools/` look for pnpm in Node's folder, not on the `PATH`), or the dev container in `.devcontainer/` (Node 26, Playwright Chromium, oasdiff, Schemathesis). The dev container runs with rootless podman only (`userns_mode: keep-id` in `.devcontainer/compose.yaml`, which Docker Engine does not accept).
+- `pnpm install`, then `pnpm run build` (workspaces import each other's `dist/`).
+- `pnpm install` also installs a pre-commit hook (`hooks/install.mjs`, shared by every git worktree). It runs Biome with the rules of `pnpm run lint` on the staged files and refuses the commit on a finding; `pnpm run format` applies the safe fixes. It runs no tests or type checks.
+  - The hook runs the checkout's `node_modules/.bin/biome`. With `pnpm install` run in the dev container on a Linux host, the container need not be running. Where that binary does not run on the host (another operating system, no `pnpm install` yet), the hook says so and the commit goes on unchecked: run `devcontainer exec --workspace-folder . pnpm run lint` before the pull request.
   - An own `core.hooksPath` or an existing `pre-commit` hook is left alone. The hook is not installed in CI.
 
 ## Before a pull request
 
-- `npm run build`, `npm run typecheck`, `npm run lint` (`npm run format` applies the fixes), `npm test`.
-- Record changes: `npm run data:validate`.
-- A change to the exports of `packages/units`: `npx api-extractor run --local` in that folder rewrites its API report `units.api.md`, which the build compares and the pull request shows.
-- API changes, in the dev container (the checks need oasdiff and Schemathesis): `npm run api:check` (a breaking change also rewrites the baseline: `npm run api-baseline -w @open-reloading/tools`) and `npm run api:conformance` against a running API.
-- CI (`.github/workflows/ci.yml`) also runs `npm run docs:check`, `npm audit` (`tools/src/audit.ts`: high and critical advisories, except the allowlisted ones without a fix), the licence policy (`tools/src/licences.ts`: licences of the production dependencies of the API image and the web app, and the list of them in `NOTICE`), the API contract checks, the e2e tests, the drawing baseline, the workflow lint (actionlint, zizmor) and the dependency review.
+- `pnpm run build`, `pnpm run typecheck`, `pnpm run lint` (`pnpm run format` applies the fixes), `pnpm test`.
+- Record changes: `pnpm run data:validate`.
+- A change to the exports of `packages/units`: `pnpm exec api-extractor run --local` in that folder rewrites its API report `units.api.md`, which the build compares and the pull request shows.
+- API changes, in the dev container (the checks need oasdiff and Schemathesis): `pnpm run api:check` (a breaking change also rewrites the baseline: `pnpm --filter @open-reloading/tools run api-baseline`) and `pnpm run api:conformance` against a running API.
+- CI (`.github/workflows/ci.yml`) also runs `pnpm run docs:check`, `pnpm audit` (`tools/src/audit.ts`: high and critical advisories, except the allowlisted ones without a fix), the licence policy (`tools/src/licences.ts`: licences of the production dependencies of the API image and the web app, and the list of them in `NOTICE`), the API contract checks, the e2e tests, the drawing baseline, the workflow lint (actionlint, zizmor) and the dependency review.
 
 ## Rules
 
@@ -24,7 +24,7 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 - Results are simulations, not load data: no wording that calls a load or a result safe.
 - Names of the record fields, the user data files and the API bodies, with the terms to avoid: [GLOSSARY.md](GLOSSARY.md).
 - A pull request that adds a major user-visible feature adds a news item (`apps/web/news/YYYY-MM-DD-slug.md`: front matter `title` and `link`, two sentences) for the home page's What's new list, reviewed like any file; smaller changes are in the changelogs only.
-- Every spike and model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md) (negative or null results too), from the template on that page, and is closed with a link to it. `npm test -w @open-reloading/docs` fails on an entry that misses a section.
+- Every spike and model-change issue ends with an entry in the [research log](apps/docs/docs/research/index.md) (negative or null results too), from the template on that page, and is closed with a link to it. `pnpm --filter @open-reloading/docs test` fails on an entry that misses a section.
 
 ## Data requests, translations and review
 

@@ -17,13 +17,13 @@
     "test:coverage": "vitest run --coverage --coverage.include='src/**/*.ts' --coverage.reporter=text-summary --coverage.reporter=lcov"
   },
   "dependencies": {
-    "@open-reloading/api": "*"
+    "@open-reloading/api": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "^5.0.5",
-    "typescript": "^7.0.2",
-    "vitest": "^5.0.5",
-    "yaml": "^2.9.1"
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "yaml": "catalog:"
   }
 }

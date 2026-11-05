@@ -1,5 +1,9 @@
 # Weekly version updates, minor and patch grouped per ecosystem; security updates come at once
-# (repository settings). Seven days of cooldown let a broken or malicious release be pulled first.
+# (repository settings), except that pnpm installs no release younger than three days: a fix that new needs an
+# entry in minimumReleaseAgeExclude of pnpm-workspace.yaml. Three days of cooldown let a broken or malicious release be pulled first
+# (.github/zizmor.yml tells zizmor, whose audit expects seven). The npm ecosystem reads pnpm-lock.yaml
+# and the catalog of pnpm-workspace.yaml; .github/pnpm pins the pnpm of the workflows and images
+# (.devcontainer/Dockerfile installs the same version, bumped by hand).
 version: 2
 updates:
   - package-ecosystem: npm
@@ -7,16 +11,22 @@ updates:
     schedule:
       interval: weekly
     cooldown:
-      default-days: 7
+      default-days: 3
     groups:
       npm:
         update-types: [minor, patch]
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: npm
+    directory: /.github/pnpm
     schedule:
       interval: weekly
     cooldown:
-      default-days: 7
+      default-days: 3
+  - package-ecosystem: github-actions
+    directories: [/, /.github/actions/*]
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
     groups:
       actions:
         patterns: ['*']
@@ -25,7 +35,7 @@ updates:
     schedule:
       interval: weekly
     cooldown:
-      default-days: 7
+      default-days: 3
     ignore:
       # Node major follows .nvmrc and engines, changed by hand
       - dependency-name: node

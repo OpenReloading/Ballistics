@@ -35,7 +35,7 @@ All errors are absolute relative errors. For the muzzle velocity the error of a 
 ### Command
 
 ```sh
-npm run build
+pnpm run build
 node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split validation
 node packages/cli/dist/bin.js verify --rows <rows> --records <records> --split test --final
 ```

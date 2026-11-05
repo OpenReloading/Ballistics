@@ -39,4 +39,4 @@ Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /primers` fil
 
 ## Validation
 
-`npm run data:validate` reports a primer whose `manufacturer` names no record, a field without a source, a load whose `primer.record` names no primer, and two primers of one manufacturer with the same name.
+`pnpm run data:validate` reports a primer whose `manufacturer` names no record, a field without a source, a load whose `primer.record` names no primer, and two primers of one manufacturer with the same name.

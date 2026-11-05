@@ -54,17 +54,28 @@ jobs:
         with:
           ref: ${{ matrix.edition == 'stable' && needs.plan.outputs.tag || 'main' }}
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # shortcut: the stable edition builds the newest release, which may predate pnpm; drop the npm path once the
+      # newest release has a pnpm-lock.yaml
+      - id: pm
+        run: if [ -f pnpm-lock.yaml ]; then echo pm=pnpm; else echo pm=npm; fi >> "$GITHUB_OUTPUT"
+      # no package cache: this job builds what is deployed (zizmor cache-poisoning)
+      - if: steps.pm.outputs.pm == 'pnpm'
+        uses: ./.github/actions/pnpm
+      - if: steps.pm.outputs.pm == 'npm'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
-          # no npm cache: this job builds what is deployed (zizmor cache-poisoning)
           package-manager-cache: false
-      - run: npm ci --ignore-scripts
-      - run: npm run build
+      - if: steps.pm.outputs.pm == 'npm'
+        run: npm ci --ignore-scripts
+      - run: '"$PM" run build'
+        env:
+          PM: ${{ steps.pm.outputs.pm }}
       - id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-      - run: npm run pages:build
+      - run: '"$PM" run pages:build'
         env:
+          PM: ${{ steps.pm.outputs.pm }}
           # the site root's path: the next edition builds under `<path>/next` (tools/src/pages.ts)
           PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           PAGES_EDITION: ${{ matrix.edition }}

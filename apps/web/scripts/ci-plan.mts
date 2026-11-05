@@ -24,7 +24,8 @@ const repoRoot = path.join(webRoot, '../..')
 const webInputs = [
   /^apps\/web\//,
   /^packages\/(units|schema|importers|core|drawing|data|api)\//,
-  /^(package\.json|package-lock\.json|tsconfig\.base\.json|\.nvmrc)$/,
+  /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
+  /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
 ]
 
@@ -57,7 +58,8 @@ const recordInputs = [
   /^packages\/data\//,
   /^packages\/schema\//,
   /^packages\/api\//,
-  /^(package\.json|package-lock\.json|tsconfig\.base\.json|\.nvmrc)$/,
+  /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
+  /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
   /^apps\/web\/(package\.json|next\.config\.ts|tsconfig\.json)$/,
   /^apps\/web\/scripts\/(ci-plan|check-prerender)\.mts$/,

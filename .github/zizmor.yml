@@ -1,0 +1,9 @@
+rules:
+  # The Dependabot cooldown is three days (dependabot.yml); the audit's default expects seven.
+  dependabot-cooldown:
+    config:
+      days: 3
+  # GitHub's `uses: $/...` for an action of this repository fails actionlint 1.7.12, the latest release, so the
+  # workflows keep `./.github/actions/...` after their checkout. Turn the audit back on with an actionlint that reads `$/`.
+  self-repository:
+    disable: true

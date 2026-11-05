@@ -12,7 +12,8 @@ reviews:
     - '!**/__snapshots__/**'
     - '!apps/web/test/golden/**'
     - '!packages/api/openapi.baseline.json'
-    - '!package-lock.json'
+    - '!pnpm-lock.yaml'
+    - '!.github/pnpm/package-lock.json'
   path_instructions:
     - path: '**'
       instructions: >-

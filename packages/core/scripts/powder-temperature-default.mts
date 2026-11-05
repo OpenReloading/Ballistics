@@ -1,7 +1,7 @@
 /**
  * Derivation of the default hot burn-rate sensitivity of extruded and flake powders
  * (`apps/docs/docs/research/powder-temperature-default.md`). Stand-in loads only: simulations, not
- * load data. Run from the repository root, after `npm ci`:
+ * load data. Run from the repository root, after `pnpm install`:
  *
  *   node packages/core/scripts/powder-temperature-default.mts
  *

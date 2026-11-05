@@ -6,7 +6,7 @@ import { parseUserDataFile, userDataText } from '../src/lib/user-data.ts'
 import { defined } from './defined.ts'
 
 // A user data file with a record of each kind, which the current code must read and write back unchanged, and
-// a share link of two of its records. `npm run baselines` at the root rewrites the link from what the code
+// a share link of two of its records. `pnpm run baselines` at the root rewrites the link from what the code
 // writes; the file is edited by hand when the format changes.
 const golden = (name: string) => readFileSync(new URL(`golden/${name}`, import.meta.url), 'utf8')
 const page = 'https://example.org/bullets/designer'

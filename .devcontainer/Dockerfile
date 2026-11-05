@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/typescript-node:26-bookworm@sha256:fc4b4da3bc5809f717860a9cd1936429774c2a41215cc2ab5d90e6160923eff6
 
 # agent-side tools that run in the container: MCP servers for Mantine docs and Playwright
-# the e2e headless shell too: keep 1.64.1 equal to @playwright/test in package-lock.json (postCreateCommand installs it on a mismatch)
+# the e2e headless shell too: keep 1.64.1 equal to @playwright/test in pnpm-lock.yaml (postCreateCommand installs it on a mismatch)
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 RUN npm i -g --prefix /usr/local @mantine/mcp-server@9.7.3 @playwright/mcp@0.0.83 \
   && cd /usr/local/lib/node_modules/@playwright/mcp && npx playwright install --with-deps chromium \
@@ -9,7 +9,7 @@ RUN npm i -g --prefix /usr/local @mantine/mcp-server@9.7.3 @playwright/mcp@0.0.8
   && chown -R node:node /ms-playwright \
   && npm cache clean --force && rm -rf /root/.npm/_npx
 
-# API contract tools of `npm run api:check` and `npm run api:conformance`; keep the versions equal to the images in ci.yml
+# API contract tools of `pnpm run api:check` and `pnpm run api:conformance`; keep the versions equal to the images in ci.yml
 RUN arch=$(dpkg --print-architecture) \
   && case $arch in \
     amd64) sum=43a4e328e2d13ba1552d760aa68d2485c75c5621f309f6ff64ae895188345247 ;; \
@@ -22,6 +22,10 @@ RUN arch=$(dpkg --print-architecture) \
 COPY --from=ghcr.io/astral-sh/uv:0.12.23@sha256:61d393e44e249f2e4b526b6c7ddcecce245946826e608e11c93ad4f5bba55b21 /uv /uvx /usr/local/bin/
 RUN UV_TOOL_BIN_DIR=/usr/local/bin UV_TOOL_DIR=/opt/uv-tools UV_PYTHON_DOWNLOADS=never UV_NO_CACHE=1 \
   uv tool install schemathesis==4.29.4
+
+# pnpm, the version .github/pnpm/package-lock.json pins for CI (keep both equal), in place of the image's own; the
+# native binary comes as an optional dependency, so no install script runs
+RUN npm rm -g pnpm && npm i -g --ignore-scripts --prefix /usr/local pnpm@12.16.1 && npm cache clean --force
 
 # runtime user: the image's own non-root user (rootless podman keep-id maps the host uid to it)
 USER node

@@ -1,6 +1,6 @@
 // Screenshots of pages for a person to look at before landing a UI change: each page at 390 and
 // 1280 px in light and dark against WEB_URL (it starts no server), then one contact sheet.
-// npm run visual-check -- [--preset drawing|calculators] [/path ...]
+// pnpm run visual-check [--preset drawing|calculators] [/path ...]
 // Output: visual-check-out/shots/<page>__<theme>__<width>.png and visual-check-out/sheet.png
 // (VISUAL_OUT for another folder; VISUAL_LANGUAGE=de for the German interface, whose pages are
 // waited for by their structure, not by English text, and the workbench by its page bar in that

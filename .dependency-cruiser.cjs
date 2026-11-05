@@ -128,6 +128,9 @@ module.exports = {
     },
   ],
   options: {
+    // swc reads `import type` too; the default transpiles with whichever TypeScript below 7 it can resolve first, which
+    // drops type-only imports
+    parser: 'swc',
     // declaration files hold type imports the compiled-file rule must not see
     exclude: { path: '\\.d\\.ts$' },
     doNotFollow: { path: '(^|/)node_modules/|^packages/(?!importers/)[^/]+/dist/' },

@@ -38,4 +38,4 @@ Served under `/v1` (`packages/api/src/routes/components.ts`): `GET /cases` filte
 
 ## Validation
 
-`npm run data:validate` reports a case whose `cartridge` or `manufacturer` names no record, a flash hole or mass outside the ranges of `checkCase` (`packages/data/src/plausibility.ts`), a stated water capacity above the water the case's enclosing cylinder holds, and two cases of one manufacturer and cartridge with the same name.
+`pnpm run data:validate` reports a case whose `cartridge` or `manufacturer` names no record, a flash hole or mass outside the ranges of `checkCase` (`packages/data/src/plausibility.ts`), a stated water capacity above the water the case's enclosing cylinder holds, and two cases of one manufacturer and cartridge with the same name.

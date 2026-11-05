@@ -1,5 +1,5 @@
 /**
- * The npm tarball of each published library, as `npm pack --dry-run` lists it after the build: fails
+ * The npm tarball of each published library, as `pnpm pack --dry-run` lists it after the build: fails
  * when the README or an entry point of `exports`, `main` or `types` is missing (a `*` pattern: no
  * packed file matches it), or when the list holds a test file, a source map without its sources, a
  * file outside the `files` field, or a bare import in a packed `.js` or `.d.ts` file of a package
@@ -7,10 +7,11 @@
  * workspace package, which npm never gets, so the published tarball would not install.
  */
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { globSync, readFileSync } from 'node:fs'
 import { isBuiltin } from 'node:module'
 import { dirname, join, matchesGlob, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parse } from 'yaml'
 import { executable } from './executable.ts'
 
 /** The workspaces published to npm. */
@@ -27,12 +28,12 @@ interface Manifest {
   peerDependencies?: Record<string, string>
 }
 
-/** A package in the output of `npm pack --json`. */
+/** A package in the output of `pnpm pack --json`. */
 interface Packed {
   files: { path: string }[]
 }
 
-/** npm packs these whatever `files` says. */
+/** Packed whatever `files` says. */
 const alwaysPacked = /^(package\.json|(readme|license|licence|changelog)([.-][^/]*)?)$/i
 const code = /\.(?:[cm]?js|d\.[cm]?ts)$/
 /** The specifier of a static or dynamic `import`, an `export ... from` or a `require` (not text such as `from "${x}"`). */
@@ -86,27 +87,29 @@ function importProblems(dir: string, file: string, manifest: Manifest) {
     .map((name) => `${file} imports ${name}, which is not in dependencies or peerDependencies`)
 }
 
-/** The package `npm pack --dry-run` would write for `dir`. */
+/** The package `pnpm pack --dry-run` would write for `dir` (no package has a pack script). */
 function packOf(dir: string): Packed | undefined {
   const listed = JSON.parse(
-    execFileSync(executable('npm'), ['pack', '--dry-run', '--json', '--ignore-scripts'], {
+    execFileSync(executable('pnpm'), ['pack', '--dry-run', '--json'], {
       cwd: dir,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
     }),
-  ) as Packed[] | Record<string, Packed>
-  // npm 12 keys the list by package name, older npm writes an array
-  return (Array.isArray(listed) ? listed : Object.values(listed))[0]
+  ) as Packed | undefined
+  return listed?.files ? listed : undefined
 }
 
 /** The names of the workspace packages of `root` marked `private`, which are never published. */
 function privateWorkspaces(root: string) {
-  const { workspaces = [] } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
-    workspaces?: string[]
+  const { packages = [] } = parse(readFileSync(join(root, 'pnpm-workspace.yaml'), 'utf8')) as {
+    packages?: string[]
   }
-  const manifests = workspaces.map(
-    (w) =>
-      JSON.parse(readFileSync(join(root, w, 'package.json'), 'utf8')) as Manifest & {
+  const manifests = globSync(
+    packages.map((p) => `${p}/package.json`),
+    { cwd: root },
+  ).map(
+    (file) =>
+      JSON.parse(readFileSync(join(root, file), 'utf8')) as Manifest & {
         private?: boolean
       },
   )
@@ -126,7 +129,7 @@ const privateDependencyProblems = (manifest: Manifest, privates: Set<string>) =>
 export function packProblems(dir: string, privates = new Set<string>()): string[] {
   const manifest = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')) as Manifest
   const pack = packOf(dir)
-  if (!pack) return ['npm pack listed no package']
+  if (!pack) return ['pnpm pack listed no package']
   const files = new Set(pack.files.map((f) => f.path))
   const problems = ['README.md']
     .filter((f) => !files.has(f))
@@ -155,5 +158,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     failed ||= problems.length > 0
   }
   if (failed) process.exit(1)
-  console.log(`npm pack: ${published.length} packages checked`)
+  console.log(`pnpm pack: ${published.length} packages checked`)
 }

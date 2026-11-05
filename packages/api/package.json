@@ -32,18 +32,18 @@
   },
   "dependencies": {
     "@fastify/sensible": "^6.0.7",
-    "@open-reloading/core": "0.0.4",
-    "@open-reloading/data": "0.0.5",
-    "@open-reloading/schema": "0.0.5",
+    "@open-reloading/core": "workspace:*",
+    "@open-reloading/data": "workspace:*",
+    "@open-reloading/schema": "workspace:*",
     "@scalar/fastify-api-reference": "1.75.1",
     "fastify": "^5.12.7",
-    "zod": "^4.6.7"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "^5.0.5",
-    "ajv": "^8.20.0",
-    "typescript": "^7.0.2",
-    "vitest": "^5.0.5"
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "ajv": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

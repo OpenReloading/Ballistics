@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 // The JSON Schemas the build writes (`src/write-json-schema.ts`), against the committed baseline.
-// `npm run baselines` at the root rewrites it.
+// `pnpm run baselines` at the root rewrites it.
 const built = new URL('../dist/json-schema/', import.meta.url)
 const baseline = new URL('golden/json-schema/', import.meta.url)
 const names = readdirSync(built).sort()

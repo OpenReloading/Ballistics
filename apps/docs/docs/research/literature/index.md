@@ -7,7 +7,7 @@ description: How the result of a literature search becomes a literature note, it
 
 A literature note records what published work says on one question of a model, including a search that found nothing or a result that changes nothing. The questions still waiting for a search are on [Open literature questions](./open-questions.md).
 
-Before you change a model, read the entries of its model page in the research index (`research-index.json` or `llms.txt` at the docs root, both written by `npm run site:research -w @open-reloading/docs`).
+Before you change a model, read the entries of its model page in the research index (`research-index.json` or `llms.txt` at the docs root, both written by `pnpm --filter @open-reloading/docs run site:research`).
 
 ## How a result enters
 
@@ -17,7 +17,7 @@ Before you change a model, read the entries of its model page in the research in
 4. Set `status`: `verified` when every source is verified, `partly_verified` when some are, `unverified` when none is.
 5. Name the file `<id>.md` in this folder (`A1.md`), so the page and its id share one link, and remove the question from the open questions page.
 
-The check (`npm test -w @open-reloading/docs`, `scripts/research-index.mts`) fails on a missing field, an answer not in its list, a model page that does not exist and a source marked verified without a DOI.
+The check (`pnpm --filter @open-reloading/docs test`, `scripts/research-index.mts`) fails on a missing field, an answer not in its list, a model page that does not exist and a source marked verified without a DOI.
 
 ## Template
 

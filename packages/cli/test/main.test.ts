@@ -85,7 +85,7 @@ describe('the JSON result', () => {
     expect($id).toMatch(/\/result\.schema\.json$/)
   })
 
-  it('is the schema the package generates (npm run schema)', () => {
+  it('is the schema the package generates (pnpm run schema)', () => {
     expect(JSON.parse(readFileSync(schemaPath, 'utf8'))).toEqual(JSON.parse(resultJsonSchema()))
   })
 })

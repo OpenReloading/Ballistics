@@ -67,6 +67,12 @@
   },
   "overrides": [
     {
+      "includes": ["apps/web/**", "apps/docs/**"],
+      "linter": {
+        "domains": { "react": "recommended" }
+      }
+    },
+    {
       "includes": ["**/test/**", "apps/e2e/**"],
       "linter": {
         "rules": {

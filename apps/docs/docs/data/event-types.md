@@ -52,7 +52,7 @@ One entry of `magazine`: `division`, `powerFactor` where the limit holds for one
 
 ## Checks
 
-`npm run data:validate` (`packages/data/src/event-types.ts`) checks that
+`pnpm run data:validate` (`packages/data/src/event-types.ts`) checks that
 
 - the federation is a record and lists the event type's rule book,
 - a ring scoring's `discipline` is a discipline of that federation,

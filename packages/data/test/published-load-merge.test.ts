@@ -287,7 +287,7 @@ function write(root: string, path: string, json: unknown) {
   writeFileSync(join(root, path), JSON.stringify(json))
 }
 
-describe('npm run loads:merge', () => {
+describe('pnpm run loads:merge', () => {
   const roots: string[] = []
   const temp = () => {
     const r = recordsRoot()

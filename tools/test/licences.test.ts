@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
 import {
+  installedLicenses,
   type Lock,
   noticeBlock,
   problems,
@@ -29,45 +30,46 @@ it('rejects an expression it cannot read', () => {
     expect(() => satisfies(bad, allowed), bad).toThrow()
 })
 
-it('reads every licence expression of the lock', () => {
-  const lock = JSON.parse(readFileSync('../package-lock.json', 'utf8')) as Lock
-  for (const { license } of Object.values(lock.packages))
-    if (typeof license === 'string')
-      expect(() => satisfies(license, allowed), license).not.toThrow()
+it('reads every licence expression of the installed packages', () => {
+  for (const license of installedLicenses('..').values())
+    if (license !== undefined) expect(() => satisfies(license, allowed), license).not.toThrow()
 })
 
-const entry = (version: string, license: string | undefined, rest = {}) => ({
-  version,
-  ...(license ? { license } : {}),
-  ...rest,
-})
+const licenses = (...ids: string[]) => new Map(ids.map((i) => [i, 'MIT']))
 const lock: Lock = {
-  packages: {
+  importers: {
     'apps/web': {
-      dependencies: { a: '*', core: '*', 'not-windows': '*', 'not-linux': '*', musl: '*' },
-      optionalDependencies: { 'bin-darwin': '*' },
+      dependencies: { a: { version: '1.0.0' }, core: { version: 'link:../../packages/core' } },
+      optionalDependencies: { 'bin-linux': { version: '1.0.0' } },
     },
-    'node_modules/core': { link: true, resolved: 'packages/core' },
-    'packages/core': { dependencies: { b: '*', sharp: '*' } },
-    'node_modules/a': entry('1.0.0', 'MIT', { dependencies: { b: '*' } }),
-    'node_modules/a/node_modules/b': entry('2.0.0', 'ISC'),
-    'node_modules/b': entry('1.0.0', 'ISC'),
-    'node_modules/sharp': entry('0.1.0', 'LGPL-3.0-or-later'),
-    'node_modules/bin-darwin': entry('1.0.0', 'GPL-3.0-only', { os: ['darwin'] }),
-    'node_modules/not-windows': entry('1.0.0', 'MIT', { os: ['!win32'] }),
-    'node_modules/not-linux': entry('1.0.0', 'GPL-3.0-only', { os: ['!linux'] }),
-    'node_modules/musl': entry('1.0.0', 'GPL-3.0-only', { libc: ['musl'] }),
-    'node_modules/unused': entry('1.0.0', 'GPL-3.0-only'),
+    'packages/core': { dependencies: { b: { version: '2.0.0' }, sharp: { version: '0.1.0' } } },
+    'packages/unused': { dependencies: { unused: { version: '1.0.0' } } },
+  },
+  packages: {
+    'a@1.0.0': { peerDependenciesMeta: { opt: { optional: true } } },
+    'bin-linux@1.0.0': { os: ['linux'], cpu: ['x64'] },
+  },
+  snapshots: {
+    'a@1.0.0': { dependencies: { b: '1.0.0', opt: '1.0.0' } },
+    'b@1.0.0': {},
+    'b@2.0.0': {},
+    'opt@1.0.0': {},
+    'sharp@0.1.0': { dependencies: { c: '1.0.0' } },
+    'unused@1.0.0': {},
   },
 }
 
-it('lists the production closure: links followed, nearest copy, a negated or other platform left out, no removed package', () => {
-  const found = shippedPackages(lock, ['apps/web'], (name) => name === 'sharp')
-  expect(found.map((p) => `${p.name}@${p.version}`)).toEqual([
-    'a@1.0.0',
-    'b@1.0.0',
-    'b@2.0.0',
-    'not-windows@1.0.0',
+it('lists the production closure: links followed, both versions, no optional peer, no platform package, no removed package', () => {
+  const found = shippedPackages(
+    lock,
+    licenses('a@1.0.0', 'b@1.0.0'),
+    ['apps/web'],
+    (name) => name === 'sharp' || name === 'bin-linux',
+  )
+  expect(found).toEqual([
+    { name: 'a', version: '1.0.0', license: 'MIT' },
+    { name: 'b', version: '1.0.0', license: 'MIT' },
+    { name: 'b', version: '2.0.0', license: undefined },
   ])
 })
 
@@ -96,11 +98,20 @@ it('wants a reason on the line of every excepted package', () => {
   ])
 })
 
-it('keeps no exception in the review configuration without a reason, and no copyleft licence', () => {
+const permissive = new Set([
+  ...['MIT', 'MIT-0', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD'],
+  ...['CC0-1.0', 'Unlicense', 'BlueOak-1.0.0', 'Python-2.0'],
+])
+
+it('keeps no exception in the review configuration without a reason, and no copyleft licence beyond MPL and LGPL', () => {
   const text = readFileSync('../.github/dependency-review-config.yml', 'utf8')
   expect(withoutReason(text)).toEqual([])
   const { allow } = readPolicy(text)
-  expect([...allow].filter((l) => /GPL|SSPL|MPL|CC-BY/.test(l))).toEqual([])
+  expect([...allow].filter((l) => !permissive.has(l)).sort()).toEqual([
+    'LGPL-2.1-or-later',
+    'LGPL-3.0-or-later',
+    'MPL-2.0',
+  ])
 })
 
 it('writes the NOTICE block with one line per package', () => {
@@ -122,92 +133,55 @@ it('names an unbalanced bracket and an operator or bracket where a licence belon
 const ids = (found: { name: string; version: string }[]) =>
   found.map((p) => `${p.name}@${p.version}`)
 
-it('leaves out sharp and the @img scope by default and starts from the API and the web app', () => {
+it('fails on a platform package that notShipped does not name', () => {
+  expect(() =>
+    shippedPackages(lock, licenses('a@1.0.0'), ['apps/web'], (name) => name === 'sharp'),
+  ).toThrow('bin-linux@1.0.0 is a platform package in a shipped closure')
+})
+
+it('leaves out sharp, the @img scope and the Next.js compiler by default and starts from the API and the web app', () => {
   const shipped: Lock = {
-    packages: {
-      'packages/api': { dependencies: { sharp: '*', '@img/sharp-linux-x64': '*', '@imgx/a': '*' } },
-      'apps/web': { dependencies: { b: '*' } },
-      'apps/docs': { dependencies: { c: '*' } },
-      'node_modules/sharp': entry('0.1.0', 'Apache-2.0'),
-      'node_modules/@img/sharp-linux-x64': entry('0.1.0', 'LGPL-3.0-or-later'),
-      'node_modules/@imgx/a': entry('1.0.0', 'MIT'),
-      'node_modules/b': entry('1.0.0', 'MIT'),
-      'node_modules/c': entry('1.0.0', 'MIT'),
+    importers: {
+      'packages/api': {
+        dependencies: {
+          sharp: { version: '0.1.0' },
+          '@img/sharp-wasm32': { version: '0.1.0' },
+          '@imgx/a': { version: '1.0.0' },
+          '@next/swc-linux-x64-gnu': { version: '1.0.0' },
+        },
+      },
+      'apps/web': { dependencies: { b: { version: '1.0.0' } } },
+      'apps/docs': { dependencies: { c: { version: '1.0.0' } } },
     },
   }
-  expect(shippedPackages(shipped)).toEqual([
+  expect(shippedPackages(shipped, licenses('@imgx/a@1.0.0', 'b@1.0.0', 'c@1.0.0'))).toEqual([
     { name: '@imgx/a', version: '1.0.0', license: 'MIT' },
     { name: 'b', version: '1.0.0', license: 'MIT' },
   ])
 })
 
-it('resolves a dependency from the nearest folder up a nested tree', () => {
-  const nested: Lock = {
-    packages: {
-      root: { dependencies: { a: '*' } },
-      'node_modules/a': entry('1.0.0', 'MIT', { dependencies: { b: '*' } }),
-      'node_modules/a/node_modules/b': entry('2.0.0', 'MIT', { dependencies: { c: '*', d: '*' } }),
-      'node_modules/a/node_modules/c': entry('2.0.0', 'MIT'),
-      'node_modules/c': entry('1.0.0', 'MIT'),
-      'node_modules/d': entry('1.0.0', 'MIT'),
+it('follows a version with resolved peers to its snapshot and lists it once, past a cycle and a missing workspace', () => {
+  const peers: Lock = {
+    importers: {
+      root: {
+        dependencies: {
+          a: { version: '1.0.0(react@19.0.0)' },
+          b: { version: '1.0.0(react@18.0.0)' },
+          gone: { version: 'link:../gone' },
+        },
+      },
+    },
+    snapshots: {
+      'a@1.0.0(react@19.0.0)': { dependencies: { react: '19.0.0', cycle: '1.0.0' } },
+      'b@1.0.0(react@18.0.0)': { dependencies: { a: '1.0.0(react@19.0.0)' } },
+      'cycle@1.0.0': { dependencies: { a: '1.0.0(react@19.0.0)' } },
     },
   }
-  expect(ids(shippedPackages(nested, ['root'], () => false))).toEqual([
+  expect(ids(shippedPackages(peers, new Map(), ['root'], () => false))).toEqual([
     'a@1.0.0',
-    'b@2.0.0',
-    'c@2.0.0',
-    'd@1.0.0',
-  ])
-})
-
-it('goes on past a dependency not installed, a link without a target and a cycle', () => {
-  const gaps: Lock = {
-    packages: {
-      root: { dependencies: { first: '*', missing: '*', last: '*', link: '*', cycle: '*' } },
-      'node_modules/first': entry('1.0.0', 'MIT'),
-      'node_modules/last': entry('1.0.0', 'MIT'),
-      'node_modules/link': { link: true },
-      'node_modules/cycle': entry('1.0.0', 'MIT', { dependencies: { cycle2: '*' } }),
-      'node_modules/cycle2': entry('1.0.0', 'MIT', { dependencies: { cycle: '*' } }),
-    },
-  }
-  expect(ids(shippedPackages(gaps, ['root'], () => false))).toEqual([
-    'cycle2@1.0.0',
+    'b@1.0.0',
     'cycle@1.0.0',
-    'first@1.0.0',
-    'last@1.0.0',
-  ])
-})
-
-it('keeps a package built for one of the two processors or for glibc, and reads mixed lists', () => {
-  const platforms: Lock = {
-    packages: {
-      root: { dependencies: { x64: '*', arm64: '*', ia32: '*', glibc: '*', mixed: '*' } },
-      'node_modules/x64': entry('1.0.0', 'MIT', { cpu: ['x64'] }),
-      'node_modules/arm64': entry('1.0.0', 'MIT', { cpu: ['arm64'] }),
-      'node_modules/ia32': entry('1.0.0', 'MIT', { cpu: ['ia32'] }),
-      'node_modules/glibc': entry('1.0.0', 'MIT', { libc: ['glibc'] }),
-      'node_modules/mixed': entry('1.0.0', 'MIT', { cpu: ['!ia32', 'arm'] }),
-    },
-  }
-  expect(ids(shippedPackages(platforms, ['root'], () => false))).toEqual([
-    'arm64@1.0.0',
-    'glibc@1.0.0',
-    'x64@1.0.0',
-  ])
-})
-
-it('takes a licence that is no text for none and a missing version for an empty one', () => {
-  const odd: Lock = {
-    packages: {
-      root: { dependencies: { a: '*', b: '*' } },
-      'node_modules/a': { version: '1.0.0', license: { type: 'MIT' } },
-      'node_modules/b': { license: 'MIT' },
-    },
-  }
-  expect(shippedPackages(odd, ['root'], () => false)).toEqual([
-    { name: 'a', version: '1.0.0', license: undefined },
-    { name: 'b', version: '', license: 'MIT' },
+    'react@19.0.0',
   ])
 })
 
@@ -233,7 +207,7 @@ it('writes the NOTICE block between its markers with its preamble', () => {
     [
       'BEGIN GENERATED: shipped packages',
       'Third-party packages installed for the API image and the web app, by name, version and the licence',
-      'package-lock.json declares. Written by `node tools/src/licences.ts --write`.',
+      'the package declares. Written by `node tools/src/licences.ts --write`.',
       '',
       'a 1.0.0 MIT',
       'END GENERATED: shipped packages',

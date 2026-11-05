@@ -1,4 +1,4 @@
-TypeScript packages in one npm workspace. The pages are generated from the doc comments of every export.
+TypeScript packages in one pnpm workspace. The pages are generated from the doc comments of every export.
 
 ## Conventions
 

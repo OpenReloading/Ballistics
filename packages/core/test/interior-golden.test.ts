@@ -7,7 +7,7 @@
  * a model constant changed by 1e-6 relative.
  *
  * Regenerate after an intended change of the model, and review the diff of the JSON file:
- *   UPDATE_GOLDEN=1 npx vitest run test/interior-golden.test.ts
+ *   UPDATE_GOLDEN=1 pnpm exec vitest run test/interior-golden.test.ts
  */
 /// <reference types="node" />
 import { readFileSync, writeFileSync } from 'node:fs'
