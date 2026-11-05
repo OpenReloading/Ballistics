@@ -39,6 +39,16 @@ describe('the decimal mark', () => {
     expect(plainNumber(1e-7, 'de')).toBe('1e-7')
   })
 
+  it('writes what Intl writes for edge values', () => {
+    expect(
+      [Number.NaN, Infinity, -Infinity, -0, 5e-324, 1e21].map((x) => formatNumber(x, 2, 'de')),
+    ).toEqual(['NaN', '∞', '-∞', '0,00', '0,00', '1000000000000000000000,00'])
+    // an unknown language takes the runtime's default locale; a malformed tag throws
+    const runtime = new Intl.NumberFormat().resolvedOptions().locale
+    expect(formatNumber(1.5, 1, 'xx')).toBe(formatNumber(1.5, 1, runtime))
+    expect(() => formatNumber(1, 0, 'en_US')).toThrow(RangeError)
+  })
+
   it('swaps the points of server-written numeric text and leaves prose points', () => {
     expect(localizeDecimals('2.5 g, 0.308 in', 'de')).toBe('2,5 g, 0,308 in')
     expect(localizeDecimals('2.5 g, 0.308 in', 'en')).toBe('2.5 g, 0.308 in')
