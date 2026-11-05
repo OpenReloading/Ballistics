@@ -30,8 +30,8 @@ describe('days', () => {
 
   it('names a month in the language', () => {
     expect(monthText(0, 'en')).toBe('January')
-    expect(monthText(11, 'de')).toBe('Dezember')
-    expect(monthText(1, 'de')).toBe('Februar')
+    expect(monthText(11, 'en')).toBe('December')
+    expect(monthText(4, 'de')).toBe('Mai')
   })
 })
 

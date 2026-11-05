@@ -107,7 +107,7 @@ describe('numbers, dates and country names follow the language shown', () => {
       lengthText('travel', grains, 0.334621),
       shownLength('diameter', grains, 7.823e-3),
       dayText('2026-05-01'),
-      monthText(0),
+      monthText(4),
     ]).toEqual([
       ',',
       '1,5',
@@ -122,7 +122,7 @@ describe('numbers, dates and country names follow the language shown', () => {
       '334,6',
       '7,82 mm',
       '1. Mai 2026',
-      'Januar',
+      'Mai',
     ])
     expect(dateTimeText(d)).toBe(d.toLocaleString('de'))
     expect(timeText(d)).toBe(d.toLocaleTimeString('de'))
