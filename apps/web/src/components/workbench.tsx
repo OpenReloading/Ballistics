@@ -981,6 +981,86 @@ function PrintViews({
   )
 }
 
+/** The charge ladder the Groups tab follows; none for a seating ladder or one step. */
+function useGroupsLadder(
+  load: Pick<Load, 'fields' | 'ladder' | 'ladderKind' | 'ladderSteps' | 'direction'>,
+) {
+  const { fields, ladder, ladderKind, ladderSteps, direction } = load
+  const [chargeSi, stepSi] = [fields.charge?.si, ladder.ladderStep?.si]
+  return useMemo(
+    () =>
+      ladderKind === 'charge' && ladderSteps > 1 && chargeSi !== undefined && stepSi !== undefined
+        ? { charge: chargeSi, step: stepSi, steps: ladderSteps, direction }
+        : undefined,
+    [ladderKind, ladderSteps, chargeSi, stepSi, direction],
+  )
+}
+
+/** The Trajectory tab's load: the run's muzzle velocity, the bullet, the twist and the sight. */
+function useTrajectoryLoad(
+  ok: OkOutcome | undefined,
+  load: Pick<Load, 'bullet' | 'bulletValues' | 'fields' | 'sight'>,
+) {
+  const { bullet, bulletValues, fields, sight } = load
+  const [muzzleVelocity, bulletId, twistSi] = [
+    ok?.body.result.muzzleVelocity,
+    bullet?.id,
+    fields.twist?.si,
+  ]
+  const [sightHeight, zeroRange] = [sight?.sightHeight, sight?.zeroRange]
+  const [zeroTemperature, zeroPressure, zeroHumidity, dragFactor, dragFactorSource] = [
+    sight?.zeroTemperature,
+    sight?.zeroPressure,
+    sight?.zeroHumidity,
+    sight?.dragFactor,
+    sight?.dragFactorSource,
+  ]
+  return useMemo(
+    () => ({
+      muzzleVelocity,
+      bullet: bulletId,
+      // the tab fetches the record itself: it gets the values typed over it, and the mass
+      bulletValues,
+      twist: twistSi,
+      sightHeight,
+      zeroRange,
+      zeroTemperature,
+      zeroPressure,
+      zeroHumidity,
+      dragFactor,
+      dragFactorSource,
+    }),
+    [
+      muzzleVelocity,
+      bulletId,
+      bulletValues,
+      twistSi,
+      sightHeight,
+      zeroRange,
+      zeroTemperature,
+      zeroPressure,
+      zeroHumidity,
+      dragFactor,
+      dragFactorSource,
+    ],
+  )
+}
+
+/** The charge the inputs echo: the run's, else the typed one, else none. */
+function chargeTextOf(
+  ok: OkOutcome | undefined,
+  shown: Load['shown'],
+  system: UnitSystem,
+  t: Translate,
+) {
+  return ok
+    ? withUnit('charge', system, ok.load.charge)
+    : (shown('charge', 'charge') ?? t('no charge'))
+}
+
+/** The load's name as far as Save counts it: the typed name, empty for a generated one. */
+const customNameKey = (name: string | undefined) => (name?.trim() ? name : '')
+
 /**
  * The load workbench: panels Cartridge, Bullet, Powder and Firearm
  * with the Run bar on the left; notice, warnings, readouts, the ladder strip and the result tabs in
@@ -1006,7 +1086,6 @@ export function Workbench() {
   }, [onStored, countChange])
   const {
     asNewLoad,
-    bullet,
     bulletValues,
     bulletLabel,
     cartridge,
@@ -1020,7 +1099,6 @@ export function Workbench() {
     bulletFit,
     describeBullet,
     designs,
-    direction,
     fields,
     apiData,
     fileData,
@@ -1031,9 +1109,6 @@ export function Workbench() {
     framed,
     fresh,
     inputs,
-    ladder,
-    ladderSteps,
-    ladderKind,
     notes,
     chronoSessions,
     edits,
@@ -1063,7 +1138,6 @@ export function Workbench() {
     showChart,
     shown,
     status,
-    sight,
     storedTick,
     system,
     tab,
@@ -1097,9 +1171,7 @@ export function Workbench() {
   const stale = Boolean(ok && changed)
   const warnings = useMemo(() => ok && warningLines(ok, system, t), [ok, system, t])
 
-  const chargeText = ok
-    ? withUnit('charge', system, ok.load.charge)
-    : (shown('charge', 'charge') ?? t('no charge'))
+  const chargeText = chargeTextOf(ok, shown, system, t)
   const charge = useCallback((kg: number) => withUnit('charge', system, kg), [system])
   const stepValue = useCallback((s: ShownStep) => stepValueOf(s, system), [system])
   const identity = useMemo(
@@ -1239,53 +1311,8 @@ export function Workbench() {
       pending,
     ],
   )
-  const [chargeSi, stepSi, twistSi] = [fields.charge?.si, ladder.ladderStep?.si, fields.twist?.si]
-  const groupsLadder = useMemo(
-    () =>
-      ladderKind === 'charge' && ladderSteps > 1 && chargeSi !== undefined && stepSi !== undefined
-        ? { charge: chargeSi, step: stepSi, steps: ladderSteps, direction }
-        : undefined,
-    [ladderKind, ladderSteps, chargeSi, stepSi, direction],
-  )
-  const [muzzleVelocity, bulletId] = [ok?.body.result.muzzleVelocity, bullet?.id]
-
-  const [sightHeight, zeroRange] = [sight?.sightHeight, sight?.zeroRange]
-  const [zeroTemperature, zeroPressure, zeroHumidity, dragFactor, dragFactorSource] = [
-    sight?.zeroTemperature,
-    sight?.zeroPressure,
-    sight?.zeroHumidity,
-    sight?.dragFactor,
-    sight?.dragFactorSource,
-  ]
-  const trajectoryLoad = useMemo(
-    () => ({
-      muzzleVelocity,
-      bullet: bulletId,
-      // the tab fetches the record itself: it gets the values typed over it, and the mass
-      bulletValues,
-      twist: twistSi,
-      sightHeight,
-      zeroRange,
-      zeroTemperature,
-      zeroPressure,
-      zeroHumidity,
-      dragFactor,
-      dragFactorSource,
-    }),
-    [
-      muzzleVelocity,
-      bulletId,
-      bulletValues,
-      twistSi,
-      sightHeight,
-      zeroRange,
-      zeroTemperature,
-      zeroPressure,
-      zeroHumidity,
-      dragFactor,
-      dragFactorSource,
-    ],
-  )
+  const groupsLadder = useGroupsLadder(load)
+  const trajectoryLoad = useTrajectoryLoad(ok, load)
   const echo = useMemo(
     () => ({ chargeText, groupsLadder, trajectoryLoad }),
     [chargeText, groupsLadder, trajectoryLoad],
@@ -1406,7 +1433,7 @@ export function Workbench() {
                       ref={fileMenu}
                       kind="load"
                       name={load.name}
-                      nameKey={load.customName?.trim() ? load.customName : ''}
+                      nameKey={customNameKey(load.customName)}
                       data={fileData}
                       apiData={apiData}
                       store={storeLoad}

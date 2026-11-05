@@ -285,6 +285,21 @@ function disciplineKeyOf(
   }
 }
 
+/** The event's section, else the page the mapping's source cites for the event. */
+function sectionOf(e: Face['events'][number], m: EventMapping | undefined) {
+  return e.section ?? m?.provenance?.sources.find((x) => x.fields?.includes('event'))?.page
+}
+
+/** The discipline's federation by its abbreviation, else the event's or the face's organization. */
+function federationOf(
+  f: Pick<Face, 'organization' | 'events'>,
+  e: Face['events'][number],
+  d: DisciplineSummary | undefined,
+  abbreviation: ReadonlyMap<string, string>,
+) {
+  return d ? (abbreviation.get(d.federation) ?? d.federation) : (e.organization ?? f.organization)
+}
+
 /** The row of event `e` for its mapping `m`, with its sort key; the event alone without a mapping. */
 function eventRow(
   f: Pick<Face, 'organization' | 'events'>,
@@ -296,11 +311,8 @@ function eventRow(
 ): FaceEventRow & { key: DisciplineKey } {
   const d = m && byId.get(m.discipline)
   const gauge = m?.gauge ?? e.gauge
-  // an event without its section: the page the mapping's source cites for it
-  const section = e.section ?? m?.provenance?.sources.find((x) => x.fields?.includes('event'))?.page
-  const federation = d
-    ? (abbreviation.get(d.federation) ?? d.federation)
-    : (e.organization ?? f.organization)
+  const section = sectionOf(e, m)
+  const federation = federationOf(f, e, d, abbreviation)
   return {
     key: disciplineKeyOf(d, e, federation),
     id: m?.id ?? e.id,

@@ -412,6 +412,21 @@ const unofferedOf = (interior: Tree | undefined): Tree =>
     unofferedKeys.flatMap((k) => (interior?.[k] === undefined ? [] : [[k, interior[k]]])),
   )
 
+/** The draft's text fields as the form shows them, empty where the draft has none. */
+function draftTexts(
+  data: UserPowder,
+): Pick<Design, 'provenanceKind' | 'grainForm' | 'propellantBase' | 'aliases' | 'note' | 'fitted'> {
+  const draft = data.draft
+  return {
+    provenanceKind: data.provenanceKind ?? '',
+    grainForm: draft?.grainForm ?? '',
+    propellantBase: draft?.propellantBase ?? '',
+    aliases: (draft?.aliases ?? []).join('\n'),
+    note: draft?.note ?? '',
+    fitted: [...(draft?.interior?.fitted ?? [])],
+  }
+}
+
 /** The draft of record data `data` named `name`, its numbers shown in `system`. */
 export function fromFile(data: UserPowder, name: string, system: UnitSystem): Design {
   const fields: Fields = {}
@@ -428,12 +443,7 @@ export function fromFile(data: UserPowder, name: string, system: UnitSystem): De
   })
   return {
     name,
-    provenanceKind: data.provenanceKind ?? '',
-    grainForm: draft?.grainForm ?? '',
-    propellantBase: draft?.propellantBase ?? '',
-    aliases: (draft?.aliases ?? []).join('\n'),
-    note: draft?.note ?? '',
-    fitted: [...(draft?.interior?.fitted ?? [])],
+    ...draftTexts(data),
     rows: rows.length > 0 ? rows : [{ id: rowId(), name: '', cas: '' }],
     fields,
     unoffered: unofferedOf(draft?.interior as Tree | undefined),

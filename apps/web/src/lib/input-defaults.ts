@@ -153,21 +153,33 @@ export function suggestDefaults(
       si: cartridge.twist,
       source: t('CIP twist u of {name}', { name: cartridge.name }),
     }
+  const barrelLength = barrelLengthDefault(gun, cartridge, settingsBarrelLength, t)
+  if (barrelLength) out.barrelLength = barrelLength
+  return out
+}
+
+/** The barrel length's default: the firearm's, else the one in Settings, else the class's assumption. */
+function barrelLengthDefault(
+  gun: DefaultSources['firearm'],
+  cartridge: DefaultSources['cartridge'],
+  settingsBarrelLength: DefaultSources['settingsBarrelLength'],
+  t: Translator['t'],
+): Suggestion | undefined {
   if (positive(gun?.barrelLength))
-    out.barrelLength = {
+    return {
       si: gun.barrelLength,
       source: t('your firearm {name}', { name: gun.name }),
       fromFirearm: true,
     }
-  else if (positive(settingsBarrelLength))
-    out.barrelLength = { si: settingsBarrelLength, source: t('your default from Settings') }
-  else if (cartridge?.class)
-    out.barrelLength = {
+  if (positive(settingsBarrelLength))
+    return { si: settingsBarrelLength, source: t('your default from Settings') }
+  if (cartridge?.class)
+    return {
       si: barrelLengthByClass[cartridge.class],
       source:
         cartridge.class === 'pistol'
           ? t('pistol barrel, assumption, no source')
           : t('rifle barrel, assumption, no source'),
     }
-  return out
+  return
 }

@@ -429,6 +429,13 @@ function ParameterHead({
   )
 }
 
+/** The design's typed name, else the record it started from, else a new cartridge. */
+function designNameOf(design: Design, t: Translator['t']) {
+  const typed = design.name?.trim()
+  if (typed) return typed
+  return design.origin ? t('design from {name}', { name: design.origin.title }) : t('new cartridge')
+}
+
 /**
  * The cartridge designer: a Symbol, Cartridge and Chamber grid of the CIP symbols, the
  * cartridge page's drawing on the design beside it, checks at the fields, derived values, undo and
@@ -470,12 +477,7 @@ export function CartridgeDesigner() {
     (update) => setCapacity((f) => update({ measuredWaterCapacity: f }).measuredWaterCapacity ?? f),
     fixedFieldText,
   )
-  const typed = design.name?.trim()
-  const designName = typed
-    ? typed
-    : design.origin
-      ? t('design from {name}', { name: design.origin.title })
-      : t('new cartridge')
+  const designName = designNameOf(design, t)
   const title = t('Outline, {name}', { name: designName })
   const { seatSpec, canSeat } = seating(drawn)
   const draft = useMemo(

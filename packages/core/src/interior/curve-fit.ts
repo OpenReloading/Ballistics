@@ -263,6 +263,21 @@ interface Withheld {
   from?: CurveParameterReport
 }
 
+/** The report of `name` held at its start value `start` because of `cause`. */
+function heldReport(name: CurveParameter, cause: Withheld, start: number): CurveParameterReport {
+  return {
+    // the variance inflation shows why; no uncertainty of a parameter that is not fitted
+    ...(cause.from?.varianceInflation === undefined
+      ? {}
+      : { varianceInflation: cause.from.varianceInflation }),
+    name,
+    status: 'fixed',
+    initial: start,
+    value: start,
+    reasons: cause.reasons,
+  }
+}
+
 /** Order in which an ill-conditioned fit gives up parameters: the exponent first. */
 const giveUp: readonly CurveParameter[] = ['exponent', 'formSlope', 'transition']
 
@@ -665,20 +680,9 @@ function fitTraces(
     } catch (e) {
       cause = withheld(e, current)
     }
-    for (const name of cause?.names ?? []) {
-      const j = order.indexOf(name)
-      held.set(name, {
-        // the variance inflation shows why; no uncertainty of a parameter that is not fitted
-        ...(cause?.from?.varianceInflation === undefined
-          ? {}
-          : { varianceInflation: cause.from.varianceInflation }),
-        name,
-        status: 'fixed',
-        initial: nth(base, j),
-        value: nth(base, j),
-        reasons: cause?.reasons ?? [],
-      })
-    }
+    if (cause)
+      for (const name of cause.names)
+        held.set(name, heldReport(name, cause, nth(base, order.indexOf(name))))
     current = current.filter((p) => !held.has(p))
   }
   const { fit, parameters, reports } = result as NonNullable<typeof result>

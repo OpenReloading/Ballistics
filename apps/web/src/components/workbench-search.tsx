@@ -49,6 +49,15 @@ export async function paletteSearch(
   return { cartridges: kept(cartridges), bullets: kept(bullets), powders: kept(powders) }
 }
 
+/** The bullet fit as a key: a changed fit searches again. */
+const fitKeyOf = (fit: CartridgeDiameters | undefined) =>
+  fit && `${fit.g1} ${fit.land} ${fit.groove}`
+
+/** Nothing matches the query: none of the `commands` (with the pages) and no record. */
+const noneFound = (commands: number, records: Found | undefined) =>
+  commands === 0 &&
+  (!records || records.cartridges.length + records.bullets.length + records.powders.length === 0)
+
 /**
  * Record search of the workbench (`@mantine/spotlight`): Ctrl+K (Cmd+K), also from a field, or
  * `spotlight.open()`; groups Pages, Commands (the page's, then the shell's), Cartridges, Bullets
@@ -105,7 +114,7 @@ export function WorkbenchSearch({
   const after = useRef<(() => void) | undefined>(undefined)
   const [text] = useDebouncedValue(query.trim(), 200)
   const [found, setFound] = useState<Found | 'error' | undefined>(undefined)
-  const fitKey = bulletFit && `${bulletFit.g1} ${bulletFit.land} ${bulletFit.groove}`
+  const fitKey = fitKeyOf(bulletFit)
   const shownFit = useRef(fitKey)
   useEffect(() => {
     // bullets of another cartridge must not stay choosable while the new search runs
@@ -133,9 +142,7 @@ export function WorkbenchSearch({
   const shown = commands.filter((c) => c.label.toLowerCase().includes(lower))
   const pages = shell.pages.filter((c) => c.label.toLowerCase().includes(lower))
   const records = typeof found === 'object' ? found : undefined
-  const none =
-    shown.length + pages.length === 0 &&
-    (!records || records.cartridges.length + records.bullets.length + records.powders.length === 0)
+  const none = noneFound(shown.length + pages.length, records)
   return (
     <Spotlight.Root
       {...(store && { store })}

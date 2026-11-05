@@ -506,6 +506,22 @@ function checkParameters(
     throw new PowderFitError('unresolved', { unresolved: [parameters.indexOf('energy')] })
 }
 
+function checkSolverOptions(
+  maxIterations: number,
+  maxCondition: number,
+  huberThreshold: number | undefined,
+) {
+  need(
+    Number.isInteger(maxIterations) && maxIterations > 0,
+    'maxIterations must be a positive integer',
+  )
+  need(maxCondition > 0, 'maxCondition must be positive')
+  need(
+    huberThreshold === undefined || (Number.isFinite(huberThreshold) && huberThreshold > 0),
+    'huberThreshold must be positive',
+  )
+}
+
 /**
  * Fits burn coefficient and optionally start pressure, chamber volume factor, specific energy and
  * temperature factor of `load` to the ladder. Points with another `barrelLength` or
@@ -529,16 +545,7 @@ export function fitPowder(
   const withSigma = checkLadder(ladder)
   const pressureRows = pressureRowsPerBasis(ladder)
   checkParameters(load, ladder, parameters)
-  need(
-    Number.isInteger(maxIterations) && maxIterations > 0,
-    'maxIterations must be a positive integer',
-  )
-  need(maxCondition > 0, 'maxCondition must be positive')
-  need(
-    options.huberThreshold === undefined ||
-      (Number.isFinite(options.huberThreshold) && options.huberThreshold > 0),
-    'huberThreshold must be positive',
-  )
+  checkSolverOptions(maxIterations, maxCondition, options.huberThreshold)
   const priors = options.priors ?? {}
   const priorNames = (Object.keys(priors) as PowderParameter[]).filter(
     (n) => priors[n] !== undefined,

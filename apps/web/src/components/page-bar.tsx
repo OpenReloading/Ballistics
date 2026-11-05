@@ -117,6 +117,13 @@ function PageTitle({
   )
 }
 
+/** The bar's state that globals.css reads: the phone panel open, one action only, folded actions. */
+const barState = (open: boolean, actions: ReactNode, single: boolean, fold: ReactNode) => ({
+  'data-open': open || undefined,
+  'data-single': (actions && single) || undefined,
+  'data-fold': (actions && fold && !single) || undefined,
+})
+
 /**
  * The page's top bar: its only
  * `h1`, what follows the title (the open load, a record's badges), one status line and the page's
@@ -208,9 +215,7 @@ export function PageBar({
     <div
       ref={root}
       className="page-bar"
-      data-open={open || undefined}
-      data-single={(actions && single) || undefined}
-      data-fold={(actions && fold && !single) || undefined}
+      {...barState(open, actions, single, fold)}
       onKeyDown={(e) => {
         // not from a menu's portalled dropdown: that one closes itself
         if (e.key !== 'Escape' || !open || !e.currentTarget.contains(e.target as Node)) return

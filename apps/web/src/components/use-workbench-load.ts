@@ -694,6 +694,45 @@ const caseLengthOf = (brass: OwnCase | undefined, cip: number | undefined) =>
     ? { mm: cip, brass: undefined }
     : { mm: brass.trimLength, brass: { name: brass.name, mm: brass.trimLength, cip } }
 
+/**
+ * The bore resistance the powder record's law gives for the fields as they stand, under the keys
+ * of the fields that can replace it: their placeholders. Undefined without the law, a loaded
+ * cartridge record or a bore diameter and start pressure.
+ */
+function recordBoreOf(o: {
+  fields: Fields
+  powder: Powder | undefined
+  cartridge: CartridgeChoice | undefined
+  groove: Groove | undefined
+  qUsed: number | undefined
+  grooveM: number | undefined
+  bulletLength: ReturnType<typeof bulletLengthOf>
+}) {
+  const { fields, powder, cartridge, groove } = o
+  const [d, start] = [fields.boreDiameter?.si, fields.startPressure?.si]
+  if (!powder?.interior?.resistance || d === undefined || start === undefined) return
+  if (cartridge && groove?.id !== cartridge.id) return
+  const { resistance } = recordResistance(powder, {
+    boreDiameter: d,
+    boreArea: boreArea({
+      area: fields.boreArea?.si ?? o.qUsed,
+      boreDiameter: d,
+      grooveDiameter: o.grooveM,
+    }),
+    startPressure: start,
+    cartridge: cartridge && { g1: cartridge.g1, z: groove?.z },
+    bulletLengthMm: o.bulletLength,
+  })
+  return resistanceFields(resistance)
+}
+
+/** A bore resistance under the keys of the fields that can replace it. */
+const resistanceFields = (r: ReturnType<typeof recordResistance>['resistance']) => ({
+  boreFriction: r?.friction,
+  engravingPressure: r?.engraving?.[0]?.pressure,
+  engravingLength: r?.engraving?.at(-1)?.travel,
+})
+
 /** The name of a powder record without burn values whose model fields are not all typed; it cannot run. */
 function burnlessOf(
   powder: Powder | undefined,
@@ -1428,6 +1467,113 @@ const changedCount = (
 ) =>
   keys.filter((k) => changes[k] !== undefined).length + (panel === 'bullet' && baseChanged ? 1 : 0)
 
+/** The powder the run reads: the record, else the design's. */
+const chosenPowderOf = (powder: Powder | undefined, design: PowderDesign | undefined) =>
+  powder ?? design?.powder
+
+/** The powder record as "<manufacturer name> <product name>", else the design's name. */
+const powderLabelOf = (
+  powder: Powder | undefined,
+  design: PowderDesign | undefined,
+  names: ManufacturerNames,
+) => labelOf(powder, names) ?? design?.name
+
+/** A design the load can name: only such a reference gives its values again. */
+const isNamedDesign = (design: { id: string } | undefined) =>
+  design !== undefined && userRef(design.id) !== undefined
+
+/**
+ * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
+ * else a user design of this browser, else the catalogue record `id`.
+ */
+const savedRef = (asked: string | undefined, design: string | undefined, id: string | undefined) =>
+  asked ? catalogueRef(asked) : (design && userRef(design)) || (id ? catalogueRef(id) : undefined)
+
+type Chosen = { id: string } | undefined
+
+/** The references the load keeps for its cartridge, bullet and powder (`savedRef`). */
+function savedRefsOf(
+  asked: Asked,
+  c: Record<
+    'cartridge' | 'cartridgeDesign' | 'bullet' | 'bulletDesign' | 'powder' | 'powderDesign',
+    Chosen
+  >,
+) {
+  return {
+    cartridgeRef: savedRef(asked.cartridge?.id, c.cartridgeDesign?.id, c.cartridge?.id),
+    bulletRef: savedRef(asked.bullet?.id, c.bulletDesign?.id, c.bullet?.id),
+    powderRef: savedRef(asked.powder?.id, c.powderDesign?.id, c.powder?.id),
+  }
+}
+
+/** The case record the load names: the user's own case group, else the catalogue case. */
+const caseRecordRef = (own: string | undefined, catalogue: string | undefined) =>
+  (own && userRefOf(own)) || (catalogue && catalogueRef(catalogue))
+
+/** What the generated name reads: the cartridge, the bullet, the powder and the charge. */
+const nameParts = (o: {
+  cartridge: { name: string } | undefined
+  cartridgeDesign: { name: string } | undefined
+  bulletLabel: string | undefined
+  bulletDesign: { name: string } | undefined
+  powderLabel: string | undefined
+  charge: string | undefined
+}) => ({
+  cartridge: o.cartridge?.name ?? o.cartridgeDesign?.name,
+  bullet: o.bulletLabel ?? o.bulletDesign?.name,
+  powder: o.powderLabel,
+  charge: o.charge,
+})
+
+/** The bullet the defaults read: the record with the diameter the run reads. */
+const bulletSource = (
+  bullet: Bullet | undefined,
+  diameter: number | undefined,
+  names: ManufacturerNames,
+) =>
+  bullet && diameter !== undefined ? { name: productLabel(bullet, names), diameter } : undefined
+
+/** The seating a session snapshot keeps, its length as stored. */
+const storedSeating = (seating: Seating) =>
+  seating && { by: seating.by, value: storedOf('length', seating.value).value }
+
+/** Whether Tune waits for the records of the load being opened (`tuneHeld`). */
+const tuneHeldOf = (asked: Asked, cartridge: Chosen, groove: Chosen, failed: string | undefined) =>
+  tuneHeld({ ...asked, detail: tuneDetail(cartridge?.id, groove?.id, failed) })
+
+/** The status line: the run's state, with the result line once there is an outcome. */
+const statusLineOf = (
+  status: Status,
+  outcome: Outcome | undefined,
+  system: UnitSystem,
+  t: Translator['t'],
+) => statusText(status, outcome && resultLineOf(outcome, system, t), t)
+
+/** The note on the bullet: a record a cartridge change cleared, else one below the firearm's groove. */
+function bulletNoteOf(
+  cleared: ClearedBullet | undefined,
+  diameter: number | undefined,
+  gun: { grooveDiameter?: number | undefined } | undefined,
+  o: {
+    system: UnitSystem
+    siLength: (si: number | undefined) => string | undefined
+    t: Translator['t']
+  },
+) {
+  const { system, t } = o
+  if (!cleared) return undersizeNote(diameter, gun?.grooveDiameter, o.siLength, t)
+  return t(
+    'Bullet record {record} cleared: its diameter {diameter} does not fit {cartridge} (over {above}, up to G1 {g1}); the bullet mass stays as typed.',
+    {
+      record: cleared.record,
+      diameter: mmLength(system, cleared.diameter),
+      cartridge: cleared.cartridge,
+      above: mmLength(system, cleared.above),
+      g1: mmLength(system, cleared.g1),
+    },
+  )
+}
+
 /** The load workbench's state and actions: inputs, records, seating, ladder, run and result. */
 export function useWorkbenchState() {
   const { choice, system } = useUnits()
@@ -1472,11 +1618,11 @@ export function useWorkbenchState() {
   /** The user powder design whose values the fields took; the powder record is then none. */
   const [powderDesign, setPowderDesign] = useState<PowderDesign>()
   /** The powder the run reads: the record, else the design's. */
-  const chosenPowder = powder ?? powderDesign?.powder
+  const chosenPowder = chosenPowderOf(powder, powderDesign)
   const names = useManufacturerNames()
   /** The chosen records as "<manufacturer name> <product name>". */
   const bulletLabel = labelOf(bullet, names)
-  const powderLabel = labelOf(powder, names) ?? powderDesign?.name
+  const powderLabel = powderLabelOf(powder, powderDesign, names)
   /** SI values of the powder record's model parameters, the reference of the field marks. */
   const [origin, setOrigin] = useState<Record<string, number> | undefined>(undefined)
   const originNow = useRef(origin)
@@ -2036,8 +2182,7 @@ export function useWorkbenchState() {
   } = useBulletValues(
     bullet,
     bulletDesign,
-    // a design the load cannot name is not a reference that gives its values again
-    bulletDesign && userRef(bulletDesign.id) !== undefined,
+    isNamedDesign(bulletDesign),
     fields.bulletMass?.si,
     typedBulletFields,
   )
@@ -3189,16 +3334,6 @@ export function useWorkbenchState() {
     temp: tempStep,
     charge: ladder,
   })[1]
-  /**
-   * The reference a load keeps: the record being loaded (`asked`, kept too when it did not resolve),
-   * else a user design of this browser, else the catalogue record `id`.
-   */
-  const savedRef = (
-    asked: string | undefined,
-    design: string | undefined,
-    id: string | undefined,
-  ) =>
-    asked ? catalogueRef(asked) : (design && userRef(design)) || (id ? catalogueRef(id) : undefined)
   const opening = useRef(openLoad)
   opening.current = openLoad
   /** An opened load: `name` is the stored name of a record, kept as the typed one. */
@@ -3229,12 +3364,14 @@ export function useWorkbenchState() {
   }
 
   const generated = generatedName(
-    {
-      cartridge: cartridge?.name ?? cartridgeDesign?.name,
-      bullet: bulletLabel ?? bulletDesign?.name,
-      powder: powderLabel,
+    nameParts({
+      cartridge,
+      cartridgeDesign,
+      bulletLabel,
+      bulletDesign,
+      powderLabel,
       charge: shown('charge', 'mass'),
-    },
+    }),
     t,
   )
   /** The load's name: the typed one, else the generated one; Save names the record and the file by it. */
@@ -3293,10 +3430,7 @@ export function useWorkbenchState() {
         system,
         t,
       ),
-      bullet:
-        bullet && bulletValues.bulletDiameter !== undefined
-          ? { name: productLabel(bullet, names), diameter: bulletValues.bulletDiameter }
-          : undefined,
+      bullet: bulletSource(bullet, bulletValues.bulletDiameter, names),
       settingsBarrelLength: defaults.barrelLength,
     },
     t,
@@ -3320,7 +3454,14 @@ export function useWorkbenchState() {
   // UUID) leaves what it gives in the load as typed values
   const firearmRef = userRefOf(firearm)
   const referenced = referencedOf(firearm, firearmRef, cartridgeDesign, bulletDesign)
-  const cartridgeRef = savedRef(asked.cartridge?.id, cartridgeDesign?.id, cartridge?.id)
+  const { cartridgeRef, bulletRef, powderRef } = savedRefsOf(asked, {
+    cartridge,
+    cartridgeDesign,
+    bullet,
+    bulletDesign,
+    powder,
+    powderDesign,
+  })
   const fieldValues: Record<string, number | undefined> = {
     ...Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.si])),
     ...bulletValues,
@@ -3331,12 +3472,7 @@ export function useWorkbenchState() {
   const given = givenKeys(fieldValues, {
     origin,
     bullet: bulletGiven,
-    specs: specsGiven(
-      spec.record,
-      cartridgeRef,
-      savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
-      spec.typed,
-    ),
+    specs: specsGiven(spec.record, cartridgeRef, powderRef, spec.typed),
     defaults,
     defaulted: savedDefaulted(defaulted, suggestions),
     followed,
@@ -3476,7 +3612,7 @@ export function useWorkbenchState() {
   const firearmData: Firearm | undefined = firearms.find((f) => f.id === firearm)?.data
   const effective = effectiveSnapshots(sessionRefs, snapshots, {
     lots,
-    seating: seating && { by: seating.by, value: storedOf('length', seating.value).value },
+    seating: storedSeating(seating),
     roundCount: firearmData?.roundCount,
   })
   useCommit(snapshotsNow, effective)
@@ -3508,12 +3644,11 @@ export function useWorkbenchState() {
     given,
     cartridge: cartridgeRef,
     firearm: firearmRef,
-    bullet: savedRef(asked.bullet?.id, bulletDesign?.id, bullet?.id),
-    powder: savedRef(asked.powder?.id, powderDesign?.id, powder?.id),
+    bullet: bulletRef,
+    powder: powderRef,
     notes,
     capacity: capacityRef,
-    caseRecord:
-      (chosenOwnCase && userRefOf(chosenOwnCase)) || (chosenCase && catalogueRef(chosenCase)),
+    caseRecord: caseRecordRef(chosenOwnCase, chosenCase),
     primerRecord: catalogueRefIn(primerChoice),
     seating,
     ladder: ladderPartOf(ladderSteps, ladderKind, activeStep.si, direction),
@@ -3586,45 +3721,21 @@ export function useWorkbenchState() {
   const next = todo.findIndex((s) => !s.done)
   const nextPanel = outcome ? undefined : nextPanelOf(next, has(['volume']))
 
-  /**
-   * The bore resistance the powder record's law gives for the fields as they stand, under the keys
-   * of the fields that can replace it: their placeholders. Undefined without the law, a loaded
-   * cartridge record or a bore diameter and start pressure.
-   */
-  const recordBore = (() => {
-    const [d, start] = [fields.boreDiameter?.si, fields.startPressure?.si]
-    if (!powder?.interior?.resistance || d === undefined || start === undefined) return
-    if (cartridge && groove?.id !== cartridge.id) return
-    const { resistance } = recordResistance(powder, {
-      boreDiameter: d,
-      boreArea: boreArea({
-        area: fields.boreArea?.si ?? qUsed,
-        boreDiameter: d,
-        grooveDiameter: grooveM,
-      }),
-      startPressure: start,
-      cartridge: cartridge && { g1: cartridge.g1, z: groove?.z },
-      bulletLengthMm: bulletLength,
-    })
-    return {
-      boreFriction: resistance?.friction,
-      engravingPressure: resistance?.engraving?.[0]?.pressure,
-      engravingLength: resistance?.engraving?.at(-1)?.travel,
-    }
-  })()
+  const recordBore = recordBoreOf({
+    fields,
+    powder,
+    cartridge,
+    groove,
+    qUsed,
+    grooveM,
+    bulletLength,
+  })
 
-  const bulletNote = clearedBullet
-    ? t(
-        'Bullet record {record} cleared: its diameter {diameter} does not fit {cartridge} (over {above}, up to G1 {g1}); the bullet mass stays as typed.',
-        {
-          record: clearedBullet.record,
-          diameter: mmLength(system, clearedBullet.diameter),
-          cartridge: clearedBullet.cartridge,
-          above: mmLength(system, clearedBullet.above),
-          g1: mmLength(system, clearedBullet.g1),
-        },
-      )
-    : undersizeNote(bulletValues.bulletDiameter, gunData?.grooveDiameter, siLength, t)
+  const bulletNote = bulletNoteOf(clearedBullet, bulletValues.bulletDiameter, gunData, {
+    system,
+    siLength,
+    t,
+  })
 
   const recordLink = recordLinkOf({
     asked,
@@ -3812,14 +3923,14 @@ export function useWorkbenchState() {
     loadNotes,
     sessionRefCount: sessionRefs.length,
     handOffTune,
-    tuneHeld: tuneHeld({ ...asked, detail: tuneDetail(cartridge?.id, groove?.id, grooveFailed) }),
+    tuneHeld: tuneHeldOf(asked, cartridge, groove, grooveFailed),
     setSeen,
     setStepsDraft,
     setTab,
     showChart,
     sight,
     suggestions,
-    status: statusText(status, outcome && resultLineOf(outcome, system, t), t),
+    status: statusLineOf(status, outcome, system, t),
     stepError,
     stepsDraft,
     storedTick,

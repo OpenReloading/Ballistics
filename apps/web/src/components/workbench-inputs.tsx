@@ -1705,6 +1705,23 @@ function landsChoice(
   return landsFor(lands, ref)
 }
 
+/** The selected step of a seating ladder, which the figure draws while its result is current. */
+function ladderStepOf(ok: ReturnType<typeof useResult>['ok'], stale: boolean) {
+  const seatingStep = ok?.steps[ok.selected]?.seating
+  return !stale && ok?.ladder.seatingBy && ok.steps.length > 1 && seatingStep
+    ? { by: ok.ladder.seatingBy, value: seatingStep.value }
+    : undefined
+}
+
+/** The cards' seating slots, null where no card holds one. */
+const slotsOf = (s: ReturnType<typeof useLoad>['seatingSlots']) => ({
+  cartridge: s.cartridge ?? null,
+  gun: s.gun ?? null,
+  choices: s.choices ?? null,
+  more: s.more ?? null,
+  moreValues: s.moreValues ?? null,
+})
+
 /**
  * The cartridge figure with the seated bullet, once a cartridge is chosen, drawn into `host`: the
  * card of the inputs' second column or the result tab Cartridge. One node moves between them, so
@@ -1768,12 +1785,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
     }),
     [bulletDiameter, bulletBaseLength, bulletBaseDiameter, bulletCavityDiameter, bulletCavityDepth],
   )
-  // the figure draws the selected step of a seating ladder while its result is current
-  const seatingStep = ok?.steps[ok.selected]?.seating
-  const ladderStep =
-    !stale && ok?.ladder.seatingBy && ok.steps.length > 1 && seatingStep
-      ? { by: ok.ladder.seatingBy, value: seatingStep.value }
-      : undefined
+  const ladderStep = ladderStepOf(ok, stale)
   // a card moved or left out of a layout drops the seating controls it held: development says so
   // once the page has settled. The More slots attach only while the Cartridge card's More is open
   // (its kept dropdown is a hidden Activity, which detaches refs)
@@ -1824,13 +1836,7 @@ function LoadFigure({ host }: { host: HTMLElement | null }) {
         baseType: bulletBaseType,
         ...linkedCaseLength(typedCaseLength(typedSpecFields), caseLengthBrass),
       }}
-      slots={{
-        cartridge: seatingSlots.cartridge ?? null,
-        gun: seatingSlots.gun ?? null,
-        choices: seatingSlots.choices ?? null,
-        more: seatingSlots.more ?? null,
-        moreValues: seatingSlots.moreValues ?? null,
-      }}
+      slots={slotsOf(seatingSlots)}
       onSeated={follow}
       onSeatLadder={setSeatAt}
       ladderStep={ladderStep}

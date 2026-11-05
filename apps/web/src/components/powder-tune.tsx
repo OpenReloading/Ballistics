@@ -290,6 +290,42 @@ function SaveFit({
 /** An offset from the fit in standard uncertainties, signed: "+1.20". */
 const offsetText = (z: number) => `${z > 0 ? '+' : z < 0 ? '−' : ''}${formatNumber(Math.abs(z), 2)}`
 
+/** The fit's band, its first prediction and its ends (one where the band has one charge). */
+function bandEnds(fit: PowderFitState['fit']) {
+  const band = fit?.band ?? []
+  const first = band[0]
+  const ends = [first, band.at(-1)].filter(
+    (p, i): p is PowderPrediction => p !== undefined && (i === 0 || band.length > 1),
+  )
+  return { band, first, ends }
+}
+
+/** Hand tuning of the fit: the offsets, the values they give and the curve of those values. */
+function useHandTuning(fit: PowderFitState['fit']) {
+  // the offsets from the fit, standard uncertainties per fitted value, of the fit answer `id`
+  const [hand, setHand] = useState<{ id: number; z: number[] }>()
+  const tuned = fit && hand?.id === fit.id ? hand.z : undefined
+  const values = useMemo(
+    () =>
+      tuned &&
+      fit?.fit.parameters.map((p, k) => p.value + (tuned[k] ?? 0) * (p.standardUncertainty ?? 0)),
+    [fit, tuned],
+  )
+  const handQuery = useMemo(
+    () =>
+      fit && values
+        ? {
+            fit: { load: fit.fit.load, parameters: fit.fit.parameters },
+            values,
+            charges: fit.band.map((p) => p.charge),
+          }
+        : undefined,
+    [fit, values],
+  )
+  const curve = useHandCurve(handQuery)
+  return { setHand, tuned, values, curve }
+}
+
 /**
  * The fit's result: the pressure range's label and its reasons, the fitted values with their
  * intervals, hand tuning, the curve and band with the band's numbers at both ends, and the save.
@@ -325,32 +361,8 @@ function FitResult({
     const q = parameterNames[p].quantity
     return q ? formatQuantity(q, system, x) : formatNumber(x, 3)
   }
-  const band = fit?.band ?? []
-  const first = band[0]
-  const ends = [first, band.at(-1)].filter(
-    (p, i): p is PowderPrediction => p !== undefined && (i === 0 || band.length > 1),
-  )
-  // the offsets from the fit, standard uncertainties per fitted value, of the fit answer `id`
-  const [hand, setHand] = useState<{ id: number; z: number[] }>()
-  const tuned = fit && hand?.id === fit.id ? hand.z : undefined
-  const values = useMemo(
-    () =>
-      tuned &&
-      fit?.fit.parameters.map((p, k) => p.value + (tuned[k] ?? 0) * (p.standardUncertainty ?? 0)),
-    [fit, tuned],
-  )
-  const handQuery = useMemo(
-    () =>
-      fit && values
-        ? {
-            fit: { load: fit.fit.load, parameters: fit.fit.parameters },
-            values,
-            charges: fit.band.map((p) => p.charge),
-          }
-        : undefined,
-    [fit, values],
-  )
-  const curve = useHandCurve(handQuery)
+  const { band, first, ends } = bandEnds(fit)
+  const { setHand, tuned, values, curve } = useHandTuning(fit)
   return (
     <>
       <div role="status" className="powder-fit-state">

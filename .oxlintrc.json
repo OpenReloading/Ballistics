@@ -18,6 +18,13 @@
   "ignorePatterns": ["**/test/golden/**", "**/next-env.d.ts"],
   "rules": {
     "array-callback-return": "error",
+    "complexity": [
+      "error",
+      {
+        "max": 20,
+        "variant": "classic"
+      }
+    ],
     "constructor-super": "error",
     "default-case-last": "error",
     "eqeqeq": [

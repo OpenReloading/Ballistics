@@ -372,6 +372,15 @@ function checkCommon(shot: TrajectoryInput, clickValue: number, options: RangeSt
   need(shot.muzzleVelocity > 0, 'muzzle velocity must be positive')
   const { priors = {}, maxZeroSigma = rangeStringDefaults.maxZeroSigma } = options
   need(maxZeroSigma > 0 && Number.isFinite(maxZeroSigma), 'maxZeroSigma must be positive')
+  checkPriors(priors, options.fitZeroOffset)
+  need(clickValue > 0 && Number.isFinite(clickValue), 'click value must be positive')
+  checkSolverLimits(options)
+}
+
+function checkPriors(
+  priors: NonNullable<RangeStringOptions['priors']>,
+  fitZeroOffset: RangeStringOptions['fitZeroOffset'],
+): void {
   for (const name of Object.keys(priors) as RangeStringParameterName[]) {
     need(names.includes(name), `prior ${name}`)
     const sigma = priors[name]
@@ -381,10 +390,12 @@ function checkCommon(shot: TrajectoryInput, clickValue: number, options: RangeSt
     )
   }
   need(
-    priors.zeroOffset === undefined || options.fitZeroOffset === true,
+    priors.zeroOffset === undefined || fitZeroOffset === true,
     'a zeroOffset prior needs the fitZeroOffset option',
   )
-  need(clickValue > 0 && Number.isFinite(clickValue), 'click value must be positive')
+}
+
+function checkSolverLimits(options: RangeStringOptions): void {
   const d = rangeStringDefaults
   const { confidenceLevel: level = d.confidenceLevel, maxInflation = d.maxInflation } = options
   const {
