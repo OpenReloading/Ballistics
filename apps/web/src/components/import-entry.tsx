@@ -307,6 +307,71 @@ function ReadNote({ c }: { c: Exclude<CardView, { header: string[] }> }) {
   return <Text size="sm">{[heldText(c.kinds, tn), note].filter(Boolean).join('. ')}</Text>
 }
 
+/**
+ * The fields of an unfolded table card: its kind, the column mapping with Save mapping, and the
+ * file's source.
+ */
+function tableFields(o: {
+  e: Entry
+  table: Extract<CardView, { header: string[] }>
+  shared: string
+  actions: CardActions
+  name: string
+  setName: (name: string) => void
+  t: Translator['t']
+}) {
+  const { e, table, shared, actions, name, setName, t } = o
+  return (
+    <>
+      <SegmentedControl
+        size="xs"
+        aria-label={t('Kind of {name}', { name: e.name })}
+        data-kind-of={e.id}
+        value={e.kind ?? ''}
+        onChange={(k) => actions.setKind(e.id, k as TableKind)}
+        data={tableKinds.map((k) => ({ value: k, label: t(kindLabels[k]) }))}
+      />
+      {e.kind &&
+        e.map?.map((m, i) => (
+          <ColumnRow
+            // oxlint-disable-next-line react/no-array-index-key -- the columns of a card are fixed, the index is the column
+            key={`${e.id}-${i}`}
+            e={{ ...e, card: table, kind: e.kind as TableKind }}
+            i={i}
+            m={m}
+            actions={actions}
+          />
+        ))}
+      {e.kind && e.map && (
+        <Group gap="xs" align="flex-end" wrap="wrap">
+          <TextInput
+            size="xs"
+            label={t('Save mapping as')}
+            value={name}
+            onChange={(ev) => setName(ev.currentTarget.value)}
+          />
+          <Button
+            size="xs"
+            variant="default"
+            disabled={name.trim() === ''}
+            onClick={() => actions.saveMapping(e.id, name.trim())}
+          >
+            {t('Save mapping')}
+          </Button>
+        </Group>
+      )}
+      <TextInput
+        size="xs"
+        label={t('Source of this file')}
+        placeholder={shared || t('Same as the source below')}
+        maxLength={500}
+        value={e.source}
+        onChange={(ev) => actions.setSource(e.id, ev.currentTarget.value)}
+      />
+    </>
+  )
+}
+
 /** One file card: the verdict, Remove, the kind and the mapping (folded on a high-tier card), the counts. */
 export function FileCard({
   e,
@@ -379,55 +444,7 @@ export function FileCard({
             </Button>
           </Group>
         )}
-        {table && !fold && (
-          <>
-            <SegmentedControl
-              size="xs"
-              aria-label={t('Kind of {name}', { name: e.name })}
-              data-kind-of={e.id}
-              value={e.kind ?? ''}
-              onChange={(k) => actions.setKind(e.id, k as TableKind)}
-              data={tableKinds.map((k) => ({ value: k, label: t(kindLabels[k]) }))}
-            />
-            {e.kind &&
-              e.map?.map((m, i) => (
-                <ColumnRow
-                  // oxlint-disable-next-line react/no-array-index-key -- the columns of a card are fixed, the index is the column
-                  key={`${e.id}-${i}`}
-                  e={{ ...e, card: table, kind: e.kind as TableKind }}
-                  i={i}
-                  m={m}
-                  actions={actions}
-                />
-              ))}
-            {e.kind && e.map && (
-              <Group gap="xs" align="flex-end" wrap="wrap">
-                <TextInput
-                  size="xs"
-                  label={t('Save mapping as')}
-                  value={name}
-                  onChange={(ev) => setName(ev.currentTarget.value)}
-                />
-                <Button
-                  size="xs"
-                  variant="default"
-                  disabled={name.trim() === ''}
-                  onClick={() => actions.saveMapping(e.id, name.trim())}
-                >
-                  {t('Save mapping')}
-                </Button>
-              </Group>
-            )}
-            <TextInput
-              size="xs"
-              label={t('Source of this file')}
-              placeholder={shared || t('Same as the source below')}
-              maxLength={500}
-              value={e.source}
-              onChange={(ev) => actions.setSource(e.id, ev.currentTarget.value)}
-            />
-          </>
-        )}
+        {table && !fold && tableFields({ e, table, shared, actions, name, setName, t })}
       </Stack>
     </Paper>
   )

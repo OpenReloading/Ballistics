@@ -95,10 +95,12 @@ import {
   compassNames,
   frameOf,
   groupColours,
+  type KnownSize,
   ladderExtremeSpreads,
   newGroup,
   offsetAngles,
   rebase,
+  referenceOf,
   turnSheet,
   viewToTarget,
   withGroup,
@@ -2591,6 +2593,13 @@ function hintOf(
   return alertText || toolHint || (help ? '' : status.text)
 }
 
+/** The workbench tab before Expand: the target and the key readouts only. */
+const isCompact = (expand: { expanded: boolean } | undefined) =>
+  expand !== undefined && !expand.expanded
+
+/** Phones: the target fills the screen; a bottom sheet holds the panels. */
+const isPhone = (compact: boolean, width: number) => !compact && width > 0 && width < 600
+
 /** Whether the sheet is a drawn target without a shot yet, with the select tool. */
 function isBlank(compact: boolean, tool: Tool, sheet: TargetSheet) {
   return !compact && tool === 'select' && !sheet.photo && sheet.groups.every((g) => !g.shots.length)
@@ -2789,11 +2798,7 @@ export function TargetEditor({
   const [tool, setTool] = useState<Tool>('select')
   const [pending, setPending] = useState<Point[]>([])
   const [refKind, setRefKind] = useState<RefKind>('line')
-  const [known, setKnown] = useState<{
-    length?: number | undefined
-    width?: number | undefined
-    height?: number | undefined
-  }>({})
+  const [known, setKnown] = useState<KnownSize>({})
   /** The browser's last overlay choice: the switches of a sheet without its own. */
   const [browserOverlays, setBrowserOverlays] = useState(defaultOverlays)
   const [noteSel, setNoteSel] = useState<string>()
@@ -3454,21 +3459,7 @@ export function TargetEditor({
   }
 
   function addReference(points: Point[]) {
-    const len = known.length
-    const [p0, p1, p2, p3] = points
-    let r: CalibrationReference | undefined
-    if (refKind === 'line' && len && p0 && p1) r = { kind: 'line', a: p0, b: p1, length: len }
-    if (refKind === 'ringCentre' && len && p0 && p1)
-      r = { kind: 'ringCentre', centre: p0, edge: p1, diameter: len }
-    if (refKind === 'ringEdge' && len && p0 && p1 && p2)
-      r = { kind: 'ringEdge', points: [p0, p1, p2], diameter: len }
-    if (refKind === 'rectangle' && known.width && known.height && p0 && p1 && p2 && p3)
-      r = {
-        kind: 'rectangle',
-        corners: [p0, p1, p2, p3],
-        width: known.width,
-        height: known.height,
-      }
+    const r = referenceOf(refKind, known, points)
     if (!r) return say(t('Enter the known size first.'), true)
     pushReference(r)
   }
@@ -3581,8 +3572,7 @@ export function TargetEditor({
     }
   }
 
-  /** The workbench tab before Expand: the target and the key readouts only. */
-  const compact = expand !== undefined && !expand.expanded
+  const compact = isCompact(expand)
   const click = optic ?? options.find((o) => o.value === opticChoice)
   const { stats, keyValues } = statsOf(group)
 
@@ -3802,8 +3792,7 @@ export function TargetEditor({
   )
   const blankSheet = isBlank(compact, tool, sheet)
 
-  /** Phones: the target fills the screen; a bottom sheet holds the panels. */
-  const phone = !compact && width > 0 && width < 600
+  const phone = isPhone(compact, width)
   const [phoneTop, setPhoneTop] = useState<number>()
   const expanded = expand?.expanded
   // the editor fills the window below its top edge; the expanded editor fills its dialog

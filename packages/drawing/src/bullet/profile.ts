@@ -208,40 +208,16 @@ function baseRadius(o: Outline) {
   return corner[0]
 }
 
-/** The dimensions of the stored values `sourced` covers that the drawn outline `o` follows. */
-function dimensionsOf(
-  shape: BulletDimensions,
-  o: Outline,
-  sourced: (field: string) => boolean,
-): Dimension[] {
-  const { length: L, diameter } = shape
-  const a = diameter / 2
-  const z0 = L - o.noseLength
-  const t = z0 - o.bearingLength
+type AddDimension = (
+  symbol: string,
+  value: number | undefined,
+  ok: boolean,
+  d: Omit<Dimension, 'symbol' | 'value' | 'stored'>,
+) => void
+
+/** The base dimensions behind station `t`: boat-tail length, base diameter and cavity. */
+function tailDimensions(shape: BulletDimensions, o: Outline, t: number, add: AddDimension) {
   const rb = baseRadius(o)
-  const tip = shape.tip?.type
-  const groove = shape.cannelure
-  const dimensions: Dimension[] = []
-  const add = (
-    symbol: string,
-    value: number | undefined,
-    ok: boolean,
-    d: Omit<Dimension, 'symbol' | 'value' | 'stored'>,
-  ) => {
-    const field = bulletSymbols.find((s) => s.symbol === symbol)?.path as string
-    if (value !== undefined && ok && sourced(field))
-      dimensions.push({ symbol, value, stored: { symbol, value }, ...d })
-  }
-  const station = shankStation(t, z0, groove)
-  add('L', L, true, { kind: 'length', from: 0, to: L })
-  add('d', diameter, true, { kind: 'diameter', from: station, to: station, radius: a })
-  add('n', shape.noseLength, !o.noseAssumed, { kind: 'chain', from: z0, to: L })
-  const bearing = shape.bearingLength
-  add('b', bearing, bearing !== undefined && Math.abs(o.bearingLength - bearing) <= 0.05, {
-    kind: 'chain',
-    from: t,
-    to: z0,
-  })
   const tail = t > 0
   const gl = shape.base?.length
   add('t', gl, tail && gl !== undefined && Math.abs(t - gl) < 1e-9, {
@@ -266,6 +242,12 @@ function dimensionsOf(
       Math.abs(2 * o.cavity.radius - cavityDiameter) < 1e-9,
     { kind: 'diameter', from: 0, to: 0, radius: o.cavity?.radius, behindHeadFace: true },
   )
+}
+
+/** The front dimensions on the meplat line: meplat, hollow-point mouth and polymer tip. */
+function frontDimensions(shape: BulletDimensions, o: Outline, add: AddDimension) {
+  const L = shape.length
+  const tip = shape.tip?.type
   const meplat = shape.meplatDiameter
   add('dm', meplat, (meplat ?? 0) > 0, {
     kind: 'diameter',
@@ -289,6 +271,37 @@ function dimensionsOf(
     from: o.tipStart ?? 0,
     to: L,
   })
+}
+
+/** The dimensions of the stored values `sourced` covers that the drawn outline `o` follows. */
+function dimensionsOf(
+  shape: BulletDimensions,
+  o: Outline,
+  sourced: (field: string) => boolean,
+): Dimension[] {
+  const { length: L, diameter } = shape
+  const a = diameter / 2
+  const z0 = L - o.noseLength
+  const t = z0 - o.bearingLength
+  const groove = shape.cannelure
+  const dimensions: Dimension[] = []
+  const add: AddDimension = (symbol, value, ok, d) => {
+    const field = bulletSymbols.find((s) => s.symbol === symbol)?.path as string
+    if (value !== undefined && ok && sourced(field))
+      dimensions.push({ symbol, value, stored: { symbol, value }, ...d })
+  }
+  const station = shankStation(t, z0, groove)
+  add('L', L, true, { kind: 'length', from: 0, to: L })
+  add('d', diameter, true, { kind: 'diameter', from: station, to: station, radius: a })
+  add('n', shape.noseLength, !o.noseAssumed, { kind: 'chain', from: z0, to: L })
+  const bearing = shape.bearingLength
+  add('b', bearing, bearing !== undefined && Math.abs(o.bearingLength - bearing) <= 0.05, {
+    kind: 'chain',
+    from: t,
+    to: z0,
+  })
+  tailDimensions(shape, o, t, add)
+  frontDimensions(shape, o, add)
   const bto = shape.baseToOgive
   add('BTO', bto, bto !== undefined && bto > 0 && bto < L, {
     kind: 'length',

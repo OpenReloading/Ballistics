@@ -604,6 +604,28 @@ function Backdrop({
   )
 }
 
+/** The view fits again for another photo or turn. */
+const extentKeyOf = (photo: { url: string } | undefined, sheet: TargetSheet) =>
+  `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
+
+/**
+ * The box shown (the fixed one, else the zoomed view, else the extent) and `k`, its view units
+ * per screen px (the box is fitted with `meet`).
+ */
+function shownView(
+  still: { box: ViewBox; k: number } | undefined,
+  view: ViewBox | undefined,
+  extent: ViewBox,
+  size: { w: number; h: number },
+) {
+  const box = still?.box ?? view ?? extent
+  return { box, k: still?.k ?? Math.max(box.w / size.w, box.h / size.h) }
+}
+
+/** The target's axes: on a calibrated sheet with its origin set, not on a fixed view. */
+const showsAxes = (frame: Frame | undefined, sheet: TargetSheet, still: object | undefined) =>
+  Boolean(frame?.calibration && sheet.targetOrigin && !still)
+
 /**
  * The drawing of a target sheet: the photo (or a drawn target), references, points of aim, shots
  * and the switchable overlays, all mapped from target m to the view through `frame`; pointer and
@@ -685,9 +707,9 @@ export function TargetCanvas({
   const [statsAt, setStatsAt] = useState({ x: 8, y: 8 })
 
   const extent = useMemo(() => extentOf(sheet, frame, photo, face), [photo, frame, sheet, face])
-  const extentKey = `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
+  const extentKey = extentKeyOf(photo, sheet)
   useEffect(() => setView(undefined), [extentKey])
-  const box = still?.box ?? view ?? extent
+  const { box, k } = shownView(still, view, extent, size)
   if (viewOut) viewOut.current = { extent }
 
   useEffect(() => {
@@ -699,9 +721,6 @@ export function TargetCanvas({
     seen.observe(el)
     return () => seen.disconnect()
   }, [])
-  /** View units per screen px (the box is fitted with `meet`). */
-  const k = still?.k ?? Math.max(box.w / size.w, box.h / size.h)
-
   const toPoint = (e: { clientX: number; clientY: number }): Point =>
     viewPoint(svg.current, e.clientX, e.clientY) ?? { x: 0, y: 0 }
 
@@ -904,9 +923,7 @@ export function TargetCanvas({
             onHandle={(e, ref, point) => tool === 'select' && start(e, { kind: 'ref', ref, point })}
           />
         )}
-        {frame?.calibration && sheet.targetOrigin && !still && (
-          <AxesMark v={v} k={k} fontSize={fontSize} />
-        )}
+        {showsAxes(frame, sheet, still) && <AxesMark v={v} k={k} fontSize={fontSize} />}
         {frame && groupOverlays({ sheet, overlays, active, box, k, fontSize, v, shotR, id, t })}
         <defs>
           <marker

@@ -833,6 +833,23 @@ function capacityOf(
   return capacityFraction({ ...water, spread: theirs ? group.spread : undefined, records })
 }
 
+/** The seated volume, cavity and lengths in SI, each where the seating has it. */
+function seatedValues(seating: Seating | undefined) {
+  const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
+  const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
+  const jump = seating?.jump.value
+  const cavityRange = cavityRangeOf(seating)
+  return {
+    ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
+    ...(cavityRange && { cavityRange }),
+    ...(travel !== undefined && { travel: toSi('length', travel) }),
+    ...(coal !== undefined && { overallLength: toSi('length', coal) }),
+    ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
+    ...(depth !== undefined && { depth: toSi('length', depth) }),
+    ...(jump !== undefined && { jump: toSi('length', jump) }),
+  }
+}
+
 /** What the page's fields follow, from the seating; none seated reports `{}`. */
 function seatedReport(o: {
   caseVolume: number | undefined
@@ -845,21 +862,12 @@ function seatedReport(o: {
   capacity: Seated['capacity']
 }): Seated {
   const { caseVolume, unseated, seating, barrel, mode, atStart, figure, capacity } = o
-  const [volume, travel] = [seating?.volumeBehindBullet?.value, seating?.travel?.value]
-  const [coal, cbto, depth] = [seating?.coal.value, seating?.cbto?.value, seating?.depth.value]
-  const jump = seating?.jump.value
-  const cavityRange = cavityRangeOf(seating)
+  const coal = seating?.coal.value
   return {
     ...(caseVolume !== undefined && { caseVolume }),
     ...(caseVolume !== undefined && capacity && { capacity }),
     ...(unseated && { unseated }),
-    ...(volume !== undefined && { volume: unitsOf.capacity.cm3.toSi(volume) }),
-    ...(cavityRange && { cavityRange }),
-    ...(travel !== undefined && { travel: toSi('length', travel) }),
-    ...(coal !== undefined && { overallLength: toSi('length', coal) }),
-    ...(cbto !== undefined && { baseToOgive: toSi('length', cbto) }),
-    ...(depth !== undefined && { depth: toSi('length', depth) }),
-    ...(jump !== undefined && { jump: toSi('length', jump) }),
+    ...seatedValues(seating),
     ...(coal !== undefined && barrel !== undefined && { barrel }),
     ...(barrel !== undefined && { barrelField: barrel }),
     ...(coal !== undefined && { mode, atStart }),
@@ -924,7 +932,8 @@ function useReportSeated(
 }
 
 /** The seated lengths; while the slider moves, as they were `slideWait` ms after its last move. */
-function useRestedLengths(coal: number | undefined, cbto: number | undefined, sliding: boolean) {
+function useRestedLengths(s: Seating | undefined, sliding: boolean) {
+  const [coal, cbto] = [s?.coal.value, s?.cbto?.value]
   const [rested, setRested] = useState({ coal, cbto })
   useEffect(() => {
     const rest = () => setRested((r) => (r.coal === coal && r.cbto === cbto ? r : { coal, cbto }))
@@ -956,13 +965,14 @@ type UnseatedArgs = {
   seatMode: Mode
   seatValue: number | undefined
   initialSeat: NonNullable<PreviewProps['initial']>['seating']
-  cbtoMissing: boolean
+  canCbto: boolean
 }
 
 /** A bullet chosen and not seated takes an estimated volume below the mouth, never none. */
 function useUnseated(a: UnseatedArgs): BelowMouth | undefined {
   const { chosenBullet, seating, cartridgeRead, detail, shape, chamber } = a
-  const { shaped, refused, seatMode, seatValue, initialSeat, cbtoMissing } = a
+  const { shaped, refused, seatMode, seatValue, initialSeat, canCbto } = a
+  const cbtoMissing = seatMode === 'baseToOgive' && !canCbto
   const groove = detail.status === 'ok' ? cartridgeDiameters(detail.value)?.groove : undefined
   // the COAL entered or loaded, when the seating is by COAL
   const coal =
@@ -997,6 +1007,85 @@ function useUnseated(a: UnseatedArgs): BelowMouth | undefined {
   )
 }
 
+/** The lands contact in mm, rebuilt only when a length changes, so the seating is not for each render. */
+function useLands(l: PreviewProps['lands']) {
+  const [cbto, coal] = [l?.baseToOgive, l?.overallLength]
+  return useMemo(() => landsMm(cbto, coal), [cbto, coal])
+}
+
+/** A choice the page holds where it passes its setter, else the preview's own. */
+function useChoice(
+  lifted: string | undefined,
+  onLifted: ((id: string | undefined) => void) | undefined,
+) {
+  const [own, setOwn] = useState<string | undefined>(undefined)
+  return [onLifted ? lifted : own, onLifted ?? setOwn] as const
+}
+
+/** The listed case record `caseId`; a renamed case answers with the record that replaced it, and the choice takes that id. */
+function useChosenCase(
+  caseList: Load<{ items: CaseSummary[] }>,
+  caseId: string | undefined,
+  setCaseId: (id: string | undefined) => void,
+) {
+  const items = caseList.status === 'ok' ? caseList.value.items : undefined
+  const renamed = useRecord<{ id: string }>(renamedCasePath(caseId, items))
+  const renamedTo = renamed.status === 'ok' ? renamed.value.id : undefined
+  useEffect(() => {
+    if (renamedTo !== undefined && renamedTo !== caseId) setCaseId(renamedTo)
+  }, [renamedTo, caseId, setCaseId])
+  return items?.find((c) => c.id === caseId)
+}
+
+/** The records' water, and the water with a measured value typed over it. */
+function watersOf<T extends Parameters<typeof usedWater>[0]['capacities'][number]>(o: {
+  measured: number | undefined
+  capacities: readonly T[]
+  capacityId: string | undefined
+  stated: number | undefined
+  pendingCase: boolean
+}) {
+  const { measured, ...records } = o
+  const stock = usedWater(records)
+  const water = usedWater({
+    measured: measured === undefined ? undefined : waterGrams(measured),
+    ...records,
+  })
+  return { stock, capacity: stock?.record, water }
+}
+
+/** The seating the figure draws: the ladder step's where the ladder is by the mode, else `seating`. */
+function useLadderSeating(
+  seatBy: SeatFn,
+  ladderStep: PreviewProps['ladderStep'],
+  seatMode: Mode,
+  seating: Seating | undefined,
+) {
+  const [stepBy, stepValue] = [ladderStep?.by, ladderStep?.value]
+  return useMemo(
+    () => ladderSeating(seatBy, { by: stepBy, value: stepValue }, seatMode, seating),
+    [seatBy, stepBy, stepValue, seatMode, seating],
+  )
+}
+
+/** The seated position is where the preview last started by itself, in the same mode. */
+const isAtStart = (pos: FieldValue, mode: Mode, started: { si: number; mode: Mode } | undefined) =>
+  pos.si === started?.si && mode === started?.mode
+
+/** The powder's fill of the space behind the seated bullet; none without a powder or a seating. */
+function fillOf(powder: PreviewProps['powder'], seating: Seating | undefined) {
+  const behind = seating?.volumeBehindBullet?.value
+  return (
+    powder &&
+    seating &&
+    chargeFill({
+      ...powder,
+      volume: behind === undefined ? undefined : unitsOf.capacity.cm3.toSi(behind),
+      base: seating.basePosition,
+    })
+  )
+}
+
 /** The seating's state and values: every hook of the preview, so its parts only draw. */
 function useSeatingModel(p: PreviewProps) {
   const { t } = useTranslation()
@@ -1009,18 +1098,12 @@ function useSeatingModel(p: PreviewProps) {
   const designer = isDesigner(draft)
   const name = nameOf(draft, cartridge)
   const bullet = useBulletChoice(initial?.bullet, p.linked)
-  // the contact object is rebuilt only when a length changes, so the seating is not for each render
-  const [landsCbto, landsCoal] = [p.lands?.baseToOgive, p.lands?.overallLength]
-  const lands = useMemo(() => landsMm(landsCbto, landsCoal), [landsCbto, landsCoal])
+  const lands = useLands(p.lands)
   const { design, record } = bullet
   const names = useManufacturerNames()
-  const [ownCapacityId, setOwnCapacityId] = useState<string | undefined>(undefined)
-  const capacityId = p.onCapacityId ? p.capacityId : ownCapacityId
-  const setCapacityId = p.onCapacityId ?? setOwnCapacityId
+  const [capacityId, setCapacityId] = useChoice(p.capacityId, p.onCapacityId)
   const caseList = useRecord<{ items: CaseSummary[] }>(casesUrl(cartridge, draft))
-  const [ownCaseId, setOwnCaseId] = useState<string | undefined>(undefined)
-  const caseId = p.onCaseId ? p.caseId : ownCaseId
-  const setCaseId = p.onCaseId ?? setOwnCaseId
+  const [caseId, setCaseId] = useChoice(p.caseId, p.onCaseId)
   const shown = useRef(system)
   const { barrel, setBarrel, barrelTyped, setBarrelTyped } = useBarrel({
     barrelLength: p.barrelLength,
@@ -1047,16 +1130,7 @@ function useSeatingModel(p: PreviewProps) {
     freebore: p.freebore === undefined ? undefined : fromSi('length', p.freebore),
     unit: drawingLengthUnit(system),
   })
-  const chosenCase =
-    caseList.status === 'ok' ? caseList.value.items.find((c) => c.id === caseId) : undefined
-  // a renamed case answers with the record that replaced it: the choice takes that id
-  const renamed = useRecord<{ id: string }>(
-    renamedCasePath(caseId, caseList.status === 'ok' ? caseList.value.items : undefined),
-  )
-  const renamedTo = renamed.status === 'ok' ? renamed.value.id : undefined
-  useEffect(() => {
-    if (renamedTo !== undefined && renamedTo !== caseId) setCaseId(renamedTo)
-  }, [renamedTo, caseId, setCaseId])
+  const chosenCase = useChosenCase(caseList, caseId, setCaseId)
   // a case record is chosen but not read (loading, failed or no longer listed): no other record stands in
   const pendingCase = caseId !== undefined && chosenCase === undefined
   // apart from `fixed`: a unit switch relabels the drawing and keeps the seating position
@@ -1087,15 +1161,11 @@ function useSeatingModel(p: PreviewProps) {
   const value = lengthMm(pos)
   const seatValue = lengthMm(seatPos)
   const measured = positive(measuredWaterCapacity.si)
-  const stated = chosenCase?.waterCapacity
-  // the records' water, and the water with a measured value typed over it
-  const stock = usedWater({ capacities, capacityId, stated, pendingCase })
-  const capacity = stock?.record
-  const water = usedWater({
-    measured: measured === undefined ? undefined : waterGrams(measured),
+  const { stock, capacity, water } = watersOf({
+    measured,
     capacities,
     capacityId,
-    stated,
+    stated: chosenCase?.waterCapacity,
     pendingCase,
   })
   const waterUsed = water?.grams
@@ -1117,22 +1187,14 @@ function useSeatingModel(p: PreviewProps) {
     () => (seatBy && seatValue !== undefined ? seatBy(seatValue) : undefined),
     [seatBy, seatValue],
   )
-  const [stepBy, stepValue] = [ladderStep?.by, ladderStep?.value]
-  const figureSeating = useMemo(
-    () => ladderSeating(seatBy, { by: stepBy, value: stepValue }, seatMode, seating),
-    [seatBy, stepBy, stepValue, seatMode, seating],
-  )
+  const figureSeating = useLadderSeating(seatBy, ladderStep, seatMode, seating)
   /** Set by the slider's moves, cleared by its release. */
   const [sliding, setSliding] = useState(false)
   // Combined without dimensions, each side's record figure with them, as on the cartridge page;
   // one frame for all, which reaches the longest COAL, so the bullet tip stays in view and the
   // outline stays put when the view changes; the bullet goes on top. In the workbench card the
   // Cartridge view's L6 is the seated COAL, with the seated CBTO added
-  const [coal, cbto, inCard] = [
-    figureSeating?.coal.value,
-    figureSeating?.cbto?.value,
-    isCard(slots, designer),
-  ]
+  const inCard = isCard(slots, designer)
   const drawn = fixed?.drawn
   const cardViews = useMemo(
     () => cardViewsOf(spec, designer, drawn, unit),
@@ -1144,7 +1206,7 @@ function useSeatingModel(p: PreviewProps) {
   )
   // the dimension layout is the costly part of a move: while the slider moves the lengths on the
   // drawing follow when it rests, the bullet itself follows each move
-  const { coal: shownCoal, cbto: shownCbto } = useRestedLengths(coal, cbto, sliding)
+  const { coal: shownCoal, cbto: shownCbto } = useRestedLengths(figureSeating, sliding)
   const models = useMemo(
     () => cardViews(inCard ? coalOf(shownCoal, shownCbto) : undefined),
     [cardViews, inCard, shownCoal, shownCbto],
@@ -1168,7 +1230,7 @@ function useSeatingModel(p: PreviewProps) {
   }, [seatAt])
 
   const figure = useMemo(() => figureOf(spec, seating), [spec, seating])
-  const atStart = seatPos.si === started?.si && seatMode === started?.mode
+  const atStart = isAtStart(seatPos, seatMode, started)
   const caseVolume = caseVolumeOf(measured, water)
   const { bulletNow: chosenBullet, shaped, refused } = geometry
   const unseated = useUnseated({
@@ -1183,7 +1245,7 @@ function useSeatingModel(p: PreviewProps) {
     seatMode,
     seatValue,
     initialSeat: initial?.seating,
-    cbtoMissing: seatMode === 'baseToOgive' && !canCbto,
+    canCbto,
   })
   useReportSeated(
     p.onSeated,
@@ -1201,15 +1263,7 @@ function useSeatingModel(p: PreviewProps) {
   )
 
   const fmt = unitFormats(system)
-  const behind = figureSeating?.volumeBehindBullet?.value
-  const fill =
-    p.powder &&
-    figureSeating &&
-    chargeFill({
-      ...p.powder,
-      volume: behind === undefined ? undefined : unitsOf.capacity.cm3.toSi(behind),
-      base: figureSeating.basePosition,
-    })
+  const fill = fillOf(p.powder, figureSeating)
   const contact = contactText(seating, fmt.mm, t)
   /** The workbench's cards: the fields there show what the rows below leave out. */
   const card = inCard

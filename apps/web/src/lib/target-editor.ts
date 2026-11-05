@@ -305,3 +305,31 @@ export const compassNames: Record<AimOffset['compass'], Message> = {
   NW: msg('high left'),
   centre: msg('on the point of aim'),
 }
+
+/** The known sizes the scale references take, m. */
+export type KnownSize = {
+  length?: number | undefined
+  width?: number | undefined
+  height?: number | undefined
+}
+
+/** The scale reference of `kind` through the clicked `points` and the known size; none while one is missing. */
+export function referenceOf(
+  kind: CalibrationReference['kind'],
+  known: KnownSize,
+  points: Point[],
+): CalibrationReference | undefined {
+  if (kind === 'rectangle') return rectangleOf(known, points)
+  const len = known.length
+  const [p0, p1, p2] = points
+  if (!len || !p0 || !p1) return
+  if (kind === 'line') return { kind: 'line', a: p0, b: p1, length: len }
+  if (kind === 'ringCentre') return { kind: 'ringCentre', centre: p0, edge: p1, diameter: len }
+  if (kind === 'ringEdge' && p2) return { kind: 'ringEdge', points: [p0, p1, p2], diameter: len }
+}
+
+function rectangleOf(known: KnownSize, points: Point[]): CalibrationReference | undefined {
+  const [p0, p1, p2, p3] = points
+  if (!known.width || !known.height || !p0 || !p1 || !p2 || !p3) return
+  return { kind: 'rectangle', corners: [p0, p1, p2, p3], width: known.width, height: known.height }
+}

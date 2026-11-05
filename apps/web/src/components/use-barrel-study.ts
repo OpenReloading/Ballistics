@@ -135,6 +135,27 @@ function atSeatingOf(
   return Math.abs(base + runTravel - seatedBarrel) < 5e-5
 }
 
+/** The longer run's travel: none until the lengths, the base and the run's travel are known. */
+const travelOf = (
+  lengths: Parameters<typeof longerTravel>[0] | undefined,
+  base: number | undefined,
+  runTravel: number | undefined,
+) =>
+  lengths && base !== undefined && runTravel !== undefined
+    ? longerTravel(lengths, base, runTravel)
+    : undefined
+
+/** The longer run's request: the run, its shown step on a single charge, the travel and the attempt. */
+const longerKey = (
+  ok: Extract<Outcome, { kind: 'ok' }> | undefined,
+  single: boolean,
+  travel: number | undefined,
+  attempt: number,
+) =>
+  ok && travel !== undefined
+    ? `${ok.id}|${single ? `${ok.selected}|` : ''}${travel}|${attempt}`
+    : undefined
+
 /**
  * The study of the shown run: the range the user typed (the defaults until then), the longer run
  * for the lengths beyond the barrel, requested once the tab has been opened (`enabled`), and the
@@ -175,15 +196,9 @@ export function useBarrelStudy({
   const single = singleCharge(ok)
   const base = figure && toSi('length', figure.base)
   const runTravel = ok?.load.barrel.length
-  const travel =
-    lengths && base !== undefined && runTravel !== undefined
-      ? longerTravel(lengths, base, runTravel)
-      : undefined
+  const travel = travelOf(lengths, base, runTravel)
   const [attempt, setAttempt] = useState(0)
-  const key =
-    ok && travel !== undefined
-      ? `${ok.id}|${single ? `${ok.selected}|` : ''}${travel}|${attempt}`
-      : undefined
+  const key = longerKey(ok, single, travel, attempt)
   const [longer, setLonger] = useState<{
     key: string
     runs?: (LongerRun | undefined)[]

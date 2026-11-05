@@ -891,6 +891,22 @@ function InvalidItem({ record: r, onDelete }: { record: InvalidRecord; onDelete:
   )
 }
 
+/** The record differs from its last save (`dirty`), and whether that is work the page would lose. */
+function unsavedState(
+  saved: { json: string } | undefined,
+  now: string,
+  autosaved: string | undefined,
+  initial: string | undefined,
+) {
+  const dirty = saved !== undefined && saved.json !== now
+  // kept in the browser on every change: nothing to lose when the page goes
+  return { dirty, unsaved: isUnsaved(autosaved, saved ? dirty : undefined, initial, now) }
+}
+
+/** The chosen folder where the browser allows writing to it. */
+const allowedFolder = (f: { handle: FileSystemDirectoryHandle; allowed: boolean } | undefined) =>
+  f?.allowed ? f.handle : undefined
+
 /**
  * The page bar's Open menu (the browser's records, a file, Import, Paste JSON, the page's examples)
  * and Save with its menu (Save as, share link, JSON, Export all, the optional workspace folder).
@@ -1017,9 +1033,7 @@ function FileMenuOf<K extends UserRecordKind>({
   // undefined between startNew without `next` and the render that shows the new record
   const initial = useRef<string | undefined>(now)
   const [started, setStarted] = useState(0)
-  const dirty = saved !== undefined && saved.json !== now
-  // kept in the browser on every change: nothing to lose when the page goes
-  const unsaved = isUnsaved(autosaved, saved ? dirty : undefined, initial.current, now)
+  const { dirty, unsaved } = unsavedState(saved, now, autosaved, initial.current)
   // Save and Open file of the menu, for a page's own commands (the workbench search)
   const commands = {
     save: () => act(msg('Save failed: {error}'), () => save(false))(),
@@ -1136,7 +1150,7 @@ function FileMenuOf<K extends UserRecordKind>({
   )
 
   const state = stateText({ saved, dirty, autosaved, kept, unsaved }, t)
-  const ready = folder?.allowed ? folder.handle : undefined
+  const ready = allowedFolder(folder)
   // in a page bar the state and messages are its status line: one line, the whole text in its tooltip
   const bar = useContext(BarStatus)
   const lines = [message, note, storageNote && t(noStorage)].filter(Boolean).join(' ')

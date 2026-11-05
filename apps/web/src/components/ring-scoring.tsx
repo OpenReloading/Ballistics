@@ -729,6 +729,30 @@ function ScorePanel(p: PanelProps) {
 }
 
 /**
+ * The group's face choice, its discipline and the federation of the Discipline list: the one
+ * picked, else the one of the group's discipline.
+ */
+function useDisciplineChoice(group: ShotGroup | undefined, data: FederationData | undefined) {
+  /** The federation picked for the Discipline list; undefined: the one of the group's discipline. */
+  const [federation, setFederation] = useState<string>()
+  const choice = group?.face
+  const mappings = data?.mappings ?? []
+  const discipline = mappingOf(mappings, choice)?.discipline
+  const own = data?.disciplines.find((d) => d.id === discipline)?.federation
+  useEffect(() => setFederation(undefined), [group?.id])
+  // a discipline of another federation (a face picked from all faces or found on the photo) shows its own
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a change of the discipline only
+  useEffect(() => setFederation((f) => (f && own && f !== own ? undefined : f)), [discipline])
+  return { choice, mappings, discipline, fed: federation ?? own ?? '', setFederation }
+}
+
+/** The loaded face of the group's choice, and its record where it did not fail. */
+function faceOf(choice: GroupFace | undefined, faces: Record<string, Face | 'error'>) {
+  const face = choice && faces[choice.id]
+  return { face, record: face && face !== 'error' ? face : undefined }
+}
+
+/**
  * Ring scoring in the target editor (`apps/docs/docs/models/ring-scoring.md`): the face and event of
  * the active group, its alignment (centred on the point of aim, or fitted to points marked on its
  * rings with the tool `rings`), the rings and values on the canvas, and every group's score.
@@ -764,8 +788,6 @@ export function useRingScoring({
   const [list, setList] = useState<FaceSummary[] | 'loading' | 'error'>('loading')
   const [all, setAll] = useState<Face[]>([])
   const [data, setData] = useState<FederationData>()
-  /** The federation picked for the Discipline list; undefined: the one of the group's discipline. */
-  const [federation, setFederation] = useState<string>()
   const [faces, setFaces] = useState<Record<string, Face | 'error'>>({})
   /** Ring value of the next mark, and the marks so far, target m. */
   const [ring, setRing] = useState<number>()
@@ -807,18 +829,9 @@ export function useRingScoring({
   /** The score of group `id`: undefined without a face. */
   const of = (id: string) => scoring.get(id)
 
-  const choice = group?.face
-  const mappings = data?.mappings ?? []
-  const discipline = mappingOf(mappings, choice)?.discipline
-  const own = data?.disciplines.find((d) => d.id === discipline)?.federation
-  useEffect(() => setFederation(undefined), [group?.id])
-  // a discipline of another federation (a face picked from all faces or found on the photo) shows its own
-  // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a change of the discipline only
-  useEffect(() => setFederation((f) => (f && own && f !== own ? undefined : f)), [discipline])
-  const fed = federation ?? own ?? ''
+  const { choice, mappings, discipline, fed, setFederation } = useDisciplineChoice(group, data)
   const choices = disciplineOptions(all, data, fed || undefined)
-  const face = choice && faces[choice.id]
-  const record = face && face !== 'error' ? face : undefined
+  const { face, record } = faceOf(choice, faces)
   const current = group && of(group.id)
   const result = scoredOnly(current)
   /** The ring the next mark lies on: chosen, else the third ring from the centre. */

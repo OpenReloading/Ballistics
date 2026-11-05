@@ -331,106 +331,138 @@ function cannelureOnShank(
     issue(['cannelure', 'depth'], 'must be smaller than the radius')
 }
 
-/** A projectile as its manufacturer sells it. Inferred type: {@link Bullet}. */
-export const bullet = z
-  .object({
-    id: recordId,
-    /** Id of the manufacturer record. */
-    manufacturer: recordId,
-    /** Product number. Absent only with `nameOnly`. */
-    productNumber: z.string().min(1).optional(),
-    name: z.string().min(1),
-    country: countryCode.optional(),
-    productLine: z.string().min(1).optional(),
-    /** Caliber as the manufacturer writes it, for example `.308`. */
-    caliber: z.string().min(1).optional(),
-    /** Diameter. Absent only with `nameOnly`; stored only where a source prints one. */
-    diameter: quantity('length').optional(),
-    mass: quantity('mass'),
-    length: quantity('length').optional(),
-    base: bulletBase.optional(),
-    ogive: bulletOgive.optional(),
-    cannelure: bulletCannelure.optional(),
-    tip: bulletTip.optional(),
-    /** Diameter of the flat at the nose (McCoy, ARBRL-TR-02293, 1981, PDF p. 14); 0 for a sharp point. */
-    meplatDiameter: quantity('length', z.number().min(0)).optional(),
-    noseLength: quantity('length').optional(),
-    baseToOgive: quantity('length').optional(),
-    bearingLength: quantity('length').optional(),
-    construction: constructionFields.optional(),
-    ballisticCoefficients: z.array(ballisticCoefficient).min(1).optional(),
-    /** Twist the manufacturer recommends, length per turn. */
-    recommendedTwist: quantity('length').optional(),
-    /** Slowest twist the manufacturer allows ("1-10\" or faster"), length per turn. */
-    slowestTwist: quantity('length').optional(),
-    note: z.string().min(1).optional(),
-    /**
-     * Set on a record that only names a bullet a table prints: no product number and, unless the
-     * table prints one, no diameter. Without it `productNumber` and `diameter` are required, so a
-     * full record cannot lose them unnoticed.
-     */
-    nameOnly: z
-      .literal(true)
-      .describe('A record that only names the bullet: it has no product number.')
-      .optional(),
-    provenance,
-  })
-  .superRefine((b, ctx) => {
-    needsCountrySource(b, ctx)
-    const issue = (path: string[], message: string) =>
-      ctx.addIssue({ code: 'custom', path, message })
-    if (b.nameOnly) {
-      if (b.productNumber !== undefined)
-        issue(['productNumber'], 'a name-only record has no product number')
-    } else {
-      if (b.productNumber === undefined)
-        issue(['productNumber'], 'a full record needs a product number')
-      if (b.diameter === undefined) issue(['diameter'], 'a full record needs a diameter')
-    }
-    const d = b.diameter?.value
-    const below = (
-      path: string[],
-      v: number | undefined,
-      limit: number | undefined,
-      what: string,
-    ) => {
-      if (v !== undefined && limit !== undefined && !(v < limit))
-        issue(path, `must be smaller than ${what}`)
-    }
-    below(['meplatDiameter'], b.meplatDiameter?.value, d, 'the diameter')
-    below(['base', 'diameter'], b.base?.diameter?.value, d, 'the diameter')
-    // Only against the diameter: the cited definition relates the mouth to the caliber, not to the meplat.
-    below(['tip', 'mouthDiameter'], b.tip?.mouthDiameter?.value, d, 'the diameter')
-    below(['tip', 'length'], b.tip?.length?.value, b.length?.value, 'the length')
-    below(['tip', 'length'], b.tip?.length?.value, b.noseLength?.value, 'the nose length')
-    below(['base', 'length'], b.base?.length?.value, b.length?.value, 'the length')
-    const cavity = b.base?.cavityDiameter?.value
-    below(
+const bulletFields = z.object({
+  id: recordId,
+  /** Id of the manufacturer record. */
+  manufacturer: recordId,
+  /** Product number. Absent only with `nameOnly`. */
+  productNumber: z.string().min(1).optional(),
+  name: z.string().min(1),
+  country: countryCode.optional(),
+  productLine: z.string().min(1).optional(),
+  /** Caliber as the manufacturer writes it, for example `.308`. */
+  caliber: z.string().min(1).optional(),
+  /** Diameter. Absent only with `nameOnly`; stored only where a source prints one. */
+  diameter: quantity('length').optional(),
+  mass: quantity('mass'),
+  length: quantity('length').optional(),
+  base: bulletBase.optional(),
+  ogive: bulletOgive.optional(),
+  cannelure: bulletCannelure.optional(),
+  tip: bulletTip.optional(),
+  /** Diameter of the flat at the nose (McCoy, ARBRL-TR-02293, 1981, PDF p. 14); 0 for a sharp point. */
+  meplatDiameter: quantity('length', z.number().min(0)).optional(),
+  noseLength: quantity('length').optional(),
+  baseToOgive: quantity('length').optional(),
+  bearingLength: quantity('length').optional(),
+  construction: constructionFields.optional(),
+  ballisticCoefficients: z.array(ballisticCoefficient).min(1).optional(),
+  /** Twist the manufacturer recommends, length per turn. */
+  recommendedTwist: quantity('length').optional(),
+  /** Slowest twist the manufacturer allows ("1-10\" or faster"), length per turn. */
+  slowestTwist: quantity('length').optional(),
+  note: z.string().min(1).optional(),
+  /**
+   * Set on a record that only names a bullet a table prints: no product number and, unless the
+   * table prints one, no diameter. Without it `productNumber` and `diameter` are required, so a
+   * full record cannot lose them unnoticed.
+   */
+  nameOnly: z
+    .literal(true)
+    .describe('A record that only names the bullet: it has no product number.')
+    .optional(),
+  provenance,
+})
+
+type BulletFields = z.infer<typeof bulletFields>
+type Issue = (path: string[], message: string) => void
+
+/** A name-only record has no product number; a full one needs a product number and a diameter. */
+function identityIssues(b: BulletFields, issue: Issue) {
+  if (b.nameOnly) {
+    if (b.productNumber !== undefined)
+      issue(['productNumber'], 'a name-only record has no product number')
+    return
+  }
+  if (b.productNumber === undefined)
+    issue(['productNumber'], 'a full record needs a product number')
+  if (b.diameter === undefined) issue(['diameter'], 'a full record needs a diameter')
+}
+
+/** Reports `path` when `v` is not smaller than `limit`; nothing while either is unknown. */
+function below(
+  issue: Issue,
+  path: string[],
+  v: number | undefined,
+  limit: number | undefined,
+  what: string,
+) {
+  if (v !== undefined && limit !== undefined && !(v < limit))
+    issue(path, `must be smaller than ${what}`)
+}
+
+/** The meplat, base and tip within the diameter, the tip and base within the lengths. */
+function sizeIssues(b: BulletFields, issue: Issue) {
+  const d = b.diameter?.value
+  below(issue, ['meplatDiameter'], b.meplatDiameter?.value, d, 'the diameter')
+  below(issue, ['base', 'diameter'], b.base?.diameter?.value, d, 'the diameter')
+  // Only against the diameter: the cited definition relates the mouth to the caliber, not to the meplat.
+  below(issue, ['tip', 'mouthDiameter'], b.tip?.mouthDiameter?.value, d, 'the diameter')
+  below(issue, ['tip', 'length'], b.tip?.length?.value, b.length?.value, 'the length')
+  below(issue, ['tip', 'length'], b.tip?.length?.value, b.noseLength?.value, 'the nose length')
+  below(issue, ['base', 'length'], b.base?.length?.value, b.length?.value, 'the length')
+}
+
+/** The cavity within the base diameter, or the diameter where the record gives no base diameter. */
+function cavityDiameterIssue(b: BulletFields, issue: Issue) {
+  below(
+    issue,
+    ['base', 'cavityDiameter'],
+    b.base?.cavityDiameter?.value,
+    b.base?.diameter?.value ?? b.diameter?.value,
+    b.base?.diameter ? 'the base diameter' : 'the diameter',
+  )
+}
+
+/** The jacket within the radius. */
+function jacketIssue(b: BulletFields, issue: Issue) {
+  const d = b.diameter?.value
+  below(
+    issue,
+    ['construction', 'jacket', 'thickness'],
+    b.construction?.jacket?.thickness?.value,
+    d === undefined ? undefined : d / 2,
+    'the radius',
+  )
+}
+
+/** The cavity depth within the length; without a stored depth it is half the opening (`bulletOutline`). */
+function cavityDepthIssues(b: BulletFields, issue: Issue) {
+  below(issue, ['base', 'cavityDepth'], b.base?.cavityDepth?.value, b.length?.value, 'the length')
+  const cavity = b.base?.cavityDiameter?.value
+  if (
+    cavity !== undefined &&
+    b.base?.cavityDepth === undefined &&
+    b.length &&
+    !(cavity / 2 < b.length.value)
+  )
+    issue(
       ['base', 'cavityDiameter'],
-      cavity,
-      b.base?.diameter?.value ?? d,
-      b.base?.diameter ? 'the base diameter' : 'the diameter',
+      'half of it, the cavity depth, must be smaller than the length',
     )
-    cannelureOnShank(b, issue)
-    below(
-      ['construction', 'jacket', 'thickness'],
-      b.construction?.jacket?.thickness?.value,
-      d === undefined ? undefined : d / 2,
-      'the radius',
-    )
-    below(['base', 'cavityDepth'], b.base?.cavityDepth?.value, b.length?.value, 'the length')
-    // Without a stored depth it is half the opening (`bulletOutline`).
-    if (
-      cavity !== undefined &&
-      b.base?.cavityDepth === undefined &&
-      b.length &&
-      !(cavity / 2 < b.length.value)
-    )
-      issue(
-        ['base', 'cavityDiameter'],
-        'half of it, the cavity depth, must be smaller than the length',
-      )
-  })
+}
+
+/** A projectile as its manufacturer sells it. Inferred type: {@link Bullet}. */
+export const bullet = bulletFields.superRefine((b, ctx) => {
+  needsCountrySource(b, ctx)
+  const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
+  identityIssues(b, issue)
+  sizeIssues(b, issue)
+  cavityDiameterIssue(b, issue)
+  cannelureOnShank(b, issue)
+  jacketIssue(b, issue)
+  cavityDepthIssues(b, issue)
+})
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */
 export interface BallisticCoefficient extends z.infer<typeof ballisticCoefficient> {}

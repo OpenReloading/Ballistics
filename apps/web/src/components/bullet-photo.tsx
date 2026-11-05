@@ -288,7 +288,8 @@ function PhotoTool({
     })
   }, [p.photo, p.tint, p.cut, found, drawing, scale, opacity, points, cursor, tool, brush])
 
-  const turned = found?.outline && fromSi('angle', found.outline.angle)
+  const outline = found?.outline
+  const turned = outline && fromSi('angle', outline.angle)
   const messages = [...stateMessages(p, t), ...valueMessages(p, record, t)]
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
@@ -391,8 +392,8 @@ function PhotoTool({
               </Button>
               <Button
                 variant="default"
-                disabled={!found?.outline}
-                onClick={() => found?.outline && p.setAxis(found.outline.angle + Math.PI)}
+                disabled={!outline}
+                onClick={() => outline && p.setAxis(outline.angle + Math.PI)}
               >
                 {t('Flip nose')}
               </Button>
@@ -412,7 +413,7 @@ function PhotoTool({
               decimalScale={2}
               value={turned === undefined ? '' : Math.round(100 * turned) / 100}
               onChange={(v) => typeof v === 'number' && p.setAxis(toSi('angle', v))}
-              disabled={!found?.outline}
+              disabled={!outline}
             />
             <Text component="label" fz="sm" htmlFor="photo-opacity">
               {t('Drawing over the photograph, {percent} %', {

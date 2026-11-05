@@ -96,6 +96,41 @@ const workerErrors = [
 ]
 
 /**
+ * What a run takes from the sheet and the group: the photo's turn, the group's choices, the
+ * expected hole size, the face on the photo and the region searched.
+ */
+function detectionInputs(o: {
+  sheet: TargetSheet
+  group: ShotGroup | undefined
+  record: TargetFace | undefined
+  frame: Frame | undefined
+  bullet: number | undefined
+  photo: { width: number; height: number } | undefined
+}) {
+  const { sheet, group, record, frame, bullet, photo } = o
+  const turn = sheet.photoRotation ?? 0
+  const choices: Choices = group?.detection ?? {}
+  const size = group
+    ? expectedHoleSize({
+        typedDiameter: choices.expectedHoleDiameter,
+        confirmedDiameters: confirmedHoleDiameters(group),
+        bulletDiameter: bullet,
+        markerDiameter: sheet.markerDiameter,
+      })
+    : undefined
+  /** The face of the group on the photo as the sheet knows it (`faceGeometry`), for the detection. */
+  const geometry = faceGeometry({
+    sheet,
+    group,
+    record,
+    toTarget: frame?.calibration && frame.toTarget,
+  })
+  /** The marked region, else the face, else the whole turned photo (for the local scale; the run finds the target). */
+  const region = searchRegion(choices.region, geometry, size, photo, turn)
+  return { turn, choices, size, geometry, region }
+}
+
+/**
  * Hole detection in the target editor (`apps/docs/docs/models/hole-detection.md`):
  * auto detection once a photo is added, its result in one line with Accept, else the guided
  * steps (rotate, scale, one example hole and the region, detect, review); a Web Worker run
@@ -169,27 +204,15 @@ export function useHoleDetection({
   const unit = useRef(1)
   /** Photo px per m of the last run, for the measured hole of an accepted proposal. */
   const runScale = useRef(1)
-  const turn = sheet.photoRotation ?? 0
   const { system } = useUnits()
-
-  const choices: Choices = group?.detection ?? {}
-  const size = group
-    ? expectedHoleSize({
-        typedDiameter: choices.expectedHoleDiameter,
-        confirmedDiameters: confirmedHoleDiameters(group),
-        bulletDiameter: bullet,
-        markerDiameter: sheet.markerDiameter,
-      })
-    : undefined
-  /** The face of the group on the photo as the sheet knows it (`faceGeometry`), for the detection. */
-  const geometry = faceGeometry({
+  const { turn, choices, size, geometry, region } = detectionInputs({
     sheet,
     group,
     record,
-    toTarget: frame?.calibration && frame.toTarget,
+    frame,
+    bullet,
+    photo,
   })
-  /** The marked region, else the face, else the whole turned photo (for the local scale; the run finds the target). */
-  const region = searchRegion(choices.region, geometry, size, photo, turn)
 
   /** Counts stops, so pending photo and face reads cannot resume a cancelled operation. */
   const stops = useRef(0)
@@ -687,8 +710,9 @@ export function useHoleDetection({
     if (plane) applyFit(plane, false)
     else if (si) say(t('Find the target first: no black area is known.'), true)
   }
+  const calibrated = Boolean(frame?.calibration)
   /** The number of scale references; undefined while the sheet has no scale. */
-  const references = frame?.calibration ? sheet.references.length : undefined
+  const references = calibrated ? sheet.references.length : undefined
   const stepBody = [
     <RotateStep key="rotate" turn={turn} running={running} onTurnBy={turnBy} onTurn={onTurn} />,
     <ScaleStep
@@ -709,8 +733,8 @@ export function useHoleDetection({
       holeDiameter={choices.expectedHoleDiameter}
       size={size}
       tool={tool}
-      canPick={Boolean(photo && frame?.calibration) && !running}
-      calibrated={Boolean(frame?.calibration)}
+      canPick={Boolean(photo) && calibrated && !running}
+      calibrated={calibrated}
       regionRow={regionRow}
       onHoleSize={(si) => setChoice({ expectedHoleDiameter: si }, 'expectedHoleDiameter')}
       onPick={() => startTool('example')}
