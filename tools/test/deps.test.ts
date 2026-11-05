@@ -15,6 +15,7 @@ const oxlint = join(root, 'node_modules/.bin/oxlint')
 const configs = [
   '.oxlintrc.json',
   'packages/units/.oxlintrc.json',
+  'packages/locale-format/.oxlintrc.json',
   'packages/schema/.oxlintrc.json',
 ]
 

@@ -6,7 +6,7 @@ import { setShownLanguage } from '../src/i18n/shown.ts'
 import { type Catalogue, english, type Translator, translator } from '../src/i18n/translate.ts'
 import type { InteriorResponse } from '../src/lib/api-types.ts'
 import { installCoreMessages } from '../src/lib/core-message-table.ts'
-import { mmLength, presetUnits, shownLength } from '../src/lib/units.ts'
+import { mmLength, presetUnits } from '../src/lib/units.ts'
 import {
   bandLine,
   bandNotice,
@@ -232,16 +232,6 @@ describe('shownWarnings', () => {
     expect(line.text).toMatch(
       /^Simulated peak pressure 60190\.8 psi \(range \d+ to 63816\.6 psi\) is above CIP Pmax 60190\.7 psi,/,
     )
-  })
-})
-
-describe('shownLength', () => {
-  it('gives travels to 0.1 mm or 0.01 in and diameters to 0.01 mm or 0.001 in', () => {
-    const [metric, us] = [presetUnits('metric-grains'), presetUnits('us')]
-    expect(shownLength('travel', us, 22.5028 * 0.0254)).toBe('22.50 in')
-    expect(shownLength('travel', metric, 0.334621)).toBe('334.6 mm')
-    expect(shownLength('diameter', us, 0.308 * 0.0254)).toBe('.308 in')
-    expect(shownLength('diameter', metric, 7.823e-3)).toBe('7.82 mm')
   })
 })
 
