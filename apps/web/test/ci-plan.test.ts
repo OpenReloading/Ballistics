@@ -1,8 +1,17 @@
 import { execFileSync } from 'node:child_process'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
-import { importSpecifiers, plan, recordClosure } from '../scripts/ci-plan.mts'
+import {
+  importSpecifiers,
+  plan,
+  recordClosure,
+  selected,
+  testGroups,
+  testJobs,
+} from '../scripts/ci-plan.mts'
 
 const closure = recordClosure()
+const root = new URL('../../../', import.meta.url).pathname
 const script = new URL('../scripts/ci-plan.mts', import.meta.url).pathname
 
 it('walks the imports of the record pages', () => {
@@ -126,6 +135,120 @@ it('prerenders every record when record data, page code or shared parts changed'
     })
 })
 
+const packages =
+  '--filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
+
+it('tests every workspace of every group without a list of affected ones', () => {
+  expect(testJobs()).toEqual([
+    { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
+    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'packages', filter: packages, e2eUnit: true },
+  ])
+})
+
+it('tests the workspaces a change reaches and leaves out the groups it does not', () => {
+  // a change of units as pnpm selects it: units and every workspace that depends on it
+  const units = [
+    'units',
+    'web',
+    'cli',
+    'core',
+    'docs',
+    'api',
+    'tools',
+    'schema',
+    'data',
+    'importers',
+  ]
+  expect(plan(['packages/units/src/units.ts'], closure, units).tests).toEqual([
+    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'packages', filter: packages, e2eUnit: false },
+  ])
+  expect(plan(['packages/drawing/src/index.ts'], closure, ['drawing', 'web', 'cli']).tests).toEqual(
+    [
+      { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
+      { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+      { name: 'packages', filter: '--filter @open-reloading/cli', e2eUnit: false },
+    ],
+  )
+  expect(plan(['apps/e2e/tests/web/groups.spec.ts'], closure, ['e2e']).tests).toEqual([
+    { name: 'packages', filter: '', e2eUnit: true },
+  ])
+})
+
+it('tests every group for a change outside the workspaces, an unknown or empty selection, and none for prose', () => {
+  for (const f of [
+    'pnpm-lock.yaml',
+    'package.json',
+    '.github/workflows/ci.yml',
+    'tsconfig.base.json',
+  ])
+    expect(plan(['packages/drawing/src/index.ts', f], closure, ['drawing']).tests, f).toEqual(
+      testJobs(),
+    )
+  expect(plan(['packages/drawing/src/index.ts'], closure).tests).toEqual(testJobs())
+  // a folder of packages/ that is no workspace: pnpm selects nothing for it
+  expect(plan(['packages/stray/src/index.ts'], closure, []).tests).toEqual(testJobs())
+  // and it selects the workspaces beside it alone
+  expect(
+    plan(['packages/stray/src/index.ts', 'packages/drawing/src/index.ts'], closure, ['drawing'])
+      .tests,
+  ).toEqual(testJobs())
+  // a workspace that no group lists (a new one)
+  expect(testJobs(['drawing', 'stray'])).toEqual(testJobs())
+  expect(plan(['apps/docs/docs/research/index.md'], closure, ['docs']).tests).toEqual(
+    testJobs(['docs']),
+  )
+  expect(plan(['CONTRIBUTING.md'], closure, []).tests).toEqual([])
+})
+
+// A test reads these workspaces' files without importing them; each reader declares the workspace it reads as a
+// devDependency, so pnpm selects the reader when the read workspace changes.
+it.each([
+  ['data', 'core'], // the event types (core/test/competition)
+  ['data', 'drawing'], // the bullet records (drawing/test/bullet-outline.test.ts)
+  ['web', 'docs'], // files named in `Code:` lines, the photo checks (docs/scripts/photo-guide.test.mts)
+  ['web', 'e2e'], // the German catalogue (e2e/scripts/visual-check.test.ts)
+  ['web', 'tools'], // the browser sources (tools/test/browser-builtins.test.ts)
+  ['importers', 'docs'], // the table fields (docs/scripts/table-import.test.mts)
+  ['importers', 'tools'], // the browser sources and exports (tools/test)
+  ['drawing', 'tools'], // the browser sources and exports (tools/test)
+  ['cli', 'docs'], // files named in `Code:` lines and the research log
+  ['tools', 'docs'], // files named in `Code:` lines and the research log
+])('selects %s and its reader %s for a change of %s', (read, reader) => {
+  expect(selected(`...@open-reloading/${read}`)).toContain(reader)
+})
+
+it('tests every workspace that has tests, in exactly one group', () => {
+  const members = Object.values(testGroups).flat()
+  const dirs = [
+    ...['packages', 'apps'].flatMap((d) => readdirSync(`${root}${d}`).map((n) => `${d}/${n}`)),
+    'tools',
+  ]
+  const withTests = dirs.flatMap((dir) => {
+    const file = `${root}${dir}/package.json`
+    if (!existsSync(file)) return []
+    const { name, scripts } = JSON.parse(readFileSync(file, 'utf8')) as {
+      name: string
+      scripts?: Record<string, string>
+    }
+    return scripts?.test === undefined ? [] : [name.replace('@open-reloading/', '')]
+  })
+  expect(members.length).toBe(new Set(members).size)
+  expect([...members].sort()).toEqual(withTests.sort())
+})
+
+it('leaves the root project out of the selection: plan reads its files itself', () => {
+  expect(selected('openreloading')).toEqual([])
+  expect(selected('@open-reloading/cli')).toEqual(['cli'])
+})
+
+it('falls back in ci.yml to the test jobs of every group', () => {
+  expect(readFileSync(`${root}.github/workflows/ci.yml`, 'utf8')).toContain(
+    JSON.stringify(testJobs()),
+  )
+})
+
 it('falls back to a full build when the change list is empty', () => {
   expect(plan([], closure)).toMatchObject({ check: true, e2e: true, prerender: 'full' })
 })
@@ -137,7 +260,7 @@ const run = (env: Record<string, string>, ...args: string[]) =>
   }).toString()
 
 it('is full unless the event is a pull request with a base commit that exists', () => {
-  const full = 'check=true\ne2e=true\nprerender=full\n'
+  const full = `check=true\ne2e=true\nprerender=full\ntests=${JSON.stringify(testJobs())}\n`
   expect(run({ EVENT_NAME: 'push', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({ EVENT_NAME: 'release', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({})).toBe(full)

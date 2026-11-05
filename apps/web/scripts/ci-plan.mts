@@ -1,12 +1,15 @@
 /**
  * Decides which CI jobs a run needs and how much of the web app it builds, from the files changed
  * since a base commit. Prints `check=true|false` (lint, build, types and unit tests), `e2e=true|false`
- * (the API's conformance run and the e2e tests on the static export) and
+ * (the API's conformance run and the e2e tests on the static export),
  * `prerender=full|sample` (every record page or the cartridge sample of `src/lib/prerender-sample.ts`)
- * as lines for $GITHUB_OUTPUT; the reason goes to stderr.
+ * and `tests=` (the test jobs as JSON: each group of workspaces that the change reaches, by pnpm's
+ * `--filter "...[<base>]"`, which adds every workspace that depends on a changed one) as lines for
+ * $GITHUB_OUTPUT; the reason goes to stderr.
  *
  * Fail closed: anything but a pull request, a missing base commit, a failed git call or an empty change
- * list gives every job and `prerender=full`.
+ * list gives every job, every test group and `prerender=full`; a change outside the workspaces (the
+ * lockfile, a root config, a workflow) or a failed pnpm call gives every test group.
  *
  *   node scripts/ci-plan.mts                      CI: EVENT_NAME and BASE_SHA from the environment
  *   node scripts/ci-plan.mts --stamp FILE         local: changes since the build recorded in FILE
@@ -127,10 +130,40 @@ export function recordClosure(root = repoRoot) {
   return { files, packages }
 }
 
+/**
+ * The test jobs of ci.yml and their workspaces; of `e2e` only the unit tests run (`test:unit`), in `packages`. A test
+ * that reads another workspace's files declares it as a devDependency, so pnpm's selection reaches it.
+ */
+export const testGroups: Record<string, string[]> = {
+  drawing: ['drawing'],
+  web: ['web'],
+  packages: ['units', 'schema', 'core', 'importers', 'data', 'api', 'cli', 'docs', 'tools', 'e2e'],
+}
+
+/** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */
+export type TestJob = { name: string; filter: string; e2eUnit: boolean }
+
+/**
+ * The test jobs for the workspaces in `affected` (names without the scope); every group's for undefined and for a
+ * workspace no group lists (a new one), which the completeness test of `testGroups` then names.
+ */
+export function testJobs(affected?: string[]): TestJob[] {
+  const listed = Object.values(testGroups).flat()
+  const only = affected?.every((m) => listed.includes(m)) ? affected : undefined
+  return Object.entries(testGroups).flatMap(([name, members]) => {
+    const hit = members.filter((m) => only === undefined || only.includes(m))
+    const tested = hit.filter((m) => m !== 'e2e')
+    const e2eUnit = hit.includes('e2e')
+    if (tested.length === 0 && !e2eUnit) return []
+    return [{ name, filter: tested.map((m) => `--filter @open-reloading/${m}`).join(' '), e2eUnit }]
+  })
+}
+
 export type Plan = {
   check: boolean
   e2e: boolean
   prerender: 'full' | 'sample'
+  tests: TestJob[]
   reason: string
 }
 
@@ -138,10 +171,21 @@ const everything = (reason: string): Plan => ({
   check: true,
   e2e: true,
   prerender: 'full',
+  tests: testJobs(),
   reason,
 })
 
-export function plan(all: string[], closure = recordClosure()): Plan {
+/** A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone. */
+const inWorkspace = (file: string) => {
+  const folder = /^((packages|apps)\/[^/]+|tools)\//.exec(file)?.[1]
+  return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
+}
+
+/**
+ * The plan for the changed files `all`; `affected` are the workspaces pnpm selects for them (names
+ * without the scope), undefined when unknown. Unknown, or none for a code change, tests every group.
+ */
+export function plan(all: string[], closure = recordClosure(), affected?: string[]): Plan {
   if (all.length === 0) return everything('no changed files found')
   const code = all.filter((f) => !docsOnly.some((re) => re.test(f)))
   if (code.length === 0)
@@ -149,8 +193,10 @@ export function plan(all: string[], closure = recordClosure()): Plan {
       check: false,
       e2e: false,
       prerender: 'sample',
+      tests: [],
       reason: 'only prose changed',
     }
+  const tests = testJobs(code.every(inWorkspace) && affected?.length ? affected : undefined)
   const changed = code.filter((f) => !ignored.some((re) => re.test(f)))
   if (!changed.some((f) => webInputs.some((re) => re.test(f)))) {
     const e2e = changed.some((f) => e2eInputs.some((re) => re.test(f)))
@@ -158,6 +204,7 @@ export function plan(all: string[], closure = recordClosure()): Plan {
       check: true,
       e2e,
       prerender: 'sample',
+      tests,
       reason: 'no changed file feeds the web build',
     }
   }
@@ -169,12 +216,39 @@ export function plan(all: string[], closure = recordClosure()): Plan {
       packageInputs.some((re) => re.test(f)),
   )
   return record
-    ? everything(`${record} feeds the record pages`)
-    : { ...everything('no changed file feeds the record pages'), prerender: 'sample' }
+    ? { ...everything(`${record} feeds the record pages`), tests }
+    : { ...everything('no changed file feeds the record pages'), prerender: 'sample', tests }
 }
 
 /** git by an absolute path of a system directory, never through `PATH`. */
 const gitPath = ['/usr/bin', '/usr/local/bin', '/bin'].map((d) => `${d}/git`).find(existsSync)
+/** pnpm next to the running Node (where CI links it) or in a system directory, never through `PATH`. */
+const pnpmPath = [path.dirname(process.execPath), '/usr/local/bin', '/usr/bin', '/bin']
+  .map((d) => `${d}/pnpm`)
+  .find(existsSync)
+
+/**
+ * The workspaces (names without the scope) pnpm selects with `filter`, such as `...[<base>]`: the changed ones and
+ * every workspace that depends on them, devDependencies included; undefined when pnpm fails.
+ */
+export function selected(filter: string): string[] | undefined {
+  try {
+    if (pnpmPath === undefined) return
+    const listed = JSON.parse(
+      execFileSync(pnpmPath, ['--filter', filter, 'ls', '--depth', '-1', '--json'], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }),
+    ) as { name: string; path: string }[]
+    // the root project: plan reads the files outside the workspaces itself
+    return listed
+      .filter((p) => path.resolve(p.path) !== path.resolve(repoRoot))
+      .map((p) => p.name.replace(/^@open-reloading\//, ''))
+  } catch {
+    return
+  }
+}
 
 function git(...args: string[]) {
   if (gitPath === undefined) throw new Error('git not found in the system directories')
@@ -206,6 +280,7 @@ const nothingChanged: Plan = {
   check: false,
   e2e: false,
   prerender: 'sample',
+  tests: [],
   reason: 'nothing changed since the recorded build',
 }
 
@@ -235,7 +310,13 @@ function decide(): Plan {
     const changed = changedSince(base)
     // an empty list is a doubt in CI, but the answer for a local run against its own last build
     const p: Plan =
-      stampFile !== undefined && changed.length === 0 ? { ...nothingChanged } : plan(changed)
+      stampFile !== undefined && changed.length === 0
+        ? { ...nothingChanged }
+        : plan(
+            changed,
+            recordClosure(),
+            stampFile === undefined ? selected(`...[${base}]`) : undefined,
+          )
     return settle(p, stampFile !== undefined, built)
   } catch (e) {
     return full(`plan failed: ${e instanceof Error ? e.message.split('\n')[0] : String(e)}`)
@@ -254,7 +335,7 @@ if (import.meta.main) {
     writeFileSync(stamp, `${git('rev-parse', 'HEAD').trim()} ${mode}\n`)
   } else {
     const p = decide()
-    const out = `check=${p.check}\ne2e=${p.e2e}\nprerender=${p.prerender}`
+    const out = `check=${p.check}\ne2e=${p.e2e}\nprerender=${p.prerender}\ntests=${JSON.stringify(p.tests)}`
     console.log(out)
     console.error(`ci-plan: ${out.replaceAll('\n', ' ')}: ${p.reason}`)
   }

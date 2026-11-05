@@ -19,8 +19,9 @@ COPY apps/e2e/package.json apps/e2e/
 COPY apps/docs/package.json apps/docs/
 RUN pnpm install --frozen-lockfile --ignore-scripts --filter "@open-reloading/docs..."
 COPY packages packages
-# the libraries the docs document and the API its REST page describes: every workspace the docs depend on
-RUN pnpm --filter "@open-reloading/docs^..." run build
+# the libraries the docs document and the API its REST page describes (the docs also depend on web, cli and tools,
+# whose files their tests read; the site needs no build of them)
+RUN pnpm --filter "@open-reloading/api..." --filter "@open-reloading/drawing..." --filter "@open-reloading/importers..." run build
 COPY apps/docs apps/docs
 # the API the REST page links to, no link when unset
 ARG API_URL
