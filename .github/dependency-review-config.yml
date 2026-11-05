@@ -14,6 +14,15 @@ allow-licenses:
   - Unlicense
   - BlueOak-1.0.0
   - Python-2.0
+  # weak copyleft, the family's default list: axe-core and lightningcss (MPL-2.0), sharp's libvips (LGPL-3.0-or-later)
+  - MPL-2.0
+  - LGPL-2.1-or-later
+  - LGPL-3.0-or-later
 allow-dependencies-licenses:
   - pkg:npm/caniuse-lite # CC-BY-4.0, a browser-support data table without code
+  # the dependency graph reads these as AND or with an extra licence; their package.json says otherwise
+  - pkg:npm/json-schema # (AFL-2.1 OR BSD-3-Clause), read as AND
+  - pkg:npm/path-is-inside # (WTFPL OR MIT), read as AND
+  - pkg:npm/unicode-match-property-value-ecmascript # MIT, read with LicenseRef-scancode-unicode
+  - pkg:npm/uri-js # BSD-2-Clause, read with BSD-2-Clause-Views
 

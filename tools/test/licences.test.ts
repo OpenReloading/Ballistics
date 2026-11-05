@@ -98,11 +98,11 @@ it('wants a reason on the line of every excepted package', () => {
   ])
 })
 
-it('keeps no exception in the review configuration without a reason, and no copyleft licence', () => {
+it('keeps no exception in the review configuration without a reason, and no strong copyleft licence', () => {
   const text = readFileSync('../.github/dependency-review-config.yml', 'utf8')
   expect(withoutReason(text)).toEqual([])
   const { allow } = readPolicy(text)
-  expect([...allow].filter((l) => /GPL|SSPL|MPL|CC-BY/.test(l))).toEqual([])
+  expect([...allow].filter((l) => /(^|[^L])GPL|SSPL|CC-BY/.test(l))).toEqual([])
 })
 
 it('writes the NOTICE block with one line per package', () => {
