@@ -176,7 +176,7 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
   ])
 })
 
-it('tests every group for a change outside the workspaces, an unknown selection, and none for prose', () => {
+it('tests every group for a change outside the workspaces, an unknown or empty selection, and none for prose', () => {
   for (const f of [
     'pnpm-lock.yaml',
     'package.json',
@@ -187,6 +187,8 @@ it('tests every group for a change outside the workspaces, an unknown selection,
       testJobs(),
     )
   expect(plan(['packages/drawing/src/index.ts'], closure).tests).toEqual(testJobs())
+  // a folder of packages/ that is no workspace: pnpm selects nothing for it
+  expect(plan(['packages/stray/src/index.ts'], closure, []).tests).toEqual(testJobs())
   expect(plan(['apps/docs/docs/research/index.md'], closure, ['docs']).tests).toEqual(
     testJobs(['docs']),
   )

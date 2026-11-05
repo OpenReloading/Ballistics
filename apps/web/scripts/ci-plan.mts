@@ -175,7 +175,7 @@ const inWorkspace = /^((packages|apps)\/[^/]+|tools)\//
 
 /**
  * The plan for the changed files `all`; `affected` are the workspaces pnpm selects for them (names
- * without the scope), undefined when unknown, which tests every group.
+ * without the scope), undefined when unknown. Unknown, or none for a code change, tests every group.
  */
 export function plan(all: string[], closure = recordClosure(), affected?: string[]): Plan {
   if (all.length === 0) return everything('no changed files found')
@@ -188,7 +188,9 @@ export function plan(all: string[], closure = recordClosure(), affected?: string
       tests: [],
       reason: 'only prose changed',
     }
-  const tests = testJobs(code.every((f) => inWorkspace.test(f)) ? affected : undefined)
+  const tests = testJobs(
+    code.every((f) => inWorkspace.test(f)) && affected?.length ? affected : undefined,
+  )
   const changed = code.filter((f) => !ignored.some((re) => re.test(f)))
   if (!changed.some((f) => webInputs.some((re) => re.test(f)))) {
     const e2e = changed.some((f) => e2eInputs.some((re) => re.test(f)))
