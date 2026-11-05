@@ -72,7 +72,6 @@ const mappingList = page(
 )
 
 /** `GET` of `/target-faces`, `/federations`, `/disciplines`, `/target-mappings`, `/caliber-classes` and `/event-types`, and their `/:id` routes. */
-// biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const federationRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
   { catalogue },

@@ -519,7 +519,6 @@ describe('computeRows in the target mode', () => {
   function api(n: number, solve: () => Promise<Response>, density?: number) {
     const requests: string[] = []
     set++
-    // biome-ignore lint/suspicious/useAwait: stands in for fetch, an aborted signal rejects rather than throws
     vi.stubGlobal('fetch', async (url: string, init?: { signal?: AbortSignal }) => {
       if (url === '/api/manufacturers') return json({ total: 1, items: [{ id: 'm', name: 'M' }] })
       if (url.startsWith('/api/powders?'))

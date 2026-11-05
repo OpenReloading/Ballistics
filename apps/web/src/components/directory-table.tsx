@@ -171,7 +171,7 @@ const noFacetKeys: readonly string[] = []
  */
 export function useListState(facetKeys: readonly string[] = noFacetKeys) {
   const [state, setState] = useState<DirectoryState>(emptyDirectory)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the keys of a list are fixed
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- the keys of a list are fixed
   useEffect(() => setState(readDirectory(window.location.search, facetKeys)), [])
   useEffect(() => {
     // the first render's empty state is not the URL's: written only after a change
@@ -419,6 +419,7 @@ export function DirectoryTable<T extends { id: string }>({
   }
   // the remembered cell may hold nothing to focus or be hidden at this width (below 48em): then
   // the row's link is the stop, so the table never has none
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs after every commit by design; keepStop sets state only when the stop moved
   useLayoutEffect(() => keepStop(body.current, stopId, link, setNav))
   // the server rows are unfiltered (the URL is read after mounting): a tick before hydration
   // would be replayed on a row the filters then hide, so the select cells swallow clicks until

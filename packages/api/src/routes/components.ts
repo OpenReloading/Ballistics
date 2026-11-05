@@ -165,7 +165,6 @@ const manufacturerList = page(
 )
 
 /** `GET` of `/manufacturers`, `/powders`, `/primers`, `/bullets` and `/cases`, and their `/:id` routes. */
-// biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const componentRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
   { catalogue },

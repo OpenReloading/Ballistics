@@ -155,7 +155,6 @@ export function ReportIssueDialog({
     (o) => ticked.includes(o.label) && (!o.needs || ticked.includes(o.needs)),
   )
   const activeKey = active.map((o) => o.label).join('\n')
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the ticked boxes are `activeKey`
   useEffect(() => {
     let current = true
     void Promise.all(
@@ -167,6 +166,7 @@ export function ReportIssueDialog({
     return () => {
       current = false
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- the ticked boxes are `activeKey`
   }, [activeKey, options])
   const url = context && reportUrl(repository, { area, type, what, context, blocks })
   const sent = url ? reportSent(url) : ''

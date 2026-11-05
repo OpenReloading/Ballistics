@@ -423,7 +423,6 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
   useEffect(() => {
     if (!short && tab === 'cartridge') setTab('results')
   }, [short, tab, setTab])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the tabs show once there is an outcome
   useEffect(() => {
     const row = list.current
     if (!framed || !row) {

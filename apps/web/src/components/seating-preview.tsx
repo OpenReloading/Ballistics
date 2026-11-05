@@ -905,7 +905,6 @@ function useReportSeated(
     atStart,
   ]
   // no seated bullet reports {}: the page forgets the earlier seating
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the reported values only, not the seating object
   useEffect(() => {
     const values = seatedReport({
       caseVolume,
@@ -920,6 +919,7 @@ function useReportSeated(
     if (sliding) return send.push(values)
     send.cancel()
     startTransition(() => seated.current(values))
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- the reported values only, not the seating object
   }, [...key, figure, sliding])
 }
 

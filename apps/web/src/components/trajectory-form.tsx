@@ -314,7 +314,7 @@ function RecordDetails({
         {(record.ballisticCoefficients ?? []).map((c, i) => {
           const values = { model: c.dragModel, value: c.value }
           return (
-            // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
+            // oxlint-disable-next-line react/no-array-index-key -- BCs keep the record order and have no id
             <li key={i}>
               {c.minVelocity
                 ? t('{model} {value} lb/in² from {velocity}', {
@@ -719,7 +719,7 @@ function DatabaseBullet({
             <Stack gap="xs" mt="xs">
               {bcOptions.values.map((v, i) => (
                 <Radio
-                  // biome-ignore lint/suspicious/noArrayIndexKey: BCs keep the record order and have no id
+                  // oxlint-disable-next-line react/no-array-index-key -- BCs keep the record order and have no id
                   key={i}
                   value={String(i)}
                   label={`${t('{value} lb/in²', { value: v.value })}${v.note ? ` (${v.note})` : ''}`}
@@ -1132,7 +1132,6 @@ export function TrajectoryForm({
   // the round default of the shown unit (runs after useFieldUnits' conversion); a later unit switch
   // converts it like any value, so the result does not change
   const firstRange = useRef(system.range)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once the units are read
   useEffect(() => {
     const before = firstRange.current
     if (!ready || before === system.range) return
@@ -1148,6 +1147,7 @@ export function TrajectoryForm({
       }
       return next as Fields
     })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs once the units are read
   }, [ready])
 
   const fields = form.values
@@ -1350,7 +1350,6 @@ export function TrajectoryForm({
   }
 
   // a copied link fills the form once
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on mount only
   useEffect(() => {
     preloadChart()
     readDesigns()
@@ -1366,28 +1365,28 @@ export function TrajectoryForm({
         setManualModel,
         setTwistHand,
       })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs on mount only
   }, [])
 
   const loadVelocity = load.muzzleVelocity
-  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load, not a unit switch
   useEffect(() => {
     if (loadVelocity !== undefined)
       form.setFieldValue('muzzleVelocity', {
         text: roundedFieldText('velocity', system, loadVelocity),
         si: loadVelocity,
       })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the load, not a unit switch
   }, [loadVelocity])
   const loadTwist = load.twist
-  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load, not a unit switch
   useEffect(() => {
     if (loadTwist !== undefined)
       form.setFieldValue('twist', {
         text: roundedFieldText('twist', system, loadTwist),
         si: loadTwist,
       })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the load, not a unit switch
   }, [loadTwist])
   const [loadSight, loadZero] = [load.sightHeight, load.zeroRange]
-  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load's firearm, not a unit switch
   useEffect(() => {
     if (loadSight !== undefined)
       form.setFieldValue('sightHeight', {
@@ -1399,12 +1398,12 @@ export function TrajectoryForm({
         text: roundedFieldText('range', system, loadZero),
         si: loadZero,
       })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the load's firearm, not a unit switch
   }, [loadSight, loadZero])
   /** The zero air and drag factor fields hold a firearm of the load's values. */
   const zeroFromLoad = useRef(false)
   const loadZeroAir = [load.zeroTemperature, load.zeroPressure, load.zeroHumidity]
   const [loadFactor, loadFactorSource] = [load.dragFactor, load.dragFactorSource]
-  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load's firearm, not a unit switch
   useEffect(() => {
     if (loadSight !== undefined) {
       // a firearm without them leaves typed or linked values alone, unless they are another
@@ -1417,6 +1416,7 @@ export function TrajectoryForm({
       zeroFromLoad.current = false
       fillZero(() => undefined)
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the load's firearm, not a unit switch
   }, [loadSight, ...loadZeroAir, loadFactor, loadFactorSource])
   const loadBullet = load.bullet
   /** The load has no bullet record: the tab offers its own bullet. */
@@ -1425,7 +1425,6 @@ export function TrajectoryForm({
   const lastBullet = useRef(loadBullet)
   /** The load's bullet took the place of one entered or chosen in this tab. */
   const [replaced, setReplaced] = useState(false)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the load's bullet record
   useEffect(() => {
     const before = lastBullet.current
     lastBullet.current = loadBullet
@@ -1446,6 +1445,7 @@ export function TrajectoryForm({
       )
     setSource('database')
     void chooseRecord(loadBullet)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- follows the load's bullet record
   }, [loadBullet])
 
   const fromDatabase = source === 'database' && record.status === 'ok'

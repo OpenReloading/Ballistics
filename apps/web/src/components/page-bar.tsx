@@ -204,7 +204,7 @@ export function PageBar({
     return () => document.removeEventListener('pointerdown', outside)
   }, [open])
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Escape closes the phone panel, also from its toggle
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Escape closes the phone panel, also from its toggle
     <div
       ref={root}
       className="page-bar"
@@ -228,6 +228,7 @@ export function PageBar({
         <div
           className="page-bar-status"
           ref={setStatusLine}
+          // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a cut-off status line takes focus, so the keyboard reaches its whole text in the tooltip
           tabIndex={full ? 0 : undefined}
           role="note"
           aria-label={full || undefined}
@@ -255,7 +256,6 @@ export function PageBar({
           >
             <DotsThree size={20} aria-hidden="true" />
           </ActionIcon>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: an action chosen closes the phone panel */}
           <div
             id={id}
             role="presentation"

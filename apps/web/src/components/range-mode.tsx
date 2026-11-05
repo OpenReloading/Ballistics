@@ -101,7 +101,7 @@ function LoadChoice({ r }: { r: ReturnType<typeof useRangeMode> }) {
         // room for both lines from the start: the names read later move nothing below
         <div className="range-load-summary" data-load-summary style={{ minHeight: '2.875rem' }}>
           {summary.map((line, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: at most two lines in a fixed order
+            // oxlint-disable-next-line react/no-array-index-key -- at most two lines in a fixed order
             <Text key={i} size="sm" c="dimmed" mt={4}>
               {line}
             </Text>
@@ -266,7 +266,7 @@ export function RangeMode() {
               <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {r.string?.shots.map((shot, k) => (
                   // shots have no id: the position in the string is the key
-                  // biome-ignore lint/suspicious/noArrayIndexKey: shots are only appended
+                  // oxlint-disable-next-line react/no-array-index-key -- shots are only appended
                   <li key={k}>
                     <Group justify="space-between" wrap="nowrap">
                       <Text td={shot.excluded ? 'line-through' : undefined}>

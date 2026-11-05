@@ -392,7 +392,7 @@ export function FileCard({
             {e.kind &&
               e.map?.map((m, i) => (
                 <ColumnRow
-                  // biome-ignore lint/suspicious/noArrayIndexKey: the columns of a card are fixed, the index is the column
+                  // oxlint-disable-next-line react/no-array-index-key -- the columns of a card are fixed, the index is the column
                   key={`${e.id}-${i}`}
                   e={{ ...e, card: table, kind: e.kind as TableKind }}
                   i={i}

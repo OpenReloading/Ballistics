@@ -39,12 +39,12 @@ export function TargetFaceFigure({ shape, label }: { shape: FaceShape; label: st
       aria-label={label}
     >
       {zones.map((z, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
+        // oxlint-disable-next-line react/no-array-index-key -- a fixed list in drawing order, rings may share a size
         <Outline key={i} e={z} fill={z.colour} />
       ))}
       <g fill="none" strokeWidth={1}>
         {lines.map((l, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: a fixed list in drawing order, rings may share a size
+          // oxlint-disable-next-line react/no-array-index-key -- a fixed list in drawing order, rings may share a size
           <Outline key={i} e={l} stroke={l.colour} vectorEffect="non-scaling-stroke" />
         ))}
       </g>

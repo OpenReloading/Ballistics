@@ -6,7 +6,7 @@ import { type BulletProfile, recordProfile } from '@open-reloading/drawing/bulle
 import type { Bullet } from '@open-reloading/schema'
 import { ArrowsLeftRight, WarningCircle } from '@phosphor-icons/react'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 import { msg, type Translator } from '../i18n/translate.ts'
 import { fetchRecord } from '../lib/api-fetch.ts'
@@ -89,7 +89,7 @@ function drawings(
     const p = nth(profiles, i)
     if ('reason' in p)
       return (
-        <Text component="p" inherit m={0} c="dimmed" fz="xs">
+        <Text key={b.id} component="p" inherit m={0} c="dimmed" fz="xs">
           {t('No drawing: {reason}', { reason: p.reason })}
         </Text>
       )
@@ -97,7 +97,7 @@ function drawings(
     const id = `${b.id}-compare`
     const title = t('Outline, {name}', { name: productLabel(b) })
     return (
-      <>
+      <Fragment key={b.id}>
         <TechnicalDrawing
           id={id}
           title={title}
@@ -113,7 +113,7 @@ function drawings(
           model={model}
           printScale={1}
         />
-      </>
+      </Fragment>
     )
   })
 }
@@ -165,7 +165,6 @@ export function CompareView() {
   const wanted = parsed.status === 'ok' ? parsed.ids.join(',') : ''
   const [got, setGot] = useState<Fetched>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Retry raises `attempt` to fetch again
   useEffect(() => {
     if (!wanted) return
     let live = true

@@ -519,7 +519,7 @@ function CombinedCaption({ unit }: { unit: LengthUnit }) {
     <span className="caption-combined">
       {' '}
       <Tooltip label={definition} events={tipEvents} multiline maw={360}>
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: the keyboard reaches the definition's tooltip */}
+        {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the keyboard reaches the definition's tooltip */}
         <span className="caption-combined-short" role="note" aria-label={definition} tabIndex={0}>
           {unit === 'mm'
             ? t('Combined: nominal minimum difference per region, chamber minus cartridge, in mm.')

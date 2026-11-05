@@ -123,7 +123,7 @@ export function FieldStrip({
       {tags.length > 0 && (
         <div className="fact-tags">
           {tags.map((tag, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: two facts can read the same
+            // oxlint-disable-next-line react/no-array-index-key -- two facts can read the same
             <MutedBadge key={i}>{say(t, tag)}</MutedBadge>
           ))}
         </div>

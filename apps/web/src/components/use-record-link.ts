@@ -17,7 +17,6 @@ export function useRecordLink(
   menu: RefObject<FileMenuHandle | null>,
   say: (message: Message | undefined) => void,
 ) {
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('record')
     if (!id) return
@@ -33,5 +32,6 @@ export function useRecordLink(
       },
       () => say(msg('The records of this browser could not be read.')),
     )
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once on mount
   }, [])
 }

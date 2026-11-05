@@ -999,10 +999,11 @@ export function Workbench() {
   const [scanOpen, setScanOpen] = useState(false)
   const [ScanDialog, setScanDialog] = useState<typeof ScanLabelDialog>()
   const { changed: countChange } = reminder
+  const { onStored } = load
   const stored = useCallback(() => {
-    load.onStored()
+    onStored()
     countChange()
-  }, [load.onStored, countChange])
+  }, [onStored, countChange])
   const {
     asNewLoad,
     bullet,
@@ -1335,7 +1336,6 @@ export function Workbench() {
     <LoadContext value={load}>
       <ResultContext value={result}>
         <InputEcho value={echo}>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: catches Ctrl+Enter from any control of the bar and the workspace */}
           <div className="page-frame" role="presentation" onKeyDown={frameKeyDown(inputs, run)}>
             <PageBar
               title={t('Load workbench')}

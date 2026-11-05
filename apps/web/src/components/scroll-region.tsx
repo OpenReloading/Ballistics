@@ -61,7 +61,6 @@ export function ScrollRegion({ label, children }: { label: string; children: Rea
     const end = b.scrollWidth - b.clientWidth - left > 1
     setMore(start && end ? 'both' : start ? 'start' : end ? 'end' : undefined)
   }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: edges reads the ref only
   useEffect(
     () =>
       ref.current

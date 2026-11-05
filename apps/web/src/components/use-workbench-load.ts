@@ -1573,12 +1573,10 @@ export function useWorkbenchState() {
         setCases(ownCases(records))
       })
       .catch(() => {})
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
     void readDesigns()
   }, [])
   // the weight of the opened load's firearm, once the library has been read
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a new library or firearm only
   useEffect(() => {
     if (!gunPending.current) return
     const f = firearmList.find((r) => r.id === firearm)
@@ -1590,6 +1588,7 @@ export function useWorkbenchState() {
     setGunFields({
       firearmMass: { text: fixedFieldText('firearmMass', unitsNow.current, mass), si: mass },
     })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a new library or firearm only
   }, [firearm, firearms, opens])
   /** A bullet design of this browser in place of a record; `fill` writes its mass into the Bullet mass field. */
   function takeBulletDesign(
@@ -2765,7 +2764,6 @@ export function useWorkbenchState() {
 
   // a run asked for by the link, after the render that holds the filled values
   const [runWhenFilled, setRunWhenFilled] = useState(false)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once, when the link asked for it
   useEffect(() => {
     // a record arriving later marks the load changed and would abort the run: wait for them all
     const loading = Object.values(asked).some((a) => a && !a.failed)
@@ -2773,6 +2771,7 @@ export function useWorkbenchState() {
     if (!runWhenFilled || fields.charge?.si === undefined || loading || !seated.figure) return
     setRunWhenFilled(false)
     run()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once, when the link asked for it
   }, [runWhenFilled, fields, asked, seated.figure])
 
   /** Runs a changed load once it is complete and valid; an invalid value shows its error only. */
@@ -2823,7 +2822,6 @@ export function useWorkbenchState() {
   }, [asked])
 
   // a copied link fills the form once
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on mount only
   useEffect(() => {
     const query = linkParams(window.location)
     const link = linkedLoad(query)
@@ -2853,6 +2851,7 @@ export function useWorkbenchState() {
         ])
       })()
     else startFromDefaults()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs on mount only
   }, [])
 
   // a copied link pasted into this tab changes the fragment only, which loads no page: reload it
@@ -3490,7 +3489,6 @@ export function useWorkbenchState() {
   )
   const sessionNames = Object.fromEntries(chronoSessions.map((r) => [sessionRef(r.id), r.name]))
   const noteKey = JSON.stringify([lots, noteList, sessionNames])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `noteKey` holds the values
   const loadNotes = useMemo<LoadNotesState>(
     () => ({
       lots,
@@ -3500,6 +3498,7 @@ export function useWorkbenchState() {
       dismiss: (session, rule) =>
         setSnapshots((stored) => dismissed(stored, snapshotsNow.current, session, rule)),
     }),
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- `noteKey` holds the values
     [noteKey, t],
   )
   const loadParts: LoadParts = {
@@ -3548,7 +3547,6 @@ export function useWorkbenchState() {
   const suggestionKey = JSON.stringify(followKeys.map((k) => suggestions[k]?.si))
   const seatedVolume = seatingOwnsVolume(seated)
   // a followed field takes its default when it changes; what was typed is not in `followed`
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of a default or of what follows
   useEffect(() => {
     const writes = followWrites({
       followed,
@@ -3565,6 +3563,7 @@ export function useWorkbenchState() {
           form.clearFieldError(k)
         }
       })
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a change of a default or of what follows
   }, [suggestionKey, followed, seatedVolume])
   const bc = bcOf(bulletNow)
 

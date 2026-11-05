@@ -31,15 +31,15 @@ const install = (cwd = repo, extra: Record<string, string> = {}) =>
     encoding: 'utf8',
   })
 
-/** A fake Biome that answers `--version`, records its other calls and exits with `code`. */
-function fakeBiome(code: number) {
+/** A fake `tool` (biome or oxlint) that answers `--version`, records its other calls and exits with `code`. */
+function fake(tool: string, code: number) {
   const bin = join(repo, 'node_modules/.bin')
   mkdirSync(bin, { recursive: true })
   writeFileSync(
-    join(bin, 'biome'),
-    `#!/bin/sh\n[ "$1" = --version ] && exit 0\necho "biome $*" >> biome.log\nexit ${code}\n`,
+    join(bin, tool),
+    `#!/bin/sh\n[ "$1" = --version ] && exit 0\necho "${tool} $*" >> ${tool}.log\nexit ${code}\n`,
   )
-  chmodSync(join(bin, 'biome'), 0o755)
+  chmodSync(join(bin, tool), 0o755)
 }
 
 function commit(extra: Record<string, string> = {}) {
@@ -147,28 +147,42 @@ it('installs nothing in CI', () => {
 
 it('checks the staged files and refuses a commit Biome fails', () => {
   install()
-  fakeBiome(1)
+  fake('oxlint', 0)
+  fake('biome', 1)
   const run = commit()
   expect(run.status).not.toBe(0)
   expect(run.stderr).toContain('fix the findings above')
   expect(readFileSync(join(repo, 'biome.log'), 'utf8')).toContain('check --staged')
 })
 
-it('lets a commit through when Biome passes', () => {
+it('lints the staged code files with Oxlint and refuses a commit it fails', () => {
   install()
-  fakeBiome(0)
+  fake('oxlint', 1)
+  fake('biome', 0)
+  const run = commit()
+  expect(run.status).not.toBe(0)
+  expect(readFileSync(join(repo, 'oxlint.log'), 'utf8')).toContain('a.ts')
+  expect(existsSync(join(repo, 'biome.log'))).toBe(false)
+})
+
+it('lets a commit through when both pass', () => {
+  install()
+  fake('oxlint', 0)
+  fake('biome', 0)
   expect(commit().status).toBe(0)
 })
 
-it('says so and goes on where Biome does not run', () => {
+it('says so and goes on where the linters do not run', () => {
   install()
+  fake('biome', 1)
   const run = commit()
   expect(run.status).toBe(0)
-  expect(run.stderr).toContain('Biome does not run in this checkout')
+  expect(run.stderr).toContain('Oxlint or Biome does not run in this checkout')
 })
 
 it('does nothing in CI', () => {
   install()
-  fakeBiome(1)
+  fake('oxlint', 1)
+  fake('biome', 1)
   expect(commit({ CI: 'true' }).status).toBe(0)
 })

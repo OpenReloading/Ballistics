@@ -72,7 +72,6 @@ export function GroupsTab({
       </p>
     )
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Esc closes the expanded editor from any control in it
     <div
       ref={ref}
       className="groups-tab"

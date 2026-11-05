@@ -15,7 +15,6 @@ import { describeAnswers } from './identity.ts'
  * Registered without fastify-plugin, so the error handler applies to these routes only. Solver
  * calls run on `compute` (a worker pool), stability here (closed form).
  */
-// biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const computeRoutes: FastifyPluginAsync<ComputeContext> = async (
   app,
   { catalogue, compute },

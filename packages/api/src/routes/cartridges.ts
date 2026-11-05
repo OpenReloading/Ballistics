@@ -84,7 +84,6 @@ export function cartridgeAnswer(catalogue: Catalogue, id: string): CartridgeAnsw
 }
 
 /** `GET /cartridges` and `GET /cartridges/:id`. */
-// biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const cartridgeRoutes: FastifyPluginAsync<{ catalogue: Catalogue }> = async (
   app,
   { catalogue },

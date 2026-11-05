@@ -47,7 +47,6 @@ export function useKeptDraft<K extends 'powder' | 'targetFaceDesign'>(
     clearTimeout(timer.current)
     pending.current = undefined
   }, [])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the key stands for the name and the data
   useEffect(() => {
     if (key === stored.current.key) {
       pending.current = undefined
@@ -67,6 +66,7 @@ export function useKeptDraft<K extends 'powder' | 'targetFaceDesign'>(
     }
     timer.current = setTimeout(flush, 400)
     return () => clearTimeout(timer.current)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- the key stands for the name and the data
   }, [key, recordId])
   useEffect(() => {
     // a write begun in pagehide can be aborted with the page: hidden comes while it is still live

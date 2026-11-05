@@ -7,7 +7,7 @@
     "node": ">=26"
   },
   "scripts": {
-    "lint": "biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
+    "lint": "oxlint --ignore-pattern \"packages/units/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
     "format": "biome check --write .",
     "build": "pnpm --filter \"./packages/*\" run build",
     "typecheck": "pnpm --recursive --workspace-concurrency=1 run typecheck",
@@ -32,6 +32,7 @@
     "@biomejs/biome": "^2.6.2",
     "@swc/core": "^1.16.20",
     "dependency-cruiser": "^18.7.0",
-    "knip": "^6.43.0"
+    "knip": "^6.43.0",
+    "oxlint": "catalog:"
   }
 }

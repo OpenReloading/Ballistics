@@ -78,7 +78,6 @@ export function FirearmRangeCards({
   const skipped = cards.flatMap((c) => ('reason' in c ? [c] : []))
   // each printed load is a line and a card, the skipped loads one list
   const parts = 2 * printed.length + (skipped.length > 0 ? 1 : 0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: prints once, the cards are fixed
   useEffect(() => {
     // the cards' portals mount a render after this one
     let frame = 0
@@ -90,6 +89,7 @@ export function FirearmRangeCards({
     }
     frame = requestAnimationFrame(ready)
     return () => cancelAnimationFrame(frame)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- prints once, the cards are fixed
   }, [])
   if (!body) return null
   return (

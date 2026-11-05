@@ -19,7 +19,6 @@ export function ResultsSkipLink() {
   const { t } = useTranslation()
   if (path !== '/workbench') return null
   return (
-    // biome-ignore lint/a11y/useValidAnchor: a skip link; the handler also opens the Results tab on phones
     <a
       className="skip-link"
       href="#results"

@@ -122,7 +122,6 @@ export function ScanLabelDialog({
   }
 
   const video = useRef<HTMLVideoElement>(null)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `openText` reads the store when a code is found
   useEffect(() => {
     const v = video.current
     if (!camera || !v) return
@@ -148,6 +147,7 @@ export function ScanLabelDialog({
       }
     }, frameInterval)
     return () => clearInterval(timer)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- `openText` reads the store when a code is found
   }, [camera, stopCamera])
 
   return (

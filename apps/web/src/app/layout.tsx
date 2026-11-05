@@ -101,7 +101,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     // the head script sets data-mantine-color-scheme before React hydrates
     <html lang="en" {...mantineHtmlProps} className={uiFont.variable}>
       <head>
-        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: constant script, no user input */}
+        {/* oxlint-disable-next-line react/no-danger -- constant script, no user input */}
         <script dangerouslySetInnerHTML={{ __html: colorSchemeScript }} />
       </head>
       <body>

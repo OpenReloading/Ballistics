@@ -229,7 +229,6 @@ export function useLoadTabs(load: UseWorkbenchStateResult) {
   }, [behind])
 
   // the saved loads of the last visit: the stored one shown when the URL asks for nothing
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
     let alive = true
     // read now: the share link removes its fragment soon after mounting

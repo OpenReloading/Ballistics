@@ -31,31 +31,12 @@
   },
   "linter": {
     "enabled": true,
+    "includes": ["**/*.css", "**/*.json", "**/*.jsonc"],
     "rules": {
       "preset": "recommended",
-      "complexity": {
-        "noUselessUndefined": "error",
-        "noExcessiveCognitiveComplexity": "error",
-        "noImportantStyles": "off"
-      },
-      "correctness": {
-        "noComponentHookFactories": "off",
-        "noInvalidGridAreas": "off",
-        "noUnusedVariables": "error",
-        "noUnusedImports": "error",
-        "noUndeclaredDependencies": "error"
-      },
-      "style": {
-        "noParameterAssign": "error",
-        "useForOf": "error",
-        "noDescendingSpecificity": "off"
-      },
-      "suspicious": {
-        "noUnusedExpressions": "error",
-        "noNestedPromises": "error",
-        "useArraySortCompare": "error",
-        "useAwait": "error"
-      }
+      "complexity": { "noImportantStyles": "off" },
+      "correctness": { "noInvalidGridAreas": "off" },
+      "style": { "noDescendingSpecificity": "off" }
     }
   },
   "javascript": {
@@ -65,54 +46,6 @@
       "semicolons": "asNeeded"
     }
   },
-  "overrides": [
-    {
-      "includes": ["apps/web/**", "apps/docs/**"],
-      "linter": {
-        "domains": { "react": "recommended" }
-      }
-    },
-    {
-      "includes": ["**/test/**", "apps/e2e/**"],
-      "linter": {
-        "rules": {
-          "performance": { "useDomNodeTextContent": "off" },
-          "suspicious": { "useArraySortCompare": "off" }
-        }
-      }
-    },
-    {
-      "includes": ["packages/drawing/src/**"],
-      "linter": {
-        "rules": {
-          "style": {
-            "noRestrictedImports": {
-              "level": "error",
-              "options": {
-                "paths": {
-                  "react": "The drawing library is pure: render in apps/web/src/components.",
-                  "next": "The drawing library is pure: render in apps/web/src/components."
-                },
-                "patterns": [
-                  {
-                    "group": [
-                      "next/**",
-                      "node:*",
-                      "node:*/**",
-                      "react/**",
-                      "react-dom",
-                      "react-dom/**"
-                    ],
-                    "message": "The drawing library is pure: no framework or Node imports."
-                  }
-                ]
-              }
-            }
-          }
-        }
-      }
-    }
-  ],
   "assist": {
     "enabled": true,
     "actions": {

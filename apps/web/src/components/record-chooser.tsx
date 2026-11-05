@@ -34,6 +34,8 @@ import { useCompleteOnly } from './use-complete-only.ts'
 
 /** Rows drawn at once: a narrower search shows the rest. */
 const shownRows = 100
+/** One empty catalogue for every render before the rows arrive, so the memos below keep their value. */
+const noRows: never[] = []
 
 /** A row of a chooser: a catalogue record, or a design of the browser (`origin: 'user'`). */
 export interface ChooserRow {
@@ -150,7 +152,6 @@ type Catalogue<R> =
 function useCatalogue<R>(opened: boolean, load: (() => Promise<R[]>) | undefined) {
   const [state, setState] = useState<Catalogue<R>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new attempt reads it again
   useEffect(() => {
     if (!opened || !load || state.status === 'ok') return
     let live = true
@@ -162,6 +163,7 @@ function useCatalogue<R>(opened: boolean, load: (() => Promise<R[]>) | undefined
     return () => {
       live = false
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- a new attempt reads it again
   }, [opened, attempt])
   return { state, retry: () => setAttempt((n) => n + 1) }
 }
@@ -225,7 +227,7 @@ function ResultRow<R extends ChooserRow>({
   const { t } = useTranslation()
   return (
     // keyboard: the search box owns the focus and moves the highlight
-    // biome-ignore lint/a11y/useKeyWithClickEvents: see above
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events -- see above
     <div
       id={`${id}-option-${index}`}
       role="option"
@@ -389,7 +391,7 @@ function ChooserBody<R extends ChooserRow>({
   const id = useId()
   const searchBox = useRef<HTMLInputElement>(null)
 
-  const catalogue = state.status === 'ok' ? state.rows : []
+  const catalogue = state.status === 'ok' ? state.rows : noRows
   const rows = useMemo<R[]>(() => [...designs, ...catalogue], [designs, catalogue])
   const kept = useMemo(
     () =>
@@ -464,6 +466,7 @@ function ChooserBody<R extends ChooserRow>({
         value={query}
         rightSection={state.status === 'loading' ? <Loader size="xs" /> : undefined}
         onChange={(e) => setQuery(e.currentTarget.value)}
+        // oxlint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-controls comes with listAria while the list is shown
         role="combobox"
         aria-expanded={listed}
         {...(listed && listAria)}

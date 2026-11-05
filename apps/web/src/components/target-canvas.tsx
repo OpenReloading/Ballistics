@@ -211,15 +211,14 @@ function RefsLayer({
   onHandle: (e: PointerEvent<SVGElement>, ref: number, point: number) => void
 }) {
   return (
-    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
     <g className="refs" aria-hidden="true">
       {references.map((r, ri) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
+        // oxlint-disable-next-line react/no-array-index-key -- references keep their order
         <g key={ri}>
           <RefShape r={r} />
           {refPoints(r).map((p, pi) => (
             <circle
-              // biome-ignore lint/suspicious/noArrayIndexKey: points keep their order
+              // oxlint-disable-next-line react/no-array-index-key -- points keep their order
               key={pi}
               className="handle"
               cx={p.x}
@@ -231,7 +230,7 @@ function RefsLayer({
         </g>
       ))}
       {pending.map((p, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: clicks keep their order
+        // oxlint-disable-next-line react/no-array-index-key -- clicks keep their order
         <circle key={i} className="handle pending" cx={p.x} cy={p.y} r={5 * k} />
       ))}
       {pending.length > 1 && <polyline className="pending" points={polyline(pending)} />}
@@ -251,7 +250,6 @@ function AxesMark({ v, k, fontSize }: { v: (q: Point) => Point; k: number; fontS
   }
   const [ex, ey] = [dir(ux), dir(uy)]
   return (
-    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
     <g className="axes" aria-hidden="true">
       <line x1={o.x} y1={o.y} x2={ex.x} y2={ex.y} />
       <line x1={o.x} y1={o.y} x2={ey.x} y2={ey.y} />
@@ -542,7 +540,6 @@ function overlayOf(
   }
   addSegments(scene, parts)
   return (
-    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
     <g
       key={g.id}
       className="group-overlays"
@@ -597,7 +594,6 @@ function Backdrop({
     )
   if (sheet.photo) return null
   return (
-    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
     <g className="drawn-target" aria-hidden="true">
       {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((r) => (
         <circle key={r} cx={0} cy={0} r={r} vectorEffect="non-scaling-stroke" />
@@ -690,7 +686,6 @@ export function TargetCanvas({
 
   const extent = useMemo(() => extentOf(sheet, frame, photo, face), [photo, frame, sheet, face])
   const extentKey = `${photo?.url ?? sheet.photo ?? 'drawn'} ${sheet.photoRotation ?? 0}`
-  // biome-ignore lint/correctness/useExhaustiveDependencies: fit once per photo and turn, not on every edit
   useEffect(() => setView(undefined), [extentKey])
   const box = still?.box ?? view ?? extent
   if (viewOut) viewOut.current = { extent }
@@ -825,7 +820,6 @@ export function TargetCanvas({
   const cursorEl = useRef<SVGCircleElement>(null)
   /** The control that had the focus when a point tool started; it gets it back after. */
   const back = useRef<HTMLElement | null>(null)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a start or end of a point tool only
   useEffect(() => {
     if (!pointTool) {
       if (document.activeElement === document.body || !document.activeElement) back.current?.focus()
@@ -835,6 +829,7 @@ export function TargetCanvas({
     setCursor(pending.at(-1) ?? { x: box.x + box.w / 2, y: box.y + box.h / 2 })
     back.current = document.activeElement as HTMLElement | null
     requestAnimationFrame(() => cursorEl.current?.focus())
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a start or end of a point tool only
   }, [pointTool])
   const onCursorKey = (e: KeyboardEvent<SVGElement>) => {
     const d = arrows[e.key]
@@ -862,7 +857,7 @@ export function TargetCanvas({
           const p = v(s)
           return (
             <circle
-              // biome-ignore lint/suspicious/noArrayIndexKey: shots keep their order
+              // oxlint-disable-next-line react/no-array-index-key -- shots keep their order
               key={`${g.id} ${i}`}
               cx={p.x}
               cy={p.y}
@@ -948,9 +943,8 @@ export function TargetCanvas({
                 const stop =
                   selected?.group === g.id && selected.index < g.shots.length ? selected.index : 0
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: shots keep their order
+                  // oxlint-disable-next-line react/no-array-index-key -- shots keep their order
                   <g key={i}>
-                    {/* biome-ignore lint/a11y/useSemanticElements: an SVG mark has no button element */}
                     <circle
                       role="button"
                       tabIndex={g.id === active && !still && i === stop ? 0 : -1}
@@ -996,7 +990,6 @@ export function TargetCanvas({
         {layer?.(k)}
         {pointTool && (
           <>
-            {/* biome-ignore lint/a11y/useSemanticElements: an SVG mark has no button element */}
             <circle
               ref={cursorEl}
               role="button"
@@ -1016,7 +1009,6 @@ export function TargetCanvas({
           </>
         )}
         {loupe && (
-          // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws
           <g className="loupe" aria-hidden="true" pointerEvents="none">
             <Loupe at={loupe} k={k} id={id}>
               {content}

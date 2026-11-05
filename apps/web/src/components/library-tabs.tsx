@@ -20,7 +20,6 @@ export function LibraryTabs() {
   const page = libraryOf(route)
   const list = useRef<HTMLDivElement>(null)
   // the strip scrolls on a phone: the current tab stays in view
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the route changes
   useEffect(() => {
     const box = list.current
     const tab = box?.querySelector<HTMLElement>('[aria-selected="true"]')

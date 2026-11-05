@@ -103,7 +103,6 @@ export function Loading({
       </Text>
       <Stack gap={6} mt={6} aria-hidden="true">
         {Array.from({ length: rows }, (_, k) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: placeholders without identity
           <Skeleton key={k} height={28} />
         ))}
       </Stack>
@@ -232,11 +231,12 @@ export function MessageSlot({
       aria-label={label}
       // the polite region of every message that appears, an error included
       aria-live="polite"
+      // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a region that scrolls takes focus, so the keyboard can scroll it
       tabIndex={scrolls ? 0 : undefined}
       data-count={messages.length}
     >
       {messages.map((m, k) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: messages have no identity
+        // oxlint-disable-next-line react/no-array-index-key -- messages have no identity
         <Message key={k} severity={m.severity} compact announce={false}>
           {m.text}
         </Message>
@@ -345,7 +345,6 @@ export function ListLoading({ what }: { what: Loadable }) {
         <div className="directory-scroll page-panel page-panel-flush" aria-hidden="true">
           <div className="list-skeleton-head" />
           {Array.from({ length: 32 }, (_, k) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: placeholders without identity
             <div key={k} className="list-skeleton-row">
               <Skeleton height={12} width={`${skeletonWidths[k % skeletonWidths.length]}%`} />
             </div>

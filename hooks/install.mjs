@@ -70,5 +70,5 @@ function install() {
 
 const skipped = install()
 if (skipped && skipped !== 'CI') {
-  console.log(`pre-commit hook not installed: ${skipped}. CI runs the same Biome check.`)
+  console.log(`pre-commit hook not installed: ${skipped}. CI runs the same checks.`)
 }

@@ -48,7 +48,7 @@ function ErrorBars({ x, y, bars }: { x: number[]; y: number[]; bars: number[] })
           sc.y((y[i] ?? 0) + (bars[i] ?? 0)),
         ]
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: one bar per point, in order
+          // oxlint-disable-next-line react/no-array-index-key -- one bar per point, in order
           <g key={i}>
             <line x1={px} x2={px} y1={low} y2={high} />
             <line x1={px - 4} x2={px + 4} y1={low} y2={low} />
@@ -115,7 +115,6 @@ export function LineChart({
   // callers pass new arrays on each render: the option follows their values, so a render that
   // changes nothing drawn does not redraw the chart
   const data = JSON.stringify([x, y, limits, xt, yt])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `data` stands for x, y, limits and the ticks
   const option = useMemo(() => {
     if (!tokens || !ok) return {}
     const [dx, dy] = [tickDecimals(xt), tickDecimals(yt)]
@@ -196,6 +195,7 @@ export function LineChart({
         },
       ],
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- the option follows the drawn values through `data` (see above)
   }, [tokens, ok, data, zeroLine, points, xLabel, yLabel, xMax])
   if (!ok) return null
   /** The scales after a draw; a new state only when the plot area moved, so no draw loop. */

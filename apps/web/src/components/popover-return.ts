@@ -11,7 +11,6 @@ export function usePopoverReturn(
   find: (which: string) => HTMLElement | null | undefined,
 ) {
   const from = useRef<string | undefined>(undefined)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a tool change only
   useEffect(() => {
     if (tool !== 'select' || !from.current) return
     const which = from.current
@@ -25,6 +24,7 @@ export function usePopoverReturn(
       if (document.activeElement !== el && ++frames < 30) requestAnimationFrame(focus)
     }
     requestAnimationFrame(focus)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a tool change only
   }, [tool])
   return (which: string) => {
     from.current = which

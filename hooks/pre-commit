@@ -1,16 +1,19 @@
 #!/bin/sh
-# Biome on the staged files, the same rules as `pnpm run lint`. The CI `check` job stays the
-# authority, so a checkout where Biome does not run is told so and the commit goes on.
-# shortcut: Biome reads the working-tree file, not the index, so a partly staged file is checked
+# Oxlint and Biome on the staged files, the rules of `pnpm run lint` (packages/units runs its typed
+# lint there only). The CI `check` job stays the authority, so a checkout where they do not run is
+# told so and the commit goes on.
+# shortcut: both read the working-tree file, not the index, so a partly staged file is checked
 # as a whole; upgrade when that hides a failure in practice.
 [ -n "$CI" ] && exit 0
 cd "$(git rev-parse --show-toplevel)" || exit 0
-biome=node_modules/.bin/biome
-if ! "$biome" --version >/dev/null 2>&1; then
-  echo 'pre-commit: Biome does not run in this checkout, nothing checked (CI checks it). pnpm install installs it; in the dev container: devcontainer exec --workspace-folder . pnpm run lint' >&2
+bin=node_modules/.bin
+if ! "$bin/oxlint" --version >/dev/null 2>&1 || ! "$bin/biome" --version >/dev/null 2>&1; then
+  echo 'pre-commit: Oxlint or Biome does not run in this checkout, nothing checked (CI checks it). pnpm install installs them; in the dev container: devcontainer exec --workspace-folder . pnpm run lint' >&2
   exit 0
 fi
-"$biome" check --staged --error-on-warnings --no-errors-on-unmatched || {
+code=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.mts' '*.cts' '*.js' '*.mjs' '*.cjs' ':!packages/units/')
+{ [ -z "$code" ] || printf '%s\n' "$code" | xargs "$bin/oxlint" --deny-warnings --report-unused-disable-directives; } &&
+  "$bin/biome" check --staged --error-on-warnings --no-errors-on-unmatched || {
   echo 'pre-commit: fix the findings above (pnpm run format applies the safe ones), stage the files and commit again' >&2
   exit 1
 }

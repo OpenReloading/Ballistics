@@ -1,4 +1,3 @@
-// biome-ignore lint/correctness/noUndeclaredDependencies: Docusaurus alias for the theme's own component
 import ComponentTypes from '@theme-original/NavbarItem/ComponentTypes'
 import RepoWidget from '../../components/RepoWidget.tsx'
 

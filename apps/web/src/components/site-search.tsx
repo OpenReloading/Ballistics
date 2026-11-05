@@ -26,7 +26,6 @@ export function SiteSearch({ request }: { request: number }) {
   const [records] = useUserRecords(request)
   const mine = useResolved(records, userBullets)
   const designs = useMemo(() => userBulletRows(mine), [mine])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: each request opens it once
   useEffect(() => search[1].open(), [request])
   return (
     <WorkbenchSearch

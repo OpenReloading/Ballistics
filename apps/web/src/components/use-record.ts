@@ -18,7 +18,6 @@ export type RecordState<T> =
 export function useRecord<T>(kind: string, id: string) {
   const [state, setState] = useState<RecordState<T>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` reads the file again
   useEffect(() => {
     let current = true
     dataFile<T>(`${kind}/${id}`).then(
@@ -45,7 +44,6 @@ export function useRecord<T>(kind: string, id: string) {
 export function useRead<T>(load: (signal: AbortSignal) => Promise<T>) {
   const [state, setState] = useState<RecordState<T>>({ status: 'loading' })
   const [attempt, setAttempt] = useState(0)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `attempt` reads again
   useEffect(() => {
     const read = new AbortController()
     load(read.signal).then(
@@ -53,6 +51,7 @@ export function useRead<T>(load: (signal: AbortSignal) => Promise<T>) {
       () => read.signal.aborted || setState({ status: 'error' }),
     )
     return () => read.abort()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- `attempt` reads again
   }, [attempt])
   const retry = useCallback(() => {
     setState({ status: 'loading' })

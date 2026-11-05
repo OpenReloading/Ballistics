@@ -98,10 +98,10 @@ export function useDesigner<D, A extends { type: string }>(setup: DesignerSetup<
     [system, begin],
   )
   // a record page's "Start a new ... from this one" link
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
     const from = new URLSearchParams(window.location.search).get('from')
     if (from) start(from)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once on mount
   }, [])
 
   useRecordLink(kind, fileMenu, setLoading)

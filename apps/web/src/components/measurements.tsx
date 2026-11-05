@@ -119,7 +119,6 @@ function Marks({ series, system }: { series: Plotted[]; system: UnitSystem }) {
           const x = px(r.charge)
           const st = r.velocityStats
           return (
-            // biome-ignore lint/suspicious/noArrayIndexKey: series keep their order of reading
             <g key={`${k} ${r.charge}`} data-shape={shape} style={{ color: colour(k) }}>
               {st?.standardDeviation !== undefined && (
                 <g className="error-bar">
@@ -147,7 +146,7 @@ function Marks({ series, system }: { series: Plotted[]; system: UnitSystem }) {
               {r.excludedShots.map((e, i) => {
                 const y = py(e.velocity)
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order
+                  // oxlint-disable-next-line react/no-array-index-key -- shots keep the file order
                   <path key={i} className="excluded-mark" d={`M${x - 4} ${y - 4}l8 8m0 -8l-8 8`} />
                 )
               })}
@@ -584,7 +583,7 @@ export function Measurements({
           <h3>{t('Excluded shots')}</h3>
           <ul>
             {excluded.map((text, k) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order and may repeat
+              // oxlint-disable-next-line react/no-array-index-key -- shots keep the file order and may repeat
               <li key={k}>{text}</li>
             ))}
           </ul>
@@ -605,7 +604,7 @@ export function Measurements({
             const step =
               at === undefined ? undefined : runSteps.find((st) => Math.abs(st.charge - at) < 1e-7)
             return (
-              // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
+              // oxlint-disable-next-line react/no-array-index-key -- strings keep the file order and have no id
               <div key={i} className="field">
                 <label htmlFor={`${idPrefix}-series-${s.id}-${i}`}>
                   {tn(str.shots.length, '{name} ({count} shot)', '{name} ({count} shots)', {

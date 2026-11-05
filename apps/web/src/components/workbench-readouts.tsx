@@ -643,7 +643,7 @@ export function LimitsView({
         columns={heads}
       >
         {body.limits.map((l, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: two limits can share symbol, variant and method
+          // oxlint-disable-next-line react/no-array-index-key -- two limits can share symbol, variant and method
           <tr key={i}>
             <td data-label={heads[0]}>{l.typed ? t('typed') : <StandardBadge label="CIP" />}</td>
             <td data-label={heads[1]}>
@@ -761,7 +761,6 @@ export function LadderStrip({
   // the selected step in view in a strip that scrolls sideways
   const cells = useRef<HTMLDivElement>(null)
   const [selectedStep, runId] = [ok?.selected, ok?.id]
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new run re-centres the same index
   useEffect(() => {
     if (selectedStep === undefined) return
     // the strip's own scroll only: scrollIntoView would move the page as well

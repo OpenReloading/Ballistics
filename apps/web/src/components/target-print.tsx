@@ -95,7 +95,7 @@ export function TargetPrint({
       </p>
       <div className="print-image" style={{ width: `${w}mm`, height: `${h}mm` }}>
         {photo && (
-          // biome-ignore lint/performance/noImgElement: the photo's blob URL at a size in mm, for print only
+          // oxlint-disable-next-line nextjs/no-img-element -- the photo's blob URL at a size in mm, for print only
           <img
             ref={photoRef}
             src={photo.url}

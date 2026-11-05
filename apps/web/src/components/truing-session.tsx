@@ -278,7 +278,7 @@ export function TruingSession({ nominal, system }: { nominal: TruingNominal; sys
         columns={[t('Kind'), t('Distance'), t('Shots'), t('Mean'), t('Deviation of one shot')]}
       >
         {rows.map((r, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: rows have no id and keep their order
+          // oxlint-disable-next-line react/no-array-index-key -- rows have no id and keep their order
           <tr key={i}>
             <td>
               <NativeSelect

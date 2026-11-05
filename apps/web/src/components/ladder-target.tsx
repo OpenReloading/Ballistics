@@ -122,7 +122,7 @@ export function LadderTarget({
             </p>
             <div className="ladder-marks">
               {marks.map((m, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: marks keep the step order and labels can repeat
+                // oxlint-disable-next-line react/no-array-index-key -- marks keep the step order and labels can repeat
                 <figure key={i}>
                   <svg
                     width={cssMm(m.diameter)}

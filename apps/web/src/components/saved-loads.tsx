@@ -179,7 +179,6 @@ export function SavedLoads({
   const storage = useStorage(opened)
   /** The box label being printed, a portal of `body`. */
   const [label, setLabel] = useState<ReactNode>()
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `tick` is the write counter
   useEffect(() => {
     if (!opened) return
     storedRecords()
