@@ -169,7 +169,7 @@ export function BulletCompare({
                   const marks = differenceMarks(row.values, turnPrefixOf(t))
                   const deltas = differenceToFirst(row.values, turnPrefixOf(t))
                   return (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: a label can repeat
+                    // oxlint-disable-next-line react/no-array-index-key -- a label can repeat
                     <TableTr key={k} data-differs={rowDiffers(row.values) || undefined}>
                       <TableTd className="field-symbol">{row.symbol}</TableTd>
                       <TableTh scope="row">

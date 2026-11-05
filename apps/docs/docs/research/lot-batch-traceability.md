@@ -1,4 +1,5 @@
 ---
+
 title: Lot and batch traceability after the pre-release
 description: Which slices of lot and batch traceability (lot record, trace from a lot, batch record, brass process steps, remaining amount, reminders, box label, cost) pass the bench gate, checked against the stored lot strings, session snapshots and the earlier inventory review.
 ---
@@ -21,25 +22,25 @@ No model equations. The one conversion the slices would need: 1 grain = 64.79891
 
 ## Numbers
 
-| Slice | Typed by the user | Shown when not kept up | Verdict |
-| --- | --- | --- | --- |
-| 1 Lot record and picker | lot, supplier, date per box | a lot without its later boxes | no-go, decided in the pre-release: the lot string stays the stored shape and no lot record is planned |
-| 2 Trace from a lot | nothing: the lot strings of loads and session snapshots | nothing wrong: a load without a lot is not found | go: the Saved loads search also matches the lot strings |
-| 3 Batch record | load, lots, quantity, date, charge per batch | a wrong quantity; old batches of a changed recipe | no-go: the session snapshot already keeps the lots, seating and round count of the load at the session; quantity is not stored |
-| 4 Brass process steps | a dated step per process run | a missing step reads as not done | no-go: the case group keeps its firing count; the history of each case is not tracked |
-| 5 Remaining amount per lot | every purchase and use | a wrong amount on hand | no-go (inventory review) |
-| 6 Reminders | a due date or a minimum | a missed or false reminder | in-app notes only, which exist; no system notification, no calendar file |
-| 7 Box label | nothing: printed from the load | not applicable | go, decided in the pre-release: a label of 90 x 60 mm printed from a saved load, with a QR code that names the load ([Box label](../models/box-label.md)) |
-| 8 Cost per round | price and pack size per component | an old price | no-go (inventory review) |
+| Slice                      | Typed by the user                                       | Shown when not kept up                            | Verdict                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 Lot record and picker    | lot, supplier, date per box                             | a lot without its later boxes                     | no-go, decided in the pre-release: the lot string stays the stored shape and no lot record is planned                                                     |
+| 2 Trace from a lot         | nothing: the lot strings of loads and session snapshots | nothing wrong: a load without a lot is not found  | go: the Saved loads search also matches the lot strings                                                                                                   |
+| 3 Batch record             | load, lots, quantity, date, charge per batch            | a wrong quantity; old batches of a changed recipe | no-go: the session snapshot already keeps the lots, seating and round count of the load at the session; quantity is not stored                            |
+| 4 Brass process steps      | a dated step per process run                            | a missing step reads as not done                  | no-go: the case group keeps its firing count; the history of each case is not tracked                                                                     |
+| 5 Remaining amount per lot | every purchase and use                                  | a wrong amount on hand                            | no-go (inventory review)                                                                                                                                  |
+| 6 Reminders                | a due date or a minimum                                 | a missed or false reminder                        | in-app notes only, which exist; no system notification, no calendar file                                                                                  |
+| 7 Box label                | nothing: printed from the load                          | not applicable                                    | go, decided in the pre-release: a label of 90 x 60 mm printed from a saved load, with a QR code that names the load ([Box label](../models/box-label.md)) |
+| 8 Cost per round           | price and pack size per component                       | an old price                                      | no-go (inventory review)                                                                                                                                  |
 
 Reminder routes:
 
-| Route | Needs | Supported |
-| --- | --- | --- |
-| Push message | a server that sends to the subscription endpoint ([MDN, Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)) | the app has no server |
+| Route                    | Needs                                                                                                                                                      | Supported                                                                                                                                                                |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Push message             | a server that sends to the subscription endpoint ([MDN, Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API))                              | the app has no server                                                                                                                                                    |
 | Periodic background sync | an installed web app, the browser's engagement score ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Periodic_Background_Synchronization_API)) | Chrome 80 and Chromium browsers; not Firefox, not Safari ([compatibility data](https://github.com/mdn/browser-compat-data/blob/main/api/ServiceWorkerRegistration.json)) |
-| Calendar file | an event with a date ([RFC 5545](https://www.rfc-editor.org/rfc/rfc5545)) | any calendar, but nothing in the app has a due date |
-| In-app note | nothing new | the load notes and the note at a round count |
+| Calendar file            | an event with a date ([RFC 5545](https://www.rfc-editor.org/rfc/rfc5545))                                                                                  | any calendar, but nothing in the app has a due date                                                                                                                      |
+| In-app note              | nothing new                                                                                                                                                | the load notes and the note at a round count                                                                                                                             |
 
 ## Result
 

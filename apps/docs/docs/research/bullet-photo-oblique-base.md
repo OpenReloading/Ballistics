@@ -1,4 +1,5 @@
 ---
+
 title: A slanted base face against a shadow past the base in a bullet photograph
 description: Whether a clean bullet with a base face cut at an angle, or an axis turned a little, gets a shadow named, and how a straight face is told from a shadow's end.
 ---
@@ -26,11 +27,11 @@ Below 3 samples the two ramps differ by the rounding of one sample and tell noth
 
 ## Numbers
 
-| Renders | #964 | This change |
-| --- | --- | --- |
-| Base face cut 0.5 to 5 degrees, no shadow (64) | 40 name a shadow | 14 name a shadow |
-| Axis forced 0.3 to 0.5 degrees off, no shadow (96) | none named | none named |
-| With a shadow (108) | every one within 1 % or 3 u, or named | every one within 1 % or 3 u, or named; 14 within and not named |
+| Renders                                            | #964                                  | This change                                                    |
+| -------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| Base face cut 0.5 to 5 degrees, no shadow (64)     | 40 name a shadow                      | 14 name a shadow                                               |
+| Axis forced 0.3 to 0.5 degrees off, no shadow (96) | none named                            | none named                                                     |
+| With a shadow (108)                                | every one within 1 % or 3 u, or named | every one within 1 % or 3 u, or named; 14 within and not named |
 
 Every render with a slanted face reads its length within 1 % or 3 u, before and after. The catalogue evaluation keeps every column of A to H but one: in F (every photograph with a drop shadow) the photographs with a warning go from 32 back to 31 of 32, as before #964. The note leaves the photograph #964 added it for, which reads 0.32 mm (3 %) long with a stated uncertainty of 0.28 mm, so within 3 u.
 

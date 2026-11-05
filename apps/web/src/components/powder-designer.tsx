@@ -255,7 +255,7 @@ export function PowderDesigner() {
   const head = (cells: string[]) => (
     <div className="powder-row powder-head" aria-hidden="true">
       {cells.map((c, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: fixed header cells
+        // oxlint-disable-next-line react/no-array-index-key -- fixed header cells
         <span key={i}>{c}</span>
       ))}
     </div>

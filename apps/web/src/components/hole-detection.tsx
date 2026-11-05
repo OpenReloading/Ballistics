@@ -200,7 +200,6 @@ export function useHoleDetection({
     setProgress(undefined)
   }
   // another photo, sheet or group: its proposals and a run on the old one go
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a photo, sheet or group change only
   useEffect(() => {
     stop()
     setProposals([])
@@ -215,14 +214,13 @@ export function useHoleDetection({
     return stop
   }, [sheet.photo, sheetId, group?.id])
   // a photo just added: the face search and the auto run start without a click
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once the added photo has loaded
   useEffect(() => {
     if (!addedPhoto.current || addedPhoto.current !== sheet.photo || !photo || !group) return
     addedPhoto.current = undefined
     start()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once the added photo has loaded
   }, [sheet.photo, photo, group?.id])
   // a turn moves the photo under the proposals
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a turn only
   useEffect(() => {
     stop()
     setProposals([])
@@ -482,11 +480,11 @@ export function useHoleDetection({
   }
 
   // after a face calibrated the sheet and its record loaded: the one-click run goes on
-  // biome-ignore lint/correctness/useExhaustiveDependencies: when the sheet or the record changes
   useEffect(() => {
     if (!awaiting.current || !frame?.calibration || !photo || (group?.face && !record)) return
     awaiting.current = false
     start()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- when the sheet or the record changes
   }, [frame, record, photo, size?.diameter])
 
   /** The user picked a face (and its event) of the choice: its fit from the rings found. */
@@ -796,7 +794,6 @@ function useCaliberCandidates(
   const [classes, setClasses] = useState<{ list: CandidateClass[]; mine: ReadonlySet<string> }>()
   const [picked, setCaliber] = useState<CandidateClass>()
   const face = group?.face
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on another group, face or event only
   useEffect(() => {
     setClasses(undefined)
     setCaliber(undefined)
@@ -809,6 +806,7 @@ function useCaliberCandidates(
     return () => {
       live = false
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on another group, face or event only
   }, [group?.id, face?.id, face?.event])
   const { candidates, preselected } = caliberCandidates(
     classes?.list ?? [],
@@ -1665,7 +1663,7 @@ function ProposalLayer({
         <>
           <polyline className="detect-region" points={pts(pending)} />
           {pending.map((p, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: clicks keep their order
+            // oxlint-disable-next-line react/no-array-index-key -- clicks keep their order
             <circle key={i} className="detect-corner" cx={p.x} cy={p.y} r={4 * k} />
           ))}
         </>
@@ -1676,7 +1674,7 @@ function ProposalLayer({
           { n: i + 1, count: Math.round(f.holeAreas) },
         )
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: a run's areas keep their order
+          // oxlint-disable-next-line react/no-array-index-key -- a run's areas keep their order
           <g key={i} className="detect-flag" data-flag>
             <title>{label}</title>
             <rect x={f.x} y={f.y} width={f.width} height={f.height} />
@@ -1701,7 +1699,6 @@ function ProposalLayer({
         const label = maybe ? `${name}, ${t('maybe')}` : name
         return (
           <g key={p.id}>
-            {/* biome-ignore lint/a11y/useSemanticElements: an SVG mark has no button element */}
             <circle
               role="button"
               tabIndex={0}
@@ -1745,7 +1742,6 @@ function ProposalLayer({
                 )}
               </title>
             </circle>
-            {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: SVG text is not focusable; the proposal's name holds it */}
             <text
               className="proposal-label"
               x={p.x + r + 2 * k}

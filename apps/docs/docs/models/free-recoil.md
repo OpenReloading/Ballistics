@@ -1,4 +1,5 @@
 ---
+
 title: Free recoil
 description: Velocity and kinetic energy of a firearm that recoils without restraint, from the momentum of the projectile and the powder gas.
 ---
@@ -31,16 +32,16 @@ Code: `packages/core/src/recoil.ts`, `gasVelocityFactor`.
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $m_g$ | Mass of the firearm with scope and attachments | g | kg |
-| $m_p$ | Mass of the projectile | g | kg |
-| $m_c$ | Mass of the powder charge, taken as the mass of the gas | g | kg |
-| $v_0$ | Muzzle velocity of the projectile | m/s | m/s |
-| $f$ | Gas velocity over muzzle velocity | 1 | 1 |
-| $I$ | Momentum of projectile and gas | no kind | kg m/s |
-| $v_g$ | Velocity of the free firearm | m/s | m/s |
-| $E_g$ | Kinetic energy of the free firearm | J | J |
+| Symbol | Meaning                                                 | Stored unit | Unit in `core` |
+| ------ | ------------------------------------------------------- | ----------- | -------------- |
+| $m_g$  | Mass of the firearm with scope and attachments          | g           | kg             |
+| $m_p$  | Mass of the projectile                                  | g           | kg             |
+| $m_c$  | Mass of the powder charge, taken as the mass of the gas | g           | kg             |
+| $v_0$  | Muzzle velocity of the projectile                       | m/s         | m/s            |
+| $f$    | Gas velocity over muzzle velocity                       | 1           | 1              |
+| $I$    | Momentum of projectile and gas                          | no kind     | kg m/s         |
+| $v_g$  | Velocity of the free firearm                            | m/s         | m/s            |
+| $E_g$  | Kinetic energy of the free firearm                      | J           | J              |
 
 ## Assumptions
 

@@ -7,7 +7,7 @@
     "node": ">=26"
   },
   "scripts": {
-    "lint": "biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
+    "lint": "oxlint --format default --ignore-pattern \"packages/units/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
     "format": "biome check --write .",
     "build": "pnpm --filter \"./packages/*\" run build",
     "typecheck": "pnpm --recursive --workspace-concurrency=1 run typecheck",
@@ -22,16 +22,14 @@
     "api:check": "pnpm --filter @open-reloading/tools run api-check",
     "api:conformance": "pnpm --filter @open-reloading/tools run api-conformance",
     "baselines": "pnpm --filter @open-reloading/schema --filter @open-reloading/web --filter @open-reloading/tools exec vitest run test/contracts.test.ts --update",
-    "deps:check": "depcruise packages/units/src packages/core/src packages/drawing/src packages/importers/src packages/importers/dist packages/schema/src packages/data/src packages/api/src packages/cli/src apps/web/src --config .dependency-cruiser.cjs --output-type err",
     "knip": "knip",
     "pack:check": "pnpm --filter @open-reloading/tools run pack-check",
     "docs:check": "pnpm --filter @open-reloading/docs run check",
     "postinstall": "node hooks/install.mjs"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.2",
-    "@swc/core": "^1.16.20",
-    "dependency-cruiser": "^18.7.0",
-    "knip": "^6.43.0"
+    "@biomejs/biome": "2.6.4",
+    "knip": "^6.43.0",
+    "oxlint": "catalog:"
   }
 }

@@ -1,4 +1,5 @@
 ---
+
 title: Point-mass trajectory
 description: Three-dimensional point-mass trajectory with gravity, drag, segmented wind and Earth rotation, its zeroing and its Runge-Kutta integration.
 ---
@@ -70,7 +71,6 @@ $$
 $$
 
 Code: `packages/core/src/exterior/trajectory.ts`, `earthRotation`, `earthRotationRate`, `pointMassRhs`.
-
 - The vertical component $\Omega_E\sin\varphi$ deflects the bullet sideways (right in the northern hemisphere).
 - The horizontal component gives the Eotvos effect: fire to the east rises, fire to the west drops.
 - The acceleration is integrated with the other terms, so the air turning with the Earth also damps the deflection through the drag.
@@ -144,52 +144,52 @@ Code: `packages/core/src/exterior/rk45.ts`, `rk45` (`denseOutput`).
 
 An event is a scalar function $g(t, \vec y)$ with a direction. When it changes sign over a step, its root is found on the continuous extension by the Illinois variant of regula falsi to $10^{-12}$ s (`root`). At a terminal event the step is repeated from its start with the step size that ends at the root, which gives a fifth-order state there.
 
-| Event | Function | Effect |
-| --- | --- | --- |
-| Requested slant range $s_j$ | $\vec r\cdot\hat u - s_j$, rising | record the point, the largest range ends the run (`done`) |
-| Wind segment boundary | $x - x_k$ | restart with the next or previous segment |
-| BC band threshold | $\lvert\vec v_a\rvert - v_k$ | restart with the next or previous band |
-| Drag table node | $M - M_k$ for both nodes of the active segment | restart with the next or previous segment |
-| Slant range stops growing | $\vec v\cdot\hat u$, falling | stop (`apex`) |
-| Altitude limit | $H_s + y = 11000$ m rising, $H_s + y = -5000$ m falling | stop (`atmosphere`) |
+| Event                       | Function                                                | Effect                                                    |
+| --------------------------- | ------------------------------------------------------- | --------------------------------------------------------- |
+| Requested slant range $s_j$ | $\vec r\cdot\hat u - s_j$, rising                       | record the point, the largest range ends the run (`done`) |
+| Wind segment boundary       | $x - x_k$                                               | restart with the next or previous segment                 |
+| BC band threshold           | $\lvert\vec v_a\rvert - v_k$                            | restart with the next or previous band                    |
+| Drag table node             | $M - M_k$ for both nodes of the active segment          | restart with the next or previous segment                 |
+| Slant range stops growing   | $\vec v\cdot\hat u$, falling                            | stop (`apex`)                                             |
+| Altitude limit              | $H_s + y = 11000$ m rising, $H_s + y = -5000$ m falling | stop (`atmosphere`)                                       |
 
 The active wind segment, BC band and drag table segment are held fixed within a step, so no step crosses a jump or a kink of the right-hand side. After a restart the driver moves each index past every boundary the restart state has already crossed (`settle`). The run also stops at `maxTime` (`maxTime`), and fails after `maxSteps` accepted and rejected steps or below a step of $10^{-12}$ s.
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $\vec r = (x, y, z)$ | Position from the sight: downrange, up, right | mm | m |
-| $\vec v$ | Ground-relative velocity | m/s | m/s |
-| $v_0$ | Muzzle velocity along the bore | m/s | m/s |
-| $\theta$ | Look angle of the line of sight | deg | rad |
-| $\hat u$, $\hat n$, $\hat z$ | Unit vectors of the line-of-sight frame | 1 | 1 |
-| $s$ | Slant range along the line of sight | mm | m |
-| $h$, $w$ | Height above and windage right of the line of sight | mm | m |
-| $h'$, $w'$ | Height and windage with jump and spin drift | mm | m |
-| $\delta_e$, $\delta_w$ | Bore elevation and windage to the line of sight | deg | rad |
-| $h_s$, $o_s$ | Sight height above the bore, sight offset right of the bore | mm | m |
-| $g$ | Gravity | no kind | m/s² |
-| $\varphi$, $\alpha$ | Latitude, azimuth of fire | deg | rad |
-| $\Omega_E$ | Earth rotation rate, $7.292115\times10^{-5}$ rad/s | no kind | rad/s |
-| $W_k$, $W_{v,k}$ | Horizontal and vertical wind speed of segment $k$ | m/s | m/s |
-| $\beta_k$ | Direction the wind of segment $k$ blows from | deg | rad |
-| $x_k$ | Horizontal distance where wind segment $k$ ends | mm | m |
-| $M$ | Mach number | 1 | 1 |
-| $a$ | Speed of sound | m/s | m/s |
-| $m$ | Bullet mass | g | kg |
-| $E$ | Kinetic energy | J | J |
-| $\gamma$ | Path angle above the horizontal | deg | rad |
-| $s_z$ | Zero range | mm | m |
-| $t$, $\Delta t$ | Time of flight, integrator step size | no kind | s |
-| $\sigma$ | Fraction of a step | 1 | 1 |
-| $r_2$ to $r_5$ | Coefficients of the continuous extension, per component | no kind | m or m/s |
-| $e_i$, $y_i$, $\hat y_i$ | Error estimate, state at the start and at the end of a step, component $i$ | no kind | m or m/s |
-| $n$ | Length of the state | 1 | 1 |
-| $\mathrm{err}$ | Error norm of a step | 1 | 1 |
-| $\mathrm{rtol}$ | Relative tolerance of the integrator | 1 | 1 |
-| $\mathrm{atol}$ | Absolute tolerance of the integrator | no kind | m, m/s or rad/s |
-| $H_s$ | Altitude of the firing point | mm | m |
+| Symbol                       | Meaning                                                                    | Stored unit | Unit in `core`  |
+| ---------------------------- | -------------------------------------------------------------------------- | ----------- | --------------- |
+| $\vec r = (x, y, z)$         | Position from the sight: downrange, up, right                              | mm          | m               |
+| $\vec v$                     | Ground-relative velocity                                                   | m/s         | m/s             |
+| $v_0$                        | Muzzle velocity along the bore                                             | m/s         | m/s             |
+| $\theta$                     | Look angle of the line of sight                                            | deg         | rad             |
+| $\hat u$, $\hat n$, $\hat z$ | Unit vectors of the line-of-sight frame                                    | 1           | 1               |
+| $s$                          | Slant range along the line of sight                                        | mm          | m               |
+| $h$, $w$                     | Height above and windage right of the line of sight                        | mm          | m               |
+| $h'$, $w'$                   | Height and windage with jump and spin drift                                | mm          | m               |
+| $\delta_e$, $\delta_w$       | Bore elevation and windage to the line of sight                            | deg         | rad             |
+| $h_s$, $o_s$                 | Sight height above the bore, sight offset right of the bore                | mm          | m               |
+| $g$                          | Gravity                                                                    | no kind     | m/s²            |
+| $\varphi$, $\alpha$          | Latitude, azimuth of fire                                                  | deg         | rad             |
+| $\Omega_E$                   | Earth rotation rate, $7.292115\times10^{-5}$ rad/s                         | no kind     | rad/s           |
+| $W_k$, $W_{v,k}$             | Horizontal and vertical wind speed of segment $k$                          | m/s         | m/s             |
+| $\beta_k$                    | Direction the wind of segment $k$ blows from                               | deg         | rad             |
+| $x_k$                        | Horizontal distance where wind segment $k$ ends                            | mm          | m               |
+| $M$                          | Mach number                                                                | 1           | 1               |
+| $a$                          | Speed of sound                                                             | m/s         | m/s             |
+| $m$                          | Bullet mass                                                                | g           | kg              |
+| $E$                          | Kinetic energy                                                             | J           | J               |
+| $\gamma$                     | Path angle above the horizontal                                            | deg         | rad             |
+| $s_z$                        | Zero range                                                                 | mm          | m               |
+| $t$, $\Delta t$              | Time of flight, integrator step size                                       | no kind     | s               |
+| $\sigma$                     | Fraction of a step                                                         | 1           | 1               |
+| $r_2$ to $r_5$               | Coefficients of the continuous extension, per component                    | no kind     | m or m/s        |
+| $e_i$, $y_i$, $\hat y_i$     | Error estimate, state at the start and at the end of a step, component $i$ | no kind     | m or m/s        |
+| $n$                          | Length of the state                                                        | 1           | 1               |
+| $\mathrm{err}$               | Error norm of a step                                                       | 1           | 1               |
+| $\mathrm{rtol}$              | Relative tolerance of the integrator                                       | 1           | 1               |
+| $\mathrm{atol}$              | Absolute tolerance of the integrator                                       | no kind     | m, m/s or rad/s |
+| $H_s$                        | Altitude of the firing point                                               | mm          | m               |
 
 ## Assumptions
 

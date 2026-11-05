@@ -1,16 +1,18 @@
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterAll, beforeAll, expect, it } from 'vitest'
 
-/** Source of each file of a mirror of the repository layout and the rules the check names for it. */
+/** Source of each file of a mirror of the repository layout and the boundary rules Oxlint names for it. */
 const fixture: Record<string, { source: string; rules: string[] }> = JSON.parse(
   readFileSync(new URL('fixtures/deps-rules.json', import.meta.url), 'utf8'),
 )
 const root = fileURLToPath(new URL('../..', import.meta.url))
-const cruiser = join(root, 'node_modules/dependency-cruiser/bin/dependency-cruiser.mjs')
+const oxlint = join(root, 'node_modules/.bin/oxlint')
+/** The configurations the mirror lints with: the root one and the own one of packages/units. */
+const configs = ['.oxlintrc.json', 'packages/units/.oxlintrc.json']
 
 let mirror = ''
 
@@ -20,35 +22,32 @@ beforeAll(() => {
     mkdirSync(join(mirror, dirname(file)), { recursive: true })
     writeFileSync(join(mirror, file), `${source}\n`)
   }
+  for (const config of configs) copyFileSync(join(root, config), join(mirror, config))
 })
 
 afterAll(() => rmSync(mirror, { recursive: true, force: true }))
 
-/** The check as the `deps:check` script runs it, over the mirror, with one reporter. */
-const cruise = (outputType: string) =>
-  spawnSync(
-    process.execPath,
-    [
-      cruiser,
-      'packages',
-      'apps',
-      '--config',
-      join(root, '.dependency-cruiser.cjs'),
-      '--output-type',
-      outputType,
-    ],
-    { cwd: mirror, encoding: 'utf8', maxBuffer: 64 << 20 },
-  )
+const lint = (...args: string[]) =>
+  spawnSync(oxlint, args, { cwd: mirror, encoding: 'utf8', maxBuffer: 64 << 20 })
 
-it('names the rule each forbidden import breaks and passes the allowed ones', () => {
-  const run = cruise('json')
-  const report = JSON.parse(run.stdout) as {
-    summary: { violations: { from: string; rule: { name: string } }[] }
+/** The boundary rule a diagnostic names: the `name:` its message starts with, the cycle rule or the type-import rule. */
+const ruleOf = (d: { code: string; message: string; help?: string }) =>
+  ({
+    'import(no-cycle)': 'no-cycle',
+    'typescript(no-import-type-side-effects)': 'no-import-type-side-effects',
+  })[d.code] ?? /\b([a-z]+(?:-[a-z]+)+): /.exec(`${d.help ?? ''} ${d.message}`)?.[1]
+
+it('names the rule each forbidden import or global breaks and passes the allowed ones', () => {
+  const report = JSON.parse(lint('--format', 'json').stdout) as {
+    diagnostics: { filename: string; code: string; message: string; help?: string }[]
   }
   const found: Record<string, Set<string>> = Object.fromEntries(
     Object.keys(fixture).map((f) => [f, new Set<string>()]),
   )
-  for (const { from, rule } of report.summary.violations) found[from]?.add(rule.name)
+  for (const d of report.diagnostics) {
+    const rule = ruleOf(d)
+    if (rule) found[d.filename]?.add(rule)
+  }
   const expected = Object.fromEntries(Object.entries(fixture).map(([f, { rules }]) => [f, rules]))
   expect(Object.fromEntries(Object.entries(found).map(([f, r]) => [f, [...r].sort()]))).toEqual(
     expected,
@@ -56,7 +55,8 @@ it('names the rule each forbidden import breaks and passes the allowed ones', ()
 })
 
 it('exits non-zero and prints the rule name', () => {
-  const run = cruise('err')
+  // the default format, also on GitHub, where Oxlint would otherwise write annotations without the help text
+  const run = lint('--format', 'default')
   expect(run.status).toBeGreaterThan(0)
   expect(run.stdout).toContain('web-reads-api-only')
 })

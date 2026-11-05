@@ -1,4 +1,5 @@
 ---
+
 title: Mutation testing of core, web, API, CLI, importer, schema, data, drawing and tools modules
 description: Whether mutation testing finds weak tests that line coverage does not, in eight rounds over core, web, API, CLI, importer, schema, data, drawing and tools modules, with the run time per module, the surviving mutant classes and the tests that kill them.
 ---
@@ -31,16 +32,15 @@ The commonest survivor class in every round: an input guard never checked one by
 
 By risk: `exterior/atmosphere.ts` (unit constants and the input limits of every exterior run), `interior/form.ts` (burn laws, grain geometry and their checks), `groups/hit-probability.ts` (the zone integral and the dispersion inputs).
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, full suite | Killed by the new tests | Score after (est.) | Wall time, own test file |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `exterior/atmosphere.ts` | 115 | 83.5 % | 19 | 21 min | 17 | 98.3 % | 8 s |
-| `interior/form.ts` | 462 | 84.0 % | 74 (8 not covered) | 74 min | 50 | 94.8 % | 33 s |
-| `groups/hit-probability.ts` | 133 | 63.9 % | 48 | 4.3 min | 43 | 96.2 % | 21 s |
+| Module                      | Mutants | Score before | Surviving or not covered | Wall time, full suite | Killed by the new tests | Score after (est.) | Wall time, own test file |
+| --------------------------- | ------- | ------------ | ------------------------ | --------------------- | ----------------------- | ------------------ | ------------------------ |
+| `exterior/atmosphere.ts`    | 115     | 83.5 %       | 19                       | 21 min                | 17                      | 98.3 %             | 8 s                      |
+| `interior/form.ts`          | 462     | 84.0 %       | 74 (8 not covered)       | 74 min                | 50                      | 94.8 %             | 33 s                     |
+| `groups/hit-probability.ts` | 133     | 63.9 %       | 48                       | 4.3 min               | 43                      | 96.2 %             | 21 s                     |
 
 The full-suite times are per-test coverage over the whole core suite: the trajectory and interior-model tests cover atmosphere and form, so each of their mutants runs those slow tests. Atmosphere and form ran in the dev container on a shared 16-core host with other jobs, hit-probability on the host itself, so the three times are not on one footing. The score after is the score before plus the former survivors that the own-test-file runs kill, over the same mutants.
 
 Surviving classes before the new tests:
-
 - Input guards: every `checkAir` limit, `burnError` for the exponent, coefficient, vivacity, reference pressure, grain dimensions, tube and seven-perforation shapes and the two-stage form, and every `need` of `pointDispersion`, `ellipseProbability` and `hitProbability` could be removed or inverted; the later check that threw was the air density or a non-finite result.
 - Inclusive limits: `altitude >= minAltitude`, `humidity <= 1`, density at most 1000 kg/m3, a tube length of exactly one web, zero wind and range uncertainty could all become strict.
 - A wrong index: `inside[k + 1]` turned into `inside[k - 1]` in `hitProbability` survived, because the test checked only that the ring probabilities sum to the hit probability and the score to their weighted sum, both still true when every inner ring gets 0.
@@ -52,18 +52,17 @@ The 31 mutants that still survive after the new tests are boundary changes where
 
 By risk: `exterior/drag.ts` (table lookup, segment search and the hold rules every trajectory step reads), `exterior/stability.ts` (unit factors of the Miller formula, the stability band, the MOA constant), `interior/range.ts` (the side bookkeeping of the pressure range and its invalid ends), `groups/statistics.ts` (input guards, signs and the CEP bracket of the group statistics) and `recoil.ts` (input guards of the free recoil).
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `exterior/drag.ts` | 181 | 85.1 % | 27 (4 not covered) | 21 s | 20 | 7 | 96.1 % |
-| `exterior/stability.ts` | 97 | 80.4 % | 19 | 4 s | 18 | 1 | 99.0 % |
-| `interior/range.ts` | 137 (9 runtime errors) | 92.2 % | 10 (2 not covered) | 9 s | 7 | 3 | 97.7 % |
-| `groups/statistics.ts` | 373 (24 runtime errors) | 86.3 % | 48 (1 not covered) | 51 min | 35 | 13 | 96.3 % |
-| `recoil.ts` | 44 | 77.3 % | 10 | 3 s | 10 | 0 | 100 % |
+| Module                  | Mutants                 | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
+| ----------------------- | ----------------------- | ------------ | ------------------------ | ------------------------ | ----------------------- | --------------- | ----------- |
+| `exterior/drag.ts`      | 181                     | 85.1 %       | 27 (4 not covered)       | 21 s                     | 20                      | 7               | 96.1 %      |
+| `exterior/stability.ts` | 97                      | 80.4 %       | 19                       | 4 s                      | 18                      | 1               | 99.0 %      |
+| `interior/range.ts`     | 137 (9 runtime errors)  | 92.2 %       | 10 (2 not covered)       | 9 s                      | 7                       | 3               | 97.7 %      |
+| `groups/statistics.ts`  | 373 (24 runtime errors) | 86.3 %       | 48 (1 not covered)       | 51 min                   | 35                      | 13              | 96.3 %      |
+| `recoil.ts`             | 44                      | 77.3 %       | 10                       | 3 s                      | 10                      | 0               | 100 %       |
 
 The statistics run is slow because 216 of its mutants (58 %) are static, so each runs the whole group test file with its seeded simulations, on a host shared with other jobs.
 
 Surviving classes before the new tests:
-
 - Input guards: the five positive inputs of `millerStability`, every guard of `freeRecoil`, the confidence level, aim and coverage checks of the group statistics and the guards of `pooledGroupStatistics`, which could be dropped as a whole.
 - Inclusive limits: zero muzzle velocity and gas factor, a drag segment exactly as narrow or as steep as the hold limit, the band edge of `isStable`.
 - A wrong index or side: `dragSegment` below the first node, at a node and at the last node, `segmentCoefficient` on the segments outside the table, the side label of the lower case of the pressure range and the side taken from the one end that could be computed.
@@ -75,18 +74,17 @@ Equivalent survivors: the default interpolation literal (any other string reads 
 
 A screening run of nine small modules not covered before; the five with the most surviving mutants, each for what reads it: `groups/velocity-statistics.ts` (the standard deviation interval and shot count the velocity string tools show), `interior/velocity-ladder.ts` (the slope bands that mark the flat spots of a charge ladder), `interior/vivacity.ts` (the mean dynamic vivacity that compares burn laws), `interior/ladder.ts` (the charges of every charge ladder the app and the API compute) and `interior/bore-resistance.ts` (the bore area and resistance law the load-table fit, the load file and the workbench read). Left out: `exterior/modified.ts` (98.6 %, 1 survivor), `exterior/moving-target.ts` (81.6 %, 7), `interior/start-pressure.ts` (80.8 %, 5) and `cartridge-specs.ts` (52.6 %, 36, of them 35 not covered by its own test file, taken in round 5).
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `groups/velocity-statistics.ts` | 95 | 81.1 % | 18 | 14 s | 16 | 2 | 97.9 % |
-| `interior/velocity-ladder.ts` | 87 | 66.7 % | 29 (2 not covered) | 3 s | 28 | 1 | 98.9 % |
-| `interior/vivacity.ts` | 58 | 77.6 % | 13 | 3 s | 6 | 7 | 87.9 % |
-| `interior/ladder.ts` | 58 | 82.8 % | 10 | 3 s | 10 | 0 | 100 % |
-| `interior/bore-resistance.ts` | 84 | 54.8 % | 38 (34 not covered) | 3 s | 38 | 0 | 100 % |
+| Module                          | Mutants | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
+| ------------------------------- | ------- | ------------ | ------------------------ | ------------------------ | ----------------------- | --------------- | ----------- |
+| `groups/velocity-statistics.ts` | 95      | 81.1 %       | 18                       | 14 s                     | 16                      | 2               | 97.9 %      |
+| `interior/velocity-ladder.ts`   | 87      | 66.7 %       | 29 (2 not covered)       | 3 s                      | 28                      | 1               | 98.9 %      |
+| `interior/vivacity.ts`          | 58      | 77.6 %       | 13                       | 3 s                      | 6                       | 7               | 87.9 %      |
+| `interior/ladder.ts`            | 58      | 82.8 %       | 10                       | 3 s                      | 10                      | 0               | 100 %       |
+| `interior/bore-resistance.ts`   | 84      | 54.8 %       | 38 (34 not covered)      | 3 s                      | 38                      | 0               | 100 %       |
 
 The wall times before and after are the same within a second or two.
 
 Surviving classes before the new tests:
-
 - Input guards: the confidence level and width of `velocityStatistics` and `shotsNeeded`, every step check of `ladderFlatSpots`, the start charge, step and odd count of `chargeLadder`, and the range of `meanDynamicVivacity`; an infinite start charge, standard deviation or charge passed when an `&&` became `||`.
 - Inclusive limits: a range of the mean vivacity from 0 or to 1, a standard deviation of 0, an oversize of exactly 5 %, a band of width 0 that counts as flat.
 - A guard never reached: a width of 0.01 or more that 100 000 shots do not reach, whose search loop then never ends without its bound; an even ladder up or down, which a mutant refusing every ladder of an even count passed.
@@ -99,18 +97,17 @@ Equivalent survivors: in the shot count search, a strict test of the width (no s
 
 Five modules of `apps/web/src/lib` by risk, one per kind of logic; generated files and pure wiring were not candidates. `units.ts` (unit conversion: every factor, preset and stored unit choice of the app, and the twist text), `chrono.ts` (file parsing: the size limits and the workbook and text paths of a chronograph import, and the session CSV it writes), `target-geometry.ts` (the matrices, the homography and the calibration that turn photo pixels into target mm for every shot group), `ring-scoring.ts` (the touch rule of a hole on round, oval, square and stadium rings, the tenths, the ring fit of marks) and `field-spec.ts` (record validation: a field's text to SI and its bounds, required, positive and whole number checks, which every designer and calculator field reads). The tests of `ring-scoring.ts` are split over three files, all counted as its own. `field-spec.ts` had no test file of its own: its tests sat in `units.test.ts`, which is its baseline, and the new tests went into `field-spec.test.ts`. The web tests ran on the host (Node 26) against the workspace's Vitest, with Stryker's temporary directory inside the workspace (one on another file system breaks the restore of an in-place run).
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `units.ts` | 243 | 79.4 % | 50 (18 not covered) | 10 s | 39 | 11 | 95.5 % |
-| `chrono.ts` | 191 (3 runtime errors) | 69.7 % | 57 (15 not covered) | 26 s | 55 | 2 | 98.9 % |
-| `target-geometry.ts` | 438 (152 runtime errors) | 57.3 % | 122 (58 not covered) | 16 s | 96 | 26 | 90.9 % |
-| `ring-scoring.ts` | 423 | 86.5 % | 57 (2 not covered) | 27 s | 19 | 38 | 91.0 % |
-| `field-spec.ts` | 141 | 36.9 % | 89 (64 not covered) | 8 s | 84 | 5 | 96.5 % |
+| Module               | Mutants                  | Score before | Surviving or not covered | Wall time, own test file | Killed by the new tests | Equivalent left | Score after |
+| -------------------- | ------------------------ | ------------ | ------------------------ | ------------------------ | ----------------------- | --------------- | ----------- |
+| `units.ts`           | 243                      | 79.4 %       | 50 (18 not covered)      | 10 s                     | 39                      | 11              | 95.5 %      |
+| `chrono.ts`          | 191 (3 runtime errors)   | 69.7 %       | 57 (15 not covered)      | 26 s                     | 55                      | 2               | 98.9 %      |
+| `target-geometry.ts` | 438 (152 runtime errors) | 57.3 %       | 122 (58 not covered)     | 16 s                     | 96                      | 26              | 90.9 %      |
+| `ring-scoring.ts`    | 423                      | 86.5 %       | 57 (2 not covered)       | 27 s                     | 19                      | 38              | 91.0 %      |
+| `field-spec.ts`      | 141                      | 36.9 %       | 89 (64 not covered)      | 8 s                      | 84                      | 5               | 96.5 %      |
 
 The wall time is the run after the new tests; the chronograph run is longer after them because two read 32 MiB of bytes. The runtime errors of `target-geometry.ts` are mutants that break the matrices the test file builds when it loads (a photo of a known homography), so the file fails before any test runs.
 
 Surviving classes before the new tests:
-
 - Input guards: a stored unit choice of `null`, a preset given as an array, overrides of `null`, of an unknown quantity or of a unit id that is no string (each threw or kept a wrong unit when its check was dropped); a matrix of 8 entries, a singular matrix and a singular linear system; three points on one line other than the first three of a homography; marks on a ring without points, exactly four marks, and an inner ring marked outside an outer one; a hole size of 0 with no event.
 - Inclusive limits: a chronograph file of exactly 32 MiB, a field value at its minimum and at its maximum, 0 for a value that must be greater than 0, two values within the relative 1e-9 of a unit round-trip.
 - A wrong index or axis: the angle step of a ring drawn on the sheet (any multiple of the step still lies on the circle), the centre of a circle whose first point is not level with it, the cold bore shot and the flyer of the example session, and a string whose shots are all excluded.
@@ -122,20 +119,19 @@ Equivalent survivors: in the units, the catch of an unreadable stored choice and
 ### Round 5
 
 By risk, on the host:
-
 - `core/cartridge-specs.ts`: the diameters and bore area that the bullet fit and the cartridge pages read; 35 of its mutants were covered by no test of its own file.
 - `api/compute/limits.ts`: the comparison of a simulated pressure range with the CIP Pmax, its warnings and the decimals that keep a printed value on its side of a limit.
 - `cli/rows.ts`: the parser of the user's load rows, a trust boundary whose messages must name file, line and column and never quote a value.
 - `cli/metrics.ts`: the error metrics, interval coverage and changes that `verify` and `compare` report. It had no test file of its own, so its scores are over `test/verify.test.ts` and `test/compare.test.ts`; the new `test/metrics.test.ts` alone reaches 67.2 % in 5 s.
 - `importers/pressure-history.ts`: unit factors and spellings of a pressure trace, the reading of numbers and the zero-phase low-pass.
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time | Killed by the new tests | Equivalent left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `core/cartridge-specs.ts` | 76 | 52.6 % | 36 (35 not covered) | 2 s | 36 | 0 | 100 % |
-| `api/compute/limits.ts` | 147 | 83.7 % | 24 (4 not covered) | 9 s | 24 | 0 | 100 % |
-| `cli/rows.ts` | 291 | 90.0 % | 29 (4 not covered) | 9 s | 21 | 8 | 97.3 % |
-| `cli/metrics.ts` | 127 | 85.8 % | 18 | 65 s | 18 | 0 | 100 % |
-| `importers/pressure-history.ts` | 242 | 84.7 % | 37 (6 not covered) | 8 s | 23 | 14 | 94.2 % |
+| Module                          | Mutants | Score before | Surviving or not covered | Wall time | Killed by the new tests | Equivalent left | Score after |
+| ------------------------------- | ------- | ------------ | ------------------------ | --------- | ----------------------- | --------------- | ----------- |
+| `core/cartridge-specs.ts`       | 76      | 52.6 %       | 36 (35 not covered)      | 2 s       | 36                      | 0               | 100 %       |
+| `api/compute/limits.ts`         | 147     | 83.7 %       | 24 (4 not covered)       | 9 s       | 24                      | 0               | 100 %       |
+| `cli/rows.ts`                   | 291     | 90.0 %       | 29 (4 not covered)       | 9 s       | 21                      | 8               | 97.3 %      |
+| `cli/metrics.ts`                | 127     | 85.8 %       | 18                       | 65 s      | 18                      | 0               | 100 %       |
+| `importers/pressure-history.ts` | 242     | 84.7 %       | 37 (6 not covered)       | 8 s       | 23                      | 14              | 94.2 %      |
 
 The kills were a dropped guard (the crusher method, a one-field record, an empty number column, a whitespace line), a changed boundary (a high end equal to the limit, a temperature of exactly -273.15, a printed velocity on the band edge, exactly ten problems), a wrong unit spelling (the micro signs, a bare or lower-case unit word, empty brackets before the unit), a wrong factor (the low-pass gain, checked against the closed form of a spike), a wrong index (the last word of a header cell, the base name of a rows file) and an output reversed or not trimmed. The 22 equivalent mutants are fallbacks for an index the code never misses, guards whose later check gives the same message, trims of cells the cell splitter already trims, a regular expression anchor whose loss `Number` still rejects, and a comparison with an undefined last time that is false either way.
 
@@ -144,23 +140,21 @@ The kills were a dropped guard (the crusher method, a one-field record, an empty
 Stryker's `testFiles` option makes every mutant run with a test filter, so a static mutant (one evaluated when the module loads, such as a constant table) is switched on only after the module has loaded and survives: the screening run of `interior/start-pressure.ts` showed 14 survivors that way against 5 without it. From this round on, the run is restricted to the own test file through a Vitest configuration outside the workspace that includes only that file.
 
 Screening of 15 small modules not covered before, score and surviving or not covered mutants: `api/compute/resolve.ts` 0.0 % (73, its test file tests a schema conversion only), `api/routes/charge-target.ts` 47.6 % (11), `schema/target-sheet.ts` 49.2 % (93), `schema/overrides.ts` 57.0 % (49), `interior/workbench-keys.ts` 60.0 % (6 of 15), `schema/case-capacity.ts` 67.6 % (23), `interior/monte-carlo.ts` 73.7 % (20), `schema/competition-order.ts` 76.6 % (29), `interior/start-pressure.ts` 80.8 % (5), `exterior/moving-target.ts` 81.6 % (7), `interior/fit-sessions.ts` 84.5 % (16), `interior/record-load.ts` 86.2 % (9), `interior/fit-strings.ts` 89.5 % (4), `interior/load-file.ts` 89.8 % (21) and `interior/shotshell.ts` 97.8 % (1). The five with the lowest score were taken, except `interior/workbench-keys.ts`, whose 15 mutants are key lists with little logic:
-
 - `api/compute/resolve.ts`: the record lookups of every compute route and the bullet record to projectile step, with the lb/in2 factor of the ballistic coefficient bands and the guards for a missing or repeated band.
 - `api/routes/charge-target.ts`: the charge solver route, its error handler for a full pool, its body limit and its OpenAPI entry.
 - `schema/target-sheet.ts`: the cross-field rules of a target sheet (one rectangle, references need a photo, unique group and note ids, a ladder step needs a load) and the units its JSON Schema states.
 - `schema/overrides.ts`: the merge of a user variant over a catalogue record and the override and draft schemas the designers save.
 - `schema/case-capacity.ts`: the catalogue rules of a water capacity record and its accepted values.
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, before and after | Killed by the new tests | Equivalent left | Description texts left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `api/compute/resolve.ts` | 73 | 0.0 % | 73 (73 not covered) | 6 s, 9 s | 72 | 1 | 0 | 98.6 % |
-| `api/routes/charge-target.ts` | 21 | 47.6 % | 11 | 33 s, 34 s | 9 | 2 | 0 | 90.5 % |
-| `schema/target-sheet.ts` | 190 (7 runtime errors) | 49.2 % | 93 | 11 s, 10 s | 20 | 1 | 72 | 60.1 % |
-| `schema/overrides.ts` | 120 (6 runtime errors) | 57.0 % | 49 (7 not covered) | 7 s, 8 s | 44 | 5 | 0 | 95.6 % |
-| `schema/case-capacity.ts` | 71 | 67.6 % | 23 | 7 s, 6 s | 13 | 0 | 10 | 85.9 % |
+| Module                        | Mutants                | Score before | Surviving or not covered | Wall time, before and after | Killed by the new tests | Equivalent left | Description texts left | Score after |
+| ----------------------------- | ---------------------- | ------------ | ------------------------ | --------------------------- | ----------------------- | --------------- | ---------------------- | ----------- |
+| `api/compute/resolve.ts`      | 73                     | 0.0 %        | 73 (73 not covered)      | 6 s, 9 s                    | 72                      | 1               | 0                      | 98.6 %      |
+| `api/routes/charge-target.ts` | 21                     | 47.6 %       | 11                       | 33 s, 34 s                  | 9                       | 2               | 0                      | 90.5 %      |
+| `schema/target-sheet.ts`      | 190 (7 runtime errors) | 49.2 %       | 93                       | 11 s, 10 s                  | 20                      | 1               | 72                     | 60.1 %      |
+| `schema/overrides.ts`         | 120 (6 runtime errors) | 57.0 %       | 49 (7 not covered)       | 7 s, 8 s                    | 44                      | 5               | 0                      | 95.6 %      |
+| `schema/case-capacity.ts`     | 71                     | 67.6 %       | 23                       | 7 s, 6 s                    | 13                      | 0               | 10                     | 85.9 %      |
 
 The kills were:
-
 - a dropped guard: a bullet record without a BC of the drag model, two BCs of one start speed, a cartridge value override with neither value nor raw text, a catalogue capacity without a case manufacturer, a sheet without a load whose groups have no ladder step;
 - a wrong unit factor: the lb/in2 to kg/m2 factor of each band, the SI mass, diameter and length of a bullet record;
 - a wrong index or default: a band without a start speed from 0, the length taken from the record only when none is stated, the 404 text naming kind and id;
@@ -173,7 +167,6 @@ The 9 equivalent mutants: in the projectile, a placeholder BC list for a record 
 ### Round 7
 
 Screening of 16 small modules of the web libraries, the data checks, the drawing geometry and the tools not covered before, with coverage analysis over all tests; the scores before in the table are a second run with per-test coverage and match the screening. Score and surviving or not covered mutants: `web/hole-proposals.ts` 50.9 % (57), `web/user-store.ts` 51.6 % (78, over its three test files), `tools/audit.ts` 60.0 % (28), `data/references.ts` 63.1 % (58), `web/caliber.ts` 69.2 % (36), `tools/pack-check.ts` 69.8 % (54), `drawing/core/geometry.ts` 71.8 % (94), `drawing/cartridge/regions.ts` 72.6 % (26), `web/case-rows.ts` 73.9 % (12), `web/ticks.ts` 74.1 % (15), `web/lot-rows.ts` 75.6 % (19), `data/load-tables.ts` 82.3 % (17), `data/names.ts` 82.5 % (22), `data/renames.ts` 87.8 % (5), `web/mass-range.ts` 93.0 % (4) and `web/query.ts` 94.5 % (8). `web/dates.ts` has no score: its test file failed the tool's first run. Taken:
-
 - `apps/web/src/lib/hole-proposals.ts`: the expected hole size of the target editor (typed, learned median, bullet, marker), the maybe tier of a proposal, the local photo scale under a perspective calibration and the proposals kept clear of placed shots.
 - `apps/web/src/lib/user-store.ts`: the browser store of user records and photos: invalid entries stored only where the id is free, the photo ids of invalid sheets, a change read and written in one transaction, the relink of a chain of refits on delete and the persistent storage request.
 - `packages/data/src/references.ts`: the reference checks of the record data (cartridge, components, primer, capacity, case, session, load and manufacturer of every record kind), with renamed ids.
@@ -182,18 +175,17 @@ Screening of 16 small modules of the web libraries, the data checks, the drawing
 
 Left out: `tools/audit.ts`, whose survivors are mostly its script block, which runs `npm audit` through a path that a test cannot replace; `web/caliber.ts`, whose survivors are mostly the literals of its caliber table; the others for their higher scores.
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, before and after | Killed by the new tests | Equivalent left | Script block left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `web/hole-proposals.ts` | 116 | 50.9 % | 57 (43 not covered) | 9 s, 11 s | 57 | 0 | 0 | 100 % |
-| `web/user-store.ts` | 161 | 51.6 % | 78 (62 not covered) | 10 s, 15 s | 73 | 5 | 0 | 96.9 % |
-| `data/references.ts` | 157 | 63.1 % | 58 (36 not covered) | 7 s, 10 s | 57 | 1 | 0 | 99.4 % |
-| `tools/pack-check.ts` | 179 | 69.8 % | 54 (21 not covered) | 56 s, 73 s | 20 | 10 | 24 | 81.0 % |
-| `drawing/core/geometry.ts` | 333 | 71.8 % | 94 (1 not covered) | 10 s, 11 s | 63 | 31 | 0 | 90.7 % |
+| Module                     | Mutants | Score before | Surviving or not covered | Wall time, before and after | Killed by the new tests | Equivalent left | Script block left | Score after |
+| -------------------------- | ------- | ------------ | ------------------------ | --------------------------- | ----------------------- | --------------- | ----------------- | ----------- |
+| `web/hole-proposals.ts`    | 116     | 50.9 %       | 57 (43 not covered)      | 9 s, 11 s                   | 57                      | 0               | 0                 | 100 %       |
+| `web/user-store.ts`        | 161     | 51.6 %       | 78 (62 not covered)      | 10 s, 15 s                  | 73                      | 5               | 0                 | 96.9 %      |
+| `data/references.ts`       | 157     | 63.1 %       | 58 (36 not covered)      | 7 s, 10 s                   | 57                      | 1               | 0                 | 99.4 %      |
+| `tools/pack-check.ts`      | 179     | 69.8 %       | 54 (21 not covered)      | 56 s, 73 s                  | 20                      | 10              | 24                | 81.0 %      |
+| `drawing/core/geometry.ts` | 333     | 71.8 %       | 94 (1 not covered)       | 10 s, 11 s                  | 63                      | 31              | 0                 | 90.7 %      |
 
 The pack check runs `npm pack --dry-run` for each test, which sets its time. Its script block (the list of published packages and the loop that packs each of them) is reached only by packing every published package, which CI does as its own step, so its 24 mutants are left and not counted as equivalent.
 
 Surviving classes before the new tests:
-
 - Not covered by the own test file: the hole size rules, the maybe tier and the nominal size test of the hole proposals; the photo ids of invalid sheets, the store of invalid entries, the change in one transaction, the photo store and the persistent storage request of the user store; the cartridge and session reference checks and every manufacturer check but the capacity's.
 - A dropped guard: a stored powder whose `fit.previous` is no text, whose data has no fit, or whose id is no text, and a record of another kind naming a deleted powder (each was relinked or broke the delete when its check was dropped); deleted records that name each other or themselves, whose loop never ended or named a deleted record without its stop rule; a bundle without renames; a load without a capacity or a primer; an export condition set to `null`; a package without `main` or `types`.
 - A changed boundary: a proposal exactly half a hole from a shot, a confidence of exactly 0.5, polygons and boxes exactly the pad apart or touching in the reverse order, segments meeting end to end at either end of either one, a segment that ends on a box edge.
@@ -206,7 +198,6 @@ The 47 equivalent survivors: in the user store, a fallback for a `getAll` that a
 ### Round 8
 
 Screening of 13 small modules not covered before (the web libraries added or changed since round 7, importer parsers and tools checks), with per-test coverage, so its scores are the scores before. Score and surviving or not covered mutants: `importers/units.ts` 22.0 % (78), `web/records-csv.ts` 50.0 % (51), `tools/licences.ts` 57.6 % (145), `tools/pages-serve.ts` 63.7 % (33), `importers/shotview.ts` 79.6 % (44), `web/load-use.ts` 81.6 % (7), `web/firearm.ts` 82.8 % (76), `web/load-gaps.ts` 83.1 % (10), `web/match-rounds.ts` 89.8 % (10), `importers/openreloading-json.ts` 91.2 % (22), `web/caliber-class-of.ts` 93.8 % (1), `web/build-line.ts` 95.0 % (1) and `tools/dev-exit.ts` 97.0 % (1). The five with the lowest scores were taken:
-
 - `packages/importers/src/units.ts`: the velocity unit spellings of every chronograph import, the exact factors to m/s, the unit the caller names against the unit of the file, and the positive velocity check. Its own test file read only one function; `parseVelocity` is also reached through the generic importer tests, which this run does not include.
 - `apps/web/src/lib/records-csv.ts`: the CSV files of the saved loads and the firearm list, with the names of the records a load names, taken from this browser or asked from the API once each.
 - `tools/src/licences.ts`: the licence policy of the shipped packages: the production closure of the lock file, the platform filter, the SPDX expression reader, the policy file, the NOTICE block and the job summary.
@@ -215,18 +206,17 @@ Screening of 13 small modules not covered before (the web libraries added or cha
 
 Left out: `web/firearm.ts`, whose survivors are mostly the literals of its label tables; the others for their higher scores or fewer survivors.
 
-| Module | Mutants | Score before | Surviving or not covered | Wall time, before and after | Killed by the new tests | Equivalent left | Script block left | Score after |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `importers/units.ts` | 100 | 22.0 % | 78 (59 not covered) | 2 s, 4 s | 78 | 0 | 0 | 100 % |
-| `web/records-csv.ts` | 109 (7 runtime errors) | 50.0 % | 51 (42 not covered) | 4 s, 13 s | 48 | 3 | 0 | 97.1 % |
-| `tools/licences.ts` | 344 (2 runtime errors) | 57.6 % | 145 (86 not covered) | 7 s, 10 s | 99 | 6 | 37 | 86.5 % |
-| `tools/pages-serve.ts` | 91 | 63.7 % | 33 (6 not covered) | 24 s, 26 s | 20 | 5 | 8 | 85.7 % |
-| `importers/shotview.ts` | 216 | 79.6 % | 44 (4 not covered) | 11 s, 16 s | 29 | 14 | 0 | 93.1 % |
+| Module                  | Mutants                | Score before | Surviving or not covered | Wall time, before and after | Killed by the new tests | Equivalent left | Script block left | Score after |
+| ----------------------- | ---------------------- | ------------ | ------------------------ | --------------------------- | ----------------------- | --------------- | ----------------- | ----------- |
+| `importers/units.ts`    | 100                    | 22.0 %       | 78 (59 not covered)      | 2 s, 4 s                    | 78                      | 0               | 0                 | 100 %       |
+| `web/records-csv.ts`    | 109 (7 runtime errors) | 50.0 %       | 51 (42 not covered)      | 4 s, 13 s                   | 48                      | 3               | 0                 | 97.1 %      |
+| `tools/licences.ts`     | 344 (2 runtime errors) | 57.6 %       | 145 (86 not covered)     | 7 s, 10 s                   | 99                      | 6               | 37                | 86.5 %      |
+| `tools/pages-serve.ts`  | 91                     | 63.7 %       | 33 (6 not covered)       | 24 s, 26 s                  | 20                      | 5               | 8                 | 85.7 %      |
+| `importers/shotview.ts` | 216                    | 79.6 %       | 44 (4 not covered)       | 11 s, 16 s                  | 29                      | 14              | 0                 | 93.1 %      |
 
 The script blocks are the parts that run only as a command: the licence check that reads the repository's lock file, policy and NOTICE, and the host's port, base path and root from the environment; CI runs the licence check as its own step. Four survivors are neither equivalent nor a script block: in the licences, a workspace entry with an `os` field, which the platform filter would read once the `node_modules/` test of a lock key is dropped, and two description texts of the packages left out of the list; in the ShotView workbook, the text of a date row with its label only.
 
 Surviving classes before the new tests:
-
 - Not covered by the own test file: `parseVelocityUnit` and `parseVelocity` of the units, the saving of both CSV files and the record names of the saved loads, the job summary and the default roots of the licence check.
 - A dropped guard: a dependency that is not installed, a link without a target and a dependency cycle (the loop ended early or never ended), a policy whose list is no list of text or names no npm package, a velocity of exactly 0, a header row without `#`, a directory without `index.html`, a path that only starts with the base path, and a non-load record whose cartridge was asked from the API.
 - A wrong unit factor or unit: the m/s factors of ft/s, km/h and mph, the rounding to 1e-6, a value in m/s rounded where it is kept as written, and the content type of each file extension.
@@ -241,7 +231,6 @@ The 28 equivalent survivors: in the CSV files, a reference test of a bullet or p
 improved. Tests were added for every module in the tables (files under Where in the app). In round 1 they check each limit accepted, each invalid field named and each ring probability against the closed form, and the closed-form check of the zone integral was tightened from 8 to 13 digits. After round 8 every survivor left is equivalent, a script block, a description text or one of the four named in round 8.
 
 Mutation testing is recommended in a reduced form, and no workflow was added:
-
 - A weekly, report-only run, each module against its own test file, not on the full suite (more than 90 minutes for two modules) and not as a required check. More modules join one at a time after a measured run.
 - Own-file run times after the new tests: the three round 1 modules about a minute in all; round 3, 3 to 17 s; round 4, 8 to 27 s; round 5 under 10 s except the metrics run over the verify and compare tests; round 6, 6 to 34 s; round 7, 11 to 15 s, except the pack check at 73 s, as each of its tests packs a package; round 8, 4 to 26 s. Four of the five round 2 modules run in seconds; the group statistics (51 min) does not fit until its simulation tests move to a file of their own.
 - The weekly run restricts the files through the Vitest configuration, not through `testFiles`, so its static mutants count.

@@ -1,4 +1,5 @@
 ---
+
 title: Interior model internal consistency checks
 description: What the energy, isentrope, pressure-gradient and tolerance tests of the interior model show, and what they cannot show.
 ---
@@ -12,7 +13,6 @@ Interior ballistics: does the [M3 model](../models/interior-m3.md) keep its own 
 ## Method
 
 Four checks on synthetic loads:
-
 - Energy: with every part switched on (Lagrange gradient, rotation, bore resistance, convective heat loss, seven-perforated grain, shot start), the energy terms of the muzzle state add up to $m_c Q z$ within a relative $10^{-12}$, and the resistance work equals the area under the resistance force over the travel within $10^{-6}$.
 - Isentrope: without heat loss, after burnout, $\bar p\, V_f^{\,k}$ is constant over more than 100 curve points within $10^{-12}$.
 - Gradient: without resistance, the ratios of breech and of mean pressure to base pressure follow the Lagrange formulas within $10^{-12}$, and with resistance the base and breech pressures follow the equation of motion and the gradient within $10^{-9}$.

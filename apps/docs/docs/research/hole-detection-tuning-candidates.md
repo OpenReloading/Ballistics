@@ -1,4 +1,5 @@
 ---
+
 title: Hole detection tuning candidates
 description: One-setting changes of the hole detector measured against the quality bar on a tuning set of target photos, and two of three scored looks at a sealed holdout of three human-checked batches.
 ---
@@ -12,7 +13,6 @@ Hole detection: does a change of one detector setting (or the confidence tier) b
 ## Method
 
 Decided before the runs.
-
 - Tuning set: 566 third-party target photos that earlier measurements have already scored. Every candidate is measured on it, and it decides which candidates go on.
 - Holdout, first batch: 62 new target photos from 39 source posts that no earlier measurement or candidate has used. A cropped re-post of a tuning photo, and photos of the same shooter and setup as a tuning photo, were left out. They are stratified by target type and photo quality and sealed. No candidate reads them until a person has checked their labels. A candidate set may look at them at most three times in total, with the aggregates logged after each look.
 - Holdout label check: a person checked every proposed mark on a phone page, moved or added marks and marked photos as unusable. The corrected marks (proposed marks with moved ones at their new place, plus added marks) are the ground truth, and unusable photos are not scored. An unresolved region the person resolved by adding marks counts as resolved. The verdict counts of the check are not a measure of the annotating model.
@@ -43,23 +43,23 @@ Tuning set: 566 photos. The quality check stops 62 of them (not the holdout of t
 
 Usable complete photos (44) and usable partial photos (381):
 
-| Candidate | Found | Missed | False | Median | 90th pct. | Max | Photos with 1 or fewer | Partial found of 2638 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Baseline | 271 | 163 | 357 | 5 | 26 | 54 | 10 | 1593 |
-| Peak strength share 0.35 to 0.5 | 268 | 166 | 363 | 5 | 26 | 54 | 10 | 1617 |
-| Peak strength share 0.35 to 0.25 | 270 | 164 | 384 | 5 | 27 | 59 | 8 | 1599 |
-| Top-hat share 0.35 to 0.5 | 269 | 165 | 295 | 5 | 25 | 53 | 10 | 1593 |
-| Least top-hat contrast 40 to 60 | 270 | 164 | 353 | 5 | 25 | 55 | 9 | 1582 |
-| Least top-hat contrast 40 to 25 | 271 | 163 | 358 | 5 | 26 | 54 | 10 | 1586 |
-| Largest part per peak 3 to 2 D | 251 | 183 | 332 | 5 | 25 | 46 | 9 | 1556 |
-| Largest run hole size 1.4 to 1.2 | 257 | 177 | 345 | 5 | 26 | 54 | 8 | 1598 |
-| Seed peaks per polarity 4 to 2 | 249 | 185 | 295 | 5 | 26 | 55 | 9 | 1462 |
-| Fill share 0.3 to 0.45 | 273 | 161 | 308 | 5 | 25 | 39 | 8 | 1582 |
-| Print polarity confidence 0.8 to 0.6 | 274 | 160 | 362 | 5 | 26 | 54 | 10 | 1656 |
-| Confidence tier 0.5 to 0.6 | 247 | 187 | 212 | 5 | 14 | 35 | 10 | 1487 |
-| Confidence tier 0.5 to 0.7 | 217 | 217 | 125 | 5 | 11 | 21 | 9 | 1334 |
-| Confidence tier 0.5 to 0.8 | 168 | 266 | 71 | 5 | 11 | 23 | 6 | 1135 |
-| Tier 0.7, top-hat 0.5, fill 0.45 | 213 | 221 | 109 | 5 | 13 | 20 | 8 | 1383 |
+| Candidate                            | Found | Missed | False | Median | 90th pct. | Max | Photos with 1 or fewer | Partial found of 2638 |
+| ------------------------------------ | ----- | ------ | ----- | ------ | --------- | --- | ---------------------- | --------------------- |
+| Baseline                             | 271   | 163    | 357   | 5      | 26        | 54  | 10                     | 1593                  |
+| Peak strength share 0.35 to 0.5      | 268   | 166    | 363   | 5      | 26        | 54  | 10                     | 1617                  |
+| Peak strength share 0.35 to 0.25     | 270   | 164    | 384   | 5      | 27        | 59  | 8                      | 1599                  |
+| Top-hat share 0.35 to 0.5            | 269   | 165    | 295   | 5      | 25        | 53  | 10                     | 1593                  |
+| Least top-hat contrast 40 to 60      | 270   | 164    | 353   | 5      | 25        | 55  | 9                      | 1582                  |
+| Least top-hat contrast 40 to 25      | 271   | 163    | 358   | 5      | 26        | 54  | 10                     | 1586                  |
+| Largest part per peak 3 to 2 D       | 251   | 183    | 332   | 5      | 25        | 46  | 9                      | 1556                  |
+| Largest run hole size 1.4 to 1.2     | 257   | 177    | 345   | 5      | 26        | 54  | 8                      | 1598                  |
+| Seed peaks per polarity 4 to 2       | 249   | 185    | 295   | 5      | 26        | 55  | 9                      | 1462                  |
+| Fill share 0.3 to 0.45               | 273   | 161    | 308   | 5      | 25        | 39  | 8                      | 1582                  |
+| Print polarity confidence 0.8 to 0.6 | 274   | 160    | 362   | 5      | 26        | 54  | 10                     | 1656                  |
+| Confidence tier 0.5 to 0.6           | 247   | 187    | 212   | 5      | 14        | 35  | 10                     | 1487                  |
+| Confidence tier 0.5 to 0.7           | 217   | 217    | 125   | 5      | 11        | 21  | 9                      | 1334                  |
+| Confidence tier 0.5 to 0.8           | 168   | 266    | 71    | 5      | 11        | 23  | 6                      | 1135                  |
+| Tier 0.7, top-hat 0.5, fill 0.45     | 213   | 221    | 109   | 5      | 13        | 20  | 8                      | 1383                  |
 
 Baseline shares: 62 % of the reference holes found on complete photos, 43 % of proposals true, 60 % of marked holes found on partial photos. Median run time is about 1.9 s per photo.
 
@@ -73,27 +73,27 @@ Holdout after the label check of all three batches, labels frozen: 132 usable ph
 
 Look 1 at the holdout, on `main` at 5f2e7ea3, nothing tuned. Every reference hole on the 39 photos without a model-made hole size is counted as missed, because the runner had no hole size for them (17 printed rings with a black centre, 8 grid or square marks, 6 rings on light paper, 1 plain paper, 5 reactive, 2 other faces; 214 of the 282 misses of the printed rings with a black centre). Found and the 90th percentile are therefore pessimistic for those types; the false holes are not affected.
 
-| Target type | Usable | Reference holes | Found | Missed | False | Median | 90th pct. |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Printed rings with a black centre | 36 | 342 | 60 | 282 | 194 | 7 | 27 |
-| Grid or square marks | 26 | 139 | 52 | 87 | 193 | 5 | 27 |
-| Rings on light paper | 25 | 245 | 85 | 160 | 136 | 7 | 19 |
-| Plain paper or card | 24 | 201 | 103 | 98 | 163 | 5.5 | 22 |
-| Reactive or splatter faces | 14 | 146 | 20 | 126 | 125 | n/a | n/a |
-| Other faces | 7 | 43 | 18 | 25 | 26 | n/a | n/a |
-| Total | 132 | 1116 | 338 | 778 | 837 | 6 | n/a |
+| Target type                       | Usable | Reference holes | Found | Missed | False | Median | 90th pct. |
+| --------------------------------- | ------ | --------------- | ----- | ------ | ----- | ------ | --------- |
+| Printed rings with a black centre | 36     | 342             | 60    | 282    | 194   | 7      | 27        |
+| Grid or square marks              | 26     | 139             | 52    | 87     | 193   | 5      | 27        |
+| Rings on light paper              | 25     | 245             | 85    | 160    | 136   | 7      | 19        |
+| Plain paper or card               | 24     | 201             | 103   | 98     | 163   | 5.5    | 22        |
+| Reactive or splatter faces        | 14     | 146             | 20    | 126    | 125   | n/a    | n/a       |
+| Other faces                       | 7      | 43              | 18    | 25     | 26    | n/a    | n/a       |
+| Total                             | 132    | 1116            | 338   | 778    | 837   | 6      | n/a       |
 
 Look 2 at the holdout, on `main` at db2b2dae: hole detection and face search as in look 1, the only change the hole-size fallback for the 39 photos without a model-made size, so every usable photo is scored.
 
-| Target type | Usable | Reference holes | Found | Missed | False | Median | 90th pct. | Photos on the fallback |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Printed rings with a black centre | 36 | 342 | 112 | 230 | 500 | 7 | 42 | 17 |
-| Grid or square marks | 26 | 139 | 58 | 81 | 1193 | 10 | 129 | 8 |
-| Rings on light paper | 25 | 245 | 96 | 149 | 249 | 7 | 32 | 6 |
-| Plain paper or card | 24 | 201 | 103 | 98 | 188 | 6 | 25 | 1 |
-| Reactive or splatter faces | 14 | 146 | 20 | 126 | 224 | n/a | n/a | 5 |
-| Other faces | 7 | 43 | 23 | 20 | 73 | n/a | n/a | 2 |
-| Total | 132 | 1116 | 412 | 704 | 2427 | 8 | n/a | 39 |
+| Target type                       | Usable | Reference holes | Found | Missed | False | Median | 90th pct. | Photos on the fallback |
+| --------------------------------- | ------ | --------------- | ----- | ------ | ----- | ------ | --------- | ---------------------- |
+| Printed rings with a black centre | 36     | 342             | 112   | 230    | 500   | 7      | 42        | 17                     |
+| Grid or square marks              | 26     | 139             | 58    | 81     | 1193  | 10     | 129       | 8                      |
+| Rings on light paper              | 25     | 245             | 96    | 149    | 249   | 7      | 32        | 6                      |
+| Plain paper or card               | 24     | 201             | 103   | 98     | 188   | 6      | 25        | 1                      |
+| Reactive or splatter faces        | 14     | 146             | 20    | 126    | 224   | n/a    | n/a       | 5                      |
+| Other faces                       | 7      | 43              | 23    | 20     | 73    | n/a    | n/a       | 2                      |
+| Total                             | 132    | 1116            | 412   | 704    | 2427  | 8      | n/a       | 39                     |
 
 Check of look 2 against look 1: the 93 photos with a model-made hole size reproduce look 1 exactly (found 338, missed 371, false 837). All of the change is on the 39 fallback photos: found 0 to 74, missed 407 to 333, false 0 to 1590. Looks taken: 2 of 3; the third is unspent.
 

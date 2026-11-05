@@ -265,7 +265,7 @@ function linkedFace(heading: string | undefined) {
   url.searchParams.delete('event')
   window.history.replaceState(window.history.state, '', url)
   if (!recordIdRegex.test(id)) return
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: control characters are what it rejects
+  // oxlint-disable-next-line no-control-regex -- control characters are what it rejects
   return event && event.length <= 200 && !/[\u0000-\u001f]/.test(event) ? { id, event } : { id }
 }
 
@@ -799,7 +799,7 @@ function ScalePanel({ ed }: { ed: Ed }) {
         {t('Mark on photo')}
       </Button>
       {sheet.references.map((r, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: references keep their order
+        // oxlint-disable-next-line react/no-array-index-key -- references keep their order
         <ReferenceRow key={i} ed={ed} r={r} i={i} />
       ))}
       {sheet.references.length > 1 && cal && (
@@ -1662,6 +1662,7 @@ function SheetName({ ed }: { ed: Ed }) {
       className="sheet-select"
       value={meta.name}
       maxLength={200}
+      // oxlint-disable-next-line jsx-a11y/no-autofocus -- the name field appears when renaming starts, so focus moves into it
       autoFocus
       error={meta.name ? undefined : true}
       onChange={(e) => setMeta({ ...meta, name: e.currentTarget.value })}
@@ -2048,6 +2049,7 @@ function Toolbar({ ed }: { ed: Ed }) {
   const { t } = useTranslation()
   const { renaming, heading, exportMenu, toolbarKeys } = ed
   return (
+    // oxlint-disable-next-line jsx-a11y/interactive-supports-focus -- a toolbar moves focus among its buttons (toolbarKeys); the bar itself takes none
     <div
       className="target-toolbar"
       role="toolbar"
@@ -2137,7 +2139,6 @@ function Canvas({ ed }: { ed: Ed }) {
       ? turnedBox(photo.width, photo.height, sheet.photoRotation ?? 0)
       : undefined
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: drop target for a photo; Photo is the keyboard path
     <div
       className="target-stage"
       // a phone with its panels open gives the stage the photo's shape
@@ -3040,7 +3041,6 @@ export function TargetEditor({
 
   // a new sheet named before its language loaded takes the names of the language shown, until it
   // is edited or stored
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a language change only
   useEffect(() => {
     const o = opened.current
     if (stored || !meta.id || sheet !== o.data || meta.name !== o.name) return
@@ -3052,6 +3052,7 @@ export function TargetEditor({
     setMeta((m) => ({ ...m, name }))
     opened.current = { data, name }
     setH(historyOf(data))
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a language change only
   }, [t])
 
   /** The sheets of this browser (of the load in the workbench), the newest first. */
@@ -3096,13 +3097,12 @@ export function TargetEditor({
       })
       .catch(() => {})
   }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on the page's File menu writes only
   useEffect(() => {
     if (storedTick) reloadStored()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on the page's File menu writes only
   }, [storedTick])
 
   // the sheets of this browser (of the load in the workbench); the last one used opens
-  // biome-ignore lint/correctness/useExhaustiveDependencies: again only for another load
   useEffect(() => {
     let live = true
     let kept: string[] = []
@@ -3141,6 +3141,7 @@ export function TargetEditor({
     return () => {
       live = false
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- again only for another load
   }, [load])
 
   // the photo of the sheet from the browser store
@@ -3632,7 +3633,6 @@ export function TargetEditor({
   const shotWindow = shotWindowOf(group?.shots.length ?? 0, coarse, shotScroll)
   const { windowed } = shotWindow
   // scroll events come only while windowed: read the scroll once it starts and on another group
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on these changes only
   useLayoutEffect(() => {
     const e = shotScroller.current
     if (windowed && e) setShotScroll({ top: e.scrollTop, height: e.clientHeight })
@@ -3931,7 +3931,6 @@ export function TargetEditor({
   return (
     <>
       <SheetPageBar ed={ed} />
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: catches undo, redo and Escape from any control of the editor, and follows the focus for the field help */}
       <div
         ref={rootRef}
         role="presentation"

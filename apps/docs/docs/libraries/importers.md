@@ -1,4 +1,5 @@
 ---
+
 title: '@open-reloading/importers'
 sidebar_label: importers
 description: Parsers of chronograph exports, pressure histories and record tables.
@@ -18,8 +19,8 @@ It installs `@open-reloading/schema` with it. Each library has its own [Semantic
 
 ## Entry points
 
-| Import | Contents |
-|---|---|
+| Import                      | Contents                          |
+| --------------------------- | --------------------------------- |
 | `@open-reloading/importers` | Format detection and every parser |
 
 ## Example

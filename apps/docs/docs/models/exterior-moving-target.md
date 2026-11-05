@@ -1,4 +1,5 @@
 ---
+
 title: Moving target lead
 description: The aim point of a target that moves across the line of sight during the bullet's time of flight, as a distance, an angle and a count of target lengths.
 ---
@@ -21,15 +22,15 @@ The lead in target lengths is $L / \ell_t$ for a target of length $\ell_t$ in th
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $v_t$ | Target speed | m/s | m/s |
-| $\psi$ | Target heading, clockwise from the direction away from the shooter | deg | rad |
-| $t$ | Time of flight of the bullet to the range | s | s |
-| $R$ | Range along the line of sight | m | m |
-| $L$ | Lateral lead, positive to the right | m | m |
-| $\theta$ | Lead angle | deg | rad |
-| $\ell_t$ | Target length | m | m |
+| Symbol   | Meaning                                                            | Stored unit | Unit in `core` |
+| -------- | ------------------------------------------------------------------ | ----------- | -------------- |
+| $v_t$    | Target speed                                                       | m/s         | m/s            |
+| $\psi$   | Target heading, clockwise from the direction away from the shooter | deg         | rad            |
+| $t$      | Time of flight of the bullet to the range                          | s           | s              |
+| $R$      | Range along the line of sight                                      | m           | m              |
+| $L$      | Lateral lead, positive to the right                                | m           | m              |
+| $\theta$ | Lead angle                                                         | deg         | rad            |
+| $\ell_t$ | Target length                                                      | m           | m              |
 
 ## Assumptions
 
@@ -44,5 +45,4 @@ The lead in target lengths is $L / \ell_t$ for a target of length $\ell_t$ in th
 ## Sources
 
 Elementary kinematics of a target at constant velocity. No reference is cited.
-
 - Research log: [lead against the kinematics](../research/exterior-moving-target-kinematics.md).

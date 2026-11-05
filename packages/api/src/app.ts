@@ -60,11 +60,9 @@ export function buildApp({
   // While closing, a keep-alive connection whose response was in flight closes after that
   // response instead of staying open for keepAliveTimeout (Fastify default 72 s)
   let closing = false
-  // biome-ignore lint/suspicious/useAwait: Fastify waits for a hook's promise or its done callback
   app.addHook('preClose', async () => {
     closing = true
   })
-  // biome-ignore lint/suspicious/useAwait: Fastify waits for a hook's promise or its done callback
   app.addHook('onSend', async (_request, reply, payload) => {
     if (closing) reply.header('connection', 'close')
     return payload
@@ -87,7 +85,6 @@ export function buildApp({
   })
   app.get('/', async () => ({ root: true }))
   app.register(
-    // biome-ignore lint/suspicious/useAwait: Fastify waits for a plugin's promise or its done callback
     async (v1) => {
       v1.register(cartridgeRoutes, { catalogue })
       v1.register(componentRoutes, { catalogue })

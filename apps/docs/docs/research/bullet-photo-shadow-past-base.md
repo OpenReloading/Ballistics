@@ -1,4 +1,5 @@
 ---
+
 title: A shadow past the base of a bullet photograph
 description: Whether the bullet photo tool can trim a drop shadow offset towards the base, and keep a shadow far along the axis, from reading as a boat tail.
 ---
@@ -22,12 +23,12 @@ A shadow offset towards the base by more than its blur carries the cut-out on pa
 
 ## Numbers
 
-| Render | #918 | This change |
-| --- | --- | --- |
-| Rifle, shadow towards the base, 15 px/mm | flat, length -10.8 % (3 u 19 %), shadow named | the same |
-| Rifle, shadow towards the base, 30 px/mm | boat tail 1.44 mm, length -7.8 % (3 u 11.8 %), shadow named | flat, length -9.6 % (3 u 11.6 %), shadow named |
-| Pistol, shadow 20 px towards the tip | boat tail 0.59 mm, length +8.9 % (3 u 13.5 %), soft-edge note | flat (from #917's base samples), the same length and note |
-| Pistol, shadow 20 px towards the base | flat, length +4.5 % (3 u 20.6 %), shadow named | the same |
+| Render                                   | #918                                                          | This change                                               |
+| ---------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------- |
+| Rifle, shadow towards the base, 15 px/mm | flat, length -10.8 % (3 u 19 %), shadow named                 | the same                                                  |
+| Rifle, shadow towards the base, 30 px/mm | boat tail 1.44 mm, length -7.8 % (3 u 11.8 %), shadow named   | flat, length -9.6 % (3 u 11.6 %), shadow named            |
+| Pistol, shadow 20 px towards the tip     | boat tail 0.59 mm, length +8.9 % (3 u 13.5 %), soft-edge note | flat (from #917's base samples), the same length and note |
+| Pistol, shadow 20 px towards the base    | flat, length +4.5 % (3 u 20.6 %), shadow named                | the same                                                  |
 
 The catalogue evaluation is unchanged on every column of A to H. Trimming before the one-sided check moved two wide bullets of F from 0.51 and 0.52 % to -0.82 and -0.89 %: their turned corners looked like an overhang. The one-sided check first keeps their values; since it also sees an overhang there, their note says the values may be off, not that the shadow was taken out (the warning count of F is unchanged).
 

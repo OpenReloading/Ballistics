@@ -1,4 +1,5 @@
 ---
+
 title: Free recoil against a published worked example
 description: Whether the free recoil model reproduces the velocity and energy of a worked example of the standards body, and why the printed energy differs in the last digits.
 ---
@@ -21,10 +22,10 @@ The momentum balance of the [free recoil model](../models/free-recoil.md), $I = 
 
 The printed values are transcribed from the test comment; the page of the standard that holds them is unverified.
 
-| Quantity | Printed on the sheet | Model |
-| --- | --- | --- |
-| recoil velocity | 16.65 ft/s | 16.653 ft/s (816000/49000) |
-| recoil energy | 30.22 ft lbf | 30.168 ft lbf |
+| Quantity        | Printed on the sheet | Model                      |
+| --------------- | -------------------- | -------------------------- |
+| recoil velocity | 16.65 ft/s           | 16.653 ft/s (816000/49000) |
+| recoil energy   | 30.22 ft lbf         | 30.168 ft lbf              |
 
 The velocity agrees to the printed digits. The energy differs in the third digit: the sheet rounds the factor $7/64.34$ to 0.109 on the way, and the exact factor gives 30.168 ft lbf.
 

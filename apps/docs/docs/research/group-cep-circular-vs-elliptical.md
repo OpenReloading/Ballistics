@@ -1,4 +1,5 @@
 ---
+
 title: Circular against elliptical CEP by axis ratio
 description: How far the circular CEP overstates the CEP of an elongated group, and why the elliptical CEP is the value the app shows.
 ---
@@ -22,14 +23,14 @@ With one axis only, $\hat\sigma = \sigma_1/\sqrt{2}$ and the circular CEP is $\s
 ## Numbers
 
 | Axis ratio | Circular over elliptical CEP | Share inside the circular CEP |
-| --- | --- | --- |
-| 1 | 1 | 0.5 |
-| 1.5 | 1.02577 | 0.51725 |
-| 2 | 1.0694 | 0.5432 |
-| 3 | 1.14228 | 0.57516 |
-| 5 | 1.20286 | 0.58992 |
-| 10 | 1.22687 | 0.59382 |
-| one axis | 1.23435 | 0.5949 |
+| ---------- | ---------------------------- | ----------------------------- |
+| 1          | 1                            | 0.5                           |
+| 1.5        | 1.02577                      | 0.51725                       |
+| 2          | 1.0694                       | 0.5432                        |
+| 3          | 1.14228                      | 0.57516                       |
+| 5          | 1.20286                      | 0.58992                       |
+| 10         | 1.22687                      | 0.59382                       |
+| one axis   | 1.23435                      | 0.5949                        |
 
 The elliptical circle holds 0.5 within $10^{-6}$ at every ratio, and the one-axis values match the closed forms above. The overstatement is 2.6 % at an axis ratio of 1.5, 6.9 % at 2 and 14.2 % at 3, and stays below 23.5 % for any ratio.
 

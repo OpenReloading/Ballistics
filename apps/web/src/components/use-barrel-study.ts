@@ -190,7 +190,6 @@ export function useBarrelStudy({
     message?: string | undefined
   }>()
   // the request reads the run it was made for: a step change does not send it again
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `key` names the run and the travel
   useEffect(() => {
     if (!enabled || !ok || travel === undefined || key === undefined) return
     const controller = new AbortController()
@@ -214,6 +213,7 @@ export function useBarrelStudy({
       clearTimeout(late)
       controller.abort()
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- `key` names the run and the travel
   }, [enabled, key])
   const got = longer?.key === key ? longer : undefined
   const pending = enabled && key !== undefined && got === undefined

@@ -1,4 +1,5 @@
 ---
+
 title: Thermochemistry partial heats
 description: Whether the mass-weighted sum of conventional ingredient partial heats matches the heat of explosion computed from a frozen equilibrium for recorded powder compositions.
 ---

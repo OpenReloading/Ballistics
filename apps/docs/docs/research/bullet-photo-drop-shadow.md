@@ -1,4 +1,5 @@
 ---
+
 title: A drop shadow beside a bullet photograph
 description: Whether comparing the two sides of the bullet photo outline takes a one-sided drop shadow out of the cut-out and stops it from reading as a boat tail, measured on the catalogue evaluation's renders.
 ---
@@ -24,17 +25,17 @@ A body of revolution is symmetric about its axis, so the left and right edges' d
 
 Before (main) and after, 32 photographs per scenario, median / P90 of the absolute error:
 
-| Scenario F | Before | After |
-| --- | --- | --- |
-| Length % | 10 / 12 | 0.52 / 0.99 |
-| Length mm | 2.6 / 4.3 | 0.13 / 0.26 |
-| Nose length % | 21 / 29 | 0.40 / 4.4 |
-| Boat tail mm (true tails) | 0.47 / 0.72 | 0.063 / 0.077 |
-| False boat tails (flat bases) | 26 of 26 | 0 of 26 |
-| Outline volume % | 5.4 / 8.8 | 0.44 / 0.66 |
-| Seated volume % | 43 / 59 | 1.7 / 3.6 |
-| Lengths within 3 u | 32 | 32 |
-| With a warning | 24 | 31 |
+| Scenario F                    | Before      | After         |
+| ----------------------------- | ----------- | ------------- |
+| Length %                      | 10 / 12     | 0.52 / 0.99   |
+| Length mm                     | 2.6 / 4.3   | 0.13 / 0.26   |
+| Nose length %                 | 21 / 29     | 0.40 / 4.4    |
+| Boat tail mm (true tails)     | 0.47 / 0.72 | 0.063 / 0.077 |
+| False boat tails (flat bases) | 26 of 26    | 0 of 26       |
+| Outline volume %              | 5.4 / 8.8   | 0.44 / 0.66   |
+| Seated volume %               | 43 / 59     | 1.7 / 3.6     |
+| Lengths within 3 u            | 32          | 32            |
+| With a warning                | 24          | 31            |
 
 Scenarios A to E, G and H: every column unchanged (no one-sided taper found). The lengths above 1 % in F after the change are three squat pistol bullets 340, 395 and 315 px across: 1.96 % (3 u = 9.0 %, shadow named), 3.02 % (3 u = 7.9 %, no warning: the axis of a bullet 1.14 calibres long turns about 11 degrees with the shadow, and no side is clear) and 1.57 % (3 u = 10 %, shadow named). The stated length uncertainty on F stays about 3 to 11 % of the length: the soft edge still raises every edge position's uncertainty.
 

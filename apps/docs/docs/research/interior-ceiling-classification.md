@@ -1,4 +1,5 @@
 ---
+
 title: Placing a maximum pressure against the tolerance range
 description: How often a cartridge's maximum pressure falls below, inside or above the simulated peak-pressure range of a reference load, which input dominates each case, and whether the three-way split is worth showing.
 ---
@@ -42,23 +43,22 @@ $L_6$ and $L_3$ are lengths of the cartridge sheet ([case capacity](../models/ca
 Tier 1, repository records only: 589 `Pmax` values on 551 of 577 cartridges. Left out: 12 crusher values, 576 without a water capacity record and without a load row, 1 with a water capacity record (a demo case) but without a load row. Classified: 0. The repository holds 0 load records and 0 capacity records, 1 demo powder, 2 demo bullets and 1 demo case; no record stores a charge or a barrel length, so no cartridge has a reference load.
 
 Tier 2, with records outside the repository: 248 powders (224 with an interior model), a water capacity for 53 cartridges, 35,232 maximum-flag rows.
-
 - `Pmax` values left out: 12 crusher, 337 without a capacity and without a row, 187 without a capacity. 53 classified, one reference load per cartridge (the row with the lower-median nominal peak pressure).
 - Rows left out: 12,832 without a water capacity record, 2,302 without bullet mass, charge or barrel length, 166 with a powder without an interior model, 138 with an invalid nominal run. 16,942 rows run. These account for 32,380 of the 35,232 rows; the log gives no reason for the other 2,852 and the script was not kept, so the reason cannot be recovered. One of the 53 per-cartridge ranges is incomplete (a case left the model).
 
-| Class | Per cartridge (53) | Per row, start-pressure tolerance 20 % (16,942) | Per row, 10 % |
-| --- | --- | --- | --- |
-| Below the low end | 0 | 1,009 (6.0 %) | 1,131 (6.7 %) |
-| Inside the range | 10 (19 %) | 3,760 (22.2 %) | 3,282 (19.4 %) |
-| Above the high end | 43 (81 %) | 12,173 (71.9 %) | 12,529 (74.0 %) |
+| Class              | Per cartridge (53) | Per row, start-pressure tolerance 20 % (16,942) | Per row, 10 %   |
+| ------------------ | ------------------ | ----------------------------------------------- | --------------- |
+| Below the low end  | 0                  | 1,009 (6.0 %)                                   | 1,131 (6.7 %)   |
+| Inside the range   | 10 (19 %)          | 3,760 (22.2 %)                                  | 3,282 (19.4 %)  |
+| Above the high end | 43 (81 %)          | 12,173 (71.9 %)                                 | 12,529 (74.0 %) |
 
 Dominant input per row (start-pressure tolerance 20 % / 10 %):
 
-| Dominant input | Below | Inside | Above |
-| --- | --- | --- | --- |
+| Dominant input   | Below       | Inside        | Above          |
+| ---------------- | ----------- | ------------- | -------------- |
 | Burn coefficient | 921 / 1,131 | 3,559 / 3,273 | 9,205 / 11,929 |
-| Start pressure | 88 / 0 | 201 / 9 | 2,941 / 565 |
-| Chamber volume | 0 / 0 | 0 / 0 | 27 / 35 |
+| Start pressure   | 88 / 0      | 201 / 9       | 2,941 / 565    |
+| Chamber volume   | 0 / 0       | 0 / 0         | 27 / 35        |
 
 Charge and temperature never dominate. Per cartridge: burn coefficient 46 and start pressure 7 at 20 %, 51 and 2 at 10 %.
 

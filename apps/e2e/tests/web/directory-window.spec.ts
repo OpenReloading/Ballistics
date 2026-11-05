@@ -35,7 +35,10 @@ test('the records of the browser arriving after a scroll leave the list where it
     Object.defineProperty(IDBRequest.prototype, 'onsuccess', {
       ...success,
       set(handler) {
-        if (!handler) return success?.set?.call(this, handler)
+        if (!handler) {
+          success?.set?.call(this, handler)
+          return
+        }
         w.pending++
         success?.set?.call(this, (e: Event) =>
           setTimeout(() => {

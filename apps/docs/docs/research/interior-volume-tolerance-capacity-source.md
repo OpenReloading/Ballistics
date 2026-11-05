@@ -1,4 +1,5 @@
 ---
+
 title: Volume tolerance from the capacity source
 description: The pressure range's tolerance of the chamber volume set from where the case capacity comes from and from the bullet volume estimate, against the former flat 1 %, with its effect on rifle and handgun cases.
 ---

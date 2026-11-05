@@ -1,4 +1,5 @@
 ---
+
 title: Rifle cant in the hit probability
 description: Whether a cant standard deviation is worth an input of the hit-probability model, from the closed form of the impact shift and a seeded simulation of normally distributed cant.
 ---
@@ -28,12 +29,12 @@ One degree of cant: 200 yd, 7.93 in drop: horizontal 0.1384 in, vertical 0.0012 
 Seeded simulation against $H\sigma_c$, error in percent of the model, largest over the five cant standard deviations: 200 yd 0.33 percent (5 degrees), 1000 yd 0.34 percent (5 degrees); at 1 degree 0.08 and 0.04 percent. Model horizontal standard deviation:
 
 | Cant SD, degrees | 200 yd, in | 1000 yd, in |
-| --- | --- | --- |
-| 0.5 | 0.069 | 2.58 |
-| 1 | 0.138 | 5.17 |
-| 2 | 0.277 | 10.33 |
-| 3 | 0.415 | 15.50 |
-| 5 | 0.692 | 25.83 |
+| ---------------- | ---------- | ----------- |
+| 0.5              | 0.069      | 2.58        |
+| 1                | 0.138      | 5.17        |
+| 2                | 0.277      | 10.33       |
+| 3                | 0.415      | 15.50       |
+| 5                | 0.692      | 25.83       |
 
 For scale, a group of 0.15 mrad standard deviation is 1.08 in at 200 yd and 5.4 in at 1000 yd. One degree of cant is 1.6 percent of the horizontal variance at 200 yd and 48 percent at 1000 yd.
 

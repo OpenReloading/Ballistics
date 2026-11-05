@@ -1,4 +1,5 @@
 ---
+
 title: Engraving ramp at the jump to the lands
 description: Starting the workbench's engraving ramp at the seated bullet's jump (0 when touching or jammed) and its effect on peak pressure and muzzle velocity of the example load.
 ---
@@ -23,14 +24,14 @@ The engraving term of the bore resistance is unchanged ([M3 interior model](../m
 
 Example load: 2.4 g charge, 3.13 cm3 behind the bullet, 10.886 g bullet, 569 mm travel, start pressure 30 MPa. Ramp values are typed stand-ins, not taken from a record or a source.
 
-| Jump | Ramp 60 MPa over 5 mm: peak, velocity | Ramp 30 MPa over 10 mm: peak, velocity |
-| --- | --- | --- |
-| -0.3 mm (jammed) | 420.1 MPa, 813.7 m/s | 338.4 MPa, 784.6 m/s |
-| 0 mm (touching) | 420.1 MPa, 813.7 m/s | 338.4 MPa, 784.6 m/s |
-| 0.5 mm | 325.1 MPa, 778.6 m/s | 296.2 MPa, 764.7 m/s |
-| 1.0 mm | 303.5 MPa, 768.4 m/s | 286.9 MPa, 759.7 m/s |
-| 1.5 mm | 292.8 MPa, 762.9 m/s | 281.6 MPa, 756.8 m/s |
-| 3.0 mm | 278.5 MPa, 755.0 m/s | 273.4 MPa, 752.0 m/s |
+| Jump             | Ramp 60 MPa over 5 mm: peak, velocity | Ramp 30 MPa over 10 mm: peak, velocity |
+| ---------------- | ------------------------------------- | -------------------------------------- |
+| -0.3 mm (jammed) | 420.1 MPa, 813.7 m/s                  | 338.4 MPa, 784.6 m/s                   |
+| 0 mm (touching)  | 420.1 MPa, 813.7 m/s                  | 338.4 MPa, 784.6 m/s                   |
+| 0.5 mm           | 325.1 MPa, 778.6 m/s                  | 296.2 MPa, 764.7 m/s                   |
+| 1.0 mm           | 303.5 MPa, 768.4 m/s                  | 286.9 MPa, 759.7 m/s                   |
+| 1.5 mm           | 292.8 MPa, 762.9 m/s                  | 281.6 MPa, 756.8 m/s                   |
+| 3.0 mm           | 278.5 MPa, 755.0 m/s                  | 273.4 MPa, 752.0 m/s                   |
 
 Without a ramp: 259.3 MPa, 743.5 m/s at every jump. Before this change every row of a column had the jammed result.
 

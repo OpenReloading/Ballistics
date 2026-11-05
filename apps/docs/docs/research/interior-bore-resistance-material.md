@@ -1,4 +1,5 @@
 ---
+
 title: Bullet material in the bore-resistance law
 description: Whether solid copper and jacketed lead bullets need their own friction stress or engraving profile, from three measures of how much more solid copper resists.
 ---
@@ -23,11 +24,11 @@ $$
 
 ## Numbers
 
-| Measure | Solid copper over jacketed lead |
-| --- | --- |
-| mean work at firing speed, two comparisons | 1.50 and 1.11 (10.5 and 3.4 times the combined uncertainty; the bullets differ in mass and length) |
-| peak push pressure, 7.62 mm (read from a plot) | about 3 to 4 (14500 / 4100 psi) |
-| fitted handgun start pressure | 1.6 (50.0 / 30.8 MPa; the intervals overlap between 33.8 and 40.6 MPa) |
+| Measure                                        | Solid copper over jacketed lead                                                                    |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| mean work at firing speed, two comparisons     | 1.50 and 1.11 (10.5 and 3.4 times the combined uncertainty; the bullets differ in mass and length) |
+| peak push pressure, 7.62 mm (read from a plot) | about 3 to 4 (14500 / 4100 psi)                                                                    |
+| fitted handgun start pressure                  | 1.6 (50.0 / 30.8 MPa; the intervals overlap between 33.8 and 40.6 MPa)                             |
 
 No measured bullet states its bearing length $L$, so no stress per bearing area can be derived. The friction law at 0.42 MPa gives 3 to 6 MPa for a 10 to 19 mm bearing on a 5.69 mm bullet; the mean push forces over the bore area are 3 to 11 times that. In a published simulation a change of the whole resistance profile by about 40 % moves the peak pressure by +11 % and -8 % and the velocity by +0.8 % and -0.5 %. The load-table fit does not resolve an effect of this size per load (its resistance variants differed by under 0.1 points of velocity error).
 

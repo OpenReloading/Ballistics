@@ -35,7 +35,6 @@ function SettingsDialogProvider({ children }: { children: ReactNode }) {
   }, [])
   const route = useRoute()
   // a link inside the dialog leaves the page
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on a route change only
   useEffect(() => close(), [route])
   return (
     <SettingsDialog value={open}>

@@ -41,6 +41,7 @@ export function SegmentedRow<T extends string>({
                 value={s.value}
                 checked={value === s.value}
                 aria-disabled={s.reason ? true : undefined}
+                // oxlint-disable-next-line jsx-a11y/role-supports-aria-props -- aria-description is a global attribute of ARIA 1.3, which the rule does not know yet
                 aria-description={s.reason}
                 onChange={() => {
                   if (!s.reason) onChange(s.value)

@@ -1,4 +1,5 @@
 ---
+
 title: Interval for the standard deviation of a velocity string
 description: Coverage of the chi-square interval for the standard deviation of a velocity string on normal, skewed, heavy-tailed and stray-shot strings, against a percentile bootstrap, and the shots needed for a given interval width, from a seeded simulation.
 ---
@@ -34,40 +35,39 @@ The percentile bootstrap resamples the string with replacement, computes the sam
 
 Coverage of the true standard deviation by a 95 percent interval (percent):
 
-| Case | Method | $n$ = 3 | 5 | 10 | 20 | 30 | 50 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| normal | chi-square | 95.0 | 95.1 | 95.0 | 95.0 | 94.8 | 95.1 |
-| normal | bootstrap | 43.9 | 65.4 | 78.0 | 85.7 | 88.6 | 90.8 |
-| skewed (gamma) | chi-square | 92.8 | 91.9 | 90.2 | 88.0 | 87.9 | 86.6 |
-| strongly skewed (lognormal) | chi-square | 91.0 | 87.3 | 83.1 | 77.5 | 75.7 | 74.0 |
-| heavy-tailed (t, 5 df) | chi-square | 92.8 | 90.8 | 87.2 | 84.0 | 82.7 | 80.8 |
-| stray shots | chi-square | 92.7 | 90.9 | 87.1 | 82.4 | 80.1 | 77.1 |
+| Case                        | Method     | $n$ = 3 | 5    | 10   | 20   | 30   | 50   |
+| --------------------------- | ---------- | ------- | ---- | ---- | ---- | ---- | ---- |
+| normal                      | chi-square | 95.0    | 95.1 | 95.0 | 95.0 | 94.8 | 95.1 |
+| normal                      | bootstrap  | 43.9    | 65.4 | 78.0 | 85.7 | 88.6 | 90.8 |
+| skewed (gamma)              | chi-square | 92.8    | 91.9 | 90.2 | 88.0 | 87.9 | 86.6 |
+| strongly skewed (lognormal) | chi-square | 91.0    | 87.3 | 83.1 | 77.5 | 75.7 | 74.0 |
+| heavy-tailed (t, 5 df)      | chi-square | 92.8    | 90.8 | 87.2 | 84.0 | 82.7 | 80.8 |
+| stray shots                 | chi-square | 92.7    | 90.9 | 87.1 | 82.4 | 80.1 | 77.1 |
 
 At 90 percent the pattern is the same: chi-square 89.7 to 90.4 on normal strings, 65 to 87 on the others, falling with $n$. The bootstrap is below chi-square for every $n$ up to 20 in every case, and its misses are almost all above the interval. At $n$ = 30 and 50 on non-normal strings the two methods are within 1 to 4 points of each other, both far below the stated level.
 
 Chi-square interval as factors of the sample standard deviation, 95 percent:
 
 | $n$ | Lower | Upper | Half-width |
-| --- | --- | --- | --- |
-| 3 | 0.52 | 6.28 | 288 % |
-| 5 | 0.60 | 2.87 | 114 % |
-| 10 | 0.69 | 1.83 | 57 % |
-| 20 | 0.76 | 1.46 | 35 % |
-| 30 | 0.80 | 1.34 | 27 % |
-| 50 | 0.84 | 1.25 | 21 % |
+| --- | ----- | ----- | ---------- |
+| 3   | 0.52  | 6.28  | 288 %      |
+| 5   | 0.60  | 2.87  | 114 %      |
+| 10  | 0.69  | 1.83  | 57 %       |
+| 20  | 0.76  | 1.46  | 35 %       |
+| 30  | 0.80  | 1.34  | 27 %       |
+| 50  | 0.84  | 1.25  | 21 %       |
 
 Shots needed for a relative half-width of the interval:
 
 | Half-width | 90 % | 95 % |
-| --- | --- | --- |
-| 50 % | 9 | 12 |
-| 30 % | 19 | 26 |
-| 20 % | 38 | 53 |
+| ---------- | ---- | ---- |
+| 50 %       | 9    | 12   |
+| 30 %       | 19   | 26   |
+| 20 %       | 38   | 53   |
 
 ## Result
 
 improved. Adopted with a caveat, as described in [Groups](../models/groups.md#velocity-strings):
-
 - The chi-square interval, not a bootstrap: it is exact for normal strings and uses the existing quantile. Caveat shown with it: it assumes roughly normal velocities; a stray shot or a skewed string makes it too narrow, so the real level is lower than the stated one (simulated: 76 to 90 percent for a stated 95 percent at 10 to 30 shots on such strings).
 - 95 percent by default (the default level of the group intervals), the level stated next to the interval.
 - Too few shots to rank below 10 shots: two strings whose intervals do not overlap are ranked only when each has 10 shots or more. Overlapping intervals read as a difference smaller than the uncertainty at any count. At 10 shots the intervals of two strings separate only when their standard deviations differ by a factor of 2.7 (1.83 / 0.69). No interval below 3 shots.

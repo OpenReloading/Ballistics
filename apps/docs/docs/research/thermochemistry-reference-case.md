@@ -1,4 +1,5 @@
 ---
+
 title: Thermochemistry reference case
 description: A double-base composition at 210 kg/m3 solved by constant-volume equilibrium and compared with an independent hand-checked calculation, with the energy scale, a real-gas energy correction and the covolume species set as candidate causes.
 ---
@@ -35,22 +36,21 @@ Real-gas energy of a Noble-Abel gas whose covolume b depends on temperature: the
 
 Computed against the reference, relative gap in percent:
 
-| run | T (K) | force (kJ/kg) | M (g/mol) | gas (mol/kg) | covolume (cm3/g) | pressure (MPa) |
-| --- | --- | --- | --- | --- | --- | --- |
-| reference | 3841 | 1170 | 27.28 | 36.66 | 0.937 | 305.9 |
-| base | 3799.2 (-1.09) | 1159.9 (-0.86) | 27.233 (-0.17) | 36.72 (+0.16) | 0.915 (-2.38) | 301.5 (-1.44) |
-| energy scale | 3838.1 (-0.08) | 1173.7 (+0.32) | 27.189 (-0.33) | 36.78 (+0.33) | 0.915 (-2.37) | 305.1 (-0.26) |
-| real-gas energy | 3811.9 (-0.76) | 1164.4 (-0.48) | 27.219 (-0.22) | 36.74 (+0.22) | 0.915 (-2.38) | 302.7 (-1.06) |
-| both | 3850.1 (+0.24) | 1178.0 (+0.69) | 27.174 (-0.39) | 36.80 (+0.38) | 0.915 (-2.37) | 306.2 (+0.10) |
-| base, minor species in covolume | 3799.2 (-1.09) | 1159.9 (-0.86) | 27.233 (-0.17) | 36.72 (+0.16) | 0.9374 (+0.04) | 303.3 (-0.85) |
-| energy scale, minor species in covolume | 3838.1 (-0.08) | 1173.7 (+0.32) | 27.189 (-0.33) | 36.78 (+0.33) | 0.9396 (+0.28) | 307.1 (+0.38) |
+| run                                     | T (K)          | force (kJ/kg)  | M (g/mol)      | gas (mol/kg)  | covolume (cm3/g) | pressure (MPa) |
+| --------------------------------------- | -------------- | -------------- | -------------- | ------------- | ---------------- | -------------- |
+| reference                               | 3841           | 1170           | 27.28          | 36.66         | 0.937            | 305.9          |
+| base                                    | 3799.2 (-1.09) | 1159.9 (-0.86) | 27.233 (-0.17) | 36.72 (+0.16) | 0.915 (-2.38)    | 301.5 (-1.44)  |
+| energy scale                            | 3838.1 (-0.08) | 1173.7 (+0.32) | 27.189 (-0.33) | 36.78 (+0.33) | 0.915 (-2.37)    | 305.1 (-0.26)  |
+| real-gas energy                         | 3811.9 (-0.76) | 1164.4 (-0.48) | 27.219 (-0.22) | 36.74 (+0.22) | 0.915 (-2.38)    | 302.7 (-1.06)  |
+| both                                    | 3850.1 (+0.24) | 1178.0 (+0.69) | 27.174 (-0.39) | 36.80 (+0.38) | 0.915 (-2.37)    | 306.2 (+0.10)  |
+| base, minor species in covolume         | 3799.2 (-1.09) | 1159.9 (-0.86) | 27.233 (-0.17) | 36.72 (+0.16) | 0.9374 (+0.04)   | 303.3 (-0.85)  |
+| energy scale, minor species in covolume | 3838.1 (-0.08) | 1173.7 (+0.32) | 27.189 (-0.33) | 36.78 (+0.33) | 0.9396 (+0.28)   | 307.1 (+0.38)  |
 
 The energy-scale shift is 90.7 kJ/kg (36.60 mol/kg of gaseous elements) and moves the flame temperature by 38.9 K. The real-gas energy is -29.3 kJ/kg and moves it by 12.7 K. Product mole percent of the base run: H2O 28.2, CO 28.3, CO2 21.1, N2 14.6, H2 4.4, OH 1.7, H, NO and KOH about 0.4 each; the minor species are 3.3 % of the moles.
 
 ## Result
 
 no change; documented as a limit. Two causes explain the gaps:
-
 - Temperature and force: the 39 K gap is the size of the shift between the enthalpy and the energy scale of the input. The base run is the consistent one (condensed reactants at their enthalpy of formation, gas products at enthalpy minus R T); the reference matches the energy-scale run within 0.1 %, so it most likely takes -2150 kJ/kg as an energy of formation.
 - Covolume: the 2.4 % gap is the five-species sum. With OH, H, O, O2 and NO counted the covolume agrees within 0.04 % (base) and 0.3 % (energy scale).
 

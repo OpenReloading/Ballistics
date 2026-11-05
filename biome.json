@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -16,9 +16,10 @@
       "!**/.next",
       "!**/dist",
       "!**/next-env.d.ts",
-      "!**/*.md",
-      "!**/*.yaml",
-      "!**/*.yml",
+      "!**/CHANGELOG.md",
+      "!**/*.api.md",
+      "!tools/test/fixtures/markdown-meaning.md",
+      "!pnpm-lock.yaml",
       "!**/test/golden",
       "!packages/data/test/fixtures/invalid/chrono/broken.json"
     ]
@@ -31,32 +32,16 @@
   },
   "linter": {
     "enabled": true,
+    "includes": ["**/*.css", "**/*.json", "**/*.jsonc"],
     "rules": {
       "preset": "recommended",
-      "complexity": {
-        "noUselessUndefined": "error",
-        "noExcessiveCognitiveComplexity": "error",
-        "noImportantStyles": "off"
-      },
-      "correctness": {
-        "noComponentHookFactories": "off",
-        "noInvalidGridAreas": "off",
-        "noUnusedVariables": "error",
-        "noUnusedImports": "error",
-        "noUndeclaredDependencies": "error"
-      },
-      "style": {
-        "noParameterAssign": "error",
-        "useForOf": "error",
-        "noDescendingSpecificity": "off"
-      },
-      "suspicious": {
-        "noUnusedExpressions": "error",
-        "noNestedPromises": "error",
-        "useArraySortCompare": "error",
-        "useAwait": "error"
-      }
+      "complexity": { "noImportantStyles": "off" },
+      "correctness": { "noInvalidGridAreas": "off" },
+      "style": { "noDescendingSpecificity": "off" }
     }
+  },
+  "markdown": {
+    "formatter": { "formatEmbeds": false }
   },
   "javascript": {
     "formatter": {
@@ -65,54 +50,6 @@
       "semicolons": "asNeeded"
     }
   },
-  "overrides": [
-    {
-      "includes": ["apps/web/**", "apps/docs/**"],
-      "linter": {
-        "domains": { "react": "recommended" }
-      }
-    },
-    {
-      "includes": ["**/test/**", "apps/e2e/**"],
-      "linter": {
-        "rules": {
-          "performance": { "useDomNodeTextContent": "off" },
-          "suspicious": { "useArraySortCompare": "off" }
-        }
-      }
-    },
-    {
-      "includes": ["packages/drawing/src/**"],
-      "linter": {
-        "rules": {
-          "style": {
-            "noRestrictedImports": {
-              "level": "error",
-              "options": {
-                "paths": {
-                  "react": "The drawing library is pure: render in apps/web/src/components.",
-                  "next": "The drawing library is pure: render in apps/web/src/components."
-                },
-                "patterns": [
-                  {
-                    "group": [
-                      "next/**",
-                      "node:*",
-                      "node:*/**",
-                      "react/**",
-                      "react-dom",
-                      "react-dom/**"
-                    ],
-                    "message": "The drawing library is pure: no framework or Node imports."
-                  }
-                ]
-              }
-            }
-          }
-        }
-      }
-    }
-  ],
   "assist": {
     "enabled": true,
     "actions": {

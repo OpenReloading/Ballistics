@@ -8,14 +8,14 @@ import {
   MarkPointComponent,
   TooltipComponent,
 } from 'echarts/components'
-import { type ECharts, type EChartsCoreOption, init, use } from 'echarts/core'
+import { type ECharts, type EChartsCoreOption, init, use as register } from 'echarts/core'
 import { LabelLayout } from 'echarts/features'
 import { SVGRenderer } from 'echarts/renderers'
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from '../i18n/language.ts'
 
 // only the parts the charts use, so the chunk stays small (tree-shaken imports)
-use([
+register([
   Lines,
   GridComponent,
   MarkLineComponent,
@@ -36,7 +36,6 @@ export const tickStep = (ticks: number[]) => (ticks[1] ?? Number.NaN) - (ticks[0
 export function useChartTokens<K extends string>(names: Record<K, string>) {
   const scheme = useComputedColorScheme('light')
   const [tokens, setTokens] = useState<Record<K, string>>()
-  // biome-ignore lint/correctness/useExhaustiveDependencies: read again on a scheme change
   useEffect(() => {
     const css = getComputedStyle(document.documentElement)
     setTokens(
@@ -44,6 +43,7 @@ export function useChartTokens<K extends string>(names: Record<K, string>) {
         Object.entries<string>(names).map(([k, n]) => [k, css.getPropertyValue(n).trim()]),
       ) as Record<K, string>,
     )
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- read again on a scheme change
   }, [scheme])
   return tokens
 }

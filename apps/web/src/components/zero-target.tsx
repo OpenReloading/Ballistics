@@ -150,7 +150,7 @@ export function ZeroTargetMenu({
         svg &&
         createPortal(
           <div className="zero-target">
-            {/* biome-ignore lint/performance/noImgElement: the sheet's own SVG at true size, for print only */}
+            {/* oxlint-disable-next-line nextjs/no-img-element -- the sheet's own SVG at true size, for print only */}
             <img
               ref={image}
               src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`}

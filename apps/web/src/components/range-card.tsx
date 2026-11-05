@@ -82,7 +82,7 @@ export function RangeCard({
           {rangeCardRows(result.tablePoints, system, extras).map((cells) => (
             <tr key={cells[0]}>
               {cells.map((c, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: the columns are fixed
+                // oxlint-disable-next-line react/no-array-index-key -- the columns are fixed
                 <td key={i} className="num">
                   {c}
                 </td>

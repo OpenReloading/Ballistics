@@ -1,4 +1,5 @@
 ---
+
 title: Bullet inertia from the outline
 description: Moments of inertia of a bullet integrated from its outline against the solid-cylinder estimate, and a stability factor from the geometry alone against Miller's rule, on analytic data.
 ---
@@ -12,7 +13,6 @@ Modified point mass and stability: is the inertia of a bullet integrated from it
 ## Method
 
 Fixed before the run.
-
 - Moments: relative error of both moments, cylinder estimate and outline integral, against a reference. Build when on every bullet the transverse error of the outline is below half the cylinder error, the axial error below 5 percent and the transverse error below 15 percent.
 - Data: no bullet with published measured moments and a dimensioned outline could be taken into the repository (see Data basis). The quadrature is checked against an independent integral of the drawing polygon of the demo 168 grain record, and the rule on one stated reference only (168 grain, 7.62 mm class: axial 7.23e-8 kg m2, transverse 5.38e-7 kg m2: author-derived values with no source page, unverified). No measured-error claim is made.
 - Stability from the geometry: the factor with the overturning-moment slope from the outline, over twelve rifle outlines (length 3.4 to 5.4 calibres, Rt/R 1, 0.7 and 0.4, boat tail 0.3 or 0.5 calibre) and two pistol outlines, with the twist that gives Miller's factor 1.5 at 2800 ft/s in standard air. Pass when every ratio to Miller's factor is from 0.6 to 1.0 and none exceeds it by more than 10 percent. Both factors scale with the mass, so the ratio does not depend on the outline density.
@@ -40,25 +40,25 @@ with $p = 2 \pi v / T_w$ the muzzle spin ($v$ the muzzle velocity, $T_w$ the twi
 
 Quadrature, demo 168 grain outline (7.823 mm, 30.5 mm, nose 16 mm, Rt/R 0.55, meplat 1.6 mm, boat tail 3.8 mm to 6.62 mm), core integral (200 panels of five Gauss-Legendre nodes per profile piece) against Simpson's rule over the segments of the drawing polygon (4000 steps per segment):
 
-| Quantity | Relative difference |
-| --- | --- |
-| Volume | 1.3e-4 |
-| Centre of mass | 9.4e-5 |
-| Axial moment | 5.0e-5 |
-| Transverse moment | 1.1e-4 |
+| Quantity          | Relative difference |
+| ----------------- | ------------------- |
+| Volume            | 1.3e-4              |
+| Centre of mass    | 9.4e-5              |
+| Axial moment      | 5.0e-5              |
+| Transverse moment | 1.1e-4              |
 
 The remaining difference is the 24-step chord sampling of the polygon nose. A cone and a cylinder match their closed forms to 1e-6 in the unit test.
 
 Moments, demo bullet (cylinder estimate with its length against the outline integral):
 
-| | Axial, kg m2 | Transverse, kg m2 |
-| --- | --- | --- |
-| Cylinder | 8.33e-8 | 8.86e-7 |
-| Outline | 7.19e-8 | 5.94e-7 |
-| Reference (author-derived, unverified) | 7.23e-8 | 5.38e-7 |
-| Error, cylinder | 15.2 % | 64.6 % |
-| Error, outline | 0.6 % | 10.4 % |
-| Verdict | improved | improved |
+|                                        | Axial, kg m2 | Transverse, kg m2 |
+| -------------------------------------- | ------------ | ----------------- |
+| Cylinder                               | 8.33e-8      | 8.86e-7           |
+| Outline                                | 7.19e-8      | 5.94e-7           |
+| Reference (author-derived, unverified) | 7.23e-8      | 5.38e-7           |
+| Error, cylinder                        | 15.2 %       | 64.6 %            |
+| Error, outline                         | 0.6 %        | 10.4 %            |
+| Verdict                                | improved     | improved          |
 
 The rule is met on this one reference (transverse 10.4 % against half of 64.6 %, axial below 5 %, transverse below 15 %), not over five bullets. The reference 5.38e-7 and the outline are not of the same bullet, so the 10 percent is a reference point, not an accuracy claim.
 

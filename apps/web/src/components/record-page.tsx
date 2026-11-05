@@ -79,7 +79,7 @@ export function RecordPage({
         after={
           badgeNodes ??
           facts.map((b, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: two facts can read the same
+            // oxlint-disable-next-line react/no-array-index-key -- two facts can read the same
             <MutedBadge key={i} className="record-badge">
               {b}
             </MutedBadge>
@@ -100,7 +100,7 @@ export function RecordPage({
       {facts.length > 0 && (
         <p className="record-facts">
           {facts.map((b, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: two facts can read the same
+            // oxlint-disable-next-line react/no-array-index-key -- two facts can read the same
             <span key={i}>{i < facts.length - 1 ? `${b} · ` : b}</span>
           ))}
         </p>

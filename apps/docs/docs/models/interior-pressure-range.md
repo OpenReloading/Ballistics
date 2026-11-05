@@ -1,4 +1,5 @@
 ---
+
 title: Peak-pressure range over input tolerances
 description: The spread of the simulated peak pressure when charge, chamber volume, bullet mass, burn coefficient, temperature and start pressure move within their tolerances.
 ---
@@ -6,7 +7,6 @@ description: The spread of the simulated peak pressure when charge, chamber volu
 # Peak-pressure range over input tolerances
 
 `interiorPressureRange` runs the [M3 model](interior-m3.md) at the ends of the tolerances of six inputs. It reports the lowest and highest peak pressure next to the nominal one. The [sampled band](interior-sampled-band.md) draws the same inputs from distributions instead of moving them to their ends. The limit check of a result reads this range, not the sampled band.
-
 1. Each input moves alone to both ends of its tolerance.
 2. All inputs move together, to the ends that raise the pressure and to the ends that lower it.
 
@@ -35,7 +35,6 @@ s_q = \operatorname{sign}\bigl(p_q^{+} - p_q^{-}\bigr)
 $$
 
 Code: `packages/core/src/interior/range.ts`, `toleranceRange` (`sides`).
-
 - $s_q = 0$ when both ends are invalid or the tolerance is 0.
 - The two combined cases move every input at once: to the side $s_q$ for the pressure-raising case, to $-s_q$ for the pressure-lowering case.
 - Inputs are applied in the order charge, volume, bullet mass, burn coefficient, temperature, start pressure. Once one move leaves the model, the remaining inputs are not applied and are reported with side 0.
@@ -84,14 +83,14 @@ A typed limit is marked `typed` and names no sheet or method: it is the user's o
 
 ### Default tolerances
 
-| Input | Default tolerance |
-| --- | --- |
-| Charge | 0.5 % |
-| Chamber volume | 1 % |
-| Bullet mass | 0 % |
-| Burn coefficient | 3 % |
-| Propellant temperature | 5 K |
-| Start pressure | 20 % |
+| Input                  | Default tolerance |
+| ---------------------- | ----------------- |
+| Charge                 | 0.5 %             |
+| Chamber volume         | 1 %               |
+| Bullet mass            | 0 %               |
+| Burn coefficient       | 3 %               |
+| Propellant temperature | 5 K               |
+| Start pressure         | 20 %              |
 
 Code: `packages/core/src/interior/range.ts`, `pressureToleranceDefaults`.
 
@@ -111,19 +110,19 @@ The rows show the simulated effect of a powder lot that burns faster or slower t
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $q$, $q^{\pm}$ | Input with a relative tolerance and its moved values | as the input | as the input |
-| $t_q$ | Relative tolerance of an input | 1 | 1 |
-| $T$, $T^{\pm}$ | Propellant temperature and its moved values | degC | K |
-| $t_T$ | Absolute temperature tolerance | no kind | K |
-| $p_q^{\pm}$, $p_c$ | Peak pressure at one end of an input, of a case | bar | Pa |
-| $p_\text{nom}$ | Nominal peak pressure | bar | Pa |
-| $p_\text{low}$, $p_\text{high}$ | Lowest and highest peak pressure of the range | bar | Pa |
-| $p_\text{max}$ | Maximum peak pressure entered with the request | bar | Pa |
-| $s_q$ | Side that raises the pressure | 1 | 1 |
-| $b$, $b^{\pm}$ | Burn coefficient (vivacity or geometric coefficient) and its values at the two lots | as the burn law | as the burn law |
-| $t_b$ | Burn-rate change of the lot rows | 1 | 1 |
+| Symbol                          | Meaning                                                                             | Stored unit     | Unit in `core`  |
+| ------------------------------- | ----------------------------------------------------------------------------------- | --------------- | --------------- |
+| $q$, $q^{\pm}$                  | Input with a relative tolerance and its moved values                                | as the input    | as the input    |
+| $t_q$                           | Relative tolerance of an input                                                      | 1               | 1               |
+| $T$, $T^{\pm}$                  | Propellant temperature and its moved values                                         | degC            | K               |
+| $t_T$                           | Absolute temperature tolerance                                                      | no kind         | K               |
+| $p_q^{\pm}$, $p_c$              | Peak pressure at one end of an input, of a case                                     | bar             | Pa              |
+| $p_\text{nom}$                  | Nominal peak pressure                                                               | bar             | Pa              |
+| $p_\text{low}$, $p_\text{high}$ | Lowest and highest peak pressure of the range                                       | bar             | Pa              |
+| $p_\text{max}$                  | Maximum peak pressure entered with the request                                      | bar             | Pa              |
+| $s_q$                           | Side that raises the pressure                                                       | 1               | 1               |
+| $b$, $b^{\pm}$                  | Burn coefficient (vivacity or geometric coefficient) and its values at the two lots | as the burn law | as the burn law |
+| $t_b$                           | Burn-rate change of the lot rows                                                    | 1               | 1               |
 
 ## Assumptions
 

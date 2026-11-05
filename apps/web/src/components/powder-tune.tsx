@@ -1020,6 +1020,7 @@ export function PowderTune() {
           const sessions = own.map((r) => r.id)
           // a user powder's stored fit makes the save a refit
           const stored = base && userRef(base.id) ? storedRecord(base.id) : Promise.resolve()
+          // oxlint-disable-next-line promise/no-nesting -- the stored fit belongs to this load; the outer chain does not wait for it
           stored
             .then((raw) => {
               const r = userRecord.safeParse(raw)

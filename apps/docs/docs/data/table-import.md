@@ -1,4 +1,5 @@
 ---
+
 title: Table import
 description: How the web app reads a table of bullets, powders or cartridges into user records, with the fields, header aliases, units and kind tiers.
 ---
@@ -12,7 +13,6 @@ Each file is told by its bytes, its extension is not read. An OpenReloading data
 ## Limits
 
 A file over a limit is not imported. The card or the status line says which limit it met.
-
 - 40 MB per file (`maxFileBytes` in `apps/web/src/lib/user-data.ts`): a larger file is refused before it is read, with "The file is larger than 40 MB."
 - 256 columns (`maxColumn` in `packages/importers/src/limits.ts`): a wider table is refused, with "The table has more than 256 columns." Remove the extra columns or choose another file.
 - 1,000,000 cells, columns times rows (`maxCells` in `packages/importers/src/limits.ts`): a larger table is refused, with "The table has more than 1000000 cells." Split it into smaller files.
@@ -22,12 +22,12 @@ A file over a limit is not imported. The card or the status line says which limi
 
 Each kind gets a score from 0 to 1: every column is matched to at most one field, and each field adds its weight times how well the column fits. A column fits by its header words (the whole header is an alias, one of its words is, or it contains an alias of four letters or more) and by its values (numbers in the usual range, a listed choice, text for a text field). The core fields of a kind, Name among them, add up to 1 or a little more, the others (such as Maker) are a bonus on top; the score is capped at 1.
 
-| Tier | Score | Card |
-|---|---|---|
-| high | 0.80 and above | folded: the verdict and the counts, the mapping behind Kind and columns |
-| medium | 0.60 to below 0.80 | open with the mapping |
-| low | 0.40 to below 0.60 | open with the mapping |
-| none | below 0.40 | no kind suggested: the card names the scores and the floor, the kind is picked by hand |
+| Tier   | Score              | Card                                                                                   |
+| ------ | ------------------ | -------------------------------------------------------------------------------------- |
+| high   | 0.80 and above     | folded: the verdict and the counts, the mapping behind Kind and columns                |
+| medium | 0.60 to below 0.80 | open with the mapping                                                                  |
+| low    | 0.40 to below 0.60 | open with the mapping                                                                  |
+| none   | below 0.40         | no kind suggested: the card names the scores and the floor, the kind is picked by hand |
 
 ## Fields
 
@@ -35,43 +35,42 @@ A header is matched in lower case, without accents, with ß as ss and ä, ö and
 
 ### Bullets
 
-| Field | Header aliases | Units | Usual range (stored unit) |
-|---|---|---|---|
-| Name (required) | name, bullet, powder, cartridge, description, product, item, bezeichnung | | |
-| Maker | maker, manufacturer, brand, make, hersteller | | |
-| Caliber | caliber, calibre, cal, kaliber | | |
-| Diameter (required) | diameter, dia, durchmesser | mm, in, cm | 3 to 25 |
-| Mass (required) | mass, weight, wt, grains, gr, gewicht, masse | g, gr | 0.5 to 60 |
-| Length | length, len, oal, laenge | mm, in, cm | 5 to 80 |
-| BC G1 | g1, bcg1, bc1 | lb/in2, kg/m2 | 0.05 to 1.5 |
-| BC G7 | g7, bcg7, bc7 | lb/in2, kg/m2 | 0.05 to 1.5 |
+| Field               | Header aliases                                                           | Units         | Usual range (stored unit) |
+| ------------------- | ------------------------------------------------------------------------ | ------------- | ------------------------- |
+| Name (required)     | name, bullet, powder, cartridge, description, product, item, bezeichnung |               |                           |
+| Maker               | maker, manufacturer, brand, make, hersteller                             |               |                           |
+| Caliber             | caliber, calibre, cal, kaliber                                           |               |                           |
+| Diameter (required) | diameter, dia, durchmesser                                               | mm, in, cm    | 3 to 25                   |
+| Mass (required)     | mass, weight, wt, grains, gr, gewicht, masse                             | g, gr         | 0.5 to 60                 |
+| Length              | length, len, oal, laenge                                                 | mm, in, cm    | 5 to 80                   |
+| BC G1               | g1, bcg1, bc1                                                            | lb/in2, kg/m2 | 0.05 to 1.5               |
+| BC G7               | g7, bcg7, bc7                                                            | lb/in2, kg/m2 | 0.05 to 1.5               |
 
 ### Powders
 
-| Field | Header aliases | Units or values | Usual range (stored unit) |
-|---|---|---|---|
-| Name (required) | name, bullet, powder, cartridge, description, product, item, bezeichnung | | |
-| Maker | maker, manufacturer, brand, make, hersteller | | |
-| Grain form | grainform, form, shape, grain, kornform | ball (also spherical), extruded (stick, tubular), flake (flattened), other | |
-| Propellant base | base, propellantbase, basis | single (single-base), double (double-base), triple (triple-base) | |
-| Bulk density | bulkdensity, density, bulk, schuettdichte | g/cm3 | 0.3 to 1.3 |
+| Field           | Header aliases                                                           | Units or values                                                            | Usual range (stored unit) |
+| --------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------- | ------------------------- |
+| Name (required) | name, bullet, powder, cartridge, description, product, item, bezeichnung |                                                                            |                           |
+| Maker           | maker, manufacturer, brand, make, hersteller                             |                                                                            |                           |
+| Grain form      | grainform, form, shape, grain, kornform                                  | ball (also spherical), extruded (stick, tubular), flake (flattened), other |                           |
+| Propellant base | base, propellantbase, basis                                              | single (single-base), double (double-base), triple (triple-base)           |                           |
+| Bulk density    | bulkdensity, density, bulk, schuettdichte                                | g/cm3                                                                      | 0.3 to 1.3                |
 
 A grain form or base not in the list is a warning: the value is left out and the row kept.
 
 ### Cartridges
 
-| Field | Header aliases | Units | Usual range (stored unit) |
-|---|---|---|---|
-| Name (required) | name, bullet, powder, cartridge, description, product, item, bezeichnung | | |
-| Case length | caselength, l3, case, huelsenlaenge | mm, in, cm | 10 to 120 |
-| Overall length | overalllength, coal, oal, l6, cartridgelength | mm, in, cm | 15 to 150 |
-| Bullet diameter | bulletdiameter, g1, diameter, dia | mm, in, cm | 3 to 25 |
-| Max pressure | maxpressure, pmax, pressure, maxpress | bar, psi, MPa, kpsi | 300 to 6500 |
+| Field           | Header aliases                                                           | Units               | Usual range (stored unit) |
+| --------------- | ------------------------------------------------------------------------ | ------------------- | ------------------------- |
+| Name (required) | name, bullet, powder, cartridge, description, product, item, bezeichnung |                     |                           |
+| Case length     | caselength, l3, case, huelsenlaenge                                      | mm, in, cm          | 10 to 120                 |
+| Overall length  | overalllength, coal, oal, l6, cartridgelength                            | mm, in, cm          | 15 to 150                 |
+| Bullet diameter | bulletdiameter, g1, diameter, dia                                        | mm, in, cm          | 3 to 25                   |
+| Max pressure    | maxpressure, pmax, pressure, maxpress                                    | bar, psi, MPa, kpsi | 300 to 6500               |
 
 ## Units and decimal mark
 
 Each number column has its own unit and decimal mark, both changeable on the card.
-
 - Unit: named in the header, in brackets or after a slash, underscore or space (`Weight (gr)`, `Diameter_in`, `Weight grains`; inch and grains are read as in and gr). A unit in brackets or after a slash or underscore that the field does not take rejects the rows of the column until a unit is chosen on the card. A last word after a space that is no unit of the field counts as part of the name. Without a unit in the header, the unit whose conversion puts the most values in the usual range is taken, and the card says the unit was guessed from the values. MPa and kpsi are never guessed: their values fall in the bar range too. Without a fit, the stored unit.
 - Decimal mark: point or comma, whichever more cells use. A column of cells such as `1,500` that could also be grouped integers is marked as a guess.
 - A value in another unit than the stored one keeps its text as written next to the converted value.

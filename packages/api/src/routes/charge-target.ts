@@ -8,7 +8,6 @@ import { describeAnswers } from './identity.ts'
  * The charge solver of the M3 model. Registered without
  * fastify-plugin, so its error handler applies to this route only; every answer carries the notice.
  */
-// biome-ignore lint/suspicious/useAwait: FastifyPluginAsync returns a promise
 export const chargeTargetRoutes: FastifyPluginAsync<ComputeContext> = async (
   app,
   { catalogue, compute },

@@ -124,7 +124,7 @@ function SummaryTables({ s, names }: { s: YearSummary; names: SummaryNames }) {
           </Table.Thead>
           <Table.Tbody>
             {s.months.map((n, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: the twelve months of a year
+              // oxlint-disable-next-line react/no-array-index-key -- the twelve months of a year
               <Table.Tr key={i}>
                 <Table.Td>{monthName(i)}</Table.Td>
                 <Table.Td className="num">{n}</Table.Td>

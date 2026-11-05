@@ -603,7 +603,6 @@ function useRefusal(problem: unknown, setFailure: () => void) {
   const said = useRef(false)
   const clear = useRef(setFailure)
   clear.current = setFailure
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the problem changes
   useEffect(() => {
     if (!said.current) return
     said.current = false
@@ -1048,7 +1047,6 @@ function FileMenuOf<K extends UserRecordKind>({
   }, [shownMaker])
 
   // a share link opens on load and when pasted into this tab (a fragment change, no reload)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once on mount
   useEffect(() => {
     if (!shareable.includes(kind)) return
     const read = () =>
@@ -1068,9 +1066,9 @@ function FileMenuOf<K extends UserRecordKind>({
     void read()
     window.addEventListener('hashchange', read)
     return () => window.removeEventListener('hashchange', read)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once on mount
   }, [])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs once per startNew
   useEffect(() => {
     if (initial.current === undefined) initial.current = latest.current.now
   }, [started])
@@ -1427,6 +1425,7 @@ function FileMenuOf<K extends UserRecordKind>({
     }
     // Save writes back only to a file of this record alone; the handle of another file is kept
     // so Save sees at write time whether that file holds records this version would drop
+    // oxlint-disable-next-line react-hooks/rules-of-hooks -- use() here is this menu's open-and-keep function, not React's hook
     await use(mine, picked.file.name, picked.handle, readNote(parsed, t), parsed.records)
   }
 

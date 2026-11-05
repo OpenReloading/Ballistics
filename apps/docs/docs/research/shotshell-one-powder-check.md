@@ -1,4 +1,5 @@
 ---
+
 title: Shotshell loads with one assumed powder
 description: Whether the shotshell model with one assumed powder for every load reproduces published 12 gauge velocities and stays under published pressure limits, and why it is not a tracked benchmark.
 ---

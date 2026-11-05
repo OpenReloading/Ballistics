@@ -1,4 +1,5 @@
 ---
+
 title: Bullet fit
 description: Which bullet diameters fit a cartridge, from its C.I.P. projectile, land and groove diameters.
 ---
@@ -31,13 +32,13 @@ $\delta$ is half the last printed digit of the two-decimal C.I.P. values, so a $
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $d$ | Bullet diameter | mm | mm |
-| $G_1$ | Projectile diameter of the cartridge drawing, a maximum | mm | mm |
-| $F$ | Land (bore) diameter of the barrel, a minimum | mm | mm |
-| $Z$ | Groove diameter of the barrel, a minimum | mm | mm |
-| $\delta$ | Half the last printed digit of a C.I.P. value | mm | mm |
+| Symbol   | Meaning                                                 | Stored unit | Unit in `core` |
+| -------- | ------------------------------------------------------- | ----------- | -------------- |
+| $d$      | Bullet diameter                                         | mm          | mm             |
+| $G_1$    | Projectile diameter of the cartridge drawing, a maximum | mm          | mm             |
+| $F$      | Land (bore) diameter of the barrel, a minimum           | mm          | mm             |
+| $Z$      | Groove diameter of the barrel, a minimum                | mm          | mm             |
+| $\delta$ | Half the last printed digit of a C.I.P. value           | mm          | mm             |
 
 ## Assumptions
 

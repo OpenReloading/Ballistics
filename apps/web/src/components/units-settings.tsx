@@ -217,12 +217,12 @@ export function useFieldUnits(
   text?: Parameters<typeof switchFields>[3],
 ) {
   const shown = useRef(system)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on a unit change only
   useEffect(() => {
     const changed = specs.filter((s) => shown.current[s.quantity] !== system[s.quantity])
     shown.current = system
     if (changed.length > 0)
       setValues((fields) => switchFields(fields as Fields, changed, system, text))
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs on a unit change only
   }, [system])
 }
 

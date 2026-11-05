@@ -1,4 +1,5 @@
 ---
+
 title: Bullet fit window against C.I.P. values
 description: Whether the window from the middle of land and groove up to G1 gives the bullet diameters expected for ten cartridges, and where its bounds fall.
 ---

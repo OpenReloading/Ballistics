@@ -1,4 +1,5 @@
 ---
+
 title: Inventory and lifecycle records worth keeping
 description: Which stock, lot, brass, label, round count, cost, history and backup records a handloader would keep up without tracking every round, checked against the records the app already stores.
 ---
@@ -18,7 +19,6 @@ User records: which of eight inventory and lifecycle ideas (stock overview, batc
 ## Formulas
 
 No model equations. The two quantities the ideas would compute:
-
 - Remaining amount of a lot: the sum of its dated entries (purchase positive, use in a batch, discard and correction signed), computed, never stored, so it cannot disagree with its entries.
 - Cost of one round: the sum over the components of pack price over pack size times the amount per round (one bullet, one primer, one case over its firings, the charge over the pack mass for the powder).
 
@@ -26,17 +26,17 @@ No model equations. The two quantities the ideas would compute:
 
 Bench work per idea, as fields typed and how often:
 
-| Idea | Typed by the user | How often | Shown when not kept up |
-| --- | --- | --- | --- |
-| Stock of components | every purchase and every use, per lot | every session at the bench | a wrong amount on hand |
-| Rounds loaded per load | one number | once per batch | a wrong count; the save time of the load as its age |
-| Lots of a batch | the lot printed on each box, already a field | once per new box | nothing wrong: an empty lot is no lot |
-| Brass firings | one counter on the case group, already a field | once per firing cycle | a low count; the save time of the record as its age |
-| Box label | nothing: printed from the load | once per box | not applicable |
-| Firearm round count | one number, already a field | after a range day | a low count; never written by a session |
-| Cost per round | price and pack size per component | every purchase | an old price |
-| History of stock movements | every change, by the app | always | not applicable |
-| Backups | one export | the reminder after 10 changes or 7 days | data lost with the browser |
+| Idea                       | Typed by the user                              | How often                               | Shown when not kept up                              |
+| -------------------------- | ---------------------------------------------- | --------------------------------------- | --------------------------------------------------- |
+| Stock of components        | every purchase and every use, per lot          | every session at the bench              | a wrong amount on hand                              |
+| Rounds loaded per load     | one number                                     | once per batch                          | a wrong count; the save time of the load as its age |
+| Lots of a batch            | the lot printed on each box, already a field   | once per new box                        | nothing wrong: an empty lot is no lot               |
+| Brass firings              | one counter on the case group, already a field | once per firing cycle                   | a low count; the save time of the record as its age |
+| Box label                  | nothing: printed from the load                 | once per box                            | not applicable                                      |
+| Firearm round count        | one number, already a field                    | after a range day                       | a low count; never written by a session             |
+| Cost per round             | price and pack size per component              | every purchase                          | an old price                                        |
+| History of stock movements | every change, by the app                       | always                                  | not applicable                                      |
+| Backups                    | one export                                     | the reminder after 10 changes or 7 days | data lost with the browser                          |
 
 Verdicts over the nine rows (the stock idea is split into component stock and rounds loaded): no new record and no new issue; 5 folded into open issues (rounds loaded and round count into the load and firearm map, lots and brass into the own lots issue, the box label into the traceability issue as a pre-1.0 candidate), 3 dropped (component stock, cost, movement history), 1 confirmed as existing (backups).
 

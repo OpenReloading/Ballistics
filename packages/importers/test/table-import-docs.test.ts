@@ -9,6 +9,8 @@ const page = readFileSync(
   'utf8',
 )
 
+const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
+
 /** The lines of the page's section `### <title>`. */
 const section = (title: string) =>
   (page.split(`### ${title}\n`)[1] ?? '').split('\n## ')[0]?.split('\n### ')[0]?.split('\n') ?? []
@@ -21,7 +23,8 @@ describe('the table import docs page', () => {
       for (const f of fieldSpecs[kind]) {
         const row = lines.find((l) => l.startsWith(`| ${f.label} `))
         expect(row, f.label).toBeDefined()
-        expect(row).toContain(`| ${f.aliases.join(', ')} |`)
+        // a table cell, padded to its column's width
+        expect(row).toMatch(new RegExp(`\\| ${escape(f.aliases.join(', '))} +\\|`))
         if (f.units) expect(row).toContain(f.units.map((u) => u.symbol).join(', '))
         if (f.range) expect(row).toContain(`${f.range[0]} to ${f.range[1]}`)
       }

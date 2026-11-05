@@ -30,7 +30,6 @@ export function useUserRecords(reread?: unknown) {
   const { t } = useTranslation()
   const [records, setRecords] = useState<UserRecord[]>([])
   const [read, setRead] = useState(false)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `reread` only restarts the read
   useEffect(() => {
     let live = true
     storedRecords().then(

@@ -11,7 +11,6 @@ OpenReloading is before 1.0. Only the `main` branch and the latest release recei
 Use [Report a vulnerability](https://github.com/OpenReloading/Ballistics/security/advisories/new) on the Security tab of this repository. Do not open a public issue or pull request for it.
 
 Include:
-
 - what is affected (package, page or API route) and the version or commit,
 - the steps to reproduce it, with the smallest input that shows it,
 - what an attacker gains.

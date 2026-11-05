@@ -1,4 +1,5 @@
 ---
+
 title: M3 interior model
 description: Interior ballistics with one gas state, a Noble-Abel gas, a pressure gradient, shot start, bore resistance and a pressure-dependent burn law.
 ---
@@ -6,7 +7,6 @@ description: Interior ballistics with one gas state, a Noble-Abel gas, a pressur
 # M3 interior model
 
 The M3 model computes pressure, travel and velocity of a projectile in the barrel from ignition to muzzle exit.
-
 - One Noble-Abel gas state stands for the whole space behind the projectile.
 - The energy of the burning charge goes into gas, projectile motion, rotation, gas motion, bore resistance and heat.
 - A two-coefficient gradient gives the base and breech pressures from the mean pressure.
@@ -134,7 +134,6 @@ Code: `packages/core/src/interior/model.ts`, `gasState` (`startG`).
 The second term of $g_\text{start}$ is a choice of the model.
 
 Without a start pressure, a caller can take `defaultStartPressure`:
-
 - Barrel of 0.3 m and longer: one value per bullet construction (lead 30.0, jacketed 29.2, monolithic 35.3 MPa), fitted by the load-table powder fit. Plated bullets have no rifle rows and a construction not given takes an assumed 30 MPa.
 - Shorter barrel: one value per bullet construction, fitted by the same fit: lead 24.3 MPa, plated 30.9 MPa, jacketed 30.8 MPa, monolithic 50.0 MPa ([research entry](../research/interior-start-pressure-rules.md)). A construction not given counts as jacketed, an unknown name is an input error.
 
@@ -146,12 +145,12 @@ Code: `packages/core/src/interior/start-pressure.ts`, `defaultStartPressure`, `h
 
 The workbench takes the construction from the bullet record's `construction.structure` and the barrel length of the seating (else the firearm's, the Settings default or the one assumed for the cartridge class):
 
-| `construction.structure` | Construction |
-| --- | --- |
-| cast, swaged | lead |
-| plated | plated |
-| cup-and-core, bonded, partitioned | jacketed |
-| monolithic | monolithic |
+| `construction.structure`                      | Construction                |
+| --------------------------------------------- | --------------------------- |
+| cast, swaged                                  | lead                        |
+| plated                                        | plated                      |
+| cup-and-core, bonded, partitioned             | jacketed                    |
+| monolithic                                    | monolithic                  |
 | frangible, a construction without a structure | jacketed, marked as assumed |
 
 In a handgun, a record without a `construction` counts as jacketed, marked as assumed, as in `defaultStartPressure`. In a rifle it gives no construction; an unknown barrel length gives no class; both keep the field at the Settings default (30 MPa unless changed), as does a plated bullet in a rifle. A changed Settings default replaces the rule by construction. The field follows this default until a value is typed; the help gives the 95 % interval of the construction. A powder record's own start pressure replaces the default.
@@ -185,7 +184,6 @@ p_f = \tau_f\, \frac{\pi G_1 L}{A} \left(1 + c\, o\right), \qquad o = \max\left(
 $$
 
 Code: `packages/core/src/interior/bore-resistance.ts`, `boreResistance`, `oversizePercent`, `recordResistance`.
-
 - $o$ is taken as 0 without $Z$ and above `maxOversizePercent` (5 %).
 - $G_1$ and $Z$ are C.I.P. tolerance limits, not measurements. A run reads $G_1$ from the cartridge record, else the bore diameter.
 - The workbench keeps the record's $Z$ in $o$ when the chosen firearm has a measured groove diameter: $G_1$ stays a nominal limit, and a measured $Z$ against it would give an oversize no bullet was measured for. A bullet below the measured groove diameter gets a note, as gas passing the bullet is not in the model.
@@ -199,12 +197,12 @@ The resistance law with $\tau_f$, $c$ and $\phi_e$ and the oversize limit of 5 %
 
 A resistance term in proportion to the gas pressure raised the training velocity error at every value tried, and a start pressure in proportion to the bearing length raised the held-out error; neither was adopted ([research entry](../research/interior-bore-resistance-pressure-bearing.md)). Sensitivity to doubled resistance on a synthetic 76 mm proxy (guessed resistance values: start pressure 25 MPa, engraving ramp 40 MPa over 25 mm, friction pressure 8 MPa; "engraving" doubles the ramp), change of peak breech pressure and muzzle velocity:
 
-| Doubled | Full charge (312 MPa, 761 m/s) | 75 % charge (178 MPa, 584 m/s) |
-| --- | --- | --- |
-| Engraving | +30.5 %, +47 m/s | +39.0 %, +68 m/s |
-| Friction | +8.2 %, −4 m/s | +10.1 %, −2 m/s |
-| Both | +38.0 %, +36 m/s | +48.2 %, +56 m/s |
-| Measured, doubled resistance, term not stated (unverified) | about +10 %, about +6 m/s | about +30 m/s |
+| Doubled                                                    | Full charge (312 MPa, 761 m/s) | 75 % charge (178 MPa, 584 m/s) |
+| ---------------------------------------------------------- | ------------------------------ | ------------------------------ |
+| Engraving                                                  | +30.5 %, +47 m/s               | +39.0 %, +68 m/s               |
+| Friction                                                   | +8.2 %, −4 m/s                 | +10.1 %, −2 m/s                |
+| Both                                                       | +38.0 %, +36 m/s               | +48.2 %, +56 m/s               |
+| Measured, doubled resistance, term not stated (unverified) | about +10 %, about +6 m/s      | about +30 m/s                  |
 
 Doubled engraving gives the direction of the measured change (more velocity, most at the reduced charge) but several times its size; doubled friction lowers the velocity slightly. The size depends strongly on the guessed proxy.
 
@@ -256,11 +254,11 @@ A powder record carries them as `temperatureSensitivity`: `reference` in K, `col
 
 The default is a value of the grain form, not of the powder. Its reference $T_\text{ref}$ is the propellant temperature of the record's fitted model (`interior.propellantTemperature`), else 294.15 K (21 °C).
 
-| Grain form | $\sigma_h$ (1/K) | Interval of $\sigma_h$ | $\sigma_c$ the run takes | Interval of $\sigma_c$ | Source |
-|---|---|---|---|---|---|
-| ball | 0.0027 | 0.0023 to 0.0031 | 0.0012 | 0 to 0.0030 | [Boulkadid 2016](../bibliography.md#boulkadid-2016): closed-vessel burn-rate sensitivity of deterred ball powders, flattened 0.229 and spherical 0.305 %/K above 21 °C, 0.115 and 0.121 %/K below (as quoted in issue #842; the tables were not re-read for this page, unverified) |
-| extruded, flake | 0.0010 | 0.0001 to 0.0029 | 0.0010 | 0 to 0.0030 | [Hodgdon 2012](../bibliography.md#hodgdon-2012): velocities at 70 and 125 °F of 14 extruded powders outside the Extreme line, converted through this model on stand-in loads ([research entry](../research/powder-temperature-default.md)) |
-| other | none | | | | |
+| Grain form      | $\sigma_h$ (1/K) | Interval of $\sigma_h$ | $\sigma_c$ the run takes | Interval of $\sigma_c$ | Source                                                                                                                                                                                                                                                                             |
+| --------------- | ---------------- | ---------------------- | ------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ball            | 0.0027           | 0.0023 to 0.0031       | 0.0012                   | 0 to 0.0030            | [Boulkadid 2016](../bibliography.md#boulkadid-2016): closed-vessel burn-rate sensitivity of deterred ball powders, flattened 0.229 and spherical 0.305 %/K above 21 °C, 0.115 and 0.121 %/K below (as quoted in issue #842; the tables were not re-read for this page, unverified) |
+| extruded, flake | 0.0010           | 0.0001 to 0.0029       | 0.0010                   | 0 to 0.0030            | [Hodgdon 2012](../bibliography.md#hodgdon-2012): velocities at 70 and 125 °F of 14 extruded powders outside the Extreme line, converted through this model on stand-in loads ([research entry](../research/powder-temperature-default.md))                                         |
+| other           | none             |                        |                          |                        |                                                                                                                                                                                                                                                                                    |
 
 Code: `packages/core/src/interior/temperature-default.ts`, `defaultSensitivity`, `recordSensitivity`, `coldPeakInterval`. `apps/web/src/lib/interior-request.ts`, `interiorRequest`.
 
@@ -289,7 +287,6 @@ $$
 Code: `packages/core/src/interior/model.ts`, `scaleInteriorLoad` (`vr`, `ts`), `interiorRhs`.
 
 With leakage the state has two more components ([leakage and heat loss](interior-leakage-heat.md)). The system is integrated in $\tau$ with the Dormand-Prince 5(4) method of the [point-mass page](exterior-point-mass.md), in chunks of `outputStep`. A curve point falls at each chunk end and at each event. Defaults (`interiorDefaults`):
-
 - relative tolerance $10^{-9}$, absolute tolerance $10^{-11}$ on the scaled state
 - output step $2\times10^{-6}$ s
 - $2\times10^{5}$ steps
@@ -299,16 +296,16 @@ The scaling of the state and the values of `interiorDefaults` are choices of the
 
 The right-hand side has kinks at shot start, at form-function breakpoints, at burnout and at profile points. Each is a terminal event, after which the integration restarts, so no step crosses a kink:
 
-| Event | Root function | Direction | Phase |
-| --- | --- | --- | --- |
-| shot start | $g_\text{start}$ | rising | held, `interior` only |
-| form breakpoint $f_k$ | $f - f_k$ | rising | burning |
-| burnout | $f - f_\text{end}$ | rising | burning |
-| profile point $x_k \lt x_e$ (engraving or leak area) | $x - x_k$ | rising | moving |
-| leak onset | $p_b - p_a$ | rising | with leakage |
-| muzzle | $x - x_e$ | rising | moving |
-| stall | $v$ | falling | moving |
-| peak of $\bar p$, $p_b$, $p_\text{br}$ | $dq/d\tau$ | falling | moving, not terminal |
+| Event                                                | Root function      | Direction | Phase                 |
+| ---------------------------------------------------- | ------------------ | --------- | --------------------- |
+| shot start                                           | $g_\text{start}$   | rising    | held, `interior` only |
+| form breakpoint $f_k$                                | $f - f_k$          | rising    | burning               |
+| burnout                                              | $f - f_\text{end}$ | rising    | burning               |
+| profile point $x_k \lt x_e$ (engraving or leak area) | $x - x_k$          | rising    | moving                |
+| leak onset                                           | $p_b - p_a$        | rising    | with leakage          |
+| muzzle                                               | $x - x_e$          | rising    | moving                |
+| stall                                                | $v$                | falling   | moving                |
+| peak of $\bar p$, $p_b$, $p_\text{br}$               | $dq/d\tau$         | falling   | moving, not terminal  |
 
 Code: `packages/core/src/interior/model.ts`, `interiorEvents`.
 
@@ -351,7 +348,6 @@ Code: `packages/core/src/interior/model.ts`, `interior` (`tenPercentPressureTime
 The level of 10 % in $t_{10}$ is a choice of the model, not taken from a source.
 
 `peakBreechPressure` is the peak breech pressure, the pressure a chamber transducer measures. The result also carries:
-
 - the peak base and mean pressures, and the three pressures at the muzzle
 - shot-start time, barrel time from shot start to muzzle, burnout time and travel
 - the burnt fraction at the muzzle
@@ -383,7 +379,6 @@ $$
 $$
 
 Code: `packages/core/src/interior/load-file.ts`, `solidFillLimit`, `fillLoadRatioLimit`.
-
 - The limit needs no bulk density, so it applies to every run. With a bulk density the API and the workbench state it as the load ratio $\Lambda_\text{max}$ of the powder.
 - The [charge solver](interior-charge-solver.md) stops at $\varphi_\text{max}$.
 - The `chamberVolume` rule of `interior` stops where the solid volume or the covolume of the charge fills $V_c$, at $\varphi = \min\left(1,\ 1/(\eta \rho_s)\right)$. With $\eta$ = 1 cm3/g and $\rho_s$ = 1.6 g/cm3 that is 0.625, below $\varphi_\text{max}$.
@@ -398,54 +393,54 @@ Code: `packages/core/src/interior/record-load.ts`, `recordLoad`.
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $V_c$ | Chamber volume behind the seated projectile base | no kind | m3 |
-| $V_f$ | Free volume of the gas | no kind | m3 |
-| $A$ | Bore area | mm2 | m2 |
-| $Q_\text{CIP}$ | C.I.P. bore area Q of the cartridge | mm2 | mm2 |
-| $F$, $Z$ | C.I.P. land and groove diameter | mm | mm |
-| $G_1$ | C.I.P. bullet diameter | mm | mm |
-| $d$ | Bore diameter | mm | m |
-| $x$, $x_e$ | Travel, travel from the seated position to the muzzle | mm | m |
-| $L_\text{tw}$ | Twist length, 0 without rifling | mm | m |
-| $L$ | Bearing length, the bullet length in a run | mm | mm |
-| $m_p$ | Projectile mass | g | kg |
-| $m_p'$, $m_e$ | Projectile mass with rotation, effective mass | g | kg |
-| $r_g$ | Axial radius of gyration of the projectile | mm | m |
-| $m_c$ | Charge mass | g | kg |
-| $Q$ | Specific energy of the propellant at constant volume | J/kg | J/kg |
-| $k$ | Ratio of specific heats of the gas | 1 | 1 |
-| $\rho_s$ | Solid density of the propellant | g/cm3 | kg/m3 |
-| $\rho_\text{bulk}$ | Bulk density of the propellant | g/cm3 | kg/m3 |
-| $\eta$ | Covolume | m3/kg | m3/kg |
-| $z$, $z_0$, $z_e$ | Burnt fraction, at ignition, at the muzzle | 1 | 1 |
-| $f$ | Form variable of the burn law | 1 | 1 |
-| $v$, $v_e$ | Projectile velocity, at the muzzle | m/s | m/s |
-| $t$ | Time from ignition | no kind | s |
-| $\bar p$, $p_b$, $p_\text{br}$ | Mean, base and breech pressure | bar | Pa |
-| $p_i$ | Ignition pressure | bar | Pa |
-| $p_\text{st}$ | Shot-start pressure | bar | Pa |
-| $p_f$, $p_e$ | Friction pressure, engraving pressure | bar | Pa |
-| $F_r$ | Resistance force | no kind | N |
-| $\tau_f$ | Friction stress of the resistance law | bar | Pa |
-| $c$ | Oversize coefficient | no kind | 1/% |
-| $o$ | Oversize of the bullet over the groove diameter | no kind | % |
-| $\phi_e$ | Engraving fraction of the start pressure | 1 | 1 |
-| $\delta$, $\varepsilon$, $s$ | Gradient coefficients, Sébert factor | 1 | 1 |
-| $W_r$ | Work against bore resistance | J | J |
-| $E_h$, $E_\ell$ | Heat lost to the bore, enthalpy carried out by leaking gas | J | J |
-| $\dot q$ | Heat flux to the bore | no kind | W |
-| $T_p$, $T_\text{ref}$ | Propellant temperature, reference temperature | degC | K |
-| $\sigma_c$, $\sigma_h$ | Burn-rate temperature sensitivity below and above $T_\text{ref}$ | no kind | 1/K |
-| $\tau_T$ | Temperature factor on the burn rate | 1 | 1 |
-| $v_r$ | Reference velocity of the scaled state | m/s | m/s |
-| $E_0$ | Muzzle energy | J | J |
-| $\eta_b$ | Ballistic efficiency | 1 | 1 |
-| $\Lambda$, $\Lambda_\text{max}$ | Load ratio, at the solid fill limit | 1 | 1 |
-| $\varphi$, $\varphi_\text{max}$ | Solid fill, its limit | 1 | 1 |
-| $p_h$ | Hold pressure | bar | Pa |
-| $E_p$, $E_v$ | Elasticity of the peak mean pressure and the muzzle velocity to $p_h$ | 1 | 1 |
+| Symbol                          | Meaning                                                               | Stored unit | Unit in `core` |
+| ------------------------------- | --------------------------------------------------------------------- | ----------- | -------------- |
+| $V_c$                           | Chamber volume behind the seated projectile base                      | no kind     | m3             |
+| $V_f$                           | Free volume of the gas                                                | no kind     | m3             |
+| $A$                             | Bore area                                                             | mm2         | m2             |
+| $Q_\text{CIP}$                  | C.I.P. bore area Q of the cartridge                                   | mm2         | mm2            |
+| $F$, $Z$                        | C.I.P. land and groove diameter                                       | mm          | mm             |
+| $G_1$                           | C.I.P. bullet diameter                                                | mm          | mm             |
+| $d$                             | Bore diameter                                                         | mm          | m              |
+| $x$, $x_e$                      | Travel, travel from the seated position to the muzzle                 | mm          | m              |
+| $L_\text{tw}$                   | Twist length, 0 without rifling                                       | mm          | m              |
+| $L$                             | Bearing length, the bullet length in a run                            | mm          | mm             |
+| $m_p$                           | Projectile mass                                                       | g           | kg             |
+| $m_p'$, $m_e$                   | Projectile mass with rotation, effective mass                         | g           | kg             |
+| $r_g$                           | Axial radius of gyration of the projectile                            | mm          | m              |
+| $m_c$                           | Charge mass                                                           | g           | kg             |
+| $Q$                             | Specific energy of the propellant at constant volume                  | J/kg        | J/kg           |
+| $k$                             | Ratio of specific heats of the gas                                    | 1           | 1              |
+| $\rho_s$                        | Solid density of the propellant                                       | g/cm3       | kg/m3          |
+| $\rho_\text{bulk}$              | Bulk density of the propellant                                        | g/cm3       | kg/m3          |
+| $\eta$                          | Covolume                                                              | m3/kg       | m3/kg          |
+| $z$, $z_0$, $z_e$               | Burnt fraction, at ignition, at the muzzle                            | 1           | 1              |
+| $f$                             | Form variable of the burn law                                         | 1           | 1              |
+| $v$, $v_e$                      | Projectile velocity, at the muzzle                                    | m/s         | m/s            |
+| $t$                             | Time from ignition                                                    | no kind     | s              |
+| $\bar p$, $p_b$, $p_\text{br}$  | Mean, base and breech pressure                                        | bar         | Pa             |
+| $p_i$                           | Ignition pressure                                                     | bar         | Pa             |
+| $p_\text{st}$                   | Shot-start pressure                                                   | bar         | Pa             |
+| $p_f$, $p_e$                    | Friction pressure, engraving pressure                                 | bar         | Pa             |
+| $F_r$                           | Resistance force                                                      | no kind     | N              |
+| $\tau_f$                        | Friction stress of the resistance law                                 | bar         | Pa             |
+| $c$                             | Oversize coefficient                                                  | no kind     | 1/%            |
+| $o$                             | Oversize of the bullet over the groove diameter                       | no kind     | %              |
+| $\phi_e$                        | Engraving fraction of the start pressure                              | 1           | 1              |
+| $\delta$, $\varepsilon$, $s$    | Gradient coefficients, Sébert factor                                  | 1           | 1              |
+| $W_r$                           | Work against bore resistance                                          | J           | J              |
+| $E_h$, $E_\ell$                 | Heat lost to the bore, enthalpy carried out by leaking gas            | J           | J              |
+| $\dot q$                        | Heat flux to the bore                                                 | no kind     | W              |
+| $T_p$, $T_\text{ref}$           | Propellant temperature, reference temperature                         | degC        | K              |
+| $\sigma_c$, $\sigma_h$          | Burn-rate temperature sensitivity below and above $T_\text{ref}$      | no kind     | 1/K            |
+| $\tau_T$                        | Temperature factor on the burn rate                                   | 1           | 1              |
+| $v_r$                           | Reference velocity of the scaled state                                | m/s         | m/s            |
+| $E_0$                           | Muzzle energy                                                         | J           | J              |
+| $\eta_b$                        | Ballistic efficiency                                                  | 1           | 1              |
+| $\Lambda$, $\Lambda_\text{max}$ | Load ratio, at the solid fill limit                                   | 1           | 1              |
+| $\varphi$, $\varphi_\text{max}$ | Solid fill, its limit                                                 | 1           | 1              |
+| $p_h$                           | Hold pressure                                                         | bar         | Pa             |
+| $E_p$, $E_v$                    | Elasticity of the peak mean pressure and the muzzle velocity to $p_h$ | 1           | 1              |
 
 ## Assumptions
 
@@ -503,7 +498,6 @@ $$
 Code: `packages/core/src/interior/model.ts`, `chargeTooSmall`.
 
 Central differences at 5 % of $p_h$ over a charge ladder of five made-up loads (rifle, rifle with bore resistance, magnum with the two-stage form, pistol, lead-bullet pistol) give:
-
 - Without bore resistance, $E_p$ is close to one function of $r = \bar p_\text{max} / p_h$ for every load: 0.68 to 0.70 at $r = 1.5$, 0.5 at $r$ = 2.18 to 2.39, 1/3 at $r$ = 3.7 to 4.3.
 - With $p_\text{st} = 0$, where $p_i$ is the hold pressure, $E_p$ is 0.5 at $r$ = 2.1 to 2.3.
 - $E_v$ is below $E_p$ except near a projectile that stops.
@@ -531,7 +525,6 @@ p_0 = p_f + p_e(0)
 $$
 
 Code: `packages/core/src/advisories.ts`, `advisoryRules`, `interiorAdvisories`. `packages/api/src/compute/limits.ts`, `warning`, `limitCheck`.
-
 - `startPressureBelowResistance`: $0 \lt p_\text{st} \le p_0$. The start condition of [shot start](#shot-start) is then decided by the second term, so the start pressure has no effect. A start pressure of 0 counts as not given.
 - `gyrationRadiusWithoutTwist`: a radius of gyration is given and $L_\text{tw} = 0$. The [effective mass](#effective-mass) then has no rotational term, so the radius is ignored.
 - `startPressureHeldOnce`: $p_\text{st} \gt p_0$, $p_\text{st} \gt p_\text{i}$ (the ignition pressure) and $p_e(0) \gt 0$. The projectile is held until the pressure reaches $p_\text{st}$ and then starts against $p_0$, which is lower. $p_0$ is the resistance at shot start only: the engraving profile can rise with travel, so the resistance later in the motion can exceed $p_0$ and $p_\text{st}$. With $p_\text{i} \ge p_\text{st}$ the [shot start](#shot-start) condition holds at ignition and there is no hold.

@@ -1,4 +1,5 @@
 ---
+
 title: Hole detection
 description: Bullet hole proposals on a target photo from a colour axis, a multi-scale blob detector, a top-hat shape test and a count per connected part.
 ---
@@ -6,7 +7,6 @@ description: Bullet hole proposals on a target photo from a colour axis, a multi
 # Hole detection
 
 Proposes bullet holes on a target photo, inside a region or the printed target found on the photo:
-
 1. A colour axis separates the colour seen through a hole from its surroundings.
 2. A scale-normalised Hessian detector finds blobs on the projection onto that axis, at scales tied to the expected hole diameter.
 3. A top-hat against a morphological opening gives the hole shape. Three tests keep the real peaks.
@@ -22,17 +22,16 @@ Cancelling detection, changing the photo, sheet or group, or rotating the photo 
 
 An action is a file choice, a click, or a value typed and entered. A decision is what only the user can give or confirm. The counts run from choosing the photo to Accept on a rendered target found for sure, on `/groups`.
 
-| Hole size | Actions | Decisions |
-| --- | --- | --- |
-| Known (bullet or marker) | 2: choose the photo, Accept sure | Accept |
-| Unknown | 3: choose the photo, type the hole size in the result line, Accept sure | the hole size, Accept |
+| Hole size                | Actions                                                                 | Decisions             |
+| ------------------------ | ----------------------------------------------------------------------- | --------------------- |
+| Known (bullet or marker) | 2: choose the photo, Accept sure                                        | Accept                |
+| Unknown                  | 3: choose the photo, type the hole size in the result line, Accept sure | the hole size, Accept |
 
 The counts are asserted in `apps/e2e/tests/web/groups-face.spec.ts` (the known and the unknown hole size tests). A photo below the minimum quality adds Detect anyway; a photo without one sure target goes on in the guided steps, which these counts do not cover.
 
 ## Quality bar
 
 For face search and hole detection on a set of photos with reference holes:
-
 - Usable photo: a photo with no bad-level problem (Photo quality). Photos held by one are counted per set as held and reported beside the corrections.
 - Matching: a proposal at or above the confidence tier matches a reference hole when the two lie within half a hole diameter, one to one, nearest pairs first. Found: a matched proposal. False: a proposal without a reference hole. Missed: a reference hole without a proposal.
 - Corrections per usable photo: the adds, moves and deletes that turn the proposals into the reference holes, $\max(n_\mathrm{false}, n_\mathrm{missed})$, since a false hole paired with a missed one is one move.
@@ -146,7 +145,6 @@ $$
 Code: `apps/web/src/lib/hole-detection.ts`, `pipeline` (`testPeaks`, `threshold`, `standsOut`), `KEEP`, `INSCRIBED`, `FILL`, `HAT`, `FLOOR`. `apps/web/src/lib/raster-ops.ts`, `distanceSquared`.
 
 with:
-
 - $\kappa = 0.35$ at the default contrast setting
 - $\delta$ the inscribed radius: Euclidean distance of a mask pixel to the nearest pixel outside the mask
 - the last ratio: filled share of the disc of radius $0.5 D$
@@ -238,7 +236,6 @@ With a found target and no region drawn, the region is the target, and a flier o
 ### Print on the target
 
 A mark within half a hole of the working image's edge leaves a run: a ring line or the sheet's edge meets the photo's edge there. With a found target, these marks are print and leave it too:
-
 - a dark mark on the black area or a light one on the paper whose confidence is below 0.8;
 - the marks where the ring numerals stand, when the run or the seed runs hold three or more there. They stand on the target's axes, between two ring lines, within $\min(6\ \text{mm}, 0.3 g)$ of an axis, with $g$ the ring spacing;
 - the marks where the quarter marks of the black area stand, when three or more stand on different axes: on an axis within $0.5$ hole diameters of it and within one hole diameter of the black area's edge. The numerals' evidence from the other runs does not count for them.
@@ -278,7 +275,6 @@ Code: `apps/web/src/lib/hole-detection.ts`, `offSheet`.
 ### Target
 
 The target search runs on the whole photo before a detection (`findFace`) and gives the scale, the centre and the target record:
-
 1. Black area: the grey levels on a grid of about 500 pixels on the longer side are cut at nine thresholds between their 2nd and 98th percentile. Each compact grey component is filled and fitted by a robust ellipse through its outline. A component the photo's edge cuts is fitted to its outline inside the photo only, and is kept when half of the ellipse and its centre lie in the photo. A candidate needs paper about it: at least 60 % of the points 1.1 to 1.3 times out from its ellipse that lie in the photo are lighter than its threshold, so a disc inside the black area bounded by a light ring line is no candidate.
 2. Ring lines: Hessian ridges on a crop of up to 2.8 black radii, averaged so the black area is at most about 500 pixels across (a zoomed photo's thick lines stay lines), grouped by their radius relative to the black edge, one robust ellipse per group. When the black edge's ellipse is flatter than 0.9 (a sheet seen at a slant), the outer rings are not concentric with it on the photo and their relative radii run into each other: the conic pencil of the black edge and the ring farthest from it in radius (its ratio within 6 % of the mean radii's) maps the photo onto the target's plane, and the ridges are grouped again by their radius there.
 3. Targets: a target record with `photoSearch: false` is skipped. With a known scale (a calibrated sheet gives the photo's pixels per mm, `pxPerMm`) a target is skipped when the pixels per mm its black diameter needs for the black area's long semi-axis differ from that scale by more than 20 % (`SCALE_TOLERANCE`): targets with the same ring ratios at another size drop out. The black edge is the target's black diameter, which fixes a scale $s$ per target. A ring found at radius $\rho_j$ matches the target ring $r_i$ when $\lvert s r_i / \rho_j - 1 \rvert \le 0.03$, closest pairs first. A target ring is expected when it lies between 0.15 and 2.9 black radii and half of its line falls inside the photo: outer rings cut off by the photo's edge or beyond an insert card do not count against a target. With $a_j$ the share of the ring's ellipse its line covers, $e_j$ that relative error, $n_\mathrm{miss}$ the target rings expected and not found and $n_\mathrm{extra}$ the rings found that match none:
@@ -336,16 +332,16 @@ Without a black area, or where its edge gives no measure, the sharpness is read 
 
 The hole diameter on the photo as taken is $D_\mathrm{px} / k$ for the resize factor $k$ (the target's scale times the bullet diameter, or the same 6 % without a fitted target). A photo with no black area found is judged by its brightness, by glare and uneven light counted over the whole photo, and by its size, none of which needs a black area. Brightness $B$ is the 95th percentile of the grey blocks of the whole photo. The light is the spread of the 90th percentile of each quarter of the photo (as $u$ above), given when at least three quarters have a 90th percentile of 120 or more, so a photo filled by a black zone has none.
 
-| Problem | Fair from | Bad from | Message and fix |
-| --- | --- | --- | --- |
-| Tilt, with the black area at least 0.9 inside | $\theta > 30^\circ$ | $55^\circ$ | "The target is photographed at a slant of about N degrees." Retake from straight above, with the camera parallel to the paper. |
-| Framing, with no target selected or recognised | $s_\mathrm{in} < 0.9$ | $0.5$ | "The black area of the target is cut off by the edge of the photo." Retake with the whole target and some paper around it in the frame. |
-| Sharpness | $w / D_\mathrm{px} > 0.3$ | $0.6$ | "The photo is soft: the edges of the target are blurred." Hold the camera steady or rest it on something, let it focus on the target and retake. |
-| Hole size | under 6 px | 3.5 px | "A bullet hole is only about N px across in this photo." Move closer so the target fills more of the frame, or use the full resolution of the camera. |
-| Contrast, with a black area | $P - K < 80$ | $45$ | "The black area and the paper are close in brightness." Retake with more light on the target and without a photo filter. |
-| Brightness, without contrast | $B < 90$ | $50$, for a selected target without a black zone only | "The photo is dark: even its brightest part is dim." Retake with more light on the target and without a photo filter. |
-| Glare | share $> 0.04$ | $0.15$ | "A bright reflection covers part of the paper." Retake with the light from the side, or turn the sheet a little to move the reflection off the target. |
-| Uneven light | $u > 0.25$ | $0.45$ | "The light is uneven: one side of the target is much darker than another." Retake in an even light with no shadow of your hand or phone on the sheet. |
+| Problem                                        | Fair from                 | Bad from                                              | Message and fix                                                                                                                                        |
+| ---------------------------------------------- | ------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Tilt, with the black area at least 0.9 inside  | $\theta > 30^\circ$       | $55^\circ$                                            | "The target is photographed at a slant of about N degrees." Retake from straight above, with the camera parallel to the paper.                         |
+| Framing, with no target selected or recognised | $s_\mathrm{in} < 0.9$     | $0.5$                                                 | "The black area of the target is cut off by the edge of the photo." Retake with the whole target and some paper around it in the frame.                |
+| Sharpness                                      | $w / D_\mathrm{px} > 0.3$ | $0.6$                                                 | "The photo is soft: the edges of the target are blurred." Hold the camera steady or rest it on something, let it focus on the target and retake.       |
+| Hole size                                      | under 6 px                | 3.5 px                                                | "A bullet hole is only about N px across in this photo." Move closer so the target fills more of the frame, or use the full resolution of the camera.  |
+| Contrast, with a black area                    | $P - K < 80$              | $45$                                                  | "The black area and the paper are close in brightness." Retake with more light on the target and without a photo filter.                               |
+| Brightness, without contrast                   | $B < 90$                  | $50$, for a selected target without a black zone only | "The photo is dark: even its brightest part is dim." Retake with more light on the target and without a photo filter.                                  |
+| Glare                                          | share $> 0.04$            | $0.15$                                                | "A bright reflection covers part of the paper." Retake with the light from the side, or turn the sheet a little to move the reflection off the target. |
+| Uneven light                                   | $u > 0.25$                | $0.45$                                                | "The light is uneven: one side of the target is much darker than another." Retake in an even light with no shadow of your hand or phone on the sheet.  |
 
 Without a black area and with no edge of a target or a hole found, the photo is reported at the bad level with "No edge of a target or a hole was found in this photo." and the fix "Retake with the target in the frame, in even light and held steady, or set the scale by hand." (the run is not held: with no target applied it already asks for the scale). With edges, a target without a black area (all white, or rings only) is not told that something is missing. Its size message reads "The photo is only N px on its longer side." with the hole size's fix, judged as a hole of one eightieth of the longer side (fair under 480 px, bad under 280 px).
 
@@ -355,40 +351,40 @@ Code: `apps/web/src/lib/photo-quality.ts`, `photoQuality`, `belowMinimum`, `layo
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `apps/web` |
-| --- | --- | --- | --- |
-| $d_b$ | Bullet diameter or expected hole diameter | mm | m |
-| $k_\mathrm{px}$ | Photo pixels per m of the target near the region | no kind | px/m |
-| $h$ | Visible hole diameter over the bullet diameter | 1 | 1 |
-| $D_\mathrm{px}$, $D$ | Expected hole diameter in photo and in working pixels | no kind | px |
-| $b$ | Block size, photo pixels per working pixel | 1 | 1 |
-| $W$, $H$ | Width and height of the region with its margin | no kind | px |
-| $\bar I_c$, $F_c$ | Mean colour of a block (0 to 255) and its logarithm | no kind | 1 |
-| $\mu$, $m$, $\Sigma$ | Hole colour, median and covariance of the surroundings in log RGB | no kind | 1 |
-| $w$, $\Delta$ | Unit colour axis and the separation of hole and surroundings along it | no kind | 1 |
-| $\theta$, $s_\mathrm{in}$ | Tilt of the black area's plane and its share inside the photo | degree, 1 | degree, 1 |
-| $P$, $K$, $u$ | Paper level, black level (0 to 255) and the relative difference of the light between the paper's four sides | no kind | 1 |
-| $P$ | Projection onto the colour axis, 0 to 255 | no kind | 1 |
-| $r$, $\sigma$, $f$ | Box radius, scale, scale over hole diameter | no kind | px, px, 1 |
-| $L_{xx}, L_{yy}, L_{xy}$ | Second differences of the smoothed projection | no kind | 1/px² |
-| $\mathcal{R}$ | Scale-normalised blob response | no kind | 1 |
-| $D_\mathrm{hole}$, $D_\mathrm{part}$ | Hole diameter at a peak, disc diameter per shot of a part | no kind | px |
-| $r_5$, $c_5$ | Median response and median top-hat contrast of the five strongest peaks | no kind | 1 |
-| $\kappa$ | Share of $r_5$ a peak must reach | 1 | 1 |
-| $\delta$ | Distance of a mask pixel to the nearest pixel outside the mask | no kind | px |
-| $A$, $k$ | Area of a part, peaks in it | no kind, 1 | px², 1 |
-| $D_0$, $D'$ | Expected hole size, refined size of a run | mm, no kind | m, px |
-| $d_\mathrm{hole}$ | Measured hole diameter of an accepted shot | mm | m |
-| $d_c$, $d_\mathrm{nearest}$, $\Delta_d$ | Nominal diameter of a caliber class, of the class nearest to the hole size, and the resolution under which classes share a hole size | mm | m |
-| $Y$, $t$ | Luma, Otsu threshold | no kind | 0 to 255 |
-| $\omega_0, \omega_1$, $\mu_0, \mu_1$ | Class weights and mean lumas below and above $t$ | no kind | 1 |
-| $s$ | Photo pixels per mm of a target, from its black diameter | no kind | px/mm |
-| $\rho_j$, $r_i$ | Mean radius of a ring found and radius of a target ring | no kind, mm | px, mm |
-| $a_j$, $e_j$ | Share of a ring's ellipse its line covers, relative radius error of a match | 1 | 1 |
-| $n_\mathrm{miss}$, $n_\mathrm{extra}$ | Target rings expected and not found, rings found that match none | 1 | 1 |
-| $S$ | Score of a target | 1 | 1 |
-| $n_\mathrm{false}$, $n_\mathrm{missed}$ | Proposals without a reference hole, reference holes without a proposal | 1 | 1 |
-| $g$, $\phi$ | Ring spacing, turn of the target's axes on the photo | mm, degree | mm, rad |
+| Symbol                                  | Meaning                                                                                                                              | Stored unit | Unit in `apps/web` |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------- | ------------------ |
+| $d_b$                                   | Bullet diameter or expected hole diameter                                                                                            | mm          | m                  |
+| $k_\mathrm{px}$                         | Photo pixels per m of the target near the region                                                                                     | no kind     | px/m               |
+| $h$                                     | Visible hole diameter over the bullet diameter                                                                                       | 1           | 1                  |
+| $D_\mathrm{px}$, $D$                    | Expected hole diameter in photo and in working pixels                                                                                | no kind     | px                 |
+| $b$                                     | Block size, photo pixels per working pixel                                                                                           | 1           | 1                  |
+| $W$, $H$                                | Width and height of the region with its margin                                                                                       | no kind     | px                 |
+| $\bar I_c$, $F_c$                       | Mean colour of a block (0 to 255) and its logarithm                                                                                  | no kind     | 1                  |
+| $\mu$, $m$, $\Sigma$                    | Hole colour, median and covariance of the surroundings in log RGB                                                                    | no kind     | 1                  |
+| $w$, $\Delta$                           | Unit colour axis and the separation of hole and surroundings along it                                                                | no kind     | 1                  |
+| $\theta$, $s_\mathrm{in}$               | Tilt of the black area's plane and its share inside the photo                                                                        | degree, 1   | degree, 1          |
+| $P$, $K$, $u$                           | Paper level, black level (0 to 255) and the relative difference of the light between the paper's four sides                          | no kind     | 1                  |
+| $P$                                     | Projection onto the colour axis, 0 to 255                                                                                            | no kind     | 1                  |
+| $r$, $\sigma$, $f$                      | Box radius, scale, scale over hole diameter                                                                                          | no kind     | px, px, 1          |
+| $L_{xx}, L_{yy}, L_{xy}$                | Second differences of the smoothed projection                                                                                        | no kind     | 1/px²              |
+| $\mathcal{R}$                           | Scale-normalised blob response                                                                                                       | no kind     | 1                  |
+| $D_\mathrm{hole}$, $D_\mathrm{part}$    | Hole diameter at a peak, disc diameter per shot of a part                                                                            | no kind     | px                 |
+| $r_5$, $c_5$                            | Median response and median top-hat contrast of the five strongest peaks                                                              | no kind     | 1                  |
+| $\kappa$                                | Share of $r_5$ a peak must reach                                                                                                     | 1           | 1                  |
+| $\delta$                                | Distance of a mask pixel to the nearest pixel outside the mask                                                                       | no kind     | px                 |
+| $A$, $k$                                | Area of a part, peaks in it                                                                                                          | no kind, 1  | px², 1             |
+| $D_0$, $D'$                             | Expected hole size, refined size of a run                                                                                            | mm, no kind | m, px              |
+| $d_\mathrm{hole}$                       | Measured hole diameter of an accepted shot                                                                                           | mm          | m                  |
+| $d_c$, $d_\mathrm{nearest}$, $\Delta_d$ | Nominal diameter of a caliber class, of the class nearest to the hole size, and the resolution under which classes share a hole size | mm          | m                  |
+| $Y$, $t$                                | Luma, Otsu threshold                                                                                                                 | no kind     | 0 to 255           |
+| $\omega_0, \omega_1$, $\mu_0, \mu_1$    | Class weights and mean lumas below and above $t$                                                                                     | no kind     | 1                  |
+| $s$                                     | Photo pixels per mm of a target, from its black diameter                                                                             | no kind     | px/mm              |
+| $\rho_j$, $r_i$                         | Mean radius of a ring found and radius of a target ring                                                                              | no kind, mm | px, mm             |
+| $a_j$, $e_j$                            | Share of a ring's ellipse its line covers, relative radius error of a match                                                          | 1           | 1                  |
+| $n_\mathrm{miss}$, $n_\mathrm{extra}$   | Target rings expected and not found, rings found that match none                                                                     | 1           | 1                  |
+| $S$                                     | Score of a target                                                                                                                    | 1           | 1                  |
+| $n_\mathrm{false}$, $n_\mathrm{missed}$ | Proposals without a reference hole, reference holes without a proposal                                                               | 1           | 1                  |
+| $g$, $\phi$                             | Ring spacing, turn of the target's axes on the photo                                                                                 | mm, degree  | mm, rad            |
 
 ## Assumptions
 

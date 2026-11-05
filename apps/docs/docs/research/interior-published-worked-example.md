@@ -1,4 +1,5 @@
 ---
+
 title: Interior model against a published worked example
 description: Whether the M3 interior model reproduces the printed values of a worked gun example from a handbook, a check on the closed form and the reading of its inputs.
 ---
@@ -19,15 +20,15 @@ Those of the [constant-surface entry](interior-constant-surface-closed-form.md):
 
 ## Numbers
 
-| Quantity | Printed value | Compared with | Accept limit (relative) |
-| --- | --- | --- | --- |
-| $\xi_e$ | 24.17 | closed form | $10^{-3}$ |
-| $\theta_B$ | 0.2958 | closed form | $10^{-3}$ |
-| $1/(1 - \theta_B)$ | 1.42 | closed form | $10^{-3}$ |
-| peak pressure | 3442 bar | numerical run | $10^{-3}$ |
-| muzzle velocity | 1061 m/s | numerical run | $10^{-3}$ |
-| velocity at burnout | 850.4 m/s | numerical run | $10^{-3}$ |
-| travel at burnout | 0.6689 m | numerical run | $2 \cdot 10^{-3}$ |
+| Quantity            | Printed value | Compared with | Accept limit (relative) |
+| ------------------- | ------------- | ------------- | ----------------------- |
+| $\xi_e$             | 24.17         | closed form   | $10^{-3}$               |
+| $\theta_B$          | 0.2958        | closed form   | $10^{-3}$               |
+| $1/(1 - \theta_B)$  | 1.42          | closed form   | $10^{-3}$               |
+| peak pressure       | 3442 bar      | numerical run | $10^{-3}$               |
+| muzzle velocity     | 1061 m/s      | numerical run | $10^{-3}$               |
+| velocity at burnout | 850.4 m/s     | numerical run | $10^{-3}$               |
+| travel at burnout   | 0.6689 m      | numerical run | $2 \cdot 10^{-3}$       |
 
 The printed values are the handbook's rounded ones, so the limit is the rounding of the print, not a measure of the model's accuracy.
 

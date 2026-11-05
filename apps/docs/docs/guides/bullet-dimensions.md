@@ -1,4 +1,5 @@
 ---
+
 title: Measuring bullet length, base to ogive and bearing length
 description: How to measure the bullet dimensions the seating and the stability estimate use, which simulation input each one moves, and where to enter them.
 ---
@@ -9,11 +10,11 @@ A bullet record carries the maker's dimensions where they are known, and the app
 
 ## What each value improves
 
-| Value | Input it moves | How |
-| --- | --- | --- |
-| Length | Chamber volume and bullet travel, when the load is seated by COAL; the gyroscopic stability factor | The base sits at COAL minus the length ([Seated bullet](../models/case-capacity.md#seated-bullet)). Miller's rule uses the length ([Stability](../models/exterior-stability.md)). |
-| Base to ogive | Chamber volume and bullet travel, when the load is seated by CBTO; the jump to the lands | The base sits at CBTO minus the base to ogive length. |
-| Bearing length | The outline below the mouth | It shapes the bullet volume that comes off the case volume. It is not an input of the interior model. |
+| Value          | Input it moves                                                                                     | How                                                                                                                                                                               |
+| -------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Length         | Chamber volume and bullet travel, when the load is seated by COAL; the gyroscopic stability factor | The base sits at COAL minus the length ([Seated bullet](../models/case-capacity.md#seated-bullet)). Miller's rule uses the length ([Stability](../models/exterior-stability.md)). |
+| Base to ogive  | Chamber volume and bullet travel, when the load is seated by CBTO; the jump to the lands           | The base sits at CBTO minus the base to ogive length.                                                                                                                             |
+| Bearing length | The outline below the mouth                                                                        | It shapes the bullet volume that comes off the case volume. It is not an input of the interior model.                                                                             |
 
 The base position moves the chamber volume, which the [peak-pressure range](../models/interior-pressure-range.md#default-tolerances) moves by 1 % either side. On a case of about 3.2 cm³ (50 grains of water) and a bore of 7.8 mm, 0.5 mm of base position is 0.024 cm³, under 1 % of the case volume. Bullet mass is not moved by the range unless a tolerance is set.
 

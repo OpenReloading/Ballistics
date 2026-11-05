@@ -1,4 +1,5 @@
 ---
+
 title: Burn laws and form functions
 description: Pressure-dependent burn laws of the M3 interior model, the form functions of geometric grains and of vivacity forms, and the dynamic vivacity.
 ---
@@ -6,7 +7,6 @@ description: Pressure-dependent burn laws of the M3 interior model, the form fun
 # Burn laws and form functions
 
 The burn law gives the rate at which the charge of the [M3 interior model](interior-m3.md) burns at the current mean pressure.
-
 - Geometric law: the regression rate of the grain surface. The grain shape turns the burnt depth into a burnt fraction.
 - Vivacity law: the rate of the burnt fraction itself, with a form function for the burning surface relative to the initial one.
 
@@ -212,31 +212,31 @@ The burn law checks keep the pressure exponent at $n = 1$. The laws accept anoth
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $y$ | Burnt depth from each surface | mm | m |
-| $e_1$ | Half web | mm | m |
-| $f$, $f_\text{end}$ | Form variable, its value at burnout | 1 | 1 |
-| $f_i$, $f_s$ | Seven-perforated grain: end of the inner slivers, burnout | 1 | 1 |
-| $z$ | Burnt fraction of the charge | 1 | 1 |
-| $Z(f)$ | Burnt fraction as a function of $f$ | 1 | 1 |
-| $\beta$ | Burn-rate coefficient | no kind | m s^-1 Pa^-n |
-| $n$ | Pressure exponent | 1 | 1 |
-| $\bar p$ | Mean pressure | bar | Pa |
-| $p_\text{ref}$ | Reference pressure of the vivacity law | bar | Pa |
-| $B_a$ | Vivacity | 1/s | 1/s |
-| $\varphi$ | Form function, burning surface over initial surface | 1 | 1 |
-| $\varphi_1$, $\varphi_2$ | Form function at $z_1$ and at $z_2$ | 1 | 1 |
-| $a$, $m$, $q$, $r$ | Form parameters | 1 | 1 |
-| $z_1$, $z_2$ | Stage boundaries in burnt fraction | 1 | 1 |
-| $\tau_T$ | Temperature factor on the burn rate | 1 | 1 |
-| $D$, $d_p$, $L$ | Grain diameter, perforation diameter, grain length | mm | m |
-| $w$ | Web | mm | m |
-| $s$ | Centre spacing of the perforations | mm | m |
-| $\varrho$, $R$ | Perforation radius and outer radius during the sliver phase | mm | m |
-| $A_0$, $A_\text{in}$, $A_\text{out}$ | Initial cross-section, area of one inner and one outer sliver | mm2 | m2 |
-| $\ell$, $\Lambda$ | Half overlap of two perforation circles, overlap of two disks | mm2 | m2 |
-| $L_d$, $\bar L_d$ | Dynamic vivacity, its mean over $z_a$ to $z_b$ | no kind | 1/(Pa s) |
+| Symbol                               | Meaning                                                       | Stored unit | Unit in `core` |
+| ------------------------------------ | ------------------------------------------------------------- | ----------- | -------------- |
+| $y$                                  | Burnt depth from each surface                                 | mm          | m              |
+| $e_1$                                | Half web                                                      | mm          | m              |
+| $f$, $f_\text{end}$                  | Form variable, its value at burnout                           | 1           | 1              |
+| $f_i$, $f_s$                         | Seven-perforated grain: end of the inner slivers, burnout     | 1           | 1              |
+| $z$                                  | Burnt fraction of the charge                                  | 1           | 1              |
+| $Z(f)$                               | Burnt fraction as a function of $f$                           | 1           | 1              |
+| $\beta$                              | Burn-rate coefficient                                         | no kind     | m s^-1 Pa^-n   |
+| $n$                                  | Pressure exponent                                             | 1           | 1              |
+| $\bar p$                             | Mean pressure                                                 | bar         | Pa             |
+| $p_\text{ref}$                       | Reference pressure of the vivacity law                        | bar         | Pa             |
+| $B_a$                                | Vivacity                                                      | 1/s         | 1/s            |
+| $\varphi$                            | Form function, burning surface over initial surface           | 1           | 1              |
+| $\varphi_1$, $\varphi_2$             | Form function at $z_1$ and at $z_2$                           | 1           | 1              |
+| $a$, $m$, $q$, $r$                   | Form parameters                                               | 1           | 1              |
+| $z_1$, $z_2$                         | Stage boundaries in burnt fraction                            | 1           | 1              |
+| $\tau_T$                             | Temperature factor on the burn rate                           | 1           | 1              |
+| $D$, $d_p$, $L$                      | Grain diameter, perforation diameter, grain length            | mm          | m              |
+| $w$                                  | Web                                                           | mm          | m              |
+| $s$                                  | Centre spacing of the perforations                            | mm          | m              |
+| $\varrho$, $R$                       | Perforation radius and outer radius during the sliver phase   | mm          | m              |
+| $A_0$, $A_\text{in}$, $A_\text{out}$ | Initial cross-section, area of one inner and one outer sliver | mm2         | m2             |
+| $\ell$, $\Lambda$                    | Half overlap of two perforation circles, overlap of two disks | mm2         | m2             |
+| $L_d$, $\bar L_d$                    | Dynamic vivacity, its mean over $z_a$ to $z_b$                | no kind     | 1/(Pa s)       |
 
 ## Assumptions
 

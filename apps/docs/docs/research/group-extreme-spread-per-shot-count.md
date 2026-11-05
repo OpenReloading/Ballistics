@@ -1,4 +1,5 @@
 ---
+
 title: Expected extreme spread per shot count
 description: The mean extreme spread of a circular normal group against its shot count, the range that holds 90 percent of single groups, and the spread of a series of five-shot groups, from a seeded simulation.
 ---
@@ -12,7 +13,6 @@ Groups: how large is the extreme spread of a group of $n$ shots in units of the 
 ## Method
 
 Decided before the run.
-
 - Seeded simulation of circular normal groups (the same $\sigma$ on both axes, no correlation), with the generator and seeds fixed in the script: 1 000 000 groups for each $n$ from 2 to 20 (the rule asks for at least 200 000), the mean extreme spread and its 5th and 95th percentile.
 - Coverage: the range from the 5th to the 95th percentile is applied to 200 000 further groups of an independent seed for each $n$; it should hold 90 percent of them within 2 points.
 - Series: 4 000 000 five-shot groups are cut into series of $k$ = 8, 12 and 20 groups; the mean of the largest and of the smallest group of a series is given relative to the expected extreme spread of one group and relative to the mean of its own series.
@@ -31,18 +31,18 @@ A source of dispersion that carries a share $f$ of the total variance, removed, 
 
 Mean extreme spread and the range that holds 90 percent of single groups, in units of $\sigma$ (selected rows; the script prints all of 2 to 20):
 
-| $n$ | Mean | 5th percentile | 95th percentile | Share of independent groups inside |
-| --- | --- | --- | --- | --- |
-| 2 | 1.770 | 0.45 | 3.46 | 90.0 % |
-| 3 | 2.408 | 1.07 | 3.99 | 89.9 % |
-| 4 | 2.792 | 1.49 | 4.30 | 90.1 % |
-| 5 | 3.066 | 1.80 | 4.51 | 89.9 % |
-| 6 | 3.277 | 2.05 | 4.68 | 89.9 % |
-| 8 | 3.585 | 2.41 | 4.93 | 90.0 % |
-| 10 | 3.812 | 2.68 | 5.11 | 90.0 % |
-| 12 | 3.988 | 2.89 | 5.25 | 90.1 % |
-| 15 | 4.197 | 3.14 | 5.42 | 89.9 % |
-| 20 | 4.452 | 3.44 | 5.63 | 90.1 % |
+| $n$ | Mean  | 5th percentile | 95th percentile | Share of independent groups inside |
+| --- | ----- | -------------- | --------------- | ---------------------------------- |
+| 2   | 1.770 | 0.45           | 3.46            | 90.0 %                             |
+| 3   | 2.408 | 1.07           | 3.99            | 89.9 %                             |
+| 4   | 2.792 | 1.49           | 4.30            | 90.1 %                             |
+| 5   | 3.066 | 1.80           | 4.51            | 89.9 %                             |
+| 6   | 3.277 | 2.05           | 4.68            | 89.9 %                             |
+| 8   | 3.585 | 2.41           | 4.93            | 90.0 %                             |
+| 10  | 3.812 | 2.68           | 5.11            | 90.0 %                             |
+| 12  | 3.988 | 2.89           | 5.25            | 90.1 %                             |
+| 15  | 4.197 | 3.14           | 5.42            | 89.9 %                             |
+| 20  | 4.452 | 3.44           | 5.63            | 90.1 %                             |
 
 The coverage is 89.9 to 90.1 percent for every $n$ from 2 to 20, inside the 2 points allowed. The simulated $n = 2$ mean differs from $\sqrt{\pi}$ by 0.14 percent.
 
@@ -52,11 +52,11 @@ Mean 3-shot over mean 5-shot extreme spread: 0.786. One five-shot group lies bet
 
 Largest and smallest of a series of five-shot groups, relative to the expected extreme spread of one group (relative to the series' own mean in brackets):
 
-| $k$ | Series | Largest | Smallest |
-| --- | --- | --- | --- |
-| 8 | 500 000 | 1.407 (1.408) | 0.643 (0.642) |
-| 12 | 333 333 | 1.472 (1.473) | 0.598 (0.598) |
-| 20 | 200 000 | 1.549 (1.550) | 0.549 (0.548) |
+| $k$ | Series  | Largest       | Smallest      |
+| --- | ------- | ------------- | ------------- |
+| 8   | 500 000 | 1.407 (1.408) | 0.643 (0.642) |
+| 12  | 333 333 | 1.472 (1.473) | 0.598 (0.598) |
+| 20  | 200 000 | 1.549 (1.550) | 0.549 (0.548) |
 
 ## Result
 
@@ -67,7 +67,6 @@ Proposed text for the Limits of [Groups](../models/groups.md), replacing the sen
 > Mean radius, width, height, the pair distances and the elliptical CEP carry no interval. The extreme spread carries none either, but its expected size for 2 to 20 shots and the range that holds 90 percent of single groups are given in units of $\sigma$ (table from a seeded simulation of circular normal groups).
 
 Web wiring, not built (at most ten lines):
-
 - In the groups tab, next to the extreme spread of a group of $n$ shots with $2 \le n \le 20$ and a per-axis $\sigma$ estimate (a radial standard deviation is divided by $\sqrt{2}$ first), a line: "For this shot count a group of this load is typically X to Y (mean Z), 90 percent range" with $X$, $Y$, $Z$ the table values times the per-axis $\sigma$.
 - Where groups of different shot counts are compared, one line: "Groups of 3 shots average 0.79 of groups of 5 shots from the same rifle; compare groups of the same shot count." The ratio is `mean(n) / mean(m)` of the table.
 - Where several groups of one load are listed, one line: "The largest of 8 five-shot groups is about 1.4 times the mean, the smallest about 0.6 times, from chance alone." The numbers come from this entry for $k$ = 8, 12, 20 and are static text.

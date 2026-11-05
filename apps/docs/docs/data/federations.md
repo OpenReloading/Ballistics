@@ -1,4 +1,5 @@
 ---
+
 title: Federations, disciplines and target mappings
 description: The records of shooting sport federations, the disciplines their rule books define and the targets each discipline is shot on.
 ---
@@ -6,7 +7,6 @@ description: The records of shooting sport federations, the disciplines their ru
 # Federations, disciplines and target mappings
 
 Three record kinds describe who defines a discipline, what the discipline is and which target scores it. Ring scoring starts from them: a federation, then a discipline, then the target (see [Ring scoring](../models/ring-scoring.md)).
-
 - Every value is read from a rule book that the target records already cite, with its section and page. A value the rule book does not state stays absent.
 - Schemas: `packages/schema/src/federation.ts`.
 - Records: `packages/data/records/federations/`, `disciplines/`, `target-mappings/` and `caliber-classes/`.
@@ -19,51 +19,51 @@ Three record kinds describe who defines a discipline, what the discipline is and
 
 `records/federations/<id>.json`, schema `federation`.
 
-| Field | Meaning |
-|---|---|
-| `id` | Record id, the file name |
-| `name` | Full name as the rule book prints it |
-| `abbreviation` | Short name ("ISSF", "DSB"), shown as the organization of a target and of a target event |
-| `country` | ISO 3166-1 alpha-2 code, or `international` for a world body |
-| `internationalFederation` | Id of the international federation the rule book names this one a member of |
-| `website` | https URL of the federation's own homepage, checked by loading it: it answers and names the federation. Absent where no address was verified |
-| `ruleBooks` | Ids of the source records of the rule books the records cite. The API returns title, edition, URL and SHA-256 |
-| `provenance` | Sources with the page each value was read at |
+| Field                     | Meaning                                                                                                                                      |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                      | Record id, the file name                                                                                                                     |
+| `name`                    | Full name as the rule book prints it                                                                                                         |
+| `abbreviation`            | Short name ("ISSF", "DSB"), shown as the organization of a target and of a target event                                                      |
+| `country`                 | ISO 3166-1 alpha-2 code, or `international` for a world body                                                                                 |
+| `internationalFederation` | Id of the international federation the rule book names this one a member of                                                                  |
+| `website`                 | https URL of the federation's own homepage, checked by loading it: it answers and names the federation. Absent where no address was verified |
+| `ruleBooks`               | Ids of the source records of the rule books the records cite. The API returns title, edition, URL and SHA-256                                |
+| `provenance`              | Sources with the page each value was read at                                                                                                 |
 
 ## Discipline
 
 `records/disciplines/<id>.json`, schema `discipline`. One record per discipline and distance of one federation: a discipline shot at 25, 50 and 100 m is three records.
 
-| Field | Meaning |
-|---|---|
-| `federation` | Id of the federation whose rule book defines it |
-| `name`, `number` | Name and discipline number or code as printed ("2113", "SG 1") |
-| `section`, `page` | Rule-book section that defines it, printed page and PDF page |
-| `distance` | `value` in mm; `unit`: the unit the rule book states, `m`, `yd` or `m/yd` (both, as in "50 Meter/Yards"). The number is the printed one: `m/yd` keeps the metric reading in `value`, and the same number applies in yards. |
-| `category` | Kind of firearm (`disciplineCategory`), where the rule book states it |
-| `caliberClasses` | `ids` of caliber class records (`records/caliber-classes/`) with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it) |
-| `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent |
-| `rules` | The rule facts below, each present only where the rule book states it |
+| Field                     | Meaning                                                                                                                                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `federation`              | Id of the federation whose rule book defines it                                                                                                                                                                            |
+| `name`, `number`          | Name and discipline number or code as printed ("2113", "SG 1")                                                                                                                                                             |
+| `section`, `page`         | Rule-book section that defines it, printed page and PDF page                                                                                                                                                               |
+| `distance`                | `value` in mm; `unit`: the unit the rule book states, `m`, `yd` or `m/yd` (both, as in "50 Meter/Yards"). The number is the printed one: `m/yd` keeps the metric reading in `value`, and the same number applies in yards. |
+| `category`                | Kind of firearm (`disciplineCategory`), where the rule book states it                                                                                                                                                      |
+| `caliberClasses`          | `ids` of caliber class records (`records/caliber-classes/`) with `basis`: `stated` (the rule book names them) or `derived` (a stated range or bound expanded to the classes whose diameter lies in it)                     |
+| `internationalDiscipline` | Id of the discipline of an international federation the rule book names as equivalent                                                                                                                                      |
+| `rules`                   | The rule facts below, each present only where the rule book states it                                                                                                                                                      |
 
 ### Rule facts
 
 `rules` holds what a shooter needs to set up a match. Every field is optional and **absent means the rule book does not state it** for that discipline: the page shows nothing for it. Each field is cited in the provenance with its own source and page (`fields`: `rules.<name>`).
 
-| Field | Meaning |
-|---|---|
-| `firearm` | `short-gun` or `long-gun` |
-| `actions` | Actions allowed: `single-shot`, `repeater`, `semi-automatic`, `revolver`, `lever-action` |
-| `positions` | Positions allowed: `standing`, `kneeling`, `sitting`, `prone` (a rule book that frees the position lists all four) |
-| `supports` | How the firearm may be supported: `freehand`, `sling`, `rest` |
-| `sights` | Sights allowed: `original` (as issued), `open`, `aperture`, `optical`, `reflex` |
-| `maxMagnification` | Greatest magnification of an optical sight |
-| `minTriggerWeight` | Least trigger weight at release, g |
-| `maxBarrelLength` | mm |
-| `maxFirearmMass` | g |
-| `ammunition` | `handloads` (reloaded ammunition allowed or not), `minMuzzleEnergy` (J), `minBulletMass` and `maxBulletMass` (g), `bulletTypes` (`lead`, `jacketed`, `full-metal-jacket`, `hollow-point`, `wadcutter`) |
-| `sighters` | Number of sighting shots, or `unlimited` where the rule book allows any number (a rule book that says none gives `0`) |
-| `seriesShots` | Shots of one series, where the score is split into series |
-| `timeLimits` | List of `duration` (s, with the printed figure in `raw`), what it `covers` (`discipline`, `stage`, `series`, `shot`) and `includesSighters` where stated |
+| Field              | Meaning                                                                                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `firearm`          | `short-gun` or `long-gun`                                                                                                                                                                              |
+| `actions`          | Actions allowed: `single-shot`, `repeater`, `semi-automatic`, `revolver`, `lever-action`                                                                                                               |
+| `positions`        | Positions allowed: `standing`, `kneeling`, `sitting`, `prone` (a rule book that frees the position lists all four)                                                                                     |
+| `supports`         | How the firearm may be supported: `freehand`, `sling`, `rest`                                                                                                                                          |
+| `sights`           | Sights allowed: `original` (as issued), `open`, `aperture`, `optical`, `reflex`                                                                                                                        |
+| `maxMagnification` | Greatest magnification of an optical sight                                                                                                                                                             |
+| `minTriggerWeight` | Least trigger weight at release, g                                                                                                                                                                     |
+| `maxBarrelLength`  | mm                                                                                                                                                                                                     |
+| `maxFirearmMass`   | g                                                                                                                                                                                                      |
+| `ammunition`       | `handloads` (reloaded ammunition allowed or not), `minMuzzleEnergy` (J), `minBulletMass` and `maxBulletMass` (g), `bulletTypes` (`lead`, `jacketed`, `full-metal-jacket`, `hollow-point`, `wadcutter`) |
+| `sighters`         | Number of sighting shots, or `unlimited` where the rule book allows any number (a rule book that says none gives `0`)                                                                                  |
+| `seriesShots`      | Shots of one series, where the score is split into series                                                                                                                                              |
+| `timeLimits`       | List of `duration` (s, with the printed figure in `raw`), what it `covers` (`discipline`, `stage`, `series`, `shot`) and `includesSighters` where stated                                               |
 
 A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](record-model.md)). Power factors, which are no single stored quantity, are not recorded on disciplines; the event types of practical shooting hold them per division ([Event types](event-types.md)).
 
@@ -71,28 +71,27 @@ A quantity is `{ value, raw? }` in its stored unit (time: s, see [Record model](
 
 Disciplines with the fact set, of the disciplines of each federation (stage values on target mappings are not counted; 58 mappings carry `sighters`, `seriesShots` or `timeLimits`):
 
-| Fact | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | KNSA (8) | NRA (13) | NSRA (2) | ÖSB (3) | VdRBw (25) |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `firearm` | 103 | 104 | 44 | 72 | 16 | 8 | 13 | 2 | 3 | 25 |
-| `actions` | 98 | 101 | 31 | 62 | 5 | 2 | 0 | 0 | 0 | 25 |
-| `positions` | 103 | 104 | 38 | 71 | 16 | 8 | 13 | 0 | 3 | 25 |
-| `supports` | 103 | 104 | 34 | 72 | 16 | 6 | 4 | 0 | 2 | 25 |
-| `sights` | 100 | 101 | 41 | 71 | 10 | 4 | 0 | 0 | 0 | 25 |
-| `maxMagnification` | 15 | 15 | 0 | 7 | 2 | 0 | 0 | 0 | 0 | 3 |
-| `minTriggerWeight` | 61 | 79 | 13 | 0 | 8 | 6 | 0 | 0 | 0 | 20 |
-| `maxBarrelLength` | 24 | 13 | 12 | 16 | 5 | 0 | 0 | 0 | 0 | 7 |
-| `maxFirearmMass` | 33 | 87 | 15 | 0 | 15 | 6 | 0 | 0 | 0 | 0 |
-| `ammunition.handloads` | 71 | 74 | 1 | 48 | 0 | 8 | 0 | 0 | 0 | 25 |
-| `ammunition.bulletTypes` | 43 | 104 | 16 | 1 | 11 | 0 | 0 | 2 | 0 | 0 |
-| `ammunition.minMuzzleEnergy` | 7 | 0 | 0 | 8 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `ammunition.minBulletMass` | 6 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 |
-| `ammunition.maxBulletMass` | 7 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `sighters` | 75 | 95 | 28 | 27 | 14 | 0 | 0 | 0 | 0 | 21 |
-| `seriesShots` | 36 | 96 | 5 | 42 | 8 | 0 | 5 | 0 | 0 | 21 |
-| `timeLimits` | 58 | 72 | 27 | 62 | 11 | 8 | 13 | 2 | 3 | 15 |
+| Fact                         | BDMP (110) | BDS (106) | DSB (47) | DSU (72) | ISSF (16) | KNSA (8) | NRA (13) | NSRA (2) | ÖSB (3) | VdRBw (25) |
+| ---------------------------- | ---------- | --------- | -------- | -------- | --------- | -------- | -------- | -------- | ------- | ---------- |
+| `firearm`                    | 103        | 104       | 44       | 72       | 16        | 8        | 13       | 2        | 3       | 25         |
+| `actions`                    | 98         | 101       | 31       | 62       | 5         | 2        | 0        | 0        | 0       | 25         |
+| `positions`                  | 103        | 104       | 38       | 71       | 16        | 8        | 13       | 0        | 3       | 25         |
+| `supports`                   | 103        | 104       | 34       | 72       | 16        | 6        | 4        | 0        | 2       | 25         |
+| `sights`                     | 100        | 101       | 41       | 71       | 10        | 4        | 0        | 0        | 0       | 25         |
+| `maxMagnification`           | 15         | 15        | 0        | 7        | 2         | 0        | 0        | 0        | 0       | 3          |
+| `minTriggerWeight`           | 61         | 79        | 13       | 0        | 8         | 6        | 0        | 0        | 0       | 20         |
+| `maxBarrelLength`            | 24         | 13        | 12       | 16       | 5         | 0        | 0        | 0        | 0       | 7          |
+| `maxFirearmMass`             | 33         | 87        | 15       | 0        | 15        | 6        | 0        | 0        | 0       | 0          |
+| `ammunition.handloads`       | 71         | 74        | 1        | 48       | 0         | 8        | 0        | 0        | 0       | 25         |
+| `ammunition.bulletTypes`     | 43         | 104       | 16       | 1        | 11        | 0        | 0        | 2        | 0       | 0          |
+| `ammunition.minMuzzleEnergy` | 7          | 0         | 0        | 8        | 0         | 0        | 0        | 0        | 0       | 0          |
+| `ammunition.minBulletMass`   | 6          | 0         | 1        | 0        | 1         | 0        | 0        | 0        | 0       | 0          |
+| `ammunition.maxBulletMass`   | 7          | 0         | 0        | 0        | 0         | 0        | 0        | 0        | 0       | 0          |
+| `sighters`                   | 75         | 95        | 28       | 27       | 14        | 0        | 0        | 0        | 0       | 21         |
+| `seriesShots`                | 36         | 96        | 5        | 42       | 8         | 0        | 5        | 0        | 0       | 21         |
+| `timeLimits`                 | 58         | 72        | 27       | 62       | 11        | 8        | 13       | 2        | 3       | 15         |
 
 A gap is a fact the rule books leave open, or a fact that one record cannot hold:
-
 - **Open in all ten rule books:** minimum muzzle energy, minimum and maximum bullet mass (stated only for the few disciplines counted above), and handload rules outside the disciplines counted. Limits written as a power factor, a momentum or a maximum energy have no stored quantity and are not recorded.
 - **Barrel length:** stated for handgun disciplines; the rifle tables of the German rule books print the length of the whole system, which is no barrel length.
 - **Free or as issued:** where a rule book says "any" or "as the original" for trigger weight, firearm mass or magnification, the field is absent.
@@ -111,7 +110,6 @@ Muzzle-loading disciplines carry no caliber classes: the classes group cartridge
 ## Target mapping
 
 `records/target-mappings/<id>.json`, schema `targetMapping`. One record per target event:
-
 - the discipline, the target and the id of the target event that scores it
 - where the rule book states them: the `stage` (a discipline with a precision and a rapid-fire part has one mapping per target; a discipline whose caliber groups shoot on different targets has one mapping per target with the groups as its `stage`), the scoring `gauge` the number of record shots `shotCount` (sighters not counted) and the stage's own `sighters`, `seriesShots` and `timeLimits` (as in [Rule facts](#rule-facts))
 
@@ -128,7 +126,6 @@ A target with `photoSearch: false` is skipped by the photo target search. The us
 ## Validation
 
 `pnpm run data:validate` (`packages/data/src/federations.ts`, `checkFederations`) reports:
-
 - a discipline whose `federation` names no record
 - an `internationalFederation` or `internationalDiscipline` link to a record that is not of an international federation, or to no record
 - a mapping whose discipline, target or target event does not exist, whose event belongs to another federation than the discipline's, or whose gauge differs from the event's
@@ -142,12 +139,12 @@ The schemas reject any key they do not define, and `data:validate` an unknown ca
 
 Served under `/v1` (`packages/api/src/routes/federations.ts`). Each `/:id` route returns the record.
 
-| Route | Items |
-|---|---|
-| `GET /federations` | `{ id, name, abbreviation, country, internationalFederation?, website? }` |
-| `GET /disciplines?federation=` | `{ id, federation, name, number?, distanceMm, category? }` |
-| `GET /target-mappings?discipline=&face=` | `{ id, discipline, face, event, stage?, gaugeMm? }`, `gaugeMm` in mm |
-| `GET /caliber-classes` | `{ id, name, diameterMm }`, by diameter |
+| Route                                    | Items                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------- |
+| `GET /federations`                       | `{ id, name, abbreviation, country, internationalFederation?, website? }` |
+| `GET /disciplines?federation=`           | `{ id, federation, name, number?, distanceMm, category? }`                |
+| `GET /target-mappings?discipline=&face=` | `{ id, discipline, face, event, stage?, gaugeMm? }`, `gaugeMm` in mm      |
+| `GET /caliber-classes`                   | `{ id, name, diameterMm }`, by diameter                                   |
 
 Each list answers `{ total, items }` in the default order below. `GET /target-faces` lists per target the caliber classes of the disciplines mapped to it (`caliberClasses`) and the categories of its events and those disciplines (`categories`).
 
@@ -155,29 +152,28 @@ Each list answers `{ total, items }` in the default order below. `GET /target-fa
 
 One set of comparators (`packages/schema/src/competition-order.ts`) orders every list: the REST lists, the discipline and target directories, the discipline table of a target page, the target table of a discipline page and the pickers of the group panel. The directories show the API's order until a column header is clicked, which sorts by that column instead.
 
-| Entity | Order |
-|---|---|
-| Federation | Abbreviation |
-| Discipline | Federation, then its own code (below), then distance, then name |
-| Target | Organization, then the code printed in the name (BDS `(Z2)` before `(Z18)`; targets with a code first), then name |
-| Target event | Distance ascending, then name |
-| Target mapping | Order of its discipline, then target id, then id |
+| Entity         | Order                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Federation     | Abbreviation                                                                                                      |
+| Discipline     | Federation, then its own code (below), then distance, then name                                                   |
+| Target         | Organization, then the code printed in the name (BDS `(Z2)` before `(Z18)`; targets with a code first), then name |
+| Target event   | Distance ascending, then name                                                                                     |
+| Target mapping | Order of its discipline, then target id, then id                                                                  |
 
 Names are alphabetical with numbers in numeric order (25 before 100). The code of a discipline, per federation:
 
-| Federation | Numbers | Order |
-|---|---|---|
-| BDS | `2101`, group codes `10xx`, `73xx` | By value, `x` read as `0`: `73xx` is 7300, after `4110` |
-| DSB | Section and item, `1.10`, several codes joined by `/` | The first code, each dotted segment numeric: `1.9`, `1.10`, `1.37/1.51/1.54`, `2.20` |
-| DSU, BDMP, VdRBw | Prefix and number, `LDG 2`, `G-H 6`, `SP3` | Prefix, then the number, then any text after it. Several codes by the first. Some BDMP and DSB records have no number |
-| ISSF, KNSA, NRA, NSRA, ÖSB | None | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name |
+| Federation                 | Numbers                                               | Order                                                                                                                 |
+| -------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| BDS                        | `2101`, group codes `10xx`, `73xx`                    | By value, `x` read as `0`: `73xx` is 7300, after `4110`                                                               |
+| DSB                        | Section and item, `1.10`, several codes joined by `/` | The first code, each dotted segment numeric: `1.9`, `1.10`, `1.37/1.51/1.54`, `2.20`                                  |
+| DSU, BDMP, VdRBw           | Prefix and number, `LDG 2`, `G-H 6`, `SP3`            | Prefix, then the number, then any text after it. Several codes by the first. Some BDMP and DSB records have no number |
+| ISSF, KNSA, NRA, NSRA, ÖSB | None                                                  | By category (the order of `disciplineCategory`: air rifle, air pistol, rifle, pistol, ...), then distance, then name  |
 
 A discipline without a number follows the numbered ones of its federation and is ordered like ISSF.
 
 ## Ring scoring
 
 The group panel of `/groups` (`apps/web/src/components/ring-scoring.tsx`, `apps/web/src/lib/face-disciplines.ts`) has these lists:
-
 1. Federation: All, or one federation, by abbreviation.
 2. Discipline: the disciplines of that federation in the default order. With All, every federation in turn, then the target events no mapping names by federation and name.
 3. Target: the targets of the discipline's mappings with their stage, in the order of the stages, else every target by name. With only a federation chosen, the targets its disciplines map to and the targets it publishes.

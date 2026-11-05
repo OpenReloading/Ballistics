@@ -1,4 +1,5 @@
 ---
+
 title: Feedback tasks
 description: Short tasks in the web app before the 1.0 release, each with the page to open and what counts as done, and where to report what went wrong.
 ---
@@ -7,15 +8,15 @@ description: Short tasks in the web app before the 1.0 release, each with the pa
 
 Try one or more of these tasks in the [web app](https://openreloading.github.io/Ballistics/) on your own, in any order, and tell us where you got stuck. Nothing you enter leaves your browser.
 
-| Task | Page | Done when |
-| --- | --- | --- |
-| First load | [Load workbench](https://openreloading.github.io/Ballistics/workbench/) | You chose a cartridge, bullet, powder and charge (or started from Example load) and read the simulated velocity and pressure. |
-| Chronograph session | [Session summary](https://openreloading.github.io/Ballistics/session/) | You read a chronograph export of your own (or the example) and see the shots and statistics per string. |
-| Truing | [Load workbench](https://openreloading.github.io/Ballistics/workbench/), Trajectory tab, Truing from range strings | You entered impacts from a range string and read the fitted parameters. |
-| Shot group from a photo | [Shot groups](https://openreloading.github.io/Ballistics/groups/) | You added a target photo, set its scale, marked the shots and read the group size. |
-| Powder tuning | [Load workbench](https://openreloading.github.io/Ballistics/workbench/), Measurements tab, Fit a powder from these strings | Following [Tuning a powder from chronograph strings](powder-tuning.md), you mapped strings at two or more charges, read the fitted values and the pressure range label, and saved the fit as a powder that the workbench's Powder search lists. |
-| Import | [Load workbench](https://openreloading.github.io/Ballistics/workbench/), File menu, Import… | You imported a file (an export of the app, or a file of your own) and see its records in the app. |
-| German interface | Settings, General, Language: Deutsch, then any page above | You did one of the tasks above in German and noted every text that was English, wrong or cut off. |
+| Task                    | Page                                                                                                                       | Done when                                                                                                                                                                                                                                       |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First load              | [Load workbench](https://openreloading.github.io/Ballistics/workbench/)                                                    | You chose a cartridge, bullet, powder and charge (or started from Example load) and read the simulated velocity and pressure.                                                                                                                   |
+| Chronograph session     | [Session summary](https://openreloading.github.io/Ballistics/session/)                                                     | You read a chronograph export of your own (or the example) and see the shots and statistics per string.                                                                                                                                         |
+| Truing                  | [Load workbench](https://openreloading.github.io/Ballistics/workbench/), Trajectory tab, Truing from range strings         | You entered impacts from a range string and read the fitted parameters.                                                                                                                                                                         |
+| Shot group from a photo | [Shot groups](https://openreloading.github.io/Ballistics/groups/)                                                          | You added a target photo, set its scale, marked the shots and read the group size.                                                                                                                                                              |
+| Powder tuning           | [Load workbench](https://openreloading.github.io/Ballistics/workbench/), Measurements tab, Fit a powder from these strings | Following [Tuning a powder from chronograph strings](powder-tuning.md), you mapped strings at two or more charges, read the fitted values and the pressure range label, and saved the fit as a powder that the workbench's Powder search lists. |
+| Import                  | [Load workbench](https://openreloading.github.io/Ballistics/workbench/), File menu, Import…                                | You imported a file (an export of the app, or a file of your own) and see its records in the app.                                                                                                                                               |
+| German interface        | Settings, General, Language: Deutsch, then any page above                                                                  | You did one of the tasks above in German and noted every text that was English, wrong or cut off.                                                                                                                                               |
 
 ## Report what went wrong
 

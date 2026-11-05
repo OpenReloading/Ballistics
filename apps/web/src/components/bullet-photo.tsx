@@ -293,12 +293,12 @@ function PhotoTool({
   return (
     <Flex gap="md" wrap="wrap" align="flex-start" className="bullet-photo">
       <div style={{ flex: '2 1 28rem', minWidth: 0 }}>
-        {/* biome-ignore lint/a11y/noInteractiveElementToNoninteractiveRole: a canvas with its own keys is announced as an application, as the target sheet is */}
         <canvas
           ref={shown}
           width={size?.width ?? 1}
           height={size?.height ?? 1}
           tabIndex={size ? 0 : -1}
+          // oxlint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- a canvas with its own keys is announced as an application, as the target sheet is
           role="application"
           aria-label={t('Photograph of the bullet')}
           aria-describedby={`${id}-keys`}

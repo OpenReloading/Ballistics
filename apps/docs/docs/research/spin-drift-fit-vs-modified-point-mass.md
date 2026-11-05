@@ -1,4 +1,5 @@
 ---
+
 title: Spin drift and jump fits against the modified point mass
 description: How far the empirical spin drift and aerodynamic jump fits of the point-mass run lie from the modified point mass for one 168 gr bullet, and why they are kept.
 ---
@@ -21,11 +22,11 @@ The fits are $D_s = 1.25\,(S_g + 1.2)\,t^{1.83}$ in and a jump linear in $S_g$ a
 
 Spin drift, fit over modified point mass:
 
-| twist (in) | 600 yd | 1000 yd |
-| --- | --- | --- |
-| 10 | 1.38 (3.76 over 2.73 in) | 1.30 (14.5 over 11.1 in) |
-| 12 | 1.32 (2.99 over 2.27 in) | 1.25 (11.6 over 9.3 in) |
-| 14 | 1.30 (2.53 over 1.95 in) | 1.23 (9.8 over 7.9 in) |
+| twist (in) | 600 yd                   | 1000 yd                  |
+| ---------- | ------------------------ | ------------------------ |
+| 10         | 1.38 (3.76 over 2.73 in) | 1.30 (14.5 over 11.1 in) |
+| 12         | 1.32 (2.99 over 2.27 in) | 1.25 (11.6 over 9.3 in)  |
+| 14         | 1.30 (2.53 over 1.95 in) | 1.23 (9.8 over 7.9 in)   |
 
 Jump per 10 mph crosswind at 100 yd, 12 in twist: fit 0.41 in, linear formula 0.36 in, ratio 1.13. A rigid-body integration of 9.3, 11.1 and 8.0 in at 1000 yd is unverified (no citable source).
 

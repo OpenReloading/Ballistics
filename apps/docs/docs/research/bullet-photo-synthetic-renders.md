@@ -1,4 +1,5 @@
 ---
+
 title: Bullet from a photo on synthetic photographs
 description: Whether the dimensions measured from rendered photographs of bullets of known size lie within their stated uncertainties, also under shadow, blur, noise and uneven light.
 ---
@@ -12,7 +13,6 @@ Bullet from a photo: do the lengths, diameters and ratios measured from a photog
 ## Method
 
 `renderPhoto` draws the bullet drawing of known dimensions beside a 45 mm ruler at 24 px per mm, 4 degrees off horizontal, with a slight blur, and the test runs the cut-out, the outline fit and the measurement on it with the scale from the ruler. The true values come from the same drawing. Accept rules, set in the tests:
-
 - Six bullets (tangent and secant ogive, flat base and boat tail, a 2.2 mm meplat, a cannelure): every value within 2 px (3 px for the cannelure width) and within 3 standard uncertainties of the truth; nose form and base type named correctly.
 - The same at any angle with the nose to the left, with a lighting gradient, side shading, noise and blur, and for a light bullet on a dark background.
 - Hard photographs (a pale tip, a reflection along the axis, black bars at the sides, a colour that differs at the same brightness, a bullet darker on one side and brighter on the other, a soft shadow, heavy blur, low contrast, a small bullet): as each test states, the values within the larger of 3 uncertainties and 2 px of the truth, the length within 0.2 mm, or a warning.

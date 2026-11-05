@@ -29,7 +29,7 @@ updates:
       default-days: 3
     groups:
       actions:
-        patterns: ['*']
+        patterns: ["*"]
   - package-ecosystem: docker
     directories: [/packages/api, /apps/docs, /.devcontainer]
     schedule:
@@ -40,5 +40,5 @@ updates:
       # Node major follows .nvmrc and engines, changed by hand
       - dependency-name: node
         update-types: [version-update:semver-major]
-      - dependency-name: '*typescript-node'
+      - dependency-name: "*typescript-node"
         update-types: [version-update:semver-major]

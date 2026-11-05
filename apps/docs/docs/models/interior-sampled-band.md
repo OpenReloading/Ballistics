@@ -1,4 +1,5 @@
 ---
+
 title: Pressure and velocity bands from sampled input tolerances
 description: The 5th, 50th and 95th percentile of the simulated peak pressure and muzzle velocity over draws of the input tolerances.
 ---
@@ -8,7 +9,6 @@ description: The 5th, 50th and 95th percentile of the simulated peak pressure an
 `interiorSampledBand` draws the six inputs of the [peak-pressure range](interior-pressure-range.md) at random from their tolerances, runs the [M3 model](interior-m3.md) once per draw and reports the 5th, 50th and 95th percentile of the peak breech pressure and of the muzzle velocity. With several inputs varying the band is narrower than the corner-case range, which moves every input to its end at once, because few draws put every input near its end.
 
 The method is the propagation of distributions by Monte Carlo sampling of [JCGM 101:2008](../bibliography.md#jcgm-101-2008). The band covers input tolerances only and is not a confidence interval.
-
 - The draws depend on the seed only (same seed, same band) and their number is fixed by the request.
 - The run has a time budget. When the draws do not finish within it, no band is reported: the answer keeps the corner-case range and says the sampling went over budget. A band from part of the draws would depend on the speed of the machine.
 - A draw that leaves the model is counted as failed and left out of the percentiles.
@@ -56,11 +56,11 @@ With $p$ = 0.05, 0.5 and 0.95 these are the reported `p05`, `p50` and `p95`. The
 
 `POST /interior` takes `sampling` with `samples` (10 to 2000), `seed` and `budgetMs`, each optional, for a single run. Defaults: 300 draws, seed 1, 3000 ms. A ladder request takes no sampling. With sampling the answer holds `sampled` with `status`:
 
-| Status | Meaning |
-| --- | --- |
-| `sampled` | `pressure` and `velocity` hold `p05`, `p50` and `p95` (Pa, m/s). |
+| Status       | Meaning                                                          |
+| ------------ | ---------------------------------------------------------------- |
+| `sampled`    | `pressure` and `velocity` hold `p05`, `p50` and `p95` (Pa, m/s). |
 | `overBudget` | The draws did not finish within `budgetMs`: use `pressureRange`. |
-| `invalid` | No draw stayed in the model. |
+| `invalid`    | No draw stayed in the model.                                     |
 
 Code: `packages/api/src/compute/interior-schema.ts`, `samplingDefaults`; `packages/api/src/compute/tasks.ts`, `runners`.
 
@@ -68,17 +68,17 @@ The workbench asks for the band of the step it shows first, in a second request 
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $q$, $q_k$ | Input with a relative tolerance and its draw | as the input | as the input |
-| $t_q$ | Relative tolerance of an input | 1 | 1 |
-| $T$, $T_k$ | Propellant temperature and its draw | degC | K |
-| $t_T$ | Absolute temperature tolerance | no kind | K |
-| $z_k$ | Standard normal number of a draw | 1 | 1 |
-| $c$ | 95th percentile of the standard normal distribution | 1 | 1 |
-| $u_1$, $u_2$ | Uniform numbers of the generator | 1 | 1 |
-| $y_{(i)}$ | Sorted outputs of the valid draws | bar, m/s | Pa, m/s |
-| $y_p$ | Percentile $p$ of the outputs | bar, m/s | Pa, m/s |
+| Symbol       | Meaning                                             | Stored unit  | Unit in `core` |
+| ------------ | --------------------------------------------------- | ------------ | -------------- |
+| $q$, $q_k$   | Input with a relative tolerance and its draw        | as the input | as the input   |
+| $t_q$        | Relative tolerance of an input                      | 1            | 1              |
+| $T$, $T_k$   | Propellant temperature and its draw                 | degC         | K              |
+| $t_T$        | Absolute temperature tolerance                      | no kind      | K              |
+| $z_k$        | Standard normal number of a draw                    | 1            | 1              |
+| $c$          | 95th percentile of the standard normal distribution | 1            | 1              |
+| $u_1$, $u_2$ | Uniform numbers of the generator                    | 1            | 1              |
+| $y_{(i)}$    | Sorted outputs of the valid draws                   | bar, m/s     | Pa, m/s        |
+| $y_p$        | Percentile $p$ of the outputs                       | bar, m/s     | Pa, m/s        |
 
 ## Assumptions
 

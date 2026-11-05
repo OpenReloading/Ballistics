@@ -19,7 +19,7 @@ export async function repoFacts(
   token = process.env.GITHUB_TOKEN,
   request: Fetch = fetch,
 ): Promise<RepoFacts> {
-  // biome-ignore lint/suspicious/noExplicitAny: the few fields read below are checked by type
+  // oxlint-disable-next-line typescript/no-explicit-any -- the few fields read below are checked by type
   const get = async (path: string): Promise<any> => {
     const response = await request(`https://api.github.com/repos/${repo}${path}`, {
       headers: {

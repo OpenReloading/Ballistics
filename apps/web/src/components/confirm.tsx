@@ -112,7 +112,6 @@ export function ConfirmHost() {
   }, [notice, held])
   // an Undo for a page that is gone would do nothing, and a question of that page is answered no
   const route = useRoute()
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a route change only
   useEffect(() => {
     if (!offer && !queue.length) return
     const asked = queue

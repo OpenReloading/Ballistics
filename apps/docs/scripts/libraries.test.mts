@@ -16,8 +16,11 @@ for (const name of libraries) {
     const manifest = JSON.parse(readFileSync(`${root}packages/${name}/package.json`, 'utf8'))
     assert.equal(manifest.name, pkg)
     assert.match(page, new RegExp(`\`\`\`sh\\nnpm install ${pkg}\\n\`\`\``))
+    // a table cell, padded to its column's width
+    const cell = (path: string) =>
+      new RegExp(`\\| \`${path.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}\` +\\|`)
     for (const entry of Object.keys(manifest.exports))
-      assert.ok(page.includes(`| \`${pkg}${entry.slice(1)}\` |`), `entry point ${entry} not listed`)
+      assert.match(page, cell(`${pkg}${entry.slice(1)}`), `entry point ${entry} not listed`)
     assert.ok(page.includes(`(pathname:///library/modules/_open-reloading_${name}.html)`))
     assert.equal(
       manifest.homepage,

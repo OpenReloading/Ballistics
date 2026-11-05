@@ -230,7 +230,7 @@ function SeriesEditor({
       {results.series.map((s, i) => {
         const n = i + 1
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: series have no id; their order is their name
+          // oxlint-disable-next-line react/no-array-index-key -- series have no id; their order is their name
           <fieldset key={i} className="event-part">
             <legend>{t('Series {n}', { n })}</legend>
             <Group gap="xs" align="end" wrap="wrap">
@@ -324,7 +324,7 @@ function StagesEditor({
           patch({ hits: { ...s.hits, [zone]: n } })
         const score = scores?.[i]
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: stages are edited in place by their order
+          // oxlint-disable-next-line react/no-array-index-key -- stages are edited in place by their order
           <fieldset key={i} className="event-part">
             <legend>{s.name}</legend>
             <SimpleGrid cols={{ base: 2, xs: 4, md: 6 }} spacing="xs" verticalSpacing="xs">
@@ -705,7 +705,7 @@ function EventSheet({
           </Table.Thead>
           <Table.Tbody>
             {e.results.series.map((s, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: series by their order
+              // oxlint-disable-next-line react/no-array-index-key -- series by their order
               <Table.Tr key={i}>
                 <Table.Td>{i + 1}</Table.Td>
                 <Table.Td>{s.shots?.join(' ')}</Table.Td>
@@ -733,7 +733,7 @@ function EventSheet({
             {e.results.stages.map((s, i) => {
               const score = totals?.parts[i] as StageScore | undefined
               return (
-                // biome-ignore lint/suspicious/noArrayIndexKey: stages by their order
+                // oxlint-disable-next-line react/no-array-index-key -- stages by their order
                 <Table.Tr key={i}>
                   <Table.Td>{s.name}</Table.Td>
                   <Table.Td className="num">

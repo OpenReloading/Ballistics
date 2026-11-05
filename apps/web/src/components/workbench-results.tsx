@@ -25,6 +25,7 @@ import { RunDownloads } from './run-downloads.tsx'
 import { ErrorNote, Loading } from './states.tsx'
 import { useInputEcho, useLoad, useResult } from './workbench-context.ts'
 import { FigureTab } from './workbench-figure.tsx'
+// oxlint-disable-next-line import/no-cycle -- workbench-inputs imports BurnFigure back; moving one of them breaks the cycle
 import { Checklist, shortFrame } from './workbench-inputs.tsx'
 import {
   type Outcome,
@@ -423,7 +424,6 @@ function useTabFit(tab: ResultTab, setTab: (tab: ResultTab) => void, hasOutcome:
   useEffect(() => {
     if (!short && tab === 'cartridge') setTab('results')
   }, [short, tab, setTab])
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the tabs show once there is an outcome
   useEffect(() => {
     const row = list.current
     if (!framed || !row) {

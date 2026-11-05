@@ -196,7 +196,6 @@ export function InteriorChart({
     mass,
     JSON.stringify(lines),
   ].join('|')
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the signature names every input drawn
   const option = useMemo(() => {
     if (!theme) return
     const base = interiorOption({
@@ -232,6 +231,7 @@ export function InteriorChart({
         },
       },
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- the signature names every input drawn
   }, [signature])
   // the selected step's first curve, which the keyboard walks
   const focus = shown.length === 0 ? 0 : selected
@@ -241,9 +241,9 @@ export function InteriorChart({
   // a new run or step whose option is the one drawn does not draw again, so no draw reports it: the
   // drawing stands for the new run too (the workbench drops its report copy on every new run)
   const drawnFor = useRef(option)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once per new run or step, with that render's option
   useEffect(() => {
     if (chart.current && drawnFor.current === option) onRender?.(chart.current)
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- once per new run or step, with that render's option
   }, [playKey])
   useEffect(() => {
     drawnFor.current = option

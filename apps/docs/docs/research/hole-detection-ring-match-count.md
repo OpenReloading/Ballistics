@@ -1,4 +1,5 @@
 ---
+
 title: Rings needed to apply a recognised target without a question
 description: How many matched rings a target recognised on a photo needs before the app applies it without the user confirming it.
 ---

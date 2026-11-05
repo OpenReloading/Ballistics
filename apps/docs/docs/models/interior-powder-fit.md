@@ -1,4 +1,5 @@
 ---
+
 title: Powder fit from a chronograph ladder
 description: Weighted least-squares fit of the M3 burn coefficient and optional further parameters to the muzzle velocities and peak pressures of a charge ladder or of sessions at several barrel lengths and temperatures, with priors, a Huber loss, prediction bands, the peak-pressure range of the fixed inputs and a confidence label.
 ---
@@ -8,7 +9,6 @@ description: Weighted least-squares fit of the M3 burn coefficient and optional 
 The burn form and the pressure exponent are fitted to a measured pressure-time trace on the [curve fit page](interior-curve-fit.md).
 
 `fitPowder` fits the burn coefficient of one [M3](interior-m3.md) load and, on request, its shot-start pressure, a factor on its chamber volume, its specific energy and a factor on its temperature sensitivities to a ladder: charges with their mean muzzle velocities and, optionally, measured peak pressures. Points fired from another barrel length or at another powder temperature resolve the energy and the temperature factor ([below](#several-barrel-lengths-and-temperatures)). The fit works on log parameters with the Levenberg-Marquardt loop of the [least-squares page](least-squares.md). It reports the fitted values with their uncertainty, correlation and covariance, the residuals, $\chi^2$ split into the ladder's and the priors' share, the degrees of freedom and the condition number. The fitted values describe the ladder's rifle, powder lot, components and model version over the ladder's charge range, barrel lengths and temperatures. They are not powder data and not load data.
-
 - `fitPowderSessions` takes such ladders as sessions and holds the parameters they do not resolve.
 - `fitPowderPooled` fits the sessions of many rifles, powders and lots at once ([below](#pooled-fit-over-rifles-powders-and-lots)), with prediction intervals that hold a model error.
 - `predictPowder` gives the muzzle velocity and the peak pressure at any charge with an interval, and names each axis on which a prediction lies outside the data of the fit.
@@ -175,12 +175,12 @@ $$
 
 Code: `packages/core/src/interior/fit.ts`, `fitDomain`, `outsideDomain`.
 
-| Axis | Spans | Checked in a prediction against |
-|---|---|---|
-| `charge` | the ladder charges | the charge |
-| `velocity` | the measured muzzle velocities | the predicted muzzle velocity |
-| `pressure` | the measured peak pressures; absent without any | the predicted peak breech pressure |
-| `boreDiameter` | the load's bore diameter, a single value | `boreDiameter` of the options, default the load's |
+| Axis           | Spans                                                       | Checked in a prediction against                   |
+| -------------- | ----------------------------------------------------------- | ------------------------------------------------- |
+| `charge`       | the ladder charges                                          | the charge                                        |
+| `velocity`     | the measured muzzle velocities                              | the predicted muzzle velocity                     |
+| `pressure`     | the measured peak pressures; absent without any             | the predicted peak breech pressure                |
+| `boreDiameter` | the load's bore diameter, a single value                    | `boreDiameter` of the options, default the load's |
 | `barrelLength` | the barrel lengths of the ladder points, default the load's | `barrelLength` of the options, default the load's |
 
 `predictPowder` sets `extrapolation` to an object that names each axis outside its range with the side, `below` or `above`, and leaves it out when every axis is inside. A value exactly at a widened end is inside, within a relative $10^{-12}$, so that a charge converted from a typed unit is inside at the ladder charge it equals. The axes are independent: a charge above the ladder usually brings a predicted velocity and pressure above the measured ones, and then all three are named. A `boreDiameter` option changes the bore diameter of the run and scales the bore area with its square. The propellant temperature is not an axis of the domain. Nothing else changes outside the domain. How the band behaves outside the range follows from the covariance: with both parameters fitted it widens quickly beyond the ladder, because the data no longer separate the two effects. With the burn coefficient alone the band follows the sensitivity of the model to that one parameter and can narrow where the sensitivity falls, the velocity band above the ladder for example. The band holds parameter uncertainty only. It contains no model error: a wrong form function, energy or heat loss shifts the true value away from the band, and the farther from the ladder, the more so. A charge at which the model has no valid run, or the perturbed parameters have none, throws a `PowderFitError` with reason `invalid`. A fit without a covariance (as many rows as parameters and no uncertainties) cannot predict.
@@ -212,13 +212,13 @@ $h$ is the relative half-width of the range at a point, and the label uses its l
 
 The inputs and their default standard uncertainties, used where the caller states none, are in one table (`powderInputDefaults`). They are assumptions for a start, to be tuned against real sessions, not measurements:
 
-| Input | Measured or entered | Estimated or assumed |
-| --- | --- | --- |
-| Case capacity (chamber volume) | 0.5 % | 3 % |
-| Propellant energy | | 3 % |
-| Start pressure | | 25 % |
-| Bore friction | | 30 % |
-| Propellant temperature | 3 K | 10 K |
+| Input                          | Measured or entered | Estimated or assumed |
+| ------------------------------ | ------------------- | -------------------- |
+| Case capacity (chamber volume) | 0.5 %               | 3 %                  |
+| Propellant energy              |                     | 3 %                  |
+| Start pressure                 |                     | 25 %                 |
+| Bore friction                  |                     | 30 %                 |
+| Propellant temperature         | 3 K                 | 10 K                 |
 
 The caller states per input whether it is measured or estimated and may give its own standard uncertainty (a fraction of the value, or K for the temperature; 0 leaves the input out). Ignition pressure, the ratio of specific heats, the covolume and the bullet mass are shifted only when the caller states an uncertainty. The burn form, the pressure exponent, the heat loss, the pressure gradient and the bore area are not shifted, so the range does not hold them. An input that is itself a fitted parameter (start pressure, case capacity with a volume factor, energy) is skipped, since the covariance holds it, and so is an input the load does not carry (a bore friction of 0, a load without temperature sensitivity). An input whose refit fails is skipped and named. The range needs a single fit with a covariance, not `fitPowderSessions`, and its points are the ladder's charges (with their barrel lengths and temperatures) or points the caller names.
 
@@ -240,27 +240,27 @@ With fewer than 3 neighbours the prior is weak: it is centred on the target's ow
 
 `powderConfidence` sets a label from the relative half-width $h$ of the range and lists the reasons that apply. The label describes the width of the simulation's pressure range, not a load:
 
-| Label | $h$ |
-| --- | --- |
-| `tight` | up to 10 % |
+| Label      | $h$        |
+| ---------- | ---------- |
+| `tight`    | up to 10 % |
 | `moderate` | up to 25 % |
-| `loose` | above 25 % |
+| `loose`    | above 25 % |
 
 Code: `packages/core/src/interior/fit-confidence.ts`, `powderConfidence`, `powderConfidenceRules`.
 
 The reasons do not change the label. They say what the range rests on or does not hold, in a fixed order:
 
-| Reason | When |
-| --- | --- |
-| `no-pressure` | the ladder has no pressure row |
-| `capacity-estimated` | the case capacity enters the range with its estimated uncertainty |
-| `narrow-ladder` | the largest ladder charge is less than 1.1 times the smallest |
-| `residual-trend` | with velocity uncertainties, at least 5 velocity rows, the residuals ordered by charge change sign at most once, and $\chi^2_\text{data}$ per row is above 1 |
-| `start-pressure-correlated` | the start pressure is fitted and its correlation with the burn coefficient is above 0.9 in magnitude |
-| `weak-prior` | the prior from `similarPowdersPrior` is weak |
-| `outside-similar-powders` | the fitted burn coefficient lies more than 2 standard deviations of the prior from its centre |
-| `extrapolated` | a point of the range lies outside the fit's domain on the charge or barrel length axis |
-| `input-refit-failed` | the refit for an input failed, so the input is not in the range |
+| Reason                      | When                                                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `no-pressure`               | the ladder has no pressure row                                                                                                                               |
+| `capacity-estimated`        | the case capacity enters the range with its estimated uncertainty                                                                                            |
+| `narrow-ladder`             | the largest ladder charge is less than 1.1 times the smallest                                                                                                |
+| `residual-trend`            | with velocity uncertainties, at least 5 velocity rows, the residuals ordered by charge change sign at most once, and $\chi^2_\text{data}$ per row is above 1 |
+| `start-pressure-correlated` | the start pressure is fitted and its correlation with the burn coefficient is above 0.9 in magnitude                                                         |
+| `weak-prior`                | the prior from `similarPowdersPrior` is weak                                                                                                                 |
+| `outside-similar-powders`   | the fitted burn coefficient lies more than 2 standard deviations of the prior from its centre                                                                |
+| `extrapolated`              | a point of the range lies outside the fit's domain on the charge or barrel length axis                                                                       |
+| `input-refit-failed`        | the refit for an input failed, so the input is not in the range                                                                                              |
 
 The thresholds are assumptions, to be tuned against real sessions. A `tight` label says that the inputs the range holds move the pressure little. It does not cover the model error of the inputs it leaves out, and a trend in the residuals, a prior far from the data or an extrapolation weaken it as the reasons say.
 
@@ -288,10 +288,10 @@ Code: `apps/web/src/lib/powder-fit.ts`, `temperatureFit`, `withSensitivity`; `ap
 
 Two rules of the screen can fit fewer values than the request names. A value they leave out keeps the value of the input load, and the screen says which rule applied.
 
-| Rule | When | Fitted |
-| --- | --- | --- |
-| Thin ladder | fewer than 3 distinct charges, or the largest charge less than 10 % above the smallest | the request without the start pressure and the volume factor |
-| Held fit | the fitted start pressure or volume factor correlates with the burn coefficient beyond 0.9 in magnitude, the limit of the confidence rule `start-pressure-correlated` | the burn coefficient alone, fitted again |
+| Rule        | When                                                                                                                                                                  | Fitted                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Thin ladder | fewer than 3 distinct charges, or the largest charge less than 10 % above the smallest                                                                                | the request without the start pressure and the volume factor |
+| Held fit    | the fitted start pressure or volume factor correlates with the burn coefficient beyond 0.9 in magnitude, the limit of the confidence rule `start-pressure-correlated` | the burn coefficient alone, fitted again                     |
 
 On 2 charges every extra value moves with the burn coefficient, so the screen offers to try the other values anyway, which lifts both rules. Hand tuning gives each fitted value with a standard uncertainty a slider of 3 standard uncertainties either side of the fitted value, in steps of 0.05; the lower end stays at 5 % of the fitted value or above. The sliders move the shown values and the curve of the chart, whose runs take an output step of 2e-5 s, 10 times the default: the muzzle velocity moves by less than 1e-6 m/s and a run takes about a sixth of the time. The band and the pressure range stay those of the fit. Save as a powder stores the fitted values, never the hand-tuned ones.
 
@@ -309,7 +309,6 @@ B_P = B_{P,0}\, e^{\theta_{B,P}}, \quad r_R = e^{\theta_R}, \quad \ell_L = e^{\t
 $$
 
 Code: `packages/core/src/interior/fit-pooled.ts`, `fitPowderPooled` (`velocity`, `targetLoad`).
-
 - $B_P$, the burn coefficient of powder $P$, is shared by all its sessions. The burn coefficient of the powder's first session is the start $B_{P,0}$ and replaces that of its other sessions. On request the temperature factor $f_{T,P}$ of the powder is fitted too, where its sessions span two or more temperatures and its load carries a sensitivity; otherwise it is listed in `held` and stays 1.
 - $r_R$, the velocity factor of rifle $R$, holds what the rifle changes beyond its load: bore, throat, chronograph. It is fitted only where the sessions hold two or more rifles. With one rifle it is absorbed by the burn coefficients.
 - $\ell_L$, the factor of lot $L$ on its powder's burn coefficient, is fitted for each named lot of a powder whose sessions hold two or more lots (a session without a lot counts as one, without a factor).
@@ -342,7 +341,6 @@ On held-out measured sessions the targets of median 1 % and P90 2 % velocity err
 ### Failures
 
 `fitPowder` throws a `PowderFitError` with one of these reasons:
-
 - `underdetermined`: fewer rows than parameters, before any run.
 - `invalid`: an `interior` run at the start values or in a Jacobian is invalid. The error names the charge and the run's reason.
 - `unresolved`: a parameter does not measurably change any prediction, for example a start pressure carried to the floor, or `energy` where the barrel lengths do not differ by 5 %.
@@ -353,47 +351,47 @@ Malformed input (an empty ladder, a value that is not finite and above 0, uncert
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $m_0$, $\Delta m$, $m_i$, $m_k$ | Start charge, ladder step, ladder charges | g | kg |
-| $N$ | Number of ladder steps | 1 | 1 |
-| $y_i$, $\hat y_i$ | Observed and predicted value of row $i$: muzzle velocity or peak pressure | m/s or bar | m/s or Pa |
-| $\sigma_i$ | Standard uncertainty of row $i$ | m/s or bar | m/s or Pa |
-| $v_0$ | Mean muzzle velocity of a string | m/s | m/s |
-| $p_\text{max}$ | Peak breech pressure | bar | Pa |
-| $B$, $B_0$ | Burn coefficient, fitted and initial: vivacity of a vivacity law | 1/s | 1/s |
-| $B$, $B_0$ | Burn coefficient, fitted and initial: coefficient of a geometric law | no kind | m s⁻¹ Pa⁻ⁿ |
-| $p_\text{st}$, $p_{\text{st},0}$ | Start pressure, fitted and initial | bar | Pa |
-| $Q$, $Q_0$ | Specific energy of the propellant, fitted and initial | J/kg | J/kg |
-| $f_T$ | Factor on both temperature sensitivities of the load, fitted; initial value 1 | 1 | 1 |
-| $\sigma_c$, $\sigma_h$, $\tau_T$ | Burn-rate temperature sensitivities below and above the reference, the factor they give on the burn rate | no kind, no kind, 1 | 1/K, 1/K, 1 |
-| $p_\text{floor}$ | Start pressure below which it has no effect | bar | Pa |
-| $f_V$ | Factor on the chamber volume of the load, fitted; initial value 1 | 1 | 1 |
-| $V_c$, $V_{c,0}$ | Chamber volume of the fitted load and of the input load | cm³ | m³ |
-| $p_i$ | Ignition pressure | bar | Pa |
-| $p_f$ | Bore friction pressure | bar | Pa |
-| $p_e(0)$ | Engraving pressure at travel 0 | bar | Pa |
-| $\theta_j$ | Log parameter | 1 | 1 |
-| $q_j^\ast$, $\mu_j$, $s_j$ | Prior centre as a value, in log parameter, and its standard deviation | as the parameter, 1, 1 | as the parameter, 1, 1 |
-| $L_k$, $k$ | Huber loss of a weighted residual, its threshold in sigmas | 1 | 1 |
-| $\chi^2_\text{data}$, $\chi^2_\text{prior}$ | Shares of $\chi^2$ of the ladder rows and of the priors | 1 | 1 |
-| $P$ | Parameters with a prior | no kind | no kind |
-| $q_j$, $o_j$ | Fitted value and its offset | as the parameter | as the parameter |
-| $r_i$ | Weighted residual | 1 | 1 |
-| $\chi^2$ | Sum of squared weighted residuals | 1 | 1 |
-| $n$, $n_p$, $\nu$ | Rows, parameters, degrees of freedom | 1 | 1 |
-| $C_\theta$ | Covariance of the log parameters | 1 | 1 |
-| $x_\min$, $x_\max$, $\delta$, $\delta_+$ | Smallest and largest value of an axis in the data, relative margin of the domain, relative margin of its upper end | as the axis, 1 | as the axis, 1 |
-| $m$, $\hat y$ | Charge of a prediction, predicted muzzle velocity or peak breech pressure | g, m/s or bar | kg, m/s or Pa |
-| $u(\hat y)$, $g_j$ | Standard uncertainty of a prediction, its gradient in the log parameters | as $\hat y$ | as $\hat y$ |
-| $k$, $z$, $t$, $\alpha$ | Coverage factor, normal and Student quantile, one minus the coverage | 1 | 1 |
-| $c_j$, $u_j$ | Effect of input $j$ on the peak pressure, its standard uncertainty | Pa, as the input | Pa, as the input |
-| $u_\text{fit}$, $u_c$, $u_\text{corr}$ | Fit, combined and fully correlated standard uncertainty of the peak pressure | bar | Pa |
-| $h$ | Relative half-width of the pressure range | 1 | 1 |
-| $B_i$, $n$ | Burn coefficients of the similar powders, their number | as the parameter, 1 | as the parameter, 1 |
-| $r_R$, $\ell_L$, $\tau_R$, $\tau_L$ | Velocity factor of a rifle, burn factor of a lot, the spreads of their logs | 1 | 1 |
-| $\varepsilon$, $\sigma_s$ | Relative model error of the pooled fit, standard uncertainty of a predicted string mean | 1, m/s | 1, m/s |
-| $J_\text{floor,i}$ | Noise floor of a Jacobian entry per unit log parameter | 1 | 1 |
+| Symbol                                      | Meaning                                                                                                            | Stored unit            | Unit in `core`         |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------- | ---------------------- |
+| $m_0$, $\Delta m$, $m_i$, $m_k$             | Start charge, ladder step, ladder charges                                                                          | g                      | kg                     |
+| $N$                                         | Number of ladder steps                                                                                             | 1                      | 1                      |
+| $y_i$, $\hat y_i$                           | Observed and predicted value of row $i$: muzzle velocity or peak pressure                                          | m/s or bar             | m/s or Pa              |
+| $\sigma_i$                                  | Standard uncertainty of row $i$                                                                                    | m/s or bar             | m/s or Pa              |
+| $v_0$                                       | Mean muzzle velocity of a string                                                                                   | m/s                    | m/s                    |
+| $p_\text{max}$                              | Peak breech pressure                                                                                               | bar                    | Pa                     |
+| $B$, $B_0$                                  | Burn coefficient, fitted and initial: vivacity of a vivacity law                                                   | 1/s                    | 1/s                    |
+| $B$, $B_0$                                  | Burn coefficient, fitted and initial: coefficient of a geometric law                                               | no kind                | m s⁻¹ Pa⁻ⁿ             |
+| $p_\text{st}$, $p_{\text{st},0}$            | Start pressure, fitted and initial                                                                                 | bar                    | Pa                     |
+| $Q$, $Q_0$                                  | Specific energy of the propellant, fitted and initial                                                              | J/kg                   | J/kg                   |
+| $f_T$                                       | Factor on both temperature sensitivities of the load, fitted; initial value 1                                      | 1                      | 1                      |
+| $\sigma_c$, $\sigma_h$, $\tau_T$            | Burn-rate temperature sensitivities below and above the reference, the factor they give on the burn rate           | no kind, no kind, 1    | 1/K, 1/K, 1            |
+| $p_\text{floor}$                            | Start pressure below which it has no effect                                                                        | bar                    | Pa                     |
+| $f_V$                                       | Factor on the chamber volume of the load, fitted; initial value 1                                                  | 1                      | 1                      |
+| $V_c$, $V_{c,0}$                            | Chamber volume of the fitted load and of the input load                                                            | cm³                    | m³                     |
+| $p_i$                                       | Ignition pressure                                                                                                  | bar                    | Pa                     |
+| $p_f$                                       | Bore friction pressure                                                                                             | bar                    | Pa                     |
+| $p_e(0)$                                    | Engraving pressure at travel 0                                                                                     | bar                    | Pa                     |
+| $\theta_j$                                  | Log parameter                                                                                                      | 1                      | 1                      |
+| $q_j^\ast$, $\mu_j$, $s_j$                  | Prior centre as a value, in log parameter, and its standard deviation                                              | as the parameter, 1, 1 | as the parameter, 1, 1 |
+| $L_k$, $k$                                  | Huber loss of a weighted residual, its threshold in sigmas                                                         | 1                      | 1                      |
+| $\chi^2_\text{data}$, $\chi^2_\text{prior}$ | Shares of $\chi^2$ of the ladder rows and of the priors                                                            | 1                      | 1                      |
+| $P$                                         | Parameters with a prior                                                                                            | no kind                | no kind                |
+| $q_j$, $o_j$                                | Fitted value and its offset                                                                                        | as the parameter       | as the parameter       |
+| $r_i$                                       | Weighted residual                                                                                                  | 1                      | 1                      |
+| $\chi^2$                                    | Sum of squared weighted residuals                                                                                  | 1                      | 1                      |
+| $n$, $n_p$, $\nu$                           | Rows, parameters, degrees of freedom                                                                               | 1                      | 1                      |
+| $C_\theta$                                  | Covariance of the log parameters                                                                                   | 1                      | 1                      |
+| $x_\min$, $x_\max$, $\delta$, $\delta_+$    | Smallest and largest value of an axis in the data, relative margin of the domain, relative margin of its upper end | as the axis, 1         | as the axis, 1         |
+| $m$, $\hat y$                               | Charge of a prediction, predicted muzzle velocity or peak breech pressure                                          | g, m/s or bar          | kg, m/s or Pa          |
+| $u(\hat y)$, $g_j$                          | Standard uncertainty of a prediction, its gradient in the log parameters                                           | as $\hat y$            | as $\hat y$            |
+| $k$, $z$, $t$, $\alpha$                     | Coverage factor, normal and Student quantile, one minus the coverage                                               | 1                      | 1                      |
+| $c_j$, $u_j$                                | Effect of input $j$ on the peak pressure, its standard uncertainty                                                 | Pa, as the input       | Pa, as the input       |
+| $u_\text{fit}$, $u_c$, $u_\text{corr}$      | Fit, combined and fully correlated standard uncertainty of the peak pressure                                       | bar                    | Pa                     |
+| $h$                                         | Relative half-width of the pressure range                                                                          | 1                      | 1                      |
+| $B_i$, $n$                                  | Burn coefficients of the similar powders, their number                                                             | as the parameter, 1    | as the parameter, 1    |
+| $r_R$, $\ell_L$, $\tau_R$, $\tau_L$         | Velocity factor of a rifle, burn factor of a lot, the spreads of their logs                                        | 1                      | 1                      |
+| $\varepsilon$, $\sigma_s$                   | Relative model error of the pooled fit, standard uncertainty of a predicted string mean                            | 1, m/s                 | 1, m/s                 |
+| $J_\text{floor,i}$                          | Noise floor of a Jacobian entry per unit log parameter                                                             | 1                      | 1                      |
 
 ## Assumptions
 

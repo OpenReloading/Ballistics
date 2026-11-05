@@ -1,4 +1,5 @@
 ---
+
 title: Atmosphere
 description: ICAO standard troposphere, station air, humid-air density and speed of sound, and the air along the trajectory.
 ---
@@ -53,7 +54,7 @@ Code: `packages/core/src/exterior/atmosphere.ts`, `airDensity` (`vapourGas`).
 
 ### Speed of sound in moist air
 
-With the vapour mole fraction $x_v = e/p$, the mixture gas constant follows from the mean molar mass, and the molar heat capacity at constant pressure is the mole-weighted mean of rigid diatomic dry air ($3.5\,R^*$) and rigid triatomic vapour ($4\,R^*$):
+With the vapour mole fraction $x_v = e/p$, the mixture gas constant follows from the mean molar mass, and the molar heat capacity at constant pressure is the mole-weighted mean of rigid diatomic dry air ($3.5\,R^_$) and rigid triatomic vapour ($4\,R^_$):
 
 $$
 R_m = \frac{R_d}{1 - x_v + x_v M_v/M_d}, \qquad \frac{c_p}{R^*} = 3.5 + 0.5\,x_v, \qquad a = \sqrt{\frac{c_p}{c_p - R^*}\,R_m T}
@@ -77,28 +78,28 @@ $\rho$ is the density of moist air of the entered temperature, station pressure 
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $H$ | Geopotential altitude above mean sea level | mm | m |
-| $y$ | Height above the firing point | mm | m |
-| $T$, $T_s$ | Air temperature, at the station | degC | K |
-| $T_0$ | ICAO sea-level temperature, 288.15 K | degC | K |
-| $p$, $p_s$ | Absolute air pressure, at the station | bar | Pa |
-| $p_0$ | ICAO sea-level pressure, 101325 Pa | bar | Pa |
-| $L$ | Temperature lapse rate, 0.0065 K/m | no kind | K/m |
-| $g_0$ | Standard gravity, 9.80665 m/s² | no kind | m/s² |
-| $R_d$ | Specific gas constant of dry air, 287.05287 J/(kg K) | no kind | J/(kg K) |
-| $R^*$ | Universal gas constant of the ICAO atmosphere, 8.31432 J/(mol K) | no kind | J/(mol K) |
-| $M_v$ | Molar mass of water vapour, 0.01801528 kg/mol | kg/kmol | kg/mol |
-| $M_d$ | Molar mass of dry air, $R^*/R_d$ | kg/kmol | kg/mol |
-| $R_v$, $R_m$ | Gas constant of water vapour, of the mixture | no kind | J/(kg K) |
-| $\phi$ | Relative humidity | % | fraction 0 to 1 |
-| $e_s$, $e$ | Saturation vapour pressure, vapour pressure | bar | Pa |
-| $x_v$ | Mole fraction of water vapour | 1 | 1 |
-| $c_p$ | Molar heat capacity of the mixture at constant pressure | no kind | J/(mol K) |
-| $\rho$, $\rho_0$ | Air density, ICAO sea-level density | g/cm3 | kg/m³ |
-| $H_\rho$ | Density altitude | mm | m |
-| $a$ | Speed of sound | m/s | m/s |
+| Symbol           | Meaning                                                          | Stored unit | Unit in `core`  |
+| ---------------- | ---------------------------------------------------------------- | ----------- | --------------- |
+| $H$              | Geopotential altitude above mean sea level                       | mm          | m               |
+| $y$              | Height above the firing point                                    | mm          | m               |
+| $T$, $T_s$       | Air temperature, at the station                                  | degC        | K               |
+| $T_0$            | ICAO sea-level temperature, 288.15 K                             | degC        | K               |
+| $p$, $p_s$       | Absolute air pressure, at the station                            | bar         | Pa              |
+| $p_0$            | ICAO sea-level pressure, 101325 Pa                               | bar         | Pa              |
+| $L$              | Temperature lapse rate, 0.0065 K/m                               | no kind     | K/m             |
+| $g_0$            | Standard gravity, 9.80665 m/s²                                   | no kind     | m/s²            |
+| $R_d$            | Specific gas constant of dry air, 287.05287 J/(kg K)             | no kind     | J/(kg K)        |
+| $R^*$            | Universal gas constant of the ICAO atmosphere, 8.31432 J/(mol K) | no kind     | J/(mol K)       |
+| $M_v$            | Molar mass of water vapour, 0.01801528 kg/mol                    | kg/kmol     | kg/mol          |
+| $M_d$            | Molar mass of dry air, $R^*/R_d$                                 | kg/kmol     | kg/mol          |
+| $R_v$, $R_m$     | Gas constant of water vapour, of the mixture                     | no kind     | J/(kg K)        |
+| $\phi$           | Relative humidity                                                | %           | fraction 0 to 1 |
+| $e_s$, $e$       | Saturation vapour pressure, vapour pressure                      | bar         | Pa              |
+| $x_v$            | Mole fraction of water vapour                                    | 1           | 1               |
+| $c_p$            | Molar heat capacity of the mixture at constant pressure          | no kind     | J/(mol K)       |
+| $\rho$, $\rho_0$ | Air density, ICAO sea-level density                              | g/cm3       | kg/m³           |
+| $H_\rho$         | Density altitude                                                 | mm          | m               |
+| $a$              | Speed of sound                                                   | m/s         | m/s             |
 
 ## Assumptions
 

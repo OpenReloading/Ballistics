@@ -1,4 +1,5 @@
 ---
+
 title: Searching records in the workbench
 description: What the record search of the workbench cards does today, where it fails on large lists, the options for a search dialog with their size and time numbers, and the decisions that remain.
 ---
@@ -26,20 +27,19 @@ Option C (inline field and dialog) with matching in the browser (E) and a "Sort 
 
 Bullets (1,686 records). "API" is what the card shows (total found), "list" is the `/bullets` list, "prototype" is the dialog.
 
-| Query pattern | API | list | prototype |
-|---|---|---|---|
-| manufacturer, then a product word of the name | 0 | 49 | 49 |
-| the same two words reversed | 0 | 49 | 49 |
-| `308 168` | 2 | 13 | 13 |
-| `.308 168` | 1 | 13 | 13 |
-| `308 168gr` | 0 | 1 | 13 |
-| `10.9g` (grams) | 0 | 0 | 18 |
-| `168` | 16 | 18 | 18 |
-| `168 gr` | 14 | 14 | 14 |
-| manufacturer and `168` | 0 | 3 | 3 |
-| `hp` | 181 | 134 | 134 |
-| `30 cal` | 110 | 188 | 188 |
-
+| Query pattern                                 | API | list | prototype |
+| --------------------------------------------- | --- | ---- | --------- |
+| manufacturer, then a product word of the name | 0   | 49   | 49        |
+| the same two words reversed                   | 0   | 49   | 49        |
+| `308 168`                                     | 2   | 13   | 13        |
+| `.308 168`                                    | 1   | 13   | 13        |
+| `308 168gr`                                   | 0   | 1    | 13        |
+| `10.9g` (grams)                               | 0   | 0    | 18        |
+| `168`                                         | 16  | 18   | 18        |
+| `168 gr`                                      | 14  | 14   | 14        |
+| manufacturer and `168`                        | 0   | 3    | 3         |
+| `hp`                                          | 181 | 134  | 134       |
+| `30 cal`                                      | 110 | 188  | 188       |
 - A manufacturer plus a word of the product name finds nothing: most product names start with their own caliber and weight words, and the substring needs the words adjacent.
 - `hp` finds 181 records, and the 20 shown are all from one manufacturer (alphabetical order). `30 cal` shows 20 of 110 from 4 manufacturers.
 - Weights are stored in grams and typed in grains or grams, the caliber is stored as a diameter, and neither is searchable in the card.
@@ -48,26 +48,26 @@ Powders (248 records): a manufacturer and the digits of a product name find 0 in
 
 Cartridges (577 CIP records, `GET /cartridges?q=`), total found:
 
-| Query | API | list | first API hits |
-|---|---|---|---|
-| `308` | 5 | 60 | 308 EH, 308 Marlin Express, 308 Match |
-| `308 win` | 1 | 6 | 308 Win. |
-| `win 308` | 0 | 6 | none |
-| `.308 winchester` | 0 | 1 | none |
-| `7.62x51` | 0 | 0 | none |
-| `7,62x51` | 0 | 1 | none |
-| `7.62 x 51` | 0 | 0 | none |
-| `6.5x55` | 0 | 0 | none |
-| `6.5 creedmoor` | 0 | 1 | none |
-| `30-06` | 4 | 4 | 30-06 Ackley Improved, 30-06 Court Cartry, 30-06 R Stief |
-| `30 06` | 0 | 5 | none |
-| `300 win mag` | 0 | 2 | none |
-| `223` | 2 | 3 | 223 Rem., 223 Win. SS Mag. |
-| `223 rem` | 1 | 1 | 223 Rem. |
-| `9mm` | 2 | 29 | 9 mm Browning court, 9 x 18 |
-| `9x19` | 0 | 1 | none |
-| `45 acp` | 2 | 2 | 38-45 ACP, 45 Auto |
-| `5.56`, `nato`, `300 wm` | 0 | 0 | none |
+| Query                    | API | list | first API hits                                           |
+| ------------------------ | --- | ---- | -------------------------------------------------------- |
+| `308`                    | 5   | 60   | 308 EH, 308 Marlin Express, 308 Match                    |
+| `308 win`                | 1   | 6    | 308 Win.                                                 |
+| `win 308`                | 0   | 6    | none                                                     |
+| `.308 winchester`        | 0   | 1    | none                                                     |
+| `7.62x51`                | 0   | 0    | none                                                     |
+| `7,62x51`                | 0   | 1    | none                                                     |
+| `7.62 x 51`              | 0   | 0    | none                                                     |
+| `6.5x55`                 | 0   | 0    | none                                                     |
+| `6.5 creedmoor`          | 0   | 1    | none                                                     |
+| `30-06`                  | 4   | 4    | 30-06 Ackley Improved, 30-06 Court Cartry, 30-06 R Stief |
+| `30 06`                  | 0   | 5    | none                                                     |
+| `300 win mag`            | 0   | 2    | none                                                     |
+| `223`                    | 2   | 3    | 223 Rem., 223 Win. SS Mag.                               |
+| `223 rem`                | 1   | 1    | 223 Rem.                                                 |
+| `9mm`                    | 2   | 29   | 9 mm Browning court, 9 x 18                              |
+| `9x19`                   | 0   | 1    | none                                                     |
+| `45 acp`                 | 2   | 2    | 38-45 ACP, 45 Auto                                       |
+| `5.56`, `nato`, `300 wm` | 0   | 0    | none                                                     |
 
 Neither search treats spacing, hyphen and decimal separator variants (`30 06` against `30-06`, `7.62x51` against the printed `7,62 x 51`) as the same: the largest group of cartridge misses. `308` in the list also matches cartridges of the .308 caliber by their caliber text.
 
@@ -81,27 +81,27 @@ All three work in the browser and against the API.
 
 **E. The browser reads the whole list through the existing routes once, then matches and orders.** No API change. The browser's own designs and the cartridge fit filter (`bulletFits` of core) are already client side.
 
-| | 1,686 bullets | 10,000 bullets |
-|---|---|---|
-| list JSON, raw / gzip | 367 KB / 37 KB | 2.58 MB / 228 KB |
-| packed rows (`packBullets`), raw / gzip | 242 KB / 34 KB | 1.49 MB / 201 KB |
-| requests of 200 rows | 9 | 50 |
-| dialog opened to first row | 0.22 s | 0.9 to 1.3 s (4 runs) |
-| same at 4 times slower CPU | 1.0 s | 2.0 to 2.1 s (4 runs) |
-| key to updated count and rows | 40 to 50 ms | 40 to 60 ms (4 times slower CPU: 140 to 210 ms) |
-| search in a script, index built | 1.3 ms | 7.7 ms |
-| first search in that script, builds the index | about 50 ms | about 300 ms |
+|                                               | 1,686 bullets  | 10,000 bullets                                  |
+| --------------------------------------------- | -------------- | ----------------------------------------------- |
+| list JSON, raw / gzip                         | 367 KB / 37 KB | 2.58 MB / 228 KB                                |
+| packed rows (`packBullets`), raw / gzip       | 242 KB / 34 KB | 1.49 MB / 201 KB                                |
+| requests of 200 rows                          | 9              | 50                                              |
+| dialog opened to first row                    | 0.22 s         | 0.9 to 1.3 s (4 runs)                           |
+| same at 4 times slower CPU                    | 1.0 s          | 2.0 to 2.1 s (4 runs)                           |
+| key to updated count and rows                 | 40 to 50 ms    | 40 to 60 ms (4 times slower CPU: 140 to 210 ms) |
+| search in a script, index built               | 1.3 ms         | 7.7 ms                                          |
+| first search in that script, builds the index | about 50 ms    | about 300 ms                                    |
 
 **F. A static search index built at build time**, like the docs site's Pagefind index (which holds the docs pages, the code reference and the REST operations, no records). Spike: one record per bullet through the index's custom-record API, with name, manufacturer, caliber and weight as text and manufacturer and caliber as filters.
 
-| | 1,686 bullets | 10,000 bullets |
-|---|---|---|
-| files written | 1,707 | 10,044 |
-| total size | 1.13 MB | 3.44 MB |
-| without the per-record files | 693 KB | 805 KB |
-| first search: files and bytes loaded | 27 files, 178 KB | 27 files, 220 KB |
-| later searches | 0 to 18 files, 0 to 12 KB | 0 to 20 files, 0 to 7 KB |
-| search time | 1 to 77 ms | 4 to 81 ms |
+|                                      | 1,686 bullets             | 10,000 bullets           |
+| ------------------------------------ | ------------------------- | ------------------------ |
+| files written                        | 1,707                     | 10,044                   |
+| total size                           | 1.13 MB                   | 3.44 MB                  |
+| without the per-record files         | 693 KB                    | 805 KB                   |
+| first search: files and bytes loaded | 27 files, 178 KB          | 27 files, 220 KB         |
+| later searches                       | 0 to 18 files, 0 to 12 KB | 0 to 20 files, 0 to 7 KB |
+| search time                          | 1 to 77 ms                | 4 to 81 ms               |
 
 F has small first loads and scales further than E, but adds ten thousand files to the static site (about 300 MB already), a separate build step, no numeric range filter (weight and diameter ranges need buckets as filters), ranking weights per field only, and the browser's own designs and the cartridge fit are outside the index, which needs a second code path to merge them.
 
@@ -110,7 +110,6 @@ Where E stops: the whole-list read is linear, so 10,000 rows per kind cost about
 ## Options
 
 Decision 1, the shape of the search:
-
 - **A. Improved inline combobox**: word matching in any order, ranking, grouped results. Smallest change. No filters, no weight or caliber range, no preview, and the phone list stays short; thousands of records stay a typing exercise.
 - **B. A dialog only**, opened from the card: query, filters, sortable result, preview. Best for browsing. The common case "I know the name" costs one more step, and the card head changes its behaviour.
 - **C. Both (recommended)**: the card's field keeps typing for a quick pick, a button at its end opens the dialog with the typed text.
@@ -118,7 +117,6 @@ Decision 1, the shape of the search:
 Decision 2, where matching runs: D, E (recommended up to about 10,000 rows per kind) or F.
 
 Decision 3, sorting the result:
-
 - **G. A "Sort by" choice** (best match, name, heaviest, highest BC). Works on a phone and keeps the list a plain listbox with the focus in the search box (recommended).
 - **H. Sortable column headers.** Needs the grid pattern, so the focus and key handling of the listbox change.
 

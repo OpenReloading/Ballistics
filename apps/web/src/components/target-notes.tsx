@@ -100,7 +100,6 @@ export function NotesLayer({
         const h = lines.length * 1.25 * font + 2 * pad
         const colour = groups.find((g) => g.id === n.group)?.colour
         return (
-          // biome-ignore lint/a11y/useSemanticElements: an SVG group has no button element
           <g
             key={n.id}
             role="button"
@@ -144,7 +143,7 @@ export function NotesLayer({
             <rect className="note-box" x={at.x} y={at.y} width={w} height={h} rx={2 * k} />
             <text className="note-text" x={at.x + pad} y={at.y + pad} fontSize={font}>
               {lines.map((l, j) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: lines keep their order
+                // oxlint-disable-next-line react/no-array-index-key -- lines keep their order
                 <tspan key={j} x={at.x + pad} dy={j === 0 ? font : 1.25 * font}>
                   {l || ' '}
                 </tspan>

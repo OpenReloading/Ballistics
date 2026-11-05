@@ -28,6 +28,7 @@ import {
 import { controlSize, tipEvents } from '../lib/theme.ts'
 import type { UnitSystem } from '../lib/units.ts'
 import { say, type Wording } from '../lib/wording.ts'
+// oxlint-disable-next-line import/no-cycle -- fact-cards imports Noted back; moving one of them breaks the cycle
 import { Sized, slotUnits } from './fact-cards.tsx'
 import { Panel } from './panel.tsx'
 import { ScrollRegion } from './scroll-region.tsx'
@@ -96,7 +97,7 @@ export function SlashBreaks({ text }: { text: string }) {
     i === 0 ? (
       part
     ) : (
-      // biome-ignore lint/suspicious/noArrayIndexKey: the parts of one fixed text
+      // oxlint-disable-next-line react/no-array-index-key -- the parts of one fixed text
       <Fragment key={i}>
         /<wbr />
         {part}
@@ -244,7 +245,7 @@ function SymbolTable({
           </TableTr>
         </TableThead>
         {groups.map((g, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: groups keep their order
+          // oxlint-disable-next-line react/no-array-index-key -- groups keep their order
           <TableTbody key={i} data-off={g.rows.some((r) => on.has(r)) ? undefined : true}>
             {g.title && (
               <TableTr className="field-group">
@@ -255,7 +256,7 @@ function SymbolTable({
             )}
             {g.rows.map((row, k) => (
               <SymbolRow
-                // biome-ignore lint/suspicious/noArrayIndexKey: a label can repeat
+                // oxlint-disable-next-line react/no-array-index-key -- a label can repeat
                 key={k}
                 row={row}
                 system={system}
@@ -415,7 +416,7 @@ export function CoefficientTable({ label, rows }: { label: Wording; rows: FieldR
         </TableThead>
         <TableTbody>
           {rows.map((row, k) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: a drag model can repeat
+            // oxlint-disable-next-line react/no-array-index-key -- a drag model can repeat
             <TableTr key={k}>
               <TableTh scope="row">{rowLabel(row, system, t)}</TableTh>
               <TableTd className="nowrap num">{rowParts(row, system, t).number}</TableTd>
@@ -453,7 +454,7 @@ export function FieldTable({
         {groups
           .filter((g) => g.rows.length > 0)
           .map((g, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: groups keep their order and may have no title
+            // oxlint-disable-next-line react/no-array-index-key -- groups keep their order and may have no title
             <TableTbody key={i}>
               {g.title && (
                 <TableTr className="field-group">
@@ -463,7 +464,7 @@ export function FieldTable({
                 </TableTr>
               )}
               {g.rows.map((row, k) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: a coefficient's label can repeat
+                // oxlint-disable-next-line react/no-array-index-key -- a coefficient's label can repeat
                 <Row key={k} row={row} system={system} />
               ))}
             </TableTbody>

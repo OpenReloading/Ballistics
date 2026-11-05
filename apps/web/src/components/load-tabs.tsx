@@ -66,7 +66,6 @@ export function LoadTabs({
   const shown = items[index]
   const [menu, setMenu] = useState(false)
   // another load is shown: the edit of the earlier one is over
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of the shown load
   useEffect(() => {
     open.current = false
     setEditing(false)

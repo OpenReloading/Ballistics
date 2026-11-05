@@ -1,4 +1,5 @@
 ---
+
 title: Stability, spin drift and jump
 description: Miller's gyroscopic stability factor, the dynamic stability criterion of linear theory, and the empirical spin drift and aerodynamic jump of the point-mass trajectory.
 ---
@@ -89,34 +90,34 @@ The upper sign holds for right-hand twist: wind from the left lowers the shot, w
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $m$ | Bullet mass | g | kg |
-| $m_{\mathrm{gr}}$ | Bullet mass in grains, inside the Miller fit | g | grain |
-| $d$ | Bullet diameter | mm | m |
-| $d_{\mathrm{in}}$ | Bullet diameter in inches, inside the Miller fit | mm | in |
-| $l$ | Bullet length | mm | m |
-| $T_w$ | Twist length per turn | mm | m |
-| $t_c$, $l_c$ | Twist and length in calibres | 1 | 1 |
-| $v_0$ | Muzzle velocity | m/s | m/s |
-| $v$ | Speed at a point of the flight | m/s | m/s |
-| $\omega$, $\omega_0$ | Spin rate along the flight and at the muzzle | no kind | rad/s |
-| $\rho$, $\rho_0$ | Air density at a point and at the firing point | g/cm3 | kg/m3 |
-| $C_{M_\alpha}$ | Overturning-moment slope, positive | 1 | 1/rad |
-| $T$ | Air temperature at the firing point | degC | K |
-| $p$ | Station pressure | bar | Pa |
-| $S_{g,0}$, $S_g$ | Gyroscopic stability factor, before and after the corrections | 1 | 1 |
-| $S_d$ | Dynamic stability factor | 1 | 1 |
-| $C_{L_\alpha}$ | Lift-force coefficient slope | 1 | 1 |
-| $C_D$ | Drag coefficient | 1 | 1 |
-| $C_{mp_\alpha}$ | Magnus-moment coefficient slope | 1 | 1 |
-| $C_{m_q} + C_{m_{\dot\alpha}}$ | Pitch-damping moment coefficient sum | 1 | 1 |
-| $I_x$, $I_y$ | Axial and transverse moments of inertia | no kind | kg m² |
-| $t$ | Time of flight | no kind | s |
-| $D_s$ | Spin drift | mm | m |
-| $W_\perp$ | Lateral wind at the muzzle | m/s | m/s |
-| $\delta_J$ | Aerodynamic jump angle, positive up | deg | rad |
-| $s$ | Slant range | mm | m |
+| Symbol                         | Meaning                                                       | Stored unit | Unit in `core` |
+| ------------------------------ | ------------------------------------------------------------- | ----------- | -------------- |
+| $m$                            | Bullet mass                                                   | g           | kg             |
+| $m_{\mathrm{gr}}$              | Bullet mass in grains, inside the Miller fit                  | g           | grain          |
+| $d$                            | Bullet diameter                                               | mm          | m              |
+| $d_{\mathrm{in}}$              | Bullet diameter in inches, inside the Miller fit              | mm          | in             |
+| $l$                            | Bullet length                                                 | mm          | m              |
+| $T_w$                          | Twist length per turn                                         | mm          | m              |
+| $t_c$, $l_c$                   | Twist and length in calibres                                  | 1           | 1              |
+| $v_0$                          | Muzzle velocity                                               | m/s         | m/s            |
+| $v$                            | Speed at a point of the flight                                | m/s         | m/s            |
+| $\omega$, $\omega_0$           | Spin rate along the flight and at the muzzle                  | no kind     | rad/s          |
+| $\rho$, $\rho_0$               | Air density at a point and at the firing point                | g/cm3       | kg/m3          |
+| $C_{M_\alpha}$                 | Overturning-moment slope, positive                            | 1           | 1/rad          |
+| $T$                            | Air temperature at the firing point                           | degC        | K              |
+| $p$                            | Station pressure                                              | bar         | Pa             |
+| $S_{g,0}$, $S_g$               | Gyroscopic stability factor, before and after the corrections | 1           | 1              |
+| $S_d$                          | Dynamic stability factor                                      | 1           | 1              |
+| $C_{L_\alpha}$                 | Lift-force coefficient slope                                  | 1           | 1              |
+| $C_D$                          | Drag coefficient                                              | 1           | 1              |
+| $C_{mp_\alpha}$                | Magnus-moment coefficient slope                               | 1           | 1              |
+| $C_{m_q} + C_{m_{\dot\alpha}}$ | Pitch-damping moment coefficient sum                          | 1           | 1              |
+| $I_x$, $I_y$                   | Axial and transverse moments of inertia                       | no kind     | kg m²          |
+| $t$                            | Time of flight                                                | no kind     | s              |
+| $D_s$                          | Spin drift                                                    | mm          | m              |
+| $W_\perp$                      | Lateral wind at the muzzle                                    | m/s         | m/s            |
+| $\delta_J$                     | Aerodynamic jump angle, positive up                           | deg         | rad            |
+| $s$                            | Slant range                                                   | mm          | m              |
 
 ## Assumptions
 

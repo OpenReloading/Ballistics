@@ -1,4 +1,5 @@
 ---
+
 title: Competition scoring
 description: How a person's own competition results are scored, ring series and practical stages, with the points and penalties of the event type record.
 ---
@@ -59,16 +60,16 @@ An event's rounds are its `rounds`, or, for ring series that all list their shot
 
 ## Symbols
 
-| Symbol | Meaning | Unit |
-| --- | --- | --- |
-| $P$ | Points of a stage | 1 |
-| $n_z$ | Scoring hits in zone $z$ | 1 |
-| $p_{z,\phi}$ | Points of a hit in zone $z$ for power factor $\phi$ (`scoring.points`) | 1 |
-| $m$, $s$, $r$ | Misses, penalized no-shoot hits, procedural penalties | 1 |
-| $q$ | Points taken off per penalty (`scoring.penalties`) | 1 |
-| $t$ | Stage time | s |
-| $H$ | Hit factor | 1/s |
-| $S_k$ | Typed stage points of stage $k$ | 1 |
-| $T$ | Event total of a practical event | 1 |
-| $v_{ij}$ | Ring value of shot $i$ of series $j$ | 1 |
-| $R$ | Event total of a ring event | 1 |
+| Symbol        | Meaning                                                                | Unit |
+| ------------- | ---------------------------------------------------------------------- | ---- |
+| $P$           | Points of a stage                                                      | 1    |
+| $n_z$         | Scoring hits in zone $z$                                               | 1    |
+| $p_{z,\phi}$  | Points of a hit in zone $z$ for power factor $\phi$ (`scoring.points`) | 1    |
+| $m$, $s$, $r$ | Misses, penalized no-shoot hits, procedural penalties                  | 1    |
+| $q$           | Points taken off per penalty (`scoring.penalties`)                     | 1    |
+| $t$           | Stage time                                                             | s    |
+| $H$           | Hit factor                                                             | 1/s  |
+| $S_k$         | Typed stage points of stage $k$                                        | 1    |
+| $T$           | Event total of a practical event                                       | 1    |
+| $v_{ij}$      | Ring value of shot $i$ of series $j$                                   | 1    |
+| $R$           | Event total of a ring event                                            | 1    |

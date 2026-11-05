@@ -1,4 +1,5 @@
 ---
+
 title: Ring scoring
 description: Ring value, tenth-ring value and inner ten of a shot on a rule-book target, and the fit of a target to points marked on its rings.
 ---
@@ -6,7 +7,6 @@ description: Ring value, tenth-ring value and inner ten of a shot on a rule-book
 # Ring scoring
 
 For each shot on a target:
-
 - the value of the highest ring its hole touches, or under outward gauging the highest ring it lies wholly inside
 - the tenth-ring value, where the target's rules allow it
 - whether it is an inner ten
@@ -71,7 +71,6 @@ A far edge within $\varepsilon$ of the outer edge of the line counts as on the l
 ### Inner ten
 
 The inner ten counts only for a shot in the innermost ring. With the inner-ten radius $R_X$ and $d = \lvert p' \rvert$:
-
 - `cover`: the hole covers the inner-ten circle completely.
 - `touch`, or no rule on the record (the rule book does not state one): the hole touches it. An oval inner ten (`height`) uses the oval distance above, and the inner ten of a stadium target is a stadium.
 
@@ -141,29 +140,29 @@ Without marks the target is centred on the group's point of aim, or on the sheet
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `apps/web` |
-| --- | --- | --- | --- |
-| $d$ | Distance of the hole centre from the bull centre | mm | m |
-| $c_k$ | Centre of bull $k$ from the sheet centre | mm | m |
-| $p'$ | Hole centre relative to its bull | mm | m |
-| $A_n$, $\delta_n$ | Area ring $n$ bounds, distance of the hole centre from it | mm | m |
-| $H_n$ | Half the height of an oval or stadium ring | mm (stored as height) | m |
-| $L_n$ | Half the length of the straight sides of a stadium ring, $H_n - R_n$ | mm | m |
-| $R_n$ | Radius of ring $n$ to the outside edge of its line | mm (stored as diameter) | m |
-| $R_X$ | Radius of the inner-ten circle | mm (stored as diameter) | m |
-| $v_n$ | Value of ring $n$ | 1 | 1 |
-| $G$ | Gauge diameter of the event, or its equivalent hole | mm | m |
-| $d_b$ | Bullet diameter, else the marker diameter | mm | m |
-| $g$ | Radius of the scored hole | mm | m |
-| $\varepsilon$ | Touch tolerance | mm | m |
-| $w_n$ | Width of ring $n$ | mm | m |
-| $T$, $T_\mathrm{dec}$ | Group total and decimal total | 1 | 1 |
-| $p = (x, y)$ | Point marked on a ring, on the sheet | mm | m |
-| $c$ | Target centre on the sheet | mm | m |
-| $s$ | Scale, sheet length per target length | 1 | 1 |
-| $u$, $t$ | Unknowns $s^2$ and $\lvert c \rvert^2$ of the linear fit | no kind | no kind |
-| $\mathrm{rms}$ | Root mean square radial misfit of the marked points | mm | m |
-| $q$ | Shot position on the target | mm | m |
+| Symbol                | Meaning                                                              | Stored unit             | Unit in `apps/web` |
+| --------------------- | -------------------------------------------------------------------- | ----------------------- | ------------------ |
+| $d$                   | Distance of the hole centre from the bull centre                     | mm                      | m                  |
+| $c_k$                 | Centre of bull $k$ from the sheet centre                             | mm                      | m                  |
+| $p'$                  | Hole centre relative to its bull                                     | mm                      | m                  |
+| $A_n$, $\delta_n$     | Area ring $n$ bounds, distance of the hole centre from it            | mm                      | m                  |
+| $H_n$                 | Half the height of an oval or stadium ring                           | mm (stored as height)   | m                  |
+| $L_n$                 | Half the length of the straight sides of a stadium ring, $H_n - R_n$ | mm                      | m                  |
+| $R_n$                 | Radius of ring $n$ to the outside edge of its line                   | mm (stored as diameter) | m                  |
+| $R_X$                 | Radius of the inner-ten circle                                       | mm (stored as diameter) | m                  |
+| $v_n$                 | Value of ring $n$                                                    | 1                       | 1                  |
+| $G$                   | Gauge diameter of the event, or its equivalent hole                  | mm                      | m                  |
+| $d_b$                 | Bullet diameter, else the marker diameter                            | mm                      | m                  |
+| $g$                   | Radius of the scored hole                                            | mm                      | m                  |
+| $\varepsilon$         | Touch tolerance                                                      | mm                      | m                  |
+| $w_n$                 | Width of ring $n$                                                    | mm                      | m                  |
+| $T$, $T_\mathrm{dec}$ | Group total and decimal total                                        | 1                       | 1                  |
+| $p = (x, y)$          | Point marked on a ring, on the sheet                                 | mm                      | m                  |
+| $c$                   | Target centre on the sheet                                           | mm                      | m                  |
+| $s$                   | Scale, sheet length per target length                                | 1                       | 1                  |
+| $u$, $t$              | Unknowns $s^2$ and $\lvert c \rvert^2$ of the linear fit             | no kind                 | no kind            |
+| $\mathrm{rms}$        | Root mean square radial misfit of the marked points                  | mm                      | m                  |
+| $q$                   | Shot position on the target                                          | mm                      | m                  |
 
 ## Assumptions
 

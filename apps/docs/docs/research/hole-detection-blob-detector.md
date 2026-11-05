@@ -1,4 +1,5 @@
 ---
+
 title: Blob detector against an area-count hole detector
 description: Why the hole detector on target photos uses a click-calibrated colour axis with a multi-scale blob detector, and which variants of automatic detection were dropped.
 ---
@@ -25,14 +26,14 @@ Why the area-count detector swung: the editor took the expected hole size from t
 
 Shots found, blob detector (area-count detector in brackets):
 
-| Photos | worst example | median example |
-| --- | --- | --- |
-| ten-shot face | 10 (8) | 10 (9) |
-| .22 scan | 5 (5) | 5 (5) |
-| paper face, 8 holes | 7 (5) | 7 (7) |
-| painted pistol face, 10 holes | 8 (9) | 10 (9) |
-| three photos not in the repository, 40 shots | 35 (13) | 39 (26) |
-| four openly licensed photos, 33 shots | 30 (27) | 32 (30) |
+| Photos                                       | worst example | median example |
+| -------------------------------------------- | ------------- | -------------- |
+| ten-shot face                                | 10 (8)        | 10 (9)         |
+| .22 scan                                     | 5 (5)         | 5 (5)          |
+| paper face, 8 holes                          | 7 (5)         | 7 (7)          |
+| painted pistol face, 10 holes                | 8 (9)         | 10 (9)         |
+| three photos not in the repository, 40 shots | 35 (13)       | 39 (26)        |
+| four openly licensed photos, 33 shots        | 30 (27)       | 32 (30)        |
 
 Automatic detection with the marked region: 32 of 33 and 35 of 40 shots (area-count: 14 and 21).
 

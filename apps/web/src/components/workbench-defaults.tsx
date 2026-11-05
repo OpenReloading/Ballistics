@@ -56,7 +56,6 @@ export function WorkbenchDefaultsForm() {
   const [fields, setFields] = useState<Fields>({})
   const [errors, setErrors] = useState<Record<string, string | undefined>>({})
   const [autoRun, setAutoRun] = useState(true)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: read once after mounting; units follow below
   useEffect(() => {
     const d = readDefaults()
     setStored(d)
@@ -68,6 +67,7 @@ export function WorkbenchDefaultsForm() {
         fixedFieldText,
       ),
     )
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- read once after mounting; units follow below
   }, [])
   useFieldUnits(specs, system, (update) => setFields((f) => update(f)), fixedFieldText)
   // the server cannot know the stored values: no form showing the cited ones until they are read

@@ -39,7 +39,7 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",
-    "oxlint": "1.90.0",
+    "oxlint": "catalog:",
     "oxlint-tsgolint": "7.0.2005",
     "publint": "0.3.25",
     "typescript": "catalog:",

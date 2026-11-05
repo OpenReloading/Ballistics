@@ -84,7 +84,6 @@ export function SessionSummary() {
 
   useEffect(preloadChart, [])
   // a file read with the fallback unit is read again when that unit changes
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only on a unit change
   useEffect(() => {
     if (file.current) void readFile(file.current, unit)
   }, [unit])
@@ -356,7 +355,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
         <Message severity="warning" title={t('Import notes')}>
           <ul>
             {warnings.map((w, k) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: warnings keep the importer order and may repeat
+              // oxlint-disable-next-line react/no-array-index-key -- warnings keep the importer order and may repeat
               <li key={k}>{translateMessage(w, t)}</li>
             ))}
           </ul>
@@ -390,7 +389,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
           >
             {session.strings.map((s, k) => (
               <StatsRow
-                // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
+                // oxlint-disable-next-line react/no-array-index-key -- strings keep the file order and have no id
                 key={k}
                 name={stringName(stringLabels, k, t)}
                 st={stats[k]}
@@ -421,7 +420,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
             controls={
               <Tabs.List>
                 {session.strings.map((_, k) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
+                  // oxlint-disable-next-line react/no-array-index-key -- strings keep the file order and have no id
                   <Tabs.Tab key={k} value={String(k)}>
                     {stringName(stringLabels, k, t)}
                   </Tabs.Tab>
@@ -436,7 +435,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                 shot.excluded ? [] : ([[n + 1, shot]] as const),
               )
               return (
-                // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
+                // oxlint-disable-next-line react/no-array-index-key -- strings keep the file order and have no id
                 <Tabs.Panel key={k} value={String(k)} className="session-string">
                   <h3 className="print-only">{name}</h3>
                   {st && <Headline st={st} speed={speed} symbol={v.symbol} level={level} />}
@@ -470,7 +469,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
               return (
                 // the open string's shots on screen, every string's in print
                 <div
-                  // biome-ignore lint/suspicious/noArrayIndexKey: strings keep the file order and have no id
+                  // oxlint-disable-next-line react/no-array-index-key -- strings keep the file order and have no id
                   key={k}
                   className="session-shots-of"
                   data-open={String(k) === open || undefined}
@@ -487,7 +486,7 @@ function SummaryView({ read, system }: { read: Read; system: UnitSystem }) {
                     ]}
                   >
                     {s.shots.map((shot, n) => (
-                      // biome-ignore lint/suspicious/noArrayIndexKey: shots keep the file order and have no id
+                      // oxlint-disable-next-line react/no-array-index-key -- shots keep the file order and have no id
                       <tr key={n}>
                         <td className="num">{n + 1}</td>
                         <td className="num">{speed(shot.velocity.value)}</td>

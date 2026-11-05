@@ -1,4 +1,5 @@
 ---
+
 title: Point of impact per charge in a ladder
 description: The height of impact of each charge's shots with the effect of their velocity removed, the mean per charge and a heterogeneity test across charges.
 ---
@@ -45,16 +46,16 @@ Code: `apps/web/src/lib/ladder-impact.ts`, `ladderImpact` (`usableShots`, `steps
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $y$ | Height of a shot above the point of aim | mm | m |
-| $v$ | Velocity of a shot | m/s | m/s |
-| $b$ | Change of height per velocity | no kind | m per m/s |
-| $z$ | Height with the velocity effect removed | mm | m |
-| $r_i$ | Residual centre of charge $i$ | mm | m |
-| $n_i$ | Shots of charge $i$ | 1 | 1 |
-| $Q$ | Heterogeneity statistic | 1 | 1 |
-| $\gamma$ | Level of the test, 0.99 by default | 1 | 1 |
+| Symbol   | Meaning                                 | Stored unit | Unit in `core` |
+| -------- | --------------------------------------- | ----------- | -------------- |
+| $y$      | Height of a shot above the point of aim | mm          | m              |
+| $v$      | Velocity of a shot                      | m/s         | m/s            |
+| $b$      | Change of height per velocity           | no kind     | m per m/s      |
+| $z$      | Height with the velocity effect removed | mm          | m              |
+| $r_i$    | Residual centre of charge $i$           | mm          | m              |
+| $n_i$    | Shots of charge $i$                     | 1           | 1              |
+| $Q$      | Heterogeneity statistic                 | 1           | 1              |
+| $\gamma$ | Level of the test, 0.99 by default      | 1           | 1              |
 
 ## Assumptions
 

@@ -279,7 +279,6 @@ export function useRangeMode() {
   }, [loadId])
 
   // the fields show the stored values of the string of the chosen step
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the string changes with these
   useEffect(() => {
     if (!string && loadId && step) {
       // no shot yet: what was typed for it so far, kept in this browser
@@ -302,6 +301,7 @@ export function useRangeMode() {
       wind: at('windSpeed', c?.windSpeed && toSi('velocity', c.windSpeed.value)),
     })
     setNote(string?.note ?? '')
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- the string changes with these
   }, [step?.key, loadId, session?.id, system])
 
   // every shot of the session was fired, an excluded one too

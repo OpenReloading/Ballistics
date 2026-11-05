@@ -1,4 +1,5 @@
 ---
+
 title: Size of the Lagrange gradient error
 description: How far the uniform-density Lagrange coefficients lie from the self-similar column of an isentropic gas, by charge to projectile mass ratio.
 ---
@@ -28,10 +29,10 @@ Breech over base is $(1 - a^2)^{-(n+1)}$, mean over base $\int_0^1 (1 - a^2 \xi^
 ## Numbers
 
 | $m_c/m_p'$ | Breech over base, uniform | isentropic | Mean over base, uniform | isentropic | Uniform high by |
-| --- | --- | --- | --- | --- | --- |
-| 0.28 | 1.140 | 1.138 | 1.093 | 1.091 | 0.2 % |
-| 0.51 | 1.255 | 1.248 | 1.170 | 1.162 | 0.6 to 0.7 % |
-| 1.03 | 1.515 | 1.489 | 1.343 | 1.315 | 1.8 to 2.1 % |
+| ---------- | ------------------------- | ---------- | ----------------------- | ---------- | --------------- |
+| 0.28       | 1.140                     | 1.138      | 1.093                   | 1.091      | 0.2 %           |
+| 0.51       | 1.255                     | 1.248      | 1.170                   | 1.162      | 0.6 to 0.7 %    |
+| 1.03       | 1.515                     | 1.489      | 1.343                   | 1.315      | 1.8 to 2.1 %    |
 
 The isentropic values change in the third decimal at most over $k$ from 1.24 to 1.26. The mean pressure coefficient of the isentropic column, (mean over base minus 1) over $m_c/m_p'$, falls from 0.324 at 0.28 to 0.306 at 1.03, against 1/3.
 

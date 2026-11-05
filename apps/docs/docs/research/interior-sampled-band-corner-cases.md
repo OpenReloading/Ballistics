@@ -1,4 +1,5 @@
 ---
+
 title: Sampled band against the corner cases
 description: Whether the 5th and 95th percentiles of the sampled band meet the corner-case range when one input varies and lie inside it when several combine.
 ---
@@ -12,7 +13,6 @@ Interior ballistics: with one input varied, do the 5th and 95th percentiles of `
 ## Method
 
 A tolerance is read as the 90 percent interval of a normal input, so for a response linear in one input the 5th and 95th percentiles of the output sit at the ends of the tolerance, where the corner cases are. Accept limit, set in the tests: 4 standard errors of a sampled percentile.
-
 - Toy model: pressure $7 q^2 b / v$, burn rate $b$ varied by 5 percent, 4000 draws, seed 7. The 5th, 50th and 95th percentiles of the pressure against $1 - 0.05$, 1 and $1 + 0.05$ times the nominal pressure.
 - M3 model: the load of the test fixtures, charge varied by 5 percent, 1000 draws, against `interiorPressureRange` with the same tolerance.
 - M3 model, every default tolerance at once, 60 draws: the 5th percentile above the low corner, the 95th below the high corner.

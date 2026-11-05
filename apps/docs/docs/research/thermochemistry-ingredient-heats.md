@@ -1,4 +1,5 @@
 ---
+
 title: Thermochemistry ingredient heats
 description: Four ingredient heats of formation that differ between two tables, a third open value for each where one exists, and the change in flame temperature over the recorded powder compositions.
 ---
@@ -23,12 +24,12 @@ Heat of formation from a combustion enthalpy: the formation heats of the combust
 
 ## Numbers
 
-| ingredient | in use | independent table | third value | third source |
-| --- | --- | --- | --- | --- |
-| ethyl centralite | -121 | -105 | -105.9, or -42 and -33 | combustion, Burlot 1939 and Ball 1931, via NIST WebBook (the -121 in use is Taylor 1947) |
-| methyl centralite | -73.1 | -61 | -51.8 or -114 | combustion, Handrick 1956 and Taylor 1947, via NIST WebBook |
-| 2,4-dinitrotoluene | -66.4 ± 3.0 | -68.2 | none within the spread | NIST WebBook lists -40 and -29 (older) |
-| dibutyl phthalate, liquid | -778 | -843 | -864.7 ± 4.8 | Maksimuk 2004 |
+| ingredient                | in use      | independent table | third value            | third source                                                                             |
+| ------------------------- | ----------- | ----------------- | ---------------------- | ---------------------------------------------------------------------------------------- |
+| ethyl centralite          | -121        | -105              | -105.9, or -42 and -33 | combustion, Burlot 1939 and Ball 1931, via NIST WebBook (the -121 in use is Taylor 1947) |
+| methyl centralite         | -73.1       | -61               | -51.8 or -114          | combustion, Handrick 1956 and Taylor 1947, via NIST WebBook                              |
+| 2,4-dinitrotoluene        | -66.4 ± 3.0 | -68.2             | none within the spread | NIST WebBook lists -40 and -29 (older)                                                   |
+| dibutyl phthalate, liquid | -778        | -843              | -864.7 ± 4.8           | Maksimuk 2004                                                                            |
 
 Records: 43 with a composition, 31 solved (the rest refuse for a missing ingredient or condensed products). Variant A changes 26 records, largest change 0.052 % on the value and 0.107 % on min or max. Variant B (ethyl centralite -105.9 from the nearest outside value, dibutyl phthalate -864.7) changes 13 records, largest 0.038 % and 0.077 %.
 

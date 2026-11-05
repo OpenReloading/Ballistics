@@ -1,4 +1,5 @@
 ---
+
 title: Burn law constants, cheaper steps and machine learning
 description: Whether a pressure exponent per powder family, a residual correction, more burn form constants per powder or a machine-learning model predicts the muzzle velocity of held-out cartridges better than the present M3 fit, and whether the load rows identify that many constants.
 ---
@@ -16,7 +17,6 @@ The [validation protocol](../models/validation.md): rows split by `splitOf` of t
 Accept rule, committed before any result: on the validation split the median velocity error falls by at least 0.1 percentage points and by more than twice the bootstrap standard error of the paired change of the median (resampling the validation cartridges, 2,000 draws, fixed seed), the P90 does not rise, used rows fall by less than 1 %, and for a fitted law the burn rate is positive, the vivacity monotone over the first stage and fewer than 1 % of perturbed held-out loads (charge +2 %, barrel -10 %) move the velocity the wrong way. Pressure is reported and never decides.
 
 Candidates:
-
 - Control: the vivacity of each powder refitted at the present exponent 1.
 - Pressure exponent per powder family, from a grid of 0.7 to 1.3, chosen on the training error, with the vivacity of each powder refitted at that exponent.
 - A residual correction of the velocity, linear in the logarithms of charge-to-bullet mass ratio and loading density (3 constants in all).
@@ -35,30 +35,30 @@ The vivacity law of the [burn forms page](../models/interior-burn-forms.md): the
 
 Baseline, `ballistics verify` on the validation split: median velocity error 3.32 %, P90 8.87 %, 10,493 used rows (the validation page: 10,497; 4 rows more are refused with the converted rows), pressure median 14.94 %, P90 38.15 % on 4,056 rows; model version `8e17f2eace299766d9ba5212de610444398d027f56b7c18270c3ea5928a27fd3` (differs from the validation page's: the hash covers the rows file and the records); 11 cartridges, bootstrap standard error of the median 0.37 percentage points.
 
-| Candidate | Median velocity | P90 velocity | Median pressure | P90 pressure | Wrong direction | Verdict |
-| --- | --- | --- | --- | --- | --- | --- |
-| M3, record parameters (baseline) | 3.32 % | 8.87 % | 14.94 % | 38.15 % | 0.13 % | baseline |
-| Vivacity refit, exponent 1 (control) | 3.09 % | 8.40 % | 15.06 % | 38.28 % | 0.13 % | fail |
-| Residual correction, 3 constants | 3.12 % | 8.58 % | 14.94 % | 38.15 % | 0.13 % | fail |
-| Pressure exponent per family + vivacity refit | 2.85 % | 7.19 % | 13.09 % | 33.72 % | 0.11 % | pass |
-| Richer form, 4 constants per powder | 2.81 % | 7.11 % | 32.48 % | 123.75 % | 0.19 % | pass, pressure worse |
-| ML corrector, gradient-boosted trees | 2.62 % | 6.79 % | not modelled | not modelled | 6.22 % | fail |
-| ML corrector, small network | 2.56 % | 6.99 % | not modelled | not modelled | 5.60 % | fail |
-| ML corrector, Gaussian process | 3.19 % | 8.75 % | not modelled | not modelled | 0.13 % | fail |
-| ML stand-alone, gradient-boosted trees | 2.90 % | 7.73 % | not modelled | not modelled | 11.67 % | fail |
-| ML stand-alone, small network | 2.99 % | 8.57 % | not modelled | not modelled | 11.47 % | fail |
+| Candidate                                     | Median velocity | P90 velocity | Median pressure | P90 pressure | Wrong direction | Verdict              |
+| --------------------------------------------- | --------------- | ------------ | --------------- | ------------ | --------------- | -------------------- |
+| M3, record parameters (baseline)              | 3.32 %          | 8.87 %       | 14.94 %         | 38.15 %      | 0.13 %          | baseline             |
+| Vivacity refit, exponent 1 (control)          | 3.09 %          | 8.40 %       | 15.06 %         | 38.28 %      | 0.13 %          | fail                 |
+| Residual correction, 3 constants              | 3.12 %          | 8.58 %       | 14.94 %         | 38.15 %      | 0.13 %          | fail                 |
+| Pressure exponent per family + vivacity refit | 2.85 %          | 7.19 %       | 13.09 %         | 33.72 %      | 0.11 %          | pass                 |
+| Richer form, 4 constants per powder           | 2.81 %          | 7.11 %       | 32.48 %         | 123.75 %     | 0.19 %          | pass, pressure worse |
+| ML corrector, gradient-boosted trees          | 2.62 %          | 6.79 %       | not modelled    | not modelled | 6.22 %          | fail                 |
+| ML corrector, small network                   | 2.56 %          | 6.99 %       | not modelled    | not modelled | 5.60 %          | fail                 |
+| ML corrector, Gaussian process                | 3.19 %          | 8.75 %       | not modelled    | not modelled | 0.13 %          | fail                 |
+| ML stand-alone, gradient-boosted trees        | 2.90 %          | 7.73 %       | not modelled    | not modelled | 11.67 %         | fail                 |
+| ML stand-alone, small network                 | 2.99 %          | 8.57 %       | not modelled    | not modelled | 11.47 %         | fail                 |
 
 Twice the standard error of the paired change: 0.28 (control), 0.26 (residual), 0.34 (exponent), 0.50 (richer form), 0.46, 0.36, 0.20, 0.52 and 0.34 percentage points (learners in table order). The exponent chosen per family: 0.8 for the double base ball and extruded families and the extruded powders of unstated base, 0.9 for single base extruded and most others.
 
 Per family, validation split, median and P90 velocity error:
 
-| Family | Rows | Baseline | Exponent per family | Richer form |
-| --- | --- | --- | --- | --- |
-| Double base, ball | 3,326 | 3.89 %, 9.60 % | 3.15 %, 6.75 % | 3.09 %, 6.96 % |
-| Double base, extruded | 1,178 | 2.82 %, 7.58 % | 2.48 %, 6.70 % | 2.81 %, 6.97 % |
-| Single base, extruded | 3,726 | 3.03 %, 8.56 % | 2.76 %, 7.72 % | 2.60 %, 7.16 % |
-| Base not stated, extruded | 285 | 2.56 %, 6.07 % | 2.15 %, 5.63 % | 2.46 %, 6.01 % |
-| Base and form not stated | 1,464 | 2.98 %, 7.56 % | 2.68 %, 6.44 % | 2.50 %, 6.54 % |
+| Family                    | Rows  | Baseline       | Exponent per family | Richer form    |
+| ------------------------- | ----- | -------------- | ------------------- | -------------- |
+| Double base, ball         | 3,326 | 3.89 %, 9.60 % | 3.15 %, 6.75 %      | 3.09 %, 6.96 % |
+| Double base, extruded     | 1,178 | 2.82 %, 7.58 % | 2.48 %, 6.70 %      | 2.81 %, 6.97 % |
+| Single base, extruded     | 3,726 | 3.03 %, 8.56 % | 2.76 %, 7.72 %      | 2.60 %, 7.16 % |
+| Base not stated, extruded | 285   | 2.56 %, 6.07 % | 2.15 %, 5.63 %      | 2.46 %, 6.01 % |
+| Base and form not stated  | 1,464 | 2.98 %, 7.56 % | 2.68 %, 6.44 %      | 2.50 %, 6.54 % |
 
 Leave-one-powder-out (powder not in the fitted set): 15.7 %, 61.7 % for the baseline. The per-powder candidates fall back to the present exponent and form for an unfitted powder, so they stay within 0.2 percentage points of it (15.5 % and 15.6 %). The learners keep the powder's own training rows, so no line is stated for them.
 
@@ -66,16 +66,16 @@ Noise floor: of 3,054 pairs of the same load in two source tables, 94.1 % print 
 
 Informative loads per powder on the training split (minimum, median, maximum) and the share of powders with fewer loads than 4 and 7 constants:
 
-| Family | Powders | Loads per powder | Below 4 | Below 7 |
-| --- | --- | --- | --- | --- |
-| Double base, ball | 64 | 2, 65, 158 | 2 % | 5 % |
-| Double base, extruded | 16 | 7, 42, 293 | 0 % | 0 % |
-| Single base, extruded | 67 | 2, 46, 299 | 3 % | 4 % |
-| Single base, form not stated | 4 | 23, 39, 65 | 0 % | 0 % |
-| Single base, flake | 8 | 6, 27, 81 | 0 % | 25 % |
-| Base not stated, extruded | 10 | 2, 14, 218 | 10 % | 40 % |
-| Base and form not stated | 38 | 1, 32, 293 | 5 % | 13 % |
-| All | 223 | 1, 39, 299 | 3 % | 9 % |
+| Family                       | Powders | Loads per powder | Below 4 | Below 7 |
+| ---------------------------- | ------- | ---------------- | ------- | ------- |
+| Double base, ball            | 64      | 2, 65, 158       | 2 %     | 5 %     |
+| Double base, extruded        | 16      | 7, 42, 293       | 0 %     | 0 %     |
+| Single base, extruded        | 67      | 2, 46, 299       | 3 %     | 4 %     |
+| Single base, form not stated | 4       | 23, 39, 65       | 0 %     | 0 %     |
+| Single base, flake           | 8       | 6, 27, 81        | 0 %     | 25 %    |
+| Base not stated, extruded    | 10      | 2, 14, 218       | 10 %    | 40 %    |
+| Base and form not stated     | 38      | 1, 32, 293       | 5 %     | 13 %    |
+| All                          | 223     | 1, 39, 299       | 3 %     | 9 %     |
 
 No row prints a propellant temperature; the model peak pressure of one powder's rows spans a factor of 2 to 4, and the burnt fraction at the muzzle moves by about 0.2 for ball and extruded powders and barely for flake powders and those whose form is not stated.
 

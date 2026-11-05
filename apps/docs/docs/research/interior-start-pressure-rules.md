@@ -1,4 +1,5 @@
 ---
+
 title: Shot-start pressure by bullet construction and firearm class
 description: Whether a fitted start pressure per bullet construction and per rifle or handgun lowers the held-out velocity error against one fixed 30 MPa.
 ---
@@ -13,13 +14,13 @@ Interior ballistics, shot start: does a fitted start pressure, by bullet constru
 
 Rules fitted on the training split with every powder refitted (vivacity and energy, two rounds), scored on the 14238 validation rows that every rule runs:
 
-| Rule | Start pressure |
-| --- | --- |
-| fixed | 30 MPa |
-| one value | one fitted value |
-| construction | one per construction (lead, plated, jacketed, monolithic, from the printed bullet type) |
-| construction and class | one per construction and class (rifle, handgun) |
-| with floor | construction and class, and in a handgun at least a fitted fraction of the C.I.P. maximum pressure |
+| Rule                   | Start pressure                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| fixed                  | 30 MPa                                                                                             |
+| one value              | one fitted value                                                                                   |
+| construction           | one per construction (lead, plated, jacketed, monolithic, from the printed bullet type)            |
+| construction and class | one per construction and class (rifle, handgun)                                                    |
+| with floor             | construction and class, and in a handgun at least a fitted fraction of the C.I.P. maximum pressure |
 
 Accept rule per class: the simplest rule within 0.1 points of the lowest median absolute velocity error, among the rules whose P90 is not above that of the fixed value. Intervals: 95 % cartridge bootstrap with the powder parameters held (lower bounds of the true spread).
 
@@ -33,13 +34,13 @@ $$
 
 ## Numbers
 
-| Rule | rifle median % | rifle P90 % | handgun median % | handgun P90 % | all median % |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| fixed | 2.76 | 7.22 | 6.16 | 13.58 | 3.33 |
-| one value | 2.76 | 7.22 | 6.15 | 13.60 | 3.33 |
-| construction | 2.73 | 7.17 | 6.02 | 13.08 | 3.28 |
-| construction and class | 2.75 | 7.18 | 5.70 | 12.99 | 3.27 |
-| with floor | 2.74 | 7.16 | 5.68 | 13.01 | 3.27 |
+| Rule                   | rifle median % | rifle P90 % | handgun median % | handgun P90 % | all median % |
+| ---------------------- | -------------: | ----------: | ---------------: | ------------: | -----------: |
+| fixed                  |           2.76 |        7.22 |             6.16 |         13.58 |         3.33 |
+| one value              |           2.76 |        7.22 |             6.15 |         13.60 |         3.33 |
+| construction           |           2.73 |        7.17 |             6.02 |         13.08 |         3.28 |
+| construction and class |           2.75 |        7.18 |             5.70 |         12.99 |         3.27 |
+| with floor             |           2.74 |        7.16 |             5.68 |         13.01 |         3.27 |
 
 Fitted values, MPa (95 % interval): one value 30.3 (25.6 to 34.5). By construction and class: jacketed handgun 30.8 (21.2 to 40.6), jacketed rifle 29.2 (27.5 to 31.3), lead handgun 24.3 (16.7 to 34.2), lead rifle 30.0 (24.5 to 40.3), monolithic handgun 50.0 (33.8 to 65.3), monolithic rifle 35.3 (33.0 to 37.9), plated handgun 30.9 (13.2 to 37.7). Floor 0.083 of the maximum pressure (0.00 to 0.18).
 

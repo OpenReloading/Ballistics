@@ -107,7 +107,6 @@ export function WorkbenchSearch({
   const [found, setFound] = useState<Found | 'error' | undefined>(undefined)
   const fitKey = bulletFit && `${bulletFit.g1} ${bulletFit.land} ${bulletFit.groove}`
   const shownFit = useRef(fitKey)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `fitKey` stands for the fit
   useEffect(() => {
     // bullets of another cartridge must not stay choosable while the new search runs
     if (shownFit.current !== fitKey) {
@@ -127,6 +126,7 @@ export function WorkbenchSearch({
         if (!controller.signal.aborted) setFound('error')
       })
     return () => controller.abort()
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- `fitKey` stands for the fit
   }, [text, fitKey, designs])
 
   const lower = query.trim().toLowerCase()

@@ -510,7 +510,7 @@ export function FirearmEditor({
                     </Table.Thead>
                     <Table.Tbody>
                       {c.mounts.map((m, k) => (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
+                        // oxlint-disable-next-line react/no-array-index-key -- mounts have no id and keep their order
                         <Table.Tr key={k}>
                           <Table.Td>
                             <NativeSelect
@@ -589,7 +589,7 @@ export function FirearmEditor({
                     </Table.Thead>
                     <Table.Tbody>
                       {c.mounts.map((m, k) => (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
+                        // oxlint-disable-next-line react/no-array-index-key -- mounts have no id and keep their order
                         <Table.Tr key={k}>
                           <Table.Th scope="row">{opticName(m.optic)}</Table.Th>
                           {zeroFields.map((spec) => (
@@ -653,7 +653,7 @@ export function FirearmEditor({
                         {c.truing.map((entry, k) => {
                           const { strings, values } = truingSummary(entry, system, t)
                           return (
-                            // biome-ignore lint/suspicious/noArrayIndexKey: results have no id and keep their order
+                            // oxlint-disable-next-line react/no-array-index-key -- results have no id and keep their order
                             <Table.Tr key={k}>
                               <Table.Th scope="row">{entry.date}</Table.Th>
                               <Table.Td>{entry.bullet}</Table.Td>

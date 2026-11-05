@@ -60,7 +60,6 @@ export function ChargeTargetDialog({ opened, onClose }: { opened: boolean; onClo
   useEffect(() => () => running.current?.abort(), [])
 
   // an open, a close and a changed load end the request in flight and drop the answer
-  // biome-ignore lint/correctness/useExhaustiveDependencies: runs on these two only
   useEffect(() => {
     reset()
   }, [opened, request])

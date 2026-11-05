@@ -1,4 +1,5 @@
 ---
+
 title: Published loads
 description: The load tables powder and bullet makers print, stored as printed with their velocity, pressure, primer and source, and the rules the data validation checks.
 ---
@@ -15,35 +16,34 @@ A published load is not a `Load` (the workbench recipe of one user, `packages/sc
 
 ## File
 
-| Field | Meaning |
-|---|---|
-| `id` | The file name without `.json` |
-| `maker` | Id of the manufacturer record that publishes the table |
-| `producedBy` | `maker`, or `customer` for loads its customers sent in |
-| `cartridgeName`, `cartridge` | The cartridge as the table prints it, and its `catalogue:<id>` reference. The folder is that id |
-| `loads` | The loads, each with an `id` unique in the file. They are sorted by `id`, so a newer edition edits loads in place |
-| `provenance` | Kind `published`. Each source names `publisher`, `url`, `retrieved` and `origin` |
+| Field                        | Meaning                                                                                                           |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `id`                         | The file name without `.json`                                                                                     |
+| `maker`                      | Id of the manufacturer record that publishes the table                                                            |
+| `producedBy`                 | `maker`, or `customer` for loads its customers sent in                                                            |
+| `cartridgeName`, `cartridge` | The cartridge as the table prints it, and its `catalogue:<id>` reference. The folder is that id                   |
+| `loads`                      | The loads, each with an `id` unique in the file. They are sorted by `id`, so a newer edition edits loads in place |
+| `provenance`                 | Kind `published`. Each source names `publisher`, `url`, `retrieved` and `origin`                                  |
 
 ## Load
 
-| Field | Meaning |
-|---|---|
-| `bullet` | `printed` (make, type and number as printed), `mass`, the `diameter` where the table prints one, and `record`, a `catalogue:` bullet reference where a record matches |
-| `powder` | `printed` and `record` |
-| `primer` | See Primer below |
-| `case` | The case as printed |
-| `coal` | Overall length as printed. `limit: min` where the table prints a minimum. A printed word such as `Flush` has no `value` |
-| `barrel` | `length` and `twist` (length of one turn: `1:12"` is 304.8 mm) |
-| `charges` | One charge per kind: `start`, `max`, `single` (stands alone) and `recommended` |
-| `source` | Position in `provenance.sources` of the source that printed the load. Absent: the first. A load a newer edition prints unchanged keeps citing the edition that printed it |
-| `page`, `url` | Page, anchor or row of the source, and a deep link where it differs from the source URL |
+| Field         | Meaning                                                                                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bullet`      | `printed` (make, type and number as printed), `mass`, the `diameter` where the table prints one, and `record`, a `catalogue:` bullet reference where a record matches     |
+| `powder`      | `printed` and `record`                                                                                                                                                    |
+| `primer`      | See Primer below                                                                                                                                                          |
+| `case`        | The case as printed                                                                                                                                                       |
+| `coal`        | Overall length as printed. `limit: min` where the table prints a minimum. A printed word such as `Flush` has no `value`                                                   |
+| `barrel`      | `length` and `twist` (length of one turn: `1:12"` is 304.8 mm)                                                                                                            |
+| `charges`     | One charge per kind: `start`, `max`, `single` (stands alone) and `recommended`                                                                                            |
+| `source`      | Position in `provenance.sources` of the source that printed the load. Absent: the first. A load a newer edition prints unchanged keeps citing the edition that printed it |
+| `page`, `url` | Page, anchor or row of the source, and a deep link where it differs from the source URL                                                                                   |
 
 A charge has `charge`, `velocity` (with `point`, the symbol the table prints for the measuring point, such as `v3` or `V5`, and its `distance` only where the source defines the symbol), `pressure`, `marks` (marks with a stated meaning: `compressed`, `do-not-reduce`, `subsonic`, `reduced-recoil`, `proof-tested`) and `printedMarks` (marks printed without a stated meaning, as printed).
 
 ## Printed figures
 
 A figure is `{ value?, raw }`. `raw` is the printed text with its unit (`55 gr`, `13,600 PSI`, `3,30 g / 50 grs`) and is always present. `value` is the printed number in the stored unit, converted with the exact factor and kept to 7 significant digits: 13,600 psi is 937.687 bar, 55 gr is 3.563940 g.
-
 - A figure with no stored unit has `raw` only: a crusher pressure (CUP, LUP) is not converted to bar, `Flush` has no number.
 - A table that prints a figure without a unit has `assumedUnit` next to `raw`, and `value` rests on it.
 - `data:validate` reads the numbers and units printed in `raw` (a decimal comma, thousands commas, a pair such as `g / grs`, a twist `1:12"`) and fails a `value` that matches none of them to 7 significant digits.
@@ -54,12 +54,12 @@ A pressure has the printed `unit` (`bar`, `psi`, `CUP`, `LUP`), the `peak` figur
 
 The method is also the basis a pressure is compared on. Values on different bases are never converted into each other and a comparison refuses to mix them:
 
-| `method` | Meaning |
-|---|---|
-| `transducer` | The C.I.P. method, as the cartridge records state it |
-| `case-contact` | A transducer that rests against the outside of the case, the way maker tables print psi figures |
-| `crusher` | A copper crusher: a conventional value in CUP or LUP, no bar value, compared by velocity only |
-| `piezo`, `energy` | As the cartridge records state them |
+| `method`          | Meaning                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| `transducer`      | The C.I.P. method, as the cartridge records state it                                            |
+| `case-contact`    | A transducer that rests against the outside of the case, the way maker tables print psi figures |
+| `crusher`         | A copper crusher: a conventional value in CUP or LUP, no bar value, compared by velocity only   |
+| `piezo`, `energy` | As the cartridge records state them                                                             |
 
 A bar or psi figure has a `value` in bar. A crusher figure has none, and a crusher method is printed in CUP or LUP.
 
@@ -88,7 +88,6 @@ pnpm --filter @open-reloading/data run loads:merge <incoming folder> [--accept <
 The id of a load is the first 10 hex digits of the SHA-1 of its natural key: maker, cartridge, printed bullet text and bullet mass, COAL with its limit, printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge. A figure counts by its `value` (its `raw` where it has none), so `55 gr` and `55 grs` are one key. Loads of equal key are counted in printed order: the first has the bare hash, the second `<hash>-2`, and so on. Edition, page, charge, velocity, pressure, primer and case are not in the key, so a newer edition finds its older load. An id the incoming file carries is replaced. Code: `loadId` and `mergePublishedLoads` in `packages/data/src/published-load-merge.ts`.
 
 By load id, the merge:
-
 - creates a load the repository does not have;
 - leaves a load whose content (everything but `id`, `source`, `page` and `url`) is equal as it is, so it keeps citing the edition and page that printed it;
 - lists a load with other content as changed, with the field paths that differ, and writes it only when its id follows `--accept` or with `--accept-all`;
@@ -101,7 +100,6 @@ The command prints per file and in total the created, changed (and how many not 
 ## Validation
 
 `pnpm run data:validate` reports:
-
 - a file whose cartridge is not its folder, names no cartridge record or a maker that is no manufacturer record, or whose name is not the maker's id (`<maker>-customer` for `producedBy: customer`);
 - a duplicate load id and loads that are not sorted by id;
 - a bullet, powder or primer a load names that is no record (an old bullet or powder id of `renames.json` does not count, so a rename rewrites the loads that name it);
@@ -111,10 +109,10 @@ The command prints per file and in total the created, changed (and how many not 
 
 It also prints plausibility warnings, each with the file, the load id and a finding id (`checkPublishedLoadPlausibility`). A printed value that looks wrong is still the maker's value: a warning never removes or changes a row and does not fail the validation, which exits 0 when there are only warnings.
 
-| Finding | When |
-|---|---|
-| `start-above-max` | The start charge is above the max charge of the same load |
-| `velocity-order` | The velocity of the max charge is below that of the start charge, both at the same point |
-| `pressure-order` | The pressure of the max charge is below that of the start charge, both with a value in bar and the same unit and method |
+| Finding                        | When                                                                                                                                                                                                                                                                                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `start-above-max`              | The start charge is above the max charge of the same load                                                                                                                                                                                                                                              |
+| `velocity-order`               | The velocity of the max charge is below that of the start charge, both at the same point                                                                                                                                                                                                               |
+| `pressure-order`               | The pressure of the max charge is below that of the start charge, both with a value in bar and the same unit and method                                                                                                                                                                                |
 | `pressure-above-cartridge-max` | A pressure with a value in bar whose method is the cartridge record's `pressureMethod` is above the record's `Pmax` (the largest one where the record has variants). A pressure on another basis (case-contact, crusher in CUP or LUP, no method) is not compared: no value is converted between bases |
-| `coal-above-cartridge-max` | The COAL is above the cartridge record's `L6`, the maximum cartridge length |
+| `coal-above-cartridge-max`     | The COAL is above the cartridge record's `L6`, the maximum cartridge length                                                                                                                                                                                                                            |

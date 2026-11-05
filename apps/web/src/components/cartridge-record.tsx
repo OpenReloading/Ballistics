@@ -55,7 +55,7 @@ const unitAfter = (q: string, system: UnitSystem) =>
 
 /** A value, then its tolerance and limit, muted (or the text as printed where nothing is stored); the unit is in its row's label. */
 function Value({ v, system }: { v: SpecValue; system: UnitSystem }) {
-  if (v.value === undefined) return <>{v.raw}</>
+  if (v.value === undefined) return v.raw
   const tolerance = toleranceText(v, system)
   return (
     <>
@@ -199,7 +199,6 @@ export function RecordScope({
   const [unit, setUnit] = useState<'mm' | 'in'>()
   const [variant, setVariant] = useState(() => defaultVariantIndex(variants))
   // a change in Settings wins over the switch
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on every new Settings choice
   useEffect(() => setUnit(undefined), [choice])
   const root = useRef<HTMLDivElement>(null)
   const pinned = useRef<Link>(undefined)
@@ -218,7 +217,6 @@ export function RecordScope({
   return (
     <RecordView value={{ unit, setUnit, variant, setVariant }}>
       <LengthOverride unit={unit}>
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: follows hover and focus of the symbols inside, takes none itself */}
         <div
           ref={root}
           role="presentation"

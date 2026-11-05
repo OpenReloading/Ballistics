@@ -1,4 +1,5 @@
 ---
+
 title: Shot groups
 description: Size and dispersion of shot groups on a target, confidence intervals by shot count, dispersion and prediction ellipses, and pooling of groups in angle.
 ---
@@ -6,7 +7,6 @@ description: Size and dispersion of shot groups on a target, confidence interval
 # Shot groups
 
 Statistics of one group on a target:
-
 - the centre of impact
 - sizes such as extreme spread and mean radius
 - standard deviations per axis and the circular error probable (CEP), with chi-square confidence intervals by shot count
@@ -152,7 +152,6 @@ $$
 Code: `packages/core/src/groups/statistics.ts`, `confidenceOf`.
 
 with:
-
 - one axis: $S = S_{xx}$ or $S_{yy}$, $\nu = n - 1$
 - circular $\sigma$: $S = S_{xx} + S_{yy}$, $\nu = 2(n - 1)$
 - radial standard deviation and CEP: the interval of $\sigma$ times $\sqrt{2}$ and $\sqrt{2 \ln 2}$
@@ -262,37 +261,37 @@ The intervals use $\nu = \sum_j (n_j - 1)$ per axis and $2\sum_j (n_j - 1)$ for 
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $n$ | Shots not excluded | 1 | 1 |
-| $x_i, y_i$ | Shot position in the target plane, $x$ right, $y$ up | mm | m |
-| $\bar x, \bar y$ | Centre of impact | mm | m |
-| $x_a, y_a$ | Point of aim | mm | m |
-| $\Delta x, \Delta y$ | Centre minus point of aim | mm | m |
-| $S_{xx}, S_{yy}, S_{xy}$ | Sums of squares and products about the centre | no kind | m² |
-| $d_{ij}$ | Distance between shots $i$ and $j$ | mm | m |
-| $\mathrm{ES}$, $W$, $H$ | Extreme spread, width, height | mm | m |
-| $r_i$, $\bar r$, $s_r$ | Radius of shot $i$, mean radius, standard deviation of the radii | mm | m |
-| $s_x, s_y, s_\mathrm{rad}$ | Standard deviations per axis and radial | mm | m |
-| $\hat\sigma$, $\sigma$ | Estimated and population per-axis standard deviation of a circular normal spread | mm | m |
-| $\mathrm{CEP}$, $R$ | Circular error probable, circular and elliptical | mm | m |
-| $C$, $c_{xx}, c_{xy}, c_{yy}$ | Sample covariance | no kind | m² |
-| $\lambda_1, \lambda_2$ | Principal variances, $\lambda_1 \ge \lambda_2 \ge 0$ | no kind | m² |
-| $\theta$ | Direction of the major axis from $+x$ | deg | rad |
-| $\beta$, $q$ | Bearing of the aim offset clockwise from up, sector index | deg, 1 | rad, 1 |
-| $p$ | Coverage of an ellipse | 1 | 1 |
-| $k$ | Ellipse scale on the principal standard deviations | 1 | 1 |
-| $F_{2,m}(p)$ | Quantile of the F distribution with 2 and $m$ degrees of freedom | 1 | 1 |
-| $1 - \alpha$ | Two-sided confidence level, default 0.95 | 1 | 1 |
-| $\nu$ | Degrees of freedom | 1 | 1 |
-| $v_i$, $\bar v$, $s$ | Velocity of shot $i$ of a string, mean, standard deviation | m/s | m/s |
-| $l_n$, $u_n$, $w$ | Limits of the interval of $\sigma$ over $s$ for $n$ shots, relative half-width | 1 | 1 |
-| $\chi^2_{q,\nu}$ | Quantile of the chi-square distribution at probability $q$ | 1 | 1 |
-| $P$, $Q$ | Regularized lower and upper incomplete gamma functions | 1 | 1 |
-| $t$, $\theta$ | Student's t quantile and its angle $\arctan(t/\sqrt{\nu})$ | 1, no kind | 1, rad |
-| $r$, $b$ | Correlation of height with velocity, slope of height on velocity | 1, no kind | 1, m per m/s |
-| $L$, $D$ | Length in the target plane, distance from the muzzle to the target | mm | m |
-| $\alpha$ | Angle subtended at the muzzle | deg | rad |
+| Symbol                        | Meaning                                                                          | Stored unit | Unit in `core` |
+| ----------------------------- | -------------------------------------------------------------------------------- | ----------- | -------------- |
+| $n$                           | Shots not excluded                                                               | 1           | 1              |
+| $x_i, y_i$                    | Shot position in the target plane, $x$ right, $y$ up                             | mm          | m              |
+| $\bar x, \bar y$              | Centre of impact                                                                 | mm          | m              |
+| $x_a, y_a$                    | Point of aim                                                                     | mm          | m              |
+| $\Delta x, \Delta y$          | Centre minus point of aim                                                        | mm          | m              |
+| $S_{xx}, S_{yy}, S_{xy}$      | Sums of squares and products about the centre                                    | no kind     | m²             |
+| $d_{ij}$                      | Distance between shots $i$ and $j$                                               | mm          | m              |
+| $\mathrm{ES}$, $W$, $H$       | Extreme spread, width, height                                                    | mm          | m              |
+| $r_i$, $\bar r$, $s_r$        | Radius of shot $i$, mean radius, standard deviation of the radii                 | mm          | m              |
+| $s_x, s_y, s_\mathrm{rad}$    | Standard deviations per axis and radial                                          | mm          | m              |
+| $\hat\sigma$, $\sigma$        | Estimated and population per-axis standard deviation of a circular normal spread | mm          | m              |
+| $\mathrm{CEP}$, $R$           | Circular error probable, circular and elliptical                                 | mm          | m              |
+| $C$, $c_{xx}, c_{xy}, c_{yy}$ | Sample covariance                                                                | no kind     | m²             |
+| $\lambda_1, \lambda_2$        | Principal variances, $\lambda_1 \ge \lambda_2 \ge 0$                             | no kind     | m²             |
+| $\theta$                      | Direction of the major axis from $+x$                                            | deg         | rad            |
+| $\beta$, $q$                  | Bearing of the aim offset clockwise from up, sector index                        | deg, 1      | rad, 1         |
+| $p$                           | Coverage of an ellipse                                                           | 1           | 1              |
+| $k$                           | Ellipse scale on the principal standard deviations                               | 1           | 1              |
+| $F_{2,m}(p)$                  | Quantile of the F distribution with 2 and $m$ degrees of freedom                 | 1           | 1              |
+| $1 - \alpha$                  | Two-sided confidence level, default 0.95                                         | 1           | 1              |
+| $\nu$                         | Degrees of freedom                                                               | 1           | 1              |
+| $v_i$, $\bar v$, $s$          | Velocity of shot $i$ of a string, mean, standard deviation                       | m/s         | m/s            |
+| $l_n$, $u_n$, $w$             | Limits of the interval of $\sigma$ over $s$ for $n$ shots, relative half-width   | 1           | 1              |
+| $\chi^2_{q,\nu}$              | Quantile of the chi-square distribution at probability $q$                       | 1           | 1              |
+| $P$, $Q$                      | Regularized lower and upper incomplete gamma functions                           | 1           | 1              |
+| $t$, $\theta$                 | Student's t quantile and its angle $\arctan(t/\sqrt{\nu})$                       | 1, no kind  | 1, rad         |
+| $r$, $b$                      | Correlation of height with velocity, slope of height on velocity                 | 1, no kind  | 1, m per m/s   |
+| $L$, $D$                      | Length in the target plane, distance from the muzzle to the target               | mm          | m              |
+| $\alpha$                      | Angle subtended at the muzzle                                                    | deg         | rad            |
 
 ## Assumptions
 

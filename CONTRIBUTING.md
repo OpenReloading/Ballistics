@@ -6,8 +6,8 @@ Where questions, ideas, bugs and record requests go: [README](README.md#communit
 
 - Node 26 (`.nvmrc`) and pnpm 12 next to it (`npm install --global pnpm@12.16.1`, the version of `.github/pnpm/package.json`; the scripts in `tools/` look for pnpm in Node's folder, not on the `PATH`), or the dev container in `.devcontainer/` (Node 26, Playwright Chromium, oasdiff, Schemathesis). The dev container runs with rootless podman only (`userns_mode: keep-id` in `.devcontainer/compose.yaml`, which Docker Engine does not accept).
 - `pnpm install`, then `pnpm run build` (workspaces import each other's `dist/`).
-- `pnpm install` also installs a pre-commit hook (`hooks/install.mjs`, shared by every git worktree). It runs Biome with the rules of `pnpm run lint` on the staged files and refuses the commit on a finding; `pnpm run format` applies the safe fixes. It runs no tests or type checks.
-  - The hook runs the checkout's `node_modules/.bin/biome`. With `pnpm install` run in the dev container on a Linux host, the container need not be running. Where that binary does not run on the host (another operating system, no `pnpm install` yet), the hook says so and the commit goes on unchecked: run `devcontainer exec --workspace-folder . pnpm run lint` before the pull request.
+- `pnpm install` also installs a pre-commit hook (`hooks/install.mjs`, shared by every git worktree). It runs Oxlint and Biome with the rules of `pnpm run lint` on the staged files and refuses the commit on a finding; `pnpm run format` applies the safe fixes. It runs no tests or type checks.
+  - The hook runs the checkout's `node_modules/.bin/oxlint` and `node_modules/.bin/biome`. With `pnpm install` run in the dev container on a Linux host, the container need not be running. Where those binaries do not run on the host (another operating system, no `pnpm install` yet), the hook says so and the commit goes on unchecked: run `devcontainer exec --workspace-folder . pnpm run lint` before the pull request.
   - An own `core.hooksPath` or an existing `pre-commit` hook is left alone. The hook is not installed in CI.
 
 ## Before a pull request

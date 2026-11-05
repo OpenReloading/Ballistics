@@ -44,6 +44,7 @@ export function ResultNotes({ ok }: { ok: Extract<Outcome, { kind: 'ok' }> }) {
         {first &&
           `${tn(notes.length, '{count} result note', '{count} result notes')}: ${t(noteLooks[first.kind].word)}: ${first.line}`}
       </p>
+      {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- a list that scrolls takes focus, so the keyboard can scroll it */}
       <ul ref={ref} tabIndex={scrolls ? 0 : undefined} aria-label={t('Result notes')}>
         {notes.length === 0 && (
           <li className="result-notes-none">{t('No notes for this result.')}</li>

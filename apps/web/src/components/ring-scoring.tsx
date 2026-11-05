@@ -318,7 +318,7 @@ function RingMarks({ marks, frame, k }: { marks: FaceMark[]; frame: Frame; k: nu
   return marks.map((m, i) => {
     const p = targetToView(frame, m)
     return (
-      // biome-ignore lint/suspicious/noArrayIndexKey: marks keep their order
+      // oxlint-disable-next-line react/no-array-index-key -- marks keep their order
       <g key={i} className="ring-mark">
         <path d={`M${p.x - 5 * k} ${p.y}h${10 * k}M${p.x} ${p.y - 5 * k}v${10 * k}`} />
         <text x={p.x + 6 * k} y={p.y - 4 * k} fontSize={10 * k}>
@@ -359,7 +359,7 @@ function GroupRings({
       )}
       {shotLabels(frame, sheet.markerDiameter, g, r, k).map((b, i) => (
         <text
-          // biome-ignore lint/suspicious/noArrayIndexKey: shots keep their order
+          // oxlint-disable-next-line react/no-array-index-key -- shots keep their order
           key={i}
           className="shot-score"
           data-excluded={g.shots[i]?.excluded || undefined}
@@ -399,7 +399,6 @@ function FaceLayer({
 }) {
   const shown = sheet.groups.filter((g) => rings && g.face && (g.id === group?.id || still))
   return (
-    // biome-ignore lint/a11y/noAriaHiddenOnFocusable: an SVG group is not focusable; it only draws (the values are in the shots' names and the table)
     <g className="face-layer" aria-hidden="true">
       {shown.map((g) => {
         const r = scored(g.id)
@@ -784,19 +783,18 @@ export function useRingScoring({
   // a face that failed to load is asked again once the browser is back online
   const [retry, setRetry] = useState(0)
   useWindowEvent('online', () => setRetry((n) => n + 1))
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of the faces used or a retry
   useEffect(() => {
     for (const id of ids)
       fetchFace(id).then(
         (f) => setFaces((x) => (x[id] === f ? x : { ...x, [id]: f })),
         () => setFaces((x) => ({ ...x, [id]: 'error' })),
       )
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a change of the faces used or a retry
   }, [idKey, retry])
   useEffect(() => {
     if (tool !== 'rings') setMarks([])
   }, [tool])
   // another face (or group) has other rings: its ring choice and the marks so far go
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of the group or face only
   useEffect(() => {
     setRing(undefined)
     setMarks([])
@@ -813,10 +811,9 @@ export function useRingScoring({
   const mappings = data?.mappings ?? []
   const discipline = mappingOf(mappings, choice)?.discipline
   const own = data?.disciplines.find((d) => d.id === discipline)?.federation
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of the group only
   useEffect(() => setFederation(undefined), [group?.id])
   // a discipline of another federation (a face picked from all faces or found on the photo) shows its own
-  // biome-ignore lint/correctness/useExhaustiveDependencies: on a change of the discipline only
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- on a change of the discipline only
   useEffect(() => setFederation((f) => (f && own && f !== own ? undefined : f)), [discipline])
   const fed = federation ?? own ?? ''
   const choices = disciplineOptions(all, data, fed || undefined)

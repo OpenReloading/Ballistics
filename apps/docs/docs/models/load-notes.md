@@ -1,4 +1,5 @@
 ---
+
 title: Notes on a saved load
 description: The rules that point out, from a load's chronograph sessions, a change of lot, seating, mean velocity or round count worth a second look.
 ---
@@ -16,7 +17,6 @@ Sessions are ordered by date when every session has one, otherwise in the order 
 ## Rules
 
 Lot (powder, primer, case):
-
 - A lot that is not recorded in a session gets a note, also in the first session.
 - A lot that differs from the earlier session's, both recorded, gets a note. Lots are compared as typed, without leading and trailing spaces.
 
@@ -52,13 +52,13 @@ $n$ is the firearm's round count recorded in a session and $N$ the count the use
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $L$ | Seating length of the load in a session | mm | mm |
-| $\bar v$ | Mean muzzle velocity of the session's strings of the load | m/s | m/s |
-| $s$ | Sample standard deviation of those shots | m/s | m/s |
-| $n$ | Round count of the firearm at the session | 1 | 1 |
-| $N$ | Round count the user set on the firearm | 1 | 1 |
+| Symbol   | Meaning                                                   | Stored unit | Unit in `core` |
+| -------- | --------------------------------------------------------- | ----------- | -------------- |
+| $L$      | Seating length of the load in a session                   | mm          | mm             |
+| $\bar v$ | Mean muzzle velocity of the session's strings of the load | m/s         | m/s            |
+| $s$      | Sample standard deviation of those shots                  | m/s         | m/s            |
+| $n$      | Round count of the firearm at the session                 | 1           | 1              |
+| $N$      | Round count the user set on the firearm                   | 1           | 1              |
 
 ## Dismissing a note
 

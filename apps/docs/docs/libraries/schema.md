@@ -1,4 +1,5 @@
 ---
+
 title: '@open-reloading/schema'
 sidebar_label: schema
 description: Zod schemas, types and stored units of every record kind.
@@ -18,9 +19,9 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 ## Entry points
 
-| Import | Contents |
-|---|---|
-| `@open-reloading/schema` | Every schema, type and unit helper |
+| Import                                 | Contents                                                                                                                                      |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@open-reloading/schema`               | Every schema, type and unit helper                                                                                                            |
 | `@open-reloading/schema/json-schema/*` | The JSON Schema (draft 2020-12) of each record kind and file, written from its Zod schema: `<name>.schema.json`, such as `bullet.schema.json` |
 
 The JSON Schemas are part of the published contract: a change to them follows the [versioning rules](../release.md#versions) of the package.

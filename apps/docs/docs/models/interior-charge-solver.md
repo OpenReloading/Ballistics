@@ -1,4 +1,5 @@
 ---
+
 title: Charge for a target value
 description: The charge at which one M3 interior run reaches a target peak pressure, muzzle velocity, load ratio, barrel time or bullet lead time, found by a log scan and a bracketed root find.
 ---
@@ -6,7 +7,6 @@ description: The charge at which one M3 interior run reaches a target peak press
 # Charge for a target value
 
 `solveCharge` finds the charge at which one [M3](interior-m3.md) run reaches a target value of one quantity: peak breech pressure, muzzle velocity, load ratio, barrel time or bullet lead time.
-
 1. A scan over the charges the case allows brackets the target.
 2. A bracketed root find runs `interior` at candidate charges until the run's value lies within a relative tolerance of the target.
 
@@ -81,17 +81,17 @@ The target value must be above 0, and the load ratio target needs a bulk density
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $m_c$, $m_i$, $m_\text{max}$ | Charge mass, scanned charge, highest charge | g | kg |
-| $a$, $b$, $c$ | Bracket ends and candidate charge | g | kg |
-| $V_c$ | Chamber volume behind the seated bullet | no kind | m3 |
-| $\rho_s$ | Solid density of the propellant | g/cm3 | kg/m3 |
-| $\rho_b$ | Bulk density of the propellant | g/cm3 | kg/m3 |
-| $\eta$ | Covolume | m3/kg | m3/kg |
-| $L$ | Load ratio | 1 | 1 |
-| $t_\text{muzzle}$, $t_{10}$, $t_\text{lead}$ | Muzzle time, time of 10 % peak pressure, bullet lead time | no kind | s |
-| $y$, $y^\ast$, $f$ | Target quantity of a run, target value, their difference | as the quantity | Pa, m/s, 1 or s |
+| Symbol                                       | Meaning                                                   | Stored unit     | Unit in `core`  |
+| -------------------------------------------- | --------------------------------------------------------- | --------------- | --------------- |
+| $m_c$, $m_i$, $m_\text{max}$                 | Charge mass, scanned charge, highest charge               | g               | kg              |
+| $a$, $b$, $c$                                | Bracket ends and candidate charge                         | g               | kg              |
+| $V_c$                                        | Chamber volume behind the seated bullet                   | no kind         | m3              |
+| $\rho_s$                                     | Solid density of the propellant                           | g/cm3           | kg/m3           |
+| $\rho_b$                                     | Bulk density of the propellant                            | g/cm3           | kg/m3           |
+| $\eta$                                       | Covolume                                                  | m3/kg           | m3/kg           |
+| $L$                                          | Load ratio                                                | 1               | 1               |
+| $t_\text{muzzle}$, $t_{10}$, $t_\text{lead}$ | Muzzle time, time of 10 % peak pressure, bullet lead time | no kind         | s               |
+| $y$, $y^\ast$, $f$                           | Target quantity of a run, target value, their difference  | as the quantity | Pa, m/s, 1 or s |
 
 ## Assumptions
 

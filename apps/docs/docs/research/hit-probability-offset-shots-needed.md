@@ -1,4 +1,5 @@
 ---
+
 title: Hit probability with a point-of-impact offset and shots needed
 description: Whether an optional offset of the group centre in the zone integral matches a seeded Monte Carlo within 0.5 percentage points, and whether the shots needed for a wanted chance of a hit follow from the single-shot probability.
 ---
@@ -29,13 +30,13 @@ Monte Carlo against the integral: the largest difference over the 42 cases is 0.
 
 Interior maximum. A zone of radius $R$, offset $d$, the probability against $\sigma/R$ (scan step 0.05):
 
-| $d/R$ | Maximum | At $\sigma/R$ | Probability at $\sigma/R$ = 0.25, 1, 4 |
-| --- | --- | --- | --- |
-| 0.5 | 1 (tends to 1 as $\sigma \to 0$) | none | 0.966, 0.357, 0.031 |
-| 1 | 0.49 at the lowest $\sigma$ scanned (tends to 0.5) | none | 0.450, 0.267, 0.030 |
-| 1.5 | 0.166 | 0.90 | 0.018, 0.164, 0.029 |
-| 2 | 0.092 | 1.30 | 0.000, 0.082, 0.027 |
-| 3 | 0.041 | 2.05 | 0.000, 0.011, 0.023 |
+| $d/R$ | Maximum                                            | At $\sigma/R$ | Probability at $\sigma/R$ = 0.25, 1, 4 |
+| ----- | -------------------------------------------------- | ------------- | -------------------------------------- |
+| 0.5   | 1 (tends to 1 as $\sigma \to 0$)                   | none          | 0.966, 0.357, 0.031                    |
+| 1     | 0.49 at the lowest $\sigma$ scanned (tends to 0.5) | none          | 0.450, 0.267, 0.030                    |
+| 1.5   | 0.166                                              | 0.90          | 0.018, 0.164, 0.029                    |
+| 2     | 0.092                                              | 1.30          | 0.000, 0.082, 0.027                    |
+| 3     | 0.041                                              | 2.05          | 0.000, 0.011, 0.023                    |
 
 For $d > R$ a tighter group lowers the probability below the maximum; for $d \le R$ it only rises with a smaller $\sigma$.
 

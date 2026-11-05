@@ -157,7 +157,7 @@ export function DataCard({
                   .filter(Boolean)
                   .join(', ')
                 return (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: mounts have no id and keep their order
+                  // oxlint-disable-next-line react/no-array-index-key -- mounts have no id and keep their order
                   <Table.Tr key={k}>
                     <Table.Td>{opticName(m.optic)}</Table.Td>
                     <Table.Td>{opt(siOf('length', m.sightHeight), 'length')}</Table.Td>

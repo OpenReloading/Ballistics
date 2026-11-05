@@ -1,6 +1,7 @@
 import type { Icon } from '@phosphor-icons/react'
 import type { ReactNode } from 'react'
 import { presetUnits } from '../lib/units.ts'
+// oxlint-disable-next-line import/no-cycle -- field-table imports Sized back; moving one of them breaks the cycle
 import { Noted } from './field-table.tsx'
 
 /** The two unit systems a value can show: a tolerance slot, a fact and a matrix cell fit the longer text, so a unit change moves nothing. */

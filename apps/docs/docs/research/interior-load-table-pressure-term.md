@@ -1,4 +1,5 @@
 ---
+
 title: Assumed peak pressure for powders fitted from velocities only
 description: Whether an assumed peak pressure at the maximum loads removes the pressure overshoot of load-table fits of powders without printed pressures, and what it costs in velocity.
 ---
@@ -14,7 +15,6 @@ Interior ballistics, load-table powder fit: can an assumed peak pressure at the 
 The overshoot was measured on 19457 maximum-load rows of the training and validation cartridges as the simulated peak breech pressure over the C.I.P. maximum pressure $p_\text{max}$ of the cartridge. Of 223 fitted powders, 85 have no printed pressure in their tables.
 
 Each powder was refitted on the training rows (vivacity and energy, the energy with a log-normal prior) with one added term per training maximum-load row:
-
 - (a) a pseudo-observation of the peak at $p_\text{max} - 50$ bar or at $0.9\, p_\text{max}$, relative sigma 10 %;
 - (b) a one-sided cap that only penalises a peak above $p_\text{max}$, sigma 10 % or 3 %.
 
@@ -35,12 +35,12 @@ Both join the velocity residuals of the weighted least-squares [powder fit](../m
 Before any variant, powders without printed pressure reach a median peak of 122.2 % of $p_\text{max}$ (77.6 % of rows above 100 %); the 123 powders with 20 or more pressure rows reach 93.1 %. The printed maximum-load pressures themselves are at a median 96.8 % of $p_\text{max}$ (P10 82.3 %, P90 106.1 %), and 27.2 % of them are above it. Along the direction the velocity rows leave free (median correlation of ln vivacity and ln energy 0.970) a step of 0.1 changes the velocity by about 0.5 % and the peak pressure by about 12 %.
 
 | Variant (14 powders, validation) | velocity median abs. error % | velocity mean error % | peak / $p_\text{max}$ median % | rows above 100 % | rows above 110 % | fitted / prior energy |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| without the term | 3.32 | -0.17 | 129.3 | 84.8 | 72.6 | 0.69 |
-| (a) $p_\text{max} - 50$ bar | 4.35 | -1.31 | 97.7 | 40.1 | 19.2 | 0.77 |
-| (a) $0.9\, p_\text{max}$ | 4.71 | -1.82 | 90.4 | 25.7 | 10.0 | 0.86 |
-| (b) cap, sigma 10 % | 4.51 | -1.65 | 92.7 | 32.2 | 14.4 | 0.83 |
-| (b) cap, sigma 3 % (11 powders) | 7.29 | -3.84 | 81.7 | 5.9 | 1.8 | 1.06 |
+| -------------------------------- | ---------------------------: | --------------------: | -----------------------------: | ---------------: | ---------------: | --------------------: |
+| without the term                 |                         3.32 |                 -0.17 |                          129.3 |             84.8 |             72.6 |                  0.69 |
+| (a) $p_\text{max} - 50$ bar      |                         4.35 |                 -1.31 |                           97.7 |             40.1 |             19.2 |                  0.77 |
+| (a) $0.9\, p_\text{max}$         |                         4.71 |                 -1.82 |                           90.4 |             25.7 |             10.0 |                  0.86 |
+| (b) cap, sigma 10 %              |                         4.51 |                 -1.65 |                           92.7 |             32.2 |             14.4 |                  0.83 |
+| (b) cap, sigma 3 % (11 powders)  |                         7.29 |                 -3.84 |                           81.7 |              5.9 |              1.8 |                  1.06 |
 
 On the 5 control powders the variants change the velocity median by -0.05 to +0.28 points; the cap with sigma 3 % raises it from 3.31 % to 3.59 %.
 

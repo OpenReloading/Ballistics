@@ -222,7 +222,7 @@ export function TargetDesigner() {
   const head = (cells: ReactNode[], row = 'face-row') => (
     <div className={`${row} face-head`} aria-hidden="true">
       {cells.map((c, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: fixed header cells
+        // oxlint-disable-next-line react/no-array-index-key -- fixed header cells
         <span key={i}>{c}</span>
       ))}
     </div>

@@ -1,4 +1,5 @@
 ---
+
 title: Truing from range strings
 description: Plan and fit of muzzle velocity, drag factor, click value and an optional zero offset from impacts, dialled corrections and chronograph readings, with identifiability statuses and intervals.
 ---
@@ -6,7 +7,6 @@ description: Plan and fit of muzzle velocity, drag factor, click value and an op
 # Truing from range strings
 
 A range string is a set of measurements at known distances: the mean impact above the line of sight at the zero setting, or the clicks dialled to centre the group, plus optional chronograph readings.
-
 - `fitTruingStrings` fits the muzzle velocity, a constant drag factor, the click value of the sight and, with `fitZeroOffset`, a zero offset, weighting every row by its stated uncertainty. A parameter the data cannot separate is named weak or unresolved, returns no value and keeps its nominal value in the reported model. Identified parameters get confidence intervals; a chi-square test checks the residuals.
 - `planTruingStrings` gives the statuses and standard errors of a planned string before any shot, and the refusals of its structure.
 - `comparePlanCandidates` does so for several candidate strings.
@@ -107,10 +107,10 @@ The limits are the options `maxInflation`, `maxRelativeStandardUncertainty` and 
 
 A plan carries `refusals`, each with a fixed `id` and an `advice` text, when the structure of the string rules out separating $v_0$ from $k$:
 
-| `id` | Condition | Advice |
-| --- | --- | --- |
-| `single-range` | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings together with an impact entry. These may not separate every parameter (dial entries alone leave the click value in the fit, a zero offset needs more observations); the statuses show what is still open. |
-| `velocity-only` | A chronograph and no impact or dial entry | Add an impact entry at a distance, or dial entries at two distances. The statuses show what is still open. |
+| `id`            | Condition                                                      | Advice                                                                                                                                                                                                                                                               |
+| --------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `single-range`  | Impact and dial entries all at one slant range, no chronograph | Add an entry at a second distance, or chronograph readings together with an impact entry. These may not separate every parameter (dial entries alone leave the click value in the fit, a zero offset needs more observations); the statuses show what is still open. |
+| `velocity-only` | A chronograph and no impact or dial entry                      | Add an impact entry at a distance, or dial entries at two distances. The statuses show what is still open.                                                                                                                                                           |
 
 Code: `packages/core/src/exterior/range-strings.ts`, `planRefusals`, `refusalAdvice`.
 
@@ -176,36 +176,35 @@ Code: `packages/core/src/exterior/range-strings.ts`, `stringsFitResult` (`chiSqu
 $K$ is the set of fitted parameters, $n$ the number of data rows. Prior rows are not counted. The level 0.99 is the option `residualConfidenceLevel`. The p-value is the upper tail of the chi-square distribution ([groups](groups.md)). Without degrees of freedom there is no check.
 
 The intervals are flagged as not to be relied on (`intervalsTrusted` false) when:
-
 - the check fails, or
 - an identified parameter was fitted while a weak or failed parameter with information was held at its nominal value (`conditionalOn`). A held parameter shifts the fitted ones by an amount the covariance does not contain, and the residual check does not see that shift.
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $v_0$, $v_{0,\text{nom}}$ | Muzzle velocity, nominal muzzle velocity | m/s | m/s |
-| $k$ | Drag factor on $C_D$ | 1 | 1 |
-| $c$, $c_\text{nom}$ | Click value (angle of one click), nominal click value | deg | rad |
-| $e$ | Zero offset | deg | rad |
-| $\theta_v$, $\theta_k$, $\theta_c$ | Log parameters | 1 | 1 |
-| $s_i$ | Slant range of row $i$, for the chronograph the distance from the muzzle | mm | m |
-| $y_i$, $\hat y_i$ | Measured and predicted mean impact above the line of sight at the zero setting | mm | m |
-| $n_i$, $\hat n_i$ | Measured and predicted clicks from the zero setting to centre the group, positive up | 1 | 1 |
-| $\bar v$, $\hat v_i$ | Measured mean and predicted chronograph speed | m/s | m/s |
-| $h$, $\alpha$, $v$ | Height above the line of sight, elevation hold, ground speed of the trajectory | mm, deg, m/s | m, rad, m/s |
-| $m_i$ | Shots behind the mean of row $i$ | 1 | 1 |
-| $\sigma_{1,i}$ | Standard deviation of one shot | unit of the row | unit of the row |
-| $w_i$ | Step of the reading | unit of the row | unit of the row |
-| $\sigma_i$ | Standard uncertainty of row $i$ | unit of the row | unit of the row |
-| $\delta$ | Standard deviation of one shot's vertical angle (plan) | deg | rad |
-| $J$ | Weighted Jacobian | no kind | 1 over the unit of the parameter |
-| $\mathrm{VIF}_j$ | Variance inflation factor | 1 | 1 |
-| $\sigma_\theta$, $\sigma_e$ | Standard error of a log parameter, of the zero offset | 1, deg | 1, rad |
-| $s_j$ | Standard deviation of a prior | 1 (zero offset: deg) | 1 (zero offset: rad) |
-| $C_\text{post}$ | Posterior covariance | no kind | 1 |
-| $t$, $z$, $u$ | Quantile, normal quantile, interval scale | 1 | 1 |
-| $\chi^2$, $\nu$ | Sum of squared standardized residuals, degrees of freedom | 1 | 1 |
+| Symbol                             | Meaning                                                                              | Stored unit          | Unit in `core`                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------ | -------------------- | -------------------------------- |
+| $v_0$, $v_{0,\text{nom}}$          | Muzzle velocity, nominal muzzle velocity                                             | m/s                  | m/s                              |
+| $k$                                | Drag factor on $C_D$                                                                 | 1                    | 1                                |
+| $c$, $c_\text{nom}$                | Click value (angle of one click), nominal click value                                | deg                  | rad                              |
+| $e$                                | Zero offset                                                                          | deg                  | rad                              |
+| $\theta_v$, $\theta_k$, $\theta_c$ | Log parameters                                                                       | 1                    | 1                                |
+| $s_i$                              | Slant range of row $i$, for the chronograph the distance from the muzzle             | mm                   | m                                |
+| $y_i$, $\hat y_i$                  | Measured and predicted mean impact above the line of sight at the zero setting       | mm                   | m                                |
+| $n_i$, $\hat n_i$                  | Measured and predicted clicks from the zero setting to centre the group, positive up | 1                    | 1                                |
+| $\bar v$, $\hat v_i$               | Measured mean and predicted chronograph speed                                        | m/s                  | m/s                              |
+| $h$, $\alpha$, $v$                 | Height above the line of sight, elevation hold, ground speed of the trajectory       | mm, deg, m/s         | m, rad, m/s                      |
+| $m_i$                              | Shots behind the mean of row $i$                                                     | 1                    | 1                                |
+| $\sigma_{1,i}$                     | Standard deviation of one shot                                                       | unit of the row      | unit of the row                  |
+| $w_i$                              | Step of the reading                                                                  | unit of the row      | unit of the row                  |
+| $\sigma_i$                         | Standard uncertainty of row $i$                                                      | unit of the row      | unit of the row                  |
+| $\delta$                           | Standard deviation of one shot's vertical angle (plan)                               | deg                  | rad                              |
+| $J$                                | Weighted Jacobian                                                                    | no kind              | 1 over the unit of the parameter |
+| $\mathrm{VIF}_j$                   | Variance inflation factor                                                            | 1                    | 1                                |
+| $\sigma_\theta$, $\sigma_e$        | Standard error of a log parameter, of the zero offset                                | 1, deg               | 1, rad                           |
+| $s_j$                              | Standard deviation of a prior                                                        | 1 (zero offset: deg) | 1 (zero offset: rad)             |
+| $C_\text{post}$                    | Posterior covariance                                                                 | no kind              | 1                                |
+| $t$, $z$, $u$                      | Quantile, normal quantile, interval scale                                            | 1                    | 1                                |
+| $\chi^2$, $\nu$                    | Sum of squared standardized residuals, degrees of freedom                            | 1                    | 1                                |
 
 ## Assumptions
 

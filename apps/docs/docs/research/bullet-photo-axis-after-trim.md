@@ -1,4 +1,5 @@
 ---
+
 title: The axis after a trimmed shadow in a bullet photograph
 description: Whether fitting the axis again after a shadow past the base is trimmed, and naming a base end softer on one side, keeps every shadow towards the base from going unnamed.
 ---
@@ -22,12 +23,12 @@ As in [a shadow past the base](./bullet-photo-shadow-past-base.md): $i_l$, $i_r$
 
 ## Numbers
 
-| Render | #935 | This change |
-| --- | --- | --- |
+| Render                                                          | #935                                                 | This change                    |
+| --------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------ |
 | Pistol, 30 px/mm, shadow 1.2 mm towards the base, 0.9 mm across | 25.5 px long, axis 3.47 degrees off, no shadow named | the same outline, shadow named |
-| Pistol, 30 px/mm, 1.2 mm, 0.3 mm across (trimmed) | -2.7 px, axis 1.71 degrees off | +2.3 px, axis 0.58 degrees off |
-| Rifle, 30 px/mm, 0.6 mm, 0.3 mm across (trimmed) | +1.4 px, axis 0.20 degrees off | +1.0 px, axis 0.02 degrees off |
-| Rifle, 30 px/mm, 0.6 mm, 0.9 mm across (trimmed) | -0.1 px, axis 0.03 degrees off | -0.4 px, axis 0.16 degrees off |
+| Pistol, 30 px/mm, 1.2 mm, 0.3 mm across (trimmed)               | -2.7 px, axis 1.71 degrees off                       | +2.3 px, axis 0.58 degrees off |
+| Rifle, 30 px/mm, 0.6 mm, 0.3 mm across (trimmed)                | +1.4 px, axis 0.20 degrees off                       | +1.0 px, axis 0.02 degrees off |
+| Rifle, 30 px/mm, 0.6 mm, 0.9 mm across (trimmed)                | -0.1 px, axis 0.03 degrees off                       | -0.4 px, axis 0.16 degrees off |
 
 On all 24 renders the length is within 1 % or 3 u, or a shadow is named, before and after; before, one render (the first row) met the rule only because the scale from its widened diameter shortened its 25 px of overhang. The 240 clean renders give the same outlines before and after and name no shadow. The catalogue evaluation keeps every column of A to H but one: in F (every photograph with a drop shadow) the photographs with a warning go from 31 to 32 of 32; the new note is on a bullet that read 0.32 mm (3 %) long without one.
 

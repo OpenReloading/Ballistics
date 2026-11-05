@@ -40,12 +40,12 @@ export function PropertyGrid({
   const [focused, setFocused] = useState<Element>()
   const [help, setHelp] = useState<string>()
   // after each commit: an edit changes the focused field's state, so its description
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- runs after every commit by design; the state changes only when the text does
   useLayoutEffect(() => {
     const text = focused && helpOf(focused)
     if (text !== help) setHelp(text)
   })
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: follows the focus of the fields inside, takes none itself
     <div
       className="prop-form page-panel"
       onFocus={(e: FocusEvent) => setFocused(e.target)}

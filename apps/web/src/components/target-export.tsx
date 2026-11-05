@@ -63,7 +63,7 @@ export function StatsBlock({
       />
       <text className="note-text" x={x + pad} y={y + pad} fontSize={font}>
         {lines.map((l, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: lines keep their order
+          // oxlint-disable-next-line react/no-array-index-key -- lines keep their order
           <tspan key={i} x={x + pad} dy={i === 0 ? font : 1.25 * font} fill={l.colour}>
             {l.text}
           </tspan>

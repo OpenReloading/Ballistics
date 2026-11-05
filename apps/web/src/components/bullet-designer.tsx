@@ -589,7 +589,6 @@ export function BulletDesigner() {
   return (
     <>
       <PageBar translated title={msg('Bullet designer')} fold={toolbar} actions={actions} />
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: follows focus and hover of the fields inside, takes none itself */}
       <div
         ref={root}
         className="designer"
