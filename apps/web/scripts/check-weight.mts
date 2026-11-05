@@ -4,7 +4,7 @@
  * headroom left under the budget (to $GITHUB_STEP_SUMMARY too, when set). A route with less than
  * `nearShare` of its budget left gets a warning line, which does not fail the check.
  *
- * Read from `.next` after the export build (`npm run static:build`, which leaves it in
+ * Read from `.next` after the export build (`pnpm run static:build`, which leaves it in
  * place): the routes of `app-path-routes-manifest.json`,
  * for each its client reference manifest (client component chunks, `entryJSFiles`), the root main and polyfill
  * files of `build-manifest.json` and the `react-loadable-manifest.json` of the page (lazy `next/dynamic` chunks).
@@ -195,7 +195,7 @@ if (import.meta.main) {
   const budget = readJson(path.join(webRoot, 'weight-budget.json')) as Budget
   const next = path.join(webRoot, '.next')
   if (!existsSync(path.join(next, 'app-path-routes-manifest.json'))) {
-    console.error('check-weight: no build in .next, run `npm run static:build` first')
+    console.error('check-weight: no build in .next, run `pnpm run static:build` first')
     process.exit(1)
   }
   const measured = measure(next)

@@ -19,7 +19,7 @@ import { resolveRecord, type SourceIndex, sourceIndex } from './sources.ts'
 
 const repository = join(import.meta.dirname, '..', '..', '..')
 
-/** The options of `npm run loads:merge`. */
+/** The options of `pnpm run loads:merge`. */
 export type MergeOptions = {
   /** The folder that holds `loads/<cartridge>/<table>.json`. */
   incoming: string
@@ -258,7 +258,7 @@ export function reportLines(run: MergeRun, dryRun: boolean) {
   return lines
 }
 
-/** Runs `npm run loads:merge` with the command line `args`; returns the exit code. */
+/** Runs `pnpm run loads:merge` with the command line `args`; returns the exit code. */
 export function main(args: readonly string[], cwd: string, records: string) {
   const options = parseMergeArgs(args, cwd, records)
   if ('error' in options) {

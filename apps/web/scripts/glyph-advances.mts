@@ -2,7 +2,6 @@
 // (src/app/fonts/Inter-Regular.woff2) in em, measured with canvas measureText in Chromium, kerning
 // off as in the drawing CSS. Run after changing the font: node scripts/glyph-advances.mts
 import { readFileSync, writeFileSync } from 'node:fs'
-// biome-ignore lint/correctness/noUndeclaredDependencies: dev dependency of the e2e workspace, hoisted to the root
 import { chromium } from '@playwright/test'
 
 const font = new URL('../src/app/fonts/Inter-Regular.woff2', import.meta.url)

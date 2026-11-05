@@ -5,7 +5,7 @@
  * images of 1000, 500 and 250 px without a ruler, JPEG, a drop shadow, a tilt), measured with the
  * same steps as the tool's worker and compared with the drawing they were rendered from.
  *
- * Opt-in, it takes minutes: `BULLET_PHOTO_EVAL=<out.json> npx vitest run test/bullet-photo-catalogue.test.ts`
+ * Opt-in, it takes minutes: `BULLET_PHOTO_EVAL=<out.json> pnpm exec vitest run test/bullet-photo-catalogue.test.ts`
  * in `apps/web`, optionally with `BULLET_PHOTO_SCENARIO=<letter>` and `BULLET_PHOTO_PER_MAKER=<n>`.
  * It writes the summary per scenario and one row per photograph.
  */

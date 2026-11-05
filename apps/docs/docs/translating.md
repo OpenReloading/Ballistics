@@ -46,8 +46,8 @@ Surrounding spaces and the minus sign U+2212 are tolerated. An empty text is emp
 ## Find what is untranslated
 
 ```sh
-npm run i18n -w @open-reloading/web -- missing de   # English messages without a German text
-npm run i18n -w @open-reloading/web -- messages     # every message in the sources
+pnpm --filter @open-reloading/web run i18n missing de   # English messages without a German text
+pnpm --filter @open-reloading/web run i18n messages     # every message in the sources
 ```
 
 `missing` also lists catalogue keys that no message matches (a text that was reworded in the source) and then exits with 1. The test `apps/web/test/i18n-catalogue.test.ts` fails on such a key.
@@ -57,7 +57,7 @@ npm run i18n -w @open-reloading/web -- messages     # every message in the sourc
 1. Add the language to `languages` and `loaders` in `apps/web/src/i18n/language.ts`: its code (a BCP 47 language tag such as `fr`) and its own name (`Français`). `loaders` is typed over `languages`, so the build fails until both are there.
 2. Create `apps/web/src/i18n/<code>.json`: the English text as key and its translation as value, or for a plural the key `one|other` (the two English forms, as in the `tn` call) and an object of the plural forms of the language by CLDR category (`one` and `other` in English and German; `Intl.PluralRules('<code>').resolvedOptions().pluralCategories` lists a language's categories). A translation keeps the placeholders of its key.
 3. Run `missing <code>` until it lists nothing you want to translate.
-4. `npm test -w @open-reloading/web` checks every catalogue: no key without a message, equal placeholders, only categories of the language.
+4. `pnpm --filter @open-reloading/web test` checks every catalogue: no key without a message, equal placeholders, only categories of the language.
 
 The German catalogue follows the term table `apps/web/src/i18n/german-terms.json`. A verified or decided term is used as the table gives it. Another language has no table yet: add one with the same shape if the language needs one.
 

@@ -1,7 +1,7 @@
 /**
  * Study of the propellant-temperature term of the specific energy
  * (`apps/docs/docs/research/propellant-temperature-energy.md`). Synthetic loads and ladders only:
- * simulations, not load data. Run from the repository root, after `npm ci`:
+ * simulations, not load data. Run from the repository root, after `pnpm install`:
  *
  *   node packages/core/scripts/propellant-temperature-energy.mts
  *

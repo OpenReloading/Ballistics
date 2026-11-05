@@ -69,19 +69,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm run lint
-      - run: npm run build
-      - run: npm run typecheck
-      - run: npm run deps:check
-      - run: npm run knip
-      - run: npm run docs:check
-      - run: npm run data:validate
-      # `npm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile
+      - uses: ./.github/actions/pnpm
+      - run: pnpm run lint
+      - run: pnpm run build
+      - run: pnpm run typecheck
+      - run: pnpm run deps:check
+      - run: pnpm run knip
+      - run: pnpm run docs:check
+      - run: pnpm run data:validate
+      # `pnpm run api:check` in the dev container; the same oasdiff version as .devcontainer/Dockerfile
       - run: node tools/src/openapi.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -91,7 +87,7 @@ jobs:
       # licences of the production dependencies of the images and the generated list in NOTICE
       - run: node tools/src/licences.ts
 
-  # Together the groups are what the root `npm test` runs. The workspaces import each other's dist/, so each job builds.
+  # Together the groups are what the root `pnpm test` runs. The workspaces import each other's dist/, so each job builds.
   test:
     name: test (${{ matrix.name }})
     needs: changes
@@ -105,29 +101,25 @@ jobs:
       matrix:
         include:
           - name: drawing
-            workspaces: -w @open-reloading/drawing
+            workspaces: --filter @open-reloading/drawing
           - name: web
-            workspaces: -w @open-reloading/web
+            workspaces: --filter @open-reloading/web
           - name: packages
-            workspaces: -w @open-reloading/units -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/importers -w @open-reloading/data -w @open-reloading/api -w @open-reloading/cli -w @open-reloading/docs -w @open-reloading/tools
+            workspaces: --filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm run build
+      - uses: ./.github/actions/pnpm
+      - run: pnpm run build
       - run: |
-          # unquoted on purpose: the value is several `-w name` words
+          # unquoted on purpose: the value is several `--filter name` words
           # shellcheck disable=SC2086
-          npm test $WORKSPACES
+          pnpm --workspace-concurrency=1 $WORKSPACES run test
         env:
           WORKSPACES: ${{ matrix.workspaces }}
       - if: matrix.name == 'packages'
-        run: npm run test:unit -w @open-reloading/e2e
+        run: pnpm --filter @open-reloading/e2e run test:unit
 
   # Fails when a part failed or was cancelled; a skipped part (the plan) passes, as the old single job did when
   # skipped. Stays the name the ruleset requires. It also checks the relative links and anchors of the Markdown
@@ -197,7 +189,7 @@ jobs:
 
   # The API runs from its compose service, as shipped: Schemathesis checks it against its document and the load
   # file spec posts to it. The tests, the drawing baseline, the JavaScript budget and the prerender check run on the
-  # static export (`npm run pages -w @open-reloading/tools`, served at the site root by `pages-serve`), which holds
+  # static export (`pnpm --filter @open-reloading/tools run pages`, served at the site root by `pages-serve`), which holds
   # no API: the smoke spec compares its data files and its workbench with the API's answers.
   e2e:
     needs: changes
@@ -218,15 +210,10 @@ jobs:
           # the drawing contact sheet compares with the base commit
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - run: ../../node_modules/.bin/playwright install --with-deps chromium
-        working-directory: apps/e2e
+      - uses: ./.github/actions/pnpm
+      - run: pnpm --filter @open-reloading/e2e exec playwright install --with-deps chromium
       # the export build and the specs import the workspace packages from their dist/
-      - run: npm run build -w @open-reloading/schema && npm run build -w @open-reloading/importers && npm run build -w @open-reloading/core && npm run build -w @open-reloading/drawing && npm run build -w @open-reloading/data && npm run build -w @open-reloading/api
+      - run: pnpm --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/core --filter @open-reloading/drawing --filter @open-reloading/data --filter @open-reloading/api run build
       - run: docker compose up --detach --build api
       - name: Wait for the API
         run: |
@@ -236,7 +223,7 @@ jobs:
           done
           docker compose logs
           exit 1
-      # `npm run api:conformance` in the dev container; the same Schemathesis version and checks
+      # `pnpm run api:conformance` in the dev container; the same Schemathesis version and checks
       - name: API conformance to its document (Schemathesis)
         run: |
           TMPDIR="$RUNNER_TEMP" node tools/src/openapi.ts
@@ -257,34 +244,34 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: apps/web/.next/cache/turbopack
-          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'pnpm-lock.yaml', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
           restore-keys: |
-            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'apps/web/next.config.ts') }}-
+            ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'pnpm-lock.yaml', 'apps/web/next.config.ts') }}-
       # the export leaves .next to the cache and to the JavaScript budget; the docs site is no part of this job
       - name: Export the static site
         run: |
           if [ "$PRERENDER" = sample ]; then
-            npm run pages -w @open-reloading/tools -- --sample
+            pnpm --filter @open-reloading/tools run pages --sample
           else
-            npm run pages -w @open-reloading/tools -- --no-docs
+            pnpm --filter @open-reloading/tools run pages --no-docs
           fi
       - name: Save the Turbopack cache
         if: github.event_name == 'pull_request' && steps.cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: apps/web/.next/cache/turbopack
-          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'package-lock.json', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
+          key: ${{ steps.next.outputs.prefix }}-${{ hashFiles('.nvmrc', 'pnpm-lock.yaml', 'apps/web/next.config.ts') }}-${{ hashFiles('apps/web/src/**', 'packages/*/src/**') }}
       - name: JavaScript budget per route
-        run: npm run check-weight -w @open-reloading/web
+        run: pnpm --filter @open-reloading/web run check-weight
       - run: node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON apps/web/scripts/check-prerender.mts
       - name: Serve the export
         run: |
           node tools/src/pages-serve.ts &
           for _ in $(seq 1 30); do curl --silent --fail http://localhost:3003/ > /dev/null && exit 0; sleep 1; done
           exit 1
-      - run: npm run test:e2e
+      - run: pnpm run test:e2e
       - name: Drawing baseline in the Playwright image
-        run: npm run drawing-baseline -w @open-reloading/e2e
+        run: pnpm --filter @open-reloading/e2e run drawing-baseline
       - name: Paired contact sheet of the baseline drawings when drawing code changed
         id: sheet
         env:
@@ -306,7 +293,7 @@ jobs:
           }
           put before "$BASE"
           put after HEAD
-          npm run pair-sheets -w @open-reloading/e2e -- "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
+          pnpm --filter @open-reloading/e2e run pair-sheets "$PWD/sheet/before" "$PWD/sheet/after" "$PWD/sheet/out"
           echo "made=1" >> "$GITHUB_OUTPUT"
       - name: Keep the paired contact sheet for review
         if: steps.sheet.outputs.made == '1'

@@ -1,14 +1,17 @@
 /**
  * Licence policy of the production dependencies of the API image and the web app, read from
- * package-lock.json: fails on a package whose licence is not in `allow-licenses` of
- * .github/dependency-review-config.yml (the list the dependency review step reads) and not excepted
- * there by `allow-dependencies-licenses`, and on a package without a declared licence. Fails too
- * when the generated list of shipped packages in NOTICE differs. `--write` rewrites that list.
- * The licence table goes to the job summary.
+ * pnpm-lock.yaml and the licences pnpm reads from the installed packages: fails on a package whose
+ * licence is not in `allow-licenses` of .github/dependency-review-config.yml (the list the
+ * dependency review step reads) and not excepted there by `allow-dependencies-licenses`, and on a
+ * package without a declared licence. Fails too when the generated list of shipped packages in
+ * NOTICE differs. `--write` rewrites that list. The licence table goes to the job summary.
  */
+import { execFileSync } from 'node:child_process'
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { posix } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parse } from 'yaml'
+import { executable } from './executable.ts'
 
 /** The API image and the web app (its bundles ship in the static site): the workspaces whose production dependencies ship. */
 const images = ['packages/api', 'apps/web']
@@ -22,23 +25,27 @@ export const notShipped: Record<string, string> = {
 const begin = 'BEGIN GENERATED: shipped packages'
 const end = 'END GENERATED: shipped packages'
 
-/** The parts of package-lock.json the check reads. */
+/** Dependencies by name: a version (with the peers it resolved, `1.0.0(react@19.0.0)`) or `link:` to a workspace. */
+type Dependencies = Record<string, string | { version: string }>
+
+interface Entry {
+  dependencies?: Dependencies
+  optionalDependencies?: Dependencies
+}
+
+/** The parts of pnpm-lock.yaml the check reads. */
 export interface Lock {
-  packages: Record<
+  importers: Record<string, Entry>
+  packages?: Record<
     string,
     {
-      version?: string
-      license?: unknown
-      link?: boolean
-      resolved?: string
       os?: string[]
       cpu?: string[]
       libc?: string[]
-      dependencies?: Record<string, string>
-      optionalDependencies?: Record<string, string>
-      peerDependencies?: Record<string, string>
+      peerDependenciesMeta?: Record<string, { optional?: boolean }>
     }
   >
+  snapshots?: Record<string, Entry>
 }
 
 /** One shipped package and the licence the lock declares for it. */
@@ -54,71 +61,86 @@ export interface Policy {
   excepted: Set<string>
 }
 
-const nameOf = (key: string) => key.slice(key.lastIndexOf('node_modules/') + 'node_modules/'.length)
+/** The licence of each installed package by `name@version`, as `pnpm licenses list --json` reads it. */
+export type Licences = Map<string, string | undefined>
 
-/** The lock key of `name` as seen from `from`: the nearest node_modules folder up the tree that has it. */
-function resolve(lock: Lock, from: string, name: string) {
-  for (let dir = from; ; ) {
-    const key = `${dir ? `${dir}/` : ''}node_modules/${name}`
-    if (key in lock.packages) return key
-    if (!dir) return
-    const up = dir.lastIndexOf('/node_modules/')
-    dir = up < 0 ? '' : dir.slice(0, up)
-  }
+/** A dependency to visit: its name, its version or `link:`, and the workspace a `link:` is relative to. */
+interface Step {
+  name: string
+  version: string
+  from: string
 }
-
-/** Whether an npm `os`, `cpu` or `libc` list rules `value` out: `!value` blocks it, a list of plain names must name it. */
-const excludes = (list: string[] | undefined, value: string) =>
-  list !== undefined &&
-  (list.includes(`!${value}`) || (list.some((c) => !c.startsWith('!')) && !list.includes(value)))
-
-/** A platform package that the API image and the static site (built on Linux, glibc, x64 or arm64) never contain. */
-const otherPlatform = (e: Lock['packages'][string]) =>
-  excludes(e.os, 'linux') ||
-  (excludes(e.cpu, 'x64') && excludes(e.cpu, 'arm64')) ||
-  excludes(e.libc, 'glibc')
 
 const id = (p: Shipped) => `${p.name}@${p.version}`
 
 const isNotShipped = (name: string) =>
   name in notShipped || name.replace(/\/.*/, '/*') in notShipped
 
-/** The lock keys of the dependencies of one lock entry, as installed beside it. */
-function dependenciesOf(lock: Lock, key: string) {
-  const entry = lock.packages[key]
-  if (!entry) return []
-  const names = [entry.dependencies, entry.optionalDependencies, entry.peerDependencies].flatMap(
-    (field) => Object.keys(field ?? {}),
-  )
-  return names.map((name) => resolve(lock, key, name)).filter((found) => found !== undefined)
+/** The production dependencies of a lock entry, without the peers `optional` names. */
+const stepsOf = (
+  entry: Entry = {},
+  from = '',
+  optional: Record<string, { optional?: boolean }> = {},
+) =>
+  Object.entries({ ...entry.dependencies, ...entry.optionalDependencies })
+    .filter(([name]) => !optional[name]?.optional)
+    .map(([name, v]): Step => ({ name, version: typeof v === 'string' ? v : v.version, from }))
+
+/**
+ * Every third-party package installed for the production dependencies of the shipped workspaces;
+ * an optional peer that the lock resolved from elsewhere in the workspace is not installed for it.
+ * shortcut: a platform package (`os`, `cpu` or `libc` in the lock) is left out, because which one
+ * is installed differs per machine; in these closures that is only the Next.js compiler, which the
+ * static export does not hold. Upgrade when the API image gains a native dependency.
+ */
+export function shippedPackages(
+  lock: Lock,
+  licences: Licences,
+  roots = images,
+  skip = isNotShipped,
+): Shipped[] {
+  const seen = new Set<string>()
+  const found = new Map<string, Shipped>()
+  const todo = roots.map((root): Step => ({ name: '', version: `link:${root}`, from: '' }))
+  for (let step = todo.pop(); step !== undefined; step = todo.pop()) {
+    const { name, version, from } = step
+    if (version.startsWith('link:')) {
+      const importer = posix.join(from, version.slice('link:'.length))
+      if (!seen.has(importer)) todo.push(...stepsOf(lock.importers[importer], importer))
+      seen.add(importer)
+      continue
+    }
+    const plain = version.replace(/\(.*$/, '')
+    const meta = lock.packages?.[`${name}@${plain}`]
+    if (seen.has(`${name}@${version}`) || skip(name) || meta?.os || meta?.cpu || meta?.libc)
+      continue
+    seen.add(`${name}@${version}`)
+    found.set(`${name}@${plain}`, {
+      name,
+      version: plain,
+      license: licences.get(`${name}@${plain}`),
+    })
+    todo.push(...stepsOf(lock.snapshots?.[`${name}@${version}`], '', meta?.peerDependenciesMeta))
+  }
+  // code-unit order, so the list does not depend on the ICU data of the running Node
+  return [...found.values()].sort((a, b) => (id(a) < id(b) ? -1 : 1))
 }
 
-/** Every third-party package installed for the production dependencies of the shipped workspaces. */
-export function shippedPackages(lock: Lock, roots = images, skip = isNotShipped): Shipped[] {
-  const seen = new Set<string>()
-  const todo = [...roots]
-  for (let key = todo.pop(); key !== undefined; key = todo.pop()) {
-    const entry = lock.packages[key]
-    if (!entry || seen.has(key)) continue
-    if (entry.link) {
-      if (entry.resolved) todo.push(entry.resolved)
-    } else if (!key.includes('node_modules/') || !(skip(nameOf(key)) || otherPlatform(entry))) {
-      seen.add(key)
-      todo.push(...dependenciesOf(lock, key))
-    }
-  }
-  const third = [...seen].filter((k) => k.includes('node_modules/'))
-  const list = third.map((key): Shipped => {
-    const { version = '', license } = lock.packages[key] ?? {}
-    return {
-      name: nameOf(key),
-      version,
-      license: typeof license === 'string' ? license : undefined,
-    }
-  })
-  const unique = new Map(list.map((p) => [`${p.name}@${p.version}`, p]))
-  // code-unit order, so the list does not depend on the ICU data of the running Node
-  return [...unique.values()].sort((a, b) => (id(a) < id(b) ? -1 : 1))
+/** The licences of the installed production dependencies of the shipped workspaces, read by pnpm. */
+export function installedLicences(root: string): Licences {
+  const filters = images.flatMap((dir) => ['--filter', `./${dir}`])
+  const listed = JSON.parse(
+    execFileSync(executable('pnpm'), [...filters, 'licenses', 'list', '--prod', '--json'], {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 64 << 20,
+    }),
+  ) as Record<string, { name: string; versions: string[]; license?: unknown }[]>
+  const licences: Licences = new Map()
+  for (const p of Object.values(listed).flat())
+    for (const v of p.versions)
+      licences.set(`${p.name}@${v}`, typeof p.license === 'string' ? p.license : undefined)
+  return licences
 }
 
 /** Whether an SPDX licence expression is met by `allowed` (OR: one side, AND: both, WITH: its licence). Throws when unreadable. */
@@ -206,7 +228,7 @@ export function noticeBlock(packages: Shipped[]) {
   return [
     begin,
     'Third-party packages installed for the API image and the web app, by name, version and the licence',
-    'package-lock.json declares. Written by `node tools/src/licences.ts --write`.',
+    'the package declares. Written by `node tools/src/licences.ts --write`.',
     '',
     ...rows,
     end,
@@ -247,9 +269,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const configPath = `${root}.github/dependency-review-config.yml`
   const noticePath = `${root}NOTICE`
   const configText = readFileSync(configPath, 'utf8')
-  const lock = JSON.parse(readFileSync(`${root}package-lock.json`, 'utf8')) as Lock
+  const lock = parse(readFileSync(`${root}pnpm-lock.yaml`, 'utf8')) as Lock
   const policy = readPolicy(configText)
-  const packages = shippedPackages(lock)
+  const packages = shippedPackages(lock, installedLicences(root))
   const found = [
     ...withoutReason(configText).map((l) => `no reason comment on: ${l.trim()}`),
     ...problems(packages, policy),

@@ -3,7 +3,7 @@
  * `api-baseline`) and Schemathesis (`api-conformance`). The destination is fixed in code, never
  * taken from an argument: `baseline` writes `packages/api/openapi.baseline.json`, no argument
  * writes `openapi.json` in the temporary directory (`TMPDIR`).
- * Needs `npm run build` at the root.
+ * Needs `pnpm run build` at the root.
  */
 import { writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'

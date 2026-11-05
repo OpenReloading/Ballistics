@@ -5,11 +5,7 @@
   "workspaces": {
     ".": {
       // read by the `webpackConfig` of .dependency-cruiser.cjs by path, not by import
-      "entry": [".dependency-cruiser-alias.cjs"],
-      "ignoreDependencies": [
-        // loaded by dependency-cruiser as its TypeScript parser, never imported
-        "@swc/core"
-      ]
+      "entry": [".dependency-cruiser-alias.cjs"]
     },
     "packages/units": {
       "entry": ["src/index.ts"]
@@ -57,7 +53,13 @@
       ],
       "ignoreDependencies": [
         // its stylesheet is imported by src/css/custom.css, which knip does not read
-        "katex"
+        "katex",
+        // imported by the examples of the library pages, which scripts/libraries.test.mts runs from this folder
+        "@open-reloading/core",
+        "@open-reloading/data",
+        "@open-reloading/drawing",
+        "@open-reloading/importers",
+        "@open-reloading/schema"
       ]
     },
     "apps/web": {

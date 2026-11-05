@@ -23,7 +23,7 @@ sidebar_position: 2
    - pushes the tags `X.Y.Z`, `X.Y` and `sha-<commit>` (the version of that component)
    - attests its build provenance (`gh attestation verify oci://ghcr.io/openreloading/ballistics-api:X.Y.Z -R OpenReloading/Ballistics`)
    - generates an SPDX SBOM of the image with Syft (a pinned container image, run on the saved image before the registry login), attests it for the pushed digest (`gh attestation verify oci://ghcr.io/openreloading/ballistics-api:X.Y.Z -R OpenReloading/Ballistics --predicate-type https://spdx.dev/Document/v2.3`), and the `sbom-release` job attaches it to the component's GitHub Release as `ballistics-api-X.Y.Z.spdx.json` (a job apart from the image build, so no step that runs image code holds `contents: write`)
-5. When `schema`, `core`, `drawing`, `importers` or `data` is released and the repository variable `NPM_PUBLISH` is `true`, the `publish` job builds those five libraries from the release commit and runs `npm publish` for each released one, `schema` first (`importers` and `data` depend on it). It uses npm trusted publishing (OIDC, `id-token: write`, npm 11.5.1 or later), so the repository holds no npm token, and npm records a provenance statement with each version. A version already on the registry is skipped, so a failed run can be re-run. While `NPM_PUBLISH` is unset the job does not run.
+5. When `schema`, `core`, `drawing`, `importers` or `data` is released and the repository variable `NPM_PUBLISH` is `true`, the `publish` job builds those five libraries from the release commit, packs each released one with `pnpm pack` (which writes the version of each `workspace:` dependency into the tarball) and publishes the tarball with `npm publish`, `schema` first (`importers` and `data` depend on it). It uses npm trusted publishing (OIDC, `id-token: write`, npm 11.5.1 or later), so the repository holds no npm token, and npm records a provenance statement with each version. A version already on the registry is skipped, so a failed run can be re-run. While `NPM_PUBLISH` is unset the job does not run.
 
 The release pull request is opened with the token of the organization's release GitHub App (`RELEASE_APP_CLIENT_ID`, `RELEASE_APP_PRIVATE_KEY`, [repository settings](ci-tools.md)). GitHub signs the App's API commits (`main` requires signed commits), and a pull request of the App starts its required checks without anyone approving them. Without the App (the variable is unset or the App is not installed on the repository) release-please falls back to the workflow token: the run says so in a warning, and the owner approves the pull request's workflow runs (Approve workflows to run on the pull request). It changes only versions and changelogs.
 
@@ -35,7 +35,7 @@ The web app's home page lists the newest five items of `apps/web/news/`, newest 
 
 `pages.yml` builds one site from two sources and deploys it in one deployment (a deployment replaces the whole site):
 
-- The root shows the latest release: the checkout of the newest GitHub Release's tag, built with `npm run pages:build`.
+- The root shows the latest release: the checkout of the newest GitHub Release's tag, built with `pnpm run pages:build`.
 - `/next/` shows `main`, built with `PAGES_EDITION=next` (`tools/src/pages.ts`).
 - Until the first release exists the root is a page that forwards to `/next/`.
 
@@ -45,28 +45,28 @@ Both editions share one origin, so the next edition keeps its data under other n
 
 ## Self-hosting
 
-- The web app is the static `pages/` folder that `npm run pages:build` writes (`PAGES_BASE_PATH` is the path the site is served under, empty for a site root). Any static host serves it: the calculations run in the browser, so there is no server process.
+- The web app is the static `pages/` folder that `pnpm run pages:build` writes (`PAGES_BASE_PATH` is the path the site is served under, empty for a site root). Any static host serves it: the calculations run in the browser, so there is no server process.
 - The REST API is the container image `ghcr.io/openreloading/ballistics-api`, one per `api` release (`docker run -p 3000:3000 ghcr.io/openreloading/ballistics-api:X.Y.Z`). `compose.yaml` builds the same image from the repository, next to the docs site.
 
 ## npm packages
 
-Publishing is off until the settings below exist, `npm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `npm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` and `core` depend on `@open-reloading/units`. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
+Publishing is off until the settings below exist, `pnpm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `pnpm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` and `core` depend on `@open-reloading/units`. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
 
-1. The npm organization `open-reloading` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand from a clean checkout of `main`: `npm ci && npm run build`, then `npm publish -w @open-reloading/<name>` for `schema`, `core`, `drawing`, `importers` and `data`, signed in with two-factor authentication. The `publish` job skips that version.
+1. The npm organization `open-reloading` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand from a clean checkout of `main`: `pnpm install && pnpm run build`, then `pnpm --filter @open-reloading/<name> publish` for `schema`, `core`, `drawing`, `importers` and `data`, signed in with two-factor authentication. The `publish` job skips that version.
 2. On npmjs.com, package Settings, Trusted Publisher, GitHub Actions: organization `OpenReloading`, repository `Ballistics`, workflow `release.yml`.
 3. Publishing access: "Require two-factor authentication and disallow tokens".
 
-`npm pack --dry-run -w @open-reloading/<name>` lists the package contents: `dist` without source maps and the license files (`data`: `LICENSE` for CC BY 4.0 and `LICENSE-MIT`), no sources, tests or records folder.
+`pnpm --filter @open-reloading/<name> pack --dry-run` lists the package contents: `dist` without source maps and the license files (`data`: `LICENSE` for CC BY 4.0 and `LICENSE-MIT`), no sources, tests or records folder.
 
 ## Contract baselines
 
-The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`npm test`, the CI `test` groups `packages` and `web`):
+The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`pnpm test`, the CI `test` groups `packages` and `web`):
 
 - The JSON Schemas the schema build writes: `packages/schema/test/golden/json-schema/`.
 - The export list (values and types) of each published package: `tools/test/golden/exports/<name>.txt`, one line per entry point and name.
 - A user data file with a record of each kind, which the current code must read and write back unchanged, and a share link of two of its records: `apps/web/test/golden/`.
 
-`npm run baselines` (after `npm run build`) rewrites the JSON Schemas, the export lists and the share link from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
+`pnpm run baselines` (after `pnpm run build`) rewrites the JSON Schemas, the export lists and the share link from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
 
 ## 1.0.0 release
 
@@ -76,6 +76,6 @@ Release notes paragraph, pasted into the release:
 
 ## API contract
 
-- `npm run api:check` compares the API document of the current routes with `packages/api/openapi.baseline.json` through `oasdiff breaking` and fails on any `ERR` finding. The CI `check` job writes the API document and runs the same oasdiff version in its container (`docker run`), not the npm script.
-- A breaking change passes only when the same pull request rewrites the baseline: `npm run api-baseline -w @open-reloading/tools`. The baseline diff then shows the break in review. From 1.0.0 on, the pull request title also marks it (`feat(api)!:`), so release-please raises the major version.
-- `npm run api:conformance` runs Schemathesis against the running API: no 5xx answer, and status codes, content types and response bodies as the document declares them. The CI `e2e` job runs the same Schemathesis version and checks in its container (`docker run`) against the compose stack, not the npm script.
+- `pnpm run api:check` compares the API document of the current routes with `packages/api/openapi.baseline.json` through `oasdiff breaking` and fails on any `ERR` finding. The CI `check` job writes the API document and runs the same oasdiff version in its container (`docker run`), not the npm script.
+- A breaking change passes only when the same pull request rewrites the baseline: `pnpm --filter @open-reloading/tools run api-baseline`. The baseline diff then shows the break in review. From 1.0.0 on, the pull request title also marks it (`feat(api)!:`), so release-please raises the major version.
+- `pnpm run api:conformance` runs Schemathesis against the running API: no 5xx answer, and status codes, content types and response bodies as the document declares them. The CI `e2e` job runs the same Schemathesis version and checks in its container (`docker run`) against the compose stack, not the npm script.

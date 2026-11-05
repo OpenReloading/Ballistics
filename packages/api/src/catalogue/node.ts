@@ -18,7 +18,7 @@ export function writeCatalogue(source: CatalogueSource, dir: string) {
 
 /**
  * Opens the catalogue from the files `writeCatalogue` wrote into `dir` (default: next to this
- * module, where `npm run build` puts them); without them, builds it from the data bundle.
+ * module, where `pnpm run build` puts them); without them, builds it from the data bundle.
  */
 export function loadCatalogue(dir = import.meta.dirname): Catalogue {
   const index = join(dir, catalogueFiles.index)

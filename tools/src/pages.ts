@@ -8,7 +8,7 @@
  * base path then, and its browser store (database, local storage keys, caches) has names of its own, because
  * both editions share one origin.
  * `PAGES_URL` (the site's origin) sets the docs' `url` and the app's `metadataBase`. Needs
- * `npm run build` at the root first.
+ * `pnpm run build` at the root first.
  * `--sample`: only the cartridge pages of `apps/web/src/lib/prerender-sample.ts` prerendered (the
  * data files stay complete) and no docs site, for the review and e2e loop.
  * `--no-docs`: no docs site, every record prerendered (the e2e job's full export).
@@ -37,27 +37,27 @@ const docs = !sample && !process.argv.includes('--no-docs')
 const at = (p: string) => fileURLToPath(new URL(`../../${p}`, import.meta.url))
 const site = at('pages')
 
-/** Runs npm without blocking this process: the build reads the API it serves. */
+/** Runs pnpm without blocking this process: the build reads the API it serves. */
 function run(args: string[], env: Record<string, string | undefined>) {
   return new Promise<void>((resolve, reject) => {
-    spawn(executable('npm'), args, {
+    spawn(executable('pnpm'), args, {
       cwd: at(''),
       env: { ...process.env, ...env },
       stdio: 'inherit',
     })
       .on('error', reject)
       .on('exit', (code) =>
-        code === 0 ? resolve() : reject(new Error(`npm ${args.join(' ')} failed`)),
+        code === 0 ? resolve() : reject(new Error(`pnpm ${args.join(' ')} failed`)),
       )
   })
 }
 
-// the data files of `npm run dev:static` would end in the export beside the ones written below
+// the data files of `pnpm run dev:static` would end in the export beside the ones written below
 rmSync(at('apps/web/public/api'), { recursive: true, force: true })
 const api = await startBundleApi()
 try {
   // never the inherited value: the dev container sets `sample`, which leaves record pages out of the export
-  await run(['run', 'build', '-w', '@open-reloading/web'], {
+  await run(['--filter', '@open-reloading/web', 'run', 'build'], {
     API_URL: api.url,
     PRERENDER: sample ? 'sample' : 'full',
     PAGES_BASE_PATH: base,
@@ -82,7 +82,7 @@ const docsEnv = {
 }
 if (docs)
   await run(
-    ['run', 'site:build', '-w', '@open-reloading/docs', '--', '--out-dir', `${site}/docs`],
+    ['--filter', '@open-reloading/docs', 'run', 'site:build', '--out-dir', `${site}/docs`],
     {
       ...docsEnv,
       ...(process.env.PAGES_URL && { DOCS_URL: process.env.PAGES_URL }),

@@ -1,0 +1,8 @@
+{
+  "name": "pnpm-ci",
+  "private": true,
+  "description": "The pnpm of the workflows, pinned with its lockfile; Dependabot updates it. Keep .devcontainer/Dockerfile equal.",
+  "dependencies": {
+    "pnpm": "12.16.1"
+  }
+}

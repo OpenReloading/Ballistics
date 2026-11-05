@@ -1,5 +1,5 @@
 /**
- * Checks that the export in `pages/` (`npm run pages:build`, `npm run static:build`) holds the page and
+ * Checks that the export in `pages/` (`pnpm run pages:build`, `pnpm run static:build`) holds the page and
  * the data file of the cartridge, bullet, powder, case, primer, target face, discipline and federation
  * lists and of every record whose data file the export holds. With PRERENDER=sample (the same value as
  * for the build) the cartridge records are those of `src/lib/prerender-sample.ts`. A record page must

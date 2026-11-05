@@ -6,9 +6,9 @@ import type { SpecValue } from '../../../web/src/lib/api-types.ts'
 import { gotoHydrated } from './nav.ts'
 
 // The pixels depend on the fonts: this runs only in the Playwright image of the installed
-// version, in CI and locally (npm run drawing-baseline); DRAWING_BASELINE=full shoots the full set
-// on demand (npm run drawing-baseline:full)
-test.skip(!process.env.DRAWING_BASELINE, 'runs in the Playwright image: npm run drawing-baseline')
+// version, in CI and locally (pnpm run drawing-baseline); DRAWING_BASELINE=full shoots the full set
+// on demand (pnpm run drawing-baseline:full)
+test.skip(!process.env.DRAWING_BASELINE, 'runs in the Playwright image: pnpm run drawing-baseline')
 const full = process.env.DRAWING_BASELINE === 'full'
 
 /**

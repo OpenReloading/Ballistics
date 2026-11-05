@@ -233,15 +233,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
+      # no lifecycle scripts: this job holds the OIDC publish token, and the libraries need none
+      - uses: ./.github/actions/pnpm
       # trusted publishing needs npm 11.5.1 or later (Node 22.14.0 or later)
       - run: '[ "$(printf ''%s\n11.5.1'' "$(npm --version)" | sort -V | head -n 1)" = 11.5.1 ]'
-      # no lifecycle scripts: this job holds the OIDC publish token, and the libraries need none
-      - run: npm ci --ignore-scripts
-      - run: npm run build -w @open-reloading/schema -w @open-reloading/core -w @open-reloading/drawing -w @open-reloading/importers -w @open-reloading/data
-      # in the order of LIBRARIES; a version that is already on the registry is skipped, so a failed run can be re-run
+      - run: pnpm --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/drawing --filter @open-reloading/importers --filter @open-reloading/data run build
+      # in the order of LIBRARIES; a version that is already on the registry is skipped, so a failed run can be re-run.
+      # pnpm packs (it writes the version of each `workspace:` dependency), npm publishes with provenance.
       - run: |
           for name in $(jq -r '.[]' <<< "$LIBRARIES"); do
             package="@open-reloading/$name"
@@ -250,5 +248,6 @@ jobs:
               echo "$package@$version is already published"
               continue
             fi
-            npm publish -w "$package" --provenance
+            pnpm --filter "$package" pack --pack-destination "$RUNNER_TEMP/$name"
+            npm publish "$RUNNER_TEMP/$name"/*.tgz --provenance
           done

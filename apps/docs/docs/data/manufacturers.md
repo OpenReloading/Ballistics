@@ -33,7 +33,7 @@ The id is the slug of the name without the legal form: "Demo Powder Co." becomes
 
 ## Validation
 
-`npm run data:validate` (`packages/data/src/references.ts`, `checkManufacturerReferences`) reports a powder, primer or bullet `manufacturer`, a case capacity `caseManufacturer`, a load table `manufacturer`, a chronograph session's `device.manufacturer` or a load's `bullet.manufacturer`, `powder.manufacturer` or `case.manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder, primer and bullet names are unique per manufacturer.
+`pnpm run data:validate` (`packages/data/src/references.ts`, `checkManufacturerReferences`) reports a powder, primer or bullet `manufacturer`, a case capacity `caseManufacturer`, a load table `manufacturer`, a chronograph session's `device.manufacturer` or a load's `bullet.manufacturer`, `powder.manufacturer` or `case.manufacturer` that names no manufacturer record. Names and aliases of manufacturers are unique. Powder, primer and bullet names are unique per manufacturer.
 
 ## API
 

@@ -1,6 +1,6 @@
 // Writes the REST reference page to static/rest/: the contract document of the current routes
 // (openapi.json), the Scalar viewer from node_modules (scalar.js) and the page that loads both.
-// Needs `npm run build` at the root (the API is imported from its dist). API_URL is the API whose
+// Needs `pnpm run build` at the root (the API is imported from its dist). API_URL is the API whose
 // own reference sends requests. Unset (no API, as on GitHub Pages): the page links to none.
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import { buildOpenApi } from '@open-reloading/api/openapi'

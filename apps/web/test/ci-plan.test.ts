@@ -113,7 +113,9 @@ it('prerenders every record when record data, page code or shared parts changed'
     'apps/web/src/components/record-page.tsx',
     'apps/web/src/lib/api.ts',
     'apps/web/next.config.ts',
-    'package-lock.json',
+    'pnpm-lock.yaml',
+    'pnpm-workspace.yaml',
+    '.github/pnpm/package-lock.json',
     '.github/workflows/ci.yml',
   ])
     expect(plan(['README.md', f], closure), f).toMatchObject({

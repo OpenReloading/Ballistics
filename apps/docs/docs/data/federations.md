@@ -127,7 +127,7 @@ A target with `photoSearch: false` is skipped by the photo target search. The us
 
 ## Validation
 
-`npm run data:validate` (`packages/data/src/federations.ts`, `checkFederations`) reports:
+`pnpm run data:validate` (`packages/data/src/federations.ts`, `checkFederations`) reports:
 
 - a discipline whose `federation` names no record
 - an `internationalFederation` or `internationalDiscipline` link to a record that is not of an international federation, or to no record

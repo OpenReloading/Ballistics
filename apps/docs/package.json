@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "check": "node check.mjs",
-    "site:build": "npm run site:openapi && npm run site:library && npm run site:research && docusaurus build",
+    "site:build": "pnpm run site:openapi && pnpm run site:library && pnpm run site:research && docusaurus build",
     "site:research": "node scripts/research-index.mts",
     "site:library": "typedoc",
     "site:openapi": "node scripts/openapi.mts",
@@ -16,6 +16,11 @@
     "@docusaurus/theme-common": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@docusaurus/types": "3.10.2",
+    "@open-reloading/core": "workspace:*",
+    "@open-reloading/data": "workspace:*",
+    "@open-reloading/drawing": "workspace:*",
+    "@open-reloading/importers": "workspace:*",
+    "@open-reloading/schema": "workspace:*",
     "typedoc": "^0.28.20",
     "typescript": "~6.0.0"
   },
@@ -24,15 +29,15 @@
     "@docusaurus/plugin-content-docs": "3.10.2",
     "@docusaurus/plugin-sitemap": "3.10.2",
     "@docusaurus/theme-classic": "3.10.2",
-    "@open-reloading/api": "0.0.5",
+    "@open-reloading/api": "workspace:*",
     "@scalar/api-reference": "1.75.1",
     "katex": "0.19.0",
     "pagefind": "1.5.2",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "rehype-katex": "7.0.1",
     "remark-math": "6.0.0",
-    "yaml": "^2.9.1"
+    "yaml": "catalog:"
   },
   "browserslist": {
     "production": [

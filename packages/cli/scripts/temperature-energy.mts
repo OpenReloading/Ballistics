@@ -3,7 +3,7 @@
  * (`apps/docs/docs/research/propellant-temperature-energy.md`), run by the owner on rows that are
  * not in the repository. It prints aggregates only: no record id, row, charge or temperature.
  *
- *   npm run build
+ *   pnpm run build
  *   node packages/cli/scripts/temperature-energy.mts --rows <rows.csv|folder> [--records <dir>]
  *
  * Rows are the CLI's (`apps/docs/docs/cli.md`, Rows) with `temperature_c` on every row. A ladder is

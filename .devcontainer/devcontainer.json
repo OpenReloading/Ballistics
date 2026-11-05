@@ -9,5 +9,5 @@
   "service": "app",
   "workspaceFolder": "${localWorkspaceFolder}",
   "forwardPorts": [3000, 3003],
-  "postCreateCommand": "npm ci && cd apps/e2e && npx playwright install --only-shell chromium"
+  "postCreateCommand": "pnpm install --frozen-lockfile && pnpm --filter @open-reloading/e2e exec playwright install --only-shell chromium"
 }

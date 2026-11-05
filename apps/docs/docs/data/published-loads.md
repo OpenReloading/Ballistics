@@ -82,7 +82,7 @@ The split of a row follows from its cartridge: the first byte of the SHA-256 of 
 A collector writes the loads of a table edition to a folder of its own, laid out like the records: `loads/<cartridge id>/<table>.json`, the loads in the order the table prints them. The merge sets the load ids and merges each file into `packages/data/records/loads/`:
 
 ```sh
-npm run loads:merge -w @open-reloading/data -- <incoming folder> [--accept <id>... | --accept-all] [--dry-run]
+pnpm --filter @open-reloading/data run loads:merge <incoming folder> [--accept <id>... | --accept-all] [--dry-run]
 ```
 
 The id of a load is the first 10 hex digits of the SHA-1 of its natural key: maker, cartridge, printed bullet text and bullet mass, COAL with its limit, printed powder, the set of charge kinds, barrel length and twist, and the marks of each charge. A figure counts by its `value` (its `raw` where it has none), so `55 gr` and `55 grs` are one key. Loads of equal key are counted in printed order: the first has the bare hash, the second `<hash>-2`, and so on. Edition, page, charge, velocity, pressure, primer and case are not in the key, so a newer edition finds its older load. An id the incoming file carries is replaced. Code: `loadId` and `mergePublishedLoads` in `packages/data/src/published-load-merge.ts`.
@@ -94,13 +94,13 @@ By load id, the merge:
 - lists a load with other content as changed, with the field paths that differ, and writes it only when its id follows `--accept` or with `--accept-all`;
 - keeps a load the incoming edition no longer prints and lists it as absent. A load is never deleted.
 
-The catalogue links are curated in the repository: `bullet.record`, `powder.record`, and the primer's `records`, `size` and `magnum`. A link the incoming load lacks is not a change and stays on the stored load; the primer's links stay only where both print the same primer. A link the incoming load sets otherwise is a change. Apart from the kept links, an accepted load replaces the stored one whole. A created or accepted load cites the incoming source, which is appended to `provenance.sources` where the file does not have it yet (a reference to a source record and the same source written out count as one). The other fields of a file in the repository stay as they are. The loads are written sorted by id, formatted the way `npm run format` formats the records, and a file the merge does not change is not written, so a second run of the same input changes no file and reports 0 created and 0 changed.
+The catalogue links are curated in the repository: `bullet.record`, `powder.record`, and the primer's `records`, `size` and `magnum`. A link the incoming load lacks is not a change and stays on the stored load; the primer's links stay only where both print the same primer. A link the incoming load sets otherwise is a change. Apart from the kept links, an accepted load replaces the stored one whole. A created or accepted load cites the incoming source, which is appended to `provenance.sources` where the file does not have it yet (a reference to a source record and the same source written out count as one). The other fields of a file in the repository stay as they are. The loads are written sorted by id, formatted the way `pnpm run format` formats the records, and a file the merge does not change is not written, so a second run of the same input changes no file and reports 0 created and 0 changed.
 
-The command prints per file and in total the created, changed (and how many not accepted), unchanged and absent loads. A file whose cartridge folder is no cartridge record is not written and is listed under "waiting for a cartridge record". When an incoming file fails the `publishedLoads` schema (its ids set, its source references resolved from `records/sources/`), nothing is merged and the command exits with 1. `--dry-run` reports and writes nothing. Run `npm run data:validate` after a merge.
+The command prints per file and in total the created, changed (and how many not accepted), unchanged and absent loads. A file whose cartridge folder is no cartridge record is not written and is listed under "waiting for a cartridge record". When an incoming file fails the `publishedLoads` schema (its ids set, its source references resolved from `records/sources/`), nothing is merged and the command exits with 1. `--dry-run` reports and writes nothing. Run `pnpm run data:validate` after a merge.
 
 ## Validation
 
-`npm run data:validate` reports:
+`pnpm run data:validate` reports:
 
 - a file whose cartridge is not its folder, names no cartridge record or a maker that is no manufacturer record, or whose name is not the maker's id (`<maker>-customer` for `producedBy: customer`);
 - a duplicate load id and loads that are not sorted by id;

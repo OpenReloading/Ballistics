@@ -1,0 +1,24 @@
+name: pnpm install
+description: Node from .nvmrc, the pnpm that .github/pnpm/package-lock.json pins, and the workspace installed without scripts.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: .nvmrc
+        # no package cache: the Pages job builds what is deployed (zizmor cache-poisoning), and a cache keyed on the
+        # lockfile would need pnpm before this step
+        package-manager-cache: false
+    # The repository's allowed-actions list has no pnpm action. The runner's native pnpm comes as an optional
+    # dependency of the pinned package, so no install script runs; it is linked next to node, on the PATH and where
+    # tools/src/executable.ts looks for it.
+    - name: pnpm (pinned by .github/pnpm/package-lock.json)
+      shell: bash
+      working-directory: .github/pnpm
+      run: |
+        npm ci --ignore-scripts --no-audit --no-fund
+        arch=$(printf '%s' "$RUNNER_ARCH" | tr '[:upper:]' '[:lower:]')
+        ln -s "$PWD/node_modules/@pnpm/exe.linux-$arch/pnpm" "$(dirname "$(command -v node)")/pnpm"
+        pnpm --version
+    - shell: bash
+      run: pnpm install --frozen-lockfile --ignore-scripts

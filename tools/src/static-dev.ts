@@ -3,7 +3,7 @@
  * static site (`writeStaticApi`) into the git-ignored `apps/web/public/api`, which the dev server
  * serves, and starts `next dev` at the site root (`PAGES_BASE_PATH=''`). Its server-side reads go
  * to the API over the catalogue of the data bundle, in this process for the length of the run:
- * there is no API to start. Port 3000, `PORT` for another. Needs `npm run build` at the root first.
+ * there is no API to start. Port 3000, `PORT` for another. Needs `pnpm run build` at the root first.
  */
 import { type ChildProcess, spawn } from 'node:child_process'
 import { rmSync } from 'node:fs'
@@ -23,7 +23,7 @@ try {
   rmSync(dataDir, { recursive: true, force: true })
   await writeStaticApi(api.data, dataDir)
   if (!stopped()) {
-    dev = spawn(executable('npm'), ['run', 'dev', '-w', '@open-reloading/web'], {
+    dev = spawn(executable('pnpm'), ['--filter', '@open-reloading/web', 'run', 'dev'], {
       cwd: at(''),
       // `full`: the inherited `sample` would leave records out of the generated routes
       env: {
@@ -35,7 +35,7 @@ try {
         NEXT_PUBLIC_NO_DOCS: '1',
       },
       stdio: 'inherit',
-      // a group of its own: npm does not pass a signal on to `next`, so the signal goes to the group
+      // a group of its own: pnpm may not pass a signal on to `next`, so the signal goes to the group
       detached: true,
     })
     await devExit(dev, stopped)

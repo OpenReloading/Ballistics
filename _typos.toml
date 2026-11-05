@@ -8,7 +8,8 @@ extend-exclude = [
   # records quote names, titles and units in the language of their source
   "packages/data/records/",
   # generated or copied byte for byte from a tool
-  "package-lock.json",
+  "pnpm-lock.yaml",
+  ".github/pnpm/package-lock.json",
   "*.snap",
   "**/*-snapshots/",
   "**/test/golden/",

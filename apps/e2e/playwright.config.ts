@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 import { safetyAck } from './tests/web/nav.ts'
 
 const webUrl = process.env.WEB_URL ?? 'http://localhost:3003'
-/** The Pages site (`npm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
+/** The Pages site (`pnpm run pages:serve`), with its base path and a trailing slash. Unset: no project `pages`. */
 const pagesUrl = process.env.PAGES_URL
 /** Set: projects `firefox` and `webkit` run the smoke spec against `WEB_URL`. */
 const allEngines = Boolean(process.env.ALL_ENGINES)
