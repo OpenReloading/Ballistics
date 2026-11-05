@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { expect, it } from 'vitest'
-import { importSpecifiers, plan, recordClosure } from '../scripts/ci-plan.mts'
+import { importSpecifiers, plan, recordClosure, testJobs } from '../scripts/ci-plan.mts'
 
 const closure = recordClosure()
 const script = new URL('../scripts/ci-plan.mts', import.meta.url).pathname
@@ -126,6 +126,64 @@ it('prerenders every record when record data, page code or shared parts changed'
     })
 })
 
+const packages =
+  '--filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
+
+it('tests every workspace of every group without a list of affected ones', () => {
+  expect(testJobs()).toEqual([
+    { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
+    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'packages', filter: packages, e2eUnit: true },
+  ])
+})
+
+it('tests the workspaces a change reaches and leaves out the groups it does not', () => {
+  // a change of units as pnpm selects it: units and every workspace that depends on it
+  const units = [
+    'units',
+    'web',
+    'cli',
+    'core',
+    'docs',
+    'api',
+    'tools',
+    'schema',
+    'data',
+    'importers',
+  ]
+  expect(plan(['packages/units/src/units.ts'], closure, units).tests).toEqual([
+    { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+    { name: 'packages', filter: packages, e2eUnit: false },
+  ])
+  expect(plan(['packages/drawing/src/index.ts'], closure, ['drawing', 'web', 'cli']).tests).toEqual(
+    [
+      { name: 'drawing', filter: '--filter @open-reloading/drawing', e2eUnit: false },
+      { name: 'web', filter: '--filter @open-reloading/web', e2eUnit: false },
+      { name: 'packages', filter: '--filter @open-reloading/cli', e2eUnit: false },
+    ],
+  )
+  expect(plan(['apps/e2e/tests/web/groups.spec.ts'], closure, ['e2e']).tests).toEqual([
+    { name: 'packages', filter: '', e2eUnit: true },
+  ])
+})
+
+it('tests every group for a change outside the workspaces, an unknown selection, and none for prose', () => {
+  for (const f of [
+    'pnpm-lock.yaml',
+    'package.json',
+    '.github/workflows/ci.yml',
+    'tsconfig.base.json',
+  ])
+    expect(plan(['packages/drawing/src/index.ts', f], closure, ['drawing']).tests, f).toEqual(
+      testJobs(),
+    )
+  expect(plan(['packages/drawing/src/index.ts'], closure).tests).toEqual(testJobs())
+  expect(plan(['apps/docs/docs/research/index.md'], closure, ['docs']).tests).toEqual(
+    testJobs(['docs']),
+  )
+  expect(plan(['CONTRIBUTING.md'], closure, []).tests).toEqual([])
+})
+
 it('falls back to a full build when the change list is empty', () => {
   expect(plan([], closure)).toMatchObject({ check: true, e2e: true, prerender: 'full' })
 })
@@ -137,7 +195,7 @@ const run = (env: Record<string, string>, ...args: string[]) =>
   }).toString()
 
 it('is full unless the event is a pull request with a base commit that exists', () => {
-  const full = 'check=true\ne2e=true\nprerender=full\n'
+  const full = `check=true\ne2e=true\nprerender=full\ntests=${JSON.stringify(testJobs())}\n`
   expect(run({ EVENT_NAME: 'push', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({ EVENT_NAME: 'release', BASE_SHA: 'HEAD' })).toBe(full)
   expect(run({})).toBe(full)
