@@ -1,4 +1,5 @@
 ---
+
 title: Engraving ramp in the bore-resistance law
 description: Whether an engraving pressure that falls over the bearing length lowers the held-out velocity error beyond bore friction scaled by bullet oversize.
 ---
@@ -25,11 +26,11 @@ $$
 
 ## Numbers
 
-| Variant (validation) | velocity median % | velocity P90 % | mean error % |
-| --- | ---: | ---: | ---: |
-| no resistance law | 3.44 | 9.79 | -1.99 |
-| friction with engraving fraction 0.89 | 3.29 | 9.38 | -1.96 |
-| friction without engraving | 3.33 | 9.28 | -1.58 |
+| Variant (validation)                  | velocity median % | velocity P90 % | mean error % |
+| ------------------------------------- | ----------------: | -------------: | -----------: |
+| no resistance law                     |              3.44 |           9.79 |        -1.99 |
+| friction with engraving fraction 0.89 |              3.29 |           9.38 |        -1.96 |
+| friction without engraving            |              3.33 |           9.28 |        -1.58 |
 
 Barrel-length error (median / P90, m/s): no resistance law 12.14 / 21.78; engraving fraction 0.85: 9.30 / 17.11; 0.89: 9.23 / 17.01; no engraving: 10.44 / 18.92.
 

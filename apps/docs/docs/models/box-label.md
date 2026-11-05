@@ -1,4 +1,5 @@
 ---
+
 title: Box label of a saved load
 description: The printed label for a box of loaded rounds, its values, its size and the text of its QR code, which names the load and nothing else.
 ---
@@ -10,7 +11,6 @@ The Saved loads drawer of the workbench prints a box label from a saved load (th
 ## What the label prints
 
 One label of 90 x 60 mm at the top left of an A4 page, with a dashed edge to cut along: the name across the top, the values left and the QR code right. In the language shown:
-
 - the load's name;
 - cartridge, bullet, powder and charge, primer;
 - the seating length as stored: COAL, or CBTO for a load seated by base to ogive (the other length is not derived);
@@ -28,11 +28,11 @@ Code: `apps/web/src/lib/box-label.ts` (`boxLabel`, `labelPayload`), `apps/web/sr
 OR1:L:<record id>
 ```
 
-| Part | Meaning |
-| --- | --- |
-| `OR` | This project's labels |
-| `1` | Format version of the text |
-| `L` | Kind of record: a saved load |
+| Part          | Meaning                                  |
+| ------------- | ---------------------------------------- |
+| `OR`          | This project's labels                    |
+| `1`           | Format version of the text               |
+| `L`           | Kind of record: a saved load             |
 | `<record id>` | The id of the load's user record, a UUID |
 
 The text names the load and holds none of its values, so a scan of an old label never disagrees with the load as it is stored now. A phone's own reader shows it as plain text: the label carries no web address, since the records stay on the device and the static site has no accounts.
@@ -42,7 +42,6 @@ A reader looks for `OR1:L:` anywhere in the scanned text, also inside a web addr
 ## Reading a label
 
 "Scan box label" in the Saved loads drawer and in the workbench's Ctrl+K search opens the reader. It offers three ways to a load:
-
 - a photo, taken or chosen from the library, read in this browser for its code; the photo is not uploaded or kept. It is read with its orientation applied, at most 1280 px on its long side, and once more at its middle half when no code is found;
 - the live camera, started by its button only: a few frames a second are read until a label is found; the camera stops on success, on error and when the dialog closes;
 - the text printed under the code, or the load's id alone, typed and confirmed with Enter.

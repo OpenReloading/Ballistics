@@ -1,4 +1,5 @@
 ---
+
 title: Burn law checks
 description: Pressure exponent, closed-vessel vivacity against the dynamic vivacity, an offset burn law and coated grains, checked against the vivacity burn law of the M3 interior model.
 ---
@@ -12,7 +13,6 @@ Interior ballistics, burn law: should the exponent stay at 1, does the dynamic v
 ## Method
 
 Four checks, accept rules fixed before the work:
-
 1. Exponent: on closed-vessel curves of one powder at four or more loading densities, the coefficient of variation of $\int \bar p^n\, dt$ for $n$ = 0.67, 0.8 and 1.0. A different $n$ is adopted only if its spread is clearly below that of $n = 1$.
 2. Definition: a conversion from $L_d(z)$ to the closed-vessel quantity $L$ must equal $\dot p / (\bar p\, p_\text{max})$ computed from a central difference of the Noble-Abel closed-vessel pressure, to $10^{-6}$ relative, for the demo powder at $D$ = 0.1, 0.2 and 0.3 and $z$ from 0.05 to 0.95 (both sides of the form's break at 0.8). If the factor between the two stays within 15 percent, the definition is only stated.
 3. Offset law: a low-charge velocity ladder fitted with the power law and with a rate proportional to $\bar p - P_1$; the offset law is kept only if $\chi^2$ falls by more than one added parameter is worth.
@@ -40,14 +40,13 @@ For a burn law $\dot z = B \varphi(z)\, \bar p^n$ with a fixed form function, th
 2. Definition: the conversion matches the numerical derivative to better than $10^{-6}$ relative at all three loading densities. The factor $(1 + \chi)/(1 + \chi z)^2$ for the demo powder ($\eta = 0.97 \cdot 10^{-3}$ m³/kg, $\rho_s = 1600$ kg/m³):
 
 | $D$ | $\chi$ | $z = 0$ | $z = 0.1$ | $z = 0.9$ | $z = 1$ |
-| --- | --- | --- | --- | --- | --- |
-| 0.1 | −0.061 | 0.94 | 0.95 | 1.05 | 1.07 |
-| 0.2 | −0.138 | 0.86 | 0.89 | 1.12 | 1.16 |
-| 0.3 | −0.237 | 0.76 | 0.80 | 1.23 | 1.31 |
-| 0.5 | −0.552 | 0.45 | 0.50 | 1.77 | 2.23 |
+| --- | ------ | ------- | --------- | --------- | ------- |
+| 0.1 | −0.061 | 0.94    | 0.95      | 1.05      | 1.07    |
+| 0.2 | −0.138 | 0.86    | 0.89      | 1.12      | 1.16    |
+| 0.3 | −0.237 | 0.76    | 0.80      | 1.23      | 1.31    |
+| 0.5 | −0.552 | 0.45    | 0.50      | 1.77      | 2.23    |
 
 The factor stays within 15 percent only at $D \le 0.1$ over the whole burn, and up to about $D = 0.2$ over $z$ = 0.1 to 0.9, the range of $\bar L_d$. Cartridge loading densities are near 0.5.
-
 3. Offset law: the velocity data holds no low-charge ladder of one powder in one rifle; load tables give a start and a maximum charge per load only. Not measured.
 4. Coated grains: the powder records hold no coating, only the grain form (`ball` among them). Not measured.
 

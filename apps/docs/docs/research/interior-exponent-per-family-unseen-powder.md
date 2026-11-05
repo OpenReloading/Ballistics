@@ -1,4 +1,5 @@
 ---
+
 title: Pressure exponent per powder family, leave one powder out
 description: Whether a per-family pressure exponent still lowers the held-out velocity error when the powder's own rows are left out of the choice, which families are too small, and the fallback.
 ---
@@ -27,25 +28,25 @@ The vivacity law of the [burn forms page](../models/interior-burn-forms.md): $\d
 
 Baseline is `ballistics verify` on the validation split: 10,498 used rows from 11 cartridges, pressure on 4,060 rows.
 
-| Candidate | Median velocity | P90 velocity | Median pressure | P90 pressure |
-| --- | --- | --- | --- | --- |
-| Baseline, exponent 1 | 3.32 % | 8.87 % | 14.95 % | 38.15 % |
-| Family exponent, every powder in the choice | 2.85 % | 7.20 % | 13.09 % | 33.68 % |
-| Family exponent, leave one powder out | 2.88 % | 7.24 % | 13.09 % | 33.88 % |
-| Baseline, powder not in the fitted set | 15.68 % | 61.74 % | 82.89 % | 486.58 % |
-| Powder not in the fitted set, family exponent | 13.36 % | 54.37 % | 78.44 % | 261.53 % |
+| Candidate                                     | Median velocity | P90 velocity | Median pressure | P90 pressure |
+| --------------------------------------------- | --------------- | ------------ | --------------- | ------------ |
+| Baseline, exponent 1                          | 3.32 %          | 8.87 %       | 14.95 %         | 38.15 %      |
+| Family exponent, every powder in the choice   | 2.85 %          | 7.20 %       | 13.09 %         | 33.68 %      |
+| Family exponent, leave one powder out         | 2.88 %          | 7.24 %       | 13.09 %         | 33.88 %      |
+| Baseline, powder not in the fitted set        | 15.68 %         | 61.74 %      | 82.89 %         | 486.58 %     |
+| Powder not in the fitted set, family exponent | 13.36 %         | 54.37 %      | 78.44 %         | 261.53 %     |
 
 Leave one powder out against the baseline: median -0.43 percentage points, twice the standard error of the change 0.33, P90 -1.63 percentage points, used rows unchanged, 0.11 % of 20,711 perturbed loads move the wrong way (baseline 0.13 %), every vivacity factor positive.
 
 Per family, median and P90 velocity error (families with fewer than 5 validation cartridges or one source table, 514 rows, merged into "other" and not reported):
 
-| Family | Rows | Baseline | Leave one powder out |
-| --- | --- | --- | --- |
-| Double base, ball | 3,328 | 3.88 %, 9.60 % | 3.15 %, 6.76 % |
-| Double base, extruded | 1,178 | 2.82 %, 7.58 % | 2.47 %, 6.71 % |
-| Single base, extruded | 3,727 | 3.04 %, 8.56 % | 2.83 %, 7.64 % |
-| Base not stated, extruded | 285 | 2.55 %, 6.06 % | 2.15 %, 5.63 % |
-| Base and form not stated | 1,466 | 2.98 %, 7.56 % | 2.68 %, 6.44 % |
+| Family                    | Rows  | Baseline       | Leave one powder out |
+| ------------------------- | ----- | -------------- | -------------------- |
+| Double base, ball         | 3,328 | 3.88 %, 9.60 % | 3.15 %, 6.76 %       |
+| Double base, extruded     | 1,178 | 2.82 %, 7.58 % | 2.47 %, 6.71 %       |
+| Single base, extruded     | 3,727 | 3.04 %, 8.56 % | 2.83 %, 7.64 %       |
+| Base not stated, extruded | 285   | 2.55 %, 6.06 % | 2.15 %, 5.63 %       |
+| Base and form not stated  | 1,466 | 2.98 %, 7.56 % | 2.68 %, 6.44 %       |
 
 Exponent choices: 17 of 223 powders get another exponent when their own rows are left out. The large families barely move (single base extruded: 8 of 67 powders from 0.9 to 0.8, the others none). Too small by the rule: double base flake (1 powder) and ball powders of unstated base (3 powders), 4 powders that take the pooled fallback of 0.8. Single base powders of unstated form (4 powders) pass the size rule, but their exponent ranges from 0.7 to 1.1 when one powder is left out.
 

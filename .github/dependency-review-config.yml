@@ -25,4 +25,3 @@ allow-dependencies-licenses:
   - pkg:npm/path-is-inside # (WTFPL OR MIT), read as AND
   - pkg:npm/unicode-match-property-value-ecmascript # MIT, read with LicenseRef-scancode-unicode
   - pkg:npm/uri-js # BSD-2-Clause, read with BSD-2-Clause-Views
-

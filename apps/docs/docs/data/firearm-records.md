@@ -1,4 +1,5 @@
 ---
+
 title: Firearm records
 description: Recommended record kinds for firearm manufacturers, models, variants and builds, their import path, workbench integration and the decisions the owner takes.
 ---
@@ -30,50 +31,49 @@ The first records are invented demo records. The choices are in the [decision br
 
 Catalogue records are `packages/data/records/<kind>/<id>.json`, stored units mm, g, deg, count, each with `provenance`. `quantity(kind)` means `{ value, raw? }` in the stored unit, as in `packages/schema/src/load.ts`.
 
-| Kind | Field | Type, unit | Notes |
-|---|---|---|---|
-| `manufacturer` (existing, extended) | `country` | ISO 3166-1 alpha-2, optional | needs a source with `fields: ["country"]`, as `needsCountrySource` (`packages/schema/src/shared.ts`) requires for powders and bullets; the doc comment "makes powders or bullets" is widened |
-| | other fields | unchanged | one record serves powder, bullet and firearm makers; a renamed maker keeps its id and the old name goes to `aliases` |
-| `firearmModel` | `id` | record id | `<manufacturer-id>-<model-slug>`; never changes |
-| | `manufacturer` | id of a `manufacturer` | required |
-| | `name` | text | as the maker prints it |
-| | `aliases` | text[] | regional and former names of the same gun; searched, unique per manufacturer |
-| | `category` | enum: rifle, carbine, pistol, revolver, shotgun, combination, other | for filters |
-| | `action` | enum: bolt, semi-auto, lever, pump, single-shot, break, revolver, other; optional | |
-| | `country` | ISO 3166-1 alpha-2, optional | country of manufacture; needs a source with `fields: ["country"]` |
-| | `production` | `{ from?, to? }` years, count 1 | `to` absent: in production when the source was retrieved |
-| | `successor` | id of a `firearmModel`, optional | a discontinued model points to its replacement |
-| | `provenance` | provenance | |
-| `firearmVariant` | `id` | record id | `<model-id>-<designation-slug>` |
-| | `model` | id of a `firearmModel` | required |
-| | `designation` | text, optional | the maker's catalogue name or item number as printed |
-| | `chamber.name` | text | chambering as printed; always stored |
-| | `chamber.cartridge` | id of a `cartridge`, optional | set only when the printed name resolves to a record; the repository holds C.I.P. cartridges only, so many chamberings stay unresolved |
-| | `barrel.length` | quantity length, mm | `barrel.measuredFrom`: enum boltFace, breech, unstated (makers differ on where the length starts) |
-| | `barrel.twist` | quantity length, mm per turn | 1:7 in is 177.8 mm; matches the user record's length per turn |
-| | `barrel.twistHand` | enum right, left | |
-| | `barrel.grooves` | count 1, optional | |
-| | `barrel.grooveDiameter`, `barrel.boreDiameter` | quantity length, mm, optional | rarely published; the cartridge sheet gives the nominal values |
-| | `mass` | quantity mass, g, optional | `massBasis` text (empty, without magazine or optic) |
-| | `overallLength` | quantity length, mm, optional | |
-| | `sightRadius` | quantity length, mm, optional | iron sights, printed for pistols |
-| | `verification` | enum verified, unverified | every value checked by hand against the cited page, as `cartridge.verification` (`packages/schema/src/cartridge.ts`) |
-| | `provenance` | provenance | page citation, `retrieved`, `sha256`, `origin`, `license` or `terms` |
-| `firearmBarrel` (phase 2) | `id`, `manufacturer`, `name`, `chamber` | as variant | an aftermarket barrel is a catalogue part; the only part that carries ballistic data |
-| | `length`, `twist`, `twistHand`, `grooves`, diameters | as variant `barrel` | plus `profile` text, `mass` g |
+| Kind                                | Field                                                | Type, unit                                                                        | Notes                                                                                                                                                                                        |
+| ----------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `manufacturer` (existing, extended) | `country`                                            | ISO 3166-1 alpha-2, optional                                                      | needs a source with `fields: ["country"]`, as `needsCountrySource` (`packages/schema/src/shared.ts`) requires for powders and bullets; the doc comment "makes powders or bullets" is widened |
+|                                     | other fields                                         | unchanged                                                                         | one record serves powder, bullet and firearm makers; a renamed maker keeps its id and the old name goes to `aliases`                                                                         |
+| `firearmModel`                      | `id`                                                 | record id                                                                         | `<manufacturer-id>-<model-slug>`; never changes                                                                                                                                              |
+|                                     | `manufacturer`                                       | id of a `manufacturer`                                                            | required                                                                                                                                                                                     |
+|                                     | `name`                                               | text                                                                              | as the maker prints it                                                                                                                                                                       |
+|                                     | `aliases`                                            | text[]                                                                            | regional and former names of the same gun; searched, unique per manufacturer                                                                                                                 |
+|                                     | `category`                                           | enum: rifle, carbine, pistol, revolver, shotgun, combination, other               | for filters                                                                                                                                                                                  |
+|                                     | `action`                                             | enum: bolt, semi-auto, lever, pump, single-shot, break, revolver, other; optional |                                                                                                                                                                                              |
+|                                     | `country`                                            | ISO 3166-1 alpha-2, optional                                                      | country of manufacture; needs a source with `fields: ["country"]`                                                                                                                            |
+|                                     | `production`                                         | `{ from?, to? }` years, count 1                                                   | `to` absent: in production when the source was retrieved                                                                                                                                     |
+|                                     | `successor`                                          | id of a `firearmModel`, optional                                                  | a discontinued model points to its replacement                                                                                                                                               |
+|                                     | `provenance`                                         | provenance                                                                        |                                                                                                                                                                                              |
+| `firearmVariant`                    | `id`                                                 | record id                                                                         | `<model-id>-<designation-slug>`                                                                                                                                                              |
+|                                     | `model`                                              | id of a `firearmModel`                                                            | required                                                                                                                                                                                     |
+|                                     | `designation`                                        | text, optional                                                                    | the maker's catalogue name or item number as printed                                                                                                                                         |
+|                                     | `chamber.name`                                       | text                                                                              | chambering as printed; always stored                                                                                                                                                         |
+|                                     | `chamber.cartridge`                                  | id of a `cartridge`, optional                                                     | set only when the printed name resolves to a record; the repository holds C.I.P. cartridges only, so many chamberings stay unresolved                                                        |
+|                                     | `barrel.length`                                      | quantity length, mm                                                               | `barrel.measuredFrom`: enum boltFace, breech, unstated (makers differ on where the length starts)                                                                                            |
+|                                     | `barrel.twist`                                       | quantity length, mm per turn                                                      | 1:7 in is 177.8 mm; matches the user record's length per turn                                                                                                                                |
+|                                     | `barrel.twistHand`                                   | enum right, left                                                                  |                                                                                                                                                                                              |
+|                                     | `barrel.grooves`                                     | count 1, optional                                                                 |                                                                                                                                                                                              |
+|                                     | `barrel.grooveDiameter`, `barrel.boreDiameter`       | quantity length, mm, optional                                                     | rarely published; the cartridge sheet gives the nominal values                                                                                                                               |
+|                                     | `mass`                                               | quantity mass, g, optional                                                        | `massBasis` text (empty, without magazine or optic)                                                                                                                                          |
+|                                     | `overallLength`                                      | quantity length, mm, optional                                                     |                                                                                                                                                                                              |
+|                                     | `sightRadius`                                        | quantity length, mm, optional                                                     | iron sights, printed for pistols                                                                                                                                                             |
+|                                     | `verification`                                       | enum verified, unverified                                                         | every value checked by hand against the cited page, as `cartridge.verification` (`packages/schema/src/cartridge.ts`)                                                                         |
+|                                     | `provenance`                                         | provenance                                                                        | page citation, `retrieved`, `sha256`, `origin`, `license` or `terms`                                                                                                                         |
+| `firearmBarrel` (phase 2)           | `id`, `manufacturer`, `name`, `chamber`              | as variant                                                                        | an aftermarket barrel is a catalogue part; the only part that carries ballistic data                                                                                                         |
+|                                     | `length`, `twist`, `twistHand`, `grooves`, diameters | as variant`barrel`                                                                | plus `profile` text, `mass` g                                                                                                                                                                |
 
 User records (browser and files) use the same shape and stored units as catalogue records (`packages/schema/src/firearm.ts`, [Record model](record-model.md#firearm)). Changes to `firearm`:
 
-| Field | Type, unit | Notes |
-|---|---|---|
-| `catalogue` | `{ variant: id, retrieved: date }`, optional | where the values were copied from; nothing reads it back |
-| `parts` | array of `{ kind, name, manufacturer?, mass? }`, at most 20, optional | `kind`: receiver, barrel, gasSystem, handguard, stock, muzzleDevice, other; `mass` a quantity in g; descriptive, no solver reads it |
-| `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `firearmMass`, `cartridge`, optics | unchanged | these stay the only values the solvers read; the solvers get them in SI |
+| Field                                                                                                      | Type, unit                                                            | Notes                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `catalogue`                                                                                                | `{ variant: id, retrieved: date }`, optional                          | where the values were copied from; nothing reads it back                                                                            |
+| `parts`                                                                                                    | array of `{ kind, name, manufacturer?, mass? }`, at most 20, optional | `kind`: receiver, barrel, gasSystem, handguard, stock, muzzleDevice, other; `mass` a quantity in g; descriptive, no solver reads it |
+| `barrelLength`, `twist`, `twistHand`, `grooveDiameter`, `boreDiameter`, `firearmMass`, `cartridge`, optics | unchanged                                                             | these stay the only values the solvers read; the solvers get them in SI                                                             |
 
 Properties that matter for ballistics: barrel length, twist and hand, chamber (through the cartridge), bore and groove diameter where known, mass (recoil), sight height (optic mount, typed by the user). Gas system, receiver, handguard and stock are descriptive parts, not numbers.
 
 Rules:
-
 - Ids are slugs and never change. A renamed maker or model keeps its id, the old name goes to `aliases`.
 - A model sold under different names in different regions is one model with the names as aliases.
 - A variant has one chamber: a model made in three calibers has three variants. A variant offered in two barrel lengths has two variants.
@@ -82,17 +82,17 @@ Rules:
 
 ## Rejected alternatives
 
-| Alternative | Why not |
-|---|---|
-| Variant inherits fields from its model and overrides some | The API, the web app, the validator and the importer would each need a merge step; a partial record cannot be validated alone; a source cites a value for one variant, not for the model. Repeating a value in three variants is cheaper than resolving inheritance. |
-| Variants nested as an array in the model file | One record per file is the convention (`checkRecordId` in `packages/data/src/read-kind.ts`); nested variants cannot carry their own provenance and ids, make files large and a re-import diff noisy. |
-| One flat record per model (chamber and barrel as fields) | Cannot list several calibers or barrel lengths of one model without repeating its identity; the model page and aliases would repeat. |
-| New `firearmManufacturer` kind | Duplicates names and ids; a company that makes bullets and rifles would have two records; reference check, search and API for `manufacturer` already exist. |
-| Every part of a build (receiver, handguard, stock, gas system) as a catalogue record | Only the barrel carries ballistic data; the other parts would be records no solver reads, with far more sources to find and keep current. They stay descriptive fields of the user's build. A barrel record is a phase 2 option. |
-| A build as its own record kind next to `firearm` | The `firearm` user record already holds barrel, twist, optics and configurations, and `Load.firearm` is tied to it. A second kind would double the picker, the file format and the editor. |
-| Compute the sight height from receiver, mount and optic heights | The bore axis height over the rail is unverified for most receivers, so the sum would carry unknown offsets. Sight height stays a measured input of the optic mount. |
-| A live reference from the workbench to the catalogue id | A saved workbench file would dangle when a record is removed or unavailable offline. A copy into the user record keeps files self-contained. |
-| Chamber only as a cartridge id | Many chamberings have no cartridge record; a required id would drop those guns. The printed name is stored, the id is optional. |
+| Alternative                                                                          | Why not                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variant inherits fields from its model and overrides some                            | The API, the web app, the validator and the importer would each need a merge step; a partial record cannot be validated alone; a source cites a value for one variant, not for the model. Repeating a value in three variants is cheaper than resolving inheritance. |
+| Variants nested as an array in the model file                                        | One record per file is the convention (`checkRecordId` in `packages/data/src/read-kind.ts`); nested variants cannot carry their own provenance and ids, make files large and a re-import diff noisy.                                                                 |
+| One flat record per model (chamber and barrel as fields)                             | Cannot list several calibers or barrel lengths of one model without repeating its identity; the model page and aliases would repeat.                                                                                                                                 |
+| New `firearmManufacturer` kind                                                       | Duplicates names and ids; a company that makes bullets and rifles would have two records; reference check, search and API for `manufacturer` already exist.                                                                                                          |
+| Every part of a build (receiver, handguard, stock, gas system) as a catalogue record | Only the barrel carries ballistic data; the other parts would be records no solver reads, with far more sources to find and keep current. They stay descriptive fields of the user's build. A barrel record is a phase 2 option.                                     |
+| A build as its own record kind next to `firearm`                                     | The `firearm` user record already holds barrel, twist, optics and configurations, and `Load.firearm` is tied to it. A second kind would double the picker, the file format and the editor.                                                                           |
+| Compute the sight height from receiver, mount and optic heights                      | The bore axis height over the rail is unverified for most receivers, so the sum would carry unknown offsets. Sight height stays a measured input of the optic mount.                                                                                                 |
+| A live reference from the workbench to the catalogue id                              | A saved workbench file would dangle when a record is removed or unavailable offline. A copy into the user record keeps files self-contained.                                                                                                                         |
+| Chamber only as a cartridge id                                                       | Many chamberings have no cartridge record; a required id would drop those guns. The printed name is stored, the id is optional.                                                                                                                                      |
 
 ## Import path
 
@@ -114,7 +114,6 @@ Rules:
 ## Follow-up issues
 
 Proposed, in order, each with acceptance criteria a test can check.
-
 1. **schema: firearm model and variant records.** Add `firearmModel`, `firearmVariant`, `manufacturer.country`. Accept: a valid example of each parses; `chamber.cartridge` is optional; twist and length are stored in mm, mass in g, years as counts; a variant without `model` is rejected; `verification` is required; the JSON Schema is written; `pnpm run docs:check` passes for the exports.
 2. **data: read and validate the new kinds.** Accept: `readRecords` reads `firearm-models` and `firearm-variants` folders; `data:validate` fails for a variant naming no model, a model naming no manufacturer, a `chamber.cartridge` naming no cartridge, a duplicate alias per manufacturer and a duplicate designation per model; demo records with invented names validate.
 3. **api: list and get endpoints.** Accept: `GET /v1/firearm-models` and `/v1/firearm-variants` with `q`, `manufacturer`, `cartridge`, paging, and `GET .../:id`; `pnpm run api:check` passes with the baseline rewritten in the same pull request; a test fixes the search order; the static API output (`writeStaticApi`) includes both lists.
@@ -128,7 +127,6 @@ Proposed, in order, each with acceptance criteria a test can check.
 ## Decision brief
 
 **Scope of the first release.** Recommended: **B**.
-
 - **A. Names only.** Keep the user firearm as it is; offer the manufacturer list in the editor as a suggestion. Smallest; the shooter still types barrel length and twist.
 - **B. Models and variants, build as a user record (recommended).** The schema of this page without barrel records, copy into the library, parts list on the user firearm. Delivers barrel length, twist, chamber and mass with the gun; later steps follow without breaking files.
 - **C. B plus barrel, receiver, handguard, stock and optic as catalogue records.** Far more sources to find and maintain; only the barrel carries ballistic data.

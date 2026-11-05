@@ -1,4 +1,5 @@
 ---
+
 title: Record model
 description: One entity per concept for catalogue records and browser user data, with references, overrides, stored units and where each entity's schema and code live.
 ---
@@ -11,28 +12,28 @@ Catalogue records and the records a user keeps in the browser describe the same 
 
 Writers: catalogue (git records, checked by `readRecords`), user (browser, `packages/schema/src/user-data.ts`), importer (a parsed file turned into a record shape), solver input (never stored). Schemas are in `packages/schema/src/`, catalogue folders in `packages/data/records/`.
 
-| Entity | Schema | Catalogue | User record kind |
-|---|---|---|---|
-| Manufacturer | `manufacturer.ts`, `userManufacturer` | `records/manufacturers` | `manufacturer` |
-| Cartridge | `cartridge.ts`, `userCartridge` | `records/cartridges`, generated from the C.I.P. sheets | `cartridge`: `basedOn` and `overrides` of a Cartridge |
-| Bullet | `bullet.ts`, `userBullet` | `records/bullets` | `bullet`: `basedOn` and `overrides` of a Bullet |
-| Powder | `powder.ts`, `userPowder` | `records/powders` | `powder`: a draft and the fit |
-| Primer | `primer.ts` | `records/primers`, named by `Load.primer.record` | none |
-| Case | `case.ts` | `records/cases`, named by `Load.case.record` | `case` (a group of the user's cases) |
-| Case capacity | `case-capacity.ts` | `records/capacities`, embedded in `GET /cartridges/:id` | `caseCapacity` |
-| Load | `load.ts` | `records/loads` (empty), bundle only: no route or web reader | `load`, and the load file |
-| Chronograph session | `chrono-session.ts` | `records/chrono` (empty), bundle only | `session`, and what an importer gives |
-| Firearm | `firearm.ts` | none | `firearm`, in the stored units |
-| Target sheet | `target-sheet.ts` | none | `targetSheet`, photos in the store `files` |
-| Target face design | `user-data.ts` (`targetFaceDesign`) | none | `targetFaceDesign` |
-| Competition event, shooting log entry | `user-data.ts` (`competitionEvent`, `shootingLogEntry`) | none | `event`, `shootingLogEntry` |
-| Firing series, range firings | `firing.ts`, `range.ts` | no folder, bundle only | none |
-| Source record | `provenance.ts` | `records/sources`, inlined into records on read | none |
-| Federation, discipline, target mapping, target | `federation.ts`, `target-face.ts` | one folder each | none |
-| Event type | `event-type.ts` | `records/event-types` | none |
-| Caliber class | `caliber-class.ts` | `records/caliber-classes` | none |
-| Load tables | `load-tables.ts` | `load-tables.json` of a records root | none |
-| Solver bodies | `packages/api/src/compute/interior-schema.ts`, `exterior-schema.ts` | never stored | none |
+| Entity                                         | Schema                                                              | Catalogue                                                    | User record kind                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
+| Manufacturer                                   | `manufacturer.ts`, `userManufacturer`                               | `records/manufacturers`                                      | `manufacturer`                                        |
+| Cartridge                                      | `cartridge.ts`, `userCartridge`                                     | `records/cartridges`, generated from the C.I.P. sheets       | `cartridge`: `basedOn` and `overrides` of a Cartridge |
+| Bullet                                         | `bullet.ts`, `userBullet`                                           | `records/bullets`                                            | `bullet`: `basedOn` and `overrides` of a Bullet       |
+| Powder                                         | `powder.ts`, `userPowder`                                           | `records/powders`                                            | `powder`: a draft and the fit                         |
+| Primer                                         | `primer.ts`                                                         | `records/primers`, named by `Load.primer.record`             | none                                                  |
+| Case                                           | `case.ts`                                                           | `records/cases`, named by `Load.case.record`                 | `case` (a group of the user's cases)                  |
+| Case capacity                                  | `case-capacity.ts`                                                  | `records/capacities`, embedded in `GET /cartridges/:id`      | `caseCapacity`                                        |
+| Load                                           | `load.ts`                                                           | `records/loads` (empty), bundle only: no route or web reader | `load`, and the load file                             |
+| Chronograph session                            | `chrono-session.ts`                                                 | `records/chrono` (empty), bundle only                        | `session`, and what an importer gives                 |
+| Firearm                                        | `firearm.ts`                                                        | none                                                         | `firearm`, in the stored units                        |
+| Target sheet                                   | `target-sheet.ts`                                                   | none                                                         | `targetSheet`, photos in the store `files`            |
+| Target face design                             | `user-data.ts` (`targetFaceDesign`)                                 | none                                                         | `targetFaceDesign`                                    |
+| Competition event, shooting log entry          | `user-data.ts` (`competitionEvent`, `shootingLogEntry`)             | none                                                         | `event`, `shootingLogEntry`                           |
+| Firing series, range firings                   | `firing.ts`, `range.ts`                                             | no folder, bundle only                                       | none                                                  |
+| Source record                                  | `provenance.ts`                                                     | `records/sources`, inlined into records on read              | none                                                  |
+| Federation, discipline, target mapping, target | `federation.ts`, `target-face.ts`                                   | one folder each                                              | none                                                  |
+| Event type                                     | `event-type.ts`                                                     | `records/event-types`                                        | none                                                  |
+| Caliber class                                  | `caliber-class.ts`                                                  | `records/caliber-classes`                                    | none                                                  |
+| Load tables                                    | `load-tables.ts`                                                    | `load-tables.json` of a records root                         | none                                                  |
+| Solver bodies                                  | `packages/api/src/compute/interior-schema.ts`, `exterior-schema.ts` | never stored                                                 | none                                                  |
 
 Session stays separate from Load: a session is an event fixed in time, a load is a recipe reused over many sessions, and merging them would copy recipe data into every event. A target sheet is an event of its own that references both. Solver bodies are derived SI inputs built from resolved entities and are never stored. The designers are separate screens but edit the same entities.
 
@@ -42,11 +43,11 @@ A user record is `{id, kind, name, saved, data}`; the entity, with its `origin`,
 
 `origin` says where a record lives and who owns it:
 
-| Value | Meaning |
-|---|---|
-| `catalogue` | the git records, read only for users |
-| `user` | the records of this browser's owner |
-| `shared` | received through a file or a share link, kept as a copy owned by the receiver, with the sender's file cited in its provenance |
+| Value       | Meaning                                                                                                                       |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `catalogue` | the git records, read only for users                                                                                          |
+| `user`      | the records of this browser's owner                                                                                           |
+| `shared`    | received through a file or a share link, kept as a copy owned by the receiver, with the sender's file cited in its provenance |
 
 `load`, `caseCapacity`, `chronoSession`, `case` and `firearm` take any of the three; the user records `bullet`, `cartridge`, `powder` and `manufacturer` carry `origin: 'user'`.
 
@@ -65,7 +66,6 @@ The finer standing of a citation (manufacturer, public, community) is `provenanc
 ## Variants of a catalogue record
 
 A user bullet or cartridge (`userBullet`, `userCartridge` in `packages/schema/src/user-data.ts`) is `basedOn`, an optional `catalogue:<id>` reference, plus `overrides`, an optional partial of the same entity schema in stored units, never a copy. Without `basedOn` it is standalone and holds every given field. Records of the former kinds `bulletDesign` and `cartridgeDesign` fail the schema and stay in the store as invalid records.
-
 - `applyOverrides(base, overrides)` (`packages/schema/src/overrides.ts`) is the one resolution function, used by the web app, the importers and the compute routes. Objects merge by key, arrays replace as a whole, and an explicit `null` removes a field or an object. A cartridge's `values` merge by `(side, symbol, variant)`, the key that identifies a value. A quantity (an object with its own `value`) is replaced whole, and so is a cartridge value entry, which also drops its tolerance, so a base's printed text never outlives a changed number. A `value: null` entry removes that cartridge value.
 - `bulletOverrides` and `cartridgeOverrides` validate the leaves against the entity schemas and allow any field to be omitted or `null`. The bullet's `manufacturer` is not an override: `bulletOverrides` leaves it out, and the user bullet's own `manufacturer` is the one place.
 - A field the user did not override follows the catalogue. `GET /v1/bullets/{id}` and `GET /v1/cartridges/{id}` (and the static site's data files of the same records) answer with `revision`, a hash of the stored record that changes with any field. The user record keeps the base's revision at save in the optional `basedOnRevision`, a sibling of `basedOn`. The designers compare the two on opening (`baseChanged` in `apps/web/src/lib/variants.ts`) and say in the parameters panel that the base changed since the design was saved. A design saved without a revision, or a base the API answers without one, says nothing. Save writes the revision the design was measured against, so the note goes away with the next save.
@@ -77,7 +77,6 @@ A user bullet or cartridge (`userBullet`, `userCartridge` in `packages/schema/sr
 ## Units
 
 Stored entities use the stored units of `packages/units/src/units.ts` (re-exported by `@open-reloading/schema`) only; SI appears at solver calls. `toSi(kind, stored)` and `fromSi(kind, si)` convert between them. `siMaps` holds one entry per `QuantityKind`: `si = stored * factor + offset`. Temperature carries the offset of 273.15 (degC to K), percent is a fraction in SI, the ballistic coefficient is kg/m2.
-
 - The API's record resolution, limit check and bore area, and the web app's field specs, record rows, designers, seating preview and workbench load hook call these functions. No file outside the units package writes a factor between a stored unit and SI: `apps/web/test/unit-literals.test.ts` scans the sources of the API and the web app for the literals.
 - Display units (inch, grain, psi, ft/s) are in `apps/web/src/lib/units.ts`, which builds its metric units from the table. The solver package takes its customary factors (grain, inch, foot, inch of mercury, mph, MOA, psi, lb/in2) from the conversion table of `@open-reloading/units`; the drawing package keeps its own.
 - User files of the old SI format are rejected, since no migrations are written before 1.0.
@@ -85,7 +84,6 @@ Stored entities use the stored units of `packages/units/src/units.ts` (re-export
 ## Manufacturer
 
 A manufacturer typed by the user is a record of kind `manufacturer` (`userManufacturer` in `packages/schema/src/user-data.ts`): `data` holds `origin: 'user'`, the name is the record's `name`. It is referenced as `user:<UUID>`.
-
 - A user bullet's and a firearm's `manufacturer` is a reference of either scope (`ref('manufacturer')`), never free text. Both schemas are strict, so a stored record with `manufacturerName` is rejected and stays in the store as an invalid record (no migration).
 - The designer's and the firearm editor's manufacturer field (`apps/web/src/components/manufacturer-input.tsx`) turns the typed text into a reference when the field is left or an option is chosen: a catalogue or user manufacturer whose name or alias is the same text (`findManufacturer` in `apps/web/src/lib/manufacturers.ts`, catalogue first), else a new user manufacturer (`referTo`), stored in the browser at once and found by the next typed name. While the catalogue's list cannot be read, a typed name that matches no user manufacturer gets no reference and no record (`referTo` with `catalogueKnown` false), so it cannot duplicate a catalogue manufacturer.
 - A name typed and then changed after leaving the field leaves its first record in the store, listed among the suggestions until it is deleted in Settings, Manufacturers (`manufacturerUses` in `apps/web/src/lib/manufacturers.ts`, `manufacturers-settings.tsx`). That tab lists the user manufacturers with the number of places that name them (a bullet's or firearm's `manufacturer`, a capacity's `caseManufacturer`, a stored record the format rejects, the record open on the page) and deletes one that nothing names at once, with Undo.
@@ -100,7 +98,6 @@ A manufacturer typed by the user is a record of kind `manufacturer` (`userManufa
 ### Name-only bullets
 
 A table names a bullet by maker, type and mass, often without a product number, diameter or length. Such a bullet is a record with only what is known: `nameOnly: true`, no `productNumber`, a `mass`, and a `diameter` only where a table prints one (never the cartridge's maximum bullet diameter). The schema checks the marker in both directions: without it `productNumber` and `diameter` are required, so a full record that loses one fails `data:validate`; with it `productNumber` must be absent.
-
 - The name and the id carry the caliber where two records of one maker would otherwise collide (names are unique per maker).
 - When a full record of the product appears, the name-only file is deleted, `records/renames.json` maps its id to the new one, and the loads that name it are rewritten in the same change (a load names current ids only).
 - A bullet that no table prints a maker for gets no record: the load keeps the printed text.
@@ -120,32 +117,31 @@ A user powder (`userPowder` in `packages/schema/src/user-data.ts`) is the powder
 
 A fitted user powder keeps a copy of what it was fitted to in the optional `fit` of its data (`userPowderFit` in `packages/schema/src/user-data.ts`), so deleting or editing a session never changes what the powder rests on. Its `provenanceKind` stays `fitted`. Every quantity is `{ value }` in its stored unit, and every field is required unless marked optional.
 
-| Field | Content | Unit |
-| --- | --- | --- |
-| `input` | 1 to 40 points, each with every field below | |
-| `input[].charge` | powder charge, above 0 | g |
-| `input[].muzzleVelocity` | mean muzzle velocity of the string, above 0 | m/s |
-| `input[].shots` | shots of the string, a whole number above 0 | 1 |
-| `input[].barrelLength` | barrel length, above 0 | mm |
-| `input[].temperature` | powder temperature | degC |
-| `input[].caseCapacity` | water capacity of the case, above 0 | cm3 |
-| `input[].bulletMass` | bullet mass, above 0 | g |
-| `parameters` | the parameters the fit freed, each once: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor` | |
-| `options.prior` | optional: per freed parameter a Gaussian prior, `value` (the centre) and `sigma` (of the log parameter) | `value`: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1; `sigma`: 1 |
-| `options.loss` | `{ kind: 'quadratic' }` or `{ kind: 'huber', threshold }` | threshold in sigmas of the rows |
-| `date` | time of the fit, ISO 8601 in UTC | |
-| `model`, `modelVersion` | interior model (such as `m3`) and the version of the code that fitted | |
-| `confidence` | width class of the peak-pressure range: `tight`, `moderate` or `loose` | |
-| `reasons` | up to 20 reason names of the fit's confidence | |
-| `sessions` | up to 50 `user:<UUID>` references to the sessions the points came from, for information only | |
-| `previous` | optional: `user:<UUID>` of the powder record this one refits | |
+| Field                    | Content                                                                                                             | Unit                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `input`                  | 1 to 40 points, each with every field below                                                                         |                                                                                       |
+| `input[].charge`         | powder charge, above 0                                                                                              | g                                                                                     |
+| `input[].muzzleVelocity` | mean muzzle velocity of the string, above 0                                                                         | m/s                                                                                   |
+| `input[].shots`          | shots of the string, a whole number above 0                                                                         | 1                                                                                     |
+| `input[].barrelLength`   | barrel length, above 0                                                                                              | mm                                                                                    |
+| `input[].temperature`    | powder temperature                                                                                                  | degC                                                                                  |
+| `input[].caseCapacity`   | water capacity of the case, above 0                                                                                 | cm3                                                                                   |
+| `input[].bulletMass`     | bullet mass, above 0                                                                                                | g                                                                                     |
+| `parameters`             | the parameters the fit freed, each once: `burnRate`, `startPressure`, `volumeFactor`, `energy`, `temperatureFactor` |                                                                                       |
+| `options.prior`          | optional: per freed parameter a Gaussian prior, `value` (the centre) and `sigma` (of the log parameter)             | `value`: burn coefficient 1/s, start pressure bar, energy J/kg, factors 1; `sigma`: 1 |
+| `options.loss`           | `{ kind: 'quadratic' }` or `{ kind: 'huber', threshold }`                                                           | threshold in sigmas of the rows                                                       |
+| `date`                   | time of the fit, ISO 8601 in UTC                                                                                    |                                                                                       |
+| `model`, `modelVersion`  | interior model (such as `m3`) and the version of the code that fitted                                               |                                                                                       |
+| `confidence`             | width class of the peak-pressure range: `tight`, `moderate` or `loose`                                              |                                                                                       |
+| `reasons`                | up to 20 reason names of the fit's confidence                                                                       |                                                                                       |
+| `sessions`               | up to 50 `user:<UUID>` references to the sessions the points came from, for information only                        |                                                                                       |
+| `previous`               | optional: `user:<UUID>` of the powder record this one refits                                                        |                                                                                       |
 
 `sessions` and `previous` are never resolved: `checkUserRefs` does not report them and a share link does not count them as user references. The block is part of the user data file baseline (`apps/web/test/golden/user-data.json`, [release](../release.md#contract-baselines)).
 
 ## Firearm
 
 `firearm` (`packages/schema/src/firearm.ts`) is the one firearm shape; the user record of kind `firearm` carries it as `data`. Catalogue firearm kinds: [Firearm records](firearm-records.md).
-
 - Lengths are `quantity('length')` objects in mm, the mass `quantity('mass')` in g, click value, travel and cant `quantity('angle')` in degrees, a mount's zero air `quantity('temperature')` in degC, `quantity('pressure')` in bar and `quantity('relativeHumidity')` in %. The drag factor, magnifications and round count are plain numbers.
 - `origin` (`catalogue`, `user`, `shared`) is required, so a firearm of the old SI format fails the schema instead of reading as a firearm 1000 times too short. An old record stays in the store as an invalid one.
 - `manufacturer` is a manufacturer reference of either scope, `cartridge` a reference (`catalogue:<id>` or `user:<UUID>`), `landsBullet` a bullet reference. Optics and configurations stay embedded.
@@ -157,7 +153,6 @@ A fitted user powder keeps a copy of what it was fitted to in the optional `fit`
 ## Load
 
 `load` (`packages/schema/src/load.ts`) is the one Load: the catalogue record (`records/loads`, read through `catalogueLoad`), the user record of kind `load` and the load file of `POST /v1/interior/load-file`. Every quantity is a stored-unit object (charge and the measured case capacity in g, seating and measured muzzle distance in mm); the SI values appear at the solver call only. A record of kind `workbenchState` or a file with `siValues` is not read: the schema's own message for the old kind (`legacyLoadProblem`) says so in Open, Import, the stored-record list and the load file route.
-
 - References: `cartridge`, `firearm`, `bullet` and `powder` are `catalogue:<id>` or `user:<UUID>` references. `primer` is a lot and an optional catalogue `record` (`primer.record`), so a lot alone can be stored. `capacity` names a case capacity, `case.record` a case group, `sessions` up to 50 chronograph sessions. `Load.case` is a strict object (maker, lot, `firingCount`, `record`); the case maker is a `manufacturer` reference, as is the maker of a bullet or powder description.
 - A catalogue load names catalogue records only and carries `id`, `name`, `provenance`, cartridge, bullet, powder and charge; a user load is named by its record. Only a catalogue load of provenance kind `measured` (a publication) may describe its bullet or powder by maker and name (`{manufacturer, model}`, the maker a `catalogue:` reference) where no record exists. `data:validate` checks the component makers (`checkManufacturerReferences`) and the capacity (`checkLoadCapacityReferences`). The primer and the case are strict objects, so a load with `manufacturerName`, a primer `manufacturer` and `model`, or `case.waterCapacity` fails the schema in Open, Import, the stored-record list and the load file route (400 at the key's path).
 - `analysis` holds the typed solver values, `overrides` and the `ladder`. `overrides` is a strict object with one optional number per key of `workbenchValueKeys` (`packages/core/src/interior/workbench-keys.ts`) except `charge` (the load's own `charge`), each in the stored unit of `analysisKinds` (`volume` in cm3, `propellantTemperature` in degC, pressures in bar). A key outside that list fails the schema. The ladder step is in the stored unit of its kind: g, mm or K.
@@ -168,7 +163,6 @@ A fitted user powder keeps a copy of what it was fitted to in the optional `fit`
 ## Saved recipes
 
 A saved recipe keeps only the keys the user typed, under `analysis.overrides`, validated against `workbenchValueKeys`: the solver values, the bullet's `bulletDiameter`, `bulletLength`, `bulletBcG1`, `bulletBcG7` and base dimensions `bulletBaseLength` (boat-tail length), `bulletBaseDiameter` (base face) and `bulletCavityDiameter` (hollow base opening) (the bullet mass is `bulletMass`), and three values of the cartridge sheet and the powder record: `pmax` (bar), `caseLength` (the sheet's L3, mm) and `bulkDensity` (g/cm3).
-
 - A typed BC replaces every velocity band of its drag model with one value from 0 m/s.
 - The base form chosen over the record's `base.type` is `analysis.bulletBase`. A form keeps only the dimensions it has: a flat base none, a boat tail no cavity. A typed boat-tail length leaves out the record's bearing length, and a typed boat-tail length or base diameter leaves out its boat-tail angle, which the outline derives. The workbench draws the bullet and computes the volume behind the seated bullet with the typed form; the interior route reads `bulletLength` for the bore resistance and ignores the other values.
 - The workbench marks a value that differs from the record's with a reset action (`apps/web/src/lib/record-changes.ts`), only when the record supplies that key and the value differs. A value without a record value, one equal to the record's and a typed BC over a record with several bands are not marked; the base form is marked when it differs from the record's `base.type`. A new record pick replaces the card's changed values.
@@ -185,7 +179,6 @@ The Powders tab's charge mode and filters are `analysis.powders`: `mode` (`typed
 ## Chronograph session
 
 `chronoSession` (`packages/schema/src/chrono-session.ts`) is the one session shape: the catalogue record (`records/chrono`, read through `catalogueSession`), the user record of kind `session` and what an import gives. It carries `origin`.
-
 - A catalogue session needs its `id`, the `date`, the device's `manufacturer` (a `catalogue:` reference, checked by `data:validate`) and `model`, `conditions.airTemperature` and the `load` of every string (a `catalogue:` reference). A user session needs none of them, so a file as the importers read it is a valid session and the Measurements tab holds exactly that. The importers cannot read the catalogue: their `missingPaths` names what a catalogue session requires and always lists `device.manufacturer`, and a name the file gives stays on the candidate (`device.manufacturerName` of `SessionCandidate`, also the member of the OpenReloading session JSON) for the caller to resolve. `packages/schema/test/session.test.ts` parses an imported file, the stored user record, a catalogue session, and the references of a load and a target sheet through the same schema.
 - A shot string has `load` (a reference, absent until the session is attached to a load), `label`, `variation`, `propellantTemperature`, `conditions` (`airTemperature` in degC, `stationPressure` in bar, `windSpeed` in m/s, each optional: the weather at that string, typed by hand at the range), `note` (plain text up to 2000 characters) and `shots` (1 to 5000; a session holds up to 500 strings). `variation` is the charge (g) or the seating length (mm) the string varies against its load; a temperature ladder stays the string's `propellantTemperature`.
 - A load names its sessions in `Load.sessions`; a group shot's `chrono.session` is a session reference.
@@ -195,7 +188,6 @@ The Powders tab's charge mode and filters are `analysis.powders`: `mode` (`typed
 ## Case capacity
 
 `caseCapacity` (`packages/schema/src/case-capacity.ts`) is the one capacity entity: the catalogue record (`records/capacities`, read through `catalogueCaseCapacity`, which needs `id`, `provenance` and catalogue references only) and the user record of kind `caseCapacity`, the water always in g (`waterCapacity`). It carries `origin`; `cartridge` and `caseManufacturer` are references (`catalogue:` or `user:`). `GET /cartridges/:id` answers with the capacity. A catalogue capacity with a plain `cartridge` id and no `origin` is rejected: no migration. `packages/schema/test/case-capacity-unit.test.ts` fails when another entity holds a water mass or when the unit is not g.
-
 - `Load.capacity` is a reference, `catalogue:<id>` or `user:<UUID>`. A catalogue load names a catalogue capacity.
 - The workbench has two inputs: the capacity record chosen in the pinned row above the input cards and the measured capacity (water to the mouth, replaces the record's value; the flags and notes of the run are unchanged). A capacity record chosen from the cartridge's catalogue capacities is saved as `catalogue:<id>` only when chosen; the first one shown by default is followed.
 - A load saved with a typed measured capacity names a user capacity record whose id is a version 8 UUID derived from the cartridge reference and the value in g (`measuredCapacityId` in `apps/web/src/lib/load-record.ts`), so one measurement is one record and a changed value another one, which a load saved earlier keeps. Save writes that record to the browser together with the load (`storeLoad`, the File menu's `store`); opening the load reads it back into the field. A record the browser does not answer stays in the load as asked and is listed as not loaded. The link parameter `measuredWaterCapacity` is in m³.
@@ -204,7 +196,6 @@ The Powders tab's charge mode and filters are `analysis.powders`: `mode` (`typed
 ## Own cases
 
 The user record of kind `case` (`packages/schema/src/user-data.ts`) holds a `Case` with `origin` `user`.
-
 - `manufacturer` is required of a catalogue case only. `basedOn` names the catalogue product the group started from; its fields are the group's own values, not overrides of the product.
 - The measured fields are optional: `numberOfFirings`, `trimLength` and `neckWall` (mm), `casesMeasured` and `spread` (g, standard deviation of the capacity over those cases).
 - The measured water capacity stays a `caseCapacity` record that the group names with `capacity`, so a capacity is stored once: the case group editor (`/cases/editor`, `apps/web/src/components/case-group-editor.tsx`) writes it with the id `measuredCapacityId` gives for the cartridge and value, the same record the workbench writes for a typed measured capacity.
@@ -220,7 +211,6 @@ The user record of kind `case` (`packages/schema/src/user-data.ts`) holds a `Cas
 ## Share links
 
 The File menu's Copy share link copies a link to a bullet, a cartridge or a load (`shareable` in `apps/web/src/components/file-menu.tsx`). Opening the link in another browser opens the record there as unsaved work.
-
 - What it carries: the record as a user data file (`shareLink` in `apps/web/src/lib/share-link.ts`). A bullet's link also carries the user manufacturer it names. A design based on a catalogue record carries its `catalogue:` base, not a copy of the base. The workbench's Copy link carries the values of a design, not its reference.
 - Where it goes: the record is compressed and written after `#record=` in the address. A browser does not send the part after `#` to a server, so the record is not uploaded; it goes only where the link is pasted or sent. Anyone who has the link can read the record.
 - Length: at most 8000 characters (`maxLinkChars` in `apps/web/src/lib/share-link.ts`, the length RFC 9110 recommends every sender and recipient support). A longer record gets no link, with a message to save it to a file instead. A received link over the limit is not opened.

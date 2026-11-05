@@ -1,4 +1,5 @@
 ---
+
 title: Flier screen for a string of shots
 description: An advisory flag for one shot far from the rest of a string of 10 to 30 shots, its factor per string length for a false-flag rate of 1 percent, and how often a planted flier is found, from a seeded simulation.
 ---
@@ -35,28 +36,28 @@ A rule that flags a shot when fewer than 0.5 shots are expected beyond it, count
 
 Factor $k$ for a false-flag rate per clean string (selected rows; the script prints $N$ = 5 to 30):
 
-| $N$ | Either end, 5 % | 1 % | 0.1 % | High end only, 5 % | 1 % | 0.1 % |
-| --- | --- | --- | --- | --- | --- | --- |
-| 5 | 6.52 | 11.42 | 24.51 | 5.08 | 8.99 | 19.67 |
-| 8 | 4.40 | 6.10 | 9.36 | 3.76 | 5.32 | 8.22 |
-| 10 | 4.04 | 5.32 | 7.53 | 3.53 | 4.74 | 6.76 |
-| 15 | 3.71 | 4.60 | 5.93 | 3.33 | 4.21 | 5.53 |
-| 20 | 3.60 | 4.34 | 5.43 | 3.28 | 4.02 | 5.09 |
-| 25 | 3.56 | 4.22 | 5.17 | 3.27 | 3.94 | 4.91 |
-| 30 | 3.54 | 4.16 | 5.03 | 3.26 | 3.90 | 4.76 |
+| $N$ | Either end, 5 % | 1 %   | 0.1 % | High end only, 5 % | 1 %  | 0.1 % |
+| --- | --------------- | ----- | ----- | ------------------ | ---- | ----- |
+| 5   | 6.52            | 11.42 | 24.51 | 5.08               | 8.99 | 19.67 |
+| 8   | 4.40            | 6.10  | 9.36  | 3.76               | 5.32 | 8.22  |
+| 10  | 4.04            | 5.32  | 7.53  | 3.53               | 4.74 | 6.76  |
+| 15  | 3.71            | 4.60  | 5.93  | 3.33               | 4.21 | 5.53  |
+| 20  | 3.60            | 4.34  | 5.43  | 3.28               | 4.02 | 5.09  |
+| 25  | 3.56            | 4.22  | 5.17  | 3.27               | 3.94 | 4.91  |
+| 30  | 3.54            | 4.16  | 5.03  | 3.26               | 3.90 | 4.76  |
 
 The issue's factors (either end 1 percent: 11.5, 5.3, 4.3, 4.2 at $N$ = 5, 10, 20, 30) agree with these to the digits it gives.
 
 False-flag rate at the 1 percent either-end $k$ on the independent seed: 0.969 to 1.038 percent for every $N$ from 8 to 30 (0.968 percent at $N = 5$). Planted flier found, 1 percent either-end $k$:
 
-| $N$ | 4 SD | 6 SD | 8 SD |
-| --- | --- | --- | --- |
-| 5 | 6.2 % | 16.6 % | 31.5 % |
-| 8 | 18.3 % | 54.3 % | 85.5 % |
-| 10 | 25.1 % | 69.6 % | 95.1 % |
-| 15 | 35.7 % | 86.1 % | 99.4 % |
-| 20 | 41.5 % | 91.5 % | 99.8 % |
-| 30 | 45.7 % | 94.7 % | 100.0 % |
+| $N$ | 4 SD   | 6 SD   | 8 SD    |
+| --- | ------ | ------ | ------- |
+| 5   | 6.2 %  | 16.6 % | 31.5 %  |
+| 8   | 18.3 % | 54.3 % | 85.5 %  |
+| 10  | 25.1 % | 69.6 % | 95.1 %  |
+| 15  | 35.7 % | 86.1 % | 99.4 %  |
+| 20  | 41.5 % | 91.5 % | 99.8 %  |
+| 30  | 45.7 % | 94.7 % | 100.0 % |
 
 Factors for $N$ = 10 to 30 at 1 percent, either end: 5.32, 5.09, 4.92, 4.78, 4.68, 4.60, 4.53, 4.47, 4.42, 4.38, 4.34, 4.31, 4.28, 4.26, 4.23, 4.22, 4.21, 4.20, 4.17, 4.16, 4.16.
 
@@ -67,7 +68,6 @@ improved. Rule met: the false-flag rate is inside 0.5 to 1.5 percent for every $
 The count of flags on real strings is not part of this entry: it waits for measured strings (issue 278). If real strings are flagged far more than 1 percent (heavy tails), the SD interval of the [Groups](../models/groups.md) assumes a normal string and the flag is not shown.
 
 Web wiring, not built (at most ten lines):
-
 - In the velocity statistics of a string of 10 to 30 shots, when `flierScreen` flags a shot, a line under the standard deviation: "Shot N (value) is far from the others (D standard deviations of the rest; a clean normal string shows this about once in a hundred). Standard deviation with it: A, without it: B." The shot stays in all numbers; the shot table marks it.
 - No flag, no line, for fewer than 10 or more than 30 shots; the line says nothing about cause (a cold-bore shot is a real effect).
 - The flag never sets `excluded` and never changes the extreme spread or the standard deviation shown first.

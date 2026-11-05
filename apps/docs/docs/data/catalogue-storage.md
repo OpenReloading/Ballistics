@@ -1,4 +1,5 @@
 ---
+
 title: Catalogue storage
 description: Why the read-only catalogue needs no server database, the single search matcher and sort order the API and the browser share, and the fallback if the decision's triggers fire.
 ---
@@ -12,19 +13,18 @@ The catalogue (the records of `packages/data`) is read only, rebuilt from git on
 No server database for the catalogue. A typed index and a record file are built at build time and opened in process through one `Catalogue` interface, used by the API server, the Pages build, the browser and the tests. User data stays in the browser ([Record model](record-model.md)).
 
 Speed does not decide it (every option answers in under 3 ms at this size). These do:
-
 1. **Parity.** One implementation of list, filter, search, ranking and order runs in Node and in the browser: the API through the catalogue, the browser through `openCatalogue` over `catalogue/index.json`, the web lists through `matchesQuery` (`apps/web/src/lib/lists.ts`). A `q` of spaces only is no query. The bullet list's own word-start rule (`bulletMatches`) stays until the record pickers use the ranker.
 2. **What a database did not fix.** PostgreSQL's JIT cost at default settings. The two sort orders between the API and the data files and the word-order dependent search it had are fixed by the shared `sortKey` and matcher below.
 3. **Less to run.** No SQL layer, database service, `DATABASE_URL` or database packages in code, containers or CI.
 
 Measured on the public bundle, one machine, medians:
 
-| | PostgreSQL 18 | PGlite | In-process index |
-|---|---|---|---|
-| Ready from nothing | 1.35 s container start, then 0.7 s seed | 0.7 to 3.1 s | 2 to 3 ms from the prebuilt files |
-| Memory beyond Node | 89 MB idle container | 560 MB or more | +6 MB |
-| 200-row cartridge page | 520 ms with JIT on, 32 ms with `jit=off` | 58 ms | 0.003 ms |
-| In the browser | no | yes, +3.7 MB brotli | yes, plain JavaScript |
+|                        | PostgreSQL 18                            | PGlite              | In-process index                  |
+| ---------------------- | ---------------------------------------- | ------------------- | --------------------------------- |
+| Ready from nothing     | 1.35 s container start, then 0.7 s seed  | 0.7 to 3.1 s        | 2 to 3 ms from the prebuilt files |
+| Memory beyond Node     | 89 MB idle container                     | 560 MB or more      | +6 MB                             |
+| 200-row cartridge page | 520 ms with JIT on, 32 ms with `jit=off` | 58 ms               | 0.003 ms                          |
+| In the browser         | no                                       | yes, +3.7 MB brotli | yes, plain JavaScript             |
 
 Ranked search over a generated 20,000 bullet index in plain JavaScript takes 1 to 2.5 ms per query. A scan with a trigram or full text index is needed only above a few thousand rows in a SQL engine; the in-process index needs none.
 
@@ -35,7 +35,6 @@ The load tables of the makers are `records/loads/<cartridge id>/<maker>.json`, o
 ## The module
 
 `packages/api/src/catalogue/`, read by the routes, the compute record lookups, the server and the static build:
-
 - `derive.ts`: one index row per record, `{ item, sortKey, search }`. `item` is the list item the route answers (the cartridge's sheet minima and case head, a bullet's first G1 and G7 coefficient, a target's caliber classes), `sortKey` and `search` come from the schema package's `sortKey` and `searchKey`. Also the revision: a synchronous 53-bit hash of the record's JSON text, the same in Node and the browser, for change detection only.
 - `build.ts`: `buildCatalogue(records)` returns the typed index (`CatalogueIndex`, every list in its default order, the renames) and the record file (every record by id, one map per kind). Both start with the header `format` and `derive`, see below. Pure, so the build, the tests and a browser can all run it. The files hold the records as they are: `kind`, `origin` and `revision` are added when a record is read.
 - `open.ts`: `openCatalogue({ index, records })` returns the `Catalogue` interface: `cartridges`, `powders`, `primers`, `bullets` and `cases` (with `q`, `table`, `manufacturer`, `cartridge`, `limit`, `offset`), `manufacturers`, `targetFaces`, `federations`, `disciplines`, `targetMappings`, `caliberClasses`, `capacities` and `get(kind, id)`. The record file may be a function, read on the first `get`. `renamed(kind, id)` answers the id that replaced an old one. A file whose header does not match is refused.
@@ -49,7 +48,6 @@ The budgets, tested as the best of fifteen runs after a warm-up (other test file
 ## Renames and the format guard
 
 `packages/data/records/renames.json` lists, per kind directory that has an id route (`cartridges`, `manufacturers`, `powders`, `primers`, `bullets`, `cases`, `target-faces`, `federations`, `disciplines`, `target-mappings`, `caliber-classes`), the ids that no longer name a record, each with the id of the record that replaced it (`renames` in `packages/schema/src/renames.ts`). A record that was removed names its successor. The file is `{}` until an id changes.
-
 - `data:validate` (`src/renames.ts`, `src/references.ts`, `src/federations.ts`): a reference to an unknown id fails, unless the id is an old id of `renames.json`. An old id must be no current record, and its replacement must be one, so a rename never chains. A kind without an id route, an id that is no record id or a file that is not JSON fails.
 - The catalogue carries the renames in its index. A reference to an old id joins the record that replaced it (a component's manufacturer, a capacity's cartridge, a mapping's discipline and target). A record is answered as stored, so the reference in its body keeps the old id.
 - The id routes answer a request for an old id with a 308 and the `Location` of the current record under the same version prefix. An unknown id stays a 404. The compute routes take current ids.
@@ -80,7 +78,6 @@ The API default order, the browser lists and the web tables (`sortRows` in `apps
 ## One matcher and ranker
 
 `packages/schema/src/search.ts`:
-
 - `fold(s)`: Unicode NFD, combining marks removed, lower case, a decimal comma between digits written as a point.
 - `searchKey(texts, name?)`: the folded texts, the same text with spaces and hyphens removed, and the folded name (default: the first text), joined by U+0001. Built once per row.
 - `score(key, query)`: the query is split into words. Each word must occur in the key, as written, without spaces and hyphens, or (for a word that starts with a point and a digit) without the point. A word scores 2 where the best occurrence starts a word of the key and 1 inside one. A word that is a number (digits, an optional decimal part, an optional leading point) must match a whole number of the key: no digit before or after it and not a part of a longer decimal. `7.8` finds neither `17.82` nor `7.82`, `168` neither `1682` nor `168.5`, `82` not `17.82`. A number is therefore found only once typed in full (`16` does not list `168`), the same in the list routes, the field, the dialog and the palette. The whole query equal to the name (ignoring a point that ends a word) adds 4. `undefined` means no match, an empty query ranks 0. The order of a ranked list is score descending, then `sortKey`, then id.

@@ -1,4 +1,5 @@
 ---
+
 title: Drag estimate from the outline
 description: Zero-yaw drag coefficient against Mach number estimated from the outline of a bullet, as a sum of head, skin friction, band, boat-tail and base drag.
 ---
@@ -179,32 +180,32 @@ Code: `packages/core/src/exterior/outline-drag.ts`, `relativeSd` (`sdPercent`).
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $d$, $d_\text{mm}$ | Reference diameter | mm | m (mm in $Re$) |
-| $L_T$ | Overall length over $d$ | 1 | 1 |
-| $L_N$ | Nose length to the meplat plane over $d$ | 1 | 1 |
-| $L_{BT}$ | Boat-tail or flare length over $d$ | 1 | 1 |
-| $d_B$, $d_M$, $d_{RB}$ | Base, meplat and band diameter over $d$ | 1 | 1 |
-| $r$ | Head shape $R_T / R$ | 1 | 1 |
-| $\tau$ | Thickness ratio of the nose | 1 | 1 |
-| $M$ | Mach number | 1 | 1 |
-| $M_f$, $M_c$ | Mach numbers where the head rules change | 1 | 1 |
-| $\chi$, $\zeta$, $\beta$ | Mach functions of the similarity rules | 1 | 1 |
-| $c_1$ to $c_4$ | Fit constants of the supersonic head rule | 1 | 1 |
-| $P_0 / p$ | Stagnation pressure on the meplat over static pressure | 1 | 1 |
-| $K$ | Meplat leakage factor | 1 | 1 |
-| $t_B$ | Boat-tail slope | 1 | 1 |
-| $r_{BT}$, $k$, $A$, $a_1$ | Terms of the boat-tail rules | 1 | 1 |
-| $Re$ | Reynolds number over the body length | 1 | 1 |
-| $C_{fT}$, $C_{fL}$, $C_{fN}$ | Turbulent, laminar and nose friction coefficients | 1 | 1 |
-| $S_N$, $S_C$ | Wetted areas of nose and afterbody, in square calibers | 1 | 1 |
-| $p_B / p_\infty$ | Base pressure over free-stream pressure | 1 | 1 |
-| $P(M)$ | Base pressure fit for a long cylinder | 1 | 1 |
-| $\gamma$ | Ratio of specific heats of air | 1 | 1 |
-| $C_{D0}$ | Zero-yaw drag coefficient | 1 | 1 |
-| $C_{DH}$, $C_{DM}$, $C_{DSF}$, $C_{DRB}$, $C_{DBT}$, $C_{DB}$ | Head, meplat, skin friction, band, boat-tail and base parts | 1 | 1 |
-| $\sigma / C_{D0}$ | Relative standard deviation of the estimate | 1 | 1 |
+| Symbol                                                        | Meaning                                                     | Stored unit | Unit in `core` |
+| ------------------------------------------------------------- | ----------------------------------------------------------- | ----------- | -------------- |
+| $d$, $d_\text{mm}$                                            | Reference diameter                                          | mm          | m (mm in $Re$) |
+| $L_T$                                                         | Overall length over $d$                                     | 1           | 1              |
+| $L_N$                                                         | Nose length to the meplat plane over $d$                    | 1           | 1              |
+| $L_{BT}$                                                      | Boat-tail or flare length over $d$                          | 1           | 1              |
+| $d_B$, $d_M$, $d_{RB}$                                        | Base, meplat and band diameter over $d$                     | 1           | 1              |
+| $r$                                                           | Head shape $R_T / R$                                        | 1           | 1              |
+| $\tau$                                                        | Thickness ratio of the nose                                 | 1           | 1              |
+| $M$                                                           | Mach number                                                 | 1           | 1              |
+| $M_f$, $M_c$                                                  | Mach numbers where the head rules change                    | 1           | 1              |
+| $\chi$, $\zeta$, $\beta$                                      | Mach functions of the similarity rules                      | 1           | 1              |
+| $c_1$ to $c_4$                                                | Fit constants of the supersonic head rule                   | 1           | 1              |
+| $P_0 / p$                                                     | Stagnation pressure on the meplat over static pressure      | 1           | 1              |
+| $K$                                                           | Meplat leakage factor                                       | 1           | 1              |
+| $t_B$                                                         | Boat-tail slope                                             | 1           | 1              |
+| $r_{BT}$, $k$, $A$, $a_1$                                     | Terms of the boat-tail rules                                | 1           | 1              |
+| $Re$                                                          | Reynolds number over the body length                        | 1           | 1              |
+| $C_{fT}$, $C_{fL}$, $C_{fN}$                                  | Turbulent, laminar and nose friction coefficients           | 1           | 1              |
+| $S_N$, $S_C$                                                  | Wetted areas of nose and afterbody, in square calibers      | 1           | 1              |
+| $p_B / p_\infty$                                              | Base pressure over free-stream pressure                     | 1           | 1              |
+| $P(M)$                                                        | Base pressure fit for a long cylinder                       | 1           | 1              |
+| $\gamma$                                                      | Ratio of specific heats of air                              | 1           | 1              |
+| $C_{D0}$                                                      | Zero-yaw drag coefficient                                   | 1           | 1              |
+| $C_{DH}$, $C_{DM}$, $C_{DSF}$, $C_{DRB}$, $C_{DBT}$, $C_{DB}$ | Head, meplat, skin friction, band, boat-tail and base parts | 1           | 1              |
+| $\sigma / C_{D0}$                                             | Relative standard deviation of the estimate                 | 1           | 1              |
 
 ## Assumptions
 

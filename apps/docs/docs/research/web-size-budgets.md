@@ -1,4 +1,5 @@
 ---
+
 title: Web script size budgets
 description: What the per-route JavaScript budgets of the web app protect, the headroom of every group on the pre-release integration branch, why one small change moves a route by hundreds of bytes, and four ways to restructure the gate.
 ---
@@ -28,19 +29,18 @@ Web app, build gate: what do the JavaScript budgets of `weight-budget.json` (che
 
 Headroom at `2c9f2c65`, Node 26.13.0, gzip level 9, bytes:
 
-| Group | Budget initial | Largest initial | Headroom initial | Budget total | Largest total | Headroom total | Largest route |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| error page | 179000 | 176553 | 2447 (1.4 %) | 179000 | 176553 | 2447 (1.4 %) | `/_global-error` |
-| shell | 424000 | 411916 | 12084 (2.9 %) | 472000 | 461442 | 10558 (2.2 %) | `/` |
-| lists | 446000 | 434317 | 11683 (2.6 %) | 494000 | 483843 | 10157 (2.1 %) | `/powders` |
-| records | 506000 | 492169 | 13831 (2.7 %) | 554000 | 541695 | 12305 (2.2 %) | `/bullets/[id]` |
-| curve charts | 462000 | 453107 | 8893 (1.9 %) | 701000 | 690229 | 10771 (1.5 %) | `/powders/[id]` |
-| designers | 419000 | 406438 | 12562 (3.0 %) | 653000 | 552649 | 100351 (15.4 %) | `/cartridges/designer` |
-| tools | 565000 | 563957 | 1043 (0.2 %) | 605000 | 604074 | 926 (0.2 %) | `/groups` |
-| workbench | 641000 | 640861 | 139 (0.0 %) | 1024000 | 1004874 | 19126 (1.9 %) | `/workbench` |
+| Group        | Budget initial | Largest initial | Headroom initial | Budget total | Largest total |  Headroom total | Largest route          |
+| ------------ | -------------: | --------------: | ---------------: | -----------: | ------------: | --------------: | ---------------------- |
+| error page   |         179000 |          176553 |     2447 (1.4 %) |       179000 |        176553 |    2447 (1.4 %) | `/_global-error`       |
+| shell        |         424000 |          411916 |    12084 (2.9 %) |       472000 |        461442 |   10558 (2.2 %) | `/`                    |
+| lists        |         446000 |          434317 |    11683 (2.6 %) |       494000 |        483843 |   10157 (2.1 %) | `/powders`             |
+| records      |         506000 |          492169 |    13831 (2.7 %) |       554000 |        541695 |   12305 (2.2 %) | `/bullets/[id]`        |
+| curve charts |         462000 |          453107 |     8893 (1.9 %) |       701000 |        690229 |   10771 (1.5 %) | `/powders/[id]`        |
+| designers    |         419000 |          406438 |    12562 (3.0 %) |       653000 |        552649 | 100351 (15.4 %) | `/cartridges/designer` |
+| tools        |         565000 |          563957 |     1043 (0.2 %) |       605000 |        604074 |     926 (0.2 %) | `/groups`              |
+| workbench    |         641000 |          640861 |      139 (0.0 %) |      1024000 |       1004874 |   19126 (1.9 %) | `/workbench`           |
 
 Other measured values:
-
 - Same build, host Node with zlib-ng: `/workbench` initial 642161 B, 1161 B over its budget; every route 0.1 to 0.2 % larger than with the CI binary (1300 B on `/workbench` initial). The gzip implementation alone moves a route by more than the headroom of tools and workbench.
 - The `initial` of `/workbench` binds: the last raise of 20000 B went to its `total`, and its `initial` has 139 B left.
 - Shared shell: of the 640861 B initial of `/workbench`, 405449 B are files that 30 or more of the 34 routes load, 78427 B are shared with a few routes and 156985 B are the workbench's own. `/` loads 411916 B. A growth of the shared files spends every group's margin at once.
@@ -50,7 +50,6 @@ Other measured values:
 - Whole app: `.next/static` holds 169 JavaScript files, 1984764 B gzipped, plus 313422 B of other files. The service worker precaches all of them once it installs, whatever page was opened.
 
 Answers to the questions of the issue:
-
 1. What each limit protects.
    - `initial` is the script a first visit to the route downloads and runs before the page responds. It is the one with a user-visible effect: download and main-thread execution are the dominant costs of script ([V8, The cost of JavaScript in 2019](https://v8.dev/blog/cost-of-javascript-2019)), main-thread work delays the response to input ([web.dev, Interaction to Next Paint](https://web.dev/articles/inp), good at 200 ms or less; [web.dev, Total Blocking Time](https://web.dev/articles/tbt), good under 200 ms on average mobile hardware). The workbench's own measurement on a throttled CPU found long tasks of 103 to 312 ms ([Automatic run and undo on the workbench](./workbench-auto-run-undo.md)). Confidence high for the direction, low for any byte threshold: the sources give no threshold for this app. The 170 KB figure of [web.dev, Performance budgets 101](https://web.dev/articles/performance-budgets-101) is a 2018 example for a 3G baseline device, and every group here is 2.4 to 3.8 times it; webpack warns at 250000 B per entry point by default and gives no reason for the number ([webpack, Performance](https://webpack.js.org/configuration/performance/)).
    - `total` adds the chunks a route loads on demand (a dialog, a tab). A user pays them only on use, so per route it protects less. The whole app is precached by the service worker (about 2.3 MB gzipped), which Lighthouse's payload guidance speaks to: it flags pages over 5000 KiB and advises under 1600 KiB ([Lighthouse, Avoid enormous network payloads](https://developer.chrome.com/docs/lighthouse/performance/total-byte-weight)); that payload is precached after the first visit, so how it counts for a user is unverified. No per-route limit covers the whole-app size. Confidence medium.
@@ -68,7 +67,6 @@ Answers to the questions of the issue:
 ## Result
 
 no change. Not adopted in code; recommendation (medium confidence): keep the absolute group budgets as a ceiling, make their headroom visible with a warning band and re-recorded weights in `check-weight.mts`, split the workbench's first render, and let the owner decide whether CI gates on a per-change limit instead.
-
 - Build issues opened (labelled needs-triage): issue #650, the headroom column, near-limit warning and re-recording of the weights in `check-weight.mts` and `weight-budget.json`; issue #651, a module-level breakdown of the workbench's initial chunks followed by moving the parts not needed for the first render behind `next/dynamic`.
 - For the owner, and not opened as issues: whether CI gates on a per-change limit with a label to accept (a workflow change: a base-branch measurement job, an artifact, the label check); whether the workbench `initial` (139 B left) and tools budgets are raised again before the split lands, since the next change to them fails; whether the gate's numbers should stop depending on the zlib build (the CI Node version is resolved from `.nvmrc` as the newest 26.x, so a Node update can move every route by up to about 1 kB).
 - Per-route limits and a periodic automatic raise are not recommended.

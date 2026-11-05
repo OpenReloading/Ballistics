@@ -1,4 +1,5 @@
 ---
+
 title: Truing
 description: Fit of the muzzle velocity and of drag factors to measured heights, holds and velocities of one or several firing sessions.
 ---
@@ -6,7 +7,6 @@ description: Fit of the muzzle velocity and of drag factors to measured heights,
 # Truing
 
 Truing adjusts inputs of the trajectory so that its predictions match measured values. Every evaluation is an ordinary `trajectory` call with candidate inputs, so truing runs on the [point-mass](exterior-point-mass.md) and the [modified point-mass](exterior-modified-point-mass.md) model with every trajectory option. The fit is the [least squares on log parameters](least-squares.md).
-
 - `trueMuzzleVelocity` fits the muzzle velocity.
 - `trueDrag` fits a drag correction, with or without the muzzle velocity.
 - `trueDragSessions` fits one drag correction of one projectile, shared by several sessions flown with their own conditions.
@@ -119,7 +119,6 @@ With a zero range, every candidate is zeroed again at that range by `trajectory`
 ### Failure modes
 
 A failed fit throws `TruingError`, an `InputError`, with one of these reasons and the last estimate:
-
 - `underdetermined`: fewer observations than parameters, before any trajectory.
 - `unresolved`: a parameter the observations do not move (a height at the zero range, a Mach knot no flight reaches).
 - `ill-conditioned`: the condition number exceeds `maxCondition` (default $10^3$), with the parameter combination the data cannot separate.
@@ -128,7 +127,6 @@ A failed fit throws `TruingError`, an `InputError`, with one of these reasons an
 - `step-budget`: the integration steps of all trajectories of the fit, zero searches included, reach `maxTotalSteps`.
 
 Malformed inputs throw a plain `InputError` before any trajectory (`checkObservations`, `dragCorrection`, `fitDrag`):
-
 - a standard deviation on some observations only, or not above 0,
 - observations of different kinds without standard deviations,
 - a height or hold at range 0,
@@ -140,27 +138,27 @@ The trajectories of a fit run at `relativeTolerance` $10^{-10}$, `absoluteTolera
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $v_0$ | Muzzle velocity | m/s | m/s |
-| $v_{0,\text{nom}}$ | Muzzle velocity of the input shot | m/s | m/s |
-| $k$ | Constant drag factor on $C_D$ | 1 | 1 |
-| $f_j$, $M_j$ | Drag factor at Mach knot $j$, knot Mach number | 1 | 1 |
-| $\theta$ | Log parameters | 1 | 1 |
-| $M$ | Mach number | 1 | 1 |
-| $C_D$, $C_\text{own}$ | Drag coefficient on $\pi d^2/4$ | 1 | 1 |
-| $C_G$ | Drag coefficient of the standard drag model | 1 | 1 |
-| $C_{\text{BC}}$ | Ballistic coefficient | lb/in2 | kg/m2 |
-| $c_n$ | Node value of a custom drag curve | 1 | 1 |
-| $m$ | Bullet mass | g | kg |
-| $d$ | Bullet diameter | mm | m |
-| $s_i$ | Slant range of observation $i$ | mm | m |
-| $y_i$, $\hat y_i$ | Observed and predicted height, elevation hold or speed | mm, deg, m/s | m, rad, m/s |
-| $\sigma_i$ | Standard deviation of observation $i$ | unit of the observation | unit of the observation |
-| $r_i$, $\chi^2$ | Weighted residual, sum of squares | 1 | 1 |
-| $\sigma_{q_j}$ | Standard uncertainty of a fitted parameter | unit of the parameter | unit of the parameter |
-| $\hat y_i^{(v)}$, $\hat y_i^{(k)}$ | Prediction of the muzzle velocity fit, of the fit of $v_0$ and $k$ | mm, deg, m/s | m, rad, m/s |
-| $D$ | Divergence of the two fits | 1 | 1 |
+| Symbol                             | Meaning                                                            | Stored unit             | Unit in `core`          |
+| ---------------------------------- | ------------------------------------------------------------------ | ----------------------- | ----------------------- |
+| $v_0$                              | Muzzle velocity                                                    | m/s                     | m/s                     |
+| $v_{0,\text{nom}}$                 | Muzzle velocity of the input shot                                  | m/s                     | m/s                     |
+| $k$                                | Constant drag factor on $C_D$                                      | 1                       | 1                       |
+| $f_j$, $M_j$                       | Drag factor at Mach knot $j$, knot Mach number                     | 1                       | 1                       |
+| $\theta$                           | Log parameters                                                     | 1                       | 1                       |
+| $M$                                | Mach number                                                        | 1                       | 1                       |
+| $C_D$, $C_\text{own}$              | Drag coefficient on $\pi d^2/4$                                    | 1                       | 1                       |
+| $C_G$                              | Drag coefficient of the standard drag model                        | 1                       | 1                       |
+| $C_{\text{BC}}$                    | Ballistic coefficient                                              | lb/in2                  | kg/m2                   |
+| $c_n$                              | Node value of a custom drag curve                                  | 1                       | 1                       |
+| $m$                                | Bullet mass                                                        | g                       | kg                      |
+| $d$                                | Bullet diameter                                                    | mm                      | m                       |
+| $s_i$                              | Slant range of observation $i$                                     | mm                      | m                       |
+| $y_i$, $\hat y_i$                  | Observed and predicted height, elevation hold or speed             | mm, deg, m/s            | m, rad, m/s             |
+| $\sigma_i$                         | Standard deviation of observation $i$                              | unit of the observation | unit of the observation |
+| $r_i$, $\chi^2$                    | Weighted residual, sum of squares                                  | 1                       | 1                       |
+| $\sigma_{q_j}$                     | Standard uncertainty of a fitted parameter                         | unit of the parameter   | unit of the parameter   |
+| $\hat y_i^{(v)}$, $\hat y_i^{(k)}$ | Prediction of the muzzle velocity fit, of the fit of $v_0$ and $k$ | mm, deg, m/s            | m, rad, m/s             |
+| $D$                                | Divergence of the two fits                                         | 1                       | 1                       |
 
 ## Assumptions
 

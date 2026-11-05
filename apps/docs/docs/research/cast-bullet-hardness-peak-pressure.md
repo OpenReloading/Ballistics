@@ -1,4 +1,5 @@
 ---
+
 title: Cast bullet hardness against peak pressure
 description: Whether a plain-base cast bullet harder than the simulated peak pressure should get a leak model or a warning, with the Brinell hardness of the cast records.
 ---
@@ -21,11 +22,11 @@ Upset pressure $p_\mathrm{ob} = 1422\ \mathrm{psi} \cdot \mathrm{BHN} \approx 9.
 
 BHN 12 gives 118 MPa, BHN 18 176 MPa, BHN 22 216 MPa. Solver response to a leak area (issue #845, stand-in loads):
 
-| Leak area (mm²) | 9 mm (232 MPa, 332 m/s) | .308 |
-|---|---|---|
-| 0.1 | -0.9 % p, -0.52 % v | -1.2 % p, -0.48 % v |
-| 0.5 | -4.3 % p, -2.60 % v | -6.1 % p, -2.39 % v |
-| 2 | -16.5 % p, -10.0 % v | about -21.9 % p |
+| Leak area (mm²) | 9 mm (232 MPa, 332 m/s) | .308                |
+| --------------- | ----------------------- | ------------------- |
+| 0.1             | -0.9 % p, -0.52 % v     | -1.2 % p, -0.48 % v |
+| 0.5             | -4.3 % p, -2.60 % v     | -6.1 % p, -2.39 % v |
+| 2               | -16.5 % p, -10.0 % v    | about -21.9 % p     |
 
 Hardness of the cast records after the data step: Brinell 12 on 80, 18 on 110, 20 on 5 of the 195 Missouri Bullet records; every one is cast with no gas check (the maker: "We don't do gas-checked bullets").
 

@@ -1,4 +1,5 @@
 ---
+
 title: Bound for a charge too small for the interior model
 description: Why the model flags a peak mean pressure below 2.2 times the hold pressure, which alternatives were not taken, and the loads it was derived on.
 ---
@@ -30,7 +31,6 @@ $$
 ## Numbers
 
 From the model page, "Charge too small":
-
 - Without bore resistance, $E_p$ is close to one function of $r = \bar p_\text{max}/p_h$: 0.68 to 0.70 at $r = 1.5$, 0.5 at $r$ = 2.18 to 2.39, 1/3 at $r$ = 3.7 to 4.3.
 - With $p_\text{st} = 0$, $E_p$ is 0.5 at $r$ = 2.1 to 2.3.
 - With bore resistance, $E_p$ stays below 0.45 above $r = 1.1$.

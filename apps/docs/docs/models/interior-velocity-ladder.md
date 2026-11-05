@@ -1,4 +1,5 @@
 ---
+
 title: Velocity flat spots of a charge ladder
 description: The slope of mean velocity against charge between neighbouring ladder strings, its confidence band by string count, and the charge ranges whose band includes zero.
 ---
@@ -39,16 +40,16 @@ Code: `packages/core/src/interior/velocity-ladder.ts`, `ladderFlatSpots` (`flat`
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $c$ | Charge of a string | g | kg |
-| $\bar v$ | Mean velocity of a string | m/s | m/s |
-| $s$ | Sample standard deviation of a string | m/s | m/s |
-| $n$ | Shots of a string | 1 | 1 |
-| $m$ | Slope of mean velocity against charge | no kind | m/s per kg |
-| $h$ | Half width of the confidence band of the slope | no kind | m/s per kg |
-| $\gamma$ | Confidence level, 0.95 by default | 1 | 1 |
-| $\nu$ | Degrees of freedom | 1 | 1 |
+| Symbol   | Meaning                                        | Stored unit | Unit in `core` |
+| -------- | ---------------------------------------------- | ----------- | -------------- |
+| $c$      | Charge of a string                             | g           | kg             |
+| $\bar v$ | Mean velocity of a string                      | m/s         | m/s            |
+| $s$      | Sample standard deviation of a string          | m/s         | m/s            |
+| $n$      | Shots of a string                              | 1           | 1              |
+| $m$      | Slope of mean velocity against charge          | no kind     | m/s per kg     |
+| $h$      | Half width of the confidence band of the slope | no kind     | m/s per kg     |
+| $\gamma$ | Confidence level, 0.95 by default              | 1           | 1              |
+| $\nu$    | Degrees of freedom                             | 1           | 1              |
 
 ## Assumptions
 

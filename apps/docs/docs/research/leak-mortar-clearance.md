@@ -1,4 +1,5 @@
 ---
+
 title: Gas leakage against published mortar clearance figures
 description: Whether the leak model reproduces the muzzle-velocity loss per 0.001 in of annular clearance that trials of smooth-bore mortars give, with discharge coefficient 0.83 and 1.
 ---
@@ -15,17 +16,17 @@ Reference figures, from the issue text: unverified targets for a plausibility co
 
 Every number below is a simulation of synthetic proxy loads, not load data. Inputs of the 81 mm mortar proxy:
 
-| Input | Value |
-| --- | --- |
-| Bore diameter, bore area | 0.081 m, $\pi/4 \cdot 0.081^2$ m² |
-| Travel | 1.2 m, no twist |
-| Bomb mass | 3.3 kg |
-| Chamber volume | $1.5\cdot10^{-3}$ m³ |
-| Propellant | specific energy $3.6\cdot10^{6}$ J/kg, $k = 1.24$, solid density 1600 kg/m³, covolume $10^{-3}$ m³/kg, propellant temperature 294.15 K |
-| Burn law | geometric, exponent 1, `tube` grain: diameter 4 mm, perforation 1 mm, length 6 mm |
-| Ignition pressure, start pressure | 1 MPa, 1 MPa (3 MPa dominated the 100 m/s load and was dropped before the final run) |
-| Burn coefficient | $10^{-8}$ m s⁻¹ Pa⁻¹ (the proxy of the verdict, named first before any run), and $3\cdot10^{-9}$ as a sensitivity |
-| Heat, back pressure | none, the ICAO sea-level pressure |
+| Input                             | Value                                                                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Bore diameter, bore area          | 0.081 m, $\pi/4 \cdot 0.081^2$ m²                                                                                                      |
+| Travel                            | 1.2 m, no twist                                                                                                                        |
+| Bomb mass                         | 3.3 kg                                                                                                                                 |
+| Chamber volume                    | $1.5\cdot10^{-3}$ m³                                                                                                                   |
+| Propellant                        | specific energy $3.6\cdot10^{6}$ J/kg, $k = 1.24$, solid density 1600 kg/m³, covolume $10^{-3}$ m³/kg, propellant temperature 294.15 K |
+| Burn law                          | geometric, exponent 1, `tube` grain: diameter 4 mm, perforation 1 mm, length 6 mm                                                      |
+| Ignition pressure, start pressure | 1 MPa, 1 MPa (3 MPa dominated the 100 m/s load and was dropped before the final run)                                                   |
+| Burn coefficient                  | $10^{-8}$ m s⁻¹ Pa⁻¹ (the proxy of the verdict, named first before any run), and $3\cdot10^{-9}$ as a sensitivity                      |
+| Heat, back pressure               | none, the ICAO sea-level pressure                                                                                                      |
 
 For each target muzzle velocity of 100, 150, 200 and 250 m/s the charge comes from `solveCharge` on the load without a leak. The load is then run again at that charge with a leak area constant over the whole travel: bore area times $2c/d$ with the clearance $c$ of 0.001 in (25.4 micrometres), at discharge 0.83 and at discharge 1. Half the clearance is run too, to check linearity. The loss is the difference of the muzzle velocities, in ft/s, multiplied by 81/80 to reduce it to 80 mm (the loss scales with $2c/d$, so the same absolute clearance on an 81 mm bore counts for less than on 80 mm).
 
@@ -48,21 +49,20 @@ and the loss is summarised by $\Delta v = c_\ell\, A_\ell / A$ with the coeffici
 Proxy of the verdict (burn coefficient $10^{-8}$), loss per 0.001 in reduced to 80 mm:
 
 | Muzzle velocity, m/s | Charge, kg | Peak breech pressure, MPa | Loss at 0.83, ft/s | Ratio to 1.6 ft/s | Loss at 1, ft/s | Ratio to 1.6 ft/s |
-| --- | --- | --- | --- | --- | --- | --- |
-| 100 | 0.022 | 4 | 1.58 | 0.99 | 1.91 | 1.19 |
-| 150 | 0.040 | 8 | 1.33 | 0.83 | 1.60 | 1.00 |
-| 200 | 0.065 | 18 | 1.24 | 0.78 | 1.50 | 0.94 |
-| 250 | 0.096 | 35 | 1.24 | 0.77 | 1.49 | 0.93 |
+| -------------------- | ---------- | ------------------------- | ------------------ | ----------------- | --------------- | ----------------- |
+| 100                  | 0.022      | 4                         | 1.58               | 0.99              | 1.91            | 1.19              |
+| 150                  | 0.040      | 8                         | 1.33               | 0.83              | 1.60            | 1.00              |
+| 200                  | 0.065      | 18                        | 1.24               | 0.78              | 1.50            | 0.94              |
+| 250                  | 0.096      | 35                        | 1.24               | 0.77              | 1.49            | 0.93              |
 
 Sensitivity, burn coefficient $3\cdot10^{-9}$:
 
 | Muzzle velocity, m/s | Charge, kg | Peak breech pressure, MPa | Loss at 0.83, ft/s | Ratio to 1.6 ft/s | Loss at 1, ft/s | Ratio to 1.6 ft/s |
-| --- | --- | --- | --- | --- | --- | --- |
-| 100 | 0.067 | 3 | 1.68 | 1.05 | 2.02 | 1.26 |
-| 150 | 0.112 | 7 | 1.75 | 1.09 | 2.11 | 1.32 |
-| 200 | 0.156 | 13 | 1.78 | 1.12 | 2.15 | 1.34 |
-| 250 | 0.199 | 21 | 1.80 | 1.13 | 2.17 | 1.36 |
-
+| -------------------- | ---------- | ------------------------- | ------------------ | ----------------- | --------------- | ----------------- |
+| 100                  | 0.067      | 3                         | 1.68               | 1.05              | 2.02            | 1.26              |
+| 150                  | 0.112      | 7                         | 1.75               | 1.09              | 2.11            | 1.32              |
+| 200                  | 0.156      | 13                        | 1.78               | 1.12              | 2.15            | 1.34              |
+| 250                  | 0.199      | 21                        | 1.80               | 1.13              | 2.17            | 1.36              |
 - Linearity: half the clearance gives half the loss to within 0.1 percent in every row.
 - The coefficient $c_\ell$ at discharge 0.83 is 480 m/s per ft/s of loss: 595 to 760 m/s for the verdict proxy and 806 to 864 m/s for the sensitivity, against 610 to 760 m/s for the reference.
 - Dependence on the charge: with the verdict proxy the loss falls by 21 percent from the 100 to the 250 m/s load; with the sensitivity proxy it rises by 7 percent. The reference shows no trend.

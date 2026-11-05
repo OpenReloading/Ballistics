@@ -1,4 +1,5 @@
 ---
+
 title: Taking a photo the app can score
 description: Six rules for a target photo that hole detection can read, each with a drawn good and bad example and the in-app quality note that matches it.
 ---
@@ -42,7 +43,6 @@ In-app note: "The target is photographed at a slant of about N degrees."
 Light the target from the side or with daylight, with no flash straight on and no shadow of your hand or phone on the sheet.
 
 In-app notes:
-
 - "A bright reflection covers part of the paper."
 - "The light is uneven: one side of the target is much darker than another."
 - "The black area and the paper are close in brightness."

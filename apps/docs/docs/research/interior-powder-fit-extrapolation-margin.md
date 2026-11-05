@@ -1,4 +1,5 @@
 ---
+
 title: Margin of the extrapolation flag of a powder fit
 description: How the coverage of the powder fit interval falls with the distance outside the fitted charges, barrel lengths and bore, on synthetic ladders, and which margin each axis of the domain needs.
 ---
@@ -12,7 +13,6 @@ description: How the coverage of the powder fit interval falls with the distance
 ## Method
 
 Synthetic ladders from the [M3 model](../models/interior-m3.md), fitted with `fitPowder` and predicted with `predictPowder` and `powderPressureRange`, 200 replicates per world with fixed seeds. Measured on the default branch before every axis had a domain (only the charge was flagged).
-
 - Load: the synthetic rifle-like load of the core powder fit tests (0.6 m barrel, 6.9 mm bore), burn coefficient 0.45 1/s as truth. The fit starts at 0.38 and fits the burn coefficient only (the default).
 - Ladders: "narrow", 5 charges from 2.2 to 2.6 g, velocity noise 4 m/s (1 sigma, given as `velocitySigma`, so the normal quantile at level 0.9); "narrow+p", the same with pressure rows of 5 % uncertainty; "wide", 6 charges from 1.9 to 2.7 g; "two-barrels", the narrow charges at 0.5 and 0.6 m.
 - Truth worlds, applied to the data and to the true values:
@@ -46,68 +46,67 @@ Coverage of the 90 % interval in %, narrow ladder.
 Charge, velocity interval:
 
 | distance | exact | inputs | structure-mild | structure |
-|---|---:|---:|---:|---:|
-| -25 % | 92 | 20 | 0 | 0 |
-| -10 % | 92 | 39 | 77 | 17 |
-| -5 % | 92 | 49 | 86 | 73 |
-| -1 % | 92 | 60 | 91 | 89 |
-| inside | 92 | 79 | 88 | 89 |
-| +1 % | 92 | 56 | 84 | 78 |
-| +3 % | 92 | 49 | 78 | 63 |
-| +5 % | 92 | 43 | 72 | 48 |
-| +10 % | 92 | 32 | 52 | 12 |
-| +25 % | 92 | 15 | 28 | 1 |
+| -------- | ----: | -----: | -------------: | --------: |
+| -25 %    |    92 |     20 |              0 |         0 |
+| -10 %    |    92 |     39 |             77 |        17 |
+| -5 %     |    92 |     49 |             86 |        73 |
+| -1 %     |    92 |     60 |             91 |        89 |
+| inside   |    92 |     79 |             88 |        89 |
+| +1 %     |    92 |     56 |             84 |        78 |
+| +3 %     |    92 |     49 |             78 |        63 |
+| +5 %     |    92 |     43 |             72 |        48 |
+| +10 %    |    92 |     32 |             52 |        12 |
+| +25 %    |    92 |     15 |             28 |         1 |
 
 Factor $k_{90}$ on the charge axis (nominal 1.645):
 
 | distance | exact | inputs | structure-mild | structure |
-|---|---:|---:|---:|---:|
-| inside | 1.6 | 2.3 | 1.7 | 1.7 |
-| +1 % | 1.6 | 3.3 | 2.1 | 2.3 |
-| +5 % | 1.6 | 4.6 | 2.6 | 3.2 |
-| +10 % | 1.6 | 6.6 | 3.1 | 4.3 |
-| +25 % | 1.6 | 13.4 | 3.9 | 5.9 |
-| -5 % | 1.6 | 5.0 | 1.8 | 2.5 |
-| -10 % | 1.6 | 6.4 | 2.4 | 4.0 |
+| -------- | ----: | -----: | -------------: | --------: |
+| inside   |   1.6 |    2.3 |            1.7 |       1.7 |
+| +1 %     |   1.6 |    3.3 |            2.1 |       2.3 |
+| +5 %     |   1.6 |    4.6 |            2.6 |       3.2 |
+| +10 %    |   1.6 |    6.6 |            3.1 |       4.3 |
+| +25 %    |   1.6 |   13.4 |            3.9 |       5.9 |
+| -5 %     |   1.6 |    5.0 |            1.8 |       2.5 |
+| -10 %    |   1.6 |    6.4 |            2.4 |       4.0 |
 
 Barrel length, velocity interval, one fitted length of 0.6 m:
 
 | distance | exact | inputs | structure-mild | structure |
-|---|---:|---:|---:|---:|
-| -20 % | 92 | 84 | 13 | 0 |
-| -5 % | 92 | 90 | 73 | 46 |
-| -2.5 % | 92 | 91 | 80 | 70 |
-| inside | 92 | 91 | 89 | 88 |
-| +2.5 % | 92 | 90 | 88 | 88 |
-| +5 % | 92 | 89 | 84 | 73 |
-| +10 % | 92 | 88 | 67 | 27 |
-| +50 % | 92 | 66 | 0 | 0 |
-| +100 % | 92 | 38 | 0 | 0 |
+| -------- | ----: | -----: | -------------: | --------: |
+| -20 %    |    92 |     84 |             13 |         0 |
+| -5 %     |    92 |     90 |             73 |        46 |
+| -2.5 %   |    92 |     91 |             80 |        70 |
+| inside   |    92 |     91 |             89 |        88 |
+| +2.5 %   |    92 |     90 |             88 |        88 |
+| +5 %     |    92 |     89 |             84 |        73 |
+| +10 %    |    92 |     88 |             67 |        27 |
+| +50 %    |    92 |     66 |              0 |         0 |
+| +100 %   |    92 |     38 |              0 |         0 |
 
 With fitted lengths of 0.5 and 0.6 m the structural worlds fall to 1 to 35 % already 2.5 % outside the fitted lengths (89 % between them).
 
 Bore diameter, velocity interval:
 
 | distance | exact | inputs | structure-mild | structure |
-|---|---:|---:|---:|---:|
-| -10 % | 92 | 59 | 80 | 80 |
-| -2.5 % | 92 | 82 | 81 | 71 |
-| inside | 92 | 91 | 89 | 88 |
-| +2.5 % | 92 | 87 | 86 | 82 |
-| +5 % | 92 | 68 | 68 | 36 |
-| +10 % | 92 | 41 | 7 | 0 |
-| +30 % | 92 | 9 | 0 | 0 |
+| -------- | ----: | -----: | -------------: | --------: |
+| -10 %    |    92 |     59 |             80 |        80 |
+| -2.5 %   |    92 |     82 |             81 |        71 |
+| inside   |    92 |     91 |             89 |        88 |
+| +2.5 %   |    92 |     87 |             86 |        82 |
+| +5 %     |    92 |     68 |             68 |        36 |
+| +10 %    |    92 |     41 |              7 |         0 |
+| +30 %    |    92 |      9 |              0 |         0 |
 
 Pressure, velocity-only ladder:
 
-| interval | exact | inputs | structure-mild | structure |
-|---|---:|---:|---:|---:|
-| `predictPowder`, inside | 91 | 27 | 0 | 0 |
-| `powderPressureRange`, inside | 100 | 92 | 1 | 0 |
-| `powderPressureRange`, charge -25 % to +25 % | 100 | 90 to 93 | 0 to 100 | 0 to 100 |
-| `predictPowder`, charge -25 % to +25 % | 91 to 92 | 7 to 30 | 0 | 0 |
-| `powderPressureRange`, barrel -75 % to +100 % | 100 | 93 | 0 | 0 |
-
+| interval                                      |    exact |   inputs | structure-mild | structure |
+| --------------------------------------------- | -------: | -------: | -------------: | --------: |
+| `predictPowder`, inside                       |       91 |       27 |              0 |         0 |
+| `powderPressureRange`, inside                 |      100 |       92 |              1 |         0 |
+| `powderPressureRange`, charge -25 % to +25 %  |      100 | 90 to 93 |       0 to 100 |  0 to 100 |
+| `predictPowder`, charge -25 % to +25 %        | 91 to 92 |  7 to 30 |              0 |         0 |
+| `powderPressureRange`, barrel -75 % to +100 % |      100 |       93 |              0 |         0 |
 - With the right model (`exact`) the intervals hold at every tested distance on every axis (92 % at 90 % nominal, charge to ±25 %, barrel to +100 %, bore to ±30 %): the linearised covariance is not the problem.
 - Any model error makes the coverage fall from the first per cent outside the range, with no plateau that a margin could mark. The loss is steepest on the charge axis (more above than below) and above the fitted bore.
 - Inside the range the velocity interval already holds too little when the fixed inputs carry their assumed uncertainties (`inputs`: 79 %, 61 % for the wide ladder). The velocity interval has no fixed-input term; the pressure range has one and holds 90 to 93 % at every distance on every axis in `inputs`.
@@ -117,13 +116,13 @@ Pressure, velocity-only ladder:
 
 Margins by the accept rule:
 
-| axis | margin | basis |
-|---|---|---|
-| charge | 0 % | `inputs`: 0 on both sides; `structure-mild`: +1 % above, 7.5 % below; `structure`: 0 above, 3 % below |
-| velocity | none, follows charge, barrel and bore | an output of the same predictions |
-| pressure | none | the interval fails by a bias that does not depend on the distance |
+| axis          | margin                                     | basis                                                                                                                                    |
+| ------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| charge        | 0 %                                        | `inputs`: 0 on both sides; `structure-mild`: +1 % above, 7.5 % below; `structure`: 0 above, 3 % below                                    |
+| velocity      | none, follows charge, barrel and bore      | an output of the same predictions                                                                                                        |
+| pressure      | none                                       | the interval fails by a bias that does not depend on the distance                                                                        |
 | barrel length | 0 %, at most 2.5 % above one fitted length | `inputs`: 10 % each side; `structure-mild`: 2.5 % above, 0 below; two fitted lengths: 2.5 to 5 % in `inputs`, 0 in the structural worlds |
-| bore diameter | 0 %, at most 2.5 % above | `inputs`: 2.5 % above, 0 below; `structure-mild`: 2.5 % above, 0 below |
+| bore diameter | 0 %, at most 2.5 % above                   | `inputs`: 2.5 % above, 0 below; `structure-mild`: 2.5 % above, 0 below                                                                   |
 
 ## Result
 

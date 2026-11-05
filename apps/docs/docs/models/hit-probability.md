@@ -1,4 +1,5 @@
 ---
+
 title: Hit probability
 description: The probability of a hit and the expected score on a target from the dispersion of a group scaled to the distance, with the crosswind and range uncertainty added.
 ---
@@ -89,23 +90,23 @@ The zones of a target are its rings, grown by the radius of the scored hole as i
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $\sigma_{g,0}$, $\sigma_g$ | Group standard deviation per axis, at the reference distance and the target | mm | m |
-| $D_0$, $D$ | Reference distance, distance of the target | m | m |
-| $W$, $\sigma_W$ | Wind speed, its standard deviation | m/s | m/s |
-| $\phi$, $\sigma_\phi$ | Direction the wind comes from, its standard deviation | deg | rad |
-| $\sigma_c$ | Standard deviation of the crosswind | m/s | m/s |
-| $S_c$ | Lateral displacement per 1 m/s of crosswind | no kind | m per m/s |
-| $S_R$, $\sigma_R$ | Height change per metre of range, standard deviation of the range | no kind, m | m/m, m |
-| $\sigma_v$ | Standard deviation of the muzzle speed | m/s | m/s |
-| $S_v$, $S_{v,0}$ | Height change per 1 m/s of muzzle speed, at the distance and at the reference distance | no kind | m per m/s |
-| $\sigma_x$, $\sigma_y$ | Standard deviations of the point of impact | mm | m |
-| $a$, $b$ | Semi-axes of a scoring zone | mm | m |
-| $P$, $p_k$ | Probability inside a zone, inside a zone and outside the next | 1 | 1 |
-| $v_k$ | Value of zone $k$ | 1 | 1 |
-| $\delta_x$, $\delta_y$ | Offset of the centre of the point of impact from the aim point | mm | m |
-| $n$, $\bar n$, $P_w$ | Shots needed, mean shots to the first hit, wanted chance of a hit | 1 | 1 |
+| Symbol                     | Meaning                                                                                | Stored unit | Unit in `core` |
+| -------------------------- | -------------------------------------------------------------------------------------- | ----------- | -------------- |
+| $\sigma_{g,0}$, $\sigma_g$ | Group standard deviation per axis, at the reference distance and the target            | mm          | m              |
+| $D_0$, $D$                 | Reference distance, distance of the target                                             | m           | m              |
+| $W$, $\sigma_W$            | Wind speed, its standard deviation                                                     | m/s         | m/s            |
+| $\phi$, $\sigma_\phi$      | Direction the wind comes from, its standard deviation                                  | deg         | rad            |
+| $\sigma_c$                 | Standard deviation of the crosswind                                                    | m/s         | m/s            |
+| $S_c$                      | Lateral displacement per 1 m/s of crosswind                                            | no kind     | m per m/s      |
+| $S_R$, $\sigma_R$          | Height change per metre of range, standard deviation of the range                      | no kind, m  | m/m, m         |
+| $\sigma_v$                 | Standard deviation of the muzzle speed                                                 | m/s         | m/s            |
+| $S_v$, $S_{v,0}$           | Height change per 1 m/s of muzzle speed, at the distance and at the reference distance | no kind     | m per m/s      |
+| $\sigma_x$, $\sigma_y$     | Standard deviations of the point of impact                                             | mm          | m              |
+| $a$, $b$                   | Semi-axes of a scoring zone                                                            | mm          | m              |
+| $P$, $p_k$                 | Probability inside a zone, inside a zone and outside the next                          | 1           | 1              |
+| $v_k$                      | Value of zone $k$                                                                      | 1           | 1              |
+| $\delta_x$, $\delta_y$     | Offset of the centre of the point of impact from the aim point                         | mm          | m              |
+| $n$, $\bar n$, $P_w$       | Shots needed, mean shots to the first hit, wanted chance of a hit                      | 1           | 1              |
 
 ## Assumptions
 

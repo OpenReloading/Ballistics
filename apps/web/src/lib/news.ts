@@ -17,20 +17,21 @@ const fileName = /^(\d{4}-\d{2}-\d{2})-([a-z0-9-]+)\.md$/
 
 /**
  * The title, link and text of a news file, split by lines; undefined for no front matter. Blank
- * lines may follow the title and the link.
+ * lines may come between the lines of the front matter (Biome's formatter puts one after `---`).
  */
 function newsContent(file: string): [title: string, link: string, text: string] | undefined {
   const lines = file.split(/\r?\n/)
-  const [open, title] = lines
-  let i = 2
+  let i = 1
   const next = () => {
     while (lines[i]?.trim() === '') i++
     return lines[i++]
   }
-  const [link, close] = [next(), next()]
+  const [title, link, close] = [next(), next(), next()]
   const t = /^title: *(\S.*)$/.exec(title ?? '')?.[1]?.trimEnd()
   const l = /^link: *(\S+)\s*$/.exec(link ?? '')?.[1]
-  return open === '---' && close === '---' && t && l ? [t, l, lines.slice(i).join('\n')] : undefined
+  return lines[0] === '---' && close === '---' && t && l
+    ? [t, l, lines.slice(i).join('\n')]
+    : undefined
 }
 
 /**

@@ -1,4 +1,5 @@
 ---
+
 title: '@open-reloading/data'
 sidebar_label: data
 description: The catalogue records as one bundle, their reader and plausibility checks.
@@ -18,11 +19,11 @@ It installs `@open-reloading/schema` with it. Each library has its own [Semantic
 
 ## Entry points
 
-| Import | Contents |
-|---|---|
-| `@open-reloading/data` | `readRecords` and `readLoadTables` (Node, they read files), the coverage and plausibility checks |
-| `@open-reloading/data/plausibility` | The plausibility checks alone, without file access |
-| `@open-reloading/data/bundle.json` | Every record, one array per kind (the `Bundle` type) |
+| Import                              | Contents                                                                                         |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `@open-reloading/data`              | `readRecords` and `readLoadTables` (Node, they read files), the coverage and plausibility checks |
+| `@open-reloading/data/plausibility` | The plausibility checks alone, without file access                                               |
+| `@open-reloading/data/bundle.json`  | Every record, one array per kind (the `Bundle` type)                                             |
 
 ## Example
 

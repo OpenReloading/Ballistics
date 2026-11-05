@@ -1,4 +1,5 @@
 ---
+
 title: Leakage and heat loss
 description: Gas leakage past the projectile and convective heat loss to the bore in the M3 interior model.
 ---
@@ -6,7 +7,6 @@ description: Gas leakage past the projectile and convective heat loss to the bor
 # Leakage and heat loss
 
 Two optional terms of the [M3 interior model](interior-m3.md):
-
 - Gas leakage: propellant gas escapes past the projectile through a leak area that can change with travel, as in a worn bore or a projectile that does not seal. The gas takes its mass and its enthalpy with it, which lowers pressure and velocity.
 - Convective heat loss: heat flows from the gas to the bore wall by a pipe-flow correlation.
 
@@ -144,42 +144,42 @@ Code: `packages/core/src/interior/model.ts`, `convectiveDefaults`.
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $m_g$ | Gas mass in the barrel | g | kg |
-| $m_\ell$ | Escaped gas mass | g | kg |
-| $\dot m_\ell$ | Mass flow through the leak | no kind | kg/s |
-| $m_c$ | Charge mass | g | kg |
-| $z$ | Burnt fraction | 1 | 1 |
-| $V_c$, $V_f$ | Chamber volume, free volume | no kind | m3 |
-| $A$ | Bore area | mm2 | m2 |
-| $A_\ell(x)$ | Leak area over travel | mm2 | m2 |
-| $C_d$ | Discharge coefficient | 1 | 1 |
-| $x$ | Travel | mm | m |
-| $v$ | Projectile velocity | m/s | m/s |
-| $\bar p$, $p_b$ | Mean pressure, base pressure | bar | Pa |
-| $p_a$ | Pressure ahead of the projectile | bar | Pa |
-| $r$, $r^\ast$ | Pressure ratio $p_a/p_b$, critical ratio | 1 | 1 |
-| $\Phi_k$ | Flow factor | 1 | 1 |
-| $k$ | Ratio of specific heats | 1 | 1 |
-| $\eta$ | Covolume | m3/kg | m3/kg |
-| $\rho_s$ | Solid density of the propellant | g/cm3 | kg/m3 |
-| $Q$ | Specific energy of the propellant | J/kg | J/kg |
-| $R$ | Gas constant of the propellant gas | no kind | J/(kg K) |
-| $T$ | Gas temperature | K | K |
-| $T_0$ | Flame temperature | K | K |
-| $T_w$ | Wall temperature | degC | K |
-| $E_\ell$ | Enthalpy carried out by leaking gas | J | J |
-| $E_h$, $W_r$ | Heat lost, work against bore resistance | J | J |
-| $\dot q$ | Heat flux to the bore | no kind | W |
-| $c_h$ | Factor on the heat flux | 1 | 1 |
-| $h$ | Heat-transfer coefficient | no kind | W/(m2 K) |
-| $d$ | Bore diameter | mm | m |
-| $\mathrm{Re}$, $\mathrm{Pr}$ | Reynolds and Prandtl number | 1 | 1 |
-| $\rho_g$ | Gas density | g/cm3 | kg/m3 |
-| $\mu_g$ | Gas viscosity | no kind | Pa s |
-| $\lambda_g$ | Thermal conductivity of the gas | no kind | W/(m K) |
-| $c_p$ | Specific heat at constant pressure | no kind | J/(kg K) |
+| Symbol                       | Meaning                                  | Stored unit | Unit in `core` |
+| ---------------------------- | ---------------------------------------- | ----------- | -------------- |
+| $m_g$                        | Gas mass in the barrel                   | g           | kg             |
+| $m_\ell$                     | Escaped gas mass                         | g           | kg             |
+| $\dot m_\ell$                | Mass flow through the leak               | no kind     | kg/s           |
+| $m_c$                        | Charge mass                              | g           | kg             |
+| $z$                          | Burnt fraction                           | 1           | 1              |
+| $V_c$, $V_f$                 | Chamber volume, free volume              | no kind     | m3             |
+| $A$                          | Bore area                                | mm2         | m2             |
+| $A_\ell(x)$                  | Leak area over travel                    | mm2         | m2             |
+| $C_d$                        | Discharge coefficient                    | 1           | 1              |
+| $x$                          | Travel                                   | mm          | m              |
+| $v$                          | Projectile velocity                      | m/s         | m/s            |
+| $\bar p$, $p_b$              | Mean pressure, base pressure             | bar         | Pa             |
+| $p_a$                        | Pressure ahead of the projectile         | bar         | Pa             |
+| $r$, $r^\ast$                | Pressure ratio $p_a/p_b$, critical ratio | 1           | 1              |
+| $\Phi_k$                     | Flow factor                              | 1           | 1              |
+| $k$                          | Ratio of specific heats                  | 1           | 1              |
+| $\eta$                       | Covolume                                 | m3/kg       | m3/kg          |
+| $\rho_s$                     | Solid density of the propellant          | g/cm3       | kg/m3          |
+| $Q$                          | Specific energy of the propellant        | J/kg        | J/kg           |
+| $R$                          | Gas constant of the propellant gas       | no kind     | J/(kg K)       |
+| $T$                          | Gas temperature                          | K           | K              |
+| $T_0$                        | Flame temperature                        | K           | K              |
+| $T_w$                        | Wall temperature                         | degC        | K              |
+| $E_\ell$                     | Enthalpy carried out by leaking gas      | J           | J              |
+| $E_h$, $W_r$                 | Heat lost, work against bore resistance  | J           | J              |
+| $\dot q$                     | Heat flux to the bore                    | no kind     | W              |
+| $c_h$                        | Factor on the heat flux                  | 1           | 1              |
+| $h$                          | Heat-transfer coefficient                | no kind     | W/(m2 K)       |
+| $d$                          | Bore diameter                            | mm          | m              |
+| $\mathrm{Re}$, $\mathrm{Pr}$ | Reynolds and Prandtl number              | 1           | 1              |
+| $\rho_g$                     | Gas density                              | g/cm3       | kg/m3          |
+| $\mu_g$                      | Gas viscosity                            | no kind     | Pa s           |
+| $\lambda_g$                  | Thermal conductivity of the gas          | no kind     | W/(m K)        |
+| $c_p$                        | Specific heat at constant pressure       | no kind     | J/(kg K)       |
 
 ## Assumptions
 

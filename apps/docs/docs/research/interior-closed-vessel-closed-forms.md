@@ -1,4 +1,5 @@
 ---
+
 title: Closed vessel against closed forms
 description: Whether the burn time and final pressure of the closed-vessel run match the exact results for a constant form, a pressure exponent, a temperature factor and the two and three-stage vivacity forms.
 ---
@@ -12,7 +13,6 @@ Interior ballistics: does `closedVessel` (the projectile held, the charge burnt 
 ## Method
 
 A synthetic rifle chamber (volume $3.4 \cdot 10^{-6}$ m³, charge 0.0028 kg, specific energy $3.9 \cdot 10^{6}$ J/kg, $k = 1.23$, solid density 1600 kg/m³, ignition pressure $10^{6}$ Pa) was run with a vivacity of 0.56 at a reference pressure of 98066.5 Pa. The accept limits are those of the tests:
-
 - final pressure, covolume 0, 1/1600 and $10^{-3}$ m³/kg: relative difference below $10^{-12}$;
 - burn time of the constant form with exponent 1, covolume 0 and $10^{-3}$ m³/kg: below $10^{-8}$;
 - burn time with pressure exponent 0.8: below $10^{-8}$;

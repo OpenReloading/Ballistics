@@ -1,4 +1,5 @@
 ---
+
 title: Case capacity and seating
 description: Case volume from the water capacity, the volume the seated bullet takes from it, the volume behind the bullet, an estimate of the bullet volume where it has no outline, the bullet travel and the jump to the lands.
 ---
@@ -141,12 +142,12 @@ Code: `apps/web/src/lib/bullet-below-mouth.ts`, `belowMouth`, `lessBullet`.
 
 The class comes from the record's `construction.structure` (`bulletStructures` in `packages/core/src/interior/start-pressure.ts`, the table that also gives the construction of the start pressure); a record without one, and swaged, plated and frangible bullets, take the pooled value (the cast class was measured on cast bullets only). The values are medians of the bullet records with a maker-published length (in-sample; the jacketed class covers two makers and the cast class one):
 
-| Class (`construction.structure`) | $\rho_\mathrm{eff}$ in g/cm3 | $e$ | Records |
-| --- | --- | --- | --- |
-| cast | 9.1 | 0.093 | 192 |
-| monolithic | 6.5 | 0.184 | 792 |
-| jacketed (cup-and-core, bonded, partitioned) | 7.3 | 0.214 | 261 |
-| unknown (pooled) | 6.8 | 0.332 | 1245 |
+| Class (`construction.structure`)             | $\rho_\mathrm{eff}$ in g/cm3 | $e$   | Records |
+| -------------------------------------------- | ---------------------------- | ----- | ------- |
+| cast                                         | 9.1                          | 0.093 | 192     |
+| monolithic                                   | 6.5                          | 0.184 | 792     |
+| jacketed (cup-and-core, bonded, partitioned) | 7.3                          | 0.214 | 261     |
+| unknown (pooled)                             | 6.8                          | 0.332 | 1245    |
 
 Code: `apps/web/src/lib/bullet-construction.ts`, `effectiveDensity`, `classOf`.
 
@@ -156,12 +157,12 @@ The records are not in the repository. The material densities (lead 11.34, coppe
 
 The workbench sets the pressure range's tolerance of the chamber volume from where the case capacity $C$ comes from, while the volume field holds the seated volume or the followed default. The capacity's tolerance $f_C$, relative to $C$:
 
-| Source of $C$ | $f_C$ |
-| --- | --- |
-| Measured, with the spread $s$ of the brass group | $s / C$ |
-| Measured, without a spread | 0.5 % (assumption) |
+| Source of $C$                                                                                   | $f_C$                                         |
+| ----------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Measured, with the spread $s$ of the brass group                                                | $s / C$                                       |
+| Measured, without a spread                                                                      | 0.5 % (assumption)                            |
 | A catalogue or case record, while the cartridge has capacity records of two or more case makers | standard deviation over mean of those records |
-| A catalogue or case record otherwise, or records that agree exactly | 2 % (assumption without a published source) |
+| A catalogue or case record otherwise, or records that agree exactly                             | 2 % (assumption without a published source)   |
 
 The range moves the volume behind the bullet $V$, so the capacity's part is taken relative to it, and the interval $h$ of an estimated bullet volume (above) adds to it:
 
@@ -233,35 +234,35 @@ A step outside the seating range of the cartridge and bullet, or one with $V_c \
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in code |
-| --- | --- | --- | --- |
-| $m_w$ | Water capacity of the case to the mouth | g | g |
-| $\rho_w$ | Density of water at 20 °C | g/cm3 | g/cm³ |
-| $V_\mathrm{case}$ | Case volume to the mouth | no kind | cm³ (m³ in `core`) |
-| $m_\mathrm{gr}$ | Mass of one grain | g | kg |
-| $z_b$ | Position of the bullet base from the case head | mm | mm |
-| $\mathrm{COAL}$, $\mathrm{CBTO}$ | Cartridge overall length, cartridge base to ogive | mm | mm |
-| $L_b$, $L_\mathrm{bto}$, $L_\mathrm{nose}$ | Bullet length, base to ogive, nose length | mm | mm |
-| $L_3$ | Case length of the cartridge (C.I.P.) | mm | mm |
-| $s$ | Seating depth below the case mouth | mm | mm |
-| $L_\mathrm{barrel}$, $x_e$ | Barrel length from the breech face, bullet travel | mm | mm (m in `core`) |
-| $r(z)$, $r_k$, $z_k$ | Outline radius and points from the base | mm | mm |
-| $c$ | Length of the bullet below the mouth | mm | mm |
-| $V_b$ | Bullet volume below the mouth | no kind | cm³ |
-| $r_c$, $h$ | Radius of the cavity at the base face, its depth | mm | mm |
-| $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{ell}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere, half ellipsoid), the whole cavity | no kind | mm³ |
-| $\sigma_k$ | Sign of segment $k$ of the profile: rising $+1$, falling $-1$ | 1 | 1 |
-| $V_c$ | Chamber volume behind the bullet | no kind | cm³ (m³ in `core`) |
-| $m$, $\rho_\mathrm{eff}$, $\hat L$ | Bullet mass, effective density, estimated length | g, g/cm3, mm | g, g/cm3, mm |
-| $e$ | 90th percentile of the relative length error of a class | 1 | 1 |
-| $d$ | Bullet diameter | mm | mm |
-| $\Delta L$ | Bullet length tolerance | mm | mm |
-| $L_{3,\mathrm{ch}}$, $s_\mathrm{ch}$, $G$ | Chamber case length, leade start and leade end past it (C.I.P.) | mm | mm |
-| $G_1$, $F$ | Chamber diameter at the leade start, land diameter at the leade end (C.I.P.) | mm | mm |
-| $i$ | Leade angle of the chamber to the axis | deg | deg |
-| $z_\mathrm{c}$, $j$ | Leade contact from the case head, jump | mm | mm |
-| $z_{b,\mathrm{c}}$ | Bullet base position at the measured lands contact | mm | mm |
-| $\ell_i$, $\Delta$, $N$ | Seating length of step $i$, step size, step count | mm, mm, 1 | m, m, 1 |
+| Symbol                                                                      | Meaning                                                                            | Stored unit  | Unit in code       |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------ | ------------------ |
+| $m_w$                                                                       | Water capacity of the case to the mouth                                            | g            | g                  |
+| $\rho_w$                                                                    | Density of water at 20 °C                                                          | g/cm3        | g/cm³              |
+| $V_\mathrm{case}$                                                           | Case volume to the mouth                                                           | no kind      | cm³ (m³ in `core`) |
+| $m_\mathrm{gr}$                                                             | Mass of one grain                                                                  | g            | kg                 |
+| $z_b$                                                                       | Position of the bullet base from the case head                                     | mm           | mm                 |
+| $\mathrm{COAL}$, $\mathrm{CBTO}$                                            | Cartridge overall length, cartridge base to ogive                                  | mm           | mm                 |
+| $L_b$, $L_\mathrm{bto}$, $L_\mathrm{nose}$                                  | Bullet length, base to ogive, nose length                                          | mm           | mm                 |
+| $L_3$                                                                       | Case length of the cartridge (C.I.P.)                                              | mm           | mm                 |
+| $s$                                                                         | Seating depth below the case mouth                                                 | mm           | mm                 |
+| $L_\mathrm{barrel}$, $x_e$                                                  | Barrel length from the breech face, bullet travel                                  | mm           | mm (m in `core`)   |
+| $r(z)$, $r_k$, $z_k$                                                        | Outline radius and points from the base                                            | mm           | mm                 |
+| $c$                                                                         | Length of the bullet below the mouth                                               | mm           | mm                 |
+| $V_b$                                                                       | Bullet volume below the mouth                                                      | no kind      | cm³                |
+| $r_c$, $h$                                                                  | Radius of the cavity at the base face, its depth                                   | mm           | mm                 |
+| $V_\mathrm{cone}$, $V_\mathrm{hemi}$, $V_\mathrm{ell}$, $V_\mathrm{cavity}$ | Cavity volume below the mouth (cone, hemisphere, half ellipsoid), the whole cavity | no kind      | mm³                |
+| $\sigma_k$                                                                  | Sign of segment $k$ of the profile: rising $+1$, falling $-1$                      | 1            | 1                  |
+| $V_c$                                                                       | Chamber volume behind the bullet                                                   | no kind      | cm³ (m³ in `core`) |
+| $m$, $\rho_\mathrm{eff}$, $\hat L$                                          | Bullet mass, effective density, estimated length                                   | g, g/cm3, mm | g, g/cm3, mm       |
+| $e$                                                                         | 90th percentile of the relative length error of a class                            | 1            | 1                  |
+| $d$                                                                         | Bullet diameter                                                                    | mm           | mm                 |
+| $\Delta L$                                                                  | Bullet length tolerance                                                            | mm           | mm                 |
+| $L_{3,\mathrm{ch}}$, $s_\mathrm{ch}$, $G$                                   | Chamber case length, leade start and leade end past it (C.I.P.)                    | mm           | mm                 |
+| $G_1$, $F$                                                                  | Chamber diameter at the leade start, land diameter at the leade end (C.I.P.)       | mm           | mm                 |
+| $i$                                                                         | Leade angle of the chamber to the axis                                             | deg          | deg                |
+| $z_\mathrm{c}$, $j$                                                         | Leade contact from the case head, jump                                             | mm           | mm                 |
+| $z_{b,\mathrm{c}}$                                                          | Bullet base position at the measured lands contact                                 | mm           | mm                 |
+| $\ell_i$, $\Delta$, $N$                                                     | Seating length of step $i$, step size, step count                                  | mm, mm, 1    | m, m, 1            |
 
 ## Assumptions
 

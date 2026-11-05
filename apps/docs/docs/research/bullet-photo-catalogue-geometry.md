@@ -1,4 +1,5 @@
 ---
+
 title: Bullet geometry from photographs for records without it
 description: How well the bullet photo tool measures catalogue bullets in own and product-style photographs, whether makers' online images can fill missing lengths, and what has to be measured instead.
 ---
@@ -12,7 +13,6 @@ Seated volume and bullet records: can the [bullet from a photo](../models/bullet
 ## Method
 
 Fixed before the run.
-
 - **Data coverage.** Count the bullet records (`packages/data/records/bullets/`, 1,686 files on 2026-11-01) by maker and by geometry field.
 - **Accuracy.** Truth: the drawing (`bulletDimensions`, `bulletOutline`) of up to six records with a length per maker, taken in name order at a step of the maker's count over six (fewer than twelve: the first six; six or fewer: all): Cutting Edge, Hammer, Lehigh and Missouri Bullet six each, Berger 2, Nosler 1 and the two demo records, 29 bullets and three boat tails of the existing photo tests, 32 bullets from 10.5 to 58 mm long. A record with a boat-tail length and no base type (Berger) is drawn as a boat tail. Each bullet is rendered with `renderPhoto` in eight scenarios and measured with the tool's worker steps (`segmentPhoto`, `fitOutline`, `outlineHints`, `resolveScale`, `measureOutline`):
   - A: own photograph beside a ruler, 24 px per mm, scale from the ruler.
@@ -32,23 +32,22 @@ The pipeline is the model page's. At a fixed COAL the seating depth moves with t
 
 **Accuracy** (32 bullets per scenario, all measured, median / P90 of the absolute error):
 
-| Scenario | Length % | L/D % | Nose % | Boat tail mm | False tails | Seated volume % | Within 3 u | Warned |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A ruler, 24 px/mm | 0.13 / 0.21 | 0.12 / 0.18 | 0.20 / 0.33 | 0.007 / 0.012 | 0 of 26 | 0.39 / 0.91 | 32 | 0 |
-| B 1000 px, diameter | 0.12 / 0.20 | 0.12 / 0.20 | 0.19 / 0.38 | 0.003 / 0.006 | 0 of 26 | 0.39 / 1.1 | 32 | 0 |
-| C 500 px, diameter | 0.22 / 0.37 | 0.22 / 0.37 | 0.40 / 0.77 | 0.012 / 0.018 | 0 of 26 | 0.79 / 1.9 | 32 | 0 |
-| D 250 px, diameter | 0.45 / 0.74 | 0.45 / 0.74 | 0.85 / 1.7 | 0.052 / 0.072 | 0 of 26 | 1.4 / 3.5 | 32 | 1 |
-| E 500 px, JPEG 70 | 0.22 / 0.41 | 0.22 / 0.41 | 0.39 / 0.79 | 0.025 / 0.037 | 0 of 26 | 0.79 / 2.0 | 32 | 0 |
-| F 500 px, drop shadow | 10 / 12 | 10 / 12 | 21 / 29 | 0.47 / 0.72 | 26 of 26 | 43 / 59 | 32 | 24 |
-| G 500 px, diameter and length | 0.025 / 0.039 | 0.22 / 0.37 | 0.19 / 0.41 | 0.011 / 0.018 | 0 of 26 | 0.43 / 0.73 | 32 | 0 |
-| H 500 px, tilted 10 degrees | 1.8 / 1.9 | 1.8 / 1.9 | 1.9 / 2.3 | 0.077 / 0.097 | 0 of 26 | 6.0 / 8.7 | 2 | 0 |
+| Scenario                      | Length %      | L/D %       | Nose %      | Boat tail mm  | False tails | Seated volume % | Within 3 u | Warned |
+| ----------------------------- | ------------- | ----------- | ----------- | ------------- | ----------- | --------------- | ---------- | ------ |
+| A ruler, 24 px/mm             | 0.13 / 0.21   | 0.12 / 0.18 | 0.20 / 0.33 | 0.007 / 0.012 | 0 of 26     | 0.39 / 0.91     | 32         | 0      |
+| B 1000 px, diameter           | 0.12 / 0.20   | 0.12 / 0.20 | 0.19 / 0.38 | 0.003 / 0.006 | 0 of 26     | 0.39 / 1.1      | 32         | 0      |
+| C 500 px, diameter            | 0.22 / 0.37   | 0.22 / 0.37 | 0.40 / 0.77 | 0.012 / 0.018 | 0 of 26     | 0.79 / 1.9      | 32         | 0      |
+| D 250 px, diameter            | 0.45 / 0.74   | 0.45 / 0.74 | 0.85 / 1.7  | 0.052 / 0.072 | 0 of 26     | 1.4 / 3.5       | 32         | 1      |
+| E 500 px, JPEG 70             | 0.22 / 0.41   | 0.22 / 0.41 | 0.39 / 0.79 | 0.025 / 0.037 | 0 of 26     | 0.79 / 2.0      | 32         | 0      |
+| F 500 px, drop shadow         | 10 / 12       | 10 / 12     | 21 / 29     | 0.47 / 0.72   | 26 of 26    | 43 / 59         | 32         | 24     |
+| G 500 px, diameter and length | 0.025 / 0.039 | 0.22 / 0.37 | 0.19 / 0.41 | 0.011 / 0.018 | 0 of 26     | 0.43 / 0.73     | 32         | 0      |
+| H 500 px, tilted 10 degrees   | 1.8 / 1.9     | 1.8 / 1.9   | 1.9 / 2.3   | 0.077 / 0.097 | 0 of 26     | 6.0 / 8.7       | 2          | 0      |
 
 In millimetres the length P90 is 0.050 (A), 0.14 (C), 0.27 (D), 4.3 (F) and 0.69 mm (H). The drop shadow widens the cut-out on one side, so the diameter scale is too large, every length too short, and the shadow's taper reads as a boat tail on every flat base; the stated uncertainty grows to about 6 % of the length, so the error stays within 3 u, and 8 of 32 photographs get no warning while 1.7 to 5.5 % short (one 3.0 % long). The tilt goes unseen: 30 of 32 lengths lie outside 3 u with no warning.
 
 **Pressure.** The length P90 converted at 1.9 % per 0.5 mm (rifle, 31 mm bullet) and 9.9 % per 0.5 mm (9 x 19 mm, 15 mm bullet): A 0.25 and 0.6 %, C 0.4 and 1.1 %, D 0.9 and 2.2 %, H 2.2 and 5.6 %, F above 14 and 30 %. A caliper reading (0.05 mm, `bulletLengthTolerance.measured`) gives 0.19 and 1.0 %; the regression 7 to 8 and 17 to 30 %.
 
 **Online sources** (20 records, pages read 2026-11-01):
-
 - No product page or current catalogue of Hornady, Sierra, Sellier & Bellot, Sako, Missouri Bullet or Lapua prints a bullet length, nose length, boat tail, meplat or a dimensioned drawing for these bullets; none publishes CAD. Sierra's load data prints the cartridge length per bullet, Sako's reloading PDF weight, BC and cartridge length. Lehigh's old store interface had length and ogive-length fields (the source of its 121 records with a length); the domain now redirects to Wilson Combat, whose pages show neither.
 - Images: Hornady product images are 600 x 624 px side-view renders filling the frame; the 162 gr 7 mm and the 220 gr .30 ELD-X give the same L/D (5.217) and the same height in pixels, so they are fitted to the frame, not drawn to scale. Sierra has 540 x 600 px side views on white without a scale; Sellier & Bellot a group photograph of boxes and bullets; Sako mood photographs at an angle; Lehigh/Wilson Combat a box and three bullets in perspective; Lapua real photographs without a scale (not used, see below). No image of any maker carries a ruler or a grid.
 - The Hornady 2026 catalogue's small side-view pictures (about 100 to 170 by 23 to 34 px) give a picture height over printed diameter of about 101.8 px per inch, within about 1 %, from .243 to .338: they may share one scale. At about 0.25 mm per pixel that would be about 1 to 2 % of the length, unverified against any bullet of known length.

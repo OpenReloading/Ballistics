@@ -11,9 +11,9 @@ strictPeerDependencies: true
 # One version per dependency that two or more workspaces use: they name it as "catalog:". Dependabot updates it here.
 # Exact versions, except zod: the published libraries depend on it, and `pnpm pack` writes the catalog's range.
 catalog:
-  '@playwright/test': 1.64.1
-  '@types/node': 26.6.6
-  '@vitest/coverage-v8': 5.0.5
+  "@playwright/test": 1.64.1
+  "@types/node": 26.6.6
+  "@vitest/coverage-v8": 5.0.5
   ajv: 8.20.0
   fast-check: 4.10.2
   oxlint: 1.90.0
@@ -26,7 +26,7 @@ catalog:
 
 # Versions with the fix for a security advisory of a transitive dependency.
 overrides:
-  '@docusaurus/core>tinypool': ^2.1.2
+  "@docusaurus/core>tinypool": ^2.1.2
   katex: 0.19.0
   postcss-selector-parser: ^7.1.6
   serialize-javascript: ^7.1.3
@@ -35,6 +35,6 @@ overrides:
 # No dependency runs an install script: CI installs with --ignore-scripts, and none of these needs one (native binaries
 # come as optional dependencies).
 allowBuilds:
-  '@swc/core': false
+  "@swc/core": false
   core-js: false
   vue-demi: false

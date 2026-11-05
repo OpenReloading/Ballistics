@@ -1,4 +1,5 @@
 ---
+
 title: Drag
 description: Drag acceleration from a ballistic coefficient against a standard drag function or from the bullet's own drag curve, with linear or monotone cubic interpolation in Mach.
 ---
@@ -90,7 +91,6 @@ $$
 Code: `packages/core/src/exterior/drag.ts`, `onSegment`.
 
 A segment with $c_k = c_{k+1}$ returns $c_k$. The slope limit keeps $\lvert d_j\rvert \le 2\min(\lvert\Delta_{j-1}\rvert, \lvert\Delta_j\rvert)$, inside the monotonicity region of the cubic Hermite form. So:
-
 - the cubic stays within its two node values,
 - a local extremum at a node keeps slope 0,
 - a curve of non-negative nodes stays non-negative.
@@ -135,24 +135,24 @@ The bore is taken as horizontal, the air as still and uniform, and the measuring
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $\vec a_D$ | Drag acceleration | no kind | m/s² |
-| $\vec v$, $\vec w$, $\vec v_a$ | Ground velocity, wind, air-relative velocity | m/s | m/s |
-| $\rho$ | Air density | g/cm3 | kg/m³ |
-| $a$ | Speed of sound | m/s | m/s |
-| $M$ | Mach number | 1 | 1 |
-| $C_D$ | Drag coefficient of the bullet on area $\pi d^2/4$ | 1 | 1 |
-| $C_G$ | Drag coefficient of a standard drag function | 1 | 1 |
-| $i$ | Form factor, $C_D/C_G$ | 1 | 1 |
-| $m$ | Bullet mass | g | kg |
-| $d$ | Reference diameter | mm | m |
-| $C$, $C_k$ | Ballistic coefficient, of band $k$ | lb/in2 | kg/m² |
-| $v_k$ | Lowest airspeed of band $k$ | m/s | m/s |
-| $S$ | Mass per area in the drag term | lb/in2 | kg/m² |
-| $M_j$, $c_j$ | Mach number and drag coefficient of node $j$ | 1 | 1 |
-| $h_j$, $\Delta_j$ | Mach spacing and secant of segment $j$ | 1 | 1 |
-| $d_j$ | Slope of the monotone cubic at node $j$ | 1 | 1 |
+| Symbol                         | Meaning                                            | Stored unit | Unit in `core` |
+| ------------------------------ | -------------------------------------------------- | ----------- | -------------- |
+| $\vec a_D$                     | Drag acceleration                                  | no kind     | m/s²           |
+| $\vec v$, $\vec w$, $\vec v_a$ | Ground velocity, wind, air-relative velocity       | m/s         | m/s            |
+| $\rho$                         | Air density                                        | g/cm3       | kg/m³          |
+| $a$                            | Speed of sound                                     | m/s         | m/s            |
+| $M$                            | Mach number                                        | 1           | 1              |
+| $C_D$                          | Drag coefficient of the bullet on area $\pi d^2/4$ | 1           | 1              |
+| $C_G$                          | Drag coefficient of a standard drag function       | 1           | 1              |
+| $i$                            | Form factor, $C_D/C_G$                             | 1           | 1              |
+| $m$                            | Bullet mass                                        | g           | kg             |
+| $d$                            | Reference diameter                                 | mm          | m              |
+| $C$, $C_k$                     | Ballistic coefficient, of band $k$                 | lb/in2      | kg/m²          |
+| $v_k$                          | Lowest airspeed of band $k$                        | m/s         | m/s            |
+| $S$                            | Mass per area in the drag term                     | lb/in2      | kg/m²          |
+| $M_j$, $c_j$                   | Mach number and drag coefficient of node $j$       | 1           | 1              |
+| $h_j$, $\Delta_j$              | Mach spacing and secant of segment $j$             | 1           | 1              |
+| $d_j$                          | Slope of the monotone cubic at node $j$            | 1           | 1              |
 
 ## Assumptions
 

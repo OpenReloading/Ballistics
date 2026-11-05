@@ -1,4 +1,5 @@
 ---
+
 title: Muzzle velocity from a speed measured downrange
 description: How much an optical screen's reading downrange lies below the muzzle velocity at 5 m, and whether an inversion of the bullet's own drag law gives the flown muzzle velocity back, from seeded simulated shots.
 ---
@@ -32,28 +33,28 @@ Test 1, 1000 shots on the 48 combinations: mean bias $-1.4\times10^{-9}$ m/s, ro
 
 Test 2, speed lost to the screen and the error after the correction:
 
-| case | distance (m) | muzzle velocity (m/s) | flown (m/s) | loss (m/s) | corrected minus flown (m/s) | closed form, Cd 0.3 (m/s) |
-| --- | --- | --- | --- | --- | --- | --- |
-| 68 gr, 6.17 mm, Cd 0.3 | 2.44 | 975 | 972.038 | 2.962 | $-2.5\times10^{-10}$ | 2.971 |
-| 68 gr, 6.17 mm, G7 0.15 | 2.44 | 975 | 972.291 | 2.709 | $-3.5\times10^{-12}$ | 2.971 |
-| 175 gr, 7.82 mm, G7 0.27 | 4.0 | 800 | 797.749 | 2.251 | $-1.1\times10^{-11}$ | 2.494 |
+| case                     | distance (m) | muzzle velocity (m/s) | flown (m/s) | loss (m/s) | corrected minus flown (m/s) | closed form, Cd 0.3 (m/s) |
+| ------------------------ | ------------ | --------------------- | ----------- | ---------- | --------------------------- | ------------------------- |
+| 68 gr, 6.17 mm, Cd 0.3   | 2.44         | 975                   | 972.038     | 2.962      | $-2.5\times10^{-10}$        | 2.971                     |
+| 68 gr, 6.17 mm, G7 0.15  | 2.44         | 975                   | 972.291     | 2.709      | $-3.5\times10^{-12}$        | 2.971                     |
+| 175 gr, 7.82 mm, G7 0.27 | 4.0          | 800                   | 797.749     | 2.251      | $-1.1\times10^{-11}$        | 2.494                     |
 
 Test 3, correction at 5 m. The percent is the same for every calibre of a bullet type (spread 0 over the 12 diameters). The last two columns give the closed form over the inversion: with the drag coefficient of the standard function at the launch Mach number, and with a fixed 0.3.
 
 | bullet type | muzzle velocity (m/s) | correction (m/s) | percent | closed form, local Cd | closed form, Cd 0.3 |
-| --- | --- | --- | --- | --- | --- |
-| SD 0.16, G1 | 350 | 2.11 | 0.606 | 1.013 | 1.068 |
-| SD 0.16, G1 | 650 | 4.62 | 0.716 | 1.006 | 0.905 |
-| SD 0.16, G1 | 950 | 5.81 | 0.616 | 1.005 | 1.052 |
-| SD 0.22, G1 | 350 | 1.54 | 0.441 | 1.010 | 1.064 |
-| SD 0.22, G1 | 650 | 3.36 | 0.520 | 1.004 | 0.904 |
-| SD 0.22, G1 | 950 | 4.23 | 0.447 | 1.004 | 1.050 |
-| SD 0.22, G7 | 350 | 2.18 | 0.626 | 1.008 | 0.752 |
-| SD 0.22, G7 | 650 | 3.06 | 0.474 | 1.004 | 0.992 |
-| SD 0.22, G7 | 950 | 3.75 | 0.396 | 1.003 | 1.186 |
-| SD 0.28, G7 | 350 | 1.71 | 0.492 | 1.006 | 0.751 |
-| SD 0.28, G7 | 650 | 2.41 | 0.372 | 1.003 | 0.991 |
-| SD 0.28, G7 | 950 | 2.94 | 0.311 | 1.002 | 1.185 |
+| ----------- | --------------------- | ---------------- | ------- | --------------------- | ------------------- |
+| SD 0.16, G1 | 350                   | 2.11             | 0.606   | 1.013                 | 1.068               |
+| SD 0.16, G1 | 650                   | 4.62             | 0.716   | 1.006                 | 0.905               |
+| SD 0.16, G1 | 950                   | 5.81             | 0.616   | 1.005                 | 1.052               |
+| SD 0.22, G1 | 350                   | 1.54             | 0.441   | 1.010                 | 1.064               |
+| SD 0.22, G1 | 650                   | 3.36             | 0.520   | 1.004                 | 0.904               |
+| SD 0.22, G1 | 950                   | 4.23             | 0.447   | 1.004                 | 1.050               |
+| SD 0.22, G7 | 350                   | 2.18             | 0.626   | 1.008                 | 0.752               |
+| SD 0.22, G7 | 650                   | 3.06             | 0.474   | 1.004                 | 0.992               |
+| SD 0.22, G7 | 950                   | 3.75             | 0.396   | 1.003                 | 1.186               |
+| SD 0.28, G7 | 350                   | 1.71             | 0.492   | 1.006                 | 0.751               |
+| SD 0.28, G7 | 650                   | 2.41             | 0.372   | 1.003                 | 0.991               |
+| SD 0.28, G7 | 950                   | 2.94             | 0.311   | 1.002                 | 1.185               |
 
 With the loss proportional to distance, 0.1 percent is reached at about 1.6 m for the heaviest bullet type and 0.7 m for the lightest (analytic, from the 5 m values). The closed form with a fixed coefficient of 0.3 is off by minus 25 to plus 19 percent, with the largest deviations at 350 and 950 m/s, where the real coefficient is far from 0.3; with the local coefficient it is within 1.3 percent, which is why it only serves as a cross-check.
 

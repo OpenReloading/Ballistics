@@ -1,4 +1,5 @@
 ---
+
 title: Modified point mass
 description: Static modified point-mass trajectory of a spin-stabilised bullet, with the yaw of repose, lift, Magnus force, spin decay and the jump of linear theory.
 ---
@@ -137,36 +138,36 @@ Code: `packages/core/src/exterior/trajectory.ts`, `fly` (`yawAt`), `trajectoryDe
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $\vec r$, $R$ | Position, slant range | mm | m |
-| $\vec v$, $v_0$ | Ground-relative velocity, muzzle velocity | m/s | m/s |
-| $\vec w$, $w$ | Wind velocity, wind speed | m/s | m/s |
-| $\vec v_a$, $V$ | Air-relative velocity, airspeed | m/s | m/s |
-| $W_\perp$ | Crosswind of the first wind segment, positive to the right | m/s | m/s |
-| $\phi_w$ | Direction the wind blows from, clockwise from the line of fire | deg | rad |
-| $a$ | Local speed of sound | m/s | m/s |
-| $M$, $M_0$ | Mach number, at the muzzle | 1 | 1 |
-| $\rho$ | Local air density | g/cm3 | kg/m3 |
-| $m$ | Bullet mass | g | kg |
-| $d$ | Reference diameter | mm | m |
-| $l$ | Bullet length | mm | m |
-| $A$ | Reference area | mm2 | m2 |
-| $T$ | Twist length per turn | mm | m |
-| $p$, $p_0$ | Axial spin rate, at the muzzle | no kind | rad/s |
-| $I_x$, $I_y$ | Axial and transverse moment of inertia about the centre of mass | no kind | kg m2 |
-| $\vec a_\text{PM}$ | Point-mass acceleration | no kind | m/s2 |
-| $\vec\alpha_R$ | Yaw of repose | deg | rad |
-| $\alpha_\text{max}$ | Yaw at which the run stops | deg | rad |
-| $C_{L\alpha}$ | Lift-force slope | 1 | 1/rad |
-| $C_{M\alpha}$ | Overturning-moment slope, positive | 1 | 1/rad |
-| $C_{N_{p\alpha}}$ | Magnus-force slope | 1 | 1/rad |
-| $C_{l_p}$ | Spin-damping coefficient, negative | 1 | 1 |
-| $S_g$ | Gyroscopic stability factor | 1 | 1 |
-| $s$ | Spin drift | mm | m |
-| $z$ | Windage, right of the line of sight | mm | m |
-| $\delta_J$ | Aerodynamic jump angle, positive up | deg | rad |
-| $h_J$ | Jump added to the height | mm | m |
+| Symbol              | Meaning                                                         | Stored unit | Unit in `core` |
+| ------------------- | --------------------------------------------------------------- | ----------- | -------------- |
+| $\vec r$, $R$       | Position, slant range                                           | mm          | m              |
+| $\vec v$, $v_0$     | Ground-relative velocity, muzzle velocity                       | m/s         | m/s            |
+| $\vec w$, $w$       | Wind velocity, wind speed                                       | m/s         | m/s            |
+| $\vec v_a$, $V$     | Air-relative velocity, airspeed                                 | m/s         | m/s            |
+| $W_\perp$           | Crosswind of the first wind segment, positive to the right      | m/s         | m/s            |
+| $\phi_w$            | Direction the wind blows from, clockwise from the line of fire  | deg         | rad            |
+| $a$                 | Local speed of sound                                            | m/s         | m/s            |
+| $M$, $M_0$          | Mach number, at the muzzle                                      | 1           | 1              |
+| $\rho$              | Local air density                                               | g/cm3       | kg/m3          |
+| $m$                 | Bullet mass                                                     | g           | kg             |
+| $d$                 | Reference diameter                                              | mm          | m              |
+| $l$                 | Bullet length                                                   | mm          | m              |
+| $A$                 | Reference area                                                  | mm2         | m2             |
+| $T$                 | Twist length per turn                                           | mm          | m              |
+| $p$, $p_0$          | Axial spin rate, at the muzzle                                  | no kind     | rad/s          |
+| $I_x$, $I_y$        | Axial and transverse moment of inertia about the centre of mass | no kind     | kg m2          |
+| $\vec a_\text{PM}$  | Point-mass acceleration                                         | no kind     | m/s2           |
+| $\vec\alpha_R$      | Yaw of repose                                                   | deg         | rad            |
+| $\alpha_\text{max}$ | Yaw at which the run stops                                      | deg         | rad            |
+| $C_{L\alpha}$       | Lift-force slope                                                | 1           | 1/rad          |
+| $C_{M\alpha}$       | Overturning-moment slope, positive                              | 1           | 1/rad          |
+| $C_{N_{p\alpha}}$   | Magnus-force slope                                              | 1           | 1/rad          |
+| $C_{l_p}$           | Spin-damping coefficient, negative                              | 1           | 1              |
+| $S_g$               | Gyroscopic stability factor                                     | 1           | 1              |
+| $s$                 | Spin drift                                                      | mm          | m              |
+| $z$                 | Windage, right of the line of sight                             | mm          | m              |
+| $\delta_J$          | Aerodynamic jump angle, positive up                             | deg         | rad            |
+| $h_J$               | Jump added to the height                                        | mm          | m              |
 
 ## Assumptions
 

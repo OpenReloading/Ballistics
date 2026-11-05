@@ -1,4 +1,5 @@
 ---
+
 title: Coverage factor and leave-one-trace-out check of the fitted pressure exponent
 description: Which coverage factor gives the pressure exponent of the joint curve fit a 90 % interval on synthetic traces, and whether refitting without each trace shows model error that the residuals hide.
 ---
@@ -14,14 +15,12 @@ Interior curve fit: which factor on the relative standard uncertainty of the pre
 The shipped `fitPressureCurves` at its default limits, with the traces, truths and start values of the [study of the exponent](interior-curve-fit-exponent.md), fall fraction 0.5.
 
 Grid, 40 replicates per cell, seeds $1000\,(r + 1) + 16\,k$ for replicate $r$ and trace $k$:
-
 - Noise only: $K$ = 2, 3, 5 traces at charges evenly spaced from 2.4 to 3.0 g, exponent 0.3, 0.5, 0.8, noise 0.1, 0.5 and 2 % of the peak (27 cells).
 - Model error: convective heat loss (flame temperature 2800 K, factor 0.5) and bore friction (2.5 MPa) in the truth, which the fitted model lacks, $K$ = 2, 3, 5, exponent 0.5, noise 0.5 %.
 
 Each run records the fitted over the true exponent, its relative standard uncertainty $u_\text{rel}$, its status and the exponents of the leave-one-out refits. Only runs with the exponent fitted (not `fixed`, no failure) count.
 
 Rules:
-
 - Coverage factor: the 90th percentile of $\lvert \ln(\hat n / n) \rvert / u_\text{rel}$ over the noise-only runs of the even replicates, rounded to one decimal, checked on the odd replicates. The split was fixed before the run.
 - Check: the threshold was chosen from the table below after the run, as the comparison with the interval that names about 3 % of the noise-only fits. The check is said to show model error only when it names clearly more of the model-error fits than of the noise-only fits.
 
@@ -48,21 +47,21 @@ Raw runs and the script: `spikes/566/` on the branch `spike/566-exponent-interva
 Coverage factor, noise only. 535 fitted runs on the even replicates give a 90th percentile of 2.20, so $k = 2.2$. On the 535 odd ones:
 
 | factor | coverage, pooled | cells at 90 % or more | lowest cell |
-| --- | ---: | ---: | ---: |
-| 1.645 | 85 % | - | - |
-| 2.2 | 91.4 % | 18 of 27 | 75 % |
-| 2.5 | 94.0 % | 21 of 27 | 80 % |
+| ------ | ---------------: | --------------------: | ----------: |
+| 1.645  |             85 % |                     - |           - |
+| 2.2    |           91.4 % |              18 of 27 |        75 % |
+| 2.5    |           94.0 % |              21 of 27 |        80 % |
 
 The 90th percentile is 1.5 for two traces, 2.0 for three and 2.3 for five. 9 of 1200 runs failed to converge, one held the exponent.
 
 Leave-one-out check, $K$ = 3 and 5: share of fits named for $s_J > T\,u_\text{rel}$:
 
-| $T$ | noise only (700 fits) | model error, 3 traces | model error, 5 traces |
-| ---: | ---: | ---: | ---: |
-| 2.2 (half-width of the interval) | 16 % | 18 of 40 | 14 of 40 |
-| 3 | 7.3 % | 10 of 40 | 8 of 40 |
-| 4.4 (full width) | 2.9 % | 2 of 40 | 3 of 40 |
-| 6 | 1.6 % | 1 of 40 | 3 of 40 |
+|                              $T$ | noise only (700 fits) | model error, 3 traces | model error, 5 traces |
+| -------------------------------: | --------------------: | --------------------: | --------------------: |
+| 2.2 (half-width of the interval) |                  16 % |              18 of 40 |              14 of 40 |
+|                                3 |                 7.3 % |              10 of 40 |               8 of 40 |
+|                 4.4 (full width) |                 2.9 % |               2 of 40 |               3 of 40 |
+|                                6 |                 1.6 % |               1 of 40 |               3 of 40 |
 
 At $T$ = 4.4 the most named noise-only cell is 12.5 % (5 of 40). The median $s_J / u_\text{rel}$ is 1.0 to 1.7 without model error and 1.9 to 2.1 with it.
 

@@ -1,4 +1,5 @@
 ---
+
 title: Gas outflow velocity after the muzzle
 description: Whether the muzzle state of an M3 run gives a mean gas outflow velocity worth showing.
 ---

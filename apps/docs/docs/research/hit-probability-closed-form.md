@@ -1,4 +1,5 @@
 ---
+
 title: Zone probability against the closed form
 description: Whether the numerical integral of the hit-probability model reproduces the exact result for a circular zone and a circular dispersion.
 ---
@@ -25,12 +26,12 @@ The model computes $P(a, b)$ with $a = b = r$ as the integral over $t$ of the de
 
 ## Numbers
 
-| $r$ (m) | $\sigma$ (m) | closed form | model | model minus closed form |
-| --- | --- | --- | --- | --- |
-| 0.01 | 0.01 | 0.39346934028737 | 0.39346934028737 | $2.8 \cdot 10^{-16}$ |
-| 0.05 | 0.02 | 0.95606306637659 | 0.95606306637659 | $4.4 \cdot 10^{-16}$ |
-| 0.003 | 0.02 | 0.01118695538877 | 0.01118695538877 | $1.9 \cdot 10^{-17}$ |
-| 0.2 | 0.01 | 1 | 0.99999999999998 | $-2.2 \cdot 10^{-15}$ |
+| $r$ (m) | $\sigma$ (m) | closed form      | model            | model minus closed form |
+| ------- | ------------ | ---------------- | ---------------- | ----------------------- |
+| 0.01    | 0.01         | 0.39346934028737 | 0.39346934028737 | $2.8 \cdot 10^{-16}$    |
+| 0.05    | 0.02         | 0.95606306637659 | 0.95606306637659 | $4.4 \cdot 10^{-16}$    |
+| 0.003   | 0.02         | 0.01118695538877 | 0.01118695538877 | $1.9 \cdot 10^{-17}$    |
+| 0.2     | 0.01         | 1                | 0.99999999999998 | $-2.2 \cdot 10^{-15}$   |
 
 The largest difference is $2.2 \cdot 10^{-15}$, about $4.4 \cdot 10^{-7}$ of the accept limit.
 

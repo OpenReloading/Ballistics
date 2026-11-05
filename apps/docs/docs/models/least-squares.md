@@ -1,4 +1,5 @@
 ---
+
 title: Least squares on log parameters
 description: The Levenberg-Marquardt loop, the conditioning check, the covariance and the identifiability measures shared by truing and the powder fit.
 ---
@@ -64,7 +65,6 @@ $$
 Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`damped`, `delta`, `lambda0`), `packages/core/src/huber.ts`, `huberRoots`.
 
 Without a Huber loss $W$ is the identity. With it, $W$ is the weight of iteratively reweighted least squares at the current residuals: it is the slope of the loss over $2r$, so the step uses the gradient of the cost.
-
 - The damping starts at $\lambda = 10^{-3}$.
 - A candidate $\theta + \delta$ that lowers the cost ($\chi^2$ without a Huber loss) is accepted, and $\lambda$ is divided by 10.
 - A candidate with a higher $\chi^2$, or one the caller rejects (no predicted values), multiplies $\lambda$ by 10.
@@ -126,7 +126,6 @@ $$
 Code: `packages/core/src/least-squares.ts`, `logLeastSquares`, `checkConditioning` (`unresolved`).
 
 The caller sets the floor of each row. The check runs at the start, at the solution and after `maxIterations`. The fit fails with:
-
 - `unresolved`, naming the parameters
 - `ill-conditioned` when $\kappa$ exceeds `maxCondition`, carrying $\kappa$ and the eigenvector of $\mu_\text{min}$ (the parameter combination the data cannot separate)
 
@@ -182,31 +181,31 @@ The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $q_j$ | Fitted parameter | unit of the parameter | unit of the parameter |
-| $q_{j,0}$ | Start value of the parameter | unit of the parameter | unit of the parameter |
-| $\theta_j$ | Log parameter, $\ln(q_j/q_{j,0})$ | 1 | 1 |
-| $y_i$, $\hat y_i$ | Observed and predicted value | unit of the observation | unit of the observation |
-| $\sigma_i$ | Standard deviation of observation $i$ | unit of the observation | unit of the observation |
-| $r_i$ | Weighted residual | 1 | 1 |
-| $\chi^2$ | Sum of squared weighted residuals | 1 | 1 |
-| $k$, $n_h$ | Huber threshold in sigmas, number of observations under the Huber loss | 1 | 1 |
-| $L_k$ | Huber loss of a weighted residual | 1 | 1 |
-| $W$ | Diagonal weights of the Huber loss, 1 without it | 1 | 1 |
-| $n$, $p$ | Observations, parameters | 1 | 1 |
-| $J$ | Weighted Jacobian, per unit $\theta$ | no kind | 1 over the unit of $\theta$ |
-| $h$ | Difference step in $\theta$ | 1 | 1 |
-| $\lambda$ | Damping of the step | 1 | 1 |
-| $\epsilon$ | Relative decrease of the cost below which an accepted step ends the loop | 1 | 1 |
-| $\delta$ | Step in $\theta$ | 1 | 1 |
-| $\mu_k$, $u_k$ | Eigenvalue and eigenvector | 1 | 1 |
-| $\kappa$ | Condition number of the column-scaled information | 1 | 1 |
-| $C_\theta$ | Covariance of $\theta$ | no kind | 1 |
-| $\sigma_{\theta_j}$ | Standard error of $\theta_j$, the relative standard error of $q_j$ | 1 | 1 |
-| $\rho_{jk}$ | Correlation of two parameters | 1 | 1 |
-| $F$, $R$ | Information and its unit-diagonal form | no kind | 1 |
-| $\mathrm{VIF}_j$ | Variance inflation factor | 1 | 1 |
+| Symbol              | Meaning                                                                  | Stored unit             | Unit in `core`              |
+| ------------------- | ------------------------------------------------------------------------ | ----------------------- | --------------------------- |
+| $q_j$               | Fitted parameter                                                         | unit of the parameter   | unit of the parameter       |
+| $q_{j,0}$           | Start value of the parameter                                             | unit of the parameter   | unit of the parameter       |
+| $\theta_j$          | Log parameter, $\ln(q_j/q_{j,0})$                                        | 1                       | 1                           |
+| $y_i$, $\hat y_i$   | Observed and predicted value                                             | unit of the observation | unit of the observation     |
+| $\sigma_i$          | Standard deviation of observation $i$                                    | unit of the observation | unit of the observation     |
+| $r_i$               | Weighted residual                                                        | 1                       | 1                           |
+| $\chi^2$            | Sum of squared weighted residuals                                        | 1                       | 1                           |
+| $k$, $n_h$          | Huber threshold in sigmas, number of observations under the Huber loss   | 1                       | 1                           |
+| $L_k$               | Huber loss of a weighted residual                                        | 1                       | 1                           |
+| $W$                 | Diagonal weights of the Huber loss, 1 without it                         | 1                       | 1                           |
+| $n$, $p$            | Observations, parameters                                                 | 1                       | 1                           |
+| $J$                 | Weighted Jacobian, per unit $\theta$                                     | no kind                 | 1 over the unit of $\theta$ |
+| $h$                 | Difference step in $\theta$                                              | 1                       | 1                           |
+| $\lambda$           | Damping of the step                                                      | 1                       | 1                           |
+| $\epsilon$          | Relative decrease of the cost below which an accepted step ends the loop | 1                       | 1                           |
+| $\delta$            | Step in $\theta$                                                         | 1                       | 1                           |
+| $\mu_k$, $u_k$      | Eigenvalue and eigenvector                                               | 1                       | 1                           |
+| $\kappa$            | Condition number of the column-scaled information                        | 1                       | 1                           |
+| $C_\theta$          | Covariance of $\theta$                                                   | no kind                 | 1                           |
+| $\sigma_{\theta_j}$ | Standard error of $\theta_j$, the relative standard error of $q_j$       | 1                       | 1                           |
+| $\rho_{jk}$         | Correlation of two parameters                                            | 1                       | 1                           |
+| $F$, $R$            | Information and its unit-diagonal form                                   | no kind                 | 1                           |
+| $\mathrm{VIF}_j$    | Variance inflation factor                                                | 1                       | 1                           |
 
 ## Assumptions
 

@@ -1,4 +1,5 @@
 ---
+
 title: Reading a chronograph ladder for the powder fit
 description: How to plan and fire a charge ladder so that the powder fit can use it, and what the fit and the flat-spot analysis can and cannot tell from it.
 ---

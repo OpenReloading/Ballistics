@@ -1,4 +1,5 @@
 ---
+
 title: '@open-reloading/core'
 sidebar_label: core
 description: The interior and exterior models, group statistics and solvers, as pure functions.
@@ -18,8 +19,8 @@ Each library has its own [Semantic Versioning](../release.md#versions) version.
 
 ## Entry points
 
-| Import | Contents |
-|---|---|
+| Import                 | Contents                          |
+| ---------------------- | --------------------------------- |
 | `@open-reloading/core` | Every model, solver and statistic |
 
 ## Example

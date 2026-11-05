@@ -1,4 +1,5 @@
 ---
+
 title: Releases and versions
 sidebar_position: 2
 ---
@@ -34,7 +35,6 @@ The web app's home page lists the newest five items of `apps/web/news/`, newest 
 ## Pages site
 
 `pages.yml` builds one site from two sources and deploys it in one deployment (a deployment replaces the whole site):
-
 - The root shows the latest release: the checkout of the newest GitHub Release's tag, built with `pnpm run pages:build`.
 - `/next/` shows `main`, built with `PAGES_EDITION=next` (`tools/src/pages.ts`).
 - Until the first release exists the root is a page that forwards to `/next/`.
@@ -51,7 +51,6 @@ Both editions share one origin, so the next edition keeps its data under other n
 ## npm packages
 
 Publishing is off until the settings below exist, `pnpm run pack:check` passes and the repository variable `NPM_PUBLISH` is set to `true`. `pnpm run pack:check` fails while a published library depends on a private workspace package that npm does not have: today `schema` and `core` depend on `@open-reloading/units`. Settings outside the repository, once per library (see the [npm documentation on trusted publishers](https://docs.npmjs.com/trusted-publishers)):
-
 1. The npm organization `open-reloading` exists. If npm offers trusted publishing only for an existing package, publish the first version by hand from a clean checkout of `main`: `pnpm install && pnpm run build`, then `pnpm --filter @open-reloading/<name> publish` for `schema`, `core`, `drawing`, `importers` and `data`, signed in with two-factor authentication. The `publish` job skips that version.
 2. On npmjs.com, package Settings, Trusted Publisher, GitHub Actions: organization `OpenReloading`, repository `Ballistics`, workflow `release.yml`.
 3. Publishing access: "Require two-factor authentication and disallow tokens".
@@ -61,7 +60,6 @@ Publishing is off until the settings below exist, `pnpm run pack:check` passes a
 ## Contract baselines
 
 The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`pnpm test`, the CI `test` groups `packages` and `web`):
-
 - The JSON Schemas the schema build writes: `packages/schema/test/golden/json-schema/`.
 - The export list (values and types) of each published package: `tools/test/golden/exports/<name>.txt`, one line per entry point and name.
 - A user data file with a record of each kind, which the current code must read and write back unchanged, and a share link of two of its records: `apps/web/test/golden/`.

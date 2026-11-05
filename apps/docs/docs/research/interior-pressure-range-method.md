@@ -1,4 +1,5 @@
 ---
+
 title: How the peak-pressure range combines input tolerances
 description: One input at a time, all inputs at the pressure-raising and lowering ends, all vertices, root-sum-square and Monte Carlo, compared on synthetic M3 loads.
 ---
@@ -25,13 +26,13 @@ $$
 
 Nominal peak 3538.9 bar; combined range 3081.4 to 4077.7 bar (-12.9 % and +15.2 %).
 
-| Input | high side % | low side % |
-| --- | ---: | ---: |
-| charge | +1.41 | -1.39 |
-| volume | -1.77 | +1.85 |
-| burn rate | +5.35 | -5.20 |
-| temperature | +3.58 | -2.60 |
-| start pressure | +2.39 | -2.47 |
+| Input          | high side % | low side % |
+| -------------- | ----------: | ---------: |
+| charge         |       +1.41 |      -1.39 |
+| volume         |       -1.77 |      +1.85 |
+| burn rate      |       +5.35 |      -5.20 |
+| temperature    |       +3.58 |      -2.60 |
+| start pressure |       +2.39 |      -2.47 |
 
 The largest single-input change is 5.35 %, so the single-input cases alone show about a third of the combined +15.23 %. Summing the pressure-raising side of each input (+1.41, +1.85, +5.35, +3.58 and +2.39, unrounded) gives +14.59 %, 0.64 % of nominal below the combined case. On the 9 synthetic loads the combined ends equal the extremes over all 32 vertices exactly; the vertices cost 2.5 times as much (13 runs take 21.0 ms).
 

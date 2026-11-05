@@ -1,4 +1,5 @@
 ---
+
 title: Burn form and exponent from a pressure-time curve
 description: Weighted least-squares fit of the M3 burn coefficient, two-stage form parameters and pressure exponent to one or several measured pressure-time traces of one powder, with an identifiability report per parameter and the import of trace files.
 ---
@@ -112,7 +113,6 @@ In the study the check named 20 of 700 noise-only fits with three or five traces
 ### Holding parameters fixed
 
 A trace often fixes the burn coefficient and the shape of the rise but not the exponent: the pressure exponent and the form parameters move the same part of the curve. The fit therefore holds parameters at their start values and reports why:
-
 - A `weak` exponent is held fixed with the reasons of the attempt that showed it, and the fit repeats without it. A fit of the exponent alone keeps it and reports it `weak`. The reason `inconsistent` of the [leave-one-trace-out check](#leave-one-trace-out-check) comes after the fit and does not hold it.
 - An `unresolved` failure of the loop holds the parameters it names.
 - An `ill-conditioned` failure holds the next of the exponent, the form slope and the transition point that is still fitted.
@@ -139,7 +139,6 @@ Code: `packages/core/src/interior/curve-fit.ts`, `fitPressureCurves` (`peak`, `e
 Each trace has its own window, sensor and $\sigma_k$, found as for one trace. Either every trace gives `sigma` or none does. A time shift moves only its own trace's residuals, so its Jacobian columns are zero elsewhere. The parameters are held and reported as for one trace, with one `timeShift` entry per trace in input order. With one trace the result is that of `fitPressureCurve`.
 
 A trace at a higher peak sees the burn rate change as $(p/p_\text{ref})^n$, while the form function and the time shift do not change with the charge, so the traces together separate the exponent from the shape of the rise. On synthetic traces two or more charges whose highest peak is 1.2 to 1.5 times the lowest gave the exponent a variance inflation of 17 to 83 against 125 to 365 for one trace ([research log](../research/interior-curve-fit-exponent.md)). The default `maxInflation` is therefore 100 when the traces come from at least two charges and the highest peak is at least 1.2 times the lowest, and 10 otherwise. The input checks are listed in `warnings`, each with the traces it names:
-
 - `sameCharge`: traces at the same charge (within a relative $10^{-6}$). Repeat shots add no pressure range but keep the limit of the other charges.
 - `narrowPeaks`: the highest peak is below 1.2 times the lowest. The exponent is then held under the limit of one trace.
 
@@ -167,31 +166,31 @@ The two passes have a combined response of $\lvert H \rvert^2$ with $\lvert H \r
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in `core` |
-| --- | --- | --- | --- |
-| $t_i$, $p_i$ | Time and measured pressure of sample $i$ | s, bar | s, Pa |
-| $\hat p$ | Model pressure at the sensor position | bar | Pa |
-| $\sigma$ | Standard uncertainty of one sample | bar | Pa |
-| $p_\text{pk}$, $t_\text{pk}$ | Peak of the trace and its time | bar, s | Pa, s |
-| $t_s$, $t_e$ | Start and end of the fit window on the trace's clock | s | s |
-| $f_\text{end}$ | Fall fraction that ends the window | 1 | 1 |
-| $B_a$, $B_\text{pk}$ | Burn coefficient (vivacity), as given and restated at $p_\text{pk}$ | 1/s | 1/s |
-| $p_\text{ref}$, $p_\text{ref,0}$ | Reference pressure of the burn law, as fitted and as given | bar | Pa |
-| $n$, $n_0$ | Pressure exponent, fitted and as given | 1 | 1 |
-| $a$, $m$, $q$, $z_1$ | Parameters of the two-stage form | 1 | 1 |
-| $z$, $\varphi$ | Burnt fraction, form function | 1 | 1 |
-| $\tau_T$ | Temperature factor | 1 | 1 |
-| $\theta_j$, $q_j$, $q_{j,0}$ | Log parameter, fitted value and start value | 1, as the parameter | 1, as the parameter |
-| $t_\text{shift}$, $s$ | Time shift of the trace clock against the model clock, its scale | s | s |
-| $r_i$, $\chi^2$, $\nu$ | Weighted residual, sum of squares, degrees of freedom | 1 | 1 |
-| $n_s$, $n_p$ | Samples in the window, fitted parameters without the time shift | 1 | 1 |
-| $K$, $k$, $W_k$ | Number of traces of a joint fit, trace index, samples in its window | 1 | 1 |
-| $C_\theta$ | Covariance of the log parameters | 1 | 1 |
-| $\text{VIF}_j$, $u_\text{rel}$ | Variance inflation factor, relative standard uncertainty | 1 | 1 |
-| $k$, $n_\text{low}$, $n_\text{high}$ | Coverage factor, ends of the exponent's interval | 1 | 1 |
-| $n_{(k)}$, $s_J$ | Exponent refitted without trace $k$, jackknife standard error of its log | 1 | 1 |
-| $f_c$, $\text{RC}$, $\Delta t_i$ | Low-pass cutoff, its time constant, sample step | Hz, s, s | Hz, s, s |
-| $x_i$, $y_i$ | Pressure before and after the low-pass | bar | bar |
+| Symbol                               | Meaning                                                                  | Stored unit         | Unit in `core`      |
+| ------------------------------------ | ------------------------------------------------------------------------ | ------------------- | ------------------- |
+| $t_i$, $p_i$                         | Time and measured pressure of sample $i$                                 | s, bar              | s, Pa               |
+| $\hat p$                             | Model pressure at the sensor position                                    | bar                 | Pa                  |
+| $\sigma$                             | Standard uncertainty of one sample                                       | bar                 | Pa                  |
+| $p_\text{pk}$, $t_\text{pk}$         | Peak of the trace and its time                                           | bar, s              | Pa, s               |
+| $t_s$, $t_e$                         | Start and end of the fit window on the trace's clock                     | s                   | s                   |
+| $f_\text{end}$                       | Fall fraction that ends the window                                       | 1                   | 1                   |
+| $B_a$, $B_\text{pk}$                 | Burn coefficient (vivacity), as given and restated at $p_\text{pk}$      | 1/s                 | 1/s                 |
+| $p_\text{ref}$, $p_\text{ref,0}$     | Reference pressure of the burn law, as fitted and as given               | bar                 | Pa                  |
+| $n$, $n_0$                           | Pressure exponent, fitted and as given                                   | 1                   | 1                   |
+| $a$, $m$, $q$, $z_1$                 | Parameters of the two-stage form                                         | 1                   | 1                   |
+| $z$, $\varphi$                       | Burnt fraction, form function                                            | 1                   | 1                   |
+| $\tau_T$                             | Temperature factor                                                       | 1                   | 1                   |
+| $\theta_j$, $q_j$, $q_{j,0}$         | Log parameter, fitted value and start value                              | 1, as the parameter | 1, as the parameter |
+| $t_\text{shift}$, $s$                | Time shift of the trace clock against the model clock, its scale         | s                   | s                   |
+| $r_i$, $\chi^2$, $\nu$               | Weighted residual, sum of squares, degrees of freedom                    | 1                   | 1                   |
+| $n_s$, $n_p$                         | Samples in the window, fitted parameters without the time shift          | 1                   | 1                   |
+| $K$, $k$, $W_k$                      | Number of traces of a joint fit, trace index, samples in its window      | 1                   | 1                   |
+| $C_\theta$                           | Covariance of the log parameters                                         | 1                   | 1                   |
+| $\text{VIF}_j$, $u_\text{rel}$       | Variance inflation factor, relative standard uncertainty                 | 1                   | 1                   |
+| $k$, $n_\text{low}$, $n_\text{high}$ | Coverage factor, ends of the exponent's interval                         | 1                   | 1                   |
+| $n_{(k)}$, $s_J$                     | Exponent refitted without trace $k$, jackknife standard error of its log | 1                   | 1                   |
+| $f_c$, $\text{RC}$, $\Delta t_i$     | Low-pass cutoff, its time constant, sample step                          | Hz, s, s            | Hz, s, s            |
+| $x_i$, $y_i$                         | Pressure before and after the low-pass                                   | bar                 | bar                 |
 
 ## Assumptions
 

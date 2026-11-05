@@ -1,4 +1,5 @@
 ---
+
 title: Magnum primer factor on the ignition pressure
 description: Whether a pooled factor on the ignition pressure of loads with magnum primers lowers the held-out velocity error of the load-table fit.
 ---
@@ -24,10 +25,10 @@ The run starts at the burnt fraction that gives the ignition pressure $p_i$ in t
 Fitted $k$ 0.050 (interval 0.050 to 2.105; 3764 training magnum rows from 57 cartridges), at the end of the grid: the profile has no interior minimum.
 
 | Validation rows | $k = 1$ median / P90 % | fitted $k$ median / P90 % |
-| --- | --- | --- |
-| all 14252 | 3.33 / 9.20 | 3.32 / 9.19 |
-| magnum 1184 | 3.16 / 8.07 | 3.12 / 8.04 |
-| standard 6811 | 3.52 / 10.01 | 3.50 / 9.99 |
+| --------------- | ---------------------- | ------------------------- |
+| all 14252       | 3.33 / 9.20            | 3.32 / 9.19               |
+| magnum 1184     | 3.16 / 8.07            | 3.12 / 8.04               |
+| standard 6811   | 3.52 / 10.01           | 3.50 / 9.99               |
 
 Paired change of the absolute error on magnum rows -0.032 points (-0.086 to -0.007); median drop over all rows 0.009 points against the 0.1 margin. Confounding: the magnum minus standard mean error at $k = 1$ is +0.99 points and is negative in 1 of 6 strata of capacity by powder form. Of 23806 groups with equal powder, cartridge, bullet mass (0.1 g) and charge (0.05 g), 64 hold two named primers and 2 a magnum and a standard primer. Without the rows where printed and tabulated primer size differ: $k$ 0.833 (0.108 to 2.067), medians 3.33 % and 3.32 %.
 

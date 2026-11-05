@@ -1,4 +1,5 @@
 ---
+
 title: Monotone cubic drag interpolation against hand-computed values
 description: Whether the monotone cubic reading of a drag table reproduces the exact values of the slope limit on small tables, and the line on two nodes.
 ---
@@ -13,13 +14,13 @@ Drag: does the monotone cubic interpolation of a drag table, `dragTableOf` with 
 
 Three small tables were evaluated by hand and compared with the code at selected Mach numbers. The accept limit, from the tests: a relative difference below $10^{-15}$ in every case.
 
-| Table (Mach, coefficient) | Mach | Hand value |
-| --- | --- | --- |
-| (0, 0), (1, 1), (3, 2) | 0.5 | 25/48 |
-| (0, 0), (1, 1), (3, 2) | 2 | 19/12 |
-| (0, 0), (1, 1), (2, 6) | 0.5 | 3/8 |
-| (0, 0), (1, 1), (2, 6) | 1.5 | 25/8 |
-| (0.5, 0.3), (2.5, 0.7) | 0.6, 1, 1.7, 2.4 | $0.3 + 0.2\,(M - 0.5)$ |
+| Table (Mach, coefficient) | Mach             | Hand value             |
+| ------------------------- | ---------------- | ---------------------- |
+| (0, 0), (1, 1), (3, 2)    | 0.5              | 25/48                  |
+| (0, 0), (1, 1), (3, 2)    | 2                | 19/12                  |
+| (0, 0), (1, 1), (2, 6)    | 0.5              | 3/8                    |
+| (0, 0), (1, 1), (2, 6)    | 1.5              | 25/8                   |
+| (0.5, 0.3), (2.5, 0.7)    | 0.6, 1, 1.7, 2.4 | $0.3 + 0.2\,(M - 0.5)$ |
 
 A fourth case reads the first segment of the first table past its nodes, at Mach 1.5, and expects 21/16.
 

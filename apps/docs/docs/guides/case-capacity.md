@@ -1,4 +1,5 @@
 ---
+
 title: Measuring case capacity with water
 description: How to weigh the water capacity of your own cases, which cases and conditions to use, how to report mean and spread, and how to enter the value as a brass group for the workbench.
 ---

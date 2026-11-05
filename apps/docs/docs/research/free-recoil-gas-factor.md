@@ -1,4 +1,5 @@
 ---
+
 title: Free recoil gas factor against other model forms
 description: How far other forms of the powder gas term change the free recoil energy of typical handgun and rifle loads, and why the constant factors stay until measured free recoil is available.
 ---
@@ -16,7 +17,6 @@ Planned: compare each form by relative error with measured free recoil (recoil v
 ## Formulas
 
 The momentum of projectile and gas in the [free recoil model](../models/free-recoil.md) is $I = (m_p + f\, m_c)\, v_0$, with the energy $E_g = I^2 / (2 m_g)$, so for a fixed firearm the energy ratio of two forms is the square of their momentum ratio. Forms of $f$ compared, after [SAAMI 2018](../bibliography.md#saami-2018) for today's factor and a table of mean gas speed over muzzle velocity that falls from about 3 at 400 m/s to about 1 at 1400 m/s (a nearly constant mean gas speed of 1200 to 1330 m/s, source unverified here):
-
 - today: $f = 1.75$ (rifle), $f = 1.50$ (pistol);
 - constant gas speed: $f = V_{gas} / v_0$ with $V_{gas} = 1250$ m/s;
 - the same as an increment on the in-bore gas momentum: $f = 0.5 + V_{gas} / v_0$;
@@ -28,11 +28,11 @@ Loads (projectile g, charge g, muzzle velocity m/s, outflow speed m/s): handgun 
 
 Change of free recoil energy against today's factor, smallest to largest over the five loads of each kind:
 
-| Form | Handgun | Rifle |
-| --- | --- | --- |
-| constant gas speed 1250 m/s | +15.3 % to +25.5 % | -22.9 % to -6.7 % |
-| increment, $0.5 + 1250 / v_0$ | +17.9 % to +35.3 % | +0.6 % to +11.7 % |
-| outflow speed, $0.5 + v_a / v_0$ | +4.1 % to +8.9 % | -11.6 % to -3.5 % |
+| Form                             | Handgun            | Rifle             |
+| -------------------------------- | ------------------ | ----------------- |
+| constant gas speed 1250 m/s      | +15.3 % to +25.5 % | -22.9 % to -6.7 % |
+| increment, $0.5 + 1250 / v_0$    | +17.9 % to +35.3 % | +0.6 % to +11.7 % |
+| outflow speed, $0.5 + v_a / v_0$ | +4.1 % to +8.9 %   | -11.6 % to -3.5 % |
 
 The rifle extreme of the outflow form is the light, fast load (3.6 g at 990 m/s), where the charge is almost half the projectile mass. The test "energy spread of other gas factor forms over ten typical loads" in `packages/core/test/recoil.test.ts` reproduces every range of the table.
 

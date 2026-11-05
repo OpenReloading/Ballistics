@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '43 4 * * 2'
+    - cron: "43 4 * * 2"
 
 permissions: {}
 

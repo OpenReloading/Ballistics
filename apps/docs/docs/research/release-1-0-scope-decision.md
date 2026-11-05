@@ -1,4 +1,5 @@
 ---
+
 title: What the 1.0 release covers
 description: The accepted decision table on the scope, versions, alpha notice, changelog, support policy and publishing order of the 1.0 release, and why the change that would make it stays unbuilt while everything remains a 0.x pre-release.
 ---
@@ -21,16 +22,16 @@ None: a release process decision, no model equation.
 
 Eight rows; six accepted as written, two (3 and 8) accepted with one change: no `hold` label.
 
-| # | Question | Decision |
-| --- | --- | --- |
-| 1 | What the tag covers | Every versioned component (`schema`, `core`, `drawing`, `importers`, `data`, `api`, `cli`, `web`, `docs`) leaves 0.0.x together in one release pull request. Data format versions stay 1. |
-| 2 | Version numbers | The same number for every component of row 1; the API contract version follows `@open-reloading/api`, routes stay under `/v1`. |
-| 3 | How to reach the version | A `release-as` key per package in `release-please-config.json`, removed again by a second pull request right after the release. A `Release-As` commit footer does not survive the squash merge (the squash commit carries only the pull request title). No `hold` label. |
-| 4 | Pre-major flags | `bump-minor-pre-major`, `bump-patch-for-minor-pre-major` and `prerelease` are removed in the same pull request as the `release-as` keys. |
-| 5 | Alpha notice | Removed in that same pull request: `alphaNote`, the badge, the README line and the test that ties them together. |
-| 6 | Changelog | The per-component `CHANGELOG.md` and GitHub Release text of release-please; one hand-written summary on the `web` release; no root changelog. |
-| 7 | Support policy | Only the latest release gets fixes. No breaking change inside `/v1`; a break ships as `/v2` next to `/v1` for one minor series. A data format change raises the format version and reads the previous version for one major. |
-| 8 | Order of publishing | The release pull request is merged by hand, then tags and GitHub Releases, the npm libraries (`schema` first), the API image, the Pages edition from the newest tag, and last a check of the release notes and a docs rebuild. No `hold` label: the weekly release stays as it is. |
+| #   | Question                 | Decision                                                                                                                                                                                                                                                                           |
+| --- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | What the tag covers      | Every versioned component (`schema`, `core`, `drawing`, `importers`, `data`, `api`, `cli`, `web`, `docs`) leaves 0.0.x together in one release pull request. Data format versions stay 1.                                                                                          |
+| 2   | Version numbers          | The same number for every component of row 1; the API contract version follows `@open-reloading/api`, routes stay under `/v1`.                                                                                                                                                     |
+| 3   | How to reach the version | A `release-as` key per package in `release-please-config.json`, removed again by a second pull request right after the release. A `Release-As` commit footer does not survive the squash merge (the squash commit carries only the pull request title). No `hold` label.           |
+| 4   | Pre-major flags          | `bump-minor-pre-major`, `bump-patch-for-minor-pre-major` and `prerelease` are removed in the same pull request as the `release-as` keys.                                                                                                                                           |
+| 5   | Alpha notice             | Removed in that same pull request: `alphaNote`, the badge, the README line and the test that ties them together.                                                                                                                                                                   |
+| 6   | Changelog                | The per-component `CHANGELOG.md` and GitHub Release text of release-please; one hand-written summary on the `web` release; no root changelog.                                                                                                                                      |
+| 7   | Support policy           | Only the latest release gets fixes. No breaking change inside `/v1`; a break ships as `/v2` next to `/v1` for one minor series. A data format change raises the format version and reads the previous version for one major.                                                       |
+| 8   | Order of publishing      | The release pull request is merged by hand, then tags and GitHub Releases, the npm libraries (`schema` first), the API image, the Pages edition from the newest tag, and last a check of the release notes and a docs rebuild. No `hold` label: the weekly release stays as it is. |
 
 ## Result
 

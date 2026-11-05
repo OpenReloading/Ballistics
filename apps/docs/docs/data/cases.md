@@ -1,4 +1,5 @@
 ---
+
 title: Brass
 description: The case records that name a cartridge, a manufacturer and the stated water capacity of a case product.
 ---
@@ -11,18 +12,18 @@ A case record describes one cartridge case product as its manufacturer sells it,
 
 `records/cases/<id>.json`, schema `catalogueCase`.
 
-| Field | Meaning |
-|---|---|
+| Field                                   | Meaning                                                                                             |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `id`, `origin`, `name`, `productNumber` | Record id (the file name), `catalogue`, the product name and number as the manufacturer prints them |
-| `manufacturer`, `cartridge` | References, `catalogue:<id>`, to the manufacturer and the cartridge record |
-| `headstamp` | Marking on the case head as the source states it |
-| `material` | `brass`, `nickel-plated-brass`, `lacquered-steel`, `polymer-coated-steel` or `aluminium` |
-| `primerPocket` | `type` `boxer` or `berdan`, and `size` as the source states it |
-| `flashHole` | Diameter of the flash hole, mm |
-| `mass` | Mass of the empty case, g |
-| `waterCapacity` | Water to the case mouth as the manufacturer states it, g |
-| `annealed` | Whether the case is delivered annealed |
-| `provenance` | Sources, each listing the fields it supports |
+| `manufacturer`, `cartridge`             | References, `catalogue:<id>`, to the manufacturer and the cartridge record                          |
+| `headstamp`                             | Marking on the case head as the source states it                                                    |
+| `material`                              | `brass`, `nickel-plated-brass`, `lacquered-steel`, `polymer-coated-steel` or `aluminium`            |
+| `primerPocket`                          | `type` `boxer` or `berdan`, and `size` as the source states it                                      |
+| `flashHole`                             | Diameter of the flash hole, mm                                                                      |
+| `mass`                                  | Mass of the empty case, g                                                                           |
+| `waterCapacity`                         | Water to the case mouth as the manufacturer states it, g                                            |
+| `annealed`                              | Whether the case is delivered annealed                                                              |
+| `provenance`                            | Sources, each listing the fields it supports                                                        |
 
 Every data field needs a source that lists it in `fields`. A value a source does not state is left out, never estimated.
 

@@ -1,4 +1,5 @@
 ---
+
 title: Target centre on a tilted photo
 description: Whether the centre of the ellipse fitted to the black area is close enough to the target centre under perspective, against the centre from two concentric ring ellipses.
 ---

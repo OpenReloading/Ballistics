@@ -1,4 +1,5 @@
 ---
+
 title: Command line
 description: One compute operation of the API offline, the list of operations with their schemas, held-out evaluation of the interior model on a file of load rows, and a comparison of two model versions.
 ---
@@ -37,26 +38,25 @@ Real rows and real records are passed by path and are never committed. The repos
 
 One CSV file, or a folder of `.csv` files read in name order, with a header line. Columns:
 
-| Column | Meaning | Required |
-|---|---|---|
-| `cartridge`, `bullet`, `powder` | Record ids | yes |
-| `charge_g` | Charge, g | yes |
-| `velocity_ms` | Printed muzzle velocity, m/s | yes |
-| `pressure_bar` | Printed peak pressure, bar | no |
-| `barrel_mm` | Barrel length, mm; a row without it is not used (`noBarrelLength`) | no |
-| `temperature_c` | Propellant temperature, degC; default the temperature of the powder's fit | no |
-| `coal_mm` | Cartridge overall length, mm; default the sheet's L6 | no |
-| `pressure_basis` | The basis the pressure was measured on (`transducer`, `case-contact`, ...); pressure errors are grouped by it, `unstated` without one | no |
-| `muzzle_distance_m` | Distance of the measuring point from the muzzle, m; the velocity is corrected to the muzzle ([below](#muzzle-distance)) | no |
-| `bearing_mm`, `session`, `rifle`, `lot` | What a later model may read: carried with the row, unused | no |
-| `table` | A free label of the source table: carried, never part of a result | no |
+| Column                                  | Meaning                                                                                                                               | Required |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `cartridge`, `bullet`, `powder`         | Record ids                                                                                                                            | yes      |
+| `charge_g`                              | Charge, g                                                                                                                             | yes      |
+| `velocity_ms`                           | Printed muzzle velocity, m/s                                                                                                          | yes      |
+| `pressure_bar`                          | Printed peak pressure, bar                                                                                                            | no       |
+| `barrel_mm`                             | Barrel length, mm; a row without it is not used (`noBarrelLength`)                                                                    | no       |
+| `temperature_c`                         | Propellant temperature, degC; default the temperature of the powder's fit                                                             | no       |
+| `coal_mm`                               | Cartridge overall length, mm; default the sheet's L6                                                                                  | no       |
+| `pressure_basis`                        | The basis the pressure was measured on (`transducer`, `case-contact`, ...); pressure errors are grouped by it, `unstated` without one | no       |
+| `muzzle_distance_m`                     | Distance of the measuring point from the muzzle, m; the velocity is corrected to the muzzle ([below](#muzzle-distance))               | no       |
+| `bearing_mm`, `session`, `rifle`, `lot` | What a later model may read: carried with the row, unused                                                                             | no       |
+| `table`                                 | A free label of the source table: carried, never part of a result                                                                     | no       |
 
 A problem in the file is reported as file, line and column with a reason, never with the value, and the exit code is 2. Fields may be double-quoted. A number is a plain decimal or exponent form (`0.5`, `2.5e1`); `0x1F` and `0b11` are not numbers.
 
 ### Published loads
 
 `--rows catalogue` reads the [published load files](data/published-loads.md) of the records instead of a CSV file; `--rows <folder>` does the same for a folder laid out as `records/loads/` (named `loads`, with one folder per cartridge): only the files of that folder are read, their source references resolved from the source records of `--records`, and a file that fails is left out with a note on stderr. Each printed charge with a velocity `value` of a maker table is one row (`rowsFromPublished`, `src/published-rows.ts`):
-
 - `charge`, `velocity` (as printed, at the printed point), `coal` and `barrel` (`barrel.length`) from their `value`; `pressure` only with a value in bar, so a crusher figure (CUP, LUP) gives a row with its velocity only; the pressure basis is the figure's `method`, `unstated` without one; the muzzle distance is `velocity.point.distance`, and a velocity without one is a muzzle value;
 - `bullet` is the bullet record, else a stand-in record per cartridge and printed mass: the cartridge's G1 as diameter, the printed mass, and the length of a least-squares fit of ln length on ln mass and ln diameter over the bullet records with a length; it has no ballistic coefficient;
 - a row without a barrel length takes the median printed barrel of its cartridge, else 610 mm for a case (L3) longer than 33 mm and 120 mm for a shorter one, as on the [validation page](models/validation.md).
@@ -96,7 +96,6 @@ A powder without rows gets no value, not an estimate, as the app refuses a powde
 ## Model version
 
 Every result carries `modelVersion`, the SHA-256 over the sorted lines:
-
 - `<label> <sha256>` of each built source file the model's result depends on: the files `@open-reloading/core` builds for `interior/model.js`, `interior/record-load.js` and `water.js` (the water density that turns a capacity into a chamber volume), the files `@open-reloading/units` builds for the unit conversion (`toSi`, `fromSi` and the conversion table), the files `@open-reloading/schema` builds for its unit entry and the water capacity of a case or capacity record, the files `@open-reloading/drawing` builds for its seating and bullet entries, each with the files they import by a relative path (a candidate module adds itself and its relative imports, because it may call the model of core; imports of other packages are not followed), and the family median estimator (`unseen.js` of the CLI with its relative imports), which no run calls, kept so that published versions stay valid;
 - `<kind>/<id> <sha256>` of the stored JSON of every cartridge, bullet, powder, capacity and case record the rows name;
 - `rows <sha256>` over the SHA-256 of each rows file.
@@ -119,11 +118,11 @@ JSON when stdout is not a terminal or with `--json`, a table with `--table` or o
 
 `--version` prints `ballistics <version>` and exits 0.
 
-| Exit code | Meaning | `kind` |
-|---|---|---|
-| 0 | A result was written | |
-| 1 | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run, a 422 answer of an operation | `refused` |
-| 2 | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id | `usage` |
-| 3 | An internal error of the CLI | `internal` |
+| Exit code | Meaning                                                                                                                                                       | `kind`     |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 0         | A result was written                                                                                                                                          |            |
+| 1         | A refused run: the test split without `--final`, a baseline of another split or data, a split without a row the model could run, a 422 answer of an operation | `refused`  |
+| 2         | Bad input: the rows file, an option, the records, a model module (also one that throws), an operation body or an unknown record id                            | `usage`    |
+| 3         | An internal error of the CLI                                                                                                                                  | `internal` |
 
 An error goes to stderr. With `--json`, or when stdout is not a terminal, it is one JSON object on one line, `{"error":{"kind":"usage","message":"..."}}`, for `run` with `issues` or `answer`; on a terminal it is a text line. It never carries a stack trace.

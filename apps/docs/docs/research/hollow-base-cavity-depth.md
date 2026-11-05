@@ -1,4 +1,5 @@
 ---
+
 title: Hollow-base cavity depth interval and override
 description: How far the unknown depth of a hollow-base cavity moves the run, and the bracket and typed depth that carry it.
 ---
@@ -21,11 +22,11 @@ Cone cavity $V = \pi r_c^2 h / 3$, rounded cavity (half ellipsoid) $V = 2 \pi r_
 
 Cavity radius 3 mm: cone 0.028 cm³, hemisphere 0.057 cm³, bracket 0.014 to 0.085 cm³. Effect on the stand-in loads (free volume 0.4 / 0.6 cm³):
 
-| Cavity change | Peak | Velocity |
-|---|---|---|
-| cone to hemisphere (+0.028 cm³), or twice the depth | -5.9 % / -3.6 % | -1.1 % / -0.7 % |
-| half the depth | +3.4 % / +2.0 % | +0.6 % / +0.4 % |
-| three times the depth (+0.056 cm³) | -10.9 % / -6.9 % | -2.1 % / -1.4 % |
+| Cavity change                                       | Peak             | Velocity        |
+| --------------------------------------------------- | ---------------- | --------------- |
+| cone to hemisphere (+0.028 cm³), or twice the depth | -5.9 % / -3.6 %  | -1.1 % / -0.7 % |
+| half the depth                                      | +3.4 % / +2.0 %  | +0.6 % / +0.4 % |
+| three times the depth (+0.056 cm³)                  | -10.9 % / -6.9 % | -2.1 % / -1.4 % |
 
 With the bracket a 9 mm hollow-base wadcutter (opening 6 mm, 0.6 cm³ behind the bullet) gets a volume tolerance of 10.4 % instead of 1 % (`apps/web/test/cavity-range.test.ts`).
 

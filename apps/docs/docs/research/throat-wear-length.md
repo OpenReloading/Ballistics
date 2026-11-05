@@ -1,4 +1,5 @@
 ---
+
 title: Throat wear length input
 description: Whether a typed throat wear length that adds its volume behind the bullet reproduces a published worn-barrel model, and what a round count can say without a rate.
 ---
@@ -19,12 +20,12 @@ $V_0' = V_0 + w A$, the added length times the bore area ([M3, throat wear](../m
 
 ## Numbers
 
-| | Peak pressure | Muzzle velocity |
-|---|---|---|
-| M3, new barrel | 350.0 MPa | 809.0 m/s |
-| M3, $w$ = 5.42 mm | -16.8 % | -5.5 % |
+|                                        | Peak pressure                | Muzzle velocity               |
+| -------------------------------------- | ---------------------------- | ----------------------------- |
+| M3, new barrel                         | 350.0 MPa                    | 809.0 m/s                     |
+| M3, $w$ = 5.42 mm                      | -16.8 %                      | -5.5 %                        |
 | Authors' model, 16000 rounds (table 2) | -15.6 % (350.0 to 295.5 MPa) | -5.1 % (854.56 to 811.19 m/s) |
-| Measured, 16000 rounds (table 3) | | -6.5 % (840.6 to 785.8 m/s) |
+| Measured, 16000 rounds (table 3)       |                              | -6.5 % (840.6 to 785.8 m/s)   |
 
 The velocity change is 0.4 points from the authors' model and 1.0 point from the measurement. A 7.62x39 slope of about 0.42 mm per 1000 rounds was derived on a proxy load in the issue (unverified).
 

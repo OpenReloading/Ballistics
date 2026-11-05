@@ -4,7 +4,7 @@ name: Links
 # request check (ci.yml `check`) covers relative links and anchors only, and this run reports the rest in one issue.
 on:
   schedule:
-    - cron: '17 4 * * *'
+    - cron: "17 4 * * *"
   workflow_dispatch:
 
 permissions: {}

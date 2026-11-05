@@ -1,4 +1,5 @@
 ---
+
 title: Bullet from a photo
 description: The dimensions of a bullet from the silhouette in a photograph beside a ruler, each with a standard uncertainty, seeded into the bullet designer.
 ---
@@ -156,38 +157,38 @@ Ratios and angles take the scale out and carry the fit's uncertainty only. The f
 
 A photograph too poor to measure gets no values, only notes on what is wrong and what to do. The outline stays on the canvas, so the cut-out can be corrected with the brush and measured again.
 
-| Finding | When | What the user is told |
-| --- | --- | --- |
-| Too small | The bullet is narrower than 16 px | No values; take the photograph closer or crop to the bullet, at least 80 px across |
-| Not a bullet's proportions | The cut-out is shorter than wide or more than 10 times as long | No values; brush the bullet in and the rest out, or retake it alone on a plain background |
-| Narrow | Narrower than 40 px | Values, with the best case of their uncertainty ($\sqrt{2} u_e$ over the width, below 40 px it is more than 1 %) |
-| Typed axis off | An axis direction the user typed is 1 degree and 3 standard uncertainties or more from the shank's symmetry line (above) | The angle, and to clear the direction or type it again |
-| Shadow on one side | One side tapers at the base and the other does not (above) | That side is left out and the other side, mirrored, is measured; or, where that cannot be told, that the values may be off by more than their uncertainty. Brush the shadow out or retake in even light |
-| Ragged | The scatter of the shank's sides is above 1.5 px and 2 % of the width | A reflection, a shadow or noise; retake in even soft light or brush the cut-out |
-| Soft edges | Edge spread above 4 px and 4 % of the thickness | Shadow beside the bullet, or out of focus or moved; values are less certain |
-| Low contrast | The cut-out used has the bullet within 60 grey levels of the background | The outline may be rough; a plainer or much lighter or darker background |
-| Cut at the frame | The cut-out touches the photograph's edge | The whole bullet may not be in it |
+| Finding                    | When                                                                                                                     | What the user is told                                                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Too small                  | The bullet is narrower than 16 px                                                                                        | No values; take the photograph closer or crop to the bullet, at least 80 px across                                                                                                                      |
+| Not a bullet's proportions | The cut-out is shorter than wide or more than 10 times as long                                                           | No values; brush the bullet in and the rest out, or retake it alone on a plain background                                                                                                               |
+| Narrow                     | Narrower than 40 px                                                                                                      | Values, with the best case of their uncertainty ($\sqrt{2} u_e$ over the width, below 40 px it is more than 1 %)                                                                                        |
+| Typed axis off             | An axis direction the user typed is 1 degree and 3 standard uncertainties or more from the shank's symmetry line (above) | The angle, and to clear the direction or type it again                                                                                                                                                  |
+| Shadow on one side         | One side tapers at the base and the other does not (above)                                                               | That side is left out and the other side, mirrored, is measured; or, where that cannot be told, that the values may be off by more than their uncertainty. Brush the shadow out or retake in even light |
+| Ragged                     | The scatter of the shank's sides is above 1.5 px and 2 % of the width                                                    | A reflection, a shadow or noise; retake in even soft light or brush the cut-out                                                                                                                         |
+| Soft edges                 | Edge spread above 4 px and 4 % of the thickness                                                                          | Shadow beside the bullet, or out of focus or moved; values are less certain                                                                                                                             |
+| Low contrast               | The cut-out used has the bullet within 60 grey levels of the background                                                  | The outline may be rough; a plainer or much lighter or darker background                                                                                                                                |
+| Cut at the frame           | The cut-out touches the photograph's edge                                                                                | The whole bullet may not be in it                                                                                                                                                                       |
 
 Code: `apps/web/src/lib/bullet-photo-quality.ts`, `outlineHints`; `bullet-photo.ts`, `segment`.
 
 ## Symbols
 
-| Symbol | Meaning | Stored unit | Unit in code |
-| --- | --- | --- | --- |
-| $k$ | Scale of the photograph | no kind | px/mm |
-| $L$, $\ell$ | Distance on the ruler, its pixel distance | mm, no kind | mm, px |
-| $u_p$ | Standard uncertainty of a placed point | no kind | 1 px |
-| $u_e$ | Standard uncertainty of an edge position | no kind | 0.3 px |
-| $r(z)$ | Half width of the bullet at $z$ along the axis | no kind | px |
-| $r_l(z)$, $r_r(z)$, $r_s(z)$ | Distance of the left, right and sharp side's edge from the axis | no kind | px |
-| $t$, $t_s$, $r_b$, $\ell_s$ | A side's taper at the base, the sharp side's, the half width at the base, the sharp side's shank line | no kind | px |
-| $a$, $d$ | Shank radius, diameter | mm | px, mm |
-| $z_b$ | Boat tail length | mm | px, mm |
-| $r_0$, $c$ | Radius of the boat tail cone at the base, its slope | mm, degrees | px, ratio |
-| $h$ | Shank radius less the meplat radius | mm | px |
-| $\rho$, $(r_c, z_c)$ | Radius and centre of the nose circle | mm | px |
-| $n$, $m$ | Nose length, meplat radius | mm | px |
-| $R_t/R$ | Ratio of the tangent ogive radius to the nose's | no kind | ratio |
+| Symbol                       | Meaning                                                                                               | Stored unit | Unit in code |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- | ----------- | ------------ |
+| $k$                          | Scale of the photograph                                                                               | no kind     | px/mm        |
+| $L$, $\ell$                  | Distance on the ruler, its pixel distance                                                             | mm, no kind | mm, px       |
+| $u_p$                        | Standard uncertainty of a placed point                                                                | no kind     | 1 px         |
+| $u_e$                        | Standard uncertainty of an edge position                                                              | no kind     | 0.3 px       |
+| $r(z)$                       | Half width of the bullet at $z$ along the axis                                                        | no kind     | px           |
+| $r_l(z)$, $r_r(z)$, $r_s(z)$ | Distance of the left, right and sharp side's edge from the axis                                       | no kind     | px           |
+| $t$, $t_s$, $r_b$, $\ell_s$  | A side's taper at the base, the sharp side's, the half width at the base, the sharp side's shank line | no kind     | px           |
+| $a$, $d$                     | Shank radius, diameter                                                                                | mm          | px, mm       |
+| $z_b$                        | Boat tail length                                                                                      | mm          | px, mm       |
+| $r_0$, $c$                   | Radius of the boat tail cone at the base, its slope                                                   | mm, degrees | px, ratio    |
+| $h$                          | Shank radius less the meplat radius                                                                   | mm          | px           |
+| $\rho$, $(r_c, z_c)$         | Radius and centre of the nose circle                                                                  | mm          | px           |
+| $n$, $m$                     | Nose length, meplat radius                                                                            | mm          | px           |
+| $R_t/R$                      | Ratio of the tangent ogive radius to the nose's                                                       | no kind     | ratio        |
 
 ## Assumptions
 

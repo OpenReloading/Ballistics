@@ -16,9 +16,9 @@
       "!**/.next",
       "!**/dist",
       "!**/next-env.d.ts",
-      "!**/*.md",
-      "!**/*.yaml",
-      "!**/*.yml",
+      "!**/CHANGELOG.md",
+      "!**/*.api.md",
+      "!pnpm-lock.yaml",
       "!**/test/golden",
       "!packages/data/test/fixtures/invalid/chrono/broken.json"
     ]
@@ -38,6 +38,9 @@
       "correctness": { "noInvalidGridAreas": "off" },
       "style": { "noDescendingSpecificity": "off" }
     }
+  },
+  "markdown": {
+    "formatter": { "formatEmbeds": false }
   },
   "javascript": {
     "formatter": {

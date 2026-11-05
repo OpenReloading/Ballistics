@@ -1,4 +1,5 @@
 ---
+
 title: Supported browsers
 description: The browsers and phone widths the web app supports, why each version is the floor, the JavaScript weight budget, and the checks that keep the code within them.
 ---
@@ -7,12 +8,11 @@ description: The browsers and phone widths the web app supports, why each versio
 
 The web app supports these browsers and widths. An older browser may open it, but a page can fail without a message.
 
-| Browser | Oldest version |
-|---|---|
-| Chrome, Edge | 111 |
-| Firefox | 121 |
-| Safari (macOS and iOS) | 16.4 |
-
+| Browser                | Oldest version |
+| ---------------------- | -------------- |
+| Chrome, Edge           | 111            |
+| Firefox                | 121            |
+| Safari (macOS and iOS) | 16.4           |
 - Phone widths: 320 and 390 CSS px.
 - Performance: the JavaScript each route loads stays within the budgets of [`apps/web/weight-budget.json`](https://github.com/OpenReloading/Ballistics/blob/main/apps/web/weight-budget.json). There is no other performance figure.
 

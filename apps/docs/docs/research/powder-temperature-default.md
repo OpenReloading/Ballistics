@@ -1,4 +1,5 @@
 ---
+
 title: Default powder temperature sensitivity by grain form
 description: A default burn-rate temperature sensitivity for powder records without their own, by grain form, with its interval, its sources and the derivation of the extruded value from a maker table.
 ---
@@ -24,10 +25,10 @@ Ball (Boulkadid 2016 as quoted): burn-rate sensitivity spherical 0.305 ± 0.016 
 Hodgdon 2012, 17 powders: velocity change mean 0.0427 %/K, SD 0.0350, range -0.0164 to 0.1001 %/K. Through the model:
 
 | Stand-in load | Muzzle velocity | $\sigma$ 0.0025 at +30.56 K: $\Delta v$ | Extruded (14): mean, SD of $\sigma_h$ | All 17: mean, SD |
-|---|---|---|---|---|
-| 2.4 g | 790 m/s | 2.13 % | 0.00153, 0.00141 | 0.00153, 0.00128 |
-| 2.8 g | 829 m/s | 3.29 % | 0.00096, 0.00088 | 0.00096, 0.00080 |
-| 3.2 g | 838 m/s | 5.11 % | 0.00061, 0.00056 | 0.00061, 0.00050 |
+| ------------- | --------------- | --------------------------------------- | ------------------------------------- | ---------------- |
+| 2.4 g         | 790 m/s         | 2.13 %                                  | 0.00153, 0.00141                      | 0.00153, 0.00128 |
+| 2.8 g         | 829 m/s         | 3.29 %                                  | 0.00096, 0.00088                      | 0.00096, 0.00080 |
+| 3.2 g         | 838 m/s         | 5.11 %                                  | 0.00061, 0.00056                      | 0.00061, 0.00050 |
 
 Default $\sigma_h$ for extruded and flake 0.0010 1/K, interval 0.0001 to 0.0029 (the issue's estimate on its own stand-in load was about 0.0020, 0.0003 to 0.0050). The issue's solver check of the cold side: with the measured cold $\sigma_c$ 0.00121 at -75 K the model gives -5.35 % velocity (measured -5.6 %) but -13.0 % peak against about -1.65 % measured, which is why the cold peak is an interval.
 

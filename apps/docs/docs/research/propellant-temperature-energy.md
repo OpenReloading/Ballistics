@@ -1,4 +1,5 @@
 ---
+
 title: Temperature dependence of the propellant gas energy
 description: How much of the effect of the propellant temperature on muzzle velocity and peak pressure the missing energy term carries, and whether fixing its coefficient lowers held-out residuals of a temperature ladder fit on synthetic data.
 ---
@@ -20,7 +21,6 @@ Assumed figures, none with a source in the [bibliography](../bibliography.md), a
 Study 1. Six loads: the golden rifle load, the same with bore resistance and convective heat loss, a 203 mm gun load, two further charges of the rifle load and a pistol load (charge to bullet mass 0.05 to 0.35). Each is run at the reference and 5.6 K above it, with the burn term alone, the energy term alone and both. Energy share: the change from the energy term alone divided by the change from both.
 
 Study 2. A truth load with a vivacity burn law and the energy term, three charges per temperature, ladders at 274.15, 294.15 and 314.15 K, 50 replicates with independent noise (seeds 1000 to 1049 for the ladder, 5000 to 5049 for the held-out strings). Fit (A): `fitPowder` with the burn rate and the temperature factor free, the load as it is today. Fit (B): the same with the energy coefficient fixed at 0.0003 1/K. Both start from a burn rate 12 % low and sensitivities 25 % low. Two held-out spans:
-
 - interpolating: fit on 274.15 and 314.15 K, hold out 294.15 K;
 - extrapolating: fit on all three, hold out 334.15 K (20 K above the hottest).
 
@@ -36,50 +36,50 @@ The burn-rate factor is $\tau_T = \exp(\sigma\,(T_p - T_\text{ref}))$ and the en
 
 Study 1, change for +5.6 K (burn sensitivity 0.004 1/K, energy coefficient 0.0003 1/K), muzzle velocity / peak breech pressure in percent:
 
-| load | charge / bullet | charge / chamber (kg/m³) | burn term: v / p (%) | energy term: v / p (%) | both: v / p (%) | energy share: v / p |
-| --- | --- | --- | --- | --- | --- | --- |
-| rifle, charge 2.8 g | 0.295 | 824 | 0.343 / 4.35 | 0.093 / 0.29 | 0.436 / 4.65 | 21.4 % / 6.2 % |
-| rifle, resistance and heat loss | 0.295 | 824 | 0.341 / 4.12 | 0.094 / 0.27 | 0.435 / 4.40 | 21.6 % / 6.2 % |
-| gun, 203 mm bore | 0.111 | 465 | 0.445 / 4.27 | 0.098 / 0.30 | 0.542 / 4.58 | 18.0 % / 6.5 % |
-| rifle, light charge 1.8 g | 0.189 | 529 | 0.449 / 4.31 | 0.095 / 0.28 | 0.543 / 4.59 | 17.4 % / 6.0 % |
-| rifle, heavy charge 3.3 g | 0.347 | 971 | 0.377 / 5.72 | 0.095 / 0.33 | 0.472 / 6.07 | 20.1 % / 5.4 % |
-| pistol, 0.4 g | 0.050 | 333 | 0.413 / 2.08 | 0.094 / 0.21 | 0.507 / 2.30 | 18.5 % / 9.4 % |
+| load                            | charge / bullet | charge / chamber (kg/m³) | burn term: v / p (%) | energy term: v / p (%) | both: v / p (%) | energy share: v / p |
+| ------------------------------- | --------------- | ------------------------ | -------------------- | ---------------------- | --------------- | ------------------- |
+| rifle, charge 2.8 g             | 0.295           | 824                      | 0.343 / 4.35         | 0.093 / 0.29           | 0.436 / 4.65    | 21.4 % / 6.2 %      |
+| rifle, resistance and heat loss | 0.295           | 824                      | 0.341 / 4.12         | 0.094 / 0.27           | 0.435 / 4.40    | 21.6 % / 6.2 %      |
+| gun, 203 mm bore                | 0.111           | 465                      | 0.445 / 4.27         | 0.098 / 0.30           | 0.542 / 4.58    | 18.0 % / 6.5 %      |
+| rifle, light charge 1.8 g       | 0.189           | 529                      | 0.449 / 4.31         | 0.095 / 0.28           | 0.543 / 4.59    | 17.4 % / 6.0 %      |
+| rifle, heavy charge 3.3 g       | 0.347           | 971                      | 0.377 / 5.72         | 0.095 / 0.33           | 0.472 / 6.07    | 20.1 % / 5.4 %      |
+| pistol, 0.4 g                   | 0.050           | 333                      | 0.413 / 2.08         | 0.094 / 0.21           | 0.507 / 2.30    | 18.5 % / 9.4 %      |
 
 The energy term carries 17 to 22 % of the velocity change and 5 to 6.5 % of the pressure change on the rifle and gun loads, and 18.5 % and 9.4 % on the pistol load. The expected shares (about 20 to 25 % for velocity, about 7 % for pressure) hold in size: velocity at or a little below the lower end, pressure a little under on the rifle and gun loads.
 
 Study 2, pooled RMS over 50 replicates and 3 held-out charges (A: shared temperature factor, B: energy coefficient fixed at 0.0003 1/K):
 
-| arm | held-out span | model | velocity RMS (m/s) | pressure RMS (%) | velocity, noise-free truth | pressure, noise-free truth | failed fits |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| truth with term, velocity only | interpolating (294 K) | A | 3.34 | 3.48 | 1.70 | 0.83 | 0 |
-| truth with term, velocity only | interpolating (294 K) | B | 3.21 | 3.42 | 1.42 | 0.68 | 0 |
-| truth with term, velocity only | extrapolating (334 K) | A | 3.93 | 4.69 | 2.90 | 2.67 | 0 |
-| truth with term, velocity only | extrapolating (334 K) | B | 3.26 | 4.08 | 1.85 | 1.71 | 0 |
-| truth with term, velocity and pressure | interpolating (294 K) | A | 2.99 | 3.48 | 1.09 | 0.53 | 0 |
-| truth with term, velocity and pressure | interpolating (294 K) | B | 2.95 | 3.45 | 0.94 | 0.45 | 0 |
-| truth with term, velocity and pressure | extrapolating (334 K) | A | 4.06 | 4.44 | 3.10 | 2.27 | 0 |
-| truth with term, velocity and pressure | extrapolating (334 K) | B | 3.13 | 4.03 | 1.68 | 1.56 | 0 |
-| truth without term, velocity only | interpolating (294 K) | A | 3.21 | 3.42 | 1.41 | 0.68 | 0 |
-| truth without term, velocity only | interpolating (294 K) | B | 3.28 | 3.41 | 1.54 | 0.73 | 0 |
-| truth without term, velocity only | extrapolating (334 K) | A | 3.27 | 4.08 | 1.86 | 1.71 | 0 |
-| truth without term, velocity only | extrapolating (334 K) | B | 3.88 | 4.41 | 2.77 | 2.60 | 0 |
-| truth without term, velocity and pressure | interpolating (294 K) | A | 2.95 | 3.45 | 0.94 | 0.45 | 0 |
-| truth without term, velocity and pressure | interpolating (294 K) | B | 2.97 | 3.44 | 0.97 | 0.47 | 0 |
-| truth without term, velocity and pressure | extrapolating (334 K) | A | 3.14 | 4.02 | 1.69 | 1.56 | 0 |
-| truth without term, velocity and pressure | extrapolating (334 K) | B | 4.19 | 4.15 | 3.23 | 2.06 | 0 |
+| arm                                       | held-out span         | model | velocity RMS (m/s) | pressure RMS (%) | velocity, noise-free truth | pressure, noise-free truth | failed fits |
+| ----------------------------------------- | --------------------- | ----- | ------------------ | ---------------- | -------------------------- | -------------------------- | ----------- |
+| truth with term, velocity only            | interpolating (294 K) | A     | 3.34               | 3.48             | 1.70                       | 0.83                       | 0           |
+| truth with term, velocity only            | interpolating (294 K) | B     | 3.21               | 3.42             | 1.42                       | 0.68                       | 0           |
+| truth with term, velocity only            | extrapolating (334 K) | A     | 3.93               | 4.69             | 2.90                       | 2.67                       | 0           |
+| truth with term, velocity only            | extrapolating (334 K) | B     | 3.26               | 4.08             | 1.85                       | 1.71                       | 0           |
+| truth with term, velocity and pressure    | interpolating (294 K) | A     | 2.99               | 3.48             | 1.09                       | 0.53                       | 0           |
+| truth with term, velocity and pressure    | interpolating (294 K) | B     | 2.95               | 3.45             | 0.94                       | 0.45                       | 0           |
+| truth with term, velocity and pressure    | extrapolating (334 K) | A     | 4.06               | 4.44             | 3.10                       | 2.27                       | 0           |
+| truth with term, velocity and pressure    | extrapolating (334 K) | B     | 3.13               | 4.03             | 1.68                       | 1.56                       | 0           |
+| truth without term, velocity only         | interpolating (294 K) | A     | 3.21               | 3.42             | 1.41                       | 0.68                       | 0           |
+| truth without term, velocity only         | interpolating (294 K) | B     | 3.28               | 3.41             | 1.54                       | 0.73                       | 0           |
+| truth without term, velocity only         | extrapolating (334 K) | A     | 3.27               | 4.08             | 1.86                       | 1.71                       | 0           |
+| truth without term, velocity only         | extrapolating (334 K) | B     | 3.88               | 4.41             | 2.77                       | 2.60                       | 0           |
+| truth without term, velocity and pressure | interpolating (294 K) | A     | 2.95               | 3.45             | 0.94                       | 0.45                       | 0           |
+| truth without term, velocity and pressure | interpolating (294 K) | B     | 2.97               | 3.44             | 0.97                       | 0.47                       | 0           |
+| truth without term, velocity and pressure | extrapolating (334 K) | A     | 3.14               | 4.02             | 1.69                       | 1.56                       | 0           |
+| truth without term, velocity and pressure | extrapolating (334 K) | B     | 4.19               | 4.15             | 3.23                       | 2.06                       | 0           |
 
 Verdict by the rule (change of the RMS of B against A in percent, negative is lower):
 
-| arm | held-out span | velocity RMS, B against A (%) | pressure RMS, B against A (%) | criterion met |
-| --- | --- | --- | --- | --- |
-| truth with term, velocity only | interpolating (294 K) | -3.7 | -1.7 | no |
-| truth with term, velocity only | extrapolating (334 K) | -17.1 | -12.9 | no |
-| truth with term, velocity and pressure | interpolating (294 K) | -1.5 | -0.7 | no |
-| truth with term, velocity and pressure | extrapolating (334 K) | -22.9 | -9.3 | no |
-| truth without term, velocity only | interpolating (294 K) | 2.0 | -0.4 | yes |
-| truth without term, velocity only | extrapolating (334 K) | 18.8 | 8.1 | no |
-| truth without term, velocity and pressure | interpolating (294 K) | 0.6 | -0.3 | yes |
-| truth without term, velocity and pressure | extrapolating (334 K) | 33.4 | 3.1 | no |
+| arm                                       | held-out span         | velocity RMS, B against A (%) | pressure RMS, B against A (%) | criterion met |
+| ----------------------------------------- | --------------------- | ----------------------------- | ----------------------------- | ------------- |
+| truth with term, velocity only            | interpolating (294 K) | -3.7                          | -1.7                          | no            |
+| truth with term, velocity only            | extrapolating (334 K) | -17.1                         | -12.9                         | no            |
+| truth with term, velocity and pressure    | interpolating (294 K) | -1.5                          | -0.7                          | no            |
+| truth with term, velocity and pressure    | extrapolating (334 K) | -22.9                         | -9.3                          | no            |
+| truth without term, velocity only         | interpolating (294 K) | 2.0                           | -0.4                          | yes           |
+| truth without term, velocity only         | extrapolating (334 K) | 18.8                          | 8.1                           | no            |
+| truth without term, velocity and pressure | interpolating (294 K) | 0.6                           | -0.3                          | yes           |
+| truth without term, velocity and pressure | extrapolating (334 K) | 33.4                          | 3.1                           | no            |
 
 The rule is not met: with the term in the truth, B reaches 15 % lower only in velocity at the extrapolating span, never in pressure; with no term in the truth, B exceeds the 5 % allowed in velocity at the extrapolating span.
 

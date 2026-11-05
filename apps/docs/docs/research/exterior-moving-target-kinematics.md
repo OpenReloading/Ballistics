@@ -1,4 +1,5 @@
 ---
+
 title: Moving target lead against the kinematics
 description: Whether the lateral lead and its angle follow speed times time of flight times the sine of the heading, and what the model leaves out.
 ---

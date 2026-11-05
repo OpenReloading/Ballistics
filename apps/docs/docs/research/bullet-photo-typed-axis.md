@@ -1,4 +1,5 @@
 ---
+
 title: An axis direction typed a few degrees off the bullet's
 description: Whether the bullet photo tool can tell an axis direction the user typed from the bullet's own axis, and stop the turned base face from reading as a boat tail.
 ---
@@ -22,15 +23,15 @@ With a typed axis only the offset is fitted, so the axis need not be the symmetr
 
 ## Numbers
 
-| Render | Typed off | Before | After |
-| --- | --- | --- | --- |
-| Flat base, 40 px/mm | 0, 0.5, 1 degrees | flat | flat, no note |
-| Flat base, 40 px/mm | 2 degrees | boat tail 0.27 mm | flat, note "about 2 degrees" |
-| Flat base, 40 px/mm | 3 degrees | boat tail 0.41 mm | flat, note "about 3 degrees" |
-| Flat base, 40 px/mm | 5 degrees | flat | flat, note "about 5 degrees" |
-| Flat base, 20 px/mm | 5 degrees | boat tail 0.68 mm | flat, note "about 5 degrees" |
-| Flat base, 20 px/mm | 2, 3, -3 degrees | flat | flat, note |
-| Boat tail 5.5 mm, 40 px/mm | 3, -3 degrees | not run | boat tail 5.66 mm, note "about 2.7 degrees" |
+| Render                     | Typed off         | Before            | After                                       |
+| -------------------------- | ----------------- | ----------------- | ------------------------------------------- |
+| Flat base, 40 px/mm        | 0, 0.5, 1 degrees | flat              | flat, no note                               |
+| Flat base, 40 px/mm        | 2 degrees         | boat tail 0.27 mm | flat, note "about 2 degrees"                |
+| Flat base, 40 px/mm        | 3 degrees         | boat tail 0.41 mm | flat, note "about 3 degrees"                |
+| Flat base, 40 px/mm        | 5 degrees         | flat              | flat, note "about 5 degrees"                |
+| Flat base, 20 px/mm        | 5 degrees         | boat tail 0.68 mm | flat, note "about 5 degrees"                |
+| Flat base, 20 px/mm        | 2, 3, -3 degrees  | flat              | flat, note                                  |
+| Boat tail 5.5 mm, 40 px/mm | 3, -3 degrees     | not run           | boat tail 5.66 mm, note "about 2.7 degrees" |
 
 The catalogue evaluation (found axis) is unchanged on every column of scenarios A to H.
 

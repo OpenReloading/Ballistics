@@ -1,4 +1,5 @@
 ---
+
 title: Tuning a powder from chronograph strings
 description: Steps from chronograph strings on the Measurements tab to a fitted powder saved in the browser, the notes and refusals the tuning screen shows, and how to refit later.
 ---
@@ -25,16 +26,16 @@ In the powder designer, the File menu's Save writes the powder as a user data fi
 
 ## Notes and refusals
 
-| What you see | Why | What to do |
-| --- | --- | --- |
-| Fewer than 3 charges, or charges less than 10 % apart: only the burn coefficient is fitted | Thin ladder: the other values stay at those of the similar powder | Add strings at charges further apart, or Try the other values anyway |
-| The start pressure or the chamber volume move together with the burn coefficient: they are held | Held values: their correlation with the burn coefficient is above 0.9 | Add a measured pressure; until then only the burn coefficient is fitted |
-| The temperature factor needs strings at two or more powder temperatures | All strings are at one temperature | Add strings at another powder temperature |
-| The temperature factor cannot be told from the burn coefficient, it stays at 1 | The temperatures are too close | Add strings at temperatures further apart |
-| The powder has no temperature sensitivity | A powder of your own without one, and strings at two or more temperatures | Type a Temperature sensitivity (1/K); the fit scales it, so any value above 0 starts it |
-| Fewer charges than values, values that cannot be told apart, charges too close, a charge the model cannot run, or a fit that did not settle | The fit refused; the message names the cause and one action | Follow the message; a charge the model cannot run is highlighted in the strings table |
-| A powder record holds at most 40 points, one per charge and powder temperature | Save refused: too many distinct charges and temperatures | Leave strings out on the Measurements tab (Not used) until 40 or fewer remain |
-| Left out, the strings of another load | The sessions hold strings of more than one load | Only the strings of the load you opened are fitted |
+| What you see                                                                                                                                | Why                                                                       | What to do                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Fewer than 3 charges, or charges less than 10 % apart: only the burn coefficient is fitted                                                  | Thin ladder: the other values stay at those of the similar powder         | Add strings at charges further apart, or Try the other values anyway                    |
+| The start pressure or the chamber volume move together with the burn coefficient: they are held                                             | Held values: their correlation with the burn coefficient is above 0.9     | Add a measured pressure; until then only the burn coefficient is fitted                 |
+| The temperature factor needs strings at two or more powder temperatures                                                                     | All strings are at one temperature                                        | Add strings at another powder temperature                                               |
+| The temperature factor cannot be told from the burn coefficient, it stays at 1                                                              | The temperatures are too close                                            | Add strings at temperatures further apart                                               |
+| The powder has no temperature sensitivity                                                                                                   | A powder of your own without one, and strings at two or more temperatures | Type a Temperature sensitivity (1/K); the fit scales it, so any value above 0 starts it |
+| Fewer charges than values, values that cannot be told apart, charges too close, a charge the model cannot run, or a fit that did not settle | The fit refused; the message names the cause and one action               | Follow the message; a charge the model cannot run is highlighted in the strings table   |
+| A powder record holds at most 40 points, one per charge and powder temperature                                                              | Save refused: too many distinct charges and temperatures                  | Leave strings out on the Measurements tab (Not used) until 40 or fewer remain           |
+| Left out, the strings of another load                                                                                                       | The sessions hold strings of more than one load                           | Only the strings of the load you opened are fitted                                      |
 
 The rules behind each note are in [Powder fit from a chronograph ladder](models/interior-powder-fit.md#several-barrel-lengths-and-temperatures), its failures in [Failures](models/interior-powder-fit.md#failures) and the label in [Confidence label](models/interior-powder-fit.md#confidence-label).
 

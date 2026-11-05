@@ -1,4 +1,5 @@
 ---
+
 title: Literature notes
 description: How the result of a literature search becomes a literature note, its front matter and sections, and the machine-readable index of all research pages.
 ---
