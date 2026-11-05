@@ -116,10 +116,13 @@ export const toSi: <K extends QuantityKind>(kind: K, stored: number & {
 }) => Si<K>;
 
 // @public
-export type UnitId = StoredUnits[QuantityKind] | 'in' | 'ft' | 'gr' | 'mph' | 'inHg' | 'psi' | 'MOA';
+export type UnitId = StoredUnits[QuantityKind] | 'in' | 'ft' | 'yd' | 'gr' | 'lb' | 'mph' | 'inHg' | 'psi' | 'ft-lbf' | 'MOA';
 
 // @public
 export const units: Readonly<StoredUnits>;
+
+// @public
+export const waterDensityGramsPerCm3 = 0.9982;
 
 // (No @packageDocumentation comment for this package)
 
