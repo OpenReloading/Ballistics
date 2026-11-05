@@ -111,7 +111,7 @@ $$
 P_\mathrm{out}(R) = \frac{2}{\pi} \int_0^{\pi/2} \exp\!\left(-\frac{R^2}{2(\lambda_1 \cos^2\varphi + \lambda_2 \sin^2\varphi)}\right) d\varphi = \frac{1}{2}
 $$
 
-Code: `packages/core/src/groups/statistics.ts`, `ellipticalCep` (`outside`), `packages/core/src/bisect.ts`, `bisect`.
+Code: `packages/core/src/groups/statistics.ts`, `ellipticalCep` (`outside`), `packages/statistics/src/bisect.ts`, `bisect`.
 
 Trapezoid rule with 64 steps; $R$ comes from bisection on $[0, 1.2\sqrt{\lambda_1}]$.
 
@@ -139,7 +139,7 @@ $$
 F_{2,\,m}(p) = \frac{m}{2}\left((1 - p)^{-2/m} - 1\right)
 $$
 
-Code: `packages/core/src/groups/f-distribution.ts`, `fQuantileTwoNumeratorDegrees`.
+Code: `packages/statistics/src/f-distribution.ts`, `fQuantileTwoNumeratorDegrees`.
 
 ### Confidence intervals by shot count
 
@@ -162,7 +162,7 @@ $$
 F_{\chi^2}(x; \nu) = P(a, z) = \sum_{k=0}^{\infty} \frac{e^{-z} z^{a+k}}{\Gamma(a + k + 1)}
 $$
 
-Code: `packages/core/src/groups/chi-square.ts`, `chiSquareCdf` (`lnGammaPlusOne`), `chiSquareQuantile`.
+Code: `packages/statistics/src/chi-square.ts`, `chiSquareCdf` (`lnGammaPlusOne`), `chiSquareQuantile`.
 
 Above $z = a + 1$ the upper tail comes from the continued fraction of the upper incomplete gamma function:
 
@@ -170,7 +170,7 @@ $$
 Q(a, z) = \frac{e^{-z} z^a}{\Gamma(a)} \cdot \cfrac{1}{z + 1 - a - \cfrac{1 \cdot (1 - a)}{z + 3 - a - \cfrac{2 \cdot (2 - a)}{z + 5 - a - \cdots}}}
 $$
 
-Code: `packages/core/src/groups/chi-square.ts`, `chiSquareSurvival`.
+Code: `packages/statistics/src/chi-square.ts`, `chiSquareSurvival`.
 
 evaluated by the modified Lentz method, and there $P = 1 - Q$: the series would need about $z$ terms. Below, $Q = 1 - P$. Quantiles come from bisection on $P$.
 
@@ -182,7 +182,7 @@ $$
 \bar v = \frac{1}{n} \sum_{i=1}^{n} v_i, \qquad s = \sqrt{\frac{\sum_i (v_i - \bar v)^2}{n - 1}}, \qquad \mathrm{ES} = \max_i v_i - \min_i v_i
 $$
 
-Code: `packages/core/src/groups/velocity-statistics.ts`, `velocityStatistics`.
+Code: `packages/statistics/src/velocity-statistics.ts`, `velocityStatistics`.
 
 The interval of the population standard deviation is the one-axis form of the interval above, $S = (n-1)s^2$ and $\nu = n - 1$, so as multiples of $s$:
 
@@ -190,13 +190,13 @@ $$
 \sqrt{\frac{n-1}{\chi^2_{1-\alpha/2,\,n-1}}} \le \frac{\sigma}{s} \le \sqrt{\frac{n-1}{\chi^2_{\alpha/2,\,n-1}}}
 $$
 
-Code: `packages/core/src/groups/velocity-statistics.ts`, `velocityStatistics` (`intervalFactors`).
+Code: `packages/statistics/src/velocity-statistics.ts`, `velocityStatistics` (`intervalFactors`).
 
 It needs 3 shots. The extreme spread has no interval.
 
 The relative half-width of the interval is $w(n) = (u_n - l_n)/2$ with $l_n$ and $u_n$ the two factors above. `shotsNeeded` returns the smallest $n \ge 3$ with $w(n)$ at most the wanted value. $w$ falls with $n$, so the search doubles $n$ and then halves the bracket. At the 95 % level, 12, 26 and 53 shots give a half-width of 50 %, 30 % and 20 %; at 90 %, 9, 19 and 38.
 
-Code: `packages/core/src/groups/velocity-statistics.ts`, `shotsNeeded`.
+Code: `packages/statistics/src/velocity-statistics.ts`, `shotsNeeded`.
 
 The session summary shows the 95 % interval and $n$ with each statistic. It compares two strings by their intervals: where they overlap, it states that the difference is smaller than the uncertainty. Two strings are ranked by the smaller SD only when the intervals are apart and each has at least 10 shots; with fewer shots, or without an interval, it states that there are too few shots to compare. At $n = 10$ and 95 % the interval runs from 0.69 to 1.83 times $s$, so two strings of 10 shots separate only when their standard deviations differ by a factor of about 2.7.
 
@@ -208,7 +208,7 @@ Code: `apps/web/src/lib/string-comparison.ts`, `compareSd`. `apps/web/src/compon
 
 The chi-square and Student's t quantiles first double the upper end of the bracket until the distribution function there reaches the target.
 
-Code: `packages/core/src/bisect.ts`, `bisect`. `packages/core/src/groups/chi-square.ts`, `chiSquareQuantile`. `packages/core/src/groups/student-t.ts`, `studentTwoSidedQuantile`.
+Code: `packages/statistics/src/bisect.ts`, `bisect`. `packages/statistics/src/chi-square.ts`, `chiSquareQuantile`. `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile`.
 
 ### Student's t quantile
 
@@ -223,7 +223,7 @@ P(\lvert T \rvert \lt t) =
 \end{cases}
 $$
 
-Code: `packages/core/src/groups/student-t.ts`, `studentTwoSidedQuantile` (`centralMass`).
+Code: `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile` (`centralMass`).
 
 The intervals of the [range string fit](exterior-truing-strings.md) use it.
 

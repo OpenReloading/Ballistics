@@ -5,6 +5,7 @@
  * It covers input tolerances only, not model error.
  */
 
+import { seededUniforms } from '@open-reloading/statistics'
 import type { Settings } from '../errors.ts'
 import { nth } from '../errors.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
@@ -71,18 +72,6 @@ export interface SampledBand {
   velocity?: Percentiles
 }
 
-/** Deterministic uniform numbers in [0, 1): the mulberry32 generator. */
-function uniforms(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
 /** Percentile `q` (0 to 1) of ascending `sorted` by linear interpolation between the closest ranks. */
 function percentile(sorted: number[], q: number) {
   const rank = q * (sorted.length - 1)
@@ -113,7 +102,7 @@ export function sampledBand<L>(
   { samples, seed, budgetMs, now }: SamplingOptions,
 ): SampledBand {
   const started = now()
-  const uniform = uniforms(seed)
+  const uniform = seededUniforms(seed)
   const normal = () => Math.sqrt(-2 * Math.log(1 - uniform())) * Math.cos(2 * Math.PI * uniform())
   const pressure: number[] = []
   const velocity: number[] = []

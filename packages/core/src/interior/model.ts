@@ -2,7 +2,7 @@
  * M3 interior model with Noble-Abel gas, described in
  * `apps/docs/docs/models/interior-m3.md`. SI in and out, temperatures in K.
  */
-import { bisect } from '../bisect.ts'
+import { bisect } from '@open-reloading/statistics'
 import { InputError, nth, overlay, type Settings } from '../errors.ts'
 import { icao } from '../exterior/atmosphere.ts'
 import { type Rhs, type Rk45Event, type Rk45Options, rk45 } from '../exterior/rk45.ts'
@@ -730,7 +730,7 @@ function ignitionState(
   const z0 = (pi * (vc - solid)) / ((k - 1) * e0 - pi * mc * (1 / load.propellant.density - eta))
   if (!(z0 > 0 && z0 < 1)) return { valid: false, reason: 'input', field: 'ignitionPressure' }
   const y = new Float64Array(leak ? 7 : 5)
-  y[0] = bisect((f) => form.z(f) < z0, 0, form.end, 200, false)
+  y[0] = bisect((f) => form.z(f) < z0, [0, form.end], 200, false)
   return y
 }
 

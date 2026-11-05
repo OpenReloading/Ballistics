@@ -26,7 +26,7 @@ const repoRoot = path.join(webRoot, '../..')
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|schema|importers|core|drawing|data|api)\//,
+  /^packages\/(units|statistics|schema|importers|core|drawing|data|api)\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
   /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
@@ -58,6 +58,7 @@ const ignored = [/^(apps|packages)\/[^/]+\/test\//, /^(apps|packages)\/[^/]+\/[^
 /** Files whose change needs every record page prerendered (`prerender=full`), besides the import closure. */
 const recordInputs = [
   /^packages\/units\//,
+  /^packages\/statistics\//,
   /^packages\/data\//,
   /^packages\/schema\//,
   /^packages\/api\//,
@@ -137,7 +138,20 @@ export function recordClosure(root = repoRoot) {
 export const testGroups: Record<string, string[]> = {
   drawing: ['drawing'],
   web: ['web'],
-  packages: ['units', 'schema', 'core', 'importers', 'data', 'api', 'cli', 'docs', 'tools', 'e2e'],
+  packages: [
+    'units',
+    'statistics',
+    'schema',
+    'core',
+    'importers',
+    'data',
+    'api',
+    'cli',
+    'docs',
+    'tools',
+    'test-kit',
+    'e2e',
+  ],
 }
 
 /** One test job: its group, the pnpm filters of its workspaces to test, whether it runs the e2e unit tests. */
@@ -177,7 +191,7 @@ const everything = (reason: string): Plan => ({
 
 /** A file of a workspace (a folder with a `package.json`): pnpm finds the workspaces a change reaches from these alone. */
 const inWorkspace = (file: string) => {
-  const folder = /^((packages|apps)\/[^/]+|tools)\//.exec(file)?.[1]
+  const folder = /^((packages|apps|tooling)\/[^/]+|tools)\//.exec(file)?.[1]
   return folder !== undefined && existsSync(path.join(repoRoot, folder, 'package.json'))
 }
 

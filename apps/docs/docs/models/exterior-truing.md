@@ -74,7 +74,7 @@ $$
 r_i = \frac{\hat y_i(\theta) - y_i}{\sigma_i}, \qquad \chi^2 = \sum_{s=1}^{S} \sum_{i \in s} r_i^2
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `leastSquares` (`sigma`, `predictRun`). `packages/core/src/least-squares.ts`, `logLeastSquares` (`residuals`).
+Code: `packages/core/src/exterior/truing.ts`, `leastSquares` (`sigma`, `predictRun`). `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`).
 
 Each session $s$ is predicted by a trajectory of its own shot (air, wind, look angle, site, zero) with the candidate drag. One session is the case of `trueMuzzleVelocity` and `trueDrag`. A muzzle velocity of one session moves only that session's predictions, so its Jacobian column is zero on the rows of the other sessions (`moves`).
 

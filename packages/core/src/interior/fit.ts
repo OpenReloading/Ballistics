@@ -9,11 +9,14 @@
  * and out.
  */
 
+import {
+  chiSquareQuantile,
+  type LogFitStop,
+  logLeastSquares,
+  studentTwoSidedQuantile,
+} from '@open-reloading/statistics'
 import type { Settings } from '../errors.ts'
 import { InputError, need, nth, positive } from '../errors.ts'
-import { chiSquareQuantile } from '../groups/chi-square.ts'
-import { studentTwoSidedQuantile } from '../groups/student-t.ts'
-import { type LogFitStop, logLeastSquares } from '../least-squares.ts'
 import {
   type InteriorInvalid,
   type InteriorLoad,

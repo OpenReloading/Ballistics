@@ -91,7 +91,7 @@ $$
 r_i = \frac{\hat y_i(\theta) - y_i}{\sigma_i}, \qquad \chi^2 = \sum_i r_i^2, \qquad \nu = n - n_p
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chi2`), `packages/core/src/interior/fit.ts`, `fitPowder` (`degreesOfFreedom`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`), `packages/core/src/interior/fit.ts`, `fitPowder` (`degreesOfFreedom`).
 
 The loop starts at $\theta = 0$. By default it takes at most 30 steps, accepted and rejected, and fails when the condition number of the column-scaled Jacobian exceeds $10^3$. A Jacobian column is unresolved when its norm is 0 or below $10^{-9}$ of the largest column norm, or when every entry lies below the noise floor per unit log parameter:
 
@@ -122,7 +122,7 @@ $$
 \text{loss} = \sum_{i \in \text{ladder}} L_k(r_i) + \chi^2_\text{prior}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/core/src/huber.ts`, `huberLoss`.
+Code: `packages/core/src/interior/fit.ts`, `fitPowder` (`huber`, `loss`), `packages/statistics/src/huber.ts`, `huberLoss`.
 
 The result carries `stop` and `weightsSettled` of the [solver](least-squares.md#levenberg-marquardt-step): which rule ended the loop and whether the set of ladder rows beyond the threshold was unchanged over the last accepted step. Without `huberThreshold` the second is true.
 
@@ -163,7 +163,7 @@ t_{1 - \alpha/2,\,\nu} & \text{otherwise}
 \end{cases}
 $$
 
-Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packages/core/src/groups/chi-square.ts`, `chiSquareQuantile`, `packages/core/src/groups/student-t.ts`, `studentTwoSidedQuantile`.
+Code: `packages/core/src/interior/fit.ts`, `predictPowder` (`quantile`), `packages/statistics/src/chi-square.ts`, `chiSquareQuantile`, `packages/statistics/src/student-t.ts`, `studentTwoSidedQuantile`.
 
 #### Domain
 

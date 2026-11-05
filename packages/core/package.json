@@ -44,10 +44,12 @@
     "test": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@open-reloading/statistics": "workspace:*",
     "@open-reloading/units": "workspace:*"
   },
   "devDependencies": {
     "@open-reloading/data": "workspace:*",
+    "@open-reloading/test-kit": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",

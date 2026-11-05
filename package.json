@@ -7,9 +7,9 @@
     "node": ">=26"
   },
   "scripts": {
-    "lint": "oxlint --format default --ignore-pattern \"packages/units/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units run lint",
+    "lint": "oxlint --format default --ignore-pattern \"packages/units/**\" --ignore-pattern \"packages/statistics/**\" --ignore-pattern \"tooling/**\" --deny-warnings --report-unused-disable-directives && biome check --error-on-warnings . && pnpm --filter @open-reloading/units --filter @open-reloading/statistics --filter @open-reloading/test-kit run lint",
     "format": "biome check --write .",
-    "build": "pnpm --filter \"./packages/*\" run build",
+    "build": "pnpm --filter \"./packages/*\" --filter \"./tooling/*\" run build",
     "typecheck": "pnpm --recursive --workspace-concurrency=1 run typecheck",
     "test": "pnpm --recursive --workspace-concurrency=1 --filter \"!@open-reloading/e2e\" run test && pnpm --filter @open-reloading/e2e run test:unit",
     "test:e2e": "pnpm --filter @open-reloading/e2e run test",

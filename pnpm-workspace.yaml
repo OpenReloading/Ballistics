@@ -2,6 +2,7 @@ packages:
   - packages/*
   - apps/*
   - tools
+  - tooling/*
 
 # A version must be 3 days old before an install resolves to it: the Dependabot cooldown, applied to transitive
 # packages too.

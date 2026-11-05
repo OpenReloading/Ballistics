@@ -4,8 +4,8 @@
  * its power series (DLMF 8.2.6, 8.7.1), each term formed in logarithms so that large pooled
  * samples do not underflow.
  */
-import { bisect } from '../bisect.ts'
-import { need } from '../errors.ts'
+import { bisect } from './bisect.ts'
+import { need } from './errors.ts'
 
 /** ln Gamma(a + 1) for a whole or half-whole a >= 0: a finite product down to Gamma(1) or Gamma(3/2). */
 function lnGammaPlusOne(a: number): number {
@@ -77,5 +77,5 @@ export function chiSquareQuantile(p: number, df: number): number {
   need(p > 0 && p < 1, 'probability must lie in (0, 1)')
   let hi = df + 10 * Math.sqrt(df) + 50
   while (chiSquareCdf(hi, df) < p) hi *= 2
-  return bisect((x) => chiSquareCdf(x, df) < p, 0, hi, 200, true)
+  return bisect((x) => chiSquareCdf(x, df) < p, [0, hi], 200, true)
 }

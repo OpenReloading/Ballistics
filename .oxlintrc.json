@@ -351,16 +351,23 @@
             "paths": [],
             "patterns": [
               {
-                "group": ["@*/*", "@*/*/**", "!@open-reloading/units", "!@open-reloading/units/**"],
-                "message": "core-imports-units-only: packages/core has no I/O: it imports only @open-reloading/units and its own files."
+                "group": [
+                  "@*/*",
+                  "@*/*/**",
+                  "!@open-reloading/units",
+                  "!@open-reloading/units/**",
+                  "!@open-reloading/statistics",
+                  "!@open-reloading/statistics/**"
+                ],
+                "message": "core-imports-units-and-statistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "core-imports-units-only: packages/core has no I/O: it imports only @open-reloading/units and its own files."
+                "message": "core-imports-units-and-statistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "core-imports-units-only: packages/core has no I/O: it imports only @open-reloading/units and its own files."
+                "regex": "^(\\.\\./)+((units|statistics|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "core-imports-units-and-statistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
               }
             ]
           }

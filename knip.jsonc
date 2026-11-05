@@ -6,6 +6,12 @@
     "packages/units": {
       "entry": ["src/index.ts"]
     },
+    "packages/statistics": {
+      "entry": ["src/index.ts"]
+    },
+    "tooling/test-kit": {
+      "entry": ["src/index.ts"]
+    },
     "packages/schema": {
       "entry": ["src/index.ts", "src/write-json-schema.ts"]
     },

@@ -35,7 +35,7 @@ $$
 z = \sqrt{-2 \ln(1 - u_1)}\,\cos(2 \pi u_2)
 $$
 
-Code: `packages/core/src/interior/monte-carlo.ts`, `sampledBand` (`normal`), `uniforms`.
+Code: `packages/core/src/interior/monte-carlo.ts`, `sampledBand` (`normal`), `packages/statistics/src/random.ts`, `seededUniforms`.
 
 Every draw takes one number per input, in the order of `pressureInputs`, also for an input whose tolerance is 0, so a tolerance set to 0 does not shift the draws of the others.
 
