@@ -282,7 +282,7 @@ const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
   if (l.provenance === undefined) issue(['provenance'], 'A catalogue load needs provenance')
   for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
     if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
-  checkCatalogueOnly(
+  checkCatalogOnly(
     [
       [['capacity'], l.capacity],
       [['case', 'record'], l.case?.record],
@@ -291,15 +291,15 @@ const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
   )
 }
 
-/** Each reference given (a path and the reference) names a catalogue record. */
-const checkCatalogueOnly = (refs: [PropertyKey[], string | undefined][], issue: LoadIssue) => {
+/** Each reference given (a path and the reference) names a catalog record. */
+const checkCatalogOnly = (refs: [PropertyKey[], string | undefined][], issue: LoadIssue) => {
   for (const [path, target] of refs)
     if (target !== undefined && !target.startsWith('catalogue:'))
       issue(path, 'A catalogue load names catalogue records only')
 }
 
 const checkComponentMakers = (l: LoadFields, issue: LoadIssue) =>
-  checkCatalogueOnly(
+  checkCatalogOnly(
     [
       [
         ['bullet', 'manufacturer'],

@@ -10,7 +10,7 @@ const padDigits = (s: string) => s.replace(/\d+/g, (run) => run.padStart(8, '0')
 export const sortKey = (...names: string[]) => names.map((n) => padDigits(fold(n))).join('\u001f')
 
 /** Orders two sort keys by UTF-16 code unit. */
-export const compareKeys = (a: string, b: string): number => {
+export const compareKeys = (a: string, b: string): -1 | 0 | 1 => {
   if (a < b) return -1
   return a > b ? 1 : 0
 }

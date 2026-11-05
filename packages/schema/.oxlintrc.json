@@ -3,6 +3,8 @@
   "extends": ["../units/.oxlintrc.json"],
   "rules": {
     "import/no-cycle": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "no-param-reassign": "error",
     "no-unused-vars": [
       "error",
       {
@@ -15,11 +17,9 @@
       "files": ["test/**"],
       "rules": {
         "complexity": "off",
-        "max-depth": "off",
         "max-lines-per-function": "off",
         "max-params": "off",
         "no-shadow": "off",
-        "typescript/no-unnecessary-type-arguments": "off",
         "typescript/no-unnecessary-type-assertion": "off",
         "unicorn/consistent-function-scoping": "off",
         "unicorn/no-array-fill-with-reference-type": "off",

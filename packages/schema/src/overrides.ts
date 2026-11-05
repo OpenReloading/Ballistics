@@ -16,13 +16,16 @@ export type Overrides<T> = T extends readonly unknown[]
     : T | null
 
 /** The key a value of a cartridge's `values` has: side, symbol and variant. */
-export const valueKey = (v: { side?: unknown; symbol?: unknown; variant?: unknown }): string =>
+export const valueKey = (v: { side?: string; symbol: string; variant?: string }): string =>
   JSON.stringify([v.side ?? null, v.symbol, v.variant ?? null])
 
-/** A spec value with a `value` of `null` removes the value of its key. */
-const removes = (v: Plain) => v['value'] === null
+/** A spec value: its key and its value. */
+type Keyed = Parameters<typeof valueKey>[0] & { value?: unknown }
 
-function mergeValues(base: Plain[], over: Plain[]): Plain[] {
+/** A spec value with a `value` of `null` removes the value of its key. */
+const removes = (v: { value?: unknown }) => v.value === null
+
+function mergeValues(base: Keyed[], over: Keyed[]): Keyed[] {
   const given = new Map(over.map((v) => [valueKey(v), v]))
   const kept = base.flatMap((v) => {
     const key = valueKey(v)
@@ -62,7 +65,7 @@ export function applyOverrides<T extends object>(base: T, overrides: object | nu
   if (Array.isArray(over))
     merged['values'] = Array.isArray(values)
       ? mergeValues(values, over)
-      : over.filter((v: Plain) => !removes(v))
+      : over.filter((v: Keyed) => !removes(v))
   // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- overrides are a partial of T, so the merge has its fields
   return merged as T
 }
