@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { compareKeys, sortKey } from '../src/index.ts'
 
-const order = (names: string[]) => [...names].sort((a, b) => compareKeys(sortKey(a), sortKey(b)))
+const order = (names: string[]) => names.toSorted((a, b) => compareKeys(sortKey(a), sortKey(b)))
 
 describe('sortKey', () => {
   it('orders numbers by value, not by digits', () => {
@@ -19,7 +19,7 @@ describe('sortKey', () => {
 
   it('orders by the first name, then the next', () => {
     const keys = [sortKey('b', 'a'), sortKey('a', 'z'), sortKey('a', 'b'), sortKey('a')]
-    expect(keys.sort(compareKeys)).toEqual([
+    expect(keys.toSorted(compareKeys)).toEqual([
       sortKey('a'),
       sortKey('a', 'b'),
       sortKey('a', 'z'),

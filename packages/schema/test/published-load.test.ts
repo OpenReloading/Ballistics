@@ -1,3 +1,4 @@
+/* oxlint-disable max-lines-per-function, unicorn/consistent-function-scoping -- these tests predate the package profile and come under it next */
 import { describe, expect, it } from 'vitest'
 import { pressureMethod, publishedLoad, publishedLoads } from '../src/index.ts'
 import { expectIssueAt } from './issue-at.ts'

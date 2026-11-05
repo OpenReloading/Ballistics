@@ -93,6 +93,13 @@ const sheet = {
   overlays: { spread: true, numbers: false, stats: true, rings: true },
 }
 
+const issues = (value: unknown) =>
+  targetSheet.safeParse(value).error?.issues.map(({ code, path, message }) => ({
+    code,
+    path,
+    message,
+  }))
+
 describe('targetSheet', () => {
   it('parses a sheet and survives a JSON round trip', () => {
     const parsed = targetSheet.parse(sheet)
@@ -127,15 +134,11 @@ describe('targetSheet', () => {
     ] as const
     for (const [s, path] of bad) expectIssueAt(targetSheet, s, path)
   })
+})
 
+describe('targetSheet issues, polarity and units', () => {
   it('names each sheet rule in a custom issue at its field', () => {
     const rect = sheet.references[3]
-    const issues = (value: unknown) =>
-      targetSheet.safeParse(value).error?.issues.map(({ code, path, message }) => ({
-        code,
-        path,
-        message,
-      }))
     expect(
       issues({
         ...sheet,
@@ -175,14 +178,16 @@ describe('targetSheet', () => {
     const json = z.toJSONSchema(targetSheet, { unrepresentable: 'any' }) as {
       properties: Record<string, { unit?: string; properties?: Record<string, { unit?: string }> }>
     }
-    expect(json.properties.targetOrigin?.properties?.x?.unit).toBe('px')
-    expect(json.properties.markerDiameter?.unit).toBe('m')
-    expect(json.properties.targetRotation?.unit).toBe('rad')
-    expect(json.properties.photoRotation?.unit).toBe('rad')
+    expect(json.properties['targetOrigin']?.properties?.['x']?.unit).toBe('px')
+    expect(json.properties['markerDiameter']?.unit).toBe('m')
+    expect(json.properties['targetRotation']?.unit).toBe('rad')
+    expect(json.properties['photoRotation']?.unit).toBe('rad')
     const shot = z.toJSONSchema(groupShot) as { properties: Record<string, { unit?: string }> }
-    expect(shot.properties.x?.unit).toBe('m')
+    expect(shot.properties['x']?.unit).toBe('m')
   })
+})
 
+describe('targetSheet detection and alignment', () => {
   it('refuses detection choices out of range: a region of 2 points, a hole size of zero, a backing that is no colour, a contrast above 1', () => {
     const g = sheet.groups[0]
     for (const [detection, field] of [

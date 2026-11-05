@@ -217,6 +217,22 @@ const file = (records: unknown[], version: unknown = userDataVersion) => ({
   records,
 })
 
+const paths = (r: object) => userRecord.safeParse(r).error?.issues.map((i) => i.path.join('.'))
+
+const basedOn = (text: string) =>
+  userRecord.safeParse({ ...bulletRecord, data: { ...bulletRecord.data, basedOn: text } }).success
+
+const maker = (manufacturer: string) =>
+  userRecord.safeParse({ ...firearmRecord, data: { ...firearmRecord.data, manufacturer } }).success
+
+const named = (r: { data: object }) => ({
+  ...r,
+  data: { ...r.data, manufacturerName: 'Maker' },
+})
+
+const ok = (fit: object) =>
+  userRecord.safeParse({ ...fittedPowder, data: { ...fittedPowder.data, fit } }).success
+
 describe('userDataFile', () => {
   it('accepts every record kind', () => {
     expect(
@@ -261,7 +277,9 @@ describe('userDataFile', () => {
       userRecord.safeParse({ ...caseRecord, data: { ...caseRecord.data, material: 1 } }).success,
     ).toBe(false)
   })
+})
 
+describe('userDataFile powder drafts and fits', () => {
   it('takes a powder draft with missing values and keeps it through a round trip', () => {
     expect(userRecord.parse(powderRecord)).toEqual(powderRecord)
     const empty = { ...powderRecord, data: { origin: 'user' } }
@@ -296,10 +314,10 @@ describe('userDataFile', () => {
 
   it('rejects a fit with more than 40 points, a negative charge or a missing field', () => {
     const [point] = powderFit.input
-    const ok = (fit: object) =>
-      userRecord.safeParse({ ...fittedPowder, data: { ...fittedPowder.data, fit } }).success
-    expect(ok({ ...powderFit, input: Array(40).fill(point) })).toBe(true)
-    expect(ok({ ...powderFit, input: Array(41).fill(point) })).toBe(false)
+    expect(ok({ ...powderFit, input: Array.from({ length: 40 }, () => ({ ...point })) })).toBe(true)
+    expect(ok({ ...powderFit, input: Array.from({ length: 41 }, () => ({ ...point })) })).toBe(
+      false,
+    )
     expect(ok({ ...powderFit, input: [{ ...point, charge: { value: -2.8 } }] })).toBe(false)
     const { caseCapacity: _, ...noCapacity } = point
     expect(ok({ ...powderFit, input: [noCapacity] })).toBe(false)
@@ -308,7 +326,9 @@ describe('userDataFile', () => {
     expect(ok({ ...powderFit, previous: 'old-1' })).toBe(false)
     expect(ok({ ...powderFit, parameters: ['burnRate', 'burnRate'] })).toBe(false)
   })
+})
 
+describe('userDataFile ids, manufacturers and faces', () => {
   it('refuses a powder with an id that is no UUID, and says why', () => {
     const r = userRecord.safeParse({ ...powderRecord, id: 'old-1' })
     expect(r.error?.issues[0]).toMatchObject({ path: ['id'], message: designIdProblem })
@@ -321,18 +341,11 @@ describe('userDataFile', () => {
   })
 
   it('refuses the manufacturer name of an older bullet or firearm', () => {
-    const named = (r: { data: object }) => ({
-      ...r,
-      data: { ...r.data, manufacturerName: 'Maker' },
-    })
     for (const r of [bulletRecord, firearmRecord])
       expect(userRecord.safeParse(named(r)).success).toBe(false)
   })
 
   it('takes a manufacturer reference of either scope and refuses a plain text', () => {
-    const maker = (manufacturer: string) =>
-      userRecord.safeParse({ ...firearmRecord, data: { ...firearmRecord.data, manufacturer } })
-        .success
     expect(maker('catalogue:alpha-powder')).toBe(true)
     expect(maker(`user:${uuid}`)).toBe(true)
     expect(maker('Alpha Powder')).toBe(false)
@@ -344,11 +357,10 @@ describe('userDataFile', () => {
     const zero = { ...faceRecord, data: { ...faceRecord.data, blackDiameter: 0 } }
     expect(userRecord.safeParse(zero).error?.issues[0]?.path).toEqual(['data', 'blackDiameter'])
   })
+})
 
+describe('userDataFile variants', () => {
   it('takes a catalogue reference as the base of a variant and refuses another text', () => {
-    const basedOn = (text: string) =>
-      userRecord.safeParse({ ...bulletRecord, data: { ...bulletRecord.data, basedOn: text } })
-        .success
     expect(basedOn('catalogue:alpha-30425')).toBe(true)
     for (const bad of ['alpha-30425', 'Alpha 30425', `user:${uuid}`, 'catalogue:Alpha 30425'])
       expect(basedOn(bad)).toBe(false)
@@ -393,7 +405,9 @@ describe('userDataFile', () => {
       true,
     )
   })
+})
 
+describe('userDataFile overrides and older kinds', () => {
   it('keeps the overrides through a round trip, including a null and a removed value', () => {
     const removed = {
       ...cartridgeRecord,
@@ -418,7 +432,9 @@ describe('userDataFile', () => {
         'kind',
       ])
   })
+})
 
+describe('userDataFile refusals', () => {
   it('rejects two records with one id', () => {
     const twin = { ...loadRecord, name: 'Another load' }
     expect(userDataFile.safeParse(file([loadRecord, twin])).error?.issues[0]?.path).toEqual([
@@ -432,7 +448,6 @@ describe('userDataFile', () => {
   })
 
   it('rejects an unknown kind, a bad date, a non-finite value and an invalid spec value', () => {
-    const paths = (r: object) => userRecord.safeParse(r).error?.issues.map((i) => i.path.join('.'))
     expect(paths({ ...bulletRecord, kind: 'unknown' })).toEqual(['kind'])
     expect(paths({ ...bulletRecord, saved: 'yesterday' })).toEqual(['saved'])
     expect(
@@ -458,18 +473,18 @@ describe('userDataFile', () => {
   })
 })
 
-describe('userDataFile files', () => {
-  const file = (files: unknown) => ({
-    format: userDataFormat,
-    version: userDataVersion,
-    records: [bulletRecord],
-    files,
-  })
+const withFiles = (files: unknown) => ({
+  format: userDataFormat,
+  version: userDataVersion,
+  records: [bulletRecord],
+  files,
+})
 
+describe('userDataFile files', () => {
   it('carries photos as base64 and reads a file without them', () => {
     const files = [{ id: 'p1', type: 'image/png', data: 'iVBORw0KGgo=' }]
-    expect(userDataFile.parse(file(files)).files).toEqual(files)
-    expect(userDataFile.parse(file(undefined)).files).toBeUndefined()
+    expect(userDataFile.parse(withFiles(files)).files).toEqual(files)
+    expect(userDataFile.parse(withFiles(undefined)).files).toBeUndefined()
   })
 
   it('takes images only, as base64, with unique ids', () => {
@@ -482,9 +497,11 @@ describe('userDataFile files', () => {
       [png, png],
       [{ ...png, id: '' }],
     ])
-      expect(userDataFile.safeParse(file(bad)).success).toBe(false)
+      expect(userDataFile.safeParse(withFiles(bad)).success).toBe(false)
     for (const type of ['jpeg', 'png', 'webp', 'gif', 'avif', 'heic', 'bmp'])
-      expect(userDataFile.safeParse(file([{ ...png, type: `image/${type}` }])).success).toBe(true)
+      expect(userDataFile.safeParse(withFiles([{ ...png, type: `image/${type}` }])).success).toBe(
+        true,
+      )
   })
 })
 
@@ -537,57 +554,62 @@ describe('withoutUnknownKinds', () => {
   })
 })
 
-describe('competition event', () => {
-  const eventId = '00000000-0000-4000-8000-0000000000e1'
-  const sheet = `user:${uuid}`
-  const ringEvent = {
-    kind: 'event',
-    id: eventId,
-    name: 'Landesmeisterschaft 25 m',
-    saved,
-    data: {
-      date: '2026-06-14',
-      place: 'Hannover',
-      eventType: 'catalogue:dsb-meisterschaft',
-      level: 'Landesmeisterschaft',
-      discipline: 'catalogue:dsb-25m-sportpistole',
-      firearm: `user:${other}`,
-      state: 'completed',
-      results: {
-        method: 'rings',
-        series: [{ shots: [10, 9, 10, 8, 9], targetSheet: sheet }, { total: 47 }],
-      },
+const eventId = '00000000-0000-4000-8000-0000000000e1'
+const eventSheet = `user:${uuid}`
+const ringEvent = {
+  kind: 'event',
+  id: eventId,
+  name: 'Landesmeisterschaft 25 m',
+  saved,
+  data: {
+    date: '2026-06-14',
+    place: 'Hannover',
+    eventType: 'catalogue:dsb-meisterschaft',
+    level: 'Landesmeisterschaft',
+    discipline: 'catalogue:dsb-25m-sportpistole',
+    firearm: `user:${other}`,
+    state: 'completed',
+    results: {
+      method: 'rings',
+      series: [{ shots: [10, 9, 10, 8, 9], targetSheet: eventSheet }, { total: 47 }],
     },
-  } as const
-  const practicalEvent = {
-    ...ringEvent,
-    id: '00000000-0000-4000-8000-0000000000e2',
-    name: 'Club match',
-    data: {
-      date: '2026-07-04',
-      eventType: 'catalogue:ipsc-handgun',
-      level: 'Level I',
-      division: 'Production',
-      rounds: 96,
-      state: 'disqualified',
-      results: {
-        method: 'hit-factor',
-        stages: [
-          {
-            name: 'Stage 1',
-            hits: { A: 10, C: 4, D: 1, metal: 2 },
-            misses: 1,
-            noShoots: 0,
-            procedurals: 1,
-            time: 12.5,
-            powerFactor: 'minor',
-            stagePoints: 88.1234,
-          },
-        ],
-      },
+  },
+} as const
+const practicalEvent = {
+  ...ringEvent,
+  id: '00000000-0000-4000-8000-0000000000e2',
+  name: 'Club match',
+  data: {
+    date: '2026-07-04',
+    eventType: 'catalogue:ipsc-handgun',
+    level: 'Level I',
+    division: 'Production',
+    rounds: 96,
+    state: 'disqualified',
+    results: {
+      method: 'hit-factor',
+      stages: [
+        {
+          name: 'Stage 1',
+          hits: { A: 10, C: 4, D: 1, metal: 2 },
+          misses: 1,
+          noShoots: 0,
+          procedurals: 1,
+          time: 12.5,
+          powerFactor: 'minor',
+          stagePoints: 88.1234,
+        },
+      ],
     },
-  } as const
+  },
+} as const
 
+const withSeries = (series: unknown[]) => ({
+  ...ringEvent,
+  data: { ...ringEvent.data, results: { method: 'rings', series } },
+})
+
+describe('competition event', () => {
   it('opens a file with a ring and a practical event', () => {
     const parsed = userDataFile.parse(file([ringEvent, practicalEvent]))
     expect(parsed.records.map((r) => r.kind)).toEqual(['event', 'event'])
@@ -613,10 +635,6 @@ describe('competition event', () => {
   })
 
   it('takes ring values in tenths only and a total that agrees with the shots', () => {
-    const withSeries = (series: unknown[]) => ({
-      ...ringEvent,
-      data: { ...ringEvent.data, results: { method: 'rings', series } },
-    })
     expect(userRecord.safeParse(withSeries([{ shots: [10.4, 9.9], total: 20.3 }])).success).toBe(
       true,
     )
@@ -635,74 +653,139 @@ describe('competition event', () => {
   })
 })
 
-describe('firearm', () => {
-  const paths = (data: object) =>
-    userRecord
-      .safeParse({ ...firearmRecord, data: { ...firearmRecord.data, ...data } })
-      .error?.issues.map((i) => i.path.join('.'))
-  const [scope, dot] = firearmRecord.data.optics
-  const config = firearmRecord.data.configurations[0]
+const firearmPaths = (data: object) =>
+  userRecord
+    .safeParse({ ...firearmRecord, data: { ...firearmRecord.data, ...data } })
+    .error?.issues.map((i) => i.path.join('.'))
+const [scope, dot] = firearmRecord.data.optics
+const config = firearmRecord.data.configurations[0]
 
+const withResults = (truing: unknown[]) => ({ configurations: [{ ...config, truing }] })
+
+const at = (key: string, leaf = '.value') => `data.configurations.0.mounts.0.${key}${leaf}`
+
+const mountWith = (m: object) => ({
+  configurations: [{ ...config, mounts: [{ ...config.mounts[0], ...m }] }],
+})
+
+const zeroAir = {
+  zeroTemperature: { value: 15 },
+  zeroPressure: { value: 1013.25 },
+  zeroHumidity: { value: 50 },
+  dragFactor: 1.034,
+  dragFactorSource: 'Truing session of 2026-09-14',
+}
+
+const truingResult = {
+  date: '2026-10-29',
+  bullet: 'Test bullet',
+  muzzleVelocity: { value: 790 },
+  zeroRange: { value: 100000 },
+  temperature: { value: 15 },
+  pressure: { value: 1013.25 },
+  humidity: { value: 0 },
+  clickValue: { value: 0.00573 },
+  fitZeroOffset: false,
+  rows: [
+    {
+      kind: 'impact',
+      range: { value: 300000 },
+      shots: 5,
+      mean: { value: -120 },
+      deviation: { value: 60 },
+    },
+    { kind: 'dial', range: { value: 800000 }, shots: 5, mean: 64, deviation: 2 },
+  ],
+  chronograph: { shots: 10, mean: { value: 800 }, deviation: { value: 4 } },
+  parameters: [
+    {
+      name: 'muzzleVelocity',
+      status: 'identified',
+      reasons: [],
+      value: { value: 801 },
+      lower: { value: 796 },
+      upper: { value: 806 },
+      confidenceLevel: 0.95,
+    },
+    { name: 'dragFactor', status: 'weak', reasons: ['imprecise'] },
+  ],
+  intervalsTrusted: true,
+}
+
+describe('firearm', () => {
   it('states its action optionally: a record without it stays valid', () => {
     expect('action' in firearmRecord.data).toBe(false)
-    expect(paths({})).toBeUndefined()
-    for (const action of ['rifle', 'pistol', 'revolver']) expect(paths({ action })).toBeUndefined()
-    expect(paths({ action: 'shotgun' })).toEqual(['data.action'])
+    expect(firearmPaths({})).toBeUndefined()
+    for (const action of ['rifle', 'pistol', 'revolver'])
+      expect(firearmPaths({ action })).toBeUndefined()
+    expect(firearmPaths({ action: 'shotgun' })).toEqual(['data.action'])
   })
 
   it('rejects a mount of an optic the firearm does not list', () => {
     expect(
-      paths({ configurations: [{ ...config, mounts: [{ ...config.mounts[0], optic: 'o9' }] }] }),
+      firearmPaths({
+        configurations: [{ ...config, mounts: [{ ...config.mounts[0], optic: 'o9' }] }],
+      }),
     ).toEqual(['data.configurations.0.mounts.0.optic'])
   })
 
   it('rejects an unknown active configuration and duplicate ids', () => {
-    expect(paths({ active: 'c9' })).toEqual(['data.active'])
-    expect(paths({ optics: [scope, { ...dot, id: 'o1' }] })).toContain('data.optics.1.id')
+    expect(firearmPaths({ active: 'c9' })).toEqual(['data.active'])
+    expect(firearmPaths({ optics: [scope, { ...dot, id: 'o1' }] })).toContain('data.optics.1.id')
   })
 
   it('needs a mount per configuration, finite numbers and a known twist direction', () => {
-    expect(paths({ configurations: [{ ...config, mounts: [] }] })).toEqual([
+    expect(firearmPaths({ configurations: [{ ...config, mounts: [] }] })).toEqual([
       'data.configurations.0.mounts',
     ])
-    expect(paths({ twist: { value: Number.POSITIVE_INFINITY } })).toEqual(['data.twist.value'])
-    expect(paths({ twistHand: 'up' })).toEqual(['data.twistHand'])
-    expect(paths({ roundCount: 1.5 })).toEqual(['data.roundCount'])
-    expect(paths({ roundCountDate: '2026-10-12T08:00:00Z' })).toEqual(['data.roundCountDate'])
+    expect(firearmPaths({ twist: { value: Number.POSITIVE_INFINITY } })).toEqual([
+      'data.twist.value',
+    ])
+    expect(firearmPaths({ twistHand: 'up' })).toEqual(['data.twistHand'])
+    expect(firearmPaths({ roundCount: 1.5 })).toEqual(['data.roundCount'])
+    expect(firearmPaths({ roundCountDate: '2026-10-12T08:00:00Z' })).toEqual([
+      'data.roundCountDate',
+    ])
   })
 
   it('caps texts and lists', () => {
-    expect(paths({ notes: 'x'.repeat(10001) })).toEqual(['data.notes'])
+    expect(firearmPaths({ notes: 'x'.repeat(10001) })).toEqual(['data.notes'])
     expect(
-      paths({ optics: Array.from({ length: 21 }, (_, i) => ({ ...dot, id: `o${i}` })) }),
+      firearmPaths({ optics: Array.from({ length: 21 }, (_, i) => ({ ...dot, id: `o${i}` })) }),
     ).toContain('data.optics')
     const counted = { session: 'user:00000000-0000-4000-8000-000000000001', rounds: 3 }
-    expect(paths({ countedSessions: [counted] })).toBeUndefined()
-    expect(paths({ countedSessions: Array(5001).fill(counted) })).toEqual(['data.countedSessions'])
-    expect(paths({ countedSessions: [{ ...counted, rounds: -1 }] })).toEqual([
+    expect(firearmPaths({ countedSessions: [counted] })).toBeUndefined()
+    expect(
+      firearmPaths({ countedSessions: Array.from({ length: 5001 }, () => ({ ...counted })) }),
+    ).toEqual(['data.countedSessions'])
+    expect(firearmPaths({ countedSessions: [{ ...counted, rounds: -1 }] })).toEqual([
       'data.countedSessions.0.rounds',
     ])
-    expect(paths({ countedSessions: [{ ...counted, shots: 3 }] })).toEqual([
+    expect(firearmPaths({ countedSessions: [{ ...counted, shots: 3 }] })).toEqual([
       'data.countedSessions.0',
     ])
   })
+})
 
+describe('firearm magnification, dates and empty entries', () => {
   it('checks the magnification range and the configuration dates', () => {
     expect(
-      paths({ optics: [{ ...scope, minMagnification: 25, maxMagnification: 5 }, dot] }),
+      firearmPaths({ optics: [{ ...scope, minMagnification: 25, maxMagnification: 5 }, dot] }),
     ).toEqual(['data.optics.0.maxMagnification'])
     expect(
-      paths({ optics: [{ ...scope, minMagnification: 5, maxMagnification: 5 }, dot] }),
+      firearmPaths({ optics: [{ ...scope, minMagnification: 5, maxMagnification: 5 }, dot] }),
     ).toBeUndefined()
     const dated = (mounted: string, removed: string) => ({
       configurations: [{ ...config, mounted, removed }],
     })
-    expect(paths(dated('2026-05-01', '2026-04-30'))).toEqual(['data.configurations.0.removed'])
-    expect(paths(dated('2026-05-01', '2026-05-01'))).toBeUndefined()
+    expect(firearmPaths(dated('2026-05-01', '2026-04-30'))).toEqual([
+      'data.configurations.0.removed',
+    ])
+    expect(firearmPaths(dated('2026-05-01', '2026-05-01'))).toBeUndefined()
     // also while another field of the configuration is not valid
     const unzeroed = { ...config.mounts[0], zeroRange: { value: 0 } }
     expect(
-      paths({
+      firearmPaths({
         configurations: [
           { ...config, mounts: [unzeroed], mounted: '2026-05-01', removed: '2026-04-30' },
         ],
@@ -711,119 +794,77 @@ describe('firearm', () => {
   })
 
   it('rejects a null optic or configuration without running their checks on it', () => {
-    expect(paths({ optics: [null, dot], configurations: [null] })).toEqual([
+    expect(firearmPaths({ optics: [null, dot], configurations: [null] })).toEqual([
       'data.optics.0',
       'data.configurations.0',
     ])
   })
+})
 
+describe('firearm mounts and truing', () => {
   describe('zero air and drag factor of a mount', () => {
-    const mountWith = (m: object) => ({
-      configurations: [{ ...config, mounts: [{ ...config.mounts[0], ...m }] }],
-    })
-    const zero = {
-      zeroTemperature: { value: 15 },
-      zeroPressure: { value: 1013.25 },
-      zeroHumidity: { value: 50 },
-      dragFactor: 1.034,
-      dragFactorSource: 'Truing session of 2026-09-14',
-    }
-
     it('round-trips through a user data file', () => {
-      const record = { ...firearmRecord, data: { ...firearmRecord.data, ...mountWith(zero) } }
+      const record = { ...firearmRecord, data: { ...firearmRecord.data, ...mountWith(zeroAir) } }
       const parsed = userDataFile.parse(file([record]))
       expect(parsed.records[0]).toEqual(record)
       expect(JSON.parse(JSON.stringify(parsed))).toEqual(parsed)
     })
 
     it('rejects a non-positive factor, a humidity outside 0 to 100 and an air below its floor', () => {
-      const at = (key: string, leaf = '.value') => `data.configurations.0.mounts.0.${key}${leaf}`
       for (const [key, bad] of [
         ['zeroHumidity', -0.01],
         ['zeroHumidity', 100.01],
         ['zeroTemperature', -273.15],
         ['zeroPressure', -1],
       ] as const)
-        expect(paths(mountWith({ [key]: { value: bad } }))).toEqual([at(key)])
+        expect(firearmPaths(mountWith({ [key]: { value: bad } }))).toEqual([at(key)])
       for (const bad of [0, -1])
-        expect(paths(mountWith({ dragFactor: bad }))).toEqual([at('dragFactor', '')])
-      expect(paths(mountWith({ zeroHumidity: { value: 0 } }))).toBeUndefined()
-      expect(paths(mountWith({ zeroHumidity: { value: 100 } }))).toBeUndefined()
+        expect(firearmPaths(mountWith({ dragFactor: bad }))).toEqual([at('dragFactor', '')])
+      expect(firearmPaths(mountWith({ zeroHumidity: { value: 0 } }))).toBeUndefined()
+      expect(firearmPaths(mountWith({ zeroHumidity: { value: 100 } }))).toBeUndefined()
       // below 0 degC is a valid zero
-      expect(paths(mountWith({ zeroTemperature: { value: -20 } }))).toBeUndefined()
+      expect(firearmPaths(mountWith({ zeroTemperature: { value: -20 } }))).toBeUndefined()
     })
   })
 
   describe('truing results of a configuration', () => {
-    const result = {
-      date: '2026-10-29',
-      bullet: 'Test bullet',
-      muzzleVelocity: { value: 790 },
-      zeroRange: { value: 100000 },
-      temperature: { value: 15 },
-      pressure: { value: 1013.25 },
-      humidity: { value: 0 },
-      clickValue: { value: 0.00573 },
-      fitZeroOffset: false,
-      rows: [
-        {
-          kind: 'impact',
-          range: { value: 300000 },
-          shots: 5,
-          mean: { value: -120 },
-          deviation: { value: 60 },
-        },
-        { kind: 'dial', range: { value: 800000 }, shots: 5, mean: 64, deviation: 2 },
-      ],
-      chronograph: { shots: 10, mean: { value: 800 }, deviation: { value: 4 } },
-      parameters: [
-        {
-          name: 'muzzleVelocity',
-          status: 'identified',
-          reasons: [],
-          value: { value: 801 },
-          lower: { value: 796 },
-          upper: { value: 806 },
-          confidenceLevel: 0.95,
-        },
-        { name: 'dragFactor', status: 'weak', reasons: ['imprecise'] },
-      ],
-      intervalsTrusted: true,
-    }
-    const withResults = (truing: unknown[]) => ({ configurations: [{ ...config, truing }] })
-
     it('round-trips through a user data file', () => {
-      const record = { ...firearmRecord, data: { ...firearmRecord.data, ...withResults([result]) } }
+      const record = {
+        ...firearmRecord,
+        data: { ...firearmRecord.data, ...withResults([truingResult]) },
+      }
       expect(userDataFile.parse(file([record])).records[0]).toEqual(record)
     })
 
     it('rejects a dial in lengths, an impact in clicks and an unknown parameter', () => {
-      const [impact, dial] = result.rows
-      expect(paths(withResults([{ ...result, rows: [{ ...dial, mean: { value: 64 } }] }]))).toEqual(
-        ['data.configurations.0.truing.0.rows.0.mean'],
-      )
-      expect(paths(withResults([{ ...result, rows: [{ ...impact, mean: -120 }] }]))).toEqual([
-        'data.configurations.0.truing.0.rows.0.mean',
-      ])
+      const [impact, dial] = truingResult.rows
       expect(
-        paths(
+        firearmPaths(withResults([{ ...truingResult, rows: [{ ...dial, mean: { value: 64 } }] }])),
+      ).toEqual(['data.configurations.0.truing.0.rows.0.mean'])
+      expect(
+        firearmPaths(withResults([{ ...truingResult, rows: [{ ...impact, mean: -120 }] }])),
+      ).toEqual(['data.configurations.0.truing.0.rows.0.mean'])
+      expect(
+        firearmPaths(
           withResults([
-            { ...result, parameters: [{ name: 'twist', status: 'weak', reasons: [] }] },
+            { ...truingResult, parameters: [{ name: 'twist', status: 'weak', reasons: [] }] },
           ]),
         ),
       ).toEqual(['data.configurations.0.truing.0.parameters.0.name'])
     })
   })
+})
 
+describe('firearm lands contact and optics', () => {
   it('takes a lands contact with the bullet it was measured with, and none without that bullet', () => {
     const contact = { baseToOgiveAtLands: { value: 28.4 }, overallLengthAtLands: { value: 71.2 } }
-    expect(paths({ ...contact, landsBullet: 'catalogue:test-bullet' })).toBeUndefined()
-    expect(paths({ ...contact, landsBullet: `user:${uuid}` })).toBeUndefined()
-    expect(paths({ baseToOgiveAtLands: { value: 28.4 } })).toEqual(['data.landsBullet'])
-    expect(paths({ overallLengthAtLands: { value: 71.2 } })).toEqual(['data.landsBullet'])
-    expect(paths({ landsBullet: 'Bullet' })).toEqual(['data.landsBullet'])
+    expect(firearmPaths({ ...contact, landsBullet: 'catalogue:test-bullet' })).toBeUndefined()
+    expect(firearmPaths({ ...contact, landsBullet: `user:${uuid}` })).toBeUndefined()
+    expect(firearmPaths({ baseToOgiveAtLands: { value: 28.4 } })).toEqual(['data.landsBullet'])
+    expect(firearmPaths({ overallLengthAtLands: { value: 71.2 } })).toEqual(['data.landsBullet'])
+    expect(firearmPaths({ landsBullet: 'Bullet' })).toEqual(['data.landsBullet'])
     // a firearm without a contact needs no bullet
-    expect(paths({})).toBeUndefined()
+    expect(firearmPaths({})).toBeUndefined()
   })
 
   it('round trips a lands contact through a user data file', () => {
@@ -840,22 +881,26 @@ describe('firearm', () => {
   })
 
   it('keeps a firearm without optics', () => {
-    expect(paths({ optics: [], configurations: [], active: undefined })).toBeUndefined()
+    expect(firearmPaths({ optics: [], configurations: [], active: undefined })).toBeUndefined()
   })
+})
 
+describe('firearm units, makers and the old shape', () => {
   it('refuses the old SI shape: plain numbers in m and no origin', () => {
     const { origin: _, ...rest } = firearmRecord.data
-    expect(paths({ barrelLength: 0.61 })).toEqual(['data.barrelLength'])
-    expect(paths({ cartridge: '308-win' })).toEqual(['data.cartridge'])
+    expect(firearmPaths({ barrelLength: 0.61 })).toEqual(['data.barrelLength'])
+    expect(firearmPaths({ cartridge: '308-win' })).toEqual(['data.cartridge'])
     expect(userRecord.safeParse({ ...firearmRecord, data: rest }).success).toBe(false)
   })
 
   it('takes a maker reference of either scope, and one schema for every origin', () => {
-    expect(paths({ manufacturer: 'user:2f6c1f3e-9b5a-4a8e-8f21-3c1d7a5b9e10' })).toBeUndefined()
-    expect(paths({ manufacturer: 'Maker' })).toEqual(['data.manufacturer'])
+    expect(
+      firearmPaths({ manufacturer: 'user:2f6c1f3e-9b5a-4a8e-8f21-3c1d7a5b9e10' }),
+    ).toBeUndefined()
+    expect(firearmPaths({ manufacturer: 'Maker' })).toEqual(['data.manufacturer'])
     for (const origin of ['catalogue', 'user', 'shared'])
       expect(firearm.safeParse({ ...firearmRecord.data, origin }).success).toBe(true)
-    expect(paths({ origin: 'cloud' })).toEqual(['data.origin'])
+    expect(firearmPaths({ origin: 'cloud' })).toEqual(['data.origin'])
   })
 
   it('stores every quantity in the one unit of its kind', () => {
@@ -932,11 +977,21 @@ describe('userRefFields', () => {
   })
 })
 
-describe('checkUserRefs', () => {
-  const withFirearm = (firearm: string) =>
-    userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, firearm } })
-  const firearm = userRecord.parse(firearmRecord)
+const open = (cartridge: string, bullet: string) =>
+  userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } }).success
 
+const withPowder = (powder: string) =>
+  userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, powder } })
+
+const withRefs = (cartridge: string, bullet: string) =>
+  userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
+
+const withFirearm = (ref: string) =>
+  userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, firearm: ref } })
+
+const parsedFirearm = userRecord.parse(firearmRecord)
+
+describe('checkUserRefs', () => {
   it('reports a load that points at a missing firearm', () => {
     expect(checkUserRefs([withFirearm(`user:${uuid}`)])).toEqual([
       { record: 'w4', kind: 'load', field: 'firearm', target: `user:${uuid}` },
@@ -944,12 +999,12 @@ describe('checkUserRefs', () => {
   })
 
   it('reports a firearm reference that names a record of another kind', () => {
-    const other = userRecord.parse({ ...bulletRecord, id: uuid })
-    expect(checkUserRefs([withFirearm(`user:${uuid}`), other])).toHaveLength(1)
+    const bullet = userRecord.parse({ ...bulletRecord, id: uuid })
+    expect(checkUserRefs([withFirearm(`user:${uuid}`), bullet])).toHaveLength(1)
   })
 
   it('reports nothing for a firearm that is there', () => {
-    const own = { ...firearm, id: uuid }
+    const own = { ...parsedFirearm, id: uuid }
     expect(checkUserRefs([withFirearm(`user:${uuid}`), own])).toEqual([])
   })
 
@@ -959,7 +1014,9 @@ describe('checkUserRefs', () => {
       [],
     )
   })
+})
 
+describe('checkUserRefs makers and lands bullets', () => {
   it('reports a bullet or firearm whose user manufacturer nobody answers', () => {
     const records = [userRecord.parse(bulletRecord), userRecord.parse(firearmRecord)].map((r) => ({
       ...r,
@@ -1002,10 +1059,10 @@ describe('checkUserRefs', () => {
     expect(userRefFields(withMakers)).toEqual(['case.manufacturer'])
     expect(checkUserRefs([withMakers, userRecord.parse(manufacturerRecord)])).toEqual([])
   })
+})
 
+describe('checkUserRefs components of a load', () => {
   it('reports a load whose cartridge or bullet is a user reference nobody answers', () => {
-    const withRefs = (cartridge: string, bullet: string) =>
-      userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
     const own = [
       { ...userRecord.parse(cartridgeRecord), id: uuid },
       { ...userRecord.parse(bulletRecord), id: crypto.randomUUID() },
@@ -1021,8 +1078,6 @@ describe('checkUserRefs', () => {
   })
 
   it('reports a load whose powder is a user reference nobody answers', () => {
-    const withPowder = (powder: string) =>
-      userRecord.parse({ ...loadRecord, data: { ...loadRecord.data, powder } })
     const own = userRecord.parse(powderRecord)
     expect(checkUserRefs([withPowder(`user:${powderId}`), own])).toEqual([])
     expect(checkUserRefs([withPowder(`user:${powderId}`)])).toEqual([
@@ -1033,14 +1088,13 @@ describe('checkUserRefs', () => {
   })
 
   it('opens a load that names its cartridge and bullet by reference and refuses a plain id', () => {
-    const open = (cartridge: string, bullet: string) =>
-      userRecord.safeParse({ ...loadRecord, data: { ...loadRecord.data, cartridge, bullet } })
-        .success
     expect(open('catalogue:308-win', `user:${uuid}`)).toBe(true)
     expect(open('308-win', 'alpha-30425')).toBe(false)
     expect(open('catalogue:308-win', 'user:1')).toBe(false)
   })
+})
 
+describe('checkUserRefs capacities, case groups and sheets', () => {
   it('reports a capacity record whose user cartridge or manufacturer nobody answers', () => {
     const capacity = userRecord.parse({
       kind: 'caseCapacity',
@@ -1086,15 +1140,15 @@ describe('checkUserRefs', () => {
   })
 })
 
-describe('shootingLogEntry', () => {
-  const entry = (data: Record<string, unknown>) => ({
-    kind: 'shootingLogEntry',
-    id: other,
-    name: '2026-10-12 Range',
-    saved,
-    data: { date: '2026-10-12', rounds: 30, ...data },
-  })
+const entry = (data: Record<string, unknown>) => ({
+  kind: 'shootingLogEntry',
+  id: other,
+  name: '2026-10-12 Range',
+  saved,
+  data: { date: '2026-10-12', rounds: 30, ...data },
+})
 
+describe('shootingLogEntry', () => {
   it('round-trips an entry with every field through a user data file', () => {
     const full = entry({
       place: 'Club range',
@@ -1130,7 +1184,9 @@ describe('shootingLogEntry', () => {
     ])
       expect(userRecord.safeParse(entry(bad)).success, JSON.stringify(bad)).toBe(false)
   })
+})
 
+describe('shootingLogEntry references', () => {
   it('needs a UUID id, as the firearm counts its rounds under the reference', () => {
     expect(userRecord.safeParse({ ...entry({}), id: 'entry-1' }).success).toBe(false)
   })
@@ -1159,8 +1215,12 @@ describe('shootingLogEntry', () => {
     }
     const r = userRecord.parse(entry({ event: `user:${uuid}` }))
     expect(checkUserRefs([r, userRecord.parse(event)])).toEqual([])
-    const maker = userRecord.parse({ ...event, kind: 'manufacturer', data: { origin: 'user' } })
-    expect(checkUserRefs([r, maker]).map((d) => d.field)).toEqual(['event'])
+    const notAnEvent = userRecord.parse({
+      ...event,
+      kind: 'manufacturer',
+      data: { origin: 'user' },
+    })
+    expect(checkUserRefs([r, notAnEvent]).map((d) => d.field)).toEqual(['event'])
   })
 
   it('is a known kind, so the reader keeps it', () => {
