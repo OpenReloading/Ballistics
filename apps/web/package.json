@@ -24,6 +24,7 @@
     "@open-reloading/data": "workspace:*",
     "@open-reloading/drawing": "workspace:*",
     "@open-reloading/importers": "workspace:*",
+    "@open-reloading/locale-format": "workspace:*",
     "@open-reloading/schema": "workspace:*",
     "@open-reloading/units": "workspace:*",
     "@phosphor-icons/react": "2.1.10",

@@ -115,6 +115,7 @@ it('prerenders every record when record data, page code or shared parts changed'
   for (const f of [
     'packages/data/records/powders/delta-2460.json',
     'packages/units/src/units.ts',
+    'packages/locale-format/src/display-units.ts',
     'packages/schema/src/units.ts',
     'packages/api/src/server.ts',
     'packages/drawing/src/index.ts',
@@ -136,7 +137,7 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'
 
 it('tests every workspace of every group without a list of affected ones', () => {
   expect(testJobs()).toEqual([
@@ -150,6 +151,7 @@ it('tests the workspaces a change reaches and leaves out the groups it does not'
   // a change of units as pnpm selects it: units and every workspace that depends on it
   const units = [
     'units',
+    'locale-format',
     'web',
     'cli',
     'core',

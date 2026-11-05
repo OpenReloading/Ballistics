@@ -6,6 +6,7 @@ RUN cd /opt/pnpm && npm ci --ignore-scripts --no-audit --no-fund && ln -s /opt/p
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages/units/package.json packages/units/
+COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/core/package.json packages/core/

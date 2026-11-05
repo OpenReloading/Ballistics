@@ -36,7 +36,7 @@ $$
 1\ \text{gr H}_2\text{O} = \frac{m_\mathrm{gr}}{\rho_w}, \qquad m_\mathrm{gr} = 6.479891 \times 10^{-5}\ \text{kg}
 $$
 
-Code: `apps/web/src/lib/units.ts`, `grH2O`, `kilogramsPerGrain`.
+Code: `packages/locale-format/src/display-units.ts`, `grH2O`, `grain`.
 
 ### Seated bullet
 
