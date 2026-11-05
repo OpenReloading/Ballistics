@@ -21,7 +21,7 @@
   },
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,21 +36,25 @@
     "dist",
     "!dist/**/*.map",
     "!dist/*.tsbuildinfo",
-    "!dist/write-json-schema.*",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json && node dist/write-json-schema.js",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run --coverage"
+    "build": "tsc -b tsconfig.build.json && node scripts/write-json-schema.ts",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
+    "test": "vitest run --coverage && publint --strict && attw --pack . --profile esm-only"
   },
   "dependencies": {
     "@open-reloading/units": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "7.0.2005",
+    "publint": "0.3.25",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

@@ -79,6 +79,7 @@ const overrideValue = ([key, kind]: [string, QuantityKind]) => [
  * Inferred type: {@link AnalysisOverrides}.
  */
 export const analysisOverrides = z.strictObject(
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- fromEntries loses the keys: they are those of analysisKinds
   Object.fromEntries(Object.entries(analysisKinds).map(overrideValue)) as Record<
     AnalysisKey,
     z.ZodOptional<z.ZodNumber>
@@ -281,22 +282,37 @@ const checkCatalogueFields = (l: LoadFields, issue: LoadIssue) => {
   if (l.provenance === undefined) issue(['provenance'], 'A catalogue load needs provenance')
   for (const k of ['cartridge', 'bullet', 'powder', 'charge'] as const)
     if (l[k] === undefined) issue([k], `A catalogue load needs a ${k}`)
-  if (l.capacity !== undefined && !l.capacity.startsWith('catalogue:'))
-    issue(['capacity'], 'A catalogue load names catalogue records only')
-  if (l.case?.record !== undefined && !l.case.record.startsWith('catalogue:'))
-    issue(['case', 'record'], 'A catalogue load names catalogue records only')
+  checkCatalogueOnly(
+    [
+      [['capacity'], l.capacity],
+      [['case', 'record'], l.case?.record],
+    ],
+    issue,
+  )
 }
 
-const checkComponentMakers = (l: LoadFields, issue: LoadIssue) => {
-  const makers: [PropertyKey[], string | undefined][] = [
-    [['bullet', 'manufacturer'], typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined],
-    [['powder', 'manufacturer'], typeof l.powder === 'object' ? l.powder.manufacturer : undefined],
-    [['case', 'manufacturer'], l.case?.manufacturer],
-  ]
-  for (const [path, maker] of makers)
-    if (maker !== undefined && !maker.startsWith('catalogue:'))
+/** Each reference given (a path and the reference) names a catalogue record. */
+const checkCatalogueOnly = (refs: [PropertyKey[], string | undefined][], issue: LoadIssue) => {
+  for (const [path, target] of refs)
+    if (target !== undefined && !target.startsWith('catalogue:'))
       issue(path, 'A catalogue load names catalogue records only')
 }
+
+const checkComponentMakers = (l: LoadFields, issue: LoadIssue) =>
+  checkCatalogueOnly(
+    [
+      [
+        ['bullet', 'manufacturer'],
+        typeof l.bullet === 'object' ? l.bullet.manufacturer : undefined,
+      ],
+      [
+        ['powder', 'manufacturer'],
+        typeof l.powder === 'object' ? l.powder.manufacturer : undefined,
+      ],
+      [['case', 'manufacturer'], l.case?.manufacturer],
+    ],
+    issue,
+  )
 
 const checkRecordReferences = (l: LoadFields, issue: LoadIssue) => {
   const catalogue = l.origin === 'catalogue'

@@ -104,18 +104,33 @@ export const constructionFields = z
   .superRefine((c, ctx) => {
     const issue = (path: string[], message: string) =>
       ctx.addIssue({ code: 'custom', path, message })
-    if (
-      c.unmapped &&
-      (c.structure || c.core || c.jacket || c.surface || c.gasCheck !== undefined || c.drivingBands)
-    )
-      issue([], 'unmapped excludes the structured fields')
+    if (c.unmapped && hasStructuredField(c)) issue([], 'unmapped excludes the structured fields')
     if (c.gasCheck !== undefined && c.structure !== 'cast')
       issue(['gasCheck'], 'only for a cast bullet')
     if (c.drivingBands && c.structure !== 'monolithic')
       issue(['drivingBands'], 'only for a monolithic bullet')
-    if (c.core?.hardness && !(leadCoreMaterials as readonly string[]).includes(c.core.material))
+    if (c.core?.hardness && !contains(leadCoreMaterials, c.core.material))
       issue(['core', 'hardness'], 'only for a lead or lead alloy core')
   })
+
+/** Whether `value` is one of `list`. */
+function contains(list: readonly string[], value: string | undefined): boolean {
+  return value !== undefined && list.includes(value)
+}
+
+/** Whether the wording was read into any structured field. */
+function hasStructuredField(c: {
+  structure?: string | undefined
+  core?: object | undefined
+  jacket?: object | undefined
+  surface?: string[] | undefined
+  gasCheck?: boolean | undefined
+  drivingBands?: number | undefined
+}): boolean {
+  return Boolean(
+    c.structure || c.core || c.jacket || c.surface || c.gasCheck !== undefined || c.drivingBands,
+  )
+}
 
 /** Bullet construction read from the manufacturer's wording, with `raw` kept as printed. */
 export interface ConstructionFields extends z.infer<typeof constructionFields> {}
@@ -128,9 +143,10 @@ export interface ConstructionFields extends z.infer<typeof constructionFields> {
  */
 export function leadFree(c: ConstructionFields | undefined): boolean | undefined {
   if (!c || c.unmapped) return undefined
-  const lead = (list: readonly string[], value: string | undefined) =>
-    value !== undefined && list.includes(value)
-  if (lead(leadCoreMaterials, c.core?.material) || c.surface?.some((s) => lead(leadSurfaces, s)))
+  if (
+    contains(leadCoreMaterials, c.core?.material) ||
+    c.surface?.some((s) => contains(leadSurfaces, s))
+  )
     return false
   const material = c.core?.material
   return material && material !== 'compressed-powder' ? true : undefined
@@ -198,6 +214,21 @@ export const tipTypes = z.enum([
   'open-meplat',
 ])
 
+/** Whether a base type has a cavity open at the base. */
+function hollowBase(type: string | undefined): boolean {
+  return type === 'conical-hollow-base' || type === 'rounded-hollow-base'
+}
+
+/** Whether a base type is a boat tail without a cavity. */
+function boatTail(type: string | undefined): boolean {
+  return type === 'boat-tail' || type === 'rebated-boat-tail'
+}
+
+/** Whether a base type ends in a base face narrower than the shank: a boat tail or a hollow base. */
+function tailedBase(type: string | undefined): boolean {
+  return boatTail(type) || hollowBase(type)
+}
+
 /** Base of a bullet: type, length, boat-tail base face diameter and angle, hollow-base cavity. */
 const bulletBase = z
   .object({
@@ -223,8 +254,8 @@ const bulletBase = z
     cavityDepth: quantity('length', z.number().positive()).optional(),
   })
   .superRefine((base, ctx) => {
-    const hollow = base.type === 'conical-hollow-base' || base.type === 'rounded-hollow-base'
-    const tail = base.type === 'boat-tail' || base.type === 'rebated-boat-tail' || hollow
+    const hollow = hollowBase(base.type)
+    const tail = tailedBase(base.type)
     const issue = (path: string, message: string) =>
       ctx.addIssue({ code: 'custom', path: [path], message })
     for (const key of ['diameter', 'angle'] as const) {
@@ -298,39 +329,7 @@ const bulletTip = z
       issue('mouthDiameter', 'only for a hollow point')
   })
 
-type Stored = { value: number } | undefined
-
-/**
- * Refuses a cannelure that leaves the shank, as far as the record gives its ends: the shank ends
- * where the nose begins (the length less the nose length) and, behind a boat tail, begins where the
- * tail ends. The drawing checks the ends the record leaves out.
- */
-function cannelureOnShank(
-  b: {
-    diameter?: { value: number } | undefined
-    length?: Stored
-    noseLength?: Stored
-    base?: { type?: string | undefined; length?: Stored } | undefined
-    cannelure?: { start: { value: number }; width: { value: number }; depth?: Stored } | undefined
-  },
-  issue: (path: string[], message: string) => void,
-) {
-  const groove = b.cannelure
-  if (!groove) return
-  const tail = b.base?.type === 'boat-tail' || b.base?.type === 'rebated-boat-tail'
-  const rear = tail ? (b.base?.length?.value ?? 0) : 0
-  if (groove.start.value < rear - lengthTolerance)
-    issue(['cannelure', 'start'], 'must not lie on the boat tail')
-  const end = b.length && b.length.value - (b.noseLength?.value ?? 0)
-  if (end !== undefined && groove.start.value + groove.width.value > end + lengthTolerance)
-    issue(
-      ['cannelure', 'width'],
-      b.noseLength ? 'must end before the nose begins' : 'must end within the length',
-    )
-  if (groove.depth && b.diameter && !(groove.depth.value < b.diameter.value / 2))
-    issue(['cannelure', 'depth'], 'must be smaller than the radius')
-}
-
+/** The fields of a bullet before its checks across fields. */
 const bulletFields = z.object({
   id: recordId,
   /** Id of the manufacturer record. */
@@ -377,8 +376,8 @@ const bulletFields = z.object({
 type BulletFields = z.infer<typeof bulletFields>
 type Issue = (path: string[], message: string) => void
 
-/** A name-only record has no product number; a full one needs a product number and a diameter. */
-function identityIssues(b: BulletFields, issue: Issue) {
+/** A full record names its product and diameter; a name-only record has no product number. */
+function checkNameOnly(b: BulletFields, issue: Issue) {
   if (b.nameOnly) {
     if (b.productNumber !== undefined)
       issue(['productNumber'], 'a name-only record has no product number')
@@ -389,56 +388,66 @@ function identityIssues(b: BulletFields, issue: Issue) {
   if (b.diameter === undefined) issue(['diameter'], 'a full record needs a diameter')
 }
 
-/** Reports `path` when `v` is not smaller than `limit`; nothing while either is unknown. */
-function below(
-  issue: Issue,
+const diameter = (b: BulletFields) => b.diameter?.value
+const length = (b: BulletFields) => b.length?.value
+
+/**
+ * A size of a bullet that must be smaller than another size of it, where the record gives both:
+ * the path of the size, the size, the limit and what the limit is.
+ */
+type SmallerThan = [
   path: string[],
-  v: number | undefined,
-  limit: number | undefined,
+  size: (b: BulletFields) => number | undefined,
+  limit: (b: BulletFields) => number | undefined,
   what: string,
-) {
-  if (v !== undefined && limit !== undefined && !(v < limit))
-    issue(path, `must be smaller than ${what}`)
-}
+]
 
-/** The meplat, base and tip within the diameter, the tip and base within the lengths. */
-function sizeIssues(b: BulletFields, issue: Issue) {
-  const d = b.diameter?.value
-  below(issue, ['meplatDiameter'], b.meplatDiameter?.value, d, 'the diameter')
-  below(issue, ['base', 'diameter'], b.base?.diameter?.value, d, 'the diameter')
+/** The meplat, base, cavity and tip within the diameter, the tip and base within the lengths. */
+const sizeLimits: SmallerThan[] = [
+  [['meplatDiameter'], (b) => b.meplatDiameter?.value, diameter, 'the diameter'],
+  [['base', 'diameter'], (b) => b.base?.diameter?.value, diameter, 'the diameter'],
   // Only against the diameter: the cited definition relates the mouth to the caliber, not to the meplat.
-  below(issue, ['tip', 'mouthDiameter'], b.tip?.mouthDiameter?.value, d, 'the diameter')
-  below(issue, ['tip', 'length'], b.tip?.length?.value, b.length?.value, 'the length')
-  below(issue, ['tip', 'length'], b.tip?.length?.value, b.noseLength?.value, 'the nose length')
-  below(issue, ['base', 'length'], b.base?.length?.value, b.length?.value, 'the length')
-}
-
-/** The cavity within the base diameter, or the diameter where the record gives no base diameter. */
-function cavityDiameterIssue(b: BulletFields, issue: Issue) {
-  below(
-    issue,
+  [['tip', 'mouthDiameter'], (b) => b.tip?.mouthDiameter?.value, diameter, 'the diameter'],
+  [['tip', 'length'], (b) => b.tip?.length?.value, length, 'the length'],
+  [['tip', 'length'], (b) => b.tip?.length?.value, (b) => b.noseLength?.value, 'the nose length'],
+  [['base', 'length'], (b) => b.base?.length?.value, length, 'the length'],
+  // against the base diameter where the record has one, else against the diameter
+  [
     ['base', 'cavityDiameter'],
-    b.base?.cavityDiameter?.value,
-    b.base?.diameter?.value ?? b.diameter?.value,
-    b.base?.diameter ? 'the base diameter' : 'the diameter',
-  )
-}
+    (b) => b.base?.cavityDiameter?.value,
+    (b) => b.base?.diameter?.value,
+    'the base diameter',
+  ],
+  [
+    ['base', 'cavityDiameter'],
+    (b) => b.base?.cavityDiameter?.value,
+    (b) => (b.base?.diameter ? undefined : diameter(b)),
+    'the diameter',
+  ],
+]
 
-/** The jacket within the radius. */
-function jacketIssue(b: BulletFields, issue: Issue) {
-  const d = b.diameter?.value
-  below(
-    issue,
+/** The jacket within the radius, the cavity depth within the length. */
+const depthLimits: SmallerThan[] = [
+  [
     ['construction', 'jacket', 'thickness'],
-    b.construction?.jacket?.thickness?.value,
-    d === undefined ? undefined : d / 2,
+    (b) => b.construction?.jacket?.thickness?.value,
+    (b) => b.diameter && b.diameter.value / 2,
     'the radius',
-  )
+  ],
+  [['base', 'cavityDepth'], (b) => b.base?.cavityDepth?.value, length, 'the length'],
+]
+
+function checkSmallerThan(b: BulletFields, limits: SmallerThan[], issue: Issue) {
+  for (const [path, size, limit, what] of limits) {
+    const v = size(b)
+    const max = limit(b)
+    if (v !== undefined && max !== undefined && !(v < max))
+      issue(path, `must be smaller than ${what}`)
+  }
 }
 
-/** The cavity depth within the length; without a stored depth it is half the opening (`bulletOutline`). */
-function cavityDepthIssues(b: BulletFields, issue: Issue) {
-  below(issue, ['base', 'cavityDepth'], b.base?.cavityDepth?.value, b.length?.value, 'the length')
+/** Without a stored depth the cavity is half its opening deep (`bulletOutline`), which must fit the length. */
+function checkCavityDepth(b: BulletFields, issue: Issue) {
   const cavity = b.base?.cavityDiameter?.value
   if (
     cavity !== undefined &&
@@ -452,16 +461,44 @@ function cavityDepthIssues(b: BulletFields, issue: Issue) {
     )
 }
 
+/** Where the shank begins: behind a boat tail where the tail ends, else at the base. */
+function shankStart(b: BulletFields): number {
+  return boatTail(b.base?.type) ? (b.base?.length?.value ?? 0) : 0
+}
+
+/** Where the shank ends: where the nose begins, the length less the nose length; unknown without a length. */
+function shankEnd(b: BulletFields): number | undefined {
+  return b.length && b.length.value - (b.noseLength?.value ?? 0)
+}
+
+/**
+ * Refuses a cannelure that leaves the shank, as far as the record gives its ends. The drawing checks
+ * the ends the record leaves out.
+ */
+function cannelureOnShank(b: BulletFields, issue: Issue) {
+  const groove = b.cannelure
+  if (!groove) return
+  if (groove.start.value < shankStart(b) - lengthTolerance)
+    issue(['cannelure', 'start'], 'must not lie on the boat tail')
+  const end = shankEnd(b)
+  if (end !== undefined && groove.start.value + groove.width.value > end + lengthTolerance)
+    issue(
+      ['cannelure', 'width'],
+      b.noseLength ? 'must end before the nose begins' : 'must end within the length',
+    )
+  if (groove.depth && b.diameter && !(groove.depth.value < b.diameter.value / 2))
+    issue(['cannelure', 'depth'], 'must be smaller than the radius')
+}
+
 /** A projectile as its manufacturer sells it. Inferred type: {@link Bullet}. */
 export const bullet = bulletFields.superRefine((b, ctx) => {
   needsCountrySource(b, ctx)
   const issue: Issue = (path, message) => ctx.addIssue({ code: 'custom', path, message })
-  identityIssues(b, issue)
-  sizeIssues(b, issue)
-  cavityDiameterIssue(b, issue)
+  checkNameOnly(b, issue)
+  checkSmallerThan(b, sizeLimits, issue)
   cannelureOnShank(b, issue)
-  jacketIssue(b, issue)
-  cavityDepthIssues(b, issue)
+  checkSmallerThan(b, depthLimits, issue)
+  checkCavityDepth(b, issue)
 })
 
 /** One published coefficient: G1 or G7, value in lb/in2, optional velocity band. */

@@ -7,7 +7,7 @@
       "entry": ["src/index.ts"]
     },
     "packages/schema": {
-      "entry": ["src/index.ts", "src/write-json-schema.ts"]
+      "entry": ["src/index.ts"]
     },
     "packages/core": {
       "entry": ["src/index.ts", "scripts/*.mts"],
