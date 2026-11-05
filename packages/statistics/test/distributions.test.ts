@@ -5,10 +5,6 @@ import { InputError } from '../src/errors.ts'
 import { fQuantileTwoNumeratorDegrees } from '../src/f-distribution.ts'
 import { studentTwoSidedQuantile } from '../src/student-t.ts'
 
-const close = (actual: number | undefined, expected: number, rel = 1e-12) => {
-  expect(actual).toEqual(near(expected, { relative: rel, absolute: 1e-18 }))
-}
-
 /** The chi-square distribution function for even `df` as a finite sum (DLMF 8.4.10). */
 const evenChiSquareCdf = (x: number, df: number) => {
   let term = 1
@@ -23,7 +19,9 @@ const evenChiSquareCdf = (x: number, df: number) => {
 describe('chi-square distribution', () => {
   it('2 degrees of freedom: 1 - exp(-x/2)', () => {
     for (const p of [0.025, 0.5, 0.95, 0.975])
-      close(chiSquareQuantile(p, 2), -2 * Math.log(1 - p), 1e-12)
+      expect(chiSquareQuantile(p, 2)).toEqual(
+        near(-2 * Math.log(1 - p), { relative: 1e-12, absolute: 1e-18 }),
+      )
   })
 
   it('even degrees of freedom: finite sum (DLMF 8.4.10)', () => {
@@ -35,7 +33,9 @@ describe('chi-square distribution', () => {
 
   it('1 degree of freedom: square of the normal quantile', () => {
     // z at 0.975 = 1.959963984540054
-    close(chiSquareQuantile(0.95, 1), 1.959963984540054 ** 2, 1e-12)
+    expect(chiSquareQuantile(0.95, 1)).toEqual(
+      near(1.959963984540054 ** 2, { relative: 1e-12, absolute: 1e-18 }),
+    )
   })
 
   it('odd degrees of freedom: integral of the density', () => {
@@ -48,7 +48,7 @@ describe('chi-square distribution', () => {
     const h = x / m
     let sum = pdf(0) + pdf(x)
     for (let i = 1; i < m; i++) sum += (i % 2 ? 4 : 2) * pdf(i * h)
-    close(chiSquareCdf(x, df), (sum * h) / 3, 1e-9)
+    expect(chiSquareCdf(x, df)).toEqual(near((sum * h) / 3, { relative: 1e-9, absolute: 1e-18 }))
   })
 
   it('large pooled degrees of freedom do not underflow', () => {
@@ -56,14 +56,19 @@ describe('chi-square distribution', () => {
     const q = chiSquareQuantile(0.5, df)
     expect(q).toBeGreaterThan(df - 1)
     expect(q).toBeLessThan(df)
-    close(chiSquareCdf(q, df), 0.5, 1e-10)
-    close(chiSquareCdf(chiSquareQuantile(0.975, df), df), 0.975, 1e-10)
+    expect(chiSquareCdf(q, df)).toEqual(near(0.5, { relative: 1e-10, absolute: 1e-18 }))
+    expect(chiSquareCdf(chiSquareQuantile(0.975, df), df)).toEqual(
+      near(0.975, { relative: 1e-10, absolute: 1e-18 }),
+    )
   })
 })
 
 describe('F distribution with 2 and m degrees of freedom', () => {
   it('2 and 2: the distribution function is x / (1 + x)', () => {
-    for (const p of [0.05, 0.5, 0.9, 0.99]) close(fQuantileTwoNumeratorDegrees(p, 2), p / (1 - p))
+    for (const p of [0.05, 0.5, 0.9, 0.99])
+      expect(fQuantileTwoNumeratorDegrees(p, 2)).toEqual(
+        near(p / (1 - p), { relative: 1e-12, absolute: 1e-18 }),
+      )
   })
 
   it('upper critical values of NIST/SEMATECH 1.3.6.7.3', () => {
@@ -82,7 +87,9 @@ describe('F distribution with 2 and m degrees of freedom', () => {
   })
 
   it('large m: chi-square with 2 degrees of freedom over 2', () => {
-    close(fQuantileTwoNumeratorDegrees(0.95, 1e7), -Math.log(0.05), 1e-6)
+    expect(fQuantileTwoNumeratorDegrees(0.95, 1e7)).toEqual(
+      near(-Math.log(0.05), { relative: 1e-6, absolute: 1e-18 }),
+    )
   })
 
   it('rejects invalid input', () => {
@@ -96,17 +103,27 @@ describe('chi-square survival function', () => {
     // two degrees of freedom: exp(-x / 2); four: exp(-x / 2) (1 + x / 2)
     // the true tail is 1e-85
     expect(1 - chiSquareCdf(400, 4)).toBe(0)
-    close(chiSquareSurvival(100, 2), Math.exp(-50), 1e-12)
-    close(chiSquareSurvival(60, 4), Math.exp(-30) * 31, 1e-12)
-    close(chiSquareSurvival(400, 4), Math.exp(-200) * 201, 1e-12)
+    expect(chiSquareSurvival(100, 2)).toEqual(
+      near(Math.exp(-50), { relative: 1e-12, absolute: 1e-18 }),
+    )
+    expect(chiSquareSurvival(60, 4)).toEqual(
+      near(Math.exp(-30) * 31, { relative: 1e-12, absolute: 1e-18 }),
+    )
+    expect(chiSquareSurvival(400, 4)).toEqual(
+      near(Math.exp(-200) * 201, { relative: 1e-12, absolute: 1e-18 }),
+    )
   })
 
   it('adds up with the distribution function on both sides of the switch', () => {
     for (const df of [1, 2, 3, 7, 30])
       for (const x of [0.5, 1, df - 0.5, df, df + 2 * Math.sqrt(df), 3 * df, 80]) {
-        close(chiSquareSurvival(x, df) + chiSquareCdf(x, df), 1, 1e-13)
+        expect(chiSquareSurvival(x, df) + chiSquareCdf(x, df)).toEqual(
+          near(1, { relative: 1e-13, absolute: 1e-18 }),
+        )
       }
-    close(chiSquareSurvival(1, 1), 0.31731050786291415, 1e-12)
+    expect(chiSquareSurvival(1, 1)).toEqual(
+      near(0.31731050786291415, { relative: 1e-12, absolute: 1e-18 }),
+    )
     expect(chiSquareSurvival(0, 3)).toBe(1)
     expect(chiSquareSurvival(Number.POSITIVE_INFINITY, 3)).toBe(0)
     expect(chiSquareCdf(Number.POSITIVE_INFINITY, 2)).toBe(1)

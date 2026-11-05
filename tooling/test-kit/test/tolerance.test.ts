@@ -25,7 +25,7 @@ describe('near', () => {
     expect(m.asymmetricMatch(Number.NaN)).toBe(false)
     expect(m.asymmetricMatch(Number.POSITIVE_INFINITY)).toBe(false)
     expect(m.asymmetricMatch('0.3')).toBe(false)
-    expect(() => expect({ v: 0.31 }).toEqual({ v: m })).toThrow()
+    expect(() => expect({ v: 0.31 }).toEqual({ v: m })).toThrow('to deeply equal')
     expect(m.toAsymmetricMatcher()).toBe('near(0.3, relative 0, absolute 1e-15)')
   })
 })
