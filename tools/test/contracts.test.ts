@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 // The exported names of each published package, read from the declarations the build writes, so a
-// type counts as much as a value. `npm run baselines` at the root rewrites the lists.
+// type counts as much as a value. `pnpm run baselines` at the root rewrites the lists.
 const published = ['schema', 'core', 'drawing', 'importers', 'data']
 
 /** The names a declaration file exports, following `export *` through its relative imports. */

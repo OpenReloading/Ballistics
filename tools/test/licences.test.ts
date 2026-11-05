@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { expect, it } from 'vitest'
 import {
-  installedLicences,
+  installedLicenses,
   type Lock,
   noticeBlock,
   problems,
@@ -31,11 +31,11 @@ it('rejects an expression it cannot read', () => {
 })
 
 it('reads every licence expression of the installed packages', () => {
-  for (const license of installedLicences('..').values())
+  for (const license of installedLicenses('..').values())
     if (license !== undefined) expect(() => satisfies(license, allowed), license).not.toThrow()
 })
 
-const licences = (...ids: string[]) => new Map(ids.map((i) => [i, 'MIT']))
+const licenses = (...ids: string[]) => new Map(ids.map((i) => [i, 'MIT']))
 const lock: Lock = {
   importers: {
     'apps/web': {
@@ -62,9 +62,9 @@ const lock: Lock = {
 it('lists the production closure: links followed, both versions, no optional peer, no platform package, no removed package', () => {
   const found = shippedPackages(
     lock,
-    licences('a@1.0.0', 'b@1.0.0'),
+    licenses('a@1.0.0', 'b@1.0.0'),
     ['apps/web'],
-    (name) => name === 'sharp',
+    (name) => name === 'sharp' || name === 'bin-linux',
   )
   expect(found).toEqual([
     { name: 'a', version: '1.0.0', license: 'MIT' },
@@ -98,11 +98,20 @@ it('wants a reason on the line of every excepted package', () => {
   ])
 })
 
-it('keeps no exception in the review configuration without a reason, and no strong copyleft licence', () => {
+const permissive = new Set([
+  ...['MIT', 'MIT-0', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD'],
+  ...['CC0-1.0', 'Unlicense', 'BlueOak-1.0.0', 'Python-2.0'],
+])
+
+it('keeps no exception in the review configuration without a reason, and no copyleft licence beyond MPL and LGPL', () => {
   const text = readFileSync('../.github/dependency-review-config.yml', 'utf8')
   expect(withoutReason(text)).toEqual([])
   const { allow } = readPolicy(text)
-  expect([...allow].filter((l) => /(^|[^L])GPL|SSPL|CC-BY/.test(l))).toEqual([])
+  expect([...allow].filter((l) => !permissive.has(l)).sort()).toEqual([
+    'LGPL-2.1-or-later',
+    'LGPL-3.0-or-later',
+    'MPL-2.0',
+  ])
 })
 
 it('writes the NOTICE block with one line per package', () => {
@@ -124,7 +133,13 @@ it('names an unbalanced bracket and an operator or bracket where a licence belon
 const ids = (found: { name: string; version: string }[]) =>
   found.map((p) => `${p.name}@${p.version}`)
 
-it('leaves out sharp and the @img scope by default and starts from the API and the web app', () => {
+it('fails on a platform package that notShipped does not name', () => {
+  expect(() =>
+    shippedPackages(lock, licenses('a@1.0.0'), ['apps/web'], (name) => name === 'sharp'),
+  ).toThrow('bin-linux@1.0.0 is a platform package in a shipped closure')
+})
+
+it('leaves out sharp, the @img scope and the Next.js compiler by default and starts from the API and the web app', () => {
   const shipped: Lock = {
     importers: {
       'packages/api': {
@@ -132,13 +147,14 @@ it('leaves out sharp and the @img scope by default and starts from the API and t
           sharp: { version: '0.1.0' },
           '@img/sharp-wasm32': { version: '0.1.0' },
           '@imgx/a': { version: '1.0.0' },
+          '@next/swc-linux-x64-gnu': { version: '1.0.0' },
         },
       },
       'apps/web': { dependencies: { b: { version: '1.0.0' } } },
       'apps/docs': { dependencies: { c: { version: '1.0.0' } } },
     },
   }
-  expect(shippedPackages(shipped, licences('@imgx/a@1.0.0', 'b@1.0.0', 'c@1.0.0'))).toEqual([
+  expect(shippedPackages(shipped, licenses('@imgx/a@1.0.0', 'b@1.0.0', 'c@1.0.0'))).toEqual([
     { name: '@imgx/a', version: '1.0.0', license: 'MIT' },
     { name: 'b', version: '1.0.0', license: 'MIT' },
   ])

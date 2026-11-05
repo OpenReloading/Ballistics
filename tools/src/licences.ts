@@ -1,6 +1,6 @@
 /**
  * Licence policy of the production dependencies of the API image and the web app, read from
- * pnpm-lock.yaml and the licences pnpm reads from the installed packages: fails on a package whose
+ * pnpm-lock.yaml and the licenses pnpm reads from the installed packages: fails on a package whose
  * licence is not in `allow-licenses` of .github/dependency-review-config.yml (the list the
  * dependency review step reads) and not excepted there by `allow-dependencies-licenses`, and on a
  * package without a declared licence. Fails too when the generated list of shipped packages in
@@ -16,10 +16,11 @@ import { executable } from './executable.ts'
 /** The API image and the web app (its bundles ship in the static site): the workspaces whose production dependencies ship. */
 const images = ['packages/api', 'apps/web']
 
-/** Packages installed for a shipped workspace that no shipped file contains, by name or `@scope/*`, with why. */
+/** Packages installed for a shipped workspace that no shipped file contains, by name or name prefix (`*`), with why. */
 export const notShipped: Record<string, string> = {
   sharp: 'the static export has no image optimisation, so the site holds no sharp code',
   '@img/*': 'the sharp binaries: the static export holds none',
+  '@next/swc-*': 'the Next.js compiler, a build tool: the static export holds no native code',
 }
 
 const begin = 'BEGIN GENERATED: shipped packages'
@@ -61,8 +62,8 @@ export interface Policy {
   excepted: Set<string>
 }
 
-/** The licence of each installed package by `name@version`, as `pnpm licenses list --json` reads it. */
-export type Licences = Map<string, string | undefined>
+/** The license of each installed package by `name@version`, as `pnpm licenses list --json` reads it. */
+export type Licenses = Map<string, string | undefined>
 
 /** A dependency to visit: its name, its version or `link:`, and the workspace a `link:` is relative to. */
 interface Step {
@@ -74,7 +75,9 @@ interface Step {
 const id = (p: Shipped) => `${p.name}@${p.version}`
 
 const isNotShipped = (name: string) =>
-  name in notShipped || name.replace(/\/.*/, '/*') in notShipped
+  Object.keys(notShipped).some((k) =>
+    k.endsWith('*') ? name.startsWith(k.slice(0, -1)) : name === k,
+  )
 
 /** The production dependencies of a lock entry, without the peers `optional` names. */
 const stepsOf = (
@@ -89,13 +92,12 @@ const stepsOf = (
 /**
  * Every third-party package installed for the production dependencies of the shipped workspaces;
  * an optional peer that the lock resolved from elsewhere in the workspace is not installed for it.
- * shortcut: a platform package (`os`, `cpu` or `libc` in the lock) is left out, because which one
- * is installed differs per machine; in these closures that is only the Next.js compiler, which the
- * static export does not hold. Upgrade when the API image gains a native dependency.
+ * Throws on a platform package (`os`, `cpu` or `libc` in the lock) that `skip` does not name: which
+ * one is installed differs per machine, so the list cannot hold it.
  */
 export function shippedPackages(
   lock: Lock,
-  licences: Licences,
+  licenses: Licenses,
   roots = images,
   skip = isNotShipped,
 ): Shipped[] {
@@ -112,13 +114,16 @@ export function shippedPackages(
     }
     const plain = version.replace(/\(.*$/, '')
     const meta = lock.packages?.[`${name}@${plain}`]
-    if (seen.has(`${name}@${version}`) || skip(name) || meta?.os || meta?.cpu || meta?.libc)
-      continue
+    if (seen.has(`${name}@${version}`) || skip(name)) continue
+    if (meta?.os || meta?.cpu || meta?.libc)
+      throw new Error(
+        `${name}@${plain} is a platform package in a shipped closure: name it in notShipped with why, or list it by hand`,
+      )
     seen.add(`${name}@${version}`)
     found.set(`${name}@${plain}`, {
       name,
       version: plain,
-      license: licences.get(`${name}@${plain}`),
+      license: licenses.get(`${name}@${plain}`),
     })
     todo.push(...stepsOf(lock.snapshots?.[`${name}@${version}`], '', meta?.peerDependenciesMeta))
   }
@@ -126,8 +131,8 @@ export function shippedPackages(
   return [...found.values()].sort((a, b) => (id(a) < id(b) ? -1 : 1))
 }
 
-/** The licences of the installed production dependencies of the shipped workspaces, read by pnpm. */
-export function installedLicences(root: string): Licences {
+/** The licenses of the installed production dependencies of the shipped workspaces, read by pnpm. */
+export function installedLicenses(root: string): Licenses {
   const filters = images.flatMap((dir) => ['--filter', `./${dir}`])
   const listed = JSON.parse(
     execFileSync(executable('pnpm'), [...filters, 'licenses', 'list', '--prod', '--json'], {
@@ -136,11 +141,11 @@ export function installedLicences(root: string): Licences {
       maxBuffer: 64 << 20,
     }),
   ) as Record<string, { name: string; versions: string[]; license?: unknown }[]>
-  const licences: Licences = new Map()
+  const licenses: Licenses = new Map()
   for (const p of Object.values(listed).flat())
     for (const v of p.versions)
-      licences.set(`${p.name}@${v}`, typeof p.license === 'string' ? p.license : undefined)
-  return licences
+      licenses.set(`${p.name}@${v}`, typeof p.license === 'string' ? p.license : undefined)
+  return licenses
 }
 
 /** Whether an SPDX licence expression is met by `allowed` (OR: one side, AND: both, WITH: its licence). Throws when unreadable. */
@@ -271,7 +276,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const configText = readFileSync(configPath, 'utf8')
   const lock = parse(readFileSync(`${root}pnpm-lock.yaml`, 'utf8')) as Lock
   const policy = readPolicy(configText)
-  const packages = shippedPackages(lock, installedLicences(root))
+  const packages = shippedPackages(lock, installedLicenses(root))
   const found = [
     ...withoutReason(configText).map((l) => `no reason comment on: ${l.trim()}`),
     ...problems(packages, policy),

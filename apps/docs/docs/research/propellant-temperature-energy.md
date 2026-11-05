@@ -92,7 +92,7 @@ Text for the Limits of the [M3 page](../models/interior-m3.md) (added there in s
 The measured part is pending: the held-out test on chronograph ladders of one powder at three or more temperature levels, at least 20 K between the coldest and the hottest and between the hottest and the next level below it, two spans, the energy coefficient fixed, passes when the velocity RMS and the pressure RMS are each at least 15 % lower than those of the current fit on both spans. It runs on unpublished rows, on the machine that holds them:
 
 ```sh
-npm ci && npm run build
+pnpm install && pnpm run build
 node packages/cli/scripts/temperature-energy.mts --rows <rows.csv|folder> [--records <dir>]
 ```
 
