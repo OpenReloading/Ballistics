@@ -1,4 +1,4 @@
-import { chiSquareQuantile } from '@open-reloading/statistics'
+import { chiSquareQuantile, seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import { InputError, nth } from '../src/errors.ts'
 import {
@@ -9,7 +9,6 @@ import {
   predictionEllipse,
   subtendedAngle,
 } from '../src/groups/statistics.ts'
-import { uniforms } from './random.ts'
 
 const mm = 1e-3
 const close = (actual: number | undefined, expected: number, rel = 1e-12) => {
@@ -460,7 +459,7 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
   }
 
   const count = 20000
-  const random = uniforms(272)
+  const random = seededUniforms(272)
   const sample = draw(random, count)
   const fresh = draw(random, count)
   const s = groupStatistics({ shots: sample, distance: 100 })
@@ -511,7 +510,7 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
   // Each trial: a new group of n shots and one further shot; the prediction ellipse holds the
   // further shot with probability `coverage` over trials, the sample ellipse less often.
   const coverageTrials = (n: number, trials: number) => {
-    const rng = uniforms(1000 + n)
+    const rng = seededUniforms(1000 + n)
     let predicted = 0
     let sampled = 0
     for (let t = 0; t < trials; t++) {

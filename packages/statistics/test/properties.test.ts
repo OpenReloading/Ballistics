@@ -5,7 +5,7 @@ import { bisect } from '../src/bisect.ts'
 import { chiSquareCdf, chiSquareQuantile, chiSquareSurvival } from '../src/chi-square.ts'
 import { nth } from '../src/errors.ts'
 import { huberCost } from '../src/huber.ts'
-import { seededUniforms } from '../src/random.ts'
+import { normalsFrom, seededUniforms } from '../src/random.ts'
 import { studentTwoSidedQuantile } from '../src/student-t.ts'
 import { velocityStatistics } from '../src/velocity-statistics.ts'
 
@@ -83,6 +83,15 @@ describe('numeric helpers', () => {
         }
       }),
     )
+  })
+
+  it('turns two uniforms into one normal number, the radius from the first', () => {
+    const u = [0.5, 0.25, 0.9, 0]
+    let i = 0
+    const draw = normalsFrom(() => u[i++] ?? 0)
+    // radius sqrt(-2 ln 0.5) at angle pi / 2, then sqrt(-2 ln 0.1) at angle 0
+    expect(draw()).toBeCloseTo(0, 12)
+    expect(draw()).toBeCloseTo(Math.sqrt(-2 * Math.log(0.1)), 12)
   })
 
   it('keeps residuals past the Huber count quadratic', () => {

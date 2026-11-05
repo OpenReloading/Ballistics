@@ -5,7 +5,7 @@
  * It covers input tolerances only, not model error.
  */
 
-import { seededUniforms } from '@open-reloading/statistics'
+import { normalsFrom, seededUniforms } from '@open-reloading/statistics'
 import type { Settings } from '../errors.ts'
 import { nth } from '../errors.ts'
 import { type InteriorLoad, type InteriorOptions, interior } from './model.ts'
@@ -102,8 +102,7 @@ export function sampledBand<L>(
   { samples, seed, budgetMs, now }: SamplingOptions,
 ): SampledBand {
   const started = now()
-  const uniform = seededUniforms(seed)
-  const normal = () => Math.sqrt(-2 * Math.log(1 - uniform())) * Math.cos(2 * Math.PI * uniform())
+  const normal = normalsFrom(seededUniforms(seed))
   const pressure: number[] = []
   const velocity: number[] = []
   for (let i = 0; i < samples; i++) {

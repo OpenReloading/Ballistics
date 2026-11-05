@@ -99,6 +99,12 @@ export function logLeastSquares(fit: LogFitInput): LogFitResult;
 export function need(ok: boolean, message: string): void;
 
 // @public
+export function normalsFrom(uniform: () => number): () => number;
+
+// @public
+export function nth<T>(a: ArrayLike<T>, i: number): T;
+
+// @public
 export function seededUniforms(seed: number): () => number;
 
 // @public

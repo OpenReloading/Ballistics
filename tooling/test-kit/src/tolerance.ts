@@ -5,7 +5,7 @@ export interface Tolerance {
 }
 
 /** Whether `actual` lies within `tolerance` of `expected`: |actual - expected| at most relative |expected| + absolute. */
-export function within(actual: number, expected: number, tolerance: Tolerance): boolean {
+function within(actual: number, expected: number, tolerance: Tolerance): boolean {
   const { relative = 0, absolute = 0 } = tolerance
   return Math.abs(actual - expected) <= relative * Math.abs(expected) + absolute
 }

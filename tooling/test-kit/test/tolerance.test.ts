@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { near, within } from '../src/index.ts'
+import { near } from '../src/index.ts'
 
-describe('within', () => {
+describe('near: the tolerance', () => {
   it('adds the relative part, scaled by the expected size, to the absolute part', () => {
-    expect(within(101, 100, { relative: 0.01 })).toBe(true)
-    expect(within(101.1, 100, { relative: 0.01 })).toBe(false)
-    expect(within(1e-13, 0, { absolute: 1e-12 })).toBe(true)
-    expect(within(1, 1, {})).toBe(true)
-    expect(within(1 + 1e-15, 1, {})).toBe(false)
+    expect(near(100, { relative: 0.01 }).asymmetricMatch(101)).toBe(true)
+    expect(near(100, { relative: 0.01 }).asymmetricMatch(101.1)).toBe(false)
+    expect(near(0, { absolute: 1e-12 }).asymmetricMatch(1e-13)).toBe(true)
+    expect(near(1, {}).asymmetricMatch(1)).toBe(true)
+    expect(near(1, {}).asymmetricMatch(1 + 1e-15)).toBe(false)
   })
 })
 

@@ -1,6 +1,6 @@
 export { bisect } from './bisect.ts'
 export { chiSquareCdf, chiSquareQuantile, chiSquareSurvival } from './chi-square.ts'
-export { InputError, need } from './errors.ts'
+export { InputError, need, nth } from './errors.ts'
 export { fQuantileTwoNumeratorDegrees } from './f-distribution.ts'
 export type { HuberLoss } from './huber.ts'
 export type { Interval } from './interval.ts'
@@ -13,6 +13,6 @@ export {
   type LogFitStop,
   logLeastSquares,
 } from './least-squares.ts'
-export { seededUniforms } from './random.ts'
+export { normalsFrom, seededUniforms } from './random.ts'
 export { studentTwoSidedQuantile } from './student-t.ts'
 export { shotsNeeded, type VelocityStatistics, velocityStatistics } from './velocity-statistics.ts'

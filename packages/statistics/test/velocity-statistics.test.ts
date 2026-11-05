@@ -1,7 +1,6 @@
-import { normalsFrom } from '@open-reloading/test-kit'
 import { describe, expect, it } from 'vitest'
 import { InputError, shotsNeeded, velocityStatistics } from '../src/index.ts'
-import { seededUniforms } from '../src/random.ts'
+import { normalsFrom, seededUniforms } from '../src/random.ts'
 
 const normals = (seed: number) => normalsFrom(seededUniforms(seed))
 
