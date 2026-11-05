@@ -85,4 +85,5 @@ export function loadWaterCapacity(records: {
   if (records.capacity) return { grams: records.capacity.waterCapacity.value, source: 'capacity' }
   if (records.case?.waterCapacity)
     return { grams: records.case.waterCapacity.value, source: 'case' }
+  return undefined
 }

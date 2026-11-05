@@ -1,0 +1,57 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../units/.oxlintrc.json"],
+  "rules": {
+    "import/no-cycle": "error",
+    "eqeqeq": ["error", "always", { "null": "ignore" }],
+    "no-param-reassign": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "ignoreRestSiblings": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "rules": {
+        "complexity": "off",
+        "max-lines-per-function": "off",
+        "max-params": "off",
+        "no-shadow": "off",
+        "typescript/no-unnecessary-type-assertion": "off",
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/no-array-fill-with-reference-type": "off",
+        "unicorn/no-array-reverse": "off",
+        "unicorn/no-array-sort": "off"
+      }
+    },
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [],
+            "patterns": [
+              {
+                "group": [
+                  "@open-reloading/*",
+                  "@open-reloading/*/**",
+                  "!@open-reloading/units",
+                  "!@open-reloading/units/**"
+                ],
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "schema-imports-units-only: packages/schema imports no workspace package but @open-reloading/units."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
