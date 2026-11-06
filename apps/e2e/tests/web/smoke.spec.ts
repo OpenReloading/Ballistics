@@ -16,7 +16,7 @@ const pages = [
   ['/disciplines/dsb-25m-pistole-revolver', '25 m Pistole/Revolver'],
   ['/federations', 'Federations'],
   ['/federations/dsb', 'Deutscher Schützenbund e.V.'],
-]
+] as const
 
 for (const [path, title] of pages)
   test(`${path} answers 200, shows its h1 and logs no error`, async ({ page }) => {

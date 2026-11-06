@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { expect, test } from '@playwright/test'
 import { recordFigures } from '../../../../packages/drawing/src/cartridge/figures.ts'
-import type { SpecValue } from '../../../web/src/lib/api-types.ts'
+import type { SpecValue } from '../../../../packages/drawing/src/core/types.ts'
 import { gotoHydrated } from './nav.ts'
 
 // The pixels depend on the fonts: this runs only in the Playwright image of the installed

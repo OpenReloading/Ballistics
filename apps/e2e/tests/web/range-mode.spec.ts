@@ -30,7 +30,11 @@ type Stored = {
   name: string
   data: { sessions?: string[]; snapshots?: { session: string }[]; strings: Strings[] }
 }
-type Strings = { load?: string; shots: { velocity: { value: number }; excluded?: string }[] }
+type Strings = {
+  load?: string
+  note?: string
+  shots: { velocity: { value: number }; excluded?: string }[]
+}
 
 const stored = (page: Page, kind: string) =>
   page.evaluate(async (kind) => {

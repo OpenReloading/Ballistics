@@ -31,7 +31,7 @@ test('a charge change updates the result without Run', async ({ page }) => {
 for (const [what, text] of [
   ['an empty charge', ''],
   ['a charge below 0', '-1'],
-])
+] as const)
   test(`${what} never starts a run, the result stays marked`, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 })
     await runExample(page)

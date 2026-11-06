@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { gotoHydrated } from './nav.ts'
 
@@ -52,7 +53,7 @@ test('a primer chosen above the cards is saved with the load and chosen again on
     .poll(async () => (await storedLoads(page)).map((r) => r.data.primer))
     .toEqual([{ record: 'catalogue:demo-primer-large-rifle' }])
 
-  const [{ name }] = await storedLoads(page)
+  const { name } = defined((await storedLoads(page))[0])
   await gotoHydrated(page, '/workbench')
   await (await barButton(page, 'Open')).click()
   await page.getByRole('menuitem', { name: /^Saved loads/ }).click()
