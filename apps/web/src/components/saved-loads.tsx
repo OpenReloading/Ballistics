@@ -166,8 +166,6 @@ export function SavedLoads({
   /** The line under the list, written in the language shown. */
   const [shown, setShown] = useState<{ say: Say }>()
   const setMessage = (say?: Say) => setShown(say && { say })
-  /** Stored loads of the earlier format, which the schema refuses. */
-  const [older, setOlder] = useState(0)
   /** Per load its firearm, sessions, last session day and gap; the stored firearms' names by id. */
   const [use, setUse] = useState({
     loads: new Map<string, LoadUse>(),
@@ -182,10 +180,9 @@ export function SavedLoads({
   useEffect(() => {
     if (!opened) return
     storedRecords()
-      .then(({ records, invalid }) => {
+      .then(({ records }) => {
         setRecords(records.filter((r): r is LoadRecord => r.kind === 'load'))
         setRead(true)
-        setOlder(invalid.filter((i) => i.kind === 'workbenchState').length)
         setUse({
           loads: loadUse(records).loads,
           firearms: new Map(
@@ -435,15 +432,6 @@ export function SavedLoads({
             </Button>
             <div className="saved-storage" role="status">
               {shown && <p>{shown.say(t)}</p>}
-              {older > 0 && (
-                <p>
-                  {tn(
-                    older,
-                    '{count} saved load has an earlier format this app no longer reads; Open lists it under Invalid records.',
-                    '{count} saved loads have an earlier format this app no longer reads; Open lists them under Invalid records.',
-                  )}
-                </p>
-              )}
               {storage.persisted !== undefined && (
                 <p>
                   {storage.persisted
