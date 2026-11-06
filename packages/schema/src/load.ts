@@ -6,47 +6,6 @@ import { type Provenance, provenance } from './provenance.ts'
 import { text } from './shared.ts'
 import { type QuantityKind, type QuantitySchema, quantity, units } from './units.ts'
 
-const kinds: Readonly<Record<AnalysisKey, QuantityKind>> = {
-  volume: 'volume',
-  boreDiameter: 'length',
-  boreArea: 'area',
-  travel: 'length',
-  twist: 'length',
-  bulletMass: 'mass',
-  bulletDiameter: 'length',
-  bulletLength: 'length',
-  bulletBcG1: 'ballisticCoefficient',
-  bulletBcG7: 'ballisticCoefficient',
-  bulletBaseLength: 'length',
-  bulletBaseDiameter: 'length',
-  bulletCavityDiameter: 'length',
-  bulletCavityDepth: 'length',
-  pmax: 'pressure',
-  caseLength: 'length',
-  bulkDensity: 'density',
-  propellantEnergy: 'specificEnergy',
-  gamma: 'dimensionless',
-  density: 'density',
-  covolume: 'specificVolume',
-  vivacity: 'burnRate',
-  exponent: 'dimensionless',
-  referencePressure: 'pressure',
-  propellantTemperature: 'temperature',
-  ignitionPressure: 'pressure',
-  startPressure: 'pressure',
-  sebert: 'dimensionless',
-  formA: 'dimensionless',
-  formM: 'dimensionless',
-  formQ: 'dimensionless',
-  formZ1: 'dimensionless',
-  leakArea: 'area',
-  throatWear: 'length',
-  boreFriction: 'pressure',
-  engravingPressure: 'pressure',
-  engravingLength: 'length',
-  firearmMass: 'mass',
-}
-
 /** A solver value a load may override: a key of {@link analysisKinds}. */
 export type AnalysisKey =
   | 'volume'
@@ -94,7 +53,46 @@ export type AnalysisKey =
  * referenced bullet record's value, and a ballistic coefficient replaces all bands of its drag
  * model. The values are in the stored unit of the quantity and become SI at the solver call.
  */
-export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = kinds
+export const analysisKinds: Readonly<Record<AnalysisKey, QuantityKind>> = {
+  volume: 'volume',
+  boreDiameter: 'length',
+  boreArea: 'area',
+  travel: 'length',
+  twist: 'length',
+  bulletMass: 'mass',
+  bulletDiameter: 'length',
+  bulletLength: 'length',
+  bulletBcG1: 'ballisticCoefficient',
+  bulletBcG7: 'ballisticCoefficient',
+  bulletBaseLength: 'length',
+  bulletBaseDiameter: 'length',
+  bulletCavityDiameter: 'length',
+  bulletCavityDepth: 'length',
+  pmax: 'pressure',
+  caseLength: 'length',
+  bulkDensity: 'density',
+  propellantEnergy: 'specificEnergy',
+  gamma: 'dimensionless',
+  density: 'density',
+  covolume: 'specificVolume',
+  vivacity: 'burnRate',
+  exponent: 'dimensionless',
+  referencePressure: 'pressure',
+  propellantTemperature: 'temperature',
+  ignitionPressure: 'pressure',
+  startPressure: 'pressure',
+  sebert: 'dimensionless',
+  formA: 'dimensionless',
+  formM: 'dimensionless',
+  formQ: 'dimensionless',
+  formZ1: 'dimensionless',
+  leakArea: 'area',
+  throatWear: 'length',
+  boreFriction: 'pressure',
+  engravingPressure: 'pressure',
+  engravingLength: 'length',
+  firearmMass: 'mass',
+}
 
 const ladderStepKindsLiteral = {
   charge: 'mass',
