@@ -1,0 +1,37 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../oxlint.logic.json"],
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@open-reloading/schema",
+                "allowTypeImports": true,
+                "message": "importers-schema-for-types-only: packages/importers uses @open-reloading/schema for types only."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@*/*", "@*/*/**", "!@open-reloading/schema"],
+                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+              },
+              {
+                "regex": "^[^.@]",
+                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+              },
+              {
+                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

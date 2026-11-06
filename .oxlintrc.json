@@ -278,61 +278,61 @@
       }
     },
     {
-      "files": ["packages/core/src/**", "packages/importers/src/**", "packages/drawing/src/**"],
+      "files": ["packages/core/src/**", "packages/drawing/src/**"],
       "rules": {
         "no-restricted-globals": [
           "error",
           {
             "name": "window",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "document",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "navigator",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "location",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "localStorage",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "sessionStorage",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "indexedDB",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "HTMLElement",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "Element",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "requestAnimationFrame",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "getComputedStyle",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "matchMedia",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           },
           {
             "name": "alert",
-            "message": "logic-no-dom: units, schema, core, importers and drawing run anywhere, so they read no browser global."
+            "message": "logic-no-dom: units, schema, core and drawing run anywhere, so they read no browser global."
           }
         ]
       }
@@ -508,37 +508,6 @@
               {
                 "regex": "^((\\.\\./)+(core|cartridge|bullet|seating)/|\\.\\./[^/]+$)",
                 "message": "drawing-target-imports: packages/drawing has no I/O, no React, DOM or Next.js. Its target folder imports only the folders target."
-              }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "files": ["packages/importers/src/**"],
-      "rules": {
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [
-              {
-                "name": "@open-reloading/schema",
-                "allowTypeImports": true,
-                "message": "importers-schema-for-types-only: packages/importers uses @open-reloading/schema for types only."
-              }
-            ],
-            "patterns": [
-              {
-                "group": ["@*/*", "@*/*/**", "!@open-reloading/schema"],
-                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
-              },
-              {
-                "regex": "^[^.@]",
-                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
-              },
-              {
-                "regex": "^(\\.\\./)+((units|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "importers-imports-schema-only: packages/importers has no I/O and imports nothing but @open-reloading/schema and its own files."
               }
             ]
           }

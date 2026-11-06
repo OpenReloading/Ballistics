@@ -22,8 +22,7 @@ const series = [
 
 /** An invented load file of the layout the reader takes: the GRT sections under `load`, a physical section and an appendix. */
 function csrFile(o: { format?: string | null; appendix?: string; physical?: string } = {}) {
-  const format =
-    o.format === undefined ? ' format="1"' : o.format === null ? '' : ` format="${o.format}"`
+  const format = o.format === null ? '' : ` format="${o.format ?? '1'}"`
   return [
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
     `<ChamberSimReloaded${format} version="9.9">`,
@@ -63,10 +62,18 @@ function csrFile(o: { format?: string | null; appendix?: string; physical?: stri
   ].join('\n')
 }
 
+/** The session ids of a file whose appendix is `appendix`. */
+const sessionIds = (appendix: string) =>
+  readCsrLoad(csrFile({ appendix }), saved)
+    .records.filter((r) => r.kind === 'session')
+    .map((r) => r.id)
+/** `n` shots of the same velocity. */
+const shots = (n: number) => '<shot velocity="700"/>'.repeat(n)
+
 const ofKind = <K extends UserRecord['kind']>(records: UserRecord[], kind: K) =>
   defined(records.find((r): r is Extract<UserRecord, { kind: K }> => r.kind === kind))
 
-describe('readCsrLoad', () => {
+describe('readCsrLoad: the load, its components and its series', () => {
   it('reads the load, its components and its measurement series, each a valid user record', () => {
     const { records, warnings } = readCsrLoad(csrFile(), saved)
     for (const r of records) expect(userRecord.safeParse(r).success, r.kind).toBe(true)
@@ -103,7 +110,9 @@ describe('readCsrLoad', () => {
     ])
     expect(warnings).toEqual([])
   })
+})
 
+describe('readCsrLoad: fields and ids', () => {
   it('accounts for every field with a value: read, not read, or warned about', () => {
     const { unmapped } = readCsrLoad(csrFile(), saved)
     expect(unmapped.toSorted((a, b) => a.localeCompare(b))).toEqual(
@@ -139,16 +148,14 @@ describe('readCsrLoad', () => {
   })
 
   it('keeps the id of a series when a repeat or another series joins the file', () => {
-    const sessionIds = (appendix: string) =>
-      readCsrLoad(csrFile({ appendix }), saved)
-        .records.filter((r) => r.kind === 'session')
-        .map((r) => r.id)
     const [single] = sessionIds(series)
     const other = series.replace('velocity="719"', 'velocity="720"')
     expect(sessionIds(other + series)[1]).toBe(single)
     expect(sessionIds(series + other + series)[0]).toBe(single)
   })
+})
 
+describe('readCsrLoad: formats, and shots without a velocity', () => {
   it('warns on another or a missing format and still reads the load', () => {
     expect(readCsrLoad(csrFile({ format: '2' }), saved).warnings[0]).toMatch(
       /^The file is of format "2"; the reader is written for format 1/,
@@ -178,9 +185,10 @@ describe('readCsrLoad', () => {
     ])
     expect(unmapped).toContain('appendix.Measurement.charge.extra')
   })
+})
 
+describe('readCsrLoad: limits and refused files', () => {
   it('leaves out the shots of a charge beyond 5000 and the charges of a series beyond 500, with warnings', () => {
-    const shots = (n: number) => '<shot velocity="700"/>'.repeat(n)
     const charges = Array.from(
       { length: 502 },
       (_, i) => `<charge name="C${i}" value="0.002">${shots(i === 0 ? 5003 : 2)}</charge>`,

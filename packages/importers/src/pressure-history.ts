@@ -103,7 +103,7 @@ function namedUnit(table: Record<string, number>, cell: string): string {
  */
 function lookup<T extends string>(table: Record<T, number>, text: string): T | undefined {
   const key = text.replace('µ', 'u').replace('μ', 'u')
-  // the keys of the table are its units
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the keys of the table are its units
   const units = Object.keys(table) as T[]
   const exact = units.find((k) => k === key)
   const loose = key === key.toLowerCase() || key === key.toUpperCase()

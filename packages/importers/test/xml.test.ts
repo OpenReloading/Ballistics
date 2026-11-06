@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { parseXml } from '../src/xml.ts'
 
-describe('parseXml', () => {
+/** `n` elements nested in one another. */
+const nest = (n: number) => `${'<e>'.repeat(n - 1)}<e/>${'</e>'.repeat(n - 1)}`
+
+describe('parseXml: markup and references', () => {
   it('reads elements, attributes, text, CDATA and prefixed names', () => {
     const xml =
       '<?xml version="1.0" encoding="UTF-8"?>\n<!-- c --><x:a xmlns:x="urn:x" k=\'1\' x:id="r"><?pi?><b>t &lt;&gt;&amp;&quot;&apos;</b><![CDATA[<raw>&]]><c/></x:a>'
@@ -35,9 +38,10 @@ describe('parseXml', () => {
       expect(() => parseXml(`<t>${ref}</t>`)).toThrow(`character reference ${ref}`)
     }
   })
+})
 
+describe('parseXml: nesting, malformed markup, limits and encodings', () => {
   it('accepts nesting of 32 and refuses 33', () => {
-    const nest = (n: number) => `${'<e>'.repeat(n - 1)}<e/>${'</e>'.repeat(n - 1)}`
     expect(parseXml(nest(32)).name).toBe('e')
     expect(() => parseXml(nest(33))).toThrow('elements nest deeper than 32')
   })

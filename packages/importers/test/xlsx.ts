@@ -25,18 +25,26 @@ interface ZipOptions {
   end?: Record<number, number>
 }
 
+/** The method, compressed data, CRC-32, size and flags a part's entries record, as given or computed. */
+function entryFields(part: Part) {
+  const data = typeof part.data === 'string' ? Buffer.from(part.data, 'utf8') : part.data
+  const method = part.method ?? 8
+  return {
+    method,
+    compressed: part.compressed ?? (method === 8 ? deflateRawSync(data) : data),
+    crc: part.crc ?? crc32(data),
+    size: part.size ?? data.length,
+    flags: (part.flags ?? 0) | (part.descriptor ? 8 : 0),
+  }
+}
+
 /** The local entry (header, name, data, descriptor) and central entry (header, name) of a part. */
 function zipPart(
   part: Part,
   offset: number,
 ): { local: Buffer[]; central: Buffer[]; length: number } {
-  const data = typeof part.data === 'string' ? Buffer.from(part.data, 'utf8') : part.data
-  const method = part.method ?? 8
-  const compressed = part.compressed ?? (method === 8 ? deflateRawSync(data) : data)
+  const { method, compressed, crc, size, flags } = entryFields(part)
   const name = Buffer.from(part.name, 'utf8')
-  const crc = part.crc ?? crc32(data)
-  const size = part.size ?? data.length
-  const flags = (part.flags ?? 0) | (part.descriptor ? 8 : 0)
   const head = Buffer.alloc(30)
   head.writeUInt32LE(0x04034b50, 0)
   head.writeUInt16LE(20, 4)
@@ -75,10 +83,12 @@ function zipPart(
 
 /** The end of central directory record; `overrides` are written over its fields. */
 function endRecord(
-  count: number,
-  directoryLength: number,
-  offset: number,
-  commentLength: number,
+  {
+    count,
+    directoryLength,
+    offset,
+    commentLength,
+  }: { count: number; directoryLength: number; offset: number; commentLength: number },
   overrides: Record<number, number>,
 ): Buffer {
   const end = Buffer.alloc(22)
@@ -108,7 +118,8 @@ export function zip(parts: Part[], options: ZipOptions = {}): Uint8Array {
   }
   const directory = Buffer.concat(central)
   const comment = Buffer.from(options.comment ?? '', 'latin1')
-  const end = endRecord(parts.length, directory.length, offset, comment.length, options.end ?? {})
+  const sizes = { count: parts.length, directoryLength: directory.length, offset }
+  const end = endRecord({ ...sizes, commentLength: comment.length }, options.end ?? {})
   return new Uint8Array(Buffer.concat([...local, directory, end, comment]))
 }
 
