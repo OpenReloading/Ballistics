@@ -48,7 +48,6 @@
     "@open-reloading/units": "workspace:*"
   },
   "devDependencies": {
-    "@open-reloading/data": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "fast-check": "catalog:",

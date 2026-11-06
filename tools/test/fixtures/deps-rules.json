@@ -306,5 +306,25 @@
   "packages/units/test/same-title.test.ts": {
     "source": "import { it } from 'vitest'\nit('runs', () => {})\nit('runs', () => {})",
     "rules": ["no-identical-title"]
+  },
+  "packages/shot-groups/src/units.ts": {
+    "source": "import { conversions } from '@open-reloading/units'\nexport { conversions }",
+    "rules": []
+  },
+  "packages/shot-groups/src/statistics.ts": {
+    "source": "import { nth } from '@open-reloading/statistics'\nexport { nth }",
+    "rules": []
+  },
+  "packages/shot-groups/src/schema.ts": {
+    "source": "import { quantity } from '@open-reloading/schema'\nexport { quantity }",
+    "rules": ["shot-groups-imports-units-statistics-only"]
+  },
+  "packages/shot-groups/src/node-fs.ts": {
+    "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
+    "rules": ["shot-groups-imports-units-statistics-only"]
+  },
+  "packages/shot-groups/src/dom.ts": {
+    "source": "export const h = () => window.innerHeight",
+    "rules": ["logic-no-dom"]
   }
 }

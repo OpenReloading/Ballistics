@@ -45,8 +45,8 @@ Public: the ring diameters, gauges and scoring rules of the cited rule books, th
 
 ## Where in the app
 
-- `apps/web/test/ring-scoring.test.ts`, `apps/web/test/ring-scoring-national.test.ts`, `apps/web/test/ring-scoring-shapes.test.ts`.
-- `apps/web/src/lib/ring-scoring.ts`.
+- `packages/shot-groups/test/ring-scoring.test.ts`, `apps/web/test/ring-scoring-national.test.ts`, `packages/shot-groups/test/ring-scoring-shapes.test.ts`.
+- `packages/shot-groups/src/ring-scoring.ts`.
 - Model page: [ring scoring](../models/ring-scoring.md).
 
 ## Confidence

@@ -8,6 +8,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/statistics/package.json packages/statistics/
+COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/core/package.json packages/core/
@@ -41,6 +42,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/units/package.json packages/units/
 COPY packages/locale-format/package.json packages/locale-format/
 COPY packages/statistics/package.json packages/statistics/
+COPY packages/shot-groups/package.json packages/shot-groups/
 COPY packages/schema/package.json packages/schema/
 COPY packages/importers/package.json packages/importers/
 COPY packages/core/package.json packages/core/
