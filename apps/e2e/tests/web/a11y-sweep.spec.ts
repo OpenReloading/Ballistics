@@ -24,7 +24,7 @@ test('every page without a dynamic segment is in the navigation, so the sweep co
   expect(routes).toEqual(expect.arrayContaining(pages.map((p) => p.href)))
 })
 
-/** Switches the system colour scheme of the open page and waits for the app to follow it. */
+/** Switches the system color scheme of the open page and waits for the app to follow it. */
 async function showScheme(page: Page, colorScheme: (typeof schemes)[number]) {
   await page.emulateMedia({ colorScheme })
   // with no stored theme the provider follows the system setting (theme.spec.ts)

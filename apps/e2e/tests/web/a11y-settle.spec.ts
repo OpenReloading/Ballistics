@@ -16,3 +16,13 @@ test('axe scans the colors a color scheme switch ends on, past endless and pause
   const { violations } = await new AxeBuilder({ page }).include('main').analyze()
   expect(violations).toEqual([])
 })
+
+test('a page still moving after 5 s fails the scan, which names what runs', async ({ page }) => {
+  await page.setContent(`<!doctype html><html lang="en"><title>Moving</title><style>
+    p { animation: slide 60s linear }
+    @keyframes slide { to { translate: 1em } }
+  </style><main><p class="far">Text</p></main></html>`)
+  await expect(new AxeBuilder({ page }).analyze()).rejects.toThrow(
+    /still moves .*: slide on p\.far$/,
+  )
+})
