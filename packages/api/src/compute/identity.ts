@@ -11,6 +11,6 @@ export const identity = {
   dataHash: z
     .string()
     .describe(
-      'SHA-256 of the data set the API ran on (every record and the renames) as 64 hex digits. It changes with any record field.',
+      'SHA-256 of the data set the API ran on (every record) as 64 hex digits. It changes with any record field.',
     ),
 }

@@ -34,7 +34,6 @@ import {
   powder,
   primer,
   type RangeFirings,
-  type Renames,
   rangeFirings,
   sourceRecord,
   type TargetFace,
@@ -75,7 +74,6 @@ import {
   checkManufacturerReferences,
   recordIds,
 } from './references.ts'
-import { checkRenames, readRenames } from './renames.ts'
 import { checkSources, sourceIndex } from './sources.ts'
 
 /** Directory `records/` of the data package, the default root of {@link readRecords}. */
@@ -145,8 +143,6 @@ export type Bundle = {
   targetMappings: TargetMapping[]
   /** Event types of competitions (`records/event-types/`); absent: none. */
   eventTypes?: EventType[] | undefined
-  /** `renames.json` of the records roots; absent: none. */
-  renames?: Renames | undefined
 }
 
 /**
@@ -188,7 +184,6 @@ function readBundle(
     disciplines: read('disciplines', discipline),
     targetMappings: read('target-mappings', targetMapping),
     eventTypes: read('event-types', eventType, true),
-    renames: readRenames(roots, errors),
   }
   const published = readPublishedLoads(roots, sources, errors)
   checkSources(sources, errors)
@@ -306,7 +301,6 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   errors.push(...checkFederations(bundle))
   errors.push(...checkEventTypes(bundle))
   errors.push(...checkCaliberClasses(bundle))
-  checkRenames(bundle, errors)
   if (roots.length === 0) throw new Error('readRecords needs at least one records root')
   const loadTables = readRootsLoadTables(roots, errors)
   for (const p of bundle.powders) {
@@ -333,7 +327,6 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
       bullets: bundle.bullets,
       powders: bundle.powders,
       primers: bundle.primers,
-      renamedPrimers: Object.keys(bundle.renames?.primers ?? {}),
     },
     errors,
   )
@@ -341,11 +334,9 @@ export function readRecords(root: string | readonly string[] = recordsDir): Read
   for (const f of collectFindings(bundle, cartridges))
     errors.push(`${f.file}: ${f.finding}: ${f.message}`)
   const warnings = published.flatMap(({ folder, file }) =>
-    // a folder under an old cartridge id reads the record that replaces it
-    checkPublishedLoadPlausibility(
-      file,
-      cartridges.get(folder) ?? cartridges.get(bundle.renames?.cartridges?.[folder] ?? ''),
-    ).map((f) => `loads/${folder}/${file.id}.json: loads ${f.load}: ${f.finding}: ${f.message}`),
+    checkPublishedLoadPlausibility(file, cartridges.get(folder)).map(
+      (f) => `loads/${folder}/${file.id}.json: loads ${f.load}: ${f.finding}: ${f.message}`,
+    ),
   )
   return { bundle, publishedLoads: published.map((p) => p.file), errors, warnings }
 }

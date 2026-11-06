@@ -14,7 +14,6 @@ import type {
   Primer,
   PrimerCompound,
   PrimerSize,
-  Renames,
   TargetFace,
   TargetMapping,
 } from '@open-reloading/schema'
@@ -289,8 +288,6 @@ export interface CatalogueIndex extends CatalogueHeader {
   eventTypes: IndexRow<EventTypeItem>[]
   /** The capacity record ids of each cartridge that has any, ordered by id. */
   capacities: Record<string, string[]>
-  /** The ids that no longer name a record, by kind, each with the id that replaces it. */
-  renames: Renames
 }
 
 /** The record file: the header and every record by id, one map per kind. */
@@ -314,8 +311,6 @@ export interface CatalogueSource {
   caliberClasses: CaliberClass[]
   /** Absent: none, as in a bundle without event types. */
   eventTypes?: EventType[] | undefined
-  /** `renames.json` of the records; absent: none. */
-  renames?: Renames | undefined
 }
 
 /** What `openCatalogue` opens: the index and the record file, or a function that reads it on first `get`. */
@@ -356,12 +351,10 @@ export interface Catalogue {
   eventTypes(): CataloguePage<EventTypeItem>
   /** The record `id` of `kind`; undefined if unknown. */
   get<K extends CatalogueKind>(kind: K, id: string): Catalogued<K> | undefined
-  /** The id that replaces `id` of a route kind where it was renamed or removed; undefined otherwise. */
-  renamed(kind: string, id: string): string | undefined
   /** The case capacity records of a cartridge, ordered by id. */
   capacities(cartridge: string): Catalogued<'caseCapacity'>[]
   /**
-   * The SHA-256 of the whole data set (every record and the renames) as 64 hex digits: the same
+   * The SHA-256 of the whole data set (every record) as 64 hex digits: the same
    * records give the same value, any changed field changes it. Reads the record file on the first call.
    */
   dataHash(): Promise<string>
