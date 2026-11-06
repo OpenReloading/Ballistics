@@ -48,7 +48,9 @@ describe('ladderFlatSpots', () => {
     expect((s.halfWidth * 0.0001) / Math.SQRT2).toBeCloseTo(2.306004, 5)
     expect(s.counts).toEqual([4, 9])
   })
+})
 
+describe('ladderFlatSpots flat runs and checks', () => {
   it('calls a band of width 0 flat when the means are equal', () => {
     const r = ladderFlatSpots([step(0, 700, 5, 0), step(1, 700, 5, 0)])
     expect(nth(r.segments, 0).halfWidth).toBe(0)

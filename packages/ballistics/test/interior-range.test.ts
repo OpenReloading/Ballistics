@@ -40,6 +40,9 @@ const toy: Toy = { q: 2, b: 3, v: 5 }
 /** Monotone closed form: rises with charge and burn rate, falls with volume. */
 const closed = (l: Toy) => (7 * l.q ** 2 * l.b) / l.v
 
+/** A peak of the toy load with its maximum at q = 1. */
+const hill = (l: Toy) => 1 - (l.q - 1) ** 2
+
 describe('toleranceRange', () => {
   it('finds the box extremes of a monotone closed form', () => {
     const p0 = closed(toy)
@@ -72,8 +75,24 @@ describe('toleranceRange', () => {
     ).toBe(false)
   })
 
+  it('turns a non-finite peak into a nonFinite case', () => {
+    const r = toleranceRange(
+      toy,
+      1,
+      { apply: toyApply, peak: (l) => (l.q > 2 ? Number.POSITIVE_INFINITY : 1) },
+      toyTolerances,
+    )
+    expect(r.cases[0]).toMatchObject({
+      input: 'chargeFraction',
+      side: 1,
+      maxPressure: null,
+      reason: 'nonFinite',
+    })
+  })
+})
+
+describe('toleranceRange with an input at its nominal peak', () => {
   it('keeps an input nominal in the combined runs when its peak lies at the nominal', () => {
-    const hill = (l: Toy) => 1 - (l.q - 1) ** 2
     const one = { ...toy, q: 1 }
     const r = toleranceRange(
       one,
@@ -91,7 +110,9 @@ describe('toleranceRange', () => {
     expect(r.cases.at(-2)?.maxPressure).toBe(1)
     expect(r.highPressure).toBe(1)
   })
+})
 
+describe('toleranceRange with failed cases', () => {
   it('lists failed cases with their reason and marks the range incomplete', () => {
     const p0 = closed(toy)
     const capped = {
@@ -129,29 +150,15 @@ describe('toleranceRange', () => {
     expect(none).toMatchObject({ lowPressure: p0, highPressure: p0, complete: false })
     expect(none.cases.every((c) => c.reason === 'stuck')).toBe(true)
   })
-
-  it('turns a non-finite peak into a nonFinite case', () => {
-    const r = toleranceRange(
-      toy,
-      1,
-      { apply: toyApply, peak: (l) => (l.q > 2 ? Number.POSITIVE_INFINITY : 1) },
-      toyTolerances,
-    )
-    expect(r.cases[0]).toMatchObject({
-      input: 'chargeFraction',
-      side: 1,
-      maxPressure: null,
-      reason: 'nonFinite',
-    })
-  })
 })
 
-describe('interiorPressureRange', () => {
-  const peak = (l: InteriorLoad) => {
-    const r = interior(l)
-    return r.valid ? r.peakBreechPressure : Number.NaN
-  }
+/** The peak breech pressure of the interior model, NaN for an invalid run. */
+const peak = (l: InteriorLoad) => {
+  const r = interior(l)
+  return r.valid ? r.peakBreechPressure : Number.NaN
+}
 
+describe('interiorPressureRange', () => {
   it('places a maximum against the range of the interior model', () => {
     const range = interiorPressureRange(m3Load, peak(m3Load))
     expect(placeMaximum(range, range.lowPressure * 0.9).class).toBe('modelDiscrepancy')
@@ -163,7 +170,7 @@ describe('interiorPressureRange', () => {
     const p0 = peak(m3Load)
     const r = interiorPressureRange(m3Load, p0)
     for (const input of ['temperatureKelvin', 'startPressureFraction'])
-      for (const c of r.cases.filter((c) => c.input === input)) expect(c.maxPressure).toBe(p0)
+      for (const c of r.cases.filter((k) => k.input === input)) expect(c.maxPressure).toBe(p0)
     expect(r.cases.at(-2)?.sides).toMatchObject({ temperatureKelvin: 0, startPressureFraction: 0 })
     expect(r.lowPressure).toBeLessThan(p0)
     expect(r.highPressure).toBeGreaterThan(p0)
@@ -183,7 +190,9 @@ describe('interiorPressureRange', () => {
     const down = nth(moved, 1)
     expect(up.maxPressure).toBeGreaterThan(down.maxPressure ?? Number.POSITIVE_INFINITY)
   })
+})
 
+describe('interiorPressureRange combined case', () => {
   it('runs the combined case as built by hand', () => {
     // temperature coefficients and a start pressure, so every input moves the peak
     const load: InteriorLoad = {
@@ -225,7 +234,9 @@ describe('interiorPressureRange', () => {
     expect(high?.maxPressure).toBe(peak(byHand))
     expect(r.highPressure).toBe(high?.maxPressure)
   })
+})
 
+describe('interiorPressureRange of a geometric burn', () => {
   it('moves the geometric burn coefficient', () => {
     const load: InteriorLoad = {
       ...m3Load,

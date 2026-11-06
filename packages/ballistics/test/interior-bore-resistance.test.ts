@@ -106,14 +106,16 @@ describe('bore resistance of a record for a run', () => {
   })
 })
 
+/** One value of a cartridge record. */
+const cartridgeValue = (side: string, symbol: string, value?: number) => ({ side, symbol, value })
+
 describe('G1 and Z of a cartridge record', () => {
-  const v = (side: string, symbol: string, value?: number) => ({ side, symbol, value })
   const cartridge = {
     values: [
-      v('cartridge', 'G1', 7.9),
-      v('cartridge', 'G1', 7.85),
-      v('chamber', 'Z', 7.82),
-      v('chamber', 'Z', 7.9),
+      cartridgeValue('cartridge', 'G1', 7.9),
+      cartridgeValue('cartridge', 'G1', 7.85),
+      cartridgeValue('chamber', 'Z', 7.82),
+      cartridgeValue('chamber', 'Z', 7.9),
     ],
   }
 
@@ -123,7 +125,7 @@ describe('G1 and Z of a cartridge record', () => {
   })
 
   it('gives none without a value', () => {
-    const none = { values: [v('chamber', 'Z')] }
+    const none = { values: [cartridgeValue('chamber', 'Z')] }
     expect(cartridgeBulletDiameterMm(none)).toBeUndefined()
     expect(cartridgeGrooveDiameterMm(none)).toBeUndefined()
   })

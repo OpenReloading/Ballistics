@@ -2,6 +2,20 @@ import { InputError } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import { freeRecoil, gasVelocityFactor } from '../src/index.ts'
 
+/** The recoil energy of a 1 kg firearm, J: projectile and charge in g, muzzle velocity m/s, gas factor f. */
+const recoilEnergy = (mp: number, mc: number, v: number, f: number) =>
+  freeRecoil({
+    firearmMass: 1,
+    projectileMass: mp / 1000,
+    chargeMass: mc / 1000,
+    muzzleVelocity: v,
+    gasFactor: f,
+  }).energy
+/** Gas factor forms: a constant gas speed of 1250 m/s, that speed plus half, and an outflow at the gas velocity va. */
+const constantSpeedFactor = (v: number) => 1250 / v
+const incrementFactor = (v: number) => 0.5 + 1250 / v
+const outflowFactor = (v: number, va: number) => 0.5 + va / v
+
 describe('freeRecoil', () => {
   it('rifle: 4 kg gun, 10 g at 800 m/s, 3 g charge, factor 1.75', () => {
     // momentum 0.01 * 800 + 0.003 * 1.75 * 800 = 8 + 4.2 = 12.2 kg m/s
@@ -43,7 +57,9 @@ describe('freeRecoil', () => {
     expect(r.momentum).toBeCloseTo(10, 12)
     expect(r.energy).toBeCloseTo(10, 12)
   })
+})
 
+describe('freeRecoil worked example and limits', () => {
   it('reproduces the SAAMI worked example in SI', () => {
     // 7 lb gun, 589.9 gr ejecta, 33.4 gr charge, 1275 ft/s, factor 1.5, with 1 lb = 0.45359237 kg,
     // 1 gr = 64.79891 mg, 1 ft = 0.3048 m, 1 ft lbf = 1.3558179483 J.
@@ -63,6 +79,23 @@ describe('freeRecoil', () => {
     expect(r.energy / 1.3558179483).toBeCloseTo(30.168, 3)
   })
 
+  it('rejects values outside the model', () => {
+    const ok = {
+      firearmMass: 4,
+      projectileMass: 0.01,
+      chargeMass: 0.003,
+      muzzleVelocity: 800,
+      gasFactor: 1.75,
+    }
+    expect(() => freeRecoil({ ...ok, firearmMass: 0 })).toThrow(InputError)
+    expect(() => freeRecoil({ ...ok, projectileMass: -1 })).toThrow(InputError)
+    expect(() => freeRecoil({ ...ok, chargeMass: -0.001 })).toThrow(InputError)
+    expect(() => freeRecoil({ ...ok, muzzleVelocity: Number.NaN })).toThrow(InputError)
+    expect(() => freeRecoil({ ...ok, gasFactor: -1 })).toThrow(InputError)
+  })
+})
+
+describe('freeRecoil gas factor forms', () => {
   it('energy spread of other gas factor forms over ten typical loads', () => {
     // Projectile g, charge g, muzzle velocity m/s, typical gas outflow speed m/s. The ranges are
     // those of the research log entry free-recoil-gas-factor.md, in percent of today's energy.
@@ -82,47 +115,25 @@ describe('freeRecoil', () => {
         [11.7, 4.5, 900, 1050],
       ],
     } as const
-    const energy = (mp: number, mc: number, v: number, f: number) =>
-      freeRecoil({
-        firearmMass: 1,
-        projectileMass: mp / 1000,
-        chargeMass: mc / 1000,
-        muzzleVelocity: v,
-        gasFactor: f,
-      }).energy
     const spread = (kind: keyof typeof loads, form: (v: number, va: number) => number) => {
       const d = loads[kind].map(
         ([mp, mc, v, va]) =>
-          100 * (energy(mp, mc, v, form(v, va)) / energy(mp, mc, v, gasVelocityFactor[kind]) - 1),
+          100 *
+          (recoilEnergy(mp, mc, v, form(v, va)) / recoilEnergy(mp, mc, v, gasVelocityFactor[kind]) -
+            1),
       )
       return [Math.min(...d), Math.max(...d)].map((x) => Math.round(10 * x) / 10)
     }
-    const constantSpeed = (v: number) => 1250 / v
-    const increment = (v: number) => 0.5 + 1250 / v
-    const outflow = (v: number, va: number) => 0.5 + va / v
-    expect(spread('pistol', constantSpeed)).toEqual([15.3, 25.5])
-    expect(spread('rifle', constantSpeed)).toEqual([-22.9, -6.7])
-    expect(spread('pistol', increment)).toEqual([17.9, 35.3])
-    expect(spread('rifle', increment)).toEqual([0.6, 11.7])
-    expect(spread('pistol', outflow)).toEqual([4.1, 8.9])
-    expect(spread('rifle', outflow)).toEqual([-11.6, -3.5])
+    expect(spread('pistol', constantSpeedFactor)).toEqual([15.3, 25.5])
+    expect(spread('rifle', constantSpeedFactor)).toEqual([-22.9, -6.7])
+    expect(spread('pistol', incrementFactor)).toEqual([17.9, 35.3])
+    expect(spread('rifle', incrementFactor)).toEqual([0.6, 11.7])
+    expect(spread('pistol', outflowFactor)).toEqual([4.1, 8.9])
+    expect(spread('rifle', outflowFactor)).toEqual([-11.6, -3.5])
   })
+})
 
-  it('rejects values outside the model', () => {
-    const ok = {
-      firearmMass: 4,
-      projectileMass: 0.01,
-      chargeMass: 0.003,
-      muzzleVelocity: 800,
-      gasFactor: 1.75,
-    }
-    expect(() => freeRecoil({ ...ok, firearmMass: 0 })).toThrow(InputError)
-    expect(() => freeRecoil({ ...ok, projectileMass: -1 })).toThrow(InputError)
-    expect(() => freeRecoil({ ...ok, chargeMass: -0.001 })).toThrow(InputError)
-    expect(() => freeRecoil({ ...ok, muzzleVelocity: Number.NaN })).toThrow(InputError)
-    expect(() => freeRecoil({ ...ok, gasFactor: -1 })).toThrow(InputError)
-  })
-
+describe('freeRecoil invalid fields', () => {
   it('names the invalid field and accepts each inclusive limit', () => {
     const ok = {
       firearmMass: 4,

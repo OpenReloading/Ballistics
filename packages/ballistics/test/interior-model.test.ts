@@ -112,12 +112,60 @@ const rifle = (ignitionPressure = 1e3) =>
     ignitionPressure,
   })
 
-describe('closed vessel', () => {
-  const withCovolume = (eta: number) => ({
-    ...rifle(1e6),
-    propellant: { ...rifle().propellant, covolume: eta },
-  })
+const withCovolume = (eta: number) => ({
+  ...rifle(1e6),
+  propellant: { ...rifle().propellant, covolume: eta },
+})
 
+// with eta = 1/rho, p = a z / b, so dz/dt = B_a tau_T phi(z) (a z / (b p_ref))^n
+const vesselA = 0.23 * 0.0028 * 3.9e6
+const vesselB = 3.4e-6 - 0.0028 / 1600
+const vesselGas = { a: vesselA, b: vesselB, z0: (1e6 * vesselB) / vesselA }
+const vessel = (burn: InteriorLoad['propellant']['burn'], temperature = 294.15): InteriorLoad => {
+  const load = withCovolume(1 / 1600)
+  return {
+    ...load,
+    propellant: {
+      ...load.propellant,
+      burn,
+      temperatureSensitivity: { reference: 294.15, cold: 1e-3, hot: 2e-3 },
+    },
+    propellantTemperature: temperature,
+  }
+}
+const constantForm = (exponent: number) =>
+  ({
+    kind: 'vivacity',
+    vivacity: 0.56,
+    exponent,
+    referencePressure: pref,
+    form: { kind: 'constant' },
+  }) as const
+
+type VivacityForm = Extract<InteriorLoad['propellant']['burn'], { kind: 'vivacity' }>['form']
+
+/** The closed vessel burning `form` at vivacity 0.56 and exponent 1. */
+const formVessel = (form: VivacityForm, config: Parameters<typeof closedVessel>[1] = {}) =>
+  closedVessel(
+    vessel({ kind: 'vivacity', vivacity: 0.56, exponent: 1, referencePressure: pref, form }),
+    config,
+  )
+
+/** Simpson's rule in ln z over the first stage: the integral of dz / (z phi(z)), phi = (1 + a z)^m, from z0 to z1. */
+function firstStage(z0: number, z1: number, am: number, m: number) {
+  const steps = 4000
+  const lo = Math.log(z0)
+  const hh = (Math.log(z1) - lo) / steps
+  let stage1 = 0
+  for (let i = 0; i <= steps; i++) {
+    // the weights 1, 4, 2, 4, ..., 2, 4, 1
+    const weight = i === 0 || i === steps ? 1 : 2 + 2 * (i % 2)
+    stage1 += weight / (1 + am * Math.exp(lo + i * hh)) ** m
+  }
+  return stage1 * (hh / 3)
+}
+
+describe('closed vessel', () => {
   it.each([0, 1 / 1600, 1e-3])('final pressure (k-1) m_c Q / (V_c - eta m_c), eta = %s', (eta) => {
     const r = closedVessel(withCovolume(eta))
     if (!r.valid) throw new Error(r.reason)
@@ -136,72 +184,36 @@ describe('closed vessel', () => {
     expect(rel(r.burnoutTime, t)).toBeLessThan(1e-8)
   })
 
-  // with eta = 1/rho, p = a z / b, so dz/dt = B_a tau_T phi(z) (a z / (b p_ref))^n
-  const a = 0.23 * 0.0028 * 3.9e6
-  const b = 3.4e-6 - 0.0028 / 1600
-  const z0 = (1e6 * b) / a
-  const vessel = (burn: InteriorLoad['propellant']['burn'], temperature = 294.15): InteriorLoad => {
-    const load = withCovolume(1 / 1600)
-    return {
-      ...load,
-      propellant: {
-        ...load.propellant,
-        burn,
-        temperatureSensitivity: { reference: 294.15, cold: 1e-3, hot: 2e-3 },
-      },
-      propellantTemperature: temperature,
-    }
-  }
-  const constant = (exponent: number) =>
-    ({
-      kind: 'vivacity',
-      vivacity: 0.56,
-      exponent,
-      referencePressure: pref,
-      form: { kind: 'constant' },
-    }) as const
-
   it('burn time with pressure exponent n = 0.8', () => {
-    const r = closedVessel(vessel(constant(0.8)))
+    const { a, b, z0 } = vesselGas
+    const r = closedVessel(vessel(constantForm(0.8)))
     if (!r.valid) throw new Error(r.reason)
     const t = ((b * pref) / a) ** 0.8 * ((1 - z0 ** 0.2) / (0.2 * 0.56))
     expect(rel(r.burnoutTime, t)).toBeLessThan(1e-8)
   })
 
   it('burn time scales as 1/tau_T with the propellant temperature', () => {
-    const ref = closedVessel(vessel(constant(1)))
-    const hot = closedVessel(vessel(constant(1), 314.15))
-    const cold = closedVessel(vessel(constant(1), 274.15))
+    const ref = closedVessel(vessel(constantForm(1)))
+    const hot = closedVessel(vessel(constantForm(1), 314.15))
+    const cold = closedVessel(vessel(constantForm(1), 274.15))
     if (!ref.valid || !hot.valid || !cold.valid) throw new Error('invalid')
     expect(rel(hot.burnoutTime * Math.exp(2e-3 * 20), ref.burnoutTime)).toBeLessThan(1e-9)
     expect(rel(cold.burnoutTime * Math.exp(-1e-3 * 20), ref.burnoutTime)).toBeLessThan(1e-9)
   })
+})
 
+describe('closed vessel form functions', () => {
   it('burn time of the two-stage form function', () => {
+    const { a, b, z0 } = vesselGas
     const [ba, am, m, q, z1] = [0.56, 1.2, 0.4, 0.3, 0.45]
-    const r = closedVessel(
-      vessel({
-        kind: 'vivacity',
-        vivacity: ba,
-        exponent: 1,
-        referencePressure: pref,
-        form: { kind: 'twoStage', a: am, m, q, z1 },
-      }),
+    const r = formVessel(
+      { kind: 'twoStage', a: am, m, q, z1 },
       // phi has an infinite slope at z = 1; the default tolerances leave 5e-7 in the burn time
       { relativeTolerance: 1e-11, absoluteTolerance: 1e-13 },
     )
     if (!r.valid) throw new Error(r.reason)
     // t = b p_ref / (B_a a) * integral of dz / (z phi(z)) from z0 to 1
-    // stage 1: Simpson in ln z
-    const steps = 4000
-    const lo = Math.log(z0)
-    const hh = (Math.log(z1) - lo) / steps
-    let stage1 = 0
-    for (let i = 0; i <= steps; i++) {
-      const weight = i === 0 || i === steps ? 1 : i % 2 ? 4 : 2
-      stage1 += weight / (1 + am * Math.exp(lo + i * hh)) ** m
-    }
-    stage1 *= hh / 3
+    const stage1 = firstStage(z0, z1, am, m)
     // stage 2: with u = (1 - z)/(1 - z1), 1/z expands as a geometric series in (1 - z1) u
     let stage2 = 0
     for (let j = 0; j < 200; j++) stage2 += (1 - z1) ** (j + 1) / (j + 1 - q)
@@ -212,35 +224,18 @@ describe('closed vessel', () => {
 
   it.each([
     // the third stage runs in a transformed variable, so r near 1 reaches z = 1 at the series time
-    [1.2, 0.4, 1.5, 0.45, 0.85, 0.3, {}, 1e-8],
-    [1.2, 0.4, 1.5, 0.45, 0.85, 0.9, {}, 1e-8],
-    [1.2, 0.4, 1.5, 0.45, 0.85, 0.99, {}, 1e-8],
-    [1.2, 0.4, 0.3, 0.45, 0.8, 0, {}, 1e-10],
+    { am: 1.2, m: 0.4, q: 1.5, z1: 0.45, z2: 0.85, r: 0.3, config: {}, limit: 1e-8 },
+    { am: 1.2, m: 0.4, q: 1.5, z1: 0.45, z2: 0.85, r: 0.9, config: {}, limit: 1e-8 },
+    { am: 1.2, m: 0.4, q: 1.5, z1: 0.45, z2: 0.85, r: 0.99, config: {}, limit: 1e-8 },
+    { am: 1.2, m: 0.4, q: 0.3, z1: 0.45, z2: 0.8, r: 0, config: {}, limit: 1e-10 },
   ] as const)(
-    'burn time of the three-stage form a %s, m %s, q %s, z1 %s, z2 %s, r %s',
-    (am, m, q, z1, z2, r, config, limit) => {
+    'burn time of the three-stage form a $am, m $m, q $q, z1 $z1, z2 $z2, r $r',
+    ({ am, m, q, z1, z2, r, config, limit }) => {
+      const { a, b, z0 } = vesselGas
       const ba = 0.56
-      const run = closedVessel(
-        vessel({
-          kind: 'vivacity',
-          vivacity: ba,
-          exponent: 1,
-          referencePressure: pref,
-          form: { kind: 'threeStage', a: am, m, q, z1, z2, r },
-        }),
-        config,
-      )
+      const run = formVessel({ kind: 'threeStage', a: am, m, q, z1, z2, r }, config)
       if (!run.valid) throw new Error(run.reason)
-      // stage 1: Simpson in ln z
-      const steps = 4000
-      const lo = Math.log(z0)
-      const hh = (Math.log(z1) - lo) / steps
-      let stage1 = 0
-      for (let i = 0; i <= steps; i++) {
-        const weight = i === 0 || i === steps ? 1 : i % 2 ? 4 : 2
-        stage1 += weight / (1 + am * Math.exp(lo + i * hh)) ** m
-      }
-      stage1 *= hh / 3
+      const stage1 = firstStage(z0, z1, am, m)
       // stages 2 and 3: 1/z as a geometric series in (1 - z_k) u, u = (1 - z)/(1 - z_k), integrated term by term
       const phi1 = (1 + am * z1) ** m
       const u2 = (1 - z2) / (1 - z1)
@@ -281,7 +276,9 @@ describe('constant-surface closed form', () => {
       // the ignition gas offsets the solution by a multiple of z0/z (z0 = 6.6e-8 here)
       const tol = 2e-6 / pt.burntFraction
       expect(rel(pt.velocity, cf.velocity(xi))).toBeLessThan(tol)
-      if (pt.travel <= burnout) expect(rel(pt.meanPressure, cf.pressure(xi))).toBeLessThan(tol)
+      // the closed-form pressure holds up to burnout
+      const pressureError = pt.travel <= burnout ? rel(pt.meanPressure, cf.pressure(xi)) : 0
+      expect(pressureError).toBeLessThan(tol)
     }
   })
 })
@@ -370,8 +367,26 @@ function trapezoid(
 
 /** Before the shot starts the gas is at the flame temperature of 2900 K. */
 function expectFlameTemperatureWhileHeld(r: InteriorPoints) {
-  for (const p of r.points)
-    if (p.time < r.shotStartTime) expect(rel(p.gasTemperature ?? 0, 2900)).toBeLessThan(1e-12)
+  for (const p of r.points.filter((q) => q.time < r.shotStartTime))
+    expect(rel(p.gasTemperature ?? 0, 2900)).toBeLessThan(1e-12)
+}
+
+const fullMpr = 0.0095 * (1 + ((2 * Math.PI * 7e-3) / (2 * Math.SQRT2 * 0.254)) ** 2)
+/** The engraving pressure of `full()` at travel `x`. */
+const engraving = (x: number) => {
+  const pr = [
+    [0.001, 0],
+    [0.003, 50e6],
+    [0.008, 10e6],
+  ]
+  for (let i = 1; i < pr.length; i++)
+    if (x >= nth(nth(pr, i - 1), 0) && x <= nth(nth(pr, i), 0))
+      return (
+        nth(nth(pr, i - 1), 1) +
+        ((x - nth(nth(pr, i - 1), 0)) * (nth(nth(pr, i), 1) - nth(nth(pr, i - 1), 1))) /
+          (nth(nth(pr, i), 0) - nth(nth(pr, i - 1), 0))
+      )
+  return 0
 }
 
 describe('energy and consistency checks', () => {
@@ -401,7 +416,9 @@ describe('energy and consistency checks', () => {
     )
     for (const v of invariant) expect(rel(v, nth(invariant, 0))).toBeLessThan(1e-12)
   })
+})
 
+describe('pressure gradient checks', () => {
   // consistency: the ratios follow from the gradient formulas
   it('Lagrange pressure ratios without resistance', () => {
     const load: InteriorLoad = {
@@ -419,23 +436,6 @@ describe('energy and consistency checks', () => {
     }
   })
 
-  const fullMpr = 0.0095 * (1 + ((2 * Math.PI * 7e-3) / (2 * Math.SQRT2 * 0.254)) ** 2)
-  const engraving = (x: number) => {
-    const pr = [
-      [0.001, 0],
-      [0.003, 50e6],
-      [0.008, 10e6],
-    ]
-    for (let i = 1; i < pr.length; i++)
-      if (x >= nth(nth(pr, i - 1), 0) && x <= nth(nth(pr, i), 0))
-        return (
-          nth(nth(pr, i - 1), 1) +
-          ((x - nth(nth(pr, i - 1), 0)) * (nth(nth(pr, i), 1) - nth(nth(pr, i - 1), 1))) /
-            (nth(nth(pr, i), 0) - nth(nth(pr, i - 1), 0))
-        )
-    return 0
-  }
-
   it('base and breech pressure with bore resistance', () => {
     const r = interior(full())
     if (!r.valid) throw new Error(r.reason)
@@ -451,7 +451,9 @@ describe('energy and consistency checks', () => {
       ).toBeLessThan(1e-9)
     }
   })
+})
 
+describe('heat loss check', () => {
   it('heat loss equals the quadrature of the convective flux over the curve', () => {
     const [area, d, vc, mc, k] = [3.75e-5, 7e-3, 3.4e-6, 0.0028, 1.23]
     const gasR = ((k - 1) * 3.9e6) / 2900
@@ -549,7 +551,33 @@ describe('event location', () => {
     const start = slow.points.find((p) => p.time === slow.shotStartTime)
     expect(rel(start?.meanPressure ?? 0, 4e6)).toBeLessThan(1e-9)
   })
+})
 
+/** The rifle load at an ignition pressure of 1e5 Pa, burning `form` at vivacity 0.56 and exponent 1. */
+const withForm = (form: VivacityForm, config: Partial<InteriorOptions> = {}) => {
+  const load = rifle(1e5)
+  return interior(
+    {
+      ...load,
+      propellant: {
+        ...load.propellant,
+        burn: { kind: 'vivacity', vivacity: 0.56, exponent: 1, referencePressure: pref, form },
+      },
+    },
+    config,
+  )
+}
+
+const staged: [string, VivacityForm, number[]][] = [
+  ['two-stage', { kind: 'twoStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45 }, [0.45]],
+  [
+    'three-stage',
+    { kind: 'threeStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45, z2: 0.8, r: 0.3 },
+    [0.45, 0.8],
+  ],
+]
+
+describe('event location of the form functions', () => {
   it('one stage (z1 = 1) with a = 0 runs as the constant form', () => {
     const load = rifle(1e5)
     const single: InteriorLoad = {
@@ -569,23 +597,6 @@ describe('event location', () => {
     expect(closedVessel(single)).toEqual(closedVessel(load))
   })
 
-  const withForm = (
-    form: Extract<InteriorLoad['propellant']['burn'], { kind: 'vivacity' }>['form'],
-    config: Partial<InteriorOptions> = {},
-  ) => {
-    const load = rifle(1e5)
-    return interior(
-      {
-        ...load,
-        propellant: {
-          ...load.propellant,
-          burn: { kind: 'vivacity', vivacity: 0.56, exponent: 1, referencePressure: pref, form },
-        },
-      },
-      config,
-    )
-  }
-
   it.each([0.6, 0.8, 0.95])('three stages with r = q and z2 = %s run as two stages', (z2) => {
     const two = withForm({ kind: 'twoStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45 })
     const three = withForm({ kind: 'threeStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45, z2, r: 0.3 })
@@ -601,14 +612,6 @@ describe('event location', () => {
     expect(rel(three.burnout.travel, twoTight.burnout.travel)).toBeLessThan(1e-7)
   })
 
-  const staged: [string, Parameters<typeof withForm>[0], number[]][] = [
-    ['two-stage', { kind: 'twoStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45 }, [0.45]],
-    [
-      'three-stage',
-      { kind: 'threeStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45, z2: 0.8, r: 0.3 },
-      [0.45, 0.8],
-    ],
-  ]
   it.each(staged)('stores a point at every %s breakpoint', (_, form, breakpoints) => {
     const r = withForm(form)
     if (!r.valid) throw new Error(r.reason)
@@ -618,16 +621,67 @@ describe('event location', () => {
   })
 })
 
+/** The full load the failures start from. */
+const fullLoad = full()
+
+/** Loads with one input outside its domain, with the field the refusal names. */
+const invalidInputs: [string, InteriorLoad][] = [
+  ['bullet.mass', { ...fullLoad, bullet: { mass: -1 } }],
+  ['propellant.gamma', { ...fullLoad, propellant: { ...fullLoad.propellant, gamma: 1 } }],
+  ['propellantTemperature', { ...fullLoad, propellantTemperature: Number.NaN }],
+  ['ignitionPressure', { ...fullLoad, ignitionPressure: 0 }],
+  ['ignitionPressure', { ...fullLoad, ignitionPressure: 1e12 }],
+  [
+    'resistance.engraving',
+    {
+      ...fullLoad,
+      resistance: {
+        engraving: [
+          { travel: 0.01, pressure: 0 },
+          { travel: 0.01, pressure: 1e6 },
+        ],
+      },
+    },
+  ],
+  [
+    'propellant.burn.grain.perforationDiameter',
+    {
+      ...fullLoad,
+      propellant: {
+        ...fullLoad.propellant,
+        burn: {
+          kind: 'geometric',
+          coefficient: 1e-9,
+          exponent: 1,
+          grain: { shape: 'sevenPerf', diameter: 1e-3, perforationDiameter: 4e-4, length: 2e-3 },
+        },
+      },
+    },
+  ],
+  [
+    'heat',
+    {
+      ...fullLoad,
+      heat: {
+        model: 'convective',
+        flameTemperature: 0,
+        wallTemperature: 300,
+        viscosity: 8e-5,
+        prandtl: 0.7,
+      },
+    },
+  ],
+]
+
 describe('failure reasons', () => {
-  const base = full()
   it.each([
-    ['chamberVolume', { ...base, charge: 0.006 }],
-    ['chamberVolume', { ...base, propellant: { ...base.propellant, covolume: 2e-3 } }],
-    ['noShotStart', { ...base, startPressure: 1e10 }],
+    ['chamberVolume', { ...fullLoad, charge: 0.006 }],
+    ['chamberVolume', { ...fullLoad, propellant: { ...fullLoad.propellant, covolume: 2e-3 } }],
+    ['noShotStart', { ...fullLoad, startPressure: 1e10 }],
     [
       'stuck',
       {
-        ...base,
+        ...fullLoad,
         resistance: {
           engraving: [
             { travel: 0.1, pressure: 0 },
@@ -653,54 +707,10 @@ describe('failure reasons', () => {
     expect(r.muzzleVelocity).toBeCloseTo(189.4, 1)
     expect(highest).toBeCloseTo(195.6, 1)
   })
+})
 
-  it.each([
-    ['bullet.mass', { ...base, bullet: { mass: -1 } }],
-    ['propellant.gamma', { ...base, propellant: { ...base.propellant, gamma: 1 } }],
-    ['propellantTemperature', { ...base, propellantTemperature: Number.NaN }],
-    ['ignitionPressure', { ...base, ignitionPressure: 0 }],
-    ['ignitionPressure', { ...base, ignitionPressure: 1e12 }],
-    [
-      'resistance.engraving',
-      {
-        ...base,
-        resistance: {
-          engraving: [
-            { travel: 0.01, pressure: 0 },
-            { travel: 0.01, pressure: 1e6 },
-          ],
-        },
-      },
-    ],
-    [
-      'propellant.burn.grain.perforationDiameter',
-      {
-        ...base,
-        propellant: {
-          ...base.propellant,
-          burn: {
-            kind: 'geometric',
-            coefficient: 1e-9,
-            exponent: 1,
-            grain: { shape: 'sevenPerf', diameter: 1e-3, perforationDiameter: 4e-4, length: 2e-3 },
-          },
-        },
-      },
-    ],
-    [
-      'heat',
-      {
-        ...base,
-        heat: {
-          model: 'convective',
-          flameTemperature: 0,
-          wallTemperature: 300,
-          viscosity: 8e-5,
-          prandtl: 0.7,
-        },
-      },
-    ],
-  ] as [string, InteriorLoad][])('input: %s', (field, load) => {
+describe('failure reasons of the inputs', () => {
+  it.each(invalidInputs)('input: %s', (field, load) => {
     expect(interior(load)).toEqual({ valid: false, reason: 'input', field })
   })
 
@@ -708,16 +718,32 @@ describe('failure reasons', () => {
     'input: option %s not positive and finite',
     (field) => {
       for (const v of [0, -1, Number.NaN, Number.POSITIVE_INFINITY])
-        expect(interior(base, { [field]: v })).toEqual({ valid: false, reason: 'input', field })
+        expect(interior(fullLoad, { [field]: v })).toEqual({ valid: false, reason: 'input', field })
     },
   )
 
   it('maxTime and integration', () => {
-    expect(interior(base, { maxTime: 1e-5 })).toEqual({ valid: false, reason: 'maxTime' })
-    expect(interior(base, { maxSteps: 10 })).toEqual({ valid: false, reason: 'integration' })
-    expect(closedVessel(base, { maxTime: 1e-6 })).toEqual({ valid: false, reason: 'maxTime' })
+    expect(interior(fullLoad, { maxTime: 1e-5 })).toEqual({ valid: false, reason: 'maxTime' })
+    expect(interior(fullLoad, { maxSteps: 10 })).toEqual({ valid: false, reason: 'integration' })
+    expect(closedVessel(fullLoad, { maxTime: 1e-6 })).toEqual({ valid: false, reason: 'maxTime' })
   })
 })
+
+/** full() with a constant leak area from travel 0 to the muzzle. */
+const leaky = (area: number, extra = {}): InteriorLoad => ({
+  ...full(),
+  leakage: {
+    area: [
+      { travel: 0, area },
+      { travel: 0.6, area },
+    ],
+    ...extra,
+  },
+})
+
+/** The subsonic branch of the orifice flow factor at the pressure ratio `r`. */
+const subsonic = (k: number, r: number) =>
+  Math.sqrt(((2 * k) / (k - 1)) * (r ** (2 / k) - r ** ((k + 1) / k)))
 
 describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
   it.each([
@@ -733,18 +759,6 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     expect(a.points.every((p) => !('leakedMass' in p))).toBe(true)
   })
 
-  /** full() with a constant leak area from travel 0 to the muzzle. */
-  const leaky = (area: number, extra = {}): InteriorLoad => ({
-    ...full(),
-    leakage: {
-      area: [
-        { travel: 0, area },
-        { travel: 0.6, area },
-      ],
-      ...extra,
-    },
-  })
-
   it('a leak beyond the muzzle loses nothing and changes the results only through the error norm', () => {
     const a = interior(full())
     const b = interior({ ...full(), leakage: { area: [{ travel: 1, area: 1e-6 }] } })
@@ -756,8 +770,6 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
   })
 
   it('flow factor: choked plateau, maximum of the subsonic branch at the critical ratio', () => {
-    const subsonic = (k: number, r: number) =>
-      Math.sqrt(((2 * k) / (k - 1)) * (r ** (2 / k) - r ** ((k + 1) / k)))
     for (const k of [1.23, 1.25]) {
       const psi = leakFlowFactor(k, 0)
       const critical = (2 / (k + 1)) ** (k / (k - 1))
@@ -776,8 +788,55 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     }
   })
 
+  it('the discharge coefficient multiplies the leak area', () => {
+    expect(interior(leaky(2e-7, { discharge: 0.5 }))).toEqual(interior(leaky(1e-7)))
+  })
+})
+
+type Leakage = NonNullable<InteriorLoad['leakage']>
+
+/** The leak area of `pts` at travel `x`, linear between the points and 0 outside them. */
+function leakAreaAt(pts: Leakage['area'], x: number) {
+  for (let i = 1; i < pts.length; i++)
+    if (x >= nth(pts, i - 1).travel && x <= nth(pts, i).travel)
+      return (
+        nth(pts, i - 1).area +
+        ((x - nth(pts, i - 1).travel) * (nth(pts, i).area - nth(pts, i - 1).area)) /
+          (nth(pts, i).travel - nth(pts, i - 1).travel)
+      )
+  return 0
+}
+
+/** Mass and enthalpy flow through the leak of `full()`; `held` takes the mean pressure as the base pressure. */
+function leakFlow(p: InteriorPoint, held: boolean, leakage: Leakage) {
+  const [vc, area, mc, k, eta, solid] = [3.4e-6, 3.75e-5, 0.0028, 1.23, 1e-3, 0.0028 / 1600]
+  const pa = leakage.backPressure ?? 101325
+  const pb = held ? p.meanPressure : p.basePressure
+  const gas = mc * p.burntFraction - (p.leakedMass ?? 0)
+  const free = vc + area * p.travel - solid * (1 - p.burntFraction) - eta * gas
+  const rt = (p.meanPressure * free) / gas
+  const m = (leakAreaAt(leakage.area, p.travel) * pb * leakFlowFactor(k, pa / pb)) / Math.sqrt(rt)
+  return [m, m * ((k * rt) / (k - 1) + eta * p.meanPressure)]
+}
+
+/** The leaked mass and enthalpy of a run by the trapezoidal rule in time over its points. */
+function leakQuadrature(r: InteriorPoints, leakage: Leakage) {
+  let mass = 0
+  let enthalpy = 0
+  for (let i = 1; i < r.points.length; i++) {
+    const p0 = nth(r.points, i - 1)
+    const p1 = nth(r.points, i)
+    // the point at shot start holds the moving state; the interval before it ends held
+    const a = leakFlow(p0, p0.time < r.shotStartTime, leakage)
+    const b = leakFlow(p1, p1.time <= r.shotStartTime, leakage)
+    mass += ((p1.time - p0.time) * (nth(a, 0) + nth(b, 0))) / 2
+    enthalpy += ((p1.time - p0.time) * (nth(a, 1) + nth(b, 1))) / 2
+  }
+  return { mass, enthalpy }
+}
+
+describe('gas leakage over the curve', () => {
   it('leaked mass and enthalpy equal the quadrature of the orifice flow over the curve', () => {
-    const [vc, area, mc, k, eta, solid] = [3.4e-6, 3.75e-5, 0.0028, 1.23, 1e-3, 0.0028 / 1600]
     const constant = { area: leaky(2e-7).leakage?.area ?? [] }
     const worn = {
       area: [
@@ -786,50 +845,18 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
         { travel: 0.012, area: 0 },
       ],
     }
-    const cases: NonNullable<InteriorLoad['leakage']>[] = [
-      worn,
-      constant,
-      { ...constant, backPressure: 3e6 },
+    // the leak-area kinks of each case, which are events like engraving points
+    const cases: [Leakage, number[]][] = [
+      [worn, [0.012]],
+      [constant, []],
+      [{ ...constant, backPressure: 3e6 }, []],
     ]
-    for (const leakage of cases) {
+    for (const [leakage, kinks] of cases) {
       // trapezoid error in the worn case: 3.1e-7 at outputStep 1e-7 s, 8.3e-5 at 2e-6 s
       const r = interior({ ...full(), leakage }, { outputStep: 1e-7 })
       if (!r.valid) throw new Error(r.reason)
-      // leak-area kinks are events, like engraving points
-      if (leakage === worn)
-        expect(r.points.some((p) => Math.abs(p.travel - 0.012) < 1e-9)).toBe(true)
-      const pa = leakage.backPressure ?? 101325
-      const pts = leakage.area
-      const leakArea = (x: number) => {
-        for (let i = 1; i < pts.length; i++)
-          if (x >= nth(pts, i - 1).travel && x <= nth(pts, i).travel)
-            return (
-              nth(pts, i - 1).area +
-              ((x - nth(pts, i - 1).travel) * (nth(pts, i).area - nth(pts, i - 1).area)) /
-                (nth(pts, i).travel - nth(pts, i - 1).travel)
-            )
-        return 0
-      }
-      /** Mass and enthalpy flow; `held` takes the mean pressure as the base pressure. */
-      const flow = (p: InteriorPoint, held: boolean) => {
-        const pb = held ? p.meanPressure : p.basePressure
-        const gas = mc * p.burntFraction - (p.leakedMass ?? 0)
-        const free = vc + area * p.travel - solid * (1 - p.burntFraction) - eta * gas
-        const rt = (p.meanPressure * free) / gas
-        const m = (leakArea(p.travel) * pb * leakFlowFactor(k, pa / pb)) / Math.sqrt(rt)
-        return [m, m * ((k * rt) / (k - 1) + eta * p.meanPressure)]
-      }
-      let mass = 0
-      let enthalpy = 0
-      for (let i = 1; i < r.points.length; i++) {
-        const p0 = nth(r.points, i - 1)
-        const p1 = nth(r.points, i)
-        // the point at shot start holds the moving state; the interval before it ends held
-        const a = flow(p0, p0.time < r.shotStartTime)
-        const b = flow(p1, p1.time <= r.shotStartTime)
-        mass += ((p1.time - p0.time) * (nth(a, 0) + nth(b, 0))) / 2
-        enthalpy += ((p1.time - p0.time) * (nth(a, 1) + nth(b, 1))) / 2
-      }
+      for (const x of kinks) expect(r.points.some((p) => Math.abs(p.travel - x) < 1e-9)).toBe(true)
+      const { mass, enthalpy } = leakQuadrature(r, leakage)
       expect(rel(mass, r.points.at(-1)?.leakedMass ?? 0)).toBeLessThan(1e-6)
       expect(rel(enthalpy, r.energy.leakage)).toBeLessThan(1e-6)
       // consistency: the gas energy is defined by the same expression as the pressure
@@ -854,7 +881,9 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     )
     for (const v of invariant) expect(rel(v, nth(invariant, 0))).toBeLessThan(1e-12)
   })
+})
 
+describe('gas leakage from a closed vessel', () => {
   it('choked blowdown of a fixed vessel follows the isentropic closed form', () => {
     // eta = 0, burnt to z0 = 1 - 1e-9, the rest burns at a constant rate until 1 ms
     const [vc, mc, q, k, rho, al] = [3.4e-6, 0.0028, 3.9e6, 1.23, 1600, 3e-6]
@@ -891,7 +920,45 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
       expect(Math.abs((p.leakedMass ?? 0) - m0 * (1 - u))).toBeLessThan(1e-8 * m0)
     }
   })
+})
 
+const expectFlowStartsAt = (pa: number, load: InteriorLoad) => {
+  const r = interior(load)
+  if (!r.valid) throw new Error(r.reason)
+  for (const p of r.points) if (p.basePressure <= pa) expect(p.leakedMass).toBe(0)
+  expect(r.points.some((p) => rel(p.basePressure, pa) < 1e-9)).toBe(true)
+  expect(r.points.at(-1)?.leakedMass).toBeGreaterThan(0)
+}
+
+/** full() with the leak area table `pts`. */
+const withLeakArea = (pts: Leakage['area']) => ({
+  ...full(),
+  leakage: { area: pts },
+})
+
+/** Leakage inputs outside their domain, with the field the refusal names. */
+const invalidLeakage: [string, InteriorLoad][] = [
+  ['leakage.area', withLeakArea([])],
+  [
+    'leakage.area',
+    withLeakArea([
+      { travel: 0.01, area: 1e-7 },
+      { travel: 0.005, area: 1e-7 },
+    ]),
+  ],
+  [
+    'leakage.area',
+    withLeakArea([
+      { travel: 0.01, area: 1e-7 },
+      { travel: 0.01, area: 1e-7 },
+    ]),
+  ],
+  ['leakage.area', withLeakArea([{ travel: 0, area: -1e-7 }])],
+  ['leakage.backPressure', leaky(1e-7, { backPressure: -1 })],
+  ['leakage.discharge', leaky(1e-7, { discharge: -1 })],
+]
+
+describe('gas leakage with the leak area and the back pressure', () => {
   it('a larger leak area lowers peak pressure and muzzle velocity', () => {
     const runs = [0, 1e-7, 2e-7, 4e-7].map((a) => interior(leaky(a)))
     for (let i = 1; i < runs.length; i++) {
@@ -903,14 +970,6 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
       expect(b.points.at(-1)?.leakedMass).toBeGreaterThan(a.points.at(-1)?.leakedMass ?? 0)
     }
   })
-
-  const expectFlowStartsAt = (pa: number, load: InteriorLoad) => {
-    const r = interior(load)
-    if (!r.valid) throw new Error(r.reason)
-    for (const p of r.points) if (p.basePressure <= pa) expect(p.leakedMass).toBe(0)
-    expect(r.points.some((p) => rel(p.basePressure, pa) < 1e-9)).toBe(true)
-    expect(r.points.at(-1)?.leakedMass).toBeGreaterThan(0)
-  }
 
   it('flow starts when the base pressure rises through the back pressure', () => {
     const runs: [number, InteriorLoad][] = [
@@ -939,37 +998,11 @@ describe('gas leakage (apps/docs/docs/models/interior-leakage-heat.md)', () => {
     if (!step.valid) throw new Error(step.reason)
     expect(step.points.at(-1)?.leakedMass).toBeGreaterThan(3e-5)
   })
+})
 
-  it('the discharge coefficient multiplies the leak area', () => {
-    expect(interior(leaky(2e-7, { discharge: 0.5 }))).toEqual(interior(leaky(1e-7)))
-  })
-
+describe('gas leakage refusals', () => {
   it('input errors and noShotStart', () => {
-    const area = (pts: { travel: number; area: number }[]) => ({
-      ...full(),
-      leakage: { area: pts },
-    })
-    const cases: [string, InteriorLoad][] = [
-      ['leakage.area', area([])],
-      [
-        'leakage.area',
-        area([
-          { travel: 0.01, area: 1e-7 },
-          { travel: 0.005, area: 1e-7 },
-        ]),
-      ],
-      [
-        'leakage.area',
-        area([
-          { travel: 0.01, area: 1e-7 },
-          { travel: 0.01, area: 1e-7 },
-        ]),
-      ],
-      ['leakage.area', area([{ travel: 0, area: -1e-7 }])],
-      ['leakage.backPressure', leaky(1e-7, { backPressure: -1 })],
-      ['leakage.discharge', leaky(1e-7, { discharge: -1 })],
-    ]
-    for (const [field, load] of cases)
+    for (const [field, load] of invalidLeakage)
       expect(interior(load)).toEqual({ valid: false, reason: 'input', field })
     // constant form, n = 0.5: gas generation grows more slowly than outflow with pressure, so they
     // balance below the start pressure
@@ -1080,16 +1113,18 @@ describe('chargeTooSmall', () => {
   })
 })
 
+/** The valid run of `full()` at a propellant temperature, K. */
+const atTemperature = (propellantTemperature: number) => {
+  const r = interior({ ...full(), propellantTemperature })
+  if (!r.valid) throw new Error(r.reason)
+  return r
+}
+
 describe('propellant temperature', () => {
   it('peak pressure and muzzle velocity rise with it for positive sensitivities', () => {
-    const run = (propellantTemperature: number) => {
-      const r = interior({ ...full(), propellantTemperature })
-      if (!r.valid) throw new Error(r.reason)
-      return r
-    }
-    const cold = run(250)
-    const mid = run(294.15)
-    const hot = run(330)
+    const cold = atTemperature(250)
+    const mid = atTemperature(294.15)
+    const hot = atTemperature(330)
     expect(cold.peakBreechPressure).toBeLessThan(mid.peakBreechPressure)
     expect(mid.peakBreechPressure).toBeLessThan(hot.peakBreechPressure)
     expect(cold.muzzleVelocity).toBeLessThan(mid.muzzleVelocity)

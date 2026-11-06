@@ -45,9 +45,9 @@ describe('ladderImpactResiduals', () => {
   })
 
   it('orders the charges and gives the steps the shape ladderFlatSpots reads', () => {
-    const r = ladderImpactResiduals([...ladder(0, 4)].reverse(), SLOPE)
+    const r = ladderImpactResiduals(ladder(0, 4).toReversed(), SLOPE)
     expect(r.steps.map((s) => s.charge)).toEqual(
-      [...r.steps.map((s) => s.charge)].sort((a, b) => a - b),
+      r.steps.map((s) => s.charge).toSorted((a, b) => a - b),
     )
   })
 
@@ -57,7 +57,9 @@ describe('ladderImpactResiduals', () => {
     const stepped = flat.map((c, i) => ({ ...c, heights: c.heights.map(() => i) }))
     expect(ladderImpactResiduals(stepped, 0).statistic).toBe(Number.POSITIVE_INFINITY)
   })
+})
 
+describe('ladderImpactResiduals input checks', () => {
   it('rejects too few charges, shots, a bad slope, level, charge or a non-finite value', () => {
     const l = ladder(0, 6, 3)
     expect(() => ladderImpactResiduals(l.slice(0, 2), SLOPE)).toThrow(InputError)

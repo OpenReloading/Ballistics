@@ -76,7 +76,9 @@ describe('solveCharge', () => {
     const t = series('barrelTime')
     for (let i = 1; i < t.length; i++) expect(t[i]).toBeLessThan(nth(t, i - 1))
   })
+})
 
+describe('solveCharge at the bounds of the model', () => {
   it.each([
     ['peakPressure', 1e12, 'aboveRange'],
     ['peakPressure', 10, 'belowRange'],
@@ -115,7 +117,9 @@ describe('solveCharge', () => {
       solidFill(s.reachable.maxValue.charge, propellant.density, chamber.volume),
     ).toBeLessThanOrEqual(solidFillLimit)
   })
+})
 
+describe('solveCharge refusals', () => {
   it('refuses when no charge gives a valid run', () => {
     const stuck = { ...base, startPressure: 1e18 }
     const s = solveCharge(stuck, { kind: 'peakPressure', value: 1e8 })
@@ -153,6 +157,15 @@ const scanCharge = (i: number) => scanHigh * 1e-3 ** (1 - i / 31)
 /** Rises from 37 to 70 over the scan with a peak of 100 at 10^-3.5 kg. */
 const bump = (c: number) => 100 - 20 * (Math.log10(c) + 3.5) ** 2
 
+/** A curve with no valid run between the scan charges 10 and 20: 1 below them, 10 above. */
+function gapCurve(c: number): number | undefined {
+  if (c < scanCharge(10)) return 1
+  return c > scanCharge(20) ? 10 : undefined
+}
+
+/** A curve that jumps from 1 to 3 at the charge `jump`. */
+const stepAt = (c: number, jump: number) => (c < jump ? 1 : 3)
+
 describe('solveCharge branches, with an injected run', () => {
   it('reports each extreme of a non-monotone curve with its own charge', () => {
     const s = solveCharge(base, target(150), { run: synthetic(bump) })
@@ -176,11 +189,13 @@ describe('solveCharge branches, with an injected run', () => {
 
   it('refuses as bracketFailed where no two neighbouring valid runs enclose the target', () => {
     // no valid run between the charges 10 and 20 of the scan
-    const gap = synthetic((c) => (c < scanCharge(10) ? 1 : c > scanCharge(20) ? 10 : undefined))
+    const gap = synthetic(gapCurve)
     const s = solveCharge(base, target(5), { run: gap })
     expect(s).toMatchObject({ reached: false, reason: 'bracketFailed' })
   })
+})
 
+describe('solveCharge branches, with an injected run, refusals and flat curves', () => {
   it('refuses as bracketFailed where the runs of the root find are not valid', () => {
     const scanOnly = synthetic((c, call) => (call <= 32 ? c : undefined))
     const s = solveCharge(base, target(scanCharge(10) * 1.1), { run: scanOnly })
@@ -203,13 +218,14 @@ describe('solveCharge branches, with an injected run', () => {
     const s = solveCharge(base, target(5), { run: flat })
     expect(s).toMatchObject({ reached: true, value: 5 })
   })
+})
 
+describe('solveCharge branches, with an injected run, counting the runs', () => {
   it('falls back to bisection where the false position charge gives no valid run', () => {
     const goal = scanCharge(10) * 1.1
-    const smooth = (c: number) => c
-    const plain = solveCharge(base, target(goal), { run: synthetic(smooth) })
+    const plain = solveCharge(base, target(goal), { run: synthetic((c) => c) })
     const failing = solveCharge(base, target(goal), {
-      run: synthetic((c, call) => (call === 33 ? undefined : smooth(c))),
+      run: synthetic((c, call) => (call === 33 ? undefined : c)),
     })
     if (!plain.reached || !failing.reached) throw new Error('both reach the target')
     expect(Math.abs(failing.value - goal)).toBeLessThanOrEqual(chargeSolverTolerance * goal)
@@ -221,7 +237,7 @@ describe('solveCharge branches, with an injected run', () => {
     const jump = scanCharge(15) * 1.07
     // from the first root find run on, every odd run is invalid and every even run valid
     const s = solveCharge(base, target(2), {
-      run: synthetic((c, call) => (call > 32 && call % 2 === 1 ? undefined : c < jump ? 1 : 3)),
+      run: synthetic((c, call) => (call > 32 && call % 2 === 1 ? undefined : stepAt(c, jump))),
     })
     expect(s).toMatchObject({ reached: false, reason: 'toleranceNotReached' })
     expect(s.evaluationCount).toBeGreaterThan(32 + 60)

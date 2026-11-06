@@ -64,34 +64,37 @@ describe('geometric form functions', () => {
   })
 })
 
+/**
+ * Uncovered cross-section of a seven-perforated grain burnt by y inside the outer circle, counted on an
+ * n by n grid: perforation diameter dp, centre spacing s, outer radius r0.
+ */
+const gridArea = (y: number, { dp, s, r0 }: { dp: number; s: number; r0: number }, n = 400) => {
+  const rho = dp / 2 + y
+  const r = r0 - y
+  const centres: [number, number][] = [[0, 0]]
+  for (let k = 0; k < 6; k++)
+    centres.push([s * Math.cos((k * Math.PI) / 3), s * Math.sin((k * Math.PI) / 3)])
+  const cell = (2 * r) / n
+  let count = 0
+  for (let i = 0; i < n; i++) {
+    const x = -r + (i + 0.5) * cell
+    for (let j = 0; j < n; j++) {
+      const yy = -r + (j + 0.5) * cell
+      if (
+        x * x + yy * yy < r * r &&
+        centres.every(([cx, cy]) => (x - cx) ** 2 + (yy - cy) ** 2 > rho * rho)
+      )
+        count++
+    }
+  }
+  return count * cell * cell
+}
+
 describe('seven-perforated grain', () => {
   const dp = 1
   const w = 1
   const s = dp + w
   const r0 = 1.5 * dp + 2 * w
-
-  /** Uncovered cross-section inside the outer circle, counted on an n by n grid. */
-  const gridArea = (y: number, n = 400) => {
-    const rho = dp / 2 + y
-    const r = r0 - y
-    const centres: [number, number][] = [[0, 0]]
-    for (let k = 0; k < 6; k++)
-      centres.push([s * Math.cos((k * Math.PI) / 3), s * Math.sin((k * Math.PI) / 3)])
-    const cell = (2 * r) / n
-    let count = 0
-    for (let i = 0; i < n; i++) {
-      const x = -r + (i + 0.5) * cell
-      for (let j = 0; j < n; j++) {
-        const yy = -r + (j + 0.5) * cell
-        if (
-          x * x + yy * yy < r * r &&
-          centres.every(([cx, cy]) => (x - cx) ** 2 + (yy - cy) ** 2 > rho * rho)
-        )
-          count++
-      }
-    }
-    return count * cell * cell
-  }
 
   it('has a sliver area equal to the web-phase remainder at the end of the web', () => {
     const { inner, outer } = sliverArea(s / 2, r0 - w / 2, s)
@@ -103,7 +106,9 @@ describe('seven-perforated grain', () => {
       const { inner, outer } = sliverArea(dp / 2 + y, r0 - y, s)
       const exact = 6 * (inner + outer)
       // grid error relative to the sliver area at the end of the web
-      expect(Math.abs(gridArea(y) - exact)).toBeLessThan(1e-3 * (Math.PI / 2) * s * s)
+      expect(Math.abs(gridArea(y, { dp, s, r0 }) - exact)).toBeLessThan(
+        1e-3 * (Math.PI / 2) * s * s,
+      )
     }
   })
 
@@ -132,15 +137,21 @@ describe('lens area', () => {
   })
 })
 
-describe('burn law checks', () => {
-  const tube = { shape: 'tube', diameter: 1e-3, perforationDiameter: 2e-4, length: 2e-3 } as const
-  const seven = {
-    shape: 'sevenPerf',
-    diameter: 1.25e-3,
-    perforationDiameter: 1.5e-4,
-    length: 2e-3,
-  } as const
+/** A tube and a seven-perforated grain of the burn law checks. */
+const checkTube = {
+  shape: 'tube',
+  diameter: 1e-3,
+  perforationDiameter: 2e-4,
+  length: 2e-3,
+} as const
+const checkSeven = {
+  shape: 'sevenPerf',
+  diameter: 1.25e-3,
+  perforationDiameter: 1.5e-4,
+  length: 2e-3,
+} as const
 
+describe('burn law checks', () => {
   it('names the first invalid field of a geometric law', () => {
     const sphere = {
       kind: 'geometric',
@@ -161,16 +172,18 @@ describe('burn law checks', () => {
 
   it('checks the perforation and the length of tube and seven-perforated grains', () => {
     // a length of one web is the shortest tube
-    expect(burnError(geometric({ ...tube, length: 4e-4 }))).toBeUndefined()
-    expect(burnError(geometric({ ...tube, length: 3.9e-4 }))).toBe('propellant.burn.grain.length')
-    expect(burnError(geometric({ ...tube, perforationDiameter: 1e-3 }))).toBe(
+    expect(burnError(geometric({ ...checkTube, length: 4e-4 }))).toBeUndefined()
+    expect(burnError(geometric({ ...checkTube, length: 3.9e-4 }))).toBe(
+      'propellant.burn.grain.length',
+    )
+    expect(burnError(geometric({ ...checkTube, perforationDiameter: 1e-3 }))).toBe(
       'propellant.burn.grain.perforationDiameter',
     )
-    expect(burnError(geometric({ ...seven, perforationDiameter: 1.25e-3 / 3 }))).toBe(
+    expect(burnError(geometric({ ...checkSeven, perforationDiameter: 1.25e-3 / 3 }))).toBe(
       'propellant.burn.grain.perforationDiameter',
     )
-    const form = burnForm(geometric(seven))
-    expect(burnError(geometric({ ...seven, length: 2 * form.halfWeb * form.end }))).toBe(
+    const form = burnForm(geometric(checkSeven))
+    expect(burnError(geometric({ ...checkSeven, length: 2 * form.halfWeb * form.end }))).toBe(
       'propellant.burn.grain.length',
     )
   })
@@ -191,40 +204,53 @@ describe('burn law checks', () => {
   })
 })
 
-describe('vivacity form functions', () => {
-  const vivacity = (form: Extract<Burn, { kind: 'vivacity' }>['form']): Burn => ({
-    kind: 'vivacity',
-    vivacity: 1,
-    exponent: 1,
-    referencePressure: 1e5,
-    form,
-  })
+const vivacityBurn = (form: Extract<Burn, { kind: 'vivacity' }>['form']): Burn => ({
+  kind: 'vivacity',
+  vivacity: 1,
+  exponent: 1,
+  referencePressure: 1e5,
+  form,
+})
 
+/** A three-stage form whose stages and tail all differ. */
+const threeStage = {
+  kind: 'threeStage',
+  a: 1.2,
+  m: 0.4,
+  q: 1.5,
+  z1: 0.45,
+  z2: 0.85,
+  r: 0.3,
+} as const
+
+describe('vivacity form functions', () => {
   it('two stages are continuous at z1, degressive to z = 1 and constant for a = 0, z1 = 1', () => {
-    const form = burnForm(vivacity({ kind: 'twoStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45 }))
+    const form = burnForm(vivacityBurn({ kind: 'twoStage', a: 1.2, m: 0.4, q: 0.3, z1: 0.45 }))
     expect(form.breaks).toEqual([0.45])
     expect(form.phi(0.45 + 1e-12)).toBeCloseTo(form.phi(0.45), 10)
     // 1.54^0.4 (0.3 / 0.55)^0.3
     expect(form.phi(0.7)).toBeCloseTo(0.9909137571728127, 14)
     expect(form.phi(1)).toBe(0)
-    const flat = burnForm(vivacity({ kind: 'twoStage', a: 0, m: 0.4, q: 0.3, z1: 1 }))
+    const flat = burnForm(vivacityBurn({ kind: 'twoStage', a: 0, m: 0.4, q: 0.3, z1: 1 }))
     // z > 1 occurs inside the step that crosses burnout
     for (const z of [0, 0.5, 1, 1.5]) expect(flat.phi(z)).toBe(1)
     expect(flat.breaks).toEqual([])
-    const single = burnForm(vivacity({ kind: 'twoStage', a: 0.5, m: 0.5, q: 2, z1: 1 }))
+    const single = burnForm(vivacityBurn({ kind: 'twoStage', a: 0.5, m: 0.5, q: 2, z1: 1 }))
     expect(single.phi(1.01)).toBe(single.phi(1))
   })
 
   it('rejects a degressive exponent q >= 1, which never burns out', () => {
-    const bad = vivacity({ kind: 'twoStage', a: 1.2, m: 0.4, q: 1, z1: 0.6 })
+    const bad = vivacityBurn({ kind: 'twoStage', a: 1.2, m: 0.4, q: 1, z1: 0.6 })
     expect(burnError(bad)).toBe('propellant.burn.form')
-    expect(burnError(vivacity({ kind: 'twoStage', a: 1.2, m: 0.4, q: 2, z1: 1 }))).toBeUndefined()
+    expect(
+      burnError(vivacityBurn({ kind: 'twoStage', a: 1.2, m: 0.4, q: 2, z1: 1 })),
+    ).toBeUndefined()
   })
+})
 
-  const three = { kind: 'threeStage', a: 1.2, m: 0.4, q: 1.5, z1: 0.45, z2: 0.85, r: 0.3 } as const
-
+describe('vivacity form functions in three stages', () => {
   it('three stages are continuous at z1 and z2 and end at z = 1 in the third-stage variable', () => {
-    const form = burnForm(vivacity(three))
+    const form = burnForm(vivacityBurn(threeStage))
     expect(form.breaks).toEqual([0.45, 0.85])
     for (const f of [0.45, 0.85]) {
       expect(Math.abs(form.phi(f + 1e-15) / form.phi(f) - 1)).toBeLessThan(1e-14)
@@ -244,7 +270,7 @@ describe('vivacity form functions', () => {
   })
 
   it('a three-stage tail with r = 0 stays at phi2 with f = z', () => {
-    const form = burnForm(vivacity({ ...three, q: 0.3, z2: 0.8, r: 0 }))
+    const form = burnForm(vivacityBurn({ ...threeStage, q: 0.3, z2: 0.8, r: 0 }))
     const phi2 = 1.54 ** 0.4 * (0.2 / 0.55) ** 0.3
     for (const z of [0.9, 1, 1.5]) expect(Math.abs(form.phi(z) / phi2 - 1)).toBeLessThan(1e-14)
     expect(form.end).toBe(1)
@@ -252,11 +278,11 @@ describe('vivacity form functions', () => {
   })
 
   it('checks the three-stage limits', () => {
-    expect(burnError(vivacity(three))).toBeUndefined()
-    expect(burnError(vivacity({ ...three, q: 2 }))).toBeUndefined()
-    expect(burnError(vivacity({ ...three, r: 0 }))).toBeUndefined()
-    expect(burnError(vivacity({ ...three, q: 0 }))).toBeUndefined()
-    expect(burnError(vivacity({ ...three, r: 0.999 }))).toBeUndefined()
+    expect(burnError(vivacityBurn(threeStage))).toBeUndefined()
+    expect(burnError(vivacityBurn({ ...threeStage, q: 2 }))).toBeUndefined()
+    expect(burnError(vivacityBurn({ ...threeStage, r: 0 }))).toBeUndefined()
+    expect(burnError(vivacityBurn({ ...threeStage, q: 0 }))).toBeUndefined()
+    expect(burnError(vivacityBurn({ ...threeStage, r: 0.999 }))).toBeUndefined()
     for (const bad of [
       { z2: 0.45 },
       { z2: 0.4 },
@@ -269,6 +295,6 @@ describe('vivacity form functions', () => {
       { m: Number.NaN },
       { r: Number.POSITIVE_INFINITY },
     ])
-      expect(burnError(vivacity({ ...three, ...bad }))).toBe('propellant.burn.form')
+      expect(burnError(vivacityBurn({ ...threeStage, ...bad }))).toBe('propellant.burn.form')
   })
 })

@@ -89,7 +89,9 @@ describe('recordLoad', () => {
     expect(warm.muzzleVelocity).toBeGreaterThan(300)
     expect(cold.muzzleVelocity).toBeLessThan(warm.muzzleVelocity)
   })
+})
 
+describe('recordLoad bore area, sensitivity and refusals', () => {
   it('takes the bore area from the circle of F and Z without Q', () => {
     const noQ = { values: cartridge.values.filter((v) => v.symbol !== 'Q') }
     const { chamber } = recordLoad({ ...run, cartridge: noQ })

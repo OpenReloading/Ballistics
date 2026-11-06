@@ -32,6 +32,12 @@ const valid = (r: ReturnType<typeof shotshellInterior>) => {
   return r
 }
 
+/** The field a run of the load with `over` names invalid, undefined for a valid run. */
+const invalidField = (over: Partial<ShotshellLoad>) => {
+  const r = shotshellInterior(load(over))
+  return r.valid ? undefined : r.field
+}
+
 describe('shotshellInterior', () => {
   it('gives the result of interior on the mapped load', () => {
     const { chamber, wadTravel, shotMass, wadMass, crimpPressure, ...rest } = load()
@@ -72,15 +78,13 @@ describe('shotshellInterior', () => {
   })
 
   it('names the shotshell fields of invalid inputs', () => {
-    const field = (over: Partial<ShotshellLoad>) => {
-      const r = shotshellInterior(load(over))
-      return r.valid ? undefined : r.field
-    }
-    expect(field({ wadMass: -0.001 })).toBe('wadMass')
-    expect(field({ crimpPressure: Number.NaN })).toBe('crimpPressure')
-    expect(field({ wadTravel: 0 })).toBe('wadTravel')
-    expect(field({ chamber: { volume: 3e-6, boreDiameter: -1 } })).toBe('chamber.boreDiameter')
-    expect(field({ chamber: { volume: 0, boreDiameter: 18.42e-3 } })).toBe('chamber.volume')
-    expect(field({ wadMass: 0 })).toBeUndefined()
+    expect(invalidField({ wadMass: -0.001 })).toBe('wadMass')
+    expect(invalidField({ crimpPressure: Number.NaN })).toBe('crimpPressure')
+    expect(invalidField({ wadTravel: 0 })).toBe('wadTravel')
+    expect(invalidField({ chamber: { volume: 3e-6, boreDiameter: -1 } })).toBe(
+      'chamber.boreDiameter',
+    )
+    expect(invalidField({ chamber: { volume: 0, boreDiameter: 18.42e-3 } })).toBe('chamber.volume')
+    expect(invalidField({ wadMass: 0 })).toBeUndefined()
   })
 })

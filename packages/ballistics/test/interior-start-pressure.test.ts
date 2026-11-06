@@ -7,6 +7,10 @@ import {
   startPressureOf,
 } from '../src/index.ts'
 
+const constructionOfStructure = (structure?: string) => constructionOf({ structure })
+/** The start pressure of a 610 mm rifle barrel for a bullet structure. */
+const rifleStart = (structure: string) => startPressureOf(0.61, { structure })
+
 describe('default start pressure', () => {
   it('gives the fitted value by construction and class, the rifle assumption where none is fitted', () => {
     const rifle = defaultStartPressure(0.61)
@@ -38,7 +42,6 @@ describe('default start pressure', () => {
 
 describe('construction of a bullet record', () => {
   it('maps the structure to the construction the start pressure is fitted for', () => {
-    const of = (structure?: string) => constructionOf({ structure })
     for (const [structure, construction] of [
       ['cast', 'lead'],
       ['swaged', 'lead'],
@@ -48,7 +51,7 @@ describe('construction of a bullet record', () => {
       ['partitioned', 'jacketed'],
       ['monolithic', 'monolithic'],
     ])
-      expect(of(structure)).toEqual({ construction, assumed: false })
+      expect(constructionOfStructure(structure)).toEqual({ construction, assumed: false })
   })
 
   it('counts a frangible bullet and a construction without a structure as jacketed, assumed', () => {
@@ -84,14 +87,15 @@ describe('start pressure of a barrel and a bullet record', () => {
   })
 
   it('gives the rifle values by construction from 300 mm, not the rifle assumption', () => {
-    const rifle = (structure: string) => startPressureOf(0.61, { structure })
-    expect([rifle('monolithic').value, rifle('cup-and-core').value]).toEqual([35.3e6, 29.2e6])
-    expect(rifle('cast').interval).toEqual([24.5e6, 40.3e6])
+    expect([rifleStart('monolithic').value, rifleStart('cup-and-core').value]).toEqual([
+      35.3e6, 29.2e6,
+    ])
+    expect(rifleStart('cast').interval).toEqual([24.5e6, 40.3e6])
     // the intervals of rifle monolithic and jacketed do not overlap
-    expect(rifle('monolithic').interval?.[0]).toBeGreaterThan(
-      rifle('cup-and-core').interval?.[1] ?? 0,
+    expect(rifleStart('monolithic').interval?.[0]).toBeGreaterThan(
+      rifleStart('cup-and-core').interval?.[1] ?? 0,
     )
-    expect(rifle('plated').interval).toBeUndefined()
+    expect(rifleStart('plated').interval).toBeUndefined()
   })
 
   it('keeps the rifle value where the barrel is not known, and for a rifle without a construction', () => {

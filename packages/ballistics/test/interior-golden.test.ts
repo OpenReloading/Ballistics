@@ -136,7 +136,7 @@ function differences(stored: unknown, actual: unknown, path = ''): string[] {
     typeof stored !== 'object' ||
     typeof actual !== 'object'
   )
-    return stored === actual ? [] : [`${path}: ${actual} against ${stored}`]
+    return stored === actual ? [] : [`${path}: ${String(actual)} against ${String(stored)}`]
   const a = actual as Record<string, unknown>
   const s = stored as Record<string, unknown>
   const keys = new Set([...Object.keys(s), ...Object.keys(a)])

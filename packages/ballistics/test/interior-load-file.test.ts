@@ -37,6 +37,19 @@ const values: Record<string, number> = {
   startPressure: 1e7,
 }
 
+/** The error `f` throws, undefined when it throws none. */
+function thrownBy(f: () => unknown): unknown {
+  try {
+    f()
+  } catch (error) {
+    return error
+  }
+  return undefined
+}
+
+/** A cartridge record with the bore area Q of its chamber. */
+const chamberQ = (value?: number) => ({ values: [{ side: 'chamber', symbol: 'Q', value }] })
+
 describe('missingLoadKeys', () => {
   it('lists every key interiorLoad needs, as interiorLoad throws for each alone', () => {
     expect(missingLoadKeys(values)).toEqual([])
@@ -87,7 +100,9 @@ describe('interiorLoad', () => {
       form: { kind: 'twoStage', a: 0, m: 0.5, q: 0.5, z1: 0.8 },
     })
   })
+})
 
+describe('interiorLoad missing values and burn forms', () => {
   it('names the field of a missing value, with the label given', () => {
     const missing = { ...values, charge: undefined }
     expect(() => interiorLoad(missing)).toThrow('Enter a number for charge.')
@@ -95,19 +110,18 @@ describe('interiorLoad', () => {
     expect(() => interiorLoad({ ...values, sebert: Number.POSITIVE_INFINITY })).toThrow(
       'Enter a number for sebert.',
     )
-    try {
-      interiorLoad({ ...values, vivacity: Number.NaN })
-    } catch (error) {
-      expect(error).toBeInstanceOf(ValueError)
-      expect((error as ValueError).field).toBe('vivacity')
-    }
+    const error = thrownBy(() => interiorLoad({ ...values, vivacity: Number.NaN }))
+    expect(error).toBeInstanceOf(ValueError)
+    expect((error as ValueError).field).toBe('vivacity')
   })
 
   it('refuses a partly filled burn form at the first empty field', () => {
     expect(() => interiorLoad({ ...values, formA: 0.8 })).toThrow('m, q, z1')
     expect(() => interiorLoad({ ...values, formA: 0.8 })).toThrow(ValueError)
   })
+})
 
+describe('interiorLoad leak area', () => {
   it('reads a leak area as a constant over the travel; no value, no leakage', () => {
     expect(interiorLoad(values)).not.toHaveProperty('leakage')
     expect(interiorLoad({ ...values, leakArea: 2e-6 }).leakage).toEqual({
@@ -184,36 +198,45 @@ describe('recordResistance', () => {
   })
 })
 
-describe('overrideResistance', () => {
-  const record = {
-    friction: 2e6,
-    engraving: [
-      { travel: 0, pressure: 3e6 },
-      { travel: 0.03, pressure: 0 },
-    ],
-  }
+/** The resistance of a powder record: a friction and a linear engraving ramp. */
+const powderResistance = {
+  friction: 2e6,
+  engraving: [
+    { travel: 0, pressure: 3e6 },
+    { travel: 0.03, pressure: 0 },
+  ],
+}
 
+describe('overrideResistance', () => {
   it('is the record itself without an override', () => {
-    expect(overrideResistance(record, {})).toBe(record)
+    expect(overrideResistance(powderResistance, {})).toBe(powderResistance)
     expect(overrideResistance(undefined, {})).toBeUndefined()
   })
 
   it('replaces the friction and keeps the record engraving', () => {
-    expect(overrideResistance(record, { boreFriction: 5e5 })).toEqual({ ...record, friction: 5e5 })
-    expect(overrideResistance(record, { boreFriction: 0 })).toEqual({ ...record, friction: 0 })
+    expect(overrideResistance(powderResistance, { boreFriction: 5e5 })).toEqual({
+      ...powderResistance,
+      friction: 5e5,
+    })
+    expect(overrideResistance(powderResistance, { boreFriction: 0 })).toEqual({
+      ...powderResistance,
+      friction: 0,
+    })
   })
 
   it('replaces the start or the length of the engraving ramp, the other staying the record', () => {
-    expect(overrideResistance(record, { engravingPressure: 4e6 })?.engraving).toEqual([
+    expect(overrideResistance(powderResistance, { engravingPressure: 4e6 })?.engraving).toEqual([
       { travel: 0, pressure: 4e6 },
       { travel: 0.03, pressure: 0 },
     ])
-    expect(overrideResistance(record, { engravingLength: 0.02 })?.engraving).toEqual([
+    expect(overrideResistance(powderResistance, { engravingLength: 0.02 })?.engraving).toEqual([
       { travel: 0, pressure: 3e6 },
       { travel: 0.02, pressure: 0 },
     ])
   })
+})
 
+describe('overrideResistance without a record and its checks', () => {
   it('stands alone without a record, with both engraving values', () => {
     expect(overrideResistance(undefined, { boreFriction: 1e6 })).toEqual({ friction: 1e6 })
     expect(
@@ -223,11 +246,8 @@ describe('overrideResistance', () => {
 
   it('names the engraving value that has nothing to complete it', () => {
     expect(() => overrideResistance(undefined, { engravingPressure: 1e6 })).toThrow(ValueError)
-    try {
-      overrideResistance(undefined, { engravingLength: 0.01 })
-    } catch (error) {
-      expect((error as ValueError).field).toBe('engravingPressure')
-    }
+    const error = thrownBy(() => overrideResistance(undefined, { engravingLength: 0.01 }))
+    expect((error as ValueError).field).toBe('engravingPressure')
   })
 
   it('takes 0 for a friction and an engraving pressure, refuses what the solver refuses', () => {
@@ -256,9 +276,8 @@ describe('boreArea', () => {
   })
 
   it('reads Q of the CIP chamber', () => {
-    const q = (value?: number) => ({ values: [{ side: 'chamber', symbol: 'Q', value }] })
-    expect(cartridgeBoreAreaMm2(q(47.51))).toBe(47.51)
-    expect(cartridgeBoreAreaMm2(q())).toBeUndefined()
+    expect(cartridgeBoreAreaMm2(chamberQ(47.51))).toBe(47.51)
+    expect(cartridgeBoreAreaMm2(chamberQ())).toBeUndefined()
   })
 })
 

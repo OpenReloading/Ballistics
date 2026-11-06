@@ -11,6 +11,16 @@ const s = (id: string, rest: Partial<SessionReading> = {}): SessionReading => ({
 const rules = (sessions: SessionReading[], threshold?: number) =>
   loadNotes(sessions, threshold).map((n) => `${n.session}:${n.rule}`)
 
+/** A seating length of a session, by overall length unless `by` says otherwise. */
+const seatedAt = (value: number, by: 'overallLength' | 'baseToOgive' = 'overallLength') => ({
+  seating: { by, value },
+})
+/** A velocity string of five shots. */
+const velocityOf = (mean: number, standardDeviation: number | undefined) => ({
+  velocity: { mean, standardDeviation, count: 5 },
+})
+const rounds = (roundCount: number) => ({ roundCount })
+
 describe('loadNotes', () => {
   it('has nothing to say without sessions and none to compare for a first session with lots', () => {
     expect(loadNotes([])).toEqual([])
@@ -39,45 +49,42 @@ describe('loadNotes', () => {
     ])
     expect(rules([s('a'), s('b', { primerLot: ' R1 ' })])).toEqual([])
   })
+})
 
+describe('loadNotes on seating, velocity and round count', () => {
   it('compares seating by the same length only, with a tolerance of 0.01 mm', () => {
-    const at = (value: number, by: 'overallLength' | 'baseToOgive' = 'overallLength') => ({
-      seating: { by, value },
-    })
-    expect(rules([s('a', at(70)), s('b', at(70.005))])).toEqual([])
-    expect(loadNotes([s('a', at(70)), s('b', at(70.5))])).toEqual([
+    expect(rules([s('a', seatedAt(70)), s('b', seatedAt(70.005))])).toEqual([])
+    expect(loadNotes([s('a', seatedAt(70)), s('b', seatedAt(70.5))])).toEqual([
       { rule: 'seating', session: 'b', earlier: 'a', by: 'overallLength', now: 70.5, before: 70 },
     ])
-    expect(rules([s('a', at(70)), s('b', at(54, 'baseToOgive'))])).toEqual([])
-    expect(rules([s('a', at(70)), s('b')])).toEqual([])
+    expect(rules([s('a', seatedAt(70)), s('b', seatedAt(54, 'baseToOgive'))])).toEqual([])
+    expect(rules([s('a', seatedAt(70)), s('b')])).toEqual([])
   })
 
   it('notes a mean velocity that moved by more than the larger standard deviation', () => {
-    const v = (mean: number, standardDeviation: number | undefined) => ({
-      velocity: { mean, standardDeviation, count: 5 },
-    })
-    expect(loadNotes([s('a', v(800, 5)), s('b', v(815, 8))])).toEqual([
+    expect(loadNotes([s('a', velocityOf(800, 5)), s('b', velocityOf(815, 8))])).toEqual([
       { rule: 'velocity', session: 'b', earlier: 'a', now: 815, before: 800, spread: 8 },
     ])
-    expect(rules([s('a', v(800, 5)), s('b', v(792, 8))])).toEqual([])
-    expect(rules([s('a', v(800, 5)), s('b', v(780, 8))])).toEqual(['b:velocity'])
+    expect(rules([s('a', velocityOf(800, 5)), s('b', velocityOf(792, 8))])).toEqual([])
+    expect(rules([s('a', velocityOf(800, 5)), s('b', velocityOf(780, 8))])).toEqual(['b:velocity'])
     // one counted shot has no standard deviation: nothing to compare against
-    expect(rules([s('a', v(800, undefined)), s('b', v(900, 1))])).toEqual([])
-    expect(rules([s('a', v(800, 5)), s('b')])).toEqual([])
+    expect(rules([s('a', velocityOf(800, undefined)), s('b', velocityOf(900, 1))])).toEqual([])
+    expect(rules([s('a', velocityOf(800, 5)), s('b')])).toEqual([])
   })
 
   it('notes the round count passing the user count, once', () => {
-    const at = (roundCount: number) => ({ roundCount })
-    const sessions = [s('a', at(400)), s('b', at(650)), s('c', at(900))]
+    const sessions = [s('a', rounds(400)), s('b', rounds(650)), s('c', rounds(900))]
     expect(loadNotes(sessions, 500)).toEqual([
       { rule: 'roundCount', session: 'b', earlier: 'a', now: 650, before: 400, threshold: 500 },
     ])
-    expect(rules([s('a', at(400)), s('b', at(500))], 500)).toEqual(['b:roundCount'])
+    expect(rules([s('a', rounds(400)), s('b', rounds(500))], 500)).toEqual(['b:roundCount'])
     expect(rules(sessions)).toEqual([])
-    expect(rules([s('a'), s('b', at(900))], 500)).toEqual([])
-    expect(rules([s('a', at(900))], 500)).toEqual([])
+    expect(rules([s('a'), s('b', rounds(900))], 500)).toEqual([])
+    expect(rules([s('a', rounds(900))], 500)).toEqual([])
   })
+})
 
+describe('loadNotes dismissed and in date order', () => {
   it('leaves out the notes a session dismissed', () => {
     const sessions = [
       s('a'),

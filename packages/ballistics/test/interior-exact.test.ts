@@ -46,16 +46,16 @@ function exactSolution(load: InteriorLoad, covolume = load.propellant.covolume, 
   const z0 = (load.startPressure * free) / ((k - 1) * mc * q - load.startPressure * c0)
   const c = (a * a) / (2 * me * b * b)
   const n = (u: number) => mc * q * (z0 + u) - c * u * u
-  const slope = (u: number, v: number) => c0 + ((2 * c * u) / ((k - 1) * n(u))) * v
+  const dvdu = (u: number, v: number) => c0 + ((2 * c * u) / ((k - 1) * n(u))) * v
   const volumeAt = (u: number) => {
     let v = free + c0 * z0
     const h = u / steps
     for (let i = 0; i < steps; i++) {
       const x = i * h
-      const k1 = slope(x, v)
-      const k2 = slope(x + h / 2, v + (h / 2) * k1)
-      const k3 = slope(x + h / 2, v + (h / 2) * k2)
-      const k4 = slope(x + h, v + h * k3)
+      const k1 = dvdu(x, v)
+      const k2 = dvdu(x + h / 2, v + (h / 2) * k1)
+      const k3 = dvdu(x + h / 2, v + (h / 2) * k2)
+      const k4 = dvdu(x + h, v + h * k3)
       v += (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
     }
     return v

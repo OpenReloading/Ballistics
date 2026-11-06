@@ -48,6 +48,9 @@ const sampling = (over: Partial<SamplingOptions> = {}): SamplingOptions => ({
   ...over,
 })
 
+/** The toy model, outside it where b is above 3. */
+const outsideAboveThree = (l: Toy) => (l.b > 3 ? 'outside' : closed(l))
+
 describe('sampledBand', () => {
   it('gives the same band for the same seed and another for another seed', () => {
     const t = { ...none, burnRateFraction: 0.05 }
@@ -80,7 +83,9 @@ describe('sampledBand', () => {
     expect(band.velocity?.p05).toBeLessThan(closed(toy).velocity)
     expect(band.failed).toBe(0)
   })
+})
 
+describe('sampledBand of the M3 model', () => {
   it('matches the corner cases of the M3 model with one input varied, within the sampling error', () => {
     const t = { ...none, chargeFraction: 0.05 }
     const samples = 1000
@@ -104,7 +109,9 @@ describe('sampledBand', () => {
     expect(band.pressure?.p95).toBeLessThan(corners.highPressure)
     expect(band.pressure?.p05).toBeLessThan(band.pressure?.p95 ?? 0)
   })
+})
 
+describe('sampledBand budget and invalid runs', () => {
   it('returns no band when the clock passes the budget', () => {
     const band = sampledBand(
       toy,
@@ -117,8 +124,12 @@ describe('sampledBand', () => {
 
   it('counts draws that leave the model and reports an invalid run', () => {
     const t = { ...none, burnRateFraction: 0.05 }
-    const odd = (l: Toy) => (l.b > 3 ? 'outside' : closed(l))
-    const band = sampledBand(toy, { apply: toyApply, run: odd }, t, sampling({ samples: 200 }))
+    const band = sampledBand(
+      toy,
+      { apply: toyApply, run: outsideAboveThree },
+      t,
+      sampling({ samples: 200 }),
+    )
     expect(band.status).toBe('sampled')
     expect(band.failed).toBeGreaterThan(60)
     expect(band.failed).toBeLessThan(140)
