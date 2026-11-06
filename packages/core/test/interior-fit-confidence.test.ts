@@ -144,6 +144,26 @@ describe('powder pressure range', () => {
     expect(extra.relativeHalfWidth).toBeGreaterThan(0)
   })
 
+  it('shifts the ignition pressure, gamma and covolume when the caller gives them', () => {
+    const range = powderPressureRange(velocityFit, velocityOnly, {
+      inputs: {
+        ignitionPressure: { standardUncertainty: 0.1 },
+        gamma: { standardUncertainty: 0.01 },
+        covolume: { standardUncertainty: 0.05 },
+      },
+    })
+    const added = range.contributions.filter((c) =>
+      ['ignitionPressure', 'gamma', 'covolume'].includes(c.input),
+    )
+    expect(added.map((c) => [c.input, c.unit, c.skipped])).toEqual([
+      ['ignitionPressure', 'relative', undefined],
+      ['gamma', 'relative', undefined],
+      ['covolume', 'relative', undefined],
+    ])
+    for (const c of added) expect(c.effects.some((e) => e !== 0)).toBe(true)
+    expect(range.relativeHalfWidth).toBeGreaterThan(velocityRange.relativeHalfWidth)
+  })
+
   it('shifts the temperature of the points that carry their own', () => {
     const own = velocityOnly.map((x) => ({ ...x, propellantTemperature: 294.15 }))
     const range = powderPressureRange(fitLadder(own), own, {
