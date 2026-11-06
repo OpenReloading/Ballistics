@@ -22,7 +22,7 @@ $$
 v_0 = v_{0,\text{nom}}\, e^{\theta_v}, \qquad k = e^{\theta_k}, \qquad f_j = e^{\theta_{f_j}}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `leastSquares` (`q`), `factorSpecs`.
+Code: `packages/ballistics/src/exterior/truing.ts`, `leastSquares` (`q`), `factorSpecs`.
 
 With the muzzle velocity fitted, it comes first. In `trueDragSessions` each session whose `fitMuzzleVelocity` is set adds its own muzzle velocity, in session order, before the drag factors.
 
@@ -34,7 +34,7 @@ $$
 C_D(M) \to k\, C_D(M): \qquad C_{\text{BC},b} \to \frac{C_{\text{BC},b}}{k}, \qquad c_n \to k\, c_n
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `dragCorrection`.
+Code: `packages/ballistics/src/exterior/truing.ts`, `dragCorrection`.
 
 $C_{\text{BC}}/k$ is the trued ballistic coefficient.
 
@@ -46,7 +46,7 @@ $$
 f(M) = \begin{cases} f_1 & M \le M_1 \\ f_j + \left(f_{j+1} - f_j\right) \dfrac{M - M_j}{M_{j+1} - M_j} & M_j \lt M \lt M_{j+1} \\ f_J & M \ge M_J \end{cases}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `dragCorrection` (`factor`). `packages/core/src/exterior/drag.ts`, `dragCoefficient`.
+Code: `packages/ballistics/src/exterior/truing.ts`, `dragCorrection` (`factor`). `packages/ballistics/src/exterior/drag.ts`, `dragCoefficient`.
 
 The bullet's own drag coefficient on the area $\pi d^2/4$ is the custom curve itself, or from a ballistic coefficient of one band:
 
@@ -54,7 +54,7 @@ $$
 C_\text{own}(M) = \frac{C_G(M)\, m}{C_\text{BC}\, d^2}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `dragCorrection` (`own`).
+Code: `packages/ballistics/src/exterior/truing.ts`, `dragCorrection` (`own`).
 
 The trued drag is a custom curve with nodes at the knots and at the nodes of the base table or curve. A base node within $10^{-9}$ relative of a knot is replaced by the knot, since two nearly equal nodes would make the slopes of a monotone cubic rounding noise:
 
@@ -62,7 +62,7 @@ $$
 C_{D,\text{trued}}(M_n) = f(M_n)\, C_\text{own}(M_n), \qquad M_n \in \{\text{base nodes}\} \cup \{M_1, \dots, M_J\}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `dragCorrection` (`nodes`, `near`).
+Code: `packages/ballistics/src/exterior/truing.ts`, `dragCorrection` (`nodes`, `near`).
 
 $C_G$ and the custom curve are read with the input's interpolation (linear or monotone cubic, [drag](exterior-drag.md)), and the trued curve carries the same option. Between two nodes the trued curve follows its own interpolation, so the fitted curve is exactly the reported curve.
 
@@ -74,7 +74,7 @@ $$
 r_i = \frac{\hat y_i(\theta) - y_i}{\sigma_i}, \qquad \chi^2 = \sum_{s=1}^{S} \sum_{i \in s} r_i^2
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `leastSquares` (`sigma`, `predictRun`). `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`).
+Code: `packages/ballistics/src/exterior/truing.ts`, `leastSquares` (`sigma`, `predictRun`). `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`).
 
 Each session $s$ is predicted by a trajectory of its own shot (air, wind, look angle, site, zero) with the candidate drag. One session is the case of `trueMuzzleVelocity` and `trueDrag`. A muzzle velocity of one session moves only that session's predictions, so its Jacobian column is zero on the rows of the other sessions (`moves`).
 
@@ -86,7 +86,7 @@ $$
 \text{floor}_i = \frac{10^{-6}\, a_i}{\sigma_i}, \qquad a_i = \begin{cases} s_i & \text{height (m)} \\ 1 & \text{elevation hold (rad)} \\ \lvert y_i \rvert & \text{velocity (m/s)} \end{cases}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `leastSquares` (`floor`).
+Code: `packages/ballistics/src/exterior/truing.ts`, `leastSquares` (`floor`).
 
 ### Uncertainty
 
@@ -96,7 +96,7 @@ $$
 \sigma_{q_j} = q_j\, \sigma_{\theta_j}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `truingResult` (`parameters`).
+Code: `packages/ballistics/src/exterior/truing.ts`, `truingResult` (`parameters`).
 
 $\sigma_{\theta_j}$ and the correlations come from [the covariance at the solution](least-squares.md). The result also reports $\chi^2$, the degrees of freedom $n - p$, the condition number, and for every observation the predicted value, the residual (predicted minus observed) and the predicted Mach number at its range.
 
@@ -108,7 +108,7 @@ $$
 D = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \left(\frac{\hat y_i^{(k)} - \hat y_i^{(v)}}{\sigma_i}\right)^2}
 $$
 
-Code: `packages/core/src/exterior/truing.ts`, `compareTruingFits` (`divergence`).
+Code: `packages/ballistics/src/exterior/truing.ts`, `compareTruingFits` (`divergence`).
 
 $\sigma_i = 1$ where the observations have none, which the fit allows for one kind only. The two-parameter fit contains the one-parameter fit as the case $k = 1$, so noiseless data that only a muzzle velocity error produced give $k = 1$ and $D = 0$ up to the solver tolerance. With measurement noise $k$ moves off 1 and $D$ is positive without a drag error. A drag error that the muzzle velocity has to absorb gives $D > 0$. $D$ compares predictions at the observed ranges and says nothing about the ranges between or beyond them.
 

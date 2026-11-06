@@ -241,11 +241,11 @@ analytic. The runs mutate the source and run the existing tests; no measured dat
 
 ## Where in the app
 
-- `packages/core/src/exterior/atmosphere.ts`, `packages/core/test/exterior-atmosphere.test.ts`
+- `packages/ballistics/src/exterior/atmosphere.ts`, `packages/ballistics/test/exterior-atmosphere.test.ts`
 - `packages/core/src/interior/form.ts`, `packages/core/test/interior-form.test.ts`
 - `packages/core/src/groups/hit-probability.ts`, `packages/core/test/hit-probability.test.ts`
-- `packages/core/src/exterior/drag.ts`, `packages/core/test/exterior-drag.test.ts`
-- `packages/core/src/exterior/stability.ts`, `packages/core/test/exterior-stability.test.ts`
+- `packages/ballistics/src/exterior/drag.ts`, `packages/ballistics/test/exterior-drag.test.ts`
+- `packages/ballistics/src/exterior/stability.ts`, `packages/ballistics/test/exterior-stability.test.ts`
 - `packages/core/src/interior/range.ts`, `packages/core/test/interior-range.test.ts`
 - `packages/core/src/groups/statistics.ts`, `packages/core/test/groups.test.ts`
 - `packages/core/src/recoil.ts`, `packages/core/test/recoil.test.ts`

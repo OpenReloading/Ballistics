@@ -78,10 +78,10 @@ analytic. Candidate reports with measured moments for 7.62 mm and 5.56 mm ammuni
 
 ## Where in the app
 
-- `packages/core/src/exterior/modified.ts` (`cylinderInertia`, unchanged).
-- `packages/core/src/exterior/trajectory.ts` (`estimateInertias`, the place a follow-up uses the outline when the bullet record has one).
-- `packages/core/src/exterior/outline-drag.ts` (`OutlineDragInput`, the outline the function takes).
-- `packages/core/src/exterior/stability.ts` (`millerStability`).
+- `packages/ballistics/src/exterior/modified.ts` (`cylinderInertia`, unchanged).
+- `packages/ballistics/src/exterior/trajectory.ts` (`estimateInertias`, the place a follow-up uses the outline when the bullet record has one).
+- `packages/ballistics/src/exterior/outline-drag.ts` (`OutlineDragInput`, the outline the function takes).
+- `packages/ballistics/src/exterior/stability.ts` (`millerStability`).
 - [Modified point mass](../models/exterior-modified-point-mass.md), "Moments of inertia estimate" and Limits: add the outline integral, the numbers above and keep the cylinder as the estimate without an outline.
 - [Stability](../models/exterior-stability.md): add the geometry-only factor as a lower estimate with its ratio range 0.65 to 0.76 to Miller's rule on the grid above, and the note that it is not shown in the interface.
 

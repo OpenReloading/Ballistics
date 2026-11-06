@@ -1,4 +1,7 @@
 // the statistics this package exported before they moved to their own package
+
+// the exterior models, the drag tables and the options bags, moved to their own package
+export * from '@open-reloading/ballistics'
 export {
   chiSquareCdf,
   chiSquareQuantile,
@@ -22,19 +25,7 @@ export * from './advisories.ts'
 export * from './bullet-fit.ts'
 export * from './cartridge-specs.ts'
 export * from './competition/scoring.ts'
-export * from './drag-tables.ts'
-export { InputError, overlay, type Settings } from './errors.ts'
-export * from './exterior/atmosphere.ts'
-export * from './exterior/drag.ts'
-export * from './exterior/modified.ts'
-export * from './exterior/moving-target.ts'
-export * from './exterior/muzzle-velocity.ts'
-export * from './exterior/outline-drag.ts'
-export * from './exterior/range-strings.ts'
-export * from './exterior/rk45.ts'
-export * from './exterior/stability.ts'
-export * from './exterior/trajectory.ts'
-export * from './exterior/truing.ts'
+export { InputError } from './errors.ts'
 export * from './groups/hit-probability.ts'
 export * from './groups/statistics.ts'
 export * from './interior/bore-resistance.ts'

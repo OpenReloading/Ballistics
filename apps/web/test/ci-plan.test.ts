@@ -137,7 +137,7 @@ it('prerenders every record when record data, page code or shared parts changed'
 })
 
 const packages =
-  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
+  '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit'
 /** The workspaces of the packages group that a change of units reaches. */
 const reachedByUnits =
   '--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools'

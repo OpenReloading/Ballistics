@@ -44,6 +44,7 @@
     "test": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@open-reloading/ballistics": "workspace:*",
     "@open-reloading/statistics": "workspace:*",
     "@open-reloading/units": "workspace:*"
   },
@@ -51,7 +52,6 @@
     "@open-reloading/data": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "fast-check": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

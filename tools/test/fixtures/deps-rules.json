@@ -97,11 +97,11 @@
   },
   "packages/core/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
-    "rules": ["core-imports-units-and-statistics"]
+    "rules": ["core-imports-units-statistics-and-ballistics"]
   },
   "packages/core/src/npm-package.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["core-imports-units-and-statistics"]
+    "rules": ["core-imports-units-statistics-and-ballistics"]
   },
   "packages/core/src/missing.ts": {
     "source": "import './nope.ts'",
@@ -217,7 +217,7 @@
   },
   "packages/core/src/react.ts": {
     "source": "import { useMemo } from 'react'\nexport { useMemo }",
-    "rules": ["core-imports-units-and-statistics"]
+    "rules": ["core-imports-units-statistics-and-ballistics"]
   },
   "packages/core/src/dom.ts": {
     "source": "export const title = () => document.title",
@@ -225,11 +225,11 @@
   },
   "packages/core/src/into-web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["core-imports-units-and-statistics"]
+    "rules": ["core-imports-units-statistics-and-ballistics"]
   },
   "packages/core/src/app-package.ts": {
     "source": "import { App } from '@open-reloading/web'\nexport { App }",
-    "rules": ["core-imports-units-and-statistics"]
+    "rules": ["core-imports-units-statistics-and-ballistics"]
   },
   "packages/units/src/dom.ts": {
     "source": "export const w = () => window.innerWidth",
@@ -306,5 +306,25 @@
   "packages/units/test/same-title.test.ts": {
     "source": "import { it } from 'vitest'\nit('runs', () => {})\nit('runs', () => {})",
     "rules": ["no-identical-title"]
+  },
+  "packages/core/src/ballistics-package.ts": {
+    "source": "import { trajectory } from '@open-reloading/ballistics'\nexport { trajectory }",
+    "rules": []
+  },
+  "packages/ballistics/src/exterior/own.ts": {
+    "source": "import { overlay } from '../settings.ts'\nimport { need } from '@open-reloading/statistics'\nimport { toSi } from '@open-reloading/units'\nexport { need, overlay, toSi }",
+    "rules": []
+  },
+  "packages/ballistics/src/schema-package.ts": {
+    "source": "import { pressureMethod } from '@open-reloading/schema'\nexport { pressureMethod }",
+    "rules": ["ballistics-imports-units-and-statistics"]
+  },
+  "packages/ballistics/src/npm-package.ts": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": ["ballistics-imports-units-and-statistics"]
+  },
+  "packages/ballistics/src/into-core.ts": {
+    "source": "import { interior } from '../../core/src/index.ts'\nexport { interior }",
+    "rules": ["ballistics-imports-units-and-statistics"]
   }
 }

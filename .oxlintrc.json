@@ -352,17 +352,19 @@
                   "!@open-reloading/units",
                   "!@open-reloading/units/**",
                   "!@open-reloading/statistics",
-                  "!@open-reloading/statistics/**"
+                  "!@open-reloading/statistics/**",
+                  "!@open-reloading/ballistics",
+                  "!@open-reloading/ballistics/**"
                 ],
-                "message": "core-imports-units-and-statistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+                "message": "core-imports-units-statistics-and-ballistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics, @open-reloading/ballistics and its own files."
               },
               {
                 "regex": "^[^.@]",
-                "message": "core-imports-units-and-statistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+                "message": "core-imports-units-statistics-and-ballistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics, @open-reloading/ballistics and its own files."
               },
               {
-                "regex": "^(\\.\\./)+((units|statistics|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
-                "message": "core-imports-units-and-statistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics and its own files."
+                "regex": "^(\\.\\./)+((units|statistics|ballistics|schema|importers|core|data|api|drawing|cli)/(src|dist)|packages|apps)/",
+                "message": "core-imports-units-statistics-and-ballistics: packages/core has no I/O: it imports only @open-reloading/units, @open-reloading/statistics, @open-reloading/ballistics and its own files."
               }
             ]
           }

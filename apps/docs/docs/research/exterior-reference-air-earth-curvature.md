@@ -35,9 +35,9 @@ Analytic: defined constants and model runs.
 
 ## Where in the app
 
-- `packages/core/src/exterior/atmosphere.ts`, `icao`.
-- `packages/core/test/exterior-atmosphere.test.ts`, the test "has a sea-level density 1.018 times the older reference density of 0.075126 lb/ft3".
-- `packages/core/src/exterior/trajectory.ts`, `pointMassRhs`.
+- `packages/ballistics/src/exterior/atmosphere.ts`, `icao`.
+- `packages/ballistics/test/exterior-atmosphere.test.ts`, the test "has a sea-level density 1.018 times the older reference density of 0.075126 lb/ft3".
+- `packages/ballistics/src/exterior/trajectory.ts`, `pointMassRhs`.
 - Model pages: [drag](../models/exterior-drag.md), [atmosphere](../models/exterior-atmosphere.md), [point mass](../models/exterior-point-mass.md).
 
 ## Confidence

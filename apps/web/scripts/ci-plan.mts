@@ -26,7 +26,7 @@ const repoRoot = path.join(webRoot, '../..')
 /** Files whose change feeds the web build: without one, only the checks and the jobs of `e2eInputs` run. */
 const webInputs = [
   /^apps\/web\//,
-  /^packages\/(units|locale-format|statistics|schema|importers|core|drawing|data|api)\//,
+  /^packages\/(units|locale-format|statistics|ballistics|schema|importers|core|drawing|data|api)\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig\.base\.json|\.nvmrc)$/,
   /^\.github\/(pnpm|actions)\//,
   /^\.github\/workflows\/ci\.yml$/,
@@ -60,6 +60,7 @@ const recordInputs = [
   /^packages\/units\//,
   /^packages\/locale-format\//,
   /^packages\/statistics\//,
+  /^packages\/ballistics\//,
   /^packages\/data\//,
   /^packages\/schema\//,
   /^packages\/api\//,
@@ -143,6 +144,7 @@ export const testGroups: Record<string, string[]> = {
     'units',
     'locale-format',
     'statistics',
+    'ballistics',
     'schema',
     'core',
     'importers',

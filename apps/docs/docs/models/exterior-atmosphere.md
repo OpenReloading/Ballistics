@@ -18,7 +18,7 @@ $$
 T(H) = T_0 - L H, \qquad p(H) = p_0 \left(\frac{T(H)}{T_0}\right)^{g_0/(R_d L)}
 $$
 
-Code: `packages/core/src/exterior/atmosphere.ts`, `standardAtmosphere` (`pressureExponent`), constants in `icao`.
+Code: `packages/ballistics/src/exterior/atmosphere.ts`, `standardAtmosphere` (`pressureExponent`), constants in `icao`.
 
 A sea-level pressure (QNH) converts to a station pressure through the same profile, $p_s = p_{\mathrm{QNH}}\,p(H)/p_0$. The model takes station pressure only; the caller converts.
 
@@ -30,7 +30,7 @@ $$
 T(y) = T_s - L y, \qquad p(y) = p_s \left(\frac{T(y)}{T_s}\right)^{g_0/(R_d L)}, \qquad \phi(y) = \phi
 $$
 
-Code: `packages/core/src/exterior/atmosphere.ts`, `airAt`.
+Code: `packages/ballistics/src/exterior/atmosphere.ts`, `airAt`.
 
 ### Saturation vapour pressure
 
@@ -40,7 +40,7 @@ $$
 e_s(T) = 611.2\ \mathrm{Pa}\cdot\exp\!\left(\frac{17.62\,t}{243.12 + t}\right), \qquad e = \phi\,e_s(T)
 $$
 
-Code: `packages/core/src/exterior/atmosphere.ts`, `saturationVapourPressure`.
+Code: `packages/ballistics/src/exterior/atmosphere.ts`, `saturationVapourPressure`.
 
 ### Density of moist air
 
@@ -50,7 +50,7 @@ $$
 \rho = \frac{p - e}{R_d T} + \frac{e}{R_v T}, \qquad R_v = \frac{R^*}{M_v}
 $$
 
-Code: `packages/core/src/exterior/atmosphere.ts`, `airDensity` (`vapourGas`).
+Code: `packages/ballistics/src/exterior/atmosphere.ts`, `airDensity` (`vapourGas`).
 
 ### Speed of sound in moist air
 
@@ -60,7 +60,7 @@ $$
 R_m = \frac{R_d}{1 - x_v + x_v M_v/M_d}, \qquad \frac{c_p}{R^*} = 3.5 + 0.5\,x_v, \qquad a = \sqrt{\frac{c_p}{c_p - R^*}\,R_m T}
 $$
 
-Code: `packages/core/src/exterior/atmosphere.ts`, `speedOfSound` (`vapourRatio`).
+Code: `packages/ballistics/src/exterior/atmosphere.ts`, `speedOfSound` (`vapourRatio`).
 
 With $\phi = 0$ both reduce to the dry-air ICAO formulas.
 
@@ -72,7 +72,7 @@ $$
 H_\rho = \frac{T_0}{L}\left(1 - \left(\frac{\rho}{\rho_0}\right)^{1/(g_0/(R_d L) - 1)}\right)
 $$
 
-Code: `packages/core/src/exterior/atmosphere.ts`, `densityAltitude`.
+Code: `packages/ballistics/src/exterior/atmosphere.ts`, `densityAltitude`.
 
 $\rho$ is the density of moist air of the entered temperature, station pressure and humidity, so a warmer, lower-pressure or more humid air has a higher density altitude. The station altitude does not enter.
 

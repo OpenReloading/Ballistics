@@ -110,7 +110,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true}]') }}
+        include: ${{ fromJSON(needs.changes.outputs.tests || '[{"name":"drawing","filter":"--filter @open-reloading/drawing","e2eUnit":false},{"name":"web","filter":"--filter @open-reloading/web","e2eUnit":false},{"name":"packages","filter":"--filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/schema --filter @open-reloading/core --filter @open-reloading/importers --filter @open-reloading/data --filter @open-reloading/api --filter @open-reloading/cli --filter @open-reloading/docs --filter @open-reloading/tools --filter @open-reloading/test-kit","e2eUnit":true}]') }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -220,8 +220,8 @@ jobs:
       - uses: ./.github/actions/pnpm
       - run: pnpm --filter @open-reloading/e2e exec playwright install --with-deps chromium
       # the export build and the specs import the workspace packages from their dist/
-      # units and statistics first: schema and core build them through their project references
-      - run: pnpm --filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/core --filter @open-reloading/drawing --filter @open-reloading/data --filter @open-reloading/api run build
+      # units, statistics and ballistics first: schema and core build them through their project references
+      - run: pnpm --filter @open-reloading/units --filter @open-reloading/locale-format --filter @open-reloading/statistics --filter @open-reloading/ballistics --filter @open-reloading/schema --filter @open-reloading/importers --filter @open-reloading/core --filter @open-reloading/drawing --filter @open-reloading/data --filter @open-reloading/api run build
       - run: docker compose up --detach --build api
       - name: Wait for the API
         run: |

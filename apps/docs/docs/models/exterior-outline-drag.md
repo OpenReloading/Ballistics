@@ -18,7 +18,7 @@ $$
 C_{D0} = C_{DH} + C_{DSF} + C_{DRB} + C_{DBT} + C_{DB}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`nodes`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`nodes`).
 
 The head part $C_{DH}$ includes the meplat term. The reference area is $\pi d^2 / 4$, the same as for the drag tables.
 
@@ -30,7 +30,7 @@ $$
 \tau = \frac{1 - d_M}{L_N}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`tau`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`tau`).
 
 Supersonic ($M \gt 1$), a similarity rule in $\tau\sqrt{M^2 - 1}$ with fit constants $c_1$ to $c_4$ that are linear or quadratic in $r$. Below $M_f$ the similarity variable is held at its value there:
 
@@ -38,7 +38,7 @@ $$
 C_{DH} = \frac{c_1(r) - c_2(r)\,\tau^2}{\zeta^2} \, (\tau \zeta)^{c_3(r) + c_4(r)\,\tau}, \qquad \zeta = \sqrt{\max(M, M_f)^2 - 1}, \qquad M_f = 1 + 0.368\,\tau^{1.85}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `headSupersonic`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `headSupersonic`.
 
 Subsonic and transonic ($M \le 1$), zero up to a critical Mach number that falls with the thickness ratio:
 
@@ -46,7 +46,7 @@ $$
 C_{DH} = \begin{cases} 0, & M \le M_c \\ 0.368\,\tau^{1.8} + 1.6\,\tau\,\chi, & M \gt M_c \end{cases}, \qquad M_c = \left(1 + 0.552\,\tau^{0.8}\right)^{-1/2}, \qquad \chi = \frac{M^2 - 1}{2.4\,M^2}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `headTransonic`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `headTransonic`.
 
 Meplat: the stagnation pressure on the flat face, from the isentropic stagnation pressure below Mach 1 and the pitot pressure behind a normal shock above, times a leakage factor $K$:
 
@@ -54,13 +54,13 @@ $$
 \frac{P_0}{p} = \begin{cases} \left(1 + 0.2 M^2\right)^{3.5}, & M \le 1 \\ \left(1.2 M^2\right)^{3.5} \left(\dfrac{6}{7 M^2 - 1}\right)^{2.5}, & M \gt 1 \end{cases}, \qquad C_{DM} = K(M) \, \frac{1.122 \, (P_0/p - 1) \, d_M^2}{M^2}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `meplat` (`pitot`, `face`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `meplat` (`pitot`, `face`).
 
 $$
 K(M) = \begin{cases} 0, & M \le 0.91 \\ 0.254 + 2.88\,\chi, & 0.91 \lt M \lt 1.41 \\ 0.85, & M \ge 1.41 \end{cases}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `meplat`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `meplat`.
 
 The factor 1.122 is $(\pi/4)(2/\gamma)$ with $\gamma = 1.4$. Above Mach 1.41 the report gives $K = 0.85$ in one place and 0.75 in its text. The code uses 0.85.
 
@@ -72,7 +72,7 @@ $$
 t_B = \frac{1 - d_B}{2 L_{BT}}, \qquad r_{BT} = 1 - e^{-2 L_{BT}} + 2 t_B \left( e^{-2 L_{BT}} \left(L_{BT} + \tfrac{1}{2}\right) - \tfrac{1}{2} \right)
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `boatTail` (`tb`, `rbt`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `boatTail` (`tb`, `rbt`).
 
 Subsonic and transonic, zero up to Mach 0.85:
 
@@ -80,7 +80,7 @@ $$
 C_{DBT} = \begin{cases} 0, & M \le 0.85 \\ \dfrac{2 (2 t_B^2 + t_B^3) \, r_{BT}}{0.564 + 1250\,\chi^2}, & 0.85 \lt M \le 1 \\ 2 (2 t_B^2 + t_B^3) \, r_{BT} \, (1.774 - 9.3\,\chi), & 1 \lt M \le 1.1 \end{cases}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `boatTail`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `boatTail`.
 
 Supersonic ($M \gt 1.1$), with $\beta = \sqrt{M^2 - 1}$, a recovery factor $k$ and a term $a_1$ for the flow arriving from the head over the cylinder:
 
@@ -88,13 +88,13 @@ $$
 C_{DBT} = \frac{4 A t_B}{k} \left( 1 - e^{-k L_{BT}} + 2 t_B \left( e^{-k L_{BT}} \left(L_{BT} + \frac{1}{k}\right) - \frac{1}{k} \right) \right), \qquad k = \frac{0.85}{\beta}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `boatTail` (`k`, `e`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `boatTail` (`k`, `e`).
 
 $$
 A = a_1 \, e^{-1.1952 (L_T - L_N - L_{BT}) / M} - \frac{(2.4 M^4 - 4 \beta^2) \, t_B^2}{2 \beta^4} + \frac{2 t_B}{\beta}, \qquad a_1 = \left(1 - \frac{0.6\,r}{M}\right) \left( \frac{5 \tau}{6 \beta} + \frac{\tau^2}{4} - \frac{0.7435}{M^2} (\tau M)^{1.6} \right)
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `boatTail`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `boatTail`.
 
 A flat base ($L_{BT} = 0$) has no boat-tail drag.
 
@@ -106,7 +106,7 @@ $$
 Re = 23296.3 \, M \, L_T \, d_\text{mm}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `skinFriction` (`re`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `skinFriction` (`re`).
 
 Flat-plate friction coefficients, turbulent and laminar, each with a compressibility factor:
 
@@ -114,7 +114,7 @@ $$
 C_{fT} = \frac{0.455}{(\log_{10} Re)^{2.58}} \left(1 + 0.21 M^2\right)^{-0.32}, \qquad C_{fL} = \frac{1.328}{\sqrt{Re}} \left(1 + 0.12 M^2\right)^{-0.12}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `skinFriction` (`cfT`, `cfL`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `skinFriction` (`cfT`, `cfL`).
 
 Wetted areas of the nose and of the rest of the body, in square calibers, and the friction drag:
 
@@ -122,17 +122,17 @@ $$
 S_N = \frac{\pi}{2} L_N \left(1 + \left(0.333 + \frac{0.02}{L_N^2}\right) r \right) \left(1 + \frac{1}{8 L_N^2}\right), \qquad S_C = \pi (L_T - L_N)
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `skinFriction` (`sNose`, `sCyl`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `skinFriction` (`sNose`, `sCyl`).
 
 $$
 C_{DSF} = \frac{4}{\pi} \left( C_{fN} S_N + C_{fT} S_C \right)
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `skinFriction`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `skinFriction`.
 
 $C_{fN}$ is $C_{fL}$ with a laminar nose and $C_{fT}$ otherwise. Without `boundaryLayer` the nose is laminar and the afterbody turbulent below a diameter of 20 mm, both turbulent from 20 mm.
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`laminarNose`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`laminarNose`).
 
 ### Base
 
@@ -142,19 +142,19 @@ $$
 \frac{p_B}{p_\infty} = P(M) \left(1 + 0.09 M^2 \left(1 - e^{L_N - L_T}\right)\right) \left(1 + 0.25 M^2 (1 - d_B)\right)
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `basePressure`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `basePressure`.
 
 $$
 P(M) = \begin{cases} \left(1 + 0.1875 M^2 + 0.0531 M^4\right)^{-1}, & M \lt 1 \\ \left(1 + 0.2477 M^2 + 0.0345 M^4\right)^{-1}, & M \ge 1 \end{cases}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `basePressure`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `basePressure`.
 
 $$
 C_{DB} = \frac{1.4286}{M^2} \left(1 - \frac{p_B}{p_\infty}\right) d_B^2
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`baseDrag`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `estimateDragFromOutline` (`baseDrag`).
 
 1.4286 is $2/\gamma$ for $\gamma = 1.4$, rounded.
 
@@ -164,7 +164,7 @@ $$
 C_{DRB} = (d_{RB} - 1) \cdot \begin{cases} M^{12.5}, & M \lt 0.95 \\ 0.21 + 0.28 / M^2, & M \ge 0.95 \end{cases}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `band`.
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `band`.
 
 Without a band ($d_{RB} = 1$) the part is zero.
 
@@ -176,7 +176,7 @@ $$
 \frac{\sigma}{C_{D0}}(M) = s_j + (s_{j+1} - s_j) \frac{M - M_j}{M_{j+1} - M_j}, \qquad M_j \le M \le M_{j+1}
 $$
 
-Code: `packages/core/src/exterior/outline-drag.ts`, `relativeSd` (`sdPercent`).
+Code: `packages/ballistics/src/exterior/outline-drag.ts`, `relativeSd` (`sdPercent`).
 
 ## Symbols
 
