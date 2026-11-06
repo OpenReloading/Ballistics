@@ -8,11 +8,10 @@
 import { InputError, nth } from '@open-reloading/statistics'
 
 export type Point = { x: number; y: number }
-type Nine<T> = [T, T, T, T, T, T, T, T, T]
 /** A 3 x 3 matrix in row-major order, acting on homogeneous points (x, y, 1). */
 export type Matrix = readonly number[]
 /** A matrix known to have its nine entries, as the functions of this module return it. */
-export type Mat3 = Readonly<Nine<number>>
+export type Mat3 = readonly [number, number, number, number, number, number, number, number, number]
 /** A homogeneous point or direction. */
 export type Vector3 = [number, number, number]
 
