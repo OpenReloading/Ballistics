@@ -4,7 +4,10 @@ import { fitTruingStrings } from '../src/index.ts'
 
 vi.mock('@open-reloading/statistics', async (original) => {
   const module = await original<typeof import('@open-reloading/statistics')>()
-  return { ...module, logLeastSquares: vi.fn(module.logLeastSquares) }
+  return {
+    ...module,
+    logLeastSquares: vi.fn<typeof module.logLeastSquares>(module.logLeastSquares),
+  }
 })
 
 import { logLeastSquares, nth } from '@open-reloading/statistics'

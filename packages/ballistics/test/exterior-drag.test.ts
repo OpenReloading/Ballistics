@@ -83,7 +83,49 @@ const shot = (drag: TrajectoryInput['projectile']['drag']): TrajectoryInput => (
 const ranges = [100, 300, 600, 900, 1200]
 const tight = { relativeTolerance: 1e-12, absoluteTolerance: 1e-12 }
 
-describe('drag inputs', () => {
+/** The shot of `drag` at 583 m/s over the ground into a 20 m/s headwind: 603 m/s airspeed, above a 600 m/s threshold. */
+const headwindShot = (drag: DragInput): TrajectoryInput => ({
+  ...shot(drag),
+  muzzleVelocity: 583,
+  wind: [{ endDistance: Infinity, speed: 20, fromDirection: 0 }],
+})
+
+/** The shot of `drag` zeroed at 100 m. */
+const zeroedAt100 = (drag: DragInput): TrajectoryInput => ({ ...shot(drag), zero: { range: 100 } })
+
+/** The shot of `drag` at 310 m/s in sea-level standard air. */
+const slowShot = (drag: DragInput): TrajectoryInput => ({
+  ...shot(drag),
+  muzzleVelocity: 310,
+  air: standardAtmosphere(0),
+})
+
+const monotoneCd = (table: DragTable, mach: number) =>
+  dragCoefficient(table, mach, 'monotone-cubic')
+
+/**
+ * Samples every segment of `table` 50 times: the samples that leave the node values or turn against
+ * the secant of their segment.
+ */
+function shapeViolations(table: DragTable): string[] {
+  const out: string[] = []
+  for (let k = 0; k + 1 < table.length; k++) {
+    const [m0, c0] = nth(table, k)
+    const [m1, c1] = nth(table, k + 1)
+    let previous = c0
+    for (let i = 1; i <= 50; i++) {
+      const m = i === 50 ? m1 : m0 + ((m1 - m0) * i) / 50
+      const c = monotoneCd(table, m)
+      const inside = c >= Math.min(c0, c1) && c <= Math.max(c0, c1)
+      const monotone = c1 >= c0 ? c >= previous : c <= previous
+      if (!(inside && monotone)) out.push(`segment ${k} at Mach ${m}: ${c}`)
+      previous = c
+    }
+  }
+  return out
+}
+
+describe('drag inputs: BC and custom curve', () => {
   it.each(['linear', 'monotone-cubic'] as const)(
     'gives the same trajectory for a BC and the equivalent custom curve (%s)',
     (interpolation) => {
@@ -132,21 +174,21 @@ describe('drag inputs', () => {
       expect(Math.abs(p.time - nth(one.points, k).time)).toBeLessThan(1e-9)
     })
   })
+})
 
+describe('drag inputs: band threshold', () => {
   it('switches band at the threshold airspeed, not at the ground speed', () => {
-    // 583 m/s over the ground into a 20 m/s headwind: 603 m/s airspeed, above the 600 m/s threshold
-    const windy = (drag: TrajectoryInput['projectile']['drag']): TrajectoryInput => ({
-      ...shot(drag),
-      muzzleVelocity: 583,
-      wind: [{ endDistance: Infinity, speed: 20, fromDirection: 0 }],
-    })
     const near = Array.from({ length: 81 }, (_, k) => k / 2)
     const upper = trajectory(
-      windy({ kind: 'bc', model: 'G7', bands: [{ ballisticCoefficient: bc, minVelocity: 0 }] }),
+      headwindShot({
+        kind: 'bc',
+        model: 'G7',
+        bands: [{ ballisticCoefficient: bc, minVelocity: 0 }],
+      }),
       near,
     )
     const banded = trajectory(
-      windy({
+      headwindShot({
         kind: 'bc',
         model: 'G7',
         bands: [
@@ -156,27 +198,24 @@ describe('drag inputs', () => {
       }),
       near,
     )
-    let before = 0
-    let close = 0
-    let after = 0
-    banded.points.forEach((p, k) => {
+    const pairs = banded.points.map((p, k) => {
       const q = nth(upper.points, k)
-      const airspeed = q.mach * speedOfSound(airAt(air, q.heightAboveFiringPoint))
-      if (airspeed > 600.25) {
-        before++
-        if (airspeed < 602) close++
-        expect(Math.abs(p.height - q.height)).toBeLessThanOrEqual(1e-9 * Math.abs(q.height))
-        expect(p.velocity).toBe(q.velocity)
-      } else if (airspeed < 599.75) {
-        after++
-        expect(p.velocity).toBeLessThan(q.velocity - 1e-6)
-      }
+      return { p, q, airspeed: q.mach * speedOfSound(airAt(air, q.heightAboveFiringPoint)) }
     })
-    expect(before).toBeGreaterThan(1)
-    expect(close).toBeGreaterThan(0)
-    expect(after).toBeGreaterThan(0)
+    const before = pairs.filter(({ airspeed }) => airspeed > 600.25)
+    const after = pairs.filter(({ airspeed }) => airspeed < 599.75)
+    for (const { p, q } of before) {
+      expect(Math.abs(p.height - q.height)).toBeLessThanOrEqual(1e-9 * Math.abs(q.height))
+      expect(p.velocity).toBe(q.velocity)
+    }
+    for (const { p, q } of after) expect(p.velocity).toBeLessThan(q.velocity - 1e-6)
+    expect(before.length).toBeGreaterThan(1)
+    expect(before.filter(({ airspeed }) => airspeed < 602).length).toBeGreaterThan(0)
+    expect(after.length).toBeGreaterThan(0)
   })
+})
 
+describe('drag inputs: invalid', () => {
   it('rejects invalid drag inputs', () => {
     const bad: TrajectoryInput['projectile']['drag'][] = [
       { kind: 'bc', model: 'G7', bands: [] },
@@ -214,14 +253,13 @@ describe('BC reference atmosphere', () => {
     { ballisticCoefficient: bc, minVelocity: 600 },
     { ballisticCoefficient: 0.9 * bc, minVelocity: 0 },
   ]
-  const zeroed = (drag: DragInput): TrajectoryInput => ({ ...shot(drag), zero: { range: 100 } })
 
   it('flies a metro or ICAO BC as a BC without reference', () => {
-    const none = trajectory(zeroed({ kind: 'bc', model: 'G7', bands }), ranges)
+    const none = trajectory(zeroedAt100({ kind: 'bc', model: 'G7', bands }), ranges)
     for (const reference of ['metro', 'icao'] as const)
-      expect(trajectory(zeroed({ kind: 'bc', model: 'G7', bands, reference }), ranges)).toEqual(
-        none,
-      )
+      expect(
+        trajectory(zeroedAt100({ kind: 'bc', model: 'G7', bands, reference }), ranges),
+      ).toEqual(none)
   })
 
   it('rejects an unknown reference and an unknown interpolation', () => {
@@ -235,32 +273,13 @@ describe('BC reference atmosphere', () => {
 })
 
 describe('monotone cubic interpolation', () => {
-  const cubic = (table: DragTable, mach: number) => dragCoefficient(table, mach, 'monotone-cubic')
-
   it('returns every printed node exactly', () => {
     for (const table of Object.values(dragTables))
-      for (const [mach, cd] of table) expect(cubic(table, mach)).toBe(cd)
+      for (const [mach, cd] of table) expect(monotoneCd(table, mach)).toBe(cd)
   })
 
-  /** Samples every segment 50 times: monotone along the secant and between the node values. */
-  const checkShape = (table: DragTable) => {
-    for (let k = 0; k + 1 < table.length; k++) {
-      const [m0, c0] = nth(table, k)
-      const [m1, c1] = nth(table, k + 1)
-      let previous = c0
-      for (let i = 1; i <= 50; i++) {
-        const c = cubic(table, i === 50 ? m1 : m0 + ((m1 - m0) * i) / 50)
-        expect(c).toBeGreaterThanOrEqual(Math.min(c0, c1))
-        expect(c).toBeLessThanOrEqual(Math.max(c0, c1))
-        if (c1 >= c0) expect(c).toBeGreaterThanOrEqual(previous)
-        else expect(c).toBeLessThanOrEqual(previous)
-        previous = c
-      }
-    }
-  }
-
   it('stays monotone and inside the node values on every table segment', () => {
-    for (const table of Object.values(dragTables)) checkShape(table)
+    for (const table of Object.values(dragTables)) expect(shapeViolations(table)).toEqual([])
   })
 
   it('keeps a peak, a flat run and zeros of a custom curve', () => {
@@ -271,9 +290,9 @@ describe('monotone cubic interpolation', () => {
       [3, 0.2],
       [4, 0],
     ]
-    checkShape(curve)
-    expect(cubic(curve, 1.5)).toBe(1)
-    expect(cubic(curve, 3.7)).toBeGreaterThanOrEqual(0)
+    expect(shapeViolations(curve)).toEqual([])
+    expect(monotoneCd(curve, 1.5)).toBe(1)
+    expect(monotoneCd(curve, 3.7)).toBeGreaterThanOrEqual(0)
   })
 
   it('matches the closed form on three nodes and the line on two', () => {
@@ -283,24 +302,26 @@ describe('monotone cubic interpolation', () => {
       [1, 1],
       [3, 2],
     ]
-    expect(Math.abs(cubic(curve, 0.5) / (25 / 48) - 1)).toBeLessThan(1e-15)
-    expect(Math.abs(cubic(curve, 2) / (19 / 12) - 1)).toBeLessThan(1e-15)
+    expect(Math.abs(monotoneCd(curve, 0.5) / (25 / 48) - 1)).toBeLessThan(1e-15)
+    expect(Math.abs(monotoneCd(curve, 2) / (19 / 12) - 1)).toBeLessThan(1e-15)
     const line: DragTable = [
       [0.5, 0.3],
       [2.5, 0.7],
     ]
     for (const m of [0.6, 1, 1.7, 2.4])
-      expect(Math.abs(cubic(line, m) / (0.3 + 0.2 * (m - 0.5)) - 1)).toBeLessThan(1e-15)
+      expect(Math.abs(monotoneCd(line, m) / (0.3 + 0.2 * (m - 0.5)) - 1)).toBeLessThan(1e-15)
     // secants 1 and 5, parabola slope 3: the secant 1 bounds the interior slope, 2 min(1, 5, 3/2) = 2
     const steep: DragTable = [
       [0, 0],
       [1, 1],
       [2, 6],
     ]
-    expect(Math.abs(cubic(steep, 0.5) / (3 / 8) - 1)).toBeLessThan(1e-15)
-    expect(Math.abs(cubic(steep, 1.5) / (25 / 8) - 1)).toBeLessThan(1e-15)
+    expect(Math.abs(monotoneCd(steep, 0.5) / (3 / 8) - 1)).toBeLessThan(1e-15)
+    expect(Math.abs(monotoneCd(steep, 1.5) / (25 / 8) - 1)).toBeLessThan(1e-15)
   })
+})
 
+describe('monotone cubic interpolation past the nodes', () => {
   it('extends the cubic of a segment past its nodes', () => {
     const curve: DragTable = [
       [0, 0],
@@ -347,7 +368,9 @@ describe('monotone cubic interpolation', () => {
       ),
     ).toBe(true)
   })
+})
 
+describe('monotone cubic interpolation at the nodes and by default', () => {
   it('has a continuous slope at every interior node', () => {
     const h = 1e-7
     let worst = 0
@@ -359,7 +382,7 @@ describe('monotone cubic interpolation', () => {
           Math.abs((read(m + h) - c) / h - (c - read(m - h)) / h)
         worst = Math.max(
           worst,
-          jump((x) => cubic(table, x)),
+          jump((x) => monotoneCd(table, x)),
         )
         linear = Math.max(
           linear,
@@ -382,7 +405,9 @@ describe('monotone cubic interpolation', () => {
         trajectory(shot(drag), ranges),
       )
   })
+})
 
+describe('monotone cubic interpolation in a trajectory', () => {
   it('integrates the cubic: equals a dense linear resample of it', () => {
     // G1 BC 0.25 lb/in2 at 310 m/s; resample at multiples of 0.0005 Mach, which hit every node
     const g1bc = 0.25 * lbPerSqInToKgPerSqM
@@ -391,27 +416,24 @@ describe('monotone cubic interpolation', () => {
       model: 'G1',
       bands: [{ ballisticCoefficient: g1bc, minVelocity: 0 }],
     }
-    const slow = (d: DragInput): TrajectoryInput => ({
-      ...shot(d),
-      muzzleVelocity: 310,
-      air: standardAtmosphere(0),
-    })
-    const ranges = [100, 200, 300]
-    const a = trajectory(slow({ ...drag, interpolation: 'monotone-cubic' }), ranges)
+    const near = [100, 200, 300]
+    const a = trajectory(slowShot({ ...drag, interpolation: 'monotone-cubic' }), near)
     const i = mass / (g1bc * diameter ** 2)
     const curve = Array.from(
       { length: 10001 },
-      (_, k) => [k / 2000, i * cubic(dragTables.G1, k / 2000)] as const,
+      (_, k) => [k / 2000, i * monotoneCd(dragTables.G1, k / 2000)] as const,
     )
-    const b = trajectory(slow({ kind: 'curve', curve }), ranges)
-    const linear = trajectory(slow(drag), ranges)
+    const b = trajectory(slowShot({ kind: 'curve', curve }), near)
+    const linear = trajectory(slowShot(drag), near)
     a.points.forEach((p, k) => {
       expect(Math.abs(p.height - nth(b.points, k).height)).toBeLessThan(1e-5)
       expect(Math.abs(p.time - nth(b.points, k).time)).toBeLessThan(1e-6)
     })
     expect(Math.abs(nth(a.points, 2).height - nth(linear.points, 2).height)).toBeGreaterThan(5e-4)
   })
+})
 
+describe('monotone cubic interpolation error', () => {
   it('keeps the error proportional to the tolerance (G1)', () => {
     const g1bc = 0.25 * lbPerSqInToKgPerSqM
     for (const [v0, elevation, range] of [

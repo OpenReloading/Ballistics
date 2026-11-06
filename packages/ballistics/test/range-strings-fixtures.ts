@@ -46,17 +46,9 @@ export interface Truth {
 
 const defaultAt = { impacts, dials }
 
-/**
- * Strings the solver gives for `truth` with its zero offset, plus noise from `noise`. Dials are
- * rounded to whole clicks and keep the default rounding of a dial, unless `exact`.
- */
-export function strings(
-  truth: Truth,
-  noise: () => number,
-  at: { impacts: number[]; dials: number[] } = defaultAt,
-  exact = false,
-): Omit<TruingStringsInput, 'entries'> & { entries: RangeStringEntry[] } {
-  const s: TrajectoryInput = {
+/** The nominal shot with the muzzle velocity and drag of `truth`. */
+function trueShot(truth: Truth): TrajectoryInput {
+  return {
     ...nominal,
     muzzleVelocity: nominal.muzzleVelocity * truth.v,
     projectile: {
@@ -69,7 +61,19 @@ export function strings(
       },
     },
   }
-  const t = trajectory(s, [...at.impacts, ...at.dials, 0], tight)
+}
+
+/**
+ * Strings the solver gives for `truth` with its zero offset, plus noise from `noise`. Dials are
+ * rounded to whole clicks and keep the default rounding of a dial, unless `exact`.
+ */
+export function strings(
+  truth: Truth,
+  noise: () => number,
+  at: { impacts: number[]; dials: number[] } = defaultAt,
+  exact = false,
+): Omit<TruingStringsInput, 'entries'> & { entries: RangeStringEntry[] } {
+  const t = trajectory(trueShot(truth), [...at.impacts, ...at.dials, 0], tight)
   const point = (r: number) => {
     const p = t.points.find((q) => q.range === r)
     if (!p) throw new Error(`range ${r}`)

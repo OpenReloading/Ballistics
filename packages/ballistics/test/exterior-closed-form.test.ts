@@ -65,6 +65,20 @@ describe('flat-fire drop with a constant drag coefficient', () => {
   }
 })
 
+/**
+ * Time at which x = W t + ln(1 + k u0 t) / k reaches `range`, u0 = v0 - W, by Newton's method: the
+ * flight of a constant drag coefficient in a range wind W.
+ */
+function rangeWindTime(k: number, v0: number, w: number, range: number) {
+  const u0 = v0 - w
+  let t = range / v0
+  for (let n = 0; n < 50; n++) {
+    const f = w * t + Math.log(1 + k * u0 * t) / k - range
+    t -= f / (w + u0 / (1 + k * u0 * t))
+  }
+  return t
+}
+
 describe('range wind with a constant drag coefficient', () => {
   const air = standardAtmosphere(0)
   const mass = 0.0113
@@ -88,21 +102,10 @@ describe('range wind with a constant drag coefficient', () => {
     expect(points).toHaveLength(ranges.length)
     return points
   }
-  /** Time at which x = W t + ln(1 + k u0 t) / k reaches `range`, by Newton's method. */
-  const timeAt = (w: number, range: number) => {
-    const u0 = v0 - w
-    let t = range / v0
-    for (let n = 0; n < 50; n++) {
-      const f = w * t + Math.log(1 + k * u0 * t) / k - range
-      t -= f / (w + u0 / (1 + k * u0 * t))
-    }
-    return t
-  }
-
   for (const w of [-10, 10, 50]) {
     it(`follows the closed form in a range wind of ${w} m/s`, () => {
       for (const q of run(w, [200, 600, 1000])) {
-        const t = timeAt(w, q.range)
+        const t = rangeWindTime(k, v0, w, q.range)
         const u0 = v0 - w
         expect(Math.abs(q.time / t - 1)).toBeLessThan(1e-8)
         expect(Math.abs(q.velocity / (w + u0 / (1 + k * u0 * t)) - 1)).toBeLessThan(1e-8)
@@ -122,16 +125,48 @@ describe('range wind with a constant drag coefficient', () => {
   })
 })
 
+/** The flat-fire spin drift case: 7.82 mm, 11.34 g, CD 0.30, CLa 2.6, CMa 3.0, Ix 7.2e-8 kg m2, 790 m/s, 254 mm twist. */
+const spinCase = {
+  air: standardAtmosphere(0),
+  mass: 0.01134,
+  d: 0.00782,
+  v0: 790,
+  ix: 7.2e-8,
+  cd: 0.3,
+  cla: 2.6,
+  cma: 3.0,
+}
+
+/** The trajectory points of the spin drift case at 100 to 400 m with the roll damping `spinDamping`. */
+function spinCaseDrift(spinDamping: number) {
+  const { air, mass, d, v0, ix, cd, cla, cma } = spinCase
+  return trajectory(
+    {
+      projectile: {
+        mass,
+        diameter: d,
+        length: 0.0312,
+        drag: flat(cd),
+        aerodynamics: {
+          liftSlope: cla,
+          momentSlope: cma,
+          spinDamping,
+          axialInertia: ix,
+          transverseInertia: 6.8e-7,
+        },
+      },
+      muzzleVelocity: v0,
+      firearm: { sightHeight: 0, twist: 0.254, twistHand: 'right' },
+      air,
+      zero: { elevationAngle: 0, windageAngle: 0 },
+    },
+    [100, 200, 300, 400],
+    { ...off, model: 'modified-point-mass' },
+  ).points
+}
+
 describe('flat-fire spin drift of the modified point mass', () => {
-  // 7.82 mm, 11.34 g, CD 0.30, CLa 2.6, CMa 3.0, Ix 7.2e-8 kg m2, 790 m/s, 254 mm twist
-  const air = standardAtmosphere(0)
-  const mass = 0.01134
-  const d = 0.00782
-  const v0 = 790
-  const ix = 7.2e-8
-  const cd = 0.3
-  const cla = 2.6
-  const cma = 3.0
+  const { air, mass, d, v0, ix, cd, cla, cma } = spinCase
   const area = (Math.PI / 4) * d ** 2
   const rho = airDensity(air)
   const k = (rho * area * cd) / (2 * mass)
@@ -142,39 +177,14 @@ describe('flat-fire spin drift of the modified point mass', () => {
     const a = 3 * k - lambda
     return (kk * (Math.exp(a * x) - a * x - 1)) / (a ** 2 * v0 ** 3)
   }
-  const drift = (spinDamping: number) =>
-    trajectory(
-      {
-        projectile: {
-          mass,
-          diameter: d,
-          length: 0.0312,
-          drag: flat(cd),
-          aerodynamics: {
-            liftSlope: cla,
-            momentSlope: cma,
-            spinDamping,
-            axialInertia: ix,
-            transverseInertia: 6.8e-7,
-          },
-        },
-        muzzleVelocity: v0,
-        firearm: { sightHeight: 0, twist: 0.254, twistHand: 'right' },
-        air,
-        zero: { elevationAngle: 0, windageAngle: 0 },
-      },
-      [100, 200, 300, 400],
-      { ...off, model: 'modified-point-mass' },
-    ).points
-
   it('matches the closed form with constant spin', () => {
-    for (const q of drift(0))
+    for (const q of spinCaseDrift(0))
       expect(Math.abs(q.windage / closed(q.range, 0) - 1)).toBeLessThan(1e-3)
   })
 
   it('matches the closed form with spin decaying as the speed', () => {
     // dp/dx = (rho A d^2 C_lp / (2 Ix)) p, so C_lp = -CD Ix / (m d^2) gives lambda = k
-    const points = drift((-cd * ix) / (mass * d ** 2))
+    const points = spinCaseDrift((-cd * ix) / (mass * d ** 2))
     for (const q of points) expect(Math.abs(q.windage / closed(q.range, k) - 1)).toBeLessThan(1e-3)
     // spin decay lowers the drift at 400 m by 11 percent, 0.0272 against 0.0306 m
     const far = nth(points, points.length - 1).windage
@@ -232,86 +242,86 @@ describe('linear-theory stability', () => {
     expect(sd).toBeCloseTo(0.1148, 3)
     expect(isStable(1.7035, sd)).toBe(false)
   })
+})
 
-  describe('damping exponents of the 168 gr case from the characteristic equation', () => {
-    // 168 gr, 0.308 in, sea-level density; per calibre of travel, xi'' + (H - iP) xi' - (M + iPT) xi = 0
-    const mass = 168 * 6.479891e-5
-    const d = 0.308 * 0.0254
-    const c = (1.225 * (Math.PI / 4) * d ** 3) / (2 * mass)
-    const [cla, cd, cma, cmpa, cmq, kx, ky] = [2.75, 0.331, 2.63, -0.22, -8.2, 9.224, 1.238]
-    const m = ky * c * cma
-    const h = c * (cla - cd - ky * cmq)
-    const t = c * (cla + kx * cmpa)
-    const sd = (2 * t) / h
-    /** Damping exponents (real parts of the roots), the fast mode (larger turning rate) first. */
-    const roots = (sg: number) => {
-      const p = 2 * Math.sqrt(sg * m)
-      const x = h ** 2 - p ** 2 + 4 * m
-      const y = 4 * p * t - 2 * h * p
-      const r = Math.hypot(x, y)
-      const re = Math.sqrt((r + x) / 2)
-      const im = Math.sign(y) * Math.sqrt((r - x) / 2)
-      return im > 0 ? [(-h + re) / 2, (-h - re) / 2] : [(-h - re) / 2, (-h + re) / 2]
-    }
+describe('linear-theory stability: damping exponents of the 168 gr case from the characteristic equation', () => {
+  // 168 gr, 0.308 in, sea-level density; per calibre of travel, xi'' + (H - iP) xi' - (M + iPT) xi = 0
+  const mass = 168 * 6.479891e-5
+  const d = 0.308 * 0.0254
+  const c = (1.225 * (Math.PI / 4) * d ** 3) / (2 * mass)
+  const [cla, cd, cma, cmpa, cmq, kx, ky] = [2.75, 0.331, 2.63, -0.22, -8.2, 9.224, 1.238]
+  const m = ky * c * cma
+  const h = c * (cla - cd - ky * cmq)
+  const t = c * (cla + kx * cmpa)
+  const sd = (2 * t) / h
+  /** Damping exponents (real parts of the roots), the fast mode (larger turning rate) first. */
+  const roots = (sg: number) => {
+    const p = 2 * Math.sqrt(sg * m)
+    const x = h ** 2 - p ** 2 + 4 * m
+    const y = 4 * p * t - 2 * h * p
+    const r = Math.hypot(x, y)
+    const re = Math.sqrt((r + x) / 2)
+    const im = Math.sign(y) * Math.sqrt((r - x) / 2)
+    return im > 0 ? [(-h + re) / 2, (-h - re) / 2] : [(-h - re) / 2, (-h + re) / 2]
+  }
 
-    it('gives -3.16e-4 for the fast and +5.0e-5 for the slow mode', () => {
-      const fast = nth(roots(1.7035), 0)
-      const slow = nth(roots(1.7035), 1)
-      expect(fast / -3.16e-4).toBeCloseTo(1, 2)
-      expect(slow / 5.0e-5).toBeCloseTo(1, 2)
-      // the linear-theory form -(H -+ P (2T - H) / (phi_f - phi_s)) / 2 drops terms of order H^2 / P^2
-      const p = 2 * Math.sqrt(1.7035 * m)
-      const split = Math.sqrt(p ** 2 - 4 * m)
-      expect(Math.abs(-(h - (p * (2 * t - h)) / split) / 2 / fast - 1)).toBeLessThan(1e-3)
-      expect(Math.abs(-(h + (p * (2 * t - h)) / split) / 2 / slow - 1)).toBeLessThan(1e-3)
-    })
-
-    it('agrees with isStable: both modes damp exactly when the criterion holds', () => {
-      for (const sg of [1.2, 1.7035, 3, 4.5, 4.8, 6, 20]) {
-        const damped = roots(sg).every((damping) => damping < 0)
-        expect(isStable(sg, sd)).toBe(damped)
-      }
-    })
+  it('gives -3.16e-4 for the fast and +5.0e-5 for the slow mode', () => {
+    const fast = nth(roots(1.7035), 0)
+    const slow = nth(roots(1.7035), 1)
+    expect(fast / -3.16e-4).toBeCloseTo(1, 2)
+    expect(slow / 5.0e-5).toBeCloseTo(1, 2)
+    // the linear-theory form -(H -+ P (2T - H) / (phi_f - phi_s)) / 2 drops terms of order H^2 / P^2
+    const p = 2 * Math.sqrt(1.7035 * m)
+    const split = Math.sqrt(p ** 2 - 4 * m)
+    expect(Math.abs(-(h - (p * (2 * t - h)) / split) / 2 / fast - 1)).toBeLessThan(1e-3)
+    expect(Math.abs(-(h + (p * (2 * t - h)) / split) / 2 / slow - 1)).toBeLessThan(1e-3)
   })
 
-  describe('yaw modes of the rifle-scale case', () => {
-    // 11.34 g, 7.82 mm, Ix 7.2e-8, Iy 6.8e-7 kg m2, CMa 3.0, 1.225 kg/m3, 790 m/s, 254 mm twist
-    const d = 0.00782
-    const v = 790
-    const i = {
-      axialInertia: 7.2e-8,
-      transverseInertia: 6.8e-7,
-      spin: (2 * Math.PI * v) / 0.254,
-      density: 1.225,
-      speed: v,
-      diameter: d,
-      momentSlope: 3.0,
+  it('agrees with isStable: both modes damp exactly when the criterion holds', () => {
+    for (const sg of [1.2, 1.7035, 3, 4.5, 4.8, 6, 20]) {
+      const damped = roots(sg).every((damping) => damping < 0)
+      expect(isStable(sg, sd)).toBe(damped)
     }
-    // turning rates in rad per calibre of travel
-    const pp = (i.axialInertia / i.transverseInertia) * ((i.spin * d) / v)
-    const m =
-      (i.density * (Math.PI / 4) * d ** 2 * d ** 3 * i.momentSlope) / (2 * i.transverseInertia)
-    const root = Math.sqrt(pp ** 2 - 4 * m)
-    const fast = (pp + root) / 2
-    const slow = (pp - root) / 2
-    const hz = (rate: number) => (rate * v) / d / (2 * Math.PI)
+  })
+})
 
-    it('splits the spin into two modes whose sum is P and product is M', () => {
-      expect(Math.abs((fast + slow) / pp - 1)).toBeLessThan(1e-12)
-      expect(Math.abs((fast * slow) / m - 1)).toBeLessThan(1e-12)
-      expect(gyroscopicStability(i)).toBeCloseTo(1.69, 2)
-      expect(hz(fast)).toBeCloseTo(269.9, 1)
-      expect(hz(slow)).toBeCloseTo(59.5, 1)
-    })
+describe('linear-theory stability: yaw modes of the rifle-scale case', () => {
+  // 11.34 g, 7.82 mm, Ix 7.2e-8, Iy 6.8e-7 kg m2, CMa 3.0, 1.225 kg/m3, 790 m/s, 254 mm twist
+  const d = 0.00782
+  const v = 790
+  const i = {
+    axialInertia: 7.2e-8,
+    transverseInertia: 6.8e-7,
+    spin: (2 * Math.PI * v) / 0.254,
+    density: 1.225,
+    speed: v,
+    diameter: d,
+    momentSlope: 3.0,
+  }
+  // turning rates in rad per calibre of travel
+  const pp = (i.axialInertia / i.transverseInertia) * ((i.spin * d) / v)
+  const m =
+    (i.density * (Math.PI / 4) * d ** 2 * d ** 3 * i.momentSlope) / (2 * i.transverseInertia)
+  const root = Math.sqrt(pp ** 2 - 4 * m)
+  const fast = (pp + root) / 2
+  const slow = (pp - root) / 2
+  const hz = (rate: number) => (rate * v) / d / (2 * Math.PI)
 
-    it('scales the spin for a target factor by the root of the factor ratio', () => {
-      const known = gyroscopicStability(i)
-      for (const s of [1, 1.5, 2.5]) {
-        const spin = i.spin * Math.sqrt(s / known)
-        expect(Math.abs(gyroscopicStability({ ...i, spin }) / s - 1)).toBeLessThan(1e-12)
-      }
-      // the factor is 1 at a twist of 330 mm
-      expect((0.254 * Math.sqrt(known)) / 0.001).toBeCloseTo(330, -1)
-    })
+  it('splits the spin into two modes whose sum is P and product is M', () => {
+    expect(Math.abs((fast + slow) / pp - 1)).toBeLessThan(1e-12)
+    expect(Math.abs((fast * slow) / m - 1)).toBeLessThan(1e-12)
+    expect(gyroscopicStability(i)).toBeCloseTo(1.69, 2)
+    expect(hz(fast)).toBeCloseTo(269.9, 1)
+    expect(hz(slow)).toBeCloseTo(59.5, 1)
+  })
+
+  it('scales the spin for a target factor by the root of the factor ratio', () => {
+    const known = gyroscopicStability(i)
+    for (const s of [1, 1.5, 2.5]) {
+      const spin = i.spin * Math.sqrt(s / known)
+      expect(Math.abs(gyroscopicStability({ ...i, spin }) / s - 1)).toBeLessThan(1e-12)
+    }
+    // the factor is 1 at a twist of 330 mm
+    expect((0.254 * Math.sqrt(known)) / 0.001).toBeCloseTo(330, -1)
   })
 })

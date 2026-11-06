@@ -38,6 +38,53 @@ const withoutChronograph = (s: ReturnType<typeof strings>) => ({
   entries: s.entries,
 })
 
+/** The relative standard uncertainty of the drag factor a plan of these impacts and a chronograph promises. */
+const dragSigmaOf = (entries: { range: number; shotCount: number }[]) =>
+  nth(
+    planTruingStrings({
+      shot: nominal,
+      clickValue: click,
+      dispersion,
+      entries: entries.map((e) => ({ kind: 'impact' as const, ...e })),
+      chronograph: { shotCount: 10, standardDeviation: 4 },
+    }).parameters,
+    1,
+  ).relativeStandardUncertainty as number
+
+const impactAt300 = { kind: 'impact' as const, range: 300, shotCount: shots }
+const dialAt300 = { kind: 'dial' as const, range: 300, shotCount: shots }
+
+/** The plan of `entries` with a chronograph of 10 shots. */
+const planWithChronograph = (entries: Parameters<typeof planTruingStrings>[0]['entries']) =>
+  planTruingStrings({
+    shot: nominal,
+    clickValue: click,
+    dispersion,
+    entries,
+    chronograph: { shotCount: 10, standardDeviation: 4 },
+  })
+
+/** Noise-free strings at the impacts, dials and chronograph of the fixtures. */
+const exactStrings = strings()
+/** The fit of the noise-free strings with `change`, to call later. */
+const fitWith = (change: Partial<Parameters<typeof fitTruingStrings>[0]>) => () =>
+  fitTruingStrings({ ...exactStrings, ...change })
+const firstEntry = nth(exactStrings.entries, 0)
+
+/** The plan of `entries`, with `chronograph` when given. */
+const refusalPlan = (
+  entries: { kind: 'impact' | 'dial'; range: number; shotCount: number; group?: string }[],
+  chronograph?: { shotCount: number; standardDeviation: number },
+) =>
+  planTruingStrings({
+    shot: nominal,
+    clickValue: click,
+    dispersion,
+    entries,
+    ...(chronograph ? { chronograph } : {}),
+  })
+const chrono = { shotCount: 10, standardDeviation: 4 }
+
 describe('range string fit', () => {
   it('recovers the three parameters from exact strings', () => {
     const r = fitTruingStrings(strings())
@@ -86,15 +133,17 @@ describe('range string fit', () => {
     }
     expect(plan.observationCount).toBe(7)
   })
+})
 
+describe('range string fit coverage', () => {
   it.each([
-    { fit: 'three parameters', options: {}, truth },
-    { fit: 'with the zero offset', options: { fitZeroOffset: true }, truth: base },
+    { fit: 'three parameters', options: {}, trueValues: truth },
+    { fit: 'with the zero offset', options: { fitZeroOffset: true }, trueValues: base },
   ])(
     'covers the true values with the stated intervals over seeded noise ($fit)',
-    ({ options, truth }) => {
+    ({ options, trueValues }) => {
       const seeds = 300
-      const { covered, inconsistent } = coverage(() => truth, options, seeds)
+      const { covered, inconsistent } = coverage(() => trueValues, options, seeds)
       expect(Object.keys(covered)).toEqual([
         'muzzleVelocity',
         'dragFactor',
@@ -216,7 +265,9 @@ describe('weakly identified parameters', () => {
     expect(r.intervalsTrusted).toBe(false)
     expect(r.consistent).toBe(true)
   })
+})
 
+describe('weakly identified parameters in the reported model', () => {
   it('reports the model whose parameters it names: weak ones at nominal, the rest refitted', () => {
     const s = strings(normals(4), { impacts: [150], dials: [] })
     const r = fitTruingStrings(s)
@@ -249,7 +300,9 @@ describe('weakly identified parameters', () => {
     expect(r.shot.muzzleVelocity).toBe(790)
     expect(r.degreesOfFreedom).toBe(7)
   })
+})
 
+describe('weakly identified parameters by the kind of entry', () => {
   it('leaves the click value out when there are no dialled corrections', () => {
     const plan = planTruingStrings({
       shot: nominal,
@@ -292,31 +345,22 @@ describe('weakly identified parameters', () => {
     expect(plan.confounded).toContain('clickValue')
     expect(plan.correlation['muzzleVelocity:clickValue']).toBeLessThan(-0.99)
   })
+})
 
+describe('weakly identified parameters and more data', () => {
   it('improves with more distances and shots', () => {
-    const sigma = (entries: { range: number; shotCount: number }[]) =>
-      nth(
-        planTruingStrings({
-          shot: nominal,
-          clickValue: click,
-          dispersion,
-          entries: entries.map((e) => ({ kind: 'impact' as const, ...e })),
-          chronograph: { shotCount: 10, standardDeviation: 4 },
-        }).parameters,
-        1,
-      ).relativeStandardUncertainty as number
-    const few = sigma([
+    const few = dragSigmaOf([
       { range: 300, shotCount: 3 },
       { range: 600, shotCount: 3 },
     ])
     expect(
-      sigma([
+      dragSigmaOf([
         { range: 300, shotCount: 12 },
         { range: 600, shotCount: 12 },
       ]),
     ).toBeLessThan(few / 1.9)
     expect(
-      sigma([
+      dragSigmaOf([
         { range: 300, shotCount: 3 },
         { range: 600, shotCount: 3 },
         { range: 900, shotCount: 3 },
@@ -325,20 +369,9 @@ describe('weakly identified parameters', () => {
   })
 })
 
-describe('groups and rounding', () => {
-  const impact = { kind: 'impact' as const, range: 300, shotCount: shots }
-  const dial = { kind: 'dial' as const, range: 300, shotCount: shots }
-  const plan = (entries: Parameters<typeof planTruingStrings>[0]['entries']) =>
-    planTruingStrings({
-      shot: nominal,
-      clickValue: click,
-      dispersion,
-      entries,
-      chronograph: { shotCount: 10, standardDeviation: 4 },
-    })
-
+describe('groups of entries', () => {
   it('rejects an impact and a dial entry of one group', () => {
-    expect(() => plan([impact, dial])).toThrow(/share their shots/)
+    expect(() => planWithChronograph([impactAt300, dialAt300])).toThrow(/share their shots/)
     const s = strings(normals(1), { impacts: [300, 600], dials: [300] })
     expect(() => fitTruingStrings(s)).toThrow(/share their shots/)
     expect(() => fitTruingStrings(s)).toThrow(InputError)
@@ -346,31 +379,38 @@ describe('groups and rounding', () => {
 
   it('accepts them when they are named as two groups, and two entries of a kind at one distance', () => {
     expect(() =>
-      plan([
-        { ...impact, group: 'a' },
-        { ...dial, group: 'b' },
+      planWithChronograph([
+        { ...impactAt300, group: 'a' },
+        { ...dialAt300, group: 'b' },
       ]),
     ).not.toThrow()
-    expect(() => plan([impact, { ...impact }, { ...dial, range: 600 }])).not.toThrow()
     expect(() =>
-      plan([
-        { ...impact, group: 'a' },
-        { ...dial, group: 'a' },
+      planWithChronograph([impactAt300, { ...impactAt300 }, { ...dialAt300, range: 600 }]),
+    ).not.toThrow()
+    expect(() =>
+      planWithChronograph([
+        { ...impactAt300, group: 'a' },
+        { ...dialAt300, group: 'a' },
       ]),
     ).toThrow(InputError)
   })
+})
 
+describe('rounding of dials', () => {
   it('rounds a dial to whole clicks unless told otherwise', () => {
-    const entries = [impact, { ...impact, range: 600 }, { ...impact, range: 900 }]
-    const click_ = (rounding?: number) =>
+    const entries = [impactAt300, { ...impactAt300, range: 600 }, { ...impactAt300, range: 900 }]
+    const clickSigma = (rounding?: number) =>
       nth(
-        plan([...entries, { ...dial, range: 450, rounding }, { ...dial, range: 800, rounding }])
-          .parameters,
+        planWithChronograph([
+          ...entries,
+          { ...dialAt300, range: 450, rounding },
+          { ...dialAt300, range: 800, rounding },
+        ]).parameters,
         2,
       ).relativeStandardUncertainty as number
-    expect(click_()).toBe(click_(1))
-    expect(click_(0)).toBeLessThan(click_())
-    expect(click_(2)).toBeGreaterThan(click_())
+    expect(clickSigma()).toBe(clickSigma(1))
+    expect(clickSigma(0)).toBeLessThan(clickSigma())
+    expect(clickSigma(2)).toBeGreaterThan(clickSigma())
   })
 
   it('weights a fitted dial entry with the click rounding by default', () => {
@@ -430,7 +470,9 @@ describe('residual check', () => {
     expect(width(scaled) / width(r)).toBeCloseTo((scaled.intervalScale * 2.77645) / 1.95996, 3)
     expect(scaled.intervalsTrusted).toBe(false)
   })
+})
 
+describe('residual check of consistent fits', () => {
   it('trusts the intervals of a consistent fit and leaves them unscaled by default', () => {
     const r = fitTruingStrings(strings(normals(11)))
     expect(r.consistent).toBe(true)
@@ -463,27 +505,58 @@ describe('residual check', () => {
   })
 })
 
-describe('errors', () => {
-  const base = strings()
-  const bad = (change: Partial<Parameters<typeof fitTruingStrings>[0]>) => () =>
-    fitTruingStrings({ ...base, ...change })
-  const entry = nth(base.entries, 0)
+describe('errors in the input', () => {
   it('rejects malformed input before any trajectory runs', () => {
-    expect(bad({ entries: [], chronograph: undefined })).toThrow(InputError)
-    expect(bad({ entries: [{ ...entry, shotCount: 0 }] })).toThrow(InputError)
-    expect(bad({ entries: [{ ...entry, shotCount: 2.5 }] })).toThrow(InputError)
-    expect(bad({ entries: [{ ...entry, range: 0 }] })).toThrow(InputError)
-    expect(bad({ entries: [{ ...entry, standardDeviation: 0 }] })).toThrow(InputError)
-    expect(bad({ entries: [{ ...entry, value: Number.NaN }] })).toThrow(InputError)
-    expect(bad({ entries: [{ ...entry, rounding: -1 }] })).toThrow(InputError)
-    expect(bad({ clickValue: 0 })).toThrow(InputError)
-    expect(bad({ chronograph: { mean: 790, shotCount: 5, standardDeviation: -1 } })).toThrow(
+    expect(fitWith({ entries: [], chronograph: undefined })).toThrow(InputError)
+    expect(fitWith({ entries: [{ ...firstEntry, shotCount: 0 }] })).toThrow(InputError)
+    expect(fitWith({ entries: [{ ...firstEntry, shotCount: 2.5 }] })).toThrow(InputError)
+    expect(fitWith({ entries: [{ ...firstEntry, range: 0 }] })).toThrow(InputError)
+    expect(fitWith({ entries: [{ ...firstEntry, standardDeviation: 0 }] })).toThrow(InputError)
+    expect(fitWith({ entries: [{ ...firstEntry, value: Number.NaN }] })).toThrow(InputError)
+    expect(fitWith({ entries: [{ ...firstEntry, rounding: -1 }] })).toThrow(InputError)
+    expect(fitWith({ clickValue: 0 })).toThrow(InputError)
+    expect(fitWith({ chronograph: { mean: 790, shotCount: 5, standardDeviation: -1 } })).toThrow(
       InputError,
     )
     const chronograph: Chronograph = { mean: 790, shotCount: 5, standardDeviation: 4, rounding: -1 }
-    expect(bad({ chronograph })).toThrow(InputError)
-    expect(() => fitTruingStrings(base, { confidenceLevel: 1 })).toThrow(InputError)
-    expect(() => fitTruingStrings(base, { maxInflation: 1 })).toThrow(InputError)
+    expect(fitWith({ chronograph })).toThrow(InputError)
+  })
+
+  it('lets the error of an invalid nominal shot through with its message', () => {
+    const shot = { ...nominal, projectile: { ...nominal.projectile, mass: -1 } }
+    const run = [
+      () => fitTruingStrings({ ...exactStrings, shot }),
+      () =>
+        planTruingStrings({
+          shot,
+          clickValue: click,
+          dispersion,
+          entries: [{ kind: 'impact', range: 300, shotCount: shots }],
+        }),
+    ]
+    for (const f of run) {
+      expect(f).toThrow(/mass must be positive/)
+      expect(f).not.toThrow(TruingError)
+    }
+  })
+
+  it('throws TruingError for a range the shot does not reach', () => {
+    const vertical = { ...nominal, zero: { elevationAngle: 1.5, windageAngle: 0 } }
+    expect(() =>
+      fitTruingStrings({
+        ...exactStrings,
+        shot: vertical,
+        entries: [{ ...firstEntry, range: 5000 }],
+        chronograph: undefined,
+      }),
+    ).toThrow(/unreachable \(range 5000 m not reached\)/)
+  })
+})
+
+describe('errors in the options and plans', () => {
+  it('rejects malformed options and plans before any trajectory runs', () => {
+    expect(() => fitTruingStrings(exactStrings, { confidenceLevel: 1 })).toThrow(InputError)
+    expect(() => fitTruingStrings(exactStrings, { maxInflation: 1 })).toThrow(InputError)
     for (const [name, value] of [
       ['maxCondition', Number.NaN],
       ['maxCondition', Infinity],
@@ -495,7 +568,7 @@ describe('errors', () => {
       ['residualConfidenceLevel', Number.NaN],
       ['confidenceLevel', Number.NaN],
     ] as const)
-      expect(() => fitTruingStrings(base, { [name]: value })).toThrow(new RegExp(name))
+      expect(() => fitTruingStrings(exactStrings, { [name]: value })).toThrow(new RegExp(name))
     expect(() =>
       planTruingStrings(
         {
@@ -520,54 +593,11 @@ describe('errors', () => {
       planTruingStrings({ shot: nominal, clickValue: click, dispersion, entries: [] }),
     ).toThrow(InputError)
   })
-
-  it('lets the error of an invalid nominal shot through with its message', () => {
-    const shot = { ...nominal, projectile: { ...nominal.projectile, mass: -1 } }
-    const run = [
-      () => fitTruingStrings({ ...base, shot }),
-      () =>
-        planTruingStrings({
-          shot,
-          clickValue: click,
-          dispersion,
-          entries: [{ kind: 'impact', range: 300, shotCount: shots }],
-        }),
-    ]
-    for (const f of run) {
-      expect(f).toThrow(/mass must be positive/)
-      expect(f).not.toThrow(TruingError)
-    }
-  })
-
-  it('throws TruingError for a range the shot does not reach', () => {
-    const vertical = { ...nominal, zero: { elevationAngle: 1.5, windageAngle: 0 } }
-    expect(() =>
-      fitTruingStrings({
-        ...base,
-        shot: vertical,
-        entries: [{ ...entry, range: 5000 }],
-        chronograph: undefined,
-      }),
-    ).toThrow(/unreachable \(range 5000 m not reached\)/)
-  })
 })
 
 describe('refusals of a plan', () => {
-  const plan = (
-    entries: { kind: 'impact' | 'dial'; range: number; shotCount: number; group?: string }[],
-    chronograph?: { shotCount: number; standardDeviation: number },
-  ) =>
-    planTruingStrings({
-      shot: nominal,
-      clickValue: click,
-      dispersion,
-      entries,
-      ...(chronograph ? { chronograph } : {}),
-    })
-  const chrono = { shotCount: 10, standardDeviation: 4 }
-
   it('single-range: entries at one distance and no chronograph', () => {
-    const p = plan([
+    const p = refusalPlan([
       { kind: 'impact', range: 500, shotCount: 5, group: 'a' },
       { kind: 'dial', range: 500, shotCount: 5, group: 'b' },
     ])
@@ -579,7 +609,7 @@ describe('refusals of a plan', () => {
   })
 
   it('velocity-only: a chronograph and no entry', () => {
-    const p = plan([], chrono)
+    const p = refusalPlan([], chrono)
     expect(p.refusals.map((r) => r.id)).toEqual(['velocity-only'])
     expect(find(p, 'dragFactor').status).not.toBe('identified')
   })
@@ -589,29 +619,31 @@ describe('refusals of a plan', () => {
       { kind: 'impact' as const, range: 300, shotCount: 5 },
       { kind: 'impact' as const, range: 900, shotCount: 5 },
     ]
-    expect(plan(two).refusals).toEqual([])
+    expect(refusalPlan(two).refusals).toEqual([])
     // a chronograph fixes the velocity, so one distance is enough
-    expect(plan([two[0] as (typeof two)[number]], chrono).refusals).toEqual([])
+    expect(refusalPlan([two[0] as (typeof two)[number]], chrono).refusals).toEqual([])
     expect(
-      find(plan([two[0] as (typeof two)[number]], chrono), 'dragFactor').reasons,
+      find(refusalPlan([two[0] as (typeof two)[number]], chrono), 'dragFactor').reasons,
     ).not.toContain('collinear')
   })
+})
 
+describe('refusals of a plan and the statuses', () => {
   it('a chronograph with dial entries at one distance leaves drag factor and click value confounded', () => {
-    const p = plan([{ kind: 'dial', range: 500, shotCount: 5 }], chrono)
+    const p = refusalPlan([{ kind: 'dial', range: 500, shotCount: 5 }], chrono)
     expect(p.refusals).toEqual([])
     expect(find(p, 'dragFactor').reasons).toContain('collinear')
     expect(find(p, 'clickValue').reasons).toContain('collinear')
   })
 
   it('a chronograph at the muzzle alone cannot identify drag factor', () => {
-    const p = plan([], chrono)
+    const p = refusalPlan([], chrono)
     expect(find(p, 'dragFactor').status).toBe('unresolved')
     expect(find(p, 'muzzleVelocity').status).toBe('identified')
   })
 
   it('two dial entries at two distances pass without refusal and the statuses show what is open', () => {
-    const p = plan([
+    const p = refusalPlan([
       { kind: 'dial', range: 300, shotCount: 5 },
       { kind: 'dial', range: 900, shotCount: 5 },
     ])

@@ -21,6 +21,8 @@ import {
 
 const g = 9.80665
 const mpm = { model: 'modified-point-mass' as const }
+/** Tolerances to compare two runs at, without the Coriolis effect. */
+const tight = { relativeTolerance: 1e-12, absoluteTolerance: 1e-12, coriolis: false }
 const flat = (cd: number) => ({
   kind: 'curve' as const,
   curve: [
@@ -57,14 +59,19 @@ const withAero = (shot: TrajectoryInput, a: object): TrajectoryInput => ({
 })
 const p0 = (2 * Math.PI * 790) / 0.254
 
+/** Weight of node k of n in Simpson's rule: 1 at the ends, 4 at odd and 2 at even nodes. */
+function simpsonWeight(k: number, n: number): number {
+  if (k === 0 || k === n) return 1
+  return k % 2 === 1 ? 4 : 2
+}
+
 /** Simpson's rule over 2000 intervals of the drift integral of the lift `az` up to time `t`. */
 function simpsonDrift(az: (t: number) => number, t: number) {
   const n = 2000
   let sum = 0
   for (let k = 0; k <= n; k++) {
     const tau = (t * k) / n
-    const w = k === 0 || k === n ? 1 : k % 2 === 1 ? 4 : 2
-    sum += w * (t - tau) * az(tau)
+    sum += simpsonWeight(k, n) * (t - tau) * az(tau)
   }
   return (sum * t) / (3 * n)
 }
@@ -116,9 +123,15 @@ describe('modified point-mass helpers', () => {
   })
 })
 
-describe('modified point mass', () => {
-  const tight = { relativeTolerance: 1e-12, absoluteTolerance: 1e-12, coriolis: false }
+/** The spin drift at 800 m of the base shot with the aerodynamic data `a`. */
+const driftAt800 = (a: object) =>
+  nth(trajectory(withAero(base, a), [800], { coriolis: false, ...mpm }).points, 0).spinDrift
 
+/** Expects the modified point mass to refuse `shot` with a RangeError. */
+const rejectsInModifiedPointMass = (shot: TrajectoryInput) =>
+  expect(() => trajectory(shot, [100], mpm)).toThrow(RangeError)
+
+describe('modified point mass against the point mass', () => {
   it('equals the point mass without lift and Magnus force', () => {
     const shot = withAero(base, { liftSlope: 0, spinDamping: -0.01 })
     const ranges = [100, 500, 1000]
@@ -146,6 +159,29 @@ describe('modified point mass', () => {
     }
   })
 
+  it('ignores the coefficients in the point mass', () => {
+    const plain = { ...base, projectile: { ...base.projectile, aerodynamics: undefined } }
+    expect(trajectory(base, [500])).toEqual(trajectory(plain, [500]))
+  })
+
+  it('reports the windage of the point-mass twin as the difference to the spin drift', () => {
+    const wind = [{ endDistance: Infinity, speed: 5, fromDirection: Math.PI / 2 }]
+    const ranges = [300, 1000]
+    const a = trajectory({ ...base, wind }, ranges, { coriolis: false, ...mpm })
+    const b = trajectory({ ...base, wind }, ranges, {
+      coriolis: false,
+      spinDrift: false,
+      jump: false,
+    })
+    for (let k = 0; k < ranges.length; k++) {
+      const q = nth(a.points, k)
+      expect(q.spinDrift).toBeCloseTo(q.windage - nth(b.points, k).windage, 12)
+      expect(Math.abs(q.spinDrift - q.windage)).toBeGreaterThan(1e-3)
+    }
+  })
+})
+
+describe('modified point mass spin and yaw', () => {
   it('decays the spin as the closed form of a flat roll damping', () => {
     const air = { pressure: 95000, temperature: 303.15, humidity: 0.8, altitude: 0 }
     const clp = -0.012
@@ -172,6 +208,25 @@ describe('modified point mass', () => {
     }
   })
 
+  it('stops when the yaw of repose exceeds the limit', () => {
+    const shot = { ...base, zero: { elevationAngle: 1.2, windageAngle: 0 } }
+    const ranges = [100, 300, 1000, 2000, 3000, 4000]
+    const r = trajectory(shot, ranges, { ...mpm, maxYaw: 0.01 })
+    expect(r.stop).toBe('yaw')
+    expect(r.points.length).toBe(3)
+    expect(r.points.at(-1)?.pathAngle).toBeGreaterThan(0)
+    expect(r.points.at(-1)?.yaw).toBeLessThan(0.01)
+  })
+
+  it('stops at the muzzle when the yaw of repose already exceeds the limit', () => {
+    const r = trajectory(base, [0, 100, 500], { ...mpm, maxYaw: 1e-5 })
+    expect(nth(r.points, 0).yaw).toBeGreaterThan(1e-5)
+    expect(r.stop).toBe('yaw')
+    expect(r.points.length).toBe(1)
+  })
+})
+
+describe('modified point mass spin drift in vacuum', () => {
   it('drifts by the integral of the first-order lift in vacuum', () => {
     const rho = airDensity(base.air)
     const area = (Math.PI / 4) * 0.00782 ** 2
@@ -214,14 +269,14 @@ describe('modified point mass', () => {
       }
     }
   })
+})
 
+describe('modified point mass drift and Magnus force', () => {
   it('scales the drift with lift slope times axial inertia over moment slope', () => {
-    const run = (a: object) =>
-      nth(trajectory(withAero(base, a), [800], { coriolis: false, ...mpm }).points, 0).spinDrift
-    const d0 = run({})
+    const d0 = driftAt800({})
     expect(d0).toBeGreaterThan(0)
     for (const a of [{ liftSlope: 5.2 }, { axialInertia: 2 * ix }, { momentSlope: 1.4 }])
-      expect(Math.abs(run(a) / (2 * d0) - 1)).toBeLessThan(1e-3)
+      expect(Math.abs(driftAt800(a) / (2 * d0) - 1)).toBeLessThan(1e-3)
   })
 
   it('grows the drift with range and mirrors it for left-hand twist', () => {
@@ -235,9 +290,9 @@ describe('modified point mass', () => {
         expect(nth(a.points, k).windage).toBeCloseTo(-nth(b.points, k).windage, 12)
         expect(nth(a.points, k).spinDrift).toBeCloseTo(-nth(b.points, k).spinDrift, 12)
         expect(nth(a.points, k).height).toBeCloseTo(nth(b.points, k).height, 12)
-        if (k > 0)
-          expect(nth(a.points, k).spinDrift).toBeGreaterThan(nth(a.points, k - 1).spinDrift)
       }
+      for (let k = 1; k < ranges.length; k++)
+        expect(nth(a.points, k).spinDrift).toBeGreaterThan(nth(a.points, k - 1).spinDrift)
     }
   })
 
@@ -263,7 +318,9 @@ describe('modified point mass', () => {
       ).toBeLessThan(1e-3)
     }
   })
+})
 
+describe('modified point mass at coefficient table nodes', () => {
   it('restarts at the nodes of a coefficient table', () => {
     // a steep lift-slope step and a large axial inertia make the kink visible in the windage
     const shot = withAero(base, {
@@ -291,7 +348,9 @@ describe('modified point mass', () => {
     expect(fine).toBeLessThan(coarse / 1000)
     expect(fine).toBeLessThan(5e-9)
   })
+})
 
+describe('modified point mass reading of the drag table', () => {
   it('holds by the slope rule the drag table only, also when a coefficient is the same table', () => {
     // 0.3 to 0.6 over 1e-3 Mach: 500 per Mach, held as drag, extended as a coefficient
     const curve: DragTable = [
@@ -342,40 +401,9 @@ describe('modified point mass', () => {
       expect(Math.abs(nth(b.points, k).velocity - p.velocity)).toBeLessThan(1e-6)
     })
   })
+})
 
-  it('stops when the yaw of repose exceeds the limit', () => {
-    const shot = { ...base, zero: { elevationAngle: 1.2, windageAngle: 0 } }
-    const ranges = [100, 300, 1000, 2000, 3000, 4000]
-    const r = trajectory(shot, ranges, { ...mpm, maxYaw: 0.01 })
-    expect(r.stop).toBe('yaw')
-    expect(r.points.length).toBe(3)
-    expect(r.points.at(-1)?.pathAngle).toBeGreaterThan(0)
-    expect(r.points.at(-1)?.yaw).toBeLessThan(0.01)
-  })
-
-  it('stops at the muzzle when the yaw of repose already exceeds the limit', () => {
-    const r = trajectory(base, [0, 100, 500], { ...mpm, maxYaw: 1e-5 })
-    expect(nth(r.points, 0).yaw).toBeGreaterThan(1e-5)
-    expect(r.stop).toBe('yaw')
-    expect(r.points.length).toBe(1)
-  })
-
-  it('reports the windage of the point-mass twin as the difference to the spin drift', () => {
-    const wind = [{ endDistance: Infinity, speed: 5, fromDirection: Math.PI / 2 }]
-    const ranges = [300, 1000]
-    const a = trajectory({ ...base, wind }, ranges, { coriolis: false, ...mpm })
-    const b = trajectory({ ...base, wind }, ranges, {
-      coriolis: false,
-      spinDrift: false,
-      jump: false,
-    })
-    for (let k = 0; k < ranges.length; k++) {
-      const q = nth(a.points, k)
-      expect(q.spinDrift).toBeCloseTo(q.windage - nth(b.points, k).windage, 12)
-      expect(Math.abs(q.spinDrift - q.windage)).toBeGreaterThan(1e-3)
-    }
-  })
-
+describe('modified point mass coefficients at the local Mach number', () => {
   it('evaluates coefficient tables at the local Mach number', () => {
     // equal to the constant at Mach >= 2.3 (the muzzle), falling to the low value at Mach 1, which
     // spans the flight (Mach 1.09 at 1000 m)
@@ -415,7 +443,9 @@ describe('modified point mass', () => {
     expect(r.points.map((q) => q.dragClamped)).toEqual([false, true])
     expect(nth(trajectory(clamped, [1000]).points, 0).dragClamped).toBe(false)
   })
+})
 
+describe('modified point mass jump', () => {
   it('reports the linear-theory jump with a crosswind', () => {
     const wind = [{ endDistance: Infinity, speed: 4, fromDirection: -Math.PI / 2 }]
     const r = trajectory({ ...base, wind }, [300], { coriolis: false, ...mpm })
@@ -455,7 +485,9 @@ describe('modified point mass', () => {
     expect(nth(off.points, 0).jump).toBe(0)
     expect(off.omitted).toContain('jump')
   })
+})
 
+describe('modified point mass jump direction and zero', () => {
   it('jumps in the same direction as the point mass (BRL-MR-3877 eq. (12))', () => {
     for (const twistHand of ['right', 'left'] as const)
       for (const from of [-Math.PI / 2, Math.PI / 2]) {
@@ -486,7 +518,9 @@ describe('modified point mass', () => {
     expect(Math.abs(nth(r.points, 0).windage)).toBeLessThan(1e-6)
     expect(r.omitted).toEqual([])
   })
+})
 
+describe('modified point mass result', () => {
   it('lists estimates and omissions and reports the stability', () => {
     const shot = withAero(base, {
       momentSlope: undefined,
@@ -523,22 +557,20 @@ describe('modified point mass', () => {
     expect(r.stability).toBeCloseTo(sg, 12)
     expect(790 / speedOfSound(base.air)).toBeGreaterThan(2)
   })
+})
 
-  it('ignores the coefficients in the point mass', () => {
-    const plain = { ...base, projectile: { ...base.projectile, aerodynamics: undefined } }
-    expect(trajectory(base, [500])).toEqual(trajectory(plain, [500]))
-  })
-
+describe('modified point mass input checks', () => {
   it('rejects incomplete or invalid inputs', () => {
-    const bad = (shot: TrajectoryInput) =>
-      expect(() => trajectory(shot, [100], mpm)).toThrow(RangeError)
-    bad({ ...base, projectile: { ...base.projectile, aerodynamics: undefined } })
-    bad({ ...base, firearm: { sightHeight: 0.05, twist: 0.254 } })
-    bad({ ...base, firearm: { sightHeight: 0.05, twistHand: 'right' } })
-    bad(withAero(base, { momentSlope: -1 }))
-    bad(withAero(base, { axialInertia: 0 }))
-    bad(withAero(base, { liftSlope: [[1, 2]] }))
-    bad(
+    rejectsInModifiedPointMass({
+      ...base,
+      projectile: { ...base.projectile, aerodynamics: undefined },
+    })
+    rejectsInModifiedPointMass({ ...base, firearm: { sightHeight: 0.05, twist: 0.254 } })
+    rejectsInModifiedPointMass({ ...base, firearm: { sightHeight: 0.05, twistHand: 'right' } })
+    rejectsInModifiedPointMass(withAero(base, { momentSlope: -1 }))
+    rejectsInModifiedPointMass(withAero(base, { axialInertia: 0 }))
+    rejectsInModifiedPointMass(withAero(base, { liftSlope: [[1, 2]] }))
+    rejectsInModifiedPointMass(
       withAero(base, {
         liftSlope: [
           [2, 2],
@@ -547,13 +579,13 @@ describe('modified point mass', () => {
       }),
     )
     const noLength = { ...base, projectile: { ...base.projectile, length: undefined } }
-    bad(withAero(noLength, { momentSlope: undefined }))
-    bad(withAero(noLength, { axialInertia: undefined }))
+    rejectsInModifiedPointMass(withAero(noLength, { momentSlope: undefined }))
+    rejectsInModifiedPointMass(withAero(noLength, { axialInertia: undefined }))
     expect(() => trajectory(base, [100], { ...mpm, maxYaw: 0 })).toThrow(RangeError)
   })
 })
 
-describe('BRL-MR-3877 formulas', () => {
+describe('BRL-MR-3877 jump', () => {
   it('equals the crosswind jump of BRL-MR-3877 eq. (12) in all four sign cases and at twice the wind', () => {
     const c = {
       ix: 2.1e-9,
@@ -588,10 +620,13 @@ describe('BRL-MR-3877 formulas', () => {
           (w / c.v0) *
           c.range
         expect(Math.abs((c.range * jump) / eq12 - 1)).toBeLessThan(1e-12)
-        if (hand === 1 && w > 0) expect(jump).toBeLessThan(0)
       }
+    // a right-hand twist in a wind from the left jumps down
+    for (const w of [c.w, 2 * c.w]) expect(jumpOf(1, w)).toBeLessThan(0)
   })
+})
 
+describe('BRL-MR-3877 stability', () => {
   it('equals P^2 / (4 M) of BRL-MR-3877 eq. (2)', () => {
     const i = {
       axialInertia: 8.7e-8,

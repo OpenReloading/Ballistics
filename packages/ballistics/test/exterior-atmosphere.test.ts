@@ -1,5 +1,5 @@
 import { InputError } from '@open-reloading/statistics'
-import fc from 'fast-check'
+import * as fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {
   airAt,
@@ -117,6 +117,15 @@ describe('limits', () => {
   })
 })
 
+/** The value `f` returns, or the error it throws. */
+function outcomeOf(f: () => unknown): unknown {
+  try {
+    return f()
+  } catch (e) {
+    return e
+  }
+}
+
 describe('checkAir on any numbers', () => {
   it('returns the air or throws an InputError', () => {
     const value = fc.oneof(fc.double(), fc.double({ min: -1000, max: 120000, noNaN: true }))
@@ -124,11 +133,8 @@ describe('checkAir on any numbers', () => {
       fc.property(
         fc.record({ altitude: value, pressure: value, temperature: value, humidity: value }),
         (air) => {
-          try {
-            expect(checkAir(air)).toBe(air)
-          } catch (e) {
-            expect(e).toBeInstanceOf(InputError)
-          }
+          const outcome = outcomeOf(() => checkAir(air))
+          expect(outcome === air || outcome instanceof InputError).toBe(true)
         },
       ),
       { seed: 20261022, numRuns: 500 },

@@ -69,7 +69,9 @@ describe('muzzle velocity from a speed measured downrange', () => {
       expect(Math.abs(got - v0)).toBeLessThan(0.3)
     }
   })
+})
 
+describe('muzzle velocity from downrange over seeded shots', () => {
   it('has no mean bias over seeded shots across calibres, bullets and speeds through the transonic range', () => {
     const next = seededUniforms(371)
     const calibres = [5.7, 6.17, 7.23, 7.85, 9.12, 10.57, 11.63]
@@ -103,7 +105,9 @@ describe('muzzle velocity from a speed measured downrange', () => {
     expect(Math.abs(sum / shots)).toBeLessThan(0.1)
     expect(worst).toBeLessThan(0.01)
   })
+})
 
+describe('muzzle velocity from downrange outside the model', () => {
   it('returns the reading at distance zero and rejects inputs outside the model', () => {
     const projectile: Projectile = { mass: 0.0113, diameter: 0.00782, drag: g7(0.27) }
     expect(muzzleVelocityFromDownrange({ projectile, air, distance: 0, velocity: 850 })).toBe(850)

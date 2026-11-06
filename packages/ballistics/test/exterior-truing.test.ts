@@ -1,6 +1,7 @@
 import { InputError, nth } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import {
+  type Air,
   airDensity,
   compareTruingFits,
   dragCoefficient,
@@ -125,6 +126,170 @@ describe('truing round trips', () => {
   })
 })
 
+/** Two sessions of different air, wind and muzzle velocity, with three observations each. */
+const sessionProjectile = base.projectile
+const firstShot: TruingSession['shot'] = {
+  muzzleVelocity: 790,
+  firearm: { sightHeight: 0.05 },
+  air: standardAtmosphere(0),
+  zero: { range: 100 },
+}
+const secondShot: TruingSession['shot'] = {
+  muzzleVelocity: 805,
+  firearm: { sightHeight: 0.05 },
+  air: { ...standardAtmosphere(1500), temperature: 268.15 },
+  wind: [{ endDistance: Infinity, speed: 4, fromDirection: 0.5 }],
+  zero: { range: 100 },
+}
+const threeObservations: [Observation['kind'], number, number][] = [
+  ['height', 300, 0.01],
+  ['height', 600, 0.01],
+  ['velocity', 800, 1],
+]
+const firstObservations = observe(
+  scaled({ ...firstShot, projectile: sessionProjectile }, 1.02, 0.95),
+  threeObservations,
+)
+const secondObservations = observe(
+  scaled({ ...secondShot, projectile: sessionProjectile }, 0.99, 0.95),
+  threeObservations,
+)
+const bothSessions = (shot2 = secondShot): TruingSession[] => [
+  { shot: firstShot, observations: firstObservations, fitMuzzleVelocity: true },
+  { shot: shot2, observations: secondObservations, fitMuzzleVelocity: true },
+]
+
+/** 2.15 moved by d units in the last place. */
+function ulpsFrom215(d: bigint) {
+  const b = new Float64Array([2.15])
+  const bits = new BigInt64Array(b.buffer)
+  bits[0] = nth(bits, 0) + d
+  return nth(b, 0)
+}
+
+/** Four heights of a shot with another velocity and drag, with noise added. */
+function noisyHeights() {
+  const obs = observe(scaled(base, 1.02, 0.95), [
+    ['height', 300],
+    ['height', 500],
+    ['height', 700],
+    ['height', 900],
+  ])
+  return obs.map((o, i) => ({ ...o, value: o.value + nth([0.004, -0.006, 0.003, 0.005], i) }))
+}
+
+/** The base shot fired along the line of sight from it with the constant drag coefficient `cd`. */
+const oneDShot = (cd: number): TrajectoryInput => ({
+  ...base,
+  projectile: { ...base.projectile, drag: flat(cd) },
+  firearm: { sightHeight: 0 },
+  zero: { elevationAngle: 0, windageAngle: 0 },
+})
+const oneDOptions = { gravity: 0, coriolis: false }
+/** The drag constant per metre of the base projectile with a drag coefficient of 0.3. */
+const flatK = (airDensity(base.air) * 0.3 * Math.PI * 0.00782 ** 2) / (8 * 0.01134)
+
+const velocityRanges = [200, 400, 600, 800, 1000, 1200].map((x): [Observation['kind'], number] => [
+  'velocity',
+  x,
+])
+const withDrag = (
+  shot: TrajectoryInput,
+  drag: TrajectoryInput['projectile']['drag'],
+): TrajectoryInput => ({
+  ...shot,
+  projectile: { ...shot.projectile, drag },
+})
+const g7Bc = nth(g7.bands, 0).ballisticCoefficient
+/** The drag curve of the G7 BC as a coefficient over the G7 table. */
+const g7Ratio = 0.01134 / (g7Bc * 0.00782 ** 2)
+const cubicBc = { ...g7, interpolation: 'monotone-cubic' as const }
+const cubicCurve = (k: number) => ({
+  kind: 'curve' as const,
+  curve: dragTables.G7.map(([m, c]) => [m, g7Ratio * k * c] as const),
+  interpolation: 'monotone-cubic' as const,
+})
+/** The drag coefficient of the curve of `shot` at the node `m`, NaN without one. */
+const curveCdAt = (shot: TrajectoryInput, m: number) => {
+  const drag = shot.projectile.drag
+  return drag.kind === 'curve' ? (drag.curve.find((n) => n[0] === m)?.[1] ?? NaN) : NaN
+}
+const ownCubicCd = (m: number) => g7Ratio * dragCoefficient(dragTables.G7, m, 'monotone-cubic')
+
+/** The TruingError `f` throws; anything else it throws or no throw fails the test. */
+function truingFailure(f: () => unknown) {
+  try {
+    f()
+  } catch (e) {
+    if (e instanceof TruingError) return e
+    throw e
+  }
+  throw new Error('no error')
+}
+
+/** The error `f` throws, undefined when it throws none. */
+function errorOf(f: () => unknown): unknown {
+  try {
+    f()
+  } catch (e) {
+    return e
+  }
+  return undefined
+}
+
+/** Whether `f` throws an InputError that is not a TruingError. */
+const isPlainInputError = (f: () => unknown) => {
+  const e = errorOf(f)
+  return e instanceof InputError && !(e instanceof TruingError)
+}
+
+const heightObs = (range: number, value = -0.1): Observation => ({ kind: 'height', range, value })
+const velocityObs = (range: number, value: number): Observation => ({
+  kind: 'velocity',
+  range,
+  value,
+})
+
+const dot = (p: number[], q: number[]) => p.reduce((t, x, i) => t + x * nth(q, i), 0)
+
+/**
+ * Sessions of a flat drag coefficient `cd` in one dimension, v = v0 exp(-k c x) in each air, read
+ * at `xs` with sigma: each with the information on ln k after its muzzle velocity.
+ */
+function oneDimensionSessions(input: {
+  cd: number
+  sigma: number
+  k: number
+  airs: Air[]
+  v0s: number[]
+  xs: number[][]
+}) {
+  const { cd, sigma, k, airs, v0s, xs } = input
+  return airs.map((air, s) => {
+    const c = (airDensity(air) * cd * Math.PI * 0.00782 ** 2) / (8 * 0.01134)
+    const values = nth(xs, s).map((x) => nth(v0s, s) * Math.exp(-k * c * x))
+    const session: TruingSession = {
+      shot: {
+        muzzleVelocity: nth(v0s, s) * 1.01,
+        firearm: { sightHeight: 0 },
+        air,
+        zero: { elevationAngle: 0, windageAngle: 0 },
+      },
+      observations: values.map((value, i) => ({
+        kind: 'velocity',
+        range: nth(nth(xs, s), i),
+        value,
+        standardUncertainty: sigma,
+      })),
+      fitMuzzleVelocity: true,
+    }
+    // rows of d v / d ln v0 and of minus d v / d ln k, over sigma
+    const a = values.map((v) => v / sigma)
+    const b = values.map((v, i) => (k * c * nth(nth(xs, s), i) * v) / sigma)
+    return { session, info: dot(b, b) - dot(a, b) ** 2 / dot(a, a) }
+  })
+}
+
 describe('truing closed forms', () => {
   it('solves the vacuum parabola for the muzzle velocity', () => {
     const e = 0.01
@@ -146,25 +311,18 @@ describe('truing closed forms', () => {
     expect(r.degreesOfFreedom).toBe(0)
   })
 
-  const oneD = (cd: number): TrajectoryInput => ({
-    ...base,
-    projectile: { ...base.projectile, drag: flat(cd) },
-    firearm: { sightHeight: 0 },
-    zero: { elevationAngle: 0, windageAngle: 0 },
-  })
-  const opts = { gravity: 0, coriolis: false }
-  const k = (airDensity(base.air) * 0.3 * Math.PI * 0.00782 ** 2) / (8 * 0.01134)
-
   it('gives the drag factor of two velocities in one dimension', () => {
     const obs: Observation[] = [200, 700].map((x) => ({
       kind: 'velocity',
       range: x,
-      value: 790 * Math.exp(-1.1 * k * x),
+      value: 790 * Math.exp(-1.1 * flatK * x),
     }))
-    const r = trueDrag(oneD(0.3), obs, {}, opts)
+    const r = trueDrag(oneDShot(0.3), obs, {}, oneDOptions)
     expect(Math.abs(nth(r.parameters, 0).value / 1.1 - 1)).toBeLessThan(1e-8)
   })
+})
 
+describe('truing closed forms of velocities', () => {
   it('agrees with the weighted regression of ln v on distance', () => {
     const xs = [100, 300, 500, 700, 900]
     const noise = [1.5, -2, 0.5, 2.5, -1]
@@ -172,10 +330,10 @@ describe('truing closed forms', () => {
     const obs: Observation[] = xs.map((x, i) => ({
       kind: 'velocity',
       range: x,
-      value: 790 * Math.exp(-1.1 * k * x) + nth(noise, i),
+      value: 790 * Math.exp(-1.1 * flatK * x) + nth(noise, i),
       standardUncertainty: sigma,
     }))
-    const r = trueDrag(oneD(0.3), obs, {}, opts)
+    const r = trueDrag(oneDShot(0.3), obs, {}, oneDOptions)
     // ln v = ln v0 - f k x with weights v^2 / sigma^2
     const w = obs.map((o) => o.value ** 2 / sigma ** 2)
     const sxx = xs.reduce((s, x, i) => s + nth(w, i) * x * x, 0)
@@ -183,8 +341,8 @@ describe('truing closed forms', () => {
       (s, x, i) => s + nth(w, i) * x * (Math.log(790) - Math.log(nth(obs, i).value)),
       0,
     )
-    const f = sxy / (k * sxx)
-    const sf = 1 / (k * Math.sqrt(sxx))
+    const f = sxy / (flatK * sxx)
+    const sf = 1 / (flatK * Math.sqrt(sxx))
     expect(Math.abs(nth(r.parameters, 0).value / f - 1)).toBeLessThan(1e-3)
     expect(Math.abs((nth(r.parameters, 0).standardUncertainty ?? 0) / sf - 1)).toBeLessThan(1e-3)
   })
@@ -192,7 +350,7 @@ describe('truing closed forms', () => {
   it('gives the closed-form sigma of noise-free velocities', () => {
     const xs = [100, 300, 500, 700, 900]
     const sigma = 2
-    const v = xs.map((x) => 790 * Math.exp(-1.1 * k * x))
+    const v = xs.map((x) => 790 * Math.exp(-1.1 * flatK * x))
     const obs = xs.map(
       (x, i): Observation => ({
         kind: 'velocity',
@@ -201,26 +359,17 @@ describe('truing closed forms', () => {
         standardUncertainty: sigma,
       }),
     )
-    const r = trueDrag(oneD(0.3), obs, {}, opts)
+    const r = trueDrag(oneDShot(0.3), obs, {}, oneDOptions)
     // dv/d(ln f) = -f k x v, so sigma_f = 1 / (k sqrt(sum x^2 v^2 / sigma^2))
-    const sf = 1 / (k * Math.sqrt(xs.reduce((s, x, i) => s + (x * nth(v, i)) ** 2, 0) / sigma ** 2))
+    const sf =
+      1 / (flatK * Math.sqrt(xs.reduce((s, x, i) => s + (x * nth(v, i)) ** 2, 0) / sigma ** 2))
     expect(Math.abs((nth(r.parameters, 0).standardUncertainty ?? 0) / sf - 1)).toBeLessThan(1e-6)
   })
 })
 
 describe('truing uncertainty', () => {
-  const noisy = () => {
-    const obs = observe(scaled(base, 1.02, 0.95), [
-      ['height', 300],
-      ['height', 500],
-      ['height', 700],
-      ['height', 900],
-    ])
-    return obs.map((o, i) => ({ ...o, value: o.value + nth([0.004, -0.006, 0.003, 0.005], i) }))
-  }
-
   it('scales the covariance by the residual variance without sigmas', () => {
-    const obs = noisy()
+    const obs = noisyHeights()
     const u = trueDrag(base, obs, { fitMuzzleVelocity: true })
     const w = trueDrag(
       base,
@@ -263,9 +412,11 @@ describe('truing uncertainty', () => {
       expect(chi(1, e)).toBeGreaterThan(r.chiSquare)
     }
   })
+})
 
+describe('truing uncertainty and conditioning', () => {
   it('reads the condition number as the correlation of two parameters', () => {
-    const r = trueDrag(base, noisy(), { fitMuzzleVelocity: true })
+    const r = trueDrag(base, noisyHeights(), { fitMuzzleVelocity: true })
     const rho = Math.abs(r.correlation?.[0]?.[1] ?? 0)
     expect(rho).toBeGreaterThan(0.5)
     expect(Math.abs(r.conditionNumber ** 2 / ((1 + rho) / (1 - rho)) - 1)).toBeLessThan(1e-9)
@@ -314,7 +465,9 @@ describe('Mach-dependent drag factor', () => {
     const factor = knots.map((m, i) => [m, nth(factors, i)] as const)
     const bc = nth(g7.bands, 0).ballisticCoefficient
     // truth on the union of the G7 nodes and the knots
-    const nodes = [...new Set([...dragTables.G7.map((n) => n[0]), ...knots])].sort((a, b) => a - b)
+    const nodes = [...new Set([...dragTables.G7.map((n) => n[0]), ...knots])].toSorted(
+      (a, b) => a - b,
+    )
     const curve = nodes.map(
       (m) =>
         [
@@ -338,19 +491,17 @@ describe('Mach-dependent drag factor', () => {
       expect(Math.abs(p.value / nth(factors, i) - 1)).toBeLessThan(1e-6)
     })
   })
+})
 
+describe('Mach-dependent drag factor at base nodes', () => {
   it('drops a base node one ulp from a knot', () => {
-    /** 2.15 moved by d units in the last place. */
-    const ulp = (d: bigint) => {
-      const b = new Float64Array([2.15])
-      const bits = new BigInt64Array(b.buffer)
-      bits[0] = nth(bits, 0) + d
-      return nth(b, 0)
-    }
     const bc = 0.5 * lbPerSqInToKgPerSqM
     const o = { coriolis: false, spinDrift: false, jump: false }
     for (const [knots, interpolation] of [1n, -1n].flatMap((d) =>
-      (['linear', 'monotone-cubic'] as const).map((i): [number[], typeof i] => [[ulp(d), 2.6], i]),
+      (['linear', 'monotone-cubic'] as const).map((i): [number[], typeof i] => [
+        [ulpsFrom215(d), 2.6],
+        i,
+      ]),
     )) {
       const shot = (k: number): TrajectoryInput => ({
         projectile: {
@@ -386,40 +537,23 @@ describe('Mach-dependent drag factor', () => {
 })
 
 describe('truing with the monotone cubic', () => {
-  const velocities = [200, 400, 600, 800, 1000, 1200].map((x): [Observation['kind'], number] => [
-    'velocity',
-    x,
-  ])
-  const withDrag = (
-    shot: TrajectoryInput,
-    drag: TrajectoryInput['projectile']['drag'],
-  ): TrajectoryInput => ({
-    ...shot,
-    projectile: { ...shot.projectile, drag },
-  })
-  const bc = nth(g7.bands, 0).ballisticCoefficient
-  const i = 0.01134 / (bc * 0.00782 ** 2)
-  const cubicBc = { ...g7, interpolation: 'monotone-cubic' as const }
-  const cubicCurve = (k: number) => ({
-    kind: 'curve' as const,
-    curve: dragTables.G7.map(([m, c]) => [m, i * k * c] as const),
-    interpolation: 'monotone-cubic' as const,
-  })
-
   it('keeps the interpolation in the constant-factor fit', () => {
-    const obs = observe(withDrag(base, cubicCurve(1.03)), velocities)
+    const obs = observe(withDrag(base, cubicCurve(1.03)), velocityRanges)
     const r = trueDrag(withDrag(base, cubicCurve(1)), obs)
     expect(Math.abs(nth(r.parameters, 0).value / 1.03 - 1)).toBeLessThan(1e-6)
-    const slower = { ...cubicBc, bands: [{ ballisticCoefficient: bc / 1.03, minVelocity: 0 }] }
-    const b = trueDrag(withDrag(base, cubicBc), observe(withDrag(base, slower), velocities))
+    const slower = { ...cubicBc, bands: [{ ballisticCoefficient: g7Bc / 1.03, minVelocity: 0 }] }
+    const b = trueDrag(withDrag(base, cubicBc), observe(withDrag(base, slower), velocityRanges))
     expect(Math.abs(nth(b.parameters, 0).value / 1.03 - 1)).toBeLessThan(1e-6)
   })
 
   it('keeps the interpolation in the knot fit', () => {
     // knots on G7 nodes: the curve built from factor 1 is the BC's cubic
     const obs = observe(
-      withDrag(base, { ...cubicBc, bands: [{ ballisticCoefficient: bc / 0.95, minVelocity: 0 }] }),
-      velocities,
+      withDrag(base, {
+        ...cubicBc,
+        bands: [{ ballisticCoefficient: g7Bc / 0.95, minVelocity: 0 }],
+      }),
+      velocityRanges,
     )
     const r = trueDrag(withDrag(base, cubicBc), obs, { knots: [1.5, 2] })
     for (const p of r.parameters) expect(Math.abs(p.value / 0.95 - 1)).toBeLessThan(1e-5)
@@ -430,62 +564,55 @@ describe('truing with the monotone cubic', () => {
     // knot 0.93 lies between G7 nodes and changes the neighbouring slopes of the cubic, so the fit
     // on the BC's own observations returns factors slightly off 1
     // (`apps/docs/docs/models/exterior-drag.md`, "Monotone cubic interpolation")
-    const obs = observe(withDrag(base, cubicBc), velocities)
+    const obs = observe(withDrag(base, cubicBc), velocityRanges)
     const knots = [0.93, 1.5, 2]
-    const at = (shot: TrajectoryInput, m: number) => {
-      const drag = shot.projectile.drag
-      return drag.kind === 'curve' ? (drag.curve.find((n) => n[0] === m)?.[1] ?? NaN) : NaN
-    }
-    const own = (m: number) => i * dragCoefficient(dragTables.G7, m, 'monotone-cubic')
     const r = trueDrag(withDrag(base, cubicBc), obs, { knots })
     const f = r.parameters.map((p) => p.value)
     for (const x of f) expect(Math.abs(x - 1)).toBeLessThan(2e-4)
     for (const x of r.residuals) expect(Math.abs(x.residual)).toBeLessThan(5e-3)
-    expect(Math.abs(at(r.shot, 0.93) / (nth(f, 0) * own(0.93)) - 1)).toBeLessThan(1e-14)
+    expect(Math.abs(curveCdAt(r.shot, 0.93) / (nth(f, 0) * ownCubicCd(0.93)) - 1)).toBeLessThan(
+      1e-14,
+    )
     // the factor stays linear between knots: base node 1.2 lies between the knots 0.93 and 1.5
     const linear = nth(f, 0) + ((nth(f, 1) - nth(f, 0)) * (1.2 - 0.93)) / (1.5 - 0.93)
-    expect(Math.abs(at(r.shot, 1.2) / (linear * own(1.2)) - 1)).toBeLessThan(1e-13)
+    expect(Math.abs(curveCdAt(r.shot, 1.2) / (linear * ownCubicCd(1.2)) - 1)).toBeLessThan(1e-13)
     const c = cubicCurve(1)
     const rc = trueDrag(withDrag(base, c), obs, { knots })
     const own0 = dragCoefficient(c.curve, 0.93, 'monotone-cubic')
-    expect(Math.abs(at(rc.shot, 0.93) / (nth(rc.parameters, 0).value * own0) - 1)).toBeLessThan(
-      1e-14,
-    )
+    expect(
+      Math.abs(curveCdAt(rc.shot, 0.93) / (nth(rc.parameters, 0).value * own0) - 1),
+    ).toBeLessThan(1e-14)
   })
 })
 
 describe('truing failures', () => {
-  const reason = (f: () => unknown) => {
-    try {
-      f()
-    } catch (e) {
-      if (e instanceof TruingError) return e
-      throw e
-    }
-    throw new Error('no error')
-  }
-
   it('reports each failure reason', () => {
-    const h = (range: number, value = -0.1): Observation => ({ kind: 'height', range, value })
-    expect(reason(() => trueDrag(base, [h(300)], { fitMuzzleVelocity: true })).reason).toBe(
-      'underdetermined',
+    expect(
+      truingFailure(() => trueDrag(base, [heightObs(300)], { fitMuzzleVelocity: true })).reason,
+    ).toBe('underdetermined')
+    const zero = truingFailure(() =>
+      trueDrag({ ...base, zero: { range: 100 } }, [heightObs(100, 0)]),
     )
-    const zero = reason(() => trueDrag({ ...base, zero: { range: 100 } }, [h(100, 0)]))
     expect(zero.reason).toBe('unresolved')
     expect(zero.unresolved).toEqual([0])
     // both knots above the flight's Mach numbers: the lower acts as a constant factor
     const slow = { ...base, muzzleVelocity: 500 }
-    const v = (range: number, value: number): Observation => ({ kind: 'velocity', range, value })
-    const knots = reason(() => trueDrag(slow, [v(200, 450), v(400, 410)], { knots: [2, 2.5] }))
+    const knots = truingFailure(() =>
+      trueDrag(slow, [velocityObs(200, 450), velocityObs(400, 410)], { knots: [2, 2.5] }),
+    )
     expect(knots.reason).toBe('unresolved')
     expect(knots.unresolved).toEqual([1])
-    const same = reason(() => trueDrag(base, [h(300), h(300, -0.11)], { fitMuzzleVelocity: true }))
+    const same = truingFailure(() =>
+      trueDrag(base, [heightObs(300), heightObs(300, -0.11)], { fitMuzzleVelocity: true }),
+    )
     expect(same.reason).toBe('ill-conditioned')
     expect(same.conditionNumber).toBeGreaterThan(1e3)
     expect(same.direction).toHaveLength(2)
     const steep = { ...base, lookAngle: Math.PI / 2, zero: { elevationAngle: 0, windageAngle: 0 } }
-    expect(reason(() => trueMuzzleVelocity(steep, [h(50000)])).reason).toBe('unreachable')
-    const stuck = reason(() =>
+    expect(truingFailure(() => trueMuzzleVelocity(steep, [heightObs(50000)])).reason).toBe(
+      'unreachable',
+    )
+    const stuck = truingFailure(() =>
       trueDrag(
         base,
         observe(scaled(base, 1.02, 0.95), mixed),
@@ -497,7 +624,9 @@ describe('truing failures', () => {
     expect(stuck.estimate).toHaveLength(2)
     expect(stuck).toBeInstanceOf(InputError)
   })
+})
 
+describe('truing failures of the budget and of the input', () => {
   it('fails with step-budget when the fit uses up maxTotalSteps', () => {
     const zeroed = { ...base, zero: { range: 100 } }
     const obs = observe(scaled(zeroed, 1.02, 0.95), mixed)
@@ -508,7 +637,7 @@ describe('truing failures', () => {
     )
     const exact = trueDrag(zeroed, obs, { fitMuzzleVelocity: true }, { maxTotalSteps: free.steps })
     expect(exact).toEqual(free)
-    const short = reason(() =>
+    const short = truingFailure(() =>
       trueDrag(zeroed, obs, { fitMuzzleVelocity: true }, { maxTotalSteps: free.steps - 1 }),
     )
     expect(short.reason).toBe('step-budget')
@@ -534,26 +663,12 @@ describe('truing failures', () => {
     expect(() => trueMuzzleVelocity(faulty, one)).toThrow(TypeError)
     expect(reads).toBe(2)
   })
+})
 
+describe('truing failures before any trajectory', () => {
   it('rejects malformed inputs before any trajectory', () => {
-    const plain = (f: () => unknown) => {
-      expect(f).toThrow(InputError)
-      try {
-        f()
-      } catch (e) {
-        expect(e).not.toBeInstanceOf(TruingError)
-      }
-    }
     const h: Observation = { kind: 'height', range: 300, value: -0.1 }
     const v: Observation = { kind: 'velocity', range: 300, value: 700 }
-    plain(() => trueMuzzleVelocity(base, [{ ...h, standardUncertainty: 0 }]))
-    plain(() => trueMuzzleVelocity(base, [{ ...h, standardUncertainty: 1 }, v]))
-    plain(() => trueMuzzleVelocity(base, [h, v]))
-    plain(() => trueMuzzleVelocity(base, [{ ...h, range: 0 }]))
-    plain(() => trueMuzzleVelocity(base, []))
-    for (const maxTotalSteps of [Number.NaN, 0, -1])
-      plain(() => trueMuzzleVelocity(base, [h], { maxTotalSteps }))
-    plain(() => trueDrag(base, [v, v], { knots: [2, 1.5] }))
     const banded = {
       ...base,
       projectile: {
@@ -567,41 +682,31 @@ describe('truing failures', () => {
         },
       },
     }
-    plain(() => trueDrag(banded, [v, v], { knots: [1.5, 2] }))
     const misspelled = { ...base.projectile, drag: { ...g7, reference: 'Metro' as 'metro' } }
-    plain(() => trueDrag({ ...base, projectile: misspelled }, [v, v], { knots: [1.5, 2] }))
+    const calls = [
+      () => trueMuzzleVelocity(base, [{ ...h, standardUncertainty: 0 }]),
+      () => trueMuzzleVelocity(base, [{ ...h, standardUncertainty: 1 }, v]),
+      () => trueMuzzleVelocity(base, [h, v]),
+      () => trueMuzzleVelocity(base, [{ ...h, range: 0 }]),
+      () => trueMuzzleVelocity(base, []),
+      ...[Number.NaN, 0, -1].map(
+        (maxTotalSteps) => () => trueMuzzleVelocity(base, [h], { maxTotalSteps }),
+      ),
+      () => trueDrag(base, [v, v], { knots: [2, 1.5] }),
+      () => trueDrag(banded, [v, v], { knots: [1.5, 2] }),
+      () => trueDrag({ ...base, projectile: misspelled }, [v, v], { knots: [1.5, 2] }),
+    ]
+    for (const call of calls) {
+      const error = errorOf(call)
+      expect(error).toBeInstanceOf(InputError)
+      expect(error).not.toBeInstanceOf(TruingError)
+    }
   })
 })
 
 describe('several sessions', () => {
-  const { projectile } = base
-  const first: TruingSession['shot'] = {
-    muzzleVelocity: 790,
-    firearm: { sightHeight: 0.05 },
-    air: standardAtmosphere(0),
-    zero: { range: 100 },
-  }
-  const second: TruingSession['shot'] = {
-    muzzleVelocity: 805,
-    firearm: { sightHeight: 0.05 },
-    air: { ...standardAtmosphere(1500), temperature: 268.15 },
-    wind: [{ endDistance: Infinity, speed: 4, fromDirection: 0.5 }],
-    zero: { range: 100 },
-  }
-  const three: [Observation['kind'], number, number][] = [
-    ['height', 300, 0.01],
-    ['height', 600, 0.01],
-    ['velocity', 800, 1],
-  ]
-  const o1 = observe(scaled({ ...first, projectile }, 1.02, 0.95), three)
-  const o2 = observe(scaled({ ...second, projectile }, 0.99, 0.95), three)
-  const both = (shot2 = second): TruingSession[] => [
-    { shot: first, observations: o1, fitMuzzleVelocity: true },
-    { shot: shot2, observations: o2, fitMuzzleVelocity: true },
-  ]
-
   it('recovers the shared drag factor and each muzzle velocity', () => {
-    const r = trueDragSessions(projectile, both())
+    const r = trueDragSessions(sessionProjectile, bothSessions())
     expect(r.parameters.map((p) => [p.name, p.session])).toEqual([
       ['muzzleVelocity', 0],
       ['muzzleVelocity', 1],
@@ -620,7 +725,7 @@ describe('several sessions', () => {
       nth(r.parameters, 0).value,
       nth(r.parameters, 1).value,
     ])
-    expect(nth(r.shots, 1).air).toBe(second.air)
+    expect(nth(r.shots, 1).air).toBe(secondShot.air)
     expect(nth(r.shots, 0).projectile.drag).toEqual({
       ...g7,
       bands: [
@@ -631,11 +736,19 @@ describe('several sessions', () => {
       ],
     })
   })
+})
 
+describe('several sessions with one held', () => {
   it('holds one session and fits the muzzle velocity of the other', () => {
-    const r = trueDragSessions(projectile, [
-      { shot: first, observations: observe(scaled({ ...first, projectile }, 1, 0.95), three) },
-      { shot: second, observations: o2, fitMuzzleVelocity: true },
+    const r = trueDragSessions(sessionProjectile, [
+      {
+        shot: firstShot,
+        observations: observe(
+          scaled({ ...firstShot, projectile: sessionProjectile }, 1, 0.95),
+          threeObservations,
+        ),
+      },
+      { shot: secondShot, observations: secondObservations, fitMuzzleVelocity: true },
     ])
     expect(r.parameters.map((p) => [p.name, p.session, p.initial])).toEqual([
       ['muzzleVelocity', 1, 805],
@@ -647,26 +760,36 @@ describe('several sessions', () => {
     })
     expect(r.shots.map((x) => x.muzzleVelocity)).toEqual([790, nth(r.parameters, 0).value])
   })
+})
 
+describe('several sessions with their own conditions', () => {
   it('takes firearm, zero and site from each session', () => {
     const own: TruingSession['shot'] = {
-      ...second,
+      ...secondShot,
       firearm: { sightHeight: 0.08 },
       zero: { range: 200 },
       site: { latitude: 1.2, azimuth: 1 },
     }
     const coriolis = { coriolis: true }
     const r = trueDragSessions(
-      projectile,
+      sessionProjectile,
       [
         {
-          shot: first,
-          observations: observe(scaled({ ...first, projectile }, 1.02, 0.95), three, coriolis),
+          shot: firstShot,
+          observations: observe(
+            scaled({ ...firstShot, projectile: sessionProjectile }, 1.02, 0.95),
+            threeObservations,
+            coriolis,
+          ),
           fitMuzzleVelocity: true,
         },
         {
           shot: own,
-          observations: observe(scaled({ ...own, projectile }, 0.99, 0.95), three, coriolis),
+          observations: observe(
+            scaled({ ...own, projectile: sessionProjectile }, 0.99, 0.95),
+            threeObservations,
+            coriolis,
+          ),
           fitMuzzleVelocity: true,
         },
       ],
@@ -681,17 +804,27 @@ describe('several sessions', () => {
     expect(nth(r.shots, 1).site).toBe(own.site)
   })
 
+  it('flies each session in its own air', () => {
+    const r = trueDragSessions(
+      sessionProjectile,
+      bothSessions({ ...secondShot, air: firstShot.air }),
+    )
+    expect(Math.abs(nth(r.parameters, 2).value / 0.95 - 1)).toBeGreaterThan(1e-2)
+  })
+})
+
+describe('several sessions with knots and alone', () => {
   it('fits knots over two sessions', () => {
     const v = (shot: TruingSession['shot'], xs: number[]) =>
       observe(
-        scaled({ ...shot, projectile }, 1, 0.95),
+        scaled({ ...shot, projectile: sessionProjectile }, 1, 0.95),
         xs.map((x): [Observation['kind'], number, number] => ['velocity', x, 1]),
       )
     const r = trueDragSessions(
-      projectile,
+      sessionProjectile,
       [
-        { shot: first, observations: v(first, [0, 200, 400, 600, 800, 1000]) },
-        { shot: second, observations: v(second, [0, 300, 600, 900]) },
+        { shot: firstShot, observations: v(firstShot, [0, 200, 400, 600, 800, 1000]) },
+        { shot: secondShot, observations: v(secondShot, [0, 300, 600, 900]) },
       ],
       { knots: [1.5, 2] },
     )
@@ -699,16 +832,13 @@ describe('several sessions', () => {
     for (const p of r.parameters) expect(Math.abs(p.value / 0.95 - 1)).toBeLessThan(1e-6)
   })
 
-  it('flies each session in its own air', () => {
-    const r = trueDragSessions(projectile, both({ ...second, air: first.air }))
-    expect(Math.abs(nth(r.parameters, 2).value / 0.95 - 1)).toBeGreaterThan(1e-2)
-  })
-
   it('equals trueDrag for one session', () => {
     const obs = observe(scaled(base, 1.02, 0.95), mixed)
     const a = trueDrag(base, obs, { fitMuzzleVelocity: true })
     const { projectile: _, ...shot } = base
-    const b = trueDragSessions(projectile, [{ shot, observations: obs, fitMuzzleVelocity: true }])
+    const b = trueDragSessions(sessionProjectile, [
+      { shot, observations: obs, fitMuzzleVelocity: true },
+    ])
     expect(b.parameters.map(({ session, ...p }) => p)).toEqual(a.parameters)
     expect(b.residuals.map(({ session, ...x }) => x)).toEqual(a.residuals)
     const counts = (r: typeof a | typeof b) => [
@@ -724,7 +854,9 @@ describe('several sessions', () => {
     expect(a.parameters.some((p) => 'session' in p)).toBe(false)
     expect(a.residuals.some((x) => 'session' in x)).toBe(false)
   })
+})
 
+describe('several sessions with their own sigmas', () => {
   it('weights each session by its own sigmas', () => {
     const sigmas = [2, 1, 3, 3, 0.5, 2, 4]
     const noise = [0.4, 0.7, -1.1, 0.2, 0.3, 1.4, -0.9]
@@ -738,7 +870,7 @@ describe('several sessions', () => {
     ).map((x, i) => ({ ...x, value: x.value + nth(noise, i) }))
     const a = trueDrag(base, obs)
     const { projectile: _, ...shot } = base
-    const b = trueDragSessions(projectile, [
+    const b = trueDragSessions(sessionProjectile, [
       { shot, observations: obs.slice(0, 3) },
       { shot, observations: obs.slice(3, 4) },
       { shot, observations: obs.slice(4) },
@@ -754,103 +886,33 @@ describe('several sessions', () => {
       ),
     ).toBeLessThan(1e-8)
   })
+})
 
-  describe('closed form in one dimension', () => {
-    // gravity 0, flat Cd, level bore: v = v0 exp(-k c x) in each session's air
-    const cd = 0.3
-    const sigma = 2
-    const k = 1.1
-    const opts = { gravity: 0, coriolis: false, relativeTolerance: 1e-12, absoluteTolerance: 1e-10 }
-    const airs = [standardAtmosphere(0), { ...standardAtmosphere(2000), temperature: 263.15 }]
-    const v0s = [800, 760]
-    const xs = [
-      [100, 300, 500],
-      [150, 400, 650, 900],
-    ]
-    const sessions = airs.map((air, s) => {
-      const c = (airDensity(air) * cd * Math.PI * 0.00782 ** 2) / (8 * 0.01134)
-      const values = nth(xs, s).map((x) => nth(v0s, s) * Math.exp(-k * c * x))
-      const session: TruingSession = {
-        shot: {
-          muzzleVelocity: nth(v0s, s) * 1.01,
-          firearm: { sightHeight: 0 },
-          air,
-          zero: { elevationAngle: 0, windageAngle: 0 },
-        },
-        observations: values.map((value, i) => ({
-          kind: 'velocity',
-          range: nth(nth(xs, s), i),
-          value,
-          standardUncertainty: sigma,
-        })),
-        fitMuzzleVelocity: true,
-      }
-      // rows of d v / d ln v0 and of minus d v / d ln k, over sigma
-      const a = values.map((v) => v / sigma)
-      const b = values.map((v, i) => (k * c * nth(nth(xs, s), i) * v) / sigma)
-      const dot = (p: number[], q: number[]) => p.reduce((t, x, i) => t + x * nth(q, i), 0)
-      return { session, info: dot(b, b) - dot(a, b) ** 2 / dot(a, a) }
-    })
-    const own = { ...projectile, drag: flat(cd) }
-    const joint = trueDragSessions(
-      own,
-      sessions.map((x) => x.session),
-      {},
-      opts,
-    )
-
-    it('gives the closed-form sigma of the shared factor', () => {
-      const f = nth(joint.parameters, 2)
-      expect(Math.abs(f.value / k - 1)).toBeLessThan(1e-9)
-      const expected = k / Math.sqrt(sessions.reduce((t, x) => t + x.info, 0))
-      expect(Math.abs((f.standardUncertainty ?? 0) / expected - 1)).toBeLessThan(1e-6)
-    })
-
-    it('adds the information of the sessions', () => {
-      const alone = sessions.map(
-        (x) =>
-          nth(trueDragSessions(own, [x.session], {}, opts).parameters, 1).standardUncertainty ??
-          Number.NaN,
-      )
-      const sum = alone.reduce((t, x) => t + x ** -2, 0)
-      expect(
-        Math.abs((nth(joint.parameters, 2).standardUncertainty ?? 0) ** -2 / sum - 1),
-      ).toBeLessThan(1e-9)
-    })
-  })
-
+describe('several sessions that fail', () => {
   it('rejects malformed sessions before any trajectory', () => {
-    const plain = (f: () => unknown) => {
-      try {
-        f()
-      } catch (e) {
-        return e instanceof InputError && !(e instanceof TruingError)
-      }
-      return false
-    }
-    expect(plain(() => trueDragSessions(projectile, []))).toBe(true)
+    expect(isPlainInputError(() => trueDragSessions(sessionProjectile, []))).toBe(true)
     expect(
-      plain(() =>
-        trueDragSessions(projectile, [
-          { shot: first, observations: o1 },
-          { shot: second, observations: [] },
+      isPlainInputError(() =>
+        trueDragSessions(sessionProjectile, [
+          { shot: firstShot, observations: firstObservations },
+          { shot: secondShot, observations: [] },
         ]),
       ),
     ).toBe(true)
-    const bare = o2.map(({ standardUncertainty, ...x }) => x)
+    const bare = secondObservations.map(({ standardUncertainty, ...x }) => x)
     expect(
-      plain(() =>
-        trueDragSessions(projectile, [
-          { shot: first, observations: o1 },
-          { shot: second, observations: bare },
+      isPlainInputError(() =>
+        trueDragSessions(sessionProjectile, [
+          { shot: firstShot, observations: firstObservations },
+          { shot: secondShot, observations: bare },
         ]),
       ),
     ).toBe(true)
     let reason: unknown
     try {
-      trueDragSessions(projectile, [
-        { shot: first, observations: o1.slice(0, 1), fitMuzzleVelocity: true },
-        { shot: second, observations: o2.slice(0, 1), fitMuzzleVelocity: true },
+      trueDragSessions(sessionProjectile, [
+        { shot: firstShot, observations: firstObservations.slice(0, 1), fitMuzzleVelocity: true },
+        { shot: secondShot, observations: secondObservations.slice(0, 1), fitMuzzleVelocity: true },
       ])
     } catch (e) {
       reason = e instanceof TruingError && e.reason
@@ -861,7 +923,7 @@ describe('several sessions', () => {
   it('names the sessions in the estimate of a failed fit', () => {
     let error: TruingError | undefined
     try {
-      trueDragSessions(projectile, both(), {}, { maxIterations: 1 })
+      trueDragSessions(sessionProjectile, bothSessions(), {}, { maxIterations: 1 })
     } catch (e) {
       if (e instanceof TruingError) error = e
     }
@@ -874,6 +936,46 @@ describe('several sessions', () => {
   })
 })
 
+describe('several sessions: closed form in one dimension', () => {
+  // gravity 0, flat Cd, level bore: v = v0 exp(-k c x) in each session's air
+  const cd = 0.3
+  const sigma = 2
+  const k = 1.1
+  const opts = { gravity: 0, coriolis: false, relativeTolerance: 1e-12, absoluteTolerance: 1e-10 }
+  const airs = [standardAtmosphere(0), { ...standardAtmosphere(2000), temperature: 263.15 }]
+  const v0s = [800, 760]
+  const xs = [
+    [100, 300, 500],
+    [150, 400, 650, 900],
+  ]
+  const sessions = oneDimensionSessions({ cd, sigma, k, airs, v0s, xs })
+  const own = { ...sessionProjectile, drag: flat(cd) }
+  const joint = trueDragSessions(
+    own,
+    sessions.map((x) => x.session),
+    {},
+    opts,
+  )
+
+  it('gives the closed-form sigma of the shared factor', () => {
+    const f = nth(joint.parameters, 2)
+    expect(Math.abs(f.value / k - 1)).toBeLessThan(1e-9)
+    const expected = k / Math.sqrt(sessions.reduce((t, x) => t + x.info, 0))
+    expect(Math.abs((f.standardUncertainty ?? 0) / expected - 1)).toBeLessThan(1e-6)
+  })
+
+  it('adds the information of the sessions', () => {
+    const alone = sessions.map(
+      (x) =>
+        nth(trueDragSessions(own, [x.session], {}, opts).parameters, 1).standardUncertainty ??
+        Number.NaN,
+    )
+    const sum = alone.reduce((t, x) => t + x ** -2, 0)
+    expect(
+      Math.abs((nth(joint.parameters, 2).standardUncertainty ?? 0) ** -2 / sum - 1),
+    ).toBeLessThan(1e-9)
+  })
+})
 describe('divergence of the muzzle velocity fit and the drag fit', () => {
   it('is zero for data from a pure velocity error', () => {
     const c = compareTruingFits(base, observe(scaled(base, 1.02, 1), mixed))

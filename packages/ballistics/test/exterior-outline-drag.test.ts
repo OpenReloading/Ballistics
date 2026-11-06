@@ -134,7 +134,7 @@ const cases = [
   },
 ]
 
-describe('drag estimate from the outline', () => {
+describe('drag estimate from the outline against the printed outputs', () => {
   for (const c of cases) {
     it(`reproduces the printed output for ${c.name}`, () => {
       const est = estimateDragFromOutline(c.in)
@@ -173,7 +173,9 @@ describe('drag estimate from the outline', () => {
     for (const [i, n] of est.nodes.entries())
       expect(Math.abs(n.dragCoefficient - nth(brl1, i)[0])).toBeLessThanOrEqual(half)
   })
+})
 
+describe('drag estimate from the outline warnings', () => {
   it('warns where the report warns', () => {
     expect(estimateDragFromOutline(nth(cases, 0).in).warnings).toEqual([])
     expect(estimateDragFromOutline(nth(cases, 1).in).warnings).toEqual([
@@ -219,7 +221,9 @@ describe('drag estimate from the outline', () => {
       estimateDragFromOutline({ ...nth(cases, 0).in, machNumbers: [0.5, 5] }).warnings,
     ).toEqual([])
   })
+})
 
+describe('drag estimate from the outline on other outlines and wrong ones', () => {
   it('gives a flat base without a boat tail and a standard deviation per node', () => {
     const est = estimateDragFromOutline({
       diameter: 0.00762,

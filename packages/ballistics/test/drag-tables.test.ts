@@ -21,10 +21,8 @@ describe('dragTables', () => {
 
   it('rises in Mach with positive drag coefficients', () => {
     for (const table of Object.values(dragTables)) {
-      table.forEach(([mach, cd], k) => {
-        expect(cd).toBeGreaterThan(0)
-        if (k > 0) expect(mach).toBeGreaterThan(nth(table, k - 1)[0])
-      })
+      for (const [, cd] of table) expect(cd).toBeGreaterThan(0)
+      table.slice(1).forEach(([mach], k) => expect(mach).toBeGreaterThan(nth(table, k)[0]))
     }
   })
 })
