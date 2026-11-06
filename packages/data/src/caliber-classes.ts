@@ -1,5 +1,4 @@
 import type { Bundle } from './records.ts'
-import { resolveId } from './renames.ts'
 
 /** Largest gap in mm between a class's nominal diameter and G1 of a member cartridge. */
 const diameterTolerance = 0.15
@@ -10,11 +9,10 @@ const projectileDiameter = (values: Bundle['cartridges'][number]['values']) => {
   return typeof value === 'number' ? value : undefined
 }
 
-type CaliberBundle = Pick<Bundle, 'caliberClasses' | 'cartridges' | 'disciplines' | 'renames'>
+type CaliberBundle = Pick<Bundle, 'caliberClasses' | 'cartridges' | 'disciplines'>
 
 /** Checks one member of a class: its record, its single class and G1 against the class diameter. */
 function checkMember(
-  bundle: CaliberBundle,
   c: CaliberBundle['caliberClasses'][number],
   id: string,
   cartridges: Map<string, Bundle['cartridges'][number]>,
@@ -22,7 +20,7 @@ function checkMember(
   errors: string[],
 ) {
   const where = `caliber-classes/${c.id}.json`
-  const cartridge = cartridges.get(resolveId(bundle.renames, 'cartridges', id))
+  const cartridge = cartridges.get(id)
   if (!cartridge) {
     errors.push(`${where}: unknown cartridge "${id}"`)
     return
@@ -48,11 +46,10 @@ export function checkCaliberClasses(bundle: CaliberBundle): string[] {
   const cartridges = new Map(bundle.cartridges.map((c) => [c.id, c]))
   const owner = new Map<string, string>()
   for (const c of bundle.caliberClasses)
-    for (const id of c.cartridges) checkMember(bundle, c, id, cartridges, owner, errors)
+    for (const id of c.cartridges) checkMember(c, id, cartridges, owner, errors)
   const classes = new Set(bundle.caliberClasses.map((c) => c.id))
   for (const d of bundle.disciplines)
     for (const id of d.caliberClasses?.ids ?? [])
-      if (!classes.has(resolveId(bundle.renames, 'caliber-classes', id)))
-        errors.push(`disciplines/${d.id}.json: unknown caliber class "${id}"`)
+      if (!classes.has(id)) errors.push(`disciplines/${d.id}.json: unknown caliber class "${id}"`)
   return errors
 }

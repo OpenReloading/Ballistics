@@ -52,7 +52,7 @@ describe('primer records', () => {
     expect(errors).toContain('primers/third-primer.json: field compound has no source')
   })
 
-  it('reports a load that names a primer that is no record and accepts a renamed one', () => {
+  it('reports a load that names a primer that is no record', () => {
     const point = (primer: string) => (root: string) => {
       const path = join(root, 'loads', 'test-load.json')
       writeFileSync(
@@ -63,11 +63,5 @@ describe('primer records', () => {
     expect(readAfter(point('catalogue:missing-primer')).errors).toEqual([
       'loads/test-load.json: unknown primer "catalogue:missing-primer"',
     ])
-    expect(
-      readAfter((root, write) => {
-        point('catalogue:old-primer')(root)
-        write('renames.json', { primers: { 'old-primer': 'test-primer' } })
-      }).errors,
-    ).toEqual([])
   })
 })
