@@ -49,15 +49,20 @@ function rotate(m: number[][], v: number[][], p: number, q: number) {
   }
 }
 
+/** One cyclic Jacobi sweep: a rotation for each nonzero entry above the diagonal of `m`. */
+function jacobiSweep(m: number[][], v: number[][]) {
+  const n = m.length
+  for (let p = 0; p < n - 1; p++)
+    for (let q = p + 1; q < n; q++) if (nth(nth(m, p), q) !== 0) rotate(m, v, p, q)
+}
+
 /** Cyclic Jacobi eigen decomposition of a symmetric matrix; vectors[i][k]: entry i of vector k. */
 function eigen(a: number[][]): { values: number[]; vectors: number[][] } {
-  const n = a.length
   const m = a.map((r) => [...r])
-  const v: number[][] = a.map((_, i) => a.map((_, j) => (i === j ? 1 : 0)))
+  const v: number[][] = a.map((row, i) => row.map((_x, j) => (i === j ? 1 : 0)))
   for (let sweep = 0; sweep < 100; sweep++) {
     if (isDiagonal(m)) break
-    for (let p = 0; p < n - 1; p++)
-      for (let q = p + 1; q < n; q++) if (nth(nth(m, p), q) !== 0) rotate(m, v, p, q)
+    jacobiSweep(m, v)
   }
   return { values: m.map((r, i) => nth(r, i)), vectors: v }
 }
@@ -71,8 +76,8 @@ function inverse(a: number[][]): number[][] {
 }
 
 const transposeTimes = (j: number[][], b: number[][]) =>
-  nth(j, 0).map((_, r) =>
-    nth(b, 0).map((_, c) => j.reduce((s, row, i) => s + nth(row, r) * nth(nth(b, i), c), 0)),
+  nth(j, 0).map((_row, r) =>
+    nth(b, 0).map((_column, c) => j.reduce((s, row, i) => s + nth(row, r) * nth(nth(b, i), c), 0)),
   )
 
 /** Parameter uncertainty and collinearity measures of a weighted Jacobian. */
@@ -111,8 +116,8 @@ export function identifiability(j: number[][]): Identifiability {
   const floor = 1e-12 * top
   const singular = (values[lo] ?? Number.NaN) <= floor
   const lambda = values.map((l) => Math.max(l, floor))
-  const inv = r.map((_, a) =>
-    r.map((_, b) =>
+  const inv = r.map((_row, a) =>
+    r.map((_column, b) =>
       lambda.reduce((s, l, k) => s + (nth(nth(vectors, a), k) * nth(nth(vectors, b), k)) / l, 0),
     ),
   )
@@ -319,81 +324,129 @@ function covarianceOf(fit: LogFitInput, jw: number[][], cost: number, dof: numbe
   return covarianceSummary(parameterCovariance(jw, fit.weighted ? 1 : cost / dof))
 }
 
+/** The chi-square of weighted residuals: the sum of their squares. */
+const chiSquareOf = (r: number[]) => r.reduce((s, x) => s + x * x, 0)
+
+/** What the iteration reads of a fit: its stacking, weighted residuals, cost and root weights. */
+interface Model {
+  fit: LogFitInput
+  stacking: Stacking
+  residuals: (values: readonly number[]) => number[]
+  cost: (r: number[]) => number
+  roots: (r: number[]) => number[]
+}
+
+function modelOf(fit: LogFitInput): Model {
+  const { observed, standardUncertainty: sigma, huber } = fit
+  const { runs = [observed.length], moves = () => true } = fit
+  const start = runs.map((_count, k) => runs.slice(0, k).reduce((t, c) => t + c, 0))
+  return {
+    fit,
+    stacking: { runs, start, moves },
+    residuals: (values) => values.map((v, i) => (v - nth(observed, i)) / nth(sigma, i)),
+    cost: (r) => (huber ? huberCost(r, huber) : chiSquareOf(r)),
+    roots: (r) => huberRoots(r, huber),
+  }
+}
+
+/** Where the iteration stands: parameters, prediction, residuals, cost, Jacobian and damping. */
+interface State {
+  theta: number[]
+  predicted: readonly number[]
+  r: number[]
+  cost: number
+  j: number[][]
+  /** Whether `j` belongs to the current `theta`. */
+  current: boolean
+  lambda: number
+  iterations: number
+  weightsSettled: boolean
+}
+
+/** The start at theta = 0, after the conditioning check of its Jacobian. */
+function startState(m: Model): State {
+  const theta = Array.from({ length: m.fit.parameterCount }, () => 0)
+  const r = m.residuals(m.fit.first)
+  const cost = m.cost(r)
+  const j = jacobian(m.fit, m.stacking, theta)
+  checkConditioning(m.fit, j, theta)
+  const iteration = { current: true, lambda: lambda0, iterations: 0, weightsSettled: true }
+  return { theta, predicted: m.fit.first, r, cost, j, ...iteration }
+}
+
+/** Whether the Huber loss treats the same rows as outliers in `a` and `b`. */
+function sameRows(m: Model, a: number[], b: number[]) {
+  const wb = m.roots(b)
+  return m.roots(a).every((w, i) => w < 1 === nth(wb, i) < 1)
+}
+
+/**
+ * Moves to the `accepted` parameters, prediction and cost and lowers the damping; `stalled`
+ * when the cost fell by less than `tolerance` of itself, else the Jacobian there.
+ */
+function acceptStep(
+  m: Model,
+  s: State,
+  accepted: { theta: number[]; predicted: readonly number[]; cost: number },
+  tolerance: number,
+): LogFitStop | undefined {
+  const before = s.r
+  s.theta = accepted.theta
+  s.predicted = accepted.predicted
+  s.r = m.residuals(accepted.predicted)
+  s.weightsSettled = sameRows(m, before, s.r)
+  s.lambda /= 10
+  s.current = false
+  const done = stalled(s.cost, accepted.cost, tolerance)
+  s.cost = accepted.cost
+  if (done) return 'stalled'
+  s.j = jacobian(m.fit, m.stacking, s.theta)
+  s.current = true
+  return undefined
+}
+
+/** One Levenberg-Marquardt iteration: a step that lowers the cost is taken, else the damping grows. */
+function iterate(m: Model, s: State, tolerance: number): LogFitStop | undefined {
+  checkIterations(m.fit, s.iterations, s.j, s.theta)
+  s.iterations++
+  const delta = levenbergMarquardtStep(s.j, s.r, m.roots(s.r), s.lambda)
+  const small = Math.max(...delta.map(Math.abs)) < 1e-8
+  const candidate = s.theta.map((x, k) => x + nth(delta, k))
+  const p = small ? null : m.fit.predict(candidate, s.theta)
+  const next = p ? m.cost(m.residuals(p)) : Infinity
+  if (p && next < s.cost)
+    return acceptStep(m, s, { theta: candidate, predicted: p, cost: next }, tolerance)
+  if (small) return 'smallStep'
+  s.lambda *= 10
+  return undefined
+}
+
 /**
  * Levenberg-Marquardt on the log parameters, starting at theta = 0
  * (`apps/docs/docs/models/least-squares.md`, "Levenberg-Marquardt step").
  */
 export function logLeastSquares(fit: LogFitInput): LogFitResult {
-  const { parameterCount, observed, standardUncertainty: sigma, predict, tolerance = 1e-12 } = fit
-  const n = observed.length
-  const residuals = (values: readonly number[]) =>
-    values.map((v, i) => (v - nth(observed, i)) / nth(sigma, i))
-  const chi2 = (r: number[]) => r.reduce((s, x) => s + x * x, 0)
-  const { huber } = fit
-  const cost2 = (r: number[]) => (huber ? huberCost(r, huber) : chi2(r))
-  const roots = (r: number[]) => huberRoots(r, huber)
-  const sameRows = (a: number[], b: number[]) => {
-    const wb = roots(b)
-    return roots(a).every((w, i) => w < 1 === nth(wb, i) < 1)
-  }
-
-  const { runs = [n], moves = () => true } = fit
-  const start = runs.map((_, k) => runs.slice(0, k).reduce((t, c) => t + c, 0))
-  const stacking = { runs, start, moves }
-
-  let theta = Array.from({ length: parameterCount }, () => 0)
-  let predicted = fit.first
-  let r = residuals(predicted)
-  let cost = cost2(r)
-  let j = jacobian(fit, stacking, theta)
-  /** Whether `j` belongs to the current `theta`. */
-  let current = true
-  checkConditioning(fit, j, theta)
-  let lambda = lambda0
-  let iterations = 0
-  let stop: LogFitStop
-  let weightsSettled = true
-  for (;;) {
-    checkIterations(fit, iterations, j, theta)
-    iterations++
-    const delta = levenbergMarquardtStep(j, r, roots(r), lambda)
-    const small = Math.max(...delta.map(Math.abs)) < 1e-8
-    const candidate = theta.map((x, k) => x + nth(delta, k))
-    const p = small ? null : predict(candidate, theta)
-    const next = p ? cost2(residuals(p)) : Infinity
-    if (p && next < cost) {
-      theta = candidate
-      predicted = p
-      const before = r
-      r = residuals(p)
-      weightsSettled = sameRows(before, r)
-      lambda /= 10
-      current = false
-      const done = stalled(cost, next, tolerance)
-      cost = next
-      if (done) {
-        stop = 'stalled'
-        break
-      }
-      j = jacobian(fit, stacking, theta)
-      current = true
-    } else if (small) {
-      stop = 'smallStep'
-      break
-    } else lambda *= 10
-  }
-
-  if (!current) j = jacobian(fit, stacking, theta)
-  const condition = checkConditioning(fit, j, theta)
+  const m = modelOf(fit)
+  const s = startState(m)
+  const tolerance = fit.tolerance ?? 1e-12
+  let stop: LogFitStop | undefined
+  while (stop === undefined) stop = iterate(m, s, tolerance)
+  if (!s.current) s.j = jacobian(fit, m.stacking, s.theta)
+  const condition = checkConditioning(fit, s.j, s.theta)
   return {
-    theta,
-    chiSquare: chi2(r),
-    loss: cost,
-    predicted,
+    theta: s.theta,
+    chiSquare: chiSquareOf(s.r),
+    loss: s.cost,
+    predicted: s.predicted,
     conditionNumber: condition,
-    iterations,
+    iterations: s.iterations,
     stop,
-    weightsSettled,
-    ...covarianceOf(fit, scaled(j, roots(r)), cost, n - parameterCount),
+    weightsSettled: s.weightsSettled,
+    ...covarianceOf(
+      fit,
+      scaled(s.j, m.roots(s.r)),
+      s.cost,
+      fit.observed.length - fit.parameterCount,
+    ),
   }
 }

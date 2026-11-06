@@ -1,7 +1,6 @@
+import { chiSquareQuantile, seededUniforms } from '@open-reloading/statistics'
 import { describe, expect, it } from 'vitest'
 import { InputError, nth } from '../src/errors.ts'
-import { chiSquareCdf, chiSquareQuantile, chiSquareSurvival } from '../src/groups/chi-square.ts'
-import { fQuantileTwoNumeratorDegrees } from '../src/groups/f-distribution.ts'
 import {
   dispersionEllipse,
   type GroupShot,
@@ -10,8 +9,6 @@ import {
   predictionEllipse,
   subtendedAngle,
 } from '../src/groups/statistics.ts'
-import { studentTwoSidedQuantile } from '../src/groups/student-t.ts'
-import { uniforms } from './random.ts'
 
 const mm = 1e-3
 const close = (actual: number | undefined, expected: number, rel = 1e-12) => {
@@ -350,86 +347,6 @@ describe('velocity correlation', () => {
   })
 })
 
-describe('chi-square distribution', () => {
-  it('2 degrees of freedom: 1 - exp(-x/2)', () => {
-    for (const p of [0.025, 0.5, 0.95, 0.975])
-      close(chiSquareQuantile(p, 2), -2 * Math.log(1 - p), 1e-12)
-  })
-
-  it('even degrees of freedom: finite sum (DLMF 8.4.10)', () => {
-    const finite = (x: number, df: number) => {
-      let term = 1
-      let sum = 1
-      for (let k = 1; k < df / 2; k++) {
-        term *= x / 2 / k
-        sum += term
-      }
-      return 1 - Math.exp(-x / 2) * sum
-    }
-    // absolute: 1 - exp(-x/2) sum cancels where the probability is small
-    for (const df of [4, 8, 20])
-      for (const x of [0.5, 3, 10, 30])
-        expect(Math.abs(chiSquareCdf(x, df) - finite(x, df))).toBeLessThan(1e-14)
-  })
-
-  it('1 degree of freedom: square of the normal quantile', () => {
-    // z at 0.975 = 1.959963984540054
-    close(chiSquareQuantile(0.95, 1), 1.959963984540054 ** 2, 1e-12)
-  })
-
-  it('odd degrees of freedom: integral of the density', () => {
-    // df 5: density x^1.5 exp(-x/2) / (2^2.5 Gamma(2.5)), Gamma(2.5) = 0.75 sqrt(pi); Simpson rule
-    const df = 5
-    const norm = 2 ** 2.5 * 0.75 * Math.sqrt(Math.PI)
-    const pdf = (x: number) => (x ** (df / 2 - 1) * Math.exp(-x / 2)) / norm
-    const x = 7
-    const m = 20000
-    const h = x / m
-    let sum = pdf(0) + pdf(x)
-    for (let i = 1; i < m; i++) sum += (i % 2 ? 4 : 2) * pdf(i * h)
-    close(chiSquareCdf(x, df), (sum * h) / 3, 1e-9)
-  })
-
-  it('large pooled degrees of freedom do not underflow', () => {
-    const df = 4000
-    const q = chiSquareQuantile(0.5, df)
-    expect(q).toBeGreaterThan(df - 1)
-    expect(q).toBeLessThan(df)
-    close(chiSquareCdf(q, df), 0.5, 1e-10)
-    close(chiSquareCdf(chiSquareQuantile(0.975, df), df), 0.975, 1e-10)
-  })
-})
-
-describe('F distribution with 2 and m degrees of freedom', () => {
-  it('2 and 2: the distribution function is x / (1 + x)', () => {
-    for (const p of [0.05, 0.5, 0.9, 0.99]) close(fQuantileTwoNumeratorDegrees(p, 2), p / (1 - p))
-  })
-
-  it('upper critical values of NIST/SEMATECH 1.3.6.7.3', () => {
-    const table: [number, number, number][] = [
-      [1, 199.5, 49.5],
-      [3, 9.552, 5.462],
-      [8, 4.459, 3.113],
-      [10, 4.103, 2.924],
-      [20, 3.493, 2.589],
-      [100, 3.087, 2.356],
-    ]
-    for (const [m, at95, at90] of table) {
-      expect(Math.abs(fQuantileTwoNumeratorDegrees(0.95, m) - at95)).toBeLessThan(5e-4)
-      expect(Math.abs(fQuantileTwoNumeratorDegrees(0.9, m) - at90)).toBeLessThan(5e-4)
-    }
-  })
-
-  it('large m: chi-square with 2 degrees of freedom over 2', () => {
-    close(fQuantileTwoNumeratorDegrees(0.95, 1e7), -Math.log(0.05), 1e-6)
-  })
-
-  it('rejects invalid input', () => {
-    expect(() => fQuantileTwoNumeratorDegrees(1, 3)).toThrow(InputError)
-    expect(() => fQuantileTwoNumeratorDegrees(0.5, 0)).toThrow(InputError)
-  })
-})
-
 describe('pooling', () => {
   it('two groups with the same shots relative to their centres', () => {
     const shifted = five.map((p) => ({ x: p.x + 0.05, y: p.y - 0.03 }))
@@ -542,7 +459,7 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
   }
 
   const count = 20000
-  const random = uniforms(272)
+  const random = seededUniforms(272)
   const sample = draw(random, count)
   const fresh = draw(random, count)
   const s = groupStatistics({ shots: sample, distance: 100 })
@@ -593,7 +510,7 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
   // Each trial: a new group of n shots and one further shot; the prediction ellipse holds the
   // further shot with probability `coverage` over trials, the sample ellipse less often.
   const coverageTrials = (n: number, trials: number) => {
-    const rng = uniforms(1000 + n)
+    const rng = seededUniforms(1000 + n)
     let predicted = 0
     let sampled = 0
     for (let t = 0; t < trials; t++) {
@@ -615,52 +532,6 @@ describe('ellipse and CEP coverage (seeded simulation)', () => {
       expect(sampled / trials).toBeLessThan(0.9 - 4 * Math.sqrt(0.09 / trials))
     })
   }
-})
-
-describe('chi-square survival function', () => {
-  it('keeps the upper tail where 1 minus the distribution function is 0', () => {
-    // two degrees of freedom: exp(-x / 2); four: exp(-x / 2) (1 + x / 2)
-    // the true tail is 1e-85
-    expect(1 - chiSquareCdf(400, 4)).toBe(0)
-    close(chiSquareSurvival(100, 2), Math.exp(-50), 1e-12)
-    close(chiSquareSurvival(60, 4), Math.exp(-30) * 31, 1e-12)
-    close(chiSquareSurvival(400, 4), Math.exp(-200) * 201, 1e-12)
-  })
-
-  it('adds up with the distribution function on both sides of the switch', () => {
-    for (const df of [1, 2, 3, 7, 30])
-      for (const x of [0.5, 1, df - 0.5, df, df + 2 * Math.sqrt(df), 3 * df, 80]) {
-        close(chiSquareSurvival(x, df) + chiSquareCdf(x, df), 1, 1e-13)
-      }
-    close(chiSquareSurvival(1, 1), 0.31731050786291415, 1e-12)
-    expect(chiSquareSurvival(0, 3)).toBe(1)
-    expect(chiSquareSurvival(Number.POSITIVE_INFINITY, 3)).toBe(0)
-    expect(chiSquareCdf(Number.POSITIVE_INFINITY, 2)).toBe(1)
-    expect(chiSquareCdf(1e12, 2)).toBe(1)
-    expect(() => chiSquareSurvival(1, 0)).toThrow(InputError)
-  })
-})
-
-describe('Student t two-sided quantile', () => {
-  it('gives the tabulated 95 % values for odd and even degrees of freedom', () => {
-    const table: [number, number][] = [
-      [1, 12.7062],
-      [2, 4.3027],
-      [3, 3.1824],
-      [4, 2.7764],
-      [5, 2.5706],
-      [10, 2.2281],
-      [30, 2.0423],
-    ]
-    for (const [df, t] of table) expect(studentTwoSidedQuantile(0.95, df)).toBeCloseTo(t, 3)
-  })
-
-  it('approaches the normal quantile and rejects bad inputs', () => {
-    expect(studentTwoSidedQuantile(0.95, 1000)).toBeCloseTo(1.96, 1)
-    expect(studentTwoSidedQuantile(0.99, 2)).toBeCloseTo(9.9248, 3)
-    expect(() => studentTwoSidedQuantile(1, 3)).toThrow(InputError)
-    expect(() => studentTwoSidedQuantile(0.9, 0)).toThrow(InputError)
-  })
 })
 
 describe('circular against elliptical CEP by axis ratio', () => {

@@ -34,7 +34,7 @@ function closure(file: string, root: string, prefix: string) {
   return [...seen].map(([path, label]) => ({ label, path }))
 }
 
-/** The built files the record to load step, the water density, the unit conversion and the seating read, which every model version shares. */
+/** The built files the record to load step, the water density, the unit conversion, the input checks and the seating read, which every model version shares. */
 function sharedFiles() {
   const core = dirname(fileURLToPath(import.meta.resolve('@open-reloading/core')))
   const drawing = dirname(
@@ -42,9 +42,13 @@ function sharedFiles() {
   )
   const schema = dirname(fileURLToPath(import.meta.resolve('@open-reloading/schema')))
   const units = dirname(fileURLToPath(import.meta.resolve('@open-reloading/units')))
+  const statistics = dirname(fileURLToPath(import.meta.resolve('@open-reloading/statistics')))
   return {
     core,
+    statistics,
     files: [
+      // the input checks (`need`, `InputError`) every core module raises its refusals with
+      ...closure(join(statistics, 'errors.js'), statistics, 'statistics'),
       ...closure(join(core, 'interior/record-load.js'), core, 'core'),
       // the unit table, whose water density turns every capacity into a chamber volume
       ...closure(join(units, 'units.js'), units, 'units'),
@@ -62,7 +66,7 @@ function sharedFiles() {
  * for a module that cannot be loaded or has no such export.
  */
 export async function loadModel(spec: string): Promise<Model> {
-  const { core, files } = sharedFiles()
+  const { core, statistics, files } = sharedFiles()
   // this file is built as .js and tested as .ts: the estimator has the same extension
   const here = fileURLToPath(import.meta.url)
   const cli = dirname(here)
@@ -70,6 +74,8 @@ export async function loadModel(spec: string): Promise<Model> {
   const coreModel = [
     ...files,
     ...closure(join(core, 'interior/model.js'), core, 'core'),
+    // the bisection of the model's start and its grain forms
+    ...closure(join(statistics, 'bisect.js'), statistics, 'statistics'),
     // the estimator of a powder not in the fitted set, unused by the runs, kept so the published versions stay valid
     ...closure(join(cli, `unseen${extname(here)}`), cli, 'cli'),
   ]

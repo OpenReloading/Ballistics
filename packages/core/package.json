@@ -44,6 +44,7 @@
     "test": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
+    "@open-reloading/statistics": "workspace:*",
     "@open-reloading/units": "workspace:*"
   },
   "devDependencies": {

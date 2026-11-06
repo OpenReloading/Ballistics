@@ -97,11 +97,11 @@
   },
   "packages/core/src/node-fs.ts": {
     "source": "import { readFileSync } from 'node:fs'\nexport { readFileSync }",
-    "rules": ["core-imports-units-only"]
+    "rules": ["core-imports-units-and-statistics"]
   },
   "packages/core/src/npm-package.ts": {
     "source": "import { z } from 'zod'\nexport { z }",
-    "rules": ["core-imports-units-only"]
+    "rules": ["core-imports-units-and-statistics"]
   },
   "packages/core/src/missing.ts": {
     "source": "import './nope.ts'",
@@ -217,7 +217,7 @@
   },
   "packages/core/src/react.ts": {
     "source": "import { useMemo } from 'react'\nexport { useMemo }",
-    "rules": ["core-imports-units-only"]
+    "rules": ["core-imports-units-and-statistics"]
   },
   "packages/core/src/dom.ts": {
     "source": "export const title = () => document.title",
@@ -225,11 +225,11 @@
   },
   "packages/core/src/into-web.ts": {
     "source": "import type { SpecValue } from '../../../apps/web/src/lib/api-types.ts'\nexport type Spec = SpecValue",
-    "rules": ["core-imports-units-only"]
+    "rules": ["core-imports-units-and-statistics"]
   },
   "packages/core/src/app-package.ts": {
     "source": "import { App } from '@open-reloading/web'\nexport { App }",
-    "rules": ["core-imports-units-only"]
+    "rules": ["core-imports-units-and-statistics"]
   },
   "packages/units/src/dom.ts": {
     "source": "export const w = () => window.innerWidth",
@@ -282,6 +282,26 @@
   "packages/importers/src/schema-subpath.ts": {
     "source": "import load from '@open-reloading/schema/json-schema/load.json' with { type: 'json' }\nexport { load }",
     "rules": ["importers-imports-schema-only"]
+  },
+  "packages/core/src/statistics-package.ts": {
+    "source": "import { bisect } from '@open-reloading/statistics'\nexport { bisect }",
+    "rules": []
+  },
+  "packages/statistics/src/own.ts": {
+    "source": "import { need } from './errors.ts'\nexport { need }",
+    "rules": []
+  },
+  "packages/statistics/src/units-package.ts": {
+    "source": "import { toSi } from '@open-reloading/units'\nexport { toSi }",
+    "rules": ["statistics-imports-nothing"]
+  },
+  "packages/statistics/src/npm-package.ts": {
+    "source": "import { z } from 'zod'\nexport { z }",
+    "rules": ["statistics-imports-nothing"]
+  },
+  "packages/statistics/src/into-core.ts": {
+    "source": "import { interior } from '../../core/src/index.ts'\nexport { interior }",
+    "rules": ["statistics-imports-nothing"]
   },
   "packages/units/test/same-title.test.ts": {
     "source": "import { it } from 'vitest'\nit('runs', () => {})\nit('runs', () => {})",

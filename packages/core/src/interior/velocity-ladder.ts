@@ -3,8 +3,9 @@
  * from the mean, spread and shot count of each string
  * (`apps/docs/docs/models/interior-velocity-ladder.md`). SI throughout: charge kg, velocity m/s.
  */
+
+import { studentTwoSidedQuantile } from '@open-reloading/statistics'
 import { need, nth } from '../errors.ts'
-import { studentTwoSidedQuantile } from '../groups/student-t.ts'
 
 /** One string of a ladder: the charge, the mean and sample standard deviation of its velocities, and its shot count. */
 export interface LadderStep {

@@ -2,8 +2,9 @@
  * Probability of a hit and expected score on a target face from a point dispersion
  * (`apps/docs/docs/models/hit-probability.md`). SI throughout: lengths m, speeds m/s, angles rad.
  */
+
+import { chiSquareCdf } from '@open-reloading/statistics'
 import { need, nth } from '../errors.ts'
-import { chiSquareCdf } from './chi-square.ts'
 
 /** A scoring zone: an ellipse about the aim point with the value a hit inside it scores. */
 export interface ScoringZone {

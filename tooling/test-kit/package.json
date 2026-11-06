@@ -1,0 +1,40 @@
+{
+  "name": "@open-reloading/test-kit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Test helpers of the logic packages: a tolerance matcher and typed arbitraries.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenReloading/Ballistics.git",
+    "directory": "tooling/test-kit"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc --noEmit && tsc -p test",
+    "lint": "oxlint --type-aware --deny-warnings --report-unused-disable-directives",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "fast-check": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -28,7 +28,7 @@ $$
 r_i(\theta) = \frac{\hat y_i(\theta) - y_i}{\sigma_i}, \qquad \chi^2(\theta) = \sum_{i=1}^{n} r_i^2
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chi2`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`residuals`, `chiSquareOf`).
 
 $\sigma_i = 1$ for unweighted observations.
 
@@ -40,7 +40,7 @@ $$
 L_k(r) = \begin{cases} r^2 & \lvert r \rvert \le k \\ 2k\lvert r \rvert - k^2 & \lvert r \rvert \gt k \end{cases}, \qquad \text{cost} = \sum_{i \le n_h} L_k(r_i) + \sum_{i \gt n_h} r_i^2
 $$
 
-Code: `packages/core/src/huber.ts`, `huberLoss`, `huberCost`.
+Code: `packages/statistics/src/huber.ts`, `huberLoss`, `huberCost`.
 
 Both pieces join at $\lvert r \rvert = k$ with the same value and slope, and $L_k = r^2$ without outliers. The step below minimizes this cost: the candidate must lower it to be accepted. `LogFitResult.chiSquare` stays the sum of $r_i^2$ and `loss` is the cost. The loss needs weighted observations, since $k$ is in units of $\sigma_i$.
 
@@ -52,7 +52,7 @@ $$
 J_{ij} = \frac{\hat y_i(\theta + h\,e_j) - \hat y_i(\theta - h\,e_j)}{2 h\, \sigma_i}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`jacobian`, `step`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`jacobian`, `step`).
 
 The observations can be stacked from several runs (sessions). A parameter that does not move a run has zero entries in that run's rows, and its predictions are not evaluated there (`moves`). A candidate whose prediction fails while forming the Jacobian ends the fit with reason `unreachable`.
 
@@ -62,7 +62,7 @@ $$
 \left(J^\top W J + \lambda\, \operatorname{diag}\!\left(J^\top W J\right)\right)\delta = -J^\top W r, \qquad W_{ii} = \begin{cases} k / \lvert r_i \rvert & i \le n_h,\ \lvert r_i \rvert \gt k \\ 1 & \text{otherwise} \end{cases}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`damped`, `delta`, `lambda0`), `packages/core/src/huber.ts`, `huberRoots`.
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`damped`, `delta`, `lambda0`), `packages/statistics/src/huber.ts`, `huberRoots`.
 
 Without a Huber loss $W$ is the identity. With it, $W$ is the weight of iteratively reweighted least squares at the current residuals: it is the slope of the loss over $2r$, so the step uses the gradient of the cost.
 - The damping starts at $\lambda = 10^{-3}$.
@@ -75,11 +75,11 @@ $$
 \frac{\chi^2_\text{old} - \chi^2_\text{new}}{\chi^2_\text{old}} \lt \epsilon \ \text{or}\ \chi^2_\text{new} = 0 \ \text{(accepted step)}, \qquad \max_j \lvert \delta_j \rvert \lt 10^{-8} \ \text{(step not applied)}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`stalled`, `small`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`stalled`, `small`).
 
 The result names the rule that ended the loop in `stop`: `stalled` for the first condition, `smallStep` for the second. Under a Huber loss the weights follow the residuals, so a row can cross the threshold on the last step. `weightsSettled` is true when the set of rows beyond the threshold was the same before and after the last accepted step, and always true without a Huber loss or without an accepted step. When it is false, the stop rule fired while the weights were still moving, and the fitted values may differ from those of a longer run.
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`stop`, `weightsSettled`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`stop`, `weightsSettled`).
 
 The tolerance $\epsilon$ is $10^{-12}$ unless the caller sets `tolerance`. The [curve fit](interior-curve-fit.md) sets $10^{-9}$: correlated form parameters leave a flat valley in which steps still gain a small share of $\chi^2$ long after the parameters have moved by far less than their uncertainty.
 
@@ -93,7 +93,7 @@ $$
 A^{-1} = \sum_k \frac{u_k u_k^\top}{\mu_k}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `inverse`.
+Code: `packages/statistics/src/least-squares.ts`, `inverse`.
 
 The eigenvalues come from the cyclic Jacobi method. Each rotation zeroes the entry $a_{pq}$ with
 
@@ -101,7 +101,7 @@ $$
 \vartheta = \frac{a_{qq} - a_{pp}}{2\, a_{pq}}, \qquad t = \frac{\operatorname{sgn}\vartheta}{\lvert\vartheta\rvert + \sqrt{\vartheta^2 + 1}}, \qquad c = \frac{1}{\sqrt{t^2 + 1}}, \qquad s = t\,c
 $$
 
-Code: `packages/core/src/least-squares.ts`, `eigen`.
+Code: `packages/statistics/src/least-squares.ts`, `eigen`.
 
 Here the sign factor is $-1$ for $\vartheta < 0$ and $+1$ for $\vartheta \ge 0$, including $\vartheta = 0$.
 
@@ -115,7 +115,7 @@ $$
 D_{jj} = \lVert J_{:,j} \rVert, \qquad J_s = J D^{-1}, \qquad \kappa = \sqrt{\frac{\mu_\text{max}\!\left(J_s^\top J_s\right)}{\mu_\text{min}\!\left(J_s^\top J_s\right)}}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares`, `checkConditioning` (`norms`, `condition`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares`, `checkConditioning` (`norms`, `condition`).
 
 A parameter is unresolved when $D_{jj} = 0$, when $D_{jj} \lt 10^{-9} \max_k D_{kk}$, or when every entry of its column lies below the noise floor of its row:
 
@@ -123,7 +123,7 @@ $$
 \lvert J_{ij} \rvert \lt \text{floor}_i \quad \text{for all } i
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares`, `checkConditioning` (`unresolved`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares`, `checkConditioning` (`unresolved`).
 
 The caller sets the floor of each row. The check runs at the start, at the solution and after `maxIterations`. The fit fails with:
 - `unresolved`, naming the parameters
@@ -135,13 +135,13 @@ $$
 C_\theta = s^2 \left(J^\top W J\right)^{-1}, \qquad s^2 = \begin{cases} 1 & \text{every observation has its own } \sigma_i \\ \chi^2 / (n - p) & \text{otherwise} \end{cases}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`scale`, `covariance`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`scale`, `covariance`).
 
 $$
 \sigma_{\theta_j} = \sqrt{C_{\theta,jj}}, \qquad \rho_{jk} = \frac{C_{\theta,jk}}{\sqrt{C_{\theta,jj}\, C_{\theta,kk}}}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `logLeastSquares` (`standardUncertainty`, `correlation`).
+Code: `packages/statistics/src/least-squares.ts`, `logLeastSquares` (`standardUncertainty`, `correlation`).
 
 With a Huber loss, $W$ is taken at the solution, so a residual beyond the threshold adds less information. This is the Laplace approximation of the posterior for a likelihood proportional to $e^{-L_k/2}$, with $W$ standing for the curvature of $L_k$. The Jacobian is formed again at the solution unless the last iteration already holds it. Without weights and with $n \le p$ there is no covariance. Because $\theta_j$ is a logarithm, $\sigma_{\theta_j}$ is the relative standard error of $q_j$, and the callers report $q_j\,\sigma_{\theta_j}$ (for the start pressure of the powder fit, its excess over the floor times $\sigma_{\theta_j}$).
 
@@ -153,7 +153,7 @@ $$
 F = J^\top J, \qquad D = \operatorname{diag}\!\left(\sqrt{F_{jj}}\right), \qquad R = D^{-1} F D^{-1}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `identifiability`.
+Code: `packages/statistics/src/least-squares.ts`, `identifiability`.
 
 With the eigenvalues $\mu_k$ and eigenvectors $u_k$ of $R$, the inverse is formed with the eigenvalues floored at $10^{-12}\mu_\text{max}$:
 
@@ -161,7 +161,7 @@ $$
 \left(R^{-1}\right)_{ab} = \sum_k \frac{u_{ak}\, u_{bk}}{\max\!\left(\mu_k,\ 10^{-12} \mu_\text{max}\right)}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `identifiability` (`floor`, `lambda`, `inv`).
+Code: `packages/statistics/src/least-squares.ts`, `identifiability` (`floor`, `lambda`, `inv`).
 
 Standard error with the other parameters free and with them known, variance inflation, and condition number:
 
@@ -169,13 +169,13 @@ $$
 \sigma_j = \frac{\sqrt{\left(R^{-1}\right)_{jj}}}{D_{jj}}, \qquad \sigma_j^\text{cond} = \frac{1}{D_{jj}}, \qquad \mathrm{VIF}_j = \left(R^{-1}\right)_{jj} = \left(\frac{\sigma_j}{\sigma_j^\text{cond}}\right)^2, \qquad \kappa = \sqrt{\frac{\mu_\text{max}}{\mu_\text{min}}}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `identifiability` (`standardUncertainty`, `conditionalSigma`, `varianceInflation`, `conditionNumber`).
+Code: `packages/statistics/src/least-squares.ts`, `identifiability` (`standardUncertainty`, `conditionalSigma`, `varianceInflation`, `conditionNumber`).
 
 $$
 \rho_{ab} = \frac{\left(R^{-1}\right)_{ab}}{\sqrt{\left(R^{-1}\right)_{aa} \left(R^{-1}\right)_{bb}}}
 $$
 
-Code: `packages/core/src/least-squares.ts`, `identifiability` (`correlation`).
+Code: `packages/statistics/src/least-squares.ts`, `identifiability` (`correlation`).
 
 The design is singular when $\mu_\text{min} \le 10^{-12}\mu_\text{max}$. Then $\kappa$ is infinite, and a parameter with $u_{j,\text{min}}^2 \gt 10^{-12}\mu_\text{max}$ in the eigenvector of $\mu_\text{min}$ gets an infinite $\sigma_j$ and $\mathrm{VIF}_j$ (`unbounded`). Parameters outside that direction keep finite values, and the correlations stay finite through the floor. `direction` returns the eigenvector of $\mu_\text{min}$.
 

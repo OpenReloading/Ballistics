@@ -6,8 +6,8 @@
  * with one shift each, `apps/docs/docs/models/interior-curve-fit.md`. SI in and out.
  */
 
+import { identifiability, logLeastSquares } from '@open-reloading/statistics'
 import { InputError, need, nth, type Settings } from '../errors.ts'
-import { identifiability, logLeastSquares } from '../least-squares.ts'
 import { PowderFitError } from './fit.ts'
 import {
   type InteriorInvalid,
