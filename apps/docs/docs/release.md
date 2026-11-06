@@ -63,9 +63,9 @@ Publishing is off until the settings below exist, `pnpm run pack:check` passes a
 The stored and published contracts besides the API each have a committed baseline that a test compares with the build (`pnpm test`, the CI `test` groups `packages` and `web`):
 - The JSON Schemas the schema build writes: `packages/schema/test/golden/json-schema/`.
 - The export list (values and types) of each published package: `tools/test/golden/exports/<name>.txt`, one line per entry point and name.
-- A user data file with a record of each kind, which the current code must read and write back unchanged, and a share link of two of its records: `apps/web/test/golden/`.
+- Per format version of the user data file (`user-data-v<version>.json`): a file with a record of each kind, which the current code must read and write back unchanged, and which the next version refuses as a whole; share links of its records, one with text beyond ASCII (`share-link-v<version>.txt`, `share-link-text-v<version>.txt`): `apps/web/test/golden/`.
 
-`pnpm run baselines` (after `pnpm run build`) rewrites the JSON Schemas, the export lists and the share link from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
+`pnpm run baselines` (after `pnpm run build`) rewrites the JSON Schemas, the export lists and the share links from the build. The user data file is edited by hand, so its diff shows what an older file needs. Before 1.0.0 a pull request may rewrite a baseline in the same change. From 1.0.0 on, a rewrite is a breaking change and its pull request title carries the `!` marker.
 
 ## 1.0.0 release
 
