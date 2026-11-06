@@ -294,7 +294,7 @@ describe('priors coverage', () => {
   )
 })
 
-describe('priors maximum a posteriori centre', () => {
+describe('priors maximum a posteriori center', () => {
   // One impact at the zero range: the offset e is the only live column and the model is linear,
   // impact = 100 m * e. 4 shots of 0.016 m make the standard uncertainty of the row 0.008 m, so
   // the data say e = y / 100 with sigma_d = 8e-5 rad. With the prior e ~ N(0, s^2) the posterior

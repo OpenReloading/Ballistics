@@ -1,7 +1,6 @@
-// the statistics this package exported before they moved to their own package
-
 // the exterior models, the drag tables and the options bags, moved to their own package
 export * from '@open-reloading/ballistics'
+// the statistics this package exported before they moved to their own package
 export {
   chiSquareCdf,
   chiSquareQuantile,
