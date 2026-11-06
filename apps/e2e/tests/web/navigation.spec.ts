@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
+import type { Message } from '../../../web/src/i18n/translate.ts'
 import { sections } from '../../../web/src/lib/sections.ts'
 import { exported, followNav, gotoHydrated } from './nav.ts'
 
-const pages = sections.flatMap((s) => s.pages)
+const pages = sections.flatMap((s): readonly { href: string; label: Message }[] => s.pages)
 // a tool page and a data page: the links all come from `sections`, the lists below check every one
 const visited = pages.filter(({ href }) => href === '/workbench' || href === '/cartridges')
 // the value the web app was built with: set, the shell shows Report an issue and the repository link

@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { defined } from '../../../web/test/defined.ts'
 import { barButton } from './bar.ts'
 import { storeUnits } from './units.ts'
 import { putRecords } from './user-store.ts'
@@ -117,7 +118,7 @@ test('a load saved on a design keeps the design by reference and reopens with it
   await expect
     .poll(async () => (await stored())[0]?.data.cartridge)
     .toBe('user:6f0f4d3e-0a43-4a43-9a3d-3a2f2e1f0c21')
-  const [{ name }] = await stored()
+  const { name } = defined((await stored())[0])
 
   // another load, then the saved one: the design is back, from the design's own values
   await page.goto('/workbench')

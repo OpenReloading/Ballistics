@@ -1,6 +1,5 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page, test } from '@playwright/test'
-import { height, problems } from './a11y.ts'
+import { AxeBuilder, height, problems } from './a11y.ts'
 import { showGerman } from './german.ts'
 import { gotoHydrated } from './nav.ts'
 import { settingsEntry, storeUnits } from './units.ts'
@@ -117,7 +116,7 @@ test('the designers in German at 1280 px keep the title, every action, Safety an
     ['/bullets/designer/', 'Geschoss-Editor'],
     ['/cartridges/designer/', 'Patronen-Editor'],
     ['/targets/designer/', 'Scheiben-Editor'],
-  ]) {
+  ] as const) {
     await gotoHydrated(page, path)
     const bar = page.locator('.page-bar')
     const h1 = bar.getByRole('heading', { level: 1, name: title })
