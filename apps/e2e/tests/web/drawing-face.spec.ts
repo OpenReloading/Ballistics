@@ -36,9 +36,8 @@ test("the designer's views switch by keyboard, keeping the frame and the axis", 
   await page.goto('/cartridges/designer?from=308-win')
   const drawing = page.locator('svg[aria-labelledby="designer-drawing-title"]')
   const views = page.getByRole('radiogroup', { name: /^View/ })
-  const [cartridge, chamber, combined] = ['Cartridge', 'Chamber', 'Combined'].map((name) =>
-    views.getByRole('radio', { name }),
-  )
+  const view = (name: string) => views.getByRole('radio', { name })
+  const [cartridge, chamber, combined] = [view('Cartridge'), view('Chamber'), view('Combined')]
   // Combined first once both sides are given; the cartridge view picked
   await expect(combined).toBeChecked()
   await views.getByText('Cartridge', { exact: true }).click()

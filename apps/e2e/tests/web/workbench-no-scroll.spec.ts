@@ -77,7 +77,7 @@ for (const [width, height, shown] of [
       test.setTimeout(60_000)
       await page.setViewportSize({ width, height })
       await runExample(page)
-      if (ladder) await runLadder(page, ...ladder)
+      if (ladder) await runLadder(page, ladder[0], ladder[1])
       // the sampled band and its note follow the result
       await expect(
         page.locator('.result-notes li', { hasText: /(Velocity|Sampled)/ }),
@@ -96,7 +96,7 @@ for (const [state, ladder] of [states[0], states[1]])
     test.setTimeout(60_000)
     await page.setViewportSize({ width: 1280, height: 650 })
     await runExample(page)
-    if (ladder) await runLadder(page, ...ladder)
+    if (ladder) await runLadder(page, ladder[0], ladder[1])
     await showGerman(page)
     await expect(page.locator('.readouts dt', { hasText: 'Ladedichte' }).first()).toBeVisible()
     await expect(
